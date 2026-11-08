@@ -91,7 +91,7 @@ assert.deepStrictEqual(mut_log, ['dialog', 'page']);
 assert.isUndefined(getOwner());
 ```
 
-synstate-dom-next builds its whole lifetime on this: `render` makes the root owner, and every branch of a switch and every row of a list mounts in an owner of its own.
+synstate-dom-next builds its whole lifetime on this: `render` makes the root owner, and every branch of `If`, `Switch` and the other branch components, and every row of a list, mounts in an owner of its own.
 
 ## Outside every owner
 
@@ -142,7 +142,7 @@ setCount(3);
 assert.strictEqual(s.value, 9);
 ```
 
-Effects and the recomputation of derived nodes always run with no owner current, so what a subscriber creates does not belong to whichever owner happened to make the write.
+Subscribers, bindings and the recomputation of derived values always run with no owner current, so what a subscriber creates does not belong to whichever owner happened to make the write.
 
 ## No completion
 

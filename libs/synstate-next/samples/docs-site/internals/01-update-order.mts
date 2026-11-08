@@ -35,10 +35,10 @@ if (import.meta.vitest !== undefined) {
     setA(2);
 
     assert.deepStrictEqual(mut_log.slice(start), [
-      // The drain: each node once, after its parents.
+      // Recomputing: each node once, after its parents.
       'compute b from a = 2',
       'compute c from a = 2, b = 3',
-      // The effects, on a settled graph: a's effect already sees the new c.
+      // The effects, every value up to date: a's effect already sees the new c.
       'effect of a: a = 2, c = 5',
       'effect of c: c = 5',
     ]);

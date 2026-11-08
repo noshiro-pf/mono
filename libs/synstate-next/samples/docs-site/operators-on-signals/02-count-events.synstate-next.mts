@@ -20,7 +20,7 @@ if (import.meta.vitest !== undefined) {
     click('A'); // every emission is an event, equal or not
 
     batch(() => {
-      // two clicks in one batch: each is delivered in a round of its own
+      // two clicks in one batch: each is delivered in an update of its own
       click('B');
 
       click('C');

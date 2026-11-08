@@ -342,7 +342,7 @@ describe('a write nothing observes', () => {
 });
 
 describe('an update that keeps starting another', () => {
-  const loop = /round/u;
+  const loop = /more than 100 updates in a row/u;
 
   test('a subscriber that writes back to its own state is stopped with an error', () => {
     const a = state(0);

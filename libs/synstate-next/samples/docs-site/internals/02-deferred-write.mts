@@ -2,7 +2,7 @@ import { createState, map } from 'synstate-next';
 
 // embed-sample-code-ignore-below
 if (import.meta.vitest !== undefined) {
-  test('a write in the drain waits for the round to end', () => {
+  test('a write made while values are recomputed waits for the update to end', () => {
     // embed-sample-code-ignore-above
     const [a, setA] = createState(0);
 
@@ -30,13 +30,13 @@ if (import.meta.vitest !== undefined) {
 
     setA(1);
 
-    // The write waits, and the effects of this round still see the old value.
+    // The write waits, and the effects of this update still see the old value.
     assert.deepStrictEqual(mut_log.slice(start), [
       'b = 0 right after setB(10)',
       'b = 0 in the effects',
     ]);
 
-    // Applied after the effects, it started the next round.
+    // Applied after the effects, it started the next update.
     assert.strictEqual(b.value, 10);
 
     // embed-sample-code-ignore-below

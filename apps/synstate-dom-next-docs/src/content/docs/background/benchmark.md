@@ -60,7 +60,7 @@ Each library's time divided by synstate-dom's. Below 1.00× means faster than sy
 synstate-dom-next took <!-- benchmark:next-over-dom-min -->0.78<!-- /benchmark -->× to <!-- benchmark:next-over-dom-max -->1.00<!-- /benchmark -->× synstate-dom's time, and at most <!-- benchmark:next-over-solid-max -->1.31<!-- /benchmark -->× Solid's, depending on the operation.
 
 - **Creating and clearing rows** costs less per row. A row's bindings are one object each instead of a closure, a subscriber and a cleanup, and removing a row disposes its owner with no completion to send through its nodes ([How it works](/mono/synstate-dom-next/background/how-it-works/#why-it-is-faster-than-synstate-dom)). What remains between it and Solid is template cloning: Solid clones a compiled `<template>` per row, where synstate-dom-next calls `createElement` for each node.
-- **Partial updates** replace the whole array, as the documentation recommends. The keys are the same, so `For` skips the diff and sets each element into its row's state; the equality cut-off stops the 900 rows whose element is the same object at the state itself, and only the 100 changed rows reach their bindings.
+- **Partial updates** replace the whole array, as the documentation recommends. The keys are the same, so `For` skips the diff and sets each element into its row's state; the 900 rows whose element is the same object stop at the state itself, since the value did not change, and only the 100 changed rows reach their bindings.
 - **Selecting a row** writes to two rows through `selector`, as Solid's `createSelector` does; synstate-dom ran a `map` in each of the 1,000 rows.
 - **Swapping two rows** moves two rows in every library, so there is little for a library to save.
 
@@ -116,7 +116,7 @@ Each scenario also times building the screen, which builds the whole graph. **sy
 
 - **Building a screen** builds a node per figure. synstate-dom-next takes <!-- benchmark:build-next-over-dom-min -->0.33<!-- /benchmark -->× synstate-dom's time at best, because a node is a class instance with its methods on a prototype and its owner keeps it in a plain list.
 - **A change that stops partway** (lengthening a task in the middle, zooming within a level) is cheap for both generations of synstate, which visit only the children of a node that passed a value on; Solid first marks everything downstream as possibly stale and then checks it.
-- **A change that travels far** (changing the rate, lengthening the first task, zooming to the next level) is where the drain's cost per node shows: no update token per write, one queue driven by an integer, and each node visited once.
+- **A change that travels far** (changing the rate, lengthening the first task, zooming to the next level) is where the scheduler's cost per node shows: no object allocated to mark an update, one queue driven by an integer, and each node visited once.
 - **Correctness comes first.** After each operation the harness compares the rendered cells with the figures a plain loop computes, and a library that rendered others is marked _wrong_ instead of timed.
 
 A change here takes well under a millisecond, so the scenarios wait for the next task through a `MessageChannel` rather than a `setTimeout`, which the browser holds back to 4 ms, and one sample is the mean of 20 changes, alternating the operation and its reverse.

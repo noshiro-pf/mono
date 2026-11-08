@@ -21,7 +21,7 @@ export type Selector<K> = Readonly<{
  * Selection in a list: `selector(selected).is(id)` is `true` while `selected`
  * holds `id`. When `selected` changes, only the observables of the old and the
  * new key are written, however many keys are watched, where a
- * `selected.pipe(map((s) => s === id))` per row wakes every row.
+ * `selected.pipe(map((s) => s === id))` per row recomputes every row.
  *
  * The writes start an update of their own, after the one that changed
  * `selected`. An `is` observable belongs to the owner it was made in, and is

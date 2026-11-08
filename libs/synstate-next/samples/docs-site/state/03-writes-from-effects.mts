@@ -23,7 +23,7 @@ if (import.meta.vitest !== undefined) {
 
     setCelsius(100);
 
-    // The subscriber's write is a round of its own, so `label` showed the
+    // The subscriber's write is an update of its own, so `label` showed the
     // update half done.
     assert.deepStrictEqual(mut_labels, [
       '0°C = 32°F',

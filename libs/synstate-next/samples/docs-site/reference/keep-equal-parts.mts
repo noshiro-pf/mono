@@ -19,7 +19,7 @@ if (import.meta.vitest !== undefined) {
     // A fresh object from the server, with the same tags.
     receive({ name: 'b', tags: ['x'] });
 
-    // The tags kept their reference, so nothing below `tags` was woken.
+    // The tags kept their reference, so nothing below `tags` was recomputed.
     assert.strictEqual(tags.peek(), first);
 
     assert.strictEqual(user.peek()?.name, 'b');

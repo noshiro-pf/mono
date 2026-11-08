@@ -46,7 +46,7 @@ The node holds nothing until it is first set, unless you give `{ initialValue }`
 
 ## Several parents
 
-A node with several parents is woken when any of them emits. `ctx.emitted(parent)` says which of them did in this update:
+A node with several parents is recomputed when any of them emits. `ctx.emitted(parent)` says which of them did in this update:
 
 ```tsx
 import {
@@ -69,7 +69,7 @@ const mergeTagged = <A, B>(
 
         const b = second.peek();
 
-        // `emitted` tells which parent woke this update.
+        // `emitted` tells which parent emitted in this update.
         if (a !== undefined && ctx.emitted(first)) {
             ctx.set({ from: 'left', value: a });
         } else if (b !== undefined && ctx.emitted(second)) {
@@ -99,7 +99,7 @@ assert.deepStrictEqual(mut_seen, [
 
 ## An async operator
 
-A value that comes later than the update that woke the node is passed on with `ctx.emit(value)`, in an update of its own. Such an operator gives `settled` too, so that it is not taken for done while a value is still due: `mergeMap` lets go of an inner observable once it is settled. Register what to stop with `ctx.onCleanup`:
+A value that comes later than the update that made the node recompute is passed on with `ctx.emit(value)`, in an update of its own. Such an operator gives `settled` too, so that it is not taken for done while a value is still due: `mergeMap` lets go of an inner observable once it is settled. Register what to stop with `ctx.onCleanup`:
 
 ```tsx
 import {
@@ -211,7 +211,7 @@ assert.deepStrictEqual(mut_types, ['click']);
 
 ## What you cannot do
 
-- **Read an observable that is not a parent from `update`.** A node is placed below its parents, so it reads their values after they settled. Another observable may not have been recomputed yet in this update. Make it a parent, and ask `ctx.emitted` which parent woke the update.
+- **Read an observable that is not a parent from `update`.** A node is placed below its parents, so it reads their values once they are up to date. Another observable may not have been recomputed yet in this update. Make it a parent, and ask `ctx.emitted` which parent emitted in this update.
 - **Create nodes in `update`.** `update` runs in the update, outside any owner, so a node made there belongs to none: it is never disposed, stays attached to its parents and is recomputed with them from then on. Create what the node needs in `setup`.
 - **Follow a node you create yourself.** A node made in `setup` is not a parent: it is visited in the same update as this one, not before it, so `update` would read its value from before the update. What `setup` creates is for work on the side (a subscription, a listener). An operator that follows observables it creates is a `switchMap` or a `mergeMap`.
 - **Combine observables from two copies of synstate-next.** `createDerived` throws for a parent from another copy.

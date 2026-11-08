@@ -176,7 +176,7 @@ const tableSliced = derive(
 );
 
 // `renderTable` and `renderError` stand for the view.
-// Runs once each update has settled, with every value above consistent.
+// Runs once every value above is up to date, consistent with each other.
 tableSliced.subscribe(renderTable);
 
 fetchError.subscribe((error) => {
@@ -190,7 +190,7 @@ fetchError.subscribe((error) => {
 - **順序はグラフが決めます。** 読むものより先に計算されるものはありません。各ノードの深さが、親の後に来るように置きます。
 - **リセットは 1 か所です。** `pageReset` が、テーブルを 1 ページ目に戻すもの、つまり新しい行（デバウンスの後、またはデータが届いたとき）と新しいページサイズを示します。リセットは、何も書き足さなくてもデバウンスを待ちます。要求したページはイベントなので、リセット前に持っていたページをもう一度要求しても、テーブルに届きます。
 - **取得もエラーも値です。** `fromPromise` がサーバーの応答を `Result` としてグラフに入れ、`fetchError` は派生値の 1 つにすぎません。
-- **購読者は常に一貫したテーブルを見ます。** `tableSliced` の購読者は更新が落ち着いてから実行され、フィルター・ページ数・ページはすべて同じ更新のものです。
+- **購読者は常に一貫したテーブルを見ます。** `tableSliced` の購読者は更新のすべての値が新しくなった後で実行され、フィルター・ページ数・ページはすべて同じ更新のものです。
 - **値を足すのは `derive` 1 つです。** 既存のものは何も変わりません。
 
 ## 次に読むもの

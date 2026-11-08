@@ -133,7 +133,7 @@ export const createSearchView = (): SearchView => {
 };
 ```
 
-`switchMap` passes on the inner observable's first value, the loading state, within the update that changed the query, so `view`, below both, runs once with `ab / loading for ab`, and once more with `ab / success for ab` when the answer arrives. (`switchMap` also projects the `'a'` that `query` holds when it is created, so `a` is requested as the Preact effect requests it.) There is no order to get wrong: a derived node runs at its depth in the graph, not in the order it was created, and the subscriber runs after every derived node, against a graph that has settled.
+`switchMap` passes on the inner observable's first value, the loading state, within the update that changed the query, so `view`, below both, runs once with `ab / loading for ab`, and once more with `ab / success for ab` when the answer arrives. (`switchMap` also projects the `'a'` that `query` holds when it is created, so `a` is requested as the Preact effect requests it.) There is no order to get wrong: a derived node runs at its depth in the graph, not in the order it was created, and the subscriber runs after every derived node, once every value is up to date.
 
 Not every library is in this position. Jotai's async atoms and Solid's `createResource` are derived nodes of their own graphs, and the same view written with them (`unwrap`, `resource.loading`) runs once per query. MobX, where the request is a `reaction` that writes an observable, behaves as Preact Signals does. The [Evaluation models](/mono/synstate-next/comparison/libraries/#evaluation-models) table lists each library.
 
@@ -170,7 +170,7 @@ batch(() => {
 // 4 clicks, counted as 2
 ```
 
-In synstate-next, an emitter's every emission is an event, whatever its value, and emissions given inside a `batch` are each delivered in a round of their own ([State and writes](/mono/synstate-next/guides/state-and-writes/)):
+In synstate-next, an emitter's every emission is an event, whatever its value, and emissions given inside a `batch` are each delivered in an update of their own ([State and writes](/mono/synstate-next/guides/state-and-writes/)):
 
 ```tsx
 import { batch, createValueEmitter, scan } from 'synstate-next';
@@ -191,7 +191,7 @@ click('A');
 click('A'); // every emission is an event, equal or not
 
 batch(() => {
-    // two clicks in one batch: each is delivered in a round of its own
+    // two clicks in one batch: each is delivered in an update of its own
     click('B');
 
     click('C');
@@ -200,7 +200,7 @@ batch(() => {
 // 4 clicks, counted as 4
 ```
 
-`createState` holds a state, as a signal does: it drops a write equal to the value it holds, and when it is written more than once before its round (in a `batch`, while the derived values are computed, or by effects of the same round), what follows sees one value, the one it holds when the round starts; an event goes through `createValueEmitter` or `source`, which pass on every emission. With Preact Signals alone, the click handler would count the click itself. That works, and it is the point: the counting is code at the place that writes, not an operator that can be put after any signal.
+`createState` holds a state, as a signal does: it drops a write equal to the value it holds, and when it is written more than once before its update (in a `batch`, while the derived values are computed, or by subscribers of the same update), what follows sees one value, the one it holds when the update starts; an event goes through `createValueEmitter` or `source`, which pass on every emission. With Preact Signals alone, the click handler would count the click itself. That works, and it is the point: the counting is code at the place that writes, not an operator that can be put after any signal.
 
 ## What fixing it would take
 
@@ -214,6 +214,6 @@ A consistent graph for every reader and an event for every emission are not oper
 
 ## Building the UI on synstate-next
 
-The way to put synstate-next on the screen is [synstate-dom-next](/mono/synstate-dom-next/). It binds observables directly to the DOM: a component runs once, and an update goes from the graph straight to the attribute, property or text node bound to it, with no virtual DOM and no component re-run. Its bindings are effects of the same scheduler, so they run after the derived values of each round, as a subscriber does. The search step above is then one graph from the query to what the page shows, with no point where an observable has to become something else, and one owner that tears down a component's requests, timers and bindings together.
+The way to put synstate-next on the screen is [synstate-dom-next](/mono/synstate-dom-next/). It binds observables directly to the DOM: a component runs once, and an update goes from the graph straight to the attribute, property or text node bound to it, with no virtual DOM and no component re-run. Its bindings run on the same scheduler, so they run after the derived values of each update, as a subscriber does. The search step above is then one graph from the query to what the page shows, with no point where an observable has to become something else, and one owner that tears down a component's requests, timers and bindings together.
 
-synstate-next has no bridge to Preact Signals yet. Where a pipeline's result has to reach another library, `subscribe` hands it every settled value, and the seam is where the guarantees above stop: every value that crosses it is converted, and an event that enters a signal becomes a value.
+synstate-next has no bridge to Preact Signals yet. Where a pipeline's result has to reach another library, `subscribe` hands it every value once it is up to date, and the seam is where the guarantees above stop: every value that crosses it is converted, and an event that enters a signal becomes a value.

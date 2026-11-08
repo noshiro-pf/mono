@@ -10,8 +10,8 @@ import {
 /**
  * Maps each value with `fn`, and emits the result unless it equals the one held
  * (`Object.is` unless `equals` says otherwise), so a result that did not change
- * wakes nothing below. For an event mapped to a value that repeats, pass
- * `equals: () => false`.
+ * makes nothing below recompute. For an event mapped to a value that repeats,
+ * pass `equals: () => false`.
  */
 export const map =
   <A, B>(

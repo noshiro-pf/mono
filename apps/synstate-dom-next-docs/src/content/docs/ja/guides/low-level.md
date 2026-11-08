@@ -99,7 +99,7 @@ const Chart = (): JSX.Element => {
 
 ## ルーターのための `Switch`
 
-`Switch`（[制御フロー](/mono/synstate-dom-next/ja/guides/control-flow/#switch)を参照）を公開しているので、ルーターはページをマウントするための switch を自分で写す必要がありません。ルーターは低レベルのコードを使わない、ただのコンポーネントになります。
+`Switch`（[制御フロー](/mono/synstate-dom-next/ja/guides/control-flow/#switch)を参照）を公開しているので、ルーターはページをマウントするための分岐のコンポーネントを自分で写す必要がありません。ルーターは低レベルのコードを使わない、ただのコンポーネントになります。
 
 ```tsx
 import { constant, listenInScope, Switch, type JSX } from 'synstate-dom-next';

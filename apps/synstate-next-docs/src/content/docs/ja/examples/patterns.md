@@ -75,7 +75,7 @@ refreshClicked.pipe(throttle(2000)).subscribe(() => {
 
 ## ToDo リスト
 
-リストのための reducer、フィルターのための状態、2 つの派生ビューです。どちらのビューも 1 回の更新で両方の親から 1 回だけ計算され、変わらなければ打ち切られます。
+リストのための reducer、フィルターのための状態、2 つの派生ビューです。どちらのビューも 1 回の更新で両方の親から 1 回だけ計算され、変わらなければ更新はそこで止まります。
 
 ```tsx
 import { createReducer, createState, derive, map } from 'synstate-next';

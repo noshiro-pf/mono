@@ -5,15 +5,15 @@ import type { Brand } from 'ts-type-forge';
  * A value that is written once and never updated. A brand that exists only in
  * the type system: at run time it is the value itself.
  *
- * A slot that takes data accepts a `Constant<T>` but not a plain `T`, so that a
- * value read once and never updated (`count.value`) is a type error rather than
- * a binding that silently stays stale.
+ * A prop or attribute that takes data accepts a `Constant<T>` but not a plain
+ * `T`, so that a value read once and never updated (`count.value`) is a type
+ * error rather than a binding that silently stays stale.
  */
 export type Constant<T> = Brand<T, 'synstate-dom-next/Constant'>;
 
 /**
- * What a slot that takes data accepts: an observable that holds a value, or an
- * explicit {@link Constant}. A plain value is not accepted.
+ * What a prop or attribute that takes data accepts: an observable that holds a
+ * value, or an explicit {@link Constant}. A plain value is not accepted.
  */
 export type Bindable<T> = Constant<T> | InitializedObservable<T>;
 

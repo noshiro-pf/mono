@@ -73,7 +73,7 @@ owner.dispose();
 
 ### `settled` は告げるものではなく、尋ねるもの
 
-内側の Observable を追いかけるオペレーター（`mergeMap`、済んだリクエストを 1 つ持っているかもしれない `switchMap`）は、それがもう値を流せないことを知る必要が今もあります。各ノードは尋ねられたら `settled` を答えます。ソースなら、破棄されたか、タイマー・Promise・購読が終わったとき。派生ノードなら、破棄されたか、親がすべて settled で、自分自身が待っているもの（`debounce` のタイマー、内側の Observable）がないとき。`mergeMap` は内側の Observable を射影したときと、それが値を流したときに尋ね、settled で、そのラウンドの effect が流した値を読み終えていれば手放します。`createDerived` で書いたオペレーターは、起こされた更新より後に値を流すなら、自分の `settled` を用意します（[独自のオペレーターとソース](/mono/synstate-next/ja/guides/custom-operators-and-sources/#非同期のオペレーター)）。
+内側の Observable を追いかけるオペレーター（`mergeMap`、済んだリクエストを 1 つ持っているかもしれない `switchMap`）は、それがもう値を流せないことを知る必要が今もあります。各ノードは尋ねられたら `settled` を答えます。ソースなら、破棄されたか、タイマー・Promise・購読が終わったとき。派生ノードなら、破棄されたか、親がすべて settled で、自分自身が待っているもの（`debounce` のタイマー、内側の Observable）がないとき。`mergeMap` は内側の Observable を射影したときと、それが値を流したときに尋ね、settled で、その更新の effect が流した値を読み終えていれば手放します。`createDerived` で書いたオペレーターは、計算し直させた更新より後に値を流すなら、自分の `settled` を用意します（[独自のオペレーターとソース](/mono/synstate-next/ja/guides/custom-operators-and-sources/#非同期のオペレーター)）。
 
 答えを使う場所で尋ねるのは、他の場所に何のコストもかけません。関心のない信号を転送するオペレーターはなく、伝え忘れることもありません。
 

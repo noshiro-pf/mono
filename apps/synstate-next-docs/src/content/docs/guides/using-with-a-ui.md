@@ -5,7 +5,7 @@ description: synstate-dom-next, the UI library built for synstate-next, and how 
 
 ## synstate-dom-next
 
-[synstate-dom-next](/mono/synstate-dom-next/) is the UI library made for synstate-next. You pass observables straight into JSX, a component runs once, and each attribute, property and text you bound is an effect of synstate-next's graph: it runs after the update has settled, once, with nothing diffed. Mounting is a batch, and a switch decides in the drain which branches to drop, so no branch computes from a value that rules it out. There is no adapter in between: the graph you build with the operators on this site ends in the DOM.
+[synstate-dom-next](/mono/synstate-dom-next/) is the UI library made for synstate-next. You pass observables straight into JSX, a component runs once, and each attribute, property and text you bound is a binding at the end of synstate-next's graph: it runs once every value of the update is up to date, once, with nothing diffed. Mounting is a batch, and a branch component (`If`, `Switch` and the like) decides which branches to drop before the values below it are recomputed, so no branch computes from a value that rules it out. There is no adapter in between: the graph you build with the operators on this site ends in the DOM.
 
 ## Any other framework
 
@@ -65,4 +65,4 @@ assert.strictEqual(mut_changes, 2);
 Two things to keep in mind:
 
 - **Subscribe where the framework can unsubscribe.** A subscription made outside every owner lives until its `Unsubscribe` is called; return it from the effect that made it.
-- **Keep the logic in the graph.** Derive what a component shows with `map` and `derive` outside it, and give the component the result. The component then re-renders only when that result changes, and the equality cut-off has already dropped every update that would not change it.
+- **Keep the logic in the graph.** Derive what a component shows with `map` and `derive` outside it, and give the component the result. The component then re-renders only when that result changes, and an update stops at the first value that does not change, so every update that would not change the result has already been dropped.

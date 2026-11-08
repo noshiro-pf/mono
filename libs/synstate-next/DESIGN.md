@@ -81,8 +81,9 @@ the function again from inside itself.
   interrupt the update under way. `update(fn)` defers `fn` itself, so two
   updates in one drain both apply.
 - A write made by an effect starts the next round. Updates never nest. A program
-  that keeps writing from its effects is stopped after 100 rounds with an error
-  naming the cause, instead of looping forever.
+  that keeps writing to what its own update reaches, from its effects or from
+  operators, is stopped after 100 updates in a row with an error naming the
+  cause, instead of looping forever.
 - `batch(fn)` makes the writes inside `fn` one update. Mounting a UI is a batch,
   so a write made while mounting propagates once the nodes are in place.
 - A state written twice before its round propagates once, with the last value,

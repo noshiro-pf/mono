@@ -1,6 +1,6 @@
 ---
 title: How an update propagates
-description: An update is an integer epoch. The drain visits the nodes it reaches by depth, each once; the effects run after it, on a settled graph; writes made on the way wait for their turn.
+description: An update is a number. The derived values it reaches are recomputed by depth, each once; the effects run after that, once every value is up to date; writes made on the way wait for their turn.
 ---
 
 This page follows one update from the write that starts it to the last subscriber it calls. [Tracing an update](/mono/synstate-next/internals/tracing-an-update/) then goes through the same steps field by field.
@@ -9,8 +9,8 @@ This page follows one update from the write that starts it to the last subscribe
 
 An update runs in two phases:
 
-1. **The drain** recomputes the derived nodes the update reaches, in order of depth, each once, after all of its parents.
-2. **The effects** run, in the order they were queued, against a graph that has settled. Subscribers are effects, and so are synstate-dom-next's bindings.
+1. **Recomputing**: the derived nodes the update reaches are recomputed, in order of depth, each once, after all of its parents.
+2. **The effects** run, in the order they were queued, once every value is up to date. An effect is what runs after the values: subscribers are effects, and so are synstate-dom-next's bindings.
 
 ```tsx
 import { createState, derive, map } from 'synstate-next';
@@ -46,10 +46,10 @@ const start = mut_log.length;
 setA(2);
 
 assert.deepStrictEqual(mut_log.slice(start), [
-    // The drain: each node once, after its parents.
+    // Recomputing: each node once, after its parents.
     'compute b from a = 2',
     'compute c from a = 2, b = 3',
-    // The effects, on a settled graph: a's effect already sees the new c.
+    // The effects, every value up to date: a's effect already sees the new c.
     'effect of a: a = 2, c = 5',
     'effect of c: c = 5',
 ]);
@@ -58,7 +58,7 @@ assert.deepStrictEqual(mut_log.slice(start), [
 The effect of `a` is queued first, but it runs after `c` has been recomputed, so it reads the new `c`. In synstate a subscriber of `a` would have run as soon as `a` changed, and read the old one.
 
 <figure>
-<svg viewBox="0 0 720 230" role="img" aria-label="The phases of one update: a write is pending; the drain visits depth 1, 2 and 3; the effects run; deferred writes and effect writes start the next round." style="width:100%;height:auto;font:13px var(--sl-font, sans-serif)">
+<svg viewBox="0 0 720 230" role="img" aria-label="The phases of one update: a write waits for its update; depth 1, 2 and 3 are recomputed; the effects run; deferred writes and effect writes start the next update." style="width:100%;height:auto;font:13px var(--sl-font, sans-serif)">
   <defs>
     <marker id="arrow-phases" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker>
   </defs>
@@ -77,8 +77,8 @@ The effect of `a` is queued first, but it runs after `c` has been recomputed, so
   </g>
   <g fill="currentColor" text-anchor="middle">
     <text x="65" y="66">setA(2)</text>
-    <text x="65" y="84" font-size="11">pending</text>
-    <text x="310" y="42" font-weight="bold">drain</text>
+    <text x="65" y="84" font-size="11">waiting</text>
+    <text x="310" y="42" font-weight="bold">recompute</text>
     <text x="215" y="80">depth 1</text>
     <text x="215" y="96" font-size="11">recompute</text>
     <text x="310" y="80">depth 2</text>
@@ -87,24 +87,22 @@ The effect of `a` is queued first, but it runs after `c` has been recomputed, so
     <text x="405" y="96" font-size="11">recompute</text>
     <text x="550" y="66" font-weight="bold">effects</text>
     <text x="550" y="84" font-size="11">in queue order</text>
-    <text x="310" y="190">writes deferred in the drain, and writes made by effects:</text>
-    <text x="310" y="208">the next round (at most 100 that keep writing)</text>
+    <text x="310" y="190">writes deferred while recomputing, and writes made by effects:</text>
+    <text x="310" y="208">the next update (at most 100 in a row)</text>
   </g>
 </svg>
 </figure>
 
 ## An update is a number
 
-The scheduler keeps one integer, the **epoch**, and adds one for each round. Each node has two integer fields that it is compared with:
+The scheduler keeps one integer, the **update number** (`epoch` in the code), and adds one for each update, and for each write that nothing observes. Each node has two integer fields that it is compared with:
 
-- `queuedAt` equals the epoch when the node is queued for this round. Queueing a child writes the epoch there, so a child that two parents reach is queued once, by whichever comes first, and nothing is allocated.
-- `changedAt` equals the epoch when the node emitted in this round. A node with several parents asks which of them did; a node with one parent knows that its parent did, since that is the only way it can have been queued.
-
-synstate made an object, an update token, for every write, and compared tokens instead.
+- `queuedAt` equals the update number when the node is queued for this update. Queueing a child writes the update number there, so a child that two parents reach is queued once, by whichever comes first, and nothing is allocated.
+- `changedAt` equals the update number when the node emitted in this update. A node with several parents asks which of them did; a node with one parent knows that its parent did, since that is the only way it can have been queued.
 
 ## Depth buckets
 
-A node's depth is one more than its deepest parent's. The queue is an array of buckets, one per depth, each with a counter of how many of its slots are in use. The drain goes through the buckets from the shallowest that holds a node to the deepest. A node that emits queues its children in deeper buckets only, so the bucket being visited never grows while it is visited, and every node is visited after all of its parents: no glitch, diamonds included.
+A node's depth is one more than its deepest parent's. The queue is an array of buckets, one per depth, each with a counter of how many of its slots are in use. Recomputing goes through the buckets from the shallowest that holds a node to the deepest. A node that emits queues its children in deeper buckets only, so the bucket being visited never grows while it is visited, and every node is visited after all of its parents: no glitch, diamonds included.
 
 <figure>
 <svg viewBox="0 0 720 220" role="img" aria-label="A graph laid out by depth: A at depth 0; B and D at depth 1; BD and E at depth 2; C at depth 3; a subscriber of C as an effect." style="width:100%;height:auto;font:13px var(--sl-font, sans-serif)">
@@ -149,17 +147,17 @@ A node's depth is one more than its deepest parent's. The queue is an array of b
 
 An update costs what it reaches: each queued node is visited once, and a node that is not reached is not touched. A priority queue would give the same order at a logarithmic cost per node; buckets indexed by depth give it at a constant one.
 
-## The equality cut-off
+## Stopping where a value does not change
 
-A node's `recompute` returns whether it emits. A node that computes a value (`map`, `derive`, `keepEqualParts`, a state's write, and `switchMap` when it switches) returns `false` when the value is equal to the one it holds, and its children are not queued: the drain does not visit what is below it. The operators that pass values on (`filter`, `take`, `skip`, …) pass what reached them, which a parent upstream has already found to be a change. `combine` and the operators that pass events (`merge`, `zip`, `scan`, `pairwise`, the time operators) never compare: a repeated event is still an event.
+A node's `recompute` returns whether it emits. A node that computes a value (`map`, `derive`, `keepEqualParts`, a state's write, and `switchMap` when it switches) returns `false` when the value is equal to the one it holds, and its children are not queued: nothing below it is visited. The operators that pass values on (`filter`, `take`, `skip`, …) pass what reached them, which a parent upstream has already found to be a change. `combine` and the operators that pass events (`merge`, `zip`, `scan`, `pairwise`, the time operators) never compare: a repeated event is still an event.
 
-## Effects run after the drain
+## Effects run after the values
 
-A node that emits queues its effects in one list, in the order they were reached, and the drain leaves them there. Once the deepest bucket is done, the effects run. Each one finds every node of the graph up to date, so it may read any of them. An effect that throws does not stop the others of its round, nor the next round: what they write still propagates, so one failing binding does not leave the rest of the page behind the state, and the exception is thrown once the flush is over. Something that keeps throwing may keep writing, so an effect that throws in a later round as well ends the flush at once, as an exception from a node does; what was still queued is dropped, and the first exception is thrown.
+A node that emits queues its effects in one list, in the order they were reached, and they wait there while the values are recomputed. Once the deepest bucket is done, the effects run. Each one finds every node of the graph up to date, so it may read any of them. An effect that throws does not stop the others of its update, nor the next update: what they write still propagates, so one failing binding does not leave the rest of the page behind the state, and the exception is thrown once the updates that follow have all run. Something that keeps throwing may keep writing, so an effect that throws in a later update as well ends them at once, as an exception from a node does; what was still queued is dropped, and the first exception is thrown.
 
 ## Writes that come during an update
 
-A write made **in the drain**, from inside a `map` say, would change a node that may already have been visited. It is deferred until the round's effects have run, and applied then, in order, so the effects of this round still see the old value and the write starts the next round:
+A write made **while values are recomputed**, from inside a `map` say, would change a node that may already have been visited. It is deferred until the update's effects have run, and applied then, in order, so the effects of this update still see the old value and the write starts the next update:
 
 ```tsx
 import { createState, map } from 'synstate-next';
@@ -190,19 +188,19 @@ const start = mut_log.length;
 
 setA(1);
 
-// The write waits, and the effects of this round still see the old value.
+// The write waits, and the effects of this update still see the old value.
 assert.deepStrictEqual(mut_log.slice(start), [
     'b = 0 right after setB(10)',
     'b = 0 in the effects',
 ]);
 
-// Applied after the effects, it started the next round.
+// Applied after the effects, it started the next update.
 assert.strictEqual(b.value, 10);
 ```
 
-A write made **by an effect** is the start of the next round. Updates never nest: the next round runs after this one's effects have all run, with an epoch of its own. A program whose effects keep writing to what their own update reaches is stopped after 100 rounds, with an error that names the cause.
+A write made **by an effect** is the start of the next update. Updates never nest: the next update runs after this one's effects have all run, with a number of its own. A program whose effects or operators keep writing to what their own update reaches is stopped after 100 updates in a row, with an error that names the cause.
 
-A write made outside any update marks its state as **pending** and starts a round at once, unless a `batch` is open: then the round starts when the outermost batch returns. A state written twice before its round is pending once, and the round reads the value it holds by then.
+A write made outside any update starts an update at once, unless a `batch` is open: then the update starts when the outermost batch returns. A state written twice before its update is queued once, and the update reads the value it holds by then.
 
 ## A node sees what happens after it was created
 
@@ -212,8 +210,8 @@ Each emission is numbered, and a node records the number current at its creation
 
 - **Nothing is allocated per update.** An update is an integer, and the queues are arrays that keep their length in a counter: emptying one does not drop its backing store, so the next update reuses it.
 - **A node with one parent asks nothing.** Being queued means its parent emitted.
-- **The cut-off is the default.** Every node that computes a value compares it, so an update stops at the first one that does not change.
-- **Updates never nest.** A write from a subscriber is a round of its own, after the drain, instead of a second update opened inside the first one with buckets of its own.
+- **Stopping at an unchanged value is the default.** Every node that computes a value compares it, so an update stops at the first one that does not change.
+- **Updates never nest.** A write from a subscriber is an update of its own, after this one's effects, instead of a second update opened inside the first one with buckets of its own.
 - **Nodes are classes.** The methods live on a prototype, and each operator is a subclass that overrides `recompute`; a node is its fields.
 
 The measurements are in [BENCHMARK.md](https://github.com/noshiro-pf/mono/blob/main/libs/synstate-next/BENCHMARK.md), written by `pnpm run benchmark` in `libs/synstate-next`.

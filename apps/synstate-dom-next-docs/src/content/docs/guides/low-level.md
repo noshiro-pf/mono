@@ -99,7 +99,7 @@ const Chart = (): JSX.Element => {
 
 ## `Switch` for a router
 
-`Switch` (see [Control flow](/mono/synstate-dom-next/guides/control-flow/#switch)) is public so that a router need not copy the switch it mounts its pages with. A router is then a component, with no low-level code at all:
+`Switch` (see [Control flow](/mono/synstate-dom-next/guides/control-flow/#switch)) is public so that a router need not copy the branch component it mounts its pages with. A router is then a component, with no low-level code at all:
 
 ```tsx
 import { constant, listenInScope, Switch, type JSX } from 'synstate-dom-next';

@@ -5,7 +5,7 @@ description: Attributes, properties, class, style, events, ref and SVG.
 
 The props of an intrinsic element are generated from `lib.dom.d.ts`, so your editor completes them and checks their types. Each writable primitive DOM property of the element (`id`, `disabled`, `value`, `tabIndex`, …) takes a `Bindable` of its type, `aria-*` takes a `Bindable` of a string, a number or a boolean (written as `"true"` / `"false"`), `data-*` takes a `Bindable<string>`, and each event gets its own handler.
 
-Each prop bound to an observable is one effect: a small object holding the element and the name it writes, run after each update that changes the observable. A prop given a constant is written once, while the element is created, and makes nothing.
+Each prop bound to an observable is one binding: a small object holding the element and the name it writes, run after each update that changes the observable. A prop given a constant is written once, while the element is created, and makes nothing.
 
 ## Attributes and properties
 

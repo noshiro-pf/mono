@@ -176,7 +176,7 @@ const tableSliced = derive(
 );
 
 // `renderTable` and `renderError` stand for the view.
-// Runs once each update has settled, with every value above consistent.
+// Runs once every value above is up to date, consistent with each other.
 tableSliced.subscribe(renderTable);
 
 fetchError.subscribe((error) => {
@@ -190,7 +190,7 @@ fetchError.subscribe((error) => {
 - **The order is the graph's.** Nothing can be computed before what it reads: the depth of each node puts it after its parents.
 - **The reset is in one place.** `pageReset` says what sends the table back to page 1: new rows (after the debounce, or when the data arrives) and a new page size. The reset waits for the debounce with no extra code. The requested page is an event, so asking again for the page that was held before a reset still reaches the table.
 - **Fetching and errors are values.** `fromPromise` puts the server's answer into the graph as a `Result`, and `fetchError` is one more derived value.
-- **Every subscriber sees one consistent table.** `tableSliced`'s subscriber runs after the update has settled, with the filters, the page count and the page all from the same update.
+- **Every subscriber sees one consistent table.** `tableSliced`'s subscriber runs once every value of the update is up to date, with the filters, the page count and the page all from the same update.
 - **Adding a value is one more `derive`.** Nothing that exists changes.
 
 ## Next steps

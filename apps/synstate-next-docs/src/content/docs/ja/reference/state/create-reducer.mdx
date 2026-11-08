@@ -3,9 +3,9 @@ title: createReducer
 description: '`dispatch` からだけ、`reducer` を通して書き込む状態です。'
 ---
 
-{/* translated-from:0ce89f305adf */}
+{/* translated-from:a38875fe8a3d */}
 
-`dispatch` からだけ、`reducer` を通して書き込む状態です。グラフのドレイン中の dispatch はそのラウンドの effect が実行されるまで待ち、その前の書き込みが残した状態を reduce します。`dispatch` は何も返さないので、状態は `getSnapshot` で読みます。
+`dispatch` からだけ、`reducer` を通して書き込む状態です。更新が値を計算し直している間に `map` や `derive` などのオペレーターの中で行った dispatch は進行中の更新の購読者と束縛が実行されるまで待ち、その前の書き込みが残した状態を reduce します。`dispatch` は何も返さないので、状態は `getSnapshot` で読みます。
 
 ## 例
 

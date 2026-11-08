@@ -9,9 +9,9 @@ import {
 } from '../core/index.mjs';
 
 /**
- * Pairs each value of the source with the value `other` holds, settled for the
- * same update. `other` does not wake it: a change of `other` alone emits
- * nothing. Emits nothing while `other` holds no value.
+ * Pairs each value of the source with the value `other` holds, up to date for
+ * the same update. A change of `other` alone does not make it recompute, so it
+ * emits nothing. Emits nothing while `other` holds no value.
  */
 export const withCurrentValueFrom =
   <A, B>(other: Observable<B>): Operator<A, readonly [A, B], 'drop'> =>

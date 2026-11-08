@@ -17,28 +17,28 @@ fixes made to synstate-dom are not ported here. The rule and its reason are in
 - **A binding is one effect.** Each text, attribute, property, class or style
   binding is an instance of an effect class holding its target in its own
   fields, rather than a subscriber, a closure and a cleanup.
-- **Bindings run after the update has settled.** `If` and `For` mount and
-  dispose in the effect phase, outside any propagation.
+- **Bindings run once every value of the update is up to date.** `If` and `For`
+  mount and dispose after the values are recomputed, outside any propagation.
 - **Mounting is a batch.** A write made while mounting propagates once the nodes
   are in the document, so nothing waits for an element to be attached.
 - **`For` keeps a state per row** and sets it when the row's element changes;
   rows whose element did not change are not visited, and a list whose keys kept
-  their order skips the keyed diff. The writes start a round of their own, so a
-  row reads its new element one round after the list changed, before anything is
-  painted.
+  their order skips the keyed diff. The writes start an update of their own, so
+  a row reads its new element one update after the list changed, before anything
+  is painted.
 - **`selector(source).is(key)`** writes only the observables of the old and the
   new key, however many rows watch it.
 - **Event handlers are `on…` properties** where the element has one, and a
   listener otherwise; neither is removed, since the element goes with its owner.
 
-- **`If`, `MatchOptional` and `MatchResult` are one keyed switch,** which is
-  public as `Switch`: a branch is mounted for the key of the value (the
+- **`If`, `MatchOptional` and `MatchResult` are one keyed branch component,**
+  which is public as `Switch`: a branch is mounted for the key of the value (the
   condition, `isSome`, `isOk`, or a `key` function of the application's) and
   kept while the key stays; what the branch is given follows the value
   meanwhile.
 
-The data slots keep synstate-dom's rule: they take a `Bindable` (an
-`InitializedObservable` or a `constant(…)`), never a plain value.
+The props and attributes that take data keep synstate-dom's rule: they take a
+`Bindable` (an `InitializedObservable` or a `constant(…)`), never a plain value.
 
 ## Changes from synstate-dom
 
@@ -50,15 +50,15 @@ The data slots keep synstate-dom's rule: they take a `Bindable` (an
   synstate-dom makes them HTML wherever they are. Their props are still typed as
   HTML's, a `ref` included, since a JSX element's type cannot depend on where it
   stands.
-- A switch (`If`, `MatchOptional`, `MatchResult`) bound to an observable is
-  marked by a comment at each end, where synstate-dom puts one after it. One
-  given a constant mounts its branch with no comment.
+- A branch component (`If`, `MatchOptional`, `MatchResult`) bound to an
+  observable is marked by a comment at each end, where synstate-dom puts one
+  after it. One given a constant mounts its branch with no comment.
 - A `For` row's or a branch's cleanup that throws stops neither the update nor
   the other disposals: the rows and branches are replaced, and the exception is
   thrown once they are in place. A row that throws while mounting takes out the
   rows its update made and keeps the others; a branch that throws leaves its
-  switch empty until the next value. A binding that throws does not stop the
-  other bindings of its update either (synstate-next's DESIGN.md,
+  branch component empty until the next value. A binding that throws does not
+  stop the other bindings of its update either (synstate-next's DESIGN.md,
   "Propagation").
 - The low-level API is smaller. `mountable(mount)` takes a function that returns
   the nodes (one, or an array) and gives a `JSX.Element`; `mountChild(child,
@@ -66,9 +66,8 @@ parent?)` returns a child's nodes, appended to `parent` in its namespace when
   given; `isChild` is kept, one level deep as before: any array counts.
   `toNodes`, `createMountable` (the factory is `jsx` from
   `synstate-dom-next/jsx-runtime`) and the types `Mountable` and `MountedNodes`
-  (a description is a `JSX.Element`) are gone.
-  `Switch` is public, so a router need not copy the switch it mounts its pages
-  with.
+  (a description is a `JSX.Element`) are gone. `Switch` is public, so a router
+  need not copy the branch component it mounts its pages with.
 - A controlled `checked` or `indeterminate` is restored in the next animation
   frame or a task after the `change`, whichever comes first, so it is restored
   in a hidden page too.

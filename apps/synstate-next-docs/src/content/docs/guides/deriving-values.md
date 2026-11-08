@@ -1,6 +1,6 @@
 ---
 title: Deriving values
-description: pipe and InitKind, derive and combine, merge and zip, the equality cut-off, and reading a value without following it.
+description: pipe and InitKind, derive and combine, merge and zip, stopping where a value does not change, and reading a value without following it.
 ---
 
 ## `pipe`
@@ -17,7 +17,7 @@ description: pipe and InitKind, derive and combine, merge and zip, the equality 
 
 ## `derive` and `combine`
 
-`derive(parents, fn)` computes one value from several observables, once per update however many of them changed, and passes it on unless it equals the one held. `combine(parents)` gives the latest values as a tuple, on every update that reaches it: a new tuple each time, so it is never cut off.
+`derive(parents, fn)` computes one value from several observables, once per update however many of them changed, and passes it on unless it equals the one held. `combine(parents)` gives the latest values as a tuple, on every update that reaches it: a new tuple each time, so it never stops an update.
 
 ```tsx
 import { batch, combine, createState, derive } from 'synstate-next';
@@ -59,7 +59,7 @@ assert.deepStrictEqual(mut_totals, [200]);
 assert.deepStrictEqual(mut_pairs, ['100 × 2', '50 × 4']);
 ```
 
-Prefer `derive` for a value computed from several others: it computes once, and it cuts off. Use `combine` where you need the tuple itself, such as an input to `debounce`. Both hold a value once every parent holds one.
+Prefer `derive` for a value computed from several others: it computes once, and stops the update when the value does not change. Use `combine` where you need the tuple itself, such as an input to `debounce`. Both hold a value once every parent holds one.
 
 ## `merge` and `zip`
 
@@ -103,9 +103,9 @@ assert.deepStrictEqual(mut_inputs, ['click', 'drag', 'a', 'b']);
 assert.deepStrictEqual(mut_pairs, ['click + a', 'drag + b']);
 ```
 
-## The equality cut-off
+## Stopping where a value does not change
 
-Every node that computes a value (`map`, `derive`, a state's write) compares it with the one it holds, by `Object.is` unless you pass `equals`, and passes nothing on when they are equal. Nothing below it is visited. `switchMap` compares, by `Object.is`, only when it switches: the value the new inner observable holds is cut off when it equals the one held, and what the inner observable emits later passes through. The operators that only pass values on (`filter`, `take`, …) pass what reached them, and those that pass events (`combine`, `merge`, `zip`, `scan`, `pairwise`, the time operators) never compare.
+Every node that computes a value (`map`, `derive`, a state's write) compares it with the one it holds, by `Object.is` unless you pass `equals`, and passes nothing on when they are equal. Nothing below it is visited. `switchMap` compares, by `Object.is`, only when it switches: the value the new inner observable holds stops there when it equals the one held, and what the inner observable emits later passes through. The operators that only pass values on (`filter`, `take`, …) pass what reached them, and those that pass events (`combine`, `merge`, `zip`, `scan`, `pairwise`, the time operators) never compare.
 
 That is what you want for a value, and not for an event. Mapping every click to `1` gives `1` each time, and the second `1` would be taken for no change: pass `equals: () => false` to a `map` of an event whose result can repeat.
 
@@ -154,7 +154,7 @@ assert.strictEqual(position.value, 2);
 
 ## Reading without following: `withCurrentValueFrom`
 
-A parent wakes its children. Sometimes a value should only be read: the text of a form when it is submitted, not every keystroke. `withCurrentValueFrom(other)` pairs each value of the source with the value `other` holds, settled for the same update, and a change of `other` alone emits nothing:
+A parent makes its children recompute. Sometimes a value should only be read: the text of a form when it is submitted, not every keystroke. `withCurrentValueFrom(other)` pairs each value of the source with the value `other` holds, up to date for the same update, and a change of `other` alone emits nothing:
 
 ```tsx
 import {

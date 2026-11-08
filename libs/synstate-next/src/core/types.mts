@@ -38,8 +38,8 @@ export type Observable<A> = Readonly<{
   /** The value it holds, or `undefined` when it holds none. */
   peek: () => A | undefined;
   /**
-   * Calls `fn` with the current value, if any, and then with every value after
-   * an update has settled. Belongs to the current owner.
+   * Calls `fn` with the current value, if any, and then with every value once
+   * every value of its update is up to date. Belongs to the current owner.
    */
   subscribe: (fn: (value: A) => void) => Unsubscribe;
   pipe: Pipe<A>;

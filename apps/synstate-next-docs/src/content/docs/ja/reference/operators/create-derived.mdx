@@ -3,13 +3,13 @@ title: createDerived
 description: '`parents` を追いかける Observable を作ります。'
 ---
 
-{/* translated-from:651873ca13f5 */}
+{/* translated-from:075ee505a24e */}
 
 `parents` を追いかける Observable を作ります。パッケージの外で書くオペレーターです。`setup` は作成時に 1 回だけ動き、`update`（単独か、`settled` と一緒に）を返します。`initialValue` を渡せばそれを持ち、渡さなければ最初に値をセットするまで何も持ちません。他の Observable と同じく、現在の owner に属します。`setup` は Observable を現在の owner として動くので、そこで作ったものと登録した後始末（`ctx.onCleanup` か `onCleanup`）は Observable に属します。破棄すると、owner と同じ順で破棄します。まず `setup` で作った owner、次に後始末、最後にノードを、それぞれ新しい順に破棄します。
 
 `update` は親を読みます。`setup` で作るものは、購読やリスナーのような脇の仕事のためのものです。そこで作ったノードはこのノードと同じ更新で、先にではなく辿られるので、`update` はその値を更新の前のまま読んでしまいます。
 
-起こされた更新より後に（タイマーから）値を流すオペレーターは `settled` を渡します。まだ値を流す予定があるのに、終わったと見なされないようにするためです。`mergeMap` は決着した内側の Observable を手放します。
+計算し直させた更新より後に（タイマーから）値を流すオペレーターは `settled` を渡します。まだ値を流す予定があるのに、終わったと見なされないようにするためです。`mergeMap` は決着した内側の Observable を手放します。
 
 ## 例
 

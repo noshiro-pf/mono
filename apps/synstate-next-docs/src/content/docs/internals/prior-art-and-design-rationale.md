@@ -21,20 +21,20 @@ None of this is new. Static scheduling, topological order for glitch avoidance, 
 
 ## What the rebuild adds, and where it comes from
 
-| synstate-next                        | What it replaces in synstate                 | Precedent                                                                                       |
-| :----------------------------------- | :------------------------------------------- | :---------------------------------------------------------------------------------------------- |
-| An update is an integer epoch        | An update token object per write             | Jane Street's Incremental numbers its stabilizations and records on each node when it changed   |
-| Effects run after the drain          | Subscribers called during propagation        | The effect queues of Solid and Preact Signals, which run effects after the update               |
-| Writes during the drain are deferred | Nested updates with bucket sets of their own | The same libraries' batching of writes made while an update runs                                |
-| Owners are the only lifetime         | Scopes plus completion and reference counts  | Solid's owner tree (`createRoot`, `getOwner`, `onCleanup`)                                      |
-| `settled` is asked where it is used  | Completion pushed down the graph             | None in particular: it is the question completion answered, asked only where the answer is used |
+| synstate-next                               | What it replaces in synstate                 | Precedent                                                                                       |
+| :------------------------------------------ | :------------------------------------------- | :---------------------------------------------------------------------------------------------- |
+| An update is a number                       | An update token object per write             | Jane Street's Incremental numbers its stabilizations and records on each node when it changed   |
+| Effects run after the values are recomputed | Subscribers called during propagation        | The effect queues of Solid and Preact Signals, which run effects after the update               |
+| Writes made while recomputing are deferred  | Nested updates with bucket sets of their own | The same libraries' batching of writes made while an update runs                                |
+| Owners are the only lifetime                | Scopes plus completion and reference counts  | Solid's owner tree (`createRoot`, `getOwner`, `onCleanup`)                                      |
+| `settled` is asked where it is used         | Completion pushed down the graph             | None in particular: it is the question completion answered, asked only where the answer is used |
 
 ## Why the graph stays static
 
 Most UI-oriented reactive libraries (Angular Signals, Preact Signals, Solid, MobX, Vue, Jotai) track dependencies while a computation runs, so the set of what a value depends on can change between runs. synstate-next keeps a static graph, for the reasons synstate did:
 
-- **Conditional dependencies are values.** A `derive` over every branch that returns the active one computes from a write to an inactive branch and finds the same value: one call and one comparison, after which the cut-off stops the update. Where that is too much, `switchMap` follows only the branch selected, and replaces its inner observable when the selection changes.
-- **Collections are one observable.** A list held in one state, with a derived observable per item (`map` to the item, cut off when it did not change), updates only what changed. synstate-dom-next's `For` keeps a state per row for the same reason.
+- **Conditional dependencies are values.** A `derive` over every branch that returns the active one computes from a write to an inactive branch and finds the same value: one call and one comparison, after which the update stops there, since the value did not change. Where that is too much, `switchMap` follows only the branch selected, and replaces its inner observable when the selection changes.
+- **Collections are one observable.** A list held in one state, with a derived observable per item (`map` to the item, which stops there when it did not change), updates only what changed. synstate-dom-next's `For` keeps a state per row for the same reason.
 - **Asynchronous data is a `switchMap`.** A request that depends on a value is projected from it, and disposing the projection aborts the request: the lifetime of the request is in the code.
 - **The dependencies are in the code.** `derive([a, b], fn)` says what it reads, like the dependency array of React's `useMemo`, and no read inside `fn` can add a dependency by accident.
 

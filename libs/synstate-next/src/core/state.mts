@@ -9,8 +9,9 @@ export type State<A> = InitializedObservable<A> &
     /** Writes `value`; nothing happens when it equals the current one. */
     set: (value: A) => void;
     /**
-     * Writes `fn(current)`. While the graph drains, `fn` itself waits with the
-     * write, so that it reads the value the writes before it left.
+     * Writes `fn(current)`. Called inside an operator such as `map` or
+     * `derive`, while an update is recomputing values, `fn` itself waits with
+     * the write, so that it reads the value the writes before it left.
      */
     update: (fn: (current: A) => A) => void;
   }>;
@@ -47,10 +48,11 @@ export type StateOptions<A> = Readonly<{
 /**
  * Creates a state holding `initial`.
  *
- * A write made while the graph drains (inside a `map`, say) is applied once that
- * round's effects have run; a write made by a subscriber is applied at once.
- * Either propagates in the next update, and neither interrupts the update under
- * way.
+ * A write made inside an operator such as `map` or `derive`, while an update is
+ * recomputing values, is applied once the subscribers and bindings of the
+ * update under way have run; a write made by a subscriber or a binding is
+ * applied at once. Either propagates in the next update, and neither interrupts
+ * the update under way.
  */
 export const state = <A,>(initial: A, options?: StateOptions<A>): State<A> =>
   view(

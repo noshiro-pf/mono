@@ -91,7 +91,7 @@ assert.deepStrictEqual(mut_log, ['dialog', 'page']);
 assert.isUndefined(getOwner());
 ```
 
-synstate-dom-next はすべての寿命をこの上に作っています。`render` がルートの owner を作り、switch の各分岐とリストの各行は、それぞれ専用の owner の中でマウントされます。
+synstate-dom-next はすべての寿命をこの上に作っています。`render` がルートの owner を作り、`If`・`Switch` などの分岐のコンポーネントの各分岐とリストの各行は、それぞれ専用の owner の中でマウントされます。
 
 ## どの owner の外でも
 
@@ -142,7 +142,7 @@ setCount(3);
 assert.strictEqual(s.value, 9);
 ```
 
-effect と派生ノードの再計算は、常に実行中の owner がない状態で動きます。購読者が作ったものが、たまたま書き込みを行った owner に属してしまうことはありません。
+購読者・束縛と派生値の再計算は、常に実行中の owner がない状態で動きます。購読者が作ったものが、たまたま書き込みを行った owner に属してしまうことはありません。
 
 ## 完了はない
 

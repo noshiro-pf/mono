@@ -5,7 +5,7 @@ description: 属性、プロパティ、class、style、イベント、ref、SVG
 
 組み込み要素の props は `lib.dom.d.ts` から生成されるので、エディタが補完し、型をチェックします。要素の書き込み可能なプリミティブ型の DOM プロパティ（`id`、`disabled`、`value`、`tabIndex` など）はその型の `Bindable` を、`aria-*` は文字列・数値・真偽値（`"true"` / `"false"` として書き込みます）の `Bindable` を、`data-*` は `Bindable<string>` を受け取り、イベントにはそれぞれ専用のハンドラがあります。
 
-Observable を束縛した prop は、それぞれ 1 つの effect です。要素と書き込む名前を持つ小さなオブジェクトで、その Observable を変える更新のあとに実行されます。constant を渡した prop は要素を作るときに 1 回書き込まれるだけで、何も作りません。
+Observable を束縛した prop は、それぞれ 1 つの束縛です。要素と書き込む名前を持つ小さなオブジェクトで、その Observable を変える更新のあとに実行されます。constant を渡した prop は要素を作るときに 1 回書き込まれるだけで、何も作りません。
 
 ## 属性とプロパティ
 
