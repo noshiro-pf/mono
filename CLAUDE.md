@@ -511,9 +511,10 @@ rules and those under "Testing" are in `docs/typescript-coding-rules.md`.
   mutable tuple reversed in place keeps a type its contents no longer have).
   Where mutation is unavoidable, prefix the binding `mut_`
   (`functional/no-let`, `functional/immutable-data`).
-- **Type safety**: type guards over assertions. Under
-  `noUncheckedIndexedAccess` narrow with `Arr.isNonEmpty(xs)` rather than
-  `xs.length > 0` plus `!`.
+- **Type safety**: type guards over assertions. Under `noUncheckedIndexedAccess`
+  narrow with `Arr.isNonEmpty(xs)` rather than `xs.length > 0` plus `!`. A type
+  that grants a guarantee puts it where the implementation must produce it, so a
+  false claim needs `as` ("Claims a value must earn").
 - **Division**: `Num.isNonZero` then `Num.div`, never a `safeDivide` helper
   with the rule disabled.
 - **Strings**: template literals for a few, `.join()` for lists, `dedent` for
