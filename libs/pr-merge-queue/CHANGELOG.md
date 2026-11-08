@@ -1,5 +1,12 @@
 # pr-merge-queue
 
+## 0.10.1
+
+### Patch Changes
+
+- 0b58be0: `unblock-prs` reads the order it releases in wherever it reads an order: the survey log's "next" and its list, which marks a pull request kept ahead by its stacked layer, `--dry-run`'s "Would …", and the settling of a double release just after one (`firstInReleaseOrder` takes that order first). The layer branches are read once a survey.
+- 79c628d: Checking ahead reads a red layer's failed jobs as `autoFix` reads them before releasing its pull request for its own run to fix: a job whose run carries the `autoFix.notFixableAnnotation` annotation is not a fixer's, so that pull request is set aside at once instead of being released, run again and declined.
+
 ## 0.10.0
 
 ### Minor Changes
