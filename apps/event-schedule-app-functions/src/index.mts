@@ -94,8 +94,9 @@ export const answerUpdateListener = regionSelectedWithConfig.firestore
 const scheduleTimeZone = 'Etc/UTC';
 
 /**
- * Every hour, so that each event is reminded at noon in its own zone
- * (`isReminderHour`). The name is kept from when this ran once a day at noon in
+ * Every hour, so that each event is reminded at noon in its own zone, or before
+ * a deadline that is not after noon (`remindersDue`). The name is kept from
+ * when this ran once a day at noon in
  * Tokyo: a deployed function renamed is a function deleted.
  */
 export const notifyAnswerDeadlineEveryday = regionSelectedWithConfig.pubsub

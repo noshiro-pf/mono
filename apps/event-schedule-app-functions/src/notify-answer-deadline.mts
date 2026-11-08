@@ -7,8 +7,7 @@ import {
   createMailBodyForAnswerDeadline,
   createMailBodyForAnswerResult,
   deadlinePassed,
-  isReminderHour,
-  todayIsNDaysBeforeDeadline,
+  remindersDue,
 } from './functions/index.mjs';
 import { getEmail } from './get-event-item.mjs';
 import { createMailOptions, sendEmail } from './setup-mailer.mjs';
@@ -20,8 +19,9 @@ const keys = {
 } as const satisfies ReadonlyRecord<string, keyof EventSchedule>;
 
 /**
- * Mails the reminders due at `nowMillis`: run every hour, it reminds each event
- * once a day, in the hour its own clock reads noon.
+ * Mails the reminders due at `nowMillis` (`remindersDue`): run every hour, it
+ * reminds each event at noon in its own zone, the day-of reminder earlier when
+ * the deadline is not after noon.
  */
 export const notifyAnswerDeadline = async (
   db: Firestore,
@@ -32,33 +32,20 @@ export const notifyAnswerDeadline = async (
     .where(keys.notificationSettings, '!=', 'none')
     .get();
 
-  const events = querySnapshot.docs
-    .map((doc) => tp(doc.id, fillEventScheduleWithCheck(doc.data())))
-    .filter(
-      ([_id, ev]) =>
-        ev.answerDeadline !== 'none' &&
-        // Before the per-event reads below: in all but one run a day, an
-        // event's clock does not read noon.
-        isReminderHour(nowMillis, ev.timezoneOffsetMinutes),
-    );
+  // Before the per-event reads below: in most runs, nothing is due for an event.
+  const due = querySnapshot.docs.flatMap((doc) => {
+    const ev = fillEventScheduleWithCheck(doc.data());
 
-  const emails = await Promise.all(
-    events.map(([eventId]) => getEmail(db, eventId)),
-  );
+    const ns = ev.notificationSettings;
 
-  const eventsWithEmail = Arr.zip(events, emails);
+    const answerDeadline = ev.answerDeadline;
 
-  await Promise.all(
-    eventsWithEmail.flatMap(([[eventId, ev], email]) => {
-      const ns = ev.notificationSettings;
+    if (answerDeadline === 'none' || ns === 'none') {
+      return [];
+    }
 
-      const answerDeadline = ev.answerDeadline;
-
-      if (answerDeadline === 'none' || ns === 'none' || email === '') {
-        return Promise.resolve();
-      }
-
-      return (
+    const days = remindersDue({
+      enabled: (
         [
           [ns.notify00daysBeforeAnswerDeadline, 0],
           [ns.notify01daysBeforeAnswerDeadline, 1],
@@ -68,31 +55,39 @@ export const notifyAnswerDeadline = async (
           [ns.notify28daysBeforeAnswerDeadline, 28],
         ] as const
       )
-        .filter(
-          ([flag, diff]) =>
-            flag &&
-            todayIsNDaysBeforeDeadline(
-              diff,
-              answerDeadline,
-              ev.timezoneOffsetMinutes,
-              nowMillis,
-            ),
-        )
-        .map(([_, diff]) => {
-          logger.log(`notify${pad2(diff)}daysBeforeAnswerDeadline`);
+        .filter(([flag]) => flag)
+        .map(([, d]) => d),
+      answerDeadline,
+      timezoneOffsetMinutes: ev.timezoneOffsetMinutes,
+      nowMillis,
+    });
 
-          return sendEmail(
-            createMailOptions({
-              to: email,
-              subject:
-                diff === 0
-                  ? `イベント「${ev.title}」の回答期限当日になりました。`
-                  : `イベント「${ev.title}」の回答期限${diff}日前になりました。`,
-              text: createMailBodyForAnswerDeadline({ eventId, diff }),
-            }),
-          );
-        });
-    }),
+    return Arr.isEmpty(days) ? [] : [{ eventId: doc.id, ev, days }];
+  });
+
+  const emails = await Promise.all(
+    due.map(({ eventId }) => getEmail(db, eventId)),
+  );
+
+  await Promise.all(
+    Arr.zip(due, emails).flatMap(([{ eventId, ev, days }, email]) =>
+      email === ''
+        ? []
+        : days.map((diff) => {
+            logger.log(`notify${pad2(diff)}daysBeforeAnswerDeadline`);
+
+            return sendEmail(
+              createMailOptions({
+                to: email,
+                subject:
+                  diff === 0
+                    ? `イベント「${ev.title}」の回答期限当日になりました。`
+                    : `イベント「${ev.title}」の回答期限${diff}日前になりました。`,
+                text: createMailBodyForAnswerDeadline({ eventId, diff }),
+              }),
+            );
+          }),
+    ),
   );
 };
 
