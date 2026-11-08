@@ -1,0 +1,58 @@
+---
+title: switchMap
+description: 'Follows the observable that `project` returns for the latest value.'
+---
+
+import MarbleDiagram from '../../../../components/MarbleDiagram.astro';
+
+{/* reference:jsdoc */}
+
+Follows the observable that `project` returns for the latest value. What the projection creates belongs to an owner of its own, disposed when the next value replaces it.
+
+The inner observable's value at the time of the switch joins the update that caused it; a later emission of the inner observable arrives in an update of its own. Like every node, it holds the last value it emitted: switching to an inner observable that holds none emits nothing, and keeps the value held. For the same reason the result may hold no value even when the source does.
+
+{/* /reference */}
+
+{/* reference:init-kind */}
+
+Its result may hold no value even when the source holds one: `pipe` gives an `Observable` ([`drop`](/mono/synstate-next/guides/deriving-values/#pipe)).
+
+{/* /reference */}
+
+## Marble diagram
+
+<MarbleDiagram slug="switch-map" />
+
+## Example
+
+```tsx
+import { createState, map, switchMap, timer } from 'synstate-next';
+
+const [selected, select] = createState('a');
+
+// Loading takes 200 ms; only the latest selection is followed.
+const loaded = selected.pipe(
+    switchMap((id) => timer(200).pipe(map(() => `item ${id}`))),
+);
+
+const mut_seen: string[] = [];
+
+loaded.subscribe((item) => {
+    mut_seen.push(item);
+});
+
+await vi.advanceTimersByTimeAsync(100);
+
+select('b');
+
+await vi.advanceTimersByTimeAsync(300);
+
+assert.deepStrictEqual(mut_seen, ['item b']);
+```
+
+## See also
+
+- [Async operators](/mono/synstate-next/guides/async-operators/)
+- [All APIs](/mono/synstate-next/reference/)
+
+[Source on GitHub](https://github.com/noshiro-pf/mono/blob/main/libs/synstate-next/src/operators/switch-map.mts)

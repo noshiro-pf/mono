@@ -1,0 +1,53 @@
+---
+title: takeWhile
+description: '`predicate` が成り立つ間、ソースの値を流します。'
+---
+
+import MarbleDiagram from '../../../../../components/MarbleDiagram.astro';
+
+{/* translated-from:46470524f3a6 */}
+
+`predicate` が成り立つ間、ソースの値を流します。成り立たない最初の値からは何も流さず、最後に流した値を持ち続けます。
+
+{/* reference:init-kind */}
+
+ソースが値を持っていても、結果は値を持たないことがあります。`pipe` の結果は `Observable` です（[`drop`](/mono/synstate-next/ja/guides/deriving-values/#pipe)）。
+
+{/* /reference */}
+
+## マーブル図
+
+<MarbleDiagram slug="take-while" lang="ja" />
+
+## 例
+
+```tsx
+import { createValueEmitter, takeWhile } from 'synstate-next';
+
+const [progress, report] = createValueEmitter<number>();
+
+const running = progress.pipe(takeWhile((p) => p < 100));
+
+const mut_seen: number[] = [];
+
+running.subscribe((p) => {
+    mut_seen.push(p);
+});
+
+report(30);
+
+report(80);
+
+report(100);
+
+report(40);
+
+assert.deepStrictEqual(mut_seen, [30, 80]);
+```
+
+## 関連項目
+
+- [値を派生させる](/mono/synstate-next/ja/guides/deriving-values/)
+- [すべての API](/mono/synstate-next/ja/reference/)
+
+[GitHub のソース](https://github.com/noshiro-pf/mono/blob/main/libs/synstate-next/src/operators/take-while.mts)

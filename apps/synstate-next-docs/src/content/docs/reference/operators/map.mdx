@@ -1,0 +1,43 @@
+---
+title: map
+description: 'Maps each value with `fn`, and emits the result unless it equals the one held (`Object.is` unless `equals` says otherwise), so a result that did not change wakes nothing below.'
+---
+
+import MarbleDiagram from '../../../../components/MarbleDiagram.astro';
+
+{/* reference:jsdoc */}
+
+Maps each value with `fn`, and emits the result unless it equals the one held (`Object.is` unless `equals` says otherwise), so a result that did not change wakes nothing below. For an event mapped to a value that repeats, pass `equals: () => false`.
+
+{/* /reference */}
+
+{/* reference:init-kind */}
+
+Its result holds a value whenever the source does: on an `InitializedObservable`, `pipe` gives one ([`keep`](/mono/synstate-next/guides/deriving-values/#pipe)).
+
+{/* /reference */}
+
+## Marble diagram
+
+<MarbleDiagram slug="map" />
+
+## Example
+
+```tsx
+import { createState, map } from 'synstate-next';
+
+const [celsius, setCelsius] = createState(0);
+
+const fahrenheit = celsius.pipe(map((c) => (c * 9) / 5 + 32));
+
+setCelsius(100);
+
+assert.strictEqual(fahrenheit.value, 212);
+```
+
+## See also
+
+- [Deriving values](/mono/synstate-next/guides/deriving-values/)
+- [All APIs](/mono/synstate-next/reference/)
+
+[Source on GitHub](https://github.com/noshiro-pf/mono/blob/main/libs/synstate-next/src/operators/map.mts)

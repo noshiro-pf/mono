@@ -1,0 +1,44 @@
+---
+title: withInitialValue
+description: 'ソースが値を流すまでは `initial` を持ち、その後はソースを追いかけます。'
+---
+
+import MarbleDiagram from '../../../../../components/MarbleDiagram.astro';
+
+{/* translated-from:0f4a18aa1f1c */}
+
+ソースが値を流すまでは `initial` を持ち、その後はソースを追いかけます。
+
+{/* reference:init-kind */}
+
+結果は常に値を持ちます。`pipe` の結果は `InitializedObservable` です（[`with`](/mono/synstate-next/ja/guides/deriving-values/#pipe)）。
+
+{/* /reference */}
+
+## マーブル図
+
+<MarbleDiagram slug="with-initial-value" lang="ja" />
+
+## 例
+
+```tsx
+import { createValueEmitter, withInitialValue } from 'synstate-next';
+
+const [message, receive] = createValueEmitter<string>();
+
+const latest = message.pipe(withInitialValue('(none yet)'));
+
+// An `InitializedObservable`: `.value` is there from the start.
+assert.strictEqual(latest.value, '(none yet)');
+
+receive('hello');
+
+assert.strictEqual(latest.value, 'hello');
+```
+
+## 関連項目
+
+- [値を派生させる](/mono/synstate-next/ja/guides/deriving-values/)
+- [すべての API](/mono/synstate-next/ja/reference/)
+
+[GitHub のソース](https://github.com/noshiro-pf/mono/blob/main/libs/synstate-next/src/operators/with-initial-value.mts)

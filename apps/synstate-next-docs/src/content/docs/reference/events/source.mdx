@@ -1,0 +1,40 @@
+---
+title: source
+description: 'Creates an event source, holding no value until its first `next`.'
+---
+
+{/* reference:jsdoc */}
+
+Creates an event source, holding no value until its first `next`.
+
+{/* /reference */}
+
+## Example
+
+```tsx
+import { source } from 'synstate-next';
+
+const ticks = source<number>();
+
+// An event source holds no value until its first `next`.
+assert.isFalse(ticks.hasValue);
+
+const mut_seen: number[] = [];
+
+ticks.subscribe((n) => {
+    mut_seen.push(n);
+});
+
+ticks.next(1);
+
+ticks.next(1);
+
+assert.deepStrictEqual(mut_seen, [1, 1]);
+```
+
+## See also
+
+- [State and writes](/mono/synstate-next/guides/state-and-writes/)
+- [All APIs](/mono/synstate-next/reference/)
+
+[Source on GitHub](https://github.com/noshiro-pf/mono/blob/main/libs/synstate-next/src/core/state.mts)

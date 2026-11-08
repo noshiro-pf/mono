@@ -1,0 +1,55 @@
+---
+title: takeWhile
+description: 'Passes the values of the source while `predicate` holds for them; from the first value it fails for, passes nothing, keeping the last value passed.'
+---
+
+import MarbleDiagram from '../../../../components/MarbleDiagram.astro';
+
+{/* reference:jsdoc */}
+
+Passes the values of the source while `predicate` holds for them; from the first value it fails for, passes nothing, keeping the last value passed.
+
+{/* /reference */}
+
+{/* reference:init-kind */}
+
+Its result may hold no value even when the source holds one: `pipe` gives an `Observable` ([`drop`](/mono/synstate-next/guides/deriving-values/#pipe)).
+
+{/* /reference */}
+
+## Marble diagram
+
+<MarbleDiagram slug="take-while" />
+
+## Example
+
+```tsx
+import { createValueEmitter, takeWhile } from 'synstate-next';
+
+const [progress, report] = createValueEmitter<number>();
+
+const running = progress.pipe(takeWhile((p) => p < 100));
+
+const mut_seen: number[] = [];
+
+running.subscribe((p) => {
+    mut_seen.push(p);
+});
+
+report(30);
+
+report(80);
+
+report(100);
+
+report(40);
+
+assert.deepStrictEqual(mut_seen, [30, 80]);
+```
+
+## See also
+
+- [Deriving values](/mono/synstate-next/guides/deriving-values/)
+- [All APIs](/mono/synstate-next/reference/)
+
+[Source on GitHub](https://github.com/noshiro-pf/mono/blob/main/libs/synstate-next/src/operators/take-while.mts)

@@ -1,0 +1,56 @@
+---
+title: switchMap
+description: '最新の値に対して `project` が返す Observable を追いかけます。'
+---
+
+import MarbleDiagram from '../../../../../components/MarbleDiagram.astro';
+
+{/* translated-from:426c1f1fb2d3 */}
+
+最新の値に対して `project` が返す Observable を追いかけます。射影の中で作ったものはそれ専用の owner に属し、次の値に置き換わるときに破棄されます。
+
+切り替えた時点で内側の Observable が持つ値は、切り替えを起こした更新に加わります。内側の Observable がその後に流す値は、独立した更新で届きます。他のノードと同じく、最後に流した値を持ち続けます。値を持たない内側の Observable に切り替えても何も流さず、持っている値はそのままです。そのため、ソースが値を持っていても、結果が値を持たないことがあります。
+
+{/* reference:init-kind */}
+
+ソースが値を持っていても、結果は値を持たないことがあります。`pipe` の結果は `Observable` です（[`drop`](/mono/synstate-next/ja/guides/deriving-values/#pipe)）。
+
+{/* /reference */}
+
+## マーブル図
+
+<MarbleDiagram slug="switch-map" lang="ja" />
+
+## 例
+
+```tsx
+import { createState, map, switchMap, timer } from 'synstate-next';
+
+const [selected, select] = createState('a');
+
+// Loading takes 200 ms; only the latest selection is followed.
+const loaded = selected.pipe(
+    switchMap((id) => timer(200).pipe(map(() => `item ${id}`))),
+);
+
+const mut_seen: string[] = [];
+
+loaded.subscribe((item) => {
+    mut_seen.push(item);
+});
+
+await vi.advanceTimersByTimeAsync(100);
+
+select('b');
+
+await vi.advanceTimersByTimeAsync(300);
+
+assert.deepStrictEqual(mut_seen, ['item b']);
+```
+
+## 関連項目
+
+- [非同期オペレーター](/mono/synstate-next/ja/guides/async-operators/)
+- [すべての API](/mono/synstate-next/ja/reference/)
+
+[GitHub のソース](https://github.com/noshiro-pf/mono/blob/main/libs/synstate-next/src/operators/switch-map.mts)

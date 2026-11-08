@@ -1,0 +1,82 @@
+---
+title: owner
+description: '現在の owner、owner の作成と破棄、後始末の登録。'
+---
+
+{/* translated-from:5c3b43306a73 */}
+
+### `createOwner`
+
+現在の owner の子として owner を作ります（どの owner の外ならルートになります）。
+
+### `createRootOwner`
+
+親を持たない owner を作ります。破棄するのは自分自身の `dispose` だけです。
+
+### `getOwner`
+
+`run` を実行中の owner を返します。なければ `undefined` です。
+
+### `onCleanup`
+
+`cleanup` を現在の owner に登録します。どの owner の外では、後始末が実行されることはないので警告します。
+
+### `untracked`
+
+現在の owner がない状態で `fn` を呼びます。そこで作ったものは呼び出し元より長く生きます。
+
+### `Owner`
+
+`run` の実行中に作ったものはすべてこれに属し、`dispose()` がそれを破棄します。子の owner、後始末、ノードの順に、それぞれ新しいものから破棄します。`createOwner` か `createRootOwner` で作ります。
+
+## 例
+
+```tsx
+import {
+    createRootOwner,
+    createState,
+    getOwner,
+    map,
+    onCleanup,
+    untracked,
+} from 'synstate-next';
+
+const [count, setCount] = createState(1);
+
+const mut_log: string[] = [];
+
+const owner = createRootOwner();
+
+const shared = owner.run(() => {
+    // What is created in `run` belongs to `owner`.
+    count.pipe(map((n) => n * 2)).subscribe((n) => {
+        mut_log.push(`doubled ${n}`);
+    });
+
+    onCleanup(() => {
+        mut_log.push('cleaned up');
+    });
+
+    assert.strictEqual(getOwner(), owner);
+
+    // `untracked` creates something no owner disposes.
+    return untracked(() => count.pipe(map((n) => n * 3)));
+});
+
+owner.dispose();
+
+setCount(2);
+
+assert.deepStrictEqual(mut_log, ['doubled 2', 'cleaned up']);
+
+assert.isTrue(owner.disposed);
+
+assert.strictEqual(shared.value, 6);
+```
+
+## 関連項目
+
+- [owner と寿命](/mono/synstate-next/ja/guides/owners-and-lifetime/)
+- [すべての API](/mono/synstate-next/ja/reference/)
+
+[GitHub のソース](https://github.com/noshiro-pf/mono/blob/main/libs/synstate-next/src/core/owner.mts)

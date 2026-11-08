@@ -1,0 +1,51 @@
+---
+title: filter
+description: 'Passes on the values that satisfy `predicate`.'
+---
+
+import MarbleDiagram from '../../../../components/MarbleDiagram.astro';
+
+{/* reference:jsdoc */}
+
+Passes on the values that satisfy `predicate`. A type guard narrows the values passed on.
+
+{/* /reference */}
+
+{/* reference:init-kind */}
+
+Its result may hold no value even when the source holds one: `pipe` gives an `Observable` ([`drop`](/mono/synstate-next/guides/deriving-values/#pipe)).
+
+{/* /reference */}
+
+## Marble diagram
+
+<MarbleDiagram slug="filter" />
+
+## Example
+
+```tsx
+import { createValueEmitter, filter } from 'synstate-next';
+
+const [keyPressed, pressKey] = createValueEmitter<string>();
+
+const enter = keyPressed.pipe(filter((key) => key === 'Enter'));
+
+const mut_seen: string[] = [];
+
+enter.subscribe((key) => {
+    mut_seen.push(key);
+});
+
+pressKey('a');
+
+pressKey('Enter');
+
+assert.deepStrictEqual(mut_seen, ['Enter']);
+```
+
+## See also
+
+- [Deriving values](/mono/synstate-next/guides/deriving-values/)
+- [All APIs](/mono/synstate-next/reference/)
+
+[Source on GitHub](https://github.com/noshiro-pf/mono/blob/main/libs/synstate-next/src/operators/filter.mts)

@@ -1,0 +1,38 @@
+---
+title: counter
+description: '作られた次のタスクで `0` を流し（`emitInitial: false` なら 1 間隔後に `1`）、その後 `milliseconds` ごとに次の整数を流します。'
+---
+
+import MarbleDiagram from '../../../../../components/MarbleDiagram.astro';
+
+{/* translated-from:e878894e803d */}
+
+作られた次のタスクで `0` を流し（`emitInitial: false` なら 1 間隔後に `1`）、その後 `milliseconds` ごとに次の整数を流します。`times`（正の整数か、既定の `Infinity`）を渡すと、その数だけ流したところで決着してタイマーを止めます。渡さなければ破棄されるまで動き続けます。`Number.MAX_SAFE_INTEGER` を超える回数も扱えます。
+
+## マーブル図
+
+<MarbleDiagram slug="counter" lang="ja" />
+
+## 例
+
+```tsx
+import { counter } from 'synstate-next';
+
+const mut_ticks: number[] = [];
+
+counter(100, { times: 3 }).subscribe((n) => {
+    mut_ticks.push(n);
+});
+
+await vi.advanceTimersByTimeAsync(1000);
+
+// 0 at once, then one every 100 ms, three values in all.
+assert.deepStrictEqual(mut_ticks, [0, 1, 2]);
+```
+
+## 関連項目
+
+- [非同期オペレーター](/mono/synstate-next/ja/guides/async-operators/)
+- [すべての API](/mono/synstate-next/ja/reference/)
+
+[GitHub のソース](https://github.com/noshiro-pf/mono/blob/main/libs/synstate-next/src/sources/timer.mts)

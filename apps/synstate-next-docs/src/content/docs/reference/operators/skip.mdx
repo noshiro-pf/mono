@@ -1,0 +1,46 @@
+---
+title: skip
+description: 'Drops the first `count` values of the source, the one it holds at the start included, and passes the rest.'
+---
+
+import MarbleDiagram from '../../../../components/MarbleDiagram.astro';
+
+{/* reference:jsdoc */}
+
+Drops the first `count` values of the source, the one it holds at the start included, and passes the rest. `count` is a non-negative integer.
+
+{/* /reference */}
+
+{/* reference:init-kind */}
+
+Its result may hold no value even when the source holds one: `pipe` gives an `Observable` ([`drop`](/mono/synstate-next/guides/deriving-values/#pipe)).
+
+{/* /reference */}
+
+## Marble diagram
+
+<MarbleDiagram slug="skip" />
+
+## Example
+
+```tsx
+import { createState, skip } from 'synstate-next';
+
+const [query, setQuery] = createState('');
+
+// Leaves out the value held at the start: only what the user typed.
+const typed = query.pipe(skip(1));
+
+assert.isFalse(typed.hasValue);
+
+setQuery('syn');
+
+assert.strictEqual(typed.peek(), 'syn');
+```
+
+## See also
+
+- [Deriving values](/mono/synstate-next/guides/deriving-values/)
+- [All APIs](/mono/synstate-next/reference/)
+
+[Source on GitHub](https://github.com/noshiro-pf/mono/blob/main/libs/synstate-next/src/operators/take.mts)

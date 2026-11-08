@@ -1,0 +1,49 @@
+---
+title: filter
+description: '`predicate` を満たす値を流します。'
+---
+
+import MarbleDiagram from '../../../../../components/MarbleDiagram.astro';
+
+{/* translated-from:2fa74cbb5ee8 */}
+
+`predicate` を満たす値を流します。型ガードを渡すと、流す値の型が絞り込まれます。
+
+{/* reference:init-kind */}
+
+ソースが値を持っていても、結果は値を持たないことがあります。`pipe` の結果は `Observable` です（[`drop`](/mono/synstate-next/ja/guides/deriving-values/#pipe)）。
+
+{/* /reference */}
+
+## マーブル図
+
+<MarbleDiagram slug="filter" lang="ja" />
+
+## 例
+
+```tsx
+import { createValueEmitter, filter } from 'synstate-next';
+
+const [keyPressed, pressKey] = createValueEmitter<string>();
+
+const enter = keyPressed.pipe(filter((key) => key === 'Enter'));
+
+const mut_seen: string[] = [];
+
+enter.subscribe((key) => {
+    mut_seen.push(key);
+});
+
+pressKey('a');
+
+pressKey('Enter');
+
+assert.deepStrictEqual(mut_seen, ['Enter']);
+```
+
+## 関連項目
+
+- [値を派生させる](/mono/synstate-next/ja/guides/deriving-values/)
+- [すべての API](/mono/synstate-next/ja/reference/)
+
+[GitHub のソース](https://github.com/noshiro-pf/mono/blob/main/libs/synstate-next/src/operators/filter.mts)

@@ -1,0 +1,59 @@
+---
+title: skipUntil
+description: 'Passes nothing until `notifier` emits, then every value of the source, the one it emits in the update the notifier emits in included.'
+---
+
+import MarbleDiagram from '../../../../components/MarbleDiagram.astro';
+
+{/* reference:jsdoc */}
+
+Passes nothing until `notifier` emits, then every value of the source, the one it emits in the update the notifier emits in included. A value the notifier holds at the start is not an emission.
+
+{/* /reference */}
+
+{/* reference:init-kind */}
+
+Its result may hold no value even when the source holds one: `pipe` gives an `Observable` ([`drop`](/mono/synstate-next/guides/deriving-values/#pipe)).
+
+{/* /reference */}
+
+## Marble diagram
+
+<MarbleDiagram slug="skip-until" />
+
+## Example
+
+```tsx
+import {
+    createEventEmitter,
+    createValueEmitter,
+    skipUntil,
+} from 'synstate-next';
+
+const [message, receive] = createValueEmitter<string>();
+
+const [ready, markReady] = createEventEmitter();
+
+const shown = message.pipe(skipUntil(ready));
+
+const mut_seen: string[] = [];
+
+shown.subscribe((m) => {
+    mut_seen.push(m);
+});
+
+receive('too early');
+
+markReady();
+
+receive('hello');
+
+assert.deepStrictEqual(mut_seen, ['hello']);
+```
+
+## See also
+
+- [Deriving values](/mono/synstate-next/guides/deriving-values/)
+- [All APIs](/mono/synstate-next/reference/)
+
+[Source on GitHub](https://github.com/noshiro-pf/mono/blob/main/libs/synstate-next/src/operators/take-until.mts)

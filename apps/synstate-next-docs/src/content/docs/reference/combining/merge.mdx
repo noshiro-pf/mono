@@ -1,0 +1,45 @@
+---
+title: merge
+description: 'Emits the value of whichever parent emitted in this update (the first of them, if several did).'
+---
+
+import MarbleDiagram from '../../../../components/MarbleDiagram.astro';
+
+{/* reference:jsdoc */}
+
+Emits the value of whichever parent emitted in this update (the first of them, if several did). Holds no value until one emits.
+
+{/* /reference */}
+
+## Marble diagram
+
+<MarbleDiagram slug="merge" />
+
+## Example
+
+```tsx
+import { createValueEmitter, merge } from 'synstate-next';
+
+const [mouse, fromMouse] = createValueEmitter<string>();
+
+const [keyboard, fromKeyboard] = createValueEmitter<string>();
+
+const mut_inputs: string[] = [];
+
+merge([mouse, keyboard]).subscribe((input) => {
+    mut_inputs.push(input);
+});
+
+fromMouse('click');
+
+fromKeyboard('enter');
+
+assert.deepStrictEqual(mut_inputs, ['click', 'enter']);
+```
+
+## See also
+
+- [Deriving values](/mono/synstate-next/guides/deriving-values/)
+- [All APIs](/mono/synstate-next/reference/)
+
+[Source on GitHub](https://github.com/noshiro-pf/mono/blob/main/libs/synstate-next/src/operators/derive.mts)

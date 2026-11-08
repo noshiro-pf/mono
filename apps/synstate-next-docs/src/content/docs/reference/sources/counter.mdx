@@ -1,0 +1,40 @@
+---
+title: counter
+description: 'Emits `0` in the task after it is created (or, with `emitInitial: false`, `1` one interval later), then the next integer every `milliseconds`.'
+---
+
+import MarbleDiagram from '../../../../components/MarbleDiagram.astro';
+
+{/* reference:jsdoc */}
+
+Emits `0` in the task after it is created (or, with `emitInitial: false`, `1` one interval later), then the next integer every `milliseconds`. With `times` (a positive integer, or `Infinity`, the default), it settles after that many values and clears its timers; otherwise it runs until disposed. Any count is accepted, beyond `Number.MAX_SAFE_INTEGER` too.
+
+{/* /reference */}
+
+## Marble diagram
+
+<MarbleDiagram slug="counter" />
+
+## Example
+
+```tsx
+import { counter } from 'synstate-next';
+
+const mut_ticks: number[] = [];
+
+counter(100, { times: 3 }).subscribe((n) => {
+    mut_ticks.push(n);
+});
+
+await vi.advanceTimersByTimeAsync(1000);
+
+// 0 at once, then one every 100 ms, three values in all.
+assert.deepStrictEqual(mut_ticks, [0, 1, 2]);
+```
+
+## See also
+
+- [Async operators](/mono/synstate-next/guides/async-operators/)
+- [All APIs](/mono/synstate-next/reference/)
+
+[Source on GitHub](https://github.com/noshiro-pf/mono/blob/main/libs/synstate-next/src/sources/timer.mts)

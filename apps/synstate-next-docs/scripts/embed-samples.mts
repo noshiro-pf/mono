@@ -3,6 +3,7 @@ import { Result } from 'ts-data-forge';
 import { isDirectlyExecuted } from 'ts-repo-utils';
 // eslint-disable-next-line import-x/no-relative-packages
 import { embedExamplesInMarkdown } from '../../../tools/configs/embed-examples-in-markdown.mjs';
+import { referencePages } from './reference-pages.mjs';
 import { workspaceRootPath } from './workspace-root-path.mjs';
 
 /**
@@ -103,6 +104,11 @@ const pageSamples: readonly (readonly [
     ['internals/03-done-without-completion.mts'],
   ],
   ['internals/tracing-an-update.md', ['internals/04-filter-diamond.mts']],
+  // Each reference page shows one sample, named after it.
+  ...referencePages.map(
+    ({ group, slug }) =>
+      [`reference/${group}/${slug}.mdx`, [`reference/${slug}.mts`]] as const,
+  ),
 ] as const;
 
 const docsDir = path.resolve(workspaceRootPath, 'src/content/docs');

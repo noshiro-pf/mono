@@ -1,0 +1,54 @@
+---
+title: take
+description: 'ソースの最初の `count` 個の値を、最初に持っている値も含めて流し、その後は何も流さず、最後に流した値を持ち続けます。'
+---
+
+import MarbleDiagram from '../../../../../components/MarbleDiagram.astro';
+
+{/* translated-from:ca400cff6373 */}
+
+ソースの最初の `count` 個の値を、最初に持っている値も含めて流し、その後は何も流さず、最後に流した値を持ち続けます。`count` は正の整数です。
+
+{/* reference:init-kind */}
+
+ソースが値を持てば、結果も値を持ちます。`pipe` は `InitializedObservable` をそのまま保ちます（[`keep`](/mono/synstate-next/ja/guides/deriving-values/#pipe)）。
+
+{/* /reference */}
+
+## マーブル図
+
+<MarbleDiagram slug="take" lang="ja" />
+
+## 例
+
+```tsx
+import { createValueEmitter, take } from 'synstate-next';
+
+const [clicked, click] = createValueEmitter<number>();
+
+const firstTwo = clicked.pipe(take(2));
+
+const mut_seen: number[] = [];
+
+firstTwo.subscribe((n) => {
+    mut_seen.push(n);
+});
+
+click(1);
+
+click(2);
+
+click(3);
+
+assert.deepStrictEqual(mut_seen, [1, 2]);
+
+// It keeps the last value it passed.
+assert.strictEqual(firstTwo.peek(), 2);
+```
+
+## 関連項目
+
+- [値を派生させる](/mono/synstate-next/ja/guides/deriving-values/)
+- [すべての API](/mono/synstate-next/ja/reference/)
+
+[GitHub のソース](https://github.com/noshiro-pf/mono/blob/main/libs/synstate-next/src/operators/take.mts)

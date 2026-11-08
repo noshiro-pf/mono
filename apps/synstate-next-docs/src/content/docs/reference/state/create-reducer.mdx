@@ -1,0 +1,39 @@
+---
+title: createReducer
+description: 'A state written only by `dispatch`, through `reducer`.'
+---
+
+{/* reference:jsdoc */}
+
+A state written only by `dispatch`, through `reducer`. A dispatch while the graph drains waits until that round's effects have run, and then reduces the state the writes before it left. `dispatch` returns nothing; read the state with `getSnapshot`.
+
+{/* /reference */}
+
+## Example
+
+```tsx
+import { createReducer } from 'synstate-next';
+
+type Action = Readonly<{ type: 'increment' } | { type: 'add'; amount: number }>;
+
+const [count, dispatch, { getSnapshot }] = createReducer(
+    (n: number, action: Action) =>
+        action.type === 'increment' ? n + 1 : n + action.amount,
+    0,
+);
+
+dispatch({ type: 'increment' });
+
+dispatch({ type: 'add', amount: 10 });
+
+assert.strictEqual(count.value, 11);
+
+assert.strictEqual(getSnapshot(), 11);
+```
+
+## See also
+
+- [State and writes](/mono/synstate-next/guides/state-and-writes/)
+- [All APIs](/mono/synstate-next/reference/)
+
+[Source on GitHub](https://github.com/noshiro-pf/mono/blob/main/libs/synstate-next/src/utils/create-reducer.mts)

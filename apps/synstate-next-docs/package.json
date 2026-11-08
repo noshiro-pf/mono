@@ -13,6 +13,8 @@
   "scripts": {
     "build": "astro build",
     "check:lint": "node ../../tools/scripts/cmd/assert-deps-built.mts && oxlint . && eslint .",
+    "check:test": "node ../../tools/scripts/cmd/assert-deps-built.mts && vitest --config ./configs/vitest.config.mts run",
+    "check:test:cov": "node ../../tools/scripts/cmd/assert-deps-built.mts && vitest --config ./configs/vitest.config.mts run --coverage",
     "check:types": "node ../../tools/scripts/cmd/assert-deps-built.mts && node ../../node_modules/typescript-native/bin/tsc --noEmit",
     "dev": "astro dev",
     "fix:fmt": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/format-uncommitted.mts --cwd .",
@@ -20,9 +22,11 @@
     "fix:fmt:full": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../tools/scripts/cmd/format-package.mts",
     "fix:lint": "node ../../tools/scripts/cmd/assert-deps-built.mts && oxlint . --fix && eslint . --fix",
     "fmt": "pnpm run fix:fmt",
-    "gen": "run-s gen:samples fix:fmt",
+    "gen": "run-s gen:reference gen:samples fix:fmt",
+    "gen:reference": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/embed-reference.mts",
     "gen:samples": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/embed-samples.mts",
     "preview": "astro preview",
+    "test": "pnpm run check:test",
     "watch:types": "node ../../node_modules/typescript-native/bin/tsc --noEmit --watch"
   },
   "dependencies": {
@@ -30,15 +34,26 @@
     "astro": "^7.4.2"
   },
   "devDependencies": {
+    "@types/mdast": "^4.0.4",
+    "@vitest/coverage-istanbul": "catalog:",
+    "dedent": "catalog:",
     "eslint-config-typed": "workspace:*",
     "eslint-plugin-ts-data-forge": "workspace:*",
     "eslint-plugin-ts-fortress": "workspace:*",
     "eslint-plugin-ts-type-forge": "workspace:*",
+    "mdast-util-directive": "^3.1.1",
+    "mdast-util-from-markdown": "^2.1.0",
+    "mdast-util-mdx": "^3.0.0",
+    "micromark-extension-directive": "^4.0.0",
+    "micromark-extension-mdxjs": "^3.0.0",
     "prettier": "catalog:",
     "prettier-plugin-organize-imports": "catalog:",
     "prettier-plugin-packagejson": "catalog:",
     "synstate-next": "workspace:*",
     "ts-data-forge": "workspace:*",
-    "ts-repo-utils": "workspace:*"
+    "ts-repo-utils": "workspace:*",
+    "ts-type-forge": "workspace:*",
+    "vitest": "catalog:",
+    "yaml": "^2.9.1"
   }
 }

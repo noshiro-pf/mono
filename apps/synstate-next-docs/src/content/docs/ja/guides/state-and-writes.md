@@ -1,6 +1,6 @@
 ---
 title: 状態と書き込み
-description: createState とそのオプション、更新の伝播中に行った書き込みの扱い、batch、createReducer、createBooleanState、イベントエミッター。
+description: createState とそのオプション、更新中に行った書き込みの扱い、batch、createReducer、createBooleanState、イベントエミッター。
 ---
 
 ## `createState` と 3 つ目の要素
@@ -42,7 +42,7 @@ assert.deepStrictEqual(mut_seen, [0, 10, 11, 0]);
 | `getSnapshot`  | 今の値を読む                                              |
 | `initialState` | 最初の値                                                  |
 
-セッターは何も返しません。更新の伝播中に行った書き込みはその更新が終わってから適用される（下を参照）ので、返すべき値はまだ決まっていないからです。必要なら `getSnapshot` か `.value` で読んでください。
+セッターは何も返しません。ドレイン中に行った書き込みはそのラウンドの effect が実行されてから適用される（下を参照）ので、返すべき値はまだ決まっていないからです。必要なら `getSnapshot` か `.value` で読んでください。
 
 `state(initial)` は同じ状態をオブジェクトとして作ります。`.value`・`.set`・`.update` を持ち、まとめて扱いたいコードに向いています。
 
@@ -208,7 +208,7 @@ batch の中で 2 回書き込んだ状態は、最後の値で 1 回だけ伝�
 
 ## `createReducer`
 
-reducer を通してだけ書き込む状態です。`dispatch` は何も返しません。更新の伝播中に行った dispatch はその更新が終わるのを待ち、それより前の書き込みが残した状態に対して reduce します。
+reducer を通してだけ書き込む状態です。`dispatch` は何も返しません。ドレイン中に行った dispatch はほかの書き込みと同じくそのラウンドの effect が実行されるまで待ち、それより前の書き込みが残した状態に対して reduce します。
 
 ```tsx
 import { createReducer } from 'synstate-next';

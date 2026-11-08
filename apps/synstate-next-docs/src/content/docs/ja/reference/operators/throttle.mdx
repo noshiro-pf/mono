@@ -1,0 +1,52 @@
+---
+title: throttle
+description: '値をすぐに流し、その後 `milliseconds` の間に来た値は捨てます。'
+---
+
+import MarbleDiagram from '../../../../../components/MarbleDiagram.astro';
+
+{/* translated-from:c5bd5dadafc5 */}
+
+値をすぐに流し、その後 `milliseconds` の間に来た値は捨てます。最初はソースが持っている値を持ちますが、それで期間を始めることはありません。
+
+{/* reference:init-kind */}
+
+ソースが値を持てば、結果も値を持ちます。`pipe` は `InitializedObservable` をそのまま保ちます（[`keep`](/mono/synstate-next/ja/guides/deriving-values/#pipe)）。
+
+{/* /reference */}
+
+## マーブル図
+
+<MarbleDiagram slug="throttle" lang="ja" />
+
+## 例
+
+```tsx
+import { createValueEmitter, throttle } from 'synstate-next';
+
+const [scrolled, scroll] = createValueEmitter<number>();
+
+const mut_seen: number[] = [];
+
+scrolled.pipe(throttle(100)).subscribe((y) => {
+    mut_seen.push(y);
+});
+
+scroll(10);
+
+scroll(20);
+
+await vi.advanceTimersByTimeAsync(100);
+
+scroll(30);
+
+// The first value of each window passes; the rest are dropped.
+assert.deepStrictEqual(mut_seen, [10, 30]);
+```
+
+## 関連項目
+
+- [非同期オペレーター](/mono/synstate-next/ja/guides/async-operators/)
+- [すべての API](/mono/synstate-next/ja/reference/)
+
+[GitHub のソース](https://github.com/noshiro-pf/mono/blob/main/libs/synstate-next/src/operators/throttle.mts)

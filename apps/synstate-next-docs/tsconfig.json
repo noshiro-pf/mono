@@ -8,6 +8,6 @@
   },
   // The code blocks are samples in `libs/synstate-next/samples/docs-site/`,
   // type-checked and run as tests there.
-  "include": ["./scripts", "./test"],
+  "include": ["./configs", "./scripts", "./test"],
   "exclude": ["./src/content.config.ts"]
 }

@@ -1,0 +1,52 @@
+---
+title: derive
+description: '`parents` の値から `fn` を計算し、持っている値と等しくなければ結果を流します。'
+---
+
+import MarbleDiagram from '../../../../../components/MarbleDiagram.astro';
+
+{/* translated-from:83fbe3e57bfb */}
+
+`parents` の値から `fn` を計算し、持っている値と等しくなければ結果を流します。親がいくつ変わっても、更新ごとに 1 回だけ計算します。すべての親が値を持つまでは値を持ちません。
+
+## マーブル図
+
+<MarbleDiagram slug="derive" lang="ja" />
+
+## 例
+
+```tsx
+import { batch, createState, derive } from 'synstate-next';
+
+const [price, setPrice] = createState(100);
+
+const [quantity, setQuantity] = createState(2);
+
+let mut_runs = 0;
+
+const total = derive([price, quantity], (p, q) => {
+    mut_runs += 1;
+
+    return p * q;
+});
+
+total.subscribe(() => {});
+
+batch(() => {
+    setPrice(120);
+
+    setQuantity(3);
+});
+
+assert.strictEqual(total.value, 360);
+
+// Once at creation, once for the update that changed both parents.
+assert.strictEqual(mut_runs, 2);
+```
+
+## 関連項目
+
+- [値を派生させる](/mono/synstate-next/ja/guides/deriving-values/)
+- [すべての API](/mono/synstate-next/ja/reference/)
+
+[GitHub のソース](https://github.com/noshiro-pf/mono/blob/main/libs/synstate-next/src/operators/derive.mts)

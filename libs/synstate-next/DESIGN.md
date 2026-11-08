@@ -169,7 +169,8 @@ from the prototype; the packages are to be measured again in
 ## Breaking changes against synstate
 
 - Subscribers run after the update has settled, not during it.
-- Writes made during propagation are deferred; nested updates do not exist.
+- Nested updates do not exist: a write made during the drain is deferred, and
+  one made by an effect propagates in the next round.
 - `complete` is gone: an observable ends by being disposed.
 - Observables from two copies of the package cannot be combined.
 - A `For` row reads its new element one round after the list changed (see
@@ -206,8 +207,9 @@ from the prototype; the packages are to be measured again in
   `complete`), the form RxJS recommends and a TC39 `Observable` takes, not with
   three functions.
 - The setters of `createState`, `createReducer` and `createBooleanState` return
-  nothing. A write made while an update propagates is applied once it ends, so
-  the state it would return is not known yet; `getSnapshot` reads it.
+  nothing. A write made while the graph drains is applied once that round's
+  effects have run, so the state it would return is not known yet; `getSnapshot`
+  reads it.
 - `collectToArray` is gone: it resolved on completion, which no longer exists.
   A node that is done is settled, which is asked rather than announced.
 - An operator written outside the package is one `createDerived` (synstate's

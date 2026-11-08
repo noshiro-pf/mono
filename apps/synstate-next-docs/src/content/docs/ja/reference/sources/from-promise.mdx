@@ -1,0 +1,43 @@
+---
+title: fromPromise
+description: '`promise` の結果を `Result.ok(value)` か `Result.err(error)` として、独立した更新で 1 回だけ流し、決着します。'
+---
+
+import MarbleDiagram from '../../../../../components/MarbleDiagram.astro';
+
+{/* translated-from:4d28276ad9a0 */}
+
+`promise` の結果を `Result.ok(value)` か `Result.err(error)` として、独立した更新で 1 回だけ流し、決着します。
+
+## マーブル図
+
+<MarbleDiagram slug="from-promise" lang="ja" />
+
+## 例
+
+```tsx
+import { fromPromise } from 'synstate-next';
+import { Result } from 'ts-std-forge';
+
+const answer = fromPromise(Promise.resolve(42));
+
+// Nothing until the promise settles.
+assert.isFalse(answer.hasValue);
+
+await vi.advanceTimersByTimeAsync(0);
+
+assert.deepStrictEqual(answer.peek(), Result.ok(42));
+
+const failed = fromPromise<number, Error>(Promise.reject(new Error('down')));
+
+await vi.advanceTimersByTimeAsync(0);
+
+assert.isTrue(Result.isErr(failed.peek() ?? Result.ok(0)));
+```
+
+## 関連項目
+
+- [非同期オペレーター](/mono/synstate-next/ja/guides/async-operators/)
+- [すべての API](/mono/synstate-next/ja/reference/)
+
+[GitHub のソース](https://github.com/noshiro-pf/mono/blob/main/libs/synstate-next/src/sources/from-promise.mts)

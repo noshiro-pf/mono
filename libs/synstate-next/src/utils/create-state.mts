@@ -7,8 +7,8 @@ import {
 /**
  * A state as a tuple of the observable, its setter and the rest, for code that
  * passes them to different places. The setters return nothing: a write made
- * while an update propagates is applied once it ends, so what it would return
- * is not known yet. Read the state with `getSnapshot`.
+ * while the graph drains is applied once that round's effects have run, so what
+ * it would return is not known yet. Read the state with `getSnapshot`.
  */
 export const createState = <S,>(
   initialState: S,
@@ -18,8 +18,9 @@ export const createState = <S,>(
   setState: (next: S) => void,
   utils: Readonly<{
     /**
-     * Writes `updateFn(current)`. During propagation `updateFn` itself waits,
-     * so that it reads the state the writes before it left.
+     * Writes `updateFn(current)`. While the graph drains, `updateFn` itself
+     * waits with the write, so that it reads the state the writes before it
+     * left.
      */
     updateState: (updateFn: (current: S) => S) => void;
     resetState: () => void;

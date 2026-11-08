@@ -1,0 +1,37 @@
+---
+title: createBooleanState
+description: '`setTrue`・`setFalse`・`toggle` を持つ真偽値の状態です。'
+---
+
+{/* translated-from:144eba0d95cc */}
+
+`setTrue`・`setFalse`・`toggle` を持つ真偽値の状態です。
+
+## 例
+
+```tsx
+import { createBooleanState } from 'synstate-next';
+
+const [isOpen, { setTrue, setFalse, toggle }] = createBooleanState(false);
+
+setTrue();
+
+assert.isTrue(isOpen.value);
+
+toggle();
+
+assert.isFalse(isOpen.value);
+
+toggle();
+
+setFalse();
+
+assert.isFalse(isOpen.value);
+```
+
+## 関連項目
+
+- [状態と書き込み](/mono/synstate-next/ja/guides/state-and-writes/)
+- [すべての API](/mono/synstate-next/ja/reference/)
+
+[GitHub のソース](https://github.com/noshiro-pf/mono/blob/main/libs/synstate-next/src/utils/create-boolean-state.mts)

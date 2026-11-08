@@ -1,0 +1,37 @@
+---
+title: createReducer
+description: '`dispatch` からだけ、`reducer` を通して書き込む状態です。'
+---
+
+{/* translated-from:0ce89f305adf */}
+
+`dispatch` からだけ、`reducer` を通して書き込む状態です。グラフのドレイン中の dispatch はそのラウンドの effect が実行されるまで待ち、その前の書き込みが残した状態を reduce します。`dispatch` は何も返さないので、状態は `getSnapshot` で読みます。
+
+## 例
+
+```tsx
+import { createReducer } from 'synstate-next';
+
+type Action = Readonly<{ type: 'increment' } | { type: 'add'; amount: number }>;
+
+const [count, dispatch, { getSnapshot }] = createReducer(
+    (n: number, action: Action) =>
+        action.type === 'increment' ? n + 1 : n + action.amount,
+    0,
+);
+
+dispatch({ type: 'increment' });
+
+dispatch({ type: 'add', amount: 10 });
+
+assert.strictEqual(count.value, 11);
+
+assert.strictEqual(getSnapshot(), 11);
+```
+
+## 関連項目
+
+- [状態と書き込み](/mono/synstate-next/ja/guides/state-and-writes/)
+- [すべての API](/mono/synstate-next/ja/reference/)
+
+[GitHub のソース](https://github.com/noshiro-pf/mono/blob/main/libs/synstate-next/src/utils/create-reducer.mts)

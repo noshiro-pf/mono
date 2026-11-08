@@ -1,0 +1,42 @@
+---
+title: createState
+description: 'A state as a tuple of the observable, its setter and the rest, for code that passes them to different places.'
+---
+
+{/* reference:jsdoc */}
+
+A state as a tuple of the observable, its setter and the rest, for code that passes them to different places. The setters return nothing: a write made while the graph drains is applied once that round's effects have run, so what it would return is not known yet. Read the state with `getSnapshot`.
+
+{/* /reference */}
+
+## Example
+
+```tsx
+import { createState } from 'synstate-next';
+
+const [count, setCount, { updateState, resetState, getSnapshot }] =
+    createState(0);
+
+const mut_seen: number[] = [];
+
+count.subscribe((n) => {
+    mut_seen.push(n);
+});
+
+setCount(5);
+
+updateState((n) => n + 1);
+
+assert.strictEqual(getSnapshot(), 6);
+
+resetState();
+
+assert.deepStrictEqual(mut_seen, [0, 5, 6, 0]);
+```
+
+## See also
+
+- [State and writes](/mono/synstate-next/guides/state-and-writes/)
+- [All APIs](/mono/synstate-next/reference/)
+
+[Source on GitHub](https://github.com/noshiro-pf/mono/blob/main/libs/synstate-next/src/utils/create-state.mts)

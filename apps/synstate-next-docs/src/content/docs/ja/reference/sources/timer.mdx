@@ -1,0 +1,41 @@
+---
+title: timer
+description: '作られてから `milliseconds` 後に `0` を 1 回流し、決着します。'
+---
+
+import MarbleDiagram from '../../../../../components/MarbleDiagram.astro';
+
+{/* translated-from:e8aeea06bd34 */}
+
+作られてから `milliseconds` 後に `0` を 1 回流し、決着します。破棄するとタイマーを止めます。
+
+## マーブル図
+
+<MarbleDiagram slug="timer" lang="ja" />
+
+## 例
+
+```tsx
+import { timer } from 'synstate-next';
+
+const mut_fired: number[] = [];
+
+timer(300).subscribe((n) => {
+    mut_fired.push(n);
+});
+
+await vi.advanceTimersByTimeAsync(299);
+
+assert.deepStrictEqual(mut_fired, []);
+
+await vi.advanceTimersByTimeAsync(1);
+
+assert.deepStrictEqual(mut_fired, [0]);
+```
+
+## 関連項目
+
+- [非同期オペレーター](/mono/synstate-next/ja/guides/async-operators/)
+- [すべての API](/mono/synstate-next/ja/reference/)
+
+[GitHub のソース](https://github.com/noshiro-pf/mono/blob/main/libs/synstate-next/src/sources/timer.mts)

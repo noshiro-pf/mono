@@ -1,0 +1,59 @@
+---
+title: withBufferedFrom
+description: 'ソースの各値に、直前の値から後に `other` が流した値を順に付けます。'
+---
+
+import MarbleDiagram from '../../../../../components/MarbleDiagram.astro';
+
+{/* translated-from:6707d5e9ae60 */}
+
+ソースの各値に、直前の値から後に `other` が流した値を順に付けます。同じ更新で流したものは含み、このノードを作る前から持っていたものは含みません。
+
+{/* reference:init-kind */}
+
+ソースが値を持てば、結果も値を持ちます。`pipe` は `InitializedObservable` をそのまま保ちます（[`keep`](/mono/synstate-next/ja/guides/deriving-values/#pipe)）。
+
+{/* /reference */}
+
+## マーブル図
+
+<MarbleDiagram slug="with-buffered-from" lang="ja" />
+
+## 例
+
+```tsx
+import {
+    createEventEmitter,
+    createValueEmitter,
+    withBufferedFrom,
+} from 'synstate-next';
+
+const [logged, log] = createValueEmitter<string>();
+
+const [flushed, flush] = createEventEmitter();
+
+const mut_batches: (readonly string[])[] = [];
+
+flushed.pipe(withBufferedFrom(logged)).subscribe(([, lines]) => {
+    mut_batches.push(lines);
+});
+
+log('a');
+
+log('b');
+
+flush();
+
+log('c');
+
+flush();
+
+assert.deepStrictEqual(mut_batches, [['a', 'b'], ['c']]);
+```
+
+## 関連項目
+
+- [値を派生させる](/mono/synstate-next/ja/guides/deriving-values/)
+- [すべての API](/mono/synstate-next/ja/reference/)
+
+[GitHub のソース](https://github.com/noshiro-pf/mono/blob/main/libs/synstate-next/src/operators/with-buffered-from.mts)

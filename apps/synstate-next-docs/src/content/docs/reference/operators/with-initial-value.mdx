@@ -1,0 +1,46 @@
+---
+title: withInitialValue
+description: 'Holds `initial` until the source emits, then follows the source.'
+---
+
+import MarbleDiagram from '../../../../components/MarbleDiagram.astro';
+
+{/* reference:jsdoc */}
+
+Holds `initial` until the source emits, then follows the source.
+
+{/* /reference */}
+
+{/* reference:init-kind */}
+
+Its result always holds a value: `pipe` gives an `InitializedObservable` ([`with`](/mono/synstate-next/guides/deriving-values/#pipe)).
+
+{/* /reference */}
+
+## Marble diagram
+
+<MarbleDiagram slug="with-initial-value" />
+
+## Example
+
+```tsx
+import { createValueEmitter, withInitialValue } from 'synstate-next';
+
+const [message, receive] = createValueEmitter<string>();
+
+const latest = message.pipe(withInitialValue('(none yet)'));
+
+// An `InitializedObservable`: `.value` is there from the start.
+assert.strictEqual(latest.value, '(none yet)');
+
+receive('hello');
+
+assert.strictEqual(latest.value, 'hello');
+```
+
+## See also
+
+- [Deriving values](/mono/synstate-next/guides/deriving-values/)
+- [All APIs](/mono/synstate-next/reference/)
+
+[Source on GitHub](https://github.com/noshiro-pf/mono/blob/main/libs/synstate-next/src/operators/with-initial-value.mts)

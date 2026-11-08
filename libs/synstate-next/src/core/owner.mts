@@ -27,6 +27,11 @@ const mut_internals: {
   retire: () => {},
 };
 
+/**
+ * Everything created while its `run` executes belongs to it, and `dispose()`
+ * disposes it: the child owners first, then the cleanups, then the nodes, each
+ * newest first. Made by `createOwner` or `createRootOwner`.
+ */
 export class Owner {
   static {
     // The internal operations of `ownerBelow` and `retireOwner`, which reach the

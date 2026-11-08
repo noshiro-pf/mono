@@ -1,0 +1,42 @@
+---
+title: fromSubscribable
+description: '`subscribable` を追いかけ、値をそれぞれ `Result.ok(value)`、エラーを `Result.err(error)` として流します。'
+---
+
+{/* translated-from:34009983a7ad */}
+
+`subscribable` を追いかけ、値をそれぞれ `Result.ok(value)`、エラーを `Result.err(error)` として流します。エラーか完了で決着し、破棄されると購読を解除します（subscribable が先に終わっていれば別です）。購読中に渡された値は、流すのではなく最初から持つ値になります。
+
+## 例
+
+```tsx
+import { fromSubscribable, type Subscribable } from 'synstate-next';
+import { Result } from 'ts-std-forge';
+
+const mut_observers: Parameters<Subscribable<number>['subscribe']>[0][] = [];
+
+const external: Subscribable<number> = {
+    subscribe: (observer) => {
+        mut_observers.push(observer);
+
+        return { unsubscribe: () => {} };
+    },
+};
+
+const followed = fromSubscribable(external);
+
+mut_observers[0]?.next(1);
+
+assert.deepStrictEqual(followed.peek(), Result.ok(1));
+
+mut_observers[0]?.error(new Error('closed'));
+
+assert.isTrue(Result.isErr(followed.peek() ?? Result.ok(0)));
+```
+
+## 関連項目
+
+- [非同期オペレーター](/mono/synstate-next/ja/guides/async-operators/)
+- [すべての API](/mono/synstate-next/ja/reference/)
+
+[GitHub のソース](https://github.com/noshiro-pf/mono/blob/main/libs/synstate-next/src/sources/from-subscribable.mts)

@@ -1,0 +1,59 @@
+---
+title: takeUntil
+description: '`notifier` が値を流すまでソースを追いかけ、その後は何も流さず、最後に流した値を持ち続けます。'
+---
+
+import MarbleDiagram from '../../../../../components/MarbleDiagram.astro';
+
+{/* translated-from:0581ae2aa0ef */}
+
+`notifier` が値を流すまでソースを追いかけ、その後は何も流さず、最後に流した値を持ち続けます。notifier が流したのと同じ更新でソースが流した値は流しません。notifier が最初に持っている値は、値を流したことに数えません。
+
+{/* reference:init-kind */}
+
+ソースが値を持てば、結果も値を持ちます。`pipe` は `InitializedObservable` をそのまま保ちます（[`keep`](/mono/synstate-next/ja/guides/deriving-values/#pipe)）。
+
+{/* /reference */}
+
+## マーブル図
+
+<MarbleDiagram slug="take-until" lang="ja" />
+
+## 例
+
+```tsx
+import {
+    createEventEmitter,
+    createValueEmitter,
+    takeUntil,
+} from 'synstate-next';
+
+const [moved, move] = createValueEmitter<number>();
+
+const [released, release] = createEventEmitter();
+
+const drag = moved.pipe(takeUntil(released));
+
+const mut_seen: number[] = [];
+
+drag.subscribe((x) => {
+    mut_seen.push(x);
+});
+
+move(1);
+
+move(2);
+
+release();
+
+move(3);
+
+assert.deepStrictEqual(mut_seen, [1, 2]);
+```
+
+## 関連項目
+
+- [値を派生させる](/mono/synstate-next/ja/guides/deriving-values/)
+- [すべての API](/mono/synstate-next/ja/reference/)
+
+[GitHub のソース](https://github.com/noshiro-pf/mono/blob/main/libs/synstate-next/src/operators/take-until.mts)

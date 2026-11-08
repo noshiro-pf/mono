@@ -1,0 +1,76 @@
+---
+title: createDerived
+description: 'Creates an observable that follows `parents`: an operator written outside the package.'
+---
+
+{/* reference:jsdoc */}
+
+Creates an observable that follows `parents`: an operator written outside the package. `setup` runs once, at creation, and returns its `update` (alone, or with `settled`). The observable holds `initialValue` if given, and nothing until it is first set otherwise. It belongs to the current owner as every observable does. `setup` runs with the observable as the current owner, so what it creates and the cleanups it registers (`ctx.onCleanup`, or `onCleanup`) belong to the observable. Disposing it disposes them as an owner does: the owners `setup` created first, then the cleanups, then the nodes, each newest first.
+
+`update` reads its parents. What `setup` creates is for work on the side (a subscription, a listener): a node made there is visited in the same update as this one, not before it, so `update` would read its value from before.
+
+An operator that emits later than the update that woke it (from a timer) gives `settled`, so that it is not taken for done while a value is still due; a `mergeMap` lets go of an inner observable that is settled.
+
+{/* /reference */}
+
+## Example
+
+```tsx
+import {
+    createDerived,
+    createState,
+    type Observable,
+    type Operator,
+} from 'synstate-next';
+
+// Passes on every `n`-th value of the source.
+const everyNth =
+    <A,>(n: number): Operator<A, A, 'drop'> =>
+    (source: Observable<A>): Observable<A> =>
+        createDerived<A>([source], (ctx) => {
+            let mut_count = 0;
+
+            return () => {
+                const value = source.peek();
+
+                if (value === undefined || !ctx.emitted(source)) {
+                    return;
+                }
+
+                mut_count += 1;
+
+                if (mut_count !== n) {
+                    return;
+                }
+
+                mut_count = 0;
+
+                ctx.set(value);
+            };
+        });
+
+const [count, setCount] = createState(0);
+
+const mut_seen: number[] = [];
+
+count.pipe(everyNth(2)).subscribe((c) => {
+    mut_seen.push(c);
+});
+
+setCount(1);
+
+setCount(2);
+
+setCount(3);
+
+setCount(4);
+
+assert.deepStrictEqual(mut_seen, [2, 4]);
+```
+
+## See also
+
+- [Custom operators and sources](/mono/synstate-next/guides/custom-operators-and-sources/)
+- [All APIs](/mono/synstate-next/reference/)
+
+[Source on GitHub](https://github.com/noshiro-pf/mono/blob/main/libs/synstate-next/src/operators/create-derived.mts)

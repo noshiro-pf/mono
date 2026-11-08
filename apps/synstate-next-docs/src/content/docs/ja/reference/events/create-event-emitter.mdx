@@ -1,0 +1,31 @@
+---
+title: createEventEmitter
+description: '`undefined` のイベントソースと、それを流す関数です。'
+---
+
+{/* translated-from:00b1777e9054 */}
+
+`undefined` のイベントソースと、それを流す関数です。
+
+## 例
+
+```tsx
+import { createEventEmitter, scan } from 'synstate-next';
+
+const [clicked, click] = createEventEmitter();
+
+const clicks = clicked.pipe(scan((n) => n + 1, 0));
+
+click();
+
+click();
+
+assert.strictEqual(clicks.value, 2);
+```
+
+## 関連項目
+
+- [状態と書き込み](/mono/synstate-next/ja/guides/state-and-writes/)
+- [すべての API](/mono/synstate-next/ja/reference/)
+
+[GitHub のソース](https://github.com/noshiro-pf/mono/blob/main/libs/synstate-next/src/utils/create-event-emitter.mts)
