@@ -3,7 +3,8 @@
 `CLAUDE.md` ("Commits and pull requests") says a pull request is reviewed with
 `/code-review` before it is opened and before any later amend is pushed. This
 file is the procedure: what to do before the first round so that it finds
-little, how each round is run, and when the loop ends.
+little, how each round is run, when the loop ends, and when it is put to the
+user.
 
 Every round is a full review of whatever it is given. The loop is cheapest
 when the first round finds little and each later round is given little: a
@@ -87,9 +88,11 @@ round dismissed, costs as much as the first.
 - **Fix it here unless it is out of scope.** A finding is fixed in this pull
   request, whatever round raised it and however many lines the fix takes, when
   it is about code or prose the change adds or alters, or about what the change
-  set out to do. A defect in the change's own new code is never deferred. Defer
-  only a finding that is out of scope, and say which way, as the tag its bullet
-  under **Deferred** opens with:
+  set out to do. A defect in the change's own new code is never deferred. Defer,
+  with an issue, only a finding that is out of scope and still worth fixing on
+  its own; one out of scope that is not worth fixing at all is dismissed with
+  that reason. Say which way a deferred one is out of scope, as the tag its
+  bullet under **Deferred** opens with:
     - `(predates)` — the problem was there before the change, in code the change
       does not otherwise need to touch;
     - `(another change)` — fixing it pursues a different goal, or reaches
@@ -108,45 +111,64 @@ round dismissed, costs as much as the first.
 
 ## When the loop ends
 
-The loop ends at the first of:
+No number of rounds ends the loop; what is left for a next round to read does.
+A later round reads only what the round before it changed, unless it is widened,
+and every fix is read by the next round but the wording fixes of the round that
+ends the loop. The loop ends at the first round whose findings, if it has any,
+are each one of:
 
-- a round with no findings;
-- a round whose findings are wording only — phrasing, typos, how a comment is
-  laid out — fix them and do not review again. A claim that is wrong is not
-  wording, wherever it is written: a false sentence in a README is a finding
-  like any other;
-- a round that raises only findings the ledger already dismisses;
-- the third round. What it finds goes where "Fix it here unless it is out of
-  scope" sends it, as in any other round. Do not start a fourth round.
+- wording — phrasing, typos, how a comment is laid out — fixed, and not reviewed
+  again. A claim that is wrong is not wording, wherever it is written:
+  a false sentence in a README is a finding like any other;
+- dismissed, newly or because the ledger already dismisses it;
+- deferred as out of scope and worth fixing on its own, as "Fix it here unless
+  it is out of scope" says.
 
-A fix the third round asked for that changes behavior — anything but wording —
-is read by `/code-review medium` given that fix alone (mark the branch as for a
-later round). That read is not a fourth round. What it finds in scope is fixed
-here, and a fix of that which changes behavior is read the same way, given that
-fix alone. When a second such read still finds something in scope, stop and ask
-in the thread, rather than reading again or deferring it. Otherwise the last
-fixes of a long loop are the only code that reaches `main` with no review at
-all.
+Ending the loop is never a reason to defer a finding. One in scope is fixed here
+and read by the next round, however late it is raised: an issue split off to end
+the loop is a second change reviewed and checked from the start.
+
+**A loop that stops converging is put to the user.** A round that is not widened
+reads only the previous round's fixes, so each should find less than the one
+before. Rounds are numbered within their loop. Below, a fix is any fix but a
+wording one, counted once per finding it answers.
+When either of these holds, stop and ask in the thread whether to go on, split
+the change or rework it, unless an earlier answer of the user's already covers
+this round ("go on through round eight"); ask before making the round's fixes,
+and instead of reviewing again or deferring:
+
+- a round from the fourth on asks for more fixes than the round before it did.
+  A widened round is compared with nothing, since it reads the whole diff again;
+  the round after it is compared with it;
+- any round from the sixth on, widened or not, asks for a fix at all.
+
+Stopping to ask is not ending the loop, and no answer leaves a fix unread. Go
+on, and the round's fixes are made and read by the next round; split, and each
+part is a pull request with its findings and a loop of its own; rework, and a
+new loop reads the whole diff. A loop that stops converging usually means the
+design was not settled before the code (see "Before writing code"), or the fixes
+keep breaking what they touch.
 
 ## What counts as a round
 
-The three rounds belong to one loop over one version of the change. What starts
+The rounds belong to one loop over one version of the change. What starts
 another, or needs none:
 
 - **A rework** — the change sent back to another approach, by the user or by a
   finding about what the change should do, so that the code the rounds read is
-  mostly gone — starts a new loop of up to three rounds over the whole diff. A
-  second rework is put to the user before its loop starts. A fix inside a loop
-  that changes a design is not a rework: it widens the next round, as "To widen
-  a round" above says, and counts in its loop.
+  mostly gone — starts a new loop over the whole diff. A second rework is put to
+  the user before its loop starts. A fix inside a loop that changes a design is
+  not a rework: it widens the next round, as "To widen a round" above says, and
+  that round keeps its place in the loop's numbering.
 - **An amend to an open pull request** is a loop of its own, over the amend.
 - **A rebase or restack that changes nothing in this layer** needs no review.
-- **A rebase that resolves a conflict** is read once, at the loop's level, given
-  the resolution alone. It is outside every count, and what it finds follows the
-  third-round rule above.
+- **A rebase that resolves a conflict** is a loop of its own, given the
+  resolution alone, at the level its diff calls for ("Level" above). Its rounds
+  are not in the description's total (below).
 
-Anything else — a fix, a test added, a comment reworded — is a round of the loop
-it belongs to.
+Anything else — a fix, a test added, a comment reworded — is part of the loop it
+is made in, and that loop's next round reads it, unless it is a wording fix that
+ends the loop.
 
 ## What the description records
 
@@ -161,10 +183,9 @@ Review at `high`, 2 rounds.
 Self-review at `high`, 1 round.
 ```
 
-The total counts the rounds of every loop. The read of a third-round fix and the
-read of a conflict resolution are not rounds and are not in it. More than one
-loop, or more than one level, is still one total; the next sentence says how it
-divides. The line may go on after a period, comma, semicolon or colon.
+The total counts the rounds of every loop but a conflict resolution's. More than
+one loop, or more than one level, is still one total; the next sentence says how
+it divides. The line may go on after a period, comma, semicolon or colon.
 `pr-description` and `open-pr --body-file` refuse a section that opens any other
 way, and `review-findings-digest` reads the total from it. A description written
 before this form changes the opening in both halves, or in the original alone
