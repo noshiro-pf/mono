@@ -1,0 +1,27 @@
+---
+title: isObservable
+description: '`value` が、このパッケージのこのコピーの Observable かどうかを返します。'
+---
+
+{/* translated-from:f5ad7f3bddb3 */}
+
+`value` が、このパッケージのこのコピーの Observable かどうかを返します。
+
+## 例
+
+```tsx
+import { createState, isObservable } from 'synstate-next';
+
+const [count] = createState(0);
+
+assert.isTrue(isObservable(count));
+
+assert.isFalse(isObservable({ value: 0 }));
+```
+
+## 関連項目
+
+- [owner と寿命](/mono/synstate-next/ja/guides/owners-and-lifetime/)
+- [すべての API](/mono/synstate-next/ja/reference/)
+
+[GitHub のソース](https://github.com/noshiro-pf/mono/blob/main/libs/synstate-next/src/core/observable-class.mts)

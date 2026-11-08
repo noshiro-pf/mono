@@ -1,0 +1,38 @@
+---
+title: empty
+description: 'Holds nothing and is settled: it never emits.'
+---
+
+{/* reference:jsdoc */}
+
+Holds nothing and is settled: it never emits. For a branch of a `switchMap` that should follow nothing.
+
+{/* /reference */}
+
+## Example
+
+```tsx
+import { counter, createState, empty, switchMap } from 'synstate-next';
+
+const [running, setRunning] = createState(true);
+
+const ticks = running.pipe(
+    // While paused, follow nothing: the last tick is kept.
+    switchMap((r) => (r ? counter(100) : empty<number>())),
+);
+
+await vi.advanceTimersByTimeAsync(250);
+
+setRunning(false);
+
+await vi.advanceTimersByTimeAsync(1000);
+
+assert.strictEqual(ticks.peek(), 2);
+```
+
+## See also
+
+- [Async operators](/mono/synstate-next/guides/async-operators/)
+- [All APIs](/mono/synstate-next/reference/)
+
+[Source on GitHub](https://github.com/noshiro-pf/mono/blob/main/libs/synstate-next/src/sources/just.mts)

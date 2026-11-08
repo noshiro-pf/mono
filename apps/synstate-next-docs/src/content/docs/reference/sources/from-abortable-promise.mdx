@@ -1,0 +1,49 @@
+---
+title: fromAbortablePromise
+description: 'Calls `factory` with an `AbortSignal` and emits the outcome of the promise it returns, as `fromPromise` does.'
+---
+
+{/* reference:jsdoc */}
+
+Calls `factory` with an `AbortSignal` and emits the outcome of the promise it returns, as `fromPromise` does. Disposing it (a `switchMap` moving on, an owner disposed) aborts the signal, whether or not the promise has settled, so read a response body inside `factory`: one read after it may be cut off. A rejection that follows emits nothing.
+
+{/* /reference */}
+
+## Example
+
+```tsx
+import { fromAbortablePromise } from 'synstate-next';
+
+const mut_aborted: boolean[] = [];
+
+const request = fromAbortablePromise(
+    async (signal) =>
+        new Promise<string>((resolve) => {
+            const id = setTimeout(() => {
+                resolve('done');
+            }, 1000);
+
+            signal.addEventListener('abort', () => {
+                clearTimeout(id);
+
+                mut_aborted.push(true);
+            });
+        }),
+);
+
+// Disposing it, as a `switchMap` does when it moves on, aborts the request.
+request.dispose();
+
+await vi.advanceTimersByTimeAsync(1000);
+
+assert.deepStrictEqual(mut_aborted, [true]);
+
+assert.isFalse(request.hasValue);
+```
+
+## See also
+
+- [Async operators](/mono/synstate-next/guides/async-operators/)
+- [All APIs](/mono/synstate-next/reference/)
+
+[Source on GitHub](https://github.com/noshiro-pf/mono/blob/main/libs/synstate-next/src/sources/from-promise.mts)

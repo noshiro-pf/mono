@@ -1,0 +1,51 @@
+---
+title: createSource
+description: 'Creates a source that emits by itself, from another library or an event: a creator written outside the package.'
+---
+
+{/* reference:jsdoc */}
+
+Creates a source that emits by itself, from another library or an event: a creator written outside the package. `setup` runs once, at creation. The source holds `initialValue` if given, and nothing until it first emits otherwise. It belongs to the current owner as every observable does. `setup` runs with the source as the current owner, so what it creates and the cleanups it registers (`ctx.onCleanup`, or `onCleanup`) belong to the source. Disposing it runs the cleanups, newest first, and then disposes what `setup` created, as an owner does. A cleanup is registered, not returned.
+
+{/* /reference */}
+
+## Example
+
+```tsx
+import { createSource, type Observable } from 'synstate-next';
+
+const everyFrame = (milliseconds: number): Observable<number> =>
+    createSource<number>((ctx) => {
+        let mut_frame = 0;
+
+        const id = setInterval(() => {
+            mut_frame += 1;
+
+            ctx.emit(mut_frame);
+        }, milliseconds);
+
+        ctx.onCleanup(() => {
+            clearInterval(id);
+        });
+    });
+
+const frames = everyFrame(16);
+
+await vi.advanceTimersByTimeAsync(50);
+
+assert.strictEqual(frames.peek(), 3);
+
+// Disposing it runs the cleanup, which clears the interval.
+frames.dispose();
+
+await vi.advanceTimersByTimeAsync(50);
+
+assert.strictEqual(frames.peek(), 3);
+```
+
+## See also
+
+- [Custom operators and sources](/mono/synstate-next/guides/custom-operators-and-sources/)
+- [All APIs](/mono/synstate-next/reference/)
+
+[Source on GitHub](https://github.com/noshiro-pf/mono/blob/main/libs/synstate-next/src/sources/create-source.mts)

@@ -1,0 +1,84 @@
+---
+title: Owners
+description: 'The current owner, creating and disposing owners, and registering cleanups.'
+---
+
+{/* reference:jsdoc */}
+
+### `createOwner`
+
+Creates an owner, a child of the current owner (a root outside every one).
+
+### `createRootOwner`
+
+Creates an owner with no parent: only its own `dispose` disposes it.
+
+### `getOwner`
+
+The owner whose `run` is executing, if any.
+
+### `onCleanup`
+
+Registers `cleanup` with the current owner. Outside every owner it warns, since the cleanup would never run.
+
+### `untracked`
+
+Calls `fn` with no current owner: what it creates outlives the caller.
+
+### `Owner`
+
+Everything created while its `run` executes belongs to it, and `dispose()` disposes it: the child owners first, then the cleanups, then the nodes, each newest first. Made by `createOwner` or `createRootOwner`.
+
+{/* /reference */}
+
+## Example
+
+```tsx
+import {
+    createRootOwner,
+    createState,
+    getOwner,
+    map,
+    onCleanup,
+    untracked,
+} from 'synstate-next';
+
+const [count, setCount] = createState(1);
+
+const mut_log: string[] = [];
+
+const owner = createRootOwner();
+
+const shared = owner.run(() => {
+    // What is created in `run` belongs to `owner`.
+    count.pipe(map((n) => n * 2)).subscribe((n) => {
+        mut_log.push(`doubled ${n}`);
+    });
+
+    onCleanup(() => {
+        mut_log.push('cleaned up');
+    });
+
+    assert.strictEqual(getOwner(), owner);
+
+    // `untracked` creates something no owner disposes.
+    return untracked(() => count.pipe(map((n) => n * 3)));
+});
+
+owner.dispose();
+
+setCount(2);
+
+assert.deepStrictEqual(mut_log, ['doubled 2', 'cleaned up']);
+
+assert.isTrue(owner.disposed);
+
+assert.strictEqual(shared.value, 6);
+```
+
+## See also
+
+- [Owners and lifetime](/mono/synstate-next/guides/owners-and-lifetime/)
+- [All APIs](/mono/synstate-next/reference/)
+
+[Source on GitHub](https://github.com/noshiro-pf/mono/blob/main/libs/synstate-next/src/core/owner.mts)

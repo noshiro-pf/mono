@@ -23,8 +23,9 @@ import {
  * until it is first set otherwise. It belongs to the current owner as every
  * observable does. `setup` runs with the observable as the current owner, so
  * what it creates and the cleanups it registers (`ctx.onCleanup`, or
- * `onCleanup`) belong to the observable. Disposing it runs the cleanups, newest
- * first, and then disposes what `setup` created, as an owner does.
+ * `onCleanup`) belong to the observable. Disposing it disposes them as an owner
+ * does: the owners `setup` created first, then the cleanups, then the nodes,
+ * each newest first.
  *
  * `update` reads its parents. What `setup` creates is for work on the side (a
  * subscription, a listener): a node made there is visited in the same update as

@@ -1,0 +1,38 @@
+---
+title: just
+description: '`value` を持ち、決着済みで、値を流すことはありません。'
+---
+
+{/* translated-from:36ddf1c4145c */}
+
+`value` を持ち、決着済みで、値を流すことはありません。非同期の処理が要らない `switchMap` や `mergeMap` の分岐のためのものです。
+
+## 例
+
+```tsx
+import { createState, just, map, switchMap, timer } from 'synstate-next';
+
+const [delayed, setDelayed] = createState(false);
+
+const label = delayed.pipe(
+    switchMap((d) =>
+        // A branch with nothing to wait for.
+        d ? timer(500).pipe(map(() => 'later')) : just('now'),
+    ),
+);
+
+assert.strictEqual(label.peek(), 'now');
+
+setDelayed(true);
+
+await vi.advanceTimersByTimeAsync(500);
+
+assert.strictEqual(label.peek(), 'later');
+```
+
+## 関連項目
+
+- [非同期オペレーター](/mono/synstate-next/ja/guides/async-operators/)
+- [すべての API](/mono/synstate-next/ja/reference/)
+
+[GitHub のソース](https://github.com/noshiro-pf/mono/blob/main/libs/synstate-next/src/sources/just.mts)

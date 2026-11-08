@@ -1,0 +1,56 @@
+---
+title: debounce
+description: 'Emits the latest value once `milliseconds` have passed without another, in an update of its own.'
+---
+
+import MarbleDiagram from '../../../../components/MarbleDiagram.astro';
+
+{/* reference:jsdoc */}
+
+Emits the latest value once `milliseconds` have passed without another, in an update of its own. Holds the value the source holds at the start; disposing it drops a value still waiting.
+
+{/* /reference */}
+
+{/* reference:init-kind */}
+
+Its result holds a value whenever the source does: on an `InitializedObservable`, `pipe` gives one ([`keep`](/mono/synstate-next/guides/deriving-values/#pipe)).
+
+{/* /reference */}
+
+## Marble diagram
+
+<MarbleDiagram slug="debounce" />
+
+## Example
+
+```tsx
+import { createState, debounce } from 'synstate-next';
+
+const [query, setQuery] = createState('');
+
+const settled = query.pipe(debounce(300));
+
+setQuery('s');
+
+await vi.advanceTimersByTimeAsync(100);
+
+setQuery('sy');
+
+await vi.advanceTimersByTimeAsync(100);
+
+setQuery('syn');
+
+// Still the value it held at the start.
+assert.strictEqual(settled.value, '');
+
+await vi.advanceTimersByTimeAsync(300);
+
+assert.strictEqual(settled.value, 'syn');
+```
+
+## See also
+
+- [Async operators](/mono/synstate-next/guides/async-operators/)
+- [All APIs](/mono/synstate-next/reference/)
+
+[Source on GitHub](https://github.com/noshiro-pf/mono/blob/main/libs/synstate-next/src/operators/debounce.mts)

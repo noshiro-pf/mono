@@ -1,0 +1,46 @@
+---
+title: scan
+description: '`seed` から始めて、値を `reducer` で畳み込みます。'
+---
+
+import MarbleDiagram from '../../../../../components/MarbleDiagram.astro';
+
+{/* translated-from:e9a938a29632 */}
+
+`seed` から始めて、値を `reducer` で畳み込みます。最初から `seed`（か、最初の値を畳み込んだ値）を持ち、ソースが値を流すたびに流します。
+
+{/* reference:init-kind */}
+
+結果は常に値を持ちます。`pipe` の結果は `InitializedObservable` です（[`with`](/mono/synstate-next/ja/guides/deriving-values/#pipe)）。
+
+{/* /reference */}
+
+## マーブル図
+
+<MarbleDiagram slug="scan" lang="ja" />
+
+## 例
+
+```tsx
+import { createValueEmitter, scan } from 'synstate-next';
+
+const [amount, add] = createValueEmitter<number>();
+
+const total = amount.pipe(scan((sum, n) => sum + n, 0));
+
+// `scan` holds its seed from the start.
+assert.strictEqual(total.value, 0);
+
+add(10);
+
+add(5);
+
+assert.strictEqual(total.value, 15);
+```
+
+## 関連項目
+
+- [値を派生させる](/mono/synstate-next/ja/guides/deriving-values/)
+- [すべての API](/mono/synstate-next/ja/reference/)
+
+[GitHub のソース](https://github.com/noshiro-pf/mono/blob/main/libs/synstate-next/src/operators/scan.mts)

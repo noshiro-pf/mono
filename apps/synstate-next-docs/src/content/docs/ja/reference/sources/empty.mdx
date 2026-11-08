@@ -1,0 +1,36 @@
+---
+title: empty
+description: '何も持たず、決着済みで、値を流すことはありません。'
+---
+
+{/* translated-from:ea8ba802ba6c */}
+
+何も持たず、決着済みで、値を流すことはありません。何も追いかけない `switchMap` の分岐のためのものです。
+
+## 例
+
+```tsx
+import { counter, createState, empty, switchMap } from 'synstate-next';
+
+const [running, setRunning] = createState(true);
+
+const ticks = running.pipe(
+    // While paused, follow nothing: the last tick is kept.
+    switchMap((r) => (r ? counter(100) : empty<number>())),
+);
+
+await vi.advanceTimersByTimeAsync(250);
+
+setRunning(false);
+
+await vi.advanceTimersByTimeAsync(1000);
+
+assert.strictEqual(ticks.peek(), 2);
+```
+
+## 関連項目
+
+- [非同期オペレーター](/mono/synstate-next/ja/guides/async-operators/)
+- [すべての API](/mono/synstate-next/ja/reference/)
+
+[GitHub のソース](https://github.com/noshiro-pf/mono/blob/main/libs/synstate-next/src/sources/just.mts)

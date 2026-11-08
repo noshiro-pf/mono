@@ -22,3 +22,12 @@ ESLint and Vitest check it, embedded by `gen:samples`
 (`scripts/embed-samples.mts` maps each page to its files, in order). Edit the
 sample and run `pnpm run gen`; an edit made to a page is overwritten by the next
 `gen`.
+
+**The reference pages** (`src/content/docs/reference/`) are listed in
+`scripts/reference-pages.mts`, one per public API, and `gen:reference` fails on
+an export no page lists. It writes each English page's JSDoc block from
+synstate-next's sources, and its description on a page of one export (a page of
+several is described by hand). The Japanese text is translated by hand, and its
+`{/* translated-from:<version> */}` marker names the version of the English text
+it translates: when that changes, `gen:reference` names each Japanese page to
+bring up to date and the version to set.

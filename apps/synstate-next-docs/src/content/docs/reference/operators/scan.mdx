@@ -1,0 +1,48 @@
+---
+title: scan
+description: 'Accumulates the values with `reducer`, starting from `seed`.'
+---
+
+import MarbleDiagram from '../../../../components/MarbleDiagram.astro';
+
+{/* reference:jsdoc */}
+
+Accumulates the values with `reducer`, starting from `seed`. Holds `seed` (or the first value folded into it) from the start, and emits on every value of the source.
+
+{/* /reference */}
+
+{/* reference:init-kind */}
+
+Its result always holds a value: `pipe` gives an `InitializedObservable` ([`with`](/mono/synstate-next/guides/deriving-values/#pipe)).
+
+{/* /reference */}
+
+## Marble diagram
+
+<MarbleDiagram slug="scan" />
+
+## Example
+
+```tsx
+import { createValueEmitter, scan } from 'synstate-next';
+
+const [amount, add] = createValueEmitter<number>();
+
+const total = amount.pipe(scan((sum, n) => sum + n, 0));
+
+// `scan` holds its seed from the start.
+assert.strictEqual(total.value, 0);
+
+add(10);
+
+add(5);
+
+assert.strictEqual(total.value, 15);
+```
+
+## See also
+
+- [Deriving values](/mono/synstate-next/guides/deriving-values/)
+- [All APIs](/mono/synstate-next/reference/)
+
+[Source on GitHub](https://github.com/noshiro-pf/mono/blob/main/libs/synstate-next/src/operators/scan.mts)

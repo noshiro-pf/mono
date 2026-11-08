@@ -1,0 +1,49 @@
+---
+title: keepEqualParts
+description: "Replaces the parts of each value that are deeply equal to the held value's with the held value's own, so that a part that did not change keeps its reference."
+---
+
+{/* reference:jsdoc */}
+
+Replaces the parts of each value that are deeply equal to the held value's with the held value's own, so that a part that did not change keeps its reference. A value deeply equal to the one held emits nothing.
+
+{/* /reference */}
+
+{/* reference:init-kind */}
+
+Its result holds a value whenever the source does: on an `InitializedObservable`, `pipe` gives one ([`keep`](/mono/synstate-next/guides/deriving-values/#pipe)).
+
+{/* /reference */}
+
+## Example
+
+```tsx
+import { createValueEmitter, keepEqualParts, map } from 'synstate-next';
+
+type User = Readonly<{ name: string; tags: readonly string[] }>;
+
+const [fetched, receive] = createValueEmitter<User>();
+
+const user = fetched.pipe(keepEqualParts());
+
+const tags = user.pipe(map((u) => u.tags));
+
+receive({ name: 'a', tags: ['x'] });
+
+const first = tags.peek();
+
+// A fresh object from the server, with the same tags.
+receive({ name: 'b', tags: ['x'] });
+
+// The tags kept their reference, so nothing below `tags` was woken.
+assert.strictEqual(tags.peek(), first);
+
+assert.strictEqual(user.peek()?.name, 'b');
+```
+
+## See also
+
+- [Deriving values](/mono/synstate-next/guides/deriving-values/)
+- [All APIs](/mono/synstate-next/reference/)
+
+[Source on GitHub](https://github.com/noshiro-pf/mono/blob/main/libs/synstate-next/src/operators/keep-equal-parts.mts)

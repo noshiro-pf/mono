@@ -1,0 +1,40 @@
+---
+title: batch
+description: '`fn` を実行し、その中の書き込みを、戻ったところで 1 回の更新として伝えます。'
+---
+
+{/* translated-from:adf5eb4b0c03 */}
+
+`fn` を実行し、その中の書き込みを、戻ったところで 1 回の更新として伝えます。batch は入れ子にでき、一番外側のものが伝えます。
+
+## 例
+
+```tsx
+import { batch, createState, derive } from 'synstate-next';
+
+const [first, setFirst] = createState('Ada');
+
+const [last, setLast] = createState('Lovelace');
+
+const mut_seen: string[] = [];
+
+derive([first, last], (f, l) => `${f} ${l}`).subscribe((name) => {
+    mut_seen.push(name);
+});
+
+batch(() => {
+    setFirst('Grace');
+
+    setLast('Hopper');
+});
+
+// One update for both writes: no "Grace Lovelace" in between.
+assert.deepStrictEqual(mut_seen, ['Ada Lovelace', 'Grace Hopper']);
+```
+
+## 関連項目
+
+- [状態と書き込み](/mono/synstate-next/ja/guides/state-and-writes/)
+- [すべての API](/mono/synstate-next/ja/reference/)
+
+[GitHub のソース](https://github.com/noshiro-pf/mono/blob/main/libs/synstate-next/src/core/scheduler.mts)

@@ -1,0 +1,47 @@
+---
+title: fromAbortablePromise
+description: '`factory` を `AbortSignal` 付きで呼び、それが返す Promise の結果を `fromPromise` と同じように流します。'
+---
+
+{/* translated-from:4cd2710195a0 */}
+
+`factory` を `AbortSignal` 付きで呼び、それが返す Promise の結果を `fromPromise` と同じように流します。破棄されると（`switchMap` が次に移ったとき、owner が破棄されたとき）、Promise が決着していてもいなくてもシグナルを中断するので、レスポンスボディは `factory` の中で読んでください。後で読むと途中で切られることがあります。その後に続く reject では何も流しません。
+
+## 例
+
+```tsx
+import { fromAbortablePromise } from 'synstate-next';
+
+const mut_aborted: boolean[] = [];
+
+const request = fromAbortablePromise(
+    async (signal) =>
+        new Promise<string>((resolve) => {
+            const id = setTimeout(() => {
+                resolve('done');
+            }, 1000);
+
+            signal.addEventListener('abort', () => {
+                clearTimeout(id);
+
+                mut_aborted.push(true);
+            });
+        }),
+);
+
+// Disposing it, as a `switchMap` does when it moves on, aborts the request.
+request.dispose();
+
+await vi.advanceTimersByTimeAsync(1000);
+
+assert.deepStrictEqual(mut_aborted, [true]);
+
+assert.isFalse(request.hasValue);
+```
+
+## 関連項目
+
+- [非同期オペレーター](/mono/synstate-next/ja/guides/async-operators/)
+- [すべての API](/mono/synstate-next/ja/reference/)
+
+[GitHub のソース](https://github.com/noshiro-pf/mono/blob/main/libs/synstate-next/src/sources/from-promise.mts)

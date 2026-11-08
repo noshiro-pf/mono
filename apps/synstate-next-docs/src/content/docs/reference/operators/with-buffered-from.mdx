@@ -1,0 +1,61 @@
+---
+title: withBufferedFrom
+description: 'Gives each value of the source the values `other` emitted since the previous one, in order: those emitted in the same update included, those it held before this node was created not.'
+---
+
+import MarbleDiagram from '../../../../components/MarbleDiagram.astro';
+
+{/* reference:jsdoc */}
+
+Gives each value of the source the values `other` emitted since the previous one, in order: those emitted in the same update included, those it held before this node was created not.
+
+{/* /reference */}
+
+{/* reference:init-kind */}
+
+Its result holds a value whenever the source does: on an `InitializedObservable`, `pipe` gives one ([`keep`](/mono/synstate-next/guides/deriving-values/#pipe)).
+
+{/* /reference */}
+
+## Marble diagram
+
+<MarbleDiagram slug="with-buffered-from" />
+
+## Example
+
+```tsx
+import {
+    createEventEmitter,
+    createValueEmitter,
+    withBufferedFrom,
+} from 'synstate-next';
+
+const [logged, log] = createValueEmitter<string>();
+
+const [flushed, flush] = createEventEmitter();
+
+const mut_batches: (readonly string[])[] = [];
+
+flushed.pipe(withBufferedFrom(logged)).subscribe(([, lines]) => {
+    mut_batches.push(lines);
+});
+
+log('a');
+
+log('b');
+
+flush();
+
+log('c');
+
+flush();
+
+assert.deepStrictEqual(mut_batches, [['a', 'b'], ['c']]);
+```
+
+## See also
+
+- [Deriving values](/mono/synstate-next/guides/deriving-values/)
+- [All APIs](/mono/synstate-next/reference/)
+
+[Source on GitHub](https://github.com/noshiro-pf/mono/blob/main/libs/synstate-next/src/operators/with-buffered-from.mts)

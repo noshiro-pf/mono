@@ -1,0 +1,52 @@
+---
+title: audit
+description: '値が来ると `milliseconds` 待ち、その時点の最新の値を独立した更新で流します。'
+---
+
+import MarbleDiagram from '../../../../../components/MarbleDiagram.astro';
+
+{/* translated-from:7beb86d00459 */}
+
+値が来ると `milliseconds` 待ち、その時点の最新の値を独立した更新で流します。待っている間に来た値は、新たな待ち時間を始めません。最初はソースが持っている値を持ちます。破棄すると、待っている値は捨てます。
+
+{/* reference:init-kind */}
+
+ソースが値を持てば、結果も値を持ちます。`pipe` は `InitializedObservable` をそのまま保ちます（[`keep`](/mono/synstate-next/ja/guides/deriving-values/#pipe)）。
+
+{/* /reference */}
+
+## マーブル図
+
+<MarbleDiagram slug="audit" lang="ja" />
+
+## 例
+
+```tsx
+import { audit, createValueEmitter } from 'synstate-next';
+
+const [resized, resize] = createValueEmitter<number>();
+
+const mut_seen: number[] = [];
+
+resized.pipe(audit(100)).subscribe((width) => {
+    mut_seen.push(width);
+});
+
+resize(300);
+
+resize(320);
+
+resize(340);
+
+await vi.advanceTimersByTimeAsync(100);
+
+// The latest value, 100 ms after the first.
+assert.deepStrictEqual(mut_seen, [340]);
+```
+
+## 関連項目
+
+- [非同期オペレーター](/mono/synstate-next/ja/guides/async-operators/)
+- [すべての API](/mono/synstate-next/ja/reference/)
+
+[GitHub のソース](https://github.com/noshiro-pf/mono/blob/main/libs/synstate-next/src/operators/audit.mts)

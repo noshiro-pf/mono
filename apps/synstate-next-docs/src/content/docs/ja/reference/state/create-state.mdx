@@ -1,0 +1,40 @@
+---
+title: createState
+description: 'observable・セッター・その他の操作をタプルにした状態です。'
+---
+
+{/* translated-from:e04a0ea44d96 */}
+
+observable・セッター・その他の操作をタプルにした状態です。それぞれを別の場所に渡すコードのためのものです。セッターは何も返しません。グラフのドレイン中の書き込みはそのラウンドの effect が実行されてから適用されるので、返すべき値はまだ決まっていません。状態は `getSnapshot` で読みます。
+
+## 例
+
+```tsx
+import { createState } from 'synstate-next';
+
+const [count, setCount, { updateState, resetState, getSnapshot }] =
+    createState(0);
+
+const mut_seen: number[] = [];
+
+count.subscribe((n) => {
+    mut_seen.push(n);
+});
+
+setCount(5);
+
+updateState((n) => n + 1);
+
+assert.strictEqual(getSnapshot(), 6);
+
+resetState();
+
+assert.deepStrictEqual(mut_seen, [0, 5, 6, 0]);
+```
+
+## 関連項目
+
+- [状態と書き込み](/mono/synstate-next/ja/guides/state-and-writes/)
+- [すべての API](/mono/synstate-next/ja/reference/)
+
+[GitHub のソース](https://github.com/noshiro-pf/mono/blob/main/libs/synstate-next/src/utils/create-state.mts)

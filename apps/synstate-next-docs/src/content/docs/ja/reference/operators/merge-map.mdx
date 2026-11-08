@@ -1,0 +1,58 @@
+---
+title: mergeMap
+description: '`project` が返すすべての Observable を追いかけ、どれかが流した値を流します。'
+---
+
+import MarbleDiagram from '../../../../../components/MarbleDiagram.astro';
+
+{/* translated-from:96d5b34c1f60 */}
+
+`project` が返すすべての Observable を追いかけ、どれかが流した値を流します。射影の中で作ったものはそれ専用の owner に属し、その Observable が決着したとき（発火した `timer`、決着した Promise）か、このノードが破棄されたときに破棄されます。
+
+射影した時点で内側の Observable が持つ値は、射影を起こした更新に加わります（このノードがその更新ですでに値を流していなければ）。その後の値は独立した更新で届きます。イベントソースと同じく、すべての値が届きます。1 つの更新で重なった値は、届いた順に 1 更新ずつ流します。
+
+{/* reference:init-kind */}
+
+ソースが値を持っていても、結果は値を持たないことがあります。`pipe` の結果は `Observable` です（[`drop`](/mono/synstate-next/ja/guides/deriving-values/#pipe)）。
+
+{/* /reference */}
+
+## マーブル図
+
+<MarbleDiagram slug="merge-map" lang="ja" />
+
+## 例
+
+```tsx
+import { createValueEmitter, map, mergeMap, timer } from 'synstate-next';
+
+const [uploaded, upload] = createValueEmitter<string>();
+
+// Every upload runs to the end, the slow one included.
+const done = uploaded.pipe(
+    mergeMap((name) =>
+        timer(name === 'big' ? 300 : 100).pipe(map(() => `${name} done`)),
+    ),
+);
+
+const mut_seen: string[] = [];
+
+done.subscribe((message) => {
+    mut_seen.push(message);
+});
+
+upload('big');
+
+upload('small');
+
+await vi.advanceTimersByTimeAsync(300);
+
+assert.deepStrictEqual(mut_seen, ['small done', 'big done']);
+```
+
+## 関連項目
+
+- [非同期オペレーター](/mono/synstate-next/ja/guides/async-operators/)
+- [すべての API](/mono/synstate-next/ja/reference/)
+
+[GitHub のソース](https://github.com/noshiro-pf/mono/blob/main/libs/synstate-next/src/operators/merge-map.mts)

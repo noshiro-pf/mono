@@ -1,0 +1,36 @@
+---
+title: createValueEmitter
+description: '`A` のイベントソースと、そこに値を流す関数です。'
+---
+
+{/* translated-from:a202f1aef54b */}
+
+`A` のイベントソースと、そこに値を流す関数です。
+
+## 例
+
+```tsx
+import { createValueEmitter } from 'synstate-next';
+
+const [keyPressed, pressKey] = createValueEmitter<string>();
+
+const mut_keys: string[] = [];
+
+keyPressed.subscribe((key) => {
+    mut_keys.push(key);
+});
+
+pressKey('a');
+
+// An event repeats: every emission propagates.
+pressKey('a');
+
+assert.deepStrictEqual(mut_keys, ['a', 'a']);
+```
+
+## 関連項目
+
+- [状態と書き込み](/mono/synstate-next/ja/guides/state-and-writes/)
+- [すべての API](/mono/synstate-next/ja/reference/)
+
+[GitHub のソース](https://github.com/noshiro-pf/mono/blob/main/libs/synstate-next/src/utils/create-event-emitter.mts)

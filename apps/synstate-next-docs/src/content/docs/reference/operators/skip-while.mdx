@@ -1,0 +1,54 @@
+---
+title: skipWhile
+description: 'Drops the values of the source while `predicate` holds for them; from the first value it fails for, passes every value.'
+---
+
+import MarbleDiagram from '../../../../components/MarbleDiagram.astro';
+
+{/* reference:jsdoc */}
+
+Drops the values of the source while `predicate` holds for them; from the first value it fails for, passes every value.
+
+{/* /reference */}
+
+{/* reference:init-kind */}
+
+Its result may hold no value even when the source holds one: `pipe` gives an `Observable` ([`drop`](/mono/synstate-next/guides/deriving-values/#pipe)).
+
+{/* /reference */}
+
+## Marble diagram
+
+<MarbleDiagram slug="skip-while" />
+
+## Example
+
+```tsx
+import { createValueEmitter, skipWhile } from 'synstate-next';
+
+const [temperature, read] = createValueEmitter<number>();
+
+// Ignore the readings until the sensor has warmed up.
+const warm = temperature.pipe(skipWhile((t) => t < 20));
+
+const mut_seen: number[] = [];
+
+warm.subscribe((t) => {
+    mut_seen.push(t);
+});
+
+read(5);
+
+read(21);
+
+read(18);
+
+assert.deepStrictEqual(mut_seen, [21, 18]);
+```
+
+## See also
+
+- [Deriving values](/mono/synstate-next/guides/deriving-values/)
+- [All APIs](/mono/synstate-next/reference/)
+
+[Source on GitHub](https://github.com/noshiro-pf/mono/blob/main/libs/synstate-next/src/operators/take-while.mts)

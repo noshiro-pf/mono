@@ -1,0 +1,61 @@
+---
+title: takeUntil
+description: 'Follows the source until `notifier` emits, then passes nothing, keeping the last value passed.'
+---
+
+import MarbleDiagram from '../../../../components/MarbleDiagram.astro';
+
+{/* reference:jsdoc */}
+
+Follows the source until `notifier` emits, then passes nothing, keeping the last value passed. A value the source emits in the update the notifier emits in does not pass. A value the notifier holds at the start is not an emission.
+
+{/* /reference */}
+
+{/* reference:init-kind */}
+
+Its result holds a value whenever the source does: on an `InitializedObservable`, `pipe` gives one ([`keep`](/mono/synstate-next/guides/deriving-values/#pipe)).
+
+{/* /reference */}
+
+## Marble diagram
+
+<MarbleDiagram slug="take-until" />
+
+## Example
+
+```tsx
+import {
+    createEventEmitter,
+    createValueEmitter,
+    takeUntil,
+} from 'synstate-next';
+
+const [moved, move] = createValueEmitter<number>();
+
+const [released, release] = createEventEmitter();
+
+const drag = moved.pipe(takeUntil(released));
+
+const mut_seen: number[] = [];
+
+drag.subscribe((x) => {
+    mut_seen.push(x);
+});
+
+move(1);
+
+move(2);
+
+release();
+
+move(3);
+
+assert.deepStrictEqual(mut_seen, [1, 2]);
+```
+
+## See also
+
+- [Deriving values](/mono/synstate-next/guides/deriving-values/)
+- [All APIs](/mono/synstate-next/reference/)
+
+[Source on GitHub](https://github.com/noshiro-pf/mono/blob/main/libs/synstate-next/src/operators/take-until.mts)

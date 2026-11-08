@@ -1,0 +1,39 @@
+---
+title: createBooleanState
+description: 'A boolean state with `setTrue`, `setFalse` and `toggle`.'
+---
+
+{/* reference:jsdoc */}
+
+A boolean state with `setTrue`, `setFalse` and `toggle`.
+
+{/* /reference */}
+
+## Example
+
+```tsx
+import { createBooleanState } from 'synstate-next';
+
+const [isOpen, { setTrue, setFalse, toggle }] = createBooleanState(false);
+
+setTrue();
+
+assert.isTrue(isOpen.value);
+
+toggle();
+
+assert.isFalse(isOpen.value);
+
+toggle();
+
+setFalse();
+
+assert.isFalse(isOpen.value);
+```
+
+## See also
+
+- [State and writes](/mono/synstate-next/guides/state-and-writes/)
+- [All APIs](/mono/synstate-next/reference/)
+
+[Source on GitHub](https://github.com/noshiro-pf/mono/blob/main/libs/synstate-next/src/utils/create-boolean-state.mts)

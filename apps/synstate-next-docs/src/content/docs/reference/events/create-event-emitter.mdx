@@ -1,0 +1,33 @@
+---
+title: createEventEmitter
+description: 'An event source of `undefined`, and the function that emits it.'
+---
+
+{/* reference:jsdoc */}
+
+An event source of `undefined`, and the function that emits it.
+
+{/* /reference */}
+
+## Example
+
+```tsx
+import { createEventEmitter, scan } from 'synstate-next';
+
+const [clicked, click] = createEventEmitter();
+
+const clicks = clicked.pipe(scan((n) => n + 1, 0));
+
+click();
+
+click();
+
+assert.strictEqual(clicks.value, 2);
+```
+
+## See also
+
+- [State and writes](/mono/synstate-next/guides/state-and-writes/)
+- [All APIs](/mono/synstate-next/reference/)
+
+[Source on GitHub](https://github.com/noshiro-pf/mono/blob/main/libs/synstate-next/src/utils/create-event-emitter.mts)

@@ -4,3 +4,5 @@ version: '0.2'
 # otherwise lose the root dictionaries and ignorePaths.
 import:
   - '../../.cspell.config.yaml'
+words:
+  - mdxjs # micromark-extension-mdxjs

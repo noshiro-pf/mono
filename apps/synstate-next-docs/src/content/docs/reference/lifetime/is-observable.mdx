@@ -1,0 +1,29 @@
+---
+title: isObservable
+description: 'Whether `value` is an observable of this copy of the package.'
+---
+
+{/* reference:jsdoc */}
+
+Whether `value` is an observable of this copy of the package.
+
+{/* /reference */}
+
+## Example
+
+```tsx
+import { createState, isObservable } from 'synstate-next';
+
+const [count] = createState(0);
+
+assert.isTrue(isObservable(count));
+
+assert.isFalse(isObservable({ value: 0 }));
+```
+
+## See also
+
+- [Owners and lifetime](/mono/synstate-next/guides/owners-and-lifetime/)
+- [All APIs](/mono/synstate-next/reference/)
+
+[Source on GitHub](https://github.com/noshiro-pf/mono/blob/main/libs/synstate-next/src/core/observable-class.mts)

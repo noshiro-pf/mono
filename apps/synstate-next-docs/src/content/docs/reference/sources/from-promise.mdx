@@ -1,0 +1,45 @@
+---
+title: fromPromise
+description: 'Emits the outcome of `promise` once, as `Result.ok(value)` or `Result.err(error)`, in an update of its own, and settles.'
+---
+
+import MarbleDiagram from '../../../../components/MarbleDiagram.astro';
+
+{/* reference:jsdoc */}
+
+Emits the outcome of `promise` once, as `Result.ok(value)` or `Result.err(error)`, in an update of its own, and settles.
+
+{/* /reference */}
+
+## Marble diagram
+
+<MarbleDiagram slug="from-promise" />
+
+## Example
+
+```tsx
+import { fromPromise } from 'synstate-next';
+import { Result } from 'ts-std-forge';
+
+const answer = fromPromise(Promise.resolve(42));
+
+// Nothing until the promise settles.
+assert.isFalse(answer.hasValue);
+
+await vi.advanceTimersByTimeAsync(0);
+
+assert.deepStrictEqual(answer.peek(), Result.ok(42));
+
+const failed = fromPromise<number, Error>(Promise.reject(new Error('down')));
+
+await vi.advanceTimersByTimeAsync(0);
+
+assert.isTrue(Result.isErr(failed.peek() ?? Result.ok(0)));
+```
+
+## See also
+
+- [Async operators](/mono/synstate-next/guides/async-operators/)
+- [All APIs](/mono/synstate-next/reference/)
+
+[Source on GitHub](https://github.com/noshiro-pf/mono/blob/main/libs/synstate-next/src/sources/from-promise.mts)

@@ -1,0 +1,49 @@
+---
+title: pairwise
+description: 'Emits the previous and the current value of the source as a pair, on every value from the second on.'
+---
+
+import MarbleDiagram from '../../../../components/MarbleDiagram.astro';
+
+{/* reference:jsdoc */}
+
+Emits the previous and the current value of the source as a pair, on every value from the second on. The value held at the start counts as the first.
+
+{/* /reference */}
+
+{/* reference:init-kind */}
+
+Its result may hold no value even when the source holds one: `pipe` gives an `Observable` ([`drop`](/mono/synstate-next/guides/deriving-values/#pipe)).
+
+{/* /reference */}
+
+## Marble diagram
+
+<MarbleDiagram slug="pairwise" />
+
+## Example
+
+```tsx
+import { createState, pairwise } from 'synstate-next';
+
+const [page, setPage] = createState(1);
+
+const mut_moves: string[] = [];
+
+page.pipe(pairwise()).subscribe(([from, to]) => {
+    mut_moves.push(`${from} -> ${to}`);
+});
+
+setPage(2);
+
+setPage(5);
+
+assert.deepStrictEqual(mut_moves, ['1 -> 2', '2 -> 5']);
+```
+
+## See also
+
+- [Deriving values](/mono/synstate-next/guides/deriving-values/)
+- [All APIs](/mono/synstate-next/reference/)
+
+[Source on GitHub](https://github.com/noshiro-pf/mono/blob/main/libs/synstate-next/src/operators/pairwise.mts)

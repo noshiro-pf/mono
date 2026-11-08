@@ -1,0 +1,58 @@
+---
+title: withCurrentValueFrom
+description: 'Pairs each value of the source with the value `other` holds, settled for the same update.'
+---
+
+import MarbleDiagram from '../../../../components/MarbleDiagram.astro';
+
+{/* reference:jsdoc */}
+
+Pairs each value of the source with the value `other` holds, settled for the same update. `other` does not wake it: a change of `other` alone emits nothing. Emits nothing while `other` holds no value.
+
+{/* /reference */}
+
+{/* reference:init-kind */}
+
+Its result may hold no value even when the source holds one: `pipe` gives an `Observable` ([`drop`](/mono/synstate-next/guides/deriving-values/#pipe)).
+
+{/* /reference */}
+
+## Marble diagram
+
+<MarbleDiagram slug="with-current-value-from" />
+
+## Example
+
+```tsx
+import {
+    createEventEmitter,
+    createState,
+    withCurrentValueFrom,
+} from 'synstate-next';
+
+const [draft, setDraft] = createState('');
+
+const [submitted, submit] = createEventEmitter();
+
+const mut_sent: string[] = [];
+
+submitted.pipe(withCurrentValueFrom(draft)).subscribe(([, text]) => {
+    mut_sent.push(text);
+});
+
+// Typing alone sends nothing.
+setDraft('hi');
+
+setDraft('hello');
+
+submit();
+
+assert.deepStrictEqual(mut_sent, ['hello']);
+```
+
+## See also
+
+- [Deriving values](/mono/synstate-next/guides/deriving-values/)
+- [All APIs](/mono/synstate-next/reference/)
+
+[Source on GitHub](https://github.com/noshiro-pf/mono/blob/main/libs/synstate-next/src/operators/with-current-value-from.mts)

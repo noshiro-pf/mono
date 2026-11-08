@@ -1,0 +1,57 @@
+---
+title: skipUntil
+description: '`notifier` が値を流すまで何も流さず、その後はソースのすべての値を流します。'
+---
+
+import MarbleDiagram from '../../../../../components/MarbleDiagram.astro';
+
+{/* translated-from:4dfc684f1740 */}
+
+`notifier` が値を流すまで何も流さず、その後はソースのすべての値を流します。notifier が流したのと同じ更新でソースが流した値も流します。notifier が最初に持っている値は、値を流したことに数えません。
+
+{/* reference:init-kind */}
+
+ソースが値を持っていても、結果は値を持たないことがあります。`pipe` の結果は `Observable` です（[`drop`](/mono/synstate-next/ja/guides/deriving-values/#pipe)）。
+
+{/* /reference */}
+
+## マーブル図
+
+<MarbleDiagram slug="skip-until" lang="ja" />
+
+## 例
+
+```tsx
+import {
+    createEventEmitter,
+    createValueEmitter,
+    skipUntil,
+} from 'synstate-next';
+
+const [message, receive] = createValueEmitter<string>();
+
+const [ready, markReady] = createEventEmitter();
+
+const shown = message.pipe(skipUntil(ready));
+
+const mut_seen: string[] = [];
+
+shown.subscribe((m) => {
+    mut_seen.push(m);
+});
+
+receive('too early');
+
+markReady();
+
+receive('hello');
+
+assert.deepStrictEqual(mut_seen, ['hello']);
+```
+
+## 関連項目
+
+- [値を派生させる](/mono/synstate-next/ja/guides/deriving-values/)
+- [すべての API](/mono/synstate-next/ja/reference/)
+
+[GitHub のソース](https://github.com/noshiro-pf/mono/blob/main/libs/synstate-next/src/operators/take-until.mts)

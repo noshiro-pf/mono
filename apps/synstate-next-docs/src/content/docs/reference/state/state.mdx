@@ -1,0 +1,43 @@
+---
+title: state
+description: 'Creates a state holding `initial`.'
+---
+
+{/* reference:jsdoc */}
+
+Creates a state holding `initial`.
+
+A write made while the graph drains (inside a `map`, say) is applied once that round's effects have run; a write made by a subscriber is applied at once. Either propagates in the next update, and neither interrupts the update under way.
+
+{/* /reference */}
+
+## Example
+
+```tsx
+import { state } from 'synstate-next';
+
+// The primitive `createState` wraps: one object with `set` and `update`.
+const count = state(0);
+
+const mut_seen: number[] = [];
+
+count.subscribe((n) => {
+    mut_seen.push(n);
+});
+
+count.set(1);
+
+count.update((n) => n + 1);
+
+// An equal value passes nothing on.
+count.set(2);
+
+assert.deepStrictEqual(mut_seen, [0, 1, 2]);
+```
+
+## See also
+
+- [State and writes](/mono/synstate-next/guides/state-and-writes/)
+- [All APIs](/mono/synstate-next/reference/)
+
+[Source on GitHub](https://github.com/noshiro-pf/mono/blob/main/libs/synstate-next/src/core/state.mts)

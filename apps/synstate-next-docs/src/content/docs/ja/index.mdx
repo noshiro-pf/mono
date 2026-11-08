@@ -32,7 +32,7 @@ import { Aside, Card, CardGrid } from '@astrojs/starlight/components';
     </Card>
     <Card title="購読者は落ち着いたグラフを見る" icon="approve-check">
         購読者は effect
-        で、更新が変わるノードすべてに届いてから実行されます。伝播の途中に行った書き込みは、伝播を中断せず、終わるまで待ちます。
+        で、更新が変わるノードすべてに届いてから実行されます。更新中に行った書き込みは更新を中断せず、その後の別のラウンドで伝播します。
     </Card>
     <Card title="変わらない値で打ち切る" icon="random">
         すでに持っている値を計算したノードは何も伝えないので、その下のグラフはまったく辿られません。

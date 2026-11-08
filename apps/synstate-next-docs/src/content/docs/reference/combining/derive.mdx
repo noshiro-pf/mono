@@ -1,0 +1,54 @@
+---
+title: derive
+description: 'Computes `fn` from the values of `parents`, once per update however many of them changed, and emits the result unless it equals the one held.'
+---
+
+import MarbleDiagram from '../../../../components/MarbleDiagram.astro';
+
+{/* reference:jsdoc */}
+
+Computes `fn` from the values of `parents`, once per update however many of them changed, and emits the result unless it equals the one held. Holds no value until every parent holds one.
+
+{/* /reference */}
+
+## Marble diagram
+
+<MarbleDiagram slug="derive" />
+
+## Example
+
+```tsx
+import { batch, createState, derive } from 'synstate-next';
+
+const [price, setPrice] = createState(100);
+
+const [quantity, setQuantity] = createState(2);
+
+let mut_runs = 0;
+
+const total = derive([price, quantity], (p, q) => {
+    mut_runs += 1;
+
+    return p * q;
+});
+
+total.subscribe(() => {});
+
+batch(() => {
+    setPrice(120);
+
+    setQuantity(3);
+});
+
+assert.strictEqual(total.value, 360);
+
+// Once at creation, once for the update that changed both parents.
+assert.strictEqual(mut_runs, 2);
+```
+
+## See also
+
+- [Deriving values](/mono/synstate-next/guides/deriving-values/)
+- [All APIs](/mono/synstate-next/reference/)
+
+[Source on GitHub](https://github.com/noshiro-pf/mono/blob/main/libs/synstate-next/src/operators/derive.mts)

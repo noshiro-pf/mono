@@ -91,7 +91,7 @@ export const stripMarkers = (page: string, name: MarkerName): string =>
 export type Embedded = Readonly<{ text: string; block: boolean }>;
 
 /** The `<name>` of `<!-- <name>:<key> -->`, one per embedding script. */
-export type MarkerName = 'benchmark' | 'bundle-size';
+export type MarkerName = 'benchmark' | 'bundle-size' | 'reference';
 
 /**
  * The two spellings of a marker, Markdown's and MDX's. A key is a word with
@@ -108,6 +108,8 @@ const spellings: readonly Readonly<{
         /<!-- benchmark:(?<key>[\w/-]+) -->[\s\S]*?<!-- \/benchmark -->/gu,
       'bundle-size':
         /<!-- bundle-size:(?<key>[\w/-]+) -->[\s\S]*?<!-- \/bundle-size -->/gu,
+      reference:
+        /<!-- reference:(?<key>[\w/-]+) -->[\s\S]*?<!-- \/reference -->/gu,
     },
     open: (name, key) => `<!-- ${name}:${key} -->`,
     close: (name) => `<!-- /${name} -->`,
@@ -118,6 +120,8 @@ const spellings: readonly Readonly<{
         /\{\/\* benchmark:(?<key>[\w/-]+) \*\/\}[\s\S]*?\{\/\* \/benchmark \*\/\}/gu,
       'bundle-size':
         /\{\/\* bundle-size:(?<key>[\w/-]+) \*\/\}[\s\S]*?\{\/\* \/bundle-size \*\/\}/gu,
+      reference:
+        /\{\/\* reference:(?<key>[\w/-]+) \*\/\}[\s\S]*?\{\/\* \/reference \*\/\}/gu,
     },
     open: (name, key) => `{/* ${name}:${key} */}`,
     close: (name) => `{/* /${name} */}`,

@@ -1,0 +1,54 @@
+---
+title: throttle
+description: 'Passes a value at once, then drops the values of the next `milliseconds`.'
+---
+
+import MarbleDiagram from '../../../../components/MarbleDiagram.astro';
+
+{/* reference:jsdoc */}
+
+Passes a value at once, then drops the values of the next `milliseconds`. Holds the value the source holds at the start, without opening a window.
+
+{/* /reference */}
+
+{/* reference:init-kind */}
+
+Its result holds a value whenever the source does: on an `InitializedObservable`, `pipe` gives one ([`keep`](/mono/synstate-next/guides/deriving-values/#pipe)).
+
+{/* /reference */}
+
+## Marble diagram
+
+<MarbleDiagram slug="throttle" />
+
+## Example
+
+```tsx
+import { createValueEmitter, throttle } from 'synstate-next';
+
+const [scrolled, scroll] = createValueEmitter<number>();
+
+const mut_seen: number[] = [];
+
+scrolled.pipe(throttle(100)).subscribe((y) => {
+    mut_seen.push(y);
+});
+
+scroll(10);
+
+scroll(20);
+
+await vi.advanceTimersByTimeAsync(100);
+
+scroll(30);
+
+// The first value of each window passes; the rest are dropped.
+assert.deepStrictEqual(mut_seen, [10, 30]);
+```
+
+## See also
+
+- [Async operators](/mono/synstate-next/guides/async-operators/)
+- [All APIs](/mono/synstate-next/reference/)
+
+[Source on GitHub](https://github.com/noshiro-pf/mono/blob/main/libs/synstate-next/src/operators/throttle.mts)

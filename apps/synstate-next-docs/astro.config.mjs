@@ -1,5 +1,6 @@
 import starlight from '@astrojs/starlight';
 import { defineConfig } from 'astro/config';
+import { groupTitles, referencePages } from './scripts/reference-pages.mts';
 
 export default defineConfig({
   site: 'https://noshiro-pf.github.io',
@@ -90,6 +91,21 @@ export default defineConfig({
           label: 'Background',
           translations: { ja: '背景' },
           items: [{ slug: 'background/changes-from-synstate' }],
+        },
+        {
+          label: 'Reference',
+          translations: { ja: 'リファレンス' },
+          items: [
+            { slug: 'reference' },
+            ...Object.entries(groupTitles.en).map(([group, label]) => ({
+              label,
+              translations: { ja: groupTitles.ja[group] },
+              collapsed: true,
+              items: referencePages
+                .filter((p) => p.group === group)
+                .map((p) => ({ slug: `reference/${group}/${p.slug}` })),
+            })),
+          ],
         },
       ],
     }),

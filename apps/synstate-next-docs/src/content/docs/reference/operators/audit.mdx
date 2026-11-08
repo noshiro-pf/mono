@@ -1,0 +1,54 @@
+---
+title: audit
+description: 'On a value, waits `milliseconds` and then emits the latest value, in an update of its own; the values in between start no wait of their own.'
+---
+
+import MarbleDiagram from '../../../../components/MarbleDiagram.astro';
+
+{/* reference:jsdoc */}
+
+On a value, waits `milliseconds` and then emits the latest value, in an update of its own; the values in between start no wait of their own. Holds the value the source holds at the start; disposing it drops a value still waiting.
+
+{/* /reference */}
+
+{/* reference:init-kind */}
+
+Its result holds a value whenever the source does: on an `InitializedObservable`, `pipe` gives one ([`keep`](/mono/synstate-next/guides/deriving-values/#pipe)).
+
+{/* /reference */}
+
+## Marble diagram
+
+<MarbleDiagram slug="audit" />
+
+## Example
+
+```tsx
+import { audit, createValueEmitter } from 'synstate-next';
+
+const [resized, resize] = createValueEmitter<number>();
+
+const mut_seen: number[] = [];
+
+resized.pipe(audit(100)).subscribe((width) => {
+    mut_seen.push(width);
+});
+
+resize(300);
+
+resize(320);
+
+resize(340);
+
+await vi.advanceTimersByTimeAsync(100);
+
+// The latest value, 100 ms after the first.
+assert.deepStrictEqual(mut_seen, [340]);
+```
+
+## See also
+
+- [Async operators](/mono/synstate-next/guides/async-operators/)
+- [All APIs](/mono/synstate-next/reference/)
+
+[Source on GitHub](https://github.com/noshiro-pf/mono/blob/main/libs/synstate-next/src/operators/audit.mts)

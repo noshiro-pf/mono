@@ -1,0 +1,41 @@
+---
+title: state
+description: '`initial` を持つ状態を作ります。'
+---
+
+{/* translated-from:0103a2dc726a */}
+
+`initial` を持つ状態を作ります。
+
+グラフのドレイン中（たとえば `map` の中）の書き込みはそのラウンドの effect が実行されてから適用され、購読者の書き込みはすぐに適用されます。どちらも次の更新で伝わり、進行中の更新を中断することはありません。
+
+## 例
+
+```tsx
+import { state } from 'synstate-next';
+
+// The primitive `createState` wraps: one object with `set` and `update`.
+const count = state(0);
+
+const mut_seen: number[] = [];
+
+count.subscribe((n) => {
+    mut_seen.push(n);
+});
+
+count.set(1);
+
+count.update((n) => n + 1);
+
+// An equal value passes nothing on.
+count.set(2);
+
+assert.deepStrictEqual(mut_seen, [0, 1, 2]);
+```
+
+## 関連項目
+
+- [状態と書き込み](/mono/synstate-next/ja/guides/state-and-writes/)
+- [すべての API](/mono/synstate-next/ja/reference/)
+
+[GitHub のソース](https://github.com/noshiro-pf/mono/blob/main/libs/synstate-next/src/core/state.mts)

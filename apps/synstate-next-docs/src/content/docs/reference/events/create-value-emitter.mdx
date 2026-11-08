@@ -1,0 +1,38 @@
+---
+title: createValueEmitter
+description: 'An event source of `A`, and the function that emits a value on it.'
+---
+
+{/* reference:jsdoc */}
+
+An event source of `A`, and the function that emits a value on it.
+
+{/* /reference */}
+
+## Example
+
+```tsx
+import { createValueEmitter } from 'synstate-next';
+
+const [keyPressed, pressKey] = createValueEmitter<string>();
+
+const mut_keys: string[] = [];
+
+keyPressed.subscribe((key) => {
+    mut_keys.push(key);
+});
+
+pressKey('a');
+
+// An event repeats: every emission propagates.
+pressKey('a');
+
+assert.deepStrictEqual(mut_keys, ['a', 'a']);
+```
+
+## See also
+
+- [State and writes](/mono/synstate-next/guides/state-and-writes/)
+- [All APIs](/mono/synstate-next/reference/)
+
+[Source on GitHub](https://github.com/noshiro-pf/mono/blob/main/libs/synstate-next/src/utils/create-event-emitter.mts)

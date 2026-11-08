@@ -1,0 +1,47 @@
+---
+title: keepEqualParts
+description: '各値のうち、持っている値と深く等しい部分を、持っている値のものに置き換えます。'
+---
+
+{/* translated-from:a9f783ce424b */}
+
+各値のうち、持っている値と深く等しい部分を、持っている値のものに置き換えます。変わらなかった部分は参照も変わりません。持っている値と深く等しい値は何も流しません。
+
+{/* reference:init-kind */}
+
+ソースが値を持てば、結果も値を持ちます。`pipe` は `InitializedObservable` をそのまま保ちます（[`keep`](/mono/synstate-next/ja/guides/deriving-values/#pipe)）。
+
+{/* /reference */}
+
+## 例
+
+```tsx
+import { createValueEmitter, keepEqualParts, map } from 'synstate-next';
+
+type User = Readonly<{ name: string; tags: readonly string[] }>;
+
+const [fetched, receive] = createValueEmitter<User>();
+
+const user = fetched.pipe(keepEqualParts());
+
+const tags = user.pipe(map((u) => u.tags));
+
+receive({ name: 'a', tags: ['x'] });
+
+const first = tags.peek();
+
+// A fresh object from the server, with the same tags.
+receive({ name: 'b', tags: ['x'] });
+
+// The tags kept their reference, so nothing below `tags` was woken.
+assert.strictEqual(tags.peek(), first);
+
+assert.strictEqual(user.peek()?.name, 'b');
+```
+
+## 関連項目
+
+- [値を派生させる](/mono/synstate-next/ja/guides/deriving-values/)
+- [すべての API](/mono/synstate-next/ja/reference/)
+
+[GitHub のソース](https://github.com/noshiro-pf/mono/blob/main/libs/synstate-next/src/operators/keep-equal-parts.mts)

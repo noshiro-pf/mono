@@ -1,0 +1,49 @@
+---
+title: createSource
+description: '他のライブラリやイベントから自分で値を流すソースを作ります。'
+---
+
+{/* translated-from:0bc7b426246b */}
+
+他のライブラリやイベントから自分で値を流すソースを作ります。パッケージの外で書く生成関数です。`setup` は作成時に 1 回だけ動きます。`initialValue` を渡せばそれを持ち、渡さなければ最初に値を流すまで何も持ちません。他の Observable と同じく、現在の owner に属します。`setup` はソースを現在の owner として動くので、そこで作ったものと登録した後始末（`ctx.onCleanup` か `onCleanup`）はソースに属します。破棄すると、後始末を新しい順に実行し、その後 `setup` で作ったものを、owner と同じように破棄します。後始末は戻り値ではなく、登録して渡します。
+
+## 例
+
+```tsx
+import { createSource, type Observable } from 'synstate-next';
+
+const everyFrame = (milliseconds: number): Observable<number> =>
+    createSource<number>((ctx) => {
+        let mut_frame = 0;
+
+        const id = setInterval(() => {
+            mut_frame += 1;
+
+            ctx.emit(mut_frame);
+        }, milliseconds);
+
+        ctx.onCleanup(() => {
+            clearInterval(id);
+        });
+    });
+
+const frames = everyFrame(16);
+
+await vi.advanceTimersByTimeAsync(50);
+
+assert.strictEqual(frames.peek(), 3);
+
+// Disposing it runs the cleanup, which clears the interval.
+frames.dispose();
+
+await vi.advanceTimersByTimeAsync(50);
+
+assert.strictEqual(frames.peek(), 3);
+```
+
+## 関連項目
+
+- [独自のオペレーターとソース](/mono/synstate-next/ja/guides/custom-operators-and-sources/)
+- [すべての API](/mono/synstate-next/ja/reference/)
+
+[GitHub のソース](https://github.com/noshiro-pf/mono/blob/main/libs/synstate-next/src/sources/create-source.mts)

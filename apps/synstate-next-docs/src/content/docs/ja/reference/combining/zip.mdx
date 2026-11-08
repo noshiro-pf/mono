@@ -1,0 +1,47 @@
+---
+title: zip
+description: 'すべての `parents` がそれぞれ `n` 番目の値を流したところで、その `n` 番目の値をタプルにして流します。'
+---
+
+import MarbleDiagram from '../../../../../components/MarbleDiagram.astro';
+
+{/* translated-from:9c7caeeec7d0 */}
+
+すべての `parents` がそれぞれ `n` 番目の値を流したところで、その `n` 番目の値をタプルにして流します。親が最初に持っている値は、それぞれの 1 番目に数えます。値は親ごとのキューで、一番遅い親が追いつくまで待ちます。
+
+## マーブル図
+
+<MarbleDiagram slug="zip" lang="ja" />
+
+## 例
+
+```tsx
+import { createValueEmitter, zip } from 'synstate-next';
+
+const [questions, ask] = createValueEmitter<string>();
+
+const [answers, answer] = createValueEmitter<number>();
+
+const mut_pairs: string[] = [];
+
+zip([questions, answers]).subscribe(([q, a]) => {
+    mut_pairs.push(`${q} = ${a}`);
+});
+
+ask('1 + 1');
+
+ask('2 + 2');
+
+answer(2);
+
+answer(4);
+
+assert.deepStrictEqual(mut_pairs, ['1 + 1 = 2', '2 + 2 = 4']);
+```
+
+## 関連項目
+
+- [値を派生させる](/mono/synstate-next/ja/guides/deriving-values/)
+- [すべての API](/mono/synstate-next/ja/reference/)
+
+[GitHub のソース](https://github.com/noshiro-pf/mono/blob/main/libs/synstate-next/src/operators/zip.mts)

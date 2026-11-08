@@ -1,6 +1,6 @@
 ---
 title: State and writes
-description: createState and its options, what happens to a write made while an update propagates, batch, createReducer, createBooleanState and the event emitters.
+description: createState and its options, what happens to a write made during an update, batch, createReducer, createBooleanState and the event emitters.
 ---
 
 ## `createState` and its third element
@@ -42,7 +42,7 @@ assert.deepStrictEqual(mut_seen, [0, 10, 11, 0]);
 | `getSnapshot`  | Reads the current value                                        |
 | `initialState` | The value it started from                                      |
 
-The setters return nothing. A write made while an update propagates is applied once that update ends (see below), so the value it would return is not known yet; read it with `getSnapshot` or `.value` when you need it.
+The setters return nothing. A write made while the graph drains is applied once that round's effects have run (see below), so the value it would return is not known yet; read it with `getSnapshot` or `.value` when you need it.
 
 `state(initial)` is the same state as an object, with `.value`, `.set` and `.update`, for code that keeps them together.
 
@@ -208,7 +208,7 @@ A state written twice in a batch propagates once, with the last value.
 
 ## `createReducer`
 
-A state written only through a reducer. `dispatch` returns nothing; a dispatch made while an update propagates waits for it to end and then reduces the state the writes before it left.
+A state written only through a reducer. `dispatch` returns nothing; a dispatch made while the graph drains waits with the other writes until the round's effects have run, and then reduces the state the writes before it left.
 
 ```tsx
 import { createReducer } from 'synstate-next';

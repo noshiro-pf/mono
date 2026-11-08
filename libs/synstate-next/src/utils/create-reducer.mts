@@ -5,9 +5,10 @@ import {
 } from '../core/index.mjs';
 
 /**
- * A state written only by `dispatch`, through `reducer`. A dispatch during
- * propagation waits for it to end, and then reduces the state the writes before
- * it left. `dispatch` returns nothing; read the state with `getSnapshot`.
+ * A state written only by `dispatch`, through `reducer`. A dispatch while the
+ * graph drains waits until that round's effects have run, and then reduces the
+ * state the writes before it left. `dispatch` returns nothing; read the state
+ * with `getSnapshot`.
  */
 export const createReducer = <S, A>(
   reducer: (current: S, action: A) => S,

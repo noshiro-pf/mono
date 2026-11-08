@@ -1,0 +1,47 @@
+---
+title: pairwise
+description: 'ソースの直前の値と今の値をペアにして、2 つ目以降の値のたびに流します。'
+---
+
+import MarbleDiagram from '../../../../../components/MarbleDiagram.astro';
+
+{/* translated-from:9b63285e5b64 */}
+
+ソースの直前の値と今の値をペアにして、2 つ目以降の値のたびに流します。最初に持っている値は 1 つ目に数えます。
+
+{/* reference:init-kind */}
+
+ソースが値を持っていても、結果は値を持たないことがあります。`pipe` の結果は `Observable` です（[`drop`](/mono/synstate-next/ja/guides/deriving-values/#pipe)）。
+
+{/* /reference */}
+
+## マーブル図
+
+<MarbleDiagram slug="pairwise" lang="ja" />
+
+## 例
+
+```tsx
+import { createState, pairwise } from 'synstate-next';
+
+const [page, setPage] = createState(1);
+
+const mut_moves: string[] = [];
+
+page.pipe(pairwise()).subscribe(([from, to]) => {
+    mut_moves.push(`${from} -> ${to}`);
+});
+
+setPage(2);
+
+setPage(5);
+
+assert.deepStrictEqual(mut_moves, ['1 -> 2', '2 -> 5']);
+```
+
+## 関連項目
+
+- [値を派生させる](/mono/synstate-next/ja/guides/deriving-values/)
+- [すべての API](/mono/synstate-next/ja/reference/)
+
+[GitHub のソース](https://github.com/noshiro-pf/mono/blob/main/libs/synstate-next/src/operators/pairwise.mts)

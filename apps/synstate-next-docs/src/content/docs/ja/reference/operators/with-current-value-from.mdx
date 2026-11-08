@@ -1,0 +1,56 @@
+---
+title: withCurrentValueFrom
+description: 'ソースの各値を、同じ更新で落ち着いた `other` の値とペアにします。'
+---
+
+import MarbleDiagram from '../../../../../components/MarbleDiagram.astro';
+
+{/* translated-from:fbd8d1eac6de */}
+
+ソースの各値を、同じ更新で落ち着いた `other` の値とペアにします。`other` はこれを起こしません。`other` だけが変わっても何も流しません。`other` が値を持たない間は何も流しません。
+
+{/* reference:init-kind */}
+
+ソースが値を持っていても、結果は値を持たないことがあります。`pipe` の結果は `Observable` です（[`drop`](/mono/synstate-next/ja/guides/deriving-values/#pipe)）。
+
+{/* /reference */}
+
+## マーブル図
+
+<MarbleDiagram slug="with-current-value-from" lang="ja" />
+
+## 例
+
+```tsx
+import {
+    createEventEmitter,
+    createState,
+    withCurrentValueFrom,
+} from 'synstate-next';
+
+const [draft, setDraft] = createState('');
+
+const [submitted, submit] = createEventEmitter();
+
+const mut_sent: string[] = [];
+
+submitted.pipe(withCurrentValueFrom(draft)).subscribe(([, text]) => {
+    mut_sent.push(text);
+});
+
+// Typing alone sends nothing.
+setDraft('hi');
+
+setDraft('hello');
+
+submit();
+
+assert.deepStrictEqual(mut_sent, ['hello']);
+```
+
+## 関連項目
+
+- [値を派生させる](/mono/synstate-next/ja/guides/deriving-values/)
+- [すべての API](/mono/synstate-next/ja/reference/)
+
+[GitHub のソース](https://github.com/noshiro-pf/mono/blob/main/libs/synstate-next/src/operators/with-current-value-from.mts)

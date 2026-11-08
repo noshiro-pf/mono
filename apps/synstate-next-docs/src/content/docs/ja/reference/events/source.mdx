@@ -1,0 +1,38 @@
+---
+title: source
+description: 'イベントソースを作ります。'
+---
+
+{/* translated-from:64568992ebb9 */}
+
+イベントソースを作ります。最初の `next` までは値を持ちません。
+
+## 例
+
+```tsx
+import { source } from 'synstate-next';
+
+const ticks = source<number>();
+
+// An event source holds no value until its first `next`.
+assert.isFalse(ticks.hasValue);
+
+const mut_seen: number[] = [];
+
+ticks.subscribe((n) => {
+    mut_seen.push(n);
+});
+
+ticks.next(1);
+
+ticks.next(1);
+
+assert.deepStrictEqual(mut_seen, [1, 1]);
+```
+
+## 関連項目
+
+- [状態と書き込み](/mono/synstate-next/ja/guides/state-and-writes/)
+- [すべての API](/mono/synstate-next/ja/reference/)
+
+[GitHub のソース](https://github.com/noshiro-pf/mono/blob/main/libs/synstate-next/src/core/state.mts)

@@ -1,0 +1,172 @@
+---
+// One marble diagram of a reference page, drawn from the data that
+// synstate-next's `marble-diagrams-check.mts` runs the operator against, so the
+// picture is what the operator does. Static SVG: nothing runs in the browser.
+// The data is read by path, as `gen:samples` reads the samples beside it:
+// synstate-next does not export its samples, and ESLint does not read `.astro`.
+import {
+  marbleDiagrams,
+  type MarbleDiagramSlug,
+} from '../../../../libs/synstate-next/samples/docs-site/reference/marble-diagrams.mts';
+
+type Props = Readonly<{ slug: MarbleDiagramSlug; lang?: 'en' | 'ja' }>;
+
+const { slug, lang = 'en' } = Astro.props;
+
+const diagram = marbleDiagrams[slug];
+
+const rowHeight = 10;
+
+const boxHeight = 9;
+
+const lineY = 5;
+
+const radius = 2.5;
+
+/** Where `t = 0` is drawn, so that a marble at the start is not cut off. */
+const x0 = 3;
+
+const arrowX = 108;
+
+const inputColors = [
+  { fill: 'rgb(255, 203, 70)', text: '#000' },
+  { fill: 'rgb(62, 161, 203)', text: '#fff' },
+] as const;
+
+const outputColor = { fill: 'rgb(155, 89, 182)', text: '#fff' } as const;
+
+const rows = [
+  ...diagram.inputs.map((marbles, i) => ({
+    y: i * rowHeight,
+    marbles: marbles.map(({ t, value }) => ({ t, label: String(value) })),
+    color: inputColors[i] ?? inputColors[0],
+  })),
+  {
+    y: diagram.inputs.length * rowHeight + boxHeight,
+    marbles: diagram.output,
+    color: outputColor,
+  },
+];
+
+const boxY = diagram.inputs.length * rowHeight;
+
+const height = boxY + boxHeight + rowHeight;
+
+const describe = (marbles: readonly { t: number; label: string }[]): string =>
+  marbles.length === 0
+    ? lang === 'en'
+      ? 'nothing'
+      : 'なし'
+    : marbles.map(({ t, label }) => `${label} (${t * 10} ms)`).join(', ');
+
+const title =
+  lang === 'en'
+    ? [
+        `Marble diagram of ${diagram.operator}.`,
+        ...rows
+          .slice(0, -1)
+          .map((row, i) => `Input ${i + 1}: ${describe(row.marbles)}.`),
+        `Output: ${describe(diagram.output)}.`,
+      ].join(' ')
+    : [
+        `${diagram.operator} のマーブル図。`,
+        ...rows
+          .slice(0, -1)
+          .map((row, i) => `入力 ${i + 1}：${describe(row.marbles)}。`),
+        `出力：${describe(diagram.output)}。`,
+      ].join('');
+---
+
+<figure class="marble-diagram">
+  <svg role="img" viewBox={`0 0 112 ${height}`}>
+    <title>{title}</title>
+    {
+      rows.map((row) => (
+        <g transform={`translate(0 ${row.y})`}>
+          <line
+            class="axis"
+            x1="0"
+            x2={arrowX}
+            y1={lineY}
+            y2={lineY}
+            stroke-width="0.3"
+          />
+          <polygon
+            class="arrow"
+            points={`${arrowX},${lineY - 1.2} ${arrowX + 2.5},${lineY} ${arrowX},${lineY + 1.2}`}
+          />
+          {row.marbles.map(({ t, label }) => (
+            <g>
+              <circle
+                cx={x0 + t}
+                cy={lineY}
+                r={radius}
+                fill={row.color.fill}
+                class="marble"
+                stroke-width="0.3"
+              />
+              <text
+                x={x0 + t}
+                y={lineY}
+                fill={row.color.text}
+                font-size={label.length > 2 ? 1.7 : 2.2}
+                font-weight="700"
+                text-anchor="middle"
+                dominant-baseline="central"
+              >
+                {label}
+              </text>
+            </g>
+          ))}
+        </g>
+      ))
+    }
+    <rect
+      class="box"
+      x="0.5"
+      y={boxY + 1}
+      width="110"
+      height={boxHeight - 2}
+      rx="1.2"
+      stroke-width="0.3"
+    />
+    <text
+      class="operator"
+      x="55.5"
+      y={boxY + boxHeight / 2}
+      font-size="2.6"
+      text-anchor="middle"
+      dominant-baseline="central"
+    >
+      {diagram.operator}
+    </text>
+  </svg>
+</figure>
+
+<style>
+  .marble-diagram svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    font-family: var(--sl-font-system, system-ui, sans-serif);
+  }
+
+  .axis,
+  .box,
+  .marble {
+    stroke: var(--sl-color-gray-3);
+  }
+
+  .arrow {
+    fill: var(--sl-color-gray-3);
+  }
+
+  .box {
+    fill: var(--sl-color-bg-nav);
+  }
+
+  .operator {
+    fill: var(--sl-color-white);
+    font-family: var(--sl-font-mono, ui-monospace, monospace);
+  }
+</style>

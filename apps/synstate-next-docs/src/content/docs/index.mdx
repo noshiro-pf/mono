@@ -32,8 +32,8 @@ import { Aside, Card, CardGrid } from '@astrojs/starlight/components';
     </Card>
     <Card title="Subscribers see a settled graph" icon="approve-check">
         Subscribers are effects: they run after the update has reached every
-        node it changes. A write made while the update propagates waits for it
-        to end instead of interrupting it.
+        node it changes. A write made during the update does not interrupt it:
+        it propagates in a round of its own afterwards.
     </Card>
     <Card title="Cut off at the first unchanged value" icon="random">
         A node that computes the value it already holds passes nothing on, so
