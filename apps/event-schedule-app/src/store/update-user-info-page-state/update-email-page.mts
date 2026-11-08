@@ -37,7 +37,9 @@ export type UpdateEmailPageDeps<User, ReauthCredential> = Readonly<{
   api: Readonly<{
     auth: StrictPick<
       AccountAuthApi<User, ReauthCredential>,
-      'emailCredential' | 'reauthenticateWithCredential' | 'update'
+      | 'emailCredential'
+      | 'reauthenticateWithCredential'
+      | 'verifyBeforeUpdateEmail'
     >;
   }>;
   auth: StrictPick<
@@ -55,7 +57,7 @@ export type UpdateEmailPageDeps<User, ReauthCredential> = Readonly<{
 
 /**
  * The dialog that changes the user's email: signing in again with the password,
- * then changing it.
+ * then sending the new address a link that changes it once opened.
  */
 export const createUpdateEmailPageStore = <
   User extends AccountUser,
@@ -218,11 +220,13 @@ export const createUpdateEmailPageStore = <
       return;
     }
 
+    // The address changes only once the link sent to it is opened, and Auth
+    // then reports the user with it; until then the old one is shown.
     const res2 = await settleAuthStep(
-      deps.api.auth.update.email(user, s.email.inputValue),
+      deps.api.auth.verifyBeforeUpdateEmail(user, s.email.inputValue),
     );
 
-    // The email is changed or not by now, so the toast says which even when the
+    // The link is sent or not by now, so the toast says which even when the
     // dialog was closed meanwhile; only the dialog it started from is closed.
     if (isCurrent()) {
       deps.dialog.closeDialog();
@@ -230,7 +234,7 @@ export const createUpdateEmailPageStore = <
 
     if (Result.isErr(res2)) {
       console.error(
-        'error occurred on updateEmail:',
+        'error occurred on verifyBeforeUpdateEmail:',
         ...describeAuthError(res2.value),
       );
 
@@ -245,7 +249,7 @@ export const createUpdateEmailPageStore = <
 
     showToast({
       toast: deps.toast,
-      message: dc.updateEmail.message.success,
+      message: dc.updateEmail.message.linkSent,
       intent: 'success',
     });
   };

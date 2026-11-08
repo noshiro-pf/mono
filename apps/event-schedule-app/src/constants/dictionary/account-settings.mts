@@ -23,7 +23,8 @@ export const accountSettingsDictionary = {
     currentEmail: '現在のメールアドレス',
     newEmail: '新しいメールアドレス',
     message: {
-      success: 'メールアドレスを更新しました。',
+      linkSent:
+        '新しいメールアドレスに確認メールを送信しました。メール内のリンクを開くと変更が完了し、新しいメールアドレスで再度ログインする必要があります。',
       error: 'メールアドレスの更新時にエラーが発生しました。',
     },
   },

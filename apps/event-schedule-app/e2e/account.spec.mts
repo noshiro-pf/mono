@@ -1,4 +1,5 @@
 import { expect, type Locator, type Page, test } from '@playwright/test';
+import { Arr, hasKey, isRecord, isString } from 'ts-data-forge';
 import type { DeepReadonly } from 'ts-type-forge';
 import {
   answerPageLoadTimeout,
@@ -246,9 +247,18 @@ test(
       await dialog.getByRole('button', { name: '更新する' }).click();
 
       await expect
-        .soft(toastWith(page, 'メールアドレスを更新しました。'))
+        .soft(
+          toastWith(
+            page,
+            '新しいメールアドレスに確認メールを送信しました。メール内のリンクを開くと変更が完了し、新しいメールアドレスで再度ログインする必要があります。',
+          ),
+        )
         .toBeVisible({ timeout: authCallTimeout });
     }
+
+    /* the address changes once the link sent to it is opened */
+
+    await openEmailChangeLink(page, newEmail);
 
     /* signing in again takes the new email and password */
 
@@ -287,6 +297,75 @@ test(
     await expect.soft(page.getByTestId('nav-sign-in')).toBeVisible();
   },
 );
+
+/**
+ * The link of the code the Auth emulator's `oobCodes` endpoint lists as sent to
+ * change an address to `newEmail`.
+ */
+const emailChangeLinkTo = (
+  body: unknown,
+  newEmail: string,
+): string | undefined => {
+  if (
+    !isRecord(body) ||
+    !hasKey(body, 'oobCodes') ||
+    !Arr.isArray(body.oobCodes)
+  ) {
+    return undefined;
+  }
+
+  const code: unknown = body.oobCodes.find(
+    (c) =>
+      isRecord(c) &&
+      c['requestType'] === 'VERIFY_AND_CHANGE_EMAIL' &&
+      c['newEmail'] === newEmail,
+  );
+
+  return isRecord(code) && hasKey(code, 'oobLink') && isString(code.oobLink)
+    ? code.oobLink
+    : undefined;
+};
+
+/**
+ * Opens the link the Auth emulator recorded as sent to `newEmail`, as its owner
+ * would from the mail. `firebase emulators:exec` gives the tests the emulator's
+ * host and the project.
+ */
+const openEmailChangeLink = async (
+  page: DeepReadonly<Page>,
+  newEmail: string,
+): Promise<void> => {
+  const host = process.env['FIREBASE_AUTH_EMULATOR_HOST'];
+
+  const projectId = process.env['GCLOUD_PROJECT'];
+
+  if (host === undefined || projectId === undefined) {
+    throw new Error(
+      'FIREBASE_AUTH_EMULATOR_HOST and GCLOUD_PROJECT are unset: run this under `check:e2e:emulators`',
+    );
+  }
+
+  const response = await page.request.get(
+    `http://${host}/emulator/v1/projects/${projectId}/oobCodes`,
+  );
+
+  if (!response.ok()) {
+    throw new Error(
+      `The Auth emulator's oobCodes endpoint answered ${response.status().toString()}`,
+    );
+  }
+
+  const oobLink = emailChangeLinkTo(await response.json(), newEmail);
+
+  if (oobLink === undefined) {
+    throw new Error(`The Auth emulator sent ${newEmail} no email change link`);
+  }
+
+  // The emulator's action page applies the code when it is fetched.
+  const applied = await page.request.get(oobLink);
+
+  expect.soft(applied.ok()).toBe(true);
+};
 
 /**
  * Unique per call, so that a retry, or a second run against the same emulators,

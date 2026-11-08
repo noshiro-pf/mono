@@ -1,9 +1,9 @@
 import {
   deleteUser as deleteUser_,
   reauthenticateWithCredential as reauthenticateWithCredential_,
-  updateEmail as updateEmail_,
   updatePassword as updatePassword_,
   updateProfile,
+  verifyBeforeUpdateEmail as verifyBeforeUpdateEmail_,
 } from 'firebase/auth';
 import { Result, castDeepMutable, castMutable } from 'ts-data-forge';
 import { assertIsCredentialError } from '../../types/index.mjs';
@@ -22,11 +22,21 @@ export const updateDisplayName = (
     }),
   );
 
-export const updateEmail = (
+/**
+ * Sends `email` a link that changes the user's address to it once opened.
+ *
+ * Not `updateEmail`, which changes it at once: with email enumeration
+ * protection on (the default for Firebase projects made since September 2023)
+ * the backend refuses that with `auth/operation-not-allowed`. The Auth emulator
+ * applies none of a project's sign-in settings, so it would not show that.
+ */
+export const verifyBeforeUpdateEmail = (
   user: FireAuthUser,
   email: string,
 ): Promise<Result<void, Readonly<{ code: string; message: string }>>> =>
-  Result.fromPromise(updateEmail_(castDeepMutable(user), email)).then(
+  Result.fromPromise(
+    verifyBeforeUpdateEmail_(castDeepMutable(user), email),
+  ).then(
     Result.mapErr((error) => {
       assertIsCredentialError(error);
 

@@ -720,10 +720,12 @@ describe(createUpdateDisplayNamePageStore, () => {
 });
 
 describe(createUpdateEmailPageStore, () => {
-  test('starts from the current email, signs in again, then changes it', async () => {
+  test('starts from the current email, signs in again, then sends the new one a link that changes it', async () => {
     const { deps, calls, dialog } = setup();
 
     const store = createUpdateEmailPageStore(deps);
+
+    const reports = watchReports();
 
     dialog.changeEmail();
 
@@ -742,8 +744,15 @@ describe(createUpdateEmailPageStore, () => {
 
     assert.deepStrictEqual(calls, [
       'reauthenticate alice cred(alice@example.com,password123)',
-      'update.email alice alicia@example.com',
+      'verifyBeforeUpdateEmail alice alicia@example.com',
     ]);
+
+    // The address is not changed yet, so the toast says where to finish it.
+    assert.deepStrictEqual(reports.toasts(), [
+      ['success', constant(dict.accountSettings.updateEmail.message.linkSent)],
+    ]);
+
+    assert.isUndefined(dialog.openingDialogType$.getSnapshot().value);
   });
 
   test('changes nothing when the dialog is closed while signing in again', async () => {
@@ -786,7 +795,9 @@ describe(createUpdateEmailPageStore, () => {
 
   test("ends the wait and reports a rejection as the step's error", async () => {
     const { deps, dialog } = setup({
-      respond: { 'update.email': () => Promise.reject(new Error('network')) },
+      respond: {
+        verifyBeforeUpdateEmail: () => Promise.reject(new Error('network')),
+      },
     });
 
     const store = createUpdateEmailPageStore(deps);
@@ -1008,7 +1019,10 @@ const alice: FakeUser = {
 } as const;
 
 type UpdateCall =
-  'deleteUser' | 'update.displayName' | 'update.email' | 'update.password';
+  | 'deleteUser'
+  | 'update.displayName'
+  | 'update.password'
+  | 'verifyBeforeUpdateEmail';
 
 type Setup = Readonly<{
   deps: Readonly<{
@@ -1085,11 +1099,14 @@ const setup = (
                 'update.displayName',
                 `update.displayName ${u.name} ${displayName}`,
               ),
-            email: (u, email) =>
-              ok('update.email', `update.email ${u.name} ${email}`),
             password: (u, password) =>
               ok('update.password', `update.password ${u.name} ${password}`),
           },
+          verifyBeforeUpdateEmail: (u, email) =>
+            ok(
+              'verifyBeforeUpdateEmail',
+              `verifyBeforeUpdateEmail ${u.name} ${email}`,
+            ),
         },
       },
       auth: {

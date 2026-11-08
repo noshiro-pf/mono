@@ -23,12 +23,16 @@ export type AccountAuthApi<User, ReauthCredential> = Readonly<{
       user: User,
       displayName: string,
     ) => Promise<Result<void, AuthError>>;
-    email: (user: User, email: string) => Promise<Result<void, AuthError>>;
     password: (
       user: User,
       password: string,
     ) => Promise<Result<void, AuthError>>;
   }>;
+  /** Sends `email` a link that changes the user's address to it once opened. */
+  verifyBeforeUpdateEmail: (
+    user: User,
+    email: string,
+  ) => Promise<Result<void, AuthError>>;
 }>;
 
 /** What the account dialogs read of the auth store. */
