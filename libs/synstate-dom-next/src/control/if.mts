@@ -1,6 +1,6 @@
 import type { Bindable } from '../constant.mjs';
-import { ControlDescription, type Description } from '../jsx/index.mjs';
-import { mountSwitch } from './switch.mjs';
+import type { Description } from '../jsx/index.mjs';
+import { Switch } from './switch.mjs';
 
 /**
  * Mounts `then` while `cond` is `true` and `else` while it is `false`; nothing
@@ -20,8 +20,10 @@ export const If = ({
   then: Description;
   else?: Description;
 }>): Description =>
-  new ControlDescription((out) => {
-    mountSwitch(cond, isTrue, (shown) => (shown ? then : elseBranch), out);
+  Switch({
+    value: cond,
+    key: isTrue,
+    children: (shown) => (shown ? then : elseBranch),
   });
 
 const isTrue = (cond: boolean): boolean => cond;

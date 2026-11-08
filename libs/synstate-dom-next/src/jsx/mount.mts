@@ -89,7 +89,7 @@ export type Child = Bindable<number | string> | Description | readonly Child[];
 export type Component<P> = (props: P) => Description;
 
 /** Mounts `child` in the current owner, appending its nodes to `out`. */
-export const mountChild = (child: Child, out: MountedNodes): void => {
+export const mountChildInto = (child: Child, out: MountedNodes): void => {
   if (child instanceof Description) {
     child.mount(out);
 
@@ -110,7 +110,7 @@ export const mountChild = (child: Child, out: MountedNodes): void => {
 
   if (Arr.isArray(child)) {
     for (const c of child) {
-      mountChild(c, out);
+      mountChildInto(c, out);
     }
 
     return;
@@ -266,9 +266,38 @@ export const Fragment = ({
 }: Readonly<{ children?: Child }>): Description =>
   new ControlDescription((out) => {
     if (children !== undefined) {
-      mountChild(children, out);
+      mountChildInto(children, out);
     }
   });
+
+/**
+ * Tells a child from any other value, one level deep as synstate-dom's: any
+ * array is taken for one, whatever it holds. An element of it that is no child
+ * (`null`, an object) mounts as an empty text node.
+ */
+export const isChild = (value: unknown): value is Child =>
+  value instanceof Description ||
+  isObservable(value) ||
+  Arr.isArray(value) ||
+  typeof value === 'string' ||
+  typeof value === 'number';
+
+/**
+ * Mounts `child` and appends its nodes to `parent` in one insertion, creating
+ * them in `parent`'s namespace; returns them. In the current owner: the caller
+ * removes them, if they are to go before `parent` does.
+ */
+export const appendChildTo = (child: Child, parent: Element): MountedNodes => {
+  const out = new MountedNodes();
+
+  mountInNamespace(namespaceInside(parent), () => {
+    mountChildInto(child, out);
+  });
+
+  out.appendTo(parent);
+
+  return out;
+};
 
 /** The namespace an element is created in. */
 export type Namespace = 'html' | 'svg';
@@ -284,14 +313,6 @@ const constantText = (child: unknown): string =>
     : typeof child === 'number'
       ? child.toString()
       : '';
-
-/** What the props typed as `Child` hold; checked one level deep. */
-const isChild = (value: unknown): value is Child =>
-  value instanceof Description ||
-  isObservable(value) ||
-  Arr.isArray(value) ||
-  typeof value === 'string' ||
-  typeof value === 'number';
 
 /** Mounts the children of `element` into it. */
 const mountChildren = (
@@ -313,10 +334,10 @@ const mountChildren = (
   const out = new MountedNodes();
 
   if (namespace === mut_mounting.namespace) {
-    mountChild(children, out);
+    mountChildInto(children, out);
   } else {
     mountInNamespace(namespace, () => {
-      mountChild(children, out);
+      mountChildInto(children, out);
     });
   }
 

@@ -14,17 +14,25 @@ export {
   MatchOptional,
   MatchResult,
   Portal,
+  Switch,
   selector,
   type Selector,
 } from './control/index.mjs';
 export {
   Fragment,
+  isChild,
+  mountChild,
+  mountable,
   type Child,
+  type ClassObject,
   type CommonElementProps,
   type Component,
+  type EventPropNames,
   type EventProps,
+  type GeneratedIntrinsicElements,
   type HtmlElementProps,
   type JSX,
+  type StyleObject,
   type SvgElementProps,
 } from './jsx/index.mjs';
 export { isImeKeyDown } from './keyboard.mjs';
