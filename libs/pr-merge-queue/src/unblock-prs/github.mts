@@ -11,6 +11,7 @@ import {
   namesEveryChangedPath,
   parseClaimComment,
   parseSetAsideComment,
+  pushersOf,
   readBranchRequirements,
   SET_ASIDE_COMMENT_SCAN,
   SKIP_CI_LABEL,
@@ -259,6 +260,8 @@ export const readReviewStates = async (
           'fragment ReviewState on PullRequest {',
           '  author { login }',
           '  headRefOid',
+          '  headRefName',
+          '  isCrossRepository',
           '  latestOpinionatedReviews(first: 20, writersOnly: true) { nodes { state author { login } } }',
           `  files(first: ${PAGE_SIZE}) { pageInfo { hasNextPage } nodes { path changeType } }`,
           // A pull request with more conversations than one page is counted
@@ -326,6 +329,54 @@ export const readReviewStates = async (
     states,
   });
 };
+
+/**
+ * Who pushed to `branch`, whose head is `head` (`pushersOf` in
+ * `pr-report-core`, which says what is read and when it cannot be told). One
+ * page, newest first, replayed oldest first: the endpoint pages by cursor, and
+ * a branch whose last creation is not among its latest hundred entries is left
+ * untold rather than followed. The check that enforces `CODEOWNERS` here reads
+ * the same page.
+ */
+export const readPushers = async (
+  api: ApiContext,
+  branch: string,
+  head: string,
+): Promise<Result<readonly string[] | 'unknown', string>> => {
+  const read = await rest(api, 'GET', '/activity', t.array(ActivitySchema), {
+    query: {
+      ref: `refs/heads/${branch}`,
+      direction: 'desc',
+      per_page: PAGE_SIZE.toString(),
+    },
+  });
+
+  return Result.isErr(read)
+    ? Result.mapErr(
+        read,
+        (message) => `${message} (reading ${branch}'s pushes)`,
+      )
+    : Result.ok(pushersOfPage(read.value, head));
+};
+
+/**
+ * {@link readPushers}' reading of one page of the activity, newest first as it
+ * asks for it: replayed oldest first, so that the chain runs from the last
+ * creation in the page to `head`.
+ */
+export const pushersOfPage = (
+  page: readonly t.TypeOf<typeof ActivitySchema>[],
+  head: string,
+): readonly string[] | 'unknown' =>
+  pushersOf(
+    page.toReversed().map((activity) => ({
+      activityType: activity.activity_type,
+      before: activity.before,
+      after: activity.after,
+      actor: activity.actor?.login,
+    })),
+    head,
+  );
 
 /**
  * What the issues the open pull requests close add to the merge order
@@ -1007,9 +1058,18 @@ const CodeOwnersBlobSchema = t.union([
 
 const LoginSchema = t.union([t.record({ login: t.string() }), t.nullType]);
 
+const ActivitySchema = t.record({
+  activity_type: t.string(),
+  before: t.string(),
+  after: t.string(),
+  actor: LoginSchema,
+});
+
 const ReviewStateNodeSchema = t.record({
   author: LoginSchema,
   headRefOid: t.string(),
+  headRefName: t.string(),
+  isCrossRepository: t.boolean(),
   latestOpinionatedReviews: t.record({
     nodes: t.array(t.record({ state: t.string(), author: LoginSchema })),
   }),
@@ -1028,6 +1088,7 @@ const reviewStateOf = (
   ({
     author: node.author?.login ?? '',
     head: node.headRefOid,
+    branch: node.isCrossRepository ? undefined : node.headRefName,
     approvers: Arr.generate(function* () {
       for (const { state, author } of node.latestOpinionatedReviews.nodes) {
         if (state === 'APPROVED' && author !== null) {

@@ -23,7 +23,8 @@
  * Not where a required check enforces `CODEOWNERS` instead of the ruleset
  * (`codeOwnerGate` is `'check'`): the check counts the author as approving what
  * they own, so such a pull request waits for nobody, and only someone else's
- * waits for an owner's approval.
+ * waits for an owner's approval — or an owner's that someone else pushed to
+ * (`ReviewState.pushers`), whose only owner is again its author: a bypass.
  *
  * GitHub will not say this itself: `reviewDecision` describes branch
  * protection, not a ruleset, and is `null` for every pull request here. The
@@ -51,6 +52,8 @@ export type ReviewState = Readonly<{
   /** Whether `files` is every file the pull request changes. */
   filesComplete: boolean;
   unresolvedConversations: number;
+  /** Who pushed to its branch, where read (`codeOwnerReview`'s `pushers`). */
+  pushers?: readonly string[] | 'unknown';
 }>;
 
 export type ReviewRules = Readonly<{
@@ -136,6 +139,7 @@ export const codeOwnerReviewOf = (
     approvers: state.approvers,
     author: state.author,
     authorApproves: gate === 'check',
+    ...(state.pushers === undefined ? {} : { pushers: state.pushers }),
   });
 };
 

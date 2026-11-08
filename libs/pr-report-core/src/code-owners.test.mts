@@ -6,6 +6,8 @@ import {
   namesEveryChangedPath,
   ownersOf,
   parseCodeOwners,
+  pushersOf,
+  type BranchActivity,
 } from './code-owners.mjs';
 
 describe(parseCodeOwners, () => {
@@ -182,6 +184,61 @@ describe(codeOwnerReview, () => {
     );
   });
 
+  // The author stands for what they own only as far as they wrote it: a commit
+  // someone else pushed to their branch is that person's.
+  describe('with who pushed to the branch', () => {
+    test('counts the author where every pusher owns the path', () => {
+      assert.deepStrictEqual(
+        review({
+          author: 'noshiro-pf',
+          authorApproves: true,
+          pushers: ['NoShiro-PF'],
+        }),
+        { state: 'approved' },
+      );
+    });
+
+    test('waits where someone who owns nothing pushed', () => {
+      assert.deepStrictEqual(
+        review({
+          author: 'noshiro-pf',
+          authorApproves: true,
+          pushers: ['noshiro-pf', 'helper-bot'],
+        }),
+        {
+          state: 'required',
+          paths: ['.github/workflows/release.yml'],
+          owners: ['noshiro-pf'],
+          authorOwns: true,
+        },
+      );
+    });
+
+    test('waits where who pushed cannot be told', () => {
+      assert.strictEqual(
+        review({
+          author: 'noshiro-pf',
+          authorApproves: true,
+          pushers: 'unknown',
+        }).state,
+        'required',
+      );
+    });
+
+    test('is satisfied by another owner’s approval as ever', () => {
+      assert.deepStrictEqual(
+        review({
+          files: ['repo-settings/a.json'],
+          author: 'noshiro-pf',
+          authorApproves: true,
+          pushers: ['helper-bot'],
+          approvers: ['other'],
+        }),
+        { state: 'approved' },
+      );
+    });
+  });
+
   // An approval by someone else might be a team member's; the author's own
   // standing is no approval at all, so a team path still waits for one.
   test('counts the author only on the paths they own, not as an approver', () => {
@@ -315,6 +372,59 @@ describe(codeOwnerReview, () => {
 const owners = (text: string, path: string): readonly string[] =>
   ownersOf(path, parseCodeOwners(text));
 
+describe(pushersOf, () => {
+  const zero = '0'.repeat(40);
+
+  test('names everyone who pushed since the branch was last created', () => {
+    assert.deepStrictEqual(
+      pushersOf(
+        [
+          activity('push', 'o1', 'o2', 'stranger'),
+          activity('branch_deletion', 'o2', zero, 'stranger'),
+          activity('branch_creation', zero, 'a', 'owner'),
+          activity('push', 'a', 'b', 'helper'),
+          activity('force_push', 'b', 'c', 'owner'),
+        ],
+        'c',
+      ),
+      ['owner', 'helper'],
+    );
+  });
+
+  test('cannot tell over a gap, a missing actor, or short of the head', () => {
+    const created = activity('branch_creation', zero, 'a', 'owner');
+
+    assert.strictEqual(
+      pushersOf([created, activity('push', 'x', 'b', 'owner')], 'b'),
+      'unknown',
+    );
+
+    assert.strictEqual(
+      pushersOf([created, activity('push', 'a', 'b', undefined)], 'b'),
+      'unknown',
+    );
+
+    assert.strictEqual(pushersOf([created], 'b'), 'unknown');
+
+    assert.strictEqual(
+      pushersOf(
+        [
+          activity('branch_creation', zero, 'a', undefined),
+          activity('push', 'a', 'b', 'owner'),
+        ],
+        'b',
+      ),
+      'unknown',
+    );
+
+    // The creation itself is past what GitHub keeps.
+    assert.strictEqual(
+      pushersOf([activity('push', 'a', 'b', 'owner')], 'b'),
+      'unknown',
+    );
+  });
+});
+
 describe(namesEveryChangedPath, () => {
   test('is false where a rename leaves its old path unnamed', () => {
     assert.isTrue(
@@ -422,3 +532,10 @@ const requirements = (
   requiredContexts: readonly string[],
 ): Parameters<typeof codeOwnerGate>[0] =>
   ({ requireCodeOwnerReview, requiredContexts }) as const;
+
+const activity = (
+  activityType: string,
+  before: string,
+  after: string,
+  actor: string | undefined,
+): BranchActivity => ({ activityType, before, after, actor }) as const;

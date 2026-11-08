@@ -104,6 +104,36 @@ export const namesEveryChangedPath = (
   );
 
 /**
+ * Who pushed to a branch whose head is `head`, from the repository's activity
+ * on it (`GET /repos/{owner}/{repo}/activity?ref=refs/heads/<branch>`, oldest
+ * first) — the one place GitHub names each push's actor; a pull request's
+ * timeline does not. Every push since the branch was last created, chained
+ * `before` to `after` and ending at `head`, or `'unknown'`: a gap, a push with
+ * no actor, a creation older than the activity GitHub keeps, or a push not
+ * recorded yet. `codeOwnerReview`'s `pushers`, and what the check that enforces
+ * `CODEOWNERS` in this repository reads the same way.
+ */
+export const pushersOf = (
+  activities: readonly BranchActivity[],
+  head: string,
+): readonly string[] | 'unknown' => {
+  const { chain, pushers } = activities.reduce(followPush, NO_BRANCH);
+
+  return chain === head && Arr.isNonEmpty(pushers)
+    ? Arr.uniq(pushers)
+    : 'unknown';
+};
+
+/** One entry of a branch's activity, as {@link pushersOf} reads it. */
+export type BranchActivity = Readonly<{
+  activityType: string;
+  before: string;
+  after: string;
+  /** The login of whoever did it, `undefined` for a deleted account. */
+  actor: string | undefined;
+}>;
+
+/**
  * The owners of one path: those of the **last** pattern that matches it, which
  * is how GitHub reads the file — a later line overrides an earlier one rather
  * than adding to it.
@@ -137,6 +167,7 @@ export const codeOwnerReview = ({
   approvers,
   author,
   authorApproves = false,
+  pushers,
 }: Readonly<{
   /** Whether code-owner review is asked for at all. */
   required: boolean;
@@ -153,6 +184,14 @@ export const codeOwnerReview = ({
    * ruleset's rule.
    */
   authorApproves?: boolean;
+  /**
+   * Who pushed to the pull request's branch, or `'unknown'` where that cannot
+   * be told. With `authorApproves`, the author stands for a path they own only
+   * where everyone who pushed owns it too: a commit someone else pushed to the
+   * author's branch is not the author's to vouch for. Absent, the author alone
+   * is taken to have written it, for a reader that does not ask.
+   */
+  pushers?: readonly string[] | 'unknown';
 }>): CodeOwnerReview => {
   if (!required) {
     return { state: 'not-required' };
@@ -161,6 +200,22 @@ export const codeOwnerReview = ({
   const approved = new Set(approvers.map((login) => login.toLowerCase()));
 
   const authorLogin = author.toLowerCase();
+
+  // Whether the author's ownership of a path counts as its approval.
+  const authorStands = (owners: readonly string[]): boolean => {
+    if (!authorApproves) {
+      return false;
+    }
+
+    const owning = new Set(owners.map((owner) => owner.toLowerCase()));
+
+    return (
+      owning.has(authorLogin) &&
+      (pushers === undefined ||
+        (pushers !== 'unknown' &&
+          pushers.every((login) => owning.has(login.toLowerCase()))))
+    );
+  };
 
   // The author is applied path by path rather than added to `approved`: an
   // approver there is someone a team might count, and the author has approved
@@ -172,10 +227,7 @@ export const codeOwnerReview = ({
       if (
         Arr.isNonEmpty(owners) &&
         owners.every((owner) => !approved.has(owner.toLowerCase())) &&
-        !(
-          authorApproves &&
-          owners.some((owner) => owner.toLowerCase() === authorLogin)
-        )
+        !authorStands(owners)
       ) {
         yield { path, owners };
       }
@@ -207,12 +259,9 @@ export const codeOwnerReview = ({
     rules.some(
       ({ owners }) =>
         Arr.isNonEmpty(owners) &&
+        !authorStands(owners) &&
         owners.every(
-          (owner) =>
-            !(
-              (!isTeam(owner) && approved.has(owner.toLowerCase())) ||
-              (authorApproves && owner.toLowerCase() === authorLogin)
-            ),
+          (owner) => isTeam(owner) || !approved.has(owner.toLowerCase()),
         ),
     )
   ) {
@@ -234,6 +283,33 @@ export const codeOwnerReview = ({
 };
 
 const ENFORCED_BY = 'enforced-by:';
+
+/** A chain {@link pushersOf} has lost; no head is ever this. */
+const UNTOLD = 'untold';
+
+/** Where {@link pushersOf} is in the activity: the head so far, and who. */
+type PushChain = Readonly<{
+  chain: string | undefined;
+  pushers: readonly string[];
+}>;
+
+const NO_BRANCH: PushChain = { chain: undefined, pushers: [] } as const;
+
+const followPush = (
+  { chain, pushers }: PushChain,
+  { activityType, before, after, actor }: BranchActivity,
+): PushChain =>
+  activityType === 'branch_creation'
+    ? actor === undefined
+      ? ({ chain: UNTOLD, pushers: [] } as const)
+      : ({ chain: after, pushers: [actor] } as const)
+    : activityType === 'branch_deletion'
+      ? NO_BRANCH
+      : activityType === 'push' || activityType === 'force_push'
+        ? chain !== undefined && before === chain && actor !== undefined
+          ? ({ chain: after, pushers: Arr.toPushed(pushers, actor) } as const)
+          : ({ chain: UNTOLD, pushers } as const)
+        : ({ chain, pushers } as const);
 
 export type CodeOwnerGate = 'check' | 'ruleset' | undefined;
 

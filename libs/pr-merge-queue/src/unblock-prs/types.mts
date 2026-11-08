@@ -136,7 +136,12 @@ export type ReviewRequirements = StrictPick<
  * A pull request's {@link ReviewState} and the head GitHub read it at, which is
  * how a read made just after a push tells whether its files are the new head's.
  */
-export type ReviewStateAt = ReviewState & Readonly<{ head: string }>;
+export type ReviewStateAt = ReviewState &
+  Readonly<{
+    head: string;
+    /** The head branch, `undefined` for one in another repository (a fork). */
+    branch: string | undefined;
+  }>;
 
 export type Survey = Readonly<{
   pullRequests: readonly PullRequest[];

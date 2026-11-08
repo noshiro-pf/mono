@@ -180,6 +180,26 @@ describe(reviewHold, () => {
   });
 });
 
+describe('reviewHold with who pushed', () => {
+  // Under the check, an owner's own pull request waits for nobody — unless
+  // someone else pushed to it, when its only owner is still its author, who may
+  // not approve it: a bypass merge, as under the ruleset's rule.
+  test('leaves an owner’s pull request another writer pushed to to a bypass', () => {
+    assert.strictEqual(
+      reviewHold(state({ author: 'owner', pushers: ['owner'] }), byCheck()),
+      undefined,
+    );
+
+    assert.strictEqual(
+      reviewHold(
+        state({ author: 'owner', pushers: ['owner', 'helper'] }),
+        byCheck(),
+      )?.kind,
+      'bypass',
+    );
+  });
+});
+
 describe(codeOwnerReviewOf, () => {
   // What holds nothing is not always known: `unblock-prs` holds a red check it
   // cannot judge rather than re-running it, and has to tell the two apart.
