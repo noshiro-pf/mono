@@ -12,14 +12,14 @@ const TimestampedType = t.intersection(
   [
     t.record({ data: t.string() }),
     t.record({
-      createdAt: t.number(Date.now()),
-      updatedAt: t.number(Date.now()),
+      createdAt: t.number(0),
+      updatedAt: t.number(0),
     }),
   ],
   t.record({
     data: t.string(),
-    createdAt: t.number(Date.now()),
-    updatedAt: t.number(Date.now()),
+    createdAt: t.number(0),
+    updatedAt: t.number(0),
   }),
 );
 

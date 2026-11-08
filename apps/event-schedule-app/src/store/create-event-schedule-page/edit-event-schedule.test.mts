@@ -2,6 +2,7 @@ import { EventSchedule, NotificationSettings } from 'event-schedule-app-shared';
 import { createState } from 'synstate';
 import { createMemoryBrowser } from 'synstate-router';
 import { Result } from 'ts-data-forge';
+import { DateUtils } from 'ts-fortress-types';
 import { answerIconsInitialValue, routes } from '../../constants/index.mjs';
 import { createAppRouter, type AppRouter } from '../router-store.mjs';
 import {
@@ -259,6 +260,9 @@ const fromDatabase: EventSchedule = EventSchedule.fill({
     },
   ],
   notificationSettings: 'none',
+  // Made where the test runs, as the form writes for a visit there.
+  // eslint-disable-next-line ts-restrictions/no-clock-read-at-module-load -- a test module lives for one run
+  timezoneOffsetMinutes: DateUtils.today().getTimezoneOffset(),
 });
 
 const withNotifications: EventSchedule = EventSchedule.fill({

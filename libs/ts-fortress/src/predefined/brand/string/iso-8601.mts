@@ -55,7 +55,9 @@ const ISO8601ValidatorOption: Type<ISO8601ValidatorOption> = record({
   /**
    * @default new Date().toISOString()
    */
-  // eslint-disable-next-line unicorn/no-unreadable-new-expression
+  // The documented default of this published type, the moment the module
+  // loaded; whether it should be something else is ts-fortress's own decision.
+  // eslint-disable-next-line unicorn/no-unreadable-new-expression, ts-restrictions/no-clock-read-at-module-load
   defaultValue: string(new Date().toISOString()),
 });
 

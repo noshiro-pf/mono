@@ -124,7 +124,7 @@ export type JsonObject = ReadonlyRecord<string, JsonValue>;
  * @example
  * ```ts
  * const builder: MutableJsonObject = {};
- * builder['timestamp'] = Date.now();
+ * builder['timestamp'] = 1_700_000_000_000;
  * builder['data'] = { message: 'Hello' };
  * builder['tags'] = ['info', 'user-action'];
  *

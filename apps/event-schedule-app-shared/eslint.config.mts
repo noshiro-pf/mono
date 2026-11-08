@@ -61,6 +61,16 @@ export default [
 
   { rules: defineKnownRules(dateUtilsRules) },
 
+  {
+    // The schema as it stood at each earlier version, frozen: the entry point
+    // exports `v9` alone and nothing imports these, so a default they compute
+    // at load (`defaultYearMonthDate`, a `createdAt`, an offset) is never read.
+    files: ['src/v[1-8]/**'],
+    rules: defineKnownRules({
+      'ts-restrictions/no-clock-read-at-module-load': 'off',
+    }),
+  },
+
   // Last, so that nothing above turns these back on.
   eslintConfigOffForOxlint,
 ] satisfies readonly FlatConfig[];

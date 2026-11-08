@@ -8,15 +8,6 @@ import type { CalendarCurrentPageReducerState } from '../../functions/index.mjs'
 import { monthsList } from '../../utils-ported/index.mjs';
 import * as styles from './multiple-date-picker.module.css';
 
-const thisYear = asSafeUint(DateUtils.getLocaleYear(DateUtils.today()));
-
-const thisMonth = DateUtils.getLocaleMonth(DateUtils.today());
-
-const yearOptions: readonly SafeUint[] = Arr.range(
-  SafeUint.sub(thisYear, asSafeUint(100)),
-  SafeUint.add(thisYear, asSafeUint(100)),
-);
-
 type Props = Readonly<{
   calendarCurrentPage: InitializedObservable<CalendarCurrentPageReducerState>;
   onYearChange: (year: SafeUint) => void;
@@ -31,50 +22,67 @@ export const DatepickerNav = ({
   onMonthChange,
   onPrevMonthClick,
   onNextMonthClick,
-}: Props): JSX.Element => (
-  <div class={constant(styles.nav)}>
-    <Button
-      icon={'chevron-left'}
-      variant={constant('minimal')}
-      onClick={onPrevMonthClick}
-    />
-    <HtmlSelect
-      minimal
-      value={calendarCurrentPage.pipe(map((p) => p.year.toString()))}
-      onChange={({ currentTarget }) => {
-        onYearChange(
-          mapNullable(Num.from(currentTarget.value), asSafeUint) ?? thisYear,
-        );
-      }}
-    >
-      {yearOptions.map((year) => (
-        <option value={constant(year.toString())}>
-          {constant(year.toString())}
-        </option>
-      ))}
-    </HtmlSelect>
-    <HtmlSelect
-      minimal
-      value={calendarCurrentPage.pipe(map((p) => p.month.toString()))}
-      onChange={({ currentTarget }) => {
-        onMonthChange(
-          mapNullable(
-            Num.from(currentTarget.value),
-            (a) =>
-              // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-              a as MonthEnum,
-          ) ?? thisMonth,
-        );
-      }}
-    >
-      {monthsList.en.map((m) => (
-        <option value={constant(m.value.toString())}>{constant(m.name)}</option>
-      ))}
-    </HtmlSelect>
-    <Button
-      icon={'chevron-right'}
-      variant={constant('minimal')}
-      onClick={onNextMonthClick}
-    />
-  </div>
-);
+}: Props): JSX.Element => {
+  // Read when the picker is drawn, not when the module loads: a page left open
+  // past a year's end would otherwise centre the years on the old one.
+  const today = DateUtils.today();
+
+  const thisYear = asSafeUint(DateUtils.getLocaleYear(today));
+
+  const thisMonth = DateUtils.getLocaleMonth(today);
+
+  const yearOptions: readonly SafeUint[] = Arr.range(
+    SafeUint.sub(thisYear, asSafeUint(100)),
+    SafeUint.add(thisYear, asSafeUint(100)),
+  );
+
+  return (
+    <div class={constant(styles.nav)}>
+      <Button
+        icon={'chevron-left'}
+        variant={constant('minimal')}
+        onClick={onPrevMonthClick}
+      />
+      <HtmlSelect
+        minimal
+        value={calendarCurrentPage.pipe(map((p) => p.year.toString()))}
+        onChange={({ currentTarget }) => {
+          onYearChange(
+            mapNullable(Num.from(currentTarget.value), asSafeUint) ?? thisYear,
+          );
+        }}
+      >
+        {yearOptions.map((year) => (
+          <option value={constant(year.toString())}>
+            {constant(year.toString())}
+          </option>
+        ))}
+      </HtmlSelect>
+      <HtmlSelect
+        minimal
+        value={calendarCurrentPage.pipe(map((p) => p.month.toString()))}
+        onChange={({ currentTarget }) => {
+          onMonthChange(
+            mapNullable(
+              Num.from(currentTarget.value),
+              (a) =>
+                // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+                a as MonthEnum,
+            ) ?? thisMonth,
+          );
+        }}
+      >
+        {monthsList.en.map((m) => (
+          <option value={constant(m.value.toString())}>
+            {constant(m.name)}
+          </option>
+        ))}
+      </HtmlSelect>
+      <Button
+        icon={'chevron-right'}
+        variant={constant('minimal')}
+        onClick={onNextMonthClick}
+      />
+    </div>
+  );
+};

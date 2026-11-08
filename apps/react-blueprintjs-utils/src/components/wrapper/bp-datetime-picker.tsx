@@ -34,7 +34,7 @@ export const BpDatetimePicker = memoNamed<BpDatetimePickerProps>(
     canClearSelection = false,
     shortcuts = false,
     reverseMonthAndYearMenus = true,
-    maxDate = tenYearsLater,
+    maxDate = tenYearsLater(),
     ...props
   }) => {
     const onChangeHandler = React.useCallback(
@@ -105,7 +105,14 @@ const formatDate = (date: Date): string =>
 const parseDate = (str: string): Date =>
   pipe(DateUtils.from(str)).map(DateUtils.toDate).value;
 
-const tenYearsLater = pipe(DateUtils.today())
-  .map(DateUtils.updateLocaleYear((a) => asSafeUint(a + 99) satisfies SafeUint))
-  .map(DateUtils.setLocaleMonth(12))
-  .map(DateUtils.toDate).value;
+/**
+ * The default `maxDate`: December, 99 years on. Read on each render, not when
+ * the module loads, which a page left open would keep.
+ */
+const tenYearsLater = (): Date =>
+  pipe(DateUtils.today())
+    .map(
+      DateUtils.updateLocaleYear((a) => asSafeUint(a + 99) satisfies SafeUint),
+    )
+    .map(DateUtils.setLocaleMonth(12))
+    .map(DateUtils.toDate).value;

@@ -102,6 +102,49 @@ namespace JsxBooleanLogicalOperands {
 }
 
 /**
+ * @description Disallow reading the clock (`Date.now()`, `new Date()`) when a module loads, which keeps that moment for as long as the module lives
+ *
+ *  ```md
+ *  | key        | value   |
+ *  | :--------- | :------ |
+ *  | type       | problem |
+ *  | deprecated | false   |
+ *  ```
+ */
+namespace NoClockReadAtModuleLoad {
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "type": "object",
+   *     "properties": {
+   *       "functions": {
+   *         "type": "array",
+   *         "items": {
+   *           "type": "string"
+   *         },
+   *         "description": "Further callees that read the clock, called or constructed, as dotted paths such as `DateUtils.today`."
+   *       }
+   *     },
+   *     "additionalProperties": false
+   *   }
+   * ]
+   * ```
+   */
+  export type Options = Readonly<{
+    /**
+     * Further callees that read the clock, called or constructed, as dotted paths such as `DateUtils.today`.
+     */
+    functions?: readonly string[];
+  }>;
+
+  export type RuleEntry =
+    'off' | Linter.Severity | readonly [Linter.StringSeverity, Options];
+}
+
+/**
  * @description Disallow a date-only string (`YYYY-MM-DD`) read by `new Date` or `Date.parse`, which take it as midnight UTC rather than local midnight
  *
  *  ```md
@@ -673,6 +716,7 @@ export type EslintTsRestrictionsRules = Readonly<{
   'ts-restrictions/explicit-collection-type-arguments': ExplicitCollectionTypeArguments.RuleEntry;
   'ts-restrictions/function-order': FunctionOrder.RuleEntry;
   'ts-restrictions/jsx-boolean-logical-operands': JsxBooleanLogicalOperands.RuleEntry;
+  'ts-restrictions/no-clock-read-at-module-load': NoClockReadAtModuleLoad.RuleEntry;
   'ts-restrictions/no-date-only-string-to-date': NoDateOnlyStringToDate.RuleEntry;
   'ts-restrictions/no-detached-jsdoc': NoDetachedJsdoc.RuleEntry;
   'ts-restrictions/no-export-type-side-effects': NoExportTypeSideEffects.RuleEntry;
@@ -698,6 +742,7 @@ export type EslintTsRestrictionsRules = Readonly<{
 
 export type EslintTsRestrictionsRulesOption = Readonly<{
   'ts-restrictions/check-destructuring-completeness': CheckDestructuringCompleteness.Options;
+  'ts-restrictions/no-clock-read-at-module-load': NoClockReadAtModuleLoad.Options;
   'ts-restrictions/no-date-only-string-to-date': NoDateOnlyStringToDate.Options;
   'ts-restrictions/no-ragged-comment-wrap': NoRaggedCommentWrap.Options;
   'ts-restrictions/no-restricted-cast-name': NoRestrictedCastName.Options;
