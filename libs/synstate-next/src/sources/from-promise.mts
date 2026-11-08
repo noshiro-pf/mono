@@ -18,8 +18,9 @@ export const fromPromise = <A, E = unknown>(
 /**
  * Calls `factory` with an `AbortSignal` and emits the outcome of the promise it
  * returns, as `fromPromise` does. Disposing it (a `switchMap` moving on, an
- * owner disposed) aborts the signal, and the rejection that follows emits
- * nothing.
+ * owner disposed) aborts the signal, whether or not the promise has settled, so
+ * read a response body inside `factory`: one read after it may be cut off. A
+ * rejection that follows emits nothing.
  */
 export const fromAbortablePromise = <A, E = unknown>(
   factory: (signal: AbortSignal) => Promise<A>,

@@ -75,8 +75,8 @@ export const pagesAppDirs = (): readonly string[] => pagesApps;
 /**
  * The hand-written documentation sites. Each one's `base` in `astro.config.mjs`
  * is `/mono/<siteDir>/`, and has to stay so.
- * `synstate-dom-docs` and `synstate-dom-next-docs` embed nothing at build
- * time, so `ws:build` builds them;
+ * `synstate-dom-docs`, `synstate-dom-next-docs` and `synstate-next-docs` embed
+ * nothing at build time, so `ws:build` builds them;
  * `deploy-pages.yml` rebuilds only `synstate-docs`, after `ws:doc`.
  * `check:prose:site-fragments` reads the pages of each.
  */
@@ -95,5 +95,10 @@ export const pagesAstroSites = [
     packageDir: 'synstate-dom-next-docs',
     siteDir: 'synstate-dom-next',
     buildCommand: 'pnpm --filter synstate-dom-next-docs run build',
+  },
+  {
+    packageDir: 'synstate-next-docs',
+    siteDir: 'synstate-next',
+    buildCommand: 'pnpm --filter synstate-next-docs run build',
   },
 ] as const;

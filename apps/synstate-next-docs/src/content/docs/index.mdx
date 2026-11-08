@@ -1,0 +1,57 @@
+---
+title: synstate-next
+description: The rebuild of synstate. A glitch-free observable state library whose updates are integer epochs, whose subscribers run after an update has settled, and whose lifetimes are owners.
+template: splash
+hero:
+    tagline: synstate rebuilt from scratch. Declare what depends on what, write a state, and every derived value is computed once, after its parents; subscribers run only once the whole update has settled.
+    actions:
+        - text: Get Started
+          link: /mono/synstate-next/getting-started/introduction/
+          icon: right-arrow
+          variant: primary
+        - text: How an update propagates
+          link: /mono/synstate-next/internals/how-an-update-propagates/
+          variant: minimal
+---
+
+import { Aside, Card, CardGrid } from '@astrojs/starlight/components';
+
+<Aside type="caution">
+    synstate-next is a private package in the repository and is not published.
+    It will be released as the next major version of synstate, and its API may
+    change until then.
+</Aside>
+
+## Features
+
+<CardGrid>
+    <Card title="Glitch-free" icon="approve-check">
+        A derived value is computed once per update, after all of its parents,
+        diamonds included. Nothing ever reads a value from halfway through an
+        update.
+    </Card>
+    <Card title="Subscribers see a settled graph" icon="approve-check">
+        Subscribers are effects: they run after the update has reached every
+        node it changes. A write made while the update propagates waits for it
+        to end instead of interrupting it.
+    </Card>
+    <Card title="Cut off at the first unchanged value" icon="random">
+        A node that computes the value it already holds passes nothing on, so
+        the part of the graph below it is not visited at all.
+    </Card>
+    <Card title="One owner, one lifetime" icon="setting">
+        Everything made while an owner runs belongs to it. Dispose the owner and
+        its derived values, subscriptions, timers and requests go with it.
+        Nothing has to be completed.
+    </Card>
+    <Card title="Types say what holds a value" icon="pencil">
+        A state, or a `map` of one, is an `InitializedObservable` with a
+        `.value`. An event, or a `filter`, is an `Observable` that may hold
+        nothing yet. `pipe` works out which one you get.
+    </Card>
+    <Card title="Small and regular" icon="rocket">
+        One way to write each thing: a transformation is a `map`, a choice is a
+        `switchMap`, an operator of your own is a `createDerived`. No aliases,
+        no one-line operators to learn.
+    </Card>
+</CardGrid>

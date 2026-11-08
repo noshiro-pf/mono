@@ -1,0 +1,13 @@
+{
+  "extends": [
+    "../../tools/configs/tsconfig/tsconfig.type-check.json",
+    "../../tools/configs/tsconfig/tsconfig.vite.json"
+  ],
+  "compilerOptions": {
+    "libReplacement": true
+  },
+  // The code blocks are samples in `libs/synstate-next/samples/docs-site/`,
+  // type-checked and run as tests there.
+  "include": ["./scripts", "./test"],
+  "exclude": ["./src/content.config.ts"]
+}

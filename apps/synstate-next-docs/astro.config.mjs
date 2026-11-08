@@ -1,0 +1,97 @@
+import starlight from '@astrojs/starlight';
+import { defineConfig } from 'astro/config';
+
+export default defineConfig({
+  site: 'https://noshiro-pf.github.io',
+  // Served beside the synstate documentation, from this repository's Pages.
+  // `tools/scripts/cmd/build-pages-site.mts` copies `dist/` to the same
+  // directory, so the two have to agree.
+  base: '/mono/synstate-next/',
+  integrations: [
+    starlight({
+      title: 'synstate-next',
+      description:
+        'The rebuild of synstate: a glitch-free observable state library whose updates are integer epochs, whose subscribers run after an update has settled, and whose lifetimes are owners.',
+      customCss: ['./src/styles/custom.css'],
+      // synstate's own icon, until synstate-next has one.
+      favicon: '/favicon.ico',
+      head: [
+        // The stripe Discord draws beside the link card; synstate's blue.
+        { tag: 'meta', attrs: { name: 'theme-color', content: '#3b82f6' } },
+        // For iOS's "Add to Home Screen", which does not read the favicon and
+        // without a touch icon draws the title's first letter instead. The
+        // PNG is synstate's, from `apps/synstate-docs/public/favicon/`.
+        {
+          tag: 'link',
+          attrs: {
+            rel: 'apple-touch-icon',
+            href: '/mono/synstate-next/apple-touch-icon.png',
+          },
+        },
+        {
+          tag: 'meta',
+          attrs: {
+            name: 'apple-mobile-web-app-title',
+            content: 'synstate-next',
+          },
+        },
+      ],
+      defaultLocale: 'root',
+      locales: {
+        root: { label: 'English', lang: 'en' },
+        ja: { label: '日本語', lang: 'ja' },
+      },
+      social: [
+        {
+          icon: 'github',
+          label: 'GitHub',
+          href: 'https://github.com/noshiro-pf/mono/tree/main/libs/synstate-next',
+        },
+      ],
+      sidebar: [
+        {
+          label: 'Getting Started',
+          translations: { ja: 'はじめに' },
+          items: [
+            { slug: 'getting-started/introduction' },
+            { slug: 'getting-started/installation' },
+          ],
+        },
+        {
+          label: 'Guides',
+          translations: { ja: 'ガイド' },
+          items: [
+            { slug: 'guides/why-synstate-next' },
+            { slug: 'guides/declarative-state' },
+            { slug: 'guides/state-and-writes' },
+            { slug: 'guides/deriving-values' },
+            { slug: 'guides/async-operators' },
+            { slug: 'guides/owners-and-lifetime' },
+            { slug: 'guides/custom-operators-and-sources' },
+            { slug: 'guides/using-with-a-ui' },
+          ],
+        },
+        {
+          label: 'Examples',
+          translations: { ja: 'サンプル' },
+          items: [{ slug: 'examples/patterns' }],
+        },
+        {
+          label: 'Internals',
+          translations: { ja: '内部の仕組み' },
+          items: [
+            { slug: 'internals/how-an-update-propagates' },
+            { slug: 'internals/why-no-completion' },
+            { slug: 'internals/tracing-an-update' },
+            { slug: 'internals/prior-art-and-design-rationale' },
+          ],
+        },
+        {
+          label: 'Background',
+          translations: { ja: '背景' },
+          items: [{ slug: 'background/changes-from-synstate' }],
+        },
+      ],
+    }),
+  ],
+});

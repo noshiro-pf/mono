@@ -334,6 +334,7 @@ export const oxlintConfig = {
     'apps/synstate-docs/src/content.config.ts',
     'apps/synstate-dom-docs/src/content.config.ts',
     'apps/synstate-dom-next-docs/src/content.config.ts',
+    'apps/synstate-next-docs/src/content.config.ts',
     'languages/sumi/cli/demo/**',
     'languages/sumi/conformance/fixtures/**',
     'libs/ts-codemod-lib/test-code/**',

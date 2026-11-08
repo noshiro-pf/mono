@@ -768,9 +768,9 @@ const collect = <A,>(observable: Observable<A>): readonly A[] => {
 };
 
 // synstate's `inner-ownership` cases of #3666 (issue #3550). A write made
-// during the projection is deferred until the drain ends here, so the
-// projection that wrote finishes first and the write then switches; what synstate
-// asked of completion during the projection is asked of disposal.
+// during the projection is deferred until the round's effects have run here, so
+// the projection that wrote finishes first and the write then switches; what
+// synstate asked of completion during the projection is asked of disposal.
 describe('a source write or disposal during a projection', () => {
   test('switchMap: a write from the projection switches to its value, and the first inner is let go', () => {
     const user$ = source<number>();

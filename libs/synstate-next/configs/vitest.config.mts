@@ -17,7 +17,9 @@ export default defineViteConfig({
     exclude: ['**/index.mts', 'src/**/*.test.mts'],
   },
   node: {
-    includeSource: ['src/**/*.mts'],
+    // `samples/docs-site/` holds the code blocks of apps/synstate-next-docs,
+    // each a test in the file it is embedded from.
+    includeSource: ['src/**/*.mts', 'samples/**/*.mts'],
     include: ['src/**/*.test.mts', 'test/**/*.test.mts'],
     exclude: ['**/*.d.mts', '**/index.mts'],
   },

@@ -14,8 +14,9 @@
  * 2. The effects run, in the order they were queued, against a graph that has
  *    settled.
  *
- * A write made during the drain is deferred until the drain ends; a write made
- * by an effect (or a mount) starts the next round. Updates never nest.
+ * A write made during the drain is deferred until the round's effects have run
+ * and then starts the next round, as a write made by an effect (or a mount)
+ * does. Updates never nest.
  *
  * A node that emitted outside the drain waits in `pending` for the next round,
  * marked by `queuedAt === -pendingGeneration` (a drain mark is a positive
@@ -157,7 +158,10 @@ export const currentEpoch = (): number => mut_state.epoch;
  */
 export const writeCount = (): number => mut_state.writeCount;
 
-/** Whether the drain is running: a write now has to wait for it to end. */
+/**
+ * Whether the drain is running: a write now has to wait until the round's
+ * effects have run.
+ */
 export const isDraining = (): boolean => mut_state.phase === 'drain';
 
 /** Whether `node` emitted outside the drain and waits for the next round. */
@@ -207,7 +211,7 @@ export const holdUntilUpdateEnds = (holder: HoldsFailure): void => {
   mut_state.holdersLength += 1;
 };
 
-/** Applies `write` once the drain ends. */
+/** Applies `write` once the round's effects have run. */
 export const deferWrite = (write: () => void): void => {
   mut_deferred[mut_state.deferredLength] = write;
 

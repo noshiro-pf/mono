@@ -560,6 +560,22 @@
       "project": ["**/*.{mts,ts,tsx,mjs,astro,mdx}"],
     },
 
+    // The Astro site `apps/*` assumes, whose code blocks are synstate-next's
+    // `samples/docs-site/`, read as files by `scripts/embed-samples.mts`. It
+    // declares synstate-next so that `check-changed` regenerates the pages when
+    // a sample changes; nothing imports it. The globs are `apps/*`'s, kept in
+    // step with it.
+    "apps/synstate-next-docs": {
+      "entry": [
+        "src/pages/**/*.{astro,mts,ts,tsx}",
+        "scripts/**/*.mts",
+        "configs/*.mts",
+        "e2e/**/*.spec.mts",
+      ],
+      "project": ["**/*.{mts,ts,tsx,mjs,astro,mdx}"],
+      "ignoreDependencies": ["synstate-next"],
+    },
+
     // Not an Astro site like the entry above assumes: plain TypeScript with a
     // single entry point.
     "apps/lambda-calculus-interpreter-core": {

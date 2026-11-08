@@ -695,6 +695,28 @@ describe(fromAbortablePromise, () => {
 
     assert.deepStrictEqual(seen, [Result.ok('result for b')]);
   });
+
+  test('disposing after the answer still aborts', async () => {
+    const mut_box: { signal?: AbortSignal } = {};
+
+    const request = fromAbortablePromise((signal) => {
+      mut_box.signal = signal;
+
+      return Promise.resolve(1);
+    });
+
+    const seen = collect(request);
+
+    await Promise.resolve();
+
+    assert.deepStrictEqual(seen, [Result.ok(1)]);
+
+    assert.isFalse(mut_box.signal?.aborted ?? true);
+
+    request.dispose();
+
+    assert.isTrue(mut_box.signal?.aborted ?? false);
+  });
 });
 
 describe('source written by its own subscriber', () => {
@@ -733,7 +755,7 @@ describe('source written by its own subscriber', () => {
       }
     });
 
-    // A `map` that writes: the write is deferred until the drain ends.
+    // A `map` that writes: the write is deferred until the round's effects ran.
     collect(
       t.pipe(
         map((x) => {

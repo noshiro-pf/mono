@@ -1,0 +1,195 @@
+---
+title: 値を派生させる
+description: pipe と InitKind、derive と combine、merge と zip、等値打ち切り、追いかけずに値を読む方法。
+---
+
+## `pipe`
+
+`observable.pipe(op1, op2, …)` は最大 4 つのオペレーターを順に適用します。それより多いときは `pipe` をもう一度つなぎます。各オペレーターは、最初に持っている値をどう扱うかを型で宣言しています。
+
+| `InitKind` | 意味                                     | オペレーター                                                                                                         |
+| :--------- | :--------------------------------------- | :------------------------------------------------------------------------------------------------------------------- |
+| `keep`     | ソースが値を持てば値を持つ               | `map`・`debounce`・`throttle`・`audit`・`take`・`takeUntil`・`skipIfNoChange`・`keepEqualParts`・`withBufferedFrom`  |
+| `drop`     | ソースにかかわらず値を持たないことがある | `filter`・`skip`・`takeWhile`・`skipWhile`・`skipUntil`・`pairwise`・`switchMap`・`mergeMap`・`withCurrentValueFrom` |
+| `with`     | 常に値を持つ                             | `scan`・`withInitialValue`                                                                                           |
+
+`pipe` はこれらを結果の型にまとめます。`.value` を持つ `InitializedObservable<A>` か、`hasValue` と `peek()` を持つ `Observable<A>` です。例は[概要](/mono/synstate-next/ja/getting-started/introduction/#pipe-で値を派生させる)にあります。
+
+## `derive` と `combine`
+
+`derive(parents, fn)` は複数の Observable から 1 つの値を計算します。親のいくつが変わっても 1 回の更新で 1 回だけ計算し、持っている値と等しくなければ伝えます。`combine(parents)` は最新の値をタプルで返し、届いた更新のたびに伝えます。毎回新しいタプルなので、打ち切られることはありません。
+
+```tsx
+import { batch, combine, createState, derive } from 'synstate-next';
+
+const [price, setPrice] = createState(100);
+
+const [quantity, setQuantity] = createState(2);
+
+// Computed once per update, however many parents changed.
+const total = derive([price, quantity], (p, q) => p * q);
+
+assert.strictEqual(total.value, 200);
+
+// The latest values as a tuple.
+const pair = combine([price, quantity]);
+
+const mut_totals: number[] = [];
+
+const mut_pairs: string[] = [];
+
+total.subscribe((t) => {
+    mut_totals.push(t);
+});
+
+pair.subscribe(([p, q]) => {
+    mut_pairs.push(`${p} × ${q}`);
+});
+
+batch(() => {
+    setPrice(50);
+
+    setQuantity(4);
+});
+
+// 50 × 4 is 200 again: `total` cuts the update off. `combine` builds a new
+// tuple on every update, so it never does.
+assert.deepStrictEqual(mut_totals, [200]);
+
+assert.deepStrictEqual(mut_pairs, ['100 × 2', '50 × 4']);
+```
+
+複数の値から計算する値には `derive` を選んでください。計算は 1 回で、打ち切りも効きます。`combine` は、`debounce` の入力のようにタプルそのものが必要なときに使います。どちらも、親がすべて値を持った時点で値を持ちます。
+
+## `merge` と `zip`
+
+`merge(parents)` は、どれかの親が流した値をそのまま流します（1 回の更新で複数が流したときは、その最初のもの）。`zip(parents)` は各親の n 番目の値を組にし、いちばん遅い親を待ちます。
+
+```tsx
+import { createValueEmitter, merge, zip } from 'synstate-next';
+
+const [mouse, emitMouse] = createValueEmitter<string>();
+
+const [keyboard, emitKeyboard] = createValueEmitter<string>();
+
+// Whichever emitted.
+const input = merge([mouse, keyboard]);
+
+// The n-th value of each, paired.
+const pairs = zip([mouse, keyboard]);
+
+const mut_inputs: string[] = [];
+
+const mut_pairs: string[] = [];
+
+input.subscribe((value) => {
+    mut_inputs.push(value);
+});
+
+pairs.subscribe(([m, k]) => {
+    mut_pairs.push(`${m} + ${k}`);
+});
+
+emitMouse('click');
+
+emitMouse('drag');
+
+emitKeyboard('a');
+
+emitKeyboard('b');
+
+assert.deepStrictEqual(mut_inputs, ['click', 'drag', 'a', 'b']);
+
+assert.deepStrictEqual(mut_pairs, ['click + a', 'drag + b']);
+```
+
+## 等値打ち切り
+
+値を計算するノード（`map`・`derive`・状態への書き込み）は、その値を持っている値と比べ（`equals` を渡さなければ `Object.is`）、等しければ何も伝えません。その下は辿られません。`switchMap` が（`Object.is` で）比べるのは切り替えたときだけです。新しい内側の Observable が持つ値は、持っている値と等しければ止まり、内側の Observable がその後に流す値はそのまま通ります。値を流すだけのオペレーター（`filter`・`take` など）は届いたものを流し、イベントを流すもの（`combine`・`merge`・`zip`・`scan`・`pairwise`・時間系のオペレーター）は比較しません。
+
+値にとってはこれが望ましい動きですが、イベントにとってはそうではありません。クリックのたびに `1` へ変換すると毎回 `1` になり、2 回目の `1` は変化なしとみなされてしまいます。結果が繰り返しうるイベントの `map` には、`equals: () => false` を渡してください。
+
+```tsx
+import { createEventEmitter, createState, map, scan } from 'synstate-next';
+
+const [count, setCount] = createState(1);
+
+const isEven = count.pipe(map((n) => n % 2 === 0));
+
+let mut_computed = 0;
+
+const label = isEven.pipe(
+    map((even) => {
+        mut_computed += 1;
+
+        return even ? 'even' : 'odd';
+    }),
+);
+
+setCount(3);
+
+setCount(5);
+
+// `isEven` stayed `false`, so nothing below it was visited.
+assert.strictEqual(mut_computed, 1);
+
+assert.strictEqual(label.value, 'odd');
+
+// An event mapped to a value that repeats: pass `equals: () => false`, or
+// the second one is taken for no change.
+const [clicked, click] = createEventEmitter();
+
+const steps = clicked.pipe(map(() => 1, { equals: () => false }));
+
+const position = steps.pipe(scan((sum, step) => sum + step, 0));
+
+click();
+
+click();
+
+assert.strictEqual(position.value, 2);
+```
+
+`skipIfNoChange` は逆の場合のためにあります。繰り返す値を落としたいイベントソースや、独自の比較をしたいときです。
+
+## 追いかけずに読む: `withCurrentValueFrom`
+
+親は子を起こします。ただ読むだけにしたい値もあります。フォームの送信時のテキストであって、キー入力のたびのテキストではない、というような場合です。`withCurrentValueFrom(other)` は、ソースの各値を、同じ更新で落ち着いた `other` の値と組にします。`other` だけが変わっても何も流しません。
+
+```tsx
+import {
+    createEventEmitter,
+    createState,
+    map,
+    withCurrentValueFrom,
+} from 'synstate-next';
+
+const [draft, setDraft] = createState('');
+
+const [submitted, submit] = createEventEmitter();
+
+// What the draft holds when the form is submitted. Typing alone sends
+// nothing: `draft` is read, not followed.
+const sent = submitted.pipe(
+    withCurrentValueFrom(draft),
+    map(([, text]) => text, { equals: () => false }),
+);
+
+const mut_sent: string[] = [];
+
+sent.subscribe((text) => {
+    mut_sent.push(text);
+});
+
+setDraft('h');
+
+setDraft('hello');
+
+submit();
+
+submit();
+
+assert.deepStrictEqual(mut_sent, ['hello', 'hello']);
+```
+
+`withBufferedFrom(other)` は同じことを、前回から `other` が流したすべての値について行います。

@@ -32,7 +32,8 @@ export class AsyncSourceClass<A> extends ObservableClass<A> {
   /**
    * Emits `value` unless disposed, as an event (see `publishEvent`); `last`
    * settles it. A value given while the graph drains (another library's
-   * callback run by a `map`) waits for the drain to end, as a write does.
+   * callback run by a `map`) waits until the round's effects have run, as a
+   * write does.
    */
   protected deliver(value: A, last: boolean): void {
     if (this.disposed) {
