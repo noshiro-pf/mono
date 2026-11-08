@@ -78,9 +78,17 @@ words:
   - wireit
   - ymdhm
   - zenn
-# A sample diff (`gen:sample-diffs`) is TypeScript with +/- prefixes; read
-# without the TypeScript dictionaries it would flag the package names they
-# know.
 overrides:
+  # A sample diff (`gen:sample-diffs`) is TypeScript with +/- prefixes; read
+  # without the TypeScript dictionaries it would flag the package names they
+  # know.
   - filename: 'libs/synstate/samples/**/ja/*.diff'
     languageId: typescript
+  # `changeset version` opens each entry with the commit's short hash, in the
+  # form of the `changelog` named in `.changeset/config.json`. cspell's own
+  # `CommitHash` pattern skips only a hash with a digit in it, so one of a-f
+  # alone reads as a word, and no `words` entry can name the next one. The hash
+  # alone is ignored: the entry's text stays checked.
+  - filename: '**/CHANGELOG.md'
+    ignoreRegExpList:
+      - '/^- [a-f]{7}(?=:)/gm'
