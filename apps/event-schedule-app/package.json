@@ -17,6 +17,7 @@
     "check:e2e:production": "playwright test --config ./configs/playwright.production.config.mts",
     "check:lint": "node ../../tools/scripts/cmd/assert-deps-built.mts && oxlint . && eslint .",
     "check:test": "node ../../tools/scripts/cmd/assert-deps-built.mts && vitest --config ./configs/vitest.config.mts run",
+    "check:test:rules": "node ../../tools/scripts/cmd/assert-deps-built.mts && firebase emulators:exec --only firestore --project demo-event-schedule-app \"vitest --config ./configs/vitest.rules.config.mts run\"",
     "check:types": "node ../../tools/scripts/cmd/assert-deps-built.mts && node ../../node_modules/typescript-native/bin/tsc --noEmit",
     "dev": "vite --config ./configs/vite.config.mts",
     "emulators": "pnpm --dir ../event-schedule-app-functions run build && firebase emulators:start --project demo-event-schedule-app --only auth,functions,firestore,pubsub --import ./emulator-data --export-on-exit",
@@ -54,6 +55,7 @@
     "ts-fortress-types": "workspace:*"
   },
   "devDependencies": {
+    "@firebase/rules-unit-testing": "^5.0.2",
     "@playwright/test": "catalog:",
     "eslint": "catalog:",
     "eslint-config-typed": "workspace:*",
