@@ -1,14 +1,17 @@
 import {
   DerivedClass,
   InnerFollower,
-  Owner,
+  currentDepthFloor,
   disposeReporting,
   noValue,
+  ownerBelow,
+  retireOwner,
   toNode,
   view,
   type Observable,
   type ObservableClass,
   type Operator,
+  type Owner,
 } from '../core/index.mjs';
 
 /**
@@ -32,6 +35,9 @@ class SwitchMapClass<A, B> extends DerivedClass<B> {
 
   readonly #project: (value: A) => Observable<B>;
 
+  /** The depth floor this node was made at, for the nodes of its projections. */
+  readonly #depthFloor: number;
+
   #mut_inner: Owner | undefined;
 
   /** The inner observable followed, for `settled`. */
@@ -46,6 +52,8 @@ class SwitchMapClass<A, B> extends DerivedClass<B> {
     this.#parent = parent;
 
     this.#project = project;
+
+    this.#depthFloor = currentDepthFloor();
 
     this.#mut_inner = undefined;
 
@@ -76,8 +84,9 @@ class SwitchMapClass<A, B> extends DerivedClass<B> {
     }
 
     // Not a child of the current owner: the inner lives as long as this node
-    // follows it, and this node disposes it.
-    const owner = new Owner(undefined);
+    // follows it, and this node disposes it. Its nodes are as deep as this
+    // node's own floor, so that a switch above retires them in time.
+    const owner = ownerBelow(undefined, this.#depthFloor);
 
     this.#mut_inner = owner;
 
@@ -142,6 +151,12 @@ class SwitchMapClass<A, B> extends DerivedClass<B> {
     this.#switchTo(v);
 
     return !Object.is(this.current, before);
+  }
+
+  protected override retireHeld(): void {
+    if (this.#mut_inner !== undefined) {
+      retireOwner(this.#mut_inner);
+    }
   }
 
   protected override teardown(): void {

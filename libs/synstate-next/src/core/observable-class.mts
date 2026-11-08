@@ -7,11 +7,17 @@
  * classes; `toNode` turns a public observable back into its class.
  */
 import { canPublishNow, EventQueue } from './event-queue.mjs';
-import { adoptIntoCurrentOwner } from './owner.mjs';
+import {
+  adoptIntoCurrentOwner,
+  currentDepthFloor,
+  type Failure,
+} from './owner.mjs';
 import {
   awaitsEffects,
+  batch,
   currentEpoch,
   emit,
+  holdUntilUpdateEnds,
   isPending,
   writeCount,
   type DerivedNode,
@@ -68,10 +74,16 @@ export class ObservableClass<A> implements DerivedNode {
   // transformer-ignore-next-line convert-to-readonly
   gone: boolean;
 
+  /**
+   * `depth` is what the parents ask for; a node created in an owner with a
+   * depth floor (a switch's branch, see `ownerBelow`) goes no higher than it.
+   */
   constructor(initial: A | NoValue, depth: number) {
     this.current = initial;
 
-    this.depth = depth;
+    const floor = currentDepthFloor();
+
+    this.depth = Math.max(depth, floor);
 
     this.children = undefined;
 
@@ -201,6 +213,36 @@ export class ObservableClass<A> implements DerivedNode {
     this.#mut_dead = 0;
   }
 
+  /**
+   * Stops being visited, keeping its value, without running any code of the
+   * application; its owner disposes it later. See `retireOwner`.
+   */
+  retire(): void {
+    this.leave();
+
+    this.retireHeld();
+  }
+
+  /** Leaves the graph for good, keeping its value; see `retire`. */
+  protected leave(): void {
+    if (this.gone) {
+      return;
+    }
+
+    this.gone = true;
+
+    this.leaveParents();
+  }
+
+  /**
+   * Retires the owners this node made for itself and disposes (what an
+   * operator's projection or a custom node's setup made), which belong to no
+   * other owner: their nodes are made below the floor this node was made at,
+   * and go out of the updates with it.
+   */
+  // eslint-disable-next-line @typescript-eslint/class-methods-use-this
+  protected retireHeld(): void {}
+
   /** Leaves the graph; never emits again. Disposing twice does nothing. */
   dispose(): void {
     if (this.disposed) {
@@ -311,8 +353,31 @@ export class ObservableClass<A> implements DerivedNode {
     return mut_result;
   }
 
+  /**
+   * Calls `fn` with the current value, if any, then after each update. A write
+   * `fn` makes during that first call is passed on once the call has returned,
+   * as one update with the last value written, as a write made by an effect is:
+   * `fn` is never re-entered. If the first call, or the update it starts,
+   * throws, the subscription is ended before the exception propagates, even
+   * when what threw was another effect: the caller receives no `Unsubscribe`,
+   * so nothing else could end it.
+   */
   subscribe(fn: (value: A) => void): Unsubscribe {
     const effect = new FnEffect(this, fn);
+
+    const v = this.current;
+
+    if (v !== noValue) {
+      try {
+        batch(() => {
+          fn(v);
+        });
+      } catch (error) {
+        effect.dispose();
+
+        throw error;
+      }
+    }
 
     return () => {
       effect.dispose();
@@ -362,13 +427,7 @@ export class DerivedClass<A> extends ObservableClass<A> {
    * at no cost per sibling.
    */
   protected detach(): void {
-    if (this.gone) {
-      return;
-    }
-
-    this.gone = true;
-
-    this.leaveParents();
+    this.leave();
   }
 
   /**
@@ -406,6 +465,82 @@ export class DerivedClass<A> extends ObservableClass<A> {
     for (const parent of this.parents) {
       parent.childGone();
     }
+  }
+}
+
+/**
+ * A node below `source` that calls `check` in the drain each time `source`
+ * emits, and emits nothing itself. A switch (synstate-dom-next's `If`, `For`)
+ * decides there which of its branches the update drops and retires them
+ * (`retireOwner`), before the drain reaches their nodes: the branches are made
+ * in an owner whose depth floor is `branchDepth` (`ownerBelow`), below this
+ * node, so none of their nodes computes from a value that rules its branch out.
+ *
+ * An exception from `check` (a key function of the application's) would end the
+ * whole update, so it is held instead and `failed` runs, retiring every branch
+ * the check could not keep. The switch's effect drops those branches and throws
+ * the exception (`takeFailure`), failing as an effect does; if the update ends
+ * before the effect runs, the exception is reported when the update ends.
+ */
+export class DrainCheck extends DerivedClass<never> {
+  readonly #check: () => void;
+
+  readonly #failed: () => void;
+
+  /** What the last check threw; see `takeFailure`. */
+  #mut_failure: Failure;
+
+  constructor(
+    source: ObservableClass<unknown>,
+    check: () => void,
+    failed: () => void,
+  ) {
+    super([source], noValue);
+
+    this.#check = check;
+
+    this.#failed = failed;
+
+    this.#mut_failure = undefined;
+  }
+
+  /** What the last check threw, if it threw; taking it clears it. */
+  takeFailure(): Failure {
+    const failure = this.#mut_failure;
+
+    this.#mut_failure = undefined;
+
+    return failure;
+  }
+
+  /** The depth floor of a branch the check decides: one below it. */
+  get branchDepth(): number {
+    return this.depth + 1;
+  }
+
+  /** See `holdUntilUpdateEnds`. */
+  reportUnclaimed(): void {
+    if (this.#mut_failure === undefined) {
+      return;
+    }
+
+    console.error(this.#mut_failure.error);
+
+    this.#mut_failure = undefined;
+  }
+
+  override recompute(): boolean {
+    try {
+      this.#check();
+    } catch (error) {
+      this.#mut_failure = { error };
+
+      holdUntilUpdateEnds(this);
+
+      this.#failed();
+    }
+
+    return false;
   }
 }
 
@@ -468,6 +603,14 @@ export abstract class EffectClass<A> implements EffectNode {
 
   abstract run(): void;
 
+  /**
+   * Stops being run; see `retireOwner`. Disposing an effect runs no code of the
+   * application, so this is its disposal.
+   */
+  retire(): void {
+    this.dispose();
+  }
+
   dispose(): void {
     if (this.disposed) {
       return;
@@ -479,7 +622,7 @@ export abstract class EffectClass<A> implements EffectNode {
   }
 }
 
-/** `subscribe`: calls `fn` with the current value, then after each update. */
+/** `subscribe`: calls `fn` after each update; `subscribe` makes the first call. */
 class FnEffect<A> extends EffectClass<A> {
   readonly #fn: (value: A) => void;
 
@@ -487,12 +630,6 @@ class FnEffect<A> extends EffectClass<A> {
     super(source);
 
     this.#fn = fn;
-
-    const v = source.current;
-
-    if (v !== noValue) {
-      fn(v);
-    }
   }
 
   run(): void {

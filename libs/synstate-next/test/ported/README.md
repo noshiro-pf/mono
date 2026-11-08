@@ -24,6 +24,8 @@ Each list is one directory of synstate, named by the files' base names.
 `libs/synstate/src/core/class/`:
 
 - The type tests of `observable-base`: `authoring.test.mts`.
+- `subscribe-first-write` (added by #3642): `subscribe-first-write.test.mts`,
+  but for the cases about `complete()`.
 - `propagation-order`, `unobserved-write`, `update-loop`,
   `write-during-propagation`, the valid graphs of `circular-dependency`, and the
   `dispose` cases of `complete-propagation` and `remove-completed`:
@@ -44,7 +46,8 @@ Each list is one directory of synstate, named by the files' base names.
   `with-buffered-from`, `debounce-audit-complete`, `audit-throttle-teardown`,
   `take-until-skip-until-teardown`: `operators.test.mts`.
 - `flat-map-initial-value`, `flat-map-sync-inner`, `inner-ownership`:
-  `flat-map.test.mts`.
+  `flat-map.test.mts`. The cases synstate added for a write or a completion
+  during a projection (#3666) ask about a write and a disposal.
 
 `libs/synstate/src/core/scope/`: `scope` is in `owner.test.mts`.
 

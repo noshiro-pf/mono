@@ -7,10 +7,41 @@
  * completion travelling down the graph.
  */
 
-/** What an owner disposes. */
-export type OwnedNode = Readonly<{ dispose: () => void; disposed: boolean }>;
+/**
+ * What an owner disposes. `retire`, where a node has it, takes the node out of
+ * the updates to come without running any code of the application; see
+ * `retireOwner`.
+ */
+export type OwnedNode = Readonly<{
+  dispose: () => void;
+  disposed: boolean;
+  retire?: () => void;
+}>;
+
+/** Filled by `Owner`'s static block; see `ownerBelow` and `retireOwner`. */
+const mut_internals: {
+  setDepthFloor: (owner: Owner, depthFloor: number) => void;
+  retire: (owner: Owner) => void;
+} = {
+  setDepthFloor: () => {},
+  retire: () => {},
+};
 
 export class Owner {
+  static {
+    // The internal operations of `ownerBelow` and `retireOwner`, which reach the
+    // private fields: no method of the public class offers them.
+    mut_internals.setDepthFloor = (owner, depthFloor) => {
+      if (depthFloor > owner.#mut_depthFloor) {
+        owner.#mut_depthFloor = depthFloor;
+      }
+    };
+
+    mut_internals.retire = (owner) => {
+      owner.#retire();
+    };
+  }
+
   readonly #parent: Owner | undefined;
 
   #mut_children: Owner[] | undefined;
@@ -33,8 +64,21 @@ export class Owner {
   /** How many calls of `run` of this owner are executing. */
   #mut_running: number;
 
+  /**
+   * The least depth of a node created in this owner; see `ownerBelow`. A child
+   * owner starts from its parent's.
+   */
+  #mut_depthFloor: number;
+
+  /** Whether `retireOwner` was called; it is disposed soon. */
+  #mut_retired: boolean;
+
   constructor(parent: Owner | undefined) {
     this.#parent = parent;
+
+    this.#mut_depthFloor = parent === undefined ? 0 : parent.#mut_depthFloor;
+
+    this.#mut_retired = false;
 
     this.#mut_children = undefined;
 
@@ -126,6 +170,23 @@ export class Owner {
     this.#mut_deadChildren = 0;
   }
 
+  /** See `retireOwner`. */
+  #retire(): void {
+    if (this.#mut_disposed || this.#mut_retired) {
+      return;
+    }
+
+    this.#mut_retired = true;
+
+    for (const child of this.#mut_children ?? []) {
+      child.#retire();
+    }
+
+    for (const node of this.#mut_nodes ?? []) {
+      node.retire?.();
+    }
+  }
+
   get parent(): Owner | undefined {
     return this.#parent;
   }
@@ -144,7 +205,11 @@ export class Owner {
   run<R>(fn: () => R): R {
     const previous = mut_current.owner;
 
+    const previousFloor = mut_current.depthFloor;
+
     mut_current.owner = this.#mut_disposed ? undefined : this;
+
+    mut_current.depthFloor = this.#mut_disposed ? 0 : this.#mut_depthFloor;
 
     this.#mut_running += 1;
 
@@ -158,6 +223,8 @@ export class Owner {
       return result;
     } finally {
       mut_current.owner = previous;
+
+      mut_current.depthFloor = previousFloor;
 
       this.#mut_running -= 1;
 
@@ -259,7 +326,11 @@ export class Owner {
   }
 }
 
-const mut_current: { owner: Owner | undefined } = { owner: undefined };
+/** The owner whose `run` is executing, and its depth floor. */
+const mut_current: { owner: Owner | undefined; depthFloor: number } = {
+  owner: undefined,
+  depthFloor: 0,
+};
 
 /** The shortest node list that is swept; see `Owner.adopt`. */
 const minimumSweep = 32;
@@ -295,13 +366,56 @@ export const onCleanup = (cleanup: () => void): void => {
 export const untracked = <R,>(fn: () => R): R => {
   const previous = mut_current.owner;
 
+  const previousFloor = mut_current.depthFloor;
+
   mut_current.owner = undefined;
+
+  mut_current.depthFloor = 0;
 
   try {
     return fn();
   } finally {
     mut_current.owner = previous;
+
+    mut_current.depthFloor = previousFloor;
   }
+};
+
+/**
+ * The least depth of a node created now: the depth floor of the current owner,
+ * 0 outside every owner. A node is placed at this depth when its parents would
+ * put it higher.
+ */
+export const currentDepthFloor = (): number => mut_current.depthFloor;
+
+/**
+ * Creates an owner, a child of `parent`, whose nodes are all at depth
+ * `depthFloor` or deeper: the nodes it creates, and those of its child owners.
+ * A switch places its branch below the node that decides it this way, so that
+ * the drain decides before it visits the branch; see `retireOwner`.
+ */
+export const ownerBelow = (
+  parent: Owner | undefined,
+  depthFloor: number,
+): Owner => {
+  const owner = new Owner(parent);
+
+  mut_internals.setDepthFloor(owner, depthFloor);
+
+  return owner;
+};
+
+/**
+ * Takes the nodes and effects of `owner` and of its child owners out of the
+ * updates to come, without running any code of the application: no cleanup,
+ * no teardown. Called in the drain by a switch that decided to drop a branch,
+ * before the drain reaches the branch's nodes (see `ownerBelow`), so that none
+ * of them computes from a value the switch rules out. The owner is to be
+ * disposed once the update has settled; until then its nodes keep their values
+ * and emit nothing.
+ */
+export const retireOwner = (owner: Owner): void => {
+  mut_internals.retire(owner);
 };
 
 /**
@@ -359,6 +473,12 @@ export const keepFirst = (failure: Failure, error: unknown): Failure => {
 
   return failure;
 };
+
+/** Keeps `first`'s exception, and reports `later`'s if it holds one. */
+export const keepFirstOf = (
+  first: NonNullable<Failure>,
+  later: Failure,
+): Failure => (later === undefined ? first : keepFirst(first, later.error));
 
 /** Throws the exception `failure` holds, if any. */
 export const throwFailure = (failure: Failure): void => {

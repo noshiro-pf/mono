@@ -1,5 +1,5 @@
-import { getOwner, Owner } from 'synstate-next';
-import { disposeReporting } from 'synstate-next/internal';
+import { getOwner, type Owner } from 'synstate-next';
+import { disposeReporting, ownerBelow } from 'synstate-next/internal';
 import {
   currentNamespace,
   MountedNodes,
@@ -24,9 +24,12 @@ export class MountSite {
     this.#namespace = currentNamespace();
   }
 
-  /** A new owner under the site's owner. */
-  newOwner(): Owner {
-    return new Owner(this.#parent);
+  /**
+   * A new owner under the site's owner, whose nodes are at depth `depthFloor`
+   * or deeper; see synstate-next's `DrainCheck`.
+   */
+  newOwner(depthFloor: number): Owner {
+    return ownerBelow(this.#parent, depthFloor);
   }
 
   /**
@@ -53,8 +56,12 @@ export class MountSite {
    * `MatchOptional` hands its branch) goes with the branch. The caller disposes
    * the owner when the branch goes.
    */
-  mount(make: () => Description | undefined, out: MountedNodes): Owner {
-    const owner = this.newOwner();
+  mount(
+    make: () => Description | undefined,
+    out: MountedNodes,
+    depthFloor: number,
+  ): Owner {
+    const owner = this.newOwner(depthFloor);
 
     this.run(owner, () => {
       make()?.mount(out);
@@ -66,10 +73,11 @@ export class MountSite {
   /** As `mount`, and returns the owner and the nodes. */
   mountDetached(
     make: () => Description | undefined,
+    depthFloor: number,
   ): readonly [Owner, MountedNodes] {
     const out = new MountedNodes();
 
-    return [this.mount(make, out), out];
+    return [this.mount(make, out, depthFloor), out];
   }
 }
 

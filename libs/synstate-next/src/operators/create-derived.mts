@@ -1,10 +1,12 @@
 import * as Arr from 'ts-data-forge/array';
 import {
   DerivedClass,
-  createRootOwner,
+  currentDepthFloor,
   disposeReporting,
   isPending,
   noValue,
+  ownerBelow,
+  retireOwner,
   toNode,
   view,
   type InitializedObservable,
@@ -132,8 +134,10 @@ class CustomDerivedClass<A> extends DerivedClass<A> {
   ) {
     super(parents, initial);
 
-    // Not a child of the current owner: this node disposes it.
-    this.#owner = createRootOwner();
+    // Not a child of the current owner: this node disposes it. What it makes is
+    // as deep as this node's own floor, so that a switch above retires it in
+    // time.
+    this.#owner = ownerBelow(undefined, currentDepthFloor());
 
     this.#mut_updating = false;
 
@@ -220,6 +224,10 @@ class CustomDerivedClass<A> extends DerivedClass<A> {
     // A value `emit`ted before this update (a batch that wrote both) is not
     // overwritten: `v` follows it.
     return v !== noValue && this.passOnInRound(v);
+  }
+
+  protected override retireHeld(): void {
+    retireOwner(this.#owner);
   }
 
   protected override teardown(): void {

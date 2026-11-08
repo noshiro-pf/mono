@@ -59,9 +59,9 @@ export const MatchResult = <S, E>({
 
 /**
  * The inner value of `value` while it stays on the branch's side, starting from
- * `initial`. When `value` leaves the side, the switch disposes the branch
- * first, in the same update: the effect that switches is queued before any made
- * in the branch, so none of them reads the fallback.
+ * `initial`. When `value` leaves the side, the switch retires the branch in the
+ * drain before this map is reached (see `mountSwitch`), so it never computes
+ * the fallback.
  */
 const innerOf = <V, T>(
   value: Bindable<V>,
