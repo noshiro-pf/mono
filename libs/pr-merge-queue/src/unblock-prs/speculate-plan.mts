@@ -93,33 +93,42 @@ export const stackedFirst = (
   candidates: readonly PullRequest[],
   built: readonly BuiltLayer[],
   baseTree: string,
-  context: Readonly<{
-    /** Whether the order lets it stay ahead: not one released and left green. */
-    mayStayAhead: (pr: PullRequest) => boolean;
-    defaultBranch: string;
-    bypass: ReadonlyMap<number, string>;
-  }>,
-): readonly PullRequest[] => {
-  const release = candidates.findIndex(({ headRefName }) =>
-    isVersionBranch(headRefName, context.defaultBranch),
-  );
+  context: OrderContext,
+): readonly PullRequest[] =>
+  releaseOrder(candidates, Result.ok({ built, baseTree }), context).order;
 
-  const kept = keptStack(
+/**
+ * The order the worker releases in, which every reader of the order reads:
+ * the triage log, the dry run, checking ahead itself, and the release step's
+ * settling of a double release. With the layer branches read, the candidates by
+ * {@link stackedFirst}, and `kept`, the pull requests it keeps ahead; with them
+ * unread, the queue's own order, as checking ahead falls back to.
+ */
+export const releaseOrder = (
+  candidates: readonly PullRequest[],
+  read: LayerRead,
+  context: OrderContext,
+): Readonly<{ order: readonly PullRequest[]; kept: readonly number[] }> => {
+  if (Result.isErr(read)) {
+    return { order: candidates, kept: [] };
+  }
+
+  const kept = stackedAhead(
     candidates,
-    built,
-    { tree: baseTree, tip: undefined },
-    (pr) =>
-      context.mayStayAhead(pr) &&
-      isStackable(pr, context) &&
-      (release === -1 || candidates.indexOf(pr) < release),
-  ).stack;
+    read.value.built,
+    read.value.baseTree,
+    context,
+  );
 
   const keptNumbers = new Set<number>(kept.map(({ number }) => number));
 
-  return [
-    ...kept,
-    ...candidates.filter(({ number }) => !keptNumbers.has(number)),
-  ];
+  return {
+    order: [
+      ...kept,
+      ...candidates.filter(({ number }) => !keptNumbers.has(number)),
+    ],
+    kept: kept.map(({ number }) => number),
+  };
 };
 
 /**
@@ -163,7 +172,11 @@ export const matchLayers = ({
  * - **A red first layer** names its own pull request, which is set aside. Only
  *   the first: a layer above it failed on top of pull requests that have not
  *   merged and may not, and it is judged once it is first, on `main`'s tree or
- *   rebuilt on it. It holds the release of nothing below it.
+ *   rebuilt on it. It holds the release of nothing below it. Setting it aside
+ *   at once would gain nothing over green layers: the first is released in the
+ *   same survey and watched until it merges, while nothing is built, and the
+ *   red one is first on the survey after. Over a layer still running it would
+ *   blame the pull request for what may be the failure of the one below.
  * - **Every layer above a red one over green ones**, which carries it, is
  *   cleaned up ({@link planDrop}), its runs cancelled to free their runners. A
  *   red layer over one still running says nothing yet.
@@ -384,70 +397,6 @@ export const layerOfMessage = (message: string): Layer | undefined => {
     : undefined;
 };
 
-/** A layer to have: a queued pull request at the head it is queued at. */
-export type Layer = Readonly<{ number: number; head: string }>;
-
-/** A layer a branch holds: the pull request and head it was built from. */
-export type BuiltLayer = Layer &
-  Readonly<{
-    /** The branch's tip, the one commit the layer adds. */
-    tip: string;
-    tree: string;
-    /** The commit below, `main`'s or the layer below's, and its tree. */
-    parent: string;
-    parentTree: string;
-    /** When the layer's commit was made, in epoch milliseconds. */
-    builtAt: number;
-  }>;
-
-/** A run on a layer, as much as {@link planDrop} reads. */
-export type DropRun = Readonly<{
-  id: number;
-  status: string;
-  updated_at: string;
-}>;
-
-/** What {@link planDrop} asks of a layer: the runs to cancel, and its branch. */
-export type LayerDrop = Readonly<{
-  cancel: readonly number[];
-  deleteBranch: boolean;
-}>;
-
-/** How far the check workflows got on a layer. */
-export type LayerStatus = Readonly<
-  | { kind: 'not-dispatched' }
-  | { kind: 'running'; queued: boolean }
-  | { kind: 'green' }
-  | { kind: 'red'; name: string; link: string }
->;
-
-/**
- * The prefix of the layer branches, on which the check workflows diff a layer
- * against `origin/main` (`code-check.yml`, `style-check.yml`).
- */
-export const LAYER_BRANCH_PREFIX = 'queue/pr-';
-
-/** How long a job of the first layer may run, from its own start. */
-export const LAYER_TIMEOUT_MS = 40 * 60_000;
-
-/**
- * How long the first layer may run, from its dispatch, before it is taken to be
- * stuck however busy the runners are.
- */
-export const LAYER_QUEUED_TIMEOUT_MS = 90 * 60_000;
-
-/**
- * How long a run of a set-aside layer may go without an update before its branch
- * goes anyway, in case GitHub never ends it: as long as a run may wait for a
- * runner ({@link LAYER_QUEUED_TIMEOUT_MS}), which it does without an update.
- */
-export const DROPPED_RUN_QUIET_MS = 90 * 60_000;
-
-/** How many runs of a workflow a layer may see cancelled. */
-export const MAX_DISPATCHES = 3;
-
-const LAYER_TRAILER = 'Queue-Layer';
-
 /** Whether a layer on `main`'s tree is not right on another that could be kept. */
 const isOnMain = (
   onTree: readonly BuiltLayer[],
@@ -527,6 +476,110 @@ const keptStack = (
     { builtAt: Number.NEGATIVE_INFINITY, stack: [] },
   );
 };
+
+/** The pull requests {@link stackedFirst} keeps ahead, in the stack's order. */
+const stackedAhead = (
+  candidates: readonly PullRequest[],
+  built: readonly BuiltLayer[],
+  baseTree: string,
+  context: OrderContext,
+): readonly PullRequest[] => {
+  const release = candidates.findIndex(({ headRefName }) =>
+    isVersionBranch(headRefName, context.defaultBranch),
+  );
+
+  return keptStack(
+    candidates,
+    built,
+    { tree: baseTree, tip: undefined },
+    (pr) =>
+      context.mayStayAhead(pr) &&
+      isStackable(pr, context) &&
+      (release === -1 || candidates.indexOf(pr) < release),
+  ).stack;
+};
+
+/** What {@link stackedFirst} needs besides the candidates and the layers. */
+export type OrderContext = Readonly<{
+  /** Whether the order lets it stay ahead: not one released and left green. */
+  mayStayAhead: (pr: PullRequest) => boolean;
+  defaultBranch: string;
+  bypass: ReadonlyMap<number, string>;
+}>;
+
+/**
+ * The layer branches as a survey reads them, once, for its order and its stack:
+ * the layers built, and the tree of `main`'s tip they stand on, or why they
+ * could not be read.
+ */
+export type LayerRead = Result<
+  Readonly<{ built: readonly BuiltLayer[]; baseTree: string }>,
+  string
+>;
+
+/** A layer to have: a queued pull request at the head it is queued at. */
+export type Layer = Readonly<{ number: number; head: string }>;
+
+/** A layer a branch holds: the pull request and head it was built from. */
+export type BuiltLayer = Layer &
+  Readonly<{
+    /** The branch's tip, the one commit the layer adds. */
+    tip: string;
+    tree: string;
+    /** The commit below, `main`'s or the layer below's, and its tree. */
+    parent: string;
+    parentTree: string;
+    /** When the layer's commit was made, in epoch milliseconds. */
+    builtAt: number;
+  }>;
+
+/** A run on a layer, as much as {@link planDrop} reads. */
+export type DropRun = Readonly<{
+  id: number;
+  status: string;
+  updated_at: string;
+}>;
+
+/** What {@link planDrop} asks of a layer: the runs to cancel, and its branch. */
+export type LayerDrop = Readonly<{
+  cancel: readonly number[];
+  deleteBranch: boolean;
+}>;
+
+/** How far the check workflows got on a layer. */
+export type LayerStatus = Readonly<
+  | { kind: 'not-dispatched' }
+  | { kind: 'running'; queued: boolean }
+  | { kind: 'green' }
+  | { kind: 'red'; name: string; link: string }
+>;
+
+/**
+ * The prefix of the layer branches, on which the check workflows diff a layer
+ * against `origin/main` (`code-check.yml`, `style-check.yml`).
+ */
+export const LAYER_BRANCH_PREFIX = 'queue/pr-';
+
+/** How long a job of the first layer may run, from its own start. */
+export const LAYER_TIMEOUT_MS = 40 * 60_000;
+
+/**
+ * How long the first layer may run, from its dispatch, before it is taken to be
+ * stuck however busy the runners are.
+ */
+export const LAYER_QUEUED_TIMEOUT_MS = 90 * 60_000;
+
+/**
+ * How long a run of a set-aside layer may go without an update before its branch
+ * goes anyway, in case GitHub never ends it: as long as a run may wait for a
+ * runner ({@link LAYER_QUEUED_TIMEOUT_MS}), which it does without an update.
+ */
+export const DROPPED_RUN_QUIET_MS = 90 * 60_000;
+
+/** How many runs of a workflow a layer may see cancelled. */
+export const MAX_DISPATCHES = 3;
+
+const LAYER_TRAILER = 'Queue-Layer';
 
 const takeStanding = (
   desired: readonly Layer[],

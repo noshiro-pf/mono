@@ -75,8 +75,8 @@ import {
   unannouncedSkips,
   withSkip,
 } from './skips.mjs';
-import { releasing } from './speculate-plan.mjs';
-import { dropAllLayers, speculate } from './speculate.mjs';
+import { releaseOrder, releasing } from './speculate-plan.mjs';
+import { dropAllLayers, readLayers, speculate } from './speculate.mjs';
 import { stackedOnAfter, stackParentsOf } from './stack.mjs';
 import {
   bypassPhrase,
@@ -960,7 +960,31 @@ const runCycle = async (
     issueOrder: await issueOrderFor(api, pullRequests),
   });
 
-  reportTriage(triaged, pullRequests.length, { defaultBranch, demoted });
+  // One released and left green goes last (`demotions.mts`); kept ahead, it
+  // would be released again and again.
+  const mayStayAhead = (pr: PullRequest): boolean => !isDemoted(demoted, pr);
+
+  // The layer branches, read once: what is stacked goes first in the order the
+  // log, the dry run, the release and its settling all read (`releaseOrder`).
+  const layers =
+    speculateConfig !== undefined && Arr.isNonEmpty(triaged.candidates)
+      ? await readLayers(baseSha)
+      : undefined;
+
+  const ordered =
+    layers === undefined
+      ? ({ order: triaged.candidates, kept: [] } as const)
+      : releaseOrder(triaged.candidates, layers, {
+          mayStayAhead,
+          defaultBranch,
+          bypass: triaged.bypass,
+        });
+
+  reportTriage(triaged, pullRequests.length, {
+    defaultBranch,
+    demoted,
+    ...ordered,
+  });
 
   const quiet = observeSurvey(
     before.quiet,
@@ -1081,6 +1105,8 @@ const runCycle = async (
     triaged.inFlight,
     defaultBranch,
     triaged.bypass,
+    // A pull request in flight is no candidate, so in no release order.
+    [],
   );
 
   if (watched !== undefined) {
@@ -1224,8 +1250,8 @@ const runCycle = async (
   }
 
   if (options.dryRun) {
-    if (Arr.isNonEmpty(triaged.candidates)) {
-      const first = triaged.candidates[0];
+    if (Arr.isNonEmpty(ordered.order)) {
+      const first = ordered.order[0];
 
       log(
         `Would ${describeAction(first, defaultBranch, triaged)} for #${first.number}.`,
@@ -1246,7 +1272,7 @@ const runCycle = async (
   // green, and alone, since the layers above carry it.
   let mut_releasing = triaged.candidates;
 
-  if (speculateConfig !== undefined) {
+  if (speculateConfig !== undefined && layers !== undefined) {
     const speculation = await speculate(api, {
       candidates: triaged.candidates,
       defaultBranch,
@@ -1255,9 +1281,8 @@ const runCycle = async (
       config: speculateConfig,
       autoFix: autoFixConfig,
       setAside: setAsideHeads(mut_skipped),
-      // One released and left green goes last (`demotions.mts`); kept ahead, it
-      // would be released again and again.
-      mayStayAhead: (pr) => !isDemoted(demoted, pr),
+      mayStayAhead,
+      layers,
     });
 
     if (speculation.setAside !== undefined) {
@@ -1415,6 +1440,7 @@ const runCycle = async (
         pausedAtSurvey,
         defaultBranch,
         bypassNow,
+        ordered.order.map(({ number }) => number),
       )) === 'yielded'
     ) {
       log(

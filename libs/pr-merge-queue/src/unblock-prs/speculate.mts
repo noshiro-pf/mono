@@ -48,6 +48,7 @@ import {
   stackedFirst,
   type BuiltLayer,
   type Layer,
+  type LayerRead,
   type LayerStatus,
 } from './speculate-plan.mjs';
 import type { PullRequest, SkipRecord } from './types.mjs';
@@ -74,11 +75,13 @@ export const speculate = async (
     setAside: ReadonlyMap<number, string>;
     /** Whether a candidate may stay ahead of the order (`stackedFirst`). */
     mayStayAhead: (pr: PullRequest) => boolean;
+    /** The layer branches as this survey read them ({@link readLayers}). */
+    layers: LayerRead;
   }>,
 ): Promise<Speculation> => {
   const { defaultBranch, baseSha, config } = context;
 
-  const branches = await readBuiltLayers(baseSha);
+  const branches = context.layers;
 
   if (Result.isErr(branches)) {
     return fallBack(
@@ -296,7 +299,7 @@ export const dropAllLayers = async (
   baseSha: string,
   setAside: ReadonlyMap<number, string>,
 ): Promise<void> => {
-  const branches = await readBuiltLayers(baseSha);
+  const branches = await readLayers(baseSha);
 
   if (Result.isErr(branches)) {
     log(`Cannot read the layer branches: ${branches.value}`);
@@ -400,6 +403,94 @@ const FAILED: ReadonlySet<string> = new Set<string>([
 
 /** What every check workflow's gate job is named with (`gates / check`). */
 const GATE_JOB = 'gates';
+
+/**
+ * The layer branches as they stand on `origin`, and `main`'s tree, fetching
+ * into the clone only the commits it lacks. Read once a survey: the order every
+ * reader of the queue reads (`releaseOrder`) and the stack {@link speculate}
+ * works on are the same.
+ */
+export const readLayers = async (baseSha: string): Promise<LayerRead> => {
+  const listed = await git(
+    `git ls-remote origin ${sh(`refs/heads/${LAYER_BRANCH_PREFIX}*`)}`,
+  );
+
+  if (Result.isErr(listed)) {
+    return listed;
+  }
+
+  const tips = Arr.generate(function* () {
+    for (const line of listed.value.split('\n')) {
+      const [sha, ref] = line.split('\t', 2);
+
+      const number =
+        ref === undefined
+          ? undefined
+          : numberOfLayerBranch(ref.replace(/^refs\/heads\//u, ''));
+
+      if (sha !== undefined && number !== undefined) {
+        yield { sha, number };
+      }
+    }
+  });
+
+  // `main`'s tip as well: after a merge it is a squash this clone has not seen.
+  // Only what the clone lacks, since this runs every survey.
+  const wanted = Arr.toUnshifted(baseSha)(tips.map(({ sha }) => sha));
+
+  const fetched = await fetchMissing(wanted);
+
+  if (Result.isErr(fetched)) {
+    return fetched;
+  }
+
+  const baseTree = await git(`git log -1 --format=%T ${sh(baseSha)}`);
+
+  if (Result.isErr(baseTree)) {
+    return baseTree;
+  }
+
+  const built = await Promise.all(
+    tips.map(async ({ sha, number }) => {
+      const shown = await git(`git log -1 --format=%T%x00%ct%x00%B ${sh(sha)}`);
+
+      const below = await git(`git log -1 --format=%H%x00%T ${sh(`${sha}^`)}`);
+
+      if (Result.isErr(shown) || Result.isErr(below)) {
+        return undefined;
+      }
+
+      const [tree, committed, message] = shown.value.split('\0', 3);
+
+      const [parent, parentTree] = below.value.trim().split('\0', 2);
+
+      const layer = layerOfMessage(message ?? '');
+
+      // An unreadable time reads as no layer, as an unreadable message does.
+      const committedAt = Num.safeParseInt(committed ?? '');
+
+      return tree === undefined ||
+        parent === undefined ||
+        parentTree === undefined ||
+        Result.isErr(committedAt) ||
+        layer?.number !== number
+        ? undefined
+        : ({
+            ...layer,
+            tip: sha,
+            tree: tree.trim(),
+            parent,
+            parentTree,
+            builtAt: committedAt.value * 1000,
+          } as const);
+    }),
+  );
+
+  return Result.ok({
+    built: built.filter((layer) => layer !== undefined),
+    baseTree: baseTree.value.trim(),
+  });
+};
 
 const deleteBranch = async (number: number): Promise<void> => {
   const deleted = await git(
@@ -554,93 +645,6 @@ const fallBack = (why: string, order: readonly PullRequest[]): Speculation => {
   return { stacked: false, release: true, setAside: undefined, order };
 };
 
-/** The layer branches as they stand on `origin`, and `main`'s tree. */
-const readBuiltLayers = async (
-  baseSha: string,
-): Promise<
-  Result<Readonly<{ built: readonly BuiltLayer[]; baseTree: string }>, string>
-> => {
-  const listed = await git(
-    `git ls-remote origin ${sh(`refs/heads/${LAYER_BRANCH_PREFIX}*`)}`,
-  );
-
-  if (Result.isErr(listed)) {
-    return listed;
-  }
-
-  const tips = Arr.generate(function* () {
-    for (const line of listed.value.split('\n')) {
-      const [sha, ref] = line.split('\t', 2);
-
-      const number =
-        ref === undefined
-          ? undefined
-          : numberOfLayerBranch(ref.replace(/^refs\/heads\//u, ''));
-
-      if (sha !== undefined && number !== undefined) {
-        yield { sha, number };
-      }
-    }
-  });
-
-  // `main`'s tip as well: after a merge it is a squash this clone has not seen.
-  // Only what the clone lacks, since this runs every survey.
-  const wanted = Arr.toUnshifted(baseSha)(tips.map(({ sha }) => sha));
-
-  const fetched = await fetchMissing(wanted);
-
-  if (Result.isErr(fetched)) {
-    return fetched;
-  }
-
-  const baseTree = await git(`git log -1 --format=%T ${sh(baseSha)}`);
-
-  if (Result.isErr(baseTree)) {
-    return baseTree;
-  }
-
-  const built = await Promise.all(
-    tips.map(async ({ sha, number }) => {
-      const shown = await git(`git log -1 --format=%T%x00%ct%x00%B ${sh(sha)}`);
-
-      const below = await git(`git log -1 --format=%H%x00%T ${sh(`${sha}^`)}`);
-
-      if (Result.isErr(shown) || Result.isErr(below)) {
-        return undefined;
-      }
-
-      const [tree, committed, message] = shown.value.split('\0', 3);
-
-      const [parent, parentTree] = below.value.trim().split('\0', 2);
-
-      const layer = layerOfMessage(message ?? '');
-
-      // An unreadable time reads as no layer, as an unreadable message does.
-      const committedAt = Num.safeParseInt(committed ?? '');
-
-      return tree === undefined ||
-        parent === undefined ||
-        parentTree === undefined ||
-        Result.isErr(committedAt) ||
-        layer?.number !== number
-        ? undefined
-        : ({
-            ...layer,
-            tip: sha,
-            tree: tree.trim(),
-            parent,
-            parentTree,
-            builtAt: committedAt.value * 1000,
-          } as const);
-    }),
-  );
-
-  return Result.ok({
-    built: built.filter((layer) => layer !== undefined),
-    baseTree: baseTree.value.trim(),
-  });
-};
-
 const buildLayer = async (
   layer: Layer,
   defaultBranch: string,
@@ -758,7 +762,7 @@ const buildLayer = async (
     tree,
     parent,
     parentTree,
-    // The commit's time, as `readBuiltLayers` reads it back.
+    // The commit's time, as `readLayers` reads it back.
     builtAt: committedAt.value * 1000,
   });
 };

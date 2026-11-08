@@ -236,7 +236,8 @@ PR には付けません。後者も解放済みの PR は一度に1本のまま
   す。それも失敗するなら PR ではなく GitHub の障害なので、見送らずに待ち続けま
   す。障害の間に、解放する PR を次々に見送ってしまわないためです。
 - **解放した直後にもう一度見る。** 同じ瞬間に、担当者が `worker` の別の PR も
-  解放されていて、そちらが pick の順（`priority:high` が先、`priority:low` と
+  解放されていて、そちらが解放の順（順番より先の検証で積んである段が先。「3b」。
+  ただし bypass でしかマージできない PR は除きます。残りは `priority:high` が先、`priority:low` と
   `priority:high` だけが付いてはいない bypass でしかマージできない PR が後、そ
   の中で番号の小さい順、version PR は最後）で先なら、**自分の PR に**
   `skip-ci` を付け直して譲り、survey からやり直します（`release.mts` の
@@ -555,7 +556,10 @@ PR なら10分続いたところで triage の前に見送ります。候補の�
   PR がまだマージされていない PR はそもそも candidate ではないので、この並びが
   その順序を破ることはありません。解放はこの並びの順に行い、従来どおりの解放に
   戻るときも同じです。ただし段のブランチを読めなかったときは、キュー本来の順で
-  解放します。同じ tree の上に段の列が2つある（古い段を落としている途中の）とき
+  解放します。順番を読むほかの箇所もこの並びを読みます。survey のログの「next」
+  と並び（保った段には「kept ahead」と添えます）、`--dry-run` の「Would …」、
+  解放直後に同時に解放された PR とどちらが先かを決める `yieldsTo` です。段の
+  ブランチは survey ごとに1回だけ読みます。同じ tree の上に段の列が2つある（古い段を落としている途中の）とき
   は、最後に積んだ段を含むほう（同じ秒なら長いほう）を保ち、もう積めなくなった PR
   は保ちません。キューの順で version PR より後ろの PR も保ちません。リリースに
   何が入るかは、引き続きキューの順で決まります。
@@ -586,7 +590,11 @@ PR なら10分続いたところで triage の前に見送ります。候補の�
   失敗です。その段は先頭になるまで待ちます。下の段がマージされれば `main` の
   tree の上にあり、キューを離れれば作り直されます。その上には積まず、積んであ
   れば、下のとおり片付けます。
-  下にまだ走っている段がある赤は、まだ誰のものとも言えません。
+  下にまだ走っている段がある赤は、まだ誰のものとも言えません。すぐに見送っても、
+  下の段がすべて緑なら得るものはありません。先頭は同じ survey で解放され、マー
+  ジされるまで watch される間は何も積まず、赤の段は次の survey で先頭になるから
+  です。下にまだ走っている段があるときに見送ると、下の段の失敗かもしれないもの
+  をその PR のせいにしてしまいます。
 - version PR、bypass でしかマージできない PR、fork の PR、コミットが下の段と
   衝突する PR では積むのを止め、その PR は従来どおり単独で解放されます。
 - もう有効でない段（head が動いた、見送られた、キューを離れた、マージされた、下
@@ -1285,20 +1293,20 @@ released, and one a person had released on purpose.
   tip of `main`; if that fails too, the failure is GitHub's rather than the pull
   request's, and it keeps waiting, so that an outage does not set aside each
   pull request it would release next.
-- **Look again straight after releasing.** When another pull request the
-  worker owns was released in the same moment and comes first in the pick
-  order (`priority:high` first, and `priority:low` last together with one
-  only a bypass merges that is not labelled `priority:high` alone, then the
-  lowest number, the version pull request last), this script puts `skip-ci`
-  back on **its own** and surveys again (`yieldsTo` in `release.mts`). A
-  set-aside or claimed pull request, a skill's or a person's, runs nothing
-  until its fix is pushed, so it does not count; counting it would stall the
-  queue behind a pull request nobody is about to run. Nor does one already
-  released when the survey ran (a person took `skip-ci` off it, or labelled
-  `merge-queued` one that never had it): not in flight — waiting on
-  `Merge-After:`, held by its review, conflicting — it is still released on
-  the next survey, and yielding to it would pick and pause the same pull
-  request forever.
+- **Look again straight after releasing.** When another pull request the worker
+  owns was released in the same moment and comes first in the release order
+  (what checking ahead keeps stacked first, "3b", unless only a bypass merges
+  it; then `priority:high` first, and `priority:low` last together with one only
+  a bypass merges that is not labelled `priority:high` alone, then the lowest
+  number, the version pull request last), this script puts `skip-ci` back on
+  **its own** and surveys again (`yieldsTo` in `release.mts`). A set-aside or
+  claimed pull request, a skill's or a person's, runs nothing until its fix is
+  pushed, so it does not count; counting it would stall the queue behind a pull
+  request nobody is about to run. Nor does one already released when the survey
+  ran (a person took `skip-ci` off it, or labelled `merge-queued` one that never
+  had it): not in flight — waiting on `Merge-After:`, held by its review,
+  conflicting — it is still released on the next survey, and yielding to it
+  would pick and pause the same pull request forever.
 - A pull request a person or a bot released runs as released. What that can
   cost is a matrix, not a wrong merge. Step 3 of the example no longer
   happens, because the skill puts `skip-ci` on its own pull request before it
@@ -1639,11 +1647,15 @@ decided in `speculate-plan.mts`).
   stack) is not a candidate until that one merges, so the order this keeps never
   breaks one. The release step releases in this order, also when it falls back
   to releasing as before, unless the layer branches could not be read, which
-  leaves the queue's own order. Of two stacks on the same tree (an old layer
-  still being dropped), the one with the layer built last is kept (of two built
-  in the same second, the longer), and a pull request that can no longer be
-  stacked is not kept ahead. Nor is one the queue's order puts after the version
-  pull request: what goes into a release is still the order's to say.
+  leaves the queue's own order. So does everything else that reads the order:
+  the survey log's "next" and its list (a kept pull request says "kept ahead"),
+  `--dry-run`'s "Would …", and `yieldsTo`, which settles a double release just
+  after one. The layer branches are read once a survey. Of two stacks on the
+  same tree (an old layer still being dropped), the one with the layer built
+  last is kept (of two built in the same second, the longer), and a pull request
+  that can no longer be stacked is not kept ahead. Nor is one the queue's order
+  puts after the version pull request: what goes into a release is still the
+  order's to say.
 - Each candidate's commits, from its merge base with `origin/main`, are squashed
   into one commit on the layer below (`main` for the first) and pushed to
   `queue/pr-<number>`. The commit carries a `Queue-Layer: <number> <head>`
@@ -1672,7 +1684,11 @@ decided in `speculate-plan.mts`).
   merged and may not. It waits until it is first: on `main`'s tree once the
   layers below merge, or rebuilt if they leave the queue. Nothing is built above
   it, and what already was is cleaned up as below. A red layer over one still
-  running is nobody's yet.
+  running is nobody's yet. Setting it aside at once would gain nothing over
+  green layers: the first is released in the same survey and watched until it
+  merges, building nothing meanwhile, and the red one is first on the survey
+  after. Over a layer still running, it would blame the pull request for what
+  may be the failure of the one below.
 - The stack stops at the version pull request, one only a bypass merges, a
   fork's, or one whose commits conflict with the layers below; that one is
   released on its own, as before.

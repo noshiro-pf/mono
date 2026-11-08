@@ -1,4 +1,4 @@
-import { Arr } from 'ts-data-forge';
+import { Arr, Result } from 'ts-data-forge';
 import {
   cancelledTooOften,
   decideSpeculation,
@@ -16,6 +16,7 @@ import {
   mayBuildAbove,
   numberOfLayerBranch,
   planDrop,
+  releaseOrder,
   releasing,
   stackedFirst,
   type BuiltLayer,
@@ -59,6 +60,43 @@ describe(desiredLayers, () => {
     assert.deepStrictEqual(
       desiredLayers([pr(5, { isCrossRepository: true }), pr(6)], context),
       [],
+    );
+  });
+});
+
+describe(releaseOrder, () => {
+  const built5 = built(5, { parentTree: 'main-tree', tree: 't5' });
+
+  const built9 = built(9, { parentTree: 't5', tree: 't9', parent: 'tip-5' });
+
+  const context = {
+    mayStayAhead: movable,
+    defaultBranch: 'main',
+    bypass: new Map<number, string>(),
+  } as const;
+
+  test('is the stacked order, with what it keeps ahead', () => {
+    const ordered = releaseOrder(
+      [pr(2), pr(5), pr(7), pr(9)],
+      Result.ok({ built: [built9, built5], baseTree: 'main-tree' }),
+      context,
+    );
+
+    assert.deepStrictEqual(
+      ordered.order.map(({ number }) => number),
+      [5, 9, 2, 7],
+    );
+
+    assert.deepStrictEqual(ordered.kept, [5, 9]);
+  });
+
+  // Checking ahead falls back to releasing as usual then.
+  test("is the queue's own order when the layer branches could not be read", () => {
+    const candidates = [pr(2), pr(5)] as const;
+
+    assert.deepStrictEqual(
+      releaseOrder(candidates, Result.err('ls-remote failed'), context),
+      { order: candidates, kept: [] },
     );
   });
 });

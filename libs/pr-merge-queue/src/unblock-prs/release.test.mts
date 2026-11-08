@@ -44,6 +44,7 @@ describe(firstInReleaseOrder, () => {
         [pullRequest({ number: 12 }), pullRequest({ number: 7 })],
         'main',
         noBypass,
+        [],
       )?.number,
       7,
     );
@@ -58,6 +59,7 @@ describe(firstInReleaseOrder, () => {
         ],
         'main',
         noBypass,
+        [],
       )?.number,
       12,
     );
@@ -75,12 +77,12 @@ describe(firstInReleaseOrder, () => {
     ] as const;
 
     assert.strictEqual(
-      firstInReleaseOrder(released, 'main', noBypass)?.number,
+      firstInReleaseOrder(released, 'main', noBypass, [])?.number,
       3,
     );
 
     assert.strictEqual(
-      firstInReleaseOrder(Arr.take(released, 2), 'main', noBypass)?.number,
+      firstInReleaseOrder(Arr.take(released, 2), 'main', noBypass, [])?.number,
       2,
     );
   });
@@ -99,6 +101,7 @@ describe(firstInReleaseOrder, () => {
         released,
         'main',
         new Map<number, string>([[1, '@someone owns it']]),
+        [],
       )?.number,
       3,
     );
@@ -108,13 +111,55 @@ describe(firstInReleaseOrder, () => {
         [pullRequest({ number: 1, labels: [queued, high] }), released[2]],
         'main',
         new Map<number, string>([[1, '@someone owns it']]),
+        [],
       )?.number,
       1,
     );
   });
 
+  test('puts first the one the release order puts first, as checking ahead keeps what it stacked', () => {
+    // #12 has a layer standing and was stacked before #3 gained priority:high.
+    assert.strictEqual(
+      firstInReleaseOrder(
+        [
+          pullRequest({ number: 3, labels: [queued, high] }),
+          pullRequest({ number: 12 }),
+        ],
+        'main',
+        noBypass,
+        [12, 3],
+      )?.number,
+      12,
+    );
+  });
+
+  test('puts one in no release order after those in it, and orders those by the rule', () => {
+    assert.strictEqual(
+      firstInReleaseOrder(
+        [
+          pullRequest({ number: 2, labels: [queued, high] }),
+          pullRequest({ number: 9 }),
+        ],
+        'main',
+        noBypass,
+        [9],
+      )?.number,
+      9,
+    );
+
+    assert.strictEqual(
+      firstInReleaseOrder(
+        [pullRequest({ number: 4 }), pullRequest({ number: 2 })],
+        'main',
+        noBypass,
+        [7],
+      )?.number,
+      2,
+    );
+  });
+
   test('is undefined for nothing', () => {
-    assert.isUndefined(firstInReleaseOrder([], 'main', noBypass));
+    assert.isUndefined(firstInReleaseOrder([], 'main', noBypass, []));
   });
 });
 
@@ -142,6 +187,7 @@ describe(yieldsTo, () => {
         new Set<number>([3, 7]),
         'main',
         noBypass,
+        [],
       )?.number,
       3,
     );
@@ -158,6 +204,7 @@ describe(yieldsTo, () => {
         new Set<number>([3, 7]),
         'main',
         new Map<number, string>([[3, '@someone owns it']]),
+        [],
       ),
     );
   });
@@ -173,7 +220,43 @@ describe(yieldsTo, () => {
         new Set<number>([7, 12]),
         'main',
         noBypass,
+        [],
       ),
+    );
+  });
+
+  test('keeps its release against a lower number the release order puts after it', () => {
+    // Its layer was stacked first and is green: its verdict is reused, while
+    // #3 would run the matrix in full.
+    const other = pullRequest({ number: 3, labels: [queued] });
+
+    assert.isUndefined(
+      yieldsTo(
+        target,
+        [target, other],
+        new Map<number, QueueOwner>([[3, worker]]),
+        new Set<number>([3, 7]),
+        'main',
+        noBypass,
+        [7, 3],
+      ),
+    );
+  });
+
+  test('yields when its rebase found that only a bypass merges it, whatever the release order', () => {
+    const other = pullRequest({ number: 3, labels: [queued] });
+
+    assert.strictEqual(
+      yieldsTo(
+        target,
+        [target, other],
+        new Map<number, QueueOwner>([[3, worker]]),
+        new Set<number>([3, 7]),
+        'main',
+        new Map<number, string>([[7, '@someone owns it']]),
+        [7, 3],
+      )?.number,
+      3,
     );
   });
 
@@ -193,6 +276,7 @@ describe(yieldsTo, () => {
         new Set<number>([7]),
         'main',
         noBypass,
+        [],
       ),
     );
   });
@@ -210,6 +294,7 @@ describe(yieldsTo, () => {
         new Set<number>([3, 7]),
         'main',
         noBypass,
+        [],
       ),
     );
 
@@ -221,6 +306,7 @@ describe(yieldsTo, () => {
         new Set<number>([3, 7]),
         'main',
         noBypass,
+        [],
       ),
     );
   });
@@ -236,6 +322,7 @@ describe(yieldsTo, () => {
         new Set<number>([3, 7]),
         'main',
         noBypass,
+        [],
       ),
     );
   });
