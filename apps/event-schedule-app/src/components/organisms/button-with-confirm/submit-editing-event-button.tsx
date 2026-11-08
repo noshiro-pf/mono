@@ -25,12 +25,11 @@ const dialogConfig = {
   confirmButtonText: dc.editEventButton.name,
 } as const;
 
-const toastConfig = {
-  message: dc.editEventButton.cancelResultMessage,
-  intent: 'none',
-} as const;
-
-/** Saves the edited event; asks first when dates with answers are removed. */
+/**
+ * Saves the edited event; asks first when dates with answers are removed. The
+ * store says whether the update went through, so the button shows no toast of
+ * its own (#3414).
+ */
 export const SubmitEditingEventButton = ({
   showConfirmationDialog,
   loading,
@@ -44,7 +43,6 @@ export const SubmitEditingEventButton = ({
         dialogConfig={dialogConfig}
         disabled={disabled}
         loading={loading}
-        toastConfig={toastConfig}
         onConfirmClick={EditEventScheduleStore.onEditEventClickPromise}
       />
     }
