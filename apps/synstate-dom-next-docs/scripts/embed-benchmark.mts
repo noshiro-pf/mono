@@ -181,12 +181,8 @@ const pages: readonly (readonly [
   hasClaims: boolean,
 ])[] = (
   [
-    ['index.mdx', ['next-over-dom-min', 'next-over-dom-max'], false],
-    [
-      'getting-started/introduction.md',
-      ['next-over-dom-min', 'next-over-dom-max', 'next-over-solid-max'],
-      false,
-    ],
+    ['index.mdx', ['next-over-solid-max'], false],
+    ['getting-started/introduction.md', ['next-over-solid-max'], false],
     ['background/benchmark.md', benchmarkKeys, true],
   ] as const
 ).flatMap(([page, keys, hasClaims]) => [

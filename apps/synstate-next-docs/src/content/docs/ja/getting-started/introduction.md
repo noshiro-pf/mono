@@ -6,15 +6,17 @@ description: synstate-next とは何か。状態・派生値・購読者を最�
 synstate-next は、Observable の上に作った TypeScript の状態管理ライブラリです。アプリケーションの状態を state に置き、そこから派生する値をオペレーターで宣言し、表示するものを購読します。状態が変わると、synstate-next はグリッチのない 1 回の更新ですべての派生値を最新にしてから、購読者を呼びます。
 
 :::caution
-synstate-next と synstate-dom-next は、synstate と synstate-dom をゼロから作り直したもので、次のメジャーバージョンで今のものを置き換えるまで、リポジトリ内の非公開パッケージとして置いています。npm には公開しておらず、それまでは API が変わることがあります。synstate から変わった点は [synstate からの変更点](/mono/synstate-next/ja/background/changes-from-synstate/)にまとめてあります。
+synstate-next と synstate-dom-next はリポジトリ内の非公開パッケージで、synstate と synstate-dom の次のメジャーバージョンとして公開する予定です。npm には公開しておらず、それまでは API が変わることがあります。いま synstate を使っているなら、違いは [synstate からの変更点](/mono/synstate-next/ja/background/changes-from-synstate/)にまとめてあります。
 :::
 
 ## 特徴
 
-- **グリッチがなく、コストは線形。** 更新は、届いたノードを深さの順に、親がすべて済んだ後に 1 回ずつ辿ります。2 つの値から派生した値が、片方だけ更新された状態を見ることはありません。`debounce` や `switchMap` を通しても同じで、Signal のライブラリはこれらを effect として書きます。それで何を失うかは [Signals の上のオペレーター](/mono/synstate-next/ja/comparison/operators-on-signals/) を参照。
-- **購読者は落ち着いたグラフの上で実行されます。** 購読者が呼ばれるのは更新がすべてのノードに届いた後で、途中ではありません。購読者が行った書き込みは次の更新を始め、ドレイン中に行った書き込みはそのラウンドが終わるまで待ちます。
-- **既定で等値打ち切り。** 派生値を計算し直した結果がすでに持っている値と等しければ、何も伝えません。その下は辿られません。
-- **完了の代わりに owner。** owner の実行中に作ったものはすべてその owner に属し、owner を破棄すればまとめて破棄されます。送り忘れる `complete` はありません。
+- **シンプルな状態を、どこからでも共有。** `createState` は状態とセッターを、`createReducer` は状態と dispatch を返します。React の `useState`・`useReducer` と同じ形で、アプリケーション全体で共有できます。それを読むパイプラインは、コンポーネントでもテストでもスクリプトでも同じように動きます。
+- **非同期オペレーターを内蔵。** `debounce`・`throttle`・`switchMap`・`fromAbortablePromise` で、タイマー、取り消し、「最新の応答だけ」がパイプラインの 1 行になります。
+- **グリッチがなく、コストは線形。** 更新は、届いた値を深さの順に、親がすべて済んだ後に 1 回ずつ辿ります。2 つの値から派生した値が、片方だけ更新された状態を見ることはありません。`debounce` や `switchMap` を通しても同じで、Signal のライブラリはこれらを effect として書きます。それで何を失うかは [Signals の上のオペレーター](/mono/synstate-next/ja/comparison/operators-on-signals/) を参照。
+- **購読者は更新の後に呼ばれます。** 購読者が呼ばれるのは、更新が変える値すべてに届いた後なので、ほかに何を読んでも最新です（同じ更新のために先に呼ばれた購読者が状態に書き込んだ場合、その状態から派生した値だけは次の更新で追いつきます）。購読者の書き込みは、この更新を中断せず、次の更新を始めます。
+- **変わらない値で更新が止まります。** 計算し直した派生値が前と同じなら何も伝えず、それに依存するものは訪れません。
+- **取り消しの仕組みが組み込まれています。** `switchMap` の中で `fromAbortablePromise` を使えば新しいクエリは置き換えた前のリクエストを中断し、owner の中で始めた処理（たとえばダイアログのリクエスト・タイマー・購読）は、その owner の `dispose()` 1 回で止まります。
 - **値があるかどうかを型が示します。** `InitializedObservable<A>` は常に値を持ち `.value` があります。`Observable<A>` はまだ値を持たないことがあります。オペレーターをつないだ結果がどちらになるかは `pipe` が計算します。
 
 ## 簡単な例

@@ -27,7 +27,7 @@ if (import.meta.vitest !== undefined) {
     setA(2);
 
     // Never 120 or 210: `sum` is computed once per update, after both of its
-    // parents, and its subscriber runs once the update has settled.
+    // parents, and its subscriber runs once every value is up to date.
     assert.deepStrictEqual(mut_seen, [110, 220]);
 
     assert.strictEqual(mut_computed, 2);

@@ -34,7 +34,7 @@
     "astro": "^7.4.2"
   },
   "devDependencies": {
-    "@types/mdast": "^4.0.4",
+    "@types/mdast": "catalog:",
     "@vitest/coverage-istanbul": "catalog:",
     "dedent": "catalog:",
     "eslint-config-typed": "workspace:*",
@@ -42,7 +42,7 @@
     "eslint-plugin-ts-fortress": "workspace:*",
     "eslint-plugin-ts-type-forge": "workspace:*",
     "mdast-util-directive": "^3.1.1",
-    "mdast-util-from-markdown": "^2.1.0",
+    "mdast-util-from-markdown": "catalog:",
     "mdast-util-mdx": "^3.0.0",
     "micromark-extension-directive": "^4.0.0",
     "micromark-extension-mdxjs": "^3.0.0",

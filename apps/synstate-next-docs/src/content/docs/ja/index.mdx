@@ -1,16 +1,16 @@
 ---
 title: synstate-next
-description: synstate の作り直し。更新は整数のエポック、購読者は更新が落ち着いてから実行、寿命は owner で管理する、グリッチのない Observable 状態管理ライブラリです。
+description: TypeScript のためのグリッチのない状態管理ライブラリ。debounce や switchMap などの組み込みの非同期オペレーターも、グリッチがありません。
 template: splash
 hero:
-    tagline: synstate をゼロから作り直したものです。何が何に依存するかを宣言して状態に書き込めば、派生値はそれぞれ親がすべて済んだ後に 1 回だけ計算され、購読者は更新全体が落ち着いてから実行されます。
+    tagline: 1 つの共有された値から非同期の処理まで広がる、TypeScript の状態管理です。状態に書き込み、表示するものを <code>map</code>・<code>debounce</code>・<code>switchMap</code> などのオペレーターで派生させれば、どの派生値もグリッチなく計算されます。
     actions:
         - text: はじめる
           link: /mono/synstate-next/ja/getting-started/introduction/
           icon: right-arrow
           variant: primary
-        - text: 更新の伝わり方
-          link: /mono/synstate-next/ja/internals/how-an-update-propagates/
+        - text: synstate-next を使う理由
+          link: /mono/synstate-next/ja/guides/why-synstate-next/
           variant: minimal
 ---
 
@@ -26,29 +26,42 @@ import { Aside, Card, CardGrid } from '@astrojs/starlight/components';
 ## 特徴
 
 <CardGrid>
-    <Card title="グリッチがない" icon="approve-check">
-        派生値は 1 回の更新につき 1
-        回、親がすべて済んだ後に計算されます。ダイヤモンド型の依存でも同じです。更新途中の値を読むことはありません。
+    <Card title="シンプルな状態" icon="pencil">
+        `createState` は状態とセッターを、`createReducer` は状態と dispatch
+        を返します。React の `useState`・`useReducer`
+        と同じ形で、アプリケーション全体で共有できます。カウンターなら状態
+        1 つと `subscribe` だけです。
     </Card>
-    <Card title="購読者は落ち着いたグラフを見る" icon="approve-check">
-        購読者は effect
-        で、更新が変わるノードすべてに届いてから実行されます。更新中に行った書き込みは更新を中断せず、その後の別のラウンドで伝播します。
+    <Card title="非同期オペレーターを内蔵" icon="setting">
+        `debounce`・`throttle`・`switchMap`・`fromAbortablePromise` など。入力が止まるのを待ち、古い応答を捨てる検索ボックスも、手で管理するタイマーとフラグではなく
+        1 本のパイプラインで書けます。
     </Card>
-    <Card title="変わらない値で打ち切る" icon="random">
-        すでに持っている値を計算したノードは何も伝えないので、その下のグラフはまったく辿られません。
+    <Card title="どのオペレーターを通してもグリッチがない" icon="approve-check">
+
+更新は、各派生値を親がすべて済んだ後に 1 回だけ計算し、その後で初めて購読者を呼びます。非同期の段の結果は、同じ規則に従う別の更新として届きます。古い入力と新しい入力を混ぜて計算される派生値はありません。effect で書いたオペレーターが何を失うかは [Signals の上のオペレーター](/mono/synstate-next/ja/comparison/operators-on-signals/) を参照。
+
     </Card>
-    <Card title="寿命は owner ひとつ" icon="setting">
-        owner の実行中に作ったものはすべてその owner に属します。owner
-        を破棄すれば、派生値・購読・タイマー・リクエストも一緒に消えます。完了を伝える必要はありません。
+    <Card title="取り消しの仕組みが組み込み" icon="random">
+
+`switchMap` の中で `fromAbortablePromise` を使えば、新しいクエリは、置き換えた前のクエリのリクエストを中断します。ダイアログの処理を owner の中で始めれば、閉じるときの `dispose()` 1 回で、そこで始めたリクエスト・タイマー・購読がすべて止まり、1 つずつ購読を解除する必要はありません。[owner と寿命](/mono/synstate-next/ja/guides/owners-and-lifetime/)を参照。
+
     </Card>
-    <Card title="値を持つかどうかが型でわかる" icon="pencil">
-        状態やその `map` は `.value` を持つ `InitializedObservable`、イベントや
-        `filter` はまだ値を持たないことがある `Observable`
-        です。どちらになるかは `pipe` が型で計算します。
+    <Card title="変わらない値で更新が止まる" icon="rocket">
+        計算し直した値が前と同じなら、更新はそこで止まり、それに依存するものは訪れません。更新のコストは、更新が届いたノードの数で、どのノードも 1 回の更新で多くても 1 回しか計算しません。
     </Card>
-    <Card title="小さく、規則的" icon="rocket">
-        1 つのことに書き方は 1 つです。変換は `map`、切り替えは
-        `switchMap`、独自のオペレーターは `createDerived`。別名や 1
-        行で書けるだけのオペレーターを覚える必要はありません。
+    <Card title="頼れる型" icon="seti:typescript">
+        状態は `.value` を持つ `InitializedObservable`
+        で、まだ値を持たないことがあるイベントは `.value` のない `Observable`
+        です。オペレーターをつないだ結果がどちらになるかは `pipe`
+        が計算します。失敗した Promise は、パイプラインが扱う `Result` の値として届きます。
     </Card>
+    <Card title="どこでも動く" icon="puzzle">
+        パイプラインはフレームワークに依存しない普通のモジュールです。コンポーネント・テスト・スクリプトのどこから読んでも同じ値が得られます。
+    </Card>
+    <Card title="synstate-next で UI を作る：synstate-dom-next" icon="window">
+
+[synstate-dom-next](/mono/synstate-dom-next/ja/) は Observable を DOM に直接束縛するので、非同期の段も含めて UI 全体が 1 つの synstate-next のグラフになります。コンポーネントは 1 回だけ実行され、仮想 DOM もコンパイラもありません。
+
+    </Card>
+
 </CardGrid>

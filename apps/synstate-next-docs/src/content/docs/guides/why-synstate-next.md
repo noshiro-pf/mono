@@ -1,6 +1,6 @@
 ---
 title: Why synstate-next
-description: What the rebuild's design gives an application — glitch-free updates at linear cost, subscribers on a settled graph, equality cut-off, owners — and where it fits.
+description: What synstate-next gives an application — glitch-free updates at linear cost, subscribers that run once every value is up to date, updates that stop at unchanged values, cleanup in one place — and where it fits.
 ---
 
 ## Simple to start, powerful when you need it
@@ -15,7 +15,7 @@ An observable is a value that changes over time and can be followed. That fits w
 
 A glitch is a moment in which a value derived from two others has seen one of them change and not the other. In the diamond below, a library that pushes each change to its children at once computes `sum` from the new `tens` and the old `hundreds`, shows 120 for an instant, and then 220.
 
-synstate-next queues the nodes an update reaches in buckets by depth and visits them shallowest first, so `sum` is computed once, after both of its parents:
+synstate-next queues the nodes an update reaches in a queue per depth and visits them shallowest first, so `sum` is computed once, after both of its parents:
 
 ```tsx
 import { createState, derive, map } from 'synstate-next';
@@ -43,7 +43,7 @@ sum.subscribe((value) => {
 setA(2);
 
 // Never 120 or 210: `sum` is computed once per update, after both of its
-// parents, and its subscriber runs once the update has settled.
+// parents, and its subscriber runs once every value is up to date.
 assert.deepStrictEqual(mut_seen, [110, 220]);
 
 assert.strictEqual(mut_computed, 2);
@@ -53,13 +53,13 @@ Each node is visited at most once per update, so an update costs what it reaches
 
 ## Subscribers run after the update
 
-synstate called a subscriber as soon as its observable changed, in the middle of the update. synstate-next queues the subscriber instead, and runs it once every node the update reaches has been recomputed. A subscriber therefore reads any other value of the graph and finds it up to date, and a write it makes is the next update rather than an update nested inside this one (the subscribers after it in the round read the written state's new value, and what derives from it still old). The UI layer, synstate-dom-next, relies on this: a binding is such an effect, so mounting and unmounting a branch never happen in the middle of a propagation.
+Many observable libraries call a subscriber as soon as its observable changes, in the middle of the update. synstate-next queues the subscriber instead, and runs it once every node the update reaches has been recomputed. A subscriber therefore finds every other value of the graph up to date, unless a subscriber called before it for the same update has written a state: it then reads that state's new value, and what derives from it still old. A write a subscriber makes is the next update rather than an update nested inside this one. The UI layer, synstate-dom-next, relies on this: its bindings run the same way, so mounting and unmounting a branch never happen in the middle of a propagation.
 
-## Cut off at the first unchanged value
+## Stops where a value does not change
 
 Every node that computes a value (a `map`, a `derive`, a state's write) compares it with what it holds (`Object.is`, or the `equals` you give it), and passes nothing on when the two are equal. A filter that matches the same rows, a page count that stays the same, a boolean that stays `false`: the part of the graph below it is not visited at all. [Deriving values](/mono/synstate-next/guides/deriving-values/) shows when to turn it off.
 
-## Owners instead of completion
+## Cleanup in one place
 
 An observable ends by being disposed, and disposal follows ownership: everything made while an owner runs belongs to that owner. A dialog that makes its own derived values, subscriptions and requests inside an owner closes all of them with one `dispose()`. Nothing travels down the graph to announce the end, so no operator can forget to pass it on. [Owners and lifetime](/mono/synstate-next/guides/owners-and-lifetime/) has the API, and [Why there is no completion](/mono/synstate-next/internals/why-no-completion/) the reasons.
 

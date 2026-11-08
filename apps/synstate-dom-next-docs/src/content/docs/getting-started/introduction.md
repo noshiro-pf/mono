@@ -6,20 +6,20 @@ description: What synstate-dom-next is, and the model it is built on.
 synstate-dom-next is a UI library that binds [synstate-next](https://github.com/noshiro-pf/mono/tree/main/libs/synstate-next) observables directly to the DOM. You write JSX and pass observables wherever values go. Like Solid, a component runs once and updates write straight to the DOM; unlike Solid, it needs no compiler. There is no virtual DOM.
 
 :::caution
-synstate-dom-next and synstate-next are a from-scratch rebuild of synstate-dom and synstate, kept as private packages in the repository until they replace the current ones in their next major versions. They are not published, and their API may change until then. What changed from synstate-dom is listed in [Changes from synstate-dom](/mono/synstate-dom-next/background/changes-from-synstate-dom/).
+synstate-dom-next and synstate-next are private packages in the repository, to be released as the next major versions of synstate-dom and synstate. They are not published, and their API may change until then. If you use synstate-dom today, [Changes from synstate-dom](/mono/synstate-dom-next/background/changes-from-synstate-dom/) lists what is different.
 :::
 
 ## Why synstate-dom-next
 
-synstate-dom-next is the UI library for SynState's next generation. It connects to synstate-next's runtime as directly as a UI can: a binding is not a subscriber wrapped around a closure but a leaf of the graph itself, an effect that holds its DOM node in its own fields. The graph you build with synstate-next's operators ends in the node bound to it.
+synstate-dom-next is synstate-next's UI library. It connects to synstate-next's runtime as directly as a UI can: a binding is not a subscriber wrapped around a closure but an end of the graph itself, which holds its DOM node in its own fields. The graph you build with synstate-next's operators ends in the node bound to it.
 
-- **A simple API that is rarely slow.** There is one way to write each thing: a transformed value is `source$.pipe(map(fn))` wherever it is bound, a choice is `If`, `MatchOptional`, `MatchResult` or `Switch`, and a list is `For`. On the operations of js-framework-benchmark, synstate-dom-next takes <!-- benchmark:next-over-dom-min -->0.78<!-- /benchmark -->× to <!-- benchmark:next-over-dom-max -->1.00<!-- /benchmark -->× synstate-dom's time, and at most <!-- benchmark:next-over-solid-max -->1.31<!-- /benchmark -->× Solid's. See [Benchmark](/mono/synstate-dom-next/background/benchmark/).
-- **Bindings run after the update has settled.** An update propagates through the whole graph before any binding runs. A binding never sees a half-updated graph, and a switch that drops a branch decides so before the branch's derivations could compute from a value that rules it out. See [How it works](/mono/synstate-dom-next/background/how-it-works/).
+- **A simple API that is rarely slow.** There is one way to write each thing: a transformed value is `source$.pipe(map(fn))` wherever it is bound, a choice is `If`, `MatchOptional`, `MatchResult` or `Switch`, and a list is `For`. On the operations of js-framework-benchmark, synstate-dom-next takes at most <!-- benchmark:next-over-solid-max -->1.31<!-- /benchmark -->× Solid's time. See [Benchmark](/mono/synstate-dom-next/background/benchmark/).
+- **Bindings run once every value is up to date.** An update propagates through the whole graph before any binding runs. A binding never sees a half-updated graph, and a branch component (`If`, `MatchOptional`, `MatchResult`, `Switch`) that drops a branch decides so before the branch's derivations could compute from a value that rules it out. See [How it works](/mono/synstate-dom-next/background/how-it-works/).
 
 ## The model
 
 - **A component is called once.** It runs when it mounts, returns a description of the DOM, and is never called again. From then on, the only thing that changes is the DOM bound to the observables you gave it.
-- **Updates go straight to the leaves.** When a state changes, synstate-next propagates the change through its graph in one glitch-free pass, visiting each node once, after all of its parents. Then each binding the update reached writes its attribute, property or text node. Nothing is diffed.
+- **Updates go straight to the DOM.** When a state changes, synstate-next propagates the change through its graph in one glitch-free pass, visiting each node once, after all of its parents. Then each binding the update reached writes its attribute, property or text node. Nothing is diffed.
 - **Dependencies are values.** A component depends on the observables you pass it. So there is nothing to track while it runs, and no JSX expression has to be compiled into a lazy one, as Solid's compiler does. See [Without a compiler](/mono/synstate-dom-next/background/without-a-compiler/).
 - **The types say what is reactive.** Anywhere that takes data accepts a `Bindable<T>`: an observable that holds a value, or a `constant(...)`. A plain value is a type error, so you cannot pass a snapshot by mistake. See [Bindable values](/mono/synstate-dom-next/guides/bindable/).
 
@@ -27,7 +27,7 @@ synstate-dom-next is the UI library for SynState's next generation. It connects 
 
     Since a prop holds the `Bindable` itself, not a value read from it, props need no special handling: destructure them, give them defaults, forward the rest, or compute from them in the component body. The price is that a value derived from props that should keep updating is built as a bindable (with `mapBindable` or `deriveBindable`) rather than written as an expression in JSX. See [Props are plain JavaScript](/mono/synstate-dom-next/guides/components/#props-are-plain-javascript).
 
-- **Owners clean up after you.** Everything created while an owner runs belongs to it: the derivations, the bindings, the subscriptions. `render` makes the root owner, and each branch of a switch and each row of `For` mounts in an owner of its own, disposed when the branch or the row goes. See [Lifecycle and owners](/mono/synstate-dom-next/guides/lifecycle/).
+- **Nothing is left behind.** Close a branch or remove a row, and what was created inside it goes too, because everything created while an owner runs belongs to it: the derivations (with the timers and requests of their operators), the bindings, the subscriptions. `render` makes the root owner, and each branch of a branch component and each row of `For` mounts in an owner of its own, disposed when the branch or the row goes. See [Lifecycle and owners](/mono/synstate-dom-next/guides/lifecycle/).
 
 ## What it is not (yet)
 
@@ -38,5 +38,5 @@ synstate-dom-next is the UI library for SynState's next generation. It connects 
 ## Where to go next
 
 - [Installation](/mono/synstate-dom-next/getting-started/installation/) sets up the JSX transform and renders a counter.
-- [How it works](/mono/synstate-dom-next/background/how-it-works/) follows an update from a write to the DOM, and says why the rebuild is faster than synstate-dom.
+- [How it works](/mono/synstate-dom-next/background/how-it-works/) follows an update from a write to the DOM, and says where the time goes.
 - [Benchmark](/mono/synstate-dom-next/background/benchmark/) compares synstate-dom-next with synstate-dom and Solid on the operations of js-framework-benchmark and three scenarios, and [Bundle size](/mono/synstate-dom-next/background/bundle-size/) compares what each adds to the same applications.

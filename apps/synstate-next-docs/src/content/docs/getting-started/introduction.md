@@ -6,15 +6,17 @@ description: What synstate-next is, and a first look at states, derived values a
 synstate-next is a state management library for TypeScript built on observables. You keep your application's state in states, declare the values derived from them with operators, and subscribe to what you show. When a state changes, synstate-next brings every derived value up to date in one glitch-free update, and then calls the subscribers.
 
 :::caution
-synstate-next and synstate-dom-next are a from-scratch rebuild of synstate and synstate-dom, kept as private packages in the repository until they replace the current ones in their next major versions. They are not published, and their API may change until then. What changed from synstate is listed in [Changes from synstate](/mono/synstate-next/background/changes-from-synstate/).
+synstate-next and synstate-dom-next are private packages in the repository, to be released as the next major versions of synstate and synstate-dom. They are not published, and their API may change until then. If you use synstate today, [Changes from synstate](/mono/synstate-next/background/changes-from-synstate/) lists what is different.
 :::
 
 ## Features
 
-- **Glitch-free, at linear cost.** An update visits the nodes it reaches in order of depth, each once, after all of its parents. A value derived from two others never sees one of them updated and the other not. The same holds through `debounce` and `switchMap`, which signal libraries write as effects; what that costs them is in [Operators on signals](/mono/synstate-next/comparison/operators-on-signals/).
-- **Subscribers run on a settled graph.** A subscriber is called after the update has reached every node, not in the middle of it. A write made by a subscriber starts the next update, and a write made in the drain waits for the round to end.
-- **Equality cut-off by default.** A derived value that recomputes to the value it holds passes nothing on: what is below it is not visited.
-- **Owners instead of completion.** Everything created while an owner runs belongs to it, and disposing the owner disposes all of it. There is no `complete` to send or to forget.
+- **Simple state, shared anywhere.** `createState` gives a state and its setter, and `createReducer` a state and its dispatch, as React's `useState` and `useReducer` do, for state the whole application shares, and a pipeline that reads them runs the same in a component, a test or a script.
+- **Async operators built in.** `debounce`, `throttle`, `switchMap` and `fromAbortablePromise` turn a timer, a cancellation or "the latest answer only" into one line of a pipeline.
+- **Glitch-free, at linear cost.** An update visits the values it reaches in order of depth, each once, after all of its parents. A value derived from two others never sees one of them updated and the other not. The same holds through `debounce` and `switchMap`, which signal libraries write as effects; what that costs them is in [Operators on signals](/mono/synstate-next/comparison/operators-on-signals/).
+- **Subscribers run after the update.** A subscriber is called once the update has reached every value it changes, so whatever else it reads is up to date. The one exception: when a subscriber called earlier for the same update writes a state, the values derived from that state catch up only in the next update. A write it makes starts the next update instead of interrupting this one.
+- **Unchanged values stop the update.** A derived value that comes out the same as before passes nothing on, and what depends on it is not visited.
+- **Cancellation is built in.** With `fromAbortablePromise` inside `switchMap`, a newer query aborts the request it replaces, and work started inside an owner (the requests, timers and subscriptions of a dialog, say) stops with one `dispose()` of that owner.
 - **Types that say whether there is a value.** `InitializedObservable<A>` always holds one and has `.value`; `Observable<A>` may hold none yet. `pipe` computes which one an operator chain gives.
 
 ## Quick example
