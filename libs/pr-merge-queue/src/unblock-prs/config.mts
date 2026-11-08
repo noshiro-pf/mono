@@ -265,7 +265,7 @@ export const ConfigFileSchema = t.annotate(
         t.strictRecord({
           workflows: t.annotate(t.array(t.string()), {
             description:
-              'The file names of the check workflows to dispatch on each layer, such as `code-check.yml`: every workflow that reports a required context. Each takes the `diff-parent` input.',
+              'The file names of the check workflows to dispatch on each layer, such as `code-check.yml`: every workflow that reports a required context, each a caller of the gate.',
           }),
           depth: t.annotate(t.number(), {
             description:
@@ -274,7 +274,7 @@ export const ConfigFileSchema = t.annotate(
         }),
         {
           description:
-            'Check queued pull requests ahead of their turn: the leading ones are stacked on the default branch, one commit each, each on a `queue/pr-<number>` branch, and the workflows are dispatched on each with `diff-parent`. A pull request is released once its layer is green, and the gate reuses that verdict. Absent: one pull request is checked at a time.',
+            'Check queued pull requests ahead of their turn: the leading ones are stacked on the default branch, one commit each, each on a `queue/pr-<number>` branch, and the workflows are dispatched on each, judging it against the default branch as a pull request is. A pull request is released once its layer is green, and the gate reuses that verdict. Absent: one pull request is checked at a time.',
         },
       ),
     ),

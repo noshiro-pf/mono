@@ -201,9 +201,10 @@ export const installArgs = (
  * the first push to the branch — everything runs rather than nothing.
  *
  * A manual run asked to diff against its parent (`DIFF_PARENT`, the
- * `diff-parent` input) is, wherever it runs: that is how a queue judges a
- * layer, one commit on top of the layer below, on its own commit as a stacked
- * pull request is. The fetch is then the commit itself, two deep.
+ * `diff-parent` input) is, wherever it runs, judged on its own commit as a
+ * stacked pull request is; the gate records no reusable verdict for it. The
+ * fetch is then the commit itself, two deep. The queue's layers do not set it:
+ * they diff against `origin/main`, as below.
  *
  * The fetch is one commit deep, two for a run diffed against its parent. The
  * diff compares two trees and reads no history, and a pull request's head,

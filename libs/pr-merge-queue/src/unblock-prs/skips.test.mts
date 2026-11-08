@@ -1,7 +1,7 @@
 import type { SetAside } from 'pr-report-core';
 import {
   newSkips,
-  setAsideFailing,
+  setAsideHeads,
   settleSkips,
   unannouncedSkips,
   withSkip,
@@ -47,15 +47,22 @@ describe(newSkips, () => {
   });
 });
 
-describe(setAsideFailing, () => {
-  // Taken up from a comment after a restart, a record has no `failedChecks`.
-  test('names those set aside for a failure, whatever links their record holds', () => {
+describe(setAsideHeads, () => {
+  test('names the head of each set aside for a failure, and of nothing else', () => {
     const records = new Map<number, SkipRecord>([
-      [1, skip({ number: 1, reason: 'checks-failed' })],
-      [2, skip({ number: 2, reason: 'rebase-failed' })],
+      [
+        1,
+        skip({ number: 1, headSha: 'a'.repeat(40), reason: 'checks-failed' }),
+      ],
+      [
+        2,
+        skip({ number: 2, headSha: 'b'.repeat(40), reason: 'rebase-failed' }),
+      ],
     ]);
 
-    assert.deepStrictEqual(Array.from(setAsideFailing(records)), [1]);
+    assert.deepStrictEqual(Array.from(setAsideHeads(records)), [
+      [1, 'a'.repeat(40)],
+    ]);
   });
 });
 

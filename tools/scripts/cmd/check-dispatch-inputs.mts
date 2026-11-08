@@ -12,11 +12,11 @@ import { projectRootPath } from '../project-root-path.mjs';
  * input the gate reads off its caller's event: `diff-parent`, a boolean that is
  * `false` unless set.
  *
- * A queue dispatches every check workflow on a layer with it set, and the gate
- * diffs the layer against its parent (README.md, "Triggers"). A check workflow
- * that did not declare it would refuse that dispatch, and one that declared it
- * as a string would hand the gate whatever was typed; either way that workflow
- * would judge the layer otherwise than the rest, and nothing else says so.
+ * The gate diffs a run with it set against its parent (README.md, "Triggers").
+ * A check workflow that did not declare it would refuse such a dispatch, and
+ * one that declared it as a string would hand the gate whatever was typed;
+ * either way that workflow would judge the commit otherwise than the rest, and
+ * nothing else says so. The queue does not set it.
  *
  * The queue dispatches the workflows `.github/unblock-prs.json` lists under
  * `speculate.workflows`, which therefore has to be exactly the gate's callers:

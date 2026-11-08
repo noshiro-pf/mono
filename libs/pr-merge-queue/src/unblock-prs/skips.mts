@@ -72,15 +72,18 @@ export const pruneSkips = (
   );
 
 /**
- * The pull requests set aside for a failure, which keep the red run of their
- * layer. By the record's reason rather than the links it holds: a record taken up
- * from a comment after a restart has none (`settleSkips`).
+ * The head each pull request set aside for a failure was set aside at, whose
+ * queue layer at that head is left to finish (`speculate-plan.mts`,
+ * `planDrop`). Only `checks-failed`: a pull request set aside for anything else
+ * has no failed layer of its own to show.
  */
-export const setAsideFailing = (skipped: SkipRecords): ReadonlySet<number> =>
-  new Set<number>(
+export const setAsideHeads = (
+  skipped: SkipRecords,
+): ReadonlyMap<number, string> =>
+  new Map<number, string>(
     Array.from(skipped.values())
       .filter(({ reason }) => reason === 'checks-failed')
-      .map(({ number }) => number),
+      .map(({ number, headSha }) => [number, headSha] as const),
   );
 
 export const withSkip = (skipped: SkipRecords, skip: SkipRecord): SkipRecords =>

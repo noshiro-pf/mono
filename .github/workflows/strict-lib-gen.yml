@@ -42,11 +42,11 @@ on:
       - unlabeled
 
   workflow_dispatch:
-    # See "Triggers" in README.md: a queue judges each layer it stacks on its
-    # own commit, against the layer below.
+    # See "Triggers" in README.md: the queue dispatches each layer it stacks
+    # without `diff-parent`, so that it is judged against `origin/main`.
     inputs:
       diff-parent:
-        description: Diff the commit against its parent, as a queue layer is judged.
+        description: Diff the commit against its parent, as a stacked pull request is judged; such a run leaves no verdict to reuse.
         type: boolean
         default: false
 

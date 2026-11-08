@@ -100,23 +100,24 @@ on:
   something broken.
 - **`workflow_dispatch`** is how the checks are asked for from the Actions tab.
   Such a run is exempt from every gate: there is no pull request to be behind
-  anything, and no verdict is reused. Its one input, `diff-parent`, is for a
-  queue that checks pull requests ahead of their turn: it stacks them on `main`,
-  one commit each, each layer on a branch of its own, and dispatches the check
-  workflows on each layer with `diff-parent` set. The gate, the codemod, the
-  `check:prose` guards and the published pins then diff the layer against its
-  parent, the layer below, so that each layer is judged on its own commit as a
-  stacked pull request is, and its verdict is reused by the pull request whose
-  rebased head has the same tree (see "Reusing a verdict"). A branch per layer,
-  named `queue/*`, because a dispatch's concurrency group is its ref — a second
-  dispatch on one branch cancels the first — and because only there is such a
-  run's verdict reusable: elsewhere nothing says the parent was ever checked.
-  The gate reads `github.ref`, so a tag of that name does not count, and the
-  prefix is reserved for the queue by
+  anything, and no verdict is reused. A queue that checks pull requests ahead of
+  their turn (`unblock-prs`'s `speculate`) stacks them on `main`, one commit
+  each, each layer on a branch of its own, and dispatches the check workflows on
+  each layer. Such a run diffs against `origin/main`, as a pull request's does,
+  so that its verdict is a whole one about the layer's tree, reused by the pull
+  request whose rebased head has the same tree (see "Reusing a verdict"),
+  whatever becomes of the layers below. A branch per layer, named `queue/*`,
+  because a dispatch's concurrency group is its ref: a second dispatch on one
+  branch cancels the first. The prefix is reserved for the queue by
   `repo-settings/rulesets/queue-branches.json` (and kept free of tags by
-  `queue-tags.json`).
-  Unset, as from the Actions tab, the run diffs as it always has — on `main` it
-  runs everything, elsewhere against `origin/main`.
+  `queue-tags.json`). The one input, `diff-parent`, diffs the commit against its
+  parent instead, judging it as a stacked pull request is; the queue does not
+  set it, and a run with it set leaves no verdict to reuse, since nothing says
+  the parent was ever checked. Unset, as from the Actions tab or the queue, the
+  gate diffs as it always has: on `main` it runs everything, elsewhere against
+  `origin/main`. On a `queue/*` branch the codemod and the `check:prose` guards
+  diff against `origin/main` too, as for a pull request; on any other manual run
+  the codemod runs in full and the guards compare the tree with itself.
 - **No `paths` filter.** A workflow a path filter skips reports no status at
   all, and a required context that never arrives blocks the merge forever.
   The diff question is answered by the gate, after the workflow has started.
@@ -473,14 +474,14 @@ few days here, matched on the runs API's `head_commit.tree_id`. A matching run
 further back is not found and the checks simply run, as they do the first time a
 tree is seen.
 
-A layer diffed against the layer below assumes that layer is green, as a pull
-request diffed against `main` assumes `main` is. A workflow its commit does not
-reach leaves no verdict (its aggregate is skipped); what does depend on the base
-is a check inside a workflow that runs and reads only the diff —
+A run with `diff-parent` set assumes the parent is green, as a pull request
+diffed against `main` assumes `main` is. A workflow its commit does not reach
+leaves no verdict (its aggregate is skipped); what does depend on the base is a
+check inside a workflow that runs and reads only the diff —
 `fix:codemod:affected`, and the `check:prose` guards that read a change
-(`markdown-wrap`, `next-major`) — whose green says nothing of the layers below.
-So the queue that dispatches layers deletes the runs above one that went red,
-and those of a layer no longer standing, before any pull request could reuse
+(`markdown-wrap`, `next-major`) — whose green says nothing of the parent. The
+gate records no verdict of such a run as reusable, and the queue sets no
+`diff-parent`, so its layers' verdicts need no such care, and it deletes none of
 them (`unblock-prs`, step 3b in
 `libs/pr-merge-queue/src/unblock-prs/README.md`).
 

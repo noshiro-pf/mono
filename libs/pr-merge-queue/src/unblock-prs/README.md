@@ -545,35 +545,44 @@ PR なら10分続いたところで triage の前に見送ります。候補の�
 - 各 candidate のコミットを、`origin/main` との merge base から1コミットに
   まとめて、1本下の段（先頭なら `main`）の上に積み、`queue/pr-<番号>` に
   push します。コミットには `Queue-Layer: <番号> <head>` のトレーラを付け、
-  次の survey はこれと tree でどの段がまだ立っているかを判断します。何も
+  次の survey はこれと tree でどの段がまだ有効かを判断します。何も
   覚えないので、worker を再起動しても枝の状態から続きます。
-- `speculate.workflows` の workflow を、各段に `diff-parent` 付きで dispatch
-  します。各段は自分のコミットだけを、1本下の段と比べて判定されます。次の
-  段を dispatch するのは、下の段の gate が終わり、ジョブがすべて開始してか
-  らで、赤の段の上には積みません。
+- `speculate.workflows` の workflow を各段に dispatch します。その run は PR の
+  run と同じく `origin/main` との差分で判定するので、段の判定はその tree につい
+  ての完全な判定で、下の段がどうなっても正しいままです。次の段を dispatch する
+  のは、下の段の gate が終わり、ジョブがすべて開始してからで、赤の段の上には積
+  みません。
 - 先頭の candidate は、その段が緑になってから、ほかを置いて1本だけ解放しま
   す。`main` に rebase した head は段と同じ tree なので、gate がその判定を
   再利用し、マトリクスは走り直しません。
-- 先頭の段が赤なら、その PR を `checks-failed` で見送ります。赤の run は見送り
-  の comment のリンク先なので残します。落ちたジョブがすべて設定された fixer の
-  受け持ちなら、代わりに段の run と枝を消して PR を解放し、PR 自身の run が落ち
+- 先頭の段が赤なら、その PR を `checks-failed` で見送ります。run は残し、走って
+  いる run も最後まで走らせ、それが終わってから段の枝を消します。見送りの
+  comment は終わった run にリンクし、直す人はすべての失敗を一度に見られ、まだ始
+  まっていないジョブも自分のコミットを取得できます。枝が消えた後に再試行すれば、
+  段は作り直されます。それより前の再試行は、赤の段が残っているので再び見送られま
+  す。落ちたジョブがすべて設定された fixer の受け持ちなら、代わりに段の run と枝を消して PR を解放し、PR 自身の run が落ち
   たところで「4a」がそのジョブを読めるようにします。消せなくても解放します。
   その場合は解放先で見送られることがあります。
 - 先頭より上の赤は、まだマージされていない（されないかもしれない）PR の上での
   失敗です。その段は先頭になるまで待ちます。下の段がマージされれば `main` の
   tree の上にあり、キューを離れれば作り直されます。その上には積まず、積んであ
-  れば落とします。走っている run は取り消し、それ以外は削除し、枝を消します。
+  れば、下のとおり片付けます。
   下にまだ走っている段がある赤は、まだ誰のものとも言えません。
 - version PR、bypass でしかマージできない PR、fork の PR、コミットが下の段と
   衝突する PR では積むのを止め、その PR は従来どおり単独で解放されます。
-- もう立っていない段（head が動いた、見送られた、下の段が作り直された）も
-  同じく落とします。candidate が1本もなくなったときも同様で、残すのは、それで
-  見送られた PR の赤の run だけです。run を落とせなければ、次の survey が
-  見つけられるよう枝を残し、落とせるまで作り直しません。
-  PR がマージされた段は、`main` への push がその run の成果物を読むので、枝だけ
-  を消します。
-- 読み込みや push、dispatch が失敗した survey、先頭の段が 40 分を超えて走って
-  いるとき、先頭の段で workflow が3回取り消されたときは、先頭を従来どおり解放
+- もう有効でない段（head が動いた、見送られた、キューを離れた、マージされた、下
+  の段が作り直された）は片付けます。candidate が1本もなくなったときも同様です。
+  段の判定は完全なので、run は消しません。
+    - 段を作った head で失敗として見送られた PR の段は、走っている run を最後ま
+      で走らせ、それが終わってから枝を消します（run が 40 分更新されなければ待ち
+      ません）。
+    - それ以外は、走っている run を取り消してランナーを空け、枝を消します。取り
+      消しを先に頼むので、まだ始まっていないジョブが消えたコミットを探すことは
+      ありません。
+- 読み込みや push、dispatch が失敗した survey、先頭の段のランナー待ちの run が dispatch から
+  90 分を超えたとき（何も待たず何も走っていないなら、走っている run の dispatch
+  から 90 分）、走っているジョブがそれ自身の開始から 40 分を超えたとき、
+  先頭の段で workflow が3回取り消されたときは、先頭を従来どおり解放
   します。最悪でもマトリクスが2回走るだけです。段を待つ間は、待ち時間を短いほう
   の間隔に保ちます。
 
@@ -1600,40 +1609,51 @@ decided in `speculate-plan.mts`).
 - Each candidate's commits, from its merge base with `origin/main`, are squashed
   into one commit on the layer below (`main` for the first) and pushed to
   `queue/pr-<number>`. The commit carries a `Queue-Layer: <number> <head>`
-  trailer, by which, and by trees, the next survey tells which layers still
-  stand. Nothing is remembered: a restarted worker carries on from the branches.
-- The `speculate.workflows` are dispatched on each layer with `diff-parent`, so
-  each layer is judged on its own commit against the layer below. The next layer
-  is dispatched only once the layers below have finished their gate and started
-  every job, and never on top of a red layer.
+  trailer, by which, and by trees, the next survey tells which layers are still
+  valid. Nothing is remembered: a restarted worker carries on from the branches.
+- The `speculate.workflows` are dispatched on each layer. Such a run diffs
+  against `origin/main`, as a pull request's does, so that a layer's verdict is
+  a whole one about its tree, true whatever becomes of the layers below. The
+  next layer is dispatched only once the layers below have finished their gate
+  and started every job, and never on top of a red layer.
 - The first candidate is released, alone, once its layer is green. Its head
   rebased onto `main` has the layer's tree, so the gate reuses that verdict and
   the matrix does not run again.
-- A red first layer sets its pull request aside `checks-failed`, its red run
-  kept, as what the set-aside comment links to. When only jobs a configured
-  fixer settles failed, the layer's runs and branch go and the pull request is
-  released instead, so that its own run fails where "4a" can read the jobs. It
-  is released even if they cannot go, and may then be set aside there.
+- A red first layer sets its pull request aside `checks-failed`. Its runs stay,
+  those still going left to finish, and its branch goes once they have, so that
+  the set-aside comment links to a finished run, whoever fixes it sees every
+  failure at once, a job not yet started still finds its commit, and a retry
+  after that builds the layer anew; a retry before then finds the red layer
+  still standing and sets the pull request aside again.
+  When only jobs a configured fixer settles failed, the layer's runs and branch
+  go and the pull request is released instead, so that its own run fails where
+  "4a" can read the jobs. It is released even if they cannot go, and may then be
+  set aside there.
 - A red layer above the first failed on top of pull requests that have not
   merged and may not. It waits until it is first: on `main`'s tree once the
   layers below merge, or rebuilt if they leave the queue. Nothing is built above
-  it, and what already was is dropped: runs still going cancelled, the others
-  deleted, branches removed. A red layer over one still running is nobody's yet.
+  it, and what already was is cleaned up as below. A red layer over one still
+  running is nobody's yet.
 - The stack stops at the version pull request, one only a bypass merges, a
   fork's, or one whose commits conflict with the layers below; that one is
   released on its own, as before.
-- A layer no longer standing (its head moved, its pull request set aside, a
-  layer below built again) is dropped the same way, also when the queue has
-  drained and no candidate is left, keeping only the red run of one set aside
-  for it. Its branch stays while its runs cannot be dropped, so that a later
-  survey finds them, and it is not built again until they are. One whose pull
-  request merged loses its branch alone: the push to `main` reads that run's
-  artifacts.
+- A layer no longer valid (its head moved, its pull request set aside, merged or
+  out of the queue, a layer below built again) is cleaned up, also when the
+  queue has drained and no candidate is left. Its verdicts are whole ones, so no
+  run is deleted:
+    - one whose pull request was set aside for a failure at the head it was
+      built at has its runs still going left to finish, and loses its branch
+      once they have (or once a run has gone 40 minutes without an update);
+    - any other has its runs still going cancelled, to free the runners, and
+      loses its branch. The cancels are asked for first, so that no job still to
+      start looks for a commit already gone.
 - A survey whose reads, pushes or dispatches fail, one whose first layer has run
-  for over 40 minutes, and one whose first layer has had a workflow cancelled
-  three times releases the first candidate as before; the worst that does is a
-  matrix run twice. While a layer is waited for, the survey stays at the active
-  interval.
+  for over 90 minutes from the dispatch of a run still waiting for a runner (or
+  of any run still going, when none waits and no job runs) or has a job running
+  for over 40 from that job's start, and one whose first layer has had a
+  workflow cancelled three times releases the first candidate as before; the
+  worst that does is a matrix run twice. While a layer is waited for, the survey
+  stays at the active interval.
 
 #### 4. Watch
 

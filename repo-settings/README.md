@@ -74,11 +74,11 @@
 
 `refs/heads/queue/**/*` の作成・更新・削除を、 admin ロール（ actor_id 5 ）以外に
 禁じる。
-`unblock-prs` は先回りの検査層を `queue/pr-<番号>` に積み、 `check-gates.yml`
-は `diff-parent` の判定を `queue/*` ブランチの上でだけ使い回す。その判定を
-信用してよいのは、この接頭辞を書けるのが queue だけだからで、接頭辞を変える
-ときは `queue-tags.json`、 `check-gates.yml`、 `speculate-plan.mts` の
-`LAYER_BRANCH_PREFIX` も揃えて変える。
+`unblock-prs` は先回りの検査層を `queue/pr-<番号>` に積み、 `code-check.yml`、
+`style-check.yml`、 `verify-published-packages.yml` は `queue/*` ブランチの run を
+PR と同じく `origin/main` と比べる。その判定を PR が使い回してよいのは、この接頭辞
+を書けるのが queue だけだからで、接頭辞を変えるときは `queue-tags.json`、その
+3 つの workflow、 `speculate-plan.mts` の `LAYER_BRANCH_PREFIX` も揃えて変える。
 
 - **bypass を admin ロールにしているのは、 worker が作者のチェックアウトから
   作者の git 認証で `git push` するから。** API 呼び出しに使うトークン
