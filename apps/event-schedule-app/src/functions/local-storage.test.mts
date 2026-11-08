@@ -33,7 +33,7 @@ describe('EventScheduleAppLocalStorage when the browser blocks site storage', ()
     });
 
     const result = EventScheduleAppLocalStorage.saveCreateEventPageTemp(
-      eventScheduleInitialValue,
+      eventScheduleInitialValue(),
     );
 
     assert.isTrue(Result.isErr(result));
@@ -82,7 +82,7 @@ describe('EventScheduleAppLocalStorage with working storage', () => {
     assert.isTrue(
       Result.isOk(
         EventScheduleAppLocalStorage.saveCreateEventPageTemp(
-          eventScheduleInitialValue,
+          eventScheduleInitialValue(),
         ),
       ),
     );
@@ -91,7 +91,7 @@ describe('EventScheduleAppLocalStorage with working storage', () => {
 
     assert.isTrue(Result.isOk(restored));
 
-    expect(restored.value?.title).toBe(eventScheduleInitialValue.title);
+    expect(restored.value?.title).toBe(eventScheduleInitialValue().title);
   });
 });
 

@@ -9,11 +9,7 @@ import {
 import { Arr, fastDeepEqual, Obj, Result } from 'ts-data-forge';
 import type { StrictPick } from 'ts-type-forge';
 import type { Api } from '../../api/index.mjs';
-import {
-  dict,
-  eventScheduleInitialValue,
-  routes,
-} from '../../constants/index.mjs';
+import { dict, routes } from '../../constants/index.mjs';
 import {
   collectEventSettingsPageDiff,
   showToast,
@@ -56,14 +52,22 @@ export type EditEventScheduleDeps = Readonly<{
 export const createEditEventScheduleStore = (
   deps: EditEventScheduleDeps,
 ): EditEventSchedule => {
-  const { commonState$, commonStateHandlers } = createEventScheduleSettingStore(
-    {
+  const { commonState$, commonStateHandlers, baseline$, startVisit } =
+    createEventScheduleSettingStore({
       fireAuthUser$: deps.fireAuthUser$,
-    },
-  );
+    });
 
   const [eventScheduleFromDatabase$, setEventScheduleFromDatabase] =
     createStateBase<EventSchedule | undefined>(undefined);
+
+  // The store outlives the page, so the form and the event it was loaded from
+  // are forgotten when the page is left: another event's edit page starts empty
+  // until its own event is read, not with this one's form.
+  deps.router.editPageLeaves$.subscribe(() => {
+    setEventScheduleFromDatabase(undefined);
+
+    startVisit();
+  });
 
   // The author email confirmed in the dialog, with the event it was confirmed
   // for. The store outlives the page, so it is forgotten when the edit page is
@@ -161,15 +165,17 @@ export const createEditEventScheduleStore = (
     emailVerified$,
     eventScheduleFromDatabase$,
     commonState$,
+    baseline$,
   ]).pipe(
     map(
       ([
         emailVerified,
         eventScheduleFromDatabase,
         { eventScheduleNormalized, notificationSettingsWithEmail },
+        baseline,
       ]) =>
         collectEventSettingsPageDiff(
-          eventScheduleFromDatabase ?? eventScheduleInitialValue,
+          eventScheduleFromDatabase ?? baseline,
           keepIdentityOf(eventScheduleFromDatabase, eventScheduleNormalized),
           emailVerified,
           notificationSettingsWithEmail?.email,

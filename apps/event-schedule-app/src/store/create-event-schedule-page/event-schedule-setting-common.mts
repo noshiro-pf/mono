@@ -8,7 +8,6 @@ import {
 import { Arr, Obj, mapNullable, pipe } from 'ts-data-forge';
 import {
   answerDeadlineInitialValue,
-  datetimeRangeListInitialValue,
   eventScheduleInitialValue,
   notificationSettingsInitialValue,
 } from '../../constants/index.mjs';
@@ -29,6 +28,10 @@ import { createToggleSectionState } from '../utils/index.mjs';
 type ReturnValues = Readonly<{
   commonState$: InitializedObservable<EventScheduleSettingCommonState>;
   commonStateHandlers: EventScheduleSettingCommonStateHandler;
+  /** The empty form of this visit: what the resets return to. */
+  baseline$: InitializedObservable<EventSchedule>;
+  /** Builds the empty form anew, from today, and resets every field to it. */
+  startVisit: () => void;
 }>;
 
 export type EventScheduleSettingDeps = Readonly<{
@@ -39,29 +42,39 @@ export type EventScheduleSettingDeps = Readonly<{
 export const createEventScheduleSettingStore = (
   deps: EventScheduleSettingDeps,
 ): ReturnValues => {
-  const [title$, setTitle, { resetState: resetTitle }] = createState<string>(
-    eventScheduleInitialValue.title,
-  );
+  // Per visit, not per store, which lives as long as the tab: a tab left open
+  // past midnight would otherwise offer, and reset to, the day it was loaded.
+  const [baseline$, setBaseline, { getSnapshot: getBaseline }] =
+    createState<EventSchedule>(eventScheduleInitialValue());
 
-  const [notes$, setNotes, { resetState: resetNotes }] = createState<string>(
-    eventScheduleInitialValue.notes,
-  );
+  const initial = getBaseline();
 
-  const [
-    datetimeSpecification$,
-    setDatetimeSpecification,
-    { resetState: resetDatetimeSpecification },
-  ] = createState<DatetimeSpecificationEnumType>(
-    eventScheduleInitialValue.datetimeSpecification,
-  );
+  const [title$, setTitle] = createState<string>(initial.title);
 
-  const [
-    datetimeRangeList$,
-    setDatetimeRangeList,
-    { resetState: resetDatetimeRangeList },
-  ] = createState<readonly DatetimeRange[]>(
-    eventScheduleInitialValue.datetimeRangeList,
-  );
+  const resetTitle = (): void => {
+    setTitle(getBaseline().title);
+  };
+
+  const [notes$, setNotes] = createState<string>(initial.notes);
+
+  const resetNotes = (): void => {
+    setNotes(getBaseline().notes);
+  };
+
+  const [datetimeSpecification$, setDatetimeSpecification] =
+    createState<DatetimeSpecificationEnumType>(initial.datetimeSpecification);
+
+  const resetDatetimeSpecification = (): void => {
+    setDatetimeSpecification(getBaseline().datetimeSpecification);
+  };
+
+  const [datetimeRangeList$, setDatetimeRangeList] = createState<
+    readonly DatetimeRange[]
+  >(initial.datetimeRangeList);
+
+  const resetDatetimeRangeList = (): void => {
+    setDatetimeRangeList(getBaseline().datetimeRangeList);
+  };
 
   const {
     toggleState$: useAnswerDeadline$,
@@ -72,14 +85,21 @@ export const createEventScheduleSettingStore = (
     turnOff: turnOffAnswerDeadlineSection_,
     turnOn: turnOnAnswerDeadlineSection,
   } = createToggleSectionState<Ymdhm | undefined>({
-    initialToggleState: eventScheduleInitialValue.answerDeadline !== 'none',
-    initialState: mapNoneToUndefined(eventScheduleInitialValue.answerDeadline),
+    // The empty form has no deadline and no notifications on any day, so these
+    // two sections reset to their initial state.
+    initialToggleState: initial.answerDeadline !== 'none',
+    initialState: mapNoneToUndefined(initial.answerDeadline),
     valueToBeSetWhenTurnedOff: () => undefined,
     valueToBeSetWhenTurnedOn: answerDeadlineInitialValue,
   });
 
-  const [answerIcons$, setAnswerIcons, { resetState: resetAnswerIcons }] =
-    createState<AnswerIconSettings>(eventScheduleInitialValue.answerIcons);
+  const [answerIcons$, setAnswerIcons] = createState<AnswerIconSettings>(
+    initial.answerIcons,
+  );
+
+  const resetAnswerIcons = (): void => {
+    setAnswerIcons(getBaseline().answerIcons);
+  };
 
   const initialNotificationSettingsWithEmailFilled$ = combine([
     deps.fireAuthUser$,
@@ -103,10 +123,9 @@ export const createEventScheduleSettingStore = (
     turnOff: turnOffNotificationSection,
     turnOn: turnOnNotificationSection,
   } = createToggleSectionState<NotificationSettingsWithEmail | undefined>({
-    initialToggleState:
-      eventScheduleInitialValue.notificationSettings !== 'none',
+    initialToggleState: initial.notificationSettings !== 'none',
     initialState: pipe(
-      mapNoneToUndefined(eventScheduleInitialValue.notificationSettings),
+      mapNoneToUndefined(initial.notificationSettings),
     ).mapNullable((a) => ({ ...a, email: '' })).value,
     valueToBeSetWhenTurnedOff: () => undefined,
     valueToBeSetWhenTurnedOn: () =>
@@ -174,6 +193,7 @@ export const createEventScheduleSettingStore = (
       answerIcons$,
       notificationSettingsWithEmail$,
       deps.fireAuthUser$,
+      baseline$,
     ]).pipe(
       map(
         ([
@@ -185,6 +205,7 @@ export const createEventScheduleSettingStore = (
           answerIcons,
           notificationSettingsWithEmail,
           fireAuthUser,
+          baseline,
         ]) =>
           normalizeEventSchedule({
             title,
@@ -192,7 +213,7 @@ export const createEventScheduleSettingStore = (
             datetimeSpecification,
             datetimeRangeList: Arr.isNonEmpty(datetimeRangeList)
               ? datetimeRangeList
-              : datetimeRangeListInitialValue,
+              : baseline.datetimeRangeList,
             answerDeadline: answerDeadline ?? 'none',
             answerIcons,
             notificationSettings:
@@ -314,7 +335,25 @@ export const createEventScheduleSettingStore = (
     turnOnNotificationSection,
   } as const;
 
-  return { commonState$, commonStateHandlers };
+  const startVisit = (): void => {
+    setBaseline(eventScheduleInitialValue());
+
+    resetTitle();
+
+    resetNotes();
+
+    resetDatetimeSpecification();
+
+    resetDatetimeRangeList();
+
+    resetAnswerDeadlineSection();
+
+    resetNotificationSettingsSection();
+
+    resetAnswerIcons();
+  };
+
+  return { commonState$, commonStateHandlers, baseline$, startVisit };
 };
 
 /** What the settings read of the signed-in user. */

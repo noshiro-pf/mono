@@ -25,6 +25,29 @@ describe(createEditEventScheduleStore, () => {
     assert.isDefined(store.diff$.getSnapshot().value.title);
   });
 
+  // #3416: the form outlived the visit, and another event's edit page showed it
+  // until its own event was read.
+  test('leaving the edit page forgets the form and the event it was loaded from', () => {
+    const { store, router } = setup();
+
+    store.setEventSchedule(fromDatabase, undefined);
+
+    store.commonStateHandlers.setTitle('renamed');
+
+    router.push(routes.event.answer.href({ eventId: 'abc' }));
+
+    router.push(routes.event.answer.edit.href({ eventId: 'other' }));
+
+    const { title, datetimeRangeList } = store.commonState$.getSnapshot().value;
+
+    assert.strictEqual(title, '');
+
+    assert.notDeepEqual(datetimeRangeList, fromDatabase.datetimeRangeList);
+
+    // Nothing is compared with the event left, either.
+    assert.isUndefined(store.diff$.getSnapshot().value.title);
+  });
+
   test('a date taken out is a deleted change', () => {
     const { store } = setup();
 
