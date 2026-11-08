@@ -9,7 +9,6 @@
 import {
   audit,
   batch,
-  combine,
   debounce,
   derive,
   just,
@@ -89,7 +88,7 @@ describe('map stops a result equal to the one it holds', () => {
     const a = state(1);
 
     const seen = collect(
-      combine([a, a.pipe(map((x) => x % 2))]).pipe(
+      derive([a, a.pipe(map((x) => x % 2))], (...values) => values).pipe(
         map(([x, p]) => `${x.toString()},${p.toString()}`),
       ),
     );
@@ -266,7 +265,7 @@ describe(skipWhile, () => {
     assert.strictEqual(
       just(seed)
         .pipe(skipWhile((x) => x > 10))
-        .peek(),
+        .getSnapshot(),
       1,
     );
   });
@@ -694,7 +693,7 @@ describe(derive, () => {
 
     expectType<typeof q, InitializedObservable<number>>('=');
 
-    assert.strictEqual(q.peek(), 5);
+    assert.strictEqual(q.getSnapshot(), 5);
   });
 });
 

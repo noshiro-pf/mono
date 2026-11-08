@@ -14,15 +14,15 @@ if (import.meta.vitest !== undefined) {
 
     receive({ name: 'a', tags: ['x'] });
 
-    const first = tags.peek();
+    const first = tags.getSnapshot();
 
     // A fresh object from the server, with the same tags.
     receive({ name: 'b', tags: ['x'] });
 
     // The tags kept their reference, so nothing below `tags` was recomputed.
-    assert.strictEqual(tags.peek(), first);
+    assert.strictEqual(tags.getSnapshot(), first);
 
-    assert.strictEqual(user.peek()?.name, 'b');
+    assert.strictEqual(user.getSnapshot()?.name, 'b');
 
     // embed-sample-code-ignore-below
   });

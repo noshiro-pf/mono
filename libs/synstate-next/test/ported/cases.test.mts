@@ -7,10 +7,10 @@
  */
 import {
   audit,
-  combine,
   counter,
   createOwner,
   debounce,
+  derive,
   filter,
   fromPromise,
   map,
@@ -112,21 +112,24 @@ describe(filter, () => {
   });
 });
 
-describe(combine, () => {
-  test('combine case 1: five nodes of one source', async () => {
+describe('derive of a tuple (combine in synstate)', () => {
+  test('a tuple, case 1: five nodes of one source', async () => {
     assert.deepStrictEqual(
       await record(() => {
         const counter10 = counter(tick).pipe(take(10));
 
         const square = counter10.pipe(map((x) => x ** 2));
 
-        return combine([
-          counter10,
-          counter10.pipe(map((x) => x * 2)),
-          counter10.pipe(map((x) => x * 2)).pipe(map((x) => x * 2)),
-          square,
-          square.pipe(filter((x) => x % 2 === 0)),
-        ]);
+        return derive(
+          [
+            counter10,
+            counter10.pipe(map((x) => x * 2)),
+            counter10.pipe(map((x) => x * 2)).pipe(map((x) => x * 2)),
+            square,
+            square.pipe(filter((x) => x % 2 === 0)),
+          ],
+          (...values) => values,
+        );
       }),
       [
         [0, 0, 0, 0, 0],
@@ -143,14 +146,15 @@ describe(combine, () => {
     );
   });
 
-  test('combine case 2: a diamond', async () => {
+  test('a tuple, case 2: a diamond', async () => {
     assert.deepStrictEqual(
       await record(() => {
         const counter5 = counter(tick).pipe(take(5));
 
-        return combine([counter5, counter5.pipe(map((x) => 1000 * x))]).pipe(
-          map(([a, b]) => a + b),
-        );
+        return derive(
+          [counter5, counter5.pipe(map((x) => 1000 * x))],
+          (...values) => values,
+        ).pipe(map(([a, b]) => a + b));
       }),
       [0, 1001, 2002, 3003, 4004],
     );
@@ -402,11 +406,10 @@ describe(timer, () => {
   test('timer case 2', async () => {
     assert.deepStrictEqual(
       await record(() =>
-        combine([
-          timer(tick * 3),
-          timer(tick * 5),
-          counter(tick * 2).pipe(take(7)),
-        ]),
+        derive(
+          [timer(tick * 3), timer(tick * 5), counter(tick * 2).pipe(take(7))],
+          (...values) => values,
+        ),
       ),
       [
         [0, 0, 2],
@@ -560,7 +563,10 @@ const withInitialValueCase = (
 
   const counter6 = counter(tick * 2).pipe(take(6));
 
-  return combine([counter6, initial ? t.pipe(withInitialValue(-1)) : t]);
+  return derive(
+    [counter6, initial ? t.pipe(withInitialValue(-1)) : t],
+    (...values) => values,
+  );
 };
 
 /** synstate's audit, debounce and throttle scenario. */

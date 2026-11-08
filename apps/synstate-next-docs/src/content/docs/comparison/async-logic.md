@@ -114,40 +114,46 @@ export const createSearch = (): Search => {
     return owner.run(() => {
         const [query, setQuery] = createState('');
 
-        const searchState = query.pipe(
-            debounce(debounceMs), // wait for typing to pause
-            map((q) => q.trim()), // map passes on only a changed query
-            // A newer query disposes the previous inner observable, and disposing it
-            // aborts its request.
-            switchMap((q): Observable<SearchState> =>
-                q === ''
-                    ? just(idleState)
-                    : fromAbortablePromise((signal) =>
-                          fetchItems(q, signal),
-                      ).pipe(
-                          // A rejection arrives as a value: Result.err(error)
-                          map((result): SearchState =>
-                              Result.isOk(result)
-                                  ? {
-                                        status: 'success',
-                                        query: q,
-                                        items: result.value,
-                                    }
-                                  : {
-                                        status: 'error',
-                                        query: q,
-                                        message: toErrorMessage(result.value),
-                                    },
-                          ),
-                          // held as soon as the request starts
-                          withInitialValue<SearchState>({
-                              status: 'loading',
-                              query: q,
-                          }),
-                      ),
-            ),
-            withInitialValue(idleState),
-        );
+        const searchState = query
+            .pipe(debounce(debounceMs)) // wait for typing to pause
+            .pipe(map((q) => q.trim())) // map passes on only a changed query
+            .pipe(
+                // A newer query disposes the previous inner observable, and disposing
+                // it aborts its request.
+                switchMap((q): Observable<SearchState> =>
+                    q === ''
+                        ? just(idleState)
+                        : fromAbortablePromise((signal) =>
+                              fetchItems(q, signal),
+                          )
+                              .pipe(
+                                  // A rejection arrives as a value: Result.err(error)
+                                  map((result): SearchState =>
+                                      Result.isOk(result)
+                                          ? {
+                                                status: 'success',
+                                                query: q,
+                                                items: result.value,
+                                            }
+                                          : {
+                                                status: 'error',
+                                                query: q,
+                                                message: toErrorMessage(
+                                                    result.value,
+                                                ),
+                                            },
+                                  ),
+                              )
+                              .pipe(
+                                  // held as soon as the request starts
+                                  withInitialValue<SearchState>({
+                                      status: 'loading',
+                                      query: q,
+                                  }),
+                              ),
+                ),
+            )
+            .pipe(withInitialValue(idleState));
 
         return {
             setQuery,
@@ -166,7 +172,7 @@ type Search = Readonly<{
 }>;
 ```
 
-- ✅ **Each requirement is one operator** on one pipeline, read top to bottom in the order the query goes through them. Adding another (a minimum query length, a retry) is one more operator in `pipe`.
+- ✅ **Each requirement is one operator** on one pipeline, read top to bottom in the order the query goes through them. Adding another (a minimum query length, a retry) is one more `pipe` in the chain.
 - ✅ **`map` deduplicates.** It passes on a result only when it differs from the previous one (`Object.is`), so the trimmed query needs no `skipIfNoChange` after it.
 - ✅ **Cancellation is the structure, not code.** `switchMap` disposes the previous inner observable, `fromAbortablePromise` aborts its `AbortController` when it is disposed, and the `AbortError` that follows is swallowed. Nothing checks `signal.aborted`.
 - ✅ **An error is a value.** `fromAbortablePromise` emits `Result.ok` or `Result.err` and never throws into the pipeline, so a failed request cannot end it, wherever the error is handled.

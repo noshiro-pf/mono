@@ -8,7 +8,7 @@ description: The fields synstate-next's scheduler reads and writes, step by step
 ## The graph
 
 ```tsx
-import { combine, createState, filter, map } from 'synstate-next';
+import { createState, derive, filter, map } from 'synstate-next';
 
 const [A, setA] = createState(0);
 
@@ -16,7 +16,7 @@ const B = A.pipe(map((n) => n * 10)); // depth 1
 
 const D = A.pipe(filter((n) => n % 2 === 0)); // depth 1
 
-const BD = combine([B, D]); // depth 2
+const BD = derive([B, D], (b, d) => [b, d] as const); // depth 2
 
 const C = BD.pipe(map(([b, d]) => b + d)); // depth 3
 
@@ -34,7 +34,7 @@ setA(2); // B = 20, D = 2, BD = [20, 2], E = 20, C = 22
 
 assert.deepStrictEqual(mut_seen, [0, 10, 22]);
 
-assert.strictEqual(E.peek(), 20);
+assert.strictEqual(E.getSnapshot(), 20);
 ```
 
 The depths are as the comments say: `A` is a state at depth 0, `B` and `D` follow it, `BD` follows both, `C` follows `BD`, `E` follows `D`. The subscriber of `C` is an effect.
@@ -61,7 +61,7 @@ The depths are as the comments say: `A` is a state at depth 0, `B` and `D` follo
 1. `A.set(1)` changes `A`'s value. `A` has children, so it is stamped (`writeCount` 1, `A.emittedAt = 1`) and put in `pending` with `queuedAt` set to the pending mark. The phase is `idle` and no batch is open, so the update starts.
 2. The update begins: `epoch` becomes 2. (It does not match the numbers in these headings: `epoch` starts at 1, and a write nothing observes moves it too.) `A.changedAt = 2`, and `A`'s children are queued: `B.queuedAt = 2` into `buckets[1]`, `D.queuedAt = 2` into `buckets[1]`. `minDepth = maxDepth = 1`.
 3. **Recompute, depth 1.** `B` recomputes `10`, which differs from `0`: `B.changedAt = 2`, and `BD` is queued into `buckets[2]` (`maxDepth = 2`). `D` recomputes: `1` is odd, so it returns `false`. `D` keeps `0`, its children are not queued, and `E` is never touched.
-4. **Recompute, depth 2.** `BD` recomputes. It reads both parents' values, `[10, 0]`; `combine` never compares, so it emits and queues `C` into `buckets[3]`.
+4. **Recompute, depth 2.** `BD` recomputes. It reads both parents' values, `[10, 0]`; its new tuple never equals the one it held, so it emits and queues `C` into `buckets[3]`.
 5. **Recompute, depth 3.** `C` recomputes `10`, emits, and queues its effect: the subscriber goes into `effects` with `queuedAt = 2`.
 6. **Effects.** The subscriber runs and reads `10`. `bucketLengths` are all 0 again, and each slot recomputing took a node out of was set back to `undefined`, so no bucket keeps a node alive.
 

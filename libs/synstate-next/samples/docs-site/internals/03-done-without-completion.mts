@@ -37,7 +37,7 @@ if (import.meta.vitest !== undefined) {
 
       await vi.advanceTimersByTimeAsync(100);
 
-      assert.strictEqual(fired.peek(), 0);
+      assert.strictEqual(fired.getSnapshot(), 0);
 
       owner.dispose();
 

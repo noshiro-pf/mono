@@ -59,27 +59,28 @@ if (import.meta.vitest !== undefined) {
       // embed-sample-code-ignore-above
       const [query, setQuery] = createState('');
 
-      const results = query.pipe(
+      const results = query
         // Wait for typing to pause.
-        debounce(300),
-        // A new query disposes the previous request, which aborts it; so does
-        // clearing the box, which follows an empty answer instead.
-        switchMap((q) =>
-          q.trim() === ''
-            ? just(Result.ok<readonly string[]>([]))
-            : fromAbortablePromise(async (signal) => {
-                const params = new URLSearchParams({ q });
+        .pipe(debounce(300))
+        .pipe(
+          // A new query disposes the previous request, which aborts it; so does
+          // clearing the box, which follows an empty answer instead.
+          switchMap((q) =>
+            q.trim() === ''
+              ? just(Result.ok<readonly string[]>([]))
+              : fromAbortablePromise(async (signal) => {
+                  const params = new URLSearchParams({ q });
 
-                return fetch(`/api/search?${params.toString()}`, {
-                  signal,
-                }).then(
-                  async (r) =>
-                    /* embed-sample-code-ignore-this-line */ // eslint-disable-next-line total-functions/no-unsafe-type-assertion -- `Response.json()` is untyped; the cast is what a reader would write, and this line is stripped from the embedded output.
-                    r.json() as Promise<readonly string[]>,
-                );
-              }),
-        ),
-      );
+                  return fetch(`/api/search?${params.toString()}`, {
+                    signal,
+                  }).then(
+                    async (r) =>
+                      /* embed-sample-code-ignore-this-line */ // eslint-disable-next-line total-functions/no-unsafe-type-assertion -- `Response.json()` is untyped; the cast is what a reader would write, and this line is stripped from the embedded output.
+                      r.json() as Promise<readonly string[]>,
+                  );
+                }),
+          ),
+        );
 
       // embed-sample-code-ignore-below
 

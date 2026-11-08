@@ -33,7 +33,6 @@ Each page gives the API's description, taken from its JSDoc, and an example that
 
 ## Combining
 
-- [`combine`](/mono/synstate-next/reference/combining/combine/): The latest values of `parents` as a tuple, on every update that reaches it.
 - [`derive`](/mono/synstate-next/reference/combining/derive/): Computes `fn` from the values of `parents`, once per update however many of them changed, and emits the result unless it equals the one held.
 - [`merge`](/mono/synstate-next/reference/combining/merge/): Emits the value of whichever parent emitted in this update (the first of them, if several did).
 - [`zip`](/mono/synstate-next/reference/combining/zip/): Emits the `n`-th values of all `parents` as a tuple, once each of them has emitted its `n`-th.

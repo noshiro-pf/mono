@@ -10,7 +10,6 @@
  * nesting it warned of.
  */
 import {
-  combine,
   debounce,
   derive,
   map,
@@ -31,7 +30,10 @@ describe('the nodes an update visits', () => {
     const other = state(0);
 
     const seen = collect(
-      combine([a.pipe(map((x) => x)), a.pipe(map((x) => x)), other]),
+      derive(
+        [a.pipe(map((x) => x)), a.pipe(map((x) => x)), other],
+        (...values) => values,
+      ),
     );
 
     a.pipe(map((x) => x)).subscribe((x) => {
@@ -164,9 +166,10 @@ describe('the nodes an update visits', () => {
     const b = state(10);
 
     const seen = collect(
-      combine([a, b.pipe(map((x) => x)).pipe(map((x) => x))]).pipe(
-        map(([x, y]) => x + y),
-      ),
+      derive(
+        [a, b.pipe(map((x) => x)).pipe(map((x) => x))],
+        (...values) => values,
+      ).pipe(map(([x, y]) => x + y)),
     );
 
     a.set(1);
@@ -186,7 +189,9 @@ describe('the depth of a node', () => {
     const quad = s.pipe(map((x) => x * 2)).pipe(map((x) => x * 2));
 
     assert.deepStrictEqual(
-      [s, double, quad, combine([s, double, quad])].map(depthOf),
+      [s, double, quad, derive([s, double, quad], (...values) => values)].map(
+        depthOf,
+      ),
       [0, 1, 2, 3],
     );
 
@@ -431,7 +436,7 @@ describe('a write made by a subscriber', () => {
       b.set(x * 2);
     });
 
-    const seen = collect(combine([doubled, b]));
+    const seen = collect(derive([doubled, b], (...values) => values));
 
     a.set(1);
 
@@ -565,7 +570,7 @@ describe('dispose', () => {
 
     assert.deepStrictEqual(seen, [3]);
 
-    assert.strictEqual(onlyChild.peek(), 3);
+    assert.strictEqual(onlyChild.getSnapshot(), 3);
   });
 
   test('cancels what it was waiting to emit', () => {

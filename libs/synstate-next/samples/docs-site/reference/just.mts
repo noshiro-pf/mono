@@ -16,13 +16,13 @@ if (import.meta.vitest !== undefined) {
         ),
       );
 
-      assert.strictEqual(label.peek(), 'now');
+      assert.strictEqual(label.getSnapshot(), 'now');
 
       setDelayed(true);
 
       await vi.advanceTimersByTimeAsync(500);
 
-      assert.strictEqual(label.peek(), 'later');
+      assert.strictEqual(label.getSnapshot(), 'later');
 
       // embed-sample-code-ignore-below
     } finally {

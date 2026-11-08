@@ -13,7 +13,7 @@ if (import.meta.vitest !== undefined) {
 
     setQuery('syn');
 
-    assert.strictEqual(typed.peek(), 'syn');
+    assert.strictEqual(typed.getSnapshot(), 'syn');
 
     // embed-sample-code-ignore-below
   });

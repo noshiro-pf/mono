@@ -42,7 +42,7 @@ if (import.meta.vitest !== undefined) {
 
     messages.next('hello');
 
-    assert.strictEqual(messages.peek(), 'hello');
+    assert.strictEqual(messages.getSnapshot(), 'hello');
 
     // embed-sample-code-ignore-below
   });

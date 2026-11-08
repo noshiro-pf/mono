@@ -26,14 +26,14 @@ if (import.meta.vitest !== undefined) {
 
       await vi.advanceTimersByTimeAsync(50);
 
-      assert.strictEqual(frames.peek(), 3);
+      assert.strictEqual(frames.getSnapshot(), 3);
 
       // Disposing it runs the cleanup, which clears the interval.
       frames.dispose();
 
       await vi.advanceTimersByTimeAsync(50);
 
-      assert.strictEqual(frames.peek(), 3);
+      assert.strictEqual(frames.getSnapshot(), 3);
 
       // embed-sample-code-ignore-below
     } finally {

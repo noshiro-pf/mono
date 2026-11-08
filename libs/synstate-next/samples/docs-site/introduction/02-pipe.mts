@@ -31,7 +31,7 @@ if (import.meta.vitest !== undefined) {
 
     assert.strictEqual(doubled.value, 8);
 
-    assert.strictEqual(even.peek(), 4);
+    assert.strictEqual(even.getSnapshot(), 4);
 
     // embed-sample-code-ignore-below
   });

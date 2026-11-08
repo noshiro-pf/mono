@@ -1,7 +1,6 @@
 // cspell:ignore unstub
 import {
   batch,
-  combine,
   createOwner,
   createRootOwner,
   derive,
@@ -124,7 +123,7 @@ describe('propagation', () => {
 
     const mut_seen: string[] = [];
 
-    combine([mirrored, b]).subscribe(([x, y]) => {
+    derive([mirrored, b], (...values) => values).subscribe(([x, y]) => {
       mut_seen.push(`${x},${y}`);
     });
 
@@ -142,7 +141,7 @@ describe('propagation', () => {
 
     const mut_pairs: string[] = [];
 
-    combine([c, d]).subscribe(([x, y]) => {
+    derive([c, d], (...values) => values).subscribe(([x, y]) => {
       mut_pairs.push(`${x},${y}`);
     });
 
@@ -769,10 +768,9 @@ describe('events', () => {
 
     const e2 = source<number>();
 
-    const sum = merge([e1, e2]).pipe(
-      filter((x) => x > 0),
-      scan((acc: number, x) => acc + x, 0),
-    );
+    const sum = merge([e1, e2])
+      .pipe(filter((x) => x > 0))
+      .pipe(scan((acc: number, x) => acc + x, 0));
 
     const mut_seen: number[] = [];
 

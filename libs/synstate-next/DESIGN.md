@@ -39,14 +39,20 @@ no longer holds.
   It leaves them as a disposed child does, through the same lazy compaction.
 - **Equality cut-off by default.** A node that recomputes to an `Object.is`
   equal value does not emit, and nothing below it is visited. `equals` replaces
-  the comparison; `combine` and the event operators pass `() => false`.
+  the comparison; the event operators pass `() => false`.
 
 ## Values
 
 A node holds its value or the `noValue` symbol. There is no `Optional` per
 value: reading a value is a field read and a comparison. `InitializedObservable`
-is a type for nodes that always hold one; `pipe` works out, from each operator's
-`InitKind` (`keep`, `drop`, `with`), whether the result does.
+is a type for nodes that always hold one; `pipe` works out, from the operator's
+`InitKind` (`keep`, `drop`, `provide`), whether the result does.
+
+`pipe` takes one operator, and calls are chained. TypeScript infers an
+operator's parameter types (the `x` of `map((x) => …)`) from the previous
+operator's output only through overloads of fixed length, so a variadic `pipe`
+stops at the last overload; a chain has no limit and two overloads. A chain
+builds the same nodes, so it costs nothing at update time.
 
 ## Effects
 
@@ -169,6 +175,10 @@ from the prototype; the packages are to be measured again in
 
 ## Breaking changes against synstate
 
+- `getSnapshot()` returns the value or `undefined`, not an `Optional`:
+  `hasValue` says whether there is one, and an `InitializedObservable` has
+  `value` and a `getSnapshot` that returns `A`. `subscribe` returns the function
+  that stops it, not a `{ unsubscribe }` object.
 - Subscribers run after the update has settled, not during it.
 - Nested updates do not exist: a write made during the drain is deferred, and
   one made by an effect propagates in the next round.
@@ -190,9 +200,13 @@ from the prototype; the packages are to be measured again in
   `getKey`, `attachIndex` and its alias `withIndex` (a `scan`), `mapOptional`,
   `unwrapOptional`, `mapResultOk`, `mapResultErr`, `unwrapResultOk`,
   `unwrapResultErr`. So are the aliases `withLatestFrom`, `withBuffered`,
-  `combineLatest` (`combine`), `distinctUntilChanged` (`skipIfNoChange`) and
-  `flatMap` (`mergeMap`). Each name is one more thing to learn for no
-  capability; a `map` with `equals: () => false` replaces `mapTo` on an event.
+  `distinctUntilChanged` (`skipIfNoChange`) and `flatMap` (`mergeMap`). Each
+  name is one more thing to learn for no capability; a `map` with
+  `equals: () => false` replaces `mapTo` on an event.
+- `combine` (and its alias `combineLatest`) is gone: it was `derive` with a `fn`
+  that returns its arguments as a tuple, and invited `combine(…).pipe(map(…))`,
+  which builds a new tuple on every update only for a second node to take it
+  apart; `derive` with the computation as its `fn` is one node and no tuple.
 - The predicates of `filter` and `skipWhile` are given the value alone, not its
   index; a `scan` counts.
 - A scope is an `Owner`: `createScope` is `createOwner`, `getCurrentScope` is

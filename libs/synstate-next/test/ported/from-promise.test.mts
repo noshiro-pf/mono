@@ -78,7 +78,7 @@ describe('fromPromise and fromAbortablePromise', () => {
 
     await promise;
 
-    assert.deepStrictEqual(result.peek(), Result.ok(1));
+    assert.deepStrictEqual(result.getSnapshot(), Result.ok(1));
   });
 });
 

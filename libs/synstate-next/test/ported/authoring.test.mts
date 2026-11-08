@@ -9,10 +9,10 @@
  */
 import {
   batch,
-  combine,
   createDerived,
   createOwner,
   createSource,
+  derive,
   map,
   onCleanup,
   source,
@@ -28,7 +28,7 @@ describe('custom operators and sources', () => {
   test('a custom operator updates in the same update as its parent', () => {
     const num = source<number>();
 
-    const seen = collect(combine([num, double(num)]));
+    const seen = collect(derive([num, double(num)], (...values) => values));
 
     num.next(1);
 
@@ -52,7 +52,7 @@ describe('custom operators and sources', () => {
       mut_calls.push(1);
 
       if (ctx.emitted(a)) {
-        ctx.set((a.peek() ?? 0) * 2);
+        ctx.set((a.getSnapshot() ?? 0) * 2);
       }
     });
 
@@ -257,7 +257,7 @@ describe('custom operators and sources', () => {
       mut_emit.current = ctx.emit;
 
       return () => {
-        ctx.set((num.peek() ?? 0) * 10);
+        ctx.set((num.getSnapshot() ?? 0) * 10);
       };
     });
 
@@ -404,7 +404,7 @@ describe('custom operators and sources', () => {
     const followed = createDerived<number>([main, other], (ctx) => ({
       update: () => {
         if (ctx.emitted(main)) {
-          ctx.set(main.peek() ?? 0);
+          ctx.set(main.getSnapshot() ?? 0);
         }
       },
       settled: () => ctx.settled(main),
@@ -441,7 +441,7 @@ describe('custom operators and sources', () => {
   test('the public types carry only the members meant for users', () => {
     const num = source<number>();
 
-    expectType<'peek', keyof typeof num>('<=');
+    expectType<'getSnapshot', keyof typeof num>('<=');
 
     expectType<'recompute', keyof typeof num>('!<=');
 
@@ -467,7 +467,7 @@ describe('custom operators and sources', () => {
 
 const double = (src: Observable<number>): Observable<number> =>
   createDerived([src], (ctx) => () => {
-    const v = src.peek();
+    const v = src.getSnapshot();
 
     if (v !== undefined && ctx.emitted(src)) {
       ctx.set(v * 2);
@@ -490,7 +490,7 @@ const delay = (src: Observable<number>, ms: number): Observable<number> =>
       // A value is still due while a timer runs.
       settled: () => mut_timers.size === 0 && ctx.settled(src),
       update: () => {
-        const v = src.peek();
+        const v = src.getSnapshot();
 
         if (v === undefined || !ctx.emitted(src)) {
           return;

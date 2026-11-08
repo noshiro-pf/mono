@@ -1,6 +1,6 @@
 import {
-  combine,
   createState,
+  derive,
   map,
   switchMap,
   timer,
@@ -21,18 +21,15 @@ export const createSearchView = (): SearchView => {
   // request.
   const searchState = query.pipe(
     switchMap((q) =>
-      timer(answerMs).pipe(
-        map((): SearchState => ({ status: 'success', query: q })),
+      timer(answerMs)
+        .pipe(map((): SearchState => ({ status: 'success', query: q })))
         // held in the same update as the query
-        withInitialValue<SearchState>({ status: 'loading', query: q }),
-      ),
+        .pipe(withInitialValue<SearchState>({ status: 'loading', query: q })),
     ),
   );
 
   // What the page shows: the query in the box, and what the list is for.
-  const view = combine([query, searchState]).pipe(
-    map(([q, state]) => showView(q, state)),
-  );
+  const view = derive([query, searchState], (q, state) => showView(q, state));
 
   const mut_viewLog: string[] = [];
 

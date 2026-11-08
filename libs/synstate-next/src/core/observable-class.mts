@@ -131,7 +131,7 @@ export class ObservableClass<A> implements DerivedNode {
     return this.current !== noValue;
   }
 
-  peek(): A | undefined {
+  getSnapshot(): A | undefined {
     const v = this.current;
 
     return v === noValue ? undefined : v;
@@ -341,16 +341,8 @@ export class ObservableClass<A> implements DerivedNode {
     return this.#mut_events?.waiting ?? false;
   }
 
-  pipe(
-    ...operators: readonly Operator<unknown, unknown>[]
-  ): Observable<unknown> {
-    let mut_result: Observable<unknown> = view(this);
-
-    for (const operator of operators) {
-      mut_result = operator(mut_result);
-    }
-
-    return mut_result;
+  pipe(operator: Operator<unknown, unknown>): Observable<unknown> {
+    return operator(view(this));
   }
 
   /**

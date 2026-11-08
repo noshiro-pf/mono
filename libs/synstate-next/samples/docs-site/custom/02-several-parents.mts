@@ -18,9 +18,9 @@ if (import.meta.vitest !== undefined) {
       second: Observable<B>,
     ): Observable<Tagged<A, B>> =>
       createDerived<Tagged<A, B>>([first, second], (ctx) => () => {
-        const a = first.peek();
+        const a = first.getSnapshot();
 
-        const b = second.peek();
+        const b = second.getSnapshot();
 
         // `emitted` tells which parent emitted in this update.
         if (a !== undefined && ctx.emitted(first)) {

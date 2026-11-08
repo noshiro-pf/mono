@@ -11,7 +11,7 @@ Preact Signals もグリッチフリーです。そこで当然の疑問が出�
 
 | オペレーターの種類             | 例                                              | Preact Signals での書き方                    | 失うもの                                                                                                     |
 | ------------------------------ | ----------------------------------------------- | -------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
-| 純粋な同期変換                 | `map`、`derive`、`combine`                      | `computed`                                   | なし                                                                                                         |
+| 純粋な同期変換                 | `map`、`derive`                                 | `computed`                                   | なし                                                                                                         |
 | 既にある signal から選ぶ       | 複数の状態の 1 つへの `switchMap`               | `branches[selector.value]` を読む `computed` | なし。依存は読んだものに付いていく                                                                           |
 | 値から値へ状態を持ち越す       | `scan`、`pairwise`、`skip`、`take`              | signal に書く effect                         | イベント（同値の書き込みは捨てられ、batch は最後の書き込みだけを届ける）、先に作った読み手の整合性、遅延評価 |
 | 時間                           | `debounce`、`throttle`、`audit`、`timer`        | タイマーを置いて signal に書く effect        | 遅延評価                                                                                                     |
@@ -110,18 +110,20 @@ export const createSearchView = (): SearchView => {
     // request.
     const searchState = query.pipe(
         switchMap((q) =>
-            timer(answerMs).pipe(
-                map((): SearchState => ({ status: 'success', query: q })),
+            timer(answerMs)
+                .pipe(map((): SearchState => ({ status: 'success', query: q })))
                 // held in the same update as the query
-                withInitialValue<SearchState>({ status: 'loading', query: q }),
-            ),
+                .pipe(
+                    withInitialValue<SearchState>({
+                        status: 'loading',
+                        query: q,
+                    }),
+                ),
         ),
     );
 
     // What the page shows: the query in the box, and what the list is for.
-    const view = combine([query, searchState]).pipe(
-        map(([q, state]) => showView(q, state)),
-    );
+    const view = derive([query, searchState], (q, state) => showView(q, state));
 
     const mut_viewLog: string[] = [];
 

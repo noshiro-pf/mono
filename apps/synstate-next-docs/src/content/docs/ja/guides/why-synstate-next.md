@@ -72,4 +72,4 @@ Observable は破棄されることで終わり、破棄は所有関係に従い
 ## 次に読むもの
 
 - [状態と書き込み](/mono/synstate-next/ja/guides/state-and-writes/): `createState` と書き込みの規則。
-- [値を派生させる](/mono/synstate-next/ja/guides/deriving-values/): `pipe`・`derive`・`combine`・`merge`・`zip`。
+- [値を派生させる](/mono/synstate-next/ja/guides/deriving-values/): `pipe`・`derive`・`merge`・`zip`。

@@ -358,10 +358,9 @@ describe(mergeMap, () => {
 
                 return { unsubscribe: () => {} };
               },
-            }).pipe(
-              filter(Result.isOk),
-              map((r) => r.value),
-            )
+            })
+              .pipe(filter(Result.isOk))
+              .pipe(map((r) => r.value))
           : state(x),
       ),
     );
@@ -847,7 +846,7 @@ describe(fromSubscribable, () => {
       },
     });
 
-    assert.deepStrictEqual(wrapped.peek(), Result.ok(1));
+    assert.deepStrictEqual(wrapped.getSnapshot(), Result.ok(1));
 
     assert.isTrue(toNode(wrapped).settled);
   });

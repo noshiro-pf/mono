@@ -34,10 +34,9 @@ export const Sparkline = ({
         // follows it, go when the sparkline is unmounted.
         mountChild(
             <figcaption>
-                {counter(1000).pipe(
-                    map((s) => `drawn ${s + 1} s ago`),
-                    withInitialValue('drawn just now'),
-                )}
+                {counter(1000)
+                    .pipe(map((s) => `drawn ${s + 1} s ago`))
+                    .pipe(withInitialValue('drawn just now'))}
             </figcaption>,
             figure,
         );

@@ -149,7 +149,7 @@ An update costs what it reaches: each queued node is visited once, and a node th
 
 ## Stopping where a value does not change
 
-A node's `recompute` returns whether it emits. A node that computes a value (`map`, `derive`, `keepEqualParts`, a state's write, and `switchMap` when it switches) returns `false` when the value is equal to the one it holds, and its children are not queued: nothing below it is visited. The operators that pass values on (`filter`, `take`, `skip`, …) pass what reached them, which a parent upstream has already found to be a change. `combine` and the operators that pass events (`merge`, `zip`, `scan`, `pairwise`, the time operators) never compare: a repeated event is still an event.
+A node's `recompute` returns whether it emits. A node that computes a value (`map`, `derive`, `keepEqualParts`, a state's write, and `switchMap` when it switches) returns `false` when the value is equal to the one it holds, and its children are not queued: nothing below it is visited. The operators that pass values on (`filter`, `take`, `skip`, …) pass what reached them, which a parent upstream has already found to be a change. The operators that pass events (`merge`, `zip`, `scan`, `pairwise`, the time operators) never compare: a repeated event is still an event.
 
 ## Effects run after the values
 

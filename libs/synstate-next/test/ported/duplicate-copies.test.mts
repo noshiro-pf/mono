@@ -32,7 +32,7 @@ describe('two copies of synstate-next in one program', () => {
     const b = copyB.state(2);
 
     assert.throws(
-      () => copyA.combine([a, b]),
+      () => copyA.derive([a, b], (...values) => values),
       TypeError,
       'another copy of synstate-next',
     );

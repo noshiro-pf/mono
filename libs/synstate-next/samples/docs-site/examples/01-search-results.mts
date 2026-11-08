@@ -61,8 +61,7 @@ if (import.meta.vitest !== undefined) {
 
       const [query, setQuery] = createState('');
 
-      const responses = query.pipe(
-        debounce(300),
+      const responses = query.pipe(debounce(300)).pipe(
         // A query too short to search follows an empty answer, which also
         // disposes the request in flight.
         switchMap((q) =>
@@ -82,14 +81,13 @@ if (import.meta.vitest !== undefined) {
         ),
       );
 
-      const results: InitializedObservable<readonly Item[]> = responses.pipe(
+      const results: InitializedObservable<readonly Item[]> = responses
         // A failed request leaves the results as they were.
-        filter(Result.isOk),
-        map((result) => result.value),
+        .pipe(filter(Result.isOk))
+        .pipe(map((result) => result.value))
         // The empty query has answered `[]` already, but `switchMap`'s type
         // says it may hold nothing: name the list it starts with.
-        withInitialValue<readonly Item[]>([]),
-      );
+        .pipe(withInitialValue<readonly Item[]>([]));
 
       // embed-sample-code-ignore-below
 

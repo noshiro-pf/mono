@@ -25,7 +25,7 @@ setRunning(false);
 
 await vi.advanceTimersByTimeAsync(1000);
 
-assert.strictEqual(ticks.peek(), 2);
+assert.strictEqual(ticks.getSnapshot(), 2);
 ```
 
 ## 関連項目

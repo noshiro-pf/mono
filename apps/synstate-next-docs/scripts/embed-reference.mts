@@ -80,7 +80,7 @@ const srcDir = path.resolve(workspaceRootPath, '../../libs/synstate-next/src');
 
 const docsDir = path.resolve(workspaceRootPath, 'src/content/docs');
 
-type InitKind = 'drop' | 'keep' | 'with';
+type InitKind = 'drop' | 'keep' | 'provide';
 
 const initKindLink = {
   en: '/mono/synstate-next/guides/deriving-values/',
@@ -91,12 +91,12 @@ const initKindSentences = {
   en: {
     keep: `Its result holds a value whenever the source does: on an \`InitializedObservable\`, \`pipe\` gives one ([\`keep\`](${initKindLink.en}#pipe)).`,
     drop: `Its result may hold no value even when the source holds one: \`pipe\` gives an \`Observable\` ([\`drop\`](${initKindLink.en}#pipe)).`,
-    with: `Its result always holds a value: \`pipe\` gives an \`InitializedObservable\` ([\`with\`](${initKindLink.en}#pipe)).`,
+    provide: `Its result always holds a value: \`pipe\` gives an \`InitializedObservable\` ([\`provide\`](${initKindLink.en}#pipe)).`,
   },
   ja: {
     keep: `ソースが値を持てば、結果も値を持ちます。\`pipe\` は \`InitializedObservable\` をそのまま保ちます（[\`keep\`](${initKindLink.ja}#pipe)）。`,
     drop: `ソースが値を持っていても、結果は値を持たないことがあります。\`pipe\` の結果は \`Observable\` です（[\`drop\`](${initKindLink.ja}#pipe)）。`,
-    with: `結果は常に値を持ちます。\`pipe\` の結果は \`InitializedObservable\` です（[\`with\`](${initKindLink.ja}#pipe)）。`,
+    provide: `結果は常に値を持ちます。\`pipe\` の結果は \`InitializedObservable\` です（[\`provide\`](${initKindLink.ja}#pipe)）。`,
   },
 } as const;
 
@@ -124,9 +124,9 @@ const extractInitKind = (
 
   const header = source.slice(start, end === -1 ? undefined : end);
 
-  const kind = /Operator<[^;]*?'(keep|drop|with)'>/u.exec(header)?.[1];
+  const kind = /Operator<[^;]*?'(keep|drop|provide)'>/u.exec(header)?.[1];
 
-  return kind === 'keep' || kind === 'drop' || kind === 'with'
+  return kind === 'keep' || kind === 'drop' || kind === 'provide'
     ? kind
     : undefined;
 };

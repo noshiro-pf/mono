@@ -1,8 +1,8 @@
-import { batch, combine, createState, derive } from 'synstate-next';
+import { batch, createState, derive } from 'synstate-next';
 
 // embed-sample-code-ignore-below
 if (import.meta.vitest !== undefined) {
-  test('derive and combine', () => {
+  test('derive', () => {
     // embed-sample-code-ignore-above
     const [price, setPrice] = createState(100);
 
@@ -14,7 +14,7 @@ if (import.meta.vitest !== undefined) {
     assert.strictEqual(total.value, 200);
 
     // The latest values as a tuple.
-    const pair = combine([price, quantity]);
+    const pair = derive([price, quantity], (p, q) => [p, q] as const);
 
     const mut_totals: number[] = [];
 
@@ -34,7 +34,7 @@ if (import.meta.vitest !== undefined) {
       setQuantity(4);
     });
 
-    // 50 × 4 is 200 again: `total` cuts the update off. `combine` builds a new
+    // 50 × 4 is 200 again: `total` stops the update there. `pair` builds a new
     // tuple on every update, so it never does.
     assert.deepStrictEqual(mut_totals, [200]);
 

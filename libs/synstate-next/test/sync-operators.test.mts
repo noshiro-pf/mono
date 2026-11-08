@@ -297,14 +297,13 @@ describe(withCurrentValueFrom, () => {
   test('reads the value the other has settled on in the same update', () => {
     const a = state(1);
 
-    const doubled = a.pipe(
-      withCurrentValueFrom(a),
-      withCurrentValueFrom(state(0)),
-    );
+    const doubled = a
+      .pipe(withCurrentValueFrom(a))
+      .pipe(withCurrentValueFrom(state(0)));
 
     const deep = state(10);
 
-    const deeper = deep.pipe(skipIfNoChange(), skipIfNoChange());
+    const deeper = deep.pipe(skipIfNoChange()).pipe(skipIfNoChange());
 
     const paired = a.pipe(withCurrentValueFrom(deeper));
 
@@ -321,7 +320,7 @@ describe(withCurrentValueFrom, () => {
       [2, 20],
     ]);
 
-    assert.deepStrictEqual(doubled.peek(), [[2, 2], 0]);
+    assert.deepStrictEqual(doubled.getSnapshot(), [[2, 2], 0]);
   });
 
   test('emits nothing while the other holds no value', () => {
@@ -339,7 +338,7 @@ describe(withCurrentValueFrom, () => {
 
     a.set(2);
 
-    assert.deepStrictEqual(paired.peek(), [2, 5]);
+    assert.deepStrictEqual(paired.getSnapshot(), [2, 5]);
   });
 });
 
@@ -762,6 +761,6 @@ describe('zip with a parent ahead', () => {
       });
     }
 
-    assert.deepStrictEqual(zipped.peek(), [199, 199]);
+    assert.deepStrictEqual(zipped.getSnapshot(), [199, 199]);
   });
 });

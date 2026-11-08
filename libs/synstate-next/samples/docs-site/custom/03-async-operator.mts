@@ -27,7 +27,7 @@ if (import.meta.vitest !== undefined) {
 
             return {
               update: () => {
-                const value = parent.peek();
+                const value = parent.getSnapshot();
 
                 if (value === undefined || !ctx.emitted(parent)) {
                   return;

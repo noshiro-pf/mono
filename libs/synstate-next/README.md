@@ -35,7 +35,7 @@ synstate や synstate-dom に入れたバグ修正・セキュリティ修正・
   `skipIfNoChange`, `keepEqualParts`, `pairwise`, `take`, `skip`, `takeWhile`,
   `skipWhile`, `takeUntil`, `skipUntil`, `withCurrentValueFrom`,
   `withBufferedFrom`, `debounce`, `throttle`, `audit`, `switchMap` and
-  `mergeMap`, and `derive`, `combine`, `merge` and `zip`.
+  `mergeMap`, and `derive`, `merge` and `zip`.
 - The helpers `createState`, `createReducer`, `createBooleanState`,
   `createEventEmitter` and `createValueEmitter`.
 - `createDerived` and `createSource`, for writing an operator or a source

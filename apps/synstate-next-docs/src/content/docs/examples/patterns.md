@@ -25,8 +25,7 @@ type Item = Readonly<{ id: string; name: string }>;
 
 const [query, setQuery] = createState('');
 
-const responses = query.pipe(
-    debounce(300),
+const responses = query.pipe(debounce(300)).pipe(
     // A query too short to search follows an empty answer, which also
     // disposes the request in flight.
     switchMap((q) =>
@@ -42,14 +41,13 @@ const responses = query.pipe(
     ),
 );
 
-const results: InitializedObservable<readonly Item[]> = responses.pipe(
+const results: InitializedObservable<readonly Item[]> = responses
     // A failed request leaves the results as they were.
-    filter(Result.isOk),
-    map((result) => result.value),
+    .pipe(filter(Result.isOk))
+    .pipe(map((result) => result.value))
     // The empty query has answered `[]` already, but `switchMap`'s type
     // says it may hold nothing: name the list it starts with.
-    withInitialValue<readonly Item[]>([]),
-);
+    .pipe(withInitialValue<readonly Item[]>([]));
 ```
 
 A query too short to search goes through `switchMap` too, to an empty answer: dropped with `filter` before it, it would leave the request for a longer query running. The result is an `InitializedObservable`, so a view reads `results.value` from the start. With synstate-dom-next, `For` binds it to a list directly.

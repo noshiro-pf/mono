@@ -1,26 +1,26 @@
 ---
 title: Deriving values
-description: pipe and InitKind, derive and combine, merge and zip, stopping where a value does not change, and reading a value without following it.
+description: pipe and InitKind, derive, merge and zip, stopping where a value does not change, and reading a value without following it.
 ---
 
 ## `pipe`
 
-`observable.pipe(op1, op2, …)` applies up to four operators in order; chain `pipe` again for more. Each operator declares in its type what it does to the value held at the start:
+`observable.pipe(op)` applies one operator; chain `pipe` for more, as in `a.pipe(map(f)).pipe(filter(p))`. Each operator declares in its type what it does to the value held at the start:
 
 | `InitKind` | Meaning                                  | Operators                                                                                                            |
 | :--------- | :--------------------------------------- | :------------------------------------------------------------------------------------------------------------------- |
 | `keep`     | Holds a value when its source does       | `map`, `debounce`, `throttle`, `audit`, `take`, `takeUntil`, `skipIfNoChange`, `keepEqualParts`, `withBufferedFrom`  |
 | `drop`     | May hold none, whatever its source holds | `filter`, `skip`, `takeWhile`, `skipWhile`, `skipUntil`, `pairwise`, `switchMap`, `mergeMap`, `withCurrentValueFrom` |
-| `with`     | Always holds one                         | `scan`, `withInitialValue`                                                                                           |
+| `provide`  | Always holds one                         | `scan`, `withInitialValue`                                                                                           |
 
-`pipe` folds them into the type of the result: an `InitializedObservable<A>`, which has `.value`, or an `Observable<A>`, which has `hasValue` and `peek()`. See the [introduction](/mono/synstate-next/getting-started/introduction/#deriving-values-with-pipe) for an example.
+`pipe` turns the operator's kind into the type of the result: an `InitializedObservable<A>`, which has `.value`, or an `Observable<A>`, which has `hasValue` and `getSnapshot()`. See the [introduction](/mono/synstate-next/getting-started/introduction/#deriving-values-with-pipe) for an example.
 
-## `derive` and `combine`
+## `derive`
 
-`derive(parents, fn)` computes one value from several observables, once per update however many of them changed, and passes it on unless it equals the one held. `combine(parents)` gives the latest values as a tuple, on every update that reaches it: a new tuple each time, so it never stops an update.
+`derive(parents, fn)` computes one value from several observables, once per update however many of them changed, and passes it on unless it equals the one held. A `fn` that returns its arguments as a tuple gives the latest values themselves, on every update that reaches it: a new tuple each time, so it never stops there.
 
 ```tsx
-import { batch, combine, createState, derive } from 'synstate-next';
+import { batch, createState, derive } from 'synstate-next';
 
 const [price, setPrice] = createState(100);
 
@@ -32,7 +32,7 @@ const total = derive([price, quantity], (p, q) => p * q);
 assert.strictEqual(total.value, 200);
 
 // The latest values as a tuple.
-const pair = combine([price, quantity]);
+const pair = derive([price, quantity], (p, q) => [p, q] as const);
 
 const mut_totals: number[] = [];
 
@@ -52,14 +52,14 @@ batch(() => {
     setQuantity(4);
 });
 
-// 50 × 4 is 200 again: `total` cuts the update off. `combine` builds a new
+// 50 × 4 is 200 again: `total` stops the update there. `pair` builds a new
 // tuple on every update, so it never does.
 assert.deepStrictEqual(mut_totals, [200]);
 
 assert.deepStrictEqual(mut_pairs, ['100 × 2', '50 × 4']);
 ```
 
-Prefer `derive` for a value computed from several others: it computes once, and stops the update when the value does not change. Use `combine` where you need the tuple itself, such as an input to `debounce`. Both hold a value once every parent holds one.
+Compute the value you need in `fn` itself: it is computed once, and an unchanged result stops the update. Return the tuple only where you need it as such, as the input of a `debounce`, say. Either way the result holds a value once every parent holds one.
 
 ## `merge` and `zip`
 
@@ -105,7 +105,7 @@ assert.deepStrictEqual(mut_pairs, ['click + a', 'drag + b']);
 
 ## Stopping where a value does not change
 
-Every node that computes a value (`map`, `derive`, a state's write) compares it with the one it holds, by `Object.is` unless you pass `equals`, and passes nothing on when they are equal. Nothing below it is visited. `switchMap` compares, by `Object.is`, only when it switches: the value the new inner observable holds stops there when it equals the one held, and what the inner observable emits later passes through. The operators that only pass values on (`filter`, `take`, …) pass what reached them, and those that pass events (`combine`, `merge`, `zip`, `scan`, `pairwise`, the time operators) never compare.
+Every node that computes a value (`map`, `derive`, a state's write) compares it with the one it holds, by `Object.is` unless you pass `equals`, and passes nothing on when they are equal. Nothing below it is visited. `switchMap` compares, by `Object.is`, only when it switches: the value the new inner observable holds stops there when it equals the one held, and what the inner observable emits later passes through. The operators that only pass values on (`filter`, `take`, …) pass what reached them, and those that pass events (`merge`, `zip`, `scan`, `pairwise`, the time operators) never compare.
 
 That is what you want for a value, and not for an event. Mapping every click to `1` gives `1` each time, and the second `1` would be taken for no change: pass `equals: () => false` to a `map` of an event whose result can repeat.
 
@@ -170,10 +170,9 @@ const [submitted, submit] = createEventEmitter();
 
 // What the draft holds when the form is submitted. Typing alone sends
 // nothing: `draft` is read, not followed.
-const sent = submitted.pipe(
-    withCurrentValueFrom(draft),
-    map(([, text]) => text, { equals: () => false }),
-);
+const sent = submitted
+    .pipe(withCurrentValueFrom(draft))
+    .pipe(map(([, text]) => text, { equals: () => false }));
 
 const mut_sent: string[] = [];
 

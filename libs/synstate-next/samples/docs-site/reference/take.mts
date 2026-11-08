@@ -23,7 +23,7 @@ if (import.meta.vitest !== undefined) {
     assert.deepStrictEqual(mut_seen, [1, 2]);
 
     // It keeps the last value it passed.
-    assert.strictEqual(firstTwo.peek(), 2);
+    assert.strictEqual(firstTwo.getSnapshot(), 2);
 
     // embed-sample-code-ignore-below
   });

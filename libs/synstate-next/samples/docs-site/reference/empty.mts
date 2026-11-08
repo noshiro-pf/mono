@@ -20,7 +20,7 @@ if (import.meta.vitest !== undefined) {
 
       await vi.advanceTimersByTimeAsync(1000);
 
-      assert.strictEqual(ticks.peek(), 2);
+      assert.strictEqual(ticks.getSnapshot(), 2);
 
       // embed-sample-code-ignore-below
     } finally {

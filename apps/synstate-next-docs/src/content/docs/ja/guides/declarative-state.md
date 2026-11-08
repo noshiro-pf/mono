@@ -60,23 +60,26 @@ import { Result } from 'ts-std-forge';
 
 const [query, setQuery] = createState('');
 
-const results = query.pipe(
+const results = query
     // Wait for typing to pause.
-    debounce(300),
-    // A new query disposes the previous request, which aborts it; so does
-    // clearing the box, which follows an empty answer instead.
-    switchMap((q) =>
-        q.trim() === ''
-            ? just(Result.ok<readonly string[]>([]))
-            : fromAbortablePromise(async (signal) => {
-                  const params = new URLSearchParams({ q });
+    .pipe(debounce(300))
+    .pipe(
+        // A new query disposes the previous request, which aborts it; so does
+        // clearing the box, which follows an empty answer instead.
+        switchMap((q) =>
+            q.trim() === ''
+                ? just(Result.ok<readonly string[]>([]))
+                : fromAbortablePromise(async (signal) => {
+                      const params = new URLSearchParams({ q });
 
-                  return fetch(`/api/search?${params.toString()}`, {
-                      signal,
-                  }).then(async (r) => r.json() as Promise<readonly string[]>);
-              }),
-    ),
-);
+                      return fetch(`/api/search?${params.toString()}`, {
+                          signal,
+                      }).then(
+                          async (r) => r.json() as Promise<readonly string[]>,
+                      );
+                  }),
+        ),
+    );
 ```
 
 `fromAbortablePromise` は `fetch` に `AbortSignal` を渡します。新しいクエリが来ると、`switchMap` はそれまで追っていたリクエストを破棄し、それによってリクエストが中断されます。古い応答が新しい応答を上書きすることはありません。空の入力欄も他と同じ 1 つの値です。すでに手元にある答えである `just` を追うので、リクエストは送らず、それでも実行中のリクエストは破棄します。`switchMap` の前で `filter` で落とすと、そのリクエストが走り続け、その応答がもう空になった入力欄の結果を埋めてしまいます。
@@ -89,7 +92,6 @@ const results = query.pipe(
 
 ```tsx
 import {
-    combine,
     createState,
     createValueEmitter,
     debounce,
@@ -127,9 +129,10 @@ const tableData = fromPromise(
     }),
 );
 
-const filters = combine([filterName, filterEmail, filterGender]).pipe(
-    debounce(300),
-);
+const filters = derive(
+    [filterName, filterEmail, filterGender],
+    (name, email, gender) => [name, email, gender] as const,
+).pipe(debounce(300));
 
 const filteredRows = derive(
     [filters, tableData],

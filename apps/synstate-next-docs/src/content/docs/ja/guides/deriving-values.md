@@ -1,26 +1,26 @@
 ---
 title: 値を派生させる
-description: pipe と InitKind、derive と combine、merge と zip、値が変わらなければ止まること、追いかけずに値を読む方法。
+description: pipe と InitKind、derive、merge と zip、値が変わらなければ止まること、追いかけずに値を読む方法。
 ---
 
 ## `pipe`
 
-`observable.pipe(op1, op2, …)` は最大 4 つのオペレーターを順に適用します。それより多いときは `pipe` をもう一度つなぎます。各オペレーターは、最初に持っている値をどう扱うかを型で宣言しています。
+`observable.pipe(op)` は 1 つのオペレーターを適用します。さらに適用するときは、`a.pipe(map(f)).pipe(filter(p))` のように `pipe` をつなぎます。各オペレーターは、最初に持っている値をどう扱うかを型で宣言しています。
 
 | `InitKind` | 意味                                     | オペレーター                                                                                                         |
 | :--------- | :--------------------------------------- | :------------------------------------------------------------------------------------------------------------------- |
 | `keep`     | ソースが値を持てば値を持つ               | `map`・`debounce`・`throttle`・`audit`・`take`・`takeUntil`・`skipIfNoChange`・`keepEqualParts`・`withBufferedFrom`  |
 | `drop`     | ソースにかかわらず値を持たないことがある | `filter`・`skip`・`takeWhile`・`skipWhile`・`skipUntil`・`pairwise`・`switchMap`・`mergeMap`・`withCurrentValueFrom` |
-| `with`     | 常に値を持つ                             | `scan`・`withInitialValue`                                                                                           |
+| `provide`  | 常に値を持つ                             | `scan`・`withInitialValue`                                                                                           |
 
-`pipe` はこれらを結果の型にまとめます。`.value` を持つ `InitializedObservable<A>` か、`hasValue` と `peek()` を持つ `Observable<A>` です。例は[概要](/mono/synstate-next/ja/getting-started/introduction/#pipe-で値を派生させる)にあります。
+`pipe` は、オペレーターの種類を結果の型に反映します。`.value` を持つ `InitializedObservable<A>` か、`hasValue` と `getSnapshot()` を持つ `Observable<A>` です。例は[概要](/mono/synstate-next/ja/getting-started/introduction/#pipe-で値を派生させる)にあります。
 
-## `derive` と `combine`
+## `derive`
 
-`derive(parents, fn)` は複数の Observable から 1 つの値を計算します。親のいくつが変わっても 1 回の更新で 1 回だけ計算し、持っている値と等しくなければ伝えます。`combine(parents)` は最新の値をタプルで返し、届いた更新のたびに伝えます。毎回新しいタプルなので、そこで更新が止まることはありません。
+`derive(parents, fn)` は複数の Observable から 1 つの値を計算します。親のいくつが変わっても 1 回の更新で 1 回だけ計算し、持っている値と等しくなければ伝えます。引数をそのままタプルにして返す `fn` なら最新の値そのものが得られ、届いた更新のたびに伝わります。毎回新しいタプルなので、そこで止まることはありません。
 
 ```tsx
-import { batch, combine, createState, derive } from 'synstate-next';
+import { batch, createState, derive } from 'synstate-next';
 
 const [price, setPrice] = createState(100);
 
@@ -32,7 +32,7 @@ const total = derive([price, quantity], (p, q) => p * q);
 assert.strictEqual(total.value, 200);
 
 // The latest values as a tuple.
-const pair = combine([price, quantity]);
+const pair = derive([price, quantity], (p, q) => [p, q] as const);
 
 const mut_totals: number[] = [];
 
@@ -52,14 +52,14 @@ batch(() => {
     setQuantity(4);
 });
 
-// 50 × 4 is 200 again: `total` cuts the update off. `combine` builds a new
+// 50 × 4 is 200 again: `total` stops the update there. `pair` builds a new
 // tuple on every update, so it never does.
 assert.deepStrictEqual(mut_totals, [200]);
 
 assert.deepStrictEqual(mut_pairs, ['100 × 2', '50 × 4']);
 ```
 
-複数の値から計算する値には `derive` を選んでください。計算は 1 回で、値が変わらなければ更新もそこで止まります。`combine` は、`debounce` の入力のようにタプルそのものが必要なときに使います。どちらも、親がすべて値を持った時点で値を持ちます。
+必要な値は `fn` の中で計算してください。計算は 1 回で、結果が変わらなければ更新はそこで止まります。タプルを返すのは、`debounce` の入力のようにタプルそのものが必要なときだけにします。どちらの場合も、親がすべて値を持った時点で値を持ちます。
 
 ## `merge` と `zip`
 
@@ -105,7 +105,7 @@ assert.deepStrictEqual(mut_pairs, ['click + a', 'drag + b']);
 
 ## 値が変わらなければそこで止まる
 
-値を計算するノード（`map`・`derive`・状態への書き込み）は、その値を持っている値と比べ（`equals` を渡さなければ `Object.is`）、等しければ何も伝えません。その下は辿られません。`switchMap` が（`Object.is` で）比べるのは切り替えたときだけです。新しい内側の Observable が持つ値は、持っている値と等しければ止まり、内側の Observable がその後に流す値はそのまま通ります。値を流すだけのオペレーター（`filter`・`take` など）は届いたものを流し、イベントを流すもの（`combine`・`merge`・`zip`・`scan`・`pairwise`・時間系のオペレーター）は比較しません。
+値を計算するノード（`map`・`derive`・状態への書き込み）は、その値を持っている値と比べ（`equals` を渡さなければ `Object.is`）、等しければ何も伝えません。その下は辿られません。`switchMap` が（`Object.is` で）比べるのは切り替えたときだけです。新しい内側の Observable が持つ値は、持っている値と等しければ止まり、内側の Observable がその後に流す値はそのまま通ります。値を流すだけのオペレーター（`filter`・`take` など）は届いたものを流し、イベントを流すもの（`merge`・`zip`・`scan`・`pairwise`・時間系のオペレーター）は比較しません。
 
 値にとってはこれが望ましい動きですが、イベントにとってはそうではありません。クリックのたびに `1` へ変換すると毎回 `1` になり、2 回目の `1` は変化なしとみなされてしまいます。結果が繰り返しうるイベントの `map` には、`equals: () => false` を渡してください。
 
@@ -170,10 +170,9 @@ const [submitted, submit] = createEventEmitter();
 
 // What the draft holds when the form is submitted. Typing alone sends
 // nothing: `draft` is read, not followed.
-const sent = submitted.pipe(
-    withCurrentValueFrom(draft),
-    map(([, text]) => text, { equals: () => false }),
-);
+const sent = submitted
+    .pipe(withCurrentValueFrom(draft))
+    .pipe(map(([, text]) => text, { equals: () => false }));
 
 const mut_sent: string[] = [];
 

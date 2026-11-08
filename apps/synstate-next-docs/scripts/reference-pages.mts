@@ -45,7 +45,6 @@ export const referencePages: readonly ReferencePage[] = [
     'createSource',
     'sources/create-source.mts',
   ]),
-  page('combining', 'combine', ['combine', 'operators/derive.mts']),
   page('combining', 'derive', ['derive', 'operators/derive.mts']),
   page('combining', 'merge', ['merge', 'operators/derive.mts']),
   page('combining', 'zip', ['zip', 'operators/zip.mts']),

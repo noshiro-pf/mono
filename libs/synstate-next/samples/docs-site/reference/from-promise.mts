@@ -15,7 +15,7 @@ if (import.meta.vitest !== undefined) {
 
       await vi.advanceTimersByTimeAsync(0);
 
-      assert.deepStrictEqual(answer.peek(), Result.ok(42));
+      assert.deepStrictEqual(answer.getSnapshot(), Result.ok(42));
 
       const failed = fromPromise<number, Error>(
         Promise.reject(new Error('down')),
@@ -23,7 +23,7 @@ if (import.meta.vitest !== undefined) {
 
       await vi.advanceTimersByTimeAsync(0);
 
-      assert.isTrue(Result.isErr(failed.peek() ?? Result.ok(0)));
+      assert.isTrue(Result.isErr(failed.getSnapshot() ?? Result.ok(0)));
 
       // embed-sample-code-ignore-below
     } finally {
