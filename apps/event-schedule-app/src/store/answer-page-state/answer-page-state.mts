@@ -27,7 +27,12 @@ import {
 import { DateUtils } from 'ts-fortress-types';
 import type { DeepReadonly, ReadonlyRecord, StrictPick } from 'ts-type-forge';
 import type { Api } from '../../api/index.mjs';
-import { datetimeRange2str, dict, routes } from '../../constants/index.mjs';
+import {
+  datetimeRange2str,
+  defaultIconPoint,
+  dict,
+  routes,
+} from '../../constants/index.mjs';
 import {
   answerSelectionReducer,
   datetimeRangeFromMapKey,
@@ -91,7 +96,7 @@ export const createAnswerPageStore = (deps: AnswerPageDeps): AnswerPage => {
               ({
                 datetimeRange: d,
                 iconId: 'none',
-                point: 0,
+                point: defaultIconPoint.none,
                 comment: '',
               }) as const,
           ),
@@ -248,7 +253,11 @@ export const createAnswerPageStore = (deps: AnswerPageDeps): AnswerPage => {
         Arr.concat(
           datetimeRangeList.map((d) => [
             d,
-            { iconId: 'none', point: 0, comment: '' } as const,
+            {
+              iconId: 'none',
+              point: defaultIconPoint.none,
+              comment: '',
+            } as const,
           ]),
           selection.map((s) => [s.datetimeRange, s]),
         );
@@ -604,6 +613,7 @@ export const createAnswerPageStore = (deps: AnswerPageDeps): AnswerPage => {
               type: 'header',
               icon: 'good',
               datetimeRangeList: eventSchedule.datetimeRangeList,
+              fairPoint: eventSchedule.answerIcons.fair.point,
             });
           },
         },
@@ -614,6 +624,7 @@ export const createAnswerPageStore = (deps: AnswerPageDeps): AnswerPage => {
               type: 'header',
               icon: 'fair',
               datetimeRangeList: eventSchedule.datetimeRangeList,
+              fairPoint: eventSchedule.answerIcons.fair.point,
             });
           },
         },
@@ -624,6 +635,7 @@ export const createAnswerPageStore = (deps: AnswerPageDeps): AnswerPage => {
               type: 'header',
               icon: 'poor',
               datetimeRangeList: eventSchedule.datetimeRangeList,
+              fairPoint: eventSchedule.answerIcons.fair.point,
             });
           },
         },
@@ -659,7 +671,7 @@ export const createAnswerPageStore = (deps: AnswerPageDeps): AnswerPage => {
                   answerSelectionMap.get(d),
                 ) ?? {
                   iconId: 'none',
-                  point: 0,
+                  point: defaultIconPoint.none,
                   comment: '',
                 },
                 buttons: {
@@ -670,6 +682,7 @@ export const createAnswerPageStore = (deps: AnswerPageDeps): AnswerPage => {
                         type: 'cell-icon',
                         datetimeRange: d,
                         icon: 'good',
+                        fairPoint: eventSchedule.answerIcons.fair.point,
                       });
                     },
                   },
@@ -680,6 +693,7 @@ export const createAnswerPageStore = (deps: AnswerPageDeps): AnswerPage => {
                         type: 'cell-icon',
                         datetimeRange: d,
                         icon: 'fair',
+                        fairPoint: eventSchedule.answerIcons.fair.point,
                       });
                     },
                   },
@@ -690,6 +704,7 @@ export const createAnswerPageStore = (deps: AnswerPageDeps): AnswerPage => {
                         type: 'cell-icon',
                         datetimeRange: d,
                         icon: 'poor',
+                        fairPoint: eventSchedule.answerIcons.fair.point,
                       });
                     },
                   },
