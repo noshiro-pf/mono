@@ -137,6 +137,35 @@ describe(createAppRouter, () => {
     assert.strictEqual(router.editPageLeaves$.getSnapshot().value, 2);
   });
 
+  test('a visit lasts until the page shown changes', () => {
+    const browser = createMemoryBrowser('https://example.com/event/abc/');
+
+    const router = createAppRouter(browser);
+
+    const isCurrent = router.trackVisit();
+
+    // The same page with another query is the same visit.
+    router.replace(
+      routes.event.answer.href(
+        { eventId: 'abc' },
+        { search: { 'sort-by': 'score' } },
+      ),
+    );
+
+    assert.isTrue(isCurrent());
+
+    router.push(routes.create.href());
+
+    assert.isFalse(isCurrent());
+
+    // Coming back is another visit.
+    router.push(routes.event.answer.href({ eventId: 'abc' }));
+
+    assert.isFalse(isCurrent());
+
+    assert.isTrue(router.trackVisit()());
+  });
+
   test('the whole URL of a page is on the origin the app is open at', () => {
     const router = createAppRouter(
       createMemoryBrowser('https://schedule.example:8080/create/?x=1'),

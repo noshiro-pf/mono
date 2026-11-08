@@ -39,7 +39,10 @@ export type RegisterPageDeps<User> = Readonly<{
    * reports no change.
    */
   auth: Readonly<{ emitAuthStateChange: () => void }>;
-  router: StrictPick<AppRouter, 'isActive' | 'pageToBack$' | 'replace'>;
+  router: StrictPick<
+    AppRouter,
+    'isActive' | 'pageToBack$' | 'replace' | 'trackVisit'
+  >;
   /** Registering waits while a Google sign-in is under way. */
   googleSignIn: StrictPick<GoogleSignIn, 'googleSignInButtonDisabledState'>;
   /** Where the page says whether it went through. */
@@ -123,12 +126,22 @@ export const createRegisterPageStore = <User,>(
       return;
     }
 
+    // A visit already left has no form to answer in and no page to leave. The
+    // account, once made, is still finished and said to be made.
+    const isCurrent = deps.router.trackVisit();
+
     const createUserResult = await deps.api.auth.createUser(
       s.email.inputValue,
       s.password.password.inputValue,
     );
 
     if (Result.isErr(createUserResult)) {
+      if (!isCurrent()) {
+        console.error(createUserResult.value);
+
+        return;
+      }
+
       switch (createUserResult.value.code) {
         case 'auth/invalid-email':
           dispatch({
@@ -183,23 +196,29 @@ export const createRegisterPageStore = <User,>(
       // TODO: use toast
       console.error(updateProfileResult.value);
 
-      dispatch({
-        type: 'setUsernameError',
-        payload: updateProfileResult.value.message,
-      });
+      if (isCurrent()) {
+        dispatch({
+          type: 'setUsernameError',
+          payload: updateProfileResult.value.message,
+        });
+      }
 
       return;
     }
 
     deps.auth.emitAuthStateChange();
 
-    dispatch({ type: 'done' });
-
     showToast({
       toast: deps.toast,
       message: dc.message.success.register,
       intent: 'success',
     });
+
+    if (!isCurrent()) {
+      return;
+    }
+
+    dispatch({ type: 'done' });
 
     if (pageToBack !== undefined) {
       deps.router.replace(pageToBack);

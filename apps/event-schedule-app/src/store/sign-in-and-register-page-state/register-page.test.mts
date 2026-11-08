@@ -62,6 +62,66 @@ describe(createRegisterPageStore, () => {
 
     assert.deepStrictEqual(calls, []);
   });
+
+  // #3415: the account is made, but the page left belongs to no form.
+  test('after leaving and coming back while registering, finishes the account and navigates nowhere', async () => {
+    const pending = Promise.withResolvers<RegisterAnswer>();
+
+    const { store, router, browser, calls } = setup(() => pending.promise);
+
+    fill(store);
+
+    store.enterClickHandler();
+
+    await settle();
+
+    router.push(routes.create.href());
+
+    router.push(routes.register.href());
+
+    pending.resolve(Result.ok({ user: { uid: 'u1' } }));
+
+    await settle();
+
+    assert.deepStrictEqual(calls, [
+      'createUser alice@example.com',
+      'displayName u1 alice',
+      'sendEmailVerification u1',
+      'emitAuthStateChange',
+    ]);
+
+    assert.strictEqual(browser.url().pathname, '/register/');
+
+    assert.isFalse(store.state.getSnapshot().value.formState.isWaitingResponse);
+  });
+
+  test('after leaving and coming back while registering, an error sets no field', async () => {
+    const pending = Promise.withResolvers<RegisterAnswer>();
+
+    const { store, router } = setup(() => pending.promise);
+
+    fill(store);
+
+    store.enterClickHandler();
+
+    await settle();
+
+    router.push(routes.create.href());
+
+    router.push(routes.register.href());
+
+    pending.resolve(
+      Result.err({ code: 'auth/email-already-in-use', message: '' }),
+    );
+
+    await settle();
+
+    const { formState } = store.state.getSnapshot().value;
+
+    assert.isUndefined(formState.email.error);
+
+    assert.strictEqual(formState.email.inputValue, '');
+  });
 });
 
 const fill = (store: RegisterPage): void => {
@@ -78,14 +138,17 @@ type FakeUser = Readonly<{ uid: string }>;
 
 type AuthError = Readonly<{ code: string; message: string }>;
 
+type RegisterAnswer = Result<Readonly<{ user: FakeUser }>, AuthError>;
+
 type Setup = Readonly<{
   store: RegisterPage;
+  router: ReturnType<typeof createAppRouter>;
   browser: ReturnType<typeof createMemoryBrowser>;
   calls: readonly string[];
 }>;
 
 const setup = (
-  answer: () => Result<Readonly<{ user: FakeUser }>, AuthError>,
+  answer: () => RegisterAnswer | Promise<RegisterAnswer>,
 ): Setup => {
   const browser = createMemoryBrowser('https://example.com/event/abc/');
 
@@ -129,7 +192,7 @@ const setup = (
     toast: Promise.resolve(fakeToaster),
   });
 
-  return { store, browser, calls: mut_calls } as const;
+  return { store, router, browser, calls: mut_calls } as const;
 };
 
 const fakeToaster: Toaster = {

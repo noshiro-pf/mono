@@ -13,7 +13,7 @@ export type GoogleSignInDeps = Readonly<{
       googleSignInWithPopup: () => Promise<Result<unknown, unknown>>;
     }>;
   }>;
-  router: StrictPick<AppRouter, 'pageToBack$' | 'replace'>;
+  router: StrictPick<AppRouter, 'pageToBack$' | 'replace' | 'trackVisit'>;
   /** Where the page says whether it went through. */
   toast: Promise<Toaster>;
 }>;
@@ -42,9 +42,25 @@ export const createGoogleSignInStore = (
   ): Promise<void> => {
     disableGoogleSignInButton();
 
+    const isCurrent = deps.router.trackVisit();
+
     const signInResult = await deps.api.auth.googleSignInWithPopup();
 
     enableGoogleSignInButton();
+
+    // A visit already left has no page to leave: a success still says so, and a
+    // failure is not said on a page that did not ask.
+    if (!isCurrent()) {
+      if (Result.isOk(signInResult)) {
+        showToast({
+          toast: deps.toast,
+          message: dc.message.success.signIn,
+          intent: 'success',
+        });
+      }
+
+      return;
+    }
 
     if (Result.isErr(signInResult)) {
       showToast({
