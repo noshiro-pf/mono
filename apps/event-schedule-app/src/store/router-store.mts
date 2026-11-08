@@ -3,6 +3,7 @@ import {
   filter,
   map,
   scan,
+  skipIfNoChange,
   type InitializedObservable,
   type Observable as SynstateObservable,
 } from 'synstate';
@@ -46,9 +47,23 @@ export const createAppRouter = (browser?: RouterBrowser): AppRouter => {
     return url.href;
   };
 
+  // Counts each change of the page shown, its path, not its query: a visit
+  // lasts while this stays the same.
+  const pageChanges$ = router.location
+    .pipe(map((location) => location.pathname))
+    .pipe(skipIfNoChange())
+    .pipe(scan((count: number) => count + 1, 0));
+
+  const trackVisit = (): (() => boolean) => {
+    const visit = pageChanges$.getSnapshot().value;
+
+    return () => pageChanges$.getSnapshot().value === visit;
+  };
+
   return {
     ...router,
     pageToBack$,
+    trackVisit,
     absoluteUrlOf,
     eventId$: router
       .at(routes.event.answer)
@@ -72,6 +87,12 @@ export type AppRouter = Router<typeof routes> &
      * names no page is not one to return to.
      */
     pageToBack$: SynstateObservable<Href>;
+    /**
+     * Taken when a request starts on a page: whether that visit lasts, the page
+     * shown neither left nor left and opened again since. An answer that comes
+     * back after it ended is for a page no longer there.
+     */
+    trackVisit: () => () => boolean;
     /** The whole URL of a page, to copy and share. */
     absoluteUrlOf: (href: Href) => string;
     eventId$: InitializedObservable<string | undefined>;

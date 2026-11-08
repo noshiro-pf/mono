@@ -30,7 +30,10 @@ export type SignInPageDeps = Readonly<{
       >;
     }>;
   }>;
-  router: StrictPick<AppRouter, 'isActive' | 'pageToBack$' | 'replace'>;
+  router: StrictPick<
+    AppRouter,
+    'isActive' | 'pageToBack$' | 'replace' | 'trackVisit'
+  >;
   /** Signing in waits while a Google sign-in is under way. */
   googleSignIn: StrictPick<GoogleSignIn, 'googleSignInButtonDisabledState'>;
   /** Where the page says whether it went through. */
@@ -100,10 +103,28 @@ export const createSignInPageStore = (deps: SignInPageDeps): SignInPage => {
       return;
     }
 
+    const isCurrent = deps.router.trackVisit();
+
     const signInResult = await deps.api.auth.signIn(
       s.email.inputValue,
       s.password.inputValue,
     );
+
+    // A visit already left has no form to answer in and no page to leave: a
+    // success still says so, and an error is only logged.
+    if (!isCurrent()) {
+      if (Result.isOk(signInResult)) {
+        showToast({
+          toast: deps.toast,
+          message: dc.message.success.signIn,
+          intent: 'success',
+        });
+      } else {
+        console.error(signInResult.value);
+      }
+
+      return;
+    }
 
     if (Result.isErr(signInResult)) {
       switch (credentialErrorOf(signInResult.value.code)) {

@@ -32,6 +32,36 @@ describe(createGoogleSignInStore, () => {
     assert.strictEqual(toasts.count(), 1);
   });
 
+  // #3415: the popup may stay open while the user goes elsewhere.
+  test('after leaving and coming back while the popup is open, a success navigates nowhere', async () => {
+    const { browser, router, toasts } = routerAt(routes.signIn.href());
+
+    const popup = Promise.withResolvers<Result<unknown, unknown>>();
+
+    const store = createGoogleSignInStore({
+      api: { auth: { googleSignInWithPopup: () => popup.promise } },
+      router,
+      toast: Promise.resolve(toasts.toaster),
+    });
+
+    store.googleSignInClickHandler();
+
+    router.push(routes.create.href());
+
+    router.push(routes.signIn.href());
+
+    popup.resolve(Result.ok(undefined));
+
+    await settle();
+
+    assert.strictEqual(browser.url().pathname, '/signIn/');
+
+    assert.isFalse(store.googleSignInButtonDisabledState.getSnapshot().value);
+
+    // Signed in all the same.
+    assert.strictEqual(toasts.count(), 1);
+  });
+
   test('stays and says so when it fails', async () => {
     const { browser, router, toasts } = routerAt(routes.signIn.href());
 
@@ -84,6 +114,40 @@ describe(createResetPasswordPageStore, () => {
     assert.deepStrictEqual(mut_sent, ['alice@example.com']);
 
     assert.strictEqual(browser.url().pathname, '/event/abc/');
+  });
+
+  // #3415: a slow answer for a visit already left belongs to no form.
+  test('after leaving and coming back while sending, navigates nowhere and sets no field', async () => {
+    const { browser, router, toasts } = routerAt(routes.signIn.href());
+
+    const pending =
+      Promise.withResolvers<
+        Result<undefined, Readonly<{ code: string; message: string }>>
+      >();
+
+    const store = createResetPasswordPageStore({
+      api: { auth: { sendPasswordResetEmail: () => pending.promise } },
+      router,
+      toast: Promise.resolve(toasts.toaster),
+    });
+
+    store.inputEmailHandler('alice@example.com');
+
+    store.enterClickHandler();
+
+    await settle();
+
+    router.push(routes.create.href());
+
+    router.push(routes.signIn.href());
+
+    pending.resolve(Result.ok(undefined));
+
+    await settle();
+
+    assert.strictEqual(browser.url().pathname, '/signIn/');
+
+    assert.isFalse(store.state.getSnapshot().value.formState.isWaitingResponse);
   });
 
   test('says when no such user exists, and stays', async () => {

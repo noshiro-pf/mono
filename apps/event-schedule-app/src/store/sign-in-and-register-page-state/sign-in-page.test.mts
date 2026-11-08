@@ -124,6 +124,51 @@ describe(createSignInPageStore, () => {
     assert.strictEqual(toasts.count, 1);
   });
 
+  // #3415: a slow answer for a visit already left belongs to no form.
+  test.each([
+    {
+      name: 'a success navigates nowhere',
+      answer: Result.ok({}),
+    },
+    {
+      name: 'an error sets no field',
+      answer: Result.err({ code: 'auth/wrong-password', message: '' }),
+    },
+  ] as const)(
+    'after leaving and coming back while signing in, $name',
+    async ({ answer }) => {
+      const pending = Promise.withResolvers<SignInAnswer>();
+
+      const { store, router, browser } = setup(() => pending.promise);
+
+      fill(store);
+
+      store.enterClickHandler();
+
+      await settle();
+
+      router.push(routes.create.href());
+
+      router.push(routes.signIn.href());
+
+      store.inputEmailHandler('alicia@example.com');
+
+      pending.resolve(answer);
+
+      await settle();
+
+      assert.strictEqual(browser.url().pathname, '/signIn/');
+
+      const { formState } = store.state.getSnapshot().value;
+
+      assert.strictEqual(formState.email.inputValue, 'alicia@example.com');
+
+      assert.isUndefined(formState.password.error);
+
+      assert.isFalse(formState.isWaitingResponse);
+    },
+  );
+
   test('does nothing while the form has an error', async () => {
     const { store, calls } = setup(() => Result.ok({}));
 
@@ -167,8 +212,14 @@ const fill = (store: SignInPage): void => {
   store.inputPasswordHandler('password123');
 };
 
+type SignInAnswer = Result<
+  unknown,
+  Readonly<{ code: string; message: string }>
+>;
+
 type Setup = Readonly<{
   store: SignInPage;
+  router: ReturnType<typeof createAppRouter>;
   browser: ReturnType<typeof createMemoryBrowser>;
   calls: readonly string[];
   toasts: Readonly<{ count: number }>;
@@ -185,9 +236,7 @@ const fakeToaster = (onShow: () => number): Toaster =>
     remove: () => undefined,
   }) as const;
 
-const setup = (
-  answer: () => Result<unknown, Readonly<{ code: string; message: string }>>,
-): Setup => {
+const setup = (answer: () => SignInAnswer | Promise<SignInAnswer>): Setup => {
   const browser = createMemoryBrowser('https://example.com/event/abc/');
 
   const router = createAppRouter(browser);
@@ -224,6 +273,7 @@ const setup = (
 
   return {
     store,
+    router,
     browser,
     calls: mut_calls,
     toasts: mut_toasts,

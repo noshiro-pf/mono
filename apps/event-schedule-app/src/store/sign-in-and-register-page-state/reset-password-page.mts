@@ -16,7 +16,10 @@ import type { AppRouter } from '../router-store.mjs';
 
 export type ResetPasswordPageDeps = Readonly<{
   api: Readonly<{ auth: StrictPick<Api['auth'], 'sendPasswordResetEmail'> }>;
-  router: StrictPick<AppRouter, 'isActive' | 'pageToBack$' | 'replace'>;
+  router: StrictPick<
+    AppRouter,
+    'isActive' | 'pageToBack$' | 'replace' | 'trackVisit'
+  >;
   /** Where the page says whether it went through. */
   toast: Promise<Toaster>;
 }>;
@@ -68,8 +71,26 @@ export const createResetPasswordPageStore = (
       return;
     }
 
+    const isCurrent = deps.router.trackVisit();
+
     const sendPasswordResetEmailResult =
       await deps.api.auth.sendPasswordResetEmail(s.email.inputValue);
+
+    // A visit already left has no form to answer in and no page to leave: a
+    // success still says so, and an error is only logged.
+    if (!isCurrent()) {
+      if (Result.isOk(sendPasswordResetEmailResult)) {
+        showToast({
+          toast: deps.toast,
+          message: dc.message.success.sendPasswordResetEmail,
+          intent: 'success',
+        });
+      } else {
+        console.error(sendPasswordResetEmailResult.value);
+      }
+
+      return;
+    }
 
     if (Result.isErr(sendPasswordResetEmailResult)) {
       switch (sendPasswordResetEmailResult.value.code) {
