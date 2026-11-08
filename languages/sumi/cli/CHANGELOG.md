@@ -1,5 +1,14 @@
 # @sumi-lang/cli
 
+## 0.1.11
+
+### Patch Changes
+
+- Updated dependencies [931ba22]
+    - ts-data-forge@14.13.0
+    - @sumi-lang/oxlint-config@0.1.11
+    - @sumi-lang/checker@0.0.12
+
 ## 0.1.10
 
 ### Patch Changes

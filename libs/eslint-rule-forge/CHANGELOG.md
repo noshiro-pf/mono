@@ -1,5 +1,13 @@
 # eslint-rule-forge
 
+## 0.9.0
+
+### Minor Changes
+
+- b0c7efb: New `asNode(node)`: a `DeepReadonly` node typed as the mutable node it is, for an ESLint or typescript-eslint API that declares a mutable parameter and only reads it, so that a rule does not carry a cast of its own.
+- 00010f5: New `mayHaveEffect(node, sourceCode)`: `ASTUtils.hasSideEffect` plus what it leaves out — a tagged template, which calls its tag, and a spread into an array or arguments, which runs an iterator — without looking into a function's body, for a fix that moves or drops an expression.
+- 72f799b: `buildCalleeResolver` resolves a default import (`import d from 'm'`, `d(…)`) to the export `default`, and the `ResolvedCallee` it returns carries `bindingNode`, the identifier whose binding decides what is called: the callee, or the namespace object. `ResolvedCallee` gains that field as a required one, so code that builds one itself has to supply it. The new `isShadowedCallee(sourceCode, resolved, moduleNames)` says whether that identifier is bound to something other than an import from `moduleNames` where the call is made, and `hasForeignBinding` takes several module names too.
+
 ## 0.8.0
 
 ### Minor Changes

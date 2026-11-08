@@ -1,5 +1,23 @@
 # pr-report-core
 
+## 0.5.0
+
+### Minor Changes
+
+- 60ab844: `unblock-prs` reads which check runs carry the "command failed" annotation from the run GitHub answers for each name, through `pr-report-core`'s new `winningRuns`. `z:ci-job` prints that annotation as a notice, so that problem matchers spending a step's ten error annotations cannot drop it, and names the step that exited non-zero, a failed build included.
+- 15bbead: `codeOwnersEnforcedBy` now reads only the file's head, the comments before its first rule, as the file and the check describe it: an `# enforced-by:` line after a rule no longer counts. `codeOwnerReviewOf` gives the code-owner half of `reviewHold` on its own, and `reviewHold` takes it precomputed. `namesEveryChangedPath` says whether GraphQL's changed files name every path (a rename or copy hides its old one), and `unblock-prs` and the Pull Requests Manager count a pull request with one as not fully read; `codeOwnerReview` still settles such a read where every rule's owners have approved. `unblock-prs` holds a red check that enforces `CODEOWNERS` when the review read cannot judge it instead of re-running it, reads failing pull requests' reviews only where `CODEOWNERS` names a required check, and names the `CODEOWNERS` a regeneration is judged by — the default branch's — apart from the branch it rebases onto.
+- 9e92857: Support a `CODEOWNERS` file enforced by a required check instead of the ruleset's `require_code_owner_review`. `codeOwnersEnforcedBy` reads the `# enforced-by: <context>` line, `codeOwnerGate` says which of the two enforces the file, and `codeOwnerReview`'s `authorApproves` and `ReviewRules.codeOwnerGate` count the author as approving the paths they own there. `unblock-prs` holds someone else's pull request until an owner approves it, re-runs the failed check after the approval, and its auto-fix no longer pushes a fix that changes a path `CODEOWNERS` owns.
+- 85e4ba4: `codeOwnerReview` takes `pushers`, who pushed to the pull request's branch: under a check that enforces `CODEOWNERS`, the author stands for a path they own only where everyone who pushed owns it too. `pushersOf` reads them from the repository's activity on the branch, or answers `'unknown'` where the chain of pushes does not reach the head. `unblock-prs` reads who pushed to a pull request failing only that check, and sets aside one only a bypass can merge (`checks-failed`) rather than re-running the check.
+- beff847: `unblock-prs` keeps a `rebase-failed` set-aside across a move of the default branch while the branch still conflicts, updating only the base its comment records, so that the owner stays `skill` and `claim-pr` succeeds. It clears the set-aside only once the conflict is gone. `pr-report-core` gains `moveSetAsideBase`.
+- 05aa7ba: Hold back the red of an earlier attempt while "Re-run failed jobs" runs its workflow run again, read from REST's `run_started_at` and shared by `unblock-prs` and `pr-report` (`isOfEarlierAttempt`, `readWorkflowRound`, `readWorkflowRounds`), for at most 40 minutes after the attempt began.
+- eeaeeda: `pr-report-core` exports `REVIEW_SECTION_HEADING`, `CLAUDE_SESSION_LINE` and `isDeclarationLine`, so that `pr-description` guards a body with the patterns its parsers read it by rather than copies of them.
+
+### Patch Changes
+
+- Updated dependencies [931ba22]
+    - ts-data-forge@14.13.0
+    - ts-fortress@12.4.6
+
 ## 0.4.1
 
 ### Patch Changes

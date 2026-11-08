@@ -1,5 +1,19 @@
 # synstate-dom-benchmark
 
+## 0.0.13
+
+### Patch Changes
+
+- Updated dependencies [fef212d]
+- Updated dependencies [72bb513]
+- Updated dependencies [60fe319]
+- Updated dependencies [c9df77c]
+- Updated dependencies [5f66da0]
+    - synstate-dom@0.9.0
+    - synstate@8.0.0
+    - synstate-dom-next@0.0.0
+    - synstate-next@0.0.0
+
 ## 0.0.12
 
 ### Patch Changes

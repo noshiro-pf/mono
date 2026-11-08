@@ -1,5 +1,15 @@
 # react-utils-styled
 
+## 0.0.31
+
+### Patch Changes
+
+- Updated dependencies [931ba22]
+    - ts-data-forge@14.13.0
+    - react-utils@0.0.31
+    - resize-observer-react-hooks@0.0.17
+    - better-react-use-state@1.0.1
+
 ## 0.0.30
 
 ### Patch Changes
