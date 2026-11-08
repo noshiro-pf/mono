@@ -41,14 +41,9 @@ on:
       - labeled
       - unlabeled
 
+  # No inputs: the queue dispatches each layer it stacks with none (see
+  # "Triggers" in README.md and `check:root:dispatch-inputs`).
   workflow_dispatch:
-    # See "Triggers" in README.md: the queue dispatches each layer it stacks
-    # without `diff-parent`, so that it is judged against `origin/main`.
-    inputs:
-      diff-parent:
-        description: Diff the commit against its parent, as a stacked pull request is judged; such a run leaves no verdict to reuse.
-        type: boolean
-        default: false
 
 concurrency:
   group: ${{ github.workflow }}-${{ case(github.event_name == 'pull_request', github.event.pull_request.number, github.event_name == 'push', github.sha, github.ref) }}

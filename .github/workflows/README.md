@@ -110,14 +110,13 @@ on:
   because a dispatch's concurrency group is its ref: a second dispatch on one
   branch cancels the first. The prefix is reserved for the queue by
   `repo-settings/rulesets/queue-branches.json` (and kept free of tags by
-  `queue-tags.json`). The one input, `diff-parent`, diffs the commit against its
-  parent instead, judging it as a stacked pull request is; the queue does not
-  set it, and a run with it set leaves no verdict to reuse, since nothing says
-  the parent was ever checked. Unset, as from the Actions tab or the queue, the
-  gate diffs as it always has: on `main` it runs everything, elsewhere against
-  `origin/main`. On a `queue/*` branch the codemod and the `check:prose` guards
-  diff against `origin/main` too, as for a pull request; on any other manual run
-  the codemod runs in full and the guards compare the tree with itself.
+  `queue-tags.json`). The check workflows take no input
+  (`check:root:dispatch-inputs`). The gate diffs a manual run as it always has:
+  on `main` it runs everything, elsewhere against `origin/main`. On a `queue/*`
+  branch the codemod and the `check:prose` guards diff against `origin/main`
+  too, as for a pull request; on any other manual run the codemod runs in full
+  and the guards compare the tree with itself, so such a run leaves no verdict
+  to reuse (see "Reusing a verdict").
 - **No `paths` filter.** A workflow a path filter skips reports no status at
   all, and a required context that never arrives blocks the merge forever.
   The diff question is answered by the gate, after the workflow has started.
@@ -474,15 +473,14 @@ few days here, matched on the runs API's `head_commit.tree_id`. A matching run
 further back is not found and the checks simply run, as they do the first time a
 tree is seen.
 
-A run with `diff-parent` set assumes the parent is green, as a pull request
-diffed against `main` assumes `main` is. A workflow its commit does not reach
-leaves no verdict (its aggregate is skipped); what does depend on the base is a
-check inside a workflow that runs and reads only the diff —
+A check inside a workflow that runs and reads only the diff —
 `fix:codemod:affected`, and the `check:prose` guards that read a change
-(`markdown-wrap`, `next-major`) — whose green says nothing of the parent. The
-gate records no verdict of such a run as reusable, and the queue sets no
-`diff-parent`, so its layers' verdicts need no such care, and it deletes none of
-them (`unblock-prs`, step 3b in
+(`markdown-wrap`, `next-major`) — judges the tree only as far as its base lets
+it. A manual run on a branch other than a queue layer's compares the guards'
+tree with itself, so they pass whatever changed, and the gate records its
+verdict as not reusable. A queue layer's runs diff against `origin/main`, as a
+pull request's do, so its verdicts need no such care, and the queue deletes none
+of them (`unblock-prs`, step 3b in
 `libs/pr-merge-queue/src/unblock-prs/README.md`).
 
 **A verdict has to be a function of the tree.** That is what makes reusing it
@@ -511,6 +509,9 @@ Deliberately not reused:
   `pull_requests` cannot say it, since it describes the pull requests open
   on that head now, after any retargeting, and is empty once they close. A
   run from before the step existed recorded nothing and is not reused;
+- a manual run on any branch but a queue layer's `queue/*`, `main` included:
+  its `check:prose` guards compare the tree with itself, so its green is not a
+  whole verdict. The same step name records it;
 - anything when this is a re-run (`run_attempt` > 1) or a
   `workflow_dispatch`. "Re-run all jobs" and `workflow_dispatch` are how a
   person asks for the checks to actually run. "Re-run failed jobs" is not

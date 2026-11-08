@@ -35,9 +35,8 @@ import { projectRootPath } from '../project-root-path.mjs';
  * globs.
  *
  * The base is `CODEMOD_DIFF_BASE`, which `code-check.yml` sets to the base of
- * the pull request (the commit before the push on `main`, `HEAD^` for a run
- * dispatched with `diff-parent`, `origin/main` for a queue layer on a `queue/*`
- * branch) and fetches. Set and empty, as on any other manual run, it means "no
+ * the pull request (the commit before the push on `main`, `origin/main` for a
+ * queue layer on a `queue/*` branch) and fetches. Set and empty, as on any other manual run, it means "no
  * base": everything is run. Unset, as on a local run, it is the merge base of
  * `HEAD` and `origin/main`. A base that is not in the clone is an error rather
  * than an empty change, which would pass.

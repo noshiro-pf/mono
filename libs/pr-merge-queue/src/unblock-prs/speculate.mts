@@ -1035,7 +1035,7 @@ const dispatch = async (
 ): Promise<Result<unknown, string>> =>
   // A path segment as it stands: `configOf` holds it to a file name.
   rest(api, 'POST', `/actions/workflows/${workflow}/dispatches`, t.unknown(), {
-    // No `diff-parent`: the run diffs against `main`, as a pull request's does,
-    // so that its verdict is a whole one about the tree.
+    // No inputs: on a `queue/*` branch the run diffs against `main`, as a pull
+    // request's does, so that its verdict is a whole one about the tree.
     body: { ref: layerBranch(number) },
   });
