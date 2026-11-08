@@ -24,6 +24,29 @@ if (import.meta.vitest !== undefined) {
 
     assert.deepStrictEqual(mut_seen, [30, 80]);
 
+    // `inclusive` passes the value that ends it too, and is settled by the time
+    // a subscriber receives it.
+    const [step, advance] = createValueEmitter<number>();
+
+    const steps = step.pipe(takeWhile((p) => p < 3, { inclusive: true }));
+
+    const mut_steps: (readonly [number, boolean])[] = [];
+
+    steps.subscribe((p) => {
+      mut_steps.push([p, steps.settled]);
+    });
+
+    advance(1);
+
+    advance(3);
+
+    advance(1);
+
+    assert.deepStrictEqual(mut_steps, [
+      [1, false],
+      [3, true],
+    ]);
+
     // embed-sample-code-ignore-below
   });
 }

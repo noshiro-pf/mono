@@ -407,7 +407,7 @@ describe('custom operators and sources', () => {
           ctx.set(main.getSnapshot() ?? 0);
         }
       },
-      settled: () => ctx.settled(main),
+      settled: () => main.settled,
     }));
 
     other.emit(0);
@@ -488,7 +488,7 @@ const delay = (src: Observable<number>, ms: number): Observable<number> =>
 
     return {
       // A value is still due while a timer runs.
-      settled: () => mut_timers.size === 0 && ctx.settled(src),
+      settled: () => mut_timers.size === 0 && src.settled,
       update: () => {
         const v = src.getSnapshot();
 

@@ -6,14 +6,18 @@ import { directive } from 'micromark-extension-directive';
 import { mdxjs } from 'micromark-extension-mdxjs';
 import { createHash } from 'node:crypto';
 import { Arr, hasKey, isRecord, Result } from 'ts-data-forge';
-import type { DeepReadonly } from 'ts-type-forge';
+import type {
+  DeepReadonly,
+  NonEmptyTuple,
+  ReadonlyRecord,
+} from 'ts-type-forge';
+import ts from 'typescript';
 import * as YAML from 'yaml';
 
 /**
- * The JSDoc of the declaration `export const|function|class name`, as Markdown
- * for an MDX page: the leading `*` stripped, any code fence left out (the
- * page's own example shows the API) and each paragraph on one line, as the
- * pages are written.
+ * The JSDoc of the exported declaration `name`, as Markdown for an MDX page:
+ * the leading `*` stripped, any code fence left out (the page's own example
+ * shows the API) and each paragraph on one line, as the pages are written.
  *
  * Each paragraph is parsed as the page will be (MDX, with the directives
  * Starlight reads), and is refused unless it is one paragraph of text, code
@@ -25,13 +29,34 @@ export const extractJsdoc = (
   source: string,
   name: string,
 ): Result<string, string> => {
-  // eslint-disable-next-line security/detect-non-literal-regexp
-  const pattern = new RegExp(
-    String.raw`/\*\*((?:(?!/\*\*)[\s\S])*?)\*/\s*\n(?:export (?:const|function|class) ${name}\b)`,
-    'u',
-  );
+  const declarations = exportedDeclarations(source, name);
 
-  const body = pattern.exec(source)?.[1];
+  if (Arr.isEmpty(declarations)) {
+    return Result.err(
+      'has no exported declaration in its file: check the name and file in reference-pages.mts, or write `export` on the declaration (an `export { name }` list is not read)',
+    );
+  }
+
+  const bodies = Arr.generate(function* () {
+    for (const { jsdoc } of declarations) {
+      if (jsdoc !== undefined) {
+        yield jsdoc;
+      }
+    }
+  });
+
+  // Overloads that carry JSDoc (an editor shows the one a call resolves to)
+  // must say the same, since the page shows the first. One with none is
+  // allowed: `filter` and `createDerived` document their first only.
+  const distinct = new Set(bodies);
+
+  if (distinct.size > 1) {
+    return Result.err(
+      'has overloads whose JSDoc differ: keep them the same, since the page shows the first and an editor the one a call resolves to',
+    );
+  }
+
+  const body = bodies[0];
 
   const paragraphs = (body ?? '')
     .split('\n')
@@ -155,6 +180,138 @@ export const setDescription = (
 export const textVersion = (text: string): string =>
   createHash('sha256').update(text).digest('hex').slice(0, 12);
 
+/**
+ * The kinds of operator the exported declarations of `name` return, in the
+ * order written: a function's overload signatures when it has them (the
+ * implementation's union only repeats them), its one signature otherwise, or
+ * the return type of the function a `const` holds, through parentheses, `as`,
+ * `satisfies`, `<T>` and `!` around it. Every member of a union return type
+ * counts; a type alias is not followed.
+ */
+export const extractOperatorKinds = (
+  source: string,
+  name: string,
+): readonly OperatorKind[] => {
+  const nodes = exportedDeclarations(source, name).map(({ node }) => node);
+
+  const functions = nodes.filter(ts.isFunctionDeclaration);
+
+  const overloads = functions.filter(({ body }) => body === undefined);
+
+  const held = nodes.flatMap((node) => {
+    if (!ts.isVariableDeclaration(node) || node.initializer === undefined) {
+      return [];
+    }
+
+    const initializer = withoutWrappers(node.initializer);
+
+    return ts.isArrowFunction(initializer) ||
+      ts.isFunctionExpression(initializer)
+      ? [initializer]
+      : [];
+  });
+
+  return Arr.uniq(
+    [...(Arr.isNonEmpty(overloads) ? overloads : functions), ...held].flatMap(
+      ({ type }) => (type === undefined ? [] : operatorKindsOf(type)),
+    ),
+  );
+};
+
+/**
+ * What `pipe` gives, for the kinds an export's overloads return: the kind's
+ * sentence for one; for several, one item per kind, after the condition the
+ * page gives for it, and the kind with none last, as what holds otherwise.
+ * `checkOperatorKindConditions` has refused conditions that do not fit.
+ */
+export const operatorKindText = (
+  lang: 'en' | 'ja',
+  sentences: ReadonlyRecord<OperatorKind, string>,
+  kinds: NonEmptyTuple<OperatorKind>,
+  conditions: OperatorKindConditions | undefined,
+): string => {
+  if (conditions === undefined || Arr.isFixedLengthArray(1, kinds)) {
+    return sentences[kinds[0]];
+  }
+
+  const otherwise = lang === 'en' ? 'Otherwise' : 'それ以外は';
+
+  // The kinds with a condition first, in the order written; the one without
+  // last, as what holds otherwise.
+  const ordered = kinds.toSorted(
+    (a, b) =>
+      Number(conditions[a] === undefined) - Number(conditions[b] === undefined),
+  );
+
+  return ordered
+    .map((kind) => {
+      const condition = conditions[kind]?.[lang] ?? otherwise;
+
+      const sentence = sentences[kind];
+
+      // In English the sentence follows the condition after a comma, so its
+      // first letter is lowered (see `operatorKindSentences`).
+      return lang === 'en'
+        ? `- ${condition}, ${sentence.slice(0, 1).toLowerCase()}${sentence.slice(1)}`
+        : `- ${condition}、${sentence}`;
+    })
+    .join('\n');
+};
+
+/**
+ * Why a page's `operatorKindConditions` do not fit the kinds its exports return:
+ * they are given for several kinds only, each for a kind returned, and for all
+ * of them but the one that holds otherwise.
+ */
+export const checkOperatorKindConditions = (
+  slug: string,
+  kinds: readonly OperatorKind[],
+  conditions: OperatorKindConditions | undefined,
+): readonly string[] => {
+  const named =
+    conditions === undefined ? ([] as const) : Object.keys(conditions);
+
+  if (Arr.isMaxLengthArray(1, kinds)) {
+    return Arr.isEmpty(named)
+      ? []
+      : [
+          `${slug} has operatorKindConditions in reference-pages.mts, but what it documents returns ${Arr.isEmpty(kinds) ? 'no operator' : 'one kind of operator'}: remove them.`,
+        ];
+  }
+
+  const strays = named.filter((kind) => kinds.every((k) => k !== kind));
+
+  const missing = kinds.filter((kind) => conditions?.[kind] === undefined);
+
+  const operators = kinds
+    .map((kind) => `${kind}InitialValueOperator`)
+    .join(', ');
+
+  return [
+    ...(Arr.isNonEmpty(strays)
+      ? [
+          `${slug} gives operatorKindConditions for ${strays.join(', ')}, which it does not return: remove them.`,
+        ]
+      : []),
+    ...(Arr.isEmpty(missing)
+      ? [
+          `${slug} gives operatorKindConditions for every kind it returns (${operators}): leave out the one that holds otherwise.`,
+        ]
+      : missing.length > 1
+        ? [
+            `${slug} documents overloads that return ${operators}: give operatorKindConditions in reference-pages.mts for each but the one that holds otherwise.`,
+          ]
+        : []),
+  ];
+};
+
+/** Per kind of operator, the condition under which it holds, in each language. */
+export type OperatorKindConditions = Partial<
+  ReadonlyRecord<OperatorKind, Readonly<{ en: string; ja: string }>>
+>;
+
+export type OperatorKind = 'Drop' | 'Keep' | 'Provide';
+
 const allowedInline: ReadonlySet<Nodes['type']> = new Set<Nodes['type']>([
   'text',
   'inlineCode',
@@ -263,4 +420,105 @@ const parseYaml = (
   } catch {
     return undefined;
   }
+};
+
+/**
+ * The declarations of `name` that `source` exports, in the order written, each
+ * with its JSDoc as TypeScript attaches it: a function's every signature, a
+ * `const`, a class. The JSDoc and the operator kinds are both read from these,
+ * so that they come from the same declarations. The file is parsed for each
+ * call: a page reads a few small files, so caching the tree would buy nothing.
+ */
+const exportedDeclarations = (
+  source: string,
+  name: string,
+): readonly Readonly<{
+  node: ts.ClassDeclaration | ts.FunctionDeclaration | ts.VariableDeclaration;
+  jsdoc: string | undefined;
+}>[] => {
+  const file = ts.createSourceFile(
+    'source.mts',
+    source,
+    ts.ScriptTarget.Latest,
+    // `getJSDocCommentsAndTags` walks up from a `const` to its statement.
+    true,
+  );
+
+  const nodes = file.statements.flatMap(
+    (
+      statement,
+    ): readonly (
+      ts.ClassDeclaration | ts.FunctionDeclaration | ts.VariableDeclaration
+    )[] => {
+      const exported =
+        ts.canHaveModifiers(statement) &&
+        (ts.getModifiers(statement) ?? []).some(
+          ({ kind }) => kind === ts.SyntaxKind.ExportKeyword,
+        );
+
+      return !exported
+        ? []
+        : ts.isFunctionDeclaration(statement) ||
+            ts.isClassDeclaration(statement)
+          ? statement.name?.text === name
+            ? [statement]
+            : []
+          : ts.isVariableStatement(statement)
+            ? statement.declarationList.declarations.filter(
+                (declaration) =>
+                  ts.isIdentifier(declaration.name) &&
+                  declaration.name.text === name,
+              )
+            : [];
+    },
+  );
+
+  return nodes.map((node) => {
+    // The last JSDoc before it, even with a `//` comment between; of a `const`
+    // that declares several, the first one's only. Its text between `/**` and
+    // `*/`.
+    const jsdoc = ts.getJSDocCommentsAndTags(node).filter(ts.isJSDoc).at(-1);
+
+    return {
+      node,
+      jsdoc:
+        jsdoc === undefined
+          ? undefined
+          : source.slice(jsdoc.getStart(file) + 3, jsdoc.end - 2),
+    };
+  });
+};
+
+/**
+ * An expression without the parentheses, `as`, `satisfies`, `<T>` and `!`
+ * around it.
+ */
+const withoutWrappers = (
+  expression: DeepReadonly<ts.Expression>,
+): DeepReadonly<ts.Expression> =>
+  ts.isParenthesizedExpression(expression) ||
+  ts.isAsExpression(expression) ||
+  ts.isSatisfiesExpression(expression) ||
+  ts.isTypeAssertionExpression(expression) ||
+  ts.isNonNullExpression(expression)
+    ? withoutWrappers(expression.expression)
+    : expression;
+
+/** The kinds of operator a return type names: itself, or each union member. */
+const operatorKindsOf = (
+  type: DeepReadonly<ts.TypeNode>,
+): readonly OperatorKind[] => {
+  if (ts.isUnionTypeNode(type)) {
+    return type.types.flatMap(operatorKindsOf);
+  }
+
+  if (!ts.isTypeReferenceNode(type) || !ts.isIdentifier(type.typeName)) {
+    return [];
+  }
+
+  const kind = /^(Keep|Drop|Provide)InitialValueOperator$/u.exec(
+    type.typeName.text,
+  )?.[1];
+
+  return kind === 'Keep' || kind === 'Drop' || kind === 'Provide' ? [kind] : [];
 };

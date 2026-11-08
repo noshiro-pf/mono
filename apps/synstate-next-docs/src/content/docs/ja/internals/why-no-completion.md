@@ -18,12 +18,12 @@ synstate の完了には 4 つの仕事がありました。
 
 ## それぞれの仕事を今は何が担うか
 
-| 仕事                     | synstate                       | synstate-next                                                            |
-| :----------------------- | :----------------------------- | :----------------------------------------------------------------------- |
-| 入力が終わった           | 完了を下へ押し出す             | `settled` を、答えを使う場所で**尋ねる**                                 |
-| グラフの解放             | 完了したノードが離れる         | owner が破棄する。済んだノードは自分で親から離れる                       |
-| 終わりを待つ             | `collectToArray`・`onComplete` | なし。終わる値は Promise で、owner の終わりは `onCleanup`                |
-| 終わりに残った保留中の値 | 完了時の `flush`               | 完了とともになくなった。synstate の `dispose` と同じく、破棄すれば捨てる |
+| 仕事                     | synstate                       | synstate-next                                                                           |
+| :----------------------- | :----------------------------- | :-------------------------------------------------------------------------------------- |
+| 入力が終わった           | 完了を下へ押し出す             | `settled` を、答えを使う場所で**尋ねる**                                                |
+| グラフの解放             | 完了したノードが離れる         | owner が破棄する。済んだノードは自分で親から離れる                                      |
+| 終わりを待つ             | `collectToArray`・`onComplete` | 最後の値と一緒に `settled` を読むか、終わりを値として送る。owner の終わりは `onCleanup` |
+| 終わりに残った保留中の値 | 完了時の `flush`               | 完了とともになくなった。synstate の `dispose` と同じく、破棄すれば捨てる                |
 
 ### owner が寿命
 
@@ -76,6 +76,52 @@ owner.dispose();
 内側の Observable を追いかけるオペレーター（`mergeMap`、済んだリクエストを 1 つ持っているかもしれない `switchMap`）は、それがもう値を流せないことを知る必要が今もあります。各ノードは尋ねられたら `settled` を答えます。ソースなら、破棄されたか、タイマー・Promise・購読が終わったとき。派生ノードなら、破棄されたか、親がすべて settled で、自分自身が待っているもの（`debounce` のタイマー、内側の Observable）がないとき。`mergeMap` は内側の Observable を射影したときと、それが値を流したときに尋ね、settled で、その更新の effect が流した値を読み終えていれば手放します。`createDerived` で書いたオペレーターは、計算し直させた更新より後に値を流すなら、自分の `settled` を用意します（[独自のオペレーターとソース](/mono/synstate-next/ja/guides/custom-operators-and-sources/#非同期のオペレーター)）。
 
 答えを使う場所で尋ねるのは、他の場所に何のコストもかけません。関心のない信号を転送するオペレーターはなく、伝え忘れることもありません。
+
+### 最後の値を見分ける
+
+`settled` はどの Observable にもあるので、購読者も尋ねられます。尋ねるものなので、役に立つのは終わりが値と一緒に来るときです。`take` は最後の値が購読者に届く時点で settled になっていて、`inclusive` を付けた `takeWhile` も、終わりを決めた値を流すので同じです。`inclusive` のない `takeWhile` は、ソースがその時点で settled でない限り、次の値が条件を満たさなくなるまで、その値が最後だと分かりません。そして満たさなかった値は誰にも流しません。これはオペレーターそのもの、または `map` の下にいる購読者についての話です。最後の値を落としうるオペレーター（`filter`）や、後から流すオペレーター（`debounce`、`switchMap`）の下では、最後の値と `settled` がずれることがあります。終わり自体が値を持たないときは、送る側が終わりを値として送ります。iterator の `{ done, value }` や、エラーを運ぶ `Result` と同じ形です。
+
+```tsx
+import { createValueEmitter, takeWhile } from 'synstate-next';
+
+const [progress, report] = createValueEmitter<number>();
+
+// `inclusive` passes the value that ends it, so `settled` is already true
+// when the subscriber receives that value.
+const upload = progress.pipe(takeWhile((p) => p < 100, { inclusive: true }));
+
+const mut_log: string[] = [];
+
+upload.subscribe((p) => {
+    mut_log.push(upload.settled ? `done at ${p}` : `${p}%`);
+});
+
+report(30);
+
+report(100);
+
+report(40);
+
+assert.deepStrictEqual(mut_log, ['30%', 'done at 100']);
+
+// Or the producer sends the end as a value.
+const [transfer, send] =
+    createValueEmitter<
+        Readonly<{ done: false; percent: number } | { done: true }>
+    >();
+
+const mut_transferLog: string[] = [];
+
+transfer.subscribe((t) => {
+    mut_transferLog.push(t.done ? 'done' : `${t.percent}%`);
+});
+
+send({ done: false, percent: 30 });
+
+send({ done: true });
+
+assert.deepStrictEqual(mut_transferLog, ['30%', 'done']);
+```
 
 ## それで省けるもの
 

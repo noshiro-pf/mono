@@ -1,9 +1,12 @@
 import dedent from 'dedent';
 import { Result } from 'ts-data-forge';
 import {
+  checkOperatorKindConditions,
   describeEnglish,
   extractJsdoc,
+  extractOperatorKinds,
   firstSentence,
+  operatorKindText,
   readDescription,
   setDescription,
   textVersion,
@@ -187,4 +190,354 @@ describe(describeEnglish, () => {
       );
     },
   );
+});
+
+describe(extractOperatorKinds, () => {
+  test('reads the kind an arrow function returns', () => {
+    const source = dedent`
+      export const take =
+        <A,>(count: number): KeepInitialValueOperator<A, A> =>
+        (source) => view(source);
+    `;
+
+    assert.deepStrictEqual(extractOperatorKinds(source, 'take'), ['Keep']);
+  });
+
+  test('reads one kind per overload, in the order written', () => {
+    const source = dedent`
+      export function takeWhile<A>(
+        predicate: (value: A) => boolean,
+        options: Readonly<{ inclusive: true }>,
+      ): KeepInitialValueOperator<A, A>;
+
+      export function takeWhile<A>(
+        predicate: (value: A) => boolean,
+        options?: TakeWhileOptions,
+      ): DropInitialValueOperator<A, A>;
+
+      export function takeWhile<A>(
+        predicate: (value: A) => boolean,
+        options?: TakeWhileOptions,
+      ): KeepInitialValueOperator<A, A> | DropInitialValueOperator<A, A> {
+        return (source) => view(source);
+      }
+    `;
+
+    assert.deepStrictEqual(extractOperatorKinds(source, 'takeWhile'), [
+      'Keep',
+      'Drop',
+    ]);
+  });
+
+  test('gives one kind for overloads that return the same kind', () => {
+    const source = dedent`
+      export function filter<A, B extends A>(
+        predicate: (value: A) => value is B,
+      ): DropInitialValueOperator<A, B>;
+
+      export function filter<A>(
+        predicate: (value: A) => boolean,
+      ): DropInitialValueOperator<A, A>;
+    `;
+
+    assert.deepStrictEqual(extractOperatorKinds(source, 'filter'), ['Drop']);
+  });
+
+  test('does not take an operator type that types a parameter', () => {
+    const source = dedent`
+      export const apply =
+        <A,>(op: ProvideInitialValueOperator<A, A>): DropInitialValueOperator<A, A> =>
+        (source) => op(source);
+    `;
+
+    assert.deepStrictEqual(extractOperatorKinds(source, 'apply'), ['Drop']);
+  });
+
+  test('gives none for a declaration that is not an operator, or is missing', () => {
+    const source = 'export const state = <A,>(initialValue: A): State<A> => s;';
+
+    assert.deepStrictEqual(extractOperatorKinds(source, 'state'), []);
+
+    assert.deepStrictEqual(extractOperatorKinds(source, 'other'), []);
+
+    assert.deepStrictEqual(
+      extractOperatorKinds('export function f(): void {}', 'f'),
+      [],
+    );
+  });
+
+  test('reads overloads that no blank line separates', () => {
+    const source = dedent`
+      export function f<A>(o: Readonly<{ x: true }>): KeepInitialValueOperator<A, A>;
+      export function f<A>(o?: O): DropInitialValueOperator<A, A>;
+    `;
+
+    assert.deepStrictEqual(extractOperatorKinds(source, 'f'), ['Keep', 'Drop']);
+  });
+
+  test('reads an overload followed by a comment on its last line', () => {
+    const source = dedent`
+      export function f<A>(o: Readonly<{ x: true }>): KeepInitialValueOperator<A, A>; // kept
+
+      export function f<A>(o?: O): DropInitialValueOperator<A, A>;
+    `;
+
+    assert.deepStrictEqual(extractOperatorKinds(source, 'f'), ['Keep', 'Drop']);
+  });
+
+  test('does not read the implementation signature after overloads', () => {
+    const source = dedent`
+      export function f<A>(p: P<A>): DropInitialValueOperator<A, A>;
+
+      export function f<A>(
+        p: P<A>,
+      ): KeepInitialValueOperator<A, A> | DropInitialValueOperator<A, A> {
+        return g(p);
+      }
+    `;
+
+    assert.deepStrictEqual(extractOperatorKinds(source, 'f'), ['Drop']);
+  });
+
+  test('reads an operator type whose output has braces or an arrow', () => {
+    const source = dedent`
+      export const f = <A,>(): KeepInitialValueOperator<A, Readonly<{ a: () => A }>> =>
+        (source) => g(source);
+    `;
+
+    assert.deepStrictEqual(extractOperatorKinds(source, 'f'), ['Keep']);
+  });
+
+  test('reads every kind of a union a single signature returns', () => {
+    const source = dedent`
+      export function f<A>(
+        p: P<A>,
+      ): KeepInitialValueOperator<A, A> | DropInitialValueOperator<A, A> {
+        return g(p);
+      }
+    `;
+
+    assert.deepStrictEqual(extractOperatorKinds(source, 'f'), ['Keep', 'Drop']);
+  });
+
+  test('reads overloads with a blank line inside a parameter list', () => {
+    const source = dedent`
+      export function f<A>(
+        p: P<A>,
+
+        o: Readonly<{ x: true }>,
+      ): KeepInitialValueOperator<A, A>;
+
+      export function f<A>(p: P<A>): DropInitialValueOperator<A, A>;
+    `;
+
+    assert.deepStrictEqual(extractOperatorKinds(source, 'f'), ['Keep', 'Drop']);
+  });
+
+  test('does not take a declaration whose name only begins the same', () => {
+    const source = dedent`
+      export const takeWhileX = (): KeepInitialValueOperator<A, A> => f;
+    `;
+
+    assert.deepStrictEqual(extractOperatorKinds(source, 'takeWhile'), []);
+  });
+});
+
+describe('extractOperatorKinds through wrappers and exports', () => {
+  test.each([
+    [
+      'parentheses and satisfies',
+      'export const f = (<A,>(): KeepInitialValueOperator<A, A> => g) satisfies F;',
+    ],
+    [
+      'as',
+      'export const f = (<A,>(): KeepInitialValueOperator<A, A> => g) as F;',
+    ],
+    [
+      'a function expression',
+      'export const f = function <A>(): KeepInitialValueOperator<A, A> { return g; };',
+    ],
+    [
+      '<T>',
+      'export const f = <F>(<A,>(): KeepInitialValueOperator<A, A> => g);',
+    ],
+    ['!', 'export const f = (<A,>(): KeepInitialValueOperator<A, A> => g)!;'],
+  ] as const)('reads a const through %s', (_, source) => {
+    assert.deepStrictEqual(extractOperatorKinds(source, 'f'), ['Keep']);
+  });
+
+  test('reads only exported declarations', () => {
+    const source = dedent`
+      /** Does f. */
+      const f = <A,>(): KeepInitialValueOperator<A, A> => g;
+      export { f };
+    `;
+
+    assert.deepStrictEqual(extractOperatorKinds(source, 'f'), []);
+
+    const result = extractJsdoc(source, 'f');
+
+    assert.isTrue(Result.isErr(result));
+
+    assert.match(result.value, /no exported declaration/u);
+  });
+});
+
+describe(operatorKindText, () => {
+  const sentences = {
+    Keep: 'Keeps it.',
+    Drop: 'Drops it.',
+    Provide: 'Provides it.',
+  } as const;
+
+  test('gives the sentence of a single kind', () => {
+    assert.strictEqual(
+      operatorKindText('en', sentences, ['Keep'], undefined),
+      'Keeps it.',
+    );
+  });
+
+  test('lists each kind after its condition, the one without last', () => {
+    assert.strictEqual(
+      operatorKindText('en', sentences, ['Drop', 'Keep'], {
+        Keep: { en: 'With `x`', ja: '`x` を付けると' },
+      }),
+      ['- With `x`, keeps it.', '- Otherwise, drops it.'].join('\n'),
+    );
+
+    assert.strictEqual(
+      operatorKindText('ja', sentences, ['Drop', 'Keep'], {
+        Keep: { en: 'With `x`', ja: '`x` を付けると' },
+      }),
+      ['- `x` を付けると、Keeps it.', '- それ以外は、Drops it.'].join('\n'),
+    );
+  });
+});
+
+describe(checkOperatorKindConditions, () => {
+  const keep = { Keep: { en: 'With `x`', ja: '`x` を付けると' } } as const;
+
+  test('accepts conditions for all kinds but one', () => {
+    assert.deepStrictEqual(
+      checkOperatorKindConditions('p', ['Keep', 'Drop'], keep),
+      [],
+    );
+  });
+
+  test('accepts no conditions for one kind or none', () => {
+    assert.deepStrictEqual(
+      checkOperatorKindConditions('p', ['Drop'], undefined),
+      [],
+    );
+
+    assert.deepStrictEqual(checkOperatorKindConditions('p', [], undefined), []);
+  });
+
+  test('refuses conditions for a single kind, or no operator', () => {
+    assert.match(
+      checkOperatorKindConditions('p', ['Keep'], keep)[0] ?? '',
+      /one kind of operator: remove them/u,
+    );
+
+    assert.match(
+      checkOperatorKindConditions('p', [], keep)[0] ?? '',
+      /no operator: remove them/u,
+    );
+  });
+
+  test('asks for conditions when several kinds have none', () => {
+    assert.match(
+      checkOperatorKindConditions('p', ['Keep', 'Drop'], undefined)[0] ?? '',
+      /give operatorKindConditions/u,
+    );
+  });
+
+  test('asks to leave one out when every kind has a condition', () => {
+    assert.match(
+      checkOperatorKindConditions('p', ['Keep', 'Drop'], {
+        ...keep,
+        Drop: { en: 'Else', ja: 'ほか' },
+      })[0] ?? '',
+      /leave out the one that holds otherwise/u,
+    );
+  });
+
+  test('refuses a condition for a kind not returned', () => {
+    assert.match(
+      checkOperatorKindConditions('p', ['Keep', 'Drop'], {
+        ...keep,
+        Provide: { en: 'Never', ja: 'なし' },
+      })[0] ?? '',
+      /for Provide, which it does not return/u,
+    );
+  });
+});
+
+describe('extractJsdoc on overloads', () => {
+  test('refuses overloads whose JSDoc differ', () => {
+    const source = dedent`
+      /** Does a. */
+      export function f(a: A): B;
+
+      /** Does b. */
+      export function f(a?: A): B;
+    `;
+
+    const result = extractJsdoc(source, 'f');
+
+    assert.isTrue(Result.isErr(result));
+  });
+
+  test('reads JSDoc that a line comment separates from its overload', () => {
+    const source = dedent`
+      /** Does a. */
+      export function f(a: A): B;
+
+      /** Does b. */
+      // A note.
+      export function f(a?: A): B;
+    `;
+
+    const result = extractJsdoc(source, 'f');
+
+    assert.isTrue(Result.isErr(result));
+
+    assert.match(result.value, /overloads whose JSDoc differ/u);
+  });
+
+  test('reads the JSDoc of exported declarations only', () => {
+    const source = dedent`
+      /** Not this. */
+      const f = 1;
+
+      /** Does a. */
+      export class f {}
+    `;
+
+    assert.deepStrictEqual(extractJsdoc(source, 'f'), Result.ok('Does a.'));
+  });
+
+  test('gives the JSDoc of a const that declares several to the first only', () => {
+    const source = dedent`
+      /** Doc of a. */
+      export const a = 1,
+        f = 2;
+    `;
+
+    assert.deepStrictEqual(extractJsdoc(source, 'a'), Result.ok('Doc of a.'));
+
+    assert.isTrue(Result.isErr(extractJsdoc(source, 'f')));
+  });
+
+  test('takes overloads whose JSDoc are the same', () => {
+    const source = dedent`
+      /** Does a. */
+      export function f(a: A): B;
+
+      /** Does a. */
+      export function f(a?: A): B;
+    `;
+
+    assert.deepStrictEqual(extractJsdoc(source, 'f'), Result.ok('Does a.'));
+  });
 });

@@ -160,6 +160,123 @@ describe(takeWhile, () => {
 
     assert.isFalse(taken.hasValue);
   });
+
+  test('is not settled at the last value it passes: only the next value ends it', () => {
+    const a = state(1);
+
+    const taken = a.pipe(takeWhile((x) => x < 3));
+
+    const mut_seen: (readonly [number, boolean])[] = [];
+
+    taken.subscribe((v) => {
+      mut_seen.push([v, taken.settled]);
+    });
+
+    a.set(2);
+
+    a.set(3);
+
+    assert.deepStrictEqual(mut_seen, [
+      [1, false],
+      [2, false],
+    ]);
+
+    assert.isTrue(taken.settled);
+  });
+
+  describe('inclusive', () => {
+    test('passes the first value the predicate fails for, and none after it', () => {
+      const a = state(1);
+
+      const seen = collect(
+        a.pipe(takeWhile((x) => x < 3, { inclusive: true })),
+      );
+
+      a.set(2);
+
+      a.set(3);
+
+      assert.isFalse(toNode(a).hasObserver);
+
+      a.set(1);
+
+      assert.deepStrictEqual(seen, [1, 2, 3]);
+    });
+
+    test('is settled when its subscriber receives that value', () => {
+      const a = state(1);
+
+      const taken = a.pipe(takeWhile((x) => x < 3, { inclusive: true }));
+
+      const mut_seen: (readonly [number, boolean])[] = [];
+
+      taken.subscribe((v) => {
+        mut_seen.push([v, taken.settled]);
+      });
+
+      a.set(2);
+
+      a.set(3);
+
+      assert.deepStrictEqual(mut_seen, [
+        [1, false],
+        [2, false],
+        [3, true],
+      ]);
+    });
+
+    test('holds the held value and is settled when that value already fails', () => {
+      const a = state(5);
+
+      const taken = a.pipe(takeWhile((x) => x < 3, { inclusive: true }));
+
+      const seen = collect(taken);
+
+      a.set(1);
+
+      assert.deepStrictEqual(seen, [5]);
+
+      assert.isTrue(taken.settled);
+
+      assert.isFalse(toNode(a).hasObserver);
+    });
+
+    test('holds no value until the source emits, then counts that value', () => {
+      const e = source<number>();
+
+      const taken = e.pipe(takeWhile((x) => x < 3, { inclusive: true }));
+
+      const seen = collect(taken);
+
+      assert.isFalse(taken.hasValue);
+
+      e.emit(4);
+
+      e.emit(1);
+
+      assert.deepStrictEqual(seen, [4]);
+
+      assert.isTrue(taken.settled);
+    });
+
+    test('passes the same values as without it until the predicate fails', () => {
+      const a = state(0);
+
+      const plain = collect(a.pipe(takeWhile((x) => x < 3)));
+
+      const inclusive = collect(
+        a.pipe(takeWhile((x) => x < 3, { inclusive: true })),
+      );
+
+      a.set(1);
+
+      a.set(2);
+
+      assert.deepStrictEqual(inclusive, plain);
+
+      assert.deepStrictEqual(inclusive, [0, 1, 2]);
+    });
+  });
 });
 
 describe(skipWhile, () => {
@@ -676,6 +793,115 @@ describe('a node made in a batch below a derived node', () => {
 
     // It read 0 when it was made: `m` emits 10 only when the round runs.
     assert.deepStrictEqual(mut_taken, [0, 10]);
+  });
+});
+
+describe('settled', () => {
+  test('a state is settled only once disposed', () => {
+    const a = state(0);
+
+    a.set(1);
+
+    assert.isFalse(a.settled);
+
+    a.dispose();
+
+    assert.isTrue(a.settled);
+  });
+
+  test('take is settled when its subscriber receives its last value', () => {
+    const e = source<number>();
+
+    const taken = e.pipe(take(2));
+
+    const mut_seen: (readonly [number, boolean])[] = [];
+
+    taken.subscribe((v) => {
+      mut_seen.push([v, taken.settled]);
+    });
+
+    e.emit(1);
+
+    e.emit(2);
+
+    e.emit(3);
+
+    assert.deepStrictEqual(mut_seen, [
+      [1, false],
+      [2, true],
+    ]);
+  });
+
+  test('below a map, the last value of a take arrives settled', () => {
+    const e = source<number>();
+
+    const doubled = e.pipe(take(2)).pipe(map((x) => x * 2));
+
+    const mut_seen: (readonly [number, boolean])[] = [];
+
+    doubled.subscribe((v) => {
+      mut_seen.push([v, doubled.settled]);
+    });
+
+    e.emit(1);
+
+    e.emit(2);
+
+    assert.deepStrictEqual(mut_seen, [
+      [2, false],
+      [4, true],
+    ]);
+  });
+
+  test('below a map, the value that ends an inclusive takeWhile arrives settled', () => {
+    const e = source<number>();
+
+    const doubled = e
+      .pipe(takeWhile((x) => x < 2, { inclusive: true }))
+      .pipe(map((x) => x * 2));
+
+    const mut_seen: (readonly [number, boolean])[] = [];
+
+    doubled.subscribe((v) => {
+      mut_seen.push([v, doubled.settled]);
+    });
+
+    e.emit(1);
+
+    e.emit(2);
+
+    e.emit(3);
+
+    assert.deepStrictEqual(mut_seen, [
+      [2, false],
+      [4, true],
+    ]);
+  });
+
+  test('a takeWhile is settled once its source is, with no value failing', () => {
+    const e = source<number>();
+
+    const taken = e.pipe(takeWhile((x) => x < 10));
+
+    e.emit(1);
+
+    assert.isFalse(taken.settled);
+
+    e.dispose();
+
+    assert.isTrue(taken.settled);
+  });
+
+  test('a disposed observable is settled', () => {
+    const a = state(0);
+
+    const doubled = a.pipe(map((x) => x * 2));
+
+    assert.isFalse(doubled.settled);
+
+    doubled.dispose();
+
+    assert.isTrue(doubled.settled);
   });
 });
 

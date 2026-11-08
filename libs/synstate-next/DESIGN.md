@@ -154,6 +154,15 @@ projected or emits, and lets it go once it is settled and its follower has read
 what it emitted. One that settles without emitting is swept once the number
 followed doubles, after the round that reached that number has run its effects.
 
+`settled` is on the public type, so a subscriber asks it too, to tell the last
+value. That works only where the end comes with a value: a `take` is settled by
+the time its subscriber receives its last value, and so is a `takeWhile` with
+`inclusive`, which passes the value that ends it. Where the end has no value of
+its own (a plain `takeWhile`, a `takeUntil`'s notifier, a subscribable
+completing), the producer sends the end as a value, as errors are `Result`s.
+Nothing is called when `settled` turns true; that push is what completion cost
+every operator.
+
 ## One copy per program
 
 A graph cannot span two copies of the package: `toNode` checks `instanceof` and
@@ -195,7 +204,10 @@ from the prototype; the packages are to be measured again in
 - Subscribers run after the update has settled, not during it.
 - Nested updates do not exist: a write made during the drain is deferred, and
   one made by an effect propagates in the next round.
-- `complete` is gone: an observable ends by being disposed.
+- `complete` is gone: an observable ends by being disposed. `subscribe` takes no
+  `onComplete`. `settled` takes the place of `isCompleted` and turns true
+  sooner: a `take` is settled when its subscriber receives its last value, where
+  synstate completed after it (see "Ownership").
 - Observables from two copies of the package cannot be combined.
 - A `For` row reads its new element one round after the list changed (see
   synstate-dom-next).

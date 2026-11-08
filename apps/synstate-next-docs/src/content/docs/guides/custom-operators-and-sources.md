@@ -139,7 +139,7 @@ const delay =
                     mut_timers.add(id);
                 },
                 // Not done while a value is still due.
-                settled: () => ctx.settled(parent) && mut_timers.size === 0,
+                settled: () => parent.settled && mut_timers.size === 0,
             };
         });
 

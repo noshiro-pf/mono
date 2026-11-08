@@ -148,9 +148,11 @@ export class ObservableClass<A> implements DerivedNode {
   }
 
   /**
-   * Whether it will never emit again: disposed, or a source that is done (a
-   * `timer` that fired, a settled promise). A `mergeMap` lets an inner
-   * observable go once it is settled. A state is never settled.
+   * Whether it will never emit again (`Observable.settled` in core/types.mts
+   * says what that means to a user). This base answer is true only once it is
+   * disposed with no write waiting for its round; a node that can finish by
+   * itself (a timer, a promise, an operator) overrides it. A `mergeMap` lets an
+   * inner observable go once it is settled.
    */
   get settled(): boolean {
     // A write made before it was disposed may still wait for its round.

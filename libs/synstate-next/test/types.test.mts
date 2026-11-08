@@ -181,6 +181,28 @@ describe('types', () => {
 
     expectType<typeof _whiles, Observable<number>>('=');
 
+    const _inclusive = s.pipe(takeWhile((x) => x > 0, { inclusive: true }));
+
+    expectType<typeof _inclusive, InitializedObservable<number>>('=');
+
+    const _inclusiveFromEvent = source<number>().pipe(
+      takeWhile((x) => x > 0, { inclusive: true }),
+    );
+
+    expectType<typeof _inclusiveFromEvent, Observable<number>>('=');
+
+    const _notInclusive = s.pipe(takeWhile((x) => x > 0, { inclusive: false }));
+
+    expectType<typeof _notInclusive, Observable<number>>('=');
+
+    const _explicit = s.pipe(
+      takeWhile<number>((x) => x > 0, { inclusive: true }),
+    );
+
+    expectType<typeof _explicit, InitializedObservable<number>>('=');
+
+    expectType<Observable<number>['settled'], boolean>('=');
+
     const _untilGo = s.pipe(skipUntil(e));
 
     expectType<typeof _untilGo, Observable<number>>('=');
