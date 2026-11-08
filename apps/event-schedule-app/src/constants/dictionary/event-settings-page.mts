@@ -81,7 +81,6 @@ export const eventSettingsPageDictionary = {
     name: 'イベント設定を更新',
     submitEditingConfirmation:
       '編集項目に日程の削除が含まれています。その日程への回答が既にある場合、その回答は失われてしまいますが、よろしいですか？',
-    cancelResultMessage: '編集をキャンセルしました。',
   },
   createEventResultMessage: {
     success: 'イベント設定を作成しました。',

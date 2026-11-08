@@ -75,6 +75,17 @@ test(
       .soft(toastWith(answerPage, 'イベント設定を更新しました。'))
       .toBeVisible({ timeout: firestoreWriteTimeout });
 
+    // The update went through, so nothing says it was cancelled (#3414).
+    // Counted once, now: `toHaveCount(0)` would retry until such a toast timed
+    // out, and pass.
+    /* eslint-disable playwright/prefer-to-have-count -- one count, not a retry */
+    const cancelToasts = await answerPage
+      .getByText('編集をキャンセルしました。')
+      .count();
+
+    expect.soft(cancelToasts).toBe(0);
+    /* eslint-enable playwright/prefer-to-have-count */
+
     /* back on the answer page, which shows the edited event */
 
     await expect
