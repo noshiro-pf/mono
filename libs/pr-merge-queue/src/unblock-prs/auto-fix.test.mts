@@ -5,6 +5,7 @@ import {
   notFixableReason,
   ownedPaths,
   planAutoFix,
+  planAutoFixFromRuns,
 } from './auto-fix.mjs';
 import { readConfig } from './config.mjs';
 
@@ -70,6 +71,55 @@ describe(contextsNotFixable, () => {
     const job = 'style-check (z:ci:style-check:checks-and-generators)';
 
     assert.include(notFixableReason([job]), job);
+  });
+});
+
+describe(planAutoFixFromRuns, () => {
+  const fixerJob = 'code-check (fix:codemod:full)';
+
+  // A layer's tip, as speculation reads it before releasing the pull request
+  // for its own run to fix: one fixer's job failed, and its aggregate.
+  const layerRuns = [
+    run(fixerJob, 1),
+    run('code-check-result / result', 2),
+  ] as const;
+
+  test('plans the fix for a fixer job that only left a diff', async () => {
+    const plan = await planAutoFixFromRuns(
+      layerRuns,
+      config,
+      titlesBy(new Map<number, readonly string[]>()),
+    );
+
+    assert.isTrue(Result.isOk(plan));
+
+    assert.deepStrictEqual(plan.value.commands, [
+      "pnpm run 'fix:codemod:full'",
+    ]);
+  });
+
+  test('declines a fixer job whose run says its command failed, naming it, as autoFix does', async () => {
+    const title = config?.notFixableAnnotation;
+
+    assert.isDefined(title);
+
+    const plan = await planAutoFixFromRuns(
+      layerRuns,
+      config,
+      titlesBy(new Map<number, readonly string[]>([[1, [title]]])),
+    );
+
+    assert.deepStrictEqual(plan, Result.err(notFixableReason([fixerJob])));
+  });
+
+  test('reads no annotation when the plan already declines', async () => {
+    const plan = await planAutoFixFromRuns(
+      [run('code-check (ws:check:types)', 1)],
+      config,
+      () => Promise.reject(new Error('read')),
+    );
+
+    assert.isTrue(Result.isErr(plan));
   });
 });
 

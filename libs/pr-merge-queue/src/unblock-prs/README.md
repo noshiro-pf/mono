@@ -578,7 +578,9 @@ PR なら10分続いたところで triage の前に見送ります。候補の�
   まっていないジョブも自分のコミットを取得できます。枝が消えた後に再試行すれば、
   段は作り直されます。それより前の再試行は、赤の段が残っているので再び見送られま
   す。落ちたジョブがすべて設定された fixer の受け持ちなら、代わりに段の run と枝を消して PR を解放し、PR 自身の run が落ち
-  たところで「4a」がそのジョブを読めるようにします。消せなくても解放します。
+  たところで「4a」がそのジョブを読めるようにします。受け持ちかどうかは「4a」と
+  同じ読み方で決めるので、コマンドが失敗したと annotation が言っているジョブは
+  受け持ちに数えません。消せなくても解放します。
   その場合は解放先で見送られることがあります。
 - 先頭より上の赤は、まだマージされていない（されないかもしれない）PR の上での
   失敗です。その段は先頭になるまで待ちます。下の段がマージされれば `main` の
@@ -1663,8 +1665,9 @@ decided in `speculate-plan.mts`).
   still standing and sets the pull request aside again.
   When only jobs a configured fixer settles failed, the layer's runs and branch
   go and the pull request is released instead, so that its own run fails where
-  "4a" can read the jobs. It is released even if they cannot go, and may then be
-  set aside there.
+  "4a" can read the jobs. Which jobs those are is read as "4a" reads them, so a
+  job whose run says its command failed is not one. It is released even if they
+  cannot go, and may then be set aside there.
 - A red layer above the first failed on top of pull requests that have not
   merged and may not. It waits until it is first: on `main`'s tree once the
   layers below merge, or rebuilt if they leave the queue. Nothing is built above

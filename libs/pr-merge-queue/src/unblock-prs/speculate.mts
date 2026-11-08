@@ -14,7 +14,6 @@
 
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
-import { statesFromCheckRuns } from 'pr-report-core';
 import { Arr, Num, Result, unknownToString } from 'ts-data-forge';
 import * as t from 'ts-fortress';
 import {
@@ -25,9 +24,13 @@ import {
   sh,
   type ApiContext,
 } from '../lib/index.mjs';
-import { planAutoFix, WORKTREE_ROOT } from './auto-fix.mjs';
+import { planAutoFixFromRuns, WORKTREE_ROOT } from './auto-fix.mjs';
 import type { AutoFixConfig, SpeculateConfig } from './config.mjs';
-import { listCheckRuns, removeWorktree } from './github.mjs';
+import {
+  listCheckRuns,
+  readAnnotationTitles,
+  removeWorktree,
+} from './github.mjs';
 import {
   cancelledTooOften,
   decideSpeculation,
@@ -1004,16 +1007,26 @@ const readStatusesOf = async (
 
 /**
  * Whether every job that failed on a layer's tip is one a configured fixer
- * settles, as `autoFix` would read them on the pull request's head.
+ * settles, as `autoFix` would read them on the pull request's head: by the same
+ * plan, which declines a job whose run says its command failed.
  */
 const isFixersOwn = async (
   api: ApiContext,
   tip: string,
   config: AutoFixConfig | undefined,
-): Promise<Result<boolean, string>> =>
-  Result.map(await listCheckRuns(api, tip), (runs) =>
-    Result.isOk(planAutoFix(statesFromCheckRuns(runs), config)),
+): Promise<Result<boolean, string>> => {
+  const runs = await listCheckRuns(api, tip);
+
+  if (Result.isErr(runs)) {
+    return runs;
+  }
+
+  const plan = await planAutoFixFromRuns(runs.value, config, async (id) =>
+    readAnnotationTitles(api, id),
   );
+
+  return Result.ok(Result.isOk(plan));
+};
 
 const dispatch = async (
   api: ApiContext,
