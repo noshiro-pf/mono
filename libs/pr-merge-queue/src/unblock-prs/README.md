@@ -747,11 +747,12 @@ matrix が作るどのチェックも受け持たないと `check:root:auto-fix-
 ます。
 
 - リポジトリに `autoFix` の設定が無い。
-- job のコマンド自体が失敗したと、その check run の annotation
-  （設定の `notFixableAnnotation`）が言っている。fixer が何を書いても、0 以外で
-  終わったコマンドは直らないので、job の名前を出して計画の時点で断り、何もインス
-  トールしません。build、コマンド、clean-tree の確認が1ステップなので、どれが失敗
+- job の build かコマンド自体が失敗した、またはセットアップがツリーを変えたと、
+  その check run の annotation（設定の `notFixableAnnotation`）が言っている。
+  fixer が何を書いても直らないので、計画を立てた後、job の名前を出して断り、何も
+  インストールしません。build、コマンド、clean-tree の確認が1ステップなので、どれが失敗
   したかはステップからは読めません。
+  annotation を読めないときは、fixer が自分で確かめます。
 - 失敗した job に1つでも fixer 以外がある（型、テスト、`ws:doc`、
   `Validate commit count` など）。push しても落ちるマトリクスを1回走らせるだけ
   なので、全体を skill に任せます。
@@ -1783,12 +1784,13 @@ is a `code-check (X)` or `style-check (X)` entry whose `X` is a `fix:` or `gen:`
 command (under `ws:` or `strict-lib:` too), or one of style-check's bundles,
 `z:ci:style-check:checks-and-generators` and `z:ci:style-check:format-and-doc`:
 every job runs through `z:ci-job`, whose clean-tree check fails a job whose
-command rewrote files. A job whose command itself failed says so in an
-annotation on its check run, `notFixableAnnotation` in the configuration, and is
-declined when the plan is made, naming the job and installing nothing: nothing a
-fixer writes fixes a command that exited non-zero, and with one step holding the
-build, the command and the clean-tree check, the steps cannot say which failed.
-Where the annotation cannot be read, the fixer finds out for itself.
+command rewrote files. A job whose build or command itself failed, or whose
+setup changed the tree, says so in a notice on its check run,
+`notFixableAnnotation` in the configuration, and is declined once the plan is
+made, naming the job and installing nothing: nothing a fixer writes fixes a step
+that exited non-zero, and with one step holding the build, the command and the
+clean-tree check, the steps cannot say which failed. Where the annotation cannot
+be read, the fixer finds out for itself.
 The first holds checks beside its formatters and generators, so it is rerun
 whole. It runs before every other fixer (stage -1), on the tree as committed,
 because its `check:prose` diffs the tree against the base and would read another
@@ -1818,6 +1820,11 @@ before with the reason logged, when:
 - Any failed job is not a fixer (types, tests, `ws:doc`, `Validate commit
 count`, …). Pushing would run a matrix that fails anyway, so the whole of it
   is left to the skill.
+- A failed job's check run says its command failed, in the annotation
+  `notFixableAnnotation` names: its build or command failed, or its setup
+  changed the tree. It is declined once the plan is made, naming the job, before
+  anything is installed. Where the annotation cannot be read, the fixer finds
+  out for itself.
 - The branch is not one commit. Squashing writes a message, which is the
   skill's to do.
 - A command failed, or none of them changed anything.

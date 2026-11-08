@@ -1,6 +1,11 @@
-import type { ContextState } from 'pr-report-core';
+import type { CheckRunReport, ContextState } from 'pr-report-core';
 import { Result } from 'ts-data-forge';
-import { ownedPaths, planAutoFix } from './auto-fix.mjs';
+import {
+  contextsNotFixable,
+  notFixableReason,
+  ownedPaths,
+  planAutoFix,
+} from './auto-fix.mjs';
 import { readConfig } from './config.mjs';
 
 // The repository's own `.github/unblock-prs.json`: these tests are what its
@@ -15,41 +20,60 @@ const states = (
   entries: readonly (readonly [string, ContextState])[],
 ): ReadonlyMap<string, ContextState> => new Map(entries);
 
-describe(planAutoFix, () => {
-  test('declines a context whose job said its command failed, naming it', () => {
-    const job = 'style-check (z:ci:style-check:checks-and-generators)';
+describe(contextsNotFixable, () => {
+  const TITLE = 'command failed';
 
-    const plan = planAutoFix(states([[job, 'failed']]), config, [job]);
-
-    assert.isTrue(Result.isErr(plan));
-
-    assert.include(plan.value, job);
-
-    assert.include(plan.value, 'in its command');
-
-    // The same failure leaving only a diff is still fixed.
-    assert.isTrue(Result.isOk(planAutoFix(states([[job, 'failed']]), config)));
-  });
-
-  test('one of several declined declines them all', () => {
-    const job = 'style-check (z:ci:style-check:checks-and-generators)';
-
-    const other = 'code-check (fix:codemod:full)';
-
-    assert.isTrue(
-      Result.isErr(
-        planAutoFix(
-          states([
-            [job, 'failed'],
-            [other, 'failed'],
-          ]),
-          config,
-          [other],
-        ),
+  test('names a job whose run says its command failed, and not one that only left a diff', async () => {
+    assert.deepStrictEqual(
+      await contextsNotFixable(
+        [run('a', 1), run('b', 2)],
+        ['a', 'b'],
+        TITLE,
+        titlesBy(new Map<number, readonly string[]>([[1, [TITLE, 'another']]])),
       ),
+      ['a'],
     );
   });
 
+  test('reads the run GitHub answers for the name, not one it superseded', async () => {
+    // A re-run in the same suite passed the command, and left only a diff.
+    assert.deepStrictEqual(
+      await contextsNotFixable(
+        [run('a', 1), run('a', 5)],
+        ['a'],
+        TITLE,
+        titlesBy(new Map<number, readonly string[]>([[1, [TITLE]]])),
+      ),
+      [],
+    );
+  });
+
+  test('without a title it reads nothing', async () => {
+    assert.deepStrictEqual(
+      await contextsNotFixable([run('a', 1)], ['a'], undefined, () =>
+        Promise.reject(new Error('read')),
+      ),
+      [],
+    );
+  });
+
+  test('one it cannot read is left to the fixer', async () => {
+    assert.deepStrictEqual(
+      await contextsNotFixable([run('a', 1)], ['a'], TITLE, () =>
+        Promise.resolve(Result.err('403')),
+      ),
+      [],
+    );
+  });
+
+  test('the decline names the job', () => {
+    const job = 'style-check (z:ci:style-check:checks-and-generators)';
+
+    assert.include(notFixableReason([job]), job);
+  });
+});
+
+describe(planAutoFix, () => {
   test('runs the command a failed matrix entry names, with the build CI gave it', () => {
     const plan = planAutoFix(
       states([
@@ -287,3 +311,20 @@ describe(ownedPaths, () => {
     assert.deepStrictEqual(ownedPaths(['.github/workflows/a.yml'], ''), []);
   });
 });
+
+/** A failed check run of `name`. */
+const run = (name: string, id: number, checkSuiteId = 1): CheckRunReport =>
+  ({
+    id,
+    name,
+    checkSuiteId,
+    status: 'completed',
+    conclusion: 'failure',
+    round: undefined,
+  }) as const;
+
+/** Answers each run's annotation titles from `byId`. */
+const titlesBy =
+  (byId: ReadonlyMap<number, readonly string[]>) =>
+  (id: number): Promise<Result<readonly string[], string>> =>
+    Promise.resolve(Result.ok(byId.get(id) ?? []));

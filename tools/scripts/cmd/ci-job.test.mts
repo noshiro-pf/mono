@@ -4,6 +4,7 @@ import { projectRootPath } from '../project-root-path.mjs';
 import {
   COMMAND_FAILED_ANNOTATION,
   commandFailedAnnotation,
+  commandFailureOf,
   diffInvocations,
   dirtyStartFailures,
   jobFailures,
@@ -11,16 +12,58 @@ import {
   writesToShow,
 } from './ci-job.mjs';
 
-describe('commandFailedAnnotation', () => {
-  test('is one workflow command, titled what unblock-prs declines by', () => {
+describe('commandFailureOf', () => {
+  test('says the step that exited non-zero', () => {
     assert.strictEqual(
-      commandFailedAnnotation('check:cspell exited with 1.\nand more'),
-      '::error title=command failed::check:cspell exited with 1.',
+      commandFailureOf(
+        [
+          { title: 'ws:build:deps', exitCode: 0, wrote: ['a'] },
+          { title: 'check:cspell', exitCode: 1, wrote: [] },
+        ],
+        false,
+      ),
+      'check:cspell exited with 1.',
+    );
+  });
+
+  test('a step that only left a diff is not a failed command', () => {
+    assert.isUndefined(
+      commandFailureOf(
+        [{ title: 'fix:fmt:full', exitCode: 0, wrote: ['a'] }],
+        false,
+      ),
+    );
+  });
+
+  test('a failed build, and a tree the setup changed, are more than a diff', () => {
+    assert.strictEqual(
+      commandFailureOf(
+        [{ title: 'ws:build:deps', exitCode: 2, wrote: [] }],
+        false,
+      ),
+      'ws:build:deps exited with 2.',
+    );
+
+    assert.include(
+      commandFailureOf(
+        [{ title: 'fix:fmt:full', exitCode: 0, wrote: [] }],
+        true,
+      ),
+      'before the first step',
+    );
+  });
+});
+
+describe('commandFailedAnnotation', () => {
+  test('is one workflow command, a notice, titled what unblock-prs declines by', () => {
+    assert.strictEqual(
+      commandFailedAnnotation('check:cspell exited with 1.'),
+      '::notice title=command failed::check:cspell exited with 1.',
     );
 
     assert.strictEqual(
-      commandFailedAnnotation('100% of it\r'),
-      '::error title=command failed::100%25 of it%0D',
+      commandFailedAnnotation('100% of it\r\n'),
+      '::notice title=command failed::100%25 of it%0D%0A',
     );
   });
 

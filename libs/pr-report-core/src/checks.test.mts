@@ -10,6 +10,7 @@ import {
   reportedContexts,
   statesFromCheckRuns,
   summarizeChecks,
+  winningRuns,
 } from './checks.mjs';
 import type { ContextState } from './types.mjs';
 
@@ -306,6 +307,25 @@ const run = (
     id,
     round: undefined,
   }) as const;
+
+describe(winningRuns, () => {
+  test('answers the run in the later suite, and within one the later run', () => {
+    const winners = winningRuns([
+      run('a', 'failure', 2, 10),
+      run('a', 'success', 1, 99),
+      run('b', 'failure', 1, 5),
+      run('b', 'success', 1, 6),
+    ]);
+
+    assert.deepStrictEqual(
+      Array.from(winners, ([name, { id }]) => [name, id]),
+      [
+        ['a', 10],
+        ['b', 6],
+      ],
+    );
+  });
+});
 
 describe(statesFromCheckRuns, () => {
   test('the run in the later suite is the one that counts', () => {

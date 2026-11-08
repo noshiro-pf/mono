@@ -88,30 +88,47 @@ export const runJob = async ({
     ],
     buildFailed:
       build !== undefined && (mut_results.at(0)?.exitCode ?? 1) !== 0,
-    commandFailed:
-      mut_results.some(({ exitCode }) => exitCode !== 0) ||
-      (requireCleanStart && initial.size > 0),
+    commandFailure: commandFailureOf(
+      mut_results,
+      requireCleanStart && initial.size > 0,
+    ),
     wrote,
   };
 };
 
 /**
- * The annotation a job that failed for more than a diff leaves on its check run:
- * nothing a fixer writes can fix a command that exited non-zero. `unblock-prs`
- * declines an auto-fix by it (`notFixableAnnotation` in
- * `.github/unblock-prs.json`, which has to say the same; `ci-job.test.mts` holds
- * them equal), since one step runs the build, the command and the clean-tree
- * check, and which of them failed cannot be read from the steps. `failure` is
- * one line of what went wrong, in the workflow command's own escaping.
+ * Why the job failed for more than a diff, if it did: the first step, the build
+ * or the command, that exited non-zero, or the setup having changed the tree
+ * before either ran. A fixer reruns the command; it fixes neither a step that
+ * fails nor what the setup writes, which is not the pull request's to commit.
+ */
+export const commandFailureOf = (
+  results: readonly StepResult[],
+  dirtyStart: boolean,
+): string | undefined => {
+  const failed = results.find(({ exitCode }) => exitCode !== 0);
+
+  return failed !== undefined
+    ? `${failed.title} exited with ${failed.exitCode}.`
+    : dirtyStart
+      ? 'The tree was changed before the first step ran, by the setup or `pnpm install`.'
+      : undefined;
+};
+
+/**
+ * The annotation a job that failed for more than a diff
+ * ({@link commandFailureOf}) leaves on its check run. `unblock-prs` declines an
+ * auto-fix by it (`notFixableAnnotation` in `.github/unblock-prs.json`, which
+ * has to say the same; `ci-job.test.mts` holds them equal), since one step runs
+ * the build, the command and the clean-tree check, and which of them failed
+ * cannot be read from the steps.
+ *
+ * A notice rather than an error: GitHub keeps ten of each per step, and the
+ * problem matchers `actions/setup-node` registers can spend the errors on a
+ * failing lint before this is printed last.
  */
 export const commandFailedAnnotation = (failure: string): string =>
-  `::error title=${COMMAND_FAILED_ANNOTATION}::${(
-    failure.split('\n', 1)[0] ?? ''
-  )
-    .replaceAll('%', '%25')
-    .replaceAll('\r', '%0D')}` as const;
-
-export const COMMAND_FAILED_ANNOTATION = 'command failed';
+  `::notice title=${COMMAND_FAILED_ANNOTATION}::${failure.replaceAll('%', '%25').replaceAll('\r', '%0D').replaceAll('\n', '%0A')}` as const;
 
 /**
  * Of the files the steps wrote, those whose diff is the steps' alone, and those
@@ -219,8 +236,8 @@ export type JobOutcome = Readonly<{
   failures: readonly string[];
   /** Whether the build ran and failed, so that the entry never ran. */
   buildFailed: boolean;
-  /** Whether a step failed or setup changed the tree: more than a diff. */
-  commandFailed: boolean;
+  /** {@link commandFailureOf}, of the steps. */
+  commandFailure: string | undefined;
   /** The paths the steps changed, together. */
   wrote: readonly string[];
 }>;
@@ -231,6 +248,8 @@ export type StepResult = Readonly<{
   /** The paths the step changed. */
   wrote: readonly string[];
 }>;
+
+export const COMMAND_FAILED_ANNOTATION = 'command failed';
 
 const DIFF_BATCH = asPositiveUint32(500);
 
@@ -380,8 +399,11 @@ if (isDirectlyExecuted(import.meta.url)) {
     if (Arr.isNonEmpty(outcome.failures)) {
       console.error(`\n❌ ${outcome.failures.join('\n\n❌ ')}`);
 
-      if (outcome.commandFailed && process.env['GITHUB_ACTIONS'] === 'true') {
-        console.info(commandFailedAnnotation(outcome.failures[0]));
+      if (
+        outcome.commandFailure !== undefined &&
+        process.env['GITHUB_ACTIONS'] === 'true'
+      ) {
+        console.info(commandFailedAnnotation(outcome.commandFailure));
       }
     }
 

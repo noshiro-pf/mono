@@ -48,20 +48,12 @@ export const statesFromCheckRuns = (
   runs: readonly CheckRunReport[],
   nowMs: number = Date.now(),
 ): ReadonlyMap<string, ContextState> => {
-  const mut_winner = new Map<string, CheckRunReport>();
-
   const mut_latestRound = new Map<
     number,
     Readonly<{ checkSuiteId: number; completed: boolean }>
   >();
 
   for (const run of runs) {
-    const previous = mut_winner.get(run.name);
-
-    if (previous === undefined || outranks(run, previous)) {
-      mut_winner.set(run.name, run);
-    }
-
     if (run.round === undefined) {
       continue;
     }
@@ -78,7 +70,7 @@ export const statesFromCheckRuns = (
 
   const mut_states = new Map<string, ContextState>();
 
-  for (const [name, run] of mut_winner) {
+  for (const [name, run] of winningRuns(runs)) {
     const latest =
       run.round === undefined
         ? undefined
@@ -102,6 +94,27 @@ export const statesFromCheckRuns = (
   }
 
   return mut_states;
+};
+
+/**
+ * Of the runs of each name, the one GitHub answers with ({@link outranks}): what
+ * {@link statesFromCheckRuns} judges, for a reader that goes on to ask more of
+ * that run.
+ */
+export const winningRuns = (
+  runs: readonly CheckRunReport[],
+): ReadonlyMap<string, CheckRunReport> => {
+  const mut_winner = new Map<string, CheckRunReport>();
+
+  for (const run of runs) {
+    const previous = mut_winner.get(run.name);
+
+    if (previous === undefined || outranks(run, previous)) {
+      mut_winner.set(run.name, run);
+    }
+  }
+
+  return mut_winner;
 };
 
 /** One check run, in the terms the decision above is made in. */
