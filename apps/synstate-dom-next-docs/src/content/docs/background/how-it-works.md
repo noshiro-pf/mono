@@ -30,7 +30,7 @@ next round, only if an effect wrote to a state
 - **Depth makes it glitch-free.** A node's depth is one more than its deepest parent's, and the drain visits depth by depth, so each node is recomputed once per update, after every parent. A diamond (`total = derive([price$, tax$], ...)` where `tax$` is itself derived from `price$`) is computed once, from consistent values.
 - **An equal result stops there.** A node that recomputes to an `Object.is` equal value passes nothing on, and nothing below it is visited.
 - **Effects run on a settled graph.** A binding never reads a value that is about to change in the same update, and it runs once per update however many of its inputs changed.
-- **Writes never interrupt.** A write made during the drain (inside a `map`) waits until the drain ends. A write made by an effect starts the next round. A program that keeps writing from its effects is stopped after 100 rounds with an error naming the cause, rather than looping forever.
+- **Writes never interrupt.** A write made during the drain (inside a `map`) waits until the round's effects have run, so the bindings of that round see the value from before it, and then starts the next round, as a write made by an effect does. A program that keeps writing from its effects is stopped after 100 rounds with an error naming the cause, rather than looping forever.
 
 ## A binding is one effect
 

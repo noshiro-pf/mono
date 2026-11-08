@@ -77,8 +77,9 @@ the function again from inside itself.
 ## Writes
 
 - A write made during the drain (inside a `map`, say) is deferred until the
-  drain ends; it does not interrupt the update under way. `update(fn)` defers
-  `fn` itself, so two updates in one drain both apply.
+  round's effects have run, and then starts the next round; it does not
+  interrupt the update under way. `update(fn)` defers `fn` itself, so two
+  updates in one drain both apply.
 - A write made by an effect starts the next round. Updates never nest. A program
   that keeps writing from its effects is stopped after 100 rounds with an error
   naming the cause, instead of looping forever.

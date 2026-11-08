@@ -5,7 +5,7 @@
   ],
   "compilerOptions": {
     "libReplacement": true,
-    // The tests import this package by its own name, the way a consumer does.
+    // The tests and samples import this package by its own name, the way a consumer does.
     // Mapped to the source so that they are checked against the code being
     // edited rather than against the last build. See
     // docs/workspace-package-linking.md.
@@ -14,5 +14,5 @@
       "synstate-next/internal": ["./src/internal.mts"]
     }
   },
-  "include": ["./src", "./test", "./scripts", "./configs"]
+  "include": ["./samples", "./src", "./test", "./scripts", "./configs"]
 }

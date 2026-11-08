@@ -1,0 +1,54 @@
+---
+title: synstate-next
+description: synstate の作り直し。更新は整数のエポック、購読者は更新が落ち着いてから実行、寿命は owner で管理する、グリッチのない Observable 状態管理ライブラリです。
+template: splash
+hero:
+    tagline: synstate をゼロから作り直したものです。何が何に依存するかを宣言して状態に書き込めば、派生値はそれぞれ親がすべて済んだ後に 1 回だけ計算され、購読者は更新全体が落ち着いてから実行されます。
+    actions:
+        - text: はじめる
+          link: /mono/synstate-next/ja/getting-started/introduction/
+          icon: right-arrow
+          variant: primary
+        - text: 更新の伝わり方
+          link: /mono/synstate-next/ja/internals/how-an-update-propagates/
+          variant: minimal
+---
+
+import { Aside, Card, CardGrid } from '@astrojs/starlight/components';
+
+<Aside type="caution">
+    synstate-next はリポジトリ内の非公開パッケージで、npm
+    には公開していません。synstate
+    の次のメジャーバージョンとして公開する予定で、それまでは API
+    が変わることがあります。
+</Aside>
+
+## 特徴
+
+<CardGrid>
+    <Card title="グリッチがない" icon="approve-check">
+        派生値は 1 回の更新につき 1
+        回、親がすべて済んだ後に計算されます。ダイヤモンド型の依存でも同じです。更新途中の値を読むことはありません。
+    </Card>
+    <Card title="購読者は落ち着いたグラフを見る" icon="approve-check">
+        購読者は effect
+        で、更新が変わるノードすべてに届いてから実行されます。伝播の途中に行った書き込みは、伝播を中断せず、終わるまで待ちます。
+    </Card>
+    <Card title="変わらない値で打ち切る" icon="random">
+        すでに持っている値を計算したノードは何も伝えないので、その下のグラフはまったく辿られません。
+    </Card>
+    <Card title="寿命は owner ひとつ" icon="setting">
+        owner の実行中に作ったものはすべてその owner に属します。owner
+        を破棄すれば、派生値・購読・タイマー・リクエストも一緒に消えます。完了を伝える必要はありません。
+    </Card>
+    <Card title="値を持つかどうかが型でわかる" icon="pencil">
+        状態やその `map` は `.value` を持つ `InitializedObservable`、イベントや
+        `filter` はまだ値を持たないことがある `Observable`
+        です。どちらになるかは `pipe` が型で計算します。
+    </Card>
+    <Card title="小さく、規則的" icon="rocket">
+        1 つのことに書き方は 1 つです。変換は `map`、切り替えは
+        `switchMap`、独自のオペレーターは `createDerived`。別名や 1
+        行で書けるだけのオペレーターを覚える必要はありません。
+    </Card>
+</CardGrid>
