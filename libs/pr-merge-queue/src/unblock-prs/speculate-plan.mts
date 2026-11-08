@@ -34,17 +34,92 @@ export const desiredLayers = (
     depth: number;
   }>,
 ): readonly Layer[] => {
-  const stackable = candidates.findIndex(
-    (pr) =>
-      isVersionBranch(pr.headRefName, context.defaultBranch) ||
-      context.bypass.has(pr.number) ||
-      pr.isCrossRepository,
-  );
+  const stackable = candidates.findIndex((pr) => !isStackable(pr, context));
 
   return candidates
     .slice(0, stackable === -1 ? undefined : stackable)
     .slice(0, context.depth)
     .map((pr) => ({ number: pr.number, head: pr.headRefOid }));
+};
+
+/**
+ * Whether a pull request can be stacked: not the version pull request
+ * (`release.yml` rebuilds it from the tip on every push to `main`, and it is
+ * never rebased), not one only a bypass merges (it waits for a person, and
+ * every layer above it would wait too), not a fork's.
+ */
+export const isStackable = (
+  pr: PullRequest,
+  context: Readonly<{
+    defaultBranch: string;
+    bypass: ReadonlyMap<number, string>;
+  }>,
+): boolean =>
+  !isVersionBranch(pr.headRefName, context.defaultBranch) &&
+  !context.bypass.has(pr.number) &&
+  !pr.isCrossRepository;
+
+/**
+ * What the release step releases, in `order` ({@link stackedFirst}): the first
+ * alone while a layer stands, since the layers above carry it; otherwise each
+ * in turn, as without checking ahead, but in that order still, so that what is
+ * stacked goes first whatever this survey could not do.
+ */
+export const releasing = (
+  order: readonly PullRequest[],
+  stacked: boolean,
+): readonly PullRequest[] => (stacked ? Arr.take(order, 1) : order);
+
+/**
+ * The candidates with the layers already stacked kept first, in the order they
+ * were stacked, and the rest after them in their own order. A pull request that
+ * becomes a candidate, or gains `priority:high`, reorders only what is not yet
+ * stacked: putting it first would leave every layer above it standing on
+ * nothing, and cancel runs that were most of the way to a verdict.
+ *
+ * The kept stack follows the layers from the base's tree up, each the one whose
+ * pull request is still a candidate at the head it was built at; it stops at
+ * the first that is not, that can no longer be stacked ({@link isStackable}),
+ * whose pull request `mayStayAhead` refuses (one released and left green, which
+ * the order puts last), or that the order puts after the version pull request,
+ * since what goes into a release is the order's to say. Of two stacks on one
+ * tree (an old layer still being dropped beside the one being checked), the one
+ * with the layer built last is kept, and of two built in the same second the
+ * longer. A candidate's own order already holds what has to come first
+ * (`Merge-After`, a stack): a pull request waiting on another is not a
+ * candidate until that one merges.
+ */
+export const stackedFirst = (
+  candidates: readonly PullRequest[],
+  built: readonly BuiltLayer[],
+  baseTree: string,
+  context: Readonly<{
+    /** Whether the order lets it stay ahead: not one released and left green. */
+    mayStayAhead: (pr: PullRequest) => boolean;
+    defaultBranch: string;
+    bypass: ReadonlyMap<number, string>;
+  }>,
+): readonly PullRequest[] => {
+  const release = candidates.findIndex(({ headRefName }) =>
+    isVersionBranch(headRefName, context.defaultBranch),
+  );
+
+  const kept = keptStack(
+    candidates,
+    built,
+    { tree: baseTree, tip: undefined },
+    (pr) =>
+      context.mayStayAhead(pr) &&
+      isStackable(pr, context) &&
+      (release === -1 || candidates.indexOf(pr) < release),
+  ).stack;
+
+  const keptNumbers = new Set<number>(kept.map(({ number }) => number));
+
+  return [
+    ...kept,
+    ...candidates.filter(({ number }) => !keptNumbers.has(number)),
+  ];
 };
 
 /**
@@ -318,8 +393,11 @@ export type BuiltLayer = Layer &
     /** The branch's tip, the one commit the layer adds. */
     tip: string;
     tree: string;
-    /** The tree of the commit below: `main`'s, or the layer below's. */
+    /** The commit below, `main`'s or the layer below's, and its tree. */
+    parent: string;
     parentTree: string;
+    /** When the layer's commit was made, in epoch milliseconds. */
+    builtAt: number;
   }>;
 
 /** A run on a layer, as much as {@link planDrop} reads. */
@@ -369,6 +447,86 @@ export const DROPPED_RUN_QUIET_MS = 90 * 60_000;
 export const MAX_DISPATCHES = 3;
 
 const LAYER_TRAILER = 'Queue-Layer';
+
+/** Whether a layer on `main`'s tree is not right on another that could be kept. */
+const isOnMain = (
+  onTree: readonly BuiltLayer[],
+  candidates: readonly PullRequest[],
+  mayStayAhead: (pr: PullRequest) => boolean,
+): ((layer: BuiltLayer) => boolean) => {
+  const tips = new Set<string>(
+    onTree
+      .filter(({ number, head }) =>
+        candidates.some(
+          (pr) =>
+            pr.number === number && pr.headRefOid === head && mayStayAhead(pr),
+        ),
+      )
+      .map(({ tip }) => tip),
+  );
+
+  return ({ parent }) => !tips.has(parent);
+};
+
+const keptStack = (
+  candidates: readonly PullRequest[],
+  built: readonly BuiltLayer[],
+  below: Readonly<{ tree: string; tip: string | undefined }>,
+  mayStayAhead: (pr: PullRequest) => boolean,
+): Readonly<{ builtAt: number; stack: readonly PullRequest[] }> => {
+  // Each layer on what is below whose pull request is a candidate at the head
+  // it was built at, with the stack it carries; more than one when an old layer
+  // is still being dropped: the one with the layer built last is the one being
+  // checked, since a stack is only ever built anew over one that no longer
+  // stands, and of two built in the same second the longer. On `main` a layer
+  // is matched by tree, as `matchLayers` does, but one right on another layer
+  // there that could be kept is that one's next, not a stack of its own (an
+  // empty layer leaves the tree as it found it); on a layer, by its commit.
+  const onTree = built.filter(({ parentTree }) => parentTree === below.tree);
+
+  const isOnBelow =
+    below.tip === undefined
+      ? isOnMain(onTree, candidates, mayStayAhead)
+      : (layer: BuiltLayer): boolean => layer.parent === below.tip;
+
+  const stacks = Arr.generate(function* () {
+    for (const pr of candidates) {
+      const layer = onTree.find(
+        (each) =>
+          each.number === pr.number &&
+          each.head === pr.headRefOid &&
+          isOnBelow(each),
+      );
+
+      if (layer === undefined || !mayStayAhead(pr)) {
+        continue;
+      }
+
+      const above = keptStack(
+        candidates.filter(({ number }) => number !== pr.number),
+        built,
+        layer,
+        mayStayAhead,
+      );
+
+      yield {
+        builtAt: Math.max(layer.builtAt, above.builtAt),
+        stack: Arr.toUnshifted(pr)(above.stack),
+      } as const;
+    }
+  });
+
+  return stacks.reduce<
+    Readonly<{ builtAt: number; stack: readonly PullRequest[] }>
+  >(
+    (kept, each) =>
+      each.builtAt > kept.builtAt ||
+      (each.builtAt === kept.builtAt && each.stack.length > kept.stack.length)
+        ? each
+        : kept,
+    { builtAt: Number.NEGATIVE_INFINITY, stack: [] },
+  );
+};
 
 const takeStanding = (
   desired: readonly Layer[],

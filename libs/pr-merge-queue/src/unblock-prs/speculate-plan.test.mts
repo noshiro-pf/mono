@@ -16,6 +16,8 @@ import {
   mayBuildAbove,
   numberOfLayerBranch,
   planDrop,
+  releasing,
+  stackedFirst,
   type BuiltLayer,
   type DropRun,
   type LayerStatus,
@@ -57,6 +59,237 @@ describe(desiredLayers, () => {
     assert.deepStrictEqual(
       desiredLayers([pr(5, { isCrossRepository: true }), pr(6)], context),
       [],
+    );
+  });
+});
+
+describe(stackedFirst, () => {
+  // Built on `main` in this order, before #2 and #7 became candidates.
+  const built5 = built(5, { parentTree: 'main-tree', tree: 't5' });
+
+  const built9 = built(9, { parentTree: 't5', tree: 't9', parent: 'tip-5' });
+
+  test('keeps the layers already stacked first, and the rest in their order', () => {
+    assert.deepStrictEqual(
+      stackedFirst(
+        [pr(2), pr(5), pr(7), pr(9)],
+        [built9, built5],
+        'main-tree',
+        {
+          mayStayAhead: movable,
+          defaultBranch: 'main',
+          bypass: new Map<number, string>(),
+        },
+      ).map(({ number }) => number),
+      [5, 9, 2, 7],
+    );
+  });
+
+  test('stops the kept stack at a layer whose pull request moved or left', () => {
+    assert.deepStrictEqual(
+      stackedFirst(
+        [pr(2), pr(5, { headRefOid: 'b'.repeat(40) }), pr(9)],
+        [built5, built9],
+        'main-tree',
+        {
+          mayStayAhead: movable,
+          defaultBranch: 'main',
+          bypass: new Map<number, string>(),
+        },
+      ).map(({ number }) => number),
+      [2, 5, 9],
+    );
+
+    assert.deepStrictEqual(
+      stackedFirst([pr(2), pr(9)], [built5, built9], 'main-tree', {
+        mayStayAhead: movable,
+        defaultBranch: 'main',
+        bypass: new Map<number, string>(),
+      }).map(({ number }) => number),
+      [2, 9],
+    );
+  });
+
+  // Released once and left green, it goes last, as the candidates' order has
+  // it; keeping it first would release it again and again.
+  test('keeps no layer whose pull request may not stay ahead', () => {
+    assert.deepStrictEqual(
+      stackedFirst([pr(2), pr(9), pr(5)], [built5, built9], 'main-tree', {
+        mayStayAhead: ({ number }) => number !== 5,
+        defaultBranch: 'main',
+        bypass: new Map<number, string>(),
+      }).map(({ number }) => number),
+      [2, 9, 5],
+    );
+  });
+
+  // An old layer of #2 still being dropped stands on the same tree: the stack
+  // being checked is the one built last, however long the old one is.
+  test('keeps the stack built last when two stand on the same tree', () => {
+    const old2 = {
+      ...built(2, { parentTree: 'main-tree', tree: 't2' }),
+      builtAt: -1,
+    } as const;
+
+    const old3 = {
+      ...built(3, { parentTree: 't2', tree: 't3', parent: 'tip-2' }),
+      builtAt: -1,
+    } as const;
+
+    assert.deepStrictEqual(
+      stackedFirst([pr(2), pr(3), pr(5)], [old2, old3, built5], 'main-tree', {
+        mayStayAhead: movable,
+        defaultBranch: 'main',
+        bypass: new Map<number, string>(),
+      }).map(({ number }) => number),
+      [5, 2, 3],
+    );
+  });
+
+  // The old layer of #2 was built after #5's, but #9 was built on #5 since.
+  test('keeps the stack whose newest layer was built last', () => {
+    const old2 = {
+      ...built(2, { parentTree: 'main-tree', tree: 't2' }),
+      builtAt: 1000,
+    } as const;
+
+    assert.deepStrictEqual(
+      stackedFirst(
+        [pr(2), pr(5), pr(9)],
+        [old2, built5, { ...built9, builtAt: 2000 }],
+        'main-tree',
+        {
+          mayStayAhead: movable,
+          defaultBranch: 'main',
+          bypass: new Map<number, string>(),
+        },
+      ).map(({ number }) => number),
+      [5, 9, 2],
+    );
+  });
+
+  // Built in the same second (a commit's time is in seconds): the longer is the
+  // one being checked, whatever the queue's order says now.
+  test('keeps the longer of two stacks built in the same second', () => {
+    const old2 = built(2, { parentTree: 'main-tree', tree: 't2' });
+
+    for (const candidates of [
+      [pr(2), pr(5), pr(9)],
+      [pr(9), pr(5), pr(2)],
+    ]) {
+      assert.deepStrictEqual(
+        Arr.take(
+          stackedFirst(candidates, [old2, built5, built9], 'main-tree', {
+            mayStayAhead: movable,
+            defaultBranch: 'main',
+            bypass: new Map<number, string>(),
+          }),
+          2,
+        ).map(({ number }) => number),
+        [5, 9],
+      );
+    }
+  });
+
+  // A layer that changes nothing leaves the tree as it found it: the one on it
+  // is its next, not a stack of its own.
+  test('follows an empty layer to the one on it', () => {
+    const empty2 = built(2, { parentTree: 'main-tree', tree: 'main-tree' });
+
+    const on2 = {
+      ...built(5, {
+        parentTree: 'main-tree',
+        tree: 't5',
+        parent: empty2.tip,
+      }),
+      builtAt: 1000,
+    } as const;
+
+    assert.deepStrictEqual(
+      stackedFirst([pr(9), pr(5), pr(2)], [empty2, on2], 'main-tree', {
+        mayStayAhead: movable,
+        defaultBranch: 'main',
+        bypass: new Map<number, string>(),
+      }).map(({ number }) => number),
+      [2, 5, 9],
+    );
+  });
+
+  // Its branch outlives it, until the survey drops it as stale.
+  test('starts at a layer on an empty one no longer a candidate', () => {
+    const empty2 = built(2, { parentTree: 'main-tree', tree: 'main-tree' });
+
+    const on2 = built(5, {
+      parentTree: 'main-tree',
+      tree: 't5',
+      parent: empty2.tip,
+    });
+
+    assert.deepStrictEqual(
+      stackedFirst([pr(9), pr(5)], [empty2, on2], 'main-tree', {
+        mayStayAhead: movable,
+        defaultBranch: 'main',
+        bypass: new Map<number, string>(),
+      }).map(({ number }) => number),
+      [5, 9],
+    );
+  });
+
+  test('keeps nothing ahead of the version pull request that the order puts after it', () => {
+    assert.deepStrictEqual(
+      stackedFirst(
+        [pr(2), pr(1, { headRefName: 'changeset-release/main' }), pr(5), pr(9)],
+        [built(2, { parentTree: 'main-tree', tree: 't2' }), built5, built9],
+        'main-tree',
+        {
+          mayStayAhead: movable,
+          defaultBranch: 'main',
+          bypass: new Map<number, string>(),
+        },
+      ).map(({ number }) => number),
+      [2, 1, 5, 9],
+    );
+  });
+
+  // Waiting for a person, it would hold every layer above it.
+  test('keeps no layer whose pull request can no longer be stacked', () => {
+    assert.deepStrictEqual(
+      stackedFirst([pr(2), pr(5), pr(9)], [built5, built9], 'main-tree', {
+        mayStayAhead: movable,
+        defaultBranch: 'main',
+        bypass: new Map<number, string>([[5, 'review']]),
+      }).map(({ number }) => number),
+      [2, 5, 9],
+    );
+  });
+
+  test('keeps nothing that does not stand on the base', () => {
+    assert.deepStrictEqual(
+      stackedFirst([pr(2), pr(5)], [built5], 'other-tree', {
+        mayStayAhead: movable,
+        defaultBranch: 'main',
+        bypass: new Map<number, string>(),
+      }).map(({ number }) => number),
+      [2, 5],
+    );
+  });
+});
+
+describe(releasing, () => {
+  const order = [pr(5), pr(9), pr(2)] as const;
+
+  test('releases the first of the kept order alone while a layer stands', () => {
+    assert.deepStrictEqual(
+      releasing(order, true).map(({ number }) => number),
+      [5],
+    );
+  });
+
+  // Whatever this survey could not do, what is stacked still goes first.
+  test('tries each in the kept order otherwise', () => {
+    assert.deepStrictEqual(
+      releasing(order, false).map(({ number }) => number),
+      [5, 9, 2],
     );
   });
 });
@@ -433,6 +666,9 @@ describe('layer branches and trailers', () => {
 
 const HEAD = 'a'.repeat(40);
 
+/** Lets every candidate stay ahead (`stackedFirst`). */
+const movable = (): boolean => true;
+
 const GREEN: LayerStatus = { kind: 'green' } as const;
 
 const RED: LayerStatus = {
@@ -450,11 +686,13 @@ const layer = (number: number): Readonly<{ number: number; head: string }> =>
 
 const built = (
   number: number,
-  trees: Readonly<{ parentTree: string; tree: string }>,
+  trees: Readonly<{ parentTree: string; tree: string; parent?: string }>,
 ): BuiltLayer =>
   ({
     ...layer(number),
     tip: `tip-${number}`,
+    parent: 'main-commit',
+    builtAt: 0,
     ...trees,
   }) as const;
 

@@ -15,7 +15,7 @@
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import { statesFromCheckRuns } from 'pr-report-core';
-import { Arr, Result, unknownToString } from 'ts-data-forge';
+import { Arr, Num, Result, unknownToString } from 'ts-data-forge';
 import * as t from 'ts-fortress';
 import {
   currentEpochMs,
@@ -42,6 +42,7 @@ import {
   mayBuildAbove,
   numberOfLayerBranch,
   planDrop,
+  stackedFirst,
   type BuiltLayer,
   type Layer,
   type LayerStatus,
@@ -68,21 +69,38 @@ export const speculate = async (
      * whose layer at that head is left to finish (`planDrop`).
      */
     setAside: ReadonlyMap<number, string>;
+    /** Whether a candidate may stay ahead of the order (`stackedFirst`). */
+    mayStayAhead: (pr: PullRequest) => boolean;
   }>,
 ): Promise<Speculation> => {
-  const { candidates, defaultBranch, baseSha, config } = context;
+  const { defaultBranch, baseSha, config } = context;
+
+  const branches = await readBuiltLayers(baseSha);
+
+  if (Result.isErr(branches)) {
+    return fallBack(
+      `cannot read the layer branches: ${branches.value}`,
+      context.candidates,
+    );
+  }
+
+  // What is stacked stays ahead; the rest follows in the queue's order.
+  const candidates = stackedFirst(
+    context.candidates,
+    branches.value.built,
+    branches.value.baseTree,
+    {
+      mayStayAhead: context.mayStayAhead,
+      defaultBranch,
+      bypass: context.bypass,
+    },
+  );
 
   const desired = desiredLayers(candidates, {
     defaultBranch,
     bypass: context.bypass,
     depth: config.depth,
   });
-
-  const branches = await readBuiltLayers(baseSha);
-
-  if (Result.isErr(branches)) {
-    return fallBack(`cannot read the layer branches: ${branches.value}`);
-  }
 
   const { kept, toBuild, stale } = matchLayers({
     desired,
@@ -95,7 +113,7 @@ export const speculate = async (
   const keptStatuses = await readStatusesOf(api, kept, config.workflows);
 
   if (Result.isErr(keptStatuses)) {
-    return fallBack(keptStatuses.value);
+    return fallBack(keptStatuses.value, candidates);
   }
 
   const buildable = mayBuildAbove(
@@ -111,7 +129,7 @@ export const speculate = async (
   const builtStatuses = await readStatusesOf(api, builtNow, config.workflows);
 
   if (Result.isErr(builtStatuses)) {
-    return fallBack(builtStatuses.value);
+    return fallBack(builtStatuses.value, candidates);
   }
 
   const layers = [...kept, ...builtNow] as const;
@@ -148,7 +166,10 @@ export const speculate = async (
     const fixersOwn = await isFixersOwn(api, layers[0].tip, context.autoFix);
 
     if (Result.isErr(fixersOwn)) {
-      return fallBack(`cannot read its layer's jobs: ${fixersOwn.value}`);
+      return fallBack(
+        `cannot read its layer's jobs: ${fixersOwn.value}`,
+        candidates,
+      );
     }
 
     if (fixersOwn.value) {
@@ -162,7 +183,12 @@ export const speculate = async (
         await deleteBranch(decided.setAside.number);
       }
 
-      return { stacked: false, release: true, setAside: undefined };
+      return {
+        stacked: false,
+        release: true,
+        setAside: undefined,
+        order: candidates,
+      };
     }
   }
 
@@ -177,6 +203,7 @@ export const speculate = async (
   ) {
     return fallBack(
       `${layerBranch(layers[0]?.number ?? 0)} has been running for too long`,
+      candidates,
     );
   }
 
@@ -190,7 +217,7 @@ export const speculate = async (
         `${layerBranch(layer?.number ?? 0)} has had a workflow cancelled ${MAX_DISPATCHES} times` as const;
 
       if (decided.dispatch === 0) {
-        return fallBack(why);
+        return fallBack(why, candidates);
       }
 
       log(`Not dispatching: ${why}; it is decided once that layer is first.`);
@@ -206,7 +233,10 @@ export const speculate = async (
           // The first layer would be waited for for ever; one above it is tried
           // again on the next survey.
           if (decided.dispatch === 0) {
-            return fallBack(`cannot dispatch ${workflow}: ${dispatched.value}`);
+            return fallBack(
+              `cannot dispatch ${workflow}: ${dispatched.value}`,
+              candidates,
+            );
           }
 
           log(
@@ -226,14 +256,17 @@ export const speculate = async (
   }
 
   if (!decided.release && candidates[0] !== undefined) {
+    const queueFirst = context.candidates[0]?.number;
+
     log(
-      `#${candidates[0].number}: waiting for its layer's checks before releasing it.`,
+      `#${candidates[0].number}: waiting for its layer's checks before releasing it${queueFirst === candidates[0].number ? '' : `, stacked ahead of #${queueFirst}, which the queue's own order puts first`}.`,
     );
   }
 
   return {
     stacked: Arr.isNonEmpty(layers),
     release: decided.release,
+    order: candidates,
     setAside:
       decided.setAside === undefined
         ? undefined
@@ -283,6 +316,11 @@ export type Speculation = Readonly<{
   stacked: boolean;
   release: boolean;
   setAside: SkipRecord | undefined;
+  /**
+   * The candidates as checking ahead orders them, what is stacked first
+   * (`stackedFirst`), which the release step releases from (`releasing`).
+   */
+  order: readonly PullRequest[];
 }>;
 
 /** Where the configured workflows stand on a layer. */
@@ -507,10 +545,10 @@ const deleteRuns = async (
   return done.every(([, each]) => Result.isOk(each));
 };
 
-const fallBack = (why: string): Speculation => {
+const fallBack = (why: string, order: readonly PullRequest[]): Speculation => {
   log(`Not checking ahead this survey (${why}); releasing as usual.`);
 
-  return { stacked: false, release: true, setAside: undefined };
+  return { stacked: false, release: true, setAside: undefined, order };
 };
 
 /** The layer branches as they stand on `origin`, and `main`'s tree. */
@@ -560,27 +598,36 @@ const readBuiltLayers = async (
 
   const built = await Promise.all(
     tips.map(async ({ sha, number }) => {
-      const shown = await git(`git log -1 --format=%T%x00%B ${sh(sha)}`);
+      const shown = await git(`git log -1 --format=%T%x00%ct%x00%B ${sh(sha)}`);
 
-      const below = await git(`git log -1 --format=%T ${sh(`${sha}^`)}`);
+      const below = await git(`git log -1 --format=%H%x00%T ${sh(`${sha}^`)}`);
 
       if (Result.isErr(shown) || Result.isErr(below)) {
         return undefined;
       }
 
-      const [tree, message] = shown.value.split('\0', 2);
+      const [tree, committed, message] = shown.value.split('\0', 3);
 
-      const parentTree = below.value.trim();
+      const [parent, parentTree] = below.value.trim().split('\0', 2);
 
       const layer = layerOfMessage(message ?? '');
 
-      return tree === undefined || parentTree === '' || layer?.number !== number
+      // An unreadable time reads as no layer, as an unreadable message does.
+      const committedAt = Num.safeParseInt(committed ?? '');
+
+      return tree === undefined ||
+        parent === undefined ||
+        parentTree === undefined ||
+        Result.isErr(committedAt) ||
+        layer?.number !== number
         ? undefined
         : ({
             ...layer,
             tip: sha,
             tree: tree.trim(),
+            parent,
             parentTree,
+            builtAt: committedAt.value * 1000,
           } as const);
     }),
   );
@@ -609,7 +656,7 @@ const buildLayer = async (
     return Result.err(`cannot fetch its head: ${fetched.value}`);
   }
 
-  const below = await run('git log -1 --format=%T HEAD');
+  const below = await run('git log -1 --format=%H%x00%T HEAD');
 
   const mergeBase = await run(
     `git merge-base ${sh(`origin/${defaultBranch}`)} ${sh(layer.head)}`,
@@ -619,7 +666,11 @@ const buildLayer = async (
     return Result.err('cannot read its commits');
   }
 
-  const parentTree = below.value.trim();
+  const [parent, parentTree] = below.value.trim().split('\0', 2);
+
+  if (parent === undefined || parentTree === undefined) {
+    return Result.err('cannot read the commit below');
+  }
 
   // Its own commits, oldest first and merges left out, as the release's
   // `git rebase` replays them, so that the layer's tree is the one its head
@@ -672,9 +723,17 @@ const buildLayer = async (
 
   const tip = await run('git rev-parse HEAD');
 
-  const tree = await run('git log -1 --format=%T HEAD');
+  const made = await run('git log -1 --format=%T%x00%ct HEAD');
 
-  if (Result.isErr(tip) || Result.isErr(tree)) {
+  if (Result.isErr(tip) || Result.isErr(made)) {
+    return Result.err('cannot read the commit it made');
+  }
+
+  const [tree, time] = made.value.trim().split('\0', 2);
+
+  const committedAt = Num.safeParseInt(time ?? '');
+
+  if (tree === undefined || Result.isErr(committedAt)) {
     return Result.err('cannot read the commit it made');
   }
 
@@ -693,8 +752,11 @@ const buildLayer = async (
   return Result.ok({
     ...layer,
     tip: tip.value.trim(),
-    tree: tree.value.trim(),
+    tree,
+    parent,
     parentTree,
+    // The commit's time, as `readBuiltLayers` reads it back.
+    builtAt: committedAt.value * 1000,
   });
 };
 

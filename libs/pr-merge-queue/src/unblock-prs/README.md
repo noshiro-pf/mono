@@ -155,13 +155,16 @@ PR — から行います。public repository なので、コメントではな�
 **`priority:high` / `priority:low` ラベル** は「pick できるものの中で優先して
 ほしい / 後回しで良い」という宣言です。
 
-- pick できる候補の中で、`priority:high` を先頭に、`priority:low` を末尾に並
-  べます。並び替えるだけで、ゲートではありません。`Merge-After`、stack、
-  `blocks-release`、レビュー待ちで止まっている PR は止まったままで、進行中の PR
-  は何が付いていても今まで通り watch します。
-- version PR にも効きます。`priority:high` を付ければ順番待ちの変更より先にリ
-  リースし、`priority:low` の付いた変更は普通の version PR より後ろ、つまり次
-  のリリースに回ります。
+- pick できる候補の中で、`priority:high` を先頭に、`priority:low` を末尾に並べ
+  ます（順番より先の検証で積んである段より前には出ません。「3b」）。並び替える
+  だけで、ゲートではありません。`Merge-After`、stack、`blocks-release`、
+  レビュー待ちで止まっている PR は止まったままで、進行中の PR は何が付いていて
+  も今まで通り watch します。
+- version PR にも効きます。`priority:high` を付ければ順番待ちの変更より先に
+  リリースします。順番より先の検証で積んである段も、キューの順で後ろなら先頭に
+  保たないので、その後になります（「3b」）。また、
+  `priority:low` の付いた変更は普通の version PR より後ろ、つまり次のリリース
+  に回ります。
 - `DIRTY` と version PR を後ろに回す並びより優先し、番号順はその内側です。
   green のまま止まった PR（「5」）を最後に回す規則だけはこれより強く、
   `priority:high` でも最後です。
@@ -542,6 +545,20 @@ PR なら10分続いたところで triage の前に見送ります。候補の�
 する前に、先頭から `depth` 本までの candidate を順番より先に検証します
 （`speculate.mts`、判断は `speculate-plan.mts`）。
 
+- すでに積んである段は、積んだ順のまま先頭に保ち、残りの candidate をその後ろに
+  キューの順で並べます（`stackedFirst`）。新しく candidate になった PR や
+  `priority:high` の付いた PR が並べ替えるのは、まだ積んでいないものだけです。
+  先頭に割り込ませると、その上の段がすべて立たなくなり、検証が終わりかけの run
+  まで取り消すことになるからです。積んである段は、`main` の tree から順に、PR が
+  段を作った head のまま candidate である限り保ちます。緑のまま止まって後ろに
+  回された PR（「5」）は保たず、そこで止めます。`Merge-After` やスタックの先行
+  PR がまだマージされていない PR はそもそも candidate ではないので、この並びが
+  その順序を破ることはありません。解放はこの並びの順に行い、従来どおりの解放に
+  戻るときも同じです。ただし段のブランチを読めなかったときは、キュー本来の順で
+  解放します。同じ tree の上に段の列が2つある（古い段を落としている途中の）とき
+  は、最後に積んだ段を含むほう（同じ秒なら長いほう）を保ち、もう積めなくなった PR
+  は保ちません。キューの順で version PR より後ろの PR も保ちません。リリースに
+  何が入るかは、引き続きキューの順で決まります。
 - 各 candidate のコミットを、`origin/main` との merge base から1コミットに
   まとめて、1本下の段（先頭なら `main`）の上に積み、`queue/pr-<番号>` に
   push します。コミットには `Queue-Layer: <番号> <head>` のトレーラを付け、
@@ -1179,13 +1196,16 @@ changes and easy to review ("3a").
 **The `priority:high` and `priority:low` labels say which of the pickable
 pull requests to take first, and which can wait.**
 
-- Among the candidates, one labelled `priority:high` goes first and one
-  labelled `priority:low` last. It is an ordering, not a gate: what
-  `Merge-After`, a stack, `blocks-release` or a review holds stays held, and
-  one in flight is watched whatever it carries.
-- The version pull request reads it too. `priority:high` on it releases
-  before the queued changes; a change labelled `priority:low` goes after an
-  unlabelled version pull request, so into the release after.
+- Among the candidates, one labelled `priority:high` goes first and one labelled
+  `priority:low` last (never ahead of the layers checking ahead has stacked; see
+  "3b"). It is an ordering, not a gate: what `Merge-After`, a stack,
+  `blocks-release` or a review holds stays held, and one in flight is watched
+  whatever it carries.
+- The version pull request reads it too. `priority:high` on it releases before
+  the queued changes, the layers checking ahead has already stacked included,
+  since none the order puts after it is kept ahead ("3b"); a change labelled
+  `priority:low` goes after an unlabelled version pull request, so into the
+  release after.
 - It outranks the ordering that moves `DIRTY` and the version pull request
   back, and the numbers order within it. Only the rule that puts last one that
   sat green without merging ("5") is stronger: that one is last even with
@@ -1606,6 +1626,22 @@ With `speculate` in `.github/unblock-prs.json`, step 3 first checks up to
 `depth` of the leading candidates ahead of their turn (`speculate.mts`, what is
 decided in `speculate-plan.mts`).
 
+- The layers already stacked stay first, in the order they were stacked, and the
+  other candidates follow in the queue's order (`stackedFirst`). A pull request
+  that becomes a candidate, or gains `priority:high`, reorders only what is not
+  yet stacked: put first, it would leave every layer above it standing on
+  nothing and cancel runs most of the way to a verdict. The kept stack follows
+  the layers up from `main`'s tree while each pull request is still a candidate
+  at the head its layer was built at, and stops at one released and left green
+  ("5"), which goes last. A pull request waiting on another (`Merge-After`, a
+  stack) is not a candidate until that one merges, so the order this keeps never
+  breaks one. The release step releases in this order, also when it falls back
+  to releasing as before, unless the layer branches could not be read, which
+  leaves the queue's own order. Of two stacks on the same tree (an old layer
+  still being dropped), the one with the layer built last is kept (of two built
+  in the same second, the longer), and a pull request that can no longer be
+  stacked is not kept ahead. Nor is one the queue's order puts after the version
+  pull request: what goes into a release is still the order's to say.
 - Each candidate's commits, from its merge base with `origin/main`, are squashed
   into one commit on the layer below (`main` for the first) and pushed to
   `queue/pr-<number>`. The commit carries a `Queue-Layer: <number> <head>`

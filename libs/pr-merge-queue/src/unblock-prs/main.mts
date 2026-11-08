@@ -24,7 +24,12 @@ import {
   STALE_STATE_PAUSE_MS,
   UNREAD_SURVEYS_BEFORE_SETTING_ASIDE,
 } from './constants.mjs';
-import { afterWatch, followHead, pruneDemotions } from './demotions.mjs';
+import {
+  afterWatch,
+  followHead,
+  isDemoted,
+  pruneDemotions,
+} from './demotions.mjs';
 import {
   checkPreflight,
   readIssueOrder,
@@ -70,6 +75,7 @@ import {
   unannouncedSkips,
   withSkip,
 } from './skips.mjs';
+import { releasing } from './speculate-plan.mjs';
 import { dropAllLayers, speculate } from './speculate.mjs';
 import { stackedOnAfter, stackParentsOf } from './stack.mjs';
 import {
@@ -1249,6 +1255,9 @@ const runCycle = async (
       config: speculateConfig,
       autoFix: autoFixConfig,
       setAside: setAsideHeads(mut_skipped),
+      // One released and left green goes last (`demotions.mts`); kept ahead, it
+      // would be released again and again.
+      mayStayAhead: (pr) => !isDemoted(demoted, pr),
     });
 
     if (speculation.setAside !== undefined) {
@@ -1265,11 +1274,12 @@ const runCycle = async (
       };
     }
 
-    if (speculation.stacked) {
-      mut_releasing = Arr.take(triaged.candidates, 1).filter(
-        (pr) => pr.number !== speculation.setAside?.number,
-      );
-    }
+    // In checking ahead's order, which keeps what is stacked first: the first
+    // alone while a layer stands (`releasing`).
+    mut_releasing = releasing(speculation.order, speculation.stacked).filter(
+      // Not one this survey set aside, whatever `releasing` is given.
+      (pr) => pr.number !== speculation.setAside?.number,
+    );
   }
 
   for (const target of mut_releasing) {
