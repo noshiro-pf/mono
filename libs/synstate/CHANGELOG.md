@@ -1,5 +1,40 @@
 # synstate
 
+## 8.0.0
+
+### Major Changes
+
+- c9df77c: synstate: a `subscribe` made while a scope runs (`createScope`, `scope.run`) now belongs to that scope, as an observable created there does, and `scope.dispose()` unsubscribes it first, before disposing the child scopes, running the `onScopeDispose` cleanups and disposing the owned observables. A subscription made outside every scope, or inside `untracked`, lasts as before, until `unsubscribe` or completion. An update and a completion now run in no scope, whichever scope wrote the value or completed the observable, so a subscription that a subscriber, or `switchMap` and `mergeMap` for an inner observable, makes on hearing it belongs to no scope that happened to be running; `collectToArray` subscribes in none either. A subscription that ends on its own (`unsubscribe`, completion) is forgotten by its scope.
+
+    Breaking: a subscription made inside `scope.run` that was meant to outlive the scope must now be made inside `untracked`. A subscription made in a scope hears no completion of the observables that scope disposes, since it ends first.
+
+    synstate-dom: `subscribeInScope` is removed. Write `source.subscribe(next)`: made while a component mounts, it belongs to the component's scope and ends with it.
+
+    Breaking: replace `subscribeInScope(source, next)` with `source.subscribe(next)`.
+
+    eslint-plugin-synstate: `no-observable-in-handler` also reports a `.subscribe(…)` made in an event handler or listener on a synstate observable that does not complete by itself, since no scope ends it there.
+
+    synstate-router: `follow` keeps following until it is stopped or the router is disposed, also when it is started while a scope runs. The release moves the `synstate` peer range to the new major, so it needs the synstate release above; nothing else changes for its consumers.
+
+    synstate-router-dom: its subscriptions are made with `subscribe` in the scope they belong to, so it needs the synstate release above.
+
+    synstate-preact-signals, synstate-preact-hooks, synstate-react-hooks, synstate-react-hooks-compat: they re-export synstate, whose `subscribe` above now ends with the scope it is made in, so each takes a major release with it.
+
+### Minor Changes
+
+- 72bb513: synstate: `createScope(parent, { after })` makes every observable derived in the scope, and in its child scopes, update after `after` in an update that reaches both, however few steps it is from the source.
+
+    synstate-dom: `If`, `MatchOptional` and `MatchResult` mount each branch, and `For` each row, in a scope created with `after: value`, so a branch the next value rules out is disposed before what it derived computes that value. A component the branch mounts that reads `user$.pipe(map((u) => u!.name))` under `<If cond={…user$ is defined…}>` no longer sees `undefined` when the condition is derived in more steps than the branch's own value, as long as the condition updates in the same update as the source (not through `debounce` or `switchMap`). A subscription the branch makes to the source directly still hears the value when the source emits, JSX written inline in `then` is created in the enclosing scope and is not ordered, and a value that arrives while the switch is still mounting (or before it is attached) is applied after the update, as before.
+
+    synstate-router-dom: `Routes` mounts each route's branch in a scope created with `after: router.match` too. What a page derived from `router.location` in one step was as deep as `router.match`, and updated after the switch only because of the order the update queued them in; it now does so by depth.
+
+### Patch Changes
+
+- 60fe319: `subscribe` passes on a value the first call of `onNext` writes to the observable itself (a clamp, a default), once, after that call has returned, unless the call disposed the scope the subscription is made in. `onNext` is not a subscriber yet while its first call runs, so that write used to reach no one. If the call passing it on throws, `subscribe` ends the subscription before the exception reaches its caller.
+- 5f66da0: `switchMap` subscribes to nothing for a projection that a write to its own source switched away from, or that completed `switchMap`, instead of leaving that inner subscribed and emitting twice; `mergeMap` does not subscribe to an inner once it has completed during the projection. A scope disposed while its `run` is still executing disposes what is created in it afterwards once that `run` returns and runs a cleanup it is given at once, and `dispose` runs every cleanup even when one throws, then rethrows the first error.
+- Updated dependencies [931ba22]
+    - ts-data-forge@14.13.0
+
 ## 7.0.2
 
 ### Patch Changes

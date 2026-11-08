@@ -1,5 +1,30 @@
 ## [5.8.4](https://github.com/noshiro-pf/eslint-config-typed/compare/v5.8.3...v5.8.4) (2026-08-09)
 
+## 7.8.0
+
+### Minor Changes
+
+- 931ba22: `total-functions/no-partial-division` checks the remainder too: `x % y` and `x %= y` are reported, as `x / y` is, unless the divisor is provably non-zero, since `x % 0` is `NaN` and `x % 0n` throws a `RangeError`. Use `Num.isNonZero` and `Num.rem` from ts-data-forge, or a divisor with a non-zero literal type.
+
+    The denominator is read through `as`, `satisfies`, `!` and `<T>`, and by its type whatever its shape. `x / (2 satisfies number)`, `x / -1`, `x / -(2 as number)` and `x / obj.n` with `n: 2` are no longer reported; `x / null`, `x / '0'`, `x / (y as unknown as 1)` with `y: number` and `x / (foo as 42 | null)` are. A denominator that is not a non-zero number or bigint literal (or a sign applied to one) is safe only when the type of every wrapper layer is a non-zero number or bigint literal, so `x / foo!` with `foo: 42 | undefined` stays reported: a `!` vouches for nothing.
+
+- d3480af: New rule `ts-restrictions/prefer-catch`, on in `eslintTsRestrictionsRules`: `promise/prefer-catch` with its fix offered only as a suggestion. `promise/prefer-catch` stays off, since its fix rewrites `p.then(a, b)` into `p.catch(b).then(a)`, which runs `a` after a rejection too; the wrapper restores its reports — `.then(null, b)`, a `Readonly<Promise<T>>` receiver and other thenables, which `unicorn/prefer-then-catch` does not report — without letting `--fix` apply the rewrite.
+- 43a6f97: `eslintTsDataForgeRules` and its types `EslintTsDataForgeRules` / `EslintTsDataForgeRulesOption` follow `eslint-plugin-ts-data-forge` again: they are generated from the plugin by `gen:rule-types` rather than kept by hand. The preset no longer names `prefer-arr-is-min-length-array`, `prefer-arr-is-max-length-array`, `prefer-arr-is-bounded-length-array`, `prefer-arr-is-fixed-length-array` and `prefer-arr-is-non-empty`, which the plugin replaced with `prefer-canonical-length-guard` and which ESLint refused as unknown rules, and turns on at `error` the rules it had not listed: `prefer-canonical-length-guard`, `prefer-canonical-length-cast`, `prefer-arr-generate`, `prefer-arr-scan`, `prefer-arr-uniq`, `no-side-effect-import`, `prefer-obj-over-entries-round-trip` and `prefer-pipe-map-nullable`, as the plugin's `recommended` config does. A rule entry with options is typed `readonly [severity, options]`, and a rule that offers suggestions says so in its JSDoc table.
+
+### Patch Changes
+
+- 72f799b: `immer-coding-style/mut-prefixed-draft` reports only the recipe of immer's own `produce` / `produceWithPatches` — a named, aliased, default or namespace import from `immer` that nothing nearer shadows — as `prefer-curried-produce` already did. A `produce` from another module, a local one, a parameter shadowing the import and one with no import at all are left alone; a namespace call (`immer.produce(state, (draft) => …)`) is now reported too.
+- b322c71: `ts-restrictions/no-date-only-string-to-date` leaves alone `new Date` with more than one argument or a spread (`new Date(year, 10, 3)`), which reads numbers and parses no string; `Date.parse` and the callees named in `functions` are still checked whatever follows their first argument. It also sees a date-only literal behind an indexed access (`T['day']`, `T[K]`) as it does behind a type parameter, and stops at a template literal type, which is its own constraint.
+- 5dfb8d2: `total-functions/no-hidden-type-assertions` reports a type argument the contextual type infers where no argument supplies it: a type parameter that only an omitted optional parameter, an empty rest parameter, a `NoInfer<…>` or the parameters of a callback given a lambda that leaves its parameter types to the context mention (`declare function g<T>(x?: T): T; const s: string = g();`). An `unknown` default no longer passes such a call (`parse<T = unknown>(): T` under `const s: string = parse()`), nor does a `never` default where the return type is the type parameter alone (`parse<T = never>(): T`); a `never` default the call does not overwrite still passes where the declared return type is a union with a member the type parameter is not in, as for `ok<S, E = never>(s: S): { ok: S } | { err: E }`. These need TypeScript 5.8 or later, whose checker gives the resolved type arguments; with an older one the rule reports what it did. In either, a cast of a function whose type parameter its value parameters mention only under `NoInfer` (`(h as (x: string) => string)('a')` for `h<T>(x: NoInfer<T>): T`) is reported as a cast of a hidden type assertion.
+- 00010f5: `vitest-coding-style/no-expect-to-strict-equal`, `ts-restrictions/prefer-range-in-number-line-order` and `ts-restrictions/prefer-ternary` judge whether moving or dropping an expression is safe with `eslint-rule-forge`'s `mayHaveEffect`. `no-expect-to-strict-equal` no longer moves a message after a spread that runs an iterator (``expect(a, `seen ${it.count}`).toStrictEqual([...it])`` is reported without a fix), and fixes an expected value whose only tagged template is inside a function body. `prefer-range-in-number-line-order` only suggests reordering an operand that is a tagged template, and `prefer-ternary` does not merge a `let` whose initial value is one.
+- 0378aad: `vitest-coding-style`'s `no-expect-to-strict-equal`, `prefer-assert-is-true-over-expect-true` and `prefer-assert-is-false-over-expect-false` report an `expect` destructured from a test's context (`test.concurrent('x', ({ expect }) => …)`, with Vitest's own `test` or `it`) or from `import.meta.vitest`, without a fix, since neither offers an `assert` the fix could name. The `assert` rules also recognize an `assert` destructured from `import.meta.vitest`.
+- Updated dependencies [b0c7efb]
+- Updated dependencies [00010f5]
+- Updated dependencies [72f799b]
+- Updated dependencies [931ba22]
+    - eslint-rule-forge@0.9.0
+    - ts-data-forge@14.13.0
+
 ## 7.7.0
 
 ### Minor Changes

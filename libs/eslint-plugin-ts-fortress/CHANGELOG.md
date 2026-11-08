@@ -1,5 +1,17 @@
 # eslint-plugin-ts-fortress
 
+## 1.3.17
+
+### Patch Changes
+
+- 43a6f97: The exported rule types say in each rule's JSDoc table whether it offers suggestions (`hasSuggestions`), so a suggestion-only rule no longer reads as having no rewrite at all. A rule entry with options is typed `readonly [severity, options]`, with the first option kept whole rather than spread into the entry when it is an array.
+- Updated dependencies [b0c7efb]
+- Updated dependencies [00010f5]
+- Updated dependencies [72f799b]
+- Updated dependencies [931ba22]
+    - eslint-rule-forge@0.9.0
+    - ts-data-forge@14.13.0
+
 ## 1.3.16
 
 ### Patch Changes
