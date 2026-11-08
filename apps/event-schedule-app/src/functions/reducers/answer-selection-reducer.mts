@@ -17,12 +17,20 @@ export type AnswerSelectionReducerAction = Readonly<
       checkboxState: ISetMapped<DatetimeRange, DatetimeRangeMapKey>;
     }
   | { type: 'cell-comment'; datetimeRange: DatetimeRange; comment: string }
-  | { type: 'cell-icon'; datetimeRange: DatetimeRange; icon: AnswerIconId }
+  | {
+      type: 'cell-icon';
+      datetimeRange: DatetimeRange;
+      icon: AnswerIconId;
+      /** The event's `answerIcons.fair.point`, which picking fair stores. */
+      fairPoint: AnswerIconPoint;
+    }
   | { type: 'cell-point'; datetimeRange: DatetimeRange; point: AnswerIconPoint }
   | {
       type: 'header';
       icon: AnswerIconId;
       datetimeRangeList: readonly DatetimeRange[];
+      /** The event's `answerIcons.fair.point`, which picking fair stores. */
+      fairPoint: AnswerIconPoint;
     }
 >;
 
@@ -46,14 +54,14 @@ export const answerSelectionReducer: Reducer<
 
               return {
                 iconId: nextIcon,
-                point: match(nextIcon, defaultIconPoint),
+                point: pointOf(nextIcon, action.fairPoint),
                 comment,
               };
             },
           )
         : state.set(action.datetimeRange, {
             iconId: action.icon,
-            point: defaultIconPoint[action.icon],
+            point: pointOf(action.icon, action.fairPoint),
             comment: '',
           });
 
@@ -96,7 +104,7 @@ export const answerSelectionReducer: Reducer<
               }
             : {
                 iconId: action.icon,
-                point: defaultIconPoint[action.icon],
+                point: pointOf(action.icon, action.fairPoint),
                 comment: Optional.toNullable(state.get(d))?.comment ?? '',
               },
         })),
@@ -112,12 +120,7 @@ export const answerSelectionReducer: Reducer<
           key: d,
           value: {
             iconId: action.selectedIconId,
-            point: match(action.selectedIconId, {
-              good: defaultIconPoint.good,
-              fair: action.point,
-              poor: defaultIconPoint.poor,
-              none: defaultIconPoint.none,
-            }),
+            point: pointOf(action.selectedIconId, action.point),
             comment: action.comment,
           },
         })),
@@ -125,3 +128,18 @@ export const answerSelectionReducer: Reducer<
     }
   }
 };
+
+/**
+ * The point an answer of `icon` stores: fair's is the one given (the event's,
+ * or what the batch input sets), the others' are fixed.
+ */
+const pointOf = (
+  icon: AnswerIconIdWithNone,
+  fairPoint: AnswerIconPoint,
+): AnswerIconPoint =>
+  match(icon, {
+    good: defaultIconPoint.good,
+    fair: fairPoint,
+    poor: defaultIconPoint.poor,
+    none: defaultIconPoint.none,
+  });

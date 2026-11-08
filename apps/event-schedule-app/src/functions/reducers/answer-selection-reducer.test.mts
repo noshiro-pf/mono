@@ -22,13 +22,14 @@ describe('answerSelectionReducer on a datetime range not yet selected', () => {
     expect(selectionOf(next)).toBeUndefined();
   });
 
-  test.each(['good', 'fair', 'poor'] as const)(
+  test.each(['good', 'poor'] as const)(
     'cell-icon %s stores its default point',
     (icon) => {
       const next = answerSelectionReducer(stateWith(undefined), {
         type: 'cell-icon',
         datetimeRange: range,
         icon,
+        fairPoint,
       });
 
       expect(selectionOf(next)).toStrictEqual({
@@ -38,6 +39,38 @@ describe('answerSelectionReducer on a datetime range not yet selected', () => {
       });
     },
   );
+
+  // The event's fair point, not `defaultIconPoint.fair` (6): the table shows
+  // any other point as a custom one (#3200).
+  test('cell-icon fair stores the fair point the event sets', () => {
+    const next = answerSelectionReducer(stateWith(undefined), {
+      type: 'cell-icon',
+      datetimeRange: range,
+      icon: 'fair',
+      fairPoint,
+    });
+
+    expect(selectionOf(next)).toStrictEqual({
+      iconId: 'fair',
+      point: fairPoint,
+      comment: '',
+    });
+  });
+
+  test('header fair stores the fair point the event sets', () => {
+    const next = answerSelectionReducer(stateWith(undefined), {
+      type: 'header',
+      icon: 'fair',
+      datetimeRangeList: [range],
+      fairPoint,
+    });
+
+    expect(selectionOf(next)).toStrictEqual({
+      iconId: 'fair',
+      point: fairPoint,
+      comment: '',
+    });
+  });
 
   test('cell-comment stores no icon with the comment', () => {
     const next = answerSelectionReducer(stateWith(undefined), {
@@ -58,6 +91,7 @@ describe('answerSelectionReducer on a datetime range not yet selected', () => {
       type: 'header',
       icon: 'good',
       datetimeRangeList: [range],
+      fairPoint,
     });
 
     expect(selectionOf(next)).toStrictEqual({
@@ -147,7 +181,7 @@ describe('answerSelectionReducer on a datetime range already selected', () => {
   test('cell-icon with the same icon clears it and keeps the comment', () => {
     const next = answerSelectionReducer(
       stateWith({ iconId: 'good', point: 10, comment: 'x' }),
-      { type: 'cell-icon', datetimeRange: range, icon: 'good' },
+      { type: 'cell-icon', datetimeRange: range, icon: 'good', fairPoint },
     );
 
     expect(selectionOf(next)).toStrictEqual({
@@ -160,7 +194,7 @@ describe('answerSelectionReducer on a datetime range already selected', () => {
   test('header on a column all of that icon clears it and keeps the comment', () => {
     const next = answerSelectionReducer(
       stateWith({ iconId: 'poor', point: 0, comment: 'x' }),
-      { type: 'header', icon: 'poor', datetimeRangeList: [range] },
+      { type: 'header', icon: 'poor', datetimeRangeList: [range], fairPoint },
     );
 
     expect(selectionOf(next)).toStrictEqual({
@@ -173,7 +207,7 @@ describe('answerSelectionReducer on a datetime range already selected', () => {
   test('cell-icon with another icon takes its default point and keeps the comment', () => {
     const next = answerSelectionReducer(
       stateWith({ iconId: 'fair', point: 3, comment: 'x' }),
-      { type: 'cell-icon', datetimeRange: range, icon: 'good' },
+      { type: 'cell-icon', datetimeRange: range, icon: 'good', fairPoint },
     );
 
     expect(selectionOf(next)).toStrictEqual({
@@ -183,6 +217,9 @@ describe('answerSelectionReducer on a datetime range already selected', () => {
     });
   });
 });
+
+/** The event's fair point, other than `defaultIconPoint.fair`. */
+const fairPoint = 5;
 
 const range = DatetimeRange.fill({
   ymd: { year: 2026, month: 11, date: 3 },
