@@ -38,7 +38,8 @@ import { isVersionPullRequest } from './version-pr.mjs';
  * Looks again once `target` has been released, and when another pull request
  * the worker owns was released in the same moment and goes first, pauses
  * `target` — the one pull request this may label. `pausedAtSurvey` is the pull
- * requests the survey that picked `target` saw labelled `skip-ci`.
+ * requests the survey that picked `target` saw labelled `skip-ci`, and `order`
+ * the numbers of the candidates in the order it released them in.
  * Resolves to whether `target` keeps its release.
  */
 export const settleAfterRelease = async (
@@ -48,6 +49,7 @@ export const settleAfterRelease = async (
   pausedAtSurvey: ReadonlySet<number>,
   defaultBranch: string,
   bypass: ReadonlyMap<number, string>,
+  order: readonly number[],
 ): Promise<'kept' | 'yielded'> => {
   const listed = await listPullRequests(api);
 
@@ -64,6 +66,7 @@ export const settleAfterRelease = async (
     pausedAtSurvey,
     defaultBranch,
     bypass,
+    order,
   );
 
   if (first === undefined) {
@@ -97,6 +100,7 @@ export const yieldsTo = (
   pausedAtSurvey: ReadonlySet<number>,
   defaultBranch: string,
   bypass: ReadonlyMap<number, string>,
+  order: readonly number[],
 ): PullRequest | undefined => {
   const others = releasedExcept(pullRequests, target.number).filter(
     (pr) =>
@@ -108,6 +112,7 @@ export const yieldsTo = (
     Arr.toUnshifted(target)(others),
     defaultBranch,
     bypass,
+    order,
   );
 
   return first === undefined || first.number === target.number
@@ -134,23 +139,39 @@ export const releasedExcept = (
   );
 
 /**
- * Which of several released pull requests keeps its release: `priority:high`
- * first and `priority:low` last — one in `bypass`, which only a ruleset bypass
- * merges, counting as `priority:low` unless labelled `priority:high` — then the
- * lowest number with the version pull request last: the order candidates are
- * picked in, so that the skill, reading the same rule, settles it the same way.
+ * Which of several released pull requests keeps its release: the one first in
+ * `order`, the pull request numbers in the order the worker releases in, which
+ * keeps what checking ahead has stacked first (`releaseOrder`); then, for those
+ * not in it and any in `bypass`, which only a ruleset bypass merges,
+ * `priority:high` first and `priority:low` last — one in `bypass` counting as
+ * `priority:low` unless labelled `priority:high` — then the lowest number with
+ * the version pull request last: the order candidates are picked in, so that
+ * the skill, reading the same rule, settles it the same way.
  */
 export const firstInReleaseOrder = (
   released: readonly PullRequest[],
   defaultBranch: string,
   bypass: ReadonlyMap<number, string>,
+  order: readonly number[],
 ): PullRequest | undefined => {
+  // One only a bypass merges is ranked by the rule alone: the head released may
+  // have been found to need one only after the order was read.
+  const position = (pr: PullRequest): number => {
+    const index = bypass.has(pr.number) ? -1 : order.indexOf(pr.number);
+
+    return index === -1 ? order.length : index;
+  };
+
   const rank = (pr: PullRequest): number =>
     priorityRank(pr, bypass.has(pr.number)) * 2 +
     (isVersionPullRequest(pr, defaultBranch) ? 1 : 0);
 
   const sorted = released.toSorted((a, b) =>
-    rank(a) === rank(b) ? a.number - b.number : rank(a) - rank(b),
+    position(a) !== position(b)
+      ? position(a) - position(b)
+      : rank(a) === rank(b)
+        ? a.number - b.number
+        : rank(a) - rank(b),
   );
 
   return Arr.isNonEmpty(sorted) ? sorted[0] : undefined;

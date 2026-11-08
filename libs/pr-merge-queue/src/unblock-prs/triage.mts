@@ -380,10 +380,20 @@ export const orderCandidates = (
     bypass: (pr) => context.bypass.has(pr.number),
   });
 
+/**
+ * Logs what the survey found. The candidates are listed in `order`, the order
+ * the worker releases in (`releaseOrder`), which puts first what checking ahead
+ * keeps stacked (`kept`), so that "next" is the one it acts on.
+ */
 export const reportTriage = (
   triaged: Triage,
   total: number,
-  context: Readonly<{ defaultBranch: string; demoted: Demotions }>,
+  context: Readonly<{
+    defaultBranch: string;
+    demoted: Demotions;
+    order: readonly PullRequest[];
+    kept: readonly number[];
+  }>,
 ): void => {
   const { defaultBranch } = context;
 
@@ -423,9 +433,9 @@ export const reportTriage = (
     );
   }
 
-  for (const [position, pr] of triaged.candidates.entries()) {
+  for (const [position, pr] of context.order.entries()) {
     log(
-      `  #${pr.number}: ${position === 0 ? 'next' : `${position} ahead of it`} — ${describeAction(pr, defaultBranch, triaged)}${isDemoted(context.demoted, pr) ? ' — last, because it sat green without merging' : ''}${priorityPhrase(pr, triaged.bypass.has(pr.number))} — ${pr.title}`,
+      `  #${pr.number}: ${position === 0 ? 'next' : `${position} ahead of it`} — ${describeAction(pr, defaultBranch, triaged)}${context.kept.includes(pr.number) ? ' — kept ahead, its layer already stacked' : ''}${isDemoted(context.demoted, pr) ? ' — last, because it sat green without merging' : ''}${priorityPhrase(pr, triaged.bypass.has(pr.number))} — ${pr.title}`,
     );
   }
 };
