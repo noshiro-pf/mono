@@ -25,6 +25,12 @@ import type {
   AccountAuthApi,
   AccountUser,
 } from './account-deps.mjs';
+import {
+  authErrorCodeOf,
+  describeAuthError,
+  runSubmitSteps,
+  settleAuthStep,
+} from './auth-step.mjs';
 import type { UpdateUserInfoDialog } from './update-user-info-dialog-state.mjs';
 
 export type UpdateEmailPageDeps<User, ReauthCredential> = Readonly<{
@@ -41,7 +47,7 @@ export type UpdateEmailPageDeps<User, ReauthCredential> = Readonly<{
   /** Which dialog is open; this one closes itself when done. */
   dialog: StrictPick<
     UpdateUserInfoDialog,
-    'closeDialog' | 'openingDialogType$'
+    'closeDialog' | 'openingDialogType$' | 'trackSession'
   >;
   /** Where the dialog says whether it went through. */
   toast: Promise<Toaster>;
@@ -137,28 +143,49 @@ export const createUpdateEmailPageStore = <
       return;
     }
 
-    const currentEmail = user.email ?? '';
+    // A submit whose dialog was closed stops at its next step, so it never
+    // changes the email after a close.
+    await runSubmitSteps(
+      deps.dialog.trackSession,
+      (isCurrent) => submitSteps(user, s, isCurrent),
+      () => {
+        dispatch({ type: 'done' });
+      },
+    );
+  };
+
+  /**
+   * The steps of `submit`, each ending its wait as an `Err` when it rejects, so
+   * that a rejection is reported as the step's own error is.
+   */
+  const submitSteps = async (
+    user: User,
+    s: UpdateEmailPageState,
+    isCurrent: () => boolean,
+  ): Promise<void> => {
+    const currentEmail: string = user.email ?? '';
 
     const credential: ReauthCredential = deps.api.auth.emailCredential(
       currentEmail,
       s.password.inputValue,
     );
 
-    const res1 = await deps.api.auth.reauthenticateWithCredential(
-      user,
-      credential,
+    const res1 = await settleAuthStep(
+      deps.api.auth.reauthenticateWithCredential(user, credential),
     );
 
     if (Result.isErr(res1)) {
-      switch (credentialErrorOf(res1.value.code)) {
+      switch (credentialErrorOf(authErrorCodeOf(res1.value))) {
         // The email signed in with is the user's own, so only the password can
         // be wrong.
         case 'wrongPassword':
         case 'wrongEmailOrPassword':
-          dispatch({
-            type: 'setPasswordError',
-            payload: dc.reauthenticate.message.wrongPassword,
-          });
+          if (isCurrent()) {
+            dispatch({
+              type: 'setPasswordError',
+              payload: dc.reauthenticate.message.wrongPassword,
+            });
+          }
 
           break;
 
@@ -168,19 +195,18 @@ export const createUpdateEmailPageStore = <
         case undefined:
           console.error(
             'error occurred on reauthenticateWithCredential:',
-            res1.value.code,
-            res1.value.message,
+            ...describeAuthError(res1.value),
           );
 
-          dispatch({ type: 'done' });
+          if (isCurrent()) {
+            deps.dialog.closeDialog();
 
-          deps.dialog.closeDialog();
-
-          showToast({
-            toast: deps.toast,
-            message: dc.reauthenticate.message.error,
-            intent: 'danger',
-          });
+            showToast({
+              toast: deps.toast,
+              message: dc.reauthenticate.message.error,
+              intent: 'danger',
+            });
+          }
 
           break;
       }
@@ -188,18 +214,25 @@ export const createUpdateEmailPageStore = <
       return;
     }
 
-    const res2 = await deps.api.auth.update.email(user, s.email.inputValue);
+    if (!isCurrent()) {
+      return;
+    }
+
+    const res2 = await settleAuthStep(
+      deps.api.auth.update.email(user, s.email.inputValue),
+    );
+
+    // The email is changed or not by now, so the toast says which even when the
+    // dialog was closed meanwhile; only the dialog it started from is closed.
+    if (isCurrent()) {
+      deps.dialog.closeDialog();
+    }
 
     if (Result.isErr(res2)) {
       console.error(
         'error occurred on updateEmail:',
-        res2.value.code,
-        res2.value.message,
+        ...describeAuthError(res2.value),
       );
-
-      dispatch({ type: 'done' });
-
-      deps.dialog.closeDialog();
 
       showToast({
         toast: deps.toast,
@@ -209,10 +242,6 @@ export const createUpdateEmailPageStore = <
 
       return;
     }
-
-    dispatch({ type: 'done' });
-
-    deps.dialog.closeDialog();
 
     showToast({
       toast: deps.toast,
@@ -230,7 +259,7 @@ export const createUpdateEmailPageStore = <
       return;
     }
 
-    // TODO: use toast
+    // `submit` reports the steps' failures; this only logs what reporting threw.
     submit(fireAuthUser).catch(console.error);
   };
 

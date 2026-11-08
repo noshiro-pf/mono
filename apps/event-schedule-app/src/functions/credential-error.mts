@@ -12,7 +12,7 @@
  * here.
  */
 export const credentialErrorOf = (
-  code: string,
+  code: string | undefined,
 ): CredentialError | undefined => {
   switch (code) {
     case 'auth/wrong-password':
@@ -24,6 +24,8 @@ export const credentialErrorOf = (
     case 'auth/invalid-credential':
       return 'wrongEmailOrPassword';
 
+    // What a step rejected with, rather than an `AuthError`, has no code.
+    case undefined:
     default:
       return undefined;
   }

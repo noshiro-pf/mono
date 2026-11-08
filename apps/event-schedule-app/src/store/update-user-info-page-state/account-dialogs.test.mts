@@ -1,6 +1,7 @@
 import { createState } from 'synstate';
 import { constant } from 'synstate-dom';
 import { Result } from 'ts-data-forge';
+import type { ReadonlyRecord } from 'ts-type-forge';
 import { dict } from '../../constants/index.mjs';
 import type {
   AccountAuth,
@@ -90,6 +91,184 @@ describe(createDeleteAccountPageStore, () => {
       dialog.openingDialogType$.getSnapshot().value,
       'deleteAccount',
     );
+  });
+
+  test('signs in no further when the dialog is closed while signing in again', async () => {
+    const reauth = Promise.withResolvers<Result<unknown, AuthError>>();
+
+    const { deps, calls, dialog } = setup({
+      reauthenticate: () => reauth.promise,
+    });
+
+    const store = createDeleteAccountPageStore(deps);
+
+    const reports = watchReports();
+
+    dialog.deleteAccount();
+
+    store.inputEmailHandler('alice@example.com');
+
+    store.inputPasswordHandler('password123');
+
+    store.enterClickHandler();
+
+    await settle();
+
+    assert.isTrue(store.state.getSnapshot().value.formState.isWaitingResponse);
+
+    dialog.closeDialog();
+
+    reauth.resolve(Result.ok(undefined));
+
+    await settle();
+
+    assert.deepStrictEqual(calls, [
+      'reauthenticate alice cred(alice@example.com,password123)',
+    ]);
+
+    assert.isFalse(store.state.getSnapshot().value.formState.isWaitingResponse);
+
+    assert.deepStrictEqual(reports.toasts(), []);
+  });
+
+  test('a submit from before a reopen leaves the new one waiting and open', async () => {
+    const reauthAnswers = [
+      Promise.withResolvers<Result<unknown, AuthError>>(),
+      Promise.withResolvers<Result<unknown, AuthError>>(),
+    ] as const;
+
+    const { deps, calls, dialog } = setup({
+      reauthenticate: () => {
+        const reauth = reauthAnswers.at(calls.length - 1);
+
+        assert.isDefined(reauth);
+
+        return reauth.promise;
+      },
+    });
+
+    const store = createDeleteAccountPageStore(deps);
+
+    const reports = watchReports();
+
+    const fillAndSubmit = (): void => {
+      dialog.deleteAccount();
+
+      store.inputEmailHandler('alice@example.com');
+
+      store.inputPasswordHandler('password123');
+
+      store.enterClickHandler();
+    };
+
+    fillAndSubmit();
+
+    await settle();
+
+    dialog.closeDialog();
+
+    fillAndSubmit();
+
+    await settle();
+
+    reauthAnswers[0].resolve(
+      Result.err({ code: 'auth/user-mismatch', message: 'mismatch' }),
+    );
+
+    await settle();
+
+    assert.isTrue(store.state.getSnapshot().value.formState.isWaitingResponse);
+
+    assert.strictEqual(
+      dialog.openingDialogType$.getSnapshot().value,
+      'deleteAccount',
+    );
+
+    assert.deepStrictEqual(reports.toasts(), []);
+
+    assert.strictEqual(reports.errors(), 1);
+
+    reauthAnswers[1].resolve(Result.ok(undefined));
+
+    await settle();
+
+    assert.deepStrictEqual(calls, [
+      'reauthenticate alice cred(alice@example.com,password123)',
+      'reauthenticate alice cred(alice@example.com,password123)',
+      'deleteUser alice',
+    ]);
+  });
+
+  test("ends the wait and reports a rejection as the step's error", async () => {
+    const { deps, calls, dialog } = setup({
+      reauthenticate: () => Promise.reject(new Error('network')),
+    });
+
+    const store = createDeleteAccountPageStore(deps);
+
+    const reports = watchReports();
+
+    dialog.deleteAccount();
+
+    store.inputEmailHandler('alice@example.com');
+
+    store.inputPasswordHandler('password123');
+
+    store.enterClickHandler();
+
+    await settle();
+
+    assert.deepStrictEqual(calls, [
+      'reauthenticate alice cred(alice@example.com,password123)',
+    ]);
+
+    assert.isFalse(store.state.getSnapshot().value.formState.isWaitingResponse);
+
+    assert.deepStrictEqual(reports.toasts(), [
+      ['danger', constant(dict.accountSettings.reauthenticate.message.error)],
+    ]);
+
+    assert.strictEqual(reports.errors(), 1);
+  });
+
+  test('says whether a deletion the dialog was closed during went through', async () => {
+    const deletion = Promise.withResolvers<Result<undefined, AuthError>>();
+
+    const { deps, dialog } = setup({
+      respond: { deleteUser: () => deletion.promise },
+    });
+
+    const store = createDeleteAccountPageStore(deps);
+
+    const reports = watchReports();
+
+    dialog.deleteAccount();
+
+    store.inputEmailHandler('alice@example.com');
+
+    store.inputPasswordHandler('password123');
+
+    store.enterClickHandler();
+
+    await settle();
+
+    dialog.closeDialog();
+
+    dialog.changeEmail();
+
+    deletion.resolve(Result.ok(undefined));
+
+    await settle();
+
+    // The dialog opened meanwhile is not the one this submit closes.
+    assert.strictEqual(
+      dialog.openingDialogType$.getSnapshot().value,
+      'updateEmail',
+    );
+
+    assert.deepStrictEqual(reports.toasts(), [
+      ['success', constant(dict.accountSettings.deleteAccount.message.success)],
+    ]);
   });
 
   test('does nothing while nobody is signed in', async () => {
@@ -459,6 +638,85 @@ describe(createUpdateDisplayNamePageStore, () => {
 
     assert.isUndefined(dialog.openingDialogType$.getSnapshot().value);
   });
+
+  test('closes no other dialog when this one was closed while saving', async () => {
+    const update = Promise.withResolvers<Result<undefined, AuthError>>();
+
+    const { deps, calls, dialog } = setup({
+      respond: { 'update.displayName': () => update.promise },
+    });
+
+    const store = createUpdateDisplayNamePageStore(deps);
+
+    const reports = watchReports();
+
+    dialog.changeUsername();
+
+    store.inputDisplayNameHandler('alicia');
+
+    store.enterClickHandler();
+
+    await settle();
+
+    assert.isTrue(store.state.getSnapshot().value.formState.isWaitingResponse);
+
+    dialog.closeDialog();
+
+    dialog.changePassword();
+
+    update.resolve(Result.ok(undefined));
+
+    await settle();
+
+    // The name did change, so the user is read again and the toast says so.
+    assert.deepStrictEqual(calls, [
+      'update.displayName alice alicia',
+      'emitAuthStateChange',
+    ]);
+
+    assert.strictEqual(
+      dialog.openingDialogType$.getSnapshot().value,
+      'updatePassword',
+    );
+
+    assert.deepStrictEqual(reports.toasts(), [
+      [
+        'success',
+        constant(dict.accountSettings.updateDisplayName.message.success),
+      ],
+    ]);
+  });
+
+  test("ends the wait and reports a rejection as the step's error", async () => {
+    const { deps, dialog } = setup({
+      respond: {
+        'update.displayName': () => Promise.reject(new Error('network')),
+      },
+    });
+
+    const store = createUpdateDisplayNamePageStore(deps);
+
+    const reports = watchReports();
+
+    dialog.changeUsername();
+
+    store.inputDisplayNameHandler('alicia');
+
+    store.enterClickHandler();
+
+    await settle();
+
+    assert.isFalse(store.state.getSnapshot().value.formState.isWaitingResponse);
+
+    assert.deepStrictEqual(reports.toasts(), [
+      [
+        'danger',
+        constant(dict.accountSettings.updateDisplayName.message.error),
+      ],
+    ]);
+
+    assert.strictEqual(reports.errors(), 1);
+  });
 });
 
 describe(createUpdateEmailPageStore, () => {
@@ -486,6 +744,72 @@ describe(createUpdateEmailPageStore, () => {
       'reauthenticate alice cred(alice@example.com,password123)',
       'update.email alice alicia@example.com',
     ]);
+  });
+
+  test('changes nothing when the dialog is closed while signing in again', async () => {
+    const reauth = Promise.withResolvers<Result<unknown, AuthError>>();
+
+    const { deps, calls, dialog } = setup({
+      reauthenticate: () => reauth.promise,
+    });
+
+    const store = createUpdateEmailPageStore(deps);
+
+    const reports = watchReports();
+
+    dialog.changeEmail();
+
+    store.inputEmailHandler('alicia@example.com');
+
+    store.inputPasswordHandler('password123');
+
+    store.enterClickHandler();
+
+    await settle();
+
+    assert.isTrue(store.state.getSnapshot().value.formState.isWaitingResponse);
+
+    dialog.closeDialog();
+
+    reauth.resolve(Result.ok(undefined));
+
+    await settle();
+
+    assert.deepStrictEqual(calls, [
+      'reauthenticate alice cred(alice@example.com,password123)',
+    ]);
+
+    assert.isFalse(store.state.getSnapshot().value.formState.isWaitingResponse);
+
+    assert.deepStrictEqual(reports.toasts(), []);
+  });
+
+  test("ends the wait and reports a rejection as the step's error", async () => {
+    const { deps, dialog } = setup({
+      respond: { 'update.email': () => Promise.reject(new Error('network')) },
+    });
+
+    const store = createUpdateEmailPageStore(deps);
+
+    const reports = watchReports();
+
+    dialog.changeEmail();
+
+    store.inputEmailHandler('alicia@example.com');
+
+    store.inputPasswordHandler('password123');
+
+    store.enterClickHandler();
+
+    await settle();
+
+    assert.isFalse(store.state.getSnapshot().value.formState.isWaitingResponse);
+
+    assert.deepStrictEqual(reports.toasts(), [
+      ['danger', constant(dict.accountSettings.updateEmail.message.error)],
+    ]);
+
+    assert.strictEqual(reports.errors(), 1);
   });
 });
 
@@ -532,6 +856,147 @@ describe(createUpdatePasswordPageStore, () => {
 
     assert.deepStrictEqual(calls, []);
   });
+
+  test('changes nothing when the dialog is closed while signing in again', async () => {
+    const reauth = Promise.withResolvers<Result<unknown, AuthError>>();
+
+    const { deps, calls, dialog } = setup({
+      reauthenticate: () => reauth.promise,
+    });
+
+    const store = createUpdatePasswordPageStore(deps);
+
+    const reports = watchReports();
+
+    dialog.changePassword();
+
+    store.inputOldPasswordHandler('password123');
+
+    store.inputNewPasswordHandler('password456');
+
+    store.inputNewPasswordConfirmationHandler('password456');
+
+    store.enterClickHandler();
+
+    await settle();
+
+    assert.isTrue(store.state.getSnapshot().value.formState.isWaitingResponse);
+
+    dialog.closeDialog();
+
+    reauth.resolve(Result.ok(undefined));
+
+    await settle();
+
+    assert.deepStrictEqual(calls, [
+      'reauthenticate alice cred(alice@example.com,password123)',
+    ]);
+
+    assert.isFalse(store.state.getSnapshot().value.formState.isWaitingResponse);
+
+    assert.deepStrictEqual(reports.toasts(), []);
+  });
+
+  test("ends the wait and reports a rejection as the step's error", async () => {
+    const { deps, dialog } = setup({
+      respond: {
+        'update.password': () => Promise.reject(new Error('network')),
+      },
+    });
+
+    const store = createUpdatePasswordPageStore(deps);
+
+    const reports = watchReports();
+
+    dialog.changePassword();
+
+    store.inputOldPasswordHandler('password123');
+
+    store.inputNewPasswordHandler('password456');
+
+    store.inputNewPasswordConfirmationHandler('password456');
+
+    store.enterClickHandler();
+
+    await settle();
+
+    assert.isFalse(store.state.getSnapshot().value.formState.isWaitingResponse);
+
+    assert.deepStrictEqual(reports.toasts(), [
+      ['danger', constant(dict.accountSettings.updatePassword.message.error)],
+    ]);
+
+    assert.strictEqual(reports.errors(), 1);
+  });
+});
+
+describe('a rejecting re-authentication in the email and password dialogs', () => {
+  test.each([
+    {
+      name: 'email',
+      run: (deps: Setup['deps']) => {
+        const store = createUpdateEmailPageStore(deps);
+
+        deps.dialog.changeEmail();
+
+        store.inputEmailHandler('alicia@example.com');
+
+        store.inputPasswordHandler('password123');
+
+        store.enterClickHandler();
+
+        return () =>
+          store.state.getSnapshot().value.formState.isWaitingResponse;
+      },
+    },
+    {
+      name: 'password',
+      run: (deps: Setup['deps']) => {
+        const store = createUpdatePasswordPageStore(deps);
+
+        deps.dialog.changePassword();
+
+        store.inputOldPasswordHandler('password123');
+
+        store.inputNewPasswordHandler('password456');
+
+        store.inputNewPasswordConfirmationHandler('password456');
+
+        store.enterClickHandler();
+
+        return () =>
+          store.state.getSnapshot().value.formState.isWaitingResponse;
+      },
+    },
+  ] as const)(
+    'the $name dialog changes nothing, ends the wait and says signing in again failed',
+    async ({ run }) => {
+      const { deps, calls, dialog } = setup({
+        reauthenticate: () => Promise.reject(new Error('network')),
+      });
+
+      const reports = watchReports();
+
+      const isWaitingResponse = run(deps);
+
+      await settle();
+
+      assert.deepStrictEqual(calls, [
+        'reauthenticate alice cred(alice@example.com,password123)',
+      ]);
+
+      assert.isFalse(isWaitingResponse());
+
+      // As for an error with no code it knows: the dialog closes.
+      assert.isUndefined(dialog.openingDialogType$.getSnapshot().value);
+
+      assert.deepStrictEqual(reports.toasts(), [
+        ['danger', constant(dict.accountSettings.reauthenticate.message.error)],
+      ]);
+
+      assert.strictEqual(reports.errors(), 1);
+    },
+  );
 });
 
 type FakeUser = AccountUser & Readonly<{ name: string }>;
@@ -541,6 +1006,9 @@ const alice: FakeUser = {
   email: 'alice@example.com',
   displayName: 'alice',
 } as const;
+
+type UpdateCall =
+  'deleteUser' | 'update.displayName' | 'update.email' | 'update.password';
 
 type Setup = Readonly<{
   deps: Readonly<{
@@ -556,9 +1024,16 @@ type Setup = Readonly<{
 const setup = (
   options?: Readonly<{
     signedIn?: boolean;
-    reauthenticate?: Result<unknown, AuthError>;
+    reauthenticate?:
+      Result<unknown, AuthError> | (() => Promise<Result<unknown, AuthError>>);
     reauthenticateWithGoogle?:
       Result<unknown, AuthError> | (() => Promise<Result<unknown, AuthError>>);
+    /** What a call other than signing in again answers, by its name. */
+    respond?: Readonly<
+      Partial<
+        ReadonlyRecord<UpdateCall, () => Promise<Result<undefined, AuthError>>>
+      >
+    >;
   }>,
 ): Setup => {
   const user = options?.signedIn === false ? undefined : alice;
@@ -569,10 +1044,15 @@ const setup = (
 
   const mut_calls: string[] = [];
 
-  const ok = (call: string): Promise<Result<undefined, AuthError>> => {
+  const ok = (
+    name: UpdateCall,
+    call: string,
+  ): Promise<Result<undefined, AuthError>> => {
     mut_calls.push(call);
 
-    return Promise.resolve(Result.ok(undefined));
+    return (
+      options?.respond?.[name]?.() ?? Promise.resolve(Result.ok(undefined))
+    );
   };
 
   return {
@@ -592,17 +1072,23 @@ const setup = (
           reauthenticateWithCredential: (u, credential) => {
             mut_calls.push(`reauthenticate ${u.name} ${credential}`);
 
-            return Promise.resolve(
-              options?.reauthenticate ?? Result.ok(undefined),
-            );
+            const reauth = options?.reauthenticate;
+
+            return typeof reauth === 'function'
+              ? reauth()
+              : Promise.resolve(reauth ?? Result.ok(undefined));
           },
-          deleteUser: (u) => ok(`deleteUser ${u.name}`),
+          deleteUser: (u) => ok('deleteUser', `deleteUser ${u.name}`),
           update: {
             displayName: (u, displayName) =>
-              ok(`update.displayName ${u.name} ${displayName}`),
-            email: (u, email) => ok(`update.email ${u.name} ${email}`),
+              ok(
+                'update.displayName',
+                `update.displayName ${u.name} ${displayName}`,
+              ),
+            email: (u, email) =>
+              ok('update.email', `update.email ${u.name} ${email}`),
             password: (u, password) =>
-              ok(`update.password ${u.name} ${password}`),
+              ok('update.password', `update.password ${u.name} ${password}`),
           },
         },
       },
@@ -633,4 +1119,28 @@ const settle = async (): Promise<void> => {
   await new Promise<void>((resolve) => {
     setTimeout(resolve, 10);
   });
+};
+
+/** Records the toasts shown and the errors logged until the test ends. */
+const watchReports = (): Readonly<{
+  toasts: () => readonly (readonly unknown[])[];
+  errors: () => number;
+}> => {
+  const showToast = vi.spyOn(fakeToaster, 'show');
+
+  const consoleError = vi
+    .spyOn(console, 'error')
+    .mockImplementation(() => undefined);
+
+  onTestFinished(() => {
+    showToast.mockRestore();
+
+    consoleError.mockRestore();
+  });
+
+  return {
+    toasts: () =>
+      showToast.mock.calls.map(([props]) => [props.intent, props.message]),
+    errors: () => consoleError.mock.calls.length,
+  } as const;
 };
