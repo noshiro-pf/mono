@@ -187,8 +187,8 @@ const memberScripts = [
 
 /**
  * Root scripts that run a member script, compile the members, or import each
- * member's `eslint.config.mts` (which imports the built plugins), across the
- * workspace.
+ * member's `eslint.config.mts` (which imports the built plugins) or resolve
+ * what it imports, across the workspace.
  */
 const rootWorkspaceScripts = [
   'check:root:dist-lib-replacement',
@@ -219,6 +219,7 @@ const rootWorkspaceScripts = [
   'ws:gen:jsdoc',
   'ws:gen:readme',
   'check:knip',
+  'check:published-deps',
 ] as const;
 
 /**
@@ -230,7 +231,6 @@ const rootPackageScripts = [
   'check:root:types',
   'check:root:test',
   'check:root:lint',
-  'check:published-deps',
 ] as const;
 
 const readScripts = async (

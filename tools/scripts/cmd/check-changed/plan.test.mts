@@ -245,7 +245,14 @@ describe('classifyChanges', () => {
       'libs/ts-data-forge/eslint.config.mts',
       ['published-source', 'root', 'root-guards'],
     ],
-    ['libs/ts-data-forge/samples/eslint.config.mts', ['root', 'root-guards']],
+    [
+      'libs/ts-data-forge/samples/eslint.config.mts',
+      ['published-source', 'root', 'root-guards'],
+    ],
+    [
+      'languages/sumi/cli/eslint.config.mts',
+      ['published-source', 'root', 'root-guards'],
+    ],
     ['.markdownlint-cli2.mjs', ['prose', 'root']],
     ['tools/scripts/cmd/check-changed/README.md', ['prose']],
     // Code to the gate, and still Markdown for `check:md`.
@@ -440,6 +447,8 @@ describe('buildPlan', () => {
     ['libs/ts-data-forge/src/array.mts', true],
     ['libs/ts-data-forge/eslint.config.mts', true],
     ['eslint.config.mts', true],
+    ['languages/sumi/cli/eslint.config.mts', true],
+    ['strict-lib/eslint.config.mts', true],
     ['libs/ts-data-forge/test/array.test.mts', false],
     ['tools/scripts/cmd/x.mts', false],
   ] as const)('%s runs the published-deps check: %s', (file, expected) => {

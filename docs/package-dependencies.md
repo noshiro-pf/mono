@@ -675,11 +675,11 @@ devDependencies ではなく `dependencies` に置く必要がある
 override も外してある。
 
 `eslint.config.mts` 自身は `eslint-config-typed` が既定で ignore する
-ため、この lint では検証されない。root と `libs/*`・`apps/*` のものは
-`check:published-deps` が別途検証する（devDependencies からの import は
-許される）。対象は `tools/configs/eslint.published-deps.mts` と root の
-`check:published-deps` スクリプトの glob の両方で決まり、`languages/*/*`
-と `strict-lib/` のものはまだ検証されていない。
+ため、この lint では検証されない。`experimental/` の外で追跡されているものは、
+すべて `check:published-deps` が別途検証し、いちばん近い `package.json` に
+照らす（devDependencies からの import は許される）。スクリプトの glob が拾わない
+置き場所にできたものは、`tools/configs/eslint.published-deps.test.mts` が失敗
+させる。
 
 バージョンは `pnpm-workspace.yaml` の `catalog:` が単一の情報源。
 各パッケージは `"eslint": "catalog:"` と書く。公開パッケージの

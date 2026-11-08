@@ -1,6 +1,6 @@
 import typescriptEslintParser from '@typescript-eslint/parser';
 import type { FlatConfig } from 'eslint-config-typed';
-import { Arr, hasKey, isRecord } from 'ts-data-forge';
+import { hasKey, isRecord } from 'ts-data-forge';
 /* eslint-disable-next-line import-x/no-rename-default */
 import eslintPluginImportX from 'eslint-plugin-import-x';
 import * as fs from 'node:fs';
@@ -22,14 +22,15 @@ import { projectRootPath } from '../scripts/project-root-path.mjs';
  * **What `eslint.config.mts` imports.** `eslint-config-typed` ignores those
  * files by default, so the repository-wide pass never sees them and the
  * packages they import — `eslint-config-typed` itself, the `eslint-plugin-ts-*`
- * trio — were declared by hand and checked by nobody. Here they are covered
- * like any other file, with devDependencies allowed, because that is what a
- * lint config legitimately reaches for.
+ * trio — were declared by hand and checked by nobody. Here every tracked one
+ * outside `experimental/` is covered like any other file, against the nearest
+ * `package.json`, with devDependencies allowed, because that is what a lint
+ * config legitimately reaches for.
  *
- * `packageDir` has to name one package, otherwise a dependency declared by any
- * package would satisfy every other, so the config is generated per package.
- * The rule is not type-aware, so this pass needs no TypeScript program and
- * stays fast.
+ * For `src/`, `packageDir` has to name one package, otherwise a dependency
+ * declared by any package would satisfy every other, so that part of the config
+ * is generated per package. The rule is not type-aware, so this pass needs no
+ * TypeScript program and stays fast.
  *
  * Run with `pnpm run check:published-deps`.
  */
@@ -67,11 +68,6 @@ const workspacePackageDirs = ['libs', 'apps'].flatMap((group) => {
 
 const publishedPackageDirs = workspacePackageDirs.filter(isPublishedPackage);
 
-// The root has an `eslint.config.mts` of its own, and it is a package directory
-// for this purpose even though nothing publishes it.
-const eslintConfigPackageDirs =
-  Arr.toUnshifted(projectRootPath)(workspacePackageDirs);
-
 export default [
   {
     ignores: ['**/dist/**', '**/node_modules/**', '**/*.test.mts'],
@@ -92,6 +88,40 @@ export default [
 
     languageOptions: { parser: typescriptEslintParser },
     plugins: { 'import-x': eslintPluginImportX },
+  },
+
+  {
+    // Every `eslint.config.mts` the root `check:published-deps` script hands
+    // ESLint, whatever its directory: ESLint skips a file no config object
+    // names, and `--quiet` hides that it did. The script names the directories
+    // so that ESLint does not walk the whole tree, and
+    // `eslint.published-deps.test.mts` fails on a tracked config they miss.
+    // Ahead of the `src/` objects, so that one of those wins for a file both
+    // name.
+    files: ['**/eslint.config.mts'],
+    rules: {
+      'import-x/no-extraneous-dependencies': [
+        'error',
+        {
+          // Left out, `packageDir` is the nearest `package.json` up from the
+          // file: its own package's, or the root's for
+          // `strict-lib/eslint.config.mts`, which is in no member.
+          // A lint config is development tooling, so unlike `src/` below it may
+          // import a devDependency — it just has to declare it.
+          devDependencies: true,
+          optionalDependencies: false,
+          peerDependencies: true,
+          includeTypes: true,
+          // A workspace package imported from a config checked against the root
+          // manifest (the root's own, `strict-lib/`'s, any other outside a
+          // member) resolves inside the root, which the rule otherwise takes
+          // for a module of its own and skips. Set for every config, so that
+          // none is missed: an alias, a `#` import or a package importing
+          // itself by name, which none does, would be reported, never skipped.
+          includeInternal: true,
+        },
+      ],
+    },
   },
 
   ...publishedPackageDirs.map(
@@ -116,30 +146,4 @@ export default [
         },
       }) as const satisfies FlatConfig,
   ),
-
-  ...eslintConfigPackageDirs.map((dir) => {
-    const relativeDir = path.relative(projectRootPath, dir);
-
-    return {
-      files: [
-        relativeDir === ''
-          ? 'eslint.config.mts'
-          : `${relativeDir}/eslint.config.mts`,
-      ],
-      rules: {
-        'import-x/no-extraneous-dependencies': [
-          'error',
-          {
-            packageDir: [dir],
-            // A lint config is development tooling, so unlike `src/` above it
-            // may import a devDependency — it just has to declare it.
-            devDependencies: true,
-            optionalDependencies: false,
-            peerDependencies: true,
-            includeTypes: true,
-          },
-        ],
-      },
-    } as const satisfies FlatConfig;
-  }),
 ] as const satisfies readonly FlatConfig[];
