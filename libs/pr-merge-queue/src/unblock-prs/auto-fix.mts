@@ -67,23 +67,12 @@ export const autoFix = async (
     return declined(`cannot read the check runs: ${runs.value}`);
   }
 
-  const states = statesFromCheckRuns(runs.value);
-
-  const plan = planAutoFix(states, config);
+  const plan = await planAutoFixFromRuns(runs.value, config, async (id) =>
+    readAnnotationTitles(api, id),
+  );
 
   if (Result.isErr(plan)) {
     return declined(plan.value);
-  }
-
-  const refused = await contextsNotFixable(
-    runs.value,
-    config === undefined ? [] : failedContexts(states, config),
-    config?.notFixableAnnotation,
-    async (id) => readAnnotationTitles(api, id),
-  );
-
-  if (Arr.isNonEmpty(refused)) {
-    return declined(notFixableReason(refused));
   }
 
   const worktreeDir = path.join(WORKTREE_ROOT, `auto-fix-pr-${pr.number}`);
@@ -134,6 +123,36 @@ export const autoFix = async (
   await removeWorktree(worktreeDir);
 
   return result;
+};
+
+/**
+ * {@link planAutoFix} on the check runs of one commit, then
+ * {@link contextsNotFixable} on the jobs it accepted: what to run, or why
+ * nothing is to be run. `autoFix` reads a pull request's head with it, and
+ * speculation a layer's tip (`speculate.mts`) before releasing a pull request
+ * for its own run to fix, so that both reach one verdict on the same jobs.
+ */
+export const planAutoFixFromRuns = async (
+  runs: readonly CheckRunReport[],
+  config: AutoFixConfig | undefined,
+  readTitles: (id: number) => Promise<Result<readonly string[], string>>,
+): Promise<Result<AutoFixPlan, string>> => {
+  const states = statesFromCheckRuns(runs);
+
+  const plan = planAutoFix(states, config);
+
+  if (config === undefined || Result.isErr(plan)) {
+    return plan;
+  }
+
+  const refused = await contextsNotFixable(
+    runs,
+    failedContexts(states, config),
+    config.notFixableAnnotation,
+    readTitles,
+  );
+
+  return Arr.isNonEmpty(refused) ? Result.err(notFixableReason(refused)) : plan;
 };
 
 /**
