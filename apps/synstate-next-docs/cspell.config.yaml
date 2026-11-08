@@ -6,3 +6,4 @@ import:
   - '../../.cspell.config.yaml'
 words:
   - mdxjs # micromark-extension-mdxjs
+  - solidjs # @solidjs/signals, on the comparison pages

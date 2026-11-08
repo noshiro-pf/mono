@@ -26,7 +26,10 @@ export type StateOptions<A> = Readonly<{
    * Decides whether a write changes anything, given the value held first and
    * the next one second (after `keepEqualParts`). A write it finds equal passes
    * nothing on and keeps the value held, identity included. Defaults to
-   * `Object.is`; pass `() => false` to pass on every write.
+   * `Object.is`; pass `() => false` to pass on every write. What follows the
+   * state still sees the writes made before one round as one, the value it
+   * holds when the round starts: an event that must arrive however often it is
+   * given goes through `source`.
    */
   equals?: (current: A, next: A) => boolean;
   /**
