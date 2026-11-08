@@ -49,6 +49,40 @@ describe(createCreateEventScheduleStore, () => {
     ]);
   });
 
+  // #3416: the form was the day the tab loaded, however long it stayed open.
+  test('a store entered on a later day starts on that day and counts as unchanged', () => {
+    const { store } = onDay(new Date(2026, 10, 3, 9, 0), () => setup());
+
+    onDay(new Date(2026, 10, 5, 9, 0), () => {
+      store.enter();
+    });
+
+    const { datetimeRangeList } = store.commonState$.getSnapshot().value;
+
+    assert.deepStrictEqual(
+      datetimeRangeList.map((d) => d.ymd),
+      [{ year: 2026, month: 11, date: 5 }],
+    );
+
+    assert.isTrue(store.hasNoChanges$.getSnapshot().value);
+
+    // Reset returns to the day the page was entered.
+    store.commonStateHandlers.setTitle('changed');
+
+    onDay(new Date(2026, 10, 6, 9, 0), () => {
+      store.resetAllState();
+    });
+
+    assert.deepStrictEqual(
+      store.commonState$
+        .getSnapshot()
+        .value.datetimeRangeList.map((d) => d.ymd),
+      [{ year: 2026, month: 11, date: 5 }],
+    );
+
+    assert.isTrue(store.hasNoChanges$.getSnapshot().value);
+  });
+
   test('creates nothing while the settings are not valid', async () => {
     const { store, calls } = setup();
 
@@ -295,4 +329,17 @@ const settle = async (ms: number): Promise<void> => {
   await new Promise<void>((resolve) => {
     setTimeout(resolve, ms);
   });
+};
+
+/** Runs `fn` with the clock on `date`. */
+const onDay = <R,>(date: Date, fn: () => R): R => {
+  vi.useFakeTimers({ toFake: ['Date'] });
+
+  try {
+    vi.setSystemTime(date);
+
+    return fn();
+  } finally {
+    vi.useRealTimers();
+  }
 };

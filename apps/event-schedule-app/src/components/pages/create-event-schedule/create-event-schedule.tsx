@@ -19,8 +19,8 @@ import { EventScheduleSettingCommon } from './event-schedule-setting-common.js';
 const dc = dict.eventSettingsPage;
 
 export const CreateEventSchedule = (): JSX.Element => {
-  // After the update that opened the page.
-  createAfterUpdate()(CreateEventScheduleStore.restoreFromLocalStorage);
+  // After the update that opened the page: the form is this visit's.
+  createAfterUpdate()(CreateEventScheduleStore.enter);
 
   const { isLoading$, hasNoChanges$, commonState$ } = CreateEventScheduleStore;
 

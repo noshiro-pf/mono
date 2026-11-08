@@ -1,5 +1,6 @@
 import {
   defaultAnswerDeadlineRemainingDays,
+  EventSchedule,
   NotificationSettings,
   UserName,
 } from 'event-schedule-app-shared';
@@ -18,16 +19,17 @@ export const yearMonthDateInitialValue = (): YearMonthDate =>
   todayYearMonthDate();
 
 /**
- * The form's first date row. Like the rest of the empty form below, it is the
- * day the page loaded.
+ * The form's first date row: today, read when the form is built for a visit,
+ * like the rest of the empty form below.
  */
-export const datetimeRangeInitialValue: DatetimeRange = {
-  ymd: yearMonthDateInitialValue(),
-  timeRange: TimeRange.defaultValue,
-} as const;
+export const datetimeRangeInitialValue = (): DatetimeRange =>
+  ({
+    ymd: yearMonthDateInitialValue(),
+    timeRange: TimeRange.defaultValue,
+  }) as const;
 
-export const datetimeRangeListInitialValue: NonEmptyArray<DatetimeRange> =
-  Arr.asNonEmptyArray([datetimeRangeInitialValue]);
+export const datetimeRangeListInitialValue = (): NonEmptyArray<DatetimeRange> =>
+  Arr.asNonEmptyArray([datetimeRangeInitialValue()]);
 
 export const answerIconsInitialValue = {
   good: {
@@ -60,15 +62,21 @@ export const notificationSettingsInitialValue: NotificationSettings = pipe(
 export const datetimeSpecificationInitialValue: DatetimeSpecificationEnumType =
   'startSpecified';
 
-export const eventScheduleInitialValue: EventSchedule = {
-  title: '',
-  notes: '',
-  datetimeSpecification: datetimeSpecificationInitialValue,
-  datetimeRangeList: datetimeRangeListInitialValue,
-  answerDeadline: 'none',
-  answerIcons: answerIconsInitialValue,
-  notificationSettings: 'none',
-  timezoneOffsetMinutes: DateUtils.today().getTimezoneOffset(),
-  author: { id: null, name: UserName.cast('') },
-  archivedBy: [],
-} as const;
+/**
+ * The empty form, built when the create page is entered and when the edit page
+ * is left: its date row is the day it is built. Its offset is the one the form
+ * writes (`EventSchedule.defaultValue`), so that an untouched form equals it.
+ */
+export const eventScheduleInitialValue = (): EventSchedule =>
+  ({
+    title: '',
+    notes: '',
+    datetimeSpecification: datetimeSpecificationInitialValue,
+    datetimeRangeList: datetimeRangeListInitialValue(),
+    answerDeadline: 'none',
+    answerIcons: answerIconsInitialValue,
+    notificationSettings: 'none',
+    timezoneOffsetMinutes: EventSchedule.defaultValue.timezoneOffsetMinutes,
+    author: { id: null, name: UserName.cast('') },
+    archivedBy: [],
+  }) as const;

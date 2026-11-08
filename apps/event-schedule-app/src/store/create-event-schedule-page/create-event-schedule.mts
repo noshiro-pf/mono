@@ -5,6 +5,7 @@ import {
 } from 'event-schedule-app-shared';
 import {
   type InitializedObservable,
+  combine,
   createBooleanState,
   createState,
   debounce,
@@ -22,13 +23,10 @@ import {
 import { compareYearMonthDate } from 'ts-fortress-types';
 import type { StrictPick } from 'ts-type-forge';
 import type { Api } from '../../api/index.mjs';
-import {
-  dict,
-  eventScheduleInitialValue,
-  routes,
-} from '../../constants/index.mjs';
+import { dict, routes } from '../../constants/index.mjs';
 import {
   type EventScheduleAppLocalStorage,
+  normalizeEventSchedule,
   showToast,
 } from '../../functions/index.mjs';
 import type {
@@ -69,15 +67,25 @@ export type CreateEventScheduleDeps = Readonly<{
 export const createCreateEventScheduleStore = (
   deps: CreateEventScheduleDeps,
 ): CreateEventSchedule => {
-  const { commonState$, commonStateHandlers } = createEventScheduleSettingStore(
-    {
+  const { commonState$, commonStateHandlers, baseline$, startVisit } =
+    createEventScheduleSettingStore({
       fireAuthUser$: deps.auth.fireAuthUser$,
-    },
-  );
+    });
 
-  const hasNoChanges$: InitializedObservable<boolean> = commonState$.pipe(
-    map(({ eventScheduleNormalized }) =>
-      fastDeepEqual(eventScheduleInitialValue, eventScheduleNormalized),
+  const hasNoChanges$: InitializedObservable<boolean> = combine([
+    baseline$,
+    commonState$,
+  ]).pipe(
+    // The form is compared as it would be saved: normalized, and written by
+    // whoever is signed in. The empty form as built is neither.
+    map(([baseline, { eventScheduleNormalized }]) =>
+      fastDeepEqual(
+        normalizeEventSchedule({
+          ...baseline,
+          author: eventScheduleNormalized.author,
+        }),
+        eventScheduleNormalized,
+      ),
     ),
   );
 
@@ -229,14 +237,16 @@ export const createCreateEventScheduleStore = (
     setUrl(deps.router.absoluteUrlOf(routes.event.answer.href({ eventId })));
 
     // reset local storage
+    const baseline = baseline$.getSnapshot().value;
+
     const resetResult = deps.storage.save({
-      answerDeadline: eventScheduleInitialValue.answerDeadline,
-      answerIcons: eventScheduleInitialValue.answerIcons,
-      datetimeRangeList: eventScheduleInitialValue.datetimeRangeList,
-      datetimeSpecification: eventScheduleInitialValue.datetimeSpecification,
-      notes: eventScheduleInitialValue.notes,
-      notificationSettings: eventScheduleInitialValue.notificationSettings,
-      title: eventScheduleInitialValue.title,
+      answerDeadline: baseline.answerDeadline,
+      answerIcons: baseline.answerIcons,
+      datetimeRangeList: baseline.datetimeRangeList,
+      datetimeSpecification: baseline.datetimeSpecification,
+      notes: baseline.notes,
+      notificationSettings: baseline.notificationSettings,
+      title: baseline.title,
     });
 
     if (Result.isErr(resetResult)) {
@@ -284,8 +294,15 @@ export const createCreateEventScheduleStore = (
     };
   };
 
+  const enter = (): void => {
+    startVisit();
+
+    restoreFromLocalStorage();
+  };
+
   return {
     start,
+    enter,
     isLoading$,
     createResultDialogIsOpen$,
     url$,
@@ -303,6 +320,11 @@ export const createCreateEventScheduleStore = (
 export type CreateEventSchedule = Readonly<{
   /** Starts saving the settings as they change; returns what stops it. */
   start: () => () => void;
+  /**
+   * Called when the page is entered: builds the empty form from today, then
+   * restores what local storage kept.
+   */
+  enter: () => void;
   isLoading$: InitializedObservable<boolean>;
   createResultDialogIsOpen$: InitializedObservable<boolean>;
   /** The link to the event just created. */

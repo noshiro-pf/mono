@@ -79,7 +79,7 @@ export const datetimeListReducer: Reducer<
       return Arr.toInserted(
         state,
         action.index,
-        state[action.index] ?? datetimeRangeInitialValue,
+        state[action.index] ?? datetimeRangeInitialValue(),
       );
 
     case 'delete':
