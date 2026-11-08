@@ -8,15 +8,11 @@ import { listWorkflowFiles } from '../lib/repo-files.mjs';
 import { projectRootPath } from '../project-root-path.mjs';
 
 /**
- * Holds every workflow that calls `check-gates.yml` to the `workflow_dispatch`
- * input the gate reads off its caller's event: `diff-parent`, a boolean that is
- * `false` unless set.
- *
- * The gate diffs a run with it set against its parent (README.md, "Triggers").
- * A check workflow that did not declare it would refuse such a dispatch, and
- * one that declared it as a string would hand the gate whatever was typed;
- * either way that workflow would judge the commit otherwise than the rest, and
- * nothing else says so. The queue does not set it.
+ * Holds every workflow that calls `check-gates.yml` to a `workflow_dispatch`
+ * trigger with no inputs: the queue dispatches each layer with none (README.md,
+ * "Triggers"), so a required input would refuse its dispatch, and an optional
+ * one would judge a manual run otherwise than the queue's, which the gate's
+ * reuse of verdicts by tree does not tell apart.
  *
  * The queue dispatches the workflows `.github/unblock-prs.json` lists under
  * `speculate.workflows`, which therefore has to be exactly the gate's callers:
@@ -143,9 +139,8 @@ export const findDispatchInputViolations = (
 
 /**
  * What is wrong with one parsed workflow's `workflow_dispatch`, one message
- * each: it has to be a trigger, with a `diff-parent` input that is a boolean
- * defaulting to `false`, and no other input, since a queue dispatches every
- * check workflow with that one alone (README.md, "Triggers").
+ * each: it has to be a trigger, and declare no input, since a queue dispatches
+ * every check workflow with none (README.md, "Triggers").
  */
 export const dispatchInputViolations = (
   workflow: unknown,
@@ -162,26 +157,13 @@ export const dispatchInputViolations = (
 
   const inputs = isRecord(dispatch) ? dispatch['inputs'] : undefined;
 
-  const input = isRecord(inputs) ? inputs['diff-parent'] : undefined;
+  const declared = isRecord(inputs) ? Object.keys(inputs) : ([] as const);
 
-  const others = isRecord(inputs)
-    ? Object.keys(inputs).filter((name) => name !== 'diff-parent')
-    : ([] as const);
-
-  return [
-    ...(isRecord(input) &&
-    input['type'] === 'boolean' &&
-    input['default'] === false
-      ? []
-      : [
-          '`workflow_dispatch` has no `diff-parent` input of `type: boolean` and `default: false`.',
-        ]),
-    ...(Arr.isNonEmpty(others)
-      ? [
-          `\`workflow_dispatch\` declares ${others.map((name) => `\`${name}\``).join(', ')}, which a queue's dispatch does not supply.`,
-        ]
-      : []),
-  ];
+  return Arr.isNonEmpty(declared)
+    ? [
+        `\`workflow_dispatch\` declares ${declared.map((name) => `\`${name}\``).join(', ')}, which a queue's dispatch does not supply.`,
+      ]
+    : [];
 };
 
 const UNBLOCK_PRS_CONFIG = '.github/unblock-prs.json';
@@ -241,8 +223,8 @@ if (isDirectlyExecuted(import.meta.url)) {
   if (Result.isErr(result)) {
     console.error(
       [
-        '❌ The workflows that call check-gates.yml do not all take the dispatch',
-        '   input the gate reads (README.md, "Triggers"):',
+        '❌ The workflows that call check-gates.yml do not all take a dispatch with',
+        '   no inputs, as the queue sends (README.md, "Triggers"):',
         '',
         result.value,
       ].join('\n'),
@@ -252,6 +234,6 @@ if (isDirectlyExecuted(import.meta.url)) {
   }
 
   console.info(
-    `${plural(result.value, 'workflow')} call check-gates.yml, and each takes the diff-parent input.`,
+    `${plural(result.value, 'workflow')} call check-gates.yml, and each takes a dispatch with no inputs.`,
   );
 }

@@ -9,32 +9,31 @@ import {
 } from './check-dispatch-inputs.mjs';
 
 describe(dispatchInputViolations, () => {
-  test('accepts the boolean diff-parent input alone', () => {
-    assert.deepStrictEqual(
-      dispatchInputViolations(
-        parse(dedent`
-          on:
-            workflow_dispatch:
-              # Comments and the description are the workflow's own.
-              inputs:
-                diff-parent:
-                  default: false
-                  type: boolean
-                  description: Anything.
-        `),
-      ),
-      [],
-    );
+  test('accepts a workflow_dispatch with no inputs', () => {
+    for (const text of [
+      dedent`
+        on:
+          workflow_dispatch:
+      `,
+      dedent`
+        on:
+          workflow_dispatch: {}
+      `,
+    ]) {
+      assert.deepStrictEqual(dispatchInputViolations(parse(text)), []);
+    }
   });
 
-  test('names an input a queue dispatch does not supply', () => {
+  // An optional one too: a manual run with it set would be judged otherwise
+  // than the queue's, and its verdict reused for the same tree.
+  test('names every input a queue dispatch does not supply', () => {
     assert.deepStrictEqual(
       dispatchInputViolations(
         parse(dedent`
           on:
             workflow_dispatch:
               inputs:
-                diff-parent:
+                full:
                   type: boolean
                   default: false
                 filter:
@@ -42,7 +41,7 @@ describe(dispatchInputViolations, () => {
         `),
       ),
       [
-        "`workflow_dispatch` declares `filter`, which a queue's dispatch does not supply.",
+        "`workflow_dispatch` declares `full`, `filter`, which a queue's dispatch does not supply.",
       ],
     );
   });
@@ -61,36 +60,6 @@ describe(dispatchInputViolations, () => {
         dispatchInputViolations(parse(text)).join(''),
         'does not trigger on `workflow_dispatch`',
       );
-    }
-  });
-
-  // A string input hands the gate whatever was typed.
-  test('names a missing diff-parent, or one of another type or default', () => {
-    for (const text of [
-      dedent`
-        on:
-          workflow_dispatch:
-      `,
-      dedent`
-        on:
-          workflow_dispatch:
-            inputs:
-              diff-parent:
-                type: string
-                default: ''
-      `,
-      dedent`
-        on:
-          workflow_dispatch:
-            inputs:
-              diff-parent:
-                type: boolean
-                default: true
-      `,
-    ]) {
-      assert.deepStrictEqual(dispatchInputViolations(parse(text)), [
-        '`workflow_dispatch` has no `diff-parent` input of `type: boolean` and `default: false`.',
-      ]);
     }
   });
 });

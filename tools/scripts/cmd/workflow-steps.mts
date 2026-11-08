@@ -200,22 +200,18 @@ export const installArgs = (
  * main pointed at before the push, and with no such commit — a manual run, or
  * the first push to the branch — everything runs rather than nothing.
  *
- * A manual run asked to diff against its parent (`DIFF_PARENT`, the
- * `diff-parent` input) is, wherever it runs, judged on its own commit as a
- * stacked pull request is; the gate records no reusable verdict for it. The
- * fetch is then the commit itself, two deep. The queue's layers do not set it:
- * they diff against `origin/main`, as below.
+ * A manual run off `main` diffs against `origin/main` too: a queue layer, on a
+ * `queue/*` branch, so that its verdict is a whole one about its tree, and any
+ * other, whose verdict the gate records as not reusable.
  *
- * The fetch is one commit deep, two for a run diffed against its parent. The
- * diff compares two trees and reads no history, and a pull request's head,
- * which the checkout fetched alone, is no ancestor of main, so an unbounded
- * fetch would download all of main's history.
+ * The fetch is one commit deep. The diff compares two trees and reads no
+ * history, and a pull request's head, which the checkout fetched alone, is no
+ * ancestor of main, so an unbounded fetch would download all of main's history.
  */
 export const planDiffCheck = (
   env: Env,
 ): Parsed<
-  | Readonly<{ fetch: string; depth?: number; scope: GateScope; base: string }>
-  | 'run-everything'
+  Readonly<{ fetch: string; scope: GateScope; base: string }> | 'run-everything'
 > => {
   const chosen = readChoice(env, 'diff-scope', GATE_SCOPES);
 
@@ -224,17 +220,6 @@ export const planDiffCheck = (
   }
 
   const scope = chosen.value;
-
-  if (env['DIFF_PARENT'] === 'true') {
-    const sha = env['GITHUB_SHA'] ?? '';
-
-    return FULL_SHA.test(sha)
-      ? { ok: true, value: { fetch: sha, depth: 2, scope, base: 'HEAD^' } }
-      : {
-          ok: false,
-          message: `GITHUB_SHA is "${sha}"; expected a full commit SHA.`,
-        };
-  }
 
   if (env['GITHUB_REF_NAME'] !== 'main') {
     const baseRef = env['BASE_REF'] ?? '';
@@ -257,8 +242,6 @@ export const planDiffCheck = (
     ? { ok: true, value: 'run-everything' }
     : { ok: true, value: { fetch: before, scope, base: before } };
 };
-
-const FULL_SHA = /^[0-9a-f]{40}$/u;
 
 /**
  * The ignore lists, read from {@link GATE_LISTS_FILE}: an object with the
@@ -787,12 +770,7 @@ const runDiffCheck = (env: Env): void => {
     return;
   }
 
-  runOrExit('git', [
-    'fetch',
-    `--depth=${plan.depth ?? 1}`,
-    'origin',
-    plan.fetch,
-  ]);
+  runOrExit('git', ['fetch', '--depth=1', 'origin', plan.fetch]);
 
   answerShouldRun({
     label: `the ${plan.scope} list`,
