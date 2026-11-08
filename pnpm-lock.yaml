@@ -2454,6 +2454,55 @@ importers:
         specifier: workspace:*
         version: link:../../libs/ts-type-forge
 
+  apps/synstate-dom-next-docs:
+    dependencies:
+      '@astrojs/starlight':
+        specifier: ^0.42.6
+        version: 0.42.6(@astrojs/markdown-remark@7.3.4(supports-color@7.2.0))(astro@7.4.2(@astrojs/markdown-remark@7.3.4(supports-color@7.2.0))(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))(supports-color@7.2.0)(typescript@6.0.3)
+      astro:
+        specifier: ^7.4.2
+        version: 7.4.2(@astrojs/markdown-remark@7.3.4(supports-color@7.2.0))(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1)
+    devDependencies:
+      eslint-config-typed:
+        specifier: workspace:*
+        version: link:../../libs/eslint-config-typed
+      eslint-plugin-ts-data-forge:
+        specifier: workspace:*
+        version: link:../../libs/eslint-plugin-ts-data-forge
+      eslint-plugin-ts-fortress:
+        specifier: workspace:*
+        version: link:../../libs/eslint-plugin-ts-fortress
+      eslint-plugin-ts-type-forge:
+        specifier: workspace:*
+        version: link:../../libs/eslint-plugin-ts-type-forge
+      prettier:
+        specifier: 'catalog:'
+        version: 3.9.10
+      prettier-plugin-organize-imports:
+        specifier: 'catalog:'
+        version: 4.3.0(prettier@3.9.10)(typescript@6.0.3)
+      prettier-plugin-packagejson:
+        specifier: 'catalog:'
+        version: 3.0.2(prettier@3.9.10)
+      synstate-dom-next:
+        specifier: workspace:*
+        version: link:../../libs/synstate-dom-next
+      synstate-next:
+        specifier: workspace:*
+        version: link:../../libs/synstate-next
+      ts-data-forge:
+        specifier: workspace:*
+        version: link:../../libs/ts-data-forge
+      ts-repo-utils:
+        specifier: workspace:*
+        version: link:../../libs/ts-repo-utils
+      ts-std-forge:
+        specifier: workspace:*
+        version: link:../../libs/ts-std-forge
+      ts-type-forge:
+        specifier: workspace:*
+        version: link:../../libs/ts-type-forge
+
   apps/synstate-dom-sample-app:
     dependencies:
       synstate:

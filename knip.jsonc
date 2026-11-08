@@ -545,6 +545,21 @@
       ],
     },
 
+    // The Astro site `apps/*` assumes, whose `samples/` are type-checked and
+    // linted modules that `scripts/embed-samples.mts` embeds into the pages as
+    // text: they are entries, so that what only a sample imports counts as
+    // used. The other globs are `apps/*`'s, kept in step with it.
+    "apps/synstate-dom-next-docs": {
+      "entry": [
+        "src/pages/**/*.{astro,mts,ts,tsx}",
+        "scripts/**/*.mts",
+        "configs/*.mts",
+        "e2e/**/*.spec.mts",
+        "samples/**/*.tsx",
+      ],
+      "project": ["**/*.{mts,ts,tsx,mjs,astro,mdx}"],
+    },
+
     // Not an Astro site like the entry above assumes: plain TypeScript with a
     // single entry point.
     "apps/lambda-calculus-interpreter-core": {

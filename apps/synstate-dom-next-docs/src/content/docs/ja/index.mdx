@@ -1,0 +1,57 @@
+---
+title: synstate-dom-next
+description: synstate-next の上に作り直した synstate-dom。Observable を DOM に直接束縛する、コンパイラ不要の細粒度 UI ライブラリです。
+template: splash
+hero:
+    tagline: synstate-dom を synstate-next の上にゼロから作り直したものです。Observable を JSX にそのまま渡すだけ。コンポーネントは 1 回しか呼ばれず、更新が落ち着いた後、束縛した属性・プロパティ・テキストを小さな effect が 1 つずつ書き換えます。コンパイラも仮想 DOM も使いません。
+    actions:
+        - text: はじめる
+          link: /mono/synstate-dom-next/ja/getting-started/introduction/
+          icon: right-arrow
+          variant: primary
+        - text: 仕組み
+          link: /mono/synstate-dom-next/ja/background/how-it-works/
+          variant: minimal
+---
+
+import { Aside, Card, CardGrid } from '@astrojs/starlight/components';
+
+<Aside type="caution">
+    synstate-dom-next はリポジトリ内の非公開パッケージで、npm
+    には公開していません。synstate-dom
+    の次のメジャーバージョンとして公開する予定で、それまでは API
+    が変わることがあります。
+</Aside>
+
+## 特徴
+
+<CardGrid>
+    <Card title="SynState のための UI" icon="star">
+
+synstate-next のオペレーターで組んだグラフは、そのまま DOM で終わります。束縛の 1 つ 1 つがグラフの葉で、途中で値を変換することはありません。js-framework-benchmark の操作では、synstate-dom の {/* benchmark:next-over-dom-min */}0.78{/* /benchmark */} 倍から {/* benchmark:next-over-dom-max */}1.00{/* /benchmark */} 倍の時間で済みます。
+
+    </Card>
+    <Card title="束縛は落ち着いたグラフで動く" icon="approve-check">
+        更新はまずグラフ全体に伝わり、その後で、届いた束縛がそれぞれ 1
+        回だけ実行されます。束縛が更新途中のグラフを見ることはなく、`If` と
+        `For` のマウントとアンマウントも伝播の外で行われます。
+    </Card>
+    <Card title="細粒度、呼び出しは 1 回" icon="rocket">
+        コンポーネント関数はマウント時に 1
+        回呼ばれるだけです。その後の更新は、変わったものに束縛した DOM
+        の葉（属性・プロパティ・テキストノード）に直接書き込みます。差分は取りません。
+    </Card>
+    <Card title="コンパイラ不要" icon="setting">
+        必要なのは TypeScript 標準の `"jsx": "react-jsx"` と `jsxImportSource`
+        だけです。Babel や Vite のプラグインを設定する必要はありません。
+    </Card>
+    <Card title="リアクティブかどうかが型でわかる" icon="pencil">
+        JSX がデータを受け取る場所には、Observable か `constant(...)`
+        を渡し、素の値は渡しません。うっかりスナップショットを読んで渡すと、黙って更新が止まる画面ではなく型エラーになります。
+    </Card>
+    <Card title="構造上リークしない" icon="random">
+        コンポーネントのマウント中に作ったものは、すべてそのマウント先の owner
+        に属します。分岐を閉じたり行を消したりすると、その中で作った派生・束縛・購読も一緒に消えます。
+    </Card>
+
+</CardGrid>

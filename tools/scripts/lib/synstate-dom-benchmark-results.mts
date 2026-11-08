@@ -109,7 +109,7 @@ export const pageLocale = (page: string): Locale =>
 
 export const parseResults = (markdown: string): Result<Results, string> => {
   const environment =
-    /Measured in `(?<userAgent>[^`]+)`\. Each figure is the median of (?<runs>\d+) runs of `pnpm run benchmark`/u.exec(
+    /Measured in `(?<userAgent>[^`]+)`\. Each figure is the median of (?<runs>\d+) runs of `pnpm run benchmark(?::next)?`/u.exec(
       markdown,
     );
 

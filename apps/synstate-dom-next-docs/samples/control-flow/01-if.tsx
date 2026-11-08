@@ -1,0 +1,14 @@
+import { constant, If, type JSX } from 'synstate-dom-next';
+import { createBooleanState } from 'synstate-next';
+
+const [isLoggedIn$] = createBooleanState(false);
+
+// Both branches are descriptions: only the chosen one is mounted, and
+// `Dashboard` is not called at all until `isLoggedIn$` becomes true.
+export const App = (): JSX.Element => (
+  <If cond={isLoggedIn$} then={<Dashboard />} else={<Login />} />
+);
+
+const Dashboard = (): JSX.Element => <main>{constant('Dashboard')}</main>;
+
+const Login = (): JSX.Element => <main>{constant('Please log in')}</main>;

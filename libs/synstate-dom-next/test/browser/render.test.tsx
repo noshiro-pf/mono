@@ -1,5 +1,5 @@
 import { constant, If, render, type JSX } from 'synstate-dom-next';
-import { map, state } from 'synstate-next';
+import { map, onCleanup, state } from 'synstate-next';
 
 const mount = (
   app: () => JSX.Element,
@@ -153,6 +153,38 @@ describe(render, () => {
     ));
 
     assert.deepStrictEqual(mut_seen, [0]);
+  });
+
+  test('ref runs in the owner the element mounts in', () => {
+    const show = state(true);
+
+    const mut_cleaned: string[] = [];
+
+    const { unmount } = mount(() => (
+      <If
+        cond={show}
+        then={
+          <p
+            ref={() => {
+              onCleanup(() => {
+                mut_cleaned.push('branch');
+              });
+            }}
+          />
+        }
+      />
+    ));
+
+    assert.deepStrictEqual(mut_cleaned, []);
+
+    // Closing the branch disposes its owner, which the ref's cleanup was in.
+    show.set(false);
+
+    assert.deepStrictEqual(mut_cleaned, ['branch']);
+
+    unmount();
+
+    assert.deepStrictEqual(mut_cleaned, ['branch']);
   });
 
   test('components and fragments', () => {

@@ -23,6 +23,7 @@ import { projectRootPath } from '../project-root-path.mjs';
  *   index.html            a list of what is here
  *   synstate/             the hand-written documentation site (Astro)
  *   synstate-dom/         the same, for synstate-dom
+ *   synstate-dom-next/    the same, for synstate-dom-next
  *   pr-manager/           the Pull Requests Manager app (Vite), and one
  *   …                     directory for each other app in `pages-apps.mts`
  *   slides/               the reveal.js decks in `docs/reveal-slides/`,

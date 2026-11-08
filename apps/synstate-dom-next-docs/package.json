@@ -1,0 +1,49 @@
+{
+  "name": "synstate-dom-next-docs",
+  "version": "0.0.0",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/noshiro-pf/mono.git",
+    "directory": "apps/synstate-dom-next-docs"
+  },
+  "license": "Apache-2.0",
+  "author": "noshiro-pf <noshiro.pf@gmail.com>",
+  "type": "module",
+  "scripts": {
+    "build": "astro build",
+    "check:lint": "node ../../tools/scripts/cmd/assert-deps-built.mts && oxlint . && eslint .",
+    "check:types": "node ../../tools/scripts/cmd/assert-deps-built.mts && node ../../node_modules/typescript-native/bin/tsc --noEmit",
+    "dev": "astro dev",
+    "fix:fmt": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/format-uncommitted.mts --cwd .",
+    "fix:fmt:diff": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/format-diff-from.mts origin/main --cwd .",
+    "fix:fmt:full": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../tools/scripts/cmd/format-package.mts",
+    "fix:lint": "node ../../tools/scripts/cmd/assert-deps-built.mts && oxlint . --fix && eslint . --fix",
+    "fmt": "pnpm run fix:fmt",
+    "gen": "run-s gen:samples gen:benchmark gen:bundle-size fix:fmt",
+    "gen:benchmark": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/embed-benchmark.mts",
+    "gen:bundle-size": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/embed-bundle-size.mts",
+    "gen:samples": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/embed-samples.mts",
+    "preview": "astro preview",
+    "watch:types": "node ../../node_modules/typescript-native/bin/tsc --noEmit --watch"
+  },
+  "dependencies": {
+    "@astrojs/starlight": "^0.42.6",
+    "astro": "^7.4.2"
+  },
+  "devDependencies": {
+    "eslint-config-typed": "workspace:*",
+    "eslint-plugin-ts-data-forge": "workspace:*",
+    "eslint-plugin-ts-fortress": "workspace:*",
+    "eslint-plugin-ts-type-forge": "workspace:*",
+    "prettier": "catalog:",
+    "prettier-plugin-organize-imports": "catalog:",
+    "prettier-plugin-packagejson": "catalog:",
+    "synstate-dom-next": "workspace:*",
+    "synstate-next": "workspace:*",
+    "ts-data-forge": "workspace:*",
+    "ts-repo-utils": "workspace:*",
+    "ts-std-forge": "workspace:*",
+    "ts-type-forge": "workspace:*"
+  }
+}
