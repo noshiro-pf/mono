@@ -11,7 +11,7 @@ synstate-next and synstate-dom-next are a from-scratch rebuild of synstate and s
 
 ## Features
 
-- **Glitch-free, at linear cost.** An update visits the nodes it reaches in order of depth, each once, after all of its parents. A value derived from two others never sees one of them updated and the other not.
+- **Glitch-free, at linear cost.** An update visits the nodes it reaches in order of depth, each once, after all of its parents. A value derived from two others never sees one of them updated and the other not. The same holds through `debounce` and `switchMap`, which signal libraries write as effects; what that costs them is in [Operators on signals](/mono/synstate-next/comparison/operators-on-signals/).
 - **Subscribers run on a settled graph.** A subscriber is called after the update has reached every node, not in the middle of it. A write made by a subscriber starts the next update, and a write made in the drain waits for the round to end.
 - **Equality cut-off by default.** A derived value that recomputes to the value it holds passes nothing on: what is below it is not visited.
 - **Owners instead of completion.** Everything created while an owner runs belongs to it, and disposing the owner disposes all of it. There is no `complete` to send or to forget.

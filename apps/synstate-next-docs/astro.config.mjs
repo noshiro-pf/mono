@@ -78,6 +78,15 @@ export default defineConfig({
           items: [{ slug: 'examples/patterns' }],
         },
         {
+          label: 'Comparison',
+          translations: { ja: '比較' },
+          items: [
+            { slug: 'comparison/libraries' },
+            { slug: 'comparison/async-logic' },
+            { slug: 'comparison/operators-on-signals' },
+          ],
+        },
+        {
           label: 'Internals',
           translations: { ja: '内部の仕組み' },
           items: [

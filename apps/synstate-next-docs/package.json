@@ -49,6 +49,7 @@
     "prettier": "catalog:",
     "prettier-plugin-organize-imports": "catalog:",
     "prettier-plugin-packagejson": "catalog:",
+    "synstate": "workspace:*",
     "synstate-next": "workspace:*",
     "ts-data-forge": "workspace:*",
     "ts-repo-utils": "workspace:*",
