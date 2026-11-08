@@ -9,7 +9,7 @@ Creates an observable that follows `parents`: an operator written outside the pa
 
 `update` reads its parents. What `setup` creates is for work on the side (a subscription, a listener): a node made there is visited in the same update as this one, not before it, so `update` would read its value from before.
 
-An operator that emits later than the update that woke it (from a timer) gives `settled`, so that it is not taken for done while a value is still due; a `mergeMap` lets go of an inner observable that is settled.
+An operator that emits later than the update that made it recompute (from a timer) gives `settled`, so that it is not taken for done while a value is still due; a `mergeMap` lets go of an inner observable that is settled.
 
 {/* /reference */}
 

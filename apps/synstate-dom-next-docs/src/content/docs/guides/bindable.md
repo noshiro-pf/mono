@@ -1,6 +1,6 @@
 ---
 title: Bindable values
-description: constant, pipe(map), and what a slot that takes data accepts.
+description: constant, pipe(map), and what the props and attributes that take data accept.
 ---
 
 Every place in JSX that takes data (an attribute, a DOM property, a text child, or a prop of a component the library provides) accepts a `Bindable<T>`:
@@ -8,7 +8,7 @@ Every place in JSX that takes data (an attribute, a DOM property, a text child, 
 | `Bindable<T>` is one of    | what happens when it is bound                                             |
 | :------------------------- | :------------------------------------------------------------------------ |
 | `InitializedObservable<T>` | written once with its value, then again after each update that changes it |
-| `Constant<T>`              | written once; nothing is made for it, neither a node nor an effect        |
+| `Constant<T>`              | written once; nothing is made for it, neither a node nor a binding        |
 
 An `Observable<T>` that may hold no value yet (an event source, a `filter`) is not a `Bindable`: there would be nothing to write when it is bound. Give it one with `withInitialValue(x)` first.
 
@@ -48,7 +48,7 @@ Things that are not data take plain values: event handlers, `ref`, the `key` fun
 
 ## Transforming an observable: `pipe(map)`
 
-To show an observable transformed, write `source$.pipe(map(fn))`. There is no separate form for bindings: a slot takes the `map` node like any other observable. Created inside a component, or inside a row of `For`, the node belongs to that owner and is disposed with it:
+To show an observable transformed, write `source$.pipe(map(fn))`. There is no separate form for bindings: a prop or attribute takes the `map` node like any other observable. Created inside a component, or inside a row of `For`, the node belongs to that owner and is disposed with it:
 
 ```tsx
 import { constant, For, type JSX } from 'synstate-dom-next';

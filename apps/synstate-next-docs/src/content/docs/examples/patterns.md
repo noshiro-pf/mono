@@ -75,7 +75,7 @@ refreshClicked.pipe(throttle(2000)).subscribe(() => {
 
 ## A todo list
 
-A reducer for the list, a state for the filter, and two derived views. Each view is computed once per update, from both of its parents, and cut off when it does not change:
+A reducer for the list, a state for the filter, and two derived views. Each view is computed once per update, from both of its parents, and stops the update when it does not change:
 
 ```tsx
 import { createReducer, createState, derive, map } from 'synstate-next';

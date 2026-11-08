@@ -21,31 +21,31 @@ import {
 import { MountSite, removeRange } from './branch.mjs';
 
 /**
- * Mounts `children(key, value)` for the key of `value`, and replaces it when the
- * key changes: after the update that changed it has settled, the previous
- * branch's owner is disposed and its nodes removed. While the key stays, the
- * branch stays; one that follows the value does so through what it makes from
- * it (`toObservable(value)`). `children` returns `undefined` for a key with
- * nothing to show. A constant `value` mounts one branch once. `If`,
- * `MatchOptional` and `MatchResult` are this.
+ * Mounts `children(key, value)` for the key of `value`, and replaces it when
+ * the key changes: once every value of the update that changed it is up to
+ * date, the previous branch's owner is disposed and its nodes removed. While
+ * the key stays, the branch stays; one that follows the value does so through
+ * what it makes from it (`toObservable(value)`). `children` returns `undefined`
+ * for a key with nothing to show. A constant `value` mounts one branch once.
+ * `If`, `MatchOptional` and `MatchResult` are this.
  *
  * Keys are compared with `Object.is`, so a key is a primitive (or an object
  * kept as it is): a key made afresh for each value (`[p.kind, p.id]`) mounts
  * the branch again on every value.
  *
  * No node made in a branch computes from a value whose key rules it out: `key`
- * is called in the drain, above the branch's nodes, and a branch that goes is
- * retired there (see `DrainCheck`). An observable the branch is given rather
- * than makes (one created where the description is written) is not the
+ * is called while values are recomputed, above the branch's nodes, and a branch
+ * that goes is taken out of the update there. An observable the branch is given
+ * rather than makes (one created where the description is written) is not the
  * branch's: it computes from every value, mounted or not.
  *
- * A `key` that throws in an update drops the branch and leaves the switch empty
- * until the next value; the exception is thrown as the switch's own. A cleanup
- * of the branch that goes that throws does not stop the switch: the exception
- * is thrown once the new branch is in place. A branch that throws while
- * mounting leaves the switch empty, and the next value mounts its branch,
- * whatever its key. A `key` or branch that throws while the switch first mounts
- * fails that mount.
+ * A `key` that throws in an update drops the branch and leaves the `Switch`
+ * empty until the next value; the exception is thrown as the `Switch`'s own. A
+ * cleanup of the branch that goes that throws does not stop the `Switch`: the
+ * exception is thrown once the new branch is in place. A branch that throws
+ * while mounting leaves the `Switch` empty, and the next value mounts its
+ * branch, whatever its key. A `key` or branch that throws while the `Switch`
+ * first mounts fails that mount.
  */
 export const Switch = <V, K>({
   value,

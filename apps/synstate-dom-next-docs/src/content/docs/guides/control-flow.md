@@ -5,7 +5,7 @@ description: If, MatchOptional, MatchResult, Switch, For, selector and Portal.
 
 A component runs once, so an `if` or an early `return` in its body is evaluated once and never again. To choose something that changes over time, use a component: `If`, `MatchOptional`, `MatchResult` or `Switch` to choose a branch, `For` to repeat one. Each mounts what it shows in an [owner](/mono/synstate-dom-next/guides/lifecycle/) of its own, and disposes that owner when it switches to something else. None of them adds a wrapper element: one bound to an observable marks its place with a comment node at each end.
 
-All of them change the DOM after the update that changed their input has settled, so mounting and unmounting never happen in the middle of a propagation. What they decide, they decide earlier: in the update itself, before the nodes of a branch or a row are visited. A branch that goes, or a row whose key is gone, is never computed from the value that rules it out.
+All of them change the DOM once every value of the update that changed their input is up to date, so mounting and unmounting never happen in the middle of a propagation. What they decide, they decide earlier: in the update itself, before the nodes of a branch or a row are visited. A branch that goes, or a row whose key is gone, is never computed from the value that rules it out.
 
 ## `If`
 
@@ -80,7 +80,7 @@ export const ParsedValue = (): JSX.Element => (
 
 - `MatchOptional` takes a `Bindable<Optional<T>>` and `MatchResult` a `Bindable<Result<S, E>>`, both types from ts-std-forge.
 - Each branch function receives an observable of the value narrowed to `T` (or `S`, `E`). The branch is rebuilt only when the tag changes; while the tag stays the same, new values just flow through that observable.
-- That observable is a `map` of `value` made inside the branch. When `value` turns to the other tag, the branch is retired in the update before that `map` is reached, so it never computes from a value of the wrong tag.
+- That observable is a `map` of `value` made inside the branch. When `value` turns to the other tag, the branch is taken out of the update before that `map` is reached, so it never computes from a value of the wrong tag.
 
 ## `Switch`
 
@@ -134,7 +134,7 @@ const ItemList = (): JSX.Element => (
 
 - `value: Bindable<V>`, `key: (value: V) => K`, and as children a function `(key, value) => JSX.Element | undefined`. `undefined` shows nothing for that key.
 - The branch is mounted for the key of the value and kept while the key stays. Keys are compared with `Object.is`, so a key is a primitive, or an object kept as it is: a key built afresh for each value, such as `[page.kind, page.id]`, mounts the branch again on every value.
-- `key` is called once per value, in the update, before any node of the branch computes. A `key` that throws drops the branch and leaves the switch empty until the next value; the exception is thrown as the switch's own, and the rest of the page is updated. One that throws while the switch first mounts fails that mount.
+- `key` is called once per value, in the update, before any node of the branch computes. A `key` that throws drops the branch and leaves the `Switch` empty until the next value; the exception is thrown as the `Switch`'s own, and the rest of the page is updated. One that throws while the `Switch` first mounts fails that mount.
 - What the branch shows from the value it reads through an observable it makes, `value.pipe(map(...))`, as the `item` branch above does. An observable made where the JSX is written, outside the branch, is not the branch's: it computes from every value, shown or not.
 
 ## `For`
@@ -169,7 +169,7 @@ export const Table = (): JSX.Element => (
 
 - `items: Bindable<readonly T[]>`, `key: (item: T, index: number) => unknown`, and as children a function `(item$, index$) => JSX.Element`. As in Solid, `index$` is created only when the function declares a second parameter. If a row does not need its position, leave the parameter out, and each row has one node fewer.
 - `key` is required, as in React. To match rows by position, say so with `key={(_, i) => i}`; there is no separate `Index` component.
-- The row function runs once per key, in an owner of the row's own. Behind `item$` and `index$` each row keeps a state. When `items` changes, a row whose key stays is not rebuilt: its state is set to the new element, which wakes only what reads that row, and rows whose element did not change are not visited at all. A new key mounts a row, and a key that went disposes its row's owner and removes its nodes.
+- The row function runs once per key, in an owner of the row's own. Behind `item$` and `index$` each row keeps a state. When `items` changes, a row whose key stays is not rebuilt: its state is set to the new element, which reaches only what reads that row, and rows whose element did not change are not visited at all. A new key mounts a row, and a key that went disposes its row's owner and removes its nodes.
 - Those writes to the rows' states start an update of their own, right after the one that changed `items`, so a row reads its new element one update later than `items` changed. Both happen before anything is painted.
 - When the keys are the same, in the same order, nothing is moved and the keyed diff is skipped. Otherwise the rows that stay are moved as little as the longest increasing run of their old positions allows, and an update that keeps no key (clearing or replacing the whole list) removes the old rows' nodes in one go.
 - If a key appears twice, `For` reports it with `console.error`, as React does.

@@ -133,7 +133,7 @@ export const createSearchView = (): SearchView => {
 };
 ```
 
-`switchMap` は内側の Observable の最初の値（読み込み中の状態）を、クエリを変えたのと同じ更新の中で渡します。そのため両方の下にある `view` は `ab / loading for ab` で 1 回実行され、答えが届くと `ab / success for ab` でもう 1 回実行されます。（`switchMap` は `query` が作られたときに持っている `'a'` も射影するので、Preact の effect と同じく `a` もリクエストします。）間違える順番はありません。派生ノードは作った順ではなくグラフの中の深さの順に実行され、購読者はすべての派生ノードの後に、落ち着いたグラフに対して実行されるからです。
+`switchMap` は内側の Observable の最初の値（読み込み中の状態）を、クエリを変えたのと同じ更新の中で渡します。そのため両方の下にある `view` は `ab / loading for ab` で 1 回実行され、答えが届くと `ab / success for ab` でもう 1 回実行されます。（`switchMap` は `query` が作られたときに持っている `'a'` も射影するので、Preact の effect と同じく `a` もリクエストします。）間違える順番はありません。派生ノードは作った順ではなくグラフの中の深さの順に実行され、購読者はすべての派生ノードの後に、すべての値が新しくなってから実行されるからです。
 
 どのライブラリも同じ立場というわけではありません。Jotai の非同期 atom と Solid の `createResource` はそれぞれのグラフの派生ノードで、同じ view をそれらで書くと（`unwrap`、`resource.loading`）クエリ 1 回につき 1 回実行されます。リクエストを observable に書く `reaction` で表す MobX は、Preact Signals と同じ振る舞いになります。ライブラリごとの一覧は[評価モデル](/mono/synstate-next/ja/comparison/libraries/#評価モデル)の表にあります。
 
@@ -170,7 +170,7 @@ batch(() => {
 // 4 clicks, counted as 2
 ```
 
-synstate-next では、emitter の発行は値に関わらずすべてイベントで、`batch` の中で行った発行もそれぞれ別のラウンドで届きます（[状態と書き込み](/mono/synstate-next/ja/guides/state-and-writes/)）。
+synstate-next では、emitter の発行は値に関わらずすべてイベントで、`batch` の中で行った発行もそれぞれ別の更新で届きます（[状態と書き込み](/mono/synstate-next/ja/guides/state-and-writes/)）。
 
 ```tsx
 import { batch, createValueEmitter, scan } from 'synstate-next';
@@ -191,7 +191,7 @@ click('A');
 click('A'); // every emission is an event, equal or not
 
 batch(() => {
-    // two clicks in one batch: each is delivered in a round of its own
+    // two clicks in one batch: each is delivered in an update of its own
     click('B');
 
     click('C');
@@ -200,7 +200,7 @@ batch(() => {
 // 4 clicks, counted as 4
 ```
 
-`createState` は signal と同じく状態を持つものです。持っている値と等しい書き込みは捨て、その状態のラウンドの前に何度も書き込まれたとき（`batch` の中、派生値の計算中、同じラウンドの effect から）は、後段にはラウンドが始まるときに持っている値が 1 つだけ届きます。イベントは、発行をすべて渡す `createValueEmitter` か `source` で送ります。Preact Signals だけで書くなら、クリックのハンドラーが自分でクリックを数えるでしょう。それで動きますし、それこそが要点です。数える処理は書き込む場所に書くコードであって、どの signal の後にも置けるオペレーターではありません。
+`createState` は signal と同じく状態を持つものです。持っている値と等しい書き込みは捨て、その状態の更新の前に何度も書き込まれたとき（`batch` の中、派生値の計算中、同じ更新の購読者から）は、後段には更新が始まるときに持っている値が 1 つだけ届きます。イベントは、発行をすべて渡す `createValueEmitter` か `source` で送ります。Preact Signals だけで書くなら、クリックのハンドラーが自分でクリックを数えるでしょう。それで動きますし、それこそが要点です。数える処理は書き込む場所に書くコードであって、どの signal の後にも置けるオペレーターではありません。
 
 ## 直すには何が要るか
 
@@ -214,6 +214,6 @@ effect で書いたオペレーターをグリッチフリーにするには、�
 
 ## synstate-next で UI を作る
 
-synstate-next を画面に出す手段は [synstate-dom-next](/mono/synstate-dom-next/ja/) です。Observable を DOM に直接束縛します。コンポーネントは 1 回しか実行されず、更新はグラフから、束縛された属性、プロパティ、テキストノードへ直接届きます。仮想 DOM もコンポーネントの再実行もありません。その束縛は同じスケジューラの effect なので、購読者と同じく各ラウンドの派生値の後に実行されます。上の検索の段なら、クエリからページに表示するものまでが 1 つのグラフになり、Observable を別のものに変える箇所がどこにもありません。コンポーネントのリクエスト、タイマー、束縛は 1 つの owner がまとめて破棄します。
+synstate-next を画面に出す手段は [synstate-dom-next](/mono/synstate-dom-next/ja/) です。Observable を DOM に直接束縛します。コンポーネントは 1 回しか実行されず、更新はグラフから、束縛された属性、プロパティ、テキストノードへ直接届きます。仮想 DOM もコンポーネントの再実行もありません。その束縛は同じスケジューラの上で動くので、購読者と同じく各更新の派生値の後に実行されます。上の検索の段なら、クエリからページに表示するものまでが 1 つのグラフになり、Observable を別のものに変える箇所がどこにもありません。コンポーネントのリクエスト、タイマー、束縛は 1 つの owner がまとめて破棄します。
 
-synstate-next にはまだ Preact Signals との橋渡しがありません。パイプラインの結果を別のライブラリに渡すなら、`subscribe` が落ち着いた値を 1 つ残らず渡します。その継ぎ目で上の保証は終わります。継ぎ目を越える値はすべて変換され、signal に入ったイベントは値になります。
+synstate-next にはまだ Preact Signals との橋渡しがありません。パイプラインの結果を別のライブラリに渡すなら、`subscribe` が新しくなった値を 1 つ残らず渡します。その継ぎ目で上の保証は終わります。継ぎ目を越える値はすべて変換され、signal に入ったイベントは値になります。

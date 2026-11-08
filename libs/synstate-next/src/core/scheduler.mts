@@ -130,8 +130,9 @@ const mut_effects: (EffectNode | undefined)[] = [];
 const mut_holders: (HoldsFailure | undefined)[] = [];
 
 /**
- * How many rounds one flush may run. A round starts when an effect writes; an
- * effect that keeps writing to what its own update reaches is a loop. A round
+ * How many rounds one flush may run. A round starts when an effect writes, or
+ * when a write an operator made during the drain is applied; an effect or an
+ * operator that keeps writing to what its own update reaches is a loop. A round
  * that delivers a queued value of an event source does not count, and starts
  * the count again: each one consumes a value written before it.
  */
@@ -144,10 +145,10 @@ export const maxRounds = 100;
 const maxAllRounds = 1_000_000;
 
 export const loopMessage =
-  `synstate-next: more than ${maxRounds.toString()} rounds in one flush: an effect keeps writing to a state that its own update reaches. Make the write stop, or derive the value with map / derive.` as const;
+  `synstate-next: more than ${maxRounds.toString()} updates in a row: a subscriber, a binding or an operator keeps writing to a state that its own update reaches. Make the write stop, or derive that state with map / derive instead of writing to it.` as const;
 
 const sourceLoopMessage =
-  `synstate-next: more than ${maxAllRounds.toString()} rounds in one flush: an event source keeps receiving values faster than its rounds deliver them, which happens when its own subscribers write to it more than once per value.` as const;
+  `synstate-next: more than ${maxAllRounds.toString()} updates in a row: an event source keeps receiving values faster than its updates deliver them, which happens when its own subscribers write to it more than once per value.` as const;
 
 /** The current epoch. A node that emitted in this update has it as `changedAt`. */
 export const currentEpoch = (): number => mut_state.epoch;

@@ -23,7 +23,7 @@ synstate-next はまだ公開していません。リポジトリ内のパッケ
 
 ## UI
 
-- **[synstate-dom-next](/mono/synstate-dom-next/ja/)** は、同じスケジューラーの上で Observable を DOM に直接束縛します。束縛は synstate-next のグラフの effect そのものです。synstate-next のために作った UI ライブラリです。
+- **[synstate-dom-next](/mono/synstate-dom-next/ja/)** は、同じスケジューラーの上で Observable を DOM に直接束縛します。束縛は synstate-next のグラフの末端そのものです。synstate-next のために作った UI ライブラリです。
 - React と Preact のフック、Preact Signals との橋渡し、ルーターはまだ作り直していません。それまでは、[UI と組み合わせる](/mono/synstate-next/ja/guides/using-with-a-ui/)で、どのフレームワークでも必要になる数行を紹介しています。
 
 ## ESLint プラグイン

@@ -7,9 +7,9 @@ synstate-next は、次のメジャーバージョンで synstate を置き換�
 
 ## 伝播と書き込み
 
-- **購読者は、更新の途中ではなく、更新が落ち着いてから実行されます。** 購読者がグラフの他の値を読めば、それは最新です。ただし、同じラウンドで先に動いた購読者が書き込んだときは別です（次の項目）。
-- **ドレイン中の書き込みは、そのラウンドの effect が実行されるまで遅らせます。** その後、次のラウンドを始めます。購読者からの書き込みはすぐに適用され、次のラウンドで伝わります。同じラウンドでその後に動く購読者は、状態の新しい値と、そこから派生したまだ古い値を読みます。更新が入れ子になることはありません。
-- **セッターは何も返しません。** `createState` の `setState`・`updateState`・`resetState`、`createReducer` の `dispatch`、`createBooleanState` のものです。ドレイン中に行った書き込みはそのラウンドの effect が実行されてから適用されるので、返すべき値はまだ決まっていません。状態は `getSnapshot` で読んでください。
+- **購読者は、更新の途中ではなく、すべての値が新しくなった後で実行されます。** 購読者がグラフの他の値を読めば、それは最新です。ただし、同じ更新で先に動いた購読者が書き込んだときは別です（次の項目）。
+- **更新が値を計算し直している間に `map` や `derive` などのオペレーターの中で行った書き込みは、その更新の購読者と束縛が実行されるまで遅らせます。** その後、次の更新を始めます。購読者や束縛からの書き込みはすぐに適用され、次の更新で伝わります。同じ更新でその後に動く購読者は、状態の新しい値と、そこから派生したまだ古い値を読みます。更新が入れ子になることはありません。
+- **セッターは何も返しません。** `createState` の `setState`・`updateState`・`resetState`、`createReducer` の `dispatch`、`createBooleanState` のものです。更新が値を計算し直している間に `map` や `derive` などのオペレーターの中で行った書き込みはその更新の購読者と束縛が実行されてから適用されるので、返すべき値はまだ決まっていません。状態は `getSnapshot` で読んでください。
 - **循環依存は検出しません。** ノードの親はノードより先に存在するので、API を通して循環を作ることはできません。
 
 ## 寿命
@@ -39,7 +39,7 @@ synstate-next は、次のメジャーバージョンで synstate を置き換�
 ## オペレーターを書く
 
 - **ファクトリーはそれぞれ 1 つです。** オペレーターは `createDerived`（synstate の `createSyncChildObservable`・`createAsyncChildObservable`・`createInitializedSyncChildObservable`）、ソースは `createSource`（`createRootObservable`）です。
-- **更新トークンはありません。** どの親が更新を起こしたかは `ctx.emitted(parent)` でわかり、`ctx.set` はその更新で値を伝え、`ctx.emit` はそれ自身の更新で伝えます。
+- **更新トークンはありません。** その更新でどの親が値を流したかは `ctx.emitted(parent)` でわかり、`ctx.set` はその更新で値を伝え、`ctx.emit` はそれ自身の更新で伝えます。
 - **`settled` が `canEmitNoMore` に代わり**、`flush` は完了とともになくなりました。
 - **setup は Observable を owner として実行されます。** そこで作ったものは Observable に属し、クリーンアップは新しいものから、作ったものを破棄する前に実行されます。synstate は登録順に実行していました。
 - **`isChildObservable`・`isManagerObservable`・`isRootObservable` の型ガードはなくなりました。** それらが区別していた種類は公開の型にありません。

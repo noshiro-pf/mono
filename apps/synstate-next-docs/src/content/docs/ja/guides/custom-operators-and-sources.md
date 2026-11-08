@@ -46,7 +46,7 @@ assert.strictEqual(lastSelected.peek(), 'a');
 
 ## 複数の親
 
-複数の親を持つノードは、どの親が値を流しても起こされます。この更新でどの親が流したかは `ctx.emitted(parent)` でわかります。
+複数の親を持つノードは、どの親が値を流しても計算し直されます。この更新でどの親が流したかは `ctx.emitted(parent)` でわかります。
 
 ```tsx
 import {
@@ -69,7 +69,7 @@ const mergeTagged = <A, B>(
 
         const b = second.peek();
 
-        // `emitted` tells which parent woke this update.
+        // `emitted` tells which parent emitted in this update.
         if (a !== undefined && ctx.emitted(first)) {
             ctx.set({ from: 'left', value: a });
         } else if (b !== undefined && ctx.emitted(second)) {
@@ -99,7 +99,7 @@ assert.deepStrictEqual(mut_seen, [
 
 ## 非同期のオペレーター
 
-ノードを起こした更新より後に来る値は、`ctx.emit(value)` で、それ自身の更新として伝えます。そういうオペレーターは `settled` も用意して、まだ値が残っているのに終わったとみなされないようにします。`mergeMap` は、settled になった内側の Observable を手放します。止めるべきものは `ctx.onCleanup` で登録します。
+ノードを計算し直させた更新より後に来る値は、`ctx.emit(value)` で、それ自身の更新として伝えます。そういうオペレーターは `settled` も用意して、まだ値が残っているのに終わったとみなされないようにします。`mergeMap` は、settled になった内側の Observable を手放します。止めるべきものは `ctx.onCleanup` で登録します。
 
 ```tsx
 import {
@@ -211,7 +211,7 @@ assert.deepStrictEqual(mut_types, ['click']);
 
 ## できないこと
 
-- **`update` から親でない Observable を読むこと。** ノードは親の下に置かれるので、親の値は落ち着いた後に読めます。それ以外の Observable は、この更新でまだ計算し直されていないかもしれません。親にして、どの親が更新を起こしたかを `ctx.emitted` で確かめてください。
+- **`update` から親でない Observable を読むこと。** ノードは親の下に置かれるので、親の値は新しくなった後に読めます。それ以外の Observable は、この更新でまだ計算し直されていないかもしれません。親にして、この更新でどの親が値を流したかを `ctx.emitted` で確かめてください。
 - **`update` の中でノードを作ること。** `update` は更新の中で、どの owner の外でも動くので、そこで作ったノードはどの owner にも属しません。破棄されることがなく、親につながったまま、それ以降は親と一緒に計算され続けます。ノードに必要なものは `setup` で作ってください。
 - **自分で作ったノードを追いかけること。** `setup` で作ったノードは親ではありません。このノードと同じ更新で、先にではなく辿られるので、`update` はその値を更新の前のまま読んでしまいます。`setup` で作るものは、購読やリスナーのような脇の仕事のためのものです。自分で作った Observable を追いかけるオペレーターは `switchMap` か `mergeMap` です。
 - **synstate-next の 2 つのコピーの Observable を組み合わせること。** 別のコピーの親を渡すと `createDerived` は例外を投げます。

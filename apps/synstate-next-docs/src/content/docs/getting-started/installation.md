@@ -23,7 +23,7 @@ A graph cannot span two copies of synstate-next: combining an observable with on
 
 ## A UI
 
-- **[synstate-dom-next](/mono/synstate-dom-next/)** binds observables straight to the DOM, with the same scheduler: a binding is an effect of synstate-next's graph. It is the UI library made for synstate-next.
+- **[synstate-dom-next](/mono/synstate-dom-next/)** binds observables straight to the DOM, with the same scheduler: a binding sits at the end of synstate-next's graph. It is the UI library made for synstate-next.
 - React and Preact hooks, the Preact Signals bridge and the router have not been rebuilt yet. Until they are, [Using it with a UI](/mono/synstate-next/guides/using-with-a-ui/) shows the few lines any framework needs.
 
 ## The ESLint plugin

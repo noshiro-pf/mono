@@ -40,7 +40,7 @@ Each page gives the API's description, taken from its JSDoc, and an example that
 
 ## Operators
 
-- [`map`](/mono/synstate-next/reference/operators/map/): Maps each value with `fn`, and emits the result unless it equals the one held (`Object.is` unless `equals` says otherwise), so a result that did not change wakes nothing below.
+- [`map`](/mono/synstate-next/reference/operators/map/): Maps each value with `fn`, and emits the result unless it equals the one held (`Object.is` unless `equals` says otherwise), so a result that did not change makes nothing below recompute.
 - [`filter`](/mono/synstate-next/reference/operators/filter/): Passes on the values that satisfy `predicate`.
 - [`scan`](/mono/synstate-next/reference/operators/scan/): Accumulates the values with `reducer`, starting from `seed`.
 - [`pairwise`](/mono/synstate-next/reference/operators/pairwise/): Emits the previous and the current value of the source as a pair, on every value from the second on.
@@ -53,7 +53,7 @@ Each page gives the API's description, taken from its JSDoc, and an example that
 - [`skipIfNoChange`](/mono/synstate-next/reference/operators/skip-if-no-change/): Drops a value equal to the one held (`Object.is` unless `equals` says otherwise).
 - [`keepEqualParts`](/mono/synstate-next/reference/operators/keep-equal-parts/): Replaces the parts of each value that are deeply equal to the held value's with the held value's own, so that a part that did not change keeps its reference.
 - [`withInitialValue`](/mono/synstate-next/reference/operators/with-initial-value/): Holds `initial` until the source emits, then follows the source.
-- [`withCurrentValueFrom`](/mono/synstate-next/reference/operators/with-current-value-from/): Pairs each value of the source with the value `other` holds, settled for the same update.
+- [`withCurrentValueFrom`](/mono/synstate-next/reference/operators/with-current-value-from/): Pairs each value of the source with the value `other` holds, up to date for the same update.
 - [`withBufferedFrom`](/mono/synstate-next/reference/operators/with-buffered-from/): Gives each value of the source the values `other` emitted since the previous one, in order: those emitted in the same update included, those it held before this node was created not.
 - [`debounce`](/mono/synstate-next/reference/operators/debounce/): Emits the latest value once `milliseconds` have passed without another, in an update of its own.
 - [`throttle`](/mono/synstate-next/reference/operators/throttle/): Passes a value at once, then drops the values of the next `milliseconds`.

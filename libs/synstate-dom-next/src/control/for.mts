@@ -38,20 +38,21 @@ import { longestIncreasingRun } from './longest-increasing-run.mjs';
  * parameter, as `Function.length` counts it: one that reads it through a
  * default value or a rest parameter is given none.
  *
- * After an update of `items` has settled, a row whose key stays is not rebuilt:
- * the state behind its `item` is set to the new element, which wakes only what
- * reads it, and its index likewise. When the keys are the same in the same
- * order, that is all that happens. Otherwise a key that went disposes its row
- * and removes its nodes, a new key mounts a row, and the rows that stay are
- * moved as little as the longest increasing run of their old positions allows.
+ * Once every value of an update of `items` is up to date, a row whose key stays
+ * is not rebuilt: the state behind its `item` is set to the new element, which
+ * reaches only what reads it, and its index likewise. When the keys are the
+ * same in the same order, that is all that happens. Otherwise a key that went
+ * disposes its row and removes its nodes, a new key mounts a row, and the rows
+ * that stay are moved as little as the longest increasing run of their old
+ * positions allows.
  *
  * The writes to the rows' states start an update of their own, after the one
- * that changed `items`: a row reads its new element one round later than
+ * that changed `items`: a row reads its new element one update later than
  * `items` changed, and before anything is painted.
  *
  * A row whose key goes never computes from the list that drops it: the keys are
- * checked in the drain, above the rows' nodes, and the rows that go are retired
- * there (see `DrainCheck`).
+ * checked while values are recomputed, above the rows' nodes, and the rows that
+ * go are taken out of the update there.
  *
  * `key` is required; `(_, i) => i` matches rows by position. A key that appears
  * twice is reported with `console.error`.

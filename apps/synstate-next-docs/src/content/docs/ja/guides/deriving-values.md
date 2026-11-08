@@ -1,6 +1,6 @@
 ---
 title: 値を派生させる
-description: pipe と InitKind、derive と combine、merge と zip、等値打ち切り、追いかけずに値を読む方法。
+description: pipe と InitKind、derive と combine、merge と zip、値が変わらなければ止まること、追いかけずに値を読む方法。
 ---
 
 ## `pipe`
@@ -17,7 +17,7 @@ description: pipe と InitKind、derive と combine、merge と zip、等値打�
 
 ## `derive` と `combine`
 
-`derive(parents, fn)` は複数の Observable から 1 つの値を計算します。親のいくつが変わっても 1 回の更新で 1 回だけ計算し、持っている値と等しくなければ伝えます。`combine(parents)` は最新の値をタプルで返し、届いた更新のたびに伝えます。毎回新しいタプルなので、打ち切られることはありません。
+`derive(parents, fn)` は複数の Observable から 1 つの値を計算します。親のいくつが変わっても 1 回の更新で 1 回だけ計算し、持っている値と等しくなければ伝えます。`combine(parents)` は最新の値をタプルで返し、届いた更新のたびに伝えます。毎回新しいタプルなので、そこで更新が止まることはありません。
 
 ```tsx
 import { batch, combine, createState, derive } from 'synstate-next';
@@ -59,7 +59,7 @@ assert.deepStrictEqual(mut_totals, [200]);
 assert.deepStrictEqual(mut_pairs, ['100 × 2', '50 × 4']);
 ```
 
-複数の値から計算する値には `derive` を選んでください。計算は 1 回で、打ち切りも効きます。`combine` は、`debounce` の入力のようにタプルそのものが必要なときに使います。どちらも、親がすべて値を持った時点で値を持ちます。
+複数の値から計算する値には `derive` を選んでください。計算は 1 回で、値が変わらなければ更新もそこで止まります。`combine` は、`debounce` の入力のようにタプルそのものが必要なときに使います。どちらも、親がすべて値を持った時点で値を持ちます。
 
 ## `merge` と `zip`
 
@@ -103,7 +103,7 @@ assert.deepStrictEqual(mut_inputs, ['click', 'drag', 'a', 'b']);
 assert.deepStrictEqual(mut_pairs, ['click + a', 'drag + b']);
 ```
 
-## 等値打ち切り
+## 値が変わらなければそこで止まる
 
 値を計算するノード（`map`・`derive`・状態への書き込み）は、その値を持っている値と比べ（`equals` を渡さなければ `Object.is`）、等しければ何も伝えません。その下は辿られません。`switchMap` が（`Object.is` で）比べるのは切り替えたときだけです。新しい内側の Observable が持つ値は、持っている値と等しければ止まり、内側の Observable がその後に流す値はそのまま通ります。値を流すだけのオペレーター（`filter`・`take` など）は届いたものを流し、イベントを流すもの（`combine`・`merge`・`zip`・`scan`・`pairwise`・時間系のオペレーター）は比較しません。
 
@@ -154,7 +154,7 @@ assert.strictEqual(position.value, 2);
 
 ## 追いかけずに読む: `withCurrentValueFrom`
 
-親は子を起こします。ただ読むだけにしたい値もあります。フォームの送信時のテキストであって、キー入力のたびのテキストではない、というような場合です。`withCurrentValueFrom(other)` は、ソースの各値を、同じ更新で落ち着いた `other` の値と組にします。`other` だけが変わっても何も流しません。
+親は子を計算し直させます。ただ読むだけにしたい値もあります。フォームの送信時のテキストであって、キー入力のたびのテキストではない、というような場合です。`withCurrentValueFrom(other)` は、ソースの各値を、同じ更新で新しくなった `other` の値と組にします。`other` だけが変わっても何も流しません。
 
 ```tsx
 import {

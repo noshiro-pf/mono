@@ -696,7 +696,7 @@ describe('a write from inside the branch or row being mounted (#3141)', () => {
         ),
         document.createElement('div'),
       ),
-    ).toThrow('more than 100 rounds in one flush');
+    ).toThrow('more than 100 updates in a row');
   });
 
   test('a For row write that never settles is an error, not a hang', () => {
@@ -720,7 +720,7 @@ describe('a write from inside the branch or row being mounted (#3141)', () => {
         ),
         document.createElement('div'),
       ),
-    ).toThrow('more than 100 rounds in one flush');
+    ).toThrow('more than 100 updates in a row');
   });
 
   test.each([

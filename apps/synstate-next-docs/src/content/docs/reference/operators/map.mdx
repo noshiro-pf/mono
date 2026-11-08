@@ -1,13 +1,13 @@
 ---
 title: map
-description: 'Maps each value with `fn`, and emits the result unless it equals the one held (`Object.is` unless `equals` says otherwise), so a result that did not change wakes nothing below.'
+description: 'Maps each value with `fn`, and emits the result unless it equals the one held (`Object.is` unless `equals` says otherwise), so a result that did not change makes nothing below recompute.'
 ---
 
 import MarbleDiagram from '../../../../components/MarbleDiagram.astro';
 
 {/* reference:jsdoc */}
 
-Maps each value with `fn`, and emits the result unless it equals the one held (`Object.is` unless `equals` says otherwise), so a result that did not change wakes nothing below. For an event mapped to a value that repeats, pass `equals: () => false`.
+Maps each value with `fn`, and emits the result unless it equals the one held (`Object.is` unless `equals` says otherwise), so a result that did not change makes nothing below recompute. For an event mapped to a value that repeats, pass `equals: () => false`.
 
 {/* /reference */}
 

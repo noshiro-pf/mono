@@ -22,7 +22,7 @@ if (import.meta.vitest !== undefined) {
 
         const b = second.peek();
 
-        // `emitted` tells which parent woke this update.
+        // `emitted` tells which parent emitted in this update.
         if (a !== undefined && ctx.emitted(first)) {
           ctx.set({ from: 'left', value: a });
         } else if (b !== undefined && ctx.emitted(second)) {

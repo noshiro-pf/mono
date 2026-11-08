@@ -73,7 +73,7 @@ owner.dispose();
 
 ### `settled` is asked, not announced
 
-An operator that follows inner observables (`mergeMap`, a `switchMap` that may hold one finished request) still needs to know when one can emit no more. Each node answers `settled` when asked: a source once it is disposed or its timer, promise or subscription is over; a derived node once every parent is settled and it waits on nothing of its own (a `debounce` timer, an inner observable). `mergeMap` asks when an inner observable is projected or emits, and lets it go once it is settled and the effects of its round have read what it emitted. An operator written with `createDerived` gives its own `settled` when it emits later than the update that woke it ([Custom operators and sources](/mono/synstate-next/guides/custom-operators-and-sources/#an-async-operator)).
+An operator that follows inner observables (`mergeMap`, a `switchMap` that may hold one finished request) still needs to know when one can emit no more. Each node answers `settled` when asked: a source once it is disposed or its timer, promise or subscription is over; a derived node once every parent is settled and it waits on nothing of its own (a `debounce` timer, an inner observable). `mergeMap` asks when an inner observable is projected or emits, and lets it go once it is settled and the effects of its update have read what it emitted. An operator written with `createDerived` gives its own `settled` when it emits later than the update that made it recompute ([Custom operators and sources](/mono/synstate-next/guides/custom-operators-and-sources/#an-async-operator)).
 
 Asking where the answer is used costs nothing elsewhere: no operator forwards a signal it does not care about, and none can forget to.
 

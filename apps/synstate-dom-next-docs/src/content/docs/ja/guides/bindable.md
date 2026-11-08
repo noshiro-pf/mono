@@ -1,6 +1,6 @@
 ---
 title: Bindable
-description: constant、pipe(map)、そしてデータを受け取るスロットが受け付けるもの。
+description: constant、pipe(map)、そしてデータを受け取る props と属性が受け付けるもの。
 ---
 
 JSX の中でデータを受け取る場所（属性、DOM プロパティ、テキストの子、ライブラリが提供するコンポーネントの props）は、どれも `Bindable<T>` を受け付けます。
@@ -8,7 +8,7 @@ JSX の中でデータを受け取る場所（属性、DOM プロパティ、テ
 | `Bindable<T>` は次のどちらか | 束縛したときに起きること                                      |
 | :--------------------------- | :------------------------------------------------------------ |
 | `InitializedObservable<T>`   | その値で 1 回書き込み、値を変える更新があるたびに書き込み直す |
-| `Constant<T>`                | 1 回書き込むだけ。ノードも effect も作らない                  |
+| `Constant<T>`                | 1 回書き込むだけ。ノードも束縛も作らない                      |
 
 まだ値を持たないことがある `Observable<T>`（イベントのソースや `filter`）は `Bindable` ではありません。束縛したときに書き込むものがないからです。先に `withInitialValue(x)` で値を持たせてください。
 
@@ -48,7 +48,7 @@ export const Stale = (): JSX.Element => <p>{count$.value}</p>;
 
 ## Observable を変換する: `pipe(map)`
 
-Observable を変換して表示するには `source$.pipe(map(fn))` と書きます。束縛のための別の書き方はありません。スロットは `map` のノードを他の Observable と同じように受け取ります。コンポーネントや `For` の行の中で作ったノードはその owner に属し、owner と一緒に破棄されます。
+Observable を変換して表示するには `source$.pipe(map(fn))` と書きます。束縛のための別の書き方はありません。props や属性は `map` のノードを他の Observable と同じように受け取ります。コンポーネントや `For` の行の中で作ったノードはその owner に属し、owner と一緒に破棄されます。
 
 ```tsx
 import { constant, For, type JSX } from 'synstate-dom-next';

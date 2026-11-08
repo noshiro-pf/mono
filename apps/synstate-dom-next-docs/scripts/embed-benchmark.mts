@@ -260,8 +260,8 @@ const claims: readonly Claim[] = [
       ),
   },
   {
-    en: "is where the drain's cost per node shows",
-    ja: 'ドレインのノードあたりのコストが表に出ます',
+    en: "is where the scheduler's cost per node shows",
+    ja: 'スケジューラーのノードあたりのコストが表に出ます',
     table: 'scenarios',
     operations: [
       'loan: change the interest rate',

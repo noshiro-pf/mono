@@ -31,9 +31,9 @@ import {
  * subscription, a listener): a node made there is visited in the same update as
  * this one, not before it, so `update` would read its value from before.
  *
- * An operator that emits later than the update that woke it (from a timer)
- * gives `settled`, so that it is not taken for done while a value is still due;
- * a `mergeMap` lets go of an inner observable that is settled.
+ * An operator that emits later than the update that made it recompute (from a
+ * timer) gives `settled`, so that it is not taken for done while a value is
+ * still due; a `mergeMap` lets go of an inner observable that is settled.
  *
  * ```ts
  * const double = (source: Observable<number>): Observable<number> =>
@@ -81,7 +81,8 @@ export function createDerived<A>(
 export type DerivedContext<A> = Readonly<{
   /**
    * Whether `parent` emitted in the update under way, after this observable was
-   * created. Several parents wake it; this tells which of them did.
+   * created. Any of its parents makes it recompute; this tells which of them
+   * did.
    */
   emitted: (parent: Observable<unknown>) => boolean;
   /**

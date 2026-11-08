@@ -186,8 +186,41 @@ describe('propagation', () => {
 
     assert.throws(() => {
       a.set(100);
-    }, /more than 100 rounds/u);
+    }, /more than 100 updates in a row/u);
 
+    const c = state(0);
+
+    const mut_seen: number[] = [];
+
+    c.subscribe((x) => {
+      mut_seen.push(x);
+    });
+
+    c.set(1);
+
+    assert.deepStrictEqual(mut_seen, [0, 1]);
+  });
+
+  test('a map that keeps writing to its own source is stopped the same way', () => {
+    const a = state(0);
+
+    const written = a.pipe(
+      map((x) => {
+        if (x >= 100) {
+          a.set(x + 1);
+        }
+
+        return x;
+      }),
+    );
+
+    written.subscribe(() => {});
+
+    assert.throws(() => {
+      a.set(100);
+    }, /more than 100 updates in a row/u);
+
+    // No deferred write is left over: the next update works.
     const c = state(0);
 
     const mut_seen: number[] = [];

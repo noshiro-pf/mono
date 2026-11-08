@@ -9,18 +9,18 @@ synstate-dom-next has no lifetime of its own: it uses synstate-next's owners, wh
 
 An owner is created only where something can be disposed on its own:
 
-| created by                                                       | parent                              | disposed when                                    |
-| :--------------------------------------------------------------- | :---------------------------------- | :----------------------------------------------- |
-| `render`                                                         | none                                | the function `render` returned is called         |
-| each branch of `If` / `MatchOptional` / `MatchResult` / `Switch` | the owner the switch was mounted in | the branch changes, or the parent is disposed    |
-| each row of `For`                                                | the owner `For` was mounted in      | the row's key is gone, or the parent is disposed |
-| each call of `mountChild`                                        | the owner current at the call       | the parent is disposed, or the child throws      |
+| created by                                                       | parent                                        | disposed when                                    |
+| :--------------------------------------------------------------- | :-------------------------------------------- | :----------------------------------------------- |
+| `render`                                                         | none                                          | the function `render` returned is called         |
+| each branch of `If` / `MatchOptional` / `MatchResult` / `Switch` | the owner the branch component was mounted in | the branch changes, or the parent is disposed    |
+| each row of `For`                                                | the owner `For` was mounted in                | the row's key is gone, or the parent is disposed |
+| each call of `mountChild`                                        | the owner current at the call                 | the parent is disposed, or the child throws      |
 
 A component does not get an owner of its own: it is called once and lives exactly as long as the branch, row or root it is mounted in.
 
 State you define at module level, outside every owner, belongs to none and lives as long as the page. That is where your application's stores go.
 
-A branch's owner is made a little differently from a plain `createOwner()`: every node created in it sits deeper in the graph than the node that decides the branch. That is what lets a switch decide, in the update, before any node of the branch is visited ([How it works](/mono/synstate-dom-next/background/how-it-works/#a-switch-decides-before-its-branch-computes)).
+A branch's owner is made a little differently from a plain `createOwner()`: every node created in it sits deeper in the graph than the node that decides the branch. That is what lets a branch component decide, in the update, before any node of the branch is visited ([How it works](/mono/synstate-dom-next/background/how-it-works/#a-branch-component-decides-before-its-branch-computes)).
 
 ## Two habits
 
@@ -130,7 +130,7 @@ The same holds after an `await` inside a component: the component runs in its ow
 
 A component is called once, so what another library would run in an effect is started in the component's body and stopped when its owner is disposed.
 
-- `source.subscribe(next)` calls `next` at once with the current value, and then once after each update that changed it, when the update has settled. Made while the component mounts, it belongs to the component's owner, which unsubscribes it when disposed. To keep a subscription past the owner, make it inside `untracked`. A write made by `next` starts the next update, after the current one; it never interrupts it.
+- `source.subscribe(next)` calls `next` at once with the current value, and then once after each update that changed it, once every value of the update is up to date. Made while the component mounts, it belongs to the component's owner, which unsubscribes it when disposed. To keep a subscription past the owner, make it inside `untracked`. A write made by `next` starts the next update, after the current one; it never interrupts it.
 - `onCleanup(fn)` runs `fn` when the current owner is disposed.
 - `listenInScope(target, type, listener, options)` adds an event listener to something other than an element the component draws, such as `window` or `document`, and removes it when the owner is disposed. For an element the component draws, use its `onClick`-style props.
 - `createAfterUpdate()` returns a function that runs work in a microtask, after the update under way and the DOM changes it makes, unless the owner has been disposed by then. A component's nodes are attached to the document only once the whole description they are in is mounted, so this is how work that needs them in the document (focusing an input, measuring an element) runs after the first mount.

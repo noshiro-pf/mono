@@ -9,8 +9,8 @@ import {
 
 /**
  * Drops a value equal to the one held (`Object.is` unless `equals` says
- * otherwise). A derived value is cut off already; this is for an event source,
- * or for a comparison of its own.
+ * otherwise). A derived value already stops an update when it does not change;
+ * this is for an event source, or for a comparison of its own.
  */
 export const skipIfNoChange =
   <A,>(equals?: (a: A, b: A) => boolean): Operator<A, A, 'keep'> =>

@@ -117,7 +117,7 @@ if (import.meta.vitest !== undefined) {
       );
 
       // `renderTable` and `renderError` stand for the view.
-      // Runs once each update has settled, with every value above consistent.
+      // Runs once every value above is up to date, consistent with each other.
       tableSliced.subscribe(renderTable);
 
       fetchError.subscribe((error) => {

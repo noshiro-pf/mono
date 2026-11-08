@@ -7,9 +7,9 @@ synstate-next replaces synstate in its next major version. This page lists what 
 
 ## Propagation and writes
 
-- **Subscribers run after the update has settled**, not during it. A subscriber reads every other value of the graph up to date, unless a subscriber before it in the same round has written (next bullet).
-- **A write made during the drain is deferred** until the round's effects have run, and then starts the next round. A write made by a subscriber is applied at once and propagates in the next round: a subscriber that runs after it in the same round reads the state's new value, and what derives from it still old. Updates never nest.
-- **The setters return nothing**: `setState`, `updateState`, `resetState` of `createState`, `dispatch` of `createReducer`, and those of `createBooleanState`. A write made in the drain is applied only once the round's effects have run, so what it would return is not known yet; read the state with `getSnapshot`.
+- **Subscribers run once every value is up to date**, not during the update. A subscriber reads every other value of the graph up to date, unless a subscriber before it in the same update has written (next bullet).
+- **A write made inside an operator such as `map` or `derive`, while an update is recomputing values, is deferred** until the update's subscribers and bindings have run, and then starts the next update. A write made by a subscriber or a binding is applied at once and propagates in the next update: a subscriber that runs after it in the same update reads the state's new value, and what derives from it still old. Updates never nest.
+- **The setters return nothing**: `setState`, `updateState`, `resetState` of `createState`, `dispatch` of `createReducer`, and those of `createBooleanState`. A write made inside an operator such as `map` or `derive`, while an update is recomputing values, is applied only once the update's subscribers and bindings have run, so what it would return is not known yet; read the state with `getSnapshot`.
 - **Circular dependencies are not detected**: a node's parents exist before it, so no cycle can be built through the API.
 
 ## Lifetime
@@ -39,7 +39,7 @@ synstate-next replaces synstate in its next major version. This page lists what 
 ## Writing operators
 
 - **One factory each**: an operator is a `createDerived` (synstate's `createSyncChildObservable`, `createAsyncChildObservable` and `createInitializedSyncChildObservable`), and a source a `createSource` (`createRootObservable`).
-- **No update token**: `ctx.emitted(parent)` says which parent woke the update, `ctx.set` passes a value on in it, and `ctx.emit` in an update of its own.
+- **No update token**: `ctx.emitted(parent)` says which parent emitted in the update, `ctx.set` passes a value on in it, and `ctx.emit` in an update of its own.
 - **`settled` replaces `canEmitNoMore`**, and `flush` is gone with completion.
 - **The setup runs with the observable as its owner**: what it creates belongs to the observable, and its cleanups run newest first, before what it created is disposed. synstate ran them in the order registered.
 - **The guards `isChildObservable`, `isManagerObservable` and `isRootObservable` are gone**: the kinds they told apart are not in the public types.
