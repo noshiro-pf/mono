@@ -174,7 +174,7 @@ describe(renderStartable, () => {
     );
   });
 
-  test('warns first when another session is on the theme named', () => {
+  test('says first that the issues another session started in the theme named are left to it', () => {
     assert.strictEqual(
       renderStartable({
         survey: NOTHING_PASSED_OVER,
@@ -191,8 +191,28 @@ describe(renderStartable, () => {
         notes: [],
       }),
       [
-        'Another session is on theme synstate (synstate-dom: #90): ask the person before taking any of it.',
+        'Another session is on theme synstate (synstate-dom: #90): those are left to it; the rest of the theme follows, to take without asking.',
         '#10  {synstate-dom}  feat: thing 10  https://github.com/o/r/issues/10',
+      ].join('\n'),
+    );
+  });
+
+  test('promises no rest when another session holds all of the theme named', () => {
+    assert.strictEqual(
+      renderStartable({
+        survey: NOTHING_PASSED_OVER,
+        candidates: [candidate(10, ['ci'])],
+        order: { taken: [], heldBack: [] },
+        issues: ISSUES,
+        authors: ['owner'],
+        limit: undefined,
+        theme: 'synstate',
+        held: new Map<string, readonly number[]>([['synstate-dom', [90]]]),
+        notes: [],
+      }),
+      [
+        'Another session is on theme synstate (synstate-dom: #90): those are left to it.',
+        'No startable issue in theme synstate. The themes with startable issues: ci (1).',
       ].join('\n'),
     );
   });

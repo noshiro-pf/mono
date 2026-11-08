@@ -42,7 +42,9 @@ export const STARTABLE_ISSUES_HELP = [
   'and the rest of its theme whatever their tier (D only after a D), then the',
   'next. An issue below priority:S mainly about a theme another session is on',
   'is left out, and named at the end. With --theme: that theme alone (synstate',
-  'takes synstate-dom too), its own priority:S first.',
+  'takes synstate-dom too), its own priority:S first; the issues another',
+  'session started in it are named on the first line, not listed, and left to',
+  'it, and the rest are listed to take without asking.',
   '',
   'Options:',
   '  --limit <n>       list the first n (default: all of them)',
@@ -170,7 +172,10 @@ export const startableIssues = async (
 /**
  * One line per issue to take, in order, up to `limit`, then a line for each
  * kind of startable issue it passed over. With a `theme` named, a first line
- * when another session is on it, and the themes there are when it has no issue.
+ * naming the issues another session started in it, which are left to that
+ * session while the rest are taken without asking (a started issue is not
+ * startable, and `start-issue` refuses one claimed meanwhile), and the themes
+ * there are when it has no issue.
  */
 export const renderStartable = ({
   survey,
@@ -207,7 +212,11 @@ export const renderStartable = ({
   return [
     ...(Arr.isNonEmpty(heldNamed)
       ? [
-          `Another session is on theme ${theme} (${describeHeld(heldNamed)}): ask the person before taking any of it.`,
+          `Another session is on theme ${theme} (${describeHeld(heldNamed)}): those are left to it${
+            Arr.isNonEmpty(order.taken)
+              ? '; the rest of the theme follows, to take without asking'
+              : ''
+          }.`,
         ]
       : []),
     ...shown.map(({ number, url, themes }) => {

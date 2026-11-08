@@ -70,9 +70,10 @@ each while it writes the next, and stacks them where they cannot conflict:
   own `priority:S` first; another theme's are left, so that runs split by theme
   stay apart. Fewer than N is fine: do those and end, rather than go beyond it.
 - **A theme another session is on** — one of its issues started by another
-  claimant — is left to it: with no theme named, its issues below `priority:S`
-  are named at the end and not listed; with that theme named, the first line
-  says so, and that is a question for the person before anything is labelled.
+  claimant: with no theme named, the theme is left to that session, its issues
+  below `priority:S` named at the end and not listed. With that theme named,
+  only the issues the other session started are left to it, named on the first
+  line and not listed; take the rest as listed, without asking.
 
 When it prints `No issue to start.`, or that the theme named has no startable
 issue, report that and what it passed over, and end.
