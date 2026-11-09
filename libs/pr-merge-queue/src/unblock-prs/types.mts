@@ -212,6 +212,7 @@ export type Classification = Readonly<
   | { kind: 'failing'; summary: ChecksSummary }
   | { kind: 'rerun'; link: string; summary: ChecksSummary }
   | { kind: 'held'; reason: string }
+  | { kind: 'awaiting-bypass'; reason: string }
   | { kind: 'ignore' }
   | { kind: 'in-flight' }
   | { kind: 'note'; note: string }
@@ -260,6 +261,20 @@ export type Triage = Readonly<{
    * pull request set aside.
    */
   rerun: readonly (Failing & Readonly<{ link: string }>)[];
+  /**
+   * Up to date, failing only the check that enforces `CODEOWNERS`, with every
+   * other required check green, on a pull request only a bypass merges (an
+   * owner's that someone else pushed to, whose only owner is its author): set
+   * aside `awaiting-bypass` with `reason`, as the watch sets aside such a pull
+   * request under the ruleset's own code-owner review once it is green.
+   */
+  awaitingBypass: readonly Readonly<{ pr: PullRequest; reason: string }>[];
+  /**
+   * The required check that enforces `CODEOWNERS` (`codeOwnerGate` in
+   * `pr-report-core`), if one does and the reviews were read: what the watch
+   * passes over on one only a bypass merges.
+   */
+  codeOwnersCheck: string | undefined;
   /**
    * Queued pull requests that would have been picked or watched but for their
    * review — an owner's approval or a conversation still open — each as a note

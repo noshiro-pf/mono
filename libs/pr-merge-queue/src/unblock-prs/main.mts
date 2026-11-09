@@ -558,6 +558,8 @@ const watchAndFix = async (
       requiredContexts: readonly string[];
       /** Set for one only a ruleset bypass merges; see `watch`. */
       bypassReason: string | undefined;
+      /** The required check that enforces `CODEOWNERS`, if one does. */
+      codeOwnersCheck: string | undefined;
       /** `undefined` under `--no-auto-fix`, or when the repository has none. */
       autoFixConfig: AutoFixConfig | undefined;
     }>,
@@ -1036,6 +1038,23 @@ const runCycle = async (
     observed.skipped,
   );
 
+  // Under a required check that enforces `CODEOWNERS`, one only a bypass merges
+  // stays red there however often it is re-run: left for that merge, as the
+  // watch leaves one under the ruleset's own review once it is green.
+  for (const { pr, reason } of triaged.awaitingBypass) {
+    log(
+      `#${pr.number}: every other required check is green, and only a ruleset bypass merges it (${reason}); ${options.dryRun ? 'would set' : 'setting'} it aside for that merge.`,
+    );
+
+    mut_skipped = withSkip(mut_skipped, {
+      number: pr.number,
+      headSha: pr.headRefOid,
+      baseSha,
+      reason: 'awaiting-bypass',
+      detail: `every required check is green but the one that enforces CODEOWNERS; ${reason}`,
+    });
+  }
+
   // Failing only the check that enforces `CODEOWNERS`, and approved since: the
   // check runs again and reads the approval. A run re-run as often as
   // `rerunFailedJobs` allows and still red is failing like any other, as is one
@@ -1167,6 +1186,7 @@ const runCycle = async (
         defaultBranch,
         requiredContexts,
         bypassReason,
+        codeOwnersCheck: triaged.codeOwnersCheck,
         autoFixConfig,
         reviewRequirements,
       },
@@ -1466,6 +1486,7 @@ const runCycle = async (
         defaultBranch,
         requiredContexts,
         bypassReason,
+        codeOwnersCheck: triaged.codeOwnersCheck,
         autoFixConfig,
         reviewRequirements,
       },

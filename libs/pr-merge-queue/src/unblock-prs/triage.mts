@@ -352,6 +352,14 @@ export const triage = async (
         }
       }
     }),
+    codeOwnersCheck,
+    awaitingBypass: Arr.generate(function* () {
+      for (const { pr, result } of classified) {
+        if (result.kind === 'awaiting-bypass') {
+          yield { pr, reason: result.reason };
+        }
+      }
+    }),
     notes: Arr.generate(function* () {
       for (const { result } of classified) {
         if (result.kind === 'note') {
@@ -671,11 +679,16 @@ export const codeOwnersClassification = (
 
   // Under the check, a bypass is an owner's pull request someone else pushed
   // to, whose only owner may not approve it. Re-running changes nothing, and
-  // holding it would hold it for ever, with nobody told: it is left to the rest
-  // of triage, which sets it aside `checks-failed` with a comment linking the
-  // check that names who wrote it.
+  // holding it for ever would tell nobody: once its other checks are green it
+  // is set aside `awaiting-bypass`, as the watch sets one aside under the
+  // ruleset's own review, so that both gates ask a person for the same merge.
   if (review?.hold?.kind === 'bypass') {
-    return undefined;
+    return Arr.isNonEmpty(summary.pending) || Arr.isNonEmpty(summary.running)
+      ? {
+          kind: 'held',
+          reason: `only a ruleset bypass merges it (${review.hold.reason}); waiting for its other checks before leaving it for one`,
+        }
+      : { kind: 'awaiting-bypass', reason: review.hold.reason };
   }
 
   if (review?.codeOwners === 'unknown') {
