@@ -3,7 +3,7 @@
 
 # パッケージ間の依存関係
 
-このリポジトリの workspace パッケージは 104 個。
+このリポジトリの workspace パッケージは 105 個。
 グラフは各 `package.json` から生成している。
 
 ## 実行時依存（`dependencies` + `peerDependencies`）
@@ -73,6 +73,7 @@ graph LR
   octokit_safe_types["octokit-safe-types"]
   pr_merge_queue["pr-merge-queue"]
   pr_report_core["pr-report-core"]
+  pr_report_core_v2["pr-report-core-v2"]
   synstate["synstate"]
   synstate_dom["synstate-dom"]
   synstate_dom_next["synstate-dom-next"]
@@ -315,6 +316,7 @@ graph LR
   pr_merge_queue --> ts_type_forge
   pr_report_core --> ts_data_forge
   pr_report_core --> ts_fortress
+  pr_report_core_v2 --> ts_data_forge
   synstate --> ts_data_forge
   synstate --> ts_std_forge
   synstate --> ts_type_forge
@@ -394,7 +396,7 @@ graph LR
 |    1 | `synstate-dom-docs`, `synstate-dom-next-docs`, `synstate-next-docs`, `@sumi-lang/eslint-config`, `better-preact-use-state`, `better-react-use-state`, `ts-type-forge`, `strict-ts-lib-scripts-common`, `strict-ts-lib-v5.0-source`, `strict-ts-lib-v5.1-source`, `strict-ts-lib-v5.2-source`, `strict-ts-lib-v5.3-source`, `strict-ts-lib-v5.4-source`, `strict-ts-lib-v5.5-source`, `strict-ts-lib-v5.6-source`, `strict-ts-lib-v5.7-source`, `strict-ts-lib-v5.8-source`, `strict-ts-lib-v5.9-source`, `strict-ts-lib-v6.0-source`, `strict-ts-lib-v7.0-source` |
 |    2 | `eslint-rule-forge`, `ts-std-forge`, `strict-ts-lib-v5.0`, `strict-ts-lib-v5.1`, `strict-ts-lib-v5.2`, `strict-ts-lib-v5.3`, `strict-ts-lib-v5.4`, `strict-ts-lib-v5.5`, `strict-ts-lib-v5.6`, `strict-ts-lib-v5.7`, `strict-ts-lib-v5.8`, `strict-ts-lib-v5.9`, `strict-ts-lib-v6.0`, `strict-ts-lib-v7.0`                                                                                                                                                                                                                                                       |
 |    3 | `eslint-plugin-synstate`, `eslint-plugin-ts-std-forge`, `ts-data-forge`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
-|    4 | `github-view-defaults-extension`, `lambda-calculus-interpreter-core`, `mahjong-scoring-tool`, `numeric-input-utils`, `resize-observer-preact-hooks`, `resize-observer-react-hooks`, `split-view-link`, `ts-utils-additional`, `@sumi-lang/checker`, `@sumi-lang/oxlint-config`, `eslint-config-typed`, `eslint-plugin-ts-data-forge`, `eslint-plugin-ts-fortress`, `eslint-plugin-ts-type-forge`, `synstate`, `synstate-next`, `ts-codemod-lib`, `ts-fortress`, `ts-repo-utils`                                                                                   |
+|    4 | `github-view-defaults-extension`, `lambda-calculus-interpreter-core`, `mahjong-scoring-tool`, `numeric-input-utils`, `resize-observer-preact-hooks`, `resize-observer-react-hooks`, `split-view-link`, `ts-utils-additional`, `@sumi-lang/checker`, `@sumi-lang/oxlint-config`, `eslint-config-typed`, `eslint-plugin-ts-data-forge`, `eslint-plugin-ts-fortress`, `eslint-plugin-ts-type-forge`, `pr-report-core-v2`, `synstate`, `synstate-next`, `ts-codemod-lib`, `ts-fortress`, `ts-repo-utils`                                                              |
 |    5 | `poll-discord-app`, `preact-utils`, `react-utils`, `slack-archive-tools`, `ts-fortress-types`, `@sumi-lang/cli`, `@sumi-lang/conformance`, `octokit-safe-types`, `pr-report-core`, `synstate-dom`, `synstate-dom-next`, `synstate-preact-hooks`, `synstate-preact-signals`, `synstate-react-hooks`, `synstate-react-hooks-compat`, `synstate-router`, `ts-codemod-cli`                                                                                                                                                                                            |
 |    6 | `catan-dice`, `color-demo`, `event-schedule-app-shared`, `lambda-calculus-interpreter-preact`, `lambda-calculus-interpreter-react`, `lambda-calculus-interpreter-synstate-dom`, `mahjong-calculator-app`, `pr-manager`, `profile`, `react-blueprintjs-utils`, `react-utils-styled`, `split-view-extension`, `@synstate/docs`, `synstate-dom-benchmark`, `synstate-dom-sample-app`, `blueprint-synstate`, `github-settings-as-code`, `pr-merge-queue`, `synstate-router-dom`, `synstate-router-react`                                                              |
 |    7 | `algo-app`, `annotation-tool`, `cant-stop-probability`, `event-schedule-app`, `event-schedule-app-functions`, `housing-loan-calculator`, `life-plan-simulator`, `react-mui-utils`, `synstate-router-dom-sample-app`, `synstate-router-react-sample-app`, `task-manager`                                                                                                                                                                                                                                                                                           |
@@ -524,6 +526,8 @@ graph LR
 | `pr-merge-queue`                           | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-fortress`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`                                                                                                                                                                                                                                        |
 | `pr-report-core`                           | dep  | `ts-data-forge`&nbsp;`workspace:^`<br>`ts-fortress`&nbsp;`workspace:^`                                                                                                                                                                                                                                                                                                                                                                    |
 | `pr-report-core`                           | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-fortress`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`<br>`ts-repo-utils`&nbsp;`workspace:*`                                                                                                                                                                                                  |
+| `pr-report-core-v2`                        | dep  | `ts-data-forge`&nbsp;`workspace:^`                                                                                                                                                                                                                                                                                                                                                                                                        |
+| `pr-report-core-v2`                        | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-fortress`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`<br>`ts-repo-utils`&nbsp;`workspace:*`                                                                                                                                                                                                  |
 | `synstate`                                 | dep  | `ts-data-forge`&nbsp;`workspace:^`<br>`ts-std-forge`&nbsp;`workspace:^`<br>`ts-type-forge`&nbsp;`workspace:^`                                                                                                                                                                                                                                                                                                                             |
 | `synstate`                                 | dev  | `@sumi-lang/cli`&nbsp;`workspace:*`<br>`eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-fortress`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`<br>`synstate-react-hooks`&nbsp;`workspace:*`<br>`synstate-react-hooks-compat`&nbsp;`workspace:*`<br>`ts-repo-utils`&nbsp;`workspace:*`                                                          |
 | `synstate-dom`                             | dep  | `ts-type-forge`&nbsp;`workspace:^`                                                                                                                                                                                                                                                                                                                                                                                                        |
@@ -590,7 +594,7 @@ graph LR
 | `strict-ts-lib-v7.0-source`                | dev  | `strict-ts-lib-scripts-common`&nbsp;`workspace:*`<br>`ts-type-forge`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                                                                                   |
 | `strict-ts-lib-v7.0`                       | dep  | `ts-type-forge`&nbsp;`^9.0.0`                                                                                                                                                                                                                                                                                                                                                                                                             |
 
-92 / 104 のパッケージが少なくとも 1 つの内部依存を `workspace:` で解決している。
+93 / 105 のパッケージが少なくとも 1 つの内部依存を `workspace:` で解決している。
 
 ### root（`package.json`、非公開）
 
