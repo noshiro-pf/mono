@@ -9,6 +9,12 @@
   display: flex;
   align-items: center;
   min-height: 30px;
+
+  /* The icons keep their size on a narrow screen; the inputs narrow instead. */
+  > svg,
+  > .operator {
+    flex-shrink: 0;
+  }
 }
 
 .checkboxWrapper {
@@ -50,10 +56,9 @@
 
 .horizontalCheckboxesWrapper {
   display: flex;
-
-  > :not(:last-of-type) {
-    margin-right: 15px;
-  }
+  /* Wraps rather than widen the filter's box past a phone's width; the
+     checkboxes are spaced by their own right margin. */
+  flex-wrap: wrap;
 }
 
 .verticalCheckboxesWrapper {
@@ -78,7 +83,7 @@
 
 .collapseBox {
   padding: 10px;
-  width: 350px;
+  max-width: 350px;
   border: solid 1px rgba(16, 22, 26, 0.15);
   border-radius: 10px;
 }
@@ -115,7 +120,8 @@
 
 .rank {
   display: flex;
-  margin-right: 40px;
+  /* Wraps rather than widen the filter's box past a phone's width. */
+  flex-wrap: wrap;
   align-items: center;
 
   & > * {
@@ -141,6 +147,7 @@
   }
 }
 
-.dateRangeField input {
+/* On `.bp6-input-group`, whose `.bp6-input` takes its width. */
+.dateRangeField {
   width: 100px;
 }
