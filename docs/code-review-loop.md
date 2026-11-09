@@ -80,11 +80,44 @@ round dismissed, costs as much as the first.
   code, and with `skip-ci` on the local checks are the only ones the branch
   gets.
 - **Keep a ledger.** The description draft lists each finding as fixed,
-  dismissed with its reason, or deferred. A finding a later round raises again
-  that the ledger already dismisses is not a new finding: do not investigate
-  it again. A later round cannot tell whether a fix broke what a dismissal
-  relied on, so check that when writing the fix, and widen the next round if
-  it did.
+  dismissed with its reason, or deferred, a security finding dismissed or
+  deferred aside (the end of this file). A finding a later round raises again
+  that the ledger already dismisses is not a new finding: do not investigate it
+  again. If its reason belongs at the site and is not there yet (below), write
+  it there, checking only that the reason still describes the code; a reason
+  that no longer does makes the finding a new one.
+  A later round cannot tell whether a fix broke what a dismissal relied on, so
+  check that when writing the fix, widen the next round if it did, and correct
+  or remove a comment at the site that no longer holds.
+    - **A reason about the code goes at the site too.** No reviewer reads the
+      ledger, so a dismissal written there alone is raised again by any later
+      round that reads the code, which spends its reading on it and makes the
+      loop look as if it does not converge. When a finding is dismissed because
+      the code is meant to be as it is — a design chosen on purpose, a
+      trade-off, a known limit — write the reason as a plain comment, not JSDoc
+      or other documentation that ships with the code, at the code the finding
+      names, its declaration or the statement it is about, with that round's
+      fixes, and let the ledger entry name the site. The comment states the
+      reason as a property of the code, for someone who never saw the review;
+      "dismissed in review" or a pull request number is not a reason. A comment
+      at the site reaches the next round, the next session and whoever edits it,
+      as `CLAUDE.md` ("What belongs in this file") says of any rule.
+      If the comment is awkward to write because the reason does not hold up
+      once written down beside the code, fix the finding instead.
+    - **The ledger alone keeps a reason about scope, or one with no site to
+      carry it.** A finding dismissed as out of scope and not worth fixing at
+      all says nothing about the code: a comment would state it of this pull
+      request and leave it stale once it merges. Prose — Markdown, MDX, a
+      changeset — has no comment that is safe everywhere: a changeset's is
+      copied into the changelog, and MDX takes no HTML comment. A file whose
+      parser takes no comments, such as `package.json` or the JSON under
+      `repo-settings/`, has nowhere to put the reason. A generated file, such as
+      a `gen:index` barrel or `strict-lib/` output, loses it to the next
+      generation. A comment in a file the change does not touch, of any kind,
+      would pull that file into the diff.
+    - **A dismissed security finding is in neither.** It goes to `mono-security`
+      alone, as "Security findings" in `CLAUDE.md` and the end of this file say:
+      a comment or a ledger entry stating why a weakness stays would publish it.
 - **Fix it here unless it is out of scope.** A finding is fixed in this pull
   request, whatever round raised it and however many lines the fix takes, when
   it is about code or prose the change adds or alters, or about what the change
@@ -120,7 +153,11 @@ are each one of:
 - wording — phrasing, typos, how a comment is laid out — fixed, and not reviewed
   again. A claim that is wrong is not wording, wherever it is written:
   a false sentence in a README is a finding like any other;
-- dismissed, newly or because the ledger already dismisses it;
+- dismissed, newly or because the ledger already dismisses it, with its reason
+  where "Keep a ledger" puts it: at the site the finding names, in the ledger
+  alone, or in `mono-security`. A comment the round writes to record a dismissal
+  is a fix like any other, read by the next round, so a round that writes one
+  does not end the loop;
 - deferred as out of scope and worth fixing on its own, as "Fix it here unless
   it is out of scope" says.
 
@@ -131,7 +168,8 @@ the loop is a second change reviewed and checked from the start.
 **A loop that stops converging is put to the user.** A round that is not widened
 reads only the previous round's fixes, so each should find less than the one
 before. Rounds are numbered within their loop. Below, a fix is any fix but a
-wording one, counted once per finding it answers.
+wording one, a comment recording a dismissal included, counted once per finding
+it answers.
 When either of these holds, stop and ask in the thread whether to go on, split
 the change or rework it, unless an earlier answer of the user's already covers
 this round ("go on through round eight"); ask before making the round's fixes,
@@ -192,10 +230,11 @@ before this form changes the opening in both halves, or in the original alone
 with `pr-description push --wording-only`.
 
 The section then lists the findings under **Fixed**, **Dismissed** (each with
-its reason) and **Deferred** (each a bullet opening with its tag and naming its
-issue, `- (predates) … (#123)`; with nothing deferred, the label is left out or
-reads `**Deferred**: none.`). Keep that shape: it is what a reader, and anything
-that later mines the descriptions for recurring findings, can parse.
+its reason, naming the site that carries it when it is about the code) and
+**Deferred** (each a bullet opening with its tag and naming its issue,
+`- (predates) … (#123)`; with nothing deferred, the label is left out or reads
+`**Deferred**: none.`). Keep that shape: it is what a reader, and anything that
+later mines the descriptions for recurring findings, can parse.
 The Japanese half of the description (`CLAUDE.md`, "Japanese text")
 translates the section under `### レビュー`, never a second `## Review`: the
 digest reads the first `## Review` alone, and only the English one parses.

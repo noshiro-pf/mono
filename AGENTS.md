@@ -25,8 +25,9 @@ command or integration being unavailable does not waive the underlying work.
     Follow that procedure, including its diff scope, finding ledger, checks
     after fixes, and timing before opening a pull request or pushing an amend.
     Its rules for when the loop ends and when it is put to the user apply as
-    written: a dismissed, deferred or wording finding does not hold it open, and
-    ending it is never a reason to defer a finding in scope.
+    written: a dismissed, deferred or wording finding does not hold it open,
+    save that a comment written to record a dismissal is a fix the next round
+    reads, and ending it is never a reason to defer a finding in scope.
 
 - **Claude Code hooks and permissions:** `.claude/settings.json` does not
   configure Codex. Do not assume its post-edit formatter and lint hook ran;
