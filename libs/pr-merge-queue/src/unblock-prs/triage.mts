@@ -831,7 +831,7 @@ const readChecks = async (
   pr: PullRequest,
   context: TriageContext,
 ): Promise<Result<ChecksSummary, Classification>> => {
-  const checks = await readHeadChecks(api, pr.number);
+  const checks = await readHeadChecks(api, pr.number, pr.headRefOid);
 
   if (Result.isErr(checks)) {
     return Result.err({

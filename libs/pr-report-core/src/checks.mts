@@ -43,27 +43,40 @@ import type { ChecksSummary, ContextState } from './types.mjs';
  * workflow run, and with it the check suite, and starts a new attempt: the
  * aggregate of the attempt before stays the newest run of its name, red, until
  * the jobs it needs are done and it runs again (#3474). Read at `nowMs`.
+ *
+ * `rounds` is every workflow run on the commit by check suite, where the reader
+ * read them: a newer round a concurrency group holds behind the one it replaces
+ * has no check run until that one ends, so the runs alone do not show it, and
+ * the cancelled jobs of the round before read as failures (#3703).
  */
 export const statesFromCheckRuns = (
   runs: readonly CheckRunReport[],
   nowMs: number = Date.now(),
+  rounds: ReadonlyMap<number, WorkflowRound> = NO_ROUNDS,
 ): ReadonlyMap<string, ContextState> => {
   const mut_latestRound = new Map<
     number,
     Readonly<{ checkSuiteId: number; completed: boolean }>
   >();
 
-  for (const run of runs) {
-    if (run.round === undefined) {
-      continue;
-    }
+  const suites = [
+    ...Array.from(rounds),
+    ...Arr.generate(function* () {
+      for (const run of runs) {
+        if (run.round !== undefined) {
+          yield [run.checkSuiteId, run.round] as const;
+        }
+      }
+    }),
+  ] as const;
 
-    const latest = mut_latestRound.get(run.round.workflowId);
+  for (const [checkSuiteId, round] of suites) {
+    const latest = mut_latestRound.get(round.workflowId);
 
-    if (latest === undefined || run.checkSuiteId > latest.checkSuiteId) {
-      mut_latestRound.set(run.round.workflowId, {
-        checkSuiteId: run.checkSuiteId,
-        completed: run.round.completed,
+    if (latest === undefined || checkSuiteId > latest.checkSuiteId) {
+      mut_latestRound.set(round.workflowId, {
+        checkSuiteId,
+        completed: round.completed,
       });
     }
   }
@@ -232,12 +245,17 @@ const PASSING_CONCLUSIONS: ReadonlySet<string> = new Set<string>([
  * "every required context has reported" is true of a commit halfway through a
  * round — with the reports coming from the round before. And the round, not
  * only its runs: between the last job finishing and the aggregate being
- * created, every run there is has completed.
+ * created, every run there is has completed. `rounds` is every workflow run on
+ * the commit, where the reader read them: one held by a concurrency group has
+ * no check run yet ({@link statesFromCheckRuns}).
  */
-export const anyRunInProgress = (runs: readonly CheckRunReport[]): boolean =>
+export const anyRunInProgress = (
+  runs: readonly CheckRunReport[],
+  rounds: ReadonlyMap<number, WorkflowRound> = NO_ROUNDS,
+): boolean =>
   runs.some(
     (run) => run.status !== 'completed' || run.round?.completed === false,
-  );
+  ) || rounds.values().some(({ completed }) => !completed);
 
 /**
  * What every context has reported on one commit, from both places GitHub keeps
@@ -251,12 +269,13 @@ export const reportedContexts = (
   runs: readonly CheckRunReport[],
   statuses: readonly Readonly<{ context: string; state: string }>[],
   nowMs: number = Date.now(),
+  rounds: ReadonlyMap<number, WorkflowRound> = NO_ROUNDS,
 ): ReadonlyMap<string, ContextState> => {
   // A commit status and a check run of the same name are two requirements, not
   // one reported twice: GitHub asks both to pass. So the stricter of the two is
   // kept rather than whichever was read second.
   const mut_states = new Map<string, ContextState>(
-    statesFromCheckRuns(runs, nowMs),
+    statesFromCheckRuns(runs, nowMs, rounds),
   );
 
   for (const { context, state } of statuses) {
@@ -400,3 +419,8 @@ export const outranks = (run: CheckRunRank, previous: CheckRunRank): boolean =>
 
 /** What {@link outranks} orders two check runs by, as {@link CheckRunReport} has them. */
 export type CheckRunRank = Readonly<{ checkSuiteId: number; id: number }>;
+
+const NO_ROUNDS: ReadonlyMap<number, WorkflowRound> = new Map<
+  number,
+  WorkflowRound
+>();

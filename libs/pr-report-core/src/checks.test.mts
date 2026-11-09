@@ -11,6 +11,7 @@ import {
   statesFromCheckRuns,
   summarizeChecks,
   winningRuns,
+  type WorkflowRound,
 } from './checks.mjs';
 import type { ContextState } from './types.mjs';
 
@@ -328,6 +329,39 @@ describe(winningRuns, () => {
 });
 
 describe(statesFromCheckRuns, () => {
+  // #3703: the run replacing a cancelled one is held by its concurrency group,
+  // with no job and so no check run, while the reds it cancelled stand.
+  test('a red is pending while a newer round of its workflow has no run yet', () => {
+    const red = {
+      ...run('Validate commit messages', 'cancelled', 10, 100),
+      round: { workflowId: 7, completed: true },
+    } as const;
+
+    const held = new Map<number, WorkflowRound>([
+      [10, { workflowId: 7, completed: true }],
+      [11, { workflowId: 7, completed: false }],
+    ]);
+
+    assert.strictEqual(
+      statesFromCheckRuns([red], NOW, held).get('Validate commit messages'),
+      'pending',
+    );
+
+    assert.isTrue(anyRunInProgress([red], held));
+
+    // Once it has finished without a run of that name, the red stands.
+    const finished = new Map<number, WorkflowRound>([
+      [11, { workflowId: 7, completed: true }],
+    ]);
+
+    assert.strictEqual(
+      statesFromCheckRuns([red], NOW, finished).get('Validate commit messages'),
+      'failed',
+    );
+
+    assert.isFalse(anyRunInProgress([red], finished));
+  });
+
   test('the run in the later suite is the one that counts', () => {
     // `code-check-result / result`: the cancelled suite was created first, so
     // the green that superseded it is what GitHub answers with.
@@ -964,3 +998,5 @@ describe(isOfEarlierAttempt, () => {
     );
   });
 });
+
+const NOW = Date.parse('2026-11-08T04:56:08Z');

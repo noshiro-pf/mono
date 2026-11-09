@@ -6,6 +6,7 @@ import { parseJson, type ApiContext } from '../lib/index.mjs';
 import {
   describeWaitingOn,
   headChecksOf,
+  heldRunsOf,
   readHeadChecks,
   reportedChecksOf,
   summarizeChecks,
@@ -986,6 +987,121 @@ describe('headChecksOf, then summarizeChecks', () => {
   });
 });
 
+describe(heldRunsOf, () => {
+  const workflow = 'Lint Pull Request';
+
+  const oldRun = 42_448_655_373;
+
+  const heldRun = 42_448_698_196;
+
+  // #3703: #3624's head at 04:56:08 on 2026-11-08. The push's run cancelled
+  // two jobs at once, and two more were slow to cancel; the run that replaced
+  // it was held by the concurrency group, with no jobs, until 04:59:27.
+  const contexts = [
+    checkRun(
+      'Validate commit messages',
+      'COMPLETED',
+      'CANCELLED',
+      '2026-11-08T04:54:23Z',
+      {
+        workflow,
+        completedAt: '2026-11-08T04:54:26Z',
+        runId: oldRun,
+      },
+    ),
+    checkRun(
+      'Validate code owners',
+      'COMPLETED',
+      'CANCELLED',
+      '2026-11-08T04:54:23Z',
+      {
+        workflow,
+        completedAt: '2026-11-08T04:54:29Z',
+        runId: oldRun,
+      },
+    ),
+    checkRun('Validate PR title', 'IN_PROGRESS', null, '2026-11-08T04:54:26Z', {
+      workflow,
+      runId: oldRun,
+    }),
+  ] as const;
+
+  const listed = [
+    {
+      id: heldRun,
+      name: workflow,
+      status: 'pending',
+      html_url: runUrl(heldRun),
+      created_at: '2026-11-08T04:55:05Z',
+    },
+    {
+      id: oldRun,
+      name: workflow,
+      status: 'in_progress',
+      html_url: runUrl(oldRun),
+      created_at: '2026-11-08T04:54:23Z',
+    },
+  ] as const;
+
+  /** When the set-aside comment was written. */
+  const at = Date.parse('2026-11-08T04:56:08Z');
+
+  test('lists the run the concurrency group holds, and not one already on the head', () => {
+    assert.deepStrictEqual(heldRunsOf(listed, contexts, at), [
+      {
+        name: `${workflow} (waiting to start)`,
+        startedAt: undefined,
+        workflow,
+        link: `${runUrl(heldRun)}/`,
+      },
+    ]);
+  });
+
+  test('lists nothing that has finished', () => {
+    assert.deepStrictEqual(
+      heldRunsOf([{ ...listed[0], status: 'completed' }], contexts, at),
+      [],
+    );
+  });
+
+  // As a re-run holds a red back: a run GitHub never starts does not hold one
+  // for good.
+  test('lists nothing created longer ago than the re-run grace', () => {
+    assert.deepStrictEqual(
+      heldRunsOf(listed, contexts, at + RE_RUN_GRACE_MS + 60_000),
+      [],
+    );
+  });
+
+  test('so the cancelled jobs of the run it replaces fail nothing', () => {
+    const checks = headChecksOf(contexts);
+
+    const summary = summarizeChecks(
+      checks.required,
+      ['Validate commit messages', 'Validate code owners', 'Validate PR title'],
+      [...checks.running, ...heldRunsOf(listed, contexts, at)],
+    );
+
+    assert.notStrictEqual(summary.verdict, 'failing');
+
+    assert.deepStrictEqual(summary.failedRuns, []);
+
+    // Without it, the timings above read as two failures.
+    assert.strictEqual(
+      summarizeChecks(
+        checks.required,
+        [
+          'Validate commit messages',
+          'Validate code owners',
+          'Validate PR title',
+        ],
+        checks.running,
+      ).verdict,
+      'failing',
+    );
+  });
+});
+
 describe(readHeadChecks, () => {
   const api: ApiContext = {
     repo: { owner: 'noshiro-pf', name: 'mono' },
@@ -1005,7 +1121,7 @@ describe(readHeadChecks, () => {
     ]);
 
     try {
-      const checks = Result.unwrapThrow(await readHeadChecks(api, 1));
+      const checks = Result.unwrapThrow(await readHeadChecks(api, 1, HEAD));
 
       assert.lengthOf(sent, 1);
 
@@ -1068,7 +1184,7 @@ describe(readHeadChecks, () => {
     );
 
     try {
-      assert.isTrue(Result.isErr(await readHeadChecks(api, 1)));
+      assert.isTrue(Result.isErr(await readHeadChecks(api, 1, HEAD)));
     } finally {
       vi.unstubAllGlobals();
     }
@@ -1118,12 +1234,14 @@ describe(readHeadChecks, () => {
               },
             },
           } as const)
-        : ({
-            check_suite_id: 1,
-            workflow_id: 7,
-            status: 'in_progress',
-            run_started_at: minutesAgo(10),
-          } as const);
+        : url.includes('/actions/workflows/')
+          ? ({ workflow_runs: [] } as const)
+          : ({
+              check_suite_id: 1,
+              workflow_id: 7,
+              status: 'in_progress',
+              run_started_at: minutesAgo(10),
+            } as const);
 
       return Promise.resolve(
         new Response(JSON.stringify(body), { status: 200 }),
@@ -1131,11 +1249,13 @@ describe(readHeadChecks, () => {
     });
 
     try {
-      const checks = Result.unwrapThrow(await readHeadChecks(api, 1));
+      const checks = Result.unwrapThrow(await readHeadChecks(api, 1, HEAD));
 
-      assert.lengthOf(mut_urls, 2);
+      assert.lengthOf(mut_urls, 3);
 
       assert.include(mut_urls[1], '/actions/runs/100');
+
+      assert.include(mut_urls[2], `/actions/workflows/7/runs?head_sha=${HEAD}`);
 
       assert.deepStrictEqual(
         checks.required.map(({ reRunAfter }) => reRunAfter),
@@ -1159,7 +1279,7 @@ describe(readHeadChecks, () => {
     ]);
 
     try {
-      const checks = Result.unwrapThrow(await readHeadChecks(api, 1));
+      const checks = Result.unwrapThrow(await readHeadChecks(api, 1, HEAD));
 
       assert.deepStrictEqual(sent, [
         undefined,
@@ -1204,7 +1324,7 @@ describe(readHeadChecks, () => {
     ]);
 
     try {
-      const checks = Result.unwrapThrow(await readHeadChecks(api, 1));
+      const checks = Result.unwrapThrow(await readHeadChecks(api, 1, HEAD));
 
       assert.lengthOf(sent, 6);
 
@@ -1237,7 +1357,7 @@ describe(readHeadChecks, () => {
     ]);
 
     try {
-      assert.isTrue(Result.isOk(await readHeadChecks(api, 1)));
+      assert.isTrue(Result.isOk(await readHeadChecks(api, 1, HEAD)));
 
       assert.lengthOf(sent, 6);
     } finally {
@@ -1254,7 +1374,7 @@ describe(readHeadChecks, () => {
     );
 
     try {
-      const read = await readHeadChecks(api, 1);
+      const read = await readHeadChecks(api, 1, HEAD);
 
       assert.isTrue(Result.isErr(read));
 
@@ -1413,3 +1533,8 @@ const minutesAgo = (minutes: number): string => {
 
   return at.toISOString();
 };
+
+const HEAD = 'c'.repeat(40);
+
+const runUrl = (id: number): string =>
+  `https://github.com/noshiro-pf/mono/actions/runs/${id}` as const;
