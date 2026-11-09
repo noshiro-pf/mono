@@ -96,8 +96,8 @@ export const classifyChanges = ({
       mut_areas.add('license');
     }
 
-    // What `check:published-deps` lints: the published packages' `src/` and the
-    // ESLint configs that name them.
+    // What `check:published-deps` lints: the published packages' `src/` and
+    // every tracked `eslint.config.mts`.
     if (PUBLISHED_DEPS_INPUT.test(file)) {
       mut_areas.add('published-source');
     }
@@ -754,12 +754,14 @@ const CONFIGS_SEGMENT = /(?:^|\/)configs\//u;
 const TYPESCRIPT_FILE = /\.(?:ts|mts|tsx)$/u;
 
 /**
- * What `check:published-deps` lints, by the globs its script in the root
- * `package.json` names: TypeScript under the `src/` of a `libs/` or `apps/`
- * member, and the ESLint configs.
+ * What `check:published-deps` lints: TypeScript under the `src/` of a `libs/`
+ * or `apps/` member, and every tracked `eslint.config.mts`. The script names
+ * the configs by directory, and `eslint.published-deps.test.mts` fails on a
+ * tracked one those globs miss, so this matches the name at any depth rather
+ * than repeating them (`experimental/` is ignored before this is read).
  */
 const PUBLISHED_DEPS_INPUT =
-  /^(?:(?:libs|apps)\/[^/]+\/(?:src\/.+\.(?:mts|ts|tsx)|eslint\.config\.mts)|eslint\.config\.mts)$/u;
+  /^(?:libs|apps)\/[^/]+\/src\/.+\.(?:mts|ts|tsx)$|(?:^|\/)eslint\.config\.mts$/u;
 
 const MANIFEST_FILES: ReadonlySet<string> = new Set<string>([
   'package.json',
