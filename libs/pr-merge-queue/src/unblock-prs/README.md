@@ -398,7 +398,9 @@ pick も「3a」の rebase もしません。
     がそのパスの所有者であるときだけで（`pr-report-core` の `pushersOf`、
     リポジトリの activity から読みます）、他の人が push した所有者の PR は、
     唯一の所有者が作者なら bypass でしかマージできず、再実行しても赤のままな
-    ので、`checks-failed` で見送って人に知らせます。所
+    ので、ほかの必須チェックがすべて緑になったところで、ruleset の場合と同じく
+    `awaiting-bypass` で見送り、bypass merge を人に頼みます。ほかのチェックが
+    まだ走っている間は held です。所
     有者自身の PR は何も待たず、bypass も要りません。待つのは所有者以外の PR だけで、所有者が承認するまで
     held です。そのチェックは承認を運ぶイベントでは走らない（ PR 自身の
     workflow で走ってしまう `pull_request_review` は使えない）ので、承認より
@@ -1468,8 +1470,10 @@ merge-base` says whether the branch was built on the current tip of the
     where everyone who pushed to the branch owns them too (`pushersOf` in
     `pr-report-core`, read from the repository's activity); an owner's pull
     request someone else pushed to, whose only owner is its author, merges by a
-    bypass alone and stays red however often it is re-run, so it is set aside
-    `checks-failed`, which tells a person. An owner's own pull request then waits for
+    bypass alone and stays red however often it is re-run, so once every other
+    required check is green it is set aside `awaiting-bypass`, asking a person
+    for the bypass merge as under the ruleset's review, and held while they
+    still run. An owner's own pull request then waits for
     nobody and needs no bypass; only
     someone else's waits, held until an owner approves. The check does not run
     on the event that carries an approval (`pull_request_review` would run the

@@ -1,6 +1,7 @@
 import { Result } from 'ts-data-forge';
 import { afterWatch } from './demotions.mjs';
-import { endOfGreenWatch } from './watch.mjs';
+import type { ChecksSummary } from './types.mjs';
+import { endOfGreenWatch, failingOutcome } from './watch.mjs';
 
 describe(endOfGreenWatch, () => {
   test('a hold a review clears is left to triage, with nothing recorded', () => {
@@ -71,3 +72,62 @@ describe(endOfGreenWatch, () => {
     assert.include(unread.detail, 'HTTP 502');
   });
 });
+
+describe(failingOutcome, () => {
+  const check = 'Validate code owners';
+
+  const reason = '@owner is the only owner';
+
+  // Under the check gate, that check stays red on one only a bypass merges, as
+  // the ruleset's own review never turns: both end in the same set-aside.
+  test('leaves one only a bypass merges for that merge once the rest is green', () => {
+    assert.deepStrictEqual(failingOutcome(failing([check]), reason, check), {
+      outcome: 'awaiting-bypass',
+      detail: `every required check is green but the one that enforces CODEOWNERS; ${reason}`,
+    });
+  });
+
+  test('waits while its other checks still run', () => {
+    assert.strictEqual(
+      failingOutcome(
+        failing([check], { pending: ['code-check-result / result'] }),
+        reason,
+        check,
+      ),
+      'wait',
+    );
+  });
+
+  test('is checks-failed for any other failure, or without a bypass or a check gate', () => {
+    for (const [summary, bypass, gate] of [
+      [failing([check, 'code-check-result / result']), reason, check],
+      [failing([check]), undefined, check],
+      [failing([check]), reason, undefined],
+    ] as const) {
+      const outcome = failingOutcome(summary, bypass, gate);
+
+      assert.strictEqual(
+        outcome === 'wait' ? 'wait' : outcome.outcome,
+        'checks-failed',
+      );
+    }
+  });
+});
+
+const failing = (
+  failed: readonly string[],
+  rest: Partial<ChecksSummary> = {},
+): ChecksSummary =>
+  ({
+    verdict: 'failing',
+    passed: [],
+    failed,
+    failedRuns: failed.map((name) => ({ name, link: `https://ci/${name}` })),
+    pending: [],
+    skipped: [],
+    missing: [],
+    notRun: [],
+    running: [],
+    required: 8,
+    ...rest,
+  }) as const;

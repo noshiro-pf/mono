@@ -29,8 +29,13 @@ import {
   describeNotStarted,
   describeTimeout,
 } from './set-aside-detail.mjs';
-import { readHoldAt, type HoldUnread, type ReviewContext } from './triage.mjs';
-import type { PullRequest, Watched } from './types.mjs';
+import {
+  codeOwnersClassification,
+  readHoldAt,
+  type HoldUnread,
+  type ReviewContext,
+} from './triage.mjs';
+import type { ChecksSummary, PullRequest, Watched } from './types.mjs';
 import { pause, stopRequested } from './util.mjs';
 
 /**
@@ -42,7 +47,10 @@ import { pause, stopRequested } from './util.mjs';
  * (`pr-report-core`'s `review-hold.mts`). It has no auto-merge to lose, and
  * nothing will merge it on green, so the watch ends at the verdict: failed as
  * for any other, or green and `awaiting-bypass`, with the reason for the
- * comment to say.
+ * comment to say. Under a required check that enforces `CODEOWNERS`
+ * (`codeOwnersCheck`), that check stays red on such a pull request, so the
+ * watch ends `awaiting-bypass` once every other one is green
+ * ({@link failingOutcome}).
  *
  * `reviewContext` is what the review of one that goes green and does not merge
  * is read with, to say what holds it.
@@ -54,7 +62,8 @@ export const watch = async (
   requiredContexts: readonly string[],
   options: Options,
   bypassReason: string | undefined,
-  reviewContext: ReviewContext,
+  reviewContext: ReviewContext &
+    Readonly<{ codeOwnersCheck: string | undefined }>,
 ): Promise<Watched> => {
   const deadline = Date.now() + options.watchTimeoutMin * 60_000;
 
@@ -142,12 +151,17 @@ export const watch = async (
       checks.value.running,
     );
 
-    if (summary.verdict === 'failing') {
-      const failed = describeFailedChecks(summary);
+    const failed =
+      summary.verdict === 'failing'
+        ? failingOutcome(summary, bypassReason, reviewContext.codeOwnersCheck)
+        : undefined;
 
-      log(`#${pr.number}: ${failed.detail}`);
+    if (failed !== undefined && failed !== 'wait') {
+      log(
+        `#${pr.number}: ${failed.outcome === 'checks-failed' ? (failed.detail ?? '') : 'every required check is green but the one that enforces CODEOWNERS; it waits for a bypass merge.'}`,
+      );
 
-      return { outcome: 'checks-failed', ...failed };
+      return failed;
     }
 
     const notStarted = observeNotStarted(mut_notStarted, summary, Date.now());
@@ -193,11 +207,13 @@ export const watch = async (
       return { outcome: 'checks-not-started', detail };
     }
 
-    if (summary.verdict === 'pending') {
+    // Only the check a bypass merge passes over failed: waited for as pending,
+    // under the same deadline.
+    if (failed === 'wait' || summary.verdict === 'pending') {
       mut_greenPolls = 0;
 
       log(
-        `#${pr.number}: ${current.mergeStateStatus}, waiting on ${describeWaitingOn(summary)}`,
+        `#${pr.number}: ${current.mergeStateStatus}, ${failed === 'wait' ? `only ${reviewContext.codeOwnersCheck ?? 'the code-owner check'} failed, which a bypass merge passes over; ` : ''}waiting on ${describeWaitingOn(summary)}`,
       );
     } else if (bypassReason !== undefined) {
       log(
@@ -243,6 +259,36 @@ export const watch = async (
   }
 
   return { outcome: 'stopped' };
+};
+
+/**
+ * What a failing summary ends the watch with: `checks-failed`, as for any pull
+ * request; but for one only a bypass merges (`bypassReason`) whose only red is
+ * the required check that enforces `CODEOWNERS` (`codeOwnersCheck`),
+ * `awaiting-bypass` once every other check is green, and `wait` while they
+ * still run, as triage decides for one up to date (`codeOwnersClassification`).
+ */
+export const failingOutcome = (
+  summary: ChecksSummary,
+  bypassReason: string | undefined,
+  codeOwnersCheck: string | undefined,
+): Watched | 'wait' => {
+  const atCheckGate =
+    bypassReason === undefined
+      ? undefined
+      : codeOwnersClassification(summary, codeOwnersCheck, {
+          hold: { kind: 'bypass', reason: bypassReason },
+          codeOwners: 'required',
+        });
+
+  return atCheckGate?.kind === 'awaiting-bypass'
+    ? {
+        outcome: 'awaiting-bypass',
+        detail: `every required check is green but the one that enforces CODEOWNERS; ${atCheckGate.reason}`,
+      }
+    : atCheckGate?.kind === 'held'
+      ? 'wait'
+      : { outcome: 'checks-failed', ...describeFailedChecks(summary) };
 };
 
 /**

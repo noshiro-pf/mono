@@ -493,14 +493,32 @@ describe(codeOwnersClassification, () => {
 
   // Someone else pushed to an owner's pull request whose only owner is its
   // author: no approval can come, so re-running would only fail again, and
-  // holding it would tell nobody. The rest of triage sets it aside.
-  test('leaves one only a bypass merges to be set aside', () => {
-    assert.isUndefined(
+  // holding it would tell nobody. It is left for a bypass merge, as under the
+  // ruleset's own review, not set aside as failing.
+  test('leaves one only a bypass merges for that merge', () => {
+    assert.deepStrictEqual(
       codeOwnersClassification(failing([check]), check, {
         hold: { kind: 'bypass', reason: '@owner is the only owner' },
         codeOwners: 'required',
       }),
+      { kind: 'awaiting-bypass', reason: '@owner is the only owner' },
     );
+  });
+
+  // The ruleset's gate leaves one for a bypass only once every check is green.
+  test('holds one only a bypass merges while its other checks still run', () => {
+    for (const summary of [
+      { ...failing([check]), pending: ['code-check-result / result'] },
+      { ...failing([check]), running: ['code-check (ws:check:types)'] },
+    ]) {
+      assert.strictEqual(
+        codeOwnersClassification(summary, check, {
+          hold: { kind: 'bypass', reason: '@owner is the only owner' },
+          codeOwners: 'required',
+        })?.kind,
+        'held',
+      );
+    }
   });
 
   // The check cannot see an approval given after it ran, so it is run again.
