@@ -10,6 +10,7 @@ import {
   parseCodeOwners,
   PRIORITY_HIGH_LABEL,
   PRIORITY_LOW_LABEL,
+  pushersMatter,
   queueGraph,
   queueStanding,
   reviewHold,
@@ -22,8 +23,6 @@ import {
   type QueueReads,
   type QueueStanding,
   type ReviewHold,
-  type ReviewRules,
-  type ReviewState,
   type RulesetRequirements,
 } from 'pr-report-core';
 import { Arr, isRecord, Result } from 'ts-data-forge';
@@ -725,20 +724,6 @@ export const failingReviewsToRead = (
   !Arr.isNonEmpty(requirements.requiredContexts)
     ? ([] as const)
     : failing.filter((prNumber) => !numbers.includes(prNumber));
-
-/**
- * Whether who pushed could change where `state` stands with the code owners:
- * whether the answer with them untold differs from the author's alone. Only
- * then is the branch's activity read — as the check reads it only for a path
- * the author owns that no owner has approved — and a read that stops short of
- * every changed path counts too, since the answer is then about the rules.
- */
-export const pushersMatter = (
-  state: ReviewState,
-  rules: ReviewRules,
-): boolean =>
-  codeOwnerReviewOf({ ...state, pushers: 'unknown' }, rules).state !==
-  codeOwnerReviewOf({ ...state, pushers: [state.author] }, rules).state;
 
 /**
  * What the rules on the default branch require, as GitHub applies them.

@@ -143,6 +143,21 @@ export const codeOwnerReviewOf = (
   });
 };
 
+/**
+ * Whether who pushed could change where `state` stands with the code owners:
+ * whether the answer with them untold differs from the author's alone. Only
+ * then is the branch's activity worth a request — as the check reads it only
+ * for a path the author owns that no owner has approved — and a read that stops
+ * short of every changed path counts too, since the answer is then about the
+ * rules. `unblock-prs` and the Pull Requests Manager both ask this.
+ */
+export const pushersMatter = (
+  state: ReviewState,
+  rules: ReviewRules,
+): boolean =>
+  codeOwnerReviewOf({ ...state, pushers: 'unknown' }, rules).state !==
+  codeOwnerReviewOf({ ...state, pushers: [state.author] }, rules).state;
+
 /** How many waiting paths are named before the rest are counted. */
 const PATHS_NAMED = 2;
 

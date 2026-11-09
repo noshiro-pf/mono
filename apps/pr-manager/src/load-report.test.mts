@@ -1798,7 +1798,10 @@ describe(loadReport, () => {
   // names enforcing the file instead: that check counts the author as approving
   // what they own, so only someone else's pull request waits.
   test('counts the author as approving what they own where a required check enforces CODEOWNERS', async () => {
-    const own = await loadEnforced('someone');
+    // Pushed by its author alone (`pushersOf` in `pr-report-core`).
+    const own = await loadEnforced('someone', [
+      activityEntry('branch_creation', '0'.repeat(40), 'sha-7', 'someone'),
+    ]);
 
     assert.isTrue(own.features.codeOwnerReview);
 
@@ -1814,6 +1817,52 @@ describe(loadReport, () => {
       owners: ['owner'],
       authorOwns: false,
     });
+  });
+
+  // #3681: as the check and `unblock-prs` judge it since #3679, the author
+  // stands for what they own only where everyone who pushed owns it too.
+  test('does not count the author where someone else pushed to the branch', async () => {
+    const pushedByOther = [
+      activityEntry('push', 'c'.repeat(40), 'sha-7', 'other'),
+      activityEntry(
+        'branch_creation',
+        '0'.repeat(40),
+        'c'.repeat(40),
+        'someone',
+      ),
+    ] as const;
+
+    const { report: loaded, sent } = await loadEnforcedSent(
+      'someone',
+      pushedByOther,
+    );
+
+    assert.strictEqual(loaded.entries[0]?.codeOwnerReview.state, 'required');
+
+    const asked = named(sent, 'Activity')[0];
+
+    assert.isDefined(asked);
+
+    const askedUrl = new URL(asked.route);
+
+    assert.strictEqual(askedUrl.searchParams.get('ref'), 'refs/heads/branch-7');
+
+    // Pushed by the author alone, it is theirs to vouch for.
+    const own = await loadEnforcedSent('someone', [
+      activityEntry('branch_creation', '0'.repeat(40), 'sha-7', 'someone'),
+    ]);
+
+    assert.strictEqual(
+      own.report.entries[0]?.codeOwnerReview.state,
+      'approved',
+    );
+  });
+
+  // A request each, so only where who pushed can change the answer.
+  test('reads no activity where who pushed changes nothing', async () => {
+    const { sent } = await loadEnforcedSent('owner', []);
+
+    assert.lengthOf(named(sent, 'Activity'), 0);
   });
 
   // Most repositories but this one: the page is still the merge order and the
@@ -2444,7 +2493,11 @@ type Sent = Readonly<{
 const sentOf = (route: string, init: FetchInit | RestFetchInit): Sent => {
   if (init.method === 'GET') {
     return {
-      operation: route.includes('/rules/branches/') ? 'BranchRules' : 'Branch',
+      operation: route.includes('/rules/branches/')
+        ? 'BranchRules'
+        : route.includes('/activity?')
+          ? 'Activity'
+          : 'Branch',
       route,
       query: '',
       variables: {},
@@ -2538,6 +2591,7 @@ const answering = (
 const REST_OPERATIONS: ReadonlySet<string> = new Set<string>([
   'BranchRules',
   'Branch',
+  'Activity',
 ]);
 
 /** Lets every answer already given land, and what follows from it run. */
@@ -2957,38 +3011,67 @@ const keywordHtml = (keyword: string, number: number): string =>
     ` href="https://github.com/noshiro-pf/mono/issues/${number}">#${number}</a>.</p>`,
   ].join('');
 
-/** A read where a required check enforces a `CODEOWNERS` naming `owner`. */
-const loadEnforced = (owner: string): Promise<LoadedReport> =>
-  load(
-    answering(
-      report(
-        [pullRequest({ number: 7, files: ['.github/workflows/a.yml'] })],
-        [],
-        undefined,
-        NO_ISSUES,
-        {
-          codeOwners: {
-            text: `# enforced-by: Validate code owners\n/.github/workflows/ @${owner}\n`,
-          },
+const loadEnforcedSent = async (
+  owner: string,
+  activity: readonly unknown[],
+): Promise<Readonly<{ report: LoadedReport; sent: readonly Sent[] }>> => {
+  const answered = answering(
+    { Activity: [activity] },
+    report(
+      [pullRequest({ number: 7, files: ['.github/workflows/a.yml'] })],
+      [],
+      undefined,
+      NO_ISSUES,
+      {
+        codeOwners: {
+          text: `# enforced-by: Validate code owners\n/.github/workflows/ @${owner}\n`,
         },
-        restAnswers({
-          rules: [
-            {
-              type: 'pull_request',
-              parameters: { require_code_owner_review: false },
+      },
+      restAnswers({
+        rules: [
+          {
+            type: 'pull_request',
+            parameters: { require_code_owner_review: false },
+          },
+          {
+            type: 'required_status_checks',
+            parameters: {
+              required_status_checks: [{ context: 'Validate code owners' }],
             },
-            {
-              type: 'required_status_checks',
-              parameters: {
-                required_status_checks: [{ context: 'Validate code owners' }],
-              },
-            },
-          ],
-        }),
-      ),
-      answer('Compare', { compare_7: null }),
-    ).fetchImpl,
+          },
+        ],
+      }),
+    ),
+    answer('Compare', { compare_7: null }),
   );
+
+  return { report: await load(answered.fetchImpl), sent: answered.sent };
+};
+
+/**
+ * A read where a required check enforces a `CODEOWNERS` naming `owner`, and the
+ * branch's activity says who pushed (`activity`, newest first), as many times
+ * as it is asked.
+ */
+const loadEnforced = (
+  owner: string,
+  activity: readonly unknown[] = [],
+): Promise<LoadedReport> =>
+  loadEnforcedSent(owner, activity).then(({ report: loaded }) => loaded);
+
+/** One entry of a branch's activity, as REST answers it. */
+const activityEntry = (
+  activityType: string,
+  before: string,
+  after: string,
+  actor: string,
+): unknown =>
+  ({
+    activity_type: activityType,
+    before,
+    after,
+    actor: { login: actor },
+  }) as const;
 
 describe(queueLayersOf, () => {
   const head = 'a'.repeat(40);

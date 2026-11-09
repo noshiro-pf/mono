@@ -30,6 +30,7 @@ import {
   parseMergeAfter,
   parseSetAsideComment,
   PENDING_LABEL,
+  pushersMatter,
   queueLayerOfMessage,
   referenceStatusOf,
   reportedContexts,
@@ -50,6 +51,8 @@ import {
   type ReferenceStatus,
   type RepoRef,
   type ReportEntry,
+  type ReviewRules,
+  type ReviewState,
   type RulesetRequirements,
   type SetAside,
 } from 'pr-report-core';
@@ -57,7 +60,7 @@ import type { ClaudeSession } from 'split-view-link';
 import { Arr, isRecord, Obj, Result } from 'ts-data-forge';
 import * as t from 'ts-fortress';
 import type { ReadonlyRecord, StrictPick } from 'ts-type-forge';
-import { loadBranchRules } from './branch-rules.mjs';
+import { loadBranchRules, loadPushers } from './branch-rules.mjs';
 import { parseClaudeSessions } from './claude-session.mjs';
 import type { ReportSource } from './constants.mjs';
 import {
@@ -803,6 +806,11 @@ type DetailsState = Readonly<{
 
 type DetailsPart = DetailsState &
   Readonly<{
+    /**
+     * Who pushed to its branch, where that could change where it stands with
+     * the code owners and was read (`readPushersWhereTheyMatter`).
+     */
+    pushers: readonly string[] | 'unknown' | undefined;
     linkedIssues: readonly LinkedIssue[];
     /**
      * The `Start-After:` of each issue it closes, which it inherits as a merge
@@ -1379,6 +1387,86 @@ const linkedIssuesOf = (
     ),
   ] as const;
 
+const approversOf = (details: PullRequestDetails): readonly string[] =>
+  Arr.generate(function* () {
+    for (const { state, author } of details.latestOpinionatedReviews.nodes) {
+      if (state === 'APPROVED' && author !== null) {
+        yield author.login;
+      }
+    }
+  });
+
+/** A pull request's review as `pr-report-core`'s `review-hold.mts` reads it. */
+const reviewStateOf = (
+  author: string,
+  state: DetailsState & Readonly<{ pushers?: readonly string[] | 'unknown' }>,
+): ReviewState =>
+  ({
+    author,
+    approvers: approversOf(state.node),
+    files: state.files,
+    filesComplete: state.filesComplete,
+    unresolvedConversations: state.node.reviewThreads.nodes.filter(
+      ({ isResolved }) => !isResolved,
+    ).length,
+    ...(state.pushers === undefined ? {} : { pushers: state.pushers }),
+  }) as const;
+
+/**
+ * Who pushed to each pull request's branch, read only where it can change where
+ * the pull request stands with the code owners (`pushersMatter`), as
+ * `unblock-prs` reads it: under a required check that enforces `CODEOWNERS`,
+ * the author stands for a path they own only where everyone who pushed owns it
+ * too. A fork's branch is not in this repository's activity, so it is untold;
+ * one whose read fails is left out, judged by its author alone, as the worker
+ * judges it.
+ */
+const readPushersWhereTheyMatter = async (
+  states: readonly DetailsState[],
+  {
+    pulls,
+    rules,
+    rest,
+  }: Readonly<{ pulls: PullsPart; rules: ReviewRules; rest: PushersRequest }>,
+): Promise<ReadonlyMap<number, readonly string[] | 'unknown'>> => {
+  const byNumber = new Map(pulls.pulls.map((pr) => [pr.number, pr] as const));
+
+  const read = await Promise.all(
+    states.map(async (state) => {
+      const pr = byNumber.get(state.number);
+
+      if (
+        pr === undefined ||
+        !pushersMatter(reviewStateOf(pr.author?.login ?? GHOST, state), rules)
+      ) {
+        return undefined;
+      }
+
+      if (pr.isCrossRepository) {
+        return [state.number, 'unknown'] as const;
+      }
+
+      const pushers = await loadPushers(
+        rest.source,
+        pr.headRefName,
+        pr.headRefOid,
+        {
+          token: rest.token,
+          ...(rest.fetchImpl === undefined
+            ? {}
+            : { fetchImpl: rest.fetchImpl }),
+        },
+      );
+
+      return Result.isOk(pushers)
+        ? ([state.number, pushers.value] as const)
+        : undefined;
+    }),
+  );
+
+  return new Map(read.filter((entry) => entry !== undefined));
+};
+
 /**
  * Each open pull request's details, with the issues its body closes. The
  * changed files are paged through only when the default branch asks for a code
@@ -1390,7 +1478,8 @@ const readDetails = async (
   ask: Ask,
   repo: RepoRef,
   rules: Promise<Answered<RulesetRequirements>>,
-  enforcedBy: Promise<string | undefined>,
+  pulls: Promise<Answered<PullsPart>>,
+  rest: PushersRequest,
 ): Promise<Answered<ReadonlyMap<number, DetailsPart>>> => {
   const answered = await readOpenPages({
     ask,
@@ -1404,13 +1493,19 @@ const readDetails = async (
 
   const { result: ruled } = await rules;
 
+  const { result: pulled } = await pulls;
+
+  const gate =
+    Result.isOk(ruled) && Result.isOk(pulled)
+      ? codeOwnerGate(ruled.value, pulled.value.codeOwnersEnforcedBy)
+      : undefined;
+
   // The pull requests' read only when the rules alone do not decide it. That
   // costs no wait of its own: `CODEOWNERS` comes with the pull requests' read,
   // and the rules are asked for only once it has named the default branch.
   const wantFiles =
     Result.isOk(ruled) &&
-    (ruled.value.requireCodeOwnerReview ||
-      codeOwnerGate(ruled.value, await enforcedBy) !== undefined);
+    (ruled.value.requireCodeOwnerReview || gate !== undefined);
 
   const followedUp = await followUpRounds({
     operationName: 'MoreFiles',
@@ -1459,6 +1554,21 @@ const readDetails = async (
   const { issues: names, startAfter: unlinkedStartAfter } =
     described.result.value;
 
+  const pushers =
+    Result.isOk(ruled) && Result.isOk(pulled)
+      ? await readPushersWhereTheyMatter(states, {
+          pulls: pulled.value,
+          rules: {
+            requireCodeOwnerReview: ruled.value.requireCodeOwnerReview,
+            requireConversationResolution:
+              ruled.value.requireConversationResolution,
+            codeOwners: pulled.value.codeOwners,
+            ...(gate === undefined ? {} : { codeOwnerGate: gate }),
+          },
+          rest,
+        })
+      : new Map<number, readonly string[] | 'unknown'>();
+
   return {
     rateLimit: described.rateLimit,
     result: Result.ok(
@@ -1467,6 +1577,7 @@ const readDetails = async (
           state.number,
           {
             ...state,
+            pushers: pushers.get(state.number),
             linkedIssues: linkedIssuesOf(repo, state.node, names),
             startAfter: closingStartAfterOf(
               repo,
@@ -1479,6 +1590,13 @@ const readDetails = async (
     ),
   };
 };
+
+/** Where {@link readPushersWhereTheyMatter} reads the activity. */
+type PushersRequest = Readonly<{
+  source: ReportSource;
+  token: string;
+  fetchImpl: RestFetch | undefined;
+}>;
 
 /**
  * The later of two budgets: the one with the later reset, or within one window
@@ -1655,9 +1773,12 @@ const readPullParts = ({
       ask,
       repo,
       orKept(rules, previous.rules),
-      pullsOrKept.then(({ result }) =>
-        Result.isOk(result) ? result.value.codeOwnersEnforcedBy : undefined,
-      ),
+      pullsOrKept,
+      {
+        source,
+        token,
+        fetchImpl,
+      },
     ),
     comparisons: pullsOrKept.then(async ({ result }) =>
       Result.isOk(result)
@@ -2103,15 +2224,6 @@ const setAsideOf = (
   };
 };
 
-const approversOf = (details: PullRequestDetails): readonly string[] =>
-  Arr.generate(function* () {
-    for (const { state, author } of details.latestOpinionatedReviews.nodes) {
-      if (state === 'APPROVED' && author !== null) {
-        yield author.login;
-      }
-    }
-  });
-
 /** What the queue reads of one pull request (`queue-view.mts`). */
 const queuePullOf = (
   entry: ReportEntry,
@@ -2132,15 +2244,7 @@ const queuePullOf = (
             position: node.stackEntry.position,
             size: node.stackEntry.stack.size,
           },
-    review: {
-      author: entry.author,
-      approvers: approversOf(node),
-      files: details.files,
-      filesComplete: details.filesComplete,
-      unresolvedConversations: node.reviewThreads.nodes.filter(
-        ({ isResolved }) => !isResolved,
-      ).length,
-    },
+    review: reviewStateOf(entry.author, details),
     ownComments: node.comments.nodes
       .filter(({ viewerDidAuthor }) => viewerDidAuthor)
       .map(({ body }) => body),
@@ -2291,6 +2395,9 @@ const assemble = ({
               approvers: approversOf(details.node),
               author: entry.author,
               authorApproves: gate === 'check',
+              ...(details.pushers === undefined
+                ? {}
+                : { pushers: details.pushers }),
             }),
       claudeSessions: parseClaudeSessions(entry.body),
       checksUnread:

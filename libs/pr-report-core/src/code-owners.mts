@@ -124,6 +124,34 @@ export const pushersOf = (
     : 'unknown';
 };
 
+/**
+ * {@link pushersOf} over one page of the activity as REST answers it, newest
+ * first: replayed oldest first, so that the chain runs from the last creation
+ * in the page to `head`. A branch whose last creation is not in the page is
+ * left untold rather than followed.
+ */
+export const pushersOfActivityPage = (
+  page: readonly ActivityEntry[],
+  head: string,
+): readonly string[] | 'unknown' =>
+  pushersOf(
+    page.toReversed().map((activity) => ({
+      activityType: activity.activity_type,
+      before: activity.before,
+      after: activity.after,
+      actor: activity.actor?.login,
+    })),
+    head,
+  );
+
+/** One entry of `GET /repos/{owner}/{repo}/activity`, as much as is read. */
+export type ActivityEntry = Readonly<{
+  activity_type: string;
+  before: string;
+  after: string;
+  actor: Readonly<{ login: string }> | null;
+}>;
+
 /** One entry of a branch's activity, as {@link pushersOf} reads it. */
 export type BranchActivity = Readonly<{
   activityType: string;
