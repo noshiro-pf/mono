@@ -18,6 +18,7 @@
  */
 
 import {
+  pushersOfActivityPage,
   readBranchRequirements,
   type RulesetRequirements,
 } from 'pr-report-core';
@@ -50,6 +51,47 @@ export const loadBranchRules = async (
     getJson(`${repoRoute}${path}`, schema, what, token, fetchImpl),
   );
 };
+
+/**
+ * Who pushed to `branch`, whose head is `head` (`pushersOfActivityPage` in
+ * `pr-report-core`, which `unblock-prs` and the check that enforces
+ * `CODEOWNERS` read the same way): one page of the repository's activity on it,
+ * newest first, or why it could not be read. A request each, so it is asked
+ * only where who pushed can change the answer (`pushersMatter`).
+ */
+export const loadPushers = async (
+  source: ReportSource,
+  branch: string,
+  head: string,
+  request: BranchRulesRequest,
+): Promise<Result<readonly string[] | 'unknown', string>> => {
+  const { token, fetchImpl = askGitHub } = request;
+
+  const query = new URLSearchParams({
+    ref: `refs/heads/${branch}`,
+    direction: 'desc',
+    per_page: ACTIVITY_PAGE_SIZE.toString(),
+  });
+
+  const read = await getJson(
+    `https://api.github.com/repos/${source.owner}/${source.repo}/activity?${query.toString()}`,
+    t.array(ActivitySchema),
+    `who pushed to ${branch}`,
+    token,
+    fetchImpl,
+  );
+
+  return Result.map(read, (page) => pushersOfActivityPage(page, head));
+};
+
+const ACTIVITY_PAGE_SIZE = 100;
+
+const ActivitySchema = t.record({
+  activity_type: t.string(),
+  before: t.string(),
+  after: t.string(),
+  actor: t.union([t.record({ login: t.string() }), t.nullType]),
+});
 
 /** As `workflow-runs.mts` words them. */
 const refusal = (response: Response, what: string): string =>

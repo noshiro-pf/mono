@@ -11,7 +11,7 @@ import {
   namesEveryChangedPath,
   parseClaimComment,
   parseSetAsideComment,
-  pushersOf,
+  pushersOfActivityPage,
   readBranchRequirements,
   SET_ASIDE_COMMENT_SCAN,
   SKIP_CI_LABEL,
@@ -359,24 +359,8 @@ export const readPushers = async (
     : Result.ok(pushersOfPage(read.value, head));
 };
 
-/**
- * {@link readPushers}' reading of one page of the activity, newest first as it
- * asks for it: replayed oldest first, so that the chain runs from the last
- * creation in the page to `head`.
- */
-export const pushersOfPage = (
-  page: readonly t.TypeOf<typeof ActivitySchema>[],
-  head: string,
-): readonly string[] | 'unknown' =>
-  pushersOf(
-    page.toReversed().map((activity) => ({
-      activityType: activity.activity_type,
-      before: activity.before,
-      after: activity.after,
-      actor: activity.actor?.login,
-    })),
-    head,
-  );
+/** {@link readPushers}' reading of one page (`pushersOfActivityPage`). */
+export const pushersOfPage = pushersOfActivityPage;
 
 /**
  * What the issues the open pull requests close add to the merge order

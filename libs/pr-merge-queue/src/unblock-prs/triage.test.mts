@@ -1,4 +1,9 @@
-import { parseCodeOwners, reviewHold, type ReviewState } from 'pr-report-core';
+import {
+  parseCodeOwners,
+  pushersMatter,
+  reviewHold,
+  type ReviewState,
+} from 'pr-report-core';
 import { Result } from 'ts-data-forge';
 import {
   awaitsMergeState,
@@ -10,7 +15,6 @@ import {
   orderCandidates,
   outOfSyncAtSurvey,
   priorityPhrase,
-  pushersMatter,
 } from './triage.mjs';
 import type {
   ChecksSummary,
