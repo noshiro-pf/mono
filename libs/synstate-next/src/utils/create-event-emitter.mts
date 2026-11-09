@@ -10,7 +10,7 @@ export const createEventEmitter = (): readonly [
   return [
     node,
     () => {
-      node.next(undefined);
+      node.emit(undefined);
     },
   ] as const;
 };
@@ -25,7 +25,7 @@ export const createValueEmitter = <A,>(): readonly [
   return [
     node,
     (value) => {
-      node.next(value);
+      node.emit(value);
     },
   ] as const;
 };

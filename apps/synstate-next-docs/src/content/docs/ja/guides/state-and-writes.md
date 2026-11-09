@@ -328,7 +328,7 @@ const messages = source<string>();
 
 assert.isFalse(messages.hasValue);
 
-messages.next('hello');
+messages.emit('hello');
 
 assert.strictEqual(messages.getSnapshot(), 'hello');
 ```

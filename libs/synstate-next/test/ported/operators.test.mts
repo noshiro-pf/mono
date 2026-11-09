@@ -38,7 +38,7 @@ describe('map stops a result equal to the one it holds', () => {
     const seen = collect(a.pipe(map((x) => x % 2)));
 
     for (const x of [1, 3, 4, 6, 7]) {
-      a.next(x);
+      a.emit(x);
     }
 
     assert.deepStrictEqual(seen, [1, 0, 1]);
@@ -106,7 +106,7 @@ describe('map stops a result equal to the one it holds', () => {
     const seen = collect(a.pipe(map((x) => x)));
 
     for (const x of [Number.NaN, Number.NaN, 0, -0]) {
-      a.next(x);
+      a.emit(x);
     }
 
     assert.deepStrictEqual(seen, [Number.NaN, 0, -0]);
@@ -123,11 +123,11 @@ describe('map stops a result equal to the one it holds', () => {
       ),
     );
 
-    a.next({ id: 1, name: 'a' });
+    a.emit({ id: 1, name: 'a' });
 
-    a.next({ id: 1, name: 'b' });
+    a.emit({ id: 1, name: 'b' });
 
-    a.next({ id: 2, name: 'b' });
+    a.emit({ id: 2, name: 'b' });
 
     assert.deepStrictEqual(
       seen.map(({ id }) => id),
@@ -140,9 +140,9 @@ describe('map stops a result equal to the one it holds', () => {
 
     const seen = collect(click.pipe(map(() => 1, { equals: () => false })));
 
-    click.next(undefined);
+    click.emit(undefined);
 
-    click.next(undefined);
+    click.emit(undefined);
 
     assert.deepStrictEqual(seen, [1, 1]);
   });
@@ -173,9 +173,9 @@ describe(keepEqualParts, () => {
 
     const seen = collect(r.pipe(keepEqualParts()));
 
-    r.next(report(1, [entry(1, 'a')]));
+    r.emit(report(1, [entry(1, 'a')]));
 
-    r.next(report(1, [entry(1, 'a')]));
+    r.emit(report(1, [entry(1, 'a')]));
 
     assert.strictEqual(seen.length, 1);
   });
@@ -185,9 +185,9 @@ describe(keepEqualParts, () => {
 
     const seen = collect(r.pipe(keepEqualParts()));
 
-    r.next(report(1, [entry(1, 'a'), entry(2, 'b')]));
+    r.emit(report(1, [entry(1, 'a'), entry(2, 'b')]));
 
-    r.next(report(2, [entry(1, 'a'), entry(2, 'b (edited)')]));
+    r.emit(report(2, [entry(1, 'a'), entry(2, 'b (edited)')]));
 
     assert.strictEqual(seen.length, 2);
 
@@ -216,9 +216,9 @@ describe(keepEqualParts, () => {
       ),
     );
 
-    r.next(report(1, [entry(1, 'a')]));
+    r.emit(report(1, [entry(1, 'a')]));
 
-    r.next(report(1, [entry(0, 'new'), entry(1, 'a')]));
+    r.emit(report(1, [entry(0, 'new'), entry(1, 'a')]));
 
     const [first, second] = seen;
 
@@ -373,7 +373,7 @@ describe('takeUntil and skipUntil leave the notifier', () => {
 
     const result = source<number>().pipe(takeUntil(notifier));
 
-    notifier.next(undefined);
+    notifier.emit(undefined);
 
     assert.isTrue(toNode(result).settled);
 
@@ -391,7 +391,7 @@ describe('takeUntil and skipUntil leave the notifier', () => {
 
     taken.subscribe(() => {});
 
-    num.next(1);
+    num.emit(1);
 
     assert.isTrue(toNode(taken).settled);
 
@@ -432,7 +432,7 @@ describe('takeUntil and skipUntil leave the notifier', () => {
     const result = num.pipe(skipUntil(notifier));
 
     batch(() => {
-      notifier.next(undefined);
+      notifier.emit(undefined);
 
       notifier.dispose();
 
@@ -441,7 +441,7 @@ describe('takeUntil and skipUntil leave the notifier', () => {
 
     assert.isFalse(toNode(result).settled);
 
-    num.next(1);
+    num.emit(1);
 
     assert.deepStrictEqual(seen, [1]);
   });
@@ -453,7 +453,7 @@ describe('takeUntil and skipUntil leave the notifier', () => {
 
     const result = num.pipe(skipUntil(notifier));
 
-    notifier.next(undefined);
+    notifier.emit(undefined);
 
     notifier.dispose();
 
@@ -471,13 +471,13 @@ describe('takeUntil and skipUntil leave the notifier', () => {
 
     const seen = collect(num.pipe(skipUntil(notifier)));
 
-    num.next(1);
+    num.emit(1);
 
-    notifier.next(undefined);
+    notifier.emit(undefined);
 
     assert.isFalse(toNode(notifier).hasObserver);
 
-    num.next(2);
+    num.emit(2);
 
     assert.deepStrictEqual(seen, [2]);
   });
@@ -525,11 +525,11 @@ describe(withBufferedFrom, () => {
 
     const seen = collect(trigger.pipe(withBufferedFrom(data)));
 
-    data.next('A');
+    data.emit('A');
 
-    data.next('B');
+    data.emit('B');
 
-    trigger.next(1);
+    trigger.emit(1);
 
     assert.deepStrictEqual(seen, [[1, ['A', 'B']]]);
   });
@@ -562,15 +562,15 @@ describe(derive, () => {
 
     const seen = collect(derive([a, b], (x, y) => `${y}${x.toString()}`));
 
-    a.next(1);
+    a.emit(1);
 
     assert.deepStrictEqual(seen, []);
 
-    b.next('x');
+    b.emit('x');
 
-    a.next(2);
+    a.emit(2);
 
-    b.next('y');
+    b.emit('y');
 
     assert.deepStrictEqual(seen, ['x1', 'x2', 'y2']);
   });
@@ -637,12 +637,12 @@ describe(derive, () => {
       }),
     );
 
-    a.next(1);
+    a.emit(1);
 
-    a.next(2);
+    a.emit(2);
 
     // A new object with the same total: equal by `equals`, not by Object.is.
-    a.next(2);
+    a.emit(2);
 
     b.set(1);
 
@@ -718,9 +718,9 @@ describe.each([
   test('passes on the pending value when its window ends, even after its source is disposed', () => {
     const { s, seen } = setup();
 
-    s.next(1);
+    s.emit(1);
 
-    s.next(2);
+    s.emit(2);
 
     s.dispose();
 
@@ -732,7 +732,7 @@ describe.each([
   test('drops the pending value when it is disposed', () => {
     const { s, operated, seen } = setup();
 
-    s.next(1);
+    s.emit(1);
 
     operated.dispose();
 
@@ -743,7 +743,7 @@ describe.each([
     // Its source is not disposed with it.
     const later = collect(s);
 
-    s.next(3);
+    s.emit(3);
 
     // The value it holds first.
     assert.deepStrictEqual(later, [1, 3]);

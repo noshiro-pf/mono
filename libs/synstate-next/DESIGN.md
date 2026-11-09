@@ -234,6 +234,7 @@ from the prototype; the packages are to be measured again in
 - `fromSubscribable` subscribes with an observer object (`next`, `error`,
   `complete`), the form RxJS recommends and a TC39 `Observable` takes, not with
   three functions.
+- `source()` emits with `.emit`, not `.next`.
 - The setters of `createState`, `createReducer` and `createBooleanState` return
   nothing. A write made while the graph drains is applied once that round's
   effects have run, so the state it would return is not known yet; `getSnapshot`

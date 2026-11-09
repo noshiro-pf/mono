@@ -40,7 +40,7 @@ if (import.meta.vitest !== undefined) {
 
     assert.isFalse(messages.hasValue);
 
-    messages.next('hello');
+    messages.emit('hello');
 
     assert.strictEqual(messages.getSnapshot(), 'hello');
 

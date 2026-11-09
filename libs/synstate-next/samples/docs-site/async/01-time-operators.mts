@@ -30,15 +30,15 @@ if (import.meta.vitest !== undefined) {
         mut_audited.push(k);
       });
 
-      keys.next('a');
+      keys.emit('a');
 
       await vi.advanceTimersByTimeAsync(40);
 
-      keys.next('b');
+      keys.emit('b');
 
       await vi.advanceTimersByTimeAsync(40);
 
-      keys.next('c');
+      keys.emit('c');
 
       await vi.advanceTimersByTimeAsync(200);
 

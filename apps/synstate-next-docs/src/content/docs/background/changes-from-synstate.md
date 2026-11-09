@@ -40,7 +40,8 @@ synstate-next replaces synstate in its next major version. This page lists what 
 ## Sources and helpers
 
 - **`fromSubscribable` subscribes with an observer object** (`next`, `error`, `complete`), the form RxJS recommends and a TC39 `Observable` takes, not with three functions.
-- **A state is also an object**: `state(initialValue)` has `.value`, `.set` and `.update`, and `source()` is an event with `.next`. `createState` and the emitters are the same as tuples.
+- **A state is also an object**: `state(initialValue)` has `.value`, `.set` and `.update`, and `createState` is the same as a tuple.
+- **`source()` emits with `.emit`**, not `.next`.
 
 ## Writing operators
 

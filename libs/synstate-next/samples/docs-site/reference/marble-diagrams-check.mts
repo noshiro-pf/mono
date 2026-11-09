@@ -128,7 +128,7 @@ if (import.meta.vitest !== undefined) {
         for (const [i, input] of [a, b].entries()) {
           for (const { t, value } of diagram.inputs[i] ?? []) {
             setTimeout(() => {
-              input.next(value);
+              input.emit(value);
             }, t * 10);
           }
         }

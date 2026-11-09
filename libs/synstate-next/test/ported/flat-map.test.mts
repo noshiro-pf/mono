@@ -59,7 +59,7 @@ describe('the value the source holds when the operator is created is projected',
 
     const seen = collect(s);
 
-    inner.next('a');
+    inner.emit('a');
 
     assert.deepStrictEqual(seen, ['a']);
   });
@@ -75,9 +75,9 @@ describe('the value the source holds when the operator is created is projected',
 
     a.set(2);
 
-    first.next('stale');
+    first.emit('stale');
 
-    second.next('b');
+    second.emit('b');
 
     assert.deepStrictEqual(seen, ['b']);
   });
@@ -121,7 +121,7 @@ describe('the value the source holds when the operator is created is projected',
 
     assert.isFalse(s.hasValue);
 
-    a.next(1);
+    a.emit(1);
 
     assert.deepStrictEqual(mut_projected, [1]);
   });
@@ -170,9 +170,9 @@ describe('the value the source holds when the operator is created is projected',
 
     a.set(2);
 
-    first.next('a');
+    first.emit('a');
 
-    second.next('b');
+    second.emit('b');
 
     assert.deepStrictEqual(seen, ['a', 'b']);
   });
@@ -314,10 +314,10 @@ describe('a projection that writes or throws', () => {
       ),
     );
 
-    s.next(0);
+    s.emit(0);
 
     batch(() => {
-      inner.next(5);
+      inner.emit(5);
 
       inner.dispose();
     });
@@ -378,11 +378,11 @@ describe('a projection that writes or throws', () => {
 
     merged.subscribe(() => {});
 
-    s.next(0);
+    s.emit(0);
 
-    s.next(1);
+    s.emit(1);
 
-    s.next(2);
+    s.emit(2);
 
     assert.throws(() => {
       merged.dispose();
@@ -440,11 +440,11 @@ describe('an inner observable that holds a value is passed on in the update that
 
     const seen = collect(a.pipe(switchMap(() => inner)));
 
-    a.next(1);
+    a.emit(1);
 
-    inner.next(5);
+    inner.emit(5);
 
-    inner.next(6);
+    inner.emit(6);
 
     assert.deepStrictEqual(seen, [5, 6]);
   });
@@ -462,15 +462,15 @@ describe('switchMap and mergeMap release only what their projection made', () =>
 
     const others = collect(a);
 
-    user.next('a');
+    user.emit('a');
 
-    a.next(1);
+    a.emit(1);
 
-    user.next('b');
+    user.emit('b');
 
-    a.next(2);
+    a.emit(2);
 
-    b.next(3);
+    b.emit(3);
 
     assert.deepStrictEqual(others, [1, 2]);
 
@@ -493,13 +493,13 @@ describe('switchMap and mergeMap release only what their projection made', () =>
         collect(user.pipe(operator(() => shared)));
       });
 
-      user.next(1);
+      user.emit(1);
 
       owner.dispose();
 
       const others = collect(shared);
 
-      shared.next(1);
+      shared.emit(1);
 
       assert.deepStrictEqual(others, [1]);
     },
@@ -532,9 +532,9 @@ describe('switchMap and mergeMap release only what their projection made', () =>
       );
     });
 
-    user.next(1);
+    user.emit(1);
 
-    user.next(2);
+    user.emit(2);
 
     assert.deepStrictEqual(mut_released, [1]);
 
@@ -569,9 +569,9 @@ describe('switchMap and mergeMap release only what their projection made', () =>
       );
     });
 
-    user.next(1);
+    user.emit(1);
 
-    user.next(2);
+    user.emit(2);
 
     assert.deepStrictEqual(mut_released, []);
 
@@ -583,7 +583,7 @@ describe('switchMap and mergeMap release only what their projection made', () =>
 
     const others = collect(shared);
 
-    shared.next(5);
+    shared.emit(5);
 
     assert.deepStrictEqual(others, [5]);
   });
@@ -620,15 +620,15 @@ describe('a projection that throws on a later value', () => {
       ),
     );
 
-    user.next(1);
+    user.emit(1);
 
     assert.throws(() => {
-      user.next(2);
+      user.emit(2);
     }, /projection failed/u);
 
     assert.deepStrictEqual(mut_released, [1, 2]);
 
-    user.next(3);
+    user.emit(3);
 
     assert.deepStrictEqual(seen, [1, 3]);
 
@@ -669,10 +669,10 @@ describe('a projection that throws on a later value', () => {
       );
     });
 
-    click.next(1);
+    click.emit(1);
 
     assert.throws(() => {
-      click.next(2);
+      click.emit(2);
     }, /projection failed/u);
 
     assert.deepStrictEqual(mut_released, [2]);
@@ -703,9 +703,9 @@ describe('mergeMap releases an inner observable once it can emit no more', () =>
       ),
     );
 
-    click.next(1);
+    click.emit(1);
 
-    click.next(2);
+    click.emit(2);
 
     assert.deepStrictEqual(seen, [1, 2]);
 
@@ -739,13 +739,13 @@ describe('mergeMap releases an inner observable once it can emit no more', () =>
       ),
     );
 
-    click.next(1);
+    click.emit(1);
 
-    click.next(2);
+    click.emit(2);
 
-    mut_inners[0]?.next('a');
+    mut_inners[0]?.emit('a');
 
-    mut_inners[1]?.next('b');
+    mut_inners[1]?.emit('b');
 
     assert.deepStrictEqual(seen, ['a', 'b']);
 
@@ -784,7 +784,7 @@ describe('a source write or disposal during a projection', () => {
     const current$ = user$.pipe(
       switchMap((u) => {
         if (u === 1) {
-          user$.next(2);
+          user$.emit(2);
 
           return a$;
         }
@@ -799,11 +799,11 @@ describe('a source write or disposal during a projection', () => {
       mut_current.push(v);
     });
 
-    user$.next(1);
+    user$.emit(1);
 
-    a$.next('a');
+    a$.emit('a');
 
-    b$.next('b');
+    b$.emit('b');
 
     assert.deepStrictEqual(mut_current, ['b']);
 
@@ -824,7 +824,7 @@ describe('a source write or disposal during a projection', () => {
     const current$ = user$.pipe(
       switchMap((u) => {
         if (u === 1) {
-          user$.next(2);
+          user$.emit(2);
         }
 
         const made$ = store$.pipe(map((x) => x));
@@ -837,7 +837,7 @@ describe('a source write or disposal during a projection', () => {
 
     current$.subscribe(() => {});
 
-    user$.next(1);
+    user$.emit(1);
 
     // The projection that wrote (1) ran first, then the one its write made (2).
     assert.deepStrictEqual(
@@ -873,7 +873,7 @@ describe('a source write or disposal during a projection', () => {
 
     current$.subscribe(() => {});
 
-    user$.next(1);
+    user$.emit(1);
 
     assert.isFalse(toNode(shared$).hasObserver);
 
@@ -909,7 +909,7 @@ describe('a source write or disposal during a projection', () => {
 
     current$.subscribe(() => {});
 
-    user$.next(1);
+    user$.emit(1);
 
     assert.isFalse(toNode(shared$).hasObserver);
 
