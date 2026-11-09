@@ -37,6 +37,7 @@ export const SetTimesPopover = ({
           }}
         />
       }
+      data-e2e={'set-times-button'}
       isOpen={isOpen$}
       onClose={handleClose}
     >

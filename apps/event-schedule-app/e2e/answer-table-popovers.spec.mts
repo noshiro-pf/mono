@@ -5,10 +5,11 @@ import {
   emulatorTestTimeout,
 } from './answer-page-steps.mjs';
 
-// The popovers of the answer table, an answer's comment and the sort menu of a
-// column. Each button opens its popover itself, inside the popover's target,
-// which once took the same click for a second one and closed it at once. The
-// answer is a Firestore write, so this runs against the emulators.
+// The popovers of the answer table: an answer's comment, the sort menu of a
+// column, and the filter of an icon's column. Each button opens its popover
+// itself, inside the popover's target, which once took the same click for a
+// second one and closed it at once. The answer is a Firestore write, so this
+// runs against the emulators.
 
 const comment = '午後なら参加できます';
 
@@ -83,5 +84,25 @@ test(
     await expect.soft(sortMenu).toBeHidden();
 
     await expect.soft(rows.first()).toHaveText(lastDate);
+
+    /* the filter of the △ column */
+
+    const filterButton = table
+      .getByTestId('icon-filter-fair')
+      .getByRole('button');
+
+    await filterButton.click();
+
+    await expect.soft(filterButton).toHaveAttribute('aria-expanded', 'true');
+
+    const filterPopover = answerPage.getByTestId('icon-filter-popover');
+
+    await expect.soft(filterPopover.getByText('絞り込み')).toBeVisible();
+
+    await filterPopover.getByRole('button', { name: '閉じる' }).click();
+
+    await expect.soft(filterButton).toHaveAttribute('aria-expanded', 'false');
+
+    await expect.soft(filterPopover).toBeHidden();
   },
 );
