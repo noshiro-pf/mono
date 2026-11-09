@@ -45,7 +45,7 @@
     "fmt": "pnpm run fix:fmt",
     "gen": "run-s gen:index gen:re-export gen:readme gen:jsdoc",
     "gen:index": "run-s gen:index:src fix:fmt",
-    "gen:index:src": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/gen-index-ts.mts ./src --index-ext .mts --export-ext .mjs --target-ext .mts --target-ext .tsx --exclude entry-point.mts",
+    "gen:index:src": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/gen-index-ts.mts ./src --index-ext .mts --export-ext .mjs --target-ext .mts --target-ext .tsx --exclude entry-point.mts --exclude react-version-hooks.mts",
     "gen:jsdoc": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/cmd/embed-examples-in-jsdoc.mts",
     "gen:re-export": "run-s gen:re-export:script fix:fmt",
     "gen:re-export:script": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/cmd/generate-re-export-script.mts",

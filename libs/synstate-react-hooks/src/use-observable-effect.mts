@@ -1,5 +1,6 @@
 import * as React from 'react';
 import type { Observable } from 'synstate';
+import { useBeforeEffects } from './react-version-hooks.mjs';
 
 /**
  * Subscribes `subscriptionFn` to `observable$` while the component is mounted,
@@ -21,9 +22,11 @@ export const useObservableEffect = <A,>(
 ): void => {
   const mut_subscriptionFnRef = React.useRef(subscriptionFn);
 
-  // Runs before the layout and passive effects of the commit, so a value one of
-  // them emits already reaches this render's `subscriptionFn`.
-  React.useInsertionEffect(() => {
+  // Runs as early in the commit as the React version allows
+  // (`react-version-hooks.mts` says when), so that a value the commit's later
+  // effects emit goes to this render's `subscriptionFn` rather than the previous
+  // render's.
+  useBeforeEffects(() => {
     mut_subscriptionFnRef.current = subscriptionFn;
   });
 

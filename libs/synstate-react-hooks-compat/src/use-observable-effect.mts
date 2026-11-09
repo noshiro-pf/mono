@@ -1,5 +1,6 @@
 import * as React from 'react';
 import type { Observable } from 'synstate';
+import { useBeforeEffects } from './react-version-hooks.mjs';
 
 /**
  * Subscribes `subscriptionFn` to `observable$` while the component is mounted,
@@ -21,9 +22,10 @@ export const useObservableEffect = <A,>(
 ): void => {
   const mut_subscriptionFnRef = React.useRef(subscriptionFn);
 
-  // On React 18 and later, runs before the layout and passive effects of the
-  // commit, so a value one of them emits already reaches this render's
-  // `subscriptionFn`.
+  // Runs as early in the commit as the React version allows
+  // (`react-version-hooks.mts` says when), so that a value the commit's later
+  // effects emit goes to this render's `subscriptionFn` rather than the previous
+  // render's.
   useBeforeEffects(() => {
     mut_subscriptionFnRef.current = subscriptionFn;
   });
@@ -38,12 +40,3 @@ export const useObservableEffect = <A,>(
     };
   }, [observable$]);
 };
-
-// `useInsertionEffect` is React 18's (`'useInsertionEffect' in React` narrows
-// to `never`, as the types have it). Before it, `useLayoutEffect` comes
-// closest, running before the passive effects only; it warns when rendered on
-// the server, where nothing emits anyway.
-const useBeforeEffects: typeof React.useLayoutEffect =
-  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- React 16 and 17 have none, whatever the types say
-  React.useInsertionEffect ??
-  (typeof window === 'undefined' ? React.useEffect : React.useLayoutEffect);
