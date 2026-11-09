@@ -94,7 +94,12 @@ export type GeneratedIntrinsicElements = Readonly<{
 }> &
   Readonly<{ [K in SvgTagName]: SvgElementProps<SVGElementTagNameMap[K]> }>;
 
-type ReflectedProps<E> = Readonly<{
+/**
+ * One `Bindable` per writable primitive DOM property of `E` (`id`, `disabled`,
+ * `value`, `tabIndex`, …): the part of {@link HtmlElementProps} read off the
+ * element type.
+ */
+export type ReflectedProps<E> = Readonly<{
   [K in keyof E as ReflectedKey<E, K>]?: Bindable<
     K extends PropertyName ? NonNullable<E[K]> : NonNullable<E[K]> | undefined
   >;
