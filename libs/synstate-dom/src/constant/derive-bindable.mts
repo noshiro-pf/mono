@@ -3,7 +3,7 @@ import {
   isObservable,
   type InitializedObservable,
 } from 'synstate';
-import { Arr } from 'ts-data-forge';
+import * as Arr from 'ts-data-forge/array';
 import type { NonEmptyTuple } from 'ts-type-forge';
 import { asConstant } from '../internal/index.mjs';
 import type { Bindable, BindableValue } from './bindable.mjs';

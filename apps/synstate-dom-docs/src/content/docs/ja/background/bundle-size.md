@@ -18,7 +18,7 @@ description: 同じアプリケーションを synstate-dom、Solid、Preact + S
 
 <!-- bundle-size:environment -->
 
-Vite 8.3.4 でバンドルしました。バージョンは `synstate-dom 0.3.0`, `synstate 6.0.0`, `solid-js 1.9.17`, `preact 10.29.8`, `@preact/signals 2.11.3`, `react 19.3.1`, `react-dom 19.3.1`, `vanjs-core 1.6.1` です。
+Vite 8.3.5 でバンドルしました。バージョンは `synstate-dom 0.9.0`, `synstate 8.0.0`, `solid-js 1.9.17`, `preact 10.29.8`, `@preact/signals 2.11.3`, `react 19.3.1`, `react-dom 19.3.1`, `vanjs-core 1.6.1` です。
 
 <!-- /bundle-size -->
 
@@ -30,12 +30,12 @@ gzip はレベル 9 です。1 kB は 1,000 バイトで、小さいほど良い
 
 | アプリケーション（kB）      | synstate-dom | Solid | Preact + Signals | Preact | React | VanJS |
 | :-------------------------- | -----------: | ----: | ---------------: | -----: | ----: | ----: |
-| すべての export             |         15.2 |  14.7 |              9.3 |    6.2 |  67.7 |   1.2 |
-| カウンター                  |          8.3 |   4.0 |              7.9 |    5.4 |  67.5 |   1.2 |
-| js-framework-benchmark の表 |         10.6 |   5.1 |              8.7 |    8.3 |  68.3 |   1.9 |
-| ローンのシナリオ            |         10.8 |   4.8 |              9.1 |    6.7 |  68.7 |   2.4 |
-| 工程表のシナリオ            |         10.8 |   4.2 |              8.5 |    6.1 |  68.1 |   1.7 |
-| ズームのシナリオ            |         10.5 |   3.9 |              8.2 |    5.9 |  67.9 |   1.5 |
+| すべての export             |         12.8 |  14.7 |              9.3 |    6.2 |  67.7 |   1.2 |
+| カウンター                  |          6.7 |   4.0 |              7.9 |    5.4 |  67.5 |   1.2 |
+| js-framework-benchmark の表 |          8.8 |   5.1 |              8.7 |    8.3 |  68.3 |   2.0 |
+| ローンのシナリオ            |          7.6 |   4.2 |              8.5 |    6.1 |  68.1 |   1.8 |
+| 工程表のシナリオ            |          7.6 |   4.2 |              8.5 |    6.1 |  68.2 |   1.8 |
+| ズームのシナリオ            |          7.4 |   4.0 |              8.3 |    5.9 |  67.9 |   1.5 |
 
 <!-- /bundle-size -->
 
@@ -47,12 +47,12 @@ Brotli は品質 11 です。
 
 | アプリケーション（kB）      | synstate-dom | Solid | Preact + Signals | Preact | React | VanJS |
 | :-------------------------- | -----------: | ----: | ---------------: | -----: | ----: | ----: |
-| すべての export             |         13.7 |  13.4 |              8.5 |    5.6 |  58.3 |   1.1 |
-| カウンター                  |          7.5 |   3.6 |              7.3 |    4.9 |  58.2 |   1.1 |
-| js-framework-benchmark の表 |          9.7 |   4.6 |              8.0 |    7.6 |  58.9 |   1.8 |
-| ローンのシナリオ            |          9.8 |   4.4 |              8.3 |    6.1 |  59.2 |   2.1 |
-| 工程表のシナリオ            |          9.8 |   3.8 |              7.8 |    5.6 |  58.7 |   1.6 |
-| ズームのシナリオ            |          9.6 |   3.6 |              7.6 |    5.4 |  58.5 |   1.4 |
+| すべての export             |         11.5 |  13.4 |              8.5 |    5.6 |  58.3 |   1.1 |
+| カウンター                  |          6.1 |   3.6 |              7.3 |    4.9 |  58.2 |   1.1 |
+| js-framework-benchmark の表 |          8.0 |   4.7 |              8.0 |    7.6 |  58.9 |   1.8 |
+| ローンのシナリオ            |          6.9 |   3.8 |              7.8 |    5.6 |  58.7 |   1.6 |
+| 工程表のシナリオ            |          6.9 |   3.8 |              7.8 |    5.6 |  58.7 |   1.6 |
+| ズームのシナリオ            |          6.7 |   3.6 |              7.6 |    5.4 |  58.5 |   1.4 |
 
 <!-- /bundle-size -->
 
@@ -60,12 +60,12 @@ Brotli は品質 11 です。
 
 <!-- `checkReadingTheResults` in scripts/embed-bundle-size.mts checks the sentences below against the tables and fails `gen:bundle-size` when one no longer holds. It quotes them word for word, so a reworded sentence is reworded there too, and a new claim about an order or a margin gets a case there. -->
 
-- **カウンターの行が基準です。** その下のアプリケーションは、自分自身のコードと、使っているライブラリの部分の分だけそこから変わります。ここで計ったアプリケーションなら、どのライブラリでも、カウンターより下の行はどれもカウンターから数 kB 以内に収まります。ライブラリの順位はカウンターの行で決まり、その下の行でも変わりません。
+- **カウンターの行が基準です。** その下のアプリケーションは、自分自身のコードと、使っているライブラリの部分の分だけそこから変わります。ここで計ったアプリケーションなら、どのライブラリでも、カウンターより下の行はどれもカウンターから数 kB 以内に収まります。その下の行もカウンターの行のライブラリの順位を保ちます。ただし、カウンターの行から下で互いに 1 kB ほどの差しかない synstate-dom と Preact + Signals は入れ替わることがあります。
 - **React** は、アプリケーションが何であってもほとんどが react-dom です。reconciler と scheduler はコンポーネントが何を使うかによって分かれないので、行どうしの差は 1 kB ほどしかありません。
 - **VanJS** は tree-shaking する余地のない小さな 1 モジュールなので、カウンターの時点でその全体が入ります。
 - **Solid** は JSX をテンプレートにコンパイルして小さなランタイムを呼び出すので、カウンターでは `solid-js/web` のごく一部しか使いません。すべての export はその数倍あります。
 - **Preact** は小さな仮想 DOM で、Signals はそこにリアクティブなコアと、signal を DOM に束縛する統合部分を足します。Preact の表がすべての export より大きいのは、表の行が `preact/compat` の `memo` を使っていて、すべての export の行ではそれを数えていないからです。
-- **synstate-dom** には、synstate の伝播のコア（グラフ、深さ順の伝播、スコープ）、自身の JSX ランタイムと束縛の表、そして両者が ts-data-forge と ts-std-forge から import するヘルパーが含まれています。synstate-dom はどの行でも React の次に大きくなっています。ただ、すでに synstate を使っているアプリケーションなら、そのコアの分は一度払えば済みます。また、モデルがどの列でも ts-data-forge を使うシナリオでは、そのヘルパーを synstate と共有します。
+- **synstate-dom** には、synstate の伝播のコア（グラフ、深さ順の伝播、スコープ）、自身の JSX ランタイムと束縛の表、そして両者が ts-data-forge と ts-std-forge から import するヘルパーが含まれています。すべての export 以外のどの行でも、React の次に大きいのは synstate-dom と Preact + Signals です。ただ、すでに synstate を使っているアプリケーションなら、そのコアの分は一度払えば済みます。また、モデルがどの列でも ts-data-forge を使うシナリオでは、そのヘルパーを synstate と共有します。
 - **すべての export** の行では、React の次に synstate-dom と Solid が大きくなっています。synstate は RxJS と同じようにオペレーターを一揃い export していますが、アプリケーションに残るのは import したものだけです。
 
 ## 実行

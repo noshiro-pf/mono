@@ -5,7 +5,7 @@ import {
   onScopeDispose,
   type Scope,
 } from 'synstate';
-import { Arr } from 'ts-data-forge';
+import * as Arr from 'ts-data-forge/array';
 import type { Bindable } from '../constant/index.mjs';
 import {
   applyWhenAttached,
