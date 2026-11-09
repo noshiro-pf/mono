@@ -56,9 +56,9 @@ if (import.meta.vitest !== undefined) {
         mut_seen.push(m);
       });
 
-      messages.next('a');
+      messages.emit('a');
 
-      messages.next('b');
+      messages.emit('b');
 
       assert.deepStrictEqual(mut_seen, []);
 

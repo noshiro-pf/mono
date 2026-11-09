@@ -57,11 +57,11 @@ describe(pairwise, () => {
 
     const seen = collect(e.pipe(pairwise()));
 
-    e.next(1);
+    e.emit(1);
 
-    e.next(1);
+    e.emit(1);
 
-    e.next(2);
+    e.emit(2);
 
     assert.deepStrictEqual(seen, [
       [1, 1],
@@ -94,11 +94,11 @@ describe(take, () => {
 
     const seen = collect(e.pipe(take(2)));
 
-    e.next(1);
+    e.emit(1);
 
-    e.next(2);
+    e.emit(2);
 
-    e.next(3);
+    e.emit(3);
 
     assert.deepStrictEqual(seen, [1, 2]);
   });
@@ -190,7 +190,7 @@ describe(takeUntil, () => {
 
     a.set(1);
 
-    stop.next(undefined);
+    stop.emit(undefined);
 
     a.set(2);
 
@@ -209,7 +209,7 @@ describe(takeUntil, () => {
     batch(() => {
       a.set(1);
 
-      stop.next(undefined);
+      stop.emit(undefined);
     });
 
     assert.deepStrictEqual(seen, [0]);
@@ -246,7 +246,7 @@ describe(skipUntil, () => {
 
     assert.isFalse(skipped.hasValue);
 
-    go.next(undefined);
+    go.emit(undefined);
 
     a.set(2);
 
@@ -265,7 +265,7 @@ describe(skipUntil, () => {
     batch(() => {
       a.set(1);
 
-      go.next(undefined);
+      go.emit(undefined);
     });
 
     assert.deepStrictEqual(seen, [1]);
@@ -280,13 +280,13 @@ describe(withCurrentValueFrom, () => {
 
     const seen = collect(clicks.pipe(withCurrentValueFrom(count)));
 
-    clicks.next('a');
+    clicks.emit('a');
 
     count.set(1);
 
     count.set(2);
 
-    clicks.next('b');
+    clicks.emit('b');
 
     assert.deepStrictEqual(seen, [
       ['a', 0],
@@ -332,7 +332,7 @@ describe(withCurrentValueFrom, () => {
 
     assert.isFalse(paired.hasValue);
 
-    other.next(5);
+    other.emit(5);
 
     assert.isFalse(paired.hasValue);
 
@@ -350,17 +350,17 @@ describe(withBufferedFrom, () => {
 
     const seen = collect(save.pipe(withBufferedFrom(edits)));
 
-    edits.next('a');
+    edits.emit('a');
 
-    edits.next('b');
+    edits.emit('b');
 
-    save.next('save');
+    save.emit('save');
 
-    save.next('save');
+    save.emit('save');
 
-    edits.next('c');
+    edits.emit('c');
 
-    save.next('save');
+    save.emit('save');
 
     assert.deepStrictEqual(seen, [
       ['save', ['a', 'b']],
@@ -377,9 +377,9 @@ describe(withBufferedFrom, () => {
     const seen = collect(save.pipe(withBufferedFrom(edits)));
 
     batch(() => {
-      edits.next('a');
+      edits.emit('a');
 
-      save.next('save');
+      save.emit('save');
     });
 
     assert.deepStrictEqual(seen, [['save', ['a']]]);
@@ -418,11 +418,11 @@ describe(skipIfNoChange, () => {
 
     const seen = collect(e.pipe(skipIfNoChange()));
 
-    e.next(1);
+    e.emit(1);
 
-    e.next(1);
+    e.emit(1);
 
-    e.next(2);
+    e.emit(2);
 
     assert.deepStrictEqual(seen, [1, 2]);
   });
@@ -432,11 +432,11 @@ describe(skipIfNoChange, () => {
 
     const seen = collect(e.pipe(skipIfNoChange((p, q) => p.id === q.id)));
 
-    e.next({ id: 1, label: 'a' });
+    e.emit({ id: 1, label: 'a' });
 
-    e.next({ id: 1, label: 'b' });
+    e.emit({ id: 1, label: 'b' });
 
-    e.next({ id: 2, label: 'c' });
+    e.emit({ id: 2, label: 'c' });
 
     assert.deepStrictEqual(
       seen.map((v) => v.label),
@@ -453,17 +453,17 @@ describe(zip, () => {
 
     const seen = collect(zip([a, b]));
 
-    a.next(1);
+    a.emit(1);
 
-    a.next(2);
+    a.emit(2);
 
-    b.next('x');
+    b.emit('x');
 
-    b.next('y');
+    b.emit('y');
 
-    b.next('z');
+    b.emit('z');
 
-    a.next(3);
+    a.emit(3);
 
     assert.deepStrictEqual(seen, [
       [1, 'x'],
@@ -499,9 +499,9 @@ describe(zip, () => {
     const seen = collect(zip([a, b]));
 
     batch(() => {
-      a.next(1);
+      a.emit(1);
 
-      b.next(10);
+      b.emit(10);
     });
 
     assert.deepStrictEqual(seen, [[1, 10]]);
@@ -572,18 +572,18 @@ describe('an operator created in the update its source was written in', () => {
     const mut_seen: unknown[] = [];
 
     batch(() => {
-      a.next(1);
+      a.emit(1);
 
-      b.next(2);
+      b.emit(2);
 
       zip([a, b]).subscribe((v) => {
         mut_seen.push(v);
       });
     });
 
-    a.next(3);
+    a.emit(3);
 
-    b.next(4);
+    b.emit(4);
 
     assert.deepStrictEqual(mut_seen, [
       [1, 2],
@@ -607,9 +607,9 @@ describe('an operator created in the update its source was written in', () => {
     let mut_buffered: unknown = undefined;
 
     batch(() => {
-      n.next(1);
+      n.emit(1);
 
-      other.next(7);
+      other.emit(7);
 
       a.pipe(takeUntil(n)).subscribe((v) => {
         mut_taken.push(v);
@@ -695,7 +695,7 @@ describe('a finished operator', () => {
 
     a.set(1);
 
-    stop.next(undefined);
+    stop.emit(undefined);
 
     assert.isFalse(toNode(a).hasObserver);
 
@@ -751,13 +751,13 @@ describe('zip with a parent ahead', () => {
 
     const zipped = zip([a, b]);
 
-    a.next(0);
+    a.emit(0);
 
     for (const i of Array.from({ length: 200 }, (_, k) => k)) {
       batch(() => {
-        a.next(i + 1);
+        a.emit(i + 1);
 
-        b.next(i);
+        b.emit(i);
       });
     }
 

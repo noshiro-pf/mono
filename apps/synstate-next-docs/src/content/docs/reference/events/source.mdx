@@ -1,11 +1,11 @@
 ---
 title: source
-description: 'Creates an event source, holding no value until its first `next`.'
+description: 'Creates an event source, holding no value until its first `emit`.'
 ---
 
 {/* reference:jsdoc */}
 
-Creates an event source, holding no value until its first `next`.
+Creates an event source, holding no value until its first `emit`.
 
 {/* /reference */}
 
@@ -16,7 +16,7 @@ import { source } from 'synstate-next';
 
 const ticks = source<number>();
 
-// An event source holds no value until its first `next`.
+// An event source holds no value until its first `emit`.
 assert.isFalse(ticks.hasValue);
 
 const mut_seen: number[] = [];
@@ -25,9 +25,9 @@ ticks.subscribe((n) => {
     mut_seen.push(n);
 });
 
-ticks.next(1);
+ticks.emit(1);
 
-ticks.next(1);
+ticks.emit(1);
 
 assert.deepStrictEqual(mut_seen, [1, 1]);
 ```

@@ -3,9 +3,9 @@ title: source
 description: 'イベントソースを作ります。'
 ---
 
-{/* translated-from:64568992ebb9 */}
+{/* translated-from:ae95ca49f3ce */}
 
-イベントソースを作ります。最初の `next` までは値を持ちません。
+イベントソースを作ります。最初の `emit` までは値を持ちません。
 
 ## 例
 
@@ -14,7 +14,7 @@ import { source } from 'synstate-next';
 
 const ticks = source<number>();
 
-// An event source holds no value until its first `next`.
+// An event source holds no value until its first `emit`.
 assert.isFalse(ticks.hasValue);
 
 const mut_seen: number[] = [];
@@ -23,9 +23,9 @@ ticks.subscribe((n) => {
     mut_seen.push(n);
 });
 
-ticks.next(1);
+ticks.emit(1);
 
-ticks.next(1);
+ticks.emit(1);
 
 assert.deepStrictEqual(mut_seen, [1, 1]);
 ```

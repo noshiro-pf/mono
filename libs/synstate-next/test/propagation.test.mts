@@ -667,7 +667,7 @@ describe('events', () => {
 
     batch(() => {
       for (const i of Array.from({ length: 150 }, (_, k) => k)) {
-        events.next(i);
+        events.emit(i);
       }
     });
 
@@ -689,22 +689,22 @@ describe('events', () => {
 
     expect(() => {
       batch(() => {
-        events.next(1);
+        events.emit(1);
 
-        events.next(2);
+        events.emit(2);
 
-        events.next(3);
+        events.emit(3);
       });
     }).toThrow('first');
 
-    events.next(4);
+    events.emit(4);
 
-    events.next(5);
+    events.emit(5);
 
     assert.deepStrictEqual(mut_seen, [2, 3, 4, 5]);
   });
 
-  test('every next propagates, in order, however many arrive before a round', () => {
+  test('every emit propagates, in order, however many arrive before a round', () => {
     const trigger = state(0);
 
     const events = source<number>();
@@ -725,29 +725,29 @@ describe('events', () => {
         return;
       }
 
-      events.next(10);
+      events.emit(10);
 
-      events.next(20);
+      events.emit(20);
     });
 
     trigger.set(1);
 
     // In a batch.
     batch(() => {
-      events.next(30);
+      events.emit(30);
 
-      events.next(40);
+      events.emit(40);
 
-      events.next(50);
+      events.emit(50);
     });
 
     // During the drain.
     const watched = trigger.pipe(
       map((x) => {
         if (x === 2) {
-          events.next(60);
+          events.emit(60);
 
-          events.next(70);
+          events.emit(70);
         }
 
         return x;
@@ -778,15 +778,15 @@ describe('events', () => {
       mut_seen.push(v);
     });
 
-    e1.next(1);
+    e1.emit(1);
 
-    e2.next(-1);
+    e2.emit(-1);
 
-    e2.next(5);
+    e2.emit(5);
 
-    e1.next(5);
+    e1.emit(5);
 
-    e1.next(5);
+    e1.emit(5);
 
     assert.deepStrictEqual(mut_seen, [0, 1, 6, 11, 16]);
   });
@@ -800,9 +800,9 @@ describe('events', () => {
       mut_seen.push(v);
     });
 
-    e.next('a');
+    e.emit('a');
 
-    e.next('a');
+    e.emit('a');
 
     assert.deepStrictEqual(mut_seen, ['a', 'a']);
   });

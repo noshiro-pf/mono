@@ -68,9 +68,9 @@ describe(debounce, () => {
         mut_seen.push(v);
       });
 
-      e.next(1);
+      e.emit(1);
 
-      e.next(2);
+      e.emit(2);
 
       assert.deepStrictEqual(mut_seen, []);
 
@@ -79,7 +79,7 @@ describe(debounce, () => {
       // Only the last value of the burst.
       assert.deepStrictEqual(mut_seen, [2]);
 
-      e.next(3);
+      e.emit(3);
 
       quiet.dispose();
 
@@ -114,15 +114,15 @@ describe(throttle, () => {
 
       const seen = collect(e.pipe(throttle(100)));
 
-      e.next(1);
+      e.emit(1);
 
-      e.next(2);
+      e.emit(2);
 
       await vi.advanceTimersByTimeAsync(100);
 
-      e.next(3);
+      e.emit(3);
 
-      e.next(4);
+      e.emit(4);
 
       assert.deepStrictEqual(seen, [1, 3]);
     } finally {
@@ -140,15 +140,15 @@ describe(audit, () => {
 
       const seen = collect(e.pipe(audit(100)));
 
-      e.next(1);
+      e.emit(1);
 
-      e.next(2);
+      e.emit(2);
 
       assert.deepStrictEqual(seen, []);
 
       await vi.advanceTimersByTimeAsync(100);
 
-      e.next(3);
+      e.emit(3);
 
       await vi.advanceTimersByTimeAsync(100);
 
@@ -168,7 +168,7 @@ describe(audit, () => {
 
       const seen = collect(audited);
 
-      e.next(1);
+      e.emit(1);
 
       audited.dispose();
 
@@ -193,9 +193,9 @@ describe(mergeMap, () => {
 
     const seen = collect(merged);
 
-    which.next('a');
+    which.emit('a');
 
-    which.next('b');
+    which.emit('b');
 
     a.set(2);
 
@@ -224,9 +224,9 @@ describe(mergeMap, () => {
 
       const seen = collect(merged);
 
-      e.next(200);
+      e.emit(200);
 
-      e.next(100);
+      e.emit(100);
 
       await vi.advanceTimersByTimeAsync(150);
 
@@ -262,9 +262,9 @@ describe(mergeMap, () => {
 
     const seen = collect(merged);
 
-    e.next(1);
+    e.emit(1);
 
-    e.next(2);
+    e.emit(2);
 
     assert.deepStrictEqual(seen, [2, 4]);
 
@@ -280,9 +280,9 @@ describe(mergeMap, () => {
 
     const seen = collect(merged);
 
-    e.next(10);
+    e.emit(10);
 
-    e.next(100);
+    e.emit(100);
 
     a.set(2);
 
@@ -298,14 +298,14 @@ describe(mergeMap, () => {
 
     const seen = collect(merged);
 
-    e.next(10);
+    e.emit(10);
 
-    e.next(100);
+    e.emit(100);
 
     batch(() => {
       a.set(2);
 
-      e.next(1000);
+      e.emit(1000);
     });
 
     // The projection joins the update; the inner values follow it.
@@ -321,13 +321,13 @@ describe(mergeMap, () => {
 
     const seen = collect(merged);
 
-    e.next(10);
+    e.emit(10);
 
-    e.next(100);
+    e.emit(100);
 
     a.subscribe((x) => {
       if (x === 2) {
-        e.next(1);
+        e.emit(1);
       }
     });
 
@@ -369,7 +369,7 @@ describe(mergeMap, () => {
 
     // Up to one short of the sweep threshold of 8.
     for (const x of [0, 1, 2, 3, 4, 5, 6]) {
-      e.next(x);
+      e.emit(x);
     }
 
     batch(() => {
@@ -378,7 +378,7 @@ describe(mergeMap, () => {
       mut_box.complete?.();
 
       // Reaches the threshold and sweeps in the drain that carries 42.
-      e.next(7);
+      e.emit(7);
     });
 
     assert.deepStrictEqual(seen, [1, 2, 3, 4, 5, 6, 7, 42]);
@@ -409,7 +409,7 @@ describe(mergeMap, () => {
     collect(merged);
 
     for (const x of [1, 2, 3]) {
-      e.next(x);
+      e.emit(x);
     }
 
     // Each was settled when projected.
@@ -440,7 +440,7 @@ describe(mergeMap, () => {
 
       // One short of the threshold of 8.
       for (const x of [1, 2, 3, 4, 5, 6, 7]) {
-        e.next(x);
+        e.emit(x);
       }
 
       await vi.advanceTimersByTimeAsync(100);
@@ -448,7 +448,7 @@ describe(mergeMap, () => {
       // Settled, but nothing has asked yet.
       assert.isFalse(mut_inners.some((inner) => toNode(inner).disposed));
 
-      e.next(1000);
+      e.emit(1000);
 
       // The projection that reached the threshold swept the settled ones.
       assert.deepStrictEqual(
@@ -469,7 +469,7 @@ describe(mergeMap, () => {
 
     collect(merged);
 
-    e.next(undefined);
+    e.emit(undefined);
 
     // `take(1)` passed the value held and is done: nothing follows `a`.
     assert.isFalse(toNode(a).hasObserver);
@@ -482,7 +482,7 @@ describe(mergeMap, () => {
 
     const merged = e.pipe(mergeMap(() => a.pipe(map((x) => x + 1))));
 
-    e.next(undefined);
+    e.emit(undefined);
 
     assert.isTrue(toNode(a).hasObserver);
 
@@ -682,9 +682,9 @@ describe(fromAbortablePromise, () => {
 
     const seen = collect(results);
 
-    query.next('a');
+    query.emit('a');
 
-    query.next('b');
+    query.emit('b');
 
     await new Promise((resolve) => {
       setTimeout(resolve, 10);
@@ -728,13 +728,13 @@ describe('source written by its own subscriber', () => {
       mut_first.push(v);
 
       if (v === 1) {
-        s.next(2);
+        s.emit(2);
       }
     });
 
     const second = collect(s);
 
-    s.next(1);
+    s.emit(1);
 
     assert.deepStrictEqual(mut_first, [1, 2]);
 
@@ -750,7 +750,7 @@ describe('source written by its own subscriber', () => {
 
     s.subscribe((v) => {
       if (v === 'start') {
-        s.next('B');
+        s.emit('B');
       }
     });
 
@@ -759,7 +759,7 @@ describe('source written by its own subscriber', () => {
       t.pipe(
         map((x) => {
           if (x === 1) {
-            s.next('A');
+            s.emit('A');
           }
 
           return x;
@@ -768,7 +768,7 @@ describe('source written by its own subscriber', () => {
     );
 
     batch(() => {
-      s.next('start');
+      s.emit('start');
 
       t.set(1);
     });
@@ -781,7 +781,7 @@ describe('source written by its own subscriber', () => {
 
     s.subscribe((v) => {
       if (v === 1) {
-        s.next(2);
+        s.emit(2);
       }
     });
 
@@ -792,14 +792,14 @@ describe('source written by its own subscriber', () => {
     });
 
     assert.throws(() => {
-      s.next(1);
+      s.emit(1);
     }, 'subscriber failed');
 
     const seen = collect(s);
 
-    s.next(3);
+    s.emit(3);
 
-    s.next(4);
+    s.emit(4);
 
     // 2 waited, and was delivered after the exception: it is the value held.
     assert.deepStrictEqual(seen, [2, 3, 4]);

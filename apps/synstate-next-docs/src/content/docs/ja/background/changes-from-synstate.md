@@ -40,7 +40,8 @@ synstate-next は、次のメジャーバージョンで synstate を置き換�
 ## ソースとヘルパー
 
 - **`fromSubscribable` はオブザーバーオブジェクト**（`next`・`error`・`complete`）で購読します。RxJS が推奨し TC39 の `Observable` が受け取る形で、3 つの関数ではありません。
-- **状態はオブジェクトとしても作れます。** `state(initialValue)` は `.value`・`.set`・`.update` を持ち、`source()` は `.next` を持つイベントです。`createState` やエミッターは、同じものをタプルで返します。
+- **状態はオブジェクトとしても作れます。** `state(initialValue)` は `.value`・`.set`・`.update` を持ち、`createState` は同じものをタプルで返します。
+- **`source()` は `.next` ではなく `.emit` で発火します。**
 
 ## オペレーターを書く
 

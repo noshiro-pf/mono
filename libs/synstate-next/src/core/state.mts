@@ -16,10 +16,14 @@ export type State<A> = InitializedObservable<A> &
     update: (fn: (current: A) => A) => void;
   }>;
 
-/** A stream of events: every `next` propagates, equal or not. */
+/** A stream of events: every `emit` propagates, equal or not. */
 export type Source<A> = Observable<A> &
   Readonly<{
-    next: (value: A) => void;
+    /**
+     * Emits `value`. Call it on the source, `s.emit(value)`; to pass it on its
+     * own, wrap it, `(value) => { s.emit(value); }`.
+     */
+    emit: (value: A) => void;
   }>;
 
 export type StateOptions<A> = Readonly<{
@@ -66,7 +70,7 @@ export const state = <A,>(
     ),
   );
 
-/** Creates an event source, holding no value until its first `next`. */
+/** Creates an event source, holding no value until its first `emit`. */
 export const source = <A,>(): Source<A> => view(new SourceClass<A>());
 
 class StateClass<A> extends ObservableClass<A> {
@@ -128,7 +132,7 @@ class StateClass<A> extends ObservableClass<A> {
 }
 
 /**
- * Every `next` propagates. A value written while the previous one still waits
+ * Every `emit` propagates. A value written while the previous one still waits
  * for its round (twice in a batch, or twice from effects) is delivered in a
  * round of its own, in order; see `publishEvent`.
  */
@@ -137,7 +141,7 @@ class SourceClass<A> extends ObservableClass<A> {
     super(noValue, 0);
   }
 
-  next(value: A): void {
+  emit(value: A): void {
     if (this.disposed) {
       return;
     }

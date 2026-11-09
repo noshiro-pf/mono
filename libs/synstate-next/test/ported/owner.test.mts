@@ -75,7 +75,7 @@ describe(Owner, () => {
 
     const seen = collect(doubled);
 
-    store.next(1);
+    store.emit(1);
 
     assert.deepStrictEqual(seen, [2]);
 
@@ -85,7 +85,7 @@ describe(Owner, () => {
 
     assert.isFalse(isDisposed(store));
 
-    store.next(2);
+    store.emit(2);
 
     assert.deepStrictEqual(seen, [2]);
   });

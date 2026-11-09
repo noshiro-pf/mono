@@ -18,7 +18,7 @@ Each page gives the API's description, taken from its JSDoc, and an example that
 
 - [`createValueEmitter`](/mono/synstate-next/reference/events/create-value-emitter/): An event source of `A`, and the function that emits a value on it.
 - [`createEventEmitter`](/mono/synstate-next/reference/events/create-event-emitter/): An event source of `undefined`, and the function that emits it.
-- [`source`](/mono/synstate-next/reference/events/source/): Creates an event source, holding no value until its first `next`.
+- [`source`](/mono/synstate-next/reference/events/source/): Creates an event source, holding no value until its first `emit`.
 
 ## Sources
 

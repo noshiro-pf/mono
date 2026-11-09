@@ -30,9 +30,9 @@ describe('custom operators and sources', () => {
 
     const seen = collect(derive([num, double(num)], (...values) => values));
 
-    num.next(1);
+    num.emit(1);
 
-    num.next(2);
+    num.emit(2);
 
     // No intermediate `[2, 2]`: the custom operator joins the same update.
     assert.deepStrictEqual(seen, [
@@ -58,11 +58,11 @@ describe('custom operators and sources', () => {
 
     const seen = collect(doubled);
 
-    a.next(1);
+    a.emit(1);
 
-    b.next(10);
+    b.emit(10);
 
-    b.next(20);
+    b.emit(20);
 
     assert.deepStrictEqual(seen, [2]);
 
@@ -102,7 +102,7 @@ describe('custom operators and sources', () => {
 
     const seen = collect(delayed);
 
-    num.next(1);
+    num.emit(1);
 
     assert.deepStrictEqual(seen, []);
 
@@ -110,7 +110,7 @@ describe('custom operators and sources', () => {
 
     assert.deepStrictEqual(seen, [1]);
 
-    num.next(2);
+    num.emit(2);
 
     delayed.dispose();
 
@@ -266,7 +266,7 @@ describe('custom operators and sources', () => {
     batch(() => {
       mut_emit.current?.(1);
 
-      num.next(5);
+      num.emit(5);
     });
 
     assert.deepStrictEqual(seen, [1, 50]);
@@ -410,7 +410,7 @@ describe('custom operators and sources', () => {
       settled: () => ctx.settled(main),
     }));
 
-    other.next(0);
+    other.emit(0);
 
     assert.isFalse(toNode(followed).settled);
 

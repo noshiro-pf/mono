@@ -37,19 +37,19 @@ describe(take, () => {
 
     const seen = collect(taken);
 
-    num.next(1);
+    num.emit(1);
 
-    num.next(2);
+    num.emit(2);
 
     assert.isFalse(isSettled(taken));
 
-    num.next(3);
+    num.emit(3);
 
     assert.isTrue(isSettled(taken));
 
     assert.isFalse(toNode(num).hasObserver);
 
-    num.next(4);
+    num.emit(4);
 
     assert.deepStrictEqual(seen, [1, 2, 3]);
   });
@@ -63,11 +63,11 @@ describe(take, () => {
 
     const pairs = collect(derive([taken, num], (...values) => values));
 
-    num.next(1);
+    num.emit(1);
 
-    num.next(2);
+    num.emit(2);
 
-    num.next(3);
+    num.emit(3);
 
     assert.deepStrictEqual(doubled, [2, 4]);
 
@@ -85,9 +85,9 @@ describe(take, () => {
 
     const seen = collect(taken);
 
-    num.next(1);
+    num.emit(1);
 
-    num.next(2);
+    num.emit(2);
 
     // synstate did not count the initial value, and passed `[0, 1, 2]`; see
     // DESIGN.md.
@@ -105,11 +105,11 @@ describe(take, () => {
 
     const seen = collect(taken);
 
-    trigger.next(0);
+    trigger.emit(0);
 
-    inner.next(1);
+    inner.emit(1);
 
-    inner.next(2);
+    inner.emit(2);
 
     assert.isTrue(isSettled(taken));
 
@@ -139,19 +139,19 @@ describe(zip, () => {
 
     const seen = collect(zipped);
 
-    a.next(1);
+    a.emit(1);
 
-    a.next(2);
+    a.emit(2);
 
     a.dispose();
 
     assert.isFalse(isSettled(zipped));
 
-    b.next('x');
+    b.emit('x');
 
     assert.isFalse(isSettled(zipped));
 
-    b.next('y');
+    b.emit('y');
 
     assert.isTrue(isSettled(zipped));
 
@@ -172,25 +172,25 @@ describe(zip, () => {
 
     const seen = collect(zipped);
 
-    a.next(1);
+    a.emit(1);
 
-    a.next(2);
+    a.emit(2);
 
-    a.next(3);
+    a.emit(3);
 
     a.dispose();
 
-    c.next(true);
+    c.emit(true);
 
-    c.next(false);
+    c.emit(false);
 
-    b.next('x');
+    b.emit('x');
 
     c.dispose();
 
     assert.isFalse(isSettled(zipped));
 
-    b.next('y');
+    b.emit('y');
 
     assert.isTrue(isSettled(zipped));
 
@@ -223,11 +223,11 @@ describe(zip, () => {
         .pipe(map((v) => `derived ${v}`)),
     );
 
-    a.next(1);
+    a.emit(1);
 
     a.dispose();
 
-    b.next('x');
+    b.emit('x');
 
     assert.deepStrictEqual(seen, ['derived 1x']);
   });
@@ -347,11 +347,11 @@ describe(source, () => {
 
     const seen = collect(s);
 
-    s.next(1);
+    s.emit(1);
 
     s.dispose();
 
-    s.next(2);
+    s.emit(2);
 
     assert.deepStrictEqual(seen, [1]);
 
@@ -361,7 +361,7 @@ describe(source, () => {
   test('what is derived from a disposed source is settled at once, and holds the value it computed (#2248)', () => {
     const s = source<number>();
 
-    s.next(5);
+    s.emit(5);
 
     s.dispose();
 
@@ -394,7 +394,7 @@ describe(source, () => {
     const seen = collect(s.pipe(map((x) => x * 2)));
 
     batch(() => {
-      s.next(1);
+      s.emit(1);
 
       s.dispose();
 

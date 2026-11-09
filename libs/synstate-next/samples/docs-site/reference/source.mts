@@ -6,7 +6,7 @@ if (import.meta.vitest !== undefined) {
     // embed-sample-code-ignore-above
     const ticks = source<number>();
 
-    // An event source holds no value until its first `next`.
+    // An event source holds no value until its first `emit`.
     assert.isFalse(ticks.hasValue);
 
     const mut_seen: number[] = [];
@@ -15,9 +15,9 @@ if (import.meta.vitest !== undefined) {
       mut_seen.push(n);
     });
 
-    ticks.next(1);
+    ticks.emit(1);
 
-    ticks.next(1);
+    ticks.emit(1);
 
     assert.deepStrictEqual(mut_seen, [1, 1]);
 
