@@ -3,6 +3,7 @@ import { checkDestructuringCompleteness } from './check-destructuring-completene
 import { explicitCollectionTypeArguments } from './explicit-collection-type-arguments.mjs';
 import { functionOrder } from './function-order.mjs';
 import { jsxBooleanLogicalOperands } from './jsx-boolean-logical-operands.mjs';
+import { noClockReadAtModuleLoad } from './no-clock-read-at-module-load.mjs';
 import { noDateOnlyStringToDate } from './no-date-only-string-to-date.mjs';
 import { noDetachedJsdoc } from './no-detached-jsdoc.mjs';
 import { noExportTypeSideEffects } from './no-export-type-side-effects.mjs';
@@ -30,6 +31,7 @@ export const tsRestrictionsRules = {
   'explicit-collection-type-arguments': explicitCollectionTypeArguments,
   'function-order': functionOrder,
   'jsx-boolean-logical-operands': jsxBooleanLogicalOperands,
+  'no-clock-read-at-module-load': noClockReadAtModuleLoad,
   'no-date-only-string-to-date': noDateOnlyStringToDate,
   'no-detached-jsdoc': noDetachedJsdoc,
   'no-export-type-side-effects': noExportTypeSideEffects,

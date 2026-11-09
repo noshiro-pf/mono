@@ -9,6 +9,7 @@ export const eslintTsRestrictionsRules = {
   'ts-restrictions/explicit-collection-type-arguments': 'error',
   'ts-restrictions/function-order': 'error',
   'ts-restrictions/jsx-boolean-logical-operands': 'error',
+  'ts-restrictions/no-clock-read-at-module-load': withDefaultOption('error'),
   'ts-restrictions/no-date-only-string-to-date': withDefaultOption('error'),
   'ts-restrictions/no-negated-comparison': 'error',
   'ts-restrictions/no-detached-jsdoc': 'error',

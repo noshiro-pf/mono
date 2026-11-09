@@ -1,6 +1,6 @@
 import {
   defaultAnswerDeadlineRemainingDays,
-  EventSchedule,
+  type EventSchedule,
   NotificationSettings,
   UserName,
 } from 'event-schedule-app-shared';
@@ -64,8 +64,8 @@ export const datetimeSpecificationInitialValue: DatetimeSpecificationEnumType =
 
 /**
  * The empty form, built when the create page is entered and when the edit page
- * is left: its date row is the day it is built. Its offset is the one the form
- * writes (`EventSchedule.defaultValue`), so that an untouched form equals it.
+ * is left: its date row is the day it is built, and its offset the one there
+ * and then, which the form writes for the visit.
  */
 export const eventScheduleInitialValue = (): EventSchedule =>
   ({
@@ -76,7 +76,7 @@ export const eventScheduleInitialValue = (): EventSchedule =>
     answerDeadline: 'none',
     answerIcons: answerIconsInitialValue,
     notificationSettings: 'none',
-    timezoneOffsetMinutes: EventSchedule.defaultValue.timezoneOffsetMinutes,
+    timezoneOffsetMinutes: DateUtils.today().getTimezoneOffset(),
     author: { id: null, name: UserName.cast('') },
     archivedBy: [],
   }) as const;

@@ -1,5 +1,4 @@
 import * as t from 'ts-fortress';
-import { DateUtils } from '../utils/index.mjs';
 
 export const commandMessageIdType = t.brandedString({
   typeName: 'CommandMessageId',
@@ -28,9 +27,14 @@ export const toPollId = pollIdType.cast;
 
 export type PollId = t.TypeOf<typeof pollIdType>;
 
+/**
+ * Every write stamps `DateUtils.now()` itself; the default only fills a stored
+ * value that has none, so it is the epoch, "unknown", rather than the moment
+ * this long-running process happened to load the module.
+ */
 export const timestampType = t.brandedNumber({
   typeName: 'Timestamp',
-  defaultValue: DateUtils.now(),
+  defaultValue: 0,
 });
 
 export const toTimestamp = timestampType.cast;

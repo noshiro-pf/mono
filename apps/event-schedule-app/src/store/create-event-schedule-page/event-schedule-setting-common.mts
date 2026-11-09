@@ -1,4 +1,8 @@
-import { EventSchedule, UserId, UserName } from 'event-schedule-app-shared';
+import {
+  type EventSchedule,
+  UserId,
+  UserName,
+} from 'event-schedule-app-shared';
 import {
   type InitializedObservable,
   combine,
@@ -220,8 +224,7 @@ export const createEventScheduleSettingStore = (
               notificationSettingsWithEmail === undefined
                 ? 'none'
                 : Obj.omit(notificationSettingsWithEmail, ['email']),
-            timezoneOffsetMinutes:
-              EventSchedule.defaultValue.timezoneOffsetMinutes,
+            timezoneOffsetMinutes: baseline.timezoneOffsetMinutes,
             author: {
               id: mapNullable(fireAuthUser?.uid, UserId.cast) ?? null,
               name: UserName.cast(fireAuthUser?.displayName ?? ''),

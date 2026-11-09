@@ -1,5 +1,5 @@
 import { Arr, expectType } from 'ts-data-forge';
-import { DateUtils, DatetimeRange, type Ymdhm } from 'ts-fortress-types';
+import { DatetimeRange, type Ymdhm } from 'ts-fortress-types';
 import type { NonEmptyArray } from 'ts-type-forge';
 import type { DatetimeSpecificationEnumType } from '../enum/index.mjs';
 import type { AnswerIconSettings } from './answer-icon-settings.mjs';
@@ -40,7 +40,8 @@ describe('EventSchedule', () => {
         poor: createAnswerIconSettingType(0).defaultValue,
       },
       notificationSettings: 'none',
-      timezoneOffsetMinutes: DateUtils.today().getTimezoneOffset(),
+      // A placeholder, not the offset where and when the module loaded.
+      timezoneOffsetMinutes: 0,
       author: User.defaultValue,
       archivedBy: [],
     } as const;
