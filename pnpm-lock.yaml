@@ -2630,6 +2630,9 @@ importers:
       ts-data-forge:
         specifier: workspace:*
         version: link:../../libs/ts-data-forge
+      ts-fortress:
+        specifier: workspace:*
+        version: link:../../libs/ts-fortress
       ts-repo-utils:
         specifier: workspace:*
         version: link:../../libs/ts-repo-utils

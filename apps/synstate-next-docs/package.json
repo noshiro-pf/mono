@@ -11,6 +11,7 @@
   "author": "noshiro-pf <noshiro.pf@gmail.com>",
   "type": "module",
   "scripts": {
+    "benchmark": "run-s z:build:deps z:benchmark:measure gen:benchmark",
     "build": "astro build",
     "check:lint": "node ../../tools/scripts/cmd/assert-deps-built.mts && oxlint . && eslint .",
     "check:test": "node ../../tools/scripts/cmd/assert-deps-built.mts && vitest --config ./configs/vitest.config.mts run",
@@ -22,12 +23,15 @@
     "fix:fmt:full": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../tools/scripts/cmd/format-package.mts",
     "fix:lint": "node ../../tools/scripts/cmd/assert-deps-built.mts && oxlint . --fix && eslint . --fix",
     "fmt": "pnpm run fix:fmt",
-    "gen": "run-s gen:reference gen:samples fix:fmt",
+    "gen": "run-s gen:reference gen:samples gen:benchmark fix:fmt",
+    "gen:benchmark": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/embed-benchmark.mts",
     "gen:reference": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/embed-reference.mts",
     "gen:samples": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/embed-samples.mts",
     "preview": "astro preview",
     "test": "pnpm run check:test",
-    "watch:types": "node ../../node_modules/typescript-native/bin/tsc --noEmit --watch"
+    "watch:types": "node ../../node_modules/typescript-native/bin/tsc --noEmit --watch",
+    "z:benchmark:measure": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/benchmark/run-benchmark.mts",
+    "z:build:deps": "pnpm --filter synstate-next --filter synstate run build"
   },
   "dependencies": {
     "@astrojs/starlight": "^0.42.6",
@@ -52,6 +56,7 @@
     "synstate": "workspace:*",
     "synstate-next": "workspace:*",
     "ts-data-forge": "workspace:*",
+    "ts-fortress": "workspace:*",
     "ts-repo-utils": "workspace:*",
     "ts-type-forge": "workspace:*",
     "typescript": "catalog:",

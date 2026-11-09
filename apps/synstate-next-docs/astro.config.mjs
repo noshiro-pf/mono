@@ -84,6 +84,7 @@ export default defineConfig({
             { slug: 'comparison/libraries' },
             { slug: 'comparison/async-logic' },
             { slug: 'comparison/operators-on-signals' },
+            { slug: 'comparison/benchmark' },
           ],
         },
         {
