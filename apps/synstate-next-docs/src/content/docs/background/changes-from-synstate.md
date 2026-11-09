@@ -40,7 +40,7 @@ synstate-next replaces synstate in its next major version. This page lists what 
 ## Sources and helpers
 
 - **`fromSubscribable` subscribes with an observer object** (`next`, `error`, `complete`), the form RxJS recommends and a TC39 `Observable` takes, not with three functions.
-- **A state is also an object**: `state(initial)` has `.value`, `.set` and `.update`, and `source()` is an event with `.next`. `createState` and the emitters are the same as tuples.
+- **A state is also an object**: `state(initialValue)` has `.value`, `.set` and `.update`, and `source()` is an event with `.next`. `createState` and the emitters are the same as tuples.
 
 ## Writing operators
 
@@ -48,6 +48,7 @@ synstate-next replaces synstate in its next major version. This page lists what 
 - **No update token**: `ctx.emitted(parent)` says which parent emitted in the update, `ctx.set` passes a value on in it, and `ctx.emit` in an update of its own.
 - **`settled` replaces `canEmitNoMore`**, and `flush` is gone with completion.
 - **The setup runs with the observable as its owner**: what it creates belongs to the observable, and its cleanups run newest first, before what it created is disposed. synstate ran them in the order registered.
+- **`WithInitialValueOperator` is `ProvideInitialValueOperator`**, a verb like the other two operator types, `KeepInitialValueOperator` and `DropInitialValueOperator`.
 - **The guards `isChildObservable`, `isManagerObservable` and `isRootObservable` are gone**: the kinds they told apart are not in the public types.
 
 ## One copy per program

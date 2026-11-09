@@ -3,8 +3,8 @@ import {
   noValue,
   toNode,
   view,
+  type DropInitialValueOperator,
   type ObservableClass,
-  type Operator,
 } from '../core/index.mjs';
 
 /**
@@ -13,18 +13,18 @@ import {
  */
 export function filter<A, B extends A>(
   predicate: (value: A) => value is B,
-): Operator<A, B, 'drop'>;
+): DropInitialValueOperator<A, B>;
 
 // A type guard and a boolean predicate are the same function at run time, so
 // the first signature only narrows the result. One signature with a union
 // parameter would infer `unknown` for a generic guard such as `isNotUndefined`.
 export function filter<A>(
   predicate: (value: A) => boolean,
-): Operator<A, A, 'drop'>;
+): DropInitialValueOperator<A, A>;
 
 export function filter<A>(
   predicate: (value: A) => boolean,
-): Operator<A, A, 'drop'> {
+): DropInitialValueOperator<A, A> {
   return (source) => view(new FilterClass(toNode(source), predicate));
 }
 

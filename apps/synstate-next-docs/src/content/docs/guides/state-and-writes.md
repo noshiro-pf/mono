@@ -5,7 +5,7 @@ description: createState and its options, what happens to a write made during an
 
 ## `createState` and its third element
 
-`createState(initial)` returns a tuple: the state, its setter, and an object with the rest. The tuple lets you hand the state to the code that reads it and the setter to the code that writes it.
+`createState(initialState)` returns a tuple: the state, its setter, and an object with the rest. The tuple lets you hand the state to the code that reads it and the setter to the code that writes it.
 
 ```tsx
 import { createState } from 'synstate-next';
@@ -44,7 +44,7 @@ assert.deepStrictEqual(mut_seen, [0, 10, 11, 0]);
 
 The setters return nothing. A write made inside an operator such as `map` or `derive`, while an update is recomputing values, is applied once the subscribers and bindings of the update under way have run (see below), so the value it would return is not known yet; read it with `getSnapshot` or `.value` when you need it.
 
-`state(initial)` is the same state as an object, with `.value`, `.set` and `.update`, for code that keeps them together.
+`state(initialValue)` is the same state as an object, with `.value`, `.set` and `.update`, for code that keeps them together.
 
 ## Deciding what counts as a change
 
@@ -92,7 +92,9 @@ assert.strictEqual(mut_tagUpdates.length, 1);
 // `equals` decides what counts as a change.
 const [point, setPoint] = createState(
     { x: 0, y: 0 },
-    { equals: (a, b) => a.x === b.x && a.y === b.y },
+    {
+        equals: (current, next) => current.x === next.x && current.y === next.y,
+    },
 );
 
 const mut_points: number[] = [];

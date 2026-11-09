@@ -3,9 +3,9 @@ import {
   noValue,
   toNode,
   view,
+  type DropInitialValueOperator,
   type Observable,
   type ObservableClass,
-  type Operator,
 } from '../core/index.mjs';
 
 /**
@@ -14,7 +14,7 @@ import {
  * emits nothing. Emits nothing while `other` holds no value.
  */
 export const withCurrentValueFrom =
-  <A, B>(other: Observable<B>): Operator<A, readonly [A, B], 'drop'> =>
+  <A, B>(other: Observable<B>): DropInitialValueOperator<A, readonly [A, B]> =>
   (source) =>
     view(new WithCurrentValueFromClass(toNode(source), toNode(other)));
 

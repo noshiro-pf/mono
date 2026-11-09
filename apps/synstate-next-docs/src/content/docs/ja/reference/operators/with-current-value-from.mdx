@@ -9,9 +9,9 @@ import MarbleDiagram from '../../../../../components/MarbleDiagram.astro';
 
 ソースの各値を、同じ更新で新しくなった `other` の値とペアにします。`other` だけが変わっても計算し直さないので、何も流しません。`other` が値を持たない間は何も流しません。
 
-{/* reference:init-kind */}
+{/* reference:operator-kind */}
 
-ソースが値を持っていても、結果は値を持たないことがあります。`pipe` の結果は `Observable` です（[`drop`](/mono/synstate-next/ja/guides/deriving-values/#pipe)）。
+ソースが値を持っていても、結果は値を持たないことがあります。`pipe` の結果は `Observable` です（[`DropInitialValueOperator`](/mono/synstate-next/ja/guides/deriving-values/#pipe)）。
 
 {/* /reference */}
 

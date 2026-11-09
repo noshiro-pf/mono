@@ -9,9 +9,9 @@ import MarbleDiagram from '../../../../../components/MarbleDiagram.astro';
 
 持っている値と等しい値を捨てます（`equals` を渡さなければ `Object.is` で比べます）。派生した値は、変わらなければすでにそこで更新を止めるので、これはイベントソースや、独自の比較のためのものです。
 
-{/* reference:init-kind */}
+{/* reference:operator-kind */}
 
-ソースが値を持てば、結果も値を持ちます。`pipe` は `InitializedObservable` をそのまま保ちます（[`keep`](/mono/synstate-next/ja/guides/deriving-values/#pipe)）。
+ソースが値を持てば、結果も値を持ちます。`pipe` は `InitializedObservable` をそのまま保ちます（[`KeepInitialValueOperator`](/mono/synstate-next/ja/guides/deriving-values/#pipe)）。
 
 {/* /reference */}
 

@@ -1,8 +1,8 @@
 import {
   createDerived,
   createState,
+  type DropInitialValueOperator,
   type Observable,
-  type Operator,
 } from 'synstate-next';
 
 // embed-sample-code-ignore-below
@@ -11,7 +11,7 @@ if (import.meta.vitest !== undefined) {
     // embed-sample-code-ignore-above
     // Passes on the values that are not `undefined`.
     const defined =
-      <A,>(): Operator<A | undefined, A, 'drop'> =>
+      <A,>(): DropInitialValueOperator<A | undefined, A> =>
       (source: Observable<A | undefined>): Observable<A> =>
         createDerived<A>([source], (ctx) => () => {
           const value = source.getSnapshot();

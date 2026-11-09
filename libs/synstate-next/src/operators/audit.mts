@@ -3,9 +3,9 @@ import {
   noValue,
   toNode,
   view,
+  type KeepInitialValueOperator,
   type NoValue,
   type ObservableClass,
-  type Operator,
 } from '../core/index.mjs';
 
 /**
@@ -15,7 +15,7 @@ import {
  * waiting.
  */
 export const audit =
-  <A,>(milliseconds: number): Operator<A, A, 'keep'> =>
+  <A,>(milliseconds: number): KeepInitialValueOperator<A, A> =>
   (source) =>
     view(new AuditClass(toNode(source), milliseconds));
 

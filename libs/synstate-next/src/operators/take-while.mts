@@ -3,8 +3,8 @@ import {
   noValue,
   toNode,
   view,
+  type DropInitialValueOperator,
   type ObservableClass,
-  type Operator,
 } from '../core/index.mjs';
 
 /**
@@ -12,7 +12,7 @@ import {
  * first value it fails for, passes nothing, keeping the last value passed.
  */
 export const takeWhile =
-  <A,>(predicate: (value: A) => boolean): Operator<A, A, 'drop'> =>
+  <A,>(predicate: (value: A) => boolean): DropInitialValueOperator<A, A> =>
   (source) =>
     view(new TakeWhileClass(toNode(source), predicate));
 
@@ -21,7 +21,7 @@ export const takeWhile =
  * first value it fails for, passes every value.
  */
 export const skipWhile =
-  <A,>(predicate: (value: A) => boolean): Operator<A, A, 'drop'> =>
+  <A,>(predicate: (value: A) => boolean): DropInitialValueOperator<A, A> =>
   (source) =>
     view(new SkipWhileClass(toNode(source), predicate));
 

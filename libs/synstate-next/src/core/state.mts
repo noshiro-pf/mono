@@ -46,7 +46,7 @@ export type StateOptions<A> = Readonly<{
 }>;
 
 /**
- * Creates a state holding `initial`.
+ * Creates a state holding `initialValue`.
  *
  * A write made inside an operator such as `map` or `derive`, while an update is
  * recomputing values, is applied once the subscribers and bindings of the
@@ -54,10 +54,13 @@ export type StateOptions<A> = Readonly<{
  * applied at once. Either propagates in the next update, and neither interrupts
  * the update under way.
  */
-export const state = <A,>(initial: A, options?: StateOptions<A>): State<A> =>
+export const state = <A,>(
+  initialValue: A,
+  options?: StateOptions<A>,
+): State<A> =>
   view(
     new StateClass(
-      initial,
+      initialValue,
       options?.equals ?? Object.is,
       keepOptionsOf(options?.keepEqualParts ?? false),
     ),
@@ -73,11 +76,11 @@ class StateClass<A> extends ObservableClass<A> {
   readonly #keep: ReplaceEqualDeepOptions | false;
 
   constructor(
-    initial: A,
+    initialValue: A,
     equals: (current: A, next: A) => boolean,
     keep: ReplaceEqualDeepOptions | false,
   ) {
-    super(initial, 0);
+    super(initialValue, 0);
 
     this.#equals = equals;
 

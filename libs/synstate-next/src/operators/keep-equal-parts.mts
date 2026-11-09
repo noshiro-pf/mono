@@ -4,8 +4,8 @@ import {
   noValue,
   toNode,
   view,
+  type KeepInitialValueOperator,
   type ObservableClass,
-  type Operator,
 } from '../core/index.mjs';
 
 /**
@@ -14,7 +14,7 @@ import {
  * reference. A value deeply equal to the one held emits nothing.
  */
 export const keepEqualParts =
-  <A,>(options?: ReplaceEqualDeepOptions): Operator<A, A, 'keep'> =>
+  <A,>(options?: ReplaceEqualDeepOptions): KeepInitialValueOperator<A, A> =>
   (source) =>
     view(new KeepEqualPartsClass(toNode(source), options));
 

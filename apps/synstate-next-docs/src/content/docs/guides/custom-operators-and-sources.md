@@ -13,13 +13,13 @@ An operator is a function from one observable to another. When the operators of 
 import {
     createDerived,
     createState,
+    type DropInitialValueOperator,
     type Observable,
-    type Operator,
 } from 'synstate-next';
 
 // Passes on the values that are not `undefined`.
 const defined =
-    <A,>(): Operator<A | undefined, A, 'drop'> =>
+    <A,>(): DropInitialValueOperator<A | undefined, A> =>
     (source: Observable<A | undefined>): Observable<A> =>
         createDerived<A>([source], (ctx) => () => {
             const value = source.getSnapshot();
@@ -42,7 +42,7 @@ setSelected(undefined);
 assert.strictEqual(lastSelected.getSnapshot(), 'a');
 ```
 
-The node holds nothing until it is first set, unless you give `{ initialValue }`. Typing the operator as `Operator<A, B, 'drop'>` (or `'keep'`, `'provide'`) tells `pipe` whether the result holds a value.
+The node holds nothing until it is first set, unless you give `{ initialValue }`. Typing the operator as a `DropInitialValueOperator<A, B>` (or a `KeepInitialValueOperator`, a `ProvideInitialValueOperator`) tells `pipe` whether the result holds a value. The last two return an `InitializedObservable`, so a node that may hold nothing needs `{ initialValue }` to be one. `pipe` also applies a `KeepInitialValueOperator` to an observable that holds no value yet, so its body must not count on its source holding one, and a node made here cannot know the value it would have to start with: write a `KeepInitialValueOperator` by chaining operators that keep, as a function typed as one (`const k: KeepInitialValueOperator<A, B> = (o) => o.pipe(map(f)).pipe(debounce(ms))`; written inline in `pipe`, the operator gets an `Observable` and its result is one), and type one made with `createDerived` as a `DropInitialValueOperator`. Called directly, a `KeepInitialValueOperator` takes only an `InitializedObservable`, so write `source.pipe(map(f))` rather than `map(f)(source)`.
 
 ## Several parents
 
@@ -105,13 +105,13 @@ A value that comes later than the update that made the node recompute is passed 
 import {
     createDerived,
     source,
+    type DropInitialValueOperator,
     type Observable,
-    type Operator,
 } from 'synstate-next';
 
 // Passes each value on `milliseconds` later, in an update of its own.
 const delay =
-    <A,>(milliseconds: number): Operator<A, A, 'drop'> =>
+    <A,>(milliseconds: number): DropInitialValueOperator<A, A> =>
     (parent: Observable<A>): Observable<A> =>
         createDerived<A>([parent], (ctx) => {
             const mut_timers = new Set<ReturnType<typeof setTimeout>>();

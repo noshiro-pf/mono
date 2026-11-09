@@ -1,19 +1,21 @@
 ---
 title: 値を派生させる
-description: pipe と InitKind、derive、merge と zip、値が変わらなければ止まること、追いかけずに値を読む方法。
+description: pipe と 3 種類のオペレーター、derive、merge と zip、値が変わらなければ止まること、追いかけずに値を読む方法。
 ---
 
 ## `pipe`
 
-`observable.pipe(op)` は 1 つのオペレーターを適用します。さらに適用するときは、`a.pipe(map(f)).pipe(filter(p))` のように `pipe` をつなぎます。各オペレーターは、最初に持っている値をどう扱うかを型で宣言しています。
+`observable.pipe(op)` は 1 つのオペレーターを適用します。さらに適用するときは、`a.pipe(map(f)).pipe(filter(p))` のように `pipe` をつなぎます。各オペレーターは、最初に持っている値をどう扱うかを、受け取る型と返す型で表しています。
 
-| `InitKind` | 意味                                     | オペレーター                                                                                                         |
-| :--------- | :--------------------------------------- | :------------------------------------------------------------------------------------------------------------------- |
-| `keep`     | ソースが値を持てば値を持つ               | `map`・`debounce`・`throttle`・`audit`・`take`・`takeUntil`・`skipIfNoChange`・`keepEqualParts`・`withBufferedFrom`  |
-| `drop`     | ソースにかかわらず値を持たないことがある | `filter`・`skip`・`takeWhile`・`skipWhile`・`skipUntil`・`pairwise`・`switchMap`・`mergeMap`・`withCurrentValueFrom` |
-| `provide`  | 常に値を持つ                             | `scan`・`withInitialValue`                                                                                           |
+| オペレーターの型              | 意味                                     | オペレーター                                                                                                         |
+| :---------------------------- | :--------------------------------------- | :------------------------------------------------------------------------------------------------------------------- |
+| `KeepInitialValueOperator`    | ソースが値を持てば値を持つ               | `map`・`debounce`・`throttle`・`audit`・`take`・`takeUntil`・`skipIfNoChange`・`keepEqualParts`・`withBufferedFrom`  |
+| `DropInitialValueOperator`    | ソースにかかわらず値を持たないことがある | `filter`・`skip`・`takeWhile`・`skipWhile`・`skipUntil`・`pairwise`・`switchMap`・`mergeMap`・`withCurrentValueFrom` |
+| `ProvideInitialValueOperator` | 常に値を持つ                             | `scan`・`withInitialValue`                                                                                           |
 
-`pipe` は、オペレーターの種類を結果の型に反映します。`.value` を持つ `InitializedObservable<A>` か、`hasValue` と `getSnapshot()` を持つ `Observable<A>` です。例は[概要](/mono/synstate-next/ja/getting-started/introduction/#pipe-で値を派生させる)にあります。
+`pipe` は、オペレーターの型を結果の型に反映します。`.value` を持つ `InitializedObservable<A>` か、`hasValue` と `getSnapshot()` を持つ `Observable<A>` です。例は[概要](/mono/synstate-next/ja/getting-started/introduction/#pipe-で値を派生させる)にあります。
+
+種類は、横に添えた印ではなく、オペレーターが受け取る型と返す型そのものに表れています。`ProvideInitialValueOperator` は `InitializedObservable` を返す型なので、値を持たないかもしれない Observable を返す自作のオペレーターは、キャストしない限りこの型になりません。
 
 ## `derive`
 

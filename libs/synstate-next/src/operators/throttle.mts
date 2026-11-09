@@ -3,8 +3,8 @@ import {
   noValue,
   toNode,
   view,
+  type KeepInitialValueOperator,
   type ObservableClass,
-  type Operator,
 } from '../core/index.mjs';
 
 /**
@@ -12,7 +12,7 @@ import {
  * Holds the value the source holds at the start, without opening a window.
  */
 export const throttle =
-  <A,>(milliseconds: number): Operator<A, A, 'keep'> =>
+  <A,>(milliseconds: number): KeepInitialValueOperator<A, A> =>
   (source) =>
     view(new ThrottleClass(toNode(source), milliseconds));
 

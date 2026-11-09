@@ -13,13 +13,13 @@ description: createDerived でオペレーターを、createSource でソース�
 import {
     createDerived,
     createState,
+    type DropInitialValueOperator,
     type Observable,
-    type Operator,
 } from 'synstate-next';
 
 // Passes on the values that are not `undefined`.
 const defined =
-    <A,>(): Operator<A | undefined, A, 'drop'> =>
+    <A,>(): DropInitialValueOperator<A | undefined, A> =>
     (source: Observable<A | undefined>): Observable<A> =>
         createDerived<A>([source], (ctx) => () => {
             const value = source.getSnapshot();
@@ -42,7 +42,7 @@ setSelected(undefined);
 assert.strictEqual(lastSelected.getSnapshot(), 'a');
 ```
 
-`{ initialValue }` を渡さない限り、ノードは最初に set されるまで何も持ちません。オペレーターを `Operator<A, B, 'drop'>`（あるいは `'keep'`・`'provide'`）と型付けすれば、結果が値を持つかどうかを `pipe` に伝えられます。
+`{ initialValue }` を渡さない限り、ノードは最初に set されるまで何も持ちません。オペレーターを `DropInitialValueOperator<A, B>`（あるいは `KeepInitialValueOperator`・`ProvideInitialValueOperator`）と型付けすれば、結果が値を持つかどうかを `pipe` に伝えられます。後の 2 つは `InitializedObservable` を返す型なので、何も持たないことがあるノードをそう型付けするには `{ initialValue }` が要ります。`pipe` は `KeepInitialValueOperator` を、まだ値を持たない Observable にも適用するので、その本体はソースが値を持っていることを当てにしてはいけません。ここで作るノードは、最初に持つべき値を知ることもできません。`KeepInitialValueOperator` は値を保つオペレーターをつなぎ、その型を付けた関数として書き（`const k: KeepInitialValueOperator<A, B> = (o) => o.pipe(map(f)).pipe(debounce(ms))`。`pipe` の中にそのまま書くと、オペレーターは `Observable` を受け取り、結果も `Observable` になります）、`createDerived` で作るものは `DropInitialValueOperator` と型付けしてください。また直接呼ぶと `InitializedObservable` しか受け取らないので、`map(f)(source)` ではなく `source.pipe(map(f))` と書きます。
 
 ## 複数の親
 
@@ -105,13 +105,13 @@ assert.deepStrictEqual(mut_seen, [
 import {
     createDerived,
     source,
+    type DropInitialValueOperator,
     type Observable,
-    type Operator,
 } from 'synstate-next';
 
 // Passes each value on `milliseconds` later, in an update of its own.
 const delay =
-    <A,>(milliseconds: number): Operator<A, A, 'drop'> =>
+    <A,>(milliseconds: number): DropInitialValueOperator<A, A> =>
     (parent: Observable<A>): Observable<A> =>
         createDerived<A>([parent], (ctx) => {
             const mut_timers = new Set<ReturnType<typeof setTimeout>>();

@@ -3,8 +3,8 @@ import {
   noValue,
   toNode,
   view,
+  type KeepInitialValueOperator,
   type ObservableClass,
-  type Operator,
 } from '../core/index.mjs';
 
 /**
@@ -13,7 +13,7 @@ import {
  * it drops a value still waiting.
  */
 export const debounce =
-  <A,>(milliseconds: number): Operator<A, A, 'keep'> =>
+  <A,>(milliseconds: number): KeepInitialValueOperator<A, A> =>
   (source) =>
     view(new DebounceClass(toNode(source), milliseconds));
 

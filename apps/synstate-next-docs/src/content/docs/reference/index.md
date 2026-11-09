@@ -12,7 +12,7 @@ Each page gives the API's description, taken from its JSDoc, and an example that
 - [`createState`](/mono/synstate-next/reference/state/create-state/): A state as a tuple of the observable, its setter and the rest, for code that passes them to different places.
 - [`createReducer`](/mono/synstate-next/reference/state/create-reducer/): A state written only by `dispatch`, through `reducer`.
 - [`createBooleanState`](/mono/synstate-next/reference/state/create-boolean-state/): A boolean state with `setTrue`, `setFalse` and `toggle`.
-- [`state`](/mono/synstate-next/reference/state/state/): Creates a state holding `initial`.
+- [`state`](/mono/synstate-next/reference/state/state/): Creates a state holding `initialValue`.
 
 ## Events
 
@@ -51,7 +51,7 @@ Each page gives the API's description, taken from its JSDoc, and an example that
 - [`skipUntil`](/mono/synstate-next/reference/operators/skip-until/): Passes nothing until `notifier` emits, then every value of the source, the one it emits in the update the notifier emits in included.
 - [`skipIfNoChange`](/mono/synstate-next/reference/operators/skip-if-no-change/): Drops a value equal to the one held (`Object.is` unless `equals` says otherwise).
 - [`keepEqualParts`](/mono/synstate-next/reference/operators/keep-equal-parts/): Replaces the parts of each value that are deeply equal to the held value's with the held value's own, so that a part that did not change keeps its reference.
-- [`withInitialValue`](/mono/synstate-next/reference/operators/with-initial-value/): Holds `initial` until the source emits, then follows the source.
+- [`withInitialValue`](/mono/synstate-next/reference/operators/with-initial-value/): Holds `initialValue` until the source emits, then follows the source.
 - [`withCurrentValueFrom`](/mono/synstate-next/reference/operators/with-current-value-from/): Pairs each value of the source with the value `other` holds, up to date for the same update.
 - [`withBufferedFrom`](/mono/synstate-next/reference/operators/with-buffered-from/): Gives each value of the source the values `other` emitted since the previous one, in order: those emitted in the same update included, those it held before this node was created not.
 - [`debounce`](/mono/synstate-next/reference/operators/debounce/): Emits the latest value once `milliseconds` have passed without another, in an update of its own.

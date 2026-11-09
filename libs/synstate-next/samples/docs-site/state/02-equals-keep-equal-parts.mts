@@ -40,7 +40,9 @@ if (import.meta.vitest !== undefined) {
     // `equals` decides what counts as a change.
     const [point, setPoint] = createState(
       { x: 0, y: 0 },
-      { equals: (a, b) => a.x === b.x && a.y === b.y },
+      {
+        equals: (current, next) => current.x === next.x && current.y === next.y,
+      },
     );
 
     const mut_points: number[] = [];

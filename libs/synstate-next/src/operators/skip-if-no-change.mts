@@ -3,8 +3,8 @@ import {
   noValue,
   toNode,
   view,
+  type KeepInitialValueOperator,
   type ObservableClass,
-  type Operator,
 } from '../core/index.mjs';
 
 /**
@@ -13,16 +13,21 @@ import {
  * this is for an event source, or for a comparison of its own.
  */
 export const skipIfNoChange =
-  <A,>(equals?: (a: A, b: A) => boolean): Operator<A, A, 'keep'> =>
+  <A,>(
+    equals?: (current: A, next: A) => boolean,
+  ): KeepInitialValueOperator<A, A> =>
   (source) =>
     view(new SkipIfNoChangeClass(toNode(source), equals ?? Object.is));
 
 class SkipIfNoChangeClass<A> extends DerivedClass<A> {
   readonly #parent: ObservableClass<A>;
 
-  readonly #equals: (a: A, b: A) => boolean;
+  readonly #equals: (current: A, next: A) => boolean;
 
-  constructor(parent: ObservableClass<A>, equals: (a: A, b: A) => boolean) {
+  constructor(
+    parent: ObservableClass<A>,
+    equals: (current: A, next: A) => boolean,
+  ) {
     super([parent], parent.current);
 
     this.#parent = parent;

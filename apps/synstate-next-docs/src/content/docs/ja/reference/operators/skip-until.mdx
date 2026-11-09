@@ -9,9 +9,9 @@ import MarbleDiagram from '../../../../../components/MarbleDiagram.astro';
 
 `notifier` が値を流すまで何も流さず、その後はソースのすべての値を流します。notifier が流したのと同じ更新でソースが流した値も流します。notifier が最初に持っている値は、値を流したことに数えません。
 
-{/* reference:init-kind */}
+{/* reference:operator-kind */}
 
-ソースが値を持っていても、結果は値を持たないことがあります。`pipe` の結果は `Observable` です（[`drop`](/mono/synstate-next/ja/guides/deriving-values/#pipe)）。
+ソースが値を持っていても、結果は値を持たないことがあります。`pipe` の結果は `Observable` です（[`DropInitialValueOperator`](/mono/synstate-next/ja/guides/deriving-values/#pipe)）。
 
 {/* /reference */}
 
