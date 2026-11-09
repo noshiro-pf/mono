@@ -666,6 +666,10 @@ describe('removing attributes', () => {
     setValue('a');
 
     assert.strictEqual(select?.value, 'a');
+
+    setValue('b');
+
+    assert.strictEqual(select?.value, 'b');
   });
 });
 
