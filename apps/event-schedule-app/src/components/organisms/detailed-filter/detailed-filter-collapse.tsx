@@ -22,7 +22,10 @@ const dc = dict.answerPage.detailedFilter.filterItems;
 export const DetailedFilterCollapse = ({ isOpen }: Props): JSX.Element => (
   <Collapse isOpen={isOpen}>
     <div class={constant(styles.collapseScroll)}>
-      <div class={constant(styles.collapseBox)}>
+      <div
+        class={constant(styles.collapseBox)}
+        data-e2e={constant('detailed-filter')}
+      >
         <DetailedFilterDateRange />
         <DetailedFilterDayOfWeek />
         <DetailedFilterScoreRange />
