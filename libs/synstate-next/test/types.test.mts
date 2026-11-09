@@ -22,9 +22,11 @@ import {
   type InitializedObservable,
   type KeepInitialValueOperator,
   type Observable,
+  type ObservableValue,
   type ProvideInitialValueOperator,
+  type ValuesOf,
 } from 'synstate-next';
-import { expectType, isNotUndefined } from 'ts-data-forge';
+import { Arr, expectType, isNotUndefined } from 'ts-data-forge';
 import type { FixedLengthTuple } from 'ts-type-forge';
 
 describe('types', () => {
@@ -252,5 +254,61 @@ describe('types', () => {
     const _kept = s.pipe(filter((x) => x !== 0));
 
     expectType<typeof _kept, Observable<number | undefined>>('=');
+  });
+
+  test('ObservableValue names the type of the values an observable holds', () => {
+    const s = state(0);
+
+    const _e = source<string>();
+
+    const mapped = s.pipe(map((x) => [x] as const));
+
+    expectType<ObservableValue<typeof s>, number>('=');
+
+    expectType<ObservableValue<typeof _e>, string>('=');
+
+    expectType<ObservableValue<typeof mapped>, readonly [number]>('=');
+
+    expectType<
+      ObservableValue<Observable<number | undefined>>,
+      number | undefined
+    >('=');
+
+    expectType<ObservableValue<InitializedObservable<boolean>>, boolean>('=');
+
+    expectType<ObservableValue<never>, unknown>('=');
+
+    expectType<
+      ValuesOf<readonly [never, Observable<number>]>,
+      readonly [unknown, number]
+    >('=');
+
+    expectType<
+      ObservableValue<Observable<number> | InitializedObservable<string>>,
+      number | string
+    >('=');
+
+    // @ts-expect-error a union with a member that is not an observable
+    expectType<ObservableValue<Observable<number> | undefined>, number>('=');
+
+    assert.strictEqual(mapped.value[0], s.value);
+  });
+
+  test('derive spreads the values of an array narrowed by Arr.isNonEmpty', () => {
+    const total = (values: readonly number[]): number => Arr.sum(values);
+
+    const parents: readonly InitializedObservable<number>[] = [
+      state(1),
+      state(2),
+    ] as const;
+
+    assert.isTrue(Arr.isNonEmpty(parents));
+
+    if (Arr.isNonEmpty(parents)) {
+      assert.strictEqual(
+        derive(parents, (...values) => total(values)).value,
+        3,
+      );
+    }
   });
 });

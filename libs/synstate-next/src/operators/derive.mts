@@ -8,7 +8,13 @@ import {
   type ObservableClass,
 } from '../core/index.mjs';
 
-/** The values of a tuple of observables. */
+/**
+ * The values of a tuple of observables. Not written with `ObservableValue`: on
+ * the intersection an array narrowed by `Arr.isNonEmpty` has, the mapped type
+ * maps the array's other members (`length`, `map`) too, which `never` leaves
+ * assignable to an array and `ObservableValue` does not, so `(...values) => …`
+ * would not type-check.
+ */
 export type ValuesOf<P extends readonly Observable<unknown>[]> = Readonly<{
   [K in keyof P]: P[K] extends Observable<infer V> ? V : never;
 }>;

@@ -268,6 +268,9 @@ from the prototype; the packages are to be measured again in
 - A source that is done (a `timer` that fired, a `fromPromise` that resolved, a
   `fromSubscribable` whose subscribable completed) is settled, not completed:
   it keeps its value and its subscribers until its owner disposes it.
+- The public types follow; what stays, what is renamed and what is gone is
+  listed on the docs site's changes page
+  (`apps/synstate-next-docs/src/content/docs/background/changes-from-synstate.md`).
 
 ## Tests
 

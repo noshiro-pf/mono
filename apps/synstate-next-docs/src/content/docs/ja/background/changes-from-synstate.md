@@ -52,6 +52,12 @@ synstate-next は、次のメジャーバージョンで synstate を置き換�
 - **`WithInitialValueOperator` は `ProvideInitialValueOperator` になりました。** ほかの 2 つのオペレーターの型、`KeepInitialValueOperator`・`DropInitialValueOperator` と同じく動詞です。
 - **`isChildObservable`・`isManagerObservable`・`isRootObservable` の型ガードはなくなりました。** それらが区別していた種類は公開の型にありません。
 
+## 型
+
+- **`ObservableValue` は残り、Observable の型だけを受け取ります。** `ObservableValue<Observable<number> | undefined>` はエラーです。synstate では `undefined` が落とされていました。また `ObservableValue<never>` は `never` ではなく `unknown` です。
+- **名前が変わった型があります。** `Subscription` は `subscribe` が返す関数の型 `Unsubscribe` に、`Scope` は `Owner` に、`Unwrap` は `ValuesOf` に、`SourceObservable` は `Source` になりました。オペレーターやソースを書くための型（`RootObservableConfig`・`RootObservableTools`・`ChildObservableConfig`・`SyncChildObservableHooks`・`SyncChildObservableTools`・`AsyncChildObservableHooks`・`AsyncChildObservableTools`）は、`SourceContext`・`DerivedContext`・`DerivedBehavior` になりました。
+- **なくなった型があります。** `Subscriber` は `onComplete` とともに、`InitializedSourceObservable` は `source(initialValue)` とともになくなりました。Observable の種類ごとの型（`ObservableBase`・`ObservableKind`・`RootObservable`・`ChildObservable`・`ManagerObservable`・`TimerObservable`・`MapOperatorObservable` など）は、Observable が `Observable` か `InitializedObservable` のどちらかになったのでなくなりました。`Operator` は、オペレーターを 3 つのオペレーター型のどれかで表すのでなくなりました。`UpdateToken` と `TimerId`、補助の型 `Wrap`・`WrapInitialized`・`NonEmptyUnknownList`・`TupleToQueueTuple` もなくなりました。
+
 ## 1 つのプログラムに 1 つのコピー
 
 パッケージの 2 つのコピーの Observable は組み合わせられません。別のコピーの Observable を渡すと、グラフが例外を投げます。

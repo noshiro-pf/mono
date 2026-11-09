@@ -83,6 +83,20 @@ export type Observable<A> = Readonly<{
 }>;
 
 /**
+ * The type of the values `O` holds and emits: `ObservableValue<typeof count>`
+ * names it where only the observable is at hand, as in a hook that returns its
+ * value. Of a union of observables, the union of their values. `O` must be an
+ * observable, so that `Observable<number> | undefined` is an error rather than
+ * a type whose `undefined` is dropped unseen. It does not distribute, so
+ * `never` gives `unknown`, as an element of `ValuesOf` does.
+ */
+export type ObservableValue<O extends Observable<unknown>> = [O] extends [
+  Observable<infer A>,
+]
+  ? A
+  : never;
+
+/**
  * An observable that always holds a value. `getSnapshot` is replaced, not
  * intersected, so that it has the one signature that returns `A`: an
  * intersection would also keep `() => A | undefined`, which inference against
