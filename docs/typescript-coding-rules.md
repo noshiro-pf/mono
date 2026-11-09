@@ -122,6 +122,29 @@ One component per file.
       (`@typescript-eslint/require-array-sort-compare`).
     - No operations that easily throw, such as a `reduce` without an initial
       value or an unchecked division (see "Troubleshooting").
+- Claims a value must earn
+    - When a type grants a stronger guarantee than another (holds a value, is
+      validated, is not empty), put it in a type the implementation has to
+      produce: the return type, or a required member. A wrong implementation
+      then fails to type-check, and only an explicit `as` or a type guard can
+      claim the guarantee.
+
+        ```ts
+        type WithInitialValue<A, B> = (
+            source: Observable<A>,
+        ) => InitializedObservable<B>;
+
+        // Type error: `filter` may drop the value, so the result is an
+        // `Observable`, not an `InitializedObservable`.
+        const op: WithInitialValue<number, number> = (s) =>
+            s.pipe(filter((x) => x > 0));
+        ```
+
+    - A marker that exists only in the type (a key declared as
+      `declare const tag: unique symbol`) is required, never optional. An
+      optional one is satisfied by every value that lacks it, so the claim it
+      stands for is accepted with no `as`
+      (`ts-restrictions/no-optional-phantom-property`).
 - Branching on a kind
     - When a reducer or any other function branches on the kind of its input
       (an action's `type`, a string literal union), name every kind as a

@@ -233,6 +233,20 @@ namespace NoNegatedComparison {
 }
 
 /**
+ * @description Disallow an optional property keyed by a type-only symbol (`declare const tag: unique symbol`), which every value that lacks it satisfies
+ *
+ *  ```md
+ *  | key        | value   |
+ *  | :--------- | :------ |
+ *  | type       | problem |
+ *  | deprecated | false   |
+ *  ```
+ */
+namespace NoOptionalPhantomProperty {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
  * @description Disallow a comment paragraph wrapped unevenly: a line with room for the first word of the line after it
  *
  *  ```md
@@ -721,6 +735,7 @@ export type EslintTsRestrictionsRules = Readonly<{
   'ts-restrictions/no-detached-jsdoc': NoDetachedJsdoc.RuleEntry;
   'ts-restrictions/no-export-type-side-effects': NoExportTypeSideEffects.RuleEntry;
   'ts-restrictions/no-negated-comparison': NoNegatedComparison.RuleEntry;
+  'ts-restrictions/no-optional-phantom-property': NoOptionalPhantomProperty.RuleEntry;
   'ts-restrictions/no-ragged-comment-wrap': NoRaggedCommentWrap.RuleEntry;
   'ts-restrictions/no-restricted-cast-name': NoRestrictedCastName.RuleEntry;
   'ts-restrictions/no-restricted-syntax': NoRestrictedSyntax.RuleEntry;

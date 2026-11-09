@@ -8,6 +8,7 @@ import { noDateOnlyStringToDate } from './no-date-only-string-to-date.mjs';
 import { noDetachedJsdoc } from './no-detached-jsdoc.mjs';
 import { noExportTypeSideEffects } from './no-export-type-side-effects.mjs';
 import { noNegatedComparison } from './no-negated-comparison.mjs';
+import { noOptionalPhantomProperty } from './no-optional-phantom-property.mjs';
 import { noRaggedCommentWrap } from './no-ragged-comment-wrap.mjs';
 import { noRestrictedCastName } from './no-restricted-cast-name.mjs';
 import { noRestrictedSyntax } from './no-restricted-syntax.mjs';
@@ -36,6 +37,7 @@ export const tsRestrictionsRules = {
   'no-detached-jsdoc': noDetachedJsdoc,
   'no-export-type-side-effects': noExportTypeSideEffects,
   'no-negated-comparison': noNegatedComparison,
+  'no-optional-phantom-property': noOptionalPhantomProperty,
   'no-ragged-comment-wrap': noRaggedCommentWrap,
   'no-restricted-cast-name': noRestrictedCastName,
   'no-restricted-syntax': noRestrictedSyntax,
