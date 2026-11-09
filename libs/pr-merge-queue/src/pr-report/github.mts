@@ -481,7 +481,9 @@ export const createClient = (
   > => {
     const prefix = `/repos/${repo.owner}/${repo.name}/commits/${sha}` as const;
 
-    const runs = await checkRuns(prefix, await workflowRounds(repo, sha));
+    const rounds = await workflowRounds(repo, sha);
+
+    const runs = await checkRuns(prefix, rounds);
 
     if (Result.isErr(runs)) {
       return Result.err(`check runs: ${runs.value}`);
@@ -497,8 +499,13 @@ export const createClient = (
     }
 
     return Result.ok({
-      reported: reportedContexts(runs.value, statuses.value.statuses),
-      running: anyRunInProgress(runs.value),
+      reported: reportedContexts(
+        runs.value,
+        statuses.value.statuses,
+        Date.now(),
+        rounds,
+      ),
+      running: anyRunInProgress(runs.value, rounds),
     });
   };
 

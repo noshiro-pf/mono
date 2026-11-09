@@ -148,7 +148,7 @@ const sendEveryQuery = async (): Promise<readonly Sent[]> => {
 
     await armAutoMerge(api, 'PR_node');
 
-    await readHeadChecks(api, 1);
+    await readHeadChecks(api, 1, 'a'.repeat(40));
 
     await markReady(api, 'PR_node');
 

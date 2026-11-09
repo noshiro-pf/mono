@@ -129,7 +129,7 @@ export const watch = async (
       return { outcome: 'behind-again' };
     }
 
-    const checks = await readHeadChecks(api, pr.number);
+    const checks = await readHeadChecks(api, pr.number, expectedHead);
 
     if (Result.isErr(checks)) {
       mut_errors += 1;

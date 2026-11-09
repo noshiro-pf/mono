@@ -8,6 +8,7 @@ import {
   epochMsOf,
   isOfEarlierAttempt,
   outranks,
+  RE_RUN_GRACE_MS,
   readWorkflowRound,
   summarizeChecks as summarizeContexts,
   type CheckRunRank,
@@ -81,6 +82,7 @@ export type RunningCheck = Readonly<{
 export const readHeadChecks = async (
   api: ApiContext,
   prNumber: number,
+  headSha: string,
 ): Promise<Result<HeadChecks, string>> => {
   const read = await readCheckContexts(api, prNumber);
 
@@ -108,8 +110,75 @@ export const readHeadChecks = async (
   const rounds = await readRedRounds(api, runIds);
 
   // Failed as the rollup read would: a poll error, not a red let through.
-  return Result.map(rounds, (read_) => headChecksOf(contexts, read_));
+  if (Result.isErr(rounds)) {
+    return rounds;
+  }
+
+  const held = await readHeldRuns(
+    api,
+    headSha,
+    Arr.uniq(Array.from(rounds.value.values(), (round) => round.workflowId)),
+    contexts,
+  );
+
+  if (Result.isErr(held)) {
+    return held;
+  }
+
+  const checks = headChecksOf(contexts, rounds.value);
+
+  return Result.ok({ ...checks, running: [...checks.running, ...held.value] });
 };
+
+/**
+ * The workflow runs on the head, of the workflows `runs` were read for, that
+ * have not finished and have no check on the head, each as a check running with
+ * no start. A run a concurrency group holds behind the one it replaces has no
+ * jobs until that one ends, so nothing in the rollup says a newer round is
+ * coming, and the cancelled jobs of the round before read as this round's
+ * failures (#3703). Listed as running, it says the round is not over, and its
+ * greater run id marks the reds of its workflow's earlier run as superseded
+ * ({@link summarizeChecks}). Only for `RE_RUN_GRACE_MS` after it was created,
+ * read at `nowMs`, as a re-run holds a red back, so that a run GitHub never
+ * starts does not hold one for good.
+ */
+export const heldRunsOf = (
+  runs: readonly WorkflowRunListed[],
+  contexts: readonly CheckContextNode[],
+  nowMs: number = currentEpochMs(),
+): readonly RunningCheck[] => {
+  const onHead = new Set(
+    contexts
+      .map((context) =>
+        context.__typename === 'CheckRun'
+          ? workflowRunId(context.detailsUrl ?? '')
+          : undefined,
+      )
+      .filter((id) => id !== undefined),
+  );
+
+  return runs
+    .filter(({ id, status, created_at: createdAt }) => {
+      const createdMs = epochMsOf(createdAt);
+
+      return (
+        status !== 'completed' &&
+        !onHead.has(id) &&
+        createdMs !== undefined &&
+        nowMs - createdMs <= RE_RUN_GRACE_MS
+      );
+    })
+    .map(({ name, html_url: url }) => ({
+      name: `${name ?? 'a workflow'} (waiting to start)`,
+      startedAt: undefined,
+      workflow: name ?? '',
+      // `workflowRunId` reads the id between slashes.
+      link: `${url}/`,
+    }));
+};
+
+/** One workflow run as REST lists it, as much as {@link heldRunsOf} reads. */
+export type WorkflowRunListed = t.TypeOf<typeof WorkflowRunListedSchema>;
 
 /**
  * Whether GitHub answers a check rollup read at all, asked of `sha` — the tip
@@ -355,6 +424,57 @@ const readRedRounds = async (
 
   return Result.ok(mut_rounds);
 };
+
+/**
+ * {@link heldRunsOf} over the runs of `workflowIds` on `headSha`, newest first,
+ * or why they could not be read. The few newest are enough: a held run is the
+ * one created last.
+ */
+const readHeldRuns = async (
+  api: ApiContext,
+  headSha: string,
+  workflowIds: readonly number[],
+  contexts: readonly CheckContextNode[],
+): Promise<Result<readonly RunningCheck[], string>> => {
+  const reads = await Promise.all(
+    workflowIds.map(async (workflowId) =>
+      rest(
+        api,
+        'GET',
+        `/actions/workflows/${workflowId}/runs?head_sha=${headSha}&per_page=${HELD_RUNS_PAGE}`,
+        WorkflowRunsListedSchema,
+      ),
+    ),
+  );
+
+  const mut_held: RunningCheck[] = [];
+
+  for (const read of reads) {
+    if (Result.isErr(read)) {
+      return Result.err(
+        `could not read the workflow runs of a red's workflow: ${read.value}`,
+      );
+    }
+
+    mut_held.push(...heldRunsOf(read.value.workflow_runs, contexts));
+  }
+
+  return Result.ok(mut_held);
+};
+
+const HELD_RUNS_PAGE = 10;
+
+const WorkflowRunListedSchema = t.record({
+  id: t.number(),
+  name: t.union([t.string(), t.nullType]),
+  status: t.union([t.string(), t.nullType]),
+  html_url: t.string(),
+  created_at: t.string(),
+});
+
+const WorkflowRunsListedSchema = t.record({
+  workflow_runs: t.array(WorkflowRunListedSchema),
+});
 
 /**
  * One page of the head commit's contexts, from `after` on; `null` when the head

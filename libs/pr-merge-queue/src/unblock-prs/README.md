@@ -665,7 +665,10 @@ round のものとして、round が終わるまで待ちます。`open-pr` が�
 になりました）。同じ workflow のもっと新しい run がまだ実行中の fail も前の round
 のものとして待ちます。`skip-ci` を付けた round のキャンセルが遅れると、その集約は
 新しい round が始まった後に赤くなるので、時刻では見分けられません（#2463 はこれで
-`checks-failed` になりました）。同じ workflow と event の同じ job の run が複数あ
+`checks-failed` になりました）。新しい run が concurrency group で前の run の後ろに
+止められていてジョブをまだ持たないときも同じで、必須の赤があるときはその workflow
+の head 上の run を REST で読み、終わっていない run を実行中として数えます（#3703
+はこれで `checks-failed` になりました）。同じ workflow と event の同じ job の run が複数あ
 るときに読むのは、最後に始まったものではなく、`pr-report` と同じく check suite、
 次にその中の check run で最も新しいものです。キューで待っている再実行や新しい
 round の集約はまだ開始時刻を持たず、開始時刻で順位を付けると置き換えるはずの赤に
@@ -1769,17 +1772,21 @@ real round aside halfway through (#2246 was set aside `checks-failed` so).
 So is a failure whose workflow has a newer run still running: when the round
 `skip-ci` was put on for is slow to cancel, its aggregate goes red after the
 round replacing it has started, and the time alone cannot tell them apart (#2463
-was set aside `checks-failed` so). Of several runs of one job in one workflow
-and event, the one read is the latest by check suite, then by check run in it,
-as `pr-report` ranks them — not the one that started last: a queued re-run, or
-the new round's queued aggregate, has no start yet, and ranked so it lost to the
-red it replaces (#3334). So does a failure that finished before the latest
-attempt of its own workflow run began, while that run has not finished: "Re-run
-failed jobs" queues the failed job again, and the aggregate that needs it is not
-created again until that job is done. When the attempt began is REST's
-`run_started_at`, which a re-run sets anew, read only when a required context is
-red (`pr-report-core`'s `isOfEarlierAttempt`, which `pr-report` applies too),
-and the failure waits no longer than 40 minutes after it (`RE_RUN_GRACE_MS`).
+was set aside `checks-failed` so). The newer run may have no jobs yet, held by
+its concurrency group behind the one it replaces, so where a required check is
+red the runs of its workflow on the head are read over REST, and one not
+finished counts as running (#3703 was set aside `checks-failed` so). Of several
+runs of one job in one workflow and event, the one read is the latest by check
+suite, then by check run in it, as `pr-report` ranks them — not the one that
+started last: a queued re-run, or the new round's queued aggregate, has no start
+yet, and ranked so it lost to the red it replaces (#3334). So does a failure
+that finished before the latest attempt of its own workflow run began, while
+that run has not finished: "Re-run failed jobs" queues the failed job again, and
+the aggregate that needs it is not created again until that job is done. When
+the attempt began is REST's `run_started_at`, which a re-run sets anew, read
+only when a required context is red (`pr-report-core`'s `isOfEarlierAttempt`,
+which `pr-report` applies too), and the failure waits no longer than 40 minutes
+after it (`RE_RUN_GRACE_MS`).
 Nor does a commit status count as the round's start: one pending since long ago
 would put it before the round before's reds.
 
