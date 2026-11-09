@@ -90,7 +90,7 @@ export const StatToggle = ({
   return (
     <div class={constant('stat-cell')}>
       <button
-        aria-pressed={mapBindable(pressed, String)}
+        aria-pressed={pressed}
         class={constant('stat-tile stat-toggle')}
         data-only={mapBindable(only, String)}
         data-status={tone}
@@ -111,7 +111,7 @@ export const StatToggle = ({
       </button>
       <button
         aria-label={constant(`Show only ${subject ?? label}`)}
-        aria-pressed={mapBindable(only, String)}
+        aria-pressed={only}
         class={constant('stat-only')}
         title={mapBindable(only, (picked) =>
           picked

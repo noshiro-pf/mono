@@ -75,7 +75,7 @@ const Zoom = (): JSX.Element => {
         class={constant('view-switch')}
       >
         <button
-          aria-pressed={fitted$.pipe(map(String))}
+          aria-pressed={fitted$}
           class={constant('view-switch-option')}
           title={constant('The whole graph in the box, however large it is')}
           type={constant('button')}
@@ -85,8 +85,9 @@ const Zoom = (): JSX.Element => {
         </button>
 
         <button
-          aria-pressed={deriveBindable([fitted$, scale$], (fitted, scale) =>
-            (!fitted && scale === 1).toString(),
+          aria-pressed={deriveBindable(
+            [fitted$, scale$],
+            (fitted, scale) => !fitted && scale === 1,
           )}
           class={constant('view-switch-option')}
           title={constant('Back to the natural size')}

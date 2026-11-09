@@ -17,7 +17,7 @@ export const DagViewModeSwitch = (): JSX.Element => (
     {dagViewModes.map((mode) => (
       <button
         aria-pressed={dagViewModeStore.mode.pipe(
-          map((current) => (current === mode).toString()),
+          map((current) => current === mode),
         )}
         class={{
           'bp6-button': constant(true),

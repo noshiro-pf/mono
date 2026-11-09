@@ -48,9 +48,7 @@ export const IssuesListFilters = (): JSX.Element => {
           class={constant('theme-switch')}
         >
           <button
-            aria-pressed={view$.pipe(
-              map(({ sort }) => (sort === 'updated').toString()),
-            )}
+            aria-pressed={view$.pipe(map(({ sort }) => sort === 'updated'))}
             class={constant('theme-switch-option')}
             title={constant('The most recently updated first.')}
             type={constant('button')}
@@ -59,9 +57,7 @@ export const IssuesListFilters = (): JSX.Element => {
             {constant('updated')}
           </button>
           <button
-            aria-pressed={view$.pipe(
-              map(({ sort }) => (sort === 'priority').toString()),
-            )}
+            aria-pressed={view$.pipe(map(({ sort }) => sort === 'priority'))}
             class={constant('theme-switch-option')}
             title={constant(
               'High first; no priority is between mid and low. The most recently updated first within each.',
@@ -72,9 +68,7 @@ export const IssuesListFilters = (): JSX.Element => {
             {constant('priority')}
           </button>
           <button
-            aria-pressed={view$.pipe(
-              map(({ sort }) => (sort === 'start').toString()),
-            )}
+            aria-pressed={view$.pipe(map(({ sort }) => sort === 'start'))}
             class={constant('theme-switch-option')}
             title={constant(
               'What can be started first, then what is in progress, what needs a look, what waits, and what is on a cycle. The most recently updated first within each.',
@@ -94,9 +88,7 @@ export const IssuesListFilters = (): JSX.Element => {
           {ISSUE_START_SWITCHES.map((start) => (
             <button
               aria-pressed={view$.pipe(
-                map(({ hiddenStarts }) =>
-                  (!hiddenStarts.includes(start)).toString(),
-                ),
+                map(({ hiddenStarts }) => !hiddenStarts.includes(start)),
               )}
               class={constant('filter-chip')}
               title={constant(
@@ -157,7 +149,7 @@ const LabelPick = ({
 
   return (
     <button
-      aria-pressed={label$.pipe(map(({ picked }) => picked.toString()))}
+      aria-pressed={label$.pipe(map(({ picked }) => picked))}
       class={constant('filter-chip label-pick')}
       title={label$.pipe(
         map(({ picked }) =>

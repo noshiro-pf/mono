@@ -1189,7 +1189,7 @@ export const DagCanvas = ({ layout, toolbar }: Props): JSX.Element => {
             <>
               <button
                 aria-pressed={lassoTool$.pipe(
-                  map((tool) => (tool === 'freehand').toString()),
+                  map((tool) => tool === 'freehand'),
                 )}
                 class={{
                   'bp6-button': constant(true),
@@ -1210,7 +1210,7 @@ export const DagCanvas = ({ layout, toolbar }: Props): JSX.Element => {
               </button>
               <button
                 aria-pressed={lassoTool$.pipe(
-                  map((tool) => (tool === 'rectangle').toString()),
+                  map((tool) => tool === 'rectangle'),
                 )}
                 class={{
                   'bp6-button': constant(true),

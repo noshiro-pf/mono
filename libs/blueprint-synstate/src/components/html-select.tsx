@@ -27,7 +27,7 @@ type Props = Readonly<{
   selectRef?: (select: HTMLSelectElement) => void;
   'aria-label'?: Bindable<string>;
   'aria-describedby'?: Bindable<string | undefined>;
-  'aria-invalid'?: Bindable<string>;
+  'aria-invalid'?: Bindable<boolean | string | undefined>;
   'data-e2e'?: Bindable<string>;
 }>;
 

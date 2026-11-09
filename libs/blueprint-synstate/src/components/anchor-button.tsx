@@ -84,7 +84,7 @@ export const AnchorButton = ({
 
   return (
     <a
-      aria-disabled={mapBindable(disabled, (d) => (d ? 'true' : 'false'))}
+      aria-disabled={disabled}
       aria-label={ariaLabel}
       class={buttonClass({
         intent,

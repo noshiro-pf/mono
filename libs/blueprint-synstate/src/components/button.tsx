@@ -47,10 +47,10 @@ export type ButtonProps = Readonly<{
     event: MouseEvent & Readonly<{ currentTarget: HTMLButtonElement }>,
   ) => void;
   'aria-label'?: Bindable<string>;
-  'aria-pressed'?: Bindable<string | undefined>;
-  'aria-checked'?: Bindable<string | undefined>;
+  'aria-pressed'?: Bindable<boolean | string | undefined>;
+  'aria-checked'?: Bindable<boolean | string | undefined>;
   'aria-controls'?: Bindable<string>;
-  'aria-expanded'?: Bindable<'false' | 'true'>;
+  'aria-expanded'?: Bindable<boolean | string | undefined>;
   'data-e2e'?: Bindable<string | undefined>;
 }>;
 

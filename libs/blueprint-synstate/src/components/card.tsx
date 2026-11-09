@@ -11,7 +11,7 @@ type Props = Readonly<{
   compact?: boolean;
   /** Classes after Blueprint's own. */
   class?: string;
-  'aria-busy'?: Bindable<string | undefined>;
+  'aria-busy'?: Bindable<boolean | string | undefined>;
   'aria-label'?: Bindable<string>;
   'data-e2e'?: Bindable<string | undefined>;
 }>;

@@ -165,9 +165,7 @@ export const Collapse = ({
       ref={(element) => {
         mut_state.body = element;
       }}
-      aria-hidden={phase$.pipe(
-        map((phase) => (phase === 'closed' ? 'true' : 'false')),
-      )}
+      aria-hidden={phase$.pipe(map((phase) => phase === 'closed'))}
       class={constant('bp6-collapse-body')}
       style={{
         transform: deriveBindable([phase$, bodyHeight$], (phase, bodyHeight) =>

@@ -17,7 +17,7 @@ export const ViewSwitch = (): JSX.Element => (
 
 const viewButton = (shows: View, label: string): JSX.Element => (
   <button
-    aria-pressed={uiStore.view.pipe(map((v) => (v === shows).toString()))}
+    aria-pressed={uiStore.view.pipe(map((v) => v === shows))}
     class={{
       'bp6-button': constant(true),
       'bp6-active': uiStore.view.pipe(map((v) => v === shows)),

@@ -117,10 +117,8 @@ export const Tabs = <T extends string>({
               controlsPanel ? constant(panelId(id, tab.id)) : undefined
             }
             aria-disabled={constant('false')}
-            aria-expanded={
-              controlsPanel ? mapBindable(selected, String) : undefined
-            }
-            aria-selected={mapBindable(selected, String)}
+            aria-expanded={controlsPanel ? selected : undefined}
+            aria-selected={selected}
             class={constant('bp6-tab')}
             data-e2e={
               tab['data-e2e'] === undefined
