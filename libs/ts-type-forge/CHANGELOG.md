@@ -1,5 +1,11 @@
 ## [7.2.1](https://github.com/noshiro-pf/ts-type-forge/compare/v7.2.0...v7.2.1) (2026-07-21)
 
+## 9.2.5
+
+### Patch Changes
+
+- 7174d10: The README and JSDoc samples no longer read the clock at module load: the `ts-fortress` intersection sample defaults its timestamps to `0` rather than `Date.now()`, and the `ts-type-forge` `MutableJsonObject` sample stores a fixed timestamp.
+
 ## 9.2.4
 
 ### Patch Changes

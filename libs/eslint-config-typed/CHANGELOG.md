@@ -1,5 +1,16 @@
 ## [5.8.4](https://github.com/noshiro-pf/eslint-config-typed/compare/v5.8.3...v5.8.4) (2026-08-09)
 
+## 7.9.0
+
+### Minor Changes
+
+- 7174d10: Add `ts-restrictions/no-clock-read-at-module-load`, on by default: it reports `Date.now()`, `new Date()` with no argument, and the callees named in its `functions` option, when the call runs as the module loads, which keeps that moment for as long as the module lives.
+
+### Patch Changes
+
+- Updated dependencies [7174d10]
+    - ts-type-forge@9.2.5
+
 ## 7.8.0
 
 ### Minor Changes
