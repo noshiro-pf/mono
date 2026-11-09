@@ -256,7 +256,7 @@ If you're using React 16.8–17 (without `useSyncExternalStore`), install `synst
 npm add synstate-react-hooks-compat
 ```
 
-This package provides **the same API** as `synstate-react-hooks` but uses `useState` + `useEffect` internally. Just change the import:
+This package provides **the same API** as `synstate-react-hooks` but reads observables through [`use-sync-external-store/shim`](https://www.npmjs.com/package/use-sync-external-store), React's own `useSyncExternalStore` for React 16.8 and 17. Just change the import:
 
 ```tsx
 import { createState } from 'synstate-react-hooks-compat';

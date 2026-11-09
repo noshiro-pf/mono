@@ -115,7 +115,7 @@ const UserProfile = (): React.JSX.Element => {
 
 ## Subscribing to Observables: `useObservableValue`
 
-Use `useObservableValue` to read any `Observable` — including derived ones produced by `pipe` / `combine` — from a React component. It is implemented on top of `useSyncExternalStore`, so the component re-renders whenever the source emits.
+Use `useObservableValue` to read any `Observable` — including derived ones produced by `pipe` / `combine` — from a React component. It is implemented on top of `useSyncExternalStore`, so the component re-renders whenever the source emits a value different (`Object.is`) from the one it shows.
 
 It works in server rendering as well: `renderToString` and React's other server renderers draw the observable's current value, since a synstate observable can be read synchronously on the server too. Two things follow from reading the current value on both sides:
 

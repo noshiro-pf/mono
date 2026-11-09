@@ -167,7 +167,7 @@ const COPIES = [
       'src/use-observable-value.mts': {
         kind: 'differs',
         reason:
-          'React 16 and 17 have no useSyncExternalStore; compat reads with useState and useEffect.',
+          'React 16 and 17 have no useSyncExternalStore; compat reads through use-sync-external-store/shim, and keeps the overloads it published.',
       },
       'configs/vitest.config.mts': {
         kind: 'differs',
