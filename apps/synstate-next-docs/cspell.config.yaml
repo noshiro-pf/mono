@@ -7,3 +7,4 @@ import:
 words:
   - mdxjs # micromark-extension-mdxjs
   - solidjs # @solidjs/signals, on the comparison pages
+  - seti # Starlight's seti:* icon names

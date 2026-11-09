@@ -11,7 +11,7 @@ export default defineConfig({
     starlight({
       title: 'synstate-dom-next',
       description:
-        'The rebuild of synstate-dom on synstate-next: a compiler-free, fine-grained UI library that binds observables directly to the DOM.',
+        'The UI library for synstate-next: a compiler-free, fine-grained UI library that binds observables directly to the DOM.',
       customCss: ['./src/styles/custom.css'],
       // synstate's own icon, until synstate-dom-next has one.
       favicon: '/favicon.ico',

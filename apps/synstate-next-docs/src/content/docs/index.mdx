@@ -1,16 +1,16 @@
 ---
 title: synstate-next
-description: The rebuild of synstate. A glitch-free observable state library whose updates are integer epochs, whose subscribers run after an update has settled, and whose lifetimes are owners.
+description: A glitch-free state management library for TypeScript, with built-in async operators, such as debounce and switchMap, that stay glitch-free.
 template: splash
 hero:
-    tagline: synstate rebuilt from scratch. Declare what depends on what, write a state, and every derived value is computed once, after its parents; subscribers run only once the whole update has settled.
+    tagline: State management for TypeScript that scales from one shared value to async workflows. Write a state, derive what you show with operators such as <code>map</code>, <code>debounce</code> and <code>switchMap</code>, and every derived value is computed glitch-free.
     actions:
         - text: Get Started
           link: /mono/synstate-next/getting-started/introduction/
           icon: right-arrow
           variant: primary
-        - text: How an update propagates
-          link: /mono/synstate-next/internals/how-an-update-propagates/
+        - text: Why synstate-next
+          link: /mono/synstate-next/guides/why-synstate-next/
           variant: minimal
 ---
 
@@ -25,33 +25,46 @@ import { Aside, Card, CardGrid } from '@astrojs/starlight/components';
 ## Features
 
 <CardGrid>
-    <Card title="Glitch-free" icon="approve-check">
-        A derived value is computed once per update, after all of its parents,
-        diamonds included. Nothing ever reads a value from halfway through an
-        update.
+    <Card title="Simple state" icon="pencil">
+        `createState` gives a state and its setter, and `createReducer` a state
+        and its dispatch, as React's `useState` and `useReducer` do, for state
+        the whole application shares. A counter is a
+        state and a `subscribe`.
     </Card>
-    <Card title="Subscribers see a settled graph" icon="approve-check">
-        Subscribers are effects: they run after the update has reached every
-        node it changes. A write made during the update does not interrupt it:
-        it propagates in a round of its own afterwards.
+    <Card title="Async operators built in" icon="setting">
+        `debounce`, `throttle`, `switchMap`, `fromAbortablePromise` and more. A
+        search box that waits for typing to pause and drops stale answers is
+        one pipeline, not a timer and a flag kept by hand.
     </Card>
-    <Card title="Cut off at the first unchanged value" icon="random">
-        A node that computes the value it already holds passes nothing on, so
-        the part of the graph below it is not visited at all.
+    <Card title="Glitch-free through every operator" icon="approve-check">
+
+An update computes each derived value once, after all of its parents, and calls subscribers only after that. The result of an async step arrives as an update of its own, under the same rules. No derived value is computed from a mix of old and new inputs. [Operators on signals](/mono/synstate-next/comparison/operators-on-signals/) shows what an operator written as an effect loses.
+
     </Card>
-    <Card title="One owner, one lifetime" icon="setting">
-        Everything made while an owner runs belongs to it. Dispose the owner and
-        its derived values, subscriptions, timers and requests go with it.
-        Nothing has to be completed.
+    <Card title="Cancellation is built in" icon="random">
+
+With `fromAbortablePromise` inside `switchMap`, a newer query aborts the request of the one it replaces. Start a dialog's work inside an owner, and one `dispose()` when it closes stops the requests, timers and subscriptions it started: there is nothing to unsubscribe one by one. See [Owners and lifetime](/mono/synstate-next/guides/owners-and-lifetime/).
+
     </Card>
-    <Card title="Types say what holds a value" icon="pencil">
-        A state, or a `map` of one, is an `InitializedObservable` with a
-        `.value`. An event, or a `filter`, is an `Observable` that may hold
-        nothing yet. `pipe` works out which one you get.
+    <Card title="Unchanged values stop the update" icon="rocket">
+        A value that comes out the same as before stops the update there, and
+        what depends on it is not visited. An update costs the nodes it reaches,
+        each computed at most once.
     </Card>
-    <Card title="Small and regular" icon="rocket">
-        One way to write each thing: a transformation is a `map`, a choice is a
-        `switchMap`, an operator of your own is a `createDerived`. No aliases,
-        no one-line operators to learn.
+    <Card title="Types you can rely on" icon="seti:typescript">
+        A state is an `InitializedObservable` with a `.value`; an event, which
+        may hold nothing yet, is an `Observable` without one, and `pipe` works
+        out which of the two an operator chain gives. A failed promise arrives
+        as a `Result` value for the pipeline to handle.
     </Card>
+    <Card title="Runs anywhere" icon="puzzle">
+        A pipeline is a plain module with no framework behind it. A component, a
+        test or a script that reads it gets the same values.
+    </Card>
+    <Card title="UI on synstate-next: synstate-dom-next" icon="window">
+
+[synstate-dom-next](/mono/synstate-dom-next/) binds observables straight to the DOM, so the whole UI, async steps included, is one synstate-next graph. A component runs once, with no virtual DOM and no compiler.
+
+    </Card>
+
 </CardGrid>

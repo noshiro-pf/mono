@@ -12,7 +12,7 @@ export default defineConfig({
     starlight({
       title: 'synstate-next',
       description:
-        'The rebuild of synstate: a glitch-free observable state library whose updates are integer epochs, whose subscribers run after an update has settled, and whose lifetimes are owners.',
+        'A glitch-free state management library for TypeScript, with built-in async operators, such as debounce and switchMap, that stay glitch-free.',
       customCss: ['./src/styles/custom.css'],
       // synstate's own icon, until synstate-next has one.
       favicon: '/favicon.ico',

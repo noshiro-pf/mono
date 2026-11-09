@@ -185,6 +185,9 @@ catalogs:
     '@testing-library/react':
       specifier: 16.3.3
       version: 16.3.3
+    '@types/mdast':
+      specifier: 4.0.4
+      version: 4.0.4
     '@types/node':
       specifier: 26.6.5
       version: 26.6.5
@@ -245,6 +248,9 @@ catalogs:
     markdownlint-cli2:
       specifier: 0.24.0
       version: 0.24.0
+    mdast-util-from-markdown:
+      specifier: 2.1.0
+      version: 2.1.0
     mobx:
       specifier: 7.1.0
       version: 7.1.0
@@ -334,6 +340,9 @@ importers:
       '@playwright/test':
         specifier: 'catalog:'
         version: 1.64.1
+      '@types/mdast':
+        specifier: 'catalog:'
+        version: 4.0.4
       '@types/node':
         specifier: 'catalog:'
         version: 26.6.5
@@ -394,6 +403,15 @@ importers:
       markdownlint-cli2:
         specifier: 'catalog:'
         version: 0.24.0(supports-color@7.2.0)
+      mdast-util-from-markdown:
+        specifier: 'catalog:'
+        version: 2.1.0(supports-color@7.2.0)
+      mdast-util-gfm-strikethrough:
+        specifier: 2.0.1
+        version: 2.0.1(supports-color@7.2.0)
+      micromark-extension-gfm-strikethrough:
+        specifier: 2.1.0
+        version: 2.1.0
       npm-run-all2:
         specifier: 'catalog:'
         version: 9.0.4
@@ -2559,7 +2577,7 @@ importers:
         version: 7.4.2(@astrojs/markdown-remark@7.3.4(supports-color@7.2.0))(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1)
     devDependencies:
       '@types/mdast':
-        specifier: ^4.0.4
+        specifier: 'catalog:'
         version: 4.0.4
       '@vitest/coverage-istanbul':
         specifier: 'catalog:'
@@ -2583,7 +2601,7 @@ importers:
         specifier: ^3.1.1
         version: 3.1.1(supports-color@7.2.0)
       mdast-util-from-markdown:
-        specifier: ^2.1.0
+        specifier: 'catalog:'
         version: 2.1.0(supports-color@7.2.0)
       mdast-util-mdx:
         specifier: ^3.0.0

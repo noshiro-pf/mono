@@ -1,9 +1,9 @@
 ---
 title: synstate-dom-next
-description: The rebuild of synstate-dom on synstate-next. A compiler-free, fine-grained UI library that binds observables directly to the DOM.
+description: The UI library for synstate-next. A compiler-free, fine-grained UI library that binds observables directly to the DOM.
 template: splash
 hero:
-    tagline: synstate-dom rebuilt from scratch on synstate-next. Pass observables straight into JSX. Your component runs once; after an update has settled, each attribute, property and text you bound is written by one small effect. No compiler, no virtual DOM.
+    tagline: The UI library for synstate-next. Pass observables straight into JSX. Your component runs once; once an update has brought every value up to date, each attribute, property and text you bound is written by one small binding. No compiler, no virtual DOM.
     actions:
         - text: Get Started
           link: /mono/synstate-dom-next/getting-started/introduction/
@@ -25,21 +25,21 @@ import { Aside, Card, CardGrid } from '@astrojs/starlight/components';
 ## Features
 
 <CardGrid>
-    <Card title="Made for SynState" icon="star">
+    <Card title="Made for synstate-next" icon="star">
 
-The graph you build with synstate-next's operators ends in the DOM: each binding is a leaf of that graph, with nothing converted on the way. On the operations of js-framework-benchmark it takes {/* benchmark:next-over-dom-min */}0.78{/* /benchmark */}× to {/* benchmark:next-over-dom-max */}1.00{/* /benchmark */}× synstate-dom's time.
+The graph you build with synstate-next's operators ends in the DOM: each binding is an end of that graph, with nothing converted on the way. A component can hand a binding any observable of the graph, async steps included.
 
     </Card>
-    <Card title="Bindings run on a settled graph" icon="approve-check">
+    <Card title="Bindings run once every value is up to date" icon="approve-check">
         An update propagates through the whole graph first, and only then are
         the bindings it reached run, each once. A binding never sees a
         half-updated graph, and `If` and `For` mount and unmount outside any
         propagation.
     </Card>
     <Card title="Fine-grained, called once" icon="rocket">
-        Your component function is called once, when it mounts. After that, an
-        update writes straight to the DOM leaves bound to what changed: an
-        attribute, a property or a text node. Nothing is diffed.
+
+Your component function is called once, when it mounts. After that, an update writes straight to the DOM bound to what changed: an attribute, a property or a text node. Nothing is diffed, and on the operations of js-framework-benchmark it takes at most {/* benchmark:next-over-solid-max */}1.31{/* /benchmark */}× Solid's time.
+
     </Card>
     <Card title="No compiler" icon="setting">
         All you need is TypeScript's standard `"jsx": "react-jsx"` and
@@ -51,9 +51,10 @@ The graph you build with synstate-next's operators ends in the DOM: each binding
         error instead of a view that silently stops updating.
     </Card>
     <Card title="No leaks by construction" icon="random">
-        Everything made while a component mounts belongs to the owner it mounts
-        in. Close a branch or remove a row, and every derivation, binding and
-        subscription made inside it goes with it.
+        Close a branch or remove a row, and every derivation, binding and
+        subscription made while it was being mounted is cleaned up with it,
+        along with the timers and requests of its operators. There is nothing
+        to unsubscribe by hand.
     </Card>
 
 </CardGrid>
