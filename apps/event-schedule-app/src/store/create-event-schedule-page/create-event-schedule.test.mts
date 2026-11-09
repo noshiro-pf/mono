@@ -154,6 +154,35 @@ describe(createCreateEventScheduleStore, () => {
     );
   });
 
+  // The draft saved as an event is created is the empty form, whose one date is
+  // the day it was built: the next visit restores no date from it.
+  test('keeps the empty form’s date, today, when the draft has no date after today', () => {
+    const today = new Date(2026, 9, 30, 12, 0);
+
+    const { store } = onDay(today, () =>
+      setup({
+        stored: EventSchedule.fill({
+          title: 'stored',
+          datetimeRangeList: [rawDayOf(29), rawDayOf(30)],
+          notificationSettings: 'none',
+        }),
+      }),
+    );
+
+    onDay(today, () => {
+      store.enter();
+    });
+
+    const state = store.commonState$.getSnapshot().value;
+
+    assert.strictEqual(state.title, 'stored');
+
+    assert.deepStrictEqual(
+      state.datetimeRangeList.map((d) => d.ymd),
+      [{ year: 2026, month: 10, date: 30 }],
+    );
+  });
+
   test('leaves the settings as they are, with a warning, when storage cannot be read', () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
 
