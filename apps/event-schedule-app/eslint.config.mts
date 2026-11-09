@@ -14,8 +14,17 @@ import {
   dateUtilsRules,
 } from '../../tools/configs/eslint-date-utils.mjs';
 import { eslintConfigOffForOxlint } from '../../tools/configs/oxlint-rules.mjs';
+import packageJson from './package.json' with { type: 'json' };
 
 const thisDir = import.meta.dirname;
+
+/** The workspace packages this app depends on, which `e2e/` may not import. */
+const workspacePackages = Object.entries({
+  ...packageJson.dependencies,
+  ...packageJson.devDependencies,
+})
+  .filter(([, range]) => range.startsWith('workspace:'))
+  .map(([name]) => name);
 
 export default [
   {
@@ -109,6 +118,41 @@ export default [
     }),
   },
   eslintConfigForPlaywright(['e2e/**']),
+  {
+    // `.github/workflows/e2e-production.yml` installs this app alone and
+    // builds nothing, and Playwright imports every spec before it filters by
+    // tag, so a spec that imports a workspace package at run time, or a module
+    // of `src/` that does, fails the daily job with "Cannot find module".
+    // Types are erased and may still be imported. The `ts-data-forge` rules
+    // ask for imports these files cannot make.
+    files: ['e2e/**'],
+    rules: defineKnownRules({
+      ...Object.fromEntries(
+        Object.keys(eslintPluginTsDataForge.configs.recommended.rules).map(
+          (rule) => [rule, 'off'] as const,
+        ),
+      ),
+      'no-restricted-imports': [
+        'error',
+        mergeRestrictedImportsOptions(restrictedImportsOptions, {
+          paths: workspacePackages.map((name) => ({
+            name,
+            allowTypeImports: true,
+            message:
+              'The daily production e2e job builds no workspace package; write the helper out in the spec.',
+          })),
+          patterns: [
+            {
+              regex: String.raw`^\.\./`,
+              allowTypeImports: true,
+              message:
+                'The daily production e2e job builds no workspace package, and a module outside `e2e/` may import one; keep run-time imports within `e2e/`.',
+            },
+          ],
+        }),
+      ],
+    }),
+  },
 
   { rules: defineKnownRules(dateUtilsRules) },
   {
