@@ -1,4 +1,4 @@
-import { writeSetAsideComment } from 'pr-report-core';
+import { queueLayerTrailer, writeSetAsideComment } from 'pr-report-core';
 import { Arr, asUint32, isRecord, Json, Result } from 'ts-data-forge';
 import type { ReadonlyRecord } from 'ts-type-forge';
 import type { ReportSource } from './constants.mjs';
@@ -7,6 +7,7 @@ import {
   appendIssues,
   loadIssuePage,
   loadReport,
+  queueLayersOf,
   type IssueList,
   type LoadedReport,
   type ReadGroup,
@@ -2988,3 +2989,59 @@ const loadEnforced = (owner: string): Promise<LoadedReport> =>
       answer('Compare', { compare_7: null }),
     ).fetchImpl,
   );
+
+describe(queueLayersOf, () => {
+  const head = 'a'.repeat(40);
+
+  test('reads a layer as the worker does, from its branch and trailer', () => {
+    assert.deepStrictEqual(
+      queueLayersOf('main-tree', [
+        queueLayerNode('pr-12', queueLayerTrailer({ number: 12, head })),
+      ]),
+      {
+        baseTree: 'main-tree',
+        built: [
+          {
+            number: 12,
+            head,
+            tip: 'tip',
+            tree: 'tree',
+            parent: 'parent',
+            parentTree: 'parent-tree',
+            builtAt: Date.parse('2026-11-08T04:00:00Z'),
+          },
+        ],
+      },
+    );
+  });
+
+  test('passes over a branch whose trailer names another pull request, or none', () => {
+    assert.deepStrictEqual(
+      queueLayersOf('main-tree', [
+        queueLayerNode('pr-13', queueLayerTrailer({ number: 12, head })),
+        queueLayerNode('pr-12', 'no trailer'),
+        queueLayerNode('other', queueLayerTrailer({ number: 12, head })),
+      ])?.built,
+      [],
+    );
+  });
+
+  test('is nothing without the tree they stand on', () => {
+    assert.isUndefined(queueLayersOf(undefined, []));
+  });
+});
+
+const queueLayerNode = (
+  name: string,
+  message: string,
+): Parameters<typeof queueLayersOf>[1][number] =>
+  ({
+    name,
+    target: {
+      oid: 'tip',
+      message: `queue layer: pull request 12\n\n${message}\n`,
+      committedDate: '2026-11-08T04:00:00Z',
+      tree: { oid: 'tree' },
+      parents: { nodes: [{ oid: 'parent', tree: { oid: 'parent-tree' } }] },
+    },
+  }) as const;

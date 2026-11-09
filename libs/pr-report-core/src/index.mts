@@ -9,6 +9,7 @@ export * from './issue-priority.mjs';
 export * from './labels.mjs';
 export * from './merge-after.mjs';
 export * from './queue-comments.mjs';
+export * from './queue-layers.mjs';
 export * from './queue-order.mjs';
 export * from './queue-owner.mjs';
 export * from './report.mjs';

@@ -46,7 +46,10 @@ nothing on GitHub's own list shows:
 **The queue** `pnpm run unblock-prs` works through is drawn under the merge
 order, as one row of boxes: the pull request it is running at the head, by the
 base it merges into, with a turning ring; then the ones it would pick next, in
-the order it would pick them; then the ones whose turn has not come,
+the order it would pick them — first what it has checked ahead of its turn, in
+the order it stacked them, marked `checked ahead` (its `queue/pr-*` branches,
+read with the pull requests, and `stackedAhead` in `pr-report-core`,
+which the worker releases by); then the ones whose turn has not come,
 in a dashed box saying what they wait for (`after #N`, `review`,
 `native stack`). Every box is the same width and carries the priority on a pill
 as the DAG's nodes do; hovering one shows its title. A box is never narrower
