@@ -1,5 +1,15 @@
 # profile
 
+## 0.0.31
+
+### Patch Changes
+
+- Updated dependencies [acd78c5]
+    - synstate-router@0.2.1
+    - synstate@8.0.0
+    - synstate-dom@0.9.0
+    - ts-data-forge@14.13.0
+
 ## 0.0.30
 
 ### Patch Changes

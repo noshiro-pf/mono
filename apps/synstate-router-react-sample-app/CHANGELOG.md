@@ -1,5 +1,17 @@
 # synstate-router-react-sample-app
 
+## 0.0.8
+
+### Patch Changes
+
+- Updated dependencies [acd78c5]
+    - synstate-router@0.2.1
+    - synstate-router-react@0.1.1
+    - synstate@8.0.0
+    - synstate-react-hooks@8.0.0
+    - ts-data-forge@14.13.0
+    - ts-std-forge@0.5.3
+
 ## 0.0.7
 
 ### Patch Changes

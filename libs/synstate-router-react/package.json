@@ -1,6 +1,6 @@
 {
   "name": "synstate-router-react",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "React bindings for synstate-router: exhaustive Routes, a Link that takes no plain string, and hooks",
   "repository": {
     "type": "git",
@@ -83,7 +83,7 @@
   "peerDependencies": {
     "react": ">=19.0.0",
     "synstate": ">=8.0.0",
-    "synstate-router": ">=0.2.0"
+    "synstate-router": ">=0.2.1"
   },
   "engines": {
     "node": ">=22.23.4",
