@@ -14,7 +14,7 @@ if (import.meta.vitest !== undefined) {
       <A,>(): Operator<A | undefined, A, 'drop'> =>
       (source: Observable<A | undefined>): Observable<A> =>
         createDerived<A>([source], (ctx) => () => {
-          const value = source.peek();
+          const value = source.getSnapshot();
 
           if (value !== undefined) {
             ctx.set(value);
@@ -31,7 +31,7 @@ if (import.meta.vitest !== undefined) {
 
     setSelected(undefined);
 
-    assert.strictEqual(lastSelected.peek(), 'a');
+    assert.strictEqual(lastSelected.getSnapshot(), 'a');
 
     // embed-sample-code-ignore-below
   });

@@ -38,7 +38,7 @@ import {
  * ```ts
  * const double = (source: Observable<number>): Observable<number> =>
  *   createDerived([source], (ctx) => () => {
- *     const v = source.peek();
+ *     const v = source.getSnapshot();
  *
  *     if (v !== undefined && ctx.emitted(source)) {
  *       ctx.set(v * 2);

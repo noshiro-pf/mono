@@ -72,4 +72,4 @@ An observable ends by being disposed, and disposal follows ownership: everything
 ## Next steps
 
 - [State and writes](/mono/synstate-next/guides/state-and-writes/): `createState` and the rules for writes.
-- [Deriving values](/mono/synstate-next/guides/deriving-values/): `pipe`, `derive`, `combine`, `merge` and `zip`.
+- [Deriving values](/mono/synstate-next/guides/deriving-values/): `pipe`, `derive`, `merge` and `zip`.

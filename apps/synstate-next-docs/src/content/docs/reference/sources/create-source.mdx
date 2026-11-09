@@ -33,14 +33,14 @@ const frames = everyFrame(16);
 
 await vi.advanceTimersByTimeAsync(50);
 
-assert.strictEqual(frames.peek(), 3);
+assert.strictEqual(frames.getSnapshot(), 3);
 
 // Disposing it runs the cleanup, which clears the interval.
 frames.dispose();
 
 await vi.advanceTimersByTimeAsync(50);
 
-assert.strictEqual(frames.peek(), 3);
+assert.strictEqual(frames.getSnapshot(), 3);
 ```
 
 ## See also

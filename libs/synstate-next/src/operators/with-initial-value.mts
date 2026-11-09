@@ -9,7 +9,7 @@ import {
 
 /** Holds `initial` until the source emits, then follows the source. */
 export const withInitialValue =
-  <A, I = A>(initial: I): Operator<A, A | I, 'with'> =>
+  <A, I = A>(initial: I): Operator<A, A | I, 'provide'> =>
   (source) =>
     view(new WithInitialValueClass<A, I>(toNode(source), initial));
 

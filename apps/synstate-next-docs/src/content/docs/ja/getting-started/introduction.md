@@ -52,7 +52,7 @@ assert.strictEqual(count.value, 2);
 
 ## `pipe` で値を派生させる
 
-`pipe` はオペレーターを順に適用します。各オペレーターは、最初に持っている値を保つ（`map`）、落とすことがある（`filter`）、必ず値を用意する（`scan`・`withInitialValue`）のどれなのかを型で示すので、結果の型を見れば `.value` を読めるのか、`hasValue` を確かめる必要があるのかがわかります。
+`pipe` はオペレーターを 1 つ適用し、`pipe` を連ねれば複数を順に適用します。各オペレーターは、最初に持っている値を保つ（`map`）、落とすことがある（`filter`）、必ず値を用意する（`scan`・`withInitialValue`）のどれなのかを型で示すので、結果の型を見れば `.value` を読めるのか、`hasValue` を確かめる必要があるのかがわかります。
 
 ```tsx
 import {
@@ -84,7 +84,7 @@ setCount(4);
 
 assert.strictEqual(doubled.value, 8);
 
-assert.strictEqual(even.peek(), 4);
+assert.strictEqual(even.getSnapshot(), 4);
 ```
 
 ## 次に読むもの

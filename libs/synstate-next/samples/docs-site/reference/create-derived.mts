@@ -13,7 +13,7 @@ const everyNth =
       let mut_count = 0;
 
       return () => {
-        const value = source.peek();
+        const value = source.getSnapshot();
 
         if (value === undefined || !ctx.emitted(source)) {
           return;

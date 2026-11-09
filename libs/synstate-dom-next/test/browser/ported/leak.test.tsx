@@ -6,7 +6,7 @@ import {
   render,
   type JSX,
 } from 'synstate-dom-next';
-import { combine, createState, map } from 'synstate-next';
+import { createState, derive, map } from 'synstate-next';
 import { Arr, Optional } from 'ts-data-forge';
 
 type Item = Readonly<{ id: number; price: number }>;
@@ -49,7 +49,7 @@ describe('mount and unmount leave nothing running', () => {
                   {(item$, index$) => (
                     <li>
                       {index$.pipe(map(counted((i) => `${i + 1}. `)))}
-                      {combine([item$, taxRate$]).pipe(
+                      {derive([item$, taxRate$], (...values) => values).pipe(
                         map(counted(([item, rate]) => item.price * (1 + rate))),
                       )}
                     </li>

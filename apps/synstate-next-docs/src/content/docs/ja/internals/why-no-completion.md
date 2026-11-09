@@ -66,7 +66,7 @@ const fired = owner.run(() => timer(100));
 
 await vi.advanceTimersByTimeAsync(100);
 
-assert.strictEqual(fired.peek(), 0);
+assert.strictEqual(fired.getSnapshot(), 0);
 
 owner.dispose();
 ```

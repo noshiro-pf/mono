@@ -328,5 +328,5 @@ assert.isFalse(messages.hasValue);
 
 messages.next('hello');
 
-assert.strictEqual(messages.peek(), 'hello');
+assert.strictEqual(messages.getSnapshot(), 'hello');
 ```

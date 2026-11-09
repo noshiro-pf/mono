@@ -33,7 +33,6 @@ description: synstate-next の公開 API を用途ごとに並べ、それぞれ
 
 ## 組み合わせ
 
-- [`combine`](/mono/synstate-next/ja/reference/combining/combine/): `parents` の最新の値をタプルにしたものです。
 - [`derive`](/mono/synstate-next/ja/reference/combining/derive/): `parents` の値から `fn` を計算し、持っている値と等しくなければ結果を流します。
 - [`merge`](/mono/synstate-next/ja/reference/combining/merge/): この更新で値を流した親の値を流します（複数あれば最初のもの）。
 - [`zip`](/mono/synstate-next/ja/reference/combining/zip/): すべての `parents` がそれぞれ `n` 番目の値を流したところで、その `n` 番目の値をタプルにして流します。

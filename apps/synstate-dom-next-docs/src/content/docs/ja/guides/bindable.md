@@ -91,7 +91,7 @@ export const PriceList = (): JSX.Element => (
 );
 ```
 
-`map` のノードは更新ごとに `fn` を 1 回計算し、結果が前回と `Object.is` で等しくないときだけ先へ渡します。等しい結果が出れば更新はそこで止まり、その下は訪れません。そのため束縛は、表示する内容が変わったときにだけ DOM に書き込みます。結果は普通の Observable なので、複数の束縛、`.value`、さらに別のオペレーターから読めます。`pipe` は `source$.pipe(filter(f), map(g), withInitialValue(x))` のように複数のオペレーターを一度に受け取り、結果が常に値を持つかどうかをそれらから判断します。
+`map` のノードは更新ごとに `fn` を 1 回計算し、結果が前回と `Object.is` で等しくないときだけ先へ渡します。等しい結果が出れば更新はそこで止まり、その下は訪れません。そのため束縛は、表示する内容が変わったときにだけ DOM に書き込みます。結果は普通の Observable なので、複数の束縛、`.value`、さらに別のオペレーターから読めます。`pipe` はオペレーターを 1 つ受け取り、`source$.pipe(filter(f)).pipe(map(g)).pipe(withInitialValue(x))` のようにつなげます。それぞれの `pipe` が、結果が常に値を持つかどうかをそのオペレーターから判断します。
 
 ## `Bindable` を受け取る側: `mapBindable`、`deriveBindable`、`toObservable`
 

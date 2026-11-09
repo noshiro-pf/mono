@@ -1,5 +1,4 @@
 import {
-  combine,
   createState,
   createValueEmitter,
   debounce,
@@ -66,9 +65,10 @@ if (import.meta.vitest !== undefined) {
         }),
       );
 
-      const filters = combine([filterName, filterEmail, filterGender]).pipe(
-        debounce(300),
-      );
+      const filters = derive(
+        [filterName, filterEmail, filterGender],
+        (name, email, gender) => [name, email, gender] as const,
+      ).pipe(debounce(300));
 
       const filteredRows = derive(
         [filters, tableData],
@@ -139,7 +139,7 @@ if (import.meta.vitest !== undefined) {
 
       requestPage(3);
 
-      assert.strictEqual(currentPage.peek(), 3);
+      assert.strictEqual(currentPage.getSnapshot(), 3);
 
       assert.strictEqual(mut_rendered.at(-1)?.length, 5);
 
@@ -150,14 +150,14 @@ if (import.meta.vitest !== undefined) {
       setFilterGender('female');
 
       // The filters wait for the debounce, and so does the reset.
-      assert.strictEqual(currentPage.peek(), 3);
+      assert.strictEqual(currentPage.getSnapshot(), 3);
 
       await vi.advanceTimersByTimeAsync(300);
 
       // Alice 0, 6, 12, 18, 24.
-      assert.strictEqual(pageLength.peek(), 1);
+      assert.strictEqual(pageLength.getSnapshot(), 1);
 
-      assert.strictEqual(currentPage.peek(), 1);
+      assert.strictEqual(currentPage.getSnapshot(), 1);
 
       assert.deepStrictEqual(
         mut_rendered.at(-1)?.map((row) => row.name),

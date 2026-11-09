@@ -8,8 +8,8 @@
  */
 import {
   batch,
-  combine,
   createOwner,
+  derive,
   filter,
   just,
   map,
@@ -31,7 +31,7 @@ describe('the value the source holds when the operator is created is projected',
 
     const s = a.pipe(switchMap((x) => just(x * 10)));
 
-    assert.strictEqual(s.peek(), 10);
+    assert.strictEqual(s.getSnapshot(), 10);
 
     const seen = collect(s);
 
@@ -134,7 +134,7 @@ describe('the value the source holds when the operator is created is projected',
       .pipe(map((some) => some.value))
       .pipe(switchMap((id) => just(`item ${id.toString()}`)));
 
-    assert.strictEqual(s.peek(), 'item 42');
+    assert.strictEqual(s.getSnapshot(), 'item 42');
   });
 
   test('switchMap and mergeMap: a settled source holding a value projects it once', () => {
@@ -154,9 +154,9 @@ describe('the value the source holds when the operator is created is projected',
     // its value, which is projected as any other held value is.
     assert.deepStrictEqual(mut_projected, [1, 2]);
 
-    assert.strictEqual(s.peek(), 1);
+    assert.strictEqual(s.getSnapshot(), 1);
 
-    assert.strictEqual(m.peek(), 2);
+    assert.strictEqual(m.getSnapshot(), 2);
   });
 
   test('mergeMap: the first inner and the later ones are merged', () => {
@@ -181,7 +181,7 @@ describe('the value the source holds when the operator is created is projected',
     assert.strictEqual(
       state(1)
         .pipe(mergeMap((x) => just(x * 10)))
-        .peek(),
+        .getSnapshot(),
       10,
     );
   });
@@ -244,7 +244,7 @@ describe('a projection that writes or throws', () => {
       }),
     );
 
-    assert.strictEqual(switched.peek(), 10);
+    assert.strictEqual(switched.getSnapshot(), 10);
   });
 
   test.each([
@@ -404,7 +404,9 @@ describe('an inner observable that holds a value is passed on in the update that
 
     const m = a.pipe(map((x) => `m${x.toString()}`));
 
-    const seen = collect(combine([m, s]).pipe(map(([x, y]) => `${x},${y}`)));
+    const seen = collect(
+      derive([m, s], (...values) => values).pipe(map(([x, y]) => `${x},${y}`)),
+    );
 
     a.set(2);
 
@@ -418,7 +420,7 @@ describe('an inner observable that holds a value is passed on in the update that
 
     const s = a.pipe(switchMap((x) => just(x * 10)));
 
-    const seen = collect(combine([a, s]));
+    const seen = collect(derive([a, s], (...values) => values));
 
     a.set(2);
 
@@ -524,7 +526,7 @@ describe('switchMap and mergeMap release only what their projection made', () =>
               mut_released.push(u);
             });
 
-            return combine([inner, derived]);
+            return derive([inner, derived], (...values) => values);
           }),
         ),
       );

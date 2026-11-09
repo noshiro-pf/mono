@@ -43,14 +43,6 @@ export const derive = <const P extends readonly Observable<unknown>[], B>(
     ),
   );
 
-/** The latest values of `parents` as a tuple, on every update that reaches it. */
-export const combine = <const P extends readonly Observable<unknown>[]>(
-  parents: P,
-): DerivedOf<P, ValuesOf<P>> =>
-  derive(parents, (...values) => values, {
-    equals: () => false,
-  });
-
 /**
  * Emits the value of whichever parent emitted in this update (the first of
  * them, if several did). Holds no value until one emits.

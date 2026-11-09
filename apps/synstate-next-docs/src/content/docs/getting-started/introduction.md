@@ -52,7 +52,7 @@ assert.strictEqual(count.value, 2);
 
 ## Deriving values with `pipe`
 
-`pipe` applies operators in order. Each operator says in its type whether the result keeps the value held at the start (`map`), may drop it (`filter`), or always provides one (`scan`, `withInitialValue`), so the type of the result tells you whether you can read `.value` or have to ask `hasValue`:
+`pipe` applies one operator, and a chain of `pipe` calls applies several. Each operator says in its type whether the result keeps the value held at the start (`map`), may drop it (`filter`), or always provides one (`scan`, `withInitialValue`), so the type of the result tells you whether you can read `.value` or have to ask `hasValue`:
 
 ```tsx
 import {
@@ -84,7 +84,7 @@ setCount(4);
 
 assert.strictEqual(doubled.value, 8);
 
-assert.strictEqual(even.peek(), 4);
+assert.strictEqual(even.getSnapshot(), 4);
 ```
 
 ## Next steps

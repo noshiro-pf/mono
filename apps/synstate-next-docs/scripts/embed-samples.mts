@@ -57,7 +57,7 @@ const pageSamples: readonly (readonly [
   [
     'guides/deriving-values.md',
     [
-      'deriving/01-derive-combine.mts',
+      'deriving/01-derive.mts',
       'deriving/02-merge-zip.mts',
       'deriving/03-cut-off.mts',
       'deriving/04-with-current-value-from.mts',

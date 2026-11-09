@@ -22,7 +22,7 @@ const defined =
     <A,>(): Operator<A | undefined, A, 'drop'> =>
     (source: Observable<A | undefined>): Observable<A> =>
         createDerived<A>([source], (ctx) => () => {
-            const value = source.peek();
+            const value = source.getSnapshot();
 
             if (value !== undefined) {
                 ctx.set(value);
@@ -39,10 +39,10 @@ setSelected('a');
 
 setSelected(undefined);
 
-assert.strictEqual(lastSelected.peek(), 'a');
+assert.strictEqual(lastSelected.getSnapshot(), 'a');
 ```
 
-The node holds nothing until it is first set, unless you give `{ initialValue }`. Typing the operator as `Operator<A, B, 'drop'>` (or `'keep'`, `'with'`) tells `pipe` whether the result holds a value.
+The node holds nothing until it is first set, unless you give `{ initialValue }`. Typing the operator as `Operator<A, B, 'drop'>` (or `'keep'`, `'provide'`) tells `pipe` whether the result holds a value.
 
 ## Several parents
 
@@ -65,9 +65,9 @@ const mergeTagged = <A, B>(
     second: Observable<B>,
 ): Observable<Tagged<A, B>> =>
     createDerived<Tagged<A, B>>([first, second], (ctx) => () => {
-        const a = first.peek();
+        const a = first.getSnapshot();
 
-        const b = second.peek();
+        const b = second.getSnapshot();
 
         // `emitted` tells which parent emitted in this update.
         if (a !== undefined && ctx.emitted(first)) {
@@ -124,7 +124,7 @@ const delay =
 
             return {
                 update: () => {
-                    const value = parent.peek();
+                    const value = parent.getSnapshot();
 
                     if (value === undefined || !ctx.emitted(parent)) {
                         return;

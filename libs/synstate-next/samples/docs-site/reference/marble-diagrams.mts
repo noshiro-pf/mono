@@ -119,11 +119,6 @@ export const marbleDiagrams = {
     inputs: [ticks([10, 'a'], [20, 'b'], [60, 'c'])],
     output: out([30, 'a'], [40, 'b'], [80, 'c']),
   },
-  combine: {
-    operator: 'combine([letters, digits])',
-    inputs: [ticks([10, 'a'], [40, 'b'], [80, 'c']), ticks([20, 1], [60, 2])],
-    output: out([20, 'a1'], [40, 'b1'], [60, 'b2'], [80, 'c2']),
-  },
   derive: {
     operator: 'derive([letters, digits], (l, d) => l + d)',
     inputs: [ticks([10, 'a'], [40, 'b'], [80, 'c']), ticks([20, 1], [60, 2])],

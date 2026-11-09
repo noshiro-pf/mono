@@ -1,4 +1,4 @@
-import { combine, createState, filter, map } from 'synstate-next';
+import { createState, derive, filter, map } from 'synstate-next';
 
 // embed-sample-code-ignore-below
 if (import.meta.vitest !== undefined) {
@@ -10,7 +10,7 @@ if (import.meta.vitest !== undefined) {
 
     const D = A.pipe(filter((n) => n % 2 === 0)); // depth 1
 
-    const BD = combine([B, D]); // depth 2
+    const BD = derive([B, D], (b, d) => [b, d] as const); // depth 2
 
     const C = BD.pipe(map(([b, d]) => b + d)); // depth 3
 
@@ -28,7 +28,7 @@ if (import.meta.vitest !== undefined) {
 
     assert.deepStrictEqual(mut_seen, [0, 10, 22]);
 
-    assert.strictEqual(E.peek(), 20);
+    assert.strictEqual(E.getSnapshot(), 20);
 
     // embed-sample-code-ignore-below
   });

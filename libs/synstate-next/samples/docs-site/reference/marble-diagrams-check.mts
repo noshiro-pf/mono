@@ -1,6 +1,5 @@
 import {
   audit,
-  combine,
   counter,
   debounce,
   derive,
@@ -65,7 +64,6 @@ const runs: readonly (readonly [MarbleDiagramSlug, Run])[] = [
     (a) => a.pipe(switchMap((x) => timer(200).pipe(map(() => x)))),
   ],
   ['merge-map', (a) => a.pipe(mergeMap((x) => timer(200).pipe(map(() => x))))],
-  ['combine', (letters, digits) => combine([letters, digits])],
   [
     'derive',
     (letters, digits) => derive([letters, digits], (l, d) => `${l}${d}`),

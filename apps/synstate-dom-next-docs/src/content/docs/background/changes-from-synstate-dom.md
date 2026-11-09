@@ -29,6 +29,7 @@ These are the changes an application written with synstate-dom meets first; syns
 - **Subscribers run once every value is up to date**, not during the update, and a write made during propagation waits for it to end. Updates never nest, so there is no warning about writing while another state propagates: the write is simply applied next.
 - **`complete` is gone.** An observable ends by being disposed with its owner. A source that is done (a `timer` that fired, a `fromPromise` that resolved) keeps its value until its owner disposes it.
 - **The setters of `createState` return nothing**; read the state with `getSnapshot`, or with `.value` on the observable.
-- **Operators that are one `map` are gone** (`mapTo`, `pluck`, `getKey`, `attachIndex`, `mapOptional`, `unwrapOptional`, `mapResultOk`, …), and so are the aliases (`combineLatest`, `distinctUntilChanged`, `withLatestFrom`, `flatMap`). `pipe` takes several operators at once.
+- **`getSnapshot()` returns the value or `undefined`**, not an `Optional`, and **`subscribe` returns the function that stops it**, not a `{ unsubscribe }` object.
+- **Operators that are one `map` are gone** (`mapTo`, `pluck`, `getKey`, `attachIndex`, `mapOptional`, `unwrapOptional`, `mapResultOk`, …), and so are the aliases (`combineLatest`, `distinctUntilChanged`, `withLatestFrom`, `flatMap`). `combine` is gone too: `derive([a, b], (x, y) => [x, y] as const)` gives the tuple.
 - **`timer` and `counter` start when they are created.** Create one inside the owner that should stop it.
 - **Observables from two copies of the package cannot be combined**, or bound.

@@ -91,7 +91,7 @@ export const PriceList = (): JSX.Element => (
 );
 ```
 
-A `map` node computes `fn` once per update, and passes on a result only when it is not `Object.is` the last one: an equal result stops the update there, and nothing below it is visited. So a binding writes to the DOM only when what it shows changed. The result is an observable like any other: several bindings, `.value` and further operators can all read it. `pipe` takes several operators at once, `source$.pipe(filter(f), map(g), withInitialValue(x))`, and works out from them whether the result always holds a value.
+A `map` node computes `fn` once per update, and passes on a result only when it is not `Object.is` the last one: an equal result stops the update there, and nothing below it is visited. So a binding writes to the DOM only when what it shows changed. The result is an observable like any other: several bindings, `.value` and further operators can all read it. `pipe` takes one operator, and calls chain, `source$.pipe(filter(f)).pipe(map(g)).pipe(withInitialValue(x))`; each works out from its operator whether the result always holds a value.
 
 ## Receiving a `Bindable`: `mapBindable`, `deriveBindable`, `toObservable`
 

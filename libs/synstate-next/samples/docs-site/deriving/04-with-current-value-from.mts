@@ -15,10 +15,9 @@ if (import.meta.vitest !== undefined) {
 
     // What the draft holds when the form is submitted. Typing alone sends
     // nothing: `draft` is read, not followed.
-    const sent = submitted.pipe(
-      withCurrentValueFrom(draft),
-      map(([, text]) => text, { equals: () => false }),
-    );
+    const sent = submitted
+      .pipe(withCurrentValueFrom(draft))
+      .pipe(map(([, text]) => text, { equals: () => false }));
 
     const mut_sent: string[] = [];
 

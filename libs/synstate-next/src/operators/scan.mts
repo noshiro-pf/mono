@@ -13,7 +13,10 @@ import {
  * the source.
  */
 export const scan =
-  <A, B>(reducer: (acc: B, value: A) => B, seed: B): Operator<A, B, 'with'> =>
+  <A, B>(
+    reducer: (acc: B, value: A) => B,
+    seed: B,
+  ): Operator<A, B, 'provide'> =>
   (source) =>
     view(new ScanClass(toNode(source), reducer, seed));
 

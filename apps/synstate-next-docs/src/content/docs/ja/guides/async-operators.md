@@ -212,5 +212,5 @@ const words: Subscribable<string> = {
 const followed = fromSubscribable(words);
 
 // A value given while it subscribes is held from the start.
-assert.deepStrictEqual(followed.peek(), Result.ok('world'));
+assert.deepStrictEqual(followed.getSnapshot(), Result.ok('world'));
 ```

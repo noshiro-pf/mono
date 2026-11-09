@@ -8,7 +8,7 @@ description: synstate-next のスケジューラーが読み書きするフィ�
 ## グラフ
 
 ```tsx
-import { combine, createState, filter, map } from 'synstate-next';
+import { createState, derive, filter, map } from 'synstate-next';
 
 const [A, setA] = createState(0);
 
@@ -16,7 +16,7 @@ const B = A.pipe(map((n) => n * 10)); // depth 1
 
 const D = A.pipe(filter((n) => n % 2 === 0)); // depth 1
 
-const BD = combine([B, D]); // depth 2
+const BD = derive([B, D], (b, d) => [b, d] as const); // depth 2
 
 const C = BD.pipe(map(([b, d]) => b + d)); // depth 3
 
@@ -34,7 +34,7 @@ setA(2); // B = 20, D = 2, BD = [20, 2], E = 20, C = 22
 
 assert.deepStrictEqual(mut_seen, [0, 10, 22]);
 
-assert.strictEqual(E.peek(), 20);
+assert.strictEqual(E.getSnapshot(), 20);
 ```
 
 深さはコメントのとおりです。`A` は深さ 0 の状態で、`B` と `D` はそれを追い、`BD` は両方を追い、`C` は `BD` を、`E` は `D` を追います。`C` の購読者は effect です。
@@ -61,7 +61,7 @@ assert.strictEqual(E.peek(), 20);
 1. `A.set(1)` が `A` の値を変えます。`A` には子があるので、番号が振られ（`writeCount` が 1、`A.emittedAt = 1`）、`queuedAt` に `pending` の印を付けて `pending` に入ります。phase は `idle` で batch も開いていないので、更新が始まります。
 2. 更新が始まり、`epoch` が 2 になります（`epoch` は 1 から始まり、何も観測していない書き込みでも増えるので、見出しの番号とは一致しません）。`A.changedAt = 2` となり、`A` の子がキューに入ります。`B.queuedAt = 2` で `buckets[1]` へ、`D.queuedAt = 2` で `buckets[1]` へ。`minDepth = maxDepth = 1` です。
 3. **再計算、深さ 1。** `B` が `10` を計算し、`0` と違うので `B.changedAt = 2` となり、`BD` を `buckets[2]` に入れます（`maxDepth = 2`）。`D` が計算し直すと `1` は奇数なので `false` を返します。`D` は `0` を保ち、子はキューに入らず、`E` には触れません。
-4. **再計算、深さ 2。** `BD` が計算し直します。両方の親の値 `[10, 0]` を読みます。`combine` は比較しないので値を流し、`C` を `buckets[3]` に入れます。
+4. **再計算、深さ 2。** `BD` が計算し直します。両方の親の値 `[10, 0]` を読みます。新しいタプルは持っていた値と等しくならないので値を流し、`C` を `buckets[3]` に入れます。
 5. **再計算、深さ 3。** `C` が `10` を計算して流し、自分の effect をキューに入れます。購読者が `queuedAt = 2` で `effects` に入ります。
 6. **effect。** 購読者が実行され、`10` を読みます。`bucketLengths` はすべて 0 に戻っており、再計算でノードを取り出した各スロットは `undefined` に戻してあるので、ノードを生かし続けるバケットはありません。
 

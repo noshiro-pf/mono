@@ -5,6 +5,12 @@ description: synstate-next で振る舞いが変わったものすべてと、�
 
 synstate-next は、次のメジャーバージョンで synstate を置き換えます。このページでは、synstate 向けに書いたプログラムが変えなければならないことを挙げます。理由は[更新の伝わり方](/mono/synstate-next/ja/internals/how-an-update-propagates/)と[完了がない理由](/mono/synstate-next/ja/internals/why-no-completion/)にあります。
 
+## 値の読み方と購読
+
+- **`getSnapshot()` は、値か、値がなければ `undefined` を返します。** `Optional` は返しません。値を持つかどうかは `hasValue` でわかり、`InitializedObservable` には `.value` があります。
+- **`subscribe` は、購読を止める関数を返します。** `{ unsubscribe }` オブジェクトではありません。
+- **`kind`・`depth`・`isCompleted`・`updateToken` は公開されていません。** 更新の順番は今もノードの深さで決まりますが、それはライブラリの内部のものです。
+
 ## 伝播と書き込み
 
 - **購読者は、更新の途中ではなく、すべての値が新しくなった後で実行されます。** 購読者がグラフの他の値を読めば、それは最新です。ただし、同じ更新で先に動いた購読者が書き込んだときは別です（次の項目）。
@@ -28,8 +34,8 @@ synstate-next は、次のメジャーバージョンで synstate を置き換�
 - **`withBufferedFrom` は、作られた後に相手が流したものを溜めます。** synstate は、相手が持っていた値を最初のバッファに入れていました。
 - **`filter` と `skipWhile` の述語が受け取るのは値だけで**、添字は受け取りません。数えるなら `scan` です。
 - **1 つの `map` で書けるオペレーターはなくなりました。** `mapTo`（イベントに対する `equals: () => false` 付きの `map`）、`pluck` と `getKey`、`attachIndex` と `withIndex`（`scan`）、`mapOptional`・`unwrapOptional`・`mapResultOk`・`mapResultErr`・`unwrapResultOk`・`unwrapResultErr` です。
-- **別名はなくなりました。** `withLatestFrom`（`withCurrentValueFrom`）、`withBuffered`（`withBufferedFrom`）、`combineLatest`（`combine`）、`distinctUntilChanged`（`skipIfNoChange`）、`flatMap`（`mergeMap`）です。
-- **`pipe` が取るオペレーターは 4 つまでです。** それより多ければ `pipe` をもう一度つなぎます。
+- **別名はなくなりました。** `withLatestFrom`（`withCurrentValueFrom`）、`withBuffered`（`withBufferedFrom`）、`distinctUntilChanged`（`skipIfNoChange`）、`flatMap`（`mergeMap`）です。
+- **`combine` はなくなりました。** `derive` は複数の Observable から 1 つの値を計算します。引数をタプルにして返す `fn` を渡した `derive([a, b], (x, y) => [x, y] as const)` で、タプルそのものが得られます。別名の `combineLatest` も一緒になくなりました。
 
 ## ソースとヘルパー
 

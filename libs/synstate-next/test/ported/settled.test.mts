@@ -8,10 +8,10 @@
  */
 import {
   batch,
-  combine,
   counter,
   createOwner,
   createState,
+  derive,
   empty,
   fromSubscribable,
   isObservable,
@@ -61,7 +61,7 @@ describe(take, () => {
 
     const doubled = collect(taken.pipe(map((x) => x * 2)));
 
-    const pairs = collect(combine([taken, num]));
+    const pairs = collect(derive([taken, num], (...values) => values));
 
     num.next(1);
 
@@ -355,7 +355,7 @@ describe(source, () => {
 
     assert.deepStrictEqual(seen, [1]);
 
-    assert.strictEqual(s.peek(), 1);
+    assert.strictEqual(s.getSnapshot(), 1);
   });
 
   test('what is derived from a disposed source is settled at once, and holds the value it computed (#2248)', () => {
@@ -533,7 +533,7 @@ describe(isObservable, () => {
   test('rejects values that only look like an observable, and primitives', () => {
     for (const value of [
       { subscribe: () => {} },
-      { subscribe: () => {}, pipe: () => {}, peek: () => {} },
+      { subscribe: () => {}, pipe: () => {}, getSnapshot: () => {} },
       () => {},
       0,
       'a',

@@ -30,31 +30,38 @@ export const createSearch = (): Search => {
   return owner.run(() => {
     const [query, setQuery] = createState('');
 
-    const searchState = query.pipe(
-      debounce(debounceMs), // wait for typing to pause
-      map((q) => q.trim()), // map passes on only a changed query
-      // A newer query disposes the previous inner observable, and disposing it
-      // aborts its request.
-      switchMap((q): Observable<SearchState> =>
-        q === ''
-          ? just(idleState)
-          : fromAbortablePromise((signal) => fetchItems(q, signal)).pipe(
-              // A rejection arrives as a value: Result.err(error)
-              map((result): SearchState =>
-                Result.isOk(result)
-                  ? { status: 'success', query: q, items: result.value }
-                  : {
-                      status: 'error',
-                      query: q,
-                      message: toErrorMessage(result.value),
-                    },
-              ),
-              // held as soon as the request starts
-              withInitialValue<SearchState>({ status: 'loading', query: q }),
-            ),
-      ),
-      withInitialValue(idleState),
-    );
+    const searchState = query
+      .pipe(debounce(debounceMs)) // wait for typing to pause
+      .pipe(map((q) => q.trim())) // map passes on only a changed query
+      .pipe(
+        // A newer query disposes the previous inner observable, and disposing
+        // it aborts its request.
+        switchMap((q): Observable<SearchState> =>
+          q === ''
+            ? just(idleState)
+            : fromAbortablePromise((signal) => fetchItems(q, signal))
+                .pipe(
+                  // A rejection arrives as a value: Result.err(error)
+                  map((result): SearchState =>
+                    Result.isOk(result)
+                      ? { status: 'success', query: q, items: result.value }
+                      : {
+                          status: 'error',
+                          query: q,
+                          message: toErrorMessage(result.value),
+                        },
+                  ),
+                )
+                .pipe(
+                  // held as soon as the request starts
+                  withInitialValue<SearchState>({
+                    status: 'loading',
+                    query: q,
+                  }),
+                ),
+        ),
+      )
+      .pipe(withInitialValue(idleState));
 
     return {
       setQuery,

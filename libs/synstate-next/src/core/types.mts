@@ -1,12 +1,14 @@
+import type { StrictOmit } from 'ts-type-forge';
+
 /** Stops a subscription. */
 export type Unsubscribe = () => void;
 
 /**
  * What an operator does to the initial value: `keep` has one when its source
- * has one (`map`), `drop` may have none (`filter`), `with` always has one
+ * has one (`map`), `drop` may have none (`filter`), `provide` always gives one
  * (`scan`, `withInitialValue`).
  */
-export type InitKind = 'drop' | 'keep' | 'with';
+export type InitKind = 'drop' | 'keep' | 'provide';
 
 declare const initKindTag: unique symbol;
 
@@ -36,7 +38,7 @@ export type Observable<A> = Readonly<{
   /** Whether it holds a value. */
   hasValue: boolean;
   /** The value it holds, or `undefined` when it holds none. */
-  peek: () => A | undefined;
+  getSnapshot: () => A | undefined;
   /**
    * Calls `fn` with the current value, if any, and then with every value once
    * every value of its update is up to date. Belongs to the current owner.
@@ -47,91 +49,40 @@ export type Observable<A> = Readonly<{
   dispose: () => void;
 }>;
 
-/** An observable that always holds a value. */
-export type InitializedObservable<A> = Observable<A> &
+/**
+ * An observable that always holds a value. `getSnapshot` is replaced, not
+ * intersected, so that it has the one signature that returns `A`: an
+ * intersection would also keep `() => A | undefined`, which inference against
+ * `Observable<A>` and `ReturnType` would read.
+ */
+export type InitializedObservable<A> = StrictOmit<
+  Observable<A>,
+  'getSnapshot'
+> &
   Initialized &
   Readonly<{
     /** The value it holds. */
     value: A;
+    /** The value it holds, as `value` reads it. */
+    getSnapshot: () => A;
   }>;
 
 type Out<B, I extends boolean> = I extends true
   ? InitializedObservable<B>
   : Observable<B>;
 
-type After<I extends boolean, K extends InitKind> = K extends 'with'
-  ? true
-  : K extends 'drop'
-    ? false
-    : I;
-
 /**
- * `pipe(op1, op2, …)`: applies the operators in order. The result holds a value
- * when the source does and no operator drops it, or when an operator provides
- * one.
+ * `pipe(op)`: applies one operator; chain calls to apply more
+ * (`a.pipe(map(f)).pipe(filter(p))`). The result holds a value when the source
+ * does and the operator does not drop it, or when the operator provides one.
  */
 export type Pipe<A> = {
-  <B, K1 extends InitKind>(
+  <B, K extends InitKind>(
     this: Initialized,
-    o1: Operator<A, B, K1>,
-  ): Out<B, After<true, K1>>;
+    operator: Operator<A, B, K>,
+  ): Out<B, K extends 'drop' ? false : true>;
 
-  <B, K1 extends InitKind>(o1: Operator<A, B, K1>): Out<B, After<false, K1>>;
-
-  <B, C, K1 extends InitKind, K2 extends InitKind>(
-    this: Initialized,
-    o1: Operator<A, B, K1>,
-    o2: Operator<B, C, K2>,
-  ): Out<C, After<After<true, K1>, K2>>;
-
-  <B, C, K1 extends InitKind, K2 extends InitKind>(
-    o1: Operator<A, B, K1>,
-    o2: Operator<B, C, K2>,
-  ): Out<C, After<After<false, K1>, K2>>;
-
-  <B, C, D, K1 extends InitKind, K2 extends InitKind, K3 extends InitKind>(
-    this: Initialized,
-    o1: Operator<A, B, K1>,
-    o2: Operator<B, C, K2>,
-    o3: Operator<C, D, K3>,
-  ): Out<D, After<After<After<true, K1>, K2>, K3>>;
-
-  <B, C, D, K1 extends InitKind, K2 extends InitKind, K3 extends InitKind>(
-    o1: Operator<A, B, K1>,
-    o2: Operator<B, C, K2>,
-    o3: Operator<C, D, K3>,
-  ): Out<D, After<After<After<false, K1>, K2>, K3>>;
-
-  <
-    B,
-    C,
-    D,
-    E,
-    K1 extends InitKind,
-    K2 extends InitKind,
-    K3 extends InitKind,
-    K4 extends InitKind,
-  >(
-    this: Initialized,
-    o1: Operator<A, B, K1>,
-    o2: Operator<B, C, K2>,
-    o3: Operator<C, D, K3>,
-    o4: Operator<D, E, K4>,
-  ): Out<E, After<After<After<After<true, K1>, K2>, K3>, K4>>;
-
-  <
-    B,
-    C,
-    D,
-    E,
-    K1 extends InitKind,
-    K2 extends InitKind,
-    K3 extends InitKind,
-    K4 extends InitKind,
-  >(
-    o1: Operator<A, B, K1>,
-    o2: Operator<B, C, K2>,
-    o3: Operator<C, D, K3>,
-    o4: Operator<D, E, K4>,
-  ): Out<E, After<After<After<After<false, K1>, K2>, K3>, K4>>;
+  <B, K extends InitKind>(
+    operator: Operator<A, B, K>,
+  ): Out<B, K extends 'provide' ? true : false>;
 };

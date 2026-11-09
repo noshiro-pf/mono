@@ -60,23 +60,26 @@ import { Result } from 'ts-std-forge';
 
 const [query, setQuery] = createState('');
 
-const results = query.pipe(
+const results = query
     // Wait for typing to pause.
-    debounce(300),
-    // A new query disposes the previous request, which aborts it; so does
-    // clearing the box, which follows an empty answer instead.
-    switchMap((q) =>
-        q.trim() === ''
-            ? just(Result.ok<readonly string[]>([]))
-            : fromAbortablePromise(async (signal) => {
-                  const params = new URLSearchParams({ q });
+    .pipe(debounce(300))
+    .pipe(
+        // A new query disposes the previous request, which aborts it; so does
+        // clearing the box, which follows an empty answer instead.
+        switchMap((q) =>
+            q.trim() === ''
+                ? just(Result.ok<readonly string[]>([]))
+                : fromAbortablePromise(async (signal) => {
+                      const params = new URLSearchParams({ q });
 
-                  return fetch(`/api/search?${params.toString()}`, {
-                      signal,
-                  }).then(async (r) => r.json() as Promise<readonly string[]>);
-              }),
-    ),
-);
+                      return fetch(`/api/search?${params.toString()}`, {
+                          signal,
+                      }).then(
+                          async (r) => r.json() as Promise<readonly string[]>,
+                      );
+                  }),
+        ),
+    );
 ```
 
 `fromAbortablePromise` hands `fetch` an `AbortSignal`. When a new query arrives, `switchMap` disposes the request it was following, which aborts it, so an old answer can never overwrite a newer one. An empty box is a value like any other: it follows `just`, an answer that is already there, so it makes no request and still disposes the one in flight. Dropping it with `filter` before `switchMap` would leave that request running, and its answer would fill the results of a box that is now empty.
@@ -89,7 +92,6 @@ Declared as a graph:
 
 ```tsx
 import {
-    combine,
     createState,
     createValueEmitter,
     debounce,
@@ -127,9 +129,10 @@ const tableData = fromPromise(
     }),
 );
 
-const filters = combine([filterName, filterEmail, filterGender]).pipe(
-    debounce(300),
-);
+const filters = derive(
+    [filterName, filterEmail, filterGender],
+    (name, email, gender) => [name, email, gender] as const,
+).pipe(debounce(300));
 
 const filteredRows = derive(
     [filters, tableData],

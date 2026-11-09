@@ -11,7 +11,7 @@ The examples on this page use `@preact/signals-core`, and each one that runs a l
 
 | Kind of operator                         | Examples                                        | Written with Preact Signals as                            | What is lost                                                                                                           |
 | ---------------------------------------- | ----------------------------------------------- | --------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
-| Pure synchronous transform               | `map`, `derive`, `combine`                      | a `computed`                                              | nothing                                                                                                                |
+| Pure synchronous transform               | `map`, `derive`                                 | a `computed`                                              | nothing                                                                                                                |
 | A choice among signals that exist        | `switchMap` to one of several states            | a `computed` that reads `branches[selector.value]`        | nothing: the dependency follows the read                                                                               |
 | State carried from one value to the next | `scan`, `pairwise`, `skip`, `take`              | an effect that writes a signal                            | events (an equal write is dropped, a batch delivers its last write), consistency for readers created earlier, laziness |
 | Time                                     | `debounce`, `throttle`, `audit`, `timer`        | an effect that sets a timer and writes a signal           | laziness                                                                                                               |
@@ -110,18 +110,20 @@ export const createSearchView = (): SearchView => {
     // request.
     const searchState = query.pipe(
         switchMap((q) =>
-            timer(answerMs).pipe(
-                map((): SearchState => ({ status: 'success', query: q })),
+            timer(answerMs)
+                .pipe(map((): SearchState => ({ status: 'success', query: q })))
                 // held in the same update as the query
-                withInitialValue<SearchState>({ status: 'loading', query: q }),
-            ),
+                .pipe(
+                    withInitialValue<SearchState>({
+                        status: 'loading',
+                        query: q,
+                    }),
+                ),
         ),
     );
 
     // What the page shows: the query in the box, and what the list is for.
-    const view = combine([query, searchState]).pipe(
-        map(([q, state]) => showView(q, state)),
-    );
+    const view = derive([query, searchState], (q, state) => showView(q, state));
 
     const mut_viewLog: string[] = [];
 

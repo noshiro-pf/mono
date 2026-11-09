@@ -5,6 +5,12 @@ description: Everything that behaves differently in synstate-next, and what to w
 
 synstate-next replaces synstate in its next major version. This page lists what a program written for synstate has to change. The reasons are in [How an update propagates](/mono/synstate-next/internals/how-an-update-propagates/) and [Why there is no completion](/mono/synstate-next/internals/why-no-completion/).
 
+## Reading and subscribing
+
+- **`getSnapshot()` returns the value, or `undefined` when there is none**, not an `Optional`. `hasValue` says whether it holds one, and an `InitializedObservable` has `.value`.
+- **`subscribe` returns the function that stops the subscription**, not a `{ unsubscribe }` object.
+- **`kind`, `depth`, `isCompleted` and `updateToken` are not public.** A node's depth still orders the update, but it is the library's own.
+
 ## Propagation and writes
 
 - **Subscribers run once every value is up to date**, not during the update. A subscriber reads every other value of the graph up to date, unless a subscriber before it in the same update has written (next bullet).
@@ -28,8 +34,8 @@ synstate-next replaces synstate in its next major version. This page lists what 
 - **`withBufferedFrom` buffers what the other observable emits after it was created**; synstate put the value it held into the first buffer.
 - **The predicates of `filter` and `skipWhile` receive the value alone**, not its index. A `scan` counts.
 - **The operators that are one `map` are gone**: `mapTo` (a `map` with `equals: () => false` on an event), `pluck` and `getKey`, `attachIndex` and `withIndex` (a `scan`), `mapOptional`, `unwrapOptional`, `mapResultOk`, `mapResultErr`, `unwrapResultOk`, `unwrapResultErr`.
-- **The aliases are gone**: `withLatestFrom` (`withCurrentValueFrom`), `withBuffered` (`withBufferedFrom`), `combineLatest` (`combine`), `distinctUntilChanged` (`skipIfNoChange`), `flatMap` (`mergeMap`).
-- **`pipe` takes up to four operators**, chained with `pipe` again for more.
+- **The aliases are gone**: `withLatestFrom` (`withCurrentValueFrom`), `withBuffered` (`withBufferedFrom`), `distinctUntilChanged` (`skipIfNoChange`), `flatMap` (`mergeMap`).
+- **`combine` is gone.** `derive` computes one value from several observables; a `fn` that returns its arguments as a tuple, `derive([a, b], (x, y) => [x, y] as const)`, gives the tuple itself. Its alias `combineLatest` goes with it.
 
 ## Sources and helpers
 
