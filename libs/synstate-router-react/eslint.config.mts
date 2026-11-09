@@ -73,8 +73,6 @@ export default [
       // reader knows; memoizing every one of them would bury that under this
       // repository's component style.
       'react-coding-style/require-react-memo': 'off',
-      // `react-dom/server` is the entry point React publishes for it.
-      'import-x/no-internal-modules': 'off',
     }),
   },
 

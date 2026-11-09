@@ -70,7 +70,9 @@ const getUser = (): Readonly<{ name: string; email: string }> =>
     userState.getSnapshot().value;
 
 const UserProfile = (): React.JSX.Element => {
-    const user = React.useSyncExternalStore(subscribeUser, getUser);
+    // `getUser` doubles as `getServerSnapshot`, which server rendering and
+    // hydration require.
+    const user = React.useSyncExternalStore(subscribeUser, getUser, getUser);
 
     return (
         <div>
