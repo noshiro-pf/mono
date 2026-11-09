@@ -9,13 +9,35 @@ import {
 import { eslintPluginTsDataForge } from 'eslint-plugin-ts-data-forge';
 import { eslintPluginTsFortress } from 'eslint-plugin-ts-fortress';
 import { eslintPluginTsTypeForge } from 'eslint-plugin-ts-type-forge';
+import { Arr } from 'ts-data-forge';
 import {
   dateUtilsClockFunctions,
   dateUtilsRules,
 } from '../../tools/configs/eslint-date-utils.mjs';
 import { eslintConfigOffForOxlint } from '../../tools/configs/oxlint-rules.mjs';
+import packageJson from './package.json' with { type: 'json' };
 
 const thisDir = import.meta.dirname;
+
+/**
+ * What this app's manifest names with a `workspace:` range, and their
+ * subpaths: what `e2e/` may import for types only.
+ */
+const workspaceDependencyPatterns = [
+  packageJson.dependencies,
+  packageJson.devDependencies,
+].flatMap((ranges) =>
+  Object.entries(ranges)
+    .filter(([, range]) => range.startsWith('workspace:'))
+    .flatMap(([name]) => [name, `${name}/*`]),
+);
+
+// An empty list would turn the restriction on `e2e/` below off without a word.
+if (!Arr.isNonEmpty(workspaceDependencyPatterns)) {
+  throw new Error(
+    'eslint.config.mts found no `workspace:` dependency in package.json to keep out of e2e/.',
+  );
+}
 
 export default [
   {
@@ -109,6 +131,53 @@ export default [
     }),
   },
   eslintConfigForPlaywright(['e2e/**']),
+  {
+    // `.github/workflows/e2e-production.yml` installs this app alone and
+    // builds nothing, and Playwright imports every spec before it filters by
+    // tag, so a spec, or anything the job's config loads, importing a
+    // workspace package at run time fails the daily job with "Cannot find
+    // module" and nothing else does. These are the files the job loads today.
+    // The rule reads each file's own import specifiers and follows no relative
+    // import, so a file the job comes to load through one has to join the list.
+    files: [
+      'e2e/**',
+      'configs/playwright.production.config.mts',
+      'scripts/workspace-root-path.mts',
+    ],
+    rules: defineKnownRules({
+      'no-restricted-imports': [
+        'error',
+        mergeRestrictedImportsOptions(restrictedImportsOptions, {
+          patterns: [
+            {
+              group: workspaceDependencyPatterns,
+              allowTypeImports: true,
+              message:
+                'The daily production e2e job builds no workspace package: import its types only (`import type`), or write the code here.',
+            },
+          ],
+        }),
+      ],
+      'ts-restrictions/no-restricted-syntax': [
+        'error',
+        {
+          selector: 'ImportExpression',
+          message:
+            'Import statically, so that `no-restricted-imports` sees what the daily production e2e job would have to load.',
+        },
+      ],
+      // These ask for ts-data-forge or ts-fortress, or check code that uses
+      // them; neither can be used here at run time.
+      ...Object.fromEntries(
+        [
+          eslintPluginTsDataForge.configs.recommended.rules,
+          eslintPluginTsFortress.configs.recommended.rules,
+        ].flatMap((rules) =>
+          Object.keys(rules).map((rule) => [rule, 'off'] as const),
+        ),
+      ),
+    }),
+  },
 
   { rules: defineKnownRules(dateUtilsRules) },
   {

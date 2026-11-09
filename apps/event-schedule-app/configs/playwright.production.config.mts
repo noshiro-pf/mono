@@ -20,7 +20,9 @@ export default defineConfig({
   // Playwright imports every spec before it filters by tag, and the daily job
   // installs this app alone and builds nothing, so no spec under `e2e/` may
   // import a workspace package at run time; one that does fails the job with
-  // "Cannot find module".
+  // "Cannot find module". `eslint.config.mts` holds `e2e/`, this file and
+  // `scripts/workspace-root-path.mts` to that; a file this one comes to import
+  // has to join the `files` of that block.
   grep: /@smoke|@production/u,
 
   // One worker, for the reason the shared config gives, and because the

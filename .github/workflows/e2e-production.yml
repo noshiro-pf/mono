@@ -50,8 +50,9 @@ jobs:
         with:
           install: false
 
-      # The specs import nothing from the workspace, so the app's own
-      # dependencies are all the tests need, and nothing is built.
+      # The specs import nothing from the workspace at run time (the app's
+      # `eslint.config.mts` holds them to it), so the app's own dependencies
+      # are all the tests need, and nothing is built.
       - name: Install the app and its browser
         env:
           DIR: apps/event-schedule-app
