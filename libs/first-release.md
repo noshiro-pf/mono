@@ -143,6 +143,7 @@ git タグも失敗したパッケージの分だけが作られる。
 - [ ] Release PR をマージする**前**に手動 publish した
 - [ ] `pnpm publish`（`npm publish` ではない）を使った
 - [ ] trusted publisher を設定した（Environment は `release`。飛ばすと Release が 404 で落ちる）
+- [ ] trusted publishing で次のバージョンが出たら、`tools/scripts/cmd/verify-npm-packages.mts` の `notYetPublished` から外し、`pnpm run verify:npm-packages:published` で published 空間に pin した
 - [ ] 公開後、まっさらなディレクトリで実際にインストールして動かした
 
 最後の項目は省略しないこと。`ts-codemod-lib` の CLI は

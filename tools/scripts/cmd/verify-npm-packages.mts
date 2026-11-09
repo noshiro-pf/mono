@@ -1099,11 +1099,7 @@ const generateSpace = async (
  * checkout — a version that does not have it. Removing the entry then only pins
  * the breakage. Wait for the release that fixes it.
  */
-const notYetPublished: ReadonlySet<string> = new Set<string>([
-  'synstate-router',
-  'synstate-router-dom',
-  'synstate-router-react',
-]);
+const notYetPublished: ReadonlySet<string> = new Set<string>();
 
 const typesOnlyPackages: ReadonlySet<string> = new Set<string>([
   'ts-type-forge',
