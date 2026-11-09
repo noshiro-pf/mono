@@ -1,19 +1,21 @@
 ---
 title: Deriving values
-description: pipe and InitKind, derive, merge and zip, stopping where a value does not change, and reading a value without following it.
+description: pipe and the three kinds of operator, derive, merge and zip, stopping where a value does not change, and reading a value without following it.
 ---
 
 ## `pipe`
 
-`observable.pipe(op)` applies one operator; chain `pipe` for more, as in `a.pipe(map(f)).pipe(filter(p))`. Each operator declares in its type what it does to the value held at the start:
+`observable.pipe(op)` applies one operator; chain `pipe` for more, as in `a.pipe(map(f)).pipe(filter(p))`. Each operator's type says what it does to the value held at the start, in what it takes and returns:
 
-| `InitKind` | Meaning                                  | Operators                                                                                                            |
-| :--------- | :--------------------------------------- | :------------------------------------------------------------------------------------------------------------------- |
-| `keep`     | Holds a value when its source does       | `map`, `debounce`, `throttle`, `audit`, `take`, `takeUntil`, `skipIfNoChange`, `keepEqualParts`, `withBufferedFrom`  |
-| `drop`     | May hold none, whatever its source holds | `filter`, `skip`, `takeWhile`, `skipWhile`, `skipUntil`, `pairwise`, `switchMap`, `mergeMap`, `withCurrentValueFrom` |
-| `provide`  | Always holds one                         | `scan`, `withInitialValue`                                                                                           |
+| Operator type                 | Meaning                                  | Operators                                                                                                            |
+| :---------------------------- | :--------------------------------------- | :------------------------------------------------------------------------------------------------------------------- |
+| `KeepInitialValueOperator`    | Holds a value when its source does       | `map`, `debounce`, `throttle`, `audit`, `take`, `takeUntil`, `skipIfNoChange`, `keepEqualParts`, `withBufferedFrom`  |
+| `DropInitialValueOperator`    | May hold none, whatever its source holds | `filter`, `skip`, `takeWhile`, `skipWhile`, `skipUntil`, `pairwise`, `switchMap`, `mergeMap`, `withCurrentValueFrom` |
+| `ProvideInitialValueOperator` | Always holds one                         | `scan`, `withInitialValue`                                                                                           |
 
-`pipe` turns the operator's kind into the type of the result: an `InitializedObservable<A>`, which has `.value`, or an `Observable<A>`, which has `hasValue` and `getSnapshot()`. See the [introduction](/mono/synstate-next/getting-started/introduction/#deriving-values-with-pipe) for an example.
+`pipe` turns the operator's type into the type of the result: an `InitializedObservable<A>`, which has `.value`, or an `Observable<A>`, which has `hasValue` and `getSnapshot()`. See the [introduction](/mono/synstate-next/getting-started/introduction/#deriving-values-with-pipe) for an example.
+
+The kind is in the types the operator takes and returns, not in a label beside them: a `ProvideInitialValueOperator` returns an `InitializedObservable`, so an operator you write that may return an observable with no value does not type-check as one without a cast.
 
 ## `derive`
 

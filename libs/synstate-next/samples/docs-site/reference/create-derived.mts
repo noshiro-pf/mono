@@ -1,13 +1,13 @@
 import {
   createDerived,
   createState,
+  type DropInitialValueOperator,
   type Observable,
-  type Operator,
 } from 'synstate-next';
 
 // Passes on every `n`-th value of the source.
 const everyNth =
-  <A,>(n: number): Operator<A, A, 'drop'> =>
+  <A,>(n: number): DropInitialValueOperator<A, A> =>
   (source: Observable<A>): Observable<A> =>
     createDerived<A>([source], (ctx) => {
       let mut_count = 0;

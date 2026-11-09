@@ -80,34 +80,34 @@ const srcDir = path.resolve(workspaceRootPath, '../../libs/synstate-next/src');
 
 const docsDir = path.resolve(workspaceRootPath, 'src/content/docs');
 
-type InitKind = 'drop' | 'keep' | 'provide';
+type OperatorKind = 'Drop' | 'Keep' | 'Provide';
 
-const initKindLink = {
+const operatorKindLink = {
   en: '/mono/synstate-next/guides/deriving-values/',
   ja: '/mono/synstate-next/ja/guides/deriving-values/',
 } as const;
 
-const initKindSentences = {
+const operatorKindSentences = {
   en: {
-    keep: `Its result holds a value whenever the source does: on an \`InitializedObservable\`, \`pipe\` gives one ([\`keep\`](${initKindLink.en}#pipe)).`,
-    drop: `Its result may hold no value even when the source holds one: \`pipe\` gives an \`Observable\` ([\`drop\`](${initKindLink.en}#pipe)).`,
-    provide: `Its result always holds a value: \`pipe\` gives an \`InitializedObservable\` ([\`provide\`](${initKindLink.en}#pipe)).`,
+    Keep: `Its result holds a value whenever the source does: on an \`InitializedObservable\`, \`pipe\` gives one ([\`KeepInitialValueOperator\`](${operatorKindLink.en}#pipe)).`,
+    Drop: `Its result may hold no value even when the source holds one: \`pipe\` gives an \`Observable\` ([\`DropInitialValueOperator\`](${operatorKindLink.en}#pipe)).`,
+    Provide: `Its result always holds a value: \`pipe\` gives an \`InitializedObservable\` ([\`ProvideInitialValueOperator\`](${operatorKindLink.en}#pipe)).`,
   },
   ja: {
-    keep: `ソースが値を持てば、結果も値を持ちます。\`pipe\` は \`InitializedObservable\` をそのまま保ちます（[\`keep\`](${initKindLink.ja}#pipe)）。`,
-    drop: `ソースが値を持っていても、結果は値を持たないことがあります。\`pipe\` の結果は \`Observable\` です（[\`drop\`](${initKindLink.ja}#pipe)）。`,
-    provide: `結果は常に値を持ちます。\`pipe\` の結果は \`InitializedObservable\` です（[\`provide\`](${initKindLink.ja}#pipe)）。`,
+    Keep: `ソースが値を持てば、結果も値を持ちます。\`pipe\` は \`InitializedObservable\` をそのまま保ちます（[\`KeepInitialValueOperator\`](${operatorKindLink.ja}#pipe)）。`,
+    Drop: `ソースが値を持っていても、結果は値を持たないことがあります。\`pipe\` の結果は \`Observable\` です（[\`DropInitialValueOperator\`](${operatorKindLink.ja}#pipe)）。`,
+    Provide: `結果は常に値を持ちます。\`pipe\` の結果は \`InitializedObservable\` です（[\`ProvideInitialValueOperator\`](${operatorKindLink.ja}#pipe)）。`,
   },
 } as const;
 
 /**
- * The kind of `Operator` the declaration of `name` returns, if it does: read
- * from its header, which runs to the first blank line.
+ * The kind of operator the declaration of `name` returns, if it does: read from
+ * its header, which runs to the first blank line.
  */
-const extractInitKind = (
+const extractOperatorKind = (
   source: string,
   name: string,
-): InitKind | undefined => {
+): OperatorKind | undefined => {
   // eslint-disable-next-line security/detect-non-literal-regexp
   const declaration = new RegExp(
     String.raw`^export (?:const|function) ${name}\b`,
@@ -124,9 +124,13 @@ const extractInitKind = (
 
   const header = source.slice(start, end === -1 ? undefined : end);
 
-  const kind = /Operator<[^;]*?'(keep|drop|provide)'>/u.exec(header)?.[1];
+  // The return type: the operator type after the parameter list, not one that
+  // types a parameter.
+  const kind = /\)\s*:\s*(Keep|Drop|Provide)InitialValueOperator</u.exec(
+    header,
+  )?.[1];
 
-  return kind === 'keep' || kind === 'drop' || kind === 'provide'
+  return kind === 'Keep' || kind === 'Drop' || kind === 'Provide'
     ? kind
     : undefined;
 };
@@ -140,7 +144,7 @@ const fillPage = async (
 
   const mut_sections: string[] = [];
 
-  let mut_initKind: InitKind | undefined;
+  let mut_operatorKind: OperatorKind | undefined;
 
   const single = Arr.isFixedLengthArray(1, refPage.exports);
 
@@ -160,7 +164,7 @@ const fillPage = async (
       single ? jsdoc.value : `### \`${name}\`\n\n${jsdoc.value}`,
     );
 
-    mut_initKind ??= extractInitKind(source, name);
+    mut_operatorKind ??= extractOperatorKind(source, name);
   }
 
   if (Arr.isNonEmpty(mut_errors)) {
@@ -244,11 +248,11 @@ const fillPage = async (
 
     const values = {
       ...(lang === 'en' ? { jsdoc: { text: jsdocText, block: true } } : {}),
-      ...(mut_initKind === undefined
+      ...(mut_operatorKind === undefined
         ? {}
         : {
-            'init-kind': {
-              text: initKindSentences[lang][mut_initKind],
+            'operator-kind': {
+              text: operatorKindSentences[lang][mut_operatorKind],
               block: true,
             },
           }),

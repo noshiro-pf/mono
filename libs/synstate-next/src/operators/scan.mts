@@ -4,7 +4,7 @@ import {
   toNode,
   view,
   type ObservableClass,
-  type Operator,
+  type ProvideInitialValueOperator,
 } from '../core/index.mjs';
 
 /**
@@ -16,7 +16,7 @@ export const scan =
   <A, B>(
     reducer: (acc: B, value: A) => B,
     seed: B,
-  ): Operator<A, B, 'provide'> =>
+  ): ProvideInitialValueOperator<A, B> =>
   (source) =>
     view(new ScanClass(toNode(source), reducer, seed));
 

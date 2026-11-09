@@ -4,9 +4,10 @@ import {
   noValue,
   toNode,
   view,
+  type DropInitialValueOperator,
+  type KeepInitialValueOperator,
   type Observable,
   type ObservableClass,
-  type Operator,
 } from '../core/index.mjs';
 
 /**
@@ -15,7 +16,7 @@ import {
  * in does not pass. A value the notifier holds at the start is not an emission.
  */
 export const takeUntil =
-  <A,>(notifier: Observable<unknown>): Operator<A, A, 'keep'> =>
+  <A,>(notifier: Observable<unknown>): KeepInitialValueOperator<A, A> =>
   (source) =>
     view(new TakeUntilClass(toNode(source), toNode(notifier)));
 
@@ -25,7 +26,7 @@ export const takeUntil =
  * notifier holds at the start is not an emission.
  */
 export const skipUntil =
-  <A,>(notifier: Observable<unknown>): Operator<A, A, 'drop'> =>
+  <A,>(notifier: Observable<unknown>): DropInitialValueOperator<A, A> =>
   (source) =>
     view(
       new SkipUntilClass(toNode(source), new FirstEmission(toNode(notifier))),

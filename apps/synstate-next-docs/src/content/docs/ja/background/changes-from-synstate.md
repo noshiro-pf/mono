@@ -40,7 +40,7 @@ synstate-next は、次のメジャーバージョンで synstate を置き換�
 ## ソースとヘルパー
 
 - **`fromSubscribable` はオブザーバーオブジェクト**（`next`・`error`・`complete`）で購読します。RxJS が推奨し TC39 の `Observable` が受け取る形で、3 つの関数ではありません。
-- **状態はオブジェクトとしても作れます。** `state(initial)` は `.value`・`.set`・`.update` を持ち、`source()` は `.next` を持つイベントです。`createState` やエミッターは、同じものをタプルで返します。
+- **状態はオブジェクトとしても作れます。** `state(initialValue)` は `.value`・`.set`・`.update` を持ち、`source()` は `.next` を持つイベントです。`createState` やエミッターは、同じものをタプルで返します。
 
 ## オペレーターを書く
 
@@ -48,6 +48,7 @@ synstate-next は、次のメジャーバージョンで synstate を置き換�
 - **更新トークンはありません。** その更新でどの親が値を流したかは `ctx.emitted(parent)` でわかり、`ctx.set` はその更新で値を伝え、`ctx.emit` はそれ自身の更新で伝えます。
 - **`settled` が `canEmitNoMore` に代わり**、`flush` は完了とともになくなりました。
 - **setup は Observable を owner として実行されます。** そこで作ったものは Observable に属し、クリーンアップは新しいものから、作ったものを破棄する前に実行されます。synstate は登録順に実行していました。
+- **`WithInitialValueOperator` は `ProvideInitialValueOperator` になりました。** ほかの 2 つのオペレーターの型、`KeepInitialValueOperator`・`DropInitialValueOperator` と同じく動詞です。
 - **`isChildObservable`・`isManagerObservable`・`isRootObservable` の型ガードはなくなりました。** それらが区別していた種類は公開の型にありません。
 
 ## 1 つのプログラムに 1 つのコピー

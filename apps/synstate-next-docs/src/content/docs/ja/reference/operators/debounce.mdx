@@ -9,9 +9,9 @@ import MarbleDiagram from '../../../../../components/MarbleDiagram.astro';
 
 `milliseconds` の間ほかの値が来なかったところで、最新の値を独立した更新で流します。最初はソースが持っている値を持ちます。破棄すると、待っている値は捨てます。
 
-{/* reference:init-kind */}
+{/* reference:operator-kind */}
 
-ソースが値を持てば、結果も値を持ちます。`pipe` は `InitializedObservable` をそのまま保ちます（[`keep`](/mono/synstate-next/ja/guides/deriving-values/#pipe)）。
+ソースが値を持てば、結果も値を持ちます。`pipe` は `InitializedObservable` をそのまま保ちます（[`KeepInitialValueOperator`](/mono/synstate-next/ja/guides/deriving-values/#pipe)）。
 
 {/* /reference */}
 

@@ -3,9 +3,9 @@ import {
   noValue,
   toNode,
   view,
+  type KeepInitialValueOperator,
   type Observable,
   type ObservableClass,
-  type Operator,
 } from '../core/index.mjs';
 
 /**
@@ -16,7 +16,7 @@ import {
 export const withBufferedFrom =
   <A, B>(
     other: Observable<B>,
-  ): Operator<A, readonly [A, readonly B[]], 'keep'> =>
+  ): KeepInitialValueOperator<A, readonly [A, readonly B[]]> =>
   (source) =>
     view(new WithBufferedFromClass(toNode(source), toNode(other)));
 

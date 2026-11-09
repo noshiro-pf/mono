@@ -11,9 +11,9 @@ import MarbleDiagram from '../../../../../components/MarbleDiagram.astro';
 
 切り替えた時点で内側の Observable が持つ値は、切り替えを起こした更新に加わります。内側の Observable がその後に流す値は、独立した更新で届きます。他のノードと同じく、最後に流した値を持ち続けます。値を持たない内側の Observable に切り替えても何も流さず、持っている値はそのままです。そのため、ソースが値を持っていても、結果が値を持たないことがあります。
 
-{/* reference:init-kind */}
+{/* reference:operator-kind */}
 
-ソースが値を持っていても、結果は値を持たないことがあります。`pipe` の結果は `Observable` です（[`drop`](/mono/synstate-next/ja/guides/deriving-values/#pipe)）。
+ソースが値を持っていても、結果は値を持たないことがあります。`pipe` の結果は `Observable` です（[`DropInitialValueOperator`](/mono/synstate-next/ja/guides/deriving-values/#pipe)）。
 
 {/* /reference */}
 

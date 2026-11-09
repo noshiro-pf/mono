@@ -12,7 +12,7 @@ description: synstate-next の公開 API を用途ごとに並べ、それぞれ
 - [`createState`](/mono/synstate-next/ja/reference/state/create-state/): observable・セッター・その他の操作をタプルにした状態です。
 - [`createReducer`](/mono/synstate-next/ja/reference/state/create-reducer/): `dispatch` からだけ、`reducer` を通して書き込む状態です。
 - [`createBooleanState`](/mono/synstate-next/ja/reference/state/create-boolean-state/): `setTrue`・`setFalse`・`toggle` を持つ真偽値の状態です。
-- [`state`](/mono/synstate-next/ja/reference/state/state/): `initial` を持つ状態を作ります。
+- [`state`](/mono/synstate-next/ja/reference/state/state/): `initialValue` を持つ状態を作ります。
 
 ## イベント
 
@@ -51,7 +51,7 @@ description: synstate-next の公開 API を用途ごとに並べ、それぞれ
 - [`skipUntil`](/mono/synstate-next/ja/reference/operators/skip-until/): `notifier` が値を流すまで何も流さず、その後はソースのすべての値を流します。
 - [`skipIfNoChange`](/mono/synstate-next/ja/reference/operators/skip-if-no-change/): 持っている値と等しい値を捨てます（`equals` を渡さなければ `Object.is` で比べます）。
 - [`keepEqualParts`](/mono/synstate-next/ja/reference/operators/keep-equal-parts/): 各値のうち、持っている値と深く等しい部分を、持っている値のものに置き換えます。
-- [`withInitialValue`](/mono/synstate-next/ja/reference/operators/with-initial-value/): ソースが値を流すまでは `initial` を持ち、その後はソースを追いかけます。
+- [`withInitialValue`](/mono/synstate-next/ja/reference/operators/with-initial-value/): ソースが値を流すまでは `initialValue` を持ち、その後はソースを追いかけます。
 - [`withCurrentValueFrom`](/mono/synstate-next/ja/reference/operators/with-current-value-from/): ソースの各値を、同じ更新で新しくなった `other` の値とペアにします。
 - [`withBufferedFrom`](/mono/synstate-next/ja/reference/operators/with-buffered-from/): ソースの各値に、直前の値から後に `other` が流した値を順に付けます。
 - [`debounce`](/mono/synstate-next/ja/reference/operators/debounce/): `milliseconds` の間ほかの値が来なかったところで、最新の値を独立した更新で流します。

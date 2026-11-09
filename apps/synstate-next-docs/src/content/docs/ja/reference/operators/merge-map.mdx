@@ -11,9 +11,9 @@ import MarbleDiagram from '../../../../../components/MarbleDiagram.astro';
 
 射影した時点で内側の Observable が持つ値は、射影を起こした更新に加わります（このノードがその更新ですでに値を流していなければ）。その後の値は独立した更新で届きます。イベントソースと同じく、すべての値が届きます。1 つの更新で重なった値は、届いた順に 1 更新ずつ流します。
 
-{/* reference:init-kind */}
+{/* reference:operator-kind */}
 
-ソースが値を持っていても、結果は値を持たないことがあります。`pipe` の結果は `Observable` です（[`drop`](/mono/synstate-next/ja/guides/deriving-values/#pipe)）。
+ソースが値を持っていても、結果は値を持たないことがあります。`pipe` の結果は `Observable` です（[`DropInitialValueOperator`](/mono/synstate-next/ja/guides/deriving-values/#pipe)）。
 
 {/* /reference */}
 

@@ -4,18 +4,20 @@ import {
   noValue,
   toNode,
   view,
+  type DropInitialValueOperator,
   type NoValue,
   type Observable,
   type ObservableClass,
-  type Operator,
 } from '../core/index.mjs';
 
 /**
  * Emits the previous and the current value of the source as a pair, on every
  * value from the second on. The value held at the start counts as the first.
  */
-export const pairwise = <A,>(): Operator<A, FixedLengthTuple<2, A>, 'drop'> =>
-  toPairs;
+export const pairwise = <A,>(): DropInitialValueOperator<
+  A,
+  FixedLengthTuple<2, A>
+> => toPairs;
 
 const toPairs = <A,>(
   source: Observable<A>,

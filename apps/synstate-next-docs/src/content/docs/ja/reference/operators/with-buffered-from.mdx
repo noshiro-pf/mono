@@ -9,9 +9,9 @@ import MarbleDiagram from '../../../../../components/MarbleDiagram.astro';
 
 ソースの各値に、直前の値から後に `other` が流した値を順に付けます。同じ更新で流したものは含み、このノードを作る前から持っていたものは含みません。
 
-{/* reference:init-kind */}
+{/* reference:operator-kind */}
 
-ソースが値を持てば、結果も値を持ちます。`pipe` は `InitializedObservable` をそのまま保ちます（[`keep`](/mono/synstate-next/ja/guides/deriving-values/#pipe)）。
+ソースが値を持てば、結果も値を持ちます。`pipe` は `InitializedObservable` をそのまま保ちます（[`KeepInitialValueOperator`](/mono/synstate-next/ja/guides/deriving-values/#pipe)）。
 
 {/* /reference */}
 

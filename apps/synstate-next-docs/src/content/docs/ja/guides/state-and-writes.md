@@ -5,7 +5,7 @@ description: createState とそのオプション、更新中に行った書き�
 
 ## `createState` と 3 つ目の要素
 
-`createState(initial)` はタプルを返します。状態、そのセッター、そしてそれ以外の操作をまとめたオブジェクトです。タプルになっているので、状態は読むコードへ、セッターは書くコードへ、別々に渡せます。
+`createState(initialState)` はタプルを返します。状態、そのセッター、そしてそれ以外の操作をまとめたオブジェクトです。タプルになっているので、状態は読むコードへ、セッターは書くコードへ、別々に渡せます。
 
 ```tsx
 import { createState } from 'synstate-next';
@@ -44,7 +44,7 @@ assert.deepStrictEqual(mut_seen, [0, 10, 11, 0]);
 
 セッターは何も返しません。更新が値を計算し直している間に `map` や `derive` などのオペレーターの中で行った書き込みは、進行中の更新の購読者と束縛が実行されてから適用される（下を参照）ので、返すべき値はまだ決まっていないからです。必要なら `getSnapshot` か `.value` で読んでください。
 
-`state(initial)` は同じ状態をオブジェクトとして作ります。`.value`・`.set`・`.update` を持ち、まとめて扱いたいコードに向いています。
+`state(initialValue)` は同じ状態をオブジェクトとして作ります。`.value`・`.set`・`.update` を持ち、まとめて扱いたいコードに向いています。
 
 ## 何を変化とみなすか
 
@@ -92,7 +92,9 @@ assert.strictEqual(mut_tagUpdates.length, 1);
 // `equals` decides what counts as a change.
 const [point, setPoint] = createState(
     { x: 0, y: 0 },
-    { equals: (a, b) => a.x === b.x && a.y === b.y },
+    {
+        equals: (current, next) => current.x === next.x && current.y === next.y,
+    },
 );
 
 const mut_points: number[] = [];

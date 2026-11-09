@@ -4,22 +4,22 @@ import {
   toNode,
   view,
   type ObservableClass,
-  type Operator,
+  type ProvideInitialValueOperator,
 } from '../core/index.mjs';
 
-/** Holds `initial` until the source emits, then follows the source. */
+/** Holds `initialValue` until the source emits, then follows the source. */
 export const withInitialValue =
-  <A, I = A>(initial: I): Operator<A, A | I, 'provide'> =>
+  <A, I = A>(initialValue: I): ProvideInitialValueOperator<A, A | I> =>
   (source) =>
-    view(new WithInitialValueClass<A, I>(toNode(source), initial));
+    view(new WithInitialValueClass<A, I>(toNode(source), initialValue));
 
 class WithInitialValueClass<A, I> extends DerivedClass<A | I> {
   readonly #parent: ObservableClass<A>;
 
-  constructor(parent: ObservableClass<A>, initial: I) {
+  constructor(parent: ObservableClass<A>, initialValue: I) {
     const v = parent.current;
 
-    super([parent], v === noValue ? initial : v);
+    super([parent], v === noValue ? initialValue : v);
 
     this.#parent = parent;
   }

@@ -29,7 +29,7 @@ export type DerivedOf<
 export const derive = <const P extends readonly Observable<unknown>[], B>(
   parents: P,
   fn: (...values: ValuesOf<P>) => B,
-  options?: Readonly<{ equals?: (a: B, b: B) => boolean }>,
+  options?: Readonly<{ equals?: (current: B, next: B) => boolean }>,
 ): DerivedOf<P, B> =>
   // The type follows the parents'; the class is the same either way.
   view(
@@ -54,12 +54,12 @@ export const merge = <const P extends readonly Observable<unknown>[]>(
 class DeriveClass<B> extends DerivedClass<B> {
   readonly #fn: (...values: readonly unknown[]) => B;
 
-  readonly #equals: (a: B, b: B) => boolean;
+  readonly #equals: (current: B, next: B) => boolean;
 
   constructor(
     parents: readonly ObservableClass<unknown>[],
     fn: (...values: readonly unknown[]) => B,
-    equals: (a: B, b: B) => boolean,
+    equals: (current: B, next: B) => boolean,
   ) {
     const initial = readAll(parents);
 

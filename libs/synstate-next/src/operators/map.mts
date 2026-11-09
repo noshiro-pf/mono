@@ -3,8 +3,8 @@ import {
   noValue,
   toNode,
   view,
+  type KeepInitialValueOperator,
   type ObservableClass,
-  type Operator,
 } from '../core/index.mjs';
 
 /**
@@ -16,8 +16,8 @@ import {
 export const map =
   <A, B>(
     fn: (value: A) => B,
-    options?: Readonly<{ equals?: (a: B, b: B) => boolean }>,
-  ): Operator<A, B, 'keep'> =>
+    options?: Readonly<{ equals?: (current: B, next: B) => boolean }>,
+  ): KeepInitialValueOperator<A, B> =>
   (source) =>
     view(new MapClass(toNode(source), fn, options?.equals ?? Object.is));
 
@@ -26,12 +26,12 @@ class MapClass<A, B> extends DerivedClass<B> {
 
   readonly #fn: (value: A) => B;
 
-  readonly #equals: (a: B, b: B) => boolean;
+  readonly #equals: (current: B, next: B) => boolean;
 
   constructor(
     parent: ObservableClass<A>,
     fn: (value: A) => B,
-    equals: (a: B, b: B) => boolean,
+    equals: (current: B, next: B) => boolean,
   ) {
     const v = parent.current;
 

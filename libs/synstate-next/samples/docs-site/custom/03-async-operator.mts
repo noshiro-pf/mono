@@ -1,8 +1,8 @@
 import {
   createDerived,
   source,
+  type DropInitialValueOperator,
   type Observable,
-  type Operator,
 } from 'synstate-next';
 
 // embed-sample-code-ignore-below
@@ -14,7 +14,7 @@ if (import.meta.vitest !== undefined) {
       // embed-sample-code-ignore-above
       // Passes each value on `milliseconds` later, in an update of its own.
       const delay =
-        <A,>(milliseconds: number): Operator<A, A, 'drop'> =>
+        <A,>(milliseconds: number): DropInitialValueOperator<A, A> =>
         (parent: Observable<A>): Observable<A> =>
           createDerived<A>([parent], (ctx) => {
             const mut_timers = new Set<ReturnType<typeof setTimeout>>();

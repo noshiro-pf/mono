@@ -8,9 +8,9 @@ import {
   retireOwner,
   toNode,
   view,
+  type DropInitialValueOperator,
   type Observable,
   type ObservableClass,
-  type Operator,
   type Owner,
 } from '../core/index.mjs';
 
@@ -26,7 +26,9 @@ import {
  * For the same reason the result may hold no value even when the source does.
  */
 export const switchMap =
-  <A, B>(project: (value: A) => Observable<B>): Operator<A, B, 'drop'> =>
+  <A, B>(
+    project: (value: A) => Observable<B>,
+  ): DropInitialValueOperator<A, B> =>
   (source) =>
     view(new SwitchMapClass(toNode(source), project));
 

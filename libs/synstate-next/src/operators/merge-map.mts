@@ -12,9 +12,9 @@ import {
   retireOwner,
   toNode,
   view,
+  type DropInitialValueOperator,
   type Observable,
   type ObservableClass,
-  type Operator,
   type Owner,
 } from '../core/index.mjs';
 
@@ -31,7 +31,9 @@ import {
  * after another, in the order they arrived.
  */
 export const mergeMap =
-  <A, B>(project: (value: A) => Observable<B>): Operator<A, B, 'drop'> =>
+  <A, B>(
+    project: (value: A) => Observable<B>,
+  ): DropInitialValueOperator<A, B> =>
   (source) =>
     view(new MergeMapClass(toNode(source), project));
 

@@ -46,13 +46,26 @@ no longer holds.
 A node holds its value or the `noValue` symbol. There is no `Optional` per
 value: reading a value is a field read and a comparison. `InitializedObservable`
 is a type for nodes that always hold one; `pipe` works out, from the operator's
-`InitKind` (`keep`, `drop`, `provide`), whether the result does.
+type, whether the result does. As in synstate, an operator is one of three
+function types, and the kind is in what it takes and returns:
+`ProvideInitialValueOperator` (synstate's `WithInitialValueOperator`, renamed to
+a verb like the other two) returns an `InitializedObservable`,
+`KeepInitialValueOperator` takes and returns one, `DropInitialValueOperator`
+takes and returns an `Observable`. An operator typed as a
+`ProvideInitialValueOperator` that may return an observable with no value does
+not type-check without a cast, which a label beside the function type (an
+earlier `InitKind`) let through. The costs are synstate's: a
+`KeepInitialValueOperator` called directly takes only an
+`InitializedObservable`, and `pipe` applies it to any observable, so its body is
+typed as reading a value its source may not hold yet. The built-in ones read
+`current` and check for `noValue`.
 
 `pipe` takes one operator, and calls are chained. TypeScript infers an
 operator's parameter types (the `x` of `map((x) => …)`) from the previous
 operator's output only through overloads of fixed length, so a variadic `pipe`
-stops at the last overload; a chain has no limit and two overloads. A chain
-builds the same nodes, so it costs nothing at update time.
+stops at the last overload; a chain has no limit and three overloads, one per
+operator type. A chain builds the same nodes, so it costs nothing at update
+time.
 
 ## Effects
 

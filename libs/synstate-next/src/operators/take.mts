@@ -4,8 +4,9 @@ import {
   noValue,
   toNode,
   view,
+  type DropInitialValueOperator,
+  type KeepInitialValueOperator,
   type ObservableClass,
-  type Operator,
 } from '../core/index.mjs';
 
 /**
@@ -13,7 +14,7 @@ import {
  * included, and then nothing, keeping the last value passed. `count` is a
  * positive integer.
  */
-export const take = <A,>(count: number): Operator<A, A, 'keep'> => {
+export const take = <A,>(count: number): KeepInitialValueOperator<A, A> => {
   assertCount(count, 1);
 
   return (source) => view(new TakeClass(toNode(source), count));
@@ -23,7 +24,7 @@ export const take = <A,>(count: number): Operator<A, A, 'keep'> => {
  * Drops the first `count` values of the source, the one it holds at the start
  * included, and passes the rest. `count` is a non-negative integer.
  */
-export const skip = <A,>(count: number): Operator<A, A, 'drop'> => {
+export const skip = <A,>(count: number): DropInitialValueOperator<A, A> => {
   assertCount(count, 0);
 
   return (source) => view(new SkipClass(toNode(source), count));
