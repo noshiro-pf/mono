@@ -32,12 +32,14 @@ export const emulatorTestTimeout = 120_000;
 /**
  * Adds an answer that marks every date with △ (`'all'`), or only the first date
  * with ○ and leaves the rest blank (`'first-only'`, for an event with two or
- * more dates: with one, nothing is left blank and no confirmation is asked).
+ * more dates: with one, nothing is left blank and no confirmation is asked),
+ * with `comment` when one is given.
  */
 export const createAnswer = async (
   answerPage: DeepReadonly<Page>,
   username: string,
   dates: 'all' | 'first-only' = 'all',
+  comment?: string,
 ): Promise<void> => {
   // create answer
   const addAnswerButton = answerPage.getByTestId('add-answer-button');
@@ -71,6 +73,10 @@ export const createAnswer = async (
 
   // submit button should be enabled if username is filled
   await expect.soft(buttonWithConfirmation).toBeEnabled();
+
+  if (comment !== undefined) {
+    await answerBeingEditedSection.getByTestId('comment').fill(comment);
+  }
 
   if (dates === 'all') {
     await answerBeingEditedSection.getByTestId('col-fair-button').click();

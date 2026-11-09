@@ -19,7 +19,10 @@ export const CommentButton = ({
       arrow={false}
       canEscapeKeyClose
       content={
-        <div class={constant(styles.commentPopover)}>
+        <div
+          class={constant(styles.commentPopover)}
+          data-e2e={constant('comment-popover')}
+        >
           <div class={constant(styles.commentText)}>{comment}</div>
           <ButtonsWrapperAlignEnd>
             <Button
@@ -30,6 +33,7 @@ export const CommentButton = ({
           </ButtonsWrapperAlignEnd>
         </div>
       }
+      data-e2e={'comment-button'}
       isOpen={isOpen$}
       placement={'top'}
       onClose={handleClose}

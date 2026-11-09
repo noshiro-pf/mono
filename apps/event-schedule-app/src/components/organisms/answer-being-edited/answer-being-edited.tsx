@@ -282,6 +282,7 @@ export const AnswerBeingEdited = ({
         <FormGroup label={constant(dc.comments)}>
           <TextArea
             autoResize
+            data-e2e={constant('comment')}
             fill
             value={answerBeingEdited.pipe(map((a) => a.comment))}
             onInput={({ currentTarget }) => {
