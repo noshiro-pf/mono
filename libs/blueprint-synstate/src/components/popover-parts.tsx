@@ -249,6 +249,11 @@ export const PopoverCore = ({
     arrow: undefined,
   };
 
+  // Whether it was open as a click on the target began, before the target's own
+  // handler had a say: Blueprint toggles from the `isOpen` it was drawn with,
+  // which a handler opening it in the same click has not yet changed.
+  const mut_click = { wasOpen: false };
+
   const [placement$, setPlacement] = createState<Placement>(
     placement ?? 'bottom',
   );
@@ -515,6 +520,18 @@ export const PopoverCore = ({
       <span
         ref={(target) => {
           mut_elements.target = target;
+
+          // Captured, so as to run before the handlers of what it holds; only a
+          // controlled one opened by a click reads it.
+          if (isControlled && !isHover) {
+            target.addEventListener(
+              'click',
+              () => {
+                mut_click.wasOpen = open$.getSnapshot().value;
+              },
+              { capture: true },
+            );
+          }
         }}
         class={classObject(
           ['bp6-popover-target'],
@@ -550,7 +567,12 @@ export const PopoverCore = ({
             return;
           }
 
-          setOpenState(!open$.getSnapshot().value, event);
+          // One keeping its own state toggles as it is now, as Blueprint's
+          // updater does: no handler in the target can set that state.
+          setOpenState(
+            !(isControlled ? mut_click.wasOpen : open$.getSnapshot().value),
+            event,
+          );
         }}
         onFocus={(event) => {
           if (isHover) {

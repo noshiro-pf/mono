@@ -576,6 +576,57 @@ describe(Popover, () => {
     assert.isNotNull(document.querySelector('.bp6-popover'));
   });
 
+  test('toggles from the state a click on its target began with, though the target opens it itself', async () => {
+    const mut_asked: (boolean | string)[] = [];
+
+    const [isOpen$, setIsOpen] = createState(false);
+
+    const { host } = mounted(() => (
+      <Popover
+        content={<Menu>{[]}</Menu>}
+        isOpen={isOpen$}
+        onClose={(event) => {
+          mut_asked.push(event.type);
+
+          setIsOpen(false);
+        }}
+        onInteraction={(nextOpen) => {
+          mut_asked.push(nextOpen);
+        }}
+      >
+        <Button
+          text={constant('Open')}
+          onClick={() => {
+            setIsOpen(true);
+          }}
+        />
+      </Popover>
+    ));
+
+    await userEvent.click(theButtonIn(host));
+
+    await transitioned();
+
+    // Blueprint toggles from the `isOpen` it was drawn with, before the
+    // target's own handler opened it, and so asks to open, not to close.
+    assert.deepStrictEqual(mut_asked, [true]);
+
+    assert.isTrue(isOpen$.getSnapshot().value);
+
+    assert.isNotNull(document.querySelector('.bp6-popover'));
+
+    // Open as the next click begins, the same target asks to close it.
+    await userEvent.click(theButtonIn(host));
+
+    await transitioned();
+
+    assert.deepStrictEqual(mut_asked, [true, false, 'click']);
+
+    assert.isFalse(isOpen$.getSnapshot().value);
+
+    assert.isNull(document.querySelector('.bp6-popover'));
+  });
+
   test('closes once, though a leaving check was still to run', async () => {
     const mut_closes: string[] = [];
 

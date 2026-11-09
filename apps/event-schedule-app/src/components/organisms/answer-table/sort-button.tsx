@@ -19,7 +19,7 @@ export const SortButton = ({ onSortChange }: Props): JSX.Element => {
     <Popover
       canEscapeKeyClose
       content={
-        <ButtonGroup vertical>
+        <ButtonGroup data-e2e={constant('sort-menu')} vertical>
           <Button
             icon={'sort-asc'}
             text={constant(dict.answerPage.answers.sortAsc)}
@@ -34,6 +34,7 @@ export const SortButton = ({ onSortChange }: Props): JSX.Element => {
           />
         </ButtonGroup>
       }
+      data-e2e={'sort-button'}
       isOpen={isOpen$}
       placement={'bottom'}
       onClose={handleClose}
