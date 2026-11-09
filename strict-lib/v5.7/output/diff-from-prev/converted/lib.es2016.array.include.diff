@@ -1,9 +1,9 @@
 diff --git a/v5.6/output/lib-files/lib.es2016.array.include.d.ts b/v5.7/output/lib-files/lib.es2016.array.include.d.ts
-index e9e37d17bf5e01bd0c6571d4c11ce25610d01683..30b29615f5240433c88055692c41ae0c7eb057d9 100644
+index 761339ffc3a7d6f1fcaed647fe55d077b18aa55c..5c85b42754527234ff040765e2b5dacdc21f5ca1 100644
 --- a/v5.6/output/lib-files/lib.es2016.array.include.d.ts
 +++ b/v5.7/output/lib-files/lib.es2016.array.include.d.ts
-@@ -46,7 +46,7 @@ interface ReadonlyArray<T> {
-   ): searchElement is T;
+@@ -78,7 +78,7 @@ interface ReadonlyArray<T> {
+   ): boolean;
  }
  
 -interface Int8Array {
@@ -11,7 +11,7 @@ index e9e37d17bf5e01bd0c6571d4c11ce25610d01683..30b29615f5240433c88055692c41ae0c
    /**
     * Determines whether an array includes a certain element, returning true or false as appropriate.
     * @param searchElement The element to search for.
-@@ -58,7 +58,7 @@ interface Int8Array {
+@@ -90,7 +90,7 @@ interface Int8Array {
    ): boolean;
  }
  
@@ -20,7 +20,7 @@ index e9e37d17bf5e01bd0c6571d4c11ce25610d01683..30b29615f5240433c88055692c41ae0c
    /**
     * Determines whether an array includes a certain element, returning true or false as appropriate.
     * @param searchElement The element to search for.
-@@ -70,7 +70,7 @@ interface Uint8Array {
+@@ -102,7 +102,7 @@ interface Uint8Array {
    ): boolean;
  }
  
@@ -29,7 +29,7 @@ index e9e37d17bf5e01bd0c6571d4c11ce25610d01683..30b29615f5240433c88055692c41ae0c
    /**
     * Determines whether an array includes a certain element, returning true or false as appropriate.
     * @param searchElement The element to search for.
-@@ -82,7 +82,7 @@ interface Uint8ClampedArray {
+@@ -114,7 +114,7 @@ interface Uint8ClampedArray {
    ): boolean;
  }
  
@@ -38,7 +38,7 @@ index e9e37d17bf5e01bd0c6571d4c11ce25610d01683..30b29615f5240433c88055692c41ae0c
    /**
     * Determines whether an array includes a certain element, returning true or false as appropriate.
     * @param searchElement The element to search for.
-@@ -91,7 +91,7 @@ interface Int16Array {
+@@ -123,7 +123,7 @@ interface Int16Array {
    includes(searchElement: number, fromIndex?: number): boolean;
  }
  
@@ -47,7 +47,7 @@ index e9e37d17bf5e01bd0c6571d4c11ce25610d01683..30b29615f5240433c88055692c41ae0c
    /**
     * Determines whether an array includes a certain element, returning true or false as appropriate.
     * @param searchElement The element to search for.
-@@ -100,7 +100,7 @@ interface Uint16Array {
+@@ -132,7 +132,7 @@ interface Uint16Array {
    includes(searchElement: number, fromIndex?: number): boolean;
  }
  
@@ -56,7 +56,7 @@ index e9e37d17bf5e01bd0c6571d4c11ce25610d01683..30b29615f5240433c88055692c41ae0c
    /**
     * Determines whether an array includes a certain element, returning true or false as appropriate.
     * @param searchElement The element to search for.
-@@ -109,7 +109,7 @@ interface Int32Array {
+@@ -141,7 +141,7 @@ interface Int32Array {
    includes(searchElement: number, fromIndex?: number): boolean;
  }
  
@@ -65,7 +65,7 @@ index e9e37d17bf5e01bd0c6571d4c11ce25610d01683..30b29615f5240433c88055692c41ae0c
    /**
     * Determines whether an array includes a certain element, returning true or false as appropriate.
     * @param searchElement The element to search for.
-@@ -118,7 +118,7 @@ interface Uint32Array {
+@@ -150,7 +150,7 @@ interface Uint32Array {
    includes(searchElement: number, fromIndex?: number): boolean;
  }
  
@@ -74,7 +74,7 @@ index e9e37d17bf5e01bd0c6571d4c11ce25610d01683..30b29615f5240433c88055692c41ae0c
    /**
     * Determines whether an array includes a certain element, returning true or false as appropriate.
     * @param searchElement The element to search for.
-@@ -127,7 +127,7 @@ interface Float32Array {
+@@ -159,7 +159,7 @@ interface Float32Array {
    includes(searchElement: number, fromIndex?: number): boolean;
  }
  

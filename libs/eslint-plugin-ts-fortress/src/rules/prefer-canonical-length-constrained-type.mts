@@ -357,12 +357,6 @@ const dropBoundsFix = (
   sourceCode: TSESLint.SourceCode,
 ): readonly TSESLint.RuleFix[] =>
   rewrite.bounds.flatMap((_, index) => {
-    // Read before the `includes` below, not after. The strict standard library
-    // types `includes` as `searchElement is T` — that is what lets a literal
-    // union narrow a wider value — but the predicate applies to the false
-    // branch too, and here `keep` is `readonly number[]` against a `number`, so
-    // `index` narrows to `never` past the guard. A false `includes` means "not
-    // in this array", not "not of this type".
     const dropped = node.arguments[index];
 
     if (dropped === undefined || rewrite.keep.includes(index)) {

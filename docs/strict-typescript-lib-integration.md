@@ -1974,7 +1974,23 @@ includes(searchElement: T | (WidenLiteral<T> & {}), fromIndex?: number): searchE
 `includes` が `false` を返す意味は「**この配列に無い**」であって「この型で
 ない」ではないので、述語としては強すぎる。ただしこの宣言は
 `KEYS.includes(s)` でリテラル union に絞れるようにするためのもので、
-狙いは分かる。**上流に報告する価値のある挙動**である。
+狙いは分かる。
+
+> **#2879 で直した。** `includes` は 3 つの overload になった。引数が `T` なら
+> `boolean`、引数の型のどの要素も `T` に含まれないとき（`s: string` を
+> `KEYS.includes(s)` に渡すとき）だけ `searchElement is S & T`、それ以外
+> （`'a' | 'c'` を `('a' | 'b')[]` で探すときなど）は `boolean` を返す。false 側が
+> 取り除くのは `T` の要素なので、引数に `T` の要素が無ければ取り除くものが無く、
+> 絞り込みは true 側だけに効く。この条件は `this` 引数で書いている。型述語の型は
+> 引数の型に代入できなければならないので、引数の型には書けない。以下の回避は
+> もう要らないが、guard の前で読む順序はそのまま残した。
+>
+> 型述語は片側だけを絞ることができないので、`T` と一部重なる引数は true 側の
+> 絞り込みも失う（`'a' | 'c'` は true 側でも `'a'` にならない）。引数の型ごとに
+> どう推論されるか、以前の宣言とどこが違うかは、12 版すべてのハーネスが検査する
+> `strict-lib/configs/tsconfig/lib-check-entry.array-includes.ts` にパターンごとに
+> まとめてある。strict-ts-lib のドキュメントで `includes` を説明するときは、
+> ここから例を引く。
 
 **直し方: `index` を使う行を guard の前へ動かした。** `some` に置き換える手も
 あるが、今度は `unicorn/prefer-includes` が `includes` に戻せと言う — #1756 の
@@ -2917,7 +2933,8 @@ catch した値）に置き換えた。
   公開しない）に寄せた。副産物として 0〜99 年が 1900 年代に読み替えられなくなった
 - **`includes` の型述語が false 側でも絞る**（前述）— `split-view-extension` で
   `siteOrigin` が `never` になった。読む側を関数に分けて、絞られた変数を guard の
-  後で読まないようにした
+  後で読まないようにした（#2879 で `includes` の宣言を直したので、この回避は
+  もう要らない）
 - **`Number#toFixed` の引数** — `formatPercent` の引数型を `UintRangeInclusive<0, 100>`
   にした（範囲外は `RangeError` なので、strict lib の言い分が正しい）
 - **`Response#json()`** — `MutableJsonValue` を返すようになったので、

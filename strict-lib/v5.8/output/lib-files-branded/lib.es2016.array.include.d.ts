@@ -28,10 +28,26 @@ interface Array<T> {
    * @param searchElement The element to search for.
    * @param fromIndex The position in this array at which to begin searching for searchElement.
    */
-  includes(
-    searchElement: T | (import('ts-type-forge').WidenLiteral<T> & {}),
+  includes(searchElement: T, fromIndex?: NumberType.ArraySizeArg): boolean;
+  /**
+   * Determines whether an array includes a certain element, returning true or false as appropriate.
+   * @param searchElement The element to search for.
+   * @param fromIndex The position in this array at which to begin searching for searchElement.
+   */
+  includes<S extends import('ts-type-forge').WidenLiteral<T> & {}>(
+    this: [S] extends [Exclude<S, T>] ? unknown : never,
+    searchElement: S,
     fromIndex?: NumberType.ArraySizeArg,
-  ): searchElement is T;
+  ): searchElement is S & T;
+  /**
+   * Determines whether an array includes a certain element, returning true or false as appropriate.
+   * @param searchElement The element to search for.
+   * @param fromIndex The position in this array at which to begin searching for searchElement.
+   */
+  includes(
+    searchElement: import('ts-type-forge').WidenLiteral<T> & {},
+    fromIndex?: NumberType.ArraySizeArg,
+  ): boolean;
 }
 
 interface ReadonlyArray<T> {
@@ -40,10 +56,26 @@ interface ReadonlyArray<T> {
    * @param searchElement The element to search for.
    * @param fromIndex The position in this array at which to begin searching for searchElement.
    */
-  includes(
-    searchElement: T | (import('ts-type-forge').WidenLiteral<T> & {}),
+  includes(searchElement: T, fromIndex?: NumberType.ArraySizeArg): boolean;
+  /**
+   * Determines whether an array includes a certain element, returning true or false as appropriate.
+   * @param searchElement The element to search for.
+   * @param fromIndex The position in this array at which to begin searching for searchElement.
+   */
+  includes<S extends import('ts-type-forge').WidenLiteral<T> & {}>(
+    this: [S] extends [Exclude<S, T>] ? unknown : never,
+    searchElement: S,
     fromIndex?: NumberType.ArraySizeArg,
-  ): searchElement is T;
+  ): searchElement is S & T;
+  /**
+   * Determines whether an array includes a certain element, returning true or false as appropriate.
+   * @param searchElement The element to search for.
+   * @param fromIndex The position in this array at which to begin searching for searchElement.
+   */
+  includes(
+    searchElement: import('ts-type-forge').WidenLiteral<T> & {},
+    fromIndex?: NumberType.ArraySizeArg,
+  ): boolean;
 }
 
 interface Int8Array<TArrayBuffer extends ArrayBufferLike> {
