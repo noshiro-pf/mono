@@ -1554,6 +1554,7 @@ const PULLS: NonNullable<KnownParts['pulls']> = {
   codeOwners: [],
   codeOwnersEnforcedBy: undefined,
   pulls: [],
+  layers: undefined,
 } as const;
 
 const MERGED: Merged = {

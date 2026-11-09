@@ -7,6 +7,7 @@ import {
   SKIP_CI_LABEL,
   writeClaimComment,
   writeSetAsideComment,
+  type BuiltQueueLayer,
   type ChecksSummary,
   type ContextState,
   type ReportEntry,
@@ -43,6 +44,67 @@ describe(queueViewOf, () => {
       [1, 'next', undefined],
       [4, 'next', 'conflicts'],
     ]);
+  });
+
+  // #3714: `unblock-prs` releases what it has stacked first, in the order it
+  // stacked it, whatever has joined the queue ahead of it since.
+  test('picks first what the worker has stacked, in its order, saying so', () => {
+    const queued = [MERGE_QUEUED_LABEL, SKIP_CI_LABEL] as const;
+
+    const pulls = [
+      pull(2, { labels: Arr.toPushed(queued, PRIORITY_HIGH_LABEL) }),
+      pull(5, { labels: queued }),
+      pull(7, { labels: queued }),
+      pull(9, { labels: queued }),
+    ] as const;
+
+    const layer = (
+      number: number,
+      below: Readonly<{ tip: string; tree: string }>,
+    ): BuiltQueueLayer =>
+      ({
+        number,
+        head: sha(number),
+        tip: `tip-${number}`,
+        tree: `tree-${number}`,
+        parent: below.tip,
+        parentTree: below.tree,
+        builtAt: NOW_MS,
+      }) as const;
+
+    // #9 on #5 on the default branch, stacked before #2 gained priority:high.
+    const built = [
+      layer(5, { tip: BASE_TIP, tree: 'main-tree' }),
+      layer(9, { tip: 'tip-5', tree: 'tree-5' }),
+    ] as const;
+
+    assert.deepStrictEqual(
+      shape(
+        queueViewOf({
+          ...input(pulls),
+          layers: { built, baseTree: 'main-tree' },
+        }),
+      ).slots,
+      [
+        [5, 'next', 'checked ahead'],
+        [9, 'next', 'checked ahead'],
+        [2, 'next', undefined],
+        [7, 'next', undefined],
+      ],
+    );
+
+    // Without the layers, or on a tree they no longer stand on, the queue's own.
+    for (const layers of [
+      undefined,
+      { built, baseTree: 'another-tree' },
+    ] as const) {
+      assert.deepStrictEqual(
+        shape(queueViewOf({ ...input(pulls), layers })).slots.map(
+          ([number]) => number,
+        ),
+        [2, 5, 7, 9],
+      );
+    }
   });
 
   test('takes one behind its base as a candidate, and one up to date with a failed check as failing', () => {

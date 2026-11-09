@@ -18,6 +18,10 @@
  *   checks and the review, as `BLOCKED` does in the worker.
  * - **What a run has demoted** — one seen green that did not merge, put
  *   last — lives in that run's memory and is not shown.
+ *
+ * What the worker has checked ahead of its turn goes first, as the worker
+ * releases it: the queue layers on the `queue/pr-*` branches, read with the
+ * pull requests, and kept ahead by `pr-report-core`'s `stackedAhead`.
  */
 
 import {
@@ -29,7 +33,9 @@ import {
   queueStanding,
   readQueueComments,
   reviewHold,
+  stackedAhead,
   withReviewHold,
+  type BuiltQueueLayer,
   type NativeStackEntry,
   type QueueContext,
   type QueueFacts,
@@ -57,6 +63,17 @@ export type QueueInput = Readonly<{
    * closing it inherits as a merge order. Absent, none is.
    */
   startAfterOf?: ReadonlyMap<number, readonly number[]>;
+  /**
+   * The queue layers `unblock-prs` has built and the tree of the default
+   * branch's tip they stand on. Absent, nothing is kept ahead of the order.
+   */
+  layers?: QueueLayers | undefined;
+}>;
+
+/** What {@link QueueInput}'s `layers` holds. */
+export type QueueLayers = Readonly<{
+  built: readonly BuiltQueueLayer[];
+  baseTree: string;
 }>;
 
 /** Everything read about one open pull request that its place turns on. */
@@ -120,6 +137,7 @@ export const queueViewOf = ({
   rules,
   pulls,
   startAfterOf,
+  layers,
 }: QueueInput): QueueView => {
   const graph = queueGraph(
     pulls.map(({ entry }) => ({
@@ -207,10 +225,11 @@ export const queueViewOf = ({
     ({ standing }) => standing.kind === 'in-flight',
   );
 
-  const picked = pickOrder({
+  const { picked, kept } = pickOrder({
     running,
     queued: byNumber,
     context,
+    layers,
   });
 
   const pickedNumbers = new Set(picked.map(({ facts }) => facts.number));
@@ -223,7 +242,10 @@ export const queueViewOf = ({
   return {
     base: defaultBranch,
     slots: [...running, ...picked, ...rest].map(({ pull, facts, standing }) =>
-      slotOf(pull, facts, standing, defaultBranch),
+      slotOf(pull, facts, standing, {
+        defaultBranch,
+        keptAhead: kept.has(facts.number),
+      }),
     ),
     outside: Arr.generate(function* () {
       for (const {
@@ -461,16 +483,21 @@ const standingOnceMerged = (
  * for the caller to put after. One only a ruleset bypass merges is picked and
  * not merged — the worker sets it aside for a person once it is green — so what
  * waits for it is left waiting.
+ *
+ * What the worker has stacked (`layers`) is picked first, in the order it was
+ * stacked, as the worker releases it (`stackedAhead`), and `kept` names it.
  */
 const pickOrder = ({
   running,
   queued,
   context,
+  layers,
 }: Readonly<{
   running: readonly Decided[];
   queued: readonly Decided[];
   context: QueueContext;
-}>): readonly Decided[] => {
+  layers: QueueLayers | undefined;
+}>): Readonly<{ picked: readonly Decided[]; kept: ReadonlySet<number> }> => {
   const mut_merged = new Set<number>(
     running.filter(({ bypass }) => !bypass).map(({ facts }) => facts.number),
   );
@@ -503,9 +530,9 @@ const pickOrder = ({
     promote();
   }
 
-  for (;;) {
-    const [next] = orderCandidates(
-      mut_pool,
+  const ordered = (pool: readonly Decided[]): readonly Decided[] =>
+    orderCandidates(
+      pool,
       ({ facts }) => facts,
       // What a run of the worker has demoted is not known here.
       {
@@ -515,8 +542,40 @@ const pickOrder = ({
       },
     );
 
+  const kept =
+    layers === undefined
+      ? ([] as const)
+      : stackedAhead(
+          ordered(mut_pool).map((decided) => ({
+            number: decided.facts.number,
+            headRefOid: decided.pull.entry.headSha,
+            headRefName: decided.facts.headRef,
+            isCrossRepository: decided.pull.entry.fromFork,
+            decided,
+          })),
+          layers.built,
+          layers.baseTree,
+          {
+            mayStayAhead: () => true,
+            defaultBranch: context.defaultBranch,
+            isBypass: ({ decided }) => decided.bypass,
+          },
+        ).map(({ decided }) => decided);
+
+  const keptNumbers: ReadonlySet<number> = new Set(
+    kept.map(({ facts }) => facts.number),
+  );
+
+  for (;;) {
+    const pool = mut_pool;
+
+    const [next] = [
+      ...kept.filter((each) => pool.includes(each)),
+      ...ordered(pool),
+    ] as const;
+
     if (next === undefined) {
-      return mut_picked;
+      return { picked: mut_picked, kept: keptNumbers };
     }
 
     mut_picked.push(next);
@@ -621,7 +680,10 @@ const slotOf = (
   pull: QueuePull,
   facts: QueueFacts,
   standing: QueueStanding,
-  defaultBranch: string,
+  {
+    defaultBranch,
+    keptAhead,
+  }: Readonly<{ defaultBranch: string; keptAhead: boolean }>,
 ): QueueSlot => {
   const { entry } = pull;
 
@@ -643,12 +705,18 @@ const slotOf = (
             : 'waiting',
     note:
       said?.note ??
-      (release
-        ? 'release'
-        : facts.mergeState === 'DIRTY'
-          ? 'conflicts'
-          : undefined),
-    detail: said?.detail,
+      (keptAhead
+        ? 'checked ahead'
+        : release
+          ? 'release'
+          : facts.mergeState === 'DIRTY'
+            ? 'conflicts'
+            : undefined),
+    detail:
+      said?.detail ??
+      (keptAhead
+        ? 'its queue layer is built, so the worker releases it before what the queue’s own order would put first'
+        : undefined),
     priority: priorityOf(entry.labels),
   };
 };

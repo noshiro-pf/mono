@@ -25,10 +25,12 @@ import {
   codeOwnersEnforcedBy,
   epochMsOf,
   namesEveryChangedPath,
+  numberOfQueueLayerBranch,
   parseCodeOwners,
   parseMergeAfter,
   parseSetAsideComment,
   PENDING_LABEL,
+  queueLayerOfMessage,
   referenceStatusOf,
   reportedContexts,
   setAsideStillApplies,
@@ -65,7 +67,12 @@ import {
   type GraphqlAnswer,
 } from './graphql.mjs';
 import { checksFailureOf } from './part-failures.mjs';
-import { queueViewOf, type QueuePull, type QueueView } from './queue-view.mjs';
+import {
+  queueViewOf,
+  type QueueLayers,
+  type QueuePull,
+  type QueueView,
+} from './queue-view.mjs';
 import type { RateLimit } from './rate-limit.mjs';
 import {
   ChecksDataSchema,
@@ -89,6 +96,7 @@ import {
   OPEN_PULLS_QUERIES,
   OpenIssuesDataSchema,
   PullRequestsDataSchema,
+  QUEUE_LAYER_REF_DIRECTORY,
   referenceAlias,
   ReferenceSchema,
   referencesQuery,
@@ -630,6 +638,55 @@ export const appendIssues = (held: IssueList, page: IssueList): IssueList => {
 };
 
 /**
+ * The queue layers on the `queue/pr-*` branches, each whose commit carries the
+ * `Queue-Layer:` trailer of the pull request its branch names, as the worker
+ * reads them; `undefined` without the default branch's tree they stand on.
+ */
+export const queueLayersOf = (
+  baseTree: string | undefined,
+  nodes: readonly QueueLayerNode[],
+): QueueLayers | undefined =>
+  baseTree === undefined
+    ? undefined
+    : ({
+        baseTree,
+        built: Arr.generate(function* () {
+          for (const { name, target } of nodes) {
+            const number = numberOfQueueLayerBranch(
+              `${QUEUE_LAYER_REF_DIRECTORY}/${name}`,
+            );
+
+            const layer = queueLayerOfMessage(target.message ?? '');
+
+            const parent = target.parents?.nodes[0];
+
+            const builtAt =
+              target.committedDate === undefined
+                ? undefined
+                : epochMsOf(target.committedDate);
+
+            if (
+              number !== undefined &&
+              parent !== undefined &&
+              builtAt !== undefined &&
+              target.oid !== undefined &&
+              target.tree !== undefined &&
+              layer?.number === number
+            ) {
+              yield {
+                ...layer,
+                tip: target.oid,
+                tree: target.tree.oid,
+                parent: parent.oid,
+                parentTree: parent.tree.oid,
+                builtAt,
+              } as const;
+            }
+          }
+        }),
+      } as const);
+
+/**
  * A part as a read that depends on it sees it: what it answered, or where it
  * failed, what the last read had of it.
  */
@@ -711,6 +768,8 @@ type PullsPart = Readonly<{
   /** The required check `CODEOWNERS` says enforces it, if it names one. */
   codeOwnersEnforcedBy: string | undefined;
   pulls: readonly OpenPullRequest[];
+  /** The queue layers built, if the default branch's tree was read. */
+  layers: QueueLayers | undefined;
 }>;
 
 /** The check results on one pull request's head. */
@@ -887,6 +946,7 @@ const readPullRequests = async (
     codeOwnersAtRoot,
     codeOwnersInDocs,
     queueLabel,
+    queueLayers,
   } = first.repository;
 
   // GitHub reads the first of the three it finds, in this order.
@@ -903,9 +963,18 @@ const readPullRequests = async (
       codeOwnersEnforcedBy:
         owners === null ? undefined : codeOwnersEnforcedBy(owners.text),
       pulls: openNodesOf(pages.value),
+      layers: queueLayersOf(
+        defaultBranchRef?.target?.tree?.oid,
+        queueLayers?.nodes ?? [],
+      ),
     }),
   };
 };
+
+/** One branch of {@link queueLayersOf}, as the query reads it. */
+type QueueLayerNode = NonNullable<
+  t.TypeOf<typeof PullRequestsDataSchema>['repository']['queueLayers']
+>['nodes'][number];
 
 /** The aliased fields under `repository` in an answer, by alias. */
 const fieldsOf =
@@ -2125,6 +2194,7 @@ const assemble = ({
     codeOwners,
     codeOwnersEnforcedBy: enforcedBy,
     pulls,
+    layers,
   } = known.pulls ?? NO_PULLS;
 
   // A part that failed is not being read any more, nor is anything once the
@@ -2296,6 +2366,7 @@ const assemble = ({
             defaultBranch,
             nowEpochMs: nowMs,
             startAfterOf: issueDeclarations.startAfter,
+            layers,
             rules: {
               requireCodeOwnerReview: requirements.requireCodeOwnerReview,
               requireConversationResolution:
@@ -2335,6 +2406,7 @@ const NO_PULLS: PullsPart = {
   codeOwners: [],
   codeOwnersEnforcedBy: undefined,
   pulls: [],
+  layers: undefined,
 } as const;
 
 /** What has answered about one pull request. */

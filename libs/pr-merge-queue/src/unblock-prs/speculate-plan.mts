@@ -1,4 +1,4 @@
-import { Arr, Num, Result } from 'ts-data-forge';
+import { Arr, Result } from 'ts-data-forge';
 /**
  * What checking queued pull requests ahead of their turn decides, apart from
  * reading GitHub and moving branches (`speculate.mts`).
@@ -15,7 +15,16 @@ import { Arr, Num, Result } from 'ts-data-forge';
  * Nothing is remembered between surveys: the branches say what was built, by
  * the trees they sit on, and the runs on their tips say how far each got.
  */
-import { isVersionBranch } from 'pr-report-core';
+import {
+  isStackable as isStackableLayer,
+  numberOfQueueLayerBranch,
+  QUEUE_LAYER_BRANCH_PREFIX,
+  queueLayerOfMessage,
+  queueLayerTrailer,
+  stackedAhead,
+  type BuiltQueueLayer,
+  type QueueLayer,
+} from 'pr-report-core';
 import type { PullRequest } from './types.mjs';
 
 /**
@@ -55,9 +64,7 @@ export const isStackable = (
     bypass: ReadonlyMap<number, string>;
   }>,
 ): boolean =>
-  !isVersionBranch(pr.headRefName, context.defaultBranch) &&
-  !context.bypass.has(pr.number) &&
-  !pr.isCrossRepository;
+  isStackableLayer(pr, context.defaultBranch, context.bypass.has(pr.number));
 
 /**
  * What the release step releases, in `order` ({@link stackedFirst}): the first
@@ -113,7 +120,7 @@ export const releaseOrder = (
     return { order: candidates, kept: [] };
   }
 
-  const kept = stackedAhead(
+  const kept = stackedAheadOf(
     candidates,
     read.value.built,
     read.value.baseTree,
@@ -347,17 +354,7 @@ export const layerBranch = (number: number): string =>
   `${LAYER_BRANCH_PREFIX}${number}` as const;
 
 /** The pull request a layer branch is for, or `undefined` for another branch. */
-export const numberOfLayerBranch = (branch: string): number | undefined => {
-  if (!branch.startsWith(LAYER_BRANCH_PREFIX)) {
-    return undefined;
-  }
-
-  const digits = branch.slice(LAYER_BRANCH_PREFIX.length);
-
-  return /^[1-9]\d*$/u.test(digits)
-    ? Result.unwrapOkOr(Num.safeParseFloat(digits), Number.NaN)
-    : undefined;
-};
+export const numberOfLayerBranch = numberOfQueueLayerBranch;
 
 /**
  * The trailer a layer's commit carries, naming the pull request and the head it
@@ -365,8 +362,7 @@ export const numberOfLayerBranch = (branch: string): number | undefined => {
  * number has no `#`: GitHub links one in a pushed commit's message, on any
  * branch, and each rebuild would add to that pull request's timeline.
  */
-export const layerTrailer = ({ number, head }: Layer): string =>
-  `${LAYER_TRAILER}: ${number} ${head}` as const;
+export const layerTrailer = queueLayerTrailer;
 
 /**
  * A layer's whole commit message. Not the pull request's own: only the trailer
@@ -377,127 +373,20 @@ export const layerMessage = (layer: Layer): string =>
   `queue layer: pull request ${layer.number}\n\n${layerTrailer(layer)}\n` as const;
 
 /** What {@link layerTrailer} wrote into a commit message, if it did. */
-export const layerOfMessage = (message: string): Layer | undefined => {
-  const line = message
-    .split('\n')
-    .findLast((each) => each.startsWith(`${LAYER_TRAILER}: `));
-
-  const [number, head] = (line ?? '')
-    .slice(`${LAYER_TRAILER}: `.length)
-    .split(' ', 2);
-
-  return head !== undefined &&
-    number !== undefined &&
-    /^[1-9]\d*$/u.test(number) &&
-    /^[0-9a-f]{40}$/u.test(head)
-    ? {
-        number: Result.unwrapOkOr(Num.safeParseFloat(number), Number.NaN),
-        head,
-      }
-    : undefined;
-};
-
-/** Whether a layer on `main`'s tree is not right on another that could be kept. */
-const isOnMain = (
-  onTree: readonly BuiltLayer[],
-  candidates: readonly PullRequest[],
-  mayStayAhead: (pr: PullRequest) => boolean,
-): ((layer: BuiltLayer) => boolean) => {
-  const tips = new Set<string>(
-    onTree
-      .filter(({ number, head }) =>
-        candidates.some(
-          (pr) =>
-            pr.number === number && pr.headRefOid === head && mayStayAhead(pr),
-        ),
-      )
-      .map(({ tip }) => tip),
-  );
-
-  return ({ parent }) => !tips.has(parent);
-};
-
-const keptStack = (
-  candidates: readonly PullRequest[],
-  built: readonly BuiltLayer[],
-  below: Readonly<{ tree: string; tip: string | undefined }>,
-  mayStayAhead: (pr: PullRequest) => boolean,
-): Readonly<{ builtAt: number; stack: readonly PullRequest[] }> => {
-  // Each layer on what is below whose pull request is a candidate at the head
-  // it was built at, with the stack it carries; more than one when an old layer
-  // is still being dropped: the one with the layer built last is the one being
-  // checked, since a stack is only ever built anew over one that no longer
-  // stands, and of two built in the same second the longer. On `main` a layer
-  // is matched by tree, as `matchLayers` does, but one right on another layer
-  // there that could be kept is that one's next, not a stack of its own (an
-  // empty layer leaves the tree as it found it); on a layer, by its commit.
-  const onTree = built.filter(({ parentTree }) => parentTree === below.tree);
-
-  const isOnBelow =
-    below.tip === undefined
-      ? isOnMain(onTree, candidates, mayStayAhead)
-      : (layer: BuiltLayer): boolean => layer.parent === below.tip;
-
-  const stacks = Arr.generate(function* () {
-    for (const pr of candidates) {
-      const layer = onTree.find(
-        (each) =>
-          each.number === pr.number &&
-          each.head === pr.headRefOid &&
-          isOnBelow(each),
-      );
-
-      if (layer === undefined || !mayStayAhead(pr)) {
-        continue;
-      }
-
-      const above = keptStack(
-        candidates.filter(({ number }) => number !== pr.number),
-        built,
-        layer,
-        mayStayAhead,
-      );
-
-      yield {
-        builtAt: Math.max(layer.builtAt, above.builtAt),
-        stack: Arr.toUnshifted(pr)(above.stack),
-      } as const;
-    }
-  });
-
-  return stacks.reduce<
-    Readonly<{ builtAt: number; stack: readonly PullRequest[] }>
-  >(
-    (kept, each) =>
-      each.builtAt > kept.builtAt ||
-      (each.builtAt === kept.builtAt && each.stack.length > kept.stack.length)
-        ? each
-        : kept,
-    { builtAt: Number.NEGATIVE_INFINITY, stack: [] },
-  );
-};
+export const layerOfMessage = queueLayerOfMessage;
 
 /** The pull requests {@link stackedFirst} keeps ahead, in the stack's order. */
-const stackedAhead = (
+const stackedAheadOf = (
   candidates: readonly PullRequest[],
   built: readonly BuiltLayer[],
   baseTree: string,
   context: OrderContext,
-): readonly PullRequest[] => {
-  const release = candidates.findIndex(({ headRefName }) =>
-    isVersionBranch(headRefName, context.defaultBranch),
-  );
-
-  return keptStack(
-    candidates,
-    built,
-    { tree: baseTree, tip: undefined },
-    (pr) =>
-      context.mayStayAhead(pr) &&
-      isStackable(pr, context) &&
-      (release === -1 || candidates.indexOf(pr) < release),
-  ).stack;
-};
+): readonly PullRequest[] =>
+  stackedAhead(candidates, built, baseTree, {
+    mayStayAhead: context.mayStayAhead,
+    defaultBranch: context.defaultBranch,
+    isBypass: (pr) => context.bypass.has(pr.number),
+  });
 
 /** What {@link stackedFirst} needs besides the candidates and the layers. */
 export type OrderContext = Readonly<{
@@ -518,20 +407,10 @@ export type LayerRead = Result<
 >;
 
 /** A layer to have: a queued pull request at the head it is queued at. */
-export type Layer = Readonly<{ number: number; head: string }>;
+export type Layer = QueueLayer;
 
 /** A layer a branch holds: the pull request and head it was built from. */
-export type BuiltLayer = Layer &
-  Readonly<{
-    /** The branch's tip, the one commit the layer adds. */
-    tip: string;
-    tree: string;
-    /** The commit below, `main`'s or the layer below's, and its tree. */
-    parent: string;
-    parentTree: string;
-    /** When the layer's commit was made, in epoch milliseconds. */
-    builtAt: number;
-  }>;
+export type BuiltLayer = BuiltQueueLayer;
 
 /** A run on a layer, as much as {@link planDrop} reads. */
 export type DropRun = Readonly<{
@@ -558,7 +437,7 @@ export type LayerStatus = Readonly<
  * The prefix of the layer branches, on which the check workflows diff a layer
  * against `origin/main` (`code-check.yml`, `style-check.yml`).
  */
-export const LAYER_BRANCH_PREFIX = 'queue/pr-';
+export const LAYER_BRANCH_PREFIX = QUEUE_LAYER_BRANCH_PREFIX;
 
 /** How long a job of the first layer may run, from its own start. */
 export const LAYER_TIMEOUT_MS = 40 * 60_000;
@@ -578,8 +457,6 @@ export const DROPPED_RUN_QUIET_MS = 90 * 60_000;
 
 /** How many runs of a workflow a layer may see cancelled. */
 export const MAX_DISPATCHES = 3;
-
-const LAYER_TRAILER = 'Queue-Layer';
 
 const takeStanding = (
   desired: readonly Layer[],

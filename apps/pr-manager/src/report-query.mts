@@ -15,7 +15,11 @@
  * any list that did not fit in one.
  */
 
-import { MERGE_QUEUED_LABEL, SET_ASIDE_COMMENT_SCAN } from 'pr-report-core';
+import {
+  MERGE_QUEUED_LABEL,
+  QUEUE_LAYER_BRANCH_PREFIX,
+  SET_ASIDE_COMMENT_SCAN,
+} from 'pr-report-core';
 import * as t from 'ts-fortress';
 import type { ReadonlyRecord } from 'ts-type-forge';
 
@@ -27,6 +31,15 @@ import type { ReadonlyRecord } from 'ts-type-forge';
  * a time.
  */
 export const OPEN_PAGE_SIZE = 50;
+
+/** The directory of the queue layer branches, `queue` of `queue/pr-<n>`. */
+export const QUEUE_LAYER_REF_DIRECTORY = QUEUE_LAYER_BRANCH_PREFIX.slice(
+  0,
+  QUEUE_LAYER_BRANCH_PREFIX.indexOf('/'),
+);
+
+/** More than the worker ever stacks; one built layer per queued pull request. */
+const QUEUE_LAYERS_SIZE = 20;
 
 /**
  * How many open pull requests one page of {@link CHECKS_QUERY} and of
@@ -152,7 +165,15 @@ const openPulls = (size: number): string =>
 export const PULL_REQUESTS_QUERY = [
   'query PullRequests($owner: String!, $name: String!, $after: String) {',
   '  repository(owner: $owner, name: $name) {',
-  '    defaultBranchRef { name }',
+  '    defaultBranchRef { name target { ... on Commit { tree { oid } } } }',
+  // The queue layers `unblock-prs` has checked ahead of their turn, which it
+  // releases first (`stackedAhead` in `pr-report-core`).
+  `    queueLayers: refs(refPrefix: "refs/heads/${QUEUE_LAYER_REF_DIRECTORY}/", first: ${QUEUE_LAYERS_SIZE}) {`,
+  '      nodes { name target { ... on Commit {',
+  '        oid message committedDate tree { oid }',
+  '        parents(first: 1) { nodes { oid tree { oid } } }',
+  '      } } }',
+  '    }',
   ...Object.entries(CODE_OWNERS_PATHS).map(
     ([alias, path]) =>
       `    ${alias}: object(expression: "HEAD:${path}") { ... on Blob { text } }`,
@@ -734,7 +755,41 @@ const BlobSchema = t.union([t.record({ text: t.string() }), t.nullType]);
 export const PullRequestsDataSchema = t.record({
   repository: t.record({
     /** `null` only for a repository with no commits, and so no pull requests. */
-    defaultBranchRef: t.union([t.record({ name: t.string() }), t.nullType]),
+    defaultBranchRef: t.union([
+      t.record({
+        name: t.string(),
+        target: t.optional(
+          t.record({ tree: t.optional(t.record({ oid: t.string() })) }),
+        ),
+      }),
+      t.nullType,
+    ]),
+    /** Absent from an answer read before the page asked for it. */
+    queueLayers: t.optional(
+      t.record({
+        nodes: t.array(
+          t.record({
+            name: t.string(),
+            target: t.record({
+              oid: t.optional(t.string()),
+              message: t.optional(t.string()),
+              committedDate: t.optional(t.string()),
+              tree: t.optional(t.record({ oid: t.string() })),
+              parents: t.optional(
+                t.record({
+                  nodes: t.array(
+                    t.record({
+                      oid: t.string(),
+                      tree: t.record({ oid: t.string() }),
+                    }),
+                  ),
+                }),
+              ),
+            }),
+          }),
+        ),
+      }),
+    ),
     codeOwners: BlobSchema,
     codeOwnersAtRoot: BlobSchema,
     codeOwnersInDocs: BlobSchema,
