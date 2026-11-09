@@ -1,6 +1,5 @@
 import { expect, type Locator, type Page, test } from '@playwright/test';
-import { Arr, hasKey, isRecord, isString } from 'ts-data-forge';
-import type { DeepReadonly } from 'ts-type-forge';
+import type { DeepReadonly, ReadonlyRecord } from 'ts-type-forge';
 import {
   answerPageLoadTimeout,
   authCallTimeout,
@@ -299,6 +298,14 @@ test(
 );
 
 /**
+ * `ts-data-forge`'s `isRecord`, written out: the daily job against production
+ * imports every spec and builds no workspace package (see the `e2e/**` block in
+ * `eslint.config.mts`).
+ */
+const isObject = (u: unknown): u is ReadonlyRecord<string, unknown> =>
+  typeof u === 'object' && u !== null && !Array.isArray(u);
+
+/**
  * The link of the code the Auth emulator's `oobCodes` endpoint lists as sent to
  * change an address to `newEmail`.
  */
@@ -306,24 +313,22 @@ const emailChangeLinkTo = (
   body: unknown,
   newEmail: string,
 ): string | undefined => {
-  if (
-    !isRecord(body) ||
-    !hasKey(body, 'oobCodes') ||
-    !Arr.isArray(body.oobCodes)
-  ) {
+  const codes: unknown = isObject(body) ? body['oobCodes'] : undefined;
+
+  if (!Array.isArray(codes)) {
     return undefined;
   }
 
-  const code: unknown = body.oobCodes.find(
-    (c) =>
-      isRecord(c) &&
+  const code: unknown = codes.find(
+    (c: unknown) =>
+      isObject(c) &&
       c['requestType'] === 'VERIFY_AND_CHANGE_EMAIL' &&
       c['newEmail'] === newEmail,
   );
 
-  return isRecord(code) && hasKey(code, 'oobLink') && isString(code.oobLink)
-    ? code.oobLink
-    : undefined;
+  const link: unknown = isObject(code) ? code['oobLink'] : undefined;
+
+  return typeof link === 'string' ? link : undefined;
 };
 
 /**
