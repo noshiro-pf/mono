@@ -3,9 +3,11 @@ title: source
 description: 'イベントソースを作ります。'
 ---
 
-{/* translated-from:ae95ca49f3ce */}
+{/* translated-from:688a3092803f */}
 
 イベントソースを作ります。最初の `emit` までは値を持ちません。
+
+`emit` はメソッドです。ソースに対して呼び出し（`clicks.emit(event)`）、単独で渡すときは `(event) => { clicks.emit(event); }` のように包みます。ソースから取り出して呼び出すと TypeScript が拒否します。
 
 ## 例
 

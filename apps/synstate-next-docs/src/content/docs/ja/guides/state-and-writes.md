@@ -46,6 +46,8 @@ assert.deepStrictEqual(mut_seen, [0, 10, 11, 0]);
 
 `state(initialValue)` は同じ状態をオブジェクトとして作ります。`.value`・`.set`・`.update` を持ち、まとめて扱いたいコードに向いています。
 
+`.set` と `.update` は、`source()` の `.emit` と同じくメソッドです。オブジェクトに対して呼び出してください。単独で呼び出すコードに渡すときは `(value) => { count.set(value); }` のように包むか、そのまま渡せる `createState`・`createValueEmitter` などのヘルパーの関数を使います。オブジェクトから取り出したメソッド（`const { set } = count`）や、`subscribe`・`onCleanup`・synstate-dom-next のイベントハンドラーに渡したメソッドは TypeScript が拒否します。
+
 ## 何を変化とみなすか
 
 状態は、書き込みが値を変えるとき（`Object.is` で判定）にだけ伝えます。「変える」の意味は 2 つのオプションで変えられます。

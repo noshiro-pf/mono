@@ -1,8 +1,13 @@
 import {
+  batch,
+  createDerived,
+  createOwner,
+  createSource,
   derive,
   filter,
   keepEqualParts,
   map,
+  onCleanup,
   pairwise,
   scan,
   skip,
@@ -14,6 +19,7 @@ import {
   take,
   takeUntil,
   takeWhile,
+  untracked,
   withBufferedFrom,
   withCurrentValueFrom,
   withInitialValue,
@@ -24,6 +30,8 @@ import {
   type Observable,
   type ObservableValue,
   type ProvideInitialValueOperator,
+  type Source,
+  type State,
   type ValuesOf,
 } from 'synstate-next';
 import { Arr, expectType, isNotUndefined } from 'ts-data-forge';
@@ -310,5 +318,153 @@ describe('types', () => {
         3,
       );
     }
+  });
+
+  test('the functions of an observable need it as their this', () => {
+    const count = state(0);
+
+    const clicks = source<number>();
+
+    const doubled = count.pipe(map((n) => n * 2));
+
+    const { set, update } = count;
+
+    const { emit } = clicks;
+
+    const { getSnapshot, subscribe, dispose } = doubled;
+
+    assert.throws(() => {
+      // @ts-expect-error set is a method of the state
+      set(1);
+    });
+
+    assert.throws(() => {
+      // @ts-expect-error update is a method of the state
+      update((n) => n + 1);
+    });
+
+    assert.throws(() => {
+      // @ts-expect-error emit is a method of the source
+      emit(1);
+    });
+
+    // @ts-expect-error getSnapshot is a method of the observable
+    assert.throws(() => getSnapshot());
+
+    // @ts-expect-error subscribe is a method of the observable
+    assert.throws(() => subscribe(() => {}));
+
+    assert.throws(() => {
+      // @ts-expect-error dispose is a method of the observable
+      dispose();
+    });
+
+    // subscribe calls its function at once, with the current value.
+    // @ts-expect-error subscribe gives its function a this of unknown
+    assert.throws(() => doubled.subscribe(count.set));
+
+    const owner = createOwner();
+
+    owner.run(() => {
+      // @ts-expect-error onCleanup gives its function a this of unknown
+      onCleanup(doubled.dispose);
+    });
+
+    // A cleanup is called with no `this`, so the method throws.
+    assert.throws(() => {
+      owner.dispose();
+    });
+
+    // @ts-expect-error untracked gives its function a this of unknown
+    assert.throws(() => untracked(count.getSnapshot));
+
+    // @ts-expect-error batch gives its function a this of unknown
+    assert.throws(() => batch(count.getSnapshot));
+
+    const runOwner = createOwner();
+
+    // @ts-expect-error run gives its function a this of unknown
+    assert.throws(() => runOwner.run(count.getSnapshot));
+
+    runOwner.dispose();
+
+    // Typed only: each would throw when its owner is disposed.
+    const _givenToContexts = (): void => {
+      createSource<number>((ctx) => {
+        // @ts-expect-error ctx.onCleanup gives its function a this of unknown
+        ctx.onCleanup(doubled.dispose);
+      });
+
+      createDerived<number>([count], (ctx) => {
+        // @ts-expect-error ctx.onCleanup gives its function a this of unknown
+        ctx.onCleanup(doubled.dispose);
+
+        return () => {
+          ctx.set(count.value);
+        };
+      });
+
+      // @ts-expect-error a returned function is called with no this
+      createDerived<number>([count], () => doubled.dispose);
+
+      // @ts-expect-error update is called on the object returned, not the state
+      createDerived<number>([count], () => ({ update: count.dispose }));
+
+      createDerived<number>([count], () => ({
+        // @ts-expect-error a function that needs a this of its own
+        update(this: Readonly<{ own: true }>) {},
+      }));
+
+      createDerived<number>([count], () => ({
+        update: () => {},
+        // @ts-expect-error a function that needs a this of its own
+        settled(this: Readonly<{ own: true }>) {
+          return true;
+        },
+      }));
+
+      // A class's methods, which declare no this, type-check; called on the
+      // instance (`Following` in ported/authoring.test.mts runs one).
+      class Counting {
+        #mut_n = 0;
+
+        update(): void {
+          this.#mut_n += 1;
+        }
+
+        settled(): boolean {
+          return this.#mut_n > 0;
+        }
+      }
+
+      createDerived<number>([count], () => new Counting());
+    };
+
+    expectType<typeof _givenToContexts, () => void>('=');
+
+    // Wrapped, it is a function of its own.
+    const mirror = state(-1);
+
+    count.subscribe((n) => {
+      mirror.set(n);
+    });
+
+    assert.strictEqual(mirror.value, 0);
+  });
+
+  test('the this of the functions keeps Observable covariant', () => {
+    expectType<Observable<1>, Observable<number>>('<=');
+
+    expectType<InitializedObservable<1>, InitializedObservable<number>>('<=');
+
+    expectType<InitializedObservable<number>, Observable<number>>('<=');
+
+    expectType<State<1>, State<number>>('!<=');
+
+    expectType<State<number>, State<1>>('!<=');
+
+    expectType<Source<1>, Source<number>>('!<=');
+
+    assert.isTrue(true);
   });
 });

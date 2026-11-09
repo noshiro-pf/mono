@@ -90,6 +90,23 @@ describe('propagation', () => {
     assert.deepStrictEqual(mut_seen, [1]);
   });
 
+  test('a subscriber is called with no this, the first time and after', () => {
+    const a = state(1);
+
+    const mut_thisValues: unknown[] = [];
+
+    // A function expression, since an arrow function has no `this` to record.
+    const record = function record(this: unknown): void {
+      mut_thisValues.push(this);
+    };
+
+    a.subscribe(record);
+
+    a.set(2);
+
+    assert.deepStrictEqual(mut_thisValues, [undefined, undefined]);
+  });
+
   test('a subscriber sees a graph that has settled', () => {
     const a = state(1);
 

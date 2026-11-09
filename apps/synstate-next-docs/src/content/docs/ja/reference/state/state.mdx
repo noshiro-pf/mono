@@ -3,11 +3,13 @@ title: state
 description: '`initialValue` を持つ状態を作ります。'
 ---
 
-{/* translated-from:909a3dc34efc */}
+{/* translated-from:2fa20280c957 */}
 
 `initialValue` を持つ状態を作ります。
 
 更新が値を計算し直している間に `map` や `derive` などのオペレーターの中で行った書き込みは進行中の更新の購読者と束縛が実行されてから適用され、購読者や束縛の書き込みはすぐに適用されます。どちらも次の更新で伝わり、進行中の更新を中断することはありません。
+
+`set` と `update` はメソッドです。状態に対して呼び出し（`count.set(1)`）、単独で渡すときは `(n) => { count.set(n); }` のように包みます。状態から取り出して呼び出すと TypeScript が拒否します。
 
 ## 例
 

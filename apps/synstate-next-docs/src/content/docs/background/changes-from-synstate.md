@@ -42,6 +42,8 @@ synstate-next replaces synstate in its next major version. This page lists what 
 - **`fromSubscribable` subscribes with an observer object** (`next`, `error`, `complete`), the form RxJS recommends and a TC39 `Observable` takes, not with three functions.
 - **A state is also an object**: `state(initialValue)` has `.value`, `.set` and `.update`, and `createState` is the same as a tuple.
 - **`source()` emits with `.emit`**, not `.next`.
+- **`source(initialValue)` is gone**: `source()` takes no argument and holds no value until its first `emit`. A source that starts with a value is a state: `state(initialValue)` drops a write equal to the value it holds, and passes on the writes made before one update as one. Where every write has to arrive, as with synstate's initialized source, emit on a `source()` and read it through `withInitialValue(initialValue)`. synstate's `.next` returned the value written; `.set`, `.update` and `.emit` return nothing.
+- **The functions of an observable, a state and a source are typed as methods**: `getSnapshot`, `subscribe`, `pipe`, `dispose`, `set`, `update` and `emit` declare their `this`, so TypeScript rejects one taken off its object (`const { set } = count`) or passed where the callee types a `this` of its own (`subscribe`, `onCleanup`, an event handler of synstate-dom-next). synstate's were methods too, typed as plain functions, and threw at the call. Wrap one to pass it: `(value) => { count.set(value); }`.
 
 ## Writing operators
 

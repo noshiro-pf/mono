@@ -227,6 +227,27 @@ describe(Owner, () => {
     expect(error).toHaveBeenCalledExactlyOnceWith(expect.any(SyntaxError));
   });
 
+  test('a cleanup is called with no this, registered before or after dispose', () => {
+    const owner = new Owner(undefined);
+
+    const mut_thisValues: unknown[] = [];
+
+    // A function expression, since an arrow function has no `this` to record.
+    const record = function record(this: unknown): void {
+      mut_thisValues.push(this);
+    };
+
+    owner.run(() => {
+      onCleanup(record);
+    });
+
+    owner.dispose();
+
+    owner.onCleanup(record);
+
+    assert.deepStrictEqual(mut_thisValues, [undefined, undefined]);
+  });
+
   test('dispose is idempotent', () => {
     const owner = new Owner(undefined);
 

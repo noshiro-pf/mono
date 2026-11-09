@@ -18,6 +18,8 @@ import {
   source,
   state,
   timer,
+  type DerivedBehavior,
+  type DerivedContext,
   type InitializedObservable,
   type Observable,
 } from 'synstate-next';
@@ -418,6 +420,53 @@ describe('custom operators and sources', () => {
 
     // `other` is still live, but nothing more can come.
     assert.isTrue(toNode(followed).settled);
+  });
+
+  test('the functions of a behavior are called on it, and a function alone with no this', () => {
+    const main = source<number>();
+
+    class Following implements DerivedBehavior {
+      readonly #ctx: DerivedContext<number>;
+
+      #mut_done: boolean;
+
+      constructor(ctx: DerivedContext<number>) {
+        this.#ctx = ctx;
+
+        this.#mut_done = false;
+      }
+
+      update(): void {
+        this.#ctx.set(main.getSnapshot() ?? 0);
+
+        this.#mut_done = true;
+      }
+
+      settled(): boolean {
+        return this.#mut_done;
+      }
+    }
+
+    const followed = createDerived<number>([main], (ctx) => new Following(ctx));
+
+    assert.isFalse(toNode(followed).settled);
+
+    main.emit(1);
+
+    assert.isTrue(toNode(followed).settled);
+
+    const mut_thisValues: unknown[] = [];
+
+    // A function expression, since an arrow function has no `this` to record.
+    const record = function record(this: unknown): void {
+      mut_thisValues.push(this);
+    };
+
+    createDerived<number>([main], () => record);
+
+    main.emit(2);
+
+    assert.deepStrictEqual(mut_thisValues, [undefined]);
   });
 
   test('without a settled handler it settles once every parent has', () => {

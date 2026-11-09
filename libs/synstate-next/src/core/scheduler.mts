@@ -314,7 +314,7 @@ export const emit = (node: DerivedNode, hasObserver: boolean): void => {
  * Runs `fn`, and propagates every write it makes in one update once it returns.
  * Batches nest; the outermost one propagates.
  */
-export const batch = <R,>(fn: () => R): R => {
+export const batch = <R,>(fn: (this: unknown) => R): R => {
   mut_state.batchDepth += 1;
 
   try {

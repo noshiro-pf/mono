@@ -629,9 +629,15 @@ class FnEffect<A> extends EffectClass<A> {
   run(): void {
     const v = this.source.current;
 
-    if (v !== noValue) {
-      this.#fn(v);
+    if (v === noValue) {
+      return;
     }
+
+    // Taken out first, so that it is called with no `this`, as the first call
+    // is, not with this effect.
+    const fn = this.#fn;
+
+    fn(v);
   }
 }
 
