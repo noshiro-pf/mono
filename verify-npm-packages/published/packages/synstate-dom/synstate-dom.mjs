@@ -4,9 +4,10 @@ import * as assert from 'node:assert/strict';
 import { createState } from 'synstate';
 import {
   constant,
-  derive,
+  deriveBindable,
   For,
   If,
+  isImeKeyDown,
   mapBindable,
   render,
   toObservable,
@@ -22,7 +23,7 @@ import { Fragment, jsx, jsxs } from 'synstate-dom/jsx-runtime';
 const [count, setCount] = createState(1);
 
 // A constant is the value itself at run time, and stays one through
-// `mapBindable` and `derive`, so it never becomes a graph node.
+// `mapBindable` and `deriveBindable`, so it never becomes a graph node.
 const label = constant('count');
 
 assert.equal(label, 'count');
@@ -33,7 +34,7 @@ assert.equal(
 );
 
 // An observable passed in comes back as a derived observable.
-const text = derive([label, count], (l, n) => `${l}: ${n}`);
+const text = deriveBindable([label, count], (l, n) => `${l}: ${n}`);
 
 const mut_seen = [];
 
@@ -62,5 +63,18 @@ assert.equal(typeof Fragment({}).mount, 'function');
 for (const component of [For, If, render]) {
   assert.equal(typeof component, 'function');
 }
+
+// `isImeKeyDown` reads only the event's fields, so a plain object stands in
+// for a `KeyboardEvent`: Safari's Enter after `compositionend` is the input
+// method's, and an Android keyboard's arrow key with the same key code is not.
+assert.equal(
+  isImeKeyDown({ key: 'Enter', keyCode: 229, isComposing: false }),
+  true,
+);
+
+assert.equal(
+  isImeKeyDown({ key: 'ArrowUp', keyCode: 229, isComposing: false }),
+  false,
+);
 
 console.info('synstate-dom ok');

@@ -42,7 +42,7 @@ published/packages/<pkg>/ 同上、依存指定だけが違う
 ```
 
 `<pkg>/` はそれぞれが独立した pnpm workspace root で、`pnpm-workspace.yaml` と
-`node_modules` を自分で持つ。install も 32 回走る。ここは生成物のうち
+`node_modules` を自分で持つ。install もパッケージの数だけ走る。ここは生成物のうち
 `pnpm-workspace.yaml` だけ commit していない — pnpm が install 中に
 `allowBuilds` を書き戻すため。
 
@@ -127,7 +127,7 @@ workspace を分けたので隣の project の解決は届かず、各 project �
 | `published/` | commit してある値。`--update` で pin を動かすときだけ registry を引く |
 
 公開済みバージョンの manifest は不変なので、commit した答えは正しいままになる。
-バージョン pin と同じ扱いで、毎回 32 回 registry を叩かずに済む。
+バージョン pin と同じ扱いで、毎回パッケージの数だけ registry を叩かずに済む。
 
 optional な peer は書かない。consumer が持っていないかもしれないから optional
 なのであって、持っていない consumer こそ検査する価値がある。
