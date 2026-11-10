@@ -182,6 +182,176 @@ describe('collectMatrixContexts', () => {
     assert.deepStrictEqual(read.contexts, ['code-check (fix:a)']);
   });
 
+  test('reads the command of an entry, not of a mapping nested in it', () => {
+    const read = collectMatrixContexts(dedent`
+      jobs:
+        code-check:
+          name: code-check (\${{ matrix.command }})
+          strategy:
+            matrix:
+              include:
+                - command: fix:a
+                  env:
+                    command: other
+          steps:
+            - run: pnpm run \${{ matrix.command }}
+    `);
+
+    assert.deepStrictEqual(read.unreadable, []);
+
+    assert.deepStrictEqual(read.contexts, ['code-check (fix:a)']);
+  });
+
+  test('reads an include list with no indentation and a flow list', () => {
+    const read = collectMatrixContexts(dedent`
+      jobs:
+        code-check:
+          name: code-check (\${{ matrix.command }})
+          strategy:
+            matrix:
+              include:
+              - command: fix:a
+          steps:
+            - run: pnpm run \${{ matrix.command }}
+        style-check:
+          strategy:
+            matrix:
+              command: [fix:b, 'fix:c']
+          steps:
+            - run: pnpm run \${{ matrix.command }}
+    `);
+
+    assert.deepStrictEqual(read.unreadable, []);
+
+    assert.deepStrictEqual(read.contexts, [
+      'code-check (fix:a)',
+      'style-check (fix:b)',
+      'style-check (fix:c)',
+    ]);
+  });
+
+  test('says which property to name an unnamed job that runs two by', () => {
+    const read = collectMatrixContexts(dedent`
+      jobs:
+        code-check:
+          strategy:
+            matrix:
+              include:
+                - command: check:root
+                  build: ws:build:deps
+          steps:
+            - run: pnpm run \${{ matrix.build }}
+            - run: pnpm run \${{ matrix.command }}
+    `);
+
+    assert.deepStrictEqual(read.contexts, []);
+
+    expect(read.unreadable).toHaveLength(1);
+
+    expect(read.unreadable[0]).toContain('`matrix.build`, `matrix.command`');
+
+    expect(read.unreadable[0]).toContain('the one a fixer reruns');
+  });
+
+  test('names the checks a job it leaves out may produce', () => {
+    const read = collectMatrixContexts(dedent`
+      jobs:
+        code-check:
+          strategy:
+            matrix:
+              include:
+                - command: fix:gen
+                  build: ws:build
+              os:
+                - ubuntu
+          steps:
+            - run: pnpm run \${{ matrix.command }}
+        named:
+          name: named (\${{ matrix.command }}, \${{ matrix.os }})
+          strategy:
+            matrix:
+              command:
+                - fix:a
+          steps:
+            - run: pnpm run \${{ matrix.command }}
+    `);
+
+    assert.deepStrictEqual(read.contexts, []);
+
+    expect(read.unreadable).toHaveLength(2);
+
+    expect(read.possible).toContain('code-check (fix:gen)');
+
+    expect(read.possible).toContain('code-check (fix:gen, ws:build)');
+
+    expect(read.possible).toContain('named (fix:a, )');
+
+    assert.deepStrictEqual(read.unguessable, []);
+  });
+
+  test('names the product of the listed keys of a job it leaves out', () => {
+    const read = collectMatrixContexts(dedent`
+      jobs:
+        code-check:
+          strategy:
+            matrix:
+              command:
+                - fix:gen
+              os:
+                - ubuntu
+                - macos
+          steps:
+            - run: pnpm run \${{ matrix.command }}
+    `);
+
+    expect(read.unreadable).toHaveLength(1);
+
+    expect(read.possible).toContain('code-check (fix:gen, ubuntu)');
+
+    expect(read.possible).toContain('code-check (fix:gen, macos)');
+  });
+
+  test('names a job it leaves out with no matrix by its name alone', () => {
+    const read = collectMatrixContexts(dedent`
+      jobs:
+        code-check:
+          name: Code check
+          steps:
+            - run: pnpm run \${{ matrix.command }}
+    `);
+
+    expect(read.unreadable).toHaveLength(1);
+
+    assert.deepStrictEqual(read.possible, ['Code check']);
+  });
+
+  test('says when it cannot guess the checks of a job it leaves out', () => {
+    const read = collectMatrixContexts(dedent`
+      jobs:
+        c:
+          name: \${{ format('c ({0})', matrix.command) }}
+          strategy:
+            matrix:
+              command:
+                - fix:a
+          steps:
+            - run: pnpm run \${{ matrix.command }}
+        d:
+          strategy:
+            matrix: \${{ fromJSON(needs.plan.outputs.matrix) }}
+          steps:
+            - run: pnpm run \${{ matrix.command }}
+    `);
+
+    expect(read.unreadable).toHaveLength(2);
+
+    expect(read.unguessable).toHaveLength(2);
+
+    expect(read.unguessable[0]).toContain('`c`');
+
+    expect(read.unguessable[1]).toContain('`d`');
+  });
+
   test('leaves out a job whose name is an expression with a brace in it', () => {
     const read = collectMatrixContexts(dedent`
       jobs:
@@ -630,7 +800,11 @@ describe('findIdlePatterns', () => {
 
     assert.deepStrictEqual(
       findIdlePatterns(config, contexts, [
-        { context: String.raw`^x \((gen)\)$`, reason: 'for a future entry' },
+        {
+          kind: 'fixer',
+          context: String.raw`^x \((gen)\)$`,
+          reason: 'for a future entry',
+        },
       ]),
       [],
     );
@@ -644,7 +818,11 @@ describe('findIdlePatterns', () => {
     });
 
     const violations = findIdlePatterns(config, contexts, [
-      { context: String.raw`^code-check \(`, reason: 'for a future entry' },
+      {
+        kind: 'fixer',
+        context: String.raw`^code-check \(`,
+        reason: 'for a future entry',
+      },
     ]);
 
     expect(violations).toHaveLength(1);
@@ -661,7 +839,11 @@ describe('findIdlePatterns', () => {
     });
 
     const violations = findIdlePatterns(config, contexts, [
-      { context: String.raw`^x \((gen)\)$`, reason: 'for a future entry' },
+      {
+        kind: 'fixer',
+        context: String.raw`^x \((gen)\)$`,
+        reason: 'for a future entry',
+      },
     ]);
 
     expect(violations).toHaveLength(1);
@@ -669,9 +851,82 @@ describe('findIdlePatterns', () => {
     expect(violations[0]).toContain('autoFix.fixers[1].context');
   });
 
+  test('exempts the entry of the kind KEPT_IDLE names, not the first', () => {
+    // A prepare entry and a fixer with one source: KEPT_IDLE names the fixer,
+    // so the prepare entry, which comes first, is still asked.
+    const config = configOf({
+      prepare: [{ context: String.raw`^x \(`, run: 'pnpm run ws:build' }],
+      fixers: [{ context: String.raw`^x \(`, run: 'pnpm run a', stage: 0 }],
+    });
+
+    const violations = findIdlePatterns(config, contexts, [
+      {
+        kind: 'fixer',
+        context: String.raw`^x \(`,
+        reason: 'for a future entry',
+      },
+    ]);
+
+    expect(violations).toHaveLength(1);
+
+    expect(violations[0]).toContain('autoFix.prepare[0].context');
+  });
+
+  test('names a pattern kept idle that a job left out may produce', () => {
+    const config = configOf({
+      fixers: [
+        { context: String.raw`^x \((gen)\)$`, run: 'pnpm run $1', stage: 0 },
+      ],
+    });
+
+    const violations = findIdlePatterns(
+      config,
+      contexts,
+      [
+        {
+          kind: 'fixer',
+          context: String.raw`^x \((gen)\)$`,
+          reason: 'for a future entry',
+        },
+      ],
+      { possible: ['x (gen)'], unguessable: [] },
+    );
+
+    expect(violations).toHaveLength(1);
+
+    expect(violations[0]).toContain('KEPT_IDLE');
+
+    expect(violations[0]).toContain('`x (gen)`');
+  });
+
+  test('names a pattern kept idle while a job left out cannot be guessed', () => {
+    const config = configOf({
+      fixers: [
+        { context: String.raw`^x \((gen)\)$`, run: 'pnpm run $1', stage: 0 },
+      ],
+    });
+
+    const violations = findIdlePatterns(
+      config,
+      contexts,
+      [
+        {
+          kind: 'fixer',
+          context: String.raw`^x \((gen)\)$`,
+          reason: 'for a future entry',
+        },
+      ],
+      { possible: [], unguessable: ['job `c`'] },
+    );
+
+    expect(violations).toHaveLength(1);
+
+    expect(violations[0]).toContain('job `c`');
+  });
+
   test('names a pattern kept idle that the file no longer has', () => {
     const violations = findIdlePatterns(configOf({}), contexts, [
-      { context: '^gone$', reason: 'for a future entry' },
+      { kind: 'fixer', context: '^gone$', reason: 'for a future entry' },
     ]);
 
     expect(violations).toHaveLength(1);

@@ -17,6 +17,7 @@ import {
 } from 'ts-data-forge';
 import * as t from 'ts-fortress';
 import { isDirectlyExecuted } from 'ts-repo-utils';
+import type { ReadonlyRecord, StrictPick } from 'ts-type-forge';
 import {
   listWorkflowFiles,
   readRepositoryFile,
@@ -72,11 +73,13 @@ export const checkAutoFixContexts = (): Promise<Result<CheckSummary, string>> =>
       ),
     );
 
-    const { contexts, unreadable } = yield* Result.safeUnwrap(
-      await readCheckContexts(),
-    );
+    const { contexts, unreadable, possible, unguessable } =
+      yield* Result.safeUnwrap(await readCheckContexts());
 
-    const violations = findIdlePatterns(config, contexts, KEPT_IDLE);
+    const violations = findIdlePatterns(config, contexts, KEPT_IDLE, {
+      possible,
+      unguessable,
+    });
 
     return Arr.isNonEmpty(violations)
       ? Result.err(formatViolations(violations, unreadable))
@@ -97,27 +100,145 @@ export const checkAutoFixContexts = (): Promise<Result<CheckSummary, string>> =>
  * name whose entries carry other properties (GitHub names those by all of
  * them), and a matrix job that runs none of its properties as
  * `pnpm run ${{ matrix.<key> }}`. Leaving a job out can only make a pattern
- * fail, never pass, and the reasons are printed with the failure.
+ * fail, never pass, but it could hide a check that a pattern in
+ * {@link KEPT_IDLE} has started taking; so the names such a job may give its
+ * checks are kept as `possible` ({@link possibleContextsOf}), and a kept
+ * pattern that matches one fails too, as every kept pattern does when a job
+ * left out is `unguessable`.
  */
 export const collectMatrixContexts = (workflowFile: string): MatrixContexts => {
   const jobs = readWorkflowJobs(workflowFile);
 
   if (Result.isErr(jobs)) {
-    return { contexts: [], unreadable: [jobs.value] };
+    return {
+      contexts: [],
+      unreadable: [jobs.value],
+      possible: [],
+      unguessable: [jobs.value],
+    };
   }
 
-  const results = jobs.value.map(collectJobContexts);
+  const results = jobs.value.map(
+    (job) => [job, collectJobContexts(job)] as const,
+  );
+
+  const leftOut = Arr.generate(function* () {
+    for (const [job, result] of results) {
+      if (Result.isErr(result)) {
+        yield {
+          reason: result.value,
+          possible: possibleContextsOf(job),
+        } as const;
+      }
+    }
+  });
 
   return {
-    contexts: results.flatMap(Result.unwrapOkOr([])),
-    unreadable: Arr.generate(function* () {
-      for (const result of results) {
-        if (Result.isErr(result)) {
-          yield result.value;
+    contexts: results.flatMap(([, result]) => Result.unwrapOkOr(result, [])),
+    unreadable: leftOut.map(({ reason }) => reason),
+    possible: Arr.uniq(
+      leftOut.flatMap(({ possible }) => Result.unwrapOkOr(possible, [])),
+    ),
+    unguessable: Arr.generate(function* () {
+      for (const { possible } of leftOut) {
+        if (Result.isErr(possible)) {
+          yield possible.value;
         }
       }
     }),
   };
+};
+
+/**
+ * The names a job's checks may have, over-approximated, for a job whose checks
+ * cannot be named exactly. The rows are GitHub's combinations of the listed
+ * keys, each `include:` entry, and each combination with each entry laid over
+ * it. A row gives, for a name with no expression in it,
+ * `<name> (<every value, in order>)` and `<name> (<one value>)`; for a name
+ * whose expressions are all `matrix.<key>`, the name with each put in from the
+ * row; a job with no rows gives its name alone. A job whose matrix is an expression, or whose name has another
+ * expression, cannot be guessed at, and is an error naming why.
+ */
+export const possibleContextsOf = (
+  job: WorkflowJob,
+): Result<readonly string[], string> => {
+  const matrix = readMatrix(job.matrix);
+
+  if (Result.isErr(matrix)) {
+    return Result.err(`job \`${job.name}\`'s matrix has ${matrix.value}`);
+  }
+
+  const combinations = Object.entries(matrix.value.lists).reduce<
+    readonly ReadonlyRecord<string, string>[]
+  >(
+    (product, [key, values]) =>
+      product.flatMap((row) =>
+        values.map((value) => ({ ...row, [key]: value }) as const),
+      ),
+    [{}],
+  );
+
+  const listed = Arr.isNonEmpty(Object.keys(matrix.value.lists))
+    ? combinations
+    : ([] as const);
+
+  const matrixRows: readonly ReadonlyRecord<string, string>[] = [
+    ...listed,
+    ...matrix.value.include,
+    ...listed.flatMap((row) =>
+      matrix.value.include.map((entry) => ({ ...row, ...entry }) as const),
+    ),
+  ] as const;
+
+  // A job with no rows runs once, under its name alone.
+  const rows = Arr.isNonEmpty(matrixRows) ? matrixRows : NO_ROW;
+
+  const name = job.displayName;
+
+  const expressions =
+    name === undefined
+      ? ([] as const)
+      : Array.from(name.matchAll(EXPRESSION), ([matched]) => matched);
+
+  if (name === undefined || !Arr.isNonEmpty(expressions)) {
+    const base = name ?? job.name;
+
+    return Result.ok(
+      Arr.uniq(
+        rows.flatMap((row) => {
+          const values = Object.values(row);
+
+          return Arr.isNonEmpty(values)
+            ? Arr.toUnshifted(`${base} (${values.join(', ')})`)(
+                values.map((value) => `${base} (${value})`),
+              )
+            : [base];
+        }),
+      ),
+    );
+  }
+
+  const others = expressions.filter(
+    (expression) => !MATRIX_PROPERTY.test(expression),
+  );
+
+  if (Arr.isNonEmpty(others)) {
+    return Result.err(
+      `job \`${job.name}\`'s name reads ${quoteList(others)}, which this guard cannot put in`,
+    );
+  }
+
+  return Result.ok(
+    Arr.uniq(
+      rows.map((row) =>
+        name.replaceAll(EXPRESSION, (expression) => {
+          const key = MATRIX_PROPERTY.exec(expression)?.groups?.['key'];
+
+          return key === undefined ? '' : (row[key] ?? '');
+        }),
+      ),
+    ),
+  );
 };
 
 /**
@@ -178,11 +299,17 @@ export const readAutoFixPatterns = (
  * prepare entry takes what it matches where a plan for that context comes out
  * (`planAutoFix`), since a failure no fixer takes declines the whole fix before
  * any prepare runs.
+ *
+ * `leftOut.possible` are names that the checks of jobs left out may have
+ * ({@link possibleContextsOf}): a kept pattern that matches one fails as one
+ * that takes a check does, since the guard cannot tell that it does not; and
+ * every kept pattern fails while a job left out is `unguessable`.
  */
 export const findIdlePatterns = (
   config: AutoFixConfig,
   contexts: readonly string[],
   keptIdle: readonly KeptIdle[],
+  leftOut: LeftOutJobs = NOTHING_LEFT_OUT,
 ): readonly string[] => {
   const { autoFix, patterns } = config;
 
@@ -196,11 +323,13 @@ export const findIdlePatterns = (
     return patterns.find(({ regex }) => regex === fixer?.context);
   };
 
-  // Only the first entry with a kept source is exempt, so a copy of it is still
-  // asked.
+  // Only the first entry of the kind with a kept source is exempt, so a copy of
+  // it is still asked, and so is an entry of the other kind with that source.
   const kept = new Set(
-    keptIdle.map(({ context }) =>
-      patterns.find(({ source }) => source === context),
+    keptIdle.map(({ kind, context }) =>
+      patterns.find(
+        (pattern) => pattern.kind === kind && pattern.source === context,
+      ),
     ),
   );
 
@@ -216,9 +345,25 @@ export const findIdlePatterns = (
     const name = `${pattern.where} \`${pattern.source}\`` as const;
 
     if (kept.has(pattern)) {
-      return Arr.isNonEmpty(taken)
+      if (Arr.isNonEmpty(taken)) {
+        return [
+          `${name} is in KEPT_IDLE but takes ${quoteList(taken)}; remove it from the list.`,
+        ];
+      }
+
+      const mayTake = leftOut.possible.filter((context) =>
+        pattern.regex.test(context),
+      );
+
+      if (Arr.isNonEmpty(mayTake)) {
+        return [
+          `${name} is in KEPT_IDLE, and a job this guard leaves out may name a check ${quoteList(mayTake)}, which it matches; give that job a name this guard reads (the reasons are below), so that whether the pattern takes it can be asked.`,
+        ];
+      }
+
+      return Arr.isNonEmpty(leftOut.unguessable)
         ? [
-            `${name} is in KEPT_IDLE but takes ${quoteList(taken)}; remove it from the list.`,
+            `${name} is in KEPT_IDLE, and a job this guard leaves out names its checks in a way it cannot guess at (${leftOut.unguessable.join('; ')}), so whether the pattern takes one cannot be asked; give that job a name this guard reads.`,
           ]
         : [];
     }
@@ -255,13 +400,15 @@ export const findIdlePatterns = (
       : [`${name} matches no check a workflow produces.`];
   });
 
-  const sources = new Set(patterns.map(({ source }) => source));
-
   const staleKept = keptIdle
-    .filter(({ context }) => !sources.has(context))
+    .filter(({ kind, context }) =>
+      patterns.every(
+        (pattern) => !(pattern.kind === kind && pattern.source === context),
+      ),
+    )
     .map(
-      ({ context }) =>
-        `KEPT_IDLE names \`${context}\`, which ${CONFIG_PATH} no longer has; remove it from the list.`,
+      ({ kind, context }) =>
+        `KEPT_IDLE names the ${kind} \`${context}\`, which ${CONFIG_PATH} no longer has; remove it from the list.`,
     );
 
   return [...fromPatterns, ...staleKept];
@@ -306,7 +453,17 @@ export type MatrixContexts = Readonly<{
   contexts: readonly string[];
   /** Why each job left out was left out. */
   unreadable: readonly string[];
+  /** The names the checks of the jobs left out may have. */
+  possible: readonly string[];
+  /** Why the names of a job left out could not even be guessed at. */
+  unguessable: readonly string[];
 }>;
+
+/** What {@link findIdlePatterns} knows of the jobs left out. */
+export type LeftOutJobs = StrictPick<
+  MatrixContexts,
+  'possible' | 'unguessable'
+>;
 
 export type AutoFixPattern = Readonly<{
   where: string;
@@ -318,6 +475,11 @@ export type AutoFixPattern = Readonly<{
 }>;
 
 export type KeptIdle = Readonly<{
+  /**
+   * Which list the entry is in, since a prepare entry and a fixer can share a
+   * source.
+   */
+  kind: AutoFixPattern['kind'];
   /** The pattern exactly as `.github/unblock-prs.json` writes it. */
   context: string;
   reason: string;
@@ -330,11 +492,13 @@ export type KeptIdle = Readonly<{
  */
 const KEPT_IDLE: readonly KeptIdle[] = [
   {
+    kind: 'fixer',
     context: String.raw`^(?:code-check|style-check) \(((?:(?:ws|strict-lib):)?(?:fix:)?gen(?::[^)]*)?)\)$`,
     reason:
       'Runs an entry of its own that is a generator at stage 0, ahead of the lint and codemod fixes that read what it generates. No entry is one today: the generators run inside `z:ci:style-check:checks-and-generators`.',
   },
   {
+    kind: 'fixer',
     context: String.raw`^(?:code-check|style-check) \(((?:(?:ws|strict-lib):)?fix:fmt(?::[^)]*)?)\)$`,
     reason:
       'Puts an entry of its own that formats at stage 2, after the fixes whose output it formats; without it the stage-1 `fix` pattern below would take such an entry. No entry is one today: formatting is checked inside `z:ci:style-check:format-and-doc`.',
@@ -367,6 +531,19 @@ const NO_AUTO_FIX: UnblockAutoFixConfig = {
   fixers: [],
   after: [],
   notFixableAnnotation: undefined,
+} as const;
+
+const NO_ROW: readonly ReadonlyRecord<string, string>[] = [{}] as const;
+
+const NOTHING_LEFT_OUT: LeftOutJobs = {
+  possible: [],
+  unguessable: [],
+} as const;
+
+const NO_CONTEXTS: MatrixContexts = {
+  contexts: [],
+  unreadable: [],
+  ...NOTHING_LEFT_OUT,
 } as const;
 
 const CONFIG_PATH = '.github/unblock-prs.json';
@@ -425,21 +602,25 @@ const alternativesOf = (
 ): AutoFixPattern['alternatives'] => {
   const parts = splitAlternatives(source);
 
-  if (!Arr.isNonEmpty(parts) || parts.length < 2) {
+  if (parts.length < 2) {
     return [{ source, regex }];
   }
 
-  return Arr.generate(function* () {
-    for (const [i, part] of parts.entries()) {
-      const alone = compile(
-        parts.map((other, j) => (i === j ? other : `(?!)${other}`)).join('|'),
-      );
+  return parts.map((part, i) => {
+    const alone = compile(
+      parts.map((other, j) => (i === j ? other : `(?!)${other}`)).join('|'),
+    );
 
-      // Compiles whenever the whole does, since only `(?!)` was added.
-      if (Result.isOk(alone)) {
-        yield { source: part, regex: alone.value };
-      }
+    // Only `(?!)` was added to a pattern that compiles, so a failure here is
+    // `splitAlternatives` cutting where it should not; skipping the alternative
+    // would stop asking it, silently.
+    if (Result.isErr(alone)) {
+      throw new Error(
+        `\`${source}\`: its alternative \`${part}\` does not compile alone (${unknownToString(alone.value)}); splitAlternatives cut it wrongly.`,
+      );
     }
+
+    return { source: part, regex: alone.value };
   });
 };
 
@@ -557,9 +738,15 @@ const collectJobContexts = (
       return runKeyEntries;
     }
 
-    if (runKeys.length > 1 || runKeyEntries.value.hasOtherProperties) {
+    if (runKeys.length > 1) {
       return Result.err(
-        `job \`${job.name}\` has no matrix property in its name and its matrix has properties beside \`${runKey}\`, so GitHub names its checks by all of them, in an order this guard does not reproduce; a job a fixer names needs a \`name:\` that reads the property of the command (it runs ${quoteList(runKeys.map((property) => `matrix.${property}`))}) and keeps its checks' names apart.`,
+        `job \`${job.name}\` has no matrix property in its name and runs ${quoteList(runKeys.map((property) => `matrix.${property}`))}, so GitHub names its checks by all of them, in an order this guard does not reproduce; a job a fixer names needs a \`name:\` that reads the one a fixer reruns.`,
+      );
+    }
+
+    if (runKeyEntries.value.hasOtherProperties) {
+      return Result.err(
+        `job \`${job.name}\` has no matrix property in its name and its matrix has properties beside \`${runKey}\`, so GitHub names its checks by all of them, in an order this guard does not reproduce; a job a fixer names needs a \`name:\` that reads \`matrix.${runKey}\` and keeps its checks' names apart.`,
       );
     }
 
@@ -617,14 +804,17 @@ const readCheckContexts = async (): Promise<Result<MatrixContexts, string>> => {
           PULL_REQUEST_EVENT,
         )
       ) {
-        return Result.ok({ contexts: [], unreadable: [] });
+        return Result.ok(NO_CONTEXTS);
       }
 
-      const { contexts, unreadable } = collectMatrixContexts(contents.value);
+      const { contexts, unreadable, possible, unguessable } =
+        collectMatrixContexts(contents.value);
 
       return Result.ok({
         contexts,
         unreadable: unreadable.map((reason) => `${relativePath}: ${reason}`),
+        possible,
+        unguessable: unguessable.map((reason) => `${relativePath}: ${reason}`),
       });
     }),
   );
@@ -646,6 +836,8 @@ const readCheckContexts = async (): Promise<Result<MatrixContexts, string>> => {
   return Result.ok({
     contexts: read.flatMap(({ contexts }) => contexts),
     unreadable: read.flatMap(({ unreadable }) => unreadable),
+    possible: read.flatMap(({ possible }) => possible),
+    unguessable: read.flatMap(({ unguessable }) => unguessable),
   });
 };
 

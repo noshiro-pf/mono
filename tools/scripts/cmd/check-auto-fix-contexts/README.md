@@ -17,7 +17,10 @@ set aside as `checks-failed`, and every check stays green.
   `tools/scripts/lib/workflow-jobs.mts` as the other workflow guards read them.
   A job whose checks it cannot name exactly is left out, with why, and the
   reasons are printed with a failure: leaving a job out can only make a pattern
-  fail.
+  fail. It could still hide a check a pattern in `KEPT_IDLE` has started taking,
+  so the names such a job may give its checks are guessed generously, and a kept
+  pattern that matches one fails as well; while a job left out cannot be guessed
+  at (its matrix or its name is an expression), every kept pattern fails.
 - **What a pattern takes.** `unblock-prs` answers, through what `pr-merge-queue`
   exports: `configOf` reads the file, `failedContexts` says what is read at all,
   `firstFixerOf` which fixer takes a check, and `planAutoFix` whether a
@@ -30,6 +33,6 @@ set aside as `checks-failed`, and every check stays green.
 
 Change the pattern to the new check name (the job's `name:` with the entry put
 in, or `<job> (<entry>)`), or remove it. A pattern kept for an entry to come
-goes in `KEPT_IDLE` in `main.mts`, with the reason; one listed there that starts
-taking a check, or leaves the file, fails too, so the list cannot outlive its
-reasons.
+goes in `KEPT_IDLE` in `main.mts`, with its kind (`prepare` or `fixer`) and the
+reason; one listed there that starts taking a check, or leaves the file, fails
+too, so the list cannot outlive its reasons.
