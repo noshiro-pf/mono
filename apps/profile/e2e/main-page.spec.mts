@@ -278,6 +278,26 @@ test(
     await expect.soft(videos.nth(0)).toHaveAttribute('frameborder', '0');
 
     await expect.soft(videos.nth(0)).toHaveAttribute('width', '560');
+
+    // A screen reader announces each frame by its title, so each says which
+    // video it is, rather than the player's default.
+    await expect.soft(videos.nth(0)).toHaveAttribute('title', /\S/u);
+
+    await expect.soft(videos.nth(1)).toHaveAttribute('title', /\S/u);
+
+    await expect
+      .soft(videos.nth(0))
+      .not.toHaveAttribute('title', 'YouTube video player');
+
+    await expect
+      .soft(videos.nth(1))
+      .not.toHaveAttribute('title', 'YouTube video player');
+
+    const firstTitle = await videos.nth(0).getAttribute('title');
+
+    await expect
+      .soft(videos.nth(1))
+      .not.toHaveAttribute('title', firstTitle ?? '');
   },
 );
 
