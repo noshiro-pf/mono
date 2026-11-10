@@ -514,3 +514,91 @@ describe('prefer-arr-scan and the import it adds', () => {
     ],
   });
 });
+
+describe('prefer-arr-scan on the other shapes of an accumulator copy', () => {
+  tester.run('prefer-arr-scan', preferArrScan, {
+    valid: [
+      {
+        name: 'a block body that does more than return the copy',
+        code: dedent`
+          declare const xs: readonly number[];
+          const ys = xs.reduce<readonly number[]>((acc, x) => {
+            console.log(x);
+            return [...acc, x];
+          }, []);
+        `,
+      },
+      {
+        name: 'the accumulator nested at a later position, not spread',
+        code: dedent`
+          declare const xs: readonly number[];
+          const ys = xs.reduce<unknown>((acc, x) => [x, acc], []);
+        `,
+      },
+    ],
+    invalid: [
+      {
+        name: 'the accumulator spread after the new value',
+        code: dedent`
+          declare const xs: readonly number[];
+          const ys = xs.reduce<readonly number[]>((acc, x) => [x, ...acc], []);
+        `,
+        errors: [{ messageId: 'preferArrScanAccumulate' }],
+      },
+      {
+        name: 'the accumulator spread between two other spreads',
+        code: dedent`
+          declare const xs: readonly number[];
+          declare const head: readonly number[];
+          const ys = xs.reduce<readonly number[]>(
+            (acc, x) => [...head, ...acc, x],
+            [],
+          );
+        `,
+        errors: [{ messageId: 'preferArrScanAccumulate' }],
+      },
+      {
+        name: 'a body wrapped in as, which only reports',
+        code: dedent`
+          declare const xs: readonly number[];
+          const ys = xs.reduce<readonly number[]>(
+            (acc, x) => [...acc, x] as readonly number[],
+            [0],
+          );
+        `,
+        errors: [{ messageId: 'preferArrScanAccumulate' }],
+      },
+      {
+        name: 'a body wrapped in satisfies, which only reports',
+        code: dedent`
+          declare const xs: readonly number[];
+          const ys = xs.reduce<readonly number[]>(
+            (acc, x) => [...acc, x] satisfies readonly number[],
+            [0],
+          );
+        `,
+        errors: [{ messageId: 'preferArrScanAccumulate' }],
+      },
+      {
+        name: 'an arrow with a block body that returns the copy',
+        code: dedent`
+          declare const xs: readonly number[];
+          const ys = xs.reduce<readonly number[]>((acc, x) => {
+            return [...acc, x];
+          }, [0]);
+        `,
+        errors: [{ messageId: 'preferArrScanAccumulate' }],
+      },
+      {
+        name: 'a function expression that returns the copy',
+        code: dedent`
+          declare const xs: readonly number[];
+          const ys = xs.reduce<readonly number[]>(function (acc, x) {
+            return [...acc, x];
+          }, [0]);
+        `,
+        errors: [{ messageId: 'preferArrScanAccumulate' }],
+      },
+    ],
+  });
+});
