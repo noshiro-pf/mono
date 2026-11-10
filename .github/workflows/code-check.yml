@@ -233,10 +233,12 @@ jobs:
       # the same branch, which then does not ask GitHub Releases again. A new
       # pull request starts without them: a cache is saved on success only,
       # and `main` rarely runs this matrix (see "Reusing a verdict" in
-      # README.md). The key is the pin file, so a moved pin starts a new
-      # cache; the script checks every archive against its pinned digest
-      # whether it came from here or from the network, so a cache can make it
-      # fail, never pass.
+      # README.md). Most runs now start without them too: a queued pull
+      # request's matrix runs on its queue layer's `queue/pr-<n>` branch, made
+      # for that one layer, and its own run reuses the layer's verdict. The
+      # key is the pin file, so a moved pin starts a new cache; the script
+      # checks every archive against its pinned digest whether it came from
+      # here or from the network, so a cache can make it fail, never pass.
       - name: Restore the release-binary archives
         if: matrix.command == 'check:root'
         uses: actions/cache@v5.1.0

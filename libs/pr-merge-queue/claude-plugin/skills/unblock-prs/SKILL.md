@@ -5,14 +5,19 @@ description: Fix the queued pull requests whose owner is this skill — set asid
 
 # Fix what the merge queue set aside
 
-`unblock-prs` — the worker, from the npm package `pr-merge-queue` — runs all
-the time on the author's machine. It rebases the queued pull requests one at a
-time, arms their auto-merge, takes `skip-ci` off when each one's turn comes,
-watches the checks, and fixes a failure that is only a fixer's diff itself
-(the package's `src/unblock-prs/README.md`, "4a. Fix a failure that is only a
-fixer's diff"). When it can go no further with one it **sets it aside** and
-says why in a comment on it. **This skill fixes those pull requests and does
-nothing else**, so that the two never do the same thing.
+`unblock-prs` — the worker, from the npm package `pr-merge-queue` — runs all the
+time on the author's machine. It rebases the queued pull requests one at a time,
+arms their auto-merge, takes `skip-ci` off when each one's turn comes, watches
+the checks, and fixes a failure that is only a fixer's diff itself (the
+package's `src/unblock-prs/README.md`, "4a. Fix a failure that is only a fixer's
+diff"). Where the repository configures `speculate`, it checks the leading
+candidates ahead of their turn first, each on a queue layer — its commits
+squashed onto the default branch on a `queue/pr-<number>` branch, the check
+workflows dispatched there — and a released pull request then reuses its layer's
+verdict rather than running the checks again (the same README, "3b. Check ahead
+of the turn"). When it can go no further with one it **sets it aside** and says
+why in a comment on it. **This skill fixes those pull requests and does nothing
+else**, so that the two never do the same thing.
 
 ## Before anything: the repository's own rules
 
@@ -190,32 +195,38 @@ is a real failure, or a fixer that did not settle it: when every failed job
 was one the repository's `.github/unblock-prs.json` names a fixer for, the
 worker already ran those and pushed what they wrote.
 
-Find the failing job and read only its failing step. `checks.failed` from the
-report names the contexts — so does the set-aside comment, with a link to each
-run. An aggregate job does not name the matrix entry that failed, so go from
-it to the run and from the run to the failing job, then to its log:
+Find the failing job and read only its failing step. **Start from the set-aside
+comment**: it names what failed, with a link to each run. A pull request whose
+queue layer failed was never checked itself — its own checks are the skipped
+ones of `skip-ci` — so its `checks.failed` in the report is empty, and the
+comment ("Its layer queue/pr-<number> … failed") is the one place that links the
+failed run, the layer's. Otherwise `checks.failed` names the contexts too. An
+aggregate job does not name the matrix entry that failed, so go from it to the
+run and from the run to the failing job, then to its log:
 [references/github-api.md](references/github-api.md), "Which job failed, and
-why". There is no `--log-failed` — the whole job log comes back, so grep for
-the command that actually failed rather than reading the first error-shaped
-line.
+why". There is no `--log-failed` — the whole job log comes back, so grep for the
+command that actually failed rather than reading the first error-shaped line.
 
 **How a check reproduces locally is the repository's**: its guide says which
 command each check runs and what has to run first. Reproduce locally before
-pushing — a speculative fix costs another full run of the checks when the
-worker releases it. A job that ends by asserting a clean working tree fails a
-generator or a formatter by _changing_ files, and the fix is to run the
-command and commit what it wrote; a green run of the command with a dirty
-tree afterwards is still a failure.
+pushing — a speculative fix costs another full run of the checks, on the layer
+the worker builds for it or when it releases it. A job that ends by asserting a
+clean working tree fails a generator or a formatter by _changing_ files, and the
+fix is to run the command and commit what it wrote; a green run of the command
+with a dirty tree afterwards is still a failure.
 
-**First ask whether the branch is broken at all.** A required context can be
-red with nothing wrong in it: the run the `opened` event starts is cancelled by
-a later one, and GitHub sometimes answers the context with the cancelled run.
+**First ask whether the branch is broken at all.** A required context can be red
+with nothing wrong in it: the run the `opened` event starts is cancelled by a
+later one, and GitHub sometimes answers the context with the cancelled run.
 When the newest run of the failing context is green and only an older suite is
-red, re-run that suite ([references/github-api.md](references/github-api.md),
-"A stale red that is holding the merge") instead of pushing anything; without
-`actions: write`, say so and leave it. Fix the cause, not the check: no
-turning a lint rule off for the file, no loosening the lint configuration, no
-cast that silences the type checker.
+red, re-run that suite ([references/github-api.md](references/github-api.md), "A
+stale red that is holding the merge") instead of pushing anything; without
+`actions: write`, say so and leave it. This asks only about the pull request's
+own checks: a failed queue layer's run is never a stale red, since no merge
+reads it and the worker deletes the layer's branch once its runs end, so fix
+what it reports. Fix the cause, not the check: no turning a lint rule off for
+the file, no loosening the lint configuration, no cast that silences the type
+checker.
 
 **Leave a decision to a person.** A failure whose fix is a choice — a
 dependency's breaking change that wants a design call, a test whose expected
