@@ -1,7 +1,6 @@
+import type { LayerStatus } from 'pr-report-core';
 import { Arr, Result } from 'ts-data-forge';
 import {
-  cancelledTooOften,
-  decideSpeculation,
   desiredLayers,
   DROPPED_RUN_QUIET_MS,
   isStuck,
@@ -12,8 +11,6 @@ import {
   layerOfMessage,
   layerTrailer,
   matchLayers,
-  MAX_DISPATCHES,
-  mayBuildAbove,
   numberOfLayerBranch,
   planDrop,
   releaseOrder,
@@ -21,7 +18,6 @@ import {
   stackedFirst,
   type BuiltLayer,
   type DropRun,
-  type LayerStatus,
 } from './speculate-plan.mjs';
 import type { PullRequest } from './types.mjs';
 
@@ -396,164 +392,6 @@ describe(matchLayers, () => {
   });
 });
 
-describe(decideSpeculation, () => {
-  const layers = [
-    built(5, { parentTree: 'main-tree', tree: 't5' }),
-    built(3, { parentTree: 't5', tree: 't3' }),
-    built(9, { parentTree: 't3', tree: 't9' }),
-  ] as const;
-
-  const red: LayerStatus = {
-    kind: 'red',
-    name: 'code-check.yml',
-    link: 'L',
-  } as const;
-
-  test('releases the first candidate once its layer is green', () => {
-    assert.isTrue(
-      decideSpeculation({
-        layers,
-        statuses: [GREEN, RUNNING, NOT_DISPATCHED],
-        firstCandidate: 5,
-      }).release,
-    );
-
-    assert.isFalse(
-      decideSpeculation({
-        layers,
-        statuses: [RUNNING, RUNNING, NOT_DISPATCHED],
-        firstCandidate: 5,
-      }).release,
-    );
-  });
-
-  // The version pull request, one only a bypass merges, or one whose commit
-  // conflicts: the release runs its checks, or finds the conflict.
-  test('releases a first candidate that has no layer to wait for', () => {
-    assert.isTrue(
-      decideSpeculation({ layers: [], statuses: [], firstCandidate: 7 })
-        .release,
-    );
-  });
-
-  test('dispatches the next layer once every job below it has started', () => {
-    assert.strictEqual(
-      decideSpeculation({
-        layers,
-        statuses: [GREEN, RUNNING, NOT_DISPATCHED],
-        firstCandidate: 5,
-      }).dispatch,
-      2,
-    );
-
-    assert.isUndefined(
-      decideSpeculation({
-        layers,
-        statuses: [GREEN, { kind: 'running', queued: true }, NOT_DISPATCHED],
-        firstCandidate: 5,
-      }).dispatch,
-    );
-
-    assert.strictEqual(
-      decideSpeculation({
-        layers,
-        statuses: [NOT_DISPATCHED, NOT_DISPATCHED, NOT_DISPATCHED],
-        firstCandidate: 5,
-      }).dispatch,
-      0,
-    );
-  });
-
-  test('dispatches nothing on top of a red layer, even one nobody owns yet', () => {
-    assert.isUndefined(
-      decideSpeculation({
-        layers,
-        statuses: [RUNNING, red, NOT_DISPATCHED],
-        firstCandidate: 5,
-      }).dispatch,
-    );
-  });
-
-  test('sets aside the pull request of a red first layer, and drops the layers above it', () => {
-    assert.deepStrictEqual(
-      decideSpeculation({
-        layers,
-        statuses: [red, RUNNING, NOT_DISPATCHED],
-        firstCandidate: 5,
-      }),
-      {
-        setAside: { number: 5, head: HEAD, name: 'code-check.yml', link: 'L' },
-        dropFrom: 1,
-        dispatch: undefined,
-        release: false,
-      },
-    );
-  });
-
-  // Reached on top of a pull request that has not merged, and that may not: it
-  // is judged once it is first, on `main`'s tree or rebuilt on it.
-  test('holds a red layer over green ones until it is first, and drops the layers above it', () => {
-    assert.deepStrictEqual(
-      decideSpeculation({
-        layers,
-        statuses: [GREEN, red, RUNNING],
-        firstCandidate: 5,
-      }),
-      {
-        setAside: undefined,
-        dropFrom: 2,
-        dispatch: undefined,
-        release: true,
-      },
-    );
-  });
-
-  // Its failure may be the layer below's, which is still running.
-  test('names nobody for a red layer over one still running', () => {
-    const decided = decideSpeculation({
-      layers,
-      statuses: [RUNNING, red, NOT_DISPATCHED],
-      firstCandidate: 5,
-    });
-
-    assert.isUndefined(decided.setAside);
-
-    assert.isUndefined(decided.dropFrom);
-  });
-});
-
-describe(mayBuildAbove, () => {
-  test('is false only on top of a red layer over green ones', () => {
-    assert.isTrue(mayBuildAbove([]));
-
-    assert.isTrue(mayBuildAbove([GREEN, RUNNING]));
-
-    // Whose it is is not known yet, and a layer built on it would wait anyway.
-    assert.isTrue(mayBuildAbove([RUNNING, RED]));
-
-    assert.isFalse(mayBuildAbove([RED]));
-
-    assert.isFalse(mayBuildAbove([GREEN, RED]));
-  });
-});
-
-describe(cancelledTooOften, () => {
-  test('is a workflow cancelled as often as it may be dispatched', () => {
-    const cancelled: readonly string[] = Array.from(
-      { length: MAX_DISPATCHES },
-      () => 'cancelled',
-    );
-
-    const onceLess = Arr.tail(cancelled);
-
-    assert.isTrue(cancelledTooOften(cancelled));
-
-    assert.isFalse(cancelledTooOften(onceLess));
-
-    assert.isFalse(cancelledTooOften([...onceLess, 'success', null]));
-  });
-});
-
 describe(planDrop, () => {
   const updatedMs = Date.parse('2026-11-01T00:00:00Z');
 
@@ -709,15 +547,7 @@ const movable = (): boolean => true;
 
 const GREEN: LayerStatus = { kind: 'green' } as const;
 
-const RED: LayerStatus = {
-  kind: 'red',
-  name: 'code-check.yml',
-  link: 'L',
-} as const;
-
 const RUNNING: LayerStatus = { kind: 'running', queued: false } as const;
-
-const NOT_DISPATCHED: LayerStatus = { kind: 'not-dispatched' } as const;
 
 const layer = (number: number): Readonly<{ number: number; head: string }> =>
   ({ number, head: HEAD }) as const;

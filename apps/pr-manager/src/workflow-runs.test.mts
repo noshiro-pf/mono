@@ -1,13 +1,12 @@
 import { Arr, asUint32, Result } from 'ts-data-forge';
 import type { ReadonlyRecord } from 'ts-type-forge';
 import type { ReportSource } from './constants.mjs';
+import type { RestFetch, RestFetchInit } from './rest-json.mjs';
 import {
   actionsQueryUrl,
   loadWorkflowRuns,
   RUN_STATES,
   RUNS_PER_STATE,
-  type RestFetch,
-  type RestFetchInit,
 } from './workflow-runs.mjs';
 
 // The repository the fixtures were taken from.

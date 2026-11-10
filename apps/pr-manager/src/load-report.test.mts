@@ -1,13 +1,19 @@
-import { queueLayerTrailer, writeSetAsideComment } from 'pr-report-core';
+import {
+  queueLayerTrailer,
+  writeSetAsideComment,
+  type DispatchedRun,
+} from 'pr-report-core';
 import { Arr, asUint32, isRecord, Json, Result } from 'ts-data-forge';
 import type { ReadonlyRecord } from 'ts-type-forge';
 import type { ReportSource } from './constants.mjs';
 import type { FetchInit } from './graphql.mjs';
 import {
   appendIssues,
+  layerChecksOf,
   loadIssuePage,
   loadReport,
   queueLayersOf,
+  speculateWorkflowsOf,
   type IssueList,
   type LoadedReport,
   type ReadGroup,
@@ -21,7 +27,7 @@ import {
   OPEN_PAGE_SIZE,
   OPEN_PULLS_QUERIES,
 } from './report-query.mjs';
-import type { RestFetchInit } from './workflow-runs.mjs';
+import type { RestFetchInit } from './rest-json.mjs';
 
 // The repository the fixtures were taken from.
 const SOURCE: ReportSource = { owner: 'noshiro-pf', repo: 'mono' } as const;
@@ -2481,7 +2487,7 @@ type Answers = ReadonlyRecord<string, readonly unknown[]>;
 type Sent = Readonly<{
   /**
    * The operation name, `PullRequests` for `query PullRequests(…`, and for the
-   * two REST requests `BranchRules` and `Branch`.
+   * REST requests `BranchRules`, `Branch`, `Activity` and `LayerRuns`.
    */
   operation: string;
   route: string;
@@ -2497,7 +2503,9 @@ const sentOf = (route: string, init: FetchInit | RestFetchInit): Sent => {
         ? 'BranchRules'
         : route.includes('/activity?')
           ? 'Activity'
-          : 'Branch',
+          : route.includes('/actions/runs?')
+            ? 'LayerRuns'
+            : 'Branch',
       route,
       query: '',
       variables: {},
@@ -2592,6 +2600,7 @@ const REST_OPERATIONS: ReadonlySet<string> = new Set<string>([
   'BranchRules',
   'Branch',
   'Activity',
+  'LayerRuns',
 ]);
 
 /** Lets every answer already given land, and what follows from it run. */
@@ -3092,6 +3101,7 @@ describe(queueLayersOf, () => {
             parent: 'parent',
             parentTree: 'parent-tree',
             builtAt: Date.parse('2026-11-08T04:00:00Z'),
+            checks: undefined,
           },
         ],
       },
@@ -3114,17 +3124,358 @@ describe(queueLayersOf, () => {
   });
 });
 
+describe('the runs on queue layers', () => {
+  const head = 'a'.repeat(40);
+
+  /**
+   * A read with a stack of layers for #12 to #15 (tips `tip-<n>`, trees
+   * `tree-<n>`), #12 on the default branch and each other on the one below, and
+   * `config` as the worker's.
+   */
+  const layered = (config: string | null): ReadonlyRecord<string, unknown> =>
+    ({
+      defaultBranchRef: {
+        name: 'main',
+        target: { tree: { oid: 'main-tree' } },
+      },
+      queueLayers: {
+        nodes: [12, 13, 14, 15].map((number) =>
+          queueLayerNode(`pr-${number}`, queueLayerTrailer({ number, head }), {
+            tip: `tip-${number}`,
+            tree: `tree-${number}`,
+            ...(number === 12
+              ? { parent: 'main-tip', parentTree: 'main-tree' }
+              : {
+                  parent: `tip-${number - 1}`,
+                  parentTree: `tree-${number - 1}`,
+                }),
+          }),
+        ),
+      },
+      queueConfig: config === null ? null : ({ text: config } as const),
+    }) as const;
+
+  // A layer whose pull request is not open at the head it was built from is
+  // never kept ahead, and so never drawn.
+  test('are read by REST, as the worker reads them, for each layer that can be kept', async () => {
+    const { fetchImpl, sent } = answering(
+      report(
+        [
+          pullRequest({ number: 12, headRefOid: head }),
+          pullRequest({ number: 13, headRefOid: head }),
+          // Open at another head than its layer's; #15 is not open at all.
+          pullRequest({ number: 14 }),
+        ],
+        [],
+        undefined,
+        NO_ISSUES,
+        layered(
+          '{ "speculate": { "workflows": ["code-check.yml"], "depth": 4 } }',
+        ),
+      ),
+      { LayerRuns: [{ workflow_runs: [] }] },
+    );
+
+    await load(fetchImpl);
+
+    assert.deepStrictEqual(
+      named(sent, 'LayerRuns').map(({ route }) => route),
+      [
+        'https://api.github.com/repos/noshiro-pf/mono/actions/runs?head_sha=tip-12&event=workflow_dispatch&per_page=100',
+        'https://api.github.com/repos/noshiro-pf/mono/actions/runs?head_sha=tip-13&event=workflow_dispatch&per_page=100',
+      ],
+    );
+  });
+
+  /**
+   * A read with #12 and #13 queued and kept ahead on their layers, each layer's
+   * runs answered by `runsOf` its tip; the tips asked for, in order.
+   */
+  const keptAhead = async (
+    runsOf: (tip: string) => Response,
+  ): Promise<Readonly<{ loaded: LoadedReport; tips: readonly string[] }>> => {
+    const answered = answering(
+      report(
+        [12, 13].map((number) =>
+          pullRequest({
+            number,
+            headRefOid: head,
+            labels: ['merge-queued', 'skip-ci'],
+          }),
+        ),
+        [],
+        undefined,
+        NO_ISSUES,
+        layered(
+          '{ "speculate": { "workflows": ["code-check.yml"], "depth": 2 } }',
+        ),
+      ),
+      answer('Compare', {
+        compare_12: { compare: { aheadBy: 1, behindBy: 0 } },
+        compare_13: { compare: { aheadBy: 1, behindBy: 0 } },
+      }),
+    );
+
+    const mut_tips: string[] = [];
+
+    const fetchImpl: Fetch = async (route, init) => {
+      if (sentOf(route, init).operation !== 'LayerRuns') {
+        return answered.fetchImpl(route, init);
+      }
+
+      const url = new URL(route);
+
+      const tip = url.searchParams.get('head_sha') ?? '';
+
+      mut_tips.push(tip);
+
+      return runsOf(tip);
+    };
+
+    return { loaded: await load(fetchImpl), tips: mut_tips };
+  };
+
+  test('are drawn on the box of the pull request kept ahead', async () => {
+    // #13's runs failed, and only its own request says so.
+    const { loaded } = await keptAhead((tip) =>
+      Response.json({
+        workflow_runs: [
+          run(1, 'code-check.yml', tip === 'tip-13' ? 'failure' : 'success'),
+        ],
+      }),
+    );
+
+    assert.deepStrictEqual(
+      loaded.queue?.slots.map(({ number, layer }) => [number, layer]),
+      [
+        [12, { standing: 'green', first: true, done: 1, total: 1 }],
+        [13, { standing: 'red', first: false, done: 1, total: 1 }],
+      ],
+    );
+  });
+
+  test('leave a layer whose runs GitHub refused unread, failing no part', async () => {
+    const { loaded, tips } = await keptAhead((tip) =>
+      tip === 'tip-13'
+        ? new Response('{}', { status: 403, statusText: 'Forbidden' })
+        : Response.json({
+            workflow_runs: [run(1, 'code-check.yml', 'success')],
+          }),
+    );
+
+    assert.deepStrictEqual(tips, ['tip-12', 'tip-13']);
+
+    assert.deepStrictEqual(
+      loaded.queue?.slots.map(({ number, layer, note }) => [
+        number,
+        layer,
+        note,
+      ]),
+      [
+        [12, undefined, 'checked ahead'],
+        [13, undefined, 'checked ahead'],
+      ],
+    );
+
+    assert.deepStrictEqual(loaded.failed, {});
+  });
+
+  test('are not read without the workflows the worker dispatches', async () => {
+    const { fetchImpl, sent } = answering(
+      report(
+        [pullRequest({ number: 12, headRefOid: head })],
+        [],
+        undefined,
+        NO_ISSUES,
+        layered(null),
+      ),
+    );
+
+    await load(fetchImpl);
+
+    assert.deepStrictEqual(named(sent, 'LayerRuns'), []);
+  });
+});
+
+describe(layerChecksOf, () => {
+  const WORKFLOWS = ['code-check.yml', 'style-check.yml'] as const;
+
+  // The page reads no jobs, so it never takes a run for one whose jobs have all
+  // started, and never says a layer above it is dispatched next.
+  test('is running while a latest run is going, counting those finished', () => {
+    assert.deepStrictEqual(
+      layerChecksOf(
+        [run(1, 'code-check.yml', 'success'), run(2, 'style-check.yml', null)],
+        WORKFLOWS,
+      ),
+      {
+        status: { kind: 'running', queued: true },
+        cancelledTooOften: false,
+        done: 1,
+        total: 2,
+      },
+    );
+  });
+
+  test('is green once the latest run of every workflow passed', () => {
+    assert.deepStrictEqual(
+      layerChecksOf(
+        [
+          run(1, 'code-check.yml', 'success'),
+          run(2, 'style-check.yml', 'skipped'),
+        ],
+        WORKFLOWS,
+      ),
+      {
+        status: { kind: 'green' },
+        cancelledTooOften: false,
+        done: 2,
+        total: 2,
+      },
+    );
+  });
+
+  // The worker dispatches a cancelled run again, and the round it ends is not
+  // its verdict, which the commit's rollup would still count as one.
+  test('reads only the latest run of each workflow', () => {
+    assert.deepStrictEqual(
+      layerChecksOf(
+        [
+          run(3, 'code-check.yml', 'success'),
+          run(2, 'style-check.yml', 'success'),
+          run(1, 'code-check.yml', 'cancelled'),
+        ],
+        WORKFLOWS,
+      ),
+      {
+        status: { kind: 'green' },
+        cancelledTooOften: false,
+        done: 2,
+        total: 2,
+      },
+    );
+  });
+
+  test('is red once a latest run failed, whatever else is going', () => {
+    assert.deepStrictEqual(
+      layerChecksOf(
+        [run(1, 'code-check.yml', 'failure'), run(2, 'style-check.yml', null)],
+        WORKFLOWS,
+      ).status,
+      {
+        kind: 'red',
+        name: 'code-check.yml',
+        link: 'https://github.com/runs/1',
+      },
+    );
+  });
+
+  test('is not dispatched while a workflow has no run, or a cancelled one', () => {
+    assert.deepStrictEqual(layerChecksOf([], WORKFLOWS), {
+      status: { kind: 'not-dispatched' },
+      cancelledTooOften: false,
+      done: 0,
+      total: 2,
+    });
+
+    assert.strictEqual(
+      layerChecksOf(
+        [
+          run(1, 'code-check.yml', 'success'),
+          run(2, 'style-check.yml', 'cancelled'),
+        ],
+        WORKFLOWS,
+      ).status.kind,
+      'not-dispatched',
+    );
+  });
+
+  test('says when a workflow to dispatch again was cancelled too often', () => {
+    assert.deepStrictEqual(
+      layerChecksOf(
+        [3, 2, 1].map((id) => run(id, 'code-check.yml', 'cancelled')),
+        ['code-check.yml'],
+      ),
+      {
+        status: { kind: 'not-dispatched' },
+        cancelledTooOften: true,
+        done: 1,
+        total: 1,
+      },
+    );
+  });
+});
+
+describe(speculateWorkflowsOf, () => {
+  test('reads the workflows unblock-prs dispatches on a layer', () => {
+    assert.deepStrictEqual(
+      speculateWorkflowsOf(
+        '{ "speculate": { "workflows": ["code-check.yml"], "depth": 2 } }',
+      ),
+      ['code-check.yml'],
+    );
+  });
+
+  test('names a workflow named twice once', () => {
+    assert.deepStrictEqual(
+      speculateWorkflowsOf(
+        '{ "speculate": { "workflows": ["code-check.yml", "code-check.yml"] } }',
+      ),
+      ['code-check.yml'],
+    );
+  });
+
+  test('is undefined for a configuration it cannot read, or that names none', () => {
+    for (const config of [
+      undefined,
+      'not json',
+      '{}',
+      '{ "speculate": { "workflows": [] } }',
+      '{ "speculate": { "workflows": [1] } }',
+    ] as const) {
+      assert.isUndefined(speculateWorkflowsOf(config));
+    }
+  });
+});
+
+/** A dispatched run, as REST answers it; a `null` conclusion is one going. */
+const run = (
+  id: number,
+  workflow: string,
+  conclusion: string | null,
+): DispatchedRun =>
+  ({
+    id,
+    path: `.github/workflows/${workflow}`,
+    status:
+      conclusion === null ? ('in_progress' as const) : ('completed' as const),
+    conclusion,
+    html_url: `https://github.com/runs/${id}`,
+  }) as const;
+
+/** A layer's branch, its commit at `at` (each field defaulted alone). */
 const queueLayerNode = (
   name: string,
   message: string,
+  at: Partial<
+    Readonly<{ tip: string; tree: string; parent: string; parentTree: string }>
+  > = {},
 ): Parameters<typeof queueLayersOf>[1][number] =>
   ({
     name,
     target: {
-      oid: 'tip',
-      message: `queue layer: pull request 12\n\n${message}\n`,
+      oid: at.tip ?? 'tip',
+      // Only the trailer is read, never the subject.
+      message: `queue layer\n\n${message}\n`,
       committedDate: '2026-11-08T04:00:00Z',
-      tree: { oid: 'tree' },
-      parents: { nodes: [{ oid: 'parent', tree: { oid: 'parent-tree' } }] },
+      tree: { oid: at.tree ?? 'tree' },
+      parents: {
+        nodes: [
+          {
+            oid: at.parent ?? 'parent',
+            tree: { oid: at.parentTree ?? 'parent-tree' },
+          },
+        ],
+      },
     },
   }) as const;

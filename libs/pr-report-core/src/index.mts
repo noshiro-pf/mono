@@ -7,6 +7,8 @@ export * from './description-lines.mjs';
 export * from './issue-claim.mjs';
 export * from './issue-priority.mjs';
 export * from './labels.mjs';
+export * from './layer-runs.mjs';
+export * from './layer-stack.mjs';
 export * from './merge-after.mjs';
 export * from './queue-comments.mjs';
 export * from './queue-layers.mjs';

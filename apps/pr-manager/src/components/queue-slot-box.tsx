@@ -14,8 +14,10 @@ type Props = Readonly<{
 /**
  * One box of the queue (`queue-section.tsx`): the number, the priority on a
  * pill across the top edge as on the DAG's nodes, and a word on why it waits,
- * or what it is. The title is in it for a screen reader, which the tooltip is
- * hidden from.
+ * or what it is. One whose queue layer's checks are going has the running ring
+ * as the running one does, and one whose are still to dispatch the queued dot:
+ * those runs are what the worker is running meanwhile. The title is in it for a
+ * screen reader, which the tooltip is hidden from.
  */
 export const QueueSlotBox = ({ slot$, onShow, onHide }: Props): JSX.Element => (
   <ExternalLink
@@ -42,6 +44,20 @@ export const QueueSlotBox = ({ slot$, onShow, onHide }: Props): JSX.Element => (
       <If
         cond={slot$.pipe(map((slot) => slot.kind === 'running'))}
         then={<RunStateIcon kind={'running'} label={'running'} />}
+      />
+      <If
+        cond={slot$.pipe(map((slot) => slot.layer?.standing === 'running'))}
+        then={<RunStateIcon kind={'running'} label={'checks running ahead'} />}
+      />
+      <If
+        cond={slot$.pipe(
+          map(
+            (slot) =>
+              slot.layer?.standing === 'to-dispatch' ||
+              slot.layer?.standing === 'waits',
+          ),
+        )}
+        then={<RunStateIcon kind={'queued'} label={'checks to dispatch'} />}
       />
       {slot$.pipe(map((slot) => `#${slot.number}`))}
     </span>

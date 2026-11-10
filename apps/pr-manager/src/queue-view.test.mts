@@ -7,13 +7,18 @@ import {
   SKIP_CI_LABEL,
   writeClaimComment,
   writeSetAsideComment,
-  type BuiltQueueLayer,
   type ChecksSummary,
   type ContextState,
   type ReportEntry,
 } from 'pr-report-core';
 import { Arr } from 'ts-data-forge';
-import { queueViewOf, type QueuePull, type QueueView } from './queue-view.mjs';
+import {
+  queueViewOf,
+  type CheckedQueueLayer,
+  type LayerChecks,
+  type QueuePull,
+  type QueueView,
+} from './queue-view.mjs';
 
 describe(queueViewOf, () => {
   test('leaves out what never asked to be queued', () => {
@@ -61,7 +66,7 @@ describe(queueViewOf, () => {
     const layer = (
       number: number,
       below: Readonly<{ tip: string; tree: string }>,
-    ): BuiltQueueLayer =>
+    ): CheckedQueueLayer =>
       ({
         number,
         head: sha(number),
@@ -70,6 +75,7 @@ describe(queueViewOf, () => {
         parent: below.tip,
         parentTree: below.tree,
         builtAt: NOW_MS,
+        checks: undefined,
       }) as const;
 
     // #9 on #5 on the default branch, stacked before #2 gained priority:high.
@@ -105,6 +111,163 @@ describe(queueViewOf, () => {
         [2, 5, 7, 9],
       );
     }
+  });
+
+  // The layers' runs are what the worker is running while what it has stacked
+  // waits with `skip-ci` on, so each box says what the worker does with its
+  // layer, decided over the whole stack (`layerStandings` in pr-report-core).
+  test('says what the worker does with each layer, and how far its runs have got', () => {
+    const cases = [
+      {
+        stack: [GREEN_LAYER, RUNNING_LAYER, NOT_DISPATCHED_LAYER],
+        says: [
+          [
+            'passed',
+            'green',
+            'queue/pr-3: all 6 workflow runs passed — the worker releases it with no run of its own',
+          ],
+          ['2/6 runs', 'running', 'queue/pr-5: 2 of 6 workflow runs finished'],
+          [
+            'to check',
+            'waits',
+            'queue/pr-7: the worker dispatches its checks once every layer below is green or has started all its jobs, and none is red',
+          ],
+        ],
+      },
+      {
+        stack: [GREEN_LAYER, NOT_DISPATCHED_LAYER, NOT_DISPATCHED_LAYER],
+        says: [
+          ['passed', 'green', undefined],
+          [
+            'to check',
+            'to-dispatch',
+            'queue/pr-5: the worker dispatches its checks on its next survey',
+          ],
+          ['to check', 'waits', undefined],
+        ],
+      },
+      {
+        stack: [RED_LAYER, GREEN_LAYER],
+        says: [
+          [
+            'failed',
+            'set-aside',
+            "queue/pr-3: a workflow run failed, so the worker sets it aside — or releases it, when only fixers' diffs failed, for the release's own run to fix",
+          ],
+          [
+            'on red',
+            'dropped',
+            'queue/pr-5: a layer below failed, so the worker drops this one and builds it again later',
+          ],
+        ],
+      },
+      {
+        stack: [RUNNING_LAYER, RED_LAYER, RUNNING_LAYER],
+        says: [
+          ['2/6 runs', 'running', undefined],
+          [
+            'failed',
+            'red',
+            'queue/pr-5: a workflow run failed on top of layers not merged yet — the worker judges it once it is first',
+          ],
+          // Its failure may be the running layer's below: nothing is dropped.
+          ['2/6 runs', 'running', undefined],
+        ],
+      },
+      {
+        // Nothing is dispatched on top of a red layer, whoever's it is.
+        stack: [RUNNING_LAYER, RED_LAYER, NOT_DISPATCHED_LAYER],
+        says: [
+          ['2/6 runs', 'running', undefined],
+          ['failed', 'red', undefined],
+          ['to check', 'waits', undefined],
+        ],
+      },
+      {
+        stack: [
+          GREEN_LAYER,
+          { ...NOT_DISPATCHED_LAYER, cancelledTooOften: true },
+        ],
+        says: [
+          ['passed', 'green', undefined],
+          [
+            'not checked',
+            'stalled',
+            'queue/pr-5: a workflow was cancelled too often to dispatch again — once first, the worker releases it to run its own checks',
+          ],
+        ],
+      },
+      {
+        stack: [{ ...NOT_DISPATCHED_LAYER, cancelledTooOften: true }],
+        says: [
+          [
+            'not checked',
+            'stalled',
+            'queue/pr-3: a workflow was cancelled too often to dispatch again — the worker releases it to run its own checks',
+          ],
+        ],
+      },
+    ] as const;
+
+    for (const { stack, says } of cases) {
+      const view = stackView(stack);
+
+      assert.deepStrictEqual(
+        view.slots.map(({ kind }) => kind),
+        stack.map(() => 'next'),
+      );
+
+      assert.deepStrictEqual(
+        view.slots.map(({ note, layer }) => [note, layer?.standing]),
+        says.map(([note, standing]) => [note, standing]),
+      );
+
+      for (const [index, said] of says.entries()) {
+        if (said[2] !== undefined) {
+          assert.strictEqual(view.slots[index]?.detail, said[2]);
+        }
+      }
+    }
+  });
+
+  // What the worker does with a layer turns on the ones below it.
+  test('says no more than "checked ahead" of a stack with a layer whose checks were not read', () => {
+    assert.deepStrictEqual(
+      stackView([GREEN_LAYER, undefined]).slots.map(({ note, layer }) => [
+        note,
+        layer,
+      ]),
+      [
+        ['checked ahead', undefined],
+        ['checked ahead', undefined],
+      ],
+    );
+  });
+
+  test('says no more than "checked ahead" of a layer whose checks were not read', () => {
+    const view = queueViewOf({
+      ...input([pull(5, { labels: [MERGE_QUEUED_LABEL, SKIP_CI_LABEL] })]),
+      layers: {
+        built: [
+          {
+            number: 5,
+            head: sha(5),
+            tip: 'tip-5',
+            tree: 'tree-5',
+            parent: BASE_TIP,
+            parentTree: 'main-tree',
+            builtAt: NOW_MS,
+            checks: undefined,
+          },
+        ],
+        baseTree: 'main-tree',
+      },
+    });
+
+    assert.deepStrictEqual(
+      view.slots.map(({ note, layer }) => [note, layer]),
+      [['checked ahead', undefined]],
+    );
   });
 
   test('takes one behind its base as a candidate, and one up to date with a failed check as failing', () => {
@@ -577,28 +740,37 @@ describe(queueViewOf, () => {
 });
 
 /** Each slot as number, kind and note; each node outside as number. */
-const shape = (
-  view: QueueView,
-): Readonly<{
-  slots: readonly (readonly [number, string, string | undefined])[];
-  outside: readonly number[];
-}> =>
-  ({
-    slots: view.slots.map(({ number, kind, note }) => [number, kind, note]),
-    outside: view.outside.map(({ number }) => number),
-  }) as const;
+const GREEN_LAYER: LayerChecks = {
+  status: { kind: 'green' },
+  cancelledTooOften: false,
+  done: 6,
+  total: 6,
+} as const;
 
-const BASE_TIP = 'b'.repeat(40);
+/** Running, its jobs not known to have all started, as the page reads it. */
+const RUNNING_LAYER: LayerChecks = {
+  status: { kind: 'running', queued: true },
+  cancelledTooOften: false,
+  done: 2,
+  total: 6,
+} as const;
 
-const OLDER_BASE = 'a'.repeat(40);
+const NOT_DISPATCHED_LAYER: LayerChecks = {
+  status: { kind: 'not-dispatched' },
+  cancelledTooOften: false,
+  done: 0,
+  total: 6,
+} as const;
+
+const RED_LAYER: LayerChecks = {
+  status: { kind: 'red', name: 'code-check.yml', link: 'L' },
+  cancelledTooOften: false,
+  done: 6,
+  total: 6,
+} as const;
 
 /** A head, as the 40 hexadecimal digits the comments' records insist on. */
 const sha = (number: number): string => number.toString(16).padStart(40, '0');
-
-const NOW_ISO = '2026-10-16T00:00:00Z';
-
-/** {@link NOW_ISO}, in milliseconds. */
-const NOW_MS = 1_792_108_800_000;
 
 const entry = (fields: PullFields): ReportEntry =>
   ({
@@ -673,23 +845,6 @@ const input = (
     pulls: pulls.map(queuePull),
   }) as const;
 
-type PullFields = Readonly<{
-  number: number;
-  labels: readonly string[];
-  isDraft: boolean;
-  body: string;
-  headRef: string;
-  baseRef: string;
-  autoMerge: boolean;
-  verdict: ChecksSummary['verdict'];
-  behindBy: number;
-  mergeable: string;
-  nativeStack: QueuePull['nativeStack'];
-  unresolvedConversations: number;
-  files: readonly string[];
-  comments: readonly string[];
-}>;
-
 const pull = (number: number, fields: Partial<PullFields> = {}): PullFields =>
   ({
     number,
@@ -708,3 +863,73 @@ const pull = (number: number, fields: Partial<PullFields> = {}): PullFields =>
     comments: [],
     ...fields,
   }) as const;
+
+/**
+ * The queue of one candidate per layer of `stack`, #3, #5, #7 and on, each
+ * stacked on the one before with those checks on it.
+ */
+const stackView = (stack: readonly (LayerChecks | undefined)[]): QueueView => {
+  const numbers = stack.map((_, index) => 3 + 2 * index);
+
+  return queueViewOf({
+    ...input(
+      numbers.map((number) =>
+        pull(number, { labels: [MERGE_QUEUED_LABEL, SKIP_CI_LABEL] }),
+      ),
+    ),
+    layers: {
+      baseTree: 'main-tree',
+      built: numbers.map(
+        (number, index): CheckedQueueLayer =>
+          ({
+            number,
+            head: sha(number),
+            tip: `tip-${number}`,
+            tree: `tree-${number}`,
+            parent: index === 0 ? BASE_TIP : `tip-${numbers[index - 1]}`,
+            parentTree:
+              index === 0 ? 'main-tree' : `tree-${numbers[index - 1]}`,
+            builtAt: NOW_MS,
+            checks: stack[index],
+          }) as const,
+      ),
+    },
+  });
+};
+
+const shape = (
+  view: QueueView,
+): Readonly<{
+  slots: readonly (readonly [number, string, string | undefined])[];
+  outside: readonly number[];
+}> =>
+  ({
+    slots: view.slots.map(({ number, kind, note }) => [number, kind, note]),
+    outside: view.outside.map(({ number }) => number),
+  }) as const;
+
+const BASE_TIP = 'b'.repeat(40);
+
+const OLDER_BASE = 'a'.repeat(40);
+
+const NOW_ISO = '2026-10-16T00:00:00Z';
+
+/** {@link NOW_ISO}, in milliseconds. */
+const NOW_MS = 1_792_108_800_000;
+
+type PullFields = Readonly<{
+  number: number;
+  labels: readonly string[];
+  isDraft: boolean;
+  body: string;
+  headRef: string;
+  baseRef: string;
+  autoMerge: boolean;
+  verdict: ChecksSummary['verdict'];
+  behindBy: number;
+  mergeable: string;
+  nativeStack: QueuePull['nativeStack'];
+  unresolvedConversations: number;
+  files: readonly string[];
+  comments: readonly string[];
+}>;

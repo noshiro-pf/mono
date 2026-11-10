@@ -328,6 +328,9 @@ const QueueBody = ({
                         <li
                           class={constant('queue-slot')}
                           data-kind={slot$.pipe(map((slot) => slot.kind))}
+                          data-layer={slot$.pipe(
+                            map((slot) => slot.layer?.standing ?? 'none'),
+                          )}
                           data-priority={slot$.pipe(
                             map((slot) => slot.priority),
                           )}
@@ -410,9 +413,18 @@ const QueueBody = ({
 const countsOf = (queue: QueueView): string => {
   const running = runningOf(queue);
 
+  const layers = queue.slots.filter(({ layer }) => layer !== undefined);
+
   return [
     `${queue.slots.length - running} queued`,
     `${running} running`,
+    // Only where the worker checks ahead: the runs on its queue layers are what
+    // it is running while what it has stacked waits with its label on.
+    ...(Arr.isNonEmpty(layers)
+      ? [
+          `${layers.filter(({ layer }) => layer?.standing === 'running').length} checking ahead`,
+        ]
+      : []),
     `${queue.outside.length} set aside`,
   ].join(' · ');
 };
