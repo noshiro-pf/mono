@@ -101,8 +101,6 @@ export type DerivedContext<A> = Readonly<{
    * is disposed already.
    */
   onCleanup: (cleanup: () => void) => void;
-  /** Whether `parent` can emit no more; for `settled`. */
-  settled: (parent: Observable<unknown>) => boolean;
 }>;
 
 /** What the setup of `createDerived` returns. */
@@ -179,7 +177,6 @@ class CustomDerivedClass<A> extends DerivedClass<A> {
       onCleanup: (cleanup) => {
         this.#owner.onCleanup(cleanup);
       },
-      settled: (parent) => toNode(parent).settled,
     });
 
     return typeof behavior === 'function' ? { update: behavior } : behavior;

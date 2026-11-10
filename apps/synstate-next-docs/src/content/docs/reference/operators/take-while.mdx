@@ -7,13 +7,14 @@ import MarbleDiagram from '../../../../components/MarbleDiagram.astro';
 
 {/* reference:jsdoc */}
 
-Passes the values of the source while `predicate` holds for them; from the first value it fails for, passes nothing, keeping the last value passed.
+Passes the values of the source while `predicate` holds for them; from the first value it fails for, passes nothing, keeping the last value passed. With `inclusive`, it passes that first value too, and is settled when a subscriber receives it, so the subscriber can tell the last value by reading `settled`; it then holds a value whenever the source does.
 
 {/* /reference */}
 
 {/* reference:operator-kind */}
 
-Its result may hold no value even when the source holds one: `pipe` gives an `Observable` ([`DropInitialValueOperator`](/mono/synstate-next/guides/deriving-values/#pipe)).
+- With `{ inclusive: true }`, its result holds a value whenever the source does: on an `InitializedObservable`, `pipe` gives one ([`KeepInitialValueOperator`](/mono/synstate-next/guides/deriving-values/#pipe)).
+- Otherwise, its result may hold no value even when the source holds one: `pipe` gives an `Observable` ([`DropInitialValueOperator`](/mono/synstate-next/guides/deriving-values/#pipe)).
 
 {/* /reference */}
 
@@ -45,6 +46,29 @@ report(100);
 report(40);
 
 assert.deepStrictEqual(mut_seen, [30, 80]);
+
+// `inclusive` passes the value that ends it too, and is settled by the time
+// a subscriber receives it.
+const [step, advance] = createValueEmitter<number>();
+
+const steps = step.pipe(takeWhile((p) => p < 3, { inclusive: true }));
+
+const mut_steps: (readonly [number, boolean])[] = [];
+
+steps.subscribe((p) => {
+    mut_steps.push([p, steps.settled]);
+});
+
+advance(1);
+
+advance(3);
+
+advance(1);
+
+assert.deepStrictEqual(mut_steps, [
+    [1, false],
+    [3, true],
+]);
 ```
 
 ## See also

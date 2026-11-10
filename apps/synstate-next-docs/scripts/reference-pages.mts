@@ -1,4 +1,5 @@
 import type { ReadonlyRecord } from 'ts-type-forge';
+import type { OperatorKindConditions } from './reference-text.mjs';
 
 /**
  * The reference pages: one per public API of synstate-next, under
@@ -54,7 +55,21 @@ export const referencePages: readonly ReferencePage[] = [
   page('operators', 'pairwise', ['pairwise', 'operators/pairwise.mts']),
   page('operators', 'take', ['take', 'operators/take.mts']),
   page('operators', 'skip', ['skip', 'operators/take.mts']),
-  page('operators', 'take-while', ['takeWhile', 'operators/take-while.mts']),
+  // Spread rather than a parameter of `page`, whose rest parameters are the
+  // exports: one page has conditions, and a second shape of `page` for it would
+  // cost more than this entry's.
+  {
+    ...page('operators', 'take-while', [
+      'takeWhile',
+      'operators/take-while.mts',
+    ]),
+    operatorKindConditions: {
+      Keep: {
+        en: 'With `{ inclusive: true }`',
+        ja: '`{ inclusive: true }` を付けると',
+      },
+    },
+  },
   page('operators', 'skip-while', ['skipWhile', 'operators/take-while.mts']),
   page('operators', 'take-until', ['takeUntil', 'operators/take-until.mts']),
   page('operators', 'skip-until', ['skipUntil', 'operators/take-until.mts']),
@@ -138,6 +153,15 @@ export type ReferencePage = Readonly<{
    * `libs/synstate-next/src/` that declares it with its JSDoc.
    */
   exports: readonly (readonly [name: string, file: string])[];
+  /**
+   * For exports whose overloads return operators of several kinds: the
+   * condition under which each kind holds, for all but the one that holds
+   * otherwise. `gen:reference` words the rest from each kind's own sentence,
+   * and fails on such a page without them, or on a page whose exports return
+   * one kind with them. Written by hand, because the condition is prose: the
+   * overload's parameters say it to the compiler, not to a reader.
+   */
+  operatorKindConditions?: OperatorKindConditions;
 }>;
 
 function page(

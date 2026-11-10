@@ -105,7 +105,7 @@ const pageSamples: readonly (readonly [
   ],
   [
     'internals/why-no-completion.md',
-    ['internals/03-done-without-completion.mts'],
+    ['internals/03-done-without-completion.mts', 'internals/05-last-value.mts'],
   ],
   ['internals/tracing-an-update.md', ['internals/04-filter-diamond.mts']],
   // The other libraries' versions are the ones the synstate docs show, run by

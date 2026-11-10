@@ -10,10 +10,14 @@ import {
   type ReferencePage,
 } from './reference-pages.mjs';
 import {
+  checkOperatorKindConditions,
   describeEnglish,
   extractJsdoc,
+  extractOperatorKinds,
+  operatorKindText,
   readDescription,
   textVersion,
+  type OperatorKind,
 } from './reference-text.mjs';
 import { workspaceRootPath } from './workspace-root-path.mjs';
 
@@ -80,13 +84,14 @@ const srcDir = path.resolve(workspaceRootPath, '../../libs/synstate-next/src');
 
 const docsDir = path.resolve(workspaceRootPath, 'src/content/docs');
 
-type OperatorKind = 'Drop' | 'Keep' | 'Provide';
-
 const operatorKindLink = {
   en: '/mono/synstate-next/guides/deriving-values/',
   ja: '/mono/synstate-next/ja/guides/deriving-values/',
 } as const;
 
+// Each English sentence opens with "Its": on a page whose exports return
+// several kinds, it follows a condition after a comma with its first letter
+// lowered, which a sentence opening with a name would not survive.
 const operatorKindSentences = {
   en: {
     Keep: `Its result holds a value whenever the source does: on an \`InitializedObservable\`, \`pipe\` gives one ([\`KeepInitialValueOperator\`](${operatorKindLink.en}#pipe)).`,
@@ -100,41 +105,6 @@ const operatorKindSentences = {
   },
 } as const;
 
-/**
- * The kind of operator the declaration of `name` returns, if it does: read from
- * its header, which runs to the first blank line.
- */
-const extractOperatorKind = (
-  source: string,
-  name: string,
-): OperatorKind | undefined => {
-  // eslint-disable-next-line security/detect-non-literal-regexp
-  const declaration = new RegExp(
-    String.raw`^export (?:const|function) ${name}\b`,
-    'mu',
-  );
-
-  const start = declaration.exec(source)?.index;
-
-  if (start === undefined) {
-    return undefined;
-  }
-
-  const end = source.indexOf('\n\n', start);
-
-  const header = source.slice(start, end === -1 ? undefined : end);
-
-  // The return type: the operator type after the parameter list, not one that
-  // types a parameter.
-  const kind = /\)\s*:\s*(Keep|Drop|Provide)InitialValueOperator</u.exec(
-    header,
-  )?.[1];
-
-  return kind === 'Keep' || kind === 'Drop' || kind === 'Provide'
-    ? kind
-    : undefined;
-};
-
 const translatedFromPattern = /\{\/\* translated-from:(\w+) \*\/\}/gu;
 
 const fillPage = async (
@@ -144,13 +114,27 @@ const fillPage = async (
 
   const mut_sections: string[] = [];
 
-  let mut_operatorKind: OperatorKind | undefined;
+  let mut_operatorKinds: readonly OperatorKind[] = [];
+
+  let mut_kindsDisagree = false;
 
   const single = Arr.isFixedLengthArray(1, refPage.exports);
 
   for (const [name, file] of refPage.exports) {
     // eslint-disable-next-line security/detect-non-literal-fs-filename
     const source = await fs.readFile(path.resolve(srcDir, file), 'utf8');
+
+    const kinds = extractOperatorKinds(source, name);
+
+    if (Arr.isEmpty(mut_operatorKinds)) {
+      mut_operatorKinds = kinds;
+    } else if (
+      Arr.isNonEmpty(kinds) &&
+      // The same kinds in another order are the same page sentence's.
+      kinds.toSorted().join(',') !== mut_operatorKinds.toSorted().join(',')
+    ) {
+      mut_kindsDisagree = true;
+    }
 
     const jsdoc = extractJsdoc(source, name);
 
@@ -163,8 +147,24 @@ const fillPage = async (
     mut_sections.push(
       single ? jsdoc.value : `### \`${name}\`\n\n${jsdoc.value}`,
     );
+  }
 
-    mut_operatorKind ??= extractOperatorKind(source, name);
+  // Conditions are checked against one set of kinds, read from every export: a
+  // page whose exports disagree has none, and one with an export that could not
+  // be read (a wrong name, a missing `export`) may have too few, which would
+  // ask for correct conditions to be removed.
+  if (mut_kindsDisagree) {
+    mut_errors.push(
+      `${refPage.slug} documents exports that return different kinds of operator; a page says one.`,
+    );
+  } else if (Arr.isEmpty(mut_errors)) {
+    mut_errors.push(
+      ...checkOperatorKindConditions(
+        refPage.slug,
+        mut_operatorKinds,
+        refPage.operatorKindConditions,
+      ),
+    );
   }
 
   if (Arr.isNonEmpty(mut_errors)) {
@@ -248,14 +248,19 @@ const fillPage = async (
 
     const values = {
       ...(lang === 'en' ? { jsdoc: { text: jsdocText, block: true } } : {}),
-      ...(mut_operatorKind === undefined
-        ? {}
-        : {
+      ...(Arr.isNonEmpty(mut_operatorKinds)
+        ? {
             'operator-kind': {
-              text: operatorKindSentences[lang][mut_operatorKind],
+              text: operatorKindText(
+                lang,
+                operatorKindSentences[lang],
+                mut_operatorKinds,
+                refPage.operatorKindConditions,
+              ),
               block: true,
             },
-          }),
+          }
+        : {}),
     } as const;
 
     const embedded = markers.embedInto(mut_page, 'reference', values);

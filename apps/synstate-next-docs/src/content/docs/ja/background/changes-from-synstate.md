@@ -9,7 +9,7 @@ synstate-next は、次のメジャーバージョンで synstate を置き換�
 
 - **`getSnapshot()` は、値か、値がなければ `undefined` を返します。** `Optional` は返しません。値を持つかどうかは `hasValue` でわかり、`InitializedObservable` には `.value` があります。
 - **`subscribe` は、購読を止める関数を返します。** `{ unsubscribe }` オブジェクトではありません。
-- **`kind`・`depth`・`isCompleted`・`updateToken` は公開されていません。** 更新の順番は今もノードの深さで決まりますが、それはライブラリの内部のものです。
+- **`kind`・`depth`・`updateToken` は公開されていません。** 更新の順番は今もノードの深さで決まりますが、それはライブラリの内部のものです。`isCompleted` は `settled` になりました。下の `complete` の項を見てください。
 
 ## 伝播と書き込み
 
@@ -20,7 +20,7 @@ synstate-next は、次のメジャーバージョンで synstate を置き換�
 
 ## 寿命
 
-- **`complete` はなくなりました。** Observable は破棄されることで終わります。`subscribe` が取る関数は 1 つで、`onComplete` はありません。
+- **`complete` はなくなりました。** Observable は破棄されることで終わります。`subscribe` が取る関数は 1 つで、`onComplete` はありません。`isCompleted` の代わりは `settled` で、true になるのが早まります。`take` や `inclusive` を付けた `takeWhile` は、最後の値が購読者に届く時点で settled になっています。synstate では完了はその値の後でした。購読者はこれを読んで最後の値を見分けます。終わり自体が値を持たないときは、終わりを値として送ります（[完了がない理由](/mono/synstate-next/ja/internals/why-no-completion/#最後の値を見分ける)）。
 - **スコープは owner になりました。** `createScope` は `createOwner`、`getCurrentScope` は `getOwner`、`onScopeDispose` は `onCleanup` です。`createRootOwner` は親のない owner を作り、`untracked` は owner なしで関数を実行します。
 - **済んだソースは、完了するのではなく settled になります。** 発火した `timer`、resolve した `fromPromise`、購読対象が完了した `fromSubscribable` は、owner に破棄されるまで値と購読者を保ちます。
 - **破棄されたノードから作ったノードは、すぐに settled になり**、親の最後の値から計算した値を持ちます。

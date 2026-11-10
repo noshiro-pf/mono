@@ -4,17 +4,52 @@ import {
   toNode,
   view,
   type DropInitialValueOperator,
+  type KeepInitialValueOperator,
+  type Observable,
   type ObservableClass,
 } from '../core/index.mjs';
 
 /**
  * Passes the values of the source while `predicate` holds for them; from the
- * first value it fails for, passes nothing, keeping the last value passed.
+ * first value it fails for, passes nothing, keeping the last value passed. With
+ * `inclusive`, it passes that first value too, and is settled when a subscriber
+ * receives it, so the subscriber can tell the last value by reading `settled`;
+ * it then holds a value whenever the source does.
  */
-export const takeWhile =
-  <A,>(predicate: (value: A) => boolean): DropInitialValueOperator<A, A> =>
-  (source) =>
-    view(new TakeWhileClass(toNode(source), predicate));
+export function takeWhile<A>(
+  predicate: (value: A) => boolean,
+  options: TakeWhileOptions & Readonly<{ inclusive: true }>,
+): KeepInitialValueOperator<A, A>;
+
+/**
+ * Passes the values of the source while `predicate` holds for them; from the
+ * first value it fails for, passes nothing, keeping the last value passed. With
+ * `inclusive`, it passes that first value too, and is settled when a subscriber
+ * receives it, so the subscriber can tell the last value by reading `settled`;
+ * it then holds a value whenever the source does.
+ */
+export function takeWhile<A>(
+  predicate: (value: A) => boolean,
+  options?: TakeWhileOptions,
+): DropInitialValueOperator<A, A>;
+
+// Overloads rather than a type parameter for `inclusive`: with one, a caller
+// who writes `takeWhile<number>(…)` fixes it at its default and cannot pass
+// `{ inclusive: true }`. Both overloads carry the JSDoc, since an editor shows
+// the one a call resolves to, and most calls resolve to the second.
+export function takeWhile<A>(
+  predicate: (value: A) => boolean,
+  options?: TakeWhileOptions,
+): KeepInitialValueOperator<A, A> | DropInitialValueOperator<A, A> {
+  return (source: Observable<A>): Observable<A> =>
+    view(
+      new TakeWhileClass(
+        toNode(source),
+        predicate,
+        options?.inclusive ?? false,
+      ),
+    );
+}
 
 /**
  * Drops the values of the source while `predicate` holds for them; from the
@@ -25,23 +60,37 @@ export const skipWhile =
   (source) =>
     view(new SkipWhileClass(toNode(source), predicate));
 
+export type TakeWhileOptions = Readonly<{
+  /** Pass the first value `predicate` fails for, and then stop. */
+  inclusive?: boolean;
+}>;
+
 class TakeWhileClass<A> extends DerivedClass<A> {
   readonly #parent: ObservableClass<A>;
 
   readonly #predicate: (value: A) => boolean;
 
-  constructor(parent: ObservableClass<A>, predicate: (value: A) => boolean) {
+  /** Whether it passes the value that ends it. */
+  readonly #inclusive: boolean;
+
+  constructor(
+    parent: ObservableClass<A>,
+    predicate: (value: A) => boolean,
+    inclusive: boolean,
+  ) {
     const v = parent.current;
 
-    const passes = v !== noValue && predicate(v);
+    const ends = v !== noValue && !predicate(v);
 
-    super([parent], passes ? v : noValue);
+    super([parent], ends && !inclusive ? noValue : v);
 
     this.#parent = parent;
 
     this.#predicate = predicate;
 
-    if (v !== noValue && !passes) {
+    this.#inclusive = inclusive;
+
+    if (ends) {
       this.detach();
     }
   }
@@ -57,7 +106,9 @@ class TakeWhileClass<A> extends DerivedClass<A> {
     if (!this.#predicate(v)) {
       this.detach();
 
-      return false;
+      if (!this.#inclusive) {
+        return false;
+      }
     }
 
     this.current = v;

@@ -61,6 +61,18 @@ export type Observable<A> = Readonly<{
    */
   getSnapshot: () => NoInfer<A> | undefined;
   /**
+   * Whether it will never emit again: disposed, a source that is done (a
+   * `timer` that fired, a promise that settled), or an operator that is done (a
+   * `take` that passed its last value). Asked, not announced: nothing is called
+   * when it turns true. A `take` is settled when its subscriber receives its
+   * last value; a `takeWhile` once a value fails, which it does not pass unless
+   * `inclusive`, or once its source is settled. Below an operator that can drop
+   * the last value (`filter`) or emit it later (`debounce`, `switchMap`), the
+   * last value and `settled` can come apart. A state is settled only once
+   * disposed.
+   */
+  settled: boolean;
+  /**
    * Calls `fn` with the current value, if any, and then with every value once
    * every value of its update is up to date. Belongs to the current owner.
    */

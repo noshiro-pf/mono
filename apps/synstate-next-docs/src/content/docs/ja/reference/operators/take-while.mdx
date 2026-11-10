@@ -5,13 +5,14 @@ description: '`predicate` が成り立つ間、ソースの値を流します。
 
 import MarbleDiagram from '../../../../../components/MarbleDiagram.astro';
 
-{/* translated-from:46470524f3a6 */}
+{/* translated-from:9c565e50bfd3 */}
 
-`predicate` が成り立つ間、ソースの値を流します。成り立たない最初の値からは何も流さず、最後に流した値を持ち続けます。
+`predicate` が成り立つ間、ソースの値を流します。成り立たない最初の値からは何も流さず、最後に流した値を持ち続けます。`inclusive` を付けると、その最初の値も流し、購読者がそれを受け取る時点で settled になっています。購読者は `settled` を読んで最後の値を見分けられます。このとき、ソースが値を持てば結果も値を持ちます。
 
 {/* reference:operator-kind */}
 
-ソースが値を持っていても、結果は値を持たないことがあります。`pipe` の結果は `Observable` です（[`DropInitialValueOperator`](/mono/synstate-next/ja/guides/deriving-values/#pipe)）。
+- `{ inclusive: true }` を付けると、ソースが値を持てば、結果も値を持ちます。`pipe` は `InitializedObservable` をそのまま保ちます（[`KeepInitialValueOperator`](/mono/synstate-next/ja/guides/deriving-values/#pipe)）。
+- それ以外は、ソースが値を持っていても、結果は値を持たないことがあります。`pipe` の結果は `Observable` です（[`DropInitialValueOperator`](/mono/synstate-next/ja/guides/deriving-values/#pipe)）。
 
 {/* /reference */}
 
@@ -43,6 +44,29 @@ report(100);
 report(40);
 
 assert.deepStrictEqual(mut_seen, [30, 80]);
+
+// `inclusive` passes the value that ends it too, and is settled by the time
+// a subscriber receives it.
+const [step, advance] = createValueEmitter<number>();
+
+const steps = step.pipe(takeWhile((p) => p < 3, { inclusive: true }));
+
+const mut_steps: (readonly [number, boolean])[] = [];
+
+steps.subscribe((p) => {
+    mut_steps.push([p, steps.settled]);
+});
+
+advance(1);
+
+advance(3);
+
+advance(1);
+
+assert.deepStrictEqual(mut_steps, [
+    [1, false],
+    [3, true],
+]);
 ```
 
 ## 関連項目

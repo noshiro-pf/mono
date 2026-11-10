@@ -18,12 +18,12 @@ Each job made every operator responsible for passing completion on correctly, in
 
 ## What does each job now
 
-| Job                        | synstate                       | synstate-next                                                                  |
-| :------------------------- | :----------------------------- | :----------------------------------------------------------------------------- |
-| An input is over           | Completion pushed down         | `settled`, **asked** where the answer is used                                  |
-| Freeing the graph          | Completed nodes leave          | Owners dispose; a node that is done leaves its parents by itself               |
-| Waiting for the end        | `collectToArray`, `onComplete` | Gone: a value that ends is a promise, and an owner's end is `onCleanup`        |
-| A pending value at the end | `flush` on completion          | Gone with completion: disposing drops it, as `dispose` already did in synstate |
+| Job                        | synstate                       | synstate-next                                                                                 |
+| :------------------------- | :----------------------------- | :-------------------------------------------------------------------------------------------- |
+| An input is over           | Completion pushed down         | `settled`, **asked** where the answer is used                                                 |
+| Freeing the graph          | Completed nodes leave          | Owners dispose; a node that is done leaves its parents by itself                              |
+| Waiting for the end        | `collectToArray`, `onComplete` | `settled` read with the last value, or the end sent as a value; an owner's end is `onCleanup` |
+| A pending value at the end | `flush` on completion          | Gone with completion: disposing drops it, as `dispose` already did in synstate                |
 
 ### Owners are the lifetime
 
@@ -76,6 +76,52 @@ owner.dispose();
 An operator that follows inner observables (`mergeMap`, a `switchMap` that may hold one finished request) still needs to know when one can emit no more. Each node answers `settled` when asked: a source once it is disposed or its timer, promise or subscription is over; a derived node once every parent is settled and it waits on nothing of its own (a `debounce` timer, an inner observable). `mergeMap` asks when an inner observable is projected or emits, and lets it go once it is settled and the effects of its update have read what it emitted. An operator written with `createDerived` gives its own `settled` when it emits later than the update that made it recompute ([Custom operators and sources](/mono/synstate-next/guides/custom-operators-and-sources/#an-async-operator)).
 
 Asking where the answer is used costs nothing elsewhere: no operator forwards a signal it does not care about, and none can forget to.
+
+### Telling the last value
+
+`settled` is on every observable, so a subscriber can ask it too. Since it is asked, it helps only where the end comes with a value: a `take` is settled by the time its subscriber receives its last value, and so is a `takeWhile` with `inclusive`, which passes the value that ends it. A plain `takeWhile` does not know that a value is its last until the next one fails, unless its source is settled by then, and it passes the failing value to nobody. This holds for a subscriber on the operator itself or below a `map`; below an operator that can drop the last value (`filter`) or emit it later (`debounce`, `switchMap`), the last value and `settled` can come apart. Where the end has no value of its own, the producer sends it as one, as an iterator's `{ done, value }` does and as a `Result` carries an error:
+
+```tsx
+import { createValueEmitter, takeWhile } from 'synstate-next';
+
+const [progress, report] = createValueEmitter<number>();
+
+// `inclusive` passes the value that ends it, so `settled` is already true
+// when the subscriber receives that value.
+const upload = progress.pipe(takeWhile((p) => p < 100, { inclusive: true }));
+
+const mut_log: string[] = [];
+
+upload.subscribe((p) => {
+    mut_log.push(upload.settled ? `done at ${p}` : `${p}%`);
+});
+
+report(30);
+
+report(100);
+
+report(40);
+
+assert.deepStrictEqual(mut_log, ['30%', 'done at 100']);
+
+// Or the producer sends the end as a value.
+const [transfer, send] =
+    createValueEmitter<
+        Readonly<{ done: false; percent: number } | { done: true }>
+    >();
+
+const mut_transferLog: string[] = [];
+
+transfer.subscribe((t) => {
+    mut_transferLog.push(t.done ? 'done' : `${t.percent}%`);
+});
+
+send({ done: false, percent: 30 });
+
+send({ done: true });
+
+assert.deepStrictEqual(mut_transferLog, ['30%', 'done']);
+```
 
 ## What that saves
 

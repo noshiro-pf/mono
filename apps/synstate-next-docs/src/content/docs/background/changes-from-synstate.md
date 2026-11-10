@@ -9,7 +9,7 @@ synstate-next replaces synstate in its next major version. This page lists what 
 
 - **`getSnapshot()` returns the value, or `undefined` when there is none**, not an `Optional`. `hasValue` says whether it holds one, and an `InitializedObservable` has `.value`.
 - **`subscribe` returns the function that stops the subscription**, not a `{ unsubscribe }` object.
-- **`kind`, `depth`, `isCompleted` and `updateToken` are not public.** A node's depth still orders the update, but it is the library's own.
+- **`kind`, `depth` and `updateToken` are not public.** A node's depth still orders the update, but it is the library's own. `isCompleted` became `settled`; see the `complete` bullet below.
 
 ## Propagation and writes
 
@@ -20,7 +20,7 @@ synstate-next replaces synstate in its next major version. This page lists what 
 
 ## Lifetime
 
-- **`complete` is gone.** An observable ends by being disposed. `subscribe` takes one function; there is no `onComplete`.
+- **`complete` is gone.** An observable ends by being disposed. `subscribe` takes one function; there is no `onComplete`. `settled` takes the place of `isCompleted`, and turns true sooner: a `take`, or a `takeWhile` with `inclusive`, is settled already when its subscriber receives its last value, where synstate completed after it. A subscriber reads it to tell the last value; where the end has no value of its own, send it as one ([Why there is no completion](/mono/synstate-next/internals/why-no-completion/#telling-the-last-value)).
 - **A scope is an owner**: `createScope` is `createOwner`, `getCurrentScope` is `getOwner`, `onScopeDispose` is `onCleanup`. `createRootOwner` makes an owner with no parent, and `untracked` runs a function with no owner.
 - **A source that is done is settled, not completed**: a `timer` that fired, a `fromPromise` that resolved, a `fromSubscribable` whose subscribable completed keeps its value and its subscribers until its owner disposes it.
 - **A node made from a disposed one is settled at once**, and holds the value it computed from the last value of its parent.
