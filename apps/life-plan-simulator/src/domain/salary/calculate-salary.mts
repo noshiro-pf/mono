@@ -224,8 +224,11 @@ const calculateSalaryMonth = (
           bonusHealthInsurance -
           bonusWelfarePension -
           bonusEmploymentInsurance) *
+        // 算出率の表は「前月の社会保険料等控除後の給与等の金額」で引く。給与から
+        // 天引きする iDeCo の掛金（小規模企業共済等掛金）も社会保険料等に入る
+        // ので、月額表と同じく iDeCo の掛金を引いた額から引く。
         bonusWithholdingRate(
-          grossAt(salary, month - 1) -
+          grossAfterIdecoAt(salary, month - 1) -
             previous.healthInsurance -
             previous.welfarePension -
             previous.employmentInsurance,
