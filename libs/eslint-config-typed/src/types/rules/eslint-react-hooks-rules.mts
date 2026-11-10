@@ -15,6 +15,8 @@ import type { UnknownRecord } from 'ts-type-forge';
  *  | hasSuggestions | true       |
  *  | recommended    | true       |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace ExhaustiveDeps {
   /**
@@ -69,6 +71,8 @@ namespace ExhaustiveDeps {
  *  | deprecated  | false   |
  *  | recommended | true    |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace RulesOfHooks {
   /**
@@ -109,6 +113,8 @@ namespace RulesOfHooks {
  *  | hasSuggestions | true    |
  *  | recommended    | false   |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace Hooks {
   /**
@@ -142,6 +148,8 @@ namespace Hooks {
  *  | hasSuggestions | true    |
  *  | recommended    | false   |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace CapitalizedCalls {
   /**
@@ -175,6 +183,8 @@ namespace CapitalizedCalls {
  *  | hasSuggestions | true    |
  *  | recommended    | true    |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace StaticComponents {
   /**
@@ -208,6 +218,8 @@ namespace StaticComponents {
  *  | hasSuggestions | true    |
  *  | recommended    | true    |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace UseMemo {
   /**
@@ -241,6 +253,8 @@ namespace UseMemo {
  *  | hasSuggestions | true    |
  *  | recommended    | false   |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace VoidUseMemo {
   /**
@@ -274,6 +288,8 @@ namespace VoidUseMemo {
  *  | hasSuggestions | true    |
  *  | recommended    | true    |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace PreserveManualMemoization {
   /**
@@ -307,6 +323,8 @@ namespace PreserveManualMemoization {
  *  | hasSuggestions | true    |
  *  | recommended    | false   |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace MemoDependencies {
   /**
@@ -340,6 +358,8 @@ namespace MemoDependencies {
  *  | hasSuggestions | true    |
  *  | recommended    | true    |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace IncompatibleLibrary {
   /**
@@ -373,6 +393,8 @@ namespace IncompatibleLibrary {
  *  | hasSuggestions | true    |
  *  | recommended    | true    |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace Immutability {
   /**
@@ -406,6 +428,8 @@ namespace Immutability {
  *  | hasSuggestions | true    |
  *  | recommended    | true    |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace Globals {
   /**
@@ -439,6 +463,8 @@ namespace Globals {
  *  | hasSuggestions | true    |
  *  | recommended    | true    |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace Refs {
   /**
@@ -472,6 +498,8 @@ namespace Refs {
  *  | hasSuggestions | true    |
  *  | recommended    | false   |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace MemoizedEffectDependencies {
   /**
@@ -505,6 +533,8 @@ namespace MemoizedEffectDependencies {
  *  | hasSuggestions | true    |
  *  | recommended    | false   |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace ExhaustiveEffectDependencies {
   /**
@@ -538,6 +568,8 @@ namespace ExhaustiveEffectDependencies {
  *  | hasSuggestions | true    |
  *  | recommended    | true    |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace SetStateInEffect {
   /**
@@ -571,6 +603,8 @@ namespace SetStateInEffect {
  *  | hasSuggestions | true    |
  *  | recommended    | false   |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoDerivingStateInEffects {
   /**
@@ -604,6 +638,8 @@ namespace NoDerivingStateInEffects {
  *  | hasSuggestions | true    |
  *  | recommended    | true    |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace ErrorBoundaries {
   /**
@@ -637,6 +673,8 @@ namespace ErrorBoundaries {
  *  | hasSuggestions | true    |
  *  | recommended    | true    |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace Purity {
   /**
@@ -670,6 +708,8 @@ namespace Purity {
  *  | hasSuggestions | true    |
  *  | recommended    | true    |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace SetStateInRender {
   /**
@@ -703,6 +743,8 @@ namespace SetStateInRender {
  *  | hasSuggestions | true    |
  *  | recommended    | false   |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace Invariant {
   /**
@@ -736,6 +778,8 @@ namespace Invariant {
  *  | hasSuggestions | true    |
  *  | recommended    | false   |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace Todo {
   /**
@@ -769,6 +813,8 @@ namespace Todo {
  *  | hasSuggestions | true    |
  *  | recommended    | false   |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace Syntax {
   /**
@@ -802,6 +848,8 @@ namespace Syntax {
  *  | hasSuggestions | true    |
  *  | recommended    | true    |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace UnsupportedSyntax {
   /**
@@ -835,6 +883,8 @@ namespace UnsupportedSyntax {
  *  | hasSuggestions | true    |
  *  | recommended    | true    |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace Config {
   /**
@@ -868,6 +918,8 @@ namespace Config {
  *  | hasSuggestions | true    |
  *  | recommended    | true    |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace Gating {
   /**
@@ -901,6 +953,8 @@ namespace Gating {
  *  | hasSuggestions | true    |
  *  | recommended    | false   |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace RuleSuppression {
   /**
@@ -934,6 +988,8 @@ namespace RuleSuppression {
  *  | hasSuggestions | true    |
  *  | recommended    | false   |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace Fbt {
   /**
@@ -963,6 +1019,8 @@ namespace Fbt {
  *  | type       | suggestion |
  *  | deprecated | true       |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace ComponentHookFactories {
   export type RuleEntry = 0;

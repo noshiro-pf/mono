@@ -11,6 +11,8 @@ import type { Linter } from 'eslint';
  *  | type       | problem |
  *  | deprecated | false   |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoEnums {
   export type RuleEntry = Linter.StringSeverity;
@@ -26,6 +28,8 @@ namespace NoEnums {
  *  | type       | problem |
  *  | deprecated | false   |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoHiddenTypeAssertions {
   export type RuleEntry = Linter.StringSeverity;
@@ -41,6 +45,8 @@ namespace NoHiddenTypeAssertions {
  *  | type       | problem |
  *  | deprecated | false   |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoNestedFpTsEffects {
   export type RuleEntry = Linter.StringSeverity;
@@ -56,6 +62,8 @@ namespace NoNestedFpTsEffects {
  *  | type       | problem |
  *  | deprecated | false   |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoPartialArrayReduce {
   export type RuleEntry = Linter.StringSeverity;
@@ -71,6 +79,8 @@ namespace NoPartialArrayReduce {
  *  | type       | problem |
  *  | deprecated | false   |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoPartialDivision {
   export type RuleEntry = Linter.StringSeverity;
@@ -86,6 +96,8 @@ namespace NoPartialDivision {
  *  | type       | problem |
  *  | deprecated | false   |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoPartialStringNormalize {
   export type RuleEntry = Linter.StringSeverity;
@@ -101,6 +113,8 @@ namespace NoPartialStringNormalize {
  *  | type       | problem |
  *  | deprecated | false   |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoPartialUrlConstructor {
   export type RuleEntry = Linter.StringSeverity;
@@ -116,6 +130,8 @@ namespace NoPartialUrlConstructor {
  *  | type       | problem |
  *  | deprecated | false   |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoPrematureFpTsEffects {
   export type RuleEntry = Linter.StringSeverity;
@@ -131,6 +147,8 @@ namespace NoPrematureFpTsEffects {
  *  | type       | problem |
  *  | deprecated | false   |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoUnsafeMutableReadonlyAssignment {
   export type RuleEntry = Linter.StringSeverity;
@@ -146,6 +164,8 @@ namespace NoUnsafeMutableReadonlyAssignment {
  *  | type       | problem |
  *  | deprecated | false   |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoUnsafeReadonlyMutableAssignment {
   export type RuleEntry = Linter.StringSeverity;
@@ -161,6 +181,8 @@ namespace NoUnsafeReadonlyMutableAssignment {
  *  | type       | problem |
  *  | deprecated | false   |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoUnsafeTypeAssertion {
   export type RuleEntry = Linter.StringSeverity;
@@ -176,6 +198,8 @@ namespace NoUnsafeTypeAssertion {
  *  | type       | problem |
  *  | deprecated | false   |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace RequireStrictMode {
   export type RuleEntry = Linter.StringSeverity;

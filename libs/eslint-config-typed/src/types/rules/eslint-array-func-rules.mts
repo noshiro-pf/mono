@@ -12,6 +12,8 @@ import type { Linter } from 'eslint';
  *  | fixable     | code       |
  *  | recommended | true       |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace FromMap {
   export type RuleEntry = Linter.StringSeverity;
@@ -28,6 +30,8 @@ namespace FromMap {
  *  | fixable     | code       |
  *  | recommended | true       |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoUnnecessaryThisArg {
   export type RuleEntry = Linter.StringSeverity;
@@ -44,6 +48,8 @@ namespace NoUnnecessaryThisArg {
  *  | fixable     | code    |
  *  | recommended | true    |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace PreferArrayFrom {
   export type RuleEntry = Linter.StringSeverity;
@@ -60,6 +66,8 @@ namespace PreferArrayFrom {
  *  | fixable     | code       |
  *  | recommended | true       |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace AvoidReverse {
   export type RuleEntry = Linter.StringSeverity;
@@ -76,6 +84,8 @@ namespace AvoidReverse {
  *  | fixable     | code       |
  *  | recommended | true       |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace PreferFlatMap {
   export type RuleEntry = Linter.StringSeverity;
@@ -92,6 +102,8 @@ namespace PreferFlatMap {
  *  | fixable     | code       |
  *  | recommended | true       |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace PreferFlat {
   export type RuleEntry = Linter.StringSeverity;

@@ -10,6 +10,8 @@ import type { Linter } from 'eslint';
  *  | deprecated  | false |
  *  | recommended | true  |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace JsxNoNewObjectAsProp {
   /**
@@ -58,6 +60,8 @@ namespace JsxNoNewObjectAsProp {
  *  | deprecated  | false |
  *  | recommended | true  |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace JsxNoNewArrayAsProp {
   /**
@@ -106,6 +110,8 @@ namespace JsxNoNewArrayAsProp {
  *  | deprecated  | false |
  *  | recommended | true  |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace JsxNoNewFunctionAsProp {
   /**
@@ -154,6 +160,8 @@ namespace JsxNoNewFunctionAsProp {
  *  | deprecated  | false |
  *  | recommended | true  |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace JsxNoJsxAsProp {
   /**

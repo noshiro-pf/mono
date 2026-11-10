@@ -188,6 +188,35 @@ export const generateRuleTypesFileContent = ({
   );
 };
 
+/**
+ * `docs`, the doc comment of a rule's namespace in a generated rule-types file
+ * (`''` for none), with {@link RULE_NAMESPACE_INTERNAL_TAG} as its last tag. A
+ * comment that does not open with `/**` and end in a newline, one space and the
+ * closing delimiter is an error, not dropped.
+ */
+export const withInternalTag = (docs: string): string => {
+  if (docs === '') {
+    return `/** ${RULE_NAMESPACE_INTERNAL_TAG} */`;
+  }
+
+  if (!docs.startsWith('/**') || !docs.endsWith('\n */')) {
+    throw new Error(
+      `A rule's doc comment should be a /** … */ block ending in a newline, one space and the closing delimiter: ${docs}`,
+    );
+  }
+
+  return `${docs.slice(0, -' */'.length)} *\n * ${RULE_NAMESPACE_INTERNAL_TAG}\n */`;
+};
+
+/**
+ * The `@internal` tag, with its reason, on the doc comment of each rule's
+ * namespace in a generated rule-types file, here and in `eslint-config-typed`,
+ * which `check:forgotten-exports` reads. Every generated rule-types file
+ * carries it: rewording it means running `pnpm run ws:gen`.
+ */
+export const RULE_NAMESPACE_INTERNAL_TAG =
+  "@internal Reached by indexing the rules record by the rule's name.";
+
 type RuleInfo = Readonly<{
   /** Rule name without the plugin prefix (e.g. `'prefer-canonical-type'`). */
   name: string;
@@ -275,11 +304,15 @@ const generateSchemaJsdoc = (schema: unknown): readonly string[] =>
 
 const generateRuleNamespace = (rule: RuleInfo): readonly string[] =>
   [
-    '/**',
-    ` * @description ${rule.description}`,
-    ' *',
-    ...generateMetaTable(rule),
-    ' */',
+    ...withInternalTag(
+      [
+        '/**',
+        ` * @description ${rule.description}`,
+        ' *',
+        ...generateMetaTable(rule),
+        ' */',
+      ].join('\n'),
+    ).split('\n'),
     `namespace ${rule.namespaceName} {`,
     ...(rule.hasOptions
       ? ([

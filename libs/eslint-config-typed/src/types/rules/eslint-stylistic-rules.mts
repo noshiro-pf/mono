@@ -23,6 +23,8 @@ type SpreadOptionsIfIsArray<
  *  | deprecated | false      |
  *  | fixable    | whitespace |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace ArrayBracketNewline {
   /**
@@ -83,6 +85,8 @@ namespace ArrayBracketNewline {
  *  | deprecated | false      |
  *  | fixable    | whitespace |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace ArrayBracketSpacing {
   /**
@@ -141,6 +145,8 @@ namespace ArrayBracketSpacing {
  *  | deprecated | false      |
  *  | fixable    | whitespace |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace ArrayElementNewline {
   /**
@@ -244,6 +250,8 @@ namespace ArrayElementNewline {
  *  | deprecated | false  |
  *  | fixable    | code   |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace ArrowParens {
   /**
@@ -294,6 +302,8 @@ namespace ArrowParens {
  *  | deprecated | false      |
  *  | fixable    | whitespace |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace ArrowSpacing {
   /**
@@ -336,6 +346,8 @@ namespace ArrowSpacing {
  *  | deprecated | false      |
  *  | fixable    | whitespace |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace BlockSpacing {
   /**
@@ -370,6 +382,8 @@ namespace BlockSpacing {
  *  | deprecated | false      |
  *  | fixable    | whitespace |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace BraceStyle {
   /**
@@ -421,6 +435,8 @@ namespace BraceStyle {
  *  | deprecated | false  |
  *  | fixable    | code   |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace CommaDangle {
   /**
@@ -542,6 +558,8 @@ namespace CommaDangle {
  *  | deprecated | false      |
  *  | fixable    | whitespace |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace CommaSpacing {
   /**
@@ -584,6 +602,8 @@ namespace CommaSpacing {
  *  | deprecated | false  |
  *  | fixable    | code   |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace CommaStyle {
   /**
@@ -637,6 +657,8 @@ namespace CommaStyle {
  *  | deprecated | false      |
  *  | fixable    | whitespace |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace ComputedPropertySpacing {
   /**
@@ -687,6 +709,8 @@ namespace ComputedPropertySpacing {
  *  | deprecated | false      |
  *  | fixable    | whitespace |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace CurlyNewline {
   /**
@@ -1461,6 +1485,8 @@ namespace CurlyNewline {
  *  | deprecated | false  |
  *  | fixable    | code   |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace DotLocation {
   /**
@@ -1495,6 +1521,8 @@ namespace DotLocation {
  *  | deprecated | false      |
  *  | fixable    | whitespace |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace EolLast {
   /**
@@ -1531,6 +1559,8 @@ namespace EolLast {
  *  | deprecated | false      |
  *  | fixable    | whitespace |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace FunctionCallArgumentNewline {
   /**
@@ -1566,6 +1596,8 @@ namespace FunctionCallArgumentNewline {
  *  | deprecated | false      |
  *  | fixable    | whitespace |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace FunctionCallSpacing {
   /**
@@ -1659,6 +1691,8 @@ namespace FunctionCallSpacing {
  *  | deprecated | false      |
  *  | fixable    | whitespace |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace FunctionParenNewline {
   /**
@@ -1714,6 +1748,8 @@ namespace FunctionParenNewline {
  *  | deprecated | false      |
  *  | fixable    | whitespace |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace GeneratorStarSpacing {
   /**
@@ -1895,6 +1931,8 @@ namespace GeneratorStarSpacing {
  *  | deprecated | false      |
  *  | fixable    | whitespace |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace ImplicitArrowLinebreak {
   /**
@@ -1929,6 +1967,8 @@ namespace ImplicitArrowLinebreak {
  *  | deprecated | false      |
  *  | fixable    | whitespace |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace Indent {
   /**
@@ -2334,6 +2374,8 @@ namespace Indent {
  *  | deprecated | false      |
  *  | fixable    | whitespace |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace IndentBinaryOps {
   /**
@@ -2374,6 +2416,8 @@ namespace IndentBinaryOps {
  *  | type       | layout |
  *  | deprecated | false  |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace JsxChildElementSpacing {
   export type RuleEntry = Linter.StringSeverity;
@@ -2390,6 +2434,8 @@ namespace JsxChildElementSpacing {
  *  | deprecated | false  |
  *  | fixable    | code   |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace JsxClosingBracketLocation {
   /**
@@ -2514,6 +2560,8 @@ namespace JsxClosingBracketLocation {
  *  | deprecated | false      |
  *  | fixable    | whitespace |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace JsxClosingTagLocation {
   /**
@@ -2552,6 +2600,8 @@ namespace JsxClosingTagLocation {
  *  | deprecated | false  |
  *  | fixable    | code   |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace JsxCurlyBracePresence {
   /**
@@ -2627,6 +2677,8 @@ namespace JsxCurlyBracePresence {
  *  | deprecated | false      |
  *  | fixable    | whitespace |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace JsxCurlyNewline {
   /**
@@ -2692,6 +2744,8 @@ namespace JsxCurlyNewline {
  *  | deprecated | false  |
  *  | fixable    | code   |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace JsxCurlySpacing {
   /**
@@ -2925,6 +2979,8 @@ namespace JsxCurlySpacing {
  *  | deprecated | false  |
  *  | fixable    | code   |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace JsxEqualsSpacing {
   /**
@@ -2959,6 +3015,8 @@ namespace JsxEqualsSpacing {
  *  | deprecated | false  |
  *  | fixable    | code   |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace JsxFirstPropNewLine {
   /**
@@ -2997,6 +3055,8 @@ namespace JsxFirstPropNewLine {
  *  | deprecated | false      |
  *  | fixable    | whitespace |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace JsxFunctionCallNewline {
   /**
@@ -3031,6 +3091,8 @@ namespace JsxFunctionCallNewline {
  *  | deprecated | true       |
  *  | fixable    | whitespace |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace JsxIndent {
   /**
@@ -3080,6 +3142,8 @@ namespace JsxIndent {
  *  | deprecated | false  |
  *  | fixable    | code   |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace JsxIndentProps {
   /**
@@ -3150,6 +3214,8 @@ namespace JsxIndentProps {
  *  | deprecated | false  |
  *  | fixable    | code   |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace JsxMaxPropsPerLine {
   /**
@@ -3229,6 +3295,8 @@ namespace JsxMaxPropsPerLine {
  *  | deprecated | false  |
  *  | fixable    | code   |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace JsxNewline {
   /**
@@ -3288,6 +3356,8 @@ namespace JsxNewline {
  *  | deprecated | false      |
  *  | fixable    | whitespace |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace JsxOneExpressionPerLine {
   /**
@@ -3332,6 +3402,8 @@ namespace JsxOneExpressionPerLine {
  *  | type       | suggestion |
  *  | deprecated | false      |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace JsxPascalCase {
   /**
@@ -3386,6 +3458,8 @@ namespace JsxPascalCase {
  *  | deprecated | true   |
  *  | fixable    | code   |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace JsxPropsNoMultiSpaces {
   export type RuleEntry = 0;
@@ -3402,6 +3476,8 @@ namespace JsxPropsNoMultiSpaces {
  *  | deprecated | false  |
  *  | fixable    | code   |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace ExpJsxPropsStyle {
   /**
@@ -3467,6 +3543,8 @@ namespace ExpJsxPropsStyle {
  *  | deprecated | false      |
  *  | fixable    | whitespace |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace JsxQuotes {
   /**
@@ -3501,6 +3579,8 @@ namespace JsxQuotes {
  *  | deprecated | false  |
  *  | fixable    | code   |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace JsxSelfClosingComp {
   /**
@@ -3543,6 +3623,8 @@ namespace JsxSelfClosingComp {
  *  | deprecated | true   |
  *  | fixable    | code   |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace JsxSortProps {
   /**
@@ -3618,6 +3700,8 @@ namespace JsxSortProps {
  *  | deprecated | false      |
  *  | fixable    | whitespace |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace JsxTagSpacing {
   /**
@@ -3691,6 +3775,8 @@ namespace JsxTagSpacing {
  *  | deprecated | false  |
  *  | fixable    | code   |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace JsxWrapMultilines {
   /**
@@ -3837,6 +3923,8 @@ namespace JsxWrapMultilines {
  *  | deprecated | false      |
  *  | fixable    | whitespace |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace KeySpacing {
   /**
@@ -4153,6 +4241,8 @@ namespace KeySpacing {
  *  | deprecated | false      |
  *  | fixable    | whitespace |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace KeywordSpacing {
   /**
@@ -5386,6 +5476,8 @@ namespace KeywordSpacing {
  *  | type       | layout |
  *  | deprecated | false  |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace LineCommentPosition {
   /**
@@ -5453,6 +5545,8 @@ namespace LineCommentPosition {
  *  | deprecated | false      |
  *  | fixable    | whitespace |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace LinebreakStyle {
   /**
@@ -5487,6 +5581,8 @@ namespace LinebreakStyle {
  *  | deprecated | false      |
  *  | fixable    | whitespace |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace LinesAroundComment {
   /**
@@ -5613,6 +5709,8 @@ namespace LinesAroundComment {
  *  | deprecated | false      |
  *  | fixable    | whitespace |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace LinesBetweenClassMembers {
   /**
@@ -5731,6 +5829,8 @@ namespace LinesBetweenClassMembers {
  *  | deprecated | false      |
  *  | fixable    | whitespace |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace ExpListStyle {
   /**
@@ -5958,6 +6058,8 @@ namespace ExpListStyle {
  *  | type       | layout |
  *  | deprecated | false  |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace MaxLen {
   /**
@@ -6162,6 +6264,8 @@ namespace MaxLen {
  *  | type       | layout |
  *  | deprecated | false  |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace MaxStatementsPerLine {
   /**
@@ -6257,6 +6361,8 @@ namespace MaxStatementsPerLine {
  *  | deprecated | false      |
  *  | fixable    | whitespace |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace MemberDelimiterStyle {
   /**
@@ -6409,6 +6515,8 @@ namespace MemberDelimiterStyle {
  *  | deprecated | false      |
  *  | fixable    | whitespace |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace MultilineCommentStyle {
   /**
@@ -6489,6 +6597,8 @@ namespace MultilineCommentStyle {
  *  | deprecated | false      |
  *  | fixable    | whitespace |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace MultilineTernary {
   /**
@@ -6540,6 +6650,8 @@ namespace MultilineTernary {
  *  | deprecated | false  |
  *  | fixable    | code   |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NewParens {
   /**
@@ -6574,6 +6686,8 @@ namespace NewParens {
  *  | deprecated | false      |
  *  | fixable    | whitespace |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NewlinePerChainedCall {
   /**
@@ -6614,6 +6728,8 @@ namespace NewlinePerChainedCall {
  *  | deprecated | false  |
  *  | fixable    | code   |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoConfusingArrow {
   /**
@@ -6656,6 +6772,8 @@ namespace NoConfusingArrow {
  *  | deprecated | false  |
  *  | fixable    | code   |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoExtraParens {
   /**
@@ -6810,6 +6928,8 @@ namespace NoExtraParens {
  *  | deprecated | false  |
  *  | fixable    | code   |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoExtraSemi {
   export type RuleEntry = Linter.StringSeverity;
@@ -6826,6 +6946,8 @@ namespace NoExtraSemi {
  *  | deprecated | false  |
  *  | fixable    | code   |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoFloatingDecimal {
   export type RuleEntry = Linter.StringSeverity;
@@ -6841,6 +6963,8 @@ namespace NoFloatingDecimal {
  *  | type       | layout |
  *  | deprecated | false  |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoMixedOperators {
   /**
@@ -6949,6 +7073,8 @@ namespace NoMixedOperators {
  *  | type       | layout |
  *  | deprecated | false  |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoMixedSpacesAndTabs {
   /**
@@ -6989,6 +7115,8 @@ namespace NoMixedSpacesAndTabs {
  *  | deprecated | false      |
  *  | fixable    | whitespace |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoMultiSpaces {
   /**
@@ -7041,6 +7169,8 @@ namespace NoMultiSpaces {
  *  | deprecated | false      |
  *  | fixable    | whitespace |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoMultipleEmptyLines {
   /**
@@ -7092,6 +7222,8 @@ namespace NoMultipleEmptyLines {
  *  | type       | layout |
  *  | deprecated | false  |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoTabs {
   /**
@@ -7130,6 +7262,8 @@ namespace NoTabs {
  *  | deprecated | false      |
  *  | fixable    | whitespace |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoTrailingSpaces {
   /**
@@ -7172,6 +7306,8 @@ namespace NoTrailingSpaces {
  *  | deprecated | false      |
  *  | fixable    | whitespace |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoWhitespaceBeforeProperty {
   export type RuleEntry = Linter.StringSeverity;
@@ -7188,6 +7324,8 @@ namespace NoWhitespaceBeforeProperty {
  *  | deprecated | false      |
  *  | fixable    | whitespace |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NonblockStatementBodyPosition {
   /**
@@ -7288,6 +7426,8 @@ namespace NonblockStatementBodyPosition {
  *  | deprecated | false      |
  *  | fixable    | whitespace |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace ObjectCurlyNewline {
   /**
@@ -7609,6 +7749,8 @@ namespace ObjectCurlyNewline {
  *  | deprecated | false      |
  *  | fixable    | whitespace |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace ObjectCurlySpacing {
   /**
@@ -7760,6 +7902,8 @@ namespace ObjectCurlySpacing {
  *  | deprecated | false      |
  *  | fixable    | whitespace |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace ObjectPropertyNewline {
   /**
@@ -7798,6 +7942,8 @@ namespace ObjectPropertyNewline {
  *  | deprecated | false      |
  *  | fixable    | whitespace |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace OneVarDeclarationPerLine {
   /**
@@ -7832,6 +7978,8 @@ namespace OneVarDeclarationPerLine {
  *  | deprecated | false  |
  *  | fixable    | code   |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace OperatorLinebreak {
   /**
@@ -7899,6 +8047,8 @@ namespace OperatorLinebreak {
  *  | deprecated | false      |
  *  | fixable    | whitespace |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace PaddedBlocks {
   /**
@@ -7996,6 +8146,8 @@ namespace PaddedBlocks {
  *  | fixable        | whitespace |
  *  | hasSuggestions | false      |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace PaddingLineBetweenStatements {
   /**
@@ -8240,6 +8392,8 @@ namespace PaddingLineBetweenStatements {
  *  | deprecated | false  |
  *  | fixable    | code   |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace QuoteProps {
   /**
@@ -8330,6 +8484,8 @@ namespace QuoteProps {
  *  | deprecated | false  |
  *  | fixable    | code   |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace Quotes {
   /**
@@ -8413,6 +8569,8 @@ namespace Quotes {
  *  | deprecated | false      |
  *  | fixable    | whitespace |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace RestSpreadSpacing {
   /**
@@ -8447,6 +8605,8 @@ namespace RestSpreadSpacing {
  *  | deprecated | false  |
  *  | fixable    | code   |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace Semi {
   /**
@@ -8548,6 +8708,8 @@ namespace Semi {
  *  | deprecated | false      |
  *  | fixable    | whitespace |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace SemiSpacing {
   /**
@@ -8590,6 +8752,8 @@ namespace SemiSpacing {
  *  | deprecated | false      |
  *  | fixable    | whitespace |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace SemiStyle {
   /**
@@ -8624,6 +8788,8 @@ namespace SemiStyle {
  *  | deprecated | false      |
  *  | fixable    | whitespace |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace SpaceBeforeBlocks {
   /**
@@ -8707,6 +8873,8 @@ namespace SpaceBeforeBlocks {
  *  | deprecated | false      |
  *  | fixable    | whitespace |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace SpaceBeforeFunctionParen {
   /**
@@ -8790,6 +8958,8 @@ namespace SpaceBeforeFunctionParen {
  *  | deprecated | false      |
  *  | fixable    | whitespace |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace SpaceInParens {
   /**
@@ -8850,6 +9020,8 @@ namespace SpaceInParens {
  *  | deprecated | false      |
  *  | fixable    | whitespace |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace SpaceInfixOps {
   /**
@@ -8892,6 +9064,8 @@ namespace SpaceInfixOps {
  *  | deprecated | false      |
  *  | fixable    | whitespace |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace SpaceUnaryOps {
   /**
@@ -8941,6 +9115,8 @@ namespace SpaceUnaryOps {
  *  | deprecated | false      |
  *  | fixable    | whitespace |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace SpacedComment {
   /**
@@ -9049,6 +9225,8 @@ namespace SpacedComment {
  *  | deprecated | false      |
  *  | fixable    | whitespace |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace SwitchColonSpacing {
   /**
@@ -9091,6 +9269,8 @@ namespace SwitchColonSpacing {
  *  | deprecated | false      |
  *  | fixable    | whitespace |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace TemplateCurlySpacing {
   /**
@@ -9125,6 +9305,8 @@ namespace TemplateCurlySpacing {
  *  | deprecated | false      |
  *  | fixable    | whitespace |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace TemplateTagSpacing {
   /**
@@ -9159,6 +9341,8 @@ namespace TemplateTagSpacing {
  *  | deprecated | false      |
  *  | fixable    | whitespace |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace TypeAnnotationSpacing {
   /**
@@ -9262,6 +9446,8 @@ namespace TypeAnnotationSpacing {
  *  | deprecated | false      |
  *  | fixable    | whitespace |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace TypeGenericSpacing {
   export type RuleEntry = Linter.StringSeverity;
@@ -9278,6 +9464,8 @@ namespace TypeGenericSpacing {
  *  | deprecated | false      |
  *  | fixable    | whitespace |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace TypeNamedTupleSpacing {
   export type RuleEntry = Linter.StringSeverity;
@@ -9294,6 +9482,8 @@ namespace TypeNamedTupleSpacing {
  *  | deprecated | false  |
  *  | fixable    | code   |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace WrapIife {
   /**
@@ -9345,6 +9535,8 @@ namespace WrapIife {
  *  | deprecated | false  |
  *  | fixable    | code   |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace WrapRegex {
   export type RuleEntry = Linter.StringSeverity;
@@ -9361,6 +9553,8 @@ namespace WrapRegex {
  *  | deprecated | false      |
  *  | fixable    | whitespace |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace YieldStarSpacing {
   /**

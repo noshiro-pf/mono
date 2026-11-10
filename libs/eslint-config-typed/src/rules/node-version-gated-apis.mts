@@ -2,7 +2,7 @@
 // Node.js loads that file without a build, so it imports nothing.
 
 /** What every gated entry says: the API, when Node.js has it, its rules. */
-type NodeVersionGated = Readonly<{
+export type NodeVersionGated = Readonly<{
   /** How the message names it. */
   name: string;
   /**
@@ -19,14 +19,20 @@ type NodeVersionGated = Readonly<{
   rules: readonly string[];
 }>;
 
-type NodeVersionGatedApi = NodeVersionGated &
+/**
+ * A gated API: a static member of a global (`Error.isError`), or a method
+ * (`Uint8Array#toBase64`, with no `object`).
+ */
+export type NodeVersionGatedApi = NodeVersionGated &
   Readonly<{
     /** The global the API is a static member of; `undefined` for a method. */
     object: string | undefined;
     property: string;
   }>;
 
-type StaticApi = NodeVersionGatedApi & Readonly<{ object: string }>;
+/** A gated API that is a static member of a global: one with an `object`. */
+export type NodeVersionGatedStaticApi = NodeVersionGatedApi &
+  Readonly<{ object: string }>;
 
 /**
  * The `no-restricted-properties`, `no-restricted-globals` and
@@ -55,13 +61,13 @@ export const nodeVersionGateAt = (
 
   return {
     properties: apis.map((api) =>
-      api.object === undefined
-        ? { property: api.property, message: messageOf(api) }
-        : {
+      isStaticApi(api)
+        ? {
             object: api.object,
             property: api.property,
             message: messageOf(api),
-          },
+          }
+        : { property: api.property, message: messageOf(api) },
     ),
     globals: nodeVersionGatedGlobals.filter(lacks).map((global) => ({
       name: global.name,
@@ -75,28 +81,32 @@ export const nodeVersionGateAt = (
       // The static APIs reached through the global object, as in
       // `globalThis.Error.isError`, which `no-restricted-properties` does not
       // match.
-      ...apis
-        .filter((api): api is StaticApi => api.object !== undefined)
-        .map((api) => ({
-          selector: [
-            'MemberExpression[computed=false]',
-            "[object.type='MemberExpression'][object.computed=false]",
-            "[object.object.type='Identifier']",
-            '[object.object.name=/^(?:globalThis|global|self|window)$/]',
-            `[object.property.name='${api.object}']`,
-            `[property.name='${api.property}']`,
-          ].join(''),
-          message: messageOf(api),
-        })),
+      ...apis.filter(isStaticApi).map((api) => ({
+        selector: [
+          'MemberExpression[computed=false]',
+          "[object.type='MemberExpression'][object.computed=false]",
+          "[object.object.type='Identifier']",
+          '[object.object.name=/^(?:globalThis|global|self|window)$/]',
+          `[object.property.name='${api.object}']`,
+          `[property.name='${api.property}']`,
+        ].join(''),
+        message: messageOf(api),
+      })),
     ],
   };
 };
 
-// Declared before the tables, which call it as the module loads.
+// `messageOf` and `isStaticApi` are declared before what calls them as the
+// module loads: `nodeVersionGatedStaticApis`, and `floorGate` and anything else
+// that runs `nodeVersionGateAt` then.
 const messageOf = ({ name, nodeMajor, instead }: NodeVersionGated): string =>
   nodeMajor === undefined
     ? (`'${name}' is in no Node.js release yet. ${instead}` as const)
     : (`'${name}' needs Node.js ${nodeMajor.toString()}, and this config supports older ones. ${instead}` as const);
+
+const isStaticApi = (
+  api: NodeVersionGatedApi,
+): api is NodeVersionGatedStaticApi => api.object !== undefined;
 
 /**
  * Built-in APIs that not every Node.js in this package's `engines.node` has.
@@ -268,10 +278,8 @@ export const nodeVersionGatedSyntax: readonly (NodeVersionGated &
 ] as const;
 
 /** The entries of {@link nodeVersionGatedApis} that are static members. */
-export const nodeVersionGatedStaticApis: readonly StaticApi[] =
-  nodeVersionGatedApis.filter(
-    (api): api is StaticApi => api.object !== undefined,
-  );
+export const nodeVersionGatedStaticApis: readonly NodeVersionGatedStaticApi[] =
+  nodeVersionGatedApis.filter(isStaticApi);
 
 const floorGate = nodeVersionGateAt(undefined);
 

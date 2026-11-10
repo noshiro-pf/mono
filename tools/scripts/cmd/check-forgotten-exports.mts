@@ -539,12 +539,6 @@ const PRIVATE_PACKAGES_READ: ReadonlySet<string> = new Set<string>([
  * pull request stacked on the one adding this check, which removes it here.
  */
 const PENDING_PACKAGES: ReadonlySet<string> = new Set<string>([
-  'eslint-config-typed',
-  'eslint-plugin-synstate',
-  'eslint-plugin-ts-data-forge',
-  'eslint-plugin-ts-fortress',
-  'eslint-plugin-ts-std-forge',
-  'eslint-plugin-ts-type-forge',
   'pr-merge-queue',
   'synstate',
   'synstate-dom',

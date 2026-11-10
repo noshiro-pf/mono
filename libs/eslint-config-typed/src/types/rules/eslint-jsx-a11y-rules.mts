@@ -15,6 +15,8 @@ import type {
  *  | :--------- | :---- |
  *  | deprecated | true  |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace AccessibleEmoji {
   /**
@@ -41,6 +43,8 @@ namespace AccessibleEmoji {
  *  | :--------- | :---- |
  *  | deprecated | false |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace AltText {
   /**
@@ -118,6 +122,8 @@ namespace AltText {
  *  | :--------- | :---- |
  *  | deprecated | false |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace AnchorAmbiguousText {
   /**
@@ -159,6 +165,8 @@ namespace AnchorAmbiguousText {
  *  | :--------- | :---- |
  *  | deprecated | false |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace AnchorHasContent {
   /**
@@ -200,6 +208,8 @@ namespace AnchorHasContent {
  *  | :--------- | :---- |
  *  | deprecated | false |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace AnchorIsValid {
   /**
@@ -268,6 +278,8 @@ namespace AnchorIsValid {
  *  | :--------- | :---- |
  *  | deprecated | false |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace AriaActivedescendantHasTabindex {
   /**
@@ -297,6 +309,8 @@ namespace AriaActivedescendantHasTabindex {
  *  | :--------- | :---- |
  *  | deprecated | false |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace AriaProps {
   /**
@@ -326,6 +340,8 @@ namespace AriaProps {
  *  | :--------- | :---- |
  *  | deprecated | false |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace AriaProptypes {
   /**
@@ -355,6 +371,8 @@ namespace AriaProptypes {
  *  | :--------- | :---- |
  *  | deprecated | false |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace AriaRole {
   /**
@@ -403,6 +421,8 @@ namespace AriaRole {
  *  | :--------- | :---- |
  *  | deprecated | false |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace AriaUnsupportedElements {
   /**
@@ -432,6 +452,8 @@ namespace AriaUnsupportedElements {
  *  | :--------- | :---- |
  *  | deprecated | false |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace AutocompleteValid {
   /**
@@ -473,6 +495,8 @@ namespace AutocompleteValid {
  *  | :--------- | :---- |
  *  | deprecated | false |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace ClickEventsHaveKeyEvents {
   /**
@@ -502,6 +526,8 @@ namespace ClickEventsHaveKeyEvents {
  *  | :--------- | :---- |
  *  | deprecated | false |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace ControlHasAssociatedLabel {
   /**
@@ -579,6 +605,8 @@ namespace ControlHasAssociatedLabel {
  *  | :--------- | :---- |
  *  | deprecated | false |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace HeadingHasContent {
   /**
@@ -620,6 +648,8 @@ namespace HeadingHasContent {
  *  | :--------- | :---- |
  *  | deprecated | false |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace HtmlHasLang {
   /**
@@ -649,6 +679,8 @@ namespace HtmlHasLang {
  *  | :--------- | :---- |
  *  | deprecated | false |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace IframeHasTitle {
   /**
@@ -678,6 +710,8 @@ namespace IframeHasTitle {
  *  | :--------- | :---- |
  *  | deprecated | false |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace ImgRedundantAlt {
   /**
@@ -728,6 +762,8 @@ namespace ImgRedundantAlt {
  *  | :--------- | :---- |
  *  | deprecated | false |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace InteractiveSupportsFocus {
   /**
@@ -844,6 +880,8 @@ namespace InteractiveSupportsFocus {
  *  | :--------- | :---- |
  *  | deprecated | false |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace LabelHasAssociatedControl {
   /**
@@ -926,6 +964,8 @@ namespace LabelHasAssociatedControl {
  *  | :--------- | :---- |
  *  | deprecated | true  |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace LabelHasFor {
   /**
@@ -1017,6 +1057,8 @@ namespace LabelHasFor {
  *  | :--------- | :---- |
  *  | deprecated | false |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace Lang {
   /**
@@ -1046,6 +1088,8 @@ namespace Lang {
  *  | :--------- | :---- |
  *  | deprecated | false |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace MediaHasCaption {
   /**
@@ -1105,6 +1149,8 @@ namespace MediaHasCaption {
  *  | :--------- | :---- |
  *  | deprecated | false |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace MouseEventsHaveKeyEvents {
   /**
@@ -1163,6 +1209,8 @@ namespace MouseEventsHaveKeyEvents {
  *  | :--------- | :---- |
  *  | deprecated | false |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoAccessKey {
   /**
@@ -1192,6 +1240,8 @@ namespace NoAccessKey {
  *  | :--------- | :---- |
  *  | deprecated | false |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoAriaHiddenOnFocusable {
   /**
@@ -1221,6 +1271,8 @@ namespace NoAriaHiddenOnFocusable {
  *  | :--------- | :---- |
  *  | deprecated | false |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoAutofocus {
   /**
@@ -1261,6 +1313,8 @@ namespace NoAutofocus {
  *  | :--------- | :---- |
  *  | deprecated | false |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoDistractingElements {
   /**
@@ -1310,6 +1364,8 @@ namespace NoDistractingElements {
  *  | :--------- | :---- |
  *  | deprecated | false |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoInteractiveElementToNoninteractiveRole {
   /**
@@ -1345,6 +1401,8 @@ namespace NoInteractiveElementToNoninteractiveRole {
  *  | :--------- | :---- |
  *  | deprecated | false |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoNoninteractiveElementInteractions {
   /**
@@ -1386,6 +1444,8 @@ namespace NoNoninteractiveElementInteractions {
  *  | :--------- | :---- |
  *  | deprecated | false |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoNoninteractiveElementToInteractiveRole {
   /**
@@ -1421,6 +1481,8 @@ namespace NoNoninteractiveElementToInteractiveRole {
  *  | :--------- | :---- |
  *  | deprecated | false |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoNoninteractiveTabindex {
   /**
@@ -1479,6 +1541,8 @@ namespace NoNoninteractiveTabindex {
  *  | :--------- | :---- |
  *  | deprecated | true  |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoOnchange {
   /**
@@ -1505,6 +1569,8 @@ namespace NoOnchange {
  *  | :--------- | :---- |
  *  | deprecated | false |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoRedundantRoles {
   /**
@@ -1540,6 +1606,8 @@ namespace NoRedundantRoles {
  *  | :--------- | :---- |
  *  | deprecated | false |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoStaticElementInteractions {
   /**
@@ -1581,6 +1649,8 @@ namespace NoStaticElementInteractions {
  *  | :--------- | :---- |
  *  | deprecated | false |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace PreferTagOverRole {
   /**
@@ -1610,6 +1680,8 @@ namespace PreferTagOverRole {
  *  | :--------- | :---- |
  *  | deprecated | false |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace RoleHasRequiredAriaProps {
   /**
@@ -1639,6 +1711,8 @@ namespace RoleHasRequiredAriaProps {
  *  | :--------- | :---- |
  *  | deprecated | false |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace RoleSupportsAriaProps {
   /**
@@ -1668,6 +1742,8 @@ namespace RoleSupportsAriaProps {
  *  | :--------- | :---- |
  *  | deprecated | false |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace Scope {
   /**
@@ -1697,6 +1773,8 @@ namespace Scope {
  *  | :--------- | :---- |
  *  | deprecated | false |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace TabindexNoPositive {
   /**

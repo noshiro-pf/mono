@@ -13,6 +13,8 @@ import type { Linter } from 'eslint';
  *  | fixable        | code       |
  *  | hasSuggestions | true       |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace Abs {
   /**
@@ -59,6 +61,8 @@ namespace Abs {
  *  | deprecated     | false      |
  *  | hasSuggestions | true       |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoStaticInfinityCalculations {
   export type RuleEntry = Linter.StringSeverity;
@@ -75,6 +79,8 @@ namespace NoStaticInfinityCalculations {
  *  | deprecated     | false      |
  *  | hasSuggestions | true       |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoStaticNanCalculations {
   export type RuleEntry = Linter.StringSeverity;
@@ -92,6 +98,8 @@ namespace NoStaticNanCalculations {
  *  | fixable        | code       |
  *  | hasSuggestions | true       |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace PreferExponentiationOperator {
   export type RuleEntry = Linter.StringSeverity;
@@ -109,6 +117,8 @@ namespace PreferExponentiationOperator {
  *  | fixable        | code       |
  *  | hasSuggestions | true       |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace PreferMathCbrt {
   export type RuleEntry = Linter.StringSeverity;
@@ -126,6 +136,8 @@ namespace PreferMathCbrt {
  *  | fixable        | code       |
  *  | hasSuggestions | true       |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace PreferMathE {
   export type RuleEntry = Linter.StringSeverity;
@@ -143,6 +155,8 @@ namespace PreferMathE {
  *  | fixable        | code       |
  *  | hasSuggestions | true       |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace PreferMathHypot {
   export type RuleEntry = Linter.StringSeverity;
@@ -160,6 +174,8 @@ namespace PreferMathHypot {
  *  | fixable        | code       |
  *  | hasSuggestions | true       |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace PreferMathLn10 {
   export type RuleEntry = Linter.StringSeverity;
@@ -177,6 +193,8 @@ namespace PreferMathLn10 {
  *  | fixable        | code       |
  *  | hasSuggestions | true       |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace PreferMathLn2 {
   export type RuleEntry = Linter.StringSeverity;
@@ -194,6 +212,8 @@ namespace PreferMathLn2 {
  *  | fixable        | code       |
  *  | hasSuggestions | true       |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace PreferMathLog10 {
   export type RuleEntry = Linter.StringSeverity;
@@ -211,6 +231,8 @@ namespace PreferMathLog10 {
  *  | fixable        | code       |
  *  | hasSuggestions | true       |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace PreferMathLog10e {
   export type RuleEntry = Linter.StringSeverity;
@@ -228,6 +250,8 @@ namespace PreferMathLog10e {
  *  | fixable        | code       |
  *  | hasSuggestions | true       |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace PreferMathLog2 {
   export type RuleEntry = Linter.StringSeverity;
@@ -245,6 +269,8 @@ namespace PreferMathLog2 {
  *  | fixable        | code       |
  *  | hasSuggestions | true       |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace PreferMathLog2e {
   export type RuleEntry = Linter.StringSeverity;
@@ -262,6 +288,8 @@ namespace PreferMathLog2e {
  *  | fixable        | code       |
  *  | hasSuggestions | false      |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace PreferMathPi {
   export type RuleEntry = Linter.StringSeverity;
@@ -279,6 +307,8 @@ namespace PreferMathPi {
  *  | fixable        | code       |
  *  | hasSuggestions | true       |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace PreferMathSqrt {
   export type RuleEntry = Linter.StringSeverity;
@@ -296,6 +326,8 @@ namespace PreferMathSqrt {
  *  | fixable        | code       |
  *  | hasSuggestions | true       |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace PreferMathSqrt12 {
   export type RuleEntry = Linter.StringSeverity;
@@ -313,6 +345,8 @@ namespace PreferMathSqrt12 {
  *  | fixable        | code       |
  *  | hasSuggestions | true       |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace PreferMathSqrt2 {
   export type RuleEntry = Linter.StringSeverity;
@@ -330,6 +364,8 @@ namespace PreferMathSqrt2 {
  *  | fixable        | code       |
  *  | hasSuggestions | true       |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace PreferMathSumPrecise {
   /**
@@ -369,6 +405,8 @@ namespace PreferMathSumPrecise {
  *  | fixable        | code       |
  *  | hasSuggestions | true       |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace PreferMathTrunc {
   /**
@@ -412,6 +450,8 @@ namespace PreferMathTrunc {
  *  | fixable        | code       |
  *  | hasSuggestions | false      |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace PreferNumberEpsilon {
   export type RuleEntry = Linter.StringSeverity;
@@ -429,6 +469,8 @@ namespace PreferNumberEpsilon {
  *  | fixable        | code       |
  *  | hasSuggestions | true       |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace PreferNumberIsFinite {
   export type RuleEntry = Linter.StringSeverity;
@@ -446,6 +488,8 @@ namespace PreferNumberIsFinite {
  *  | fixable        | code       |
  *  | hasSuggestions | true       |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace PreferNumberIsInteger {
   export type RuleEntry = Linter.StringSeverity;
@@ -463,6 +507,8 @@ namespace PreferNumberIsInteger {
  *  | fixable        | code       |
  *  | hasSuggestions | true       |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace PreferNumberIsNan {
   export type RuleEntry = Linter.StringSeverity;
@@ -480,6 +526,8 @@ namespace PreferNumberIsNan {
  *  | fixable        | code       |
  *  | hasSuggestions | true       |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace PreferNumberIsSafeInteger {
   export type RuleEntry = Linter.StringSeverity;
@@ -497,6 +545,8 @@ namespace PreferNumberIsSafeInteger {
  *  | fixable        | code       |
  *  | hasSuggestions | true       |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace PreferNumberMaxSafeInteger {
   export type RuleEntry = Linter.StringSeverity;
@@ -514,6 +564,8 @@ namespace PreferNumberMaxSafeInteger {
  *  | fixable        | code       |
  *  | hasSuggestions | false      |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace PreferNumberMaxValue {
   export type RuleEntry = Linter.StringSeverity;
@@ -531,6 +583,8 @@ namespace PreferNumberMaxValue {
  *  | fixable        | code       |
  *  | hasSuggestions | true       |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace PreferNumberMinSafeInteger {
   export type RuleEntry = Linter.StringSeverity;
@@ -548,6 +602,8 @@ namespace PreferNumberMinSafeInteger {
  *  | fixable        | code       |
  *  | hasSuggestions | false      |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace PreferNumberMinValue {
   export type RuleEntry = Linter.StringSeverity;

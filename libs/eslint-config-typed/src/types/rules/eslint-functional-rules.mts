@@ -13,6 +13,8 @@ import type { Linter } from 'eslint';
  *  | recommended          | recommended |
  *  | requiresTypeChecking | true        |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace FunctionalParameters {
   /**
@@ -689,6 +691,8 @@ namespace FunctionalParameters {
  *  | recommended          | recommended |
  *  | requiresTypeChecking | true        |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace ImmutableData {
   /**
@@ -1339,6 +1343,8 @@ namespace ImmutableData {
  *  | recommended          | recommended |
  *  | requiresTypeChecking | false       |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoClasses {
   /**
@@ -1394,6 +1400,8 @@ namespace NoClasses {
  *  | recommended          | recommended |
  *  | requiresTypeChecking | false       |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoClassInheritance {
   /**
@@ -1449,6 +1457,8 @@ namespace NoClassInheritance {
  *  | recommended          | recommended |
  *  | requiresTypeChecking | true        |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoConditionalStatements {
   /**
@@ -1508,6 +1518,8 @@ namespace NoConditionalStatements {
  *  | recommended          | recommended |
  *  | requiresTypeChecking | true        |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoExpressionStatements {
   /**
@@ -1561,6 +1573,8 @@ namespace NoExpressionStatements {
  *  | recommended          | recommended |
  *  | requiresTypeChecking | false       |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoLet {
   /**
@@ -1614,6 +1628,8 @@ namespace NoLet {
  *  | recommended          | recommended |
  *  | requiresTypeChecking | false       |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoLoopStatements {
   export type RuleEntry = Linter.StringSeverity;
@@ -1631,6 +1647,8 @@ namespace NoLoopStatements {
  *  | recommended          | recommended |
  *  | requiresTypeChecking | true        |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoMixedTypes {
   /**
@@ -1674,6 +1692,8 @@ namespace NoMixedTypes {
  *  | recommended          | false      |
  *  | requiresTypeChecking | false      |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoPromiseReject {
   export type RuleEntry = Linter.StringSeverity;
@@ -1691,6 +1711,8 @@ namespace NoPromiseReject {
  *  | recommended          | recommended |
  *  | requiresTypeChecking | true        |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoReturnVoid {
   /**
@@ -1738,6 +1760,8 @@ namespace NoReturnVoid {
  *  | recommended          | recommended |
  *  | requiresTypeChecking | false       |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoThisExpressions {
   export type RuleEntry = Linter.StringSeverity;
@@ -1755,6 +1779,8 @@ namespace NoThisExpressions {
  *  | recommended          | recommended |
  *  | requiresTypeChecking | true        |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoThrowStatements {
   /**
@@ -1794,6 +1820,8 @@ namespace NoThrowStatements {
  *  | recommended          | recommended |
  *  | requiresTypeChecking | false       |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoTryStatements {
   /**
@@ -1839,6 +1867,8 @@ namespace NoTryStatements {
  *  | recommended          | recommended |
  *  | requiresTypeChecking | true        |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace PreferImmutableTypes {
   /**
@@ -3621,6 +3651,8 @@ namespace PreferImmutableTypes {
  *  | recommended          | recommended |
  *  | requiresTypeChecking | true        |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace PreferPropertySignatures {
   /**
@@ -3665,6 +3697,8 @@ namespace PreferPropertySignatures {
  *  | recommended          | recommended |
  *  | requiresTypeChecking | true        |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace PreferReadonlyType {
   /**
@@ -3734,6 +3768,8 @@ namespace PreferReadonlyType {
  *  | recommended          | recommended |
  *  | requiresTypeChecking | true        |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace PreferTacit {
   /**
@@ -3774,6 +3810,8 @@ namespace PreferTacit {
  *  | recommended          | recommended |
  *  | requiresTypeChecking | true        |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace ReadonlyType {
   /**
@@ -3811,6 +3849,8 @@ namespace ReadonlyType {
  *  | recommended          | recommended |
  *  | requiresTypeChecking | true        |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace TypeDeclarationImmutability {
   /**

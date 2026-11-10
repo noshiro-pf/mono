@@ -11,6 +11,8 @@ import type { Linter } from 'eslint';
  *  | fixable     | code  |
  *  | recommended | false |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace SortDestructureKeys {
   /**

@@ -1,6 +1,7 @@
 /* cSpell:disable */
 import type { Linter } from 'eslint';
 
+/** @internal Reached by indexing the rules record by the rule's name. */
 namespace OnlyExportComponents {
   /**
    * ### schema

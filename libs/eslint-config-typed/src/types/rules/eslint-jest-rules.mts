@@ -13,6 +13,8 @@ import type { FixedLengthTuple, ReadonlyRecord } from 'ts-type-forge';
  *  | deprecated | false      |
  *  | fixable    | code       |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace ConsistentTestIt {
   /**
@@ -62,6 +64,8 @@ namespace ConsistentTestIt {
  *  | type       | suggestion |
  *  | deprecated | false      |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace ExpectExpect {
   /**
@@ -109,6 +113,8 @@ namespace ExpectExpect {
  *  | type       | suggestion |
  *  | deprecated | false      |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace MaxExpects {
   /**
@@ -147,6 +153,8 @@ namespace MaxExpects {
  *  | type       | suggestion |
  *  | deprecated | false      |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace MaxNestedDescribe {
   /**
@@ -186,6 +194,8 @@ namespace MaxNestedDescribe {
  *  | deprecated | false      |
  *  | fixable    | code       |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoAliasMethods {
   export type RuleEntry = Linter.StringSeverity;
@@ -201,6 +211,8 @@ namespace NoAliasMethods {
  *  | type       | suggestion |
  *  | deprecated | false      |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoCommentedOutTests {
   export type RuleEntry = Linter.StringSeverity;
@@ -216,6 +228,8 @@ namespace NoCommentedOutTests {
  *  | type       | problem |
  *  | deprecated | false   |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoConditionalExpect {
   export type RuleEntry = Linter.StringSeverity;
@@ -231,6 +245,8 @@ namespace NoConditionalExpect {
  *  | type       | problem |
  *  | deprecated | false   |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoConditionalInTest {
   /**
@@ -268,6 +284,8 @@ namespace NoConditionalInTest {
  *  | type       | problem |
  *  | deprecated | false   |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoConfusingSetTimeout {
   export type RuleEntry = Linter.StringSeverity;
@@ -284,6 +302,8 @@ namespace NoConfusingSetTimeout {
  *  | deprecated | false      |
  *  | fixable    | code       |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoDeprecatedFunctions {
   export type RuleEntry = Linter.StringSeverity;
@@ -299,6 +319,8 @@ namespace NoDeprecatedFunctions {
  *  | type       | suggestion |
  *  | deprecated | false      |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoDisabledTests {
   export type RuleEntry = Linter.StringSeverity;
@@ -315,6 +337,8 @@ namespace NoDisabledTests {
  *  | deprecated     | false      |
  *  | hasSuggestions | true       |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoDoneCallback {
   export type RuleEntry = Linter.StringSeverity;
@@ -330,6 +354,8 @@ namespace NoDoneCallback {
  *  | type       | suggestion |
  *  | deprecated | false      |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoDuplicateHooks {
   export type RuleEntry = Linter.StringSeverity;
@@ -346,6 +372,8 @@ namespace NoDuplicateHooks {
  *  | deprecated           | false      |
  *  | requiresTypeChecking | true       |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoErrorEqual {
   export type RuleEntry = Linter.StringSeverity;
@@ -361,6 +389,8 @@ namespace NoErrorEqual {
  *  | type       | suggestion |
  *  | deprecated | false      |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoExport {
   export type RuleEntry = Linter.StringSeverity;
@@ -377,6 +407,8 @@ namespace NoExport {
  *  | deprecated     | false      |
  *  | hasSuggestions | true       |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoFocusedTests {
   export type RuleEntry = Linter.StringSeverity;
@@ -392,6 +424,8 @@ namespace NoFocusedTests {
  *  | type       | suggestion |
  *  | deprecated | false      |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoHooks {
   /**
@@ -435,6 +469,8 @@ namespace NoHooks {
  *  | type       | suggestion |
  *  | deprecated | false      |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoIdenticalTitle {
   export type RuleEntry = Linter.StringSeverity;
@@ -450,6 +486,8 @@ namespace NoIdenticalTitle {
  *  | type       | problem |
  *  | deprecated | false   |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoInterpolationInSnapshots {
   export type RuleEntry = Linter.StringSeverity;
@@ -466,6 +504,8 @@ namespace NoInterpolationInSnapshots {
  *  | deprecated | false      |
  *  | fixable    | code       |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoJasmineGlobals {
   export type RuleEntry = Linter.StringSeverity;
@@ -481,6 +521,8 @@ namespace NoJasmineGlobals {
  *  | type       | suggestion |
  *  | deprecated | false      |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoLargeSnapshots {
   /**
@@ -529,6 +571,8 @@ namespace NoLargeSnapshots {
  *  | type       | problem |
  *  | deprecated | false   |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoMocksImport {
   export type RuleEntry = Linter.StringSeverity;
@@ -544,6 +588,8 @@ namespace NoMocksImport {
  *  | type       | suggestion |
  *  | deprecated | false      |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoRestrictedJestMethods {
   /**
@@ -579,6 +625,8 @@ namespace NoRestrictedJestMethods {
  *  | type       | suggestion |
  *  | deprecated | false      |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoRestrictedMatchers {
   /**
@@ -614,6 +662,8 @@ namespace NoRestrictedMatchers {
  *  | type       | suggestion |
  *  | deprecated | false      |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoStandaloneExpect {
   /**
@@ -655,6 +705,8 @@ namespace NoStandaloneExpect {
  *  | deprecated | false      |
  *  | fixable    | code       |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoTestPrefixes {
   export type RuleEntry = Linter.StringSeverity;
@@ -670,6 +722,8 @@ namespace NoTestPrefixes {
  *  | type       | suggestion |
  *  | deprecated | false      |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoTestReturnStatement {
   export type RuleEntry = Linter.StringSeverity;
@@ -686,6 +740,8 @@ namespace NoTestReturnStatement {
  *  | deprecated           | false      |
  *  | requiresTypeChecking | true       |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoUnnecessaryAssertion {
   export type RuleEntry = Linter.StringSeverity;
@@ -702,6 +758,8 @@ namespace NoUnnecessaryAssertion {
  *  | deprecated | false      |
  *  | fixable    | code       |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoUnneededAsyncExpectFunction {
   export type RuleEntry = Linter.StringSeverity;
@@ -718,6 +776,8 @@ namespace NoUnneededAsyncExpectFunction {
  *  | deprecated | false      |
  *  | fixable    | code       |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoUntypedMockFactory {
   export type RuleEntry = Linter.StringSeverity;
@@ -734,6 +794,8 @@ namespace NoUntypedMockFactory {
  *  | deprecated | false      |
  *  | fixable    | whitespace |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace PaddingAroundAfterAllBlocks {
   export type RuleEntry = Linter.StringSeverity;
@@ -750,6 +812,8 @@ namespace PaddingAroundAfterAllBlocks {
  *  | deprecated | false      |
  *  | fixable    | whitespace |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace PaddingAroundAfterEachBlocks {
   export type RuleEntry = Linter.StringSeverity;
@@ -766,6 +830,8 @@ namespace PaddingAroundAfterEachBlocks {
  *  | deprecated | false      |
  *  | fixable    | whitespace |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace PaddingAroundAll {
   export type RuleEntry = Linter.StringSeverity;
@@ -782,6 +848,8 @@ namespace PaddingAroundAll {
  *  | deprecated | false      |
  *  | fixable    | whitespace |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace PaddingAroundBeforeAllBlocks {
   export type RuleEntry = Linter.StringSeverity;
@@ -798,6 +866,8 @@ namespace PaddingAroundBeforeAllBlocks {
  *  | deprecated | false      |
  *  | fixable    | whitespace |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace PaddingAroundBeforeEachBlocks {
   export type RuleEntry = Linter.StringSeverity;
@@ -814,6 +884,8 @@ namespace PaddingAroundBeforeEachBlocks {
  *  | deprecated | false      |
  *  | fixable    | whitespace |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace PaddingAroundDescribeBlocks {
   export type RuleEntry = Linter.StringSeverity;
@@ -830,6 +902,8 @@ namespace PaddingAroundDescribeBlocks {
  *  | deprecated | false      |
  *  | fixable    | whitespace |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace PaddingAroundExpectGroups {
   export type RuleEntry = Linter.StringSeverity;
@@ -846,6 +920,8 @@ namespace PaddingAroundExpectGroups {
  *  | deprecated | false      |
  *  | fixable    | whitespace |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace PaddingAroundTestBlocks {
   export type RuleEntry = Linter.StringSeverity;
@@ -861,6 +937,8 @@ namespace PaddingAroundTestBlocks {
  *  | type       | suggestion |
  *  | deprecated | false      |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace PreferCalledWith {
   export type RuleEntry = Linter.StringSeverity;
@@ -877,6 +955,8 @@ namespace PreferCalledWith {
  *  | deprecated | false      |
  *  | fixable    | code       |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace PreferComparisonMatcher {
   export type RuleEntry = Linter.StringSeverity;
@@ -892,6 +972,8 @@ namespace PreferComparisonMatcher {
  *  | type       | suggestion |
  *  | deprecated | false      |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace PreferEach {
   export type RuleEntry = Linter.StringSeverity;
@@ -907,6 +989,8 @@ namespace PreferEach {
  *  | type       | suggestion |
  *  | deprecated | false      |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace PreferEndingWithAnExpect {
   /**
@@ -955,6 +1039,8 @@ namespace PreferEndingWithAnExpect {
  *  | deprecated     | false      |
  *  | hasSuggestions | true       |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace PreferEqualityMatcher {
   export type RuleEntry = Linter.StringSeverity;
@@ -971,6 +1057,8 @@ namespace PreferEqualityMatcher {
  *  | deprecated     | false      |
  *  | hasSuggestions | true       |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace PreferExpectAssertions {
   /**
@@ -1017,6 +1105,8 @@ namespace PreferExpectAssertions {
  *  | deprecated | false      |
  *  | fixable    | code       |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace PreferExpectResolves {
   export type RuleEntry = Linter.StringSeverity;
@@ -1032,6 +1122,8 @@ namespace PreferExpectResolves {
  *  | type       | suggestion |
  *  | deprecated | false      |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace PreferHooksInOrder {
   export type RuleEntry = Linter.StringSeverity;
@@ -1047,6 +1139,8 @@ namespace PreferHooksInOrder {
  *  | type       | suggestion |
  *  | deprecated | false      |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace PreferHooksOnTop {
   export type RuleEntry = Linter.StringSeverity;
@@ -1063,6 +1157,8 @@ namespace PreferHooksOnTop {
  *  | deprecated | false   |
  *  | fixable    | code    |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace PreferImportingJestGlobals {
   /**
@@ -1114,6 +1210,8 @@ namespace PreferImportingJestGlobals {
  *  | deprecated | false      |
  *  | fixable    | code       |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace PreferJestMocked {
   export type RuleEntry = Linter.StringSeverity;
@@ -1130,6 +1228,8 @@ namespace PreferJestMocked {
  *  | deprecated | false      |
  *  | fixable    | code       |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace PreferLowercaseTitle {
   /**
@@ -1201,6 +1301,8 @@ namespace PreferLowercaseTitle {
  *  | deprecated | false      |
  *  | fixable    | code       |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace PreferMockPromiseShorthand {
   export type RuleEntry = Linter.StringSeverity;
@@ -1217,6 +1319,8 @@ namespace PreferMockPromiseShorthand {
  *  | deprecated | false      |
  *  | fixable    | code       |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace PreferMockReturnShorthand {
   export type RuleEntry = Linter.StringSeverity;
@@ -1232,6 +1336,8 @@ namespace PreferMockReturnShorthand {
  *  | type       | suggestion |
  *  | deprecated | false      |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace PreferSnapshotHint {
   /**
@@ -1266,6 +1372,8 @@ namespace PreferSnapshotHint {
  *  | deprecated | false      |
  *  | fixable    | code       |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace PreferSpyOn {
   export type RuleEntry = Linter.StringSeverity;
@@ -1282,6 +1390,8 @@ namespace PreferSpyOn {
  *  | deprecated     | false      |
  *  | hasSuggestions | true       |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace PreferStrictEqual {
   export type RuleEntry = Linter.StringSeverity;
@@ -1298,6 +1408,8 @@ namespace PreferStrictEqual {
  *  | deprecated | false      |
  *  | fixable    | code       |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace PreferToBe {
   export type RuleEntry = Linter.StringSeverity;
@@ -1314,6 +1426,8 @@ namespace PreferToBe {
  *  | deprecated | false      |
  *  | fixable    | code       |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace PreferToContain {
   export type RuleEntry = Linter.StringSeverity;
@@ -1330,6 +1444,8 @@ namespace PreferToContain {
  *  | deprecated | false      |
  *  | fixable    | code       |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace PreferToHaveBeenCalledTimes {
   export type RuleEntry = Linter.StringSeverity;
@@ -1346,6 +1462,8 @@ namespace PreferToHaveBeenCalledTimes {
  *  | deprecated | false      |
  *  | fixable    | code       |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace PreferToHaveBeenCalled {
   export type RuleEntry = Linter.StringSeverity;
@@ -1362,6 +1480,8 @@ namespace PreferToHaveBeenCalled {
  *  | deprecated | false      |
  *  | fixable    | code       |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace PreferToHaveLength {
   export type RuleEntry = Linter.StringSeverity;
@@ -1378,6 +1498,8 @@ namespace PreferToHaveLength {
  *  | deprecated | false  |
  *  | fixable    | code   |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace PreferTodo {
   export type RuleEntry = Linter.StringSeverity;
@@ -1393,6 +1515,8 @@ namespace PreferTodo {
  *  | type       | suggestion |
  *  | deprecated | false      |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace RequireHook {
   /**
@@ -1433,6 +1557,8 @@ namespace RequireHook {
  *  | type       | suggestion |
  *  | deprecated | false      |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace RequireToThrowMessage {
   export type RuleEntry = Linter.StringSeverity;
@@ -1448,6 +1574,8 @@ namespace RequireToThrowMessage {
  *  | type       | suggestion |
  *  | deprecated | false      |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace RequireTopLevelDescribe {
   /**
@@ -1488,6 +1616,8 @@ namespace RequireTopLevelDescribe {
  *  | recommended          | recommended |
  *  | requiresTypeChecking | true        |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace UnboundMethod {
   /**
@@ -1529,6 +1659,8 @@ namespace UnboundMethod {
  *  | type       | problem |
  *  | deprecated | false   |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace ValidDescribeCallback {
   export type RuleEntry = Linter.StringSeverity;
@@ -1544,6 +1676,8 @@ namespace ValidDescribeCallback {
  *  | type       | suggestion |
  *  | deprecated | false      |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace ValidExpectInPromise {
   export type RuleEntry = Linter.StringSeverity;
@@ -1560,6 +1694,8 @@ namespace ValidExpectInPromise {
  *  | deprecated           | false      |
  *  | requiresTypeChecking | true       |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace ValidExpectWithPromise {
   /**
@@ -1598,6 +1734,8 @@ namespace ValidExpectWithPromise {
  *  | deprecated | false      |
  *  | fixable    | code       |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace ValidExpect {
   /**
@@ -1656,6 +1794,8 @@ namespace ValidExpect {
  *  | type       | problem |
  *  | deprecated | false   |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace ValidMockModulePath {
   /**
@@ -1698,6 +1838,8 @@ namespace ValidMockModulePath {
  *  | deprecated | false      |
  *  | fixable    | code       |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace ValidTitle {
   /**

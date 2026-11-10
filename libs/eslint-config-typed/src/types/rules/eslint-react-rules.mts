@@ -22,6 +22,8 @@ type SpreadOptionsIfIsArray<
  *  | deprecated  | false |
  *  | recommended | false |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace BooleanPropNaming {
   /**
@@ -89,6 +91,8 @@ namespace BooleanPropNaming {
  *  | deprecated  | false |
  *  | recommended | false |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace ButtonHasType {
   /**
@@ -146,6 +150,8 @@ namespace ButtonHasType {
  *  | deprecated  | false |
  *  | recommended | false |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace CheckedRequiresOnchangeOrReadonly {
   /**
@@ -185,6 +191,8 @@ namespace CheckedRequiresOnchangeOrReadonly {
  *  | :--------- | :---- |
  *  | deprecated | false |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace DefaultPropsMatchPropTypes {
   /**
@@ -227,6 +235,8 @@ namespace DefaultPropsMatchPropTypes {
  *  | fixable     | code  |
  *  | recommended | false |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace DestructuringAssignment {
   /**
@@ -284,6 +294,8 @@ namespace DestructuringAssignment {
  *  | deprecated  | false |
  *  | recommended | true  |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace DisplayName {
   /**
@@ -325,6 +337,8 @@ namespace DisplayName {
  *  | deprecated  | false |
  *  | recommended | false |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace ForbidComponentProps {
   /**
@@ -543,6 +557,8 @@ namespace ForbidComponentProps {
  *  | deprecated  | false |
  *  | recommended | false |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace ForbidDomProps {
   /**
@@ -615,6 +631,8 @@ namespace ForbidDomProps {
  *  | deprecated  | false |
  *  | recommended | false |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace ForbidElements {
   /**
@@ -680,6 +698,8 @@ namespace ForbidElements {
  *  | deprecated  | false |
  *  | recommended | false |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace ForbidForeignPropTypes {
   /**
@@ -717,6 +737,8 @@ namespace ForbidForeignPropTypes {
  *  | deprecated  | false |
  *  | recommended | false |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace ForbidPropTypes {
   /**
@@ -768,6 +790,8 @@ namespace ForbidPropTypes {
  *  | hasSuggestions | true       |
  *  | recommended    | false      |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace ForwardRefUsesRef {
   export type RuleEntry = Linter.StringSeverity;
@@ -784,6 +808,8 @@ namespace ForwardRefUsesRef {
  *  | fixable     | code  |
  *  | recommended | false |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace FunctionComponentDefinition {
   /**
@@ -869,6 +895,8 @@ namespace FunctionComponentDefinition {
  *  | hasSuggestions | true       |
  *  | recommended    | false      |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace HookUseState {
   /**
@@ -910,6 +938,8 @@ namespace HookUseState {
  *  | deprecated  | false |
  *  | recommended | false |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace IframeMissingSandbox {
   export type RuleEntry = Linter.StringSeverity;
@@ -926,6 +956,8 @@ namespace IframeMissingSandbox {
  *  | fixable     | code  |
  *  | recommended | false |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace JsxBooleanValue {
   /**
@@ -1040,6 +1072,8 @@ namespace JsxBooleanValue {
  *  | deprecated  | false |
  *  | recommended | false |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace JsxChildElementSpacing {
   export type RuleEntry = Linter.StringSeverity;
@@ -1056,6 +1090,8 @@ namespace JsxChildElementSpacing {
  *  | fixable     | code  |
  *  | recommended | false |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace JsxClosingBracketLocation {
   /**
@@ -1154,6 +1190,8 @@ namespace JsxClosingBracketLocation {
  *  | fixable     | whitespace |
  *  | recommended | false      |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace JsxClosingTagLocation {
   /**
@@ -1207,6 +1245,8 @@ namespace JsxClosingTagLocation {
  *  | fixable     | code  |
  *  | recommended | false |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace JsxCurlySpacing {
   /**
@@ -1367,6 +1407,8 @@ namespace JsxCurlySpacing {
  *  | fixable     | whitespace |
  *  | recommended | false      |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace JsxCurlyNewline {
   /**
@@ -1429,6 +1471,8 @@ namespace JsxCurlyNewline {
  *  | fixable     | code  |
  *  | recommended | false |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace JsxEqualsSpacing {
   /**
@@ -1461,6 +1505,8 @@ namespace JsxEqualsSpacing {
  *  | deprecated  | false |
  *  | recommended | false |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace JsxFilenameExtension {
   /**
@@ -1513,6 +1559,8 @@ namespace JsxFilenameExtension {
  *  | fixable     | code  |
  *  | recommended | false |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace JsxFirstPropNewLine {
   /**
@@ -1549,6 +1597,8 @@ namespace JsxFirstPropNewLine {
  *  | deprecated  | false |
  *  | recommended | false |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace JsxHandlerNames {
   /**
@@ -1723,6 +1773,8 @@ namespace JsxHandlerNames {
  *  | fixable     | whitespace |
  *  | recommended | false      |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace JsxIndent {
   /**
@@ -1782,6 +1834,8 @@ namespace JsxIndent {
  *  | fixable     | code  |
  *  | recommended | false |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace JsxIndentProps {
   /**
@@ -1849,6 +1903,8 @@ namespace JsxIndentProps {
  *  | deprecated  | false |
  *  | recommended | true  |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace JsxKey {
   /**
@@ -1906,6 +1962,8 @@ namespace JsxKey {
  *  | deprecated  | false |
  *  | recommended | false |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace JsxMaxDepth {
   /**
@@ -1945,6 +2003,8 @@ namespace JsxMaxDepth {
  *  | fixable     | code  |
  *  | recommended | false |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace JsxMaxPropsPerLine {
   /**
@@ -2024,6 +2084,8 @@ namespace JsxMaxPropsPerLine {
  *  | fixable     | code  |
  *  | recommended | false |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace JsxNewline {
   /**
@@ -2090,6 +2152,8 @@ namespace JsxNewline {
  *  | deprecated  | false |
  *  | recommended | false |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace JsxNoBind {
   /**
@@ -2163,6 +2227,8 @@ namespace JsxNoBind {
  *  | deprecated  | false |
  *  | recommended | true  |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace JsxNoCommentTextnodes {
   export type RuleEntry = Linter.StringSeverity;
@@ -2178,6 +2244,8 @@ namespace JsxNoCommentTextnodes {
  *  | deprecated  | false |
  *  | recommended | false |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace JsxNoConstructedContextValues {
   export type RuleEntry = Linter.StringSeverity;
@@ -2193,6 +2261,8 @@ namespace JsxNoConstructedContextValues {
  *  | deprecated  | false |
  *  | recommended | true  |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace JsxNoDuplicateProps {
   /**
@@ -2231,6 +2301,8 @@ namespace JsxNoDuplicateProps {
  *  | fixable     | code  |
  *  | recommended | false |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace JsxNoLeakedRender {
   /**
@@ -2282,6 +2354,8 @@ namespace JsxNoLeakedRender {
  *  | deprecated  | false |
  *  | recommended | false |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace JsxNoLiterals {
   /**
@@ -2375,6 +2449,8 @@ namespace JsxNoLiterals {
  *  | deprecated  | false |
  *  | recommended | false |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace JsxNoScriptUrl {
   /**
@@ -2485,6 +2561,8 @@ namespace JsxNoScriptUrl {
  *  | fixable     | code  |
  *  | recommended | true  |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace JsxNoTargetBlank {
   /**
@@ -2551,6 +2629,8 @@ namespace JsxNoTargetBlank {
  *  | fixable     | code       |
  *  | recommended | false      |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace JsxNoUselessFragment {
   /**
@@ -2589,6 +2669,8 @@ namespace JsxNoUselessFragment {
  *  | fixable     | whitespace |
  *  | recommended | false      |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace JsxOneExpressionPerLine {
   /**
@@ -2634,6 +2716,8 @@ namespace JsxOneExpressionPerLine {
  *  | deprecated  | false |
  *  | recommended | true  |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace JsxNoUndef {
   /**
@@ -2672,6 +2756,8 @@ namespace JsxNoUndef {
  *  | fixable     | code  |
  *  | recommended | false |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace JsxCurlyBracePresence {
   /**
@@ -2742,6 +2828,8 @@ namespace JsxCurlyBracePresence {
  *  | deprecated  | false |
  *  | recommended | false |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace JsxPascalCase {
   /**
@@ -2800,6 +2888,8 @@ namespace JsxPascalCase {
  *  | fixable     | code  |
  *  | recommended | false |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace JsxFragments {
   /**
@@ -2833,6 +2923,8 @@ namespace JsxFragments {
  *  | fixable     | code  |
  *  | recommended | false |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace JsxPropsNoMultiSpaces {
   export type RuleEntry = Linter.StringSeverity;
@@ -2848,6 +2940,8 @@ namespace JsxPropsNoMultiSpaces {
  *  | deprecated  | false |
  *  | recommended | false |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace JsxPropsNoSpreading {
   /**
@@ -2940,6 +3034,8 @@ namespace JsxPropsNoSpreading {
  *  | deprecated  | false |
  *  | recommended | false |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace JsxPropsNoSpreadMulti {
   export type RuleEntry = Linter.StringSeverity;
@@ -2955,6 +3051,8 @@ namespace JsxPropsNoSpreadMulti {
  *  | deprecated  | true  |
  *  | recommended | false |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace JsxSortDefaultProps {
   /**
@@ -2988,6 +3086,8 @@ namespace JsxSortDefaultProps {
  *  | fixable     | code  |
  *  | recommended | false |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace JsxSortProps {
   /**
@@ -3069,6 +3169,8 @@ namespace JsxSortProps {
  *  | fixable     | code  |
  *  | recommended | false |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace JsxSpaceBeforeClosing {
   /**
@@ -3099,6 +3201,8 @@ namespace JsxSpaceBeforeClosing {
  *  | fixable     | whitespace |
  *  | recommended | false      |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace JsxTagSpacing {
   /**
@@ -3173,6 +3277,8 @@ namespace JsxTagSpacing {
  *  | deprecated  | false |
  *  | recommended | true  |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace JsxUsesReact {
   export type RuleEntry = Linter.StringSeverity;
@@ -3188,6 +3294,8 @@ namespace JsxUsesReact {
  *  | deprecated  | false |
  *  | recommended | true  |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace JsxUsesVars {
   export type RuleEntry = Linter.StringSeverity;
@@ -3204,6 +3312,8 @@ namespace JsxUsesVars {
  *  | fixable     | code  |
  *  | recommended | false |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace JsxWrapMultilines {
   /**
@@ -3318,6 +3428,8 @@ namespace JsxWrapMultilines {
  *  | deprecated     | false      |
  *  | hasSuggestions | true       |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoInvalidHtmlAttribute {
   /**
@@ -3353,6 +3465,8 @@ namespace NoInvalidHtmlAttribute {
  *  | deprecated  | false |
  *  | recommended | false |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoAccessStateInSetstate {
   export type RuleEntry = Linter.StringSeverity;
@@ -3368,6 +3482,8 @@ namespace NoAccessStateInSetstate {
  *  | deprecated  | false |
  *  | recommended | false |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoAdjacentInlineElements {
   export type RuleEntry = Linter.StringSeverity;
@@ -3383,6 +3499,8 @@ namespace NoAdjacentInlineElements {
  *  | deprecated  | false |
  *  | recommended | false |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoArrayIndexKey {
   export type RuleEntry = Linter.StringSeverity;
@@ -3399,6 +3517,8 @@ namespace NoArrayIndexKey {
  *  | fixable     | code  |
  *  | recommended | false |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoArrowFunctionLifecycle {
   export type RuleEntry = Linter.StringSeverity;
@@ -3414,6 +3534,8 @@ namespace NoArrowFunctionLifecycle {
  *  | deprecated  | false |
  *  | recommended | true  |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoChildrenProp {
   /**
@@ -3455,6 +3577,8 @@ namespace NoChildrenProp {
  *  | deprecated  | false |
  *  | recommended | false |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoDanger {
   /**
@@ -3500,6 +3624,8 @@ namespace NoDanger {
  *  | deprecated  | false |
  *  | recommended | true  |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoDangerWithChildren {
   export type RuleEntry = Linter.StringSeverity;
@@ -3515,6 +3641,8 @@ namespace NoDangerWithChildren {
  *  | deprecated  | false |
  *  | recommended | true  |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoDeprecated {
   export type RuleEntry = Linter.StringSeverity;
@@ -3530,6 +3658,8 @@ namespace NoDeprecated {
  *  | deprecated  | false |
  *  | recommended | false |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoDidMountSetState {
   /**
@@ -3561,6 +3691,8 @@ namespace NoDidMountSetState {
  *  | deprecated  | false |
  *  | recommended | false |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoDidUpdateSetState {
   /**
@@ -3592,6 +3724,8 @@ namespace NoDidUpdateSetState {
  *  | deprecated  | false |
  *  | recommended | true  |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoDirectMutationState {
   export type RuleEntry = Linter.StringSeverity;
@@ -3607,6 +3741,8 @@ namespace NoDirectMutationState {
  *  | deprecated  | false |
  *  | recommended | true  |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoFindDomNode {
   export type RuleEntry = Linter.StringSeverity;
@@ -3622,6 +3758,8 @@ namespace NoFindDomNode {
  *  | deprecated  | false |
  *  | recommended | true  |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoIsMounted {
   export type RuleEntry = Linter.StringSeverity;
@@ -3637,6 +3775,8 @@ namespace NoIsMounted {
  *  | deprecated  | false |
  *  | recommended | false |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoMultiComp {
   /**
@@ -3678,6 +3818,8 @@ namespace NoMultiComp {
  *  | deprecated  | false |
  *  | recommended | false |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoNamespace {
   export type RuleEntry = Linter.StringSeverity;
@@ -3693,6 +3835,8 @@ namespace NoNamespace {
  *  | deprecated  | false |
  *  | recommended | false |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoSetState {
   export type RuleEntry = Linter.StringSeverity;
@@ -3708,6 +3852,8 @@ namespace NoSetState {
  *  | deprecated  | false |
  *  | recommended | true  |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoStringRefs {
   /**
@@ -3745,6 +3891,8 @@ namespace NoStringRefs {
  *  | deprecated  | false |
  *  | recommended | false |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoRedundantShouldComponentUpdate {
   export type RuleEntry = Linter.StringSeverity;
@@ -3760,6 +3908,8 @@ namespace NoRedundantShouldComponentUpdate {
  *  | deprecated  | false |
  *  | recommended | true  |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoRenderReturnValue {
   export type RuleEntry = Linter.StringSeverity;
@@ -3775,6 +3925,8 @@ namespace NoRenderReturnValue {
  *  | deprecated  | false |
  *  | recommended | false |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoThisInSfc {
   export type RuleEntry = Linter.StringSeverity;
@@ -3790,6 +3942,8 @@ namespace NoThisInSfc {
  *  | deprecated  | false |
  *  | recommended | false |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoTypos {
   export type RuleEntry = Linter.StringSeverity;
@@ -3806,6 +3960,8 @@ namespace NoTypos {
  *  | hasSuggestions | true  |
  *  | recommended    | true  |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoUnescapedEntities {
   /**
@@ -3873,6 +4029,8 @@ namespace NoUnescapedEntities {
  *  | fixable     | code  |
  *  | recommended | true  |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoUnknownProperty {
   /**
@@ -3921,6 +4079,8 @@ namespace NoUnknownProperty {
  *  | deprecated  | false |
  *  | recommended | false |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoUnsafe {
   /**
@@ -3962,6 +4122,8 @@ namespace NoUnsafe {
  *  | deprecated  | false |
  *  | recommended | false |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoUnstableNestedComponents {
   /**
@@ -4010,6 +4172,8 @@ namespace NoUnstableNestedComponents {
  *  | deprecated  | false |
  *  | recommended | false |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoUnusedClassComponentMethods {
   export type RuleEntry = Linter.StringSeverity;
@@ -4025,6 +4189,8 @@ namespace NoUnusedClassComponentMethods {
  *  | deprecated  | false |
  *  | recommended | false |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoUnusedPropTypes {
   /**
@@ -4077,6 +4243,8 @@ namespace NoUnusedPropTypes {
  *  | deprecated  | false |
  *  | recommended | false |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoUnusedState {
   export type RuleEntry = Linter.StringSeverity;
@@ -4092,6 +4260,8 @@ namespace NoUnusedState {
  *  | deprecated  | false |
  *  | recommended | false |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoObjectTypeAsDefaultProp {
   export type RuleEntry = Linter.StringSeverity;
@@ -4107,6 +4277,8 @@ namespace NoObjectTypeAsDefaultProp {
  *  | deprecated  | false |
  *  | recommended | false |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoWillUpdateSetState {
   /**
@@ -4138,6 +4310,8 @@ namespace NoWillUpdateSetState {
  *  | deprecated  | false |
  *  | recommended | false |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace PreferEs6Class {
   /**
@@ -4170,6 +4344,8 @@ namespace PreferEs6Class {
  *  | deprecated  | false |
  *  | recommended | false |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace PreferExactProps {
   export type RuleEntry = Linter.StringSeverity;
@@ -4186,6 +4362,8 @@ namespace PreferExactProps {
  *  | fixable     | code  |
  *  | recommended | false |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace PreferReadOnlyProps {
   export type RuleEntry = Linter.StringSeverity;
@@ -4201,6 +4379,8 @@ namespace PreferReadOnlyProps {
  *  | deprecated  | false |
  *  | recommended | false |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace PreferStatelessFunction {
   /**
@@ -4242,6 +4422,8 @@ namespace PreferStatelessFunction {
  *  | deprecated  | false |
  *  | recommended | true  |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace PropTypes {
   /**
@@ -4293,6 +4475,8 @@ namespace PropTypes {
  *  | deprecated  | false |
  *  | recommended | true  |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace ReactInJsxScope {
   export type RuleEntry = Linter.StringSeverity;
@@ -4307,6 +4491,8 @@ namespace ReactInJsxScope {
  *  | :--------- | :---- |
  *  | deprecated | false |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace RequireDefaultProps {
   /**
@@ -4363,6 +4549,8 @@ namespace RequireDefaultProps {
  *  | deprecated  | false |
  *  | recommended | false |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace RequireOptimization {
   /**
@@ -4403,6 +4591,8 @@ namespace RequireOptimization {
  *  | deprecated  | false |
  *  | recommended | true  |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace RequireRenderReturn {
   export type RuleEntry = Linter.StringSeverity;
@@ -4419,6 +4609,8 @@ namespace RequireRenderReturn {
  *  | fixable     | code  |
  *  | recommended | false |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace SelfClosingComp {
   /**
@@ -4468,6 +4660,8 @@ namespace SelfClosingComp {
  *  | deprecated  | false |
  *  | recommended | false |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace SortComp {
   /**
@@ -4520,6 +4714,8 @@ namespace SortComp {
  *  | deprecated  | false |
  *  | recommended | false |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace SortDefaultProps {
   /**
@@ -4558,6 +4754,8 @@ namespace SortDefaultProps {
  *  | fixable     | code  |
  *  | recommended | false |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace SortPropTypes {
   /**
@@ -4615,6 +4813,8 @@ namespace SortPropTypes {
  *  | deprecated  | false |
  *  | recommended | false |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace StateInConstructor {
   /**
@@ -4647,6 +4847,8 @@ namespace StateInConstructor {
  *  | deprecated  | false |
  *  | recommended | false |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace StaticPropertyPlacement {
   /**
@@ -4746,6 +4948,8 @@ namespace StaticPropertyPlacement {
  *  | deprecated  | false |
  *  | recommended | false |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace StylePropObject {
   /**
@@ -4788,6 +4992,8 @@ namespace StylePropObject {
  *  | deprecated  | false |
  *  | recommended | false |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace VoidDomElementsNoChildren {
   export type RuleEntry = Linter.StringSeverity;

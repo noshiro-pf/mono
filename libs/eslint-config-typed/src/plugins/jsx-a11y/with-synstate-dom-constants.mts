@@ -52,7 +52,7 @@ import type { DeepReadonly, ReadonlyRecord } from 'ts-type-forge';
 export const withSynstateDomConstants = (
   plugin: unknown,
 ): Readonly<{
-  meta?: PluginMeta;
+  meta?: Readonly<{ name?: string; version?: string }>;
   rules: ReadonlyRecord<string, Rule.RuleModule>;
 }> =>
   ({
