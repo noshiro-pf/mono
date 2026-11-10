@@ -100,6 +100,45 @@ describe('readWorkflowJobs', () => {
     assert.strictEqual(other?.steps[0]?.workingDirectory, 'apps/w');
   });
 
+  test('reads what a job calls, and each job’s and step’s name and `if:`', () => {
+    const [caller, job] = jobs(dedent`
+      jobs:
+        gates:
+          uses: ./.github/workflows/check-gates.yml
+        work:
+          if: >-
+            !cancelled() &&
+            github.event_name == 'pull_request'
+          steps:
+            - name: Named
+              if: failure()
+            - id: unnamed
+              run: pnpm run x
+            - if: false
+              run: pnpm run y
+    `);
+
+    assert.strictEqual(caller?.uses, './.github/workflows/check-gates.yml');
+
+    assert.strictEqual(caller?.condition, undefined);
+
+    assert.strictEqual(job?.uses, undefined);
+
+    assert.strictEqual(
+      job?.condition,
+      "!cancelled() && github.event_name == 'pull_request'",
+    );
+
+    assert.deepStrictEqual(
+      job?.steps.map(({ name, condition }) => ({ name, condition })),
+      [
+        { name: 'Named', condition: 'failure()' },
+        { name: 'unnamed', condition: undefined },
+        { name: undefined, condition: 'false' },
+      ],
+    );
+  });
+
   test('a file YAML cannot parse is an error, not no jobs', () => {
     assert.isTrue(Result.isErr(readWorkflowJobs('jobs:\n  a: [\n')));
   });

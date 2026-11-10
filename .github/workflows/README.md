@@ -680,9 +680,10 @@ each caller passes it as `result-job: <name>-result / result`.
 ### When a check fails
 
 A matrix job of `code-check.yml` or `style-check.yml` whose command or
-clean-tree check fails on a pull request writes to its job summary which of its
-entry's commands `check-changed` would have run for the same diff
-(`pnpm run z:check-changed-gap`; its header in
+clean-tree check fails on a pull request, or on a queue layer (where a queued
+pull request is checked, diffing against `origin/main`), writes to its job
+summary which of its entry's commands `check-changed` would have run for the
+same diff (`pnpm run z:check-changed-gap`; its header in
 `tools/scripts/cmd/check-changed-gap.mts` says how to read it): planned (the
 difference is in how the two ran it), planned over the diff only, left to CI by
 design (`CI_ONLY` in `tools/scripts/cmd/check-changed/reach.mts`), in a package
@@ -691,6 +692,13 @@ this diff (the rule in `check-changed/plan.mts` is too narrow). It is a report:
 the step runs only after that failure, with `continue-on-error`, and fetches the
 base it diffs against itself. `check:root:check-changed-reach` asks the other
 half, whether some diff's plan reaches every command CI runs.
+
+A step or job of a check workflow that runs only on a pull request is skipped on
+the queue layer as well as on the pull request's own run, which reuses the
+layer's verdict, so it runs nowhere: `check:root:queue-layer-conditions` reports
+an `if:` that reads `github.event_name == 'pull_request'` and no test that holds
+on every layer branch (`startsWith(github.ref, 'refs/heads/queue/')`), unless
+the guard lists it with its reason.
 
 ### The `dist/` artifact
 

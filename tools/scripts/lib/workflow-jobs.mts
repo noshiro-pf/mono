@@ -11,13 +11,14 @@ import type { ReadonlyRecord } from 'ts-type-forge';
 import { parse } from 'yaml';
 
 /**
- * A workflow's jobs, read by a YAML parser: each job's matrix as written, and
- * its steps' `run:` scripts and `env:`. The guards that ask what CI runs
- * (`check-ci-commands.mts`, `check-ci-job-shape.mts`) and `check-all.mts`,
- * which runs the matrices, read workflows through this, so that a quoted or
- * folded value, a flow-style mapping, a comment after `include:` or an entry
- * that starts with `- name:` is read the same way by all three — and the way
- * GitHub reads it. What a `run:` script runs is `shell-commands.mts`'s.
+ * A workflow's jobs, read by a YAML parser: each job's matrix as written, what
+ * it `uses:`, its `if:`, and its steps' names, `if:`, `run:` scripts and
+ * `env:`. The guards that ask what CI runs (`check-ci-commands.mts`,
+ * `check-ci-job-shape.mts`) and `check-all.mts`, which runs the matrices, read
+ * workflows through this, so that a quoted or folded value, a flow-style
+ * mapping, a comment after `include:` or an entry that starts with `- name:` is
+ * read the same way by all three — and the way GitHub reads it. What a `run:`
+ * script runs is `shell-commands.mts`'s.
  */
 export const readWorkflowJobs = (
   text: string,
@@ -58,9 +59,13 @@ export const readWorkflowJobs = (
 
       const displayName = record['name'];
 
+      const uses = record['uses'];
+
       return {
         name,
         displayName: isString(displayName) ? displayName : undefined,
+        uses: isString(uses) ? uses : undefined,
+        condition: scalarText(record['if']),
         matrix: isRecord(strategy) ? strategy['matrix'] : undefined,
         env: { ...workflowEnv, ...readEnv(record['env']) },
         steps: Arr.isArray(steps)
@@ -71,7 +76,11 @@ export const readWorkflowJobs = (
 
               const directory = stepRecord['working-directory'];
 
+              const stepName = stepRecord['name'] ?? stepRecord['id'];
+
               return {
+                name: isString(stepName) ? stepName : undefined,
+                condition: scalarText(stepRecord['if']),
                 run: isString(run) ? run : undefined,
                 env: readEnv(stepRecord['env']),
                 workingDirectory: isString(directory)
@@ -186,10 +195,21 @@ export const expandVariable = (
   return name === undefined ? word : (env[name] ?? word);
 };
 
+/** The gate every check workflow calls, as a job's `uses:` names it. */
+export const CHECK_GATES_WORKFLOW = './.github/workflows/check-gates.yml';
+
+/** Whether a workflow is a check workflow: one of its jobs calls the gate. */
+export const callsCheckGates = (jobs: readonly WorkflowJob[]): boolean =>
+  jobs.some(({ uses }) => uses === CHECK_GATES_WORKFLOW);
+
 export type WorkflowJob = Readonly<{
   name: string;
   /** The job's `name:` as written, expressions and all; absent when unnamed. */
   displayName: string | undefined;
+  /** The reusable workflow the job calls (`uses:`), as written. */
+  uses: string | undefined;
+  /** The job's `if:` as written, a folded one joined; absent without one. */
+  condition: string | undefined;
   /** `strategy.matrix` as written: a mapping, an expression, or absent. */
   matrix: unknown;
   /** The workflow's `env:` and the job's, the job's taking precedence. */
@@ -198,6 +218,10 @@ export type WorkflowJob = Readonly<{
 }>;
 
 export type WorkflowStep = Readonly<{
+  /** The step's `name:`, else its `id:`; absent when it has neither. */
+  name: string | undefined;
+  /** The step's `if:` as written, a folded one joined; absent without one. */
+  condition: string | undefined;
   run: string | undefined;
   env: ReadonlyRecord<string, string>;
   /**

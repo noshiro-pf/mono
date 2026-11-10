@@ -5,6 +5,7 @@ import { isDirectlyExecuted } from 'ts-repo-utils';
 import { parse } from 'yaml';
 import { plural } from '../lib/plural.mjs';
 import { listWorkflowFiles } from '../lib/repo-files.mjs';
+import { CHECK_GATES_WORKFLOW } from '../lib/workflow-jobs.mjs';
 import { projectRootPath } from '../project-root-path.mjs';
 
 /**
@@ -122,7 +123,7 @@ export const findDispatchInputViolations = (
   });
 
   if (!Arr.isNonEmpty(callers)) {
-    return Result.err(`No workflow calls ${GATES_WORKFLOW}.`);
+    return Result.err(`No workflow calls ${CHECK_GATES_WORKFLOW}.`);
   }
 
   return Result.ok({
@@ -168,15 +169,13 @@ export const dispatchInputViolations = (
 
 const UNBLOCK_PRS_CONFIG = '.github/unblock-prs.json';
 
-const GATES_WORKFLOW = './.github/workflows/check-gates.yml';
-
 const callsGates = (workflow: unknown): boolean => {
   const jobs = isRecord(workflow) ? workflow['jobs'] : undefined;
 
   return (
     isRecord(jobs) &&
     Object.values(jobs).some(
-      (job) => isRecord(job) && job['uses'] === GATES_WORKFLOW,
+      (job) => isRecord(job) && job['uses'] === CHECK_GATES_WORKFLOW,
     )
   );
 };
