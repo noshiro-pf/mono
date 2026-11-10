@@ -1,4 +1,4 @@
-@@ -13,13 +13,23 @@ See the Apache Version 2.0 License for specific language governing permissions
+@@ -13,6 +13,13 @@ See the Apache Version 2.0 License for specific language governing permissions
  and limitations under the License.
  ***************************************************************************** */
  
@@ -12,30 +12,59 @@
  interface Array<T> {
    /**
     * Determines whether an array includes a certain element, returning true or false as appropriate.
-    * @param searchElement The element to search for.
+@@ -20,6 +27,25 @@ interface Array<T> {
     * @param fromIndex The position in this array at which to begin searching for searchElement.
     */
--  includes(searchElement: T, fromIndex?: number): boolean;
-+  includes(
-+    searchElement: T | (import('ts-type-forge').WidenLiteral<T> & {}),
+   includes(searchElement: T, fromIndex?: number): boolean;
++  /**
++   * Determines whether an array includes a certain element, returning true or false as appropriate.
++   * @param searchElement The element to search for.
++   * @param fromIndex The position in this array at which to begin searching for searchElement.
++   */
++  includes<S extends import('ts-type-forge').WidenLiteral<T> & {}>(
++    this: [S] extends [Exclude<S, T>] ? unknown : never,
++    searchElement: S,
 +    fromIndex?: number,
-+  ): searchElement is T;
++  ): searchElement is S & T;
++  /**
++   * Determines whether an array includes a certain element, returning true or false as appropriate.
++   * @param searchElement The element to search for.
++   * @param fromIndex The position in this array at which to begin searching for searchElement.
++   */
++  includes(
++    searchElement: import('ts-type-forge').WidenLiteral<T> & {},
++    fromIndex?: number,
++  ): boolean;
  }
  
  interface ReadonlyArray<T> {
-@@ -28,7 +38,10 @@ interface ReadonlyArray<T> {
-    * @param searchElement The element to search for.
+@@ -29,6 +55,25 @@ interface ReadonlyArray<T> {
     * @param fromIndex The position in this array at which to begin searching for searchElement.
     */
--  includes(searchElement: T, fromIndex?: number): boolean;
-+  includes(
-+    searchElement: T | (import('ts-type-forge').WidenLiteral<T> & {}),
+   includes(searchElement: T, fromIndex?: number): boolean;
++  /**
++   * Determines whether an array includes a certain element, returning true or false as appropriate.
++   * @param searchElement The element to search for.
++   * @param fromIndex The position in this array at which to begin searching for searchElement.
++   */
++  includes<S extends import('ts-type-forge').WidenLiteral<T> & {}>(
++    this: [S] extends [Exclude<S, T>] ? unknown : never,
++    searchElement: S,
 +    fromIndex?: number,
-+  ): searchElement is T;
++  ): searchElement is S & T;
++  /**
++   * Determines whether an array includes a certain element, returning true or false as appropriate.
++   * @param searchElement The element to search for.
++   * @param fromIndex The position in this array at which to begin searching for searchElement.
++   */
++  includes(
++    searchElement: import('ts-type-forge').WidenLiteral<T> & {},
++    fromIndex?: number,
++  ): boolean;
  }
  
  interface Int8Array<TArrayBuffer extends ArrayBufferLike> {
-@@ -37,7 +50,10 @@ interface Int8Array<TArrayBuffer extends ArrayBufferLike> {
+@@ -37,7 +82,10 @@ interface Int8Array<TArrayBuffer extends ArrayBufferLike> {
     * @param searchElement The element to search for.
     * @param fromIndex The position in this array at which to begin searching for searchElement.
     */
@@ -47,7 +76,7 @@
  }
  
  interface Uint8Array<TArrayBuffer extends ArrayBufferLike> {
-@@ -46,7 +62,10 @@ interface Uint8Array<TArrayBuffer extends ArrayBufferLike> {
+@@ -46,7 +94,10 @@ interface Uint8Array<TArrayBuffer extends ArrayBufferLike> {
     * @param searchElement The element to search for.
     * @param fromIndex The position in this array at which to begin searching for searchElement.
     */
@@ -59,7 +88,7 @@
  }
  
  interface Uint8ClampedArray<TArrayBuffer extends ArrayBufferLike> {
-@@ -55,7 +74,10 @@ interface Uint8ClampedArray<TArrayBuffer extends ArrayBufferLike> {
+@@ -55,7 +106,10 @@ interface Uint8ClampedArray<TArrayBuffer extends ArrayBufferLike> {
     * @param searchElement The element to search for.
     * @param fromIndex The position in this array at which to begin searching for searchElement.
     */
