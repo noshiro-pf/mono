@@ -279,14 +279,20 @@ const claimedApplications = [
 
 /**
  * Every library larger than another in the counter row is so in `application`'s
- * row. Two libraries tied in the counter row have no order to keep, so a tie
- * fails the claim.
+ * row, except a pair both in `swappable`, whose order is not claimed. Two other
+ * libraries tied in the counter row have no order to keep, so such a tie fails
+ * the claim.
  */
-const keepsCounterOrder = (table: ClaimTable, application: string): boolean =>
+const keepsCounterOrder = (
+  table: ClaimTable,
+  application: string,
+  swappable: readonly ClaimedLibrary[],
+): boolean =>
   claimedLibraries.every((a) =>
     claimedLibraries.every(
       (b) =>
         a === b ||
+        (swappable.includes(a) && swappable.includes(b)) ||
         table.size('counter', a) < table.size('counter', b) ||
         (table.size('counter', a) > table.size('counter', b) &&
           table.size(application, a) > table.size(application, b)),
@@ -310,6 +316,12 @@ const isLargestAfterReact = (
   );
 
 /**
+ * The two libraries next in size after React, close enough that the sentences
+ * claim no order between them.
+ */
+const closePair = ['synstate-dom', 'Preact + Signals'] as const;
+
+/**
  * What the "Reading the results" bullets say about the tables. Each sentence
  * has to appear on its page word for word, so rewording one without updating
  * its case here fails too. A new sentence about an order or a margin gets a
@@ -331,11 +343,19 @@ const claims: readonly Claim[] = [
       ),
   },
   {
-    en: 'The order of the libraries is set by the counter row and stays the same in the rows below it.',
-    ja: 'ライブラリの順位はカウンターの行で決まり、その下の行でも変わりません。',
+    en: "The rows below it keep the counter row's order of the libraries, except that synstate-dom and Preact + Signals, within about a kB of each other from the counter row down, may change places.",
+    ja: 'その下の行もカウンターの行のライブラリの順位を保ちます。ただし、カウンターの行から下で互いに 1 kB ほどの差しかない synstate-dom と Preact + Signals は入れ替わることがあります。',
+    // "about a kB": at most 1.5 kB
     holds: (table) =>
       table.applications.every((application) =>
-        keepsCounterOrder(table, application),
+        keepsCounterOrder(table, application, closePair),
+      ) &&
+      Arr.toUnshifted('counter')(table.applications).every(
+        (application) =>
+          Math.abs(
+            table.size(application, closePair[0]) -
+              table.size(application, closePair[1]),
+          ) <= 15,
       ),
   },
   {
@@ -373,12 +393,14 @@ const claims: readonly Claim[] = [
       table.size('everything exported', 'Preact'),
   },
   {
-    en: 'synstate-dom is the largest after React in every row.',
-    ja: 'synstate-dom はどの行でも React の次に大きくなっています。',
+    en: 'synstate-dom and Preact + Signals are the largest after React in every row but everything exported.',
+    ja: 'すべての export 以外のどの行でも、React の次に大きいのは synstate-dom と Preact + Signals です。',
     holds: (table) =>
-      table.allApplications.every((application) =>
-        isLargestAfterReact(table, application, ['synstate-dom']),
-      ),
+      table.allApplications
+        .filter((application) => application !== 'everything exported')
+        .every((application) =>
+          isLargestAfterReact(table, application, closePair),
+        ),
   },
   {
     en: '**Everything exported**: synstate-dom and Solid are the largest after React in this row.',

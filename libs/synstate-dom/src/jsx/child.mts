@@ -1,5 +1,6 @@
 import { isObservable } from 'synstate';
-import { Arr, hasKey, isNumber, isRecord, isString } from 'ts-data-forge';
+import { hasKey, isNumber, isRecord, isString } from 'ts-data-forge';
+import * as Arr from 'ts-data-forge/array';
 import type { Bindable } from '../constant/index.mjs';
 import { bindValue, mountableTag } from '../internal/index.mjs';
 import type { Mountable, MountedNodes } from './mountable.mjs';

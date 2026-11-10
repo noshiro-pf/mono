@@ -8,7 +8,8 @@ import {
   type Observable,
   type Scope,
 } from 'synstate';
-import { Arr, Optional } from 'ts-data-forge';
+import { Optional } from 'ts-data-forge';
+import * as Arr from 'ts-data-forge/array';
 import type { BivariantHack } from 'ts-type-forge';
 import { toObservable, type Bindable } from '../constant/index.mjs';
 import {
