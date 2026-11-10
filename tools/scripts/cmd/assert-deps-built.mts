@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url';
 // A top-level `import type`, not the inline `import { type … }` the lint
 // prefers: Node erases the former and keeps the latter as a bare
 // `import {} from 'ts-type-forge'`, which fails to resolve before `ws:build`.
-// The test's runtime-import check guards this.
+// `check:root:node-run-scripts` guards this.
 import type { ReadonlyRecord } from 'ts-type-forge';
 
 /**

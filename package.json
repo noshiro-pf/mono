@@ -74,6 +74,7 @@
     "check:root:lockfile": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-lockfile-tarballs.mts",
     "check:root:lockfile-integrity": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-lockfile-integrity.mts",
     "check:root:minimum-release-age": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-minimum-release-age.mts",
+    "check:root:node-run-scripts": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-node-run-scripts.mts",
     "check:root:node-support": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-node-support.mts",
     "check:root:oxlint-rules": "node ./tools/scripts/cmd/assert-deps-built.mts --workspace && tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-oxlint-rules.mts",
     "check:root:package-manager": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-package-manager.mts",

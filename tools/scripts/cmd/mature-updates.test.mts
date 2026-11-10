@@ -1428,23 +1428,4 @@ describe('shared', () => {
 
     assert.strictEqual(compareVersions(v('1', '2', '3'), v('1', '2', '3')), 0);
   });
-
-  test('the script imports nothing outside node: builtins at runtime', () => {
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
-    const source = fs.readFileSync(scriptPath, 'utf8');
-
-    // A top-level `import type` is erased by Node and so is allowed; an inline
-    // `import { type X }` is not, because it keeps the module load.
-    const specifiers = source
-      .matchAll(/^import (?!type )[^;]* from '([^']+)';$/gmu)
-      .map((m) => m[1])
-      .toArray();
-
-    assert.isNotEmpty(specifiers);
-
-    assert.deepStrictEqual(
-      specifiers.filter((s) => !(s?.startsWith('node:') ?? false)),
-      [],
-    );
-  });
 });

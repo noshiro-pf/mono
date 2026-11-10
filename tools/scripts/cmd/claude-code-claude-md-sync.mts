@@ -37,8 +37,8 @@ import type { UnknownRecord } from 'ts-type-forge';
  * fetch throttle and nothing of it is tracked.
  *
  * **Run with `node`, not `tsx`**, for the reasons `claude-code-post-edit.mts`
- * gives: only `node:*` modules at runtime, erasable syntax, no `Temporal`; the
- * test holds that. The repository is the one holding the hook's `cwd`, not
+ * gives: only `node:*` modules at runtime, erasable syntax, no `Temporal`;
+ * `check:root:node-run-scripts` holds the first two, the test the last. The repository is the one holding the hook's `cwd`, not
  * `$CLAUDE_PROJECT_DIR`, for the same reason.
  */
 export const run = (

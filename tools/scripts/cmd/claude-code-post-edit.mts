@@ -27,8 +27,8 @@ import type { UnknownRecord } from 'ts-type-forge';
  *
  * **Run with `node`, not `tsx`.** The hook starts on whatever Node the session
  * has, possibly before `pnpm install`, so this imports only `node:*`
- * modules at runtime, uses only erasable syntax and no `Temporal`; the test
- * holds that. `$CLAUDE_PROJECT_DIR`, which the hook command uses to find this
+ * modules at runtime, uses only erasable syntax and no `Temporal`;
+ * `check:root:node-run-scripts` holds the first two, the test the last. `$CLAUDE_PROJECT_DIR`, which the hook command uses to find this
  * file, names the checkout the session started in, not a worktree it moved to;
  * the repository root is therefore found from the edited file, so that a
  * worktree's own `node_modules` and configs are the ones used.

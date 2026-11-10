@@ -251,8 +251,44 @@ describe('readShellCommands', () => {
   test('arithmetic in a heredoc runs nothing', () => {
     assert.deepStrictEqual(
       readShellCommands('cat <<EOF\nTotal: $((a + b))\nEOF\npnpm run x'),
-      { commands: [['cat'], ['pnpm', 'run', 'x']], problems: [] },
+      {
+        commands: [['cat'], ['pnpm', 'run', 'x']],
+        assignments: [],
+        problems: [],
+      },
     );
+  });
+
+  test('keeps an assignment after a reserved word or through export', () => {
+    assert.deepStrictEqual(
+      readShellCommands(
+        'if [ -f a ]; then f=a.mts; else f=b.mts; fi; export G=c readonly; local h=d',
+      ).assignments,
+      [
+        ['f', 'a.mts'],
+        ['f', 'b.mts'],
+        ['G', 'c'],
+        ['h', 'd'],
+      ],
+    );
+  });
+
+  test('keeps what an assignment alone sets, and not one inside $(…)', () => {
+    const reading = readShellCommands(
+      'f="$DIR/a b.mts"; FOO=1 node "$f"; x=$(y=2; echo "$y"); g=1 h=2',
+    );
+
+    assert.deepStrictEqual(reading.assignments, [
+      ['f', '$DIR/a b.mts'],
+      ['x', '$(…)'],
+      ['g', '1'],
+      ['h', '2'],
+    ]);
+
+    assert.deepStrictEqual(reading.commands, [
+      ['node', '$f'],
+      ['echo', '$y'],
+    ]);
   });
 
   test("a heredoc's body is text, not commands", () => {
