@@ -101,14 +101,20 @@ export const disabledButtonTabIndex = (line: string): string =>
     : line;
 
 /**
- * `Intl`'s short weekday names (`Sun`), which this library's pickers show, for
- * Blueprint's, which shows date-fns's shortest (`Su`) and which `Intl` has no
- * format for: the one text the two are known to differ in, given to Blueprint
- * so that the rest of the picker, the weekdays' order included, is compared.
+ * The weekday heads Blueprint draws by default, date-fns's two-letter short
+ * names in `en-US` (`Su`), which `Intl` has no format for.
+ *
+ * Every picker case gives them to this library's picker through `weekdayNames`.
+ * The plain `DatePicker` case leaves Blueprint's picker its default, to check
+ * that these are it: if that case fails on the heads alone,
+ * Blueprint's default has changed, and so must these. The other cases give them
+ * to Blueprint's too, through its formatter, so that they compare the rest of
+ * the picker whatever that default is.
  */
-const intlWeekdayName = (date: Date): string => shortWeekday.format(date);
+const WEEKDAY_NAMES = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'] as const;
 
-const shortWeekday = new Intl.DateTimeFormat('en-US', { weekday: 'short' });
+const blueprintWeekdayName = (date: Date): string =>
+  WEEKDAY_NAMES[date.getDay()];
 
 const ignore = (): void => {};
 
@@ -956,16 +962,20 @@ export const cases: readonly Case[] = [
     'DatePicker',
     {
       element: () =>
+        // Blueprint's own heads, which `WEEKDAY_NAMES` is said to be.
         h(BlueprintDatetime.DatePicker, {
           value: blueprintDate('2026-10-15T00:00'),
-          dayPickerProps: {
-            formatters: { formatWeekdayName: intlWeekdayName },
-          },
           onChange: ignore,
         }),
       deliberate: [htmlSelectWrapper],
     },
-    () => <DatePicker value={constant('2026-10-15')} onChange={ignore} />,
+    () => (
+      <DatePicker
+        value={constant('2026-10-15')}
+        weekdayNames={WEEKDAY_NAMES}
+        onChange={ignore}
+      />
+    ),
   ],
   ...(
     [
@@ -992,7 +1002,7 @@ export const cases: readonly Case[] = [
           shortcuts: false,
           ...blueprintBounds(bounds),
           dayPickerProps: {
-            formatters: { formatWeekdayName: intlWeekdayName },
+            formatters: { formatWeekdayName: blueprintWeekdayName },
           },
           onChange: ignore,
         }),
@@ -1002,6 +1012,7 @@ export const cases: readonly Case[] = [
       <DateRangePicker
         {...bounds}
         value={constant([start, end] as const)}
+        weekdayNames={WEEKDAY_NAMES}
         onChange={ignore}
       />
     ),
@@ -1015,7 +1026,7 @@ export const cases: readonly Case[] = [
           timePrecision: 'minute',
           showActionsBar: true,
           dayPickerProps: {
-            formatters: { formatWeekdayName: intlWeekdayName },
+            formatters: { formatWeekdayName: blueprintWeekdayName },
           },
           onChange: ignore,
         }),
@@ -1026,6 +1037,7 @@ export const cases: readonly Case[] = [
         showActionsBar
         timePrecision={'minute'}
         value={constant('2026-10-15T10:20')}
+        weekdayNames={WEEKDAY_NAMES}
         onChange={ignore}
       />
     ),
@@ -1046,7 +1058,7 @@ export const cases: readonly Case[] = [
           })),
           selectedShortcutIndex: 1,
           dayPickerProps: {
-            formatters: { formatWeekdayName: intlWeekdayName },
+            formatters: { formatWeekdayName: blueprintWeekdayName },
           },
           onChange: ignore,
         }),
@@ -1064,6 +1076,7 @@ export const cases: readonly Case[] = [
         }))}
         timePrecision={'minute'}
         value={constant('2026-10-15T23:59')}
+        weekdayNames={WEEKDAY_NAMES}
         onChange={ignore}
       />
     ),
@@ -1845,7 +1858,7 @@ export const cases: readonly Case[] = [
           value: blueprintDate('2026-10-15T00:00'),
           reverseMonthAndYearMenus: true,
           dayPickerProps: {
-            formatters: { formatWeekdayName: intlWeekdayName },
+            formatters: { formatWeekdayName: blueprintWeekdayName },
           },
           onChange: ignore,
         }),
@@ -1855,6 +1868,7 @@ export const cases: readonly Case[] = [
       <DatePicker
         reverseMonthAndYearMenus
         value={constant('2026-10-15')}
+        weekdayNames={WEEKDAY_NAMES}
         onChange={ignore}
       />
     ),

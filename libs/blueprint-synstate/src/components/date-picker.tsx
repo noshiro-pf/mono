@@ -25,6 +25,7 @@ import {
   withDayOf,
   type TimePrecision,
   type WallClock,
+  type WeekdayNames,
 } from '../date/index.mjs';
 import { Calendar } from './calendar-parts.js';
 import { MenuItem } from './menu-item.js';
@@ -72,6 +73,11 @@ export type DatePickerOptions = Readonly<{
   maxDate?: string;
   /** The first day of each week drawn, 0 for Sunday (the default) to 6. */
   weekStartsOn?: number;
+  /**
+   * The heads of the weekday columns, Sunday first whatever `weekStartsOn` is;
+   * `Intl`'s short names in `locale` if omitted. See {@link WeekdayNames}.
+   */
+  weekdayNames?: WeekdayNames;
   /** Whether pressing the selected day again clears it, and 「クリア」 is offered. */
   canClearSelection?: boolean;
   /** The bar of the today and clear buttons under the calendar. */
@@ -134,6 +140,7 @@ export const DatePicker = ({
   minDate,
   maxDate,
   weekStartsOn = 0,
+  weekdayNames,
   canClearSelection = true,
   showActionsBar = false,
   todayButtonText = 'Today',
@@ -148,7 +155,8 @@ export const DatePicker = ({
 }: Props): JSX.Element => {
   const labels = { ...DEFAULT_DATE_PICKER_LABELS, ...labelOverrides } as const;
 
-  const names = calendarNames(locale);
+  // Read once, as `locale` is: a picker keeps the names it was drawn with.
+  const names = calendarNames(locale, weekdayNames);
 
   const today = now();
 

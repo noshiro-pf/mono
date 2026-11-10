@@ -353,6 +353,32 @@ describe(DateInput, () => {
     unmount();
   });
 
+  test('passes the weekday heads on to its calendar', async () => {
+    fixNow();
+
+    const { value$, onChange } = controlled('');
+
+    const { container, unmount } = mountInto(() => (
+      <DateInput
+        {...RANGE}
+        value={value$}
+        weekdayNames={['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa']}
+        onChange={onChange}
+      />
+    ));
+
+    one<HTMLInputElement>(container, 'input').focus();
+
+    await settle();
+
+    assert.deepStrictEqual(
+      all(container, 'th.rdp-head_cell').map((th) => th.textContent),
+      ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'],
+    );
+
+    unmount();
+  });
+
   test('Escape closes the calendar without reaching the page', async () => {
     fixNow();
 

@@ -92,6 +92,33 @@ describe(DatePicker, () => {
     unmount();
   });
 
+  test('heads the weekdays with the names given, reading out the full ones', () => {
+    fixNow();
+
+    const { value$, onChange } = controlled('2026-10-09');
+
+    const { container, unmount } = mountInto(() => (
+      <DatePicker
+        {...RANGE}
+        value={value$}
+        weekStartsOn={1}
+        weekdayNames={['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa']}
+        onChange={onChange}
+      />
+    ));
+
+    const heads = all(container, 'th.rdp-head_cell');
+
+    assert.deepStrictEqual(
+      heads.map((th) => th.textContent),
+      ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'],
+    );
+
+    assert.strictEqual(heads[0]?.getAttribute('aria-label'), 'Monday');
+
+    unmount();
+  });
+
   test('picking a day keeps the time, and picking it again clears it', async () => {
     fixNow();
 
