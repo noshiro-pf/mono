@@ -23,12 +23,10 @@ import { parse } from 'yaml';
 export const readWorkflowJobs = (
   text: string,
 ): Result<readonly WorkflowJob[], string> => {
-  const parsed = Result.fromThrowable((): unknown => parse(text));
+  const parsed = parseWorkflow(text);
 
   if (Result.isErr(parsed)) {
-    return Result.err(
-      `not YAML this reads: ${unknownToString(parsed.value).split('\n', 1)[0] ?? ''}`,
-    );
+    return parsed;
   }
 
   const workflow = parsed.value;
@@ -61,11 +59,18 @@ export const readWorkflowJobs = (
 
       const uses = record['uses'];
 
+      const needs = record['needs'];
+
       return {
         name,
         displayName: isString(displayName) ? displayName : undefined,
         uses: isString(uses) ? uses : undefined,
         condition: scalarText(record['if']),
+        needs: isString(needs)
+          ? [needs]
+          : Arr.isArray(needs)
+            ? needs.filter(isString)
+            : [],
         matrix: isRecord(strategy) ? strategy['matrix'] : undefined,
         env: { ...workflowEnv, ...readEnv(record['env']) },
         steps: Arr.isArray(steps)
@@ -93,6 +98,25 @@ export const readWorkflowJobs = (
     }),
   );
 };
+
+/**
+ * The events a workflow's `on:` names, however it is written: one event, a
+ * list, or a mapping of each to its filters.
+ */
+export const readWorkflowTriggers = (
+  text: string,
+): Result<readonly string[], string> =>
+  Result.map(parseWorkflow(text), (workflow) => {
+    const on = isRecord(workflow) ? workflow['on'] : undefined;
+
+    return isString(on)
+      ? [on]
+      : Arr.isArray(on)
+        ? on.filter(isString)
+        : isRecord(on)
+          ? Object.keys(on)
+          : [];
+  });
 
 /**
  * A job's matrix: the entries under `include:`, each property as a string
@@ -210,6 +234,8 @@ export type WorkflowJob = Readonly<{
   uses: string | undefined;
   /** The job's `if:` as written, a folded one joined; absent without one. */
   condition: string | undefined;
+  /** The jobs its `needs:` names, one or a list. */
+  needs: readonly string[];
   /** `strategy.matrix` as written: a mapping, an expression, or absent. */
   matrix: unknown;
   /** The workflow's `env:` and the job's, the job's taking precedence. */
@@ -240,6 +266,16 @@ const MATRIX_REFERENCE = /^\$\{\{\s*matrix\.(?<key>[\w-]+)\s*\}\}$/u;
 
 const VARIABLE_REFERENCE =
   /^\$(?:\{(?<braced>[A-Za-z_]\w*)\}|(?<bare>[A-Za-z_]\w*))$/u;
+
+const parseWorkflow = (text: string): Result<unknown, string> => {
+  const parsed = Result.fromThrowable((): unknown => parse(text));
+
+  return Result.isErr(parsed)
+    ? Result.err(
+        `not YAML this reads: ${unknownToString(parsed.value).split('\n', 1)[0] ?? ''}`,
+      )
+    : parsed;
+};
 
 /** The `defaults.run.working-directory` of a workflow or a job. */
 const defaultDirectory = (

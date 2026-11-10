@@ -42,6 +42,13 @@ name: Node.js Support Update
 # `merge-queued` here as pnpm-update.yml does — and the split becomes
 # necessary. `close-obsolete`, after it, holds `GITHUB_TOKEN` alone and runs
 # nothing but `gh`.
+#
+# `update` runs on the default branch only. A dispatch on any other ref skips
+# it, and `close-obsolete` with it: `update` would otherwise rebuild
+# `chore/node-support-update` on that ref's commits and open them into `main`
+# with auto-merge armed, reading as a refresh, and queueing it would merge them
+# with nobody having reviewed them (`check:root:dispatch-default-branch`).
+# `canary` pushes nothing, so it runs on any ref.
 
 on:
   schedule:
@@ -178,6 +185,10 @@ jobs:
           fi
 
   update:
+    # The default branch only; see the header. A tag is not a branch, so the
+    # full ref is compared.
+    if: >-
+      github.ref == format('refs/heads/{0}', case(github.event.repository.default_branch != '', github.event.repository.default_branch, 'main'))
     runs-on: ubuntu-latest
     timeout-minutes: 15
 
@@ -305,10 +316,10 @@ jobs:
   # close it: every later run finds nothing to do either. Closed rather than
   # pushed `main`'s tip, which would leave an empty pull request open.
   #
-  # Only on the default branch: a run dispatched on another ref finds that
-  # ref's tree up to date, which says nothing about `main`'s. A refresh that
-  # failed fails `update`, which skips this job, so a nodejs.org outage closes
-  # nothing.
+  # Only on the default branch, as `update` is, whose skip skips this job: a run
+  # dispatched on another ref would find that ref's tree up to date, which says
+  # nothing about `main`'s. A refresh that failed fails `update`, which skips
+  # this job, so a nodejs.org outage closes nothing.
   #
   # `gh` alone, no checkout: nothing from the tree runs here. `GITHUB_TOKEN`
   # rather than the App token, because a close needs to trigger no workflow.
@@ -319,9 +330,7 @@ jobs:
   # not come off is a warning, since the close is what matters.
   close-obsolete:
     needs: update
-    if: >-
-      needs.update.outputs.changed == 'false' &&
-      github.ref_name == case(github.event.repository.default_branch != '', github.event.repository.default_branch, 'main')
+    if: needs.update.outputs.changed == 'false'
     runs-on: ubuntu-latest
     timeout-minutes: 5
 
