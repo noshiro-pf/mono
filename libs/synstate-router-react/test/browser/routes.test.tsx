@@ -1,7 +1,7 @@
 import { act, render } from '@testing-library/react';
 import * as React from 'react';
 import { asSafeInt, expectType, type SafeInt } from 'ts-data-forge';
-import { routes, setup } from './fixture.js';
+import { nextTask, routes, setup, setupWithDocument } from './fixture.js';
 
 /**
  * The same element type for every page, so that only the key can make React
@@ -10,6 +10,31 @@ import { routes, setup } from './fixture.js';
 const page = (label: string): React.JSX.Element => (
   <p data-testid="page">{label}</p>
 );
+
+/** A page whose module comes when `load` is called. */
+const lazyPage = (): Readonly<{
+  Page: React.LazyExoticComponent<() => React.JSX.Element>;
+  load: () => void;
+}> => {
+  const mut_load = { current: (): void => {} };
+
+  const loaded = new Promise<void>((resolve) => {
+    mut_load.current = resolve;
+  });
+
+  const Page = React.lazy(async () => {
+    await loaded;
+
+    return { default: () => <h2 id="install">Install</h2> };
+  });
+
+  return {
+    Page,
+    load: () => {
+      mut_load.current();
+    },
+  };
+};
 
 describe('Routes', () => {
   test('draws the case of the page, with its params and search', () => {
@@ -259,5 +284,104 @@ describe('Routes', () => {
 
     // Before the frame: the layout effect made it.
     assert.deepStrictEqual(browser.scrolls(), ['top']);
+  });
+
+  describe('a fragment on a page that React.lazy loads', () => {
+    const otherCases = {
+      home: () => 'home',
+      products: () => 'products',
+      'products.new': undefined,
+      'products.item': undefined,
+      drafts: undefined,
+    } as const;
+
+    test('is scrolled to once the page draws it, with Suspense inside the case', async () => {
+      const { Page, load } = lazyPage();
+
+      const {
+        router,
+        browser,
+        bound: { Routes },
+      } = setupWithDocument('/');
+
+      const view = render(
+        <Routes
+          cases={{
+            ...otherCases,
+            settings: () => (
+              <React.Suspense fallback={<p>loading</p>}>
+                <Page />
+              </React.Suspense>
+            ),
+          }}
+        />,
+      );
+
+      act(() => {
+        router.push(routes.settings.href({ hash: 'install' }));
+      });
+
+      // The commit has the fallback alone.
+      view.getByText('loading');
+
+      assert.deepStrictEqual(browser.scrolls(), []);
+
+      await act(async () => {
+        load();
+
+        await nextTask();
+      });
+
+      view.getByText('Install');
+
+      assert.deepStrictEqual(browser.scrolls(), ['#install']);
+
+      view.unmount();
+
+      router.dispose();
+    });
+
+    test('is scrolled to once the page draws it, with Suspense around Routes', async () => {
+      const { Page, load } = lazyPage();
+
+      const {
+        router,
+        browser,
+        bound: { Routes },
+      } = setupWithDocument('/');
+
+      const view = render(
+        <React.Suspense fallback={<p>loading</p>}>
+          <Routes
+            cases={{
+              ...otherCases,
+              settings: () => <Page />,
+            }}
+          />
+        </React.Suspense>,
+      );
+
+      act(() => {
+        router.push(routes.settings.href({ hash: 'install' }));
+      });
+
+      view.getByText('loading');
+
+      assert.deepStrictEqual(browser.scrolls(), []);
+
+      await act(async () => {
+        load();
+
+        await nextTask();
+      });
+
+      view.getByText('Install');
+
+      assert.deepStrictEqual(browser.scrolls(), ['#install']);
+
+      view.unmount();
+
+      router.dispose();
+    });
   });
 });

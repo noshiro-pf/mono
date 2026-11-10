@@ -43,6 +43,45 @@ export const globalBrowser = (): RouterBrowser =>
 
       return element !== null;
     },
+    observeDocument: ({ changed, userScrolled }) => {
+      const observer = new MutationObserver(() => {
+        changed();
+      });
+
+      // An element added, or an id given to one already there.
+      observer.observe(document, {
+        childList: true,
+        subtree: true,
+        attributeFilter: ['id'],
+      });
+
+      // What starts a scroll of the user's own: the scroll event itself fires
+      // for the router's scrolls too. A key or a pointer press that scrolls
+      // nothing gives the fragment up as well, which only leaves a page where
+      // the user put it.
+      const scrollStarts = ['wheel', 'touchmove', 'keydown', 'pointerdown'];
+
+      const onScrollStart = (): void => {
+        userScrolled();
+      };
+
+      for (const type of scrollStarts) {
+        globalThis.addEventListener(type, onScrollStart, {
+          capture: true,
+          passive: true,
+        });
+      }
+
+      return () => {
+        observer.disconnect();
+
+        for (const type of scrollStarts) {
+          globalThis.removeEventListener(type, onScrollStart, {
+            capture: true,
+          });
+        }
+      };
+    },
     // The browser's own restore, or the app's when it set
     // `history.scrollRestoration` to 'manual': either way not the router's.
     restoresScroll: () =>
