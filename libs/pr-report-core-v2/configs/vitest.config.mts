@@ -4,8 +4,6 @@ import { defineViteConfig } from '../../../tools/configs/vite-config.mjs';
 
 export default defineViteConfig({
   packageRoot: projectRootPath,
-  // Nothing here has behavior of its own yet: the snapshot is types only.
-  passWithNoTests: true,
   coverage: {
     include: ['src/**/*.mts'],
   },
