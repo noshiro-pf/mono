@@ -1,7 +1,7 @@
 {
   "name": "synstate-react-hooks-compat",
   "version": "8.0.0",
-  "description": "SynState React hooks for React 16.8–17 (without useSyncExternalStore)",
+  "description": "SynState React hooks for React 16.8–17, through React's use-sync-external-store shim",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/noshiro-pf/mono.git",
@@ -59,9 +59,11 @@
     "z:vitest:node": "pnpm run z:vitest --project='Node.js'"
   },
   "dependencies": {
+    "@types/use-sync-external-store": "^1.7.0",
     "synstate": "workspace:*",
     "ts-data-forge": "workspace:^",
-    "ts-type-forge": "workspace:^"
+    "ts-type-forge": "workspace:^",
+    "use-sync-external-store": "^1.7.0"
   },
   "devDependencies": {
     "@testing-library/dom": "catalog:",

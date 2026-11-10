@@ -28,6 +28,7 @@ export default defineViteConfig({
       'react-dom',
       'react-dom/client',
       'react-dom/server',
+      'use-sync-external-store/shim',
     ],
   },
 });

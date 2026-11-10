@@ -256,7 +256,7 @@ React 16.8–17（`useSyncExternalStore` なし）を使用している場合は
 npm add synstate-react-hooks-compat
 ```
 
-このパッケージは `synstate-react-hooks` と**同じ API** を提供しますが、内部で `useState` + `useEffect` を使用します。import を変更するだけで使えます：
+このパッケージは `synstate-react-hooks` と**同じ API** を提供しますが、observable を React 公式の React 16.8・17 向け `useSyncExternalStore` である [`use-sync-external-store/shim`](https://www.npmjs.com/package/use-sync-external-store) で読みます。import を変更するだけで使えます：
 
 ```tsx
 import { createState } from 'synstate-react-hooks-compat';
