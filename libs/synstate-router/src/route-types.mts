@@ -7,14 +7,25 @@ import type {
   routeNodeKey,
   routeTreeKey,
 } from './internal/index.mjs';
+import type { RestSegments } from './param-codec.mjs';
 import type { SearchParseResult } from './search-codec.mjs';
 
 // Definition: what the application writes
 
 /** Any path parameter codec, whatever its value type. */
-export type AnyParamCodec = Readonly<{
+export type AnyParamCodec = AnySegmentParamCodec | AnyRestParamCodec;
+
+/** Any codec of one path segment. */
+export type AnySegmentParamCodec = Readonly<{
   decode: (raw: string) => Optional<unknown>;
   encode: (value: never) => string;
+}>;
+
+/** Any codec of the rest of the path (`param.rest`). */
+export type AnyRestParamCodec = Readonly<{
+  rest: true;
+  decode: (segments: RestSegments) => Optional<unknown>;
+  encode: (value: never) => RestSegments;
 }>;
 
 /** Any search codec, whatever its value type. */
@@ -80,7 +91,17 @@ type IsInvalidKey<K extends string> = K extends ReservedRouteKey | ''
 
 type ValidateRoute<D> = ValidateParams<D> &
   ValidateSegment<D> &
+  ValidateRest<D> &
   ValidateChildren<D>;
+
+type ValidateRest<D> =
+  D extends Readonly<{ params: infer P; children: unknown }>
+    ? P[keyof P] extends Readonly<{ rest: true }>
+      ? Readonly<{
+          children: 'synstate-router: a param.rest node ends its branch and has no children';
+        }>
+      : unknown
+    : unknown;
 
 type ValidateParams<D> =
   D extends Readonly<{ params: infer P }>
@@ -116,7 +137,11 @@ type ValidateChildren<D> =
 type EmptyRecord = ReadonlyRecord<never, never>;
 
 type ParamValue<C> =
-  C extends Readonly<{ encode: (value: infer T) => string }> ? T : never;
+  C extends Readonly<{
+    encode: (value: infer T) => string | RestSegments;
+  }>
+    ? T
+    : never;
 
 type SearchValue<C> =
   C extends Readonly<{
@@ -141,7 +166,9 @@ type OwnSearchCodecs<D> =
 
 type OwnSegment<K extends string, D> =
   D extends Readonly<{ params: infer P }>
-    ? `:${keyof P & string}`
+    ? P[keyof P] extends Readonly<{ rest: true }>
+      ? `:${keyof P & string}*`
+      : `:${keyof P & string}`
     : D extends Readonly<{ segment: infer S extends string }>
       ? S
       : K;
