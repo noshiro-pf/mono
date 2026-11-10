@@ -145,6 +145,7 @@ strict-lib generators, which rewrite thousands of files, are
 `strict-lib-gen.yml`'s, and so are the harnesses' own type checks
 (`ws:check:types:strict-lib`, each TypeScript minor over its generated lib).
 Browser tests, end-to-end tests, the Firestore rules tests (`check:test:rules`,
-which need Java), `ws:check:dist` and `check:forgotten-exports` are not run, nor
-is `check:cspell` over the whole tree, so a `words` entry that the diff made
-dead is not found.
+which need Java; a diff touching a package's `firestore.rules`, `test/` or rules
+config prints a note naming the command, `rules-tests.mts`), `ws:check:dist` and
+`check:forgotten-exports` are not run, nor is `check:cspell` over the whole
+tree, so a `words` entry that the diff made dead is not found.
