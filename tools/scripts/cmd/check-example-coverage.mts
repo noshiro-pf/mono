@@ -1,17 +1,9 @@
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
-import {
-  Arr,
-  hasKey,
-  isRecord,
-  isString,
-  Obj,
-  Optional,
-  Result,
-  unknownToString,
-} from 'ts-data-forge';
+import { Arr, Result, unknownToString } from 'ts-data-forge';
 import { glob, isDirectlyExecuted } from 'ts-repo-utils';
 import type { ReadonlyRecord } from 'ts-type-forge';
+import { readScripts } from '../lib/manifest-scripts.mjs';
 import { listLibraryDirs } from '../lib/repo-files.mjs';
 
 /**
@@ -189,32 +181,14 @@ const readFileOrUndefined = async (
   return Result.isErr(result) ? undefined : result.value;
 };
 
-const readScripts = async (
+const readPackageScripts = async (
   packageDir: string,
 ): Promise<ReadonlyRecord<string, string> | undefined> => {
   const text = await readFileOrUndefined(
     path.resolve(packageDir, 'package.json'),
   );
 
-  if (text === undefined) {
-    return undefined;
-  }
-
-  const parsed: unknown = JSON.parse(text);
-
-  if (!isRecord(parsed) || !hasKey(parsed, 'scripts')) {
-    return undefined;
-  }
-
-  const scripts: unknown = parsed.scripts;
-
-  if (!isRecord(scripts)) {
-    return undefined;
-  }
-
-  return Obj.filterMap(scripts, (value) =>
-    isString(value) ? Optional.some(value) : Optional.none,
-  );
+  return text === undefined ? undefined : readScripts(JSON.parse(text));
 };
 
 const fileExists = async (filePath: string): Promise<boolean> =>
@@ -255,7 +229,7 @@ const findWiringViolation = async (
     };
   }
 
-  const scripts = await readScripts(packageDir);
+  const scripts = await readPackageScripts(packageDir);
 
   const docScript = scripts?.['doc'];
 

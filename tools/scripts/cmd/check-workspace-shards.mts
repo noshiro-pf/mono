@@ -4,7 +4,7 @@ import { Arr, hasKey, Json, Result, unknownToString } from 'ts-data-forge';
 import { getWorkspacePackages, isDirectlyExecuted } from 'ts-repo-utils';
 import type { ReadonlyRecord } from 'ts-type-forge';
 import { readScripts } from '../lib/manifest-scripts.mjs';
-import { readPnpmRun } from '../lib/pnpm-command.mjs';
+import { isFilterFlag, readPnpmRun } from '../lib/pnpm-command.mjs';
 import { readShellCommands } from '../lib/shell-commands.mjs';
 import { projectRootPath } from '../project-root-path.mjs';
 
@@ -33,19 +33,38 @@ import { projectRootPath } from '../project-root-path.mjs';
  */
 export const checkWorkspaceShards = (): Promise<Result<CheckSummary, string>> =>
   Result.safeTry(async function* () {
-    const [scripts, packages] = await Promise.all([
-      readRootScripts(),
+    const [file, packages] = await Promise.all([
+      readRootManifest(),
       getWorkspacePackages(projectRootPath),
     ]);
 
-    const families = groupFamilies(
-      readFilteredRuns(yield* Result.safeUnwrap(scripts)),
+    const scripts = yield* Result.safeUnwrap(
+      readRootScripts(yield* Result.safeUnwrap(file)),
     );
 
-    const violations = findShardViolations(
-      families,
-      new Set<string>(packages.map((pkg) => pkg.name)),
-    );
+    const families = groupFamilies(readFilteredRuns(scripts));
+
+    const violations = [
+      ...findUnreadRuns(
+        scripts,
+        new Set<string>([
+          ...Object.keys(scripts),
+          ...packages.flatMap((pkg) =>
+            Object.keys(readScripts(pkg.packageJson)),
+          ),
+        ]),
+      ),
+      ...findStaleNotShards(scripts, NOT_SHARDS),
+      ...findShardViolations(
+        families,
+        new Set<string>(packages.map((pkg) => pkg.name)),
+      ),
+    ] as const;
+
+    // The unread runs name the cause when no family is found because of them.
+    if (Arr.isNonEmpty(violations)) {
+      return Result.err(formatViolations(violations));
+    }
 
     if (!Arr.isNonEmpty(families)) {
       return Result.err(
@@ -53,12 +72,10 @@ export const checkWorkspaceShards = (): Promise<Result<CheckSummary, string>> =>
       );
     }
 
-    return Arr.isNonEmpty(violations)
-      ? Result.err(formatViolations(violations))
-      : Result.ok({
-          families: families.length,
-          shards: families.reduce((sum, { runs }) => sum + runs.length, 0),
-        });
+    return Result.ok({
+      families: families.length,
+      shards: families.reduce((sum, { runs }) => sum + runs.length, 0),
+    });
   });
 
 /**
@@ -84,6 +101,95 @@ export const readFilteredRuns = (
         }
       }),
     );
+
+/**
+ * One message per filtered `pnpm` command of a root script that is not read as
+ * a run, so that a shard written another way is not skipped in silence: one
+ * `readPnpmRun` does not read (an implicit run, `pnpm recursive run`,
+ * `pnpm test`, a value flag it does not know before `run`) and that names no
+ * other pnpm command; and one it reads whose script neither the root nor a
+ * workspace package defines, which is what a value flag it does not know after
+ * `run` leaves.
+ * {@link NOT_SHARDS} entries are skipped, as {@link readFilteredRuns} skips them.
+ */
+export const findUnreadRuns = (
+  scripts: ReadonlyRecord<string, string>,
+  packageScripts: ReadonlySet<string>,
+): readonly string[] =>
+  Object.entries(scripts)
+    .filter(([scriptName]) => !hasKey(NOT_SHARDS, scriptName))
+    .flatMap(([scriptName, body]) =>
+      Arr.generate(function* () {
+        for (const words of readShellCommands(body).commands) {
+          if (words[0] !== 'pnpm' || !words.some(isFilterFlag)) {
+            continue;
+          }
+
+          const run = readPnpmRun(words);
+
+          if (run === undefined) {
+            if (words.every((word) => !PNPM_COMMANDS.has(word))) {
+              yield `\`${scriptName}\` runs \`${words.join(' ')}\`, a filtered pnpm command this guard does not read as a run; write it as \`pnpm run [flags] <script>\`.`;
+            }
+          } else if (!packageScripts.has(run.script)) {
+            yield `\`${scriptName}\` runs \`${run.script}\` in the packages it filters, which no workspace package defines as a script; a pnpm flag this guard does not know may have taken its value as the script.`;
+          }
+        }
+      }),
+    );
+
+/**
+ * One message per {@link NOT_SHARDS} entry that no longer applies: its script
+ * is gone, or runs no filtered `pnpm run`. Either way it would go on exempting
+ * whatever that script runs later.
+ */
+export const findStaleNotShards = (
+  scripts: ReadonlyRecord<string, string>,
+  notShards: ReadonlyRecord<string, string>,
+): readonly string[] =>
+  Object.keys(notShards).flatMap((scriptName) => {
+    const body = scripts[scriptName];
+
+    if (body === undefined) {
+      return [
+        `NOT_SHARDS names \`${scriptName}\`, which the root package.json no longer has; remove it from the list.`,
+      ];
+    }
+
+    const filtered = readShellCommands(body).commands.some((words) =>
+      Arr.isNonEmpty(readPnpmRun(words)?.filters ?? []),
+    );
+
+    return filtered
+      ? []
+      : [
+          `NOT_SHARDS names \`${scriptName}\`, which no longer runs a filtered \`pnpm run\`; remove it from the list.`,
+        ];
+  });
+
+/**
+ * The root manifest's scripts, from its text; an error that says so when there
+ * are none, rather than the "no family found" that would follow.
+ */
+export const readRootScripts = (
+  manifestText: string,
+): Result<ReadonlyRecord<string, string>, string> => {
+  const manifest = Json.parse(manifestText);
+
+  if (Result.isErr(manifest)) {
+    return Result.err(
+      `Failed to parse package.json: ${unknownToString(manifest.value)}`,
+    );
+  }
+
+  const scripts = readScripts(manifest.value);
+
+  return Arr.isNonEmpty(Object.keys(scripts))
+    ? Result.ok(scripts)
+    : Result.err(
+        '❌ The root package.json has no `scripts` (or none that is a string), so there are no shards to read.',
+      );
+};
 
 /**
  * The runs grouped into families: the same target, from scripts that share
@@ -147,6 +253,56 @@ const NOT_SHARDS: ReadonlyRecord<string, string> = {
 } as const;
 
 const isExclusion = (filter: string): boolean => filter.startsWith('!');
+
+/**
+ * pnpm's own commands, which a filtered command that is not a `pnpm run` may be
+ * (`pnpm update --filter …`): one that names none of them is read as a script
+ * run this guard does not read.
+ */
+const PNPM_COMMANDS: ReadonlySet<string> = new Set<string>([
+  'add',
+  'approve-builds',
+  'audit',
+  'bin',
+  'config',
+  'create',
+  'dedupe',
+  'deploy',
+  'dlx',
+  'doctor',
+  'env',
+  'exec',
+  'fetch',
+  'i',
+  'import',
+  'init',
+  'install',
+  'install-test',
+  'licenses',
+  'link',
+  'list',
+  'll',
+  'ls',
+  'outdated',
+  'pack',
+  'patch',
+  'patch-commit',
+  'prune',
+  'publish',
+  'rebuild',
+  'remove',
+  'rm',
+  'root',
+  'setup',
+  'store',
+  'un',
+  'uninstall',
+  'unlink',
+  'up',
+  'update',
+  'upgrade',
+  'why',
+]);
 
 /**
  * Whether a selector is a bare package name rather than a path (`./apps/**`), a
@@ -249,27 +405,15 @@ function* familyViolations(
   }
 }
 
-const readRootScripts = async (): Promise<
-  Result<ReadonlyRecord<string, string>, string>
-> => {
+const readRootManifest = async (): Promise<Result<string, string>> => {
   const file = await Result.fromPromise(
     // eslint-disable-next-line security/detect-non-literal-fs-filename
     fs.readFile(path.join(projectRootPath, 'package.json'), 'utf8'),
   );
 
-  if (Result.isErr(file)) {
-    return Result.err(
-      `Failed to read package.json: ${unknownToString(file.value)}`,
-    );
-  }
-
-  const manifest = Json.parse(file.value);
-
-  return Result.isErr(manifest)
-    ? Result.err(
-        `Failed to parse package.json: ${unknownToString(manifest.value)}`,
-      )
-    : Result.ok(readScripts(manifest.value));
+  return Result.isErr(file)
+    ? Result.err(`Failed to read package.json: ${unknownToString(file.value)}`)
+    : file;
 };
 
 const formatViolations = (violations: readonly string[]): string =>

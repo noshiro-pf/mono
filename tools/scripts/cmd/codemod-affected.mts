@@ -4,7 +4,6 @@ import {
   Arr,
   hasKey,
   isRecord,
-  isString,
   Json,
   Result,
   unknownToString,
@@ -14,8 +13,9 @@ import {
   getUntrackedFiles,
   isDirectlyExecuted,
 } from 'ts-repo-utils';
-import type { MutableFixedLengthTuple, ReadonlyRecord } from 'ts-type-forge';
+import type { ReadonlyRecord } from 'ts-type-forge';
 import { resolveDiffBase } from '../lib/diff-base.mjs';
+import { readScripts } from '../lib/manifest-scripts.mjs';
 import { readRepositoryFile } from '../lib/repo-files.mjs';
 import { projectRootPath } from '../project-root-path.mjs';
 
@@ -156,26 +156,21 @@ const resolveBase = (): Result<string | undefined, string> => {
   }
 };
 
-const readScripts = (
+/**
+ * A manifest's scripts, from its text; undefined when it is not JSON or has no
+ * `scripts` object, which is not the same as having none.
+ */
+const readManifestScripts = (
   json: string,
 ): ReadonlyRecord<string, string> | undefined => {
   const parsed = Json.parse(json);
 
-  if (
-    Result.isErr(parsed) ||
-    !isRecord(parsed.value) ||
-    !hasKey(parsed.value, 'scripts') ||
-    !isRecord(parsed.value.scripts)
-  ) {
-    return undefined;
-  }
-
-  return Object.fromEntries(
-    Object.entries(parsed.value.scripts).filter(
-      (entry): entry is MutableFixedLengthTuple<2, string> =>
-        isString(entry[1]),
-    ),
-  );
+  return Result.isOk(parsed) &&
+    isRecord(parsed.value) &&
+    hasKey(parsed.value, 'scripts') &&
+    isRecord(parsed.value.scripts)
+    ? readScripts(parsed.value)
+    : undefined;
 };
 
 const listInputDirs = (): Result<readonly string[], string> => {
@@ -230,7 +225,7 @@ const decide = (
 
     const inputDirs = yield* Result.safeUnwrap(listInputDirs());
 
-    const headScripts = readScripts(
+    const headScripts = readManifestScripts(
       yield* Result.safeUnwrap(await readRepositoryFile('package.json')),
     );
 
@@ -247,7 +242,7 @@ const decide = (
         ),
         inputDirs,
         baseScripts: Result.isOk(baseJson)
-          ? readScripts(baseJson.value)
+          ? readManifestScripts(baseJson.value)
           : undefined,
         headScripts,
       }),

@@ -1,15 +1,9 @@
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
-import {
-  Arr,
-  hasKey,
-  isRecord,
-  isString,
-  Result,
-  unknownToString,
-} from 'ts-data-forge';
+import { Arr, hasKey, isString, Result, unknownToString } from 'ts-data-forge';
 import { getWorkspacePackages, isDirectlyExecuted } from 'ts-repo-utils';
-import type { MutableFixedLengthTuple, ReadonlyRecord } from 'ts-type-forge';
+import type { ReadonlyRecord } from 'ts-type-forge';
+import { readScripts } from '../lib/manifest-scripts.mjs';
 import { projectRootPath } from '../project-root-path.mjs';
 
 /**
@@ -26,14 +20,14 @@ import { projectRootPath } from '../project-root-path.mjs';
 export const checkDepsBuiltGuard = async (): Promise<
   Result<number, string>
 > => {
-  const rootScripts = await readScripts(projectRootPath);
+  const rootScripts = await readPackageScripts(projectRootPath);
 
   const members = await getWorkspacePackages(projectRootPath);
 
   const memberOffenders = await Promise.all(
     members.map(async (member) =>
       findUnguardedScripts({
-        scripts: await readScripts(member.path),
+        scripts: await readPackageScripts(member.path),
         names: memberScripts,
         guard: `node ${path.relative(member.path, guardPath)}`,
       }).map(
@@ -233,31 +227,15 @@ const rootPackageScripts = [
   'check:root:lint',
 ] as const;
 
-const readScripts = async (
+const readPackageScripts = async (
   packageDir: string,
-): Promise<ReadonlyRecord<string, string>> => {
-  const manifest: unknown = JSON.parse(
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
-    await fs.readFile(path.join(packageDir, 'package.json'), 'utf8'),
-  );
-
-  if (!isRecord(manifest) || !hasKey(manifest, 'scripts')) {
-    return {};
-  }
-
-  const { scripts } = manifest;
-
-  if (!isRecord(scripts)) {
-    return {};
-  }
-
-  return Object.fromEntries(
-    Object.entries(scripts).filter(
-      (entry): entry is MutableFixedLengthTuple<2, string> =>
-        isString(entry[1]),
+): Promise<ReadonlyRecord<string, string>> =>
+  readScripts(
+    JSON.parse(
+      // eslint-disable-next-line security/detect-non-literal-fs-filename
+      await fs.readFile(path.join(packageDir, 'package.json'), 'utf8'),
     ),
   );
-};
 
 if (isDirectlyExecuted(import.meta.url)) {
   const result = await checkDepsBuiltGuard().catch((error: unknown) =>

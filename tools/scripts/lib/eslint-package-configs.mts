@@ -5,29 +5,25 @@ import { pathToFileURL } from 'node:url';
 import { Arr, hasKey, isRecord } from 'ts-data-forge';
 import type { ReadonlyRecord } from 'ts-type-forge';
 import { projectRootPath } from '../project-root-path.mjs';
+import { readScripts } from './manifest-scripts.mjs';
 import { isUnderExperimental } from './repo-files.mjs';
 
 /** The extensions ESLint lints in a package. */
 export const lintedExtensions = /\.(?:[cm]?[jt]s|[jt]sx)$/u;
 
 /** The `scripts` of the `package.json` in `dir`, relative to the root. */
-export const readScripts = async (
+export const readPackageScripts = async (
   dir: string,
-): Promise<ReadonlyRecord<string, unknown>> => {
-  const manifest: unknown = JSON.parse(
-    // eslint-disable-next-line security/detect-non-literal-fs-filename -- the package.json of a workspace member git lists
-    await fs.readFile(
-      path.resolve(projectRootPath, dir, 'package.json'),
-      'utf8',
+): Promise<ReadonlyRecord<string, string>> =>
+  readScripts(
+    JSON.parse(
+      // eslint-disable-next-line security/detect-non-literal-fs-filename -- the package.json of a workspace member git lists
+      await fs.readFile(
+        path.resolve(projectRootPath, dir, 'package.json'),
+        'utf8',
+      ),
     ),
   );
-
-  return isRecord(manifest) &&
-    hasKey(manifest, 'scripts') &&
-    isRecord(manifest.scripts)
-    ? manifest.scripts
-    : {};
-};
 
 /**
  * The packages `ws:fix:lint` reaches: every member with a `fix:lint`, from the
@@ -44,7 +40,7 @@ export const listLintedPackages = async (
 
   const withFixLint = await Promise.all(
     manifests.map(async (dir) =>
-      hasKey(await readScripts(dir), 'fix:lint') ? [dir] : [],
+      hasKey(await readPackageScripts(dir), 'fix:lint') ? [dir] : [],
     ),
   );
 

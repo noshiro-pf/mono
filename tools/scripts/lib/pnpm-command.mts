@@ -161,6 +161,10 @@ export type RunAllList = Readonly<{
   withArguments: readonly string[];
 }>;
 
+/** A `--filter` / `--filter-prod` / `-F` word, with its value or without. */
+export const isFilterFlag = (word: string): boolean =>
+  FILTER_FLAGS.has(splitFlag(word)[0]);
+
 /** `--flag=value` as its flag and value; a flag alone as itself. */
 const splitFlag = (word: string): readonly [string, string | undefined] => {
   const equals = word.indexOf('=');
