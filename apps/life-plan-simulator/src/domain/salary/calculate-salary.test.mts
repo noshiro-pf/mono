@@ -1,3 +1,4 @@
+import { monthlyWithholdingTax } from '../tax/index.mjs';
 import { parseYearMonthOr } from '../year-month/index.mjs';
 import { calculateSalary, resolveSalaryHistory } from './calculate-salary.mjs';
 
@@ -89,6 +90,67 @@ describe(calculateSalary, () => {
     assert.closeTo(withIdeco.bonusIncomeTax, taxableBonus * 0.040_84, 1e-6);
   });
 
+  test('前月の給与が無ければ、賞与の 1/12 を月額表に当てはめて 12 倍すること', () => {
+    const [bonusMonth] = calculateSalary(
+      {
+        history: salaryFrom('2027-01', 3_600_000, 3_000_000),
+        retirementMonth: ym('2030-12'),
+      },
+      [ym('2027-01')],
+    );
+
+    assert.isDefined(bonusMonth);
+
+    const taxableBonus =
+      3_000_000 -
+      bonusMonth.bonusHealthInsurance -
+      bonusMonth.bonusWelfarePension -
+      bonusMonth.bonusEmploymentInsurance;
+
+    // 算出率の表なら前月 0 円の 0% で 0 円になるところ。
+    assert.isAbove(bonusMonth.bonusIncomeTax, 0);
+
+    assert.strictEqual(
+      bonusMonth.bonusIncomeTax,
+      monthlyWithholdingTax(taxableBonus / 12) * 12,
+    );
+  });
+
+  test('賞与が前月の給与の 10 倍を超えれば、1/12 を前月の給与に足して月額表で求めること', () => {
+    const [december, bonusMonth] = calculateSalary(
+      {
+        history: salaryFrom('2025-01', 1_200_000, 2_000_000),
+        retirementMonth: ym('2030-12'),
+      },
+      [ym('2026-12'), ym('2027-01')],
+    );
+
+    assert.isDefined(december);
+
+    assert.isDefined(bonusMonth);
+
+    const previous =
+      december.grossAfterIdeco -
+      december.healthInsurance -
+      december.welfarePension -
+      december.employmentInsurance;
+
+    const taxableBonus =
+      2_000_000 -
+      bonusMonth.bonusHealthInsurance -
+      bonusMonth.bonusWelfarePension -
+      bonusMonth.bonusEmploymentInsurance;
+
+    assert.isAbove(taxableBonus, previous * 10);
+
+    assert.strictEqual(
+      bonusMonth.bonusIncomeTax,
+      (monthlyWithholdingTax(previous + taxableBonus / 12) -
+        monthlyWithholdingTax(previous)) *
+        12,
+    );
+  });
+
   test('標準報酬月額の上限より大きい賞与も標準賞与額で保険料を求めること', () => {
     const [bigBonusJanuary] = calculateSalary(
       {
@@ -175,3 +237,23 @@ const januaryWith = (idecoMonthly: number): SalaryMonthOf =>
     },
     [ym('2027-01')],
   )[0];
+
+/** A salary history of one entry, with no DC or iDeCo contribution. */
+const salaryFrom = (
+  start: string,
+  annualBase: number,
+  annualBonus: number,
+): ReturnType<typeof resolveSalaryHistory> =>
+  resolveSalaryHistory(
+    [
+      {
+        id: 1,
+        start,
+        annualBase,
+        companyDcMonthly: 0,
+        idecoMonthly: 0,
+        annualBonus,
+      },
+    ],
+    0,
+  );
