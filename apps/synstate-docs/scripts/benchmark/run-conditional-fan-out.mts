@@ -73,10 +73,12 @@ await runSeriesSweep({
       file: '05-conditional-fan-out.preact-signals.mts',
     },
   ],
-  // Result should be 0: selector=0, active branch=branch[0]=0
   prepare: scenarioModule(K, {
     updates: 3,
-    accepts: (result) => Number.isFinite(result),
+    // The selector stays 0 and only branch[1] is written, so the result is
+    // branch[0]'s initial 0 whatever k and B are. That catches a library that
+    // lets the inactive branch through, not one that computes nothing.
+    expected: () => 0,
   }),
   resultsFile: 'results-conditional-fan-out.md',
 });

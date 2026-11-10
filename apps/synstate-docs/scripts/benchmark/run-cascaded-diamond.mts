@@ -44,7 +44,12 @@ await runSeriesSweep({
   ],
   prepare: scenarioModule(K, {
     updates: 3,
-    accepts: (result) => result !== 0 && Number.isFinite(result),
+    // Each stage maps x to (x + 1) + (x + 2) = 2x + 3, so after the source's
+    // last write k, N stages give 2^N (k + 3) − 3: about 1.1e8 at K=100, N=20.
+    // Every stage's value is below the last, so the result being a safe
+    // integer, which `scenarioModule` checks, keeps them all exact; the product
+    // 2^N (k + 3) is a power of two times a small integer, exact as well.
+    expected: (k, depth) => 2 ** depth * (k + 3) - 3,
   }),
   resultsFile: 'results-cascaded-diamond.md',
 });
