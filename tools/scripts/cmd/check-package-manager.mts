@@ -2,7 +2,10 @@ import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import { Arr, hasKey, isRecord, Result, unknownToString } from 'ts-data-forge';
 import { glob, isDirectlyExecuted } from 'ts-repo-utils';
-import { readPnpmWorkspaceGlobs } from '../lib/workspace-globs.mjs';
+import {
+  memberManifestGlobs,
+  readPnpmWorkspaceGlobs,
+} from '../lib/workspace-globs.mjs';
 import { projectRootPath } from '../project-root-path.mjs';
 
 /**
@@ -75,10 +78,6 @@ export const findPackageManagerDeclarations = (
       return isRecord(parsed) && hasKey(parsed, 'packageManager');
     })
     .map(({ relativePath }) => relativePath);
-
-/** The `packages` globs of `pnpm-workspace.yaml`, as manifest paths. */
-const memberManifestGlobs = (globs: readonly string[]): readonly string[] =>
-  globs.map((g) => path.posix.join(g, 'package.json'));
 
 if (isDirectlyExecuted(import.meta.url)) {
   const result = await checkPackageManager().catch((error: unknown) =>

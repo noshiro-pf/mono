@@ -4,6 +4,7 @@ import * as path from 'node:path';
 import { Arr, isRecord, Result, unknownToString } from 'ts-data-forge';
 import { isDirectlyExecuted } from 'ts-repo-utils';
 import * as ts from 'typescript';
+import { readPnpmWorkspaceGlobs } from '../lib/workspace-globs.mjs';
 import { projectRootPath } from '../project-root-path.mjs';
 
 /**
@@ -78,8 +79,14 @@ export const checkKnipConfig = async (): Promise<Result<number, string>> => {
     return Result.err('❌ knip.jsonc `workspaces` is not an object.');
   }
 
+  const memberGlobs = await readPnpmWorkspaceGlobs();
+
+  if (Result.isErr(memberGlobs)) {
+    return Result.err(`❌ ${memberGlobs.value}`);
+  }
+
   const violations = Object.entries(workspaces).flatMap(([name, entry]) =>
-    collectNestedWorkspaceKeys(name, entry),
+    collectNestedWorkspaceKeys(memberGlobs.value, name, entry),
   );
 
   const keys = Object.keys(workspaces);
@@ -147,6 +154,32 @@ export const findUnusedWorkspaceKeys = (
         : isNormalized(key) && packageDirs.includes(key)),
   );
 
+/**
+ * Whether `key` lies under the top directory of one of the workspace member
+ * globs in `pnpm-workspace.yaml` (`libs/` for `libs/*`, `strict-lib/` for
+ * `strict-lib/v*`). knip's own workspace options are bare identifiers (`entry`,
+ * `project`, `ignore`, …) or plugin names; only a workspace key carries a `/`.
+ * Matching on the member globs keeps the rule narrow enough that a future knip
+ * option containing a slash would not trip it, and a top directory a new glob
+ * adds is covered without a list here to update.
+ */
+export const looksLikeWorkspacePath = (
+  memberGlobs: readonly string[],
+  key: string,
+): boolean => {
+  const [keyTop, ...keyRest] = key.split('/');
+
+  return (
+    keyTop !== undefined &&
+    Arr.isNonEmpty(keyRest) &&
+    memberGlobs.some((memberGlob) => {
+      const globTop = memberGlob.split('/', 1)[0];
+
+      return globTop !== undefined && path.posix.matchesGlob(keyTop, globTop);
+    })
+  );
+};
+
 const isPattern = (key: string): boolean => key.includes('*');
 
 /**
@@ -186,25 +219,15 @@ const findPackageDirs = async (
 
 type Violation = Readonly<{ owner: string; key: string }>;
 
-/**
- * knip's own workspace options are bare identifiers (`entry`, `project`,
- * `ignore`, …) or plugin names; only a workspace key carries a `/`. Matching on
- * the workspace globs in `pnpm-workspace.yaml` keeps the rule narrow enough
- * that a future knip option containing a slash would not trip it.
- */
-const looksLikeWorkspacePath = (key: string): boolean =>
-  ['apps/', 'libs/', 'tools/', 'languages/', 'strict-lib/'].some((prefix) =>
-    key.startsWith(prefix),
-  );
-
 /** A workspace path used as a key inside another entry — never legitimate. */
 const collectNestedWorkspaceKeys = (
+  memberGlobs: readonly string[],
   owner: string,
   entry: unknown,
 ): readonly Violation[] =>
   isRecord(entry)
     ? Object.keys(entry)
-        .filter(looksLikeWorkspacePath)
+        .filter((key) => looksLikeWorkspacePath(memberGlobs, key))
         .map((key) => ({ owner, key }))
     : ([] as const);
 
