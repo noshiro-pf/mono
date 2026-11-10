@@ -49,7 +49,9 @@
     "z:vitest:node": "pnpm run z:vitest --project='Node.js'"
   },
   "dependencies": {
-    "ts-data-forge": "workspace:^"
+    "ts-data-forge": "workspace:^",
+    "ts-fortress": "workspace:^",
+    "ts-type-forge": "workspace:^"
   },
   "devDependencies": {
     "@types/node": "catalog:",
