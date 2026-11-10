@@ -1,0 +1,224 @@
+@layer components {
+  .queue-summary {
+    font-size: 0.85rem;
+  }
+
+  .queue {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .queue-rows {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  /* One mark per box, and a frame around the part in view. */
+  .queue-map {
+    position: relative;
+    display: flex;
+    gap: 2px;
+    height: 14px;
+    border-radius: 4px;
+    background: var(--hairline);
+    padding: 3px;
+    cursor: pointer;
+    touch-action: none;
+  }
+
+  .queue-map-mark {
+    flex: 1;
+    border-radius: 2px;
+    background: var(--ink-3);
+  }
+
+  .queue-map-mark[data-place='running'] {
+    background: var(--accent);
+  }
+
+  .queue-map-mark[data-place='waiting'] {
+    background: transparent;
+    outline: 1px dashed var(--ink-3);
+  }
+
+  .queue-map-frame {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    border: 2px solid var(--ink-1);
+    border-radius: 4px;
+    cursor: grab;
+  }
+
+  .queue-scroll {
+    overflow-x: auto;
+    padding: 6px 0;
+  }
+
+  /* As wide as its boxes, so the sticky ones have room to stick in. */
+  .queue-row {
+    display: grid;
+    width: max-content;
+    grid-auto-columns: 7.5rem;
+    grid-auto-flow: column;
+    gap: 6px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  /* The base and what runs stay at the start while the rest scrolls. */
+  .queue-base {
+    position: sticky;
+    left: 0;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    background: var(--plane);
+    padding-right: 4px;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+  }
+
+  .queue-box {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    border: 1px solid var(--baseline);
+    border-radius: 6px;
+    background: var(--surface);
+    padding: 4px 8px;
+    font-size: 0.8rem;
+  }
+
+  .queue-box[data-place='running'] {
+    position: sticky;
+    left: 7.9rem;
+    z-index: 1;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 1px var(--accent);
+  }
+
+  .queue-box[data-ahead='true'] {
+    border-left: 3px solid var(--accent);
+  }
+
+  .queue-box[data-place='waiting'] {
+    border-style: dashed;
+    background: transparent;
+    color: var(--ink-2);
+  }
+
+  .queue-box-number {
+    font-weight: 600;
+  }
+
+  .queue-box-marks {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    min-height: 1.2rem;
+  }
+
+  .queue-box-place {
+    color: var(--ink-2);
+    font-size: 0.75rem;
+  }
+
+  .queue-bypass {
+    border: 1px solid var(--serious);
+    border-radius: 999px;
+    padding: 0 6px;
+    color: var(--ink-1);
+    font-size: 0.7rem;
+  }
+
+  .priority-pill {
+    border-radius: 999px;
+    padding: 0 6px;
+    font-size: 0.7rem;
+  }
+
+  .priority-pill:empty {
+    display: none;
+  }
+
+  .priority-pill[data-priority='high'] {
+    background: var(--ink-1);
+    color: var(--surface);
+  }
+
+  .priority-pill[data-priority='mid'] {
+    border: 1px solid var(--ink-2);
+  }
+
+  .priority-pill[data-priority='low'] {
+    border: 1px solid var(--hairline);
+    color: var(--ink-3);
+  }
+
+  .queue-outside h3 {
+    margin: 0 0 4px;
+    font-size: 0.95rem;
+  }
+
+  .queue-outside ul {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: 0.85rem;
+  }
+
+  .queue-outside li {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 8px;
+  }
+
+  .queue-why {
+    font-weight: 600;
+  }
+
+  .queue-outside-title {
+    color: var(--ink-2);
+  }
+
+  .queue-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 16px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    color: var(--ink-2);
+    font-size: 0.75rem;
+  }
+
+  .queue-legend li {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+  }
+
+  .legend-box {
+    display: inline-block;
+    width: 1.2em;
+    height: 0.9em;
+    border: 1px solid var(--baseline);
+    border-radius: 3px;
+  }
+
+  .legend-waiting {
+    border-style: dashed;
+  }
+
+  .legend-ahead {
+    border-left: 3px solid var(--accent);
+  }
+}

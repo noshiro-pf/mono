@@ -25,6 +25,7 @@ const pagesApps: readonly string[] = [
   'lambda-calculus-interpreter-synstate-dom',
   'life-plan-simulator',
   'pr-manager',
+  'pr-manager-v2',
   'profile',
   'task-manager',
 ] as const;

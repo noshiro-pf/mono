@@ -1,0 +1,198 @@
+@layer components {
+  /*
+   * A status badge: the tone tints its border and glyph, never alone; the
+   * word says it.
+   */
+  .badge {
+    --tone: var(--ink-3);
+
+    display: inline-flex;
+    gap: 4px;
+    align-items: baseline;
+    border: 1px solid color-mix(in srgb, var(--tone) 55%, transparent);
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--tone) 10%, var(--surface));
+    padding: 0 8px;
+    font-size: 0.8rem;
+    line-height: 1.6;
+    white-space: nowrap;
+  }
+
+  .badge > [aria-hidden='true'] {
+    color: var(--tone);
+    font-weight: 700;
+  }
+
+  .badge[data-tone='good'] {
+    --tone: var(--good);
+  }
+
+  .badge[data-tone='warning'] {
+    --tone: var(--warning);
+  }
+
+  .badge[data-tone='serious'] {
+    --tone: var(--serious);
+  }
+
+  .badge[data-tone='critical'] {
+    --tone: var(--critical);
+  }
+
+  /* Categorical, not a status: open and draft. */
+  .badge[data-tone='info'] {
+    --tone: var(--accent);
+  }
+
+  .badge-counts {
+    color: var(--ink-2);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+  }
+
+  .label-chip {
+    display: inline-block;
+    border-radius: 999px;
+    padding: 0 8px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    line-height: 1.6;
+    white-space: nowrap;
+  }
+
+  /* Count tiles, each a switch with an `only` in its corner, and chips. */
+  .tiles {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .tile {
+    --tone: var(--baseline);
+
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    min-width: 5.5rem;
+    border: 1px solid var(--hairline);
+    border-left: 3px solid var(--tone);
+    border-radius: 6px;
+    background: var(--surface);
+    padding: 2px 10px;
+    text-align: left;
+  }
+
+  .tile-switch {
+    cursor: pointer;
+  }
+
+  .tile-switch:hover {
+    border-color: var(--ink-3);
+    border-left-color: var(--tone);
+  }
+
+  .tile[data-tone='critical'] {
+    --tone: var(--critical);
+  }
+
+  .tile[data-tone='serious'] {
+    --tone: var(--serious);
+  }
+
+  .tile[data-tone='warning'] {
+    --tone: var(--warning);
+  }
+
+  .tile-switch[aria-pressed='false'] {
+    background: transparent;
+    color: var(--ink-3);
+  }
+
+  .tile-value {
+    font-size: 1.15rem;
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+    line-height: 1.3;
+  }
+
+  /* How many showing would add: struck through, since none are drawn. */
+  .tile-value[data-hidden='true'] {
+    text-decoration: line-through;
+  }
+
+  .tile-label {
+    color: var(--ink-2);
+    font-size: 0.75rem;
+  }
+
+  .tile-cell {
+    position: relative;
+  }
+
+  /* Over the tile's corner, always drawn: the page is used on phones too. */
+  .tile-only {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    border: 1px solid var(--hairline);
+    border-radius: 999px;
+    background: var(--surface);
+    padding: 0 6px;
+    color: var(--ink-3);
+    font-size: 0.65rem;
+    cursor: pointer;
+  }
+
+  .tile-only[aria-pressed='true'] {
+    border-color: var(--accent);
+    background: var(--accent);
+    color: #fff;
+  }
+
+  .controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 16px;
+  }
+
+  .control-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    align-items: center;
+    margin: 0;
+    border: 0;
+    padding: 0;
+  }
+
+  .control-group legend {
+    float: left;
+    margin-right: 4px;
+    color: var(--ink-3);
+    font-size: 0.75rem;
+  }
+
+  .chip {
+    display: inline-flex;
+    gap: 6px;
+    align-items: baseline;
+    border: 1px solid var(--baseline);
+    border-radius: 999px;
+    background: transparent;
+    padding: 0 10px;
+    color: var(--ink-3);
+    font-size: 0.8rem;
+    cursor: pointer;
+  }
+
+  .chip[aria-pressed='true'] {
+    border-color: var(--accent);
+    background: var(--accent-soft);
+    color: var(--ink-1);
+  }
+
+  .chip .tile-value {
+    font-size: 0.8rem;
+    font-weight: 500;
+  }
+}

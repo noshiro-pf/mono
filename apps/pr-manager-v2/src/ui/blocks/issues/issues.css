@@ -1,0 +1,272 @@
+@layer components {
+  .issues {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  /* Joined, and wrapping rather than widening the page at phone width. */
+  .tile-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px;
+    max-width: 100%;
+  }
+
+  .tile-group .tile {
+    min-width: 4.6rem;
+  }
+
+  .segmented {
+    display: inline-flex;
+    border: 1px solid var(--baseline);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+
+  .segment {
+    border: 0;
+    background: transparent;
+    padding: 0 10px;
+    font-size: 0.85rem;
+    cursor: pointer;
+  }
+
+  .segment[aria-pressed='true'] {
+    background: var(--hairline);
+    font-weight: 600;
+  }
+
+  .issue-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .search {
+    min-width: 12rem;
+    border: 1px solid var(--baseline);
+    border-radius: 6px;
+    background: var(--surface);
+    padding: 2px 8px;
+    color: var(--ink-1);
+    font: inherit;
+    font-size: 0.85rem;
+  }
+
+  .wait {
+    border-bottom: 1px dotted currentcolor;
+  }
+
+  .wait[data-status='waiting'] {
+    color: var(--ink-1);
+  }
+
+  .wait[data-status='done'] {
+    color: var(--ink-3);
+    text-decoration: line-through;
+  }
+
+  .wait[data-status='abandoned'],
+  .wait[data-status='unknown'] {
+    color: var(--serious);
+  }
+
+  .claimant[data-stale='true'] {
+    font-weight: 600;
+  }
+}
+
+@layer components {
+  .dag {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .dag-zoom {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+  }
+
+  .dag-scale {
+    min-width: 3.5em;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* At most 70% of the window, or what a block that scrolls on its own has. */
+  .dag-box {
+    max-height: 70vh;
+    overflow: auto;
+    border: 1px solid var(--hairline);
+    border-radius: var(--radius);
+    background: var(--surface);
+  }
+
+  .dag-svg {
+    display: block;
+  }
+
+  .dag-edge {
+    fill: none;
+    stroke: var(--ink-3);
+    stroke-width: 1.5;
+  }
+
+  .dag-edge-closes {
+    stroke-dasharray: 5 4;
+  }
+
+  .dag-arrow {
+    fill: var(--ink-3);
+  }
+
+  .dag-caption {
+    fill: var(--ink-2);
+    font-size: 13px;
+  }
+
+  .dag-node {
+    --node: var(--ink-3);
+  }
+
+  .dag-node[data-state='ready'],
+  .dag-node[data-state='free'] {
+    --node: var(--good);
+  }
+
+  .dag-node[data-state='waiting'] {
+    --node: light-dark(#8a5a2b, #c49a6c);
+  }
+
+  .dag-node[data-state='planned'] {
+    --node: var(--merged);
+  }
+
+  .dag-node[data-state='in-progress'],
+  .dag-node[data-state='pull'] {
+    --node: var(--accent);
+  }
+
+  .dag-node[data-state='attention'] {
+    --node: var(--warning);
+  }
+
+  .dag-node[data-state='cycle'] {
+    --node: var(--critical);
+  }
+
+  .dag-shape {
+    fill: color-mix(in srgb, var(--node) 10%, var(--surface));
+    stroke: var(--node);
+    stroke-width: 1.5;
+  }
+
+  .dag-node[data-state='ready'] .dag-shape {
+    stroke-width: 3.5;
+  }
+
+  .dag-node[data-state='unread'] .dag-shape {
+    stroke-dasharray: 2 3;
+  }
+
+  .dag-node[data-state='waiting'] .dag-shape {
+    stroke-dasharray: 6 4;
+  }
+
+  .dag-node[data-faint='true'],
+  .dag-node[data-extra='true'] {
+    opacity: 0.6;
+  }
+
+  .dag-number-pill {
+    fill: var(--node);
+  }
+
+  .dag-number {
+    fill: var(--surface);
+    font-size: 11px;
+    font-weight: 700;
+    text-anchor: middle;
+  }
+
+  .dag-pill {
+    fill: none;
+    stroke: var(--ink-2);
+  }
+
+  .dag-pill[data-pill='high'],
+  .dag-pill[data-pill='S'] {
+    fill: var(--ink-1);
+    stroke: var(--ink-1);
+  }
+
+  .dag-pill[data-pill='low'],
+  .dag-pill[data-pill='D'] {
+    stroke: var(--hairline);
+  }
+
+  .dag-pill-text {
+    fill: var(--ink-1);
+    font-size: 10px;
+    text-anchor: middle;
+  }
+
+  .dag-pill-text[data-pill='high'],
+  .dag-pill-text[data-pill='S'] {
+    fill: var(--surface);
+  }
+
+  .dag-claim {
+    fill: var(--ink-2);
+    font-size: 10px;
+  }
+
+  .dag-claim[data-stale='true'] {
+    fill: var(--serious);
+    font-weight: 700;
+  }
+
+  .dag-title {
+    fill: var(--ink-1);
+    font-size: 12px;
+  }
+
+  .dag-link:hover .dag-shape,
+  .dag-link:focus-visible .dag-shape {
+    stroke-width: 3;
+  }
+
+  .dag-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 14px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    color: var(--ink-2);
+    font-size: 0.75rem;
+  }
+
+  .dag-legend li {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+  }
+
+  .dag-legend-mark {
+    width: 28px;
+    height: 16px;
+  }
+
+  .block-body .dag-box {
+    max-height: none;
+  }
+
+  .group[data-fixed='true'] .dag-box,
+  .columns[data-mode='fill'] .dag-box {
+    max-height: 100%;
+  }
+}

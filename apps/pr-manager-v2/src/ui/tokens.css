@@ -1,0 +1,198 @@
+/* cspell:ignore sfmono */
+
+/*
+ * Design tokens. The palette is the repository's validated data-visualization
+ * default: surface, plane, three inks, hairlines, four status steps. Every
+ * colour is written once with `light-dark()`; `color-scheme` picks the side,
+ * following the system until the theme toggle sets `data-theme` on `<html>`.
+ *
+ * A status colour never carries meaning alone: every badge using one also
+ * carries a glyph and a word.
+ */
+@layer tokens, base, components, utilities;
+
+@layer tokens {
+  :root {
+    color-scheme: light dark;
+
+    --surface: light-dark(#fcfcfb, #1a1a19);
+    --plane: light-dark(#f9f9f7, #0d0d0d);
+    --ink-1: light-dark(#0b0b0b, #fff);
+    --ink-2: light-dark(#52514e, #c3c2b7);
+    --ink-3: #898781;
+    --hairline: light-dark(#e1e0d9, #2c2c2a);
+    --baseline: light-dark(#c3c2b7, #383835);
+    --ring: light-dark(rgb(11 11 11 / 10%), rgb(255 255 255 / 10%));
+
+    --good: #0ca30c;
+    --warning: #fab219;
+    --serious: #ec835a;
+    --critical: #d03b3b;
+
+    --accent: light-dark(#2a78d6, #3987e5);
+    --accent-soft: light-dark(#dfeafa, #17263a);
+
+    /* One quantity in two directions: the categorical blue and red. */
+    --ahead: light-dark(#2a78d6, #3987e5);
+    --behind: light-dark(#e34948, #e66767);
+
+    --merged: light-dark(#8250df, #a371f7);
+    --closed: light-dark(#2a78d6, #3987e5);
+
+    --radius: 8px;
+    --gap: 12px;
+    --font-sans: system-ui, -apple-system, 'Segoe UI', sans-serif;
+    --font-mono: ui-monospace, sfmono-regular, menlo, consolas, monospace;
+
+    /* Set by the page from the header's measured height. */
+    --header-height: 0px;
+  }
+
+  :root[data-theme='light'] {
+    color-scheme: light;
+  }
+
+  :root[data-theme='dark'] {
+    color-scheme: dark;
+  }
+}
+
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    background: var(--plane);
+    color: var(--ink-1);
+    font-family: var(--font-sans);
+    font-size: 15px;
+    line-height: 1.55;
+  }
+
+  a {
+    color: var(--accent);
+    text-decoration: none;
+  }
+
+  a:hover,
+  a:focus-visible {
+    text-decoration: underline;
+  }
+
+  code {
+    font-family: var(--font-mono);
+    font-size: 0.9em;
+  }
+
+  button {
+    font: inherit;
+    color: inherit;
+  }
+
+  /* Quiet scroll bars, always drawn, so a block shows that it scrolls. */
+  ::-webkit-scrollbar {
+    height: 10px;
+    width: 10px;
+  }
+
+  ::-webkit-scrollbar-track,
+  ::-webkit-scrollbar-corner {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background-clip: padding-box;
+    background-color: var(--baseline);
+    border: 2px solid transparent;
+    border-radius: 999px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: var(--ink-3);
+  }
+
+  ::-webkit-scrollbar-button {
+    display: none;
+  }
+
+  @supports not selector(::-webkit-scrollbar) {
+    * {
+      scrollbar-color: var(--baseline) transparent;
+      scrollbar-width: thin;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * {
+      animation-duration: 0s !important;
+      transition-duration: 0s !important;
+    }
+  }
+}
+
+@layer components {
+  .button {
+    border: 1px solid var(--baseline);
+    border-radius: 6px;
+    background: var(--surface);
+    padding: 4px 12px;
+    cursor: pointer;
+  }
+
+  .button:hover:not(:disabled, [aria-disabled='true']) {
+    border-color: var(--ink-3);
+  }
+
+  /* aria-disabled: unavailable but still focusable, so focus stays put. */
+  .button:disabled,
+  .button[aria-disabled='true'] {
+    cursor: default;
+    opacity: 0.6;
+  }
+
+  .button[aria-pressed='true'] {
+    background: var(--hairline);
+    font-weight: 600;
+  }
+
+  .muted {
+    color: var(--ink-2);
+  }
+
+  /* A turning ring: something is being read. */
+  .spinner {
+    display: inline-block;
+    width: 0.8em;
+    height: 0.8em;
+    border: 2px solid var(--baseline);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    vertical-align: -0.1em;
+    animation: spin 0.9s linear infinite;
+  }
+
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  .visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
+
+@layer components {
+  .page {
+    max-width: 120rem;
+    margin: 0 auto;
+    padding: 0 16px 24px;
+  }
+}

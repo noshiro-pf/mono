@@ -1,0 +1,191 @@
+@layer components {
+  .columns {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--gap);
+    align-items: start;
+  }
+
+  /* Two columns need 60rem, three 80rem; narrower, they stack. */
+  @media (width >= 60rem) {
+    .columns[data-count='2'] {
+      grid-template-columns: var(--column-template);
+      gap: 0;
+    }
+  }
+
+  @media (width >= 80rem) {
+    .columns[data-count='3'] {
+      grid-template-columns: var(--column-template);
+      gap: 0;
+    }
+  }
+
+  .column {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  .column-line {
+    display: none;
+    align-self: stretch;
+    cursor: col-resize;
+    touch-action: none;
+  }
+
+  .column-line::after {
+    content: '';
+    display: block;
+    width: 1px;
+    height: 100%;
+    margin: 0 auto;
+    background: var(--hairline);
+  }
+
+  .column-line:hover::after {
+    background: var(--accent);
+    width: 2px;
+  }
+
+  @media (width >= 60rem) {
+    .columns[data-count='2'] .column-line {
+      display: block;
+    }
+  }
+
+  @media (width >= 80rem) {
+    .columns[data-count='3'] .column-line {
+      display: block;
+    }
+  }
+
+  .group {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+
+  .columns[data-mode='natural'] .group[data-fixed='true'] {
+    height: var(--fixed-height);
+  }
+
+  .group > .block:not([hidden]) {
+    flex: 1 1 auto;
+    min-height: 0;
+  }
+
+  .block {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  .block[hidden] {
+    display: none;
+  }
+
+  /* A tab names the block already; its title row keeps only the extras. */
+  .block[data-tabbed='true'] .block-title h2 {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .block[data-tabbed='true'] .block-title:not(:has(> :not(h2))) {
+    display: none;
+  }
+
+  .block-title {
+    position: sticky;
+    top: var(--sticky-top, 0px);
+    z-index: 2;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 12px;
+    align-items: baseline;
+    padding: 8px 0 4px;
+    border-bottom: 1px solid var(--hairline);
+    background: var(--plane);
+  }
+
+  .block-title h2 {
+    margin: 0;
+    font-size: 1.05rem;
+  }
+
+  .block-body {
+    min-height: 0;
+    padding: 8px 0 16px;
+  }
+
+  /* Its height is the block's rest, whatever it holds (the DAG's fit reads it). */
+  .group[data-fixed='true'] .block-body,
+  .columns[data-mode='fill'] .block-body {
+    flex: 1 1 0;
+    overflow: auto;
+  }
+
+  .boundary-line {
+    height: 8px;
+    cursor: row-resize;
+    touch-action: none;
+  }
+
+  .boundary-line:hover {
+    background: linear-gradient(var(--accent), var(--accent)) center / 100% 2px
+      no-repeat;
+  }
+
+  /* Fill the window: the page does not scroll, each block does. */
+  .columns[data-mode='fill'] {
+    height: calc(100dvh - var(--header-height) - 16px);
+    align-items: stretch;
+  }
+
+  .columns[data-mode='fill'] .column {
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .columns[data-mode='fill'] .group {
+    height: auto;
+    flex: var(--share) 1 0;
+  }
+
+  .columns[data-mode='fill'] .block-title {
+    position: static;
+  }
+
+  .columns[data-mode='fill'] .boundary-line[data-last='true'] {
+    display: none;
+  }
+
+  .tab-list {
+    display: flex;
+    gap: 4px;
+    border-bottom: 1px solid var(--hairline);
+  }
+
+  .tab {
+    border: none;
+    border-bottom: 2px solid transparent;
+    background: none;
+    padding: 6px 10px;
+    cursor: pointer;
+    color: var(--ink-2);
+  }
+
+  .tab[aria-selected='true'] {
+    border-bottom-color: var(--accent);
+    color: var(--ink-1);
+    font-weight: 600;
+  }
+
+  :root[data-dragging='true'] {
+    user-select: none;
+  }
+}

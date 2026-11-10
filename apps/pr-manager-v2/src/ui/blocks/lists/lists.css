@@ -1,0 +1,57 @@
+@layer components {
+  .rows {
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .row {
+    display: flex;
+    gap: 10px;
+    align-items: baseline;
+    border-bottom: 1px solid var(--hairline);
+    padding: 6px 0;
+  }
+
+  .row-main {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .row-title {
+    color: var(--ink-1);
+    font-weight: 600;
+  }
+
+  .row-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 6px;
+    align-items: baseline;
+    color: var(--ink-2);
+    font-size: 0.8rem;
+  }
+
+  .run-state {
+    flex: none;
+    min-width: 1.2em;
+  }
+
+  .dot {
+    display: inline-block;
+    width: 0.6em;
+    height: 0.6em;
+    border-radius: 50%;
+    background: var(--warning);
+  }
+
+  .merged-mark {
+    flex: none;
+    color: var(--merged);
+  }
+}
