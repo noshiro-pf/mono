@@ -1,4 +1,9 @@
-import { optionValues, readPnpmRun, readRunAll } from './pnpm-command.mjs';
+import {
+  isFilterFlag,
+  optionValues,
+  readPnpmRun,
+  readRunAll,
+} from './pnpm-command.mjs';
 
 describe('readPnpmRun', () => {
   test('a plain run names the root script and its arguments', () => {
@@ -151,5 +156,19 @@ describe('optionValues', () => {
       ),
       ['b', 'c'],
     );
+  });
+});
+
+describe('isFilterFlag', () => {
+  test('takes each filter flag with or without its value', () => {
+    for (const word of ['--filter', '--filter=a', '--filter-prod=a', '-F']) {
+      assert.isTrue(isFilterFlag(word));
+    }
+  });
+
+  test('takes no other flag', () => {
+    for (const word of ['--filters', '-r', 'filter', '--dir=a']) {
+      assert.isFalse(isFilterFlag(word));
+    }
   });
 });

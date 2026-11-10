@@ -6,7 +6,6 @@ import {
   collectWorkflowCommands,
   findRedundantCommands,
   findUncoveredCommands,
-  matchScriptNames,
   readMatrixInclude,
   resolvePackageRuns,
   resolveScriptInvocations,
@@ -174,37 +173,6 @@ describe('resolveScriptInvocations', () => {
       resolveScriptInvocations('tsc -p ./tsconfig.json --noEmit'),
       invocations({ local: [], recursive: [] }),
     );
-  });
-});
-
-describe('matchScriptNames', () => {
-  const names = [
-    'check:md',
-    'check:prose',
-    'check:prose:one',
-    'check:prose:two',
-  ] as const;
-
-  test('takes a literal name', () => {
-    assert.deepStrictEqual(matchScriptNames('check:md', names), ['check:md']);
-  });
-
-  test('takes a name that no script defines as nothing', () => {
-    assert.deepStrictEqual(matchScriptNames('check:absent', names), []);
-  });
-
-  test('expands the regular expression pnpm reads between slashes', () => {
-    assert.deepStrictEqual(matchScriptNames('/check:prose:.*/', names), [
-      'check:prose:one',
-      'check:prose:two',
-    ]);
-  });
-
-  test('expands an npm-run-all glob', () => {
-    assert.deepStrictEqual(matchScriptNames('check:prose:*', names), [
-      'check:prose:one',
-      'check:prose:two',
-    ]);
   });
 });
 

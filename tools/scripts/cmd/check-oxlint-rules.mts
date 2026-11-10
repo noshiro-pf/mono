@@ -20,7 +20,7 @@ import {
   forEachLintedFile,
   importPackageEslintConfigs,
   listLintedPackages,
-  readScripts,
+  readPackageScripts,
   severityNumber,
 } from '../lib/eslint-package-configs.mjs';
 import { listTrackedFiles, readRepositoryFile } from '../lib/repo-files.mjs';
@@ -235,7 +235,7 @@ const checkPackage = async (
   dir: string,
   trackedFiles: readonly string[],
 ): Promise<PackageResult> => {
-  const scripts = await readScripts(dir);
+  const scripts = await readPackageScripts(dir);
 
   const scriptViolations = Arr.generate(function* () {
     for (const [name, prefix] of Object.entries(lintScriptPrefixes)) {

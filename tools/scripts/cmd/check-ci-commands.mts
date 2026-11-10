@@ -9,14 +9,17 @@ import {
   unknownToString,
 } from 'ts-data-forge';
 import { getWorkspacePackages, isDirectlyExecuted } from 'ts-repo-utils';
-import { Regex } from 'ts-std-forge';
 import type { ReadonlyRecord, StrictPick } from 'ts-type-forge';
 import {
   CI_JOB,
   CI_JOB_BUILD,
   CI_JOB_COMMAND,
 } from '../lib/ci-job-options.mjs';
-import { readScripts } from '../lib/manifest-scripts.mjs';
+import {
+  matchesGlob,
+  matchScriptNames,
+  readScripts,
+} from '../lib/manifest-scripts.mjs';
 import { optionValues, readPnpmRun, readRunAll } from '../lib/pnpm-command.mjs';
 import { listWorkflowFiles } from '../lib/repo-files.mjs';
 import { readShellCommands } from '../lib/shell-commands.mjs';
@@ -299,31 +302,6 @@ export const resolveScriptInvocations = (body: string): ScriptInvocations => {
     pointed: mut_pointed,
     problems: reading.problems,
   };
-};
-
-/**
- * The script names a pattern from a script body selects.
- *
- * pnpm reads a name wrapped in slashes as a regular expression and
- * `npm-run-all` reads `*` as a glob; everything else is a literal name.
- */
-export const matchScriptNames = (
-  pattern: string,
-  scriptNames: readonly string[],
-): readonly string[] => {
-  if (pattern.startsWith('/') && pattern.endsWith('/') && pattern.length > 1) {
-    const expression = Regex.create(pattern.slice(1, -1), 'u');
-
-    return Result.isErr(expression)
-      ? []
-      : scriptNames.filter((name) => expression.value.test(name));
-  }
-
-  return pattern.includes('*')
-    ? scriptNames.filter((name) => matchesGlob(pattern, name))
-    : scriptNames.includes(pattern)
-      ? [pattern]
-      : [];
 };
 
 /**
@@ -1028,45 +1006,6 @@ export const readRootManifest = async (): Promise<Result<Manifest, string>> => {
         directory: ROOT_DIRECTORY,
         scripts: readScripts(parsed.value),
       });
-};
-
-/**
- * A script name against an `npm-run-all` glob, where `*` stands for any run of
- * characters. Matched rather than compiled, so that nothing here builds a
- * regular expression out of a string read from a manifest.
- */
-const matchesGlob = (pattern: string, name: string): boolean => {
-  const segments = pattern.split('*');
-
-  if (Arr.isFixedLengthArray(1, segments)) {
-    return name === pattern;
-  }
-
-  const first = segments.at(0) ?? '';
-
-  const last = segments.at(-1) ?? '';
-
-  if (!name.startsWith(first) || !name.endsWith(last)) {
-    return false;
-  }
-
-  if (first.length + last.length > name.length) {
-    return false;
-  }
-
-  const mut_cursor = { at: first.length };
-
-  for (const segment of segments.slice(1, -1)) {
-    const found = name.indexOf(segment, mut_cursor.at);
-
-    if (found === -1) {
-      return false;
-    }
-
-    mut_cursor.at = found + segment.length;
-  }
-
-  return mut_cursor.at <= name.length - last.length;
 };
 
 /**

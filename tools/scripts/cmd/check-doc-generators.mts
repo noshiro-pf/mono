@@ -4,9 +4,10 @@ import { Arr, unknownToString } from 'ts-data-forge';
 import { getWorkspacePackages, isDirectlyExecuted } from 'ts-repo-utils';
 import type { DeepReadonly, ReadonlyRecord } from 'ts-type-forge';
 import * as ts from 'typescript';
-import { readScripts } from '../lib/manifest-scripts.mjs';
+import { matchScriptNames, readScripts } from '../lib/manifest-scripts.mjs';
+import { readPnpmRun, readRunAll } from '../lib/pnpm-command.mjs';
+import { readShellCommands } from '../lib/shell-commands.mjs';
 import { projectRootPath } from '../project-root-path.mjs';
-import { matchScriptNames } from './check-ci-commands.mjs';
 
 /**
  * Fails when a package's `doc` writes a committed file through a generator its
@@ -145,33 +146,42 @@ export const findDocOnlyGenerators = ({
  * out.
  */
 export const parseScriptInvocations = (body: string): readonly string[] =>
-  [
-    ...Array.from(body.matchAll(PNPM_RUN), (match) => {
-      const tokens = tokenize(match.groups?.['args'] ?? '');
+  readShellCommands(body).commands.flatMap((words) => {
+    const run = readPnpmRun(words);
 
-      return tokens.some((token) => ELSEWHERE_FLAGS.has(token))
-        ? undefined
-        : tokens.find((token) => !token.startsWith('-'));
-    }).filter((name) => name !== undefined),
-    ...Array.from(body.matchAll(RUN_ALL), (match) =>
-      tokenize(match.groups?.['args'] ?? '').filter(
-        (token) => !token.startsWith('-'),
-      ),
-    ).flat(),
-  ] as const;
+    if (run !== undefined) {
+      return run.recursive ||
+        run.workspaceRoot ||
+        run.directory !== undefined ||
+        Arr.isNonEmpty(run.filters)
+        ? []
+        : [run.script];
+    }
+
+    const list = readRunAll(words);
+
+    return list === undefined ? [] : [...list.scripts, ...list.withArguments];
+  });
 
 /**
  * The files a script body runs with `tsx` or `node`, package-relative and
  * `/`-separated: the first script-file argument after each, past its options.
  */
 export const parseScriptEntries = (body: string): readonly string[] =>
-  Array.from(body.matchAll(SCRIPT_RUNNER), (match) =>
-    tokenize(match.groups?.['args'] ?? '').find((token) =>
-      SCRIPT_FILE.test(token),
-    ),
-  )
-    .filter((file) => file !== undefined)
-    .map(path.posix.normalize);
+  Arr.generate(function* () {
+    for (const words of readShellCommands(body).commands) {
+      const runner = words.findIndex((word) => SCRIPT_RUNNERS.has(word));
+
+      const file =
+        runner === -1
+          ? undefined
+          : words.slice(runner + 1).find((word) => SCRIPT_FILE.test(word));
+
+      if (file !== undefined) {
+        yield path.posix.normalize(file);
+      }
+    }
+  });
 
 /**
  * What a module's syntax says about it, read with TypeScript's parser so that
@@ -300,27 +310,10 @@ export const readModule = (
   return { relativeImports: mut_imports, writesFiles: mut_state.writes };
 };
 
-const PNPM_RUN = /\bpnpm run (?<args>[^&|;\n]*)/gu;
-
-const RUN_ALL = /\brun-[sp] (?<args>[^&|;\n]*)/gu;
-
-/** The `pnpm run` options that run the script somewhere other than here. */
-const ELSEWHERE_FLAGS: ReadonlySet<string> = new Set<string>([
-  '--recursive',
-  '-r',
-  '--filter',
-  '-F',
-  '--dir',
-  '-C',
-  '--workspace-root',
-  '-w',
-]);
-
-const SCRIPT_RUNNER = /\b(?:tsx|node)\s(?<args>[^&|;\n]*)/gu;
+/** The programs whose first script-file argument is the file a body runs. */
+const SCRIPT_RUNNERS: ReadonlySet<string> = new Set<string>(['tsx', 'node']);
 
 const SCRIPT_FILE = /\.[cm]?[jt]s$/u;
-
-const QUOTE = /["']/gu;
 
 const MJS_EXTENSION = /\.mjs$/u;
 
@@ -439,13 +432,6 @@ const importsValues = (node: DeepReadonly<ts.ImportDeclaration>): boolean => {
     bindings.elements.some((element) => !element.isTypeOnly)
   );
 };
-
-/** Whitespace-separated, quotes taken off. */
-const tokenize = (args: string): readonly string[] =>
-  args
-    .split(/\s+/u)
-    .map((token) => token.replaceAll(QUOTE, ''))
-    .filter((token) => token !== '');
 
 const main = async (): Promise<number> => {
   const packages = await getWorkspacePackages(projectRootPath);

@@ -1,7 +1,11 @@
+import { Result } from 'ts-data-forge';
 import {
   findShardViolations,
+  findStaleNotShards,
+  findUnreadRuns,
   groupFamilies,
   readFilteredRuns,
+  readRootScripts,
 } from './check-workspace-shards.mjs';
 
 const guard = 'node ./tools/scripts/cmd/assert-deps-built.mts --workspace';
@@ -204,5 +208,86 @@ describe('findShardViolations', () => {
       '`s:*` (`t`): `s:rest` names gone, which is not a workspace package.',
       '`s:*` (`t`): `s:rest` names !a twice.',
     ]);
+  });
+});
+
+describe('findUnreadRuns', () => {
+  const packageScripts = new Set<string>(['check:test', 'fix:lint']);
+
+  test('reports a filtered pnpm command it cannot read as a run', () => {
+    expect(
+      findUnreadRuns(
+        {
+          'x:implicit': 'pnpm -r --filter=a check:test',
+          'x:recursive': 'pnpm recursive run check:test --filter=a',
+          'x:test': 'pnpm test --filter=a',
+          'x:flag': 'pnpm --filter=a --use-node-version 20 run check:test',
+          'x:update': "pnpm update --latest --recursive --filter '!./x'",
+          'x:read': 'pnpm run -r --filter=a check:test',
+          'x:unfiltered': 'pnpm -r check:test',
+        },
+        packageScripts,
+      ),
+    ).toStrictEqual([
+      '`x:implicit` runs `pnpm -r --filter=a check:test`, a filtered pnpm command this guard does not read as a run; write it as `pnpm run [flags] <script>`.',
+      '`x:recursive` runs `pnpm recursive run check:test --filter=a`, a filtered pnpm command this guard does not read as a run; write it as `pnpm run [flags] <script>`.',
+      '`x:test` runs `pnpm test --filter=a`, a filtered pnpm command this guard does not read as a run; write it as `pnpm run [flags] <script>`.',
+      '`x:flag` runs `pnpm --filter=a --use-node-version 20 run check:test`, a filtered pnpm command this guard does not read as a run; write it as `pnpm run [flags] <script>`.',
+    ]);
+  });
+
+  test('reports a filtered run of a script no package defines', () => {
+    expect(
+      findUnreadRuns(
+        {
+          'x:flag': 'pnpm run -r --filter=a --use-node-version 20 check:test',
+          'x:read': 'pnpm run -r --filter=a check:test',
+        },
+        packageScripts,
+      ),
+    ).toStrictEqual([
+      '`x:flag` runs `20` in the packages it filters, which no workspace package defines as a script; a pnpm flag this guard does not know may have taken its value as the script.',
+    ]);
+  });
+});
+
+describe('findStaleNotShards', () => {
+  test('reports an entry whose script is gone or has no filtered run', () => {
+    expect(
+      findStaleNotShards(
+        {
+          'x:kept': 'pnpm run --filter=a gen',
+          'x:unfiltered': 'pnpm run gen',
+        },
+        {
+          'x:kept': 'one package by design',
+          'x:unfiltered': 'one package by design',
+          'x:gone': 'one package by design',
+        },
+      ),
+    ).toStrictEqual([
+      'NOT_SHARDS names `x:unfiltered`, which no longer runs a filtered `pnpm run`; remove it from the list.',
+      'NOT_SHARDS names `x:gone`, which the root package.json no longer has; remove it from the list.',
+    ]);
+  });
+});
+
+describe('readRootScripts', () => {
+  test('says when the root manifest has no scripts', () => {
+    for (const manifest of ['{}', '{ "scripts": {} }', '{ "scripts": 1 }']) {
+      const read = readRootScripts(manifest);
+
+      assert.isTrue(Result.isErr(read));
+
+      expect(read.value).toContain('has no `scripts`');
+    }
+  });
+
+  test('reads the scripts of the root manifest', () => {
+    const read = readRootScripts('{ "scripts": { "a": "pnpm run b" } }');
+
+    assert.isTrue(Result.isOk(read));
+
+    assert.deepStrictEqual(read.value, { a: 'pnpm run b' });
   });
 });
