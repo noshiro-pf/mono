@@ -33,6 +33,8 @@ import type { MapSetKeyType, SizeType } from '../types.mjs';
  *
  * @template K The type of the elements in the set. Must extend MapSetKeyType
  *   (string, number, boolean, etc.)
+ *
+ * @internal The method set `ISet` is made of; a consumer spells `ISet`.
  */
 type ISetInterface<K extends MapSetKeyType> = Readonly<{
   // Getting information

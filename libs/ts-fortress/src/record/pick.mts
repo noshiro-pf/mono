@@ -49,6 +49,10 @@ export const pick = <
   }) as unknown as PickedType<R, KeysToPick>;
 };
 
+/**
+ * @internal The `Type` `pick` returns, computed from the arguments; a consumer
+ * spells `ReturnType<typeof pick<…>>`.
+ */
 type PickedType<
   R extends UnknownRecord,
   KeysToPick extends readonly (keyof R & string)[],

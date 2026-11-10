@@ -140,7 +140,7 @@ export type ExcludeFalsyValue<A> = RelaxedExclude<A, FalsyValue>;
 export type Intersection<Types extends readonly unknown[]> =
   IntersectionImpl<Types>;
 
-/** @internal */
+/** @internal A step of `Intersection`; a consumer spells `Intersection`. */
 type IntersectionImpl<Types extends readonly unknown[]> = MergeIfRecords<
   IntersectionImplSub<Types>
 >;

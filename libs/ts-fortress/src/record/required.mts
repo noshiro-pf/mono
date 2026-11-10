@@ -73,6 +73,10 @@ export const required = <
   }) as unknown as Type<RequiredValue<R, KeysToBeRequired>>;
 };
 
+/**
+ * @internal The `Type` `required` returns, computed from the arguments; a
+ * consumer spells `ReturnType<typeof required<…>>`.
+ */
 type RequiredType<
   R extends UnknownRecord,
   KeysToBeRequired extends NonEmptyTuple<keyof R & string>,

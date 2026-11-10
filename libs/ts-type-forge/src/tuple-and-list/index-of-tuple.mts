@@ -26,7 +26,7 @@ export type IndexOfTuple<T extends readonly unknown[]> = IndexOfTupleImpl<
  * Determines the numeric index type based on whether the input is a fixed-length tuple or a variable-length array.
  * @template T - The readonly array or tuple type.
  * @template K - The keys of `T` (including array methods and numeric indices).
- * @internal
+ * @internal A step of `IndexOfTuple`; a consumer spells `IndexOfTuple`.
  */
 type IndexOfTupleImpl<T extends readonly unknown[], K> =
   IsFixedLengthList<T> extends true

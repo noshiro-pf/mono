@@ -30,6 +30,8 @@ import type { MapSetKeyType, SizeType } from '../types.mjs';
  * @template K The type of the keys in the map. Must extend MapSetKeyType
  *   (string, number, boolean, etc.)
  * @template V The type of the values in the map.
+ *
+ * @internal The method set `IMap` is made of; a consumer spells `IMap`.
  */
 type IMapInterface<K extends MapSetKeyType, V> = Readonly<{
   // Getting information

@@ -10,6 +10,11 @@ import {
   type ValidationError,
 } from '../utils/index.mjs';
 
+/**
+ * @internal What the `Type` `keyValueRecord` returns validates, computed from
+ * the arguments; a consumer reads it with
+ * `TypeOf<ReturnType<typeof keyValueRecord<…>>>`.
+ */
 type RecordResultType<
   K extends Type<string>,
   V extends UnknownType,

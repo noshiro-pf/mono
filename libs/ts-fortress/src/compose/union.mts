@@ -378,6 +378,10 @@ const compareByCloseness = (x: MemberCloseness, y: MemberCloseness): number =>
     ? x.score - y.score
     : y.satisfiedCheckCount - x.satisfiedCheckCount;
 
+/**
+ * @internal The `Type` `union` returns, computed from the arguments; a consumer
+ * spells `ReturnType<typeof union<…>>`.
+ */
 type UnionType<Types extends NonEmptyTuple<UnknownType>> = Type<
   UnionTypeValue<Types>
 >;

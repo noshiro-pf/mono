@@ -7,18 +7,30 @@ import type { TSTypeForgeInternals_BrandEncapsulated } from './_internals.mjs';
  */
 export type UnknownBrand = Brand<unknown, never, never>;
 
+/**
+ * @internal A step of `UnwrapBrandTrueKeys`; a consumer spells
+ * `UnwrapBrandTrueKeys`.
+ */
 type ExtractTrueKeys<B extends UnknownBrand> = ExtractBooleanKeysImpl<
   B,
   keyof B,
   true
 >;
 
+/**
+ * @internal A step of `UnwrapBrandFalseKeys`; a consumer spells
+ * `UnwrapBrandFalseKeys`.
+ */
 type ExtractFalseKeys<B extends UnknownBrand> = ExtractBooleanKeysImpl<
   B,
   keyof B,
   false
 >;
 
+/**
+ * @internal A step of `UnwrapBrandBooleanKeys`; a consumer spells
+ * `UnwrapBrandBooleanKeys`.
+ */
 type ExtractBooleanKeys<B extends UnknownBrand> = ExtractBooleanKeysImpl<
   B,
   keyof B,

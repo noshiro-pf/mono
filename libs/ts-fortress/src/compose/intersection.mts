@@ -132,6 +132,10 @@ const mergePruned = (x: unknown, y: unknown): unknown => {
     : y;
 };
 
+/**
+ * @internal The `Type` `intersection` returns, computed from the arguments; a
+ * consumer spells `ReturnType<typeof intersection<…>>`.
+ */
 type IntersectionType<Types extends NonEmptyTuple<UnknownType>> = Type<
   IntersectionTypeValue<Types>
 >;

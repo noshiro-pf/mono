@@ -49,6 +49,10 @@ export const omit = <
   }) as unknown as OmittedType<R, KeysToOmit>;
 };
 
+/**
+ * @internal The `Type` `omit` returns, computed from the arguments; a consumer
+ * spells `ReturnType<typeof omit<…>>`.
+ */
 type OmittedType<
   R extends UnknownRecord,
   KeysToOmit extends readonly (keyof R & string)[],

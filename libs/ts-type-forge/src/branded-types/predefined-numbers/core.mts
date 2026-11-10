@@ -28,6 +28,7 @@ Utility types:
 └── small-int.mts - SmallInt, WithSmallInt variants, RemoveSmallInt
 */
 
+/** @internal A step of `NaNType`; a consumer spells `NaNType`. */
 type IntRangeKeys =
   | '< 2^15'
   | '< 2^16'

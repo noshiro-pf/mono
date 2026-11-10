@@ -71,6 +71,10 @@ export const partial = <
   }) as unknown as PartialType<R, KeysToBeOptional>;
 };
 
+/**
+ * @internal The `Type` `partial` returns, computed from the arguments; a
+ * consumer spells `ReturnType<typeof partial<…>>`.
+ */
 type PartialType<
   R extends UnknownRecord,
   KeysToBeOptional extends NonEmptyTuple<keyof R & string> | undefined =

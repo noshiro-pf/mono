@@ -26,15 +26,15 @@ export function string(
   defaultValue?: string,
 ): ConstrainedType<string, StringConstraintsOf<NoConstraints>>;
 
-export function string<S extends string, const C extends RawConstraints>(
+export function string<S extends string, const C extends StringTypeConstraints>(
   defaultValue: S & DefaultValueType<S, C>,
   constraints: C,
-): ConstrainedType<ConstraintsResultType<C>, StringConstraintsOf<C>>;
+): ConstrainedType<StringConstraintsResultType<C>, StringConstraintsOf<C>>;
 
 export function string(
   defaultValue: string = '',
-  constraints?: RawConstraints,
-): ConstrainedType<string, StringConstraintsOf<RawConstraints>> {
+  constraints?: StringTypeConstraints,
+): ConstrainedType<string, StringConstraintsOf<StringTypeConstraints>> {
   const baseType = createPrimitiveType({
     typeName: 'string',
     defaultValue,
@@ -43,8 +43,8 @@ export function string(
   });
 
   const constraintValues = fillConstraints<
-    Required<RawConstraints>,
-    RawConstraints
+    Required<StringTypeConstraints>,
+    StringTypeConstraints
   >(stringConstraintKeys, constraints);
 
   if (constraints === undefined || Arr.isEmpty(Object.keys(constraints))) {
@@ -96,7 +96,10 @@ export function string(
   );
 }
 
-type RawConstraints = Partial<
+/**
+ * The set of constraints accepted by {@link string}.
+ */
+export type StringTypeConstraints = Partial<
   Readonly<{
     nonempty: true;
     minLength: number;
@@ -110,7 +113,7 @@ type RawConstraints = Partial<
   }>
 >;
 
-type Constraints = Partial<
+type ValidatedConstraints = Partial<
   Readonly<{
     nonempty: true;
     minLength: PositiveInt;
@@ -123,11 +126,6 @@ type Constraints = Partial<
     regex: RegExp;
   }>
 >;
-
-/**
- * The set of constraints accepted by {@link string}.
- */
-export type StringTypeConstraints = RawConstraints;
 
 /**
  * The result type produced by {@link string} for a given set of constraints `C`
@@ -159,11 +157,11 @@ export type StringConstraintsResultType<C extends StringTypeConstraints> =
  * ```
  */
 export type StringConstraintsOf<C extends StringTypeConstraints> =
-  FillConstraints<Required<RawConstraints>, C>;
+  FillConstraints<Required<StringTypeConstraints>, C>;
 
 /**
- * Every key of {@link RawConstraints}, in the order the runtime predicate
- * checks them. The `expectType` below keeps it in step with the type.
+ * Every key of {@link StringTypeConstraints}, in the order the runtime
+ * predicate checks them. The `expectType` below keeps it in step with the type.
  */
 const stringConstraintKeys = [
   'nonempty',
@@ -175,15 +173,20 @@ const stringConstraintKeys = [
   'uppercase',
   'lowercase',
   'regex',
-] as const satisfies readonly (keyof RawConstraints)[];
+] as const satisfies readonly (keyof StringTypeConstraints)[];
 
-expectType<ArrayElement<typeof stringConstraintKeys>, keyof RawConstraints>(
-  '=',
-);
+expectType<
+  ArrayElement<typeof stringConstraintKeys>,
+  keyof StringTypeConstraints
+>('=');
 
+/**
+ * @internal The type `defaultValue` must have for the constraints `C`, a step
+ * of a parameter type, which a caller meets with the argument it passes.
+ */
 type DefaultValueType<
   S extends string,
-  C extends RawConstraints,
+  C extends StringTypeConstraints,
 > = DefaultValueWhenNonemptyIsOn<S, C> &
   DefaultValueWhenMinLengthIsOn<S, C> &
   DefaultValueWhenMaxLengthIsOn<S, C> &
@@ -193,7 +196,11 @@ type DefaultValueType<
   DefaultValueWhenUppercaseIsOn<S, C> &
   DefaultValueWhenLowercaseIsOn<S, C>;
 
-type ConstraintsResultType<C extends RawConstraints> =
+/**
+ * @internal A step of `StringConstraintsResultType`; a consumer spells
+ * `StringConstraintsResultType`.
+ */
+type ConstraintsResultType<C extends StringTypeConstraints> =
   ConstraintsResultTypeWhenNonemptyIsOn<C> &
     ConstraintsResultTypeWhenMinLengthIsOn<C> &
     ConstraintsResultTypeWhenMaxLengthIsOn<C> &
@@ -201,43 +208,49 @@ type ConstraintsResultType<C extends RawConstraints> =
     DefaultValueWhenEndsWithIsOn<C> &
     DefaultValueWhenIncludesIsOn<C>;
 
-type DefaultValueWhenStartsWithIsOn<C extends RawConstraints> =
+type DefaultValueWhenStartsWithIsOn<C extends StringTypeConstraints> =
   C extends Readonly<{
     startsWith: infer S extends string;
   }>
     ? `${S}${string}`
     : string;
 
-type DefaultValueWhenEndsWithIsOn<C extends RawConstraints> =
+type DefaultValueWhenEndsWithIsOn<C extends StringTypeConstraints> =
   C extends Readonly<{
     endsWith: infer E extends string;
   }>
     ? `${string}${E}`
     : string;
 
-type DefaultValueWhenIncludesIsOn<C extends RawConstraints> =
+type DefaultValueWhenIncludesIsOn<C extends StringTypeConstraints> =
   C extends Readonly<{
     includes: infer M extends string;
   }>
     ? `${string}${M}${string}`
     : string;
 
-type DefaultValueWhenUppercaseIsOn<S extends string, C extends RawConstraints> =
-  C extends Readonly<{ uppercase: true }> ? CastUppercase<S> : string;
+type DefaultValueWhenUppercaseIsOn<
+  S extends string,
+  C extends StringTypeConstraints,
+> = C extends Readonly<{ uppercase: true }> ? CastUppercase<S> : string;
 
-type DefaultValueWhenLowercaseIsOn<S extends string, C extends RawConstraints> =
-  C extends Readonly<{ lowercase: true }> ? CastLowercase<S> : string;
+type DefaultValueWhenLowercaseIsOn<
+  S extends string,
+  C extends StringTypeConstraints,
+> = C extends Readonly<{ lowercase: true }> ? CastLowercase<S> : string;
 
 type CastLowercase<S extends string> = S extends Lowercase<S> ? S : never;
 
 type CastUppercase<S extends string> = S extends Uppercase<S> ? S : never;
 
-type DefaultValueWhenNonemptyIsOn<S extends string, C extends RawConstraints> =
-  C extends Readonly<{ nonempty: true }> ? RejectEmptyString<S> : string;
+type DefaultValueWhenNonemptyIsOn<
+  S extends string,
+  C extends StringTypeConstraints,
+> = C extends Readonly<{ nonempty: true }> ? RejectEmptyString<S> : string;
 
 type RejectEmptyString<S extends string> = S extends '' ? never : S;
 
-type ConstraintsResultTypeWhenNonemptyIsOn<C extends RawConstraints> =
+type ConstraintsResultTypeWhenNonemptyIsOn<C extends StringTypeConstraints> =
   C extends Readonly<{ nonempty: true }> ? NonEmptyString : string;
 
 /**
@@ -252,22 +265,28 @@ type ConstraintsResultTypeWhenNonemptyIsOn<C extends RawConstraints> =
  */
 type SupportedLengthLiteral = RelaxedExclude<SupportedLength, 0>;
 
-type ConstraintsResultTypeWhenMinLengthIsOn<C extends RawConstraints> =
+type ConstraintsResultTypeWhenMinLengthIsOn<C extends StringTypeConstraints> =
   C extends Readonly<{ minLength: infer M extends SupportedLengthLiteral }>
     ? MinLengthString<M>
     : string; // minLength outside the supported literal range is not encoded in the brand
 
-type ConstraintsResultTypeWhenMaxLengthIsOn<C extends RawConstraints> =
+type ConstraintsResultTypeWhenMaxLengthIsOn<C extends StringTypeConstraints> =
   C extends Readonly<{ maxLength: infer M extends SupportedLengthLiteral }>
     ? MaxLengthString<M>
     : string; // maxLength outside the supported literal range is not encoded in the brand
 
-type DefaultValueWhenMinLengthIsOn<S extends string, C extends RawConstraints> =
+type DefaultValueWhenMinLengthIsOn<
+  S extends string,
+  C extends StringTypeConstraints,
+> =
   C extends Readonly<{ minLength: infer M extends SupportedLengthLiteral }>
     ? StringWithMinLength<S, M>
     : string; // the default's length is only checked at runtime for such bounds
 
-type DefaultValueWhenMaxLengthIsOn<S extends string, C extends RawConstraints> =
+type DefaultValueWhenMaxLengthIsOn<
+  S extends string,
+  C extends StringTypeConstraints,
+> =
   C extends Readonly<{ maxLength: infer M extends SupportedLengthLiteral }>
     ? StringWithMaxLength<S, M>
     : string; // the default's length is only checked at runtime for such bounds
@@ -320,8 +339,8 @@ const validateLengthConstraint = (
 };
 
 const validateConstraints = (
-  constraints: RawConstraints,
-): Result<Constraints, string> => {
+  constraints: StringTypeConstraints,
+): Result<ValidatedConstraints, string> => {
   const result1 = validateLengthConstraint('minLength', constraints.minLength);
 
   if (Result.isErr(result1)) {
@@ -334,11 +353,11 @@ const validateConstraints = (
     ? Result.err(result2.value)
     : // Both constraints are valid.
       // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
-      Result.ok(constraints as Constraints);
+      Result.ok(constraints as ValidatedConstraints);
 };
 
 const createConstraintsPredicate =
-  (constraints: Constraints) =>
+  (constraints: ValidatedConstraints) =>
   (value: string): Result<true, StringConstraintViolation> => {
     const {
       nonempty,

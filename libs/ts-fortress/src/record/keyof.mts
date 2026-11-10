@@ -68,6 +68,10 @@ const getKeysHelper = (
   return Array.from(mut_allKeys);
 };
 
+/**
+ * @internal The `Type` `keyof` returns, computed from the arguments; a consumer
+ * spells `ReturnType<typeof keyof<…>>`.
+ */
 type KeyofType<R extends UnknownRecord> =
   IsNever<keyof R> extends true ? Type<undefined> : Type<ToString<keyof R>>;
 

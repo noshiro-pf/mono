@@ -2,6 +2,7 @@ import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import {
   Arr,
+  isNotUndefined,
   isRecord,
   isString,
   memoizeFunction,
@@ -60,22 +61,22 @@ import { projectRootPath } from '../project-root-path.mjs';
  * a `types` file (a command-line tool's name none), and the private ones of
  * `PRIVATE_PACKAGES_READ`, built: it needs the `dist/` of each, so CI runs it
  * after `ws:build`, beside `ws:check:dist`, not in `check:root`, whose
- * `ws:build:deps` leaves out a package no other one links. What a package of
- * `PENDING_PACKAGES` reports is printed and does not fail.
+ * `ws:build:deps` leaves out a package no other one links.
  */
 export const checkForgottenExports = async (): Promise<
   Result<number, string>
 > => {
   const packages = await getWorkspacePackages(projectRootPath);
 
-  const { enrolled, stale } = packagesRead(packages, projectRootPath, {
-    privateRead: PRIVATE_PACKAGES_READ,
-    pending: PENDING_PACKAGES,
-  });
+  const { enrolled, stale } = packagesRead(
+    packages,
+    projectRootPath,
+    PRIVATE_PACKAGES_READ,
+  );
 
   if (Arr.isNonEmpty(stale)) {
     return Result.err(
-      `PRIVATE_PACKAGES_READ or PENDING_PACKAGES names ${stale.join(', ')}, which is not what the list holds: for PRIVATE_PACKAGES_READ a private package with a types file, for PENDING_PACKAGES a package read (published under libs/ with a types file, or private and in PRIVATE_PACKAGES_READ).`,
+      `PRIVATE_PACKAGES_READ names ${stale.join(', ')}, which is not a private package with a types file: remove it from the list, or make it a private package with a types file again.`,
     );
   }
 
@@ -84,7 +85,7 @@ export const checkForgottenExports = async (): Promise<
   const host = cachingHost();
 
   const reports = await Promise.all(
-    enrolled.map(async (pkg): Promise<PackageReport> => {
+    enrolled.map(async (pkg) => {
       const absent = await asyncFilter(pkg.entryPoints, async (file) =>
         fs
           .access(file)
@@ -93,9 +94,7 @@ export const checkForgottenExports = async (): Promise<
       );
 
       if (Arr.isNonEmpty(absent)) {
-        return {
-          failure: `${pkg.name}: ${absent.map((file) => path.relative(projectRootPath, file)).join(', ')} not built; run \`pnpm run ws:build\`.`,
-        };
+        return `${pkg.name}: ${absent.map((file) => path.relative(projectRootPath, file)).join(', ')} not built; run \`pnpm run ws:build\`.`;
       }
 
       const findings = findForgottenExports(pkg.entryPoints, pkg.path, host);
@@ -109,31 +108,13 @@ export const checkForgottenExports = async (): Promise<
         ),
       );
 
-      if (PENDING_PACKAGES.has(pkg.name)) {
-        return Arr.isNonEmpty(lines)
-          ? { pending: [`${pkg.name} (pending):`, ...lines].join('\n') }
-          : {
-              failure: `${pkg.name}: PENDING_PACKAGES names it, but it reports nothing; if its dist/ is current (\`pnpm run ws:build\`), remove it.`,
-            };
-      }
-
       return Arr.isNonEmpty(lines)
-        ? { failure: [`${pkg.name}:`, ...lines].join('\n') }
-        : {};
+        ? [`${pkg.name}:`, ...lines].join('\n')
+        : undefined;
     }),
   );
 
-  const pending = reports
-    .map((report) => report.pending)
-    .filter((report) => report !== undefined);
-
-  if (Arr.isNonEmpty(pending)) {
-    console.log(pending.join('\n'));
-  }
-
-  const failures = reports
-    .map((report) => report.failure)
-    .filter((report) => report !== undefined);
+  const failures = reports.filter(isNotUndefined);
 
   if (Arr.isNonEmpty(failures)) {
     return Result.err(
@@ -148,8 +129,7 @@ export const checkForgottenExports = async (): Promise<
     );
   }
 
-  // The pending packages are not counted as clean.
-  return Result.ok(enrolled.length - pending.length);
+  return Result.ok(enrolled.length);
 };
 
 /**
@@ -171,10 +151,9 @@ export const typesEntryPoints = (exportsField: unknown): readonly string[] =>
 
 /**
  * The packages read, each with its entry points, absolute: a published one
- * under `libs/`, or a private one of `lists.privateRead`, with a `types` file
- * either way. And `stale`, the packages the lists name that are not what the
- * list says: a private package read, for `lists.privateRead`, and a package
- * read, for `lists.pending`.
+ * under `libs/`, or a private one of `privateRead`, with a `types` file either
+ * way. And `stale`, the packages `privateRead` names that are not a private
+ * package read.
  */
 export const packagesRead = (
   packages: readonly Readonly<{
@@ -183,10 +162,7 @@ export const packagesRead = (
     packageJson: unknown;
   }>[],
   rootDir: string,
-  lists: Readonly<{
-    privateRead: ReadonlySet<string>;
-    pending: ReadonlySet<string>;
-  }>,
+  privateRead: ReadonlySet<string>,
 ): Readonly<{
   enrolled: readonly Readonly<{
     name: string;
@@ -210,7 +186,7 @@ export const packagesRead = (
       const read =
         Arr.isNonEmpty(entryPoints) &&
         (isPrivate
-          ? lists.privateRead.has(pkg.name)
+          ? privateRead.has(pkg.name)
           : path.relative(rootDir, pkg.path).startsWith(`libs${path.sep}`));
 
       if (read) {
@@ -225,14 +201,9 @@ export const packagesRead = (
       path: dir,
       entryPoints,
     })),
-    stale: [
-      ...Array.from(lists.privateRead).filter((name) =>
-        classified.every((pkg) => pkg.name !== name || !pkg.isPrivate),
-      ),
-      ...Array.from(lists.pending).filter((name) =>
-        classified.every((pkg) => pkg.name !== name),
-      ),
-    ],
+    stale: Array.from(privateRead).filter((name) =>
+      classified.every((pkg) => pkg.name !== name || !pkg.isPrivate),
+    ),
   };
 };
 
@@ -525,24 +496,10 @@ export const findForgottenExports = (
   return mut_findings;
 };
 
-/** What one package gives the summary: nothing when it is clean. */
-type PackageReport = Readonly<{ failure?: string; pending?: string }>;
-
 /** The private packages read, as if published: they replace published ones. */
 const PRIVATE_PACKAGES_READ: ReadonlySet<string> = new Set<string>([
   'synstate-dom-next',
   'synstate-next',
-]);
-
-/**
- * Packages whose findings are printed and do not fail yet: each is fixed in a
- * pull request stacked on the one adding this check, which removes it here.
- */
-const PENDING_PACKAGES: ReadonlySet<string> = new Set<string>([
-  'ts-data-forge',
-  'ts-fortress',
-  'ts-std-forge',
-  'ts-type-forge',
 ]);
 
 export type Finding = Readonly<{

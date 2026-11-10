@@ -9,6 +9,10 @@ import {
   type ValidationError,
 } from '../utils/index.mjs';
 
+/**
+ * @internal What the `Type` `SetType` returns validates; a consumer reads it
+ * with `TypeOf<ReturnType<typeof SetType<…>>>`.
+ */
 type SetResultType<T extends UnknownType> = ReadonlySet<TypeOf<T>>;
 
 export const SetType = <T extends UnknownType>(

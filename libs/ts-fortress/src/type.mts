@@ -237,13 +237,12 @@ export const copyTypeByDescriptors = (
 };
 
 /**
- * @internal The bound used wherever a codec is accepted without caring which
- * value type it validates — `<T extends UnknownType>`, {@link UnknownShape},
- * and the element bounds of `union` / `tuple` / `intersection`.
+ * The bound used wherever a codec is accepted without caring which value type
+ * it validates — `<T extends UnknownType>`, {@link UnknownShape}, and the
+ * element bounds of `union` / `tuple` / `intersection`.
  *
  * It is plainly `Type<unknown>`; no `any` is involved, so a value typed by it
- * stays checked. It is not exported because it says nothing a caller cannot
- * write themselves.
+ * stays checked.
  *
  * NOTE — one way to break this bound, worth knowing before it bites:
  * `prune` is `<B extends A>(a: B) => A`, so relating it to

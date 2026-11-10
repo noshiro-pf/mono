@@ -56,6 +56,10 @@ export const valueof = <const R extends UnknownRecord>(
       (undefinedType satisfies Type<undefined> as ValueOfType<R>);
 };
 
+/**
+ * @internal The `Type` `valueof` returns, computed from the arguments; a
+ * consumer spells `ReturnType<typeof valueof<…>>`.
+ */
 type ValueOfType<T extends UnknownRecord> =
   IsNever<keyof T> extends true ? Type<undefined> : Type<ValueOf<T>>;
 

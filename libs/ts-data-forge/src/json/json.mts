@@ -118,7 +118,11 @@ export namespace Json {
   /** What {@link parseWithReviver} calls for each key-value pair. */
   export type Reviver = (this: unknown, key: string, value: unknown) => unknown;
 
-  /** The call signatures of {@link parse}. */
+  /**
+   * The call signatures of {@link parse}.
+   *
+   * @internal A consumer spells `typeof Json.parse`.
+   */
   // Two signatures rather than one with an optional reviver, so that the one
   // taking a reviver carries `@deprecated` and the other does not.
   /* eslint-disable @typescript-eslint/unified-signatures */

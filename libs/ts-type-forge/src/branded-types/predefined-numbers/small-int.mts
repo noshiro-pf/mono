@@ -134,16 +134,25 @@ export type ExcludeSmallInt<
   MaxIndex extends number = TSTypeForgeInternals_SmallIntIndexMax,
 > = RelaxedExclude<N, SmallInt<'', MaxIndex>>;
 
-/** Integers in `[1, MaxIndex - 1]` */
+/**
+ * Integers in `[1, MaxIndex - 1]`
+ *
+ * @internal A step of `SmallInt`; a consumer spells `SmallInt`.
+ */
 type SmallPositiveInt<
   MaxIndex extends number = TSTypeForgeInternals_SmallIntIndexMax,
 > = RelaxedExclude<Index<MaxIndex>, 0>;
 
-/** Integers in `[-MaxIndex, -1]` */
+/**
+ * Integers in `[-MaxIndex, -1]`
+ *
+ * @internal A step of `SmallInt`; a consumer spells `SmallInt`.
+ */
 type SmallNegativeInt<
   MaxIndex extends number = TSTypeForgeInternals_SmallIntIndexMax,
 > = NegativeIndex<MaxIndex>;
 
+/** @internal A step of `WithSmallInt`; a consumer spells `WithSmallInt`. */
 type WithSmallIntImpl<N extends Int, MaxIndex extends number> =
   | RelaxedExclude<
       SmallInt<'', MaxIndex>,

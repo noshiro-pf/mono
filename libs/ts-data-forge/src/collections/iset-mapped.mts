@@ -38,6 +38,9 @@ import type { MapSetKeyType, SizeType } from '../types.mjs';
  *
  * @template K The type of the custom elements in the set.
  * @template KM The type of the mapped primitive keys (string, number, etc.).
+ *
+ * @internal The method set `ISetMapped` is made of; a consumer spells
+ * `ISetMapped`.
  */
 type ISetMappedInterface<K, KM extends MapSetKeyType> = Readonly<{
   /**

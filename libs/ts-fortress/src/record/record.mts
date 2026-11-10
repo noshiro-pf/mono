@@ -239,7 +239,11 @@ export const strictRecord = <const S extends UnknownShape>(
 // RecordTypeValue (internal — computes value type from shape)
 // ---------------------------------------------------------------------------
 
-/** @internal */
+/**
+ * @internal What the `Type` `record` and `strictRecord` return validates,
+ * computed from the shape; a consumer reads it with
+ * `TypeOf<ReturnType<typeof record<…>>>`.
+ */
 type RecordTypeFromShape<S extends UnknownShape> =
   TsFortressInternal.RecordTypeFromShapeImpl<S>;
 

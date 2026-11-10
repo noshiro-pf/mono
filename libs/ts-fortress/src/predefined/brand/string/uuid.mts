@@ -67,9 +67,21 @@ export const uuid = <V extends UuidVersion | UuidVersionAdditionalOption>(
   ) satisfies Type<T> as Type<UuidOf<V>>;
 };
 
-type UuidVersionAdditionalOption = 'nil' | 'max' | 'all' | 'loose';
+/**
+ * The `version` values of {@link uuid} beyond the numbered versions: `'nil'`
+ * and `'max'` accept only the all-zero and all-`f` UUIDs, `'all'` those and
+ * versions 1–8 in either case, and `'loose'` any lower-case hexadecimal string
+ * of the UUID layout, ignoring RFC 9562. A numbered version and the lower-case
+ * forms accept no upper-case digit.
+ */
+export type UuidVersionAdditionalOption = 'nil' | 'max' | 'all' | 'loose';
 
-type UuidOf<V extends UuidVersion | UuidVersionAdditionalOption> =
+/**
+ * The type {@link uuid} gives for the `version` `V`: `Uuid4`, `Uuid6` or
+ * `Uuid7` for those versions, and `Uuid` for any other. All four carry the
+ * brand `'Uuid'`; they differ only in the version digit of their string type.
+ */
+export type UuidOf<V extends UuidVersion | UuidVersionAdditionalOption> =
   TypeEq<V, 4> extends true
     ? Uuid4
     : TypeEq<V, 6> extends true
@@ -96,18 +108,25 @@ export const uuidV7 = (defaultValue?: string): Type<Uuid7> =>
     version: 7,
   });
 
-type UuidValidatorOption<V extends UuidVersion | UuidVersionAdditionalOption> =
-  Partial<
-    Readonly<{
-      /**
-       * @param version One of 1-8, 'nil', 'max', 'all' or 'loose'. The 'loose' option checks if the string is a UUID-like string with hexadecimal values, ignoring RFC9562.
-       */
-      version: V;
+/**
+ * The options {@link uuid} takes, each optional. `defaultValue` is the nil UUID
+ * when left out, which only `'nil'`, `'all'` and `'loose'` accept: another
+ * `version` needs a `defaultValue` of its own, or `uuid` panics when it builds
+ * the type.
+ */
+export type UuidValidatorOption<
+  V extends UuidVersion | UuidVersionAdditionalOption,
+> = Partial<
+  Readonly<{
+    /**
+     * 1–8, or one of {@link UuidVersionAdditionalOption}; `'all'` if left out.
+     */
+    version: V;
 
-      typeName: string;
-      defaultValue: string;
-    }>
-  >;
+    typeName: string;
+    defaultValue: string;
+  }>
+>;
 
 const nilUuid = '00000000-0000-0000-0000-000000000000' satisfies UuidBaseString;
 

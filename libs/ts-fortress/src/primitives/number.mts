@@ -31,21 +31,19 @@ import {
   type NumericConstraintViolation,
 } from '../utils/index.mjs';
 
-type NumberType = number;
-
 export function number(
-  defaultValue?: NumberType,
-): ConstrainedType<NumberType, NumberConstraintsOf<NoConstraints>>;
+  defaultValue?: number,
+): ConstrainedType<number, NumberConstraintsOf<NoConstraints>>;
 
-export function number<N extends NumberType, const C extends Constraints>(
+export function number<N extends number, const C extends NumberTypeConstraints>(
   defaultValue: N & DefaultValueType<N, C>,
   constraints: C,
 ): ConstrainedType<ConstraintsToResultType<C>, NumberConstraintsOf<C>>;
 
 export function number(
-  defaultValue: NumberType = 0,
-  constraints?: Constraints,
-): ConstrainedType<NumberType, NumberConstraintsOf<Constraints>> {
+  defaultValue: number = 0,
+  constraints?: NumberTypeConstraints,
+): ConstrainedType<number, NumberConstraintsOf<NumberTypeConstraints>> {
   const baseType = createPrimitiveType({
     typeName: 'number',
     defaultValue,
@@ -53,10 +51,10 @@ export function number(
     structure: STRUCTURE,
   });
 
-  const constraintValues = fillConstraints<Required<Constraints>, Constraints>(
-    numberConstraintKeys,
-    constraints,
-  );
+  const constraintValues = fillConstraints<
+    Required<NumberTypeConstraints>,
+    NumberTypeConstraints
+  >(numberConstraintKeys, constraints);
 
   if (constraints === undefined || Arr.isEmpty(Object.keys(constraints))) {
     return attachConstraints(baseType, constraintValues);
@@ -82,7 +80,7 @@ export function number(
       refine({
         baseType,
         defaultValue,
-        is: (value): value is NumberType =>
+        is: (value): value is number =>
           Result.isOk(constraintsPredicate(value)),
         typeName: 'number',
         getConstraintDetails: (value) => {
@@ -103,7 +101,10 @@ export function number(
   );
 }
 
-type Constraints = Partial<
+/**
+ * The set of constraints accepted by {@link number}.
+ */
+export type NumberTypeConstraints = Partial<
   Readonly<{
     finite: true;
     int: true;
@@ -114,21 +115,16 @@ type Constraints = Partial<
     positive: true;
     nonPositive: true;
 
-    gt: NumberType;
-    gte: NumberType;
-    min: NumberType;
-    lt: NumberType;
-    lte: NumberType;
-    max: NumberType;
-    multipleOf: NumberType;
-    step: NumberType;
+    gt: number;
+    gte: number;
+    min: number;
+    lt: number;
+    lte: number;
+    max: number;
+    multipleOf: number;
+    step: number;
   }>
 >;
-
-/**
- * The set of constraints accepted by {@link number}.
- */
-export type NumberTypeConstraints = Constraints;
 
 /**
  * The numeric-range subset of {@link NumberTypeConstraints}. These constraints
@@ -164,11 +160,11 @@ export type NumberRangeConstraints = StrictPick<
  * ```
  */
 export type NumberConstraintsOf<C extends NumberTypeConstraints> =
-  FillConstraints<Required<Constraints>, C>;
+  FillConstraints<Required<NumberTypeConstraints>, C>;
 
 /**
- * Every key of {@link Constraints}, in the order the runtime predicate checks
- * them. The `expectType` below keeps it in step with the type.
+ * Every key of {@link NumberTypeConstraints}, in the order the runtime predicate
+ * checks them. The `expectType` below keeps it in step with the type.
  */
 const numberConstraintKeys = [
   'finite',
@@ -187,30 +183,41 @@ const numberConstraintKeys = [
   'max',
   'multipleOf',
   'step',
-] as const satisfies readonly (keyof Constraints)[];
+] as const satisfies readonly (keyof NumberTypeConstraints)[];
 
-expectType<ArrayElement<typeof numberConstraintKeys>, keyof Constraints>('=');
+expectType<
+  ArrayElement<typeof numberConstraintKeys>,
+  keyof NumberTypeConstraints
+>('=');
 
+/**
+ * @internal The type `defaultValue` must have for the constraints `C`, a step
+ * of a parameter type, which a caller meets with the argument it passes.
+ */
 type DefaultValueType<
-  N extends NumberType,
-  C extends Constraints,
+  N extends number,
+  C extends NumberTypeConstraints,
 > = DefaultValueWhenNonZeroIsOn<N, C> &
   DefaultValueWhenNegativeIsOn<N, C> &
   DefaultValueWhenNonNegativeIsOn<N, C> &
   DefaultValueWhenPositiveIsOn<N, C> &
   DefaultValueWhenNonPositiveIsOn<N, C>;
 
-type ConstraintsToResultType<C extends Constraints> =
+/**
+ * @internal What the `Type` `number` returns for the constraints `C` validates;
+ * a consumer reads it with `TypeOf`.
+ */
+type ConstraintsToResultType<C extends NumberTypeConstraints> =
   ConstraintsToResultHelperType<ConstraintsToResultBrandKeys<C>>;
 
 type ConstraintsToResultHelperType<
   R extends Readonly<{ brandKeys: string; brandFalseKeys: string }>,
 > =
   IsNever<R> extends true
-    ? NumberType
-    : Brand<NumberType, R['brandKeys'], R['brandFalseKeys']>;
+    ? number
+    : Brand<number, R['brandKeys'], R['brandFalseKeys']>;
 
-type ConstraintsToResultBrandKeys<C extends Constraints> =
+type ConstraintsToResultBrandKeys<C extends NumberTypeConstraints> =
   | (C extends Readonly<{ int: true }>
       ? Readonly<{ brandKeys: 'Int' | 'Finite'; brandFalseKeys: 'NaNValue' }>
       : never)
@@ -321,75 +328,77 @@ type ConstraintsToResultBrandKeys<C extends Constraints> =
   >('=');
 }
 
-type DefaultValueWhenNonZeroIsOn<N extends NumberType, C extends Constraints> =
-  C extends Readonly<{ nonZero: true }> ? NonZeroNumber<N> : NumberType;
+type DefaultValueWhenNonZeroIsOn<
+  N extends number,
+  C extends NumberTypeConstraints,
+> = C extends Readonly<{ nonZero: true }> ? NonZeroNumber<N> : number;
 
-type DefaultValueWhenNegativeIsOn<N extends NumberType, C extends Constraints> =
-  C extends Readonly<{ negative: true }> ? NegativeNumber<N> : NumberType;
+type DefaultValueWhenNegativeIsOn<
+  N extends number,
+  C extends NumberTypeConstraints,
+> = C extends Readonly<{ negative: true }> ? NegativeNumber<N> : number;
 
 type DefaultValueWhenNonNegativeIsOn<
-  N extends NumberType,
-  C extends Constraints,
-> =
-  C extends Readonly<{ nonNegative: true }> ? NonNegativeNumber<N> : NumberType;
+  N extends number,
+  C extends NumberTypeConstraints,
+> = C extends Readonly<{ nonNegative: true }> ? NonNegativeNumber<N> : number;
 
-type DefaultValueWhenPositiveIsOn<N extends NumberType, C extends Constraints> =
-  C extends Readonly<{ positive: true }> ? PositiveNumber<N> : NumberType;
+type DefaultValueWhenPositiveIsOn<
+  N extends number,
+  C extends NumberTypeConstraints,
+> = C extends Readonly<{ positive: true }> ? PositiveNumber<N> : number;
 
 type DefaultValueWhenNonPositiveIsOn<
-  N extends NumberType,
-  C extends Constraints,
-> =
-  C extends Readonly<{ nonPositive: true }> ? NonPositiveNumber<N> : NumberType;
+  N extends number,
+  C extends NumberTypeConstraints,
+> = C extends Readonly<{ nonPositive: true }> ? NonPositiveNumber<N> : number;
 
-type NonZeroNumber<N extends NumberType> = NumberType extends N
-  ? NumberType
+type NonZeroNumber<N extends number> = number extends N
+  ? number
   : IsZero<N> extends true
     ? never
     : N;
 
-type NegativeNumber<N extends NumberType> = NumberType extends N
-  ? NumberType
+type NegativeNumber<N extends number> = number extends N
+  ? number
   : IsNegative<N> extends true
     ? N
     : never;
 
-type NonNegativeNumber<N extends NumberType> = NumberType extends N
-  ? NumberType
+type NonNegativeNumber<N extends number> = number extends N
+  ? number
   : IsNonNegative<N> extends true
     ? N
     : never;
 
-type PositiveNumber<N extends NumberType> = NumberType extends N
-  ? NumberType
+type PositiveNumber<N extends number> = number extends N
+  ? number
   : IsPositive<N> extends true
     ? N
     : never;
 
-type NonPositiveNumber<N extends NumberType> = NumberType extends N
-  ? NumberType
+type NonPositiveNumber<N extends number> = number extends N
+  ? number
   : IsNonPositive<N> extends true
     ? N
     : never;
 
-type IsZero<N extends NumberType> = `${N}` extends '0' ? true : false;
+type IsZero<N extends number> = `${N}` extends '0' ? true : false;
 
-type IsNonZero<N extends NumberType> = IsZero<N> extends true ? false : true;
+type IsNonZero<N extends number> = IsZero<N> extends true ? false : true;
 
-type IsNegative<N extends NumberType> = `${N}` extends `-${string}`
-  ? true
-  : false;
+type IsNegative<N extends number> = `${N}` extends `-${string}` ? true : false;
 
-type IsNonNegative<N extends NumberType> =
+type IsNonNegative<N extends number> =
   IsNegative<N> extends true ? false : true;
 
-type IsPositive<N extends NumberType> = BoolAnd<IsNonZero<N>, IsNonNegative<N>>;
+type IsPositive<N extends number> = BoolAnd<IsNonZero<N>, IsNonNegative<N>>;
 
-type IsNonPositive<N extends NumberType> = BoolNot<IsPositive<N>>;
+type IsNonPositive<N extends number> = BoolNot<IsPositive<N>>;
 
 const createConstraintsPredicate =
-  (constraints: Constraints) =>
-  (value: NumberType): Result<true, NumericConstraintViolation> => {
+  (constraints: NumberTypeConstraints) =>
+  (value: number): Result<true, NumericConstraintViolation> => {
     const {
       finite,
       int,
@@ -513,7 +522,7 @@ const createConstraintsPredicate =
   };
 
 const defaultValueErrorMessage = (
-  value: NumberType,
+  value: number,
   violation: NumericConstraintViolation,
 ): string =>
   `defaultValue [${value}] for number does not satisfy the constraint ${violation.constraint} = ${violation.value}` as const;

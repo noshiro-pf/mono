@@ -63,7 +63,12 @@ export function match<S, E, I, P, O, X>(
   }
 }
 
-type Cases<S, E, I, P, O, X> = Readonly<{
+/**
+ * The handlers `match` takes, one per state of an `AsyncData<S, E>`: `idle`
+ * returns `I`, `pending` `P`, `ok` `O` and `err` `X`. `pending` and `err` get
+ * the last success value, if any, as `previous`.
+ */
+export type Cases<S, E, I, P, O, X> = Readonly<{
   idle: () => I;
   pending: (previous: Optional<S>) => P;
   ok: (value: S) => O;

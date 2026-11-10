@@ -170,6 +170,10 @@ export const copy = <const Ar extends readonly unknown[]>(array: Ar): Ar =>
 
 type LT = Readonly<{ [N in SmallUint]: Index<N> }>;
 
+/**
+ * @internal The type `range` returns, computed from its arguments, which a
+ * consumer gets from the call.
+ */
 type RangeList<S extends SmallUint, E extends SmallUint> =
   BoolOr<IsUnion<S>, IsUnion<E>> extends true
     ? readonly RelaxedExclude<LT[E], LT[Min<S>]>[] // Avoid incorrect type calculation for unions with Seq
