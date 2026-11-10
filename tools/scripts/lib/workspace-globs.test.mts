@@ -1,6 +1,9 @@
 import dedent from 'dedent';
 import { Result } from 'ts-data-forge';
-import { parseWorkspacePackages } from './workspace-globs.mjs';
+import {
+  memberManifestGlobs,
+  parseWorkspacePackages,
+} from './workspace-globs.mjs';
 
 describe(parseWorkspacePackages, () => {
   test('reads the packages list, skipping comments and blank lines', () => {
@@ -106,5 +109,14 @@ describe(parseWorkspacePackages, () => {
     `);
 
     assert.isTrue(Result.isErr(result));
+  });
+});
+
+describe(memberManifestGlobs, () => {
+  test('names each member glob’s manifest, not the root’s', () => {
+    assert.deepStrictEqual(
+      memberManifestGlobs(['libs/*', 'strict-lib/v*/output/lib']),
+      ['libs/*/package.json', 'strict-lib/v*/output/lib/package.json'],
+    );
   });
 });

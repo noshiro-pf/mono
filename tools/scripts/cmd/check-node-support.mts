@@ -10,6 +10,10 @@ import {
   unknownToString,
 } from 'ts-data-forge';
 import { glob, isDirectlyExecuted } from 'ts-repo-utils';
+import {
+  memberManifestGlobs,
+  readPnpmWorkspaceGlobs,
+} from '../lib/workspace-globs.mjs';
 import { projectRootPath } from '../project-root-path.mjs';
 
 /**
@@ -284,21 +288,6 @@ type Violation = Readonly<{
   }>;
 }>;
 
-/**
- * `apps/*` and the private packages under `languages/*` are workspace members
- * like any other, so they are governed too where they declare a field. What is
- * *not* required is that they declare one: adding `engines` to thirty private
- * applications would be noise, and a field that is absent makes no claim to be
- * wrong.
- */
-const manifestGlobs = [
-  'package.json',
-  'libs/*/package.json',
-  'apps/*/package.json',
-  'tools/*/package.json',
-  'languages/*/*/package.json',
-] as const;
-
 const workflowPath = path.resolve(
   projectRootPath,
   '.github/workflows/node-version-compatibility.yml',
@@ -461,14 +450,31 @@ const expectedCeiling = (config: NodeSupportConfig): number | undefined => {
  */
 const parseJson = (text: string): unknown => JSON.parse(text);
 
+/**
+ * The root's manifest and every workspace member's, the members read from
+ * `pnpm-workspace.yaml`. `apps/*`, the private packages under `languages/*` and
+ * `strict-lib/` are members like any other, so they are governed too where they
+ * declare a field. What is *not* required is that they declare one: adding
+ * `engines` to thirty private applications would be noise, and a field that is
+ * absent makes no claim to be wrong.
+ */
 const collectManifests = async (): Promise<
   Result<readonly Manifest[], string>
 > => {
-  const result = await glob(Array.from(manifestGlobs), {
-    cwd: projectRootPath,
-    ignore: ['**/node_modules/**'],
-    absolute: true,
-  });
+  const memberGlobs = await readPnpmWorkspaceGlobs();
+
+  if (Result.isErr(memberGlobs)) {
+    return Result.err(`❌ ${memberGlobs.value}`);
+  }
+
+  const result = await glob(
+    Arr.toUnshifted('package.json')(memberManifestGlobs(memberGlobs.value)),
+    {
+      cwd: projectRootPath,
+      ignore: ['**/node_modules/**'],
+      absolute: true,
+    },
+  );
 
   if (Result.isErr(result)) {
     return Result.err(

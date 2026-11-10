@@ -1,4 +1,8 @@
-import { findUnusedWorkspaceKeys } from './check-knip-config.mjs';
+import { Arr } from 'ts-data-forge';
+import {
+  findUnusedWorkspaceKeys,
+  looksLikeWorkspacePath,
+} from './check-knip-config.mjs';
 
 describe(findUnusedWorkspaceKeys, () => {
   test('accepts keys that name a package directory', () => {
@@ -66,5 +70,35 @@ describe(findUnusedWorkspaceKeys, () => {
       ),
       ['./apps/profile', 'apps/profile/', 'apps/x/../profile'],
     );
+  });
+});
+
+describe(looksLikeWorkspacePath, () => {
+  const memberGlobs = ['libs/*', 'apps/*', 'strict-lib/v*/output/lib'] as const;
+
+  test('matches a key under a member glob’s top directory', () => {
+    assert.isTrue(looksLikeWorkspacePath(memberGlobs, 'libs/ts-data-forge'));
+
+    assert.isTrue(looksLikeWorkspacePath(memberGlobs, 'strict-lib/v7.0'));
+  });
+
+  test('matches a top directory a newly added glob introduces', () => {
+    assert.isTrue(
+      looksLikeWorkspacePath(Arr.toPushed(memberGlobs, 'games/*'), 'games/x'),
+    );
+  });
+
+  test('does not match a knip option or a path outside the members', () => {
+    assert.isFalse(looksLikeWorkspacePath(memberGlobs, 'entry'));
+
+    assert.isFalse(looksLikeWorkspacePath(memberGlobs, 'games/x'));
+
+    assert.isFalse(looksLikeWorkspacePath(memberGlobs, 'libs-old/y'));
+  });
+
+  test('matches through a wildcard in the top directory itself', () => {
+    assert.isTrue(looksLikeWorkspacePath(['pkg-*/*'], 'pkg-a/b'));
+
+    assert.isFalse(looksLikeWorkspacePath(['pkg-*/*'], 'other/b'));
   });
 });

@@ -31,6 +31,14 @@ export const readPnpmWorkspaceGlobs = async (): Promise<
 };
 
 /**
+ * The manifest of each member a `packages` glob matches. The root's is not one
+ * of them: a guard that reads it too adds `package.json` itself.
+ */
+export const memberManifestGlobs = (
+  globs: readonly string[],
+): readonly string[] => globs.map((g) => path.posix.join(g, 'package.json'));
+
+/**
  * The entries of the top-level `packages` block sequence.
  *
  * This reads the one shape the file uses — `packages:` alone on its line, then
