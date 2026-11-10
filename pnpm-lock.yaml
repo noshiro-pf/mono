@@ -3727,6 +3727,9 @@ importers:
       ts-repo-utils:
         specifier: workspace:*
         version: link:../ts-repo-utils
+      ts-std-forge:
+        specifier: workspace:*
+        version: link:../ts-std-forge
 
   libs/eslint-plugin-ts-fortress:
     dependencies:

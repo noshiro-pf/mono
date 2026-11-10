@@ -15,7 +15,7 @@ import {
 import { isString } from 'ts-data-forge';
 import type { DeepReadonly, ReadonlyRecord } from 'ts-type-forge';
 import * as ts from 'typescript';
-import { TS_DATA_FORGE_MODULE } from './constants.mjs';
+import { TS_DATA_FORGE_MODULE, TS_STD_FORGE_MODULE } from './constants.mjs';
 import { tsDataForgeValueAtByName } from './import-binding.mjs';
 
 type Options = readonly [
@@ -216,6 +216,14 @@ export const noUnnecessaryTypeGuard: TSESLint.RuleModule<MessageIds, Options> =
 
       const resolveGuard = buildCalleeResolver(tsDataForgeImports);
 
+      // The algebraic data types are ts-std-forge's; ts-data-forge only
+      // re-exports them and tells new code to import them from there. Their
+      // variant guards (`Optional.isNone`, …) are the only guards read from it:
+      // every member spec is one, and the tags they read are the same.
+      const resolveStdForgeOwner = buildCalleeResolver(
+        getImportDeclarations(program, TS_STD_FORGE_MODULE),
+      );
+
       // `Optional.isNone(x)`, `tf.Optional.isNone(x)`: a guard that is a member
       // of an exported object, named `Optional.isNone` in `GUARD_SPECS`.
       const resolveMemberGuard = (
@@ -232,7 +240,8 @@ export const noUnnecessaryTypeGuard: TSESLint.RuleModule<MessageIds, Options> =
           return undefined;
         }
 
-        const owner = resolveGuard(member.object);
+        const owner =
+          resolveGuard(member.object) ?? resolveStdForgeOwner(member.object);
 
         return owner === undefined
           ? undefined

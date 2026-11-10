@@ -14,7 +14,7 @@ import {
 } from 'eslint-rule-forge';
 import { Arr } from 'ts-data-forge';
 import * as ts from 'typescript';
-import { TS_DATA_FORGE_MODULE } from './constants.mjs';
+import { TS_DATA_FORGE_MODULE, TS_STD_FORGE_MODULE } from './constants.mjs';
 
 type Options = readonly [];
 
@@ -279,7 +279,7 @@ export const preferPipeMapNullable: TSESLint.RuleModule<MessageIds, Options> = {
  * through either package is the same object. `mapNullable` is exported by
  * `ts-data-forge` only.
  */
-const PIPE_MODULES = [TS_DATA_FORGE_MODULE, 'ts-std-forge'] as const;
+const PIPE_MODULES = [TS_DATA_FORGE_MODULE, TS_STD_FORGE_MODULE] as const;
 
 /** The methods of a `Pipe` that return another `Pipe`. */
 const PIPE_CHAIN_METHODS: ReadonlySet<string> = new Set<string>([

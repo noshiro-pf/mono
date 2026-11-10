@@ -71,7 +71,8 @@
     "prettier": "catalog:",
     "prettier-plugin-organize-imports": "catalog:",
     "prettier-plugin-packagejson": "catalog:",
-    "ts-repo-utils": "workspace:*"
+    "ts-repo-utils": "workspace:*",
+    "ts-std-forge": "workspace:*"
   },
   "peerDependencies": {
     "eslint": ">=9.0.0",
