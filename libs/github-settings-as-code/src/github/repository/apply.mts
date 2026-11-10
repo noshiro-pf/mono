@@ -8,6 +8,7 @@ import * as t from 'ts-fortress';
 import {
   formatUncommittedFiles,
   isDirectlyExecuted,
+  pathExists,
   Result,
 } from 'ts-repo-utils';
 import type { StrictPick } from 'ts-type-forge';
@@ -19,7 +20,17 @@ import {
   RepositoryPicked,
 } from './constants.mjs';
 
+/**
+ * `repo-settings/repository-settings/settings.json` を Settings > General に反映する。
+ * 設定ファイルを置いていない repository では何もしない（pages と同じ理由）。
+ */
 export const applyRepositorySettings = async (): Promise<void> => {
+  if (
+    !(await pathExists(path.resolve(repositorySettingsDir, settingsJsonName)))
+  ) {
+    return;
+  }
+
   const settings = await readSettings();
 
   await updateRepository({

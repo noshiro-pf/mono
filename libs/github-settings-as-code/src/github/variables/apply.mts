@@ -3,7 +3,7 @@ import 'dotenv/config';
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import * as t from 'ts-fortress';
-import { isDirectlyExecuted, Result } from 'ts-repo-utils';
+import { isDirectlyExecuted, pathExists, Result } from 'ts-repo-utils';
 import { settingsJsonName, variablesDir } from '../constants.mjs';
 import {
   createRepoVariable,
@@ -23,8 +23,13 @@ import {
  * ときは宣言から外したうえで GitHub 側でも消す。 apply が片付けてしまうと、
  * 誰かが GUI で足したものが「いつの間にか無くなる」ことになり、drift 検査が
  * 報せるという見え方が働かなくなる。
+ * 設定ファイルを置いていない repository では何もしない（pages と同じ理由）。
  */
 export const applyVariables = async (): Promise<void> => {
+  if (!(await pathExists(path.resolve(variablesDir, settingsJsonName)))) {
+    return;
+  }
+
   const variables = await readSettings();
 
   // 1 本目を送る前に、全部の名前を見る。

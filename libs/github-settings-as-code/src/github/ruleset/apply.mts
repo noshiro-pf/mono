@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import 'dotenv/config';
 import * as fs from 'node:fs/promises';
-import { Obj } from 'ts-data-forge';
+import { Arr, Obj } from 'ts-data-forge';
 import { formatUncommittedFiles, isDirectlyExecuted } from 'ts-repo-utils';
 import { rulesetsDir } from '../constants.mjs';
 import { settingsFilePath } from '../settings-file-path.mjs';
@@ -14,8 +14,16 @@ import {
 import { rulesetKeysToPick } from './constants.mjs';
 import { readRulesetFiles } from './read-rule-set-contents.mjs';
 
+/**
+ * `repo-settings/rulesets/*.json` を Settings > Rules > Rulesets に反映する。
+ * 宣言が一つも無ければ（ディレクトリが無い repository も含む）何もしない。
+ */
 export const applyRulesets = async (): Promise<void> => {
   const rulesets = await readRulesetFiles();
+
+  if (!Arr.isNonEmpty(rulesets)) {
+    return;
+  }
 
   // 既にあるかどうかは live に訊く。以前はこの直前に走らせた backup の出力を
   // 読んでいたが、それは live の写しでしかなく、写した時点と送る時点のあいだに

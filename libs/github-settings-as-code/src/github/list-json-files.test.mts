@@ -42,4 +42,20 @@ describe(listJsonFilesIn, () => {
 
     assert.deepStrictEqual(await listJsonFilesIn(dir), []);
   });
+
+  test('is empty for a directory that does not exist', async () => {
+    const dir = await makeDir();
+
+    assert.deepStrictEqual(await listJsonFilesIn(path.join(dir, 'absent')), []);
+  });
+
+  test('still throws for a path that is a file', async () => {
+    const dir = await makeDir();
+
+    await write(path.join(dir, 'file.json'), '{}');
+
+    await expect(listJsonFilesIn(path.join(dir, 'file.json'))).rejects.toThrow(
+      'ENOTDIR',
+    );
+  });
 });
