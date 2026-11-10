@@ -190,19 +190,27 @@ jobs:
       # reports; the job has failed already. Not after a failed setup, nor
       # after a failed build (`z:ci-job` says so in `build-failed`), when the
       # command never ran. Last, and capped, so that it cannot
-      # spend the job's time limit before the steps above.
+      # spend the job's time limit before the steps above. On a pull request,
+      # and on a queue layer, which is where a queued one is checked and
+      # whose run its set-aside comment links; the layer diffs against
+      # `origin/main`, as its other steps do.
       - name: Say which of "${{ matrix.command }}"'s commands check-changed would have run
         if: >-
-          failure() && github.event_name == 'pull_request' &&
+          failure() &&
+          (github.event_name == 'pull_request' || startsWith(github.ref, 'refs/heads/queue/')) &&
           steps.command.outcome == 'failure' &&
           steps.command.outputs.build-failed != 'true'
         continue-on-error: true
         timeout-minutes: 2
         env:
-          GAP_BASE: ${{ github.event.pull_request.base.sha }}
+          GAP_BASE: ${{ case(github.event_name == 'pull_request', github.event.pull_request.base.sha, 'origin/main') }}
           GAP_JOB: ${{ matrix.command }}
         run: |
-          git fetch --no-tags --depth=1 origin "${GAP_BASE}"
+          if [ "${GAP_BASE}" = 'origin/main' ]; then
+            git fetch --no-tags --depth=1 origin '+refs/heads/main:refs/remotes/origin/main'
+          else
+            git fetch --no-tags --depth=1 origin "${GAP_BASE}"
+          fi
           pnpm run --silent z:check-changed-gap --job "${GAP_JOB}" --base "${GAP_BASE}" >> "${GITHUB_STEP_SUMMARY}"
 
   # The one required status check for this workflow, reported as

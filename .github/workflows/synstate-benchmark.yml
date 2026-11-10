@@ -389,11 +389,13 @@ jobs:
       # `check-drift.mts`'s rules. The baseline is passed as the committed
       # side and this branch as the reference, so in the table this step adds
       # to the summary "the committed tables" are the baseline and "the
-      # reference" is this branch.
+      # reference" is this branch. On a queue layer too: a queued pull request
+      # is measured there, and its own run reuses that verdict, whose summary
+      # links the layer's run, without measuring again.
       - name: Judge this branch's measurement
         id: branch
         if: >-
-          github.event_name == 'pull_request' &&
+          (github.event_name == 'pull_request' || startsWith(github.ref, 'refs/heads/queue/')) &&
           steps.baseline.outputs.cache-matched-key != '' &&
           steps.baseline.outputs.cache-hit != 'true'
         run: |
