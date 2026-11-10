@@ -95,14 +95,7 @@ export const convertLibEs5_Math =
               : roundingFunctions.map((fn) =>
                   replaceWithNoMatchCheck(
                     `${fn}(x: number): number;`,
-                    // The `Int` overload returns a generic caller's type
-                    // parameter as itself; the conditional one still maps an
-                    // `Int` member of a union to itself.
-                    dedent`
-                      ${fn}<N extends ${brandedNumber.Int}>(x: N): N;
-                      ${fn}<N extends ${brandedNumber.FiniteNumber}>(x: N): ${roundingReturnType(fn, brandedNumber)};
-                      ${fn}(x: number): ${brandedNumber.Int} | ${brandedNumber.InfiniteNumber} | ${brandedNumber.NaNType};
-                    `,
+                    roundingOverloads(fn, brandedNumber),
                   ),
                 )),
           ),
@@ -110,21 +103,40 @@ export const convertLibEs5_Math =
       ),
     ).value;
 
+/**
+ * The branded overloads of a rounding function: `Math.ceil` / `floor` / `round`
+ * here, and `Math.trunc`, which `lib.es2015.core` declares. The `Int` overload
+ * returns a generic caller's type parameter as itself; the conditional one
+ * still maps an `Int` member of a union to itself.
+ */
+export const roundingOverloads = (
+  fn: RoundingFunction,
+  brandedNumber: BrandedNumberTypes,
+): string => dedent`
+  ${fn}<N extends ${brandedNumber.Int}>(x: N): N;
+  ${fn}<N extends ${brandedNumber.FiniteNumber}>(x: N): ${roundingReturnType(fn, brandedNumber)};
+  ${fn}(x: number): ${brandedNumber.Int} | ${brandedNumber.InfiniteNumber} | ${brandedNumber.NaNType};
+`;
+
 const roundingFunctions = ['ceil', 'floor', 'round'] as const;
 
+type RoundingFunction = (typeof roundingFunctions)[number] | 'trunc';
+
 /**
- * The branded return type of `Math.ceil` / `floor` / `round` for a finite `N`.
+ * The branded return type of `Math.ceil` / `floor` / `round` / `trunc` for a
+ * finite `N`.
  *
  * An integer is returned unchanged, so a concrete `Int` argument keeps every
  * brand (a type parameter leaves the conditional deferred, so a generic caller
  * gets no `N` back). Otherwise only what rounding preserves is kept: a sign
  * bound (`>= 0` stays `>= 0`, `<= 0` stays `<= 0`) and `!= 0` only where the
  * result moves away from zero — `floor` of a negative number, `ceil` of a
- * positive one. Intersecting with `N` instead would keep `!= 0` through
- * `Math.floor(0.5) === 0` and an upper bound through `Math.ceil`.
+ * positive one, never `trunc`, which moves toward zero. Intersecting with `N`
+ * instead would keep `!= 0` through `Math.floor(0.5) === 0` and an upper bound
+ * through `Math.ceil`.
  */
 const roundingReturnType = (
-  fn: (typeof roundingFunctions)[number],
+  fn: RoundingFunction,
   {
     Int,
     PositiveNumber,
@@ -152,8 +164,12 @@ const roundingReturnType = (
       [NonNegativeNumber, NonNegativeInt],
       [NonPositiveNumber, NonPositiveInt],
     ],
+    trunc: [
+      [NonNegativeNumber, NonNegativeInt],
+      [NonPositiveNumber, NonPositiveInt],
+    ],
   } as const satisfies ReadonlyRecord<
-    (typeof roundingFunctions)[number],
+    RoundingFunction,
     readonly (readonly [input: string, output: string])[]
   >;
 

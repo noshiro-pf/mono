@@ -6,6 +6,7 @@ import {
   replaceWithinInterface,
 } from '../functions/utils/node-utils.mjs';
 import { idFn, type ConverterOptions } from './common.mjs';
+import { roundingOverloads } from './lib.es5-math.mjs';
 
 export const convertLibEs2015Core =
   ({
@@ -114,7 +115,7 @@ export const convertLibEs2015Core =
               ? idFn
               : replaceWithNoMatchCheck(
                   'trunc(x: number): number;',
-                  `trunc(x: number): ${brandedNumber.Int} | ${brandedNumber.InfiniteNumber} | ${brandedNumber.NaNType};`,
+                  roundingOverloads('trunc', brandedNumber),
                 ),
             !useBrandedNumber
               ? idFn
