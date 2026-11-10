@@ -17,7 +17,10 @@ import {
   splitZ,
 } from '../../lib/step-runner.mjs';
 import { projectRootPath } from '../../project-root-path.mjs';
-import { findMissingChangesets } from './changesets.mjs';
+import {
+  bundledPrivatePackages,
+  findMissingChangesets,
+} from './changesets.mjs';
 import {
   checkCommitMessages,
   readJapanesePattern,
@@ -574,7 +577,11 @@ const checkChangesets = async (
     }),
   );
 
-  const released = packages.filter((_, i) => isReleased[i] === true);
+  const bundles = bundledPrivatePackages(packages);
+
+  const released = packages
+    .filter((_, i) => isReleased[i] === true)
+    .map((pkg) => ({ ...pkg, bundles: bundles.get(pkg.name) ?? [] }));
 
   const changesetFiles = await filterExisting(
     changedFiles.filter(isChangesetPath),
