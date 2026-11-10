@@ -1,8 +1,8 @@
 import { Result } from 'ts-data-forge';
 import type { UnknownRecord } from 'ts-type-forge';
 import type { ReferenceFacts } from '../snapshot/index.mjs';
+import { branchTipsNotRead, readSnapshotRest } from './read-snapshot.mjs';
 import { ok, recordedTransport, status } from './recorded-transport.mjs';
-import { branchTipsNotRead, readSnapshotRest } from './rest-snapshot.mjs';
 import type { ReadContext } from './transport.mjs';
 
 type Routes = Parameters<typeof recordedTransport>[0];

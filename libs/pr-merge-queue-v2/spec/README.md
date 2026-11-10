@@ -56,12 +56,15 @@ Every command, the worker included, runs the same three steps:
 
 Every part is read for every open pull request, or for the runs a fixed rule on
 the facts names (the annotations of a run that did not pass), never for those
-the plan might need: a handful of GraphQL queries, one per part (§3 below), read
-labels, merge state, check rollup, review threads, comments, comparisons and
-base changes; REST reads the branch rules once, and the workflow runs of each
-head (a round a concurrency group holds has no check run yet, #3703). It costs a
-few requests per open pull request a cycle, which the rate limits leave room
-for, against v1's lazy reads and the bugs of reading half a picture.
+the plan might need: a few GraphQL queries, one per part (§3 below), read
+labels, merge state, closing issues, review threads, comments and base changes;
+REST reads the branch rules once, and for each head its checks, its comparison
+with the base and who pushed it. The checks are REST's for both readers: every
+run of every name (`filter=all`) and the workflow runs beside them (a round a
+concurrency group holds has no check run yet, #3703), which GraphQL's rollup
+does not give. It costs a few requests per open pull request a cycle, which the
+rate limits leave room for, against v1's lazy reads and the bugs of reading half
+a picture.
 
 **The snapshot grows with the decisions.** `pr-report-core-v2/src/snapshot/`
 holds the facts the decisions built so far and those plainly needed next; a fact
@@ -120,10 +123,13 @@ with the transport injected:
   `startable-issues`, `report-unowned-prs`).
 
 Both readers are tested to build the same snapshot from recorded answers of the
-same repository state. What only REST answers — the workflow runs and their
-`run_started_at` (#3474), the branch rules, the comparisons — every reader reads
-over REST, the page included. Every list is paged to its end or fails loudly; no
-reader reports the first page as the whole (#3217).
+same repository state. What only REST answers — the checks with their workflow
+runs and `run_started_at` (#3474), the branch rules, the comparisons, the
+pushers — every reader reads over REST, the page included; so are the issues,
+the merged pull requests and the queue layers, until a GraphQL part of them
+earns its own query. Every list is paged to its end, or to as much as was asked
+for and says whether there was more, or fails loudly; no reader reports the
+first page as the whole (#3217).
 
 ### 4. Packages
 
