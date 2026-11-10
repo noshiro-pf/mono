@@ -3,6 +3,7 @@ import {
   type Href,
   type Router,
   type RouterBrowser,
+  type RouterLocation,
 } from 'synstate-router';
 import { Optional } from 'ts-data-forge';
 import { routes, type Routes } from '../constants/index.mjs';
@@ -13,11 +14,6 @@ import { routes, type Routes } from '../constants/index.mjs';
  * inputs its query holds and its hash: a shared link keeps them, and the
  * setters, which write the page's search, keep working. Query parameters the
  * page does not declare are not carried.
- *
- * `redirect` is given the match, not the URL, so the URL is read from the
- * browser. That is the URL being resolved on the first load and on back and
- * forward, which is how a URL off the page arrives: every href the app pushes
- * is the page's own.
  */
 export const createLoanRouter = (
   options: Readonly<{
@@ -29,17 +25,15 @@ export const createLoanRouter = (
   createRouter(routes, {
     basePath: options.basePath,
     ...(options.browser === undefined ? {} : { browser: options.browser }),
-    redirect: (match) =>
-      match.route === undefined
-        ? loanPageFrom(
-            options.browser?.location.href ?? globalThis.location.href,
-          )
-        : undefined,
+    redirect: (match, location) =>
+      match.route === undefined ? loanPageFrom(location) : undefined,
   });
 
-/** The loan page with what the query of `url` holds for it, and its hash. */
-const loanPageFrom = (url: string): Href => {
-  const { search, hash } = new URL(url);
+/** The loan page with what the query of `location` holds for it, and its hash. */
+const loanPageFrom = ({ href, hash }: RouterLocation): Href => {
+  // `matchExact` reads the query as a string, and `RouterLocation` holds it
+  // parsed, so it is taken from the whole URL.
+  const { search } = new URL(href);
 
   return routes.loan.href({
     search: Optional.unwrapOr(

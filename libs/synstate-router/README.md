@@ -114,7 +114,7 @@ assert.deepStrictEqual(router.match.getSnapshot().value, {
 ```
 
 - `push`, `replace` and `follow` (navigating from an observable) take an `Href` only. `back`, `forward` and `go` change the state when the browser fires `popstate`, never before.
-- The URL is canonical: `trailingSlash` (`'always'` by default) is applied to every URL read, by `replaceState`, before `match` shows it, and so is `redirect`. A chain of redirects stops after ten. `basePath` must name a path: a relative base such as Vite's `base: './'` throws.
+- The URL is canonical: `trailingSlash` (`'always'` by default) is applied to every URL read, by `replaceState`, before `match` shows it, and so is `redirect`. `redirect` receives the match and the location being resolved, so a redirect from a URL that matches no page can carry its query and hash; inside `push`, `replace` and `setSearch` that location is the destination, not the URL the browser is still at. A chain of redirects stops after ten. `basePath` must name a path: a relative base such as Vite's `base: './'` throws.
 - `match` passes nothing on when the route, params and search stay the same, and keeps the references of what did not change. `at(node)` and `isActive(node)` derive from it.
 - Scrolling: to the fragment when the destination has one, to the top when the path changed, and not at all when only the search changed. Back and forward are left to the browser.
 
