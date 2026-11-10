@@ -23,6 +23,7 @@ import {
   fragmentId,
   globalBrowser,
   isAtOrBelow,
+  isDevelopment,
   normalizeBasePath,
   prependBasePath,
   routeNodeKey,
@@ -101,6 +102,13 @@ export type RouterOptions<R extends AnyRoutes> = Readonly<{
   ) => Href | undefined;
 }>;
 
+/**
+ * The history state to write with a `push` or `replace`, next to the `Href`:
+ * the value the destination page's `state` codec encodes. A page that declares
+ * no state, or a destination a redirect changed, gets none.
+ */
+export type StateOptions = Readonly<{ state?: unknown }>;
+
 export type NavigateOptions = Readonly<{
   /** Replace the current history entry instead of adding one. */
   replace?: boolean;
@@ -148,10 +156,10 @@ export type Router<R extends AnyRoutes> = Readonly<{
    * Goes to `href`, adding a history entry; replaces the current one when
    * `href`, before or after redirects, is where the location already is.
    */
-  push: (href: Href) => void;
+  push: (href: Href, options?: StateOptions) => void;
 
   /** Goes to `href`, replacing the current history entry. */
-  replace: (href: Href) => void;
+  replace: (href: Href, options?: StateOptions) => void;
 
   /**
    * Rewrites the search of `node` while the page is the node or one of its
@@ -340,17 +348,73 @@ export const createRouter = <R extends AnyRoutes>(
       return found;
     }
 
-    return resolve(next, redirects + 1);
+    return { ...resolve(next, redirects + 1), redirected: true } as const;
+  };
+
+  /**
+   * `snapshot` with the page's typed state read from `raw`, the entry's state
+   * as the browser stores it; none across a redirect.
+   */
+  const withState = (snapshot: Snapshot<R>, raw: unknown): Snapshot<R> => {
+    const { match: m } = snapshot;
+
+    if (m.route === undefined) {
+      return snapshot;
+    }
+
+    const codec = routes[routeTreeKey].stateCodecOf(m.route);
+
+    if (codec === undefined) {
+      return snapshot;
+    }
+
+    const decoded =
+      raw === undefined || raw === null || snapshot.redirected
+        ? Optional.none
+        : codec.decode(raw);
+
+    const state = Optional.isSome(decoded) ? decoded.value : undefined;
+
+    // eslint-disable-next-line total-functions/no-unsafe-type-assertion -- the page declares a state, so its match has one
+    const withValue: RouteMatch<R> = { ...m, state } as RouteMatch<R>;
+
+    return { ...snapshot, match: withValue } as const;
+  };
+
+  /** Whether the page of `m` declares a history state. */
+  const declaresState = (m: RouteMatch<R>): boolean =>
+    m.route !== undefined &&
+    routes[routeTreeKey].stateCodecOf(m.route) !== undefined;
+
+  /** What a new entry stores for `next`: `value` encoded by its page's codec. */
+  const encodeStateFor = (next: Snapshot<R>, value: unknown): unknown => {
+    if (next.redirected || next.match.route === undefined) {
+      return null;
+    }
+
+    const codec = routes[routeTreeKey].stateCodecOf(next.match.route);
+
+    return codec === undefined
+      ? null
+      : // eslint-disable-next-line total-functions/no-unsafe-type-assertion -- the caller's value, for the page's codec; the match decodes it back
+        codec.encode(value as never);
   };
 
   /** The current URL, rewritten first when it is not where it leads. */
   const read = (): Snapshot<R> => {
     const current = new URL(browser.location.href);
 
-    const snapshot = resolve(current, 0);
+    const raw = browser.history.state;
+
+    const snapshot = withState(resolve(current, 0), raw);
 
     if (snapshot.location.href !== current.href) {
-      browser.history.replaceState(null, '', snapshot.location.href);
+      // Canonicalizing keeps the entry's state; a redirect drops it.
+      browser.history.replaceState(
+        snapshot.redirected ? null : (raw ?? null),
+        '',
+        snapshot.location.href,
+      );
     }
 
     return snapshot;
@@ -361,7 +425,14 @@ export const createRouter = <R extends AnyRoutes>(
   // and so does what `at` and `isActive` cache.
   const [snapshot$, setSnapshot, { getSnapshot }] = untracked(() =>
     createState(read(), {
-      equals: (a, b) => a.location.href === b.location.href,
+      // The entry's state is not in the URL: a replace to the same URL with
+      // another state is a change.
+      equals: (a, b) =>
+        a.location.href === b.location.href &&
+        valuesEqual(
+          Reflect.get(a.match, 'state'),
+          Reflect.get(b.match, 'state'),
+        ),
     }),
   );
 
@@ -564,7 +635,12 @@ export const createRouter = <R extends AnyRoutes>(
 
   // Navigation
 
-  const navigate = (href: Href, replace: boolean, scrolls: boolean): void => {
+  const navigate = (
+    href: Href,
+    replace: boolean,
+    scrolls: boolean,
+    entryState: EntryState,
+  ): void => {
     const before = getSnapshot().location;
 
     const current = new URL(browser.location.href);
@@ -573,6 +649,7 @@ export const createRouter = <R extends AnyRoutes>(
 
     if (
       !replace &&
+      !(entryState.kind === 'value' && declaresState(getSnapshot().match)) &&
       target.hash !== '' &&
       target.pathname === current.pathname &&
       target.search === current.search
@@ -594,16 +671,37 @@ export const createRouter = <R extends AnyRoutes>(
     // Where the target leads after redirects. A push to where the location
     // already is, before or after them, replaces the entry instead of adding
     // one.
-    const next = resolve(target, 0);
+    const resolved = resolve(target, 0);
+
+    const raw =
+      entryState.kind === 'value'
+        ? encodeStateFor(resolved, entryState.value)
+        : entryState.kind === 'keep' && !resolved.redirected
+          ? (browser.history.state ?? null)
+          : null;
+
+    const next = withState(resolved, raw);
+
+    if (
+      isDevelopment &&
+      raw !== null &&
+      entryState.kind === 'value' &&
+      next.match.route !== undefined &&
+      Reflect.get(next.match, 'state') === undefined
+    ) {
+      console.warn(
+        `synstate-router: ${next.match.route}: the state given does not read back through its codec, and is read as absent`,
+      );
+    }
 
     if (
       replace ||
       target.href === current.href ||
       next.location.href === current.href
     ) {
-      browser.history.replaceState(null, '', next.location.href);
+      browser.history.replaceState(raw, '', next.location.href);
     } else {
-      browser.history.pushState(null, '', next.location.href);
+      browser.history.pushState(raw, '', next.location.href);
     }
 
     setSnapshot(next);
@@ -673,6 +771,8 @@ export const createRouter = <R extends AnyRoutes>(
       ),
       navigateOptions?.replace ?? false,
       false,
+      // The same page: its state stays.
+      keepState,
     );
 
     return true;
@@ -740,7 +840,7 @@ export const createRouter = <R extends AnyRoutes>(
 
         queueMicrotask(() => {
           if (mut_follow.active && !mut_router.disposed) {
-            navigate(href, navigateOptions?.replace ?? false, true);
+            navigate(href, navigateOptions?.replace ?? false, true, noState);
           }
         });
       }),
@@ -824,11 +924,11 @@ export const createRouter = <R extends AnyRoutes>(
     },
     at,
     isActive,
-    push: (href) => {
-      navigate(href, false, true);
+    push: (href, stateOptions) => {
+      navigate(href, false, true, entryStateOf(stateOptions));
     },
-    replace: (href) => {
-      navigate(href, true, true);
+    replace: (href, stateOptions) => {
+      navigate(href, true, true, entryStateOf(stateOptions));
     },
     setSearch,
     back: () => {
@@ -865,9 +965,25 @@ export const createRouter = <R extends AnyRoutes>(
 type Snapshot<R extends AnyRoutes> = Readonly<{
   location: RouterLocation;
   match: RouteMatch<R>;
+  /** Whether a redirect led here: the state given for the URL asked is not this page's. */
+  redirected: boolean;
 }>;
 
 type ScrollTarget = 'top' | Readonly<{ id: string }>;
+
+/** What a navigation writes as the new entry's state. */
+type EntryState = Readonly<
+  { kind: 'value'; value: unknown } | { kind: 'keep' } | { kind: 'none' }
+>;
+
+const keepState: EntryState = { kind: 'keep' } as const;
+
+const noState: EntryState = { kind: 'none' } as const;
+
+const entryStateOf = (options: StateOptions | undefined): EntryState =>
+  options?.state === undefined
+    ? noState
+    : ({ kind: 'value', value: options.state } as const);
 
 /** Whether some node of `definitions` has a `meta.title`. */
 const definesTitle = (definitions: RouteDefinitions): boolean =>
@@ -924,6 +1040,7 @@ const snapshotOf = <R extends AnyRoutes>(
       href: url.href,
     },
     match,
+    redirected: false,
   }) as const;
 
 /**

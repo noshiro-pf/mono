@@ -1,3 +1,4 @@
+import { hasKey } from 'ts-data-forge';
 import type { RelaxedExtract } from 'ts-type-forge';
 import {
   hrefWithSearch,
@@ -35,7 +36,12 @@ export type PageValues<
   search: M['search'];
   /** This page with the same params and `patch` laid over its search. */
   withSearch: (patch: SearchPatch<M['search']>) => Href;
-}>;
+}> &
+  PageState<M>;
+
+/** The history state, on a page that declares one. */
+type PageState<M> =
+  M extends Readonly<{ state: infer S }> ? Readonly<{ state: S }> : unknown;
 
 /**
  * The {@link PageValues} of `match`, for a binding's `Routes`.
@@ -65,9 +71,18 @@ export type PageValues<
 export const pageValues = <R extends AnyRoutes, const M extends PageMatch<R>>(
   routes: R,
   match: M,
-): PageValues<M> =>
-  ({
+): PageValues<M> => {
+  const values = {
     params: match.params,
     search: match.search,
-    withSearch: (patch) => hrefWithSearch<R, M>(routes, match, patch),
-  }) as const;
+    withSearch: (patch: SearchPatch<M['search']>) =>
+      hrefWithSearch<R, M>(routes, match, patch),
+  } as const;
+
+  // eslint-disable-next-line total-functions/no-unsafe-type-assertion -- `state` is there exactly when the page declares one, as the type says
+  return (
+    hasKey(match, 'state')
+      ? { ...values, state: Reflect.get(match, 'state') }
+      : values
+  ) as PageValues<M>;
+};
