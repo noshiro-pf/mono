@@ -41,6 +41,11 @@ export type RouterBrowser = Readonly<{
    */
   observeDocument?: (on: DocumentObserver) => () => void;
   /**
+   * The document's title, which the router sets from the `title` in the matched
+   * nodes' `meta`. Left out, the router sets none.
+   */
+  documentTitle?: Readonly<{ get: () => string; set: (title: string) => void }>;
+  /**
    * Whether the scroll position of this document load is restored by someone
    * other than the router: the browser, or an app that restores it itself,
    * after a reload or back or forward to the document.
@@ -63,6 +68,8 @@ export type MemoryBrowser = RouterBrowser &
     url: () => URL;
     /** The scrolls so far, oldest first: `'top'`, or `#` and the id. */
     scrolls: () => readonly string[];
+    /** The document's title. */
+    title: () => string;
   }>;
 
 export type MemoryBrowserOptions = Readonly<{
@@ -73,6 +80,8 @@ export type MemoryBrowserOptions = Readonly<{
   hasElement?: (id: string) => boolean;
   /** What `restoresScroll` returns: `false` when left out. */
   restoresScroll?: boolean;
+  /** The document's title at first: `''` when left out. */
+  title?: string;
   /**
    * The browser's `observeDocument`, which a test calls from where it draws an
    * element or scrolls. Left out, the browser has none.
@@ -124,6 +133,8 @@ export const createMemoryBrowser = (
   };
 
   const mut_scrolls: string[] = [];
+
+  const mut_title = { current: options?.title ?? '' };
 
   const mut_listeners = new Set<() => void>();
 
@@ -216,10 +227,17 @@ export const createMemoryBrowser = (
       return true;
     },
     restoresScroll: () => options?.restoresScroll ?? false,
+    documentTitle: {
+      get: () => mut_title.current,
+      set: (title) => {
+        mut_title.current = title;
+      },
+    },
     ...(options?.observeDocument === undefined
       ? {}
       : { observeDocument: options.observeDocument }),
     url,
     scrolls: () => Array.from(mut_scrolls),
+    title: () => mut_title.current,
   };
 };
