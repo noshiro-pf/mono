@@ -9,7 +9,6 @@ import {
   createAfterUpdate,
   deriveBindable,
   isImeKeyDown,
-  mapBindable,
   toObservable,
   type Bindable,
   type JSX,
@@ -147,13 +146,7 @@ export const NumericInputView = ({
       >
         <input
           // As Blueprint's input group says it: absent when `disabled` is.
-          aria-disabled={
-            disabled === undefined
-              ? undefined
-              : mapBindable(disabled, (isDisabled) =>
-                  isDisabled ? 'true' : 'false',
-                )
-          }
+          aria-disabled={disabled}
           aria-label={ariaLabel}
           aria-valuemax={max}
           aria-valuemin={min}

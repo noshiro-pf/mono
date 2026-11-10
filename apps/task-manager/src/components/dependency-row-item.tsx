@@ -64,7 +64,7 @@ export const DependencyRowItem = ({ row }: Props): JSX.Element => {
               ),
             )}
             aria-invalid={row.pipe(
-              map(({ check }) => (check?.status === 'error').toString()),
+              map(({ check }) => check?.status === 'error'),
             )}
             data-e2e={constant('dependency-source')}
             fill

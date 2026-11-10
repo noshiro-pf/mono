@@ -326,7 +326,7 @@ export const DateInput = ({
             mut_elements.input = input;
           }}
           aria-controls={constant(popoverId)}
-          aria-expanded={open$.pipe(map(String))}
+          aria-expanded={open$}
           aria-haspopup={constant('menu')}
           autocomplete={constant('off')}
           class={constant('bp6-input')}

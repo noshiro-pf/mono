@@ -33,7 +33,7 @@ export const LanguageField = (): JSX.Element => (
     <div class={constant('bp6-button-group')}>
       {choices.map((choice) => (
         <button
-          aria-pressed={constant((choice === current).toString())}
+          aria-pressed={constant(choice === current)}
           class={constant(
             choice === current ? 'bp6-button bp6-active' : 'bp6-button',
           )}

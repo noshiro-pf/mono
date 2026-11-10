@@ -99,7 +99,7 @@ export const SegmentedControl = <T extends string>({
 
       return (
         <Button
-          aria-checked={mapBindable(selected, String)}
+          aria-checked={selected}
           data-e2e={
             option['data-e2e'] === undefined
               ? undefined

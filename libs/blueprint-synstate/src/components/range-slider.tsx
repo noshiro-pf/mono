@@ -320,13 +320,11 @@ export const RangeSlider = ({
 
           handleSizes.observe(element);
         }}
-        aria-disabled={mapBindable(disabled$, (isDisabled) =>
-          isDisabled ? 'true' : 'false',
-        )}
+        aria-disabled={disabled$}
         aria-orientation={constant('horizontal')}
-        aria-valuemax={constant(max.toString())}
-        aria-valuemin={constant(min.toString())}
-        aria-valuenow={mapBindable(at$, (at) => at.toString())}
+        aria-valuemax={constant(max)}
+        aria-valuemin={constant(min)}
+        aria-valuenow={at$}
         class={classObject(
           ['bp6-slider-handle', index === 0 ? 'bp6-start' : 'bp6-end'],
           [['bp6-active', mapBindable(moving$, (moving) => moving === index)]],

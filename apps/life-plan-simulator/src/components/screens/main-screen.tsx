@@ -23,11 +23,7 @@ export const MainScreen = ({ userName }: Props): JSX.Element => {
         cond={currentPlan.pipe(map((p) => p !== undefined))}
         then={<Workspace />}
         else={
-          <Card
-            aria-busy={plans.pipe(
-              map((s) => (s.type === 'loading').toString()),
-            )}
-          >
+          <Card aria-busy={plans.pipe(map((s) => s.type === 'loading'))}>
             <p
               data-e2e={constant('plans-status')}
               role={plans.pipe(

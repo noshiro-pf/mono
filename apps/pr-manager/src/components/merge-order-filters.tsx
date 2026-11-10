@@ -113,8 +113,9 @@ export const MergeOrderFilters = (): JSX.Element => {
           {PRIORITIES.map((priority) => (
             <button
               aria-pressed={view$.pipe(
-                map(({ hiddenPriorities }) =>
-                  (!hiddenPriorities.includes(priority)).toString(),
+                map(
+                  ({ hiddenPriorities }) =>
+                    !hiddenPriorities.includes(priority),
                 ),
               )}
               class={constant('filter-chip')}
@@ -146,9 +147,7 @@ export const MergeOrderFilters = (): JSX.Element => {
             {constant('state')}
           </span>
           <button
-            aria-pressed={view$.pipe(
-              map(({ hideDrafts }) => (!hideDrafts).toString()),
-            )}
+            aria-pressed={view$.pipe(map(({ hideDrafts }) => !hideDrafts))}
             class={constant('filter-chip')}
             title={constant(
               'Drafts, which are still being worked on; switched off, they are hidden whatever else they are.',
@@ -170,9 +169,7 @@ export const MergeOrderFilters = (): JSX.Element => {
         >
           <button
             aria-label={constant('merge order')}
-            aria-pressed={view$.pipe(
-              map(({ sort }) => (sort === 'order').toString()),
-            )}
+            aria-pressed={view$.pipe(map(({ sort }) => sort === 'order'))}
             class={constant('theme-switch-option')}
             title={constant(
               'In the order the trailers and the stacks declare.',
@@ -189,9 +186,7 @@ export const MergeOrderFilters = (): JSX.Element => {
             </span>
           </button>
           <button
-            aria-pressed={view$.pipe(
-              map(({ sort }) => (sort === 'priority').toString()),
-            )}
+            aria-pressed={view$.pipe(map(({ sort }) => sort === 'priority'))}
             class={constant('theme-switch-option')}
             title={constant(
               'Each level of the tree by the highest priority in it and below it; no priority is between mid and low.',

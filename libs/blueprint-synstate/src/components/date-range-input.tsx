@@ -758,7 +758,7 @@ export const DateRangeInput = ({
         ref={(target) => {
           mut_elements.target = target;
         }}
-        aria-expanded={open$.pipe(map(String))}
+        aria-expanded={open$}
         aria-haspopup={constant('menu')}
         class={{
           'bp6-control-group': constant(true),

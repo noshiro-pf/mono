@@ -375,9 +375,7 @@ export const LabelInput = ({
           aria-controls={shown$.pipe(
             map((shown) => (shown ? listId : undefined)),
           )}
-          aria-expanded={shown$.pipe(
-            map((shown) => (shown ? 'true' : 'false')),
-          )}
+          aria-expanded={shown$}
           autocapitalize={constant('off')}
           autocomplete={constant('off')}
           class={constant('label-input-text')}
@@ -457,9 +455,7 @@ export const LabelInput = ({
             <For items={options$} key={(option) => option.label}>
               {(option$) => (
                 <li
-                  aria-selected={option$.pipe(
-                    map(({ active }) => (active ? 'true' : 'false')),
-                  )}
+                  aria-selected={option$.pipe(map(({ active }) => active))}
                   class={option$.pipe(
                     map(({ active }) =>
                       active ? 'label-suggestion active' : 'label-suggestion',
