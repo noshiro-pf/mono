@@ -26,9 +26,9 @@ name: SynState Benchmark
 #   summary (see `Build`).
 # - A shared runner is noisy; `check-drift.mts` divides the runner out and
 #   calls drift a library's change relative to the others beyond 2× either
-#   way, a library or sweep point only one side has, or a library with no
-#   point measured on both sides, besides a results file the reference has
-#   and the committed side lacks. The summary it prints gives each verdict.
+#   way, a scenario, library or sweep point only one side has, or a library
+#   with no point measured on both sides. The summary it prints gives each
+#   verdict.
 
 on:
   push:
@@ -194,7 +194,8 @@ jobs:
           key: ${{ steps.key.outputs.value }}
           restore-keys: ${{ steps.key.outputs.prefix }}
 
-      # `Measure` overwrites them, and they are what is judged below.
+      # `Measure` and `Use that measurement` clear them and write the
+      # measurement in their place, and they are what is judged below.
       - name: Keep the committed tables
         run: cp -R apps/synstate-docs/src/data committed
 
@@ -220,6 +221,8 @@ jobs:
           artifact-pattern: '^synstate-benchmark-[0-9]+$'
           conclusion: any
 
+      # Into a directory of its own, so that a failed or partial download
+      # leaves the committed tables for `Build`, which then runs.
       - name: Take that measurement
         id: taken
         if: steps.measured.outputs.run-id != ''
@@ -228,9 +231,30 @@ jobs:
         uses: actions/download-artifact@v8.0.2
         with:
           name: synstate-benchmark-${{ steps.measured.outputs.run-id }}
-          path: apps/synstate-docs/src/data
+          path: taken
           run-id: ${{ steps.measured.outputs.run-id }}
           github-token: ${{ github.token }}
+
+      # In place of the committed tables, not over them: a results file that
+      # measurement does not have (a scenario the runners no longer measure)
+      # must not stay behind and pass as measured. See `Measure`. The artifact
+      # was uploaded by a run of this tree after its `Measure`, checks
+      # included, passed, or re-uploaded by one that took it the same way, so
+      # it holds every table the runners wrote; one without both kinds of
+      # table is not used, and this run measures.
+      - name: Use that measurement
+        id: used
+        if: steps.taken.outcome == 'success'
+        run: |
+          set -euo pipefail
+          if [ -z "$(find taken -maxdepth 1 -name 'results*.json' -print -quit)" ] ||
+            [ -z "$(find taken -maxdepth 1 -name 'results*.md' -print -quit)" ]; then
+            echo '::warning title=Measurement not used::The artifact taken lacks its results*.json or results*.md tables, so this run measures instead.'
+            exit 0
+          fi
+          pnpm --filter @synstate/docs run z:benchmark:clear
+          cp taken/results*.json taken/results*.md apps/synstate-docs/src/data/
+          echo 'done=true' >>"${GITHUB_OUTPUT}"
 
       # Not on an exact hit, and neither is any step that reads the
       # measurement. The verdict there is the committed tables against the
@@ -246,7 +270,7 @@ jobs:
       - name: Build
         if: >-
           steps.baseline.outputs.cache-hit != 'true' &&
-          steps.taken.outcome != 'success'
+          steps.used.outputs.done != 'true'
         run: pnpm run ws:build
 
       # The tables only, without `gen:benchmark-doc`: a near tie in one noisy
@@ -264,11 +288,13 @@ jobs:
       - name: Measure
         if: >-
           steps.baseline.outputs.cache-hit != 'true' &&
-          steps.taken.outcome != 'success'
+          steps.used.outputs.done != 'true'
         run: |
           set -euo pipefail
           BENCHMARK_MEASURED_ON="$(date -u +%F)"
           export BENCHMARK_MEASURED_ON
+          # `z:benchmark:measure` clears the checkout's tables first, after
+          # `Build` has read them (`scripts/benchmark/clear-results.mts`).
           pnpm --filter @synstate/docs run z:benchmark:measure
           pnpm --filter @synstate/docs run z:benchmark:check-measurement
           pnpm --filter @synstate/docs run fix:fmt
@@ -280,6 +306,8 @@ jobs:
         if: steps.baseline.outputs.cache-hit != 'true'
         run: |
           set -euo pipefail
+          # Intent to add, so that a table the measurement adds is listed too.
+          git add --intent-to-add -- apps/synstate-docs/src/data
           {
             echo '### The measurement against the committed tables'
             echo
@@ -370,9 +398,9 @@ jobs:
       # a dependency bump that moves nothing keeps the published tables, and
       # one that moves a library, or adds or removes one or a point, moves
       # them. A library's change beyond what unchanged code moves by between
-      # runs is drift, and so are a library or sweep point only one side has
-      # and a library with no point measured on both sides; the summary it
-      # prints gives each verdict.
+      # runs is drift, and so are a scenario, library or sweep point only one
+      # side has and a library with no point measured on both sides; the
+      # summary it prints gives each verdict.
       - name: Judge the committed tables
         id: committed
         run: |
@@ -407,7 +435,7 @@ jobs:
 
       - name: Warn that this branch's measurement differs from the baseline
         if: steps.branch.outputs.drifted == 'true'
-        run: echo '::warning title=Benchmark differs from the baseline::The measurement of this branch differs from the baseline beyond run-to-run noise, or the two differ in the libraries or sweep points they measure. The last table of the job summary says which; there, the committed tables are the baseline.'
+        run: echo '::warning title=Benchmark differs from the baseline::The measurement of this branch differs from the baseline beyond run-to-run noise, or the two differ in the scenarios, libraries or sweep points they measure. The last table of the job summary says which; there, the committed tables are the baseline.'
 
       # What to commit when the tables have drifted: the reference itself, so
       # that the next run judges the tables equal to it.
@@ -429,7 +457,7 @@ jobs:
         if: steps.committed.outputs.drifted == 'true'
         run: |
           set -euo pipefail
-          echo '::error title=Benchmark tables drifted::The committed tables in apps/synstate-docs/src/data do not describe this code and these library versions. If the change is meant to move the numbers, replace them with the files of the synstate-benchmark-to-commit-${{ github.run_id }} artifact, then run pnpm --filter @synstate/docs run gen:benchmark-doc until it passes, fixing what each error names (a sentence the tables no longer support is rewritten), run pnpm run fmt, and commit the result.'
+          echo '::error title=Benchmark tables drifted::The committed tables in apps/synstate-docs/src/data do not describe this code and these library versions. If the change is meant to move the numbers, replace their results*.json and results*.md with those of the synstate-benchmark-to-commit-${{ github.run_id }} artifact, deleting any it does not have (a scenario the summary reports missing from the reference, whose imports in apps/synstate-docs go with it), then run pnpm --filter @synstate/docs run gen:benchmark-doc until it passes, fixing what each error names (a sentence the tables no longer support is rewritten), run pnpm run fmt, and commit the result.'
           exit 1
 
   # The one required status check for this workflow, reported as

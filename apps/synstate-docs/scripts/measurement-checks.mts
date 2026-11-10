@@ -21,7 +21,7 @@ import {
   singleState,
 } from '../src/data/index.mjs';
 import type { BenchmarkEnvironment } from './benchmark/environment.mjs';
-import { resultsDir } from './benchmark/paths.mjs';
+import { isResultsTable, resultsDir } from './benchmark/paths.mjs';
 import { workspaceRootPath } from './workspace-root-path.mjs';
 
 /**
@@ -316,6 +316,6 @@ const readTables = (): readonly Readonly<{
 }>[] =>
   // eslint-disable-next-line security/detect-non-literal-fs-filename
   (fs.existsSync(resultsDir) ? fs.readdirSync(resultsDir) : [])
-    .filter((file) => file.startsWith('results') && file.endsWith('.json'))
+    .filter(isResultsTable)
     .toSorted()
     .map((file) => ({ file, environment: environmentOf(readJson(file)) }));
