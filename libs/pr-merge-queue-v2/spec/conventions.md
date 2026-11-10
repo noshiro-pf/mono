@@ -25,6 +25,10 @@ Pull request labels:
 A pull request carrying both `priority:high` and `priority:low` counts as
 carrying neither, and the worker's output says so.
 
+Label names are compared case-insensitively, as GitHub compares them (**Changed
+in v2**: v1 compared pull request labels exactly and issue labels
+case-insensitively).
+
 Issue labels:
 
 | label                                                                   | meaning                                            |
@@ -78,7 +82,9 @@ The issues a pull request closes are:
 - Without GraphQL or a token, the keywords are read from the text, outside
   fenced code.
 
-Only this repository's issues count, in first-appearance order, each once.
+Only this repository's issues count, in first-appearance order, each once. The
+owner and name in an issue URL are compared case-insensitively (**Changed in
+v2**: v1's text reading compared them exactly).
 
 ### Two-language descriptions
 
@@ -125,11 +131,14 @@ by prose for people that nothing reads back. Three rules hold for all of them:
 - **One comment per pull request or issue and kind, edited in place.** Of
   several, the oldest is the one, so two writers at once read back the same
   answer.
-- **The most recent 100 comments are searched** (`SET_ASIDE_COMMENT_SCAN`); a
+- **The most recent 100 comments are searched** (`RECORD_COMMENT_SCAN`); a
   record older than that is not found, and a new one is posted.
 
 SHAs are always the full 40 hex digits. Instants are UTC to the second,
-`YYYY-MM-DDTHH:MM:SSZ`.
+`YYYY-MM-DDTHH:MM:SSZ`; GitHub's may carry a fraction of a second. An instant
+naming no real date or time (`2026-02-30`, `24:00`) is unreadable, and a record
+dated by one does not hold (**Changed in v2**: v1 counted it out field by
+field).
 
 ### Set-aside (written by the worker)
 

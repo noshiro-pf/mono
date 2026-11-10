@@ -63,14 +63,19 @@ From the head commit's check runs and commit statuses:
    start. Only a red: the green of the attempt before stands.
 5. A commit status classifies `success` → `passed`, `pending` and `expected`
    (GraphQL's, for one not reported yet) → `pending`, anything else → `failed`.
+   **Changed in v2**: v1 read `expected` as `failed`, which only a reader of
+   GraphQL's rollup ever saw.
 6. **A check run and a commit status of one name: the stricter wins**
    (`failed` > `pending` > `skipped` > `passed`): GitHub requires both.
 
-`running` is true when any run on the head has not completed, or any round on it
-has not, required or not: an aggregate has no run in a new round until the jobs
-before it finish, so "every required context reported" is true halfway through a
-round, from the round before (#2031). A commit status pending since long ago is
-not a round start.
+`running` is true when the counting run of any name on the head (the one
+GitHub answers with, above; every run is read, superseded ones included) has not
+completed, or the newest round of any workflow (by suite) has not, required or
+not (**Changed in v2**: an older round GitHub never closed, as a superseded run,
+holds nothing): an aggregate has no run in a new round until the jobs before it
+finish, so "every required context reported" is true halfway through a round,
+from the round before (#2031). A commit status pending since long ago is not a
+round start.
 
 ### The verdict
 
@@ -174,7 +179,9 @@ watched while GitHub still calls it `BLOCKED`:
     - Under a `check` gate, the author counts as approving a path they own —
       only where everyone who pushed to the branch owns it too (pushers read
       from the repository activity of the branch, chained `before` → `after` to
-      the head; `unknown` on any gap).
+      the head; `unknown` on any gap). Where unknown pushers decide whether
+      anything waits, nothing holds, as for any unknown, and as v1's worker,
+      which read no pushers, did.
     - A team owner cannot be resolved without `read:org`: a team-owned path
       waits while nobody approved and is otherwise `unknown`.
     - Changed files past what was read, or a rename or copy whose old path the
@@ -225,6 +232,18 @@ would be picked, as in v1: one already released and in flight stays so.
 Then the review: a `candidate`, or an `in-flight` that GitHub does not call
 mergeable, whose hold is `held` becomes **`held`**. A `bypass` changes the
 standing in nothing; the worker reads it to leave the pull request unarmed.
+
+A standing that turns on a part that could not be read is **`unread`**, with
+why, and nothing acts on it: the owner of a queued pull request, the native
+stack of one not armed, the checks of one `BLOCKED`, the review a `candidate`
+asks, and, for a `candidate` other than the version pull request (which inherits
+nothing), what it inherits: its closing issues, the bodies and "blocked by" of
+the issues it closes, and — when one of those names an open issue, or a number
+that may be one because the issue lists were not read — the closing issues of
+every open pull request, which say who stands for that issue. Picked without
+them, it could merge before what an issue it closes waits for. **Changed in
+v2**: v1 read an unread inheritance as none. A released pull request whose
+review is unread stays `in-flight`, so that nothing is released beside it.
 
 The version pull request is judged by its own rule after `release-blocked` and
 `release-stale`: `candidate` if `skip-ci` is on, else by its checks.

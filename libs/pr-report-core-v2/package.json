@@ -54,6 +54,7 @@
   "devDependencies": {
     "@types/node": "catalog:",
     "@vitest/coverage-istanbul": "catalog:",
+    "dedent": "catalog:",
     "eslint": "catalog:",
     "eslint-config-typed": "workspace:*",
     "eslint-plugin-ts-data-forge": "workspace:*",
