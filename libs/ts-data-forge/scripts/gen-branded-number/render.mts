@@ -170,7 +170,12 @@ const renderImports = (config: BrandedNumberConfig): string =>
     // and sorts them into the single `ts-type-forge` import.
     ...[
       ...(config.extraTtfTypes ?? []),
-      ...(config.absType === undefined ? [] : [config.absType]),
+      ...(config.absType === undefined ||
+      (config.extraImports ?? []).some((line) =>
+        line.includes(`{ ${config.absType} }`),
+      )
+        ? []
+        : [config.absType]),
     ].map((t) => `import type { ${t} } from 'ts-type-forge';`),
     ...(config.extraImports ?? []),
     ...(config.numberClassParams !== undefined

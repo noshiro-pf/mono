@@ -131,10 +131,12 @@ export const Int8 = {
   /**
    * Returns the absolute value of an integer in [-128, 127].
    *
-   * The result is non-negative and keeps the `Int8` brand.
+   * The result is typed `AbsoluteValue<N>`, not `Int8`: the range is
+   * asymmetric, and `abs(MIN_VALUE)` is `MAX_VALUE + 1`, which is not an
+   * `Int8`.
    *
    * @param a - The integer value
-   * @returns The absolute value as a non-negative `Int8`
+   * @returns The absolute value as an `AbsoluteValue<N>`
    */
   abs,
 

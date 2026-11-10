@@ -88,10 +88,11 @@ export const NegativeSafeInt = {
   /**
    * Returns the absolute value of a negative safe integer.
    *
-   * The result is non-negative and keeps the `NegativeSafeInt` brand.
+   * The result is typed `PositiveSafeInt`, not `NegativeSafeInt`: the absolute
+   * value of a negative number is positive.
    *
    * @param a - The negative safe integer value
-   * @returns The absolute value as a non-negative `NegativeSafeInt`
+   * @returns The absolute value as a `PositiveSafeInt`
    */
   abs,
 

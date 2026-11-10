@@ -82,12 +82,13 @@ export const NegativeInt = {
   /**
    * Returns the absolute value of a negative integer.
    *
-   * The result is non-negative and keeps the `NegativeInt` brand. Note that
+   * The result is typed `PositiveInt`, not `NegativeInt`: the absolute value of
+   * a negative number is positive. Note that
    * `Math.abs(Number.MIN_SAFE_INTEGER)` exceeds `Number.MAX_SAFE_INTEGER`, so
    * use `SafeInt` for guaranteed precision.
    *
    * @param a - The negative integer value
-   * @returns The absolute value as a non-negative `NegativeInt`
+   * @returns The absolute value as a `PositiveInt`
    */
   abs,
 
