@@ -22,7 +22,7 @@ import type { Child } from './mount.mjs';
  * and a boolean, written as `"true"` or `"false"`.
  */
 export type CommonElementProps<E extends Element> = Readonly<{
-  ref?: (element: E) => void;
+  ref?: (this: unknown, element: E) => void;
   children?: Child;
   class?: Bindable<string> | ClassObject;
   style?: Bindable<string> | StyleObject;
@@ -61,10 +61,13 @@ export type HtmlElementProps<E extends HTMLElement> = CommonElementProps<E> &
 /**
  * One handler per event, named `on` followed by the event's name in PascalCase
  * (`onClick`, `onPointerDown`). `currentTarget` is narrowed to the element. A
- * handler is a function, never an observable.
+ * handler is a function, never an observable. Its `this` is typed `unknown`, so
+ * that passing a method of an observable (`onClick={clicks.emit}`), which needs
+ * its own, does not type-check.
  */
 export type EventProps<E extends Element, M> = Readonly<{
   [K in keyof M & keyof EventPropNames as EventPropNames[K]]?: (
+    this: unknown,
     event: M[K] & Readonly<{ currentTarget: E }>,
   ) => void;
 }>;

@@ -247,6 +247,36 @@ from the prototype; the packages are to be measured again in
   `complete`), the form RxJS recommends and a TC39 `Observable` takes, not with
   three functions.
 - `source()` emits with `.emit`, not `.next`.
+- `source(initialValue)` is gone. A source that starts with a value is a state,
+  `state(initialValue)`, which drops a write equal to the value it holds and
+  passes on the writes made before one update as one. Where every write has to
+  arrive, as with synstate's initialized source, emit on a `source()` and read
+  it through `withInitialValue(initialValue)`. synstate's `.next` returned the
+  value written; `.set`, `.update` and `.emit` return nothing.
+- The functions of an observable, a state and a source are prototype methods,
+  as in synstate, and their types now declare `this`: `Observable<unknown>`,
+  which keeps `Observable<A>` covariant, and `State<A>` or `Source<A>` for the
+  writers. A call of one taken off its object fails to type-check, and so does
+  one passed to a callback whose `this` is typed `unknown`, as are those a
+  method of an observable is likely to be handed. The functions given to
+  `subscribe`, `untracked`, `batch`, `Owner.run` and each `onCleanup`, the work
+  given to the function `createAfterUpdate` returns, and a function
+  `createDerived`'s setup returns in place of an object are called with no
+  `this`: `void` would do for them, but `no-invalid-void-type` rejects it there.
+  Others may be called with one, which `void` would reject: an event handler
+  with its element, the `listenInScope` listener with its target (which need not
+  be a DOM one), the `update` and `settled` of an object the setup returns on
+  that object, and a handler or `ref` a component forwards from its props with
+  the props (synstate-dom-next itself calls a `ref` with none).
+  The functions the operators take (`map`'s, `filter`'s …) are left without one
+  on purpose: handing them a method that needs its object reads as a mistake
+  already, and a `this` on each of some forty signatures would be noise in every
+  hover, so no check asks for one. Binding them instead was measured on a
+  stand-in class: two arrow fields per state took 112 → 280 bytes per instance,
+  construction 1.5× and `set` 2–3× as long, paid by every `For` row. Method
+  signatures would let `@typescript-eslint/unbound-method` see them, but make
+  `State<A>` bivariant. A callback typed without `this`
+  (`Array.prototype.forEach`, `Promise.prototype.then`) still accepts one.
 - The setters of `createState`, `createReducer` and `createBooleanState` return
   nothing. A write made while the graph drains is applied once that round's
   effects have run, so the state it would return is not known yet; `getSnapshot`

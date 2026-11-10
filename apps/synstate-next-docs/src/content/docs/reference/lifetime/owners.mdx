@@ -19,7 +19,7 @@ The owner whose `run` is executing, if any.
 
 ### `onCleanup`
 
-Registers `cleanup` with the current owner. Outside every owner it warns, since the cleanup would never run.
+Registers `cleanup` with the current owner. Outside every owner it warns, since the cleanup would never run. The `this` of `cleanup` is `unknown`, so a method of an observable (`onCleanup(o.dispose)`) does not type-check; wrap it.
 
 ### `untracked`
 

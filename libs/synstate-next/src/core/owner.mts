@@ -207,7 +207,7 @@ export class Owner {
    * `run` of this owner returns: not at once, since a node is adopted before
    * its constructor ends.
    */
-  run<R>(fn: () => R): R {
+  run<R>(fn: (this: unknown) => R): R {
     const previous = mut_current.owner;
 
     const previousFloor = mut_current.depthFloor;
@@ -240,7 +240,7 @@ export class Owner {
   }
 
   /** Registers `cleanup` to run when this owner is disposed. */
-  onCleanup(cleanup: () => void): void {
+  onCleanup(cleanup: (this: unknown) => void): void {
     if (this.#mut_disposed) {
       cleanup();
 
@@ -351,9 +351,11 @@ export const getOwner = (): Owner | undefined => mut_current.owner;
 
 /**
  * Registers `cleanup` with the current owner. Outside every owner it warns,
- * since the cleanup would never run.
+ * since the cleanup would never run. The `this` of `cleanup` is `unknown`, so a
+ * method of an observable (`onCleanup(o.dispose)`) does not type-check; wrap
+ * it.
  */
-export const onCleanup = (cleanup: () => void): void => {
+export const onCleanup = (cleanup: (this: unknown) => void): void => {
   const owner = mut_current.owner;
 
   if (owner === undefined) {
@@ -368,7 +370,7 @@ export const onCleanup = (cleanup: () => void): void => {
 };
 
 /** Calls `fn` with no current owner: what it creates outlives the caller. */
-export const untracked = <R,>(fn: () => R): R => {
+export const untracked = <R,>(fn: (this: unknown) => R): R => {
   const previous = mut_current.owner;
 
   const previousFloor = mut_current.depthFloor;
@@ -525,8 +527,12 @@ const runNewestFirst = (
   let mut_failure = failure;
 
   for (let mut_i = fns.length - 1; mut_i >= 0; mut_i -= 1) {
+    // Taken out first, so that it is called with no `this`, as a cleanup
+    // registered after the owner was disposed is, not with the array.
+    const fn = fns[mut_i];
+
     try {
-      fns[mut_i]?.();
+      fn?.();
     } catch (error) {
       mut_failure = keepFirst(mut_failure, error);
     }

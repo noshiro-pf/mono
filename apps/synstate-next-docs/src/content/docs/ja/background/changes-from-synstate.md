@@ -42,6 +42,8 @@ synstate-next は、次のメジャーバージョンで synstate を置き換�
 - **`fromSubscribable` はオブザーバーオブジェクト**（`next`・`error`・`complete`）で購読します。RxJS が推奨し TC39 の `Observable` が受け取る形で、3 つの関数ではありません。
 - **状態はオブジェクトとしても作れます。** `state(initialValue)` は `.value`・`.set`・`.update` を持ち、`createState` は同じものをタプルで返します。
 - **`source()` は `.next` ではなく `.emit` で発火します。**
+- **`source(initialValue)` はなくなりました。** `source()` は引数を取らず、最初の `emit` まで値を持ちません。初めから値を持つソースは状態です。`state(initialValue)` は持っている値と等しい書き込みを流さず、1 回の更新の前に行った書き込みをまとめて 1 つとして流します。synstate の初期値付きソースのようにすべての書き込みを届ける必要があるときは、`source()` で発火し、`withInitialValue(initialValue)` を通して読みます。synstate の `.next` は書き込んだ値を返しましたが、`.set`・`.update`・`.emit` は何も返しません。
+- **Observable・状態・ソースの関数はメソッドとして型付けされています。** `getSnapshot`・`subscribe`・`pipe`・`dispose`・`set`・`update`・`emit` は `this` を宣言するので、オブジェクトから取り出したもの（`const { set } = count`）や、独自の `this` を型に持つ呼び出し先（`subscribe`・`onCleanup`・synstate-dom-next のイベントハンドラー）に渡したものを TypeScript が拒否します。synstate のものもメソッドでしたが、ただの関数として型付けされていたので、呼び出したときに例外になりました。単独で渡すときは包みます: `(value) => { count.set(value); }`。
 
 ## オペレーターを書く
 

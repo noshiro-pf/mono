@@ -3,27 +3,27 @@ import { noValue, ObservableClass, view } from './observable-class.mjs';
 import { deferWrite, isDraining } from './scheduler.mjs';
 import type { InitializedObservable, Observable } from './types.mjs';
 
-/** A value that the application writes. */
+/** A value that the application writes; see `state` for its methods. */
 export type State<A> = InitializedObservable<A> &
   Readonly<{
     /** Writes `value`; nothing happens when it equals the current one. */
-    set: (value: A) => void;
+    set: (this: State<A>, value: A) => void;
     /**
      * Writes `fn(current)`. Called inside an operator such as `map` or
      * `derive`, while an update is recomputing values, `fn` itself waits with
      * the write, so that it reads the value the writes before it left.
      */
-    update: (fn: (current: A) => A) => void;
+    update: (this: State<A>, fn: (current: A) => A) => void;
   }>;
 
-/** A stream of events: every `emit` propagates, equal or not. */
+/**
+ * A stream of events: every `emit` propagates, equal or not. See `source` for
+ * its method.
+ */
 export type Source<A> = Observable<A> &
   Readonly<{
-    /**
-     * Emits `value`. Call it on the source, `s.emit(value)`; to pass it on its
-     * own, wrap it, `(value) => { s.emit(value); }`.
-     */
-    emit: (value: A) => void;
+    /** Emits `value`. */
+    emit: (this: Source<A>, value: A) => void;
   }>;
 
 export type StateOptions<A> = Readonly<{
@@ -57,6 +57,10 @@ export type StateOptions<A> = Readonly<{
  * update under way have run; a write made by a subscriber or a binding is
  * applied at once. Either propagates in the next update, and neither interrupts
  * the update under way.
+ *
+ * `set` and `update` are methods: call them on the state (`count.set(1)`), and
+ * wrap one to pass it on its own, `(n) => { count.set(n); }`. TypeScript
+ * rejects a call of one taken off the state.
  */
 export const state = <A,>(
   initialValue: A,
@@ -70,7 +74,13 @@ export const state = <A,>(
     ),
   );
 
-/** Creates an event source, holding no value until its first `emit`. */
+/**
+ * Creates an event source, holding no value until its first `emit`.
+ *
+ * `emit` is a method: call it on the source (`clicks.emit(event)`), and wrap it
+ * to pass it on its own, `(event) => { clicks.emit(event); }`. TypeScript
+ * rejects a call of it taken off the source.
+ */
 export const source = <A,>(): Source<A> => view(new SourceClass<A>());
 
 class StateClass<A> extends ObservableClass<A> {

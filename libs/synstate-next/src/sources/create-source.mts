@@ -68,7 +68,7 @@ export type SourceContext<A> = Readonly<{
    * Registers `cleanup` to run when the source is disposed; at once if it is
    * disposed already.
    */
-  onCleanup: (cleanup: () => void) => void;
+  onCleanup: (cleanup: (this: unknown) => void) => void;
 }>;
 
 class CustomSourceClass<A> extends AsyncSourceClass<A> {

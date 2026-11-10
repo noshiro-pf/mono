@@ -7,6 +7,8 @@ description: 'Creates an event source, holding no value until its first `emit`.'
 
 Creates an event source, holding no value until its first `emit`.
 
+`emit` is a method: call it on the source (`clicks.emit(event)`), and wrap it to pass it on its own, `(event) => { clicks.emit(event); }`. TypeScript rejects a call of it taken off the source.
+
 {/* /reference */}
 
 ## Example

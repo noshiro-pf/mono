@@ -46,6 +46,8 @@ The setters return nothing. A write made inside an operator such as `map` or `de
 
 `state(initialValue)` is the same state as an object, with `.value`, `.set` and `.update`, for code that keeps them together.
 
+`.set` and `.update`, like `.emit` of a `source()`, are methods: call them on their object. To hand one to code that calls it on its own, wrap it, `(value) => { count.set(value); }`, or take the functions of `createState`, `createValueEmitter` and the other helpers, which can be passed as they are. TypeScript rejects a method taken off its object (`const { set } = count`), and one passed to `subscribe`, `onCleanup` or an event handler of synstate-dom-next.
+
 ## Deciding what counts as a change
 
 A state passes a write on only when it changes the value, by `Object.is`. Two options change what "changes" means:

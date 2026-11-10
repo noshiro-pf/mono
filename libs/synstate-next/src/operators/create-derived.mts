@@ -48,18 +48,24 @@ import {
  */
 export function createDerived<A>(
   parents: readonly Observable<unknown>[],
-  setup: (ctx: DerivedContext<A>) => DerivedBehavior | (() => void),
+  setup: (
+    ctx: DerivedContext<A>,
+  ) => DerivedBehavior | ((this: unknown) => void),
   options: Readonly<{ initialValue: A }>,
 ): InitializedObservable<A>;
 
 export function createDerived<A>(
   parents: readonly Observable<unknown>[],
-  setup: (ctx: DerivedContext<A>) => DerivedBehavior | (() => void),
+  setup: (
+    ctx: DerivedContext<A>,
+  ) => DerivedBehavior | ((this: unknown) => void),
 ): Observable<A>;
 
 export function createDerived<A>(
   parents: readonly Observable<unknown>[],
-  setup: (ctx: DerivedContext<A>) => DerivedBehavior | (() => void),
+  setup: (
+    ctx: DerivedContext<A>,
+  ) => DerivedBehavior | ((this: unknown) => void),
   options?: Readonly<{ initialValue: A }>,
 ): Observable<A> {
   if (Arr.isEmpty(parents)) {
@@ -100,24 +106,31 @@ export type DerivedContext<A> = Readonly<{
    * Registers `cleanup` to run when the observable is disposed; at once if it
    * is disposed already.
    */
-  onCleanup: (cleanup: () => void) => void;
+  onCleanup: (cleanup: (this: unknown) => void) => void;
 }>;
 
-/** What the setup of `createDerived` returns. */
+/**
+ * What the setup of `createDerived` returns in place of a function: an object
+ * whose functions are called on it, as methods (a function returned instead is
+ * called with no `this`). Each is typed with a `this` of `unknown`, not `void`,
+ * which a call on the object would not satisfy, so that a function that needs a
+ * particular `this`, as a method of an observable does, does not type-check; a
+ * class's methods, which declare none, do.
+ */
 export type DerivedBehavior = Readonly<{
   /** Called in each update a parent emitted in. */
-  update: () => void;
+  update: (this: unknown) => void;
   /**
    * Whether it can emit no more, besides being disposed: every parent settled
    * unless given. A value given to `emit` and not passed on yet keeps it from
    * being settled either way.
    */
-  settled?: () => boolean;
+  settled?: (this: unknown) => boolean;
 }>;
 
 class CustomDerivedClass<A> extends DerivedClass<A> {
   /** Undefined until `setup` returns: a write it makes may wake the node. */
-  readonly #behavior: DerivedBehavior | undefined;
+  readonly #behavior: DerivedBehavior | ((this: unknown) => void) | undefined;
 
   /** What `setup` made and registered; disposed with the node. */
   readonly #owner: Owner;
@@ -129,7 +142,9 @@ class CustomDerivedClass<A> extends DerivedClass<A> {
 
   constructor(
     parents: readonly ObservableClass<unknown>[],
-    setup: (ctx: DerivedContext<A>) => DerivedBehavior | (() => void),
+    setup: (
+      ctx: DerivedContext<A>,
+    ) => DerivedBehavior | ((this: unknown) => void),
     initial: A | NoValue,
   ) {
     super(parents, initial);
@@ -156,9 +171,11 @@ class CustomDerivedClass<A> extends DerivedClass<A> {
   }
 
   #setUp(
-    setup: (ctx: DerivedContext<A>) => DerivedBehavior | (() => void),
-  ): DerivedBehavior {
-    const behavior = setup({
+    setup: (
+      ctx: DerivedContext<A>,
+    ) => DerivedBehavior | ((this: unknown) => void),
+  ): DerivedBehavior | ((this: unknown) => void) {
+    return setup({
       emitted: (parent) => this.emittedNow(toNode(parent)),
       set: (value) => {
         if (!this.#mut_updating) {
@@ -178,8 +195,6 @@ class CustomDerivedClass<A> extends DerivedClass<A> {
         this.#owner.onCleanup(cleanup);
       },
     });
-
-    return typeof behavior === 'function' ? { update: behavior } : behavior;
   }
 
   /** Ends `update`: returns what `set` gave, and holds it no longer. */
@@ -194,11 +209,13 @@ class CustomDerivedClass<A> extends DerivedClass<A> {
   }
 
   override get settled(): boolean {
-    const settled = this.#behavior?.settled;
+    const behavior = this.#behavior;
 
-    return settled === undefined
-      ? super.settled && !this.eventsWaiting
-      : !isPending(this) && !this.eventsWaiting && (this.gone || settled());
+    return typeof behavior === 'object' && behavior.settled !== undefined
+      ? !isPending(this) &&
+          !this.eventsWaiting &&
+          (this.gone || behavior.settled())
+      : super.settled && !this.eventsWaiting;
   }
 
   override recompute(): boolean {
@@ -213,7 +230,12 @@ class CustomDerivedClass<A> extends DerivedClass<A> {
     let mut_v: A | NoValue;
 
     try {
-      behavior.update();
+      // A function is called with no `this`; an object's `update` on it.
+      if (typeof behavior === 'function') {
+        behavior();
+      } else {
+        behavior.update();
+      }
     } finally {
       mut_v = this.#endUpdate();
     }
