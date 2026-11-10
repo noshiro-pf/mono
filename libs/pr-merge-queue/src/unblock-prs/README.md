@@ -567,9 +567,19 @@ PR なら10分続いたところで triage の前に見送ります。候補の�
   は、最後に積んだ段を含むほう（同じ秒なら長いほう）を保ち、もう積めなくなった PR
   は保ちません。キューの順で version PR より後ろの PR も保ちません。リリースに
   何が入るかは、引き続きキューの順で決まります。
-- 各 candidate のコミットを、`origin/main` との merge base から1コミットに
-  まとめて、1本下の段（先頭なら `main`）の上に積み、`queue/pr-<番号>` に
-  push します。コミットには `Queue-Layer: <番号> <head>` のトレーラを付け、
+- 積む PR の上に stack されたキュー済みの PR（`main <- A <- B` で両方に
+  `merge-queued`）は、A の直上に積みます。A が保たれているなら、保った段の列の
+  直上です。ほかに open のものを待っておらず、`Merge-After` の循環になく、fork
+  の PR でない場合に限ります（`pr-report-core` の `stackedLayerParent` と
+  `withStackedAbove`）。B は検証するだけで解放しません。candidate ではないので、
+  解放の処理も survey のログも `--dry-run` も B を挙げません。A がマージされると
+  GitHub が B を `main` に移し、candidate になった B は `main` の tree の上に
+  自分の段が立っているのを見つけ、ほかの段と同じく先頭に保たれます。Pull
+  Requests Manager も同じ列を描きます。
+- 各 candidate のコミットを、`origin/main` との merge base から（stack された PR
+  は、下の段にある、その base の PR の head から。その PR のマージで GitHub が
+  `main` に移した PR は、解放時の rebase と同じく、マージされた head から）1コミットにまとめて、1本下の
+  段（先頭なら `main`）の上に積み、`queue/pr-<番号>` に push します。コミットには `Queue-Layer: <番号> <head>` のトレーラを付け、
   次の survey はこれと tree でどの段がまだ有効かを判断します。何も
   覚えないので、worker を再起動しても枝の状態から続きます。
 - `speculate.workflows` の workflow を各段に dispatch します。その run は PR の
@@ -603,6 +613,9 @@ PR なら10分続いたところで triage の前に見送ります。候補の�
   衝突する PR では積むのを止め、その PR は従来どおり単独で解放されます。
 - もう有効でない段（head が動いた、見送られた、キューを離れた、マージされた、下
   の段が作り直された）は片付けます。candidate が1本もなくなったときも同様です。
+  段と同じ tree のコミットへ動いた head は、ここでは動いたと数えません
+  （`withMovedHeads`）。A を解放すると A は rebase され、B は A の新しい head に
+  restack されますが、その head は B の段がすでに持つ tree を持つからです。
   段の判定は完全なので、run は消しません。
     - 段を作った head で失敗として見送られた PR の段は、走っている run を最後ま
       で走らせ、それが終わってから枝を消します（run が 40 分更新されなければ待ち
@@ -1668,11 +1681,23 @@ Requests Manager draws the stack by).
   that can no longer be stacked is not kept ahead. Nor is one the queue's order
   puts after the version pull request: what goes into a release is still the
   order's to say.
-- Each candidate's commits, from its merge base with `origin/main`, are squashed
-  into one commit on the layer below (`main` for the first) and pushed to
-  `queue/pr-<number>`. The commit carries a `Queue-Layer: <number> <head>`
-  trailer, by which, and by trees, the next survey tells which layers are still
-  valid. Nothing is remembered: a restarted worker carries on from the branches.
+- A queued pull request stacked on one that is stacked (`main <- A <- B`, both
+  `merge-queued`) is stacked right above it, or right above the kept stack when
+  A is kept, as long as it waits on nothing else still open, is on no
+  `Merge-After` cycle and is not a fork's (`stackedLayerParent`,
+  `withStackedAbove` in `pr-report-core`). B is checked, never released: it is
+  not a candidate, so neither the release, the survey log nor the dry run names
+  it. Once A has merged, GitHub moves B onto `main`, and B, now a candidate,
+  finds its layer standing on `main`'s tree, kept ahead as any other. The Pull
+  Requests Manager draws the same stack.
+- Each candidate's commits, from its merge base with `origin/main` (a stacked
+  one's from the head of the pull request it is on, whose layer is below it; one
+  GitHub moved onto `main` as that one merged, from its merged head, as its
+  release rebases it), are squashed into one commit on the layer below (`main`
+  for the first) and pushed to `queue/pr-<number>`. The commit carries a
+  `Queue-Layer: <number> <head>` trailer, by which, and by trees, the next
+  survey tells which layers are still valid. Nothing is remembered: a restarted
+  worker carries on from the branches.
 - The `speculate.workflows` are dispatched on each layer. Such a run diffs
   against `origin/main`, as a pull request's does, so that a layer's verdict is
   a whole one about its tree, true whatever becomes of the layers below. The
@@ -1706,8 +1731,10 @@ Requests Manager draws the stack by).
   released on its own, as before.
 - A layer no longer valid (its head moved, its pull request set aside, merged or
   out of the queue, a layer below built again) is cleaned up, also when the
-  queue has drained and no candidate is left. Its verdicts are whole ones, so no
-  run is deleted:
+  queue has drained and no candidate is left. A head that moved to a commit with
+  the layer's tree has not moved for this (`withMovedHeads`): releasing A
+  rebases it and restacks B on its new head, which has the tree B's layer
+  already has. Its verdicts are whole ones, so no run is deleted:
     - one whose pull request was set aside for a failure at the head it was
       built at has its runs still going left to finish, and loses its branch
       once they have (or once a run has gone 40 minutes without an update);

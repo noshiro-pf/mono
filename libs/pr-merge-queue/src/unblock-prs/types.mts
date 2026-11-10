@@ -237,6 +237,12 @@ export type Triage = Readonly<{
   /** Which open pull request each stacked one is on: child → parent. */
   stackParents: ReadonlyMap<number, number>;
   /**
+   * The queued pull requests stacked on another that checking ahead may stack
+   * right above it (`stackedLayerParent` in `pr-report-core`), with the one
+   * each is on. Never released: each is a candidate once that one has merged.
+   */
+  stackedAbove: readonly Readonly<{ pr: PullRequest; on: number }>[];
+  /**
    * The candidates and the pull requests in flight that only a ruleset bypass
    * will merge, with why (`pr-report-core`'s `review-hold.mts`): their checks
    * are run all the same, and they are never armed.

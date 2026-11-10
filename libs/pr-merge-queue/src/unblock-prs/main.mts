@@ -76,7 +76,12 @@ import {
   withSkip,
 } from './skips.mjs';
 import { releaseOrder, releasing } from './speculate-plan.mjs';
-import { dropAllLayers, readLayers, speculate } from './speculate.mjs';
+import {
+  dropAllLayers,
+  followMovedHeads,
+  readLayers,
+  speculate,
+} from './speculate.mjs';
 import { stackedOnAfter, stackParentsOf } from './stack.mjs';
 import {
   bypassPhrase,
@@ -970,7 +975,7 @@ const runCycle = async (
   // log, the dry run, the release and its settling all read (`releaseOrder`).
   const layers =
     speculateConfig !== undefined && Arr.isNonEmpty(triaged.candidates)
-      ? await readLayers(baseSha)
+      ? await followMovedHeads(await readLayers(baseSha), pullRequests)
       : undefined;
 
   const ordered =
@@ -980,6 +985,7 @@ const runCycle = async (
           mayStayAhead,
           defaultBranch,
           bypass: triaged.bypass,
+          stackedAbove: triaged.stackedAbove,
         });
 
   reportTriage(triaged, pullRequests.length, {
@@ -1249,7 +1255,12 @@ const runCycle = async (
   // candidate, nothing below has anything to do either.
   if (Arr.isEmpty(triaged.candidates)) {
     if (speculateConfig !== undefined && !options.dryRun) {
-      await dropAllLayers(api, baseSha, setAsideHeads(mut_skipped));
+      await dropAllLayers(
+        api,
+        baseSha,
+        setAsideHeads(mut_skipped),
+        pullRequests,
+      );
     }
 
     const behind = await restackBehind(pullRequests, defaultBranch, {
@@ -1302,6 +1313,7 @@ const runCycle = async (
       autoFix: autoFixConfig,
       setAside: setAsideHeads(mut_skipped),
       mayStayAhead,
+      stackedAbove: triaged.stackedAbove,
       layers,
     });
 

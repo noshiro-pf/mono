@@ -9,7 +9,11 @@
  */
 
 import { Arr, Num, Result } from 'ts-data-forge';
-import { isVersionBranch } from './queue-order.mjs';
+import {
+  isVersionBranch,
+  type QueueGraph,
+  type QueueStanding,
+} from './queue-order.mjs';
 
 /**
  * The pull requests of `candidates`, in the queue's own order, that stay ahead
@@ -51,6 +55,88 @@ export const stackedAhead = <P extends LayerCandidate>(
       (release === -1 || candidates.indexOf(pr) < release),
   ).stack;
 };
+
+/**
+ * The candidates in their order, each followed by the queued pull requests
+ * stacked on it ({@link stackedLayerParent}), and those by theirs in turn, the
+ * ones on one pull request in number order: the order in which the worker
+ * checks them ahead of their turn. One stacked on a pull request is checked on
+ * top of it but released only once that one has merged and GitHub has moved it
+ * onto the default branch, when it is a candidate of its own. What is stacked
+ * on no candidate is left out, and each is taken once, whatever cycle the bases
+ * make.
+ */
+export const withStackedAbove = <P extends Readonly<{ number: number }>>(
+  candidates: readonly P[],
+  stackedAbove: readonly Readonly<{ pr: P; on: number }>[],
+): readonly P[] => {
+  const mut_taken = new Set<number>(candidates.map(({ number }) => number));
+
+  const above = (number: number): readonly P[] =>
+    stackedAbove
+      .filter(({ on }) => on === number)
+      .map(({ pr }) => pr)
+      .toSorted((a, b) => a.number - b.number)
+      .flatMap((pr) => {
+        if (mut_taken.has(pr.number)) {
+          return [];
+        }
+
+        mut_taken.add(pr.number);
+
+        return Arr.toUnshifted(pr)(above(pr.number));
+      });
+
+  return candidates.flatMap((pr) => Arr.toUnshifted(pr)(above(pr.number)));
+};
+
+/**
+ * The layers with the pull requests whose head moved since followed: one whose
+ * head now has its layer's tree (`heads`, each pull request's current head and
+ * its tree) is still that pull request's layer, at that head. Releasing a pull
+ * request rebases it and restacks the one stacked on it ({@link withStackedAbove}),
+ * whose layer, built on the first's, already has the tree its new head has;
+ * dropped, its runs would be cancelled just as its turn comes. Any other moved
+ * head is the pull request's to check again. The worker reads the layers this
+ * way, and so must every reader of the order it releases in.
+ */
+export const withMovedQueueHeads = <L extends BuiltQueueLayer>(
+  built: readonly L[],
+  heads: ReadonlyMap<number, Readonly<{ head: string; tree: string }>>,
+): readonly L[] =>
+  built.map((layer) => {
+    const moved = heads.get(layer.number);
+
+    return moved !== undefined &&
+      moved.head !== layer.head &&
+      moved.tree === layer.tree
+      ? { ...layer, head: moved.head }
+      : layer;
+  });
+
+/**
+ * The pull request a queued one is stacked on, when it may be checked right
+ * above that one's layer ({@link withStackedAbove}): stacked, on no
+ * `Merge-After` cycle, not a fork's, and waiting on nothing else still open, so
+ * that it becomes a candidate as soon as that one merges. `undefined`
+ * otherwise.
+ */
+export const stackedLayerParent = (
+  pr: Readonly<{ number: number; fromFork: boolean }>,
+  standing: QueueStanding,
+  graph: Readonly<{
+    dependencies: QueueGraph['dependencies'];
+    openNumbers: QueueGraph['openNumbers'];
+  }>,
+): number | undefined =>
+  standing.kind === 'stacked' &&
+  !standing.cyclic &&
+  !pr.fromFork &&
+  (graph.dependencies.get(pr.number) ?? []).every(
+    (each) => each === standing.on || !graph.openNumbers.has(each),
+  )
+    ? standing.on
+    : undefined;
 
 /**
  * Whether a pull request can be stacked: not the version pull request

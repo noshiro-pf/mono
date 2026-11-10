@@ -2394,6 +2394,7 @@ const queuePullOf = (
   return {
     entry,
     baseTip: pr.baseRef?.target?.oid ?? '',
+    headTree: pr.commits.nodes[0]?.commit.tree?.oid,
     mergeable: node.mergeable,
     nativeStack:
       node.stackEntry === null

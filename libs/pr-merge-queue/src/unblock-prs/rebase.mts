@@ -611,6 +611,49 @@ export const armOnPick = async (
 };
 
 /**
+ * The layer this pull request was stacked on, if GitHub moved it onto the
+ * default branch when that layer merged — and so the head below its own
+ * commits, if GitHub did not rebase it. Anything that cannot be read is
+ * `undefined`, and the rebase falls back to dropping commits by their patches,
+ * which a one-commit layer squash-merged unchanged also survives.
+ */
+export const stackedOnMerged = async (
+  api: ApiContext,
+  pr: PullRequest,
+  defaultBranch: string,
+  /** What the caller does without it, for the log. */
+  without = 'rebasing by patch',
+): Promise<MergedHead | undefined> => {
+  const changes = await readBaseChanges(api, pr.number);
+
+  if (Result.isErr(changes)) {
+    log(
+      `#${pr.number}: cannot read whether it came off a stack; ${without}. (${lastLines(changes.value, 2)})`,
+    );
+
+    return undefined;
+  }
+
+  const from = retargetedFrom(changes.value, defaultBranch);
+
+  if (from === undefined || !isSafeRefName(from)) {
+    return undefined;
+  }
+
+  const merged = await mergedHeadOf(api, from);
+
+  if (Result.isErr(merged)) {
+    log(
+      `#${pr.number}: cannot read what merged from ${from}; ${without}. (${lastLines(merged.value, 2)})`,
+    );
+
+    return undefined;
+  }
+
+  return merged.value;
+};
+
+/**
  * What a rebase regenerates with: `config`, with what it writes judged by the
  * default branch's `CODEOWNERS`, the copy a merge is judged by.
  */
@@ -864,47 +907,6 @@ const removeSkipCiLabel = async (
         removed.value,
       )
     : Result.ok('removed');
-};
-
-/**
- * The layer this pull request was stacked on, if GitHub moved it onto the
- * default branch when that layer merged — and so the head below its own
- * commits, if GitHub did not rebase it. Anything that cannot be read is
- * `undefined`, and the rebase falls back to dropping commits by their patches,
- * which a one-commit layer squash-merged unchanged also survives.
- */
-const stackedOnMerged = async (
-  api: ApiContext,
-  pr: PullRequest,
-  defaultBranch: string,
-): Promise<MergedHead | undefined> => {
-  const changes = await readBaseChanges(api, pr.number);
-
-  if (Result.isErr(changes)) {
-    log(
-      `#${pr.number}: cannot read whether it came off a stack; rebasing by patch. (${lastLines(changes.value, 2)})`,
-    );
-
-    return undefined;
-  }
-
-  const from = retargetedFrom(changes.value, defaultBranch);
-
-  if (from === undefined || !isSafeRefName(from)) {
-    return undefined;
-  }
-
-  const merged = await mergedHeadOf(api, from);
-
-  if (Result.isErr(merged)) {
-    log(
-      `#${pr.number}: cannot read what merged from ${from}; rebasing by patch. (${lastLines(merged.value, 2)})`,
-    );
-
-    return undefined;
-  }
-
-  return merged.value;
 };
 
 /**

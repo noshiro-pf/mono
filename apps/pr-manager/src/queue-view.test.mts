@@ -270,6 +270,93 @@ describe(queueViewOf, () => {
     );
   });
 
+  // The worker checks #6 right above #5, the one it is stacked on, and releases
+  // it once #5 has merged, ahead of #2's priority:high.
+  test('picks one stacked on a layer it has stacked in its place in the stack', () => {
+    const queued = [MERGE_QUEUED_LABEL, SKIP_CI_LABEL] as const;
+
+    const pulls = [
+      pull(2, { labels: Arr.toPushed(queued, PRIORITY_HIGH_LABEL) }),
+      pull(5, { labels: queued }),
+      pull(6, { labels: queued, baseRef: 'branch-5' }),
+      pull(7, { labels: queued }),
+    ] as const;
+
+    const built = [
+      {
+        number: 5,
+        head: sha(5),
+        tip: 'tip-5',
+        tree: 'tree-5',
+        parent: BASE_TIP,
+        parentTree: 'main-tree',
+        builtAt: NOW_MS,
+        checks: undefined,
+      },
+      {
+        number: 6,
+        head: sha(6),
+        tip: 'tip-6',
+        tree: 'tree-6',
+        parent: 'tip-5',
+        parentTree: 'tree-5',
+        builtAt: NOW_MS,
+        checks: undefined,
+      },
+    ] as const satisfies readonly CheckedQueueLayer[];
+
+    assert.deepStrictEqual(
+      shape(
+        queueViewOf({
+          ...input(pulls),
+          layers: { built, baseTree: 'main-tree' },
+        }),
+      ).slots.map(([number]) => number),
+      [5, 6, 2, 7],
+    );
+
+    assert.deepStrictEqual(
+      shape(queueViewOf({ ...input(pulls), layers: undefined })).slots.map(
+        ([number]) => number,
+      ),
+      [2, 5, 6, 7],
+    );
+  });
+
+  // Releasing #5 rebased it and restacked #6 on its new head, which has the
+  // tree #6's layer was checked with; #5 has merged since.
+  test('keeps a layer whose pull request moved to a head with its tree', () => {
+    const queued = [MERGE_QUEUED_LABEL, SKIP_CI_LABEL] as const;
+
+    const built = [
+      {
+        number: 6,
+        head: sha(60),
+        tip: 'tip-6',
+        tree: 'tree-6',
+        parent: 'tip-5',
+        parentTree: 'main-tree',
+        builtAt: NOW_MS,
+        checks: undefined,
+      },
+    ] as const satisfies readonly CheckedQueueLayer[];
+
+    const slots = (headTree: string): readonly number[] =>
+      shape(
+        queueViewOf({
+          ...input([
+            pull(2, { labels: Arr.toPushed(queued, PRIORITY_HIGH_LABEL) }),
+            pull(6, { labels: queued, headTree }),
+          ]),
+          layers: { built, baseTree: 'main-tree' },
+        }),
+      ).slots.map(([number]) => number);
+
+    assert.deepStrictEqual(slots('tree-6'), [6, 2]);
+
+    assert.deepStrictEqual(slots('tree-6-pushed'), [2, 6]);
+  });
+
   test('takes one behind its base as a candidate, and one up to date with a failed check as failing', () => {
     const view = queueViewOf(
       input([
@@ -817,6 +904,7 @@ const queuePull = (fields: PullFields): QueuePull =>
   ({
     entry: entry(fields),
     baseTip: BASE_TIP,
+    headTree: fields.headTree,
     mergeable: fields.mergeable,
     nativeStack: fields.nativeStack,
     review: {
@@ -861,6 +949,7 @@ const pull = (number: number, fields: Partial<PullFields> = {}): PullFields =>
     unresolvedConversations: 0,
     files: [],
     comments: [],
+    headTree: undefined,
     ...fields,
   }) as const;
 
@@ -932,4 +1021,5 @@ type PullFields = Readonly<{
   unresolvedConversations: number;
   files: readonly string[];
   comments: readonly string[];
+  headTree: string | undefined;
 }>;
