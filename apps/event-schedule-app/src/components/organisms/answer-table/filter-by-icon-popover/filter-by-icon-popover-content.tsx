@@ -30,7 +30,10 @@ export const FilterByIconPopoverContent = ({
   const disabled = mapBindable(state, (s) => !s.enabled);
 
   return (
-    <div class={constant(styles.filterPopover)}>
+    <div
+      class={constant(styles.filterPopover)}
+      data-e2e={constant('icon-filter-popover')}
+    >
       <div class={constant(styles.filterRow)}>
         <div class={constant(styles.filterInput)}>
           <IconCountNumericInput

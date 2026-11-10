@@ -67,7 +67,10 @@ export const SetTimesPopoverContent = ({
     });
 
   return (
-    <div class={constant(styles.popover)}>
+    <div
+      class={constant(styles.popover)}
+      data-e2e={constant('set-times-popover')}
+    >
       <div class={constant(styles.popoverTime)}>
         <TimeRangeView
           datetimeSpecification={datetimeSpecification}

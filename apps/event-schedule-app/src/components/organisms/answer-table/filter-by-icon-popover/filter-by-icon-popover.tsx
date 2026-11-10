@@ -42,6 +42,7 @@ export const FilterByIconPopover = ({ answerIconId }: Props): JSX.Element => {
           }}
         />
       }
+      data-e2e={`icon-filter-${answerIconId}`}
       isOpen={isOpen$}
       placement={'bottom'}
       onClose={handleClose}
