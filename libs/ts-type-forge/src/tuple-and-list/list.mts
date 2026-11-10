@@ -1,5 +1,4 @@
 import type { IsFixedLengthList } from '../condition/index.mjs';
-import type { NonEmptyTuple } from './array.mjs';
 import type { Tuple } from './tuple.mjs';
 
 export namespace List {
@@ -209,20 +208,14 @@ export namespace List {
 
   /**
    * Creates pairs of elements from two readonly arrays or tuples `A` and `B`.
-   * Zipping stops at the shorter input, so a pair is required only while both
-   * inputs still have a leading required element. Once one side runs out of
-   * them, the pairs the other side's leading elements would form are optional:
-   * they may be missing. The result ends where either side's fixed length ends;
-   * only when both sides go on with a rest does it end in an unsized array of
-   * pairs.
-   *
-   * Only leading required elements count. A tuple with optional elements
-   * (`[A, B?]`) or with elements after a rest (`[...A[], B]`) is read from that
-   * point on as possibly empty and as long as the other side, so some of its
-   * pairs come out optional, or widened by `undefined`, where an exact answer
-   * would not need them to be, and the result can lose its length bound
-   * (`Zip<[1, 2?], readonly string[]>` ends in an unsized rest). The result
-   * never claims a pair that may be missing.
+   * Zipping stops at the shorter input, so the result has as many required
+   * pairs as both inputs are sure to have elements, then optional pairs up to
+   * the shorter input's greatest length, and ends in an unsized array of pairs
+   * only when both inputs are unsized. An optional element (`[A, B?]`) is a
+   * pair that may be missing, and an element after a rest (`[...A[], B]`)
+   * counts toward the length, with the array's element type, since which
+   * element sits at a position is not known. The result never claims a pair
+   * that may be missing.
    * @template A - The first readonly array or tuple.
    * @template B - The second readonly array or tuple.
    * @returns A readonly array/tuple of pairs `readonly [A[i], B[i]]`.
@@ -239,23 +232,7 @@ export namespace List {
   export type Zip<
     A extends readonly unknown[],
     B extends readonly unknown[],
-  > = A extends readonly []
-    ? readonly []
-    : B extends readonly []
-      ? readonly []
-      : A extends NonEmptyTuple<unknown>
-        ? B extends NonEmptyTuple<unknown>
-          ? readonly [readonly [Head<A>, Head<B>], ...Zip<Tail<A>, Tail<B>>] // both A and B have at least 1 element
-          : readonly [
-              (readonly [Head<A>, B[number]])?,
-              ...Zip<Tail<A>, Tail<B>>,
-            ] // only A is sure to have one; B may already be exhausted
-        : B extends NonEmptyTuple<unknown>
-          ? readonly [
-              (readonly [A[number], Head<B>])?,
-              ...Zip<Tail<A>, Tail<B>>,
-            ] // only B is sure to have one; A may already be exhausted
-          : readonly (readonly [A[number], B[number]])[];
+  > = ZipSteps<ZipStep<A>, ZipStep<B>>;
 
   /**
    * Partitions a readonly array or tuple `T` into sub-arrays/tuples of length `N`.
@@ -276,3 +253,95 @@ export namespace List {
     T extends readonly unknown[],
   > = Tuple.Partition<N, T>;
 }
+
+/**
+ * @internal
+ * One element of a tuple, as {@link List.Zip} reads it: the input has ended
+ * (`End`); its first element is there (`Required`) or may be missing
+ * (`Optional`), with what follows; or it is an unsized array of `Element`
+ * (`Rest`). Elements after a rest (`[...A[], B]`) are read as that many
+ * required elements of the array's element type, since which of them sits at
+ * a position is not known.
+ */
+type ZipStep<A extends readonly unknown[]> = A extends readonly []
+  ? ZipEnd
+  : A extends readonly [infer Head, ...infer Rest]
+    ? ZipElement<'Required', Head, Rest>
+    : number extends A['length']
+      ? TrailingCount<A> extends readonly [unknown, ...infer Fewer]
+        ? ZipElement<'Required', A[number], AtLeast<A[number], Fewer>>
+        : A[number][] extends A
+          ? Readonly<{ kind: 'Rest'; element: A[number] }>
+          : A extends readonly [(infer Head)?, ...infer Rest]
+            ? ZipElement<'Optional', Head, Rest>
+            : Readonly<{ kind: 'Rest'; element: A[number] }>
+      : A extends readonly [(infer Head)?, ...infer Rest]
+        ? ZipElement<'Optional', Head, Rest>
+        : ZipEnd;
+
+/** @internal */
+type ZipEnd = Readonly<{ kind: 'End' }>;
+
+/** @internal */
+type ZipElement<
+  K extends 'Required' | 'Optional',
+  Head,
+  Rest extends readonly unknown[],
+> = Readonly<{ kind: K; head: Head; rest: Rest }>;
+
+/**
+ * @internal The elements of `A` after its rest, as a tuple counting them. An
+ * array matches `[...infer Before, unknown]` with `Before` the array itself,
+ * which is where the count stops; the two are compared both ways, since
+ * `[...E[], X]` is assignable to `E[]`.
+ */
+type TrailingCount<
+  A extends readonly unknown[],
+  Count extends readonly unknown[] = [],
+> = A extends readonly [...infer Before, unknown]
+  ? [A, Before] extends [Before, A]
+    ? Count
+    : TrailingCount<Before, [...Count, unknown]>
+  : Count;
+
+/**
+ * @internal An array of `E` with at least as many elements as `Count` has: the
+ * rest of a tuple whose elements after a rest are not yet all paired.
+ */
+type AtLeast<E, Count extends readonly unknown[]> = readonly [
+  ...{ [I in keyof Count]: E },
+  ...E[],
+];
+
+/**
+ * @internal
+ * The pairs of two inputs read one {@link ZipStep} at a time: a pair is
+ * required while both sides are sure to have an element, optional once either
+ * may have run out, and the result ends where either side ends; only two
+ * unsized arrays give an unsized array of pairs.
+ */
+type ZipSteps<SA, SB> = SA extends ZipEnd
+  ? readonly []
+  : SB extends ZipEnd
+    ? readonly []
+    : SA extends Readonly<{ kind: 'Rest'; element: infer EA }>
+      ? SB extends Readonly<{ kind: 'Rest'; element: infer EB }>
+        ? readonly (readonly [EA, EB])[]
+        : SB extends ZipElement<'Required' | 'Optional', infer HB, infer RB>
+          ? readonly [(readonly [EA, HB])?, ...ZipSteps<SA, ZipStep<RB>>]
+          : never
+      : SA extends ZipElement<infer KA, infer HA, infer RA>
+        ? SB extends Readonly<{ kind: 'Rest'; element: infer EB }>
+          ? readonly [(readonly [HA, EB])?, ...ZipSteps<ZipStep<RA>, SB>]
+          : SB extends ZipElement<infer KB, infer HB, infer RB>
+            ? [KA, KB] extends ['Required', 'Required']
+              ? readonly [
+                  readonly [HA, HB],
+                  ...ZipSteps<ZipStep<RA>, ZipStep<RB>>,
+                ]
+              : readonly [
+                  (readonly [HA, HB])?,
+                  ...ZipSteps<ZipStep<RA>, ZipStep<RB>>,
+                ]
+            : never
+        : never;

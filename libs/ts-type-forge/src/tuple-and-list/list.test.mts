@@ -347,22 +347,39 @@ import type { List } from './list.mjs';
     readonly [(readonly [1, string])?, ...(readonly [number, string])[]]
   >('=');
 
-  // Only leading required elements are counted. Elements after a rest, or
-  // optional ones, give a sound but imprecise answer: here B has at least two
-  // elements, yet the second pair is optional.
+  // An element after a rest counts toward the length: B has at least two
+  // elements, so the second pair is required. Which of B's elements sits at the
+  // second position is not known, so its type is B's element type.
   expectType<
     List.Zip<readonly [1, 2], readonly [string, ...string[], number]>,
-    readonly [readonly [1, string], (readonly [2, string | number])?]
+    readonly [readonly [1, string], readonly [2, string | number]]
   >('=');
 
-  // B has at most two elements, yet a third optional pair is still emitted, and
-  // the second pair's element includes `undefined`.
+  // An optional element is stepped past: B has at most two elements, so there
+  // is no third pair, and the second one is optional, not widened by
+  // `undefined`.
   expectType<
     List.Zip<readonly [1, 2, 3], readonly [string, string?]>,
+    readonly [readonly [1, string], (readonly [2, string])?]
+  >('=');
+
+  // A has at most two elements, so the result does not end in a rest.
+  expectType<
+    List.Zip<readonly [1, 2?], readonly string[]>,
+    readonly [(readonly [1, string])?, (readonly [2, string])?]
+  >('=');
+
+  expectType<
+    List.Zip<readonly [1?, 2?], readonly [string, string, string]>,
+    readonly [(readonly [1, string])?, (readonly [2, string])?]
+  >('=');
+
+  expectType<
+    List.Zip<readonly [...number[], 1, 2], readonly [string, string, string]>,
     readonly [
-      readonly [1, string],
-      (readonly [2, string | undefined])?,
-      (readonly [3, string | undefined])?,
+      readonly [number, string],
+      readonly [number, string],
+      (readonly [number, string])?,
     ]
   >('=');
 
