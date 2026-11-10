@@ -7,6 +7,8 @@
  * for, in both themes.
  */
 @import '@blueprintjs/core/lib/css/blueprint.css';
+/* Keyboard focus rings only; after Blueprint's style sheets. */
+@import 'blueprint-synstate/focus-visible.css';
 
 :root {
   /* Blueprint's palette: light gray 5, dark gray 1. */
@@ -346,14 +348,4 @@ table.editable td.derived {
 .sign-in-card h1 {
   margin: 0;
   font-size: 1.6rem;
-}
-
-/*
- * Blueprint draws a focus ring on `:focus`, so a tab or button clicked with
- * the mouse keeps one; only keyboard focus is shown, as Blueprint's
- * `FocusStyleManager.onlyShowFocusOnTabs()` would do.
- */
-:focus:not(:focus-visible),
-.bp6-control input:focus:not(:focus-visible) ~ .bp6-control-indicator {
-  outline: none;
 }
