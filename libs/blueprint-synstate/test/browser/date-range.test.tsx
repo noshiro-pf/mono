@@ -142,6 +142,39 @@ describe(DateRangePicker, () => {
     }
   });
 
+  test('heads the weekdays with the names given', () => {
+    fixNow();
+
+    const host = stage();
+
+    const unmount = render(
+      () => (
+        <DateRangePicker
+          locale={'ja'}
+          value={constant(['', ''] as const)}
+          weekdayNames={['S', 'M', 'T', 'W', 'T', 'F', 'S']}
+          onChange={() => {}}
+        />
+      ),
+      host,
+    );
+
+    try {
+      const heads = all(host, 'th.rdp-head_cell');
+
+      assert.deepStrictEqual(
+        heads.map((th) => th.textContent),
+        ['S', 'M', 'T', 'W', 'T', 'F', 'S'],
+      );
+
+      assert.strictEqual(heads[0]?.getAttribute('aria-label'), '日曜日');
+    } finally {
+      unmount();
+
+      host.remove();
+    }
+  });
+
   test('keeps the month shown when the value comes again with the same days', async () => {
     fixNow();
 
@@ -176,6 +209,44 @@ describe(DateRangePicker, () => {
       await settle();
 
       assert.strictEqual(shown(), '10/2026');
+    } finally {
+      unmount();
+
+      host.remove();
+    }
+  });
+});
+
+describe(DateRangeInput, () => {
+  test('passes the weekday heads on to its calendar', async () => {
+    fixNow();
+
+    const host = stage();
+
+    const unmount = render(
+      () => (
+        <DateRangeInput
+          value={constant(['', ''] as const)}
+          weekdayNames={['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa']}
+          onChange={() => {}}
+        />
+      ),
+      host,
+    );
+
+    try {
+      const [start] = all(host, '.bp6-date-range-input input');
+
+      assert.isDefined(start);
+
+      await userEvent.click(start);
+
+      await settle();
+
+      assert.deepStrictEqual(
+        all(host, 'th.rdp-head_cell').map((th) => th.textContent),
+        ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'],
+      );
     } finally {
       unmount();
 

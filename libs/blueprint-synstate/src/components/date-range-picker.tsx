@@ -17,6 +17,7 @@ import {
   parseWallClock,
   toDateValue,
   type WallClock,
+  type WeekdayNames,
 } from '../date/index.mjs';
 import {
   localNoon,
@@ -44,6 +45,11 @@ export type DateRangePickerOptions = Readonly<{
   maxDate?: string;
   /** The first day of each week drawn, 0 for Sunday (the default) to 6. */
   weekStartsOn?: number;
+  /**
+   * The heads of the weekday columns, Sunday first whatever `weekStartsOn` is;
+   * `Intl`'s short names in `locale` if omitted. See {@link WeekdayNames}.
+   */
+  weekdayNames?: WeekdayNames;
   /** Marks today on the calendar. */
   highlightCurrentDay?: boolean;
   labels?: Partial<DatePickerLabels>;
@@ -83,12 +89,14 @@ export const DateRangePicker = ({
   minDate,
   maxDate,
   weekStartsOn = 0,
+  weekdayNames,
   highlightCurrentDay = false,
   labels: labelOverrides,
 }: Props): JSX.Element => {
   const labels = { ...DEFAULT_DATE_PICKER_LABELS, ...labelOverrides } as const;
 
-  const names = calendarNames(locale);
+  // Read once, as `locale` is: a picker keeps the names it was drawn with.
+  const names = calendarNames(locale, weekdayNames);
 
   const today = now();
 
