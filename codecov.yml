@@ -14,7 +14,9 @@ codecov:
     # never arrives gets no statuses, as it already got no comment. A push to
     # main that `coverage-main` uploads once gets none either, which nothing
     # on main reads; its report, the base pull requests compare against and
-    # the badges read, is processed all the same.
+    # the badges read, is processed all the same. A pull request whose
+    # verdict was reused, as a queued one's is from its queue layer, uploads
+    # through `coverage-pr`, once per entry too.
     after_n_builds: 2
 
 coverage:

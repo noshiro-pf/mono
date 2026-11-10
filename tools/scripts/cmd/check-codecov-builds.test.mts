@@ -1,6 +1,7 @@
 import dedent from 'dedent';
 import {
   collectBuildCountViolations,
+  collectCoveragePrViolations,
   countCoverageEntries,
   readAfterNBuilds,
 } from './check-codecov-builds.mjs';
@@ -134,6 +135,62 @@ describe('collectBuildCountViolations', () => {
         'codecov.yml: `codecov.notify.after_n_builds: 2` should be 0, the number of `coverage: true` entries in .github/workflows/code-check.yml.',
         'codecov.yml: `comment.after_n_builds: 2` should be 0, the number of `coverage: true` entries in .github/workflows/code-check.yml.',
       ],
+    );
+  });
+});
+
+/** A workflow whose coverage-pr job uploads `artifacts`. */
+const withUploads = (artifacts: string): string => dedent`
+  jobs:
+    code-check:
+      strategy:
+        matrix:
+          include:
+            - command: lint
+            - command: shard-1
+              coverage: true
+            - command: e2e
+              coverage: false
+            - command: shard-2
+              coverage: true
+    coverage-pr:
+      strategy:
+        matrix:
+          artifact: ${artifacts}
+`;
+
+describe('collectCoveragePrViolations', () => {
+  test('accepts one upload per artifact a coverage entry keeps, by its index', () => {
+    assert.deepStrictEqual(
+      collectCoveragePrViolations(withUploads('[coverage-1, coverage-3]')),
+      [],
+    );
+  });
+
+  test('reports an artifact it leaves out and one no entry keeps', () => {
+    const violations = collectCoveragePrViolations(
+      withUploads('[coverage-1, coverage-2]'),
+    );
+
+    assert.deepStrictEqual(
+      violations.map((message) =>
+        message.includes('does not upload coverage-3')
+          ? 'missing coverage-3'
+          : message.includes('uploads coverage-2, which no')
+            ? 'extra coverage-2'
+            : message,
+      ),
+      ['missing coverage-3', 'extra coverage-2'],
+    );
+  });
+
+  test('reports a workflow with no coverage-pr job', () => {
+    const violations = collectCoveragePrViolations(workflowFile);
+
+    assert.strictEqual(violations.length, 1);
+
+    assert.isTrue(
+      violations.some((message) => message.includes('`coverage-pr`')),
     );
   });
 });

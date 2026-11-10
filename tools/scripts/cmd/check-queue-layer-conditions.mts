@@ -158,7 +158,10 @@ type CheckSummary = Readonly<{
  * The pull-request-only conditions a queue layer's run does without, each with
  * the reason. Keyed as {@link findQueueLayerViolations} keys them.
  */
-const PULL_REQUEST_ONLY: ReadonlyRecord<string, string> = {} as const;
+const PULL_REQUEST_ONLY: ReadonlyRecord<string, string> = {
+  'code-check.yml: coverage-pr':
+    "Re-uploads a reused verdict's coverage reports for the pull request's head; a queue layer's own matrix uploads them for the layer's commit.",
+} as const;
 
 const BRANCH_REFS = 'refs/heads/';
 

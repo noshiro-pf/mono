@@ -2,6 +2,12 @@ import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import { Arr, Num, Result, unknownToString } from 'ts-data-forge';
 import { isDirectlyExecuted } from 'ts-repo-utils';
+import {
+  matrixValues,
+  readMatrix,
+  readWorkflowJobs,
+  type Matrix,
+} from '../lib/workflow-jobs.mjs';
 import { projectRootPath } from '../project-root-path.mjs';
 
 /**
@@ -14,6 +20,10 @@ import { projectRootPath } from '../project-root-path.mjs';
  * symptom of its own: a number below the uploads brings back statuses and a
  * comment on part of the suite, one above it leaves a pull request with
  * neither, and both read as Codecov being slow.
+ *
+ * A pull request whose verdict was reused uploads through `coverage-pr`
+ * instead, one entry per artifact the matrix keeps, so its `artifact` list has
+ * to name exactly the artifacts of those entries.
  */
 export const checkCodecovBuilds = (): Promise<Result<CheckSummary, string>> =>
   Result.safeTry(async function* () {
@@ -27,10 +37,10 @@ export const checkCodecovBuilds = (): Promise<Result<CheckSummary, string>> =>
 
     const uploads = countCoverageEntries(workflowFile);
 
-    const violations = collectBuildCountViolations(
-      uploads,
-      readAfterNBuilds(codecovFile),
-    );
+    const violations = [
+      ...collectBuildCountViolations(uploads, readAfterNBuilds(codecovFile)),
+      ...collectCoveragePrViolations(workflowFile),
+    ] as const;
 
     return Arr.isNonEmpty(violations)
       ? Result.err(formatViolations(violations))
@@ -148,6 +158,70 @@ export const collectBuildCountViolations = (
     }
   });
 
+/**
+ * What is wrong with the artifacts `coverage-pr` uploads against the ones the
+ * code-check matrix keeps: each `coverage: true` entry keeps
+ * `coverage-<strategy.job-index>`, its place among the `include:` entries, and
+ * `coverage-pr` uploads each of them once, so that a pull request whose verdict
+ * was reused still makes as many uploads as `after_n_builds` waits for.
+ */
+export const collectCoveragePrViolations = (
+  workflowFile: string,
+): readonly string[] => {
+  const read = readWorkflowJobs(workflowFile);
+
+  if (Result.isErr(read)) {
+    return [`${WORKFLOW_PATH}: ${read.value}`];
+  }
+
+  const matrixOf = (name: string): Result<Matrix, string> | undefined => {
+    const job = read.value.find((candidate) => candidate.name === name);
+
+    return job === undefined ? undefined : readMatrix(job.matrix);
+  };
+
+  const shards = matrixOf(MATRIX_JOB);
+
+  if (shards === undefined || Result.isErr(shards)) {
+    return [
+      `${WORKFLOW_PATH}: the \`${MATRIX_JOB}\` job's matrix could not be read${shards === undefined ? '' : `: ${shards.value}`}.`,
+    ];
+  }
+
+  const uploads = matrixOf(PR_UPLOAD_JOB);
+
+  if (uploads === undefined || Result.isErr(uploads)) {
+    return [
+      `${WORKFLOW_PATH}: the \`${PR_UPLOAD_JOB}\` job's matrix could not be read${uploads === undefined ? '' : `: ${uploads.value}`}; a pull request whose verdict was reused would upload no coverage.`,
+    ];
+  }
+
+  const expected = shards.value.include.flatMap((entry, index) =>
+    entry['coverage'] === 'true' ? [`coverage-${index}`] : [],
+  );
+
+  const listed = matrixValues(uploads.value, 'artifact');
+
+  const expectedSet = new Set<string>(expected);
+
+  const listedSet = new Set<string>(listed);
+
+  return [
+    ...expected
+      .filter((name) => !listedSet.has(name))
+      .map(
+        (name) =>
+          `${WORKFLOW_PATH}: \`${PR_UPLOAD_JOB}\` does not upload ${name}, which a \`coverage: true\` entry keeps; add it to its \`artifact\` list.`,
+      ),
+    ...listed
+      .filter((name) => !expectedSet.has(name))
+      .map(
+        (name) =>
+          `${WORKFLOW_PATH}: \`${PR_UPLOAD_JOB}\` uploads ${name}, which no \`coverage: true\` entry keeps (each keeps \`coverage-<its index among the include: entries>\`); remove it or correct the index.`,
+      ),
+  ];
+};
+
 type CheckSummary = Readonly<{
   uploads: number;
 }>;
@@ -155,6 +229,12 @@ type CheckSummary = Readonly<{
 const WORKFLOW_PATH = '.github/workflows/code-check.yml';
 
 const CODECOV_PATH = 'codecov.yml';
+
+/** The job whose `coverage: true` entries upload, and keep their reports. */
+const MATRIX_JOB = 'code-check';
+
+/** The job that uploads those reports again for a reused verdict. */
+const PR_UPLOAD_JOB = 'coverage-pr';
 
 const AFTER_N_BUILDS = 'after_n_builds';
 
@@ -187,7 +267,8 @@ const formatViolations = (violations: readonly string[]): string =>
     ...violations.map((message) => `  ${message}`),
     '',
     'Each `coverage: true` entry of the code-check matrix uploads once; set',
-    'both `after_n_builds` in codecov.yml to that count.',
+    'both `after_n_builds` in codecov.yml to that count, and list each',
+    "entry's `coverage-<index>` artifact in the coverage-pr job's matrix.",
   ].join('\n');
 
 if (isDirectlyExecuted(import.meta.url)) {
