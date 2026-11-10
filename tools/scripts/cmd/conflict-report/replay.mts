@@ -6,9 +6,9 @@
  * regenerating, whether or not `unblock-prs` ever set it aside.
  */
 
-import { spawnSync } from 'node:child_process';
 import { git, sh } from 'pr-merge-queue';
 import { Arr, Num, Result } from 'ts-data-forge';
+import { runFile } from '../../lib/child-process.mjs';
 import type { ConflictEvent } from './report.mjs';
 
 /**
@@ -93,7 +93,7 @@ export const replayPull = async (
       continue;
     }
 
-    const paths = conflictsOfPick(before, after, from);
+    const paths = await conflictsOfPick(before, after, from);
 
     if (!Arr.isNonEmpty(paths)) {
       continue;
@@ -137,12 +137,12 @@ const sessionOf = async (sha: string): Promise<string | undefined> => {
  * stdout after the tree id, which a failed `git()` does not keep, so it is run
  * directly: an argument vector, no shell.
  */
-const conflictsOfPick = (
+const conflictsOfPick = async (
   base: string,
   onto: string,
   commit: string,
-): readonly string[] => {
-  const picked = spawnSync(
+): Promise<readonly string[]> => {
+  const picked = await runFile(
     'git',
     [
       'merge-tree',
@@ -153,7 +153,7 @@ const conflictsOfPick = (
       onto,
       commit,
     ],
-    { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 },
+    { maxBuffer: 64 * 1024 * 1024 },
   );
 
   return picked.status === 1

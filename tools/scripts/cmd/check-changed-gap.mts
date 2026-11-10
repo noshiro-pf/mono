@@ -300,18 +300,16 @@ const main = async (): Promise<Result<string, string>> => {
   // The diff from the merge base, as check-changed takes it. CI's checkout is
   // one commit deep, where there is none; the gate runs a check only on a
   // branch up to date with its base, so the base is the fork point there.
-  const mergeBase = Result.fromThrowable(() =>
-    git(['merge-base', 'HEAD', base]),
-  );
+  const mergeBase = await Result.fromPromise(git(['merge-base', 'HEAD', base]));
 
   const from = Result.isOk(mergeBase) ? mergeBase.value.trim() : base;
 
   // The committed diff, as the pushed branch has it: the job's own steps may
   // have left files behind, which are not the change.
-  const listDiff = (
+  const listDiff = async (
     filter: readonly string[],
-  ): Result<readonly string[], string> => {
-    const diff = Result.fromThrowable(() =>
+  ): Promise<Result<readonly string[], string>> => {
+    const diff = await Result.fromPromise(
       git([
         'diff',
         '--name-only',
@@ -331,7 +329,7 @@ const main = async (): Promise<Result<string, string>> => {
         );
   };
 
-  const changed = listDiff([]);
+  const changed = await listDiff([]);
 
   if (Result.isErr(changed)) {
     return changed;
@@ -340,7 +338,7 @@ const main = async (): Promise<Result<string, string>> => {
   const files = changed.value;
 
   // What still exists in HEAD, for the cspell step, as check-changed passes it.
-  const remaining = listDiff(['--diff-filter=d']);
+  const remaining = await listDiff(['--diff-filter=d']);
 
   if (Result.isErr(remaining)) {
     return remaining;

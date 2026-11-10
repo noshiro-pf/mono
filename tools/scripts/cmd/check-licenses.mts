@@ -1,4 +1,5 @@
-import { execFileSync } from 'node:child_process';
+import { execFile } from 'node:child_process';
+import * as util from 'node:util';
 import { Arr, Json, Result, unknownToString } from 'ts-data-forge';
 import * as t from 'ts-fortress';
 import { isDirectlyExecuted } from 'ts-repo-utils';
@@ -6,6 +7,7 @@ import {
   licensePolicy,
   type LicensePolicy,
 } from '../../configs/license-policy.mjs';
+import { closingStdin } from '../lib/child-process.mjs';
 import { projectRootPath } from '../project-root-path.mjs';
 
 /**
@@ -42,8 +44,10 @@ import { projectRootPath } from '../project-root-path.mjs';
  * files someone has read, but only by its exact name — a wildcard there, or
  * `Unknown` in `allowed`, would be the gap again, and fails.
  */
-export const checkLicenses = (): Result<CheckSummary, string> => {
-  const installed = readInstalledLicenses();
+export const checkLicenses = async (): Promise<
+  Result<CheckSummary, string>
+> => {
+  const installed = await readInstalledLicenses();
 
   if (Result.isErr(installed)) {
     return installed;
@@ -386,24 +390,27 @@ const isExcepted = (entry: InstalledLicense, policy: LicensePolicy): boolean =>
       packages.some((pattern) => matchesPackagePattern(pattern, entry.name)),
   );
 
-const readInstalledLicenses = (): Result<
-  readonly InstalledLicense[],
-  string
+const execFileAsync = util.promisify(execFile);
+
+const readInstalledLicenses = async (): Promise<
+  Result<readonly InstalledLicense[], string>
 > => {
-  const output = Result.fromThrowable(() =>
-    execFileSync('pnpm', ['licenses', 'list', '--recursive', '--json'], {
-      cwd: projectRootPath,
-      encoding: 'utf8',
-      // The listing carries every install path and is several hundred KB.
-      maxBuffer: 256 * 1024 * 1024,
-    }),
+  const output = await Result.fromPromise(
+    closingStdin(
+      execFileAsync('pnpm', ['licenses', 'list', '--recursive', '--json'], {
+        cwd: projectRootPath,
+        encoding: 'utf8',
+        // The listing carries every install path and is several hundred KB.
+        maxBuffer: 256 * 1024 * 1024,
+      }),
+    ),
   );
 
   return Result.isErr(output)
     ? Result.err(
         `\`pnpm licenses list --recursive --json\` failed: ${unknownToString(output.value)}`,
       )
-    : parseLicensesOutput(output.value);
+    : parseLicensesOutput(output.value.stdout);
 };
 
 const formatViolations = (violations: readonly Violation[]): string =>
@@ -418,7 +425,7 @@ const formatViolations = (violations: readonly Violation[]): string =>
 
 if (isDirectlyExecuted(import.meta.url)) {
   if (process.argv.includes(REPORT_FLAG)) {
-    const installed = readInstalledLicenses();
+    const installed = await readInstalledLicenses();
 
     if (Result.isErr(installed)) {
       console.error(installed.value);
@@ -428,7 +435,7 @@ if (isDirectlyExecuted(import.meta.url)) {
 
     console.info(formatReport(installed.value, licensePolicy));
   } else {
-    const result = checkLicenses();
+    const result = await checkLicenses();
 
     if (Result.isErr(result)) {
       console.error(result.value);

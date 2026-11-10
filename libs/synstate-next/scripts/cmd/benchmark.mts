@@ -1,10 +1,19 @@
-import { spawnSync } from 'node:child_process';
+import { execFile, type PromiseWithChild } from 'node:child_process';
 import * as fs from 'node:fs/promises';
 import * as os from 'node:os';
 import * as path from 'node:path';
+import * as util from 'node:util';
 import type { Observable as SynstateObservable } from 'synstate';
 import type { Observable as NextObservable } from 'synstate-next';
-import { Arr, asSafeInt, hasKey, isRecord, Num, range } from 'ts-data-forge';
+import {
+  Arr,
+  asSafeInt,
+  hasKey,
+  isRecord,
+  Num,
+  range,
+  unknownToString,
+} from 'ts-data-forge';
 import type { NonEmptyTuple } from 'ts-type-forge';
 
 // The libraries themselves are imported in `loadLibrary`, so that a process
@@ -44,11 +53,23 @@ const main = async (): Promise<void> => {
   for (const scenario of scenarios) {
     // The libraries alternate, and which goes first turns from round to round,
     // so that a slow stretch of the machine falls on both.
-    const runs = Array.from({ length: processes }, (_, round) =>
-      (round % 2 === 0 ? libraryNames : libraryNames.toReversed()).map(
-        (library) => [library, measureInChild(scenario.name, library)] as const,
-      ),
-    );
+    // One process at a time: two measured at once would share the machine.
+    const mut_runs: (readonly (readonly [LibraryName, number])[])[] = [];
+
+    for (const round of range(0, asSafeInt(processes))) {
+      const mut_run: (readonly [LibraryName, number])[] = [];
+
+      for (const library of round % 2 === 0
+        ? libraryNames
+        : libraryNames.toReversed()) {
+        mut_run.push([library, await measureInChild(scenario.name, library)]);
+      }
+
+      mut_runs.push(mut_run);
+    }
+
+    const runs: readonly (readonly (readonly [LibraryName, number])[])[] =
+      mut_runs;
 
     const [synstateNs, nextNs] = libraryNames.map((library) =>
       median(
@@ -129,6 +150,25 @@ const samples = 21;
 const warmupSamples = 10;
 
 const libraryNames = ['synstate', 'synstate-next'] as const;
+
+type LibraryName = (typeof libraryNames)[number];
+
+const execFileAsync = util.promisify(execFile);
+
+/**
+ * Closes the stdin of the process `util.promisify(execFile)` started and
+ * returns the same promise. The promisified `execFile` leaves stdin an open
+ * pipe, where `execFileSync` closed it at once: a process that reads it would
+ * wait for input that never comes.
+ */
+const closingStdin = <T,>(
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types -- a ChildProcess, whose stdin is ended here
+  running: PromiseWithChild<T>,
+): PromiseWithChild<T> => {
+  running.child.stdin?.end();
+
+  return running;
+};
 
 const thisFile = import.meta.filename;
 
@@ -427,28 +467,28 @@ const parseJson = (text: string): unknown => {
 };
 
 /** Runs one scenario with one library in a new process, and reads its median. */
-const measureInChild = (scenarioName: string, libraryName: string): number => {
+const measureInChild = async (
+  scenarioName: string,
+  libraryName: string,
+): Promise<number> => {
   // Plain Node.js, which strips this file's types itself, and never tsx, which
   // would map `ts-data-forge` and `ts-std-forge`, imported by both libraries'
   // `dist/`, to their TypeScript sources through the repository's `paths`.
   const { TSX_TSCONFIG_PATH: _, ...env } = process.env;
 
-  const result = spawnSync(
-    process.execPath,
-    [thisFile, scenarioName, libraryName],
-    {
+  // A failure rejects with an error whose message holds the child's stderr.
+  const { stdout } = await closingStdin(
+    execFileAsync(process.execPath, [thisFile, scenarioName, libraryName], {
       env: { ...env, NODE_ENV: 'production' },
       encoding: 'utf8',
-    },
-  );
-
-  if (result.status !== 0) {
+    }),
+  ).catch((error: unknown) => {
     throw new Error(
-      `${scenarioName} with ${libraryName} failed:\n${result.error?.message ?? result.stderr}`,
+      `${scenarioName} with ${libraryName} failed:\n${unknownToString(error)}`,
     );
-  }
+  });
 
-  const lastLine = result.stdout.trim().split('\n').at(-1) ?? '';
+  const lastLine = stdout.trim().split('\n').at(-1) ?? '';
 
   const parsed = parseJson(lastLine);
 

@@ -52,13 +52,15 @@ const main = async (): Promise<number> => {
     return 2;
   }
 
-  const base = git(['merge-base', 'HEAD', options.baseRef]).trim();
+  const mergeBase = await git(['merge-base', 'HEAD', options.baseRef]);
+
+  const base = mergeBase.trim();
 
   const tracked = splitZ(
-    git(['diff', '--name-only', '--no-renames', '-z', base, '--']),
+    await git(['diff', '--name-only', '--no-renames', '-z', base, '--']),
   );
 
-  const untracked = listUntracked();
+  const untracked = await listUntracked();
 
   const changedFiles = Arr.uniq([...tracked, ...untracked]).toSorted();
 
@@ -364,7 +366,7 @@ const runPlan = async ({
 
   const mut_writes: (readonly [Step, readonly string[]])[] = [];
 
-  const initial = snapshotTree();
+  const initial = await snapshotTree();
 
   // The tree after each step, the last of which is the next step's "before".
   // A step that wrote nothing repeats the snapshot before it, so that the
@@ -418,7 +420,7 @@ const runPlan = async ({
 
       const seconds = ((performance.now() - started) / 1000).toFixed(1);
 
-      const after = snapshotTree();
+      const after = await snapshotTree();
 
       const rewritten = diffSnapshots(before, after);
 
@@ -505,12 +507,14 @@ const checkCommits = async (
     };
   }
 
-  const commits: readonly Commit[] = git([
+  const log = await git([
     'log',
     '--reverse',
     '--format=%H%x00%B%x1e',
     `${base}..HEAD`,
-  ])
+  ]);
+
+  const commits: readonly Commit[] = log
     .split(RECORD_SEPARATOR)
     .map((record) => record.replace(LEADING_NEWLINE, ''))
     .filter((record) => record.includes('\0'))
@@ -615,10 +619,10 @@ const checkChangesets = async (
  * The untracked files, without the `dir/` git lists for an untracked nested
  * repository, which no check could read.
  */
-const listUntracked = (): readonly string[] =>
-  splitZ(git(['ls-files', '--others', '--exclude-standard', '-z'])).filter(
-    (file) => !file.endsWith('/'),
-  );
+const listUntracked = async (): Promise<readonly string[]> =>
+  splitZ(
+    await git(['ls-files', '--others', '--exclude-standard', '-z']),
+  ).filter((file) => !file.endsWith('/'));
 
 /**
  * The lines the diff added or changed, by file: the `-U0` hunks of what git
@@ -627,10 +631,10 @@ const listUntracked = (): readonly string[] =>
 const collectAddedLines = async (
   base: string,
 ): Promise<ReadonlyMap<string, readonly number[]>> => {
-  const untracked = listUntracked();
+  const untracked = await listUntracked();
 
   const trackedLines = parseAddedLines(
-    git([
+    await git([
       '-c',
       'core.quotePath=false',
       'diff',

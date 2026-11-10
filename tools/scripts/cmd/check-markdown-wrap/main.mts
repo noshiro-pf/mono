@@ -1,9 +1,9 @@
-import { spawnSync } from 'node:child_process';
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import * as prettier from 'prettier';
 import { Arr, Result, unknownToString } from 'ts-data-forge';
 import { isDirectlyExecuted } from 'ts-repo-utils';
+import { runFile } from '../../lib/child-process.mjs';
 import { resolveDiffBase } from '../../lib/diff-base.mjs';
 import { parseAddedLines } from '../../lib/diff-lines.mjs';
 import { isRepositoryProse } from '../../lib/repo-files.mjs';
@@ -19,7 +19,9 @@ export const checkMarkdownWrap = async (
 ): Promise<Result<CheckSummary, string>> => {
   const { fix = false } = options;
 
-  const changed = changedLines(resolveDiffBase('read the change from'));
+  const changed = await changedLines(
+    await resolveDiffBase('read the change from'),
+  );
 
   if (Result.isErr(changed)) {
     return changed;
@@ -89,10 +91,11 @@ const DEFAULT_PRINT_WIDTH = 80;
 const reportOf = (file: string, refill: Refill): string =>
   `${file}:${refill.reportLine}: not filled to the print width; refilled it reads:\n${refill.lines.map((l) => `    ${l}`).join('\n')}` as const;
 
-const git = (args: readonly string[]): Result<string, string> => {
-  const result = spawnSync('git', args, {
+const git = async (
+  args: readonly string[],
+): Promise<Result<string, string>> => {
+  const result = await runFile('git', args, {
     cwd: projectRootPath,
-    encoding: 'utf8',
     maxBuffer: 256 * 1024 * 1024,
   });
 
@@ -106,10 +109,10 @@ const git = (args: readonly string[]): Result<string, string> => {
  * by repository document: the diff of the working tree against `base`, and
  * every line of an untracked one.
  */
-const changedLines = (
+const changedLines = async (
   base: string,
-): Result<ReadonlyMap<string, (line: number) => boolean>, string> => {
-  const diff = git([
+): Promise<Result<ReadonlyMap<string, (line: number) => boolean>, string>> => {
+  const diff = await git([
     'diff',
     // Whatever path prefixes the user's git config asks diffs for, the parser
     // reads `+++ b/…`.
@@ -128,7 +131,7 @@ const changedLines = (
     return diff;
   }
 
-  const untracked = git([
+  const untracked = await git([
     'ls-files',
     '--others',
     '--exclude-standard',

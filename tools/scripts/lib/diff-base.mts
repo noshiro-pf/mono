@@ -1,5 +1,5 @@
-import { spawnSync } from 'node:child_process';
 import { projectRootPath } from '../project-root-path.mjs';
+import { runFile } from './child-process.mjs';
 
 /**
  * The commit the `check:prose` guards that read a change compare the tree with:
@@ -15,18 +15,18 @@ import { projectRootPath } from '../project-root-path.mjs';
  * which would pass every check that reads one. `purpose` finishes the sentence
  * "the commit to …" in the messages.
  */
-export const resolveDiffBase = (
+export const resolveDiffBase = async (
   purpose: string,
   variable: string = DIFF_BASE_VARIABLE,
-): string => {
+): Promise<string> => {
   const fromEnv = process.env[variable];
 
   if (fromEnv !== undefined && fromEnv !== '') {
-    const verified = spawnSync(
+    const verified = await runFile(
       'git',
       // `^0` peels to the commit, and fails on anything that is not one.
       ['rev-parse', '--verify', '--quiet', `${fromEnv}^0`],
-      { cwd: projectRootPath, encoding: 'utf8' },
+      { cwd: projectRootPath },
     );
 
     if (verified.status !== 0) {
@@ -38,10 +38,13 @@ export const resolveDiffBase = (
     return fromEnv;
   }
 
-  const mergeBase = spawnSync('git', ['merge-base', 'HEAD', 'origin/main'], {
-    cwd: projectRootPath,
-    encoding: 'utf8',
-  });
+  const mergeBase = await runFile(
+    'git',
+    ['merge-base', 'HEAD', 'origin/main'],
+    {
+      cwd: projectRootPath,
+    },
+  );
 
   if (mergeBase.status !== 0) {
     throw new Error(

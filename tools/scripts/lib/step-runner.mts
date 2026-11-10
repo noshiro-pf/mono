@@ -1,9 +1,10 @@
-import { spawn, spawnSync } from 'node:child_process';
+import { spawn } from 'node:child_process';
 import * as fsSync from 'node:fs';
 import * as path from 'node:path';
 import { Arr } from 'ts-data-forge';
 import type { ReadonlyRecord } from 'ts-type-forge';
 import { projectRootPath } from '../project-root-path.mjs';
+import { runFile } from './child-process.mjs';
 
 /**
  * What `check-changed`, `z:ci-job` and `check-all` share to run a step: one
@@ -49,9 +50,9 @@ export const spawnPnpm = ({
  * with the hash of its content, or `not a file` for one that is not a regular
  * file.
  */
-export const snapshotTree = (): ReadonlyMap<string, string> => {
+export const snapshotTree = async (): Promise<ReadonlyMap<string, string>> => {
   const files = splitZ(
-    git([
+    await git([
       'status',
       '--porcelain=v1',
       '-z',
@@ -65,9 +66,12 @@ export const snapshotTree = (): ReadonlyMap<string, string> => {
   // repository — so those are set apart first.
   const hashed = files.filter(isRegularFile);
 
-  const hashes = Arr.isEmpty(hashed)
-    ? ([] as const)
-    : git(['hash-object', '--stdin-paths'], hashed.join('\n')).split('\n');
+  const hashOutput = Arr.isEmpty(hashed)
+    ? undefined
+    : await git(['hash-object', '--stdin-paths'], hashed.join('\n'));
+
+  const hashes =
+    hashOutput === undefined ? ([] as const) : hashOutput.split('\n');
 
   const hashOf = new Map(hashed.map((file, i) => [file, hashes[i] ?? '']));
 
@@ -84,10 +88,12 @@ export const diffSnapshots = (
     .toSorted();
 
 /** Runs git in the repository and returns its output, throwing on failure. */
-export const git = (args: readonly string[], input?: string): string => {
-  const result = spawnSync('git', args, {
+export const git = async (
+  args: readonly string[],
+  input?: string,
+): Promise<string> => {
+  const result = await runFile('git', args, {
     cwd: projectRootPath,
-    encoding: 'utf8',
     maxBuffer: GIT_MAX_BUFFER,
     ...(input === undefined ? {} : { input }),
   });

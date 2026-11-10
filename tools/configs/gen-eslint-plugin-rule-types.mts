@@ -66,7 +66,7 @@ export const genEslintPluginRuleTypes = async ({
   }
 
   // Normalize import order and line wrapping with the repo's Prettier config.
-  const fmtStatus = formatPackage({
+  const fmtStatus = await formatPackage({
     cwd: packageRoot,
     patterns: [ruleTypesPath],
   });

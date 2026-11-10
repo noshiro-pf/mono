@@ -1,12 +1,14 @@
 // cspell:ignore ture flase docsx libsx xcspell
 
-import { execFile, execFileSync } from 'node:child_process';
+import { execFile } from 'node:child_process';
 import * as fs from 'node:fs';
 import * as os from 'node:os';
 import * as path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import * as util from 'node:util';
 import { Arr, isRecord, isString } from 'ts-data-forge';
 import type { ReadonlyRecord } from 'ts-type-forge';
+import { closingStdin } from '../lib/child-process.mjs';
 import {
   firstFileToCheck,
   ignoredBy,
@@ -669,24 +671,30 @@ const makeBinDir = (): string => {
   return dir;
 };
 
-const git = (repo: string, args: readonly string[]): void => {
-  execFileSync('git', args, {
-    cwd: repo,
-    env: {
-      ...process.env,
-      GIT_AUTHOR_NAME: 'test',
-      GIT_AUTHOR_EMAIL: 'test@example.com',
-      GIT_COMMITTER_NAME: 'test',
-      GIT_COMMITTER_EMAIL: 'test@example.com',
-    },
-  });
+const execFileAsync = util.promisify(execFile);
+
+const git = async (repo: string, args: readonly string[]): Promise<void> => {
+  await closingStdin(
+    execFileAsync('git', args, {
+      cwd: repo,
+      env: {
+        ...process.env,
+        GIT_AUTHOR_NAME: 'test',
+        GIT_AUTHOR_EMAIL: 'test@example.com',
+        GIT_COMMITTER_NAME: 'test',
+        GIT_COMMITTER_EMAIL: 'test@example.com',
+      },
+    }),
+  );
 };
 
 /** A repository with `files` committed, for the real `git` to diff. */
-const makeRepo = (files: ReadonlyRecord<string, string>): string => {
+const makeRepo = async (
+  files: ReadonlyRecord<string, string>,
+): Promise<string> => {
   const repo = fs.mkdtempSync(path.join(os.tmpdir(), 'workflow-steps-repo-'));
 
-  git(repo, ['init', '-q']);
+  await git(repo, ['init', '-q']);
 
   for (const [file, content] of Object.entries(files)) {
     // eslint-disable-next-line security/detect-non-literal-fs-filename
@@ -696,9 +704,16 @@ const makeRepo = (files: ReadonlyRecord<string, string>): string => {
     fs.writeFileSync(path.join(repo, file), content);
   }
 
-  git(repo, ['add', '.']);
+  await git(repo, ['add', '.']);
 
-  git(repo, ['-c', 'core.hooksPath=/dev/null', 'commit', '-q', '-m', 'base']);
+  await git(repo, [
+    '-c',
+    'core.hooksPath=/dev/null',
+    'commit',
+    '-q',
+    '-m',
+    'base',
+  ]);
 
   return repo;
 };
@@ -724,11 +739,11 @@ const runIn = async (
  * `docs/a.md` and `libs/x.mts` with `docs/` ignored, after `change`.
  */
 const shouldRunAfter = async (
-  change: (dir: string) => void,
+  change: (dir: string) => Promise<void> | void,
 ): Promise<string | undefined> => {
-  const repo = makeRepo({ 'docs/a.md': 'a', 'libs/x.mts': 'x' });
+  const repo = await makeRepo({ 'docs/a.md': 'a', 'libs/x.mts': 'x' });
 
-  change(repo);
+  await change(repo);
 
   const { stdout } = await runIn(repo, [
     'should-run',
@@ -1030,15 +1045,15 @@ describe('the script, run the way the workflows run it', () => {
     // onto a pattern, has to run the checks, which a filter on the diff would
     // quietly undo.
     assert.strictEqual(
-      await shouldRunAfter((dir) => {
-        git(dir, ['rm', '-q', 'libs/x.mts']);
+      await shouldRunAfter(async (dir) => {
+        await git(dir, ['rm', '-q', 'libs/x.mts']);
       }),
       'true',
     );
 
     assert.strictEqual(
-      await shouldRunAfter((dir) => {
-        git(dir, ['mv', 'libs/x.mts', 'docs/x.mts']);
+      await shouldRunAfter(async (dir) => {
+        await git(dir, ['mv', 'libs/x.mts', 'docs/x.mts']);
       }),
       'true',
     );

@@ -2,4 +2,4 @@
 import { packExtensionZip } from '../../../tools/configs/chrome-extension-packaging.mjs';
 import { storePackageOptions } from './store-package.mjs';
 
-packExtensionZip(storePackageOptions);
+await packExtensionZip(storePackageOptions);

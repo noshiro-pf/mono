@@ -1,24 +1,30 @@
-import * as childProcess from 'node:child_process';
+import {
+  exec,
+  type ExecOptions as ChildProcessExecOptions,
+  type ExecOptionsWithBufferEncoding as ChildProcessExecOptionsWithBufferEncoding,
+  type ExecOptionsWithStringEncoding as ChildProcessExecOptionsWithStringEncoding,
+  type ExecException,
+} from 'node:child_process';
 import { Result } from 'ts-data-forge';
 
 type ExecOptionsCustom = Readonly<{
   silent?: boolean;
 }>;
 
-type ExecOptionsWithStringEncoding =
-  childProcess.ExecOptionsWithStringEncoding & ExecOptionsCustom;
+type ExecOptionsWithStringEncoding = ChildProcessExecOptionsWithStringEncoding &
+  ExecOptionsCustom;
 
-type ExecOptionsWithBufferEncoding =
-  childProcess.ExecOptionsWithBufferEncoding & ExecOptionsCustom;
+type ExecOptionsWithBufferEncoding = ChildProcessExecOptionsWithBufferEncoding &
+  ExecOptionsCustom;
 
-type NormalizedExecOptions = childProcess.ExecOptions &
+type NormalizedExecOptions = ChildProcessExecOptions &
   Readonly<{ encoding?: BufferEncoding | 'buffer' | null }>;
 
-export type ExecOptions = childProcess.ExecOptions & ExecOptionsCustom;
+export type ExecOptions = ChildProcessExecOptions & ExecOptionsCustom;
 
 export type ExecResult<T extends string | Buffer> = Result<
   Readonly<{ stdout: T; stderr: T }>,
-  childProcess.ExecException
+  ExecException
 >;
 
 /**
@@ -80,7 +86,7 @@ export function $(
   return new Promise((resolve) => {
     const handleResult = <T extends string | Buffer>(
       // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-      error: childProcess.ExecException | null,
+      error: ExecException | null,
       stdout: T,
       stderr: T,
     ): void => {
@@ -109,10 +115,10 @@ export function $(
 
     if (encoding === 'buffer' || encoding === null) {
       // eslint-disable-next-line security/detect-child-process
-      childProcess.exec(
+      exec(
         command,
         // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-        normalizedOptions as childProcess.ExecOptionsWithBufferEncoding,
+        normalizedOptions as ChildProcessExecOptionsWithBufferEncoding,
         (error, stdout, stderr) => {
           handleResult(error, stdout, stderr);
         },
@@ -122,10 +128,10 @@ export function $(
     }
 
     // eslint-disable-next-line security/detect-child-process
-    childProcess.exec(
+    exec(
       command,
       // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-      normalizedOptions as childProcess.ExecOptionsWithStringEncoding,
+      normalizedOptions as ChildProcessExecOptionsWithStringEncoding,
       (error, stdout, stderr) => {
         handleResult(error, stdout, stderr);
       },

@@ -3,4 +3,4 @@ import { chromium } from '@playwright/test';
 import { packExtensionCrx } from '../../../tools/configs/chrome-extension-packaging.mjs';
 import { storePackageOptions } from './store-package.mjs';
 
-packExtensionCrx(storePackageOptions, chromium.executablePath());
+await packExtensionCrx(storePackageOptions, chromium.executablePath());

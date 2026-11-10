@@ -1,10 +1,12 @@
-import { execFileSync } from 'node:child_process';
+import { execFile } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import * as fs from 'node:fs';
 import * as os from 'node:os';
 import * as path from 'node:path';
+import * as util from 'node:util';
 import { Arr, hasKey, isRecord, Obj } from 'ts-data-forge';
 import type { StrictPick, UnknownRecord } from 'ts-type-forge';
+import { closingStdin } from '../scripts/lib/child-process.mjs';
 
 /** Copies the build for upload, omitting source maps and unpacked-only fields. */
 export const stageForStore = (
@@ -76,7 +78,9 @@ export const storeManifestOf = (
 };
 
 /** Packs the staged build into a zip whose root is the extension's root. */
-export const packExtensionZip = (options: ExtensionPackageOptions): void => {
+export const packExtensionZip = async (
+  options: ExtensionPackageOptions,
+): Promise<void> => {
   const { packPath, stagingPath } = extensionPackagePaths(options.packageRoot);
 
   const { version, removedFields } = stageForStore(options);
@@ -91,7 +95,11 @@ export const packExtensionZip = (options: ExtensionPackageOptions): void => {
   // The store wants the files at the root of the archive, not a directory
   // holding them, so this zips `.` from inside the staging copy. `-X` leaves
   // out the extra file attributes, which are noise in a package.
-  execFileSync('zip', ['-r', '-X', '-q', zipPath, '.'], { cwd: stagingPath });
+  await closingStdin(
+    execFileAsync('zip', ['-r', '-X', '-q', zipPath, '.'], {
+      cwd: stagingPath,
+    }),
+  );
 
   // eslint-disable-next-line security/detect-non-literal-fs-filename
   const { size } = fs.statSync(zipPath);
@@ -120,10 +128,10 @@ export const packExtensionZip = (options: ExtensionPackageOptions): void => {
  * means losing the ability to publish an update at all, once the store has the
  * public half on file.
  */
-export const packExtensionCrx = (
+export const packExtensionCrx = async (
   options: ExtensionPackageOptions,
   chromiumExecutable: string,
-): void => {
+): Promise<void> => {
   // Before the key: a missing browser, build or manifest field must say what to
   // fix without asking `pass` to decrypt anything first.
   const chrome = assertChromiumPresent(chromiumExecutable);
@@ -132,7 +140,7 @@ export const packExtensionCrx = (
 
   const { version, manifestKey, removedFields } = stageForStore(options);
 
-  const key = readSigningKey(options);
+  const key = await readSigningKey(options);
 
   try {
     const crxPath = path.resolve(
@@ -148,16 +156,18 @@ export const packExtensionCrx = (
 
     fs.rmSync(crxPath, { force: true });
 
-    execFileSync(chrome, [
-      '--no-sandbox',
-      `--pack-extension=${stagingPath}`,
-      `--pack-extension-key=${key.path}`,
-    ]);
+    await closingStdin(
+      execFileAsync(chrome, [
+        '--no-sandbox',
+        `--pack-extension=${stagingPath}`,
+        `--pack-extension-key=${key.path}`,
+      ]),
+    );
 
     // eslint-disable-next-line security/detect-non-literal-fs-filename
     fs.renameSync(packedPath, crxPath);
 
-    report(crxPath, key, manifestKey, removedFields);
+    await report(crxPath, key, manifestKey, removedFields);
   } finally {
     key.forget();
   }
@@ -204,6 +214,8 @@ type SigningKey = Readonly<{
   forget: () => void;
 }>;
 
+const execFileAsync = util.promisify(execFile);
+
 const aCodePoint = 'a'.codePointAt(0) ?? 97;
 
 /** `a`, `a and b`, `a, b, and c`. */
@@ -240,17 +252,17 @@ const reportStaging = (removedFields: readonly string[]): void => {
  * Neither the key nor anything `pass` said about it goes into the error: what
  * went wrong is worth reporting, and the entry's contents are not.
  */
-const passShow = (entry: string, signingKeyEnvName: string): string => {
-  const pem = ((): string | undefined => {
-    try {
-      return execFileSync('pass', ['show', entry], {
-        encoding: 'utf8',
-        stdio: ['ignore', 'pipe', 'ignore'],
-      });
-    } catch {
-      return undefined;
-    }
-  })();
+const passShow = async (
+  entry: string,
+  signingKeyEnvName: string,
+): Promise<string> => {
+  const shown = await closingStdin(
+    execFileAsync('pass', ['show', entry], {
+      encoding: 'utf8',
+    }),
+  ).catch(() => undefined);
+
+  const pem = shown?.stdout;
 
   if (pem === undefined) {
     throw new Error(
@@ -279,7 +291,9 @@ const passShow = (entry: string, signingKeyEnvName: string): string => {
  * file that nothing else can read — `mkdtemp` makes its directory `0700` — and
  * deleted as soon as the packing is over, whether or not it worked.
  */
-const readSigningKey = (options: ExtensionPackageOptions): SigningKey => {
+const readSigningKey = async (
+  options: ExtensionPackageOptions,
+): Promise<SigningKey> => {
   const fromEnv = process.env[options.signingKeyPassEnv];
 
   // Empty counts as unset: `pass show ''` lists the whole store instead.
@@ -288,7 +302,7 @@ const readSigningKey = (options: ExtensionPackageOptions): SigningKey => {
       ? options.defaultPassEntry
       : fromEnv;
 
-  const pem = passShow(entry, options.signingKeyPassEnv);
+  const pem = await passShow(entry, options.signingKeyPassEnv);
 
   const directory = fs.mkdtempSync(
     path.join(os.tmpdir(), `${options.packageName}-key-`),
@@ -317,14 +331,19 @@ const readSigningKey = (options: ExtensionPackageOptions): SigningKey => {
   };
 };
 
-const publicKeyDerOf = (keyPath: string): Buffer =>
-  execFileSync(
-    'openssl',
-    ['rsa', '-in', keyPath, '-pubout', '-outform', 'DER'],
-    // `openssl rsa` says "writing RSA key" on the way past, which is not
-    // something this report needs to pass on.
-    { stdio: ['ignore', 'pipe', 'ignore'] },
+const publicKeyDerOf = async (keyPath: string): Promise<Buffer> => {
+  // `openssl rsa` says "writing RSA key" on stderr on the way past, which is
+  // not something this report needs to pass on, so only stdout is read.
+  const { stdout } = await closingStdin(
+    execFileAsync(
+      'openssl',
+      ['rsa', '-in', keyPath, '-pubout', '-outform', 'DER'],
+      { encoding: 'buffer' },
+    ),
   );
+
+  return stdout;
+};
 
 /**
  * The id Chrome derives from a public key: the first half of its SHA-256, with
@@ -336,12 +355,12 @@ const idFromDer = (der: Readonly<Uint8Array>): string =>
     .map((nibble) => String.fromCodePoint(aCodePoint + nibble))
     .join('');
 
-const report = (
+const report = async (
   crxPath: string,
   key: SigningKey,
   manifestKey: string | undefined,
   removedFields: readonly string[],
-): void => {
+): Promise<void> => {
   // eslint-disable-next-line security/detect-non-literal-fs-filename
   const crx = fs.readFileSync(crxPath);
 
@@ -349,7 +368,7 @@ const report = (
     throw new Error('That is not a CRX: the file does not start with `Cr24`.');
   }
 
-  const signedId = idFromDer(publicKeyDerOf(key.path));
+  const signedId = idFromDer(await publicKeyDerOf(key.path));
 
   console.log(`${crxPath}  (${Math.round(crx.length / 1024).toString()} kB)`);
 

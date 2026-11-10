@@ -1,7 +1,8 @@
-import { execFileSync } from 'node:child_process';
+import { execFile, spawn, type PromiseWithChild } from 'node:child_process';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import * as util from 'node:util';
 // A top-level `import type`, not the inline `import { type … }` the lint
 // prefers: Node erases the former and keeps the latter as a bare
 // `import {} from 'ts-type-forge'`, which fails to resolve before
@@ -105,7 +106,7 @@ export const main = async (argv: readonly string[]): Promise<void> => {
 
   switch (command) {
     case 'pnpm': {
-      selfUpdatePnpm();
+      await selfUpdatePnpm();
 
       break;
     }
@@ -153,14 +154,14 @@ export const main = async (argv: readonly string[]): Promise<void> => {
 // `pnpm`
 // ---------------------------------------------------------------------------
 
-export const selfUpdatePnpm = (
+export const selfUpdatePnpm = async (
   now: number = Temporal.Now.instant().epochMilliseconds,
-): void => {
-  const hold = readMinimumReleaseAge();
+): Promise<void> => {
+  const hold = await readMinimumReleaseAge();
 
   const cutoff = now - hold.milliseconds;
 
-  const metadata = readPnpmRegistryMetadata();
+  const metadata = await readPnpmRegistryMetadata();
 
   const selection = selectMaturePnpmVersion(metadata, cutoff);
 
@@ -180,7 +181,7 @@ export const selfUpdatePnpm = (
 
   console.log(`Held back by minimumReleaseAge: [${heldBack.join(', ')}]`);
 
-  execFileSync('pnpm', ['self-update', target], { stdio: 'inherit' });
+  await runStreamed('pnpm', ['self-update', target]);
 };
 
 /**
@@ -391,13 +392,13 @@ export const updateActionPins = async (
   // Asked before anything is rewritten: a missing extension fails the run with
   // the tree as it was, rather than with pins moved and a lockfile that no
   // longer covers them.
-  assertGhActionsLockInstalled();
+  await assertGhActionsLockInstalled();
 
   const api = options.api ?? createGitHubApi();
 
   const now = options.now ?? Temporal.Now.instant().epochMilliseconds;
 
-  const hold = readMinimumReleaseAge();
+  const hold = await readMinimumReleaseAge();
 
   const cutoff = now - hold.milliseconds;
 
@@ -465,7 +466,7 @@ export const updateActionPins = async (
   // start once it runs, so the two move together. Nothing moved, nothing to
   // record: the lockfile is left as it is.
   if (mut_updates.length > 0) {
-    regenerateLockfile(path.dirname(githubDir));
+    await regenerateLockfile(path.dirname(githubDir));
   }
 };
 
@@ -547,7 +548,7 @@ export const updateReleaseBinaryPins = async (
 
   const now = options.now ?? Temporal.Now.instant().epochMilliseconds;
 
-  const hold = readMinimumReleaseAge();
+  const hold = await readMinimumReleaseAge();
 
   const cutoff = now - hold.milliseconds;
 
@@ -685,16 +686,39 @@ const parseRegistryMetadata = (raw: unknown): RegistryMetadata | undefined => {
     : { versions, time };
 };
 
-/** Stdout only; stderr goes through, so a pnpm warning is seen and not parsed. */
-const pnpmStdout = (args: readonly string[]): string =>
-  execFileSync('pnpm', args, {
-    encoding: 'utf8',
-    stdio: ['ignore', 'pipe', 'inherit'],
-  }).trim();
+const execFileAsync = util.promisify(execFile);
 
-const readPnpmRegistryMetadata = (): RegistryMetadata => {
+/**
+ * Closes the stdin of the process `util.promisify(execFile)` started and
+ * returns the same promise. The promisified `execFile` leaves stdin an open
+ * pipe, where `execFileSync` closed it at once: a process that reads it would
+ * wait for input that never comes.
+ */
+const closingStdin = <T,>(
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types -- a ChildProcess, whose stdin is ended here
+  running: PromiseWithChild<T>,
+): PromiseWithChild<T> => {
+  running.child.stdin?.end();
+
+  return running;
+};
+
+/** Stdout only; stderr is passed on, so a pnpm warning is seen and not parsed. */
+const pnpmStdout = async (args: readonly string[]): Promise<string> => {
+  const { stdout, stderr } = await closingStdin(
+    execFileAsync('pnpm', args, {
+      encoding: 'utf8',
+    }),
+  );
+
+  process.stderr.write(stderr);
+
+  return stdout.trim();
+};
+
+const readPnpmRegistryMetadata = async (): Promise<RegistryMetadata> => {
   const raw: unknown = JSON.parse(
-    pnpmStdout(['view', 'pnpm', 'versions', 'time', '--json']),
+    await pnpmStdout(['view', 'pnpm', 'versions', 'time', '--json']),
   );
 
   const metadata = parseRegistryMetadata(raw);
@@ -744,15 +768,43 @@ const listPinnedFiles = (githubDir: string): readonly string[] => {
 };
 
 /** Fails, saying how to install it, unless `gh actions-lock` runs. */
-const assertGhActionsLockInstalled = (): void => {
+const assertGhActionsLockInstalled = async (): Promise<void> => {
   try {
-    execFileSync('gh', ['actions-lock', '--version'], {
-      stdio: ['ignore', 'ignore', 'pipe'],
-    });
+    await closingStdin(
+      execFileAsync('gh', ['actions-lock', '--version'], { encoding: 'utf8' }),
+    );
   } catch (error) {
     throw new Error(
       '`gh actions-lock --version` failed, and the lockfile has to be regenerated whenever a pin moves. Install the extension at the release `.github/actions/install-gh-actions-lock/action.yml` names (`gh extension install github/gh-actions-lock --pin <tag>`).',
       { cause: error },
+    );
+  }
+};
+
+/**
+ * Runs `command`, its output going straight to the log as it runs, and rejects
+ * unless it exits 0. `spawn` rather than `runInherited`, which this file cannot
+ * import (see the header).
+ */
+const runStreamed = async (
+  command: string,
+  args: readonly string[],
+  cwd?: string,
+): Promise<void> => {
+  const status = await new Promise<number | null>((resolve, reject) => {
+    const child = spawn(command, args, {
+      stdio: 'inherit',
+      ...(cwd === undefined ? {} : { cwd }),
+    });
+
+    child.once('error', reject);
+
+    child.once('close', resolve);
+  });
+
+  if (status !== 0) {
+    throw new Error(
+      `${[command, ...args].join(' ')} exited with ${status ?? 'a signal'}.`,
     );
   }
 };
@@ -763,12 +815,8 @@ const assertGhActionsLockInstalled = (): void => {
  * workflow on the default branch, where verify-lockfile.yml has already held
  * every merged one to the lockfile.
  */
-const regenerateLockfile = (root: string): void => {
-  execFileSync('gh', ['actions-lock', '--no-interactive'], {
-    cwd: root,
-    stdio: 'inherit',
-  });
-};
+const regenerateLockfile = (root: string): Promise<void> =>
+  runStreamed('gh', ['actions-lock', '--no-interactive'], root);
 
 const readActionPins = (githubDir: string): readonly ActionPin[] =>
   listPinnedFiles(githubDir).flatMap((file) =>
@@ -1321,8 +1369,8 @@ const compareDigits = (a: string, b: string): number =>
 type Hold = Readonly<{ minutes: string; milliseconds: number }>;
 
 /** `minimumReleaseAge` is minutes; anything unparsable counts as no hold. */
-const readMinimumReleaseAge = (): Hold => {
-  const minutes = pnpmStdout(['config', 'get', 'minimumReleaseAge']);
+const readMinimumReleaseAge = async (): Promise<Hold> => {
+  const minutes = await pnpmStdout(['config', 'get', 'minimumReleaseAge']);
 
   try {
     return {

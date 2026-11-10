@@ -1,4 +1,4 @@
-import { spawnSync } from 'node:child_process';
+import { execFile } from 'node:child_process';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -41,10 +41,10 @@ import type { UnknownRecord } from 'ts-type-forge';
  * `check:root:node-run-scripts` holds the first two, the test the last. The repository is the one holding the hook's `cwd`, not
  * `$CLAUDE_PROJECT_DIR`, for the same reason.
  */
-export const run = (
+export const run = async (
   stdin: string,
   now: number = Date.now(),
-): string | undefined => {
+): Promise<string | undefined> => {
   const input = parseJson(stdin);
 
   if (!isObject(input)) {
@@ -55,13 +55,17 @@ export const run = (
 
   // Every later git command runs at the top level, where a pathspec such as
   // `CLAUDE.md` means the root one whatever directory the session is in.
-  const [root, commonDir] =
-    git(typeof input['cwd'] === 'string' ? input['cwd'] : process.cwd(), [
+  const located = await git(
+    typeof input['cwd'] === 'string' ? input['cwd'] : process.cwd(),
+    [
       'rev-parse',
       '--path-format=absolute',
       '--show-toplevel',
       '--git-common-dir',
-    ])?.split('\n') ?? [];
+    ],
+  );
+
+  const [root, commonDir] = located?.split('\n') ?? [];
 
   if (
     root === undefined ||
@@ -232,30 +236,47 @@ const isMemoryFile = (file: string): boolean =>
   path.posix.basename(file) === 'CLAUDE.md' &&
   !file.startsWith('experimental/');
 
-/** Trimmed stdout, or `undefined` when git fails or times out. */
-const git = (cwd: string, args: readonly string[]): string | undefined => {
-  // Unquoted, so that a non-ASCII path compares equal to the one CLAUDE.md names.
-  const result = spawnSync('git', ['-c', 'core.quotePath=false', ...args], {
-    cwd,
-    encoding: 'utf8',
-    timeout: GIT_TIMEOUT_MS,
-    // A credential prompt would hang until the timeout.
-    env: { ...process.env, GIT_TERMINAL_PROMPT: '0' },
-  });
+/**
+ * Trimmed stdout, or `undefined` when git fails or times out. `execFile` with a
+ * callback rather than `tools/scripts/lib/child-process.mts`, which this file
+ * cannot import (see the header).
+ */
+const git = (
+  cwd: string,
+  args: readonly string[],
+): Promise<string | undefined> =>
+  new Promise((resolve) => {
+    const child = execFile(
+      'git',
+      // Unquoted, so that a non-ASCII path compares equal to the one CLAUDE.md
+      // names.
+      ['-c', 'core.quotePath=false', ...args],
+      {
+        cwd,
+        encoding: 'utf8',
+        timeout: GIT_TIMEOUT_MS,
+        // A credential prompt would hang until the timeout.
+        env: { ...process.env, GIT_TERMINAL_PROMPT: '0' },
+      },
+      (error, stdout) => {
+        resolve(error === null ? stdout.trim() : undefined);
+      },
+    );
 
-  return result.status === 0 ? result.stdout.trim() : undefined;
-};
+    // Nothing is written to git; an open stdin would only be something to wait on.
+    child.stdin?.end();
+  });
 
 /**
  * The report for `seen..tip`: `undefined` when nothing the session loaded
  * changed, `FAILED` when git could not say.
  */
-const buildReport = (
+const buildReport = async (
   cwd: string,
   seen: string,
   tip: string,
-): string | undefined | typeof FAILED => {
-  const nameStatus = git(cwd, [
+): Promise<string | undefined | typeof FAILED> => {
+  const nameStatus = await git(cwd, [
     'diff',
     '--no-renames',
     '--name-status',
@@ -270,11 +291,13 @@ const buildReport = (
   const changes = parseNameStatus(nameStatus);
 
   // Both commits' references, so a file named only before or only after counts.
-  const references = extractReferences(
-    [seen, tip]
-      .map((commit) => git(cwd, ['show', `${commit}:CLAUDE.md`]) ?? '')
-      .join('\n'),
+  const memoryFileTexts = await Promise.all(
+    [seen, tip].map(
+      async (commit) => (await git(cwd, ['show', `${commit}:CLAUDE.md`])) ?? '',
+    ),
   );
+
+  const references = extractReferences(memoryFileTexts.join('\n'));
 
   const memoryFiles = changes.filter(({ path: file }) => isMemoryFile(file));
 
@@ -289,7 +312,7 @@ const buildReport = (
   const diff =
     memoryFiles.length === 0
       ? undefined
-      : git(cwd, [
+      : await git(cwd, [
           'diff',
           '--no-color',
           '--no-ext-diff',
@@ -331,7 +354,11 @@ const writeText = (file: string, text: string): void => {
  * last minute. The stamp is touched first, so prompts in several sessions at
  * once fetch once.
  */
-const fetchMain = (cwd: string, stateDir: string, now: number): void => {
+const fetchMain = async (
+  cwd: string,
+  stateDir: string,
+  now: number,
+): Promise<void> => {
   const stamp = path.join(stateDir, FETCH_STAMP);
 
   if (now - modifiedAt(stamp) < FETCH_INTERVAL_MS) {
@@ -340,7 +367,7 @@ const fetchMain = (cwd: string, stateDir: string, now: number): void => {
 
   writeText(stamp, '');
 
-  git(cwd, ['fetch', '--quiet', '--no-tags', REMOTE, BRANCH]);
+  await git(cwd, ['fetch', '--quiet', '--no-tags', REMOTE, BRANCH]);
 };
 
 const readText = (file: string): string | undefined => {
@@ -358,15 +385,15 @@ const readSeen = (stateFile: string): string | undefined => {
   return text !== undefined && COMMIT.test(text) ? text : undefined;
 };
 
-const onPrompt = (
+const onPrompt = async (
   cwd: string,
   stateDir: string,
   stateFile: string,
   now: number,
-): string | undefined => {
-  fetchMain(cwd, stateDir, now);
+): Promise<string | undefined> => {
+  await fetchMain(cwd, stateDir, now);
 
-  const tip = git(cwd, [
+  const tip = await git(cwd, [
     'rev-parse',
     '--verify',
     '--quiet',
@@ -378,9 +405,9 @@ const onPrompt = (
   }
 
   const seen =
-    readSeen(stateFile) ?? git(cwd, ['merge-base', 'HEAD', tip]) ?? tip;
+    readSeen(stateFile) ?? (await git(cwd, ['merge-base', 'HEAD', tip])) ?? tip;
 
-  const report = seen === tip ? undefined : buildReport(cwd, seen, tip);
+  const report = seen === tip ? undefined : await buildReport(cwd, seen, tip);
 
   // Kept at `seen` when git failed, so the next prompt tries the range again.
   // Otherwise written even when nothing changed, so that the first prompt's
@@ -428,7 +455,7 @@ const isDirectlyExecuted = (fileUrl: string): boolean =>
   fs.realpathSync(fileURLToPath(fileUrl)) === fs.realpathSync(process.argv[1]);
 
 if (isDirectlyExecuted(import.meta.url)) {
-  const report = run(fs.readFileSync(0, 'utf8'));
+  const report = await run(fs.readFileSync(0, 'utf8'));
 
   if (report !== undefined) {
     process.stdout.write(

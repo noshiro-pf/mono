@@ -28,7 +28,7 @@ import { git, isRegularFile, splitZ } from '../lib/step-runner.mjs';
 export const checkSynstateHooksCopies = async (): Promise<
   Result<number, string>
 > => {
-  const listed = listSharedFiles();
+  const listed = await listSharedFiles();
 
   const [reference, copies] = await Promise.all([
     readSharedFiles(REFERENCE, listed),
@@ -269,9 +269,9 @@ const departureOf = (
  * repository-relative: tracked, or untracked and not ignored, and present in
  * the working tree.
  */
-const listSharedFiles = (): readonly string[] =>
+const listSharedFiles = async (): Promise<readonly string[]> =>
   splitZ(
-    git([
+    await git([
       'ls-files',
       '-z',
       '--cached',

@@ -84,6 +84,8 @@ export default [
             ...eslintImportsRules['import-x/no-internal-modules'][1].allow,
             // The bundle-size measurement shared with synstate-docs (#3066).
             '**/tools/scripts/lib/bundle-size.mjs',
+            // How the repository runs a process (`runInherited`).
+            '**/tools/scripts/lib/child-process.mjs',
           ],
         },
       ],

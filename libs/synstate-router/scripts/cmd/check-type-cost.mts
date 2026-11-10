@@ -1,8 +1,9 @@
 import dedent from 'dedent';
-import { spawnSync } from 'node:child_process';
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import { Arr } from 'ts-data-forge';
+// eslint-disable-next-line import-x/no-relative-packages -- the repository's one way to run a process
+import { runFile } from '../../../../tools/scripts/lib/child-process.mjs';
 import { workspaceRootPath } from '../workspace-root-path.mjs';
 
 /**
@@ -128,11 +129,13 @@ try {
     '../../node_modules/typescript-native/bin/tsc',
   );
 
-  const result = spawnSync(
-    process.execPath,
-    [tsc, '--noEmit', '--extendedDiagnostics', '-p', tsconfigPath],
-    { encoding: 'utf8' },
-  );
+  const result = await runFile(process.execPath, [
+    tsc,
+    '--noEmit',
+    '--extendedDiagnostics',
+    '-p',
+    tsconfigPath,
+  ]);
 
   if (result.error !== undefined || result.signal !== null) {
     throw new Error(

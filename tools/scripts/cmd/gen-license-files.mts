@@ -1,11 +1,13 @@
-import { execFileSync } from 'node:child_process';
+import { execFile } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { existsSync, readFileSync } from 'node:fs';
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
+import * as util from 'node:util';
 import { Arr, Json, Result, unknownToString } from 'ts-data-forge';
 import * as t from 'ts-fortress';
 import { isDirectlyExecuted } from 'ts-repo-utils';
+import { closingStdin } from '../lib/child-process.mjs';
 import { projectRootPath } from '../project-root-path.mjs';
 
 /**
@@ -61,7 +63,7 @@ export const genLicenseFiles = async (): Promise<
     return rootLicense;
   }
 
-  const manifests = readWorkspaceManifests();
+  const manifests = await readWorkspaceManifests();
 
   if (Result.isErr(manifests)) {
     return manifests;
@@ -73,7 +75,7 @@ export const genLicenseFiles = async (): Promise<
     return rootDeclaration;
   }
 
-  const trackedLicenseFiles = listTrackedLicenseFiles();
+  const trackedLicenseFiles = await listTrackedLicenseFiles();
 
   if (Result.isErr(trackedLicenseFiles)) {
     return trackedLicenseFiles;
@@ -413,6 +415,8 @@ const readManifest = (
 const toRepoRelative = (absolute: string): string =>
   path.relative(projectRootPath, absolute).split(path.sep).join('/');
 
+const execFileAsync = util.promisify(execFile);
+
 /**
  * Every workspace package, with the `package.json` fields this reads and
  * whether a LICENSE sits beside it.
@@ -423,16 +427,17 @@ const toRepoRelative = (absolute: string): string =>
  * declarations, which name no package anyone installs and are kept out of the
  * tarball on purpose.
  */
-const readWorkspaceManifests = (): Result<
-  readonly PackageManifest[],
-  string
+const readWorkspaceManifests = async (): Promise<
+  Result<readonly PackageManifest[], string>
 > => {
-  const listed = Result.fromThrowable(() =>
-    execFileSync('pnpm', ['ls', '--recursive', '--depth', '-1', '--json'], {
-      cwd: projectRootPath,
-      encoding: 'utf8',
-      maxBuffer: 64 * 1024 * 1024,
-    }),
+  const listed = await Result.fromPromise(
+    closingStdin(
+      execFileAsync('pnpm', ['ls', '--recursive', '--depth', '-1', '--json'], {
+        cwd: projectRootPath,
+        encoding: 'utf8',
+        maxBuffer: 64 * 1024 * 1024,
+      }),
+    ),
   );
 
   if (Result.isErr(listed)) {
@@ -441,7 +446,7 @@ const readWorkspaceManifests = (): Result<
     );
   }
 
-  const parsed = Json.parse(listed.value);
+  const parsed = Json.parse(listed.value.stdout);
 
   if (Result.isErr(parsed)) {
     return Result.err(`\`pnpm ls\` returned no JSON: ${parsed.value}`);
@@ -521,13 +526,17 @@ const collectOrphanLicenseFiles = (
  * Tracked rather than globbed, which keeps `node_modules` and every untracked
  * scratch copy out without a pattern list.
  */
-const listTrackedLicenseFiles = (): Result<readonly string[], string> => {
-  const listed = Result.fromThrowable(() =>
-    execFileSync('git', ['ls-files', '-z', '--', `*${LICENSE_FILE}`], {
-      cwd: projectRootPath,
-      encoding: 'utf8',
-      maxBuffer: 16 * 1024 * 1024,
-    }),
+const listTrackedLicenseFiles = async (): Promise<
+  Result<readonly string[], string>
+> => {
+  const listed = await Result.fromPromise(
+    closingStdin(
+      execFileAsync('git', ['ls-files', '-z', '--', `*${LICENSE_FILE}`], {
+        cwd: projectRootPath,
+        encoding: 'utf8',
+        maxBuffer: 16 * 1024 * 1024,
+      }),
+    ),
   );
 
   if (Result.isErr(listed)) {
@@ -537,7 +546,7 @@ const listTrackedLicenseFiles = (): Result<readonly string[], string> => {
   }
 
   return Result.ok(
-    listed.value
+    listed.value.stdout
       .split('\0')
       .filter((entry) => path.posix.basename(entry) === LICENSE_FILE),
   );

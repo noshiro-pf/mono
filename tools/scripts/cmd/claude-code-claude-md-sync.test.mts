@@ -1,11 +1,11 @@
 // cspell:ignore gpgsign
 
 import dedent from 'dedent';
-import { spawnSync } from 'node:child_process';
 import * as fs from 'node:fs';
 import * as os from 'node:os';
 import * as path from 'node:path';
 import type { ReadonlyRecord } from 'ts-type-forge';
+import { runFile } from '../lib/child-process.mjs';
 import { projectRootPath } from '../project-root-path.mjs';
 import {
   extractReferences,
@@ -29,23 +29,24 @@ const write = (file: string, content: string): void => {
   fs.writeFileSync(file, content);
 };
 
-const withTemporaryDirectory = (body: (directory: string) => void): void => {
+const withTemporaryDirectory = async (
+  body: (directory: string) => Promise<void> | void,
+): Promise<void> => {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'claude-md-sync-'));
 
   try {
-    body(dir);
+    await body(dir);
   } finally {
     fs.rmSync(dir, { recursive: true, force: true });
   }
 };
 
-const gitIn = (cwd: string, args: readonly string[]): string => {
-  const result = spawnSync(
+const gitIn = async (cwd: string, args: readonly string[]): Promise<string> => {
+  const result = await runFile(
     'git',
     ['-c', 'commit.gpgsign=false', '-c', 'init.defaultBranch=main', ...args],
     {
       cwd,
-      encoding: 'utf8',
       env: {
         ...process.env,
         GIT_AUTHOR_NAME: 'test',
@@ -61,17 +62,17 @@ const gitIn = (cwd: string, args: readonly string[]): string => {
   return result.stdout.trim();
 };
 
-const commit = (
+const commit = async (
   repo: string,
   files: ReadonlyRecord<string, string>,
-): string => {
+): Promise<string> => {
   for (const [file, content] of Object.entries(files)) {
     write(path.join(repo, file), content);
   }
 
-  gitIn(repo, ['add', '--all']);
+  await gitIn(repo, ['add', '--all']);
 
-  gitIn(repo, ['commit', '--quiet', '--message', 'change']);
+  await gitIn(repo, ['commit', '--quiet', '--message', 'change']);
 
   return gitIn(repo, ['rev-parse', 'HEAD']);
 };
@@ -88,10 +89,12 @@ const CLAUDE_MD = dedent`
  * `upstream` stands for GitHub, `work` for the session's clone of it, both with
  * `main` at a `CLAUDE.md` naming `docs/a.md`, `docs/b.md` and `docs/c.md`.
  */
-const withClone = (
-  body: (dirs: Readonly<{ upstream: string; work: string }>) => void,
-): void => {
-  withTemporaryDirectory((dir) => {
+const withClone = async (
+  body: (
+    dirs: Readonly<{ upstream: string; work: string }>,
+  ) => Promise<void> | void,
+): Promise<void> => {
+  await withTemporaryDirectory(async (dir) => {
     const upstream = path.join(dir, 'upstream');
 
     const work = path.join(dir, 'work');
@@ -99,9 +102,9 @@ const withClone = (
     // eslint-disable-next-line security/detect-non-literal-fs-filename -- a temporary fixture.
     fs.mkdirSync(upstream);
 
-    gitIn(upstream, ['init', '--quiet']);
+    await gitIn(upstream, ['init', '--quiet']);
 
-    commit(upstream, {
+    await commit(upstream, {
       'CLAUDE.md': `${CLAUDE_MD}\n`,
       'docs/a.md': 'a\n',
       'docs/b.md': 'b\n',
@@ -109,20 +112,20 @@ const withClone = (
       'docs/unnamed.md': 'u\n',
     });
 
-    gitIn(dir, ['clone', '--quiet', upstream, work]);
+    await gitIn(dir, ['clone', '--quiet', upstream, work]);
 
-    body({ upstream, work });
+    await body({ upstream, work });
   });
 };
 
 /** Late enough that the once-a-minute fetch is always due. */
 const later = (): number => Date.now() + 3_600_000;
 
-const prompt = (
+const prompt = async (
   cwd: string,
   now: number = later(),
   sessionId: string = 'session-1',
-): string | undefined =>
+): Promise<string | undefined> =>
   run(
     JSON.stringify({
       hook_event_name: 'UserPromptSubmit',
@@ -132,9 +135,9 @@ const prompt = (
     now,
   );
 
-const sessionStart = (cwd: string): void => {
+const sessionStart = async (cwd: string): Promise<void> => {
   assert.isUndefined(
-    run(
+    await run(
       JSON.stringify({
         hook_event_name: 'SessionStart',
         session_id: 'session-1',
@@ -206,21 +209,21 @@ describe('formatReport', () => {
 });
 
 describe('run', () => {
-  test('is silent while origin/main has not moved', () => {
-    withClone(({ work }) => {
-      assert.isUndefined(prompt(work));
+  test('is silent while origin/main has not moved', async () => {
+    await withClone(async ({ work }) => {
+      assert.isUndefined(await prompt(work));
 
-      assert.isUndefined(prompt(work));
+      assert.isUndefined(await prompt(work));
     });
   });
 
-  test('reports a CLAUDE.md change once, with its diff', () => {
-    withClone(({ upstream, work }) => {
-      assert.isUndefined(prompt(work));
+  test('reports a CLAUDE.md change once, with its diff', async () => {
+    await withClone(async ({ upstream, work }) => {
+      assert.isUndefined(await prompt(work));
 
-      commit(upstream, { 'CLAUDE.md': `${CLAUDE_MD}\nA new rule.\n` });
+      await commit(upstream, { 'CLAUDE.md': `${CLAUDE_MD}\nA new rule.\n` });
 
-      const report = prompt(work);
+      const report = await prompt(work);
 
       assert.isDefined(report);
 
@@ -230,22 +233,22 @@ describe('run', () => {
 
       assert.notInclude(report, 'Files CLAUDE.md names');
 
-      assert.isUndefined(prompt(work));
+      assert.isUndefined(await prompt(work));
     });
   });
 
-  test('names the referenced files that changed, and no others', () => {
-    withClone(({ upstream, work }) => {
-      assert.isUndefined(prompt(work));
+  test('names the referenced files that changed, and no others', async () => {
+    await withClone(async ({ upstream, work }) => {
+      assert.isUndefined(await prompt(work));
 
-      commit(upstream, {
+      await commit(upstream, {
         'docs/a.md': 'a2\n',
         'docs/b.md': 'b2\n',
         'docs/c.md': 'c2\n',
         'docs/unnamed.md': 'u2\n',
       });
 
-      const report = prompt(work);
+      const report = await prompt(work);
 
       assert.isDefined(report);
 
@@ -257,60 +260,60 @@ describe('run', () => {
     });
   });
 
-  test('says nothing when only files CLAUDE.md does not name changed', () => {
-    withClone(({ upstream, work }) => {
-      assert.isUndefined(prompt(work));
+  test('says nothing when only files CLAUDE.md does not name changed', async () => {
+    await withClone(async ({ upstream, work }) => {
+      assert.isUndefined(await prompt(work));
 
-      commit(upstream, { 'docs/unnamed.md': 'u2\n' });
+      await commit(upstream, { 'docs/unnamed.md': 'u2\n' });
 
-      assert.isUndefined(prompt(work));
+      assert.isUndefined(await prompt(work));
     });
   });
 
-  test('reports from the merge base on a branch already behind', () => {
-    withClone(({ upstream, work }) => {
-      commit(upstream, { 'CLAUDE.md': `${CLAUDE_MD}\nA new rule.\n` });
+  test('reports from the merge base on a branch already behind', async () => {
+    await withClone(async ({ upstream, work }) => {
+      await commit(upstream, { 'CLAUDE.md': `${CLAUDE_MD}\nA new rule.\n` });
 
-      assert.include(prompt(work), '+A new rule.');
+      assert.include(await prompt(work), '+A new rule.');
     });
   });
 
-  test('keeps its baseline when HEAD moves during the session', () => {
-    withClone(({ upstream, work }) => {
-      assert.isUndefined(prompt(work));
+  test('keeps its baseline when HEAD moves during the session', async () => {
+    await withClone(async ({ upstream, work }) => {
+      assert.isUndefined(await prompt(work));
 
-      commit(upstream, { 'CLAUDE.md': `${CLAUDE_MD}\nA new rule.\n` });
+      await commit(upstream, { 'CLAUDE.md': `${CLAUDE_MD}\nA new rule.\n` });
 
       // The session pulls before the next prompt; the CLAUDE.md it loaded is
       // still the old one.
-      gitIn(work, ['pull', '--quiet', '--ff-only']);
+      await gitIn(work, ['pull', '--quiet', '--ff-only']);
 
-      assert.include(prompt(work), '+A new rule.');
+      assert.include(await prompt(work), '+A new rule.');
     });
   });
 
-  test('reads the root CLAUDE.md from a subdirectory', () => {
-    withClone(({ upstream, work }) => {
+  test('reads the root CLAUDE.md from a subdirectory', async () => {
+    await withClone(async ({ upstream, work }) => {
       const docs = path.join(work, 'docs');
 
-      assert.isUndefined(prompt(docs));
+      assert.isUndefined(await prompt(docs));
 
-      commit(upstream, { 'CLAUDE.md': `${CLAUDE_MD}\nA new rule.\n` });
+      await commit(upstream, { 'CLAUDE.md': `${CLAUDE_MD}\nA new rule.\n` });
 
-      assert.include(prompt(docs), '+A new rule.');
+      assert.include(await prompt(docs), '+A new rule.');
     });
   });
 
-  test('diffs a nested CLAUDE.md but not one under experimental/', () => {
-    withClone(({ upstream, work }) => {
-      assert.isUndefined(prompt(work));
+  test('diffs a nested CLAUDE.md but not one under experimental/', async () => {
+    await withClone(async ({ upstream, work }) => {
+      assert.isUndefined(await prompt(work));
 
-      commit(upstream, {
+      await commit(upstream, {
         'libs/a/CLAUDE.md': 'A nested rule.\n',
         'experimental/old/CLAUDE.md': 'An old rule.\n',
       });
 
-      const report = prompt(work);
+      const report = await prompt(work);
 
       assert.include(report, '+A nested rule.');
 
@@ -318,26 +321,26 @@ describe('run', () => {
     });
   });
 
-  test('lists at most 30 referenced files', () => {
-    withClone(({ upstream, work }) => {
+  test('lists at most 30 referenced files', async () => {
+    await withClone(async ({ upstream, work }) => {
       const names = Array.from(
         { length: 32 },
         (_, i) => `docs/n${i.toString().padStart(2, '0')}.md`,
       );
 
-      commit(upstream, {
+      await commit(upstream, {
         'CLAUDE.md': `${names.map((name) => `\`${name}\``).join('\n')}\n`,
       });
 
       // The CLAUDE.md that names them, reported first.
-      assert.include(prompt(work), '+`docs/n31.md`');
+      assert.include(await prompt(work), '+`docs/n31.md`');
 
-      commit(
+      await commit(
         upstream,
         Object.fromEntries(names.map((name) => [name, 'changed\n'])),
       );
 
-      const report = prompt(work);
+      const report = await prompt(work);
 
       assert.include(report, '  A docs/n29.md\n  … and 2 more');
 
@@ -345,8 +348,8 @@ describe('run', () => {
     });
   });
 
-  test('keeps the session where it was when git fails', () => {
-    withClone(({ work }) => {
+  test('keeps the session where it was when git fails', async () => {
+    await withClone(async ({ work }) => {
       const stateFile = path.join(work, '.git/claude-md-sync/session-1');
 
       // A commit this clone does not have, as after a failed `git diff`.
@@ -354,16 +357,16 @@ describe('run', () => {
 
       write(stateFile, `${missing}\n`);
 
-      assert.isUndefined(prompt(work));
+      assert.isUndefined(await prompt(work));
 
       // eslint-disable-next-line security/detect-non-literal-fs-filename -- a temporary fixture.
       assert.strictEqual(fs.readFileSync(stateFile, 'utf8'), `${missing}\n`);
     });
   });
 
-  test('SessionStart removes the state of sessions gone for 30 days', () => {
-    withClone(({ work }) => {
-      assert.isUndefined(prompt(work, later(), 'session-2'));
+  test('SessionStart removes the state of sessions gone for 30 days', async () => {
+    await withClone(async ({ work }) => {
+      assert.isUndefined(await prompt(work, later(), 'session-2'));
 
       const stale = path.join(work, '.git/claude-md-sync/session-2');
 
@@ -371,7 +374,7 @@ describe('run', () => {
       assert.isTrue(fs.existsSync(stale));
 
       assert.isUndefined(
-        run(
+        await run(
           JSON.stringify({
             hook_event_name: 'SessionStart',
             session_id: 'session-1',
@@ -386,50 +389,50 @@ describe('run', () => {
     });
   });
 
-  test('reports again after SessionStart', () => {
-    withClone(({ upstream, work }) => {
-      assert.isUndefined(prompt(work));
+  test('reports again after SessionStart', async () => {
+    await withClone(async ({ upstream, work }) => {
+      assert.isUndefined(await prompt(work));
 
-      commit(upstream, { 'CLAUDE.md': `${CLAUDE_MD}\nA new rule.\n` });
+      await commit(upstream, { 'CLAUDE.md': `${CLAUDE_MD}\nA new rule.\n` });
 
-      assert.include(prompt(work), '+A new rule.');
+      assert.include(await prompt(work), '+A new rule.');
 
-      sessionStart(work);
+      await sessionStart(work);
 
-      assert.include(prompt(work), '+A new rule.');
+      assert.include(await prompt(work), '+A new rule.');
     });
   });
 
-  test('fetches at most once a minute per clone', () => {
-    withClone(({ upstream, work }) => {
-      assert.isUndefined(prompt(work));
+  test('fetches at most once a minute per clone', async () => {
+    await withClone(async ({ upstream, work }) => {
+      assert.isUndefined(await prompt(work));
 
-      commit(upstream, { 'CLAUDE.md': `${CLAUDE_MD}\nA new rule.\n` });
+      await commit(upstream, { 'CLAUDE.md': `${CLAUDE_MD}\nA new rule.\n` });
 
       // Another session of the same clone, within the minute.
-      assert.isUndefined(prompt(work, Date.now(), 'session-2'));
+      assert.isUndefined(await prompt(work, Date.now(), 'session-2'));
 
-      assert.include(prompt(work, later(), 'session-2'), '+A new rule.');
+      assert.include(await prompt(work, later(), 'session-2'), '+A new rule.');
     });
   });
 
-  test('keeps sessions apart', () => {
-    withClone(({ upstream, work }) => {
-      assert.isUndefined(prompt(work));
+  test('keeps sessions apart', async () => {
+    await withClone(async ({ upstream, work }) => {
+      assert.isUndefined(await prompt(work));
 
-      assert.isUndefined(prompt(work, later(), 'session-2'));
+      assert.isUndefined(await prompt(work, later(), 'session-2'));
 
-      commit(upstream, { 'CLAUDE.md': `${CLAUDE_MD}\nA new rule.\n` });
+      await commit(upstream, { 'CLAUDE.md': `${CLAUDE_MD}\nA new rule.\n` });
 
-      assert.include(prompt(work), '+A new rule.');
+      assert.include(await prompt(work), '+A new rule.');
 
-      assert.include(prompt(work, later(), 'session-2'), '+A new rule.');
+      assert.include(await prompt(work, later(), 'session-2'), '+A new rule.');
     });
   });
 
-  test('is silent outside a git repository', () => {
-    withTemporaryDirectory((dir) => {
-      assert.isUndefined(prompt(dir));
+  test('is silent outside a git repository', async () => {
+    await withTemporaryDirectory(async (dir) => {
+      assert.isUndefined(await prompt(dir));
     });
   });
 
@@ -443,23 +446,22 @@ describe('run', () => {
         cwd: projectRootPath,
       }),
     ],
-  ])('is silent for %s', (_, stdin) => {
-    assert.isUndefined(run(stdin));
+  ])('is silent for %s', async (_, stdin) => {
+    assert.isUndefined(await run(stdin));
   });
 });
 
 describe('the hook as Claude Code runs it', () => {
-  test('prints the report as additionalContext', () => {
-    withClone(({ upstream, work }) => {
-      commit(upstream, { 'CLAUDE.md': `${CLAUDE_MD}\nA new rule.\n` });
+  test('prints the report as additionalContext', async () => {
+    await withClone(async ({ upstream, work }) => {
+      await commit(upstream, { 'CLAUDE.md': `${CLAUDE_MD}\nA new rule.\n` });
 
-      const result = spawnSync(process.execPath, [scriptPath], {
+      const result = await runFile(process.execPath, [scriptPath], {
         input: JSON.stringify({
           hook_event_name: 'UserPromptSubmit',
           session_id: 'session-1',
           cwd: work,
         }),
-        encoding: 'utf8',
       });
 
       expect(result.status, result.stderr).toBe(0);
@@ -474,9 +476,15 @@ describe('the hook as Claude Code runs it', () => {
 
       assert.nestedInclude(output, {
         'hookSpecificOutput.additionalContext': formatReport({
-          seen: gitIn(work, ['rev-parse', 'HEAD']),
-          tip: gitIn(work, ['rev-parse', 'origin/main']),
-          diff: gitIn(work, ['diff', 'HEAD', 'origin/main', '--', 'CLAUDE.md']),
+          seen: await gitIn(work, ['rev-parse', 'HEAD']),
+          tip: await gitIn(work, ['rev-parse', 'origin/main']),
+          diff: await gitIn(work, [
+            'diff',
+            'HEAD',
+            'origin/main',
+            '--',
+            'CLAUDE.md',
+          ]),
           referenced: [],
         }),
       });

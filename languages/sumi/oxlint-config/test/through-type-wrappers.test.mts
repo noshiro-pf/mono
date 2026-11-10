@@ -66,7 +66,7 @@ const files = {
   ),
 } as const;
 
-const run = runOxlint(Object.values(files));
+const run = await runOxlint(Object.values(files));
 
 const linesOf = (file: string, code: string): readonly number[] =>
   run.diagnostics

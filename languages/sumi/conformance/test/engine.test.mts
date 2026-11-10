@@ -52,7 +52,7 @@ const fixtures = listFixtures(fixturesRootPath).fixtures;
 
 // One oxlint process for the whole corpus: startup (JS plugin load, tsgolint)
 // dominates per-file cost.
-const run = runOxlint(fixtures.map((fixture) => fixture.absolutePath));
+const run = await runOxlint(fixtures.map((fixture) => fixture.absolutePath));
 
 // One program for the whole corpus, for the same reason.
 const fixturePaths: ReadonlySet<string> = new Set(
@@ -71,7 +71,7 @@ const checkerRun = runRules(
 );
 
 // One compiler run for the whole corpus, for the same reason.
-const tscRun = typeCheck(path.resolve(fixturesRootPath, 'tsconfig.json'));
+const tscRun = await typeCheck(path.resolve(fixturesRootPath, 'tsconfig.json'));
 
 type Observed = Readonly<{
   ruleId: string;

@@ -123,7 +123,7 @@ const files = {
   ),
 } as const;
 
-const run = runOxlint(Object.values(files));
+const run = await runOxlint(Object.values(files));
 
 const codesOf = (file: string): readonly string[] =>
   run.diagnostics

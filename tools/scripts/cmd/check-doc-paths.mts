@@ -1,4 +1,3 @@
-import { spawnSync } from 'node:child_process';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import {
@@ -12,6 +11,7 @@ import {
 } from 'ts-data-forge';
 import { isDirectlyExecuted } from 'ts-repo-utils';
 import type { StrictOmit } from 'ts-type-forge';
+import { runFile } from '../lib/child-process.mjs';
 import {
   codeSpanRanges,
   codeSpans,
@@ -130,7 +130,7 @@ export const checkDocPaths = async (): Promise<Result<CheckSummary, string>> =>
     );
 
     const gitIgnored = yield* Result.safeUnwrap(
-      listGitIgnored(
+      await listGitIgnored(
         unresolvedByDocument.flatMap(({ unresolved }) =>
           unresolved.flatMap(({ candidates }) => candidates),
         ),
@@ -581,9 +581,9 @@ const goesPastASymlink = (relativePath: string): boolean =>
  * the question — and is returned with the ignored ones: the tree does not
  * describe what a link points at.
  */
-const listGitIgnored = (
+const listGitIgnored = async (
   candidates: readonly string[],
-): Result<ReadonlySet<string>, string> => {
+): Promise<Result<ReadonlySet<string>, string>> => {
   const pastASymlink = candidates.filter(goesPastASymlink);
 
   const asked = candidates.filter((candidate) => !goesPastASymlink(candidate));
@@ -592,12 +592,11 @@ const listGitIgnored = (
     return Result.ok(new Set<string>(pastASymlink));
   }
 
-  const result = spawnSync(
+  const result = await runFile(
     'git',
     ['-c', 'core.excludesFile=/dev/null', 'check-ignore', '--stdin', '-z'],
     {
       cwd: projectRootPath,
-      encoding: 'utf8',
       input: asked.flatMap((c) => [c, `${c}/`]).join('\0'),
     },
   );

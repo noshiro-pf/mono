@@ -55,7 +55,7 @@ const files = {
   none: write('none.tsx', 'export const plain = (n: number): number => n;\n'),
 } as const;
 
-const run = runOxlint(Object.values(files));
+const run = await runOxlint(Object.values(files));
 
 const codesOf = (file: string): readonly string[] =>
   run.diagnostics.filter((d) => d.filename === file).map((d) => d.code);

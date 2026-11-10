@@ -1,8 +1,11 @@
 import * as assert from 'node:assert/strict';
-import { execFileSync } from 'node:child_process';
+import { execFile } from 'node:child_process';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
+import * as util from 'node:util';
 import { sh } from 'pr-merge-queue';
+
+const execFileAsync = util.promisify(execFile);
 
 // Executables: anything past `--help` would need GitHub credentials and a
 // repository, so this checks that each command loads and reports its usage.
@@ -47,7 +50,13 @@ for (const command of commands) {
     command,
   );
 
-  const help = execFileSync(bin, ['--help'], { encoding: 'utf8' });
+  const running = execFileAsync(bin, ['--help'], { encoding: 'utf8' });
+
+  // The promisified `execFile` leaves stdin an open pipe; nothing is written to
+  // it.
+  running.child.stdin.end();
+
+  const { stdout: help } = await running;
 
   assert.match(help, new RegExp(`Usage: ${command}`, 'u'));
 }
