@@ -61,7 +61,7 @@ assert.strictEqual(
 - **Layouts** nest with `prefix` and `under`: `<Routes prefix cases={...}>` branches on the top-level node the page is under, and inside it `<Routes under={routes.products} cases={...}>` requires the pages of that branch alone.
 - **`Link`** writes the URL below the base path and routes a click through `handleLinkClick`, whose rules are in synstate-router: a modified or middle click, `target`, `download` and another origin stay the browser's; a fragment of the current page becomes the browser's own fragment navigation; a click on an icon inside the link counts; a link to the current URL replaces the entry.
 - **`useRouteMatch`**, **`useAt(node)`** and **`useIsActive(node, { exact })`** read the router's observables with `useSyncExternalStore`, whose server snapshot is the same value, so a router on a memory browser renders on a server.
-- **Scrolling**: `Routes` makes the navigation's scroll in a layout effect, once the new page is in the document.
+- **Scrolling**: `Routes` makes the navigation's scroll in a layout effect, once the new page is in the document. A page behind `Suspense`, such as a `React.lazy` case, commits its fallback first; the router then waits for the fragment's element and scrolls to it once the page draws it.
 
 ## Installation
 

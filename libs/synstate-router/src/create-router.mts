@@ -189,9 +189,12 @@ export type Router<R extends AnyRoutes> = Readonly<{
    * now. For a binding's `Routes`, which calls it once the new page is in the
    * document; without one, the router makes it after the next frame. The URL
    * the page was loaded at counts as a navigation when it has a fragment. A
-   * fragment that frame did not find is looked for once more by the next call,
-   * while the location has not changed: the frame can run before a binding has
-   * drawn the page.
+   * fragment whose element is not in the document yet is looked for again by
+   * every later call and, where the browser can observe the document, as soon
+   * as the page draws it, until the location changes, the user scrolls, or
+   * {@link maxFragmentWaitMs} pass: the frame can run before a binding has drawn
+   * the page, and a page behind a `Suspense` boundary commits its fallback
+   * first.
    */
   flushScroll: () => void;
 
@@ -213,6 +216,13 @@ export type DeclaresSearch<S extends AnySearchCodecs> = [keyof S] extends [
 
 /** How many redirects in a row the router follows. */
 export const maxRedirects = 10;
+
+/**
+ * How long, in milliseconds, the router waits for the element of a fragment it
+ * was asked to scroll to, while the location stays: a page behind a `Suspense`
+ * boundary, or one waiting for its data, draws it after its first commit.
+ */
+export const maxFragmentWaitMs = 10_000;
 
 /**
  * Starts routing `routes` in the browser.
@@ -355,55 +365,98 @@ export const createRouter = <R extends AnyRoutes>(
     /** Whether a frame is queued to make `pending`. */
     frameQueued: boolean;
     /**
-     * A fragment the frame did not find. The frame can run before a binding has
-     * drawn the page, so the binding's `flushScroll` tries it once more, unless
-     * the location has changed since.
+     * A fragment whose element was not in the document when its scroll was
+     * made. The page can draw it later: the frame can run before a binding has
+     * drawn the page, and a page behind a `Suspense` boundary commits its
+     * fallback first. So it is looked for again by every `flushScroll` and on
+     * every change of the document, until it is found, the location changes,
+     * the user scrolls, or {@link maxFragmentWaitMs} pass.
      */
     missed: Optional<string>;
+    /** Stops watching the document for `missed`, and its time limit. */
+    stopWaiting: () => void;
   } = {
     pending: Optional.none,
     frameQueued: false,
     missed: Optional.none,
+    stopWaiting: () => {},
+  };
+
+  const forgetMissed = (): void => {
+    mut_scroll.missed = Optional.none;
+
+    const stop = mut_scroll.stopWaiting;
+
+    mut_scroll.stopWaiting = () => {};
+
+    stop();
+  };
+
+  const waitFor = (id: string): void => {
+    forgetMissed();
+
+    mut_scroll.missed = Optional.some(id);
+
+    const stopObserving = browser.observeDocument?.({
+      changed: () => {
+        if (browser.scrollToFragment(id)) {
+          forgetMissed();
+        }
+      },
+      // The page is where the user put it now, not where the URL said.
+      userScrolled: forgetMissed,
+    });
+
+    // Armed with or without an observer of the document: `flushScroll` looks
+    // again too. A memory browser finds every fragment unless a test says
+    // otherwise, so a server render does not wait on this timer.
+    const timer = setTimeout(forgetMissed, maxFragmentWaitMs);
+
+    mut_scroll.stopWaiting = () => {
+      clearTimeout(timer);
+
+      stopObserving?.();
+    };
   };
 
   // Any change of the location, and only that: a replace to the same URL is not
   // one.
   const stopMissed = untracked(() =>
     snapshot$.subscribe(() => {
-      mut_scroll.missed = Optional.none;
+      forgetMissed();
     }),
   );
 
-  const makeScroll = (inFrame: boolean): void => {
+  const makeScroll = (): void => {
     const { pending, missed } = mut_scroll;
 
     mut_scroll.pending = Optional.none;
 
-    mut_scroll.missed = Optional.none;
+    if (Optional.isNone(pending)) {
+      if (Optional.isSome(missed) && browser.scrollToFragment(missed.value)) {
+        forgetMissed();
+      }
 
-    const target: Optional<ScrollTarget> = Optional.isSome(pending)
-      ? pending
-      : Optional.map(missed, (id) => ({ id }) as const);
-
-    if (Optional.isNone(target)) {
       return;
     }
 
-    if (target.value === 'top') {
+    forgetMissed();
+
+    // The top needs no element: a page still drawing its fallback is scrolled
+    // to the top as well as the page itself would be.
+    if (pending.value === 'top') {
       browser.scrollToTop();
 
       return;
     }
 
-    const found = browser.scrollToFragment(target.value.id);
-
-    if (inFrame && !found) {
-      mut_scroll.missed = Optional.some(target.value.id);
+    if (!browser.scrollToFragment(pending.value.id)) {
+      waitFor(pending.value.id);
     }
   };
 
   const flushScroll = (): void => {
-    makeScroll(false);
+    makeScroll();
   };
 
   const scheduleScroll = (target: ScrollTarget): void => {
@@ -418,7 +471,7 @@ export const createRouter = <R extends AnyRoutes>(
     browser.afterRender(() => {
       mut_scroll.frameQueued = false;
 
-      makeScroll(true);
+      makeScroll();
     });
   };
 
@@ -719,7 +772,7 @@ export const createRouter = <R extends AnyRoutes>(
 
       mut_scroll.pending = Optional.none;
 
-      mut_scroll.missed = Optional.none;
+      forgetMissed();
 
       stopMissed.unsubscribe();
     },

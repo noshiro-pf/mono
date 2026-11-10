@@ -5,9 +5,11 @@ import {
   createMemoryBrowser,
   createRouter,
   defineRoutes,
+  maxFragmentWaitMs,
   maxRedirects,
   param,
   search,
+  type DocumentObserver,
   type Href,
   type RouteMatch,
   type RouterLocation,
@@ -48,18 +50,41 @@ const setup = (
 const current = <A,>(observable: InitializedObservable<A>): A =>
   observable.getSnapshot().value;
 
-/** A router whose document has only the ids given to `draw`. */
+/**
+ * A router whose document has only the ids given to `draw`. With `observes`,
+ * the browser tells the router of each `draw`, as a real one does through a
+ * `MutationObserver`, and of each `scrollByUser`.
+ */
 const setupDrawing = (
   url: string,
+  options?: Readonly<{ observes?: boolean }>,
 ): Readonly<{
   router: ReturnType<typeof createRouter<Routes>>;
   browser: ReturnType<typeof createMemoryBrowser>;
   draw: (id: string) => void;
+  scrollByUser: () => void;
+  observers: () => number;
 }> => {
   const mut_drawn = new Set<string>();
 
+  const mut_observers = new Set<DocumentObserver>();
+
   const browser = createMemoryBrowser(url, {
     hasElement: (id) => mut_drawn.has(id),
+    ...(options?.observes === true
+      ? {
+          observeDocument: (on: DocumentObserver) => {
+            // A new object each time, as each observer is its own.
+            const observer = { ...on } as const;
+
+            mut_observers.add(observer);
+
+            return () => {
+              mut_observers.delete(observer);
+            };
+          },
+        }
+      : {}),
   });
 
   const router = createRouter(routes, { browser });
@@ -69,7 +94,17 @@ const setupDrawing = (
     browser,
     draw: (id) => {
       mut_drawn.add(id);
+
+      for (const observer of mut_observers) {
+        observer.changed();
+      }
     },
+    scrollByUser: () => {
+      for (const observer of mut_observers) {
+        observer.userScrolled();
+      }
+    },
+    observers: () => mut_observers.size,
   };
 };
 
@@ -914,7 +949,7 @@ describe('scrolling', () => {
     assert.deepStrictEqual(browser.scrolls(), []);
   });
 
-  describe('a fragment the frame did not find', () => {
+  describe('a fragment not found yet', () => {
     test('is looked for once more by the next flushScroll', async () => {
       const { router, browser, draw } = setupDrawing(
         'https://example.com/settings/#a',
@@ -936,7 +971,7 @@ describe('scrolling', () => {
       assert.deepStrictEqual(browser.scrolls(), ['#a']);
     });
 
-    test('is looked for once only', async () => {
+    test('is looked for by every flushScroll until it is found', async () => {
       const { router, browser, draw } = setupDrawing(
         'https://example.com/settings/#a',
       );
@@ -944,6 +979,151 @@ describe('scrolling', () => {
       await nextTask();
 
       router.flushScroll();
+
+      draw('a');
+
+      router.flushScroll();
+
+      assert.deepStrictEqual(browser.scrolls(), ['#a']);
+
+      router.flushScroll();
+
+      assert.deepStrictEqual(browser.scrolls(), ['#a']);
+    });
+
+    test('is looked for when flushScroll itself did not find it', async () => {
+      const { router, browser, draw } = setupDrawing(
+        'https://example.com/settings/#a',
+      );
+
+      router.flushScroll();
+
+      draw('a');
+
+      router.flushScroll();
+
+      await nextTask();
+
+      assert.deepStrictEqual(browser.scrolls(), ['#a']);
+    });
+
+    test('is scrolled to as soon as the document draws it', async () => {
+      const { router, browser, draw, observers } = setupDrawing(
+        'https://example.com/',
+        { observes: true },
+      );
+
+      router.push(routes.settings.href({ hash: 'a' }));
+
+      // A page behind a `Suspense` boundary: the commit has the fallback only.
+      router.flushScroll();
+
+      assert.deepStrictEqual(browser.scrolls(), []);
+
+      assert.strictEqual(observers(), 1);
+
+      draw('b');
+
+      assert.deepStrictEqual(browser.scrolls(), []);
+
+      draw('a');
+
+      assert.deepStrictEqual(browser.scrolls(), ['#a']);
+
+      assert.strictEqual(observers(), 0);
+
+      await nextTask();
+
+      assert.deepStrictEqual(browser.scrolls(), ['#a']);
+    });
+
+    test('scrolls to the top at once, with no element to wait for', () => {
+      const { router, browser, observers } = setupDrawing(
+        'https://example.com/',
+        { observes: true },
+      );
+
+      router.push(routes.settings.href());
+
+      router.flushScroll();
+
+      assert.deepStrictEqual(browser.scrolls(), ['top']);
+
+      assert.strictEqual(observers(), 0);
+    });
+
+    test(`is given up after ${maxFragmentWaitMs} ms`, () => {
+      vi.useFakeTimers();
+
+      try {
+        const { router, browser, draw, observers } = setupDrawing(
+          'https://example.com/',
+          { observes: true },
+        );
+
+        router.push(routes.settings.href({ hash: 'a' }));
+
+        const start = Date.now();
+
+        router.flushScroll();
+
+        assert.strictEqual(observers(), 1);
+
+        // The push's frame, then the time limit.
+        vi.advanceTimersToNextTimer();
+
+        assert.strictEqual(observers(), 1);
+
+        vi.advanceTimersToNextTimer();
+
+        assert.strictEqual(Date.now() - start, maxFragmentWaitMs);
+
+        assert.strictEqual(observers(), 0);
+
+        draw('a');
+
+        router.flushScroll();
+
+        assert.deepStrictEqual(browser.scrolls(), []);
+      } finally {
+        vi.useRealTimers();
+      }
+    });
+
+    test('is given up when the location changes', () => {
+      const { router, browser, draw, observers } = setupDrawing(
+        'https://example.com/',
+        { observes: true },
+      );
+
+      router.push(routes.settings.href({ hash: 'a' }));
+
+      router.flushScroll();
+
+      router.push(routes.products.href());
+
+      assert.strictEqual(observers(), 0);
+
+      draw('a');
+
+      router.flushScroll();
+
+      assert.deepStrictEqual(browser.scrolls(), ['top']);
+    });
+
+    test('is given up when the user scrolls', () => {
+      const { router, browser, draw, scrollByUser, observers } = setupDrawing(
+        'https://example.com/',
+        { observes: true },
+      );
+
+      router.push(routes.settings.href({ hash: 'a' }));
+
+      router.flushScroll();
+
+      scrollByUser();
+
+      assert.strictEqual(observers(), 0);
 
       draw('a');
 
@@ -952,20 +1132,27 @@ describe('scrolling', () => {
       assert.deepStrictEqual(browser.scrolls(), []);
     });
 
-    test('is not looked for when flushScroll itself did not find it', async () => {
-      const { router, browser, draw } = setupDrawing(
-        'https://example.com/settings/#a',
+    test('a newer miss replaces the one waited for', () => {
+      const { router, browser, draw, observers } = setupDrawing(
+        'https://example.com/',
+        { observes: true },
       );
 
+      router.push(routes.settings.href({ hash: 'a' }));
+
       router.flushScroll();
+
+      router.push(routes.products.href({ hash: 'b' }));
+
+      router.flushScroll();
+
+      assert.strictEqual(observers(), 1);
 
       draw('a');
 
-      router.flushScroll();
+      draw('b');
 
-      await nextTask();
-
-      assert.deepStrictEqual(browser.scrolls(), []);
+      assert.deepStrictEqual(browser.scrolls(), ['#b']);
     });
 
     test('is still looked for after a replace to the same URL', async () => {
@@ -1078,6 +1265,22 @@ describe('scrolling', () => {
       router.flushScroll();
 
       assert.deepStrictEqual(browser.scrolls(), []);
+    });
+
+    test('stops being waited for on dispose', () => {
+      const { router, observers } = setupDrawing('https://example.com/', {
+        observes: true,
+      });
+
+      router.push(routes.settings.href({ hash: 'a' }));
+
+      router.flushScroll();
+
+      assert.strictEqual(observers(), 1);
+
+      router.dispose();
+
+      assert.strictEqual(observers(), 0);
     });
   });
 

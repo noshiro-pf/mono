@@ -32,11 +32,28 @@ export type RouterBrowser = Readonly<{
    */
   scrollToFragment: (id: string) => boolean;
   /**
+   * Calls `changed` after the document changes and `userScrolled` when the user
+   * starts scrolling the page, until the returned function is called: how the
+   * router finds the element of a fragment that a page draws after its first
+   * commit, behind a `Suspense` boundary or once its data has come, and gives
+   * it up once the user has moved the page themselves. Left out, such a
+   * fragment is looked for by `flushScroll` alone.
+   */
+  observeDocument?: (on: DocumentObserver) => () => void;
+  /**
    * Whether the scroll position of this document load is restored by someone
    * other than the router: the browser, or an app that restores it itself,
    * after a reload or back or forward to the document.
    */
   restoresScroll: () => boolean;
+}>;
+
+/** What {@link RouterBrowser}'s `observeDocument` calls. */
+export type DocumentObserver = Readonly<{
+  /** The document has changed: an element added, or an id given. */
+  changed: () => void;
+  /** The user has started scrolling: a wheel, a touch, a key or a pointer. */
+  userScrolled: () => void;
 }>;
 
 /** A {@link RouterBrowser} in memory, with what a test reads of it. */
@@ -56,6 +73,11 @@ export type MemoryBrowserOptions = Readonly<{
   hasElement?: (id: string) => boolean;
   /** What `restoresScroll` returns: `false` when left out. */
   restoresScroll?: boolean;
+  /**
+   * The browser's `observeDocument`, which a test calls from where it draws an
+   * element or scrolls. Left out, the browser has none.
+   */
+  observeDocument?: (on: DocumentObserver) => () => void;
 }>;
 
 /**
@@ -194,6 +216,9 @@ export const createMemoryBrowser = (
       return true;
     },
     restoresScroll: () => options?.restoresScroll ?? false,
+    ...(options?.observeDocument === undefined
+      ? {}
+      : { observeDocument: options.observeDocument }),
     url,
     scrolls: () => Array.from(mut_scrolls),
   };
