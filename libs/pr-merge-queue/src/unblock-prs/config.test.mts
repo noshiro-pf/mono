@@ -115,6 +115,60 @@ describe(configOf, () => {
     assert.isTrue(Result.isOk(config));
 
     assert.isUndefined(config.value.translation);
+
+    assert.isUndefined(config.value.openingHeading);
+  });
+
+  test('reads the heading a pull request description opens with', () => {
+    const config = configOf(
+      {
+        $schema: undefined,
+        autoFix: undefined,
+        translation: { heading: '日本語' },
+        pullRequestDescription: { openingHeading: 'Background' },
+      },
+      'x',
+    );
+
+    assert.isTrue(Result.isOk(config));
+
+    assert.strictEqual(config.value.openingHeading, 'Background');
+  });
+
+  test.each(['', ' Background', 'Background '])(
+    'refuses the opening heading %j, which no heading reads as',
+    (openingHeading) => {
+      const config = configOf(
+        {
+          $schema: undefined,
+          autoFix: undefined,
+          translation: { heading: '日本語' },
+          pullRequestDescription: { openingHeading },
+        },
+        'x',
+      );
+
+      assert.isTrue(Result.isErr(config));
+
+      assert.include(config.value, 'openingHeading');
+    },
+  );
+
+  test('refuses an opening heading without a translation heading', () => {
+    // The description is checked only where it is written twice, so the heading
+    // would be asked of nothing.
+    const config = configOf(
+      {
+        $schema: undefined,
+        autoFix: undefined,
+        pullRequestDescription: { openingHeading: 'Background' },
+      },
+      'x',
+    );
+
+    assert.isTrue(Result.isErr(config));
+
+    assert.include(config.value, 'pullRequestDescription');
   });
 
   test('reads the regenerators, and names a pattern that is not one', () => {

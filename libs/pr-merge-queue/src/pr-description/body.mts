@@ -14,6 +14,7 @@
 
 import {
   CLAUDE_SESSION_LINE,
+  codeFenceBlocks,
   isDeclarationLine,
   outsideCodeFences,
   REVIEW_SECTION_HEADING,
@@ -117,8 +118,10 @@ export const splitDescription = (
  * - The translation has the original's headings one level down, in order,
  *   and may give a heading of its own to prose the original opens with.
  * - Each half names the same `#N`, outside code, tables and declarations.
- * - Code, tables and images appear once, in the original; the translation
- *   refers to them.
+ * - Each code block of the original appears in the translation too, the same
+ *   and in the same order, so that either half reads on its own and the copies
+ *   cannot drift ({@link codeBlockProblem}); tables and images appear once, in
+ *   the original, and the translation refers to them.
  * - `Merge-After:` appears once, in the original: it is read wherever it is,
  *   so a second copy that drifted would be obeyed as well.
  * - The trailers — `Start-After:` and `Claude-Session:` lines, and in a pull
@@ -134,10 +137,18 @@ export const splitDescription = (
  *   ({@link deferralProblemsIn}): a finding in scope is fixed in the pull
  *   request, and a deferral with no reason reads as one deferred for the
  *   round it came in.
+ * - With an `openingHeading`, a pull request's original opens with
+ *   `## <openingHeading>`, declarations and the `--merge-before` note aside:
+ *   the section that says what the change is about and why, for a reader who
+ *   has not read the issue ({@link openingProblem}).
  */
 export const checkDescription = (
   parts: DescriptionParts,
   kind: DescriptionKind,
+  // Optional so that a check of the other rules need not name it;
+  // `descriptionProblems`, through which every posting path calls this,
+  // requires it.
+  openingHeading?: string,
 ): readonly string[] => {
   const original = visibleLines(parts.original);
 
@@ -178,8 +189,6 @@ export const checkDescription = (
     referencesIn(original, 'issue'),
   );
 
-  const fenced = parts.translation.split('\n').some((line) => FENCE.test(line));
-
   const reviews = original.filter((line) =>
     REVIEW_SECTION_HEADING.test(line),
   ).length;
@@ -207,9 +216,7 @@ export const checkDescription = (
     Arr.isNonEmpty(missingFromOriginal)
       ? `the translation names ${missingFromOriginal.join(', ')} and the original does not`
       : undefined,
-    fenced
-      ? 'the translation has a code block; code appears once, in the original, and the translation refers to it'
-      : undefined,
+    codeBlockProblem(parts),
     translation.some((line) => TABLE_ROW.test(line))
       ? 'the translation has a table; a table appears once, in the original, and the translation refers to it'
       : undefined,
@@ -234,6 +241,9 @@ export const checkDescription = (
         ? `the "## Review" section is empty; ${REVIEW_OPENING_RULE}`
         : `the "## Review" section opens with "${reviewOpening}"; ${REVIEW_OPENING_RULE}`,
     ...deferrals,
+    kind === 'pull-request' && openingHeading !== undefined
+      ? openingProblem(parts.original, original, openingHeading)
+      : undefined,
   ].filter((problem) => problem !== undefined);
 };
 
@@ -324,8 +334,6 @@ const HEADING_INDENT = /^ {0,3}\S/u;
 /** A thematic break of hyphens, the one a description's trailers follow. */
 const RULE = /^ {0,3}-{3,}[ \t]*$/u;
 
-const FENCE = /^[^\S\n]*(?:`{3,}|~{3,})/u;
-
 const TABLE_ROW = /^[^\S\n]*\|/u;
 
 const IMAGE = /!\[[^\]]*\]\(/u;
@@ -352,6 +360,8 @@ const SECTION_HEADING = /^ {0,3}#{1,2}(?:[ \t]|$)/u;
 
 /** `open-pr --merge-before`'s line (`mergeBeforeNote`). */
 const MERGE_BEFORE_NOTE = /^Merges before #\d/u;
+
+const HTML_COMMENT = /<!--[\s\S]*?-->/gu;
 
 /**
  * A closing keyword before any reference GitHub closes by: `#N`,
@@ -409,6 +419,10 @@ const outline = (headings: readonly Heading[]): string =>
         .join(', ')
     : '(none)';
 
+/** A line before the first heading that is neither blank nor what tools write there. */
+const isLeadContent = (line: string): boolean =>
+  line.trim() !== '' && !isDeclaration(line) && !MERGE_BEFORE_NOTE.test(line);
+
 /**
  * Whether anything is written before the first heading, declarations and the
  * `--merge-before` note aside.
@@ -416,13 +430,89 @@ const outline = (headings: readonly Heading[]): string =>
 const opensWithProse = (lines: readonly string[]): boolean => {
   const first = lines.findIndex((line) => Arr.isNonEmpty(headingOf(line)));
 
-  return (first === -1 ? lines : lines.slice(0, first)).some(
-    (line) =>
-      line.trim() !== '' &&
-      !isDeclaration(line) &&
-      !MERGE_BEFORE_NOTE.test(line),
-  );
+  return (first === -1 ? lines : lines.slice(0, first)).some(isLeadContent);
 };
+
+/** `text`'s lines with fenced code blanked out; `text` is LF only, as {@link splitDescription} leaves it. */
+const visibleLines = (text: string): readonly string[] =>
+  outsideCodeFences(text).split('\n');
+
+/** `text` with each HTML comment blanked, its line breaks kept. */
+const withoutComments = (text: string): string =>
+  text.replaceAll(HTML_COMMENT, (comment) => comment.replaceAll(/[^\n]/gu, ''));
+
+/**
+ * Why `original` does not open with `## <openingHeading>`, or `undefined` when
+ * it does, given its {@link visibleLines} too. The first heading is found
+ * outside code, and anything before it but declarations, the `--merge-before`
+ * note and HTML comments, which a reader does not see — a code block included —
+ * is content under no heading.
+ */
+const openingProblem = (
+  original: string,
+  visible: readonly string[],
+  openingHeading: string,
+): string | undefined => {
+  // Blanked fences and comments keep the line count, so an index in `shown` is
+  // one in `lines`.
+  const lines = withoutComments(original).split('\n');
+
+  const shown = withoutComments(visible.join('\n')).split('\n');
+
+  const first = shown.findIndex((line) => Arr.isNonEmpty(headingOf(line)));
+
+  const rule =
+    `a pull request's description opens with "## ${openingHeading}": what the change is about and why it is needed, for a reader who has not read the issue (the pr-description README says what to write)` as const;
+
+  if ((first === -1 ? lines : lines.slice(0, first)).some(isLeadContent)) {
+    return `the original opens with prose under no heading; ${rule}`;
+  }
+
+  const [heading] = headingOf(shown[first] ?? '');
+
+  return heading === undefined
+    ? `the original has no heading; ${rule}`
+    : heading.level === 2 && heading.text === openingHeading
+      ? undefined
+      : `the original opens with "${'#'.repeat(heading.level)} ${heading.text}"; ${rule}`;
+};
+
+/** `block` with the indentation its lines share taken off, and trailing spaces. */
+const unindented = (block: string): string => {
+  const lines = block.split('\n').map((line) => line.trimEnd());
+
+  const indent = Math.min(
+    ...lines
+      .filter((line) => line !== '')
+      .map((line) => line.length - line.trimStart().length),
+  );
+
+  return lines.map((line) => line.slice(indent)).join('\n');
+};
+
+/**
+ * Why the translation's code blocks are not the original's, one for one and in
+ * order, or `undefined` when they are. Each is compared with its indentation
+ * taken off, since one half may hold it in a list item and the other not.
+ */
+const codeBlockProblem = (parts: DescriptionParts): string | undefined => {
+  const original = codeFenceBlocks(parts.original).map(unindented);
+
+  const translation = codeFenceBlocks(parts.translation).map(unindented);
+
+  if (original.length !== translation.length) {
+    return `the original has ${original.length} code ${Arr.isFixedLengthArray(1, original) ? 'block' : 'blocks'} and the translation ${translation.length}; ${CODE_RULE}`;
+  }
+
+  const differs = translation.findIndex((block, i) => block !== original[i]);
+
+  return differs === -1
+    ? undefined
+    : `code block ${differs + 1} of the translation is not the original's; ${CODE_RULE}`;
+};
+
+const CODE_RULE =
+  'each code block appears in both halves, the same and in the same order, so that either half reads on its own';
 
 /** The references in `a` that `b` lacks, as `#N`. */
 const onlyIn = (
@@ -452,10 +542,6 @@ const reviewSectionIn = (
 
   return end === -1 ? rest : rest.slice(0, end);
 };
-
-/** `text`'s lines with fenced code blanked out; `text` is LF only, as {@link splitDescription} leaves it. */
-const visibleLines = (text: string): readonly string[] =>
-  outsideCodeFences(text).split('\n');
 
 /**
  * The `#N` a half names, outside code, table rows, declarations and, in a pull

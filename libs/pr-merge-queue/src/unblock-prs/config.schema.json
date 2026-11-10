@@ -149,6 +149,18 @@
       },
       "required": ["heading"],
       "additionalProperties": false
+    },
+    "pullRequestDescription": {
+      "description": "What a pull request's description must have beyond the translation's rules; needs `translation`. Present: `open-pr --body-file`, `pr-description push` and `check` refuse a pull request's description whose original does not open with `## <openingHeading>` (declarations aside): the section that says what the change is about and why, for a reader who has not read the issue. Issues are not asked. Absent: a description may open with any section.",
+      "type": "object",
+      "properties": {
+        "openingHeading": {
+          "description": "The text of the `## ` heading a pull request's original opens with, such as `Background`.",
+          "type": "string"
+        }
+      },
+      "required": ["openingHeading"],
+      "additionalProperties": false
     }
   },
   "required": [],

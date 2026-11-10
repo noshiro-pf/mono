@@ -48,11 +48,14 @@ export const runDescription = async (
 
   const heading = config.value?.translation;
 
+  const openingHeading = config.value?.openingHeading;
+
   switch (command.kind) {
     case 'check':
       return check(
         command.file,
         heading,
+        openingHeading,
         command.issue ? 'issue' : 'pull-request',
       );
 
@@ -72,10 +75,16 @@ export const runDescription = async (
           return readDescription(api.value, command.number, heading);
 
         case 'pull':
-          return pull(api.value, command.number, command.file, heading);
+          return pull(
+            api.value,
+            command.number,
+            command.file,
+            heading,
+            openingHeading,
+          );
 
         case 'push':
-          return push(api.value, command, heading);
+          return push(api.value, command, heading, openingHeading);
 
         case 'create':
           return create(api.value, command, heading);
@@ -90,14 +99,16 @@ export const runDescription = async (
 /**
  * Why `body` may not be posted, or `undefined` when it may: with a translation
  * heading configured, a body whose halves do not mirror each other, or that has
- * a trailer or a `## Review` out of its place (`./body.mts`); what is a trailer
- * depends on whether `body` is an issue's or a pull request's.
+ * a trailer or a `## Review` out of its place, or a pull request's that does
+ * not open with `openingHeading` when one is given (`./body.mts`); what is a
+ * trailer depends on whether `body` is an issue's or a pull request's.
  * `open-pr --body-file` asks the same before it pushes.
  */
 export const descriptionProblems = (
   body: string,
   heading: string | undefined,
   kind: DescriptionKind,
+  openingHeading: string | undefined,
 ): string | undefined => {
   if (heading === undefined) {
     return undefined;
@@ -109,7 +120,7 @@ export const descriptionProblems = (
     return parts.value;
   }
 
-  const problems = checkDescription(parts.value, kind);
+  const problems = checkDescription(parts.value, kind, openingHeading);
 
   return Arr.isNonEmpty(problems)
     ? `the description cannot be posted as it is:\n${problems.map((p) => `- ${p}`).join('\n')}`
@@ -180,6 +191,7 @@ const readBody = async (
 const check = async (
   file: string,
   heading: string | undefined,
+  openingHeading: string | undefined,
   kind: DescriptionKind,
 ): Promise<Result<string, string>> => {
   if (heading === undefined) {
@@ -194,11 +206,16 @@ const check = async (
     return body;
   }
 
-  const problems = descriptionProblems(body.value, heading, kind);
+  const problems = descriptionProblems(
+    body.value,
+    heading,
+    kind,
+    openingHeading,
+  );
 
   return problems === undefined
     ? Result.ok(
-        `${file}: the original and its translation mirror each other, and the deferred findings give their reasons`,
+        `${file}: the original and its translation mirror each other, the deferred findings give their reasons${openingHeading === undefined || kind === 'issue' ? '' : `, and the original opens with "## ${openingHeading}"`}`,
       )
     : Result.err(`${file}: ${problems}`);
 };
@@ -258,6 +275,7 @@ const pull = async (
   number: number,
   file: string,
   heading: string | undefined,
+  openingHeading: string | undefined,
 ): Promise<Result<string, string>> => {
   const read = await readBody(api, number);
 
@@ -281,7 +299,7 @@ const pull = async (
     }
   }
 
-  const problems = descriptionProblems(body, heading, kind);
+  const problems = descriptionProblems(body, heading, kind, openingHeading);
 
   return Result.ok(
     [
@@ -324,6 +342,7 @@ const push = async (
   api: ApiContext,
   command: PushCommand,
   heading: string | undefined,
+  openingHeading: string | undefined,
 ): Promise<Result<string, string>> => {
   const { number, file, wordingOnly } = command;
 
@@ -361,7 +380,12 @@ const push = async (
     return Result.ok(`#${number}: unchanged, nothing written`);
   }
 
-  const problems = descriptionProblems(edited.value, heading, kind);
+  const problems = descriptionProblems(
+    edited.value,
+    heading,
+    kind,
+    openingHeading,
+  );
 
   if (problems !== undefined) {
     return Result.err(`${file}: ${problems}`);
@@ -432,7 +456,8 @@ const create = async (
     return body;
   }
 
-  const problems = descriptionProblems(body.value, heading, 'issue');
+  // An issue's description is asked for no opening section.
+  const problems = descriptionProblems(body.value, heading, 'issue', undefined);
 
   if (problems !== undefined) {
     return Result.err(`${command.file}: ${problems}`);

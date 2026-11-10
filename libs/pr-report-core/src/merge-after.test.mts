@@ -1,6 +1,8 @@
 import {
+  codeFenceBlocks,
   findMergeAfterCycles,
   isDeclarationLine,
+  outsideCodeFences,
   parseMergeAfter,
   parseStartAfter,
 } from './merge-after.mjs';
@@ -325,5 +327,34 @@ describe(findMergeAfterCycles, () => {
       findMergeAfterCycles(new Map<number, readonly number[]>([[1, [2]]])),
       [],
     );
+  });
+});
+
+describe(codeFenceBlocks, () => {
+  test('cuts each block from its opening line through its closing one', () => {
+    assert.deepStrictEqual(
+      codeFenceBlocks('A.\n\n```ts\nx;\n\ny;\n```\n\n```\nz\n```\nB.'),
+      ['```ts\nx;\n\ny;\n```', '```\nz\n```'],
+    );
+  });
+
+  test('keeps a shorter fence inside a longer one as code', () => {
+    assert.deepStrictEqual(codeFenceBlocks('````md\n```\nx\n```\n````'), [
+      '````md\n```\nx\n```\n````',
+    ]);
+  });
+
+  test('runs a fence left open to the end', () => {
+    assert.deepStrictEqual(codeFenceBlocks('A.\n~~~\nx'), ['~~~\nx']);
+  });
+
+  test('reads inline code as no block', () => {
+    assert.deepStrictEqual(codeFenceBlocks('```x``` and ``y``'), []);
+  });
+
+  test('blanks exactly the lines it cuts', () => {
+    const body = 'A.\n```\nx\n```\nB.\n````\ny\n````';
+
+    assert.strictEqual(outsideCodeFences(body), 'A.\n\n\n\nB.\n\n\n');
   });
 });
