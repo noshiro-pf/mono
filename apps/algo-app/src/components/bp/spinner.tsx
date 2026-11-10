@@ -44,6 +44,7 @@ export const Spinner = ({ size: _size }: Props): JSX.Element => {
   // - SVG elements in IE do not support anim/trans so they must be set on a parent HTML element.
   // - SPINNER_ANIMATION isolates svg from parent display and is always centered inside root element.
   return (
+    // eslint-disable-next-line synstate-dom-a11y/prefer-tag-over-role -- a spinner drawn in SVG, as Blueprint's is, which `<progress>` cannot hold
     <div class={constant(styles.spinner)} role={constant('progressbar')}>
       <div
         class={constant(styles.animation)}

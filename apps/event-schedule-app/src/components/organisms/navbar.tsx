@@ -65,6 +65,7 @@ export const NavBar = (): JSX.Element => {
             cond={Auth.fireAuthUser$.pipe(map((user) => user === undefined))}
             then={
               <>
+                {/* eslint-disable-next-line synstate-dom-a11y/anchor-is-valid, synstate-dom-a11y/click-events-have-key-events, synstate-dom-a11y/no-static-element-interactions -- recorded, not fixed, when jsx-a11y came to synstate-dom (#3764) */}
                 <a
                   class={constant(styles.itemAnchor)}
                   data-e2e={constant('nav-event-list')}
@@ -113,6 +114,7 @@ export const NavBar = (): JSX.Element => {
                     placement={'bottom-start'}
                     transitionDuration={50}
                   >
+                    {/* eslint-disable-next-line synstate-dom-a11y/anchor-is-valid -- recorded, not fixed, when jsx-a11y came to synstate-dom (#3764) */}
                     <a
                       class={constant(styles.anchor)}
                       data-e2e={constant('nav-user-menu')}

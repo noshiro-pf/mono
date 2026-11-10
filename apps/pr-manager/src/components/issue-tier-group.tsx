@@ -23,6 +23,7 @@ export const IssueTierGroup = ({ row, counts$ }: Props): JSX.Element => {
   const view$ = issuesListStore.view;
 
   return (
+    // eslint-disable-next-line synstate-dom-a11y/prefer-tag-over-role -- recorded, not fixed, when jsx-a11y came to synstate-dom (#3764)
     <div
       aria-label={constant(GROUP_NAMES[row])}
       class={constant(`stat-group tiers-${row}`)}

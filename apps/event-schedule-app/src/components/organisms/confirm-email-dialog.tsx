@@ -73,6 +73,7 @@ export const ConfirmEmailDialog = ({
             label={constant('')}
           >
             <InputGroup
+              // eslint-disable-next-line synstate-dom-a11y/no-autofocus -- focus moves into a dialog as it opens, as the WAI-ARIA dialog pattern asks
               autoFocus
               intent={intent}
               rightElement={

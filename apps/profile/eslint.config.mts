@@ -1,8 +1,7 @@
 import {
-  defineKnownRules,
   eslintConfigForPlaywright,
+  eslintConfigForSynstateDom,
   eslintConfigForTypeScript,
-  eslintJsxA11yRules,
   type FlatConfig,
 } from 'eslint-config-typed';
 import { eslintPluginTsDataForge } from 'eslint-plugin-ts-data-forge';
@@ -19,25 +18,12 @@ export default [
     packageDirs: [thisDir],
   }),
 
+  // Accessibility, reading synstate-dom's `constant(x)` as `x`.
+  eslintConfigForSynstateDom(['src/**/*.tsx']),
+
   eslintPluginTsTypeForge.configs.recommended,
   eslintPluginTsDataForge.configs.recommended,
   eslintPluginTsFortress.configs.recommended,
-
-  // The components are synstate-dom, not React, so `eslintConfigForReact` and
-  // its accessibility rules do not apply. Only the rules that check whether an
-  // element has an attribute or content are taken: jsx-a11y reads a
-  // `constant('#')` value as the string "constant('#')" or as no literal at
-  // all, so a rule that reads `href`, `role` or `aria-*` values passes wrong
-  // ones and reports correct ones. The rest wait for a synstate-dom
-  // configuration in eslint-config-typed (#3408).
-  {
-    files: ['src/**/*.tsx'],
-    rules: defineKnownRules({
-      'jsx-a11y/alt-text': eslintJsxA11yRules['jsx-a11y/alt-text'],
-      'jsx-a11y/anchor-has-content':
-        eslintJsxA11yRules['jsx-a11y/anchor-has-content'],
-    }),
-  },
 
   eslintConfigForPlaywright(['e2e/**']),
 

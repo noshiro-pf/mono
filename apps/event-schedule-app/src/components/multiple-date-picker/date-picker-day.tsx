@@ -17,6 +17,7 @@ export const DatePickerDate = ({
   onClick,
   useOutlinedSelectedStyle,
 }: Props): JSX.Element => (
+  // eslint-disable-next-line synstate-dom-a11y/click-events-have-key-events, synstate-dom-a11y/prefer-tag-over-role -- recorded, not fixed, when jsx-a11y came to synstate-dom (#3764)
   <div
     aria-disabled={cell.pipe(map((c) => (c.outside ? 'true' : 'false')))}
     aria-label={cell.pipe(

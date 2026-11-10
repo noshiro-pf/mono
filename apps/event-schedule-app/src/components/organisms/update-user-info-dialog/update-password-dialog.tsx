@@ -57,6 +57,7 @@ export const UpdatePasswordDialog = ({
           >
             <InputGroup
               autoComplete={'current-password'}
+              // eslint-disable-next-line synstate-dom-a11y/no-autofocus -- focus moves into a dialog as it opens, as the WAI-ARIA dialog pattern asks
               autoFocus
               data-e2e={constant('old-password')}
               disabled={isWaitingResponse}

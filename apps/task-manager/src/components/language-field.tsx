@@ -59,6 +59,7 @@ export const LanguageField = (): JSX.Element => (
     <If
       cond={projectFileStore.importing}
       then={
+        // eslint-disable-next-line synstate-dom-a11y/prefer-tag-over-role -- recorded, not fixed, when jsx-a11y came to synstate-dom (#3764)
         <p class={constant('settings-hint')} role={constant('status')}>
           {constant(m.projectFile.languageWhileImporting)}
         </p>

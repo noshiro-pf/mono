@@ -49,6 +49,7 @@ export const UpdateEmailDialog = ({
           >
             <InputGroup
               autoComplete={'username'}
+              // eslint-disable-next-line synstate-dom-a11y/no-autofocus -- focus moves into a dialog as it opens, as the WAI-ARIA dialog pattern asks
               autoFocus
               data-e2e={constant('new-email')}
               disabled={isWaitingResponse}

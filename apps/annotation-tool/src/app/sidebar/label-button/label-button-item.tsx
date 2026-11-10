@@ -62,8 +62,7 @@ export const LabelButtonItem = ({
           )}
         />
         <div class={constant(styles.text)}>{constant(label.name)}</div>
-        {/* Reached by pointer only, as before the move to synstate-dom: a button
-            here would be one inside another. */}
+        {/* eslint-disable-next-line synstate-dom-a11y/click-events-have-key-events, synstate-dom-a11y/no-static-element-interactions -- reached by pointer only, as before the move to synstate-dom: a button here would be one inside another */}
         <div
           class={constant(styles.visibilityToggle)}
           data-e2e={constant('visibility-toggle')}

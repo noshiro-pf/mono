@@ -51,6 +51,7 @@ export const IssuesSummary = (): JSX.Element => {
 
   return (
     <div class={constant('issues-summary-box')}>
+      {/* eslint-disable-next-line synstate-dom-a11y/prefer-tag-over-role -- recorded, not fixed, when jsx-a11y came to synstate-dom (#3764) */}
       <div
         aria-label={constant('Open issues by priority and in progress')}
         class={constant('summary-row issues-summary')}

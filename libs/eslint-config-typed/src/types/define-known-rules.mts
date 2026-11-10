@@ -33,6 +33,7 @@ import type {
   EslintVitestRules,
   TypeScriptEslintRules,
 } from './rules/index.mjs';
+import type { EslintSynstateDomA11yRules } from './synstate-dom-a11y-rules.mjs';
 
 type KnownRules = DeepReadonly<
   EslintTsRestrictionsRules &
@@ -42,6 +43,7 @@ type KnownRules = DeepReadonly<
     EslintImportsRules &
     EslintJestRules &
     EslintJsxA11yRules &
+    EslintSynstateDomA11yRules &
     EslintMathRules &
     EslintPlaywrightRules &
     EslintPluginRules &

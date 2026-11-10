@@ -21,6 +21,7 @@ export const DialogDemo = (): JSX.Element => {
           // when the branch closes.
           <Portal>
             <div class={constant('overlay')}>
+              {/* eslint-disable-next-line synstate-dom-a11y/prefer-tag-over-role -- the demo shows `Portal`: a `dialog` opened with `showModal()` goes to the top layer and needs no portal, and one opened with `open` is not modal */}
               <div
                 class={constant('dialog')}
                 role={constant('dialog')}

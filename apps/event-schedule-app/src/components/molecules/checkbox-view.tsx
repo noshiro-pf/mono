@@ -23,6 +23,7 @@ export const CheckboxView = ({
   onCheck,
   'data-e2e': e2e,
 }: Props): JSX.Element => (
+  // eslint-disable-next-line synstate-dom-a11y/label-has-associated-control -- recorded, not fixed, when jsx-a11y came to synstate-dom (#3764)
   <label class={constant(styles.root)}>
     <input
       ref={(mut_input) => {

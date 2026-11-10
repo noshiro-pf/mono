@@ -4,6 +4,7 @@ import {
   eslintConfigForPlaywright,
   eslintConfigForPreact,
   eslintConfigForReact,
+  eslintConfigForSynstateDom,
   eslintConfigForTypeScript,
   eslintConfigForVitest,
   eslintImportsRules,
@@ -61,6 +62,9 @@ export default [
   })),
 
   ...eslintConfigForPreact(preactComponentGlobs),
+
+  // Accessibility, reading synstate-dom's `constant(x)` as `x`.
+  eslintConfigForSynstateDom(synstateDomComponentGlobs),
 
   {
     files: ['src/components/propagation-animation/**/*.tsx'],

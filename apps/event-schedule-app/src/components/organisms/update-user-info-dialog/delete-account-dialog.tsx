@@ -37,6 +37,7 @@ export const DeleteAccountDialog = ({ dialogIsOpen }: Props): JSX.Element => {
             <InputGroup
               // suppress auto complete
               autoComplete={'new-password'}
+              // eslint-disable-next-line synstate-dom-a11y/no-autofocus -- focus moves into a dialog as it opens, as the WAI-ARIA dialog pattern asks
               autoFocus
               data-e2e={constant('verify-email')}
               disabled={isWaitingResponse}

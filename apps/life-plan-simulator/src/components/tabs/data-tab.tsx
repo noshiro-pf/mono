@@ -117,6 +117,7 @@ export const DataTab = (): JSX.Element => {
             importIntoCurrentPlan,
           )}
         </div>
+        {/* eslint-disable-next-line synstate-dom-a11y/prefer-tag-over-role -- recorded, not fixed, when jsx-a11y came to synstate-dom (#3764) */}
         <div role={constant('status')}>
           <p>{message$}</p>
           <WarningList warnings$={warnings$} />

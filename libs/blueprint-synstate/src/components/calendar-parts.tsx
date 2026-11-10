@@ -204,6 +204,7 @@ export const Calendar = ({
     const { selected, classes = {} } = dayState(day);
 
     return (
+      // eslint-disable-next-line synstate-dom-a11y/no-interactive-element-to-noninteractive-role -- react-day-picker's markup, which Blueprint's DatePicker renders and visual-parity.test.tsx compares
       <td class={constant('rdp-cell')} role={constant('presentation')}>
         <button
           ref={(button) => {
@@ -411,6 +412,7 @@ export const Calendar = ({
     <table
       aria-labelledby={constant(captionId)}
       class={constant('rdp-table')}
+      // eslint-disable-next-line synstate-dom-a11y/no-noninteractive-element-to-interactive-role -- react-day-picker's markup, which Blueprint's DatePicker renders and visual-parity.test.tsx compares
       role={constant('grid')}
     >
       <thead class={constant('rdp-head')}>

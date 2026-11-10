@@ -57,6 +57,7 @@ export const MenuItem = ({
   const hasSubmenu = children !== undefined;
 
   const target = (
+    // eslint-disable-next-line synstate-dom-a11y/anchor-is-valid -- Blueprint's MenuItem is an `a` with no `href` and the `menuitem` role, which visual-parity.test.tsx compares
     <a
       aria-disabled={disabled ? constant('true') : undefined}
       class={classObject(

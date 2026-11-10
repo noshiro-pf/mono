@@ -496,6 +496,7 @@ These functions return (arrays of) ESLint flat configuration(s):
     - `eslintConfigForBrowser` is included in this configuration
 - **`eslintConfigForPreact(files?)`** - Preact (lighter React alternative) configuration
     - `eslintConfigForBrowser` is included in this configuration
+- **`eslintConfigForSynstateDom(files?)`** - synstate-dom configuration: the jsx-a11y rules under `synstate-dom-a11y/`, which read an attribute bound to `constant(x)` as bound to `x`; the plugin itself is registered by `eslintConfigForTypeScript`, which goes before it
 - **`eslintConfigForVitest(files?)`** - Vitest testing framework configuration
 - **`eslintConfigForJest(files?)`** - Jest testing framework configuration
 - **`eslintConfigForTestingLibrary(files?)`** - Testing Library configuration
@@ -535,6 +536,7 @@ Pre-configured rule sets that can be imported and customized:
 | **`eslintReactRefreshRules`**              | `eslint-plugin-react-refresh`          | React Refresh (HMR) rules                              |
 | **`eslintReactCodingStyleRules`**          | `eslint-plugin-react-coding-style`     | Opinionated React component style rules                |
 | **`eslintJsxA11yRules`**                   | `eslint-plugin-jsx-a11y`               | Accessibility rules for JSX                            |
+| **`eslintSynstateDomA11yRules`**           | `eslint-plugin-jsx-a11y`               | The same, under `synstate-dom-a11y/`, for synstate-dom |
 | **`eslintVitestRules`**                    | `eslint-plugin-vitest`                 | Vitest-specific rules                                  |
 | **`eslintJestRules`**                      | `eslint-plugin-jest`                   | Jest-specific rules                                    |
 | **`eslintTestingLibraryRules`**            | `eslint-plugin-testing-library`        | Testing Library rules                                  |
@@ -575,6 +577,11 @@ The shape of the rule option varies depending on the rule, so please check the c
     - Flat Config version of `eslint-plugin-tree-shakable`
 - **`eslintPluginStrictDependencies`**
     - Flat Config version of `eslint-plugin-strict-dependencies`
+
+#### Wrapped plugins
+
+- **`withSynstateDomConstants(plugin)`**
+    - The `meta` and `rules` of `eslint-plugin-jsx-a11y`, each rule reading an attribute bound to synstate-dom's `constant(x)` as bound to `x`, in a file that imports `constant`, or the namespace, from `'synstate-dom'` itself (a re-export through another module is not followed); registered as `synstate-dom-a11y`
 
 #### ts-restrictions
 

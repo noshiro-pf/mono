@@ -1,5 +1,6 @@
 import {
   eslintConfigForPlaywright,
+  eslintConfigForSynstateDom,
   eslintConfigForTypeScript,
   type FlatConfig,
 } from 'eslint-config-typed';
@@ -14,6 +15,9 @@ export default [
     tsconfigFileName: './tsconfig.json',
     packageDirs: [thisDir],
   }),
+
+  // Accessibility, reading synstate-dom's `constant(x)` as `x`.
+  eslintConfigForSynstateDom(['src/**/*.tsx']),
 
   eslintPluginTsDataForge.configs.recommended,
 

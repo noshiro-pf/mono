@@ -24,6 +24,7 @@ export const createLink =
     const current = readerOf(destination);
 
     return (
+      // eslint-disable-next-line synstate-dom-a11y/anchor-has-content -- the content is the caller's, in `anchorProps`
       <a
         {...anchorProps}
         href={mapBindable(destination, (target) =>

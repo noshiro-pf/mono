@@ -27,6 +27,7 @@ export const Menu = ({
     aria-label={ariaLabel === undefined ? undefined : constant(ariaLabel)}
     class={classObject([className, 'bp6-menu', sizeClass(size)])}
     data-e2e={e2e === undefined ? undefined : constant(e2e)}
+    // eslint-disable-next-line synstate-dom-a11y/no-noninteractive-element-to-interactive-role -- Blueprint's Menu is a `ul` with the `menu` role, which visual-parity.test.tsx compares
     role={constant('menu')}
     tabIndex={tabIndex === undefined ? undefined : constant(tabIndex)}
   >

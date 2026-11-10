@@ -32,6 +32,7 @@ export const DeleteAccountCreatedWithGoogleDialog = ({
             <InputGroup
               // suppress auto complete
               autoComplete={'new-password'}
+              // eslint-disable-next-line synstate-dom-a11y/no-autofocus -- focus moves into a dialog as it opens, as the WAI-ARIA dialog pattern asks
               autoFocus
               disabled={isWaitingResponse}
               intent={intent}

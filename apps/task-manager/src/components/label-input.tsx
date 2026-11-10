@@ -315,6 +315,7 @@ export const LabelInput = ({
       <label class={constant('bp6-label field-label')} htmlFor={constant(id)}>
         {constant(caption)}
       </label>
+      {/* eslint-disable-next-line synstate-dom-a11y/no-static-element-interactions -- recorded, not fixed, when jsx-a11y came to synstate-dom (#3764) */}
       <div
         class={constant('bp6-input label-input-box')}
         onPointerDown={(pressed) => {
@@ -433,6 +434,7 @@ export const LabelInput = ({
       <If
         cond={shown$}
         then={
+          // eslint-disable-next-line synstate-dom-a11y/prefer-tag-over-role -- recorded, not fixed, when jsx-a11y came to synstate-dom (#3764)
           <ul
             aria-label={constant(m.labels.suggestions(caption))}
             class={constant('label-suggestions')}
@@ -450,10 +452,12 @@ export const LabelInput = ({
                 list.scrollIntoView({ block: 'nearest' });
               });
             }}
+            // eslint-disable-next-line synstate-dom-a11y/no-noninteractive-element-to-interactive-role -- recorded, not fixed, when jsx-a11y came to synstate-dom (#3764)
             role={constant('listbox')}
           >
             <For items={options$} key={(option) => option.label}>
               {(option$) => (
+                // eslint-disable-next-line synstate-dom-a11y/click-events-have-key-events, synstate-dom-a11y/prefer-tag-over-role -- recorded, not fixed, when jsx-a11y came to synstate-dom (#3764)
                 <li
                   aria-selected={option$.pipe(map(({ active }) => active))}
                   class={option$.pipe(
@@ -463,6 +467,7 @@ export const LabelInput = ({
                   )}
                   data-e2e={constant('label-suggestion')}
                   id={option$.pipe(map((option) => option.id))}
+                  // eslint-disable-next-line synstate-dom-a11y/no-noninteractive-element-to-interactive-role -- recorded, not fixed, when jsx-a11y came to synstate-dom (#3764)
                   role={constant('option')}
                   // Focusable, so that the focus a tap may take from the box
                   // stays in the list (`onBlur`).
