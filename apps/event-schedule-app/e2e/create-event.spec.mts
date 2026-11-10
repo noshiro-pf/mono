@@ -157,4 +157,14 @@ test('create event', { tag: '@emulators' }, async ({ page, context }) => {
   const text = answerPage.getByTestId('icon-description-row--fair');
 
   await expect.soft(text).toHaveText('（7.5点）');
+
+  /* the create page, opened again, starts from today as the first visit did */
+
+  // Creating the event saved the empty form as the draft, and the draft's dates
+  // up to today are not restored: the form once came back with none.
+  await page.goto('/');
+
+  await expect
+    .soft(page.getByTestId('create-page').getByTestId('selected-datetime-row'))
+    .toHaveCount(1);
 });

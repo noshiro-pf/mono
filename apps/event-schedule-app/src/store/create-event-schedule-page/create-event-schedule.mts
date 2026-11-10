@@ -14,6 +14,7 @@ import {
   skip,
 } from 'synstate';
 import {
+  Arr,
   Result,
   fastDeepEqual,
   isNotUndefined,
@@ -126,12 +127,16 @@ export const createCreateEventScheduleStore = (
 
     commonStateHandlers.setDatetimeSpecification(ev.datetimeSpecification);
 
-    // 過去日（今日含む）は復元しない
-    commonStateHandlers.setDatetimeRangeList(
-      ev.datetimeRangeList.filter(
-        (d) => compareYearMonthDate(d.ymd, deps.now()) > 0,
-      ),
+    // 過去日（今日含む）は復元しない。一つも残らなければ、空のフォームの日付
+    // （今日）のままにする。イベントを作成したときに保存される下書きは空の
+    // フォームで、その日付は作成した日なので、次の訪問では必ず一つも残らない。
+    const upcomingDates = ev.datetimeRangeList.filter(
+      (d) => compareYearMonthDate(d.ymd, deps.now()) > 0,
     );
+
+    if (Arr.isNonEmpty(upcomingDates)) {
+      commonStateHandlers.setDatetimeRangeList(upcomingDates);
+    }
 
     commonStateHandlers.setAnswerIcons(ev.answerIcons);
 
