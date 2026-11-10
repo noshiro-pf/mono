@@ -14,10 +14,20 @@ import type { ReadonlyRecord } from '../others/index.mjs';
  * ```ts
  * type Data = { a: { b: { c: number; d: string } }; e: boolean };
  * type Picked = DeepPick<Data, ['a', 'b', 'c']>;
- * // Result: { a: { b: { c: number } } }
+ *
+ * expectType<
+ *   Picked,
+ *   // Result:
+ *   { a: { b: { c: number } } }
+ * >('=');
  *
  * type Multi = DeepPick<Data, ['a', 'b', 'c'] | ['e']>;
- * // Result: { a: { b: { c: number } }; e: boolean }
+ *
+ * expectType<
+ *   Multi,
+ *   // Result:
+ *   { a: { b: { c: number } }; e: boolean }
+ * >('=');
  * ```
  */
 export type DeepPick<T, Path extends readonly PropertyKey[]> = {
@@ -41,10 +51,20 @@ export type DeepPick<T, Path extends readonly PropertyKey[]> = {
  * ```ts
  * type Data = { a: { b: { c: number; d: string } }; e: boolean };
  * type Omitted = DeepOmit<Data, ['a', 'b', 'c']>;
- * // Result: { a: { b: { d: string } }; e: boolean }
  *
- * type Multi = DeepOmit<Data, ['a', 'b'] | ['a', 'c']>;
- * // Result: { a: { d: boolean } }
+ * expectType<
+ *   Omitted,
+ *   // Result:
+ *   { a: { b: { d: string } }; e: boolean }
+ * >('=');
+ *
+ * type Multi = DeepOmit<Data, ['a', 'b', 'c'] | ['e']>;
+ *
+ * expectType<
+ *   Multi,
+ *   // Result:
+ *   { a: { b: { d: string } } }
+ * >('=');
  * ```
  */
 export type DeepOmit<T, Path extends readonly PropertyKey[]> = {

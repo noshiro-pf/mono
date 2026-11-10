@@ -17,14 +17,21 @@
  * }>;
  *
  * type MutableUser = Mutable<ReadonlyUser>;
- * // Result: { id: number; name: string; email: string }
+ *
+ * expectType<
+ *   MutableUser,
+ *   // Result:
+ *   { id: number; name: string; email: string }
+ * >('=');
  *
  * const user: MutableUser = { id: 1, name: 'Alice', email: 'alice@example.com' };
  * user.name = 'Alice Smith'; // ✓ allowed - property is mutable
  *
  * // Useful for creating editable versions of readonly data
  * type Config = Readonly<{ host: string; port: number; ssl: boolean }>;
- * type EditableConfig = Mutable<Config>; // { host: string; port: number; ssl: boolean }
+ * type EditableConfig = Mutable<Config>;
+ *
+ * expectType<EditableConfig, { host: string; port: number; ssl: boolean }>('=');
  * ```
  */
 export type Mutable<T> = { -readonly [P in keyof T]: T[P] };

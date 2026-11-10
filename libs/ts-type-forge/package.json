@@ -48,6 +48,7 @@
     "check:ext": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/cmd/check-ext.mts",
     "check:lint": "node ../../tools/scripts/cmd/assert-deps-built.mts && oxlint . && eslint .",
     "check:test": "node ../../tools/scripts/cmd/assert-deps-built.mts && run-p check:test:*",
+    "check:test:sample-results": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/cmd/check-sample-results.mts",
     "check:test:src": "node ../../node_modules/typescript-native/bin/tsc --noEmit -p ./tsconfig.json",
     "check:types": "node ../../tools/scripts/cmd/assert-deps-built.mts && node ../../node_modules/typescript-native/bin/tsc --noEmit",
     "doc": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/cmd/gen-docs.mts",
