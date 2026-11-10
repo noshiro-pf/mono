@@ -429,11 +429,10 @@ namespace NoRestrictedCastName {
  * @link https://eslint.org/docs/latest/rules/no-restricted-syntax
  *
  *  ```md
- *  | key         | value      |
- *  | :---------- | :--------- |
- *  | type        | suggestion |
- *  | deprecated  | false      |
- *  | recommended | false      |
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
  *  ```
  *
  * @internal Reached by indexing the rules record by the rule's name.
@@ -541,24 +540,6 @@ namespace NoUnnecessaryCoalesceUndefined {
 }
 
 /**
- * @description `promise/prefer-catch`, its fix offered only as a suggestion: Prefer `catch` to `then(a, b)`/`then(null, b)` for handling errors.
- * @link https://github.com/eslint-community/eslint-plugin-promise/blob/main/docs/rules/prefer-catch.md
- *
- *  ```md
- *  | key            | value      |
- *  | :------------- | :--------- |
- *  | type           | suggestion |
- *  | deprecated     | false      |
- *  | hasSuggestions | true       |
- *  ```
- *
- * @internal Reached by indexing the rules record by the rule's name.
- */
-namespace PreferCatch {
-  export type RuleEntry = Linter.StringSeverity;
-}
-
-/**
  * @description Replace a redundant arrow wrapper with the function itself (`(a) => f(a)` → `f`) or, when the callee has a curried version, its curried form (`(a) => f(a, ...rest)` → `f(...rest)`).
  *
  *  ```md
@@ -589,23 +570,6 @@ namespace PreferCurriedCall {
  * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace PreferDedent {
-  export type RuleEntry = Linter.StringSeverity;
-}
-
-/**
- * @description Prefer `globalThis` over `window`, `self` and `global` (`unicorn/prefer-global-this`), except for members `typeof globalThis` lacks — under the strict standard library, a window's own globals such as `history`
- *
- *  ```md
- *  | key        | value      |
- *  | :--------- | :--------- |
- *  | type       | suggestion |
- *  | deprecated | false      |
- *  | fixable    | code       |
- *  ```
- *
- * @internal Reached by indexing the rules record by the rule's name.
- */
-namespace PreferGlobalThis {
   export type RuleEntry = Linter.StringSeverity;
 }
 
@@ -779,6 +743,41 @@ namespace RequireImeGuardOnEnter {
     'off' | Linter.Severity | readonly [Linter.StringSeverity, Options];
 }
 
+/**
+ * @description `promise/prefer-catch`, its fix offered only as a suggestion: Prefer `catch` to `then(a, b)`/`then(null, b)` for handling errors.
+ * @link https://github.com/eslint-community/eslint-plugin-promise/blob/main/docs/rules/prefer-catch.md
+ *
+ *  ```md
+ *  | key            | value      |
+ *  | :------------- | :--------- |
+ *  | type           | suggestion |
+ *  | deprecated     | false      |
+ *  | hasSuggestions | true       |
+ *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
+ */
+namespace PreferCatch {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
+ * @description Prefer `globalThis` over `window`, `self` and `global` (`unicorn/prefer-global-this`), except for members `typeof globalThis` lacks — under the strict standard library, a window's own globals such as `history`
+ *
+ *  ```md
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  | fixable    | code       |
+ *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
+ */
+namespace PreferGlobalThis {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
 export type EslintTsRestrictionsRules = Readonly<{
   'ts-restrictions/check-destructuring-completeness': CheckDestructuringCompleteness.RuleEntry;
   'ts-restrictions/explicit-collection-type-arguments': ExplicitCollectionTypeArguments.RuleEntry;
@@ -796,10 +795,8 @@ export type EslintTsRestrictionsRules = Readonly<{
   'ts-restrictions/no-string-spread': NoStringSpread.RuleEntry;
   'ts-restrictions/no-unnecessary-array-from': NoUnnecessaryArrayFrom.RuleEntry;
   'ts-restrictions/no-unnecessary-coalesce-undefined': NoUnnecessaryCoalesceUndefined.RuleEntry;
-  'ts-restrictions/prefer-catch': PreferCatch.RuleEntry;
   'ts-restrictions/prefer-curried-call': PreferCurriedCall.RuleEntry;
   'ts-restrictions/prefer-dedent': PreferDedent.RuleEntry;
-  'ts-restrictions/prefer-global-this': PreferGlobalThis.RuleEntry;
   'ts-restrictions/prefer-logical-over-boolean-ternary': PreferLogicalOverBooleanTernary.RuleEntry;
   'ts-restrictions/prefer-non-mutating-array-method': PreferNonMutatingArrayMethod.RuleEntry;
   'ts-restrictions/prefer-nullish-coalescing-when-safe': PreferNullishCoalescingWhenSafe.RuleEntry;
@@ -807,6 +804,8 @@ export type EslintTsRestrictionsRules = Readonly<{
   'ts-restrictions/prefer-range-in-number-line-order': PreferRangeInNumberLineOrder.RuleEntry;
   'ts-restrictions/prefer-ternary': PreferTernary.RuleEntry;
   'ts-restrictions/require-ime-guard-on-enter': RequireImeGuardOnEnter.RuleEntry;
+  'ts-restrictions/prefer-catch': PreferCatch.RuleEntry;
+  'ts-restrictions/prefer-global-this': PreferGlobalThis.RuleEntry;
 }>;
 
 export type EslintTsRestrictionsRulesOption = Readonly<{

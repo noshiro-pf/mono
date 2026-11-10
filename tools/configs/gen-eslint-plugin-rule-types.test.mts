@@ -139,6 +139,79 @@ describe('generateRuleTypesFileContent', () => {
     );
   });
 
+  test('spreads the options of a rule whose schema describes them all as one array', () => {
+    // A schema that is an object rather than an array of per-option schemas
+    // describes the whole options list: `no-restricted-syntax`'s
+    // `['error', 'A', { selector: 'B' }]`, every selector an option of its own.
+    const variadicRule = {
+      meta: {
+        type: 'suggestion',
+        docs: { description: 'Disallow syntax.' },
+        schema: { type: 'array', items: { type: 'string' } },
+      },
+    } as const;
+
+    const content = generateRuleTypesFileContent({
+      pluginPrefix: 'ts-restrictions',
+      expectTypeFrom: 'ts-data-forge',
+      rules: { 'no-syntax': variadicRule },
+    });
+
+    assert.isTrue(Result.isOk(content));
+
+    assert.include(
+      content.value,
+      [
+        "  export type Options = RuleOptionsOf<'no-syntax'>[number];",
+        '',
+        '  export type RuleEntry =',
+        "    | 'off'",
+        '    | Linter.Severity',
+        '    | readonly [Linter.StringSeverity, ...Options[]];',
+      ].join('\n'),
+    );
+
+    // `…RulesOption` names one option, as it does for every other rule.
+    assert.include(
+      content.value,
+      "  'ts-restrictions/no-syntax': NoSyntax.Options;",
+    );
+  });
+
+  test('types only the first option of a tuple-form array schema', () => {
+    // Each position of a tuple-form `items` has its own schema, so the options
+    // are not a list of like elements to repeat.
+    const tupleRule = {
+      meta: {
+        type: 'suggestion',
+        docs: { description: 'Prefer tuples.' },
+        schema: {
+          type: 'array',
+          items: [{ enum: ['a', 'b'] }, { type: 'object' }],
+          additionalItems: false,
+        },
+      },
+    } as const;
+
+    const content = generateRuleTypesFileContent({
+      pluginPrefix: 'ts-restrictions',
+      expectTypeFrom: 'ts-data-forge',
+      rules: { 'prefer-tuple': tupleRule },
+    });
+
+    assert.isTrue(Result.isOk(content));
+
+    assert.include(
+      content.value,
+      "  export type Options = NonNullable<RuleOptionsOf<'prefer-tuple'>[0]>;",
+    );
+
+    assert.include(
+      content.value,
+      '    | readonly [Linter.StringSeverity, Options];',
+    );
+  });
+
   test('writes the rule metadata into the JSDoc', () => {
     const content = generateRuleTypesFileContent({
       pluginPrefix: 'ts-fortress',

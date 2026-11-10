@@ -1,58 +1,16 @@
+import { tsRestrictionsRules as standaloneTsRestrictionsRules } from 'eslint-plugin-ts-restrictions';
 import type { ESLintPlugin } from '../../../types/index.mjs';
-import { checkDestructuringCompleteness } from './check-destructuring-completeness.mjs';
-import { explicitCollectionTypeArguments } from './explicit-collection-type-arguments.mjs';
-import { functionOrder } from './function-order.mjs';
-import { jsxBooleanLogicalOperands } from './jsx-boolean-logical-operands.mjs';
-import { noClockReadAtModuleLoad } from './no-clock-read-at-module-load.mjs';
-import { noDateOnlyStringToDate } from './no-date-only-string-to-date.mjs';
-import { noDetachedJsdoc } from './no-detached-jsdoc.mjs';
-import { noExportTypeSideEffects } from './no-export-type-side-effects.mjs';
-import { noNegatedComparison } from './no-negated-comparison.mjs';
-import { noOptionalPhantomProperty } from './no-optional-phantom-property.mjs';
-import { noRaggedCommentWrap } from './no-ragged-comment-wrap.mjs';
-import { noRestrictedCastName } from './no-restricted-cast-name.mjs';
-import { noRestrictedSyntax } from './no-restricted-syntax.mjs';
-import { noStringSpread } from './no-string-spread.mjs';
-import { noUnnecessaryArrayFrom } from './no-unnecessary-array-from.mjs';
-import { noUnnecessaryCoalesceUndefined } from './no-unnecessary-coalesce-undefined.mjs';
 import { preferCatch } from './prefer-catch.mjs';
-import { preferCurriedCall } from './prefer-curried-call.mjs';
-import { preferDedent } from './prefer-dedent.mjs';
 import { preferGlobalThis } from './prefer-global-this.mjs';
-import { preferLogicalOverBooleanTernary } from './prefer-logical-over-boolean-ternary.mjs';
-import { preferNonMutatingArrayMethod } from './prefer-non-mutating-array-method.mjs';
-import { preferNullishCoalescingWhenSafe } from './prefer-nullish-coalescing-when-safe.mjs';
-import { preferOptionalChainOverTernary } from './prefer-optional-chain-over-ternary.mjs';
-import { preferRangeInNumberLineOrder } from './prefer-range-in-number-line-order.mjs';
-import { preferTernary } from './prefer-ternary.mjs';
-import { requireImeGuardOnEnter } from './require-ime-guard-on-enter.mjs';
 
+/**
+ * The rules of `eslint-plugin-ts-restrictions`, plus the two that wrap a rule
+ * of another plugin this package already depends on. They stay here so that the
+ * standalone plugin depends on neither `eslint-plugin-promise` nor
+ * `eslint-plugin-unicorn`; under this package their ids are unchanged.
+ */
 export const tsRestrictionsRules = {
-  'check-destructuring-completeness': checkDestructuringCompleteness,
-  'explicit-collection-type-arguments': explicitCollectionTypeArguments,
-  'function-order': functionOrder,
-  'jsx-boolean-logical-operands': jsxBooleanLogicalOperands,
-  'no-clock-read-at-module-load': noClockReadAtModuleLoad,
-  'no-date-only-string-to-date': noDateOnlyStringToDate,
-  'no-detached-jsdoc': noDetachedJsdoc,
-  'no-export-type-side-effects': noExportTypeSideEffects,
-  'no-negated-comparison': noNegatedComparison,
-  'no-optional-phantom-property': noOptionalPhantomProperty,
-  'no-ragged-comment-wrap': noRaggedCommentWrap,
-  'no-restricted-cast-name': noRestrictedCastName,
-  'no-restricted-syntax': noRestrictedSyntax,
-  'no-string-spread': noStringSpread,
-  'no-unnecessary-array-from': noUnnecessaryArrayFrom,
-  'no-unnecessary-coalesce-undefined': noUnnecessaryCoalesceUndefined,
+  ...standaloneTsRestrictionsRules,
   'prefer-catch': preferCatch,
-  'prefer-curried-call': preferCurriedCall,
-  'prefer-dedent': preferDedent,
   'prefer-global-this': preferGlobalThis,
-  'prefer-logical-over-boolean-ternary': preferLogicalOverBooleanTernary,
-  'prefer-non-mutating-array-method': preferNonMutatingArrayMethod,
-  'prefer-nullish-coalescing-when-safe': preferNullishCoalescingWhenSafe,
-  'prefer-optional-chain-over-ternary': preferOptionalChainOverTernary,
-  'prefer-range-in-number-line-order': preferRangeInNumberLineOrder,
-  'prefer-ternary': preferTernary,
-  'require-ime-guard-on-enter': requireImeGuardOnEnter,
 } as const satisfies ESLintPlugin['rules'];
