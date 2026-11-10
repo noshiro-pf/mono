@@ -2,13 +2,14 @@
  * What a repository says about itself in `.github/unblock-prs.json`: the parts
  * of the run that depend on how its CI is laid out.
  *
- * The auto-fix, the branches the repository generates rather than writes, and
- * the heading its descriptions are translated under (`../pr-description/`). The
- * labels, `Merge-After:` and the version pull request's branch
- * (`changeset-release/<base>`) are conventions the PR Manager page reads too,
- * from repositories it has no configuration for, so they are fixed in
- * `pr-report-core` rather than set per repository. A repository without the
- * file gets everything but the auto-fix, and has no generated branches.
+ * The auto-fix, the branches the repository generates rather than writes, the
+ * heading its descriptions are translated under and the one a pull request's
+ * opens with (`../pr-description/`). The labels, `Merge-After:` and the version
+ * pull request's branch (`changeset-release/<base>`) are conventions the PR
+ * Manager page reads too, from repositories it has no configuration for, so
+ * they are fixed in `pr-report-core` rather than set per repository. A
+ * repository without the file gets everything but the auto-fix, and has no
+ * generated branches.
  *
  * The file's JSON Schema, `config.schema.json` beside this module, is generated
  * from {@link ConfigFileSchema}; a test holds it to the output.
@@ -50,6 +51,24 @@ export const configOf = (
   const generatedBranches = file.generatedBranches ?? [];
 
   const translation = file.translation?.heading;
+
+  const openingHeading = file.pullRequestDescription?.openingHeading;
+
+  if (openingHeading !== undefined && translation === undefined) {
+    return Result.err(
+      `${source}: pullRequestDescription needs translation: a description is checked only where it is written twice`,
+    );
+  }
+
+  // A heading's text is read trimmed, so a padded or empty one matches nothing.
+  if (
+    openingHeading !== undefined &&
+    (openingHeading.trim() === '' || openingHeading.trim() !== openingHeading)
+  ) {
+    return Result.err(
+      `${source}: pullRequestDescription.openingHeading is the heading's text, not empty and with no spaces around it, such as "Background"`,
+    );
+  }
 
   const speculate = file.speculate;
 
@@ -108,6 +127,7 @@ export const configOf = (
       autoFix: undefined,
       generatedBranches,
       translation,
+      openingHeading,
       regenerate,
       speculate,
     });
@@ -134,6 +154,7 @@ export const configOf = (
     },
     generatedBranches,
     translation,
+    openingHeading,
     regenerate,
     speculate,
   });
@@ -293,6 +314,20 @@ export const ConfigFileSchema = t.annotate(
         },
       ),
     ),
+    pullRequestDescription: t.optional(
+      t.annotate(
+        t.strictRecord({
+          openingHeading: t.annotate(t.string(), {
+            description:
+              "The text of the `## ` heading a pull request's original opens with, such as `Background`.",
+          }),
+        }),
+        {
+          description:
+            "What a pull request's description must have beyond the translation's rules; needs `translation`. Present: `open-pr --body-file`, `pr-description push` and `check` refuse a pull request's description whose original does not open with `## <openingHeading>` (declarations aside): the section that says what the change is about and why, for a reader who has not read the issue. Issues are not asked. Absent: a description may open with any section.",
+        },
+      ),
+    ),
   }),
   {
     title: 'unblock-prs configuration',
@@ -308,6 +343,8 @@ export type Config = Readonly<{
   generatedBranches: readonly GeneratedBranch[];
   /** The heading descriptions are translated under, when they are. */
   translation: string | undefined;
+  /** The `## ` heading a pull request's description opens with, when one is asked for. */
+  openingHeading: string | undefined;
   /** How a conflict in generated files is resolved, when it is. */
   regenerate: RegenerateConfig | undefined;
   /** Checking queued pull requests ahead of their turn, when it is on. */

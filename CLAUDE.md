@@ -233,13 +233,14 @@ not (see "Commits and pull requests").
 
 **A pull request or issue description a session writes is in both languages:
 English first, then the Japanese under `## 日本語`, its headings the English's
-one level down.** The author reviews the Japanese; sessions and tools read the
-English. **Read one with `pnpm run pr-description -- read <N>`, which leaves the
+one level down.** Both halves say the same thing, each written for a reader new
+to the work; sessions and tools read the English, the author the Japanese.
+**Read one with `pnpm run pr-description -- read <N>`, which leaves the
 Japanese out, and write one only through `pr-description` (`pull` then `push`;
 `create` for an issue) or `open-pr --body-file`**: they refuse halves that do
 not mirror each other and an edit to one half alone
-(`libs/pr-merge-queue/src/pr-description/README.md`). `## Review` heads the
-English review alone (`docs/code-review-loop.md`).
+(`libs/pr-merge-queue/src/pr-description/README.md`, which says what to write).
+`## Review` heads the English review alone (`docs/code-review-loop.md`).
 
 ## Session rules
 

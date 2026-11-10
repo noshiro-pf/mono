@@ -70,48 +70,35 @@ export const parseStartAfter = (body: string): readonly number[] =>
  * showing what a declaration looks like must not become one.
  */
 export const outsideCodeFences = (body: string): string => {
-  // The marker that opened the fence the current line is in, if any.
-  let mut_openedBy: string | undefined = undefined;
+  const lines = body.split('\n');
 
-  return body
-    .split('\n')
-    .map((line) => {
-      const fence = FENCE_LINE.exec(line)?.groups;
+  const inCode = codeLines(lines);
 
-      const marker = fence?.['marker'];
-
-      const rest = fence?.['rest'] ?? '';
-
-      if (mut_openedBy === undefined) {
-        // A backtick fence's info string cannot hold a backtick (CommonMark),
-        // so ```` ```x``` ```` is inline code, not an opening line.
-        if (
-          marker === undefined ||
-          (marker.startsWith('`') && rest.includes('`'))
-        ) {
-          return line;
-        }
-
-        mut_openedBy = marker;
-
-        return '';
-      }
-
-      // Only a run of the opening character, at least as long, with nothing
-      // after it, closes the fence (CommonMark); any other fence line is part
-      // of the code, so a ``` inside a ```` or ~~~ block does not end it.
-      if (
-        marker !== undefined &&
-        marker.at(0) === mut_openedBy.at(0) &&
-        marker.length >= mut_openedBy.length &&
-        rest.trim() === ''
-      ) {
-        mut_openedBy = undefined;
-      }
-
-      return '';
-    })
+  return lines
+    .map((line, i) => (inCode[i] === undefined ? line : ''))
     .join('\n');
+};
+
+/**
+ * The fenced code blocks of `body`, each from its opening line through its
+ * closing one (or the end of the body, for one left open), as written: the
+ * lines {@link outsideCodeFences} blanks, cut where it cuts them.
+ */
+export const codeFenceBlocks = (body: string): readonly string[] => {
+  const lines = body.split('\n');
+
+  const inCode = codeLines(lines);
+
+  // A block runs from its opening line up to the first line that is not code.
+  return inCode.flatMap((role, start) => {
+    if (role !== 'open') {
+      return [];
+    }
+
+    const end = inCode.findIndex((r, i) => i > start && r !== 'code');
+
+    return [lines.slice(start, end === -1 ? lines.length : end).join('\n')];
+  });
 };
 
 /**
@@ -162,6 +149,54 @@ export const findMergeAfterCycles = (
   }
 
   return Array.from(mut_cycles.values());
+};
+
+/**
+ * What each line is to the fences of a body: `'open'` for a line that opens
+ * one, `'code'` for one inside it or closing it, `undefined` outside any.
+ */
+const codeLines = (
+  lines: readonly string[],
+): readonly ('open' | 'code' | undefined)[] => {
+  // The marker that opened the fence the current line is in, if any.
+  let mut_openedBy: string | undefined = undefined;
+
+  return lines.map((line) => {
+    const fence = FENCE_LINE.exec(line)?.groups;
+
+    const marker = fence?.['marker'];
+
+    const rest = fence?.['rest'] ?? '';
+
+    if (mut_openedBy === undefined) {
+      // A backtick fence's info string cannot hold a backtick (CommonMark),
+      // so ```` ```x``` ```` is inline code, not an opening line.
+      if (
+        marker === undefined ||
+        (marker.startsWith('`') && rest.includes('`'))
+      ) {
+        return undefined;
+      }
+
+      mut_openedBy = marker;
+
+      return 'open';
+    }
+
+    // Only a run of the opening character, at least as long, with nothing
+    // after it, closes the fence (CommonMark); any other fence line is part
+    // of the code, so a ``` inside a ```` or ~~~ block does not end it.
+    if (
+      marker !== undefined &&
+      marker.at(0) === mut_openedBy.at(0) &&
+      marker.length >= mut_openedBy.length &&
+      rest.trim() === ''
+    ) {
+      mut_openedBy = undefined;
+    }
+
+    return 'code';
+  });
 };
 
 /**

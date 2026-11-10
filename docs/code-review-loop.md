@@ -236,7 +236,7 @@ its reason, naming the site that carries it when it is about the code) and
 `**Deferred**: none.`). Keep that shape: it is what a reader, and anything that
 later mines the descriptions for recurring findings, can parse.
 The Japanese half of the description (`CLAUDE.md`, "Japanese text")
-translates the section under `### レビュー`, never a second `## Review`: the
+carries the section under `### レビュー`, never a second `## Review`: the
 digest reads the first `## Review` alone, and only the English one parses.
 
 A security finding is the exception, as "Security findings" in `CLAUDE.md`

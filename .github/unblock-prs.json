@@ -1,6 +1,7 @@
 {
   "$schema": "../libs/pr-merge-queue/src/unblock-prs/config.schema.json",
   "translation": { "heading": "日本語" },
+  "pullRequestDescription": { "openingHeading": "Background" },
   "autoFix": {
     "ignore": ["^[\\w-]+-result / result$"],
     "before": ["pnpm install --frozen-lockfile"],

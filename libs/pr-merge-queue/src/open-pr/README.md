@@ -97,7 +97,7 @@ pnpm run open-pr -- --base feat/lower-layer        # その PR の上に積む
 
 **本文は自分で書くものです。** `skip-ci` が付いている間はローカルで走らせた
 チェックがそのブランチの唯一のチェックなので、どれを走らせたかを本文に書いて
-ください。`.github/unblock-prs.json` に `translation.heading` があれば、
+ください。何をどの順で書くかは `../pr-description/README.md` にあります。`.github/unblock-prs.json` に `translation.heading` があれば、
 `--body-file` の本文は原文と訳文が対応しているかを push の前に確かめ、対応して
 いなければ止まります（`../pr-description/README.md`）。`--merge-after` を付けると `Merge-After:` 行が本文の先頭に入ります。
 
@@ -234,12 +234,12 @@ pnpm run open-pr -- --base feat/lower-layer        # stack it on that one
 | `--dry-run`          |                    off | print the steps and touch nothing         |
 
 The description is yours to write: while `skip-ci` is on, the checks you ran
-locally are the only checks the branch gets, so say which ones. When
-`.github/unblock-prs.json` names a `translation.heading`, a `--body-file`
-whose original and translation do not mirror each other is refused before
-anything is pushed (`../pr-description/README.md`). `--merge-after`
-puts the `Merge-After:` line at the top of the body, where `unblock-prs` reads
-it.
+locally are the only checks the branch gets, so say which ones; what else it
+says, and in what order, is in `../pr-description/README.md`. When
+`.github/unblock-prs.json` names a `translation.heading`, a `--body-file` whose
+original and translation do not mirror each other is refused before anything is
+pushed (`../pr-description/README.md`). `--merge-after` puts the `Merge-After:`
+line at the top of the body, where `unblock-prs` reads it.
 
 **What the issues it closes start after is written too.** Once the pull
 request exists, the script reads the issues GitHub found closing keywords for

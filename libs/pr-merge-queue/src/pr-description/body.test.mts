@@ -52,6 +52,10 @@ const BODY = dedent`
 const split = (body: string): DescriptionParts =>
   Result.unwrapThrow(splitDescription(body, HEADING));
 
+/** A body whose original is `original`, its translation opening with `### 背景`. */
+const opened = (original: string): DescriptionParts =>
+  split(`${original}\n\n## 日本語\n\n### 背景\n\nあ。`);
+
 /** A Review section of `lines`, its translation naming what they name. */
 const review = (lines: string): DescriptionParts =>
   split(
@@ -230,13 +234,77 @@ describe(checkDescription, () => {
 
       ## 日本語
 
+      \`\`\`sh
+      echo '#4'
+      \`\`\`
+
       \`#6\` と書く。
     `);
 
     assert.deepStrictEqual(checkDescription(parts, 'pull-request'), []);
   });
 
-  test('keeps code, tables and images in the original', () => {
+  test("wants the original's code blocks repeated in the translation", () => {
+    const body = dedent`
+      - A:
+
+        \`\`\`ts
+        f(1);
+        \`\`\`
+
+      \`\`\`text
+      out
+      \`\`\`
+
+      ## 日本語
+
+      A は次のとおり。
+
+      \`\`\`ts
+      f(1);
+      \`\`\`
+
+      - 出力:
+
+        \`\`\`text
+        out
+        \`\`\`
+    `;
+
+    assert.deepStrictEqual(checkDescription(split(body), 'pull-request'), []);
+  });
+
+  test('names a code block the translation leaves out or adds', () => {
+    assert.deepStrictEqual(
+      checkDescription(
+        split('A.\n\n```ts\nf(1);\n```\n\n## 日本語\n\nあ。'),
+        'pull-request',
+      ),
+      [`the original has 1 code block and the translation 0; ${CODE_RULE}`],
+    );
+
+    assert.deepStrictEqual(
+      checkDescription(
+        split('A.\n\n## 日本語\n\nあ。\n\n```ts\nf(1);\n```'),
+        'pull-request',
+      ),
+      [`the original has 0 code blocks and the translation 1; ${CODE_RULE}`],
+    );
+  });
+
+  test('names a code block the translation changes', () => {
+    assert.deepStrictEqual(
+      checkDescription(
+        split(
+          'A.\n\n```ts\nf(1); // one\n```\n\n## 日本語\n\nあ。\n\n```ts\nf(1); // 一\n```',
+        ),
+        'pull-request',
+      ),
+      [`code block 1 of the translation is not the original's; ${CODE_RULE}`],
+    );
+  });
+
+  test('keeps tables and images in the original', () => {
     const problems = checkDescription(
       split(dedent`
         A.
@@ -453,7 +521,11 @@ describe(checkDescription, () => {
 
           ## 日本語
 
-          \`Closes #2\` を書く。
+          \`Closes #2\` と次を書く。
+
+          \`\`\`md
+          Start-After: #3
+          \`\`\`
         `),
         'pull-request',
       ),
@@ -729,6 +801,12 @@ describe(checkDescription, () => {
 
           い。
 
+          \`\`\`md
+          **Deferred**
+
+          - an example.
+          \`\`\`
+
           ### チェック
 
           う。
@@ -754,9 +832,138 @@ describe(checkDescription, () => {
           ## 日本語
 
           あ。
+
+          \`\`\`md
+          ## Review
+
+          Anything.
+          \`\`\`
         `),
         'pull-request',
       ),
+      [],
+    );
+  });
+});
+
+describe('checkDescription with an opening heading', () => {
+  test('passes an original that opens with the heading', () => {
+    assert.deepStrictEqual(
+      checkDescription(
+        opened('## Background\n\nA.'),
+        'pull-request',
+        'Background',
+      ),
+      [],
+    );
+  });
+
+  test('lets declarations and the merge-before note come first', () => {
+    assert.deepStrictEqual(
+      checkDescription(
+        opened(
+          'Merge-After: #10\nMerges before #11.\n\n## Background\n\nA (#10, #11).',
+        ),
+        'pull-request',
+        'Background',
+      ).filter((problem) => problem.includes('Background')),
+      [],
+    );
+  });
+
+  test('names the heading an original opens with instead', () => {
+    assert.deepStrictEqual(
+      checkDescription(
+        opened('## Summary\n\nA.'),
+        'pull-request',
+        'Background',
+      ),
+      [`the original opens with "## Summary"; ${OPENING_RULE}`],
+    );
+  });
+
+  test('refuses prose before the heading', () => {
+    assert.deepStrictEqual(
+      checkDescription(
+        split(
+          'A.\n\n## Background\n\nB.\n\n## 日本語\n\nあ。\n\n### 背景\n\nい。',
+        ),
+        'pull-request',
+        'Background',
+      ),
+      [`the original opens with prose under no heading; ${OPENING_RULE}`],
+    );
+  });
+
+  test('refuses an original with no heading at all', () => {
+    assert.deepStrictEqual(
+      checkDescription(
+        split('A.\n\n## 日本語\n\nあ。'),
+        'pull-request',
+        'Background',
+      ),
+      [`the original opens with prose under no heading; ${OPENING_RULE}`],
+    );
+  });
+
+  test('wants the heading at the second level', () => {
+    assert.deepStrictEqual(
+      checkDescription(
+        split('### Background\n\nA.\n\n## 日本語\n\n#### 背景\n\nあ。'),
+        'pull-request',
+        'Background',
+      ),
+      [`the original opens with "### Background"; ${OPENING_RULE}`],
+    );
+  });
+
+  test('reads no heading out of a code fence', () => {
+    assert.deepStrictEqual(
+      checkDescription(
+        opened('```md\n## Background\n```\n\n## Summary\n\nA.'),
+        'pull-request',
+        'Background',
+      ).filter((problem) => problem.includes(OPENING_RULE)),
+      [`the original opens with prose under no heading; ${OPENING_RULE}`],
+    );
+  });
+
+  test('refuses an original that holds only declarations', () => {
+    assert.deepStrictEqual(
+      checkDescription(
+        split('Merge-After: #10\n\n## 日本語\n\nあ。'),
+        'pull-request',
+        'Background',
+      ),
+      [`the original has no heading; ${OPENING_RULE}`],
+    );
+  });
+
+  test('lets an HTML comment come first', () => {
+    assert.deepStrictEqual(
+      checkDescription(
+        opened('<!-- a\nnote -->\n\n## Background\n\nA.'),
+        'pull-request',
+        'Background',
+      ),
+      [],
+    );
+  });
+
+  test('reads no heading out of an HTML comment', () => {
+    assert.deepStrictEqual(
+      checkDescription(
+        opened('<!--\n## Background\n-->\n\n## Summary\n\nA.'),
+        'pull-request',
+        'Background',
+      ).filter((problem) => problem.includes(OPENING_RULE)),
+      [`the original opens with "## Summary"; ${OPENING_RULE}`],
+    );
+  });
+
+  test('asks nothing of an issue', () => {
+    assert.deepStrictEqual(
+      checkDescription(split('A.\n\n## 日本語\n\nあ。'), 'issue', 'Background'),
       [],
     );
   });
@@ -924,3 +1131,9 @@ describe(readableDescription, () => {
     );
   });
 });
+
+const OPENING_RULE =
+  'a pull request\'s description opens with "## Background": what the change is about and why it is needed, for a reader who has not read the issue (the pr-description README says what to write)';
+
+const CODE_RULE =
+  'each code block appears in both halves, the same and in the same order, so that either half reads on its own';

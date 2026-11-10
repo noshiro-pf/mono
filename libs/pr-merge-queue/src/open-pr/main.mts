@@ -485,6 +485,7 @@ const checkBodyFile = async (
     read.value,
     config.value?.translation,
     'pull-request',
+    config.value?.openingHeading,
   );
 
   return problems === undefined

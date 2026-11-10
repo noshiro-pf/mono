@@ -50,6 +50,35 @@ pnpm run pr-description -- create --title 'fix: x' --file ./d.md --priority B  #
 `--keyword` に渡した名前（関数名、ファイル名、ルール名）をそのまま書いている
 ものを一覧できます。
 
+### 何を書くか
+
+ツールが確かめるのは形だけで、読みやすさは書く人に任されています。pull request
+の description は、原文も訳文も、issue もコードも読んでいない人がそれだけで変更を
+判断できるように、次の順で書きます。
+
+1. **背景**。`.github/unblock-prs.json` の `pullRequestDescription.openingHeading`
+   の節で、このリポジトリでは `## Background` です。変更する対象が何で、何が
+   問題だったのか、または何が足りなかったのかを書きます。リポジトリ固有の名前は、
+   初めて出るところで一言説明します。
+2. **何が変わるか**。効果を先に書きます。何が通るようになり、何が失敗するように
+   なり、何の振る舞いが変わるのか。関数名や使った API などの仕組みはその後に、
+   コードを読むときの手がかりとして書きます。前後の短い例は、抽象的な規則より
+   よく伝わります。
+3. **注意点**（あれば）。意図して変えないこと、関係する pull request、確かめて
+   いないこと。
+4. 実行したチェックと `## Review`。
+
+訳文は原文と同じことを、同じ節と同じ参照で言います。原文を一語ずつ置き換える
+のではなく、その言語として自然な文で書きます。コードブロックは訳文にも同じものを
+置くので、訳文だけで読めます。表と画像は原文だけに置きます。対応のチェックが比べるのは見出しと
+`#N` で、文は比べません。
+
+`openingHeading` を設定すると、pull request の原文が `## <openingHeading>` で
+始まらない本文を拒否します（宣言の行、`--merge-before` の行、HTML のコメントは
+先に来てかまいません）。issue には求めません。設定より前に書いた description は、次に
+`push` するときにこの節を足します。原文にだけコードブロックを置いていた
+description も、次の `push` で訳文に同じものを置きます。
+
 ### 書くときに確かめること
 
 `push`・`create`・`check` と、`open-pr --body-file` は、次のどれかに当たる本文を
@@ -61,8 +90,10 @@ pnpm run pr-description -- create --title 'fix: x' --file ./d.md --priority B  #
   1つ足してもかまいません）。
 - `#N` の参照が片方にしか無い（コード、表、`Merge-After:` などの宣言、
   pull request の closing keyword の中は数えません）。
-- 訳文にコードブロック、表、画像がある。どれも原文に1度だけ置き、訳文はそれを
-  参照します。
+- 原文のコードブロックが、訳文に同じ順で同じ内容のまま（字下げは問いません）
+  置かれていない。訳文だけを読んでも分かるように両方に置き、写しが食い違わない
+  ように中身は変えません（コードの中のコメントも原文のままです）。
+- 訳文に表か画像がある。どちらも原文に1度だけ置き、訳文はそれを参照します。
 - 訳文に `Merge-After:` の行がある。ツールは本文のどこにあっても読むので、
   食い違った写しも効いてしまいます。原文に1度だけ置きます。
 - トレーラ（`Start-After:`・`Claude-Session:` の行、pull request なら closing
@@ -71,6 +102,9 @@ pnpm run pr-description -- create --title 'fix: x' --file ./d.md --priority B  #
   keyword では何もしないので、issue（`create`、issue への `push`、
   `check --issue`）ではただの文として扱い、`#N` も数えます。`push` は番号が
   issue か pull request かを GitHub から読みます。
+- pull request の原文が `pullRequestDescription.openingHeading` の `##` 見出しで
+  始まっていない（設定したときだけ。宣言の行と `--merge-before` の行は先に来て
+  かまいません）。
 - `## Review`（`## Review (…)` のような後ろに続きのある見出しも含む）が原文に
   2つ以上ある、または訳文にある。ツールが読むのは本文で最初の1つだけです。
   訳文の節は `### レビュー` です。
@@ -139,6 +173,34 @@ named with `--not-duplicate <number>`. Before writing the body, `similar` lists
 the open issues with a close title and those that name a `--keyword` as written
 — a function, a file, a rule.
 
+The tools check the shape alone; whether a description reads well is the
+writer's. Write a pull request's, both halves, for someone who has read neither
+the issue nor the code and has to judge the change from it, in this order:
+
+1. **Background**, the section `pullRequestDescription.openingHeading` in
+   `.github/unblock-prs.json` names (`## Background` here): what the change is
+   about, and what was wrong or missing. Explain a name particular to the
+   repository the first time it appears.
+2. **What changes**, by its effect first: what now passes, what now fails, what
+   behaves differently. The mechanism — a function, the API used — comes after,
+   as a pointer for whoever reads the code. A short before-and-after example
+   says more than a rule stated in the abstract.
+3. **Notes**, if any: what the change deliberately leaves, related pull
+   requests, what was not verified.
+4. The checks run, then `## Review`.
+
+The translation says what the original says, with the same sections and
+references, in sentences natural to its language rather than word for word: the
+mirror check compares headings and `#N`, never sentences. Its code blocks are
+the original's, repeated, so that it reads on its own; tables and images stay in
+the original.
+
+With `openingHeading` set, a pull request's original that does not open with
+`## <openingHeading>` is refused (declarations, the `--merge-before` line and
+HTML comments may come first); an issue is not asked. A description written
+before the setting gets the section the next time it is pushed; one whose code
+blocks are in the original alone gets them in the translation too.
+
 `push`, `create`, `check` and `open-pr --body-file` refuse a body when:
 
 - the `## <heading>` line is missing or there twice, or a half is empty;
@@ -147,8 +209,12 @@ the open issues with a close title and those that name a `--keyword` as written
   give it one, such as `### 概要`);
 - a `#N` appears in one half only, counting neither code, tables, declarations
   nor a pull request's closing keywords;
-- the translation holds code, a table or an image, which appear once, in the
-  original, for the translation to refer to;
+- the original's code blocks are not in the translation, the same and in the
+  same order (their indentation aside): each appears in both, so that either
+  half reads on its own, unchanged, comments in it included, so that the copies
+  cannot drift;
+- the translation holds a table or an image, which appear once, in the original,
+  for the translation to refer to;
 - the translation holds a `Merge-After:` line: the tools read it wherever it is,
   so a copy that drifted would be obeyed too, and it appears once, in the
   original;
@@ -157,6 +223,9 @@ the open issues with a close title and those that name a `--keyword` as written
   it is, so it appears once, after the `---` rule. GitHub acts on no closing
   keyword in an issue, so there (`create`, `push` to an issue, `check --issue`)
   one is prose and its `#N` counts; `push` asks GitHub which the number is;
+- with `pullRequestDescription.openingHeading` set, a pull request's original
+  does not open with that `##` heading, declarations and the `--merge-before`
+  line aside;
 - the original has more than one `## Review` section, a suffixed heading such as
   `## Review (…)` included, or the translation has one: the tools read the
   first in the body. The translation's is `### レビュー`;
