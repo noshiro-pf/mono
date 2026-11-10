@@ -25,6 +25,7 @@ GitHub shows a `.github/README.md` in place of the root one.
 | `check-result.yml`               | `workflow_call`, from the six above    | the six above; it is their aggregate           |
 | `skip-ci-label.yml`              | `pull_request_target`                  | the `no-skip-ci-label` commit status           |
 | `lint-pull-request.yml`          | `pull_request_target`                  | its four jobs, by name                         |
+| `verify-lockfile.yml`            | pull requests; `push` to `main`        | `verify-lockfile`, its one job                 |
 | `release.yml`                    | `push` to `main`                       | none                                           |
 | `pnpm-update.yml`                | schedule                               | none; opens/closes `chore/pnpm-update`         |
 | `node-support-update.yml`        | schedule                               | none; opens/closes `chore/node-support-update` |
@@ -226,7 +227,7 @@ to be the diff the checks then run against. On a `push` or
   uses: actions/checkout@…
 
 - name: Set up pnpm, Node.js and the dependencies
-  uses: ./.github/actions/setup
+  uses: $/.github/actions/setup
 ```
 
 Every job that runs repository code starts with these two steps. The second is
@@ -250,12 +251,15 @@ place those action pins are written, rather than every job that takes the steps.
   deploy job, `deploy-event-schedule-app.yml`'s deploy job and
   `e2e-production.yml`, which install one app rather than the workspace, and
   `pnpm: false` in `check-gates.yml`, whose diff check runs on Node.js alone.
-- **The checkout stays in the caller.** A local action is read from the
-  workspace, so it cannot be resolved before something has checked it out.
-- **A composite action is a file in the tree**, read when its step starts
-  rather than when the run does (see "Jobs that hold a key"). It is safe
-  because it is the first step after the checkout, before anything has run
-  that could have rewritten it. Keep it there.
+- **The checkout stays in the caller.** The action itself needs none — a `$/`
+  action is this repository's at the running commit, not a path in the workspace
+  — but its install step runs a script from the checked-out tree.
+- **A composite action is named `$/…`, never `./…`.** A `./` action is read from
+  the workspace when its step starts, after anything that ran earlier could have
+  rewritten it, and the lockfile cannot cover the actions it uses (see "Action
+  pins and the lockfile"), so `gh actions-lock` refuses one that uses any. A
+  `$/` one is read at the commit the workflow runs from, and its own pins are
+  locked like a workflow's.
 - **The install is `tools/scripts/cmd/workflow-steps.mts install`**, which
   also checks that each boolean input is `true` or `false`: a misspelt one
   would otherwise read as `false`. The script is read later still, after
@@ -289,9 +293,9 @@ place those action pins are written, rather than every job that takes the steps.
 - **Composite actions live under `.github/actions/`**, which is where
   `update-actions` reads pins besides the workflows, and the only other path
   under `.github/` that `pnpm-update.yml`'s `commit` job accepts in its patch
-  (outside it, the manifests, the lockfile, a changeset and
-  `tools/configs/release-binaries.json`). An action anywhere
-  else keeps its pins where they are, and nothing reports it.
+  (outside it, the manifests, `pnpm-lock.yaml`, `actions.lock`, a changeset and
+  `tools/configs/release-binaries.json`). An action anywhere else keeps its pins
+  where they are, and nothing reports it.
 
 ### The gate: `check-gates.yml`
 
@@ -725,12 +729,12 @@ on each Node version is the check itself.
 
 `skip-ci` on a pull request skips the six check workflows; every gated job
 carries the label condition and boots no runner. The four
-`lint-pull-request.yml` jobs run regardless (see "A label event under
-`skip-ci`"). GitHub has no label-based merge block, so on its own the label
-would leave a pull request that nothing checked looking exactly like one that
-passed. The block is `skip-ci-label.yml`: it writes a required commit status,
-`no-skip-ci-label`, on every head commit, `pending` while the label is on and
-`success` without it.
+`lint-pull-request.yml` jobs and `verify-lockfile` run regardless (see "A label
+event under `skip-ci`"). GitHub has no label-based merge block, so on its own
+the label would leave a pull request that nothing checked looking exactly like
+one that passed. The block is `skip-ci-label.yml`: it writes a required commit
+status, `no-skip-ci-label`, on every head commit, `pending` while the label is
+on and `success` without it.
 
 - **It is what holds a labelled pull request.** The aggregates report
   `skipped` on a commit pushed while the label is on (a pull request nobody
@@ -788,7 +792,9 @@ its red marked stale.
 `lint-pull-request.yml`'s four jobs are their own required contexts, with no
 caller to skip, so they carry no `skip-ci` condition and run on every event.
 They read the API for seconds, and a job still queued or running is `pending`,
-which holds the merge as well.
+which holds the merge as well. `verify-lockfile.yml`'s one job is the same kind
+of context for the same reasons, and does not run on label events at all, so
+taking `skip-ci` off would not bring back a run it had skipped.
 
 ## `pull_request_target`
 
@@ -897,6 +903,42 @@ can only narrow what the App already holds), so that the push triggers the
   `skip-ci` on the version pull request on every run. Which label a bot opens
   with is the whole statement of whether it is queued.
 
+## Action pins and the lockfile
+
+**A `uses:` names a full version (`actions/checkout@v7.0.1`), and
+`.github/workflows/actions.lock` records the commit it ran as.** The lockfile is
+GitHub's (`gh actions-lock`, github/gh-actions-lock): it holds, per workflow,
+every action the workflow uses, directly or through a composite action, and per
+action the commit, the ref it was resolved from, and the owner and repository
+ids. The runner checks each step's action against it at job start, so a tag
+moved upstream, a commit no longer reachable from its tag, or a repository that
+changed hands fails the job rather than running what nobody reviewed. That is
+what the SHA in each `uses:` used to do, and the reason the repository's
+"Require actions to be pinned to a full-length commit SHA"
+(`repo-settings/actions-settings/`) still holds: GitHub counts the lockfile as
+the pin for a workflow it covers. Never edit it by hand.
+
+- **A change to any `uses:`, a new workflow or a new composite action is
+  followed by `gh actions-lock`** (the extension, installed at the release
+  `.github/actions/install-gh-actions-lock` names), and the lockfile is
+  committed with it. `verify-lockfile.yml` runs `gh actions-lock --verify` on
+  every pull request and fails, naming the workflow, when the two disagree;
+  `gh actions-lock --verify-local` is the offline half of it.
+- **`update-actions` moves the versions within their major** and regenerates the
+  lockfile in the same run; a major waits for a human (see "Dependencies" in
+  `CLAUDE.md`). A pin the setup action already carries belongs there, not in a
+  workflow (see "Setup").
+- **A local action is `$/…`** (see "Setup"); a reusable workflow of this
+  repository stays `./.github/workflows/…`, which the lockfile covers as a
+  workflow of its own. A reusable workflow of another repository is not locked;
+  none is used.
+- **The extension's own version moves by hand**: no scheduled job reads its
+  releases. Take a release older than `minimumReleaseAge`, as everything else
+  here is held to.
+- **The lockfile is owned in `.github/CODEOWNERS`** through
+  `.github/workflows/`, which is what GitHub's guidance asks: a changed commit
+  is code the workflows will run.
+
 ## Expressions
 
 **`&&` and `||` join booleans, and nothing else.** An expression that
@@ -934,17 +976,16 @@ Nothing checks this; a review does.
   `check:root:dispatch-inputs`. `fmt` and `check:cspell` read it too; CI itself
   runs nothing on a workflow change until the pull request runs.
   `check:root:actionlint` also lints the composite actions' steps, which
-  actionlint does not read on its own. It downloads the actionlint and
-  shellcheck that `tools/configs/release-binaries.json` pins, so it needs
-  nothing installed; `pnpm-update.yml` moves those pins.
+  actionlint does not read on its own, and reads a `$/` action as `./`, the only
+  form the pinned actionlint knows. It downloads the actionlint and shellcheck
+  that `tools/configs/release-binaries.json` pins, so it needs nothing
+  installed; `pnpm-update.yml` moves those pins.
 - **`.github/workflows/` and `.github/actions/` are owned in
   `.github/CODEOWNERS`**, which `lint-pull-request.yml`'s `code-owners` job
   enforces in the ruleset's place: a change there by anyone but the owner waits
   for the owner's approval, so a bot's pull request that touches either does not
   auto-merge, while the owner's own needs no bypass — unless someone else pushed
   to its branch, which the job reads from the repository's activity. The action
-  pins are the one thing a bot writes there.
-- **Action pins are SHAs with a version comment**, moved by `update-actions`
-  within their major; a major waits for a human (see "Dependencies" in
-  `CLAUDE.md`). A pin the setup action already carries belongs there, not in
-  a workflow (see "Setup").
+  pins and the lockfile are the one thing a bot writes there.
+- **A changed `uses:` is followed by `gh actions-lock`** (see "Action pins and
+  the lockfile").

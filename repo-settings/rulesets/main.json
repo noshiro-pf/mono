@@ -85,6 +85,10 @@
           {
             "context": "Validate code owners",
             "integration_id": 15368
+          },
+          {
+            "context": "verify-lockfile",
+            "integration_id": 15368
           }
         ]
       }

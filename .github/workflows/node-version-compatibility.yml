@@ -117,7 +117,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        uses: actions/checkout@v7.0.1
         with:
           ref: ${{ case(github.event_name == 'pull_request', github.event.pull_request.head.sha, github.sha) }}
 
@@ -141,7 +141,7 @@ jobs:
       # excludes the running version, so the floor every published package
       # promises is exercised on the exact version it names.
       - name: Set up pnpm, Node.js for `${{ matrix.target }}` and the dependencies
-        uses: ./.github/actions/setup
+        uses: $/.github/actions/setup
         with:
           node-version: ${{ steps.node-version.outputs.version }}
           engine-strict: true

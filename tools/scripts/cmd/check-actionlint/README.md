@@ -16,6 +16,12 @@ Lints the GitHub Actions configuration with the actionlint and shellcheck that
   `toJSON(secrets)`, a key only a workflow's step takes (`timeout-minutes:`),
   and the `with:` of a local action (`uses: ./…`), which actionlint resolves
   only from a file.
+- A `uses: $/…` step (an action of this repository at the running commit, the
+  form `.github/workflows/actions.lock` requires) is linted as `uses: ./…`, the
+  only form the pinned actionlint reads: the workflows are linted in a temporary
+  copy of `.github/` with the steps rewritten, and a composite action's wrapper
+  is rewritten the same way. Every line keeps its length, so what it reports is
+  at the file's line and column, though a message quoting the step says `./`.
 - `run-scripts.mts` finds those steps and their `run:` scripts in each
   `action.yml`.
   It reports any shape it does not read rather than skipping it.

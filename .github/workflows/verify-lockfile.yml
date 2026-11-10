@@ -1,0 +1,61 @@
+name: Verify Lockfile
+
+# Fails when `.github/workflows/actions.lock` is out of step with the
+# workflows, or when a pin it records no longer verifies upstream (a tag that
+# moved, a commit no longer reachable from its tag, a repository that changed
+# hands). Built from the sample in github/gh-actions-lock
+# (`.github/workflows/verify-lockfile.yml`); what the lockfile is and how it is
+# kept current is in README.md under "Action pins and the lockfile".
+#
+# Its one job is its own required context (`verify-lockfile` in
+# `repo-settings/rulesets/main.json`), as the `lint-pull-request.yml` jobs are,
+# rather than a gate and an aggregate: it runs no repository code — the
+# extension reads the workflow files as data — and takes seconds, so it runs
+# on every event and always reports a real verdict. That is also why it carries
+# no `skip-ci` condition and no `paths` filter: either would leave the
+# required context `skipped`, or never reported, on a head nothing verified,
+# and since this workflow does not run on `unlabeled`, taking `skip-ci` off
+# would not bring it back.
+#
+# `push` to `main` as well, for a merge the ruleset was bypassed for, which can
+# land a tree no pull request run verified.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ case(github.event_name == 'pull_request', github.event.pull_request.number, github.event_name == 'push', github.sha, github.ref) }}
+  cancel-in-progress: true
+
+permissions: {}
+
+jobs:
+  verify:
+    # The required context; renaming it is a ruleset change
+    # (repo-settings/README.md).
+    name: verify-lockfile
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7.0.1
+        with:
+          ref: ${{ case(github.event_name == 'pull_request', github.event.pull_request.head.sha, github.sha) }}
+          persist-credentials: false
+
+      - name: Install gh-actions-lock
+        uses: $/.github/actions/install-gh-actions-lock
+
+      # `GITHUB_TOKEN` reads the actions' public repositories, and lifts the
+      # unauthenticated rate limit the runners' shared IP range exhausts.
+      - name: Verify the lockfile
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh actions-lock --verify

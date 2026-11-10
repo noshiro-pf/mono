@@ -2,6 +2,7 @@ import dedent from 'dedent';
 import { Arr, Result } from 'ts-data-forge';
 import type { ReleaseBinaryPin } from '../../lib/release-binaries.mjs';
 import {
+  asLocalActionForm,
   checkActionlint,
   wrapInWorkflow,
   type Install,
@@ -104,6 +105,56 @@ describe('checkActionlint', () => {
         { inputs: [] },
       ),
     );
+  });
+
+  test('hands actionlint a `$/` step in a composite action as `./`, which it reads', async () => {
+    const lintWorkflowText = vi.fn(compositeReports([]));
+
+    const nestedAction = {
+      path: '.github/actions/outer/action.yml',
+      text: dedent`
+        name: Outer
+        runs:
+          using: composite
+          steps:
+            - name: Set up
+              uses: ${dollar}/.github/actions/setup
+      `,
+    } as const;
+
+    const result = await checkActionlint({
+      pins,
+      install: installed,
+      tryRunning: runsFine,
+      runActionlint: actionlintExits(0),
+      compositeActions: [nestedAction],
+      lintWorkflowText,
+    });
+
+    assert.isTrue(Result.isOk(result));
+
+    const wrapped = wrapInWorkflow(
+      {
+        line: 5,
+        dashIndent: 4,
+        lines: Arr.skip(nestedAction.text.split('\n'), 4),
+      },
+      { inputs: [] },
+    );
+
+    expect(lintWorkflowText).toHaveBeenCalledExactlyOnceWith(
+      '/cache/bin/actionlint',
+      '/cache/bin/shellcheck',
+      {
+        ...wrapped,
+        text: wrapped.text.replace(
+          `uses: ${dollar}/.github/actions/setup`,
+          'uses: ./.github/actions/setup',
+        ),
+      },
+    );
+
+    assert.include(wrapped.text, `uses: ${dollar}/.github/actions/setup`);
   });
 
   test('fails naming the tools the pin file lacks', async () => {
@@ -572,6 +623,48 @@ describe('checkActionlint', () => {
     );
 
     assert.notInclude(result.value, 'shellcheck disable');
+  });
+});
+
+describe('asLocalActionForm', () => {
+  test('writes `uses: $/` as `uses: ./`, keeping every line its length', () => {
+    const text = dedent`
+      steps:
+        - uses: ${dollar}/.github/actions/setup
+        - name: Set up
+          uses: ${dollar}/.github/actions/setup
+          with:
+            install: false
+    `;
+
+    const local = asLocalActionForm(text);
+
+    assert.strictEqual(
+      local,
+      dedent`
+        steps:
+          - uses: ./.github/actions/setup
+          - name: Set up
+            uses: ./.github/actions/setup
+            with:
+              install: false
+      `,
+    );
+
+    assert.deepStrictEqual(
+      local.split('\n').map((line) => line.length),
+      text.split('\n').map((line) => line.length),
+    );
+  });
+
+  test.each([
+    `        run: sed '/^${dollar}/d'`,
+    String.raw`        run: awk '${dollar}4 ~ /\.mts${dollar}/'`,
+    '        uses: ./.github/actions/setup',
+    '        uses: actions/checkout@v7.0.1',
+    `        # uses: ${dollar}/.github/actions/setup`,
+  ])('leaves %j alone', (line) => {
+    assert.strictEqual(asLocalActionForm(line), line);
   });
 });
 

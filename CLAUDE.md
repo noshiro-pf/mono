@@ -191,11 +191,12 @@ workflow has to be wired to. A workflow's own comments say only what is
 particular to it. Here is only what a session has to act on.
 
 - **The required contexts** (`repo-settings/rulesets/main.json`) are the six
-  `*-result / result` aggregates, the `no-skip-ci-label` status and the four
-  `lint-pull-request.yml` jobs. None does work, because a skipped job satisfies
-  a required check. A new matrix entry needs nothing; a new job or workflow
-  needs its aggregate context added there, or it runs and blocks nothing. A red
-  aggregate names the jobs that did not pass; open the run.
+  `*-result / result` aggregates, the `no-skip-ci-label` status, the four
+  `lint-pull-request.yml` jobs and `verify-lockfile`. None does work, because a
+  skipped job satisfies a required check. A new matrix entry needs nothing; a
+  new job or workflow needs its aggregate context added there, or it runs and
+  blocks nothing. A red aggregate names the jobs that did not pass; open the
+  run.
 - **A push to `main` runs the check workflows too.** A merged tree that
   already has a verdict costs one gate job; one that has none, as a bypass
   merge can land, is checked in full. Nothing needs running by hand.

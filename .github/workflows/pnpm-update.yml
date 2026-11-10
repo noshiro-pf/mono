@@ -43,8 +43,9 @@ name: pnpm update
 # `minimumReleaseAge` nor `ignoreDeps` reaches them and a tag hours old was
 # taken regardless. The script reads each action's GitHub Releases, moves a pin
 # to the newest release of the same major that is older than
-# `minimumReleaseAge`, and resolves the tag to its commit — the same SHA pin
-# pnpm wrote. A major stays put until a human takes it, as before:
+# `minimumReleaseAge`, and regenerates `.github/workflows/actions.lock` with
+# `gh actions-lock`, which records the commit the new tag points at. A major
+# stays put until a human takes it, as before:
 # `changesets/action` v2 is why. It requires Changesets CLI v3 and renamed every
 # input, so the major landing unattended broke release.yml on main.
 #
@@ -121,7 +122,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        uses: actions/checkout@v7.0.1
         with:
           persist-credentials: false
 
@@ -129,7 +130,7 @@ jobs:
       # and the release-binary pins before anything is installed, and "Update
       # dependencies" installs once they have.
       - name: Set up pnpm and Node.js
-        uses: ./.github/actions/setup
+        uses: $/.github/actions/setup
         with:
           install: false
 
@@ -163,9 +164,15 @@ jobs:
       # `node_modules` at all; the package.json script stays as the local
       # entry point.
       #
-      # `GITHUB_TOKEN` only reads the Releases and Commits APIs here, and lifts
-      # the unauthenticated rate limit that the runners' shared IP range
-      # otherwise exhausts.
+      # `update-actions` regenerates the lockfile after it moves a pin, through
+      # the `gh actions-lock` extension, which is a release binary of GitHub's
+      # and not part of the dependency tree.
+      - name: Install gh-actions-lock
+        uses: $/.github/actions/install-gh-actions-lock
+
+      # `GITHUB_TOKEN` only reads the Releases API and the actions' public
+      # repositories here, and lifts the unauthenticated rate limit that the
+      # runners' shared IP range otherwise exhausts.
       - name: Update the action pins
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -232,7 +239,7 @@ jobs:
 
       - name: Upload the patch
         if: steps.patch.outputs.changed == 'true'
-        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        uses: actions/upload-artifact@v7.0.2
         with:
           name: pnpm-update-patch
           path: ${{ runner.temp }}/pnpm-update.patch
@@ -258,20 +265,20 @@ jobs:
       # `unblock-prs` rebases it, and the next run rebuilds the branch from
       # `main` regardless.
       - name: Checkout
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        uses: actions/checkout@v7.0.1
         with:
           ref: ${{ needs.update.outputs.base_sha }}
           persist-credentials: false
 
       - name: Download the patch
-        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        uses: actions/download-artifact@v8.0.2
         with:
           name: pnpm-update-patch
           path: ${{ runner.temp }}
 
       - name: Generate Token
         id: app-token
-        uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3.3.0
+        uses: actions/create-github-app-token@v3.3.0
         with:
           client-id: ${{ vars.REPO_AUTOMATION_BOT_CLIENT_ID }}
           private-key: ${{ secrets.REPO_AUTOMATION_BOT_PRIVATE_KEY }}
@@ -321,7 +328,9 @@ jobs:
           # `update-actions` moves the action pins in the workflows and in
           # the composite actions under `.github/actions/` — the two places
           # `mature-updates.mts` reads; a third has to be named in both, or
-          # its pins stop moving without a word — and
+          # its pins stop moving without a word — and regenerates
+          # `.github/workflows/actions.lock`, whose commits
+          # verify-lockfile.yml checks upstream on the pull request, and
           # `update-release-binaries` rewrites
           # `tools/configs/release-binaries.json`. A patch reaching
           # beyond that is not a dependency update whatever it is, and this is
@@ -353,7 +362,7 @@ jobs:
             | grep -Ev '^(pnpm-lock\.yaml|pnpm-workspace\.yaml)$' \
             | grep -Ev '(^|/)package\.json$' \
             | grep -Ev '^\.changeset/[^/]+\.md$' \
-            | grep -Ev '^\.github/workflows/[^/]+\.ya?ml$' \
+            | grep -Ev '^\.github/workflows/([^/]+\.ya?ml|actions\.lock)$' \
             | grep -Ev '^\.github/actions/(.+/)?action\.ya?ml$' \
             | grep -Ev '^tools/configs/release-binaries\.json$' || true)"
 

@@ -36,8 +36,9 @@
 - **ジョブやワークフローを増やしたら、その集約コンテキストをここに足す。**
   足さなければ、動きはするが何も止めない。マトリクスのエントリを増やす分には
   何も要らない。required にしてあるコンテキストは、集約ジョブ（`*-result`）か、
-  リポジトリのコードを走らせないもの（`no-skip-ci-label` の commit status と
-  `lint-pull-request.yml` の 4 つのジョブ）のどちらかで、作業そのものをする
+  リポジトリのコードを走らせないもの（`no-skip-ci-label` の commit status、
+  `lint-pull-request.yml` の 4 つのジョブ、`verify-lockfile.yml` の
+  `verify-lockfile` ジョブ）のどちらかで、作業そのものをする
   ジョブは一つも入っていない。理由は `.github/workflows/README.md` の
   「The aggregate job」と `CLAUDE.md` の「CI」節。
 - **ここに書いてあってどのワークフローも報告しないコンテキストは、いつまでも

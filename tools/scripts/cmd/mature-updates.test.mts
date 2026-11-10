@@ -237,6 +237,77 @@ describe('pnpm', () => {
   });
 });
 
+/**
+ * The fake GitHub API the script reads releases from, served from this process,
+ * and every request it answered, with the token it came with.
+ */
+const serveReleases = async (
+  releasesByRepo: ReadonlyRecord<string, readonly unknown[]>,
+): Promise<
+  Readonly<{
+    apiUrl: string;
+    requests: readonly string[];
+    close: () => void;
+  }>
+> => {
+  const mut_requests: string[] = [];
+
+  const server = http.createServer((req, res) => {
+    const url = new URL(req.url ?? '/', 'http://localhost');
+
+    mut_requests.push(`${req.headers.authorization ?? ''} ${url.pathname}`);
+
+    const releases = /^\/repos\/([^/]+\/[^/]+)\/releases$/u.exec(url.pathname);
+
+    if (releases?.[1] !== undefined) {
+      const page = url.searchParams.get('page');
+
+      res.setHeader('content-type', 'application/json');
+
+      res.end(
+        JSON.stringify(page === '1' ? (releasesByRepo[releases[1]] ?? []) : []),
+      );
+
+      return;
+    }
+
+    res.writeHead(404);
+
+    res.end('unexpected route');
+  });
+
+  await new Promise<void>((resolve) => {
+    server.listen(0, '127.0.0.1', resolve);
+  });
+
+  const address = server.address();
+
+  const port = isNonNullObject(address) ? address.port : 0;
+
+  return {
+    apiUrl: `http://127.0.0.1:${port}`,
+    requests: mut_requests,
+    close: () => {
+      server.closeAllConnections();
+
+      server.close();
+    },
+  };
+};
+
+/**
+ * A fake `gh` on `PATH` that says what it was asked to do and where, rather
+ * than regenerating a lockfile. The echo reaches the script's stdout.
+ */
+const installFakeGh = (dir: string): void => {
+  // eslint-disable-next-line security/detect-non-literal-fs-filename
+  fs.writeFileSync(
+    path.join(dir, 'gh'),
+    ['#!/bin/sh', 'echo "fake gh: $* (in $(pwd))"', ''].join('\n'),
+    { mode: 0o755 },
+  );
+};
+
 describe('actions', () => {
   const release = (
     tag: string,
@@ -342,8 +413,7 @@ describe('actions', () => {
 
   describe('parseActionPinLine / renderActionPin', () => {
     test('round-trips a pinned line, subpath included', () => {
-      const line =
-        `      - uses: owner/tool/sub/path@${sha('a')} # v1.2.3` as const;
+      const line = '      - uses: owner/tool/sub/path@v1.2.3';
 
       const pin = parseActionPinLine(line);
 
@@ -351,32 +421,58 @@ describe('actions', () => {
         prefix: '      - uses: ',
         repo: 'owner/tool',
         subpath: '/sub/path',
-        sha: sha('a'),
         tag: 'v1.2.3',
+        comment: '',
       });
 
       assert.strictEqual(pin === undefined ? '' : renderActionPin(pin), line);
     });
 
+    test('keeps a comment after the pin', () => {
+      const line = '        uses: actions/checkout@v7.0.1 # why it is here';
+
+      const pin = parseActionPinLine(line);
+
+      assert.deepStrictEqual(pin?.comment, ' # why it is here');
+
+      assert.strictEqual(
+        pin === undefined ? '' : renderActionPin({ ...pin, tag: 'v7.0.2' }),
+        '        uses: actions/checkout@v7.0.2 # why it is here',
+      );
+    });
+
+    test('takes trailing blanks after the version as no comment', () => {
+      assert.deepStrictEqual(
+        parseActionPinLine('        uses: actions/checkout@v7.0.1  ')?.tag,
+        'v7.0.1',
+      );
+    });
+
     test.each([
       '        uses: ./.github/workflows/check-gates.yml',
+      '        uses: $/.github/actions/setup',
       '        uses: actions/checkout@v7',
+      '        uses: actions/checkout@v7.0',
+      '        uses: actions/checkout@main',
+      '        uses: actions/checkout@v7.0.1-rc.1',
       `        uses: actions/checkout@${sha('a')}`,
-      `        uses: actions/checkout@${sha('a')} # main`,
+      `        uses: actions/checkout@${sha('a')} # v7.0.1`,
       '        uses: write',
     ])('leaves %j alone', (line) => {
       assert.deepStrictEqual(parseActionPinLine(line), undefined);
     });
   });
 
-  test('runs on node alone and rewrites the mature pins in place', async () => {
+  test('runs on node alone, rewrites the mature pins in place and regenerates the lockfile', async () => {
     const realNow = Temporal.Now.instant();
 
     const realDaysAgo = (days: number): string =>
       realNow.subtract({ hours: days * hoursPerDay }).toString();
 
-    const dir = fs.mkdtempSync(
-      path.join(os.tmpdir(), 'mature-updates-actions-'),
+    // The real path, which the fake `gh` reports its working directory as.
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
+    const dir = fs.realpathSync(
+      fs.mkdtempSync(path.join(os.tmpdir(), 'mature-updates-actions-')),
     );
 
     const workflowsDir = path.join(dir, '.github', 'workflows');
@@ -393,11 +489,13 @@ describe('actions', () => {
         'jobs:',
         '  build:',
         '    steps:',
-        `      - uses: actions/checkout@${sha('1')} # v7.0.1`,
-        `      - uses: pnpm/action-setup@${sha('2')} # v6.1.0`,
-        `      - uses: owner/tool/sub/path@${sha('3')} # v1.2.3`,
+        '      - uses: actions/checkout@v7.0.1',
+        '      - uses: pnpm/action-setup@v6.1.0',
+        '      - uses: owner/tool/sub/path@v1.2.3',
         '      - uses: ./.github/workflows/check-gates.yml',
-        `      - uses: actions/checkout@${sha('1')} # v7.0.1`,
+        '      - uses: $/.github/actions/setup',
+        `      - uses: owner/frozen@${sha('f')} # v1.0.0`,
+        '      - uses: actions/checkout@v7.0.1',
         '',
       ].join('\n'),
     );
@@ -420,9 +518,9 @@ describe('actions', () => {
         '  using: composite',
         '  steps:',
         '    - name: Install pnpm',
-        `      uses: pnpm/action-setup@${sha('2')} # v6.1.0`,
+        '      uses: pnpm/action-setup@v6.1.0',
         '    - name: Set up Node.js',
-        `      uses: actions/setup-node@${sha('4')} # v7.0.0`,
+        '      uses: actions/setup-node@v7.0.0',
         '',
       ].join('\n'),
     );
@@ -430,14 +528,16 @@ describe('actions', () => {
     // Not an action: only an `action.yml` is read under `.github/actions/`.
     const notes = path.join(actionDir, 'notes.yml');
 
-    const notesText = `pin: actions/setup-node@${sha('4')} # v7.0.0\n` as const;
+    const notesText = 'pin: actions/setup-node@v7.0.0\n';
 
     // eslint-disable-next-line security/detect-non-literal-fs-filename
     fs.writeFileSync(notes, notesText);
 
     installFakePnpm(dir, '{}');
 
-    const releasesByRepo: ReadonlyRecord<string, readonly unknown[]> = {
+    installFakeGh(dir);
+
+    const api = await serveReleases({
       'actions/checkout': [
         { tag_name: 'v7.0.3', published_at: realDaysAgo(1) },
         { tag_name: 'v8.0.0', published_at: realDaysAgo(30) },
@@ -460,74 +560,13 @@ describe('actions', () => {
         { tag_name: 'v7.0.1', published_at: realDaysAgo(10) },
         { tag_name: 'v7.0.0', published_at: realDaysAgo(90) },
       ],
-    } as const;
-
-    const commitShaByTag: ReadonlyRecord<string, string> = {
-      'actions/checkout@v7.0.2': sha('b'),
-      'owner/tool@v1.2.4': sha('c'),
-      'actions/setup-node@v7.0.1': sha('d'),
-    } as const;
-
-    const mut_requests: string[] = [];
-
-    const server = http.createServer((req, res) => {
-      const url = new URL(req.url ?? '/', 'http://localhost');
-
-      mut_requests.push(`${req.headers.authorization ?? ''} ${url.pathname}`);
-
-      const releases = /^\/repos\/([^/]+\/[^/]+)\/releases$/u.exec(
-        url.pathname,
-      );
-
-      const commit = /^\/repos\/([^/]+\/[^/]+)\/commits\/([^/]+)$/u.exec(
-        url.pathname,
-      );
-
-      if (releases?.[1] !== undefined) {
-        const page = url.searchParams.get('page');
-
-        res.setHeader('content-type', 'application/json');
-
-        res.end(
-          JSON.stringify(
-            page === '1' ? (releasesByRepo[releases[1]] ?? []) : [],
-          ),
-        );
-
-        return;
-      }
-
-      if (commit?.[1] !== undefined && commit[2] !== undefined) {
-        const answer = commitShaByTag[`${commit[1]}@${commit[2]}`];
-
-        res.writeHead(answer === undefined ? 404 : 200);
-
-        res.end(answer ?? 'no such tag');
-
-        return;
-      }
-
-      res.writeHead(404);
-
-      res.end('unexpected route');
-    });
-
-    await new Promise<void>((resolve) => {
-      server.listen(0, '127.0.0.1', resolve);
     });
 
     try {
-      const address = server.address();
-
-      const port = isNonNullObject(address) ? address.port : 0;
-
       const stdout = await runScript(['actions'], {
         cwd: dir,
         binDir: dir,
-        env: {
-          GITHUB_API_URL: `http://127.0.0.1:${port}`,
-          GH_TOKEN: 'fake-token',
-        },
+        env: { GITHUB_API_URL: api.apiUrl, GH_TOKEN: 'fake-token' },
       });
 
       assert.include(
@@ -542,6 +581,26 @@ describe('actions', () => {
 
       assert.include(stdout, 'Moved 4 action pin(s).\n');
 
+      // A pin it cannot move is named, so that it does not fall behind unseen.
+      assert.include(
+        stdout,
+        `::warning file=.github/workflows/ci.yml,line=9::Not moved by update-actions, which moves \`owner/repo@vX.Y.Z\` only: - uses: owner/frozen@${sha('f')} # v1.0.0\n`,
+      );
+
+      // The lockfile records the commit each new tag points at, once, after
+      // every file has been rewritten.
+      assert.include(
+        stdout,
+        `fake gh: actions-lock --no-interactive (in ${dir})\n`,
+      );
+
+      assert.strictEqual(stdout.split('fake gh:').length - 1, 1);
+
+      assert.isAbove(
+        stdout.indexOf('fake gh:'),
+        stdout.indexOf('Moved 4 action pin(s).'),
+      );
+
       assert.strictEqual(
         // eslint-disable-next-line security/detect-non-literal-fs-filename
         fs.readFileSync(workflow, 'utf8'),
@@ -549,11 +608,13 @@ describe('actions', () => {
           'jobs:',
           '  build:',
           '    steps:',
-          `      - uses: actions/checkout@${sha('b')} # v7.0.2`,
-          `      - uses: pnpm/action-setup@${sha('2')} # v6.1.0`,
-          `      - uses: owner/tool/sub/path@${sha('c')} # v1.2.4`,
+          '      - uses: actions/checkout@v7.0.2',
+          '      - uses: pnpm/action-setup@v6.1.0',
+          '      - uses: owner/tool/sub/path@v1.2.4',
           '      - uses: ./.github/workflows/check-gates.yml',
-          `      - uses: actions/checkout@${sha('b')} # v7.0.2`,
+          '      - uses: $/.github/actions/setup',
+          `      - uses: owner/frozen@${sha('f')} # v1.0.0`,
+          '      - uses: actions/checkout@v7.0.2',
           '',
         ].join('\n'),
       );
@@ -566,9 +627,9 @@ describe('actions', () => {
           '  using: composite',
           '  steps:',
           '    - name: Install pnpm',
-          `      uses: pnpm/action-setup@${sha('2')} # v6.1.0`,
+          '      uses: pnpm/action-setup@v6.1.0',
           '    - name: Set up Node.js',
-          `      uses: actions/setup-node@${sha('d')} # v7.0.1`,
+          '      uses: actions/setup-node@v7.0.1',
           '',
         ].join('\n'),
       );
@@ -577,21 +638,138 @@ describe('actions', () => {
       assert.strictEqual(fs.readFileSync(notes, 'utf8'), notesText);
 
       // One releases query per distinct pin — `pnpm/action-setup` is in both
-      // files and asked about once — one commit lookup per move, all
-      // authenticated.
-      assert.deepStrictEqual(mut_requests.toSorted(), [
-        'Bearer fake-token /repos/actions/checkout/commits/v7.0.2',
+      // files and asked about once — all authenticated. No commit lookups: the
+      // lockfile is where a tag becomes a commit.
+      assert.deepStrictEqual(api.requests.toSorted(), [
         'Bearer fake-token /repos/actions/checkout/releases',
-        'Bearer fake-token /repos/actions/setup-node/commits/v7.0.1',
         'Bearer fake-token /repos/actions/setup-node/releases',
-        'Bearer fake-token /repos/owner/tool/commits/v1.2.4',
         'Bearer fake-token /repos/owner/tool/releases',
         'Bearer fake-token /repos/pnpm/action-setup/releases',
       ]);
     } finally {
-      server.closeAllConnections();
+      api.close();
+    }
+  });
 
-      server.close();
+  test('fails before rewriting anything when gh actions-lock does not run', async () => {
+    const dir = fs.mkdtempSync(
+      path.join(os.tmpdir(), 'mature-updates-actions-'),
+    );
+
+    const workflowsDir = path.join(dir, '.github', 'workflows');
+
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
+    fs.mkdirSync(workflowsDir, { recursive: true });
+
+    const workflowText = [
+      'jobs:',
+      '  build:',
+      '    steps:',
+      '      - uses: actions/checkout@v7.0.1',
+      '',
+    ].join('\n');
+
+    const workflow = path.join(workflowsDir, 'ci.yml');
+
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
+    fs.writeFileSync(workflow, workflowText);
+
+    installFakePnpm(dir, '{}');
+
+    // `gh` without the extension: an unknown command.
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
+    fs.writeFileSync(
+      path.join(dir, 'gh'),
+      [
+        '#!/bin/sh',
+        String.raw`echo "unknown command \"$1\" for \"gh\"" >&2`,
+        'exit 1',
+        '',
+      ].join('\n'),
+      { mode: 0o755 },
+    );
+
+    const api = await serveReleases({
+      'actions/checkout': [
+        { tag_name: 'v7.0.2', published_at: '2026-01-02T00:00:00Z' },
+        { tag_name: 'v7.0.1', published_at: '2026-01-01T00:00:00Z' },
+      ],
+    });
+
+    try {
+      await expect(
+        runScript(['actions'], {
+          cwd: dir,
+          binDir: dir,
+          env: { GITHUB_API_URL: api.apiUrl, GH_TOKEN: 'fake-token' },
+        }),
+      ).rejects.toThrow(
+        'Install the extension at the release `.github/actions/install-gh-actions-lock/action.yml` names',
+      );
+
+      // eslint-disable-next-line security/detect-non-literal-fs-filename
+      assert.strictEqual(fs.readFileSync(workflow, 'utf8'), workflowText);
+
+      assert.deepStrictEqual(api.requests, []);
+    } finally {
+      api.close();
+    }
+  });
+
+  test('leaves the lockfile alone when no pin moved', async () => {
+    const realNow = Temporal.Now.instant();
+
+    const dir = fs.mkdtempSync(
+      path.join(os.tmpdir(), 'mature-updates-actions-'),
+    );
+
+    const workflowsDir = path.join(dir, '.github', 'workflows');
+
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
+    fs.mkdirSync(workflowsDir, { recursive: true });
+
+    const workflowText = [
+      'jobs:',
+      '  build:',
+      '    steps:',
+      '      - uses: actions/checkout@v7.0.1',
+      '',
+    ].join('\n');
+
+    const workflow = path.join(workflowsDir, 'ci.yml');
+
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
+    fs.writeFileSync(workflow, workflowText);
+
+    installFakePnpm(dir, '{}');
+
+    installFakeGh(dir);
+
+    const api = await serveReleases({
+      'actions/checkout': [
+        {
+          tag_name: 'v7.0.2',
+          published_at: realNow.subtract({ hours: 1 }).toString(),
+        },
+        { tag_name: 'v7.0.1', published_at: '2026-01-01T00:00:00Z' },
+      ],
+    });
+
+    try {
+      const stdout = await runScript(['actions'], {
+        cwd: dir,
+        binDir: dir,
+        env: { GITHUB_API_URL: api.apiUrl, GH_TOKEN: 'fake-token' },
+      });
+
+      assert.include(stdout, 'Moved 0 action pin(s).\n');
+
+      assert.notInclude(stdout, 'fake gh:');
+
+      // eslint-disable-next-line security/detect-non-literal-fs-filename
+      assert.strictEqual(fs.readFileSync(workflow, 'utf8'), workflowText);
+    } finally {
+      api.close();
     }
   });
 });
