@@ -248,6 +248,16 @@ interface Math {
    * If x is already an integer, the result is x.
    * @param x A numeric expression.
    */
+  trunc<N extends import('ts-type-forge').Int>(x: N): N;
+  trunc<N extends import('ts-type-forge').FiniteNumber>(
+    x: N,
+  ): N extends import('ts-type-forge').Int
+    ? N
+    : N extends import('ts-type-forge').NonNegativeNumber
+      ? import('ts-type-forge').NonNegativeInt
+      : N extends import('ts-type-forge').NonPositiveNumber
+        ? import('ts-type-forge').NonPositiveInt
+        : import('ts-type-forge').Int;
   trunc(
     x: number,
   ):

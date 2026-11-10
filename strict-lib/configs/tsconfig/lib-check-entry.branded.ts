@@ -116,6 +116,24 @@ const roundOfFinite = Math.round(finite);
 // A generic caller gets its own type parameter back.
 export const floorOfGeneric = <T extends Int>(x: T): T => Math.floor(x);
 
+// #3516 — `trunc` moves toward zero, so it keeps a sign bound and never
+// `'!=0'`: `Math.trunc(0.5)` is `0`, as is `Math.trunc(-0.5)` (`-0`).
+const truncOfInt16 = Math.trunc(int16);
+
+const truncOfPositive = Math.trunc(positive);
+
+const truncOfNonNegative = Math.trunc(nonNegative);
+
+const truncOfNegative = Math.trunc(negative);
+
+const truncOfNonPositive = Math.trunc(nonPositive);
+
+const truncOfFinite = Math.trunc(finite);
+
+const truncOfPositiveOrNegative = Math.trunc(positiveOrNegative);
+
+export const truncOfGeneric = <T extends Int>(x: T): T => Math.trunc(x);
+
 export const roundingTypes = [
   true satisfies TypeEq<typeof floorOfInt16, Int16>,
   true satisfies TypeEq<typeof ceilOfNegativeInt, NegativeInt>,
@@ -137,7 +155,20 @@ export const roundingTypes = [
     NonNegativeInt | NegativeInt
   >,
   true satisfies TypeEq<typeof roundOfFinite, Int>,
+  true satisfies TypeEq<typeof truncOfInt16, Int16>,
+  true satisfies TypeEq<typeof truncOfPositive, NonNegativeInt>,
+  true satisfies TypeEq<typeof truncOfNonNegative, NonNegativeInt>,
+  true satisfies TypeEq<typeof truncOfNegative, NonPositiveInt>,
+  true satisfies TypeEq<typeof truncOfNonPositive, NonPositiveInt>,
+  true satisfies TypeEq<typeof truncOfFinite, Int>,
+  true satisfies TypeEq<
+    typeof truncOfPositiveOrNegative,
+    NonNegativeInt | NonPositiveInt
+  >,
 ] as const;
+
+// @ts-expect-error `Math.trunc(0.5)` is `0`, so it is no non-zero divisor.
+export const truncatedDivisor: NonZeroNumber = Math.trunc(positive);
 
 // @ts-expect-error `Math.floor(0.5)` is `0`, so it is no non-zero divisor.
 export const flooredDivisor: NonZeroNumber = Math.floor(positive);

@@ -1,5 +1,5 @@
 diff --git a/v5.9/output/lib-files-branded/lib.es2015.core.d.ts b/v6.0/output/lib-files-branded/lib.es2015.core.d.ts
-index d51168d4f08c45e97dee626bede1617bff0b726a..d188f4fd354f139d24278041ceaaa6f853d7ae16 100644
+index b3368d26a40f402ec6d56d2ef6813b1f7c43d54d..32e27333fb68ec9ef1da50101395915a11910d5f 100644
 --- a/v5.9/output/lib-files-branded/lib.es2015.core.d.ts
 +++ b/v6.0/output/lib-files-branded/lib.es2015.core.d.ts
 @@ -7,7 +7,7 @@ License at http://www.apache.org/licenses/LICENSE-2.0
