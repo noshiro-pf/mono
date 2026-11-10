@@ -333,11 +333,12 @@ ingest the feed). Outside reports come through private vulnerability reporting
 - **The `opened` run the label cancels leaves red `*-result` checks and "check
   failed" notifications naming nothing — ignore them**; they stay until
   `skip-ci` comes off, and `pr-report` marks them stale.
-- Taking `skip-ci` off is how CI is asked for, and `unblock-prs` takes it off
-  only from a pull request labelled `merge-queued`. **Queueing one is that
-  label alone** — `unblock-prs` arms auto-merge in its turn — and it is the
-  author's; a session leaves `skip-ci` on. The label itself blocks nothing: GitHub does
-  not read it, so it is never a substitute for `skip-ci`.
+- Taking `skip-ci` off is how CI is asked for; `unblock-prs` takes it off only
+  from a `merge-queued` pull request, mostly checked by then on its queue layer,
+  whose verdict it reuses. **Queueing one is that label alone** — `unblock-prs`
+  arms auto-merge in its turn — and it is the author's; a session leaves
+  `skip-ci` on. The label itself blocks nothing: GitHub does not read it, so it
+  is never a substitute for `skip-ci`.
 - **The pull request stays the session's until it merges or closes.**
   Subscribe to its activity (`subscribe_pr_activity` where available) and end
   the turn to wait — do not poll. A small in-scope fix is amended onto the
@@ -358,15 +359,15 @@ ingest the feed). Outside reports come through private vulnerability reporting
   and so arms it, only once A has merged and GitHub has moved B onto `main`.
   No ruleset covers a stacked base, so nothing but that keeps B out of A's
   branch: never arm or merge a layer by hand.
-- `pnpm run unblock-prs` lands queued pull requests one at a time: scope is
-  the `merge-queued` label, order is the stack, the `Merge-After: #N` body
-  trailer (not read inside fenced code) and `blocks-release` for the release
-  (see "Releases"); it rebases — carrying the layers above along — and arms
-  auto-merge before removing `skip-ci` so the matrix runs once. The
-  `unblock-prs` skill only fixes what it sets aside. A bot's label says if it
-  is queued: `pnpm-update.yml` opens with `merge-queued`,
-  `node-support-update.yml` with `skip-ci`, held until a person queues it, as
-  `open-pr` leaves a session's. Both arm their own auto-merge. Details in
+- `pnpm run unblock-prs` lands queued pull requests one at a time: scope is the
+  `merge-queued` label, order is the stack, the `Merge-After: #N` body trailer
+  (not read inside fenced code) and `blocks-release` for the release (see
+  "Releases"); it rebases — carrying the layers above along — and arms
+  auto-merge before removing `skip-ci` so the checks run once at most. The
+  `unblock-prs` skill only fixes what it sets aside. A bot's label says if it is
+  queued: `pnpm-update.yml` opens with `merge-queued`, `node-support-update.yml`
+  with `skip-ci`, held until a person queues it, as `open-pr` leaves a
+  session's. Both arm their own auto-merge. Details in
   `libs/pr-merge-queue/src/unblock-prs/README.md`.
 
 ## Releases

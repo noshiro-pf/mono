@@ -773,10 +773,12 @@ on and `success` without it.
   without the status reads "Expected — waiting for status to be reported",
   which blocks forever. For the same reason the workflow has no `branches:`
   filter.
-- **Taking the label off fires `unlabeled`**, which is what starts the checks
-  on a commit already pushed. `unblock-prs` takes it off only from a pull
-  request labelled `merge-queued`, after rebasing, so the matrix runs once on
-  the head that will merge.
+- **Taking the label off fires `unlabeled`**, which is what starts the checks on
+  a commit already pushed. `unblock-prs` takes it off only from a pull request
+  labelled `merge-queued`, after rebasing, so the matrix runs at most once on
+  the head that will merge. Where it checked the pull request ahead of its turn
+  on a queue layer, that head has the layer's tree, and the run reuses the
+  layer's verdict instead of running the matrix (see "Triggers").
 - `skip-ci`, `merge-queued`, `blocks-release` and `auto-rebase` exist only
   on GitHub; the
   strings are in the workflows and `libs/pr-report-core/src/labels.mts`.
