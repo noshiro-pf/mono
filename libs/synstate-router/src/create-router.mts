@@ -79,8 +79,16 @@ export type RouterOptions<R extends AnyRoutes> = Readonly<{
    * to every URL before `match` shows it, the first one included, so that
    * nobody has to navigate from a subscriber. A chain stops after
    * {@link maxRedirects} redirects, with a `console.error`.
+   *
+   * `location` is the URL being resolved, with its path canonicalized: the one
+   * a `push`, `replace` or `setSearch` goes to, not the one the browser is at
+   * yet. A redirect from a URL that matches no page can carry its query and
+   * hash with it.
    */
-  redirect?: (match: RouteMatch<R>) => Href | undefined;
+  redirect?: (
+    match: RouteMatch<R>,
+    location: RouterLocation,
+  ) => Href | undefined;
 }>;
 
 export type NavigateOptions = Readonly<{
@@ -277,18 +285,24 @@ export const createRouter = <R extends AnyRoutes>(
 
     const url: Readonly<URL> = mut_url;
 
-    const found = matchRoutes(routes, { pathname, search: url.search });
+    const found = snapshotOf(
+      url,
+      pathname,
+      matchRoutes(routes, { pathname, search: url.search }),
+    );
 
-    const to = redirect?.(found);
+    // The location handed over is the one the snapshot keeps, the same object
+    // `router.location` passes on, read-only by its type.
+    const to = redirect?.(found.match, found.location);
 
     if (to === undefined) {
-      return snapshotOf(url, pathname, found);
+      return found;
     }
 
     const next = new URL(toUrl(to), url);
 
     if (next.href === url.href) {
-      return snapshotOf(url, pathname, found);
+      return found;
     }
 
     if (redirects >= maxRedirects) {
@@ -296,7 +310,7 @@ export const createRouter = <R extends AnyRoutes>(
         `synstate-router: stopped after ${maxRedirects} redirects in a row, at ${url.href} (next: ${next.href})`,
       );
 
-      return snapshotOf(url, pathname, found);
+      return found;
     }
 
     return resolve(next, redirects + 1);

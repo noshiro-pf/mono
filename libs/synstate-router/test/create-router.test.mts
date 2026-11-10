@@ -10,6 +10,7 @@ import {
   search,
   type Href,
   type RouteMatch,
+  type RouterLocation,
   type RouterOptions,
 } from '../src/index.mjs';
 
@@ -504,6 +505,76 @@ describe('redirect', () => {
       // cspell:disable-next-line
       vi.unstubAllGlobals();
     }
+  });
+
+  test('receives the location of a URL that matches no page', () => {
+    const mut_seen: RouterLocation[] = [];
+
+    const { router, browser } = setup(
+      'https://example.com/index.html?page=3&q=tea#list',
+      {
+        redirect: (m, location) => {
+          if (m.route !== undefined) {
+            return undefined;
+          }
+
+          mut_seen.push(location);
+
+          return routes.products.href({
+            search: {
+              page: asSafeInt(Number(location.search.get('page'))),
+            },
+            hash: location.hash.slice(1),
+          });
+        },
+      },
+    );
+
+    assert.deepStrictEqual(
+      mut_seen.map(({ pathname, search: query, hash, href }) => ({
+        pathname,
+        search: query.entries().toArray(),
+        hash,
+        href,
+      })),
+      [
+        {
+          pathname: '/index.html/',
+          search: [
+            ['page', '3'],
+            ['q', 'tea'],
+          ],
+          hash: '#list',
+          href: 'https://example.com/index.html/?page=3&q=tea#list',
+        },
+      ],
+    );
+
+    assert.strictEqual(current(router.match).route, 'products');
+
+    assert.strictEqual(
+      browser.url().href,
+      'https://example.com/products/?page=3#list',
+    );
+  });
+
+  test('receives the location being resolved inside a push, not the current one', () => {
+    const { router, browser } = setup('https://example.com/#old', {
+      // The hash is in the location only: a match carries none.
+      redirect: (m, location) =>
+        m.route === 'settings'
+          ? routes.products.href({ hash: location.hash.slice(1) })
+          : undefined,
+    });
+
+    router.push(routes.settings.href({ hash: 'billing' }));
+
+    assert.strictEqual(current(router.match).route, 'products');
+
+    assert.strictEqual(
+      browser.url().href,
+      'https://example.com/products/#billing',
+    );
   });
 
   test('a redirect to where the location already is stays', () => {
