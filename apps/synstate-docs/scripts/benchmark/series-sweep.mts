@@ -23,10 +23,9 @@ import { resultsDir, scenarioDir } from './paths.mjs';
  * times unmeasured and up to `MEASURE_ROUNDS` (5) times measured, and the
  * median recorded. Where the library's result is checked is the runner's:
  * {@link scenarioModule} checks it at each point and after every round. A round
- * over `TIMEOUT_MS` (5000) ends the point as `null`, and every later point of
- * that library is `null` too, unmeasured. That reads the points as listed
- * cheapest first, which the deep chain's are not wholly: a library timing out
- * at `K=1000, M=50` would show its cheaper `K=100, M=100` as a timeout too.
+ * over `TIMEOUT_MS` (5000), warmups included, ends the point as `null`, and so
+ * is every later point of that library that costs at least as much
+ * ({@link SeriesSweep.costlier}), unmeasured; a cheaper one is still measured.
  *
  * The runner calls this once from its top level and is otherwise data — the
  * points, the libraries and how each is run.
@@ -43,6 +42,7 @@ export const runSeriesSweep = async <
   pointLabel,
   entries,
   prepare,
+  costlier = everyLaterPoint,
   resultsFile,
 }: SeriesSweep<Entry, Point>): Promise<void> => {
   if (!isMeasuringChild) {
@@ -61,7 +61,13 @@ export const runSeriesSweep = async <
     scriptUrl,
     entries,
     async (entry) =>
-      measureEntry(entry.label, points, pointLabel, await prepare(entry)),
+      measureEntry(
+        entry.label,
+        points,
+        pointLabel,
+        costlier,
+        await prepare(entry),
+      ),
   );
 
   const series: readonly BenchmarkSeries[] = measured.map(
@@ -214,6 +220,16 @@ export type SeriesSweep<
    */
   prepare: (entry: Entry) => PreparePoint<Point> | Promise<PreparePoint<Point>>;
 
+  /**
+   * Whether point `a` costs every library at least as much as `b`, so that a
+   * library that timed out at `b` would time out at `a` too and `a` is written
+   * as a timeout without being run. Without it, every point after a timeout is
+   * taken to cost at least as much: the points are listed cheapest first. A
+   * runner whose points are not in that order says which dominate which; a
+   * point it calls cheaper is measured after a timeout, and its result stands.
+   */
+  costlier?: (a: Point, b: Point) => boolean;
+
   /** The Markdown file under `resultsDir`; the JSON is named after it. */
   resultsFile: string;
 }>;
@@ -232,29 +248,40 @@ const WARMUP_ROUNDS = 2;
 
 const MEASURE_ROUNDS = 5;
 
-/** Abort if a single measurement exceeds this threshold */
+/** Abort if a single round, warmup or measured, exceeds this threshold */
 const TIMEOUT_MS = 5000;
 
+/** The default {@link SeriesSweep.costlier}: points listed cheapest first. */
+const everyLaterPoint = (): boolean => true;
+
 /**
- * Runs the measured rounds for one point, bailing out as soon as a round
- * exceeds the timeout.
+ * Runs the warmup rounds and then the measured rounds for one point, and
+ * returns the measured times, or `undefined` as soon as any round exceeds the
+ * timeout. A warmup round over it ends the point too, the first, unoptimized
+ * one included: a point whose round takes minutes would otherwise run both
+ * warmups and a measured round before it was abandoned, and a point that slow
+ * once is not one the table can report a steady time for.
  */
-const measureRounds = (
-  round: () => number,
-): Readonly<{ times: readonly number[]; timedOut: boolean }> => {
+const runRounds = (round: () => number): readonly number[] | undefined => {
+  for (const _w of range(0, WARMUP_ROUNDS)) {
+    if (round() > TIMEOUT_MS) {
+      return undefined;
+    }
+  }
+
   const mut_times: number[] = [];
 
   for (const _r of range(0, MEASURE_ROUNDS)) {
     const elapsed = round();
 
-    mut_times.push(elapsed);
-
     if (elapsed > TIMEOUT_MS) {
-      return { times: mut_times, timedOut: true };
+      return undefined;
     }
+
+    mut_times.push(elapsed);
   }
 
-  return { times: mut_times, timedOut: false };
+  return mut_times;
 };
 
 /** Measures every point for one library. */
@@ -262,33 +289,36 @@ const measureEntry = <Point,>(
   label: string,
   points: readonly Point[],
   pointLabel: (point: Point) => string,
+  costlier: (a: Point, b: Point) => boolean,
   preparePoint: PreparePoint<Point>,
 ): readonly (number | null)[] => {
   const mut_values: (number | null)[] = [];
 
-  let mut_skippingRest = false;
+  const mut_timedOut: Point[] = [];
 
   for (const point of points) {
-    if (mut_skippingRest) {
+    const xLabel = pointLabel(point);
+
+    const isDominated = mut_timedOut.some((t) => costlier(point, t));
+
+    if (isDominated) {
       mut_values.push(null);
+
+      console.info(
+        `  ⏱ ${label} ${xLabel}: not run, costs at least as much as a point that timed out`,
+      );
 
       continue;
     }
 
-    const xLabel = pointLabel(point);
-
     const round = preparePoint(point, xLabel);
 
-    for (const _w of range(0, WARMUP_ROUNDS)) {
-      round();
-    }
+    const times = runRounds(round);
 
-    const { times, timedOut } = measureRounds(round);
-
-    if (timedOut) {
+    if (times === undefined) {
       mut_values.push(null);
 
-      mut_skippingRest = true;
+      mut_timedOut.push(point);
 
       console.info(
         `  ⏱ ${label} ${xLabel}: TIMEOUT (> ${TIMEOUT_MS.toString()} ms)`,

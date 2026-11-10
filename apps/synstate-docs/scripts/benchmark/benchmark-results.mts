@@ -12,7 +12,11 @@ import {
 export type BenchmarkSeries = Readonly<{
   label: string;
 
-  /** Median ms at each point, `null` where the measurement timed out. */
+  /**
+   * Median ms at each point, `null` where a round timed out, or where the point
+   * was not run because it costs at least as much as one that timed out
+   * (`SeriesSweep.costlier`).
+   */
   values: readonly (number | null)[];
 }>;
 
@@ -34,7 +38,8 @@ export type BenchmarkMeta = Readonly<{
   updates: number | null;
 
   /**
-   * A measurement taking longer than this is abandoned and recorded as `null`.
+   * A round, warmup or measured, taking longer than this abandons the point,
+   * recorded as `null`.
    * `null` where the scenario has no timeout.
    */
   timeoutMs: number | null;
