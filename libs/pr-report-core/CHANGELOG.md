@@ -1,5 +1,16 @@
 # pr-report-core
 
+## 0.6.0
+
+### Minor Changes
+
+- ee61504: `pr-report-core` exports `pushersMatter` and `pushersOfActivityPage`, which `unblock-prs` decides by, so that the Pull Requests Manager reads who pushed to a branch where that can change where a pull request stands with the code owners. `pr-merge-queue` keeps exporting `pushersOfPage` as before, and its `pushersMatter` now comes from `pr-report-core`.
+- c2ef470: `pr-report-core` exports what decides which queue layers stay ahead of the queue's own order (`stackedAhead`, `isStackable`, the `Queue-Layer:` trailer and the `queue/pr-` prefix), so that the Pull Requests Manager draws the queue in the order `unblock-prs` releases it. `pr-merge-queue` now decides its release order by them, and keeps exporting its own names for them (`LAYER_BRANCH_PREFIX`, `numberOfLayerBranch`, `layerTrailer`, `layerOfMessage`, `isStackable`) as before.
+
+### Patch Changes
+
+- d246a03: A check cancelled by a newer run of its workflow no longer fails a pull request while that run waits on its concurrency group with no jobs: `unblock-prs` reads the head's runs of a red's workflow and counts one not finished as running, and `statesFromCheckRuns`, `reportedContexts` and `anyRunInProgress` take the commit's workflow runs, which `pr-report` passes, so that a newer round with no check run yet holds the red back as pending.
+
 ## 0.5.0
 
 ### Minor Changes

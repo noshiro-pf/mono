@@ -1,5 +1,15 @@
 # catan-dice
 
+## 0.0.31
+
+### Patch Changes
+
+- Updated dependencies [3f822d1]
+- Updated dependencies [4d7929b]
+    - synstate-dom@0.10.0
+    - synstate@8.0.0
+    - ts-data-forge@14.13.0
+
 ## 0.0.30
 
 ### Patch Changes

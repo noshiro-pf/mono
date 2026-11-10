@@ -1,5 +1,15 @@
 ## [5.8.4](https://github.com/noshiro-pf/eslint-config-typed/compare/v5.8.3...v5.8.4) (2026-08-09)
 
+## 7.10.0
+
+### Minor Changes
+
+- 45089cc: Add `ts-restrictions/no-optional-phantom-property`, enabled as an error: an optional property keyed by a type-only symbol (`declare const tag: unique symbol`) is satisfied by every value that lacks it, so the claim it stands for is never checked. Make the marker required, or put the claim in a type the implementation must produce.
+
+### Patch Changes
+
+- 10b7612: `import-x/no-internal-modules` allows `react-dom/server`, the entry point React publishes for server rendering, as it already allows `react-dom/client`.
+
 ## 7.9.0
 
 ### Minor Changes
