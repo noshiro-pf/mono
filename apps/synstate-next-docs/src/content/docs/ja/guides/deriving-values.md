@@ -13,7 +13,7 @@ description: pipe と 3 種類のオペレーター、derive、merge と zip、�
 | `DropInitialValueOperator`    | ソースにかかわらず値を持たないことがある | `filter`・`skip`・`takeWhile`（`inclusive` 付きは `Keep`）・`skipWhile`・`skipUntil`・`pairwise`・`switchMap`・`mergeMap`・`withCurrentValueFrom` |
 | `ProvideInitialValueOperator` | 常に値を持つ                             | `scan`・`withInitialValue`                                                                                                                        |
 
-`pipe` は、オペレーターの型を結果の型に反映します。`.value` を持つ `InitializedObservable<A>` か、`hasValue` と `getSnapshot()` を持つ `Observable<A>` です。例は[概要](/mono/synstate-next/ja/getting-started/introduction/#pipe-で値を派生させる)にあります。
+`pipe` は、オペレーターの型を結果の型に反映します。`.value` を持つ `InitializedObservable<A>` か、値を `getSnapshot()` が `Optional` で返す `Observable<A>` です。例は[概要](/mono/synstate-next/ja/getting-started/introduction/#pipe-で値を派生させる)にあります。
 
 種類は、横に添えた印ではなく、オペレーターが受け取る型と返す型そのものに表れています。`ProvideInitialValueOperator` は `InitializedObservable` を返す型なので、値を持たないかもしれない Observable を返す自作のオペレーターは、キャストしない限りこの型になりません。
 

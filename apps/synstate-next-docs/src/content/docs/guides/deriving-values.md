@@ -13,7 +13,7 @@ description: pipe and the three kinds of operator, derive, merge and zip, stoppi
 | `DropInitialValueOperator`    | May hold none, whatever its source holds | `filter`, `skip`, `takeWhile` (`Keep` with `inclusive`), `skipWhile`, `skipUntil`, `pairwise`, `switchMap`, `mergeMap`, `withCurrentValueFrom` |
 | `ProvideInitialValueOperator` | Always holds one                         | `scan`, `withInitialValue`                                                                                                                     |
 
-`pipe` turns the operator's type into the type of the result: an `InitializedObservable<A>`, which has `.value`, or an `Observable<A>`, which has `hasValue` and `getSnapshot()`. See the [introduction](/mono/synstate-next/getting-started/introduction/#deriving-values-with-pipe) for an example.
+`pipe` turns the operator's type into the type of the result: an `InitializedObservable<A>`, which has `.value`, or an `Observable<A>`, whose value `getSnapshot()` gives as an `Optional`. See the [introduction](/mono/synstate-next/getting-started/introduction/#deriving-values-with-pipe) for an example.
 
 The kind is in the types the operator takes and returns, not in a label beside them: a `ProvideInitialValueOperator` returns an `InitializedObservable`, so an operator you write that may return an observable with no value does not type-check as one without a cast.
 

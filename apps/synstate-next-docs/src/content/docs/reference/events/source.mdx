@@ -15,11 +15,12 @@ Creates an event source, holding no value until its first `emit`.
 
 ```tsx
 import { source } from 'synstate-next';
+import { Optional } from 'ts-std-forge';
 
 const ticks = source<number>();
 
 // An event source holds no value until its first `emit`.
-assert.isFalse(ticks.hasValue);
+assert.isTrue(Optional.isNone(ticks.getSnapshot()));
 
 const mut_seen: number[] = [];
 

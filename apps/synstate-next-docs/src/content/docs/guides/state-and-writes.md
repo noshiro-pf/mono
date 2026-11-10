@@ -329,7 +329,7 @@ assert.deepStrictEqual(mut_keys, ['a', 'a']);
 // Both are `source()`, with the function taken off.
 const messages = source<string>();
 
-assert.isFalse(messages.hasValue);
+assert.isTrue(Optional.isNone(messages.getSnapshot()));
 
 messages.emit('hello');
 

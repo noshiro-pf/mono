@@ -13,6 +13,7 @@ Calls `factory` with an `AbortSignal` and emits the outcome of the promise it re
 
 ```tsx
 import { fromAbortablePromise } from 'synstate-next';
+import { Optional } from 'ts-std-forge';
 
 const mut_aborted: boolean[] = [];
 
@@ -38,7 +39,7 @@ await vi.advanceTimersByTimeAsync(1000);
 
 assert.deepStrictEqual(mut_aborted, [true]);
 
-assert.isFalse(request.hasValue);
+assert.isTrue(Optional.isNone(request.getSnapshot()));
 ```
 
 ## See also

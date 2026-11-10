@@ -910,7 +910,7 @@ describe(empty, () => {
   test('holds nothing and is done', () => {
     const e = empty<number>();
 
-    assert.isFalse(e.hasValue);
+    assert.isTrue(Optional.isNone(e.getSnapshot()));
 
     assert.isTrue(toNode(e).settled);
   });

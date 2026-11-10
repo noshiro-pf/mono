@@ -34,7 +34,7 @@ const [selected, setSelected] = createState<string | undefined>(undefined);
 
 const lastSelected = selected.pipe(defined());
 
-assert.isFalse(lastSelected.hasValue);
+assert.isTrue(Optional.isNone(lastSelected.getSnapshot()));
 
 setSelected('a');
 

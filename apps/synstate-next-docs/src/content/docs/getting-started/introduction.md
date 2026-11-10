@@ -52,7 +52,7 @@ assert.strictEqual(count.value, 2);
 
 ## Deriving values with `pipe`
 
-`pipe` applies one operator, and a chain of `pipe` calls applies several. Each operator says in its type whether the result keeps the value held at the start (`map`), may drop it (`filter`), or always provides one (`scan`, `withInitialValue`), so the type of the result tells you whether you can read `.value` or have to ask `hasValue`:
+`pipe` applies one operator, and a chain of `pipe` calls applies several. Each operator says in its type whether the result keeps the value held at the start (`map`), may drop it (`filter`), or always provides one (`scan`, `withInitialValue`), so the type of the result tells you whether you can read `.value` or have to read the `Optional` that `getSnapshot()` returns:
 
 ```tsx
 import {
@@ -79,7 +79,7 @@ expectType<typeof even, Observable<number>>('=');
 
 assert.strictEqual(doubled.value, 2);
 
-assert.isFalse(even.hasValue);
+assert.isTrue(Optional.isNone(even.getSnapshot()));
 
 setCount(4);
 

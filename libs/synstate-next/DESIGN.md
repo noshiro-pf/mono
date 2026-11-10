@@ -52,11 +52,14 @@ read reachable until the next read). src/ never calls it (a
 `no-restricted-syntax` entry in `eslint.config.mts`, defined in
 `configs/eslint/rules/get-snapshot-ban.mts`), so an update of the built-in
 operators allocates none; an operator written with `createDerived` that reads it
-allocates one when the value has changed. `hasValue`, and `value` on an
-`InitializedObservable`, read without one. `InitializedObservable` is a type for
-nodes that always hold one; `pipe` works out, from the operator's type, whether
-the result does. As in synstate, an operator is one of three function types, and
-the kind is in what it takes and returns:
+allocates one when the value has changed. `value` on an `InitializedObservable`
+reads without one. Whether an observable holds a value is
+`Optional.isSome(o.getSnapshot())`, as in synstate; `getSnapshot()` allocates
+nothing while it holds none. `InitializedObservable` is a type for nodes that
+always hold one; `pipe` works out, from the operator's type, whether the result
+does.
+As in synstate, an operator is one of three function types, and the kind is in
+what it takes and returns:
 `ProvideInitialValueOperator` (synstate's `WithInitialValueOperator`, renamed to
 a verb like the other two) returns an `InitializedObservable`,
 `KeepInitialValueOperator` takes and returns one, `DropInitialValueOperator`

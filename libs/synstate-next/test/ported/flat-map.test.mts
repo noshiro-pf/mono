@@ -119,7 +119,7 @@ describe('the value the source holds when the operator is created is projected',
       }),
     );
 
-    assert.isFalse(s.hasValue);
+    assert.isTrue(Optional.isNone(s.getSnapshot()));
 
     a.emit(1);
 

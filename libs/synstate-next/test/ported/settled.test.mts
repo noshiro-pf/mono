@@ -308,7 +308,7 @@ describe(empty, () => {
   test('holds no value, is settled, and passes nothing to a subscriber', () => {
     const nothing = empty<number>();
 
-    assert.isFalse(nothing.hasValue);
+    assert.isTrue(Optional.isNone(nothing.getSnapshot()));
 
     assert.isTrue(isSettled(nothing));
 

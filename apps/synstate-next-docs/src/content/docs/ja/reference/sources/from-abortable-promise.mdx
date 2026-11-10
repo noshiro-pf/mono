@@ -11,6 +11,7 @@ description: '`factory` を `AbortSignal` 付きで呼び、それが返す Prom
 
 ```tsx
 import { fromAbortablePromise } from 'synstate-next';
+import { Optional } from 'ts-std-forge';
 
 const mut_aborted: boolean[] = [];
 
@@ -36,7 +37,7 @@ await vi.advanceTimersByTimeAsync(1000);
 
 assert.deepStrictEqual(mut_aborted, [true]);
 
-assert.isFalse(request.hasValue);
+assert.isTrue(Optional.isNone(request.getSnapshot()));
 ```
 
 ## 関連項目

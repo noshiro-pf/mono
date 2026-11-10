@@ -1,4 +1,5 @@
 import { source } from 'synstate-next';
+import { Optional } from 'ts-std-forge';
 
 // embed-sample-code-ignore-below
 if (import.meta.vitest !== undefined) {
@@ -7,7 +8,7 @@ if (import.meta.vitest !== undefined) {
     const ticks = source<number>();
 
     // An event source holds no value until its first `emit`.
-    assert.isFalse(ticks.hasValue);
+    assert.isTrue(Optional.isNone(ticks.getSnapshot()));
 
     const mut_seen: number[] = [];
 

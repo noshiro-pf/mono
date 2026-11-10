@@ -41,7 +41,7 @@ describe(pairwise, () => {
 
     const seen = collect(pairs);
 
-    assert.isFalse(pairs.hasValue);
+    assert.isTrue(Optional.isNone(pairs.getSnapshot()));
 
     a.set(2);
 
@@ -119,7 +119,7 @@ describe(skip, () => {
 
     const seen = collect(skipped);
 
-    assert.isFalse(skipped.hasValue);
+    assert.isTrue(Optional.isNone(skipped.getSnapshot()));
 
     a.set(1);
 
@@ -159,7 +159,7 @@ describe(takeWhile, () => {
 
     a.set(1);
 
-    assert.isFalse(taken.hasValue);
+    assert.isTrue(Optional.isNone(taken.getSnapshot()));
   });
 
   test('is not settled at the last value it passes: only the next value ends it', () => {
@@ -249,7 +249,7 @@ describe(takeWhile, () => {
 
       const seen = collect(taken);
 
-      assert.isFalse(taken.hasValue);
+      assert.isTrue(Optional.isNone(taken.getSnapshot()));
 
       e.emit(4);
 
@@ -362,7 +362,7 @@ describe(skipUntil, () => {
 
     a.set(1);
 
-    assert.isFalse(skipped.hasValue);
+    assert.isTrue(Optional.isNone(skipped.getSnapshot()));
 
     go.emit(undefined);
 
@@ -448,11 +448,11 @@ describe(withCurrentValueFrom, () => {
 
     const paired = a.pipe(withCurrentValueFrom(other));
 
-    assert.isFalse(paired.hasValue);
+    assert.isTrue(Optional.isNone(paired.getSnapshot()));
 
     other.emit(5);
 
-    assert.isFalse(paired.hasValue);
+    assert.isTrue(Optional.isNone(paired.getSnapshot()));
 
     a.set(2);
 
