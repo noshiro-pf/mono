@@ -13,6 +13,8 @@ import type {
 } from 'ts-type-forge';
 import ts from 'typescript';
 import * as YAML from 'yaml';
+// eslint-disable-next-line import-x/no-relative-packages -- tools/ is not a package; this is how apps reach its shared scripts
+import { skipExpressionWrappers } from '../../../tools/scripts/lib/ts-expression-wrappers.mjs';
 
 /**
  * The JSDoc of the exported declaration `name`, as Markdown for an MDX page:
@@ -203,7 +205,7 @@ export const extractOperatorKinds = (
       return [];
     }
 
-    const initializer = withoutWrappers(node.initializer);
+    const initializer = skipExpressionWrappers(node.initializer);
 
     return ts.isArrowFunction(initializer) ||
       ts.isFunctionExpression(initializer)
@@ -488,21 +490,6 @@ const exportedDeclarations = (
     };
   });
 };
-
-/**
- * An expression without the parentheses, `as`, `satisfies`, `<T>` and `!`
- * around it.
- */
-const withoutWrappers = (
-  expression: DeepReadonly<ts.Expression>,
-): DeepReadonly<ts.Expression> =>
-  ts.isParenthesizedExpression(expression) ||
-  ts.isAsExpression(expression) ||
-  ts.isSatisfiesExpression(expression) ||
-  ts.isTypeAssertionExpression(expression) ||
-  ts.isNonNullExpression(expression)
-    ? withoutWrappers(expression.expression)
-    : expression;
 
 /** The kinds of operator a return type names: itself, or each union member. */
 const operatorKindsOf = (

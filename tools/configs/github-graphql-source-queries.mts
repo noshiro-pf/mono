@@ -2,6 +2,10 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { Arr } from 'ts-data-forge';
 import * as ts from 'typescript';
+import {
+  isExpressionWrapper,
+  skipExpressionWrappers,
+} from '../scripts/lib/ts-expression-wrappers.mjs';
 
 /**
  * The GraphQL written in the files under `srcDir` that none of `sent` contains,
@@ -87,27 +91,9 @@ const containsInOrder = (text: string, pieces: readonly string[]): boolean => {
   return at !== -1 && containsInOrder(text.slice(at + first.length), rest);
 };
 
-const isWrapper = (
-  node: ts.Node,
-): node is
-  | ts.AsExpression
-  | ts.NonNullExpression
-  | ts.ParenthesizedExpression
-  | ts.SatisfiesExpression
-  | ts.TypeAssertion =>
-  ts.isParenthesizedExpression(node) ||
-  ts.isAsExpression(node) ||
-  ts.isSatisfiesExpression(node) ||
-  ts.isNonNullExpression(node) ||
-  ts.isTypeAssertionExpression(node);
-
-/** `node` without the type assertions and parentheses around it. */
-const innermost = (node: ts.Node): ts.Node =>
-  isWrapper(node) ? innermost(node.expression) : node;
-
 /** `node` with what it is the operand of a type assertion or parentheses in. */
 const outermost = (node: ts.Node): ts.Node =>
-  isWrapper(node.parent) ? outermost(node.parent) : node;
+  isExpressionWrapper(node.parent) ? outermost(node.parent) : node;
 
 const isLiteralPiece = (node: ts.Node): node is LiteralPiece =>
   ts.isStringLiteral(node) ||
@@ -160,7 +146,7 @@ const constructOf = (piece: ts.Node): ts.Node => {
  * literal goes.
  */
 const fragmentsOf = (node: ts.Node): readonly (string | undefined)[] => {
-  const inner = innermost(node);
+  const inner = skipExpressionWrappers(node);
 
   if (ts.isStringLiteral(inner) || ts.isNoSubstitutionTemplateLiteral(inner)) {
     return [inner.text];
