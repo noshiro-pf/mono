@@ -118,6 +118,44 @@ assert.deepStrictEqual(router.match.getSnapshot().value, {
 - `match` passes nothing on when the route, params and search stay the same, and keeps the references of what did not change. `at(node)` and `isActive(node)` derive from it.
 - Scrolling: to the fragment when the destination has one, to the top when the path changed, and not at all when only the search changed. Back and forward are left to the browser. A fragment whose element is not drawn yet, as on a `React.lazy` page behind `Suspense`, is waited for: it is scrolled to once the page draws it, unless the location changes first, the user scrolls the page themselves, or `maxFragmentWaitMs` (ten seconds) pass.
 
+## An optional segment
+
+There is no optional segment, such as React Router's `:lang?` or TanStack Router's `{-$lang}`. Write the page twice, with and without the segment, and let one function tell the two apart: matching stays a plain ranking of static before dynamic, and each URL still has one node.
+
+```ts
+// `/about/` and `/ja/about/`: one page with and without a locale prefix,
+// written as two nodes.
+const routes = defineRoutes({
+    about: {},
+    localized: {
+        params: { lang: param.literal('ja', 'fr') },
+        page: false,
+        children: { about: {} },
+    },
+});
+
+type Lang = 'en' | 'ja' | 'fr';
+
+// The one place that tells the two apart; a `Routes` case for each node
+// draws the same page with it.
+const langOf = (m: RouteMatch<typeof routes>): Lang =>
+    m.route === 'localized.about' ? m.params.lang : 'en';
+
+const aboutHref = (lang: Lang): Href =>
+    lang === 'en' ? routes.about.href() : routes.localized.about.href({ lang });
+
+assert.strictEqual(aboutHref('en'), '/about/');
+
+assert.strictEqual(aboutHref('ja'), '/ja/about/');
+
+assert.strictEqual(
+    langOf(matchRoutes(routes, { pathname: '/fr/about/' })),
+    'fr',
+);
+
+assert.strictEqual(langOf(matchRoutes(routes, { pathname: '/about/' })), 'en');
+```
+
 ## Installation
 
 ```sh
