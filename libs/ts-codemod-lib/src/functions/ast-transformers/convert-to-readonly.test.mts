@@ -3736,6 +3736,59 @@ describe(convertToReadonlyTransformer, () => {
           type T = A /* x */;
         `,
       },
+      // A comment before the `,` or `>` after a type argument is trivia of that
+      // token, so text built from the argument alone leaves it out.
+      {
+        name: 'A comment before the `>` of Set',
+        source: dedent`
+          type T = Set<E /* x */>;
+        `,
+        expected: dedent`
+          type T = ReadonlySet<E /* x */>;
+        `,
+      },
+      {
+        name: 'Comments before the `,` and the `>` of Map',
+        source: dedent`
+          type T = Map<K /* x */, V /* y */>;
+        `,
+        expected: dedent`
+          type T = ReadonlyMap<K /* x */, V /* y */>;
+        `,
+      },
+      {
+        name: 'Comments before the `,` and the `>` of Record',
+        source: dedent`
+          type T = Record<K /* x */, V /* y */>;
+        `,
+        expected: dedent`
+          type T = Readonly<Record<K /* x */, V /* y */>>;
+        `,
+      },
+      {
+        name: 'Comments before the `,` and the `>` of a Record inside Readonly',
+        source: dedent`
+          type T = Readonly<Record<K /* x */, V /* y */>>;
+        `,
+        expected: dedent`
+          type T = Readonly<Record<K /* x */, V /* y */>>;
+        `,
+      },
+      {
+        name: 'A line comment before the `>` of Map keeps its line break',
+        source: dedent`
+          type T = Map<
+            K,
+            V // about V
+          >;
+        `,
+        expected: dedent`
+          type T = ReadonlyMap<
+            K,
+            V // about V
+          >;
+        `,
+      },
       {
         name: 'A comment before the `>` of Array',
         source: dedent`

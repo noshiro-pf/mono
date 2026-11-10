@@ -755,6 +755,39 @@ const commentsBeforeClosingToken = (
   };
 };
 
+/**
+ * The `index`-th type argument of `node` as written, with the comments after
+ * it: those before the `,` that follows it, or before the `>` for the last.
+ * They are trivia of that token, so `getFullText()` leaves them out, and a
+ * replacement of `node` built from its arguments would drop them.
+ */
+const typeArgumentText = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  node: tsm.TypeReferenceNode,
+  index: number,
+): string => {
+  const typeArguments = node.getTypeArguments();
+
+  const argument = typeArguments[index];
+
+  if (argument === undefined) {
+    return '';
+  }
+
+  const next = typeArguments[index + 1];
+
+  const comments = commentsBetween(
+    node.getSourceFile(),
+    argument.getEnd(),
+    // The `,` is the token right before the next argument's leading trivia.
+    next === undefined ? node.getEnd() - 1 : next.getFullStart() - 1,
+  );
+
+  return comments === ''
+    ? argument.getFullText()
+    : (`${argument.getFullText()} ${comments}` as const);
+};
+
 /** `DeepReadonly<T>` |-> `T`, anything else |-> `undefined` */
 const getDeepReadonlyTypeArg = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
@@ -1002,10 +1035,7 @@ const transformTypeReferenceNode = (
       options,
     );
 
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const T = node.getTypeArguments()[0]!;
-
-    options.replaceNode(node, `ReadonlySet<${T.getFullText()}>`);
+    options.replaceNode(node, `ReadonlySet<${typeArgumentText(node, 0)}>`);
 
     return;
   }
@@ -1029,12 +1059,9 @@ const transformTypeReferenceNode = (
       transformNode(t, nextReadonlyContextValue, options);
     }
 
-    const [K, V] = node.getTypeArguments();
-
     options.replaceNode(
       node,
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      `ReadonlyMap<${K!.getFullText()}, ${V!.getFullText()}>`,
+      `ReadonlyMap<${typeArgumentText(node, 0)}, ${typeArgumentText(node, 1)}>`,
     );
 
     return;
@@ -1069,12 +1096,13 @@ const transformTypeReferenceNode = (
       readonlyContext.type === 'none' &&
       readonlyContext.indexedAccessDepth === 0
     ) {
-      const [K, V] = node.getTypeArguments();
-
       options.replaceNode(
         node,
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        readonlyRecordText(K!.getFullText(), V!.getFullText(), options),
+        readonlyRecordText(
+          typeArgumentText(node, 0),
+          typeArgumentText(node, 1),
+          options,
+        ),
       );
     }
 
@@ -1100,11 +1128,11 @@ const transformTypeReferenceNode = (
       transformNode(t, nextReadonlyContextValue, options);
     }
 
-    const [K, V] = node.getTypeArguments();
+    const K = typeArgumentText(node, 0);
 
-    const bareRecordText =
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      `Record<${K!.getFullText()}, ${V!.getFullText()}>` as const;
+    const V = typeArgumentText(node, 1);
+
+    const bareRecordText = `Record<${K}, ${V}>` as const;
 
     // Readonly<ReadonlyRecord<K, V>> -> Readonly<Record<K, V>>
     //   (the surrounding `Readonly` handler then unifies it to the configured
@@ -1275,8 +1303,8 @@ const transformTypeReferenceNode = (
         options.replaceNode(
           node,
           `${commentsInFrontOfT}${readonlyRecordText(
-            recordTypeArguments[0].getFullText(),
-            recordTypeArguments[1].getFullText(),
+            typeArgumentText(T, 0),
+            typeArgumentText(T, 1),
             options,
           )}`,
         );
