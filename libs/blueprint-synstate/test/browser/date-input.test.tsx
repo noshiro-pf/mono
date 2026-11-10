@@ -1,10 +1,13 @@
 import { DateInput } from 'blueprint-synstate';
+import { render } from 'synstate-dom';
+import { page, userEvent } from 'vitest/browser';
 import {
   all,
   controlled,
   dayButton,
   fixNow,
   mountInto,
+  nextFrame,
   one,
   press,
   settle,
@@ -69,17 +72,91 @@ describe(DateInput, () => {
 
     assert.strictEqual(one(dialog, '.rdp-day_selected').textContent, '9');
 
-    // Below the input, by half the arrow.
+    // Below the input, by half the arrow, from its left edge, once Floating UI
+    // has placed it.
     const transition = one(container, '.bp6-popover-transition-container');
 
     assert.strictEqual(transition.style.position, 'fixed');
 
-    assert.strictEqual(
-      transition.style.top,
-      `${input.getBoundingClientRect().bottom + 15}px`,
+    await nextFrame();
+
+    const placed = transition.getBoundingClientRect();
+
+    assert.closeTo(placed.top, input.getBoundingClientRect().bottom + 15, 1);
+
+    assert.closeTo(
+      placed.left,
+      one(container, '.bp6-input-group').getBoundingClientRect().left,
+      1,
     );
 
     unmount();
+  });
+
+  describe('where there is no room below', () => {
+    test('opens above the field where there is room there', async () => {
+      fixNow();
+
+      await openAt(
+        { top: window.innerHeight - 40 },
+        ({ field, popover, placed }) => {
+          assert.isTrue(
+            popover.classList.contains('bp6-popover-placement-top'),
+          );
+
+          assert.closeTo(placed.bottom, field.top - 15, 1);
+        },
+      );
+    });
+
+    test('stays below where there is room on neither side', async () => {
+      fixNow();
+
+      const { innerWidth, innerHeight } = window;
+
+      // Short enough that the calendar fits neither above nor below the field,
+      // which has more room above, where it would overflow less.
+      await page.viewport(innerWidth, 400);
+
+      try {
+        await openAt({ top: 230 }, ({ popover, placed }) => {
+          // Taller than the room above the field, less the offset.
+          assert.isAbove(placed.height, 230 - 15);
+
+          assert.isTrue(
+            popover.classList.contains('bp6-popover-placement-bottom'),
+          );
+        });
+      } finally {
+        await page.viewport(innerWidth, innerHeight);
+      }
+    });
+  });
+
+  test('moves left to stay in the viewport, the arrow still at the field', async () => {
+    fixNow();
+
+    // Not flush with the edge, where the popover's right edge would be the
+    // field's either way.
+    await openAt({ top: 0, right: 40 }, ({ field, placed, arrow }) => {
+      assert.isAbove(placed.width, field.width + 40);
+
+      assert.closeTo(placed.right, document.documentElement.clientWidth, 1);
+
+      assert.closeTo(
+        arrow.left + arrow.width / 2,
+        field.left + field.width / 2,
+        1,
+      );
+    });
+  });
+
+  test('is dark within a dark element', async () => {
+    fixNow();
+
+    await openAt({ top: 0, dark: true }, ({ popover }) => {
+      assert.isTrue(popover.classList.contains('bp6-dark'));
+    });
   });
 
   test('takes typed text that reads as a date, and shows the value again on blur', async () => {
@@ -403,6 +480,96 @@ describe(DateInput, () => {
     unmount();
   });
 
+  test('works inside a modal dialog, and its Escape leaves the dialog open', async () => {
+    fixNow();
+
+    const { value$, onChange, changes } = controlled('2026-10-09');
+
+    const dialog = document.createElement('dialog');
+
+    document.body.append(dialog);
+
+    const unmount = render(
+      () => <DateInput {...RANGE} value={value$} onChange={onChange} />,
+      dialog,
+    );
+
+    try {
+      dialog.showModal();
+
+      const input = one<HTMLInputElement>(dialog, 'input.bp6-input');
+
+      input.focus();
+
+      await settle();
+
+      const popover = one(dialog, '.bp6-date-input-popover');
+
+      // Drawn in the dialog, in the top layer with it: a press reaches it.
+      await userEvent.click(dayButton(popover, 12));
+
+      assert.deepStrictEqual(changes, ['2026-10-12']);
+
+      input.click();
+
+      await settle();
+
+      dayButton(one(dialog, '.bp6-date-input-popover'), 12).focus();
+
+      await userEvent.keyboard('{Escape}');
+
+      await settle();
+
+      assert.strictEqual(all(dialog, '.bp6-date-input-popover').length, 0);
+
+      // Given back to the field, which does not open the calendar again.
+      assert.strictEqual(document.activeElement, input);
+
+      await settle();
+
+      assert.strictEqual(all(dialog, '.bp6-date-input-popover').length, 0);
+
+      assert.isTrue(dialog.open);
+    } finally {
+      unmount();
+
+      dialog.remove();
+    }
+  });
+
+  test('Escape elsewhere closes the calendar, leaving the focus where it is', async () => {
+    fixNow();
+
+    const { value$, onChange } = controlled('');
+
+    const { container, unmount } = mountInto(() => (
+      <DateInput {...RANGE} value={value$} onChange={onChange} />
+    ));
+
+    const input = one<HTMLInputElement>(container, 'input');
+
+    input.focus();
+
+    await settle();
+
+    // As a press on the calendar's text leaves it.
+    input.blur();
+
+    assert.strictEqual(document.activeElement, document.body);
+
+    assert.strictEqual(all(container, '.bp6-date-input-popover').length, 1);
+
+    assert.isFalse(press(document.body, 'Escape'));
+
+    await settle();
+
+    assert.strictEqual(all(container, '.bp6-date-input-popover').length, 0);
+
+    assert.strictEqual(document.activeElement, document.body);
+
+    unmount();
+  });
+
   test('a press outside closes it, and one inside does not', async () => {
     fixNow();
 
@@ -417,6 +584,13 @@ describe(DateInput, () => {
     await settle();
 
     one(container, '.rdp-table').dispatchEvent(
+      new MouseEvent('mousedown', { bubbles: true }),
+    );
+
+    assert.strictEqual(all(container, '.bp6-overlay').length, 1);
+
+    // A press on the field is the field's.
+    one(container, 'input').dispatchEvent(
       new MouseEvent('mousedown', { bubbles: true }),
     );
 
@@ -611,3 +785,63 @@ describe(DateInput, () => {
     unmount();
   });
 });
+
+/**
+ * Mounts a `DateInput` whose field is at `at` in the viewport, opens it, and
+ * once Floating UI has placed the calendar, runs `check` on where everything
+ * went; unmounts it whatever `check` does, so that no calendar is left open
+ * over the overlays of the tests after.
+ */
+const openAt = async (
+  at: Readonly<{ top: number; right?: number; dark?: boolean }>,
+  check: (
+    placed: Readonly<{
+      field: DOMRectReadOnly;
+      popover: HTMLElement;
+      placed: DOMRectReadOnly;
+      arrow: DOMRectReadOnly;
+    }>,
+  ) => void,
+): Promise<void> => {
+  const { value$, onChange } = controlled('2026-10-09');
+
+  const { container, unmount } = mountInto(() => (
+    <DateInput {...RANGE} value={value$} onChange={onChange} />
+  ));
+
+  try {
+    container.style.setProperty('position', 'fixed');
+
+    container.style.setProperty('top', `${at.top.toString()}px`);
+
+    if (at.right === undefined) {
+      container.style.setProperty('left', '0px');
+    } else {
+      container.style.setProperty('right', `${at.right.toString()}px`);
+    }
+
+    if (at.dark === true) {
+      container.classList.add('bp6-dark');
+    }
+
+    const input = one<HTMLInputElement>(container, 'input');
+
+    input.focus();
+
+    await settle();
+
+    await nextFrame();
+
+    check({
+      field: one(container, '.bp6-input-group').getBoundingClientRect(),
+      popover: one(container, '.bp6-date-input-popover'),
+      placed: one(
+        container,
+        '.bp6-popover-transition-container',
+      ).getBoundingClientRect(),
+      arrow: one(container, '.bp6-popover-arrow').getBoundingClientRect(),
+    });
+  } finally {
+    unmount();
+  }
+};
