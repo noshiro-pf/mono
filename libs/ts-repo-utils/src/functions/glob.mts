@@ -3,36 +3,32 @@ import fastGlob from 'fast-glob';
 import { castDeepMutable, castMutable, Result } from 'ts-data-forge';
 import type { DeepReadonly, StrictPick } from 'ts-type-forge';
 
-type EntryInternal = DeepReadonly<fsWalk.Entry>;
+/** An entry `glob` gives with `objectMode` or `stats`. */
+export type GlobEntry = DeepReadonly<fsWalk.Entry>;
 
-type PatternInternal = string;
+/** The options of `glob`: fast-glob's. */
+export type GlobOptions = DeepReadonly<fastGlob.Options>;
 
-type OptionsInternal = DeepReadonly<fastGlob.Options>;
-
-type EntryObjectModePredicate = Readonly<{
-  [TKey in keyof StrictPick<OptionsInternal, 'objectMode'>]-?: true;
-}>;
-
-type EntryStatsPredicate = Readonly<{
-  [TKey in keyof StrictPick<OptionsInternal, 'stats'>]-?: true;
-}>;
-
-type EntryObjectPredicate = EntryObjectModePredicate | EntryStatsPredicate;
+/** The options that make `glob` give entries instead of paths. */
+export type GlobEntryOptions = Readonly<
+  | { [TKey in keyof StrictPick<GlobOptions, 'objectMode'>]-?: true }
+  | { [TKey in keyof StrictPick<GlobOptions, 'stats'>]-?: true }
+>;
 
 export async function glob(
-  source: PatternInternal | readonly PatternInternal[],
-  options: OptionsInternal & EntryObjectPredicate,
-): Promise<Result<readonly EntryInternal[], unknown>>;
+  source: string | readonly string[],
+  options: GlobOptions & GlobEntryOptions,
+): Promise<Result<readonly GlobEntry[], unknown>>;
 
 export async function glob(
-  source: PatternInternal | readonly PatternInternal[],
-  options?: OptionsInternal,
+  source: string | readonly string[],
+  options?: GlobOptions,
 ): Promise<Result<readonly string[], unknown>>;
 
 export async function glob(
-  source: PatternInternal | readonly PatternInternal[],
-  options?: OptionsInternal,
-): Promise<Result<readonly string[] | readonly EntryInternal[], unknown>> {
+  source: string | readonly string[],
+  options?: GlobOptions,
+): Promise<Result<readonly string[] | readonly GlobEntry[], unknown>> {
   try {
     const result = await fastGlob(
       castMutable(source),

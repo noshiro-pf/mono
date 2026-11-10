@@ -1,8 +1,9 @@
 import { hasKey, isRecord, isString, Result } from 'ts-data-forge';
 
-type ResultProducer<TConfig, TOk, TErr> = (
-  config: TConfig,
-) => Promise<Result<TOk, TErr>>;
+/** What `run` of `createResultAssert` is: one check, as a `Result`. */
+export type ResultProducer<Config, Ok, Err> = (
+  config: Config,
+) => Promise<Result<Ok, Err>>;
 
 export type CreateResultAssertOptions<Config, Ok, Err> = Readonly<{
   run: ResultProducer<Config, Ok, Err>;
