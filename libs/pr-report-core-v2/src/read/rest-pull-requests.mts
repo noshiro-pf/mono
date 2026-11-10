@@ -62,6 +62,143 @@ export const readPullRequests = async (
   return allRead(read);
 };
 
+/**
+ * Who pushed to `branch` up to `headSha`, from the repository's activity, which
+ * only REST serves; `unknown` where it is unread or the chain has a gap.
+ */
+export const readPushers = async (
+  context: ReadContext,
+  branch: string,
+  headSha: string,
+): Promise<readonly string[] | 'unknown'> => {
+  const activity = await restAllPages(
+    context,
+    `the pushes to ${branch}`,
+    `/activity?${activityQueryOf(branch)}`,
+    t.array(ActivitySchema),
+  );
+
+  return Result.isErr(activity)
+    ? 'unknown'
+    : pushersOf(
+        activity.value.map(({ activity_type, before, after, actor }) => ({
+          activityType: activity_type,
+          before,
+          after,
+          actor: actor?.login,
+        })),
+        headSha,
+      );
+};
+
+/** How far a head is from its base's tip, over REST (GraphQL has no such). */
+export const readComparison = async (
+  context: ReadContext,
+  what: string,
+  base: string,
+  head: string,
+): Promise<Read<Comparison>> =>
+  Result.map(
+    await restGet(
+      context,
+      what,
+      `/compare/${pathSegment(base)}...${head}`,
+      t.record({ ahead_by: t.number(), behind_by: t.number() }),
+    ),
+    ({ ahead_by, behind_by }) => ({ aheadBy: ahead_by, behindBy: behind_by }),
+  );
+
+/**
+ * One issue a body closes, by number: its state `unknown` where it cannot be
+ * read, which holds what waits on it rather than failing the pull request.
+ */
+export const readClosingIssue = async (
+  context: ReadContext,
+  number: number,
+): Promise<ClosingIssue> => {
+  const read = await restGet(
+    context,
+    `issue #${number}`,
+    `/issues/${number}`,
+    t.record({
+      title: t.string(),
+      html_url: t.string(),
+      state: t.string(),
+    }),
+  );
+
+  return Result.isErr(read)
+    ? { number, title: '', url: '', state: 'unknown' }
+    : {
+        number,
+        title: read.value.title,
+        url: read.value.html_url,
+        state: read.value.state === 'open' ? 'open' : 'closed',
+      };
+};
+
+/** When a head commit was made, read by its own sha. */
+export const readHeadCommittedAt = async (
+  context: ReadContext,
+  sha: string,
+): Promise<Read<string>> =>
+  Result.map(
+    await restGet(
+      context,
+      `commit ${sha.slice(0, 7)}`,
+      `/commits/${sha}`,
+      t.record({
+        commit: t.record({ committer: t.record({ date: t.string() }) }),
+      }),
+    ),
+    ({ commit }) => commit.committer.date,
+  );
+
+/**
+ * Every file a pull request changes, renames with their old path; `complete`
+ * once past REST's 3000 or short of `changedFiles` is `false`.
+ */
+export const readChangedFiles = async (
+  context: ReadContext,
+  number: number,
+  changedFiles: number | undefined,
+): Promise<
+  Read<Readonly<{ files: readonly ChangedFile[]; complete: boolean }>>
+> =>
+  Result.map(
+    await restAllPages(
+      context,
+      `the files of #${number}`,
+      `/pulls/${number}/files`,
+      t.array(FileSchema),
+    ),
+    (files) => ({
+      files: files.map(({ filename, status, previous_filename }) => ({
+        path: filename,
+        change: changeOf(status),
+        previousPath: previous_filename,
+      })),
+      complete:
+        files.length < FILES_LISTED &&
+        (changedFiles === undefined || files.length >= changedFiles),
+    }),
+  );
+
+/** Every label of a pull request or issue, over REST. */
+export const readLabels = async (
+  context: ReadContext,
+  number: number,
+): Promise<Read<readonly Label[]>> =>
+  Result.map(
+    await restAllPages(
+      context,
+      `the labels of #${number}`,
+      `/issues/${number}/labels`,
+      t.array(LabelSchema),
+    ),
+    labelsOf,
+  );
+
 /** Labels as GitHub holds them, `description` empty when none. */
 export const labelsOf = (
   labels: readonly t.TypeOf<typeof LabelSchema>[],
@@ -131,7 +268,8 @@ export const latestReviewsOf = (
   return Array.from(mut_latest.values()).filter(({ login }) => canWrite(login));
 };
 
-const LabelSchema = t.record({
+/** A label as REST and GraphQL send it. */
+export const LabelSchema = t.record({
   name: t.string(),
   color: t.string(),
   description: t.union([t.string(), t.nullType]),
@@ -257,25 +395,15 @@ const readReview = async (
   pr: PullJson,
   permissions: (login: string) => Promise<Read<boolean>>,
 ): Promise<Read<ReviewFacts>> => {
-  const [reviews, files, activity] = await Promise.all([
+  const [reviews, files, pushers] = await Promise.all([
     restAllPages(
       context,
       `the reviews of #${pr.number}`,
       `/pulls/${pr.number}/reviews`,
       t.array(ReviewSchema),
     ),
-    restAllPages(
-      context,
-      `the files of #${pr.number}`,
-      `/pulls/${pr.number}/files`,
-      t.array(FileSchema),
-    ),
-    restAllPages(
-      context,
-      `the pushes to ${pr.head.ref}`,
-      `/activity?${activityQueryOf(pr.head.ref)}`,
-      t.array(ActivitySchema),
-    ),
+    readChangedFiles(context, pr.number, pr.changed_files),
+    readPushers(context, pr.head.ref, pr.head.sha),
   ]);
 
   if (Result.isErr(reviews)) {
@@ -314,27 +442,10 @@ const readReview = async (
 
   return Result.ok({
     latestReviews: latestReviewsOf(byLogin, (login) => writers.has(login)),
-    files: files.value.map(({ filename, status, previous_filename }) => ({
-      path: filename,
-      change: changeOf(status),
-      previousPath: previous_filename,
-    })),
-    filesComplete:
-      files.value.length < FILES_LISTED &&
-      (pr.changed_files === undefined ||
-        files.value.length >= pr.changed_files),
+    files: files.value.files,
+    filesComplete: files.value.complete,
     unresolvedConversations: 'unknown',
-    pushers: Result.isErr(activity)
-      ? 'unknown'
-      : pushersOf(
-          activity.value.map(({ activity_type, before, after, actor }) => ({
-            activityType: activity_type,
-            before,
-            after,
-            actor: actor?.login,
-          })),
-          pr.head.sha,
-        ),
+    pushers,
   });
 };
 
@@ -349,62 +460,11 @@ const readClosingIssues = async (
   );
 
   const issues = await Promise.all(
-    numbers.map(async (number): Promise<ClosingIssue> => {
-      const read = await restGet(
-        context,
-        `issue #${number}`,
-        `/issues/${number}`,
-        t.record({
-          title: t.string(),
-          html_url: t.string(),
-          state: t.string(),
-          pull_request: t.optional(t.unknown()),
-        }),
-      );
-
-      return Result.isErr(read)
-        ? { number, title: '', url: '', state: 'unknown' }
-        : {
-            number,
-            title: read.value.title,
-            url: read.value.html_url,
-            state: read.value.state === 'open' ? 'open' : 'closed',
-          };
-    }),
+    numbers.map(async (number) => readClosingIssue(context, number)),
   );
 
   return Result.ok(issues);
 };
-
-const readComparison = async (
-  context: ReadContext,
-  pr: PullJson,
-): Promise<Read<Comparison>> =>
-  Result.map(
-    await restGet(
-      context,
-      `the comparison of #${pr.number}`,
-      `/compare/${pathSegment(pr.base.ref)}...${pr.head.sha}`,
-      t.record({ ahead_by: t.number(), behind_by: t.number() }),
-    ),
-    ({ ahead_by, behind_by }) => ({ aheadBy: ahead_by, behindBy: behind_by }),
-  );
-
-const readHeadCommittedAt = async (
-  context: ReadContext,
-  sha: string,
-): Promise<Read<string>> =>
-  Result.map(
-    await restGet(
-      context,
-      `commit ${sha.slice(0, 7)}`,
-      `/commits/${sha}`,
-      t.record({
-        commit: t.record({ committer: t.record({ date: t.string() }) }),
-      }),
-    ),
-    ({ commit }) => commit.committer.date,
-  );
 
 const readPullRequest = async (
   context: ReadContext,
@@ -437,7 +497,12 @@ const readPullRequest = async (
       readReview(context, pr, options.permissions),
       readOwnComments(context, number, options.viewer),
       readClosingIssues(context, body),
-      readComparison(context, pr),
+      readComparison(
+        context,
+        `the comparison of #${number}`,
+        pr.base.ref,
+        pr.head.sha,
+      ),
     ]);
 
   return Result.ok({

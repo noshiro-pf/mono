@@ -1,6 +1,8 @@
 /**
- * A whole {@link Snapshot} over REST, which the session commands read: every
- * part GraphQL alone serves is `skipped` (`rest-pull-requests.mts`).
+ * A whole {@link Snapshot}, by either reader: over REST for the session
+ * commands, every part GraphQL alone serves `skipped` (`rest-pull-requests.mts`),
+ * or with the repository and the pull requests over GraphQL for the page and
+ * the worker. What GraphQL does not serve better is read over REST by both.
  */
 
 import { Arr, Result } from 'ts-data-forge';
@@ -15,9 +17,12 @@ import type {
   PullRequestFacts,
   Read,
   ReferenceFacts,
+  RepositoryFacts,
   Snapshot,
 } from '../snapshot/index.mjs';
 import { skipped } from './classify.mjs';
+import { readPullRequestsGraphql } from './graphql-pull-requests.mjs';
+import { readRepositoryFactsGraphql } from './graphql-repository.mjs';
 import { readHeadChecks } from './rest-checks.mjs';
 import {
   readFollowed,
@@ -55,85 +60,34 @@ export const branchTipsNotRead = (): Promise<
     Result.err(skipped('the branch tips', 'read without git ls-remote')),
   );
 
-/**
- * Every part of a snapshot, read in parallel where nothing orders them. No
- * snapshot at all where the repository's facts are unread: every head is judged
- * against the default branch's tip.
- */
+/** The snapshot over REST alone, as a Claude Code session's proxy allows. */
 export const readSnapshotRest = async (
   context: ReadContext,
   options: SnapshotOptions,
-): Promise<Read<Snapshot>> => {
-  const repository = await readRepositoryFacts(context);
-
-  if (Result.isErr(repository)) {
-    return repository;
-  }
-
-  const { repo, defaultBranch, defaultBranchTip, viewer } = repository.value;
-
-  // Every later read names the repository as GitHub does now, which is what its
-  // answers name it by.
-  const current: ReadContext = {
-    ...context,
-    owner: repo.owner,
-    name: repo.name,
-  } as const;
-
-  const pullRequestsRead = readPullRequests(current, { viewer, defaultBranch });
-
-  const openIssuesRead = readOpenIssues(current, {
-    limit: options.issuesLimit,
-    viewer,
+): Promise<Read<Snapshot>> =>
+  readSnapshotWith(context, options, {
+    repositoryFacts: readRepositoryFacts,
+    pullRequests: readPullRequests,
   });
 
-  const [
-    requirements,
-    defaultBranchChecks,
-    [pullRequests, openIssues, named],
-    merged,
-    queueLayers,
-    branchTips,
-    followed,
-  ] = await Promise.all([
-    readRequirements(current, defaultBranch),
-    readHeadChecks(current, defaultBranchTip),
-    // What the open pull requests and issues name is read as soon as they are,
-    // beside the rest.
-    Promise.all([pullRequestsRead, openIssuesRead]).then(
-      async ([pulls, issues]) =>
-        [pulls, issues, await namedOf(current, viewer, pulls, issues)] as const,
-    ),
-    readMerged(current, {
-      limit: options.mergedLimit,
-      days: options.mergedDays,
-      nowEpochMs: options.nowEpochMs,
-    }),
-    readQueueLayers(current),
-    options.readBranchTips(),
-    readFollowed(current, options.follow),
-  ]);
-
-  return Result.ok({
-    readAt: instantOf(options.nowEpochMs),
-    authenticated: context.token !== undefined,
-    repository: repository.value,
-    requirements,
-    defaultBranchChecks,
-    pullRequests,
-    openIssues,
-    // Unread, the open issues would leave an open issue named by a pull request
-    // to be taken for one that is not open.
-    otherIssues: Result.isErr(openIssues)
-      ? openIssues
-      : Result.map(named, ({ issues }) => issues),
-    references: Result.map(named, ({ references }) => references),
-    merged,
-    queueLayers,
-    branchTips,
-    followed,
+/** The snapshot with the repository and the pull requests over GraphQL. */
+export const readSnapshotGraphql = async (
+  context: ReadContext,
+  options: SnapshotOptions,
+): Promise<Read<Snapshot>> =>
+  readSnapshotWith(context, options, {
+    repositoryFacts: readRepositoryFactsGraphql,
+    pullRequests: readPullRequestsGraphql,
   });
-};
+
+/** The parts the two readers read each their own way. */
+type ReaderParts = Readonly<{
+  repositoryFacts: (context: ReadContext) => Promise<Read<RepositoryFacts>>;
+  pullRequests: (
+    context: ReadContext,
+    options: Readonly<{ viewer: Read<string>; defaultBranch: string }>,
+  ) => Promise<Read<readonly PullRequestFacts[]>>;
+}>;
 
 /** Numbers named, read as issues or as references. */
 type Named = Readonly<{
@@ -239,3 +193,87 @@ const namedOf = async (
         pullRequests: pullRequests.value,
         openIssues: Result.isOk(openIssues) ? openIssues.value.issues : [],
       });
+
+/**
+ * Every part of a snapshot, read in parallel where nothing orders them. No
+ * snapshot at all where the repository's facts are unread: every head is judged
+ * against the default branch's tip.
+ */
+const readSnapshotWith = async (
+  context: ReadContext,
+  options: SnapshotOptions,
+  parts: ReaderParts,
+): Promise<Read<Snapshot>> => {
+  const repository = await parts.repositoryFacts(context);
+
+  if (Result.isErr(repository)) {
+    return repository;
+  }
+
+  const { repo, defaultBranch, defaultBranchTip, viewer } = repository.value;
+
+  // Every later read names the repository as GitHub does now, which is what its
+  // answers name it by.
+  const current: ReadContext = {
+    ...context,
+    owner: repo.owner,
+    name: repo.name,
+  } as const;
+
+  const pullRequestsRead = parts.pullRequests(current, {
+    viewer,
+    defaultBranch,
+  });
+
+  const openIssuesRead = readOpenIssues(current, {
+    limit: options.issuesLimit,
+    viewer,
+  });
+
+  const [
+    requirements,
+    defaultBranchChecks,
+    [pullRequests, openIssues, named],
+    merged,
+    queueLayers,
+    branchTips,
+    followed,
+  ] = await Promise.all([
+    readRequirements(current, defaultBranch),
+    readHeadChecks(current, defaultBranchTip),
+    // What the open pull requests and issues name is read as soon as they are,
+    // beside the rest.
+    Promise.all([pullRequestsRead, openIssuesRead]).then(
+      async ([pulls, issues]) =>
+        [pulls, issues, await namedOf(current, viewer, pulls, issues)] as const,
+    ),
+    readMerged(current, {
+      limit: options.mergedLimit,
+      days: options.mergedDays,
+      nowEpochMs: options.nowEpochMs,
+    }),
+    readQueueLayers(current),
+    options.readBranchTips(),
+    readFollowed(current, options.follow),
+  ]);
+
+  return Result.ok({
+    readAt: instantOf(options.nowEpochMs),
+    authenticated: context.token !== undefined,
+    repository: repository.value,
+    requirements,
+    defaultBranchChecks,
+    pullRequests,
+    openIssues,
+    // Unread, the open issues would leave an open issue named by a pull request
+    // to be taken for one that is not open.
+    otherIssues: Result.isErr(openIssues)
+      ? openIssues
+      : Result.map(named, ({ issues }) => issues),
+    references: Result.map(named, ({ references }) => references),
+    merged,
+    queueLayers,
+    branchTips,
+    followed,
+  });
+};
