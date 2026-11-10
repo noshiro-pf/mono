@@ -1,5 +1,17 @@
 # synstate-router
 
+## 0.3.0
+
+### Minor Changes
+
+- 08aae75: `createRouter`'s `redirect` now receives the location being resolved as its second argument, next to the match: the canonical pathname below the base, the search and the hash. A redirect from a URL that matches no page can carry that URL's query and hash, and inside `push`, `replace` and `setSearch` the location is the destination rather than the URL the browser is still at.
+- cb45d70: Add `param.rest`, a catch-all path parameter for the rest of the path: `/docs/a/b/c/` matches a node declared with `params: { path: param.rest }` with `path` as `['a', 'b', 'c']`. It takes one segment or more, is allowed only on a node with no children (a type error and a `defineRoutes` error otherwise), and ranks below every static and dynamic sibling. `href` encodes each segment, so a `/` inside one stays inside it. `param.restCustom({ decode, encode })` reads the segments into a value of its own type.
+- c952894: A navigation to a fragment whose element is not in the document yet now waits for it, so that a page behind a `Suspense` boundary (a `React.lazy` page, or one reading its data with `use`) is scrolled to its fragment once it draws it. The router looks again on every later `flushScroll` and, through the new optional `RouterBrowser.observeDocument` (a `MutationObserver` on the real window), whenever the document changes, until the element is found, the location changes, the user starts scrolling (a wheel, a touch, a key or a pointer press), or `maxFragmentWaitMs` (ten seconds) pass. Before, a fragment `flushScroll` did not find was dropped. `createMemoryBrowser` takes an `observeDocument` option for tests.
+
+### Patch Changes
+
+- synstate@8.0.0
+
 ## 0.2.1
 
 ### Patch Changes

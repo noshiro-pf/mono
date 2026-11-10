@@ -1,5 +1,15 @@
 # lambda-calculus-interpreter-preact
 
+## 0.0.32
+
+### Patch Changes
+
+- lambda-calculus-interpreter-core@0.0.17
+    - preact-utils@0.0.29
+    - synstate@8.0.0
+    - synstate-preact-hooks@8.0.1
+    - ts-data-forge@14.13.0
+
 ## 0.0.31
 
 ### Patch Changes

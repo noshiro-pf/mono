@@ -1,5 +1,36 @@
 # strict-ts-lib-v5.6
 
+## 0.6.9
+
+### Patch Changes
+
+- b39bd06: In the branded flavor (`libs-branded/`), `Math.trunc` of a finite branded number
+  returns a finite integer, as `Math.floor`, `Math.ceil` and `Math.round` do,
+  rather than `Int | InfiniteNumber | NaNType`. An `Int` argument comes back
+  unchanged, a non-negative one is a `NonNegativeInt`, a non-positive one a
+  `NonPositiveInt`, and any other finite one an `Int`. Truncation moves toward
+  zero, so a non-zero brand is never kept: `Math.trunc(0.5)` is `0`.
+- 15ac030: `Array#includes` and `ReadonlyArray#includes` no longer narrow the false branch
+  to a type the argument can still hold. A `false` means "not in this array", not
+  "not of type `T`", so they now narrow only an argument none of whose members is
+  in `T`:
+
+    - an argument already of type `T` (`i: number` searched in a `number[]`) returns
+      `boolean`, so `i` is no longer `never` after `if (xs.includes(i)) return;`;
+    - an argument overlapping `T` (`s: 'a' | 'c'` searched in an `('a' | 'b')[]`)
+      returns `boolean`, so `s` is no longer `'c'` after
+      `if (allowed.includes(s)) return;`;
+    - a wider argument (`s: string` searched in a `readonly ('a' | 'b')[]`) still
+      narrows `s` to `'a' | 'b'` on the true branch, as before.
+
+- 5cbcc0d: In the plain flavor (`libs/`), the generic `Math.abs` overload takes a
+  `SmallInt` literal, as in the branded flavor, rather than any `number`. It
+  returned `AbsoluteValue<N>`, which rewrites only a number literal, so a
+  ts-type-forge brand came back unchanged: `Math.abs` of an `Int16` was typed
+  `Int16`, although `Math.abs(-32768)` is `32768`. Any other argument, branded or
+  not, now gets a `number`; `Math.abs(-3)` is still `3`, while a literal outside
+  `SmallInt` (`-100`, `-1.5`) is a `number` rather than its absolute value.
+
 ## 0.6.8
 
 ### Patch Changes

@@ -1,5 +1,17 @@
 # blueprint-synstate
 
+## 0.11.0
+
+### Minor Changes
+
+- f583d99: `DatePicker` and `DateRangePicker`, and so `DateInput` and `DateRangeInput`, take `weekdayNames`: the seven heads of the weekday columns, Sunday first, in place of `Intl`'s short names (`Sun`). Blueprint draws date-fns's two letters (`Su`), which no `Intl` format gives; pass them to draw those. The full names read out stay `Intl`'s.
+
+### Patch Changes
+
+- synstate@8.0.0
+    - synstate-dom@0.10.0
+    - ts-data-forge@14.13.0
+
 ## 0.10.0
 
 ### Minor Changes
