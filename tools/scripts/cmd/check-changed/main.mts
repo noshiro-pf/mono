@@ -24,6 +24,7 @@ import {
   type Commit,
 } from './commit-messages.mjs';
 import { parseLcov, uncoveredChangedLines } from './coverage.mjs';
+import { findPatchExportChanges } from './exports.mjs';
 import { readPackages, readProseGate, scriptsOf } from './packages.mjs';
 import {
   buildPlan,
@@ -105,7 +106,7 @@ const main = async (): Promise<number> => {
   // What is read rather than run comes first: it is quick and needs no tree.
   const commits = await checkCommits(base);
 
-  const changesetWarnings = await checkChangesets(changedFiles, packages);
+  const changesetWarnings = await checkChangesets(base, changedFiles, packages);
 
   const notes = [
     ...(Arr.isNonEmpty(classification.ignored)
@@ -556,7 +557,12 @@ const filterExisting = async (
   return files.filter((_, i) => present[i] === true);
 };
 
+/** A repository-relative file as it is now, or `undefined` when there is none. */
+const readTextOrUndefined = async (file: string): Promise<string | undefined> =>
+  Result.unwrapOkOr(await Result.fromPromise(readText(file)), undefined);
+
 const checkChangesets = async (
+  base: string,
   changedFiles: readonly string[],
   packages: readonly PackageInfo[],
 ): Promise<readonly string[]> => {
@@ -597,22 +603,38 @@ const checkChangesets = async (
     }
   });
 
+  const readable = parsed
+    .filter(({ result }) => Result.isOk(result))
+    .map(({ changeset }) => changeset);
+
   const missing = findMissingChangesets({
     changedFiles,
     released,
-    changesets: parsed
-      .filter(({ result }) => Result.isOk(result))
-      .map(({ changeset }) => changeset),
+    changesets: readable,
   });
 
-  return Arr.isNonEmpty(missing)
-    ? Arr.toPushed(
-        unreadable,
-        Arr.isNonEmpty(unreadable)
-          ? `src/ changed and no readable changeset in the diff names ${missing.join(', ')}. Fix the unreadable one above if it is meant to; otherwise, if the change is user-visible, run \`pnpm changeset\` (CLAUDE.md, "Releases").`
-          : `src/ changed and no changeset in the diff names ${missing.join(', ')}. If the change is user-visible, run \`pnpm changeset\` (CLAUDE.md, "Releases").`,
-      )
-    : unreadable;
+  const exportChanges = await findPatchExportChanges({
+    bumps: listChangesetBumps(readable),
+    packages: released.filter(({ dir }) => dir.startsWith('libs/')),
+    readAtBase: async (file) =>
+      Result.unwrapOkOr(
+        await Result.fromPromise(git(['show', `${base}:${file}`])),
+        undefined,
+      ),
+    readAtHead: readTextOrUndefined,
+  });
+
+  return [
+    ...unreadable,
+    ...(Arr.isNonEmpty(missing)
+      ? [
+          Arr.isNonEmpty(unreadable)
+            ? `src/ changed and no readable changeset in the diff names ${missing.join(', ')}. Fix the unreadable one above if it is meant to; otherwise, if the change is user-visible, run \`pnpm changeset\` (CLAUDE.md, "Releases").`
+            : `src/ changed and no changeset in the diff names ${missing.join(', ')}. If the change is user-visible, run \`pnpm changeset\` (CLAUDE.md, "Releases").`,
+        ]
+      : []),
+    ...exportChanges,
+  ];
 };
 
 /**
