@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url';
 // A top-level `import type`, not the inline `import { type … }` the lint
 // prefers: Node erases the former and keeps the latter as a bare
 // `import {} from 'ts-type-forge'`, which fails to resolve before
-// `pnpm install`. The test's runtime-import check guards this.
+// `pnpm install`. `check:root:node-run-scripts` guards this.
 import type { MutableRecord, ReadonlyRecord, StrictOmit } from 'ts-type-forge';
 // Erased the same way: the module itself imports packages this cannot load.
 import type { ReleaseBinaryPin } from '../lib/release-binaries.mjs';

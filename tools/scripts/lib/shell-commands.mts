@@ -1,5 +1,5 @@
+import type { FixedLengthTuple } from 'ts-type-forge';
 // cspell:ignore esac nohup
-
 import { Arr, hasKey } from 'ts-data-forge';
 
 /**
@@ -28,13 +28,20 @@ import { Arr, hasKey } from 'ts-data-forge';
 export const readShellCommands = (script: string): ShellReading => {
   const chars = Array.from(script.replaceAll('\r\n', '\n'));
 
-  const { commands, problems } = readList(chars, 0, undefined);
+  const { commands, assignments, problems } = readList(chars, 0, undefined);
 
-  return { commands, problems };
+  return { commands, assignments, problems };
 };
 
 export type ShellReading = Readonly<{
   commands: readonly (readonly string[])[];
+  /**
+   * What a command of assignments alone sets (`f="$DIR/x"`, `then f=x`,
+   * `export F=x`), name and value as written, in order. One inside a
+   * substitution or subshell sets nothing outside it and is left out, as is one
+   * before a command (`FOO=1 node x`), which only that command sees.
+   */
+  assignments: readonly (readonly [name: string, value: string])[];
   problems: readonly string[];
 }>;
 
@@ -123,6 +130,35 @@ const commandWords = (
     command.every((word) => CLOSING_RESERVED.has(word))
     ? undefined
     : command;
+};
+
+/**
+ * The variables a command sets when it is assignments alone, after any reserved
+ * word (`then f=x`), or through a declaration builtin (`export F=x`); nothing
+ * for any other command.
+ */
+const assignmentsOf = (
+  words: readonly string[],
+): readonly FixedLengthTuple<2, string>[] => {
+  const afterReserved = words.slice(
+    Math.max(
+      0,
+      words.findIndex((word) => !LEADING_RESERVED.has(word)),
+    ),
+  );
+
+  // A declaration builtin's other words (`export NAME`, `-x`) set no value.
+  const assigned = DECLARATION_BUILTINS.has(afterReserved[0] ?? '')
+    ? Arr.tail(afterReserved).filter((word) => ASSIGNMENT.test(word))
+    : afterReserved.every((word) => ASSIGNMENT.test(word))
+      ? afterReserved
+      : ([] as const);
+
+  return assigned.map((word): FixedLengthTuple<2, string> => {
+    const at = word.indexOf('=');
+
+    return [word.slice(0, at), word.slice(at + 1)];
+  });
 };
 
 const lineOf = (chars: readonly string[], at: number): number =>
@@ -303,6 +339,8 @@ const readList = (
 ): ListReading => {
   const mut_commands: (readonly string[])[] = [];
 
+  const mut_assignments: FixedLengthTuple<2, string>[] = [];
+
   const mut_problems: string[] = [];
 
   let mut_words: string[] = [];
@@ -328,6 +366,7 @@ const readList = (
   const stopped = (): ListReading =>
     ({
       commands: mut_commands,
+      assignments: mut_assignments,
       problems: mut_problems,
       end: chars.length,
     }) as const;
@@ -415,6 +454,8 @@ const readList = (
       mut_state.caseAwaitsIn =
         head[0] === 'case' && Arr.isFixedLengthArray(2, head);
     }
+
+    mut_assignments.push(...assignmentsOf(mut_words));
 
     const command = commandWords(mut_words);
 
@@ -750,6 +791,7 @@ const readList = (
 
       return {
         commands: mut_commands,
+        assignments: mut_assignments,
         problems: mut_problems,
         end: at + 1,
       };
@@ -959,7 +1001,12 @@ const readList = (
 
   return Arr.isNonEmpty(mut_heredocs)
     ? problem(chars.length, 'a heredoc with no body')
-    : { commands: mut_commands, problems: mut_problems, end: chars.length };
+    : {
+        commands: mut_commands,
+        assignments: mut_assignments,
+        problems: mut_problems,
+        end: chars.length,
+      };
 };
 
 /** What a substitution's word reads, its commands having been read apart. */
@@ -999,6 +1046,15 @@ const CASE_SPACE: ReadonlySet<string> = new Set<string>([' ', '\t', '\n']);
 const DESCRIPTOR = /^[\d-]$/u;
 
 const ASSIGNMENT = /^[A-Za-z_]\w*=/u;
+
+/** Builtins whose arguments may be assignments that set variables. */
+const DECLARATION_BUILTINS: ReadonlySet<string> = new Set<string>([
+  'declare',
+  'export',
+  'local',
+  'readonly',
+  'typeset',
+]);
 
 const LEADING_RESERVED: ReadonlySet<string> = new Set<string>([
   'if',

@@ -4,7 +4,7 @@ import * as path from 'node:path';
 import { fileURLToPath } from 'node:url';
 // A top-level `import type`, not the inline `import { type … }`: Node erases
 // the former and keeps the latter as a bare import, which fails to resolve
-// before `pnpm install`. The test's runtime-import check guards this.
+// before `pnpm install`. `check:root:node-run-scripts` guards this.
 import type { ReadonlyRecord } from 'ts-type-forge';
 
 /**

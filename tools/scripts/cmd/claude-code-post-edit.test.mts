@@ -246,23 +246,12 @@ describe('the hook as Claude Code runs it', () => {
     assert.deepStrictEqual(runHook('{'), { status: 0, stderr: '' });
   });
 
-  test('the script needs nothing but Node itself', () => {
-    // It runs on whatever Node the session has, possibly before anything is
-    // installed; the `minimum` of tools/configs/node-support.json has no
-    // `Temporal`.
+  test('the script uses nothing the minimum Node lacks', () => {
+    // It runs on whatever Node the session has; the `minimum` of
+    // tools/configs/node-support.json has no `Temporal`. That it loads nothing
+    // but builtins, as it may run before anything is installed, is
+    // `check:root:node-run-scripts`'s.
     const source = read(scriptPath);
-
-    const specifiers = source
-      .matchAll(/^import (?!type )[^;]* from '([^']+)';$/gmu)
-      .map((m) => m[1])
-      .toArray();
-
-    assert.isNotEmpty(specifiers);
-
-    assert.deepStrictEqual(
-      specifiers.filter((s) => !(s?.startsWith('node:') ?? false)),
-      [],
-    );
 
     assert.notMatch(source, /\bTemporal\./u);
   });

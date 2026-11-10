@@ -352,21 +352,10 @@ describe('the script', () => {
     assert.strictEqual(result.only, undefined);
   });
 
-  test('the script needs nothing but Node itself', () => {
+  test('the script uses nothing the minimum Node lacks', () => {
+    // That it loads nothing but builtins is `check:root:node-run-scripts`'s.
     // eslint-disable-next-line security/detect-non-literal-fs-filename
     const source = fs.readFileSync(scriptPath, 'utf8');
-
-    const specifiers = source
-      .matchAll(/^import (?!type )[^;]* from '([^']+)';$/gmu)
-      .map((m) => m[1])
-      .toArray();
-
-    assert.isNotEmpty(specifiers);
-
-    assert.deepStrictEqual(
-      specifiers.filter((s) => !(s?.startsWith('node:') ?? false)),
-      [],
-    );
 
     assert.notMatch(source, /\bTemporal\./u);
   });

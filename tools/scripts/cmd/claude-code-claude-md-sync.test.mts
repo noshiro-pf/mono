@@ -483,23 +483,11 @@ describe('the hook as Claude Code runs it', () => {
     });
   });
 
-  test('the script needs nothing but Node itself', () => {
+  test('the script uses nothing the minimum Node lacks', () => {
     // As for claude-code-post-edit.mts: it runs on whatever Node the session
-    // has, possibly before anything is installed.
+    // has. That it loads nothing but builtins is `check:root:node-run-scripts`'s.
     // eslint-disable-next-line security/detect-non-literal-fs-filename -- this repository's own file.
     const source = fs.readFileSync(scriptPath, 'utf8');
-
-    const specifiers = Array.from(
-      source.matchAll(/^import (?!type )[^;]* from '([^']+)';$/gmu),
-      (m) => m[1],
-    );
-
-    assert.isNotEmpty(specifiers);
-
-    assert.deepStrictEqual(
-      specifiers.filter((s) => !(s?.startsWith('node:') ?? false)),
-      [],
-    );
 
     assert.notMatch(source, /\bTemporal\./u);
   });
