@@ -22,6 +22,10 @@ const router = createRouter(routes, {
 
 const bound = createRouterComponents(router);
 
-assert.deepEqual(Object.keys(bound).toSorted(), ['Link', 'Routes']);
+assert.deepEqual(Object.keys(bound).toSorted(), [
+  'Link',
+  'Routes',
+  'blockWhile',
+]);
 
 console.info('synstate-router-dom: ok');

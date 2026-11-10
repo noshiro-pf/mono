@@ -1,5 +1,12 @@
+import type { InitializedObservable } from 'synstate';
 import type { JSX } from 'synstate-dom';
-import type { AnyRouteNode, AnyRoutes, Router } from 'synstate-router';
+import type {
+  AnyRouteNode,
+  AnyRoutes,
+  Blocker,
+  NavigationAttempt,
+  Router,
+} from 'synstate-router';
 import { createLink, createRoutes } from './internal/index.mjs';
 import type { LinkProps } from './link-props.mjs';
 import type { RoutesProps } from './routes-props.mjs';
@@ -21,6 +28,17 @@ export type RouterComponents<R extends AnyRoutes> = Readonly<{
    * browser what the browser should do (`handleLinkClick`).
    */
   Link: (props: LinkProps) => JSX.Element;
+
+  /**
+   * Blocks leaving the page while `when` holds `true` (`router.block`): an
+   * unsaved form's dirty flag, say. `except` lets through the moves it returns
+   * `true` for, such as another tab of the same form. Dispose of the blocker
+   * when the page goes.
+   */
+  blockWhile: (
+    when: InitializedObservable<boolean>,
+    except?: (attempt: NavigationAttempt<R>) => boolean,
+  ) => Blocker<R>;
 }>;
 
 /**
@@ -34,4 +52,8 @@ export const createRouterComponents = <R extends AnyRoutes>(
   ({
     Routes: createRoutes(router),
     Link: createLink(router),
+    blockWhile: (when, except) =>
+      router.block(
+        (attempt) => when.getSnapshot().value && except?.(attempt) !== true,
+      ),
   }) as const;

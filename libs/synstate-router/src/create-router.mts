@@ -7,7 +7,7 @@ import {
   type InitializedObservable,
   type Observable,
 } from 'synstate';
-import { isNonNullObject, Optional } from 'ts-data-forge';
+import { isNonNullObject, isRecord, Optional } from 'ts-data-forge';
 import type {
   DeepReadonly,
   ReadonlyRecord,
@@ -160,6 +160,18 @@ export type Router<R extends AnyRoutes> = Readonly<{
 
   /** Goes to `href`, replacing the current history entry. */
   replace: (href: Href, options?: StateOptions) => void;
+
+  /**
+   * Registers a blocker: `push`, `replace`, `setSearch`, `follow` and a
+   * `Link`'s click ask it before writing the history, and a back, forward or
+   * `go` (the browser's buttons included) it blocks is undone once `popstate`
+   * arrives, so that `match` does not change. While it blocks a move with no
+   * destination (`to: undefined`), unloading the document asks the user first.
+   * A held navigation waits in the blocker's `state` for `proceed` or `reset`.
+   */
+  block: (
+    shouldBlock: (attempt: NavigationAttempt<R>) => boolean,
+  ) => Blocker<R>;
 
   /**
    * Rewrites the search of `node` while the page is the node or one of its
@@ -400,18 +412,33 @@ export const createRouter = <R extends AnyRoutes>(
         codec.encode(value as never);
   };
 
-  /** The current URL, rewritten first when it is not where it leads. */
-  const read = (): Snapshot<R> => {
+  /**
+   * The position of the current entry in the session history, which the router
+   * keeps in each entry it writes: a blocked back or forward is undone by
+   * moving the other way by the difference.
+   */
+  const mut_index = { current: 0 };
+
+  /**
+   * The current URL, rewritten first when it is not where it leads. An entry
+   * the router has not written yet (the first one, or one a fragment navigation
+   * of the browser's own added) is given `indexForNew`.
+   */
+  const read = (indexForNew: number): Snapshot<R> => {
     const current = new URL(browser.location.href);
 
-    const raw = browser.history.state;
+    const entry = readEntry(browser.history.state);
 
-    const snapshot = withState(resolve(current, 0), raw);
+    const snapshot = withState(resolve(current, 0), entry.state);
 
-    if (snapshot.location.href !== current.href) {
+    const index = entry.index ?? indexForNew;
+
+    mut_index.current = index;
+
+    if (snapshot.location.href !== current.href || entry.index === undefined) {
       // Canonicalizing keeps the entry's state; a redirect drops it.
       browser.history.replaceState(
-        snapshot.redirected ? null : (raw ?? null),
+        entryOf(index, snapshot.redirected ? null : entry.state),
         '',
         snapshot.location.href,
       );
@@ -424,7 +451,7 @@ export const createRouter = <R extends AnyRoutes>(
   // outlives a component, a test or a `scope.run` that happened to create it,
   // and so does what `at` and `isActive` cache.
   const [snapshot$, setSnapshot, { getSnapshot }] = untracked(() =>
-    createState(read(), {
+    createState(read(0), {
       // The entry's state is not in the URL: a replace to the same URL with
       // another state is a change.
       equals: (a, b) =>
@@ -437,7 +464,7 @@ export const createRouter = <R extends AnyRoutes>(
   );
 
   const update = (): void => {
-    setSnapshot(read());
+    setSnapshot(read(mut_index.current + 1));
   };
 
   const match = untracked(() =>
@@ -633,6 +660,179 @@ export const createRouter = <R extends AnyRoutes>(
     scheduleScroll({ id: fragmentId(startHash) });
   }
 
+  // Blocking
+
+  const mut_blockers = new Set<BlockerEntry<R>>();
+
+  const mut_block: {
+    /**
+     * The position the browser is moving back to, after a blocked move took it
+     * away: the `popstate` that arrives there is the router's own.
+     */
+    restoringTo: number | undefined;
+    /** The next history move was let through by `proceed`. */
+    letThrough: boolean;
+    stopUnload: () => void;
+  } = { restoringTo: undefined, letThrough: false, stopUnload: () => {} };
+
+  /** The first blocker that blocks going from the page to `to`. */
+  const blockerOf = (
+    to: RouteMatch<R> | undefined,
+  ): BlockerEntry<R> | undefined => {
+    const from = getSnapshot().match;
+
+    return Array.from(mut_blockers).find((blocker) =>
+      blocker.shouldBlock({ from, to }),
+    );
+  };
+
+  /** Drops a held navigation: another move went through, so it is stale. */
+  const releaseHeld = (): void => {
+    for (const blocker of mut_blockers) {
+      blocker.setState(idle);
+    }
+  };
+
+  /** Holds `proceed` with `blocker`, until the user's answer. */
+  const hold = (
+    blocker: BlockerEntry<R>,
+    to: RouteMatch<R>,
+    proceed: () => void,
+  ): void => {
+    // One navigation is held at a time: a newer one replaces it.
+    releaseHeld();
+
+    blocker.setState({
+      status: 'blocked',
+      to,
+      proceed: () => {
+        blocker.setState(idle);
+
+        proceed();
+      },
+      reset: () => {
+        blocker.setState(idle);
+      },
+    });
+  };
+
+  /**
+   * Whether a navigation to `href` is held by a blocker, which then holds
+   * `proceed`. A move to where the location already is asks nothing.
+   */
+  const holdIfBlocked = (href: Href, proceed: () => void): boolean => {
+    if (mut_blockers.size === 0) {
+      return false;
+    }
+
+    const current = new URL(browser.location.href);
+
+    // Resolved here and again by the navigation: `redirect` is a function of
+    // the match and location it is given, so asking it twice changes nothing,
+    // and only a router with a blocker pays for it.
+    const to = resolve(new URL(toUrl(href), current), 0);
+
+    if (to.location.href === current.href) {
+      return false;
+    }
+
+    const blocker = blockerOf(to.match);
+
+    if (blocker === undefined) {
+      return false;
+    }
+
+    hold(blocker, to.match, proceed);
+
+    return true;
+  };
+
+  /**
+   * `popstate`: the browser has already moved. A move a blocker blocks is
+   * undone by moving back by the same distance, and the match stays.
+   */
+  const onPopstate = (): void => {
+    const { index } = readEntry(browser.history.state);
+
+    const restoring = mut_block.restoringTo;
+
+    mut_block.restoringTo = undefined;
+
+    // Back where the blocked move started. Any other move, such as a second
+    // press of back before the browser got there, is asked about as usual.
+    if (restoring !== undefined && index === restoring) {
+      return;
+    }
+
+    const delta = index === undefined ? 0 : index - mut_index.current;
+
+    if (delta !== 0 && !mut_block.letThrough && mut_blockers.size > 0) {
+      const to = withState(
+        resolve(new URL(browser.location.href), 0),
+        readEntry(browser.history.state).state,
+      );
+
+      const blocker = blockerOf(to.match);
+
+      if (blocker !== undefined) {
+        mut_block.restoringTo = mut_index.current;
+
+        browser.history.go(-delta);
+
+        hold(blocker, to.match, () => {
+          mut_block.letThrough = true;
+
+          browser.history.go(delta);
+        });
+
+        return;
+      }
+    }
+
+    mut_block.letThrough = false;
+
+    releaseHeld();
+
+    update();
+  };
+
+  const block = (
+    shouldBlock: (attempt: NavigationAttempt<R>) => boolean,
+  ): Blocker<R> => {
+    const [state, setState] = untracked(() =>
+      createState<BlockerState<R>>(idle),
+    );
+
+    if (mut_router.disposed) {
+      return { state, dispose: () => {} };
+    }
+
+    const entry: BlockerEntry<R> = { shouldBlock, setState } as const;
+
+    if (mut_blockers.size === 0) {
+      mut_block.stopUnload =
+        browser.onBeforeUnload?.(() => blockerOf(undefined) !== undefined) ??
+        (() => {});
+    }
+
+    mut_blockers.add(entry);
+
+    return {
+      state,
+      dispose: () => {
+        setState(idle);
+
+        if (!mut_blockers.delete(entry) || mut_blockers.size > 0) {
+          return;
+        }
+
+        mut_block.stopUnload();
+
+        mut_block.stopUnload = () => {};
+      },
+    };
+  };
+
   // Navigation
 
   const navigate = (
@@ -641,6 +841,23 @@ export const createRouter = <R extends AnyRoutes>(
     scrolls: boolean,
     entryState: EntryState,
   ): void => {
+    const held = holdIfBlocked(href, () => {
+      navigateNow(href, replace, scrolls, entryState);
+    });
+
+    if (!held) {
+      navigateNow(href, replace, scrolls, entryState);
+    }
+  };
+
+  const navigateNow = (
+    href: Href,
+    replace: boolean,
+    scrolls: boolean,
+    entryState: EntryState,
+  ): void => {
+    releaseHeld();
+
     const before = getSnapshot().location;
 
     const current = new URL(browser.location.href);
@@ -677,7 +894,7 @@ export const createRouter = <R extends AnyRoutes>(
       entryState.kind === 'value'
         ? encodeStateFor(resolved, entryState.value)
         : entryState.kind === 'keep' && !resolved.redirected
-          ? (browser.history.state ?? null)
+          ? readEntry(browser.history.state).state
           : null;
 
     const next = withState(resolved, raw);
@@ -699,9 +916,19 @@ export const createRouter = <R extends AnyRoutes>(
       target.href === current.href ||
       next.location.href === current.href
     ) {
-      browser.history.replaceState(raw, '', next.location.href);
+      browser.history.replaceState(
+        entryOf(mut_index.current, raw),
+        '',
+        next.location.href,
+      );
     } else {
-      browser.history.pushState(raw, '', next.location.href);
+      mut_index.current += 1;
+
+      browser.history.pushState(
+        entryOf(mut_index.current, raw),
+        '',
+        next.location.href,
+      );
     }
 
     setSnapshot(next);
@@ -913,7 +1140,7 @@ export const createRouter = <R extends AnyRoutes>(
     return cached;
   };
 
-  browser.addEventListener('popstate', update);
+  browser.addEventListener('popstate', onPopstate);
 
   return {
     routes,
@@ -931,6 +1158,7 @@ export const createRouter = <R extends AnyRoutes>(
       navigate(href, true, true, entryStateOf(stateOptions));
     },
     setSearch,
+    block,
     back: () => {
       browser.history.go(-1);
     },
@@ -947,7 +1175,15 @@ export const createRouter = <R extends AnyRoutes>(
     dispose: () => {
       mut_router.disposed = true;
 
-      browser.removeEventListener('popstate', update);
+      browser.removeEventListener('popstate', onPopstate);
+
+      for (const blocker of mut_blockers) {
+        blocker.setState(idle);
+      }
+
+      mut_blockers.clear();
+
+      mut_block.stopUnload();
 
       follows.dispose();
 
@@ -970,6 +1206,70 @@ type Snapshot<R extends AnyRoutes> = Readonly<{
 }>;
 
 type ScrollTarget = 'top' | Readonly<{ id: string }>;
+
+/** What a blocker is asked about. */
+export type NavigationAttempt<R extends AnyRoutes> = Readonly<{
+  /** Where the location is. */
+  from: RouteMatch<R>;
+  /**
+   * Where the navigation leads, or `undefined` when the document is being
+   * unloaded: a reload, a URL typed in, the tab closed.
+   */
+  to: RouteMatch<R> | undefined;
+}>;
+
+/** Whether a blocker holds a navigation, and the user's two answers. */
+export type BlockerState<R extends AnyRoutes> = Readonly<
+  | { status: 'idle' }
+  | {
+      status: 'blocked';
+      /** Where the held navigation leads. */
+      to: RouteMatch<R>;
+      /** Makes the held navigation. */
+      proceed: () => void;
+      /** Drops it. */
+      reset: () => void;
+    }
+>;
+
+/** A blocker registered by `router.block`. */
+export type Blocker<R extends AnyRoutes> = Readonly<{
+  state: InitializedObservable<BlockerState<R>>;
+  /** Stops blocking, and drops a navigation it holds. */
+  dispose: () => void;
+}>;
+
+type BlockerEntry<R extends AnyRoutes> = Readonly<{
+  shouldBlock: (attempt: NavigationAttempt<R>) => boolean;
+  setState: (state: BlockerState<R>) => void;
+}>;
+
+const idle = { status: 'idle' } as const;
+
+/** The key a history entry the router writes keeps its position under. */
+const indexKey = 'synstateRouterIndex';
+
+/**
+ * A history entry's state as the router writes it: its position, and the page's
+ * state. One the router did not write has no position, and its whole state is
+ * the page's.
+ */
+const readEntry = (
+  raw: unknown,
+): Readonly<{ index: number | undefined; state: unknown }> => {
+  if (isRecord(raw)) {
+    const index: unknown = raw[indexKey];
+
+    if (typeof index === 'number') {
+      return { index, state: raw['state'] ?? null };
+    }
+  }
+
+  return { index: undefined, state: raw ?? null };
+};
+
+const entryOf = (index: number, state: unknown): unknown =>
+  ({ [indexKey]: index, state }) as const;
 
 /** What a navigation writes as the new entry's state. */
 type EntryState = Readonly<

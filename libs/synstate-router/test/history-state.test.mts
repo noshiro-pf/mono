@@ -90,7 +90,11 @@ describe('history state', () => {
     // Never in the URL.
     assert.strictEqual(browser.url().href, 'https://example.com/checkout/');
 
-    assert.deepStrictEqual(browser.history.state, { step: 2 });
+    // Next to the entry's position, which the router keeps there.
+    assert.deepStrictEqual(browser.history.state, {
+      synstateRouterIndex: 1,
+      state: { step: 2 },
+    });
   });
 
   test('is restored by back and forward', async () => {
@@ -171,7 +175,10 @@ describe('history state', () => {
     // Canonicalizing the URL keeps the entry's state.
     assert.strictEqual(browser.url().pathname, '/checkout/');
 
-    assert.deepStrictEqual(browser.history.state, { step: 7 });
+    assert.deepStrictEqual(browser.history.state, {
+      synstateRouterIndex: 0,
+      state: { step: 7 },
+    });
 
     router.dispose();
   });
@@ -218,13 +225,13 @@ describe('history state', () => {
 
     router.push(routes.home.href({ hash: 'x' }), { state: { step: 1 } });
 
-    assert.isNull(browser.history.state);
+    assert.isNull(Reflect.get(browser.history.state ?? {}, 'state'));
 
     router.push(routes.settings.href(), { state: { step: 1 } });
 
     assert.strictEqual(current(router).route, 'signIn');
 
-    assert.isNull(browser.history.state);
+    assert.isNull(Reflect.get(browser.history.state ?? {}, 'state'));
   });
 
   test("a page's values carry its state, for a binding's case", () => {

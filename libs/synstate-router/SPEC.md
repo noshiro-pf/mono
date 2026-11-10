@@ -1,6 +1,6 @@
 # synstate-router 実装仕様
 
-<!-- cspell:ignore Rocon Chicane Valibot ArkType typegen splat devtools -->
+<!-- cspell:ignore Rocon Chicane Valibot ArkType typegen splat devtools bfcache -->
 <!-- doc-paths-ignore: apps/tiny-router-observable -->
 
 アプリが書く遷移先・パスパラメータ・検索パラメータをすべて型で検査し、現在地を synstate の Observable として配るクライアントサイドルーターの実装仕様。v1 の目標は「文字列で書いた URL がどこにも残らない」ことで、TanStack Router と同等以上の型安全性を、コード生成も module augmentation もなしに得る。
@@ -51,7 +51,7 @@ Preact 版は v1 に入れない（「10. 今後のタスク」）。
 - **tiny-router-observable**: 履歴層（`RouterBrowser`・`createMemoryBrowser`・`basePath`）を synstate-router に移し、#2912 はそこで直す。アプリを移し終えたら tiny-router を引退させる。`createMemoryBrowser` の `popstate` は同期から `setTimeout` に変わるので、移行するアプリのテストは `back()` の後に待つよう書き換える。
 - **末尾スラッシュ**: 既定値は `'always'`（tiny-router と GitHub Pages に合わせる）。
 - **不正な検索パラメータ**: 「ない」として扱い、URL は書き換えない。
-- **遷移のブロック**: v1.1。
+- **遷移のブロック**: v1.1（「4.4」）。
 - **スクロール**: 遷移先に `hash` があればその要素へ、なければパスが変わったときだけ先頭へ。戻る・進むはブラウザの `scrollRestoration` に任せる（詳細は「4.2」の 6）。
 
 ## 3. ルート定義
@@ -239,6 +239,16 @@ type M = RouteMatch<typeof routes>;
 
 7. **文書のタイトルは一致した枝の `meta.title` から決める（#3440）。** 一致した枝で最も深い、`title` を持つノードのものを使う。関数ならページの params と search を渡して作る。`match` が変わるたびに（最初の照合を含む）`RouterBrowser` の `documentTitle` に書く。params だけが変わっても `match` は変わるので、params から作るタイトルも追従する。`title` を持たないページに移ったら、ルーターが最初に書く前の文書のタイトルに戻す。ルーターが一度も書いていなければ何もしない（アプリが自分で書いたタイトルを消さない）。`<head>` のほかの部分には触れない。関数の引数は `meta` を書く時点ではノードの型がないので `{ params: ReadonlyRecord<string, unknown>; search: ... }` で、値は実行時に読んで確かめる。
 
+### 4.4 遷移のブロック（#3428）
+
+`router.block(shouldBlock)` は blocker を登録し、`{ state, dispose }` を返す。`shouldBlock({ from, to })` は今のページの match と遷移先の match を受け取り、`true` なら止める。`to` が `undefined` なのは文書を離れるとき（再読み込み、URL の入力、タブを閉じる）。
+
+- `push`・`replace`・`setSearch`・`follow`（と、それを呼ぶ `Link` のクリック）は履歴に書く前に聞く。止めたら何も書かず、`match` も変えず、blocker の `state` を `{ status: 'blocked'; to; proceed; reset }` にする。`proceed()` は止めた遷移を行い、`reset()` は捨てる。どちらでも `state` は `'idle'` に戻る。今と同じ URL への遷移は聞かない。
+- `back`・`forward`・`go` とブラウザのボタンは、`popstate` が来た時点でブラウザがもう動いている。止めるなら同じ距離だけ逆へ `go` して元のエントリーに戻し、その `popstate` は無視するので、`match` は変わらない（「4.2」の 1 を保つ）。距離を知るため、ルーターは書くエントリーの state に位置を持たせる（`{ synstateRouterIndex, state }`。`state` が「3.4」のページの state）。ルーターが書いていないエントリー（ブラウザ自身の fragment navigation が足したもの）には、最初に読んだときに位置を付ける。位置のないエントリーへの移動は距離がわからないので止めない。止めた移動の `proceed()` は同じ距離だけもう一度動き、その移動は聞かずに通す。
+- 止めている間に別の遷移が通ったら、止めていた遷移は古いので捨てる（`'idle'` に戻す）。止められる遷移は一度に 1 つで、新しく止めたものが前のものを置き換える。
+- blocker が 1 つでもある間は `beforeunload` を購読し、`shouldBlock({ from, to: undefined })` が `true` を返す blocker があればブラウザに確認させる。最後の blocker が `dispose` されたら購読をやめる（bfcache を妨げないため）。`RouterBrowser` の `onBeforeUnload` は省略でき、ない環境では文書を離れる遷移は止められない。`createMemoryBrowser` の `unload()` はそれをテストで起こす。
+- React は `useBlocker(shouldBlock)`（マウントしている間だけ登録し、最新の関数に聞く）、synstate-dom は `blockWhile(when$, except?)`（Observable が `true` の間だけ止める）を持つ。
+
 ### 4.3 データ取得（v1 ではルーターに持たせない）
 
 v1 は loader を持たない。ルートの params は Observable なので、取得と取り消しは synstate の演算子で書ける。
@@ -423,7 +433,7 @@ const App = (): JSX.Element => (
 
 | 機能                                   | React Router                                                              | TanStack Router                                                 | 方針                                                                                                                                                                           |
 | :------------------------------------- | :------------------------------------------------------------------------ | :-------------------------------------------------------------- | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 遷移のブロック（未保存フォームの確認） | `useBlocker`                                                              | `useBlocker` / `Block`                                          | v1.1（[#3428](https://github.com/noshiro-pf/mono/issues/3428)）。`beforeunload` とルーター内遷移の両方                                                                         |
+| 遷移のブロック（未保存フォームの確認） | `useBlocker`                                                              | `useBlocker` / `Block`                                          | v1.1 で入れた（[#3428](https://github.com/noshiro-pf/mono/issues/3428)）。`beforeunload` とルーター内遷移の両方（「4.4」）                                                     |
 | ルートごとの非同期ガード（認証など）   | `clientMiddleware` / loader 内の `redirect`                               | `beforeLoad`                                                    | v1.1（[#3429](https://github.com/noshiro-pf/mono/issues/3429)）。v1 は同期の `redirect` オプションのみ                                                                         |
 | 任意深さの catch-all（`/docs/*`）      | `*`                                                                       | `$`（splat）                                                    | v1.1 で入れた（[#3430](https://github.com/noshiro-pf/mono/issues/3430)）。`param.rest` として枝の末尾だけに許す（「3.1」「3.3」）                                              |
 | 省略可能セグメント                     | `:lang?`                                                                  | `{-$lang}`                                                      | 入れない（[#3431](https://github.com/noshiro-pf/mono/issues/3431)）。無しと有りの 2 ノードで表す書き方を「3.1」と README に書いた                                              |
