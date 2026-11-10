@@ -13,6 +13,7 @@ Creates a source that emits by itself, from another library or an event: a creat
 
 ```tsx
 import { createSource, type Observable } from 'synstate-next';
+import { Optional } from 'ts-std-forge';
 
 const everyFrame = (milliseconds: number): Observable<number> =>
     createSource<number>((ctx) => {
@@ -33,14 +34,14 @@ const frames = everyFrame(16);
 
 await vi.advanceTimersByTimeAsync(50);
 
-assert.strictEqual(frames.getSnapshot(), 3);
+assert.deepStrictEqual(frames.getSnapshot(), Optional.some(3));
 
 // Disposing it runs the cleanup, which clears the interval.
 frames.dispose();
 
 await vi.advanceTimersByTimeAsync(50);
 
-assert.strictEqual(frames.getSnapshot(), 3);
+assert.deepStrictEqual(frames.getSnapshot(), Optional.some(3));
 ```
 
 ## See also

@@ -35,6 +35,7 @@ A `take`, `takeWhile` or `takeUntil` that will pass nothing more takes itself ou
 
 ```tsx
 import { createRootOwner, createState, take, timer } from 'synstate-next';
+import { Optional } from 'ts-std-forge';
 
 const [a, setA] = createState(0);
 
@@ -66,7 +67,7 @@ const fired = owner.run(() => timer(100));
 
 await vi.advanceTimersByTimeAsync(100);
 
-assert.strictEqual(fired.getSnapshot(), 0);
+assert.deepStrictEqual(fired.getSnapshot(), Optional.some(0));
 
 owner.dispose();
 ```

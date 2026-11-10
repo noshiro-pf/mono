@@ -1,4 +1,5 @@
 import { createValueEmitter, keepEqualParts, map } from 'synstate-next';
+import { Optional } from 'ts-std-forge';
 
 // embed-sample-code-ignore-below
 if (import.meta.vitest !== undefined) {
@@ -14,15 +15,15 @@ if (import.meta.vitest !== undefined) {
 
     receive({ name: 'a', tags: ['x'] });
 
-    const first = tags.getSnapshot();
+    const first = Optional.unwrapThrow(tags.getSnapshot());
 
     // A fresh object from the server, with the same tags.
     receive({ name: 'b', tags: ['x'] });
 
     // The tags kept their reference, so nothing below `tags` was recomputed.
-    assert.strictEqual(tags.getSnapshot(), first);
+    assert.strictEqual(Optional.unwrapThrow(tags.getSnapshot()), first);
 
-    assert.strictEqual(user.getSnapshot()?.name, 'b');
+    assert.strictEqual(Optional.unwrapThrow(user.getSnapshot()).name, 'b');
 
     // embed-sample-code-ignore-below
   });

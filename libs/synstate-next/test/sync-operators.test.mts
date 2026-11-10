@@ -20,6 +20,7 @@ import {
   type State,
 } from 'synstate-next';
 import { toNode } from 'synstate-next/internal';
+import { Optional } from 'ts-std-forge';
 
 /** Every value `observable` gives a subscriber, the current one first. */
 const collect = <A,>(observable: Observable<A>): readonly A[] => {
@@ -437,7 +438,7 @@ describe(withCurrentValueFrom, () => {
       [2, 20],
     ]);
 
-    assert.deepStrictEqual(doubled.getSnapshot(), [[2, 2], 0]);
+    assert.deepStrictEqual(doubled.getSnapshot(), Optional.some([[2, 2], 0]));
   });
 
   test('emits nothing while the other holds no value', () => {
@@ -455,7 +456,7 @@ describe(withCurrentValueFrom, () => {
 
     a.set(2);
 
-    assert.deepStrictEqual(paired.getSnapshot(), [2, 5]);
+    assert.deepStrictEqual(paired.getSnapshot(), Optional.some([2, 5]));
   });
 });
 
@@ -987,6 +988,6 @@ describe('zip with a parent ahead', () => {
       });
     }
 
-    assert.deepStrictEqual(zipped.getSnapshot(), [199, 199]);
+    assert.deepStrictEqual(zipped.getSnapshot(), Optional.some([199, 199]));
   });
 });

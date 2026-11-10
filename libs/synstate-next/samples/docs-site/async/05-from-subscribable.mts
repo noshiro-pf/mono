@@ -1,5 +1,5 @@
 import { fromSubscribable, type Subscribable } from 'synstate-next';
-import { Result } from 'ts-std-forge';
+import { Optional, Result } from 'ts-std-forge';
 
 // embed-sample-code-ignore-below
 if (import.meta.vitest !== undefined) {
@@ -23,7 +23,10 @@ if (import.meta.vitest !== undefined) {
     const followed = fromSubscribable(words);
 
     // A value given while it subscribes is held from the start.
-    assert.deepStrictEqual(followed.getSnapshot(), Result.ok('world'));
+    assert.deepStrictEqual(
+      followed.getSnapshot(),
+      Optional.some(Result.ok('world')),
+    );
 
     // embed-sample-code-ignore-below
   });

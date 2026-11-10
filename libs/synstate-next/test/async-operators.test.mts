@@ -21,7 +21,7 @@ import {
   type Observable,
 } from 'synstate-next';
 import { toNode } from 'synstate-next/internal';
-import { expectType, Result } from 'ts-std-forge';
+import { expectType, Optional, Result } from 'ts-std-forge';
 
 describe(switchMap, () => {
   test('follows the latest inner observable and disposes the previous one', () => {
@@ -846,7 +846,7 @@ describe(fromSubscribable, () => {
       },
     });
 
-    assert.deepStrictEqual(wrapped.getSnapshot(), Result.ok(1));
+    assert.deepStrictEqual(wrapped.getSnapshot(), Optional.some(Result.ok(1)));
 
     assert.isTrue(toNode(wrapped).settled);
   });

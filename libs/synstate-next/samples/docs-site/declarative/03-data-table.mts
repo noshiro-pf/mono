@@ -8,7 +8,7 @@ import {
   merge,
 } from 'synstate-next';
 import { Num } from 'ts-data-forge';
-import { Result } from 'ts-std-forge';
+import { Optional, Result } from 'ts-std-forge';
 
 type Row = Readonly<{ name: string; email: string; gender: string }>;
 
@@ -139,7 +139,7 @@ if (import.meta.vitest !== undefined) {
 
       requestPage(3);
 
-      assert.strictEqual(currentPage.getSnapshot(), 3);
+      assert.deepStrictEqual(currentPage.getSnapshot(), Optional.some(3));
 
       assert.strictEqual(mut_rendered.at(-1)?.length, 5);
 
@@ -150,14 +150,14 @@ if (import.meta.vitest !== undefined) {
       setFilterGender('female');
 
       // The filters wait for the debounce, and so does the reset.
-      assert.strictEqual(currentPage.getSnapshot(), 3);
+      assert.deepStrictEqual(currentPage.getSnapshot(), Optional.some(3));
 
       await vi.advanceTimersByTimeAsync(300);
 
       // Alice 0, 6, 12, 18, 24.
-      assert.strictEqual(pageLength.getSnapshot(), 1);
+      assert.deepStrictEqual(pageLength.getSnapshot(), Optional.some(1));
 
-      assert.strictEqual(currentPage.getSnapshot(), 1);
+      assert.deepStrictEqual(currentPage.getSnapshot(), Optional.some(1));
 
       assert.deepStrictEqual(
         mut_rendered.at(-1)?.map((row) => row.name),

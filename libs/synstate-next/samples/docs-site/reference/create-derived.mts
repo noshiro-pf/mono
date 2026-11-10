@@ -4,6 +4,7 @@ import {
   type DropInitialValueOperator,
   type Observable,
 } from 'synstate-next';
+import { Optional } from 'ts-std-forge';
 
 // Passes on every `n`-th value of the source.
 const everyNth =
@@ -15,7 +16,7 @@ const everyNth =
       return () => {
         const value = source.getSnapshot();
 
-        if (value === undefined || !ctx.emitted(source)) {
+        if (Optional.isNone(value) || !ctx.emitted(source)) {
           return;
         }
 
@@ -27,7 +28,7 @@ const everyNth =
 
         mut_count = 0;
 
-        ctx.set(value);
+        ctx.set(value.value);
       };
     });
 

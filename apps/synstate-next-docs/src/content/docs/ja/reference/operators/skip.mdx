@@ -23,6 +23,7 @@ import MarbleDiagram from '../../../../../components/MarbleDiagram.astro';
 
 ```tsx
 import { createState, skip } from 'synstate-next';
+import { Optional } from 'ts-std-forge';
 
 const [query, setQuery] = createState('');
 
@@ -33,7 +34,7 @@ assert.isFalse(typed.hasValue);
 
 setQuery('syn');
 
-assert.strictEqual(typed.getSnapshot(), 'syn');
+assert.deepStrictEqual(typed.getSnapshot(), Optional.some('syn'));
 ```
 
 ## 関連項目

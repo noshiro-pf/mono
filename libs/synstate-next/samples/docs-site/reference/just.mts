@@ -1,4 +1,5 @@
 import { createState, just, map, switchMap, timer } from 'synstate-next';
+import { Optional } from 'ts-std-forge';
 
 // embed-sample-code-ignore-below
 if (import.meta.vitest !== undefined) {
@@ -16,13 +17,13 @@ if (import.meta.vitest !== undefined) {
         ),
       );
 
-      assert.strictEqual(label.getSnapshot(), 'now');
+      assert.deepStrictEqual(label.getSnapshot(), Optional.some('now'));
 
       setDelayed(true);
 
       await vi.advanceTimersByTimeAsync(500);
 
-      assert.strictEqual(label.getSnapshot(), 'later');
+      assert.deepStrictEqual(label.getSnapshot(), Optional.some('later'));
 
       // embed-sample-code-ignore-below
     } finally {

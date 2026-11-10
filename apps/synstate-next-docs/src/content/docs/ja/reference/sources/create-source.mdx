@@ -11,6 +11,7 @@ description: '他のライブラリやイベントから自分で値を流すソ
 
 ```tsx
 import { createSource, type Observable } from 'synstate-next';
+import { Optional } from 'ts-std-forge';
 
 const everyFrame = (milliseconds: number): Observable<number> =>
     createSource<number>((ctx) => {
@@ -31,14 +32,14 @@ const frames = everyFrame(16);
 
 await vi.advanceTimersByTimeAsync(50);
 
-assert.strictEqual(frames.getSnapshot(), 3);
+assert.deepStrictEqual(frames.getSnapshot(), Optional.some(3));
 
 // Disposing it runs the cleanup, which clears the interval.
 frames.dispose();
 
 await vi.advanceTimersByTimeAsync(50);
 
-assert.strictEqual(frames.getSnapshot(), 3);
+assert.deepStrictEqual(frames.getSnapshot(), Optional.some(3));
 ```
 
 ## 関連項目

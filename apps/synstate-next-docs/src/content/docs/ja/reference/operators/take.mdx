@@ -23,6 +23,7 @@ import MarbleDiagram from '../../../../../components/MarbleDiagram.astro';
 
 ```tsx
 import { createValueEmitter, take } from 'synstate-next';
+import { Optional } from 'ts-std-forge';
 
 const [clicked, click] = createValueEmitter<number>();
 
@@ -43,7 +44,7 @@ click(3);
 assert.deepStrictEqual(mut_seen, [1, 2]);
 
 // It keeps the last value it passed.
-assert.strictEqual(firstTwo.getSnapshot(), 2);
+assert.deepStrictEqual(firstTwo.getSnapshot(), Optional.some(2));
 ```
 
 ## 関連項目

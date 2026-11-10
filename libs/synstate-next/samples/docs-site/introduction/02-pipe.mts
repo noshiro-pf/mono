@@ -6,6 +6,7 @@ import {
   type Observable,
 } from 'synstate-next';
 import { expectType } from 'ts-data-forge';
+import { Optional } from 'ts-std-forge';
 
 // embed-sample-code-ignore-below
 if (import.meta.vitest !== undefined) {
@@ -31,7 +32,7 @@ if (import.meta.vitest !== undefined) {
 
     assert.strictEqual(doubled.value, 8);
 
-    assert.strictEqual(even.getSnapshot(), 4);
+    assert.deepStrictEqual(even.getSnapshot(), Optional.some(4));
 
     // embed-sample-code-ignore-below
   });

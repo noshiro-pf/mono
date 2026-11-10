@@ -298,6 +298,7 @@ import {
     scan,
     source,
 } from 'synstate-next';
+import { Optional } from 'ts-std-forge';
 
 // An event holds nothing until it first fires, and every `emit` passes on,
 // equal to the last or not.
@@ -332,5 +333,5 @@ assert.isFalse(messages.hasValue);
 
 messages.emit('hello');
 
-assert.strictEqual(messages.getSnapshot(), 'hello');
+assert.deepStrictEqual(messages.getSnapshot(), Optional.some('hello'));
 ```

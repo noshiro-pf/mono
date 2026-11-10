@@ -63,6 +63,7 @@ import {
     type Observable,
 } from 'synstate-next';
 import { expectType } from 'ts-data-forge';
+import { Optional } from 'ts-std-forge';
 
 const [count, setCount] = createState(1);
 
@@ -84,7 +85,7 @@ setCount(4);
 
 assert.strictEqual(doubled.value, 8);
 
-assert.strictEqual(even.getSnapshot(), 4);
+assert.deepStrictEqual(even.getSnapshot(), Optional.some(4));
 ```
 
 ## 次に読むもの

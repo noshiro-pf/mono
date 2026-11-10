@@ -28,6 +28,7 @@ import {
 } from 'synstate-next';
 import { toNode } from 'synstate-next/internal';
 import { Arr } from 'ts-data-forge';
+import { Optional } from 'ts-std-forge';
 
 describe(take, () => {
   test('settles, and leaves its parent, in the update of its nth value', () => {
@@ -355,7 +356,7 @@ describe(source, () => {
 
     assert.deepStrictEqual(seen, [1]);
 
-    assert.strictEqual(s.getSnapshot(), 1);
+    assert.deepStrictEqual(s.getSnapshot(), Optional.some(1));
   });
 
   test('what is derived from a disposed source is settled at once, and holds the value it computed (#2248)', () => {

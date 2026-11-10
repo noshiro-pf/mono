@@ -1,4 +1,5 @@
 import { createValueEmitter, take } from 'synstate-next';
+import { Optional } from 'ts-std-forge';
 
 // embed-sample-code-ignore-below
 if (import.meta.vitest !== undefined) {
@@ -23,7 +24,7 @@ if (import.meta.vitest !== undefined) {
     assert.deepStrictEqual(mut_seen, [1, 2]);
 
     // It keeps the last value it passed.
-    assert.strictEqual(firstTwo.getSnapshot(), 2);
+    assert.deepStrictEqual(firstTwo.getSnapshot(), Optional.some(2));
 
     // embed-sample-code-ignore-below
   });

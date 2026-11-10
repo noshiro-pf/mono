@@ -9,6 +9,7 @@ description: synstate-next のスケジューラーが読み書きするフィ�
 
 ```tsx
 import { createState, derive, filter, map } from 'synstate-next';
+import { Optional } from 'ts-std-forge';
 
 const [A, setA] = createState(0);
 
@@ -34,7 +35,7 @@ setA(2); // B = 20, D = 2, BD = [20, 2], E = 20, C = 22
 
 assert.deepStrictEqual(mut_seen, [0, 10, 22]);
 
-assert.strictEqual(E.getSnapshot(), 20);
+assert.deepStrictEqual(E.getSnapshot(), Optional.some(20));
 ```
 
 深さはコメントのとおりです。`A` は深さ 0 の状態で、`B` と `D` はそれを追い、`BD` は両方を追い、`C` は `BD` を、`E` は `D` を追います。`C` の購読者は effect です。

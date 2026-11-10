@@ -4,6 +4,7 @@ import {
   type DropInitialValueOperator,
   type Observable,
 } from 'synstate-next';
+import { Optional } from 'ts-std-forge';
 
 // embed-sample-code-ignore-below
 if (import.meta.vitest !== undefined) {
@@ -16,8 +17,8 @@ if (import.meta.vitest !== undefined) {
         createDerived<A>([source], (ctx) => () => {
           const value = source.getSnapshot();
 
-          if (value !== undefined) {
-            ctx.set(value);
+          if (Optional.isSome(value) && value.value !== undefined) {
+            ctx.set(value.value);
           }
         });
 
@@ -31,7 +32,7 @@ if (import.meta.vitest !== undefined) {
 
     setSelected(undefined);
 
-    assert.strictEqual(lastSelected.getSnapshot(), 'a');
+    assert.deepStrictEqual(lastSelected.getSnapshot(), Optional.some('a'));
 
     // embed-sample-code-ignore-below
   });

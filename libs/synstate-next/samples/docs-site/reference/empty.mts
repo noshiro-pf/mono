@@ -1,4 +1,5 @@
 import { counter, createState, empty, switchMap } from 'synstate-next';
+import { Optional } from 'ts-std-forge';
 
 // embed-sample-code-ignore-below
 if (import.meta.vitest !== undefined) {
@@ -20,7 +21,7 @@ if (import.meta.vitest !== undefined) {
 
       await vi.advanceTimersByTimeAsync(1000);
 
-      assert.strictEqual(ticks.getSnapshot(), 2);
+      assert.deepStrictEqual(ticks.getSnapshot(), Optional.some(2));
 
       // embed-sample-code-ignore-below
     } finally {

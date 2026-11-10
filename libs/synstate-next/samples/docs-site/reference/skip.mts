@@ -1,4 +1,5 @@
 import { createState, skip } from 'synstate-next';
+import { Optional } from 'ts-std-forge';
 
 // embed-sample-code-ignore-below
 if (import.meta.vitest !== undefined) {
@@ -13,7 +14,7 @@ if (import.meta.vitest !== undefined) {
 
     setQuery('syn');
 
-    assert.strictEqual(typed.getSnapshot(), 'syn');
+    assert.deepStrictEqual(typed.getSnapshot(), Optional.some('syn'));
 
     // embed-sample-code-ignore-below
   });
