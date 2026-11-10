@@ -4,6 +4,7 @@ import { Arr, isRecord, Result } from 'ts-data-forge';
 import { isDirectlyExecuted } from 'ts-repo-utils';
 // eslint-disable-next-line import-x/no-relative-packages
 import { embedExamplesInMarkdown } from '../../../tools/configs/embed-examples-in-markdown.mjs';
+import { isSubject, scenarios } from './benchmark/scenarios.mjs';
 import { referencePages } from './reference-pages.mjs';
 import { workspaceRootPath } from './workspace-root-path.mjs';
 
@@ -19,6 +20,20 @@ const samplesDir = path.resolve(
 
 /** synstate's samples, relative to {@link samplesDir}. */
 const synstateSamples = '../../../synstate/samples/docs-site';
+
+/**
+ * The code each scenario of the benchmark page shows, in the order its
+ * libraries are measured, which is the order of its fences: synstate-next's
+ * first, then, where the page lists them, the other libraries' as synstate's
+ * benchmark measures them.
+ */
+const benchmarkListings = scenarios.flatMap(({ entries, listsOthers }) =>
+  entries
+    .filter(({ label }) => listsOthers || isSubject(label))
+    .map(({ file }) =>
+      path.relative(samplesDir, file).split(path.sep).join('/'),
+    ),
+);
 
 /**
  * Each page and the samples that fill its code fences, in order. The English
@@ -130,6 +145,7 @@ const pageSamples: readonly (readonly [
       'operators-on-signals/02-count-events.synstate-next.mts',
     ],
   ],
+  ['comparison/benchmark.md', benchmarkListings],
   // Each reference page shows one sample, named after it.
   ...referencePages.map(
     ({ group, slug }) =>
