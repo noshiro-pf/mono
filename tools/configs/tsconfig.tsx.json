@@ -11,7 +11,8 @@
   // Every workspace package reachable from a source-run entry point needs an
   // entry here — `z:repo-settings` runs `github-settings-as-code`'s `src/`,
   // which reaches `ts-fortress` and `octokit-safe-types`, the commands of
-  // `pr-merge-queue` reach `pr-report-core`, and the tools that share their
+  // `pr-merge-queue` reach `pr-report-core` (those of `pr-merge-queue-v2`,
+  // `pr-report-core-v2`), and the tools that share their
   // GitHub client reach `pr-merge-queue`.
   //
   // The long-running `unblock-prs` and `run-unblock-prs-skill` rely on it too:
@@ -32,7 +33,8 @@
       "ts-fortress": ["libs/ts-fortress/src/entry-point.mts"],
       "octokit-safe-types": ["libs/octokit-safe-types/src/entry-point.mts"],
       "pr-merge-queue": ["libs/pr-merge-queue/src/entry-point.mts"],
-      "pr-report-core": ["libs/pr-report-core/src/entry-point.mts"]
+      "pr-report-core": ["libs/pr-report-core/src/entry-point.mts"],
+      "pr-report-core-v2": ["libs/pr-report-core-v2/src/entry-point.mts"]
     }
   }
 }

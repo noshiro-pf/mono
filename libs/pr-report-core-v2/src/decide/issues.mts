@@ -87,34 +87,38 @@ export const decideStartStates = (
 };
 
 /**
+ * The claim a claim comment makes while it holds at `nowEpochMs`; `undefined`
+ * for none, a released one, or an expired `planned` one.
+ */
+export const heldIssueClaim = (
+  claim: ClaimComment<IssueClaim> | undefined,
+  nowEpochMs: number,
+): IssueClaim | undefined =>
+  claim?.kind === 'standing' && issueClaimHolds(claim.claim, nowEpochMs)
+    ? claim.claim
+    : undefined;
+
+/**
  * The {@link IssueProgress} of an issue. Being worked on wins over being
  * planned. **Changed in v2** (#3233): a claim that holds counts as its label.
  */
 export const progressOf = ({
   labels,
   closedByOpenPull,
-  claim,
-  nowEpochMs,
+  held,
 }: Readonly<{
   labels: readonly string[];
   closedByOpenPull: boolean;
-  /** This account's claim comment on it, if any. */
-  claim: ClaimComment<IssueClaim> | undefined;
-  nowEpochMs: number;
-}>): IssueProgress => {
-  const held =
-    claim?.kind === 'standing' && issueClaimHolds(claim.claim, nowEpochMs)
-      ? claim.claim.state
-      : undefined;
-
-  return closedByOpenPull ||
-    held === 'started' ||
-    hasLabel(labels, IssueLabel.inProgress)
+  /** This account's claim on it while it holds ({@link heldIssueClaim}). */
+  held: IssueClaim | undefined;
+}>): IssueProgress =>
+  closedByOpenPull ||
+  held?.state === 'started' ||
+  hasLabel(labels, IssueLabel.inProgress)
     ? 'in-progress'
-    : held === 'planned' || hasLabel(labels, IssueLabel.planned)
+    : held?.state === 'planned' || hasLabel(labels, IssueLabel.planned)
       ? 'planned'
       : 'none';
-};
 
 /** The state an issue is shown in: its progress once it is startable. */
 export const withProgress = (
