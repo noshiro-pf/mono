@@ -16,6 +16,7 @@ export {
   type InitializedObservable,
   type KeepInitialValueOperator,
   type Observable,
+  type ObservableValue,
   type Pipe,
   type ProvideInitialValueOperator,
   type Source,

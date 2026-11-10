@@ -52,6 +52,12 @@ synstate-next replaces synstate in its next major version. This page lists what 
 - **`WithInitialValueOperator` is `ProvideInitialValueOperator`**, a verb like the other two operator types, `KeepInitialValueOperator` and `DropInitialValueOperator`.
 - **The guards `isChildObservable`, `isManagerObservable` and `isRootObservable` are gone**: the kinds they told apart are not in the public types.
 
+## Types
+
+- **`ObservableValue` stays, and takes only an observable type**: `ObservableValue<Observable<number> | undefined>` is an error, where synstate dropped the `undefined`, and `ObservableValue<never>` is `unknown` rather than `never`.
+- **Some types are renamed**: `Subscription` is `Unsubscribe`, the function `subscribe` returns; `Scope` is `Owner`; `Unwrap` is `ValuesOf`; `SourceObservable` is `Source`. The types for writing operators and sources (`RootObservableConfig`, `RootObservableTools`, `ChildObservableConfig`, `SyncChildObservableHooks`, `SyncChildObservableTools`, `AsyncChildObservableHooks`, `AsyncChildObservableTools`) are `SourceContext`, `DerivedContext` and `DerivedBehavior`.
+- **Some types are gone**: `Subscriber`, with `onComplete`; `InitializedSourceObservable`, with `source(initialValue)`; the type of each kind of observable (`ObservableBase`, `ObservableKind`, `RootObservable`, `ChildObservable`, `ManagerObservable`, `TimerObservable`, `MapOperatorObservable` and the rest), since an observable is an `Observable` or an `InitializedObservable`; `Operator`, since an operator is typed by one of the three operator types; `UpdateToken` and `TimerId`; and the helpers `Wrap`, `WrapInitialized`, `NonEmptyUnknownList` and `TupleToQueueTuple`.
+
 ## One copy per program
 
 Observables from two copies of the package cannot be combined: the graph throws for an observable from another copy.
