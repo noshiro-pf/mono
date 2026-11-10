@@ -5,6 +5,7 @@ import { hasDisableNextLineComment } from '../functions/index.mjs';
 import {
   ensureTsTypeForgeTypeImport,
   replaceNodeWithText,
+  typeNameUse,
 } from '../utils/index.mjs';
 import type { TsMorphTransformer } from './types.mjs';
 
@@ -17,19 +18,29 @@ const UNKNOWN_RECORD_NAME = 'UnknownRecord';
  * index signatures `[k: string]: unknown` with `UnknownRecord`.
  *
  * When a replacement occurs, also imports `UnknownRecord` from `ts-type-forge`
- * as {@link ensureTsTypeForgeTypeImport} does.
+ * as {@link ensureTsTypeForgeTypeImport} does, where the file may take the
+ * import ({@link typeNameUse}). Where `UnknownRecord` is already in scope it is
+ * written with no import; in a script, which an import would turn into a module,
+ * or where the file binds the name to a value or a namespace, nothing is
+ * replaced.
  */
 export const replaceRecordWithUnknownRecordTransformer =
   (): TsMorphTransformer =>
     ({
       name: TRANSFORMER_NAME,
       transform: (sourceAst) => {
+        const use = typeNameUse(sourceAst.compilerNode, UNKNOWN_RECORD_NAME);
+
+        if (use === 'leave') {
+          return;
+        }
+
         const containerModifications = Arr.toUnshifted(
           sourceAst.getModules().map(processDeclarations),
           processDeclarations(sourceAst),
         );
 
-        if (containerModifications.includes(true)) {
+        if (use === 'import' && containerModifications.includes(true)) {
           ensureTsTypeForgeTypeImport(sourceAst, UNKNOWN_RECORD_NAME);
         }
       },

@@ -44,6 +44,145 @@ export const ensureTsTypeForgeTypeImport = (
 };
 
 /**
+ * Whether the file has a type reference to `name` (an `extends` or `implements`
+ * clause included).
+ */
+export const referencesTypeName = (node: tsm.ts.Node, name: string): boolean =>
+  (tsm.ts.isTypeReferenceNode(node) &&
+    tsm.ts.isIdentifier(node.typeName) &&
+    node.typeName.text === name) ||
+  (tsm.ts.isExpressionWithTypeArguments(node) &&
+    tsm.ts.isIdentifier(node.expression) &&
+    node.expression.text === name) ||
+  (tsm.ts.forEachChild(
+    node,
+    (child) => referencesTypeName(child, name) || undefined,
+  ) ??
+    false);
+
+/**
+ * Whether the type `name` can be written in the file as it is:
+ *
+ * - `"in-scope"`: the top level imports it or declares it as a type, or the
+ *   file has a type reference to it, which without either relies on a global.
+ * - `"taken"`: the top level declares it as a value or a namespace only, which
+ *   an import of the name could clash with (an exported one does).
+ * - `"free"`: neither; it can be imported.
+ *
+ * A qualified name (`tf.UnknownRecord`), a property name, the original name of
+ * an aliased import (`UnknownRecord as UR`) and a declaration in an inner scope
+ * bind nothing at the top level, so they do not count.
+ */
+export const typeNameScope = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  sourceFile: tsm.ts.SourceFile,
+  name: string,
+): TypeNameScope => {
+  const topLevelNames = sourceFile.statements.flatMap(topLevelBindings);
+
+  return topLevelNames.some(
+    (binding) => binding.isType && binding.name === name,
+  ) || referencesTypeName(sourceFile, name)
+    ? 'in-scope'
+    : topLevelNames.some((binding) => binding.name === name)
+      ? 'taken'
+      : 'free';
+};
+
+/**
+ * What a transformer that writes the `ts-type-forge` type `name` may do in the
+ * file: `"write"` the name as it is (it is in scope), `"import"` it with
+ * {@link ensureTsTypeForgeTypeImport} (it is free, and the file is a module, so
+ * an import does not turn a script's global declarations into a module's), or
+ * `"leave"` the file alone (a script, or a file where the name is taken).
+ */
+export const typeNameUse = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  sourceFile: tsm.ts.SourceFile,
+  name: string,
+): 'write' | 'import' | 'leave' => {
+  const scope = typeNameScope(sourceFile, name);
+
+  return scope === 'in-scope'
+    ? 'write'
+    : scope === 'free' && tsm.ts.isExternalModule(sourceFile)
+      ? 'import'
+      : 'leave';
+};
+
+export type TypeNameScope = 'free' | 'in-scope' | 'taken';
+
+/**
+ * The names a top-level statement binds, and whether each can name a type (an
+ * import can).
+ */
+const topLevelBindings = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  statement: tsm.ts.Statement,
+): readonly Readonly<{ name: string; isType: boolean }>[] => {
+  if (tsm.ts.isImportDeclaration(statement)) {
+    const clause = statement.importClause;
+
+    const bindings = clause?.namedBindings;
+
+    // A namespace import cannot name a type.
+    const namespaceImport =
+      bindings !== undefined && tsm.ts.isNamespaceImport(bindings)
+        ? ([{ name: bindings.name.text, isType: false }] as const)
+        : ([] as const);
+
+    const named =
+      bindings !== undefined && tsm.ts.isNamedImports(bindings)
+        ? bindings.elements.map((element) => ({
+            name: element.name.text,
+            isType: true,
+          }))
+        : ([] as const);
+
+    const defaultImport =
+      clause?.name === undefined
+        ? ([] as const)
+        : ([{ name: clause.name.text, isType: true }] as const);
+
+    return [...defaultImport, ...namespaceImport, ...named];
+  }
+
+  if (tsm.ts.isImportEqualsDeclaration(statement)) {
+    return [{ name: statement.name.text, isType: true }];
+  }
+
+  if (
+    tsm.ts.isTypeAliasDeclaration(statement) ||
+    tsm.ts.isInterfaceDeclaration(statement) ||
+    tsm.ts.isClassDeclaration(statement) ||
+    tsm.ts.isEnumDeclaration(statement)
+  ) {
+    return statement.name === undefined
+      ? []
+      : [{ name: statement.name.text, isType: true }];
+  }
+
+  if (
+    (tsm.ts.isFunctionDeclaration(statement) ||
+      tsm.ts.isModuleDeclaration(statement)) &&
+    statement.name !== undefined &&
+    tsm.ts.isIdentifier(statement.name)
+  ) {
+    return [{ name: statement.name.text, isType: false }];
+  }
+
+  if (tsm.ts.isVariableStatement(statement)) {
+    return statement.declarationList.declarations.flatMap((declaration) =>
+      tsm.ts.isIdentifier(declaration.name)
+        ? [{ name: declaration.name.text, isType: false }]
+        : [],
+    );
+  }
+
+  return [];
+};
+
+/**
  * `end`, moved past the comments that start on the same line after it: one such
  * as `// eslint-disable-line` is about that line.
  */
