@@ -87,6 +87,79 @@ describe('findJobShapeViolations', () => {
     assert.include(found[0], 'z:ci-job');
   });
 
+  test('a matrix job that names no command runs no entries, and passes', () => {
+    const uploadJob = [
+      '  coverage-pr:',
+      '    strategy:',
+      '      matrix:',
+      '        artifact: [coverage-4, coverage-5]',
+      '    steps:',
+      '      - uses: actions/download-artifact@v8',
+      '        with:',
+      // eslint-disable-next-line no-template-curly-in-string -- a GitHub Actions expression, not a template.
+      '          name: ${{ matrix.artifact }}',
+      '      - run: echo uploaded',
+    ].join('\n');
+
+    assert.deepStrictEqual(
+      violations(
+        [workflow('.github/workflows/a.yml', `${ciJobWorkflow}\n${uploadJob}`)],
+        ['.github/workflows/a.yml'],
+      ),
+      [],
+    );
+  });
+
+  test('a matrix of commands run through an action is bare all the same', () => {
+    const actionJob = [
+      '  through-action:',
+      '    strategy:',
+      '      matrix:',
+      '        command: [ws:check:test]',
+      '    steps:',
+      '      - uses: some/runner@v1',
+      '        with:',
+      // eslint-disable-next-line no-template-curly-in-string -- a GitHub Actions expression, not a template.
+      '          command: ${{ matrix.command }}',
+    ].join('\n');
+
+    const found = violations(
+      [workflow('.github/workflows/a.yml', `${ciJobWorkflow}\n${actionJob}`)],
+      ['.github/workflows/a.yml'],
+    );
+
+    assert.lengthOf(found, 1);
+
+    assert.include(
+      found[0],
+      '(job `through-action`) runs its matrix entries without',
+    );
+  });
+
+  test('a matrix keyed otherwise and run by a script is bare all the same', () => {
+    const scriptJob = [
+      '  by-script:',
+      '    strategy:',
+      '      matrix:',
+      '        script: [ws:check:test]',
+      '    steps:',
+      // eslint-disable-next-line no-template-curly-in-string -- a GitHub Actions expression, not a template.
+      '      - run: pnpm run ${{ matrix.script }}',
+    ].join('\n');
+
+    const found = violations(
+      [workflow('.github/workflows/a.yml', `${ciJobWorkflow}\n${scriptJob}`)],
+      ['.github/workflows/a.yml'],
+    );
+
+    assert.lengthOf(found, 1);
+
+    assert.include(
+      found[0],
+      '(job `by-script`) runs its matrix entries without',
+    );
+  });
+
   test('a workflow allowed its bare matrix, with a reason, passes', () => {
     assert.deepStrictEqual(
       violations(

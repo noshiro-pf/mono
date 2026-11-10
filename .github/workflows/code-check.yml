@@ -406,6 +406,76 @@ jobs:
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v7.1.1
 
+  # What a pull request's run uploads to Codecov when it reused a verdict:
+  # the reports the run of the same tree kept (`coverage-*`, above), most
+  # often its queue layer's, which checked it ahead of its turn and uploaded
+  # them for the layer's own commit. Without this the pull request's head has
+  # no report, and Codecov writes neither its statuses nor its comment.
+  #
+  # One entry per artifact, so one upload each: Codecov waits for as many
+  # uploads as there are coverage shards (`after_n_builds` in `codecov.yml`),
+  # and one merged upload, as `coverage-main` makes, would never be enough.
+  # The names are `coverage-<strategy.job-index>` of the `coverage: true`
+  # entries above; `check:root:codecov-builds` holds the two lists together,
+  # which is why they are a matrix rather than two steps of one job.
+  #
+  # Only on a reused `success`, since a failed run kept no reports. A later
+  # label event that reuses the verdict again uploads the same reports for
+  # the same head once more, which Codecov merges into the same result; a
+  # released pull request seldom has one before it merges.
+  #
+  # Where no run of the tree kept them, nothing is uploaded: the statuses are
+  # informational, and running the shards again here would cost what the
+  # reused verdict saved. See "Reusing what a pull request produced" in
+  # README.md.
+  coverage-pr:
+    needs: gates
+    if: >-
+      !cancelled() &&
+      github.event_name == 'pull_request' &&
+      needs.gates.outputs.branch_up_to_date != 'false' &&
+      needs.gates.outputs.reused_result == 'success'
+    name: coverage-pr (${{ matrix.artifact }})
+    runs-on: ubuntu-latest
+    # `actions: read` to find and download the reports of an earlier run.
+    permissions:
+      actions: read
+      contents: read
+    timeout-minutes: 5
+    strategy:
+      fail-fast: false
+      matrix:
+        artifact: [coverage-4, coverage-5]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7.0.1
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Find the coverage reports of this tree
+        id: reported
+        uses: $/.github/actions/find-run-of-tree
+        with:
+          workflow: code-check.yml
+          artifact-pattern: ^${{ matrix.artifact }}$
+          conclusion: success
+
+      - name: Take those reports
+        id: taken
+        if: steps.reported.outputs.run-id != ''
+        # A download that fails uploads nothing.
+        continue-on-error: true
+        uses: actions/download-artifact@v8.0.2
+        with:
+          name: ${{ matrix.artifact }}
+          run-id: ${{ steps.reported.outputs.run-id }}
+          github-token: ${{ github.token }}
+
+      - name: Upload coverage reports to Codecov
+        if: steps.taken.outcome == 'success'
+        uses: codecov/codecov-action@v7.1.1
+
   # The one required status check for this workflow, reported as
   # `code-check-result / result` — see "The aggregate job" in README.md.
   code-check-result:

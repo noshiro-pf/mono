@@ -554,6 +554,18 @@ Where no run of the tree holds the artifact — it expired, or the merge bypasse
 the checks — the job produces it as it used to, so the lookup can only save
 work, never skip it.
 
+A pull request's own run takes the coverage reports the same way when it reused
+a passing verdict, which is the usual case for a queued one: its queue layer ran
+the shards and uploaded them for the layer's commit, so without `coverage-pr`
+its head would have no report and Codecov would write neither its statuses nor
+its comment. `coverage-pr` uploads each `coverage-<index>` artifact on its own,
+as the shards did, because Codecov waits for as many uploads as there are shards
+(`after_n_builds`) and one merged upload, as `coverage-main` makes, would not
+do. Where no run of the tree kept them it uploads nothing rather than running
+the shards: the statuses are informational, and that would cost what the reuse
+saved. `check:root:codecov-builds` holds its `artifact` list to the
+`coverage: true` entries.
+
 #### Why a workflow of its own
 
 The answers need a checkout (the gate is a program, not a glob match), so they

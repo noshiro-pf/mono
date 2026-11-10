@@ -17,6 +17,7 @@ import { readShellCommands } from '../lib/shell-commands.mjs';
 import {
   expandVariable,
   matrixKeyOf,
+  matrixValues,
   readMatrix,
   readWorkflowJobs,
   type WorkflowJob,
@@ -73,14 +74,14 @@ export const checkCiJobShape = (): Promise<Result<number, string>> =>
 
 /**
  * Every way the workflows have left the shape, one message each. A matrix job
- * (a job with a `matrix:`) of a check workflow either runs `z:ci-job`, and then
- * carries the report and no clean-tree step of its own, or runs its entries
- * some other way, which its workflow has to be allowed to do. Read job by job,
- * through the YAML parser and the shell reader that `check-ci-commands.mts` and
- * `check-all.mts` read the workflows with, so that one job's step answers for
- * no other, a mention is not a run, and a run is a run however the line is
- * written (joined by `|` or `$(…)`, continued with `\`, a matrix value handed
- * on through a variable).
+ * (a job with a `matrix:` that runs entries) of a check workflow either runs
+ * `z:ci-job`, and then carries the report and no clean-tree step of its own, or
+ * runs its entries some other way, which its workflow has to be allowed to do.
+ * Read job by job, through the YAML parser and the shell reader that
+ * `check-ci-commands.mts` and `check-all.mts` read the workflows with, so that
+ * one job's step answers for no other, a mention is not a run, and a run is a
+ * run however the line is written (joined by `|` or `$(…)`, continued with `\`,
+ * a matrix value handed on through a variable).
  */
 export const findJobShapeViolations = ({
   workflows,
@@ -112,7 +113,7 @@ export const findJobShapeViolations = ({
 
   const jobs = read.flatMap(({ relativePath, isCheck, jobs: parsed }) =>
     (Result.isOk(parsed) ? parsed.value : [])
-      .filter(({ matrix }) => matrix !== undefined)
+      .filter((job) => job.matrix !== undefined && runsEntries(job))
       .map((job) => ({
         relativePath,
         isCheck,
@@ -330,6 +331,32 @@ const readJob = (
     problems: readings.flatMap(({ reading }) => reading.problems),
   };
 };
+
+/**
+ * Whether a matrix job runs entries: its matrix names a `command`, however a
+ * step runs it, by a script or through an action; or a step's script reads a
+ * matrix value, in its `run:` or through its `env:`, whatever the key. A matrix
+ * it cannot read counts, so that the reason is reported. A job that does
+ * neither hands its values to actions alone and has no entry for `z:ci-job` to
+ * run: `coverage-pr` in code-check.yml names the artifacts it uploads.
+ */
+const runsEntries = (job: WorkflowJob): boolean => {
+  const matrix = readMatrix(job.matrix);
+
+  return (
+    Result.isErr(matrix) ||
+    Arr.isNonEmpty(matrixValues(matrix.value, 'command')) ||
+    job.steps.some(
+      ({ run, env }) =>
+        run !== undefined &&
+        Arr.toUnshifted(run)(Object.values({ ...job.env, ...env })).some(
+          (text) => text.includes(MATRIX_CONTEXT),
+        ),
+    )
+  );
+};
+
+const MATRIX_CONTEXT = 'matrix.';
 
 const GAP_REPORT = 'z:check-changed-gap';
 

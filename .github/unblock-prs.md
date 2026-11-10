@@ -47,6 +47,7 @@ table to the check workflows):
 | `strict-lib-types`                         | `pnpm run ws:build:deps` then `pnpm run ws:check:types:strict-lib`                                                                                  |
 | `benchmark`                                | Read its failure: drifted tables are replaced by the files of the run's `synstate-benchmark-to-commit-<run id>` artifact, as its message says       |
 | `coverage-main`                            | Runs on `main` alone, never on a pull request                                                                                                       |
+| `coverage-pr (<artifact>)`                 | Uploads reports an earlier run kept, for Codecov alone; it holds no merge, and nothing in the branch fixes it                                       |
 | `Validate PR title`                        | The PR title is not Conventional Commits — `PATCH /pulls/{n}`                                                                                       |
 | `Validate commit messages`                 | A commit message is not English — amend it                                                                                                          |
 | `Validate commit count`                    | The branch is more than one commit — squash it, see below                                                                                           |
