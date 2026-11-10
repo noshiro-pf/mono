@@ -106,7 +106,8 @@ type ReflectedKey<E, K extends keyof E> = string extends K
   ? never
   : number extends K
     ? never
-    : K extends ExcludedKey | `aria${string}` | `on${string}`
+    : K extends
+          ExcludedKey | ElementExcludedKey<E> | `aria${string}` | `on${string}`
       ? never
       : NonNullable<E[K]> extends boolean | number | string
         ? IsWritable<E, K> extends true
@@ -132,10 +133,10 @@ type IsWritable<E, K extends keyof E> =
  * binds every key that is left and reads the property back in Chromium, from
  * the list `gen:reflected-keys` writes from these types.
  *
- * The keys are left out of every element, so a name that is an attribute on one
- * element and not on another goes by the common case: `<body>`'s obsolete
- * `text` attribute is left out with the rest, and `<style>`'s `disabled`, which
- * has no attribute, stays in with every other `disabled`.
+ * The keys are left out of every element, so a name that is an attribute on
+ * most elements and not on a few is in `ElementExcludedKey` instead, and one
+ * that is an attribute on a few and not on most goes by the common case:
+ * `<body>`'s obsolete `text` attribute is left out with the rest.
  */
 type ExcludedKey =
   | 'className'
@@ -171,3 +172,13 @@ type ExcludedKey =
   | 'length'
   | 'ch'
   | 'chOff';
+
+/**
+ * Writable primitive properties that are attributes on other elements but not
+ * on `E`, so they are left out of `E` alone, as `ExcludedKey`s are of every
+ * element: `<style>`'s `disabled` (#3418). The element is matched by identity,
+ * because `HTMLLinkElement`, whose `disabled` is an attribute, is assignable to
+ * `HTMLStyleElement`.
+ */
+type ElementExcludedKey<E> =
+  TypeEq<E, HTMLStyleElement> extends true ? 'disabled' : never;

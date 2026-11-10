@@ -294,7 +294,7 @@ export const reflectedKeysByTag = {
   source: ['height', 'media', 'sizes', 'src', 'srcset', 'type', 'width'],
   span: [],
   strong: [],
-  style: ['disabled', 'media', 'type'],
+  style: ['media', 'type'],
   sub: [],
   summary: [],
   sup: [],

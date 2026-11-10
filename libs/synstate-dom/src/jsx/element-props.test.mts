@@ -1,6 +1,10 @@
 import { expectType } from 'ts-data-forge';
 import type { Bindable } from '../constant/index.mjs';
-import type { CommonElementProps } from './element-props.mjs';
+import type {
+  CommonElementProps,
+  GeneratedIntrinsicElements,
+  HtmlElementProps,
+} from './element-props.mjs';
 import type { EventPropNames } from './event-prop-names.mjs';
 
 describe('EventPropNames', () => {
@@ -39,6 +43,49 @@ describe('CommonElementProps', () => {
     expectType<
       CommonElementProps<HTMLElement>['data-row'],
       Bindable<string | undefined> | undefined
+    >('=');
+
+    assert.isTrue(true);
+  });
+});
+
+describe('the keys left out of one element (#3418)', () => {
+  test("<style>'s `disabled`, which has no attribute, is left out", () => {
+    expectType<
+      'disabled' extends keyof GeneratedIntrinsicElements['style']
+        ? true
+        : false,
+      false
+    >('=');
+
+    expectType<
+      'disabled' extends keyof HtmlElementProps<HTMLStyleElement>
+        ? true
+        : false,
+      false
+    >('=');
+
+    assert.isTrue(true);
+  });
+
+  test('the other keys of <style>, and `disabled` of any other element, stay in', () => {
+    expectType<
+      'media' extends keyof GeneratedIntrinsicElements['style'] ? true : false,
+      true
+    >('=');
+
+    expectType<
+      'disabled' extends keyof GeneratedIntrinsicElements['link']
+        ? true
+        : false,
+      true
+    >('=');
+
+    expectType<
+      'disabled' extends keyof GeneratedIntrinsicElements['button']
+        ? true
+        : false,
+      true
     >('=');
 
     assert.isTrue(true);

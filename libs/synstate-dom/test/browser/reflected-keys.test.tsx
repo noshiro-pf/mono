@@ -147,9 +147,6 @@ const notReflected: ReadonlySet<string> = new Set<string>([
   // Chromium has no such property; the attribute is what a browser that has one
   // reads.
   'input.capture',
-  // Has no attribute, but is left in with every other `disabled`
-  // (`ExcludedKey`).
-  'style.disabled',
 ]);
 
 /**
