@@ -28,6 +28,7 @@ import {
 } from '../lib/changesets.mjs';
 import { RUNTIME_DEPENDENCY_FIELDS } from '../lib/dependency-fields.mjs';
 import { plural } from '../lib/plural.mjs';
+import { skipExpressionWrappers } from '../lib/ts-expression-wrappers.mjs';
 import { projectRootPath } from '../project-root-path.mjs';
 
 /**
@@ -805,25 +806,20 @@ const isExported = (statement: DeepReadonly<ts.Statement>): boolean =>
   );
 
 /**
- * The binding an expression names, through parentheses, `as`, `satisfies`, `!`,
- * `<T>` and member access: `a` of `(a.b as T)!`. `undefined` for any other
+ * The binding an expression names, through the wrappers
+ * `skipExpressionWrappers` sees through and member access: `a` of `(a.b as T)!`. `undefined` for any other
  * expression, such as a call.
  */
 const aliasedBinding = (
   expression: DeepReadonly<ts.Expression>,
 ): string | undefined => {
-  if (
-    ts.isParenthesizedExpression(expression) ||
-    ts.isAsExpression(expression) ||
-    ts.isSatisfiesExpression(expression) ||
-    ts.isNonNullExpression(expression) ||
-    ts.isTypeAssertionExpression(expression) ||
-    ts.isPropertyAccessExpression(expression)
-  ) {
-    return aliasedBinding(expression.expression);
-  }
+  const inner = skipExpressionWrappers(expression);
 
-  return ts.isIdentifier(expression) ? expression.text : undefined;
+  return ts.isPropertyAccessExpression(inner)
+    ? aliasedBinding(inner.expression)
+    : ts.isIdentifier(inner)
+      ? inner.text
+      : undefined;
 };
 
 /**
