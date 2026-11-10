@@ -41,6 +41,9 @@ export type AnySearchCodec = Readonly<{
   parse: (raw: readonly string[]) => SearchParseResult<unknown>;
 }>;
 
+/** Search codecs by parameter name, whatever their value types. */
+export type AnySearchCodecs = ReadonlyRecord<string, AnySearchCodec>;
+
 export type RouteDefinition = Readonly<{
   /**
    * The static segment, in place of the key. `''` puts the node on its parent's
@@ -53,7 +56,7 @@ export type RouteDefinition = Readonly<{
    */
   params?: ReadonlyRecord<string, AnyParamCodec>;
   /** Search parameters, inherited by every descendant. */
-  search?: ReadonlyRecord<string, AnySearchCodec>;
+  search?: AnySearchCodecs;
   /** `false` for a node that is not a page of its own, such as a layout. */
   page?: false;
   /**
@@ -126,6 +129,7 @@ type IsInvalidKey<K extends string> = K extends ReservedRouteKey | ''
     ? true
     : false;
 
+/** @internal One node's step of `ValidateRoutes`, which a consumer spells. */
 type ValidateRoute<D> = ValidateParams<D> &
   ValidateSegment<D> &
   ValidateRest<D> &
@@ -169,18 +173,25 @@ type ValidateChildren<D> =
 
 // Values read from a definition
 
-// Deliberately empty: a node with no params or search adds none.
+/**
+ * Deliberately empty: a node with no params or search adds none.
+ *
+ * @internal The params and search a tree starts from; a consumer spells the
+ * `Routes` and `RouteNode` types built on it.
+ */
 // eslint-disable-next-line @typescript-eslint/no-generated-empty-object-type
 type EmptyRecord = ReadonlyRecord<never, never>;
 
-type ParamValue<C> =
+/** The value a path parameter's codec encodes and decodes. */
+export type ParamValue<C> =
   C extends Readonly<{
     encode: (value: infer T) => string | RestSegments;
   }>
     ? T
     : never;
 
-type SearchValue<C> =
+/** The value a search parameter's codec parses to. */
+export type SearchValue<C> =
   C extends Readonly<{
     parse: (raw: readonly string[]) => SearchParseResult<infer T>;
   }>
@@ -196,7 +207,7 @@ type OwnParamCodecs<D> =
 
 type OwnSearchCodecs<D> =
   D extends Readonly<{
-    search: infer S extends ReadonlyRecord<string, AnySearchCodec>;
+    search: infer S extends AnySearchCodecs;
   }>
     ? S
     : EmptyRecord;
@@ -219,8 +230,16 @@ type JoinId<Parent extends string, K extends string> = Parent extends ''
   ? K
   : `${Parent}.${K}`;
 
+/**
+ * @internal A node's `pattern`, `/` for the root; a consumer reads it as
+ * `RouteNode['pattern']`.
+ */
 type DisplayPattern<Path extends string> = Path extends '' ? '/' : Path;
 
+/**
+ * @internal A definition's `meta`, `undefined` without one; a consumer reads a
+ * node's as `typeof routes.x.meta`.
+ */
 type MetaOf<D> = D extends Readonly<{ meta: infer M }> ? M : undefined;
 
 type OwnState<D> =
@@ -292,6 +311,10 @@ export type RouteLocation = Readonly<{
 
 // Nodes: what `defineRoutes` returns
 
+/**
+ * @internal Shows an intersection of codecs as one object type in a hover; a
+ * consumer reads it as `RouteNode['search']`.
+ */
 type Flatten<T> = Readonly<{ [K in keyof T]: T[K] }>;
 
 export type RouteNode<
@@ -330,6 +353,10 @@ export type RouteNode<
       }>) &
   RouteChildren<D, Id, Path, ParamCodecs, SearchCodecs>;
 
+/**
+ * @internal The child nodes a definition with `children` adds to its
+ * `RouteNode`; a consumer spells `RouteNode` or `Routes`.
+ */
 type RouteChildren<
   D,
   Id extends string,
@@ -341,6 +368,10 @@ type RouteChildren<
     ? RouteNodes<C, Id, Path, ParamCodecs, SearchCodecs>
     : unknown;
 
+/**
+ * @internal The nodes of one level of definitions, which `Routes` and
+ * `RouteNode` are made of; a consumer spells those.
+ */
 type RouteNodes<
   Ds extends RouteDefinitions,
   ParentId extends string,
@@ -374,7 +405,7 @@ export type AnyRoutes = Readonly<{
 export type AnyRouteNode = Readonly<{
   [routeNodeKey]: RouteNodeInternals;
   id: string;
-  search: ReadonlyRecord<string, AnySearchCodec>;
+  search: AnySearchCodecs;
   match: (location: RouteLocation) => Optional<AnyRouteValues>;
 }>;
 
@@ -392,6 +423,10 @@ export type RouteNodeValues<N extends AnyRouteNode> =
 
 // Matches
 
+/**
+ * @internal The page matches below one level of definitions, which
+ * `RouteMatch` is the union of; a consumer spells `RouteMatch`.
+ */
 type PageMatches<Ds, ParentId extends string, ParamCodecs, SearchCodecs> = {
   [K in keyof Ds & string]:
     | (Ds[K] extends Readonly<{ page: false }>
@@ -430,6 +465,11 @@ export type RouteMatch<R extends AnyRoutes> =
 
 // The matched branch
 
+/**
+ * @internal The branch entries of one level of definitions and their
+ * descendants, which `RouteBranchEntry` names for a whole tree; a consumer
+ * spells `RouteBranchEntry<R>` or `RouteBranch<R>`.
+ */
 type BranchEntries<Ds, ParentId extends string> = {
   [K in keyof Ds & string]:
     | Readonly<{

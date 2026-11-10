@@ -69,6 +69,10 @@ export type ScanOperatorObservable<A, B> = InitializedSyncChildObservable<
 // A namespace holding only types is erasable, so it passes `erasableSyntaxOnly`
 // (TS1294); the `expectType` assertions are call statements, which is why they
 // sit below it rather than beside the types they check.
+/**
+ * @internal The steps behind the types `combine`, `zip`, `merge` and `derive`
+ * return (`CombineObservable`, `ZipObservable`, …), which a consumer spells.
+ */
 namespace SynStateInternals {
   type Cast<A> = A extends NonEmptyUnknownList ? A : never;
 

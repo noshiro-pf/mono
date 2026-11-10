@@ -11,20 +11,20 @@ import type { UpdateToken } from './id.mjs';
 import type { ObservableKind } from './observable-kind.mjs';
 import type { NonEmptyUnknownList, Subscription } from './types.mjs';
 
-/**
- * Inheritance
- *
- * ```txt
- * ObservableBase
- *   |
- *   +- SyncChildObservable    \                       \
- *   |                          +-- ChildObservable     \
- *   +- AsyncChildObservable   X                         +-- Observable
- *   |                          +-- ManagerObservable   /
- *   +- RootObservableType     /                       /
- * ```
- */
+// Inheritance
+//
+// ObservableBase
+//   |
+//   +- SyncChildObservable    \                       \
+//   |                          +-- ChildObservable     \
+//   +- AsyncChildObservable   X                         +-- Observable
+//   |                          +-- ManagerObservable   /
+//   +- RootObservableType     /                       /
 
+/**
+ * @internal The shape each observable type is made from (`ObservableBase`,
+ * `SyncChildObservable`, …); a consumer spells those.
+ */
 type CreateObservableType<A, Kind extends ObservableKind> = Readonly<{
   [observableBrand]: true;
 
@@ -83,7 +83,11 @@ type PipeMethod<A> = (<B>(
 
 export type ObservableBase<A> = CreateObservableType<A, ObservableKind>;
 
-/** @internal */
+/**
+ * @internal Turns an observable type into its initialized or child form, for
+ * the exported observable types made with it (`SyncChildObservable`,
+ * `InitializedObservable`, …), which a consumer spells.
+ */
 namespace ObservableTypeConverter {
   export type ToInitialized<
     A,

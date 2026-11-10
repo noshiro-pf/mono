@@ -9,7 +9,12 @@ import type {
 /** Where the compiled tree is kept on the object `defineRoutes` returns. */
 export const routeTreeKey: unique symbol = Symbol('synstate-router/route-tree');
 
-/** The compiled tree, typed by the definition it came from. */
+/**
+ * The compiled tree, typed by the definition it came from.
+ *
+ * @internal Kept under a symbol key of `Routes` for the router, written by
+ * `defineRoutes`: no entry point exports the key.
+ */
 export type RouteTree<D extends RouteDefinitions> = Readonly<{
   definition: D;
   /** Resolves a location against the whole tree. */
@@ -37,7 +42,13 @@ export type ResolvedLocation = Readonly<
 /** Where a node keeps what the router needs of it. */
 export const routeNodeKey: unique symbol = Symbol('synstate-router/route-node');
 
-/** What the router reads of a node; not part of the public API. */
+/**
+ * What the router reads of a node.
+ *
+ * @internal Kept under a symbol key of each node for the router, written by
+ * `defineRoutes`: a consumer passes the nodes `defineRoutes` returns, and no
+ * entry point exports the key.
+ */
 export type RouteNodeInternals = Readonly<{
   /** The compiled tree the node belongs to, compared by identity. */
   tree: RouteTree<RouteDefinitions>;
