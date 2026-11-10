@@ -16,6 +16,11 @@ import type { ReadonlyRecord, UnknownRecord } from 'ts-type-forge';
  * - For union types, only union members that contain the key are preserved
  * - The key's value type is preserved from the original object type when possible
  *
+ * **Own properties only:** a property inherited from the prototype chain is not
+ * seen, and that includes an accessor declared in a class (`get partial() {…}`),
+ * which lives on the class's prototype rather than on its instances. Read such
+ * a property through the prototype chain instead, with `Reflect.get(obj, key)`.
+ *
  * @example
  *
  * ```ts
