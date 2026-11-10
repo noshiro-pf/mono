@@ -232,11 +232,36 @@
         "config": ["configs/vitest.config.mts", "configs/vite.doc.config.mts"],
       },
       "typedoc": { "config": ["configs/typedoc.config.mjs"] },
-      // `no-unnecessary-type-guard`'s tests lint code that imports from
-      // `ts-std-forge` inside a string, and type-check it against the real
-      // package, which this one has to declare to resolve. knip does not read
-      // the code under test.
+      // The rule tests lint code that imports from `ts-std-forge` inside a
+      // string — every case is run again importing the shared exports from it
+      // (`configs/module-parity.setup.mts`) — and type-check it against the
+      // real package, which this one has to declare to resolve. knip does not
+      // read the code under test.
       "ignoreDependencies": ["ts-std-forge"],
+    },
+
+    // Same as `libs/*`, plus a dependency only the rule tests name.
+    "libs/eslint-plugin-ts-std-forge": {
+      "entry": [
+        "src/entry-point.mts",
+        "src/index.mts",
+        "src/cmd/*.mts",
+        "scripts/**/*.mts",
+        "configs/*.{mts,mjs}",
+        "test/**/*.{mts,tsx}",
+        "samples/**/*.{mts,tsx}",
+        "**/*.test.mts",
+      ],
+      "project": ["**/*.{mts,ts,tsx,mjs}"],
+
+      // It lives under `configs/`, not where the plugin looks by default.
+      "vitest": { "config": ["configs/vitest.config.mts"] },
+      // The rule tests lint code that imports from `ts-data-forge` inside a
+      // string — every case is run again importing the shared exports from it
+      // (`configs/module-parity.setup.mts`) — and type-check it against the
+      // real package, which this one has to declare to resolve. knip does not
+      // read the code under test.
+      "ignoreDependencies": ["ts-data-forge"],
     },
 
     // Same as `libs/*`, plus the Sumi dogfood exception.

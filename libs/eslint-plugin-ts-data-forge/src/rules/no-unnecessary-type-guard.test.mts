@@ -1182,7 +1182,7 @@ describe('no-unnecessary-type-guard on the variant guards imported from ts-std-f
         `,
       },
       {
-        name: 'a plain guard of ts-std-forge, which only the ts-data-forge import is read for',
+        name: 'a guard ts-std-forge does not export, which is not read through it',
         code: dedent`
           import { isString } from 'ts-std-forge';
           declare const x: string;

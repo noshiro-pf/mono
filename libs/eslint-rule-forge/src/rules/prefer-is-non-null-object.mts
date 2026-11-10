@@ -4,7 +4,7 @@ import {
   type TSESTree,
 } from '@typescript-eslint/utils';
 import { isRuntimeBound } from '../bindings.mjs';
-import { bindValueImportsAt } from '../imports.mjs';
+import { bindValueImportsAt, type EquivalentModule } from '../imports.mjs';
 import { getRangeWithParens, parenthesesDepth } from '../parentheses.mjs';
 import { skipTypeWrappers } from '../type-wrappers.mjs';
 
@@ -23,9 +23,15 @@ import { skipTypeWrappers } from '../type-wrappers.mjs';
  */
 export const createPreferIsNonNullObject = ({
   moduleName,
+  equivalentModules = [],
 }: Readonly<{
   /** The module that exports `isNonNullObject`. */
   moduleName: string;
+  /**
+   * Modules that export some of its exports as the same declarations; an
+   * import of one of them from there is reused rather than refused.
+   */
+  equivalentModules?: readonly EquivalentModule[];
 }>): TSESLint.RuleModule<'useIsNonNullObject', readonly []> =>
   ({
     meta: {
@@ -72,9 +78,12 @@ export const createPreferIsNonNullObject = ({
             return;
           }
 
-          const bindingAt = bindValueImportsAt(sourceCode, moduleName, [
-            'isNonNullObject',
-          ]);
+          const bindingAt = bindValueImportsAt(
+            sourceCode,
+            moduleName,
+            ['isNonNullObject'],
+            equivalentModules,
+          );
 
           // Every fix brings `isNonNullObject` into scope itself, so that one
           // applied alone (an editor's quick fix) is complete.

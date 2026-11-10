@@ -309,6 +309,25 @@ describe('prefer-obj-over-entries-round-trip', () => {
           errors: [{ messageId: 'useObjFilterMap' }],
         },
         {
+          name: 'reuses `Optional` imported from ts-std-forge, which shares it',
+          code: dedent`
+            import { Optional } from 'ts-std-forge';
+            const scores = { alice: 1, bob: 2 };
+            const scaled = Object.fromEntries(
+              Object.entries(scores).flatMap(([k, v]) =>
+                v > 1 ? [[k, v * 10]] : [],
+              ),
+            );
+          `,
+          output: dedent`
+            import { Obj } from 'ts-data-forge';
+            import { Optional } from 'ts-std-forge';
+            const scores = { alice: 1, bob: 2 };
+            const scaled = Obj.filterMap(scores, (v) => v > 1 ? Optional.some(v * 10) : Optional.none);
+          `,
+          errors: [{ messageId: 'useObjFilterMap' }],
+        },
+        {
           name: 'writes through a namespace import',
           code: dedent`
             import * as tdf from 'ts-data-forge';

@@ -257,13 +257,21 @@ export const buildNamedImportFix = (
  * when the file imports it. Whether something other than an import binds the
  * name where it is written is the caller's to check
  * ({@link hasForeignBinding}).
+ *
+ * `equivalentModules` name the modules that export some of `moduleName`'s
+ * exports as the same declarations ({@link EquivalentModule}). An import of one
+ * of those from such a module counts as an import from `moduleName`: its local
+ * name is written, and a name still to add goes into its braces when the file
+ * imports nothing from `moduleName` itself and the module exports every name to
+ * add.
  */
 export const bindValueImports = (
   sourceCode: TSESLint.SourceCode,
   moduleName: string,
   exportNames: readonly string[],
+  equivalentModules: readonly EquivalentModule[] = [],
 ): ValueImportBinding | undefined =>
-  bindNames(sourceCode, moduleName, exportNames, undefined);
+  bindNames(sourceCode, moduleName, exportNames, undefined, equivalentModules);
 
 /**
  * {@link bindValueImports} for the code at a node, which writes an export
@@ -280,6 +288,8 @@ export const bindValueImports = (
  *   the first namespace import that is not `import type * as`, with no edit.
  * - Where a local binding shadows the namespace's name, every export is bound
  *   as {@link bindValueImports} binds it instead.
+ * - A namespace import of one of `equivalentModules` serves as well, after
+ *   `moduleName`'s own, when that module exports every one of `exportNames`.
  *
  * Each choice is worked out once, however many nodes ask.
  */
@@ -287,35 +297,61 @@ export const bindValueImportsAt = (
   sourceCode: TSESLint.SourceCode,
   moduleName: string,
   exportNames: readonly string[],
+  equivalentModules: readonly EquivalentModule[] = [],
 ): ((node: TSESTree.Node) => ValueImportBinding | undefined) => {
-  const namespaceName = getImportDeclarations(sourceCode.ast, moduleName)
-    .filter((declaration) => !isTypeOnlyDeclaration(declaration))
-    .flatMap((declaration) => declaration.specifiers)
-    .find(
-      (specifier) => specifier.type === AST_NODE_TYPES.ImportNamespaceSpecifier,
-    )?.local.name;
+  const namespaceModules = [
+    moduleName,
+    ...equivalentModules
+      .filter((equivalent) => exportsAll(equivalent, exportNames))
+      .map((equivalent) => equivalent.moduleName),
+  ] as const;
 
-  const viaNamespace =
-    namespaceName === undefined
-      ? undefined
-      : bindNames(sourceCode, moduleName, exportNames, namespaceName);
+  const viaNamespaces = namespaceModules.flatMap((namespaceModule) => {
+    const namespaceName = getImportDeclarations(sourceCode.ast, namespaceModule)
+      .filter((declaration) => !isTypeOnlyDeclaration(declaration))
+      .flatMap((declaration) => declaration.specifiers)
+      .find(
+        (specifier) =>
+          specifier.type === AST_NODE_TYPES.ImportNamespaceSpecifier,
+      )?.local.name;
 
-  const byName = bindNames(sourceCode, moduleName, exportNames, undefined);
+    return namespaceName === undefined
+      ? []
+      : [
+          bindNames(
+            sourceCode,
+            moduleName,
+            exportNames,
+            namespaceName,
+            equivalentModules,
+          ),
+        ];
+  });
+
+  const byName = bindNames(
+    sourceCode,
+    moduleName,
+    exportNames,
+    undefined,
+    equivalentModules,
+  );
+
+  const importedFrom = [
+    moduleName,
+    ...equivalentModules.map((equivalent) => equivalent.moduleName),
+  ] as const;
 
   const holdsAt = (
     binding: BoundNames | undefined,
     node: TSESTree.Node,
   ): binding is BoundNames =>
     binding?.boundNames.every(
-      (name) => !hasForeignBinding(sourceCode, node, name, moduleName),
+      (name) => !hasForeignBinding(sourceCode, node, name, importedFrom),
     ) ?? false;
 
   return (node) =>
-    holdsAt(viaNamespace, node)
-      ? viaNamespace
-      : holdsAt(byName, node)
-        ? byName
-        : undefined;
+    viaNamespaces.find((binding) => holdsAt(binding, node)) ??
+    (holdsAt(byName, node) ? byName : undefined);
 };
 
 /**
@@ -430,6 +466,25 @@ export const importedNameOf = (
   specifier.imported.type === AST_NODE_TYPES.Identifier
     ? specifier.imported.name
     : specifier.imported.value;
+
+/**
+ * A module that exports some of another module's exports as the same
+ * declarations, under the same names — a re-export, as ts-data-forge exports
+ * ts-std-forge's `isRecord` — so that a file importing one of `exportNames` from
+ * it already has what a fix would import from the other.
+ */
+export type EquivalentModule = Readonly<{
+  moduleName: string;
+
+  /** The exports it shares with the other module. */
+  exportNames: readonly string[];
+}>;
+
+/** Whether `equivalent` exports every one of `names`. */
+const exportsAll = (
+  equivalent: EquivalentModule,
+  names: readonly string[],
+): boolean => names.every((name) => equivalent.exportNames.includes(name));
 
 /** The first fix `toFix` gives for `declarations`, trying them in order. */
 const firstFix = (
@@ -592,6 +647,52 @@ const bindingOf = (
 };
 
 /**
+ * The module whose import `toAdd` joins: `moduleName` when the file imports
+ * from it, else the first of `equivalentModules` the file imports from that
+ * exports all of `toAdd`, else `moduleName`, in a new declaration.
+ */
+const hostModuleFor = (
+  program: TSESTree.Program,
+  moduleName: string,
+  declarations: readonly TSESTree.ImportDeclaration[],
+  equivalentModules: readonly EquivalentModule[],
+  toAdd: readonly string[],
+): Readonly<{
+  moduleName: string;
+  hosts: readonly TSESTree.ImportDeclaration[];
+}> => {
+  const own = { moduleName, hosts: hostsFor(declarations) } as const;
+
+  if (own.hosts.length > 0) {
+    return own;
+  }
+
+  return (
+    equivalentModules
+      .filter((equivalent) => exportsAll(equivalent, toAdd))
+      .map((equivalent) => ({
+        moduleName: equivalent.moduleName,
+        hosts: hostsFor(getImportDeclarations(program, equivalent.moduleName)),
+      }))
+      .find(({ hosts }) => hosts.length > 0) ?? own
+  );
+};
+
+/** The named specifiers of `declarations` whose export `isShared` accepts. */
+const namedIn = (
+  declarations: readonly TSESTree.ImportDeclaration[],
+  isShared: (exportName: string) => boolean,
+): readonly NamedSpecifier[] =>
+  declarations.flatMap((declaration) =>
+    declaration.specifiers.flatMap((specifier) =>
+      specifier.type === AST_NODE_TYPES.ImportSpecifier &&
+      isShared(importedNameOf(specifier))
+        ? [{ declaration, specifier }]
+        : [],
+    ),
+  );
+
+/**
  * {@link bindValueImports}, writing an export no value import binds through the
  * namespace import `namespaceName` when there is one. `boundNames` are the
  * names the written text starts with, which something at the node must not
@@ -602,6 +703,7 @@ const bindNames = (
   moduleName: string,
   exportNames: readonly string[],
   namespaceName: string | undefined,
+  equivalentModules: readonly EquivalentModule[],
 ): BoundNames | undefined => {
   const program = sourceCode.ast;
 
@@ -612,13 +714,16 @@ const bindNames = (
 
   const declarations = getImportDeclarations(program, moduleName);
 
-  const named = declarations.flatMap((declaration) =>
-    declaration.specifiers.flatMap((specifier) =>
-      specifier.type === AST_NODE_TYPES.ImportSpecifier
-        ? [{ declaration, specifier }]
-        : [],
+  // `moduleName`'s own imports first, so that they are the ones written.
+  const named = [
+    ...namedIn(declarations, () => true),
+    ...equivalentModules.flatMap((equivalent) =>
+      namedIn(
+        getImportDeclarations(program, equivalent.moduleName),
+        (exportName) => equivalent.exportNames.includes(exportName),
+      ),
     ),
-  );
+  ] as const;
 
   const bindings = exportNames.map((exportName) =>
     bindingOf(sourceCode, allImports, named, exportName, namespaceName),
@@ -632,7 +737,13 @@ const bindNames = (
 
   const toAdd = defined.flatMap((b) => (b.isAdded ? [b.localName] : []));
 
-  const hosts = hostsFor(declarations);
+  const host = hostModuleFor(
+    program,
+    moduleName,
+    declarations,
+    equivalentModules,
+    toAdd,
+  );
 
   return {
     localNames: defined.map((b) => b.localName),
@@ -641,7 +752,13 @@ const bindNames = (
       ...defined.flatMap((b) => b.edits(fixer)),
       ...(toAdd.length === 0
         ? []
-        : addToFirstHost(fixer, sourceCode, moduleName, hosts, toAdd)),
+        : addToFirstHost(
+            fixer,
+            sourceCode,
+            host.moduleName,
+            host.hosts,
+            toAdd,
+          )),
     ],
   };
 };

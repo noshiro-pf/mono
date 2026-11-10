@@ -19,6 +19,10 @@ type ProjectOverrides = DeepReadonly<{
    */
   exclude?: string[];
   testTimeout?: number;
+  /** Run before each test file, in its module graph (Vitest's `setupFiles`). */
+  setupFiles?: string[];
+  /** Run once before the project's tests (Vitest's `globalSetup`). */
+  globalSetup?: string[];
 }>;
 
 /**
@@ -270,6 +274,8 @@ const projectConfig = (packageRoot: string, overrides?: ProjectOverrides) =>
       'src/entry-point.mts',
     ],
     testTimeout: overrides?.testTimeout,
+    setupFiles: castMutable(overrides?.setupFiles),
+    globalSetup: castMutable(overrides?.globalSetup),
   }) as const satisfies ProjectConfig;
 
 // A pattern, never the plain text: Vitest takes a file whose text holds the
