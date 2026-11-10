@@ -1,7 +1,10 @@
 import * as fs from 'node:fs/promises';
 import * as os from 'node:os';
 import * as path from 'node:path';
-import { removeStaleProjects } from './verify-npm-packages.mjs';
+import {
+  findOrphanedSmokeSources,
+  removeStaleProjects,
+} from './verify-npm-packages.mjs';
 
 describe(removeStaleProjects, () => {
   test('removes the project of a package that is no longer checked', async () => {
@@ -125,3 +128,28 @@ const listNames = async (dir: string): Promise<readonly string[]> => {
 
   return names.toSorted();
 };
+
+describe(findOrphanedSmokeSources, () => {
+  test('names a check no publishable package uses, and nothing else', () => {
+    assert.deepStrictEqual(
+      findOrphanedSmokeSources(
+        [
+          'ts-data-forge.mjs',
+          'old-name.mjs',
+          'strict-ts-lib.mts',
+          'ts-type-forge.mts',
+          'README.md',
+        ],
+        ['ts-data-forge', 'strict-ts-lib-v7.0', 'ts-type-forge'],
+      ),
+      ['old-name.mjs'],
+    );
+  });
+
+  test('names the shared strict-lib check when no strict-lib package is left', () => {
+    assert.deepStrictEqual(
+      findOrphanedSmokeSources(['strict-ts-lib.mts'], ['ts-data-forge']),
+      ['strict-ts-lib.mts'],
+    );
+  });
+});

@@ -122,6 +122,25 @@ export const generateLocalSpace = async (): Promise<
 };
 
 /**
+ * The hand-written checks under `verify-npm-packages/smoke/` that no
+ * publishable package maps to through `smokeSourceName`: left behind by a
+ * package renamed, removed or made private. The generator copies a check into
+ * the project of the package it is for, so one no package maps to is run by
+ * nothing, and it looks like a live check. A file that is not a `.mjs` or
+ * `.mts` module is no check, and is not named.
+ */
+export const findOrphanedSmokeSources = (
+  smokeFiles: readonly string[],
+  packageNames: readonly string[],
+): readonly string[] => {
+  const used = new Set<string>(packageNames.map(smokeSourceName));
+
+  return smokeFiles
+    .filter((file) => /\.m[jt]s$/u.test(file) && !used.has(file))
+    .toSorted();
+};
+
+/**
  * Removes every entry under `<spaceDir>/packages/` that is not the project of
  * one of `packageNames`, and returns their names, sorted.
  *
@@ -923,6 +942,21 @@ const generateSpace = async (
   if (!Arr.isNonEmpty(packages)) {
     return Result.err(
       'No publishable package was found in the workspace, so it was misread; nothing was written or removed.',
+    );
+  }
+
+  const orphans = findOrphanedSmokeSources(
+    await readNamesIfAny(smokeDir),
+    packages.map(({ name }) => name),
+  );
+
+  if (Arr.isNonEmpty(orphans)) {
+    return Result.err(
+      [
+        `No publishable package uses these checks in ${path.relative(projectRootPath, smokeDir)}/, so nothing runs them:`,
+        ...orphans.map((file) => `  ${file}`),
+        'Delete each, or rename it after the package it checks now.',
+      ].join('\n'),
     );
   }
 
