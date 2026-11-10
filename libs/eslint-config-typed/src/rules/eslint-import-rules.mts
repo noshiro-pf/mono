@@ -28,6 +28,7 @@ export const eslintImportsRules = {
         'solid-js/web',
         '@testing-library/jest-dom/**',
         'react-dom/client',
+        'react-dom/server',
         'preact/**',
         'immer/**',
         'firebase/*',

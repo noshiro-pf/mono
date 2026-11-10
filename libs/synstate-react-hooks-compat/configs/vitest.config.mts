@@ -27,6 +27,7 @@ export default defineViteConfig({
       'react',
       'react-dom',
       'react-dom/client',
+      'react-dom/server',
     ],
   },
 });

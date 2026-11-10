@@ -117,6 +117,11 @@ const UserProfile = (): React.JSX.Element => {
 
 Use `useObservableValue` to read any `Observable` — including derived ones produced by `pipe` / `combine` — from a React component. It is implemented on top of `useSyncExternalStore`, so the component re-renders whenever the source emits.
 
+It works in server rendering as well: `renderToString` and React's other server renderers draw the observable's current value, since a synstate observable can be read synchronously on the server too. Two things follow from reading the current value on both sides:
+
+- `hydrateRoot` compares the server's markup with the value the observable holds on the client when it hydrates. If the two differ (a value read from `localStorage` at module load, say), React reports a hydration mismatch and renders on the client again everything up to the nearest `Suspense` boundary above it, the whole root when there is none.
+- A store created at module level, as `createState` is in the examples here, is one store per server process, shared by every request it renders, and the hooks it returns always read that store. Keep per-request data out of such stores on the server: create a store for each request instead (once, outside render or in `useState(() => …)`, so that it keeps its identity), pass its observable down through a React context, and read it with `useObservableValue`.
+
 ### Overloads
 
 | Signature                                                           | Return type      | When to use                                                                                                                   |

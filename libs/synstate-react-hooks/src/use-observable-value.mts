@@ -51,7 +51,10 @@ export function useObservableValue<A, B = A>(
     [observable$],
   );
 
-  const value = React.useSyncExternalStore(subscribe, getSnapshot);
+  // `getSnapshot` doubles as `getServerSnapshot`, which server rendering and
+  // hydration require: an observable's value can be read synchronously on the
+  // server too (#3639).
+  const value = React.useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
 
   return Optional.unwrapOr(value, initialValue);
 }

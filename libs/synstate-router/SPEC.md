@@ -243,7 +243,7 @@ const product$ = router
 
 ## 5. React との連携（`synstate-router-react`）
 
-React 版は synstate-dom 版と同じ保証（`Href` だけを受ける `Link`、全ページを要求する `Routes`）を持つ。Observable は server snapshot を渡す自前の `useSyncExternalStore` の hook で読む。`synstate-react-hooks` の `useObservableValue` は server snapshot を渡さないので、memory browser 上のルーターをサーバーで描けないため。
+React 版は synstate-dom 版と同じ保証（`Href` だけを受ける `Link`、全ページを要求する `Routes`）を持つ。Observable は server snapshot を渡す自前の `useSyncExternalStore` の hook で読み、memory browser 上のルーターをサーバーでも描けるようにする。`synstate-react-hooks` の `useObservableValue` も同じく server snapshot を渡す（#3639）が、hook 1 つのためにそのパッケージへ依存はしない。
 
 ```tsx
 export const { Routes, Link, useRouteMatch, useAt, useIsActive } =
