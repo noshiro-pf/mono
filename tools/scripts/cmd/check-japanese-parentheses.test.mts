@@ -100,6 +100,26 @@ describe('findHalfwidthParentheses', () => {
     ]);
   });
 
+  test('reads a CRLF line without its carriage return', () => {
+    assert.deepStrictEqual(
+      findHalfwidthParentheses('一行目。\r\nあ(い)う\r\n'),
+      [{ line: 2, column: 2, matched: '(い)', lineText: 'あ(い)う' }],
+    );
+  });
+
+  test('does not close a fence on a fence line with an info string', () => {
+    const text = dedent`
+      \`\`\`
+      \`\`\`ts
+      const x = 1; // 補足(内側)
+      \`\`\`
+
+      以上(補足)。
+    `;
+
+    assert.deepStrictEqual(matchesOf(text, true), ['(補足)']);
+  });
+
   test('does not read a pair that wraps across two lines', () => {
     assert.deepStrictEqual(matchesOf('速度(実測\nの結果)を測る。'), []);
   });
