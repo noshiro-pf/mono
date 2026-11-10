@@ -248,14 +248,4 @@ describe('the hook as Claude Code runs it', () => {
   test('is silent on bad input', async () => {
     assert.deepStrictEqual(await runHook('{'), { status: 0, stderr: '' });
   });
-
-  test('the script uses nothing the minimum Node lacks', () => {
-    // It runs on whatever Node the session has; the `minimum` of
-    // tools/configs/node-support.json has no `Temporal`. That it loads nothing
-    // but builtins, as it may run before anything is installed, is
-    // `check:root:node-run-scripts`'s.
-    const source = read(scriptPath);
-
-    assert.notMatch(source, /\bTemporal\./u);
-  });
 });

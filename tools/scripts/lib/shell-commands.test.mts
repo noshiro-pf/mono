@@ -1,7 +1,7 @@
 // cspell:ignore esac
 
 import dedent from 'dedent';
-import { readShellCommands } from './shell-commands.mjs';
+import { readShellCommands, readShellScript } from './shell-commands.mjs';
 
 const commands = (script: string): readonly (readonly string[])[] =>
   readShellCommands(script).commands;
@@ -339,6 +339,44 @@ describe('readShellCommands', () => {
     assert.deepStrictEqual(
       readShellCommands('echo "a" && pnpm run x # done').problems,
       [],
+    );
+  });
+});
+
+describe(readShellScript, () => {
+  test('lists an assignment on its own, before the command after it', () => {
+    assert.deepStrictEqual(
+      readShellScript('f="./tools/a.mts"; node "$f"\nf=./b.mts\nnode "$f"'),
+      {
+        commands: [
+          ['node', '$f'],
+          ['node', '$f'],
+        ],
+        problems: [],
+        assignments: [
+          { name: 'f', value: './tools/a.mts', before: 0 },
+          { name: 'f', value: './b.mts', before: 1 },
+        ],
+      },
+    );
+  });
+
+  test('lists an assignment after a reserved word or behind export', () => {
+    assert.deepStrictEqual(
+      readShellScript('if true; then f=./a.mts; fi; export -n g=./b.mts')
+        .assignments,
+      [
+        { name: 'f', value: './a.mts', before: 1 },
+        { name: 'g', value: './b.mts', before: 2 },
+      ],
+    );
+  });
+
+  test('leaves out an assignment before a command, and one in a subshell', () => {
+    assert.deepStrictEqual(
+      readShellScript('FOO=./tools/a.mts node ./x.mjs; y="$(g=1; node "$g")"')
+        .assignments,
+      [{ name: 'y', value: '$(…)', before: 2 }],
     );
   });
 });
