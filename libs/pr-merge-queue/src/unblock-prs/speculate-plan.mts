@@ -23,6 +23,7 @@ import {
   queueLayerTrailer,
   stackedAhead,
   type BuiltQueueLayer,
+  type LayerStatus,
   type QueueLayer,
 } from 'pr-report-core';
 import type { PullRequest } from './types.mjs';
@@ -172,107 +173,6 @@ export const matchLayers = ({
     stale: built.filter(({ number }) => !keptNumbers.has(number)),
   };
 };
-
-/**
- * What to do this survey with the layers that stand, `statuses` in their order.
- *
- * - **A red first layer** names its own pull request, which is set aside. Only
- *   the first: a layer above it failed on top of pull requests that have not
- *   merged and may not, and it is judged once it is first, on `main`'s tree or
- *   rebuilt on it. It holds the release of nothing below it. Setting it aside
- *   at once would gain nothing over green layers: the first is released in the
- *   same survey and watched until it merges, while nothing is built, and the
- *   red one is first on the survey after. Over a layer still running it would
- *   blame the pull request for what may be the failure of the one below.
- * - **Every layer above a red one over green ones**, which carries it, is
- *   cleaned up ({@link planDrop}), its runs cancelled to free their runners. A
- *   red layer over one still running says nothing yet.
- * - **The next layer is dispatched** only once the layers below are green, or
- *   have finished their gate and started every job, so that the first finishes
- *   as fast as it would alone, and never on top of a red layer.
- * - **The first candidate is released** when its layer is green, and also when
- *   it has none to wait for — not stacked (the version pull request, one only a
- *   bypass merges) or not buildable (its commit conflicts): the release then
- *   runs its checks, or finds the conflict, as it always has.
- */
-export const decideSpeculation = ({
-  layers,
-  statuses,
-  firstCandidate,
-}: Readonly<{
-  layers: readonly BuiltLayer[];
-  statuses: readonly LayerStatus[];
-  firstCandidate: number | undefined;
-}>): Readonly<{
-  setAside: (Layer & Readonly<{ name: string; link: string }>) | undefined;
-  dropFrom: number | undefined;
-  dispatch: number | undefined;
-  release: boolean;
-}> => {
-  const red = firstRedOverGreen(statuses);
-
-  const redLayer = red === undefined ? undefined : layers[red.index];
-
-  const standing = red === undefined ? layers.length : red.index + 1;
-
-  const dispatch = statuses
-    .slice(0, standing)
-    .findIndex((status) => status.kind === 'not-dispatched');
-
-  const below = dispatch === -1 ? ([] as const) : statuses.slice(0, dispatch);
-
-  // Green, or running with every job started: never on top of a red layer,
-  // which spoils whatever is stacked above it.
-  const ready = below.every(
-    (status) =>
-      status.kind === 'green' || (status.kind === 'running' && !status.queued),
-  );
-
-  const first = layers[0];
-
-  const release =
-    firstCandidate !== undefined &&
-    (first?.number !== firstCandidate || statuses[0]?.kind === 'green');
-
-  return {
-    setAside:
-      redLayer === undefined || red?.index !== 0
-        ? undefined
-        : {
-            number: redLayer.number,
-            head: redLayer.head,
-            name: red.name,
-            link: red.link,
-          },
-    dropFrom:
-      red === undefined || red.index + 1 >= layers.length
-        ? undefined
-        : red.index + 1,
-    dispatch: dispatch === -1 || !ready ? undefined : dispatch,
-    release: release && red?.index !== 0,
-  };
-};
-
-/**
- * Whether anything may be built on top of the layers that stand, `statuses` in
- * their order: not on a red one over green ones, whose layers above are dropped.
- */
-export const mayBuildAbove = (statuses: readonly LayerStatus[]): boolean =>
-  firstRedOverGreen(statuses) === undefined;
-
-/**
- * Whether a workflow's runs on a layer, by their conclusions, have been
- * cancelled as often as it may be dispatched. A cancelled run is dispatched
- * again, and something that keeps cancelling them would otherwise hold the first
- * candidate for ever, with no run lasting long enough for {@link isStuck}.
- */
-export const cancelledTooOften = (
-  conclusions: readonly (string | null)[],
-): boolean =>
-  Arr.isMinLengthArray(
-    MAX_DISPATCHES,
-    conclusions.filter((conclusion) => conclusion === 'cancelled'),
-  );
 
 /**
  * What cleaning up an invalid layer does with its runs and its branch. A layer's
@@ -425,14 +325,6 @@ export type LayerDrop = Readonly<{
   deleteBranch: boolean;
 }>;
 
-/** How far the check workflows got on a layer. */
-export type LayerStatus = Readonly<
-  | { kind: 'not-dispatched' }
-  | { kind: 'running'; queued: boolean }
-  | { kind: 'green' }
-  | { kind: 'red'; name: string; link: string }
->;
-
 /**
  * The prefix of the layer branches, on which the check workflows diff a layer
  * against `origin/main` (`code-check.yml`, `style-check.yml`).
@@ -455,9 +347,6 @@ export const LAYER_QUEUED_TIMEOUT_MS = 90 * 60_000;
  */
 export const DROPPED_RUN_QUIET_MS = 90 * 60_000;
 
-/** How many runs of a workflow a layer may see cancelled. */
-export const MAX_DISPATCHES = 3;
-
 const takeStanding = (
   desired: readonly Layer[],
   built: ReadonlyMap<number, BuiltLayer>,
@@ -474,20 +363,4 @@ const takeStanding = (
   return layer?.head === next.head && layer.parentTree === baseTree
     ? Arr.toUnshifted(layer)(takeStanding(rest, built, layer.tree))
     : [];
-};
-
-/**
- * The lowest red layer whose layers below are all green, with what failed on
- * it; a red layer above one not yet green is not yet anyone's.
- */
-const firstRedOverGreen = (
-  statuses: readonly LayerStatus[],
-): Readonly<{ index: number; name: string; link: string }> | undefined => {
-  const index = statuses.findIndex((each) => each.kind !== 'green');
-
-  const status = index === -1 ? undefined : statuses[index];
-
-  return status?.kind === 'red'
-    ? { index, name: status.name, link: status.link }
-    : undefined;
 };

@@ -24,9 +24,8 @@
 
 import { Arr, Result } from 'ts-data-forge';
 import * as t from 'ts-fortress';
-import type { ReadonlyRecord } from 'ts-type-forge';
-import { askAndRead, unreachable } from './answer-body.mjs';
 import { repositoryUrl, type ReportSource } from './constants.mjs';
+import { askGitHub, getJson, type RestFetch } from './rest-json.mjs';
 
 /**
  * The states the Actions tab's filter names, in the order the block's badges
@@ -79,19 +78,6 @@ export type WorkflowRunList = Readonly<{
    * {@link RUNS_PER_STATE} (or, then, when a run met past a page moved state).
    */
   totalCount: number;
-}>;
-
-/** What these functions need of `globalThis.fetch`, and no more. */
-export type RestFetch = (
-  route: string,
-  init: RestFetchInit,
-) => Promise<Response>;
-
-/** Its own type, as `FetchInit` is in `graphql.mts`, so a test can read it. */
-export type RestFetchInit = Readonly<{
-  method: 'GET';
-  cache: RequestCache;
-  headers: ReadonlyRecord<string, string>;
 }>;
 
 export type WorkflowRunsRequest = Readonly<{
@@ -180,64 +166,24 @@ const runOf = (run: t.TypeOf<typeof RunSchema>, state: RunState): WorkflowRun =>
     createdAt: run.created_at,
   }) as const;
 
-/** As `graphql.mts` words them, with the budget said to be REST's. */
-const refusal = (response: Response): string =>
-  response.status === UNAUTHORIZED
-    ? 'GitHub would not accept the token for the workflow runs. It may have expired or been revoked.'
-    : response.headers.get('x-ratelimit-remaining') === '0'
-      ? "The REST rate limit on this token's account is spent, so the workflow runs cannot be read. It resets within the hour."
-      : (`GitHub answered ${response.status} ${response.statusText} for the workflow runs.` as const);
-
 const readState = async (
   source: ReportSource,
   state: RunState,
   token: string,
   fetchImpl: RestFetch,
 ): Promise<Result<WorkflowRunList, string>> => {
-  const answered = await askAndRead(
-    async (again) =>
-      fetchImpl(
-        `https://api.github.com/repos/${source.owner}/${source.repo}/actions/runs?status=${state}&per_page=${RUNS_PER_STATE}`,
-        {
-          method: 'GET',
-          // Revalidated rather than refetched: see the top of this file.
-          // Asked again, it is the cached body that was bad.
-          cache: again ? 'reload' : 'no-cache',
-          headers: {
-            Authorization: `Bearer ${token}`,
-            Accept: 'application/vnd.github+json',
-          },
-        },
-      ),
+  const read = await getJson(
+    `https://api.github.com/repos/${source.owner}/${source.repo}/actions/runs?status=${state}&per_page=${RUNS_PER_STATE}`,
+    RunsPageSchema,
     'the workflow runs',
+    token,
+    fetchImpl,
   );
 
-  if (answered === undefined) {
-    return Result.err(unreachable('the workflow runs'));
-  }
-
-  const { response, body: parsed } = answered;
-
-  if (!response.ok) {
-    return Result.err(refusal(response));
-  }
-
-  if (parsed === undefined || Result.isErr(parsed)) {
-    return parsed ?? Result.err('GitHub sent no body.');
-  }
-
-  const validated = RunsPageSchema.validate(parsed.value);
-
-  if (Result.isErr(validated)) {
-    return Result.err(
-      `GitHub's list of workflow runs is not the shape this page expects:\n${t.validationErrorsToMessages(validated.value).join('\n')}`,
-    );
-  }
-
-  return Result.ok({
-    runs: validated.value.workflow_runs.map((run) => runOf(run, state)),
-    totalCount: validated.value.total_count,
-  });
+  return Result.map(read, ({ workflow_runs, total_count }) => ({
+    runs: workflow_runs.map((run) => runOf(run, state)),
+    totalCount: total_count,
+  }));
 };
 
 const RunSchema = t.record({
@@ -256,11 +202,3 @@ const RunsPageSchema = t.record({
   total_count: t.number(),
   workflow_runs: t.array(RunSchema),
 });
-
-/**
- * Written as a wrapper rather than handed over bare, because `fetch` detached
- * from the global it belongs to is not callable in every engine.
- */
-const askGitHub: RestFetch = async (route, init) => fetch(route, init);
-
-const UNAUTHORIZED = 401;

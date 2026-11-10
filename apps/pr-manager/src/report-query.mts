@@ -19,6 +19,7 @@ import {
   MERGE_QUEUED_LABEL,
   QUEUE_LAYER_BRANCH_PREFIX,
   SET_ASIDE_COMMENT_SCAN,
+  UNBLOCK_PRS_CONFIG_PATH,
 } from 'pr-report-core';
 import * as t from 'ts-fortress';
 import type { ReadonlyRecord } from 'ts-type-forge';
@@ -179,6 +180,8 @@ export const PULL_REQUESTS_QUERY = [
       `    ${alias}: object(expression: "HEAD:${path}") { ... on Blob { text } }`,
   ),
   `    queueLabel: label(name: "${MERGE_QUEUED_LABEL}") { name }`,
+  // Which workflows `unblock-prs` dispatches on each queue layer.
+  `    queueConfig: object(expression: "HEAD:${UNBLOCK_PRS_CONFIG_PATH}") { ... on Blob { text } }`,
   `    ${openPulls(OPEN_PAGE_SIZE)} {`,
   `      ${PAGE_INFO}`,
   '      nodes {',
@@ -792,6 +795,8 @@ export const PullRequestsDataSchema = t.record({
     ),
     codeOwners: BlobSchema,
     codeOwnersAtRoot: BlobSchema,
+    /** Absent from an answer read before the page asked for it. */
+    queueConfig: t.optional(BlobSchema),
     codeOwnersInDocs: BlobSchema,
     /** `null` when the repository has no such label. */
     queueLabel: t.union([t.record({ name: t.string() }), t.nullType]),

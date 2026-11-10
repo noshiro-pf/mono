@@ -27,7 +27,9 @@
 import {
   isSetAsideReason,
   isVersionBranch,
+  layerStandings,
   orderCandidates,
+  QUEUE_LAYER_BRANCH_PREFIX,
   queueGraph,
   queueOwner,
   queueStanding,
@@ -36,6 +38,8 @@ import {
   stackedAhead,
   withReviewHold,
   type BuiltQueueLayer,
+  type LayerStanding,
+  type LayerStatus,
   type NativeStackEntry,
   type QueueContext,
   type QueueFacts,
@@ -72,8 +76,33 @@ export type QueueInput = Readonly<{
 
 /** What {@link QueueInput}'s `layers` holds. */
 export type QueueLayers = Readonly<{
-  built: readonly BuiltQueueLayer[];
+  built: readonly CheckedQueueLayer[];
   baseTree: string;
+}>;
+
+/** A layer `unblock-prs` has built, and where the checks on it stand. */
+export type CheckedQueueLayer = BuiltQueueLayer &
+  Readonly<{
+    /** `undefined` when they were not read. */
+    checks: LayerChecks | undefined;
+  }>;
+
+/**
+ * Where the checks `unblock-prs` dispatches on a queue layer stand, as it reads
+ * them (`layerRunsVerdict` in `pr-report-core`).
+ */
+export type LayerChecks = Readonly<{
+  /**
+   * As the worker decides by it. `running` is always `queued`: the page does
+   * not read the jobs, so it never takes the layers below for started.
+   */
+  status: LayerStatus;
+  /** A workflow to dispatch again has been cancelled too often to. */
+  cancelledTooOften: boolean;
+  /** How many of the workflows' latest runs have finished. */
+  done: number;
+  /** How many workflows it dispatches. */
+  total: number;
 }>;
 
 /** Everything read about one open pull request that its place turns on. */
@@ -105,6 +134,23 @@ export type QueueSlot = Readonly<{
   /** The tooltip's second line, when the note leaves something out. */
   detail: string | undefined;
   priority: Priority;
+  /**
+   * Where the checks on its queue layer stand, for one the worker has checked
+   * ahead of its turn and whose layer's checks were read.
+   */
+  layer: SlotLayer | undefined;
+}>;
+
+/**
+ * A layer as the box draws it: what the worker does with it (`layerStandings`
+ * in `pr-report-core`), and how far its runs have got.
+ */
+export type SlotLayer = Readonly<{
+  standing: LayerStanding;
+  /** Whether it is the lowest layer, which the worker acts on this survey. */
+  first: boolean;
+  done: number;
+  total: number;
 }>;
 
 /** One pull request outside the queue: not the worker's to move. */
@@ -239,12 +285,20 @@ export const queueViewOf = ({
       waitOf(standing) !== 'none' && !pickedNumbers.has(facts.number),
   );
 
+  const slotLayers = slotLayersOf(
+    picked
+      .filter(({ facts }) => kept.has(facts.number))
+      .map(({ facts }) => facts.number),
+    layers,
+  );
+
   return {
     base: defaultBranch,
     slots: [...running, ...picked, ...rest].map(({ pull, facts, standing }) =>
       slotOf(pull, facts, standing, {
         defaultBranch,
         keptAhead: kept.has(facts.number),
+        layer: slotLayers.get(facts.number),
       }),
     ),
     outside: Arr.generate(function* () {
@@ -676,6 +730,102 @@ const sayStanding = (
   }
 };
 
+/**
+ * What each layer kept ahead, `numbers` in the order they stand, draws: what
+ * the worker does with it, decided over the whole stack as the worker decides
+ * it. Nothing when the checks on one of them were not read, since what is done
+ * with a layer turns on the ones below.
+ */
+const slotLayersOf = (
+  numbers: readonly number[],
+  layers: QueueLayers | undefined,
+): ReadonlyMap<number, SlotLayer> => {
+  const checks = Arr.generate(function* () {
+    for (const number of numbers) {
+      const read = layers?.built.find(
+        (built) => built.number === number,
+      )?.checks;
+
+      if (read !== undefined) {
+        yield { number, ...read } as const;
+      }
+    }
+  });
+
+  if (checks.length !== numbers.length) {
+    return new Map<number, SlotLayer>();
+  }
+
+  return new Map<number, SlotLayer>(
+    Arr.zip(checks, layerStandings(checks)).map(
+      ([{ number, done, total }, standing], index) => [
+        number,
+        { standing, first: index === 0, done, total },
+      ],
+    ),
+  );
+};
+
+/** Where the checks on the layer of one checked ahead stand, in words. */
+const sayLayer = (
+  number: number,
+  { standing, first, done, total }: SlotLayer,
+): Readonly<{ note: string; detail: string }> => {
+  // The prefix is the worker's own spelling of a layer branch, shared through
+  // pr-report-core with the parser of its number; the number is all it adds.
+  const branch = `${QUEUE_LAYER_BRANCH_PREFIX}${number}` as const;
+
+  switch (standing) {
+    case 'running':
+      return {
+        note: `${done}/${total} runs`,
+        detail: `${branch}: ${done} of ${total} workflow runs finished`,
+      };
+
+    case 'green':
+      return {
+        note: 'passed',
+        detail: `${branch}: all ${total} workflow runs passed — ${first ? '' : 'once first, '}the worker releases it with no run of its own`,
+      };
+
+    case 'set-aside':
+      return {
+        note: 'failed',
+        detail: `${branch}: a workflow run failed, so the worker sets it aside — or releases it, when only fixers' diffs failed, for the release's own run to fix`,
+      };
+
+    case 'red':
+      return {
+        note: 'failed',
+        detail: `${branch}: a workflow run failed on top of layers not merged yet — the worker judges it once it is first`,
+      };
+
+    case 'dropped':
+      return {
+        note: 'on red',
+        detail: `${branch}: a layer below failed, so the worker drops this one and builds it again later`,
+      };
+
+    case 'stalled':
+      return {
+        note: 'not checked',
+        detail: `${branch}: a workflow was cancelled too often to dispatch again — ${first ? '' : 'once first, '}the worker releases it to run its own checks`,
+      };
+
+    case 'to-dispatch':
+      return {
+        note: 'to check',
+        detail: `${branch}: the worker dispatches its checks on its next survey`,
+      };
+
+    case 'waits':
+      return {
+        note: 'to check',
+        detail: `${branch}: the worker dispatches its checks once every layer below is green or has started all its jobs, and none is red`,
+      };
+  }
+};
+
 const slotOf = (
   pull: QueuePull,
   facts: QueueFacts,
@@ -683,13 +833,20 @@ const slotOf = (
   {
     defaultBranch,
     keptAhead,
-  }: Readonly<{ defaultBranch: string; keptAhead: boolean }>,
+    layer,
+  }: Readonly<{
+    defaultBranch: string;
+    keptAhead: boolean;
+    layer: SlotLayer | undefined;
+  }>,
 ): QueueSlot => {
   const { entry } = pull;
 
   const release = isVersionBranch(entry.headRef, defaultBranch);
 
-  const said = sayStanding(standing);
+  const said =
+    sayStanding(standing) ??
+    (layer === undefined ? undefined : sayLayer(entry.number, layer));
 
   return {
     number: entry.number,
@@ -718,6 +875,7 @@ const slotOf = (
         ? 'its queue layer is built, so the worker releases it before what the queue’s own order would put first'
         : undefined),
     priority: priorityOf(entry.labels),
+    layer,
   };
 };
 

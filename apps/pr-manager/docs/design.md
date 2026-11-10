@@ -47,10 +47,10 @@ nothing on GitHub's own list shows:
 order, as one row of boxes: the pull request it is running at the head, by the
 base it merges into, with a turning ring; then the ones it would pick next, in
 the order it would pick them — first what it has checked ahead of its turn, in
-the order it stacked them, marked `checked ahead` (its `queue/pr-*` branches,
-read with the pull requests, and `stackedAhead` in `pr-report-core`,
-which the worker releases by); then the ones whose turn has not come,
-in a dashed box saying what they wait for (`after #N`, `review`,
+the order it stacked them (its `queue/pr-*` branches, read with the pull
+requests, and `stackedAhead` in `pr-report-core`, which the worker releases by),
+each saying where the checks on its layer stand; then the ones whose turn has
+not come, in a dashed box saying what they wait for (`after #N`, `review`,
 `native stack`). Every box is the same width and carries the priority on a pill
 as the DAG's nodes do; hovering one shows its title. A box is never narrower
 than its number needs: when more are queued than fit, the row scrolls across
@@ -62,6 +62,24 @@ outside the row, with why in a word and whose it is. It is decided by the code
 the worker decides with (`queue-order.mts` in `pr-report-core`), from what the
 page reads; what one run of the worker has seen green without merging, and so
 put last, lives in that run's memory and is not shown.
+
+A layer's checks are what the worker is running while the pull request waits
+with `skip-ci` on, so its box says what the worker does with the layer, as the
+worker decides it over the whole stack (`layerStandings` and `decideSpeculation`
+in `pr-report-core`): `2/6 runs` with the turning ring, `passed`, `failed` (set
+aside when first, judged once first when not), `on red` for one the worker drops
+because a layer below failed, `to check` for one whose checks are dispatched
+next or wait for the layers below, and `not checked` for one with a workflow
+cancelled too often to dispatch again; the counts above the row say how many are
+`checking ahead`. Each layer's runs are read by REST as the worker reads them,
+one request a layer, and judged by `layerRunsVerdict`, the worker's own reading:
+the latest dispatched run of each workflow in the `speculate.workflows` of
+`.github/unblock-prs.json`, not the commit's rollup,
+which still counts a cancelled round dispatched again. The page reads no jobs,
+so it never takes the layers below for started and never says a layer above a
+running one is dispatched next. Without that file, or when the runs on a layer
+cannot be read (a token that may not read Actions), the stack says only
+`checked ahead`.
 
 Below that, the workflow runs still going, what merged in the last week, and
 the open issues, most recently updated first. Every open issue is read: the

@@ -1729,6 +1729,21 @@ a:focus-visible {
   color: var(--status-critical);
 }
 
+/*
+ * Where the checks on the queue layer of a candidate checked ahead stand: a
+ * verdict in its colour; one still going has the ring beside its number. A
+ * kept one still waiting says what for, and keeps that note's colour.
+ */
+.queue-slot[data-kind='next'][data-layer='green'] .queue-note {
+  color: var(--status-good);
+}
+
+.queue-slot[data-kind='next'][data-layer='set-aside'] .queue-note,
+.queue-slot[data-kind='next'][data-layer='red'] .queue-note,
+.queue-slot[data-kind='next'][data-layer='dropped'] .queue-note {
+  color: var(--status-critical);
+}
+
 .queue-place {
   color: var(--ink-muted);
   font-size: clamp(0.5625rem, 15cqi, 0.6875rem);

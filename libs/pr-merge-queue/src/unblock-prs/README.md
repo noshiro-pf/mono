@@ -546,7 +546,9 @@ PR なら10分続いたところで triage の前に見送ります。候補の�
 
 `.github/unblock-prs.json` に `speculate` があると、「3」で candidate を解放
 する前に、先頭から `depth` 本までの candidate を順番より先に検証します
-（`speculate.mts`、判断は `speculate-plan.mts`）。
+（`speculate.mts`、判断は `speculate-plan.mts`。段の run の読み方と積みの判断
+（`layerRunsVerdict`・`decideSpeculation`）は PR Manager と共有するため
+`pr-report-core` の `layer-runs.mts`・`layer-stack.mts` にあります）。
 
 - すでに積んである段は、積んだ順のまま先頭に保ち、残りの candidate をその後ろに
   キューの順で並べます（`stackedFirst`）。新しく candidate になった PR や
@@ -1641,7 +1643,10 @@ branch left to sleep included — is not moved by this step.
 
 With `speculate` in `.github/unblock-prs.json`, step 3 first checks up to
 `depth` of the leading candidates ahead of their turn (`speculate.mts`, what is
-decided in `speculate-plan.mts`).
+decided in `speculate-plan.mts`; how a layer's runs are read and what is done
+with the stack, `layerRunsVerdict` and `decideSpeculation`, are in
+`pr-report-core`'s `layer-runs.mts` and `layer-stack.mts`, which the Pull
+Requests Manager draws the stack by).
 
 - The layers already stacked stay first, in the order they were stacked, and the
   other candidates follow in the queue's order (`stackedFirst`). A pull request

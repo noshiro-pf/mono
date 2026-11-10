@@ -24,6 +24,7 @@ import {
   codeOwnerReview,
   codeOwnersEnforcedBy,
   epochMsOf,
+  layerRunsVerdict,
   namesEveryChangedPath,
   numberOfQueueLayerBranch,
   parseCodeOwners,
@@ -41,6 +42,7 @@ import {
   type CodeOwnerReview,
   type CodeOwnersRule,
   type Comparison,
+  type DispatchedRun,
   type IssueDeclarations,
   type Label,
   type LinkedIssue,
@@ -57,7 +59,7 @@ import {
   type SetAside,
 } from 'pr-report-core';
 import type { ClaudeSession } from 'split-view-link';
-import { Arr, isRecord, Obj, Result } from 'ts-data-forge';
+import { Arr, isRecord, Json, Obj, Result } from 'ts-data-forge';
 import * as t from 'ts-fortress';
 import type { ReadonlyRecord, StrictPick } from 'ts-type-forge';
 import { loadBranchRules, loadPushers } from './branch-rules.mjs';
@@ -69,9 +71,11 @@ import {
   type Fetch,
   type GraphqlAnswer,
 } from './graphql.mjs';
+import { loadLayerRuns } from './layer-runs.mjs';
 import { checksFailureOf } from './part-failures.mjs';
 import {
   queueViewOf,
+  type LayerChecks,
   type QueueLayers,
   type QueuePull,
   type QueueView,
@@ -115,7 +119,7 @@ import {
   type OpenPullsQuery,
   type PullRequestDetails,
 } from './report-query.mjs';
-import type { RestFetch } from './workflow-runs.mjs';
+import type { RestFetch } from './rest-json.mjs';
 
 /**
  * What `unblock-prs` said when it last set the pull request aside, read from
@@ -643,7 +647,8 @@ export const appendIssues = (held: IssueList, page: IssueList): IssueList => {
 /**
  * The queue layers on the `queue/pr-*` branches, each whose commit carries the
  * `Queue-Layer:` trailer of the pull request its branch names, as the worker
- * reads them; `undefined` without the default branch's tree they stand on.
+ * reads them, the checks on each not read yet (`withLayerChecks` reads them);
+ * `undefined` without the default branch's tree they stand on.
  */
 export const queueLayersOf = (
   baseTree: string | undefined,
@@ -683,11 +688,71 @@ export const queueLayersOf = (
                 parent: parent.oid,
                 parentTree: parent.tree.oid,
                 builtAt,
+                // Read by REST once the branches are (`withLayerChecks`).
+                checks: undefined,
               } as const;
             }
           }
         }),
       } as const);
+
+/**
+ * Where the checks dispatched on a layer stand, from the runs dispatched on its
+ * commit, judged as the worker judges them (`layerRunsVerdict` in
+ * `pr-report-core`) against the workflows it dispatches.
+ */
+export const layerChecksOf = (
+  runs: readonly DispatchedRun[],
+  workflows: readonly string[],
+): LayerChecks => {
+  const verdict = layerRunsVerdict(runs, workflows);
+
+  return {
+    status: verdict.status,
+    cancelledTooOften: verdict.cancelledTooOften,
+    done: verdict.latest.filter(({ run }) => run?.status === 'completed')
+      .length,
+    total: workflows.length,
+  };
+};
+
+/**
+ * The workflows `unblock-prs` dispatches on each layer, from the
+ * `speculate.workflows` of its configuration; `undefined` when that cannot be
+ * read, or names none.
+ */
+export const speculateWorkflowsOf = (
+  config: string | undefined,
+): readonly string[] | undefined => {
+  if (config === undefined) {
+    return undefined;
+  }
+
+  const parsed = Json.parse(config);
+
+  if (Result.isErr(parsed)) {
+    return undefined;
+  }
+
+  const validated = SpeculateConfigSchema.validate(parsed.value);
+
+  if (Result.isErr(validated)) {
+    return undefined;
+  }
+
+  // Only the workflows are read, not the rest the worker checks of the file: a
+  // file it refuses stops every run of it, which the worker's own log says and
+  // this page, reading no log, cannot. The layers then stand as it left them,
+  // and are drawn so.
+  const workflows = Arr.uniq(validated.value.speculate?.workflows ?? []);
+
+  return Arr.isNonEmpty(workflows) ? workflows : undefined;
+};
+
+/** As much of `unblock-prs`'s configuration as {@link speculateWorkflowsOf} reads. */
+const SpeculateConfigSchema = t.record({
+  speculate: t.optional(t.record({ workflows: t.array(t.string()) })),
+});
 
 /**
  * A part as a read that depends on it sees it: what it answered, or where it
@@ -774,6 +839,19 @@ type PullsPart = Readonly<{
   /** The queue layers built, if the default branch's tree was read. */
   layers: QueueLayers | undefined;
 }>;
+
+/**
+ * The pull requests' query as it answers, before the runs on its queue layers
+ * are read ({@link withLayerChecks}), which is all `layerWorkflows` is for.
+ */
+type ListedPulls = PullsPart &
+  Readonly<{
+    /**
+     * The workflows `unblock-prs` dispatches on each layer, which the checks on
+     * one are judged against; `undefined` when its configuration names none.
+     */
+    layerWorkflows: readonly string[] | undefined;
+  }>;
 
 /** The check results on one pull request's head. */
 type ChecksState = Readonly<{
@@ -920,10 +998,84 @@ const openNodesOf = <N,>(pages: readonly OpenPage<N>[]): readonly N[] =>
 const repositoryOf = ({ data }: GraphqlAnswer): unknown =>
   isRecord(data) ? data['repository'] : undefined;
 
+/**
+ * The pull requests' part with the runs on each queue layer read, by REST, as
+ * the worker reads them (`layer-runs.mts`). A layer whose runs could not be read
+ * keeps none, and the queue says of its stack only that it was checked ahead.
+ */
+const withLayerChecks = async (
+  part: Promise<Answered<ListedPulls>>,
+  {
+    source,
+    token,
+    fetchImpl,
+  }: Readonly<{
+    source: ReportSource;
+    token: string;
+    fetchImpl: RestFetch | undefined;
+  }>,
+): Promise<Answered<PullsPart>> => {
+  const { rateLimit, result } = await part;
+
+  if (Result.isErr(result)) {
+    return { rateLimit, result };
+  }
+
+  const { layerWorkflows: workflows, ...listed } = result.value;
+
+  const { layers } = listed;
+
+  if (
+    layers === undefined ||
+    workflows === undefined ||
+    !Arr.isNonEmpty(layers.built)
+  ) {
+    return { rateLimit, result: Result.ok(listed) };
+  }
+
+  // Only a layer whose pull request is open at the head it was built from can
+  // be kept ahead (`stackedAhead`); one set aside or left from an old stack is
+  // never drawn, and its runs are not asked for. Not the whole of the kept
+  // stack's rule, which needs the checks and details read after this part: a
+  // necessary condition only, so that a layer it lets through costs a request
+  // and no more, and none it drops could be kept.
+  const heads = new Map<number, string>(
+    listed.pulls.map(({ number, headRefOid }) => [number, headRefOid]),
+  );
+
+  const built = await Promise.all(
+    layers.built.map(async (layer) => {
+      if (heads.get(layer.number) !== layer.head) {
+        return layer;
+      }
+
+      const runs = await loadLayerRuns(source, layer.tip, {
+        token,
+        ...(fetchImpl === undefined ? {} : { fetchImpl }),
+      });
+
+      // A failed read is not reported as a part failing: the queue's order is
+      // still right without the runs, only less detailed, and a token that may
+      // not read Actions would otherwise warn on every read.
+      return {
+        ...layer,
+        checks: Result.isOk(runs)
+          ? layerChecksOf(runs.value, workflows)
+          : undefined,
+      } as const;
+    }),
+  );
+
+  return {
+    rateLimit,
+    result: Result.ok({ ...listed, layers: { ...layers, built } }),
+  };
+};
+
 const readPullRequests = async (
   ask: Ask,
   repo: RepoRef,
-): Promise<Answered<PullsPart>> => {
+): Promise<Answered<ListedPulls>> => {
   const { rateLimit, result: pages } = await readOpenPages({
     ask,
     listing: OPEN_PULLS_QUERIES.pullRequests,
@@ -955,6 +1107,7 @@ const readPullRequests = async (
     codeOwnersInDocs,
     queueLabel,
     queueLayers,
+    queueConfig,
   } = first.repository;
 
   // GitHub reads the first of the three it finds, in this order.
@@ -975,6 +1128,7 @@ const readPullRequests = async (
         defaultBranchRef?.target?.tree?.oid,
         queueLayers?.nodes ?? [],
       ),
+      layerWorkflows: speculateWorkflowsOf(queueConfig?.text),
     }),
   };
 };
@@ -1743,12 +1897,17 @@ const readPullParts = ({
   previous: KnownParts;
   fetchImpl: (Fetch & RestFetch) | undefined;
 }>): PullParts => {
-  const pulls = readPullRequests(ask, repo);
+  const listed = readPullRequests(ask, repo);
+
+  // The runs on the queue layers follow the pull requests, as the rules do, and
+  // the part waits for them: the queue's own order is drawn by them. What reads
+  // the pull requests alone does not.
+  const pulls = withLayerChecks(listed, { source, token, fetchImpl });
 
   // What the rules and the comparisons are asked from: the pull requests this
   // read found, or where it could not, the ones the last read had, so that one
   // query timing out does not take three parts back to the last read.
-  const pullsOrKept = orKept(pulls, previous.pulls);
+  const pullsOrKept = orKept(listed, previous.pulls);
 
   const rules = pullsOrKept.then(async ({ result }) =>
     Result.isOk(result)

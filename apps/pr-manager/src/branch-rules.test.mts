@@ -1,7 +1,7 @@
 import { Result } from 'ts-data-forge';
 import { loadBranchRules } from './branch-rules.mjs';
 import type { ReportSource } from './constants.mjs';
-import type { RestFetch, RestFetchInit } from './workflow-runs.mjs';
+import type { RestFetch, RestFetchInit } from './rest-json.mjs';
 
 // The repository the fixtures were taken from.
 const SOURCE: ReportSource = { owner: 'noshiro-pf', repo: 'mono' } as const;

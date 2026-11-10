@@ -14,6 +14,14 @@
 
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
+import {
+  decideSpeculation,
+  layerRunsRequest,
+  layerRunsVerdict,
+  MAX_DISPATCHES,
+  mayBuildAbove,
+  type LayerStatus,
+} from 'pr-report-core';
 import { Arr, Num, Result, unknownToString } from 'ts-data-forge';
 import * as t from 'ts-fortress';
 import {
@@ -32,8 +40,6 @@ import {
   removeWorktree,
 } from './github.mjs';
 import {
-  cancelledTooOften,
-  decideSpeculation,
   desiredLayers,
   isStuck,
   LAYER_BRANCH_PREFIX,
@@ -41,15 +47,12 @@ import {
   layerMessage,
   layerOfMessage,
   matchLayers,
-  MAX_DISPATCHES,
-  mayBuildAbove,
   numberOfLayerBranch,
   planDrop,
   stackedFirst,
   type BuiltLayer,
   type Layer,
   type LayerRead,
-  type LayerStatus,
 } from './speculate-plan.mjs';
 import type { PullRequest, SkipRecord } from './types.mjs';
 
@@ -393,14 +396,6 @@ const JOB_NOT_STARTED: ReadonlySet<string> = new Set<string>([
   'requested',
 ]);
 
-/** A run's conclusions that make its layer red. */
-const FAILED: ReadonlySet<string> = new Set<string>([
-  'failure',
-  'timed_out',
-  'startup_failure',
-  'action_required',
-]);
-
 /** What every check workflow's gate job is named with (`gates / check`). */
 const GATE_JOB = 'gates';
 
@@ -506,17 +501,18 @@ const deleteBranch = async (number: number): Promise<void> => {
 const runsOn = async (
   api: ApiContext,
   sha: string,
-): Promise<Result<readonly LayerRun[], string>> =>
-  Result.map(
-    await rest(api, 'GET', '/actions/runs', RunsSchema, {
-      query: { head_sha: sha, event: 'workflow_dispatch', per_page: '100' },
-    }),
+): Promise<Result<readonly LayerRun[], string>> => {
+  const { route, query } = layerRunsRequest(sha);
+
+  return Result.map(
+    await rest(api, 'GET', route, RunsSchema, { query }),
     (answered) =>
       answered.workflow_runs.map(
         ({ run_started_at, created_at, ...run }) =>
           ({ ...run, run_started_at: run_started_at ?? created_at }) as const,
       ),
   );
+};
 
 /**
  * Fetches, in one go, those of `shas` this clone lacks. Whether it could; a sha
@@ -889,15 +885,10 @@ const readStatus = async (
 
   const runs = answered.value;
 
-  const latest = workflows.map((workflow) => ({
-    workflow,
-    run: runs
-      .filter((run) => run.path.endsWith(`/${workflow}`))
-      .toSorted((a, b) => b.id - a.id)[0],
-  }));
+  const verdict = layerRunsVerdict(runs, workflows);
 
   const going = Arr.generate(function* () {
-    for (const { run } of latest) {
+    for (const { run } of verdict.latest) {
       if (run !== undefined && run.status !== 'completed') {
         yield run;
       }
@@ -912,40 +903,16 @@ const readStatus = async (
     ? Math.min(...dispatches)
     : undefined;
 
-  const missing = latest
-    .filter(({ run }) => run === undefined || run.conclusion === 'cancelled')
-    .map(({ workflow }) => workflow);
-
-  const spent = missing.some((workflow) =>
-    cancelledTooOften(
-      runs
-        .filter((run) => run.path.endsWith(`/${workflow}`))
-        .map((run) => run.conclusion),
-    ),
-  );
-
   const reading = {
-    missing,
+    missing: verdict.missing,
     runs,
     since: dispatched === undefined ? ({} as const) : ({ dispatched } as const),
-    cancelledTooOften: spent,
+    cancelledTooOften: verdict.cancelledTooOften,
   } as const;
 
-  const failed = latest.find(({ run }) => FAILED.has(run?.conclusion ?? ''));
-
-  if (failed?.run !== undefined) {
-    return Result.ok({
-      ...reading,
-      status: { kind: 'red', name: failed.workflow, link: failed.run.html_url },
-    });
-  }
-
-  if (Arr.isNonEmpty(missing)) {
-    return Result.ok({ ...reading, status: { kind: 'not-dispatched' } });
-  }
-
-  if (!Arr.isNonEmpty(going)) {
-    return Result.ok({ ...reading, status: { kind: 'green' } });
+  // Whether every job of a run still going has started is read from its jobs.
+  if (verdict.status.kind !== 'running') {
+    return Result.ok({ ...reading, status: verdict.status });
   }
 
   const starting = await Promise.all(

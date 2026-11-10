@@ -16,12 +16,13 @@
 
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
+import { UNBLOCK_PRS_CONFIG_PATH } from 'pr-report-core';
 import { Arr, Result } from 'ts-data-forge';
 import * as t from 'ts-fortress';
 import { readJsonFile, repoRoot } from '../lib/index.mjs';
 
 /** Where the file is read from, relative to the repository root. */
-export const CONFIG_PATH = '.github/unblock-prs.json';
+export const CONFIG_PATH = UNBLOCK_PRS_CONFIG_PATH;
 
 /**
  * The repository's configuration, or `undefined` when it has none. A file that
