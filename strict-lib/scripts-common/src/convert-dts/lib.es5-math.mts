@@ -43,8 +43,12 @@ export const convertLibEs5_Math =
 
             replaceWithNoMatchCheck(
               'abs(x: number): number;',
+              // `AbsoluteValue` rewrites only a number literal, so it is held
+              // to `SmallInt` in both flavors: under a `number` constraint it
+              // returns a ts-type-forge brand unchanged, and `Math.abs` of an
+              // `Int16` stays an `Int16` although `Math.abs(-32768)` is 32768.
               Arr.toUnshifted(
-                `abs<N extends ${useBrandedNumber ? 'SmallInt' : 'number'}>(x: N): AbsoluteValue<N>;`,
+                'abs<N extends SmallInt>(x: N): AbsoluteValue<N>;',
               )(
                 !useBrandedNumber
                   ? ['abs(x: number): number;']

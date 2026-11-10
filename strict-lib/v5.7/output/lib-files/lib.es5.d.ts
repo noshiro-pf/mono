@@ -784,7 +784,9 @@ interface Math {
    * For example, the absolute value of -5 is the same as the absolute value of 5.
    * @param x A numeric expression for which the absolute value is needed.
    */
-  abs<N extends number>(x: N): import('ts-type-forge').AbsoluteValue<N>;
+  abs<N extends import('ts-type-forge').SmallInt>(
+    x: N,
+  ): import('ts-type-forge').AbsoluteValue<N>;
   abs(x: number): number;
   /**
    * Returns the arc cosine (or inverse cosine) of a number.

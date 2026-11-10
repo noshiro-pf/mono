@@ -1,5 +1,5 @@
 diff --git a/v5.2/output/lib-files/lib.es5.d.ts b/v5.3/output/lib-files/lib.es5.d.ts
-index 22576ed875cf4240031446ce522d17fb2d06d19e..0f77cd47946725bf24771ce5d2d0ccbd5c43edc9 100644
+index 386f9d33f7a2be4cde967886355c5c9f9eba9b75..0415a545c111fed41ac3a28c962d10a19b4ab990 100644
 --- a/v5.2/output/lib-files/lib.es5.d.ts
 +++ b/v5.3/output/lib-files/lib.es5.d.ts
 @@ -743,7 +743,8 @@ interface ImportMeta {}

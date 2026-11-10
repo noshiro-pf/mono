@@ -51,7 +51,7 @@ export const asInt8 = (value: number): Int8 => {
 const fromNumber = (a: number): Int8 => asInt8(fromNumberImpl(a));
 
 const abs = <N extends Int8>(x: N): AbsoluteValue<N> =>
-  // eslint-disable-next-line total-functions/no-unsafe-type-assertion, @typescript-eslint/no-unnecessary-type-assertion -- unnecessary only under the strict standard library; the stock one types `Math.abs` as returning `number`
+  // eslint-disable-next-line total-functions/no-unsafe-type-assertion -- unnecessary only under the strict standard library; the stock one types `Math.abs` as returning `number`
   Math.abs(x) as unknown as AbsoluteValue<N>;
 
 const min_ = (...values: readonly Int8[]): Int8 => asInt8(Math.min(...values));
