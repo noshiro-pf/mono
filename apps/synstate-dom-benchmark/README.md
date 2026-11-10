@@ -34,7 +34,7 @@ Libraries run as production builds (`mode: 'production'` and the `production` ex
 Each follows the way its own documentation or its js-framework-benchmark entry writes such a table.
 
 - **synstate-dom**: the rows are one immutable array in a `createState`, and `For` derives each row's value from it. The selection is a state each row binds with `.pipe(map(...))`. This is the form SPEC.md recommends, not a tuned one.
-- **synstate-dom-next**: the rows are one immutable array in a `state`, `For` keeps a state per row, and `selector` writes only the two rows whose selection changed. In the scenarios each figure is one `derive` or `map`, and both pass on only a value that changed, so it needs no `skipIfNoChange` variant. A cell formats its figure with `.pipe(map(f))`, as synstate-dom does.
+- **synstate-dom-next**: the rows are one immutable array in a `state`, `For` keeps a state per row, and `selector` writes only the two rows whose selection changed. In the scenarios each figure is one `derive` or `map`, and both pass on only a value that changed. A cell formats its figure with `.pipe(map(f))`, as synstate-dom does.
 - **Solid**: a signal per label, `For` over the row objects, and `createSelector` for the selection, so that selecting touches two rows. Compiled by `vite-plugin-solid`.
 - **Preact + Signals**: a signal per label and a `useComputed` class per row, both bound to the DOM as signals; the list is re-rendered with keys.
 - **Preact** and **React**: the rows and the selection are one immutable state in a `useState` at the top, and each row is a `memo` component given its label and whether it is selected, so that a change re-renders the rows whose props changed. Each change is rendered with `flushSync` in React; Preact renders it in a microtask.
@@ -54,7 +54,7 @@ Each scenario also times `mount`, which builds the whole graph.
 
 A change here costs well under a millisecond, less than the 4 ms to which the browser holds a nested `setTimeout`, so the scenarios wait for the next task through a `MessageChannel` instead. And since `performance.now()` is rounded to 0.1 ms, one sample is the mean of 20 changes, alternating the operation and its reverse, which reach the same figures; a build sample is the mean of 5 mounts.
 
-synstate-dom is measured twice. As written, each figure is `combine` + `map`, which passes on every value it computes, so an update goes on through figures that came out the same. With a `skipIfNoChange` after every figure, it stops there, as Solid and Preact + Signals do by default, at the cost of a third node per figure.
+In synstate-dom's scenarios a figure computed from others is a `map`, over a `combine` where it has several inputs, and `map` passes on only a value that is not `Object.is` the last, so an update stops at a figure that came out the same, as it does in Solid and Preact + Signals. A `skipIfNoChange` after every figure would stop at the same place and only add a node per figure, so it is not measured.
 
 ## Bundle size
 
@@ -62,7 +62,7 @@ synstate-dom is measured twice. As written, each figure is `combine` + `map`, wh
 
 - **everything exported**: every export of the library's entry points (`scripts/measure-bundle-size.mts` lists them), kept whole; an upper bound rather than what an application ships. Preact's table uses `memo` from `preact/compat`, which this row does not count.
 - **counter** (`src/counter/`): a button that shows a count and adds one when clicked, the smallest application each library can be measured on.
-- **js-framework-benchmark table** (`src/frameworks/`) and the **loan**, **schedule** and **zoom scenarios** (`src/scenarios/`), as timed. synstate-dom's scenarios are measured as written, without `skipIfNoChange`.
+- **js-framework-benchmark table** (`src/frameworks/`) and the **loan**, **schedule** and **zoom scenarios** (`src/scenarios/`), as timed.
 
 The code the implementations share, the row factory and the scenario models, is in every column. One run is enough: the sizes depend only on the sources and the installed versions.
 

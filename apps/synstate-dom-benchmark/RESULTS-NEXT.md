@@ -36,34 +36,34 @@ Each library's time divided by synstate-dom's: below 1 is faster than synstate-d
 
 The scenarios of `src/scenarios/`; see README.md. `wrong` is a library that rendered figures other than the model's, so has no time. The medians are taken as above.
 
-| operation (median ms)                   | synstate-dom | synstate-dom (skipIfNoChange) | synstate-dom (derive) | synstate-dom-next | Solid |
-| :-------------------------------------- | -----------: | ----------------------------: | --------------------: | ----------------: | ----: |
-| loan: build the table                   |         2.80 |                          5.44 |                  3.04 |              1.64 |  1.56 |
-| loan: change the interest rate          |         0.89 |                          1.18 |                  0.79 |              0.68 |  1.11 |
-| loan: prepay in month 181               |         0.48 |                          0.65 |                  0.44 |              0.40 |  0.57 |
-| loan: prepay in month 349               |         0.13 |                          0.14 |                  0.12 |              0.11 |  0.14 |
-| schedule: build the schedule            |        11.56 |                         17.32 |                  8.68 |              3.82 |  3.72 |
-| schedule: lengthen the first task       |         2.48 |                          3.05 |                  1.68 |              1.30 |  3.52 |
-| schedule: lengthen a task in the middle |         0.06 |                          0.07 |                  0.05 |              0.05 |  0.63 |
-| schedule: lengthen a task near the end  |         0.17 |                          0.20 |                  0.19 |              0.17 |  0.76 |
-| zoom: build the map                     |         8.06 |                         17.90 |                  8.36 |              3.60 |  3.14 |
-| zoom: zoom within a level               |         0.09 |                          0.08 |                  0.08 |              0.08 |  0.56 |
-| zoom: zoom to the next level            |         2.23 |                          2.80 |                  2.30 |              1.72 |  3.31 |
+| operation (median ms)                   | synstate-dom | synstate-dom (derive) | synstate-dom-next | Solid |
+| :-------------------------------------- | -----------: | --------------------: | ----------------: | ----: |
+| loan: build the table                   |         2.80 |                  3.04 |              1.64 |  1.56 |
+| loan: change the interest rate          |         0.89 |                  0.79 |              0.68 |  1.11 |
+| loan: prepay in month 181               |         0.48 |                  0.44 |              0.40 |  0.57 |
+| loan: prepay in month 349               |         0.13 |                  0.12 |              0.11 |  0.14 |
+| schedule: build the schedule            |        11.56 |                  8.68 |              3.82 |  3.72 |
+| schedule: lengthen the first task       |         2.48 |                  1.68 |              1.30 |  3.52 |
+| schedule: lengthen a task in the middle |         0.06 |                  0.05 |              0.05 |  0.63 |
+| schedule: lengthen a task near the end  |         0.17 |                  0.19 |              0.17 |  0.76 |
+| zoom: build the map                     |         8.06 |                  8.36 |              3.60 |  3.14 |
+| zoom: zoom within a level               |         0.09 |                  0.08 |              0.08 |  0.56 |
+| zoom: zoom to the next level            |         2.23 |                  2.30 |              1.72 |  3.31 |
 
 ### Relative to synstate-dom
 
 Each library's time divided by synstate-dom's: below 1 is faster than synstate-dom, above 1 slower.
 
-| operation                               | synstate-dom (skipIfNoChange) | synstate-dom (derive) | synstate-dom-next |  Solid |
-| :-------------------------------------- | ----------------------------: | --------------------: | ----------------: | -----: |
-| loan: build the table                   |                         1.94× |                 1.09× |             0.59× |  0.56× |
-| loan: change the interest rate          |                         1.33× |                 0.89× |             0.76× |  1.25× |
-| loan: prepay in month 181               |                         1.35× |                 0.92× |             0.83× |  1.19× |
-| loan: prepay in month 349               |                         1.08× |                 0.92× |             0.85× |  1.08× |
-| schedule: build the schedule            |                         1.50× |                 0.75× |             0.33× |  0.32× |
-| schedule: lengthen the first task       |                         1.23× |                 0.68× |             0.52× |  1.42× |
-| schedule: lengthen a task in the middle |                         1.17× |                 0.83× |             0.83× | 10.50× |
-| schedule: lengthen a task near the end  |                         1.18× |                 1.12× |             1.00× |  4.47× |
-| zoom: build the map                     |                         2.22× |                 1.04× |             0.45× |  0.39× |
-| zoom: zoom within a level               |                         0.89× |                 0.89× |             0.89× |  6.22× |
-| zoom: zoom to the next level            |                         1.26× |                 1.03× |             0.77× |  1.48× |
+| operation                               | synstate-dom (derive) | synstate-dom-next |  Solid |
+| :-------------------------------------- | --------------------: | ----------------: | -----: |
+| loan: build the table                   |                 1.09× |             0.59× |  0.56× |
+| loan: change the interest rate          |                 0.89× |             0.76× |  1.25× |
+| loan: prepay in month 181               |                 0.92× |             0.83× |  1.19× |
+| loan: prepay in month 349               |                 0.92× |             0.85× |  1.08× |
+| schedule: build the schedule            |                 0.75× |             0.33× |  0.32× |
+| schedule: lengthen the first task       |                 0.68× |             0.52× |  1.42× |
+| schedule: lengthen a task in the middle |                 0.83× |             0.83× | 10.50× |
+| schedule: lengthen a task near the end  |                 1.12× |             1.00× |  4.47× |
+| zoom: build the map                     |                 1.04× |             0.45× |  0.39× |
+| zoom: zoom within a level               |                 0.89× |             0.89× |  6.22× |
+| zoom: zoom to the next level            |                 1.03× |             0.77× |  1.48× |
