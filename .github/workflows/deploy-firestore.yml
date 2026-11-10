@@ -73,7 +73,7 @@ jobs:
     steps:
       # Only the history is read; no file in the tree is.
       - name: Checkout
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        uses: actions/checkout@v7.0.1
         with:
           persist-credentials: false
           filter: blob:none
@@ -146,7 +146,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        uses: actions/checkout@v7.0.1
         with:
           persist-credentials: false
 
@@ -177,13 +177,13 @@ jobs:
 
       - name: Set up pnpm, Node.js and the dependencies
         if: steps.find.outputs.tested != ''
-        uses: ./.github/actions/setup
+        uses: $/.github/actions/setup
 
       # The Firestore emulator needs Java 21 or later. firebase-tools is a
       # catalog-pinned dependency of each app; no Firebase login is needed.
       - name: Set up Java for the Firestore emulator
         if: steps.find.outputs.tested != ''
-        uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad # v6.1.0
+        uses: actions/setup-java@v6.1.0
         with:
           distribution: temurin
           java-version: '21'
@@ -286,7 +286,7 @@ jobs:
 
       - name: Checkout
         if: steps.tested.outputs.passed == 'true'
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        uses: actions/checkout@v7.0.1
         with:
           persist-credentials: false
 
@@ -322,7 +322,7 @@ jobs:
       # workspace.
       - name: Set up pnpm and Node.js
         if: steps.current.outputs.current == 'true'
-        uses: ./.github/actions/setup
+        uses: $/.github/actions/setup
         with:
           install: false
 
@@ -371,7 +371,7 @@ jobs:
 
       - name: Authenticate to Google Cloud
         if: steps.current.outputs.current == 'true'
-        uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3.0.0
+        uses: google-github-actions/auth@v3.0.0
         with:
           workload_identity_provider: ${{ vars.FIREBASE_DEPLOY_WORKLOAD_IDENTITY_PROVIDER }}
           service_account: ${{ vars.FIREBASE_DEPLOY_SERVICE_ACCOUNT }}

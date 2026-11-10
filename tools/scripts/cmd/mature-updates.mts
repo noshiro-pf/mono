@@ -38,19 +38,21 @@ import type { ReleaseBinaryPin } from '../lib/release-binaries.mjs';
  * adds the `pnpm` npm package to switch, `@pnpm/exe.*` optional dependencies
  * and all.
  *
- * **`actions`** moves every `uses: owner/repo@<sha> # vX.Y.Z` pin in the
- * workflows (`.github/workflows/*.yml`) and in the composite actions they call
- * (an `action.yml` at any depth under `.github/actions/`) to the newest release
- * of the same major that is older than the hold. A pin anywhere else is not
- * read, and nothing says so: it simply stops moving.
- * `pnpm update --include-github-actions` cannot apply the hold: it resolves
- * action versions from `git ls-remote` refs, which carry a tag name and a SHA
- * but no publication date. GitHub's Releases API carries `published_at`, so
- * that is what this reads, and the tag is resolved to its commit through the
- * Commits API — the same SHA pin pnpm writes. A major still waits for a human,
- * as before; it is reported, not taken. Set `GH_TOKEN` (the workflow passes
- * `GITHUB_TOKEN`) or the unauthenticated rate limit, shared across a runner's
- * whole IP range, will be hit.
+ * **`actions`** moves every `uses: owner/repo@vX.Y.Z` pin in the workflows
+ * (`.github/workflows/*.yml`) and in the composite actions they call (an
+ * `action.yml` at any depth under `.github/actions/`) to the newest release of
+ * the same major that is older than the hold, then regenerates
+ * `.github/workflows/actions.lock` with `gh actions-lock`, which records the
+ * commit each new tag points at. A pin anywhere else is not read, and nothing
+ * says so: it simply stops moving. `pnpm update --include-github-actions`
+ * cannot apply the hold: it resolves action versions from `git ls-remote` refs,
+ * which carry a tag name and a SHA but no publication date. GitHub's
+ * Releases API carries `published_at`, so that is what this reads. A major
+ * still waits for a human, as before; it is reported, not taken. Set `GH_TOKEN`
+ * (the workflow passes `GITHUB_TOKEN`) or the unauthenticated rate limit,
+ * shared across a runner's whole IP range, will be hit; `gh` needs it too, and
+ * the `gh actions-lock` extension installed
+ * (`.github/actions/install-gh-actions-lock` says which release).
  *
  * **`release-binaries`** moves each tool in
  * `tools/configs/release-binaries.json` (actionlint and shellcheck, which
@@ -308,30 +310,30 @@ export const releaseLine = ({ major, minor, patch }: StableVersion): string =>
       : (`0.0.${patch}` as const);
 
 /**
- * `uses: owner/repo[/path]@<40-hex sha> # vX.Y.Z` — the shape
- * `pnpm update --include-github-actions` writes and the only one this moves.
- * A local workflow (`./…`), a bare tag, or a pin without the version comment is
- * left alone.
+ * `uses: owner/repo[/path]@vX.Y.Z`, optionally followed by a comment — the
+ * shape `gh actions-lock` writes, a full version whose commit the lockfile
+ * records, and the only one this moves. A local action or workflow (`./…`,
+ * `$/…`), a partial version (`v7`), a branch, or a SHA is left alone.
  */
 export const parseActionPinLine = (
   line: string,
 ): StrictOmit<ActionPin, 'file' | 'line'> | undefined => {
-  const match =
-    /^(\s*-?\s*uses:\s+)(\S+)@([0-9a-f]{40})\s+#\s*(v?\d+\.\d+\.\d+)\s*$/u.exec(
-      line,
-    );
+  const match = /^(\s*-?\s*uses:\s+)(\S+)@(v?\d+\.\d+\.\d+)(.*)$/u.exec(line);
 
   if (match === null) {
     return undefined;
   }
 
-  const [, prefix, reference, sha, tag] = match;
+  const [, prefix, reference, tag, comment] = match;
 
+  // After the version, a comment, blanks or nothing: `@v7.0.1-rc.1` is another
+  // tag.
   if (
     prefix === undefined ||
     reference === undefined ||
-    sha === undefined ||
-    tag === undefined
+    tag === undefined ||
+    comment === undefined ||
+    !/^(?:\s*|\s+#.*)$/u.test(comment)
   ) {
     return undefined;
   }
@@ -351,15 +353,15 @@ export const parseActionPinLine = (
     prefix,
     repo: `${owner}/${name}`,
     subpath: rest.map((segment) => `/${segment}`).join(''),
-    sha,
     tag,
+    comment,
   };
 };
 
 export const renderActionPin = (
   pin: StrictOmit<ActionPin, 'file' | 'line'>,
 ): string =>
-  `${pin.prefix}${pin.repo}${pin.subpath}@${pin.sha} # ${pin.tag}` as const;
+  `${pin.prefix}${pin.repo}${pin.subpath}@${pin.tag}${pin.comment}` as const;
 
 export const compareVersions = (a: StableVersion, b: StableVersion): number => {
   const major = compareDigits(a.major, b.major);
@@ -386,6 +388,11 @@ export const updateActionPins = async (
 ): Promise<void> => {
   const githubDir = options.githubDir ?? path.join(process.cwd(), '.github');
 
+  // Asked before anything is rewritten: a missing extension fails the run with
+  // the tree as it was, rather than with pins moved and a lockfile that no
+  // longer covers them.
+  assertGhActionsLockInstalled();
+
   const api = options.api ?? createGitHubApi();
 
   const now = options.now ?? Temporal.Now.instant().epochMilliseconds;
@@ -397,6 +404,14 @@ export const updateActionPins = async (
   console.log(describeHold(hold, cutoff));
 
   const pins = readActionPins(githubDir);
+
+  // Accepted by `gh actions-lock` and the runner alike, and never moved: say so
+  // on every run, rather than let it fall behind without a word.
+  for (const { file, line, text } of readUnmovablePins(githubDir)) {
+    console.log(
+      `::warning file=${path.relative(path.dirname(githubDir), file)},line=${line + 1}::Not moved by update-actions, which moves \`owner/repo@vX.Y.Z\` only: ${text.trim()}`,
+    );
+  }
 
   const groups = Object.groupBy(pins, (pin) => `${pin.repo}@${pin.tag}`);
 
@@ -419,10 +434,8 @@ export const updateActionPins = async (
       continue;
     }
 
-    const sha = await api.commitSha(first.repo, selection.target);
-
     mut_updates.push(
-      ...group.map((pin) => ({ pin, tag: selection.target ?? '', sha })),
+      ...group.map((pin) => ({ pin, tag: selection.target ?? '' })),
     );
   }
 
@@ -437,8 +450,8 @@ export const updateActionPins = async (
     const lines = fs.readFileSync(file, 'utf8').split('\n');
 
     const rewritten = fileUpdates.reduce(
-      (acc, { pin, tag, sha }) =>
-        acc.with(pin.line, renderActionPin({ ...pin, tag, sha })),
+      (acc, { pin, tag }) =>
+        acc.with(pin.line, renderActionPin({ ...pin, tag })),
       lines,
     );
 
@@ -447,6 +460,13 @@ export const updateActionPins = async (
   }
 
   console.log(`Moved ${mut_updates.length} action pin(s).`);
+
+  // A workflow whose tag moved and whose lockfile entry did not fails at job
+  // start once it runs, so the two move together. Nothing moved, nothing to
+  // record: the lockfile is left as it is.
+  if (mut_updates.length > 0) {
+    regenerateLockfile(path.dirname(githubDir));
+  }
 };
 
 export type ActionPin = Readonly<{
@@ -460,9 +480,10 @@ export type ActionPin = Readonly<{
   repo: string;
   /** `/path` inside the repository, or `''`. */
   subpath: string;
-  sha: string;
-  /** The version comment, as written (`v7.0.1`). */
+  /** The version, as written (`v7.0.1`). */
   tag: string;
+  /** What follows the version on the line (` # why`), or `''`. */
+  comment: string;
 }>;
 
 export type Release = Readonly<{
@@ -493,13 +514,11 @@ export type GitHubApi = Readonly<{
    * `currentTag` so that everything newer than it is in hand.
    */
   releases: (repo: string, currentTag: string) => Promise<readonly Release[]>;
-  /** The commit a tag points at — peeled, so an annotated tag is fine. */
-  commitSha: (repo: string, tag: string) => Promise<string>;
   /** The release `tag` names, or `undefined` when there is none. */
   releaseByTag: (repo: string, tag: string) => Promise<Release | undefined>;
 }>;
 
-type ActionPinUpdate = Readonly<{ pin: ActionPin; tag: string; sha: string }>;
+type ActionPinUpdate = Readonly<{ pin: ActionPin; tag: string }>;
 
 /** `release-binaries --to <tool>@<x.y.z>`. */
 export type ReleaseBinaryTarget = Readonly<{ name: string; version: string }>;
@@ -724,6 +743,33 @@ const listPinnedFiles = (githubDir: string): readonly string[] => {
   return [...workflows, ...actions].toSorted();
 };
 
+/** Fails, saying how to install it, unless `gh actions-lock` runs. */
+const assertGhActionsLockInstalled = (): void => {
+  try {
+    execFileSync('gh', ['actions-lock', '--version'], {
+      stdio: ['ignore', 'ignore', 'pipe'],
+    });
+  } catch (error) {
+    throw new Error(
+      '`gh actions-lock --version` failed, and the lockfile has to be regenerated whenever a pin moves. Install the extension at the release `.github/actions/install-gh-actions-lock/action.yml` names (`gh extension install github/gh-actions-lock --pin <tag>`).',
+      { cause: error },
+    );
+  }
+};
+
+/**
+ * `gh actions-lock`, run at the repository `root`: it re-pins every entry whose
+ * tag changed and writes `.github/workflows/actions.lock`. It onboards no
+ * workflow on the default branch, where verify-lockfile.yml has already held
+ * every merged one to the lockfile.
+ */
+const regenerateLockfile = (root: string): void => {
+  execFileSync('gh', ['actions-lock', '--no-interactive'], {
+    cwd: root,
+    stdio: 'inherit',
+  });
+};
+
 const readActionPins = (githubDir: string): readonly ActionPin[] =>
   listPinnedFiles(githubDir).flatMap((file) =>
     // eslint-disable-next-line security/detect-non-literal-fs-filename -- a workflow or an `action.yml`.
@@ -735,6 +781,26 @@ const readActionPins = (githubDir: string): readonly ActionPin[] =>
 
         return pin === undefined ? [] : [{ ...pin, file, line }];
       }),
+  );
+
+/**
+ * Each `uses:` of another repository's action that {@link parseActionPinLine}
+ * does not read: a SHA, a partial version, a branch.
+ */
+const readUnmovablePins = (
+  githubDir: string,
+): readonly Readonly<{ file: string; line: number; text: string }>[] =>
+  listPinnedFiles(githubDir).flatMap((file) =>
+    // eslint-disable-next-line security/detect-non-literal-fs-filename -- a workflow or an `action.yml`.
+    fs
+      .readFileSync(file, 'utf8')
+      .split('\n')
+      .flatMap((text, line) =>
+        /^\s*-?\s*uses:\s+[\w-][\w.-]*\/\S*@/u.test(text) &&
+        parseActionPinLine(text) === undefined
+          ? [{ file, line, text }]
+          : [],
+      ),
   );
 
 const describeMove = (
@@ -892,23 +958,6 @@ const createGitHubApi = (): GitHubApi => {
       }
 
       return mut_collected;
-    },
-
-    commitSha: async (repo, tag) => {
-      const { text } = await requestFound(
-        `/repos/${repo}/commits/${tag}`,
-        'application/vnd.github.sha',
-      );
-
-      const sha = text.trim();
-
-      if (!/^[0-9a-f]{40}$/u.test(sha)) {
-        throw new Error(
-          `GET /repos/${repo}/commits/${tag} did not answer a commit SHA: ${sha}`,
-        );
-      }
-
-      return sha;
     },
 
     releaseByTag: async (repo, tag) => {

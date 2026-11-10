@@ -1,0 +1,21 @@
+name: Install gh-actions-lock
+
+# The one place the version of the `gh actions-lock` extension is written, for
+# the two workflows that run it: verify-lockfile.yml verifies
+# `.github/workflows/actions.lock`, and pnpm-update.yml regenerates it after
+# `update-actions` has moved a pin. Nothing moves this version on its own; see
+# "Action pins and the lockfile" in .github/workflows/README.md.
+
+description: >-
+  `gh extension install github/gh-actions-lock` at a fixed release, with the
+  job's `GITHUB_TOKEN`, which `gh` needs to read the release.
+
+runs:
+  using: composite
+  steps:
+    - name: Install gh-actions-lock
+      shell: bash
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: |
+        gh extension install github/gh-actions-lock --pin v0.4.1

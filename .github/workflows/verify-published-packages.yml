@@ -81,7 +81,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        uses: actions/checkout@v7.0.1
         with:
           ref: ${{ case(github.event_name == 'pull_request', github.event.pull_request.head.sha, github.sha) }}
           # The gate below resolves a merge base, which does not exist in the
@@ -137,7 +137,7 @@ jobs:
 
       - name: Set up pnpm, Node.js and the dependencies
         if: steps.pins.outputs.changed == 'true'
-        uses: ./.github/actions/setup
+        uses: $/.github/actions/setup
 
       - name: Verify the published packages
         if: steps.pins.outputs.changed == 'true'

@@ -60,12 +60,12 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        uses: actions/checkout@v7.0.1
         with:
           persist-credentials: false
 
       - name: Set up pnpm, Node.js and the dependencies
-        uses: ./.github/actions/setup
+        uses: $/.github/actions/setup
 
       # version PR に載せる `NEXT_MAJOR.md` の未適用の項目（リリースを止める
       # decided と、決めるべき Undecided 候補 —
@@ -77,7 +77,7 @@ jobs:
         run: pnpm run z:next-major-reminder "${RUNNER_TEMP}/next-major-reminder.md"
 
       - name: Upload the item list
-        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        uses: actions/upload-artifact@v7.0.2
         with:
           name: next-major-reminder
           path: ${{ runner.temp }}/next-major-reminder.md
@@ -98,7 +98,7 @@ jobs:
           ls -lh "${RUNNER_TEMP}/dist.tar.gz"
 
       - name: Upload the build output
-        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        uses: actions/upload-artifact@v7.0.2
         with:
           name: dist
           path: ${{ runner.temp }}/dist.tar.gz
@@ -144,7 +144,7 @@ jobs:
       id-token: write # required for OIDC / npm provenance
     steps:
       - name: Checkout
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        uses: actions/checkout@v7.0.1
         with:
           persist-credentials: false
           fetch-depth: 0
@@ -176,7 +176,7 @@ jobs:
       # キャッシュの段落。この job での代償は、root の install が入れる
       # ワークスペース全体の依存を毎回 registry から取り直すこと。
       - name: Set up pnpm, Node.js and the dependencies
-        uses: ./.github/actions/setup
+        uses: $/.github/actions/setup
         with:
           cache: false
           ignore-scripts: true
@@ -189,7 +189,7 @@ jobs:
       # 分割前もビルドが attest されていたわけではなく、ここは publish が
       # 同じ workflow・同じコミットの run から出ているという事実のまま。
       - name: Download the build output
-        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        uses: actions/download-artifact@v8.0.2
         with:
           name: dist
           path: ${{ runner.temp }}
@@ -201,7 +201,7 @@ jobs:
       # that hold a key" の 2 つめ ）。ここに足すステップも同じ順序に従うこと。
       - name: Generate Token
         id: app-token
-        uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3.3.0
+        uses: actions/create-github-app-token@v3.3.0
         with:
           client-id: ${{ vars.REPO_AUTOMATION_BOT_CLIENT_ID }}
           private-key: ${{ secrets.REPO_AUTOMATION_BOT_PRIVATE_KEY }}
@@ -215,7 +215,7 @@ jobs:
       # 何であれ。publish はこの workflow の仕事で、手元の仕事ではない。
       - name: Create Release Pull Request or Publish
         id: changesets
-        uses: changesets/action@ae32849d5ba541f9ae29e40e22a623bc13562f51 # v2.1.2
+        uses: changesets/action@v2.1.2
         with:
           github-token: ${{ steps.app-token.outputs.token }}
           publish-script: pnpm run changeset:publish
@@ -279,7 +279,7 @@ jobs:
 
     steps:
       - name: Download the item list
-        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        uses: actions/download-artifact@v8.0.2
         with:
           name: next-major-reminder
           path: ${{ runner.temp }}

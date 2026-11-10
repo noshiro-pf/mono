@@ -1,6 +1,7 @@
 // cspell:ignore pyflakes
 import { spawnSync } from 'node:child_process';
 import * as fs from 'node:fs/promises';
+import * as os from 'node:os';
 import * as path from 'node:path';
 import { Arr, isRecord, Num, Result, unknownToString } from 'ts-data-forge';
 import { glob, isDirectlyExecuted } from 'ts-repo-utils';
@@ -36,7 +37,18 @@ import {
  * `push` to `main`, a schedule or `workflow_dispatch` is after the merge; an
  * injection shows only when someone uses it. The inputs and outputs of a
  * third-party action are not checked: actionlint knows them by `owner/repo@vX`
- * only, and every pin here is a SHA.
+ * only, and every pin here is a full version (`vX.Y.Z`).
+ *
+ * **A `$/…` action is linted as `./…`.** The pinned actionlint does not know
+ * the `$/` form (an action of this repository at the running commit, which
+ * `.github/workflows/actions.lock` requires of an action that uses others), and
+ * reports every such step as an action without a ref. Both name the same
+ * directory of this repository, so actionlint is given the files with
+ * `uses: $/` written `uses: ./` ({@link asLocalActionForm}) — a copy of
+ * `.github/` for the workflows, and the wrapper's text for a composite action —
+ * and judges the step and the `with:` it passes as it judged the `./` form. The
+ * rewrite keeps every line's length, so a position it reports is the file's; a
+ * message that quotes the step says `./` where the file says `$/`.
  *
  * **The verdict is CI's.** Both binaries are the ones
  * `tools/configs/release-binaries.json` pins, downloaded and verified by
@@ -142,15 +154,17 @@ export const checkActionlint = async ({
   const actions = compositeActions.map((action) => {
     const { scripts, steps, inputs, problems } = extractRunScripts(action.text);
 
+    const wrapped =
+      steps === undefined ? undefined : wrapInWorkflow(steps, { inputs });
+
     const verdict =
-      steps === undefined
+      wrapped === undefined
         ? ({ findings: [], failure: undefined } as const)
         : judgeComposite(
-            lintWorkflowText(
-              actionlint.value,
-              shellcheck.value,
-              wrapInWorkflow(steps, { inputs }),
-            ),
+            lintWorkflowText(actionlint.value, shellcheck.value, {
+              ...wrapped,
+              text: asLocalActionForm(wrapped.text),
+            }),
             action.path,
             scripts,
           );
@@ -270,6 +284,15 @@ export const wrapInWorkflow = (
     headerLines: header.length,
   };
 };
+
+/**
+ * `text` with each `uses: $/<path>` written `uses: ./<path>`, the form the
+ * pinned actionlint reads, and nothing else changed: a `$/` anywhere but at the
+ * start of a `uses:` value (a `sed '/^$/d'` in a script) is left as it is, and
+ * every line keeps its length.
+ */
+export const asLocalActionForm = (text: string): string =>
+  text.replaceAll(/^(\s*-?\s*uses:\s+)\$\//gmu, '$1./');
 
 /** What {@link wrapInWorkflow} makes of a composite action's steps. */
 export type WrappedWorkflow = Readonly<{
@@ -549,14 +572,75 @@ const tryRunningBinary = (
       : `exit status ${status ?? 'none'}: ${stderr.trim()}`;
 };
 
-const runActionlintBinary: RunActionlint = (actionlint, shellcheck) => {
-  const { status, signal, error } = spawnSync(
-    actionlint,
-    [`-shellcheck=${shellcheck}`, '-pyflakes='],
-    { cwd: projectRootPath, stdio: 'inherit', env: toolEnv },
+/**
+ * actionlint over the workflows of the project at `root`: the copy
+ * {@link copyGithubDirAsLocalForm} made, whose paths it reports as the
+ * repository's (`.github/workflows/<file>`), since it runs from that copy's
+ * root.
+ */
+const runActionlintIn =
+  (root: string): RunActionlint =>
+  (actionlint, shellcheck) => {
+    const { status, signal, error } = spawnSync(
+      actionlint,
+      [`-shellcheck=${shellcheck}`, '-pyflakes='],
+      { cwd: root, stdio: 'inherit', env: toolEnv },
+    );
+
+    return { status, signal, error: error?.message };
+  };
+
+/**
+ * A temporary project holding a copy of `.github/` with every YAML file passed
+ * through {@link asLocalActionForm}, and an empty `.git`, without which
+ * actionlint finds no project there. The local actions and reusable workflows
+ * the workflows name are read from the copy as well, so the copy is the whole
+ * directory.
+ */
+const copyGithubDirAsLocalForm = async (): Promise<Result<string, string>> => {
+  const copied = await Result.fromPromise(
+    (async () => {
+      const root = await fs.mkdtemp(
+        path.join(os.tmpdir(), 'check-actionlint-'),
+      );
+
+      await fs.cp(
+        path.join(projectRootPath, '.github'),
+        path.join(root, '.github'),
+        { recursive: true },
+      );
+
+      // eslint-disable-next-line security/detect-non-literal-fs-filename -- inside the temporary directory just made.
+      await fs.mkdir(path.join(root, '.git'));
+
+      const files = await glob('.github/**/*.{yml,yaml}', {
+        cwd: root,
+        absolute: true,
+      });
+
+      if (Result.isErr(files)) {
+        throw new Error(unknownToString(files.value));
+      }
+
+      await Promise.all(
+        files.value.map(async (file) => {
+          // eslint-disable-next-line security/detect-non-literal-fs-filename -- a file the glob listed, in the copy.
+          const text = await fs.readFile(file, 'utf8');
+
+          // eslint-disable-next-line security/detect-non-literal-fs-filename -- a file the glob listed, in the copy.
+          await fs.writeFile(file, asLocalActionForm(text));
+        }),
+      );
+
+      return root;
+    })(),
   );
 
-  return { status, signal, error: error?.message };
+  return Result.isErr(copied)
+    ? Result.err(
+        `❌ Could not copy .github/ for actionlint: ${unknownToString(copied.value)}`,
+      )
+    : Result.ok(copied.value);
 };
 
 const lintWorkflowTextBinary: LintWorkflowText = (
@@ -643,23 +727,35 @@ const readPins = async (): Promise<
 };
 
 if (isDirectlyExecuted(import.meta.url)) {
-  const [pins, compositeActions] = await Promise.all([
+  const [pins, compositeActions, copy] = await Promise.all([
     readPins(),
     readCompositeActions(),
+    copyGithubDirAsLocalForm(),
   ]);
 
-  const result = Result.isErr(pins)
-    ? pins
-    : Result.isErr(compositeActions)
-      ? compositeActions
-      : await checkActionlint({
-          pins: pins.value,
-          install: installPinned,
-          tryRunning: tryRunningBinary,
-          runActionlint: runActionlintBinary,
-          compositeActions: compositeActions.value,
-          lintWorkflowText: lintWorkflowTextBinary,
-        });
+  const result = await (async () => {
+    try {
+      return Result.isErr(pins)
+        ? pins
+        : Result.isErr(compositeActions)
+          ? compositeActions
+          : Result.isErr(copy)
+            ? copy
+            : await checkActionlint({
+                pins: pins.value,
+                install: installPinned,
+                tryRunning: tryRunningBinary,
+                runActionlint: runActionlintIn(copy.value),
+                compositeActions: compositeActions.value,
+                lintWorkflowText: lintWorkflowTextBinary,
+              });
+    } finally {
+      // Whatever happened above, thrown or returned.
+      if (Result.isOk(copy)) {
+        await fs.rm(copy.value, { recursive: true, force: true });
+      }
+    }
+  })();
 
   if (Result.isErr(result)) {
     console.error(result.value);

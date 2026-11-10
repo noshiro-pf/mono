@@ -90,7 +90,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        uses: actions/checkout@v7.0.1
 
       # `setup-node` takes `<major>-nightly` and resolves it to the newest
       # nightly of that line; the major comes from the pinned `current` rather
@@ -117,7 +117,7 @@ jobs:
       # install would fail on every nightly run whatever `engines.node` said,
       # which is the one outcome that would tell us nothing.
       - name: Set up pnpm, Node.js for `${{ matrix.channel }}` and the dependencies
-        uses: ./.github/actions/setup
+        uses: $/.github/actions/setup
         with:
           node-version: ${{ steps.node-version.outputs.version }}
 
@@ -189,12 +189,12 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        uses: actions/checkout@v7.0.1
         with:
           persist-credentials: false
 
       - name: Set up pnpm, Node.js and the dependencies
-        uses: ./.github/actions/setup
+        uses: $/.github/actions/setup
 
       # Refreshes `lts` and `current` from nodejs.org and rewrites the
       # `volta.node` / `devEngines.runtime` fields that follow them.
@@ -209,7 +209,7 @@ jobs:
 
       - name: Generate Token
         id: app-token
-        uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3.3.0
+        uses: actions/create-github-app-token@v3.3.0
         with:
           client-id: ${{ vars.REPO_AUTOMATION_BOT_CLIENT_ID }}
           private-key: ${{ secrets.REPO_AUTOMATION_BOT_PRIVATE_KEY }}

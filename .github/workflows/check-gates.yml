@@ -305,7 +305,7 @@ jobs:
           inputs.diff-scope != 'none' &&
           steps.branch_state.outputs.branch_up_to_date != 'false' &&
           (steps.reuse.outputs.reused_result == '' || inputs.diff-when-reused)
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        uses: actions/checkout@v7.0.1
         with:
           ref: ${{ case(github.event_name == 'pull_request', github.event.pull_request.head.sha, github.sha) }}
 
@@ -314,7 +314,7 @@ jobs:
       # install, which were most of this job's time.
       - name: Set up Node.js
         if: steps.checkout.outcome == 'success'
-        uses: ./.github/actions/setup
+        uses: $/.github/actions/setup
         with:
           pnpm: 'false'
           install: 'false'
