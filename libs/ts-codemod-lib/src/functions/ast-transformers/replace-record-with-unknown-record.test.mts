@@ -540,12 +540,21 @@ describe(replaceRecordWithUnknownRecordTransformer, () => {
   test.each([
     'export type Foo = Record<string, unknown>;\r\n',
     "import { foo } from './foo.mjs';\r\ntype Foo = Record<string, typeof foo> | Record<string, unknown>;\r\n",
-    "import {\r\n  type DeepReadonly,\r\n} from 'ts-type-forge';\r\ntype Foo = DeepReadonly<Record<string, unknown>>;\r\n",
   ])('an import takes the CRLF line breaks of the file: %j', (source) => {
     const output = transform(source);
 
     expect(output).toMatch(/\bUnknownRecord\b.*\} from 'ts-type-forge'/u);
 
     expect(output).not.toMatch(/(?<!\r)\n/u);
+  });
+
+  test('a name merged into a multi-line import takes its own CRLF line', () => {
+    expect(
+      transform(
+        "import {\r\n  type DeepReadonly,\r\n} from 'ts-type-forge';\r\ntype Foo = DeepReadonly<Record<string, unknown>>;\r\n",
+      ),
+    ).toBe(
+      "import {\r\n  type DeepReadonly,\r\n  type UnknownRecord,\r\n} from 'ts-type-forge';\r\ntype Foo = DeepReadonly<UnknownRecord>;\r\n",
+    );
   });
 });

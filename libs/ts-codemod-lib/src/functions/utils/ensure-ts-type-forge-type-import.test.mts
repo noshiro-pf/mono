@@ -108,3 +108,68 @@ describe(typeNameUse, () => {
     );
   });
 });
+
+describe('ensureTsTypeForgeTypeImport into a multi-line named import', () => {
+  test('adds the specifier on a line of its own, keeping a trailing comma', () => {
+    expect(
+      withImport(dedent`
+        import {
+          type A,
+        } from 'ts-type-forge';
+        export type B = A;
+      `),
+    ).toBe(dedent`
+      import {
+        type A,
+        type UnknownRecord,
+      } from 'ts-type-forge';
+      export type B = A;
+    `);
+  });
+
+  test('adds no trailing comma to an import written without one', () => {
+    expect(
+      withImport(dedent`
+        import type {
+            A,
+            B
+        } from 'ts-type-forge';
+        export type C = A | B;
+      `),
+    ).toBe(dedent`
+      import type {
+          A,
+          B,
+          UnknownRecord
+      } from 'ts-type-forge';
+      export type C = A | B;
+    `);
+  });
+
+  test('keeps a comment at the end of the last line with its specifier', () => {
+    expect(
+      withImport(dedent`
+        import {
+          type A, // about A
+        } from 'ts-type-forge';
+        export type B = A;
+      `),
+    ).toBe(dedent`
+      import {
+        type A, // about A
+        type UnknownRecord,
+      } from 'ts-type-forge';
+      export type B = A;
+    `);
+  });
+
+  test('writes the line breaks of a CRLF file', () => {
+    expect(
+      withImport(
+        "import {\r\n  type A,\r\n} from 'ts-type-forge';\r\nexport type B = A;\r\n",
+      ),
+    ).toBe(
+      "import {\r\n  type A,\r\n  type UnknownRecord,\r\n} from 'ts-type-forge';\r\nexport type B = A;\r\n",
+    );
+  });
+});

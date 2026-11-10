@@ -190,6 +190,74 @@ const endOfLineComments = (text: string, end: number): number =>
   tsm.ts.getTrailingCommentRanges(text, end)?.at(-1)?.end ?? end;
 
 /**
+ * Adds `name` to the named imports of `host` when they span several lines, on a
+ * line of its own after the last one: with that line's indentation, a trailing
+ * comma if the list has one, and the file's line breaks. A comment at the end
+ * of the last specifier's line stays there. `addNamedImport` would put the name
+ * on that line and pull the closing brace up onto it, leaving the layout to a
+ * formatter. Gives `false`, having changed nothing, for a list on one line, or
+ * one with no specifier, which it leaves to `addNamedImport`.
+ */
+const addToMultiLineNamedImport = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  sourceFile: tsm.SourceFile,
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  host: tsm.ImportDeclaration,
+  text: string,
+  name: string,
+  isTypeOnly: boolean,
+): boolean => {
+  const namedImports = host.getImportClause()?.getNamedBindings();
+
+  if (!tsm.Node.isNamedImports(namedImports)) {
+    return false;
+  }
+
+  const last = namedImports.getElements().at(-1);
+
+  if (
+    last === undefined ||
+    !text.slice(namedImports.getStart(), namedImports.getEnd()).includes('\n')
+  ) {
+    return false;
+  }
+
+  const lineStart = text.lastIndexOf('\n', last.getStart()) + 1;
+
+  const indentation = text.slice(lineStart, last.getStart());
+
+  if (!/^[ \t]*$/u.test(indentation)) {
+    return false;
+  }
+
+  const newLine = text.includes('\r\n') ? '\r\n' : '\n';
+
+  const specifier = `${isTypeOnly ? 'type ' : ''}${name}` as const;
+
+  const hasTrailingComma = namedImports.compilerNode.elements.hasTrailingComma;
+
+  // Read before the first edit, which makes ts-morph forget the node.
+  const lastEnd = last.getEnd();
+
+  // Past the comma that follows the last specifier, when there is one.
+  const afterLast = hasTrailingComma ? text.indexOf(',', lastEnd) + 1 : lastEnd;
+
+  const lineEnd = endOfLineComments(text, afterLast);
+
+  // The later position first, so that the earlier one has not moved.
+  sourceFile.insertText(
+    lineEnd,
+    `${newLine}${indentation}${specifier}${hasTrailingComma ? ',' : ''}`,
+  );
+
+  if (!hasTrailingComma) {
+    sourceFile.insertText(lastEnd, ',');
+  }
+
+  return true;
+};
+
+/**
  * Where a new import goes in a file with no import and no directive prologue:
  * before the first statement, and before the run of JSDoc and `//` comments
  * right above it with no blank line in between (its documentation, an
@@ -287,7 +355,11 @@ const insertTypeImport = (
   if (host !== undefined) {
     // `import type { ..., type X }` is an error: the declaration already makes
     // every name type-only.
-    host.addNamedImport({ name, isTypeOnly: !host.isTypeOnly() });
+    const isTypeOnly = !host.isTypeOnly();
+
+    if (!addToMultiLineNamedImport(sourceFile, host, text, name, isTypeOnly)) {
+      host.addNamedImport({ name, isTypeOnly });
+    }
 
     return;
   }
