@@ -1,5 +1,11 @@
 # ts-std-forge
 
+## 0.5.4
+
+### Patch Changes
+
+- 2c04f3f: `hasKey`'s documentation now says that it sees own properties only, so an accessor declared in a class — which lives on the prototype — is not found, and that `Reflect.get` reads one through the prototype chain.
+
 ## 0.5.3
 
 ### Patch Changes

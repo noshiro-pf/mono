@@ -1,5 +1,15 @@
 ## [5.8.4](https://github.com/noshiro-pf/eslint-config-typed/compare/v5.8.3...v5.8.4) (2026-08-09)
 
+## 7.11.0
+
+### Minor Changes
+
+- ca4ca7d: `eslintConfigForSynstateDom(files?)` brings the jsx-a11y rules of `eslintConfigForReact` to components written with synstate-dom, registered a second time under `synstate-dom-a11y/` (rule set `eslintSynstateDomA11yRules`). Those rules read an attribute bound to synstate-dom's `constant(x)` as bound to `x`, so `role={constant('button')}` counts as a role and `aria-hidden={constant('yes')}` is reported; the element's other attributes, and those of the elements around and inside it, are read the same way. A child in `{...}` is read as React's is, as content jsx-a11y does not look into, and an attribute's name is read as written (`autofocus`, not React's `autoFocus`). `jsx-a11y` itself is registered unchanged.
+
+### Patch Changes
+
+- 0052b93: The `restrictedSyntax` entry that bans the `in` operator now names `Reflect.has` beside `Object.hasOwn`, and no longer reports a private brand check (`#field in obj`). `Object.hasOwn` answers `false` for a property inherited through the prototype chain (a method, a DOM accessor, a Promise's `then`), and neither function can name a private field, so the old message offered no replacement for those checks.
+
 ## 7.10.0
 
 ### Minor Changes

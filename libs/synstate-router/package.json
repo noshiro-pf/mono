@@ -1,6 +1,6 @@
 {
   "name": "synstate-router",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "description": "Type-safe client-side router for SynState: branded destinations, codec-checked params, exhaustive route matching",
   "repository": {
     "type": "git",

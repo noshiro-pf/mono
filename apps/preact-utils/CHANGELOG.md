@@ -1,5 +1,15 @@
 # preact-utils
 
+## 0.0.29
+
+### Patch Changes
+
+- Updated dependencies [2c04f3f]
+    - ts-std-forge@0.5.4
+    - better-preact-use-state@1.0.4
+    - synstate@8.0.0
+    - ts-data-forge@14.13.0
+
 ## 0.0.28
 
 ### Patch Changes

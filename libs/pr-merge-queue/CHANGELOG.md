@@ -1,5 +1,18 @@
 # pr-merge-queue
 
+## 0.12.0
+
+### Minor Changes
+
+- b4d6614: `pr-description` and `open-pr --body-file` can ask a pull request's description to open with a given `##` section, set by `pullRequestDescription.openingHeading` in `.github/unblock-prs.json`. The `pr-description` README now says what a description should contain and in what order. A translation now repeats the original's code blocks, unchanged and in order, rather than referring to them, so that it reads on its own.
+- 44dc243: `unblock-prs` now judges the runs on its queue layers and decides what to do with its stack through `pr-report-core`'s `layerRunsVerdict`, `layerRunsRequest` and `decideSpeculation`, which the Pull Requests Manager reads too, so it needs the `pr-report-core` release that adds them. What the worker does is unchanged.
+
+### Patch Changes
+
+- Updated dependencies [44dc243]
+- Updated dependencies [b4d6614]
+    - pr-report-core@0.7.0
+
 ## 0.11.0
 
 ### Minor Changes
