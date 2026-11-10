@@ -1,5 +1,6 @@
 import {
   decideStartStates,
+  heldIssueClaim,
   issuesInProgress,
   issueStartRank,
   issueStatusOf,
@@ -30,8 +31,7 @@ const referenceStatusOf = (
 const progress = (
   labels: readonly string[],
   closedByOpenPull: boolean,
-): IssueProgress =>
-  progressOf({ labels, closedByOpenPull, claim: undefined, nowEpochMs: 0 });
+): IssueProgress => progressOf({ labels, closedByOpenPull, held: undefined });
 
 describe(referenceStatusOfFacts, () => {
   test('anything open is waited for, in either API’s spelling', () => {
@@ -303,7 +303,34 @@ const known = (
   return (number) => byNumber.get(number) ?? 'unknown';
 };
 
+const held = (state: 'planned' | 'started') =>
+  ({ state, by: 'session', at: '2026-10-12T01:00:00Z' }) as const;
+
 describe('progressOf with a claim', () => {
+  test('a started claim is in progress, without the label', () => {
+    assert.strictEqual(
+      progressOf({
+        labels: [],
+        closedByOpenPull: false,
+        held: held('started'),
+      }),
+      'in-progress',
+    );
+  });
+
+  test('a planned claim is planned, without the label', () => {
+    assert.strictEqual(
+      progressOf({
+        labels: [],
+        closedByOpenPull: false,
+        held: held('planned'),
+      }),
+      'planned',
+    );
+  });
+});
+
+describe(heldIssueClaim, () => {
   const at = '2026-10-12T01:00:00Z';
 
   /** `at`. */
@@ -312,50 +339,23 @@ describe('progressOf with a claim', () => {
   const claim = (state: 'planned' | 'started') =>
     ({ kind: 'standing', claim: { state, by: 'session', at } }) as const;
 
-  test('a started claim that holds is in progress, without the label', () => {
-    assert.strictEqual(
-      progressOf({
-        labels: [],
-        closedByOpenPull: false,
-        claim: claim('started'),
-        nowEpochMs: AT,
-      }),
-      'in-progress',
+  test('a started claim holds until released', () => {
+    assert.deepStrictEqual(
+      heldIssueClaim(claim('started'), AT + 30 * 24 * 60 * 60_000),
+      { state: 'started', by: 'session', at },
     );
   });
 
-  test('a planned claim that holds is planned, and one that lapsed is not', () => {
-    assert.strictEqual(
-      progressOf({
-        labels: [],
-        closedByOpenPull: false,
-        claim: claim('planned'),
-        nowEpochMs: AT,
-      }),
-      'planned',
-    );
+  test('a planned claim holds for a day, and lapses after', () => {
+    assert.isDefined(heldIssueClaim(claim('planned'), AT));
 
-    assert.strictEqual(
-      progressOf({
-        labels: [],
-        closedByOpenPull: false,
-        claim: claim('planned'),
-        nowEpochMs: AT + 25 * 60 * 60_000,
-      }),
-      'none',
-    );
+    assert.isUndefined(heldIssueClaim(claim('planned'), AT + 25 * 60 * 60_000));
   });
 
-  test('a released claim is nothing', () => {
-    assert.strictEqual(
-      progressOf({
-        labels: [],
-        closedByOpenPull: false,
-        claim: { kind: 'released' },
-        nowEpochMs: AT,
-      }),
-      'none',
-    );
+  test('a released claim, or none, is nothing', () => {
+    assert.isUndefined(heldIssueClaim({ kind: 'released' }, AT));
+
+    assert.isUndefined(heldIssueClaim(undefined, AT));
   });
 });
 

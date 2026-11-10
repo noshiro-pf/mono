@@ -266,6 +266,65 @@ describe(decideQueue, () => {
     );
   });
 
+  test('carries the claim an issue’s start state was read from', () => {
+    const decided = decide(
+      snapshot(
+        [],
+        [
+          issue(30, {
+            comments: Result.ok([
+              {
+                id: 1,
+                body: '<!-- start-issue:claim state=planned by=s at=2026-11-09T23:00:00Z -->',
+                createdAt: '2026-11-09T23:00:00Z',
+              },
+            ]),
+          }),
+        ],
+      ),
+    );
+
+    assert.deepStrictEqual(
+      Result.unwrapThrow(decided.issues).map(({ start, claim }) => ({
+        start,
+        claim,
+      })),
+      [
+        {
+          start: 'planned',
+          claim: { state: 'planned', by: 's', at: '2026-11-09T23:00:00Z' },
+        },
+      ],
+    );
+  });
+
+  test('carries no claim once a planned one has lapsed', () => {
+    const decided = decide(
+      snapshot(
+        [],
+        [
+          issue(30, {
+            comments: Result.ok([
+              {
+                id: 1,
+                body: '<!-- start-issue:claim state=planned by=s at=2026-11-07T23:00:00Z -->',
+                createdAt: '2026-11-07T23:00:00Z',
+              },
+            ]),
+          }),
+        ],
+      ),
+    );
+
+    assert.deepStrictEqual(
+      Result.unwrapThrow(decided.issues).map(({ start, claim }) => ({
+        start,
+        claim,
+      })),
+      [{ start: 'free', claim: undefined }],
+    );
+  });
+
   // Picked without what an issue it closes waits for, it could merge first.
   test('leaves a candidate unread when its inherited order is', () => {
     const failed = {

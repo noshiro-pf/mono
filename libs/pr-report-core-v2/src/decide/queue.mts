@@ -38,6 +38,7 @@ import {
 } from './graph.mjs';
 import {
   decideStartStates,
+  heldIssueClaim,
   issuesInProgress,
   issueStatusOf,
   progressOf,
@@ -300,6 +301,12 @@ export type IssueDecision = Readonly<{
   start: IssueStartState;
   named: readonly Readonly<{ number: number; status: ReferenceStatus }>[];
   /**
+   * The token's account's `start-issue` claim on it while it holds, as `start`
+   * counts it; `undefined` when there is none, it has lapsed, or the comments
+   * are unread.
+   */
+  claim: IssueClaim | undefined;
+  /**
    * Why `start` may be wrong, if it may: its "blocked by" unread (`waitsFor` is
    * then its `Start-After:` alone), its comments unread (a claim is not seen),
    * a named number outside the lists unread (it reads `unknown`), or an open
@@ -510,6 +517,8 @@ const decideIssues = (
     issues.map((issue) => {
       const waitsOn = waits.get(issue.number) ?? [];
 
+      const held = heldIssueClaim(claimOf(issue), nowEpochMs);
+
       const named = waitsOn.map((number) => ({
         number,
         status: statusOf(number),
@@ -523,11 +532,11 @@ const decideIssues = (
           progressOf({
             labels: labelNames(issue.labels),
             closedByOpenPull: worked.has(issue.number),
-            claim: claimOf(issue),
-            nowEpochMs,
+            held,
           }),
         ),
         named,
+        claim: held,
         unread: Result.isErr(issue.blockedBy)
           ? issue.blockedBy.value
           : Result.isErr(issue.comments)

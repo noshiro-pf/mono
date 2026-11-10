@@ -43,7 +43,7 @@ export const readPullRequests = async (
   const listed = await restAllPages(
     context,
     'the open pull requests',
-    '/pulls?state=open&sort=created&direction=asc',
+    OPEN_PULLS_PATH,
     t.array(PullListSchema),
   );
 
@@ -267,6 +267,12 @@ export const latestReviewsOf = (
 
   return Array.from(mut_latest.values()).filter(({ login }) => canWrite(login));
 };
+
+/**
+ * The list the open pull requests are read from, oldest first; a command that
+ * counts them before reading them all asks the same one.
+ */
+export const OPEN_PULLS_PATH = '/pulls?state=open&sort=created&direction=asc';
 
 /** A label as REST and GraphQL send it. */
 export const LabelSchema = t.record({

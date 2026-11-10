@@ -8,9 +8,11 @@ otherwise:
 - **Token**: `GH_TOKEN`, then `GITHUB_TOKEN`, then `gh auth token`; refused
   without one. **Repository**: `--repo`, else `origin`, else the root
   `package.json`.
-- **Proxy**: Node's `fetch` reads `HTTPS_PROXY` only with
-  `NODE_USE_ENV_PROXY=1`, which the command sets for itself (without it the
-  request bypasses the proxy and fails as `401 Bad credentials`).
+- **Proxy**: Node's `fetch` reads `HTTPS_PROXY` only once told to (without it
+  the request bypasses the proxy and fails as `401 Bad credentials`). The
+  command tells it with `http.setGlobalProxyFromEnv()` where Node has it (25.4
+  and later); an older Node is told only from outside, by
+  `NODE_USE_ENV_PROXY=1`, which the root script of each command is to set.
 - **GraphQL** is refused by a Claude Code session's proxy, so every command a
   session runs reads REST only, through the REST reader, and writes by GraphQL
   only where REST has no equivalent (drafts, auto-merge), saying so plainly when
