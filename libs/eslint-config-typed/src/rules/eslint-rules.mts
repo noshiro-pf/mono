@@ -123,9 +123,14 @@ export const restrictedGlobalsForBrowser = [
  */
 export const restrictedSyntaxWithoutNodeVersionGate = [
   {
-    // ban "in" operator
-    selector: "BinaryExpression[operator='in']",
-    message: 'use "Object.hasOwn" instead.',
+    // ban "in" operator: it narrows the type, but it reads the prototype chain
+    // whether or not that was meant. A private brand check (`#field in obj`) is
+    // left alone, since nothing else can name a private field. The message
+    // names built-ins only: `hasKey` comes from the ts-data-forge rules, which
+    // are opt-in, and their `prefer-is-record-and-has-key` takes it from there.
+    selector: "BinaryExpression[operator='in'][left.type!='PrivateIdentifier']",
+    message:
+      'use "Object.hasOwn" for an own property, or "Reflect.has" for one that may be inherited through the prototype chain (a method, a DOM accessor, a Promise\'s "then").',
   },
   {
     // ban Object.prototype.hasOwnProperty.call

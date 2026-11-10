@@ -1,4 +1,5 @@
 import { Arr, isRecord, isString } from 'ts-data-forge';
+import { restrictedSyntaxWithoutNodeVersionGate } from '../rules/index.mjs';
 import { eslintConfigForNodeJs } from './nodejs.mjs';
 
 describe(eslintConfigForNodeJs, () => {
@@ -37,7 +38,9 @@ describe(eslintConfigForNodeJs, () => {
       ),
     );
 
-    assert.include(selectors, "BinaryExpression[operator='in']");
+    for (const { selector } of restrictedSyntaxWithoutNodeVersionGate) {
+      assert.include(selectors, selector);
+    }
   });
 
   test('for a runtime older than an API, still reports it', () => {
