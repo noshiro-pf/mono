@@ -1,4 +1,4 @@
-import { Arr, hasKey, isNonNullObject, Optional } from 'ts-data-forge';
+import { Arr, hasKey, isNonNullObject, Obj, Optional } from 'ts-data-forge';
 import type { FixedLengthTuple, ReadonlyRecord } from 'ts-type-forge';
 import type { Href } from './href.mjs';
 import {
@@ -811,6 +811,44 @@ const toRecord = (value: unknown): ReadonlyRecord<string, unknown> =>
       (value as ReadonlyRecord<string, unknown>)
     : ({} as const);
 
+/** `record` without its `undefined` entries, which mean absent. */
+const dropUndefined = (
+  record: ReadonlyRecord<string, unknown>,
+): ReadonlyRecord<string, unknown> =>
+  Obj.filter(record, (value) => value !== undefined);
+
+/**
+ * `options.search` with the values `options.retain` names taken from its source
+ * where `search` gives none.
+ */
+const searchWithRetained = (
+  options: ReadonlyRecord<string, unknown>,
+): ReadonlyRecord<string, unknown> => {
+  const given = toRecord(options['search']);
+
+  const retain = toRecord(options['retain']);
+
+  const from = toRecord(retain['from']);
+
+  const keys: unknown = retain['keys'];
+
+  if (!Arr.isArray(keys)) {
+    return given;
+  }
+
+  const retained = Object.fromEntries(
+    Arr.generate(function* () {
+      for (const key of keys) {
+        if (typeof key === 'string' && from[key] !== undefined) {
+          yield [key, from[key]] as const;
+        }
+      }
+    }),
+  );
+
+  return { ...retained, ...dropUndefined(given) } as const;
+};
+
 const makeHref = (
   node: CompiledNode,
   resolvePage: Resolvers['resolvePage'],
@@ -835,7 +873,7 @@ const makeHref = (
     encodeSearch(
       `${node.id}.href`,
       node.search,
-      toRecord(options['search']),
+      searchWithRetained(options),
     ).map(([key, value]) => [key, value]),
   );
 
