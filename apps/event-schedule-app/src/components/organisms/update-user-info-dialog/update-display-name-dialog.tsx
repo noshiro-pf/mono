@@ -32,6 +32,7 @@ export const UpdateDisplayNameDialog = ({
             label={constant(dc.updateDisplayName.newDisplayName)}
           >
             <InputGroup
+              // eslint-disable-next-line synstate-dom-a11y/no-autofocus -- focus moves into a dialog as it opens, as the WAI-ARIA dialog pattern asks
               autoFocus
               data-e2e={constant('new-display-name')}
               disabled={isWaitingResponse}

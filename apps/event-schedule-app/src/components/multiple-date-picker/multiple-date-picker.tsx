@@ -59,6 +59,7 @@ export const MultipleDatePicker = ({
     <div>
       <div class={constant(styles.datePicker)}>
         <div class={constant(styles.dayPicker)} lang={constant('en')}>
+          {/* eslint-disable-next-line synstate-dom-a11y/no-noninteractive-tabindex -- recorded, not fixed, when jsx-a11y came to synstate-dom (#3764) */}
           <div class={constant(styles.column)} tabIndex={constant(0)}>
             <DatepickerNav
               calendarCurrentPage={calendarCurrentPage$}
@@ -69,9 +70,11 @@ export const MultipleDatePicker = ({
             />
             <div class={constant(styles.month)} role={constant('grid')}>
               <WeekdaysHeader onClick={onWeekdaysHeaderCellClick} />
+              {/* eslint-disable-next-line synstate-dom-a11y/prefer-tag-over-role -- recorded, not fixed, when jsx-a11y came to synstate-dom (#3764) */}
               <div class={constant(styles.body)} role={constant('rowgroup')}>
                 <For items={calendarCells$} key={(_, index) => index}>
                   {(week$) => (
+                    // eslint-disable-next-line synstate-dom-a11y/prefer-tag-over-role -- recorded, not fixed, when jsx-a11y came to synstate-dom (#3764)
                     <div class={constant(styles.row)} role={constant('row')}>
                       <For items={week$} key={(_, index) => index}>
                         {(cell$) => (

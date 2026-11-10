@@ -42,8 +42,7 @@ export const DagGroupFrame = ({ record }: Props): JSX.Element => {
         rx={constant(GROUP_CORNER_RADIUS)}
         width={record.pipe(map(({ frame }) => frame.width))}
       />
-      {/* An SVG has no <button>: the title takes its role, focus and keys. */}
-      {}
+      {/* eslint-disable-next-line synstate-dom-a11y/prefer-tag-over-role -- An SVG has no <button>: the title takes its role, focus and keys. */}
       <g
         aria-label={record.pipe(map((r) => m.dag.group(r.title)))}
         class={constant('dag-group-header')}

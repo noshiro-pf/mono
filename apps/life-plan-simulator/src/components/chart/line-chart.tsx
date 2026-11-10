@@ -20,6 +20,7 @@ export const LineChart = ({
 
   return (
     <figure class={constant('chart')}>
+      {/* eslint-disable-next-line synstate-dom-a11y/prefer-tag-over-role -- an SVG element has no HTML element to use instead */}
       <svg
         viewBox={constant(`0 0 ${width} ${height}`)}
         role={constant('img')}

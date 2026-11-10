@@ -9,13 +9,16 @@ type Props = Readonly<{
 }>;
 
 export const WeekdaysHeader = ({ onClick }: Props): JSX.Element => (
+  // eslint-disable-next-line synstate-dom-a11y/prefer-tag-over-role -- recorded, not fixed, when jsx-a11y came to synstate-dom (#3764)
   <div class={constant(styles.weekdays)} role={constant('rowgroup')}>
+    {/* eslint-disable-next-line synstate-dom-a11y/prefer-tag-over-role -- recorded, not fixed, when jsx-a11y came to synstate-dom (#3764) */}
     <div class={constant(styles.row)} role={constant('row')}>
       <For items={constant(daysOfWeekList.en)} key={(w) => w.name}>
         {(w$, index$) => {
           const { name, abbr } = w$.getSnapshot().value;
 
           return (
+            // eslint-disable-next-line synstate-dom-a11y/click-events-have-key-events, synstate-dom-a11y/interactive-supports-focus, synstate-dom-a11y/prefer-tag-over-role -- recorded, not fixed, when jsx-a11y came to synstate-dom (#3764)
             <div
               class={constant(
                 onClick === undefined

@@ -23,6 +23,7 @@ export const MuiTabs = ({
 }: Props): JSX.Element => (
   <div class={constant(styles.root)}>
     <div class={constant(styles.scroller)}>
+      {/* eslint-disable-next-line synstate-dom-a11y/interactive-supports-focus -- recorded, not fixed, when jsx-a11y came to synstate-dom (#3764) */}
       <div
         class={constant(styles.list)}
         role={constant('tablist')}

@@ -2,6 +2,7 @@ import {
   defineKnownRules,
   eslintConfigForNodeJs,
   eslintConfigForPlaywright,
+  eslintConfigForSynstateDom,
   eslintConfigForTypeScript,
   eslintConfigForVitest,
   mergeRestrictedImportsOptions,
@@ -23,6 +24,9 @@ export default [
     tsconfigFileName: './tsconfig.json',
     packageDirs: [thisDir],
   }),
+
+  // Accessibility, reading synstate-dom's `constant(x)` as `x`.
+  eslintConfigForSynstateDom(['src/**/*.tsx']),
 
   eslintPluginTsTypeForge.configs.recommended,
   eslintPluginTsDataForge.configs.recommended,

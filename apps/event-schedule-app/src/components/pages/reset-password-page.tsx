@@ -50,6 +50,7 @@ export const ResetPasswordPage = ({
             >
               <InputGroup
                 autoComplete={'email'}
+                // eslint-disable-next-line synstate-dom-a11y/no-autofocus -- recorded, not fixed, when jsx-a11y came to synstate-dom (#3764)
                 autoFocus
                 data-e2e={constant('email')}
                 disabled={isWaitingResponse}

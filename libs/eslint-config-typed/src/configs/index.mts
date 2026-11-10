@@ -7,6 +7,7 @@ export * from './playwright.mjs';
 export * from './plugins.mjs';
 export * from './preact.mjs';
 export * from './react.mjs';
+export * from './synstate-dom.mjs';
 export * from './testing-library.mjs';
 export * from './typescript-without-rules.mjs';
 export * from './typescript.mjs';

@@ -1,6 +1,7 @@
 import {
   defineKnownRules,
   eslintConfigForNodeJs,
+  eslintConfigForSynstateDom,
   eslintConfigForTypeScript,
   eslintConfigForVitest,
   eslintImportsRules,
@@ -26,6 +27,9 @@ export default [
   eslintPluginTsFortress.configs.recommended,
 
   eslintConfigForVitest(),
+
+  // Accessibility, reading `constant(x)` as `x`, for the README samples.
+  eslintConfigForSynstateDom(['samples/**/*.tsx']),
 
   {
     rules: defineKnownRules({

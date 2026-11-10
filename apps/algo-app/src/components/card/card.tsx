@@ -86,6 +86,7 @@ export const CardComponent = ({
   // The rect is read off the outer element, which floating does not move.
   return (
     <div ref={outerRef}>
+      {/* eslint-disable-next-line synstate-dom-a11y/click-events-have-key-events, synstate-dom-a11y/no-static-element-interactions -- recorded, not fixed, when jsx-a11y came to synstate-dom (#3764) */}
       <div
         class={constant(styles.wrapper)}
         style={{

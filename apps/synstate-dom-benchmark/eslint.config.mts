@@ -1,6 +1,7 @@
 import {
   defineKnownRules,
   eslintConfigForNodeJs,
+  eslintConfigForSynstateDom,
   eslintConfigForTypeScript,
   eslintConfigForVitest,
   eslintImportsRules,
@@ -22,6 +23,14 @@ export default [
 
   eslintPluginTsTypeForge.configs.recommended,
   eslintPluginTsDataForge.configs.recommended,
+
+  // Accessibility, reading synstate-dom's `constant(x)` as `x`, for the
+  // synstate-dom implementations; the other frameworks' are measured as their
+  // own documentation writes them.
+  eslintConfigForSynstateDom([
+    'src/**/synstate-dom.tsx',
+    'src/**/synstate-dom-derive.tsx',
+  ]),
 
   {
     files: ['src/**'],

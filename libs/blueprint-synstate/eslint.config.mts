@@ -1,6 +1,7 @@
 import {
   defineKnownRules,
   eslintConfigForNodeJs,
+  eslintConfigForSynstateDom,
   eslintConfigForTypeScript,
   eslintConfigForVitest,
   eslintImportsRules,
@@ -17,6 +18,25 @@ export default [
     tsconfigFileName: 'tsconfig.json',
     packageDirs: [import.meta.dirname],
   }),
+
+  // Accessibility, reading synstate-dom's `constant(x)` as `x`.
+  eslintConfigForSynstateDom(['src/**/*.tsx', 'samples/**/*.tsx']),
+  {
+    files: ['src/**/*.tsx'],
+    rules: defineKnownRules({
+      // The markup is Blueprint's, element for element, so that
+      // `visual-parity.test.tsx` compares it with Blueprint's own: its roles
+      // on `div`s, its focus traps and backdrops that take clicks, and the
+      // focus it moves into an overlay. The rules that read values (roles,
+      // `aria-*`, `alt`, `href`) stay on.
+      'synstate-dom-a11y/click-events-have-key-events': 'off',
+      'synstate-dom-a11y/interactive-supports-focus': 'off',
+      'synstate-dom-a11y/no-autofocus': 'off',
+      'synstate-dom-a11y/no-noninteractive-tabindex': 'off',
+      'synstate-dom-a11y/no-static-element-interactions': 'off',
+      'synstate-dom-a11y/prefer-tag-over-role': 'off',
+    }),
+  },
 
   eslintPluginTsTypeForge.configs.recommended,
   eslintPluginTsDataForge.configs.recommended,

@@ -63,6 +63,7 @@ import {
   eslintPluginTreeShakable,
   eslintPluginTsRestrictions,
   eslintPluginVitestCodingStyle,
+  withSynstateDomConstants,
 } from '../plugins/index.mjs';
 
 import type { ESLintPlugin, FlatConfig } from '../types/index.mjs';
@@ -78,6 +79,7 @@ export const plugins: ReadonlyRecord<
   | 'jest'
   | 'vitest'
   | 'jsx-a11y'
+  | 'synstate-dom-a11y'
   | 'math'
   | 'prefer-arrow-functions'
   | 'promise'
@@ -114,6 +116,10 @@ export const plugins: ReadonlyRecord<
   vitest: eslintPluginVitest,
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   'jsx-a11y': eslintPluginJsxA11y,
+  // jsx-a11y again, reading synstate-dom's `constant(x)` attribute values as
+  // `x`. Under a name of its own, so that a configuration that registers
+  // jsx-a11y itself still loads: ESLint refuses two objects under one name.
+  'synstate-dom-a11y': withSynstateDomConstants(eslintPluginJsxA11y),
   math: eslintPluginMath,
   'prefer-arrow-functions': eslintPluginPreferArrowFunctions,
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment

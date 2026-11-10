@@ -1,6 +1,7 @@
 import {
   defineKnownRules,
   eslintConfigForNodeJs,
+  eslintConfigForSynstateDom,
   eslintConfigForTypeScript,
   type FlatConfig,
 } from 'eslint-config-typed';
@@ -19,6 +20,21 @@ export default [
   eslintPluginTsTypeForge.configs.recommended,
   eslintPluginTsDataForge.configs.recommended,
   eslintPluginTsFortress.configs.recommended,
+
+  // Accessibility, reading synstate-dom's `constant(x)` as `x`, for the
+  // samples the pages show.
+  eslintConfigForSynstateDom(['samples/**/*.tsx']),
+  {
+    files: ['samples/control-flow/05-portal.tsx'],
+    rules: defineKnownRules({
+      // The sample shows `Portal` with a `div` given the dialog role: a
+      // `dialog` element opened with `showModal()` goes to the top layer and
+      // needs no portal, and one opened with `open` is not modal. Turned off
+      // here rather than on the line, so that the page shows the sample with no
+      // directive in it.
+      'synstate-dom-a11y/prefer-tag-over-role': 'off',
+    }),
+  },
 
   {
     ignores: ['.astro/**', 'src/content.config.ts', 'astro.config.mjs'],
