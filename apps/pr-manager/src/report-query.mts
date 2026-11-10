@@ -191,7 +191,7 @@ export const PULL_REQUESTS_QUERY = [
   '        headRefName headRefOid baseRefName isCrossRepository',
   '        baseRef { target { oid } }',
   `        ${LABELS}`,
-  '        commits(last: 1) { nodes { commit { committedDate } } }',
+  '        commits(last: 1) { nodes { commit { committedDate tree { oid } } } }',
   '      }',
   '    }',
   '  }',
@@ -624,6 +624,11 @@ const PullRequestSchema = t.record({
         commit: t.record({
           /** When the head commit was made: the branch's last push, nearly. */
           committedDate: t.string(),
+          /**
+           * The head's tree, by which a queue layer built at an earlier head is
+           * still the pull request's (`withMovedQueueHeads`).
+           */
+          tree: t.optional(t.record({ oid: t.string() })),
         }),
       }),
     ),

@@ -3,8 +3,9 @@ import { Arr, Result } from 'ts-data-forge';
  * What checking queued pull requests ahead of their turn decides, apart from
  * reading GitHub and moving branches (`speculate.mts`).
  *
- * The leading candidates are stacked on `main`, one commit each, every layer on
- * a branch of its own (`queue/pr-<number>`), and the check workflows are
+ * The leading candidates, each with the queued pull requests stacked on it
+ * right above it, are stacked on `main`, one commit each, every layer on a
+ * branch of its own (`queue/pr-<number>`), and the check workflows are
  * dispatched on each layer, which diff it against `main` as a pull request's
  * run does, so that its verdict is a whole one about its tree, whatever becomes
  * of the layers below. When the first candidate's turn comes, its layer has a
@@ -22,6 +23,8 @@ import {
   queueLayerOfMessage,
   queueLayerTrailer,
   stackedAhead,
+  withMovedQueueHeads,
+  withStackedAbove,
   type BuiltQueueLayer,
   type LayerStatus,
   type QueueLayer,
@@ -29,27 +32,47 @@ import {
 import type { PullRequest } from './types.mjs';
 
 /**
- * The layers to have: the leading candidates, in the order they are picked, up
- * to `depth` and up to the first that cannot be stacked. The version pull
- * request cannot (`release.yml` rebuilds it from the tip on every push to
- * `main`, and it is never rebased), and neither can one only a bypass merges
- * (it waits for a person, and every layer above it would wait too). Each of
- * those is released on its own once the layers before it have merged.
+ * The layers to have: the leading pull requests of the order checking ahead
+ * keeps ({@link stackedFirst}), in that order, up to `depth` and up to the
+ * first that cannot be stacked. The version pull request cannot (`release.yml`
+ * rebuilds it from the tip on every push to `main`, and it is never rebased),
+ * and neither can one only a bypass merges (it waits for a person, and every
+ * layer above it would wait too). Each of those is released on its own once the
+ * layers before it have merged.
+ *
+ * One stacked on another pull request (`stackedOn`, child → parent) is stacked
+ * from that one's head, its `upstream`: its own commits are the ones after it.
+ * It cannot be stacked below that one's layer, which carries what it builds on.
  */
 export const desiredLayers = (
-  candidates: readonly PullRequest[],
+  order: readonly PullRequest[],
   context: Readonly<{
     defaultBranch: string;
     bypass: ReadonlyMap<number, string>;
     depth: number;
+    stackedOn: ReadonlyMap<number, number>;
   }>,
-): readonly Layer[] => {
-  const stackable = candidates.findIndex((pr) => !isStackable(pr, context));
+): readonly DesiredLayer[] => {
+  const stackable = order.findIndex(
+    (pr, index) =>
+      !isStackable(pr, context) ||
+      !hasParentBelow(pr, order.slice(0, index), context.stackedOn),
+  );
 
-  return candidates
+  return order
     .slice(0, stackable === -1 ? undefined : stackable)
     .slice(0, context.depth)
-    .map((pr) => ({ number: pr.number, head: pr.headRefOid }));
+    .map((pr, _, taken) => {
+      const parent = context.stackedOn.get(pr.number);
+
+      const upstream = taken.find(
+        ({ number }) => number === parent,
+      )?.headRefOid;
+
+      return upstream === undefined
+        ? { number: pr.number, head: pr.headRefOid }
+        : { number: pr.number, head: pr.headRefOid, upstream };
+    });
 };
 
 /**
@@ -79,14 +102,19 @@ export const releasing = (
 ): readonly PullRequest[] => (stacked ? Arr.take(order, 1) : order);
 
 /**
- * The candidates with the layers already stacked kept first, in the order they
- * were stacked, and the rest after them in their own order. A pull request that
- * becomes a candidate, or gains `priority:high`, reorders only what is not yet
- * stacked: putting it first would leave every layer above it standing on
- * nothing, and cancel runs that were most of the way to a verdict.
+ * The order checking ahead stacks in: the candidates with the layers already
+ * stacked kept first, in the order they were stacked, and the rest after them
+ * in their own order. Each queued pull request stacked on one of them
+ * (`stackedAbove`, `withStackedAbove` in `pr-report-core`) comes right after
+ * it, or right after the kept stack when that one is kept: checked on top of it,
+ * and released only once it has merged, when it is a candidate of its own. A
+ * pull request that becomes a candidate, or gains `priority:high`, reorders
+ * only what is not yet stacked: putting it first would leave every layer above
+ * it standing on nothing, and cancel runs that were most of the way to a
+ * verdict.
  *
  * The kept stack follows the layers from the base's tree up, each the one whose
- * pull request is still a candidate at the head it was built at; it stops at
+ * pull request is still in the order at the head it was built at; it stops at
  * the first that is not, that can no longer be stacked ({@link isStackable}),
  * whose pull request `mayStayAhead` refuses (one released and left green, which
  * the order puts last), or that the order puts after the version pull request,
@@ -103,14 +131,15 @@ export const stackedFirst = (
   baseTree: string,
   context: OrderContext,
 ): readonly PullRequest[] =>
-  releaseOrder(candidates, Result.ok({ built, baseTree }), context).order;
+  checkingOrder(candidates, built, baseTree, context).order;
 
 /**
  * The order the worker releases in, which every reader of the order reads:
  * the triage log, the dry run, checking ahead itself, and the release step's
- * settling of a double release. With the layer branches read, the candidates by
- * {@link stackedFirst}, and `kept`, the pull requests it keeps ahead; with them
- * unread, the queue's own order, as checking ahead falls back to.
+ * settling of a double release. With the layer branches read, the candidates in
+ * {@link stackedFirst}'s order, and `kept`, the candidates it keeps ahead; with
+ * them unread, the queue's own order, as checking ahead falls back to. What is
+ * stacked on a candidate is checked, never released, so it is in neither.
  */
 export const releaseOrder = (
   candidates: readonly PullRequest[],
@@ -121,23 +150,37 @@ export const releaseOrder = (
     return { order: candidates, kept: [] };
   }
 
-  const kept = stackedAheadOf(
+  const { release, kept } = checkingOrder(
     candidates,
     read.value.built,
     read.value.baseTree,
     context,
   );
 
-  const keptNumbers = new Set<number>(kept.map(({ number }) => number));
-
-  return {
-    order: [
-      ...kept,
-      ...candidates.filter(({ number }) => !keptNumbers.has(number)),
-    ],
-    kept: kept.map(({ number }) => number),
-  };
+  return { order: release, kept };
 };
+
+/** The layers with each moved head followed to its layer's tree, if it has it. */
+export const withMovedHeads = withMovedQueueHeads;
+
+/**
+ * The heads {@link withMovedHeads} has to read the trees of: each open pull
+ * request's whose layer was built at another head. A layer of a pull request no
+ * longer open is not followed.
+ */
+export const movedHeads = (
+  built: readonly BuiltLayer[],
+  pullRequests: readonly PullRequest[],
+): readonly Layer[] =>
+  Arr.generate(function* () {
+    for (const layer of built) {
+      const pr = pullRequests.find(({ number }) => number === layer.number);
+
+      if (pr !== undefined && pr.headRefOid !== layer.head) {
+        yield { number: layer.number, head: pr.headRefOid };
+      }
+    }
+  });
 
 /**
  * Which built layers still stand, and what is left to build. A layer stands
@@ -148,17 +191,17 @@ export const releaseOrder = (
  * not stand is built again with every one above it; a branch no layer stands on
  * is stale.
  */
-export const matchLayers = ({
+export const matchLayers = <L extends Layer>({
   desired,
   built,
   baseTree,
 }: Readonly<{
-  desired: readonly Layer[];
+  desired: readonly L[];
   built: readonly BuiltLayer[];
   baseTree: string;
 }>): Readonly<{
   kept: readonly BuiltLayer[];
-  toBuild: readonly Layer[];
+  toBuild: readonly L[];
   stale: readonly BuiltLayer[];
 }> => {
   const byNumber = new Map(built.map((layer) => [layer.number, layer]));
@@ -275,18 +318,74 @@ export const layerMessage = (layer: Layer): string =>
 /** What {@link layerTrailer} wrote into a commit message, if it did. */
 export const layerOfMessage = queueLayerOfMessage;
 
-/** The pull requests {@link stackedFirst} keeps ahead, in the stack's order. */
-const stackedAheadOf = (
+/**
+ * {@link stackedFirst}'s order, with `release`, the candidates alone in that
+ * order, and `kept`, the candidates of the kept stack, in the stack's order.
+ * What is stacked on a candidate is checked, never released: it is in `order`
+ * alone.
+ */
+export const checkingOrder = (
   candidates: readonly PullRequest[],
   built: readonly BuiltLayer[],
   baseTree: string,
   context: OrderContext,
-): readonly PullRequest[] =>
-  stackedAhead(candidates, built, baseTree, {
-    mayStayAhead: context.mayStayAhead,
-    defaultBranch: context.defaultBranch,
-    isBypass: (pr) => context.bypass.has(pr.number),
-  });
+): Readonly<{
+  order: readonly PullRequest[];
+  release: readonly PullRequest[];
+  kept: readonly number[];
+}> => {
+  const kept = stackedAhead(
+    withStackedAbove(candidates, context.stackedAbove),
+    built,
+    baseTree,
+    {
+      mayStayAhead: context.mayStayAhead,
+      defaultBranch: context.defaultBranch,
+      isBypass: (pr) => context.bypass.has(pr.number),
+    },
+  );
+
+  const keptNumbers = new Set<number>(kept.map(({ number }) => number));
+
+  const notKept = (pr: PullRequest): boolean => !keptNumbers.has(pr.number);
+
+  const order = [
+    ...kept,
+    // What is stacked on the kept stack goes on top of it.
+    ...withStackedAbove(kept, context.stackedAbove).filter(notKept),
+    ...withStackedAbove(
+      candidates.filter(notKept),
+      context.stackedAbove,
+    ).filter(notKept),
+  ] as const;
+
+  const candidateNumbers = new Set<number>(
+    candidates.map(({ number }) => number),
+  );
+
+  const isCandidate = (pr: PullRequest): boolean =>
+    candidateNumbers.has(pr.number);
+
+  return {
+    order,
+    release: order.filter(isCandidate),
+    kept: kept.filter(isCandidate).map(({ number }) => number),
+  };
+};
+
+/**
+ * Whether what `pr` is stacked on, if anything, is among `below`, the layers
+ * under it.
+ */
+const hasParentBelow = (
+  pr: PullRequest,
+  below: readonly PullRequest[],
+  stackedOn: ReadonlyMap<number, number>,
+): boolean => {
+  const parent = stackedOn.get(pr.number);
+
+  return parent === undefined || below.some(({ number }) => number === parent);
+};
 
 /** What {@link stackedFirst} needs besides the candidates and the layers. */
 export type OrderContext = Readonly<{
@@ -294,7 +393,15 @@ export type OrderContext = Readonly<{
   mayStayAhead: (pr: PullRequest) => boolean;
   defaultBranch: string;
   bypass: ReadonlyMap<number, string>;
+  /**
+   * The queued pull requests stacked on another that may be checked right above
+   * it (`stackedLayerParent` in `pr-report-core`), with the one each is on.
+   */
+  stackedAbove: readonly StackedAbove[];
 }>;
+
+/** A queued pull request stacked on another one, `on`. */
+export type StackedAbove = Readonly<{ pr: PullRequest; on: number }>;
 
 /**
  * The layer branches as a survey reads them, once, for its order and its stack:
@@ -308,6 +415,14 @@ export type LayerRead = Result<
 
 /** A layer to have: a queued pull request at the head it is queued at. */
 export type Layer = QueueLayer;
+
+/**
+ * A layer to have, as {@link desiredLayers} says to build it: from `upstream`,
+ * the head of the pull request it is stacked on, when it is stacked on one, or
+ * that one's merged head, when GitHub moved it onto `main` as that one merged;
+ * otherwise from its merge base with `main`.
+ */
+export type DesiredLayer = Layer & Readonly<{ upstream?: string }>;
 
 /** A layer a branch holds: the pull request and head it was built from. */
 export type BuiltLayer = BuiltQueueLayer;

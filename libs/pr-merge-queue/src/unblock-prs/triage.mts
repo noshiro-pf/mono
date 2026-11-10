@@ -16,6 +16,7 @@ import {
   reviewHold,
   SKIP_CI_LABEL,
   stackDescendants,
+  stackedLayerParent,
   withReviewHold,
   type CodeOwnerReview,
   type QueueFacts,
@@ -237,13 +238,33 @@ export const triage = async (
     sorted.map(async (pr) => ({ pr, ...(await settle(api, pr, context)) })),
   );
 
+  // What checking ahead may stack on a candidate (`stackedLayerParent`).
+  const stackedOn = Arr.generate(function* () {
+    for (const { pr, standing } of beforeReview) {
+      const on = stackedLayerParent(
+        { number: pr.number, fromFork: pr.isCrossRepository },
+        standing,
+        graph,
+      );
+
+      if (on !== undefined) {
+        yield { pr, on } as const;
+      }
+    }
+  });
+
   // A failing one too, but only where a required check enforces `CODEOWNERS`:
-  // the check is red until an owner approves, and its review says which.
+  // the check is red until an owner approves, and its review says which. And
+  // what checking ahead may stack: one its review would hold, or only a bypass
+  // merges, would not be released from its layer once it is a candidate.
   const { holds, codeOwnerStates, codeOwnersCheck } = await readReviewHolds(
     api,
-    beforeReview
-      .filter(({ pr, standing }) => asksReview(standing, pr.mergeStateStatus))
-      .map(({ pr }) => pr.number),
+    [
+      ...beforeReview
+        .filter(({ pr, standing }) => asksReview(standing, pr.mergeStateStatus))
+        .map(({ pr }) => pr.number),
+      ...stackedOn.map(({ pr }) => pr.number),
+    ],
     // Only one red context can be that check alone (`codeOwnersClassification`).
     beforeReview
       .filter(
@@ -272,11 +293,14 @@ export const triage = async (
   }));
 
   // Released and watched as ever, but never armed: auto-merge would wait for an
-  // approval nobody may give. See `review-hold.mts` in `pr-report-core`.
+  // approval nobody may give. See `review-hold.mts` in `pr-report-core`. Not
+  // what is stacked: it is neither released nor watched yet.
+  const stacked = new Set<number>(stackedOn.map(({ pr }) => pr.number));
+
   const bypass: ReadonlyMap<number, string> = new Map(
     Arr.generate(function* () {
       for (const [prNumber, hold] of Array.from(holds)) {
-        if (hold.kind === 'bypass') {
+        if (hold.kind === 'bypass' && !stacked.has(prNumber)) {
           yield [prNumber, hold.reason] as const;
         }
       }
@@ -311,6 +335,7 @@ export const triage = async (
     ),
     bypass,
     stackParents: graph.stackParents,
+    stackedAbove: stackedOn.filter(({ pr }) => !holds.has(pr.number)),
     inFlight: classified
       .filter(({ result }) => result.kind === 'in-flight')
       .map(({ pr }) => pr),

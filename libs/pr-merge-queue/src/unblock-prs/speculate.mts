@@ -39,7 +39,9 @@ import {
   readAnnotationTitles,
   removeWorktree,
 } from './github.mjs';
+import { stackedOnMerged } from './rebase.mjs';
 import {
+  checkingOrder,
   desiredLayers,
   isStuck,
   LAYER_BRANCH_PREFIX,
@@ -47,12 +49,14 @@ import {
   layerMessage,
   layerOfMessage,
   matchLayers,
+  movedHeads,
   numberOfLayerBranch,
   planDrop,
-  stackedFirst,
+  withMovedHeads,
   type BuiltLayer,
-  type Layer,
+  type DesiredLayer,
   type LayerRead,
+  type StackedAbove,
 } from './speculate-plan.mjs';
 import type { PullRequest, SkipRecord } from './types.mjs';
 
@@ -78,6 +82,11 @@ export const speculate = async (
     setAside: ReadonlyMap<number, string>;
     /** Whether a candidate may stay ahead of the order (`stackedFirst`). */
     mayStayAhead: (pr: PullRequest) => boolean;
+    /**
+     * The queued pull requests stacked on another, checked right above it and
+     * never released here (`Triage`'s `stackedAbove`).
+     */
+    stackedAbove: readonly StackedAbove[];
     /** The layer branches as this survey read them ({@link readLayers}). */
     layers: LayerRead;
   }>,
@@ -93,8 +102,9 @@ export const speculate = async (
     );
   }
 
-  // What is stacked stays ahead; the rest follows in the queue's order.
-  const candidates = stackedFirst(
+  // What is stacked stays ahead; the rest follows in the queue's order, each
+  // with what is stacked on it right after it.
+  const { order: checking, release: candidates } = checkingOrder(
     context.candidates,
     branches.value.built,
     branches.value.baseTree,
@@ -102,13 +112,17 @@ export const speculate = async (
       mayStayAhead: context.mayStayAhead,
       defaultBranch,
       bypass: context.bypass,
+      stackedAbove: context.stackedAbove,
     },
   );
 
-  const desired = desiredLayers(candidates, {
+  const desired = desiredLayers(checking, {
     defaultBranch,
     bypass: context.bypass,
     depth: config.depth,
+    stackedOn: new Map(
+      context.stackedAbove.map(({ pr, on }) => [pr.number, on] as const),
+    ),
   });
 
   const { kept, toBuild, stale } = matchLayers({
@@ -132,7 +146,11 @@ export const speculate = async (
     : ([] as const);
 
   const builtNow = Arr.isNonEmpty(buildable)
-    ? await buildLayers(buildable, kept.at(-1)?.tip ?? baseSha, defaultBranch)
+    ? await buildLayers(
+        await withMergedUpstreams(api, buildable, candidates, defaultBranch),
+        kept.at(-1)?.tip ?? baseSha,
+        defaultBranch,
+      )
     : ([] as const);
 
   const builtStatuses = await readStatusesOf(api, builtNow, config.workflows);
@@ -301,8 +319,14 @@ export const dropAllLayers = async (
   api: ApiContext,
   baseSha: string,
   setAside: ReadonlyMap<number, string>,
+  pullRequests: readonly PullRequest[],
 ): Promise<void> => {
-  const branches = await readLayers(baseSha);
+  // Followed as the survey reads them, so that a layer set aside at a head it
+  // was followed to is still the one whose runs are left to finish.
+  const branches = await followMovedHeads(
+    await readLayers(baseSha),
+    pullRequests,
+  );
 
   if (Result.isErr(branches)) {
     log(`Cannot read the layer branches: ${branches.value}`);
@@ -487,6 +511,56 @@ export const readLayers = async (baseSha: string): Promise<LayerRead> => {
   });
 };
 
+/**
+ * The layer branches as {@link readLayers} read them, each layer whose pull
+ * request's head has moved since followed to it when that head has the layer's
+ * tree (`withMovedHeads`), as every reader of the layers reads them. Only a
+ * moved head is read; one that cannot be leaves the layer as it was, to be
+ * built again.
+ */
+export const followMovedHeads = async (
+  read: LayerRead,
+  pullRequests: readonly PullRequest[],
+): Promise<LayerRead> => {
+  if (Result.isErr(read)) {
+    return read;
+  }
+
+  const moved = movedHeads(read.value.built, pullRequests);
+
+  if (Arr.isEmpty(moved)) {
+    return read;
+  }
+
+  const fetched = await fetchMissing(moved.map(({ head }) => head));
+
+  if (Result.isErr(fetched)) {
+    log(
+      `Cannot fetch the moved heads of layered pull requests: ${fetched.value}`,
+    );
+
+    return read;
+  }
+
+  const heads = await Promise.all(
+    moved.map(async ({ number, head }) => {
+      const tree = await git(`git log -1 --format=%T ${sh(head)}`);
+
+      return Result.isErr(tree)
+        ? undefined
+        : ([number, { head, tree: tree.value.trim() }] as const);
+    }),
+  );
+
+  return Result.ok({
+    ...read.value,
+    built: withMovedHeads(
+      read.value.built,
+      new Map(heads.filter((each) => each !== undefined)),
+    ),
+  });
+};
+
 const deleteBranch = async (number: number): Promise<void> => {
   const deleted = await git(
     `git push --quiet origin --delete ${sh(layerBranch(number))}`,
@@ -642,7 +716,7 @@ const fallBack = (why: string, order: readonly PullRequest[]): Speculation => {
 };
 
 const buildLayer = async (
-  layer: Layer,
+  { upstream, ...layer }: DesiredLayer,
   defaultBranch: string,
   worktreeDir: string,
 ): Promise<Result<BuiltLayer, string>> => {
@@ -652,7 +726,7 @@ const buildLayer = async (
   // The head by its SHA, as the survey read it: `refs/pull/<n>/head` follows a
   // push a little late, and the branch may have moved on since.
   const fetched = await run(
-    `git fetch --quiet origin ${sh(layer.head)} ${sh(defaultBranch)}`,
+    `git fetch --quiet origin ${[layer.head, ...(upstream === undefined ? [] : [upstream]), defaultBranch].map(sh).join(' ')}`,
   );
 
   if (Result.isErr(fetched)) {
@@ -661,8 +735,10 @@ const buildLayer = async (
 
   const below = await run('git log -1 --format=%H%x00%T HEAD');
 
+  // One stacked on another pull request from that one's head, which its layer
+  // below already carries; any other from its merge base with `main`.
   const mergeBase = await run(
-    `git merge-base ${sh(`origin/${defaultBranch}`)} ${sh(layer.head)}`,
+    `git merge-base ${sh(upstream ?? `origin/${defaultBranch}`)} ${sh(layer.head)}`,
   );
 
   if (Result.isErr(below) || Result.isErr(mergeBase)) {
@@ -764,14 +840,50 @@ const buildLayer = async (
 };
 
 /**
+ * `layers`, each candidate's that GitHub moved off a stack whose layer below
+ * has merged given that layer's merged head as its `upstream`, as its release
+ * rebases it (`stackedOnMerged`): until then it still carries that layer's own
+ * commits, which its merge base with `main` would replay onto their squash.
+ */
+const withMergedUpstreams = async (
+  api: ApiContext,
+  layers: readonly DesiredLayer[],
+  candidates: readonly PullRequest[],
+  defaultBranch: string,
+): Promise<readonly DesiredLayer[]> =>
+  Promise.all(
+    layers.map(async (layer) => {
+      const pr = candidates.find(({ number }) => number === layer.number);
+
+      if (pr === undefined || layer.upstream !== undefined) {
+        return layer;
+      }
+
+      // Read for each layer about to be built, again on each survey one fails
+      // to build: at most `depth` of them, and only while a layer is missing.
+      const merged = await stackedOnMerged(
+        api,
+        pr,
+        defaultBranch,
+        'building its layer from its merge base with the default branch',
+      );
+
+      return merged === undefined
+        ? layer
+        : { ...layer, upstream: merged.headSha };
+    }),
+  );
+
+/**
  * Builds `layers` one on another from `base`, each the pull request's commits
- * on its merge base with the default branch, squashed into one commit carrying
- * the trailer, and pushes each to its branch. Stops at the first that cannot be
- * built — its commits conflict, or its head moved — since everything above it
- * would carry it.
+ * since its merge base with the default branch, or with the head of the pull
+ * request it is stacked on, squashed into one commit carrying the trailer, and
+ * pushes each to its branch. Stops at the first that cannot be built — its
+ * commits conflict, or its head moved — since everything above it would carry
+ * it.
  */
 const buildLayers = async (
-  layers: readonly Layer[],
+  layers: readonly DesiredLayer[],
   base: string,
   defaultBranch: string,
 ): Promise<readonly BuiltLayer[]> => {

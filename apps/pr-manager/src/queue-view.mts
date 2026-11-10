@@ -36,7 +36,10 @@ import {
   readQueueComments,
   reviewHold,
   stackedAhead,
+  stackedLayerParent,
+  withMovedQueueHeads,
   withReviewHold,
+  withStackedAbove,
   type BuiltQueueLayer,
   type LayerStanding,
   type LayerStatus,
@@ -110,6 +113,8 @@ export type QueuePull = Readonly<{
   entry: ReportEntry;
   /** The tip of its base, which a set-aside was recorded against. */
   baseTip: string;
+  /** Its head's tree, `undefined` when it was not read. */
+  headTree: string | undefined;
   /** GraphQL's `mergeable`: `CONFLICTING`, `MERGEABLE` or `UNKNOWN`. */
   mergeable: string;
   nativeStack: NativeStackEntry | undefined;
@@ -539,7 +544,10 @@ const standingOnceMerged = (
  * waits for it is left waiting.
  *
  * What the worker has stacked (`layers`) is picked first, in the order it was
- * stacked, as the worker releases it (`stackedAhead`), and `kept` names it.
+ * stacked, as the worker releases it (`stackedAhead`), and `kept` names it. A
+ * stack runs through the layer of a pull request stacked on a candidate, which
+ * the worker checks right above it (`withStackedAbove`), and that one is picked
+ * in its place in the stack once the one below has merged.
  */
 const pickOrder = ({
   running,
@@ -596,18 +604,51 @@ const pickOrder = ({
       },
     );
 
+  const asLayer = (decided: Decided) =>
+    ({
+      number: decided.facts.number,
+      headRefOid: decided.pull.entry.headSha,
+      headRefName: decided.facts.headRef,
+      isCrossRepository: decided.pull.entry.fromFork,
+      decided,
+    }) as const;
+
+  const stackedAbove = Arr.generate(function* () {
+    for (const decided of queued) {
+      const on = stackedLayerParent(
+        { number: decided.facts.number, fromFork: decided.pull.entry.fromFork },
+        decided.standing,
+        context,
+      );
+
+      if (on !== undefined) {
+        yield { pr: asLayer(decided), on };
+      }
+    }
+  });
+
   const kept =
     layers === undefined
       ? ([] as const)
       : stackedAhead(
-          ordered(mut_pool).map((decided) => ({
-            number: decided.facts.number,
-            headRefOid: decided.pull.entry.headSha,
-            headRefName: decided.facts.headRef,
-            isCrossRepository: decided.pull.entry.fromFork,
-            decided,
-          })),
-          layers.built,
+          withStackedAbove(ordered(mut_pool).map(asLayer), stackedAbove),
+          // A head moved to its layer's tree is still at its layer, as the
+          // worker reads it.
+          withMovedQueueHeads(
+            layers.built,
+            new Map(
+              Arr.generate(function* () {
+                for (const { pull } of [...running, ...queued]) {
+                  if (pull.headTree !== undefined) {
+                    yield [
+                      pull.entry.number,
+                      { head: pull.entry.headSha, tree: pull.headTree },
+                    ] as const;
+                  }
+                }
+              }),
+            ),
+          ),
           layers.baseTree,
           {
             mayStayAhead: () => true,

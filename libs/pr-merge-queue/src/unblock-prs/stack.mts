@@ -9,7 +9,9 @@
  * The life of a layer, and what this script does at each point:
  *
  * 1. **Stacked.** Its base is the layer below, so its diff is its own and its
- *    turn has not come: it is reported as waiting, and nothing else. It has
+ *    turn has not come: it is reported as waiting, and, when queued, checked
+ *    ahead of its turn right above the layer below's own queue layer
+ *    (`stackedFirst` in `speculate-plan.mts`), and nothing else. It has
  *    no auto-merge, and must not: nothing holds a pull request onto an
  *    unprotected branch, so armed it would land in the layer below rather
  *    than on the default branch. Nothing arms it — `open-pr` arms nothing,

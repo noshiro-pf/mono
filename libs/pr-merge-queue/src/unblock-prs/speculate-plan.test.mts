@@ -11,11 +11,13 @@ import {
   layerOfMessage,
   layerTrailer,
   matchLayers,
+  movedHeads,
   numberOfLayerBranch,
   planDrop,
   releaseOrder,
   releasing,
   stackedFirst,
+  withMovedHeads,
   type BuiltLayer,
   type DropRun,
 } from './speculate-plan.mjs';
@@ -26,6 +28,7 @@ describe(desiredLayers, () => {
     defaultBranch: 'main',
     bypass: new Map<number, string>(),
     depth: 3,
+    stackedOn: new Map<number, number>(),
   } as const;
 
   test('takes the leading candidates, in order, up to the depth', () => {
@@ -58,6 +61,32 @@ describe(desiredLayers, () => {
       [],
     );
   });
+
+  // Its own commits are the ones after its base's head: from its merge base with
+  // `main`, the base's would be replayed again.
+  test("stacks one on a pull request right above that one's layer, from its head", () => {
+    assert.deepStrictEqual(
+      desiredLayers([pr(5, { headRefOid: headOf(5) }), pr(9), pr(3)], {
+        ...context,
+        depth: 2,
+        stackedOn: new Map<number, number>([[9, 5]]),
+      }),
+      [
+        { number: 5, head: headOf(5) },
+        { number: 9, head: HEAD, upstream: headOf(5) },
+      ],
+    );
+  });
+
+  test('stops at one stacked on a pull request no layer below it holds', () => {
+    assert.deepStrictEqual(
+      desiredLayers([pr(3), pr(9), pr(5)], {
+        ...context,
+        stackedOn: new Map<number, number>([[9, 5]]),
+      }),
+      [layer(3)],
+    );
+  });
 });
 
 describe(releaseOrder, () => {
@@ -69,6 +98,7 @@ describe(releaseOrder, () => {
     mayStayAhead: movable,
     defaultBranch: 'main',
     bypass: new Map<number, string>(),
+    stackedAbove: [],
   } as const;
 
   test('is the stacked order, with what it keeps ahead', () => {
@@ -76,6 +106,30 @@ describe(releaseOrder, () => {
       [pr(2), pr(5), pr(7), pr(9)],
       Result.ok({ built: [built9, built5], baseTree: 'main-tree' }),
       context,
+    );
+
+    assert.deepStrictEqual(
+      ordered.order.map(({ number }) => number),
+      [5, 9, 2, 7],
+    );
+
+    assert.deepStrictEqual(ordered.kept, [5, 9]);
+  });
+
+  // #6 is checked on #5, and is not released until #5 has merged.
+  test('keeps a stack through one stacked on a candidate, and holds only candidates', () => {
+    const built6 = built(6, { parentTree: 't5', tree: 't6', parent: 'tip-5' });
+
+    const built9On6 = built(9, {
+      parentTree: 't6',
+      tree: 't9',
+      parent: 'tip-6',
+    });
+
+    const ordered = releaseOrder(
+      [pr(2), pr(5), pr(7), pr(9)],
+      Result.ok({ built: [built9On6, built6, built5], baseTree: 'main-tree' }),
+      { ...context, stackedAbove: [{ pr: pr(6), on: 5 }] },
     );
 
     assert.deepStrictEqual(
@@ -113,6 +167,7 @@ describe(stackedFirst, () => {
           mayStayAhead: movable,
           defaultBranch: 'main',
           bypass: new Map<number, string>(),
+          stackedAbove: [],
         },
       ).map(({ number }) => number),
       [5, 9, 2, 7],
@@ -129,6 +184,7 @@ describe(stackedFirst, () => {
           mayStayAhead: movable,
           defaultBranch: 'main',
           bypass: new Map<number, string>(),
+          stackedAbove: [],
         },
       ).map(({ number }) => number),
       [2, 5, 9],
@@ -139,6 +195,7 @@ describe(stackedFirst, () => {
         mayStayAhead: movable,
         defaultBranch: 'main',
         bypass: new Map<number, string>(),
+        stackedAbove: [],
       }).map(({ number }) => number),
       [2, 9],
     );
@@ -152,6 +209,7 @@ describe(stackedFirst, () => {
         mayStayAhead: ({ number }) => number !== 5,
         defaultBranch: 'main',
         bypass: new Map<number, string>(),
+        stackedAbove: [],
       }).map(({ number }) => number),
       [2, 9, 5],
     );
@@ -175,6 +233,7 @@ describe(stackedFirst, () => {
         mayStayAhead: movable,
         defaultBranch: 'main',
         bypass: new Map<number, string>(),
+        stackedAbove: [],
       }).map(({ number }) => number),
       [5, 2, 3],
     );
@@ -196,6 +255,7 @@ describe(stackedFirst, () => {
           mayStayAhead: movable,
           defaultBranch: 'main',
           bypass: new Map<number, string>(),
+          stackedAbove: [],
         },
       ).map(({ number }) => number),
       [5, 9, 2],
@@ -217,6 +277,7 @@ describe(stackedFirst, () => {
             mayStayAhead: movable,
             defaultBranch: 'main',
             bypass: new Map<number, string>(),
+            stackedAbove: [],
           }),
           2,
         ).map(({ number }) => number),
@@ -244,6 +305,7 @@ describe(stackedFirst, () => {
         mayStayAhead: movable,
         defaultBranch: 'main',
         bypass: new Map<number, string>(),
+        stackedAbove: [],
       }).map(({ number }) => number),
       [2, 5, 9],
     );
@@ -264,6 +326,7 @@ describe(stackedFirst, () => {
         mayStayAhead: movable,
         defaultBranch: 'main',
         bypass: new Map<number, string>(),
+        stackedAbove: [],
       }).map(({ number }) => number),
       [5, 9],
     );
@@ -279,6 +342,7 @@ describe(stackedFirst, () => {
           mayStayAhead: movable,
           defaultBranch: 'main',
           bypass: new Map<number, string>(),
+          stackedAbove: [],
         },
       ).map(({ number }) => number),
       [2, 1, 5, 9],
@@ -292,6 +356,7 @@ describe(stackedFirst, () => {
         mayStayAhead: movable,
         defaultBranch: 'main',
         bypass: new Map<number, string>([[5, 'review']]),
+        stackedAbove: [],
       }).map(({ number }) => number),
       [2, 5, 9],
     );
@@ -303,8 +368,88 @@ describe(stackedFirst, () => {
         mayStayAhead: movable,
         defaultBranch: 'main',
         bypass: new Map<number, string>(),
+        stackedAbove: [],
       }).map(({ number }) => number),
       [2, 5],
+    );
+  });
+
+  test('puts one stacked on a candidate right after it, among what is not yet stacked', () => {
+    assert.deepStrictEqual(
+      stackedFirst([pr(2), pr(5), pr(7)], [], 'main-tree', {
+        mayStayAhead: movable,
+        defaultBranch: 'main',
+        bypass: new Map<number, string>(),
+        stackedAbove: [{ pr: pr(6), on: 2 }],
+      }).map(({ number }) => number),
+      [2, 6, 5, 7],
+    );
+  });
+
+  // #6 was queued once #5 and #9 were stacked: it goes on top of them.
+  test('puts one stacked on a kept layer right after the kept stack', () => {
+    assert.deepStrictEqual(
+      stackedFirst(
+        [pr(2), pr(5), pr(7), pr(9)],
+        [built9, built5],
+        'main-tree',
+        {
+          mayStayAhead: movable,
+          defaultBranch: 'main',
+          bypass: new Map<number, string>(),
+          stackedAbove: [{ pr: pr(6), on: 5 }],
+        },
+      ).map(({ number }) => number),
+      [5, 9, 6, 2, 7],
+    );
+  });
+});
+
+// Releasing #5 rebases it and restacks #9 on its new head: #9's layer is still
+// its own while its head has the layer's tree.
+describe(withMovedHeads, () => {
+  const built9 = built(9, { parentTree: 't5', tree: 't9', parent: 'tip-5' });
+
+  test("follows a pull request's head that moved to the layer's tree", () => {
+    assert.deepStrictEqual(
+      withMovedHeads(
+        [built9],
+        new Map<number, HeadAndTree>([[9, { head: headOf(9), tree: 't9' }]]),
+      ),
+      [{ ...built9, head: headOf(9) }],
+    );
+  });
+
+  test('leaves a layer whose pull request moved to another tree, or did not move', () => {
+    assert.deepStrictEqual(
+      withMovedHeads(
+        [built9],
+        new Map<number, HeadAndTree>([
+          [9, { head: headOf(9), tree: 't9-pushed' }],
+        ]),
+      ),
+      [built9],
+    );
+
+    assert.deepStrictEqual(
+      withMovedHeads([built9], new Map<number, HeadAndTree>()),
+      [built9],
+    );
+  });
+});
+
+describe(movedHeads, () => {
+  test('is each open pull request whose layer was built at another head', () => {
+    assert.deepStrictEqual(
+      movedHeads(
+        [
+          built(5, { parentTree: 'main-tree', tree: 't5' }),
+          built(6, { parentTree: 't5', tree: 't6' }),
+          built(7, { parentTree: 't6', tree: 't7' }),
+        ],
+        [pr(5), pr(6, { headRefOid: headOf(6) })],
+      ),
+      [{ number: 6, head: headOf(6) }],
     );
   });
 });
@@ -541,6 +686,12 @@ describe('layer branches and trailers', () => {
 });
 
 const HEAD = 'a'.repeat(40);
+
+type HeadAndTree = Readonly<{ head: string; tree: string }>;
+
+/** A head other than {@link HEAD}, told apart by its number. */
+const headOf = (number: number): string =>
+  number.toString(16).padStart(40, '0');
 
 /** Lets every candidate stay ahead (`stackedFirst`). */
 const movable = (): boolean => true;
