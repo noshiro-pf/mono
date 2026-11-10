@@ -11,6 +11,8 @@
 // here is checked by all twelve TypeScript minors in both flavors. One that
 // holds only from TypeScript 5.4 on goes in `lib-check-entry.since-5.4.ts`.
 
+import type { Int16 } from 'ts-type-forge';
+
 /**
  * #1840 — `ReturnType<typeof setTimeout>` came out `unknown`.
  *
@@ -151,3 +153,17 @@ export const unionOfLetters: ReadonlySet<Letter> = letters.union(letters);
 
 export const symmetricDifferenceOfLetters: ReadonlySet<Letter> =
   letters.symmetricDifference(letters);
+
+/**
+ * #3515 — the plain flavor's generic `abs` took any `number` and returned
+ * `AbsoluteValue<N>`, which rewrites only a number literal, so a ts-type-forge
+ * brand came back unchanged: `Math.abs` of an `Int16` was an `Int16`, although
+ * `Math.abs(-32768)` is `32768`. The generic overload takes a `SmallInt` now,
+ * as in the branded flavor, and any other argument gets a plain `number`.
+ */
+declare const int16: Int16;
+
+// @ts-expect-error `Math.abs(-32768)` is `32768`, outside `Int16`.
+export const absOfInt16: Int16 = Math.abs(int16);
+
+export const absOfSmallLiteral: 3 = Math.abs(-3);
