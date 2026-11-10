@@ -3,6 +3,7 @@ import * as path from 'node:path';
 import { Arr, Result, unknownToString } from 'ts-data-forge';
 import { isDirectlyExecuted } from 'ts-repo-utils';
 import type { FixedLengthTuple } from 'ts-type-forge';
+import { markdownLines } from '../lib/markdown.mjs';
 import {
   listTrackedFiles,
   readRepositoryFile,
@@ -109,37 +110,9 @@ export const findHalfwidthParentheses = (
 ): readonly ParenthesisViolation[] => {
   const { markdown = false } = options;
 
-  const lines = fileText.split('\n');
-
-  const mut_violations: ParenthesisViolation[] = [];
-
-  // The run of backticks or tildes that opened the fenced block being skipped,
-  // or `undefined` while the scan is in prose.
-  let mut_openFence: string | undefined = undefined;
-
-  for (const [index, line] of lines.entries()) {
-    if (markdown) {
-      const marker = fenceMarkerOf(line);
-
-      if (mut_openFence !== undefined) {
-        if (marker !== undefined && closesFence(mut_openFence, marker)) {
-          mut_openFence = undefined;
-        }
-
-        continue;
-      }
-
-      if (marker !== undefined) {
-        mut_openFence = marker;
-
-        continue;
-      }
-    }
-
-    mut_violations.push(...scanLine(line, index + 1));
-  }
-
-  return mut_violations;
+  return markdownLines(fileText)
+    .filter(({ fenced }) => !markdown || !fenced)
+    .flatMap(({ text, line }) => scanLine(text, line));
 };
 
 /**
@@ -262,9 +235,6 @@ const containsJapanese = (text: string): boolean =>
 /** A halfwidth pair with no parenthesis and no line break inside it. */
 const HALFWIDTH_PAIR = /\((?<inner>[^()\n]*)\)/gu;
 
-/** An opening or closing fence: three or more backticks or tildes. */
-const FENCE_MARKER = /^\s{0,3}(?<marker>`{3,}|~{3,})/u;
-
 /**
  * Two passes carry a pair nested one deep, which is as deep as anything here
  * goes; the third is what proves the text has stopped changing.
@@ -320,17 +290,6 @@ const isScanned = (relativePath: string): boolean =>
   !IGNORED_PATHS.has(relativePath) &&
   IGNORED_PREFIXES.every((prefix) => !relativePath.startsWith(prefix)) &&
   !IGNORED_PATTERN.test(relativePath);
-
-const fenceMarkerOf = (line: string): string | undefined =>
-  FENCE_MARKER.exec(line)?.groups?.['marker'];
-
-/**
- * A fence closes on a run of the same character at least as long as the one
- * that opened it — the rule CommonMark states, and the reason a sample
- * containing a fence is written with four backticks around it.
- */
-const closesFence = (openFence: string, marker: string): boolean =>
-  marker.startsWith(openFence.slice(0, 1)) && marker.length >= openFence.length;
 
 const enclosesJapaneseProse = (
   line: string,

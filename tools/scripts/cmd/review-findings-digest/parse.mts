@@ -7,6 +7,7 @@ import {
 } from 'pr-merge-queue';
 import { REVIEW_SECTION_HEADING } from 'pr-report-core';
 import { Arr, Num, Result } from 'ts-data-forge';
+import { markdownLines } from '../../lib/markdown.mjs';
 
 /**
  * Reads the `## Review` section a pull request description records: the
@@ -320,9 +321,6 @@ const TIMES =
 /** Where {@link roundsIn} splits a text into sentences. */
 const SENTENCE_BREAK = /(?<=[.!?])\s+|\n/u;
 
-/** A code fence's opening or closing line. */
-const FENCE = /^\s*(`{3,}|~{3,})/u;
-
 /** "the …", "a …": what follows "Fixed" when it is a verb, not a label. */
 const VERB_OBJECT = /^ (?:the|a|an|its|their|this|that|these|those)\b/iu;
 
@@ -401,33 +399,12 @@ const countsIn = (text: string, pattern: RegExp): readonly number[] =>
   ).filter((count) => count !== undefined);
 
 /**
- * Whether each line is inside a code fence, the fence lines included. A fence
- * holds commands or output, never a heading that ends the section or a bullet
- * that is a finding.
+ * Whether each line is inside a code fence, the fence lines included, as
+ * `markdownLines` reads fences. A fence holds commands or output, never a
+ * heading that ends the section or a bullet that is a finding.
  */
-const insideFences = (lines: readonly string[]): readonly boolean[] => {
-  /** The opening fence, which only a run of its character as long closes. */
-  let mut_opener: string | undefined = undefined;
-
-  return lines.map((line) => {
-    const fence = FENCE.exec(line)?.[1];
-
-    if (fence === undefined) {
-      return mut_opener !== undefined;
-    }
-
-    if (mut_opener === undefined) {
-      mut_opener = fence;
-    } else if (
-      fence.startsWith(mut_opener.slice(0, 1)) &&
-      fence.length >= mut_opener.length
-    ) {
-      mut_opener = undefined;
-    }
-
-    return true;
-  });
-};
+const insideFences = (lines: readonly string[]): readonly boolean[] =>
+  markdownLines(lines.join('\n')).map(({ fenced }) => fenced);
 
 /** The last disposition a text states, or `undefined` if it states none. */
 const lastCue = (text: string): Disposition | undefined =>
