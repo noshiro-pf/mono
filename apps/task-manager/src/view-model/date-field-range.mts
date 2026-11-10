@@ -3,9 +3,9 @@
  * blueprint-synstate's `DateInput` takes them: from 1 January 2000 to 31
  * December 30 years after `todayYear`. Without them `DateInput` keeps
  * Blueprint's default, which ends six months from today — too soon for a plan —
- * and shows a stored date past it as out of range. The start is fixed rather
- * than moving with the year, so that a date inside the range stays inside it as
- * the years pass.
+ * and draws a stored date past it as an error. The start is fixed rather than
+ * moving with the year, so that a date inside the range stays inside it as the
+ * years pass.
  */
 export const dateFieldRange = (todayYear: number) =>
   ({

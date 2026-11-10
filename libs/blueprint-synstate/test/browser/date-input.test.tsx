@@ -38,6 +38,8 @@ describe(DateInput, () => {
 
     assert.strictEqual(input.value, '2026/10/09 18:00');
 
+    assert.isFalse(input.hasAttribute('aria-invalid'));
+
     assert.strictEqual(input.placeholder, '日時を選ぶ');
 
     assert.strictEqual(input.getAttribute('aria-expanded'), 'false');
@@ -648,15 +650,14 @@ describe(DateInput, () => {
     unmount();
   });
 
-  test('marks a value out of range as an error, but not while it is corrected', async () => {
+  test('shows a value out of range as its date, drawn as an error, until it is corrected', async () => {
     fixNow();
 
-    const { value$, onChange } = controlled('2031-01-01T00:00');
+    const { value$, onChange, changes } = controlled('2031-01-01T00:00');
 
     const { container, unmount } = mountInto(() => (
       <DateInput
         {...RANGE}
-        outOfRangeMessage={'範囲外'}
         timePrecision={'minute'}
         value={value$}
         onChange={onChange}
@@ -667,7 +668,44 @@ describe(DateInput, () => {
 
     const group = one(container, '.bp6-input-group');
 
-    assert.strictEqual(input.value, '範囲外');
+    assert.strictEqual(input.value, '2031/01/01 00:00');
+
+    assert.isTrue(group.classList.contains('bp6-intent-danger'));
+
+    assert.strictEqual(input.getAttribute('aria-invalid'), 'true');
+
+    input.focus();
+
+    await settle();
+
+    // Focused and not yet changed, it is still the value out of range.
+    assert.strictEqual(input.value, '2031/01/01 00:00');
+
+    assert.isTrue(group.classList.contains('bp6-intent-danger'));
+
+    assert.strictEqual(input.getAttribute('aria-invalid'), 'true');
+
+    // The calendar is given no value for it, so that changing the month moves
+    // no day into the range.
+    assert.strictEqual(all(container, '.rdp-day_selected').length, 0);
+
+    one<HTMLButtonElement>(container, 'button[name="next-month"]').click();
+
+    await settle();
+
+    assert.deepStrictEqual(changes, []);
+
+    type(input, '2031');
+
+    assert.isFalse(group.classList.contains('bp6-intent-danger'));
+
+    assert.isFalse(input.hasAttribute('aria-invalid'));
+
+    input.blur();
+
+    await settle();
+
+    assert.strictEqual(input.value, '2031/01/01 00:00');
 
     assert.isTrue(group.classList.contains('bp6-intent-danger'));
 
@@ -675,12 +713,35 @@ describe(DateInput, () => {
 
     await settle();
 
-    type(input, '2031');
+    // A day picked, from a calendar given no value, is that day at midnight;
+    // the calendar still shows the month it was moved to.
+    assert.strictEqual(
+      one<HTMLSelectElement>(container, 'select[name="months"]').value,
+      '10',
+    );
 
-    assert.isFalse(group.classList.contains('bp6-intent-danger'));
+    await userEvent.click(dayButton(container, 12));
 
-    // The calendar is given no value for it.
-    assert.strictEqual(all(container, '.rdp-day_selected').length, 0);
+    // November, the month it was moved to.
+    assert.deepStrictEqual(changes, ['2026-11-12T00:00']);
+
+    unmount();
+  });
+
+  test('marks a value that is not a date as invalid', () => {
+    fixNow();
+
+    const { value$, onChange } = controlled('garbage');
+
+    const { container, unmount } = mountInto(() => (
+      <DateInput {...RANGE} value={value$} onChange={onChange} />
+    ));
+
+    const input = one<HTMLInputElement>(container, 'input');
+
+    assert.strictEqual(input.value, 'Invalid date');
+
+    assert.strictEqual(input.getAttribute('aria-invalid'), 'true');
 
     unmount();
   });
@@ -712,7 +773,15 @@ describe(DateInput, () => {
 
     input.blur();
 
-    assert.strictEqual(input.value, 'Out of range');
+    // Shown as itself, drawn as an error, where Blueprint's reads "Out of
+    // range".
+    assert.strictEqual(input.value, '2031/03/04');
+
+    assert.isTrue(
+      one(container, '.bp6-input-group').classList.contains(
+        'bp6-intent-danger',
+      ),
+    );
 
     unmount();
   });
