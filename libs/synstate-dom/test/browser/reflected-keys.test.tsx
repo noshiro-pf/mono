@@ -3,7 +3,9 @@ import { createMountable, render } from 'synstate-dom';
 import { Obj, unknownToString } from 'ts-data-forge';
 import type { ReadonlyRecord } from 'ts-type-forge';
 import {
+  commonPropertyKeys,
   commonReflectedKeys,
+  propertyKeysByTag,
   reflectedKeysByTag,
 } from './reflected-keys.generated.mjs';
 
@@ -17,61 +19,44 @@ import {
 describe('every key the element props admit as an attribute', () => {
   test.each(Object.entries(reflectedKeysByTag))('<%s>', (tag, tagKeys) => {
     const keys = [...commonReflectedKeys, ...tagKeys].filter(
-      (key) => !notReflected.has(`${tag}.${key}`),
+      (key) => !setAside.has(`${tag}.${key}`),
     );
 
-    const mut_failures: string[] = [];
-
-    for (const key of keys) {
-      const attributes = attributesFor.get(`${tag}.${key}`) ?? {};
-
-      const write = propertyWrite(tag, key, attributes);
-
-      if (write.refused !== undefined) {
-        mut_failures.push(
-          `${key}: ${JSON.stringify(write.value)} is refused (${write.refused}); give a value in \`samples\``,
-        );
-
-        continue;
-      }
-
-      const { before, value, expected } = write;
-
-      if (Object.is(expected, before)) {
-        mut_failures.push(
-          `${key}: ${JSON.stringify(value)} leaves the property as it was; give a value in \`samples\``,
-        );
-
-        continue;
-      }
-
-      mut_failures.push(
-        ...bindingFailures(tag, key, attributes, value, expected, before),
-      );
-    }
-
-    assert.deepStrictEqual(mut_failures, []);
+    assert.deepStrictEqual(keyFailures(tag, keys, 'attribute'), []);
   });
+});
 
-  test('every sample names a listed key, and every pair set aside or attribute set a listed pair', () => {
-    const pairs = new Set<string>(
-      Object.entries(reflectedKeysByTag).flatMap(([tag, keys]) =>
-        [...commonReflectedKeys, ...keys].map((key) => `${tag}.${key}`),
-      ),
+// Every key the props of an HTML element admit that is written as a property
+// (`propertyNames`), bound to a value, gives the element the property that
+// writing the value to the property gives; bound to the value the property had,
+// that value again (#3448). That an entry of `propertyNames` is admitted by
+// some tag is checked by `gen:reflected-keys`.
+describe('every key the element props admit that is written as a property', () => {
+  test.each(Object.entries(propertyKeysByTag))('<%s>', (tag, tagKeys) => {
+    const keys = [...commonPropertyKeys, ...tagKeys].filter(
+      (key) => !setAside.has(`${tag}.${key}`),
     );
 
+    assert.deepStrictEqual(keyFailures(tag, keys, 'property'), []);
+  });
+});
+
+describe('the samples, pairs set aside and attributes the tests above read', () => {
+  test('every sample names a listed key, and every pair set aside or given attributes a listed pair', () => {
     const listedKeys = new Set<string>([
       ...commonReflectedKeys,
       ...Object.values(reflectedKeysByTag).flat(),
+      ...commonPropertyKeys,
+      ...Object.values(propertyKeysByTag).flat(),
     ]);
 
     assert.deepStrictEqual(
       [
         ...Array.from(samples.keys()).filter(
-          (name) => !listedKeys.has(name) && !pairs.has(name),
+          (name) => !listedKeys.has(name) && !listedPairs.has(name),
         ),
-        ...[...notReflected, ...attributesFor.keys()].filter(
-          (name) => !pairs.has(name),
+        ...[...setAside, ...attributesFor.keys()].filter(
+          (name) => !listedPairs.has(name),
         ),
       ],
       [],
@@ -82,7 +67,7 @@ describe('every key the element props admit as an attribute', () => {
   // how the key behaves on an element without it.
   test('every attribute set is for a pair not set aside, and each of its attributes is needed', () => {
     const unneeded = Array.from(attributesFor).flatMap(([name, attributes]) => {
-      if (notReflected.has(name)) {
+      if (setAside.has(name)) {
         return [name];
       }
 
@@ -142,11 +127,25 @@ const samples: ReadonlyMap<string, unknown> = new Map<string, unknown>([
   ['srcset', 'about:blank'],
 ]);
 
-/** `tag.key` pairs this test cannot judge. */
-const notReflected: ReadonlySet<string> = new Set<string>([
+/** `tag.key` pairs these tests cannot judge. */
+const setAside: ReadonlySet<string> = new Set<string>([
   // Chromium has no such property; the attribute is what a browser that has one
   // reads.
   'input.capture',
+  // Keeps only the value of one of its options: "a select takes the value of
+  // one of its options" in `bindings.test.tsx` binds it to another option's
+  // value, to the one it had, and to the other again.
+  'select.value',
+]);
+
+/** Every `tag.key` pair the generated lists name. */
+const listedPairs: ReadonlySet<string> = new Set<string>([
+  ...Object.entries(reflectedKeysByTag).flatMap(([tag, keys]) =>
+    [...commonReflectedKeys, ...keys].map((key) => `${tag}.${key}`),
+  ),
+  ...Object.entries(propertyKeysByTag).flatMap(([tag, keys]) =>
+    [...commonPropertyKeys, ...keys].map((key) => `${tag}.${key}`),
+  ),
 ]);
 
 /**
@@ -230,18 +229,31 @@ const propertyWrite = (
 };
 
 /**
- * What goes wrong when `key` is bound to `value`, to `undefined`, then to
- * `value` again: the property should read `expected`, `before`, then
- * `expected`, as the attribute comes and goes.
+ * What goes wrong when `key` is bound to `value`, to `other`, then to `value`
+ * again: the property should read `expected`, `before`, then `expected`, as the
+ * attribute comes and goes (`other` is `undefined`) or the property is written
+ * back (`other` is `before`).
  */
 const bindingFailures = (
   tag: string,
   key: string,
   attributes: ReadonlyRecord<string, string>,
-  value: unknown,
-  expected: unknown,
-  before: unknown,
+  {
+    value,
+    expected,
+    other,
+    before,
+    dirty,
+  }: Readonly<{
+    value: unknown;
+    expected: unknown;
+    other: unknown;
+    before: unknown;
+    dirty: boolean;
+  }>,
 ): readonly string[] => {
+  const label = dirty ? (`${key} (property written first)` as const) : key;
+
   const container = document.createElement('div');
 
   const [value$, setValue] = createState<unknown>(value);
@@ -255,6 +267,15 @@ const bindingFailures = (
           // `ref` is called before anything is bound.
           ref: (created: Element) => {
             withAttributes(created, attributes);
+
+            if (dirty) {
+              // Writing the property, as a user's input does, parts `value`,
+              // `checked` and `selected` from their attributes (the dirty value,
+              // checkedness and selectedness flags), so one written as an
+              // attribute is not read back. It also clears a script's
+              // force-async flag, which only a clean element shows.
+              Reflect.set(created, key, Reflect.get(created, key));
+            }
           },
           [key]: value$,
         }),
@@ -264,12 +285,12 @@ const bindingFailures = (
     const element = container.firstElementChild;
 
     if (element === null) {
-      return [`${key}: <${tag}> was not rendered`];
+      return [`${label}: <${tag}> was not rendered`];
     }
 
     const bound: unknown = Reflect.get(element, key);
 
-    setValue(undefined);
+    setValue(other);
 
     const removed: unknown = Reflect.get(element, key);
 
@@ -281,22 +302,73 @@ const bindingFailures = (
       ...(Object.is(bound, expected)
         ? []
         : [
-            `${key}: bound to ${JSON.stringify(value)}, reads ${JSON.stringify(bound)}, not ${JSON.stringify(expected)}`,
+            `${label}: bound to ${JSON.stringify(value)}, reads ${JSON.stringify(bound)}, not ${JSON.stringify(expected)}`,
           ]),
       ...(Object.is(removed, before)
         ? []
         : [
-            `${key}: bound to undefined, reads ${JSON.stringify(removed)}, not ${JSON.stringify(before)}`,
+            `${label}: bound to ${JSON.stringify(other)}, reads ${JSON.stringify(removed)}, not ${JSON.stringify(before)}`,
           ]),
       ...(Object.is(rebound, expected)
         ? []
         : [
-            `${key}: bound to ${JSON.stringify(value)} again, reads ${JSON.stringify(rebound)}, not ${JSON.stringify(expected)}`,
+            `${label}: bound to ${JSON.stringify(value)} again, reads ${JSON.stringify(rebound)}, not ${JSON.stringify(expected)}`,
           ]),
     ];
   } catch (error) {
-    return [`${key}: binding throws (${unknownToString(error)})`];
+    return [`${label}: binding throws (${unknownToString(error)})`];
   } finally {
     mut_unmount?.();
   }
 };
+
+/**
+ * What goes wrong when each of `keys` of `tag` is bound to a value, to another,
+ * and to the first value again. The other is `undefined` for a key written as
+ * an attribute, which removes it, and the value the property had for one
+ * written as a property, bound both on a new element and on one whose property
+ * has been written.
+ */
+const keyFailures = (
+  tag: string,
+  keys: readonly string[],
+  writtenAs: 'attribute' | 'property',
+): readonly string[] =>
+  keys.flatMap((key) => {
+    // Written and read back, a property the element does not have would be an
+    // expando that passes.
+    if (!Reflect.has(document.createElement(tag), key)) {
+      return [`${key}: <${tag}> has no such property`];
+    }
+
+    const attributes = attributesFor.get(`${tag}.${key}`) ?? {};
+
+    const write = propertyWrite(tag, key, attributes);
+
+    if (write.refused !== undefined) {
+      return [
+        `${key}: ${JSON.stringify(write.value)} is refused (${write.refused}); give a value in \`samples\``,
+      ];
+    }
+
+    const { before, value, expected } = write;
+
+    if (Object.is(expected, before)) {
+      return [
+        `${key}: ${JSON.stringify(value)} leaves the property as it was; give a value in \`samples\``,
+      ];
+    }
+
+    // A key written as a property is bound on a clean element and on one whose
+    // property has been written.
+    return (writtenAs === 'attribute' ? [false] : [false, true]).flatMap(
+      (dirty) =>
+        bindingFailures(tag, key, attributes, {
+          value,
+          expected,
+          other: writtenAs === 'attribute' ? undefined : before,
+          before,
+          dirty,
+        }),
+    );
+  });
