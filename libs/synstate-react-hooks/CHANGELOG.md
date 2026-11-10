@@ -1,5 +1,13 @@
 # synstate-react-hooks
 
+## 8.0.1
+
+### Patch Changes
+
+- 2832e99: `useObservableValue`, and the `useCurrentValue` hooks `createState`, `createReducer` and `createBooleanState` return, no longer re-render the component for an emission equal (`Object.is`) to the value it shows. The store snapshot was synstate's `Optional`, a new object on every emission; it is now the value itself.
+- 10b7612: `useObservableValue`, and the `useCurrentValue` hooks `createState` and `createReducer` return, now render on the server: they pass `getServerSnapshot` to `useSyncExternalStore`, so `renderToString` draws the observable's current value instead of throwing "Missing getServerSnapshot".
+- synstate@8.0.0
+
 ## 8.0.0
 
 ### Major Changes

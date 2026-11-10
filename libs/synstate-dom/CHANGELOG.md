@@ -1,5 +1,19 @@
 # synstate-dom
 
+## 0.10.0
+
+### Minor Changes
+
+- 3f822d1: A type-level break, released as a minor while synstate-dom is 0.x: `<style>` no longer takes a `disabled` prop. `HTMLStyleElement.disabled` has no attribute behind it, so binding it wrote a `disabled` attribute that nothing reads; `disabled` stays on every element whose attribute it is (`<button>`, `<link>`, …).
+
+    Breaking: to turn a style sheet off, set `element.disabled` from `ref` instead of binding `disabled`.
+
+### Patch Changes
+
+- 4d7929b: synstate-dom imports `Arr` from `ts-data-forge/array` instead of the ts-data-forge root, so esbuild no longer keeps all of `Arr` in an application's bundle: a counter bundled by esbuild drops from 12.3 to 7.4 kB minified and gzipped. Vite already shook it off.
+- synstate@8.0.0
+    - ts-data-forge@14.13.0
+
 ## 0.9.0
 
 ### Minor Changes
