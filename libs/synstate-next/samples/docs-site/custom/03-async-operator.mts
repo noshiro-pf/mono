@@ -4,6 +4,7 @@ import {
   type DropInitialValueOperator,
   type Observable,
 } from 'synstate-next';
+import { Optional } from 'ts-std-forge';
 
 // embed-sample-code-ignore-below
 if (import.meta.vitest !== undefined) {
@@ -29,14 +30,14 @@ if (import.meta.vitest !== undefined) {
               update: () => {
                 const value = parent.getSnapshot();
 
-                if (value === undefined || !ctx.emitted(parent)) {
+                if (Optional.isNone(value) || !ctx.emitted(parent)) {
                   return;
                 }
 
                 const id = setTimeout(() => {
                   mut_timers.delete(id);
 
-                  ctx.emit(value);
+                  ctx.emit(value.value);
                 }, milliseconds);
 
                 mut_timers.add(id);

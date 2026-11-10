@@ -16,6 +16,7 @@ import {
     type DropInitialValueOperator,
     type Observable,
 } from 'synstate-next';
+import { Optional } from 'ts-std-forge';
 
 // Passes on the values that are not `undefined`.
 const defined =
@@ -24,8 +25,8 @@ const defined =
         createDerived<A>([source], (ctx) => () => {
             const value = source.getSnapshot();
 
-            if (value !== undefined) {
-                ctx.set(value);
+            if (Optional.isSome(value) && value.value !== undefined) {
+                ctx.set(value.value);
             }
         });
 
@@ -39,7 +40,7 @@ setSelected('a');
 
 setSelected(undefined);
 
-assert.strictEqual(lastSelected.getSnapshot(), 'a');
+assert.deepStrictEqual(lastSelected.getSnapshot(), Optional.some('a'));
 ```
 
 The node holds nothing until it is first set, unless you give `{ initialValue }`. Typing the operator as a `DropInitialValueOperator<A, B>` (or a `KeepInitialValueOperator`, a `ProvideInitialValueOperator`) tells `pipe` whether the result holds a value. The last two return an `InitializedObservable`, so a node that may hold nothing needs `{ initialValue }` to be one. `pipe` also applies a `KeepInitialValueOperator` to an observable that holds no value yet, so its body must not count on its source holding one, and a node made here cannot know the value it would have to start with: write a `KeepInitialValueOperator` by chaining operators that keep, as a function typed as one (`const k: KeepInitialValueOperator<A, B> = (o) => o.pipe(map(f)).pipe(debounce(ms))`; written inline in `pipe`, the operator gets an `Observable` and its result is one), and type one made with `createDerived` as a `DropInitialValueOperator`. Called directly, a `KeepInitialValueOperator` takes only an `InitializedObservable`, so write `source.pipe(map(f))` rather than `map(f)(source)`.
@@ -54,6 +55,7 @@ import {
     createValueEmitter,
     type Observable,
 } from 'synstate-next';
+import { Optional } from 'ts-std-forge';
 
 type Tagged<A, B> = Readonly<
     { from: 'left'; value: A } | { from: 'right'; value: B }
@@ -70,10 +72,10 @@ const mergeTagged = <A, B>(
         const b = second.getSnapshot();
 
         // `emitted` tells which parent emitted in this update.
-        if (a !== undefined && ctx.emitted(first)) {
-            ctx.set({ from: 'left', value: a });
-        } else if (b !== undefined && ctx.emitted(second)) {
-            ctx.set({ from: 'right', value: b });
+        if (Optional.isSome(a) && ctx.emitted(first)) {
+            ctx.set({ from: 'left', value: a.value });
+        } else if (Optional.isSome(b) && ctx.emitted(second)) {
+            ctx.set({ from: 'right', value: b.value });
         }
     });
 
@@ -108,6 +110,7 @@ import {
     type DropInitialValueOperator,
     type Observable,
 } from 'synstate-next';
+import { Optional } from 'ts-std-forge';
 
 // Passes each value on `milliseconds` later, in an update of its own.
 const delay =
@@ -126,14 +129,14 @@ const delay =
                 update: () => {
                     const value = parent.getSnapshot();
 
-                    if (value === undefined || !ctx.emitted(parent)) {
+                    if (Optional.isNone(value) || !ctx.emitted(parent)) {
                         return;
                     }
 
                     const id = setTimeout(() => {
                         mut_timers.delete(id);
 
-                        ctx.emit(value);
+                        ctx.emit(value.value);
                     }, milliseconds);
 
                     mut_timers.add(id);

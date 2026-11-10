@@ -31,7 +31,7 @@ describe('the value the source holds when the operator is created is projected',
 
     const s = a.pipe(switchMap((x) => just(x * 10)));
 
-    assert.strictEqual(s.getSnapshot(), 10);
+    assert.deepStrictEqual(s.getSnapshot(), Optional.some(10));
 
     const seen = collect(s);
 
@@ -134,7 +134,7 @@ describe('the value the source holds when the operator is created is projected',
       .pipe(map((some) => some.value))
       .pipe(switchMap((id) => just(`item ${id.toString()}`)));
 
-    assert.strictEqual(s.getSnapshot(), 'item 42');
+    assert.deepStrictEqual(s.getSnapshot(), Optional.some('item 42'));
   });
 
   test('switchMap and mergeMap: a settled source holding a value projects it once', () => {
@@ -154,9 +154,9 @@ describe('the value the source holds when the operator is created is projected',
     // its value, which is projected as any other held value is.
     assert.deepStrictEqual(mut_projected, [1, 2]);
 
-    assert.strictEqual(s.getSnapshot(), 1);
+    assert.deepStrictEqual(s.getSnapshot(), Optional.some(1));
 
-    assert.strictEqual(m.getSnapshot(), 2);
+    assert.deepStrictEqual(m.getSnapshot(), Optional.some(2));
   });
 
   test('mergeMap: the first inner and the later ones are merged', () => {
@@ -178,11 +178,11 @@ describe('the value the source holds when the operator is created is projected',
   });
 
   test('mergeMap: an inner holding a value gives the operator its value at once', () => {
-    assert.strictEqual(
+    assert.deepStrictEqual(
       state(1)
         .pipe(mergeMap((x) => just(x * 10)))
         .getSnapshot(),
-      10,
+      Optional.some(10),
     );
   });
 
@@ -244,7 +244,7 @@ describe('a projection that writes or throws', () => {
       }),
     );
 
-    assert.strictEqual(switched.getSnapshot(), 10);
+    assert.deepStrictEqual(switched.getSnapshot(), Optional.some(10));
   });
 
   test.each([

@@ -43,11 +43,20 @@ no longer holds.
 
 ## Values
 
-A node holds its value or the `noValue` symbol. There is no `Optional` per
-value: reading a value is a field read and a comparison. `InitializedObservable`
-is a type for nodes that always hold one; `pipe` works out, from the operator's
-type, whether the result does. As in synstate, an operator is one of three
-function types, and the kind is in what it takes and returns:
+A node holds its value or the `noValue` symbol, not an `Optional`: inside the
+package, reading a value is a field read and a comparison. `getSnapshot()` gives
+the application an `Optional`, as synstate's did, built when it is called and
+kept while the value is the same, so that a caller such as
+`useSyncExternalStore` sees the same object (a node read once keeps the value it
+read reachable until the next read). src/ never calls it (a
+`no-restricted-syntax` entry in `eslint.config.mts`, defined in
+`configs/eslint/rules/get-snapshot-ban.mts`), so an update of the built-in
+operators allocates none; an operator written with `createDerived` that reads it
+allocates one when the value has changed. `hasValue`, and `value` on an
+`InitializedObservable`, read without one. `InitializedObservable` is a type for
+nodes that always hold one; `pipe` works out, from the operator's type, whether
+the result does. As in synstate, an operator is one of three function types, and
+the kind is in what it takes and returns:
 `ProvideInitialValueOperator` (synstate's `WithInitialValueOperator`, renamed to
 a verb like the other two) returns an `InitializedObservable`,
 `KeepInitialValueOperator` takes and returns one, `DropInitialValueOperator`
@@ -197,10 +206,8 @@ from the prototype; the packages are to be measured again in
 
 ## Breaking changes against synstate
 
-- `getSnapshot()` returns the value or `undefined`, not an `Optional`:
-  `hasValue` says whether there is one, and an `InitializedObservable` has
-  `value` and a `getSnapshot` that returns `A`. `subscribe` returns the function
-  that stops it, not a `{ unsubscribe }` object.
+- `subscribe` returns the function that stops it, not a `{ unsubscribe }`
+  object.
 - Subscribers run after the update has settled, not during it.
 - Nested updates do not exist: a write made during the drain is deferred, and
   one made by an effect propagates in the next round.

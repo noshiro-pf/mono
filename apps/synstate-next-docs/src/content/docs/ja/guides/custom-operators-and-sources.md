@@ -16,6 +16,7 @@ import {
     type DropInitialValueOperator,
     type Observable,
 } from 'synstate-next';
+import { Optional } from 'ts-std-forge';
 
 // Passes on the values that are not `undefined`.
 const defined =
@@ -24,8 +25,8 @@ const defined =
         createDerived<A>([source], (ctx) => () => {
             const value = source.getSnapshot();
 
-            if (value !== undefined) {
-                ctx.set(value);
+            if (Optional.isSome(value) && value.value !== undefined) {
+                ctx.set(value.value);
             }
         });
 
@@ -39,7 +40,7 @@ setSelected('a');
 
 setSelected(undefined);
 
-assert.strictEqual(lastSelected.getSnapshot(), 'a');
+assert.deepStrictEqual(lastSelected.getSnapshot(), Optional.some('a'));
 ```
 
 `{ initialValue }` を渡さない限り、ノードは最初に set されるまで何も持ちません。オペレーターを `DropInitialValueOperator<A, B>`（あるいは `KeepInitialValueOperator`・`ProvideInitialValueOperator`）と型付けすれば、結果が値を持つかどうかを `pipe` に伝えられます。後の 2 つは `InitializedObservable` を返す型なので、何も持たないことがあるノードをそう型付けするには `{ initialValue }` が要ります。`pipe` は `KeepInitialValueOperator` を、まだ値を持たない Observable にも適用するので、その本体はソースが値を持っていることを当てにしてはいけません。ここで作るノードは、最初に持つべき値を知ることもできません。`KeepInitialValueOperator` は値を保つオペレーターをつなぎ、その型を付けた関数として書き（`const k: KeepInitialValueOperator<A, B> = (o) => o.pipe(map(f)).pipe(debounce(ms))`。`pipe` の中にそのまま書くと、オペレーターは `Observable` を受け取り、結果も `Observable` になります）、`createDerived` で作るものは `DropInitialValueOperator` と型付けしてください。また直接呼ぶと `InitializedObservable` しか受け取らないので、`map(f)(source)` ではなく `source.pipe(map(f))` と書きます。
@@ -54,6 +55,7 @@ import {
     createValueEmitter,
     type Observable,
 } from 'synstate-next';
+import { Optional } from 'ts-std-forge';
 
 type Tagged<A, B> = Readonly<
     { from: 'left'; value: A } | { from: 'right'; value: B }
@@ -70,10 +72,10 @@ const mergeTagged = <A, B>(
         const b = second.getSnapshot();
 
         // `emitted` tells which parent emitted in this update.
-        if (a !== undefined && ctx.emitted(first)) {
-            ctx.set({ from: 'left', value: a });
-        } else if (b !== undefined && ctx.emitted(second)) {
-            ctx.set({ from: 'right', value: b });
+        if (Optional.isSome(a) && ctx.emitted(first)) {
+            ctx.set({ from: 'left', value: a.value });
+        } else if (Optional.isSome(b) && ctx.emitted(second)) {
+            ctx.set({ from: 'right', value: b.value });
         }
     });
 
@@ -108,6 +110,7 @@ import {
     type DropInitialValueOperator,
     type Observable,
 } from 'synstate-next';
+import { Optional } from 'ts-std-forge';
 
 // Passes each value on `milliseconds` later, in an update of its own.
 const delay =
@@ -126,14 +129,14 @@ const delay =
                 update: () => {
                     const value = parent.getSnapshot();
 
-                    if (value === undefined || !ctx.emitted(parent)) {
+                    if (Optional.isNone(value) || !ctx.emitted(parent)) {
                         return;
                     }
 
                     const id = setTimeout(() => {
                         mut_timers.delete(id);
 
-                        ctx.emit(value);
+                        ctx.emit(value.value);
                     }, milliseconds);
 
                     mut_timers.add(id);

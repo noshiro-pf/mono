@@ -13,6 +13,7 @@ Holds `value` and is settled: it never emits. For a branch of a `switchMap` or `
 
 ```tsx
 import { createState, just, map, switchMap, timer } from 'synstate-next';
+import { Optional } from 'ts-std-forge';
 
 const [delayed, setDelayed] = createState(false);
 
@@ -23,13 +24,13 @@ const label = delayed.pipe(
     ),
 );
 
-assert.strictEqual(label.getSnapshot(), 'now');
+assert.deepStrictEqual(label.getSnapshot(), Optional.some('now'));
 
 setDelayed(true);
 
 await vi.advanceTimersByTimeAsync(500);
 
-assert.strictEqual(label.getSnapshot(), 'later');
+assert.deepStrictEqual(label.getSnapshot(), Optional.some('later'));
 ```
 
 ## See also

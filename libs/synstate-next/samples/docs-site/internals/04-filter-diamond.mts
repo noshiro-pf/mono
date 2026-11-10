@@ -1,4 +1,5 @@
 import { createState, derive, filter, map } from 'synstate-next';
+import { Optional } from 'ts-std-forge';
 
 // embed-sample-code-ignore-below
 if (import.meta.vitest !== undefined) {
@@ -28,7 +29,7 @@ if (import.meta.vitest !== undefined) {
 
     assert.deepStrictEqual(mut_seen, [0, 10, 22]);
 
-    assert.strictEqual(E.getSnapshot(), 20);
+    assert.deepStrictEqual(E.getSnapshot(), Optional.some(20));
 
     // embed-sample-code-ignore-below
   });

@@ -40,8 +40,8 @@ import {
  *   createDerived([source], (ctx) => () => {
  *     const v = source.getSnapshot();
  *
- *     if (v !== undefined && ctx.emitted(source)) {
- *       ctx.set(v * 2);
+ *     if (Optional.isSome(v) && ctx.emitted(source)) {
+ *       ctx.set(v.value * 2);
  *     }
  *   });
  * ```

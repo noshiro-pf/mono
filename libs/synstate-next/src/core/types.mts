@@ -1,3 +1,4 @@
+import type { Optional, Some } from 'ts-std-forge';
 import type { StrictOmit } from 'ts-type-forge';
 
 /** Stops a subscription. */
@@ -63,12 +64,13 @@ export type Observable<A> = Readonly<{
   /** Whether it holds a value. */
   hasValue: boolean;
   /**
-   * The value it holds, or `undefined` when it holds none. `NoInfer`, because
-   * inferring `A` from `A | undefined` against `number | undefined` gives
-   * `number`, which, where an operator's `source` is inferred (a parameter),
-   * would win over the `number | undefined` the other members give.
+   * The value it holds as an `Optional`: `Optional.none` while it holds none.
+   * The same object while the value is the same, so a wrapper
+   * (`() => o.getSnapshot()`) can be handed to `useSyncExternalStore`. Built
+   * when it is read: the package itself never reads it, so an update allocates
+   * none.
    */
-  getSnapshot: (this: Observable<unknown>) => NoInfer<A> | undefined;
+  getSnapshot: (this: Observable<unknown>) => Optional<A>;
   /**
    * Whether it will never emit again: disposed, a source that is done (a
    * `timer` that fired, a promise that settled), or an operator that is done (a
@@ -110,8 +112,8 @@ export type ObservableValue<O extends Observable<unknown>> = [O] extends [
 
 /**
  * An observable that always holds a value. `getSnapshot` is replaced, not
- * intersected, so that it has the one signature that returns `A`: an
- * intersection would also keep `() => A | undefined`, which inference against
+ * intersected, so that it has the one signature that returns `Some<A>`: an
+ * intersection would also keep `() => Optional<A>`, which inference against
  * `Observable<A>` and `ReturnType` would read.
  */
 export type InitializedObservable<A> = StrictOmit<
@@ -122,8 +124,8 @@ export type InitializedObservable<A> = StrictOmit<
   Readonly<{
     /** The value it holds. */
     value: A;
-    /** The value it holds, as `value` reads it. */
-    getSnapshot: (this: Observable<unknown>) => A;
+    /** The value it holds, as a `Some`; `value` reads it without one. */
+    getSnapshot: (this: Observable<unknown>) => Some<A>;
   }>;
 
 /**

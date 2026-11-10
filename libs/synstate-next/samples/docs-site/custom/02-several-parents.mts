@@ -3,6 +3,7 @@ import {
   createValueEmitter,
   type Observable,
 } from 'synstate-next';
+import { Optional } from 'ts-std-forge';
 
 // embed-sample-code-ignore-below
 if (import.meta.vitest !== undefined) {
@@ -23,10 +24,10 @@ if (import.meta.vitest !== undefined) {
         const b = second.getSnapshot();
 
         // `emitted` tells which parent emitted in this update.
-        if (a !== undefined && ctx.emitted(first)) {
-          ctx.set({ from: 'left', value: a });
-        } else if (b !== undefined && ctx.emitted(second)) {
-          ctx.set({ from: 'right', value: b });
+        if (Optional.isSome(a) && ctx.emitted(first)) {
+          ctx.set({ from: 'left', value: a.value });
+        } else if (Optional.isSome(b) && ctx.emitted(second)) {
+          ctx.set({ from: 'right', value: b.value });
         }
       });
 

@@ -101,7 +101,7 @@ import {
     merge,
 } from 'synstate-next';
 import { Num } from 'ts-data-forge';
-import { Result } from 'ts-std-forge';
+import { Optional, Result } from 'ts-std-forge';
 
 type Row = Readonly<{ name: string; email: string; gender: string }>;
 

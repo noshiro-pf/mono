@@ -6,6 +6,7 @@ import {
   eslintImportsRules,
   mergeRestrictedImportsOptions,
   restrictedImportsOptions,
+  restrictedSyntax,
   typescriptEslintRules,
   type FlatConfig,
 } from 'eslint-config-typed';
@@ -13,6 +14,7 @@ import { eslintPluginTsDataForge } from 'eslint-plugin-ts-data-forge';
 import { eslintPluginTsFortress } from 'eslint-plugin-ts-fortress';
 import { eslintPluginTsTypeForge } from 'eslint-plugin-ts-type-forge';
 import { eslintConfigOffForOxlint } from '../../tools/configs/oxlint-rules.mjs';
+import { getSnapshotBan } from './configs/eslint/rules/get-snapshot-ban.mjs';
 
 export default [
   ...eslintConfigForTypeScript({
@@ -37,6 +39,8 @@ export default [
           allow: [
             ...eslintImportsRules['import-x/no-internal-modules'][1].allow,
             'synstate-next/internal',
+            // test/eslint-config.test.mts reads the ban it tests.
+            '**/configs/eslint/rules/get-snapshot-ban.mjs',
           ],
         },
       ],
@@ -46,6 +50,8 @@ export default [
   {
     files: ['src/**'],
     rules: defineKnownRules({
+      // See configs/eslint/rules/get-snapshot-ban.mts.
+      'no-restricted-syntax': ['error', ...restrictedSyntax, getSnapshotBan],
       // The observables are classes: a node per derived value has to be
       // cheap, so the methods live on a prototype and each operator is a
       // subclass that overrides `recompute`. See DESIGN.md.

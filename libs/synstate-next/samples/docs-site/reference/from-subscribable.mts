@@ -1,5 +1,5 @@
 import { fromSubscribable, type Subscribable } from 'synstate-next';
-import { Result } from 'ts-std-forge';
+import { Optional, Result } from 'ts-std-forge';
 
 // embed-sample-code-ignore-below
 if (import.meta.vitest !== undefined) {
@@ -21,11 +21,13 @@ if (import.meta.vitest !== undefined) {
 
     mut_observers[0]?.next(1);
 
-    assert.deepStrictEqual(followed.getSnapshot(), Result.ok(1));
+    assert.deepStrictEqual(followed.getSnapshot(), Optional.some(Result.ok(1)));
 
     mut_observers[0]?.error(new Error('closed'));
 
-    assert.isTrue(Result.isErr(followed.getSnapshot() ?? Result.ok(0)));
+    assert.isTrue(
+      Result.isErr(Optional.unwrapOr(followed.getSnapshot(), Result.ok(0))),
+    );
 
     // embed-sample-code-ignore-below
   });

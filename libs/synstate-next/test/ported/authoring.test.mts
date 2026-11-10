@@ -25,6 +25,7 @@ import {
 } from 'synstate-next';
 import { toNode } from 'synstate-next/internal';
 import { expectType } from 'ts-data-forge';
+import { Optional } from 'ts-std-forge';
 
 describe('custom operators and sources', () => {
   test('a custom operator updates in the same update as its parent', () => {
@@ -54,7 +55,7 @@ describe('custom operators and sources', () => {
       mut_calls.push(1);
 
       if (ctx.emitted(a)) {
-        ctx.set((a.getSnapshot() ?? 0) * 2);
+        ctx.set(Optional.unwrapOr(a.getSnapshot(), 0) * 2);
       }
     });
 
@@ -259,7 +260,7 @@ describe('custom operators and sources', () => {
       mut_emit.current = ctx.emit;
 
       return () => {
-        ctx.set((num.getSnapshot() ?? 0) * 10);
+        ctx.set(Optional.unwrapOr(num.getSnapshot(), 0) * 10);
       };
     });
 
@@ -406,7 +407,7 @@ describe('custom operators and sources', () => {
     const followed = createDerived<number>([main, other], (ctx) => ({
       update: () => {
         if (ctx.emitted(main)) {
-          ctx.set(main.getSnapshot() ?? 0);
+          ctx.set(Optional.unwrapOr(main.getSnapshot(), 0));
         }
       },
       settled: () => main.settled,
@@ -437,7 +438,7 @@ describe('custom operators and sources', () => {
       }
 
       update(): void {
-        this.#ctx.set(main.getSnapshot() ?? 0);
+        this.#ctx.set(Optional.unwrapOr(main.getSnapshot(), 0));
 
         this.#mut_done = true;
       }
@@ -518,8 +519,8 @@ const double = (src: Observable<number>): Observable<number> =>
   createDerived([src], (ctx) => () => {
     const v = src.getSnapshot();
 
-    if (v !== undefined && ctx.emitted(src)) {
-      ctx.set(v * 2);
+    if (Optional.isSome(v) && ctx.emitted(src)) {
+      ctx.set(v.value * 2);
     }
   });
 
@@ -541,14 +542,14 @@ const delay = (src: Observable<number>, ms: number): Observable<number> =>
       update: () => {
         const v = src.getSnapshot();
 
-        if (v === undefined || !ctx.emitted(src)) {
+        if (Optional.isNone(v) || !ctx.emitted(src)) {
           return;
         }
 
         const t = setTimeout(() => {
           mut_timers.delete(t);
 
-          ctx.emit(v);
+          ctx.emit(v.value);
         }, ms);
 
         mut_timers.add(t);

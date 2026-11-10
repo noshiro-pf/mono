@@ -22,6 +22,7 @@ import {
   type Observable,
 } from 'synstate-next';
 import { toNode } from 'synstate-next/internal';
+import { Optional } from 'ts-std-forge';
 
 describe('the nodes an update visits', () => {
   test('a write made by a subscriber is a round of its own, after the one that reached it', () => {
@@ -570,7 +571,7 @@ describe('dispose', () => {
 
     assert.deepStrictEqual(seen, [3]);
 
-    assert.strictEqual(onlyChild.getSnapshot(), 3);
+    assert.deepStrictEqual(onlyChild.getSnapshot(), Optional.some(3));
   });
 
   test('cancels what it was waiting to emit', () => {

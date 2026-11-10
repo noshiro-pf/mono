@@ -25,6 +25,7 @@ Its result may hold no value even when the source holds one: `pipe` gives an `Ob
 
 ```tsx
 import { createState, skip } from 'synstate-next';
+import { Optional } from 'ts-std-forge';
 
 const [query, setQuery] = createState('');
 
@@ -35,7 +36,7 @@ assert.isFalse(typed.hasValue);
 
 setQuery('syn');
 
-assert.strictEqual(typed.getSnapshot(), 'syn');
+assert.deepStrictEqual(typed.getSnapshot(), Optional.some('syn'));
 ```
 
 ## See also

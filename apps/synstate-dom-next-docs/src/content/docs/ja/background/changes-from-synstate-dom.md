@@ -29,7 +29,7 @@ synstate-dom で書いたアプリケーションが最初に出会う変更で�
 - **購読者はすべての値が新しくなった後で実行され**、伝播中の書き込みは伝播が終わるまで待ちます。更新は入れ子にならないので、別の状態の伝播中に書き込んだときの警告もありません。書き込みは単に次に適用されます。
 - **`complete` はなくなりました。** Observable は owner と一緒に破棄されることで終わります。終わったソース（発火した `timer`、解決した `fromPromise`）は、owner に破棄されるまで値を持ち続けます。
 - **`createState` のセッターは何も返しません。** 状態は `getSnapshot` か、Observable の `.value` で読みます。
-- **`getSnapshot()` は値か `undefined` を返します**（`Optional` ではありません）。**`subscribe` は購読を止める関数を返します**（`{ unsubscribe }` オブジェクトではありません）。
+- **`subscribe` は購読を止める関数を返します**（`{ unsubscribe }` オブジェクトではありません）。
 - **1 つの `map` で書けるオペレーターはなくなりました**（`mapTo`、`pluck`、`getKey`、`attachIndex`、`mapOptional`、`unwrapOptional`、`mapResultOk` など）。別名（`combineLatest`、`distinctUntilChanged`、`withLatestFrom`、`flatMap`）もなくなりました。`combine` もなくなり、タプルは `derive([a, b], (x, y) => [x, y] as const)` で得られます。
 - **`timer` と `counter` は作ったときに始まります。** 止めるべき owner の中で作ってください。
 - **パッケージの 2 つのコピーの Observable は組み合わせられず**、束縛もできません。

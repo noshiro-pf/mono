@@ -4,7 +4,7 @@
  */
 import { fromAbortablePromise, fromPromise } from 'synstate-next';
 import { toNode } from 'synstate-next/internal';
-import { Result } from 'ts-std-forge';
+import { Optional, Result } from 'ts-std-forge';
 
 describe('fromPromise and fromAbortablePromise', () => {
   test.each([
@@ -78,7 +78,7 @@ describe('fromPromise and fromAbortablePromise', () => {
 
     await promise;
 
-    assert.deepStrictEqual(result.getSnapshot(), Result.ok(1));
+    assert.deepStrictEqual(result.getSnapshot(), Optional.some(Result.ok(1)));
   });
 });
 

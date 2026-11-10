@@ -193,7 +193,7 @@ assert.deepStrictEqual(mut_ticks, [0, -1, 1, 2]);
 
 ```tsx
 import { fromSubscribable, type Subscribable } from 'synstate-next';
-import { Result } from 'ts-std-forge';
+import { Optional, Result } from 'ts-std-forge';
 
 // Anything subscribed to with an observer object: an RxJS observable, a
 // TC39 `Observable`, or this.
@@ -212,5 +212,8 @@ const words: Subscribable<string> = {
 const followed = fromSubscribable(words);
 
 // A value given while it subscribes is held from the start.
-assert.deepStrictEqual(followed.getSnapshot(), Result.ok('world'));
+assert.deepStrictEqual(
+    followed.getSnapshot(),
+    Optional.some(Result.ok('world')),
+);
 ```

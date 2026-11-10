@@ -29,7 +29,7 @@ import {
 } from 'synstate-next';
 import { toNode } from 'synstate-next/internal';
 import { expectType } from 'ts-data-forge';
-import { hasKey, isRecord } from 'ts-std-forge';
+import { hasKey, isRecord, Optional } from 'ts-std-forge';
 
 describe('map stops a result equal to the one it holds', () => {
   test('a result equal by Object.is is not emitted', () => {
@@ -262,11 +262,11 @@ describe(skipWhile, () => {
   const seed: number = 1;
 
   test('keeps an initialized parent value the predicate does not skip', () => {
-    assert.strictEqual(
+    assert.deepStrictEqual(
       just(seed)
         .pipe(skipWhile((x) => x > 10))
         .getSnapshot(),
-      1,
+      Optional.some(1),
     );
   });
 
@@ -693,7 +693,7 @@ describe(derive, () => {
 
     expectType<typeof q, InitializedObservable<number>>('=');
 
-    assert.strictEqual(q.getSnapshot(), 5);
+    assert.deepStrictEqual(q.getSnapshot(), Optional.some(5));
   });
 });
 

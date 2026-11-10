@@ -35,6 +35,7 @@ import {
   type ValuesOf,
 } from 'synstate-next';
 import { Arr, expectType, isNotUndefined } from 'ts-data-forge';
+import { Optional, type Some } from 'ts-std-forge';
 import type { FixedLengthTuple } from 'ts-type-forge';
 
 describe('types', () => {
@@ -148,24 +149,24 @@ describe('types', () => {
     // Covariant: a narrower observable goes where a wider one is expected.
     const wide: Observable<number | string> = kept;
 
-    assert.strictEqual(wide.getSnapshot(), 1);
+    assert.deepStrictEqual(wide.getSnapshot(), Optional.some(1));
 
     assert.isTrue(kept.hasValue);
 
-    // An observable that always holds a value reads it without `undefined`.
+    // An observable that always holds a value reads it as a `Some`.
     const _keptValue = kept.getSnapshot();
 
-    expectType<typeof _keptValue, number>('=');
+    expectType<typeof _keptValue, Some<number>>('=');
 
-    expectType<ReturnType<typeof kept.getSnapshot>, number>('=');
+    expectType<ReturnType<typeof kept.getSnapshot>, Some<number>>('=');
 
     const _notYetValue = notYet.getSnapshot();
 
-    expectType<typeof _notYetValue, string | undefined>('=');
+    expectType<typeof _notYetValue, Optional<string>>('=');
 
     assert.isFalse(notYet.hasValue);
 
-    assert.isUndefined(notYet.getSnapshot());
+    assert.isTrue(Optional.isNone(notYet.getSnapshot()));
   });
 
   test('the synchronous operators keep or drop the initial value', () => {
@@ -257,7 +258,7 @@ describe('types', () => {
 
     expectType<typeof narrowed, Observable<number>>('=');
 
-    assert.strictEqual(narrowed.getSnapshot(), 0);
+    assert.deepStrictEqual(narrowed.getSnapshot(), Optional.some(0));
 
     const _kept = s.pipe(filter((x) => x !== 0));
 

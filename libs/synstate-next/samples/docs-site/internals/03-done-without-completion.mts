@@ -1,4 +1,5 @@
 import { createRootOwner, createState, take, timer } from 'synstate-next';
+import { Optional } from 'ts-std-forge';
 
 // embed-sample-code-ignore-below
 if (import.meta.vitest !== undefined) {
@@ -37,7 +38,7 @@ if (import.meta.vitest !== undefined) {
 
       await vi.advanceTimersByTimeAsync(100);
 
-      assert.strictEqual(fired.getSnapshot(), 0);
+      assert.deepStrictEqual(fired.getSnapshot(), Optional.some(0));
 
       owner.dispose();
 

@@ -4,6 +4,7 @@ import {
   scan,
   source,
 } from 'synstate-next';
+import { Optional } from 'ts-std-forge';
 
 // embed-sample-code-ignore-below
 if (import.meta.vitest !== undefined) {
@@ -42,7 +43,7 @@ if (import.meta.vitest !== undefined) {
 
     messages.emit('hello');
 
-    assert.strictEqual(messages.getSnapshot(), 'hello');
+    assert.deepStrictEqual(messages.getSnapshot(), Optional.some('hello'));
 
     // embed-sample-code-ignore-below
   });

@@ -13,7 +13,8 @@ import {
   source,
   state,
 } from 'synstate-next';
-import { Arr } from 'ts-data-forge';
+import { Arr, expectType } from 'ts-data-forge';
+import { Optional, type Some } from 'ts-std-forge';
 
 describe('propagation', () => {
   test('a diamond is computed once per update and never sees a mix of old and new', () => {
@@ -105,6 +106,69 @@ describe('propagation', () => {
     a.set(2);
 
     assert.deepStrictEqual(mut_thisValues, [undefined, undefined]);
+  });
+
+  test('getSnapshot keeps its Some while the value is the same', () => {
+    const a = state(1);
+
+    const first = a.getSnapshot();
+
+    assert.strictEqual(a.getSnapshot(), first);
+
+    a.set(2);
+
+    const second = a.getSnapshot();
+
+    assert.notStrictEqual(second, first);
+
+    assert.deepStrictEqual(second, Optional.some(2));
+
+    assert.strictEqual(a.getSnapshot(), second);
+
+    // Changed and changed back with no getSnapshot between: the Some of the
+    // last read.
+    a.set(3);
+
+    assert.strictEqual(a.value, 3);
+
+    a.set(2);
+
+    assert.strictEqual(a.getSnapshot(), second);
+
+    // A getSnapshot of another value replaces the Some kept.
+    a.set(3);
+
+    assert.deepStrictEqual(a.getSnapshot(), Optional.some(3));
+
+    a.set(2);
+
+    const third = a.getSnapshot();
+
+    assert.notStrictEqual(third, second);
+
+    assert.deepStrictEqual(third, Optional.some(2));
+
+    assert.strictEqual(a.getSnapshot(), third);
+
+    assert.isTrue(Optional.isNone(source<number>().getSnapshot()));
+  });
+
+  test('getSnapshot of a derived node keeps its Some the same way', () => {
+    const a = state(1);
+
+    const doubled = a.pipe(map((x) => x * 2));
+
+    const first = doubled.getSnapshot();
+
+    expectType<typeof first, Some<number>>('=');
+
+    assert.strictEqual(doubled.getSnapshot(), first);
+
+    a.set(2);
+
+    assert.notStrictEqual(doubled.getSnapshot(), first);
+
+    assert.deepStrictEqual(doubled.getSnapshot(), Optional.some(4));
   });
 
   test('a subscriber sees a graph that has settled', () => {

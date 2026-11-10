@@ -9,6 +9,7 @@ description: The fields synstate-next's scheduler reads and writes, step by step
 
 ```tsx
 import { createState, derive, filter, map } from 'synstate-next';
+import { Optional } from 'ts-std-forge';
 
 const [A, setA] = createState(0);
 
@@ -34,7 +35,7 @@ setA(2); // B = 20, D = 2, BD = [20, 2], E = 20, C = 22
 
 assert.deepStrictEqual(mut_seen, [0, 10, 22]);
 
-assert.strictEqual(E.getSnapshot(), 20);
+assert.deepStrictEqual(E.getSnapshot(), Optional.some(20));
 ```
 
 The depths are as the comments say: `A` is a state at depth 0, `B` and `D` follow it, `BD` follows both, `C` follows `BD`, `E` follows `D`. The subscriber of `C` is an effect.

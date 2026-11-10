@@ -1,5 +1,5 @@
 import { fromPromise } from 'synstate-next';
-import { Result } from 'ts-std-forge';
+import { Optional, Result } from 'ts-std-forge';
 
 // embed-sample-code-ignore-below
 if (import.meta.vitest !== undefined) {
@@ -15,7 +15,10 @@ if (import.meta.vitest !== undefined) {
 
       await vi.advanceTimersByTimeAsync(0);
 
-      assert.deepStrictEqual(answer.getSnapshot(), Result.ok(42));
+      assert.deepStrictEqual(
+        answer.getSnapshot(),
+        Optional.some(Result.ok(42)),
+      );
 
       const failed = fromPromise<number, Error>(
         Promise.reject(new Error('down')),
@@ -23,7 +26,9 @@ if (import.meta.vitest !== undefined) {
 
       await vi.advanceTimersByTimeAsync(0);
 
-      assert.isTrue(Result.isErr(failed.getSnapshot() ?? Result.ok(0)));
+      assert.isTrue(
+        Result.isErr(Optional.unwrapOr(failed.getSnapshot(), Result.ok(0))),
+      );
 
       // embed-sample-code-ignore-below
     } finally {
