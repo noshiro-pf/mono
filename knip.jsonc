@@ -609,6 +609,21 @@
       "project": ["**/*.{mts,tsx}"],
     },
 
+    // The rebuild of the entry above (apps/split-view-extension-v2/docs/spec.md),
+    // with the same four entry points, each a `main` in its own directory.
+    "apps/split-view-extension-v2": {
+      "entry": [
+        "src/page/main.tsx",
+        "src/background/main.mts",
+        "src/content/*/main.mts",
+        "configs/*.mts",
+        "scripts/**/*.mts",
+        "test/**/*.test.mts",
+        "e2e/**/*.spec.mts",
+      ],
+      "project": ["**/*.{mts,tsx}"],
+    },
+
     // Not an Astro site like the entry above assumes either: a Chrome extension
     // with one entry point, the content script the manifest names. `src/index.mts`
     // is reached from the tests rather than being an entry of its own.

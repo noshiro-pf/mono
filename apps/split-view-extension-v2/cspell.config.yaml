@@ -1,0 +1,12 @@
+version: '0.2'
+# Inherit the repository-wide settings: run from this directory, cspell stops
+# at the nearest config and would otherwise lose the root dictionaries.
+import:
+  - '../../.cspell.config.yaml'
+words:
+  # What the browser itself refuses to put in a frame (spec P5), told apart from
+  # a site refusing to be framed.
+  - unframeable
+  # The 2×2 grid in the notation of `src/core/layout/spec.mts`, as the code, the
+  # tests and the spec spell it.
+  - rcppcpp

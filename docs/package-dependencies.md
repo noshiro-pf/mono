@@ -3,7 +3,7 @@
 
 # パッケージ間の依存関係
 
-このリポジトリの workspace パッケージは 106 個。
+このリポジトリの workspace パッケージは 107 個。
 グラフは各 `package.json` から生成している。
 
 ## 実行時依存（`dependencies` + `peerDependencies`）
@@ -42,6 +42,7 @@ graph LR
   resize_observer_react_hooks["resize-observer-react-hooks"]
   slack_archive_tools["slack-archive-tools"]
   split_view_extension["split-view-extension"]
+  split_view_extension_v2["split-view-extension-v2"]
   split_view_link["split-view-link"]
   _synstate_docs["@synstate/docs"]
   synstate_dom_benchmark["synstate-dom-benchmark"]
@@ -238,6 +239,10 @@ graph LR
   split_view_extension --> synstate
   split_view_extension --> synstate_dom
   split_view_extension --> ts_data_forge
+  split_view_extension_v2 --> split_view_link
+  split_view_extension_v2 --> synstate
+  split_view_extension_v2 --> synstate_dom
+  split_view_extension_v2 --> ts_data_forge
   split_view_link --> ts_data_forge
   _synstate_docs --> synstate
   _synstate_docs --> synstate_dom
@@ -405,7 +410,7 @@ graph LR
 |    3 | `eslint-plugin-synstate`, `eslint-plugin-ts-std-forge`, `ts-data-forge`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
 |    4 | `github-view-defaults-extension`, `lambda-calculus-interpreter-core`, `mahjong-scoring-tool`, `numeric-input-utils`, `resize-observer-preact-hooks`, `resize-observer-react-hooks`, `split-view-link`, `ts-utils-additional`, `@sumi-lang/checker`, `@sumi-lang/oxlint-config`, `eslint-config-typed`, `eslint-plugin-ts-data-forge`, `eslint-plugin-ts-fortress`, `eslint-plugin-ts-type-forge`, `synstate`, `synstate-next`, `ts-codemod-lib`, `ts-fortress`, `ts-repo-utils`                                                                                   |
 |    5 | `poll-discord-app`, `preact-utils`, `react-utils`, `slack-archive-tools`, `ts-fortress-types`, `@sumi-lang/cli`, `@sumi-lang/conformance`, `octokit-safe-types`, `pr-report-core`, `pr-report-core-v2`, `synstate-dom`, `synstate-dom-next`, `synstate-preact-hooks`, `synstate-preact-signals`, `synstate-react-hooks`, `synstate-react-hooks-compat`, `synstate-router`, `ts-codemod-cli`                                                                                                                                                                       |
-|    6 | `catan-dice`, `color-demo`, `event-schedule-app-shared`, `lambda-calculus-interpreter-preact`, `lambda-calculus-interpreter-react`, `lambda-calculus-interpreter-synstate-dom`, `mahjong-calculator-app`, `pr-manager`, `profile`, `react-blueprintjs-utils`, `react-utils-styled`, `split-view-extension`, `@synstate/docs`, `synstate-dom-benchmark`, `synstate-dom-sample-app`, `blueprint-synstate`, `github-settings-as-code`, `pr-merge-queue`, `pr-merge-queue-v2`, `synstate-router-dom`, `synstate-router-react`                                         |
+|    6 | `catan-dice`, `color-demo`, `event-schedule-app-shared`, `lambda-calculus-interpreter-preact`, `lambda-calculus-interpreter-react`, `lambda-calculus-interpreter-synstate-dom`, `mahjong-calculator-app`, `pr-manager`, `profile`, `react-blueprintjs-utils`, `react-utils-styled`, `split-view-extension`, `split-view-extension-v2`, `@synstate/docs`, `synstate-dom-benchmark`, `synstate-dom-sample-app`, `blueprint-synstate`, `github-settings-as-code`, `pr-merge-queue`, `pr-merge-queue-v2`, `synstate-router-dom`, `synstate-router-react`              |
 |    7 | `algo-app`, `annotation-tool`, `cant-stop-probability`, `event-schedule-app`, `event-schedule-app-functions`, `housing-loan-calculator`, `life-plan-simulator`, `react-mui-utils`, `synstate-router-dom-sample-app`, `synstate-router-react-sample-app`, `task-manager`                                                                                                                                                                                                                                                                                           |
 
 ### 参考: devDependencies も含めた場合
@@ -476,6 +481,8 @@ graph LR
 | `slack-archive-tools`                      | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-fortress`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`<br>`ts-type-forge`&nbsp;`workspace:*`                                                                                                                                                                                                  |
 | `split-view-extension`                     | dep  | `split-view-link`&nbsp;`workspace:*`<br>`synstate`&nbsp;`workspace:*`<br>`synstate-dom`&nbsp;`workspace:*`<br>`ts-data-forge`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                          |
 | `split-view-extension`                     | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`ts-type-forge`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                                        |
+| `split-view-extension-v2`                  | dep  | `split-view-link`&nbsp;`workspace:*`<br>`synstate`&nbsp;`workspace:*`<br>`synstate-dom`&nbsp;`workspace:*`<br>`ts-data-forge`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                          |
+| `split-view-extension-v2`                  | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`ts-type-forge`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                                        |
 | `split-view-link`                          | dep  | `ts-data-forge`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                                                                                                                                        |
 | `split-view-link`                          | dev  | `eslint-config-typed`&nbsp;`workspace:*`<br>`eslint-plugin-ts-data-forge`&nbsp;`workspace:*`<br>`eslint-plugin-ts-type-forge`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                          |
 | `@synstate/docs`                           | dep  | `synstate`&nbsp;`workspace:*`<br>`synstate-dom`&nbsp;`workspace:*`<br>`synstate-preact-hooks`&nbsp;`workspace:*`<br>`synstate-preact-signals`&nbsp;`workspace:*`<br>`synstate-react-hooks`&nbsp;`workspace:*`                                                                                                                                                                                                                             |
@@ -603,7 +610,7 @@ graph LR
 | `strict-ts-lib-v7.0-source`                | dev  | `strict-ts-lib-scripts-common`&nbsp;`workspace:*`<br>`ts-type-forge`&nbsp;`workspace:*`                                                                                                                                                                                                                                                                                                                                                   |
 | `strict-ts-lib-v7.0`                       | dep  | `ts-type-forge`&nbsp;`^9.0.0`                                                                                                                                                                                                                                                                                                                                                                                                             |
 
-94 / 106 のパッケージが少なくとも 1 つの内部依存を `workspace:` で解決している。
+95 / 107 のパッケージが少なくとも 1 つの内部依存を `workspace:` で解決している。
 
 ### root（`package.json`、非公開）
 

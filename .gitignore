@@ -225,6 +225,7 @@ rollup.config-*.mjs
 # apps/split-view-extension: dist/ without its source maps and without the
 # manifest `key`, which the store refuses.
 apps/split-view-extension/pack/
+apps/split-view-extension-v2/pack/
 
 # The same, from apps/github-view-defaults-extension.
 apps/github-view-defaults-extension/pack/
