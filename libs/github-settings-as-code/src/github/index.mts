@@ -1,5 +1,6 @@
 export * from './actions-settings/index.mjs';
 export * from './clear-json-files.mjs';
+export * from './collect-pages.mjs';
 export * from './constants.mjs';
 export * from './environments/index.mjs';
 export * from './list-json-files.mjs';

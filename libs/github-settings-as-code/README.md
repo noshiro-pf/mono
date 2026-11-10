@@ -50,9 +50,12 @@ there is one copy of each resource, not a declaration and a mirror of it.
 what was actually applied, so a value GitHub canonicalized or refused shows up
 as a diff; `variables` writes nothing back. For rulesets and environments, only
 the ones a declaration file names are rewritten (a ruleset by its id, or by the
-id GitHub gave it when created; an environment by name). One that exists only on
-GitHub stays undeclared, so the drift check keeps reporting it; importing it is
-an explicit `backup`.
+id GitHub gave it when created; an environment by its name, compared without
+case as GitHub compares it), each in the file it was read from, so renaming one
+does not leave a second file. A ruleset is written back as soon as it is sent,
+so the id of one just created reaches its file even if a later step fails. One
+that exists only on GitHub stays undeclared, so the drift check keeps reporting
+it; importing it is an explicit `backup`.
 
 ## Resolving the target repository
 

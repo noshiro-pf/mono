@@ -28,3 +28,10 @@ export const listJsonFilesIn = async (
     .filter((entry) => entry.isFile() && entry.name.endsWith('.json'))
     .map((entry) => path.resolve(dir, entry.name));
 };
+
+/**
+ * 読んだ宣言。値と、それを読んだファイル。 apply が反映後の値を書き戻すのは
+ * このファイルで、宣言の名前から作り直したパスではない。名前を変えた宣言を
+ * 名前から書き戻すと、元のファイル（同じ id を持つ）が残って二つになる。
+ */
+export type Declaration<T> = Readonly<{ file: string; value: T }>;
