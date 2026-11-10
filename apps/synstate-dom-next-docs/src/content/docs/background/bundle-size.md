@@ -18,7 +18,7 @@ Every bundle is built by the same Vite (Rolldown, with Oxc's minifier), with the
 
 <!-- bundle-size:environment -->
 
-Bundled by Vite 8.3.5. Versions: `synstate-dom 0.8.0`, `synstate 7.0.2`, `synstate-dom-next 0.0.0`, `synstate-next 0.0.0`, `solid-js 1.9.17`.
+Bundled by Vite 8.3.5. Versions: `synstate-dom 0.9.0`, `synstate 8.0.0`, `synstate-dom-next 0.0.0`, `synstate-next 0.0.0`, `solid-js 1.9.17`.
 
 <!-- /bundle-size -->
 
@@ -32,10 +32,10 @@ gzip at level 9. One kB is 1,000 bytes; smaller is better.
 | :--------------------------- | -----------: | ----------------: | ----: |
 | everything exported          |         12.8 |              11.9 |  14.7 |
 | counter                      |          6.7 |               6.6 |   4.0 |
-| js-framework-benchmark table |          8.8 |               9.1 |   5.1 |
+| js-framework-benchmark table |          8.8 |               9.2 |   5.1 |
 | loan scenario                |          7.6 |               7.3 |   4.2 |
 | schedule scenario            |          7.6 |               7.3 |   4.2 |
-| zoom scenario                |          7.4 |               7.1 |   4.0 |
+| zoom scenario                |          7.3 |               7.1 |   4.0 |
 
 <!-- /bundle-size -->
 
@@ -47,12 +47,12 @@ Brotli at quality 11.
 
 | application (kB)             | synstate-dom | synstate-dom-next | Solid |
 | :--------------------------- | -----------: | ----------------: | ----: |
-| everything exported          |         11.5 |              10.8 |  13.4 |
+| everything exported          |         11.5 |              10.7 |  13.4 |
 | counter                      |          6.1 |               6.0 |   3.6 |
 | js-framework-benchmark table |          8.0 |               8.3 |   4.7 |
 | loan scenario                |          6.9 |               6.6 |   3.8 |
 | schedule scenario            |          6.9 |               6.7 |   3.8 |
-| zoom scenario                |          6.7 |               6.4 |   3.6 |
+| zoom scenario                |          6.7 |               6.5 |   3.6 |
 
 <!-- /bundle-size -->
 
@@ -62,7 +62,7 @@ The figures quoted here are the gzipped ones.
 
 - **The counter row is the baseline**: <!-- bundle-size:counter-next -->6.6<!-- /bundle-size --> kB for synstate-dom-next, <!-- bundle-size:counter-dom -->6.7<!-- /bundle-size --> kB for synstate-dom and <!-- bundle-size:counter-solid -->4.0<!-- /bundle-size --> kB for Solid. Even a counter carries synstate-next's propagation core (owners, the per-depth queue, and the loop that recomputes the values) and the JSX runtime that turns a description into nodes and bindings. Solid compiles JSX into templates and calls into a small runtime, so a counter uses only a little of `solid-js/web`.
 - **The rebuild is not a size project.** It replaced closures and subscriber records by classes whose methods are shared on a prototype, and dropped completion and reference counting, which takes code away; it also added the checks that let a branch component drop a branch before it recomputes, keyed rows that keep a state each, and `selector`, which bring code in. In the loan scenario, synstate-dom-next is <!-- bundle-size:loan-next -->7.3<!-- /bundle-size --> kB against synstate-dom's <!-- bundle-size:loan-dom -->7.6<!-- /bundle-size --> kB.
-- **The table** is <!-- bundle-size:table-next -->9.1<!-- /bundle-size --> kB, against synstate-dom's <!-- bundle-size:table-dom -->8.8<!-- /bundle-size --> kB and Solid's <!-- bundle-size:table-solid -->5.1<!-- /bundle-size --> kB. It is the one application that uses `For` with keys and `selector`, which only it pulls in.
+- **The table** is <!-- bundle-size:table-next -->9.2<!-- /bundle-size --> kB, against synstate-dom's <!-- bundle-size:table-dom -->8.8<!-- /bundle-size --> kB and Solid's <!-- bundle-size:table-solid -->5.1<!-- /bundle-size --> kB. It is the one application that uses `For` with keys and `selector`, which only it pulls in.
 - **Everything exported** is <!-- bundle-size:everything-next -->11.9<!-- /bundle-size --> kB, against synstate-dom's <!-- bundle-size:everything-dom -->12.8<!-- /bundle-size --> kB and Solid's <!-- bundle-size:everything-solid -->14.7<!-- /bundle-size --> kB. synstate-next exports a full set of operators, as synstate does, but an application keeps only the ones it imports. The scenarios' models use ts-data-forge in every column, and synstate-dom-next shares those helpers with them.
 
 ## Running it

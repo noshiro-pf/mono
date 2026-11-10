@@ -94,19 +94,19 @@ Each scenario also times building the screen, which builds the whole graph.
 
 <!-- benchmark:scenario-medians -->
 
-| operation (median ms)                   | synstate-dom | synstate-dom (skipIfNoChange) | Solid | Preact + Signals | Preact | React | VanJS |
-| :-------------------------------------- | -----------: | ----------------------------: | ----: | ---------------: | -----: | ----: | ----: |
-| loan: build the table                   |         2.71 |                          5.72 |  1.57 |             1.76 |   0.99 |  0.97 |  2.26 |
-| loan: change the interest rate          |         0.96 |                          1.32 |  1.10 |             0.87 |   0.74 |  0.69 |  2.92 |
-| loan: prepay in month 181               |         0.53 |                          0.69 |  0.61 |             0.45 |   0.46 |  0.42 | wrong |
-| loan: prepay in month 349               |         0.13 |                          0.13 |  0.14 |             0.14 |   0.25 |  0.23 |  0.65 |
-| schedule: build the schedule            |        11.07 |                         15.59 |  3.51 |             3.94 |   1.91 |  1.56 |  9.69 |
-| schedule: lengthen the first task       |         3.30 |                          3.97 |  4.00 |             1.82 |   1.11 |  1.07 | wrong |
-| schedule: lengthen a task in the middle |         0.06 |                          0.07 |  0.84 |             0.31 |   0.36 |  0.33 |  0.65 |
-| schedule: lengthen a task near the end  |         0.20 |                          0.22 |  0.85 |             0.47 |   0.59 |  0.54 |  0.40 |
-| zoom: build the map                     |         7.62 |                         14.69 |  3.39 |             4.34 |   1.36 |  1.32 | 10.85 |
-| zoom: zoom within a level               |         0.08 |                          0.07 |  0.69 |             0.48 |   0.37 |  0.31 |  0.09 |
-| zoom: zoom to the next level            |         2.40 |                          2.91 |  3.26 |             1.92 |   1.12 |  1.12 |  5.94 |
+| operation (median ms)                   | synstate-dom | Solid | Preact + Signals | Preact | React | VanJS |
+| :-------------------------------------- | -----------: | ----: | ---------------: | -----: | ----: | ----: |
+| loan: build the table                   |         2.71 |  1.57 |             1.76 |   0.99 |  0.97 |  2.26 |
+| loan: change the interest rate          |         0.96 |  1.10 |             0.87 |   0.74 |  0.69 |  2.92 |
+| loan: prepay in month 181               |         0.53 |  0.61 |             0.45 |   0.46 |  0.42 | wrong |
+| loan: prepay in month 349               |         0.13 |  0.14 |             0.14 |   0.25 |  0.23 |  0.65 |
+| schedule: build the schedule            |        11.07 |  3.51 |             3.94 |   1.91 |  1.56 |  9.69 |
+| schedule: lengthen the first task       |         3.30 |  4.00 |             1.82 |   1.11 |  1.07 | wrong |
+| schedule: lengthen a task in the middle |         0.06 |  0.84 |             0.31 |   0.36 |  0.33 |  0.65 |
+| schedule: lengthen a task near the end  |         0.20 |  0.85 |             0.47 |   0.59 |  0.54 |  0.40 |
+| zoom: build the map                     |         7.62 |  3.39 |             4.34 |   1.36 |  1.32 | 10.85 |
+| zoom: zoom within a level               |         0.08 |  0.69 |             0.48 |   0.37 |  0.31 |  0.09 |
+| zoom: zoom to the next level            |         2.40 |  3.26 |             1.92 |   1.12 |  1.12 |  5.94 |
 
 <!-- /benchmark -->
 
@@ -114,19 +114,19 @@ Each scenario also times building the screen, which builds the whole graph.
 
 <!-- benchmark:scenario-ratios -->
 
-| operation                               | synstate-dom (skipIfNoChange) |  Solid | Preact + Signals | Preact | React |  VanJS |
-| :-------------------------------------- | ----------------------------: | -----: | ---------------: | -----: | ----: | -----: |
-| loan: build the table                   |                         2.11× |  0.58× |            0.65× |  0.37× | 0.36× |  0.83× |
-| loan: change the interest rate          |                         1.38× |  1.15× |            0.91× |  0.77× | 0.72× |  3.04× |
-| loan: prepay in month 181               |                         1.30× |  1.15× |            0.85× |  0.87× | 0.79× |      – |
-| loan: prepay in month 349               |                         1.00× |  1.08× |            1.08× |  1.92× | 1.77× |  5.00× |
-| schedule: build the schedule            |                         1.41× |  0.32× |            0.36× |  0.17× | 0.14× |  0.88× |
-| schedule: lengthen the first task       |                         1.20× |  1.21× |            0.55× |  0.34× | 0.32× |      – |
-| schedule: lengthen a task in the middle |                         1.17× | 14.00× |            5.17× |  6.00× | 5.50× | 10.83× |
-| schedule: lengthen a task near the end  |                         1.10× |  4.25× |            2.35× |  2.95× | 2.70× |  2.00× |
-| zoom: build the map                     |                         1.93× |  0.44× |            0.57× |  0.18× | 0.17× |  1.42× |
-| zoom: zoom within a level               |                         0.88× |  8.63× |            6.00× |  4.63× | 3.88× |  1.13× |
-| zoom: zoom to the next level            |                         1.21× |  1.36× |            0.80× |  0.47× | 0.47× |  2.48× |
+| operation                               |  Solid | Preact + Signals | Preact | React |  VanJS |
+| :-------------------------------------- | -----: | ---------------: | -----: | ----: | -----: |
+| loan: build the table                   |  0.58× |            0.65× |  0.37× | 0.36× |  0.83× |
+| loan: change the interest rate          |  1.15× |            0.91× |  0.77× | 0.72× |  3.04× |
+| loan: prepay in month 181               |  1.15× |            0.85× |  0.87× | 0.79× |      – |
+| loan: prepay in month 349               |  1.08× |            1.08× |  1.92× | 1.77× |  5.00× |
+| schedule: build the schedule            |  0.32× |            0.36× |  0.17× | 0.14× |  0.88× |
+| schedule: lengthen the first task       |  1.21× |            0.55× |  0.34× | 0.32× |      – |
+| schedule: lengthen a task in the middle | 14.00× |            5.17× |  6.00× | 5.50× | 10.83× |
+| schedule: lengthen a task near the end  |  4.25× |            2.35× |  2.95× | 2.70× |  2.00× |
+| zoom: build the map                     |  0.44× |            0.57× |  0.18× | 0.17× |  1.42× |
+| zoom: zoom within a level               |  8.63× |            6.00× |  4.63× | 3.88× |  1.13× |
+| zoom: zoom to the next level            |  1.36× |            0.80× |  0.47× | 0.47× |  2.48× |
 
 <!-- /benchmark -->
 
@@ -134,7 +134,7 @@ Each scenario also times building the screen, which builds the whole graph.
 
 - **Correctness comes first.** After each operation the harness compares the rendered cells with the figures a plain loop computes, and a library that rendered others is marked _wrong_ instead of timed. VanJS recomputes derived states in rounds, each rerunning the derivations that read a state the last round changed, and stops after 100 rounds; where a change has to travel further down the chain than that, it leaves stale figures on the screen. synstate-dom, Solid and Preact + Signals compute each figure once per change, after every figure it depends on.
 - **React and Preact have no graph.** They keep the inputs in one state and compute every figure in a loop when they render, so a change costs one pass over the whole calculation, whatever it reaches. At this size that pass is cheap, and they are compared here as the baseline a graph has to beat.
-- **Stopping at a figure that came out the same.** Solid and Preact + Signals do not pass a value on when it equals the last one, and neither does synstate's `map`: each figure is `combine` + `map`, so lengthening a task in the middle, or zooming within a level, stops at the figures that came out the same. The second synstate-dom column, with a [`skipIfNoChange`](https://noshiro-pf.github.io/mono/synstate/reference/skip-if-no-change/) after every figure, dates from before `map` stopped there; it now stops at the same place and only adds a third node per figure, and so a slower build.
+- **Stopping at a figure that came out the same.** Solid and Preact + Signals do not pass a value on when it equals the last one, and neither does synstate's `map`: a figure computed from others is a `map`, over a `combine` where it has several inputs, so lengthening a task in the middle, or zooming within a level, stops at the figures that came out the same.
 - **What a stop is worth depends on how a library notices a change.** A write in Solid and Preact + Signals first marks everything downstream as possibly stale, and the figures are then checked against their sources, so a change that stops at the level still visits all 10,000 labels. synstate visits only the children of a node that passed a value on, so a change within a level costs the same whatever the size of the map below it. VanJS stops there too, because a state assigned the value it already has does not propagate. React and Preact keep the labels in a `useMemo` that depends on the level, and render the 51 rows again.
 
 A change here takes well under a millisecond. The scenarios therefore wait for the next task through a `MessageChannel` rather than a `setTimeout`, which the browser holds back to 4 ms, and one sample is the mean of 20 changes, alternating the operation and its reverse.

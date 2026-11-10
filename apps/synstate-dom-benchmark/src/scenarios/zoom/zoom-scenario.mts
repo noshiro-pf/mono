@@ -4,7 +4,7 @@ import { preactSignalsZoom } from './preact-signals.js';
 import { preactZoom } from './preact.js';
 import { reactZoom } from './react.js';
 import { solidZoom } from './solid.js';
-import { synstateDomZoom, synstateDomZoomChangedOnly } from './synstate-dom.js';
+import { synstateDomZoom } from './synstate-dom.js';
 import { vanjsZoom } from './vanjs.mjs';
 
 /** Setting the zoom to `zoom`, from the initial one. */
@@ -39,7 +39,6 @@ export const zoomScenario: Scenario<ZoomApp> = {
   ],
   frameworks: [
     synstateDomZoom,
-    synstateDomZoomChangedOnly,
     solidZoom,
     preactSignalsZoom,
     preactZoom,

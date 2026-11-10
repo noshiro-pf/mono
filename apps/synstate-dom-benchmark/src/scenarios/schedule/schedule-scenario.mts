@@ -9,10 +9,7 @@ import { preactSignalsSchedule } from './preact-signals.js';
 import { preactSchedule } from './preact.js';
 import { reactSchedule } from './react.js';
 import { solidSchedule } from './solid.js';
-import {
-  synstateDomSchedule,
-  synstateDomScheduleChangedOnly,
-} from './synstate-dom.js';
+import { synstateDomSchedule } from './synstate-dom.js';
 import { vanjsSchedule } from './vanjs.mjs';
 
 /** Lengthening `task` by `days`, from the initial durations. */
@@ -52,7 +49,6 @@ export const scheduleScenario: Scenario<ScheduleApp> = {
   ],
   frameworks: [
     synstateDomSchedule,
-    synstateDomScheduleChangedOnly,
     solidSchedule,
     preactSignalsSchedule,
     preactSchedule,

@@ -35,7 +35,7 @@ gzip at level 9. One kB is 1,000 bytes; smaller is better.
 | js-framework-benchmark table |          8.8 |   5.1 |              8.7 |    8.3 |  68.3 |   2.0 |
 | loan scenario                |          7.6 |   4.2 |              8.5 |    6.1 |  68.1 |   1.8 |
 | schedule scenario            |          7.6 |   4.2 |              8.5 |    6.1 |  68.2 |   1.8 |
-| zoom scenario                |          7.4 |   4.0 |              8.3 |    5.9 |  67.9 |   1.5 |
+| zoom scenario                |          7.3 |   4.0 |              8.3 |    5.9 |  67.9 |   1.5 |
 
 <!-- /bundle-size -->
 

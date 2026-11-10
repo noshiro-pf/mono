@@ -13,7 +13,7 @@ Each figure is the size of one application bundled by Vite 8.3.5 with the produc
 | js-framework-benchmark table |          8.8 |   5.1 |              8.7 |    8.3 |  68.3 |   2.0 |
 | loan scenario                |          7.6 |   4.2 |              8.5 |    6.1 |  68.1 |   1.8 |
 | schedule scenario            |          7.6 |   4.2 |              8.5 |    6.1 |  68.2 |   1.8 |
-| zoom scenario                |          7.4 |   4.0 |              8.3 |    5.9 |  67.9 |   1.5 |
+| zoom scenario                |          7.3 |   4.0 |              8.3 |    5.9 |  67.9 |   1.5 |
 
 ## Minified and Brotli-compressed
 
@@ -35,4 +35,4 @@ Each figure is the size of one application bundled by Vite 8.3.5 with the produc
 | js-framework-benchmark table |         23.2 |  12.5 |             22.1 |   20.6 | 220.7 |   4.1 |
 | loan scenario                |         20.0 |  10.7 |             21.8 |   14.7 | 220.5 |   3.8 |
 | schedule scenario            |         20.2 |  10.8 |             21.9 |   14.9 | 220.6 |   3.9 |
-| zoom scenario                |         19.4 |  10.0 |             21.1 |   14.1 | 219.9 |   3.1 |
+| zoom scenario                |         19.3 |  10.0 |             21.1 |   14.1 | 219.9 |   3.1 |

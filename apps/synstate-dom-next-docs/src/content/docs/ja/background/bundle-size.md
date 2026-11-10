@@ -18,7 +18,7 @@ description: 同じアプリケーションを synstate-dom・synstate-dom-next�
 
 <!-- bundle-size:environment -->
 
-Vite 8.3.5 でバンドルしました。バージョンは `synstate-dom 0.8.0`, `synstate 7.0.2`, `synstate-dom-next 0.0.0`, `synstate-next 0.0.0`, `solid-js 1.9.17` です。
+Vite 8.3.5 でバンドルしました。バージョンは `synstate-dom 0.9.0`, `synstate 8.0.0`, `synstate-dom-next 0.0.0`, `synstate-next 0.0.0`, `solid-js 1.9.17` です。
 
 <!-- /bundle-size -->
 
@@ -32,10 +32,10 @@ gzip のレベルは 9 です。1 kB は 1,000 バイトで、小さいほど良
 | :-------------------------- | -----------: | ----------------: | ----: |
 | すべての export             |         12.8 |              11.9 |  14.7 |
 | カウンター                  |          6.7 |               6.6 |   4.0 |
-| js-framework-benchmark の表 |          8.8 |               9.1 |   5.1 |
+| js-framework-benchmark の表 |          8.8 |               9.2 |   5.1 |
 | ローンのシナリオ            |          7.6 |               7.3 |   4.2 |
 | 工程表のシナリオ            |          7.6 |               7.3 |   4.2 |
-| ズームのシナリオ            |          7.4 |               7.1 |   4.0 |
+| ズームのシナリオ            |          7.3 |               7.1 |   4.0 |
 
 <!-- /bundle-size -->
 
@@ -47,12 +47,12 @@ Brotli の品質は 11 です。
 
 | アプリケーション（kB）      | synstate-dom | synstate-dom-next | Solid |
 | :-------------------------- | -----------: | ----------------: | ----: |
-| すべての export             |         11.5 |              10.8 |  13.4 |
+| すべての export             |         11.5 |              10.7 |  13.4 |
 | カウンター                  |          6.1 |               6.0 |   3.6 |
 | js-framework-benchmark の表 |          8.0 |               8.3 |   4.7 |
 | ローンのシナリオ            |          6.9 |               6.6 |   3.8 |
 | 工程表のシナリオ            |          6.9 |               6.7 |   3.8 |
-| ズームのシナリオ            |          6.7 |               6.4 |   3.6 |
+| ズームのシナリオ            |          6.7 |               6.5 |   3.6 |
 
 <!-- /bundle-size -->
 
@@ -62,7 +62,7 @@ Brotli の品質は 11 です。
 
 - **カウンターの行が基準です**。synstate-dom-next は <!-- bundle-size:counter-next -->6.6<!-- /bundle-size --> kB、synstate-dom は <!-- bundle-size:counter-dom -->6.7<!-- /bundle-size --> kB、Solid は <!-- bundle-size:counter-solid -->4.0<!-- /bundle-size --> kB です。カウンターでも、synstate-next の伝播の中核（owner、深さごとのキュー、値を計算し直すループ）と、description をノードと束縛に変える JSX ランタイムが入ります。Solid は JSX をテンプレートにコンパイルして小さなランタイムを呼び出すので、カウンターでは `solid-js/web` のごく一部しか使いません。
 - **作り直しはサイズのためのものではありません。** クロージャと購読者のレコードを、メソッドをプロトタイプで共有するクラスに置き換え、完了と参照カウントをなくしたことでコードは減りました。一方で、分岐のコンポーネントが分岐を計算し直す前に外すためのチェック、行ごとに state を持つキー付きの行、`selector` を加えたことでコードは増えました。ローンのシナリオでは synstate-dom の <!-- bundle-size:loan-dom -->7.6<!-- /bundle-size --> kB に対して <!-- bundle-size:loan-next -->7.3<!-- /bundle-size --> kB です。
-- **表**は <!-- bundle-size:table-next -->9.1<!-- /bundle-size --> kB で、synstate-dom は <!-- bundle-size:table-dom -->8.8<!-- /bundle-size --> kB、Solid は <!-- bundle-size:table-solid -->5.1<!-- /bundle-size --> kB です。キー付きの `For` と `selector` を使うのはこのアプリケーションだけなので、それらを取り込むのもこれだけです。
+- **表**は <!-- bundle-size:table-next -->9.2<!-- /bundle-size --> kB で、synstate-dom は <!-- bundle-size:table-dom -->8.8<!-- /bundle-size --> kB、Solid は <!-- bundle-size:table-solid -->5.1<!-- /bundle-size --> kB です。キー付きの `For` と `selector` を使うのはこのアプリケーションだけなので、それらを取り込むのもこれだけです。
 - **すべての export** は <!-- bundle-size:everything-next -->11.9<!-- /bundle-size --> kB で、synstate-dom は <!-- bundle-size:everything-dom -->12.8<!-- /bundle-size --> kB、Solid は <!-- bundle-size:everything-solid -->14.7<!-- /bundle-size --> kB です。synstate-next は synstate と同じく一通りのオペレーターを export しますが、アプリケーションに残るのは import したものだけです。シナリオのモデルはどの列でも ts-data-forge を使っており、synstate-dom-next はそのヘルパーをモデルと共有します。
 
 ## 実行のしかた

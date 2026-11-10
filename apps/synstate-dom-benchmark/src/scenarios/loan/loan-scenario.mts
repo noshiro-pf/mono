@@ -4,7 +4,7 @@ import { preactSignalsLoan } from './preact-signals.js';
 import { preactLoan } from './preact.js';
 import { reactLoan } from './react.js';
 import { solidLoan } from './solid.js';
-import { synstateDomLoan, synstateDomLoanChangedOnly } from './synstate-dom.js';
+import { synstateDomLoan } from './synstate-dom.js';
 import { vanjsLoan } from './vanjs.mjs';
 
 const changedRate = 1.6;
@@ -53,7 +53,6 @@ export const loanScenario: Scenario<LoanApp> = {
   ],
   frameworks: [
     synstateDomLoan,
-    synstateDomLoanChangedOnly,
     solidLoan,
     preactSignalsLoan,
     preactLoan,
