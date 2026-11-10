@@ -1,4 +1,5 @@
 import type { FixedLengthTuple, ReadonlyRecord } from 'ts-type-forge';
+import type { Href } from '../href.mjs';
 import type { RouteDefinitions, RouteLocation } from '../route-types.mjs';
 
 /** Where the compiled tree is kept on the object `defineRoutes` returns. */
@@ -32,6 +33,12 @@ export const routeNodeKey: unique symbol = Symbol('synstate-router/route-node');
 export type RouteNodeInternals = Readonly<{
   /** The compiled tree the node belongs to, compared by identity. */
   tree: RouteTree<RouteDefinitions>;
+  /**
+   * The `Href` of the node's own page with `params` (its own and its
+   * ancestors'), or `undefined` for a `page: false` node and for one whose URL
+   * with these params resolves to another page.
+   */
+  pageHref: (params: ReadonlyRecord<string, unknown>) => Href | undefined;
   /** The path parameters of the node, its ancestors' included. */
   paramNames: readonly string[];
   /** The search keys of the node, its ancestors' included. */

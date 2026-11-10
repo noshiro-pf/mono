@@ -27,10 +27,12 @@ import {
   type TrailingSlash,
 } from './internal/index.mjs';
 import { matchAt } from './match-at.mjs';
+import { matchedBranch } from './matched-branch.mjs';
 import type {
   AnyRouteNode,
   AnyRoutes,
   AnySearchCodec,
+  RouteBranch,
   RouteMatch,
   RouteNodeValues,
   RouteSearch,
@@ -108,6 +110,13 @@ export type Router<R extends AnyRoutes> = Readonly<{
 
   /** The URL itself, for query parameters no route declares. */
   location: InitializedObservable<RouterLocation>;
+
+  /**
+   * The nodes from the top of the tree down to the page, with their `meta` and
+   * `Href`s ({@link matchedBranch}), for a breadcrumb or a title. It follows
+   * `match`, and keeps its references while the branch stays the same.
+   */
+  branch: InitializedObservable<RouteBranch<R>>;
 
   /**
    * `Some` with the node's params and search while the page is the node or one
@@ -357,6 +366,24 @@ export const createRouter = <R extends AnyRoutes>(
   );
 
   const location = untracked(() => snapshot$.pipe(map((s) => s.location)));
+
+  // Made when first read: a router that never reads it does no work for it on
+  // each navigation.
+  const mut_branch: {
+    observable: InitializedObservable<RouteBranch<R>> | undefined;
+  } = {
+    observable: undefined,
+  };
+
+  const branchOf = (): InitializedObservable<RouteBranch<R>> => {
+    mut_branch.observable ??= untracked(() =>
+      match
+        .pipe(map((m) => matchedBranch(routes, m)))
+        .pipe(keepEqualParts<RouteBranch<R>>()),
+    );
+
+    return mut_branch.observable;
+  };
 
   // Scrolling
 
@@ -741,6 +768,9 @@ export const createRouter = <R extends AnyRoutes>(
     routes,
     match,
     location,
+    get branch() {
+      return branchOf();
+    },
     at,
     isActive,
     push: (href) => {

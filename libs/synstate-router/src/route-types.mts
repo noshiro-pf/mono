@@ -50,6 +50,12 @@ export type RouteDefinition = Readonly<{
   search?: ReadonlyRecord<string, AnySearchCodec>;
   /** `false` for a node that is not a page of its own, such as a layout. */
   page?: false;
+  /**
+   * Data of the node's own, typed as written: a breadcrumb's label, a page's
+   * title. The node exposes it as `meta`, and the matched branch lists it
+   * (`matchedBranch`, `router.branch`).
+   */
+  meta?: unknown;
   children?: RouteDefinitions;
 }>;
 
@@ -62,6 +68,7 @@ export type ReservedRouteKey =
   | 'id'
   | 'match'
   | 'matchExact'
+  | 'meta'
   | 'page'
   | 'params'
   | 'pattern'
@@ -184,6 +191,8 @@ type JoinId<Parent extends string, K extends string> = Parent extends ''
 
 type DisplayPattern<Path extends string> = Path extends '' ? '/' : Path;
 
+type MetaOf<D> = D extends Readonly<{ meta: infer M }> ? M : undefined;
+
 /** The path parameters of a node, its ancestors' included. */
 export type RouteParams<ParamCodecs> = Readonly<{
   [K in keyof ParamCodecs]: ParamValue<ParamCodecs[K]>;
@@ -244,6 +253,8 @@ export type RouteNode<
   id: Id;
   /** For display and debugging; never a key for matching or branching. */
   pattern: DisplayPattern<Path>;
+  /** The node's own `meta`, as written; `undefined` when it has none. */
+  meta: MetaOf<D>;
   /** The search codecs of this node, its ancestors' included. */
   search: Flatten<SearchCodecs>;
   /**
@@ -361,6 +372,35 @@ export type RouteMatch<R extends AnyRoutes> =
       EmptyRecord
     >
   | NotFoundMatch;
+
+// The matched branch
+
+type BranchEntries<Ds, ParentId extends string> = {
+  [K in keyof Ds & string]:
+    | Readonly<{
+        id: JoinId<ParentId, K>;
+        meta: MetaOf<Ds[K]>;
+        href: Ds[K] extends Readonly<{ page: false }>
+          ? undefined
+          : Href | undefined;
+      }>
+    | (Ds[K] extends Readonly<{ children: infer C }>
+        ? BranchEntries<C, JoinId<ParentId, K>>
+        : never);
+}[keyof Ds & string];
+
+/**
+ * A node of the matched branch: its id, its `meta`, and the `Href` of its own
+ * page with the match's params, or `undefined` for a `page: false` node and for
+ * one whose own URL is another page (a branch the tree backtracked into).
+ */
+export type RouteBranchEntry<R extends AnyRoutes> = BranchEntries<
+  R[typeof routeTreeKey]['definition'],
+  ''
+>;
+
+/** The nodes from the top of the tree down to the matched page. */
+export type RouteBranch<R extends AnyRoutes> = readonly RouteBranchEntry<R>[];
 
 /** The ids of the pages in a route tree. */
 export type RouteId<R extends AnyRoutes> = NonNullable<RouteMatch<R>['route']>;

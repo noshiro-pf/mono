@@ -156,6 +156,40 @@ assert.strictEqual(
 assert.strictEqual(langOf(matchRoutes(routes, { pathname: '/about/' })), 'en');
 ```
 
+## Breadcrumbs
+
+A node can carry `meta`, data of its own typed as written. `router.branch` (or `matchedBranch(routes, match)`) lists the matched nodes from the top down to the page, each with its `meta` and the `Href` of its own page with the match's params, so a breadcrumb needs no lookup table. A `page: false` node has no `Href`.
+
+```ts
+const routes = defineRoutes({
+    products: {
+        meta: { label: 'Products' },
+        children: {
+            item: {
+                params: { productId: param.int },
+                meta: { label: 'Product' },
+                children: { reviews: { meta: { label: 'Reviews' } } },
+            },
+        },
+    },
+});
+
+const router = createRouter(routes, {
+    browser: createMemoryBrowser('https://example.com/products/42/reviews/'),
+});
+
+// Root first, each with its own meta and the Href of its page.
+const crumbs = router.branch
+    .getSnapshot()
+    .value.map(({ meta, href }) => `${meta.label} ${href ?? ''}`);
+
+assert.deepStrictEqual(crumbs, [
+    'Products /products/',
+    'Product /products/42/',
+    'Reviews /products/42/reviews/',
+]);
+```
+
 ## Installation
 
 ```sh

@@ -152,6 +152,7 @@ type Page = Readonly<{ id: string; search: SearchEntries }>;
 type CompiledNode = Context &
   Readonly<{
     key: string;
+    meta: unknown;
     segment: Segment;
     page: Page | undefined;
     children: readonly CompiledNode[];
@@ -191,6 +192,7 @@ const reservedKeys: ReadonlySet<string> = new Set<ReservedRouteKey>([
   'id',
   'match',
   'matchExact',
+  'meta',
   'page',
   'params',
   'pattern',
@@ -447,7 +449,15 @@ const compileNode = (
       ? emptyLevel
       : buildLevel(page, children, patternOf(context.segments));
 
-  return { ...context, key, segment, page, children, level };
+  return {
+    ...context,
+    key,
+    meta: definition.meta,
+    segment,
+    page,
+    children,
+    level,
+  };
 };
 
 const compileChildren = (
@@ -829,6 +839,21 @@ const buildNodeApi = (
 
   const internals: RouteNodeInternals = {
     tree,
+    pageHref: (params) => {
+      if (node.page === undefined) {
+        return undefined;
+      }
+
+      const own = pick(params, paramNames);
+
+      // The params were read by these codecs, so they write back; a codec whose
+      // `encode` does not read back throws here as it does in `href`.
+      const segments = buildSegments(node, own);
+
+      return resolvePage(segments.map(({ raw }) => raw)) === node.id
+        ? makeHref(node, resolvePage, own, {})
+        : undefined;
+    },
     paramNames,
     searchKeys,
     encodeSearch: (where, values) => encodeSearch(where, node.search, values),
@@ -838,6 +863,7 @@ const buildNodeApi = (
     [routeNodeKey]: internals,
     id: node.id,
     pattern: patternOf(node.segments),
+    meta: node.meta,
     search: Object.fromEntries(node.search),
     match: (location: RouteLocation) =>
       valuesIf(
