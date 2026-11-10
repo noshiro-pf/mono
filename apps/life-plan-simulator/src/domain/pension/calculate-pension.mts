@@ -14,19 +14,25 @@ import {
   residentTaxBasicDeduction,
   residentTaxPerCapita,
   residentTaxRate,
-  welfarePensionAnnualIncomeCap,
   welfarePensionCoefficient,
   welfarePensionCountFromAge,
+  welfarePensionMaxStandardRemuneration,
 } from '../../data/index.mjs';
 import type { ResolvedSalaryEntry } from '../salary/index.mjs';
-import { progressiveIncomeTax, publicPensionDeduction } from '../tax/index.mjs';
+import {
+  progressiveIncomeTax,
+  publicPensionDeduction,
+  welfarePensionStandardBonus,
+} from '../tax/index.mjs';
 import { ageAt, integerRange, type MonthIndex } from '../year-month/index.mjs';
 
 /**
  * 年金の受給額と手取りを受給開始年齢ごとに求める（`年金受給額` シート）。
  *
  * - 老齢厚生年金（報酬比例部分）は 平均年収 × 乗率 × 加入年数。年収は
- *   年収の推移の表から年齢ごとに引き、上限で頭打ちにする。
+ *   年収の推移の表から年齢ごとに引き、保険料と同じ額を数える: 月給を標準報酬
+ *   月額の上限（65 万円）で頭打ちにして 12 倍し、標準賞与額（1 回 150 万円が
+ *   上限）を足す。
  * - 受給開始年齢ごとに繰上げ・繰下げの増減率を掛け、公的年金等控除・
  *   社会保険料（概算）・所得税・住民税を引いて手取りにする。
  * - 損益分岐: 各年齢までの手取りの累計（老後の運用利回りで複利運用した
@@ -48,12 +54,7 @@ export const calculatePension = (params: PensionParams): PensionResult => {
   );
 
   const incomes = countedAges
-    .map((age) =>
-      Math.min(
-        welfarePensionAnnualIncomeCap,
-        annualIncomeAtAge(salaryHistory, birth, age),
-      ),
-    )
+    .map((age) => remunerationAtAge(salaryHistory, birth, age))
     .filter((income) => income > 0);
 
   const enrolledYears = incomes.length;
@@ -117,7 +118,7 @@ export type PensionParams = Readonly<{
 export type PensionResult = Readonly<{
   /** 厚生年金の加入年数 */
   enrolledYears: number;
-  /** 平均年収（円） */
+  /** 報酬比例部分の元になる平均年収（円）: 保険料のかかる月給と標準賞与額 */
   averageAnnualIncome: number;
   /** 老齢厚生年金（報酬比例部分）（円 / 年） */
   welfarePension: number;
@@ -144,23 +145,31 @@ export type PensionByStartAge = Readonly<{
   lastAgeBest: number | undefined;
 }>;
 
-/** 満 `age` 歳の時点で適用されている年収の推移の行の年収（無ければ 0）。 */
-const annualIncomeAtAge = (
+/**
+ * 満 `age` 歳の時点で適用されている年収の推移の行から、報酬比例部分に数える
+ * 年額（無ければ 0）: 保険料がかかるのと同じく、上限で頭打ちにした月給の
+ * 12 か月分と標準賞与額。
+ */
+const remunerationAtAge = (
   history: readonly ResolvedSalaryEntry[],
   birth: MonthIndex,
   age: number,
 ): number => {
-  let mut_income = 0;
+  let mut_entry: ResolvedSalaryEntry | undefined = undefined;
 
   for (const entry of history) {
     if (ageAt(entry.start, birth) > age) {
       break;
     }
 
-    mut_income = entry.annualIncome;
+    mut_entry = entry;
   }
 
-  return mut_income;
+  return mut_entry === undefined
+    ? 0
+    : Math.min(mut_entry.monthlyGross, welfarePensionMaxStandardRemuneration) *
+        12 +
+        welfarePensionStandardBonus(mut_entry.annualBonus);
 };
 
 const pensionForStartAge = (

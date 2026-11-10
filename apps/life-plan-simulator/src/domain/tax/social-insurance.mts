@@ -48,16 +48,27 @@ export const bonusHealthInsurancePremium = (bonus: number): number =>
 export const bonusWelfarePensionPremium = (bonus: number): number =>
   bonusPremiumHalf(bonus, welfarePensionMaxStandardBonus, welfarePensionRate);
 
+/**
+ * 厚生年金保険の標準賞与額（円）: 賞与の 1,000 円未満を切り捨て、1 回 150 万円を
+ * 上限にした額。保険料と老齢厚生年金の報酬比例部分は、どちらもこれを使う。
+ */
+export const welfarePensionStandardBonus = (bonus: number): number =>
+  standardBonus(bonus, welfarePensionMaxStandardBonus);
+
 /** 雇用保険料（労働者負担）。 */
 export const employmentInsurancePremium = (wage: number): number =>
   Math.max(0, wage) * employmentInsuranceRate;
+
+/** 賞与の 1,000 円未満を切り捨て、`cap` を上限にした標準賞与額。0 以下なら 0。 */
+const standardBonus = (bonus: number, cap: number): number =>
+  Math.min(Math.max(0, Math.floor(bonus / 1000) * 1000), cap);
 
 /**
  * 標準賞与額（賞与の 1,000 円未満を切り捨てた額、`cap` が上限）に `rate` を
  * 掛けた保険料の折半額。0 以下の賞与なら 0。
  */
 const bonusPremiumHalf = (bonus: number, cap: number, rate: number): number =>
-  (Math.min(Math.max(0, Math.floor(bonus / 1000) * 1000), cap) * rate) / 2;
+  (standardBonus(bonus, cap) * rate) / 2;
 
 const findGrade = (
   remuneration: number,
