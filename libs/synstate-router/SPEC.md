@@ -102,7 +102,8 @@ export const routes = defineRoutes({
 - どのノードもそのパスちょうどのページになる。ページを持たない中間ノードは `page: false` と書く。このノードは `RouteMatch` と網羅チェックの対象にならない。
 - 子のキーには予約名（`id`・`pattern`・`href`・`match`・`matchExact`・`params`・`search`・`children`・`segment`・`page`）を使えない。キーは空にせず、`.` と `/` を含めない（`.` はルート id の区切りなので、許すと別のノードが同じ id になる）。`segment` は `/` を含めず、`.`・`..` そのものにもしない（URL のパーサーが取り除くため。`sitemap.xml` のように `.` を含むのはよい）。どれも型エラーにし、`defineRoutes` も例外を投げる。
 - 同じパスの階層に動的セグメントが 2 つある、静的セグメント名が重なる、または同じパスのページが 2 つある（`segment: ''` の子と親がどちらもページ）ときは、`defineRoutes` が例外を投げる。「同じ階層」は親子関係ではなくパスで数える。`segment: ''` のノードはパスに現れないので、その子は親の兄弟と同じ階層として検査する。照合の結果が定義順に依存する形を作らせない。`segment: ''` の子を置くなら、親か子のどちらかを `page: false` にする。
-- 照合は深さ優先で、各階層で静的な子を動的な子より先に試し、最初に最後まで一致したものを採る。静的な枝が深い所で失敗したら、同じ階層の動的な子に戻って試す（`users.new` と `users.item.posts` があるとき、`/users/new/posts/` は `userId = 'new'` の `users.item.posts` に一致する）。動的セグメントの decode が失敗したら（`/products/abc` で `param.int`）その枝は一致しない。どの枝も一致しなければ notFound。
+- `params` の codec が `param.rest`（または `param.restCustom`）のノードは、残りのパス全体（1 セグメント以上）に一致する（#3430）。枝の末尾にしか置けず、子を持つと型エラーにし、`defineRoutes` も例外を投げる。同じ階層の rest は 1 つまでで、静的な子と動的な子のどちらよりも後に試す。残りが 0 セグメントのパス（`/docs/`）は親のページであり、rest には一致しない。pattern では `/docs/:path*` と書く。
+- 照合は深さ優先で、各階層で静的な子を動的な子より先に、動的な子を rest より先に試し、最初に最後まで一致したものを採る。静的な枝が深い所で失敗したら、同じ階層の動的な子に戻って試す（`users.new` と `users.item.posts` があるとき、`/users/new/posts/` は `userId = 'new'` の `users.item.posts` に一致する）。動的セグメントの decode が失敗したら（`/products/abc` で `param.int`）その枝は一致しない。どの枝も一致しなければ notFound。
 
 ### 3.2 ノードが持つ API
 
@@ -132,16 +133,18 @@ type ParamCodec<T> = Readonly<{
 }>;
 ```
 
-| 宣言                                                            | 型                                                                           | decode の規則                                                                                       |
-| :-------------------------------------------------------------- | :--------------------------------------------------------------------------- | :-------------------------------------------------------------------------------------------------- |
-| `param.string`                                                  | `string`                                                                     | 空文字は不一致                                                                                      |
-| `param.int`                                                     | `SafeInt`（ts-data-forge）                                                   | 正規形だけ一致（`01`・`1.0`・`+1` は不一致）。URL が 1 つに定まる                                   |
-| `param.literal('live', 'sandbox')`                              | `'live' \| 'sandbox'`                                                        | 列挙外は不一致                                                                                      |
-| `param.refine(codec, guard)`                                    | guard が絞る型（`UserId` など）                                              | guard が偽なら不一致。archive の `branded` と違い、実行時にも検証される                             |
-| `param.custom({ decode, encode })`                              | 任意                                                                         | 上のどれにも当てはまらないとき                                                                      |
-| `search.string()` / `.int()` / `.boolean()` / `.literal([...])` | `T \| undefined`、`{ default }` 付きなら `T`（`.int()` の `T` は `SafeInt`） | 不正な値は「ない」と同じ扱い（default があればそれ）。`search.string()` の `''` は不正ではなく `''` |
-| `search.array(codec)`                                           | `readonly T[]`                                                               | `?tag=a&tag=b` の繰り返しキー。archive のカンマ区切りは値に `,` を含めないのでやめる                |
-| `search.schema(schema)`                                         | Standard Schema の出力型                                                     | Zod・Valibot・ArkType をそのまま渡せる。同期の検証だけを受け付ける（下記）                          |
+| 宣言                                                            | 型                                                                           | decode の規則                                                                                          |
+| :-------------------------------------------------------------- | :--------------------------------------------------------------------------- | :----------------------------------------------------------------------------------------------------- |
+| `param.string`                                                  | `string`                                                                     | 空文字は不一致                                                                                         |
+| `param.int`                                                     | `SafeInt`（ts-data-forge）                                                   | 正規形だけ一致（`01`・`1.0`・`+1` は不一致）。URL が 1 つに定まる                                      |
+| `param.literal('live', 'sandbox')`                              | `'live' \| 'sandbox'`                                                        | 列挙外は不一致                                                                                         |
+| `param.refine(codec, guard)`                                    | guard が絞る型（`UserId` など）                                              | guard が偽なら不一致。archive の `branded` と違い、実行時にも検証される                                |
+| `param.custom({ decode, encode })`                              | 任意                                                                         | 上のどれにも当てはまらないとき                                                                         |
+| `param.rest`                                                    | `NonEmptyTuple<string>`（残りのセグメント）                                  | 1 セグメント以上。各セグメントを decode してから渡す。`href` は各要素を 1 セグメントとして encode する |
+| `param.restCustom({ decode, encode })`                          | 任意                                                                         | 残りのセグメント（`NonEmptyTuple<string>`）を受け取り、`Optional<T>` を返す                            |
+| `search.string()` / `.int()` / `.boolean()` / `.literal([...])` | `T \| undefined`、`{ default }` 付きなら `T`（`.int()` の `T` は `SafeInt`） | 不正な値は「ない」と同じ扱い（default があればそれ）。`search.string()` の `''` は不正ではなく `''`    |
+| `search.array(codec)`                                           | `readonly T[]`                                                               | `?tag=a&tag=b` の繰り返しキー。archive のカンマ区切りは値に `,` を含めないのでやめる                   |
+| `search.schema(schema)`                                         | Standard Schema の出力型                                                     | Zod・Valibot・ArkType をそのまま渡せる。同期の検証だけを受け付ける（下記）                             |
 
 検索パラメータもパスパラメータと同じく refine と独自の検証を持つ。
 
@@ -404,7 +407,7 @@ const App = (): JSX.Element => (
 | :------------------------------------- | :------------------------------------------------------------------------ | :-------------------------------------------------------------- | :-------------------------------------------------------------------------------------------------------------------------------------- |
 | 遷移のブロック（未保存フォームの確認） | `useBlocker`                                                              | `useBlocker` / `Block`                                          | v1.1（[#3428](https://github.com/noshiro-pf/mono/issues/3428)）。`beforeunload` とルーター内遷移の両方                                  |
 | ルートごとの非同期ガード（認証など）   | `clientMiddleware` / loader 内の `redirect`                               | `beforeLoad`                                                    | v1.1（[#3429](https://github.com/noshiro-pf/mono/issues/3429)）。v1 は同期の `redirect` オプションのみ                                  |
-| 任意深さの catch-all（`/docs/*`）      | `*`                                                                       | `$`（splat）                                                    | v1.1（[#3430](https://github.com/noshiro-pf/mono/issues/3430)）。`param.rest` として枝の末尾だけに許す                                  |
+| 任意深さの catch-all（`/docs/*`）      | `*`                                                                       | `$`（splat）                                                    | v1.1 で入れた（[#3430](https://github.com/noshiro-pf/mono/issues/3430)）。`param.rest` として枝の末尾だけに許す（「3.1」「3.3」）       |
 | 省略可能セグメント                     | `:lang?`                                                                  | `{-$lang}`                                                      | v1.1（[#3431](https://github.com/noshiro-pf/mono/issues/3431)）。無しと有りの 2 ノードで表せるので優先度は低い                          |
 | ルートごとのエラー表示                 | `ErrorBoundary`                                                           | `errorComponent`                                                | v1.1（[#3432](https://github.com/noshiro-pf/mono/issues/3432)）。React 版 `Routes` に case ごとの error boundary                        |
 | コード分割（遅延読み込み）             | `lazy`（data mode）、route module ごと（framework mode）                  | `autoCodeSplitting` / `createLazyRoute`                         | v1.1（[#3433](https://github.com/noshiro-pf/mono/issues/3433)）。React は `React.lazy` を case に書けば動くので、書き方と例を先に整える |

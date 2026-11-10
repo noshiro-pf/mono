@@ -7,7 +7,7 @@ A client-side router for [SynState](https://github.com/noshiro-pf/mono/tree/main
 ## What it checks
 
 - **Destinations.** A route node's `href` returns an `Href`, a branded string. A hand-written string, a template literal or a `string` variable is not an `Href`, so `/prodcts/1` fails `tsc` instead of failing in the browser.
-- **Parameters.** Path and search parameters are codecs that read the raw string into a value (`param.int` gives a `SafeInt`, `param.literal` a union, `param.refine` a branded type) and are checked when the URL is read, not only declared. A path segment that does not decode means the route does not match; a search value that does not decode is read as absent, or as its default.
+- **Parameters.** Path and search parameters are codecs that read the raw string into a value (`param.int` gives a `SafeInt`, `param.literal` a union, `param.refine` a branded type) and are checked when the URL is read, not only declared. A path segment that does not decode means the route does not match; a search value that does not decode is read as absent, or as its default. `param.rest` matches the rest of the path (`/docs/a/b/c/` as `['a', 'b', 'c']`), one segment or more, on a node with no children; it ranks below every static and dynamic sibling, and `param.restCustom` reads the segments into a value of your own.
 - **Branching.** A match is a union keyed by the dotted route id, so a `switch` on `route` narrows `params` and `search`.
 - **The tree.** Two routes that would match the same URL, depending on the order they were defined in, are rejected when the tree is defined.
 

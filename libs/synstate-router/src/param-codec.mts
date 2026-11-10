@@ -54,6 +54,36 @@ const paramRefine = <T, U extends T>(
 
 const paramCustom = <T,>(codec: ParamCodec<T>): ParamCodec<T> => codec;
 
+/** The rest of a path: one segment or more, percent-decoded. */
+export type RestSegments = NonEmptyTuple<string>;
+
+/**
+ * Reads the rest of the path, one segment or more, into a value and writes it
+ * back. Only a node with no children can declare one: it ends its branch.
+ */
+export type RestParamCodec<T> = Readonly<{
+  /** Tells a rest codec from a {@link ParamCodec}. */
+  rest: true;
+  /** Receives the remaining segments after percent-decoding. */
+  decode: (segments: RestSegments) => Optional<T>;
+  /** Returns the segments before percent-encoding. */
+  encode: (value: T) => RestSegments;
+}>;
+
+const paramRest: RestParamCodec<RestSegments> = {
+  rest: true,
+  decode: (segments) => Optional.some(segments),
+  encode: (value) => value,
+} as const;
+
+const paramRestCustom = <T,>(
+  codec: Readonly<{
+    decode: (segments: RestSegments) => Optional<T>;
+    encode: (value: T) => RestSegments;
+  }>,
+): RestParamCodec<T> =>
+  ({ rest: true, decode: codec.decode, encode: codec.encode }) as const;
+
 /**
  * Codecs for path parameters. A segment that fails to decode means the route
  * does not match.
@@ -65,6 +95,11 @@ const paramCustom = <T,>(codec: ParamCodec<T>): ParamCodec<T> => codec;
  * - `param.refine(codec, guard)`: narrows a codec with a type guard, checked at
  *   run time.
  * - `param.custom({ decode, encode })`: anything else.
+ * - `param.rest`: the rest of the path, one segment or more, as a non-empty
+ *   list of segments; only on a node with no children, and ranked below every
+ *   static and dynamic sibling.
+ * - `param.restCustom({ decode, encode })`: the rest of the path read by a codec
+ *   over its segments.
  *
  * @example
  *
@@ -88,4 +123,6 @@ export const param = {
   literal: paramLiteral,
   refine: paramRefine,
   custom: paramCustom,
+  rest: paramRest,
+  restCustom: paramRestCustom,
 } as const;

@@ -1,4 +1,4 @@
-import { Arr, isNonNullObject, Optional } from 'ts-data-forge';
+import { Arr, hasKey, isNonNullObject, Optional } from 'ts-data-forge';
 import type { FixedLengthTuple, ReadonlyRecord } from 'ts-type-forge';
 import type { Href } from './href.mjs';
 import {
@@ -16,8 +16,10 @@ import {
 } from './internal/index.mjs';
 import type {
   AnyParamCodec,
+  AnyRestParamCodec,
   AnyRoutes,
   AnySearchCodec,
+  AnySegmentParamCodec,
   ReservedRouteKey,
   RouteDefinition,
   RouteDefinitions,
@@ -127,7 +129,8 @@ export const matchRoutes = <R extends AnyRoutes>(
 };
 
 type Segment = Readonly<
-  | { kind: 'dynamic'; name: string; codec: AnyParamCodec }
+  | { kind: 'dynamic'; name: string; codec: AnySegmentParamCodec }
+  | { kind: 'rest'; name: string; codec: AnyRestParamCodec }
   | { kind: 'static'; value: string; encoded: string }
   | { kind: 'transparent' }
 >;
@@ -158,8 +161,8 @@ type CompiledNode = Context &
 
 /**
  * One path level: the nodes that consume the next segment, statics before the
- * one dynamic, with `segment: ''` nodes looked through; and the page that sits
- * on this path itself.
+ * one dynamic, and the one rest last, with `segment: ''` nodes looked through;
+ * and the page that sits on this path itself.
  */
 type Level = Readonly<{
   next: readonly CompiledNode[];
@@ -227,6 +230,9 @@ const assertValidKey = (key: string, what: string): void => {
   }
 };
 
+const isRestCodec = (codec: AnyParamCodec): codec is AnyRestParamCodec =>
+  hasKey(codec, 'rest') && codec.rest;
+
 const compileSegment = (
   id: string,
   key: string,
@@ -249,7 +255,17 @@ const compileSegment = (
 
     const [name, codec] = first;
 
-    return { kind: 'dynamic', name, codec };
+    if (!isRestCodec(codec)) {
+      return { kind: 'dynamic', name, codec };
+    }
+
+    if (definition.children !== undefined) {
+      throw new Error(
+        `synstate-router: ${id}: a param.rest node ends its branch and has no children`,
+      );
+    }
+
+    return { kind: 'rest', name, codec };
   }
 
   const value = definition.segment ?? key;
@@ -292,6 +308,9 @@ const patternOf = (segments: readonly Segment[]): string => {
 
       case 'dynamic':
         return [`:${segment.name}`];
+
+      case 'rest':
+        return [`:${segment.name}*`];
     }
   });
 
@@ -304,6 +323,7 @@ const collectLevel = (
 ): Readonly<{
   statics: readonly CompiledNode[];
   dynamics: readonly CompiledNode[];
+  rests: readonly CompiledNode[];
   pages: readonly Page[];
 }> => {
   const parts = nodes.map((node) => {
@@ -312,8 +332,7 @@ const collectLevel = (
         const inner = collectLevel(node.children);
 
         return {
-          statics: inner.statics,
-          dynamics: inner.dynamics,
+          ...inner,
           pages:
             node.page === undefined
               ? inner.pages
@@ -322,16 +341,20 @@ const collectLevel = (
       }
 
       case 'static':
-        return { statics: [node], dynamics: [], pages: [] };
+        return { statics: [node], dynamics: [], rests: [], pages: [] };
 
       case 'dynamic':
-        return { statics: [], dynamics: [node], pages: [] };
+        return { statics: [], dynamics: [node], rests: [], pages: [] };
+
+      case 'rest':
+        return { statics: [], dynamics: [], rests: [node], pages: [] };
     }
   });
 
   return {
     statics: parts.flatMap((part) => part.statics),
     dynamics: parts.flatMap((part) => part.dynamics),
+    rests: parts.flatMap((part) => part.rests),
     pages: parts.flatMap((part) => part.pages),
   };
 };
@@ -368,7 +391,7 @@ const buildLevel = (
   children: readonly CompiledNode[],
   path: string,
 ): Level => {
-  const { statics, dynamics, pages: inner } = collectLevel(children);
+  const { statics, dynamics, rests, pages: inner } = collectLevel(children);
 
   const pages = owner === undefined ? inner : Arr.toUnshifted(owner)(inner);
 
@@ -384,9 +407,15 @@ const buildLevel = (
     );
   }
 
+  if (rests.length > 1) {
+    throw new Error(
+      `synstate-router: ${rests.map((n) => n.id).join(' and ')} are rest segments at the same level under ${path}`,
+    );
+  }
+
   assertUniqueStatics(statics, path);
 
-  return { next: [...statics, ...dynamics], page: pages[0] };
+  return { next: [...statics, ...dynamics, ...rests], page: pages[0] };
 };
 
 const compileNode = (
@@ -452,14 +481,47 @@ const resolveSegment = (
         : Optional.none;
     }
 
+    // The rest of the path, not one segment: `resolveLevel` reads it.
+    case 'rest':
     case 'transparent':
       return Optional.none;
   }
 };
 
 /**
- * Depth first, statics before the dynamic, backtracking: when a static branch
- * fails deeper down, the dynamic sibling is tried.
+ * The page of a rest node, which takes every remaining segment: one or more,
+ * and `None` when its codec refuses them.
+ */
+const resolveRest = (
+  node: CompiledNode,
+  segments: readonly string[],
+  index: number,
+  params: readonly ParamEntry[],
+): Optional<Found> => {
+  const rest = segments.slice(index);
+
+  if (
+    node.segment.kind !== 'rest' ||
+    node.page === undefined ||
+    !Arr.isNonEmptyTuple(rest)
+  ) {
+    return Optional.none;
+  }
+
+  const decoded = node.segment.codec.decode(rest);
+
+  return Optional.isSome(decoded)
+    ? Optional.some({
+        page: node.page,
+        params: Arr.toPushed(params, [node.segment.name, decoded.value]),
+      })
+    : Optional.none;
+};
+
+/**
+ * Depth first, statics before the dynamic and the dynamic before the rest,
+ * backtracking: when a static branch fails deeper down, the dynamic sibling is
+ * tried, and then the rest.
  */
 const resolveLevel = (
   level: Level,
@@ -476,6 +538,10 @@ const resolveLevel = (
   }
 
   for (const node of level.next) {
+    if (node.segment.kind === 'rest') {
+      return resolveRest(node, segments, index, params);
+    }
+
     const consumed = resolveSegment(node, segment, params);
 
     if (Optional.isNone(consumed)) {
@@ -567,6 +633,26 @@ const failHref = (node: CompiledNode, what: string, reason: string): never => {
   throw new Error(`synstate-router: ${node.id}.href: ${what} ${reason}`);
 };
 
+/** One segment of a param's value, checked to be one in the URL. */
+const checkedSegment = (
+  node: CompiledNode,
+  name: string,
+  raw: string,
+): HrefSegment => {
+  // An empty segment collapses into its neighbors (`//`, which a browser also
+  // reads as the start of a host), and a URL parser removes a `.` or `..`
+  // segment, encoded or not: either way the URL would lead somewhere else.
+  if (raw === '' || raw === '.' || raw === '..') {
+    failHref(node, `params.${name}`, `("${raw}") cannot be a path segment`);
+  }
+
+  if (!raw.isWellFormed()) {
+    failHref(node, `params.${name}`, 'is not well-formed Unicode');
+  }
+
+  return { raw, encoded: encodeSegment(raw) };
+};
+
 /** The segments of the path to `node`, each checked to read back as itself. */
 const buildSegments = (
   node: CompiledNode,
@@ -597,23 +683,25 @@ const buildSegments = (
           );
         }
 
-        // An empty segment collapses into its neighbors (`//`, which a browser
-        // also reads as the start of a host), and a URL parser removes a `.` or
-        // `..` segment, encoded or not: either way the URL would lead somewhere
-        // else.
-        if (raw === '' || raw === '.' || raw === '..') {
+        return [checkedSegment(node, name, raw)];
+      }
+
+      case 'rest': {
+        const { name, codec } = segment;
+
+        // The type of `params` was checked against this codec.
+        // eslint-disable-next-line total-functions/no-unsafe-type-assertion -- see above
+        const raws: readonly string[] = codec.encode(params[name] as never);
+
+        if (!Arr.isNonEmptyTuple(raws) || Optional.isNone(codec.decode(raws))) {
           failHref(
             node,
             `params.${name}`,
-            `("${raw}") cannot be a path segment`,
+            `(${raws.join('/')}) is rejected by its own codec`,
           );
         }
 
-        if (!raw.isWellFormed()) {
-          failHref(node, `params.${name}`, 'is not well-formed Unicode');
-        }
-
-        return [{ raw, encoded: encodeSegment(raw) }];
+        return raws.map((raw) => checkedSegment(node, name, raw));
       }
     }
   });
@@ -717,7 +805,7 @@ const buildNodeApi = (
 ): ReadonlyRecord<string | symbol, unknown> => {
   const paramNames = Arr.generate(function* () {
     for (const segment of node.segments) {
-      if (segment.kind === 'dynamic') {
+      if (segment.kind === 'dynamic' || segment.kind === 'rest') {
         yield segment.name;
       }
     }
