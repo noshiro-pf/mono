@@ -17,13 +17,14 @@
 
 ### 1.2 パッケージ
 
-| パッケージ              | 責任                                                                          | peer         |
-| :---------------------- | :---------------------------------------------------------------------------- | :----------- |
-| `synstate-router`       | ルート定義・codec・照合・`Href`・履歴・Observable・リンクのクリック判定       | synstate     |
-| `synstate-router-react` | React 向けの `Routes`・`Link`・hooks。社内プロジェクトが React なので先に作る | react >= 19  |
-| `synstate-router-dom`   | synstate-dom 向けの `Routes`・`Link`                                          | synstate-dom |
+| パッケージ               | 責任                                                                          | peer         |
+| :----------------------- | :---------------------------------------------------------------------------- | :----------- |
+| `synstate-router`        | ルート定義・codec・照合・`Href`・履歴・Observable・リンクのクリック判定       | synstate     |
+| `synstate-router-react`  | React 向けの `Routes`・`Link`・hooks。社内プロジェクトが React なので先に作る | react >= 19  |
+| `synstate-router-dom`    | synstate-dom 向けの `Routes`・`Link`                                          | synstate-dom |
+| `synstate-router-preact` | Preact 向けの `Routes`・`Link`・hooks。React 版と同じ形（「5」）              | preact >= 10 |
 
-Preact 版は v1 に入れない（「10. 今後のタスク」）。
+Preact 版は v1.1 で入れた（#3437）。
 
 ## 2. 決定事項
 
@@ -451,7 +452,7 @@ const App = (): JSX.Element => (
 | 型付きの履歴 state                     | `state`（型なし）                                                         | `state`（`HistoryState` の拡張で全体に 1 つの型）               | v1.1 で入れた（[#3434](https://github.com/noshiro-pf/mono/issues/3434)）。ページに codec を宣言する形（「3.4」）                                                                                                                                                                                         |
 | パンくず・ルートの静的データ           | `handle` + `useMatches`                                                   | `staticData` + `useMatches`                                     | v1.1 で入れた（[#3435](https://github.com/noshiro-pf/mono/issues/3435)）。ノードに型付き `meta` を置き、`router.branch`・`useBranch` で一致した枝を読む（「3.2」「4.1」「5」）                                                                                                                           |
 | 検索パラメータの引き継ぎ・除去の規則   | なし                                                                      | search middleware の `retainSearchParams` / `stripSearchParams` | v1.1 で入れた（[#3436](https://github.com/noshiro-pf/mono/issues/3436)）。`href` のオプション `retain` として。既定値の除去は `href` がもともと行う（「3.3」）                                                                                                                                           |
-| Preact 版                              | なし                                                                      | なし                                                            | v1.1（[#3437](https://github.com/noshiro-pf/mono/issues/3437)）。React 版と同じ形                                                                                                                                                                                                                        |
+| Preact 版                              | なし                                                                      | なし                                                            | v1.1 で入れた（[#3437](https://github.com/noshiro-pf/mono/issues/3437)）。`synstate-router-preact`。React 版と同じ形                                                                                                                                                                                     |
 | View Transitions                       | `viewTransition`（非推奨。React の `<ViewTransition>` へ）                | `viewTransition`                                                | v1.2 で入れた（[#3438](https://github.com/noshiro-pf/mono/issues/3438)）。`push`・`replace`・`Link` の `viewTransition`（「4.2」の 8）                                                                                                                                                                   |
 | head / meta の管理                     | `meta` export（framework mode）。React 19 の `<title>`・`<meta>` を勧める | `head` + `<HeadContent />`                                      | `document.title` は v1.2 で入れた（[#3440](https://github.com/noshiro-pf/mono/issues/3440)）。ルートの `meta.title` から設定する（「4.2」の 7）。`<head>` のほかの部分は別検討                                                                                                                           |
 | devtools                               | なし（コミュニティの `react-router-devtools`）                            | `TanStackRouterDevtools`                                        | v1.2 で入れた（[#3439](https://github.com/noshiro-pf/mono/issues/3439)）。React の開発用パネル `RouterDevtools` と、コアの `describeRoutes`・`router.redirects`（「5」）                                                                                                                                 |

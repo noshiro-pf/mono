@@ -1,0 +1,12 @@
+{
+  "name": "verify-synstate-router-preact",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "preact": ">=10.0.0",
+    "synstate": ">=8.0.0",
+    "synstate-router": ">=0.2.1",
+    "synstate-router-preact": "file:../../../.tarballs/synstate-router-preact.tgz"
+  }
+}
