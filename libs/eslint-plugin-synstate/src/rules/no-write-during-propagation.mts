@@ -8,6 +8,7 @@ import {
   buildCalleeResolver,
   getImportDeclarations,
   isShadowedCallee,
+  skipTsTypeWrappers,
   skipTypeWrappers,
 } from 'eslint-rule-forge';
 import * as ts from 'typescript';
@@ -456,19 +457,6 @@ const isSynstateImport = (
   ts.isStringLiteral(declaration.moduleSpecifier) &&
   SYNSTATE_AND_WRAPPER_MODULES.includes(declaration.moduleSpecifier.text);
 
-/** `as`, `satisfies`, `!`, `<T>` and parentheses, in the TypeScript tree. */
-const skipTsTypeWrappers = (
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  expression: ts.Expression,
-): ts.Expression =>
-  ts.isParenthesizedExpression(expression) ||
-  ts.isAsExpression(expression) ||
-  ts.isSatisfiesExpression(expression) ||
-  ts.isNonNullExpression(expression) ||
-  ts.isTypeAssertionExpression(expression)
-    ? skipTsTypeWrappers(expression.expression)
-    : expression;
-
 /**
  * The name `callee` has among synstate's exports, when the file it is in
  * imports it from synstate: by name, under an alias, or through a namespace.
@@ -491,15 +479,17 @@ const tsSynstateExportOf = (
       : undefined;
   }
 
-  if (
-    !ts.isPropertyAccessExpression(callee) ||
-    !ts.isIdentifier(callee.expression)
-  ) {
+  if (!ts.isPropertyAccessExpression(callee)) {
     return undefined;
   }
 
-  const declaration = checker.getSymbolAtLocation(callee.expression)
-    ?.declarations?.[0];
+  const namespace = skipTsTypeWrappers(callee.expression);
+
+  if (!ts.isIdentifier(namespace)) {
+    return undefined;
+  }
+
+  const declaration = checker.getSymbolAtLocation(namespace)?.declarations?.[0];
 
   return declaration !== undefined &&
     ts.isNamespaceImport(declaration) &&

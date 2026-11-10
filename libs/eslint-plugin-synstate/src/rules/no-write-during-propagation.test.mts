@@ -437,6 +437,22 @@ describe('no-write-during-propagation through type wrappers', () => {
         ],
       },
       {
+        name: 'the factory read from a namespace under `satisfies`, `as` and `!`',
+        code: dedent`
+          import * as s from 'synstate';
+          const [a$, setA] = s.createState(0);
+          const [b$, setB] = (s satisfies typeof s).createState(0);
+          const [c$, setC] = (s as typeof s).createState(0);
+          const [d$, setD] = s!.createState(0);
+          a$.subscribe((a) => { setB(a); setC(a); setD(a); });
+        `,
+        errors: [
+          { messageId: 'writeDuringPropagation', column: 23 },
+          { messageId: 'writeDuringPropagation', column: 32 },
+          { messageId: 'writeDuringPropagation', column: 41 },
+        ],
+      },
+      {
         name: 'the factory call wrapped in `satisfies`',
         code: dedent`
           import { createState } from 'synstate';

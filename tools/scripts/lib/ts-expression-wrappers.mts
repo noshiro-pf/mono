@@ -7,8 +7,19 @@ import * as ts from 'typescript';
  * see through all of them, so the scripts and the configs ask this one list,
  * and a wrapper TypeScript adds is added here once.
  *
- * `eslint-plugin-synstate` keeps a copy of its own: it is published, and cannot
- * import `tools/`.
+ * A published package cannot import `tools/`, so the ESLint packages' `src/`
+ * read `isTsTypeWrapper` / `skipTsTypeWrappers` from `eslint-rule-forge`
+ * instead: the compiler API counterpart of its ESTree `TypeWrapper`, which
+ * leaves out the instantiation expression as that list does.
+ *
+ * `check:root:ts-expression-wrappers` reads every `ts.is…(` call here as an
+ * entry of the list, counts copies with it, and holds eslint-rule-forge's to it:
+ * keep anything else out of this module. Add a wrapper TypeScript adds here and
+ * to eslint-rule-forge, or, when ESTree's `TypeWrapper` has no counterpart, to
+ * the guard's `TOOLS_ONLY_PREDICATES` instead. Sumi's checker keeps a list of
+ * its own for `typescript-native` nodes (`isTransparent` in
+ * `languages/sumi/checker/src/ast/node-helpers.mts`), which the guard does not
+ * read: add it there too.
  */
 export const isExpressionWrapper = (node: ts.Node): node is ExpressionWrapper =>
   ts.isParenthesizedExpression(node) ||
