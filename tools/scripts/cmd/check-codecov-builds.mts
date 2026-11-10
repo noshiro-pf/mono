@@ -35,7 +35,12 @@ export const checkCodecovBuilds = (): Promise<Result<CheckSummary, string>> =>
       await readRepoFile(CODECOV_PATH),
     );
 
-    const uploads = countCoverageEntries(workflowFile);
+    const uploads = yield* Result.safeUnwrap(
+      Result.mapErr(
+        countCoverageEntries(workflowFile),
+        (message) => `${WORKFLOW_PATH}: ${message}`,
+      ),
+    );
 
     const violations = [
       ...collectBuildCountViolations(uploads, readAfterNBuilds(codecovFile)),
@@ -48,36 +53,35 @@ export const checkCodecovBuilds = (): Promise<Result<CheckSummary, string>> =>
   });
 
 /**
- * The matrix entries that upload coverage: the `coverage: true` keys of the
- * `- command:` entries, read with a line scanner, not yet through the YAML
- * parser of `tools/scripts/lib/workflow-jobs.mts`. Only a key at an entry's own
- * indentation counts, so an action input or a comment naming it is not an
- * entry.
+ * The matrix entries that upload coverage: the `include:` entries of every
+ * job's matrix that set `coverage` to `true`, read through
+ * `tools/scripts/lib/workflow-jobs.mts`, so that a flow-style entry or a quoted
+ * key counts as GitHub reads it, and an action input or a comment naming the
+ * key is no entry. A matrix whose entries are not in the file is an error.
  */
-export const countCoverageEntries = (workflowFile: string): number => {
-  const lines = workflowFile.split('\n');
+export const countCoverageEntries = (
+  workflowFile: string,
+): Result<number, string> =>
+  Result.safeTry(function* () {
+    const jobs = yield* Result.safeUnwrap(readWorkflowJobs(workflowFile));
 
-  const entryIndents = new Set<number>(
-    Arr.generate(function* () {
-      for (const line of lines) {
-        const dash = /^(?<indent> *)- command:/u.exec(line)?.groups?.['indent'];
+    let mut_count = 0;
 
-        if (dash !== undefined) {
-          yield dash.length + 2;
-        }
-      }
-    }),
-  );
+    for (const job of jobs) {
+      const matrix = yield* Result.safeUnwrap(
+        Result.mapErr(
+          readMatrix(job.matrix),
+          (message) => `job "${job.name}": ${message}`,
+        ),
+      );
 
-  return lines.filter((line) => {
-    const indent = line.length - line.trimStart().length;
+      mut_count += matrix.include.filter(
+        (entry) => entry['coverage'] === 'true',
+      ).length;
+    }
 
-    return (
-      entryIndents.has(indent) &&
-      line.replace(/#.*/u, '').trim() === 'coverage: true'
-    );
-  }).length;
-};
+    return Result.ok(mut_count);
+  });
 
 /**
  * Each `after_n_builds` of `codecov.yml`, keyed by the path of keys it sits

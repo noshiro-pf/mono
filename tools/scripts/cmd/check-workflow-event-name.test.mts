@@ -1,8 +1,20 @@
 import dedent from 'dedent';
+import { Result } from 'ts-data-forge';
 import {
   collectEventNameViolations,
-  parseWorkflowTriggers,
+  parseWorkflowTriggers as parseOrThrow,
+  type WorkflowTriggers,
 } from './check-workflow-event-name.mjs';
+
+const parseWorkflowTriggers = (text: string): WorkflowTriggers => {
+  const parsed = parseOrThrow(text);
+
+  if (Result.isErr(parsed)) {
+    throw new Error(parsed.value);
+  }
+
+  return parsed.value;
+};
 
 /**
  * The shape the seven workflows share, with the two things this check reads
@@ -86,6 +98,38 @@ describe('parseWorkflowTriggers', () => {
     `);
 
     assert.deepStrictEqual(triggers.comparedEventNames, []);
+  });
+
+  test('reads `on:` written as one event or a list', () => {
+    assert.deepStrictEqual(
+      parseWorkflowTriggers('on: pull_request\n').triggerEvents,
+      ['pull_request'],
+    );
+
+    assert.deepStrictEqual(
+      parseWorkflowTriggers("on: [push, 'workflow_dispatch']\n").triggerEvents,
+      ['push', 'workflow_dispatch'],
+    );
+  });
+
+  test('reads a comparison in a folded value, and none in a comment', () => {
+    const triggers = parseWorkflowTriggers(dedent`
+      on:
+        pull_request:
+
+      # cancel-in-progress: \${{ github.event_name == 'push' }}
+      jobs:
+        x:
+          if: >-
+            github.event_name ==
+            'pull_request'
+    `);
+
+    assert.deepStrictEqual(triggers.comparedEventNames, ['pull_request']);
+  });
+
+  test('a file YAML cannot parse is an error, not no triggers', () => {
+    assert.isTrue(Result.isErr(parseOrThrow('on: [\n')));
   });
 
   test('reads a `!=` comparison as well as an `==` one', () => {
@@ -176,11 +220,9 @@ describe('collectEventNameViolations', () => {
     assert.deepStrictEqual(violations, []);
   });
 
-  test('rejects a comparison it cannot judge because the `on:` block is unreadable', () => {
+  test('rejects a comparison it cannot judge because the workflow has no `on:`', () => {
     const violations = collectEventNameViolations(
       parseWorkflowTriggers(dedent`
-        on: pull_request
-
         jobs:
           x:
             if: \${{ github.event_name == 'pull_request' }}
@@ -189,6 +231,6 @@ describe('collectEventNameViolations', () => {
 
     assert.deepStrictEqual(violations.length, 1);
 
-    assert.isTrue(violations.join('\n').includes('no `on:` block'));
+    assert.isTrue(violations.join('\n').includes('no `on:`'));
   });
 });

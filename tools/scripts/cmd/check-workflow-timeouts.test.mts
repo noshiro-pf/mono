@@ -1,4 +1,5 @@
 import dedent from 'dedent';
+import { Result } from 'ts-data-forge';
 import {
   collectTimeoutViolations,
   parseWorkflowJobs,
@@ -38,15 +39,47 @@ const workflow = (
 
 describe('parseWorkflowJobs', () => {
   test('reads each job, whether it runs on a runner, and its own timeout', () => {
-    assert.deepStrictEqual(parseWorkflowJobs(workflowFile), [
-      { jobId: 'gates', runsOnRunner: false, timeout: undefined },
-      { jobId: 'build', runsOnRunner: true, timeout: '15' },
-      { jobId: 'code-check', runsOnRunner: true, timeout: undefined },
-    ]);
+    assert.deepStrictEqual(
+      parseWorkflowJobs(workflowFile),
+      Result.ok([
+        { jobId: 'gates', runsOnRunner: false, timeout: undefined },
+        { jobId: 'build', runsOnRunner: true, timeout: '15' },
+        { jobId: 'code-check', runsOnRunner: true, timeout: undefined },
+      ]),
+    );
+  });
+
+  test('reads a job written in flow style, or with quoted keys, as YAML does', () => {
+    assert.deepStrictEqual(
+      parseWorkflowJobs(dedent`
+        jobs:
+          a: { runs-on: ubuntu-latest, timeout-minutes: 5, steps: [] }
+          "b":
+            "runs-on": ubuntu-latest
+            'timeout-minutes': 7
+          c:
+            runs-on: [self-hosted, linux]
+            timeout-minutes: \${{ inputs.minutes }}
+      `),
+      Result.ok([
+        { jobId: 'a', runsOnRunner: true, timeout: '5' },
+        { jobId: 'b', runsOnRunner: true, timeout: '7' },
+        {
+          jobId: 'c',
+          runsOnRunner: true,
+          // eslint-disable-next-line no-template-curly-in-string -- a GitHub Actions expression, not a template.
+          timeout: '${{ inputs.minutes }}',
+        },
+      ]),
+    );
   });
 
   test('reads no job from a workflow without a jobs block', () => {
-    assert.deepStrictEqual(parseWorkflowJobs('name: Empty\n'), []);
+    assert.deepStrictEqual(parseWorkflowJobs('name: Empty\n'), Result.ok([]));
+  });
+
+  test('a file YAML cannot parse is an error, not no jobs', () => {
+    assert.isTrue(Result.isErr(parseWorkflowJobs('jobs:\n  a: [\n')));
   });
 });
 

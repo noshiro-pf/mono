@@ -57,8 +57,68 @@ describe('parsePatterns', () => {
   test('fails on a variable assigned without being defined first', () => {
     assert.isTrue(
       Result.isErr(
-        // eslint-disable-next-line no-template-curly-in-string -- a shell assignment, not a template.
-        parsePatterns('            runner_re="^${nowhere}/x"', ['runner_re']),
+        parsePatterns(
+          dedent`
+            jobs:
+              notify:
+                steps:
+                  - run: runner_re="^\${nowhere}/x"
+          `,
+          ['runner_re'],
+        ),
+      ),
+    );
+  });
+
+  test('reads assignments as the shell does: several on a line, and one with a trailing comment', () => {
+    const patterns = parsePatterns(
+      dedent`
+        jobs:
+          notify:
+            steps:
+              - run: |
+                  src='libs/q/src'; core=libs/core/src/ # the shared one
+                  worker_re="^(\${src}/|\${core})" # what the worker loads
+      `,
+      ['worker_re'],
+    );
+
+    assert.strictEqual(
+      Result.unwrapOk(patterns)?.get('worker_re')?.source,
+      String.raw`^(libs\/q\/src\/|libs\/core\/src\/)`,
+    );
+  });
+
+  test('reads a step written in flow style', () => {
+    const patterns = parsePatterns(
+      dedent`
+        jobs:
+          notify:
+            steps:
+              - { name: Paths, run: "worker_re='^libs/q/'" }
+      `,
+      ['worker_re'],
+    );
+
+    assert.strictEqual(
+      Result.unwrapOk(patterns)?.get('worker_re')?.source,
+      String.raw`^libs\/q\/`,
+    );
+  });
+
+  test('does not expand a variable another step assigned, which the shell would not see', () => {
+    assert.isTrue(
+      Result.isErr(
+        parsePatterns(
+          dedent`
+            jobs:
+              notify:
+                steps:
+                  - run: src='libs/q/src'
+                  - run: worker_re="^\${src}/"
+          `,
+          ['worker_re'],
+        ),
       ),
     );
   });

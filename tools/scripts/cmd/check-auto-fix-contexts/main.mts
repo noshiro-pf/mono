@@ -26,10 +26,10 @@ import {
   matrixValues,
   readMatrix,
   readWorkflowJobs,
+  triggersOn,
   type WorkflowJob,
 } from '../../lib/workflow-jobs.mjs';
 import { projectRootPath } from '../../project-root-path.mjs';
-import { parseWorkflowTriggers } from '../check-workflow-event-name.mjs';
 
 /**
  * Fails when a `context` pattern in `.github/unblock-prs.json` takes no check
@@ -799,11 +799,7 @@ const readCheckContexts = async (): Promise<Result<MatrixContexts, string>> => {
         return contents;
       }
 
-      if (
-        !parseWorkflowTriggers(contents.value).triggerEvents.includes(
-          PULL_REQUEST_EVENT,
-        )
-      ) {
+      if (!triggersOn(contents.value, PULL_REQUEST_EVENT)) {
         return Result.ok(NO_CONTEXTS);
       }
 

@@ -4,7 +4,9 @@ import {
   matrixValues,
   readMatrix,
   readWorkflowJobs,
+  readWorkflowStrings,
   readWorkflowTriggers,
+  triggersOn,
   type WorkflowJob,
 } from './workflow-jobs.mjs';
 
@@ -166,6 +168,25 @@ describe('readWorkflowJobs', () => {
     assert.deepStrictEqual(third?.needs, ['a', 'b']);
   });
 
+  test('reads whether a job has a runner, and its `timeout-minutes` as text', () => {
+    const [runner, call] = jobs(dedent`
+      jobs:
+        a:
+          runs-on: ubuntu-latest
+          timeout-minutes: 15
+        b:
+          uses: ./.github/workflows/check-gates.yml
+    `);
+
+    assert.strictEqual(runner?.hasRunner, true);
+
+    assert.strictEqual(runner?.timeoutMinutes, '15');
+
+    assert.strictEqual(call?.hasRunner, false);
+
+    assert.strictEqual(call?.timeoutMinutes, undefined);
+  });
+
   test('a file YAML cannot parse is an error, not no jobs', () => {
     assert.isTrue(Result.isErr(readWorkflowJobs('jobs:\n  a: [\n')));
   });
@@ -270,6 +291,42 @@ describe('readMatrix', () => {
     assert.deepStrictEqual(
       readMatrix(undefined),
       Result.ok({ include: [], lists: {} }),
+    );
+  });
+});
+
+describe('triggersOn', () => {
+  test('says whether `on:` names the event', () => {
+    assert.isTrue(triggersOn('on: [push, pull_request]\n', 'pull_request'));
+
+    assert.isFalse(triggersOn('on: push\n', 'pull_request'));
+  });
+
+  test('counts a file YAML cannot parse as triggering, so it is read on', () => {
+    assert.isTrue(triggersOn('on: [\n', 'pull_request'));
+  });
+});
+
+describe('readWorkflowStrings', () => {
+  test('reads the string values in order, not the keys or the comments', () => {
+    assert.deepStrictEqual(
+      readWorkflowStrings(dedent`
+        # if: \${{ github.event_name == 'push' }}
+        on: pull_request
+        jobs:
+          a:
+            if: >-
+              github.event_name ==
+              'pull_request'
+            steps:
+              - run: echo one
+            timeout-minutes: 5
+      `),
+      Result.ok([
+        'pull_request',
+        "github.event_name == 'pull_request'",
+        'echo one',
+      ]),
     );
   });
 });

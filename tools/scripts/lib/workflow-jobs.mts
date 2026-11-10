@@ -61,11 +61,15 @@ export const readWorkflowJobs = (
 
       const needs = record['needs'];
 
+      const timeoutMinutes = record['timeout-minutes'];
+
       return {
         name,
         displayName: isString(displayName) ? displayName : undefined,
         uses: isString(uses) ? uses : undefined,
         condition: scalarText(record['if']),
+        hasRunner: record['runs-on'] !== undefined,
+        timeoutMinutes: scalarText(timeoutMinutes),
         needs: isString(needs)
           ? [needs]
           : Arr.isArray(needs)
@@ -117,6 +121,44 @@ export const readWorkflowTriggers = (
           ? Object.keys(on)
           : [];
   });
+
+/**
+ * Whether a workflow triggers on `event`, by {@link readWorkflowTriggers}. A
+ * file YAML cannot parse counts as one that does, so that a guard reading only
+ * such workflows reads it on and reports the error, rather than skipping it.
+ */
+export const triggersOn = (text: string, event: string): boolean =>
+  Result.unwrapOkOr(
+    Result.map(readWorkflowTriggers(text), (triggers) =>
+      triggers.includes(event),
+    ),
+    true,
+  );
+
+/**
+ * Every string value in a workflow, in document order, keys and comments left
+ * out: where its expressions are, however YAML quotes or folds them.
+ */
+export const readWorkflowStrings = (
+  text: string,
+): Result<readonly string[], string> =>
+  Result.map(parseWorkflow(text), (workflow) =>
+    Arr.generate(function* () {
+      const mut_pending: unknown[] = [workflow];
+
+      while (Arr.isNonEmpty(mut_pending)) {
+        const value = mut_pending.shift();
+
+        if (isString(value)) {
+          yield value;
+        } else if (Arr.isArray(value)) {
+          mut_pending.unshift(...value);
+        } else if (isRecord(value)) {
+          mut_pending.unshift(...Object.values(value));
+        }
+      }
+    }),
+  );
 
 /**
  * A job's matrix: the entries under `include:`, each property as a string
@@ -236,6 +278,13 @@ export type WorkflowJob = Readonly<{
   condition: string | undefined;
   /** The jobs its `needs:` names, one or a list. */
   needs: readonly string[];
+  /**
+   * Whether it has a `runs-on:`, as a job that calls a reusable workflow
+   * (`uses:`) does not.
+   */
+  hasRunner: boolean;
+  /** Its `timeout-minutes` as written (`15` reads `'15'`); absent when none. */
+  timeoutMinutes: string | undefined;
   /** `strategy.matrix` as written: a mapping, an expression, or absent. */
   matrix: unknown;
   /** The workflow's `env:` and the job's, the job's taking precedence. */

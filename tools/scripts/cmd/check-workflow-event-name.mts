@@ -3,6 +3,10 @@ import * as path from 'node:path';
 import { Arr, Result, unknownToString } from 'ts-data-forge';
 import { isDirectlyExecuted } from 'ts-repo-utils';
 import { listWorkflowFiles } from '../lib/repo-files.mjs';
+import {
+  readWorkflowStrings,
+  readWorkflowTriggers,
+} from '../lib/workflow-jobs.mjs';
 import { projectRootPath } from '../project-root-path.mjs';
 
 /**
@@ -60,21 +64,25 @@ export const checkWorkflowEventName = (): Promise<
 
 /**
  * The trigger events of a workflow and the event names its expressions compare
- * against, read with a line scanner rather than a YAML parser — as
- * `check-minimum-release-age.mts` reads `pnpm-workspace.yaml`. Both sit at a
- * fixed depth in a file whose shape is stable; the command guards read the rest
- * of a workflow through `tools/scripts/lib/workflow-jobs.mts`.
+ * against, read through `tools/scripts/lib/workflow-jobs.mts`: `on:` however it
+ * is written (one event, a list, a mapping), and the comparisons in its string
+ * values, folded or quoted, but not in its comments.
  */
 export const parseWorkflowTriggers = (
   workflowFile: string,
-): WorkflowTriggers => {
-  const lines = workflowFile.split('\n');
+): Result<WorkflowTriggers, string> =>
+  Result.safeTry(function* () {
+    const triggerEvents = yield* Result.safeUnwrap(
+      readWorkflowTriggers(workflowFile),
+    );
 
-  return {
-    triggerEvents: collectTriggerEvents(lines),
-    comparedEventNames: collectComparedEventNames(workflowFile),
-  };
-};
+    const strings = yield* Result.safeUnwrap(readWorkflowStrings(workflowFile));
+
+    return Result.ok({
+      triggerEvents,
+      comparedEventNames: strings.flatMap(collectComparedEventNames),
+    });
+  });
 
 /**
  * What is wrong with one workflow's comparisons, as one message per problem.
@@ -96,7 +104,7 @@ export const collectEventNameViolations = (
   if (!Arr.isNonEmpty(triggers.triggerEvents)) {
     return [
       [
-        'compares `github.event_name` but no `on:` block could be read, so',
+        'compares `github.event_name` but has no `on:` naming an event, so',
         'nothing here can say whether the comparison names a real trigger.',
       ].join(' '),
     ] as const;
@@ -137,8 +145,6 @@ type CheckSummary = Readonly<{
 
 const REUSABLE_EVENT = 'workflow_call';
 
-const TRIGGER_BLOCK_KEY = 'on:';
-
 /**
  * Every event name compared against `github.event_name`.
  *
@@ -149,42 +155,8 @@ const TRIGGER_BLOCK_KEY = 'on:';
 const EVENT_NAME_COMPARISON =
   /github\.event_name\s*[=!]=\s*'(?<eventName>[^']+)'/gu;
 
-/**
- * The keys of the `on:` block: the lines indented exactly one level below a
- * bare `on:`, up to the first line that starts a key of its own.
- */
-const collectTriggerEvents = (lines: readonly string[]): readonly string[] => {
-  const blockIndex = lines.findIndex(
-    (line) => line.trimEnd() === TRIGGER_BLOCK_KEY,
-  );
-
-  if (blockIndex === -1) {
-    return [];
-  }
-
-  const rest = lines.slice(blockIndex + 1);
-
-  const endIndex = rest.findIndex(
-    (line) => line !== '' && !line.startsWith(' '),
-  );
-
-  const block = endIndex === -1 ? rest : rest.slice(0, endIndex);
-
-  return Arr.generate(function* () {
-    for (const line of block) {
-      const matched = /^ {2}(?<eventName>[a-z_]+):/u.exec(line);
-
-      const eventName = matched?.groups?.['eventName'];
-
-      if (eventName !== undefined) {
-        yield eventName;
-      }
-    }
-  });
-};
-
-const collectComparedEventNames = (workflowFile: string): readonly string[] => {
-  const matches = Array.from(workflowFile.matchAll(EVENT_NAME_COMPARISON));
+const collectComparedEventNames = (value: string): readonly string[] => {
+  const matches = Array.from(value.matchAll(EVENT_NAME_COMPARISON));
 
   return Arr.generate(function* () {
     for (const matched of matches) {
@@ -207,14 +179,19 @@ const readWorkflow = async (
     fs.readFile(workflowPath, 'utf8'),
   );
 
-  return Result.isErr(result)
-    ? Result.err(
-        `Failed to read ${relativePath}: ${unknownToString(result.value)}`,
-      )
-    : Result.ok({
-        relativePath,
-        triggers: parseWorkflowTriggers(result.value),
-      });
+  if (Result.isErr(result)) {
+    return Result.err(
+      `Failed to read ${relativePath}: ${unknownToString(result.value)}`,
+    );
+  }
+
+  return Result.map(
+    Result.mapErr(
+      parseWorkflowTriggers(result.value),
+      (message) => `${relativePath}: ${message}`,
+    ),
+    (triggers) => ({ relativePath, triggers }),
+  );
 };
 
 const readWorkflows = async (
