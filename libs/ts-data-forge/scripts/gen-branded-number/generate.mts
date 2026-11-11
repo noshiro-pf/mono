@@ -1,7 +1,7 @@
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import { workspaceRootPath } from '../workspace-root-path.mjs';
-import { brandedNumberConfigs } from './config.mjs';
+import { brandedNumberConfigs, findAbsTypeProblems } from './config.mjs';
 import { renderModule, renderOperatorsModule } from './render.mjs';
 
 /**
@@ -12,6 +12,14 @@ import { renderModule, renderOperatorsModule } from './render.mjs';
  * formatting.
  */
 const main = async (): Promise<void> => {
+  const problems = findAbsTypeProblems(brandedNumberConfigs);
+
+  if (problems.length > 0) {
+    throw new Error(
+      ['A config would document `abs` wrongly:', ...problems].join('\n'),
+    );
+  }
+
   for (const config of brandedNumberConfigs) {
     const filePath = path.resolve(
       workspaceRootPath,

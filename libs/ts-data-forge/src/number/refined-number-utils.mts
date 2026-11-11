@@ -6,13 +6,20 @@ import type {
   Int16,
   Int32,
   IntersectBrand,
+  NegativeFiniteNumber,
+  NegativeInt,
+  NegativeNumber,
+  NegativeSafeInt,
   NonNegativeInt16,
   NonNegativeNumber,
   NonZeroInt,
   NonZeroInt16,
   NonZeroInt32,
   NonZeroNumber,
+  PositiveFiniteNumber,
+  PositiveInt,
   PositiveNumber,
+  PositiveSafeInt,
   PositiveUint16,
   PositiveUint32,
   RelaxedExclude,
@@ -106,8 +113,10 @@ export namespace TsDataForgeInternals {
      * The type of `abs` of a branded number type. A signed range bounded by
      * `-2^k <= x < 2^k` is asymmetric — `abs(-2^k)` is `2^k`, outside it — so
      * `Int16` maps to `Uint16` and `Int32` to `Uint32` (`PositiveUint16` and
-     * `PositiveUint32` for the non-zero ones); every other type keeps its
-     * brands and gains the non-negative one.
+     * `PositiveUint32` for the non-zero ones). A negative type loses its
+     * negative brand and gains the positive one (`NegativeInt` to
+     * `PositiveInt`), as the strict standard library's `Math.abs` does; every
+     * other type keeps its brands and gains the non-negative one.
      *
      * @template N - A branded number type
      * @internal
@@ -115,15 +124,17 @@ export namespace TsDataForgeInternals {
     export type ToAbs<N extends UnknownNumberBrand> =
       N extends NonNegativeNumber
         ? ToNonNegative<N>
-        : N extends Int16
-          ? N extends NonZeroNumber
-            ? PositiveUint16
-            : Uint16
-          : N extends Int32
+        : N extends NegativeNumber
+          ? IntersectBrand<WithoutNonPositiveBrand<N>, PositiveNumber>
+          : N extends Int16
             ? N extends NonZeroNumber
-              ? PositiveUint32
-              : Uint32
-            : ToNonNegative<N>;
+              ? PositiveUint16
+              : Uint16
+            : N extends Int32
+              ? N extends NonZeroNumber
+                ? PositiveUint32
+                : Uint32
+              : ToNonNegative<N>;
 
     expectType<ToAbs<Int16>, Uint16>('=');
 
@@ -142,6 +153,31 @@ export namespace TsDataForgeInternals {
     expectType<ToAbs<Uint32>, Uint32>('=');
 
     expectType<ToAbs<NonNegativeInt16>, NonNegativeInt16>('=');
+
+    expectType<ToAbs<NegativeInt>, PositiveInt>('=');
+
+    expectType<ToAbs<NegativeSafeInt>, PositiveSafeInt>('=');
+
+    expectType<ToAbs<NegativeFiniteNumber>, PositiveFiniteNumber>('=');
+
+    /**
+     * `N` without the brand keys a negative number carries: the true keys of
+     * `NonPositiveNumber` (`<=0` and the upper bounds it implies) and the false
+     * `>=0`. What is left is the rest of `N` (an integer, a safe one, a finite
+     * one), which {@link ToAbs} makes positive.
+     *
+     * @template N - A branded number type
+     * @internal
+     */
+    type WithoutNonPositiveBrand<N extends UnknownNumberBrand> = Brand<
+      GetBrandValuePart<N>,
+      RelaxedExclude<
+        UnwrapBrandTrueKeys<N>,
+        '< 2^15' | '< 2^16' | '< 2^31' | '< 2^32' | '<=0'
+      > &
+        string,
+      RelaxedExclude<UnwrapBrandFalseKeys<N>, '>=0'> & string
+    >;
 
     /**
      * Removes the non-zero brand constraint from a branded number type. Used

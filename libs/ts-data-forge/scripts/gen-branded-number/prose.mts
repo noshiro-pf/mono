@@ -1,4 +1,4 @@
-import type { BrandedNumberConfig } from './config.mjs';
+import { type BrandedNumberConfig, isNegativeRange } from './config.mjs';
 
 export type ParamDoc = Readonly<{ name: string; desc: string }>;
 
@@ -79,16 +79,19 @@ export const methodProse = (
         ),
       );
 
-    case 'abs':
+    case 'abs': {
+      const absType = absTypeOf(config);
+
       return {
-        description: `Returns the absolute value of ${tn}.\n\n${config.absType === undefined ? `The result is non-negative and keeps the \`${t}\` brand.` : `The result is typed \`${config.absType}\`, not \`${t}\`: the range is asymmetric, and \`abs(MIN_VALUE)\` is \`MAX_VALUE + 1\`.`}${config.precision === 'may-lose' ? ' Note that `Math.abs(Number.MIN_SAFE_INTEGER)` exceeds `Number.MAX_SAFE_INTEGER`, so use `SafeInt` for guaranteed precision.' : ''}`,
+        description: `Returns the absolute value of ${tn}.\n\n${absType === undefined ? `The result is non-negative and keeps the \`${t}\` brand.` : `The result is typed \`${absType}\`, not \`${t}\`: ${absReasonOf(config)}.`}${config.precision === 'may-lose' ? ' Note that `Math.abs(Number.MIN_SAFE_INTEGER)` exceeds `Number.MAX_SAFE_INTEGER`, so use `SafeInt` for guaranteed precision.' : ''}`,
         hasExample: true,
         params: [{ name: 'a', desc: `The ${nounOf(config)} value` }],
         returns:
-          config.absType === undefined
+          absType === undefined
             ? `The absolute value as a non-negative \`${t}\``
-            : `The absolute value as a \`${config.absType}\``,
+            : `The absolute value as ${indefinite(absType)} \`${absType}\``,
       };
+    }
 
     case 'min':
       return {
@@ -283,3 +286,17 @@ const namespaceDescription = (config: BrandedNumberConfig): string => {
 };
 
 const VOWELS = new Set<string>(['a', 'e', 'i', 'o', 'u']);
+
+/**
+ * The type `abs` returns when it is not the module's own type: `absType`, or
+ * for an enum module (`Int8`) the literal `AbsoluteValue<N>` its renderer
+ * writes.
+ */
+const absTypeOf = (config: BrandedNumberConfig): string | undefined =>
+  config.enumSpec?.hasAbs === true ? 'AbsoluteValue<N>' : config.absType;
+
+/** Why `abs` does not keep the module's own type. */
+const absReasonOf = (config: BrandedNumberConfig): string =>
+  isNegativeRange(config)
+    ? 'the absolute value of a negative number is positive'
+    : (`the range is asymmetric, and \`abs(MIN_VALUE)\` is \`MAX_VALUE + 1\`${config.enumSpec?.hasAbs === true ? `, which is not ${indefinite(config.pascalName)} \`${config.pascalName}\`` : ''}` as const);

@@ -87,7 +87,7 @@ export const Int32 = {
    * `abs(MIN_VALUE)` is `MAX_VALUE + 1`.
    *
    * @param a - The integer value
-   * @returns The absolute value as a `Uint32`
+   * @returns The absolute value as an `Uint32`
    */
   abs,
 

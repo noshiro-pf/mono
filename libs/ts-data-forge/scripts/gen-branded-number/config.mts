@@ -109,10 +109,15 @@ export type BrandedNumberConfig = Readonly<{
   enumSpec?: Readonly<{ wideBase: string; hasAbs: boolean }>;
 
   /**
-   * The type `abs` returns when the range is asymmetric (`-2^k <= x < 2^k`), so
-   * that `abs(MIN_VALUE)` is outside it. The generated module asserts that its
-   * `abs` returns this type, which `ToAbs` in
-   * `src/number/refined-number-utils.mts` decides.
+   * The type `abs` returns when it is not the module's own type: for an
+   * asymmetric range (`-2^k <= x < 2^k`), whose `abs(MIN_VALUE)` is outside it,
+   * and for a negative one, whose absolute values are positive. The JSDoc names
+   * it, and a module with a `NumberClass` assertion asserts that its `abs`
+   * returns it, which `ToAbs` in `src/number/refined-number-utils.mts` decides.
+   * It is imported from `ts-type-forge` unless `extraImports` already imports
+   * it. `generate.mts` refuses such a config without one
+   * ({@link findAbsTypeProblems}); an enum module names its `AbsoluteValue<N>`
+   * itself.
    */
   absType?: string;
 
@@ -194,6 +199,101 @@ const TO_INT_RET = 'TsDataForgeInternals.RefinedNumberUtils.ToInt<ElementType>';
 
 const REMOVE_NZ_RET =
   `TsDataForgeInternals.RefinedNumberUtils.RemoveNonZeroBrandKey<${TO_INT_RET}>` as const;
+
+/**
+ * Whether every value of the config's range is negative, read from its
+ * `maxValueExpr`.
+ */
+export const isNegativeRange = (config: BrandedNumberConfig): boolean =>
+  (evaluateBound(config.maxValueExpr) ?? 0) < 0;
+
+/**
+ * One message per config whose `abs` cannot keep the module's own type and that
+ * names no `absType`: an asymmetric range, where `abs(MIN_VALUE)` is
+ * `MAX_VALUE + 1`, or a negative one. Without it the generated JSDoc says the
+ * result "keeps the brand", which is false, and nothing else would say so. A
+ * bound the reader below cannot evaluate is a message too.
+ */
+export const findAbsTypeProblems = (
+  configs: readonly BrandedNumberConfig[],
+): readonly string[] =>
+  configs.flatMap((config) => {
+    if (
+      !config.namespaceKeys.includes('abs') ||
+      config.absType !== undefined ||
+      config.enumSpec !== undefined
+    ) {
+      return [];
+    }
+
+    const min = evaluateBound(config.minValueExpr);
+
+    const max = evaluateBound(config.maxValueExpr);
+
+    if (min === undefined || max === undefined) {
+      return [
+        `${config.pascalName}: cannot read its range (\`${config.minValueExpr}\`, \`${config.maxValueExpr}\`) to tell whether \`abs\` keeps the brand; teach \`evaluateBound\` the form.`,
+      ];
+    }
+
+    if (max < 0) {
+      return [
+        `${config.pascalName}: its range is negative, so \`abs\` returns a positive type; name it in \`absType\`.`,
+      ];
+    }
+
+    // Exact only for safe integers: `Number.MAX_VALUE + 1` is `Number.MAX_VALUE`.
+    return Number.isSafeInteger(max) && -min === max + 1
+      ? [
+          `${config.pascalName}: its range is asymmetric (\`abs(${config.minValueExpr})\` is outside it); name the type \`abs\` returns in \`absType\`.`,
+        ]
+      : [];
+  });
+
+/**
+ * A `minValueExpr` / `maxValueExpr` as a number: an integer literal, a
+ * `Number.*` constant, `2 ** k`, `x - 1`, a negation, with a trailing `as T`
+ * ignored; `undefined` for any other form.
+ */
+export const evaluateBound = (expression: string): number | undefined => {
+  const text = expression.replace(/\s+as\s+\w+$/u, '').trim();
+
+  if (/^\d+$/u.test(text)) {
+    return Number(text);
+  }
+
+  const constant = NUMBER_CONSTANTS.get(text);
+
+  if (constant !== undefined) {
+    return constant;
+  }
+
+  const power = /^2 \*\* (?<k>\d+)$/u.exec(text)?.groups?.['k'];
+
+  if (power !== undefined) {
+    return 2 ** Number(power);
+  }
+
+  const lessOne = /^(?<x>.+) - 1$/u.exec(text)?.groups?.['x'];
+
+  if (lessOne !== undefined) {
+    const x = evaluateBound(lessOne);
+
+    return x === undefined ? undefined : x - 1;
+  }
+
+  const negated =
+    /^-\((?<x>.+)\)$/u.exec(text)?.groups?.['x'] ??
+    /^-(?<x>[^-].*)$/u.exec(text)?.groups?.['x'];
+
+  if (negated !== undefined) {
+    const x = evaluateBound(negated);
+
+    return x === undefined ? undefined : -x;
+  }
+
+  return undefined;
+};
 
 /** A locally-defined `floor`/`ceil`/`round` const for a float module. */
 const roundingConst = (name: string, ret: string): string =>
@@ -777,6 +877,7 @@ export const brandedNumberConfigs: readonly BrandedNumberConfig[] = [
     customConsts:
       'const abs = (x: WithSmallInt<ElementType>): PositiveInt =>\n  PositiveInt.fromNumber(Math.abs(x));',
     customKeys: ['abs'],
+    absType: 'PositiveInt',
     namespaceKeys: [
       'is',
       'MAX_VALUE',
@@ -813,6 +914,7 @@ export const brandedNumberConfigs: readonly BrandedNumberConfig[] = [
     customConsts:
       'const abs = (x: WithSmallInt<ElementType>): PositiveSafeInt =>\n  PositiveSafeInt.fromNumber(Math.abs(x));',
     customKeys: ['abs'],
+    absType: 'PositiveSafeInt',
     namespaceKeys: [
       'is',
       'MIN_VALUE',
@@ -999,6 +1101,7 @@ export const brandedNumberConfigs: readonly BrandedNumberConfig[] = [
       floatRounding(TO_INT_RET, REMOVE_NZ_RET, REMOVE_NZ_RET),
     ].join('\n\n'),
     customKeys: ['abs', 'floor', 'ceil', 'round'],
+    absType: 'PositiveFiniteNumber',
     namespaceKeys: [
       'is',
       'MAX_VALUE',
@@ -1086,3 +1189,10 @@ export const brandedNumberConfigs: readonly BrandedNumberConfig[] = [
     hasExamples: false,
   },
 ] as const;
+
+const NUMBER_CONSTANTS: ReadonlyMap<string, number> = new Map<string, number>([
+  ['Number.MAX_VALUE', Number.MAX_VALUE],
+  ['Number.MIN_VALUE', Number.MIN_VALUE],
+  ['Number.MAX_SAFE_INTEGER', Number.MAX_SAFE_INTEGER],
+  ['Number.MIN_SAFE_INTEGER', Number.MIN_SAFE_INTEGER],
+]);

@@ -110,10 +110,11 @@ export const NegativeFiniteNumber = {
   /**
    * Returns the absolute value of a negative finite number.
    *
-   * The result is non-negative and keeps the `NegativeFiniteNumber` brand.
+   * The result is typed `PositiveFiniteNumber`, not `NegativeFiniteNumber`: the
+   * absolute value of a negative number is positive.
    *
    * @param a - The negative finite number value
-   * @returns The absolute value as a non-negative `NegativeFiniteNumber`
+   * @returns The absolute value as a `PositiveFiniteNumber`
    */
   abs,
 
