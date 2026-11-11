@@ -45,3 +45,6 @@ words:
   # one of the frames the content script also runs in, as the docs, the
   # source and the changelog say.
   - srcdoc
+  # The ARIA attribute `aria-labelledby`, which names each option of GitHub's
+  # label picker; the merge-queued button and its e2e stand-in read it.
+  - labelledby

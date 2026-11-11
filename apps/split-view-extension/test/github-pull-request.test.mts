@@ -4,7 +4,10 @@ import {
   asGitHubMessage,
   claudeSessionUrlOfBody,
   computeGeometry,
+  conversationPathOf,
   githubMessageTag,
+  hasMergeQueue,
+  isConversationOf,
   issueUrlOf,
   parseLayoutSpec,
   pullRequestOf,
@@ -388,3 +391,70 @@ const widthsOf = (root: LayoutNode, width: number): readonly number[] =>
     { left: 0, top: 0, width, height: 800 },
     gutter,
   ).panes.map(({ rect }) => rect.width);
+
+describe('conversationPathOf', () => {
+  test('is the path of the conversation tab', () => {
+    assert.strictEqual(
+      conversationPathOf({
+        number: 2085,
+        url: 'https://github.com/noshiro-pf/mono/pull/2085',
+      }),
+      '/noshiro-pf/mono/pull/2085',
+    );
+  });
+});
+
+describe('isConversationOf', () => {
+  const pullRequest = {
+    number: 2085,
+    url: 'https://github.com/noshiro-pf/mono/pull/2085',
+  } as const;
+
+  test.each([
+    'https://github.com/noshiro-pf/mono/pull/2085',
+    'https://github.com/noshiro-pf/mono/pull/2085/',
+    'https://github.com/noshiro-pf/mono/pull/2085?w=1#issuecomment-1',
+  ])('is the conversation at %s', (address) => {
+    assert.isTrue(isConversationOf(address, pullRequest));
+  });
+
+  test.each([
+    ['the diff', 'https://github.com/noshiro-pf/mono/pull/2085/files'],
+    ['the new diff', 'https://github.com/noshiro-pf/mono/pull/2085/changes'],
+    ['the commits', 'https://github.com/noshiro-pf/mono/pull/2085/commits'],
+    ['another pull request', 'https://github.com/noshiro-pf/mono/pull/2086'],
+    ['another repository', 'https://github.com/someone/mono/pull/2085'],
+    ['the list', 'https://github.com/noshiro-pf/mono/pulls'],
+    ['not an address', 'pull/2085'],
+  ])('is not on %s', (_name, address) => {
+    assert.isFalse(isConversationOf(address, pullRequest));
+  });
+});
+
+describe('hasMergeQueue', () => {
+  test.each([
+    ['this repository', 'https://github.com/noshiro-pf/mono/pull/1', true],
+    [
+      'this repository, spelled in another case',
+      'https://github.com/Noshiro-PF/Mono/pull/1',
+      true,
+    ],
+    [
+      'another repository of the same owner',
+      'https://github.com/noshiro-pf/other/pull/1',
+      false,
+    ],
+    [
+      'a repository whose name starts with this one',
+      'https://github.com/noshiro-pf/mono.github.io/pull/1',
+      false,
+    ],
+    [
+      'the same name under another owner',
+      'https://github.com/someone/mono/pull/1',
+      false,
+    ],
+  ])('%s: %s', (_name, url, expected) => {
+    assert.strictEqual(hasMergeQueue({ number: 1, url }), expected);
+  });
+});

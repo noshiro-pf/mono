@@ -1,6 +1,6 @@
 # Split View — privacy policy
 
-Last updated: 2026-10-27
+Last updated: 2026-11-12
 
 **Split View collects nothing, sends nothing, and has no server.** There is no
 account, no analytics, no telemetry and no third party of any kind.
@@ -39,9 +39,21 @@ Removing the extension removes the lot.
   in a pane. All three become part of that split view and are saved as
   described above.
   Nothing is read until you ask, and nothing is sent anywhere else.
+- **The labels of a GitHub pull request in `noshiro-pf/mono`**, when you press
+  the **＋ merge-queued** button, which is shown on that repository's pull
+  requests and nowhere else. The script reads the label names in GitHub's own
+  label picker, and which are selected, and the labels listed in the pull
+  request's sidebar.
 - **Nothing else about the page.** The scripts do not read page content, form
   fields, cookies or storage beyond the above, and on a page that is not inside
   a split view or a GitHub pull request they stop immediately.
+
+## What the extension changes on GitHub
+
+Only when you press **＋ merge-queued**: it adds the `merge-queued` label to
+that pull request by using GitHub's label picker on the page, as you would by
+hand. GitHub makes the change, as the signed-in user and with that user's
+permissions; the extension sends nothing itself.
 
 ## What the panes themselves do
 

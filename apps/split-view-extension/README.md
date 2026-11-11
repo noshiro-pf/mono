@@ -228,6 +228,34 @@ Every pull request opened this way reuses one saved split view, **GitHub pull
 request**, instead of adding one to the list each time; the PR Manager's links
 use another, so the two do not replace each other's.
 
+#### ＋ merge-queued, on this repository's pull requests
+
+On the pull requests of `noshiro-pf/mono`, and nowhere else, a second button
+sits beside **⧉ Split view**: **＋ merge-queued**. It puts the `merge-queued`
+label on the pull request, which is what queues it for `unblock-prs`
+(`libs/pr-report-core/src/labels.mts`). It is shown only there because the label
+is this repository's convention, not GitHub's: on any other repository it could
+only report that there is no such label, and anyone else who installs the
+extension never sees it. The list is `hasMergeQueue` in
+`src/github/pull-request.mts`.
+
+It works GitHub's own label picker in the sidebar, as a person would: open it,
+filter for the label, select it, close it, and then read the sidebar back. So
+the label is added as you, with your permissions, and the extension holds no
+token and makes no request for it. The picker is on the conversation tab only;
+pressed on another tab, the button follows GitHub's own link there first. It
+then says what happened for a few seconds: `✓ merge-queued`,
+`✓ already merge-queued`, or what stopped it — no label picker (no permission to
+label, or GitHub's markup changed), no such label, not saved, or that you left
+the pull request while it waited, in which case it does nothing to the page you
+went to.
+
+What it reads of GitHub's page is the `Manage labels` button, the
+`Filter labels` input, and the `role="option"` items with their
+`aria-labelledby` and `aria-selected` — accessibility attributes, which GitHub
+keeps stable longest. When they change the button says it found no label picker,
+and `src/github/label-picker.mts` is what to update.
+
 ## Good to know
 
 - **Most sites ask not to be shown inside another page.** For its own panes, and

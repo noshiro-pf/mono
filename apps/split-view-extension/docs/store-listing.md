@@ -195,7 +195,10 @@ github.com and reads its title, the address of the issue it closes and the
 address of a Claude Code session named on a "Claude-Session:" line of its
 description. It reads nothing until then, and sends
 nothing anywhere but to the extension's own service worker, which opens the
-tab.
+tab. On the pull requests of the developer's own repository only, a second
+button adds the "merge-queued" label used by that repository's merge queue, by
+using GitHub's own label picker on the page; it reads the label names there
+when pressed, and the change is made by GitHub as the signed-in user.
 ```
 
 **Remote code**: No. Every script in the package is in the package. The panes

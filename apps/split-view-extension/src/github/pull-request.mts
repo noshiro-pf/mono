@@ -85,6 +85,56 @@ export const claudeSessionUrlOfBody = (body: string): string | undefined =>
   claudeSessionTrailersOf(body)[0]?.url;
 
 /**
+ * `/<owner>/<repo>/pull/<number>`: the path of the pull request's conversation
+ * tab, which is the only tab with the sidebar, and so the only one with
+ * GitHub's label picker.
+ */
+export const conversationPathOf = (pullRequest: PullRequest): string => {
+  const { pathname } = new URL(pullRequest.url);
+
+  return pathname;
+};
+
+/**
+ * Whether `address` is the conversation tab of `pullRequest`, rather than its
+ * diff, its commits or any other tab, or another page altogether. A trailing
+ * `/`, a query and a fragment do not make it another tab.
+ */
+export const isConversationOf = (
+  address: string,
+  pullRequest: PullRequest,
+): boolean => {
+  if (pullRequestOf(address)?.url !== pullRequest.url) {
+    return false;
+  }
+
+  const { pathname } = new URL(address);
+
+  const conversationPath = conversationPathOf(pullRequest);
+
+  return pathname === conversationPath || pathname === `${conversationPath}/`;
+};
+
+/**
+ * Whether the merge-queued button belongs on `pullRequest`.
+ *
+ * `merge-queued` is the label `unblock-prs` (`libs/pr-merge-queue`) reads to
+ * queue a pull request of this repository — a convention of this repository,
+ * not of GitHub — so the button is shown only where such a queue reads it, and
+ * nobody else who installs the extension ever sees it. Owner and repository
+ * names ignore case on GitHub, so this does too. A repository is added to
+ * `mergeQueueRepositories`, and the extension rebuilt.
+ */
+export const hasMergeQueue = (pullRequest: PullRequest): boolean => {
+  const [, owner = '', repo = ''] = conversationPathOf(pullRequest).split(
+    '/',
+    3,
+  );
+
+  return mergeQueueRepositories.has(`${owner}/${repo}`.toLowerCase());
+};
+
+/**
  * The saved split view a pull request opened from GitHub reuses, rather than
  * adding one to the list each time. It is not the PR Manager's `pr-manager`, so
  * the two do not overwrite each other. What it is opened with is
@@ -136,6 +186,11 @@ const ownerPattern = /^[a-z\d-]+$/iu;
 const repoPattern = /^[\w.-]+$/u;
 
 const numberPattern = /^\d+$/u;
+
+/** `<owner>/<repo>`, in lower case. */
+const mergeQueueRepositories: ReadonlySet<string> = new Set<string>([
+  'noshiro-pf/mono',
+]);
 
 const titleSeparator = ' · ';
 
