@@ -271,7 +271,13 @@ describe(skipWhile, () => {
   });
 
   test('drops an initialized parent value the predicate skips', () => {
-    assert.isFalse(just(seed).pipe(skipWhile((x) => x < 10)).hasValue);
+    assert.isTrue(
+      Optional.isNone(
+        just(seed)
+          .pipe(skipWhile((x) => x < 10))
+          .getSnapshot(),
+      ),
+    );
   });
 
   test('passes every later value once the initial value has ended the skipping', () => {
@@ -607,7 +613,11 @@ describe(derive, () => {
 
     assert.strictEqual(sum.value, 3);
 
-    assert.isFalse(derive([a, source<number>()], (x, y) => x + y).hasValue);
+    assert.isTrue(
+      Optional.isNone(
+        derive([a, source<number>()], (x, y) => x + y).getSnapshot(),
+      ),
+    );
   });
 
   test('a result equal by Object.is to the one held is not emitted', () => {

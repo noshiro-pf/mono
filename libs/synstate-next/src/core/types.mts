@@ -61,8 +61,6 @@ export type Operator<A, B> =
  * name `A`, so that `Observable<A>` stays covariant in `A`.
  */
 export type Observable<A> = Readonly<{
-  /** Whether it holds a value. */
-  hasValue: boolean;
   /**
    * The value it holds as an `Optional`: `Optional.none` while it holds none.
    * The same object while the value is the same, so a wrapper

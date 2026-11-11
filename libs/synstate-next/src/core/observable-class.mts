@@ -134,10 +134,6 @@ export class ObservableClass<A> implements DerivedNode {
     return false;
   }
 
-  get hasValue(): boolean {
-    return this.current !== noValue;
-  }
-
   /**
    * The same `Some` while the value is the same, as `useSyncExternalStore`
    * needs. Built when read, and kept aside in `snapshots` rather than in a

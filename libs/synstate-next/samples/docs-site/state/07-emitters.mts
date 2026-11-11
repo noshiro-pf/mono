@@ -39,7 +39,7 @@ if (import.meta.vitest !== undefined) {
     // Both are `source()`, with the function taken off.
     const messages = source<string>();
 
-    assert.isFalse(messages.hasValue);
+    assert.isTrue(Optional.isNone(messages.getSnapshot()));
 
     messages.emit('hello');
 

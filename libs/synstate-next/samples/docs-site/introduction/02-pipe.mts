@@ -26,7 +26,7 @@ if (import.meta.vitest !== undefined) {
 
     assert.strictEqual(doubled.value, 2);
 
-    assert.isFalse(even.hasValue);
+    assert.isTrue(Optional.isNone(even.getSnapshot()));
 
     setCount(4);
 

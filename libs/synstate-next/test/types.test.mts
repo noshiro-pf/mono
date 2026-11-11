@@ -151,7 +151,7 @@ describe('types', () => {
 
     assert.deepStrictEqual(wide.getSnapshot(), Optional.some(1));
 
-    assert.isTrue(kept.hasValue);
+    assert.isTrue(Optional.isSome(kept.getSnapshot()));
 
     // An observable that always holds a value reads it as a `Some`.
     const _keptValue = kept.getSnapshot();
@@ -164,7 +164,7 @@ describe('types', () => {
 
     expectType<typeof _notYetValue, Optional<string>>('=');
 
-    assert.isFalse(notYet.hasValue);
+    assert.isTrue(Optional.isNone(notYet.getSnapshot()));
 
     assert.isTrue(Optional.isNone(notYet.getSnapshot()));
   });
@@ -248,7 +248,7 @@ describe('types', () => {
       '=',
     );
 
-    assert.isTrue(taken.hasValue);
+    assert.isTrue(Optional.isSome(taken.getSnapshot()));
   });
 
   test('filter narrows the values by a type guard', () => {

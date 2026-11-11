@@ -1,4 +1,5 @@
 import { fromAbortablePromise } from 'synstate-next';
+import { Optional } from 'ts-std-forge';
 
 // embed-sample-code-ignore-below
 if (import.meta.vitest !== undefined) {
@@ -31,7 +32,7 @@ if (import.meta.vitest !== undefined) {
 
       assert.deepStrictEqual(mut_aborted, [true]);
 
-      assert.isFalse(request.hasValue);
+      assert.isTrue(Optional.isNone(request.getSnapshot()));
 
       // embed-sample-code-ignore-below
     } finally {

@@ -11,7 +11,7 @@ if (import.meta.vitest !== undefined) {
       const answer = fromPromise(Promise.resolve(42));
 
       // Nothing until the promise settles.
-      assert.isFalse(answer.hasValue);
+      assert.isTrue(Optional.isNone(answer.getSnapshot()));
 
       await vi.advanceTimersByTimeAsync(0);
 
