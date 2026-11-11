@@ -547,8 +547,8 @@ holds a matching artifact. By the tree, as a verdict is, and not by
 `reused_from`, because the run whose verdict was reused may itself have reused
 one and then holds nothing. A fork's run is never taken: its artifacts come from
 workflow files the fork wrote. `coverage-main` takes only a successful run,
-since a failed shard kept no reports; `benchmark` takes a failed one too,
-because what fails there is the committed tables, not the measurement.
+since a failed one kept no reports; `benchmark` takes a failed one too, because
+what fails there is the committed tables, not the measurement.
 
 Where no run of the tree holds the artifact — it expired, or the merge bypassed
 the checks — the job produces it as it used to, so the lookup can only save
@@ -556,15 +556,16 @@ work, never skip it.
 
 A pull request's own run takes the coverage reports the same way when it reused
 a passing verdict, which is the usual case for a queued one: its queue layer ran
-the shards and uploaded them for the layer's commit, so without `coverage-pr`
+the coverage and uploaded it for the layer's commit, so without `coverage-pr`
 its head would have no report and Codecov would write neither its statuses nor
 its comment. `coverage-pr` uploads each `coverage-<index>` artifact on its own,
-as the shards did, because Codecov waits for as many uploads as there are shards
-(`after_n_builds`) and one merged upload, as `coverage-main` makes, would not
-do. Where no run of the tree kept them it uploads nothing rather than running
-the shards: the statuses are informational, and that would cost what the reuse
-saved. `check:root:codecov-builds` holds its `artifact` list to the
-`coverage: true` entries.
+as the matrix entries did, because Codecov waits for as many uploads as there
+are `coverage: true` entries (`after_n_builds`; one today), and with more than
+one, a merged upload, as `coverage-main` makes, would not do. Where no run of
+the tree kept them it uploads nothing rather than running the coverage again:
+the statuses are informational, and that would cost what the reuse saved.
+`check:root:codecov-builds` holds its `artifact` list to the `coverage: true`
+entries.
 
 #### Why a workflow of its own
 
@@ -667,27 +668,31 @@ each caller passes it as `result-job: <name>-result / result`.
   nowhere. What a script body cannot show is declared in `DECLARED_COVERAGE`;
   `UNCOVERED_BY_DESIGN` is a list of claims, each with a reason, not a silencer.
 - **`timeout-minutes` is for a command that hangs, not a slow runner.** It is 15
-  or less (`pnpm run check:root:workflow-timeouts`), more than twice the six and
-  a half minutes a check job takes (see the next point); a 10-minute cap was
-  spent once by a `pnpm/action-setup` step that took three minutes instead of
-  its usual few seconds. A job whose usual length leaves too little of 15 to
-  spare is named in that check with its reason, and may declare more.
-- **One pull request runs seventeen jobs at a time, of about equal length.**
-  The account runs twenty GitHub-hosted jobs at once, across every workflow, and
-  a merge to `main` runs about three of its own while the next queued pull
-  request's checks start. Above twenty a job waits, and which one is GitHub's
-  choice. So the check workflows' jobs, which all start together after their
-  gates, are seventeen (code-check's ten, style-check's two,
-  node-version-compatibility's three, strict-lib-gen's two; the benchmark's job,
-  about a minute when its baseline hits, is one more), and each takes about six
-  to six and a half minutes from start to end. Pull requests merge one at a
-  time, so a pull request's longest job is what the queue waits on (with
-  `speculate` in `.github/unblock-prs.json` the queue checks the next pull
-  requests ahead of their turn on top of the first, so the runners carry more
-  than one pull request's jobs; "Triggers" says how): a short check rides along
-  with a longer one rather than taking a runner of its own, and a job that
-  outgrows the others is split. A new entry joins an existing one unless the
-  count is rethought; the matrix comment in `code-check.yml` has the arithmetic.
+  or less (`pnpm run check:root:workflow-timeouts`), and a check job is kept
+  below about 12 minutes at p90 (see the next point), so that a slow runner does
+  not reach it; a 10-minute cap was spent once by a `pnpm/action-setup` step
+  that took three minutes instead of its usual few seconds. A job whose usual
+  length leaves too little of 15 to spare is named in that check with its
+  reason, and may declare more.
+- **A pull request's checks are few and long, because runner-minutes are what
+  the queue spends.** The account runs twenty GitHub-hosted jobs at once, across
+  every workflow; above twenty a job waits, and which one is GitHub's choice.
+  With `speculate` in `.github/unblock-prs.json` the queue checks the next pull
+  requests ahead of their turn, each on its own queue layer ("Triggers" says
+  how), so the runners carry several pull requests' jobs at once, and how many
+  pull requests merge in an hour is the runners divided by the runner-minutes
+  one pull request costs. Every job pays its own setup and build — about 40
+  seconds of setup, then about 45 for `ws:build:deps` or 105 for `ws:build` — so
+  a job split in two costs that once more and buys nothing but a shorter wait
+  for a pull request checked alone, which happens only when the queue is empty.
+  So the check workflows run thirteen jobs a pull request (code-check's seven,
+  style-check's two, node-version-compatibility's two, strict-lib-gen's two; the
+  benchmark's job, about a minute when its baseline hits, is one more): a short
+  check rides along with a longer one rather than taking a runner of its own,
+  and a job is split only when its p90 comes near the timeout. The longest,
+  `ws:fix:lint`, is estimated at about ten minutes, twelve at p90, from the two
+  halves it used to be. A new check joins an existing entry; the matrix comment
+  in `code-check.yml` has the arithmetic.
 
 ### When a check fails
 
@@ -740,10 +745,11 @@ end-to-end suite run against a site's production build).
 `code-check.yml` used to build once and hand its matrix the tarball, which saved
 runner time and cost the critical path about three minutes — the gate, then the
 build job's setup and build, then each entry's setup and download — while ten
-runners waited; what is short is the twenty concurrent runners, not runner time,
-which a public repository does not pay for (see "One pull request runs seventeen
-jobs at a time" under "The work"). In `node-version-compatibility.yml`, building
-on each Node version is the check itself.
+runners waited. That was weighed when the queue checked one pull request at a
+time; with the queue checking ahead, runner-minutes are what it spends (see "A
+pull request's checks are few and long" under "The work"), so the trade-off
+needs measuring again. In `node-version-compatibility.yml`, building on each
+Node version is the check itself.
 
 ## `skip-ci` and `no-skip-ci-label`
 

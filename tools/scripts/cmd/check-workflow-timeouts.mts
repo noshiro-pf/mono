@@ -214,7 +214,8 @@ const LONGER_TIMEOUTS: ReadonlyRecord<string, LongerTimeout> = {
   },
   'code-check.yml#coverage-main': {
     minutes: 20,
-    reason: 'every coverage shard in a row has taken up to 12m30s',
+    reason:
+      'the whole ws:build and ws:check:test:cov in a row has taken up to 12m30s',
   },
 } as const;
 

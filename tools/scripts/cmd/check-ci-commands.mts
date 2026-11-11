@@ -9,7 +9,7 @@ import {
   unknownToString,
 } from 'ts-data-forge';
 import { getWorkspacePackages, isDirectlyExecuted } from 'ts-repo-utils';
-import type { ReadonlyRecord, StrictPick } from 'ts-type-forge';
+import type { MutableRecord, ReadonlyRecord, StrictPick } from 'ts-type-forge';
 import {
   CI_JOB,
   CI_JOB_BUILD,
@@ -86,6 +86,7 @@ export const checkCiCommands = (): Promise<Result<CheckSummary, string>> =>
 
     const violations = [
       ...unread,
+      ...findStaleExclusiveJobs(workflows, EXCLUSIVE_JOBS),
       ...findRedundantCommands(workflows, graph),
       ...findUncoveredCommands(workflows, manifests, graph),
     ] as const;
@@ -243,9 +244,10 @@ export const buildCoverageGraph = (
  * rather than a sibling of the caller. That is the whole of what the `ws:`
  * commands are, so it is what connects the workflows' command names to the
  * scripts each package defines. Each carries its `--filter` selectors, which
- * `buildCoverageGraph` applies: CI shards by them (`ws:fix:lint:apps`,
- * `ws:check:test:shard-1`), and a shard reaches its own packages, not every
- * package. `pointed` holds a `pnpm --dir <path> run`, the path as written.
+ * `buildCoverageGraph` applies: the root splits a command by them
+ * (`ws:check:types:strict-lib`, `ws:check:test:heavy`), and a part reaches its
+ * own packages, not every package. `pointed` holds a `pnpm --dir <path> run`,
+ * the path as written.
  *
  * A script run with arguments of its own is left out. Everything after the
  * script name is handed to it, and an argument can change what the script
@@ -314,16 +316,29 @@ export const resolveScriptInvocations = (body: string): ScriptInvocations => {
  * check, because the Node underneath differs. Which versions that matrix may
  * name is `check-node-support.mts`'s question, and it is the one that caught
  * `current` naming the same Node as `volta.node`.
+ *
+ * Nor is a job that never runs beside the rest of its workflow, named in
+ * `exclusiveJobs` ({@link EXCLUSIVE_JOBS}) with the reason: what it runs is
+ * never run twice over.
  */
 export const findRedundantCommands = (
   workflows: readonly CheckWorkflow[],
   graph: CoverageGraph,
+  exclusiveJobs: ReadonlyRecord<string, string> = EXCLUSIVE_JOBS,
 ): readonly string[] => {
   const shared = workflows.filter(({ pinsNodeVersion }) => !pinsNodeVersion);
 
   const mut_origins = new Map<string, readonly string[]>();
 
-  for (const { relativePath, commands: workflowCommands } of shared) {
+  for (const { relativePath, jobCommands } of shared) {
+    const workflowCommands = Arr.uniq(
+      Object.entries(jobCommands).flatMap(([job, jobScripts]) =>
+        hasKey(exclusiveJobs, exclusiveJobKey(relativePath, job))
+          ? []
+          : jobScripts,
+      ),
+    );
+
     for (const command of workflowCommands) {
       mut_origins.set(
         command,
@@ -360,6 +375,33 @@ export const findRedundantCommands = (
     }),
   );
 };
+
+/**
+ * One message per `exclusiveJobs` entry that no longer names a job of a check
+ * workflow running a root command, so that an entry left behind by a renamed or
+ * deleted job cannot later hide one that does run beside the rest.
+ */
+export const findStaleExclusiveJobs = (
+  workflows: readonly CheckWorkflow[],
+  exclusiveJobs: ReadonlyRecord<string, string>,
+): readonly string[] =>
+  Arr.generate(function* () {
+    for (const key of Object.keys(exclusiveJobs)) {
+      if (
+        workflows.every(({ relativePath, jobCommands }) =>
+          Object.entries(jobCommands).every(
+            ([job, jobScripts]) =>
+              !(
+                exclusiveJobKey(relativePath, job) === key &&
+                Arr.isNonEmpty(jobScripts)
+              ),
+          ),
+        )
+      ) {
+        yield `EXCLUSIVE_JOBS in check-ci-commands.mts names \`${key}\`, which is no job of a check workflow that runs a root command; remove the entry.`;
+      }
+    }
+  });
 
 /**
  * Every check script that no check workflow reaches.
@@ -450,6 +492,12 @@ export type CheckWorkflow = Readonly<{
   relativePath: string;
   /** The root scripts it runs. */
   commands: readonly string[];
+  /**
+   * The root scripts each job runs, by job id: `commands` is their union, kept
+   * as well because most readers ask what the workflow runs, not which job.
+   * `collectWorkflowCommands` makes both from one reading.
+   */
+  jobCommands: ReadonlyRecord<string, readonly string[]>;
   /** What it runs in packages, resolved by {@link resolvePackageRuns}. */
   packageRuns: readonly PackageRun[];
   /** What it says that this could not read. */
@@ -459,7 +507,7 @@ export type CheckWorkflow = Readonly<{
 
 export type WorkflowCommands = StrictPick<
   CheckWorkflow,
-  'commands' | 'packageRuns' | 'problems'
+  'commands' | 'jobCommands' | 'packageRuns' | 'problems'
 >;
 
 /** A `pnpm run` pointed at packages by `--filter`, `-r` or `--dir`. */
@@ -510,6 +558,18 @@ const WORKSPACE_EXPRESSION = /^\$\{\{\s*github\.workspace\s*\}\}\/?$/u;
 
 /** `node-version:` pins a version; `node-version-file:` reads `volta.node`. */
 const PINNED_NODE_VERSION = /^ *node-version: /mu;
+
+/**
+ * Jobs that never run beside the rest of their workflow, keyed by
+ * `<workflow path>#<job id>`, each with the reason. Their commands still count
+ * as run, for {@link findUncoveredCommands}, but not as run twice, for
+ * {@link findRedundantCommands}. A claim, not a silencer: an entry whose job is
+ * gone fails ({@link findStaleExclusiveJobs}).
+ */
+const EXCLUSIVE_JOBS: ReadonlyRecord<string, string> = {
+  '.github/workflows/code-check.yml#coverage-main':
+    'Runs `ws:check:test:cov` on a push to main only when the matrix reused a verdict and no run of the tree kept its reports, so never beside the coverage entry that runs it.',
+} as const;
 
 /**
  * What a script body cannot say about itself.
@@ -607,31 +667,13 @@ const UNCOVERED_BY_DESIGN: readonly UncoveredDeclaration[] = [
   },
   {
     directory: ROOT_DIRECTORY,
-    scriptName: 'ws:check:e2e',
-    // `code-check.yml` runs it as two shards, `ws:check:e2e:shard-1` and
-    // `ws:check:e2e:shard-2`, which between them reach every app's `check:e2e`;
-    // that their filters partition the apps is `check:root:workspace-shards`.
-  },
-  {
-    directory: ROOT_DIRECTORY,
     scriptName: 'ws:check:types',
     // CI runs it as two halves, `ws:check:types:non-strict-lib` (in
     // `code-check.yml`) and `ws:check:types:strict-lib` (in
     // `strict-lib-gen.yml`), which between them reach every package's
-    // `check:types`. As with `ws:check:lint` below, neither covers the root
-    // command on its own; that the halves partition the packages is in their
-    // filters, `!./strict-lib/**` and `./strict-lib/**`
-    // (`check:root:workspace-shards`).
-  },
-  {
-    directory: ROOT_DIRECTORY,
-    scriptName: 'ws:check:lint',
-    // `code-check.yml` runs `ws:fix:lint` as two halves, `ws:fix:lint:apps` and
-    // `ws:fix:lint:non-apps`, which between them reach every package's
-    // `fix:lint` — and through it `check:lint`. Neither half covers the root
-    // command on its own, so no `DECLARED_COVERAGE` edge says so; that the
-    // halves partition the packages is in their filters
-    // (`check:root:workspace-shards`).
+    // `check:types`. Neither covers the root command on its own; that the
+    // halves partition the packages is in their filters, `!./strict-lib/**` and
+    // `./strict-lib/**` (`check:root:workspace-shards`).
   },
   {
     // Every package that defines one.
@@ -679,10 +721,15 @@ export const collectWorkflowCommands = (
   const jobs = readWorkflowJobs(workflowFile);
 
   if (Result.isErr(jobs)) {
-    return { commands: [], packageRuns: [], problems: [jobs.value] };
+    return {
+      commands: [],
+      jobCommands: {},
+      packageRuns: [],
+      problems: [jobs.value],
+    };
   }
 
-  const mut_commands: string[] = [];
+  const mut_jobCommands: MutableRecord<string, readonly string[]> = {};
 
   const mut_packageRuns: PackageRun[] = [];
 
@@ -690,6 +737,8 @@ export const collectWorkflowCommands = (
 
   for (const job of jobs.value) {
     const matrix = readMatrix(job.matrix);
+
+    const mut_commands: string[] = [];
 
     for (const [index, step] of job.steps.entries()) {
       if (step.run === undefined) {
@@ -767,10 +816,15 @@ export const collectWorkflowCommands = (
         }
       }
     }
+
+    if (Arr.isNonEmpty(mut_commands)) {
+      mut_jobCommands[job.name] = Arr.uniq(mut_commands).toSorted();
+    }
   }
 
   return {
-    commands: Arr.uniq(mut_commands).toSorted(),
+    commands: Arr.uniq(Object.values(mut_jobCommands).flat()).toSorted(),
+    jobCommands: mut_jobCommands,
     packageRuns: mut_packageRuns,
     problems: mut_problems,
   };
@@ -1223,6 +1277,9 @@ const isUncoveredByDesign = (directory: string, scriptName: string): boolean =>
       entry.scriptName === scriptName &&
       (entry.directory === undefined || entry.directory === directory),
   );
+
+const exclusiveJobKey = (relativePath: string, job: string): string =>
+  `${relativePath}#${job}` as const;
 
 const reaches = (
   graph: CoverageGraph,

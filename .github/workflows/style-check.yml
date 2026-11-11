@@ -78,12 +78,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # Two entries of about six minutes each, so that one pull request's
-        # jobs across the check workflows stay at seventeen of the account's
-        # twenty concurrent runners (see the matrix of code-check.yml), each
-        # a `run-s --continue-on-error` bundle, so every part of it reports
-        # even when an earlier one fails. As ten entries, most of these were a
-        # minute of setup for seconds of work.
+        # Two entries of about six minutes each (eight at p90), each a
+        # `run-s --continue-on-error` bundle, so every part of it reports even
+        # when an earlier one fails. As ten entries, most of these were a
+        # minute of setup for seconds of work. One entry would save a setup
+        # and build, which is what the queue spends (see the matrix of
+        # code-check.yml), but would come to about 13 minutes at p90, too near
+        # the 15-minute timeout.
         #
         # `z:ci:style-check:checks-and-generators` builds the packages the
         # others link to and runs, in this order, the checks, on the tree as

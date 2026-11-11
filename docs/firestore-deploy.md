@@ -34,7 +34,7 @@ workflow は対象のアプリと project を `TARGETS` に明示的に書いて
 ## ルールを変えるとき
 
 `check:test:rules`（`life-plan-simulator`・`task-manager`）は Java と Firestore
-エミュレータを使うルールのテストで、`code-check.yml` の `z:ci:code-check:coverage-2-types-and-rules` の中で `ws:check:test:rules` が
+エミュレータを使うルールのテストで、`code-check.yml` の `z:ci:code-check:coverage-types-and-emulators` の中で `ws:check:test:rules` が
 pull request で走らせる。workflow もデプロイの前に、鍵を持たない job で
 デプロイするアプリのテストを走らせ、落ちたアプリはデプロイしない。バイパスでの
 マージや、チェックがまだ走っている `main` への push でも、テストに落ちるルールは

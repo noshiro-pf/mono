@@ -17,7 +17,7 @@ codecov:
     # the badges read, is processed all the same. A pull request whose
     # verdict was reused, as a queued one's is from its queue layer, uploads
     # through `coverage-pr`, once per entry too.
-    after_n_builds: 2
+    after_n_builds: 1
 
 coverage:
   status:
@@ -39,16 +39,16 @@ comment:
   # part of the suite. Keep this equal to the number of `coverage: true`
   # entries of code-check.yml's matrix, as `codecov.notify` above
   # (`check:root:codecov-builds`).
-  after_n_builds: 2
+  after_n_builds: 1
 
 # One component per package, so that a repository-wide number is not the only
 # thing on offer. `pnpm run ws:check:test:cov` writes a coverage report per package
-# and the workflow uploads them from each of its shards; components split that
-# back apart by path, which flags could not do without one upload per package.
+# and the workflow uploads them together; components split that back apart by
+# path, which flags could not do without one upload per package.
 #
 # The paths below assume Codecov sees `libs/<pkg>/src/...`. It does because
 # `coverage:normalize-paths` (tools/scripts/cmd/normalize-coverage-paths.mts),
-# which `ws:check:test:cov` and each of its shards run last, rewrites every
+# which `ws:check:test:cov` runs last, even after a failed part, rewrites every
 # lcov.info to repository-relative paths before upload. The test runner writes
 # them relative to the package and the uploader does not prefix them, so
 # without that step Codecov guesses the package and merges files of the same

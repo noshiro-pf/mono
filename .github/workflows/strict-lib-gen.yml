@@ -163,11 +163,11 @@ jobs:
   # read by `tsc`.
   #
   # A job of its own beside the generator rather than after it: the two take
-  # about three and six minutes, and one pull request's jobs all start
-  # together after their gates and are kept at seventeen runners, each about
-  # as long as the longest (see the matrix of code-check.yml), so one job of
-  # nine minutes would be the longest of the pull request. It checks the
-  # committed output; a stale one fails the generator's job.
+  # about three and six minutes. They were split when every job was sized to
+  # the longest one; with the queue checking ahead, runner-minutes are what it
+  # spends (see the matrix of code-check.yml), and one job of about eight
+  # minutes would save a setup. It checks the committed output; a stale one
+  # fails the generator's job.
   #
   # `ws:build:deps` builds what the members link (`assert-deps-built.mts
   # --workspace`, which the script starts with, asks for all of it), under a
