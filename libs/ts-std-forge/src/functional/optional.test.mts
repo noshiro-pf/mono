@@ -1,3 +1,4 @@
+import type { optionalValue, optionalVariant } from 'ts-std-forge-keys';
 import type { None, Some } from '../adt-types.mjs';
 import { expectType } from '../expect-type.mjs';
 import { unknownToString } from '../others/index.mjs';
@@ -1145,6 +1146,39 @@ describe('Optional test', () => {
       });
 
       assert.strictEqual(result, 'some: undefined');
+    });
+  });
+
+  describe('the type-only keys', () => {
+    test("are ts-std-forge-keys' symbols, so no string names them", () => {
+      expectType<
+        keyof Some<number>,
+        typeof optionalVariant | typeof optionalValue
+      >('=');
+
+      expectType<keyof None, typeof optionalVariant>('=');
+
+      expectType<keyof Some<number> & string, never>('=');
+    });
+
+    test('cannot be written in an object literal', () => {
+      const forged: Optional<number> = {
+        // @ts-expect-error the keys of `Some` are symbols, not these strings
+        'ts-std-forge::Optional': 'some',
+        'ts-std-forge::Optional.value': 1,
+      } as const;
+
+      // What `Optional.some` would not make: an object is a `Some` of itself.
+      assert.isTrue(Optional.isSome(forged));
+    });
+
+    test('cannot be read', () => {
+      const held = Optional.some(1);
+
+      // @ts-expect-error the value of a `Some` is read with `Optional.unwrap`
+      const peeked: unknown = held['ts-std-forge::Optional.value'];
+
+      assert.isUndefined(peeked);
     });
   });
 });

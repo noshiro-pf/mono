@@ -153,6 +153,17 @@ export default [
     }),
   },
 
+  {
+    // Records what the internal encoding writes, which no entry point exports
+    // (see the file's header). It sits in `test/`, beside the table it reads,
+    // rather than beside the encoding: `src/` is published, and the table is
+    // not.
+    files: ['test/optional-encoding.test.mts'],
+    rules: defineKnownRules({
+      'import-x/no-internal-modules': 'off',
+    }),
+  },
+
   // Last, so that nothing above turns these back on.
   eslintConfigOffForOxlint,
 ] satisfies readonly FlatConfig[];

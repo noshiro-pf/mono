@@ -483,12 +483,14 @@ const COMMANDS = [
  * Workspace packages the commands import (from `src/`, through
  * `tools/configs/tsconfig.tsx.json`) that the workflow leaves out on purpose:
  * they change often and the queue rarely waits on them (see the comment above
- * the patterns). A package that joins them is added here.
+ * the patterns), or, as `ts-std-forge-keys`, they publish types only and are
+ * never loaded at runtime. A package that joins them is added here.
  */
 const LEFT_OUT = [
   'ts-data-forge',
   'ts-fortress',
   'ts-repo-utils',
+  'ts-std-forge-keys',
   'ts-type-forge',
 ] as const;
 

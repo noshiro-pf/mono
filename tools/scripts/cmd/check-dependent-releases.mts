@@ -698,9 +698,18 @@ type PlannedRelease = Readonly<{ from: string; to: string }>;
 
 /**
  * Corrections of re-export detection, each with the reason it is a claim and
- * not a silencer. None is needed today.
+ * not a silencer.
  */
-const OVERRIDES: readonly ExposureOverride[] = [] as const;
+const OVERRIDES: readonly ExposureOverride[] = [
+  // ts-std-forge re-exports nothing of ts-std-forge-keys, but keys the `Some` /
+  // `None` it exports by its symbols, so a new major of the keys changes the
+  // type of every Optional ts-std-forge declares, as a re-export's would.
+  {
+    dependency: 'ts-std-forge-keys',
+    dependents: ['ts-std-forge'],
+    exposure: 're-export',
+  },
+] as const;
 
 const SELF_RELATIVE = 'tools/scripts/cmd/check-dependent-releases.mts';
 

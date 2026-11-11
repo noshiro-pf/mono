@@ -69,6 +69,7 @@
     "z:vitest:node": "pnpm run z:vitest --project='Node.js'"
   },
   "dependencies": {
+    "ts-std-forge-keys": "workspace:*",
     "ts-type-forge": "workspace:~"
   },
   "devDependencies": {

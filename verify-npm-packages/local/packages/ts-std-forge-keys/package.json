@@ -1,0 +1,10 @@
+{
+  "name": "verify-ts-std-forge-keys",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "ts-std-forge-keys": "file:../../../.tarballs/ts-std-forge-keys.tgz",
+    "typescript": "latest"
+  }
+}
