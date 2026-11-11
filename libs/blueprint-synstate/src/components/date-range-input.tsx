@@ -90,10 +90,10 @@ type Props = DateRangePickerOptions &
  *   the end field one before the start, drawn as an error.
  *
  * Unlike Blueprint's, the popover is drawn in place, as {@link DateInput}'s is;
- * Escape while it is open is kept from the page, and gives the focus back to
- * the field it was opened from without opening it again; and Enter on text that
- * reads as no date changes nothing, where Blueprint's passes on an invalid
- * `Date`.
+ * Escape in the calendar is kept from the page, and gives the focus back to the
+ * field it was opened from without opening it again (one pressed elsewhere only
+ * closes it, as Blueprint's); and Enter on text that reads as no date changes
+ * nothing, where Blueprint's passes on an invalid `Date`.
  */
 export const DateRangeInput = ({
   value,
@@ -141,7 +141,7 @@ export const DateRangeInput = ({
     target: HTMLDivElement | undefined;
     start: HTMLInputElement | undefined;
     end: HTMLInputElement | undefined;
-    popover: HTMLDivElement | undefined;
+    popover: HTMLElement | undefined;
   } = {
     target: undefined,
     start: undefined,
@@ -708,6 +708,29 @@ export const DateRangeInput = ({
     );
   };
 
+  /**
+   * Closes the calendar. What the pointer showed goes with it, as no day is
+   * left for it to leave; and a field the pointer moved the focus to, as it
+   * does over the calendar, has it only if it really does: an Escape pressed
+   * elsewhere closes the calendar with the pointer still over a day.
+   */
+  const closeCalendar = (): void => {
+    update({
+      ...current(),
+      open: false,
+      start: {
+        ...current().start,
+        focused: document.activeElement === mut_elements.start,
+        hover: undefined,
+      },
+      end: {
+        ...current().end,
+        focused: document.activeElement === mut_elements.end,
+        hover: undefined,
+      },
+    });
+  };
+
   const Overlay = (): JSX.Element => (
     <DatePopover
       getTarget={() => mut_elements.target}
@@ -715,27 +738,18 @@ export const DateRangeInput = ({
         mut_elements.popover = container;
       }}
       popoverClass={'bp6-date-range-input-popover'}
+      onClose={closeCalendar}
       onEscape={() => {
         // Blueprint's popover gives the focus back to the field it was opened
         // from as Escape closes it, so that it is not lost with the calendar;
         // unlike Blueprint's, that focus does not open the calendar again.
-        // What the pointer showed goes with the calendar, as no day is left for
-        // it to leave.
-        update({
-          ...current(),
-          open: false,
-          start: { ...current().start, hover: undefined },
-          end: { ...current().end, hover: undefined },
-        });
+        closeCalendar();
 
         mut_sync.suppressOpen = true;
 
         inputOf(mut_sync.openedFrom)?.focus();
 
         mut_sync.suppressOpen = false;
-      }}
-      onOutsidePress={() => {
-        update({ ...current(), open: false });
       }}
     >
       <DateRangePicker

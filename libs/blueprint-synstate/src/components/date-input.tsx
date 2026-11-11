@@ -89,8 +89,11 @@ type Props = StrictOmit<DatePickerOptions, 'shortcuts'> &
  * - Picking a day closes the calendar with `closeOnSelection`, unless the
  *   month or the time changed with it.
  *
- * Unlike Blueprint's, Escape while the calendar is open is kept from the page,
- * so that the `<dialog>` it is in stays open and the next Escape closes it.
+ * Unlike Blueprint's, Escape in the field or the calendar while the calendar is
+ * open is kept from the page, so that the `<dialog>` it is in stays open and
+ * the next Escape closes it; the one in the calendar gives the focus back to
+ * the field. One pressed elsewhere that nothing took only closes the calendar,
+ * as Blueprint's does.
  */
 export const DateInput = ({
   value,
@@ -261,7 +264,7 @@ export const DateInput = ({
       onEscape={() => {
         focusInput(true);
       }}
-      onOutsidePress={() => {
+      onClose={() => {
         setOpen(false);
       }}
     >

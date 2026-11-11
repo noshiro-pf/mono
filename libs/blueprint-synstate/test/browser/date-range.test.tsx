@@ -255,6 +255,63 @@ describe(DateRangeInput, () => {
   });
 });
 
+describe('DateRangeInput, Escape elsewhere', () => {
+  test('closes the calendar and drops what the pointer showed', async () => {
+    fixNow();
+
+    const host = stage();
+
+    const unmount = render(
+      () => (
+        <DateRangeInput
+          maxDate={RANGE.maxDate}
+          minDate={RANGE.minDate}
+          value={constant(['', ''] as const)}
+          onChange={() => {}}
+        />
+      ),
+      host,
+    );
+
+    try {
+      const [start] = all<HTMLInputElement>(
+        host,
+        '.bp6-date-range-input input',
+      );
+
+      assert.isDefined(start);
+
+      await userEvent.click(start);
+
+      await settle();
+
+      await userEvent.hover(dayButton(host, 12));
+
+      assert.strictEqual(start.value, '2026/10/12');
+
+      start.blur();
+
+      assert.strictEqual(document.activeElement, document.body);
+
+      document.body.dispatchEvent(
+        new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }),
+      );
+
+      await settle();
+
+      assert.strictEqual(all(host, '.bp6-date-range-input-popover').length, 0);
+
+      assert.strictEqual(start.value, '');
+
+      assert.strictEqual(document.activeElement, document.body);
+    } finally {
+      unmount();
+
+      host.remove();
+    }
+  });
+});
+
 describe('DateRangeInput beside Blueprint React', () => {
   test('picks both ends on the calendar, the fields following the pointer', async () => {
     fixNow();

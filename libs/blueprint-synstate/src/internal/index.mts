@@ -5,6 +5,6 @@ export * from './icon-paths.mjs';
 export * from './intent.mjs';
 export * from './local-noon.mjs';
 export * from './parse-integer.mjs';
-export * from './popover-position.mjs';
+export * from './popover-arrow.mjs';
 export * from './range-selection.mjs';
 export * from './unique-id.mjs';
