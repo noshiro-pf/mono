@@ -244,6 +244,294 @@ describe(createToaster, () => {
     assert.notStrictEqual(keys[0], keys[1]);
   });
 
+  test('ignores a toast shown with a key once it is removed', () => {
+    const host = stage();
+
+    onTestFinished(() => {
+      host.remove();
+    });
+
+    const toaster = createToaster({}, host);
+
+    toaster.show({ message: constant('Saving.'), timeout: 0 }, 'save');
+
+    toaster.remove();
+
+    // The key of the toast removed, and a new one.
+    assert.strictEqual(
+      toaster.show({ message: constant('Saved.'), timeout: 0 }, 'save'),
+      'save',
+    );
+
+    toaster.show({ message: constant('Saved.'), timeout: 0 }, 'other');
+
+    assert.strictEqual(host.childNodes.length, 0);
+
+    assert.deepStrictEqual(toaster.getToasts(), []);
+  });
+
+  test('tells the toasts shown that removing dismissed them, and drops those waiting', () => {
+    const host = stage();
+
+    onTestFinished(() => {
+      host.remove();
+    });
+
+    const toaster = createToaster({}, host);
+
+    const mut_dismissals: string[] = [];
+
+    toaster.show({
+      message: constant('Shown.'),
+      timeout: 0,
+      onDismiss: (didTimeoutExpire) => {
+        mut_dismissals.push(`shown:${didTimeoutExpire.toString()}`);
+      },
+    });
+
+    // Within the 50 ms between toasts: waiting to be shown.
+    toaster.show({
+      message: constant('Waiting.'),
+      timeout: 0,
+      onDismiss: (didTimeoutExpire) => {
+        mut_dismissals.push(`waiting:${didTimeoutExpire.toString()}`);
+      },
+    });
+
+    assert.strictEqual(toaster.getToasts().length, 1);
+
+    toaster.remove();
+
+    assert.deepStrictEqual(mut_dismissals, ['shown:false']);
+
+    assert.deepStrictEqual(toaster.getToasts(), []);
+
+    // Once.
+    toaster.remove();
+
+    assert.deepStrictEqual(mut_dismissals, ['shown:false']);
+  });
+
+  test('calls onDismiss once when it dismisses its own toast again', () => {
+    const host = stage();
+
+    const toaster = createToaster({}, host);
+
+    onTestFinished(() => {
+      toaster.remove();
+
+      host.remove();
+    });
+
+    const mut_dismissals: string[] = [];
+
+    toaster.show(
+      {
+        message: constant('Saved.'),
+        timeout: 0,
+        onDismiss: () => {
+          mut_dismissals.push('saved');
+
+          toaster.dismiss('saved');
+
+          toaster.clear();
+        },
+      },
+      'saved',
+    );
+
+    toaster.dismiss('saved');
+
+    assert.deepStrictEqual(mut_dismissals, ['saved']);
+  });
+
+  test('keeps the toast an onDismiss shows with the key of the one it dismisses', () => {
+    const host = stage();
+
+    const toaster = createToaster({}, host);
+
+    onTestFinished(() => {
+      toaster.remove();
+
+      host.remove();
+    });
+
+    toaster.show(
+      {
+        message: constant('Saving.'),
+        timeout: 0,
+        onDismiss: () => {
+          toaster.show({ message: constant('Saved.'), timeout: 0 }, 'save');
+        },
+      },
+      'save',
+    );
+
+    toaster.dismiss('save');
+
+    assert.deepStrictEqual(
+      toaster.getToasts().map(({ key }) => key),
+      ['save'],
+    );
+  });
+
+  test('reports an onDismiss that throws, and still calls the others', async () => {
+    const host = stage();
+
+    onTestFinished(() => {
+      host.remove();
+    });
+
+    // What `reportError` dispatches, kept from the test run as handled.
+    const mut_reported: unknown[] = [];
+
+    const onError = (event: Readonly<ErrorEvent>): void => {
+      mut_reported.push(event.error);
+
+      event.preventDefault();
+    };
+
+    globalThis.addEventListener('error', onError);
+
+    onTestFinished(() => {
+      globalThis.removeEventListener('error', onError);
+    });
+
+    const toaster = createToaster({}, host);
+
+    const mut_dismissals: string[] = [];
+
+    toaster.show({
+      message: constant('First.'),
+      timeout: 0,
+      onDismiss: () => {
+        mut_dismissals.push('first');
+      },
+    });
+
+    // Past the 50 ms between toasts, so that both are shown.
+    await transitioned(80);
+
+    // The newest, whose `onDismiss` is called first.
+    toaster.show({
+      message: constant('Second.'),
+      timeout: 0,
+      onDismiss: () => {
+        mut_dismissals.push('second');
+
+        throw new Error('handler failed');
+      },
+    });
+
+    assert.strictEqual(toaster.getToasts().length, 2);
+
+    toaster.remove();
+
+    assert.deepStrictEqual(mut_dismissals, ['second', 'first']);
+
+    assert.strictEqual(mut_reported.length, 1);
+
+    assert.strictEqual(host.childNodes.length, 0);
+  });
+
+  test('stays removed when the oldest toast past maxToasts removes it as it goes', async () => {
+    const host = stage();
+
+    onTestFinished(() => {
+      host.remove();
+    });
+
+    const toaster = createToaster({ maxToasts: 1 }, host);
+
+    toaster.show({
+      message: constant('First.'),
+      timeout: 0,
+      onDismiss: () => {
+        toaster.remove();
+      },
+    });
+
+    await transitioned(80);
+
+    toaster.show({ message: constant('Second.'), timeout: 0 });
+
+    assert.deepStrictEqual(toaster.getToasts(), []);
+
+    assert.strictEqual(host.childNodes.length, 0);
+  });
+
+  test('queues a toast the oldest past maxToasts shows as it goes', async () => {
+    const host = stage();
+
+    const toaster = createToaster({ maxToasts: 1 }, host);
+
+    onTestFinished(() => {
+      toaster.remove();
+
+      host.remove();
+    });
+
+    toaster.show({
+      message: constant('First.'),
+      timeout: 0,
+      onDismiss: () => {
+        toaster.show({ message: constant('Third.'), timeout: 0 }, 'third');
+      },
+    });
+
+    await transitioned(80);
+
+    toaster.show({ message: constant('Second.'), timeout: 0 }, 'second');
+
+    assert.deepStrictEqual(
+      toaster.getToasts().map(({ key }) => key),
+      ['second'],
+    );
+
+    await transitioned(80);
+
+    assert.deepStrictEqual(
+      toaster.getToasts().map(({ key }) => key),
+      ['third'],
+    );
+  });
+
+  test('ignores what an onDismiss does to it while it is being removed', () => {
+    const host = stage();
+
+    onTestFinished(() => {
+      host.remove();
+    });
+
+    const toaster = createToaster({}, host);
+
+    const mut_dismissals: string[] = [];
+
+    toaster.show(
+      {
+        message: constant('Saving.'),
+        timeout: 0,
+        onDismiss: () => {
+          mut_dismissals.push('saving');
+
+          // Replaces it, and clears, as a handler might.
+          toaster.show({ message: constant('Saved.'), timeout: 0 }, 'save');
+
+          toaster.clear();
+        },
+      },
+      'save',
+    );
+
+    toaster.remove();
+
+    assert.deepStrictEqual(mut_dismissals, ['saving']);
+
+    assert.deepStrictEqual(toaster.getToasts(), []);
+
+    assert.strictEqual(host.childNodes.length, 0);
+  });
+
   test('dismisses a toast once its timeout is over, and says so', async () => {
     const toaster = mountedToaster();
 
