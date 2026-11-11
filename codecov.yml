@@ -64,9 +64,14 @@ comment:
 # A component without `statuses` posts no check (Codecov's worker reads a
 # missing list as empty); the badge and the comment read the paths alone.
 component_management:
+  # cspell:ignore immer vitest
   individual_components:
     - component_id: eslint-config-typed
       paths: ['libs/eslint-config-typed/**']
+    - component_id: eslint-plugin-immer-coding-style
+      paths: ['libs/eslint-plugin-immer-coding-style/**']
+    - component_id: eslint-plugin-react-coding-style
+      paths: ['libs/eslint-plugin-react-coding-style/**']
     - component_id: eslint-plugin-ts-data-forge
       paths: ['libs/eslint-plugin-ts-data-forge/**']
     - component_id: eslint-plugin-ts-fortress
@@ -77,6 +82,8 @@ component_management:
       paths: ['libs/eslint-plugin-ts-type-forge/**']
     - component_id: eslint-plugin-ts-ui-restrictions
       paths: ['libs/eslint-plugin-ts-ui-restrictions/**']
+    - component_id: eslint-plugin-vitest-coding-style
+      paths: ['libs/eslint-plugin-vitest-coding-style/**']
     - component_id: github-settings-as-code
       paths: ['libs/github-settings-as-code/**']
     - component_id: octokit-safe-types

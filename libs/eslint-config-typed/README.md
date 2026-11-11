@@ -570,6 +570,18 @@ The shape of the rule option varies depending on the rule, so please check the c
 
 ### Custom Plugins
 
+The plugins written for this package are also published on their own, with none
+of the third-party ESLint plugins this package depends on:
+`eslint-plugin-ts-restrictions`, `eslint-plugin-ts-ui-restrictions`,
+`eslint-plugin-vitest-coding-style`, `eslint-plugin-react-coding-style` and
+`eslint-plugin-immer-coding-style`. This package depends on them and exports the
+same plugin objects, except `eslintPluginTsRestrictions` (below), so a config
+may combine this package with one of them. Only two installed copies of a plugin
+package, or `eslintPluginTsRestrictions` beside the standalone one, are
+different objects under one name, which ESLint refuses
+(`Cannot redefine plugin`). The forked plugins are not published: they are other
+projects' plugins, changed for flat config, and live in this package only.
+
 #### Forked plugins
 
 - **`eslintPluginTotalFunctions`**
@@ -696,7 +708,7 @@ nothing. Note also that this `deepStrictEqual` is Chai's `deepEqual` under a
 second name (the same function object), not Node.js's `node:assert` function of
 that name; a test that has to pin a class rather than a shape needs
 `assert.instanceOf` alongside it. Both halves are pinned as executable tests in
-[`assert-vs-expect-strict-equality.test.mts`](src/plugins/vitest-coding-style/rules/assert-vs-expect-strict-equality.test.mts).
+[`assert-vs-expect-strict-equality.test.mts`](../eslint-plugin-vitest-coding-style/src/rules/assert-vs-expect-strict-equality.test.mts).
 
 All of these rules resolve the binding behind `assert` / `expect` rather than
 matching the identifier's spelling. `includeSource` puts in-source tests in
@@ -715,7 +727,7 @@ in-source test reaches Vitest only through that handle, so neither a global
 
 **`eslintPluginReactCodingStyle`** - Custom ESLint plugin that codifies this repository's React memo component conventions (namespace imports, `React.memo<Props>`, arrow props naming, etc.).
 
-- See [`src/plugins/react-coding-style/README.md`](src/plugins/react-coding-style/README.md) for the rationale and examples.
+- See [`eslint-plugin-react-coding-style`'s rule guide](../eslint-plugin-react-coding-style/RULES.md) for the rationale and examples.
 - Provides rules such as `react-coding-style/import-style`, `react-coding-style/component-var-type-annotation`, `react-coding-style/react-memo-type-parameter`, `react-coding-style/react-memo-props-argument-name`, `react-coding-style/props-type-annotation-style`, and `react-coding-style/use-memo-hook-style`.
 
 | Included rules                   | Description                                                                                                           |

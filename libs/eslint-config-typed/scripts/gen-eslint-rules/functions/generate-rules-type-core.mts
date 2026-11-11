@@ -1,6 +1,9 @@
 import type { DeprecatedInfo } from '@eslint/core';
+import { immerCodingStyleRules } from 'eslint-plugin-immer-coding-style';
+import { reactCodingStyleRules } from 'eslint-plugin-react-coding-style';
 import { tsDataForgeRules } from 'eslint-plugin-ts-data-forge';
 import { tsUiRestrictionsRules } from 'eslint-plugin-ts-ui-restrictions';
+import { vitestCodingStyleRules } from 'eslint-plugin-vitest-coding-style';
 import { builtinRules } from 'eslint/use-at-your-own-risk';
 import { compile, type Options } from 'json-schema-to-typescript';
 import { Arr, castDeepMutable, expectType } from 'ts-data-forge';
@@ -11,13 +14,10 @@ import type {
   Rule,
   Rules,
 } from '../../../src/index.mjs';
-import { immerCodingStyleRules } from '../../../src/plugins/immer-coding-style/rules/rules.mjs';
-import { reactCodingStyleRules } from '../../../src/plugins/react-coding-style/rules/rules.mjs';
 import { strictDependenciesRules } from '../../../src/plugins/strict-dependencies/rules/index.mjs';
 import { totalFunctionsRules } from '../../../src/plugins/total-functions/rules/index.mjs';
 import { treeShakableRules } from '../../../src/plugins/tree-shakable/rules/index.mjs';
 import { tsRestrictionsRules } from '../../../src/plugins/ts-restrictions/rules/rules.mjs';
-import { vitestCodingStyleRules } from '../../../src/plugins/vitest-coding-style/rules/rules.mjs';
 // eslint-disable-next-line import-x/no-relative-packages -- tools/ is not a package; this is how packages reach its shared scripts
 import { withInternalTag } from '../../../../../tools/configs/gen-eslint-plugin-rule-types.mjs';
 import { eslintPlugins } from '../constants/eslint-plugins.mjs';

@@ -2,7 +2,7 @@
 import type { Linter } from 'eslint';
 
 /**
- * @description Forbits non-tree-shakable access to module name space objects.
+ * @description Forbid non-tree-shakable access to module name space objects.
  *
  *  ```md
  *  | key        | value   |
