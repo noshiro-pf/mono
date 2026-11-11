@@ -1,10 +1,11 @@
 import type { Evaluation, Scenario } from './scenario.mjs';
 
-/** `B = A × 10`, `C = A × 1000`, `D = combine([B, C]).pipe(map(sum))` */
-export const diamondScenario: Scenario = {
-  initialValue: 0,
-  inputs: [1],
-  nodes: [
+/**
+ * `B = A × 10`, `C = A × 1000`, `D = B + C`, with `D` labelled by the code that
+ * builds it.
+ */
+const diamondNodes = (sumLabel: string): Scenario['nodes'] =>
+  [
     { id: 'A', depth: 0, parents: [], x: 470, valuesSide: 'right' },
     {
       id: 'B',
@@ -30,20 +31,30 @@ export const diamondScenario: Scenario = {
       parents: ['B', 'C'],
       x: 470,
       valuesSide: 'right',
-      op: { text: 'combine([B, C]).pipe(map(sum))', x: 470, y: 265 },
+      op: { text: sumLabel, x: 470, y: 265 },
       evaluate: ([b = 0, c = 0]) => sum(b, c),
     },
-  ],
-} as const;
+  ] as const;
 
-/** The diamond run for three inputs, to show RxJS's glitches repeat. */
-export const rxjsDiamondScenario: Scenario = {
-  ...diamondScenario,
-  inputs: [1, 2, 3],
+/** `B = A × 10`, `C = A × 1000`, `D = derive([B, C], (a, b) => a + b)` */
+export const diamondScenario: Scenario = {
+  initialValue: 0,
+  inputs: [1],
+  nodes: diamondNodes('derive([B, C], (a, b) => a + b)'),
 } as const;
 
 /**
- * `B = A × 10`, `D = A | filter(isEven)`, `C = combine([B, D]).pipe(map(sum))`,
+ * The diamond run for three inputs, to show RxJS's glitches repeat, with `D`
+ * built as the RxJS code on the page builds it.
+ */
+export const rxjsDiamondScenario: Scenario = {
+  ...diamondScenario,
+  inputs: [1, 2, 3],
+  nodes: diamondNodes('combineLatest([B, C]).pipe(map(([a, b]) => a + b))'),
+} as const;
+
+/**
+ * `B = A × 10`, `D = A | filter(isEven)`, `C = derive([B, D], (b, d) => b + d)`,
  * `E = D × 10`, created in that order, as on the page.
  */
 export const filterDiamondScenario: Scenario = {
@@ -88,7 +99,7 @@ export const filterDiamondScenario: Scenario = {
       parents: ['B', 'D'],
       x: 470,
       valuesSide: 'left',
-      op: { text: 'combine([B, D]).pipe(map(sum))', x: 470, y: 265 },
+      op: { text: 'derive([B, D], (b, d) => b + d)', x: 470, y: 265 },
       evaluate: ([b = 0, d = 0]) => sum(b, d),
     },
     {

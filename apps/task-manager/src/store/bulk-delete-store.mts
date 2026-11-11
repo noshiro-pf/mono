@@ -10,12 +10,7 @@
  * in it stay the same, and a new one when they do not.
  */
 
-import {
-  combine,
-  createState,
-  map,
-  type InitializedObservable,
-} from 'synstate';
+import { createState, derive, type InitializedObservable } from 'synstate';
 import { Arr } from 'ts-data-forge';
 import { nodeRefOf, type GraphNodeId, type NodeRef } from '../domain/index.mjs';
 
@@ -48,8 +43,8 @@ export const createBulkDeleteStore = (
   ): boolean => asked === selected && Arr.isNonEmpty(selected);
 
   return {
-    confirming: combine([requested, deps.selected]).pipe(
-      map(([asked, selected]) => asking(asked, selected)),
+    confirming: derive([requested, deps.selected], (asked, selected) =>
+      asking(asked, selected),
     ),
     request: () => {
       setRequested(deps.selected.getSnapshot().value);

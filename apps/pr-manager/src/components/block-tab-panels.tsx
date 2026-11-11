@@ -1,4 +1,4 @@
-import { combine, map, type InitializedObservable } from 'synstate';
+import { derive, map, type InitializedObservable } from 'synstate';
 import { constant, For, type JSX } from 'synstate-dom';
 import type { ReadonlyRecord } from 'ts-type-forge';
 import type { BlockId, Pane } from '../layout.mjs';
@@ -37,8 +37,9 @@ export const BlockTabPanels = ({
               map((tabbed) => (tabbed ? tabIdOf(id) : undefined)),
             )}
             class={constant('block-tab-panel')}
-            hidden={combine([tabbed$, selected$]).pipe(
-              map(([tabbed, selected]) => tabbed && selected !== id),
+            hidden={derive(
+              [tabbed$, selected$],
+              (tabbed, selected) => tabbed && selected !== id,
             )}
             id={constant(tabPanelIdOf(id))}
             role={tabbed$.pipe(

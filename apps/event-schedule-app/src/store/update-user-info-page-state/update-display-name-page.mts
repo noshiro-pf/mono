@@ -1,5 +1,5 @@
 import {
-  combine,
+  derive,
   filter,
   map,
   withCurrentValueFrom,
@@ -92,16 +92,13 @@ export const createUpdateDisplayNamePageStore = <User extends AccountUser>(
     map((st) => (st.displayName.error === undefined ? 'primary' : 'danger')),
   );
 
-  const state = combine([
-    formState$,
-    enterButtonDisabled$,
-    displayNameFormIntent$,
-  ]).pipe(
-    map(([formState, enterButtonDisabled, displayNameFormIntent]) => ({
+  const state = derive(
+    [formState$, enterButtonDisabled$, displayNameFormIntent$],
+    (formState, enterButtonDisabled, displayNameFormIntent) => ({
       formState,
       enterButtonDisabled,
       displayNameFormIntent,
-    })),
+    }),
   );
 
   const submit = async (user: User): Promise<void> => {

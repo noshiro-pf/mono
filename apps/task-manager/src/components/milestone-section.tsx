@@ -1,4 +1,4 @@
-import { combine, map } from 'synstate';
+import { derive, map } from 'synstate';
 import { constant, For, If, type JSX } from 'synstate-dom';
 import { Arr } from 'ts-data-forge';
 import { m } from '../i18n/index.mjs';
@@ -7,8 +7,8 @@ import { buildMilestoneRows } from '../view-model/index.mjs';
 import { MilestoneItem } from './milestone-item.js';
 
 export const MilestoneSection = (): JSX.Element => {
-  const rows$ = combine([dataStore.state, clockStore.now]).pipe(
-    map(([state, now]) => buildMilestoneRows(state, now)),
+  const rows$ = derive([dataStore.state, clockStore.now], (state, now) =>
+    buildMilestoneRows(state, now),
   );
 
   return (

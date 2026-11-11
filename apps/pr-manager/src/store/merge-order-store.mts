@@ -10,8 +10,8 @@
  */
 
 import {
-  combine,
   createState,
+  derive,
   map,
   skipIfNoChange,
   type InitializedObservable,
@@ -82,26 +82,21 @@ export const createMergeOrderStore = (
   };
 
   // The view as it applies to this repository; `view` is what is kept.
-  const applied = combine([view, deps.features]).pipe(
-    map(([current, features]) =>
-      withAvailable(current, statusFiltersOf(features)),
-    ),
+  const applied = derive([view, deps.features], (current, features) =>
+    withAvailable(current, statusFiltersOf(features)),
   );
 
   return {
     view,
     // Passed on only when it changed, as the reader's parts are: a pull request
     // whose checks moved changes the entries, not the tree.
-    roots: combine([deps.roots, deps.entries, applied])
-      .pipe(
-        map(([roots, entries, current]) =>
-          arrangeMergeOrder(roots, entries, current),
-        ),
-      )
-      .pipe(skipIfNoChange(fastDeepEqual)),
-    counts: combine([deps.entries, applied])
-      .pipe(map(([entries, current]) => countView(entries, current)))
-      .pipe(skipIfNoChange(fastDeepEqual)),
+    roots: derive(
+      [deps.roots, deps.entries, applied],
+      (roots, entries, current) => arrangeMergeOrder(roots, entries, current),
+    ).pipe(skipIfNoChange(fastDeepEqual)),
+    counts: derive([deps.entries, applied], (entries, current) =>
+      countView(entries, current),
+    ).pipe(skipIfNoChange(fastDeepEqual)),
     search: applied
       .pipe(map(githubSearchOf))
       .pipe(skipIfNoChange(fastDeepEqual)),

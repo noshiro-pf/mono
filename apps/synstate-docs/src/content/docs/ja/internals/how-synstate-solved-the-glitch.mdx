@@ -185,7 +185,7 @@ sum (derive)        → level 2
 
 優先度キューアプローチはグリッチを正しく排除しますが、**更新のたびに**オーバーヘッドが発生します。ソースが発行するたびに、すべての子孫を優先度キューに追加・取り出しする必要があり、各操作のコストは **$O(\log n)$**（$n$ はグラフ内の Observable の数）です。$n$ 個の子孫を持つグラフの場合、ソース発行あたりの合計伝搬コストは **$O(n \log n)$** になります。
 
-RxJS の深さ優先伝搬はこのオーバーヘッドを回避します — 各ノードは関数呼び出しだけで訪問されます。しかし、RxJS は依存関係グラフを DAG（有向非巡回グラフ）ではなく**ツリー**として扱います。ダイヤモンド依存関係が存在する場合、RxJS は両方のブランチを独立にトラバースします。共有された子孫（例： `combine`）は、それに到達する各ブランチごとに1回ずつ評価されます。
+RxJS の深さ優先伝搬はこのオーバーヘッドを回避します — 各ノードは関数呼び出しだけで訪問されます。しかし、RxJS は依存関係グラフを DAG（有向非巡回グラフ）ではなく**ツリー**として扱います。ダイヤモンド依存関係が存在する場合、RxJS は両方のブランチを独立にトラバースします。共有された子孫（例： `combineLatest`）は、それに到達する各ブランチごとに1回ずつ評価されます。
 
 コストはダイヤモンドのトポロジーに依存します：
 
@@ -322,17 +322,23 @@ SynState はこれを、各更新サイクルに一意のアイデンティテ�
 これによりシンプルな不変条件が成立します： **ノードの `updateToken` が現在のサイクルのトークンと等しいのは、そのノードがこのサイクルで更新された場合かつその場合に限ります。** 各ノードは $O(1)$ の単一の参照比較で親のこれをチェックし、更新するかスキップするかを決定します：
 
 - **単一親演算子**（例： `map`、`scan`）： `parent.updateToken === token` をチェック。親のトークンが一致しない場合、親はスキップされたので子もスキップします。
-- **複数親演算子**（例： `combine`）： **少なくとも1つ**の親のトークンが一致するかをチェック。すべての親がスキップされた場合、`combine` もスキップします。少なくとも1つが更新された場合、`combine` はすべての親（このサイクルで更新されたかどうかにかかわらず）の最新のスナップショットを使用して再評価します。
+- **複数親演算子**（例： `derive`）： **少なくとも1つ**の親のトークンが一致するかをチェック。すべての親がスキップされた場合、`derive` もスキップします。少なくとも1つが更新された場合、`derive` はすべての親（このサイクルで更新されたかどうかにかかわらず）の最新のスナップショットを使用して再評価します。
 
 各演算子は `SyncChildObservableClass` または `AsyncChildObservableClass` のサブクラスで、マネージャーがトークンを渡して呼ぶ `tryUpdate` をオーバーライドします：
 
 ```ts
-// Simplified from DeriveObservableClass, which `combine` is built on
+// Simplified from DeriveObservableClass, the class behind `derive`
 override tryUpdate(updateToken: UpdateToken): void {
     let updated = false;
 
     for (const [i, parent] of this.parents.entries()) {
-        this.values[i] = parent.getSnapshot().value;
+        const snapshot = parent.getSnapshot();
+
+        if (Optional.isNone(snapshot)) {
+            return; // a parent has no value yet
+        }
+
+        this.values[i] = snapshot.value;
 
         if (parent.updateToken === updateToken) {
             updated = true;
@@ -344,7 +350,15 @@ override tryUpdate(updateToken: UpdateToken): void {
         return;
     }
 
-    // ... this.setNext(this.project(...this.values), updateToken) ...
+    const next = this.project(...this.values);
+
+    const held = this.getSnapshot();
+
+    if (Optional.isSome(held) && this.equals(held.value, next)) {
+        return; // the result did not change (Object.is by default)
+    }
+
+    this.setNext(next, updateToken);
 }
 ```
 

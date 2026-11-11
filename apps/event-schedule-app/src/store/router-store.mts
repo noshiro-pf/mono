@@ -1,5 +1,5 @@
 import {
-  combine,
+  derive,
   filter,
   map,
   scan,
@@ -27,7 +27,10 @@ export const createAppRouter = (browser?: RouterBrowser): AppRouter => {
     ...(browser === undefined ? {} : { browser }),
   });
 
-  const pageToBack$ = combine([router.match, router.location])
+  const pageToBack$ = derive(
+    [router.match, router.location],
+    (...values) => values,
+  )
     .pipe(
       filter(
         // ログインページ・新規登録ページは除外

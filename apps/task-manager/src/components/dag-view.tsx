@@ -1,4 +1,4 @@
-import { combine, map, type InitializedObservable } from 'synstate';
+import { derive, map, type InitializedObservable } from 'synstate';
 import { constant, If, MatchOptional, type JSX } from 'synstate-dom';
 import { Arr, Optional } from 'ts-data-forge';
 import type { GraphLayout } from '../dag/index.mjs';
@@ -24,8 +24,9 @@ import { DagToolbar } from './dag-toolbar.js';
 export const DagView = (): JSX.Element => {
   const { autoLayout } = dagLayoutStore;
 
-  const layout$ = combine([autoLayout, dagViewModeStore.mode]).pipe(
-    map(([layoutState, mode]): Optional<GraphLayout> => {
+  const layout$ = derive(
+    [autoLayout, dagViewModeStore.mode],
+    (layoutState, mode): Optional<GraphLayout> => {
       const laidOut =
         layoutState.type === 'ready'
           ? layoutState.layout
@@ -38,7 +39,7 @@ export const DagView = (): JSX.Element => {
         : mode === 'dag'
           ? Optional.none
           : Optional.some(NOT_LAID_OUT);
-    }),
+    },
   );
 
   return (

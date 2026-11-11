@@ -11,10 +11,10 @@ import PropagationTrace from '../../../components/propagation-animation/propagat
 
 ## The graph
 
-`combine` and the `map` after it are two nodes, so the `C` of the previous page appears here as `BD` (the `combine`) and `C` (the `map`):
+In code, `C` is a `derive` over `B` and `D`:
 
 ```tsx
-import { combine, createState, filter, map } from 'synstate';
+import { createState, derive, filter, map } from 'synstate';
 
 const [A, setA] = createState(0);
 
@@ -22,15 +22,13 @@ const B = A.pipe(map((n) => n * 10)); // depth 1
 
 const D = A.pipe(filter((n) => n % 2 === 0)); // depth 1
 
-const BD = combine([B, D]); // depth 2
-
-const C = BD.pipe(map(([b, d]) => b + d)); // depth 3
+const C = derive([B, D], (b, d) => b + d); // depth 2
 
 const E = D.pipe(map((n) => n * 10)); // depth 2
 
-setA(1); // B = 10, BD = [10, 0], C = 10; D rejects 1, so E is not reached
+setA(1); // B = 10, C = 10; D rejects 1, so E is not reached
 
-setA(2); // B = 20, D = 2, BD = [20, 2], E = 20, C = 22
+setA(2); // B = 20, D = 2, C = 22, E = 20
 ```
 
 ## Where the queue lives
@@ -58,15 +56,15 @@ In the drawing, a cyan tag on a node is a slot in use, `[index][slot]`, holding 
 <PropagationTrace scenario="filterDiamond" update={1} lang="en" />
 
 - `bucketSets[0]` and each of its buckets are made the first time they are needed: this is the update that pays for them.
-- `B` and `D` go in bucket 0, at slots 0 and 1 of its `nodes`. `#size` grows from 2 to 3 while the loop is at `index = 1`, when `BD` queues `C`. The loop compares `index` with `#size` on every turn, so it reaches the new bucket.
-- `D` is visited, rejects 1, and returns without `setNext`: it keeps `t0`, and queues neither `BD` nor `E`. `BD` is visited anyway, because `B` queued it, and sees `B.updateToken === t1` and `D.updateToken === t0`. `E` is never touched.
+- `B` and `D` go in bucket 0, at slots 0 and 1 of its `nodes`. `#size` grows from 1 to 2 while the loop is at `index = 0`, when `B` queues `C`. The loop compares `index` with `#size` on every turn, so it reaches the new bucket.
+- `D` is visited, rejects 1, and returns without `setNext`: it keeps `t0`, and queues neither `C` nor `E`. `C` is visited anyway, because `B` queued it, and sees `B.updateToken === t1` and `D.updateToken === t0`. `E` is never touched.
 
 ## Update 2: `setA(2)`, an even value
 
 <PropagationTrace scenario="filterDiamond" update={2} lang="en" />
 
 - `t2` takes the same `bucketSets[0]`. Every bucket's `length` is 0, so it is empty, though their `nodes` arrays still have their slots; `#push` writes `B` and `D` over the `undefined` that update 1 left in them.
-- `B.queuedFor` is still `t1`, but `t1` has closed, so the mark is overwritten with `t2`. `BD` gets `queuedFor === t2` from `B`, so when `D` passes 2 and queues its children, `BD` is skipped: that one comparison keeps a node from being queued twice. `E` takes slot 1 of bucket 1, whose `nodes` grows by one.
+- `B.queuedFor` is still `t1`, but `t1` has closed, so the mark is overwritten with `t2`. `C` gets `queuedFor === t2` from `B`, so when `D` passes 2 and queues its children, `C` is skipped: that one comparison keeps a node from being queued twice. `E` takes slot 1 of bucket 1, whose `nodes` grows by one.
 - When the update ends, every `length` is 0 and every slot `undefined` again; the marks stay, as `t2`'s.
 
 ## A write from a subscriber (an anti-pattern)
@@ -74,7 +72,7 @@ In the drawing, a cyan tag on a node is a slot in use, `[index][slot]`, holding 
 A subscriber that writes to a root starts an update while the update that called it is still draining. Do not write one, even where it does not loop: the write is not an edge of the graph, so SynState cannot place it in the order of the update that called it, and can only run it as a second update. SynState lets the write through, and warns once per root, because the subscribers of the graph can then see intermediate states: in this graph, `BDR` emits twice for one `setA`. This section shows how the queue copes with such a write, so that it stays correct, not how to use one.
 
 ```tsx
-import { combine, createState, map } from 'synstate';
+import { createState, derive, map } from 'synstate';
 
 const [A, setA] = createState(0);
 
@@ -84,7 +82,7 @@ const B = A.pipe(map((n) => n * 10)); // depth 1
 
 const D = A.pipe(map((n) => n * 100)); // depth 1
 
-const BDR = combine([B, D, R]); // depth 2
+const BDR = derive([B, D, R], (b, d, r) => [b, d, r]); // depth 2
 
 // A write from a subscriber: an update nested in the one that reached D.
 D.subscribe((d) => {
@@ -109,7 +107,7 @@ setA(1); // warns once: a root written to from a subscriber
 - `B` queues `BDR` in `t1` before `D`'s subscriber runs. When `setR(100)` starts `t2`, `BDR` waits in `t1`'s bucket 1 with `queuedFor === t1`.
 - `t2` is the second update open in this copy (`queueState.level` is 2), so it takes `bucketSets[1]`, a set of its own: it never writes into the buckets `t1` is still draining.
 - `R` queues `BDR` in `t2`. `BDR.queuedFor` is `t1`, and `t1.isOpen` is true, so `t2` leaves the mark alone: had it written `t2` there, `t1` would no longer see `BDR` as queued, and would queue it a second time if another parent of `BDR` emitted later in `t1`. `t2` records `BDR` in its own `#queuedDespiteMark` instead, which keeps `t2` itself from queuing it twice, and puts it in its own bucket 1.
-- `t2` runs to the end inside `D`'s subscriber: drained and closed before `t1` visits another node. `t1`'s buckets are as it left them, so `t1` visits `BDR` again, and `BDR` emits `[10, 100, 100]` once per token. `t1` cannot tell that `t2` has already brought `BDR` up to date.
+- `t2` runs to the end inside `D`'s subscriber: drained and closed before `t1` visits another node. `t1`'s buckets are as it left them, so `t1` visits `BDR` again, and `BDR` emits `[10, 100, 100]` once per token: its projection builds a new array each time, so `derive`'s `Object.is` check does not hold the second one back. `t1` cannot tell that `t2` has already brought `BDR` up to date.
 - `propagation.depth` counts both updates, so `outermostToken` stays `t1`, and the work deferred with `runAfterPropagation` waits for `t1`'s `endPropagation`.
 
 The correct way is to describe the connection with `pipe`. Deriving the value (`const R = D.pipe(…)`) makes `D → R` an edge of the graph, so SynState knows that `BDR` comes after `R`, and the one update reaches `BDR` once, with every parent settled: no warning, no second emission. The `synstate/no-write-during-propagation` rule of [`eslint-plugin-synstate`](/mono/synstate/getting-started/installation/#eslint-plugin) reports a write from a subscriber, or from a projection inside `pipe`, where it is written.

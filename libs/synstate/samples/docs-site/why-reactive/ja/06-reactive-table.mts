@@ -4,7 +4,6 @@
 // embed-sample-code-ignore-above
 
 import {
-  combine,
   createState,
   createValueEmitter,
   debounce,
@@ -57,9 +56,14 @@ const tableDataResult = fromPromise(
 );
 
 // 派生： デバウンスされたフィルター → フィルタ結果（データ取得成功時のみ）
-const headerValues = combine([filterName, filterEmail, filterGender]).pipe(
-  debounce(300),
-);
+const headerValues = derive(
+  [filterName, filterEmail, filterGender],
+  (nameQuery, emailQuery, genderQuery) => ({
+    name: nameQuery,
+    email: emailQuery,
+    gender: genderQuery,
+  }),
+).pipe(debounce(300));
 
 const filteredRows = derive(
   [headerValues, tableDataResult],
@@ -68,9 +72,9 @@ const filteredRows = derive(
       ? [] // エラー時は空テーブルを表示
       : result.value.filter(
           (row) =>
-            row.name.includes(filters[0]) &&
-            row.email.includes(filters[1]) &&
-            row.gender.includes(filters[2]),
+            row.name.includes(filters.name) &&
+            row.email.includes(filters.email) &&
+            row.gender.includes(filters.gender),
         ),
 );
 

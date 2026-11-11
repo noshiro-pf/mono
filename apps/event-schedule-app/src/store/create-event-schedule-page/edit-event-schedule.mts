@@ -1,7 +1,7 @@
 import {
-  combine,
   createBooleanState,
   createState as createStateBase,
+  derive,
   map,
   mapTo,
   type InitializedObservable,
@@ -79,15 +79,12 @@ export const createEditEventScheduleStore = (
     [deps.router.editPageLeaves$.pipe(mapTo(undefined))],
   );
 
-  const emailVerified$: InitializedObservable<string | undefined> = combine([
-    verified$,
-    deps.router.eventId$,
-  ]).pipe(
-    map(([verified, eventId]) =>
+  const emailVerified$: InitializedObservable<string | undefined> = derive(
+    [verified$, deps.router.eventId$],
+    (verified, eventId) =>
       verified !== undefined && verified.eventId === eventId
         ? verified.email
         : undefined,
-    ),
   );
 
   const setEmailVerified = (eventId: string, email: string): void => {
@@ -161,26 +158,20 @@ export const createEditEventScheduleStore = (
           archivedBy: fromDatabase.archivedBy,
         } as const);
 
-  const diff$: InitializedObservable<EventSettingsPageDiffResult> = combine([
-    emailVerified$,
-    eventScheduleFromDatabase$,
-    commonState$,
-    baseline$,
-  ]).pipe(
-    map(
-      ([
+  const diff$: InitializedObservable<EventSettingsPageDiffResult> = derive(
+    [emailVerified$, eventScheduleFromDatabase$, commonState$, baseline$],
+    (
+      emailVerified,
+      eventScheduleFromDatabase,
+      { eventScheduleNormalized, notificationSettingsWithEmail },
+      baseline,
+    ) =>
+      collectEventSettingsPageDiff(
+        eventScheduleFromDatabase ?? baseline,
+        keepIdentityOf(eventScheduleFromDatabase, eventScheduleNormalized),
         emailVerified,
-        eventScheduleFromDatabase,
-        { eventScheduleNormalized, notificationSettingsWithEmail },
-        baseline,
-      ]) =>
-        collectEventSettingsPageDiff(
-          eventScheduleFromDatabase ?? baseline,
-          keepIdentityOf(eventScheduleFromDatabase, eventScheduleNormalized),
-          emailVerified,
-          notificationSettingsWithEmail?.email,
-        ),
-    ),
+        notificationSettingsWithEmail?.email,
+      ),
   );
 
   const hasDeletedDatetimeChanges$: InitializedObservable<boolean> = diff$.pipe(
@@ -191,23 +182,18 @@ export const createEditEventScheduleStore = (
     ),
   );
 
-  const hasNoChanges$: InitializedObservable<boolean> = combine([
-    emailVerified$,
-    eventScheduleFromDatabase$,
-    commonState$,
-  ]).pipe(
-    map(
-      ([
-        emailVerified,
+  const hasNoChanges$: InitializedObservable<boolean> = derive(
+    [emailVerified$, eventScheduleFromDatabase$, commonState$],
+    (
+      emailVerified,
+      eventScheduleFromDatabase,
+      { eventScheduleNormalized, notificationSettingsWithEmail },
+    ) =>
+      emailVerified === notificationSettingsWithEmail?.email &&
+      fastDeepEqual(
         eventScheduleFromDatabase,
-        { eventScheduleNormalized, notificationSettingsWithEmail },
-      ]) =>
-        emailVerified === notificationSettingsWithEmail?.email &&
-        fastDeepEqual(
-          eventScheduleFromDatabase,
-          keepIdentityOf(eventScheduleFromDatabase, eventScheduleNormalized),
-        ),
-    ),
+        keepIdentityOf(eventScheduleFromDatabase, eventScheduleNormalized),
+      ),
   );
 
   const onBackToAnswerPage = (): void => {

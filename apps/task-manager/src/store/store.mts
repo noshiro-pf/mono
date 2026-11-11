@@ -8,7 +8,7 @@
  * puts together — this file is only which real thing each of them is handed.
  */
 
-import { combine, map, skipIfNoChange } from 'synstate';
+import { derive, map, skipIfNoChange } from 'synstate';
 import {
   downloadJson,
   fromEvent,
@@ -171,16 +171,16 @@ export const dagFilterStore = createDagFilterStore({
  * What the graph screen leaves out (`dag/hidden-nodes.mts`) and what its filter
  * leaves of the rest (`dag/node-filter.mts`).
  */
-const dagFilteredNodes = combine([
-  dataStore.state,
-  dataStore.groups,
-  clockStore.now,
-  dagShowDoneStore.showDone,
-  dagFilterStore.filter,
-]).pipe(
-  map(([state, groups, now, showDone, filter]) =>
+const dagFilteredNodes = derive(
+  [
+    dataStore.state,
+    dataStore.groups,
+    clockStore.now,
+    dagShowDoneStore.showDone,
+    dagFilterStore.filter,
+  ],
+  (state, groups, now, showDone, filter) =>
     filterNodes(state, groups, filter, hiddenNodeIds(state, now, showDone)),
-  ),
 );
 
 /** The nodes the graph screen draws in no mode. */
@@ -241,11 +241,13 @@ const viewQuerySync = createViewQuerySync({
 export const dagSelectionStore = createDagSelectionStore({
   state: dataStore.state,
   // The nodes outside the filter are there to be seen, not edited with it.
-  hidden: combine([dagHiddenNodes, dagOutsideNodes]).pipe(
-    map(([hidden, outside]): ReadonlySet<GraphNodeId> => hidden.union(outside)),
+  hidden: derive(
+    [dagHiddenNodes, dagOutsideNodes],
+    (hidden, outside): ReadonlySet<GraphNodeId> => hidden.union(outside),
   ),
-  active: combine([uiStore.view, dagViewModeStore.mode]).pipe(
-    map(([view, mode]) => view === 'dag' && isArrangeable(mode)),
+  active: derive(
+    [uiStore.view, dagViewModeStore.mode],
+    (view, mode) => view === 'dag' && isArrangeable(mode),
   ),
 });
 

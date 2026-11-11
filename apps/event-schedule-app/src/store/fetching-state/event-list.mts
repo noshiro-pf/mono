@@ -1,9 +1,9 @@
 import type { EventListItem } from 'event-schedule-app-shared';
 import {
-  combine,
   createEventEmitter,
   createState,
   debounce,
+  derive,
   filter,
   map,
   mapTo,
@@ -71,7 +71,7 @@ export const createEventListStore = (deps: EventListDeps): EventListFetcher => {
 
   // Read on request (the first is made in `start`), and again whenever the user
   // or a filter changes.
-  const fetchEventListRequest$ = combine(
+  const fetchEventListRequest$ = derive(
     tp(
       fetchEventListThrottled$,
       deps.fireAuthUser$,
@@ -85,6 +85,7 @@ export const createEventListStore = (deps: EventListDeps): EventListFetcher => {
       deps.filter.showAllPastDaysEvent$,
       deps.filter.showOnlyEventSchedulesICreated$,
     ),
+    (...values) => values,
   );
 
   const fetchEventListStarted$ = fetchEventListRequest$.pipe(

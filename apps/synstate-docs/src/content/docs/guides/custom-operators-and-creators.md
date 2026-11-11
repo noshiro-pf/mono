@@ -7,12 +7,12 @@ sidebar:
 
 SynState exports four factories for writing observables of your own. They wrap the same base classes that the built-in observables extend, so a custom operator or creator built with them takes part in glitch-free propagation exactly as `map` or `source` do.
 
-| Factory                                | Makes                                                | Behaves like                      |
-| :------------------------------------- | :--------------------------------------------------- | :-------------------------------- |
-| `createRootObservable`                 | an observable with no parents (`kind: 'root'`)       | `source`, `timer`, `fromPromise`  |
-| `createSyncChildObservable`            | a child that emits in its parents' update            | `map`, `filter`, `combine`, `zip` |
-| `createInitializedSyncChildObservable` | the same, typed as always holding a value            | `scan`, `withInitialValue`        |
-| `createAsyncChildObservable`           | a child that may emit later, in an update of its own | `debounce`, `audit`, `switchMap`  |
+| Factory                                | Makes                                                | Behaves like                     |
+| :------------------------------------- | :--------------------------------------------------- | :------------------------------- |
+| `createRootObservable`                 | an observable with no parents (`kind: 'root'`)       | `source`, `timer`, `fromPromise` |
+| `createSyncChildObservable`            | a child that emits in its parents' update            | `map`, `filter`, `derive`, `zip` |
+| `createInitializedSyncChildObservable` | the same, typed as always holding a value            | `scan`, `withInitialValue`       |
+| `createAsyncChildObservable`           | a child that may emit later, in an update of its own | `debounce`, `audit`, `switchMap` |
 
 The names follow `kind`, which every observable carries and which a debugger shows: `'root'`, `'sync child'` and `'async child'`.
 
@@ -42,7 +42,7 @@ export const double = (src: Observable<number>): Observable<number> =>
 
 `src.updateToken` is the token of the update in which `src` last emitted. When it differs from the token `tryUpdate` received, `src` was skipped in this update (a `filter` above it rejected the value, say), and so is `double`. Emitting is `setNext` with the token received; not calling it is how a child skips, and its own children see that through the same comparison.
 
-With more than one parent, compare each parent's token: `combine` emits when any parent did, `zip` queues the values of those that did.
+With more than one parent, compare each parent's token: `derive` recomputes when any parent did, `zip` queues the values of those that did.
 
 ### Depth, and reading an observable that is not a parent
 

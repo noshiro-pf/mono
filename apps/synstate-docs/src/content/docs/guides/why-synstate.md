@@ -7,7 +7,7 @@ sidebar:
 
 ## Simple to Start, Powerful When You Need It
 
-SynState is a state management library for web frontends. For most use cases, `createState`, `createReducer`, and simple combinators like `combine` and `map` are all you need — clean, minimal APIs that feel as intuitive as React's `useState` / `useReducer`, but for global state. For example, a [simple counter](/mono/synstate/examples/react/#global-counter) can be implemented in just a few lines:
+SynState is a state management library for web frontends. For most use cases, `createState`, `createReducer`, and simple combinators like `derive` and `map` are all you need — clean, minimal APIs that feel as intuitive as React's `useState` / `useReducer`, but for global state. For example, a [simple counter](/mono/synstate/examples/react/#global-counter) can be implemented in just a few lines:
 
 ```tsx
 import { createState } from 'synstate-react-hooks';
@@ -49,7 +49,7 @@ RxJS is not the only library to compare against. Preact Signals and Solid are gl
 
 ## Fully Compatible with React Compiler
 
-All of SynState's reactive computation (`combine`, `map`, `filter`, etc.) happens **outside** React's rendering cycle. Components read values through `useSyncExternalStore` (a first-class React API) and have no implicit side effects during rendering — no proxy-based tracking, no hidden subscriptions triggered by property access. This means React Compiler can safely analyze and memoize these components, fully aligned with [React Compiler](https://react.dev/learn/react-compiler)'s automatic memoization.
+All of SynState's reactive computation (`derive`, `map`, `filter`, etc.) happens **outside** React's rendering cycle. Components read values through `useSyncExternalStore` (a first-class React API) and have no implicit side effects during rendering — no proxy-based tracking, no hidden subscriptions triggered by property access. This means React Compiler can safely analyze and memoize these components, fully aligned with [React Compiler](https://react.dev/learn/react-compiler)'s automatic memoization.
 
 MobX's `observer()` HOC tracks observable access during rendering, which conflicts with React Compiler's memoization and requires opting out via the `"use no memo"` directive. SynState requires no such workarounds.
 

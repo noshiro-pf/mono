@@ -1,4 +1,4 @@
-import { combine, map, type InitializedObservable } from 'synstate';
+import { derive, map, type InitializedObservable } from 'synstate';
 import { Arr, fastDeepEqual, Num, Optional } from 'ts-data-forge';
 import {
   arcContentBounds,
@@ -94,12 +94,13 @@ export const createDagCanvasScene = ({
 
   const arrangeable = mode.pipe(map(isArrangeable));
 
-  const views = combine([dataStore.state, clockStore.now]).pipe(
-    map(([state, now]) => buildNodeViews(state, now)),
+  const views = derive([dataStore.state, clockStore.now], (state, now) =>
+    buildNodeViews(state, now),
   );
 
-  const arcEdgeList = combine([dataStore.state, dagHiddenNodes]).pipe(
-    map(([state, hidden]) => arcEdges(withoutNodes(state, hidden))),
+  const arcEdgeList = derive(
+    [dataStore.state, dagHiddenNodes],
+    (state, hidden) => arcEdges(withoutNodes(state, hidden)),
   );
 
   const selection = dagSelectionStore.selected.pipe(
@@ -107,49 +108,34 @@ export const createDagCanvasScene = ({
   );
 
   // At the current size, which a layout still being made at it may not be.
-  const placed = combine([
-    layout,
-    nodeSizeStore.size,
-    arrangement,
-    membership,
-  ]).pipe(
-    map(([laidOut, size, { positions }, members]) =>
+  const placed = derive(
+    [layout, nodeSizeStore.size, arrangement, membership],
+    (laidOut, size, { positions }, members) =>
       placeNodes(
         resizeNodes(laidOut.nodes, size),
         laidOut.edges,
         positions,
         members,
       ),
-    ),
   );
 
   // Where the empty frames are when nothing moves.
-  const emptyAt = combine([membership, layout, placed, arrangement]).pipe(
-    map(([members, { groups }, placedNodes, { groupPositions }]) =>
+  const emptyAt = derive(
+    [membership, layout, placed, arrangement],
+    (members, { groups }, placedNodes, { groupPositions }) =>
       placeEmptyGroups(members, groups, placedNodes, groupPositions),
-    ),
   );
 
   // The frames as they are when nothing moves, and while a node is dragged.
-  const settledFrames = combine([
-    arrangeable,
-    placed,
-    membership,
-    emptyAt,
-  ]).pipe(
-    map(([canArrange, placedNodes, members, empty]): readonly GroupFrame[] =>
+  const settledFrames = derive(
+    [arrangeable, placed, membership, emptyAt],
+    (canArrange, placedNodes, members, empty): readonly GroupFrame[] =>
       canArrange ? groupFrames(placedNodes, members, empty) : [],
-    ),
   );
 
-  const drags = combine([
-    dragged,
-    settledFrames,
-    membership,
-    selection,
-    placed,
-  ]).pipe(
-    map(([drag, settled, members, selected, placedNodes]): Drags => {
+  const drags = derive(
+    [dragged, settledFrames, membership, selection, placed],
+    (drag, settled, members, selected, placedNodes): Drags => {
       const groupDrag = groupDragOf(drag, settled, members);
 
       const selectionDrag = selectionDragOf(drag, selected, placedNodes);
@@ -159,13 +145,14 @@ export const createDagCanvasScene = ({
         selection: selectionDrag,
         moving: groupDrag ?? selectionDrag,
       };
-    }),
+    },
   );
 
   // Every node some mode draws: those of the DAG, and those 「アーク」 and
   // 「タイル」 draw before ELK has laid them out.
-  const anyMode = combine([placed, arcNodes, tileNodes]).pipe(
-    map(([placedNodes, arc, tile]) => {
+  const anyMode = derive(
+    [placed, arcNodes, tileNodes],
+    (placedNodes, arc, tile) => {
       const known = new Set(placedNodes.map(({ id }) => id));
 
       return [
@@ -175,22 +162,14 @@ export const createDagCanvasScene = ({
           ({ id }) => id,
         ),
       ];
-    }),
+    },
   );
 
   // While they move, the nodes moving, wherever they are going; otherwise the
   // nodes of the mode, where it draws them.
-  const shown = combine([
-    anyMode,
-    placed,
-    dragged,
-    drags,
-    animated,
-    mode,
-    arcNodes,
-    tileNodes,
-  ]).pipe(
-    map(([all, placedNodes, drag, { moving }, moved, current, arc, tile]) =>
+  const shown = derive(
+    [anyMode, placed, dragged, drags, animated, mode, arcNodes, tileNodes],
+    (all, placedNodes, drag, { moving }, moved, current, arc, tile) =>
       moved !== undefined
         ? moveNodesTo(all, moved).filter(({ id }) => moved.has(id))
         : current === 'arc'
@@ -210,225 +189,212 @@ export const createDagCanvasScene = ({
                         }
                       : node,
                 ),
-    ),
   );
 
   // Drawn while the DAG is, and not while the view changes mode: round the
   // nodes moving, or the group dragged, and otherwise as they are.
-  const shownFrames = combine([
-    arrangeable,
-    opacities,
-    animated,
-    drags,
-    settledFrames,
-    shown,
-    membership,
-    emptyAt,
-  ]).pipe(
-    map(
-      ([
-        canArrange,
-        fading,
-        moved,
-        { group, selection: selectionDrag },
-        settled,
+  const shownFrames = derive(
+    [
+      arrangeable,
+      opacities,
+      animated,
+      drags,
+      settledFrames,
+      shown,
+      membership,
+      emptyAt,
+    ],
+    (
+      canArrange,
+      fading,
+      moved,
+      { group, selection: selectionDrag },
+      settled,
+      shownNodes,
+      members,
+      empty,
+    ): readonly GroupFrame[] => {
+      if (!canArrange || fading !== undefined) {
+        return [];
+      }
+
+      if (moved !== undefined || selectionDrag !== undefined) {
+        return groupFrames(shownNodes, members, empty);
+      }
+
+      if (group === undefined) {
+        return settled;
+      }
+
+      const from = empty.get(group.id);
+
+      return groupFrames(
         shownNodes,
         members,
-        empty,
-      ]): readonly GroupFrame[] => {
-        if (!canArrange || fading !== undefined) {
-          return [];
-        }
-
-        if (moved !== undefined || selectionDrag !== undefined) {
-          return groupFrames(shownNodes, members, empty);
-        }
-
-        if (group === undefined) {
-          return settled;
-        }
-
-        const from = empty.get(group.id);
-
-        return groupFrames(
-          shownNodes,
-          members,
-          from === undefined
-            ? empty
-            : new Map<GroupId, Point>([
-                ...empty,
-                [group.id, { x: from.x + group.dx, y: from.y + group.dy }],
-              ]),
-        );
-      },
-    ),
+        from === undefined
+          ? empty
+          : new Map<GroupId, Point>([
+              ...empty,
+              [group.id, { x: from.x + group.dx, y: from.y + group.dy }],
+            ]),
+      );
+    },
   );
 
   // The group a node being dragged would be dropped into, and the one it is in.
-  const dropTargets = combine([
-    dragged,
-    drags,
-    shown,
-    settledFrames,
-    membership,
-  ]).pipe(
-    map(
-      ([drag, { moving }, shownNodes, settled, members]):
-        NodeDropTargets | undefined => {
-        const node =
-          drag === undefined || moving !== undefined
-            ? undefined
-            : shownNodes.find(({ id }) => id === drag.id);
-
-        return node === undefined
+  const dropTargets = derive(
+    [dragged, drags, shown, settledFrames, membership],
+    (
+      drag,
+      { moving },
+      shownNodes,
+      settled,
+      members,
+    ): NodeDropTargets | undefined => {
+      const node =
+        drag === undefined || moving !== undefined
           ? undefined
-          : {
-              into: dropTarget(settled, node),
-              from: groupsByMember(members).get(node.id),
-            };
-      },
-    ),
+          : shownNodes.find(({ id }) => id === drag.id);
+
+      return node === undefined
+        ? undefined
+        : {
+            into: dropTarget(settled, node),
+            from: groupsByMember(members).get(node.id),
+          };
+    },
   );
 
   // The edges as they are when nothing moves.
-  const settledEdges = combine([arrangeable, arrangement, placed, layout]).pipe(
-    map(([canArrange, { direction }, placedNodes, laidOut]) =>
+  const settledEdges = derive(
+    [arrangeable, arrangement, placed, layout],
+    (canArrange, { direction }, placedNodes, laidOut) =>
       canArrange ? routeEdges(direction, placedNodes, laidOut.edges) : [],
-    ),
   );
 
-  const settledArcs = combine([mode, arcNodes, arcEdgeList]).pipe(
-    map(([current, arc, arcList]): readonly ArcGeometry[] =>
+  const settledArcs = derive(
+    [mode, arcNodes, arcEdgeList],
+    (current, arc, arcList): readonly ArcGeometry[] =>
       current === 'arc' ? arcGeometries(arc, arcList) : [],
-    ),
   );
 
   // Hidden while the view changes mode, and in 「アーク」 while anything
   // moves: the arcs are drawn for the column alone. 「タイル」 has none.
-  const edgesHidden = combine([arrangeable, opacities, animated]).pipe(
-    map(([canArrange, fading, moved]) =>
+  const edgesHidden = derive(
+    [arrangeable, opacities, animated],
+    (canArrange, fading, moved) =>
       canArrange ? fading !== undefined : moved !== undefined,
-    ),
   );
 
-  const highlight = combine([mode, animated, pointed, arcEdgeList]).pipe(
-    map(([current, moved, node, arcList]) =>
+  const highlight = derive(
+    [mode, animated, pointed, arcEdgeList],
+    (current, moved, node, arcList) =>
       current === 'arc' && moved === undefined
         ? arcHighlight(node, arcList)
         : undefined,
-    ),
   );
 
   // Whether routing has been too slow to keep up with this drag.
   let mut_slowDrag = false;
 
-  const edges = combine([
-    arrangeable,
-    animated,
-    dragged,
-    drags,
-    arrangement,
-    shown,
-    layout,
-    settledEdges,
-  ]).pipe(
-    map(
-      ([
-        canArrange,
-        moved,
-        drag,
-        { selection: selectionDrag },
-        { direction },
-        shownNodes,
-        { edges: layoutEdges },
-        settled,
-      ]): readonly EdgeGeometry[] => {
-        if (!canArrange) {
-          return [];
-        }
+  const edges = derive(
+    [
+      arrangeable,
+      animated,
+      dragged,
+      drags,
+      arrangement,
+      shown,
+      layout,
+      settledEdges,
+    ],
+    (
+      canArrange,
+      moved,
+      drag,
+      { selection: selectionDrag },
+      { direction },
+      shownNodes,
+      { edges: layoutEdges },
+      settled,
+    ): readonly EdgeGeometry[] => {
+      if (!canArrange) {
+        return [];
+      }
 
-        if (moved !== undefined) {
-          return edgeGeometries(direction, shownNodes, layoutEdges);
-        }
+      if (moved !== undefined) {
+        return edgeGeometries(direction, shownNodes, layoutEdges);
+      }
 
-        if (drag === undefined) {
-          mut_slowDrag = false;
+      if (drag === undefined) {
+        mut_slowDrag = false;
 
-          return settled;
-        }
+        return settled;
+      }
 
-        if (mut_slowDrag) {
-          const curves = edgeGeometries(direction, shownNodes, layoutEdges);
+      if (mut_slowDrag) {
+        const curves = edgeGeometries(direction, shownNodes, layoutEdges);
 
-          // A group's nodes, or the selected ones, all move: every edge is a
-          // curve.
-          return selectionDrag === undefined && GraphNodeIdCodec.is(drag.id)
-            ? withCurvesOf(settled, curves, drag.id)
-            : curves;
-        }
+        // A group's nodes, or the selected ones, all move: every edge is a
+        // curve.
+        return selectionDrag === undefined && GraphNodeIdCodec.is(drag.id)
+          ? withCurvesOf(settled, curves, drag.id)
+          : curves;
+      }
 
-        const started = performance.now();
+      const started = performance.now();
 
-        const routed = routeEdges(direction, shownNodes, layoutEdges);
+      const routed = routeEdges(direction, shownNodes, layoutEdges);
 
-        mut_slowDrag = performance.now() - started > DRAG_ROUTING_BUDGET_MS;
+      mut_slowDrag = performance.now() - started > DRAG_ROUTING_BUDGET_MS;
 
-        return routed;
-      },
-    ),
+      return routed;
+    },
   );
 
   // While a lasso is drawn, the nodes it closes round so far, which are drawn
   // selected in place of those that are.
-  const drawnSelection = combine([lasso, selection, placed]).pipe(
-    map(([points, selected, placedNodes]): ReadonlySet<GraphNodeId> =>
+  const drawnSelection = derive(
+    [lasso, selection, placed],
+    (points, selected, placedNodes): ReadonlySet<GraphNodeId> =>
       points === undefined
         ? selected
         : new Set(nodesInLasso(placedNodes, points)),
-    ),
   );
 
   // The edge selected, while it is drawn as it was when clicked: not once it is
   // gone or has moved, nor while anything is dragged or moves.
-  const shownSelectedEdge = combine([
-    selectedEdge,
-    edgesHidden,
-    animated,
-    dragged,
-    connecting,
-    edges,
-  ]).pipe(
-    map(
-      ([clicked, hidden, moved, drag, arrow, drawnEdges]):
-        ShownSelectedEdge | undefined => {
-        if (
-          clicked === undefined ||
-          hidden ||
-          moved !== undefined ||
-          drag !== undefined ||
-          arrow !== undefined
-        ) {
-          return undefined;
-        }
+  const shownSelectedEdge = derive(
+    [selectedEdge, edgesHidden, animated, dragged, connecting, edges],
+    (
+      clicked,
+      hidden,
+      moved,
+      drag,
+      arrow,
+      drawnEdges,
+    ): ShownSelectedEdge | undefined => {
+      if (
+        clicked === undefined ||
+        hidden ||
+        moved !== undefined ||
+        drag !== undefined ||
+        arrow !== undefined
+      ) {
+        return undefined;
+      }
 
-        const edge = drawnEdges.find(({ id }) => id === clicked.id);
+      const edge = drawnEdges.find(({ id }) => id === clicked.id);
 
-        return edge?.path === clicked.path
-          ? { edge, at: clicked.at }
-          : undefined;
-      },
-    ),
+      return edge?.path === clicked.path ? { edge, at: clicked.at } : undefined;
+    },
   );
 
   // The node the arrow being drawn is over, other than the one it is drawn
   // from, and whether a dependency on that one would be refused.
-  const connectTarget = combine([
-    connecting,
-    placed,
-    transform,
-    dataStore.state,
-  ]).pipe(
-    map(([arrow, placedNodes, { scale }, state]): ConnectTarget | undefined => {
+  const connectTarget = derive(
+    [connecting, placed, transform, dataStore.state],
+    (arrow, placedNodes, { scale }, state): ConnectTarget | undefined => {
       if (arrow === undefined) {
         return undefined;
       }
@@ -451,83 +417,78 @@ export const createDagCanvasScene = ({
                 nodeRefOf(arrow.from),
               ) !== undefined,
           };
-    }),
+    },
   );
 
-  const drawnTransform = combine([viewFrom, transform, progress]).pipe(
-    map(([from, to, t]) =>
+  const drawnTransform = derive(
+    [viewFrom, transform, progress],
+    (from, to, t) =>
       from === undefined || t === undefined
         ? to
         : interpolateTransform(from, to, t),
-    ),
   );
 
   const nodeRecords = createRecordCache(
     (record: DagNodeRecord) => record.node.id,
   );
 
-  const nodes = combine([
-    shown,
-    views,
-    dragged,
-    drags,
-    arrangeable,
-    drawnSelection,
-    highlight,
-    opacities,
-    dagOutsideNodes,
-    nodeSizeStore.size,
-  ]).pipe(
-    map(
-      ([
-        shownNodes,
-        nodeViews,
-        drag,
-        { selection: selectionDrag },
-        canArrange,
-        selected,
-        highlighted,
-        fading,
-        outside,
-        size,
-      ]) =>
-        nodeRecords(
-          Arr.generate(function* () {
-            for (const node of shownNodes) {
-              const view = nodeViews.get(node.id);
+  const nodes = derive(
+    [
+      shown,
+      views,
+      dragged,
+      drags,
+      arrangeable,
+      drawnSelection,
+      highlight,
+      opacities,
+      dagOutsideNodes,
+      nodeSizeStore.size,
+    ],
+    (
+      shownNodes,
+      nodeViews,
+      drag,
+      { selection: selectionDrag },
+      canArrange,
+      selected,
+      highlighted,
+      fading,
+      outside,
+      size,
+    ) =>
+      nodeRecords(
+        Arr.generate(function* () {
+          for (const node of shownNodes) {
+            const view = nodeViews.get(node.id);
 
-              if (view !== undefined) {
-                yield {
-                  node,
-                  view,
-                  dragging:
-                    node.id === drag?.id ||
-                    selectionDrag?.members.has(node.id) === true,
-                  selected: canArrange && selected.has(node.id),
-                  movable: canArrange,
-                  highlight: highlightOf(highlighted?.nodes, node.id),
-                  outside: outside.has(node.id),
-                  opacity: fading?.get(node.id),
-                  size,
-                } satisfies DagNodeRecord;
-              }
+            if (view !== undefined) {
+              yield {
+                node,
+                view,
+                dragging:
+                  node.id === drag?.id ||
+                  selectionDrag?.members.has(node.id) === true,
+                selected: canArrange && selected.has(node.id),
+                movable: canArrange,
+                highlight: highlightOf(highlighted?.nodes, node.id),
+                outside: outside.has(node.id),
+                opacity: fading?.get(node.id),
+                size,
+              } satisfies DagNodeRecord;
             }
-          }),
-        ),
-    ),
+          }
+        }),
+      ),
   );
 
   const frameRecords = createRecordCache(
     (record: DagFrameRecord) => record.frame.id,
   );
 
-  const frames = combine([
-    shownFrames,
-    drags,
-    dropTargets,
-    dataStore.groups,
-  ]).pipe(
-    map(([shownList, { group }, targets, groups]) => {
+  const frames = derive(
+    [shownFrames, drags, dropTargets, dataStore.groups],
+    (shownList, { group }, targets, groups) => {
       const titles = new Map(groups.map(({ id, title }) => [id, title]));
 
       return frameRecords(
@@ -545,39 +506,36 @@ export const createDagCanvasScene = ({
                   : undefined,
         })),
       );
-    }),
+    },
   );
 
   const edgeRecords = createRecordCache(
     (record: DagEdgeRecord) => record.edge.id,
   );
 
-  const edgeList = combine([edges, shownSelectedEdge]).pipe(
-    map(([drawnEdges, selected]) =>
-      edgeRecords(
-        drawnEdges.map((edge): DagEdgeRecord => ({
-          edge,
-          selected: edge.id === selected?.edge.id,
-        })),
-      ),
+  const edgeList = derive([edges, shownSelectedEdge], (drawnEdges, selected) =>
+    edgeRecords(
+      drawnEdges.map((edge): DagEdgeRecord => ({
+        edge,
+        selected: edge.id === selected?.edge.id,
+      })),
     ),
   );
 
   const arcRecords = createRecordCache((record: DagArcRecord) => record.arc.id);
 
-  const arcs = combine([settledArcs, highlight]).pipe(
-    map(([arcList, highlighted]) =>
-      arcRecords(
-        arcList.map((arc): DagArcRecord => ({
-          arc,
-          highlight: highlightOf(highlighted?.edges, arc.id),
-        })),
-      ),
+  const arcs = derive([settledArcs, highlight], (arcList, highlighted) =>
+    arcRecords(
+      arcList.map((arc): DagArcRecord => ({
+        arc,
+        highlight: highlightOf(highlighted?.edges, arc.id),
+      })),
     ),
   );
 
-  const edgeDelete = combine([shownSelectedEdge, drawnTransform, views]).pipe(
-    map(([selected, { scale }, nodeViews]): Optional<EdgeDeleteState> =>
+  const edgeDelete = derive(
+    [shownSelectedEdge, drawnTransform, views],
+    (selected, { scale }, nodeViews): Optional<EdgeDeleteState> =>
       selected === undefined
         ? Optional.none
         : Optional.some({
@@ -590,42 +548,29 @@ export const createDagCanvasScene = ({
             from: selected.edge.from,
             to: selected.edge.to,
           }),
-    ),
   );
 
-  const connectOverlay = combine([
-    arrangeable,
-    handle,
-    connecting,
-    connectTarget,
-    drawnTransform,
-  ]).pipe(
-    map(
-      ([
-        canArrange,
-        handleAt,
-        arrow,
-        target,
-        { scale },
-      ]): Optional<ConnectOverlayState> => {
-        const anchor = arrow?.anchor ?? handleAt?.at;
+  const connectOverlay = derive(
+    [arrangeable, handle, connecting, connectTarget, drawnTransform],
+    (
+      canArrange,
+      handleAt,
+      arrow,
+      target,
+      { scale },
+    ): Optional<ConnectOverlayState> => {
+      const anchor = arrow?.anchor ?? handleAt?.at;
 
-        return !canArrange || anchor === undefined
-          ? Optional.none
-          : Optional.some({ anchor, connecting: arrow, target, scale });
-      },
-    ),
+      return !canArrange || anchor === undefined
+        ? Optional.none
+        : Optional.some({ anchor, connecting: arrow, target, scale });
+    },
   );
 
   // What `fit` shows all of, in the way the mode is read.
-  const fitTarget = combine([
-    mode,
-    placed,
-    settledFrames,
-    arcNodes,
-    settledArcs,
-  ]).pipe(
-    map(([current, placedNodes, settled, arc, arcList]): FitTarget =>
+  const fitTarget = derive(
+    [mode, placed, settledFrames, arcNodes, settledArcs],
+    (current, placedNodes, settled, arc, arcList): FitTarget =>
       current === 'arc'
         ? {
             kind: 'column',
@@ -637,20 +582,20 @@ export const createDagCanvasScene = ({
               kind: 'whole',
               bounds: nodesBounds([...placedNodes, ...settled], GRAPH_MARGIN),
             },
-    ),
   );
 
   // The nodes a press can grab: none outside the mode the reader arranges.
-  const movableNodes = combine([arrangeable, placed]).pipe(
-    map(([canArrange, placedNodes]) => (canArrange ? placedNodes : [])),
+  const movableNodes = derive(
+    [arrangeable, placed],
+    (canArrange, placedNodes) => (canArrange ? placedNodes : []),
   );
 
   // The nodes a handle can be on: those that can be grabbed, once they are
   // where they are drawn.
-  const connectable = combine([arrangeable, animated, placed]).pipe(
-    map(([canArrange, moved, placedNodes]) =>
+  const connectable = derive(
+    [arrangeable, animated, placed],
+    (canArrange, moved, placedNodes) =>
       canArrange && moved === undefined ? placedNodes : [],
-    ),
   );
 
   return {

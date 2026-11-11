@@ -130,7 +130,7 @@ const Counter = (): React.JSX.Element => {
 
 // `state` is the same InitializedObservable<number> that the core synstate
 // package's createState returns as its first element.
-// You can use it with pipe, combine, subscribe, etc.
+// You can use it with pipe, derive, subscribe, etc.
 state.subscribe((value) => {
     console.log('count changed:', value);
 });
@@ -139,17 +139,17 @@ state.subscribe((value) => {
 console.log('current count:', getCountSnapshot());
 ```
 
-| プロパティ     | 型                                | 説明                                                                                                                                           |
-| :------------- | :-------------------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------- |
-| `state`        | `InitializedObservable<S>`        | コアの `synstate` パッケージの `createState` が第1要素として返すのと同じ Observable。`pipe`、`combine`、`subscribe` などと組み合わせて使用可能 |
-| `updateState`  | `(updateFn: (prev: S) => S) => S` | 前の値を受け取る関数で状態を更新（詳細は [createState 詳説](/mono/synstate/ja/guides/core-state-management/) を参照）                          |
-| `resetState`   | `() => S`                         | 状態を初期値にリセット                                                                                                                         |
-| `getSnapshot`  | `() => S`                         | 購読せずに現在の値を同期的に読み取る                                                                                                           |
-| `initialState` | `S`                               | `createState` に渡された初期値                                                                                                                 |
+| プロパティ     | 型                                | 説明                                                                                                                                          |
+| :------------- | :-------------------------------- | :-------------------------------------------------------------------------------------------------------------------------------------------- |
+| `state`        | `InitializedObservable<S>`        | コアの `synstate` パッケージの `createState` が第1要素として返すのと同じ Observable。`pipe`、`derive`、`subscribe` などと組み合わせて使用可能 |
+| `updateState`  | `(updateFn: (prev: S) => S) => S` | 前の値を受け取る関数で状態を更新（詳細は [createState 詳説](/mono/synstate/ja/guides/core-state-management/) を参照）                         |
+| `resetState`   | `() => S`                         | 状態を初期値にリセット                                                                                                                        |
+| `getSnapshot`  | `() => S`                         | 購読せずに現在の値を同期的に読み取る                                                                                                          |
+| `initialState` | `S`                               | `createState` に渡された初期値                                                                                                                |
 
 ## 派生 Observable の購読: `useObservableValue`
 
-3番目の要素の `state` は通常の Observable であり、`pipe`、`map`、`combine` などで自由に変換できます。派生した Observable を React コンポーネントで購読するには `useObservableValue` を使用します：
+3番目の要素の `state` は通常の Observable であり、`pipe`、`map`、`derive` などで自由に変換できます。派生した Observable を React コンポーネントで購読するには `useObservableValue` を使用します：
 
 ```tsx
 import type * as React from 'react';
@@ -182,7 +182,7 @@ const CountDisplay = (): React.JSX.Element => {
 };
 ```
 
-`useObservableValue` は `createState`、`pipe`、`combine` など、SynState のあらゆるオペレーターから得られる `Observable` に対して動作します。Observable を購読し、現在の値を React state として返します。値が変化するとコンポーネントが再レンダリングされます。
+`useObservableValue` は `createState`、`pipe`、`derive` など、SynState のあらゆるオペレーターから得られる `Observable` に対して動作します。Observable を購読し、現在の値を React state として返します。値が変化するとコンポーネントが再レンダリングされます。
 
 ### 初期値を持たない Observable のためのフォールバック
 

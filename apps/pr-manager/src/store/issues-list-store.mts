@@ -16,8 +16,8 @@
  */
 
 import {
-  combine,
   createState,
+  derive,
   map,
   skipIfNoChange,
   type InitializedObservable,
@@ -109,9 +109,9 @@ export const createIssuesListStore = (
     };
   };
 
-  const starts = combine([deps.graph, deps.issues])
-    .pipe(map(([graph, issues]) => issueStartsOf(graph, issues.items)))
-    .pipe(skipIfNoChange(fastDeepEqual));
+  const starts = derive([deps.graph, deps.issues], (graph, issues) =>
+    issueStartsOf(graph, issues.items),
+  ).pipe(skipIfNoChange(fastDeepEqual));
 
   const startStates = starts.pipe(
     map(
@@ -142,20 +142,16 @@ export const createIssuesListStore = (
     query,
     // Passed on only when it changed: a poll that moved nothing of the issues
     // lays nothing out again.
-    items: combine([deps.issues, view, query, startStates])
-      .pipe(
-        map(([issues, current, typed, states]) =>
-          arrangeIssues(issues.items, current, typed, states),
-        ),
-      )
-      .pipe(skipIfNoChange(fastDeepEqual)),
-    counts: combine([deps.issues, view, query, startStates])
-      .pipe(
-        map(([issues, current, typed, states]) =>
-          countIssues(issues.items, current, typed, states),
-        ),
-      )
-      .pipe(skipIfNoChange(fastDeepEqual)),
+    items: derive(
+      [deps.issues, view, query, startStates],
+      (issues, current, typed, states) =>
+        arrangeIssues(issues.items, current, typed, states),
+    ).pipe(skipIfNoChange(fastDeepEqual)),
+    counts: derive(
+      [deps.issues, view, query, startStates],
+      (issues, current, typed, states) =>
+        countIssues(issues.items, current, typed, states),
+    ).pipe(skipIfNoChange(fastDeepEqual)),
     starts,
     togglePriority: (priority) => {
       updateView((current) => toggleIssuePriority(current, priority));

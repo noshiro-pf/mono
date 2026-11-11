@@ -1,4 +1,4 @@
-import { combine, createState, filter, map } from 'synstate';
+import { createState, derive, filter, map } from 'synstate';
 
 // embed-sample-code-ignore-below
 if (import.meta.vitest !== undefined) {
@@ -10,20 +10,18 @@ if (import.meta.vitest !== undefined) {
 
     const D = A.pipe(filter((n) => n % 2 === 0)); // depth 1
 
-    const BD = combine([B, D]); // depth 2
-
-    const C = BD.pipe(map(([b, d]) => b + d)); // depth 3
+    const C = derive([B, D], (b, d) => b + d); // depth 2
 
     const E = D.pipe(map((n) => n * 10)); // depth 2
 
-    setA(1); // B = 10, BD = [10, 0], C = 10; D rejects 1, so E is not reached
+    setA(1); // B = 10, C = 10; D rejects 1, so E is not reached
 
-    setA(2); // B = 20, D = 2, BD = [20, 2], E = 20, C = 22
+    setA(2); // B = 20, D = 2, C = 22, E = 20
     // embed-sample-code-ignore-below
 
     assert.deepStrictEqual(
-      [A.depth, B.depth, D.depth, BD.depth, C.depth, E.depth],
-      [0, 1, 1, 2, 3, 2],
+      [A.depth, B.depth, D.depth, C.depth, E.depth],
+      [0, 1, 1, 2, 2],
     );
 
     // Back to the initial values, then the two updates again, logging the order
@@ -46,9 +44,6 @@ if (import.meta.vitest !== undefined) {
       D.subscribe((v) => {
         log(`D ${v.toString()}`);
       }),
-      BD.subscribe((v) => {
-        log(`BD ${v.join(',')}`);
-      }),
       C.subscribe((v) => {
         log(`C ${v.toString()}`);
       }),
@@ -70,14 +65,14 @@ if (import.meta.vitest !== undefined) {
       logOf(() => {
         setA(1);
       }),
-      ['A 1', 'B 10', 'BD 10,0', 'C 10'],
+      ['A 1', 'B 10', 'C 10'],
     );
 
     assert.deepStrictEqual(
       logOf(() => {
         setA(2);
       }),
-      ['A 2', 'B 20', 'D 2', 'BD 20,2', 'E 20', 'C 22'],
+      ['A 2', 'B 20', 'D 2', 'C 22', 'E 20'],
     );
 
     for (const s of subscriptions) {

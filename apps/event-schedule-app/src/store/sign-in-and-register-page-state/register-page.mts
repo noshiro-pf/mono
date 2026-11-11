@@ -1,4 +1,4 @@
-import { type InitializedObservable, combine, filter, map } from 'synstate';
+import { type InitializedObservable, derive, filter, map } from 'synstate';
 import type { Href } from 'synstate-router';
 import { Optional, Result } from 'ts-data-forge';
 import type { StrictPick } from 'ts-type-forge';
@@ -92,31 +92,30 @@ export const createRegisterPageStore = <User,>(
   const { state: passwordIsOpen$, toggle: togglePasswordLock } =
     createToggleState([left$]);
 
-  const state = combine([
-    formState$,
-    enterButtonDisabled$,
-    usernameFormIntent$,
-    emailFormIntent$,
-    passwordFormIntent$,
-    passwordIsOpen$,
-  ]).pipe(
-    map(
-      ([
-        formState,
-        enterButtonDisabled,
-        usernameFormIntent,
-        emailFormIntent,
-        passwordFormIntent,
-        passwordIsOpen,
-      ]) => ({
-        formState,
-        enterButtonDisabled,
-        usernameFormIntent,
-        emailFormIntent,
-        passwordFormIntent,
-        passwordIsOpen,
-      }),
-    ),
+  const state = derive(
+    [
+      formState$,
+      enterButtonDisabled$,
+      usernameFormIntent$,
+      emailFormIntent$,
+      passwordFormIntent$,
+      passwordIsOpen$,
+    ],
+    (
+      formState,
+      enterButtonDisabled,
+      usernameFormIntent,
+      emailFormIntent,
+      passwordFormIntent,
+      passwordIsOpen,
+    ) => ({
+      formState,
+      enterButtonDisabled,
+      usernameFormIntent,
+      emailFormIntent,
+      passwordFormIntent,
+      passwordIsOpen,
+    }),
   );
 
   const submit = async (pageToBack: Href | undefined): Promise<void> => {

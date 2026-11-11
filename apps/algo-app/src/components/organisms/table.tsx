@@ -1,4 +1,4 @@
-import { combine, map, type InitializedObservable } from 'synstate';
+import { derive, map, type InitializedObservable } from 'synstate';
 import { constant, type JSX } from 'synstate-dom';
 import { Num, asPositiveFiniteNumber } from 'ts-data-forge';
 import type { Rect, RectSize } from 'ts-utils-additional';
@@ -93,7 +93,7 @@ export const Table = ({
   // size or of what the table shows, rather than after a list of what can move
   // them, which would go stale silently; `reportRectOn` reports only the rects
   // that changed.
-  const measureOn = combine([windowSize, displayValues]);
+  const measureOn = derive([windowSize, displayValues], (...values) => values);
 
   return (
     <div

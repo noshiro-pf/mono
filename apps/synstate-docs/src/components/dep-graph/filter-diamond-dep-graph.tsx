@@ -35,7 +35,10 @@ const nodes: readonly NodeDef[] = [
   {
     id: 'C',
     label: 'C: sum',
-    sublabel: '= combine(B, D)',
+    // Letters, not names: B and E are both labelled multipliedBy10 here, so a
+    // name would not say which of them C reads; D is a letter too, so the sum
+    // reads as one expression.
+    sublabel: '= B + D',
     color: '#10b981',
     col: 2,
     row: 1,

@@ -185,7 +185,7 @@ The queue is empty — propagation is complete. `sum` emits **`1010`**, the corr
 
 The priority queue approach correctly eliminates glitches, but it introduces overhead on **every update**. Each time a source emits, every descendant must be enqueued into and dequeued from the priority queue — each operation costing **$O(\log n)$** where $n$ is the number of observables in the graph. For a graph with $n$ descendants, the total propagation cost per source emission becomes **$O(n \log n)$**.
 
-RxJS's depth-first propagation avoids this overhead — each node is visited with just a function call. However, RxJS treats the dependency graph as a **tree**, not a DAG (directed acyclic graph). When a diamond dependency exists, RxJS traverses both branches independently: the shared descendant (e.g., `combine`) is evaluated once for each branch that reaches it.
+RxJS's depth-first propagation avoids this overhead — each node is visited with just a function call. However, RxJS treats the dependency graph as a **tree**, not a DAG (directed acyclic graph). When a diamond dependency exists, RxJS traverses both branches independently: the shared descendant (e.g., `combineLatest`) is evaluated once for each branch that reaches it.
 
 The cost depends on the diamond topology:
 
@@ -322,17 +322,23 @@ SynState solves this by giving every update cycle a unique identity — an **upd
 This creates a simple invariant: **a node's `updateToken` equals the current cycle's token if and only if it was updated in this cycle.** Each node checks this on its parents with a single reference comparison — $O(1)$ — to decide whether to update or skip:
 
 - **Single-parent operators** (e.g., `map`, `scan`): Check `parent.updateToken === token`. If the parent's token doesn't match, the parent was skipped — so the child skips too.
-- **Multi-parent operators** (e.g., `combine`): Check whether **at least one** parent's token matches. If all parents were skipped, `combine` skips. If at least one updated, `combine` re-evaluates using the latest snapshot from every parent (whether updated in this cycle or not).
+- **Multi-parent operators** (e.g., `derive`): Check whether **at least one** parent's token matches. If all parents were skipped, `derive` skips. If at least one updated, `derive` re-evaluates using the latest snapshot from every parent (whether updated in this cycle or not).
 
 Each operator is a subclass of `SyncChildObservableClass` or `AsyncChildObservableClass`, and overrides `tryUpdate`, which the manager calls with the token:
 
 ```ts
-// Simplified from DeriveObservableClass, which `combine` is built on
+// Simplified from DeriveObservableClass, the class behind `derive`
 override tryUpdate(updateToken: UpdateToken): void {
     let updated = false;
 
     for (const [i, parent] of this.parents.entries()) {
-        this.values[i] = parent.getSnapshot().value;
+        const snapshot = parent.getSnapshot();
+
+        if (Optional.isNone(snapshot)) {
+            return; // a parent has no value yet
+        }
+
+        this.values[i] = snapshot.value;
 
         if (parent.updateToken === updateToken) {
             updated = true;
@@ -344,7 +350,15 @@ override tryUpdate(updateToken: UpdateToken): void {
         return;
     }
 
-    // ... this.setNext(this.project(...this.values), updateToken) ...
+    const next = this.project(...this.values);
+
+    const held = this.getSnapshot();
+
+    if (Optional.isSome(held) && this.equals(held.value, next)) {
+        return; // the result did not change (Object.is by default)
+    }
+
+    this.setNext(next, updateToken);
 }
 ```
 

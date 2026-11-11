@@ -28,7 +28,7 @@
 - 🌐 **Framework Agnostic**: Works with React, Vue, Svelte, or vanilla JavaScript
 - 🔄 **Reactive Updates**: Automatic propagation of state changes to all subscribers
 - 📡 **Event System**: Built-in `createValueEmitter`, `createEventEmitter` for event-driven architecture
-- 🔧 **Observable-based**: Built on Observable pattern similar to RxJS, but with a completely independent implementation from scratch — not a wrapper. Offers optional advanced features like operators (`map`, `filter`, `scan`, `debounce`) and combinators (`merge`, `combine`)
+- 🔧 **Observable-based**: Built on Observable pattern similar to RxJS, but with a completely independent implementation from scratch — not a wrapper. Offers optional advanced features like operators (`map`, `filter`, `scan`, `debounce`) and combinators (`merge`, `derive`)
 
 ## Documentation
 
@@ -203,7 +203,7 @@ const UserProfile = (): React.JSX.Element => {
 
 ### Simple to Start, Powerful When You Need It
 
-SynState is a state management library for web frontends. For most use cases, `createState`, `createReducer`, and simple combinators like `combine` and `map` are all you need — clean, minimal APIs that feel as intuitive as React's `useState` / `useReducer`, but for global state.
+SynState is a state management library for web frontends. For most use cases, `createState`, `createReducer`, and simple combinators like `derive` and `map` are all you need — clean, minimal APIs that feel as intuitive as React's `useState` / `useReducer`, but for global state.
 
 When your requirements grow more complex, SynState scales with you. Built on its own Observable implementation, it provides operators like `debounce`, `throttle`, `switchMap`, and `mergeMap` for sophisticated asynchronous state management — without requiring an additional library like RxJS. You can describe everything from a simple counter to a debounced search pipeline with auto-cancellation in a single, unified API.
 

@@ -1,6 +1,6 @@
 import {
-  combine,
   createState,
+  derive,
   map,
   onScopeDispose,
   type InitializedObservable,
@@ -75,22 +75,21 @@ export const LabelInput = ({
 
   const [open$, setOpen] = createState(false);
 
-  const suggestions$ = combine([known, labels, typed$]).pipe(
-    map(([all, chosen, typed]) => suggestLabels(all, chosen, typed)),
+  const suggestions$ = derive([known, labels, typed$], (all, chosen, typed) =>
+    suggestLabels(all, chosen, typed),
   );
 
-  const shown$ = combine([open$, suggestions$]).pipe(
-    map(([open, suggestions]) => open && Arr.isNonEmpty(suggestions)),
+  const shown$ = derive(
+    [open$, suggestions$],
+    (open, suggestions) => open && Arr.isNonEmpty(suggestions),
   );
 
-  const options$ = combine([suggestions$, active$]).pipe(
-    map(([suggestions, active]) =>
-      suggestions.map((label, index) => ({
-        label,
-        id: optionId(index),
-        active: label === active,
-      })),
-    ),
+  const options$ = derive([suggestions$, active$], (suggestions, active) =>
+    suggestions.map((label, index) => ({
+      label,
+      id: optionId(index),
+      active: label === active,
+    })),
   );
 
   let mut_box: HTMLInputElement | undefined = undefined;
@@ -367,10 +366,8 @@ export const LabelInput = ({
           )}
         </For>
         <input
-          aria-activedescendant={combine([options$, shown$]).pipe(
-            map(([options, shown]) =>
-              shown ? options.find(({ active }) => active)?.id : undefined,
-            ),
+          aria-activedescendant={derive([options$, shown$], (options, shown) =>
+            shown ? options.find(({ active }) => active)?.id : undefined,
           )}
           aria-autocomplete={constant('list')}
           aria-controls={shown$.pipe(

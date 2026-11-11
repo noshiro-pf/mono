@@ -7,12 +7,12 @@ sidebar:
 
 SynState は自分で observable を書くための 4 つの factory を export しています。どれも組み込みの observable が継承しているのと同じ基底クラスを包んでいるので、これで作ったカスタム operator や creator は、`map` や `source` と同じようにグリッチのない伝搬に加わります。
 
-| Factory                                | 作るもの                                           | 同じ振る舞いの組み込み            |
-| :------------------------------------- | :------------------------------------------------- | :-------------------------------- |
-| `createRootObservable`                 | 親を持たない observable（`kind: 'root'`）          | `source`、`timer`、`fromPromise`  |
-| `createSyncChildObservable`            | 親と同じ更新の中で値を出す子                       | `map`、`filter`、`combine`、`zip` |
-| `createInitializedSyncChildObservable` | 同上。常に値を持つ型になる                         | `scan`、`withInitialValue`        |
-| `createAsyncChildObservable`           | 後から、自分で始めた更新の中で値を出すことがある子 | `debounce`、`audit`、`switchMap`  |
+| Factory                                | 作るもの                                           | 同じ振る舞いの組み込み           |
+| :------------------------------------- | :------------------------------------------------- | :------------------------------- |
+| `createRootObservable`                 | 親を持たない observable（`kind: 'root'`）          | `source`、`timer`、`fromPromise` |
+| `createSyncChildObservable`            | 親と同じ更新の中で値を出す子                       | `map`、`filter`、`derive`、`zip` |
+| `createInitializedSyncChildObservable` | 同上。常に値を持つ型になる                         | `scan`、`withInitialValue`       |
+| `createAsyncChildObservable`           | 後から、自分で始めた更新の中で値を出すことがある子 | `debounce`、`audit`、`switchMap` |
 
 名前はすべての observable が持ち、debugger にも表示される `kind`（`'root'`、`'sync child'`、`'async child'`）に揃えています。
 
@@ -42,7 +42,7 @@ export const double = (src: Observable<number>): Observable<number> =>
 
 `src.updateToken` は、`src` が最後に値を出した更新のトークンです。`tryUpdate` が受け取ったトークンと違えば、`src` はこの更新ではスキップされた（たとえば上流の `filter` が値を通さなかった）ということで、`double` もスキップします。値を出すには受け取ったトークンで `setNext` を呼びます。呼ばないことがスキップで、その子も同じ比較でそれを知ります。
 
-親が複数あるときは、親ごとにトークンを比べます。`combine` はどれかの親が値を出せば値を出し、`zip` は値を出した親の値をキューに積みます。
+親が複数あるときは、親ごとにトークンを比べます。`derive` はどれかの親が値を出せば再計算し、`zip` は値を出した親の値をキューに積みます。
 
 ### depth と、親でない observable を読む場合
 

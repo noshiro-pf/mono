@@ -1,4 +1,4 @@
-import { combine, map, type InitializedObservable } from 'synstate';
+import { derive, map, type InitializedObservable } from 'synstate';
 import { constant, For, If, type JSX } from 'synstate-dom';
 import type { ReadonlyRecord } from 'ts-type-forge';
 import {
@@ -46,14 +46,13 @@ export const BlockColumn = ({ panes$, blocks }: Props): JSX.Element => {
 
           const ids$ = pane$.pipe(map(({ ids }) => ids));
 
-          const placement$ = combine([layoutStore.layout, keys$, index$]).pipe(
-            map(([layout, keys, index]) =>
-              placementOf(layout, keys, index, id),
-            ),
+          const placement$ = derive(
+            [layoutStore.layout, keys$, index$],
+            (layout, keys, index) => placementOf(layout, keys, index, id),
           );
 
-          const selected$ = combine([layoutStore.layout, ids$]).pipe(
-            map(([layout, ids]) => selectedTabOf(layout, ids)),
+          const selected$ = derive([layoutStore.layout, ids$], (layout, ids) =>
+            selectedTabOf(layout, ids),
           );
 
           return (

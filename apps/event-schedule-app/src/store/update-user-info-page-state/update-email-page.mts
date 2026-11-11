@@ -1,5 +1,5 @@
 import {
-  combine,
+  derive,
   filter,
   map,
   withCurrentValueFrom,
@@ -114,28 +114,27 @@ export const createUpdateEmailPageStore = <
       ),
     ]);
 
-  const state = combine([
-    formState$,
-    enterButtonDisabled$,
-    emailFormIntent$,
-    passwordFormIntent$,
-    passwordIsOpen$,
-  ]).pipe(
-    map(
-      ([
-        formState,
-        enterButtonDisabled,
-        emailFormIntent,
-        passwordFormIntent,
-        passwordIsOpen,
-      ]) => ({
-        formState,
-        enterButtonDisabled,
-        emailFormIntent,
-        passwordFormIntent,
-        passwordIsOpen,
-      }),
-    ),
+  const state = derive(
+    [
+      formState$,
+      enterButtonDisabled$,
+      emailFormIntent$,
+      passwordFormIntent$,
+      passwordIsOpen$,
+    ],
+    (
+      formState,
+      enterButtonDisabled,
+      emailFormIntent,
+      passwordFormIntent,
+      passwordIsOpen,
+    ) => ({
+      formState,
+      enterButtonDisabled,
+      emailFormIntent,
+      passwordFormIntent,
+      passwordIsOpen,
+    }),
   );
 
   const submit = async (user: User): Promise<void> => {

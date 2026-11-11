@@ -7,9 +7,9 @@
  */
 
 import {
-  combine,
   createBooleanState,
   createState,
+  derive,
   map,
   type InitializedObservable,
 } from 'synstate';
@@ -182,20 +182,17 @@ export const createCalculatorStore = (
 
   const handSorted = hand.pipe(map(sortTiles));
 
-  const numHandTiles = combine([handSorted, revealedBlocks]).pipe(
-    map(([handTiles, blocks]) => handTiles.length + blocks.length * 3),
+  const numHandTiles = derive(
+    [handSorted, revealedBlocks],
+    (handTiles, blocks) => handTiles.length + blocks.length * 3,
   );
 
   const numDoraTiles = doraIndicators.pipe(map((a) => a.length));
 
-  const numRemainingTiles = combine([
-    handSorted,
-    doraIndicators,
-    revealedBlocks,
-  ]).pipe(
-    map(([handTiles, indicators, blocks]) =>
+  const numRemainingTiles = derive(
+    [handSorted, doraIndicators, revealedBlocks],
+    (handTiles, indicators, blocks) =>
       countRemainingTiles(handTiles, indicators, blocks),
-    ),
   );
 
   const tenhoURL = handSorted.pipe(
@@ -210,17 +207,10 @@ export const createCalculatorStore = (
     ),
   );
 
-  const problemAsText = combine([
-    bakaze,
-    jikaze,
-    turn,
-    doraIndicators,
-    hand,
-    revealedBlocks,
-  ]).pipe(
-    map(([b, j, t, indicators, handTiles, blocks]) =>
+  const problemAsText = derive(
+    [bakaze, jikaze, turn, doraIndicators, hand, revealedBlocks],
+    (b, j, t, indicators, handTiles, blocks) =>
       problem2String(b, j, t, indicators, handTiles, blocks),
-    ),
   );
 
   /* handlers */

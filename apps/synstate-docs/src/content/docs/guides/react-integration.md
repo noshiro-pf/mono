@@ -130,7 +130,7 @@ const Counter = (): React.JSX.Element => {
 
 // `state` is the same InitializedObservable<number> that the core synstate
 // package's createState returns as its first element.
-// You can use it with pipe, combine, subscribe, etc.
+// You can use it with pipe, derive, subscribe, etc.
 state.subscribe((value) => {
     console.log('count changed:', value);
 });
@@ -139,17 +139,17 @@ state.subscribe((value) => {
 console.log('current count:', getCountSnapshot());
 ```
 
-| Property       | Type                              | Description                                                                                                                                         |
-| :------------- | :-------------------------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `state`        | `InitializedObservable<S>`        | The same Observable that the core `synstate` package's `createState` returns as its first element. Use it with `pipe`, `combine`, `subscribe`, etc. |
-| `updateState`  | `(updateFn: (prev: S) => S) => S` | Update the state using a function of the previous value (see [createState in Depth](/mono/synstate/guides/core-state-management/))                  |
-| `resetState`   | `() => S`                         | Reset the state to its initial value                                                                                                                |
-| `getSnapshot`  | `() => S`                         | Read the current value synchronously without subscribing                                                                                            |
-| `initialState` | `S`                               | The initial value passed to `createState`                                                                                                           |
+| Property       | Type                              | Description                                                                                                                                        |
+| :------------- | :-------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `state`        | `InitializedObservable<S>`        | The same Observable that the core `synstate` package's `createState` returns as its first element. Use it with `pipe`, `derive`, `subscribe`, etc. |
+| `updateState`  | `(updateFn: (prev: S) => S) => S` | Update the state using a function of the previous value (see [createState in Depth](/mono/synstate/guides/core-state-management/))                 |
+| `resetState`   | `() => S`                         | Reset the state to its initial value                                                                                                               |
+| `getSnapshot`  | `() => S`                         | Read the current value synchronously without subscribing                                                                                           |
+| `initialState` | `S`                               | The initial value passed to `createState`                                                                                                          |
 
 ## Subscribing to Derived Observables: `useObservableValue`
 
-The `state` property from the third element is a regular Observable that you can transform with `pipe`, `map`, `combine`, etc. To subscribe to a derived Observable in a React component, use `useObservableValue`:
+The `state` property from the third element is a regular Observable that you can transform with `pipe`, `map`, `derive`, etc. To subscribe to a derived Observable in a React component, use `useObservableValue`:
 
 ```tsx
 import type * as React from 'react';
@@ -182,7 +182,7 @@ const CountDisplay = (): React.JSX.Element => {
 };
 ```
 
-`useObservableValue` works with any `Observable` — whether it comes from `createState`, `pipe`, `combine`, or any other SynState operator. It subscribes to the Observable and returns the current value as React state, re-rendering the component when the value changes.
+`useObservableValue` works with any `Observable` — whether it comes from `createState`, `pipe`, `derive`, or any other SynState operator. It subscribes to the Observable and returns the current value as React state, re-rendering the component when the value changes.
 
 ### Fallback for Observables Without an Initial Value
 

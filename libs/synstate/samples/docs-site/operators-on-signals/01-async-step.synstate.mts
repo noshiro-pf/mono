@@ -1,6 +1,6 @@
 import {
-  combine,
   createState,
+  derive,
   map,
   switchMap,
   timer,
@@ -29,9 +29,7 @@ export const createSearchView = (): SearchView => {
   );
 
   // What the page shows: the query in the box, and what the list is for.
-  const view = combine([query, searchState]).pipe(
-    map(([q, state]) => showView(q, state)),
-  );
+  const view = derive([query, searchState], showView);
 
   // transformer-ignore-next-line convert-to-readonly, append-as-const
   const viewLog: string[] = [];

@@ -3,9 +3,9 @@ import { computed, effect, signal } from '@preact/signals-core';
 import type { InputEventHandler } from 'preact';
 import { useCallback, useLayoutEffect, useRef, useState } from 'preact/hooks';
 import {
-  combine,
   createScope,
   createState,
+  derive,
   map,
   switchMap,
   timer,
@@ -256,9 +256,10 @@ const buildSynState = (onView: (row: ViewRow) => void): Built => {
       ),
     );
 
-    const view = combine([query, searchState]).pipe(
-      map(([q, state]): ViewRow => ({ query: q, state })),
-    );
+    const view = derive([query, searchState], (q, state): ViewRow => ({
+      query: q,
+      state,
+    }));
 
     view.subscribe(onView);
 

@@ -9,7 +9,7 @@
 
 import { serverTimestamp } from 'firebase/firestore';
 import {
-  combine,
+  derive,
   filter,
   map,
   merge,
@@ -235,7 +235,7 @@ export const createGameStateStore = (deps: GameStateDeps): GameStateStore => {
 
   const start = (): (() => void) => {
     // Each action played here is written once. A new snapshot of the room
-    // (another player joining) re-emits the `combine`, so what to write is the
+    // (another player joining) re-emits the `derive`, so what to write is the
     // actions played since the last emission, not the latest one; those played
     // before the room is known are written, in order, once it is.
     const knownRoom = deps.room.pipe(filter(isNotUndefined));
@@ -247,7 +247,7 @@ export const createGameStateStore = (deps: GameStateDeps): GameStateStore => {
       ),
     );
 
-    const writing = combine([knownRoom, playedHere])
+    const writing = derive([knownRoom, playedHere], (...values) => values)
       .pipe(
         scan<
           readonly [Room, readonly GameStateActionToWrite[]],

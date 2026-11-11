@@ -33,19 +33,11 @@ const nodes: readonly NodeDef[] = [
     row: 2,
   },
   {
-    id: 'combine',
-    label: 'combine',
-    sublabel: '[×10, ×1000]',
-    color: '#6366f1',
-    col: 2,
-    row: 1,
-  },
-  {
     id: 'sum',
     label: 'D: sum',
     sublabel: '= ×10 + ×1000',
     color: '#10b981',
-    col: 3,
+    col: 2,
     row: 1,
   },
 ] as const;
@@ -53,7 +45,6 @@ const nodes: readonly NodeDef[] = [
 const edges: readonly EdgeDef[] = [
   { from: 'counter', to: 'multipliedBy10' },
   { from: 'counter', to: 'multipliedBy1000' },
-  { from: 'multipliedBy10', to: 'combine' },
-  { from: 'multipliedBy1000', to: 'combine' },
-  { from: 'combine', to: 'sum' },
+  { from: 'multipliedBy10', to: 'sum' },
+  { from: 'multipliedBy1000', to: 'sum' },
 ] as const;

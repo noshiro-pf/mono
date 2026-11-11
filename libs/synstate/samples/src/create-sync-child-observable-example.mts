@@ -1,6 +1,6 @@
 import {
-  combine,
   createSyncChildObservable,
+  derive,
   source,
   type Observable,
 } from 'synstate';
@@ -32,7 +32,7 @@ if (import.meta.vitest !== undefined) {
 
     const num$ = source<number>();
 
-    const pair$ = combine([num$, double(num$)]);
+    const pair$ = derive([num$, double(num$)], (n, d) => [n, d] as const);
 
     // transformer-ignore-next-line convert-to-readonly, append-as-const
     const valueHistory: FixedLengthTuple<2, number>[] = [];
@@ -45,7 +45,7 @@ if (import.meta.vitest !== undefined) {
 
     num$.next(2);
 
-    // `double` joins the same update as `num$`, so `combine` sees no [2, 2].
+    // `double` joins the same update as `num$`, so `derive` sees no [2, 2].
     assert.deepStrictEqual(valueHistory, [
       [1, 2],
       [2, 4],

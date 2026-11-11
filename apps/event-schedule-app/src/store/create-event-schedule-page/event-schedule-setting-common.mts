@@ -3,12 +3,7 @@ import {
   UserId,
   UserName,
 } from 'event-schedule-app-shared';
-import {
-  type InitializedObservable,
-  combine,
-  createState,
-  map,
-} from 'synstate';
+import { type InitializedObservable, createState, derive, map } from 'synstate';
 import { Arr, Obj, mapNullable, pipe } from 'ts-data-forge';
 import {
   answerDeadlineInitialValue,
@@ -105,16 +100,14 @@ export const createEventScheduleSettingStore = (
     setAnswerIcons(getBaseline().answerIcons);
   };
 
-  const initialNotificationSettingsWithEmailFilled$ = combine([
-    deps.fireAuthUser$,
-    answerDeadline$,
-  ]).pipe(
-    map(([user, answerDeadline]) => ({
+  const initialNotificationSettingsWithEmailFilled$ = derive(
+    [deps.fireAuthUser$, answerDeadline$],
+    (user, answerDeadline) => ({
       ...notificationSettingsInitialValue,
       email: user?.email ?? '',
       notifyAfterAnswerDeadline: answerDeadline !== undefined,
       notify00daysBeforeAnswerDeadline: answerDeadline !== undefined,
-    })),
+    }),
   );
 
   const {
@@ -187,8 +180,8 @@ export const createEventScheduleSettingStore = (
     }));
   };
 
-  const eventScheduleNormalized$: InitializedObservable<EventSchedule> =
-    combine([
+  const eventScheduleNormalized$: InitializedObservable<EventSchedule> = derive(
+    [
       title$,
       notes$,
       datetimeSpecification$,
@@ -198,64 +191,56 @@ export const createEventScheduleSettingStore = (
       notificationSettingsWithEmail$,
       deps.fireAuthUser$,
       baseline$,
-    ]).pipe(
-      map(
-        ([
-          title,
-          notes,
-          datetimeSpecification,
-          datetimeRangeList,
-          answerDeadline,
-          answerIcons,
-          notificationSettingsWithEmail,
-          fireAuthUser,
-          baseline,
-        ]) =>
-          normalizeEventSchedule({
-            title,
-            notes,
-            datetimeSpecification,
-            datetimeRangeList: Arr.isNonEmpty(datetimeRangeList)
-              ? datetimeRangeList
-              : baseline.datetimeRangeList,
-            answerDeadline: answerDeadline ?? 'none',
-            answerIcons,
-            notificationSettings:
-              notificationSettingsWithEmail === undefined
-                ? 'none'
-                : Obj.omit(notificationSettingsWithEmail, ['email']),
-            timezoneOffsetMinutes: baseline.timezoneOffsetMinutes,
-            author: {
-              id: mapNullable(fireAuthUser?.uid, UserId.cast) ?? null,
-              name: UserName.cast(fireAuthUser?.displayName ?? ''),
-            },
-            archivedBy: [],
-          }),
-      ),
-    );
+    ],
+    (
+      title,
+      notes,
+      datetimeSpecification,
+      datetimeRangeList,
+      answerDeadline,
+      answerIcons,
+      notificationSettingsWithEmail,
+      fireAuthUser,
+      baseline,
+    ) =>
+      normalizeEventSchedule({
+        title,
+        notes,
+        datetimeSpecification,
+        datetimeRangeList: Arr.isNonEmpty(datetimeRangeList)
+          ? datetimeRangeList
+          : baseline.datetimeRangeList,
+        answerDeadline: answerDeadline ?? 'none',
+        answerIcons,
+        notificationSettings:
+          notificationSettingsWithEmail === undefined
+            ? 'none'
+            : Obj.omit(notificationSettingsWithEmail, ['email']),
+        timezoneOffsetMinutes: baseline.timezoneOffsetMinutes,
+        author: {
+          id: mapNullable(fireAuthUser?.uid, UserId.cast) ?? null,
+          name: UserName.cast(fireAuthUser?.displayName ?? ''),
+        },
+        archivedBy: [],
+      }),
+  );
 
   const eventScheduleValidation$: InitializedObservable<EventScheduleValidation> =
-    combine([
-      title$,
-      datetimeRangeList$,
-      answerIcons$,
-      notificationSettingsWithEmail$,
-    ]).pipe(
-      map(
-        ([
+    derive(
+      [
+        title$,
+        datetimeRangeList$,
+        answerIcons$,
+        notificationSettingsWithEmail$,
+      ],
+      (title, datetimeRangeList, answerIcons, notificationSettingsWithEmail) =>
+        validateEventSchedule({
           title,
           datetimeRangeList,
           answerIcons,
-          notificationSettingsWithEmail,
-        ]) =>
-          validateEventSchedule({
-            title,
-            datetimeRangeList,
-            answerIcons,
-            notificationSettingsWithEmail:
-              notificationSettingsWithEmail ?? 'none',
-          }),
-      ),
+          notificationSettingsWithEmail:
+            notificationSettingsWithEmail ?? 'none',
+        }),
     );
 
   const eventScheduleValidationOk$ = eventScheduleValidation$.pipe(
@@ -263,49 +248,48 @@ export const createEventScheduleSettingStore = (
   );
 
   const commonState$: InitializedObservable<EventScheduleSettingCommonState> =
-    combine([
-      title$,
-      notes$,
-      datetimeSpecification$,
-      datetimeRangeList$,
-      useAnswerDeadline$,
-      answerDeadline$,
-      answerIcons$,
-      useNotification$,
-      notificationSettingsWithEmail$,
-      eventScheduleValidation$,
-      eventScheduleNormalized$,
-      eventScheduleValidationOk$,
-    ]).pipe(
-      map(
-        ([
-          title,
-          notes,
-          datetimeSpecification,
-          datetimeRangeList,
-          useAnswerDeadline,
-          answerDeadline,
-          answerIcons,
-          useNotification,
-          notificationSettingsWithEmail,
-          eventScheduleValidation,
-          eventScheduleNormalized,
-          eventScheduleValidationOk,
-        ]) => ({
-          title,
-          notes,
-          datetimeSpecification,
-          datetimeRangeList,
-          useAnswerDeadline,
-          answerDeadline,
-          answerIcons,
-          useNotification,
-          notificationSettingsWithEmail,
-          eventScheduleValidation,
-          eventScheduleNormalized,
-          eventScheduleValidationOk,
-        }),
-      ),
+    derive(
+      [
+        title$,
+        notes$,
+        datetimeSpecification$,
+        datetimeRangeList$,
+        useAnswerDeadline$,
+        answerDeadline$,
+        answerIcons$,
+        useNotification$,
+        notificationSettingsWithEmail$,
+        eventScheduleValidation$,
+        eventScheduleNormalized$,
+        eventScheduleValidationOk$,
+      ],
+      (
+        title,
+        notes,
+        datetimeSpecification,
+        datetimeRangeList,
+        useAnswerDeadline,
+        answerDeadline,
+        answerIcons,
+        useNotification,
+        notificationSettingsWithEmail,
+        eventScheduleValidation,
+        eventScheduleNormalized,
+        eventScheduleValidationOk,
+      ) => ({
+        title,
+        notes,
+        datetimeSpecification,
+        datetimeRangeList,
+        useAnswerDeadline,
+        answerDeadline,
+        answerIcons,
+        useNotification,
+        notificationSettingsWithEmail,
+        eventScheduleValidation,
+        eventScheduleNormalized,
+        eventScheduleValidationOk,
+      }),
     );
 
   const commonStateHandlers: EventScheduleSettingCommonStateHandler = {
