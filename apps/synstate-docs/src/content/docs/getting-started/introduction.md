@@ -19,7 +19,7 @@ sidebar:
 - 🔧 **Built-in Async Operators**: `debounce`, `throttle`, `switchMap`, and more — handle complex async flows in a unified, declarative API without external libraries.
 - ⚡ **Glitch-Free Through Every Operator**: Every update is one depth-ordered pass over what it reaches, the ones `debounce` or `switchMap` start later included, so no subscriber sees a half-updated graph, and an update costs in proportion to the nodes it reaches rather than the paths between them. [Operators on Signals](/mono/synstate/guides/library-comparison/operators-on-signals/) shows what an operator written as an effect loses.
 - 🏎️ **Very Fast**: In the benchmark summary, SynState stays within <!-- bench:summary/synstate-worst-over-fastest -->2.7<!-- /bench -->× of the fastest library in every scenario: <!-- bench:summary/synstate-alone-in-single-digits -->the only library measured in all of them whose worst case stays in single digits<!-- /bench -->. [See each library's worst case](/mono/synstate/guides/library-comparison/benchmark/#how-to-read-this-page).
-- 🚀 **Lightweight**: <!-- bundle-size:synstate -->~7.7 kB min+gzip<!-- /bundle-size:synstate --> with two external runtime dependencies ([ts-data-forge](https://www.npmjs.com/package/ts-data-forge) and [ts-std-forge](https://www.npmjs.com/package/ts-std-forge), and the first depends on the second). [Compare it with other libraries](/mono/synstate/guides/library-comparison/bundle-size/).
+- 🚀 **Lightweight**: <!-- bundle-size:synstate -->~7.8 kB min+gzip<!-- /bundle-size:synstate --> with two external runtime dependencies ([ts-data-forge](https://www.npmjs.com/package/ts-data-forge) and [ts-std-forge](https://www.npmjs.com/package/ts-std-forge), and the first depends on the second). [Compare it with other libraries](/mono/synstate/guides/library-comparison/bundle-size/).
 - ⚛️ **React-Optimized**: Fully compatible with [React Compiler](https://react.dev/learn/react-compiler). `synstate-react-hooks` lets you add global state to any component in just a few lines.
 - 🌐 **Framework Agnostic**: Core library works as-is with vanilla JavaScript, Vue, Svelte, or any framework. For React and Preact, hooks wrappers (`synstate-react-hooks` / `synstate-preact-hooks`) are available. For Preact, a [Preact Signals integration](/mono/synstate/preact-signals/demo/) (`synstate-preact-signals`) is also provided for fine-grained DOM updates without component re-renders. Without any framework, [synstate-dom](/mono/synstate/synstate-dom/introduction/) binds Observables directly to the DOM.
 
@@ -67,11 +67,12 @@ SynState's power comes from composing Observables. Use `pipe` to derive new valu
 
 ```tsx
 import { createState, derive, type InitializedObservable, map } from 'synstate';
+import { Optional } from 'ts-data-forge';
 
 const [count, setCount] = createState<number>(0);
 
 // Read the current value
-console.log(count.getSnapshot().value); // 0
+console.log(Optional.unwrap(count.getSnapshot())); // 0
 
 // Derive new Observables using pipe
 const doubled: InitializedObservable<number> = count.pipe(map((n) => n * 2));

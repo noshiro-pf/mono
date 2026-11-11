@@ -1,5 +1,6 @@
 import { map, type InitializedObservable } from 'synstate';
 import { constant, For, type JSX } from 'synstate-dom';
+import { Optional } from 'ts-data-forge';
 import type { ReadonlyRecord } from 'ts-type-forge';
 import {
   PRIORITIES,
@@ -35,7 +36,7 @@ export const MergeOrderFilters = ({ view, update }: Props): JSX.Element => (
       <For items={view.pipe(map(({ available }) => available))} key={(s) => s}>
         {(status$) => {
           // Keyed by the status: it never changes within a row.
-          const status = status$.getSnapshot().value;
+          const status = Optional.unwrap(status$.getSnapshot());
 
           return (
             <TileSwitch

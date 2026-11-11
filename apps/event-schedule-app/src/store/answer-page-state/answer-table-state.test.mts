@@ -1,6 +1,6 @@
 import { EventSchedule, type Answer } from 'event-schedule-app-shared';
 import { createState } from 'synstate';
-import { Result } from 'ts-data-forge';
+import { Optional, Result } from 'ts-data-forge';
 import { AnswerFilterState } from '../../functions/index.mjs';
 import {
   createAnswerTableStore,
@@ -12,9 +12,9 @@ describe(createAnswerTableStore, () => {
     const { store } = setup();
 
     assert.deepStrictEqual(
-      store.tableBodyValuesFiltered$
-        .getSnapshot()
-        .value.map((row) => row.datetimeRange.ymd.date),
+      Optional.unwrap(store.tableBodyValuesFiltered$.getSnapshot()).map(
+        (row) => row.datetimeRange.ymd.date,
+      ),
       [1, 2],
     );
   });
@@ -25,9 +25,9 @@ describe(createAnswerTableStore, () => {
     setSort(['date', 'desc']);
 
     assert.deepStrictEqual(
-      store.tableBodyValuesFiltered$
-        .getSnapshot()
-        .value.map((row) => row.datetimeRange.ymd.date),
+      Optional.unwrap(store.tableBodyValuesFiltered$.getSnapshot()).map(
+        (row) => row.datetimeRange.ymd.date,
+      ),
       [2, 1],
     );
   });
@@ -45,20 +45,22 @@ describe(createAnswerTableStore, () => {
   test('the table starts at the width storage kept and saves each change', () => {
     const { store, saved } = setup({ storedTableIsFullWidth: true });
 
-    assert.isTrue(store.tableIsFullWidth$.getSnapshot().value);
+    assert.isTrue(Optional.unwrap(store.tableIsFullWidth$.getSnapshot()));
 
     assert.isFalse(store.toggleTableIsFullWidth());
 
-    assert.isFalse(store.tableIsFullWidth$.getSnapshot().value);
+    assert.isFalse(Optional.unwrap(store.tableIsFullWidth$.getSnapshot()));
 
     assert.deepStrictEqual(saved, [false]);
   });
 
   test('the table starts at the page width when storage has nothing', () => {
     assert.isFalse(
-      setup({
-        storedTableIsFullWidth: undefined,
-      }).store.tableIsFullWidth$.getSnapshot().value,
+      Optional.unwrap(
+        setup({
+          storedTableIsFullWidth: undefined,
+        }).store.tableIsFullWidth$.getSnapshot(),
+      ),
     );
   });
 
@@ -72,9 +74,11 @@ describe(createAnswerTableStore, () => {
     });
 
     assert.isFalse(
-      setup({
-        storedTableIsFullWidth: 'blocked',
-      }).store.tableIsFullWidth$.getSnapshot().value,
+      Optional.unwrap(
+        setup({
+          storedTableIsFullWidth: 'blocked',
+        }).store.tableIsFullWidth$.getSnapshot(),
+      ),
     );
 
     expect(consoleWarn).toHaveBeenCalledExactlyOnceWith(
@@ -95,7 +99,7 @@ describe(createAnswerTableStore, () => {
 
     assert.isTrue(store.toggleTableIsFullWidth());
 
-    assert.isTrue(store.tableIsFullWidth$.getSnapshot().value);
+    assert.isTrue(Optional.unwrap(store.tableIsFullWidth$.getSnapshot()));
 
     expect(consoleWarn).toHaveBeenCalledExactlyOnceWith(
       'QuotaExceededError: The quota has been exceeded.',

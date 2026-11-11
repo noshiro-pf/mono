@@ -1,5 +1,6 @@
 import { map, type InitializedObservable } from 'synstate';
 import { constant, For, If, type JSX } from 'synstate-dom';
+import { Optional } from 'ts-data-forge';
 import type { ReadonlyRecord } from 'ts-type-forge';
 import {
   withSelectedTab,
@@ -42,7 +43,7 @@ export const LayoutGroup = ({
     />
 
     <For items={group.pipe(map((g) => g.tabs))} key={(id) => id}>
-      {(id$) => blocks[id$.getSnapshot().value]}
+      {(id$) => blocks[Optional.unwrap(id$.getSnapshot())]}
     </For>
   </div>
 );

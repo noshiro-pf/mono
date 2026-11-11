@@ -39,7 +39,7 @@ describe('hooks', () => {
 
     assert.isTrue(Optional.isSome(values));
 
-    assert.strictEqual(values.value.search.page, 1);
+    assert.strictEqual(Optional.unwrap(values).search.page, 1);
   });
 
   test('useIsActive is true at or below the node, or at it alone with exact', async () => {

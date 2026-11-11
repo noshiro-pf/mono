@@ -1,6 +1,6 @@
 import { createState, map } from 'synstate';
 import { constant, For, If, render, type JSX } from 'synstate-dom';
-import { Arr } from 'ts-data-forge';
+import { Arr, Optional } from 'ts-data-forge';
 
 type Todo = Readonly<{ id: number; title: string; done: boolean }>;
 
@@ -64,7 +64,7 @@ const TodoApp = (): JSX.Element => {
                       type={constant('checkbox')}
                       checked={todo$.pipe(map((todo) => todo.done))}
                       onChange={() => {
-                        toggle(todo$.getSnapshot().value.id);
+                        toggle(Optional.unwrap(todo$.getSnapshot()).id);
                       }}
                     />
                     {index$.pipe(map((i) => `${i + 1}. `))}

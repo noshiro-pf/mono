@@ -1,5 +1,5 @@
 import { createState } from 'synstate';
-import { Result } from 'ts-data-forge';
+import { Optional, Result } from 'ts-data-forge';
 import { createErrorType } from './fetched-values-state.mjs';
 import type {
   AnswersResult,
@@ -10,7 +10,7 @@ describe(createErrorType, () => {
   test('is undefined while neither read has failed', () => {
     const { errorType$ } = setup();
 
-    assert.isUndefined(errorType$.getSnapshot().value);
+    assert.isUndefined(Optional.unwrap(errorType$.getSnapshot()));
   });
 
   test('names the failed read, the event’s before the answers’', () => {
@@ -18,14 +18,14 @@ describe(createErrorType, () => {
 
     setAnswers(Result.err({ type: 'others', message: 'a' }));
 
-    assert.deepStrictEqual(errorType$.getSnapshot().value, {
+    assert.deepStrictEqual(Optional.unwrap(errorType$.getSnapshot()), {
       data: 'answersResult',
       type: { type: 'others', message: 'a' },
     });
 
     setEventSchedule(Result.err({ type: 'not-found', message: 'e' }));
 
-    assert.deepStrictEqual(errorType$.getSnapshot().value, {
+    assert.deepStrictEqual(Optional.unwrap(errorType$.getSnapshot()), {
       data: 'eventScheduleResult',
       type: { type: 'not-found', message: 'e' },
     });

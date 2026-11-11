@@ -1,6 +1,6 @@
 import { createState, map } from 'synstate';
 import { constant, type JSX } from 'synstate-dom';
-import { expectType } from 'ts-data-forge';
+import { expectType, Optional } from 'ts-data-forge';
 
 describe('JSX types', () => {
   test('text children must be Bindable', () => {
@@ -13,7 +13,7 @@ describe('JSX types', () => {
     const plain = <p>{'big'}</p>;
 
     // @ts-expect-error the snapshot is read once
-    const snapshot = <p>{count$.getSnapshot().value}</p>;
+    const snapshot = <p>{Optional.unwrap(count$.getSnapshot())}</p>;
 
     const ok = (
       <p>

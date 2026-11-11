@@ -16,7 +16,7 @@ import {
   type Child,
   type JSX,
 } from 'synstate-dom';
-import { Arr } from 'ts-data-forge';
+import { Arr, Optional } from 'ts-data-forge';
 import { classObject, intentClass } from '../internal/index.mjs';
 import { ButtonGroup } from './button-group.js';
 import { Button } from './button.js';
@@ -149,7 +149,7 @@ export const createToaster = (
   };
 
   const shown = (): readonly Row[] =>
-    rows$.getSnapshot().value.filter(({ leaving }) => !leaving);
+    Optional.unwrap(rows$.getSnapshot()).filter(({ leaving }) => !leaving);
 
   /**
    * Shows `toast` at once, dismissing first the oldest past `maxToasts`, as
@@ -171,7 +171,7 @@ export const createToaster = (
       }
     }
 
-    const isFirst = !hasOpened$.getSnapshot().value;
+    const isFirst = !Optional.unwrap(hasOpened$.getSnapshot());
 
     if (isFirst) {
       container.append(root);
@@ -186,7 +186,7 @@ export const createToaster = (
 
     mut_toaster.rowId += 1;
 
-    setRows(Arr.toUnshifted(rows$.getSnapshot().value, row));
+    setRows(Arr.toUnshifted(Optional.unwrap(rows$.getSnapshot()), row));
 
     setHasOpened(true);
   };
@@ -226,7 +226,7 @@ export const createToaster = (
       return true;
     }
 
-    const rows = rows$.getSnapshot().value;
+    const rows = Optional.unwrap(rows$.getSnapshot());
 
     if (rows.every((row) => row.leaving || row.toast.key !== toast.key)) {
       return false;
@@ -311,11 +311,9 @@ export const createToaster = (
     const toastOf = new Map(leaving.map((row) => [row.id, row.toast]));
 
     setRows(
-      rows$
-        .getSnapshot()
-        .value.map((row) =>
-          toastOf.get(row.id) === row.toast ? { ...row, leaving: true } : row,
-        ),
+      Optional.unwrap(rows$.getSnapshot()).map((row) =>
+        toastOf.get(row.id) === row.toast ? { ...row, leaving: true } : row,
+      ),
     );
   };
 
@@ -339,7 +337,9 @@ export const createToaster = (
   };
 
   const removeRow = (id: number): void => {
-    setRows(rows$.getSnapshot().value.filter((row) => row.id !== id));
+    setRows(
+      Optional.unwrap(rows$.getSnapshot()).filter((row) => row.id !== id),
+    );
   };
 
   const unmount = render(
@@ -446,7 +446,7 @@ const ToastView = ({
   onDismiss: (key: string, didTimeoutExpire: boolean) => void;
   onExited: (rowId: number) => void;
 }>): JSX.Element => {
-  const { id, appears } = row$.getSnapshot().value;
+  const { id, appears } = Optional.unwrap(row$.getSnapshot());
 
   const kind = appears ? 'appear' : 'enter';
 
@@ -503,13 +503,13 @@ const ToastView = ({
   const startTimeout = (): void => {
     stopTimeout();
 
-    const row = row$.getSnapshot().value;
+    const row = Optional.unwrap(row$.getSnapshot());
 
     const timeout = timeoutOf(row);
 
     if (timeout > 0 && !row.leaving) {
       mut_timers.dismiss = setTimeout(() => {
-        onDismiss(row$.getSnapshot().value.toast.key, true);
+        onDismiss(Optional.unwrap(row$.getSnapshot()).toast.key, true);
       }, timeout);
     }
   };
@@ -580,7 +580,7 @@ const ToastView = ({
         key={(toast) => toast}
       >
         {(toast$) => {
-          const toast = toast$.getSnapshot().value;
+          const toast = Optional.unwrap(toast$.getSnapshot());
 
           return (
             <>
@@ -667,7 +667,7 @@ const ToastContainer = ({
       !canEscapeKeyClear ||
       event.key !== 'Escape' ||
       isImeKeyDown(event) ||
-      !isOpen$.getSnapshot().value
+      !Optional.unwrap(isOpen$.getSnapshot())
     ) {
       return;
     }

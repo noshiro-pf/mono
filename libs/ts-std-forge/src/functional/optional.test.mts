@@ -6,37 +6,10 @@ import { Optional, type UnknownOptional } from './optional/index.mjs';
 import { pipe } from './pipe.mjs';
 import { Result } from './result/index.mjs';
 
+/** An `Optional<T>` that TypeScript does not narrow to `Some` or `None`. */
+const asOptional = <T,>(optional: Optional<T>): Optional<T> => optional;
+
 describe('Optional test', () => {
-  describe('isOptional', () => {
-    test('should return true for Some values', () => {
-      assert.isTrue(Optional.isOptional(Optional.some(42)));
-
-      assert.isTrue(Optional.isOptional(Optional.some('hello')));
-
-      assert.isTrue(Optional.isOptional(Optional.some(null)));
-
-      assert.isTrue(Optional.isOptional(Optional.some(undefined)));
-    });
-
-    test('should return true for None value', () => {
-      assert.isTrue(Optional.isOptional(Optional.none));
-    });
-
-    test('should return false for non-Optional values', () => {
-      assert.isFalse(Optional.isOptional(42));
-
-      assert.isFalse(Optional.isOptional('hello'));
-
-      assert.isFalse(Optional.isOptional(null));
-
-      assert.isFalse(Optional.isOptional(undefined));
-
-      assert.isFalse(Optional.isOptional({}));
-
-      assert.isFalse(Optional.isOptional({ type: 'fake', value: 42 }));
-    });
-  });
-
   describe('some', () => {
     test('should create a Some variant with the provided value', () => {
       const someNumber = Optional.some(42);
@@ -244,15 +217,53 @@ describe('Optional test', () => {
       expect(Optional.unwrap(Optional.some(null))).toBeNull();
     });
 
+    test('should unwrap an Optional narrowed by isSome to its value type alone', () => {
+      // With `| undefined` in the result, this would not compile.
+      const valueOrNone = <O extends UnknownOptional>(
+        o: O,
+      ): Optional.Unwrap<O> | 'none' =>
+        Optional.isSome(o) ? Optional.unwrap(o) : 'none';
+
+      assert.strictEqual(valueOrNone(Optional.some(1)), 1);
+
+      assert.strictEqual(valueOrNone(Optional.none), 'none');
+
+      const maybe = asOptional<number>(Optional.some(1));
+
+      assert.isTrue(Optional.isSome(maybe));
+
+      if (!Optional.isSome(maybe)) {
+        return;
+      }
+
+      const value = Optional.unwrap(maybe);
+
+      expectType<typeof value, number>('=');
+
+      assert.strictEqual(value, 1);
+    });
+
     test('should return undefined for None', () => {
       // eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
       expect(Optional.unwrapOr(Optional.none, undefined)).toBeUndefined();
+
+      assert.isUndefined(Optional.unwrap(asOptional<number>(Optional.none)));
     });
 
     test('should have correct return types', () => {
       const someNumber = Optional.some(42);
 
-      expectTypeOf(Optional.unwrap(someNumber)).toExtend<number | undefined>();
+      const fromSome = Optional.unwrap(someNumber);
+
+      expectType<typeof fromSome, 42>('=');
+
+      assert.strictEqual(fromSome, 42);
+
+      const fromOptional = Optional.unwrap(asOptional<number>(someNumber));
+
+      expectType<typeof fromOptional, number | undefined>('=');
+
+      assert.strictEqual(fromOptional, 42);
 
       const none = Optional.none;
 
@@ -805,10 +816,257 @@ describe('Optional test', () => {
 
       const inner = Optional.unwrap(nested);
 
-      assert.isTrue(Optional.isOptional(inner));
+      expectType<typeof inner, Some<42>>('=');
 
       expect(Optional.unwrap(inner)).toBe(42);
     });
+
+    test('should keep Some(None) distinct from None', () => {
+      const someNone = Optional.some(Optional.none);
+
+      assert.isTrue(Optional.isSome(someNone));
+
+      expect(someNone).not.toBe(Optional.none);
+
+      assert.isTrue(Optional.isNone(Optional.unwrap(someNone)));
+    });
+
+    test('should keep every level of a deeply nested None', () => {
+      const depth3 = Optional.some(Optional.some(Optional.some(Optional.none)));
+
+      const depth2 = Optional.unwrap(depth3);
+
+      const depth1 = Optional.unwrap(depth2);
+
+      const depth0 = Optional.unwrap(depth1);
+
+      assert.isTrue(Optional.isSome(depth3));
+
+      assert.isTrue(Optional.isSome(depth2));
+
+      assert.isTrue(Optional.isSome(depth1));
+
+      assert.isTrue(Optional.isNone(depth0));
+    });
+
+    test('should give Some(None) when map returns None', () => {
+      const mapped = Optional.map(Optional.some(1), () => Optional.none);
+
+      expectType<typeof mapped, Optional<None>>('=');
+
+      assert.isTrue(Optional.isSome(mapped));
+
+      assert.isTrue(Optional.isNone(Optional.unwrap(mapped)));
+    });
+
+    test('should tell a missing key from a key holding None', () => {
+      const entries = new Map<string, Optional<number>>([
+        ['present', Optional.none],
+      ]);
+
+      const get = (key: string): Optional<Optional<number>> =>
+        entries.has(key)
+          ? Optional.fromNullable(entries.get(key))
+          : Optional.none;
+
+      assert.isTrue(Optional.isSome(get('present')));
+
+      assert.isTrue(Optional.isNone(get('missing')));
+    });
+
+    test('should make some(some(5)) the same runtime value as some(5)', () => {
+      expect(Optional.some(Optional.some(5)) as unknown).toBe(Optional.some(5));
+    });
+
+    test('should return a non-nullish, non-string value itself as the Some', () => {
+      const value = { id: 1 } as const;
+
+      // The representation, not the contract: what makes a Some free.
+      expect(Optional.some(value) as unknown).toBe(value);
+
+      expect(Optional.unwrap(Optional.some(value))).toBe(value);
+    });
+  });
+
+  describe('reserved strings', () => {
+    // The strings `Optional.none` and nested Optionals are made of.
+    const prefix = 'ts-std-forge::Optional/';
+
+    const reserved = [
+      `${prefix}n0`,
+      `${prefix}n1`,
+      `${prefix}n2`,
+      `${prefix}n01`,
+      `${prefix}nx`,
+      `${prefix}n`,
+      `${prefix}n9999999999999999999`,
+      `${prefix}n999999998`,
+      `${prefix}n999999999`,
+      `${prefix}n1000000000`,
+      `${prefix}r`,
+      `${prefix}rn0`,
+      `${prefix}rr`,
+      `${prefix}f`,
+      `${prefix}fu`,
+      `${prefix}f0`,
+      `${prefix}fx`,
+      `${prefix}rfu`,
+      `${prefix}x`,
+      prefix,
+      'ts-std-forge::Optional',
+      '',
+      'n0',
+    ] as const;
+
+    test.each(reserved)('should hold %j as a Some and give it back', (str) => {
+      const held = Optional.some(str);
+
+      assert.isTrue(Optional.isSome(held));
+
+      expect(Optional.unwrap(held)).toBe(str);
+    });
+
+    test.each(reserved)('should hold %j two levels deep', (str) => {
+      const held = Optional.some(Optional.some(str));
+
+      const inner = Optional.unwrap(held);
+
+      assert.isTrue(Optional.isSome(inner));
+
+      expect(Optional.unwrap(inner)).toBe(str);
+    });
+
+    test('should keep None, Some(None), Some of a falsy value and held strings distinct', () => {
+      const values = [
+        Optional.none,
+        Optional.some(Optional.none),
+        Optional.some(undefined),
+        Optional.some(null),
+        Optional.some(0),
+        // `<prefix>n0` is `none`'s runtime value, so `some` of it is
+        // `some(none)`, which is in the list already: checked below instead.
+        ...reserved
+          .filter((str) => str !== `${prefix}n0`)
+          .map((str) => Optional.some(str)),
+      ] as const;
+
+      const distinct = new Set<unknown>(values);
+
+      expect(distinct.size).toBe(values.length);
+    });
+
+    test('should make None a reserved string', () => {
+      const none: unknown = Optional.none;
+
+      assert.isTrue(typeof none === 'string' && none.startsWith(prefix));
+    });
+
+    test('should hold a reserved string that is no marker as an escape', () => {
+      // The representation, not the contract: how such a string gains a level.
+      expect(Optional.some(`${prefix}x`) as unknown).toBe(`${prefix}rx`);
+    });
+
+    test('should hold the string None is made of as Some(None)', () => {
+      expect(Optional.some(`${prefix}n0`) as unknown).toBe(`${prefix}n1`);
+
+      expect(Optional.some(Optional.none) as unknown).toBe(`${prefix}n1`);
+    });
+  });
+
+  describe('falsy values', () => {
+    const falsy = [undefined, null, false, 0, -0, Number.NaN, '', 0n] as const;
+
+    test.each(falsy)('should hold %o and give it back', (value) => {
+      const held = Optional.some(value);
+
+      assert.isTrue(Optional.isSome(held));
+
+      assert.isTrue(Object.is(Optional.unwrap(held), value));
+
+      const nested = Optional.unwrap(Optional.some(held));
+
+      assert.isTrue(Object.is(Optional.unwrap(nested), value));
+    });
+
+    test.each(falsy)(
+      'should hold a Some of %o as the value itself, at every level',
+      (value) => {
+        // Not rewritten: a Some of a falsy value is falsy at runtime, although
+        // its type is an object, so an Optional is tested with `isSome` /
+        // `isNone`, never with truthiness or `??`.
+        assert.isTrue(Object.is(Optional.some(value), value));
+
+        const three = Optional.some(Optional.some(Optional.some(value)));
+
+        assert.isTrue(Object.is(three, value));
+
+        assert.isTrue(
+          Object.is(
+            Optional.unwrap(Optional.unwrapThrow(Optional.unwrapThrow(three))),
+            value,
+          ),
+        );
+      },
+    );
+
+    test.each(falsy)(
+      'should keep a Some of %o apart from None and Some(None)',
+      (value) => {
+        const held: unknown = Optional.some(value);
+
+        assert.isFalse(Object.is(held, Optional.none));
+
+        assert.isFalse(Object.is(held, Optional.some(Optional.none)));
+
+        assert.isTrue(Optional.isSome(Optional.some(value)));
+      },
+    );
+
+    test('should keep unwrapOr from replacing Some(undefined) or Some(null)', () => {
+      assert.isUndefined(Optional.unwrapOr(Optional.some(undefined), 5));
+
+      assert.isNull(Optional.unwrapOr(Optional.some(null), 5));
+
+      assert.strictEqual(Optional.unwrapOr(Optional.none, 5), 5);
+    });
+
+    test('should keep None a non-empty string at runtime', () => {
+      const none: unknown = Optional.none;
+
+      // Truthy and not nullish, as the object type of `None` says.
+      assert.isTrue(typeof none === 'string' && none !== '');
+    });
+  });
+
+  describe('serialization', () => {
+    const optionals = [
+      Optional.none,
+      Optional.some(1),
+      Optional.some('text'),
+      Optional.some({ id: 1 }),
+      Optional.some(Optional.none),
+      Optional.some(Optional.some(Optional.none)),
+    ] as const;
+
+    test.each(optionals)('should survive structuredClone (%#)', (optional) => {
+      assert.deepStrictEqual(structuredClone(optional), optional);
+    });
+
+    test.each(optionals)(
+      'should survive a JSON round trip (%#)',
+      (optional) => {
+        // What a server or a file would hold: the round trip is the point, not
+        // a way to clone.
+        const json = JSON.stringify([optional]);
+
+        // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+        const parsed = JSON.parse(json) as unknown as readonly [
+          typeof optional,
+        ];
+
+        assert.deepStrictEqual(parsed[0], optional);
+      },
+    );
   });
 
   describe('match', () => {

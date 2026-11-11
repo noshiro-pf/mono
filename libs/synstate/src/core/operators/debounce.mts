@@ -167,7 +167,7 @@ class DebounceObservableClass<A>
 
       this.#mut_pending = Optional.none;
 
-      this.startUpdate(sn.value);
+      this.startUpdate(Optional.unwrap(sn));
     }, this.#milliSeconds);
   }
 
@@ -177,7 +177,7 @@ class DebounceObservableClass<A>
     this.#resetTimer();
 
     if (Optional.isSome(pending)) {
-      this.startUpdate(pending.value);
+      this.startUpdate(Optional.unwrap(pending));
     }
   }
 

@@ -1,6 +1,7 @@
 import { Card } from 'blueprint-synstate';
 import { createState, map } from 'synstate';
 import { constant, deriveBindable, type JSX } from 'synstate-dom';
+import { Optional } from 'ts-data-forge';
 import {
   ageAt,
   deriveSalaryEntry,
@@ -44,7 +45,7 @@ export const SalaryTab = (): JSX.Element => {
           }}
           createItem={(id) => ({
             id,
-            start: input$.getSnapshot().value.profile.start,
+            start: Optional.unwrap(input$.getSnapshot()).profile.start,
             annualBase: 0,
             companyDcMonthly: 0,
             idecoMonthly: 0,

@@ -105,7 +105,7 @@ class TakeObservableClass<A>
 
     this.#mut_count += 1;
 
-    this.setNext(sn.value, updateToken);
+    this.setNext(Optional.unwrap(sn), updateToken);
 
     if (this.#mut_count >= this.#n) {
       this.completeAfterPropagation();

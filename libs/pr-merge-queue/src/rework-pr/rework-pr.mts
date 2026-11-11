@@ -389,13 +389,9 @@ export const isUntouchedSince = (
   events: readonly QueueEvent[],
   recorded: number,
 ): boolean => {
-  const last = Arr.last(events);
+  const last = Optional.toNullable(Arr.last(events));
 
-  return (
-    Optional.isSome(last) &&
-    last.value.event === 'unlabeled' &&
-    last.value.id === recorded
-  );
+  return last?.event === 'unlabeled' && last.id === recorded;
 };
 
 /** What `start` has left to do to the pull request, in order. */
@@ -692,10 +688,10 @@ export const readOwnDequeueEvent = async (
       return events;
     }
 
-    const last = Arr.last(events.value);
+    const last = Optional.toNullable(Arr.last(events.value));
 
-    if (Optional.isSome(last) && last.value.event === 'unlabeled') {
-      return Result.ok(last.value.id);
+    if (last?.event === 'unlabeled') {
+      return Result.ok(last.id);
     }
   }
 

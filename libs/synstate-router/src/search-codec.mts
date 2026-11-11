@@ -127,7 +127,7 @@ const applyDefault = <V,>(
 
 const fromOptional = <V,>(decoded: Optional<V>): ElementOutcome<V> =>
   Optional.isSome(decoded)
-    ? ({ ok: true, value: decoded.value } as const)
+    ? ({ ok: true, value: Optional.unwrap(decoded) } as const)
     : ({ ok: false, issue: 'invalid' } as const);
 
 const invalid: ElementOutcome<never> = { ok: false, issue: 'invalid' } as const;

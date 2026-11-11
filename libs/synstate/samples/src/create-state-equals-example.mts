@@ -1,5 +1,5 @@
 import { createState, map } from 'synstate';
-import { fastDeepEqual } from 'ts-data-forge';
+import { fastDeepEqual, Optional } from 'ts-data-forge';
 
 if (import.meta.vitest !== undefined) {
   test('createState with equals', () => {
@@ -10,7 +10,7 @@ if (import.meta.vitest !== undefined) {
       { equals: fastDeepEqual },
     );
 
-    const before = filters.getSnapshot().value;
+    const before = Optional.unwrap(filters.getSnapshot());
 
     // Derived state is recomputed only when the state really changes.
     const query = filters.pipe(
@@ -26,7 +26,7 @@ if (import.meta.vitest !== undefined) {
 
     setFilters({ label: 'bug', page: 1 }); // equal: nothing is passed on
 
-    assert.strictEqual(filters.getSnapshot().value, before);
+    assert.strictEqual(Optional.unwrap(filters.getSnapshot()), before);
 
     setFilters({ label: 'bug', page: 2 });
 

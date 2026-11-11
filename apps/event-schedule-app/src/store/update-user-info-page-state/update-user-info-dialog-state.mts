@@ -1,4 +1,5 @@
 import { type InitializedObservable, createState, scan } from 'synstate';
+import { Optional } from 'ts-data-forge';
 
 /** Which of the account dialogs is open, if any. */
 export const createUpdateUserInfoDialogStore = (): UpdateUserInfoDialog => {
@@ -14,7 +15,8 @@ export const createUpdateUserInfoDialogStore = (): UpdateUserInfoDialog => {
     scan((session: number) => session + 1, 0),
   );
 
-  const getDialogSession = (): number => dialogSession$.getSnapshot().value;
+  const getDialogSession = (): number =>
+    Optional.unwrap(dialogSession$.getSnapshot());
 
   const trackSession = (): (() => boolean) => {
     const session = getDialogSession();

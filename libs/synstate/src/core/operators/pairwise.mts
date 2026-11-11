@@ -112,7 +112,7 @@ class PairwiseObservableClass<A>
     this.#mut_previousValue = sn;
 
     if (Optional.isSome(prev)) {
-      this.setNext([prev.value, sn.value], updateToken);
+      this.setNext([Optional.unwrap(prev), Optional.unwrap(sn)], updateToken);
     }
   }
 }

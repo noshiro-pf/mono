@@ -1,4 +1,5 @@
 import { createState } from 'synstate';
+import { Optional } from 'ts-data-forge';
 import {
   createEventScheduleSettingStore,
   type EventScheduleSettingUser,
@@ -8,8 +9,9 @@ describe(createEventScheduleSettingStore, () => {
   test('makes the signed-in user the author', () => {
     const { store } = setup(alice);
 
-    const { author } =
-      store.commonState$.getSnapshot().value.eventScheduleNormalized;
+    const { author } = Optional.unwrap(
+      store.commonState$.getSnapshot(),
+    ).eventScheduleNormalized;
 
     assert.deepStrictEqual([author.id, author.name], ['u1', 'alice']);
   });
@@ -17,8 +19,9 @@ describe(createEventScheduleSettingStore, () => {
   test('an event made while signed out has no author id', () => {
     const { store } = setup(undefined);
 
-    const { author } =
-      store.commonState$.getSnapshot().value.eventScheduleNormalized;
+    const { author } = Optional.unwrap(
+      store.commonState$.getSnapshot(),
+    ).eventScheduleNormalized;
 
     assert.deepStrictEqual([author.id, author.name], [null, '']);
   });
@@ -29,8 +32,8 @@ describe(createEventScheduleSettingStore, () => {
     store.commonStateHandlers.toggleNotificationSection();
 
     assert.strictEqual(
-      store.commonState$.getSnapshot().value.notificationSettingsWithEmail
-        ?.email,
+      Optional.unwrap(store.commonState$.getSnapshot())
+        .notificationSettingsWithEmail?.email,
       'alice@example.com',
     );
   });
@@ -44,7 +47,7 @@ describe(createEventScheduleSettingStore, () => {
     });
 
     assert.deepStrictEqual(
-      store.commonState$.getSnapshot().value.answerDeadline,
+      Optional.unwrap(store.commonState$.getSnapshot()).answerDeadline,
       { year: 2027, month: 1, date: 17, hours: 23, minutes: 59 },
     );
   });
@@ -55,7 +58,8 @@ describe(createEventScheduleSettingStore, () => {
     setUser(alice);
 
     assert.strictEqual(
-      store.commonState$.getSnapshot().value.eventScheduleNormalized.author.id,
+      Optional.unwrap(store.commonState$.getSnapshot()).eventScheduleNormalized
+        .author.id,
       'u1',
     );
   });

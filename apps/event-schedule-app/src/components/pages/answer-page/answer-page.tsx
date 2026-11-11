@@ -18,7 +18,7 @@ import {
   type Bindable,
   type JSX,
 } from 'synstate-dom';
-import { castMutable, match } from 'ts-data-forge';
+import { Optional, castMutable, match } from 'ts-data-forge';
 import { dict } from '../../../constants/index.mjs';
 import { eventIsAfterDeadline } from '../../../functions/index.mjs';
 import {
@@ -87,7 +87,7 @@ export const AnswerPage = (): JSX.Element => {
   return (
     <For items={mapBindable(status$, (s) => [s])} key={(s) => s}>
       {(status$_) => {
-        const status = status$_.getSnapshot().value;
+        const status = Optional.unwrap(status$_.getSnapshot());
 
         return status === 'not-found' ? (
           <NotFoundPage />
@@ -104,7 +104,7 @@ export const AnswerPage = (): JSX.Element => {
                 >
                   {(errorType$_) => (
                     <AnswerPageError
-                      errorType={errorType$_.getSnapshot().value}
+                      errorType={Optional.unwrap(errorType$_.getSnapshot())}
                     />
                   )}
                 </For>
@@ -555,7 +555,7 @@ const AnswerPageOk = ({
           key={(state) => state}
         >
           {(state$) => {
-            const state = state$.getSnapshot().value;
+            const state = Optional.unwrap(state$.getSnapshot());
 
             return (
               <Section
@@ -586,9 +586,9 @@ const AnswerPageOk = ({
 
 /** `ok` is drawn once the event and its answers have been read. */
 const AnswerPageOkOnceRead = (): JSX.Element => {
-  const eventSchedule = eventSchedule$.getSnapshot().value;
+  const eventSchedule = Optional.unwrap(eventSchedule$.getSnapshot());
 
-  const answers = answersFiltered$.getSnapshot().value;
+  const answers = Optional.unwrap(answersFiltered$.getSnapshot());
 
   return eventSchedule === undefined || answers === undefined ? (
     <Spinner />

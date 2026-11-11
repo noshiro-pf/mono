@@ -1,3 +1,4 @@
+import { Optional } from 'ts-data-forge';
 import { createHeaderStore } from './header-store.mjs';
 
 describe(createHeaderStore, () => {
@@ -6,7 +7,7 @@ describe(createHeaderStore, () => {
 
     store.start();
 
-    assert.isFalse(store.folded.getSnapshot().value);
+    assert.isFalse(Optional.unwrap(store.folded.getSnapshot()));
 
     assert.deepStrictEqual(saved, []);
 
@@ -14,11 +15,11 @@ describe(createHeaderStore, () => {
 
     await settle();
 
-    assert.isTrue(store.folded.getSnapshot().value);
+    assert.isTrue(Optional.unwrap(store.folded.getSnapshot()));
 
     store.toggle();
 
-    assert.isFalse(store.folded.getSnapshot().value);
+    assert.isFalse(Optional.unwrap(store.folded.getSnapshot()));
 
     assert.strictEqual(saved.at(-1), false);
   });
@@ -34,7 +35,7 @@ describe(createHeaderStore, () => {
 
     await settle();
 
-    assert.isTrue(store.folded.getSnapshot().value);
+    assert.isTrue(Optional.unwrap(store.folded.getSnapshot()));
 
     assert.strictEqual(saved.at(-1), true);
   });
@@ -48,7 +49,7 @@ describe(createHeaderStore, () => {
 
     await settle();
 
-    assert.isFalse(store.folded.getSnapshot().value);
+    assert.isFalse(Optional.unwrap(store.folded.getSnapshot()));
   });
 
   test('a database that cannot be read leaves it unfolded, and changes are still handed to save', async () => {
@@ -60,7 +61,7 @@ describe(createHeaderStore, () => {
 
     await settle();
 
-    assert.isFalse(store.folded.getSnapshot().value);
+    assert.isFalse(Optional.unwrap(store.folded.getSnapshot()));
 
     store.toggle();
 
@@ -78,7 +79,7 @@ describe(createHeaderStore, () => {
 
     await settle();
 
-    assert.isFalse(store.folded.getSnapshot().value);
+    assert.isFalse(Optional.unwrap(store.folded.getSnapshot()));
 
     assert.deepStrictEqual(saved, []);
   });

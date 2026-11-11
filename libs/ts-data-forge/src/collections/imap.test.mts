@@ -414,7 +414,7 @@ describe('IMap.set', () => {
 
     assert.isTrue(Optional.isSome(curr));
 
-    const updated = map.set('a', curr.value);
+    const updated = map.set('a', Optional.unwrap(curr));
 
     expect(updated).toBe(map);
 

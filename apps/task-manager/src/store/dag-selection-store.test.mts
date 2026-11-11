@@ -1,4 +1,5 @@
 import { createState } from 'synstate';
+import { Optional } from 'ts-data-forge';
 import {
   asMilestoneId,
   asTaskId,
@@ -42,7 +43,7 @@ const setup = (): Readonly<{
 
   return {
     store,
-    selected: () => store.selected.getSnapshot().value,
+    selected: () => Optional.unwrap(store.selected.getSnapshot()),
     setState,
     setHidden,
     setActive,

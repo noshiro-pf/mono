@@ -1,4 +1,5 @@
 import { createState, map } from 'synstate';
+import { Optional } from 'ts-data-forge';
 import type { DeepReadonly } from 'ts-type-forge';
 
 if (import.meta.vitest !== undefined) {
@@ -31,7 +32,7 @@ if (import.meta.vitest !== undefined) {
       pulls: [{ number: 1, title: 'one' }],
     });
 
-    const held = report.getSnapshot().value;
+    const held = Optional.unwrap(report.getSnapshot());
 
     // An answer that changes nothing is not passed on at all.
     setReport({
@@ -39,7 +40,7 @@ if (import.meta.vitest !== undefined) {
       pulls: [{ number: 1, title: 'one' }],
     });
 
-    assert.strictEqual(report.getSnapshot().value, held);
+    assert.strictEqual(Optional.unwrap(report.getSnapshot()), held);
 
     // An edited title: a new report and a new array, while the summary is the
     // one held, so `summary` is not told of it.
@@ -48,9 +49,12 @@ if (import.meta.vitest !== undefined) {
       pulls: [{ number: 1, title: 'one (edited)' }],
     });
 
-    assert.notStrictEqual(report.getSnapshot().value, held);
+    assert.notStrictEqual(Optional.unwrap(report.getSnapshot()), held);
 
-    assert.strictEqual(report.getSnapshot().value.summary, held.summary);
+    assert.strictEqual(
+      Optional.unwrap(report.getSnapshot()).summary,
+      held.summary,
+    );
 
     assert.deepStrictEqual(summaryHistory, [{ open: 0 }, { open: 1 }]);
 

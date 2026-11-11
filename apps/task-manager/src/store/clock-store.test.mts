@@ -1,4 +1,5 @@
 import { createState, source } from 'synstate';
+import { Optional } from 'ts-data-forge';
 import {
   asMilestoneId,
   createMilestone,
@@ -12,11 +13,11 @@ describe(createClockStore, () => {
 
     clock.advance(4999);
 
-    assert.strictEqual(store.now.getSnapshot().value, 1000);
+    assert.strictEqual(Optional.unwrap(store.now.getSnapshot()), 1000);
 
     clock.advance(1);
 
-    assert.strictEqual(store.now.getSnapshot().value, 6000);
+    assert.strictEqual(Optional.unwrap(store.now.getSnapshot()), 6000);
   });
 
   test('ticks at least every maxDelayMs', () => {
@@ -24,11 +25,11 @@ describe(createClockStore, () => {
 
     clock.advance(60_000);
 
-    assert.strictEqual(store.now.getSnapshot().value, 61_000);
+    assert.strictEqual(Optional.unwrap(store.now.getSnapshot()), 61_000);
 
     clock.advance(60_000);
 
-    assert.strictEqual(store.now.getSnapshot().value, 121_000);
+    assert.strictEqual(Optional.unwrap(store.now.getSnapshot()), 121_000);
   });
 
   test('reads the clock again when the state changes', () => {
@@ -38,11 +39,11 @@ describe(createClockStore, () => {
 
     setState(withDateAt(5000));
 
-    assert.strictEqual(store.now.getSnapshot().value, 3000);
+    assert.strictEqual(Optional.unwrap(store.now.getSnapshot()), 3000);
 
     clock.advance(2000);
 
-    assert.strictEqual(store.now.getSnapshot().value, 5000);
+    assert.strictEqual(Optional.unwrap(store.now.getSnapshot()), 5000);
   });
 
   test('reads the clock again when the page wakes', () => {
@@ -52,7 +53,7 @@ describe(createClockStore, () => {
 
     wake.next(undefined);
 
-    assert.strictEqual(store.now.getSnapshot().value, 40_000);
+    assert.strictEqual(Optional.unwrap(store.now.getSnapshot()), 40_000);
   });
 
   test('keeps one timer at a time, and none once stopped', () => {

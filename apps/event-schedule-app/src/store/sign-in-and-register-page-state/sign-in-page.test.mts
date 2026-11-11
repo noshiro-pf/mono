@@ -1,6 +1,6 @@
 import { createState } from 'synstate';
 import { createMemoryBrowser } from 'synstate-router';
-import { Result } from 'ts-data-forge';
+import { Optional, Result } from 'ts-data-forge';
 import { dict, routes } from '../../constants/index.mjs';
 import { createAppRouter } from '../router-store.mjs';
 import { createSignInPageStore, type SignInPage } from './sign-in-page.mjs';
@@ -53,7 +53,7 @@ describe(createSignInPageStore, () => {
 
       await settle();
 
-      const { formState } = store.state.getSnapshot().value;
+      const { formState } = Optional.unwrap(store.state.getSnapshot());
 
       assert.strictEqual(formState.email.error, email);
 
@@ -83,8 +83,9 @@ describe(createSignInPageStore, () => {
 
       store.inputEmailHandler('alicia@example.com');
 
-      const { formState, enterButtonDisabled } =
-        store.state.getSnapshot().value;
+      const { formState, enterButtonDisabled } = Optional.unwrap(
+        store.state.getSnapshot(),
+      );
 
       // The message says the email may be what was wrong, so fixing it lets the
       // form be sent again without retyping the password.
@@ -115,7 +116,7 @@ describe(createSignInPageStore, () => {
 
     await settle();
 
-    const { formState } = store.state.getSnapshot().value;
+    const { formState } = Optional.unwrap(store.state.getSnapshot());
 
     assert.isUndefined(formState.password.error);
 
@@ -159,7 +160,7 @@ describe(createSignInPageStore, () => {
 
       assert.strictEqual(browser.url().pathname, '/signIn/');
 
-      const { formState } = store.state.getSnapshot().value;
+      const { formState } = Optional.unwrap(store.state.getSnapshot());
 
       assert.strictEqual(formState.email.inputValue, 'alicia@example.com');
 
@@ -202,7 +203,7 @@ describe(createSignInPageStore, () => {
 
     store.togglePasswordLock();
 
-    assert.isTrue(store.state.getSnapshot().value.passwordIsOpen);
+    assert.isTrue(Optional.unwrap(store.state.getSnapshot()).passwordIsOpen);
   });
 });
 

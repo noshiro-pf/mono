@@ -1,3 +1,4 @@
+import { Optional } from 'ts-data-forge';
 import {
   asGroupId,
   asMilestoneId,
@@ -34,7 +35,7 @@ describe(createBulkEditStore, () => {
 
     store.open(refs);
 
-    assert.deepStrictEqual(store.editor.getSnapshot().value, {
+    assert.deepStrictEqual(Optional.unwrap(store.editor.getSnapshot()), {
       type: 'open',
       refs,
       progress: undefined,
@@ -47,7 +48,10 @@ describe(createBulkEditStore, () => {
 
     assert.deepStrictEqual(edits, [[refs, NO_NODE_EDIT]]);
 
-    assert.strictEqual(store.editor.getSnapshot().value.type, 'closed');
+    assert.strictEqual(
+      Optional.unwrap(store.editor.getSnapshot()).type,
+      'closed',
+    );
   });
 
   test('saves what was chosen, the labels to add parsed from the field', () => {

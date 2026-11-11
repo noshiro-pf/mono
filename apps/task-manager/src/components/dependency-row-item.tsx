@@ -1,6 +1,7 @@
 import { HtmlSelect } from 'blueprint-synstate';
 import { map, type InitializedObservable } from 'synstate';
 import { constant, For, If, type JSX } from 'synstate-dom';
+import { Optional } from 'ts-data-forge';
 import { dependencyTypes } from '../domain/index.mjs';
 import { m } from '../i18n/index.mjs';
 import { editorStore } from '../store/index.mjs';
@@ -38,7 +39,7 @@ type Props = Readonly<{
  */
 export const DependencyRowItem = ({ row }: Props): JSX.Element => {
   // A row keeps its key for as long as it exists.
-  const { key } = row.getSnapshot().value.row;
+  const { key } = Optional.unwrap(row.getSnapshot()).row;
 
   const errorId = `dependency-row-error-${key}` as const;
 

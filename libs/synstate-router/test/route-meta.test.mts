@@ -1,4 +1,4 @@
-import { asSafeInt, expectType } from 'ts-data-forge';
+import { asSafeInt, expectType, Optional } from 'ts-data-forge';
 import type { RelaxedExtract } from 'ts-type-forge';
 import {
   createMemoryBrowser,
@@ -172,7 +172,7 @@ describe('router.branch', () => {
     // The same observable each time it is read.
     assert.strictEqual(router.branch, router.branch);
 
-    const first = router.branch.getSnapshot().value;
+    const first = Optional.unwrap(router.branch.getSnapshot());
 
     expectType<typeof first, RouteBranch<Routes>>('=');
 
@@ -184,12 +184,12 @@ describe('router.branch', () => {
     // The search alone changed: the branch is the same.
     router.setSearch(routes.products, () => ({ page: asSafeInt(2) }));
 
-    assert.strictEqual(router.branch.getSnapshot().value, first);
+    assert.strictEqual(Optional.unwrap(router.branch.getSnapshot()), first);
 
     router.push(routes.users.href());
 
     assert.deepStrictEqual(
-      router.branch.getSnapshot().value.map(({ id }) => id),
+      Optional.unwrap(router.branch.getSnapshot()).map(({ id }) => id),
       ['users'],
     );
 

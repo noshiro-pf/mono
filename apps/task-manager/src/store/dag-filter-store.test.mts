@@ -1,3 +1,4 @@
+import { Optional } from 'ts-data-forge';
 import { asGroupId } from '../domain/index.mjs';
 import { NO_DAG_FILTER } from '../view-model/index.mjs';
 import { createDagFilterStore } from './dag-filter-store.mjs';
@@ -8,7 +9,10 @@ describe(createDagFilterStore, () => {
 
     const store = createDagFilterStore({ initial });
 
-    assert.deepStrictEqual(store.filter.getSnapshot().value, initial);
+    assert.deepStrictEqual(
+      Optional.unwrap(store.filter.getSnapshot()),
+      initial,
+    );
   });
 
   test('chooses groups and labels, and takes them out', () => {
@@ -20,7 +24,7 @@ describe(createDagFilterStore, () => {
 
     store.toggleLabel('ui');
 
-    assert.deepStrictEqual(store.filter.getSnapshot().value, {
+    assert.deepStrictEqual(Optional.unwrap(store.filter.getSnapshot()), {
       groups: [asGroupId('g1'), undefined],
       labels: ['ui'],
     });
@@ -29,7 +33,7 @@ describe(createDagFilterStore, () => {
 
     store.toggleLabel('ui');
 
-    assert.deepStrictEqual(store.filter.getSnapshot().value, {
+    assert.deepStrictEqual(Optional.unwrap(store.filter.getSnapshot()), {
       groups: [undefined],
       labels: [],
     });
@@ -42,6 +46,9 @@ describe(createDagFilterStore, () => {
 
     store.clear();
 
-    assert.deepStrictEqual(store.filter.getSnapshot().value, NO_DAG_FILTER);
+    assert.deepStrictEqual(
+      Optional.unwrap(store.filter.getSnapshot()),
+      NO_DAG_FILTER,
+    );
   });
 });

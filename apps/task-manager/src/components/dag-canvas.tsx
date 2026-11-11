@@ -321,7 +321,7 @@ export const DagCanvas = ({ layout, toolbar }: Props): JSX.Element => {
       return;
     }
 
-    const content = tileContentHeight(tileNodes.getSnapshot().value);
+    const content = tileContentHeight(Optional.unwrap(tileNodes.getSnapshot()));
 
     setTransform(
       tileViewTransform(
@@ -346,7 +346,7 @@ export const DagCanvas = ({ layout, toolbar }: Props): JSX.Element => {
       height: element.clientHeight,
     } as const;
 
-    const target = scene.fitTarget.getSnapshot().value;
+    const target = Optional.unwrap(scene.fitTarget.getSnapshot());
 
     switch (target.kind) {
       case 'whole':
@@ -388,7 +388,7 @@ export const DagCanvas = ({ layout, toolbar }: Props): JSX.Element => {
   // The button under the canvas: 「全体表示」, or in 「アーク」 the other
   // of the whole column and its natural size.
   const pressFit = (): void => {
-    if (mode.getSnapshot().value === 'arc') {
+    if (Optional.unwrap(mode.getSnapshot()) === 'arc') {
       updateArcZoom(otherArcZoom);
     }
 
@@ -418,7 +418,9 @@ export const DagCanvas = ({ layout, toolbar }: Props): JSX.Element => {
    */
   const scrollTileByKey = (key: string): boolean => {
     const frame =
-      mode.getSnapshot().value === 'tile' ? measureTile() : undefined;
+      Optional.unwrap(mode.getSnapshot()) === 'tile'
+        ? measureTile()
+        : undefined;
 
     const target =
       frame === undefined
@@ -427,7 +429,7 @@ export const DagCanvas = ({ layout, toolbar }: Props): JSX.Element => {
             key,
             tileOffset(),
             frame.viewport,
-            tileContentHeight(tileNodes.getSnapshot().value),
+            tileContentHeight(Optional.unwrap(tileNodes.getSnapshot())),
           );
 
     if (target === undefined) {
@@ -449,19 +451,19 @@ export const DagCanvas = ({ layout, toolbar }: Props): JSX.Element => {
       return;
     }
 
-    const before = tileNodes.getSnapshot().value;
+    const before = Optional.unwrap(tileNodes.getSnapshot());
 
     const offset = tileOffset();
 
-    const from = scene.drawnTransform.getSnapshot().value;
+    const from = Optional.unwrap(scene.drawnTransform.getSnapshot());
 
     dagLayoutStore.setTileWidth(tileAvailableWidth(element.clientWidth));
 
-    if (mode.getSnapshot().value !== 'tile') {
+    if (Optional.unwrap(mode.getSnapshot()) !== 'tile') {
       return;
     }
 
-    const after = tileNodes.getSnapshot().value;
+    const after = Optional.unwrap(tileNodes.getSnapshot());
 
     remeasureTile();
 
@@ -479,7 +481,8 @@ export const DagCanvas = ({ layout, toolbar }: Props): JSX.Element => {
     if (
       Arr.isNonEmpty(before) &&
       !samePositions(positionsOf(before), positionsOf(after)) &&
-      dagLayoutStore.animationProgress.getSnapshot().value !== undefined
+      Optional.unwrap(dagLayoutStore.animationProgress.getSnapshot()) !==
+        undefined
     ) {
       setViewFrom(from);
     }
@@ -514,8 +517,8 @@ export const DagCanvas = ({ layout, toolbar }: Props): JSX.Element => {
     requests: number;
     queued: boolean;
   } = {
-    mode: mode.getSnapshot().value,
-    requests: dagLayoutStore.fitRequests.getSnapshot().value,
+    mode: Optional.unwrap(mode.getSnapshot()),
+    requests: Optional.unwrap(dagLayoutStore.fitRequests.getSnapshot()),
     queued: false,
   };
 
@@ -538,9 +541,11 @@ export const DagCanvas = ({ layout, toolbar }: Props): JSX.Element => {
 
       const from = getTransform();
 
-      const currentMode = mode.getSnapshot().value;
+      const currentMode = Optional.unwrap(mode.getSnapshot());
 
-      const requests = dagLayoutStore.fitRequests.getSnapshot().value;
+      const requests = Optional.unwrap(
+        dagLayoutStore.fitRequests.getSnapshot(),
+      );
 
       const asked =
         mut_fitted.mode !== currentMode || mut_fitted.requests !== requests;
@@ -557,7 +562,8 @@ export const DagCanvas = ({ layout, toolbar }: Props): JSX.Element => {
 
       setViewFrom(
         asked &&
-          dagLayoutStore.animationProgress.getSnapshot().value !== undefined
+          Optional.unwrap(dagLayoutStore.animationProgress.getSnapshot()) !==
+            undefined
           ? from
           : undefined,
       );
@@ -571,7 +577,10 @@ export const DagCanvas = ({ layout, toolbar }: Props): JSX.Element => {
     }
 
     afterUpdate(() => {
-      if (dagLayoutStore.animationProgress.getSnapshot().value === undefined) {
+      if (
+        Optional.unwrap(dagLayoutStore.animationProgress.getSnapshot()) ===
+        undefined
+      ) {
         setViewFrom(undefined);
       }
     });
@@ -633,7 +642,7 @@ export const DagCanvas = ({ layout, toolbar }: Props): JSX.Element => {
 
     const pressedHandle = getHandle();
 
-    const movableNodes = scene.movableNodes.getSnapshot().value;
+    const movableNodes = Optional.unwrap(scene.movableNodes.getSnapshot());
 
     const first = !Arr.isNonEmpty(mut_gesture.pointers);
 
@@ -647,7 +656,7 @@ export const DagCanvas = ({ layout, toolbar }: Props): JSX.Element => {
         : (grabOf(
             pressed.target,
             movableNodes,
-            scene.settledFrames.getSnapshot().value,
+            Optional.unwrap(scene.settledFrames.getSnapshot()),
           ) ??
           // The background, in the mode the reader arranges.
           (first &&
@@ -686,7 +695,7 @@ export const DagCanvas = ({ layout, toolbar }: Props): JSX.Element => {
         moved.pointerType === 'touch'
           ? undefined
           : connectHandleAt(
-              scene.connectable.getSnapshot().value,
+              Optional.unwrap(scene.connectable.getSnapshot()),
               contentPointAt(getTransform(), pointerOf(moved)),
               reachAt(getTransform().scale),
             ),
@@ -721,7 +730,7 @@ export const DagCanvas = ({ layout, toolbar }: Props): JSX.Element => {
       return;
     }
 
-    if (mode.getSnapshot().value !== 'tile') {
+    if (Optional.unwrap(mode.getSnapshot()) !== 'tile') {
       setTransform(next.transform);
 
       return;
@@ -744,15 +753,15 @@ export const DagCanvas = ({ layout, toolbar }: Props): JSX.Element => {
 
     mut_gesture = gesture;
 
-    const movableNodes = scene.movableNodes.getSnapshot().value;
+    const movableNodes = Optional.unwrap(scene.movableNodes.getSnapshot());
 
     // A cancelled pointer (the system took it over) drops nothing.
     if (dropped !== undefined && ended.type === 'pointerup') {
       dropDragged(
         dropped,
         movableNodes,
-        scene.settledFrames.getSnapshot().value,
-        scene.selection.getSnapshot().value,
+        Optional.unwrap(scene.settledFrames.getSnapshot()),
+        Optional.unwrap(scene.selection.getSnapshot()),
       );
     }
 
@@ -814,9 +823,9 @@ export const DagCanvas = ({ layout, toolbar }: Props): JSX.Element => {
     const edge =
       id === undefined
         ? undefined
-        : scene.edges
-            .getSnapshot()
-            .value.find((candidate) => candidate.id === id);
+        : Optional.unwrap(scene.edges.getSnapshot()).find(
+            (candidate) => candidate.id === id,
+          );
 
     if (edge === undefined || edge.implied) {
       setSelectedEdge(undefined);
@@ -829,7 +838,7 @@ export const DagCanvas = ({ layout, toolbar }: Props): JSX.Element => {
     setSelectedEdge({
       id: edge.id,
       path: edge.path,
-      at: contentPointAt(scene.drawnTransform.getSnapshot().value, {
+      at: contentPointAt(Optional.unwrap(scene.drawnTransform.getSnapshot()), {
         x: clicked.clientX - bounds.left,
         y: clicked.clientY - bounds.top,
       }),
@@ -839,7 +848,7 @@ export const DagCanvas = ({ layout, toolbar }: Props): JSX.Element => {
   const onWheel = (wheeled: WheelEvent & SvgTarget): void => {
     wheeled.preventDefault();
 
-    const tile = mode.getSnapshot().value === 'tile';
+    const tile = Optional.unwrap(mode.getSnapshot()) === 'tile';
 
     // A pinch on a trackpad comes as a wheel with Ctrl, and zooms nothing
     // in 「タイル」.
@@ -913,11 +922,13 @@ export const DagCanvas = ({ layout, toolbar }: Props): JSX.Element => {
     });
 
     // In 「タイル」, a task given the focus — by Tab — is scrolled into view.
-    if (mode.getSnapshot().value !== 'tile') {
+    if (Optional.unwrap(mode.getSnapshot()) !== 'tile') {
       return;
     }
 
-    const node = tileNodes.getSnapshot().value.find((tile) => tile.id === id);
+    const node = Optional.unwrap(tileNodes.getSnapshot()).find(
+      (tile) => tile.id === id,
+    );
 
     const frame = measureTile();
 
@@ -936,7 +947,7 @@ export const DagCanvas = ({ layout, toolbar }: Props): JSX.Element => {
   };
 
   const deleteSelectedEdge = (): void => {
-    const state = scene.edgeDelete.getSnapshot().value;
+    const state = Optional.unwrap(scene.edgeDelete.getSnapshot());
 
     setSelectedEdge(undefined);
 
@@ -945,8 +956,8 @@ export const DagCanvas = ({ layout, toolbar }: Props): JSX.Element => {
     }
 
     dataStore.removeDependency(
-      nodeRefOf(state.value.to),
-      nodeRefOf(state.value.from),
+      nodeRefOf(Optional.unwrap(state).to),
+      nodeRefOf(Optional.unwrap(state).from),
     );
   };
 

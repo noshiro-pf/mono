@@ -1,5 +1,6 @@
 import { type InitializedObservable, map } from 'synstate';
 import { constant, If, type JSX } from 'synstate-dom';
+import { Optional } from 'ts-data-forge';
 import { m } from '../i18n/index.mjs';
 import { editorStore } from '../store/index.mjs';
 import { formatWhen, type MilestoneRow } from '../view-model/index.mjs';
@@ -18,7 +19,7 @@ export const MilestoneItem = ({ row }: Props): JSX.Element => (
       onClick={() => {
         editorStore.open({
           kind: 'milestone',
-          id: row.getSnapshot().value.milestone.id,
+          id: Optional.unwrap(row.getSnapshot()).milestone.id,
         });
       }}
     >

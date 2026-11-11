@@ -1,3 +1,4 @@
+import { Optional } from 'ts-data-forge';
 import { createUiStore } from './ui-store.mjs';
 
 describe(createUiStore, () => {
@@ -6,7 +7,7 @@ describe(createUiStore, () => {
 
     store.setView('dag');
 
-    assert.strictEqual(store.view.getSnapshot().value, 'dag');
+    assert.strictEqual(Optional.unwrap(store.view.getSnapshot()), 'dag');
   });
 
   test('shows and dismisses a notice', () => {
@@ -14,27 +15,27 @@ describe(createUiStore, () => {
 
     store.showNotice('oops');
 
-    assert.strictEqual(store.notice.getSnapshot().value, 'oops');
+    assert.strictEqual(Optional.unwrap(store.notice.getSnapshot()), 'oops');
 
     store.dismissNotice();
 
-    assert.isUndefined(store.notice.getSnapshot().value);
+    assert.isUndefined(Optional.unwrap(store.notice.getSnapshot()));
   });
 
   test('opens the display settings where it is told, and closes them', () => {
     const store = createUiStore({ initialView: 'dag' });
 
-    assert.isUndefined(store.settingsPanel.getSnapshot().value);
+    assert.isUndefined(Optional.unwrap(store.settingsPanel.getSnapshot()));
 
     store.openSettings({ kind: 'sheet' });
 
-    assert.deepStrictEqual(store.settingsPanel.getSnapshot().value, {
+    assert.deepStrictEqual(Optional.unwrap(store.settingsPanel.getSnapshot()), {
       kind: 'sheet',
     });
 
     store.closeSettings();
 
-    assert.isUndefined(store.settingsPanel.getSnapshot().value);
+    assert.isUndefined(Optional.unwrap(store.settingsPanel.getSnapshot()));
   });
 
   test('moves the open display settings, and does not open them so', () => {
@@ -49,13 +50,16 @@ describe(createUiStore, () => {
 
     store.placeSettings(popover);
 
-    assert.isUndefined(store.settingsPanel.getSnapshot().value);
+    assert.isUndefined(Optional.unwrap(store.settingsPanel.getSnapshot()));
 
     store.openSettings({ kind: 'sheet' });
 
     store.placeSettings(popover);
 
-    assert.deepStrictEqual(store.settingsPanel.getSnapshot().value, popover);
+    assert.deepStrictEqual(
+      Optional.unwrap(store.settingsPanel.getSnapshot()),
+      popover,
+    );
   });
 
   test('closes the display settings when the view changes', () => {
@@ -65,10 +69,10 @@ describe(createUiStore, () => {
 
     store.setView('list');
 
-    assert.isUndefined(store.settingsPanel.getSnapshot().value);
+    assert.isUndefined(Optional.unwrap(store.settingsPanel.getSnapshot()));
 
     store.setView('dag');
 
-    assert.isUndefined(store.settingsPanel.getSnapshot().value);
+    assert.isUndefined(Optional.unwrap(store.settingsPanel.getSnapshot()));
   });
 });

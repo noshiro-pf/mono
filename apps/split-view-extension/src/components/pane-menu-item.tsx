@@ -1,5 +1,6 @@
 import { type InitializedObservable, map } from 'synstate';
 import { constant, type JSX } from 'synstate-dom';
+import { Optional } from 'ts-data-forge';
 import { Icon, type IconName } from './icon.js';
 
 /** One row of a pane's menu. `onChosen` is told which row was chosen. */
@@ -23,7 +24,7 @@ export const PaneMenuItem = ({
     title={item$.pipe(map((item) => item.title))}
     type={constant('button')}
     onClick={() => {
-      onChosen(item$.getSnapshot().value.choice);
+      onChosen(Optional.unwrap(item$.getSnapshot()).choice);
     }}
   >
     <Icon icon={item$.pipe(map((item) => item.icon))} />

@@ -87,7 +87,7 @@ class WithInitialValueObservableClass<A, I>
       return; // skip update
     }
 
-    this.setNext(sn.value, updateToken);
+    this.setNext(Optional.unwrap(sn), updateToken);
   }
 }
 

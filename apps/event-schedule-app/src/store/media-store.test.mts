@@ -1,16 +1,17 @@
+import { Optional } from 'ts-data-forge';
 import { createMediaStore, type MediaStore } from './media-store.mjs';
 
 describe(createMediaStore, () => {
   test('starts as mobile when the media query matches on creation', () => {
     const { store } = setup(true);
 
-    assert.isTrue(store.isMobile$.getSnapshot().value);
+    assert.isTrue(Optional.unwrap(store.isMobile$.getSnapshot()));
   });
 
   test('starts as not mobile when the media query does not match on creation', () => {
     const { store } = setup(false);
 
-    assert.isFalse(store.isMobile$.getSnapshot().value);
+    assert.isFalse(Optional.unwrap(store.isMobile$.getSnapshot()));
   });
 
   test('takes up a change made before the first start', () => {
@@ -18,11 +19,11 @@ describe(createMediaStore, () => {
 
     media.resize(true);
 
-    assert.isFalse(store.isMobile$.getSnapshot().value);
+    assert.isFalse(Optional.unwrap(store.isMobile$.getSnapshot()));
 
     store.start();
 
-    assert.isTrue(store.isMobile$.getSnapshot().value);
+    assert.isTrue(Optional.unwrap(store.isMobile$.getSnapshot()));
   });
 
   test('takes up a change made between a stop and the next start', () => {
@@ -34,11 +35,11 @@ describe(createMediaStore, () => {
 
     media.resize(false);
 
-    assert.isTrue(store.isMobile$.getSnapshot().value);
+    assert.isTrue(Optional.unwrap(store.isMobile$.getSnapshot()));
 
     store.start();
 
-    assert.isFalse(store.isMobile$.getSnapshot().value);
+    assert.isFalse(Optional.unwrap(store.isMobile$.getSnapshot()));
   });
 
   test('follows the media query once started', () => {
@@ -52,11 +53,11 @@ describe(createMediaStore, () => {
 
     media.change(true);
 
-    assert.isTrue(store.isMobile$.getSnapshot().value);
+    assert.isTrue(Optional.unwrap(store.isMobile$.getSnapshot()));
 
     media.change(false);
 
-    assert.isFalse(store.isMobile$.getSnapshot().value);
+    assert.isFalse(Optional.unwrap(store.isMobile$.getSnapshot()));
   });
 
   test('stop ends the watching', () => {
@@ -70,7 +71,7 @@ describe(createMediaStore, () => {
 
     media.change(true);
 
-    assert.isFalse(store.isMobile$.getSnapshot().value);
+    assert.isFalse(Optional.unwrap(store.isMobile$.getSnapshot()));
   });
 });
 

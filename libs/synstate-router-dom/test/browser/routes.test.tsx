@@ -1,6 +1,6 @@
 import { map } from 'synstate';
 import { constant, type Constant, type JSX } from 'synstate-dom';
-import { asSafeInt, expectType, type SafeInt } from 'ts-data-forge';
+import { asSafeInt, expectType, type SafeInt, type Some } from 'ts-data-forge';
 import { afterUpdate, mountInto, routes, setup } from './fixture.js';
 
 /** A fixed label for a page. */
@@ -20,9 +20,9 @@ describe('Routes', () => {
           'products.new': () => <p>{page('new')}</p>,
           'products.item': (item$) => {
             expectType<
-              typeof item$.getSnapshot extends () => Readonly<{
-                value: Readonly<{ params: Readonly<{ productId: infer P }> }>;
-              }>
+              typeof item$.getSnapshot extends () => Some<
+                Readonly<{ params: Readonly<{ productId: infer P }> }>
+              >
                 ? P
                 : never,
               SafeInt

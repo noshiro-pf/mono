@@ -16,11 +16,13 @@
     `pipe(x).map(fn(...args))`. Waits on `mapWith` being added to `pipe` here
     first (D-58, `languages/sumi/docs/overload-design.md`).
 
-- Change the `$$tag` values from `'ts-data-forge::…'` to this package's name.
+- Change the `$$tag` values of `Result`, `TernaryResult` and `AsyncData` from
+  `'ts-data-forge::…'` to this package's name.
 
     They were kept when the implementation moved here, so that values from
     either package stayed interchangeable during the move (D-49). Code that
-    reads `$$tag` directly would have to follow.
+    reads `$$tag` directly would have to follow. `Optional` has no `$$tag` any
+    more: its values are unwrapped.
 
 - Move `expectType` to ts-type-forge.
 

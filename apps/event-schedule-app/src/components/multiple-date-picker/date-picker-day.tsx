@@ -1,6 +1,6 @@
 import { type InitializedObservable, map } from 'synstate';
 import { constant, type JSX } from 'synstate-dom';
-import { Arr } from 'ts-data-forge';
+import { Arr, Optional } from 'ts-data-forge';
 import { DateUtils } from 'ts-fortress-types';
 import type { CalendarCell } from '../../hooks/index.mjs';
 import * as styles from './multiple-date-picker.module.css';
@@ -36,7 +36,7 @@ export const DatePickerDate = ({
       onClick === undefined
         ? undefined
         : () => {
-            const { outside, ymd } = cell.getSnapshot().value;
+            const { outside, ymd } = Optional.unwrap(cell.getSnapshot());
 
             if (!outside) {
               onClick(ymd);

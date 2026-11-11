@@ -65,7 +65,10 @@ export const createLoanStore = (deps: LoanDeps): LoanStore => {
   ]).pipe(withInitialValue(false));
 
   const setInputs = (patch: Partial<Store>): void => {
-    const next = { ...inputs.getSnapshot().value, ...patch } as const;
+    const next = {
+      ...Optional.unwrap(inputs.getSnapshot()),
+      ...patch,
+    } as const;
 
     // The hash, and query parameters the page does not declare, are kept.
     deps.router.setSearch(routes.loan, () => ({
@@ -108,7 +111,7 @@ const storeFromPage = (
     return defaultValues;
   }
 
-  const query = page.value.search;
+  const query = Optional.unwrap(page).search;
 
   return {
     repaymentType: query['repayment-type'] ?? defaultValues.repaymentType,

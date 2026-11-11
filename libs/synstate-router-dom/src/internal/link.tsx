@@ -8,6 +8,7 @@ import {
   type Href,
   type Router,
 } from 'synstate-router';
+import { Optional } from 'ts-data-forge';
 import type { LinkProps } from '../link-props.mjs';
 
 /** `Link` bound to `router` (`RouterComponents['Link']`). */
@@ -47,4 +48,6 @@ export const createLink =
  * observable for it: `Link` needs the destination only when it is clicked.
  */
 const readerOf = <T extends string>(bindable: Bindable<T>): (() => T) =>
-  isObservable(bindable) ? () => bindable.getSnapshot().value : () => bindable;
+  isObservable(bindable)
+    ? () => Optional.unwrap(bindable.getSnapshot())
+    : () => bindable;

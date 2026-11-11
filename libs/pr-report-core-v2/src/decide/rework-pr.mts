@@ -168,8 +168,8 @@ export const isUntouchedSince = (
 
   return (
     Optional.isSome(last) &&
-    last.value.event === 'unlabeled' &&
-    last.value.id === recorded
+    Optional.unwrap(last).event === 'unlabeled' &&
+    Optional.unwrap(last).id === recorded
   );
 };
 

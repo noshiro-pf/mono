@@ -5,7 +5,7 @@ import {
   map,
   mapTo,
 } from 'synstate';
-import { Result } from 'ts-data-forge';
+import { Optional, Result } from 'ts-data-forge';
 import type { StrictPick } from 'ts-type-forge';
 import { dict } from '../../constants/index.mjs';
 import {
@@ -198,8 +198,9 @@ export const createDeleteAccountCreatedWithGoogleStore = <
   };
 
   const enterClickHandler = (): void => {
-    const { enterButtonDisabled, isWaitingResponse } =
-      state.getSnapshot().value;
+    const { enterButtonDisabled, isWaitingResponse } = Optional.unwrap(
+      state.getSnapshot(),
+    );
 
     const fireAuthUser = deps.auth.getFireAuthUserSnapshot();
 

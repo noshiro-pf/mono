@@ -29,7 +29,7 @@ describe('Arr reducing value', () => {
         assert.isTrue(Optional.isSome(result));
 
         if (Optional.isSome(result)) {
-          expect(result.value).toBe(3);
+          expect(Optional.unwrap(result)).toBe(3);
         }
       });
     }
@@ -45,7 +45,7 @@ describe('Arr reducing value', () => {
         assert.isTrue(Optional.isSome(result));
 
         if (Optional.isSome(result)) {
-          expect(result.value).toBe(3);
+          expect(Optional.unwrap(result)).toBe(3);
         }
       });
     }
@@ -61,7 +61,7 @@ describe('Arr reducing value', () => {
         assert.isTrue(Optional.isSome(result));
 
         if (Optional.isSome(result)) {
-          expect(result.value).toBe(3);
+          expect(Optional.unwrap(result)).toBe(3);
         }
       });
     }
@@ -78,7 +78,7 @@ describe('Arr reducing value', () => {
       assert.isTrue(Optional.isSome(result));
 
       if (Optional.isSome(result)) {
-        expect(result.value).toBe(5);
+        expect(Optional.unwrap(result)).toBe(5);
       }
     });
 
@@ -90,7 +90,7 @@ describe('Arr reducing value', () => {
       assert.isTrue(Optional.isSome(res));
 
       if (Optional.isSome(res)) {
-        expect(res.value).toBe(5);
+        expect(Optional.unwrap(res)).toBe(5);
       }
     });
 
@@ -104,7 +104,7 @@ describe('Arr reducing value', () => {
       assert.isTrue(Optional.isSome(res));
 
       if (Optional.isSome(res)) {
-        expect(res.value).toBe(5);
+        expect(Optional.unwrap(res)).toBe(5);
       }
     });
 
@@ -149,7 +149,7 @@ describe('Arr reducing value', () => {
       assert.isTrue(Optional.isSome(result));
 
       if (Optional.isSome(result)) {
-        assert.deepStrictEqual(result.value, { x: 1, y: 2 });
+        assert.deepStrictEqual(Optional.unwrap(result), { x: 1, y: 2 });
       }
     });
 
@@ -190,7 +190,10 @@ describe('Arr reducing value', () => {
       assert.isTrue(Optional.isSome(res));
 
       if (Optional.isSome(res)) {
-        assert.deepStrictEqual(res.value, { name: 'apple', score: 10 });
+        assert.deepStrictEqual(Optional.unwrap(res), {
+          name: 'apple',
+          score: 10,
+        });
       }
     });
   });
@@ -225,7 +228,7 @@ describe('Arr reducing value', () => {
       assert.isTrue(Optional.isSome(result));
 
       if (Optional.isSome(result)) {
-        assert.deepStrictEqual(result.value, { x: 6, y: 1 });
+        assert.deepStrictEqual(Optional.unwrap(result), { x: 6, y: 1 });
       }
     });
 
@@ -266,7 +269,10 @@ describe('Arr reducing value', () => {
       assert.isTrue(Optional.isSome(res));
 
       if (Optional.isSome(res)) {
-        assert.deepStrictEqual(res.value, { name: 'cherry', score: 12 });
+        assert.deepStrictEqual(Optional.unwrap(res), {
+          name: 'cherry',
+          score: 12,
+        });
       }
     });
   });
@@ -353,7 +359,7 @@ describe('Arr reducing value', () => {
       assert.isTrue(Optional.isSome(even));
 
       if (Optional.isSome(even)) {
-        expect(even.value).toBe(3);
+        expect(Optional.unwrap(even)).toBe(3);
       }
 
       const odd = res.get(1);
@@ -361,7 +367,7 @@ describe('Arr reducing value', () => {
       assert.isTrue(Optional.isSome(odd));
 
       if (Optional.isSome(odd)) {
-        expect(odd.value).toBe(3);
+        expect(Optional.unwrap(odd)).toBe(3);
       }
     });
   });

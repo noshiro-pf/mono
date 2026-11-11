@@ -941,7 +941,9 @@ export namespace IMapMapped {
     a.size === b.size &&
     a.every(
       (v, k) =>
-        pipe(b.get(k)).map((bv) => Optional.isSome(bv) && bv.value === v).value,
+        pipe(b.get(k)).map(
+          (bv) => Optional.isSome(bv) && Optional.unwrap(bv) === v,
+        ).value,
     );
 }
 
@@ -1080,7 +1082,7 @@ class IMapMappedClass<K, V, KM extends MapSetKeyType>
   set(key: K, value: V): IMapMapped<K, V, KM> {
     const curr = this.get(key);
 
-    if (Optional.isSome(curr) && value === curr.value) {
+    if (Optional.isSome(curr) && value === Optional.unwrap(curr)) {
       return this;
     }
 
@@ -1125,7 +1127,7 @@ class IMapMappedClass<K, V, KM extends MapSetKeyType>
       Array.from(this.#map, ([km, v]) =>
         tp(
           this.#fromKey(km),
-          Object.is(km, keyMapped) ? updater(curr.value) : v,
+          Object.is(km, keyMapped) ? updater(Optional.unwrap(curr)) : v,
         ),
       ),
       this.#toKey,

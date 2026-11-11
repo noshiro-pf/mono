@@ -1,5 +1,6 @@
 import { type InitializedObservable, map } from 'synstate';
 import type { JSX } from 'synstate-dom';
+import { Optional } from 'ts-data-forge';
 import type { SplitterRect } from '../layout/index.mjs';
 
 /**
@@ -31,7 +32,7 @@ export const Splitter = ({
       // pointer over the panes for the length of the drag.
       pointerEvent.preventDefault();
 
-      onDragStart(splitter$.getSnapshot().value);
+      onDragStart(Optional.unwrap(splitter$.getSnapshot()));
     }}
   />
 );

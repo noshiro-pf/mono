@@ -6,7 +6,7 @@ import {
   mapBindable,
   type JSX,
 } from 'synstate-dom';
-import { Arr } from 'ts-data-forge';
+import { Arr, Optional } from 'ts-data-forge';
 import type { ReadonlyRecord } from 'ts-type-forge';
 import {
   STATUS_NAMES,
@@ -65,7 +65,7 @@ export const MergeOrderFilters = (): JSX.Element => {
         >
           {(filter$) => {
             // Read once: the tiles are keyed by it.
-            const filter = filter$.getSnapshot().value;
+            const filter = Optional.unwrap(filter$.getSnapshot());
 
             // Not known while what it is counted from is still being read.
             const count = deriveBindable(

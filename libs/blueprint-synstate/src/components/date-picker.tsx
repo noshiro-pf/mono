@@ -167,20 +167,23 @@ export const DatePicker = ({
 
   const value$ = toObservable(value).pipe(map(parseWallClock));
 
-  const selected = (): Optional<WallClock> => value$.getSnapshot().value;
+  const selected = (): Optional<WallClock> =>
+    Optional.unwrap(value$.getSnapshot());
 
   const initial = selected();
 
   const [display$, setDisplay] = createState(
     monthIndexOf(
-      Optional.isSome(initial) ? initial.value : clampDay(today, min, max),
+      Optional.isSome(initial)
+        ? Optional.unwrap(initial)
+        : clampDay(today, min, max),
     ),
   );
 
   // The day of the month the value was last on, which a change of month keeps;
   // Blueprint's `selectedDay`.
   const mut_memory: { selectedDay: number } = {
-    selectedDay: Optional.isSome(initial) ? initial.value.day : 1,
+    selectedDay: Optional.isSome(initial) ? Optional.unwrap(initial).day : 1,
   };
 
   const afterUpdate = createAfterUpdate();
@@ -191,9 +194,9 @@ export const DatePicker = ({
   value$.subscribe((current) => {
     if (Optional.isSome(current)) {
       afterUpdate(() => {
-        mut_memory.selectedDay = current.value.day;
+        mut_memory.selectedDay = Optional.unwrap(current).day;
 
-        setDisplay(monthIndexOf(current.value));
+        setDisplay(monthIndexOf(Optional.unwrap(current)));
       });
     }
   });
@@ -208,8 +211,8 @@ export const DatePicker = ({
         year,
         month,
         day: Math.min(mut_memory.selectedDay, daysInMonth(year, month)),
-        hour: Optional.isSome(current) ? current.value.hour : 0,
-        minute: Optional.isSome(current) ? current.value.minute : 0,
+        hour: Optional.isSome(current) ? Optional.unwrap(current).hour : 0,
+        minute: Optional.isSome(current) ? Optional.unwrap(current).minute : 0,
       },
       min,
       max,
@@ -228,7 +231,7 @@ export const DatePicker = ({
     if (
       canClearSelection &&
       Optional.isSome(current) &&
-      isSameDay(current.value, day)
+      isSameDay(Optional.unwrap(current), day)
     ) {
       onChange('');
 
@@ -238,14 +241,19 @@ export const DatePicker = ({
     mut_memory.selectedDay = day.day;
 
     onChange(
-      toValue(Optional.isSome(current) ? withDayOf(current.value, day) : day),
+      toValue(
+        Optional.isSome(current)
+          ? withDayOf(Optional.unwrap(current), day)
+          : day,
+      ),
     );
   };
 
   const isSelectedDay = (day: WallClock): Bindable<boolean> =>
     value$.pipe(
       map(
-        (current) => Optional.isSome(current) && isSameDay(current.value, day),
+        (current) =>
+          Optional.isSome(current) && isSameDay(Optional.unwrap(current), day),
       ),
     );
 
@@ -271,10 +279,10 @@ export const DatePicker = ({
 
     const next =
       shortcut.includeTime === true
-        ? clock.value
+        ? Optional.unwrap(clock)
         : Optional.isSome(current)
-          ? withDayOf(current.value, clock.value)
-          : ({ ...clock.value, hour: 0, minute: 0 } as const);
+          ? withDayOf(Optional.unwrap(current), Optional.unwrap(clock))
+          : ({ ...Optional.unwrap(clock), hour: 0, minute: 0 } as const);
 
     mut_memory.selectedDay = next.day;
 
@@ -322,7 +330,7 @@ export const DatePicker = ({
                   )}
                   disabled={
                     Optional.isNone(clock) ||
-                    !isDayInRange(clock.value, min, max)
+                    !isDayInRange(Optional.unwrap(clock), min, max)
                   }
                   shouldDismissPopover={false}
                   text={constant(shortcut.label)}
@@ -342,7 +350,9 @@ export const DatePicker = ({
           dayState={(day) => ({ selected: isSelectedDay(day) })}
           display$={display$}
           focusCandidates$={value$.pipe(
-            map((current) => (Optional.isSome(current) ? [current.value] : [])),
+            map((current) =>
+              Optional.isSome(current) ? [Optional.unwrap(current)] : [],
+            ),
           )}
           labels={labels}
           max={max}
@@ -359,7 +369,9 @@ export const DatePicker = ({
               showArrowButtons={timePickerProps?.showArrowButtons ?? false}
               value={value$.pipe(
                 map((current) =>
-                  Optional.isSome(current) ? formatTime(current.value) : '',
+                  Optional.isSome(current)
+                    ? formatTime(Optional.unwrap(current))
+                    : '',
                 ),
               )}
               onChange={(time) => {
@@ -367,7 +379,9 @@ export const DatePicker = ({
 
                 onChange(
                   toValue({
-                    ...(Optional.isSome(current) ? current.value : now()),
+                    ...(Optional.isSome(current)
+                      ? Optional.unwrap(current)
+                      : now()),
                     ...parseTime(time),
                   }),
                 );

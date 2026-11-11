@@ -1,4 +1,5 @@
 import { createState, map } from 'synstate';
+import { Optional } from 'ts-data-forge';
 import { createFormError } from './create-form-error.mjs';
 
 describe(createFormError, () => {
@@ -9,7 +10,7 @@ describe(createFormError, () => {
       value$.pipe(map((v) => v === '')),
     );
 
-    const shown = (): boolean => errorShown$.getSnapshot().value;
+    const shown = (): boolean => Optional.unwrap(errorShown$.getSnapshot());
 
     // Invalid from the start, but untouched.
     assert.isFalse(shown());
@@ -46,7 +47,7 @@ describe(createFormError, () => {
     // The form reset to blank.
     setValue('');
 
-    assert.isFalse(errorShown$.getSnapshot().value);
+    assert.isFalse(Optional.unwrap(errorShown$.getSnapshot()));
   });
 
   test('follows a validity that changes for another reason, without writing during the update', () => {
@@ -66,11 +67,11 @@ describe(createFormError, () => {
 
     touch();
 
-    assert.isTrue(errorShown$.getSnapshot().value);
+    assert.isTrue(Optional.unwrap(errorShown$.getSnapshot()));
 
     setTaken(false);
 
-    assert.isFalse(errorShown$.getSnapshot().value);
+    assert.isFalse(Optional.unwrap(errorShown$.getSnapshot()));
 
     assert.deepStrictEqual(warn.mock.calls, []);
   });

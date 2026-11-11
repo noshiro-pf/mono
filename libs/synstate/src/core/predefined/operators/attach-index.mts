@@ -114,6 +114,6 @@ class WithIndexObservableClass<A> extends SyncChildObservableClass<
 
     this.#mut_index = asSafeUint(this.#mut_index + 1);
 
-    this.setNext([this.#mut_index, sn.value], updateToken);
+    this.setNext([this.#mut_index, Optional.unwrap(sn)], updateToken);
   }
 }

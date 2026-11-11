@@ -1,4 +1,5 @@
 import { derive, source } from 'synstate';
+import { Optional } from 'ts-data-forge';
 
 const mode$ = source<'celsius' | 'fahrenheit'>('celsius');
 
@@ -16,6 +17,6 @@ const temperature$ = derive([mode$, celsius$, fahrenheit$], (mode, c, f) =>
 
 if (import.meta.vitest !== undefined) {
   test('conditional dependencies (synstate)', () => {
-    assert.strictEqual(temperature$.getSnapshot().value, 20);
+    assert.strictEqual(Optional.unwrap(temperature$.getSnapshot()), 20);
   });
 }

@@ -15,10 +15,10 @@ if (import.meta.vitest !== undefined) {
       <A,>(): DropInitialValueOperator<A | undefined, A> =>
       (source: Observable<A | undefined>): Observable<A> =>
         createDerived<A>([source], (ctx) => () => {
-          const value = source.getSnapshot();
+          const value = Optional.unwrap(source.getSnapshot());
 
-          if (Optional.isSome(value) && value.value !== undefined) {
-            ctx.set(value.value);
+          if (value !== undefined) {
+            ctx.set(value);
           }
         });
 

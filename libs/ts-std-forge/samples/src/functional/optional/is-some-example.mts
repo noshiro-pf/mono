@@ -10,7 +10,7 @@ if (import.meta.vitest !== undefined) {
       return;
     }
 
-    const value: number = optionalNumber.value;
+    const value: number = Optional.unwrap(optionalNumber);
 
     assert.isTrue(value === 42);
 

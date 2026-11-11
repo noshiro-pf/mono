@@ -7,7 +7,7 @@ import {
   type InitializedObservable,
 } from 'synstate';
 import { constant, For, If, type JSX } from 'synstate-dom';
-import { Arr, fastDeepEqual, Num, Result } from 'ts-data-forge';
+import { Arr, fastDeepEqual, Num, Optional, Result } from 'ts-data-forge';
 import {
   bestFreeColumns,
   fitScale,
@@ -78,7 +78,7 @@ export const IssueDag = ({ view, store, now }: Props): JSX.Element => {
   const zoomTo = (next: DagZoom): void => {
     const element = mut_scroller.element;
 
-    const { scale } = drawn.getSnapshot().value;
+    const { scale } = Optional.unwrap(drawn.getSnapshot());
 
     store.setZoom(next);
 
@@ -141,7 +141,7 @@ export const IssueDag = ({ view, store, now }: Props): JSX.Element => {
           onClick={() => {
             zoomTo({
               kind: 'scale',
-              scale: zoomOutFrom(drawn.getSnapshot().value.scale),
+              scale: zoomOutFrom(Optional.unwrap(drawn.getSnapshot()).scale),
             });
           }}
         >
@@ -157,7 +157,7 @@ export const IssueDag = ({ view, store, now }: Props): JSX.Element => {
           onClick={() => {
             zoomTo({
               kind: 'scale',
-              scale: zoomInFrom(drawn.getSnapshot().value.scale),
+              scale: zoomInFrom(Optional.unwrap(drawn.getSnapshot()).scale),
             });
           }}
         >

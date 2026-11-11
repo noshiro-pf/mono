@@ -140,24 +140,26 @@ class KeepEqualPartsObservableClass<A>
 
     const prev = this.#mut_previousValue;
 
+    const value = Optional.unwrap(sn);
+
     if (Optional.isNone(prev)) {
       this.#mut_previousValue = sn;
 
-      this.setNext(sn.value, updateToken);
+      this.setNext(value, updateToken);
 
       return;
     }
 
-    const kept = replaceEqualDeep(prev.value, sn.value, this.#options);
+    const previousValue = Optional.unwrap(prev);
 
-    if (Object.is(kept, prev.value)) {
+    const kept = replaceEqualDeep(previousValue, value, this.#options);
+
+    if (Object.is(kept, previousValue)) {
       return;
     }
 
     // Updated before `setNext`, which can lead back here.
-    this.#mut_previousValue = Object.is(kept, sn.value)
-      ? sn
-      : Optional.some(kept);
+    this.#mut_previousValue = Object.is(kept, value) ? sn : Optional.some(kept);
 
     this.setNext(kept, updateToken);
   }

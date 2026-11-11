@@ -72,7 +72,7 @@ describe(pipe, () => {
     assert.isTrue(Optional.isSome(result));
 
     if (Optional.isSome(result)) {
-      expect(result.value).toBe(84);
+      expect(Optional.unwrap(result)).toBe(84);
     }
 
     expectType<typeof result, Some<number>>('=');

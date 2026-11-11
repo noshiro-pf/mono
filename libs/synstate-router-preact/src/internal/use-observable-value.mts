@@ -1,5 +1,6 @@
 import { useLayoutEffect, useReducer } from 'preact/hooks';
 import type { InitializedObservable } from 'synstate';
+import { Optional } from 'ts-data-forge';
 
 /**
  * The current value of `observable`, re-rendering when it changes. Built on
@@ -13,7 +14,7 @@ export const useObservableValue = <A,>(
 ): A => {
   const [, rerender] = useReducer(countRenders, 0);
 
-  const value = observable.getSnapshot().value;
+  const value = Optional.unwrap(observable.getSnapshot());
 
   useLayoutEffect(() => {
     const { unsubscribe } = observable.subscribe(() => {
@@ -21,7 +22,7 @@ export const useObservableValue = <A,>(
     });
 
     // An emission between the render and this effect.
-    if (!Object.is(observable.getSnapshot().value, value)) {
+    if (!Object.is(Optional.unwrap(observable.getSnapshot()), value)) {
       rerender(undefined);
     }
 

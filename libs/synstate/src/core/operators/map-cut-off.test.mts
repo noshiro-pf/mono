@@ -1,4 +1,4 @@
-import { expectType } from 'ts-data-forge';
+import { expectType, Optional } from 'ts-data-forge';
 import { combine } from '../combine/index.mjs';
 import { source } from '../create/index.mjs';
 import { mapTo, withIndex } from '../predefined/index.mjs';
@@ -194,7 +194,10 @@ describe('operators that turn events into values emit every event', () => {
 
     const indexed$ = a$.pipe(withIndex());
 
-    assert.deepStrictEqual(indexed$.getSnapshot().value, [-1, 'init']);
+    assert.deepStrictEqual(Optional.unwrap(indexed$.getSnapshot()), [
+      -1,
+      'init',
+    ]);
 
     const mut_history: (readonly [number, string])[] = [];
 

@@ -110,7 +110,7 @@ class FilterObservableClass<A>
       initialValue: pipe(parentObservable.getSnapshot()).map((sn) =>
         Optional.isNone(sn)
           ? Optional.none
-          : predicate(sn.value, -1)
+          : predicate(Optional.unwrap(sn), -1)
             ? sn
             : Optional.none,
       ).value,
@@ -134,8 +134,10 @@ class FilterObservableClass<A>
 
     this.#mut_index = asSafeUint(this.#mut_index + 1);
 
-    if (this.#predicate(sn.value, this.#mut_index)) {
-      this.setNext(sn.value, updateToken);
+    const value = Optional.unwrap(sn);
+
+    if (this.#predicate(value, this.#mut_index)) {
+      this.setNext(value, updateToken);
     }
   }
 }

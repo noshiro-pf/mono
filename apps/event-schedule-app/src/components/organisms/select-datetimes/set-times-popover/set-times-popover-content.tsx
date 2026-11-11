@@ -12,6 +12,7 @@ import {
   type Bindable,
   type JSX,
 } from 'synstate-dom';
+import { Optional } from 'ts-data-forge';
 import { TimeRange } from 'ts-fortress-types';
 import type { DayOfWeekName, ReadonlyRecord, Reducer } from 'ts-type-forge';
 import { dict } from '../../../../constants/index.mjs';
@@ -138,8 +139,8 @@ export const SetTimesPopoverContent = ({
           text={constant(dict.common.buttonText.decide)}
           onClick={() => {
             onOkClick({
-              timeRange: timeRange$.getSnapshot().value,
-              checkboxState: checkboxState$.getSnapshot().value,
+              timeRange: Optional.unwrap(timeRange$.getSnapshot()),
+              checkboxState: Optional.unwrap(checkboxState$.getSnapshot()),
             });
           }}
         />

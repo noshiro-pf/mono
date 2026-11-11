@@ -7,7 +7,7 @@ synstate-next は、次のメジャーバージョンで synstate を置き換�
 
 ## 値の読み方と購読
 
-- **`getSnapshot()` はこれまでどおり `Optional` を返します。** 値が同じあいだは同じオブジェクトです。`InitializedObservable` には `.value` があり、`Optional` を作らずに値を読めます。synstate と同じく `hasValue` はなく、値を持つかどうかは `Optional.isSome(o.getSnapshot())` で確かめます。
+- **`getSnapshot()` はこれまでどおり `Optional` を返します。** 値が同じあいだは `Object.is` で等しくなります。ただしスナップショットが値そのものとは限りません（`Optional.none` を表す文字列と同じ接頭辞で始まる文字列は書き換えて持ちます）。スナップショットを値と比べるのではなく、`Optional.unwrap` で値を読みます。`InitializedObservable` には `.value` があり、`Optional` を経由せずに値を読めます。synstate と同じく `hasValue` はなく、値を持つかどうかは `Optional.isSome(o.getSnapshot())` で確かめます。
 - **`subscribe` は、購読を止める関数を返します。** `{ unsubscribe }` オブジェクトではありません。
 - **`kind`・`depth`・`updateToken` は公開されていません。** 更新の順番は今もノードの深さで決まりますが、それはライブラリの内部のものです。`isCompleted` は `settled` になりました。下の `complete` の項を見てください。
 

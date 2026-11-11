@@ -119,15 +119,20 @@ const pageOf = (
   return AsyncData.match(data, {
     idle: () => loading,
     pending: () => loading,
-    ok: (found) =>
-      Optional.isSome(found)
-        ? found.value.id === productId
-          ? { ...loading, title: found.value.name, product: found.value }
-          : // An answer for another id. `switchMap` moves to the new request in
-            // the same update as the id, so this is not seen; it is checked
+    ok: Optional.match({
+      some: (product: ProductDetail) =>
+        product.id === productId
+          ? { ...loading, title: product.name, product }
+          : // An answer for another id. `switchMap` moves to the new request
+            // in the same update as the id, so this is not seen; it is checked
             // rather than assumed.
-            loading
-        : { ...loading, title: `No product ${productId}`, found: false },
+            loading,
+      none: () => ({
+        ...loading,
+        title: `No product ${productId}`,
+        found: false,
+      }),
+    }),
     err: () => ({
       ...loading,
       title: `Could not load product ${productId}`,

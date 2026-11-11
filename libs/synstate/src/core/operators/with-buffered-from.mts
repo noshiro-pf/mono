@@ -107,8 +107,8 @@ class WithBufferedFromObservableClass<A, B>
         Optional.isNone(par)
           ? Optional.none
           : Optional.some([
-              par.value,
-              Optional.isNone(me) ? [] : [me.value],
+              Optional.unwrap(par),
+              Optional.isNone(me) ? [] : [Optional.unwrap(me)],
             ] as const),
       ).value,
     });
@@ -143,7 +143,7 @@ class WithBufferedFromObservableClass<A, B>
     // writes to the buffered observable belongs to the next batch.
     this.#mut_bufferedValues = [];
 
-    this.setNext([sn.value, buffered], updateToken);
+    this.setNext([Optional.unwrap(sn), buffered], updateToken);
   }
 
   protected override teardown(): void {

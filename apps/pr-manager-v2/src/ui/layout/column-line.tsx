@@ -1,6 +1,6 @@
 import type { InitializedObservable } from 'synstate';
 import { constant, type JSX } from 'synstate-dom';
-import { Num } from 'ts-data-forge';
+import { Num, Optional } from 'ts-data-forge';
 import { withEvenLine, withLineAt } from '../../domain/index.mjs';
 import type { LayoutStore } from '../../store/index.mjs';
 import { dragFrom } from './drag.mjs';
@@ -13,7 +13,8 @@ export const ColumnLine = ({
   layout: LayoutStore;
   line: InitializedObservable<number>;
 }>): JSX.Element => {
-  const which = (): 0 | 1 => (line.getSnapshot().value === 0 ? 0 : 1);
+  const which = (): 0 | 1 =>
+    Optional.unwrap(line.getSnapshot()) === 0 ? 0 : 1;
 
   return (
     <div

@@ -35,7 +35,7 @@ export const double = (src: Observable<number>): Observable<number> =>
                     return; // the parent did not emit in this update
                 }
 
-                setNext(sn.value * 2, updateToken);
+                setNext(Optional.unwrap(sn) * 2, updateToken);
             },
     );
 ```
@@ -124,7 +124,7 @@ export const delay = (
                 const t = setTimeout(() => {
                     mut_timers.delete(t);
 
-                    startUpdate(sn.value);
+                    startUpdate(Optional.unwrap(sn));
                 }, ms);
 
                 mut_timers.add(t);

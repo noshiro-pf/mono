@@ -142,7 +142,7 @@ const IssuesBody = ({
       <IssueTiles
         counts={view.pipe(
           map((v) =>
-            store.settings.getSnapshot().value.view === 'dag'
+            Optional.unwrap(store.settings.getSnapshot()).view === 'dag'
               ? v.dagCounts
               : v.listCounts,
           ),

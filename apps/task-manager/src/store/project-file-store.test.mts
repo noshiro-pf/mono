@@ -1,4 +1,5 @@
 import { createState } from 'synstate';
+import { Optional } from 'ts-data-forge';
 import type { FixedLengthTuple } from 'ts-type-forge';
 import { asTaskId, createTask, type DomainState } from '../domain/index.mjs';
 import { projectFileText, type ProjectSnapshot } from '../repository/index.mjs';
@@ -88,7 +89,7 @@ const setup = (
     downloads: mut_downloads,
     replaced: mut_replaced,
     errors: mut_notices,
-    importState: () => store.importState.getSnapshot().value,
+    importState: () => Optional.unwrap(store.importState.getSnapshot()),
   };
 };
 
@@ -282,7 +283,7 @@ describe(createProjectFileStore, () => {
       await pending.promise;
     });
 
-    assert.isFalse(store.importing.getSnapshot().value);
+    assert.isFalse(Optional.unwrap(store.importing.getSnapshot()));
 
     store.openFile('p.json', projectFileText(incoming, NOW));
 
@@ -290,13 +291,13 @@ describe(createProjectFileStore, () => {
 
     store.close();
 
-    assert.isTrue(store.importing.getSnapshot().value);
+    assert.isTrue(Optional.unwrap(store.importing.getSnapshot()));
 
     pending.resolve(undefined);
 
     await flush();
 
-    assert.isFalse(store.importing.getSnapshot().value);
+    assert.isFalse(Optional.unwrap(store.importing.getSnapshot()));
   });
 
   test('replaces nothing when the backup cannot be made', () => {
@@ -421,11 +422,11 @@ describe(createProjectFileStore, () => {
 
     store.confirm();
 
-    assert.isTrue(store.importing.getSnapshot().value);
+    assert.isTrue(Optional.unwrap(store.importing.getSnapshot()));
 
     setLoad('loading');
 
-    assert.isFalse(store.importing.getSnapshot().value);
+    assert.isFalse(Optional.unwrap(store.importing.getSnapshot()));
 
     stop();
   });

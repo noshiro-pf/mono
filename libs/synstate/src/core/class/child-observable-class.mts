@@ -222,7 +222,7 @@ export class AsyncChildObservableClass<A, const P extends NonEmptyUnknownList>
 
     runUndoingOnThrow(
       () => {
-        project(sn.value, issueUnqueuedToken());
+        project(Optional.unwrap(sn), issueUnqueuedToken());
       },
       () => {
         this.dispose();

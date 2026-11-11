@@ -26,7 +26,7 @@ import {
   type InitializedObservable,
   type Observable as SynstateObservable,
 } from 'synstate';
-import { Arr, Result } from 'ts-data-forge';
+import { Arr, Optional, Result } from 'ts-data-forge';
 import type { DagLayout } from '../dag/index.mjs';
 import {
   addDependency,
@@ -194,7 +194,7 @@ export const createDataStore = (deps: DataDeps): DataStore => {
 
   const dataStatus = loaded.pipe(map((current) => current.status));
 
-  const getState = (): DomainState => state.getSnapshot().value;
+  const getState = (): DomainState => Optional.unwrap(state.getSnapshot());
 
   /**
    * What `subscribeTo` hands on, as `follow` does, with whether it has yet — or
@@ -267,7 +267,7 @@ export const createDataStore = (deps: DataDeps): DataStore => {
   );
 
   const currentRepository = (): Repository | undefined => {
-    const repository = followed.getSnapshot().value;
+    const repository = Optional.unwrap(followed.getSnapshot());
 
     return repository === 'stopped' ? undefined : repository;
   };

@@ -1,5 +1,6 @@
 import { map, type InitializedObservable } from 'synstate';
 import { constant, type JSX } from 'synstate-dom';
+import { Optional } from 'ts-data-forge';
 import {
   dividerKeyOf,
   dividerValue,
@@ -51,7 +52,7 @@ export const DividerHandle = ({
       }}
       tabIndex={constant(0)}
       onKeyDown={(event) => {
-        const divider = divider$.getSnapshot().value;
+        const divider = Optional.unwrap(divider$.getSnapshot());
 
         const key = dividerKeyOf(divider.axis, event.key);
 
@@ -69,7 +70,7 @@ export const DividerHandle = ({
 
         event.currentTarget.focus();
 
-        onDragStart(divider$.getSnapshot().value);
+        onDragStart(Optional.unwrap(divider$.getSnapshot()));
       }}
     />
   );

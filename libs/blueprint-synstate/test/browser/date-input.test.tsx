@@ -1,5 +1,6 @@
 import { DateInput } from 'blueprint-synstate';
 import { render } from 'synstate-dom';
+import { Optional } from 'ts-data-forge';
 import { page, userEvent } from 'vitest/browser';
 import {
   all,
@@ -269,7 +270,10 @@ describe(DateInput, () => {
 
     await settle();
 
-    assert.strictEqual(value$.getSnapshot().value, '2026-11-09T18:00');
+    assert.strictEqual(
+      Optional.unwrap(value$.getSnapshot()),
+      '2026-11-09T18:00',
+    );
 
     one(
       container,
@@ -278,7 +282,10 @@ describe(DateInput, () => {
 
     await settle();
 
-    assert.strictEqual(value$.getSnapshot().value, '2026-11-09T18:01');
+    assert.strictEqual(
+      Optional.unwrap(value$.getSnapshot()),
+      '2026-11-09T18:01',
+    );
 
     assert.strictEqual(all(container, '.bp6-overlay').length, 1);
 
@@ -324,7 +331,10 @@ describe(DateInput, () => {
 
     await settle();
 
-    assert.strictEqual(value$.getSnapshot().value, '2026-10-24T23:59');
+    assert.strictEqual(
+      Optional.unwrap(value$.getSnapshot()),
+      '2026-10-24T23:59',
+    );
 
     assert.strictEqual(all(container, '.bp6-overlay').length, 1);
 

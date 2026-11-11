@@ -28,6 +28,7 @@ import {
   hasKey,
   isRecord,
   Obj,
+  Optional,
   replaceEqualDeep,
   Result,
   unknownToString,
@@ -509,7 +510,7 @@ export const createReader = (deps: ReaderDeps): Reader => {
     }) as const;
 
   const currentToken = (): string | undefined =>
-    token.getSnapshot().value?.value;
+    Optional.unwrap(token.getSnapshot())?.value;
 
   // When the last read of the page was sent, for a tab shown again to tell
   // whether the next is due yet.
@@ -1143,6 +1144,6 @@ const createResettableState = <S,>(
       update(() => next);
     },
     update,
-    getSnapshot: () => state.getSnapshot().value,
+    getSnapshot: () => Optional.unwrap(state.getSnapshot()),
   };
 };

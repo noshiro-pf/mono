@@ -46,7 +46,18 @@ setCount(2);
 
 assert.deepStrictEqual(mut_seen, ['count: 1', 'count: 2']);
 
-assert.equal(toObservable(label).getSnapshot().value, 'count');
+// The snapshot is an Optional: `{ $$tag, value }` up to synstate 8, and the
+// string itself from synstate 9. `published/` runs this file against the last
+// release, so it reads both.
+// It reads what this file asserts on (a string), not a tagged value such as a
+// `Result`, which holds `$$tag` itself. Each smoke file runs alone in its own
+// project, so the helper is repeated in each that needs it.
+const valueOf = (optional) =>
+  typeof optional === 'object' && optional !== null && '$$tag' in optional
+    ? optional.value
+    : optional;
+
+assert.equal(valueOf(toObservable(label).getSnapshot()), 'count');
 
 // `jsx` only describes an element; nothing touches `document` until it is
 // mounted, which is what lets this run under Node.

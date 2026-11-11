@@ -1,6 +1,7 @@
 import { panic } from '../../../panic/index.mjs';
 import type { UnknownOptional } from '../optional.mjs';
 import { isSome } from './optional-is-some.mjs';
+import { unwrapSome } from './optional-unwrap-some.mjs';
 import type { Unwrap } from './types.mjs';
 
 /**
@@ -34,8 +35,7 @@ export const unwrapThrow = <O extends UnknownOptional>(
   optional: O,
 ): Unwrap<O> => {
   if (isSome(optional)) {
-    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-    return optional.value as Unwrap<O>;
+    return unwrapSome(optional);
   }
 
   panic('`unwrapThrow()` has failed because it is `None`');

@@ -39,7 +39,7 @@ issue #2131 とライフサイクル仕様で決まったもの。実装はこ�
 1. **コンポーネント関数はマウント時に 1 回だけ呼ぶ。** 仮想 DOM も差分計算も持たない。
 2. **コンパイラを使わない。** `jsx: react-jsx` と `jsxImportSource: "synstate-dom"` を使う。
 3. **リアクティビティは型で表す。** 依存は synstate のグラフ（`pipe`・`combine`）で明示し、自動追跡はしない。実行時に持つのは「今どのスコープの中にいるか」だけである。
-4. **データを受け取るスロットは `Bindable<T>`（`InitializedObservable<T> | Constant<T>`）だけを受け付け、素の `T` は受け付けない。** 定数は `constant()` で包む。対象は DOM の属性・プロパティ、テキストの子要素、ライブラリが提供するコンポーネントの props。`{count$.getSnapshot().value}` のような「一度だけ読まれて更新されない」誤りを型エラーにするためである。
+4. **データを受け取るスロットは `Bindable<T>`（`InitializedObservable<T> | Constant<T>`）だけを受け付け、素の `T` は受け付けない。** 定数は `constant()` で包む。対象は DOM の属性・プロパティ、テキストの子要素、ライブラリが提供するコンポーネントの props。`{Optional.unwrap(count$.getSnapshot())}` のような「一度だけ読まれて更新されない」誤りを型エラーにするためである。
     - 例外（データではないもの）: イベントハンドラ、`ref`、`For` の `key` 関数、子要素を返す関数。
 5. **束縛先に Observable を渡すなら初期値ありのもの（`InitializedObservable`）を要求する。** マウント時点で DOM に書く値が要るため。
 6. **条件分岐とリストには専用のコンポーネント（`If`、`Match` 系、`For`）を使う。** 本体の `if` や早期 return はリアクティブにならないため。条件分岐は `<If cond then else />` とし、2 つの分岐を対等な props として書く。
@@ -116,7 +116,7 @@ export const asConstant = <T>(value: T): Constant<T> => value as Constant<T>;
 - 素の値は `Constant<T>` に代入できない。`constant('btn')` の型は `Constant<'btn'>` でリテラル型を保つ。`Constant<T>` は `T` に代入できる。
 - `null` と `undefined` は `Observable` と同じ条件型で拒否する。`string | undefined` の値を渡すと引数の型は `string` に絞られるので、`constant(maybeStr)` は型エラーになる。属性が無いことは props の省略で、あったりなかったりする値は `InitializedObservable<T | undefined>` で表す。値が無い状態を定数で渡す必要は props の省略で常に代えられるので、`null` / `undefined` の定数は用意しない。そのため、ライブラリのコンポーネントは値が無いことを表す props を optional にする。
 - `constant(obs$)` は条件型で拒否する。
-- 残る穴は `constant(count$.getSnapshot().value)` だけで、明示的な呼び出しなので読めば分かり、検索でも見つかる。
+- 残る穴は `constant(Optional.unwrap(count$.getSnapshot()))` だけで、明示的な呼び出しなので読めば分かり、検索でも見つかる。
 - 自作コンポーネントが「初期値として一度だけ読む」props は `Constant<T>` で受ける（例: `initial: Constant<number>`）。呼び出し側は `initial={constant(0)}` と書くことになり、Observable も素の値も型エラーになるので、「一度だけ読む」ことが変数名の慣習ではなく型で表れる。受け取った側は `Constant<T>` をそのまま `T` として使える。
 - `constant` の短い別名は公式には用意しない。短く書きたい利用者は `import { constant as c } from 'synstate-dom'` のように import 時に名前を変える。
 
@@ -530,7 +530,7 @@ synstate の派生は遅延評価ではなく、親が更新されるたびに�
 
 TDD で、テストを先に書いて失敗を確認してから実装する。
 
-- **型テスト**（`expectType` と `@ts-expect-error`）: 素の値・`getSnapshot().value`・`null`・`undefined`・Observable を `constant` や `Bindable` スロットに渡すと型エラーになること。`constant('btn')` がリテラル型を保つこと。`<p>text</p>` が型エラーになること。イベントの `currentTarget` が要素の型に絞られること。
+- **型テスト**（`expectType` と `@ts-expect-error`）: 素の値・`Optional.unwrap(getSnapshot())`・`null`・`undefined`・Observable を `constant` や `Bindable` スロットに渡すと型エラーになること。`constant('btn')` がリテラル型を保つこと。`<p>text</p>` が型エラーになること。イベントの `currentTarget` が要素の型に絞られること。
 - **単体テスト**（Node、jsdom を使わずに済む部分）: `mapBindable` / `deriveBindable` が定数からノードを作らないこと。`jsx()` が DOM もコンポーネント呼び出しも行わないこと。
 - **ブラウザテスト**（`test/browser/`、Vitest browser + Playwright）:
     - 束縛: 属性・プロパティ・テキスト・`class`・`style`・イベントの初期値と更新。`Constant` と完了済み Observable は購読しないこと。

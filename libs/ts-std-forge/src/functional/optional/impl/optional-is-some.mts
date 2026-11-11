@@ -1,9 +1,15 @@
 import type { UnknownOptional } from '../optional.mjs';
-import { SomeTypeTagName } from './tag.mjs';
+import { noneValue } from './encoding.mjs';
 import type { NarrowToSome } from './types.mjs';
 
 /**
  * Checks if an {@link Optional} is {@link Some}. Acts as a type guard.
+ *
+ * It tells a `Some` from `None` in a value typed as an Optional; it does not
+ * validate untrusted input, in which any value other than the `None` string is
+ * a valid `Some`. Nor does it recognize an Optional made before Optional was
+ * unwrapped (`{ $$tag, value }`): it reads one, even an old `None`, as a `Some`
+ * of that object.
  *
  * @example
  *
@@ -14,7 +20,7 @@ import type { NarrowToSome } from './types.mjs';
  *   return;
  * }
  *
- * const value: number = optionalNumber.value;
+ * const value: number = Optional.unwrap(optionalNumber);
  *
  * assert.isTrue(value === 42);
  * ```
@@ -26,4 +32,4 @@ import type { NarrowToSome } from './types.mjs';
  */
 export const isSome = <O extends UnknownOptional>(
   optional: O,
-): optional is NarrowToSome<O> => optional.$$tag === SomeTypeTagName;
+): optional is NarrowToSome<O> => (optional as unknown) !== noneValue;

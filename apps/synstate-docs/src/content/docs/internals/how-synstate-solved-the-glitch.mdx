@@ -338,7 +338,7 @@ override tryUpdate(updateToken: UpdateToken): void {
             return; // a parent has no value yet
         }
 
-        this.values[i] = snapshot.value;
+        this.values[i] = Optional.unwrap(snapshot);
 
         if (parent.updateToken === updateToken) {
             updated = true;
@@ -373,8 +373,14 @@ override tryUpdate(updateToken: UpdateToken): void {
 
     const sn = par.getSnapshot();
 
-    if (Optional.isSome(sn) && this.#predicate(sn.value)) {
-        this.setNext(sn.value, updateToken); // stamp with token → "I updated"
+    if (Optional.isNone(sn)) {
+        return;
+    }
+
+    const value = Optional.unwrap(sn);
+
+    if (this.#predicate(value)) {
+        this.setNext(value, updateToken); // stamp with token → "I updated"
     }
     // If predicate fails: no setNext → updateToken stays stale → descendants know to skip
 }

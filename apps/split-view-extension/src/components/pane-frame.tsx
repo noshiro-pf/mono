@@ -13,7 +13,7 @@ import {
   listenInScope,
   type JSX,
 } from 'synstate-dom';
-import { Arr, fastDeepEqual } from 'ts-data-forge';
+import { Arr, fastDeepEqual, Optional } from 'ts-data-forge';
 import type { ReadonlyRecord } from 'ts-type-forge';
 import type {
   PaneId,
@@ -236,7 +236,7 @@ export const PaneFrame = ({
     addressInput: undefined,
     reportsSinceLoad: 0,
     leavingFor: undefined,
-    loadKey: model$.getSnapshot().value.loadKey,
+    loadKey: Optional.unwrap(model$.getSnapshot()).loadKey,
     greetingTimer: undefined,
     noAnswerTimer: undefined,
     resetTimer: undefined,
@@ -442,10 +442,11 @@ export const PaneFrame = ({
   model$.subscribe(() => {
     afterUpdate(() => {
       const { alwaysReset, blockedBySite, loadKey, siteOrigin } =
-        model$.getSnapshot().value;
+        Optional.unwrap(model$.getSnapshot());
 
-      const { resetUrl, resetAttemptedFor, automaticClears } =
-        load$.getSnapshot().value;
+      const { resetUrl, resetAttemptedFor, automaticClears } = Optional.unwrap(
+        load$.getSnapshot(),
+      );
 
       if (
         !alwaysReset ||
@@ -528,7 +529,7 @@ export const PaneFrame = ({
   };
 
   const handleReload = (): void => {
-    const { agentSeen, frameBlocked } = model$.getSnapshot().value;
+    const { agentSeen, frameBlocked } = Optional.unwrap(model$.getSnapshot());
 
     // Reloading through the agent keeps the frame's history; replacing the
     // element is the only way to reload a pane that has no agent — including
@@ -542,7 +543,7 @@ export const PaneFrame = ({
   };
 
   const handleResetServiceWorkers = (): void => {
-    const { siteOrigin } = model$.getSnapshot().value;
+    const { siteOrigin } = Optional.unwrap(model$.getSnapshot());
 
     if (siteOrigin !== undefined) {
       patchLoad({
@@ -553,7 +554,7 @@ export const PaneFrame = ({
   };
 
   const handleOpenExternally = (): void => {
-    const { address, frameBlocked } = model$.getSnapshot().value;
+    const { address, frameBlocked } = Optional.unwrap(model$.getSnapshot());
 
     // A pane that followed a link into a page that will not frame is still
     // showing the address it came from; the page wanted is the other one.
@@ -568,7 +569,7 @@ export const PaneFrame = ({
     dispatch({
       type: 'set-sandboxed',
       paneId,
-      sandboxed: !pane$.getSnapshot().value.sandboxed,
+      sandboxed: !Optional.unwrap(pane$.getSnapshot()).sandboxed,
     });
   };
 
@@ -587,7 +588,7 @@ export const PaneFrame = ({
   const menuActions: ReadonlyRecord<PaneMenuChoice, () => void> = {
     'clear-service-workers': handleResetServiceWorkers,
     'toggle-always-clear': () => {
-      const { alwaysReset, siteOrigin } = model$.getSnapshot().value;
+      const { alwaysReset, siteOrigin } = Optional.unwrap(model$.getSnapshot());
 
       if (siteOrigin !== undefined) {
         onToggleResetOrigin(siteOrigin, !alwaysReset);
@@ -715,7 +716,8 @@ export const PaneFrame = ({
 
             onNavigate(
               paneId,
-              mut_state.addressInput?.value ?? address$.getSnapshot().value,
+              mut_state.addressInput?.value ??
+                Optional.unwrap(address$.getSnapshot()),
             );
           }}
         >
@@ -855,7 +857,9 @@ export const PaneFrame = ({
                 title={constant('More for this pane')}
                 type={constant('button')}
                 onClick={() => {
-                  patchLoad({ menuOpen: !load$.getSnapshot().value.menuOpen });
+                  patchLoad({
+                    menuOpen: !Optional.unwrap(load$.getSnapshot()).menuOpen,
+                  });
                 }}
               >
                 <Icon icon={'more'} />
@@ -930,7 +934,7 @@ export const PaneFrame = ({
                 element.setAttribute('sandbox', paneSandboxTokens);
               }}
               class={constant('pane__helper')}
-              src={constant(resetUrl$.getSnapshot().value)}
+              src={constant(Optional.unwrap(resetUrl$.getSnapshot()))}
               title={constant('service worker reset')}
               onLoad={handleResetFrameLoad}
             />
@@ -958,7 +962,7 @@ export const PaneFrame = ({
 
                     // Set once, before `src` is bound: a change of it is a new
                     // element, as the key says.
-                    if (shown$.getSnapshot().value.sandboxed) {
+                    if (Optional.unwrap(shown$.getSnapshot()).sandboxed) {
                       element.setAttribute('sandbox', paneSandboxTokens);
                     }
 

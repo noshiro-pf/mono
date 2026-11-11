@@ -39,11 +39,13 @@ export const createAppRouter = (browser?: RouterBrowser): AppRouter => {
     )
     .pipe(map(([, location]) => router.parseHref(location.href)))
     .pipe(filter(Optional.isSome))
-    .pipe(map((href) => href.value));
+    .pipe(map((href) => Optional.unwrap(href)));
 
   const absoluteUrlOf = (href: Href): string => {
     // `toUrl` gives the path from the root: only the origin is taken.
-    const { origin } = new URL(router.location.getSnapshot().value.href);
+    const { origin } = new URL(
+      Optional.unwrap(router.location.getSnapshot()).href,
+    );
 
     const url = new URL(router.toUrl(href), origin);
 
@@ -58,9 +60,9 @@ export const createAppRouter = (browser?: RouterBrowser): AppRouter => {
     .pipe(scan((count: number) => count + 1, 0));
 
   const trackVisit = (): (() => boolean) => {
-    const visit = pageChanges$.getSnapshot().value;
+    const visit = Optional.unwrap(pageChanges$.getSnapshot());
 
-    return () => pageChanges$.getSnapshot().value === visit;
+    return () => Optional.unwrap(pageChanges$.getSnapshot()) === visit;
   };
 
   return {
@@ -72,7 +74,9 @@ export const createAppRouter = (browser?: RouterBrowser): AppRouter => {
       .at(routes.event.answer)
       .pipe(
         map((values) =>
-          Optional.isSome(values) ? values.value.params.eventId : undefined,
+          Optional.isSome(values)
+            ? Optional.unwrap(values).params.eventId
+            : undefined,
         ),
       ),
     editPageLeaves$: router

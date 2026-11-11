@@ -1,3 +1,4 @@
+import { Optional } from 'ts-data-forge';
 import {
   createMemoryBrowser,
   createRouter,
@@ -66,7 +67,7 @@ describe('router.redirects', () => {
       redirect: (m) => (m.route === 'old' ? routes.home.href() : undefined),
     });
 
-    assert.deepStrictEqual(router.redirects.getSnapshot().value, [
+    assert.deepStrictEqual(Optional.unwrap(router.redirects.getSnapshot()), [
       { from: 'https://example.com/old-home/', to: 'https://example.com/' },
     ]);
 
@@ -75,7 +76,7 @@ describe('router.redirects', () => {
     }
 
     assert.strictEqual(
-      router.redirects.getSnapshot().value.length,
+      Optional.unwrap(router.redirects.getSnapshot()).length,
       maxRedirectRecords,
     );
 

@@ -1,3 +1,4 @@
+import { Optional } from 'ts-data-forge';
 import { createToggleSectionState } from './create-toggle-section-state.mjs';
 
 describe(createToggleSectionState, () => {
@@ -12,9 +13,9 @@ describe(createToggleSectionState, () => {
 
     section.turnOff();
 
-    assert.isFalse(section.toggleState$.getSnapshot().value);
+    assert.isFalse(Optional.unwrap(section.toggleState$.getSnapshot()));
 
-    assert.isUndefined(section.value$.getSnapshot().value);
+    assert.isUndefined(Optional.unwrap(section.value$.getSnapshot()));
   });
 
   test('turning the section on sets the value given for that, as toggling it on does', () => {
@@ -27,16 +28,16 @@ describe(createToggleSectionState, () => {
 
     section.turnOn();
 
-    assert.isTrue(section.toggleState$.getSnapshot().value);
+    assert.isTrue(Optional.unwrap(section.toggleState$.getSnapshot()));
 
-    assert.strictEqual(section.value$.getSnapshot().value, 0);
-
-    section.toggle();
-
-    assert.isUndefined(section.value$.getSnapshot().value);
+    assert.strictEqual(Optional.unwrap(section.value$.getSnapshot()), 0);
 
     section.toggle();
 
-    assert.strictEqual(section.value$.getSnapshot().value, 0);
+    assert.isUndefined(Optional.unwrap(section.value$.getSnapshot()));
+
+    section.toggle();
+
+    assert.strictEqual(Optional.unwrap(section.value$.getSnapshot()), 0);
   });
 });

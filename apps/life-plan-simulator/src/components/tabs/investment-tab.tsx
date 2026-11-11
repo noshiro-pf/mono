@@ -1,7 +1,7 @@
 import { Card } from 'blueprint-synstate';
 import { createState, map } from 'synstate';
 import { constant, type Bindable, type JSX } from 'synstate-dom';
-import { Arr } from 'ts-data-forge';
+import { Arr, Optional } from 'ts-data-forge';
 import {
   withAge,
   type InvestmentAccountInput,
@@ -188,7 +188,7 @@ const oneOffColumns: readonly EditableColumn<OneOffAmount>[] = [
 const newStep = (id: number): MonthlyAmountFrom =>
   ({
     id,
-    start: input$.getSnapshot().value.profile.start,
+    start: Optional.unwrap(input$.getSnapshot()).profile.start,
     amount: 0,
   }) as const;
 
@@ -196,7 +196,7 @@ const newOneOff = (id: number): OneOffAmount =>
   ({
     id,
     name: '',
-    month: input$.getSnapshot().value.profile.start,
+    month: Optional.unwrap(input$.getSnapshot()).profile.start,
     amount: 0,
   }) as const;
 

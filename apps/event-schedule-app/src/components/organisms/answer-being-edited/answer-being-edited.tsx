@@ -10,7 +10,7 @@ import {
   type BindableValue,
   type JSX,
 } from 'synstate-dom';
-import type { IMapMapped } from 'ts-data-forge';
+import { Optional, type IMapMapped } from 'ts-data-forge';
 import { dict } from '../../../constants/index.mjs';
 import { createFormError } from '../../../hooks/index.mjs';
 import { AnswerPageStore, Auth } from '../../../store/index.mjs';
@@ -175,7 +175,9 @@ export const AnswerBeingEdited = ({
                           map((h) => h[iconId].iconDescription),
                         )}
                         onClick={() => {
-                          header$.getSnapshot().value[iconId].onClick();
+                          Optional.unwrap(header$.getSnapshot())[
+                            iconId
+                          ].onClick();
                         }}
                       />
                     </th>
@@ -190,7 +192,7 @@ export const AnswerBeingEdited = ({
             <For items={answerBeingEditedList$} key={(row) => row.key}>
               {(row$) => {
                 const row = (): BindableValue<typeof row$> =>
-                  row$.getSnapshot().value;
+                  Optional.unwrap(row$.getSnapshot());
 
                 const iconId = row$.pipe(
                   map((r) => r.answerSelectionValue.iconId),

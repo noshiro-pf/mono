@@ -13,6 +13,7 @@ import {
   type InitializedObservable,
   type Observable as SynstateObservable,
 } from 'synstate';
+import { Optional } from 'ts-data-forge';
 import { chosenTheme, type ColorScheme, type Theme } from '../theme.mjs';
 
 export type ThemeDeps = Readonly<{
@@ -50,7 +51,7 @@ export const createThemeStore = (deps: ThemeDeps): ThemeStore => {
     )
     .pipe(withInitialValue(deps.system.get()));
 
-  const getSystem = (): ColorScheme => system.getSnapshot().value;
+  const getSystem = (): ColorScheme => Optional.unwrap(system.getSnapshot());
 
   const choose = (picked: ColorScheme): void => {
     setTheme(chosenTheme(picked, getSystem()));

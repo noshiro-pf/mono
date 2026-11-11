@@ -63,10 +63,9 @@ export type Operator<A, B> =
 export type Observable<A> = Readonly<{
   /**
    * The value it holds as an `Optional`: `Optional.none` while it holds none.
-   * The same object while the value is the same, so a wrapper
-   * (`() => o.getSnapshot()`) can be handed to `useSyncExternalStore`. Built
-   * when it is read: the package itself never reads it, so an update allocates
-   * none.
+   * Equal under `Object.is` while the value is the same (an `Optional` holds
+   * its value unwrapped), so a wrapper (`() => o.getSnapshot()`) can be handed
+   * to `useSyncExternalStore`.
    */
   getSnapshot: (this: Observable<unknown>) => Optional<A>;
   /**

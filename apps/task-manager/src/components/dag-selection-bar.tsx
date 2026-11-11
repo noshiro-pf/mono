@@ -1,6 +1,6 @@
 import { map } from 'synstate';
 import { constant, If, type JSX } from 'synstate-dom';
-import { Arr } from 'ts-data-forge';
+import { Arr, Optional } from 'ts-data-forge';
 import { nodeRefOf } from '../domain/index.mjs';
 import { m } from '../i18n/index.mjs';
 import {
@@ -64,9 +64,9 @@ export const DagSelectionBar = (): JSX.Element => (
                 type={constant('button')}
                 onClick={() => {
                   bulkEditStore.open(
-                    dagSelectionStore.selected
-                      .getSnapshot()
-                      .value.map(nodeRefOf),
+                    Optional.unwrap(
+                      dagSelectionStore.selected.getSnapshot(),
+                    ).map(nodeRefOf),
                   );
                 }}
               >

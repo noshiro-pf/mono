@@ -1,7 +1,7 @@
 import { panic } from '../../../panic/index.mjs';
 import type { Optional, UnknownOptional } from '../optional.mjs';
 import { isSome } from './optional-is-some.mjs';
-import { unwrap } from './optional-unwrap.mjs';
+import { unwrapSome } from './optional-unwrap-some.mjs';
 import type { Unwrap } from './types.mjs';
 
 /**
@@ -69,7 +69,7 @@ const expectToBeImpl = <O extends UnknownOptional>(
   message: string,
 ): Unwrap<O> => {
   if (isSome(optional)) {
-    return unwrap(optional);
+    return unwrapSome(optional);
   }
 
   panic(message);

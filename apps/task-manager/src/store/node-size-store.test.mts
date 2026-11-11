@@ -1,3 +1,4 @@
+import { Optional } from 'ts-data-forge';
 import type { NodeSize } from '../view-model/index.mjs';
 import { createNodeSizeStore } from './node-size-store.mjs';
 
@@ -25,7 +26,7 @@ describe(createNodeSizeStore, () => {
   test('starts from the size read', () => {
     const { store } = setup('compact');
 
-    assert.strictEqual(store.size.getSnapshot().value, 'compact');
+    assert.strictEqual(Optional.unwrap(store.size.getSnapshot()), 'compact');
   });
 
   test('saves every change', () => {
@@ -37,6 +38,6 @@ describe(createNodeSizeStore, () => {
 
     assert.deepStrictEqual(saved, ['standard', 'compact', 'standard']);
 
-    assert.strictEqual(store.size.getSnapshot().value, 'standard');
+    assert.strictEqual(Optional.unwrap(store.size.getSnapshot()), 'standard');
   });
 });

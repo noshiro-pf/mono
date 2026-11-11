@@ -101,13 +101,15 @@ export const createAnswerFilterQueryParam = (
     ) => void,
     filterStateDispatch: (action: AnswerFilterStateAction) => void,
   ): void => {
-    const values = deps.router.at(routes.event.answer).getSnapshot().value;
+    const values = Optional.unwrap(
+      deps.router.at(routes.event.answer).getSnapshot(),
+    );
 
     if (Optional.isNone(values)) {
       return;
     }
 
-    const query = values.value.search;
+    const query = Optional.unwrap(values).search;
 
     setSortOrderAndKey([query['sort-by'], query['sort-order']]);
 

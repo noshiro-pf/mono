@@ -25,16 +25,27 @@ setCount(3);
 // The subscriber sees the current value first, then each update.
 assert.deepStrictEqual(mut_seen, [2, 4, 6]);
 
-// The snapshot is an Optional from ts-data-forge, not a bare value.
-assert.deepStrictEqual(doubled.getSnapshot().value, 6);
+// The snapshot is an Optional from ts-data-forge, which this project does not
+// declare. Up to synstate 8 it is `{ $$tag, value }`; from synstate 9 a Some of
+// a value that is not one of its reserved strings is the value itself.
+// `published/` runs this file against the last release, so it reads both.
+// It reads what this file asserts on (numbers), not a tagged value such as a
+// `Result`, which holds `$$tag` itself. Each smoke file runs alone in its own
+// project, so the helper is repeated in each that needs it.
+const valueOf = (snapshot) =>
+  typeof snapshot === 'object' && snapshot !== null && '$$tag' in snapshot
+    ? snapshot.value
+    : snapshot;
+
+assert.deepStrictEqual(valueOf(doubled.getSnapshot()), 6);
 
 // The authoring API: a custom creator, sync operator and async operator
-// built only from what the package exports. `Optional` is ts-data-forge's,
-// which this project does not declare, so an empty snapshot stands in for
-// `Optional.none`.
+// built only from what the package exports. An empty snapshot stands in for
+// `Optional.none`, and the values emitted below are truthy numbers, which
+// `valueOf` reads in either representation.
 const none = source().getSnapshot();
 
-const hasValue = (snapshot) => 'value' in snapshot;
+const hasValue = (snapshot) => snapshot !== none;
 
 const mut_listeners = new Set();
 
@@ -59,7 +70,7 @@ const double = (src) =>
         const sn = src.getSnapshot();
 
         if (src.updateToken === updateToken && hasValue(sn)) {
-          setNext(sn.value * 2, updateToken);
+          setNext(valueOf(sn) * 2, updateToken);
         }
       },
   );
@@ -76,7 +87,7 @@ const deferred = (src) =>
 
         if (src.updateToken === updateToken && hasValue(sn)) {
           mut_pending.push(() => {
-            startUpdate(sn.value);
+            startUpdate(valueOf(sn));
           });
         }
       },

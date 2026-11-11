@@ -1,6 +1,6 @@
 import { derive, map, type InitializedObservable } from 'synstate';
 import { constant, type JSX } from 'synstate-dom';
-import { Arr } from 'ts-data-forge';
+import { Arr, Optional } from 'ts-data-forge';
 import type { RectSize } from 'ts-utils-additional';
 import { dictionary, outlineColorDef } from '../../constants/index.mjs';
 import type { SelectAnswerBalloonProps } from '../../types/index.mjs';
@@ -80,7 +80,7 @@ export const SelectAnswerBalloon = ({ props }: Props): JSX.Element => {
               )}
               size={constant(smallestCardSize)}
               onClick={() => {
-                props.getSnapshot().value.onSelectedNumberChange(n);
+                Optional.unwrap(props.getSnapshot()).onSelectedNumberChange(n);
               }}
             />
           ))}
@@ -92,7 +92,7 @@ export const SelectAnswerBalloon = ({ props }: Props): JSX.Element => {
         >
           <Button
             onClick={() => {
-              props.getSnapshot().value.onCancelClick();
+              Optional.unwrap(props.getSnapshot()).onCancelClick();
             }}
           >
             {constant(dictionary.cancel)}
@@ -105,7 +105,7 @@ export const SelectAnswerBalloon = ({ props }: Props): JSX.Element => {
               ),
             )}
             onClick={() => {
-              props.getSnapshot().value.submitAnswer();
+              Optional.unwrap(props.getSnapshot()).submitAnswer();
             }}
           >
             {constant(dictionary.submitAnswer)}

@@ -28,7 +28,7 @@ const everyNth =
 
         mut_count = 0;
 
-        ctx.set(value.value);
+        ctx.set(Optional.unwrap(value));
       };
     });
 

@@ -51,7 +51,9 @@ export const mergedBlock = (
       <>
         {constant('Merged in the last 7 days')}
         {merged.pipe(
-          map((o) => (Optional.isSome(o) ? ` (${o.value.length})` : '')),
+          map((o) =>
+            Optional.isSome(o) ? ` (${Optional.unwrap(o).length})` : '',
+          ),
         )}
       </>
     ),

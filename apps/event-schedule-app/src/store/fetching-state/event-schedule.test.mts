@@ -1,6 +1,6 @@
 import { EventSchedule } from 'event-schedule-app-shared';
 import { createState } from 'synstate';
-import { Result } from 'ts-data-forge';
+import { Optional, Result } from 'ts-data-forge';
 import type { Api } from '../../api/index.mjs';
 import {
   createEventScheduleStore,
@@ -20,7 +20,7 @@ describe(createEventScheduleStore, () => {
     await settle(0);
 
     assert.deepStrictEqual(
-      store.eventSchedule$.getSnapshot().value,
+      Optional.unwrap(store.eventSchedule$.getSnapshot()),
       eventFixture,
     );
   });
@@ -90,13 +90,13 @@ describe(createEventScheduleStore, () => {
 
     assert.strictEqual(errorsLogged, 1);
 
-    const result = store.result$.getSnapshot().value;
+    const result = Optional.unwrap(store.result$.getSnapshot());
 
     assert.isDefined(result);
 
     assert.isTrue(Result.isErr(result));
 
-    assert.isUndefined(store.eventSchedule$.getSnapshot().value);
+    assert.isUndefined(Optional.unwrap(store.eventSchedule$.getSnapshot()));
   });
 
   test('drops a read still out when the store stops', async () => {
@@ -108,7 +108,7 @@ describe(createEventScheduleStore, () => {
 
     await settle(0);
 
-    assert.isUndefined(store.result$.getSnapshot().value);
+    assert.isUndefined(Optional.unwrap(store.result$.getSnapshot()));
   });
 
   test('stop ends the reading', () => {

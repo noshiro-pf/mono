@@ -102,7 +102,7 @@ class ScanObservableClass<A, B>
     }
 
     this.setNext(
-      this.#reducer(this.getSnapshot().value, psn.value),
+      this.#reducer(Optional.unwrap(this.getSnapshot()), Optional.unwrap(psn)),
       updateToken,
     );
   }

@@ -416,7 +416,7 @@ export class ObservableBaseClass<
     const updateToken = this.#mut_updateToken;
 
     // first emit
-    onNext(this.#mut_snapshot.value);
+    onNext(Optional.unwrap(this.#mut_snapshot));
 
     // `onNext` is not a subscriber while its first call runs, so what that call
     // wrote to this observable has reached no one (#3280). Unless the call
@@ -429,7 +429,7 @@ export class ObservableBaseClass<
       return this.#register(onNext, onComplete);
     }
 
-    const latest = this.#mut_snapshot.value;
+    const latest = Optional.unwrap(this.#mut_snapshot);
 
     // Before a completion that followed the write.
     if (this.#mut_isCompleted) {

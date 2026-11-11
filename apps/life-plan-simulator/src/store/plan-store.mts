@@ -29,6 +29,7 @@ import {
   hasKey,
   isRecord,
   isString,
+  Optional,
   Result,
   unknownToString,
 } from 'ts-data-forge';
@@ -146,10 +147,10 @@ export const createPlanStore = ({
   );
 
   const getCurrentPlan = (): Plan | undefined =>
-    currentPlan.getSnapshot().value;
+    Optional.unwrap(currentPlan.getSnapshot());
 
   const currentRepository = (): PlanRepository | undefined => {
-    const repository = followed.getSnapshot().value;
+    const repository = Optional.unwrap(followed.getSnapshot());
 
     return repository === 'stopped' ? undefined : repository;
   };
@@ -178,7 +179,7 @@ export const createPlanStore = ({
     name: (existing: readonly Plan[]) => string,
     planInput: SimulationInput,
   ): void => {
-    const state = plans.getSnapshot().value;
+    const state = Optional.unwrap(plans.getSnapshot());
 
     const repository = currentRepository();
 

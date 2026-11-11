@@ -1,11 +1,12 @@
 /* eslint-disable @stylistic/padding-line-between-statements */
 // embed-sample-code-ignore-above
 import { createState, derive, type InitializedObservable, map } from 'synstate';
+import { Optional } from 'ts-data-forge';
 
 const [count, setCount] = createState<number>(0);
 
 // 現在の値を取得
-console.log(count.getSnapshot().value); // 0
+console.log(Optional.unwrap(count.getSnapshot())); // 0
 
 // pipe で新しい Observable を派生
 const doubled: InitializedObservable<number> = count.pipe(map((n) => n * 2));

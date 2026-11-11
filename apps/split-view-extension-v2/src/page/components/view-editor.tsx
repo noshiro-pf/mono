@@ -5,6 +5,7 @@ import {
   type InitializedObservable,
 } from 'synstate';
 import { constant, createAfterUpdate, For, If, type JSX } from 'synstate-dom';
+import { Optional } from 'ts-data-forge';
 import type { ListEntry } from '../../core/index.mjs';
 
 /**
@@ -49,7 +50,7 @@ export const ViewEditor = ({
   const withEntry =
     (act: (entry: ListEntry) => void): (() => void) =>
     () => {
-      const entry = entry$.getSnapshot().value;
+      const entry = Optional.unwrap(entry$.getSnapshot());
 
       if (entry !== undefined) {
         act(entry);

@@ -5,6 +5,7 @@ import {
   type Bindable,
   type JSX,
 } from 'synstate-dom';
+import { Optional } from 'ts-data-forge';
 import {
   dict,
   notificationSettingsWithEmailDefaultValue,
@@ -93,7 +94,7 @@ export const EventSettings = ({
 
           // The email input is wanted next once notifications are turned on.
           afterUpdate(() => {
-            if (useNotification.getSnapshot().value) {
+            if (Optional.unwrap(useNotification.getSnapshot())) {
               focusEmailInput();
             }
           });

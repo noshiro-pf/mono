@@ -1,6 +1,6 @@
 import { map } from 'synstate';
 import { constant, For, If, type Bindable, type JSX } from 'synstate-dom';
-import { Arr } from 'ts-data-forge';
+import { Arr, Optional } from 'ts-data-forge';
 import {
   columnsOf,
   columnWidths,
@@ -202,7 +202,7 @@ export const ViewSettings = (): JSX.Element => {
           {(column$) => {
             // The key is the column, so the row's column is the one it was made
             // with.
-            const column = column$.getSnapshot().value;
+            const column = Optional.unwrap(column$.getSnapshot());
 
             const ids$ = layout$.pipe(
               map((layout) => columnsOf(layout)[column] ?? []),
@@ -225,7 +225,7 @@ export const ViewSettings = (): JSX.Element => {
                         {(id$, index$) => (
                           <ViewSettingsRow
                             column={column}
-                            id={id$.getSnapshot().value}
+                            id={Optional.unwrap(id$.getSnapshot())}
                             ids$={ids$}
                             index$={index$}
                           />

@@ -1,4 +1,5 @@
 import { createState, isObservable } from 'synstate';
+import { Optional } from 'ts-data-forge';
 import { constant } from './constant.mjs';
 import { toObservable } from './to-observable.mjs';
 
@@ -10,7 +11,7 @@ describe(toObservable, () => {
 
     assert.isTrue(result$.isCompleted);
 
-    assert.strictEqual(result$.getSnapshot().value, 'a');
+    assert.strictEqual(Optional.unwrap(result$.getSnapshot()), 'a');
   });
 
   test('an observable is returned as is', () => {

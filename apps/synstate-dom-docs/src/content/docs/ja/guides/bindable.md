@@ -19,6 +19,7 @@ JSX でデータを受け取る場所（属性、DOM のプロパティ、テキ
 ```tsx
 import { createState } from 'synstate';
 import { constant, type JSX } from 'synstate-dom';
+import { Optional } from 'ts-data-forge';
 
 const [count$] = createState(0);
 
@@ -32,13 +33,17 @@ export const Counter = (): JSX.Element => (
 // @ts-expect-error A plain string is not a Bindable: write constant('Hi').
 export const Plain = (): JSX.Element => <p>{'Hi'}</p>;
 
-// @ts-expect-error A snapshot would be written once and never updated.
-export const Stale = (): JSX.Element => <p>{count$.getSnapshot().value}</p>;
+export const Stale = (): JSX.Element => {
+    const count = Optional.unwrap(count$.getSnapshot());
+
+    // @ts-expect-error A snapshot would be written once and never updated.
+    return <p>{count}</p>;
+};
 ```
 
 `constant` は引数をそのまま返すだけです。`Constant<T>` は型の上にしか存在しないので、実行時のコストはかかりません。`constant('button')` と書けば、リテラル型 `Constant<'button'>` もそのまま保たれます。
 
-このルールがあるのは、上の 2 つ目のエラーを防ぐためです。`{count$.getSnapshot().value}` は状態を 1 回読むだけなので、二度と更新されない数値を書き込みます。素の値を受け付けてしまうと、これがコンパイルを通り、最初の更新までは正しい数値が表示されるので気づきにくくなります。synstate-dom ではこれがコンパイルエラーになります。
+このルールがあるのは、上の 2 つ目のエラーを防ぐためです。`Optional.unwrap(count$.getSnapshot())` で 1 回だけ読んだ `count` は、二度と更新されない数値を書き込みます。素の値を受け付けてしまうと、これがコンパイルを通り、最初の更新までは正しい数値が表示されるので気づきにくくなります。synstate-dom ではこれがコンパイルエラーになります。
 
 データでないものは素の値で渡します。イベントハンドラ、`ref`、`For` の `key` 関数、子要素を返す関数がそうです。
 

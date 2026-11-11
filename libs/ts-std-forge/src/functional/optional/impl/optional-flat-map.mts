@@ -1,7 +1,7 @@
 import type { Optional, UnknownOptional } from '../optional.mjs';
 import { isSome } from './optional-is-some.mjs';
 import { none } from './optional-none.mjs';
-import { unwrap } from './optional-unwrap.mjs';
+import { unwrapSome } from './optional-unwrap-some.mjs';
 import type { Unwrap } from './types.mjs';
 
 /**
@@ -72,4 +72,4 @@ export function flatMap<O extends UnknownOptional, S2>(
 const flatMapImpl = <O extends UnknownOptional, S2>(
   optional: O,
   flatMapFn: (value: Unwrap<O>) => Optional<S2>,
-): Optional<S2> => (isSome(optional) ? flatMapFn(unwrap(optional)) : none);
+): Optional<S2> => (isSome(optional) ? flatMapFn(unwrapSome(optional)) : none);

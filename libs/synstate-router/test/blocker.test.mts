@@ -1,5 +1,5 @@
 import { createState } from 'synstate';
-import { Arr, asSafeInt } from 'ts-data-forge';
+import { Arr, asSafeInt, Optional } from 'ts-data-forge';
 import {
   createMemoryBrowser,
   createRouter,
@@ -54,7 +54,10 @@ describe('router.block', () => {
 
     router.push(routes.home.href());
 
-    assert.strictEqual(router.match.getSnapshot().value.route, 'form');
+    assert.strictEqual(
+      Optional.unwrap(router.match.getSnapshot()).route,
+      'form',
+    );
 
     assert.strictEqual(browser.url().pathname, '/form/');
 
@@ -64,7 +67,7 @@ describe('router.block', () => {
     );
 
     assert.strictEqual(
-      statusOf(blocker.state.getSnapshot().value),
+      statusOf(Optional.unwrap(blocker.state.getSnapshot())),
       'blocked → home',
     );
 
@@ -80,19 +83,25 @@ describe('router.block', () => {
 
     router.push(routes.home.href());
 
-    const blocked = blocker.state.getSnapshot().value;
+    const blocked = Optional.unwrap(blocker.state.getSnapshot());
 
     assert.isTrue(blocked.status === 'blocked');
 
     blocked.proceed();
 
-    assert.strictEqual(router.match.getSnapshot().value.route, 'home');
+    assert.strictEqual(
+      Optional.unwrap(router.match.getSnapshot()).route,
+      'home',
+    );
 
-    assert.strictEqual(statusOf(blocker.state.getSnapshot().value), 'idle');
+    assert.strictEqual(
+      statusOf(Optional.unwrap(blocker.state.getSnapshot())),
+      'idle',
+    );
 
     router.push(routes.form.href());
 
-    const again = blocker.state.getSnapshot().value;
+    const again = Optional.unwrap(blocker.state.getSnapshot());
 
     assert.isTrue(again.status === 'blocked');
 
@@ -100,7 +109,10 @@ describe('router.block', () => {
 
     assert.strictEqual(browser.url().pathname, '/');
 
-    assert.strictEqual(statusOf(blocker.state.getSnapshot().value), 'idle');
+    assert.strictEqual(
+      statusOf(Optional.unwrap(blocker.state.getSnapshot())),
+      'idle',
+    );
 
     router.dispose();
   });
@@ -113,17 +125,20 @@ describe('router.block', () => {
 
     router.setSearch(routes.form, () => ({ tab: 'b' }));
 
-    assert.strictEqual(statusOf(blocker.state.getSnapshot().value), 'idle');
+    assert.strictEqual(
+      statusOf(Optional.unwrap(blocker.state.getSnapshot())),
+      'idle',
+    );
 
     assert.strictEqual(
-      router.location.getSnapshot().value.search.get('tab'),
+      Optional.unwrap(router.location.getSnapshot()).search.get('tab'),
       'b',
     );
 
     router.replace(routes.products.item.href({ productId: asSafeInt(1) }));
 
     assert.strictEqual(
-      statusOf(blocker.state.getSnapshot().value),
+      statusOf(Optional.unwrap(blocker.state.getSnapshot())),
       'blocked → products.item',
     );
 
@@ -137,7 +152,9 @@ describe('router.block', () => {
 
     assert.isTrue(router.setSearch(routes.form, () => ({ tab: 'x' })));
 
-    assert.isNull(router.location.getSnapshot().value.search.get('tab'));
+    assert.isNull(
+      Optional.unwrap(router.location.getSnapshot()).search.get('tab'),
+    );
 
     const [href$, setHref] = createState(routes.form.href());
 
@@ -147,10 +164,13 @@ describe('router.block', () => {
 
     await Promise.resolve();
 
-    assert.strictEqual(router.match.getSnapshot().value.route, 'form');
+    assert.strictEqual(
+      Optional.unwrap(router.match.getSnapshot()).route,
+      'form',
+    );
 
     assert.strictEqual(
-      statusOf(blocker.state.getSnapshot().value),
+      statusOf(Optional.unwrap(blocker.state.getSnapshot())),
       'blocked → home',
     );
 
@@ -181,7 +201,7 @@ describe('router.block', () => {
 
     assert.deepStrictEqual(mut_seen, ['form']);
 
-    const blocked = blocker.state.getSnapshot().value;
+    const blocked = Optional.unwrap(blocker.state.getSnapshot());
 
     assert.isTrue(blocked.status === 'blocked' && blocked.to.route === 'home');
 
@@ -224,11 +244,17 @@ describe('router.block', () => {
     // Each press was asked about, and the page stays.
     assert.isTrue(Arr.isMinLengthArray(2, mut_asked));
 
-    assert.strictEqual(router.match.getSnapshot().value.route, 'form');
+    assert.strictEqual(
+      Optional.unwrap(router.match.getSnapshot()).route,
+      'form',
+    );
 
     assert.strictEqual(browser.url().search, '?tab=b');
 
-    assert.strictEqual(blocker.state.getSnapshot().value.status, 'blocked');
+    assert.strictEqual(
+      Optional.unwrap(blocker.state.getSnapshot()).status,
+      'blocked',
+    );
 
     router.dispose();
   });
@@ -252,10 +278,13 @@ describe('router.block', () => {
 
     assert.strictEqual(browser.url().pathname, '/');
 
-    assert.strictEqual(router.match.getSnapshot().value.route, 'home');
+    assert.strictEqual(
+      Optional.unwrap(router.match.getSnapshot()).route,
+      'home',
+    );
 
     assert.strictEqual(
-      statusOf(blocker.state.getSnapshot().value),
+      statusOf(Optional.unwrap(blocker.state.getSnapshot())),
       'blocked → form',
     );
 
@@ -268,7 +297,7 @@ describe('router.block', () => {
     const [dirty, setDirty] = createState(true);
 
     const blocker = router.block(
-      ({ to }) => to !== undefined || dirty.getSnapshot().value,
+      ({ to }) => to !== undefined || Optional.unwrap(dirty.getSnapshot()),
     );
 
     assert.isTrue(browser.unload());
@@ -296,13 +325,19 @@ describe('router.block', () => {
 
     router.push(routes.home.href());
 
-    assert.strictEqual(router.match.getSnapshot().value.route, 'home');
+    assert.strictEqual(
+      Optional.unwrap(router.match.getSnapshot()).route,
+      'home',
+    );
 
     const other = router.block(() => true);
 
     router.dispose();
 
-    assert.strictEqual(statusOf(other.state.getSnapshot().value), 'idle');
+    assert.strictEqual(
+      statusOf(Optional.unwrap(other.state.getSnapshot())),
+      'idle',
+    );
   });
 
   test('a move that goes through drops the one held', () => {
@@ -312,13 +347,22 @@ describe('router.block', () => {
 
     router.push(routes.home.href());
 
-    assert.strictEqual(blocker.state.getSnapshot().value.status, 'blocked');
+    assert.strictEqual(
+      Optional.unwrap(blocker.state.getSnapshot()).status,
+      'blocked',
+    );
 
     router.push(routes.products.item.href({ productId: asSafeInt(2) }));
 
-    assert.strictEqual(router.match.getSnapshot().value.route, 'products.item');
+    assert.strictEqual(
+      Optional.unwrap(router.match.getSnapshot()).route,
+      'products.item',
+    );
 
-    assert.strictEqual(blocker.state.getSnapshot().value.status, 'idle');
+    assert.strictEqual(
+      Optional.unwrap(blocker.state.getSnapshot()).status,
+      'idle',
+    );
 
     router.dispose();
   });

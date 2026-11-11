@@ -234,7 +234,7 @@ class MergeMapObservableClass<A, B>
       return; // skip update
     }
 
-    this.#project(sn.value, updateToken);
+    this.#project(Optional.unwrap(sn), updateToken);
   }
 
   /** Releases the inner observables, and only those this operator made. */

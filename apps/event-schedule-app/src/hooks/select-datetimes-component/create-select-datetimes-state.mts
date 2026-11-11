@@ -1,5 +1,5 @@
 import { map, type InitializedObservable } from 'synstate';
-import type { SizeType } from 'ts-data-forge';
+import { Optional, type SizeType } from 'ts-data-forge';
 import type { DayOfWeekName, ReadonlyRecord } from 'ts-type-forge';
 import { yearMonthDateInitialValue } from '../../constants/index.mjs';
 import {
@@ -36,7 +36,7 @@ export const createSelectDatetimesState = (
 ): SelectDatetimesState => {
   const dispatch = (action: DatetimeListReducerAction): void => {
     onDatetimeListChange(
-      datetimeListReducer(datetimeList$.getSnapshot().value, action),
+      datetimeListReducer(Optional.unwrap(datetimeList$.getSnapshot()), action),
     );
   };
 
@@ -55,7 +55,9 @@ export const createSelectDatetimesState = (
       dispatch({
         type: 'fromCalendar',
         list,
-        mostFrequentTimeRange: mostFrequentTimeRange$.getSnapshot().value,
+        mostFrequentTimeRange: Optional.unwrap(
+          mostFrequentTimeRange$.getSnapshot(),
+        ),
       });
     },
     onYmdChange: (index, ymd) => {
@@ -78,7 +80,7 @@ export const createSelectDatetimesState = (
         type: 'addClick',
         datetimeRange: {
           ymd: yearMonthDateInitialValue(),
-          timeRange: mostFrequentTimeRange$.getSnapshot().value,
+          timeRange: Optional.unwrap(mostFrequentTimeRange$.getSnapshot()),
         },
       });
     },

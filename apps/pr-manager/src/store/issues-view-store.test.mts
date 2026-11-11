@@ -1,4 +1,5 @@
 import { createState } from 'synstate';
+import { Optional } from 'ts-data-forge';
 import { NATURAL_ZOOM, type DagZoom } from '../dag-zoom.mjs';
 import { DEFAULT_ISSUE_FILTER, type IssueFilter } from '../issue-filter.mjs';
 import {
@@ -18,7 +19,7 @@ describe(createIssuesViewStore, () => {
       initial: { view: 'dag' },
     });
 
-    assert.strictEqual(store.view.getSnapshot().value, 'dag');
+    assert.strictEqual(Optional.unwrap(store.view.getSnapshot()), 'dag');
 
     store.choose('list');
 
@@ -54,11 +55,14 @@ describe(createIssuesViewStore, () => {
       referenced: [],
     });
 
-    assert.deepStrictEqual(store.graph.getSnapshot().value.edges, [
+    assert.deepStrictEqual(Optional.unwrap(store.graph.getSnapshot()).edges, [
       { from: 1, to: 2, kind: 'start-after' },
     ]);
 
-    assert.strictEqual(store.layout.getSnapshot().value.nodes.length, 2);
+    assert.strictEqual(
+      Optional.unwrap(store.layout.getSnapshot()).nodes.length,
+      2,
+    );
 
     const drawn = mut_graphs.length;
 
@@ -133,17 +137,21 @@ describe(createIssuesViewStore, () => {
     });
 
     assert.deepStrictEqual(
-      store.graph.getSnapshot().value.nodes.map(({ number }) => number),
+      Optional.unwrap(store.graph.getSnapshot()).nodes.map(
+        ({ number }) => number,
+      ),
       [4, 5],
     );
 
     assert.deepStrictEqual(
-      store.layout.getSnapshot().value.nodes.map(({ number }) => number),
+      Optional.unwrap(store.layout.getSnapshot()).nodes.map(
+        ({ number }) => number,
+      ),
       [4, 5],
     );
 
     // The wait on what is done is over, and is not drawn either.
-    assert.deepStrictEqual(store.graph.getSnapshot().value.edges, [
+    assert.deepStrictEqual(Optional.unwrap(store.graph.getSnapshot()).edges, [
       { from: 4, to: 5, kind: 'start-after' },
     ]);
   });
@@ -161,21 +169,26 @@ describe(createIssuesViewStore, () => {
       referenced: [referencedIssue(3, 'abandoned')],
     });
 
-    assert.deepStrictEqual(store.counts.getSnapshot().value.priorities.hold, {
-      shown: 1,
-      total: 1,
-    });
+    assert.deepStrictEqual(
+      Optional.unwrap(store.counts.getSnapshot()).priorities.hold,
+      {
+        shown: 1,
+        total: 1,
+      },
+    );
 
     setFilter({ ...DEFAULT_ISSUE_FILTER, hiddenPriorities: ['hold'] });
 
     // #5 stays because #6 waits on it, without #3, which only #5 waits on.
     assert.deepStrictEqual(
-      store.layout.getSnapshot().value.nodes.map(({ number }) => number),
+      Optional.unwrap(store.layout.getSnapshot()).nodes.map(
+        ({ number }) => number,
+      ),
       [5, 6],
     );
 
     // Switched off, hold reads what switching it on would draw.
-    assert.deepStrictEqual(store.counts.getSnapshot().value, {
+    assert.deepStrictEqual(Optional.unwrap(store.counts.getSnapshot()), {
       open: { shown: 1, total: 2 },
       priorities: {
         S: { shown: 0, total: 0 },
@@ -193,7 +206,9 @@ describe(createIssuesViewStore, () => {
     setFilter(DEFAULT_ISSUE_FILTER);
 
     assert.deepStrictEqual(
-      store.graph.getSnapshot().value.nodes.map(({ number }) => number),
+      Optional.unwrap(store.graph.getSnapshot()).nodes.map(
+        ({ number }) => number,
+      ),
       [3, 5, 6],
     );
   });
@@ -213,7 +228,7 @@ describe(createIssuesViewStore, () => {
       referenced: [referencedIssue(9, 'waiting')],
     });
 
-    assert.deepStrictEqual(store.counts.getSnapshot().value, {
+    assert.deepStrictEqual(Optional.unwrap(store.counts.getSnapshot()), {
       open: { shown: 4, total: 4 },
       priorities: {
         S: { shown: 1, total: 1 },
@@ -233,7 +248,9 @@ describe(createIssuesViewStore, () => {
     // #1 stays, alone, since #2 waits on it; #9, which only #1 waits on,
     // goes with it.
     assert.deepStrictEqual(
-      store.graph.getSnapshot().value.nodes.map(({ number }) => number),
+      Optional.unwrap(store.graph.getSnapshot()).nodes.map(
+        ({ number }) => number,
+      ),
       [1, 2, 3],
     );
 
@@ -241,12 +258,14 @@ describe(createIssuesViewStore, () => {
     setFilter({ ...DEFAULT_ISSUE_FILTER, hiddenPriorities: ['D'] });
 
     assert.deepStrictEqual(
-      store.graph.getSnapshot().value.nodes.map(({ number }) => number),
+      Optional.unwrap(store.graph.getSnapshot()).nodes.map(
+        ({ number }) => number,
+      ),
       [1, 4, 9],
     );
 
     // A tier switched off counts what switching it on would draw.
-    assert.deepStrictEqual(store.counts.getSnapshot().value, {
+    assert.deepStrictEqual(Optional.unwrap(store.counts.getSnapshot()), {
       open: { shown: 2, total: 4 },
       priorities: {
         S: { shown: 1, total: 1 },
@@ -278,41 +297,46 @@ describe(createIssuesViewStore, () => {
     setFilter({ ...DEFAULT_ISSUE_FILTER, hiddenPriorities: ['D'] });
 
     assert.deepStrictEqual(
-      store.graph.getSnapshot().value.nodes.map(({ number }) => number),
+      Optional.unwrap(store.graph.getSnapshot()).nodes.map(
+        ({ number }) => number,
+      ),
       [1, 2],
     );
 
     setFilter({ ...DEFAULT_ISSUE_FILTER, hiddenPriorities: ['D', 'hold'] });
 
-    assert.deepStrictEqual(store.graph.getSnapshot().value.nodes, []);
+    assert.deepStrictEqual(
+      Optional.unwrap(store.graph.getSnapshot()).nodes,
+      [],
+    );
   });
 
   test('draws the DAG at its natural size until told otherwise, and steps a zoom in and out', () => {
     const { store } = setup();
 
-    assert.strictEqual(store.dagScale.getSnapshot().value, 1);
+    assert.strictEqual(Optional.unwrap(store.dagScale.getSnapshot()), 1);
 
-    assert.isFalse(store.dagFitted.getSnapshot().value);
+    assert.isFalse(Optional.unwrap(store.dagFitted.getSnapshot()));
 
     store.zoomIn();
 
-    assert.strictEqual(store.dagScale.getSnapshot().value, 1.1);
+    assert.strictEqual(Optional.unwrap(store.dagScale.getSnapshot()), 1.1);
 
     store.zoomOut();
 
     store.zoomOut();
 
-    assert.strictEqual(store.dagScale.getSnapshot().value, 0.9);
+    assert.strictEqual(Optional.unwrap(store.dagScale.getSnapshot()), 0.9);
 
     store.resetZoom();
 
-    assert.strictEqual(store.dagScale.getSnapshot().value, 1);
+    assert.strictEqual(Optional.unwrap(store.dagScale.getSnapshot()), 1);
   });
 
   test('starts at the zoom it is given, and hands every change to save as it starts', () => {
     const { store, savedZoom } = setup({ initialZoom: { type: 'fit' } });
 
-    assert.isTrue(store.dagFitted.getSnapshot().value);
+    assert.isTrue(Optional.unwrap(store.dagFitted.getSnapshot()));
 
     const stopStore = store.start();
 
@@ -340,11 +364,11 @@ describe(createIssuesViewStore, () => {
   test('a scale it is given is drawn as it is', () => {
     const { store } = setup({ initialZoom: { type: 'scale', scale: 1.5 } });
 
-    assert.strictEqual(store.dagScale.getSnapshot().value, 1.5);
+    assert.strictEqual(Optional.unwrap(store.dagScale.getSnapshot()), 1.5);
 
     store.zoomIn();
 
-    assert.strictEqual(store.dagScale.getSnapshot().value, 1.75);
+    assert.strictEqual(Optional.unwrap(store.dagScale.getSnapshot()), 1.75);
   });
 
   test('the fit puts the whole graph in the box, and follows the box and the graph until a zoom', () => {
@@ -357,19 +381,19 @@ describe(createIssuesViewStore, () => {
       referenced: [],
     });
 
-    const { width, height } = store.layout.getSnapshot().value;
+    const { width, height } = Optional.unwrap(store.layout.getSnapshot());
 
     store.setDagBox({ width: width / 2, height: height * 4 });
 
     store.fitDag();
 
-    assert.isTrue(store.dagFitted.getSnapshot().value);
+    assert.isTrue(Optional.unwrap(store.dagFitted.getSnapshot()));
 
-    assert.strictEqual(store.dagScale.getSnapshot().value, 0.5);
+    assert.strictEqual(Optional.unwrap(store.dagScale.getSnapshot()), 0.5);
 
     store.setDagBox({ width: width / 4, height: height * 4 });
 
-    assert.strictEqual(store.dagScale.getSnapshot().value, 0.25);
+    assert.strictEqual(Optional.unwrap(store.dagScale.getSnapshot()), 0.25);
 
     // One more column makes the graph wider, and the fit smaller.
     setIssues({
@@ -384,26 +408,26 @@ describe(createIssuesViewStore, () => {
       referenced: [],
     });
 
-    assert.isBelow(store.dagScale.getSnapshot().value, 0.25);
+    assert.isBelow(Optional.unwrap(store.dagScale.getSnapshot()), 0.25);
 
     // A zoom starts from the fit, and leaves it.
     store.zoomIn();
 
-    assert.isFalse(store.dagFitted.getSnapshot().value);
+    assert.isFalse(Optional.unwrap(store.dagFitted.getSnapshot()));
 
-    assert.strictEqual(store.dagScale.getSnapshot().value, 0.25);
+    assert.strictEqual(Optional.unwrap(store.dagScale.getSnapshot()), 0.25);
 
     store.setDagBox({ width: width * 4, height: height * 4 });
 
-    assert.strictEqual(store.dagScale.getSnapshot().value, 0.25);
+    assert.strictEqual(Optional.unwrap(store.dagScale.getSnapshot()), 0.25);
 
     store.fitDag();
 
-    assert.strictEqual(store.dagScale.getSnapshot().value, 1);
+    assert.strictEqual(Optional.unwrap(store.dagScale.getSnapshot()), 1);
 
     store.resetZoom();
 
-    assert.isFalse(store.dagFitted.getSnapshot().value);
+    assert.isFalse(Optional.unwrap(store.dagFitted.getSnapshot()));
   });
 
   test('the fit arranges what has no edge for the box, a zoom keeps that arrangement, and 100% puts the default back', () => {
@@ -420,27 +444,30 @@ describe(createIssuesViewStore, () => {
       referenced: [],
     });
 
-    const natural = store.layout.getSnapshot().value;
+    const natural = Optional.unwrap(store.layout.getSnapshot());
 
     // Wide and short: twelve under the pair, three to a row, would be small.
     store.setDagBox({ width: natural.width * 3, height: natural.height / 3 });
 
     store.fitDag();
 
-    const fitted = store.layout.getSnapshot().value;
+    const fitted = Optional.unwrap(store.layout.getSnapshot());
 
     assert.notDeepEqual(fitted.nodes, natural.nodes);
 
     // The default arrangement would be held to a third by the box's height.
-    assert.isAbove(store.dagScale.getSnapshot().value, 0.34);
+    assert.isAbove(Optional.unwrap(store.dagScale.getSnapshot()), 0.34);
 
     store.zoomIn();
 
-    assert.deepStrictEqual(store.layout.getSnapshot().value, fitted);
+    assert.deepStrictEqual(Optional.unwrap(store.layout.getSnapshot()), fitted);
 
     store.resetZoom();
 
-    assert.deepStrictEqual(store.layout.getSnapshot().value, natural);
+    assert.deepStrictEqual(
+      Optional.unwrap(store.layout.getSnapshot()),
+      natural,
+    );
   });
 
   test('a scale it is given draws what has no edge where it goes by default, whatever the box', () => {
@@ -459,7 +486,7 @@ describe(createIssuesViewStore, () => {
 
     atNatural.setIssues(issues);
 
-    const natural = atNatural.store.layout.getSnapshot().value;
+    const natural = Optional.unwrap(atNatural.store.layout.getSnapshot());
 
     const { store, setIssues } = setup({
       initialZoom: { type: 'scale', scale: 0.5 },
@@ -479,13 +506,19 @@ describe(createIssuesViewStore, () => {
 
     fitted.store.setDagBox(box);
 
-    assert.notDeepEqual(fitted.store.layout.getSnapshot().value, natural);
+    assert.notDeepEqual(
+      Optional.unwrap(fitted.store.layout.getSnapshot()),
+      natural,
+    );
 
     store.setDagBox(box);
 
-    assert.deepStrictEqual(store.layout.getSnapshot().value, natural);
+    assert.deepStrictEqual(
+      Optional.unwrap(store.layout.getSnapshot()),
+      natural,
+    );
 
-    assert.strictEqual(store.dagScale.getSnapshot().value, 0.5);
+    assert.strictEqual(Optional.unwrap(store.dagScale.getSnapshot()), 0.5);
   });
 });
 

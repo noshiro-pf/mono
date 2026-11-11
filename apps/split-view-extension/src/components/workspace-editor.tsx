@@ -13,6 +13,7 @@ import {
   type Bindable,
   type JSX,
 } from 'synstate-dom';
+import { Optional } from 'ts-data-forge';
 import type { WorkspaceEntry } from '../state/index.mjs';
 
 /**
@@ -75,7 +76,7 @@ export const WorkspaceEditor = ({
   const withEntry =
     (act: (entry: WorkspaceEntry) => void): (() => void) =>
     () => {
-      const entry = entry$.getSnapshot().value;
+      const entry = Optional.unwrap(entry$.getSnapshot());
 
       if (entry !== undefined) {
         act(entry);

@@ -1,3 +1,4 @@
+import { Optional } from 'ts-data-forge';
 import {
   DEFAULT_LAYOUT,
   withColumns,
@@ -39,25 +40,34 @@ describe(createLayoutStore, () => {
 
     store.resizeTo(500);
 
-    assert.deepStrictEqual(store.layout.getSnapshot().value.heights, {});
+    assert.deepStrictEqual(
+      Optional.unwrap(store.layout.getSnapshot()).heights,
+      {},
+    );
 
     store.startResize('open', 100, 300);
 
     store.resizeTo(160);
 
-    assert.deepStrictEqual(store.layout.getSnapshot().value.heights, {
-      open: 360,
-    });
+    assert.deepStrictEqual(
+      Optional.unwrap(store.layout.getSnapshot()).heights,
+      {
+        open: 360,
+      },
+    );
 
     store.endResize();
 
     store.resizeTo(900);
 
-    assert.isUndefined(store.resizing.getSnapshot().value);
+    assert.isUndefined(Optional.unwrap(store.resizing.getSnapshot()));
 
-    assert.deepStrictEqual(store.layout.getSnapshot().value.heights, {
-      open: 360,
-    });
+    assert.deepStrictEqual(
+      Optional.unwrap(store.layout.getSnapshot()).heights,
+      {
+        open: 360,
+      },
+    );
   });
 
   test('a boundary drag shares the height between two blocks', () => {
@@ -75,7 +85,7 @@ describe(createLayoutStore, () => {
 
     store.resizeTo(150);
 
-    assert.deepStrictEqual(store.layout.getSnapshot().value.shares, {
+    assert.deepStrictEqual(Optional.unwrap(store.layout.getSnapshot()).shares, {
       merged: 125,
       issues: 75,
     });
@@ -84,14 +94,14 @@ describe(createLayoutStore, () => {
 
     store.resizeTo(300);
 
-    assert.deepStrictEqual(store.layout.getSnapshot().value.shares, {
+    assert.deepStrictEqual(Optional.unwrap(store.layout.getSnapshot()).shares, {
       merged: 125,
       issues: 75,
     });
 
     store.evenShares(['merged', 'issues']);
 
-    assert.deepStrictEqual(store.layout.getSnapshot().value.shares, {
+    assert.deepStrictEqual(Optional.unwrap(store.layout.getSnapshot()).shares, {
       merged: 100,
       issues: 100,
     });
@@ -114,7 +124,7 @@ describe(createLayoutStore, () => {
 
     assert.deepStrictEqual(mut_modes, ['natural', 'fill', 'natural']);
 
-    assert.deepStrictEqual(store.layout.getSnapshot().value.shares, {
+    assert.deepStrictEqual(Optional.unwrap(store.layout.getSnapshot()).shares, {
       open: 50,
     });
   });
@@ -122,15 +132,15 @@ describe(createLayoutStore, () => {
   test('the settings open and close', () => {
     const { store } = setup(DEFAULT_LAYOUT);
 
-    assert.isFalse(store.settingsOpen.getSnapshot().value);
+    assert.isFalse(Optional.unwrap(store.settingsOpen.getSnapshot()));
 
     store.openSettings();
 
-    assert.isTrue(store.settingsOpen.getSnapshot().value);
+    assert.isTrue(Optional.unwrap(store.settingsOpen.getSnapshot()));
 
     store.closeSettings();
 
-    assert.isFalse(store.settingsOpen.getSnapshot().value);
+    assert.isFalse(Optional.unwrap(store.settingsOpen.getSnapshot()));
   });
 
   test('reset puts the default back', () => {
@@ -140,7 +150,10 @@ describe(createLayoutStore, () => {
 
     store.reset();
 
-    assert.deepStrictEqual(store.layout.getSnapshot().value, DEFAULT_LAYOUT);
+    assert.deepStrictEqual(
+      Optional.unwrap(store.layout.getSnapshot()),
+      DEFAULT_LAYOUT,
+    );
   });
 
   test('the line between two of three columns moves with the pointer, and a double click evens them', () => {
@@ -150,11 +163,17 @@ describe(createLayoutStore, () => {
 
     store.setLine(0, 20);
 
-    assert.deepStrictEqual(store.layout.getSnapshot().value.lines, [20, 80]);
+    assert.deepStrictEqual(
+      Optional.unwrap(store.layout.getSnapshot()).lines,
+      [20, 80],
+    );
 
     store.evenLine(0);
 
-    assert.deepStrictEqual(store.layout.getSnapshot().value.lines, [40, 80]);
+    assert.deepStrictEqual(
+      Optional.unwrap(store.layout.getSnapshot()).lines,
+      [40, 80],
+    );
   });
 
   test('makes tabs, shows one, and steps a block among them', () => {
@@ -164,15 +183,26 @@ describe(createLayoutStore, () => {
 
     store.selectTab('runs');
 
-    assert.deepStrictEqual(store.layout.getSnapshot().value.tabbed, ['runs']);
+    assert.deepStrictEqual(Optional.unwrap(store.layout.getSnapshot()).tabbed, [
+      'runs',
+    ]);
 
-    assert.deepStrictEqual(store.layout.getSnapshot().value.selected, ['runs']);
+    assert.deepStrictEqual(
+      Optional.unwrap(store.layout.getSnapshot()).selected,
+      ['runs'],
+    );
 
     store.step('runs', 'down');
 
-    assert.deepStrictEqual(store.layout.getSnapshot().value.tabbed, []);
+    assert.deepStrictEqual(
+      Optional.unwrap(store.layout.getSnapshot()).tabbed,
+      [],
+    );
 
-    assert.deepStrictEqual(store.layout.getSnapshot().value.selected, []);
+    assert.deepStrictEqual(
+      Optional.unwrap(store.layout.getSnapshot()).selected,
+      [],
+    );
   });
 
   test('stop ends the saving, a change still waiting included', async () => {

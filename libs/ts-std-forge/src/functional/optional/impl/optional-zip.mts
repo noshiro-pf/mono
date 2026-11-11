@@ -2,6 +2,7 @@ import type { Optional } from '../optional.mjs';
 import { isSome } from './optional-is-some.mjs';
 import { none } from './optional-none.mjs';
 import { some } from './optional-some.mjs';
+import { unwrapSome } from './optional-unwrap-some.mjs';
 
 /**
  * Combines two `Optional` values into a single `Optional` containing a tuple.
@@ -17,7 +18,7 @@ import { some } from './optional-some.mjs';
  * if (Optional.isSome(zipped)) {
  *   const expected: readonly [string, number] = ['left', 1] as const;
  *
- *   assert.deepStrictEqual(zipped.value, expected);
+ *   assert.deepStrictEqual(Optional.unwrap(zipped), expected);
  * }
  *
  * const missing = Optional.zip(
@@ -40,5 +41,5 @@ export const zip = <A, const B>(
   optionalB: Optional<B>,
 ): Optional<readonly [A, B]> =>
   isSome(optionalA) && isSome(optionalB)
-    ? some([optionalA.value, optionalB.value] as const)
+    ? some([unwrapSome(optionalA), unwrapSome(optionalB)] as const)
     : none;

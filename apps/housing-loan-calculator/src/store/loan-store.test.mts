@@ -20,7 +20,10 @@ describe(createLoanStore, () => {
   test('starts from the defaults when the URL names nothing', () => {
     const { store } = setup('https://example.com/mono/loan/');
 
-    assert.deepStrictEqual(store.inputs.getSnapshot().value, defaultValues);
+    assert.deepStrictEqual(
+      Optional.unwrap(store.inputs.getSnapshot()),
+      defaultValues,
+    );
   });
 
   test('reads the inputs from the URL it was opened at', () => {
@@ -28,7 +31,7 @@ describe(createLoanStore, () => {
       'https://example.com/mono/loan/?repayment-type=principal-and-interest-equal-repayment&borrowing-total=3000&borrowing-period=20&interest-rate=1.2',
     );
 
-    assert.deepStrictEqual(store.inputs.getSnapshot().value, {
+    assert.deepStrictEqual(Optional.unwrap(store.inputs.getSnapshot()), {
       repaymentType: 'principal-and-interest-equal-repayment',
       borrowingTotalManYen: BorrowingTotal.cast(3000),
       borrowingPeriodYear: Year.cast(20),
@@ -41,7 +44,7 @@ describe(createLoanStore, () => {
       'https://example.com/mono/loan/?repayment-type=monthly&interest-rate=2',
     );
 
-    assert.deepStrictEqual(store.inputs.getSnapshot().value, {
+    assert.deepStrictEqual(Optional.unwrap(store.inputs.getSnapshot()), {
       ...defaultValues,
       interestRatePercentPerYear: PercentFloat.cast(2),
     });
@@ -69,7 +72,10 @@ describe(createLoanStore, () => {
     (key, value) => {
       const { store } = setup(`https://example.com/mono/loan/?${key}=${value}`);
 
-      assert.deepStrictEqual(store.inputs.getSnapshot().value, defaultValues);
+      assert.deepStrictEqual(
+        Optional.unwrap(store.inputs.getSnapshot()),
+        defaultValues,
+      );
     },
   );
 
@@ -78,7 +84,7 @@ describe(createLoanStore, () => {
       'https://example.com/mono/loan/?borrowing-total=1e3&borrowing-period=1&interest-rate=100',
     );
 
-    assert.deepStrictEqual(store.inputs.getSnapshot().value, {
+    assert.deepStrictEqual(Optional.unwrap(store.inputs.getSnapshot()), {
       ...defaultValues,
       borrowingTotalManYen: BorrowingTotal.cast(1000),
       borrowingPeriodYear: Year.cast(1),
@@ -93,7 +99,7 @@ describe(createLoanStore, () => {
         `https://example.com/mono/loan/?borrowing-total=${total}`,
       );
 
-      assert.deepStrictEqual(store.inputs.getSnapshot().value, {
+      assert.deepStrictEqual(Optional.unwrap(store.inputs.getSnapshot()), {
         ...defaultValues,
         borrowingTotalManYen: BorrowingTotal.cast(total),
       });
@@ -105,7 +111,7 @@ describe(createLoanStore, () => {
       'https://example.com/mono/loan/?borrowing-period=100',
     );
 
-    assert.deepStrictEqual(store.inputs.getSnapshot().value, {
+    assert.deepStrictEqual(Optional.unwrap(store.inputs.getSnapshot()), {
       ...defaultValues,
       borrowingPeriodYear: Year.cast(100),
     });
@@ -126,7 +132,10 @@ describe(createLoanStore, () => {
       ),
     );
 
-    assert.deepStrictEqual(store.inputs.getSnapshot().value, defaultValues);
+    assert.deepStrictEqual(
+      Optional.unwrap(store.inputs.getSnapshot()),
+      defaultValues,
+    );
   });
 
   test('going back to a URL that names nothing brings back the defaults', async () => {
@@ -138,7 +147,10 @@ describe(createLoanStore, () => {
 
     await settle();
 
-    assert.deepStrictEqual(store.inputs.getSnapshot().value, defaultValues);
+    assert.deepStrictEqual(
+      Optional.unwrap(store.inputs.getSnapshot()),
+      defaultValues,
+    );
   });
 
   test('a URL off the page, such as its index.html, goes to the page with the inputs its query holds', () => {
@@ -150,7 +162,7 @@ describe(createLoanStore, () => {
 
     assert.strictEqual(browser.url().hash, '#table');
 
-    assert.deepStrictEqual(store.inputs.getSnapshot().value, {
+    assert.deepStrictEqual(Optional.unwrap(store.inputs.getSnapshot()), {
       ...defaultValues,
       borrowingTotalManYen: BorrowingTotal.cast(3000),
     });
@@ -190,7 +202,7 @@ describe(createLoanStore, () => {
     });
 
     assert.strictEqual(
-      store.inputs.getSnapshot().value.borrowingTotalManYen,
+      Optional.unwrap(store.inputs.getSnapshot()).borrowingTotalManYen,
       BorrowingTotal.cast(4000),
     );
   });
@@ -204,7 +216,7 @@ describe(createLoanStore, () => {
 
     store.setInterestRatePercentPerYear(PercentFloat.cast(0.8));
 
-    assert.deepStrictEqual(store.inputs.getSnapshot().value, {
+    assert.deepStrictEqual(Optional.unwrap(store.inputs.getSnapshot()), {
       repaymentType: 'principal-and-interest-equal-repayment',
       borrowingTotalManYen: defaultValues.borrowingTotalManYen,
       borrowingPeriodYear: Year.cast(10),
@@ -224,7 +236,7 @@ describe(createLoanStore, () => {
     await settle();
 
     assert.strictEqual(
-      store.inputs.getSnapshot().value.borrowingPeriodYear,
+      Optional.unwrap(store.inputs.getSnapshot()).borrowingPeriodYear,
       Year.cast(10),
     );
   });
@@ -240,15 +252,15 @@ describe(createLoanStore, () => {
 
     store.setBorrowingPeriodYear(Year.cast(10));
 
-    assert.isTrue(store.isCalculating.getSnapshot().value);
+    assert.isTrue(Optional.unwrap(store.isCalculating.getSnapshot()));
 
     await settle();
 
-    assert.isFalse(store.isCalculating.getSnapshot().value);
+    assert.isFalse(Optional.unwrap(store.isCalculating.getSnapshot()));
 
     assert.deepStrictEqual(
       mut_calculated.at(-1),
-      calcAll(store.inputs.getSnapshot().value),
+      calcAll(Optional.unwrap(store.inputs.getSnapshot())),
     );
   });
 });

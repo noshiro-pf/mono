@@ -5,6 +5,7 @@ import {
   deriveBindable,
   type JSX,
 } from 'synstate-dom';
+import { Optional } from 'ts-data-forge';
 import { dict } from '../../../constants/index.mjs';
 import {
   EditEventScheduleStore,
@@ -28,12 +29,12 @@ export const EditEventScheduleEmailVerified = (): JSX.Element => {
     EditEventScheduleStore;
 
   const resetState = (): void => {
-    const eventSchedule = eventSchedule$.getSnapshot().value;
+    const eventSchedule = Optional.unwrap(eventSchedule$.getSnapshot());
 
     if (eventSchedule !== undefined) {
       EditEventScheduleStore.setEventSchedule(
         eventSchedule,
-        emailVerified$.getSnapshot().value,
+        Optional.unwrap(emailVerified$.getSnapshot()),
       );
     }
   };

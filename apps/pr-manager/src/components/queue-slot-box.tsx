@@ -1,5 +1,6 @@
 import { type InitializedObservable, map } from 'synstate';
 import { constant, If, type JSX } from 'synstate-dom';
+import { Optional } from 'ts-data-forge';
 import type { QueueSlot } from '../queue-view.mjs';
 import { ExternalLink } from './external-link.js';
 import { RunStateIcon } from './run-state-icon.js';
@@ -25,7 +26,7 @@ export const QueueSlotBox = ({ slot$, onShow, onHide }: Props): JSX.Element => (
     href={slot$.pipe(map((slot) => slot.url))}
     variant={'queue-link'}
     onEnter={() => {
-      onShow(slot$.getSnapshot().value.number);
+      onShow(Optional.unwrap(slot$.getSnapshot()).number);
     }}
     onLeave={onHide}
   >

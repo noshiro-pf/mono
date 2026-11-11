@@ -1,4 +1,4 @@
-import { hasKey, isRecord } from 'ts-data-forge';
+import { hasKey, isRecord, Optional } from 'ts-data-forge';
 import { createState } from './create-state.mjs';
 
 describe(createState, () => {
@@ -92,7 +92,7 @@ describe(createState, () => {
 
     assert.deepStrictEqual(seen, [0, 5]);
 
-    assert.strictEqual(state.getSnapshot().value, 5);
+    assert.strictEqual(Optional.unwrap(state.getSnapshot()), 5);
   });
 
   describe('keepEqualParts', () => {
@@ -167,7 +167,7 @@ describe(createState, () => {
 
       assert.strictEqual(written.entries[1], initial.entries[0]);
 
-      assert.strictEqual(state.getSnapshot().value, written);
+      assert.strictEqual(Optional.unwrap(state.getSnapshot()), written);
     });
 
     test('is off by default', () => {

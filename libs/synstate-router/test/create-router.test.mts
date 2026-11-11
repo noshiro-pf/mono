@@ -48,7 +48,7 @@ const setup = (
 };
 
 const current = <A,>(observable: InitializedObservable<A>): A =>
-  observable.getSnapshot().value;
+  Optional.unwrap(observable.getSnapshot());
 
 /**
  * A router whose document has only the ids given to `draw`. With `observes`,
@@ -360,7 +360,7 @@ describe('push and replace', () => {
 
     const { router } = setup('https://example.com/', {
       redirect: (m) =>
-        m.route === 'settings' && !signedIn.getSnapshot().value
+        m.route === 'settings' && !Optional.unwrap(signedIn.getSnapshot())
           ? routes.signIn.href()
           : undefined,
     });
@@ -485,7 +485,7 @@ describe('redirect', () => {
 
     const { router } = setup('https://example.com/', {
       redirect: (m) =>
-        m.route === 'settings' && !signedIn.getSnapshot().value
+        m.route === 'settings' && !Optional.unwrap(signedIn.getSnapshot())
           ? routes.signIn.href()
           : undefined,
     });
@@ -769,7 +769,7 @@ describe('at and isActive', () => {
     assert.isTrue(
       Optional.isSome(before) &&
         Optional.isSome(after) &&
-        before.value.params === after.value.params,
+        Optional.unwrap(before).params === Optional.unwrap(after).params,
     );
   });
 
@@ -1618,11 +1618,11 @@ describe('router types', () => {
 
     const productItem = current(router.at(routes.products.item));
 
-    if (Optional.isSome(productItem)) {
-      expectType<typeof productItem.value.params.productId, SafeInt>('=');
+    type ProductItem = Optional.Unwrap<typeof productItem>;
 
-      expectType<typeof productItem.value.search.q, string | undefined>('=');
-    }
+    expectType<ProductItem['params']['productId'], SafeInt>('=');
+
+    expectType<ProductItem['search']['q'], string | undefined>('=');
 
     assert.isTrue(Optional.isSome(productItem));
   });

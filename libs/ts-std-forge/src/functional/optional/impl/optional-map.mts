@@ -2,7 +2,7 @@ import type { Optional, UnknownOptional } from '../optional.mjs';
 import { isSome } from './optional-is-some.mjs';
 import { none } from './optional-none.mjs';
 import { some } from './optional-some.mjs';
-import { unwrap } from './optional-unwrap.mjs';
+import { unwrapSome } from './optional-unwrap-some.mjs';
 import type { Unwrap } from './types.mjs';
 
 /**
@@ -84,7 +84,4 @@ const mapImpl = <O extends UnknownOptional, S2>(
   optional: O,
   mapFn: (value: Unwrap<O>) => S2,
 ): Optional<S2> =>
-  isSome(optional)
-    ? // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      some(mapFn(unwrap(optional)!))
-    : none;
+  isSome(optional) ? some(mapFn(unwrapSome(optional))) : none;

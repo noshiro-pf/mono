@@ -1,6 +1,6 @@
 import { EventSchedule } from 'event-schedule-app-shared';
 import { createState } from 'synstate';
-import { Result, asSafeUint } from 'ts-data-forge';
+import { asSafeUint, Optional, Result } from 'ts-data-forge';
 import {
   createCreateEventScheduleStore,
   type CreateEventSchedule,
@@ -57,14 +57,16 @@ describe(createCreateEventScheduleStore, () => {
       store.enter();
     });
 
-    const { datetimeRangeList } = store.commonState$.getSnapshot().value;
+    const { datetimeRangeList } = Optional.unwrap(
+      store.commonState$.getSnapshot(),
+    );
 
     assert.deepStrictEqual(
       datetimeRangeList.map((d) => d.ymd),
       [{ year: 2026, month: 11, date: 5 }],
     );
 
-    assert.isTrue(store.hasNoChanges$.getSnapshot().value);
+    assert.isTrue(Optional.unwrap(store.hasNoChanges$.getSnapshot()));
 
     // Reset returns to the day the page was entered.
     store.commonStateHandlers.setTitle('changed');
@@ -74,13 +76,13 @@ describe(createCreateEventScheduleStore, () => {
     });
 
     assert.deepStrictEqual(
-      store.commonState$
-        .getSnapshot()
-        .value.datetimeRangeList.map((d) => d.ymd),
+      Optional.unwrap(store.commonState$.getSnapshot()).datetimeRangeList.map(
+        (d) => d.ymd,
+      ),
       [{ year: 2026, month: 11, date: 5 }],
     );
 
-    assert.isTrue(store.hasNoChanges$.getSnapshot().value);
+    assert.isTrue(Optional.unwrap(store.hasNoChanges$.getSnapshot()));
   });
 
   test('creates nothing while the settings are not valid', async () => {
@@ -144,7 +146,7 @@ describe(createCreateEventScheduleStore, () => {
 
     store.restoreFromLocalStorage();
 
-    const state = store.commonState$.getSnapshot().value;
+    const state = Optional.unwrap(store.commonState$.getSnapshot());
 
     assert.strictEqual(state.title, 'stored');
 
@@ -173,7 +175,7 @@ describe(createCreateEventScheduleStore, () => {
       store.enter();
     });
 
-    const state = store.commonState$.getSnapshot().value;
+    const state = Optional.unwrap(store.commonState$.getSnapshot());
 
     assert.strictEqual(state.title, 'stored');
 
@@ -192,11 +194,14 @@ describe(createCreateEventScheduleStore, () => {
 
     const { store } = setup({ restoreFails: true });
 
-    const before = store.commonState$.getSnapshot().value;
+    const before = Optional.unwrap(store.commonState$.getSnapshot());
 
     store.restoreFromLocalStorage();
 
-    assert.strictEqual(store.commonState$.getSnapshot().value, before);
+    assert.strictEqual(
+      Optional.unwrap(store.commonState$.getSnapshot()),
+      before,
+    );
 
     assert.deepStrictEqual(warn.mock.calls, [
       ['SecurityError: The operation is insecure.'],

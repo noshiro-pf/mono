@@ -48,7 +48,7 @@ import {
   skipIfNoChange,
   type InitializedObservable,
 } from 'synstate';
-import { fastDeepEqual } from 'ts-data-forge';
+import { fastDeepEqual, Optional } from 'ts-data-forge';
 import {
   fitPlacement,
   fitScale,
@@ -214,9 +214,12 @@ export const createIssuesViewStore = (
   const dagFitted = zoom.pipe(map(({ type }) => type === 'fit'));
 
   const zoomBy = (step: (scale: number) => number) => (): void => {
-    setKept(placement.getSnapshot().value);
+    setKept(Optional.unwrap(placement.getSnapshot()));
 
-    setZoom({ type: 'scale', scale: step(dagScale.getSnapshot().value) });
+    setZoom({
+      type: 'scale',
+      scale: step(Optional.unwrap(dagScale.getSnapshot())),
+    });
   };
 
   return {

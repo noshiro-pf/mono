@@ -47,7 +47,7 @@ if (import.meta.vitest !== undefined) {
     const productName = router
       .at(routes.products.item)
       .pipe(filter(Optional.isSome))
-      .pipe(map((some) => some.value.params.productId))
+      .pipe(map((some) => Optional.unwrap(some).params.productId))
       .pipe(
         switchMap((productId) =>
           fromAbortablePromise((signal) => fetchProductName(productId, signal)),

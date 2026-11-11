@@ -1,5 +1,5 @@
 import type { None } from '../../../adt-types.mjs';
-import { NoneTypeTagName } from './tag.mjs';
+import { noneValue } from './encoding.mjs';
 
 /**
  * The singleton instance representing {@link None} (an empty
@@ -17,4 +17,5 @@ import { NoneTypeTagName } from './tag.mjs';
  * assert.isTrue(Optional.isNone(noneValue));
  * ```
  */
-export const none: None = { $$tag: NoneTypeTagName } as const;
+// eslint-disable-next-line total-functions/no-unsafe-type-assertion -- `None` is a type-only shape over the reserved string (see `encoding.mts`).
+export const none: None = noneValue as unknown as None;

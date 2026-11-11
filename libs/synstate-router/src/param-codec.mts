@@ -45,9 +45,13 @@ const paramRefine = <T, U extends T>(
     decode: (raw) => {
       const decoded = codec.decode(raw);
 
-      return Optional.isSome(decoded) && guard(decoded.value)
-        ? Optional.some(decoded.value)
-        : Optional.none;
+      if (Optional.isNone(decoded)) {
+        return Optional.none;
+      }
+
+      const value = Optional.unwrap(decoded);
+
+      return guard(value) ? Optional.some(value) : Optional.none;
     },
     encode: (value) => codec.encode(value),
   }) as const;

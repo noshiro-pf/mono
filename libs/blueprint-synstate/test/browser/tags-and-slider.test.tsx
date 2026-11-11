@@ -14,6 +14,7 @@ import {
 import { createElement as h, useState } from 'react';
 import { createState } from 'synstate';
 import { constant, mapBindable, render } from 'synstate-dom';
+import { Optional } from 'ts-data-forge';
 import { userEvent } from 'vitest/browser';
 import { mountBlueprint } from './blueprint-cases.js';
 import { mountInto, nextFrame, settle } from './helpers.mjs';
@@ -717,7 +718,7 @@ const ourTagInput =
             log(`add ${added.join('|')} by ${method}`);
 
             setValues([
-              ...values$.getSnapshot().value,
+              ...Optional.unwrap(values$.getSnapshot()),
               ...added.map((value) => ({ value })),
             ]);
           }}
@@ -725,7 +726,9 @@ const ourTagInput =
             log(`remove ${value} at ${index.toString()}`);
 
             setValues(
-              values$.getSnapshot().value.filter((_, i) => i !== index),
+              Optional.unwrap(values$.getSnapshot()).filter(
+                (_, i) => i !== index,
+              ),
             );
           }}
         />

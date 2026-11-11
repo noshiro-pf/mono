@@ -1,7 +1,7 @@
 import { EventSchedule, NotificationSettings } from 'event-schedule-app-shared';
 import { createState } from 'synstate';
 import { createMemoryBrowser } from 'synstate-router';
-import { Result } from 'ts-data-forge';
+import { Optional, Result } from 'ts-data-forge';
 import { DateUtils } from 'ts-fortress-types';
 import { answerIconsInitialValue, routes } from '../../constants/index.mjs';
 import { createAppRouter, type AppRouter } from '../router-store.mjs';
@@ -17,13 +17,13 @@ describe(createEditEventScheduleStore, () => {
 
     store.setEventSchedule(fromDatabase, undefined);
 
-    assert.isTrue(store.hasNoChanges$.getSnapshot().value);
+    assert.isTrue(Optional.unwrap(store.hasNoChanges$.getSnapshot()));
 
     store.commonStateHandlers.setTitle('renamed');
 
-    assert.isFalse(store.hasNoChanges$.getSnapshot().value);
+    assert.isFalse(Optional.unwrap(store.hasNoChanges$.getSnapshot()));
 
-    assert.isDefined(store.diff$.getSnapshot().value.title);
+    assert.isDefined(Optional.unwrap(store.diff$.getSnapshot()).title);
   });
 
   // #3416: the form outlived the visit, and another event's edit page showed it
@@ -39,14 +39,16 @@ describe(createEditEventScheduleStore, () => {
 
     router.push(routes.event.answer.edit.href({ eventId: 'other' }));
 
-    const { title, datetimeRangeList } = store.commonState$.getSnapshot().value;
+    const { title, datetimeRangeList } = Optional.unwrap(
+      store.commonState$.getSnapshot(),
+    );
 
     assert.strictEqual(title, '');
 
     assert.notDeepEqual(datetimeRangeList, fromDatabase.datetimeRangeList);
 
     // Nothing is compared with the event left, either.
-    assert.isUndefined(store.diff$.getSnapshot().value.title);
+    assert.isUndefined(Optional.unwrap(store.diff$.getSnapshot()).title);
   });
 
   test('a date taken out is a deleted change', () => {
@@ -58,7 +60,9 @@ describe(createEditEventScheduleStore, () => {
       fromDatabase.datetimeRangeList.slice(1),
     );
 
-    assert.isTrue(store.hasDeletedDatetimeChanges$.getSnapshot().value);
+    assert.isTrue(
+      Optional.unwrap(store.hasDeletedDatetimeChanges$.getSnapshot()),
+    );
   });
 
   test('saves the event as the database has its author and archivers, then goes back', async () => {
@@ -154,18 +158,20 @@ describe(createEditEventScheduleStore, () => {
 
     store.setEventSchedule(withNotifications, 'bob@example.com');
 
-    assert.isTrue(store.hasNoChanges$.getSnapshot().value);
+    assert.isTrue(Optional.unwrap(store.hasNoChanges$.getSnapshot()));
 
     // Another event, with no notifications and so no email to confirm.
     router.push(routes.event.answer.edit.href({ eventId: 'xyz' }));
 
-    assert.isUndefined(store.emailVerified$.getSnapshot().value);
+    assert.isUndefined(Optional.unwrap(store.emailVerified$.getSnapshot()));
 
     store.setEventSchedule(fromDatabase, undefined);
 
-    assert.isTrue(store.hasNoChanges$.getSnapshot().value);
+    assert.isTrue(Optional.unwrap(store.hasNoChanges$.getSnapshot()));
 
-    assert.isUndefined(store.diff$.getSnapshot().value.notificationSettings);
+    assert.isUndefined(
+      Optional.unwrap(store.diff$.getSnapshot()).notificationSettings,
+    );
   });
 
   test('a confirmed email is forgotten once the edit page is left', () => {
@@ -174,7 +180,7 @@ describe(createEditEventScheduleStore, () => {
     store.setEmailVerified('abc', 'bob@example.com');
 
     assert.strictEqual(
-      store.emailVerified$.getSnapshot().value,
+      Optional.unwrap(store.emailVerified$.getSnapshot()),
       'bob@example.com',
     );
 
@@ -184,11 +190,11 @@ describe(createEditEventScheduleStore, () => {
 
     router.push(routes.event.answer.edit.href({ eventId: 'abc' }));
 
-    assert.isUndefined(store.emailVerified$.getSnapshot().value);
+    assert.isUndefined(Optional.unwrap(store.emailVerified$.getSnapshot()));
 
     store.setEventSchedule(fromDatabase, undefined);
 
-    assert.isTrue(store.hasNoChanges$.getSnapshot().value);
+    assert.isTrue(Optional.unwrap(store.hasNoChanges$.getSnapshot()));
   });
 
   test('the notification settings of one event are not kept for the next one', () => {
@@ -201,10 +207,11 @@ describe(createEditEventScheduleStore, () => {
     store.setEventSchedule(fromDatabase, undefined);
 
     assert.isUndefined(
-      store.commonState$.getSnapshot().value.notificationSettingsWithEmail,
+      Optional.unwrap(store.commonState$.getSnapshot())
+        .notificationSettingsWithEmail,
     );
 
-    assert.isTrue(store.hasNoChanges$.getSnapshot().value);
+    assert.isTrue(Optional.unwrap(store.hasNoChanges$.getSnapshot()));
   });
 
   test('an answer deadline of one event is not kept for the next one', () => {
@@ -212,15 +219,17 @@ describe(createEditEventScheduleStore, () => {
 
     store.setEventSchedule(withAnswerDeadline, undefined);
 
-    assert.isTrue(store.hasNoChanges$.getSnapshot().value);
+    assert.isTrue(Optional.unwrap(store.hasNoChanges$.getSnapshot()));
 
     router.push(routes.event.answer.edit.href({ eventId: 'xyz' }));
 
     store.setEventSchedule(fromDatabase, undefined);
 
-    assert.isTrue(store.hasNoChanges$.getSnapshot().value);
+    assert.isTrue(Optional.unwrap(store.hasNoChanges$.getSnapshot()));
 
-    assert.isUndefined(store.diff$.getSnapshot().value.answerDeadline);
+    assert.isUndefined(
+      Optional.unwrap(store.diff$.getSnapshot()).answerDeadline,
+    );
   });
 
   test('the back button goes to the answer page', () => {

@@ -1,5 +1,5 @@
 import { createState, filter, mapTo } from 'synstate';
-import { match } from 'ts-data-forge';
+import { match, Optional } from 'ts-data-forge';
 import {
   createReducerWithActions,
   createToggleState,
@@ -46,11 +46,11 @@ describe('createToggleState', () => {
 
     toggle();
 
-    assert.isTrue(state.getSnapshot().value);
+    assert.isTrue(Optional.unwrap(state.getSnapshot()));
 
     setClosed(true);
 
-    assert.isFalse(state.getSnapshot().value);
+    assert.isFalse(Optional.unwrap(state.getSnapshot()));
   });
 });
 

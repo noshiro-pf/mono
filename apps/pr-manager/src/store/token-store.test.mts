@@ -1,3 +1,4 @@
+import { Optional } from 'ts-data-forge';
 import type { KeyValueStore, TokenStores } from '../token.mjs';
 import { createTokenStore } from './token-store.mjs';
 
@@ -15,10 +16,13 @@ describe(createTokenStore, () => {
 
     first.submit();
 
-    assert.deepStrictEqual(createTokenStore(stores).token.getSnapshot().value, {
-      value: 'ghp_kept',
-      store: 'device',
-    });
+    assert.deepStrictEqual(
+      Optional.unwrap(createTokenStore(stores).token.getSnapshot()),
+      {
+        value: 'ghp_kept',
+        store: 'device',
+      },
+    );
   });
 
   test('keeps what was typed, trimmed, for the tab unless told to remember', () => {
@@ -28,12 +32,12 @@ describe(createTokenStore, () => {
 
     store.submit();
 
-    assert.deepStrictEqual(store.token.getSnapshot().value, {
+    assert.deepStrictEqual(Optional.unwrap(store.token.getSnapshot()), {
       value: 'ghp_a',
       store: 'session',
     });
 
-    assert.strictEqual(store.typed.getSnapshot().value, '');
+    assert.strictEqual(Optional.unwrap(store.typed.getSnapshot()), '');
 
     store.setRemember(true);
 
@@ -41,7 +45,7 @@ describe(createTokenStore, () => {
 
     store.submit();
 
-    assert.deepStrictEqual(store.token.getSnapshot().value, {
+    assert.deepStrictEqual(Optional.unwrap(store.token.getSnapshot()), {
       value: 'ghp_b',
       store: 'device',
     });
@@ -54,7 +58,7 @@ describe(createTokenStore, () => {
 
     store.submit();
 
-    assert.isUndefined(store.token.getSnapshot().value);
+    assert.isUndefined(Optional.unwrap(store.token.getSnapshot()));
   });
 
   test('uses a token the browser refused to keep, and says so', () => {
@@ -66,12 +70,12 @@ describe(createTokenStore, () => {
 
     store.submit();
 
-    assert.deepStrictEqual(store.token.getSnapshot().value, {
+    assert.deepStrictEqual(Optional.unwrap(store.token.getSnapshot()), {
       value: 'ghp_a',
       store: 'session',
     });
 
-    assert.isString(store.saveError.getSnapshot().value);
+    assert.isString(Optional.unwrap(store.saveError.getSnapshot()));
   });
 
   test('forgetting clears the token, the error, what was typed, and the storage', () => {
@@ -89,13 +93,15 @@ describe(createTokenStore, () => {
 
     store.forget();
 
-    assert.isUndefined(store.token.getSnapshot().value);
+    assert.isUndefined(Optional.unwrap(store.token.getSnapshot()));
 
-    assert.isUndefined(store.saveError.getSnapshot().value);
+    assert.isUndefined(Optional.unwrap(store.saveError.getSnapshot()));
 
-    assert.strictEqual(store.typed.getSnapshot().value, '');
+    assert.strictEqual(Optional.unwrap(store.typed.getSnapshot()), '');
 
-    assert.isUndefined(createTokenStore(stores).token.getSnapshot().value);
+    assert.isUndefined(
+      Optional.unwrap(createTokenStore(stores).token.getSnapshot()),
+    );
   });
 
   test('writes to storage only while started', () => {
@@ -119,10 +125,13 @@ describe(createTokenStore, () => {
 
     store.submit();
 
-    assert.deepStrictEqual(createTokenStore(stores).token.getSnapshot().value, {
-      value: 'ghp_during',
-      store: 'session',
-    });
+    assert.deepStrictEqual(
+      Optional.unwrap(createTokenStore(stores).token.getSnapshot()),
+      {
+        value: 'ghp_during',
+        store: 'session',
+      },
+    );
   });
 });
 

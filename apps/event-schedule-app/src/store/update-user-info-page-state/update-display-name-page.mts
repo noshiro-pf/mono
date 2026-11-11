@@ -5,7 +5,7 @@ import {
   withCurrentValueFrom,
   type InitializedObservable,
 } from 'synstate';
-import { Result, isNotUndefined } from 'ts-data-forge';
+import { isNotUndefined, Optional, Result } from 'ts-data-forge';
 import type { StrictPick } from 'ts-type-forge';
 import { dict } from '../../constants/index.mjs';
 import {
@@ -162,7 +162,9 @@ export const createUpdateDisplayNamePageStore = <User extends AccountUser>(
   };
 
   const enterClickHandler = (): void => {
-    const enterButtonDisabled = enterButtonDisabled$.getSnapshot().value;
+    const enterButtonDisabled = Optional.unwrap(
+      enterButtonDisabled$.getSnapshot(),
+    );
 
     const fireAuthUser = deps.auth.getFireAuthUserSnapshot();
 

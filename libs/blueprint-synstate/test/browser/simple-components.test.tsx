@@ -11,6 +11,7 @@ import {
 } from 'blueprint-synstate';
 import { createState } from 'synstate';
 import { constant } from 'synstate-dom';
+import { Optional } from 'ts-data-forge';
 import { mountInto, nextFrame, one } from './helpers.mjs';
 
 describe(Callout, () => {
@@ -92,7 +93,7 @@ describe(Checkbox, () => {
 
     one<HTMLInputElement>(label, ':scope > input').click();
 
-    assert.isTrue(checked$.getSnapshot().value);
+    assert.isTrue(Optional.unwrap(checked$.getSnapshot()));
 
     unmount();
   });

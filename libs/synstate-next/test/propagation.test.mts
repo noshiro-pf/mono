@@ -108,7 +108,7 @@ describe('propagation', () => {
     assert.deepStrictEqual(mut_thisValues, [undefined, undefined]);
   });
 
-  test('getSnapshot keeps its Some while the value is the same', () => {
+  test('getSnapshot is the same while the value is the same', () => {
     const a = state(1);
 
     const first = a.getSnapshot();
@@ -125,8 +125,8 @@ describe('propagation', () => {
 
     assert.strictEqual(a.getSnapshot(), second);
 
-    // Changed and changed back with no getSnapshot between: the Some of the
-    // last read.
+    // Changed and changed back: an `Optional` is unwrapped, so the snapshot of
+    // the same value is the same whether or not it was read in between.
     a.set(3);
 
     assert.strictEqual(a.value, 3);
@@ -135,25 +135,18 @@ describe('propagation', () => {
 
     assert.strictEqual(a.getSnapshot(), second);
 
-    // A getSnapshot of another value replaces the Some kept.
     a.set(3);
 
     assert.deepStrictEqual(a.getSnapshot(), Optional.some(3));
 
     a.set(2);
 
-    const third = a.getSnapshot();
-
-    assert.notStrictEqual(third, second);
-
-    assert.deepStrictEqual(third, Optional.some(2));
-
-    assert.strictEqual(a.getSnapshot(), third);
+    assert.strictEqual(a.getSnapshot(), second);
 
     assert.isTrue(Optional.isNone(source<number>().getSnapshot()));
   });
 
-  test('getSnapshot of a derived node keeps its Some the same way', () => {
+  test('getSnapshot of a derived node is the same the same way', () => {
     const a = state(1);
 
     const doubled = a.pipe(map((x) => x * 2));

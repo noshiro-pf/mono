@@ -563,7 +563,9 @@ export namespace Obj {
         Object.entries(record).flatMap(([k, v]) => {
           const mapped = mapFnWidened(v, k);
 
-          return Optional.isSome(mapped) ? [[k, mapped.value] as const] : [];
+          return Optional.isSome(mapped)
+            ? [[k, Optional.unwrap(mapped)] as const]
+            : [];
         }),
       ) as never
     );

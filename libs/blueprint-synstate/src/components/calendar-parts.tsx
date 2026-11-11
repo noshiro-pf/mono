@@ -123,7 +123,7 @@ export const Calendar = ({
 
     setFocused(Optional.some(next));
 
-    if (monthIndexOf(next) !== display$.getSnapshot().value) {
+    if (monthIndexOf(next) !== Optional.unwrap(display$.getSnapshot())) {
       changeMonth(monthIndexOf(next));
     }
 
@@ -140,7 +140,7 @@ export const Calendar = ({
 
       const target = [
         ...(Optional.isSome(focused)
-          ? ([focused.value] as const)
+          ? ([Optional.unwrap(focused)] as const)
           : ([] as const)),
         ...candidates,
         today,
@@ -322,7 +322,8 @@ export const Calendar = ({
               if (!Number.isNaN(month)) {
                 changeMonth(
                   monthIndexOf({
-                    year: monthOfIndex(display$.getSnapshot().value).year,
+                    year: monthOfIndex(Optional.unwrap(display$.getSnapshot()))
+                      .year,
                     month: month + 1,
                   }),
                 );
@@ -356,7 +357,8 @@ export const Calendar = ({
                 changeMonth(
                   monthIndexOf({
                     year,
-                    month: monthOfIndex(display$.getSnapshot().value).month,
+                    month: monthOfIndex(Optional.unwrap(display$.getSnapshot()))
+                      .month,
                   }),
                 );
               }
@@ -385,7 +387,7 @@ export const Calendar = ({
           name={constant('previous-month')}
           type={constant('button')}
           onClick={() => {
-            changeMonth(display$.getSnapshot().value - 1);
+            changeMonth(Optional.unwrap(display$.getSnapshot()) - 1);
           }}
         >
           <Icon class={'rdp-nav_icon'} icon={'chevron-left'} />
@@ -399,7 +401,7 @@ export const Calendar = ({
           name={constant('next-month')}
           type={constant('button')}
           onClick={() => {
-            changeMonth(display$.getSnapshot().value + 1);
+            changeMonth(Optional.unwrap(display$.getSnapshot()) + 1);
           }}
         >
           <Icon class={'rdp-nav_icon'} icon={'chevron-right'} />
@@ -435,7 +437,7 @@ export const Calendar = ({
           key={(index) => index}
         >
           {(index$) => {
-            const shown = index$.getSnapshot().value;
+            const shown = Optional.unwrap(index$.getSnapshot());
 
             const { year, month } = monthOfIndex(shown);
 

@@ -1,4 +1,4 @@
-import { expectType } from 'ts-data-forge';
+import { expectType, Optional } from 'ts-data-forge';
 import type { SourceObservable } from '../types/index.mjs';
 import { source } from './source.mjs';
 
@@ -8,7 +8,7 @@ describe(source, () => {
 
     assert.strictEqual(count$.next(1), 1);
 
-    assert.strictEqual(count$.getSnapshot().value, 1);
+    assert.strictEqual(Optional.unwrap(count$.getSnapshot()), 1);
   });
 
   test('once completed, `next` passes nothing on and returns the value held', () => {

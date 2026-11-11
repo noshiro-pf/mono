@@ -1,6 +1,6 @@
 import { map, type InitializedObservable } from 'synstate';
 import { constant, For, type JSX } from 'synstate-dom';
-import { Num } from 'ts-data-forge';
+import { Num, Optional } from 'ts-data-forge';
 import { BLOCK_NAMES, type BlockId, type Pane } from '../layout.mjs';
 import { layoutStore } from '../store/index.mjs';
 import { tabIdOf, tabPanelIdOf } from './block-tab-ids.mjs';
@@ -25,7 +25,7 @@ export const BlockTabList = ({ ids$, selected$ }: Props): JSX.Element => {
   const onKeyDown = (
     pressed: KeyboardEvent & Readonly<{ currentTarget: HTMLButtonElement }>,
   ): void => {
-    const ids = ids$.getSnapshot().value;
+    const ids = Optional.unwrap(ids$.getSnapshot());
 
     const index = ids.findIndex(
       (id) => tabIdOf(id) === pressed.currentTarget.id,
@@ -60,7 +60,7 @@ export const BlockTabList = ({ ids$, selected$ }: Props): JSX.Element => {
       <For items={ids$} key={(id) => id}>
         {(id$) => {
           // The key is the id, so the row's id is the one it was made with.
-          const id = id$.getSnapshot().value;
+          const id = Optional.unwrap(id$.getSnapshot());
 
           return (
             <button

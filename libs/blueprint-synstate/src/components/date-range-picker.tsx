@@ -116,7 +116,7 @@ export const DateRangePicker = ({
   const [hover$, setHover] = createState<DayRange | undefined>(undefined);
 
   const [display$, setDisplay] = createState(
-    initialMonth(value$.getSnapshot().value, min, max, today),
+    initialMonth(Optional.unwrap(value$.getSnapshot()), min, max, today),
   );
 
   const afterUpdate = createAfterUpdate();
@@ -124,7 +124,7 @@ export const DateRangePicker = ({
   // The month shown follows the value, as Blueprint's `useContiguousCalendarViews`
   // for one month; written once the update that brought it has finished.
   const mut_previous: { range: DayRange } = {
-    range: value$.getSnapshot().value,
+    range: Optional.unwrap(value$.getSnapshot()),
   };
 
   value$.subscribe((range) => {
@@ -138,17 +138,23 @@ export const DateRangePicker = ({
     }
 
     afterUpdate(() => {
-      setDisplay(monthFollowing(display$.getSnapshot().value, previous, range));
+      setDisplay(
+        monthFollowing(
+          Optional.unwrap(display$.getSnapshot()),
+          previous,
+          range,
+        ),
+      );
     });
   });
 
   /** Draws what a press on `day` would make, and returns it. */
   const enter = (day: WallClock): DayRange => {
     const { range, boundary } = nextRangeState(
-      value$.getSnapshot().value,
+      Optional.unwrap(value$.getSnapshot()),
       toDateValue(day),
       allowSingleDayRange,
-      boundary$.getSnapshot().value,
+      Optional.unwrap(boundary$.getSnapshot()),
     );
 
     setHover(range);
@@ -231,7 +237,7 @@ export const DateRangePicker = ({
                   const clock = parseWallClock(end);
 
                   if (Optional.isSome(clock)) {
-                    yield clock.value;
+                    yield Optional.unwrap(clock);
                   }
                 }
               }),
@@ -360,13 +366,13 @@ const initialMonth = (
   const startClock = parseWallClock(start);
 
   if (Optional.isSome(startClock)) {
-    return monthIndexOf(startClock.value);
+    return monthIndexOf(Optional.unwrap(startClock));
   }
 
   const endClock = parseWallClock(end);
 
   if (Optional.isSome(endClock)) {
-    const index = monthIndexOf(endClock.value);
+    const index = monthIndexOf(Optional.unwrap(endClock));
 
     return index === monthIndexOf(min) ? index : index - 1;
   }
@@ -379,7 +385,9 @@ const initialMonth = (
 const monthOf = (day: string): number | undefined => {
   const clock = parseWallClock(day);
 
-  return Optional.isSome(clock) ? monthIndexOf(clock.value) : undefined;
+  return Optional.isSome(clock)
+    ? monthIndexOf(Optional.unwrap(clock))
+    : undefined;
 };
 
 /**

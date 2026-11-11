@@ -262,7 +262,7 @@ v1 は loader を持たない。ルートの params は Observable なので、�
 const product$ = router
     .at(routes.products.item)
     .pipe(filter(Optional.isSome))
-    .pipe(map((m) => m.value.params.productId))
+    .pipe(map((m) => Optional.unwrap(m).params.productId))
     .pipe(skipIfNoChange())
     .pipe(
         switchMap((id) =>

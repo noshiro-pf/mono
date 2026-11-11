@@ -31,7 +31,7 @@ describe('Arr element access', () => {
       assert.isTrue(Optional.isSome(result));
 
       if (Optional.isSome(result)) {
-        expect(result.value).toBe(20);
+        expect(Optional.unwrap(result)).toBe(20);
       }
     });
 
@@ -43,7 +43,7 @@ describe('Arr element access', () => {
       assert.isTrue(Optional.isSome(result));
 
       if (Optional.isSome(result)) {
-        expect(result.value).toBe(30);
+        expect(Optional.unwrap(result)).toBe(30);
       }
     });
   });
@@ -59,7 +59,7 @@ describe('Arr element access', () => {
       assert.isTrue(Optional.isSome(h));
 
       if (Optional.isSome(h)) {
-        expect(h.value).toBe(1);
+        expect(Optional.unwrap(h)).toBe(1);
       }
     });
 
@@ -73,7 +73,7 @@ describe('Arr element access', () => {
       assert.isTrue(Optional.isSome(h));
 
       if (Optional.isSome(h)) {
-        expect(h.value).toBe(1);
+        expect(Optional.unwrap(h)).toBe(1);
       }
     });
 
@@ -87,7 +87,7 @@ describe('Arr element access', () => {
       assert.isTrue(Optional.isSome(h));
 
       if (Optional.isSome(h)) {
-        expect(h.value).toBe(1);
+        expect(Optional.unwrap(h)).toBe(1);
       }
     });
 
@@ -113,7 +113,7 @@ describe('Arr element access', () => {
       assert.isTrue(Optional.isSome(result));
 
       if (Optional.isSome(result)) {
-        expect(result.value).toBe(42);
+        expect(Optional.unwrap(result)).toBe(42);
       }
     });
   });
@@ -129,7 +129,7 @@ describe('Arr element access', () => {
       assert.isTrue(Optional.isSome(l));
 
       if (Optional.isSome(l)) {
-        expect(l.value).toBe(3);
+        expect(Optional.unwrap(l)).toBe(3);
       }
     });
 
@@ -143,7 +143,7 @@ describe('Arr element access', () => {
       assert.isTrue(Optional.isSome(l));
 
       if (Optional.isSome(l)) {
-        expect(l.value).toBe(3);
+        expect(Optional.unwrap(l)).toBe(3);
       }
     });
 
@@ -157,7 +157,7 @@ describe('Arr element access', () => {
       assert.isTrue(Optional.isSome(l));
 
       if (Optional.isSome(l)) {
-        expect(l.value).toBe(3);
+        expect(Optional.unwrap(l)).toBe(3);
       }
     });
 
@@ -183,7 +183,7 @@ describe('Arr element access', () => {
       assert.isTrue(Optional.isSome(result));
 
       if (Optional.isSome(result)) {
-        expect(result.value).toBe(42);
+        expect(Optional.unwrap(result)).toBe(42);
       }
     });
   });

@@ -1,5 +1,6 @@
 import { type InitializedObservable, map } from 'synstate';
 import { constant, If, type JSX } from 'synstate-dom';
+import { Optional } from 'ts-data-forge';
 import { m } from '../i18n/index.mjs';
 import { editorStore } from '../store/index.mjs';
 import {
@@ -28,7 +29,10 @@ export const TaskCard = ({ row }: Props): JSX.Element => (
       data-e2e={constant('task-row')}
       type={constant('button')}
       onClick={() => {
-        editorStore.open({ kind: 'task', id: row.getSnapshot().value.task.id });
+        editorStore.open({
+          kind: 'task',
+          id: Optional.unwrap(row.getSnapshot()).task.id,
+        });
       }}
     >
       <span class={constant('task-card-top')}>

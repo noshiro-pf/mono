@@ -24,7 +24,7 @@
 - 🎯 **Simple State Management**: Easy-to-use `createState` and `createReducer` similar to React useState/useReducer for global state
 - ⚡ **Glitch-Free Through Every Operator**: Every update is one depth-ordered pass over what it reaches, the ones `debounce` or `switchMap` start later included, so no subscriber sees a half-updated graph, and its cost grows with the nodes it reaches, never with the paths between them ([why SynState](https://noshiro-pf.github.io/mono/synstate/guides/why-synstate/), [benchmark](https://noshiro-pf.github.io/mono/synstate/guides/library-comparison/benchmark/))
 - 🎨 **Type-Safe**: Full TypeScript support with precise type inference
-- 🚀 **Lightweight**: <!-- bundle-size:synstate -->~7.7 kB min+gzip<!-- /bundle-size:synstate --> with two external runtime dependencies ([ts-data-forge](https://www.npmjs.com/package/ts-data-forge) and [ts-std-forge](https://www.npmjs.com/package/ts-std-forge), and the first depends on the second; [compared with other libraries](https://noshiro-pf.github.io/mono/synstate/guides/library-comparison/bundle-size/))
+- 🚀 **Lightweight**: <!-- bundle-size:synstate -->~7.8 kB min+gzip<!-- /bundle-size:synstate --> with two external runtime dependencies ([ts-data-forge](https://www.npmjs.com/package/ts-data-forge) and [ts-std-forge](https://www.npmjs.com/package/ts-std-forge), and the first depends on the second; [compared with other libraries](https://noshiro-pf.github.io/mono/synstate/guides/library-comparison/bundle-size/))
 - 🌐 **Framework Agnostic**: Works with React, Vue, Svelte, or vanilla JavaScript
 - 🔄 **Reactive Updates**: Automatic propagation of state changes to all subscribers
 - 📡 **Event System**: Built-in `createValueEmitter`, `createEventEmitter` for event-driven architecture
@@ -116,6 +116,7 @@ This is equivalent to the following code without synstate-react-hooks:
 ```tsx
 import * as React from 'react';
 import { createState } from 'synstate';
+import { Optional } from 'ts-data-forge';
 
 const [userState, setUserState] = createState({
     name: '',
@@ -131,7 +132,7 @@ const subscribeUser = (onStoreChange: () => void): (() => void) => {
 };
 
 const getUser = (): Readonly<{ name: string; email: string }> =>
-    userState.getSnapshot().value;
+    Optional.unwrap(userState.getSnapshot());
 
 const UserProfile = (): React.JSX.Element => {
     // `getUser` doubles as `getServerSnapshot`, which server rendering and
@@ -296,7 +297,7 @@ const [filters, setFilters] = createState(
     { equals: fastDeepEqual },
 );
 
-const before = filters.getSnapshot().value;
+const before = Optional.unwrap(filters.getSnapshot());
 
 // Derived state is recomputed only when the state really changes.
 const query = filters.pipe(
@@ -311,7 +312,7 @@ query.subscribe((value: string) => {
 
 setFilters({ label: 'bug', page: 1 }); // equal: nothing is passed on
 
-assert.strictEqual(filters.getSnapshot().value, before);
+assert.strictEqual(Optional.unwrap(filters.getSnapshot()), before);
 
 setFilters({ label: 'bug', page: 2 });
 
@@ -370,7 +371,7 @@ setReport({
     pulls: [{ number: 1, title: 'one' }],
 });
 
-const held = report.getSnapshot().value;
+const held = Optional.unwrap(report.getSnapshot());
 
 // An answer that changes nothing is not passed on at all.
 setReport({
@@ -378,7 +379,7 @@ setReport({
     pulls: [{ number: 1, title: 'one' }],
 });
 
-assert.strictEqual(report.getSnapshot().value, held);
+assert.strictEqual(Optional.unwrap(report.getSnapshot()), held);
 
 // An edited title: a new report and a new array, while the summary is the
 // one held, so `summary` is not told of it.
@@ -387,9 +388,9 @@ setReport({
     pulls: [{ number: 1, title: 'one (edited)' }],
 });
 
-assert.notStrictEqual(report.getSnapshot().value, held);
+assert.notStrictEqual(Optional.unwrap(report.getSnapshot()), held);
 
-assert.strictEqual(report.getSnapshot().value.summary, held.summary);
+assert.strictEqual(Optional.unwrap(report.getSnapshot()).summary, held.summary);
 
 assert.deepStrictEqual(summaryHistory, [{ open: 0 }, { open: 1 }]);
 ```

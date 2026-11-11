@@ -279,10 +279,6 @@ export const sourceFileMappings: readonly SourceFileMapping[] = [
     sampleFiles: ['samples/src/functional/optional/is-none-example.mts'],
   },
   {
-    sourcePath: 'src/functional/optional/impl/optional-is-optional.mts',
-    sampleFiles: ['samples/src/functional/optional/is-optional-example.mts'],
-  },
-  {
     sourcePath: 'src/functional/optional/impl/optional-is-some.mts',
     sampleFiles: ['samples/src/functional/optional/is-some-example.mts'],
   },

@@ -1005,20 +1005,20 @@ describe('Arr transformations', () => {
       assert.isTrue(Optional.isSome(vegetables));
 
       if (Optional.isSome(fruits)) {
-        expect(fruits.value).toHaveLength(2);
+        expect(Optional.unwrap(fruits)).toHaveLength(2);
 
-        expect(fruits.value[0]?.name).toBe('apple');
+        expect(Optional.unwrap(fruits)[0]?.name).toBe('apple');
 
-        expect(fruits.value[1]?.name).toBe('banana');
+        expect(Optional.unwrap(fruits)[1]?.name).toBe('banana');
       }
 
       if (!Optional.isSome(vegetables)) {
         return;
       }
 
-      expect(vegetables.value).toHaveLength(1);
+      expect(Optional.unwrap(vegetables)).toHaveLength(1);
 
-      expect(vegetables.value[0]?.name).toBe('carrot');
+      expect(Optional.unwrap(vegetables)[0]?.name).toBe('carrot');
     });
 
     test('should work with numeric keys', () => {
@@ -1033,11 +1033,11 @@ describe('Arr transformations', () => {
       const odds = grouped.get(1);
 
       if (Optional.isSome(evens)) {
-        assert.deepStrictEqual(evens.value, [2, 4, 6]);
+        assert.deepStrictEqual(Optional.unwrap(evens), [2, 4, 6]);
       }
 
       if (Optional.isSome(odds)) {
-        assert.deepStrictEqual(odds.value, [1, 3, 5]);
+        assert.deepStrictEqual(Optional.unwrap(odds), [1, 3, 5]);
       }
     });
 
@@ -1059,7 +1059,7 @@ describe('Arr transformations', () => {
       const all = grouped.get('all');
 
       if (Optional.isSome(all)) {
-        assert.deepStrictEqual(all.value, [1, 2, 3, 4]);
+        assert.deepStrictEqual(Optional.unwrap(all), [1, 2, 3, 4]);
       }
     });
   });

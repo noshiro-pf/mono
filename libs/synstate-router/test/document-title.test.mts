@@ -1,4 +1,4 @@
-import { asSafeInt } from 'ts-data-forge';
+import { asSafeInt, Optional } from 'ts-data-forge';
 import {
   createMemoryBrowser,
   createRouter,
@@ -117,7 +117,10 @@ describe('document title', () => {
     router.push(routes.products.href());
 
     // The match moved on; the title did not.
-    assert.strictEqual(router.match.getSnapshot().value.route, 'products');
+    assert.strictEqual(
+      Optional.unwrap(router.match.getSnapshot()).route,
+      'products',
+    );
 
     assert.strictEqual(browser.title(), 'Home');
   });

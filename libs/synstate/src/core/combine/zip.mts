@@ -112,7 +112,7 @@ class ZipObservableClass<const A extends NonEmptyUnknownList>
     // fact the checker cannot derive on its own.
     const initialValue: Optional<Readonly<{ [K in keyof A]: A[K] }>> =
       Arr.every(parentsValues, Optional.isSome)
-        ? Optional.some(Arr.map(parentsValues, (c) => c.value))
+        ? Optional.some(Arr.map(parentsValues, (c) => Optional.unwrap(c)))
         : Optional.none;
 
     super({ parents, initialValue });
@@ -134,7 +134,7 @@ class ZipObservableClass<const A extends NonEmptyUnknownList>
         continue;
       }
 
-      queues[index]?.enqueue(sn.value);
+      queues[index]?.enqueue(Optional.unwrap(sn));
 
       this.#mut_takenTokens[index] = updateToken;
     }

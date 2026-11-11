@@ -13,6 +13,7 @@ import {
   type Bindable,
   type JSX,
 } from 'synstate-dom';
+import { Optional } from 'ts-data-forge';
 import type { StrictOmit } from 'ts-type-forge';
 import {
   classObject,
@@ -318,12 +319,18 @@ export const NumericInput = <N extends number>({
   /** `n` within the bounds as they are now; `NaN` stays `NaN`. */
   const clamp = (n: number): number =>
     clampTo(
-      min$?.getSnapshot().value ?? Number.NEGATIVE_INFINITY,
-      max$?.getSnapshot().value ?? Number.POSITIVE_INFINITY,
+      min$ === undefined
+        ? Number.NEGATIVE_INFINITY
+        : Optional.unwrap(min$.getSnapshot()),
+      max$ === undefined
+        ? Number.POSITIVE_INFINITY
+        : Optional.unwrap(max$.getSnapshot()),
       n,
     );
 
-  const [text$, setText] = createState(encode(value$.getSnapshot().value));
+  const [text$, setText] = createState(
+    encode(Optional.unwrap(value$.getSnapshot())),
+  );
 
   const afterUpdate = createAfterUpdate();
 
@@ -352,7 +359,7 @@ export const NumericInput = <N extends number>({
    * a bound.
    */
   const commit = (delta: number): boolean => {
-    const decoded = read(text$.getSnapshot().value);
+    const decoded = read(Optional.unwrap(text$.getSnapshot()));
 
     const start = Number.isNaN(decoded)
       ? clamp(normalize(Number.NaN))
@@ -364,7 +371,7 @@ export const NumericInput = <N extends number>({
 
     setText(encode(next));
 
-    if (next !== value$.getSnapshot().value) {
+    if (next !== Optional.unwrap(value$.getSnapshot())) {
       onValueChange(next);
     }
 

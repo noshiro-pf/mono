@@ -1,5 +1,5 @@
 import { createState } from 'synstate';
-import { expectType } from 'ts-data-forge';
+import { expectType, Optional } from 'ts-data-forge';
 import type { Bindable } from './bindable.mjs';
 import { constant, type Constant } from './constant.mjs';
 
@@ -46,6 +46,13 @@ describe(constant, () => {
     assert.isTrue(true);
   });
 
+  test('accepts a Some of an observable, which is the observable itself', () => {
+    const [count$] = createState(0);
+
+    // Accepted on purpose (see `constant`); `MatchOptional` says what follows.
+    assert.strictEqual<unknown>(constant(Optional.some(count$)), count$);
+  });
+
   test('a plain value is not a Bindable', () => {
     const [count$] = createState(0);
 
@@ -53,7 +60,7 @@ describe(constant, () => {
     const plain: Bindable<string> = 'btn';
 
     // @ts-expect-error the snapshot is read once
-    const snapshot: Bindable<number> = count$.getSnapshot().value;
+    const snapshot: Bindable<number> = Optional.unwrap(count$.getSnapshot());
 
     const fromConstant: Bindable<string> = constant('btn');
 

@@ -526,19 +526,19 @@ export const createAnswerPageStore = (deps: AnswerPageDeps): AnswerPage => {
   };
 
   const onEditButtonClick = (): void => {
-    onEditButtonClickImpl(deps.router.eventId$.getSnapshot().value);
+    onEditButtonClickImpl(Optional.unwrap(deps.router.eventId$.getSnapshot()));
   };
 
   const onSubmitAnswerClickPromise = (): Promise<void> =>
     onSubmitAnswerImpl(
-      deps.router.eventId$.getSnapshot().value,
+      Optional.unwrap(deps.router.eventId$.getSnapshot()),
       getAnswerBeingEditedSnapshot(),
       getAnswerBeingEditedSectionStateSnapshot(),
     );
 
   const onSubmitAnswerClick = (): void => {
     onSubmitAnswerImpl(
-      deps.router.eventId$.getSnapshot().value,
+      Optional.unwrap(deps.router.eventId$.getSnapshot()),
       getAnswerBeingEditedSnapshot(),
       getAnswerBeingEditedSectionStateSnapshot(),
     ).catch(() => {});
@@ -546,13 +546,13 @@ export const createAnswerPageStore = (deps: AnswerPageDeps): AnswerPage => {
 
   const onSubmitEmptyAnswerClick = (): Promise<void> =>
     onSubmitEmptyAnswerImpl(
-      deps.router.eventId$.getSnapshot().value,
+      Optional.unwrap(deps.router.eventId$.getSnapshot()),
       deps.auth.getFireAuthUserSnapshot(),
     );
 
   const onDeleteAnswerClick = (): Promise<void> =>
     onDeleteAnswerImpl(
-      deps.router.eventId$.getSnapshot().value,
+      Optional.unwrap(deps.router.eventId$.getSnapshot()),
       getAnswerBeingEditedSnapshot(),
     );
 
@@ -720,7 +720,8 @@ export const createAnswerPageStore = (deps: AnswerPageDeps): AnswerPage => {
 
   const onCheckAll = (checked: boolean): void => {
     const dates =
-      deps.eventSchedule$.getSnapshot().value?.datetimeRangeList ?? [];
+      Optional.unwrap(deps.eventSchedule$.getSnapshot())?.datetimeRangeList ??
+      [];
 
     if (checked) {
       setCheckboxesState(

@@ -1,5 +1,5 @@
 import { onScopeDispose, type InitializedObservable } from 'synstate';
-import { Num, Result } from 'ts-data-forge';
+import { Num, Optional, Result } from 'ts-data-forge';
 import {
   centreAt,
   scrollToCentre,
@@ -42,14 +42,14 @@ export const dagBox = (
     centre: Point;
   } = {
     box: undefined,
-    drawnAt: scale$.getSnapshot().value,
+    drawnAt: Optional.unwrap(scale$.getSnapshot()),
     centre: { x: 0, y: 0 },
   };
 
   const note = (box: HTMLDivElement): void => {
     mut_state.centre = centreAt(
       scrollBoxOf(box),
-      content$.getSnapshot().value,
+      Optional.unwrap(content$.getSnapshot()),
       mut_state.drawnAt,
     );
   };

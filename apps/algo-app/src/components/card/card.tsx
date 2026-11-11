@@ -7,6 +7,7 @@ import {
   type Bindable,
   type JSX,
 } from 'synstate-dom';
+import { Optional } from 'ts-data-forge';
 import type { Rect, RectSize } from 'ts-utils-additional';
 import {
   darkGray,
@@ -106,7 +107,7 @@ export const CardComponent = ({
           width: mapBindable(cardSize, (s) => `${s.width}px`),
         }}
         onClick={() => {
-          if (card.getSnapshot().value.isClickable) {
+          if (Optional.unwrap(card.getSnapshot()).isClickable) {
             onClick?.();
           }
         }}

@@ -1,5 +1,6 @@
 import { map, type InitializedObservable } from 'synstate';
 import { constant, If, type JSX } from 'synstate-dom';
+import { Optional } from 'ts-data-forge';
 import {
   BLOCK_NAMES,
   canMoveAcross,
@@ -68,7 +69,7 @@ export const LayoutBlockRow = ({
             title={of((l) => actionOf(l).title)}
             type={constant('button')}
             onClick={(event) => {
-              const [layout, absent] = state.getSnapshot().value;
+              const [layout, absent] = Optional.unwrap(state.getSnapshot());
 
               const action = actionOf(layout);
 

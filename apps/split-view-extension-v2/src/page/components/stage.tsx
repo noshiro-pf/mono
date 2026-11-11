@@ -6,7 +6,7 @@ import {
   type InitializedObservable,
 } from 'synstate';
 import { constant, For, If, listenInScope, type JSX } from 'synstate-dom';
-import { Arr } from 'ts-data-forge';
+import { Arr, Optional } from 'ts-data-forge';
 import {
   computeGeometry,
   dropTargetAt,
@@ -133,9 +133,9 @@ export const Stage = ({
   };
 
   const targetAt = (event: Event): DropTarget | undefined => {
-    const move = move$.getSnapshot().value;
+    const move = Optional.unwrap(move$.getSnapshot());
 
-    const geometry = geometry$.getSnapshot().value;
+    const geometry = Optional.unwrap(geometry$.getSnapshot());
 
     const point = pointOf(event);
 
@@ -145,7 +145,7 @@ export const Stage = ({
   };
 
   listenInScope(globalThis, 'pointermove', (event) => {
-    const drag = drag$.getSnapshot().value;
+    const drag = Optional.unwrap(drag$.getSnapshot());
 
     const point = pointOf(event);
 
@@ -160,7 +160,7 @@ export const Stage = ({
   });
 
   listenInScope(globalThis, 'pointermove', (event) => {
-    if (move$.getSnapshot().value === undefined) {
+    if (Optional.unwrap(move$.getSnapshot()) === undefined) {
       return;
     }
 
@@ -180,7 +180,7 @@ export const Stage = ({
   listenInScope(globalThis, 'pointerup', (event) => {
     setDrag(undefined);
 
-    const move = move$.getSnapshot().value;
+    const move = Optional.unwrap(move$.getSnapshot());
 
     if (move === undefined) {
       return;
@@ -244,7 +244,7 @@ export const Stage = ({
         {(slot$) => (
           <PaneFrame
             dispatch={dispatch}
-            paneId={slot$.getSnapshot().value.paneId}
+            paneId={Optional.unwrap(slot$.getSnapshot()).paneId}
             resetOrigins$={resetOrigins$}
             view$={slot$.pipe(map(({ view }) => view))}
             onMoveStart={(paneId) => {

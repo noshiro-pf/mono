@@ -80,7 +80,7 @@ const router = createRouter(routes, {
     browser: createMemoryBrowser('https://example.com/shop/'), // the window when left out
     // Applied before `match` shows a page, so no subscriber has to navigate.
     redirect: (m) =>
-        m.route === 'settings' && !signedIn.getSnapshot().value
+        m.route === 'settings' && !Optional.unwrap(signedIn.getSnapshot())
             ? routes.signIn.href()
             : undefined,
 });
@@ -88,7 +88,7 @@ const router = createRouter(routes, {
 // `push` takes an `Href` only; `router.push('/settings/')` fails `tsc`.
 router.push(routes.settings.href());
 
-assert.strictEqual(router.match.getSnapshot().value.route, 'signIn');
+assert.strictEqual(Optional.unwrap(router.match.getSnapshot()).route, 'signIn');
 
 // The URL the browser shows, below the base path.
 assert.strictEqual(
@@ -101,12 +101,12 @@ const inProducts = router.isActive(routes.products);
 
 router.push(routes.products.href());
 
-assert.isTrue(inProducts.getSnapshot().value);
+assert.isTrue(Optional.unwrap(inProducts.getSnapshot()));
 
 // Rewrites the search of a node, keeping the rest of the URL.
 router.setSearch(routes.products, (prev) => ({ ...prev, q: 'shoe' }));
 
-assert.deepStrictEqual(router.match.getSnapshot().value, {
+assert.deepStrictEqual(Optional.unwrap(router.match.getSnapshot()), {
     route: 'products',
     params: {},
     search: { q: 'shoe' },
@@ -182,9 +182,9 @@ const router = createRouter(routes, {
 });
 
 // Root first, each with its own meta and the Href of its page.
-const crumbs = router.branch
-    .getSnapshot()
-    .value.map(({ meta, href }) => `${meta.label} ${href ?? ''}`);
+const crumbs = Optional.unwrap(router.branch.getSnapshot()).map(
+    ({ meta, href }) => `${meta.label} ${href ?? ''}`,
+);
 
 assert.deepStrictEqual(crumbs, [
     'Products /products/',

@@ -78,7 +78,7 @@ export const defineRoutes = <const D extends RouteDefinitions>(
   const resolvePage = (segments: readonly string[]): string | undefined => {
     const found = findPage(rootLevel, segments);
 
-    return Optional.isSome(found) ? found.value.page.id : undefined;
+    return Optional.isSome(found) ? Optional.unwrap(found).page.id : undefined;
   };
 
   const stateCodecs: ReadonlyMap<string, AnyHistoryStateCodec> = new Map(
@@ -514,7 +514,7 @@ const resolveSegment = (
 
       return Optional.isSome(decoded)
         ? Optional.some(
-            Arr.toPushed(params, [node.segment.name, decoded.value]),
+            Arr.toPushed(params, [node.segment.name, Optional.unwrap(decoded)]),
           )
         : Optional.none;
     }
@@ -551,7 +551,10 @@ const resolveRest = (
   return Optional.isSome(decoded)
     ? Optional.some({
         page: node.page,
-        params: Arr.toPushed(params, [node.segment.name, decoded.value]),
+        params: Arr.toPushed(params, [
+          node.segment.name,
+          Optional.unwrap(decoded),
+        ]),
       })
     : Optional.none;
 };
@@ -586,7 +589,12 @@ const resolveLevel = (
       continue;
     }
 
-    const found = resolveLevel(node.level, segments, index + 1, consumed.value);
+    const found = resolveLevel(
+      node.level,
+      segments,
+      index + 1,
+      Optional.unwrap(consumed),
+    );
 
     if (Optional.isSome(found)) {
       return found;
@@ -639,7 +647,7 @@ const readState = (codec: AnyHistoryStateCodec, raw: unknown): unknown => {
 
   const decoded = codec.decode(raw);
 
-  return Optional.isSome(decoded) ? decoded.value : undefined;
+  return Optional.isSome(decoded) ? Optional.unwrap(decoded) : undefined;
 };
 
 const resolveLocation = (
@@ -654,13 +662,13 @@ const resolveLocation = (
     return { page: undefined, pathname };
   }
 
-  const found = findPage(rootLevel, segments.value);
+  const found = findPage(rootLevel, Optional.unwrap(segments));
 
   if (Optional.isNone(found)) {
     return { page: undefined, pathname };
   }
 
-  const { page, params } = found.value;
+  const { page, params } = Optional.unwrap(found);
 
   return {
     page: page.id,

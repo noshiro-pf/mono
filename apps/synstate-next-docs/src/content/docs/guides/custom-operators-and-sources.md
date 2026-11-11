@@ -23,10 +23,10 @@ const defined =
     <A,>(): DropInitialValueOperator<A | undefined, A> =>
     (source: Observable<A | undefined>): Observable<A> =>
         createDerived<A>([source], (ctx) => () => {
-            const value = source.getSnapshot();
+            const value = Optional.unwrap(source.getSnapshot());
 
-            if (Optional.isSome(value) && value.value !== undefined) {
-                ctx.set(value.value);
+            if (value !== undefined) {
+                ctx.set(value);
             }
         });
 
@@ -73,9 +73,9 @@ const mergeTagged = <A, B>(
 
         // `emitted` tells which parent emitted in this update.
         if (Optional.isSome(a) && ctx.emitted(first)) {
-            ctx.set({ from: 'left', value: a.value });
+            ctx.set({ from: 'left', value: Optional.unwrap(a) });
         } else if (Optional.isSome(b) && ctx.emitted(second)) {
-            ctx.set({ from: 'right', value: b.value });
+            ctx.set({ from: 'right', value: Optional.unwrap(b) });
         }
     });
 
@@ -136,7 +136,7 @@ const delay =
                     const id = setTimeout(() => {
                         mut_timers.delete(id);
 
-                        ctx.emit(value.value);
+                        ctx.emit(Optional.unwrap(value));
                     }, milliseconds);
 
                     mut_timers.add(id);

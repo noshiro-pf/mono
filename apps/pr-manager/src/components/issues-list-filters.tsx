@@ -1,6 +1,6 @@
 import { type InitializedObservable, map } from 'synstate';
 import { constant, For, If, type JSX } from 'synstate-dom';
-import { Arr } from 'ts-data-forge';
+import { Arr, Optional } from 'ts-data-forge';
 import {
   ISSUE_START_SWITCHES,
   type IssueSort,
@@ -145,7 +145,7 @@ export const IssuesListFilters = (): JSX.Element => {
 const LabelPick = ({
   label$,
 }: Readonly<{ label$: InitializedObservable<LabelCount> }>): JSX.Element => {
-  const labelName = label$.getSnapshot().value.name;
+  const labelName = Optional.unwrap(label$.getSnapshot()).name;
 
   return (
     <button

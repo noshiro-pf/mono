@@ -121,7 +121,7 @@ export const createMultipleDatePickerState = (
       f(
         Array.from(
           selectedDatesReducer(
-            selectedDatesSet$.getSnapshot().value,
+            Optional.unwrap(selectedDatesSet$.getSnapshot()),
             action,
           ).values(),
         ).toSorted(compareYearMonthDate),
@@ -156,13 +156,12 @@ export const createMultipleDatePickerState = (
     onWeekdaysHeaderCellClick: mapNullable(
       selectedDatesDispatch,
       (f) => (w: DayOfWeekIndex) => {
-        const { month } = calendarCurrentPage$.getSnapshot().value;
+        const { month } = Optional.unwrap(calendarCurrentPage$.getSnapshot());
 
         f({
           type: 'fill-column',
-          dates: dates$
-            .getSnapshot()
-            .value.map((week) => week[w])
+          dates: Optional.unwrap(dates$.getSnapshot())
+            .map((week) => week[w])
             .filter(isNotUndefined)
             .filter((d) => d.month === month),
         });

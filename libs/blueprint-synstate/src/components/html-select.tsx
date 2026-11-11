@@ -6,6 +6,7 @@ import {
   type Child,
   type JSX,
 } from 'synstate-dom';
+import { Optional } from 'ts-data-forge';
 import { Icon } from './icon.js';
 
 type Props = Readonly<{
@@ -82,7 +83,7 @@ export const HtmlSelect = ({
 
         value$.subscribe(() => {
           afterUpdate(() => {
-            mut_select.value = value$.getSnapshot().value;
+            mut_select.value = Optional.unwrap(value$.getSnapshot());
           });
         });
       }}

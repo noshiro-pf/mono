@@ -1,4 +1,5 @@
 import { createState } from 'synstate';
+import { Optional } from 'ts-data-forge';
 import type { FixedLengthTuple, ReadonlyRecord } from 'ts-type-forge';
 import type { Rect } from 'ts-utils-additional';
 import { newRoom } from '../functions/index.mjs';
@@ -16,29 +17,31 @@ describe(createDisplayStore, () => {
   test('finds this player in the room by name', () => {
     const { store, setRoom, setMyName } = setup();
 
-    assert.isUndefined(store.myPlayerIndex.getSnapshot().value);
+    assert.isUndefined(Optional.unwrap(store.myPlayerIndex.getSnapshot()));
 
     setRoom(roomWith(['alice', 'bob']));
 
-    assert.isUndefined(store.myPlayerIndex.getSnapshot().value);
+    assert.isUndefined(Optional.unwrap(store.myPlayerIndex.getSnapshot()));
 
     setMyName('bob');
 
-    assert.strictEqual(store.myPlayerIndex.getSnapshot().value, 1);
+    assert.strictEqual(Optional.unwrap(store.myPlayerIndex.getSnapshot()), 1);
   });
 
   test('highlights the name of the player whose turn it is, once the names are placed', () => {
     const { store, setPlayerNamePositions } = setup();
 
-    assert.isUndefined(store.turnPlayerHighlighterPosition.getSnapshot().value);
+    assert.isUndefined(
+      Optional.unwrap(store.turnPlayerHighlighterPosition.getSnapshot()),
+    );
 
     const positions = namePositions();
 
     setPlayerNamePositions(positions);
 
     assert.strictEqual(
-      store.turnPlayerHighlighterPosition.getSnapshot().value,
-      positions[store.displayValues.getSnapshot().value.turnPlayer],
+      Optional.unwrap(store.turnPlayerHighlighterPosition.getSnapshot()),
+      positions[Optional.unwrap(store.displayValues.getSnapshot()).turnPlayer],
     );
   });
 
@@ -61,11 +64,13 @@ describe(createDisplayStore, () => {
 
     setMyName('alice');
 
-    assert.isUndefined(store.confirmTossBalloonProps.getSnapshot().value);
+    assert.isUndefined(
+      Optional.unwrap(store.confirmTossBalloonProps.getSnapshot()),
+    );
 
     setMyName('bob');
 
-    const props = store.confirmTossBalloonProps.getSnapshot().value;
+    const props = Optional.unwrap(store.confirmTossBalloonProps.getSnapshot());
 
     assert.isDefined(props);
 
@@ -94,11 +99,17 @@ describe(createDisplayStore, () => {
 
     setMyName('alice');
 
-    assert.isUndefined(store.confirmTossBalloonProps.getSnapshot().value);
+    assert.isUndefined(
+      Optional.unwrap(store.confirmTossBalloonProps.getSnapshot()),
+    );
 
-    assert.isUndefined(store.selectAnswerBalloonProps.getSnapshot().value);
+    assert.isUndefined(
+      Optional.unwrap(store.selectAnswerBalloonProps.getSnapshot()),
+    );
 
-    assert.isUndefined(store.decidedAnswerBalloonProps.getSnapshot().value);
+    assert.isUndefined(
+      Optional.unwrap(store.decidedAnswerBalloonProps.getSnapshot()),
+    );
   });
 });
 

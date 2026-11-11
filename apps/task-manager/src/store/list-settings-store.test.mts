@@ -1,3 +1,4 @@
+import { Optional } from 'ts-data-forge';
 import {
   DEFAULT_LIST_SETTINGS,
   type ListSettings,
@@ -34,7 +35,7 @@ describe(createListSettingsStore, () => {
 
     store.toggleOrder(2);
 
-    assert.deepStrictEqual(store.settings.getSnapshot().value.sort, [
+    assert.deepStrictEqual(Optional.unwrap(store.settings.getSnapshot()).sort, [
       { key: 'dueDate', order: 'asc' },
       { key: 'priority', order: 'asc' },
       { key: 'title', order: 'desc' },

@@ -1,3 +1,4 @@
+import { Optional } from 'ts-data-forge';
 import { createState, source, zip } from '../src/index.mjs';
 
 describe('zip completion (#2343)', () => {
@@ -167,6 +168,6 @@ describe('zip completion (#2343)', () => {
 
     setNumber(2);
 
-    assert.deepStrictEqual(zipped$.getSnapshot().value, ['A', 1]);
+    assert.deepStrictEqual(Optional.unwrap(zipped$.getSnapshot()), ['A', 1]);
   });
 });

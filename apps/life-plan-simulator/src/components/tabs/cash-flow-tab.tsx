@@ -6,7 +6,7 @@ import {
   type Bindable,
   type JSX,
 } from 'synstate-dom';
-import { Arr } from 'ts-data-forge';
+import { Arr, Optional } from 'ts-data-forge';
 import type {
   CashFlowMonth,
   OneOffAmount,
@@ -64,7 +64,7 @@ export const CashFlowTab = (): JSX.Element => {
             name: '',
             amount: 0,
             intervalYears: 1,
-            first: input$.getSnapshot().value.profile.start,
+            first: Optional.unwrap(input$.getSnapshot()).profile.start,
             until: '2090-01',
           })}
         />
@@ -233,7 +233,7 @@ const newOneOff = (id: number): OneOffAmount =>
   ({
     id,
     name: '',
-    month: input$.getSnapshot().value.profile.start,
+    month: Optional.unwrap(input$.getSnapshot()).profile.start,
     amount: 0,
   }) as const;
 

@@ -1,4 +1,4 @@
-import { replaceEqualDeep } from 'ts-data-forge';
+import { Optional, replaceEqualDeep } from 'ts-data-forge';
 import { source, type InitializedSourceObservable } from '../core/index.mjs';
 import type { StateOptions } from './create-reducer.mjs';
 
@@ -23,7 +23,7 @@ export const createStateSource = <S,>(
 }> => {
   const state = source<S>(initialState);
 
-  const getSnapshot = (): S => state.getSnapshot().value;
+  const getSnapshot = (): S => Optional.unwrap(state.getSnapshot());
 
   const equals = options?.equals ?? Object.is;
 

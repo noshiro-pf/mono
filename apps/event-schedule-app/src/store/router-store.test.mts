@@ -11,7 +11,9 @@ describe(createAppRouter, () => {
 
     assert.strictEqual(browser.url().pathname, '/create/');
 
-    assert.isTrue(router.isActive(routes.create).getSnapshot().value);
+    assert.isTrue(
+      Optional.unwrap(router.isActive(routes.create).getSnapshot()),
+    );
   });
 
   test('reads the event id and the page from the path', () => {
@@ -19,27 +21,31 @@ describe(createAppRouter, () => {
 
     const router = createAppRouter(browser);
 
-    assert.strictEqual(router.eventId$.getSnapshot().value, 'abc');
+    assert.strictEqual(Optional.unwrap(router.eventId$.getSnapshot()), 'abc');
 
     assert.isTrue(
-      router.isActive(routes.event.answer, { exact: true }).getSnapshot().value,
+      Optional.unwrap(
+        router.isActive(routes.event.answer, { exact: true }).getSnapshot(),
+      ),
     );
 
     assert.isFalse(
-      router.isActive(routes.event.answer.edit).getSnapshot().value,
+      Optional.unwrap(router.isActive(routes.event.answer.edit).getSnapshot()),
     );
 
     router.push(routes.event.answer.edit.href({ eventId: 'abc' }));
 
     assert.isTrue(
-      router.isActive(routes.event.answer.edit).getSnapshot().value,
+      Optional.unwrap(router.isActive(routes.event.answer.edit).getSnapshot()),
     );
 
     assert.isFalse(
-      router.isActive(routes.event.answer, { exact: true }).getSnapshot().value,
+      Optional.unwrap(
+        router.isActive(routes.event.answer, { exact: true }).getSnapshot(),
+      ),
     );
 
-    assert.strictEqual(router.eventId$.getSnapshot().value, 'abc');
+    assert.strictEqual(Optional.unwrap(router.eventId$.getSnapshot()), 'abc');
 
     assert.strictEqual(browser.url().pathname, '/event/abc/edit/');
   });
@@ -49,23 +55,31 @@ describe(createAppRouter, () => {
 
     const router = createAppRouter(browser);
 
-    assert.isTrue(router.isActive(routes.eventList).getSnapshot().value);
+    assert.isTrue(
+      Optional.unwrap(router.isActive(routes.eventList).getSnapshot()),
+    );
 
-    assert.isUndefined(router.eventId$.getSnapshot().value);
+    assert.isUndefined(Optional.unwrap(router.eventId$.getSnapshot()));
 
     router.push(routes.signIn.href());
 
     assert.strictEqual(browser.url().pathname, '/signIn/');
 
-    assert.isTrue(router.isActive(routes.signIn).getSnapshot().value);
+    assert.isTrue(
+      Optional.unwrap(router.isActive(routes.signIn).getSnapshot()),
+    );
 
     router.push(routes.register.href());
 
     assert.strictEqual(browser.url().pathname, '/register/');
 
-    assert.isTrue(router.isActive(routes.register).getSnapshot().value);
+    assert.isTrue(
+      Optional.unwrap(router.isActive(routes.register).getSnapshot()),
+    );
 
-    assert.isFalse(router.isActive(routes.eventList).getSnapshot().value);
+    assert.isFalse(
+      Optional.unwrap(router.isActive(routes.eventList).getSnapshot()),
+    );
   });
 
   test('names no page for an event path without an id or with more after it', () => {
@@ -75,12 +89,12 @@ describe(createAppRouter, () => {
       );
 
       assert.deepStrictEqual(
-        [path, router.match.getSnapshot().value.route],
+        [path, Optional.unwrap(router.match.getSnapshot()).route],
         [path, undefined],
       );
 
       assert.deepStrictEqual(
-        [path, router.eventId$.getSnapshot().value],
+        [path, Optional.unwrap(router.eventId$.getSnapshot())],
         [path, undefined],
       );
     }
@@ -124,17 +138,26 @@ describe(createAppRouter, () => {
 
     const router = createAppRouter(browser);
 
-    assert.strictEqual(router.editPageLeaves$.getSnapshot().value, 0);
+    assert.strictEqual(
+      Optional.unwrap(router.editPageLeaves$.getSnapshot()),
+      0,
+    );
 
     router.push(routes.event.answer.href({ eventId: 'abc' }));
 
-    assert.strictEqual(router.editPageLeaves$.getSnapshot().value, 1);
+    assert.strictEqual(
+      Optional.unwrap(router.editPageLeaves$.getSnapshot()),
+      1,
+    );
 
     router.push(routes.event.answer.edit.href({ eventId: 'abc' }));
 
     router.push(routes.create.href());
 
-    assert.strictEqual(router.editPageLeaves$.getSnapshot().value, 2);
+    assert.strictEqual(
+      Optional.unwrap(router.editPageLeaves$.getSnapshot()),
+      2,
+    );
   });
 
   test('a visit lasts until the page shown changes', () => {
@@ -210,6 +233,8 @@ describe(createAppRouter, () => {
       setTimeout(resolve, 0);
     });
 
-    assert.isTrue(router.isActive(routes.create).getSnapshot().value);
+    assert.isTrue(
+      Optional.unwrap(router.isActive(routes.create).getSnapshot()),
+    );
   });
 });

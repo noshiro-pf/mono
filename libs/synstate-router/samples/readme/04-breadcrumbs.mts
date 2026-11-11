@@ -4,6 +4,7 @@ import {
   defineRoutes,
   param,
 } from 'synstate-router';
+import { Optional } from 'ts-data-forge';
 
 if (import.meta.vitest !== undefined) {
   test('README: breadcrumbs', () => {
@@ -27,9 +28,9 @@ if (import.meta.vitest !== undefined) {
     });
 
     // Root first, each with its own meta and the Href of its page.
-    const crumbs = router.branch
-      .getSnapshot()
-      .value.map(({ meta, href }) => `${meta.label} ${href ?? ''}`);
+    const crumbs = Optional.unwrap(router.branch.getSnapshot()).map(
+      ({ meta, href }) => `${meta.label} ${href ?? ''}`,
+    );
 
     assert.deepStrictEqual(crumbs, [
       'Products /products/',

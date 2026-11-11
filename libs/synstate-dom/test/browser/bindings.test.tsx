@@ -1,5 +1,6 @@
 import { createState, just, map } from 'synstate';
 import { constant, render, type JSX } from 'synstate-dom';
+import { Optional } from 'ts-data-forge';
 
 const mountInto = (
   app: () => JSX.Element,
@@ -290,7 +291,7 @@ describe('controlled checked', () => {
 
     assert.isTrue(checkbox.checked);
 
-    assert.isTrue(checked$.getSnapshot().value);
+    assert.isTrue(Optional.unwrap(checked$.getSnapshot()));
 
     unmount();
   });

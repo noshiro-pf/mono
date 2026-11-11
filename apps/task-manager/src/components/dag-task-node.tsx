@@ -1,5 +1,6 @@
 import { map, type InitializedObservable } from 'synstate';
 import { constant, For, If, type JSX } from 'synstate-dom';
+import { Optional } from 'ts-data-forge';
 import {
   LARGE_NODE_LINE_HEIGHT,
   textWidthUnits,
@@ -27,11 +28,11 @@ type Props = Readonly<{
  * keys move it.
  */
 export const DagTaskNode = ({ record }: Props): JSX.Element => {
-  const { node: first } = record.getSnapshot().value;
+  const { node: first } = Optional.unwrap(record.getSnapshot());
 
   const { openNode, onKeyDown } = dagNodeHandlers(
-    record.getSnapshot().value.view.ref,
-    () => record.getSnapshot().value.movable,
+    Optional.unwrap(record.getSnapshot()).view.ref,
+    () => Optional.unwrap(record.getSnapshot()).movable,
   );
 
   const compact = record.pipe(map((r) => r.size === 'compact'));

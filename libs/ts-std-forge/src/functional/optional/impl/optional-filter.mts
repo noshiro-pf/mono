@@ -2,12 +2,12 @@ import type { Optional, UnknownOptional } from '../optional.mjs';
 import { isSome } from './optional-is-some.mjs';
 import { none } from './optional-none.mjs';
 import { some } from './optional-some.mjs';
-import { unwrap } from './optional-unwrap.mjs';
+import { unwrapSome } from './optional-unwrap-some.mjs';
 import type { Unwrap } from './types.mjs';
 
 /**
  * Filters an `Optional` based on a predicate. If the `Optional` is `Some` and
- * the predicate returns true, returns the original `Optional`. Otherwise
+ * the predicate returns true, returns a `Some` of the same value. Otherwise
  * returns `None`.
  *
  * @example
@@ -69,8 +69,12 @@ const filterImpl = <O extends UnknownOptional>(
   predicate: (value: Unwrap<O>) => boolean,
 ): Optional<Unwrap<O>> => {
   if (isSome(optional)) {
-    const value = unwrap(optional);
+    const value = unwrapSome(optional);
 
+    // `some(value)` rather than `optional`. For a value `some` made, the two are
+    // the same runtime value; for one it did not (revived from a store that
+    // mangled it), re-encoding gives the canonical form `some` and `map` give.
+    // `optional` would also need a cast from the narrowed `O`.
     return predicate(value) ? some(value) : none;
   }
 

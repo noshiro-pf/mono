@@ -13,7 +13,7 @@ import { isRecord } from '../guard/index.mjs';
  * and throw that very object — original `name`, tag, payload and stack
  * intact — and the boundary functions still rethrow it.
  *
- * The spelling follows the `$$tag` discriminant of `Result` and `Optional`.
+ * The spelling follows the `$$tag` discriminant of `Result`.
  */
 const panicBrandKey = '$$panic';
 

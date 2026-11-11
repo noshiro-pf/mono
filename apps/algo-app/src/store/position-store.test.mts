@@ -1,3 +1,4 @@
+import { Optional } from 'ts-data-forge';
 import type { Rect } from 'ts-utils-additional';
 import { createPositionStore } from './position-store.mjs';
 
@@ -5,9 +6,11 @@ describe(createPositionStore, () => {
   test('knows no position until one is measured', () => {
     const store = createPositionStore();
 
-    assert.isUndefined(store.cardPositions.getSnapshot().value);
+    assert.isUndefined(Optional.unwrap(store.cardPositions.getSnapshot()));
 
-    assert.isUndefined(store.playerNamePositions.getSnapshot().value);
+    assert.isUndefined(
+      Optional.unwrap(store.playerNamePositions.getSnapshot()),
+    );
   });
 
   test('keeps the position measured for each card', () => {
@@ -17,7 +20,7 @@ describe(createPositionStore, () => {
 
     store.cardPositionsDispatcher(['white', 11, rectB]);
 
-    const positions = store.cardPositions.getSnapshot().value;
+    const positions = Optional.unwrap(store.cardPositions.getSnapshot());
 
     assert.isDefined(positions);
 
@@ -34,7 +37,7 @@ describe(createPositionStore, () => {
     store.playerNamePositionsDispatcher(['N', rectB]);
 
     assert.deepStrictEqual(
-      store.playerNamePositions.getSnapshot().value?.N,
+      Optional.unwrap(store.playerNamePositions.getSnapshot())?.N,
       rectB,
     );
   });
@@ -46,7 +49,9 @@ describe(createPositionStore, () => {
 
     first.playerNamePositionsDispatcher(['S', rectA]);
 
-    assert.isUndefined(second.playerNamePositions.getSnapshot().value);
+    assert.isUndefined(
+      Optional.unwrap(second.playerNamePositions.getSnapshot()),
+    );
   });
 });
 

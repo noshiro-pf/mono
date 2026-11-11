@@ -1,4 +1,4 @@
-import { expectType } from 'ts-data-forge';
+import { expectType, Optional } from 'ts-data-forge';
 import {
   derive,
   source,
@@ -22,7 +22,7 @@ describe('re-exports of synstate', () => {
 
     expectType<typeof subscription, Subscription>('=');
 
-    assert.strictEqual(doubled.getSnapshot().value, 2);
+    assert.strictEqual(Optional.unwrap(doubled.getSnapshot()), 2);
 
     subscription.unsubscribe();
   });

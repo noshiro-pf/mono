@@ -18,12 +18,14 @@ import { PendingTypeTagName } from './tag.mjs';
  * assert.deepStrictEqual(reload.previous, Optional.some([1, 2, 3]));
  * ```
  *
- * @param previous The latest success value; `Optional.none` by default.
+ * @param previous The latest success value; `Optional.none` when omitted.
  */
 export const pending = <S = never,>(
-  previous: Optional<S> = Optional.none,
+  // Not a default parameter: a `Some` of `undefined` is `undefined` at runtime,
+  // which a default would replace with `Optional.none`.
+  ...args: readonly [] | readonly [previous: Optional<S>]
 ): AsyncPending<S> =>
   ({
     $$tag: PendingTypeTagName,
-    previous,
+    previous: args.length === 0 ? Optional.none : args[0],
   }) as const;

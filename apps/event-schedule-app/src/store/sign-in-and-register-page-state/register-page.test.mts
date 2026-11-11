@@ -1,6 +1,6 @@
 import { createState } from 'synstate';
 import { createMemoryBrowser } from 'synstate-router';
-import { Result } from 'ts-data-forge';
+import { Optional, Result } from 'ts-data-forge';
 import { routes } from '../../constants/index.mjs';
 import { createAppRouter } from '../router-store.mjs';
 import {
@@ -44,7 +44,9 @@ describe(createRegisterPageStore, () => {
 
     assert.deepStrictEqual(calls, ['createUser alice@example.com']);
 
-    assert.isDefined(store.state.getSnapshot().value.formState.email.error);
+    assert.isDefined(
+      Optional.unwrap(store.state.getSnapshot()).formState.email.error,
+    );
 
     assert.strictEqual(browser.url().pathname, '/register/');
   });
@@ -92,7 +94,9 @@ describe(createRegisterPageStore, () => {
 
     assert.strictEqual(browser.url().pathname, '/register/');
 
-    assert.isFalse(store.state.getSnapshot().value.formState.isWaitingResponse);
+    assert.isFalse(
+      Optional.unwrap(store.state.getSnapshot()).formState.isWaitingResponse,
+    );
   });
 
   test('after leaving and coming back while registering, an error sets no field', async () => {
@@ -116,7 +120,7 @@ describe(createRegisterPageStore, () => {
 
     await settle();
 
-    const { formState } = store.state.getSnapshot().value;
+    const { formState } = Optional.unwrap(store.state.getSnapshot());
 
     assert.isUndefined(formState.email.error);
 

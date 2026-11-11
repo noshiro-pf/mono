@@ -1,5 +1,6 @@
 import { onScopeDispose, type InitializedObservable } from 'synstate';
 import type { JSX } from 'synstate-dom';
+import { Optional } from 'ts-data-forge';
 
 /**
  * A `ref` that keeps a `<dialog>` opened modal while `open$` is `true`, for as
@@ -26,7 +27,7 @@ export const followOpen =
         follow(shown);
       } else {
         queueMicrotask(() => {
-          follow(open$.getSnapshot().value);
+          follow(Optional.unwrap(open$.getSnapshot()));
         });
       }
     });

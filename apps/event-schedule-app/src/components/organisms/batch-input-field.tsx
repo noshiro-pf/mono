@@ -7,6 +7,7 @@ import {
   type Bindable,
   type JSX,
 } from 'synstate-dom';
+import { Optional } from 'ts-data-forge';
 import { dict } from '../../constants/index.mjs';
 import { AnswerIconPointCell, CustomIconButton } from '../molecules/index.mjs';
 import {
@@ -76,7 +77,8 @@ export const BatchInputAnswerForm = ({
                         onClick={() => {
                           onIconClick(
                             iconId,
-                            answerIcons.getSnapshot().value.fair.point,
+                            Optional.unwrap(answerIcons.getSnapshot()).fair
+                              .point,
                           );
                         }}
                       />
@@ -111,9 +113,11 @@ export const BatchInputAnswerForm = ({
                 text={constant(dc.batchInput.apply)}
                 onClick={() => {
                   applyBatchInput({
-                    comment: comment$.getSnapshot().value,
-                    selectedIconId: selectedIconId$.getSnapshot().value,
-                    point: fairPoint$.getSnapshot().value,
+                    comment: Optional.unwrap(comment$.getSnapshot()),
+                    selectedIconId: Optional.unwrap(
+                      selectedIconId$.getSnapshot(),
+                    ),
+                    point: Optional.unwrap(fairPoint$.getSnapshot()),
                   });
                 }}
               />

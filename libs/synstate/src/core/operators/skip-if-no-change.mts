@@ -124,13 +124,16 @@ class SkipIfNoChangeObservableClass<A>
 
     const prev = this.#mut_previousValue;
 
-    const cond = Optional.isNone(prev) || !this.#eq(prev.value, sn.value);
+    const value = Optional.unwrap(sn);
+
+    const cond =
+      Optional.isNone(prev) || !this.#eq(Optional.unwrap(prev), value);
 
     // NOTE: Must update before setNext, otherwise Optional.isNone(prev) remains true when tryUpdate is called consecutively
     this.#mut_previousValue = sn;
 
     if (cond) {
-      this.setNext(sn.value, updateToken);
+      this.setNext(value, updateToken);
     }
   }
 }

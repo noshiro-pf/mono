@@ -20,7 +20,7 @@ import {
   type InitializedObservable,
   type Subscription,
 } from 'synstate';
-import { Result, unknownToString } from 'ts-data-forge';
+import { Optional, Result, unknownToString } from 'ts-data-forge';
 import type { Answered } from '../graphql.mjs';
 import type { StoredToken } from '../token.mjs';
 import {
@@ -71,7 +71,7 @@ export const createActivityStore = (deps: ActivityDeps): ActivityStore => {
 
     const id = mut_reads.latest;
 
-    const stored = deps.token.getSnapshot().value;
+    const stored = Optional.unwrap(deps.token.getSnapshot());
 
     if (stored === undefined) {
       setStatus({
@@ -128,7 +128,7 @@ export const createActivityStore = (deps: ActivityDeps): ActivityStore => {
 
   /** The week held is no longer the one to show: read it now, or next time. */
   const invalidate = (): void => {
-    if (isOpen.getSnapshot().value) {
+    if (Optional.unwrap(isOpen.getSnapshot())) {
       read();
     } else {
       mut_reads.latest += 1;

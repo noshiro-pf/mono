@@ -1,6 +1,6 @@
 import type { UnknownOptional } from '../optional.mjs';
 import { isSome } from './optional-is-some.mjs';
-import { unwrap } from './optional-unwrap.mjs';
+import { unwrapSome } from './optional-unwrap-some.mjs';
 import type { Unwrap } from './types.mjs';
 
 /**
@@ -101,7 +101,4 @@ const matchImpl = <O extends UnknownOptional, S2, N2>(
     none: () => N2;
   }>,
 ): N2 | S2 =>
-  isSome(optional)
-    ? // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      cases.some(unwrap(optional)!)
-    : cases.none();
+  isSome(optional) ? cases.some(unwrapSome(optional)) : cases.none();

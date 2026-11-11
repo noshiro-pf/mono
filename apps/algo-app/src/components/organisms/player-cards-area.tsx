@@ -1,5 +1,6 @@
 import { map, type InitializedObservable } from 'synstate';
 import { constant, For, type Bindable, type JSX } from 'synstate-dom';
+import { Optional } from 'ts-data-forge';
 import type { Rect, RectSize } from 'ts-utils-additional';
 import { cardToString } from '../../functions/index.mjs';
 import type {
@@ -66,14 +67,14 @@ export const PlayerCardsArea = ({
               rectReport={{
                 measureOn,
                 onBoundingClientRectChange: (rect) => {
-                  const c = card$.getSnapshot().value;
+                  const c = Optional.unwrap(card$.getSnapshot());
 
                   cardPositionsDispatcher([c.color, c.number, rect]);
                 },
               }}
               size={cardSize}
               onClick={() => {
-                card$.getSnapshot().value.onClick();
+                Optional.unwrap(card$.getSnapshot()).onClick();
               }}
             />
           )}

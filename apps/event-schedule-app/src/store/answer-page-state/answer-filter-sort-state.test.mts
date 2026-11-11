@@ -1,5 +1,6 @@
 import { Answer, type EventSchedule } from 'event-schedule-app-shared';
 import { createState } from 'synstate';
+import { Optional } from 'ts-data-forge';
 import type { AnswerFilterState } from '../../functions/index.mjs';
 import type { AnswerFilterQueryParam } from './answer-filter-query-param.mjs';
 import {
@@ -11,10 +12,10 @@ describe(createAnswerFilterAndSortStore, () => {
   test('sorts by date, ascending, at first', () => {
     const { store } = setup();
 
-    assert.deepStrictEqual(store.sortKeyAndOrder$.getSnapshot().value, [
-      'date',
-      'asc',
-    ]);
+    assert.deepStrictEqual(
+      Optional.unwrap(store.sortKeyAndOrder$.getSnapshot()),
+      ['date', 'asc'],
+    );
   });
 
   test('a sort change is kept and written to the query string', () => {
@@ -22,10 +23,10 @@ describe(createAnswerFilterAndSortStore, () => {
 
     store.onScoreSortOrderChange('desc');
 
-    assert.deepStrictEqual(store.sortKeyAndOrder$.getSnapshot().value, [
-      'score',
-      'desc',
-    ]);
+    assert.deepStrictEqual(
+      Optional.unwrap(store.sortKeyAndOrder$.getSnapshot()),
+      ['score', 'desc'],
+    );
 
     assert.deepStrictEqual(savedSorts, [['score', 'desc']]);
   });
@@ -35,7 +36,9 @@ describe(createAnswerFilterAndSortStore, () => {
 
     store.setOnlyFilledDate(true);
 
-    assert.isTrue(store.filterState$.getSnapshot().value.filledDateOnly);
+    assert.isTrue(
+      Optional.unwrap(store.filterState$.getSnapshot()).filledDateOnly,
+    );
 
     assert.strictEqual(savedFilters.at(-1)?.filledDateOnly, true);
   });
@@ -50,7 +53,7 @@ describe(createAnswerFilterAndSortStore, () => {
         store.setOnlyFilledDate(checked);
 
         assert.strictEqual(
-          store.filterState$.getSnapshot().value.filledDateOnly,
+          Optional.unwrap(store.filterState$.getSnapshot()).filledDateOnly,
           checked,
         );
 
@@ -64,32 +67,36 @@ describe(createAnswerFilterAndSortStore, () => {
 
     store.restoreFromQueryParams();
 
-    assert.deepStrictEqual(store.sortKeyAndOrder$.getSnapshot().value, [
-      'score',
-      'desc',
-    ]);
+    assert.deepStrictEqual(
+      Optional.unwrap(store.sortKeyAndOrder$.getSnapshot()),
+      ['score', 'desc'],
+    );
   });
 
   test('leaves out the respondents unchecked in the filter', () => {
     const { store } = setup();
 
     assert.deepStrictEqual(
-      store.answersFiltered$.getSnapshot().value?.map((a) => a.user.name),
+      Optional.unwrap(store.answersFiltered$.getSnapshot())?.map(
+        (a) => a.user.name,
+      ),
       ['bob', 'carol'],
     );
 
     store.setEnabledFilteringByRespondent(true);
 
-    const bob = store.respondentCheckState$
-      .getSnapshot()
-      .value.find((r) => r.username === 'bob');
+    const bob = Optional.unwrap(store.respondentCheckState$.getSnapshot()).find(
+      (r) => r.username === 'bob',
+    );
 
     assert.isDefined(bob);
 
     bob.checkState.onCheck(false);
 
     assert.deepStrictEqual(
-      store.answersFiltered$.getSnapshot().value?.map((a) => a.user.name),
+      Optional.unwrap(store.answersFiltered$.getSnapshot())?.map(
+        (a) => a.user.name,
+      ),
       ['carol'],
     );
   });

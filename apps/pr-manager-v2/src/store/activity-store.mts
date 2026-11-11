@@ -1,6 +1,6 @@
 import { readContextOf, type Read } from 'pr-report-core-v2';
 import { createState, type InitializedObservable } from 'synstate';
-import { Result } from 'ts-data-forge';
+import { Optional, Result } from 'ts-data-forge';
 import {
   nextMidnightMs,
   type Repo,
@@ -66,7 +66,7 @@ export const createActivityStore = (deps: ActivityDeps): ActivityStore => {
 
     const id = mut_reads.latest;
 
-    const stored = deps.token.getSnapshot().value;
+    const stored = Optional.unwrap(deps.token.getSnapshot());
 
     if (stored === undefined) {
       setStatus({

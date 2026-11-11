@@ -11,7 +11,7 @@
  */
 
 import { createState, derive, type InitializedObservable } from 'synstate';
-import { Arr } from 'ts-data-forge';
+import { Arr, Optional } from 'ts-data-forge';
 import { nodeRefOf, type GraphNodeId, type NodeRef } from '../domain/index.mjs';
 
 export type BulkDeleteDeps = Readonly<{
@@ -47,13 +47,13 @@ export const createBulkDeleteStore = (
       asking(asked, selected),
     ),
     request: () => {
-      setRequested(deps.selected.getSnapshot().value);
+      setRequested(Optional.unwrap(deps.selected.getSnapshot()));
     },
     cancel: () => {
       setRequested(undefined);
     },
     confirm: () => {
-      const selected = deps.selected.getSnapshot().value;
+      const selected = Optional.unwrap(deps.selected.getSnapshot());
 
       const asked = getSnapshot();
 

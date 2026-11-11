@@ -1,5 +1,6 @@
 import { createState, map } from 'synstate';
 import { constant, For, render, type JSX } from 'synstate-dom';
+import { Optional } from 'ts-data-forge';
 import type { BenchApp, Framework } from '../bench-app.mjs';
 import {
   createRowFactory,
@@ -27,7 +28,7 @@ export const synstateDom: Framework = {
         <tbody>
           <For items={rows$} key={(row) => row.id}>
             {(row$) => {
-              const { id } = row$.getSnapshot().value;
+              const { id } = Optional.unwrap(row$.getSnapshot());
 
               return (
                 <tr class={{ danger: selected$.pipe(map((s) => s === id)) }}>

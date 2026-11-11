@@ -1,7 +1,7 @@
 import { EventSchedule, NotificationSettings } from 'event-schedule-app-shared';
 import { createState } from 'synstate';
 import { createMemoryBrowser } from 'synstate-router';
-import { Result } from 'ts-data-forge';
+import { Optional, Result } from 'ts-data-forge';
 import { routes } from '../constants/index.mjs';
 import {
   createConfirmEmailDialogStore,
@@ -14,7 +14,7 @@ describe(createConfirmEmailDialogStore, () => {
   test('is open for an event with notifications until the email is confirmed', async () => {
     const { store, verified } = setup('ok');
 
-    assert.isTrue(store.isOpen$.getSnapshot().value);
+    assert.isTrue(Optional.unwrap(store.isOpen$.getSnapshot()));
 
     store.inputEmailHandler('bob@example.com');
 
@@ -22,7 +22,7 @@ describe(createConfirmEmailDialogStore, () => {
 
     await settle();
 
-    assert.isFalse(store.isOpen$.getSnapshot().value);
+    assert.isFalse(Optional.unwrap(store.isOpen$.getSnapshot()));
 
     assert.deepStrictEqual(verified, ['abc:bob@example.com']);
   });
@@ -30,7 +30,7 @@ describe(createConfirmEmailDialogStore, () => {
   test('is never open for an event without notifications', () => {
     const { store } = setup('ok', { notifications: false });
 
-    assert.isFalse(store.isOpen$.getSnapshot().value);
+    assert.isFalse(Optional.unwrap(store.isOpen$.getSnapshot()));
   });
 
   test('stays open with an error for an email that does not match', async () => {
@@ -42,9 +42,11 @@ describe(createConfirmEmailDialogStore, () => {
 
     await settle();
 
-    assert.isTrue(store.isOpen$.getSnapshot().value);
+    assert.isTrue(Optional.unwrap(store.isOpen$.getSnapshot()));
 
-    assert.isDefined(store.state.getSnapshot().value.formState.email.error);
+    assert.isDefined(
+      Optional.unwrap(store.state.getSnapshot()).formState.email.error,
+    );
 
     assert.deepStrictEqual(verified, []);
   });
@@ -64,7 +66,7 @@ describe(createConfirmEmailDialogStore, () => {
 
     consoleError.mockRestore();
 
-    assert.isTrue(store.isOpen$.getSnapshot().value);
+    assert.isTrue(Optional.unwrap(store.isOpen$.getSnapshot()));
 
     assert.strictEqual(toasts.count, 1);
   });
@@ -78,7 +80,7 @@ describe(createConfirmEmailDialogStore, () => {
 
     await settle();
 
-    assert.isFalse(store.isOpen$.getSnapshot().value);
+    assert.isFalse(Optional.unwrap(store.isOpen$.getSnapshot()));
 
     browser.history.go(-1);
 
@@ -88,7 +90,7 @@ describe(createConfirmEmailDialogStore, () => {
 
     await settle();
 
-    assert.isTrue(store.isOpen$.getSnapshot().value);
+    assert.isTrue(Optional.unwrap(store.isOpen$.getSnapshot()));
   });
 
   test('drops an answer that comes back after the edit page is left and opened again', async () => {
@@ -108,7 +110,7 @@ describe(createConfirmEmailDialogStore, () => {
 
     assert.deepStrictEqual(verified, []);
 
-    assert.isTrue(store.isOpen$.getSnapshot().value);
+    assert.isTrue(Optional.unwrap(store.isOpen$.getSnapshot()));
   });
 
   test('drops an answer that comes back after another event’s edit page opened', async () => {
@@ -124,9 +126,11 @@ describe(createConfirmEmailDialogStore, () => {
 
     assert.deepStrictEqual(verified, []);
 
-    assert.isTrue(store.isOpen$.getSnapshot().value);
+    assert.isTrue(Optional.unwrap(store.isOpen$.getSnapshot()));
 
-    assert.isFalse(store.state.getSnapshot().value.formState.isWaitingResponse);
+    assert.isFalse(
+      Optional.unwrap(store.state.getSnapshot()).formState.isWaitingResponse,
+    );
   });
 
   test('drops an answer that comes back after the edit page is left', async () => {

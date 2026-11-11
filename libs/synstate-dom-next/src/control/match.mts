@@ -24,7 +24,7 @@ export const MatchOptional = <T,>({
     key: Optional.isSome,
     children: (_isSome, current) =>
       Optional.isSome(current)
-        ? some(innerOf(value, current.value, someValueOr))
+        ? some(innerOf(value, Optional.unwrap(current), someValueOr))
         : none,
   });
 
