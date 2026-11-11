@@ -1,4 +1,3 @@
-import type { FixedLengthTuple } from 'ts-type-forge';
 // cspell:ignore esac nohup
 import { Arr, hasKey } from 'ts-data-forge';
 
@@ -26,6 +25,21 @@ import { Arr, hasKey } from 'ts-data-forge';
  * it is.
  */
 export const readShellCommands = (script: string): ShellReading => {
+  const { commands, assignments, problems } = readShellScript(script);
+
+  return {
+    commands,
+    assignments: assignments.map(({ name, value }) => [name, value] as const),
+    problems,
+  };
+};
+
+/**
+ * {@link readShellCommands}, with each assignment's place among the commands:
+ * the index of the first command that comes after it, so that a reader can say
+ * what `$f` holds where it is used (`f=./x.mts; node "$f"`).
+ */
+export const readShellScript = (script: string): ShellScriptReading => {
   const chars = Array.from(script.replaceAll('\r\n', '\n'));
 
   const { commands, assignments, problems } = readList(chars, 0, undefined);
@@ -45,7 +59,22 @@ export type ShellReading = Readonly<{
   problems: readonly string[];
 }>;
 
-type ListReading = ShellReading & Readonly<{ end: number }>;
+export type ShellScriptReading = Readonly<{
+  commands: ShellReading['commands'];
+  /** {@link ShellReading.assignments}, each with where it is made. */
+  assignments: readonly ShellAssignment[];
+  problems: ShellReading['problems'];
+}>;
+
+export type ShellAssignment = Readonly<{
+  name: string;
+  /** As the shell holds it, quotes taken off and nothing expanded. */
+  value: string;
+  /** The index in `commands` of the first command after the assignment. */
+  before: number;
+}>;
+
+type ListReading = ShellScriptReading & Readonly<{ end: number }>;
 
 type Heredoc = Readonly<{
   delimiter: string;
@@ -139,7 +168,8 @@ const commandWords = (
  */
 const assignmentsOf = (
   words: readonly string[],
-): readonly FixedLengthTuple<2, string>[] => {
+  before: number,
+): readonly ShellAssignment[] => {
   const afterReserved = words.slice(
     Math.max(
       0,
@@ -154,10 +184,10 @@ const assignmentsOf = (
       ? afterReserved
       : ([] as const);
 
-  return assigned.map((word): FixedLengthTuple<2, string> => {
+  return assigned.map((word): ShellAssignment => {
     const at = word.indexOf('=');
 
-    return [word.slice(0, at), word.slice(at + 1)];
+    return { name: word.slice(0, at), value: word.slice(at + 1), before };
   });
 };
 
@@ -339,7 +369,7 @@ const readList = (
 ): ListReading => {
   const mut_commands: (readonly string[])[] = [];
 
-  const mut_assignments: FixedLengthTuple<2, string>[] = [];
+  const mut_assignments: ShellAssignment[] = [];
 
   const mut_problems: string[] = [];
 
@@ -455,9 +485,15 @@ const readList = (
         head[0] === 'case' && Arr.isFixedLengthArray(2, head);
     }
 
-    mut_assignments.push(...assignmentsOf(mut_words));
-
     const command = commandWords(mut_words);
+
+    // A declaration is a command itself; what it assigns holds after it.
+    mut_assignments.push(
+      ...assignmentsOf(
+        mut_words,
+        mut_commands.length + (command === undefined ? 0 : 1),
+      ),
+    );
 
     mut_words = [];
 

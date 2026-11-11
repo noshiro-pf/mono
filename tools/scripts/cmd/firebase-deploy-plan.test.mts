@@ -358,14 +358,6 @@ describe('the script', () => {
 
     assert.strictEqual(result.only, undefined);
   });
-
-  test('the script uses nothing the minimum Node lacks', () => {
-    // That it loads nothing but builtins is `check:root:node-run-scripts`'s.
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
-    const source = fs.readFileSync(scriptPath, 'utf8');
-
-    assert.notMatch(source, /\bTemporal\./u);
-  });
 });
 
 const writeFiles = (

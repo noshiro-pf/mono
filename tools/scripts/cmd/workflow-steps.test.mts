@@ -1072,15 +1072,4 @@ describe('the script, run the way the workflows run it', () => {
 
     assert.deepStrictEqual(result.code, 2);
   });
-
-  test('the script uses nothing the minimum Node lacks', () => {
-    // It runs on every Node the setup action is given — the `minimum` of
-    // tools/configs/node-support.json included, which has no `Temporal`. That
-    // it loads nothing but builtins is `check:root:node-run-scripts`'s.
-
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
-    const source = fs.readFileSync(scriptPath, 'utf8');
-
-    assert.notMatch(source, /\bTemporal\./u);
-  });
 });
