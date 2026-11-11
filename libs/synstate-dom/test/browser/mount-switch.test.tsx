@@ -1,13 +1,12 @@
 import { createScope, createState, map } from 'synstate';
-// eslint-disable-next-line import-x/no-internal-modules -- not exported: `Routes` cannot show what this tests (see below)
-import { mountSwitch } from '../../src/internal/mount-switch.mjs';
+import { mountSwitch, toNodes } from 'synstate-dom';
 
 type User = Readonly<{ name: string }>;
 
 describe(mountSwitch, () => {
-  // `Routes` switches on `router.match`, which nothing a page reads is shallower
-  // than, so the switch is tested here with a value derived in more steps than
-  // the branch's own.
+  // Moved from synstate-router-dom, whose `Routes` switches on `router.match`,
+  // which nothing a page reads is shallower than: so the switch is tested here,
+  // with a value derived in more steps than the branch's own.
   test('disposes a branch before what it derived computes a value that rules it out (#3605)', () => {
     const [user$, setUser] = createState<User | undefined>({ name: 'a' });
 
@@ -21,23 +20,25 @@ describe(mountSwitch, () => {
     const container = document.createElement('p');
 
     container.append(
-      ...scope.run(() =>
-        mountSwitch(
-          value$,
-          (defined) => defined,
-          (defined) =>
-            defined ? (
-              <b>
-                {user$.pipe(
-                  map((u) => {
-                    mut_seen.push(u?.name);
+      ...toNodes(
+        scope.run(() =>
+          mountSwitch(
+            value$,
+            (defined) => defined,
+            (defined) =>
+              defined ? (
+                <b>
+                  {user$.pipe(
+                    map((u) => {
+                      mut_seen.push(u?.name);
 
-                    // The switch rules `undefined` out; reaching it here is the bug.
-                    return u === undefined ? 'unreachable' : u.name;
-                  }),
-                )}
-              </b>
-            ) : undefined,
+                      // The switch rules `undefined` out; reaching it here is the bug.
+                      return u === undefined ? 'unreachable' : u.name;
+                    }),
+                  )}
+                </b>
+              ) : undefined,
+          ),
         ),
       ),
     );
