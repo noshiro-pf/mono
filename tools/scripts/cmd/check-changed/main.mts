@@ -36,6 +36,7 @@ import {
   type PackageInfo,
   type Step,
 } from './plan.mjs';
+import { findRulesTestNotes } from './rules-tests.mjs';
 
 /**
  * Runs the checks a diff needs, and only those. README.md beside this file says
@@ -132,6 +133,7 @@ const main = async (): Promise<number> => {
           'tools/configs/ changed: the packages that consume it are not checked here; run the `ws:*` command for what it configures (`ws:check:types`, `ws:check:test`, `ws:fix:lint`).',
         ] as const)
       : ([] as const)),
+    ...findRulesTestNotes(changedFiles, packages),
   ] as const;
 
   const env = stepEnvironment(base);
