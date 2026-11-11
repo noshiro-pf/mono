@@ -1,0 +1,91 @@
+name: synstate-next Benchmark
+
+# Measures the benchmark of the synstate-next documentation
+# (apps/synstate-next-docs) on a GitHub-hosted runner, when dispatched by hand,
+# and uploads what it measured, laid out as it is committed, as the
+# `synstate-next-benchmark-<commit>-<run id>` artifact, named after the commit
+# it measured. Whoever dispatched it commits that file, on that commit's
+# branch, as apps/synstate-next-docs/src/data/benchmark-results.json, and runs
+# `pnpm --filter synstate-next-docs run gen:benchmark`, which embeds it into
+# the page and stops on a sentence the new figures no longer bear out.
+#
+# The page is published, and its figures are comparable with the synstate
+# documentation's, measured by `synstate-benchmark.yml`, only when both come
+# from the same kind of machine: a cloud container's CPU moved every ratio
+# between libraries. Hence the runner image pinned below, as there. The image
+# does not fix the CPU GitHub schedules the job onto, and a workflow has no
+# way to choose one, so nothing here can hold it: each page states the CPU it
+# was measured on, and two pages are compared only where those match.
+#
+# Not a check workflow: it reports no required context, and calls neither
+# `check-gates.yml` nor `check-result.yml`. A measurement is a decision to
+# republish the page, not a property of a tree, and it is long: half an hour
+# in a cloud container with three processes per library. Dispatch it on the
+# branch whose code is to be measured: the run measures the dispatched ref.
+on:
+  workflow_dispatch:
+
+# One measurement per ref at a time, and a running one never cancelled: a run
+# writes nothing until every scenario is measured, so a cancelled one loses
+# everything it measured. A dispatch made meanwhile waits; GitHub keeps one
+# waiting run per group, so of several such dispatches only the last runs.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions: {}
+
+jobs:
+  measure:
+    # Pinned, not `ubuntu-latest`, so that a re-measurement differs from the
+    # last only in the code and the versions measured.
+    runs-on: ubuntu-24.04
+    # Every library in every scenario, several times, each in a process of its
+    # own (`run-benchmark.mts`), with the timeouts of the slow libraries in the
+    # sweeps; see `LONGER_TIMEOUTS` in check-workflow-timeouts.mts. It holds
+    # one of the account's concurrent runners all that time, which the checks
+    # of the merge queue share ("The work" in README.md), so dispatch it when
+    # the queue is quiet.
+    timeout-minutes: 120
+
+    permissions:
+      contents: read
+
+    env:
+      # Where `run-benchmark.mts` writes (`resultsPath` in its `scenarios.mts`).
+      RESULTS_PATH: apps/synstate-next-docs/src/data/benchmark-results.json
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up pnpm, Node.js and the dependencies
+        uses: $/.github/actions/setup
+
+      # Every workspace package that another one links, as every package
+      # script assumes, rather than only those the measurement loads from
+      # `dist/`: a list of those would be one more to keep in step with what
+      # the benchmark imports, and building them all is short beside the
+      # measurement.
+      - name: Build
+        run: pnpm run ws:build:deps
+
+      # The docs app's `benchmark` without `gen:benchmark`, which stops on a
+      # sentence the figures no longer bear out; rewording one is the
+      # committer's to do. The committed copy is removed first, so that a run
+      # that wrote its results anywhere else fails the upload rather than
+      # uploading that copy as a measurement.
+      - name: Measure
+        run: |
+          set -euo pipefail
+          rm "${RESULTS_PATH}"
+          pnpm --filter synstate-next-docs run z:benchmark:measure
+
+      - name: Upload the measurement
+        uses: actions/upload-artifact@v7.0.2
+        with:
+          name: synstate-next-benchmark-${{ github.sha }}-${{ github.run_id }}
+          path: ${{ env.RESULTS_PATH }}
+          if-no-files-found: error

@@ -36,6 +36,7 @@ GitHub shows a `.github/README.md` in place of the root one.
 | `issue-closed-labels.yml`        | `issues` closed                        | none; releases the closed issue's start        |
 | `link-check.yml`                 | pull requests, path-filtered; schedule | none; other people's servers decide it         |
 | `e2e-production.yml`             | schedule; `workflow_dispatch`          | none; the live sites decide it                 |
+| `synstate-next-benchmark.yml`    | `workflow_dispatch`                    | none; uploads a measurement to commit          |
 
 The required contexts are listed in `repo-settings/rulesets/main.json`. Every
 one of them is either an aggregate job (see "The aggregate job") or a job that

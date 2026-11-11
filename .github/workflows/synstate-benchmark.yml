@@ -96,7 +96,7 @@ jobs:
     # two warmup rounds at least as long. Measured locally at about 2m30s for
     # the first four, and 6m for the cut-off on a slower machine, plus install
     # and build; on the runner a measurement takes 10 to 14 minutes, which is
-    # why this is one of the two jobs above the 15-minute ceiling
+    # why this is one of the jobs above the 15-minute ceiling
     # (`check:root:workflow-timeouts`).
     timeout-minutes: 20
 

@@ -6,6 +6,12 @@ import * as path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { Arr, isRecord, isString, Result } from 'ts-data-forge';
 import type { ReadonlyRecord } from 'ts-type-forge';
+// A measuring child, which runs this file too, loads it as well: it costs the
+// child little, since Prettier runs in a process of its own and only when
+// `formatPackage` is called.
+// eslint-disable-next-line import-x/no-relative-packages -- tools/ is not a package; this is how apps reach its shared scripts
+import { formatPackage } from '../../../../tools/configs/format-package.mjs';
+import { workspaceRootPath } from '../workspace-root-path.mjs';
 import {
   type BenchmarkResults,
   type EntryResult,
@@ -39,10 +45,14 @@ import { medianOverRounds, timeEntry } from './time-entry.mjs';
 // page must stand on one run again, so keeping what was measured before it
 // would mix two builds on one page.
 //
-// `benchmark` builds synstate-next and synstate, the workspace packages the runs
-// load from `dist/`. `tools/configs/tsconfig.tsx.json` maps ts-data-forge and
-// ts-std-forge to their sources, so their `dist/` is not read; a clone with
-// nothing built runs `ws:build:deps` first, as for every package script.
+// `benchmark` builds synstate-next and synstate, which the runs load from
+// `dist/`. `tools/configs/tsconfig.tsx.json` maps the bare `ts-data-forge` and
+// `ts-std-forge` to their sources, but not a subpath such as
+// `ts-data-forge/array`, which they load from `dist/` too; so a clone with
+// nothing built, or one whose ts-data-forge changed, runs `ws:build:deps` first.
+// `assert-deps-built.mts` would say so on a clone with nothing built, but it
+// asks for every package the app links, the ESLint ones included, which the
+// runs never load.
 const main = async (): Promise<void> => {
   if (process.env[childEnv] !== undefined) {
     await measureAsChild();
@@ -84,7 +94,23 @@ const main = async (): Promise<void> => {
   // eslint-disable-next-line security/detect-non-literal-fs-filename
   await fs.writeFile(resultsPath, `${JSON.stringify(results, undefined, 2)}\n`);
 
-  console.info(`\nWrote ${path.relative(process.cwd(), resultsPath)}`);
+  const shown = path.relative(process.cwd(), resultsPath);
+
+  // Laid out as it is committed, so that neither `benchmark` nor the workflow
+  // that uploads it formats it after. A failure fails the run with the file
+  // already written in `JSON.stringify`'s layout, which a local run keeps; the
+  // workflow, like `synstate-benchmark.yml` over its own `fix:fmt`, uploads
+  // only what a run completed.
+  if (
+    (await formatPackage({
+      cwd: workspaceRootPath,
+      patterns: [path.relative(workspaceRootPath, resultsPath)],
+    })) !== 0
+  ) {
+    throw new Error(`Prettier failed on ${shown}, written unformatted`);
+  }
+
+  console.info(`\nWrote ${shown}`);
 };
 
 /** How many times each library is measured, each in a new process. */
