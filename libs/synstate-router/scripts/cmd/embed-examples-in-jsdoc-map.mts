@@ -41,6 +41,10 @@ export const sourceFileMappings: readonly SourceFileMapping[] = [
     sampleFiles: ['samples/src/match-at-example.mts'],
   },
   {
+    sourcePath: 'src/matched-branch.mts',
+    sampleFiles: ['samples/src/matched-branch-example.mts'],
+  },
+  {
     sourcePath: 'src/href-with-search.mts',
     sampleFiles: ['samples/src/href-with-search-example.mts'],
   },

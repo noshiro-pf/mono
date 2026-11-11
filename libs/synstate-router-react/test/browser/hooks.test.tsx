@@ -20,6 +20,28 @@ describe('hooks', () => {
     assert.strictEqual(result.current.route, 'settings');
   });
 
+  test('useBranch follows the matched branch, root first', () => {
+    const {
+      router,
+      bound: { useBranch },
+    } = setup('/products/3/');
+
+    const { result } = renderHook(useBranch);
+
+    assert.deepStrictEqual<unknown>(result.current, [
+      { id: 'products', meta: undefined, href: '/products/' },
+      { id: 'products.item', meta: undefined, href: '/products/3/' },
+    ]);
+
+    act(() => {
+      router.push(routes.settings.href());
+    });
+
+    assert.deepStrictEqual<unknown>(result.current, [
+      { id: 'settings', meta: undefined, href: '/settings/' },
+    ]);
+  });
+
   test('useAt holds the values of a node the page is at or below', () => {
     const {
       router,

@@ -2,6 +2,7 @@ import type * as React from 'react';
 import type {
   AnyRouteNode,
   AnyRoutes,
+  RouteBranch,
   RouteMatch,
   RouteNodeValues,
   Router,
@@ -37,6 +38,12 @@ export type ReactRouter<R extends AnyRoutes> = Readonly<{
   /** The match; a `switch` on `route` narrows it. */
   useRouteMatch: () => RouteMatch<R>;
 
+  /**
+   * `router.branch`'s value: the nodes from the top down to the page, with
+   * their `meta` and `Href`s, for a breadcrumb or a title.
+   */
+  useBranch: () => RouteBranch<R>;
+
   /** `router.at(node)`'s value. */
   useAt: <N extends AnyRouteNode>(node: N) => Optional<RouteNodeValues<N>>;
 
@@ -59,6 +66,7 @@ export const createReactRouter = <R extends AnyRoutes>(
     Routes: createRoutes(router),
     Link: createLink(router),
     useRouteMatch: () => useObservableValue(router.match),
+    useBranch: () => useObservableValue(router.branch),
     useAt: (node) => useObservableValue(router.at(node)),
     useIsActive: (node, options) =>
       useObservableValue(router.isActive(node, options)),

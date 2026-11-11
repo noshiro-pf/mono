@@ -13,6 +13,7 @@ const documents = [
       '01-define-routes.mts',
       '02-create-router.mts',
       '03-optional-segment.mts',
+      '04-breadcrumbs.mts',
     ],
   },
 ] as const;
