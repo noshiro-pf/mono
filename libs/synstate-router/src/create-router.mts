@@ -7,10 +7,16 @@ import {
   type InitializedObservable,
   type Observable,
 } from 'synstate';
-import { Optional } from 'ts-data-forge';
-import type { DeepReadonly, ReadonlyRecord, StrictOmit } from 'ts-type-forge';
+import { isNonNullObject, Optional } from 'ts-data-forge';
+import type {
+  DeepReadonly,
+  ReadonlyRecord,
+  RelaxedExclude,
+  StrictOmit,
+} from 'ts-type-forge';
 import type { RouterBrowser } from './browser.mjs';
 import { matchRoutes } from './define-routes.mjs';
+import type { PageMatch } from './href-with-search.mjs';
 import type { Href } from './href.mjs';
 import {
   canonicalPathname,
@@ -33,9 +39,11 @@ import type {
   AnyRoutes,
   AnySearchCodec,
   RouteBranch,
+  RouteDefinitions,
   RouteMatch,
   RouteNodeValues,
   RouteSearch,
+  RouteTitle,
   RouteValues,
 } from './route-types.mjs';
 
@@ -384,6 +392,49 @@ export const createRouter = <R extends AnyRoutes>(
 
     return mut_branch.observable;
   };
+
+  // The document's title
+
+  // The title the document had before the router set one: what a page with no
+  // title of its own goes back to.
+  const mut_title: { original: string | undefined; set: string | undefined } = {
+    original: undefined,
+    set: undefined,
+  };
+
+  // A tree that declares no title costs nothing on a navigation.
+  const declaresTitle = definesTitle(routes[routeTreeKey].definition);
+
+  const stopTitle = untracked(() =>
+    match.subscribe((m) => {
+      const { documentTitle } = browser;
+
+      if (documentTitle === undefined || !declaresTitle) {
+        return;
+      }
+
+      const title = titleOf(matchedBranch(routes, m), m);
+
+      if (title === undefined) {
+        // A router that never set a title leaves the app's own alone.
+        if (mut_title.set !== undefined) {
+          documentTitle.set(mut_title.original ?? '');
+
+          mut_title.set = undefined;
+        }
+
+        return;
+      }
+
+      if (mut_title.set === undefined) {
+        mut_title.original = documentTitle.get();
+      }
+
+      mut_title.set = title;
+
+      documentTitle.set(title);
+    }),
+  );
 
   // Scrolling
 
@@ -805,6 +856,8 @@ export const createRouter = <R extends AnyRoutes>(
       forgetMissed();
 
       stopMissed.unsubscribe();
+
+      stopTitle.unsubscribe();
     },
   };
 };
@@ -815,6 +868,48 @@ type Snapshot<R extends AnyRoutes> = Readonly<{
 }>;
 
 type ScrollTarget = 'top' | Readonly<{ id: string }>;
+
+/** Whether some node of `definitions` has a `meta.title`. */
+const definesTitle = (definitions: RouteDefinitions): boolean =>
+  Object.values(definitions).some(
+    (definition) =>
+      definition.meta?.title !== undefined ||
+      definesTitle(definition.children ?? {}),
+  );
+
+/** The title of the deepest node of `branch` that has one. */
+const titleOf = <R extends AnyRoutes>(
+  branch: RouteBranch<R>,
+  match: RouteMatch<R>,
+): string | undefined => {
+  if (match.route === undefined) {
+    return undefined;
+  }
+
+  // eslint-disable-next-line total-functions/no-unsafe-type-assertion -- `route` is not undefined, which a generic match does not narrow by
+  const page = match as PageMatch<R>;
+
+  for (const { meta } of branch.toReversed()) {
+    const title: unknown = isNonNullObject(meta)
+      ? Reflect.get(meta, 'title')
+      : undefined;
+
+    if (typeof title === 'string') {
+      return title;
+    }
+
+    if (typeof title === 'function') {
+      // The type of `meta.title` was checked against `RouteMeta`.
+      // eslint-disable-next-line total-functions/no-unsafe-type-assertion -- see above
+      return (title as RelaxedExclude<RouteTitle, string>)({
+        params: page.params,
+        search: page.search,
+      });
+    }
+  }
+
+  return undefined;
+};
 
 const snapshotOf = <R extends AnyRoutes>(
   url: Readonly<URL>,

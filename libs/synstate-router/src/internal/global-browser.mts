@@ -82,6 +82,14 @@ export const globalBrowser = (): RouterBrowser =>
         }
       };
     },
+    documentTitle: {
+      get: () => document.title,
+      set: (title) => {
+        // The document's own property, the one way to set its title.
+        // eslint-disable-next-line functional/immutable-data -- see above
+        document.title = title;
+      },
+    },
     // The browser's own restore, or the app's when it set
     // `history.scrollRestoration` to 'manual': either way not the router's.
     restoresScroll: () =>

@@ -158,7 +158,7 @@ assert.strictEqual(langOf(matchRoutes(routes, { pathname: '/about/' })), 'en');
 
 ## Breadcrumbs
 
-A node can carry `meta`, data of its own typed as written. `router.branch` (or `matchedBranch(routes, match)`) lists the matched nodes from the top down to the page, each with its `meta` and the `Href` of its own page with the match's params, so a breadcrumb needs no lookup table. A `page: false` node has no `Href`.
+A node can carry `meta`, data of its own typed as written. `router.branch` (or `matchedBranch(routes, match)`) lists the matched nodes from the top down to the page, each with its `meta` and the `Href` of its own page with the match's params, so a breadcrumb needs no lookup table. A `page: false` node has no `Href`. A `title` in `meta`, a string or a function of the page's params and search, becomes `document.title` while the page is that node or below it, the deepest one winning; a page with none goes back to the title the document had before.
 
 ```ts
 const routes = defineRoutes({

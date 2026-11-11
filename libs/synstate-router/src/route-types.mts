@@ -51,15 +51,31 @@ export type RouteDefinition = Readonly<{
   /** `false` for a node that is not a page of its own, such as a layout. */
   page?: false;
   /**
-   * Data of the node's own, typed as written: a breadcrumb's label, a page's
-   * title. The node exposes it as `meta`, and the matched branch lists it
-   * (`matchedBranch`, `router.branch`).
+   * Data of the node's own, typed as written: a breadcrumb's label, say. The
+   * node exposes it as `meta`, and the matched branch lists it
+   * (`matchedBranch`, `router.branch`). A `title` in it is the document's title
+   * while the page is the node or below it, the deepest one winning.
    */
-  meta?: unknown;
+  meta?: RouteMeta;
   children?: RouteDefinitions;
 }>;
 
 export type RouteDefinitions = ReadonlyRecord<string, RouteDefinition>;
+
+/**
+ * What the router reads of a node's `meta`; any other key is the application's.
+ */
+export type RouteMeta = ReadonlyRecord<string, unknown> &
+  Readonly<{
+    /**
+     * The document's title while the page is this node or below it, unless a
+     * deeper node has one: a string, or made from the page's params and search.
+     */
+    title?: RouteTitle;
+  }>;
+
+/** A `meta.title`: a string, or made from the page's params and search. */
+export type RouteTitle = string | ((values: AnyRouteValues) => string);
 
 /** Names a route node uses for its own members, so not usable as keys. */
 export type ReservedRouteKey =
@@ -325,7 +341,8 @@ export type AnyRouteNode = Readonly<{
   match: (location: RouteLocation) => Optional<AnyRouteValues>;
 }>;
 
-type AnyRouteValues = Readonly<{
+/** The params and search of any page. */
+export type AnyRouteValues = Readonly<{
   params: ReadonlyRecord<string, unknown>;
   search: ReadonlyRecord<string, unknown>;
 }>;
