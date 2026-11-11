@@ -96,6 +96,12 @@ codemod's reprinting, is not.
 - **Changesets** (`changesets.mts`): a `libs/*` package or a Chrome extension
   whose `src/` changed with no changeset in the diff naming it is a warning.
   Only the author knows whether a change is user-visible.
+- **Exports under a `patch`** (`exports.mts`): for a published `libs/*` package
+  the diff's changesets name at `patch` and no higher, the names its public
+  entry (`src/entry-point.mts` or `src/index.mts`, through its barrels) exports
+  at the merge base and now. A new name is a warning to make the changeset
+  `minor`; a removed one is a warning that the change is breaking. Names only:
+  a changed signature of an export that stays is not read.
 - **Changed-line coverage** (`coverage.mts`): after a package's tests (and
   `check:root:test` for `tools/`), the added or changed lines from
   `git diff -U0` that the coverage report knows as executable and no test ran.
