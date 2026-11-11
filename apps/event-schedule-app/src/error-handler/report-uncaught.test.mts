@@ -139,6 +139,115 @@ describe(createUncaughtErrorReporter, () => {
     ]);
   });
 
+  test('does not send an error whose stack names only scripts that are not its own', async () => {
+    const { reporter, sent, logged } = setup({ ownScripts: pageScripts });
+
+    // What Brave on iOS ran in the page, where its wallet was off, in
+    // Safari's form: no script of the page, but the page's own URL.
+    const injected = withStack(
+      new TypeError(
+        "undefined is not an object (evaluating 'window.ethereum.selectedAddress = undefined')",
+      ),
+      'global code@https://example.com/event/abc/:1:16',
+    );
+
+    // An extension's script, in Chrome's form.
+    const extension = withStack(
+      new TypeError('x is null'),
+      'TypeError: x is null\n    at chrome-extension://abcdef/inject.js:1:5',
+    );
+
+    reporter.onError(thrown(injected));
+
+    reporter.onUnhandledRejection(rejection(extension));
+
+    await settle();
+
+    assert.deepStrictEqual(sent, []);
+
+    // Still logged, as the browser would.
+    assert.strictEqual(logged.length, 2);
+  });
+
+  test('sends an error whose stack names any of its own scripts', async () => {
+    const { reporter, sent } = setup({ ownScripts: pageScripts });
+
+    reporter.onError(
+      thrown(
+        withStack(
+          new TypeError('x is null'),
+          [
+            'onClick@https://example.com/assets/index-1a2b.js:3:9',
+            'global code@https://example.com/event/abc/:1:16',
+          ].join('\n'),
+        ),
+      ),
+    );
+
+    reporter.onUnhandledRejection(
+      rejection(
+        withStack(
+          new RangeError('too far'),
+          [
+            'RangeError: too far',
+            '    at f (https://example.com/assets/index-1a2b.js:3:9)',
+          ].join('\n'),
+        ),
+      ),
+    );
+
+    await settle();
+
+    assert.strictEqual(sent.length, 2);
+  });
+
+  test('sends an error whose stack names no script', async () => {
+    const { reporter, sent } = setup({ ownScripts: pageScripts });
+
+    reporter.onError(
+      thrown(withStack(new TypeError('x is null'), 'forEach@[native code]')),
+    );
+
+    await settle();
+
+    assert.deepStrictEqual(sent, [
+      'TypeError: x is null\nforEach@[native code]',
+    ]);
+  });
+
+  test('does not count an error it did not send toward the limit', async () => {
+    const { reporter, sent } = setup({
+      ownScripts: pageScripts,
+      maxReports: 1,
+    });
+
+    for (const _ of [1, 2]) {
+      reporter.onError(
+        thrown(
+          withStack(
+            new TypeError('x is null'),
+            'global code@https://example.com/event/abc/:1:16',
+          ),
+        ),
+      );
+    }
+
+    reporter.onError(
+      thrown(
+        withStack(
+          new TypeError('y is null'),
+          'onClick@https://example.com/assets/index-1a2b.js:3:9',
+        ),
+      ),
+    );
+
+    await settle();
+
+    assert.deepStrictEqual(sent, [
+      'TypeError: y is null\nonClick@https://example.com/assets/index-1a2b.js:3:9',
+    ]);
+  });
+
   test('reports a repeated error once, and stops after the limit', async () => {
     const { reporter, sent } = setup({ maxReports: 2 });
 
@@ -170,6 +279,13 @@ type ErrorEventFields = Parameters<UncaughtErrorReporter['onError']>[0];
 type RejectionFields = Parameters<
   UncaughtErrorReporter['onUnhandledRejection']
 >[0];
+
+/** `error`, its stack replaced by `stack`. */
+const withStack = <E extends Error>(mut_error: E, stack: string): E => {
+  Object.defineProperty(mut_error, 'stack', { value: stack });
+
+  return mut_error;
+};
 
 /** The fields of an `ErrorEvent` for `error`, and whether its default was prevented. */
 const thrown = (
@@ -206,7 +322,11 @@ const rejection = (
 };
 
 const setup = (
-  options?: Readonly<{ maxReports?: number; reportFails?: boolean }>,
+  options?: Readonly<{
+    maxReports?: number;
+    reportFails?: boolean;
+    ownScripts?: string;
+  }>,
 ): Readonly<{
   reporter: UncaughtErrorReporter;
   sent: readonly string[];
@@ -231,11 +351,22 @@ const setup = (
   };
 
   return {
-    reporter: createUncaughtErrorReporter(sendReport, options?.maxReports),
+    reporter: createUncaughtErrorReporter({
+      sendReport,
+      // The stacks V8 writes here name Vitest's files by their file URL, which
+      // stand in for the page's scripts unless a test says otherwise.
+      ownScripts: options?.ownScripts ?? 'file:///',
+      ...(options?.maxReports === undefined
+        ? {}
+        : { maxReports: options.maxReports }),
+    }),
     sent: mut_sent,
     logged: mut_logged,
   } as const;
 };
+
+/** Where the page's scripts are served from, in the tests that write a stack. */
+const pageScripts = 'https://example.com/assets/';
 
 const settle = async (): Promise<void> => {
   await new Promise<void>((resolve) => {
