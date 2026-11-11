@@ -94,8 +94,11 @@ codemod's reprinting, is not.
   commit fail as they would there. A tip subject that is not Conventional
   Commits, which `open-pr` would make the title, is a warning.
 - **Changesets** (`changesets.mts`): a `libs/*` package or a Chrome extension
-  whose `src/` changed with no changeset in the diff naming it is a warning.
-  Only the author knows whether a change is user-visible.
+  whose `src/` changed with no changeset in the diff naming it is a warning, and
+  so is one that bundles a private package whose `src/` changed: one it reaches
+  through `dependencies` or `peerDependencies`, passing through private packages
+  only, since nobody releases a private one. Only the author knows whether a
+  change is user-visible.
 - **Exports under a `patch`** (`exports.mts`): for a published `libs/*` package
   the diff's changesets name at `patch` and no higher, the names its public
   entry (`src/entry-point.mts` or `src/index.mts`, through its barrels) exports
