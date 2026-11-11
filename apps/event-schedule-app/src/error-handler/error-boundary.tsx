@@ -26,7 +26,15 @@ import * as styles from './error-boundary.module.css';
 import { createUncaughtErrorReporter } from './report-uncaught.mjs';
 
 if (isProduction) {
-  const reporter = createUncaughtErrorReporter(api.sendReport);
+  // The directory of the chunk this module is built into, where the build puts
+  // every chunk of the page: Vite's `build.assetsDir`, which the app leaves at
+  // its default. A chunk written anywhere else would have its errors dropped.
+  const chunkDirectory = new URL('.', import.meta.url);
+
+  const reporter = createUncaughtErrorReporter({
+    sendReport: api.sendReport,
+    ownScripts: chunkDirectory.href,
+  });
 
   addEventListener('error', reporter.onError);
 

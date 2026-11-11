@@ -48,6 +48,11 @@
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root"></div>
+    <!--
+      No inline script: the error reporter (src/error-handler/report-uncaught.mts)
+      takes code named by the page's own URL for code something else ran in the
+      page, and does not report its errors.
+    -->
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
