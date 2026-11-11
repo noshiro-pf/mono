@@ -18,6 +18,10 @@
 //   Nothing is written to answers after the event's deadline.
 // - `internal/values` holds the author's notification email. It is written
 //   by whoever may edit the event and read by the functions alone.
+// - `internal/closingMail` is the functions' record of the deadline the
+//   "answers closed" mail was sent for. No rule matches it, so no client reads
+//   or writes it; do not move it into `internal/values`, which the author's
+//   write replaces whole.
 
 rules_version = '2';
 

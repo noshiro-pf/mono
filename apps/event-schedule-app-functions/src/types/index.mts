@@ -1,3 +1,4 @@
+export * from './closing-mail-mark.mjs';
 export * from './config.mjs';
 export * from './email-data.mjs';
 export * from './fetch-event-list-of-user-payload.mjs';

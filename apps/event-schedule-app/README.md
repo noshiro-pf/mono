@@ -146,3 +146,5 @@ Admin SDK and bypassing it:
   the deadline, read in the event's own `timezoneOffsetMinutes`.
 - `internal/values` is written by whoever may edit the event and read only by
   the functions.
+- `internal/closingMail` is read and written by the functions alone: it records
+  the deadline the "answers closed" mail was sent for.
