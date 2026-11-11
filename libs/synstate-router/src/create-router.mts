@@ -119,11 +119,21 @@ export type RouterOptions<R extends AnyRoutes> = Readonly<{
  * the value the destination page's `state` codec encodes. A page that declares
  * no state, or a destination a redirect changed, gets none.
  */
-export type StateOptions = Readonly<{ state?: unknown }>;
+export type StateOptions = Readonly<{
+  state?: unknown;
+  /**
+   * Make the navigation inside a View Transition
+   * (`document.startViewTransition`), which animates from the page shown to the
+   * one drawn. Ignored where the browser has none.
+   */
+  viewTransition?: boolean;
+}>;
 
 export type NavigateOptions = Readonly<{
   /** Replace the current history entry instead of adding one. */
   replace?: boolean;
+  /** Make the navigation inside a View Transition; see {@link StateOptions}. */
+  viewTransition?: boolean;
 }>;
 
 export type Router<R extends AnyRoutes> = Readonly<{
@@ -826,6 +836,58 @@ export const createRouter = <R extends AnyRoutes>(
 
   const flushScroll = (): void => {
     makeScroll();
+
+    // A binding's `Routes` calls this once the new page is in the document.
+    finishTransitions();
+  };
+
+  // View Transitions waiting for the new page to be drawn.
+  const mut_transitions = new Set<() => void>();
+
+  const finishTransitions = (): void => {
+    for (const finish of mut_transitions) {
+      finish();
+    }
+
+    mut_transitions.clear();
+  };
+
+  /**
+   * Runs `navigation` inside a View Transition when asked for and the browser
+   * has them: the transition ends once a binding's `Routes` has drawn the new
+   * page, or after the next frame without one.
+   */
+  const inTransition = (
+    navigationOptions: StateOptions | undefined,
+    navigation: () => void,
+  ): void => {
+    const start = browser.startViewTransition;
+
+    if (start === undefined || navigationOptions?.viewTransition !== true) {
+      navigation();
+
+      return;
+    }
+
+    start(async () => {
+      const { promise, resolve: settle } = Promise.withResolvers<undefined>();
+
+      const drawn = (): void => {
+        settle(undefined);
+      };
+
+      mut_transitions.add(drawn);
+
+      navigation();
+
+      browser.afterRender(() => {
+        mut_transitions.delete(drawn);
+
+        drawn();
+      });
+
+      return promise;
+    });
   };
 
   const scheduleScroll = (target: ScrollTarget): void => {
@@ -1366,10 +1428,14 @@ export const createRouter = <R extends AnyRoutes>(
     at,
     isActive,
     push: (href, stateOptions) => {
-      navigate(href, false, true, entryStateOf(stateOptions));
+      inTransition(stateOptions, () => {
+        navigate(href, false, true, entryStateOf(stateOptions));
+      });
     },
     replace: (href, stateOptions) => {
-      navigate(href, true, true, entryStateOf(stateOptions));
+      inTransition(stateOptions, () => {
+        navigate(href, true, true, entryStateOf(stateOptions));
+      });
     },
     setSearch,
     block,

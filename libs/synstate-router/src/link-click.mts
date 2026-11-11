@@ -131,10 +131,15 @@ export const handleLinkClick = (
 
   event.preventDefault();
 
+  const pushOptions =
+    options?.viewTransition === true
+      ? ({ viewTransition: true } as const)
+      : undefined;
+
   if (options?.replace === true) {
-    router.replace(href.value);
+    router.replace(href.value, pushOptions);
   } else {
-    router.push(href.value);
+    router.push(href.value, pushOptions);
   }
 
   return true;
