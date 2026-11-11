@@ -33,6 +33,7 @@
   "dependencies": {
     "goober": "^2.1.19",
     "lambda-calculus-interpreter-core": "workspace:*",
+    "preact": "catalog:",
     "preact-utils": "workspace:*",
     "synstate": "workspace:*",
     "synstate-preact-hooks": "workspace:*",
@@ -44,7 +45,6 @@
     "eslint-config-typed": "workspace:*",
     "eslint-plugin-ts-data-forge": "workspace:*",
     "npm-run-all2": "catalog:",
-    "preact": "catalog:",
     "prettier-plugin-organize-imports": "catalog:",
     "prettier-plugin-packagejson": "catalog:",
     "tsx": "catalog:",

@@ -1170,6 +1170,9 @@ importers:
       lambda-calculus-interpreter-core:
         specifier: workspace:*
         version: link:../lambda-calculus-interpreter-core
+      preact:
+        specifier: 'catalog:'
+        version: 10.29.8(preact-render-to-string@6.8.1)
       preact-utils:
         specifier: workspace:*
         version: link:../preact-utils
@@ -1198,9 +1201,6 @@ importers:
       npm-run-all2:
         specifier: 'catalog:'
         version: 9.0.4
-      preact:
-        specifier: 'catalog:'
-        version: 10.29.8(preact-render-to-string@6.8.1)
       prettier-plugin-organize-imports:
         specifier: 'catalog:'
         version: 4.3.0(prettier@3.9.10)(typescript@6.0.3)
@@ -1225,6 +1225,12 @@ importers:
       lambda-calculus-interpreter-core:
         specifier: workspace:*
         version: link:../lambda-calculus-interpreter-core
+      react:
+        specifier: 'catalog:'
+        version: 19.3.1
+      react-dom:
+        specifier: 'catalog:'
+        version: 19.3.1(react@19.3.1)
       react-utils:
         specifier: workspace:*
         version: link:../react-utils
@@ -1265,12 +1271,6 @@ importers:
       prettier-plugin-packagejson:
         specifier: 'catalog:'
         version: 3.0.2(prettier@3.9.10)
-      react:
-        specifier: 'catalog:'
-        version: 19.3.1
-      react-dom:
-        specifier: 'catalog:'
-        version: 19.3.1(react@19.3.1)
       tsx:
         specifier: 'catalog:'
         version: 4.23.15
@@ -2344,12 +2344,24 @@ importers:
       '@preact/signals':
         specifier: ^2.11.3
         version: 2.11.3(preact@10.29.8)
+      '@preact/signals-core':
+        specifier: 'catalog:'
+        version: 1.14.4
+      '@reduxjs/toolkit':
+        specifier: 'catalog:'
+        version: 2.13.0(react@19.3.1)
       '@resvg/resvg-js':
         specifier: ^2.6.2
         version: 2.6.2
       astro:
         specifier: ^7.4.2
         version: 7.4.2(@astrojs/markdown-remark@7.3.4(supports-color@7.2.0))(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1)
+      jotai:
+        specifier: 'catalog:'
+        version: 3.0.1(@types/react@19.3.0)(react@19.3.1)
+      mobx:
+        specifier: 'catalog:'
+        version: 7.1.0
       preact:
         specifier: ^10.29.8
         version: 10.29.8(preact-render-to-string@6.8.1)
@@ -2365,9 +2377,15 @@ importers:
       remark-math:
         specifier: ^6.0.0
         version: 6.0.0(supports-color@7.2.0)
+      rxjs:
+        specifier: 'catalog:'
+        version: 7.8.2
       satori:
         specifier: ^0.63.2
         version: 0.63.2
+      solid-js:
+        specifier: 'catalog:'
+        version: 1.9.17
       synstate:
         specifier: workspace:*
         version: link:../../libs/synstate
@@ -2383,6 +2401,9 @@ importers:
       synstate-react-hooks:
         specifier: workspace:*
         version: link:../../libs/synstate-react-hooks
+      ts-data-forge:
+        specifier: workspace:*
+        version: link:../../libs/ts-data-forge
     devDependencies:
       '@astrojs/markdown-remark':
         specifier: 7.3.4
@@ -2390,12 +2411,6 @@ importers:
       '@playwright/test':
         specifier: 'catalog:'
         version: 1.64.1
-      '@preact/signals-core':
-        specifier: 'catalog:'
-        version: 1.14.4
-      '@reduxjs/toolkit':
-        specifier: 'catalog:'
-        version: 2.13.0(react@19.3.1)
       '@types/react':
         specifier: 'catalog:'
         version: 19.3.0
@@ -2417,12 +2432,6 @@ importers:
       eslint-plugin-ts-type-forge:
         specifier: workspace:*
         version: link:../../libs/eslint-plugin-ts-type-forge
-      jotai:
-        specifier: 'catalog:'
-        version: 3.0.1(@types/react@19.3.0)(react@19.3.1)
-      mobx:
-        specifier: 'catalog:'
-        version: 7.1.0
       prettier:
         specifier: 'catalog:'
         version: 3.9.10
@@ -2432,12 +2441,6 @@ importers:
       prettier-plugin-packagejson:
         specifier: 'catalog:'
         version: 3.0.2(prettier@3.9.10)
-      rxjs:
-        specifier: 'catalog:'
-        version: 7.8.2
-      solid-js:
-        specifier: 'catalog:'
-        version: 1.9.17
       synstate-router:
         specifier: workspace:*
         version: link:../../libs/synstate-router
@@ -2447,9 +2450,6 @@ importers:
       synstate-router-react:
         specifier: workspace:*
         version: link:../../libs/synstate-router-react
-      ts-data-forge:
-        specifier: workspace:*
-        version: link:../../libs/ts-data-forge
       ts-repo-utils:
         specifier: workspace:*
         version: link:../../libs/ts-repo-utils
@@ -2489,6 +2489,9 @@ importers:
       synstate-next:
         specifier: workspace:*
         version: link:../../libs/synstate-next
+      ts-data-forge:
+        specifier: workspace:*
+        version: link:../../libs/ts-data-forge
       vanjs-core:
         specifier: 1.6.1
         version: 1.6.1
@@ -2526,9 +2529,6 @@ importers:
       prettier-plugin-packagejson:
         specifier: 'catalog:'
         version: 3.0.2(prettier@3.9.10)
-      ts-data-forge:
-        specifier: workspace:*
-        version: link:../../libs/ts-data-forge
       tsx:
         specifier: 'catalog:'
         version: 4.23.15

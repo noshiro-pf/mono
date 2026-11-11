@@ -40,6 +40,7 @@
     "synstate-dom": "workspace:*",
     "synstate-dom-next": "workspace:*",
     "synstate-next": "workspace:*",
+    "ts-data-forge": "workspace:*",
     "vanjs-core": "1.6.1"
   },
   "devDependencies": {
@@ -54,7 +55,6 @@
     "playwright": "catalog:",
     "prettier-plugin-organize-imports": "catalog:",
     "prettier-plugin-packagejson": "catalog:",
-    "ts-data-forge": "workspace:*",
     "tsx": "catalog:",
     "vite": "catalog:",
     "vite-plugin-solid": "2.11.14",

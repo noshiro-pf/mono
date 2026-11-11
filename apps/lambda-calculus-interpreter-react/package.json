@@ -34,6 +34,8 @@
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
     "lambda-calculus-interpreter-core": "workspace:*",
+    "react": "catalog:",
+    "react-dom": "catalog:",
     "react-utils": "workspace:*",
     "synstate": "workspace:*",
     "synstate-react-hooks": "workspace:*",
@@ -49,8 +51,6 @@
     "npm-run-all2": "catalog:",
     "prettier-plugin-organize-imports": "catalog:",
     "prettier-plugin-packagejson": "catalog:",
-    "react": "catalog:",
-    "react-dom": "catalog:",
     "tsx": "catalog:",
     "vite": "catalog:"
   }
