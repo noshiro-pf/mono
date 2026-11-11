@@ -2,7 +2,18 @@
 import type { Linter } from 'eslint';
 import type { ReadonlyRecord } from 'ts-type-forge';
 
-/** @internal Reached by indexing the rules record by the rule's name. */
+/**
+ * @description Allow a module to be imported only from the files the config lists for it
+ *
+ *  ```md
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
+ */
 namespace StrictDependencies {
   /**
    * ### schema
