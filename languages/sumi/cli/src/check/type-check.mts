@@ -1,4 +1,4 @@
-import { spawnSync } from 'node:child_process';
+import { execFile } from 'node:child_process';
 import * as path from 'node:path';
 import { nativeTscPath } from './native-tsc.mjs';
 
@@ -33,21 +33,21 @@ export type TypeCheckResult = Readonly<{
  * options are already verified at this point (languages/sumi/docs/spec/compiler-options.md),
  * so these diagnostics are the language's.
  */
-export const typeCheck = (
+export const typeCheck = async (
   tsconfigPath: string,
   /** The compiler script run with this Node.js; replaced only by tests. */
   compilerPath: string = nativeTscPath,
-): TypeCheckResult => {
-  const result = spawnSync(
-    process.execPath,
-    [compilerPath, '-p', tsconfigPath, '--noEmit', '--pretty', 'false'],
-    { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 },
-  );
+): Promise<TypeCheckResult> => {
+  const result = await runCompiler([
+    compilerPath,
+    '-p',
+    tsconfigPath,
+    '--noEmit',
+    '--pretty',
+    'false',
+  ]);
 
-  // Both are null when the process could not be spawned at all.
-  const output = [result.stdout, result.stderr]
-    .map((text: string | null) => text ?? '')
-    .join('');
+  const output = `${result.stdout}${result.stderr}` as const;
 
   // The compiler prints each file relative to its working directory — this
   // process's, which is also what makes the printed output usable from the
@@ -60,7 +60,7 @@ export const typeCheck = (
     output,
     failure: describeFailure(
       {
-        errorMessage: result.error?.message,
+        errorMessage: result.errorMessage,
         signal: result.signal,
         status: result.status,
       },
@@ -68,6 +68,55 @@ export const typeCheck = (
     ),
   };
 };
+
+/**
+ * Runs `args` with this Node.js and resolves with how it ended, never
+ * rejecting. An exit code is a `status`; a process that did not start, or that
+ * overran `maxBuffer` (killed for it), has an `errorMessage`; one killed from
+ * elsewhere has a `signal`.
+ */
+const runCompiler = (
+  args: readonly string[],
+): Promise<
+  Readonly<{
+    status: number | null;
+    signal: string | null;
+    errorMessage: string | undefined;
+    stdout: string;
+    stderr: string;
+  }>
+> =>
+  new Promise((resolve) => {
+    const child = execFile(
+      process.execPath,
+      args,
+      { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 },
+      (error, stdout, stderr) => {
+        const exited = error !== null && typeof error.code === 'number';
+
+        // Typed as optional, but `null` when the process exited by itself.
+        const signal = error?.signal ?? null;
+
+        const signalled = signal !== null && error?.killed !== true;
+
+        resolve({
+          status:
+            error === null
+              ? 0
+              : typeof error.code === 'number'
+                ? error.code
+                : null,
+          signal: signalled ? signal : null,
+          errorMessage:
+            error === null || exited || signalled ? undefined : error.message,
+          stdout,
+          stderr,
+        });
+      },
+    );
+
+    child.stdin?.end();
+  });
 
 /**
  * The compiler exits non-zero when it reports a diagnostic — 1 for most, 2 for

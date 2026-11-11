@@ -22,8 +22,8 @@ const check = cmd.command({
       description: 'A tsconfig path, or a directory holding tsconfig.json.',
     }),
   },
-  handler: ({ project }) => {
-    const result = runCheck(project);
+  handler: async ({ project }) => {
+    const result = await runCheck(project);
 
     if (Result.isErr(result)) {
       console.error(result.value);

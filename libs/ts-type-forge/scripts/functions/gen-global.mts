@@ -117,10 +117,10 @@ export const genGlobal = async (
   // (`check:root:format-scripts`). Outside the `try` above, so that a failure
   // fails the run.
   if (
-    formatPackage({
+    (await formatPackage({
       cwd: path.resolve(srcDir, '..'),
       patterns: [globalFilePath],
-    }) !== 0
+    })) !== 0
   ) {
     throw new Error(`Prettier failed on ${globalFilePath}; see above.`);
   }

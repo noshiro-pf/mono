@@ -1,5 +1,22 @@
 import { Octokit } from '@octokit/core';
-import { execFileSync } from 'node:child_process';
+import { execFile, type PromiseWithChild } from 'node:child_process';
+import * as util from 'node:util';
+
+const execFileAsync = util.promisify(execFile);
+
+/**
+ * Closes the stdin of the process `util.promisify(execFile)` started and
+ * returns the same promise. The promisified `execFile` leaves stdin an open
+ * pipe, where `execFileSync` closed it at once: a process that reads it would
+ * wait for input that never comes.
+ */
+const closingStdin = <T,>(
+  running: PromiseWithChild<T>,
+): PromiseWithChild<T> => {
+  running.child.stdin?.end();
+
+  return running;
+};
 
 /**
  * GitHub API の認証トークンを解決する。
@@ -11,7 +28,7 @@ import { execFileSync } from 'node:child_process';
  * `GITHUB_TOKEN` は候補に含めない。 Actions では既定の（ administration 権限を
  * 持たない）トークンが同名で入っていることがあり、黙って弱い方を掴むため。
  */
-const resolveAuthToken = (): string => {
+const resolveAuthToken = async (): Promise<string> => {
   const fromEnv =
     process.env['GITHUB_APP_TOKEN'] ??
     process.env['GH_TOKEN'] ??
@@ -22,11 +39,13 @@ const resolveAuthToken = (): string => {
   }
 
   try {
-    // シェルを経由させない。 stderr も捨てて、失敗時にトークンが混ざらないようにする。
-    const stdout = execFileSync('gh', ['auth', 'token'], {
-      encoding: 'utf8',
-      stdio: ['ignore', 'pipe', 'ignore'],
-    });
+    // シェルを経由させない。 stderr は execFile が受け取るだけで表示せず、失敗時は
+    // 下の catch でエラーごと捨てるので、トークンが混ざることもない。
+    const { stdout } = await closingStdin(
+      execFileAsync('gh', ['auth', 'token'], {
+        encoding: 'utf8',
+      }),
+    );
 
     const token = stdout.trim();
 
@@ -46,4 +65,4 @@ const resolveAuthToken = (): string => {
   );
 };
 
-export const octokit = new Octokit({ auth: resolveAuthToken() });
+export const octokit = new Octokit({ auth: await resolveAuthToken() });

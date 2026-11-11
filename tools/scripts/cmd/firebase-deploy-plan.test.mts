@@ -1,11 +1,13 @@
 // cspell:ignore gpgsign
 
-import { execFile, execFileSync } from 'node:child_process';
+import { execFile } from 'node:child_process';
 import * as fs from 'node:fs';
 import * as os from 'node:os';
 import * as path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import * as util from 'node:util';
 import type { ReadonlyRecord } from 'ts-type-forge';
+import { closingStdin } from '../lib/child-process.mjs';
 import {
   BUILD_TOOL_PACKAGES,
   dependencyDirs,
@@ -241,17 +243,22 @@ describe('the script', () => {
   ): Promise<string | undefined> => {
     const repo = makeTree(files);
 
-    git(repo, ['init', '-q']);
+    await git(repo, ['init', '-q']);
 
-    commitAll(repo);
+    await commitAll(repo);
 
-    const base = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: repo })
-      .toString()
-      .trim();
+    const { stdout } = await closingStdin(
+      execFileAsync('git', ['rev-parse', 'HEAD'], {
+        cwd: repo,
+        encoding: 'utf8',
+      }),
+    );
+
+    const base = stdout.trim();
 
     writeFiles(repo, change);
 
-    commitAll(repo);
+    await commitAll(repo);
 
     return runScript(repo, { TARGETS: targets, BASE: base, HEAD: 'HEAD' });
   };
@@ -298,9 +305,9 @@ describe('the script', () => {
   test('chooses every target when nothing is deployed yet', async () => {
     const repo = makeTree(files);
 
-    git(repo, ['init', '-q']);
+    await git(repo, ['init', '-q']);
 
-    commitAll(repo);
+    await commitAll(repo);
 
     assert.strictEqual(
       await runScript(repo, { TARGETS: targets, BASE: '', HEAD: 'HEAD' }),
@@ -311,9 +318,9 @@ describe('the script', () => {
   test('gives each chosen target the pathspecs it was chosen by', async () => {
     const repo = makeTree(files);
 
-    git(repo, ['init', '-q']);
+    await git(repo, ['init', '-q']);
 
-    commitAll(repo);
+    await commitAll(repo);
 
     const { written } = await runScriptWithCode(repo, {
       TARGETS: targets,
@@ -337,9 +344,9 @@ describe('the script', () => {
   test('fails, rather than choosing nothing, when git cannot diff', async () => {
     const repo = makeTree(files);
 
-    git(repo, ['init', '-q']);
+    await git(repo, ['init', '-q']);
 
-    commitAll(repo);
+    await commitAll(repo);
 
     const result = await runScriptWithCode(repo, {
       TARGETS: targets,
@@ -382,23 +389,27 @@ const makeTree = (files: ReadonlyRecord<string, string>): string => {
   return root;
 };
 
-const git = (repo: string, args: readonly string[]): void => {
-  execFileSync('git', args, {
-    cwd: repo,
-    env: {
-      ...process.env,
-      GIT_AUTHOR_NAME: 'test',
-      GIT_AUTHOR_EMAIL: 'test@example.com',
-      GIT_COMMITTER_NAME: 'test',
-      GIT_COMMITTER_EMAIL: 'test@example.com',
-    },
-  });
+const execFileAsync = util.promisify(execFile);
+
+const git = async (repo: string, args: readonly string[]): Promise<void> => {
+  await closingStdin(
+    execFileAsync('git', args, {
+      cwd: repo,
+      env: {
+        ...process.env,
+        GIT_AUTHOR_NAME: 'test',
+        GIT_AUTHOR_EMAIL: 'test@example.com',
+        GIT_COMMITTER_NAME: 'test',
+        GIT_COMMITTER_EMAIL: 'test@example.com',
+      },
+    }),
+  );
 };
 
-const commitAll = (repo: string): void => {
-  git(repo, ['add', '.']);
+const commitAll = async (repo: string): Promise<void> => {
+  await git(repo, ['add', '.']);
 
-  git(repo, [
+  await git(repo, [
     '-c',
     'core.hooksPath=/dev/null',
     '-c',

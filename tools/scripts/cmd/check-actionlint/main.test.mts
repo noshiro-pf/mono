@@ -28,24 +28,24 @@ const pins = {
 const installed: Install = (name) =>
   Promise.resolve(Result.ok(`/cache/bin/${name}`));
 
-const runsFine = (): undefined => undefined;
+const runsFine = (): Promise<undefined> => Promise.resolve(undefined);
 
 const actionlintExits =
   (status: number | null, signal: string | null = null): RunActionlint =>
   () =>
-    ({ status, signal, error: undefined }) as const;
+    Promise.resolve({ status, signal, error: undefined } as const);
 
 /** actionlint over the wrapped composite scripts, answering `reports`. */
 const compositeReports =
   (reports: readonly unknown[]): LintWorkflowText =>
   (_actionlint, _shellcheck, workflow) =>
-    ({
+    Promise.resolve({
       workflow,
       status: Arr.isEmpty(reports) ? (0 as const) : (1 as const),
       stdout: JSON.stringify(reports),
       stderr: '',
       error: undefined,
-    }) as const;
+    } as const);
 
 const setupAction = {
   path: '.github/actions/setup/action.yml',
@@ -578,13 +578,13 @@ describe('checkActionlint', () => {
       runActionlint: actionlintExits(0),
       compositeActions: [setupAction],
       lintWorkflowText: (_actionlint, _shellcheck, workflow) =>
-        ({
+        Promise.resolve({
           workflow,
           status: 3,
           stdout: '',
           stderr: 'could not read config',
           error: undefined,
-        }) as const,
+        } as const),
     });
 
     assert.isTrue(Result.isErr(result));
@@ -750,7 +750,9 @@ describe('checkActionlint, binaries that do not run', () => {
       pins,
       install: installed,
       tryRunning: (binary) =>
-        binary.endsWith('shellcheck') ? 'Exec format error' : undefined,
+        Promise.resolve(
+          binary.endsWith('shellcheck') ? 'Exec format error' : undefined,
+        ),
       runActionlint,
       compositeActions: [],
       lintWorkflowText: compositeReports([]),

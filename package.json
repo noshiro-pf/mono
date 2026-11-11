@@ -70,7 +70,7 @@
     "check:root:format-scripts": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-format-scripts.mts",
     "check:root:knip-config": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-knip-config.mts",
     "check:root:licenses": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-licenses.mts",
-    "check:root:lint": "node ./tools/scripts/cmd/assert-deps-built.mts && pnpm run z:eslint './tools/{scripts,configs}/**/*.mts' --fix",
+    "check:root:lint": "node ./tools/scripts/cmd/assert-deps-built.mts && oxlint tools/scripts tools/configs && pnpm run z:eslint './tools/{scripts,configs}/**/*.mts' --fix",
     "check:root:lockfile": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-lockfile-tarballs.mts",
     "check:root:lockfile-integrity": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-lockfile-integrity.mts",
     "check:root:markdown-fence-readers": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-markdown-fence-readers.mts",

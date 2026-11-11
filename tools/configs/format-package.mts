@@ -1,8 +1,8 @@
-import { spawnSync } from 'node:child_process';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { Arr } from 'ts-data-forge';
+import { runInherited } from '../scripts/lib/child-process.mjs';
 import { projectRootPath } from '../scripts/project-root-path.mjs';
 
 /**
@@ -56,20 +56,20 @@ export const prettierArguments = ({
  * Runs Prettier as above in `cwd` (a member's directory) over `patterns`, and
  * returns its exit status.
  */
-export const formatPackage = ({
+export const formatPackage = async ({
   cwd,
   patterns,
 }: Readonly<{
   cwd: string;
   patterns: readonly string[];
-}>): number => {
+}>): Promise<number> => {
   const ownIgnoreFile = path.join(cwd, '.prettierignore');
 
   const prettierCli = fileURLToPath(
     import.meta.resolve('prettier/bin/prettier.cjs'),
   );
 
-  const result = spawnSync(
+  const result = await runInherited(
     process.execPath,
     Arr.toUnshifted(prettierCli)(
       prettierArguments({
@@ -83,7 +83,7 @@ export const formatPackage = ({
         patterns,
       }),
     ),
-    { cwd, stdio: 'inherit' },
+    { cwd },
   );
 
   if (result.error !== undefined) {

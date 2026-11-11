@@ -1,4 +1,3 @@
-import { spawnSync } from 'node:child_process';
 import * as fs from 'node:fs/promises';
 import * as os from 'node:os';
 import * as path from 'node:path';
@@ -16,6 +15,8 @@ import {
 import { benchmarkSets, type BenchmarkSet } from './benchmark-sets.mjs';
 // eslint-disable-next-line import-x/no-relative-packages -- shared with synstate-docs' measurement (#3066)
 import { mapInSequence } from '../../../tools/scripts/lib/bundle-size.mjs';
+// eslint-disable-next-line import-x/no-relative-packages -- the repository's one way to run a process
+import { runInherited } from '../../../tools/scripts/lib/child-process.mjs';
 import { workspaceRootPath } from './workspace-root-path.mjs';
 
 /**
@@ -147,7 +148,11 @@ const main = async (): Promise<void> => {
     }
   } finally {
     if (baselineRoot !== undefined) {
-      run('git', ['worktree', 'remove', '--force', baselineRoot], repoRoot);
+      await run(
+        'git',
+        ['worktree', 'remove', '--force', baselineRoot],
+        repoRoot,
+      );
     }
   }
 };
@@ -197,15 +202,14 @@ const readResults = async (
   // eslint-disable-next-line security/detect-non-literal-fs-filename
   fs.readFile(resultsPath(appRoot, set), 'utf8');
 
-const run = (
+const run = async (
   command: string,
   args: readonly string[],
   cwd: string,
   env: Readonly<{ BENCHMARK_ROTATE?: string }> = {},
-): void => {
-  const result = spawnSync(command, args, {
+): Promise<void> => {
+  const result = await runInherited(command, args, {
     cwd,
-    stdio: 'inherit',
     env: { ...process.env, ...env },
   });
 
@@ -282,7 +286,7 @@ const runOnce = async (
   rotate: number,
   set: BenchmarkSet,
 ): Promise<Tables> => {
-  run('pnpm', ['run', benchmarkSets[set].script], appRoot, {
+  await run('pnpm', ['run', benchmarkSets[set].script], appRoot, {
     BENCHMARK_ROTATE: rotate.toString(),
   });
 
@@ -326,24 +330,24 @@ const prepareBaseline = async (
     path.join(os.tmpdir(), 'synstate-dom-benchmark-baseline-'),
   );
 
-  run('git', ['worktree', 'add', '--detach', root, ref], repoRoot);
+  await run('git', ['worktree', 'add', '--detach', root, ref], repoRoot);
 
   // Before the install and the build, which take minutes.
   const { script } = benchmarkSets[set];
 
   if (!(await definesScript(appIn(root), script))) {
-    run('git', ['worktree', 'remove', '--force', root], repoRoot);
+    await run('git', ['worktree', 'remove', '--force', root], repoRoot);
 
     throw new Error(`${ref} has no \`${script}\` script to compare with`);
   }
 
-  run('pnpm', ['install', '--frozen-lockfile'], root);
+  await run('pnpm', ['install', '--frozen-lockfile'], root);
 
   // `ws:build`, not `pnpm --filter 'synstate-dom-benchmark^...' run build`:
   // pnpm orders a filtered run by devDependencies too, which run in a cycle
   // through the ESLint packages, so a fresh worktree builds a package before
   // what it imports.
-  run('pnpm', ['run', 'ws:build'], root);
+  await run('pnpm', ['run', 'ws:build'], root);
 
   return root;
 };

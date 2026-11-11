@@ -1,4 +1,4 @@
-import { spawnSync } from 'node:child_process';
+import { execFile } from 'node:child_process';
 import { hasKey, isRecord } from 'ts-data-forge';
 import type { UnknownRecord } from 'ts-type-forge';
 import {
@@ -32,24 +32,44 @@ export type OxlintRunResult = Readonly<{
  * plugin) and `oxlint-tsgolint` (type-aware rules) resolve; each file's
  * tsconfig is discovered by oxlint per file, so callers only pass paths.
  */
-export const runOxlint = (files: readonly string[]): OxlintRunResult => {
-  const result = spawnSync(
-    process.execPath,
-    [
-      oxlintBinPath,
-      '-c',
-      oxlintConfigPath,
-      '-f',
-      'json',
-      '--type-aware',
-      ...files,
-    ],
-    {
-      cwd: packageRootPath,
-      encoding: 'utf8',
-      maxBuffer: 64 * 1024 * 1024,
-    },
-  );
+export const runOxlint = async (
+  files: readonly string[],
+): Promise<OxlintRunResult> => {
+  // oxlint exits non-zero when it reports something, so the exit status is not
+  // read: the diagnostics are on stdout either way, and a failure to run at all
+  // shows on stderr, which is returned.
+  const result = await new Promise<
+    Readonly<{ stdout: string; stderr: string }>
+  >((resolve) => {
+    const child = execFile(
+      process.execPath,
+      [
+        oxlintBinPath,
+        '-c',
+        oxlintConfigPath,
+        '-f',
+        'json',
+        '--type-aware',
+        ...files,
+      ],
+      {
+        cwd: packageRootPath,
+        encoding: 'utf8',
+        maxBuffer: 64 * 1024 * 1024,
+      },
+      (error, stdout, stderr) => {
+        resolve({
+          stdout,
+          stderr:
+            error !== null && typeof error.code !== 'number'
+              ? `${stderr}${error.message}\n`
+              : stderr,
+        });
+      },
+    );
+
+    child.stdin?.end();
+  });
 
   return {
     diagnostics: parseDiagnostics(result.stdout, result.stderr),

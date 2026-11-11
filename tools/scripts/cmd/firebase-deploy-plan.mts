@@ -1,4 +1,4 @@
-import { spawnSync } from 'node:child_process';
+import { spawn } from 'node:child_process';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -45,7 +45,7 @@ import type { ReadonlyRecord } from 'ts-type-forge';
  * that. It runs `git` and reads `package.json` files, and its job holds nothing
  * that can write.
  */
-export const main = (env: Env): void => {
+export const main = async (env: Env): Promise<void> => {
   const targets = orExit(parseTargets(env['TARGETS'] ?? ''));
 
   const base = env['BASE'] ?? '';
@@ -65,19 +65,28 @@ export const main = (env: Env): void => {
       [target.only, orExit(targetPathspecs(target, packages))] as const,
   );
 
-  const chosen = withPathspecs.filter(([only, pathspecs]) => {
+  const mut_chosen: (typeof withPathspecs)[number][] = [];
+
+  // One target at a time, so that the log reads in the order of `TARGETS`.
+  for (const [only, pathspecs] of withPathspecs) {
     if (base === '') {
       console.log(`${only}: nothing deployed yet, deploying.`);
 
-      return true;
+      mut_chosen.push([only, pathspecs]);
+
+      continue;
     }
 
-    const changed = differs(base, head, pathspecs);
+    const changed = await differs(base, head, pathspecs);
 
     console.log(`${only}: ${changed ? 'changed' : 'unchanged'} since ${base}.`);
 
-    return changed;
-  });
+    if (changed) {
+      mut_chosen.push([only, pathspecs]);
+    }
+  }
+
+  const chosen: readonly (typeof withPathspecs)[number][] = mut_chosen;
 
   const output = env['GITHUB_OUTPUT'];
 
@@ -405,17 +414,34 @@ const exitWithError = (message: string): never => {
 const orExit = <T,>(parsed: Parsed<T>): T =>
   parsed.ok ? parsed.value : exitWithError(parsed.message);
 
-/** Whether `pathspecs` differ between `base` and `head`; any other failure exits. */
-const differs = (
+/**
+ * Whether `pathspecs` differ between `base` and `head`; any other failure
+ * exits. `spawn` rather than `tools/scripts/lib/child-process.mts`, which this
+ * file cannot import (see the header): git's own messages go straight to the
+ * log.
+ */
+const differs = async (
   base: string,
   head: string,
   pathspecs: readonly string[],
-): boolean => {
-  const { status, error } = spawnSync(
-    'git',
-    ['diff', '--quiet', '--no-renames', base, head, '--', ...pathspecs],
-    { stdio: ['ignore', 'inherit', 'inherit'] },
-  );
+): Promise<boolean> => {
+  const { status, error } = await new Promise<
+    Readonly<{ status: number | null; error: Error | undefined }>
+  >((resolve) => {
+    const child = spawn(
+      'git',
+      ['diff', '--quiet', '--no-renames', base, head, '--', ...pathspecs],
+      { stdio: ['ignore', 'inherit', 'inherit'] },
+    );
+
+    child.once('error', (spawnError) => {
+      resolve({ status: null, error: spawnError });
+    });
+
+    child.once('close', (code) => {
+      resolve({ status: code, error: undefined });
+    });
+  });
 
   if (error !== undefined) {
     exitWithError(`git could not be run: ${error.message}`);
@@ -479,5 +505,5 @@ const isDirectlyExecuted = (fileUrl: string): boolean =>
   fs.realpathSync(fileURLToPath(fileUrl)) === fs.realpathSync(process.argv[1]);
 
 if (isDirectlyExecuted(import.meta.url)) {
-  main(process.env);
+  await main(process.env);
 }

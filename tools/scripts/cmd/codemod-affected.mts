@@ -1,4 +1,3 @@
-import { spawnSync } from 'node:child_process';
 import * as path from 'node:path';
 import {
   Arr,
@@ -14,6 +13,7 @@ import {
   isDirectlyExecuted,
 } from 'ts-repo-utils';
 import type { ReadonlyRecord } from 'ts-type-forge';
+import { runFile, runInherited } from '../lib/child-process.mjs';
 import { resolveDiffBase } from '../lib/diff-base.mjs';
 import { readScripts } from '../lib/manifest-scripts.mjs';
 import { readRepositoryFile } from '../lib/repo-files.mjs';
@@ -121,13 +121,12 @@ const CODEMOD_PACKAGE = 'ts-codemod-cli';
 
 const BASE_VARIABLE = 'CODEMOD_DIFF_BASE';
 
-const run = (
+const run = async (
   command: string,
   args: readonly string[],
-): Result<string, string> => {
-  const result = spawnSync(command, args, {
+): Promise<Result<string, string>> => {
+  const result = await runFile(command, args, {
     cwd: projectRootPath,
-    encoding: 'utf8',
     maxBuffer: 64 * 1024 * 1024,
   });
 
@@ -142,14 +141,14 @@ const lines = (text: string): readonly string[] =>
   text.split('\n').filter((line) => line !== '');
 
 /** The base commit, or `undefined` when the run is asked to cover everything. */
-const resolveBase = (): Result<string | undefined, string> => {
+const resolveBase = async (): Promise<Result<string | undefined, string>> => {
   if (process.env[BASE_VARIABLE] === '') {
     return Result.ok(undefined);
   }
 
   try {
     return Result.ok(
-      resolveDiffBase('diff the codemod against', BASE_VARIABLE),
+      await resolveDiffBase('diff the codemod against', BASE_VARIABLE),
     );
   } catch (error: unknown) {
     return Result.err(unknownToString(error));
@@ -173,8 +172,8 @@ const readManifestScripts = (
     : undefined;
 };
 
-const listInputDirs = (): Result<readonly string[], string> => {
-  const listed = run('pnpm', [
+const listInputDirs = async (): Promise<Result<readonly string[], string>> => {
+  const listed = await run('pnpm', [
     '--filter-prod',
     `${CODEMOD_PACKAGE}...`,
     'ls',
@@ -223,7 +222,7 @@ const decide = (
       ),
     );
 
-    const inputDirs = yield* Result.safeUnwrap(listInputDirs());
+    const inputDirs = yield* Result.safeUnwrap(await listInputDirs());
 
     const headScripts = readManifestScripts(
       yield* Result.safeUnwrap(await readRepositoryFile('package.json')),
@@ -233,7 +232,7 @@ const decide = (
       return Result.err('The root package.json has no scripts.');
     }
 
-    const baseJson = run('git', ['show', `${base}:package.json`]);
+    const baseJson = await run('git', ['show', `${base}:package.json`]);
 
     return Result.ok({
       scope: decideCodemodScope({
@@ -250,20 +249,24 @@ const decide = (
     });
   });
 
-const codemod = (args: readonly string[]): boolean =>
-  spawnSync('pnpm', ['run', 'z:ts-codemod', ...args], {
-    cwd: projectRootPath,
-    stdio: 'inherit',
-  }).status === 0;
+const codemod = async (args: readonly string[]): Promise<boolean> => {
+  const { status } = await runInherited(
+    'pnpm',
+    ['run', 'z:ts-codemod', ...args],
+    { cwd: projectRootPath },
+  );
+
+  return status === 0;
+};
 
 const main = (): Promise<Result<undefined, string>> =>
   Result.safeTry(async function* () {
-    const base = yield* Result.safeUnwrap(resolveBase());
+    const base = yield* Result.safeUnwrap(await resolveBase());
 
     if (base === undefined) {
       console.info(`${BASE_VARIABLE} is empty: running the codemod in full.`);
 
-      return codemod([])
+      return (await codemod([]))
         ? Result.ok(undefined)
         : Result.err('The codemod failed.');
     }
@@ -277,7 +280,7 @@ const main = (): Promise<Result<undefined, string>> =>
 
       console.info(scope.reasons.map((reason) => `  ${reason}`).join('\n'));
 
-      return codemod([])
+      return (await codemod([]))
         ? Result.ok(undefined)
         : Result.err('The codemod failed.');
     }
@@ -288,8 +291,8 @@ const main = (): Promise<Result<undefined, string>> =>
 
     // `--diff-from` reads `git diff`, which leaves out untracked files.
     const ok =
-      codemod(['--diff-from', base]) &&
-      (!untracked || codemod(['--uncommitted']));
+      (await codemod(['--diff-from', base])) &&
+      (!untracked || (await codemod(['--uncommitted'])));
 
     return ok ? Result.ok(undefined) : Result.err('The codemod failed.');
   });

@@ -75,7 +75,10 @@ export const embedBenchmark = async (): Promise<Result<undefined, string>> => {
       path.relative(workspaceRootPath, pagePath),
     );
 
-    const status = formatPackage({ cwd: workspaceRootPath, patterns: written });
+    const status = await formatPackage({
+      cwd: workspaceRootPath,
+      patterns: written,
+    });
 
     if (status !== 0) {
       return Result.err(`❌ Prettier failed on ${written.join(', ')}`);

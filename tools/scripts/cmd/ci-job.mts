@@ -1,8 +1,8 @@
-import { spawnSync } from 'node:child_process';
 import * as fs from 'node:fs/promises';
 import * as util from 'node:util';
 import { Arr, asPositiveUint32, Result, unknownToString } from 'ts-data-forge';
 import { isDirectlyExecuted } from 'ts-repo-utils';
+import { runInherited } from '../lib/child-process.mjs';
 import { plural } from '../lib/plural.mjs';
 import {
   diffSnapshots,
@@ -43,7 +43,7 @@ export const runJob = async ({
    */
   requireCleanStart: boolean;
 }>): Promise<JobOutcome> => {
-  const initial = snapshotTree();
+  const initial = await snapshotTree();
 
   const mut_state = { before: initial };
 
@@ -59,7 +59,7 @@ export const runJob = async ({
       env: { CI: 'true' },
     });
 
-    const after = snapshotTree();
+    const after = await snapshotTree();
 
     mut_results.push({
       title: step.title,
@@ -77,7 +77,7 @@ export const runJob = async ({
 
   const wrote = Arr.uniq(mut_results.flatMap((result) => result.wrote));
 
-  printWrites(writesToShow({ written: wrote, changedAtStart: initial }));
+  await printWrites(writesToShow({ written: wrote, changedAtStart: initial }));
 
   return {
     failures: [
@@ -270,31 +270,59 @@ const USAGE =
   'Usage: pnpm run z:ci-job [--build <root script>] --command <root script>';
 
 /**
+ * Runs each `git diff` in turn, its output going straight to the log, and
+ * returns the index of the first that failed, or -1. One at a time, so the
+ * diffs do not interleave.
+ */
+const firstFailedDiff = async (
+  invocations: readonly (readonly string[])[],
+): Promise<number> => {
+  for (const [index, args] of invocations.entries()) {
+    const result = await runInherited('git', args, { cwd: projectRootPath });
+
+    const failed =
+      result.error !== undefined ||
+      (result.status !== 0 && result.status !== DIFFERENCES_FOUND);
+
+    if (failed) {
+      console.error(
+        `git diff of the changed files failed: ${unknownToString(result.error ?? result.signal ?? result.status)}`,
+      );
+
+      return index;
+    }
+  }
+
+  return -1;
+};
+
+/**
  * Prints the diffs of `files`; the files whose diff it did not show, the new
  * ones past the first few, and every one a failed git left out.
  */
-const printDiffs = (files: readonly string[]): readonly string[] => {
+const printDiffs = async (
+  files: readonly string[],
+): Promise<readonly string[]> => {
   if (Arr.isEmpty(files)) {
     return [];
   }
 
-  const untracked = Result.fromThrowable(
-    () =>
-      new Set<string>(
-        Arr.partition(files, DIFF_BATCH).flatMap((batch) =>
-          splitZ(
-            git([
-              '--literal-pathspecs',
-              'ls-files',
-              '--others',
-              '--exclude-standard',
-              '-z',
-              '--',
-              ...batch,
-            ]),
-          ),
+  const untracked = await Result.fromPromise(
+    Promise.all(
+      Arr.partition(files, DIFF_BATCH).map(async (batch) =>
+        splitZ(
+          await git([
+            '--literal-pathspecs',
+            'ls-files',
+            '--others',
+            '--exclude-standard',
+            '-z',
+            '--',
+            ...batch,
+          ]),
         ),
       ),
+    ).then((batches) => new Set<string>(batches.flat())),
   );
 
   if (Result.isErr(untracked)) {
@@ -310,24 +338,7 @@ const printDiffs = (files: readonly string[]): readonly string[] => {
     untracked: untracked.value,
   });
 
-  const failedAt = invocations.findIndex((args) => {
-    const result = spawnSync('git', args, {
-      cwd: projectRootPath,
-      stdio: 'inherit',
-    });
-
-    const failed =
-      result.error !== undefined ||
-      (result.status !== 0 && result.status !== DIFFERENCES_FOUND);
-
-    if (failed) {
-      console.error(
-        `git diff of the changed files failed: ${unknownToString(result.error ?? result.signal ?? result.status)}`,
-      );
-    }
-
-    return failed;
-  });
+  const failedAt = await firstFailedDiff(invocations);
 
   // Every invocation ends in its files, after the `--`.
   return failedAt === -1
@@ -349,11 +360,11 @@ const printDiffs = (files: readonly string[]): readonly string[] => {
  * that fails here is reported and the diff left out, the names still listed:
  * the job's verdict does not depend on it.
  */
-const printWrites = ({
+const printWrites = async ({
   shown,
   alreadyChanged,
-}: ReturnType<typeof writesToShow>): void => {
-  const notShown = printDiffs(shown);
+}: ReturnType<typeof writesToShow>): Promise<void> => {
+  const notShown = await printDiffs(shown);
 
   for (const [heading, files] of [
     [

@@ -1,4 +1,3 @@
-import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { rmSync } from 'node:fs';
 import * as fs from 'node:fs/promises';
@@ -8,6 +7,7 @@ import { Arr, Result, unknownToString } from 'ts-data-forge';
 import * as t from 'ts-fortress';
 import type { ReadonlyRecord } from 'ts-type-forge';
 import { projectRootPath } from '../project-root-path.mjs';
+import { runFile } from './child-process.mjs';
 
 /**
  * Binaries a command runs that npm does not distribute, pinned in
@@ -425,10 +425,10 @@ const install = async ({
   // read a second time, so what is extracted is what was hashed. GNU tar cannot
   // tell the compression of a pipe, so it is named from the magic bytes: gzip
   // or xz, the two a release ships.
-  const extracted = spawnSync(
+  const extracted = await runFile(
     'tar',
     [...compressionFlag(verified.value), '-xf', '-', '-C', extractDir, binary],
-    { input: verified.value, encoding: 'utf8' },
+    { input: verified.value },
   );
 
   if (extracted.error !== undefined || extracted.status !== 0) {

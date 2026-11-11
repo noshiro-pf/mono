@@ -1,10 +1,12 @@
-import { execFileSync } from 'node:child_process';
+import { execFile } from 'node:child_process';
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
+import * as util from 'node:util';
 import { Arr, hasKey, isRecord, isString } from 'ts-data-forge';
 import { isDirectlyExecuted } from 'ts-repo-utils';
 import type { ReadonlyRecord } from 'ts-type-forge';
 import { parseAllDocuments } from 'yaml';
+import { closingStdin } from '../lib/child-process.mjs';
 import { isChromeExtension } from '../lib/chrome-extensions.mjs';
 import { projectRootPath } from '../project-root-path.mjs';
 
@@ -369,25 +371,32 @@ const workspaceManifests = async (): Promise<readonly WorkspaceManifest[]> => {
   return mut_found;
 };
 
-const baselineText = (relativePath: string): string =>
-  execFileSync('git', ['show', `HEAD:${relativePath}`], {
-    cwd: projectRootPath,
-    encoding: 'utf8',
-    // The lockfile is several megabytes; the default 1 MiB would cut it off.
-    maxBuffer: 256 * 1024 * 1024,
-  });
+const execFileAsync = util.promisify(execFile);
+
+const baselineText = async (relativePath: string): Promise<string> => {
+  const { stdout } = await closingStdin(
+    execFileAsync('git', ['show', `HEAD:${relativePath}`], {
+      cwd: projectRootPath,
+      encoding: 'utf8',
+      // The lockfile is several megabytes; the default 1 MiB would cut it off.
+      maxBuffer: 256 * 1024 * 1024,
+    }),
+  );
+
+  return stdout;
+};
 
 /**
  * The manifest as `HEAD` has it, or `{}` for a package this update added.
  *
- * `execFileSync` rather than a shell, so a path is an argument and never part
- * of a command line.
+ * `execFile` rather than a shell, so a path is an argument and never part of a
+ * command line.
  */
-const baselineManifest = (
+const baselineManifest = async (
   relativePath: string,
-): ReadonlyRecord<string, unknown> => {
+): Promise<ReadonlyRecord<string, unknown>> => {
   try {
-    const parsed: unknown = JSON.parse(baselineText(relativePath));
+    const parsed: unknown = JSON.parse(await baselineText(relativePath));
 
     return isRecord(parsed) ? parsed : {};
   } catch {
@@ -411,7 +420,10 @@ const peersOfImporters = async (
         const manifest =
           (await readJsonIfPresent(
             path.resolve(projectRootPath, importerPath, 'package.json'),
-          )) ?? baselineManifest(path.posix.join(importerPath, 'package.json'));
+          )) ??
+          (await baselineManifest(
+            path.posix.join(importerPath, 'package.json'),
+          ));
 
         return [
           importerPath,
@@ -436,13 +448,7 @@ const lockfiles = async (): Promise<Lockfiles> => {
     await fs.readFile(path.resolve(projectRootPath, LOCKFILE), 'utf8'),
   );
 
-  const baselineSource = (() => {
-    try {
-      return baselineText(LOCKFILE);
-    } catch {
-      return undefined;
-    }
-  })();
+  const baselineSource = await baselineText(LOCKFILE).catch(() => undefined);
 
   return {
     current,
@@ -486,7 +492,10 @@ const packagesToRelease = async (): Promise<readonly string[]> => {
 
     if (isPublishable(manifest)) {
       if (
-        runtimeDependenciesChanged(manifest, baselineManifest(relativePath))
+        runtimeDependenciesChanged(
+          manifest,
+          await baselineManifest(relativePath),
+        )
       ) {
         mut_changed.push(name);
       }

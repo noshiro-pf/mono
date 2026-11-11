@@ -5,10 +5,15 @@
  *
  * Usage: tsx ./scripts/cmd/generate-ja-sample-diffs.mts
  */
-import { execFileSync } from 'node:child_process';
+import { execFile } from 'node:child_process';
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
+import * as util from 'node:util';
+// eslint-disable-next-line import-x/no-relative-packages -- the repository's one way to run a process
+import { closingStdin } from '../../../../tools/scripts/lib/child-process.mjs';
 import { workspaceRootPath } from '../workspace-root-path.mjs';
+
+const execFileAsync = util.promisify(execFile);
 
 const docsSiteDir = path.resolve(workspaceRootPath, 'samples/docs-site');
 
@@ -80,31 +85,37 @@ const generateDiffForFile = async (
   let mut_diffContent: string;
 
   try {
-    execFileSync('diff', [
-      '-u',
-      `--label=en/${fileName}`,
-      `--label=ja/${fileName}`,
-      enFilePath,
-      jaFilePath,
-    ]);
+    await closingStdin(
+      execFileAsync(
+        'diff',
+        [
+          '-u',
+          `--label=en/${fileName}`,
+          `--label=ja/${fileName}`,
+          enFilePath,
+          jaFilePath,
+        ],
+        { encoding: 'utf8' },
+      ),
+    );
 
     // diff returns 0 if files are identical (shouldn't reach here)
     return 'skipped';
   } catch (error: unknown) {
     // eslint-disable-next-line total-functions/no-unsafe-type-assertion
     const execError = error as Readonly<{
-      status: number;
-      stdout: Buffer;
+      code: unknown;
+      stdout: string;
     }>;
 
-    if (execError.status !== 1) {
+    if (execError.code !== 1) {
       console.error(`❌ diff failed for ${fileName}`);
 
       return undefined;
     }
 
     // Exit code 1 = files differ (normal)
-    mut_diffContent = execError.stdout.toString('utf8');
+    mut_diffContent = execError.stdout;
   }
 
   const diffPath = path.resolve(jaDir, `${fileName}.diff`);

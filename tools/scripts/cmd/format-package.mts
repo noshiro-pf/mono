@@ -10,6 +10,9 @@ import { formatPackage } from '../../configs/format-package.mjs';
  */
 if (isDirectlyExecuted(import.meta.url)) {
   process.exit(
-    formatPackage({ cwd: process.cwd(), patterns: Arr.skip(process.argv, 2) }),
+    await formatPackage({
+      cwd: process.cwd(),
+      patterns: Arr.skip(process.argv, 2),
+    }),
   );
 }

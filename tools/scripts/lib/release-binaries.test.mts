@@ -1,9 +1,9 @@
-import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import * as fs from 'node:fs';
 import * as os from 'node:os';
 import * as path from 'node:path';
 import { Result } from 'ts-data-forge';
+import { runFile } from './child-process.mjs';
 import {
   installReleaseBinary,
   parseReleaseBinaryPins,
@@ -28,7 +28,7 @@ afterAll(() => {
 });
 
 /** A `.tar.gz` holding `tool-v1.2.3/tool`, as a release would. */
-const makeArchive = (): Uint8Array => {
+const makeArchive = async (): Promise<Uint8Array> => {
   const dir = newTempDir('release-binary-src-');
 
   const inner = path.join(dir, 'tool-v1.2.3');
@@ -46,13 +46,13 @@ const makeArchive = (): Uint8Array => {
 
   const archivePath = path.join(dir, 'tool.tar.gz');
 
-  spawnSync('tar', ['-czf', archivePath, '-C', dir, 'tool-v1.2.3']);
+  await runFile('tar', ['-czf', archivePath, '-C', dir, 'tool-v1.2.3']);
 
   // eslint-disable-next-line security/detect-non-literal-fs-filename
   return fs.readFileSync(archivePath);
 };
 
-const archive = makeArchive();
+const archive = await makeArchive();
 
 const archiveDigest = createHash('sha256').update(archive).digest('hex');
 
@@ -148,7 +148,9 @@ describe('installReleaseBinary', () => {
       '#!/bin/sh\necho tool\n',
     );
 
-    assert.strictEqual(spawnSync(first.value).stdout.toString(), 'tool\n');
+    const { stdout } = await runFile(first.value, []);
+
+    assert.strictEqual(stdout, 'tool\n');
 
     const second = await installReleaseBinary({
       name: 'tool',
@@ -166,7 +168,9 @@ describe('installReleaseBinary', () => {
     // remove the binary another is running.
     assert.notStrictEqual(second.value, first.value);
 
-    assert.strictEqual(spawnSync(first.value).stdout.toString(), 'tool\n');
+    const ran = await runFile(first.value, []);
+
+    assert.strictEqual(ran.stdout, 'tool\n');
   });
 
   test('refuses a download whose digest is not the pinned one, and keeps none of it', async () => {

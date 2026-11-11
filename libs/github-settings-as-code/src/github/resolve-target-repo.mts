@@ -1,4 +1,4 @@
-import { execFileSync } from 'node:child_process';
+import { execFile, type PromiseWithChild } from 'node:child_process';
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import * as util from 'node:util';
@@ -24,7 +24,7 @@ export const resolveTargetRepo = async (): Promise<TargetRepo> => {
   const sources: readonly Partial<TargetRepo>[] = [
     fromCliArgs(),
     fromEnv(),
-    fromGitRemote(),
+    await fromGitRemote(),
     await fromPackageJson(),
   ] as const;
 
@@ -58,6 +58,22 @@ export const resolveTargetRepo = async (): Promise<TargetRepo> => {
 };
 
 /** `strict: false` の解析結果は string | boolean | 配列 になりうるため絞り込む。 */
+const execFileAsync = util.promisify(execFile);
+
+/**
+ * Closes the stdin of the process `util.promisify(execFile)` started and
+ * returns the same promise. The promisified `execFile` leaves stdin an open
+ * pipe, where `execFileSync` closed it at once: a process that reads it would
+ * wait for input that never comes.
+ */
+const closingStdin = <T,>(
+  running: PromiseWithChild<T>,
+): PromiseWithChild<T> => {
+  running.child.stdin?.end();
+
+  return running;
+};
+
 const pickString = (value: unknown): string | undefined =>
   value !== '' && isString(value) ? value : undefined;
 
@@ -95,12 +111,15 @@ const fromEnv = (): Partial<TargetRepo> =>
  * SSH 形式（ `git@github.com:owner/repo.git` ）と HTTPS 形式
  * （ `https://github.com/owner/repo.git` ）の両方に対応する。
  */
-const fromGitRemote = (): Partial<TargetRepo> => {
+const fromGitRemote = async (): Promise<Partial<TargetRepo>> => {
   try {
-    const url = execFileSync('git', ['remote', 'get-url', 'origin'], {
-      encoding: 'utf8',
-      stdio: ['ignore', 'pipe', 'ignore'],
-    }).trim();
+    const { stdout } = await closingStdin(
+      execFileAsync('git', ['remote', 'get-url', 'origin'], {
+        encoding: 'utf8',
+      }),
+    );
+
+    const url = stdout.trim();
 
     const matched =
       /^(?:git@[^:]+:|(?:https?|ssh):\/\/[^/]+\/)(?<owner>[^/]+)\/(?<repo>[^/]+?)(?:\.git)?$/u.exec(

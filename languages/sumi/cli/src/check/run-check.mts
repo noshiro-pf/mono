@@ -78,14 +78,16 @@ export type CheckResult = Readonly<
  *
  * `project` is a tsconfig path or a directory holding `tsconfig.json`.
  */
-export const runCheck = (project: string): Result<CheckResult, string> => {
+export const runCheck = async (
+  project: string,
+): Promise<Result<CheckResult, string>> => {
   const tsconfigPath = resolveTsconfigPath(project);
 
   if (Result.isErr(tsconfigPath)) {
     return tsconfigPath;
   }
 
-  const config = showConfig(tsconfigPath.value);
+  const config = await showConfig(tsconfigPath.value);
 
   if (Result.isErr(config)) {
     return config;
@@ -101,12 +103,12 @@ export const runCheck = (project: string): Result<CheckResult, string> => {
     });
   }
 
-  const typeCheckResult = typeCheck(tsconfigPath.value);
+  const typeCheckResult = await typeCheck(tsconfigPath.value);
 
   const lintResult =
     config.value.files.length === 0
       ? ({ diagnostics: [], stderr: '' } as const)
-      : runOxlint(config.value.files);
+      : await runOxlint(config.value.files);
 
   // The checker opens the same tsconfig, so it sees the same program the type
   // check just ran on; `files` is passed only to keep the two from disagreeing

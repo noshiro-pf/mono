@@ -272,8 +272,8 @@ describe('stageForStore', () => {
 /* eslint-enable security/detect-non-literal-fs-filename */
 
 describe('packExtensionCrx', () => {
-  test('names the browser install command before reading any signing key', () => {
-    assert.throws(() => {
+  test('names the browser install command before reading any signing key', async () => {
+    await expect(
       packExtensionCrx(
         {
           packageRoot: '/missing-extension-build',
@@ -283,12 +283,12 @@ describe('packExtensionCrx', () => {
           defaultPassEntry: 'fixture',
         },
         '/missing-playwright-chromium',
-      );
-    }, /pnpm exec playwright install chromium/u);
+      ),
+    ).rejects.toThrow(/pnpm exec playwright install chromium/u);
   });
 
-  test('checks the build before reading any signing key', () => {
-    assert.throws(() => {
+  test('checks the build before reading any signing key', async () => {
+    await expect(
       packExtensionCrx(
         {
           packageRoot: '/missing-extension-build',
@@ -300,7 +300,7 @@ describe('packExtensionCrx', () => {
         },
         // Any file that exists stands in for the browser here.
         process.execPath,
-      );
-    }, /pnpm run build/u);
+      ),
+    ).rejects.toThrow(/pnpm run build/u);
   });
 });

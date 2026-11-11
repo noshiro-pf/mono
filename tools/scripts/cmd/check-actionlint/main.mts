@@ -1,11 +1,11 @@
 // cspell:ignore pyflakes
-import { spawnSync } from 'node:child_process';
 import * as fs from 'node:fs/promises';
 import * as os from 'node:os';
 import * as path from 'node:path';
 import { Arr, isRecord, Num, Result, unknownToString } from 'ts-data-forge';
 import { glob, isDirectlyExecuted } from 'ts-repo-utils';
 import type { ReadonlyRecord } from 'ts-type-forge';
+import { runFile, runInherited } from '../../lib/child-process.mjs';
 import { plural } from '../../lib/plural.mjs';
 import {
   downloadWithFetch,
@@ -93,7 +93,10 @@ export const checkActionlint = async ({
    * binary this machine cannot execute fails here instead of actionlint quietly
    * skipping the shellcheck it was given.
    */
-  tryRunning: (binary: string, args: readonly string[]) => string | undefined;
+  tryRunning: (
+    binary: string,
+    args: readonly string[],
+  ) => Promise<string | undefined>;
   runActionlint: RunActionlint;
   /** Each `action.yml` under `.github/actions/`, by repository path. */
   compositeActions: readonly Readonly<{ path: string; text: string }>[];
@@ -126,18 +129,20 @@ export const checkActionlint = async ({
     );
   }
 
-  const notRunning = Arr.generate(function* () {
-    for (const { binary, args } of [
+  const runReports = await Promise.all(
+    [
       { binary: actionlint.value, args: ['-version'] },
       { binary: shellcheck.value, args: ['--version'] },
-    ]) {
-      const why = tryRunning(binary, args);
+    ].map(async ({ binary, args }) => {
+      const why = await tryRunning(binary, args);
 
-      if (why !== undefined) {
-        yield `❌ ${binary} does not run here: ${why}`;
-      }
-    }
-  });
+      return why === undefined
+        ? undefined
+        : `❌ ${binary} does not run here: ${why}`;
+    }),
+  );
+
+  const notRunning = runReports.filter((reason) => reason !== undefined);
 
   if (Arr.isNonEmpty(notRunning)) {
     return Result.err(notRunning.join('\n'));
@@ -147,34 +152,38 @@ export const checkActionlint = async ({
     `actionlint ${actionlintPin.version}, shellcheck ${shellcheckPin.version}` as const;
 
   const workflows = judgeActionlint(
-    runActionlint(actionlint.value, shellcheck.value),
+    await runActionlint(actionlint.value, shellcheck.value),
     versions,
   );
 
-  const actions = compositeActions.map((action) => {
-    const { scripts, steps, inputs, problems } = extractRunScripts(action.text);
+  const actions = await Promise.all(
+    compositeActions.map(async (action) => {
+      const { scripts, steps, inputs, problems } = extractRunScripts(
+        action.text,
+      );
 
-    const wrapped =
-      steps === undefined ? undefined : wrapInWorkflow(steps, { inputs });
+      const wrapped =
+        steps === undefined ? undefined : wrapInWorkflow(steps, { inputs });
 
-    const verdict =
-      wrapped === undefined
-        ? ({ findings: [], failure: undefined } as const)
-        : judgeComposite(
-            lintWorkflowText(actionlint.value, shellcheck.value, {
-              ...wrapped,
-              text: asLocalActionForm(wrapped.text),
-            }),
-            action.path,
-            scripts,
-          );
+      const verdict =
+        wrapped === undefined
+          ? ({ findings: [], failure: undefined } as const)
+          : judgeComposite(
+              await lintWorkflowText(actionlint.value, shellcheck.value, {
+                ...wrapped,
+                text: asLocalActionForm(wrapped.text),
+              }),
+              action.path,
+              scripts,
+            );
 
-    return {
-      checked: steps !== undefined,
-      unread: problems.map((problem) => `${action.path}:${problem}`),
-      ...verdict,
-    };
-  });
+      return {
+        checked: steps !== undefined,
+        unread: problems.map((problem) => `${action.path}:${problem}`),
+        ...verdict,
+      };
+    }),
+  );
 
   const unread = actions.flatMap((action) => action.unread);
 
@@ -321,31 +330,35 @@ export type Install = (
 export type RunActionlint = (
   actionlint: string,
   shellcheck: string,
-) => Readonly<{
-  status: number | null;
-  signal: string | null;
-  /** Why it could not be started at all, if it could not. */
-  error: string | undefined;
-}>;
+) => Promise<
+  Readonly<{
+    status: number | null;
+    signal: string | null;
+    /** Why it could not be started at all, if it could not. */
+    error: string | undefined;
+  }>
+>;
 
 /** One actionlint run over a workflow given as text, in its JSON format. */
 export type LintWorkflowText = (
   actionlint: string,
   shellcheck: string,
   workflow: WrappedWorkflow,
-) => Readonly<{
-  workflow: WrappedWorkflow;
-  status: number | null;
-  stdout: string;
-  /** Where actionlint says why it stopped, when it did. */
-  stderr: string;
-  /** Why it could not be started at all, if it could not. */
-  error: string | undefined;
-}>;
+) => Promise<
+  Readonly<{
+    workflow: WrappedWorkflow;
+    status: number | null;
+    stdout: string;
+    /** Where actionlint says why it stopped, when it did. */
+    stderr: string;
+    /** Why it could not be started at all, if it could not. */
+    error: string | undefined;
+  }>
+>;
 
 /** The failure for the workflows, or `undefined` when actionlint passed. */
 const judgeActionlint = (
-  { status, signal, error }: ReturnType<RunActionlint>,
+  { status, signal, error }: Awaited<ReturnType<RunActionlint>>,
   versions: string,
 ): string | undefined => {
   if (error !== undefined) {
@@ -398,7 +411,13 @@ const explain = (message: string): string =>
  * where the script starts.
  */
 const judgeComposite = (
-  { workflow, status, stdout, stderr, error }: ReturnType<LintWorkflowText>,
+  {
+    workflow,
+    status,
+    stdout,
+    stderr,
+    error,
+  }: Awaited<ReturnType<LintWorkflowText>>,
   file: string,
   scripts: readonly RunScript[],
 ): Readonly<{ findings: readonly string[]; failure: string | undefined }> => {
@@ -555,13 +574,12 @@ const installPinned: Install = (name, pin) =>
     download: downloadWithFetch,
   });
 
-const tryRunningBinary = (
+const tryRunningBinary = async (
   binary: string,
   args: readonly string[],
-): string | undefined => {
-  const { status, error, stderr } = spawnSync(binary, args, {
+): Promise<string | undefined> => {
+  const { status, error, stderr } = await runFile(binary, args, {
     env: toolEnv,
-    encoding: 'utf8',
     timeout: 30_000,
   });
 
@@ -580,11 +598,11 @@ const tryRunningBinary = (
  */
 const runActionlintIn =
   (root: string): RunActionlint =>
-  (actionlint, shellcheck) => {
-    const { status, signal, error } = spawnSync(
+  async (actionlint, shellcheck) => {
+    const { status, signal, error } = await runInherited(
       actionlint,
       [`-shellcheck=${shellcheck}`, '-pyflakes='],
-      { cwd: root, stdio: 'inherit', env: toolEnv },
+      { cwd: root, env: toolEnv },
     );
 
     return { status, signal, error: error?.message };
@@ -643,12 +661,12 @@ const copyGithubDirAsLocalForm = async (): Promise<Result<string, string>> => {
     : Result.ok(copied.value);
 };
 
-const lintWorkflowTextBinary: LintWorkflowText = (
+const lintWorkflowTextBinary: LintWorkflowText = async (
   actionlint,
   shellcheck,
   workflow,
 ) => {
-  const { status, stdout, stderr, error } = spawnSync(
+  const { status, stdout, stderr, error } = await runFile(
     actionlint,
     [
       `-shellcheck=${shellcheck}`,
@@ -663,7 +681,6 @@ const lintWorkflowTextBinary: LintWorkflowText = (
       cwd: projectRootPath,
       env: toolEnv,
       input: workflow.text,
-      encoding: 'utf8',
     },
   );
 

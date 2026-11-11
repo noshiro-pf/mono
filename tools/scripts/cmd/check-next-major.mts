@@ -1,4 +1,3 @@
-import { spawnSync } from 'node:child_process';
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import {
@@ -18,6 +17,7 @@ import {
   type Bump,
   type ChangesetFile,
 } from '../lib/changesets.mjs';
+import { runFile } from '../lib/child-process.mjs';
 import { resolveDiffBase } from '../lib/diff-base.mjs';
 import { markdownLines } from '../lib/markdown.mjs';
 import { projectRootPath } from '../project-root-path.mjs';
@@ -370,31 +370,31 @@ const parseManifest = (content: string): StockFile['manifest'] => {
  * `package.json` the base does not have is left out: its first release is
  * manual (`libs/first-release.md`).
  */
-const readBaseVersions = (
+const readBaseVersions = async (
   base: string,
   stocks: readonly StockFile[],
-): ReadonlyMap<string, string> =>
-  new Map(
-    Arr.generate(function* () {
-      for (const { file } of stocks) {
-        const shown = spawnSync(
-          'git',
-          [
-            'show',
-            `${base}:${path.posix.join(path.posix.dirname(file), 'package.json')}`,
-          ],
-          { cwd: projectRootPath, encoding: 'utf8' },
-        );
+): Promise<ReadonlyMap<string, string>> => {
+  const manifests = await Promise.all(
+    stocks.map(async ({ file }) => {
+      const shown = await runFile(
+        'git',
+        [
+          'show',
+          `${base}:${path.posix.join(path.posix.dirname(file), 'package.json')}`,
+        ],
+        { cwd: projectRootPath },
+      );
 
-        const manifest =
-          shown.status === 0 ? parseManifest(shown.stdout) : undefined;
-
-        if (manifest !== undefined) {
-          yield [manifest.name, manifest.version] as const;
-        }
-      }
+      return shown.status === 0 ? parseManifest(shown.stdout) : undefined;
     }),
   );
+
+  return new Map(
+    manifests
+      .filter((manifest) => manifest !== undefined)
+      .map(({ name, version }) => [name, version] as const),
+  );
+};
 
 const readManifest = async (
   manifestPath: string,
@@ -409,13 +409,13 @@ const readManifest = async (
 
 if (isDirectlyExecuted(import.meta.url)) {
   const result = await readStocks()
-    .then((stocks) => {
-      const base = resolveDiffBase('compare versions with');
+    .then(async (stocks) => {
+      const base = await resolveDiffBase('compare versions with');
 
       return Result.map(
         checkNextMajor({
           stocks,
-          baseVersions: readBaseVersions(base, stocks),
+          baseVersions: await readBaseVersions(base, stocks),
         }),
         (summary) => ({ ...summary, base }),
       );

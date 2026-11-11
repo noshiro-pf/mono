@@ -1,4 +1,4 @@
-import { spawnSync } from 'node:child_process';
+import { execFile } from 'node:child_process';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -33,7 +33,7 @@ import type { UnknownRecord } from 'ts-type-forge';
  * the repository root is therefore found from the edited file, so that a
  * worktree's own `node_modules` and configs are the ones used.
  */
-export const main = (stdin: string): number => {
+export const main = async (stdin: string): Promise<number> => {
   const file = readFilePath(stdin);
 
   const root =
@@ -55,7 +55,7 @@ export const main = (stdin: string): number => {
     return 0;
   }
 
-  const prettier = spawnSync(
+  const prettier = await runTool(
     path.join(bin, 'prettier'),
     [
       '--write',
@@ -69,7 +69,7 @@ export const main = (stdin: string): number => {
       '--log-level=error',
       file,
     ],
-    { cwd: root, encoding: 'utf8' },
+    root,
   );
 
   const packageDir = findPackageDir(root, path.dirname(file));
@@ -79,10 +79,7 @@ export const main = (stdin: string): number => {
     LINTED_FILE.test(relative) &&
     exists(path.join(bin, 'oxlint')) &&
     lintsWithOxlint(packageDir)
-      ? spawnSync(path.join(bin, 'oxlint'), ['--quiet', file], {
-          cwd: packageDir,
-          encoding: 'utf8',
-        })
+      ? await runTool(path.join(bin, 'oxlint'), ['--quiet', file], packageDir)
       : undefined;
 
   const findings = [
@@ -134,6 +131,43 @@ export const isEligible = (relative: string): boolean =>
   !path.isAbsolute(relative) &&
   SKIPPED_ROOTS.every((dir) => !relative.startsWith(dir)) &&
   relative.split('/').every((segment) => !SKIPPED_SEGMENTS.has(segment));
+
+/**
+ * How `file` ended when run in `cwd`: its exit status (`null` when it did not
+ * start or did not exit by itself) and its output. `execFile` with a callback
+ * rather than `tools/scripts/lib/child-process.mts`, which this file cannot
+ * import (see the header).
+ */
+const runTool = (
+  file: string,
+  args: readonly string[],
+  cwd: string,
+): Promise<
+  Readonly<{ status: number | null; stdout: string; stderr: string }>
+> =>
+  new Promise((resolve) => {
+    const child = execFile(
+      file,
+      args,
+      { cwd, encoding: 'utf8' },
+      (error, stdout, stderr) => {
+        resolve({
+          status:
+            error === null
+              ? 0
+              : typeof error.code === 'number'
+                ? error.code
+                : null,
+          stdout,
+          stderr,
+        });
+      },
+    );
+
+    // Nothing is written to the tool; an open stdin would only be something to
+    // wait on.
+    child.stdin?.end();
+  });
 
 const SKIPPED_ROOTS = ['experimental/', 'strict-lib/'] as const;
 
@@ -217,5 +251,5 @@ const isDirectlyExecuted = (fileUrl: string): boolean =>
   fs.realpathSync(fileURLToPath(fileUrl)) === fs.realpathSync(process.argv[1]);
 
 if (isDirectlyExecuted(import.meta.url)) {
-  process.exit(main(fs.readFileSync(0, 'utf8')));
+  process.exit(await main(fs.readFileSync(0, 'utf8')));
 }

@@ -26,8 +26,8 @@ const makeCompiler = (source: string): string => {
 const tsconfigPath = path.join(os.tmpdir(), 'tsconfig.json');
 
 describe(typeCheck, () => {
-  test('a compiler exiting non-zero without a diagnostic is a failure', () => {
-    const result = typeCheck(
+  test('a compiler exiting non-zero without a diagnostic is a failure', async () => {
+    const result = await typeCheck(
       tsconfigPath,
       makeCompiler(dedent`
         process.stderr.write('panic: runtime error\\n');
@@ -45,8 +45,8 @@ describe(typeCheck, () => {
     );
   });
 
-  test('a compiler killed by a signal is a failure', () => {
-    const result = typeCheck(
+  test('a compiler killed by a signal is a failure', async () => {
+    const result = await typeCheck(
       tsconfigPath,
       makeCompiler("process.kill(process.pid, 'SIGKILL');"),
     );
@@ -59,8 +59,8 @@ describe(typeCheck, () => {
     );
   });
 
-  test('a compiler that cannot be found is a failure', () => {
-    const result = typeCheck(
+  test('a compiler that cannot be found is a failure', async () => {
+    const result = await typeCheck(
       tsconfigPath,
       path.join(os.tmpdir(), 'sumi-type-check-missing', 'tsc.mjs'),
     );
@@ -74,17 +74,17 @@ describe(typeCheck, () => {
     );
   });
 
-  test('a compiler output over the buffer limit is a failure', () => {
-    const result = typeCheck(
+  test('a compiler output over the buffer limit is a failure', async () => {
+    const result = await typeCheck(
       tsconfigPath,
       makeCompiler("process.stdout.write('x'.repeat(65 * 1024 * 1024));"),
     );
 
-    assert.include(result.failure, 'ENOBUFS');
+    assert.include(result.failure, 'maxBuffer');
   });
 
-  test('a non-zero exit with a diagnostic is a type error, not a failure', () => {
-    const result = typeCheck(
+  test('a non-zero exit with a diagnostic is a type error, not a failure', async () => {
+    const result = await typeCheck(
       tsconfigPath,
       makeCompiler(dedent`
         process.stdout.write("error TS5083: Cannot read file 'x'.\\n");
@@ -105,8 +105,8 @@ describe(typeCheck, () => {
     assert.isUndefined(result.failure);
   });
 
-  test('a zero exit without output is clean', () => {
-    const result = typeCheck(tsconfigPath, makeCompiler(''));
+  test('a zero exit without output is clean', async () => {
+    const result = await typeCheck(tsconfigPath, makeCompiler(''));
 
     assert.deepStrictEqual(result.diagnostics, []);
 

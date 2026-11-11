@@ -1,5 +1,4 @@
 import { parseForESLint } from '@typescript-eslint/parser';
-import { spawnSync } from 'node:child_process';
 import * as path from 'node:path';
 import {
   Arr,
@@ -16,6 +15,7 @@ import {
   oxlintConfig,
   toOxlintRuleName,
 } from '../../configs/oxlint-rules.mjs';
+import { runFile } from '../lib/child-process.mjs';
 import {
   forEachLintedFile,
   importPackageEslintConfigs,
@@ -297,10 +297,9 @@ const describeMismatches = (
  * `git grep -z`, for which no match is exit status 1 rather than a failure;
  * NUL-separated, so a path git would quote arrives as it is.
  */
-const gitGrep = (args: readonly string[]): readonly string[] => {
-  const result = spawnSync('git', ['grep', '-z', ...args], {
+const gitGrep = async (args: readonly string[]): Promise<readonly string[]> => {
+  const result = await runFile('git', ['grep', '-z', ...args], {
     cwd: projectRootPath,
-    encoding: 'utf8',
     maxBuffer: 2 ** 28,
   });
 
@@ -331,13 +330,15 @@ const findEslintDisableDirectives = async (
   // Whole files, not grep lines: a block directive's rule list can start on the
   // line after the keyword, and only a parser tells a comment from a string.
   // ESLint lints no Markdown here, so a README's fence is not read.
-  const files = gitGrep([
+  const withDirective = await gitGrep([
     '--files-with-matches',
     '--fixed-strings',
     'eslint-disable',
     '--',
     ...packageDirs.map((dir) => `:(literal)${dir}/`),
-  ]).filter((file) => lintedFiles.has(file));
+  ]);
+
+  const files = withDirective.filter((file) => lintedFiles.has(file));
 
   const perFile = await Promise.all(
     files.map(async (file) => {

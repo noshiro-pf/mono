@@ -49,14 +49,14 @@ const makeProject = (
 };
 
 describe(runCheck, () => {
-  test('a clean project passes', () => {
+  test('a clean project passes', async () => {
     const dir = makeProject({
       'a.mts': dedent`
         export const double = (x: number): number => x * 2;
       `,
     });
 
-    const result = runCheck(dir);
+    const result = await runCheck(dir);
 
     assert.isTrue(Result.isOk(result));
 
@@ -75,7 +75,7 @@ describe(runCheck, () => {
     assert.deepStrictEqual(result.value.lint.diagnostics, []);
   });
 
-  test('reports type errors and lint problems together', () => {
+  test('reports type errors and lint problems together', async () => {
     const dir = makeProject({
       'a.mts': dedent`
         var n: number = 'x';
@@ -83,7 +83,7 @@ describe(runCheck, () => {
       `,
     });
 
-    const result = runCheck(path.join(dir, 'tsconfig.json'));
+    const result = await runCheck(path.join(dir, 'tsconfig.json'));
 
     assert.isTrue(Result.isOk(result));
 
@@ -116,13 +116,13 @@ describe(runCheck, () => {
     );
   });
 
-  test('stops at a locked option overridden by the project', () => {
+  test('stops at a locked option overridden by the project', async () => {
     const dir = makeProject(
       { 'a.mts': 'export const x = 1;' },
       { strict: false, module: 'esnext' },
     );
 
-    const result = runCheck(dir);
+    const result = await runCheck(dir);
 
     assert.isTrue(Result.isOk(result));
 
@@ -136,10 +136,10 @@ describe(runCheck, () => {
     });
   });
 
-  test('fails to start without a tsconfig', () => {
+  test('fails to start without a tsconfig', async () => {
     const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'sumi-check-empty-'));
 
-    const result = runCheck(dir);
+    const result = await runCheck(dir);
 
     assert.isTrue(Result.isErr(result));
   });

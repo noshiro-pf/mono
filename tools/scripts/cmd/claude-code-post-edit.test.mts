@@ -1,7 +1,7 @@
-import { spawnSync } from 'node:child_process';
 import * as fs from 'node:fs';
 import * as os from 'node:os';
 import * as path from 'node:path';
+import { runFile } from '../lib/child-process.mjs';
 import { projectRootPath } from '../project-root-path.mjs';
 import { isEligible, readFilePath } from './claude-code-post-edit.mjs';
 
@@ -11,12 +11,11 @@ const scriptPath = path.join(
 );
 
 /** Runs the hook as Claude Code does: `node`, the event on stdin. */
-const runHook = (
+const runHook = async (
   stdin: string,
-): Readonly<{ status: number | null; stderr: string }> => {
-  const result = spawnSync(process.execPath, [scriptPath], {
+): Promise<Readonly<{ status: number | null; stderr: string }>> => {
+  const result = await runFile(process.execPath, [scriptPath], {
     input: stdin,
-    encoding: 'utf8',
   });
 
   return { status: result.status, stderr: result.stderr };
@@ -24,7 +23,7 @@ const runHook = (
 
 const runHookOn = (
   filePath: string,
-): Readonly<{ status: number | null; stderr: string }> =>
+): Promise<Readonly<{ status: number | null; stderr: string }>> =>
   runHook(
     JSON.stringify({
       hook_event_name: 'PostToolUse',
@@ -47,11 +46,13 @@ const read = (file: string): string =>
   // eslint-disable-next-line security/detect-non-literal-fs-filename -- a temporary fixture.
   fs.readFileSync(file, 'utf8');
 
-const withTemporaryDirectory = (run: (directory: string) => void): void => {
+const withTemporaryDirectory = async (
+  run: (directory: string) => Promise<void> | void,
+): Promise<void> => {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'post-edit-'));
 
   try {
-    run(dir);
+    await run(dir);
   } finally {
     fs.rmSync(dir, { recursive: true, force: true });
   }
@@ -62,8 +63,10 @@ const withTemporaryDirectory = (run: (directory: string) => void): void => {
  * the plugin this repository's has, this repository's `node_modules` for the
  * tools, and one package that lints with oxlint.
  */
-const withRepository = (run: (root: string) => void): void => {
-  withTemporaryDirectory((root) => {
+const withRepository = async (
+  run: (root: string) => Promise<void> | void,
+): Promise<void> => {
+  await withTemporaryDirectory(async (root) => {
     write(path.join(root, 'pnpm-workspace.yaml'), '');
 
     write(
@@ -92,7 +95,7 @@ const withRepository = (run: (root: string) => void): void => {
       JSON.stringify({ rules: { 'no-debugger': 'error' } }),
     );
 
-    run(root);
+    await run(root);
   });
 };
 
@@ -131,20 +134,20 @@ describe('isEligible', () => {
 });
 
 describe('the hook as Claude Code runs it', () => {
-  test('formats the file and says nothing when all is well', () => {
-    withRepository((root) => {
+  test('formats the file and says nothing when all is well', async () => {
+    await withRepository(async (root) => {
       const file = path.join(root, 'libs/a/src/a.mts');
 
       write(file, 'export const a=1\n');
 
-      assert.deepStrictEqual(runHookOn(file), { status: 0, stderr: '' });
+      assert.deepStrictEqual(await runHookOn(file), { status: 0, stderr: '' });
 
       assert.strictEqual(read(file), 'export const a = 1;\n');
     });
   });
 
-  test('sorts the imports but keeps one not used yet', () => {
-    withRepository((root) => {
+  test('sorts the imports but keeps one not used yet', async () => {
+    await withRepository(async (root) => {
       const file = path.join(root, 'libs/a/src/a.mts');
 
       write(
@@ -152,7 +155,7 @@ describe('the hook as Claude Code runs it', () => {
         "import { b } from './b.mjs';\nimport { a } from './a.mjs';\n\nexport const x = a;\n",
       );
 
-      assert.deepStrictEqual(runHookOn(file), { status: 0, stderr: '' });
+      assert.deepStrictEqual(await runHookOn(file), { status: 0, stderr: '' });
 
       assert.strictEqual(
         read(file),
@@ -161,13 +164,13 @@ describe('the hook as Claude Code runs it', () => {
     });
   });
 
-  test('reports a syntax error with exit code 2', () => {
-    withRepository((root) => {
+  test('reports a syntax error with exit code 2', async () => {
+    await withRepository(async (root) => {
       const file = path.join(root, 'libs/a/src/a.mts');
 
       write(file, 'export const a = (;\n');
 
-      const result = runHookOn(file);
+      const result = await runHookOn(file);
 
       assert.strictEqual(result.status, 2);
 
@@ -178,8 +181,8 @@ describe('the hook as Claude Code runs it', () => {
     });
   });
 
-  test('is silent when Prettier itself fails rather than the file', () => {
-    withRepository((root) => {
+  test('is silent when Prettier itself fails rather than the file', async () => {
+    await withRepository(async (root) => {
       write(
         path.join(root, '.prettierrc'),
         JSON.stringify({ plugins: ['prettier-plugin-that-does-not-exist'] }),
@@ -189,17 +192,17 @@ describe('the hook as Claude Code runs it', () => {
 
       write(file, 'export const a = 1;\n');
 
-      assert.deepStrictEqual(runHookOn(file), { status: 0, stderr: '' });
+      assert.deepStrictEqual(await runHookOn(file), { status: 0, stderr: '' });
     });
   });
 
-  test('reports what oxlint finds with exit code 2', () => {
-    withRepository((root) => {
+  test('reports what oxlint finds with exit code 2', async () => {
+    await withRepository(async (root) => {
       const file = path.join(root, 'libs/a/src/a.mts');
 
       write(file, 'export const f = (): void => {\n  debugger;\n};\n');
 
-      const result = runHookOn(file);
+      const result = await runHookOn(file);
 
       assert.strictEqual(result.status, 2);
 
@@ -209,41 +212,41 @@ describe('the hook as Claude Code runs it', () => {
     });
   });
 
-  test('leaves experimental/ alone', () => {
-    withRepository((root) => {
+  test('leaves experimental/ alone', async () => {
+    await withRepository(async (root) => {
       const file = path.join(root, 'experimental/a.mts');
 
       write(file, 'export const a=1\n');
 
-      assert.deepStrictEqual(runHookOn(file), { status: 0, stderr: '' });
+      assert.deepStrictEqual(await runHookOn(file), { status: 0, stderr: '' });
 
       assert.strictEqual(read(file), 'export const a=1\n');
     });
   });
 
-  test('is silent for a file outside any repository', () => {
-    withTemporaryDirectory((dir) => {
+  test('is silent for a file outside any repository', async () => {
+    await withTemporaryDirectory(async (dir) => {
       const file = path.join(dir, 'a.mts');
 
       write(file, 'export const a=1\n');
 
-      assert.deepStrictEqual(runHookOn(file), { status: 0, stderr: '' });
+      assert.deepStrictEqual(await runHookOn(file), { status: 0, stderr: '' });
 
       assert.strictEqual(read(file), 'export const a=1\n');
     });
   });
 
-  test('is silent for a file that does not exist', () => {
+  test('is silent for a file that does not exist', async () => {
     assert.deepStrictEqual(
-      runHookOn(
+      await runHookOn(
         path.join(projectRootPath, 'tools/scripts/cmd/does-not-exist.mts'),
       ),
       { status: 0, stderr: '' },
     );
   });
 
-  test('is silent on bad input', () => {
-    assert.deepStrictEqual(runHook('{'), { status: 0, stderr: '' });
+  test('is silent on bad input', async () => {
+    assert.deepStrictEqual(await runHook('{'), { status: 0, stderr: '' });
   });
 
   test('the script uses nothing the minimum Node lacks', () => {

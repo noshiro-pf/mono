@@ -14,7 +14,7 @@
  * aside, so it has no conflict here to keep.
  */
 
-import { spawnSync } from 'node:child_process';
+import { execFile } from 'node:child_process';
 import { Arr, Result } from 'ts-data-forge';
 import { git, sh } from '../lib/index.mjs';
 import type { RegenerateConfig } from './config.mjs';
@@ -53,7 +53,7 @@ export const conflictsOnTip = async (
   let mut_current = onto;
 
   for (const commit of commits) {
-    const picked = pick(`${commit}^`, mut_current, commit, cwd);
+    const picked = await pick(`${commit}^`, mut_current, commit, cwd);
 
     if (Result.isErr(picked)) {
       return picked;
@@ -178,29 +178,55 @@ type Picked = Readonly<
  * paths on stdout after the tree id, which a failed `git()` does not keep, so it
  * is run directly: an argument vector, no shell.
  */
-const pick = (
+const pick = async (
   base: string,
   onto: string,
   commit: string,
   cwd: string | undefined,
-): Result<Picked, string> => {
-  const picked = spawnSync(
-    'git',
-    [
-      'merge-tree',
-      '--write-tree',
-      '--name-only',
-      '--no-messages',
-      `--merge-base=${base}`,
-      onto,
-      commit,
-    ],
-    {
-      encoding: 'utf8',
-      maxBuffer: 64 * 1024 * 1024,
-      ...(cwd === undefined ? {} : { cwd }),
-    },
-  );
+): Promise<Result<Picked, string>> => {
+  const picked = await new Promise<
+    Readonly<{
+      status: number | null;
+      stdout: string;
+      stderr: string;
+      error: Error | undefined;
+    }>
+  >((resolve) => {
+    const child = execFile(
+      'git',
+      [
+        'merge-tree',
+        '--write-tree',
+        '--name-only',
+        '--no-messages',
+        `--merge-base=${base}`,
+        onto,
+        commit,
+      ],
+      {
+        encoding: 'utf8',
+        maxBuffer: 64 * 1024 * 1024,
+        ...(cwd === undefined ? {} : { cwd }),
+      },
+      (error, stdout, stderr) => {
+        const exited = error !== null && typeof error.code === 'number';
+
+        resolve({
+          status:
+            error === null
+              ? 0
+              : typeof error.code === 'number'
+                ? error.code
+                : null,
+          stdout,
+          stderr,
+          error: error === null || exited ? undefined : error,
+        });
+      },
+    );
+
+    child.stdin?.end();
+  });
 
   // Git could not be started, or wrote more than `maxBuffer`: no stdout to read.
   if (picked.error !== undefined) {

@@ -494,6 +494,7 @@ export const ROOT_GENERATORS = {
     entry: 'tools/scripts/cmd/gen-license-files.mts',
     inputs: [
       'tools/scripts/cmd/gen-license-files.mts',
+      'tools/scripts/lib/child-process.mts',
       'tools/scripts/project-root-path.mts',
       'libs/ts-repo-utils/src/functions/is-directly-executed.mts',
     ],

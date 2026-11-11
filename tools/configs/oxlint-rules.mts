@@ -289,6 +289,36 @@ const oxlintNameOverrides: ReadonlyMap<string, string> = new Map<
   ['@typescript-eslint/no-useless-constructor', 'no-useless-constructor'],
 ]);
 
+/**
+ * Rules only oxlint checks: repository policy rather than rules moved from
+ * ESLint, so they are not in {@link eslintRulesMovedToOxlint} and no ESLint
+ * configuration knows them. They are here because oxlint reads one
+ * configuration for the whole repository, while ESLint's `no-restricted-imports`
+ * is replaced or turned off by package after package. Disable one with
+ * `oxlint-disable` and the name written here.
+ */
+export const oxlintOnlyRules = {
+  // A child process is started with `execFile` (promisified, or with a
+  // callback), or with `spawn` where its output streams to this process's,
+  // never with the sync variants: one way across the repository, and nothing
+  // blocks the event loop while the process runs. Under `tools/`,
+  // `tools/scripts/lib/child-process.mts` wraps both. `exec` is not listed; it
+  // is `ts-repo-utils`' `$`, a shell command line on purpose. What this sees is
+  // a static import in a file oxlint lints: a dynamic `import()`, `require`, and
+  // `verify-npm-packages/`, which nothing lints, are outside it.
+  'no-restricted-imports': [
+    'error',
+    {
+      paths: ['node:child_process', 'child_process'].map((name) => ({
+        name,
+        importNames: ['execFileSync', 'execSync', 'spawnSync'],
+        message:
+          'Use `execFile` (`util.promisify(execFile)`, or with a callback), or `spawn` to stream the output; under tools/, `runFile` / `runInherited` from tools/scripts/lib/child-process.mts.',
+      })),
+    },
+  ],
+} as const satisfies ReadonlyRecord<string, unknown>;
+
 /** Turns off every rule oxlint checks instead. Last in each `eslint.config.mts`. */
 export const eslintConfigOffForOxlint = {
   rules: Object.fromEntries(
@@ -319,12 +349,15 @@ export const oxlintConfig = {
   plugins: ['eslint', 'typescript', 'unicorn', 'import', 'promise'],
   // oxlint turns `correctness` on by default; only the rules listed here run.
   categories: { correctness: 'off' },
-  rules: Object.fromEntries(
-    Object.entries(eslintRulesMovedToOxlint).map(([ruleId, entry]) => [
-      toOxlintRuleName(ruleId),
-      entry,
-    ]),
-  ),
+  rules: {
+    ...Object.fromEntries(
+      Object.entries(eslintRulesMovedToOxlint).map(([ruleId, entry]) => [
+        toOxlintRuleName(ruleId),
+        entry,
+      ]),
+    ),
+    ...oxlintOnlyRules,
+  },
   // The tracked files ESLint does not lint: what the packages'
   // `eslint.config.mts` ignore, and what no ESLint config matches.
   ignorePatterns: [

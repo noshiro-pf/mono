@@ -1,31 +1,38 @@
-import { execFileSync } from 'node:child_process';
+import { execFile } from 'node:child_process';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
+import * as util from 'node:util';
 import { Arr } from 'ts-data-forge';
+import { closingStdin } from '../scripts/lib/child-process.mjs';
 import { projectRootPath } from '../scripts/project-root-path.mjs';
 import { scriptsRunBeforeInstall } from './scripts-run-before-install.mjs';
 
 const HOOK_SETTINGS = '.claude/settings.json';
 
+const execFileAsync = util.promisify(execFile);
+
 /** The tracked files that can start a command: manifests, workflows, hooks. */
-const commandFiles = (): readonly string[] =>
-  execFileSync(
-    'git',
-    [
-      'ls-files',
-      '-z',
-      '--',
-      '**/package.json',
-      'package.json',
-      '.github/**.yml',
-      '.github/**.yaml',
-      HOOK_SETTINGS,
-      ':!experimental/**',
-    ],
-    { cwd: projectRootPath, encoding: 'utf8' },
-  )
-    .split('\0')
-    .filter((file) => file !== '');
+const commandFiles = async (): Promise<readonly string[]> => {
+  const { stdout } = await closingStdin(
+    execFileAsync(
+      'git',
+      [
+        'ls-files',
+        '-z',
+        '--',
+        '**/package.json',
+        'package.json',
+        '.github/**.yml',
+        '.github/**.yaml',
+        HOOK_SETTINGS,
+        ':!experimental/**',
+      ],
+      { cwd: projectRootPath, encoding: 'utf8' },
+    ),
+  );
+
+  return stdout.split('\0').filter((file) => file !== '');
+};
 
 const read = (file: string): string =>
   // eslint-disable-next-line security/detect-non-literal-fs-filename -- a tracked file of the repository.
@@ -84,10 +91,13 @@ const scriptsRunByNodeIn = (text: string): readonly string[] => {
 };
 
 /** Every `tools/**.mts` a manifest, workflow or hook runs under `node`. */
-const scriptsRunByNode = (): readonly string[] =>
-  Arr.uniq(
-    commandFiles().flatMap((file) => scriptsRunByNodeIn(read(file))),
+const scriptsRunByNode = async (): Promise<readonly string[]> => {
+  const files = await commandFiles();
+
+  return Arr.uniq(
+    files.flatMap((file) => scriptsRunByNodeIn(read(file))),
   ).toSorted();
+};
 
 /**
  * Every module a file loads at runtime: a static `import` that is not
@@ -143,9 +153,9 @@ describe('scriptsRunBeforeInstall', () => {
     expect(scriptsRunByNodeIn(line)).toStrictEqual(expected);
   });
 
-  test('names every script a command runs under plain node, and only those', () => {
+  test('names every script a command runs under plain node, and only those', async () => {
     expect(scriptsRunBeforeInstall.toSorted()).toStrictEqual(
-      scriptsRunByNode(),
+      await scriptsRunByNode(),
     );
   });
 

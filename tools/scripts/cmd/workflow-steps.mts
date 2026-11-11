@@ -1,4 +1,4 @@
-import { spawnSync } from 'node:child_process';
+import { execFile, spawn } from 'node:child_process';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -47,24 +47,24 @@ import type { ReadonlyRecord } from 'ts-type-forge';
  * modules at runtime, uses only erasable syntax, and uses no `Temporal`, which
  * that Node does not have. The test holds all three.
  */
-export const main = (argv: readonly string[]): void => {
+export const main = async (argv: readonly string[]): Promise<void> => {
   const command = argv[2];
 
   switch (command) {
     case 'install': {
-      runInstall(process.env);
+      await runInstall(process.env);
 
       break;
     }
 
     case 'check-diff': {
-      runDiffCheck(process.env);
+      await runDiffCheck(process.env);
 
       break;
     }
 
     case 'should-run': {
-      runShouldRun(argv.slice(3), process.env);
+      await runShouldRun(argv.slice(3), process.env);
 
       break;
     }
@@ -635,8 +635,28 @@ const exitWithError = (message: string): never => {
   process.exit(1);
 };
 
-const runOrExit = (command: string, args: readonly string[]): void => {
-  const { status, error } = spawnSync(command, args, { stdio: 'inherit' });
+/**
+ * Runs `command`, its output going straight to the log, and exits as it did if
+ * it failed. `spawn` rather than `tools/scripts/lib/child-process.mts`, which
+ * this file cannot import (see the header).
+ */
+const runOrExit = async (
+  command: string,
+  args: readonly string[],
+): Promise<void> => {
+  const { status, error } = await new Promise<
+    Readonly<{ status: number | null; error: Error | undefined }>
+  >((resolve) => {
+    const child = spawn(command, args, { stdio: 'inherit' });
+
+    child.once('error', (spawnError) => {
+      resolve({ status: null, error: spawnError });
+    });
+
+    child.once('close', (code) => {
+      resolve({ status: code, error: undefined });
+    });
+  });
 
   if (error !== undefined) {
     exitWithError(`${command} could not be run: ${error.message}`);
@@ -650,7 +670,7 @@ const runOrExit = (command: string, args: readonly string[]): void => {
 const orExit = <T,>(parsed: Parsed<T>): T =>
   parsed.ok ? parsed.value : exitWithError(parsed.message);
 
-const runInstall = (env: Env): void => {
+const runInstall = async (env: Env): Promise<void> => {
   const args = orExit(installArgs(env));
 
   if (args === undefined) {
@@ -671,7 +691,7 @@ const runInstall = (env: Env): void => {
 
   console.log(`pnpm ${args.join(' ')}`);
 
-  runOrExit('pnpm', args);
+  await runOrExit('pnpm', args);
 
   // The record is what lets the jobs after the first skip pnpm's lockfile
   // verification. Missing, the cache step saves nothing, and only this says so.
@@ -697,20 +717,44 @@ const isRecord = (value: unknown): value is ReadonlyRecord<string, unknown> =>
  * both out. `-z` keeps a name with non-ASCII characters as it is rather than
  * quoted, which a pattern would not match.
  */
-const changedFiles = (base: string): readonly string[] => {
+const changedFiles = async (base: string): Promise<readonly string[]> => {
   if (base.startsWith('-')) {
     exitWithError(`Invalid base "${base}": a base must name a revision.`);
   }
 
-  const { status, stdout, error } = spawnSync(
-    'git',
-    ['diff', '--name-only', '-z', '--no-renames', base, '--'],
-    {
-      encoding: 'utf8',
-      stdio: ['ignore', 'pipe', 'inherit'],
-      maxBuffer: MAX_DIFF_BYTES,
-    },
-  );
+  // `execFile` with a callback, for the reason `runOrExit` gives. git's stderr
+  // is passed on once it has exited.
+  const { status, stdout, error } = await new Promise<
+    Readonly<{
+      status: number | null;
+      stdout: string;
+      error: Error | undefined;
+    }>
+  >((resolve) => {
+    const child = execFile(
+      'git',
+      ['diff', '--name-only', '-z', '--no-renames', base, '--'],
+      { encoding: 'utf8', maxBuffer: MAX_DIFF_BYTES },
+      (execError, out, err) => {
+        process.stderr.write(err);
+
+        const exited = execError !== null && typeof execError.code === 'number';
+
+        resolve({
+          status:
+            execError === null
+              ? 0
+              : typeof execError.code === 'number'
+                ? execError.code
+                : null,
+          stdout: out,
+          error: execError === null || exited ? undefined : execError,
+        });
+      },
+    );
+
+    child.stdin?.end();
+  });
 
   if (error !== undefined) {
     exitWithError(`git could not be run: ${error.message}`);
@@ -724,7 +768,7 @@ const changedFiles = (base: string): readonly string[] => {
 };
 
 /** Diffs against `base`, says why, and appends `should_run` to `output`. */
-const answerShouldRun = ({
+const answerShouldRun = async ({
   label,
   base,
   patterns,
@@ -734,8 +778,8 @@ const answerShouldRun = ({
   base: string;
   patterns: readonly string[];
   output: string | undefined;
-}>): void => {
-  const files = changedFiles(base);
+}>): Promise<void> => {
+  const files = await changedFiles(base);
 
   const fileToCheck = firstFileToCheck(files, patterns);
 
@@ -755,7 +799,7 @@ const answerShouldRun = ({
   }
 };
 
-const runDiffCheck = (env: Env): void => {
+const runDiffCheck = async (env: Env): Promise<void> => {
   const plan = orExit(planDiffCheck(env));
 
   const output =
@@ -770,9 +814,9 @@ const runDiffCheck = (env: Env): void => {
     return;
   }
 
-  runOrExit('git', ['fetch', '--depth=1', 'origin', plan.fetch]);
+  await runOrExit('git', ['fetch', '--depth=1', 'origin', plan.fetch]);
 
-  answerShouldRun({
+  await answerShouldRun({
     label: `the ${plan.scope} list`,
     base: plan.base,
     patterns: orExit(readGateList(plan.scope)),
@@ -785,10 +829,13 @@ const runDiffCheck = (env: Env): void => {
  * base on the command line, so that `--scope <list>` by hand gives the gate's
  * answer.
  */
-const runShouldRun = (args: readonly string[], env: Env): void => {
+const runShouldRun = async (
+  args: readonly string[],
+  env: Env,
+): Promise<void> => {
   const { patterns, base, label } = orExit(parseShouldRunArgs(args));
 
-  answerShouldRun({
+  await answerShouldRun({
     label,
     base,
     patterns,
@@ -806,5 +853,5 @@ const isDirectlyExecuted = (fileUrl: string): boolean =>
   fs.realpathSync(fileURLToPath(fileUrl)) === fs.realpathSync(process.argv[1]);
 
 if (isDirectlyExecuted(import.meta.url)) {
-  main(process.argv);
+  await main(process.argv);
 }

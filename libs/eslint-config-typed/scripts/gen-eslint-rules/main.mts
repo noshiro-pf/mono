@@ -92,7 +92,7 @@ export const generateRulesType = async (
 
   // A Prettier failure does not stop the run, so that the passes below still
   // run over every file; the run fails at its end.
-  const formattedBeforePostLint = fmt(targetFileNames);
+  const formattedBeforePostLint = await fmt(targetFileNames);
 
   {
     console.info('running `oxlint --fix` (post codemod) ...');
@@ -104,7 +104,7 @@ export const generateRulesType = async (
     await restoreTsTypeForgeImport(targetFileNames);
   }
 
-  const formattedLast = fmt(targetFileNames);
+  const formattedLast = await fmt(targetFileNames);
 
   if (!formattedBeforePostLint || !formattedLast) {
     throw new Error('Prettier failed on the generated files; see above.');
@@ -184,17 +184,19 @@ const tsTypeForgeImportPattern =
 const eslintImportPattern = /import[\s\w]*\{[^}]*\}\s*from\s*'eslint';/u;
 
 /** Formats the generated files; `false` when Prettier failed (it said why). */
-const fmt = (targetFileNames?: NonEmptyArray<string>): boolean => {
+const fmt = async (
+  targetFileNames?: NonEmptyArray<string>,
+): Promise<boolean> => {
   console.info('formatting code ...');
 
   return (
-    formatPackage({
+    (await formatPackage({
       cwd: projectRootPath,
       patterns:
         targetFileNames === undefined
           ? ['src/types/rules/*.mts']
           : targetFileNames.map((name) => `src/types/rules/${name}`),
-    }) === 0
+    })) === 0
   );
 };
 
