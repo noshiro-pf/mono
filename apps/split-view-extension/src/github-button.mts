@@ -1,10 +1,16 @@
+import type { ReadonlyRecord } from 'ts-type-forge';
 import {
+  addLabelThroughPicker,
   asGitHubMessage,
   claudeSessionUrlOfBody,
+  conversationPathOf,
   githubMessageTag,
+  hasMergeQueue,
+  isConversationOf,
   issueUrlOf,
   pullRequestOf,
   pullRequestTitleOf,
+  type AddLabelResult,
   type GitHubMessage,
   type PullRequest,
 } from './github/index.mjs';
@@ -24,10 +30,15 @@ import {
  * installed. The click is passed to the service worker instead, which opens the
  * tab with the extension's own id, whatever that id is.
  *
- * It sits at the bottom left of the window, in a shadow root on `<html>` rather
- * than anywhere in `<body>`: GitHub replaces the body on every navigation
- * within the site and rearranges its pull request header often, and a button
- * wedged into either would come and go with them.
+ * Beside it, on this repository's pull requests only (`hasMergeQueue`), a
+ * "＋ merge-queued" button puts the label that queues a pull request for
+ * `unblock-prs` on the one on screen, through GitHub's own label picker
+ * (`github/label-picker.mts`).
+ *
+ * They sit at the bottom left of the window, in a shadow root on `<html>`
+ * rather than anywhere in `<body>`: GitHub replaces the body on every
+ * navigation within the site and rearranges its pull request header often, and
+ * a button wedged into either would come and go with them.
  */
 const main = (): void => {
   const mut_host = document.createElement('div');
@@ -55,10 +66,27 @@ const main = (): void => {
   // be asked about.
   mut_shadow.adoptedStyleSheets = [style];
 
-  mut_shadow.append(mut_button);
+  const mut_queueButton = document.createElement('button');
+
+  mut_queueButton.type = 'button';
+
+  mut_queueButton.textContent = queueIdleText;
+
+  mut_queueButton.title = [
+    `Add the "${mergeQueuedLabel}" label to this pull request,`,
+    "through the sidebar's label picker, as you.",
+    'On another tab of the pull request it goes to the conversation first.',
+  ].join('\n');
+
+  mut_shadow.append(mut_button, mut_queueButton);
 
   const showOnPullRequests = (): void => {
-    mut_host.hidden = pullRequestOf(document.location.href) === undefined;
+    const pullRequest = pullRequestOf(document.location.href);
+
+    mut_host.hidden = pullRequest === undefined;
+
+    mut_queueButton.hidden =
+      pullRequest === undefined || !hasMergeQueue(pullRequest);
   };
 
   showOnPullRequests();
@@ -91,6 +119,40 @@ const main = (): void => {
 
   mut_button.addEventListener('click', (mouseEvent) => {
     openThisPullRequest(!(mouseEvent.ctrlKey || mouseEvent.metaKey));
+  });
+
+  mut_queueButton.addEventListener('click', () => {
+    if (mut_queueButton.disabled) {
+      return;
+    }
+
+    mut_queueButton.disabled = true;
+
+    mut_queueButton.textContent = queueBusyText;
+
+    queueThisPullRequest()
+      .catch((error: unknown): QueueResult => {
+        console.error(error);
+
+        return 'not-saved';
+      })
+      .then(async (result) => {
+        mut_queueButton.textContent = queueResultText[result];
+
+        mut_queueButton.dataset['result'] = result;
+
+        await new Promise((resolve) => {
+          setTimeout(resolve, queueResultShownMs);
+        });
+      })
+      .finally(() => {
+        mut_queueButton.disabled = false;
+
+        mut_queueButton.textContent = queueIdleText;
+
+        delete mut_queueButton.dataset['result'];
+      })
+      .catch(console.error);
   });
 
   mut_button.addEventListener('auxclick', (mouseEvent) => {
@@ -236,6 +298,50 @@ const openPullRequest = async (
   await chrome.runtime.sendMessage(message);
 };
 
+/**
+ * Goes to the conversation tab when on another one — the picker is in its
+ * sidebar and nowhere else — and adds the label there.
+ *
+ * The tab is reached by clicking GitHub's own link to it, so it is a
+ * client-side navigation like any other and this script lives on; with no such
+ * link on the page the address is changed instead, which loads a new document
+ * and ends this script, and the button is pressed again there.
+ *
+ * Every step after that is taken only while the page is still this pull
+ * request's conversation, so following a link while it waits labels nothing.
+ */
+const queueThisPullRequest = async (): Promise<QueueResult> => {
+  const pullRequest = pullRequestOf(document.location.href);
+
+  if (pullRequest === undefined || !hasMergeQueue(pullRequest)) {
+    return 'no-picker';
+  }
+
+  if (!isConversationOf(document.location.href, pullRequest)) {
+    const conversationPath = conversationPathOf(pullRequest);
+
+    const conversationLink = Array.from(
+      document.querySelectorAll('a[href]'),
+    ).find(
+      (anchor): anchor is HTMLAnchorElement =>
+        anchor instanceof HTMLAnchorElement &&
+        anchor.getAttribute('href') === conversationPath,
+    );
+
+    if (conversationLink === undefined) {
+      document.location.assign(conversationPath);
+
+      return 'reloading';
+    }
+
+    conversationLink.click();
+  }
+
+  return addLabelThroughPicker(mergeQueuedLabel, () =>
+    isConversationOf(document.location.href, pullRequest),
+  );
+};
+
 const closingIssueSelector =
   'development-menu a[data-hovercard-type="issue"][href]';
 
@@ -248,6 +354,36 @@ const fetchTimeoutMs = 5000;
 /** `MouseEvent.button` of the wheel. */
 const middleButton = 1;
 
+/**
+ * What the merge-queued button shows afterwards: what adding the label came to,
+ * or that the conversation tab is being loaded as a new document.
+ */
+type QueueResult = AddLabelResult | 'reloading';
+
+/**
+ * The string is the one in `libs/pr-report-core/src/labels.mts` and the
+ * workflows; it is written out rather than imported because this is a content
+ * script, built into one file, and that package is the queue's Node tooling.
+ */
+const mergeQueuedLabel = 'merge-queued';
+
+const queueIdleText = `＋ ${mergeQueuedLabel}` as const;
+
+const queueBusyText = `… ${mergeQueuedLabel}` as const;
+
+const queueResultText = {
+  labelled: `✓ ${mergeQueuedLabel}`,
+  'already-labelled': `✓ already ${mergeQueuedLabel}`,
+  'no-picker': '✕ no label picker here',
+  'no-such-label': `✕ no "${mergeQueuedLabel}" label`,
+  'not-saved': '✕ not saved',
+  'left-page': '✕ left the pull request',
+  reloading: '→ conversation; press again there',
+} as const satisfies ReadonlyRecord<QueueResult, string>;
+
+/** How long the outcome stays on the button before it is ready again. */
+const queueResultShownMs = 3000;
+
 const css = [
   ':host {',
   '  all: initial;',
@@ -255,6 +391,8 @@ const css = [
   '  left: 16px;',
   '  bottom: 16px;',
   '  z-index: 2147483000;',
+  '  display: flex;',
+  '  gap: 8px;',
   '}',
   '',
   ':host([hidden]) {',
@@ -277,9 +415,29 @@ const css = [
   '  opacity: 1;',
   '}',
   '',
+  'button[hidden] {',
+  '  display: none;',
+  '}',
+  '',
   'button:disabled {',
   '  cursor: progress;',
   '  opacity: 0.5;',
+  '}',
+  '',
+  // The merge-queued button's outcome, shown for a few seconds while it is
+  // still disabled.
+  'button[data-result="labelled"],',
+  'button[data-result="already-labelled"] {',
+  '  background: #1a7f37;',
+  '  opacity: 1;',
+  '}',
+  '',
+  'button[data-result="no-picker"],',
+  'button[data-result="no-such-label"],',
+  'button[data-result="not-saved"],',
+  'button[data-result="left-page"] {',
+  '  background: #cf222e;',
+  '  opacity: 1;',
   '}',
 ].join('\n');
 

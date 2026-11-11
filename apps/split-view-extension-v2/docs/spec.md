@@ -278,6 +278,19 @@ Two things outside the extension depend on it, so they are fixed:
   under the saved split view `github-pull-request` ("GitHub pull request").
   The worker re-validates every address: a pull request, an issue on github.com,
   a Claude Code session.
+- **G4.** On the pull requests of `noshiro-pf/mono` only (owner and repository
+  compared ignoring case), a "＋ merge-queued" button sits beside G1's. It adds
+  the `merge-queued` label by working GitHub's own label picker: on another tab
+  it follows the page's link to the conversation tab first; it clicks
+  `button[aria-label="Manage labels"]` unless the picker is already open, sets
+  `input[aria-label="Filter labels"]` and dispatches `input`, clicks the
+  `role="option"` named exactly `merge-queued` by `aria-labelledby` unless it is
+  already `aria-selected`, closes the picker with Escape, and reads the label
+  back from the sidebar's Labels section (the nearest ancestor of the picker's
+  button holding links, short of one holding a second heading). Every wait gives
+  up as soon as the page is no longer that pull request's conversation.
+  The outcome stays on the button for 3s: labelled, already labelled, no picker,
+  no such label, not saved, or left the pull request.
 
 ## 10. Framing
 
