@@ -19,8 +19,10 @@ import { listTrackedFiles, readRepositoryFile } from '../lib/repo-files.mjs';
  * The benchmark page says its numbers come from CI on a pinned runner, and
  * `synstate-benchmark.yml` judges drift against that runner alone. A local pass
  * committed by mistake passes everything else as long as all the tables agree
- * with one another (`apps/synstate-docs/scripts/measurement-checks.mts`), and a
- * table with its environment removed only shows dashes on the page.
+ * with one another: the checks in
+ * `apps/synstate-docs/scripts/measurement-checks.mts` fail on a table whose
+ * environment is missing, malformed or differs from the others', not on one
+ * that records `'local'` in every table.
  *
  * A root guard rather than part of `gen:benchmark-doc`, because the local
  * `benchmark` command runs that generator on what it has just measured: running

@@ -13,10 +13,7 @@ import {
   MS_TENTHS_BELOW,
   singleState as singleStateJson,
 } from '../src/data/index.mjs';
-import {
-  type RecordedEnvironment,
-  recordedEnvironment,
-} from './measurement-checks.mjs';
+import { recordedEnvironment } from './measurement-checks.mjs';
 
 /**
  * Every number the benchmark prose quotes, keyed by what it stands for.
@@ -59,25 +56,31 @@ import {
  * emphasis the page explains under the table, so they are cells rather than
  * numbers: prose quoting one of those figures has a plain key of its own.
  */
-export const benchmarkNumbers = (): ReadonlyRecord<string, BenchmarkNumber> =>
-  ({
+export const benchmarkNumbers = (): ReadonlyRecord<string, BenchmarkNumber> => {
+  // Derived rather than written, for the reason the rest of this module exists:
+  // the environment is as much a part of a millisecond as the digits are, and a
+  // page describing one machine while its tables came from another is how this
+  // repository spent a day telling a code regression apart from a change of
+  // machine. `recordedEnvironment` fails where the scenarios disagree or a
+  // table records no environment. It reads the tables from disk on each call,
+  // which `gen:benchmark-doc` makes a few times: milliseconds in all.
+  const e = recordedEnvironment();
+
+  return {
     // Where the numbers on this page were measured. Bare facts rather than a
     // sentence: a marker's value is written once and spliced into both language
     // versions, so it must carry no English of its own.
-    'environment/runner': environmentFact((e) =>
+    'environment/runner':
       e.runner === 'github-actions'
         ? `GitHub Actions ${e.runnerImage ?? 'standard runner'}`
         : 'local',
-    ),
-    'environment/os': environmentFact((e) => `${e.platform} (${e.arch})`),
-    'environment/cpu': environmentFact((e) => e.cpu),
-    'environment/node': environmentFact((e) => e.node),
-    'environment/libraries': environmentFact((e) =>
-      Object.entries(e.libraries)
-        .map(([name, version]) => `${name} ${version}`)
-        .join(', '),
-    ),
-    'environment/measured-on': environmentFact((e) => e.measuredOn),
+    'environment/os': `${e.platform} (${e.arch})`,
+    'environment/cpu': e.cpu,
+    'environment/node': e.node,
+    'environment/libraries': Object.entries(e.libraries)
+      .map(([name, version]) => `${name} ${version}`)
+      .join(', '),
+    'environment/measured-on': e.measuredOn,
 
     // Scenario: Single State — the one scenario every library takes part in, so
     // the one that quotes each of them against SynState.
@@ -716,7 +719,8 @@ export const benchmarkNumbers = (): ReadonlyRecord<string, BenchmarkNumber> =>
       at(deepChain, 'Preact Signals', DEEP_MAX),
       at(deepChain, 'Preact Signals', DEEP_SHALLOW),
     ),
-  }) as const;
+  } as const;
+};
 
 /**
  * What a marker is replaced with: one string for every page, or one per
@@ -729,7 +733,6 @@ type Localized = Readonly<{ en: string; ja: string }>;
 type ResultsMeta = Readonly<{
   updates: number | null;
   timeoutMs: number | null;
-  environment?: RecordedEnvironment;
 }>;
 
 type SeriesData = Readonly<{
@@ -775,25 +778,6 @@ const cascadedDiamond: SeriesData = cascadedDiamondJson;
 const conditionalFanOut: SeriesData = conditionalFanOutJson;
 
 const equalityCutOff: SeriesData = equalityCutOffJson;
-
-/**
- * One fact about where every table on the page was measured.
- *
- * Derived rather than written, for the reason the rest of this module exists:
- * the environment is as much a part of a millisecond as the digits are, and a
- * page describing one machine while its tables came from another is how this
- * repository spent a day telling a code regression apart from a change of
- * machine. {@link recordedEnvironment} fails where the scenarios disagree, and
- * gives nothing where a table records no environment, which the page shows as
- * an em dash.
- */
-const environmentFact = (
-  read: (environment: RecordedEnvironment) => string,
-): string => {
-  const recorded = recordedEnvironment();
-
-  return recorded === undefined ? '\u{2014}' : read(recorded);
-};
 
 /** The sweep points the prose singles out by name. */
 const DEEP_MAX = 'K=1000, M=200';
