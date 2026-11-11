@@ -2,8 +2,9 @@
 
 The pre-2026 monorepo plus standalone repositories imported before deletion.
 The inventory is `docs/experimental-inventory.md`. Nothing here is installed,
-built or checked, and a diff touching only this directory skips every
-workflow, so the rules below have no check behind them.
+built or checked, and a diff touching only this directory skips the check
+workflows, so the rules below have no check behind them, save the one
+`verify-lockfile.yml` holds: no `package.json` or lockfile.
 
 ## Importing
 
@@ -17,6 +18,7 @@ the repository, Dependabot raises alerts on what they declare, and neither
 `dependabot.yml` nor any repository setting excludes a directory from alerts.
 So an import renames each `package.json` to `package.snapshot.json` and drops
 its lockfile; the dependency list stays readable and nothing is alerted on.
+`verify-lockfile.yml` fails a pull request that leaves one of the four here.
 
 ## Reviving
 

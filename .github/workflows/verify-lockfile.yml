@@ -19,6 +19,14 @@ name: Verify Lockfile
 #
 # `push` to `main` as well, for a merge the ruleset was bypassed for, which can
 # land a tree no pull request run verified.
+#
+# The job also refuses a `package.json` or lockfile under `experimental/`
+# (`experimental/README.md` says why none stays there). That has nothing to do
+# with the action pins; it is here because the check workflows skip a diff that
+# touches `experimental/` alone, which is exactly the diff that adds one, and
+# this is the one job with a checkout that runs on every pull request. A step
+# costs no job and no required context of its own, at the price of a failure
+# reported under `verify-lockfile`, so the step's message says what it found.
 
 on:
   push:
@@ -59,3 +67,48 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: gh actions-lock --verify
+
+      # Inline and `git` alone, like the rest of this job: no repository code
+      # runs. Git matches the names itself (`**/` is any depth, none included)
+      # and `-z` gives each path as it is, where a line of output would quote
+      # one with a non-ASCII byte in it. The four names are the rule
+      # `experimental/README.md` states, no more: an import from another
+      # ecosystem would bring a manifest this does not look for.
+      #
+      # Last, and run when the verification above has failed too, so that one
+      # run reports both.
+      - name: Refuse a package.json or lockfile under experimental/
+        if: ${{ !cancelled() }}
+        run: |
+          set -euo pipefail
+
+          # To a file first: a failure of `git` inside a process substitution
+          # would go unseen, and the loop would read an empty list as a clean
+          # tree.
+          list="$(mktemp)"
+
+          git ls-files -z -- \
+            ':(glob)experimental/**/package.json' \
+            ':(glob)experimental/**/yarn.lock' \
+            ':(glob)experimental/**/package-lock.json' \
+            ':(glob)experimental/**/pnpm-lock.yaml' \
+            > "${list}"
+
+          found=0
+
+          # One annotation per file, on the file. `%`, CR and LF are escaped
+          # for a workflow command, `:` and `,` for a property of one.
+          while IFS= read -r -d '' path; do
+            found=1
+
+            escaped="${path//'%'/%25}"
+            escaped="${escaped//$'\r'/%0D}"
+            escaped="${escaped//$'\n'/%0A}"
+            escaped="${escaped//:/%3A}"
+            escaped="${escaped//,/%2C}"
+
+            echo "::error file=${escaped}::experimental/ holds no package.json and no lockfile: GitHub's dependency graph reads them and Dependabot alerts on what they declare, though nothing installs it. Rename a package.json to package.snapshot.json and delete a lockfile (experimental/README.md)."
+            printf 'experimental/ must not hold: %s\n' "${path}"
+          done < "${list}"
+
+          exit "${found}"
