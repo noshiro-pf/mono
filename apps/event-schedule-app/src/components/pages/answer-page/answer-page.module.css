@@ -18,7 +18,14 @@
 }
 
 .tableTopWrapper {
-  margin: 5px;
+  /*
+   * It scrolls sideways, so it clips what stands out of it: the 5px around its
+   * content are padding, not margin, to hold a focus ring, and its scroll bar
+   * sits that much further out. The negative margin gives back the 5px the
+   * margin used to share with the toggles' below it.
+   */
+  padding: 5px;
+  margin-bottom: -5px;
   display: flex;
   flex-direction: column;
   align-items: flex-start;

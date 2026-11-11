@@ -3,7 +3,11 @@
 /* import these first because they're the base layer */
 @import '@blueprintjs/core/lib/css/blueprint.css';
 @import '@blueprintjs/datetime/lib/css/blueprint-datetime.css';
-/* Keyboard focus rings only; after Blueprint's style sheets. */
+/*
+ * Keyboard focus rings only; after Blueprint's style sheets. A native `select`
+ * clicked in Chromium matches `:focus-visible`, so it keeps Blueprint's ring,
+ * as it would keep Chromium's own without Blueprint.
+ */
 @import 'blueprint-synstate/focus-visible.css';
 
 body {
@@ -46,15 +50,4 @@ a {
 
 input[type='number'] {
   text-align: right;
-}
-
-/*
- * Every focus ring is off here, the keyboard's too, except a checkbox's, a
- * radio's or a switch's, whose indicator Blueprint rings with a heavier rule;
- * `blueprint-synstate/focus-visible.css`, imported above, takes that one off a
- * click. Showing the keyboard's everywhere means checking the app's own
- * focusable elements, which were drawn without one: #3872.
- */
-:focus {
-  outline: none;
 }
