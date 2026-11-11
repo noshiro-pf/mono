@@ -1,5 +1,9 @@
 import { defineJsonSecret } from 'firebase-functions/params';
-import { fillFirebaseConfig, type FirebaseConfig } from './types/index.mjs';
+import {
+  discordWebhookUrlOf,
+  fillFirebaseConfig,
+  type FirebaseConfig,
+} from './types/index.mjs';
 
 /**
  * What `functions.config()` used to hold, which firebase-functions v7 removed.
@@ -14,3 +18,6 @@ export const runtimeConfig = defineJsonSecret<unknown>('RUNTIME_CONFIG');
 
 export const getFirebaseConfig = (): FirebaseConfig =>
   fillFirebaseConfig(runtimeConfig.value());
+
+export const getDiscordWebhookUrl = (): string =>
+  discordWebhookUrlOf(runtimeConfig.value());

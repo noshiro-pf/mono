@@ -41,9 +41,30 @@ of the shape `functions.config()` used to return:
         "password": "…",
         "app-password": "…",
         "email-address-for-error-log": "…"
+    },
+    "discord": {
+        "error-report-webhook-url": "https://discord.com/api/webhooks/…"
     }
 }
 ```
+
+`discord` is optional. With it, `sendReport` posts each error report to that
+Discord channel as well as mailing it, and answers success when either got
+through. Make the webhook in the channel's settings (Integrations → Webhooks),
+then add it to the secret and deploy, since a function reads the secret version
+it was deployed with. Run in `apps/event-schedule-app`, which holds
+`firebase.json`; the copy of the secret goes outside the repository, so that the
+password in it cannot be committed:
+
+```sh
+config_file="$(mktemp)"
+pnpm dlx firebase-tools@15 functions:secrets:access RUNTIME_CONFIG > "$config_file"
+# add the "discord" object to the file
+pnpm dlx firebase-tools@15 functions:secrets:set RUNTIME_CONFIG --data-file "$config_file"
+rm "$config_file"
+```
+
+A `discord` object written wrong is logged and ignored; the mail goes on.
 
 firebase-functions v7 removed `functions.config()`. To create the secret from
 the existing runtime config, run once in `apps/event-schedule-app`, after
