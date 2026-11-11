@@ -77,7 +77,9 @@ For each pull request with a set-aside comment of this account (`settleSkips`):
 - a record that no longer applies (`setAsideApplies` false) is rewritten as
   resolved — except a `rebase-failed` whose base moved but which still conflicts
   by `git merge-tree` replay of its own commits onto the new tip:
-  then only its recorded base is moved, and it stays the skill's;
+  then only its recorded base is moved, and it stays the skill's. When whether
+  it still conflicts cannot be told (`origin` unreachable, the branch moved
+  meanwhile), it is left as it stands until a later cycle can tell;
 - a ticked retry box is rewritten as resolved, and the pull request is treated
   as never set aside this cycle;
 - a set-aside the worker decided but whose comment write failed is written again
@@ -92,10 +94,13 @@ For each open pull request onto `main`, not `merge-queued`, that GitHub moved
 off a merged pull request's branch (its `mergedParent`, read from the timeline's
 `baseChanges` as every part is, so a restart loses nothing): if it still
 contains the head its parent merged at, rebase it `--onto` the parent's squash
-commit from that head, push leased, and carry along the layers above it. One no
+commit from that head, push leased, and carry along every layer above it. One no
 longer containing that head is passed over silently; one that cannot be
-restacked (conflict, fork) is logged and left. A restack changes no tree, so it
-costs no CI. Labels and auto-merge are left alone.
+restacked (conflict, fork) is logged and left, and so is one claimed or whose
+claim is unread, as every command that restacks leaves it, with the layers on
+it. They are restacked one at a time, since each fetches and makes worktrees in
+the one clone. A restack changes no tree, so it costs no CI. Labels and
+auto-merge are left alone.
 
 GitHub's native stacks are not landed: a pull request in one is a `note`, to be
 merged by hand.
@@ -202,6 +207,12 @@ cycle tests, in order, and the first that matches ends its turn:
 | past `--watch-timeout` (90 minutes) since released           | set aside `watch-timeout`                                  |
 | its checks cannot be read                                    | "Conditions": `read-failed`                                |
 
+**Changed in v2**: v1 watched in a loop inside one cycle; v2 judges one snapshot
+per cycle (`judgeWatch`) and keeps the watch in the memory, so a restart picks
+it up again. With none in memory, the lowest-numbered released pull request the
+worker owns that is up to date (`in-flight` or `failing`) is adopted, its watch
+timed from then.
+
 **Changed in v2**: v1 ended the turn of a pull request whose auto-merge was
 switched off and left it released, to be armed when next picked, which a
 released pull request never is; v2 puts `skip-ci` back on, so it is picked,
@@ -254,7 +265,16 @@ when: a conflicted file matches no generator (the comment names the ones that
 could have been regenerated); a generator leaves a file the pull request changed
 as the base has it; the pull request is `auto-rebase` without `merge-queued`
 (this runs the branch's own code). A failed `before` is not the pull request's
-(no set-aside; this cycle releases nothing else).
+(no set-aside; this cycle releases nothing else), and neither is a rebase that
+stops with no file unmerged (an upstream the clone lacks, a lock, no committer
+identity): it is counted as a failed push ("Conditions"). What the generators
+wrote is judged by the `CODEOWNERS` of the tip read for this rebase.
+
+Changed in v2: it is also set aside when the branch is not one commit on the
+base (counted as the rebase replays it, before a commit emptied by taking the
+base's sides is dropped; only one is amended), and when what the generators
+wrote touches a path `CODEOWNERS` gives owners, as Auto-fix is; a set-aside for
+a conflict names the merged pull requests that changed the files on the base.
 
 `generatedBranches`: a `rebase-failed` on one of these branches is not rebased
 by the skill; it runs the branch's `rebuild`.
@@ -309,7 +329,17 @@ candidates are checked ahead of their turn.
   squashed into one commit on the layer below (`main` for the first), with the
   `Queue-Layer:` trailer, and pushed to `queue/pr-<N>`. Nothing is remembered:
   the next snapshot reads which layers are valid from the branches, their
-  trailers and their trees.
+  trailers and their trees. One GitHub moved onto `main` as the pull request it
+  was stacked on merged, while its head still contains that one's merged head,
+  is squashed from that head instead, as its release rebases it.
+- **Stacked above** (v1 #3823). A queued pull request stacked on another
+  (`main <- A <- B`, both `merge-queued`) is stacked right above A, or right
+  above the kept stack when A is kept, from A's head, as long as it waits on
+  nothing else still open, is on no `Merge-After` cycle, is not a fork's, and
+  its review holds nothing and is read (`stackedLayerParent`; the decision's
+  `stackedAbove`). B is checked, never released: once A has merged, GitHub moves
+  B onto `main`, and B, now a candidate, finds its layer standing on `main`'s
+  tree. B cannot be stacked below A's layer.
 - **Dispatch.** The configured workflows are dispatched on each layer, diffing
   against `main` as a pull request's run does. A layer is dispatched only once
   every layer below has passed its gate and started every job, and never on a
@@ -332,6 +362,12 @@ candidates are checked ahead of their turn.
   pull request is released so that "Auto-fix" can act on its own run.
 - **A red layer above the first** waits until it is first (its layers below
   merged) or is rebuilt (they left the queue). Nothing is built on it.
+- **Moved heads** (v1 #3823). A layer whose pull request's head moved to a
+  commit with the layer's tree is still that pull request's layer, at the new
+  head (`withMovedHeads`): releasing A rebases it and restacks B on its new
+  head, which has the tree B's layer already has. The snapshot reads the tree of
+  each such head (`QueueLayersFacts.movedHeads`); one unread leaves the layer to
+  be built again.
 - **Cleanup.** A layer no longer valid (head moved, set aside, merged, left the
   queue, a layer below rebuilt) has its unfinished runs cancelled — except one
   set aside for a failure at its built head, whose runs finish — and its branch
@@ -340,6 +376,13 @@ candidates are checked ahead of their turn.
   layer over 90 minutes from a dispatch still waiting for a runner, a job
   running over 40 minutes, or a workflow cancelled three times on the first
   layer, releases the first candidate as without layers.
+- **Changed in v2**: the step waits while the first candidate waits for its
+  layer, and the work on the layers (drop, build, dispatch) is done before the
+  cycle's step, after which the next cycle reads what it built. A candidate its
+  green layer let go is remembered, and picked alone until it is in flight,
+  though its rebase moves its head off the layer's. The runs on a layer are the
+  workflow runs read with its checks; whether every job has started is read from
+  its check runs (the gate's included), not from a separate read of the jobs.
 - **New in v2** (#3628): one function decides whether a run is a layer run
   (`isQueueLayerRun`); the verdict lookup pages past layer runs so pull request
   and `main` verdicts are not lost; a candidate that conflicts only with a lower
@@ -364,6 +407,8 @@ cycle (write to a temporary file, then rename):
   state, labels, auto-merge, draft, body), the review holds and the tip — for
   "Intervals";
 - per pull request, how many code-owner re-runs were asked;
+- the first candidate a green layer let go, with the head its layer was built
+  from and the layer's tree ("Checking ahead");
 - the idle count: how many snapshots in a row the fingerprint has held.
 
 A file that cannot be read is logged and replaced with an empty memory, which is

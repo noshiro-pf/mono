@@ -6,6 +6,7 @@
  * that a Node of 25.4 or later is told; an older one must be started told.
  */
 
+import * as http from 'node:http';
 import type { Transport } from 'pr-report-core-v2';
 import { Result, unknownToString } from 'ts-data-forge';
 import type { ReadonlyRecord } from 'ts-type-forge';
@@ -21,6 +22,22 @@ export const proxiedFetchTransport = (
   fetchFn: typeof fetch,
 ): Result<Transport, string> =>
   Result.map(useEnvProxy(env, node), () => fetchTransport(fetchFn));
+
+/**
+ * {@link proxiedFetchTransport} over this process: its environment, its Node
+ * and the global `fetch`; what every command's entry point builds.
+ */
+export const processFetchTransport = (): Result<Transport, string> =>
+  proxiedFetchTransport(
+    process.env,
+    {
+      setGlobalProxyFromEnv:
+        typeof http.setGlobalProxyFromEnv === 'function'
+          ? http.setGlobalProxyFromEnv
+          : undefined,
+    },
+    fetch,
+  );
 
 /**
  * Tells `fetch` to use the environment's proxy through

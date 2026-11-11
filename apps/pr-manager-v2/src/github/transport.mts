@@ -1,4 +1,4 @@
-import type { HttpAnswer, Transport } from 'pr-report-core-v2';
+import type { HttpAnswer, HttpRequest, Transport } from 'pr-report-core-v2';
 import { hasKey, isRecord } from 'ts-data-forge';
 import type { ReadonlyRecord } from 'ts-type-forge';
 import type { RateLimit } from '../domain/index.mjs';
@@ -73,7 +73,7 @@ export const rateLimitOf = (
 export type Fetch = (url: string, init: FetchInit) => Promise<HttpAnswer>;
 
 export type FetchInit = Readonly<{
-  method: 'GET' | 'POST';
+  method: HttpRequest['method'];
   headers: ReadonlyRecord<string, string>;
   body?: string;
   cache: RequestCache;

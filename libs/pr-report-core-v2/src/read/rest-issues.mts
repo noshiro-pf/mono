@@ -5,7 +5,7 @@
 
 import { Arr, Result } from 'ts-data-forge';
 import * as t from 'ts-fortress';
-import { closingKeywordIssuesInText } from '../conventions/index.mjs';
+import { closingKeywordIssuesInHtml } from '../conventions/index.mjs';
 import type {
   FollowedPullRequest,
   IssueFacts,
@@ -18,7 +18,8 @@ import { allRead } from './all-read.mjs';
 import { isGone, isNotFound } from './classify.mjs';
 import { labelsOf, readOwnComments } from './rest-pull-requests.mjs';
 import {
-  isContextRepository,
+  answersAsContext,
+  RenderedBodySchema,
   restAllPages,
   restGet,
   restLeadingItems,
@@ -129,13 +130,13 @@ export const readMerged = async (
         ).length >= options.limit
       );
     },
+    // The rendering, where GitHub marks the closing keywords it recognized.
+    'full',
   );
 
   if (Result.isErr(listed)) {
     return listed;
   }
-
-  const repo = { owner: context.owner, name: context.name } as const;
 
   return Result.ok(
     Arr.generate(function* () {
@@ -152,7 +153,7 @@ export const readMerged = async (
             headSha: pr.head.sha,
             mergeCommitSha: pr.merge_commit_sha ?? '',
             labels: labelsOf(pr.labels),
-            closingIssues: closingKeywordIssuesInText(repo, pr.body ?? ''),
+            closingIssues: closingKeywordIssuesInHtml(context, pr.body_html),
           };
         }
       }
@@ -209,6 +210,34 @@ export const readFollowed = async (
   );
 };
 
+/**
+ * The issues GitHub records as blocking `issue`, this repository's alone: one
+ * of another repository has a number that names something else here, as v1
+ * reads them. Not asked when the issue's summary says nothing blocks it.
+ * **Changed in v2**: asked when the summary is absent or null, which says
+ * nothing, where v1 took it for none.
+ */
+export const readBlockedBy = async (
+  context: ReadContext,
+  number: number,
+  /** The issue's `issue_dependencies_summary`. */
+  summary: DependenciesSummary | undefined,
+): Promise<Read<readonly number[]>> =>
+  summary?.total_blocked_by === 0
+    ? Result.ok([])
+    : Result.map(
+        await restAllPages(
+          context,
+          `what blocks #${number}`,
+          `/issues/${number}/dependencies/blocked_by`,
+          t.array(t.record({ number: t.number(), repository_url: t.string() })),
+        ),
+        (issues) =>
+          issues
+            .filter(({ repository_url: url }) => answersAsContext(url, context))
+            .map(({ number: blocking }) => blocking),
+      );
+
 const readAsPullRequest = async (
   context: ReadContext,
   number: number,
@@ -245,13 +274,13 @@ const issueFactsOf = async (
   viewer: Read<string>,
 ): Promise<IssueFacts> => {
   const [blockedBy, comments] = await Promise.all([
-    restAllPages(
-      context,
-      `what blocks #${issue.number}`,
-      `/issues/${issue.number}/dependencies/blocked_by`,
-      t.array(t.record({ number: t.number() })),
-    ),
-    readOwnComments(context, issue.number, viewer),
+    readBlockedBy(context, issue.number, issue.issue_dependencies_summary),
+    // An issue with no comments has no claim, and a thousand issues read that
+    // way would spend a request each on nothing. The rest wait their turn in
+    // the context's limit of requests in flight.
+    issue.comments === 0
+      ? Promise.resolve(Result.ok([]))
+      : readOwnComments(context, issue.number, viewer),
   ]);
 
   return {
@@ -266,9 +295,7 @@ const issueFactsOf = async (
     createdAt: issue.created_at,
     updatedAt: issue.updated_at,
     commentCount: issue.comments,
-    blockedBy: Result.map(blockedBy, (issues) =>
-      issues.map(({ number }) => number),
-    ),
+    blockedBy,
     comments,
   };
 };
@@ -294,12 +321,7 @@ const readNumber = async (
   }
 
   // A transferred issue answers, redirected, as another repository's.
-  if (
-    !isContextRepository(
-      issue.value.repository_url.split('/repos/', 2).at(1),
-      context,
-    )
-  ) {
+  if (!answersAsContext(issue.value.repository_url, context)) {
     return Result.ok({ kind: 'unknown', number });
   }
 
@@ -326,6 +348,16 @@ const readNumber = async (
 type NumberFacts =
   Readonly<{ kind: 'issue'; facts: IssueFacts }> | ReferenceFacts;
 
+/**
+ * How many issues block one, which GitHub sends beside an issue where it keeps
+ * dependencies; absent or null where it does not.
+ */
+export const DependenciesSummarySchema = t.optional(
+  t.union([t.record({ total_blocked_by: t.number() }), t.nullType]),
+);
+
+export type DependenciesSummary = t.TypeOf<typeof DependenciesSummarySchema>;
+
 const LabelSchema = t.record({
   name: t.string(),
   color: t.string(),
@@ -345,6 +377,7 @@ const IssueSchema = t.record({
   created_at: t.string(),
   updated_at: t.string(),
   comments: t.number(),
+  issue_dependencies_summary: DependenciesSummarySchema,
   pull_request: t.optional(
     t.record({ merged_at: t.optional(t.union([t.string(), t.nullType])) }),
   ),
@@ -355,7 +388,7 @@ type IssueJson = t.TypeOf<typeof IssueSchema>;
 const ClosedPullSchema = t.record({
   number: t.number(),
   title: t.string(),
-  body: t.union([t.string(), t.nullType]),
+  body_html: RenderedBodySchema,
   user: t.union([t.record({ login: t.string() }), t.nullType]),
   html_url: t.string(),
   labels: t.array(LabelSchema),

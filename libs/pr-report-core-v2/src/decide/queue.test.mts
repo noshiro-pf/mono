@@ -3,6 +3,7 @@ import { writeSetAsideComment } from '../conventions/index.mjs';
 import type {
   HeadChecks,
   IssueFacts,
+  MovedHead,
   PullRequestFacts,
   ReferenceFacts,
   Snapshot,
@@ -109,7 +110,11 @@ const snapshot = (
     otherIssues: Result.ok(new Map<number, IssueFacts>()),
     references: Result.ok(new Map<number, ReferenceFacts>()),
     merged: Result.ok([]),
-    queueLayers: Result.ok([]),
+    queueLayers: Result.ok({
+      baseTree: 'tree',
+      layers: [],
+      movedHeads: new Map<number, MovedHead>(),
+    }),
     branchTips: Result.ok(new Map<string, string>()),
     followed: Result.ok([]),
   }) as const;
@@ -164,6 +169,21 @@ describe(decideQueue, () => {
     );
   });
 
+  test('checks a queued pull request stacked on another right above it, unless something else holds it', () => {
+    assert.deepStrictEqual(
+      decide(
+        snapshot([
+          pull(1),
+          pull(2, { baseRef: 'feature/1' }),
+          pull(3, { baseRef: 'feature/1', fromFork: true }),
+          pull(4, { baseRef: 'feature/1', body: 'Merge-After: #5' }),
+          pull(5),
+        ]),
+      ).stackedAbove,
+      [{ number: 2, on: 1 }],
+    );
+  });
+
   test('leaves a pull request set aside at its head to its owner', () => {
     const pr = pull(5);
 
@@ -206,6 +226,26 @@ describe(decideQueue, () => {
     assert.strictEqual(decided.pullRequests[0]?.standing.kind, 'unread');
 
     assert.deepStrictEqual(decided.candidates, []);
+  });
+
+  test('gives a pull request the queue does not cover no owner, its comments read or not', () => {
+    const unread = Result.err({
+      kind: 'unavailable',
+      what: 'the comments of #6',
+      message: '502',
+    } as const);
+
+    const decided = decide(
+      snapshot([
+        pull(6, { labels: [], comments: unread }),
+        pull(7, { comments: unread }),
+      ]),
+    );
+
+    assert.deepStrictEqual(
+      decided.pullRequests.map(({ owner }) => owner),
+      [Result.ok(undefined), unread],
+    );
   });
 
   test('judges the checks of a blocked pull request without skip-ci', () => {

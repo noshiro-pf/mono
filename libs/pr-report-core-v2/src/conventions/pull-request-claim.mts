@@ -58,9 +58,17 @@ export const pullRequestClaimHolds = (
     claim.headSha === headSha &&
     at !== undefined &&
     at - CLAIM_CLOCK_SKEW_MS <= nowEpochMs &&
-    nowEpochMs < at + PULL_REQUEST_CLAIM_LIFETIME_MS
+    nowEpochMs < pullRequestClaimLapsesAt(at)
   );
 };
+
+/**
+ * When a pull request claim made at `atEpochMs` (its `at`, parsed) lapses, in
+ * epoch milliseconds, if the head does not move first: after
+ * {@link PULL_REQUEST_CLAIM_LIFETIME_MS}.
+ */
+export const pullRequestClaimLapsesAt = (atEpochMs: number): number =>
+  atEpochMs + PULL_REQUEST_CLAIM_LIFETIME_MS;
 
 /** How long a pull request claim lasts when the head does not move first. */
 export const PULL_REQUEST_CLAIM_LIFETIME_MS = 120 * 60_000;

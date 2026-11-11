@@ -120,7 +120,7 @@ with the transport injected:
   progressively and keeps the last good answer of each part.
 - **REST** for the commands a Claude Code session runs, whose proxy refuses
   GraphQL (`pr-report`, `claim-pr`, `push-fixed-pr`, `rework-pr`, `start-issue`,
-  `startable-issues`, `report-unowned-prs`).
+  `startable-issues`, `report-unowned-prs`, `pr-description`, `open-pr`).
 
 Both readers are tested to build the same snapshot from recorded answers of the
 same repository state. What only REST answers — the checks with their workflow
@@ -130,6 +130,13 @@ the merged pull requests and the queue layers, until a GraphQL part of them
 earns its own query. Every list is paged to its end, or to as much as was asked
 for and says whether there was more, or fails loudly; no reader reports the
 first page as the whole (#3217).
+
+A REST read sends its token to `https://api.github.com` alone: a URL that is
+not plainly there (another origin, credentials in it, no URL at all), from a
+caller or from an answer's next link, is not asked and fails the read as
+`malformed`. A next link GitHub writes by the repository's numeric id
+(`/repositories/<id>/…`), which the session proxy refuses, is asked by the route
+that was read, with the link's query (**New in v2**).
 
 ### 4. Packages
 

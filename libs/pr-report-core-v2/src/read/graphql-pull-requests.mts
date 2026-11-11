@@ -386,10 +386,7 @@ const closingIssuesOf = async (
       ]),
   );
 
-  const named = closingKeywordIssuesInHtml(
-    { owner: context.owner, name: context.name },
-    pr.bodyHTML,
-  );
+  const named = closingKeywordIssuesInHtml(context, pr.bodyHTML);
 
   const fromBody = await Promise.all(
     named.map(

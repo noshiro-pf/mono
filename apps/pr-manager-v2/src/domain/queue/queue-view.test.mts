@@ -1,4 +1,8 @@
-import { decideQueue, type QueueDecision } from 'pr-report-core-v2';
+import {
+  decideQueue,
+  type MovedHead,
+  type QueueDecision,
+} from 'pr-report-core-v2';
 import { Arr, Result } from 'ts-data-forge';
 import { label, pull, snapshot } from '../../../test/index.mjs';
 import { queueSummary, queueViewOf } from './queue-view.mjs';
@@ -24,17 +28,22 @@ describe(queueViewOf, () => {
     ],
     [],
     {
-      queueLayers: Result.ok([
-        {
-          branch: 'queue/pr-2',
-          origin: { number: 2, builtFromHead: 'x' },
-          sha: 's',
-          tree: 't',
-          parentTree: 'p',
-          committedAt: '2026-11-01T00:00:00Z',
-          checks: Result.ok({ sha: 's', runs: [], statuses: [], rounds: [] }),
-        },
-      ]),
+      queueLayers: Result.ok({
+        baseTree: 'b',
+        movedHeads: new Map<number, MovedHead>(),
+        layers: [
+          {
+            branch: 'queue/pr-2',
+            origin: { number: 2, builtFromHead: 'x' },
+            sha: 's',
+            tree: 't',
+            parent: 'q',
+            parentTree: 'p',
+            committedAt: '2026-11-01T00:00:00Z',
+            checks: Result.ok({ sha: 's', runs: [], statuses: [], rounds: [] }),
+          },
+        ],
+      }),
     },
   );
 

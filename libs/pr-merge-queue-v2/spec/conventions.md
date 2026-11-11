@@ -36,7 +36,7 @@ Issue labels:
 | `in-progress`                                                           | someone started it (`start-issue`)                 |
 | `planned`                                                               | someone means to start it next                     |
 | `priority:S`, `:A`, `:B`, `:C`, `:D`, `priority:hold`, `priority:close` | its tier, one per issue (`docs/issue-priority.md`) |
-| `question`, `wontfix`, `duplicate`, `invalid`, `pending`                | not handed to `run-issue-resolver`                 |
+| `duplicate`, `invalid`, `question`, `wontfix`, `pending`                | not handed to `run-issue-resolver`                 |
 
 `issue-closed-labels.yml` takes `in-progress` and `planned` off a closing issue
 and releases its claim.
@@ -61,12 +61,20 @@ and releases its claim.
   as a slip. `Start-After:` on a pull request is not read.
 - The version pull request's body is never read for `Merge-After:`: its body is
   rewritten on every push to the base.
-- GitHub's issue dependencies ("blocked by") count as `Start-After:` does.
+- GitHub's issue dependencies ("blocked by") count as `Start-After:` does. Only
+  this repository's count, and they are asked for unless the issue's summary
+  says none (**Changed in v2**: an absent summary was taken for none).
 
 ### `Merges before #A, …` (written by `open-pr --merge-before`)
 
-The first line of B's body: ``Merges before #A, whose `Merge-After:` names this
-one.`` Prose for people; nothing reads it as a declaration.
+``Merges before #A, whose `Merge-After:` names this one.``, under the
+`Merge-After:` line B's body opens with, or else its first line. Prose for
+people; nothing reads it as a declaration. Only that line is read as it, so that
+a person's sentence starting the same way stays theirs. A second run rewrites it
+rather than adding another, naming its own and, in the line's order, those named
+before that still name B and that B does not merge after; and `pr-description`
+does not count it as an edit of the original (**Changed in v2**: v1 set aside
+any line starting `Merges before #`).
 
 ### Closing issues
 
@@ -79,12 +87,14 @@ The issues a pull request closes are:
   `data-hovercard-type` is `issue` and whose `data-url` is this repository's
   issue. A body cannot forge the mark, because GitHub strips `class` from
   written HTML.
-- Without GraphQL or a token, the keywords are read from the text, outside
-  fenced code.
+- Over REST as over GraphQL: every REST read of a pull request's body asks for
+  its rendering too, with `application/vnd.github.full+json` (**Changed in v2**:
+  v1's `pr-report` read the text, outside fenced code, without GraphQL). An
+  answer without the `body_html` key fails to decode; a null one is GitHub's for
+  a null body and closes nothing.
 
 Only this repository's issues count, in first-appearance order, each once. The
-owner and name in an issue URL are compared case-insensitively (**Changed in
-v2**: v1's text reading compared them exactly).
+owner and name in an issue URL are compared case-insensitively.
 
 ### Two-language descriptions
 
@@ -130,7 +140,10 @@ by prose for people that nothing reads back. Three rules hold for all of them:
   post the same first line.
 - **One comment per pull request or issue and kind, edited in place.** Of
   several, the oldest is the one, so two writers at once read back the same
-  answer.
+  answer. Nothing is deleted: a newer comment beside the record is never read as
+  one. A read-back that fails, or names no record or a newer one (it lags),
+  settles nothing, and the command says how a rerun or a release settles the
+  comment it wrote, which may be the record.
 - **The most recent 100 comments are searched** (`RECORD_COMMENT_SCAN`); a
   record older than that is not found, and a new one is posted.
 

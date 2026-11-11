@@ -52,8 +52,14 @@ describe(fetchTransport, () => {
 
     await transport({ ...request, method: 'POST', body: '{"q":1}' });
 
-    assert.strictEqual(mut_seen[0]?.method, 'POST');
+    await transport(request);
 
-    assert.strictEqual(mut_seen[0]?.body, '{"q":1}');
+    assert.deepStrictEqual(
+      mut_seen.map(({ method, body, redirect }) => [method, body, redirect]),
+      [
+        ['POST', '{"q":1}', 'manual'],
+        [request.method, undefined, 'follow'],
+      ],
+    );
   });
 });

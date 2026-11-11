@@ -7,7 +7,10 @@ import type { Label } from './repository.mjs';
 export type PullRequestFacts = Readonly<{
   number: number;
   title: string;
-  /** Where `Merge-After:` and the closing keywords are read from. */
+  /**
+   * Where `Merge-After:` is read from; the closing keywords are read from its
+   * rendering, as GitHub marked them.
+   */
   body: string;
   author: string;
   url: string;

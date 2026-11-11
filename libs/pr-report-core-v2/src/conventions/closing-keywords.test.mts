@@ -1,7 +1,4 @@
-import {
-  closingKeywordIssuesInHtml,
-  closingKeywordIssuesInText,
-} from './closing-keywords.mjs';
+import { closingKeywordIssuesInHtml } from './closing-keywords.mjs';
 
 const repo = { owner: 'noshiro-pf', name: 'mono' } as const;
 
@@ -76,6 +73,10 @@ describe(closingKeywordIssuesInHtml, () => {
     );
   });
 
+  test('closes none for a null rendering, which a null body has', () => {
+    assert.deepStrictEqual(closingKeywordIssuesInHtml(repo, null), []);
+  });
+
   test('leaves out a pull request, which no keyword closes', () => {
     assert.deepStrictEqual(
       closingKeywordIssuesInHtml(
@@ -103,78 +104,3 @@ const link = (
     ` data-hovercard-url="/${nameWithOwner}/issues/${number}/hovercard"`,
     ` href="https://github.com/${nameWithOwner}/issues/${number}">#${number}</a>`,
   ].join('');
-
-describe(closingKeywordIssuesInText, () => {
-  test('reads every keyword GitHub reads', () => {
-    for (const keyword of [
-      'close',
-      'closes',
-      'closed',
-      'fix',
-      'fixes',
-      'fixed',
-      'resolve',
-      'resolves',
-      'resolved',
-    ]) {
-      assert.deepStrictEqual(
-        closingKeywordIssuesInText(repo, `${keyword} #12`),
-        [12],
-      );
-    }
-  });
-
-  test('is case-insensitive and accepts the colon form', () => {
-    assert.deepStrictEqual(
-      closingKeywordIssuesInText(repo, 'Closes: #12'),
-      [12],
-    );
-  });
-
-  test('reads a full URL, but only for this repository', () => {
-    assert.deepStrictEqual(
-      closingKeywordIssuesInText(
-        repo,
-        'Fixes https://github.com/noshiro-pf/mono/issues/34',
-      ),
-      [34],
-    );
-
-    assert.deepStrictEqual(
-      closingKeywordIssuesInText(
-        repo,
-        'Fixes https://github.com/someone/else/issues/34',
-      ),
-      [],
-    );
-  });
-
-  test('a bare reference is not a link', () => {
-    // `#12` on its own is a cross-reference; GitHub closes nothing for it, and
-    // neither does this.
-    assert.deepStrictEqual(closingKeywordIssuesInText(repo, 'see #12'), []);
-  });
-
-  test('ignores fenced code, like `Merge-After:` does', () => {
-    const body = ['```markdown', 'Closes #12', '```', 'Closes #13'].join('\n');
-
-    assert.deepStrictEqual(closingKeywordIssuesInText(repo, body), [13]);
-  });
-
-  test('deduplicates and keeps the first occurrence order', () => {
-    assert.deepStrictEqual(
-      closingKeywordIssuesInText(repo, 'Closes #5\nFixes #3\nResolves #5'),
-      [5, 3],
-    );
-  });
-
-  test('reads a URL of this repository whatever its case', () => {
-    assert.deepStrictEqual(
-      closingKeywordIssuesInText(
-        repo,
-        'Fixes https://github.com/Noshiro-PF/Mono/issues/34',
-      ),
-      [34],
-    );
-  });
-});

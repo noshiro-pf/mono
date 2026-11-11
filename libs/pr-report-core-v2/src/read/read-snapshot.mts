@@ -30,7 +30,7 @@ import {
   readNumbers,
   readOpenIssues,
 } from './rest-issues.mjs';
-import { readQueueLayers } from './rest-layers.mjs';
+import { readMovedHeads, readQueueLayers } from './rest-layers.mjs';
 import { readPullRequests } from './rest-pull-requests.mjs';
 import { readRepositoryFacts, readRequirements } from './rest-repository.mjs';
 import type { ReadContext } from './transport.mjs';
@@ -252,7 +252,11 @@ const readSnapshotWith = async (
       days: options.mergedDays,
       nowEpochMs: options.nowEpochMs,
     }),
-    readQueueLayers(current),
+    // Once the pull requests are read too, the heads moved off their layers.
+    Promise.all([
+      readQueueLayers(current, defaultBranchTip),
+      pullRequestsRead,
+    ]).then(async ([layers, pulls]) => readMovedHeads(current, layers, pulls)),
     options.readBranchTips(),
     readFollowed(current, options.follow),
   ]);

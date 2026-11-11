@@ -24,30 +24,13 @@ import type { ReadContext } from './transport.mjs';
 export const readRepositoryFacts = async (
   context: ReadContext,
 ): Promise<Read<RepositoryFacts>> => {
-  const repository = await restGet(
-    context,
-    'the repository',
-    '',
-    t.record({ full_name: t.string(), default_branch: t.string() }),
-  );
+  const repository = await readNamedRepository(context);
 
   if (Result.isErr(repository)) {
     return repository;
   }
 
-  const [owner, name] = repository.value.full_name.split('/', 2);
-
-  if (owner === undefined || name === undefined) {
-    return Result.err(
-      malformed('the repository', `full_name ${repository.value.full_name}`),
-    );
-  }
-
-  // The repository as GitHub names it now: a renamed one answers its old name
-  // by a redirect, and what is read after names the new.
-  const named: ReadContext = { ...context, owner, name } as const;
-
-  const defaultBranch = repository.value.default_branch;
+  const { named, defaultBranch } = repository.value;
 
   const [tip, viewer, codeOwners, hasQueueLabel] = await Promise.all([
     restGet(
@@ -62,7 +45,7 @@ export const readRepositoryFacts = async (
   ]);
 
   return Result.map(tip, ({ object }) => ({
-    repo: { owner, name },
+    repo: { owner: named.owner, name: named.name },
     defaultBranch,
     defaultBranchTip: object.sha,
     viewer,
@@ -186,7 +169,41 @@ const StatusChecksSchema = t.record({
   required_status_checks: t.array(t.record({ context: t.string() })),
 });
 
-const readViewer = async (context: ReadContext): Promise<Read<string>> =>
+/**
+ * The context as GitHub names the repository now, and its default branch: a
+ * renamed one answers its old name by a redirect, and what is read after names
+ * the new.
+ */
+export const readNamedRepository = async (
+  context: ReadContext,
+): Promise<Read<Readonly<{ named: ReadContext; defaultBranch: string }>>> => {
+  const repository = await restGet(
+    context,
+    'the repository',
+    '',
+    t.record({ full_name: t.string(), default_branch: t.string() }),
+  );
+
+  if (Result.isErr(repository)) {
+    return repository;
+  }
+
+  const [owner, name] = repository.value.full_name.split('/', 2);
+
+  return owner === undefined || name === undefined
+    ? Result.err(
+        malformed('the repository', `full_name ${repository.value.full_name}`),
+      )
+    : Result.ok({
+        named: { ...context, owner, name },
+        defaultBranch: repository.value.default_branch,
+      });
+};
+
+/** The login the token authenticates as; `skipped` without a token. */
+export const readViewer = async (
+  context: ReadContext,
+): Promise<Read<string>> =>
   context.token === undefined
     ? Result.err(skipped('the account of the token', 'read without a token'))
     : Result.map(

@@ -70,7 +70,7 @@ export const queueViewOf = (
   );
 
   const layers = Result.isOk(snapshot.queueLayers)
-    ? snapshot.queueLayers.value
+    ? snapshot.queueLayers.value.layers
     : ([] as const);
 
   const layered = new Set<number>(

@@ -16,8 +16,21 @@ import {
   RE_RUN_GRACE_MS,
   summarizeChecks,
   winningRuns,
+  workflowRunOf,
   type ContextState,
 } from './checks.mjs';
+
+/** What a round has that these tests do not read. */
+const ROUND_REST = {
+  headBranch: 'feature',
+  path: '.github/workflows/code-check.yml',
+  event: 'pull_request',
+  status: 'completed',
+  conclusion: undefined,
+  createdAt: '2026-11-07T10:00:00Z',
+  updatedAt: '2026-11-07T10:00:00Z',
+  url: '',
+} as const;
 
 // v1's tests, ported as they were: a run there carried its round, and the shims
 // below build the head v2 reads from the same fixtures.
@@ -53,7 +66,7 @@ const headOf = (
       workflowId: round.workflowId,
       completed: round.completed,
       attemptStartedAt: round.attemptStartedAt,
-      headBranch: 'feature',
+      ...ROUND_REST,
     }) as const;
 
   const fromRuns = Arr.generate(function* () {
@@ -1160,3 +1173,42 @@ describe(isOfEarlierAttempt, () => {
 });
 
 const NOW = Date.parse('2026-11-08T04:56:08Z');
+
+describe(workflowRunOf, () => {
+  test('is the run of the suite the winning check run belongs to', () => {
+    const checkRun = {
+      name: 'gate',
+      status: 'completed',
+      conclusion: 'failure',
+      id: 1,
+      startedAt: undefined,
+      completedAt: undefined,
+      annotationTitles: undefined,
+      url: '',
+    } as const;
+
+    const round = {
+      workflowId: 1,
+      completed: true,
+      attemptStartedAt: undefined,
+      ...ROUND_REST,
+    } as const;
+
+    const checks = {
+      sha: 'a'.repeat(40),
+      runs: [
+        { ...checkRun, checkSuiteId: 10 },
+        { ...checkRun, checkSuiteId: 11, id: 2 },
+      ],
+      statuses: [],
+      rounds: [
+        { ...round, checkSuiteId: 10, runId: 100 },
+        { ...round, checkSuiteId: 11, runId: 110 },
+      ],
+    } as const;
+
+    assert.strictEqual(workflowRunOf(checks, 'gate'), 110);
+
+    assert.isTrue(workflowRunOf(checks, 'other') === undefined);
+  });
+});

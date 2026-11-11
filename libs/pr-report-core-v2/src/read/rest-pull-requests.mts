@@ -7,7 +7,11 @@
 
 import { Arr, Result } from 'ts-data-forge';
 import * as t from 'ts-fortress';
-import { closingKeywordIssuesInText } from '../conventions/index.mjs';
+import {
+  closingKeywordIssuesInHtml,
+  findRecord,
+  type FoundRecord,
+} from '../conventions/index.mjs';
 import { pushersOf } from '../decide/index.mjs';
 import type {
   ChangedFile,
@@ -26,6 +30,7 @@ import { readHeadChecks } from './rest-checks.mjs';
 import {
   isContextRepository,
   pathSegment,
+  RenderedBodySchema,
   restAllPages,
   restGet,
 } from './rest.mjs';
@@ -222,6 +227,21 @@ export const ownCommentsOf = (
       createdAt: created_at,
     }));
 
+/**
+ * The oldest comment of `viewer` on `number` that `parse` reads as a record,
+ * read from every page: a record posted on an issue with a hundred comments is
+ * on the second.
+ */
+export const readOwnRecord = async <A,>(
+  context: ReadContext,
+  number: number,
+  viewer: string,
+  parse: (body: string) => A | undefined,
+): Promise<Read<FoundRecord<A> | undefined>> =>
+  Result.map(await readOwnComments(context, number, Result.ok(viewer)), (own) =>
+    findRecord(own, parse),
+  );
+
 /** This account's comments on issue or pull request `number`. */
 export const readOwnComments = async (
   context: ReadContext,
@@ -287,6 +307,7 @@ const PullSchema = t.record({
   number: t.number(),
   title: t.string(),
   body: t.union([t.string(), t.nullType]),
+  body_html: RenderedBodySchema,
   user: t.union([t.record({ login: t.string() }), t.nullType]),
   html_url: t.string(),
   draft: t.optional(t.boolean()),
@@ -455,15 +476,12 @@ const readReview = async (
   });
 };
 
-/** The issues the body closes, each with its state. */
+/** The issues the body closes, read from its rendering, each with its state. */
 const readClosingIssues = async (
   context: ReadContext,
-  body: string,
+  bodyHtml: string | null,
 ): Promise<Read<readonly ClosingIssue[]>> => {
-  const numbers = closingKeywordIssuesInText(
-    { owner: context.owner, name: context.name },
-    body,
-  );
+  const numbers = closingKeywordIssuesInHtml(context, bodyHtml);
 
   const issues = await Promise.all(
     numbers.map(async (number) => readClosingIssue(context, number)),
@@ -486,6 +504,8 @@ const readPullRequest = async (
     `#${number}`,
     `/pulls/${number}`,
     PullSchema,
+    // The rendering too, where GitHub marks the closing keywords it recognized.
+    'full',
   );
 
   if (Result.isErr(pull)) {
@@ -502,7 +522,7 @@ const readPullRequest = async (
       readHeadChecks(context, pr.head.sha),
       readReview(context, pr, options.permissions),
       readOwnComments(context, number, options.viewer),
-      readClosingIssues(context, body),
+      readClosingIssues(context, pr.body_html),
       readComparison(
         context,
         `the comparison of #${number}`,

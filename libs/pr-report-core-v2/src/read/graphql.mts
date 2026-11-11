@@ -17,8 +17,51 @@ import {
 } from './classify.mjs';
 import type { ReadContext } from './transport.mjs';
 
-/** One query, with every value from GitHub passed as a variable. */
+/**
+ * One query, with every value from GitHub passed as a variable, and the
+ * repository's `$owner` and `$name` too.
+ */
 export const graphqlRead = async <A,>(
+  context: ReadContext,
+  what: string,
+  query: string,
+  variables: ReadonlyRecord<string, number | string | null>,
+  schema: t.Type<A>,
+): Promise<Read<A>> =>
+  graphqlSend(
+    context,
+    what,
+    query,
+    { owner: context.owner, name: context.name, ...variables },
+    schema,
+  );
+
+/**
+ * One mutation, `variables` alone passed: a variable sent that the operation
+ * does not declare is an error to GraphQL. The one way a command writes over
+ * GraphQL, so that what a read refuses a write refuses too.
+ */
+export const graphqlWrite = async (
+  context: ReadContext,
+  what: string,
+  mutation: string,
+  variables: ReadonlyRecord<string, number | string | null>,
+): Promise<Read<undefined>> =>
+  Result.map(
+    await graphqlSend(context, what, mutation, variables, t.unknown()),
+    () => undefined,
+  );
+
+const GRAPHQL_URL = 'https://api.github.com/graphql';
+
+const EnvelopeSchema = t.record({
+  data: t.optional(t.unknown()),
+  errors: t.optional(
+    t.array(t.record({ type: t.optional(t.string()), message: t.string() })),
+  ),
+});
+
+const graphqlSend = async <A,>(
   context: ReadContext,
   what: string,
   query: string,
@@ -35,10 +78,7 @@ export const graphqlRead = async <A,>(
         ? {}
         : { authorization: `Bearer ${context.token}` }),
     },
-    body: JSON.stringify({
-      query,
-      variables: { owner: context.owner, name: context.name, ...variables },
-    }),
+    body: JSON.stringify({ query, variables }),
   });
 
   if (answer.kind === 'failed') {
@@ -85,12 +125,3 @@ export const graphqlRead = async <A,>(
       )
     : Result.ok(decoded.value);
 };
-
-const GRAPHQL_URL = 'https://api.github.com/graphql';
-
-const EnvelopeSchema = t.record({
-  data: t.optional(t.unknown()),
-  errors: t.optional(
-    t.array(t.record({ type: t.optional(t.string()), message: t.string() })),
-  ),
-});

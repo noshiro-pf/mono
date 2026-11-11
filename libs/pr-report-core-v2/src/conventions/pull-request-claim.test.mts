@@ -2,6 +2,7 @@ import {
   parsePullRequestClaimComment,
   PULL_REQUEST_CLAIM_LIFETIME_MS,
   pullRequestClaimHolds,
+  pullRequestClaimLapsesAt,
   writePullRequestClaimComment,
   writeReleasedPullRequestClaimComment,
   type PullRequestClaim,
@@ -138,6 +139,15 @@ describe(pullRequestClaimHolds, () => {
   test('does not apply from a time that does not exist', () => {
     assert.isFalse(
       pullRequestClaimHolds({ ...CLAIM, at: '2026-13-40T00:00:00Z' }, HEAD, AT),
+    );
+  });
+});
+
+describe(pullRequestClaimLapsesAt, () => {
+  test('lapses after its lifetime', () => {
+    assert.strictEqual(
+      pullRequestClaimLapsesAt(AT),
+      AT + PULL_REQUEST_CLAIM_LIFETIME_MS,
     );
   });
 });

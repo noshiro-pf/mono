@@ -60,6 +60,20 @@ export type WorkflowRoundFacts = Readonly<{
    * is decided from this (`isQueueLayerRun`), not by the reader.
    */
   headBranch: string;
+  /** The workflow's file, `.github/workflows/<name>`. */
+  path: string;
+  /** What started it, such as `pull_request` or `workflow_dispatch`. */
+  event: string;
+  /** `queued`, `in_progress`, `completed`, … as REST spells it. */
+  status: string;
+  /** Lower case; `undefined` until completed. */
+  conclusion: string | undefined;
+  /** When it was created: a dispatched run's dispatch. */
+  createdAt: string;
+  /** When anything about it last changed. */
+  updatedAt: string;
+  /** The run's page, for a link. */
+  url: string;
 }>;
 
 export type HeadChecks = Readonly<{

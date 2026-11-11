@@ -1,6 +1,6 @@
 import { Result } from 'ts-data-forge';
 import type { UnknownRecord } from 'ts-type-forge';
-import type { ReferenceFacts } from '../snapshot/index.mjs';
+import type { MovedHead, ReferenceFacts } from '../snapshot/index.mjs';
 import { branchTipsNotRead, readSnapshotRest } from './read-snapshot.mjs';
 import { ok, recordedTransport, status } from './recorded-transport.mjs';
 import type { ReadContext } from './transport.mjs';
@@ -70,6 +70,13 @@ const routes: Routes = {
     pull_request: { merged_at: '2026-11-01T00:00:00Z' },
   }),
   '/repos/o/n/git/matching-refs/heads/queue/pr-?per_page=100': ok([]),
+  [`/repos/o/n/git/commits/${TIP}`]: ok({
+    sha: TIP,
+    message: 'tip',
+    tree: { sha: 'tip-tree' },
+    committer: { date: '2026-11-09T00:00:00Z' },
+    parents: [],
+  }),
 } as const;
 
 describe(readSnapshotRest, () => {
@@ -102,7 +109,14 @@ describe(readSnapshotRest, () => {
       ],
     );
 
-    assert.deepStrictEqual(snapshot.queueLayers, Result.ok([]));
+    assert.deepStrictEqual(
+      snapshot.queueLayers,
+      Result.ok({
+        baseTree: 'tip-tree',
+        layers: [],
+        movedHeads: new Map<number, MovedHead>(),
+      }),
+    );
 
     assert.deepStrictEqual(snapshot.followed, Result.ok([]));
 

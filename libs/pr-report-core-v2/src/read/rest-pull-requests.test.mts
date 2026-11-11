@@ -26,28 +26,33 @@ const emptyChecks = {
   }),
 } as const;
 
+const PULL = {
+  number: 7,
+  title: 'fix: a thing',
+  body: 'Fixes #3\n\n```\nFixes #4\n```',
+  // GitHub marks the keyword it links; the one in code it leaves as text.
+  body_html:
+    '<p><span class="issue-keyword tooltipped">Fixes</span> <a data-hovercard-type="issue" data-url="https://github.com/o/n/issues/3" href="https://github.com/o/n/issues/3">#3</a></p><pre><code>Fixes #4</code></pre>',
+  user: { login: 'author' },
+  html_url: 'https://github.com/o/n/pull/7',
+  draft: false,
+  labels: [{ name: 'merge-queued', color: '0e8a16', description: null }],
+  auto_merge: null,
+  // GitHub's names ignore case.
+  head: { ref: 'feature', sha: HEAD, repo: { full_name: 'O/n' } },
+  base: { ref: 'main' },
+  mergeable_state: 'behind',
+  created_at: '2026-11-01T00:00:00Z',
+  updated_at: '2026-11-02T00:00:00Z',
+  changed_files: 1,
+} as const;
+
 const routesOf = (overrides: Routes = {}): Routes =>
   ({
     '/repos/o/n/pulls?state=open&sort=created&direction=asc&per_page=100': ok([
       { number: 7 },
     ]),
-    '/repos/o/n/pulls/7': ok({
-      number: 7,
-      title: 'fix: a thing',
-      body: 'Fixes #3\n\n```\nFixes #4\n```',
-      user: { login: 'author' },
-      html_url: 'https://github.com/o/n/pull/7',
-      draft: false,
-      labels: [{ name: 'merge-queued', color: '0e8a16', description: null }],
-      auto_merge: null,
-      // GitHub's names ignore case.
-      head: { ref: 'feature', sha: HEAD, repo: { full_name: 'O/n' } },
-      base: { ref: 'main' },
-      mergeable_state: 'behind',
-      created_at: '2026-11-01T00:00:00Z',
-      updated_at: '2026-11-02T00:00:00Z',
-      changed_files: 1,
-    }),
+    '/repos/o/n/pulls/7': ok(PULL),
     [`/repos/o/n/commits/${HEAD}`]: ok({
       commit: { committer: { date: '2026-11-02T00:00:00Z' } },
     }),
@@ -135,7 +140,7 @@ describe(readPullRequests, () => {
       Result.ok([{ id: 1, body: 'mine', createdAt: '2026-11-03T00:00:00Z' }]),
     );
 
-    // A closing keyword inside a fence closes nothing.
+    // Only what GitHub marked closes: not the keyword in code.
     assert.deepStrictEqual(
       pr.closingIssues,
       Result.ok([
@@ -157,6 +162,35 @@ describe(readPullRequests, () => {
       Result.isErr(pr.nativeStack) ? pr.nativeStack.value.kind : undefined,
       'skipped',
     );
+  });
+
+  test('asks each pull request with its rendering', async () => {
+    const { transport, sent } = recordedTransport(routesOf());
+
+    await readPullRequests(
+      { transport, owner: 'o', name: 'n', token: 'token' },
+      { viewer: Result.ok('me'), defaultBranch: 'main' },
+    );
+
+    assert.strictEqual(
+      sent.find(({ url }) => url.endsWith('/pulls/7'))?.headers['accept'],
+      'application/vnd.github.full+json',
+    );
+  });
+
+  test('fails on an answer without the rendering', async () => {
+    const { body_html: _, ...withoutRendering } = PULL;
+
+    const read = await readPullRequests(
+      contextOf(routesOf({ '/repos/o/n/pulls/7': ok(withoutRendering) })),
+      { viewer: Result.ok('me'), defaultBranch: 'main' },
+    );
+
+    assert.isTrue(Result.isErr(read));
+
+    assert.strictEqual(read.value.kind, 'malformed');
+
+    assert.include(read.value.message, 'body_html');
   });
 
   test('keeps a part that failed on its own', async () => {
