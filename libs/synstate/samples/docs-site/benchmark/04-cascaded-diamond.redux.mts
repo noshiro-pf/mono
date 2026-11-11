@@ -69,6 +69,7 @@ if (import.meta.vitest !== undefined) {
   test('cascaded-diamond benchmark (Redux)', () => {
     const result = runBenchmark(10, 4);
 
-    assert.isAbove(result, 0);
+    // Each level maps x to (x + 1) + (x + 2): 10 → 23 → 49 → 101 → 205.
+    assert.strictEqual(result, 205);
   });
 }

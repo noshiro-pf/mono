@@ -34,9 +34,16 @@ const K = 100_000;
 /** View counts to test */
 const VIEW_COUNTS = [1, 2, 5, 10, 20, 50, 100, 200, 500, 1000] as const;
 
-/** What `runBenchmark(2500, width)` returns: the sum of 2, 3, …, width + 1. */
-const expectedCheck = (width: number): number =>
-  Num.div(width * (width + 3), 2);
+/**
+ * What `runBenchmark(k, width)` returns. The last write is k, in bucket
+ * b = ⌊k / 1000⌋, so the views hold b, b + 1, …, b + width − 1, which sum to
+ * width · b + width (width − 1) / 2. The 1000 and the `b + i` views are the
+ * scenarios' own (`06-equality-cut-off.*.mts`), written again here: a scenario
+ * that changes them so that the sum moves, at the check's updates or at `K`,
+ * fails with the value it got and the one expected.
+ */
+const expected = (k: number, width: number): number =>
+  width * Math.floor(k / 1000) + Num.div(width * (width - 1), 2);
 
 await runSeriesSweep({
   scriptUrl: import.meta.url,
@@ -58,10 +65,6 @@ await runSeriesSweep({
     { label: 'Solid', file: '06-equality-cut-off.solid.mts' },
     { label: 'Preact Signals', file: '06-equality-cut-off.preact-signals.mts' },
   ],
-  // After 2500 writes the bucket is 2, so the views hold 2, 3, …, W + 1.
-  prepare: scenarioModule(K, {
-    updates: 2500,
-    accepts: (result, width) => result === expectedCheck(width),
-  }),
+  prepare: scenarioModule(K, { updates: 2500, expected }),
   resultsFile: 'results-equality-cut-off.md',
 });

@@ -1,7 +1,7 @@
 import * as path from 'node:path';
 // eslint-disable-next-line @typescript-eslint/no-shadow
 import { performance } from 'node:perf_hooks';
-import { range } from 'ts-data-forge';
+import { range, unknownToString } from 'ts-data-forge';
 import {
   type BenchmarkSeries,
   formatBenchmarkCell,
@@ -19,13 +19,14 @@ import { resultsDir, scenarioDir } from './paths.mjs';
  * Each library is measured in a process of its own (see
  * {@link measureEachInOwnProcess}), point by point in order: `prepare` is
  * called once there, and at each point the function it returns is called once
- * (to check the library's result and set it up), then the round it returns is
- * run `WARMUP_ROUNDS` (2) times unmeasured and up to `MEASURE_ROUNDS` (5) times
- * measured, and the median recorded. A round over `TIMEOUT_MS` (5000) ends the
- * point as `null`, and every later point of that library is `null` too,
- * unmeasured. That reads the points as listed cheapest first, which the deep
- * chain's are not wholly: a library timing out at `K=1000, M=50` would show its
- * cheaper `K=100, M=100` as a timeout too.
+ * to set that point up, then the round it returns is run `WARMUP_ROUNDS` (2)
+ * times unmeasured and up to `MEASURE_ROUNDS` (5) times measured, and the
+ * median recorded. Where the library's result is checked is the runner's:
+ * {@link scenarioModule} checks it at each point and after every round. A round
+ * over `TIMEOUT_MS` (5000) ends the point as `null`, and every later point of
+ * that library is `null` too, unmeasured. That reads the points as listed
+ * cheapest first, which the deep chain's are not wholly: a library timing out
+ * at `K=1000, M=50` would show its cheaper `K=100, M=100` as a timeout too.
  *
  * The runner calls this once from its top level and is otherwise data — the
  * points, the libraries and how each is run.
@@ -89,15 +90,30 @@ export const runSeriesSweep = async <
 /**
  * The {@link SeriesSweep.prepare} of a library whose scenario module under
  * `scenarioDir` exports `runBenchmark(k, x)`: each round times
- * `runBenchmark(updates, x)`, after `runBenchmark(check.updates, x)` has
- * returned a value `check.accepts`.
+ * `runBenchmark(updates, x)`.
+ *
+ * Every result is compared with `expected(k, x)`, the exact value a correct
+ * library returns, and any other ends the run: the unmeasured
+ * `runBenchmark(check.updates, x)` before the first round, so that a wrong
+ * library fails before a long round, and the result of every round, warmups
+ * included, so that the workload that is timed is the one that was checked.
+ * The comparison is made after the clock stops. It is made here, not in
+ * {@link runSeriesSweep}, because only a scenario module returns a value to
+ * compare; the deep chain's adapters are checked by their runner.
+ *
+ * The comparison is exact, so both expected values of a point must be safe
+ * integers, and so must the terms the formula computes them from: past 2^53 a
+ * library's step-by-step arithmetic and the formula's can round apart. A value
+ * that is not one ends the run at that point, before the library runs, with a
+ * message about `expected` rather than about the library. A term is the
+ * runner's to keep in range.
  */
 export const scenarioModule =
   <Point extends number>(
     updates: number,
     check: Readonly<{
       updates: number;
-      accepts: (result: number, point: Point) => boolean;
+      expected: (k: number, point: Point) => number;
     }>,
   ) =>
   async (
@@ -109,20 +125,58 @@ export const scenarioModule =
     );
 
     return (point, label) => {
-      const result = mod.runBenchmark(check.updates, point);
+      // Checked as each point is reached rather than up front: a formula that
+      // fails is the runner's bug, found the first time the runner is run.
+      const expectedAt = (k: number): number => {
+        const expected = check.expected(k, point);
 
-      if (!check.accepts(result, point)) {
-        console.error(`❌ ${entry.label} ${label}: got ${result.toString()}`);
+        if (!Number.isSafeInteger(expected)) {
+          console.error(
+            `❌ ${entry.file} ${label}, ${k.toString()} updates: the runner's \`expected\` gives ${expected.toString()}, not a safe integer, so no result can be compared with it exactly`,
+          );
+
+          process.exit(1);
+        }
+
+        return expected;
+      };
+
+      const assertResult = (
+        k: number,
+        expected: number,
+        result: number,
+      ): void => {
+        if (result === expected) {
+          return;
+        }
+
+        console.error(
+          `❌ ${entry.label} ${label}, ${k.toString()} updates: got ${unknownToString(result)}, expected ${expected.toString()}`,
+        );
 
         process.exit(1);
-      }
+      };
+
+      const expectedOfCheck = expectedAt(check.updates);
+
+      const expectedOfRound = expectedAt(updates);
+
+      assertResult(
+        check.updates,
+        expectedOfCheck,
+        mod.runBenchmark(check.updates, point),
+      );
 
       return () => {
         const t0 = performance.now();
 
-        mod.runBenchmark(updates, point);
+        const result = mod.runBenchmark(updates, point);
 
-        return performance.now() - t0;
+        const elapsed = performance.now() - t0;
+
+        assertResult(updates, expectedOfRound, result);
+
+        return elapsed;
       };
     };
   };
@@ -152,9 +206,11 @@ export type SeriesSweep<
   entries: readonly Entry[];
 
   /**
-   * Loads one library, in its own process. It, or the function it returns at a
-   * point, ends the run with `process.exit(1)` where the library computes the
-   * scenario wrongly: {@link scenarioModule} checks at each point.
+   * Loads one library, in its own process. It, the function it returns at a
+   * point, or the round that returns, ends the run with `process.exit(1)` where
+   * the library computes the scenario wrongly: {@link scenarioModule} checks
+   * before the first round and after every round, and also ends it, before the
+   * library runs, where its own `expected` gives no safe integer.
    */
   prepare: (entry: Entry) => PreparePoint<Point> | Promise<PreparePoint<Point>>;
 
