@@ -90,6 +90,23 @@ assertion (`x as string | null`) then makes the rule more cautious, and a
 narrowing one (`x!`, `v as string` on an `unknown`), which the checker cannot
 verify, changes nothing.
 
+### Compiler API nodes
+
+A rule that reads the program's own nodes through the type checker gets
+TypeScript compiler API nodes (`ts.Node`), not ESTree ones, and there
+parentheses are a node too.
+
+| Helper               | What it gives                                                                  |
+| :------------------- | :----------------------------------------------------------------------------- |
+| `isTsTypeWrapper`    | whether a compiler API node is one of the four or parentheses                  |
+| `skipTsTypeWrappers` | the expression inside every wrapper and parentheses around a compiler API node |
+| `TsTypeWrapper`      | the compiler API node types of the four and parentheses                        |
+
+The two functions take a readonly or a mutable node. Unlike `skipTypeWrappers`,
+what `skipTsTypeWrappers` returns is typed as the node given or a readonly
+`ts.Expression`, because the compiler API's node types are interfaces, not
+unions.
+
 ## Negation
 
 Writing the negation of a condition the short way, as a fix that removes a

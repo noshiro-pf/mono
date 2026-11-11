@@ -4,11 +4,14 @@
 報告・修正するものすべてである。
 
 - ESLint ルール: `libs/eslint-config-typed/src/plugins/*/rules/`、
-  `libs/eslint-plugin-ts-*/src/rules/`
+  `libs/eslint-plugin-*/src/rules/`、`libs/eslint-rule-forge/src/rules/`
 - Sumi の oxlint JS plugin: `languages/sumi/oxlint-config/src/plugin/rules/`
   （ESTree なので ESLint と同じ形で当てはまる）
 - TypeScript の AST を直接見るもの: Sumi の checker
-  （`languages/sumi/checker/src/rules/`）、`libs/ts-codemod-lib` の変換
+  （`languages/sumi/checker/src/rules/`）、`libs/ts-codemod-lib` の変換、
+  型情報を使う ESLint ルールが読むプログラムのノード
+  （`eslint-plugin-synstate` の `no-write-during-propagation` など）、
+  コンパイラ API で解析する `tools/` や `scripts/` のスクリプト
 
 どれも**すり抜けても何も失敗しない**種類の誤りである。報告されるべきコードが黙って
 通るか、修正がコードの意味を黙って変える。テストが通っていても、そのケースを
@@ -60,7 +63,9 @@
   plugin では `eslint-rule-forge`（`libs/eslint-rule-forge`）の
   `skipTypeWrappers` で剥がし、`typeWrapperLayers` で各層を得て型を聞く。
   公開しているプラグインもこれを `dependencies` に持つので、ヘルパーを
-  パッケージへコピーせず、足りないものはこのパッケージに足す。同じ参照かどうかは、
+  パッケージへコピーせず、足りないものはこのパッケージに足す。型チェッカー経由で
+  コンパイラ API のノード（`ts.Node`）を読むときは、同じパッケージの
+  `skipTsTypeWrappers` で剥がす。同じ参照かどうかは、
   `ts-restrictions/rules/reference-utils.mts` の `isSameReference` がラッパー越しに比べる。
 - **位置を判定するときも剥がす。** 「JSX の中か」「呼び出しの callee か」のように
   親をたどる判定では、親がラッパーならさらにその上を見る（`jsx-utils.mts` の
@@ -84,8 +89,13 @@ ESTree には括弧のノードがない。`sourceCode.getText(node)` は、ソ�
 `getArgumentText` で作る。カンマ式 `(a, b)` が 2 つの引数にならないよう括弧を付ける。
 
 TypeScript の AST は逆で、括弧が `ParenthesizedExpression` というノードとして残る。
-構文を判定する前に、型ラッパーと一緒に剥がす（Sumi の checker の
-`src/ast/node-helpers.mts` の `unwrap`）。
+構文を判定する前に、型ラッパーと一緒に剥がす（ESLint ルールが型チェッカー経由で読む
+`typescript` のノードは `eslint-rule-forge` の `skipTsTypeWrappers`、`tools/` や `scripts/` の
+スクリプトは `tools/scripts/lib/ts-expression-wrappers.mts` の
+`skipExpressionWrappers`、Sumi の checker の `typescript-native` のノードは
+`src/ast/node-helpers.mts` の `unwrap`）。`skipExpressionWrappers` はインスタンス化式
+（`f<T>`）も剥がすが、`skipTsTypeWrappers` は ESTree の `skipTypeWrappers` に合わせて
+剥がさない。ロジックを両者の間で移すときは、この違いで結果が変わらないか確かめる。
 
 ## カンマ式
 

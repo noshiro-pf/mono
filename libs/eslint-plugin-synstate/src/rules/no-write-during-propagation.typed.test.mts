@@ -39,6 +39,14 @@ ruleTester.run(
           setCount(1);
         `,
       },
+      {
+        name: 'a setter-like function made through another module under a type wrapper',
+        filename,
+        code: dedent`
+          import { count$, setLookalike } from './store.mjs';
+          count$.subscribe((count) => { setLookalike(String(count)); });
+        `,
+      },
     ],
     invalid: [
       {
@@ -72,6 +80,23 @@ ruleTester.run(
         errors: [
           { messageId: 'writeDuringPropagation', line: 3 },
           { messageId: 'writeDuringPropagation', line: 4 },
+        ],
+      },
+      {
+        name: 'setters made through a namespace import under `satisfies`, `as` and `!`',
+        filename,
+        code: dedent`
+          import { count$, setNote, setSubtitle, setTitle } from './store.mjs';
+          count$.subscribe((count) => {
+            setTitle(String(count));
+            setSubtitle(String(count));
+            setNote(String(count));
+          });
+        `,
+        errors: [
+          { messageId: 'writeDuringPropagation', line: 3 },
+          { messageId: 'writeDuringPropagation', line: 4 },
+          { messageId: 'writeDuringPropagation', line: 5 },
         ],
       },
       {
