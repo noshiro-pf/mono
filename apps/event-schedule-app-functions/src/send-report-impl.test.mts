@@ -1,11 +1,87 @@
 import { https, logger } from 'firebase-functions/v1';
 import { hasKey, isRecord } from 'ts-data-forge';
-import { handleSendReport } from './send-report-impl.mjs';
+import { postToDiscord } from './discord-webhook.mjs';
+import { getDiscordWebhookUrl, getFirebaseConfig } from './env.mjs';
+import {
+  deliverToAny,
+  handleSendReport,
+  sendReportImpl,
+} from './send-report-impl.mjs';
+import { sendEmail } from './setup-mailer.mjs';
 
 vi.mock(import('firebase-functions/v1'), async (importOriginal) => {
   const original = await importOriginal();
 
   return { ...original, logger: { ...original.logger, error: vi.fn() } };
+});
+
+vi.mock(import('./env.mjs'), async (importOriginal) => ({
+  ...(await importOriginal()),
+  getFirebaseConfig: vi.fn(),
+  getDiscordWebhookUrl: vi.fn(),
+}));
+
+vi.mock(import('./setup-mailer.mjs'), async (importOriginal) => ({
+  ...(await importOriginal()),
+  sendEmail: vi.fn(() => Promise.resolve()),
+}));
+
+vi.mock(import('./discord-webhook.mjs'), () => ({
+  postToDiscord: vi.fn(() => Promise.resolve()),
+}));
+
+describe(sendReportImpl, () => {
+  const gmail = {
+    email: 'from@example.com',
+    password: 'password',
+    'app-password': 'password',
+    'email-address-for-error-log': 'log@example.com',
+  } as const;
+
+  beforeEach(() => {
+    vi.mocked(sendEmail).mockClear();
+
+    vi.mocked(postToDiscord).mockClear();
+  });
+
+  test('only mails the report when no webhook is configured', async () => {
+    vi.mocked(getFirebaseConfig).mockReturnValue({ gmail });
+
+    vi.mocked(getDiscordWebhookUrl).mockReturnValue('');
+
+    await sendReportImpl({ error: String.raw`a\nb` });
+
+    assert.strictEqual(vi.mocked(sendEmail).mock.calls.length, 1);
+
+    assert.strictEqual(
+      vi.mocked(sendEmail).mock.calls[0]?.[0].to,
+      'log@example.com',
+    );
+
+    assert.deepStrictEqual(vi.mocked(postToDiscord).mock.calls, []);
+  });
+
+  test('mails the report and posts it to the configured webhook', async () => {
+    vi.mocked(getFirebaseConfig).mockReturnValue({ gmail });
+
+    vi.mocked(getDiscordWebhookUrl).mockReturnValue(
+      'https://discord.test/hook',
+    );
+
+    await sendReportImpl({ error: String.raw`a\nb` });
+
+    assert.strictEqual(vi.mocked(sendEmail).mock.calls.length, 1);
+
+    assert.deepStrictEqual(vi.mocked(postToDiscord).mock.calls, [
+      [
+        {
+          webhookUrl: 'https://discord.test/hook',
+          title: 'エラー報告がありました。',
+          text: 'a\nb',
+        },
+      ],
+    ]);
+  });
 });
 
 describe(handleSendReport, () => {
@@ -91,6 +167,67 @@ describe(handleSendReport, () => {
       ),
       'internal',
     );
+  });
+});
+
+describe(deliverToAny, () => {
+  test('resolves when one way delivers and logs the one that failed', async () => {
+    const logged = spyOnLoggerError();
+
+    await deliverToAny('boom', [
+      { name: 'mail', send: () => Promise.reject(new Error('smtp')) },
+      { name: 'Discord', send: () => Promise.resolve() },
+    ]);
+
+    assert.isTrue(
+      logged().some(
+        (args) =>
+          typeof args[0] === 'string' &&
+          args[0].includes('mail') &&
+          args.includes('boom'),
+      ),
+    );
+  });
+
+  test('tries every way, even after one delivered', async () => {
+    const mut_tried: string[] = [];
+
+    await deliverToAny('boom', [
+      {
+        name: 'mail',
+        send: () => {
+          mut_tried.push('mail');
+
+          return Promise.resolve();
+        },
+      },
+      {
+        name: 'Discord',
+        send: () => {
+          mut_tried.push('Discord');
+
+          return Promise.resolve();
+        },
+      },
+    ]);
+
+    assert.deepStrictEqual(mut_tried.toSorted(), ['Discord', 'mail']);
+  });
+
+  test('rejects when every way fails, a throw included', async () => {
+    spyOnLoggerError();
+
+    await expect(
+      deliverToAny('boom', [
+        { name: 'mail', send: () => Promise.reject(new Error('smtp')) },
+        {
+          name: 'Discord',
+          send: () => {
+            throw new Error('no fetch');
+          },
+        },
+      ]),
+    ).rejects.toThrow();
   });
 });
 
