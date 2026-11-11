@@ -21,8 +21,11 @@ import {
  * conversation, and beside those the issue it closes and the Claude Code
  * session it was written in, when it names them.
  *
- * It runs in the top frame of github.com only, so a pull request shown in a
- * pane of a split view has no button of its own.
+ * It runs in every frame of github.com. In a pane of a split view — the only
+ * place github.com is framed, since GitHub refuses to be framed anywhere the
+ * extension has not taken that refusal away — there is no "⧉ Split view"
+ * button, the pull request being in one already, and the merge-queued button
+ * below is shown on the conversation tab alone (`inPane`).
  *
  * The button is a `<button>` rather than a link to `split.html`: a web page may
  * not navigate to an extension page it is not listed for, and listing github.com
@@ -41,6 +44,8 @@ import {
  * a button wedged into either would come and go with them.
  */
 const main = (): void => {
+  const inPane = globalThis.self !== window.top;
+
   const mut_host = document.createElement('div');
 
   const mut_shadow = mut_host.attachShadow({ mode: 'open' });
@@ -75,7 +80,11 @@ const main = (): void => {
   mut_queueButton.title = [
     `Add the "${mergeQueuedLabel}" label to this pull request,`,
     "through the sidebar's label picker, as you.",
-    'On another tab of the pull request it goes to the conversation first.',
+    ...(inPane
+      ? []
+      : [
+          'On another tab of the pull request it goes to the conversation first.',
+        ]),
   ].join('\n');
 
   mut_shadow.append(mut_button, mut_queueButton);
@@ -83,10 +92,19 @@ const main = (): void => {
   const showOnPullRequests = (): void => {
     const pullRequest = pullRequestOf(document.location.href);
 
-    mut_host.hidden = pullRequest === undefined;
+    // In a pane the button never moves the pane to another tab, which would
+    // take the conversation's place beside the diff, so it is shown only where
+    // the picker already is.
+    const queueShown =
+      pullRequest !== undefined &&
+      hasMergeQueue(pullRequest) &&
+      (!inPane || isConversationOf(document.location.href, pullRequest));
 
-    mut_queueButton.hidden =
-      pullRequest === undefined || !hasMergeQueue(pullRequest);
+    mut_button.hidden = inPane;
+
+    mut_queueButton.hidden = !queueShown;
+
+    mut_host.hidden = pullRequest === undefined || (inPane && !queueShown);
   };
 
   showOnPullRequests();
@@ -130,7 +148,7 @@ const main = (): void => {
 
     mut_queueButton.textContent = queueBusyText;
 
-    queueThisPullRequest()
+    queueThisPullRequest(inPane)
       .catch((error: unknown): QueueResult => {
         console.error(error);
 
@@ -162,7 +180,12 @@ const main = (): void => {
   });
 
   // The context menu's request, for a link to a pull request on this page or
-  // for this page itself.
+  // for this page itself. The worker asks the top frame alone, so a pane has
+  // nothing to listen for.
+  if (inPane) {
+    return;
+  }
+
   chrome.runtime.onMessage.addListener((value: unknown) => {
     const message = asGitHubMessage(value);
 
@@ -307,10 +330,14 @@ const openPullRequest = async (
  * link on the page the address is changed instead, which loads a new document
  * and ends this script, and the button is pressed again there.
  *
+ * In a pane it never goes anywhere: moving the pane to the conversation would
+ * take it away from what the split view was showing there, so it only ever
+ * works the picker of a conversation already on screen.
+ *
  * Every step after that is taken only while the page is still this pull
  * request's conversation, so following a link while it waits labels nothing.
  */
-const queueThisPullRequest = async (): Promise<QueueResult> => {
+const queueThisPullRequest = async (inPane: boolean): Promise<QueueResult> => {
   const pullRequest = pullRequestOf(document.location.href);
 
   if (pullRequest === undefined || !hasMergeQueue(pullRequest)) {
@@ -318,6 +345,10 @@ const queueThisPullRequest = async (): Promise<QueueResult> => {
   }
 
   if (!isConversationOf(document.location.href, pullRequest)) {
+    if (inPane) {
+      return 'no-picker';
+    }
+
     const conversationPath = conversationPathOf(pullRequest);
 
     const conversationLink = Array.from(

@@ -250,6 +250,13 @@ label, or GitHub's markup changed), no such label, not saved, or that you left
 the pull request while it waited, in which case it does nothing to the page you
 went to.
 
+It is in the panes of a split view too, where the conversation usually sits
+beside the diff: a pane showing the conversation of one of this repository's
+pull requests has the button at its own bottom left, and works its own picker.
+A pane never gets **⧉ Split view**, since it is in one already, and in a pane
+the button is shown on the conversation tab alone rather than moving the pane
+there, which would take the conversation's place beside the diff.
+
 What it reads of GitHub's page is the `Manage labels` button, the
 `Filter labels` input, and the `role="option"` items with their
 `aria-labelledby` and `aria-selected` — accessibility attributes, which GitHub

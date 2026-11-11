@@ -6,6 +6,7 @@ import {
 } from '@playwright/test';
 import type { DeepReadonly } from 'ts-type-forge';
 import { test } from './fixtures.mjs';
+import { frameOf, panes } from './helpers.mjs';
 
 /**
  * The buttons `src/github-button.mts` floats over a pull request on github.com,
@@ -160,6 +161,62 @@ test.describe('the merge-queued button', () => {
   );
 });
 
+test.describe('in a pane of a split view', () => {
+  test(
+    'only the merge-queued button, and only on the conversation',
+    { tag: '@smoke' },
+    async ({ context, page, extensionId }) => {
+      await serveGitHub(context, withLabel);
+
+      await openDiffBesideConversation(page, extensionId);
+
+      const diff = frameOf(panes(page).nth(0));
+
+      const conversation = frameOf(panes(page).nth(1));
+
+      await expect
+        .soft(conversation.getByRole('button', { name: queueButtonName }))
+        .toBeVisible();
+
+      await expect
+        .soft(conversation.getByRole('button', { name: '⧉ Split view' }))
+        .toBeHidden();
+
+      await expect
+        .soft(diff.getByRole('button', { name: queueButtonName }))
+        .toBeHidden();
+
+      await expect
+        .soft(diff.getByRole('button', { name: '⧉ Split view' }))
+        .toBeHidden();
+    },
+  );
+
+  test(
+    'adds the label in the conversation pane, as in a tab',
+    { tag: '@smoke' },
+    async ({ context, page, extensionId }) => {
+      await serveGitHub(context, withLabel);
+
+      await openDiffBesideConversation(page, extensionId);
+
+      const conversation = frameOf(panes(page).nth(1));
+
+      const button = conversation.getByRole('button', {
+        name: queueButtonName,
+      });
+
+      await button.click();
+
+      await expect.soft(button).toHaveText('✓ merge-queued', outcome);
+
+      await expect
+        .soft(conversation.getByTestId('labels-list').getByRole('link'))
+        .toHaveText(['auto-rebase', 'merge-queued']);
+    },
+  );
+});
+
 const githubOrigin = 'https://github.com';
 
 /** The pull request the pages stand in for. */
@@ -283,6 +340,25 @@ const defaultRouterDelayMs = 500;
 
 /** Longer than the button ever waits for the picker, so it never appears. */
 const slowRouterDelayMs = 30_000;
+
+/** A split view of the pull request's diff beside its conversation. */
+const openDiffBesideConversation = async (
+  page: DeepReadonly<Page>,
+  extensionId: string,
+): Promise<void> => {
+  const query = new URLSearchParams([
+    ['ws', 'github'],
+    ['layout', 'rpp'],
+    ['url', `${githubOrigin}${labelled}/files`],
+    ['url', `${githubOrigin}${labelled}`],
+  ]);
+
+  await page.goto(
+    `chrome-extension://${extensionId}/split.html?${query.toString()}`,
+  );
+
+  await panes(page).nth(1).waitFor();
+};
 
 /** Answers every github.com request with a pull request page and its picker. */
 const serveGitHub = async (
