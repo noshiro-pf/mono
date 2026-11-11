@@ -32,6 +32,7 @@
     "z:gen-index-ts": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/gen-index-ts.mts"
   },
   "dependencies": {
+    "mui-look": "workspace:*",
     "synstate": "workspace:*",
     "synstate-dom": "workspace:*",
     "synstate-router": "workspace:*",

@@ -1,7 +1,7 @@
-import { type InitializedObservable, map } from 'synstate';
-import { constant, type JSX } from 'synstate-dom';
-import { Num } from 'ts-data-forge';
-import * as styles from './mui-tabs.module.css';
+import { MuiTabs as SharedMuiTabs } from 'mui-look';
+import type { InitializedObservable } from 'synstate';
+import type { JSX } from 'synstate-dom';
+import { indicator, list, root, scroller, tab } from './mui-tabs.module.css';
 
 type Props = Readonly<{
   labels: readonly string[];
@@ -11,102 +11,12 @@ type Props = Readonly<{
 }>;
 
 /**
- * MUI's `Tabs` with `variant="fullWidth"`, in the default theme's look and
- * without the ripple. The tabs share the width equally, so the indicator is
- * placed by the selected index alone. As in MUI, the arrow keys, Home and End
- * move the focus between the tabs, and Enter or Space selects one.
+ * mui-look's `MuiTabs` in the look of MUI's `Tabs` with `variant="fullWidth"`
+ * and the default theme. The tabs share the width equally, so the indicator is
+ * placed by the selected index and the tab count alone.
  */
-export const MuiTabs = ({
-  labels,
-  tabIndex,
-  tabIndexChange,
-}: Props): JSX.Element => (
-  <div class={constant(styles.root)}>
-    <div class={constant(styles.scroller)}>
-      {/* eslint-disable-next-line synstate-dom-a11y/interactive-supports-focus -- recorded, not fixed, when jsx-a11y came to synstate-dom (#3764) */}
-      <div
-        class={constant(styles.list)}
-        role={constant('tablist')}
-        onKeyDown={(event) => {
-          const tabs = Array.from(
-            event.currentTarget.querySelectorAll<HTMLElement>(
-              ':scope > [role="tab"]',
-            ),
-          );
-
-          // The tab with the focus: the key went to it.
-          const current = tabs.findIndex((tab) =>
-            tab.contains(document.activeElement),
-          );
-
-          const next = nextFocus(event.key, current, tabs.length);
-
-          if (next === undefined) {
-            return;
-          }
-
-          event.preventDefault();
-
-          tabs[next]?.focus();
-        }}
-      >
-        {labels.map((label, index) => (
-          <button
-            aria-selected={tabIndex.pipe(
-              map((selected) => (selected === index ? 'true' : 'false')),
-            )}
-            class={constant(styles.tab)}
-            role={constant('tab')}
-            tabIndex={tabIndex.pipe(
-              map((selected) => (selected === index ? 0 : -1)),
-            )}
-            type={constant('button')}
-            onClick={() => {
-              // Only for a change of tab, as MUI's `onChange`.
-              if (tabIndex.getSnapshot().value !== index) {
-                tabIndexChange(index);
-              }
-            }}
-          >
-            {constant(label)}
-          </button>
-        ))}
-      </div>
-      <span
-        class={constant(styles.indicator)}
-        style={{
-          '--tab-count': constant(labels.length.toString()),
-          '--tab-index': tabIndex.pipe(map((i) => i.toString())),
-        }}
-      />
-    </div>
-  </div>
+export const MuiTabs = (props: Props): JSX.Element => (
+  <SharedMuiTabs {...props} classes={classes} />
 );
 
-/** The tab the key moves the focus to, from `current` of `count`. */
-const nextFocus = (
-  key: string,
-  current: number,
-  count: number,
-): number | undefined => {
-  if (!Num.isNonZero(count)) {
-    return undefined;
-  }
-
-  switch (key) {
-    case 'ArrowRight':
-      return Num.rem(current + 1, count);
-
-    case 'ArrowLeft':
-      return Num.rem(current - 1 + count, count);
-
-    case 'Home':
-      return 0;
-
-    case 'End':
-      return count - 1;
-
-    default:
-      return undefined;
-  }
-};
+const classes = { root, scroller, list, tab, indicator } as const;
