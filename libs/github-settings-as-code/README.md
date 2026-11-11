@@ -93,9 +93,13 @@ under `permissions:`).
 | `repo-settings/environments/*.json`                | Settings > Environments                                |
 | `repo-settings/vulnerability-alerts/settings.json` | Settings > Advanced Security > Dependabot alerts       |
 
-In a repository without `repo-settings/pages/settings.json`, `apply` leaves
-Pages untouched, so that a repository that does not use Pages never has it
-enabled by mistake. Without `repo-settings/vulnerability-alerts/settings.json`,
-`apply` likewise leaves Dependabot alerts as they are, rather than read the
-absence as "disable". `backup` always writes that file, even when the alerts are
-off, and from then on `apply` enforces it.
+Every target `apply`s only what is declared. Without its file, or for `rulesets`
+and `environments` without its directory (or with no `*.json` in it), `apply`
+leaves that target untouched and goes on to the next, so a repository may
+declare only some of `repo-settings/`. In particular, in a repository without
+`repo-settings/pages/settings.json`, `apply` leaves Pages untouched, so that a
+repository that does not use Pages never has it enabled by mistake. Without
+`repo-settings/vulnerability-alerts/settings.json`, `apply` likewise leaves
+Dependabot alerts as they are, rather than read the absence as "disable".
+`backup` always writes that file, even when the alerts are off, and from then on
+`apply` enforces it.

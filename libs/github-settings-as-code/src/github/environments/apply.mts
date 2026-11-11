@@ -15,10 +15,15 @@ import { selectDeclaredEnvironments } from './select-declared-environments.mjs';
  *
  * ruleset と同じく、宣言に無い環境は消さない。 GUI で作られたものは drift
  * 検査が報せるのであって、 apply が黙って片付けてしまうと「いつ誰が何を
- * 作ったか」を見る機会がなくなる。
+ * 作ったか」を見る機会がなくなる。宣言が一つも無ければ（ディレクトリが無い
+ * repository も含む）何もしない。
  */
 export const applyEnvironments = async (): Promise<void> => {
   const environments = await readEnvironmentFiles();
+
+  if (!Arr.isNonEmpty(environments)) {
+    return;
+  }
 
   for (const environment of environments) {
     assertConsistent(environment);

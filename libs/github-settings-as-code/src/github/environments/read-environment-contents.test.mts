@@ -28,4 +28,13 @@ describe(readEnvironmentFilesIn, () => {
 
     expect(values).toHaveLength(declarations.length);
   });
+
+  test('reads a directory that does not exist as no declarations', async () => {
+    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'absent-'));
+
+    assert.deepStrictEqual(
+      await readEnvironmentFilesIn(path.join(dir, 'absent')),
+      [],
+    );
+  });
 });

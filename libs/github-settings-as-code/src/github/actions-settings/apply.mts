@@ -6,14 +6,22 @@ import * as t from 'ts-fortress';
 import {
   formatUncommittedFiles,
   isDirectlyExecuted,
+  pathExists,
   Result,
 } from 'ts-repo-utils';
 import { actionsSettingsDir, settingsJsonName } from '../constants.mjs';
 import { getActionsSettings, setActionsSettings } from './api/index.mjs';
 import { ActionsSettings } from './constants.mjs';
 
-/** `repo-settings/actions-settings/settings.json` を Settings > Actions > General に反映する。 */
+/**
+ * `repo-settings/actions-settings/settings.json` を Settings > Actions > General に反映する。
+ * 設定ファイルを置いていない repository では何もしない（pages と同じ理由）。
+ */
 export const applyActionsSettings = async (): Promise<void> => {
+  if (!(await pathExists(path.resolve(actionsSettingsDir, settingsJsonName)))) {
+    return;
+  }
+
   const settings = await readSettings();
 
   await setActionsSettings(settings);
