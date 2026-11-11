@@ -1,4 +1,10 @@
-import { Navbar, NavbarGroup, Tabs, type TabProps } from 'blueprint-synstate';
+import {
+  Navbar,
+  NavbarGroup,
+  Tabs,
+  tabTitleId,
+  type TabProps,
+} from 'blueprint-synstate';
 import { map } from 'synstate';
 import { constant, If, type JSX } from 'synstate-dom';
 import * as styles from './app.module.css';
@@ -10,14 +16,22 @@ export const App = (): JSX.Element => (
     <Navbar>
       <NavbarGroup>
         <Tabs
-          id={'cant-stop'}
+          id={TABS_ID}
           selectedTabId={selectedTabId$}
           tabs={tabs}
           onChange={setSelectedTabId}
         />
       </NavbarGroup>
     </Navbar>
-    <div class={constant(styles.content)}>
+    {/* The panel every tab controls, labelled by the one chosen. */}
+    <div
+      aria-labelledby={selectedTabId$.pipe(
+        map((id) => tabTitleId(TABS_ID, id)),
+      )}
+      class={constant(styles.content)}
+      id={constant(PANEL_ID)}
+      role={constant('tabpanel')}
+    >
       <If
         cond={selectedTabId$.pipe(map((id) => id === 'table'))}
         then={<ProbabilityTable />}
@@ -30,7 +44,11 @@ export const App = (): JSX.Element => (
   </div>
 );
 
+const TABS_ID = 'cant-stop';
+
+const PANEL_ID = 'cant-stop-panel';
+
 const tabs = [
-  { id: 'table', title: '確率表' },
-  { id: 'deadColumnUI', title: '残存列確率' },
+  { id: 'table', title: '確率表', panelId: PANEL_ID },
+  { id: 'deadColumnUI', title: '残存列確率', panelId: PANEL_ID },
 ] as const satisfies readonly TabProps<TabId>[];
