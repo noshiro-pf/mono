@@ -212,6 +212,7 @@ const rootWorkspaceScripts = [
   'ws:gen',
   'ws:gen:jsdoc',
   'ws:gen:readme',
+  'check:forgotten-exports',
   'check:knip',
   'check:published-deps',
 ] as const;

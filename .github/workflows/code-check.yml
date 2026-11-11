@@ -192,8 +192,9 @@ jobs:
 
           # What reads the packages' own `dist/`: `ws:check:dist` (what the
           # build emitted, type-checked by package name through the `exports`
-          # map) and `verify:npm-packages`, which installs what the packages
-          # publish.
+          # map), `check:forgotten-exports` (that a public declaration names
+          # only exported types) and `verify:npm-packages`, which installs
+          # what the packages publish.
           - command: z:ci:code-check:dist-and-verify
             build: ws:build
 

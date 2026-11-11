@@ -17,6 +17,7 @@ export {
   type KeepInitialValueOperator,
   type Observable,
   type ObservableValue,
+  type OwnedNode,
   type Pipe,
   type ProvideInitialValueOperator,
   type Source,

@@ -246,8 +246,8 @@ class ComponentDescription extends Description {
  * would otherwise get a `key` attribute.
  */
 export const createDescription = (
-  type: Component<Props> | string,
-  props: Props,
+  type: Component<ReadonlyRecord<string, unknown>> | string,
+  props: ReadonlyRecord<string, unknown>,
   key?: unknown,
 ): Description => {
   if (typeof type === 'string') {
