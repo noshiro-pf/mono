@@ -1,7 +1,6 @@
-import { ESLint } from 'eslint';
 import * as path from 'node:path';
-
-const workspaceRootPath = path.resolve(import.meta.dirname, '..');
+// eslint-disable-next-line import-x/no-relative-packages, import-x/no-internal-modules
+import { defineImportProbe } from '../../../tools/configs/eslint-import-probe.mjs';
 
 // The import allow-list in eslint.config.mts is what keeps `Arr`, `SafeUint`
 // and the like from the ts-data-forge root out of src/, and a block after it
@@ -9,33 +8,10 @@ const workspaceRootPath = path.resolve(import.meta.dirname, '..');
 // nothing failing. So this lints probe text the way `check:lint` lints a source
 // file.
 describe('eslint.config.mts', () => {
-  // The probe text is linted under the path of a real file. With `CI` set,
-  // typescript-estree assumes no file changes during the run and parses that
-  // file from disk instead of the text given, so that inference is turned off.
-  // Only the rule under test runs: rules that read the TypeScript program can
-  // still see the file's contents.
-  const eslint = new ESLint({
-    cwd: workspaceRootPath,
-    overrideConfig: {
-      languageOptions: {
-        parserOptions: { disallowAutomaticSingleRunInference: true },
-      },
-    },
-    ruleFilter: ({ ruleId }) => ruleId === 'no-restricted-imports',
+  const restrictedImportLines = defineImportProbe({
+    packageRoot: path.resolve(import.meta.dirname, '..'),
+    sourcePath: 'src/core/combine/zip.mts',
   });
-
-  const filePath = path.resolve(workspaceRootPath, 'src/core/combine/zip.mts');
-
-  const restrictedImportLines = async (
-    code: string,
-  ): Promise<readonly number[]> => {
-    const results = await eslint.lintText(code, { filePath });
-
-    return results
-      .flatMap((r) => r.messages)
-      .filter((m) => m.ruleId === 'no-restricted-imports')
-      .map((m) => m.line);
-  };
 
   test('refuses objects from the ts-data-forge root in src/', async () => {
     const lines = await restrictedImportLines(

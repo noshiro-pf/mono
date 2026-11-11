@@ -1,41 +1,16 @@
-import { ESLint } from 'eslint';
 import * as path from 'node:path';
-
-const workspaceRootPath = path.resolve(import.meta.dirname, '..');
+// eslint-disable-next-line import-x/no-relative-packages, import-x/no-internal-modules
+import { defineImportProbe } from '../../../tools/configs/eslint-import-probe.mjs';
 
 // `eslint.config.mts` keeps the library's own source from importing the `Arr`
 // and `Num` objects, which esbuild would keep whole in a consumer's bundle. A
 // later block that sets `no-restricted-imports` again would turn that off with
 // nothing failing, so this lints a source file the way `check:lint` does.
 describe('eslint.config.mts', () => {
-  // The probe text is linted under the path of a real file. With `CI` set,
-  // typescript-estree assumes no file changes during the run and parses that
-  // file from disk instead of the text given, so that inference is turned off.
-  // Only the rule under test runs: rules that read the TypeScript program can
-  // still see the file's contents (`no-ragged-comment-wrap` throws).
-  const eslint = new ESLint({
-    cwd: workspaceRootPath,
-    overrideConfig: {
-      languageOptions: {
-        parserOptions: { disallowAutomaticSingleRunInference: true },
-      },
-    },
-    ruleFilter: ({ ruleId }) => ruleId === 'no-restricted-imports',
+  const restrictedImportLines = defineImportProbe({
+    packageRoot: path.resolve(import.meta.dirname, '..'),
+    sourcePath: 'src/object/object.mts',
   });
-
-  const restrictedImportLines = async (
-    code: string,
-    sourcePath = 'src/object/object.mts',
-  ): Promise<readonly number[]> => {
-    const results = await eslint.lintText(code, {
-      filePath: path.resolve(workspaceRootPath, sourcePath),
-    });
-
-    return results
-      .flatMap((r) => r.messages)
-      .filter((m) => m.ruleId === 'no-restricted-imports')
-      .map((m) => m.line);
-  };
 
   test('refuses the Arr object and self-imports in src/', async () => {
     const lines = await restrictedImportLines(
