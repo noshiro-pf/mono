@@ -27,12 +27,28 @@ export type PrefixCases<R extends AnyRoutes> = Readonly<{
     | undefined;
 }>;
 
+/** What `Routes`' `error` is drawn with. */
+export type CaseErrorProps = Readonly<{
+  /** What the case threw. */
+  error: unknown;
+  /** Draws the case again. */
+  retry: () => void;
+}>;
+
 export type RoutesProps<
   R extends AnyRoutes,
   N extends AnyRouteNode,
 > = Readonly<{
   /** Drawn when no case draws the location. Defaults to nothing. */
   notFound?: React.ReactNode;
+  /**
+   * Drawn in place of a case that throws while rendering, with what it threw
+   * and a way to draw it again; the layouts around `Routes` stay drawn. A
+   * navigation to another route, or to the same route with other params or
+   * search, clears it. Left out, the error reaches the nearest boundary above
+   * `Routes`.
+   */
+  error?: (props: CaseErrorProps) => React.ReactNode;
   /**
    * Drawn until the router is `ready`: while an asynchronous `redirect` for the
    * URL the document was loaded at is awaited, no page is drawn. Defaults to
