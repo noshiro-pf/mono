@@ -3,7 +3,6 @@ import type { BranchIds } from 'synstate-router';
 import type { PageCases } from 'synstate-router-react';
 import { routes, Routes, type Routes as AppRoutes } from '../routes.mjs';
 import { NavLink } from './nav-link.js';
-import { NotificationsTab } from './notifications-tab.js';
 import { ProfileTab } from './profile-tab.js';
 
 /**
@@ -39,6 +38,19 @@ export const SettingsLayout = React.memo(() => (
 
 SettingsLayout.displayName = 'SettingsLayout';
 
+/**
+ * Split out of the main bundle and loaded the first time the tab is opened.
+ * `src/lazy/` is imported only here, and only with `import()`, so that the
+ * bundler makes it a chunk of its own.
+ */
+const NotificationsTab = React.lazy(async () => {
+  const { NotificationsTab: Tab } = await import('../lazy/index.mjs');
+
+  return { default: Tab };
+});
+
+const loading = <p>{'Loading…'}</p>;
+
 const tabs: PageCases<
   AppRoutes,
   BranchIds<AppRoutes, typeof routes.settings>
@@ -46,5 +58,9 @@ const tabs: PageCases<
   // Redirected to the profile tab before it is drawn.
   settings: undefined,
   'settings.profile': () => <ProfileTab />,
-  'settings.notifications': () => <NotificationsTab />,
+  'settings.notifications': () => (
+    <React.Suspense fallback={loading}>
+      <NotificationsTab />
+    </React.Suspense>
+  ),
 } as const;
