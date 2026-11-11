@@ -3,8 +3,6 @@ import 'dotenv/config';
 import * as fs from 'node:fs/promises';
 import { Arr } from 'ts-data-forge';
 import { formatUncommittedFiles, isDirectlyExecuted } from 'ts-repo-utils';
-import { environmentsDir } from '../constants.mjs';
-import { settingsFilePath } from '../settings-file-path.mjs';
 import { getAllEnvironments, setEnvironment } from './api/index.mjs';
 import type { EnvironmentSettings } from './constants.mjs';
 import { readEnvironmentFiles } from './read-environment-contents.mjs';
@@ -19,38 +17,35 @@ import { selectDeclaredEnvironments } from './select-declared-environments.mjs';
  * repository も含む）何もしない。
  */
 export const applyEnvironments = async (): Promise<void> => {
-  const environments = await readEnvironmentFiles();
+  const declarations = await readEnvironmentFiles();
 
-  if (!Arr.isNonEmpty(environments)) {
+  if (!Arr.isNonEmpty(declarations)) {
     return;
   }
 
-  for (const environment of environments) {
-    assertConsistent(environment);
+  for (const { value } of declarations) {
+    assertConsistent(value);
   }
 
-  for (const environment of environments) {
-    await setEnvironment(environment);
+  for (const { value } of declarations) {
+    await setEnvironment(value);
   }
 
-  // 反映後の実際の値で、宣言したファイルだけを更新する。 GitHub が値を
+  // 反映後の実際の値で、宣言を読んだファイルだけを更新する。 GitHub が値を
   // 正規化したり受け付けなかったりしたものが diff に出る。宣言に無い環境まで
   // 書くと、 drift 検査が報せるはずのものが宣言として取り込まれてしまう。
+  // 書き先を名前から作らないのは、 GitHub の綴り（大文字小文字）が宣言と
+  // 違うときに、二つ目のファイルができてしまうため。
   {
     const applied = selectDeclaredEnvironments(
       await getAllEnvironments(),
-      environments,
+      declarations,
     );
 
-    for (const environment of applied) {
-      const str = JSON.stringify(environment, undefined, 2);
-
-      // `settingsFilePath` が `environmentsDir` の直下であることを確かめている。
+    for (const { file, environment } of applied) {
+      // `file` は `environmentsDir` の直下で `listJsonFilesIn` が見つけたもの。
       // eslint-disable-next-line security/detect-non-literal-fs-filename
-      await fs.writeFile(
-        settingsFilePath(environmentsDir, environment.name),
-        str,
-      );
+      await fs.writeFile(file, JSON.stringify(environment, undefined, 2));
     }
 
     await formatUncommittedFiles();

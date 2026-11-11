@@ -27,6 +27,12 @@ describe(readRulesetFilesIn, () => {
     const values = await readRulesetFilesIn(dir);
 
     expect(values).toHaveLength(declarations.length);
+
+    // Each with the file it was read from, which apply writes back to.
+    assert.deepStrictEqual(
+      values.map(({ file }) => file).toSorted(),
+      declarations.map((name) => path.join(dir, name)).toSorted(),
+    );
   });
 
   test('reads a directory that does not exist as no declarations', async () => {
