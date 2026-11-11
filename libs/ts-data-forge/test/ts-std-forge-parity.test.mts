@@ -28,8 +28,11 @@ const parseSweep = [
   '0x10',
   '0b101',
   '.5',
+  '-.9',
   '5.',
   '-0',
+  '-0x10',
+  '\t\n',
   '',
   ' ',
   'abc',
@@ -107,7 +110,7 @@ describe('Num.safeParseInt is SafeNumber.parseInteger plus a brand', () => {
 
     assert.strictEqual(
       failed.value.message,
-      'safeParseInt: "abc" is not a valid base-10 integer',
+      'safeParseInt: "abc" is not a valid integer',
     );
   });
 });

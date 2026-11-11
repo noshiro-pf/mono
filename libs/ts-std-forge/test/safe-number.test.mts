@@ -179,13 +179,22 @@ describe('SafeNumber.parseInteger', () => {
     { input: '-12.9', expected: -12 },
     { input: '1e3', expected: 1000 },
     { input: '0x10', expected: 16 },
+    { input: '0x1F', expected: 31 },
+    { input: '0b11', expected: 3 },
+    { input: '0o17', expected: 15 },
     { input: '  12  ', expected: 12 },
+    { input: '0.5', expected: 0 },
+    { input: '.5', expected: 0 },
+    { input: '5.', expected: 5 },
+    { input: '-.9', expected: -0 },
+    { input: '-0.9', expected: -0 },
   ])('parseInteger($input) returns Ok($expected)', ({ input, expected }) => {
     const result = SafeNumber.parseInteger(input);
 
     assert.isTrue(Result.isOk(result));
 
-    assert.strictEqual(result.value, expected);
+    // eslint-disable-next-line vitest-coding-style/prefer-assert-strict-equal-for-primitives -- the cases have -0, which only deepStrictEqual tells apart from 0
+    assert.deepStrictEqual(result.value, expected);
   });
 
   test.each([
@@ -193,6 +202,10 @@ describe('SafeNumber.parseInteger', () => {
     { input: ' '.repeat(3) },
     { input: 'abc' },
     { input: '123abc' },
+    { input: '\t\n' },
+    { input: '-0x10' },
+    { input: '0x' },
+    { input: '.' },
     { input: 'NaN' },
     { input: 'Infinity' },
   ])('parseInteger($input) returns a tagged Err', ({ input }) => {
