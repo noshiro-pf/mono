@@ -17,6 +17,12 @@ plugin covers the part that moved, and names the new home:
 | `prefer-safe-array-length-guard`   | `prefer-canonical-length-guard` | only the empty / non-empty half: ts-std-forge has no branded length family (D-26 / D-39) |
 | `prefer-is-record-and-has-key`     | same name                       | same rule, pointing at `ts-std-forge`                                                    |
 | `prefer-is-non-null-object`        | same name                       | same rule, pointing at `ts-std-forge`                                                    |
+| `no-side-effect-import`            | same name                       | same rule, for `import 'ts-std-forge';`                                                  |
+
+Each pair is one implementation: both rules are built by the same factory of
+[`eslint-rule-forge`](https://www.npmjs.com/package/eslint-rule-forge), told
+which module and namespace to write, and a test of this package fails when a
+pair in this table is not, or when a rule here is missing from it.
 
 **Do not enable both plugins on the same files.** Every pair above would
 report the same code twice with conflicting fixes or suggestions. Pick the
@@ -101,9 +107,10 @@ export default [
 | `prefer-is-non-null-object`        | Replace `typeof u === 'object' && u !== null` with `isNonNullObject(u)`. Leaves a global or `declare`d `u` alone, which `isNonNullObject(u)` would throw on where it does not exist.                                                                                                                    |
 | `prefer-is-record-and-has-key`     | Replace `Object.hasOwn(obj, key)` / `key in obj` with `isRecord(obj) && hasKey(obj, key)`. Drops the `isRecord` half when the type already makes it true; `key in obj` is a suggestion unless `obj` is typed as a plain record (`Record<string, …>`) and the key is not a member of `Object.prototype`. |
 | `prefer-safe-array-is-array`       | Replace `Array.isArray(x)` with `SafeArray.isArray(x)`, which keeps the array members of a union instead of widening to `any[]`.                                                                                                                                                                        |
-| `prefer-safe-array-length-guard`   | Replace an emptiness check on an array (`xs.length === 0`, `> 0`, `>= 1`, `!== 0`) with `SafeArray.isEmpty(xs)` / `SafeArray.isNonEmpty(xs)`, which narrow.                                                                                                                                             |
+| `prefer-safe-array-length-guard`   | Replace an emptiness check on an array (`xs.length === 0`, `<= 0`, `< 1`; `> 0`, `>= 1`, `!== 0`) with `SafeArray.isEmpty(xs)` / `SafeArray.isNonEmpty(xs)`, which narrow.                                                                                                                              |
 | `prefer-safe-number-parse`         | Replace `parseFloat(x)` / `Number.parseFloat(x)` / `Number(x)` (string argument) with `Result.unwrapOkOr(SafeNumber.parse(x), Number.NaN)`. Always a suggestion, since some strings parse differently.                                                                                                  |
 | `prefer-safe-number-parse-integer` | Replace `parseInt(x)` / `Number.parseInt(x, 10)` with `Result.unwrapOkOr(SafeNumber.parseInteger(x), Number.NaN)`. Always a suggestion, since some strings parse differently.                                                                                                                           |
+| `no-side-effect-import`            | Remove a side-effect-only `import 'ts-std-forge';`; the package declares `sideEffects: false`, so it binds no name and does nothing.                                                                                                                                                                    |
 
 ## License
 

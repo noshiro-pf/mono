@@ -5,7 +5,7 @@ export const tokensRepresentsLambdaTerm = (
   tokens: readonly string[],
 ): boolean => {
   /* e ::= x | (lambda x.e) | (e e) */
-  if (tokens.length < 1) {
+  if (Arr.isEmpty(tokens)) {
     return false;
   }
 

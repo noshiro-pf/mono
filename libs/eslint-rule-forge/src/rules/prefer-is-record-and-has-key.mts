@@ -11,6 +11,7 @@ import {
   skipTypeWrappers,
   typeHoldsAtEveryLayer,
 } from '../type-wrappers.mjs';
+import { builtBy } from './rule-factory.mjs';
 
 /**
  * Builds a rule that replaces `Object.hasOwn(obj, key)` and `key in obj` with
@@ -43,7 +44,7 @@ export const createPreferIsRecordAndHasKey = ({
   | 'suggestRecordCheck',
   readonly []
 > =>
-  ({
+  builtBy(createPreferIsRecordAndHasKey, {
     meta: {
       type: 'suggestion',
       docs: {
@@ -263,10 +264,11 @@ export const createPreferIsRecordAndHasKey = ({
               // `isRecord(obj) && hasKey(obj, key)` evaluates `obj` twice.
               (!needsIsRecord || isSideEffectFree(objExpression));
 
-            const hasKeyCall = `${hasKeyName ?? 'hasKey'}(${objText}, ${keyText})`;
+            const hasKeyCall =
+              `${hasKeyName ?? 'hasKey'}(${objText}, ${keyText})` as const;
 
             const replacement = needsIsRecord
-              ? `${isRecordName ?? 'isRecord'}(${objText}) && ${hasKeyCall}`
+              ? (`${isRecordName ?? 'isRecord'}(${objText}) && ${hasKeyCall}` as const)
               : hasKeyCall;
 
             const data = {
@@ -275,13 +277,14 @@ export const createPreferIsRecordAndHasKey = ({
             } as const;
 
             const fix: TSESLint.ReportFixFunction | null = fixable
-              ? (fixer) => [
-                  ...binding.edits(fixer),
-                  fixer.replaceText(
-                    node,
-                    needsIsRecord ? `(${replacement})` : replacement,
-                  ),
-                ]
+              ? (fixer) =>
+                  [
+                    ...binding.edits(fixer),
+                    fixer.replaceText(
+                      node,
+                      needsIsRecord ? `(${replacement})` : replacement,
+                    ),
+                  ] as const
               : null;
 
             // Off a plain record the object may be a class instance, a
@@ -327,7 +330,7 @@ export const createPreferIsRecordAndHasKey = ({
         },
       };
     },
-  }) as const;
+  });
 
 /**
  * Whether reading `node` again has no side effects: a variable, `this`, or a

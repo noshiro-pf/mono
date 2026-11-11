@@ -1,7 +1,7 @@
 import parser from '@typescript-eslint/parser';
 import { RuleTester } from '@typescript-eslint/rule-tester';
 import dedent from 'dedent';
-import { preferArrIsNonEmpty } from './prefer-arr-is-non-empty.mjs';
+import { preferArrEmptinessGuard } from './prefer-arr-emptiness-guard.mjs';
 
 const tester = new RuleTester({
   languageOptions: {
@@ -17,8 +17,8 @@ const tester = new RuleTester({
   },
 });
 
-describe('prefer-arr-is-non-empty', () => {
-  tester.run('prefer-arr-is-non-empty', preferArrIsNonEmpty, {
+describe('prefer-arr-emptiness-guard', () => {
+  tester.run('prefer-arr-emptiness-guard', preferArrEmptinessGuard, {
     valid: [
       {
         name: 'ignores non-array types',
@@ -28,10 +28,10 @@ describe('prefer-arr-is-non-empty', () => {
         `,
       },
       {
-        name: 'ignores other comparisons',
+        name: 'leaves half of a range to prefer-arr-is-bounded-length-array',
         code: dedent`
           const xs = [1, 2, 3];
-          const ok = xs.length >= 1;
+          const ok = xs.length >= 1 && xs.length <= 3;
         `,
       },
       {
@@ -43,6 +43,71 @@ describe('prefer-arr-is-non-empty', () => {
       },
     ],
     invalid: [
+      {
+        name: 'replaces xs.length >= 1 with Arr.isNonEmpty',
+        code: dedent`
+          const xs = [1, 2, 3];
+          const ok = xs.length >= 1;
+        `,
+        output: dedent`
+          import { Arr } from 'ts-data-forge';
+          const xs = [1, 2, 3];
+          const ok = Arr.isNonEmpty(xs);
+        `,
+        errors: [{ messageId: 'useIsNonEmpty' }],
+      },
+      {
+        name: 'replaces xs.length !== 0 with Arr.isNonEmpty',
+        code: dedent`
+          const xs = [1, 2, 3];
+          const ok = xs.length !== 0;
+        `,
+        output: dedent`
+          import { Arr } from 'ts-data-forge';
+          const xs = [1, 2, 3];
+          const ok = Arr.isNonEmpty(xs);
+        `,
+        errors: [{ messageId: 'useIsNonEmpty' }],
+      },
+      {
+        name: 'replaces xs.length === 0 with Arr.isEmpty',
+        code: dedent`
+          const xs = [1, 2, 3];
+          const ok = xs.length === 0;
+        `,
+        output: dedent`
+          import { Arr } from 'ts-data-forge';
+          const xs = [1, 2, 3];
+          const ok = Arr.isEmpty(xs);
+        `,
+        errors: [{ messageId: 'useIsEmpty' }],
+      },
+      {
+        name: 'replaces xs.length <= 0 with Arr.isEmpty',
+        code: dedent`
+          const xs = [1, 2, 3];
+          const ok = xs.length <= 0;
+        `,
+        output: dedent`
+          import { Arr } from 'ts-data-forge';
+          const xs = [1, 2, 3];
+          const ok = Arr.isEmpty(xs);
+        `,
+        errors: [{ messageId: 'useIsEmpty' }],
+      },
+      {
+        name: 'replaces xs.length < 1 with Arr.isEmpty',
+        code: dedent`
+          const xs = [1, 2, 3];
+          const ok = xs.length < 1;
+        `,
+        output: dedent`
+          import { Arr } from 'ts-data-forge';
+          const xs = [1, 2, 3];
+          const ok = Arr.isEmpty(xs);
+        `,
+        errors: [{ messageId: 'useIsEmpty' }],
+      },
       {
         name: 'replaces xs.length > 0 with Arr.isNonEmpty',
         code: dedent`
@@ -89,8 +154,8 @@ describe('prefer-arr-is-non-empty', () => {
   });
 }, 20000);
 
-describe('prefer-arr-is-non-empty through type wrappers', () => {
-  tester.run('prefer-arr-is-non-empty', preferArrIsNonEmpty, {
+describe('prefer-arr-emptiness-guard through type wrappers', () => {
+  tester.run('prefer-arr-emptiness-guard', preferArrEmptinessGuard, {
     valid: [
       {
         name: 'a type that says `0` is not the value `0`: only a literal is read through its wrapper',
@@ -144,8 +209,8 @@ describe('prefer-arr-is-non-empty through type wrappers', () => {
   });
 }, 20000);
 
-describe('prefer-arr-is-non-empty with parenthesized operands', () => {
-  tester.run('prefer-arr-is-non-empty', preferArrIsNonEmpty, {
+describe('prefer-arr-emptiness-guard with parenthesized operands', () => {
+  tester.run('prefer-arr-emptiness-guard', preferArrEmptinessGuard, {
     valid: [],
     invalid: [
       {
@@ -168,8 +233,8 @@ describe('prefer-arr-is-non-empty with parenthesized operands', () => {
   });
 }, 20000);
 
-describe('prefer-arr-is-non-empty and the import it adds', () => {
-  tester.run('prefer-arr-is-non-empty', preferArrIsNonEmpty, {
+describe('prefer-arr-emptiness-guard and the import it adds', () => {
+  tester.run('prefer-arr-emptiness-guard', preferArrEmptinessGuard, {
     valid: [],
     invalid: [
       {

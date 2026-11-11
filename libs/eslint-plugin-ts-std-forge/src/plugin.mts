@@ -16,6 +16,7 @@ const recommendedRules = {
   'ts-std-forge/prefer-safe-array-length-guard': 'error',
   'ts-std-forge/prefer-safe-number-parse': 'error',
   'ts-std-forge/prefer-safe-number-parse-integer': 'error',
+  'ts-std-forge/no-side-effect-import': 'error',
 } as const satisfies ReadonlyRecord<
   `ts-std-forge/${keyof typeof tsStdForgeRules}`,
   'error'

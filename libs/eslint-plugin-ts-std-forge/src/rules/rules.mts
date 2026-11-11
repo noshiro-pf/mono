@@ -1,4 +1,5 @@
 import type { ESLintPlugin } from '../types.mjs';
+import { noSideEffectImport } from './no-side-effect-import.mjs';
 import { preferIsNonNullObject } from './prefer-is-non-null-object.mjs';
 import { preferIsRecordAndHasKey } from './prefer-is-record-and-has-key.mjs';
 import { preferSafeArrayIsArray } from './prefer-safe-array-is-array.mjs';
@@ -13,4 +14,5 @@ export const tsStdForgeRules = {
   'prefer-safe-array-length-guard': preferSafeArrayLengthGuard,
   'prefer-safe-number-parse': preferSafeNumberParse,
   'prefer-safe-number-parse-integer': preferSafeNumberParseInteger,
+  'no-side-effect-import': noSideEffectImport,
 } as const satisfies ESLintPlugin['rules'];

@@ -1,4 +1,5 @@
 import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
+import { builtBy } from './rule-factory.mjs';
 
 /**
  * Builds a rule that removes `import '<moduleName>';`, an import that binds no
@@ -21,7 +22,7 @@ export const createNoSideEffectImport = ({
   description: string;
   message: string;
 }>): TSESLint.RuleModule<'removeSideEffectImport', readonly []> =>
-  ({
+  builtBy(createNoSideEffectImport, {
     meta: {
       type,
       docs: { description },
@@ -44,7 +45,7 @@ export const createNoSideEffectImport = ({
         });
       },
     }),
-  }) as const;
+  });
 
 /* eslint-disable @typescript-eslint/prefer-readonly-parameter-types */
 

@@ -12,6 +12,7 @@ import {
   skipTypeWrappers,
   typeHoldsAtEveryLayer,
 } from '../type-wrappers.mjs';
+import { builtBy } from './rule-factory.mjs';
 
 /** What {@link createPreferSafeParseInt} and its float twin are told. */
 export type SafeParseRuleConfig = Readonly<{
@@ -48,28 +49,31 @@ export const createPreferSafeParseInt = (
   'useSafeParseInt' | 'replaceWithSafeParse',
   readonly []
 > =>
-  createSafeParseRule(config, 'useSafeParseInt', {
-    messages: { useSafeParseInt: messageText(config) },
-    description: `Replace \`parseInt(x)\` or \`Number.parseInt(x, 10)\` with \`Result.unwrapOkOr(${config.namespace}.${config.method}(x), Number.NaN)\` from ${config.moduleName}.`,
-    isTarget: (callee, args) => {
-      if (
-        !isGlobalCall(callee, 'parseInt') &&
-        !isNumberMethod(callee, 'parseInt')
-      ) {
-        return false;
-      }
+  builtBy(
+    createPreferSafeParseInt,
+    createSafeParseRule(config, 'useSafeParseInt', {
+      messages: { useSafeParseInt: messageText(config) },
+      description: `Replace \`parseInt(x)\` or \`Number.parseInt(x, 10)\` with \`Result.unwrapOkOr(${config.namespace}.${config.method}(x), Number.NaN)\` from ${config.moduleName}.`,
+      isTarget: (callee, args) => {
+        if (
+          !isGlobalCall(callee, 'parseInt') &&
+          !isNumberMethod(callee, 'parseInt')
+        ) {
+          return false;
+        }
 
-      // Only base 10: accept a missing radix or an explicit literal `10`, read
-      // through its type wrappers, which leave the value as it is.
-      const radix =
-        args[1] === undefined ? undefined : skipTypeWrappers(args[1]);
+        // Only base 10: accept a missing radix or an explicit literal `10`, read
+        // through its type wrappers, which leave the value as it is.
+        const radix =
+          args[1] === undefined ? undefined : skipTypeWrappers(args[1]);
 
-      return (
-        radix === undefined ||
-        (radix.type === AST_NODE_TYPES.Literal && radix.value === 10)
-      );
-    },
-  });
+        return (
+          radix === undefined ||
+          (radix.type === AST_NODE_TYPES.Literal && radix.value === 10)
+        );
+      },
+    }),
+  );
 
 /**
  * Builds a rule that reports `parseFloat(x)`, `Number.parseFloat(x)` and
@@ -86,16 +90,19 @@ export const createPreferSafeParseFloat = (
   'useSafeParseFloat' | 'replaceWithSafeParse',
   readonly []
 > =>
-  createSafeParseRule(config, 'useSafeParseFloat', {
-    messages: { useSafeParseFloat: messageText(config) },
-    description: `Replace \`parseFloat(x)\`, \`Number.parseFloat(x)\`, or \`Number(x)\` (when x is a string) with \`Result.unwrapOkOr(${config.namespace}.${config.method}(x), Number.NaN)\` from ${config.moduleName}.`,
-    // `Number(...)` is matched only as a call; `new Number(...)` is a
-    // `NewExpression`, which this rule never visits.
-    isTarget: (callee) =>
-      isGlobalCall(callee, 'parseFloat') ||
-      isNumberMethod(callee, 'parseFloat') ||
-      isGlobalCall(callee, 'Number'),
-  });
+  builtBy(
+    createPreferSafeParseFloat,
+    createSafeParseRule(config, 'useSafeParseFloat', {
+      messages: { useSafeParseFloat: messageText(config) },
+      description: `Replace \`parseFloat(x)\`, \`Number.parseFloat(x)\`, or \`Number(x)\` (when x is a string) with \`Result.unwrapOkOr(${config.namespace}.${config.method}(x), Number.NaN)\` from ${config.moduleName}.`,
+      // `Number(...)` is matched only as a call; `new Number(...)` is a
+      // `NewExpression`, which this rule never visits.
+      isTarget: (callee) =>
+        isGlobalCall(callee, 'parseFloat') ||
+        isNumberMethod(callee, 'parseFloat') ||
+        isGlobalCall(callee, 'Number'),
+    }),
+  );
 
 /* eslint-disable @typescript-eslint/prefer-readonly-parameter-types */
 

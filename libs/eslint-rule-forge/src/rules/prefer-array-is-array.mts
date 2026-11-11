@@ -6,6 +6,7 @@ import {
 import { bindValueImportsAt } from '../imports.mjs';
 import { getRangeWithParens } from '../parentheses.mjs';
 import { isIdentifierNamed, skipTypeWrappers } from '../type-wrappers.mjs';
+import { builtBy } from './rule-factory.mjs';
 
 /**
  * Builds a rule that replaces `Array.isArray` with `<namespace>.isArray`
@@ -22,7 +23,7 @@ export const createPreferArrayIsArray = ({
   /** The exported namespace whose `isArray` replaces `Array.isArray`. */
   namespace: string;
 }>): TSESLint.RuleModule<'useIsArray', readonly []> =>
-  ({
+  builtBy(createPreferArrayIsArray, {
     meta: {
       type: 'suggestion',
       docs: {
@@ -90,7 +91,7 @@ export const createPreferArrayIsArray = ({
         },
       };
     },
-  }) as const;
+  });
 
 /**
  * Whether `node` calls `Array.isArray`, the callee and `Array` both read

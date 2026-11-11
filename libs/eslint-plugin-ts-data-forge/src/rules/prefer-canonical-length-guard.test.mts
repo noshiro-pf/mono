@@ -55,6 +55,84 @@ describe('prefer-canonical-length-guard (folded-in length comparisons)', () => {
         errors: [{ messageId: 'useIsNonEmpty' }],
       },
       {
+        name: 'xs.length === 0 becomes Arr.isEmpty(xs) in one pass',
+        code: dedent`
+          const xs = [1, 2, 3];
+          const ok = xs.length === 0;
+        `,
+        output: dedent`
+          import { Arr } from 'ts-data-forge';
+          const xs = [1, 2, 3];
+          const ok = Arr.isEmpty(xs);
+        `,
+        errors: [{ messageId: 'useIsEmpty' }],
+      },
+      {
+        name: 'xs.length <= 0 becomes Arr.isEmpty(xs) in one pass',
+        code: dedent`
+          const xs = [1, 2, 3];
+          const ok = xs.length <= 0;
+        `,
+        output: dedent`
+          import { Arr } from 'ts-data-forge';
+          const xs = [1, 2, 3];
+          const ok = Arr.isEmpty(xs);
+        `,
+        errors: [{ messageId: 'useIsEmpty' }],
+      },
+      {
+        name: 'xs.length < 1 becomes Arr.isEmpty(xs) in one pass',
+        code: dedent`
+          const xs = [1, 2, 3];
+          const ok = xs.length < 1;
+        `,
+        output: dedent`
+          import { Arr } from 'ts-data-forge';
+          const xs = [1, 2, 3];
+          const ok = Arr.isEmpty(xs);
+        `,
+        errors: [{ messageId: 'useIsEmpty' }],
+      },
+      {
+        name: 'xs.length !== 0 becomes Arr.isNonEmpty(xs) in one pass',
+        code: dedent`
+          const xs = [1, 2, 3];
+          const ok = xs.length !== 0;
+        `,
+        output: dedent`
+          import { Arr } from 'ts-data-forge';
+          const xs = [1, 2, 3];
+          const ok = Arr.isNonEmpty(xs);
+        `,
+        errors: [{ messageId: 'useIsNonEmpty' }],
+      },
+      {
+        name: 'xs.length >= 1 becomes Arr.isNonEmpty(xs) in one pass',
+        code: dedent`
+          const xs = [1, 2, 3];
+          const ok = xs.length >= 1;
+        `,
+        output: dedent`
+          import { Arr } from 'ts-data-forge';
+          const xs = [1, 2, 3];
+          const ok = Arr.isNonEmpty(xs);
+        `,
+        errors: [{ messageId: 'useIsNonEmpty' }],
+      },
+      {
+        name: 'a range starting at 1 stays one range, not an emptiness check',
+        code: dedent`
+          const xs = [1, 2, 3];
+          const ok = xs.length >= 1 && xs.length <= 3;
+        `,
+        output: dedent`
+          import { Arr } from 'ts-data-forge';
+          const xs = [1, 2, 3];
+          const ok = Arr.isBoundedLengthArray(1, 3, xs);
+        `,
+        errors: [{ messageId: 'useIsBoundedLengthArray' }],
+      },
+      {
         name: 'xs.length >= 2 becomes Arr.isMinLengthArray(2, xs)',
         code: dedent`
           const xs = [1, 2, 3];

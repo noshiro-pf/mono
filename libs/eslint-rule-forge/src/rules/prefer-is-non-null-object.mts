@@ -7,6 +7,7 @@ import { isRuntimeBound } from '../bindings.mjs';
 import { bindValueImportsAt, type EquivalentModule } from '../imports.mjs';
 import { getRangeWithParens, parenthesesDepth } from '../parentheses.mjs';
 import { skipTypeWrappers } from '../type-wrappers.mjs';
+import { builtBy } from './rule-factory.mjs';
 
 /**
  * Builds a rule that replaces `typeof u === 'object' && u !== null`, in either
@@ -33,7 +34,7 @@ export const createPreferIsNonNullObject = ({
    */
   equivalentModules?: readonly EquivalentModule[];
 }>): TSESLint.RuleModule<'useIsNonNullObject', readonly []> =>
-  ({
+  builtBy(createPreferIsNonNullObject, {
     meta: {
       type: 'suggestion',
       docs: {
@@ -119,7 +120,7 @@ export const createPreferIsNonNullObject = ({
         },
       };
     },
-  }) as const;
+  });
 
 /**
  * A `typeof u === 'object'` and a `u !== null` next to each other in an `&&`
