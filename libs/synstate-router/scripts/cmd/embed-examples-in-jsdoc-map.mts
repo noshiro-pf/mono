@@ -41,6 +41,10 @@ export const sourceFileMappings: readonly SourceFileMapping[] = [
     sampleFiles: ['samples/src/match-at-example.mts'],
   },
   {
+    sourcePath: 'src/describe-routes.mts',
+    sampleFiles: ['samples/src/describe-routes-example.mts'],
+  },
+  {
     sourcePath: 'src/matched-branch.mts',
     sampleFiles: ['samples/src/matched-branch-example.mts'],
   },
