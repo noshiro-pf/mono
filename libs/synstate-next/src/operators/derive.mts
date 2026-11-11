@@ -6,18 +6,20 @@ import {
   type InitializedObservable,
   type Observable,
   type ObservableClass,
+  type ObservableValue,
 } from '../core/index.mjs';
 
 /**
- * The values of a tuple of observables. Not written with `ObservableValue`: on
- * the intersection an array narrowed by `Arr.isNonEmpty` has, the mapped type
- * maps the array's other members (`length`, `map`) too, which `never` leaves
- * assignable to an array and `ObservableValue` does not, so `(...values) => …`
- * would not type-check.
+ * The values of a tuple or an array of observables, in the same shape. A mapped
+ * type keeps that shape only over a tuple or an array itself. An array narrowed
+ * by `Arr.isNonEmpty` is an intersection, over which it maps the array's other
+ * members too (`length`, `map`) and gives an object whose `length` is `never`;
+ * that one is read element by element instead.
  */
-export type ValuesOf<P extends readonly Observable<unknown>[]> = Readonly<{
-  [K in keyof P]: P[K] extends Observable<infer V> ? V : never;
-}>;
+export type ValuesOf<P extends readonly Observable<unknown>[]> =
+  MappedValuesOf<P> extends Readonly<{ length: never }>
+    ? LeadingValuesOf<P>
+    : MappedValuesOf<P>;
 
 /** Holds a value when every parent always holds one. */
 export type DerivedOf<
@@ -56,6 +58,41 @@ export const derive = <const P extends readonly Observable<unknown>[], B>(
 export const merge = <const P extends readonly Observable<unknown>[]>(
   parents: P,
 ): Observable<ValuesOf<P>[number]> => view(new MergeClass(parents.map(toNode)));
+
+/**
+ * @internal A step of `ValuesOf`, which is what a consumer spells.
+ *
+ * The values of `P` by a mapped type over it.
+ */
+type MappedValuesOf<P extends readonly Observable<unknown>[]> = Readonly<{
+  [K in keyof P]: P[K] extends Observable<infer V> ? V : never;
+}>;
+
+/**
+ * @internal A step of `ValuesOf`, which is what a consumer spells.
+ *
+ * The values of the leading elements of `P`, one at a time, then, if its length
+ * is `number`, the values of any element after them as a rest. `Skip` counts the
+ * elements read: inferring the rest of an intersection as `...infer R` gives
+ * `unknown[]`.
+ */
+type LeadingValuesOf<
+  P extends readonly Observable<unknown>[],
+  Skip extends readonly unknown[] = readonly [],
+  Acc extends readonly unknown[] = readonly [],
+> = P extends readonly [
+  ...Skip,
+  infer H extends Observable<unknown>,
+  ...unknown[],
+]
+  ? LeadingValuesOf<
+      P,
+      readonly [...Skip, unknown],
+      readonly [...Acc, ObservableValue<H>]
+    >
+  : number extends P['length']
+    ? readonly [...Acc, ...ObservableValue<P[number]>[]]
+    : Acc;
 
 class DeriveClass<B> extends DerivedClass<B> {
   readonly #fn: (...values: readonly unknown[]) => B;

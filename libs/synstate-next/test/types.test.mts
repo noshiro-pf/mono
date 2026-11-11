@@ -36,7 +36,12 @@ import {
 } from 'synstate-next';
 import { Arr, expectType, isNotUndefined } from 'ts-data-forge';
 import { Optional, type Some } from 'ts-std-forge';
-import type { FixedLengthTuple } from 'ts-type-forge';
+import type {
+  FixedLengthTuple,
+  MinLengthArray,
+  MinLengthTuple,
+  NonEmptyTuple,
+} from 'ts-type-forge';
 
 describe('types', () => {
   test('pipe keeps, drops or provides the initial value', () => {
@@ -467,5 +472,90 @@ describe('types', () => {
     expectType<Source<1>, Source<number>>('!<=');
 
     assert.isTrue(true);
+  });
+
+  test('ValuesOf keeps the shape of tuples and arrays', () => {
+    expectType<
+      ValuesOf<readonly [Observable<number>, Observable<string>]>,
+      readonly [number, string]
+    >('=');
+
+    expectType<
+      ValuesOf<NonEmptyTuple<Observable<number>>>,
+      NonEmptyTuple<number>
+    >('=');
+
+    expectType<
+      ValuesOf<readonly [Observable<number>, ...Observable<string>[]]>,
+      readonly [number, ...string[]]
+    >('=');
+
+    expectType<ValuesOf<readonly Observable<number>[]>, readonly number[]>('=');
+
+    expectType<ValuesOf<readonly []>, readonly []>('=');
+
+    expectType<
+      ValuesOf<MinLengthArray<1, Observable<number>>>,
+      NonEmptyTuple<number>
+    >('=');
+
+    expectType<
+      ValuesOf<
+        MinLengthArray<2, Observable<number>> & readonly Observable<number>[]
+      >,
+      MinLengthTuple<2, number>
+    >('=');
+
+    // What `Arr.isNonEmpty` narrows a tuple to: its length stays fixed.
+    expectType<
+      ValuesOf<
+        MinLengthArray<1, Observable<number> | Observable<string>> &
+          readonly [Observable<number>, Observable<string>]
+      >,
+      readonly [number, string]
+    >('=');
+
+    const both = zip([state(1), state('a')]);
+
+    expectType<typeof both, InitializedObservable<readonly [number, string]>>(
+      '=',
+    );
+
+    assert.deepStrictEqual(both.value, [1, 'a']);
+  });
+
+  test('derive and zip over an array narrowed by Arr.isNonEmpty give arrays', () => {
+    const parents: readonly InitializedObservable<number>[] = [
+      state(1),
+      state(2),
+    ] as const;
+
+    if (!Arr.isNonEmpty(parents)) {
+      throw new Error('the parents are empty');
+    }
+
+    expectType<ValuesOf<typeof parents>, NonEmptyTuple<number>>('=');
+
+    const doubled = derive(parents, (...values): readonly number[] =>
+      values.map((v) => v * 2),
+    );
+
+    expectType<typeof doubled, InitializedObservable<readonly number[]>>('=');
+
+    assert.deepStrictEqual(doubled.value, [2, 4]);
+
+    const count = derive(parents, (...values) => values.length);
+
+    expectType<typeof count, InitializedObservable<number>>('=');
+
+    assert.strictEqual(count.value, 2);
+
+    const zipped = zip(parents);
+
+    expectType<typeof zipped, InitializedObservable<NonEmptyTuple<number>>>(
+      '=',
+    );
+
+    assert.deepStrictEqual(zipped.value, [1, 2]);
   });
 });
