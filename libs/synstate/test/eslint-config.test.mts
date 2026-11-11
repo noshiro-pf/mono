@@ -10,7 +10,7 @@ import { defineImportProbe } from '../../../tools/configs/eslint-import-probe.mj
 describe('eslint.config.mts', () => {
   const restrictedImportLines = defineImportProbe({
     packageRoot: path.resolve(import.meta.dirname, '..'),
-    sourcePath: 'src/core/combine/zip.mts',
+    sourcePath: 'src/core/combine/__probe__.mts',
   });
 
   test('refuses objects from the ts-data-forge root in src/', async () => {
