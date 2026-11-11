@@ -635,9 +635,9 @@ const checkManifest = (
  * rather than `Object.keys(config.targets)`. `expectedFields` above asserts
  * `volta.node === targets.current`, and `volta.node` is what
  * `node-version-file: 'package.json'` resolves to in every other workflow — so
- * code-check.yml's `ws:check:test:cov` shards run the same Vitest
- * suite on the same Node already, with coverage on top of it. A `current` entry
- * in the matrix was that suite a second time, and `ws:build` in front of it a
+ * code-check.yml's `ws:check:test:cov` runs the same Vitest suite
+ * on the same Node already, with coverage on top of it. A `current` entry in
+ * the matrix was that suite a second time, and `ws:build` in front of it a
  * second time.
  *
  * What the two that remain are for is covered nowhere else: `minimum` is the

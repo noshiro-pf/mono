@@ -57,10 +57,10 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-    # install + ws:build + ws:check:test or a shard of it, per job, which has
-    # taken under ten minutes. The 10 minutes this was set to when the
-    # repository held two packages cut two of the three matrix entries off
-    # mid-test.
+    # install + ws:build + ws:check:test, per job: about eight minutes on
+    # `minimum`, nine at p90, and `lts` whole was about the same before it was
+    # split. The 10 minutes this was set to when the repository held two
+    # packages cut two of the three matrix entries off mid-test.
     timeout-minutes: 15
 
     strategy:
@@ -78,42 +78,25 @@ jobs:
         # `current` is deliberately not one of them. `check-node-support` also
         # asserts `volta.node == targets.current`, and `volta.node` is what
         # `node-version-file: 'package.json'` resolves to in every other
-        # workflow — so code-check.yml's `ws:check:test:cov` shards already run
-        # this very suite on this very version, with coverage on top. A `current` entry
+        # workflow — so code-check.yml's `ws:check:test:cov` already runs this
+        # very suite on this very version, with coverage on top. A `current` entry
         # here was the same tests on the same Node a second time, and the build
         # in front of them a second time.
         target: [minimum, lts]
-        # Three jobs: `minimum` runs `ws:check:test` whole, and `lts`, whose
-        # tests take longer, runs it in two shards, each building again. One
-        # pull request's jobs across the check workflows are kept at
-        # seventeen of the account's twenty runners and all start together
-        # after their gates (see the matrix of code-check.yml), so every job
-        # is sized to about the longest one: `minimum` whole, about 400
-        # seconds (a build of one and a half minutes, four and a half of
-        # tests). `lts` whole was about 470 and would be the longest of the
-        # pull request; its shards are about 300 each. The shards name the
-        # four slowest suites and exclude them, so a new package lands in the
-        # second. Each is `--no-bail`, so one package's failure does not hide
-        # the rest.
-        #
-        # The second shard takes four packages at a time
-        # (`--workspace-concurrency=4`): most of its suites spend their few
-        # seconds starting the test runner on one core, which four cores
-        # overlap (about 110 seconds of tests became 60 on four cores). The
-        # first stays at one: each of its suites fills the runner on its own,
-        # and running them together is what once pushed eslint-config-typed's
-        # RuleTester tests past their timeout. So `ws:check:test` is the two
-        # shards in a row rather than one run at either setting: about 100
-        # and 60 seconds on four cores, where one run at one was about 210,
-        # and the heavy suites never overlap.
-        command:
-          - ws:check:test:shard-1
-          - ws:check:test:shard-2
-        exclude:
-          - target: minimum
-        include:
-          - target: minimum
-            command: ws:check:test
+        # Two jobs, each `ws:check:test` whole, after a build of its own. A
+        # queued pull request is checked ahead of its turn, so what the queue
+        # spends is runner-minutes rather than the longest job's length (see
+        # the matrix of code-check.yml), and `lts` is no longer split in two,
+        # which built twice. `ws:check:test` is two runs in a row: the four
+        # slowest suites one at a time (`ws:check:test:heavy`), and every other
+        # package four at a time (`ws:check:test:light`), excluding the first
+        # four, so a new package lands there. Most light suites spend their
+        # few seconds starting the test runner on one core, which four cores
+        # overlap; each heavy suite fills the runner on its own, and running
+        # them together is what once pushed eslint-config-typed's RuleTester
+        # tests past their timeout. Each is `--no-bail`, so one package's
+        # failure does not hide the rest.
+        command: [ws:check:test]
 
     steps:
       - name: Checkout

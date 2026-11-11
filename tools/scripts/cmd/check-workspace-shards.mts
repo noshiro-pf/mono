@@ -12,19 +12,20 @@ import { projectRootPath } from '../project-root-path.mjs';
  * Fails when the root scripts that split one recursive command into shards do
  * not partition the workspace between them.
  *
- * CI runs `ws:check:test:cov`, `ws:check:e2e`, `ws:fix:lint` and
- * `ws:check:types` as shards: some name what they run with `--filter=<pkg>`,
- * and one runs the rest by excluding those names again with `--filter=!<pkg>`.
- * The two lists are written by hand. Moving a package out of one shard while
- * its exclusion stays in the rest runs its tests nowhere, and every check stays
- * green; naming it in a shard without excluding it runs it twice.
- * `check-ci-commands.mts` checks that each shard is run, and
- * `check-codecov-builds.mts` that Codecov waits for each upload, but neither
- * reads the filters.
+ * The root splits `ws:check:test` and `ws:check:test:cov` by how many suites
+ * may run at once (`:heavy` one at a time, `:light` four at a time), and
+ * `ws:check:types` between `code-check.yml` and `strict-lib-gen.yml`
+ * (`:non-strict-lib`, `:strict-lib`): some shards name what they run with
+ * `--filter=<pkg>`, and one runs the rest by excluding those names again with
+ * `--filter=!<pkg>`. The two lists are written by hand. Moving a package out of
+ * one shard while its exclusion stays in the rest runs its tests nowhere, and
+ * every check stays green; naming it in a shard without excluding it runs it
+ * twice. `check-ci-commands.mts` checks that each shard is run, but does not
+ * read the filters.
  *
  * A family is the filtered `pnpm run` commands of the root manifest that run
  * the same package script from scripts whose names differ only in their last
- * segment (`ws:check:e2e:shard-1`, `ws:check:e2e:shard-2`).
+ * segment (`ws:check:test:heavy`, `ws:check:test:light`).
  * In each, exactly one shard is the rest (all of its filters are `!`
  * exclusions), every other shard only includes, nothing is included twice, and
  * what the rest excludes is exactly what the others include. A filter that

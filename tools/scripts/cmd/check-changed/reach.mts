@@ -82,8 +82,8 @@ export const stepCommands = (
  *
  * An aggregate (a body that runs other scripts and nothing else) is not judged
  * itself; what it reaches is. So `check:root` asks for each `check:root:*`, and
- * `ws:fix:lint:apps` for each app's `fix:lint`, while a script that does work
- * of its own (`fix:codemod:affected` decides the codemod's scope before it runs
+ * `ws:fix:lint` for each package's `fix:lint`, while a script that does work of
+ * its own (`fix:codemod:affected` decides the codemod's scope before it runs
  * it) has to be reached by the local commands itself.
  */
 export const findUncovered = ({

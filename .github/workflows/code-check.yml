@@ -86,21 +86,19 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # Ten entries, packed so that each takes six to six and a half minutes
-        # from its start to its end, setup and build included. One pull
-        # request's jobs across the check workflows start together after
-        # their gates and are kept at seventeen — ten here, style-check's two,
-        # node-version-compatibility's three, strict-lib-gen's two — of the
-        # account's twenty runners, which leaves three for what a merge to
-        # `main` runs at the same time; the benchmark's job, a minute when its
-        # baseline hits, is the one more. Above twenty a job waits for a
-        # runner, and which one waits is GitHub's choice. So an entry is as
-        # long as the longest job any of them has to be (minimum Node's whole
-        # `ws:check:test`, about 400 seconds), short checks ride along with a
-        # longer one, and a bundle is a `run-s --continue-on-error` script so
-        # that every part of it reports even when an earlier one fails. The
-        # `fix:*` entries stay alone: unblock-prs auto-fixes them by their
-        # check names (`.github/unblock-prs.json`).
+        # Seven entries. A queued pull request is checked ahead of its turn on
+        # its queue layer (`speculate` in `.github/unblock-prs.json`), so the
+        # runners carry several layers at once and what the queue spends is
+        # runner-minutes per pull request, not the longest job's length. Every
+        # entry pays its own setup and build — about 40 seconds of setup, then
+        # about 45 for `ws:build:deps` or 105 for `ws:build` — so work is not
+        # split to make a job shorter: short checks ride along with a longer
+        # one, a bundle is a `run-s --continue-on-error` script so that every
+        # part of it reports even when an earlier one fails, and an entry is
+        # split only when its p90 comes near the 15-minute timeout, which is a
+        # guard against a hung command rather than a target; keep each below
+        # about 12 minutes. The `fix:*` entries stay alone: unblock-prs
+        # auto-fixes them by their check names (`.github/unblock-prs.json`).
         #
         # Each entry says what it needs beside its command: `build`, the
         # script that builds what it reads; `browser`, Playwright's headless
@@ -109,14 +107,12 @@ jobs:
         # `coverage`, that it uploads coverage reports; `diff-base`, the commit
         # `CODEMOD_DIFF_BASE` names, fetched.
         include:
-          # `ws:fix:lint` in two halves, `apps/` and the rest, each with
           # `--no-sort`: pnpm's topological order kept one package in flight
           # for minutes while the packages everything depends on were linted.
           # No lint waits on another package's — siblings resolve to `dist/`.
-          # Each half is about 285 seconds of work.
-          - command: ws:fix:lint:apps
-            build: ws:build:deps
-          - command: ws:fix:lint:non-apps
+          # The longest entry: about 10 minutes (12 at p90), estimated from the
+          # two halves it used to be, less one setup and build.
+          - command: ws:fix:lint
             build: ws:build:deps
 
           # The codemod over the files that differ from the base, and over
@@ -133,56 +129,42 @@ jobs:
           - command: check:root
             build: ws:build:deps
 
-          # `ws:check:test:cov` in two shards. The first names the four ESLint
-          # plugin suites, about half of it, and runs them one at a time: each
-          # fills the runner on its own, and together they once pushed
-          # eslint-config-typed's RuleTester tests past their timeout. The
-          # second is everything else by excluding them, so a new package
-          # lands there, four at a time (`--workspace-concurrency=4`): most
-          # of its suites spend their few seconds starting vitest on one core,
-          # and four cores overlap that (about 225 seconds became 125 on four
-          # cores). The synstate adapters' browser projects run in it too, and
-          # passed four at a time. Each shard uploads its own reports and
-          # Codecov merges them; it waits for as many uploads as there are
-          # `coverage: true` entries here, by the two `after_n_builds` in
-          # `codecov.yml`, so adding or removing a shard changes both
-          # (`check:root:codecov-builds`). The first rides with the
-          # emulator end-to-end tests; the second with `ws:check:types`
-          # outside `strict-lib/` (about a minute: the strict-lib harnesses
-          # run in strict-lib-gen.yml) and the Firestore rules tests of
+          # `ws:check:test:cov`, with `ws:check:types` outside `strict-lib/`
+          # (about a minute: the strict-lib harnesses run in
+          # strict-lib-gen.yml), the Firestore rules tests of
           # life-plan-simulator and task-manager, so that a pull request
           # breaking `firestore.rules` fails before it merges
-          # (`deploy-firestore.yml` runs them again before it deploys, for
-          # what reaches `main` without this verdict).
-          - command: z:ci:code-check:coverage-1-and-emulators
-            build: ws:build:deps
-            browser: true
-            java: true
-            coverage: true
-          - command: z:ci:code-check:coverage-2-types-and-rules
+          # (`deploy-firestore.yml` runs them again before it deploys, for what
+          # reaches `main` without this verdict), and the emulator end-to-end
+          # tests. About 9 minutes, estimated as the lint entry's is. The
+          # coverage run is the heavy suites one at a time and the rest four at
+          # a time (`ws:check:test:cov:heavy`, `:light`): each heavy suite fills
+          # the runner on its own, and together they once pushed
+          # eslint-config-typed's RuleTester tests past their timeout, while
+          # most light suites spend their few seconds starting vitest on one
+          # core, which four cores overlap. The synstate adapters' browser
+          # projects run in the light part. Codecov waits for as many uploads as
+          # there are `coverage: true` entries here, by the two `after_n_builds`
+          # in `codecov.yml`, so adding or removing one changes both
+          # (`check:root:codecov-builds`).
+          - command: z:ci:code-check:coverage-types-and-emulators
             build: ws:build:deps
             browser: true
             java: true
             coverage: true
 
-          # `ws:check:e2e` in two shards, one app at a time: `task-manager`,
-          # about half of it, and every other app by excluding it, so a new
-          # suite lands there. The first rides with five checks of under
+          # `ws:check:e2e`, one app at a time, after five checks of under
           # forty seconds each: `check:knip`, `check:published-deps`,
           # `strict-lib:check:types`, `strict-lib:check:lint` (the
           # `strict-lib/` tooling and converter, which no member's own check
           # script covers; the harnesses are workspace members, and their
           # `check:types` is strict-lib-gen.yml's) and `ws:check:sumi` (the
-          # Sumi lint of the dogfood packages).
-          - command: z:ci:code-check:e2e-1-and-quick
-            build: ws:build:deps
-            browser: true
-          # The whole `ws:build`: synstate-docs' suite runs against its
-          # production build, served by `preview` alone in CI
-          # (`tools/configs/playwright-config.mts`), and `ws:build:deps` builds
-          # no app. `full`: an extension's suite loads its build, and lands
-          # here as every new suite does.
-          - command: ws:check:e2e:shard-2
+          # Sumi lint of the dogfood packages). The whole `ws:build`:
+          # synstate-docs' suite runs against its production build, served by
+          # `preview` alone in CI (`tools/configs/playwright-config.mts`), and
+          # `ws:build:deps` builds no app. `full`: an extension's suite loads
+          # its build. About 9 minutes, estimated the same way.
+          - command: z:ci:code-check:e2e-and-quick
             build: ws:build
             browser: full
 
@@ -271,18 +253,18 @@ jobs:
         id: command
         run: pnpm run z:ci-job --build ${{ matrix.build }} --command ${{ matrix.command }}
 
-      # Whatever the rest of the bundle concluded: a coverage shard shares its
+      # Whatever the rest of the bundle concluded: the coverage run shares its
       # job with checks that have nothing to do with coverage, and Codecov
-      # comments only once both shards have uploaded (`codecov.yml`). A shard
-      # whose own tests failed uploads what it wrote, on a pull request that
-      # is red anyway; the copy kept for `main` below is taken only from a
-      # successful run.
+      # comments only once every `coverage: true` entry has uploaded
+      # (`codecov.yml`). A run whose own tests failed uploads what it wrote, on
+      # a pull request that is red anyway; the copy kept for `main` below is
+      # taken only from a successful run.
       - name: Upload coverage reports to Codecov
         if: ${{ !cancelled() && matrix.coverage }}
         uses: codecov/codecov-action@v7.1.1
 
       # The same reports again, for `coverage-main` to upload when this tree
-      # reaches `main` instead of running the shards a second time. Only the
+      # reaches `main` instead of running the coverage a second time. Only the
       # files Codecov reads: each package's `lcov.info`, already rewritten to
       # repository paths by `coverage:normalize-paths`, without the HTML
       # report beside it. Kept for a week, longer than the reuse lookup
@@ -330,15 +312,15 @@ jobs:
   # Codecov has a report on the base commit to compare a pull request's
   # against. The upload is the point of this job, so a verdict cannot stand in
   # for it. When the matrix does run on a push — no verdict matched, or the
-  # gate failed to answer — its own shards upload, and this job stays out of
-  # it.
+  # gate failed to answer — its own coverage entry uploads, and this job stays
+  # out of it.
   #
   # What it uploads is the reports the pull request's run made of this same
   # tree (`coverage-*`, kept by the matrix above), so a merge costs a download
-  # and an upload rather than a build and every coverage shard in a row. Only
-  # a successful run is taken, because a failed shard kept no reports and the
-  # rest would be a partial picture. Where no run of this tree holds them, the
-  # shards run here, as one command: the steps below the lookup are the matrix
+  # and an upload rather than a build and the whole coverage run. Only a
+  # successful run is taken, because a failed one kept no reports and the
+  # rest would be a partial picture. Where no run of this tree holds them,
+  # `ws:check:test:cov` runs here: the steps below the lookup are the matrix
   # job's, repeated, with the whole `ws:build`; keep the two in step. See
   # "Reusing what a pull request produced" in README.md.
   #
@@ -362,8 +344,8 @@ jobs:
     permissions:
       actions: read
       contents: read
-    # Above the 15-minute ceiling (`check:root:workflow-timeouts`): every
-    # coverage shard in a row has taken up to 12m30s.
+    # Above the 15-minute ceiling (`check:root:workflow-timeouts`): the whole
+    # `ws:build` and `ws:check:test:cov` in a row has taken up to 12m30s.
     timeout-minutes: 20
 
     steps:
@@ -381,7 +363,7 @@ jobs:
       - name: Take those reports
         id: taken
         if: steps.reported.outputs.run-id != ''
-        # A download that fails runs the shards here instead.
+        # A download that fails runs the coverage here instead.
         continue-on-error: true
         uses: actions/download-artifact@v8.0.2
         with:
@@ -416,11 +398,12 @@ jobs:
   # no report, and Codecov writes neither its statuses nor its comment.
   #
   # One entry per artifact, so one upload each: Codecov waits for as many
-  # uploads as there are coverage shards (`after_n_builds` in `codecov.yml`),
-  # and one merged upload, as `coverage-main` makes, would never be enough.
-  # The names are `coverage-<strategy.job-index>` of the `coverage: true`
-  # entries above; `check:root:codecov-builds` holds the two lists together,
-  # which is why they are a matrix rather than two steps of one job.
+  # uploads as there are `coverage: true` entries above (`after_n_builds` in
+  # `codecov.yml`), and with more than one, a merged upload, as
+  # `coverage-main` makes, would never be enough. The names are
+  # `coverage-<strategy.job-index>` of those entries;
+  # `check:root:codecov-builds` holds the two lists together, which is why
+  # they are a matrix even with one entry.
   #
   # Only on a reused `success`, since a failed run kept no reports. A later
   # label event that reuses the verdict again uploads the same reports for
@@ -428,7 +411,7 @@ jobs:
   # released pull request seldom has one before it merges.
   #
   # Where no run of the tree kept them, nothing is uploaded: the statuses are
-  # informational, and running the shards again here would cost what the
+  # informational, and running the coverage again here would cost what the
   # reused verdict saved. See "Reusing what a pull request produced" in
   # README.md.
   coverage-pr:
@@ -448,7 +431,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        artifact: [coverage-4, coverage-5]
+        artifact: [coverage-3]
 
     steps:
       - name: Checkout

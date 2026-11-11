@@ -5,6 +5,7 @@ import {
   buildCoverageGraph,
   collectWorkflowCommands,
   findRedundantCommands,
+  findStaleExclusiveJobs,
   findUncoveredCommands,
   readMatrixInclude,
   resolvePackageRuns,
@@ -35,9 +36,24 @@ const workflow = (
   ({
     relativePath,
     commands,
+    jobCommands: { check: commands },
     packageRuns: [],
     problems: [],
     pinsNodeVersion,
+  }) as const;
+
+/** A workflow whose root commands are given per job. */
+const workflowOfJobs = (
+  relativePath: string,
+  jobCommands: ReadonlyRecord<string, readonly string[]>,
+): CheckWorkflow =>
+  ({
+    relativePath,
+    commands: Arr.uniq(Object.values(jobCommands).flat()).toSorted(),
+    jobCommands,
+    packageRuns: [],
+    problems: [],
+    pinsNodeVersion: false,
   }) as const;
 
 const invocations = (read: Partial<ScriptInvocations>): ScriptInvocations =>
@@ -250,6 +266,33 @@ describe('readMatrixInclude', () => {
 });
 
 describe('collectWorkflowCommands', () => {
+  test('keeps the root commands of each job apart', () => {
+    const read = collectWorkflowCommands(dedent`
+      on: pull_request
+      jobs:
+        check:
+          runs-on: ubuntu-latest
+          steps:
+            - run: pnpm run check:root
+        fallback:
+          runs-on: ubuntu-latest
+          steps:
+            - run: pnpm run ws:build && pnpm run ws:check:test:cov
+            - run: pnpm run --recursive check:test
+    `);
+
+    assert.deepStrictEqual(read.jobCommands, {
+      check: ['check:root'],
+      fallback: ['ws:build', 'ws:check:test:cov'],
+    });
+
+    assert.deepStrictEqual(read.commands, [
+      'check:root',
+      'ws:build',
+      'ws:check:test:cov',
+    ]);
+  });
+
   test('reads the entries of a matrix the workflow hands to `pnpm run`', () => {
     const text = dedent`
       jobs:
@@ -886,6 +929,63 @@ describe('findRedundantCommands', () => {
         buildCoverageGraph(manifests),
       ),
       [],
+    );
+  });
+
+  // `code-check.yml`'s `coverage-main` runs `ws:check:test:cov` only when the
+  // matrix, whose coverage entry runs it inside a bundle, reused a verdict.
+  const withFallback = workflowOfJobs('.github/workflows/code-check.yml', {
+    'code-check': ['ws:check:test:cov'],
+    'coverage-main': ['ws:check:test:cov:run'],
+  });
+
+  test('compares the commands of every job of a workflow', () => {
+    assert.deepStrictEqual(
+      findRedundantCommands([withFallback], buildCoverageGraph(manifests), {})
+        .length,
+      1,
+    );
+  });
+
+  test('leaves out a job declared never to run beside the rest', () => {
+    assert.deepStrictEqual(
+      findRedundantCommands([withFallback], buildCoverageGraph(manifests), {
+        '.github/workflows/code-check.yml#coverage-main': 'a fallback',
+      }),
+      [],
+    );
+  });
+});
+
+describe('findStaleExclusiveJobs', () => {
+  const workflows = [
+    workflowOfJobs('.github/workflows/code-check.yml', {
+      'code-check': ['ws:check:test:cov'],
+      'coverage-main': ['ws:check:test:cov'],
+      gates: [],
+    }),
+  ] as const;
+
+  test('accepts an entry naming a job that runs a root command', () => {
+    assert.deepStrictEqual(
+      findStaleExclusiveJobs(workflows, {
+        '.github/workflows/code-check.yml#coverage-main': 'a fallback',
+      }),
+      [],
+    );
+  });
+
+  test('reports an entry whose job is gone, runs no root command, or whose workflow is gone', () => {
+    const violations = findStaleExclusiveJobs(workflows, {
+      '.github/workflows/code-check.yml#coverage-old': 'renamed',
+      '.github/workflows/code-check.yml#gates': 'runs nothing',
+      '.github/workflows/gone.yml#job': 'deleted',
+    });
+
+    assert.deepStrictEqual(violations.length, 3);
+
+    assert.isTrue(
+      violations.every((violation) => violation.includes('EXCLUSIVE_JOBS')),
     );
   });
 });

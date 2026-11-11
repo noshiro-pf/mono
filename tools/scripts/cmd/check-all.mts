@@ -27,8 +27,8 @@ import { runJob } from './ci-job.mjs';
  *   which `pnpm install` does not set up, except the parts of a bundle that
  *   need neither (`PART_NEEDS` names the rest); `--all` runs them too, once
  *   `pnpm exec playwright install --only-shell chromium` (the full build,
- *   `pnpm exec playwright install chromium`, for `ws:check:e2e:shard-2`, whose
- *   suites may load an extension) and a Java 21 are in place.
+ *   `pnpm exec playwright install chromium`, for `ws:check:e2e`, whose suites
+ *   may load an extension) and a Java 21 are in place.
  * - The other check workflows: `strict-lib-gen.yml` (its generators rewrite
  *   thousands of files), `node-version-compatibility.yml` (other Node
  *   versions), `verify-published-packages.yml` (what the registry serves) and
@@ -453,9 +453,11 @@ type EntrySelection = Readonly<{
  */
 const PART_NEEDS: ReadonlyRecord<string, string> = {
   // Each package's whole Vitest, its Browser project included where it has one.
-  // Shard 1's four packages have none (`browser: false`), and run.
-  'ws:check:test:cov:shard-2': 'Chromium',
-  'ws:check:e2e:shard-1': 'Chromium',
+  // The whole coverage run, since a bundle's parts are what is skipped or run:
+  // its heavy suites need no browser, but run with the light ones.
+  'ws:check:test:cov': 'Chromium',
+  // An extension's suite loads its build, which needs the full Chromium build.
+  'ws:check:e2e': 'the full Chromium build',
   'ws:check:e2e:emulators': 'Chromium and Java',
   'ws:check:test:rules': 'Java',
 } as const;
