@@ -1,5 +1,6 @@
 import type { IsNever } from '../condition/index.mjs';
 import type { Uint10 } from '../constants/index.mjs';
+import type { MakeTuple } from '../tuple-and-list/index.mjs';
 
 /**
  * Calculates the maximum value within a union of non-negative integer literals `N` (which must extend `Uint10`).
@@ -9,29 +10,51 @@ import type { Uint10 } from '../constants/index.mjs';
  * @example
  * ```ts
  * type U2 = 0 | 1 | 2;
- * type Result = Max<U2>; // 2
- * type ResultSingle = Max<5>; // 5
- * // type ResultFull = Max<Uint10>; // 1023
+ *
+ * expectType<Max<U2>, 2>('=');
+ *
+ * expectType<Max<5>, 5>('=');
+ *
+ * expectType<Max<Uint10>, 1023>('=');
  * ```
  */
-export type Max<N extends Uint10> = MaxImpl<N, []>;
+export type Max<N extends Uint10> =
+  // `Max<never>` is `never`. Without this guard, `[never] extends [UpTo<[]>]` holds and the result would be `0`.
+  IsNever<N> extends true ? never : MaxCoarse<N, []>;
 
 // https://zenn.dev/noshiro_piko/articles/typescript-type-level-min
 
 /**
  * @internal
- * Recursive implementation for `Max`. It builds a tuple `T` until its length is not less than any number in the union `N`.
+ * Grows the tuple `T` {@link Step} at a time until no member of `N` is greater than its length, then hands over to {@link MaxFine}.
+ * A step of one would recurse once per integer, and TypeScript stops a tail-recursive type at 1000 steps, so `Max<1000>` failed with TS2589;
+ * {@link Step} at a time it is at most 32 steps here and 32 in {@link MaxFine} for all of `Uint10`.
  * @template N - The union of numbers to check against; it is passed through unchanged.
- * @template T - An accumulator tuple whose length represents the current candidate for `max(N)`.
+ * @template T - An accumulator tuple whose length is a multiple of 32.
  */
-type MaxImpl<N extends Uint10, T extends readonly unknown[]> =
-  // `Max<never>` is `never`. Without this guard, `[never] extends [Partial<[]>['length']]` holds and the result would be `0`.
-  IsNever<N> extends true
-    ? never
-    : // Check if no number in the union N is greater than the current tuple length T['length'].
-      // `Partial<T>['length']` creates a union 0 | 1 | ... | T['length'] (inclusive).
-      // `[N] extends [Partial<T>['length']]` checks if N is a subset of numbers not greater than T['length'].
-      [N] extends [Partial<T>['length']]
-      ? T['length'] // If yes, T['length'] is the smallest number not less than any in N, i.e. max(N).
-      : // Recursive step: Increment the tuple length and check again.
-        MaxImpl<N, [0, ...T]>;
+type MaxCoarse<N extends Uint10, T extends readonly unknown[]> =
+  // `[N] extends [UpTo<T>]` checks that every member of N is at most T['length'].
+  [N] extends [UpTo<T>] ? MaxFine<N, T> : MaxCoarse<N, [...T, ...Step]>;
+
+/**
+ * @internal
+ * Shrinks the tuple `T` one at a time from a length no member of `N` exceeds; the first length that is a member of `N` is `max(N)`.
+ * Called with a length less than 32 above `max(N)`, so it recurses at most 32 times.
+ */
+type MaxFine<
+  N extends Uint10,
+  T extends readonly unknown[],
+> = T['length'] extends N
+  ? T['length']
+  : T extends readonly [unknown, ...infer Rest]
+    ? MaxFine<N, Rest>
+    : never;
+
+/**
+ * @internal
+ * `0 | 1 | ... | T['length']` (inclusive): `Partial<T>` makes every element optional, so its length is any of them.
+ */
+type UpTo<T extends readonly unknown[]> = Partial<T>['length'];
+
+/** @internal How far {@link MaxCoarse} grows its tuple at a time. */
+type Step = MakeTuple<32, 0>;
