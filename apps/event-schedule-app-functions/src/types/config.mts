@@ -1,5 +1,5 @@
 import { logger } from 'firebase-functions/v1';
-import { hasKey, isRecord, Json, Result } from 'ts-data-forge';
+import { Arr, hasKey, isRecord, Result } from 'ts-data-forge';
 import * as t from 'ts-fortress';
 
 const firebaseConfigTypeDef = t.record({
@@ -13,16 +13,27 @@ const firebaseConfigTypeDef = t.record({
 
 export type FirebaseConfig = t.TypeOf<typeof firebaseConfigTypeDef>;
 
-const isFirebaseConfig = firebaseConfigTypeDef.is;
-
 const isDiscordConfig = t.record({
   'error-report-webhook-url': t.string(''),
 }).is;
 
+/**
+ * `config` if it is a {@link FirebaseConfig}, and otherwise empty settings, with
+ * where `config` is wrong logged. Only the paths and the types expected there
+ * are logged, never a value: the secret holds passwords.
+ */
 export const fillFirebaseConfig = (config: unknown): FirebaseConfig => {
-  if (!isFirebaseConfig(config)) {
+  const result = firebaseConfigTypeDef.validate(config);
+
+  if (Result.isErr(result)) {
     logger.error(
-      `${Result.unwrapThrow(Json.stringify(config))} is not FirebaseConfig`,
+      `RUNTIME_CONFIG is not FirebaseConfig: ${result.value
+        .map(
+          ({ path, expectedType }) =>
+            // An empty path is the secret itself, not one of its keys.
+            `${Arr.isNonEmpty(path) ? path.join('.') : '(the whole value)'} (${expectedType})`,
+        )
+        .join(', ')}`,
     );
 
     return {
@@ -35,7 +46,7 @@ export const fillFirebaseConfig = (config: unknown): FirebaseConfig => {
     };
   }
 
-  return config;
+  return result.value;
 };
 
 /**

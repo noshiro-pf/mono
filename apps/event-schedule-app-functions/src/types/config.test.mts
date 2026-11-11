@@ -14,6 +14,54 @@ const gmail = {
   'email-address-for-error-log': 'log@example.com',
 } as const;
 
+describe(fillFirebaseConfig, () => {
+  test('returns a config of the right shape as it is', () => {
+    assert.deepStrictEqual(fillFirebaseConfig({ gmail }), { gmail });
+  });
+
+  test('logs where a config of the wrong shape is wrong, and none of its values', () => {
+    vi.mocked(logger.error).mockClear();
+
+    const filled = fillFirebaseConfig({
+      gmail: {
+        email: 'from@example.com',
+        password: 'secret-password',
+        'app-password': 1234,
+      },
+      discord: { 'error-report-webhook-url': 'https://discord.test/secret' },
+    });
+
+    assert.deepStrictEqual(filled.gmail['app-password'], '');
+
+    const logged = JSON.stringify(vi.mocked(logger.error).mock.calls);
+
+    for (const value of [
+      'from@example.com',
+      'secret-password',
+      '1234',
+      'discord.test',
+    ]) {
+      assert.notInclude(logged, value);
+    }
+
+    assert.include(logged, 'gmail.app-password');
+
+    assert.include(logged, 'gmail.email-address-for-error-log');
+  });
+
+  test('says so when the secret is not an object at all', () => {
+    vi.mocked(logger.error).mockClear();
+
+    fillFirebaseConfig('secret-password');
+
+    const logged = JSON.stringify(vi.mocked(logger.error).mock.calls);
+
+    assert.include(logged, '(the whole value)');
+
+    assert.notInclude(logged, 'secret-password');
+  });
+});
+
 describe(discordWebhookUrlOf, () => {
   test('reads the webhook URL', () => {
     assert.strictEqual(
