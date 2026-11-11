@@ -17,6 +17,8 @@ import { totalFunctionsRules } from '../../../src/plugins/total-functions/rules/
 import { treeShakableRules } from '../../../src/plugins/tree-shakable/rules/index.mjs';
 import { tsRestrictionsRules } from '../../../src/plugins/ts-restrictions/rules/rules.mjs';
 import { vitestCodingStyleRules } from '../../../src/plugins/vitest-coding-style/rules/rules.mjs';
+// eslint-disable-next-line import-x/no-relative-packages -- tools/ is not a package; this is how packages reach its shared scripts
+import { withInternalTag } from '../../../../../tools/configs/gen-eslint-plugin-rule-types.mjs';
 import { eslintPlugins } from '../constants/eslint-plugins.mjs';
 import { tsTypeForgeImportStatement } from '../constants/ts-type-forge-import.mjs';
 import {
@@ -265,7 +267,10 @@ const createResult = async (
   } of schemaList) {
     const namespaceName = toCapitalCase(ruleName);
 
-    mut_resultToWrite.push(docs, `namespace ${namespaceName} {`);
+    mut_resultToWrite.push(
+      withInternalTag(docs),
+      `namespace ${namespaceName} {`,
+    );
 
     if (isDeprecated(deprecated)) {
       if (Arr.isNonEmpty(schema)) {

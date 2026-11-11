@@ -2,6 +2,7 @@
 import type { Linter } from 'eslint';
 import type { ReadonlyRecord } from 'ts-type-forge';
 
+/** @internal Reached by indexing the rules record by the rule's name. */
 namespace StrictDependencies {
   /**
    * ### schema

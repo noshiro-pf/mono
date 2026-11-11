@@ -11,6 +11,8 @@ import type { Linter } from 'eslint';
  *  | deprecated | false      |
  *  | fixable    | code       |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoExpectToStrictEqual {
   export type RuleEntry = Linter.StringSeverity;
@@ -26,6 +28,8 @@ namespace NoExpectToStrictEqual {
  *  | deprecated | false      |
  *  | fixable    | code       |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace PreferAssertDeepStrictEqualOverDeepEqual {
   export type RuleEntry = Linter.StringSeverity;
@@ -42,6 +46,8 @@ namespace PreferAssertDeepStrictEqualOverDeepEqual {
  *  | fixable        | code       |
  *  | hasSuggestions | true       |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace PreferAssertStrictEqualForPrimitives {
   export type RuleEntry = Linter.StringSeverity;
@@ -57,6 +63,8 @@ namespace PreferAssertStrictEqualForPrimitives {
  *  | deprecated | false      |
  *  | fixable    | code       |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace PreferAssertIsTrueOverAssert {
   export type RuleEntry = Linter.StringSeverity;
@@ -72,6 +80,8 @@ namespace PreferAssertIsTrueOverAssert {
  *  | deprecated | false      |
  *  | fixable    | code       |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace PreferAssertIsFalseOverAssertNotOk {
   export type RuleEntry = Linter.StringSeverity;
@@ -87,6 +97,8 @@ namespace PreferAssertIsFalseOverAssertNotOk {
  *  | deprecated | false      |
  *  | fixable    | code       |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace PreferAssertIsTrueOverExpectTrue {
   export type RuleEntry = Linter.StringSeverity;
@@ -102,6 +114,8 @@ namespace PreferAssertIsTrueOverExpectTrue {
  *  | deprecated | false      |
  *  | fixable    | code       |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace PreferAssertIsFalseOverExpectFalse {
   export type RuleEntry = Linter.StringSeverity;
@@ -117,6 +131,8 @@ namespace PreferAssertIsFalseOverExpectFalse {
  *  | deprecated | false      |
  *  | fixable    | code       |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace PreferAssertIsFalseOverNegatedAssertIsTrue {
   export type RuleEntry = Linter.StringSeverity;
@@ -132,6 +148,8 @@ namespace PreferAssertIsFalseOverNegatedAssertIsTrue {
  *  | deprecated | false      |
  *  | fixable    | code       |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace PreferAssertIsTrueOverNegatedAssertIsFalse {
   export type RuleEntry = Linter.StringSeverity;

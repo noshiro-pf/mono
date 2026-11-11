@@ -12,6 +12,8 @@ import type { Linter } from 'eslint';
  *  | deprecated  | false   |
  *  | recommended | true    |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace DetectUnsafeRegex {
   export type RuleEntry = Linter.StringSeverity;
@@ -28,6 +30,8 @@ namespace DetectUnsafeRegex {
  *  | deprecated  | false   |
  *  | recommended | true    |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace DetectNonLiteralRegexp {
   export type RuleEntry = Linter.StringSeverity;
@@ -44,6 +48,8 @@ namespace DetectNonLiteralRegexp {
  *  | deprecated  | false   |
  *  | recommended | true    |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace DetectNonLiteralRequire {
   export type RuleEntry = Linter.StringSeverity;
@@ -60,6 +66,8 @@ namespace DetectNonLiteralRequire {
  *  | deprecated  | false   |
  *  | recommended | true    |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace DetectNonLiteralFsFilename {
   export type RuleEntry = Linter.StringSeverity;
@@ -76,6 +84,8 @@ namespace DetectNonLiteralFsFilename {
  *  | deprecated  | false   |
  *  | recommended | true    |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace DetectEvalWithExpression {
   export type RuleEntry = Linter.StringSeverity;
@@ -92,6 +102,8 @@ namespace DetectEvalWithExpression {
  *  | deprecated  | false   |
  *  | recommended | true    |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace DetectPseudoRandomBytes {
   export type RuleEntry = Linter.StringSeverity;
@@ -108,6 +120,8 @@ namespace DetectPseudoRandomBytes {
  *  | deprecated  | false   |
  *  | recommended | true    |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace DetectPossibleTimingAttacks {
   export type RuleEntry = Linter.StringSeverity;
@@ -124,6 +138,8 @@ namespace DetectPossibleTimingAttacks {
  *  | deprecated  | false   |
  *  | recommended | true    |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace DetectNoCsrfBeforeMethodOverride {
   export type RuleEntry = Linter.StringSeverity;
@@ -140,6 +156,8 @@ namespace DetectNoCsrfBeforeMethodOverride {
  *  | deprecated  | false   |
  *  | recommended | true    |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace DetectBufferNoassert {
   export type RuleEntry = Linter.StringSeverity;
@@ -156,6 +174,8 @@ namespace DetectBufferNoassert {
  *  | deprecated  | false   |
  *  | recommended | true    |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace DetectChildProcess {
   export type RuleEntry = Linter.StringSeverity;
@@ -172,6 +192,8 @@ namespace DetectChildProcess {
  *  | deprecated  | false   |
  *  | recommended | true    |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace DetectDisableMustacheEscape {
   export type RuleEntry = Linter.StringSeverity;
@@ -188,6 +210,8 @@ namespace DetectDisableMustacheEscape {
  *  | deprecated  | false   |
  *  | recommended | true    |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace DetectObjectInjection {
   export type RuleEntry = Linter.StringSeverity;
@@ -204,6 +228,8 @@ namespace DetectObjectInjection {
  *  | deprecated  | false   |
  *  | recommended | true    |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace DetectNewBuffer {
   export type RuleEntry = Linter.StringSeverity;
@@ -220,6 +246,8 @@ namespace DetectNewBuffer {
  *  | deprecated  | false   |
  *  | recommended | true    |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace DetectBidiCharacters {
   export type RuleEntry = Linter.StringSeverity;
@@ -236,6 +264,8 @@ namespace DetectBidiCharacters {
  *  | deprecated  | false   |
  *  | recommended | true    |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace DetectInvisibleCharacters {
   export type RuleEntry = Linter.StringSeverity;

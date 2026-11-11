@@ -48,6 +48,7 @@ type Operator = Chai.Operator;
 
 type OperatorComparable = Chai.OperatorComparable;
 
+/** @internal A consumer reaches it as the global `assert`, by `typeof assert`. */
 type OverriddenAssert = Readonly<{
   /**
    * Asserts that value is true.

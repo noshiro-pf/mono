@@ -18,6 +18,8 @@ import type { synstateRules } from './rules/index.mjs';
  *  | deprecated | false      |
  *  | fixable    | code       |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoIdentityMap {
   export type RuleEntry = Linter.StringSeverity;
@@ -33,6 +35,8 @@ namespace NoIdentityMap {
  *  | deprecated | false   |
  *  | fixable    | false   |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoObservableInHandler {
   export type RuleEntry = Linter.StringSeverity;
@@ -48,6 +52,8 @@ namespace NoObservableInHandler {
  *  | deprecated | false      |
  *  | fixable    | code       |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoRedundantSkipIfNoChange {
   export type RuleEntry = Linter.StringSeverity;
@@ -63,6 +69,8 @@ namespace NoRedundantSkipIfNoChange {
  *  | deprecated | false      |
  *  | fixable    | false      |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoThrowInOperator {
   export type RuleEntry = Linter.StringSeverity;
@@ -78,6 +86,8 @@ namespace NoThrowInOperator {
  *  | deprecated | false   |
  *  | fixable    | false   |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoUnboundedCounterPipe {
   export type RuleEntry = Linter.StringSeverity;
@@ -93,6 +103,8 @@ namespace NoUnboundedCounterPipe {
  *  | deprecated | false   |
  *  | fixable    | false   |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoWriteDuringPropagation {
   export type RuleEntry = Linter.StringSeverity;
@@ -108,6 +120,8 @@ namespace NoWriteDuringPropagation {
  *  | deprecated | false      |
  *  | fixable    | code       |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace PreferDerive {
   export type RuleEntry = Linter.StringSeverity;
@@ -123,6 +137,8 @@ namespace PreferDerive {
  *  | deprecated | false   |
  *  | fixable    | code    |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace PreferMapTo {
   export type RuleEntry = Linter.StringSeverity;

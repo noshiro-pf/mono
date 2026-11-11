@@ -178,8 +178,12 @@ export type RestrictedImportsOptions = Readonly<{
   >;
 }>;
 
-/** The options are either a list of paths or a 1-tuple of this object. */
-type RestrictedImportsObjectOptions =
+/**
+ * The object form of ESLint's own `no-restricted-imports` options, `paths` and
+ * `patterns` as ESLint takes them; the rule's options are either a list of
+ * paths or a 1-tuple of this object.
+ */
+export type RestrictedImportsObjectOptions =
   EslintRulesOption['no-restricted-imports'] extends infer O
     ? O extends readonly [infer Options]
       ? Options

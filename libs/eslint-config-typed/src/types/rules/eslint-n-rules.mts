@@ -18,6 +18,8 @@ import type {
  *  | deprecated  | false      |
  *  | recommended | false      |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace CallbackReturn {
   /**
@@ -52,6 +54,8 @@ namespace CallbackReturn {
  *  | fixable     | code       |
  *  | recommended | false      |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace ExportsStyle {
   /**
@@ -102,6 +106,8 @@ namespace ExportsStyle {
  *  | fixable     | code       |
  *  | recommended | false      |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace FileExtensionInImport {
   /**
@@ -150,6 +156,8 @@ namespace FileExtensionInImport {
  *  | deprecated  | false      |
  *  | recommended | false      |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace GlobalRequire {
   export type RuleEntry = Linter.StringSeverity;
@@ -166,6 +174,8 @@ namespace GlobalRequire {
  *  | deprecated  | false      |
  *  | recommended | false      |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace HandleCallbackErr {
   /**
@@ -196,6 +206,8 @@ namespace HandleCallbackErr {
  *  | deprecated  | false   |
  *  | recommended | false   |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoCallbackLiteral {
   export type RuleEntry = Linter.StringSeverity;
@@ -212,6 +224,8 @@ namespace NoCallbackLiteral {
  *  | deprecated  | false   |
  *  | recommended | true    |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoDeprecatedApi {
   /**
@@ -506,6 +520,8 @@ namespace NoDeprecatedApi {
  *  | deprecated  | false   |
  *  | recommended | true    |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoExportsAssign {
   export type RuleEntry = Linter.StringSeverity;
@@ -522,6 +538,8 @@ namespace NoExportsAssign {
  *  | deprecated  | false   |
  *  | recommended | true    |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoExtraneousImport {
   /**
@@ -651,6 +669,8 @@ namespace NoExtraneousImport {
  *  | deprecated  | false   |
  *  | recommended | true    |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoExtraneousRequire {
   /**
@@ -789,6 +809,8 @@ namespace NoExtraneousRequire {
  *  | deprecated  | false   |
  *  | recommended | true    |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoMissingImport {
   /**
@@ -902,6 +924,8 @@ namespace NoMissingImport {
  *  | deprecated  | false   |
  *  | recommended | true    |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoMissingRequire {
   /**
@@ -1007,6 +1031,8 @@ namespace NoMissingRequire {
  *  | deprecated  | false      |
  *  | recommended | false      |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoMixedRequires {
   /**
@@ -1058,6 +1084,8 @@ namespace NoMixedRequires {
  *  | deprecated  | false      |
  *  | recommended | false      |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoNewRequire {
   export type RuleEntry = Linter.StringSeverity;
@@ -1074,6 +1102,8 @@ namespace NoNewRequire {
  *  | deprecated  | false      |
  *  | recommended | false      |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoPathConcat {
   export type RuleEntry = Linter.StringSeverity;
@@ -1090,6 +1120,8 @@ namespace NoPathConcat {
  *  | deprecated  | false      |
  *  | recommended | false      |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoProcessEnv {
   /**
@@ -1131,6 +1163,8 @@ namespace NoProcessEnv {
  *  | deprecated  | false      |
  *  | recommended | true       |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoProcessExit {
   export type RuleEntry = Linter.StringSeverity;
@@ -1147,6 +1181,8 @@ namespace NoProcessExit {
  *  | deprecated  | false      |
  *  | recommended | false      |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoRestrictedImport {
   /**
@@ -1217,6 +1253,8 @@ namespace NoRestrictedImport {
  *  | deprecated  | false      |
  *  | recommended | false      |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoRestrictedRequire {
   /**
@@ -1287,6 +1325,8 @@ namespace NoRestrictedRequire {
  *  | deprecated  | false      |
  *  | recommended | false      |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoSync {
   /**
@@ -1413,6 +1453,8 @@ namespace NoSync {
  *  | deprecated  | false   |
  *  | recommended | false   |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoTopLevelAwait {
   /**
@@ -1522,6 +1564,8 @@ namespace NoTopLevelAwait {
  *  | type       | problem |
  *  | deprecated | false   |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoUnpublishedBin {
   /**
@@ -1628,6 +1672,8 @@ namespace NoUnpublishedBin {
  *  | deprecated  | false   |
  *  | recommended | true    |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoUnpublishedImport {
   /**
@@ -1782,6 +1828,8 @@ namespace NoUnpublishedImport {
  *  | deprecated  | false   |
  *  | recommended | true    |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoUnpublishedRequire {
   /**
@@ -1928,6 +1976,8 @@ namespace NoUnpublishedRequire {
  *  | deprecated  | false   |
  *  | recommended | true    |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoUnsupportedFeaturesEsBuiltins {
   /**
@@ -2542,6 +2592,8 @@ namespace NoUnsupportedFeaturesEsBuiltins {
  *  | deprecated  | false   |
  *  | recommended | true    |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoUnsupportedFeaturesEsSyntax {
   /**
@@ -3770,6 +3822,8 @@ namespace NoUnsupportedFeaturesEsSyntax {
  *  | deprecated  | false   |
  *  | recommended | true    |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoUnsupportedFeaturesNodeBuiltins {
   /**
@@ -7620,6 +7674,8 @@ namespace NoUnsupportedFeaturesNodeBuiltins {
  *  | deprecated  | false      |
  *  | recommended | false      |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace PreferGlobalBuffer {
   /**
@@ -7653,6 +7709,8 @@ namespace PreferGlobalBuffer {
  *  | deprecated  | false      |
  *  | recommended | false      |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace PreferGlobalConsole {
   /**
@@ -7686,6 +7744,8 @@ namespace PreferGlobalConsole {
  *  | deprecated  | false      |
  *  | recommended | false      |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace PreferGlobalCrypto {
   /**
@@ -7719,6 +7779,8 @@ namespace PreferGlobalCrypto {
  *  | deprecated  | false      |
  *  | recommended | false      |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace PreferGlobalProcess {
   /**
@@ -7752,6 +7814,8 @@ namespace PreferGlobalProcess {
  *  | deprecated  | false      |
  *  | recommended | false      |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace PreferGlobalTextDecoder {
   /**
@@ -7785,6 +7849,8 @@ namespace PreferGlobalTextDecoder {
  *  | deprecated  | false      |
  *  | recommended | false      |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace PreferGlobalTextEncoder {
   /**
@@ -7818,6 +7884,8 @@ namespace PreferGlobalTextEncoder {
  *  | deprecated  | false      |
  *  | recommended | false      |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace PreferGlobalUrlSearchParams {
   /**
@@ -7851,6 +7919,8 @@ namespace PreferGlobalUrlSearchParams {
  *  | deprecated  | false      |
  *  | recommended | false      |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace PreferGlobalUrl {
   /**
@@ -7884,6 +7954,8 @@ namespace PreferGlobalUrl {
  *  | deprecated  | false      |
  *  | recommended | false      |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace PreferGlobalTimers {
   /**
@@ -7917,6 +7989,8 @@ namespace PreferGlobalTimers {
  *  | deprecated  | false      |
  *  | recommended | false      |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace PreferImportAssertStrict {
   export type RuleEntry = Linter.StringSeverity;
@@ -7934,6 +8008,8 @@ namespace PreferImportAssertStrict {
  *  | fixable     | code       |
  *  | recommended | false      |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace PreferNodeProtocol {
   /**
@@ -7972,6 +8048,8 @@ namespace PreferNodeProtocol {
  *  | deprecated  | false      |
  *  | recommended | false      |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace PreferProcessGetBuiltinModule {
   /**
@@ -8010,6 +8088,8 @@ namespace PreferProcessGetBuiltinModule {
  *  | deprecated  | false      |
  *  | recommended | false      |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace PreferPromisesDns {
   export type RuleEntry = Linter.StringSeverity;
@@ -8026,6 +8106,8 @@ namespace PreferPromisesDns {
  *  | deprecated  | false      |
  *  | recommended | false      |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace PreferPromisesFs {
   export type RuleEntry = Linter.StringSeverity;
@@ -8042,6 +8124,8 @@ namespace PreferPromisesFs {
  *  | deprecated  | false   |
  *  | recommended | true    |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace ProcessExitAsThrow {
   export type RuleEntry = Linter.StringSeverity;
@@ -8059,6 +8143,8 @@ namespace ProcessExitAsThrow {
  *  | fixable     | code    |
  *  | recommended | true    |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace Hashbang {
   /**
@@ -8187,6 +8273,8 @@ namespace Hashbang {
  *  | deprecated  | true    |
  *  | recommended | false   |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoHideCoreModules {
   /**
@@ -8262,6 +8350,8 @@ namespace NoHideCoreModules {
  *  | fixable     | code    |
  *  | recommended | false   |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace Shebang {
   /**

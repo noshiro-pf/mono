@@ -11,6 +11,8 @@ import type { Linter } from 'eslint';
  *  | deprecated | false      |
  *  | fixable    | code       |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace MutPrefixedDraft {
   export type RuleEntry = Linter.StringSeverity;
@@ -26,6 +28,8 @@ namespace MutPrefixedDraft {
  *  | deprecated | false      |
  *  | fixable    | code       |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace PreferCurriedProduce {
   export type RuleEntry = Linter.StringSeverity;

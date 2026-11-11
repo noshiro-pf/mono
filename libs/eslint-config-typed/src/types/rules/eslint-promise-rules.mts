@@ -11,6 +11,8 @@ import type { Linter } from 'eslint';
  *  | type       | suggestion |
  *  | deprecated | false      |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace ParamNames {
   /**
@@ -52,6 +54,8 @@ namespace ParamNames {
  *  | type       | suggestion |
  *  | deprecated | false      |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoReturnWrap {
   /**
@@ -89,6 +93,8 @@ namespace NoReturnWrap {
  *  | type       | problem |
  *  | deprecated | false   |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace AlwaysReturn {
   /**
@@ -135,6 +141,8 @@ namespace AlwaysReturn {
  *  | type       | problem |
  *  | deprecated | false   |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace CatchOrReturn {
   /**
@@ -194,6 +202,8 @@ namespace CatchOrReturn {
  *  | type       | suggestion |
  *  | deprecated | false      |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace PreferAwaitToCallbacks {
   export type RuleEntry = Linter.StringSeverity;
@@ -209,6 +219,8 @@ namespace PreferAwaitToCallbacks {
  *  | type       | suggestion |
  *  | deprecated | false      |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace PreferAwaitToThen {
   /**
@@ -247,6 +259,8 @@ namespace PreferAwaitToThen {
  *  | deprecated | false      |
  *  | fixable    | code       |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace PreferCatch {
   export type RuleEntry = Linter.StringSeverity;
@@ -262,6 +276,8 @@ namespace PreferCatch {
  *  | type       | suggestion |
  *  | deprecated | false      |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoNative {
   export type RuleEntry = Linter.StringSeverity;
@@ -277,6 +293,8 @@ namespace NoNative {
  *  | type       | suggestion |
  *  | deprecated | false      |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoCallbackInPromise {
   /**
@@ -321,6 +339,8 @@ namespace NoCallbackInPromise {
  *  | type       | suggestion |
  *  | deprecated | false      |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoPromiseInCallback {
   /**
@@ -358,6 +378,8 @@ namespace NoPromiseInCallback {
  *  | type       | suggestion |
  *  | deprecated | false      |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoNesting {
   export type RuleEntry = Linter.StringSeverity;
@@ -373,6 +395,8 @@ namespace NoNesting {
  *  | type       | suggestion |
  *  | deprecated | false      |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace AvoidNew {
   export type RuleEntry = Linter.StringSeverity;
@@ -389,6 +413,8 @@ namespace AvoidNew {
  *  | deprecated | false   |
  *  | fixable    | code    |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoNewStatics {
   export type RuleEntry = Linter.StringSeverity;
@@ -404,6 +430,8 @@ namespace NoNewStatics {
  *  | type       | problem |
  *  | deprecated | false   |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoReturnInFinally {
   export type RuleEntry = Linter.StringSeverity;
@@ -419,6 +447,8 @@ namespace NoReturnInFinally {
  *  | type       | problem |
  *  | deprecated | false   |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace ValidParams {
   /**
@@ -459,6 +489,8 @@ namespace ValidParams {
  *  | type       | problem |
  *  | deprecated | false   |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoMultipleResolved {
   export type RuleEntry = Linter.StringSeverity;
@@ -474,6 +506,8 @@ namespace NoMultipleResolved {
  *  | type       | problem |
  *  | deprecated | false   |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace SpecOnly {
   /**

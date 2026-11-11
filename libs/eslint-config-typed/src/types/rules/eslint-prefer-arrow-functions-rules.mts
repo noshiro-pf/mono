@@ -12,6 +12,8 @@ import type { Linter } from 'eslint';
  *  | deprecated | false      |
  *  | fixable    | code       |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace PreferArrowFunctions {
   /**

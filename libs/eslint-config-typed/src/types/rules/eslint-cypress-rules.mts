@@ -12,6 +12,8 @@ import type { Linter } from 'eslint';
  *  | deprecated  | false   |
  *  | recommended | false   |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace AssertionBeforeScreenshot {
   export type RuleEntry = Linter.StringSeverity;
@@ -29,6 +31,8 @@ namespace AssertionBeforeScreenshot {
  *  | fixable     | code       |
  *  | recommended | false      |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoAnd {
   export type RuleEntry = Linter.StringSeverity;
@@ -45,6 +49,8 @@ namespace NoAnd {
  *  | deprecated  | false   |
  *  | recommended | true    |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoAssigningReturnValues {
   export type RuleEntry = Linter.StringSeverity;
@@ -61,6 +67,8 @@ namespace NoAssigningReturnValues {
  *  | deprecated  | false   |
  *  | recommended | true    |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoAsyncBefore {
   export type RuleEntry = Linter.StringSeverity;
@@ -77,6 +85,8 @@ namespace NoAsyncBefore {
  *  | deprecated  | false   |
  *  | recommended | true    |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoAsyncTests {
   export type RuleEntry = Linter.StringSeverity;
@@ -93,6 +103,8 @@ namespace NoAsyncTests {
  *  | deprecated  | false   |
  *  | recommended | false   |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoChainedGet {
   export type RuleEntry = Linter.StringSeverity;
@@ -109,6 +121,8 @@ namespace NoChainedGet {
  *  | deprecated  | false      |
  *  | recommended | false      |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoDebug {
   export type RuleEntry = Linter.StringSeverity;
@@ -125,6 +139,8 @@ namespace NoDebug {
  *  | deprecated  | false      |
  *  | recommended | false      |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoForce {
   export type RuleEntry = Linter.StringSeverity;
@@ -141,6 +157,8 @@ namespace NoForce {
  *  | deprecated  | false      |
  *  | recommended | false      |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoPause {
   export type RuleEntry = Linter.StringSeverity;
@@ -157,6 +175,8 @@ namespace NoPause {
  *  | deprecated  | false   |
  *  | recommended | true    |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoUnnecessaryWaiting {
   export type RuleEntry = Linter.StringSeverity;
@@ -173,6 +193,8 @@ namespace NoUnnecessaryWaiting {
  *  | deprecated  | true    |
  *  | recommended | false   |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoXpath {
   export type RuleEntry = 0;
@@ -189,6 +211,8 @@ namespace NoXpath {
  *  | deprecated  | false      |
  *  | recommended | false      |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace RequireDataSelectors {
   export type RuleEntry = Linter.StringSeverity;
@@ -205,6 +229,8 @@ namespace RequireDataSelectors {
  *  | deprecated  | false   |
  *  | recommended | true    |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace UnsafeToChainCommand {
   /**

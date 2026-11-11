@@ -11,6 +11,8 @@ import type { UnknownRecord } from 'ts-type-forge';
  *  | type       | suggestion |
  *  | deprecated | false      |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace ComponentName {
   /**
@@ -52,6 +54,8 @@ namespace ComponentName {
  *  | type       | suggestion |
  *  | deprecated | false      |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace ComponentVarTypeAnnotation {
   export type RuleEntry = Linter.StringSeverity;
@@ -66,6 +70,8 @@ namespace ComponentVarTypeAnnotation {
  *  | type       | suggestion |
  *  | deprecated | false      |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace ImportStyle {
   /**
@@ -110,6 +116,8 @@ namespace ImportStyle {
  *  | type       | suggestion |
  *  | deprecated | false      |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace PropsTypeAnnotationStyle {
   export type RuleEntry = Linter.StringSeverity;
@@ -124,6 +132,8 @@ namespace PropsTypeAnnotationStyle {
  *  | type       | suggestion |
  *  | deprecated | false      |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace ReactMemoPropsArgumentName {
   export type RuleEntry = Linter.StringSeverity;
@@ -138,6 +148,8 @@ namespace ReactMemoPropsArgumentName {
  *  | type       | suggestion |
  *  | deprecated | false      |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace ReactMemoTypeParameter {
   export type RuleEntry = Linter.StringSeverity;
@@ -152,6 +164,8 @@ namespace ReactMemoTypeParameter {
  *  | type       | suggestion |
  *  | deprecated | false      |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace RequireReactMemo {
   /**
@@ -203,6 +217,8 @@ namespace RequireReactMemo {
  *  | type       | suggestion |
  *  | deprecated | false      |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace RequireUseMemo {
   /**
@@ -257,6 +273,8 @@ namespace RequireUseMemo {
  *  | type       | suggestion |
  *  | deprecated | false      |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace SingleJsxReturn {
   /**
@@ -300,6 +318,8 @@ namespace SingleJsxReturn {
  *  | type       | suggestion |
  *  | deprecated | false      |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace UseMemoHookStyle {
   export type RuleEntry = Linter.StringSeverity;
@@ -314,6 +334,8 @@ namespace UseMemoHookStyle {
  *  | type       | suggestion |
  *  | deprecated | false      |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace BanUseImperativeHandleHook {
   export type RuleEntry = Linter.StringSeverity;
@@ -328,6 +350,8 @@ namespace BanUseImperativeHandleHook {
  *  | type       | suggestion |
  *  | deprecated | false      |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace DisplayName {
   /**

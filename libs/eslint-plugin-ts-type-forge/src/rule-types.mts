@@ -31,6 +31,8 @@ type RuleOptionsOf<Name extends keyof typeof tsTypeForgeRules> =
  *  | deprecated | false   |
  *  | fixable    | code    |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoSideEffectImport {
   export type RuleEntry = Linter.StringSeverity;
@@ -46,6 +48,8 @@ namespace NoSideEffectImport {
  *  | deprecated | false      |
  *  | fixable    | code       |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace PreferCanonicalLengthConstrainedTuple {
   /**
@@ -93,6 +97,8 @@ namespace PreferCanonicalLengthConstrainedTuple {
  *  | deprecated | false      |
  *  | fixable    | code       |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace PreferCanonicalMutableRecord {
   /**
@@ -136,6 +142,8 @@ namespace PreferCanonicalMutableRecord {
  *  | fixable        | false      |
  *  | hasSuggestions | true       |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace PreferReadonlyOrMutableRecord {
   /**
@@ -179,6 +187,8 @@ namespace PreferReadonlyOrMutableRecord {
  *  | fixable        | false      |
  *  | hasSuggestions | true       |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace PreferStrictOrRelaxedUtilityType {
   /**

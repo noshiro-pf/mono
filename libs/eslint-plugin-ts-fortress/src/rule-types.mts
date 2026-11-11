@@ -31,6 +31,8 @@ type RuleOptionsOf<Name extends keyof typeof tsFortressRules> =
  *  | deprecated | false      |
  *  | fixable    | false      |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoTypeOnlyCodec {
   /**
@@ -71,6 +73,8 @@ namespace NoTypeOnlyCodec {
  *  | deprecated | false      |
  *  | fixable    | code       |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace PreferCanonicalLengthConstrainedType {
   export type RuleEntry = Linter.StringSeverity;
@@ -86,6 +90,8 @@ namespace PreferCanonicalLengthConstrainedType {
  *  | deprecated | false      |
  *  | fixable    | code       |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace PreferNamespaceImport {
   /**
@@ -125,6 +131,8 @@ namespace PreferNamespaceImport {
  *  | deprecated | false      |
  *  | fixable    | false      |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace PreferSchemaOverGuardChain {
   /**

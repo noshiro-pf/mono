@@ -18,6 +18,8 @@ import type { tsStdForgeRules } from './rules/index.mjs';
  *  | deprecated | false      |
  *  | fixable    | code       |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace PreferIsNonNullObject {
   export type RuleEntry = Linter.StringSeverity;
@@ -34,6 +36,8 @@ namespace PreferIsNonNullObject {
  *  | fixable        | code       |
  *  | hasSuggestions | true       |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace PreferIsRecordAndHasKey {
   export type RuleEntry = Linter.StringSeverity;
@@ -49,6 +53,8 @@ namespace PreferIsRecordAndHasKey {
  *  | deprecated | false      |
  *  | fixable    | code       |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace PreferSafeArrayIsArray {
   export type RuleEntry = Linter.StringSeverity;
@@ -64,6 +70,8 @@ namespace PreferSafeArrayIsArray {
  *  | deprecated | false      |
  *  | fixable    | code       |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace PreferSafeArrayLengthGuard {
   export type RuleEntry = Linter.StringSeverity;
@@ -80,6 +88,8 @@ namespace PreferSafeArrayLengthGuard {
  *  | fixable        | false      |
  *  | hasSuggestions | true       |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace PreferSafeNumberParse {
   export type RuleEntry = Linter.StringSeverity;
@@ -96,6 +106,8 @@ namespace PreferSafeNumberParse {
  *  | fixable        | false      |
  *  | hasSuggestions | true       |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace PreferSafeNumberParseInteger {
   export type RuleEntry = Linter.StringSeverity;

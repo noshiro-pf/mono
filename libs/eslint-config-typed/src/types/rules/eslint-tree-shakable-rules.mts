@@ -10,6 +10,8 @@ import type { Linter } from 'eslint';
  *  | type       | problem |
  *  | deprecated | false   |
  *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace ImportStar {
   export type RuleEntry = Linter.StringSeverity;

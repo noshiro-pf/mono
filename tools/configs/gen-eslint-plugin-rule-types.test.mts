@@ -1,5 +1,9 @@
 import { Result } from 'ts-data-forge';
-import { generateRuleTypesFileContent } from './gen-eslint-plugin-rule-types.mjs';
+import {
+  generateRuleTypesFileContent,
+  RULE_NAMESPACE_INTERNAL_TAG,
+  withInternalTag,
+} from './gen-eslint-plugin-rule-types.mjs';
 
 describe('generateRuleTypesFileContent', () => {
   const noOptionRule = {
@@ -157,6 +161,12 @@ describe('generateRuleTypesFileContent', () => {
       ].join('\n'),
     );
 
+    // check:forgotten-exports reads the tag, which keeps the namespace out.
+    assert.include(
+      content.value,
+      [' *  ```', ' *', ` * ${RULE_NAMESPACE_INTERNAL_TAG}`, ' */'].join('\n'),
+    );
+
     assert.include(content.value, '   *     "type": "object"');
   });
 
@@ -244,5 +254,33 @@ describe('generateRuleTypesFileContent', () => {
     assert.isTrue(Result.isErr(content));
 
     assert.include(content.value, '"no-foo"');
+  });
+});
+
+describe(withInternalTag, () => {
+  test('makes the tag the comment of a rule with no docs', () => {
+    assert.strictEqual(
+      withInternalTag(''),
+      `/** ${RULE_NAMESPACE_INTERNAL_TAG} */`,
+    );
+  });
+
+  test('adds the tag as the last paragraph of a doc comment', () => {
+    assert.strictEqual(
+      withInternalTag(['/**', ' * Disallows x.', ' */'].join('\n')),
+      [
+        '/**',
+        ' * Disallows x.',
+        ' *',
+        ` * ${RULE_NAMESPACE_INTERNAL_TAG}`,
+        ' */',
+      ].join('\n'),
+    );
+  });
+
+  test('refuses a comment of another shape rather than drop it', () => {
+    assert.throws(() => withInternalTag('/** @deprecated */'));
+
+    assert.throws(() => withInternalTag('// Disallows x.\n */'));
   });
 });

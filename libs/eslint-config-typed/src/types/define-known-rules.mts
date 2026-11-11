@@ -35,7 +35,13 @@ import type {
 } from './rules/index.mjs';
 import type { EslintSynstateDomA11yRules } from './synstate-dom-a11y-rules.mjs';
 
-type KnownRules = DeepReadonly<
+/**
+ * Every rule `eslint-config-typed` has types for, by the name a rules record
+ * uses (`no-console`, `@typescript-eslint/no-explicit-any`), each with the
+ * entries it accepts (a severity alone, or with the rule's options): what
+ * {@link defineKnownRules} checks a rules record against.
+ */
+export type KnownRules = DeepReadonly<
   EslintTsRestrictionsRules &
     EslintArrayFuncRules &
     EslintCypressRules &
