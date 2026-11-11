@@ -1160,3 +1160,79 @@ describe('no-unnecessary-type-guard on the variant guards of Optional, Result, T
     ],
   });
 });
+
+describe('no-unnecessary-type-guard on the variant guards imported from ts-std-forge', () => {
+  tester.run('no-unnecessary-type-guard', noUnnecessaryTypeGuard, {
+    valid: [
+      {
+        name: 'Optional.isNone on an Optional',
+        code: dedent`
+          import { Optional } from 'ts-std-forge';
+          declare const x: Optional<number>;
+          const y = Optional.isNone(x);
+        `,
+      },
+      {
+        name: 'Optional.isSome on a Some handed to an assertion function',
+        code: dedent`
+          import { Optional, type Some } from 'ts-std-forge';
+          declare const assertIsTrue: (value: unknown) => asserts value is true;
+          declare const x: Some<number>;
+          assertIsTrue(Optional.isSome(x));
+        `,
+      },
+      {
+        name: 'a plain guard of ts-std-forge, which only the ts-data-forge import is read for',
+        code: dedent`
+          import { isString } from 'ts-std-forge';
+          declare const x: string;
+          const y = isString(x);
+        `,
+      },
+    ],
+    invalid: [
+      {
+        name: 'Optional.isNone on a Some, named import',
+        code: dedent`
+          import { Optional, type Some } from 'ts-std-forge';
+          declare const x: Some<number>;
+          const y = Optional.isNone(x);
+        `,
+        output: dedent`
+          import { Optional, type Some } from 'ts-std-forge';
+          declare const x: Some<number>;
+          const y = false;
+        `,
+        errors: [{ messageId: 'alwaysFalse' }],
+      },
+      {
+        name: 'Result.isOk on an Ok, aliased import',
+        code: dedent`
+          import { Result as R, type Ok } from 'ts-std-forge';
+          declare const x: Ok<number>;
+          const y = R.isOk(x);
+        `,
+        output: dedent`
+          import { Result as R, type Ok } from 'ts-std-forge';
+          declare const x: Ok<number>;
+          const y = true;
+        `,
+        errors: [{ messageId: 'alwaysTrue' }],
+      },
+      {
+        name: 'Optional.isSome on a None, namespace import',
+        code: dedent`
+          import * as std from 'ts-std-forge';
+          declare const x: std.None;
+          const y = std.Optional.isSome(x);
+        `,
+        output: dedent`
+          import * as std from 'ts-std-forge';
+          declare const x: std.None;
+          const y = false;
+        `,
+        errors: [{ messageId: 'alwaysFalse' }],
+      },
+    ],
+  });
+});
