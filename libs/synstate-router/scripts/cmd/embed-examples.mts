@@ -9,7 +9,11 @@ const documents = [
   {
     mdPath: path.resolve(workspaceRootPath, 'README.md'),
     samplesDir: path.resolve(workspaceRootPath, 'samples/readme'),
-    sampleCodeFiles: ['01-define-routes.mts', '02-create-router.mts'],
+    sampleCodeFiles: [
+      '01-define-routes.mts',
+      '02-create-router.mts',
+      '03-optional-segment.mts',
+    ],
   },
 ] as const;
 
