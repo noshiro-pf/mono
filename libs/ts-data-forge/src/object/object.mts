@@ -77,9 +77,12 @@ export namespace Obj {
 
     const bEntries = Object.entries(b);
 
+    // Equal counts of own enumerable keys, and every key of `a` an own key of
+    // `b`, make the key sets equal; a missing key reads as `undefined`, which a
+    // stored `undefined` would otherwise equal.
     return (
       aEntries.length === bEntries.length &&
-      aEntries.every(([k, v]) => eq(b[k], v))
+      aEntries.every(([k, v]) => Object.hasOwn(b, k) && eq(v, b[k]))
     );
   };
 
