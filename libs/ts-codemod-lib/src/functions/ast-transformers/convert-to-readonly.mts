@@ -36,8 +36,10 @@ import {
 } from '../functions/index.mjs';
 import {
   ensureTsTypeForgeTypeImport,
+  referencesTypeName,
   replaceNodeWithDebugPrint,
   replaceNodeWithText,
+  typeNameUse,
 } from '../utils/index.mjs';
 import {
   groupUnionIntersectionTypes,
@@ -106,21 +108,18 @@ export const convertToReadonlyTransformer = (
   return {
     name: TRANSFORMER_NAME,
     transform: (sourceAst) => {
-      const scope =
-        optionsInternal.recordStyle === 'ReadonlyRecord' &&
-        optionsInternal.importStyle === 'named'
-          ? readonlyRecordScope(sourceAst.compilerNode)
-          : 'in-scope';
-
       // An import would turn a script into a module, and its declarations would
       // stop being global (a `global.d.ts`); in a file whose top level declares
       // the name as a value or a namespace, it could clash. Either gets the
       // built-in style instead.
-      const mayImport =
-        scope === 'free' && tsm.ts.isExternalModule(sourceAst.compilerNode);
+      const use =
+        optionsInternal.recordStyle === 'ReadonlyRecord' &&
+        optionsInternal.importStyle === 'named'
+          ? typeNameUse(sourceAst.compilerNode, READONLY_RECORD_NAME)
+          : 'write';
 
       const fileOptions: ReadonlyTransformerOptionsInternal =
-        scope !== 'in-scope' && !mayImport
+        use === 'leave'
           ? ({ ...optionsInternal, recordStyle: 'Readonly<Record>' } as const)
           : optionsInternal;
 
@@ -128,7 +127,10 @@ export const convertToReadonlyTransformer = (
         transformNode(node, initialReadonlyContext, fileOptions);
       }
 
-      if (mayImport && referencesReadonlyRecord(sourceAst.compilerNode)) {
+      if (
+        use === 'import' &&
+        referencesTypeName(sourceAst.compilerNode, READONLY_RECORD_NAME)
+      ) {
         ensureTsTypeForgeTypeImport(sourceAst, READONLY_RECORD_NAME);
       }
     },
@@ -549,122 +551,6 @@ const transformNode = (
   for (const child of node.getChildren()) {
     transformNode(child, initialReadonlyContext, options);
   }
-};
-
-/**
- * The names a top-level statement binds, and whether each can name a type (an
- * import can).
- */
-const topLevelBindings = (
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  statement: tsm.ts.Statement,
-): readonly Readonly<{ name: string; isType: boolean }>[] => {
-  if (tsm.ts.isImportDeclaration(statement)) {
-    const clause = statement.importClause;
-
-    const bindings = clause?.namedBindings;
-
-    // A namespace import cannot name a type.
-    const namespaceImport =
-      bindings !== undefined && tsm.ts.isNamespaceImport(bindings)
-        ? ([{ name: bindings.name.text, isType: false }] as const)
-        : ([] as const);
-
-    const named =
-      bindings !== undefined && tsm.ts.isNamedImports(bindings)
-        ? bindings.elements.map((element) => ({
-            name: element.name.text,
-            isType: true,
-          }))
-        : ([] as const);
-
-    const defaultImport =
-      clause?.name === undefined
-        ? ([] as const)
-        : ([{ name: clause.name.text, isType: true }] as const);
-
-    return [...defaultImport, ...namespaceImport, ...named];
-  }
-
-  if (tsm.ts.isImportEqualsDeclaration(statement)) {
-    return [{ name: statement.name.text, isType: true }];
-  }
-
-  if (
-    tsm.ts.isTypeAliasDeclaration(statement) ||
-    tsm.ts.isInterfaceDeclaration(statement) ||
-    tsm.ts.isClassDeclaration(statement) ||
-    tsm.ts.isEnumDeclaration(statement)
-  ) {
-    return statement.name === undefined
-      ? []
-      : [{ name: statement.name.text, isType: true }];
-  }
-
-  if (
-    (tsm.ts.isFunctionDeclaration(statement) ||
-      tsm.ts.isModuleDeclaration(statement)) &&
-    statement.name !== undefined &&
-    tsm.ts.isIdentifier(statement.name)
-  ) {
-    return [{ name: statement.name.text, isType: false }];
-  }
-
-  if (tsm.ts.isVariableStatement(statement)) {
-    return statement.declarationList.declarations.flatMap((declaration) =>
-      tsm.ts.isIdentifier(declaration.name)
-        ? [{ name: declaration.name.text, isType: false }]
-        : [],
-    );
-  }
-
-  return [];
-};
-
-/**
- * Whether the file has a type reference to `ReadonlyRecord` (an `extends` or
- * `implements` clause included).
- */
-const referencesReadonlyRecord = (node: tsm.ts.Node): boolean =>
-  (tsm.ts.isTypeReferenceNode(node) &&
-    tsm.ts.isIdentifier(node.typeName) &&
-    node.typeName.text === READONLY_RECORD_NAME) ||
-  (tsm.ts.isExpressionWithTypeArguments(node) &&
-    tsm.ts.isIdentifier(node.expression) &&
-    node.expression.text === READONLY_RECORD_NAME) ||
-  (tsm.ts.forEachChild(
-    node,
-    (child) => referencesReadonlyRecord(child) || undefined,
-  ) ??
-    false);
-
-/**
- * Whether `ReadonlyRecord` can be written in the file as it is, with
- * `importStyle: "named"`:
- *
- * - `"in-scope"`: the top level imports it or declares it as a type, or the
- *   file has a type reference to it, which without either relies on a global.
- * - `"taken"`: the top level declares it as a value or a namespace only, which
- *   an import of the name could clash with (an exported one does).
- * - `"free"`: neither; it can be imported.
- *
- * A qualified name (`tf.ReadonlyRecord`), a property name, the original name of
- * an aliased import (`ReadonlyRecord as RR`) and a declaration in an inner
- * scope bind nothing at the top level, so they do not count.
- */
-const readonlyRecordScope = (
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  sourceFile: tsm.ts.SourceFile,
-): 'free' | 'in-scope' | 'taken' => {
-  const topLevelNames = sourceFile.statements.flatMap(topLevelBindings);
-
-  return topLevelNames.some(
-    ({ name, isType }) => isType && name === READONLY_RECORD_NAME,
-  ) || referencesReadonlyRecord(sourceFile)
-    ? 'in-scope'
-    : topLevelNames.some(({ name }) => name === READONLY_RECORD_NAME)
-      ? 'taken'
-      : 'free';
 };
 
 //

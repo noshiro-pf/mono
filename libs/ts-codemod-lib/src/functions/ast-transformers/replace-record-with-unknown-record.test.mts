@@ -35,38 +35,46 @@ describe(replaceRecordWithUnknownRecordTransformer, () => {
   test.each([
     {
       name: 'Simple Record<string, unknown> with import added',
-      source: 'type Foo = Record<string, unknown>;',
+      source: 'type Foo = Record<string, unknown>;\n\nexport {};',
       expected: dedent`
         import type { UnknownRecord } from 'ts-type-forge';
 
         type Foo = UnknownRecord;
+
+        export {};
       `,
     },
     {
       name: 'Readonly<Record<string, unknown>>',
-      source: 'type Foo = Readonly<Record<string, unknown>>;',
+      source: 'type Foo = Readonly<Record<string, unknown>>;\n\nexport {};',
       expected: dedent`
         import type { UnknownRecord } from 'ts-type-forge';
 
         type Foo = UnknownRecord;
+
+        export {};
       `,
     },
     {
       name: 'Type literal { [k: string]: unknown }',
-      source: 'type Foo = { [k: string]: unknown };',
+      source: 'type Foo = { [k: string]: unknown };\n\nexport {};',
       expected: dedent`
         import type { UnknownRecord } from 'ts-type-forge';
 
         type Foo = UnknownRecord;
+
+        export {};
       `,
     },
     {
       name: 'Readonly type literal Readonly<{ [k: string]: unknown }>',
-      source: 'type Foo = Readonly<{ [k: string]: unknown }>;',
+      source: 'type Foo = Readonly<{ [k: string]: unknown }>;\n\nexport {};',
       expected: dedent`
         import type { UnknownRecord } from 'ts-type-forge';
 
         type Foo = UnknownRecord;
+
+        export {};
       `,
     },
     {
@@ -88,11 +96,15 @@ describe(replaceRecordWithUnknownRecordTransformer, () => {
         interface Foo {
           [k: string]: unknown;
         }
+
+        export {};
       `,
       expected: dedent`
         import type { UnknownRecord } from 'ts-type-forge';
 
         type Foo = UnknownRecord;
+
+        export {};
       `,
     },
     {
@@ -167,6 +179,8 @@ describe(replaceRecordWithUnknownRecordTransformer, () => {
                 patternOptions?: Readonly<Record<string, unknown>>;
               }>,
             ];
+
+        export {};
       `,
       expected: dedent`
         import type { UnknownRecord } from 'ts-type-forge';
@@ -178,6 +192,8 @@ describe(replaceRecordWithUnknownRecordTransformer, () => {
                 patternOptions?: UnknownRecord;
               }>,
             ];
+
+        export {};
       `,
     },
     {
@@ -186,6 +202,8 @@ describe(replaceRecordWithUnknownRecordTransformer, () => {
         type Foo = Readonly<{
           forbid?: readonly (string | Record<string, unknown>)[];
         }>;
+
+        export {};
       `,
       expected: dedent`
         import type { UnknownRecord } from 'ts-type-forge';
@@ -193,15 +211,20 @@ describe(replaceRecordWithUnknownRecordTransformer, () => {
         type Foo = Readonly<{
           forbid?: readonly (string | UnknownRecord)[];
         }>;
+
+        export {};
       `,
     },
     {
       name: 'readonly Readonly<Record<...>>[] at type alias root (regression)',
-      source: 'type Foo = readonly Readonly<Record<string, unknown>>[];',
+      source:
+        'type Foo = readonly Readonly<Record<string, unknown>>[];\n\nexport {};',
       expected: dedent`
         import type { UnknownRecord } from 'ts-type-forge';
 
         type Foo = readonly UnknownRecord[];
+
+        export {};
       `,
     },
     {
@@ -210,6 +233,8 @@ describe(replaceRecordWithUnknownRecordTransformer, () => {
         namespace Ns {
           export type Foo = Record<string, unknown>;
         }
+
+        export {};
       `,
       expected: dedent`
         import type { UnknownRecord } from 'ts-type-forge';
@@ -217,6 +242,8 @@ describe(replaceRecordWithUnknownRecordTransformer, () => {
         namespace Ns {
           export type Foo = UnknownRecord;
         }
+
+        export {};
       `,
     },
     {
@@ -230,6 +257,8 @@ describe(replaceRecordWithUnknownRecordTransformer, () => {
               | Readonly<Record<string, unknown>>;
           }>;
         }
+
+        export {};
       `,
       expected: dedent`
         import type { UnknownRecord } from 'ts-type-forge';
@@ -239,6 +268,8 @@ describe(replaceRecordWithUnknownRecordTransformer, () => {
             targets: string | readonly unknown[] | UnknownRecord;
           }>;
         }
+
+        export {};
       `,
     },
     {
@@ -289,6 +320,8 @@ describe(replaceRecordWithUnknownRecordTransformer, () => {
         // transformer-ignore-next-line replace-record-with-unknown-record
         type A = Record<string, unknown>;
         type B = Record<string, unknown>;
+
+        export {};
       `,
       expected: dedent`
         import type { UnknownRecord } from 'ts-type-forge';
@@ -296,6 +329,8 @@ describe(replaceRecordWithUnknownRecordTransformer, () => {
         // transformer-ignore-next-line replace-record-with-unknown-record
         type A = Record<string, unknown>;
         type B = UnknownRecord;
+
+        export {};
       `,
     },
     {
@@ -322,6 +357,49 @@ describe(replaceRecordWithUnknownRecordTransformer, () => {
 
         type Foo = Record<string, typeof foo>;
         type Bar = UnknownRecord;
+      `,
+    },
+    {
+      // An import would make the file a module, and its global declarations
+      // would stop being global.
+      name: 'A script is left alone',
+      source: dedent`
+        interface Window {
+          x: Record<string, unknown>;
+        }
+      `,
+      expected: dedent`
+        interface Window {
+          x: Record<string, unknown>;
+        }
+      `,
+    },
+    {
+      name: 'An UnknownRecord the file already imports is written with no new import',
+      source: dedent`
+        import type { UnknownRecord } from './types.mjs';
+
+        export type Foo = Record<string, unknown>;
+        export type Bar = UnknownRecord;
+      `,
+      expected: dedent`
+        import type { UnknownRecord } from './types.mjs';
+
+        export type Foo = UnknownRecord;
+        export type Bar = UnknownRecord;
+      `,
+    },
+    {
+      name: 'A file that binds UnknownRecord to a value is left alone',
+      source: dedent`
+        export const UnknownRecord = 1;
+
+        export type Foo = Record<string, unknown>;
+      `,
+      expected: dedent`
+        export const UnknownRecord = 1;
+
+        export type Foo = Record<string, unknown>;
       `,
     },
     {
@@ -430,14 +508,14 @@ describe(replaceRecordWithUnknownRecordTransformer, () => {
   test('a shebang stays the first line', () => {
     const source = dedent`
       #!/usr/bin/env node
-      type Foo = Record<string, unknown>;
+      export type Foo = Record<string, unknown>;
     `;
 
     expect(transform(source)).toBe(dedent`
       #!/usr/bin/env node
       import type { UnknownRecord } from 'ts-type-forge';
 
-      type Foo = UnknownRecord;
+      export type Foo = UnknownRecord;
     `);
   });
 
@@ -454,13 +532,13 @@ describe(replaceRecordWithUnknownRecordTransformer, () => {
     expect(
       transform(dedent`
         "use client";
-        type Foo = Record<string, unknown>;
+        export type Foo = Record<string, unknown>;
       `),
     ).toContain('import type { UnknownRecord } from "ts-type-forge";');
   });
 
   test.each([
-    'type Foo = Record<string, unknown>;\r\n',
+    'export type Foo = Record<string, unknown>;\r\n',
     "import { foo } from './foo.mjs';\r\ntype Foo = Record<string, typeof foo> | Record<string, unknown>;\r\n",
     "import {\r\n  type DeepReadonly,\r\n} from 'ts-type-forge';\r\ntype Foo = DeepReadonly<Record<string, unknown>>;\r\n",
   ])('an import takes the CRLF line breaks of the file: %j', (source) => {
