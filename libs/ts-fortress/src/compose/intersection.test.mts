@@ -2,7 +2,7 @@ import { expectType, Result } from 'ts-data-forge';
 import type { UnknownRecord } from 'ts-type-forge';
 import { array } from '../array/index.mjs';
 import { uintRange } from '../enum/index.mjs';
-import { literal } from '../other-types/index.mjs';
+import { literal, recursion } from '../other-types/index.mjs';
 import { number } from '../primitives/index.mjs';
 import { record } from '../record/index.mjs';
 import type { TypeOf } from '../type.mjs';
@@ -14,6 +14,20 @@ import { intersection } from './intersection.mjs';
 import { union } from './union.mjs';
 
 describe(intersection, () => {
+  test("reads the default type's default on first use", () => {
+    // `Fallback` is not initialized yet when the intersection is built.
+    const Later = intersection(
+      [number()],
+      recursion('Fallback', () => Fallback),
+    );
+
+    const Fallback = number(1);
+
+    assert.strictEqual(Later.defaultValue, 1);
+
+    assert.strictEqual(Later.fill('x'), 1);
+  });
+
   describe('merge records', () => {
     const targetType = intersection(
       [

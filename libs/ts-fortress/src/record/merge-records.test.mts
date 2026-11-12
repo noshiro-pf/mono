@@ -1,15 +1,22 @@
-import { expectType, Result } from 'ts-data-forge';
+import { Arr, asUint32, expectType, type Int, Result } from 'ts-data-forge';
+import type { MinLengthString, Uint32 } from 'ts-type-forge';
 import { array } from '../array/index.mjs';
 import { intersection, union } from '../compose/index.mjs';
-import { literal, recursion } from '../other-types/index.mjs';
-import { boolean, number, string } from '../primitives/index.mjs';
+import { enumType } from '../enum/index.mjs';
+import { toJsonSchema } from '../json-schema/index.mjs';
+import { annotate, literal, recursion } from '../other-types/index.mjs';
+import { int } from '../predefined/index.mjs';
+import { boolean, nullType, number, string } from '../primitives/index.mjs';
 import type { Type, TypeOf } from '../type.mjs';
 import {
   type ValidationError,
   validationErrorsToMessages,
 } from '../utils/index.mjs';
 import { mergeRecords } from './merge-records.mjs';
+import { optional } from './optional.mjs';
+import { partial } from './partial.mjs';
 import { record, strictRecord } from './record.mjs';
+import { required } from './required.mjs';
 
 describe(mergeRecords, () => {
   const targetType = mergeRecords([
@@ -574,11 +581,21 @@ describe(mergeRecords, () => {
 
       const MergedA = mergeRecords([BaseA, ExtA]);
 
+      expectType<
+        TypeOf<typeof MergedA>,
+        Readonly<{ value: number; type: 'A'; extA: string }>
+      >('=');
+
       const BaseB = record({ type: literal('B'), count: number() });
 
       const ExtB = record({ extB: boolean() });
 
       const MergedB = mergeRecords([BaseB, ExtB]);
+
+      expectType<
+        TypeOf<typeof MergedB>,
+        Readonly<{ type: 'B'; count: number; extB: boolean }>
+      >('=');
 
       const Combined = union([MergedA, MergedB]);
 
@@ -606,9 +623,17 @@ describe(mergeRecords, () => {
 
       const MergedA = mergeRecords([Common, PartA]);
 
+      expectType<TypeOf<typeof MergedA>, Readonly<{ id: string; a: number }>>(
+        '=',
+      );
+
       const PartB = record({ b: string() });
 
       const MergedB = mergeRecords([Common, PartB]);
+
+      expectType<TypeOf<typeof MergedB>, Readonly<{ id: string; b: string }>>(
+        '=',
+      );
 
       const Intersected = intersection(
         [MergedA, MergedB],
@@ -744,6 +769,14 @@ describe(mergeRecords, () => {
 
       // Merge TypeField with EventType
       const EventWithType = mergeRecords([TypeField, EventType]);
+
+      expectType<
+        TypeOf<typeof EventWithType>,
+        Readonly<
+          | { type: 'event'; eventType: 'click' }
+          | { type: 'event'; eventType: 'hover' }
+        >
+      >('=');
 
       // Create another branch
       const DataFieldA = record({
@@ -925,9 +958,16 @@ describe(mergeRecords, () => {
         | { variant: 'v2'; items: readonly RecType[] }
       >;
 
-      const RecursiveType: Type<RecType> = recursion<RecType>('RecType', () =>
-        mergeRecords([Variants, record({ items: array(RecursiveType) })]),
-      );
+      const RecursiveType: Type<RecType> = recursion<RecType>('RecType', () => {
+        const Merged = mergeRecords([
+          Variants,
+          record({ items: array(RecursiveType) }),
+        ]);
+
+        expectType<TypeOf<typeof Merged>, RecType>('=');
+
+        return Merged;
+      });
 
       const Base = record({ id: number() });
 
@@ -968,9 +1008,16 @@ describe(mergeRecords, () => {
         children: readonly RecData[];
       }>;
 
-      const RecursiveType: Type<RecData> = recursion<RecData>('RecData', () =>
-        mergeRecords([BaseInt, record({ children: array(RecursiveType) })]),
-      );
+      const RecursiveType: Type<RecData> = recursion<RecData>('RecData', () => {
+        const Merged = mergeRecords([
+          BaseInt,
+          record({ children: array(RecursiveType) }),
+        ]);
+
+        expectType<TypeOf<typeof Merged>, RecData>('=');
+
+        return Merged;
+      });
 
       const Extra = record({ id: string() });
 
@@ -1003,15 +1050,27 @@ describe(mergeRecords, () => {
 
       const MergedBase = mergeRecords([Base1, Base2]);
 
+      expectType<
+        TypeOf<typeof MergedBase>,
+        Readonly<{ prop1: string; prop2: number }>
+      >('=');
+
       type RecType = Readonly<{
         prop1: string;
         prop2: number;
         refs: readonly RecType[];
       }>;
 
-      const RecursiveType: Type<RecType> = recursion<RecType>('RecType', () =>
-        mergeRecords([MergedBase, record({ refs: array(RecursiveType) })]),
-      );
+      const RecursiveType: Type<RecType> = recursion<RecType>('RecType', () => {
+        const Merged = mergeRecords([
+          MergedBase,
+          record({ refs: array(RecursiveType) }),
+        ]);
+
+        expectType<TypeOf<typeof Merged>, RecType>('=');
+
+        return Merged;
+      });
 
       const Var1 = record({ variant: literal('v1') });
 
@@ -1078,11 +1137,16 @@ describe(mergeRecords, () => {
 
       const RecursiveProduct: Type<RecProduct> = recursion<RecProduct>(
         'RecProduct',
-        () =>
-          mergeRecords([
+        () => {
+          const Merged = mergeRecords([
             Attributes,
             record({ related: array(RecursiveProduct) }),
-          ]),
+          ]);
+
+          expectType<TypeOf<typeof Merged>, RecProduct>('=');
+
+          return Merged;
+        },
       );
 
       const Base = record({ sku: string() });
@@ -1142,6 +1206,14 @@ describe(mergeRecords, () => {
 
       const Merged = mergeRecords([Base, TypeVariant]);
 
+      expectType<
+        TypeOf<typeof Merged>,
+        Readonly<
+          | { id: string; type: 'A'; dataA: number }
+          | { id: string; type: 'B'; dataB: string }
+        >
+      >('=');
+
       // Wrong type literal
       assert.isFalse(Merged.is({ id: '1', type: 'C', dataA: 1 }));
 
@@ -1170,6 +1242,14 @@ describe(mergeRecords, () => {
       const Merged = mergeRecords([Base, TypeVariant], {
         excessProperty: 'reject',
       });
+
+      expectType<
+        TypeOf<typeof Merged>,
+        Readonly<
+          | { id: string; type: 'A'; dataA: number }
+          | { id: string; type: 'B'; dataB: string }
+        >
+      >('=');
 
       // Valid cases
       assert.isTrue(Merged.is({ id: '1', type: 'A', dataA: 1 }));
@@ -1201,6 +1281,11 @@ describe(mergeRecords, () => {
 
       const Merged = mergeRecords([Base, Intersected]);
 
+      expectType<
+        TypeOf<typeof Merged>,
+        Readonly<{ id: string; x: number; y: number }>
+      >('=');
+
       // Missing 'x'
       assert.isFalse(Merged.is({ id: '1', y: 2 }));
 
@@ -1223,6 +1308,16 @@ describe(mergeRecords, () => {
       ]);
 
       const Merged = mergeRecords([DimA, DimB]);
+
+      expectType<
+        TypeOf<typeof Merged>,
+        Readonly<
+          | { a: 'a1'; b: 'b1' }
+          | { a: 'a1'; b: 'b2' }
+          | { a: 'a2'; b: 'b1' }
+          | { a: 'a2'; b: 'b2' }
+        >
+      >('=');
 
       // Valid values from each dimension but invalid combination
       assert.isFalse(Merged.is({ a: 'a1' })); // missing 'b'
@@ -1253,6 +1348,14 @@ describe(mergeRecords, () => {
 
       const Final = mergeRecords([TreeNodeType, TypeVariant]);
 
+      expectType<
+        TypeOf<typeof Final>,
+        Readonly<
+          | { value: number; children: readonly TreeNode[]; type: 'A' }
+          | { value: number; children: readonly TreeNode[]; type: 'B' }
+        >
+      >('=');
+
       // Wrong type literal
       assert.isFalse(Final.is({ value: 1, children: [], type: 'C' }));
 
@@ -1277,6 +1380,1516 @@ describe(mergeRecords, () => {
           type: 'A',
         }),
       );
+    });
+  });
+
+  describe('records that declare the same key', () => {
+    const Base = record({ id: int(0), tag: enumType(['a', 'b']) });
+
+    const Loose = record({ id: number(0), tag: enumType(['b', 'c']) });
+
+    test('a value has to satisfy every member of the key', () => {
+      const Merged = mergeRecords([Base, Loose]);
+
+      expectType<TypeOf<typeof Merged>, Readonly<{ id: Int; tag: 'b' }>>('=');
+
+      assert.isFalse(Merged.is({ id: 1.5, tag: 'c' }));
+
+      assert.isFalse(Merged.is({ id: 1, tag: 'a' }));
+
+      assert.isFalse(Merged.is({ id: 1, tag: 'c' }));
+
+      assert.isTrue(Merged.is({ id: 1, tag: 'b' }));
+
+      assert.isTrue(Result.isErr(Merged.validate({ id: 1.5, tag: 'b' })));
+    });
+
+    test('defaultValue and fill satisfy is', () => {
+      const Merged = mergeRecords([Base, Loose]);
+
+      expectType<TypeOf<typeof Merged>, Readonly<{ id: Int; tag: 'b' }>>('=');
+
+      assert.deepStrictEqual(Merged.defaultValue, { id: 0, tag: 'b' });
+
+      assert.isTrue(Merged.is(Merged.defaultValue));
+
+      assert.isTrue(Merged.is(Merged.fill({})));
+
+      assert.deepStrictEqual(Merged.fill({ id: 3, tag: 'c' }), {
+        id: 3,
+        tag: 'b',
+      });
+    });
+
+    test("the default is the earlier member's when the later member's does not satisfy both", () => {
+      const Merged = mergeRecords([
+        record({ tag: enumType(['b', 'c']) }),
+        record({ tag: enumType(['a', 'b']) }),
+      ]);
+
+      expectType<TypeOf<typeof Merged>, Readonly<{ tag: 'b' }>>('=');
+
+      assert.deepStrictEqual(Merged.defaultValue, { tag: 'b' });
+    });
+
+    test('the default is any member’s that satisfies all of them, among three records', () => {
+      const Merged = mergeRecords([
+        record({ tag: enumType(['a', 'b', 'c']) }),
+        record({ tag: enumType(['b', 'a']) }),
+        record({ tag: enumType(['c', 'a']) }),
+      ]);
+
+      expectType<TypeOf<typeof Merged>, Readonly<{ tag: 'a' }>>('=');
+
+      assert.deepStrictEqual(Merged.defaultValue, { tag: 'a' });
+
+      assert.isTrue(Merged.is({ tag: 'a' }));
+
+      assert.isFalse(Merged.is({ tag: 'b' }));
+
+      assert.isFalse(Merged.is({ tag: 'c' }));
+    });
+
+    test('members that list their values and share none are refused when the merge is built', () => {
+      expect(() => {
+        const _merged = mergeRecords([
+          record({ tag: literal(0) }),
+          record({ tag: literal(1) }),
+        ]);
+
+        expectType<TypeOf<typeof _merged>, never>('=');
+      }).toThrow('mergeRecords: no value of "tag" satisfies all of 0, 1');
+    });
+
+    test("contradictory members that do not list their values default to the last member's default", () => {
+      const Merged = mergeRecords([
+        record({ n: number(0, { max: 1 }) }),
+        record({ n: number(5, { min: 5 }) }),
+      ]);
+
+      expectType<TypeOf<typeof Merged>, Readonly<{ n: number }>>('=');
+
+      assert.isFalse(Merged.is({ n: 0 }));
+
+      assert.isFalse(Merged.is({ n: 5 }));
+
+      assert.deepStrictEqual(Merged.defaultValue, { n: 5 });
+
+      assert.isFalse(Merged.is(Merged.defaultValue));
+
+      assert.deepStrictEqual(Merged.fill({ n: 3 }), { n: 5 });
+    });
+
+    test('an optional key whose members contradict defaults to undefined', () => {
+      const Merged = mergeRecords([
+        record({ n: optional(number(0, { max: 1 })) }),
+        record({ n: optional(number(5, { min: 5 })) }),
+      ]);
+
+      expectType<TypeOf<typeof Merged>, Readonly<{ n?: number }>>('=');
+
+      assert.isFalse(Merged.is({ n: 0 }));
+
+      assert.isFalse(Merged.is({ n: 5 }));
+
+      assert.deepStrictEqual(Merged.defaultValue, { n: undefined });
+
+      assert.isTrue(Merged.is(Merged.defaultValue));
+
+      assert.deepStrictEqual(Merged.fill({ n: 3 }), { n: undefined });
+
+      assert.deepStrictEqual(Merged.fill({}), { n: undefined });
+    });
+
+    test('the default is the default of a union branch every member accepts', () => {
+      const Merged = mergeRecords([
+        record({ v: union([literal('a'), number()]) }),
+        record({ v: union([literal('b'), number()]) }),
+      ]);
+
+      expectType<TypeOf<typeof Merged>, Readonly<{ v: number }>>('=');
+
+      assert.isTrue(Merged.is({ v: 1 }));
+
+      assert.deepStrictEqual(Merged.defaultValue, { v: 0 });
+
+      assert.deepStrictEqual(Merged.fill({ v: 'z' }), { v: 0 });
+
+      assert.deepStrictEqual(Merged.fill({ v: 3 }), { v: 3 });
+    });
+
+    test('the default merges the record branches of the members', () => {
+      const Merged = mergeRecords([
+        record({ meta: record({ a: number() }) }),
+        record({ meta: union([nullType, record({ b: number() })]) }),
+      ]);
+
+      // `convert-to-readonly` would merge the members into one `Readonly`, a type
+      // `expectType` tells apart from the one `mergeRecords` gives.
+      // ts-codemod-ignore-next-line convert-to-readonly
+      expectType<
+        TypeOf<typeof Merged>,
+        Readonly<{ meta: Readonly<{ a: number }> & Readonly<{ b: number }> }>
+      >('=');
+
+      assert.isTrue(Merged.is({ meta: { a: 1, b: 2 } }));
+
+      assert.isFalse(Merged.is({ meta: { a: 1 } }));
+
+      assert.deepStrictEqual(Merged.defaultValue, { meta: { a: 0, b: 0 } });
+
+      assert.deepStrictEqual(Merged.fill({ meta: { a: 5 } }), {
+        meta: { a: 5, b: 0 },
+      });
+
+      assert.deepStrictEqual(Merged.fill({}), { meta: { a: 0, b: 0 } });
+    });
+
+    test('record branches merge in the order of the records', () => {
+      const Merged = mergeRecords([
+        record({
+          x: union([string(), record({ a: number(5), k: number(1) })]),
+        }),
+        record({
+          x: union([boolean(), record({ b: number(7), k: number(2) })]),
+        }),
+      ]);
+
+      expectType<
+        TypeOf<typeof Merged>,
+        Readonly<{
+          x: (string | Readonly<{ a: number; k: number }>) &
+            (boolean | Readonly<{ b: number; k: number }>);
+        }>
+      >('=');
+
+      assert.deepStrictEqual(Merged.defaultValue, { x: { a: 5, k: 2, b: 7 } });
+    });
+
+    test('a key the parts of an intersection share requires every part', () => {
+      const Both = intersection(
+        [record({ id: int() }), record({ id: number() })],
+        record({ id: int() }),
+      );
+
+      const Merged = mergeRecords([Both, record({ z: number() })]);
+
+      expectType<TypeOf<typeof Merged>, Readonly<{ id: Int; z: number }>>('=');
+
+      assert.isFalse(Merged.is({ id: 1.5, z: 0 }));
+
+      assert.isTrue(Merged.is({ id: 1, z: 0 }));
+    });
+
+    test('a combination of variants whose intersection parts contradict is left out', () => {
+      const Variants = intersection(
+        [
+          union([
+            record({ k: literal('a'), x: number() }),
+            record({ k: literal('b') }),
+          ]),
+          record({ k: literal('b') }),
+        ],
+        record({ k: literal('b') }),
+      );
+
+      const MergedVariants = mergeRecords([Variants]);
+
+      expectType<TypeOf<typeof MergedVariants>, Readonly<{ k: 'b' }>>('=');
+
+      assert.isFalse(MergedVariants.is({ k: 'a', x: 0 }));
+
+      assert.isTrue(MergedVariants.is({ k: 'b' }));
+
+      // Were the contradicting combination of `{ k: 'a', x }` and `{ k: 'b' }`
+      // kept, it would come first, and the default would be its merge, with `x`.
+      assert.deepStrictEqual(MergedVariants.defaultValue, { k: 'b' });
+    });
+
+    test("past the bound on combinations of record branches, the default is the last member's", () => {
+      const branches = (prefix: string): readonly Type<unknown>[] =>
+        Array.from({ length: 9 }, (_, i) =>
+          record({ [`${prefix}${i.toString()}`]: number() }),
+        );
+
+      const Merged = mergeRecords([
+        record({ k: union(Arr.toUnshifted(nullType)(branches('x'))) }),
+        record({ k: union(Arr.toUnshifted(literal('z'))(branches('y'))) }),
+      ]);
+
+      expectType<TypeOf<typeof Merged>, Readonly<{ k: unknown }>>('=');
+
+      assert.isTrue(Merged.is({ k: { x0: 0, y0: 0 } }));
+
+      assert.deepStrictEqual(Merged.defaultValue, { k: 'z' });
+
+      const Within = mergeRecords([
+        record({
+          k: union(Arr.toUnshifted(nullType)(Arr.take(branches('x'), 2))),
+        }),
+        record({
+          k: union(Arr.toUnshifted(literal('z'))(Arr.take(branches('y'), 2))),
+        }),
+      ]);
+
+      expectType<TypeOf<typeof Within>, Readonly<{ k: unknown }>>('=');
+
+      assert.isTrue(Within.is(Within.defaultValue));
+    });
+
+    test('one member that lists its values stands for the others when they accept them all', () => {
+      const Merged = mergeRecords([
+        record({ type: string() }),
+        record({ type: literal('x') }),
+      ]);
+
+      expectType<TypeOf<typeof Merged>, Readonly<{ type: 'x' }>>('=');
+
+      assert.deepStrictEqual(
+        toJsonSchema(Merged),
+        Result.ok({
+          $schema: 'https://json-schema.org/draft/2020-12/schema',
+          type: 'object',
+          properties: { type: { const: 'x' } },
+          required: ['type'],
+        }),
+      );
+    });
+
+    test('one member that lists no value the others accept is refused when the merge is built', () => {
+      expect(() => {
+        const _merged = mergeRecords([
+          record({ k: literal('a') }),
+          record({ k: record({ z: number() }) }),
+        ]);
+
+        expectType<
+          TypeOf<typeof _merged>,
+          Readonly<{ k: 'a' & Readonly<{ z: number }> }>
+        >('=');
+      }).toThrow('mergeRecords: no value of "k" satisfies all of');
+    });
+
+    test('a required standing member is kept as it is', () => {
+      const tag = literal('a');
+
+      const Merged = mergeRecords([
+        record({ tag }),
+        record({ tag: enumType(['a', 'b']) }),
+      ]);
+
+      expectType<TypeOf<typeof Merged>, Readonly<{ tag: 'a' }>>('=');
+
+      assert.strictEqual(
+        Merged.structure?.kind === 'record'
+          ? Merged.structure.shape['tag']
+          : undefined,
+        tag,
+      );
+    });
+
+    test('an optional standing member keeps an undefined default that a member forces', () => {
+      const Merged = mergeRecords([
+        record({ t: optional(literal('a')) }),
+        record({
+          t: optional(enumType(['a', 'b']), { forceUndefinedDefault: true }),
+        }),
+      ]);
+
+      expectType<TypeOf<typeof Merged>, Readonly<{ t?: 'a' }>>('=');
+
+      assert.deepStrictEqual(Merged.defaultValue, { t: undefined });
+
+      const Earlier = mergeRecords([
+        record({
+          t: optional(enumType(['a', 'b']), { forceUndefinedDefault: true }),
+        }),
+        record({ t: optional(literal('a')) }),
+      ]);
+
+      expectType<TypeOf<typeof Earlier>, Readonly<{ t?: 'a' }>>('=');
+
+      assert.deepStrictEqual(Earlier.defaultValue, { t: undefined });
+    });
+
+    test('the default is a value both members list when neither default is one', () => {
+      const Merged = mergeRecords([
+        record({ tag: enumType(['a', 'b']) }),
+        record({ tag: enumType(['c', 'b']) }),
+      ]);
+
+      expectType<TypeOf<typeof Merged>, Readonly<{ tag: 'b' }>>('=');
+
+      assert.deepStrictEqual(Merged.defaultValue, { tag: 'b' });
+
+      assert.deepStrictEqual(Merged.fill({ tag: 'c' }), { tag: 'b' });
+    });
+
+    test('an optional key whose members share no value can only be absent', () => {
+      const Merged = mergeRecords([
+        record({ tag: optional(literal(0)) }),
+        record({ tag: optional(literal(1)) }),
+      ]);
+
+      expectType<TypeOf<typeof Merged>, Readonly<{ tag?: undefined }>>('=');
+
+      assert.isTrue(Merged.is({}));
+
+      assert.isFalse(Merged.is({ tag: 0 }));
+
+      assert.isTrue(Merged.is(Merged.defaultValue));
+    });
+
+    test('union variants whose shared key contradicts are left out', () => {
+      const A = union([
+        record({ kind: literal('a'), x: number() }),
+        record({ kind: literal('b'), y: string() }),
+      ]);
+
+      const B = union([
+        record({ kind: literal('b'), q: number() }),
+        record({ kind: literal('a'), p: string() }),
+      ]);
+
+      const Merged = mergeRecords([A, B]);
+
+      expectType<
+        TypeOf<typeof Merged>,
+        Readonly<
+          | { kind: 'a'; x: number; p: string }
+          | { kind: 'b'; y: string; q: number }
+        >
+      >('~=');
+
+      assert.isTrue(Result.isErr(Merged.validate({ kind: 'c' })));
+
+      assert.isTrue(Merged.is(Merged.defaultValue));
+
+      assert.isTrue(Merged.is(Merged.fill({})));
+
+      assert.isTrue(Merged.is({ kind: 'a', x: 1, p: 'p' }));
+
+      assert.isFalse(Merged.is({ kind: 'a', x: 1, q: 1 }));
+    });
+
+    test('a nested contradiction leaves an optional key only absent, and a union variant out', () => {
+      const Optional = mergeRecords([
+        record({ p: optional(record({ x: literal(1) })) }),
+        record({ p: optional(record({ x: literal(2) })) }),
+      ]);
+
+      expectType<TypeOf<typeof Optional>, Readonly<{ p?: never }>>('=');
+
+      assert.isTrue(Optional.is({}));
+
+      assert.isFalse(Optional.is({ p: { x: 1 } }));
+
+      assert.isTrue(Optional.is(Optional.defaultValue));
+
+      const Variants = mergeRecords([
+        union([
+          record({ k: literal('a'), p: record({ x: literal(1) }) }),
+          record({ k: literal('b') }),
+        ]),
+        record({ p: record({ x: literal(2) }) }),
+      ]);
+
+      expectType<
+        TypeOf<typeof Variants>,
+        Readonly<{ k: 'a'; p: never } | { k: 'b'; p: Readonly<{ x: 2 }> }>
+      >('=');
+
+      assert.isTrue(Variants.is({ k: 'b', p: { x: 2 } }));
+
+      assert.isFalse(Variants.is({ k: 'a', p: { x: 2 } }));
+
+      expect(() => {
+        const _merged = mergeRecords([
+          record({ p: record({ x: literal(1) }) }),
+          record({ p: record({ x: literal(2) }) }),
+        ]);
+
+        expectType<TypeOf<typeof _merged>, Readonly<{ p: never }>>('=');
+      }).toThrow('mergeRecords: no value of "p.x" satisfies all of 1, 2');
+    });
+
+    test('a member whose listed values every member accepts is kept as it is', () => {
+      const Merged = mergeRecords([
+        union([
+          record({ kind: literal('a'), x: number() }),
+          record({ kind: literal('b'), y: number() }),
+        ]),
+        union([
+          record({ kind: literal('a'), z: number() }),
+          record({ kind: literal('b'), w: number() }),
+        ]),
+      ]);
+
+      expectType<
+        TypeOf<typeof Merged>,
+        Readonly<
+          | { x: number; kind: 'a'; z: number }
+          | { y: number; kind: 'b'; w: number }
+        >
+      >('=');
+
+      const schema = toJsonSchema(Merged);
+
+      assert.isTrue(Result.isOk(schema));
+
+      assert.notInclude(JSON.stringify(schema), 'allOf');
+
+      assert.isTrue(Merged.is({ kind: 'a', x: 0, z: 0 }));
+
+      assert.isFalse(Merged.is({ kind: 'a', x: 0, w: 0 }));
+    });
+
+    test('the default is a value one member lists that the others accept', () => {
+      const Merged = mergeRecords([
+        record({ s: enumType(['a', 'bb']) }),
+        record({ s: string('cc', { minLength: 2 }) }),
+      ]);
+
+      expectType<
+        TypeOf<typeof Merged>,
+        Readonly<{ s: ('a' | 'bb') & MinLengthString<2> }>
+      >('=');
+
+      assert.deepStrictEqual(Merged.defaultValue, { s: 'bb' });
+
+      assert.deepStrictEqual(Merged.fill({ s: 'zz' }), { s: 'bb' });
+    });
+
+    test('a union of literals lists its values', () => {
+      expect(() => {
+        const _merged = mergeRecords([
+          union([record({ k: literal('x') }), record({ k: literal('y') })]),
+          record({ k: union([literal('a'), literal('b')]) }),
+        ]);
+
+        expectType<TypeOf<typeof _merged>, never>('=');
+      }).toThrow('mergeRecords: no value of "k" satisfies all of');
+    });
+
+    test('fill repairs a deep value whose members are recursions', () => {
+      type TreeA = Readonly<{ a: number; c?: TreeA }>;
+
+      type TreeB = Readonly<{ b: number; c?: TreeB }>;
+
+      const TreeA: Type<TreeA> = recursion('TreeA', () =>
+        record({
+          a: number(),
+          c: optional(TreeA, { forceUndefinedDefault: true }),
+        }),
+      );
+
+      const TreeB: Type<TreeB> = recursion('TreeB', () =>
+        record({
+          b: number(),
+          c: optional(TreeB, { forceUndefinedDefault: true }),
+        }),
+      );
+
+      const Merged = mergeRecords([
+        record({ c: optional(TreeA, { forceUndefinedDefault: true }) }),
+        record({ c: optional(TreeB, { forceUndefinedDefault: true }) }),
+      ]);
+
+      expectType<TypeOf<typeof Merged>, Readonly<{ c?: TreeA & TreeB }>>('=');
+
+      const deep = (depth: number): unknown =>
+        depth === 0
+          ? ({ a: 'x' } as const)
+          : ({ a: 1, b: 2, c: deep(depth - 1) } as const);
+
+      const filled: unknown = Merged.fill({ c: deep(50) });
+
+      assert.isTrue(Merged.is(filled));
+    });
+
+    test('a key merged as records fills and defaults as the top level does', () => {
+      const Merged = mergeRecords([
+        record({ s: record({ x: optional(number()) }) }),
+        record({ s: record({ y: optional(string()) }) }),
+      ]);
+
+      // `convert-to-readonly` would merge the members into one `Readonly`, a type
+      // `expectType` tells apart from the one `mergeRecords` gives.
+      // ts-codemod-ignore-next-line convert-to-readonly
+      expectType<
+        TypeOf<typeof Merged>,
+        Readonly<{ s: Readonly<{ x?: number }> & Readonly<{ y?: string }> }>
+      >('=');
+
+      assert.deepStrictEqual(Merged.defaultValue, { s: { x: 0, y: '' } });
+
+      assert.deepStrictEqual(Merged.fill({ s: { x: 1, y: 'a', extra: 3 } }), {
+        s: { x: 1, y: 'a' },
+      });
+    });
+
+    test('a record member wrapped in a recursion is validated as the records merged', () => {
+      const Node: Type<Readonly<{ id: string }>> = recursion('Node', () =>
+        strictRecord({ id: string() }),
+      );
+
+      const Merged = mergeRecords([
+        record({ n: Node }),
+        record({ n: record({ extra: number() }) }),
+      ]);
+
+      // `convert-to-readonly` would merge the members into one `Readonly`, a type
+      // `expectType` tells apart from the one `mergeRecords` gives.
+      // ts-codemod-ignore-next-line convert-to-readonly
+      expectType<
+        TypeOf<typeof Merged>,
+        Readonly<{ n: Readonly<{ id: string }> & Readonly<{ extra: number }> }>
+      >('=');
+
+      assert.isTrue(Merged.is({ n: { id: 'a', extra: 1 } }));
+
+      assert.isFalse(Merged.is({ n: { id: 'a', extra: 1, more: 0 } }));
+
+      assert.deepStrictEqual(Merged.defaultValue, { n: { id: '', extra: 0 } });
+    });
+
+    test('an optional member stands for a required key whose values it narrows', () => {
+      const Merged = mergeRecords([
+        record({ k: union([literal('a'), literal('b')]) }),
+        record({ k: optional(literal('a')) }),
+      ]);
+
+      expectType<TypeOf<typeof Merged>, Readonly<{ k: 'a' }>>('=');
+
+      assert.isFalse(Merged.is({}));
+
+      assert.isTrue(Merged.is({ k: 'a' }));
+
+      assert.isFalse(Merged.is({ k: 'b' }));
+
+      assert.notInclude(JSON.stringify(toJsonSchema(Merged)), 'allOf');
+    });
+
+    test('an optional member that forces an undefined default stands for a required key with a value it lists', () => {
+      const Merged = mergeRecords([
+        record({ k: union([literal('a'), literal('b')]) }),
+        record({ k: optional(literal('a'), { forceUndefinedDefault: true }) }),
+      ]);
+
+      expectType<TypeOf<typeof Merged>, Readonly<{ k: 'a' }>>('=');
+
+      assert.deepStrictEqual(Merged.defaultValue, { k: 'a' });
+
+      assert.isTrue(Merged.is(Merged.defaultValue));
+
+      assert.deepStrictEqual(Merged.fill({}), { k: 'a' });
+
+      assert.isFalse(Merged.is({ k: 'b' }));
+
+      assert.notInclude(JSON.stringify(toJsonSchema(Merged)), 'allOf');
+    });
+
+    test('a standing member whose default reads undefined stands for a required key with a value it lists', () => {
+      // `k` of `Inner` is optional and defaults to `undefined`, as one of its
+      // members forces.
+      const Inner = mergeRecords([
+        record({ k: optional(literal('a')) }),
+        record({ k: optional(literal('a'), { forceUndefinedDefault: true }) }),
+      ]);
+
+      expectType<TypeOf<typeof Inner>, Readonly<{ k?: 'a' }>>('=');
+
+      const Merged = mergeRecords([record({ k: literal('a') }), Inner]);
+
+      expectType<TypeOf<typeof Merged>, Readonly<{ k: 'a' }>>('=');
+
+      assert.deepStrictEqual(Merged.defaultValue, { k: 'a' });
+
+      assert.deepStrictEqual(Merged.fill({}), { k: 'a' });
+
+      const Reversed = mergeRecords([Inner, record({ k: literal('a') })]);
+
+      expectType<TypeOf<typeof Reversed>, Readonly<{ k: 'a' }>>('=');
+
+      assert.deepStrictEqual(Reversed.defaultValue, { k: 'a' });
+
+      // `required` keeps the `undefined` default of `k` in `InnerBA`, and the
+      // key defaults to `b`, what that enum's `fill` repairs `undefined` to,
+      // not to the union's `a`.
+      const InnerBA = mergeRecords([
+        record({ k: optional(enumType(['b', 'a'])) }),
+        record({
+          k: optional(enumType(['b', 'a']), { forceUndefinedDefault: true }),
+        }),
+      ]);
+
+      expectType<TypeOf<typeof InnerBA>, Readonly<{ k?: 'a' | 'b' }>>('=');
+
+      const RequiredInner = mergeRecords([
+        record({ k: union([literal('a'), literal('b')]) }),
+        required(InnerBA),
+      ]);
+
+      expectType<TypeOf<typeof RequiredInner>, Readonly<{ k: 'a' | 'b' }>>('=');
+
+      assert.deepStrictEqual(RequiredInner.defaultValue, { k: 'b' });
+
+      assert.deepStrictEqual(RequiredInner.fill({}), { k: 'b' });
+
+      assert.notInclude(JSON.stringify(toJsonSchema(RequiredInner)), 'allOf');
+
+      // `b` again where the enum lists it last.
+      const InnerDefaultB = mergeRecords([
+        record({ k: optional(enumType(['a', 'b'], { defaultValue: 'b' })) }),
+        record({
+          k: optional(enumType(['a', 'b'], { defaultValue: 'b' }), {
+            forceUndefinedDefault: true,
+          }),
+        }),
+      ]);
+
+      expectType<TypeOf<typeof InnerDefaultB>, Readonly<{ k?: 'a' | 'b' }>>(
+        '=',
+      );
+
+      const RequiredInnerDefaultB = mergeRecords([
+        record({ k: union([literal('a'), literal('b')]) }),
+        required(InnerDefaultB),
+      ]);
+
+      expectType<
+        TypeOf<typeof RequiredInnerDefaultB>,
+        Readonly<{ k: 'a' | 'b' }>
+      >('=');
+
+      assert.deepStrictEqual(RequiredInnerDefaultB.defaultValue, { k: 'b' });
+
+      assert.deepStrictEqual(RequiredInnerDefaultB.fill({ k: 'c' }), {
+        k: 'b',
+      });
+    });
+
+    test('a required member whose forced undefined default `required` kept stands for a required key with a value it lists', () => {
+      const RequiredForced = mergeRecords([
+        record({ k: union([literal('a'), literal('b')]) }),
+        required(
+          record({
+            k: optional(enumType(['b', 'a']), { forceUndefinedDefault: true }),
+          }),
+        ),
+      ]);
+
+      expectType<TypeOf<typeof RequiredForced>, Readonly<{ k: 'a' | 'b' }>>(
+        '=',
+      );
+
+      // `b`, what the standing enum's `fill` repairs to, not the union's `a`.
+      assert.deepStrictEqual(RequiredForced.defaultValue, { k: 'b' });
+
+      assert.deepStrictEqual(RequiredForced.fill({}), { k: 'b' });
+
+      assert.deepStrictEqual(RequiredForced.fill({ k: 'z' }), { k: 'b' });
+
+      // `b` again where the enum lists it last: the default is the value the
+      // key's `fill` repairs to.
+      const ForcedDefaultB = mergeRecords([
+        record({ k: union([literal('a'), literal('b')]) }),
+        required(
+          record({
+            k: optional(enumType(['a', 'b'], { defaultValue: 'b' }), {
+              forceUndefinedDefault: true,
+            }),
+          }),
+        ),
+      ]);
+
+      expectType<TypeOf<typeof ForcedDefaultB>, Readonly<{ k: 'a' | 'b' }>>(
+        '=',
+      );
+
+      assert.deepStrictEqual(ForcedDefaultB.defaultValue, { k: 'b' });
+
+      assert.deepStrictEqual(ForcedDefaultB.fill({}), { k: 'b' });
+
+      assert.deepStrictEqual(ForcedDefaultB.fill({ k: 'z' }), { k: 'b' });
+
+      assert.isFalse(RequiredForced.is({}));
+
+      assert.notInclude(JSON.stringify(toJsonSchema(RequiredForced)), 'allOf');
+
+      // The member written for `k` stores `b` as its default, so a later merge
+      // keeps it as it is rather than reading it through a getter.
+      const keyMemberOf = (type: Type<unknown>): unknown =>
+        type.structure?.kind === 'record'
+          ? type.structure.shape['k']
+          : undefined;
+
+      const MergedAgain = mergeRecords([
+        record({ k: union([literal('a'), literal('b')]) }),
+        RequiredForced,
+      ]);
+
+      expectType<TypeOf<typeof MergedAgain>, Readonly<{ k: 'a' | 'b' }>>('=');
+
+      assert.isDefined(keyMemberOf(RequiredForced));
+
+      assert.strictEqual(keyMemberOf(MergedAgain), keyMemberOf(RequiredForced));
+    });
+
+    test('a default read by a getter is not run while the merge is built, or later', () => {
+      const listed = enumType(['b', 'a']);
+
+      let mut_reads = 0;
+
+      const Lazy: Type<'a' | 'b'> = {
+        ...listed,
+        get defaultValue() {
+          mut_reads += 1;
+
+          return 'b' as const;
+        },
+      } as const;
+
+      const Merged = mergeRecords([
+        record({ k: union([literal('a'), literal('b')]) }),
+        record({ k: Lazy }),
+      ]);
+
+      expectType<TypeOf<typeof Merged>, Readonly<{ k: 'a' | 'b' }>>('=');
+
+      assert.strictEqual(mut_reads, 0);
+
+      // The key lists what `Lazy` lists, in its order, so the first of them.
+      assert.deepStrictEqual(Merged.defaultValue, { k: 'b' });
+
+      assert.deepStrictEqual(Merged.fill({}), { k: 'b' });
+
+      assert.strictEqual(mut_reads, 0);
+    });
+
+    test('an optional standing member keeps its own default on a required key when it lists it', () => {
+      const Merged = mergeRecords([
+        record({ k: union([literal('a'), literal('b')]) }),
+        record({ k: optional(enumType(['a', 'b'], { defaultValue: 'b' })) }),
+      ]);
+
+      expectType<TypeOf<typeof Merged>, Readonly<{ k: 'a' | 'b' }>>('=');
+
+      assert.deepStrictEqual(Merged.defaultValue, { k: 'b' });
+    });
+
+    test('fill repairs a value through the members', () => {
+      const Merged = mergeRecords([
+        record({ xs: array(int()) }),
+        record({ xs: array(number()) }),
+      ]);
+
+      expectType<
+        TypeOf<typeof Merged>,
+        Readonly<{ xs: readonly Int[] & readonly number[] }>
+      >('=');
+
+      const filled: unknown = Merged.fill({ xs: [1, 2, 'x'] });
+
+      assert.deepStrictEqual(filled, { xs: [1, 2, 0] });
+    });
+
+    test('a record member wrapped in a recursion is merged when its default is needed', () => {
+      const Meta: Type<Readonly<{ b: string }>> = recursion('Meta', () =>
+        record({ b: string() }),
+      );
+
+      const Merged = mergeRecords([
+        record({ meta: record({ a: number() }) }),
+        record({ meta: Meta }),
+      ]);
+
+      // `convert-to-readonly` would merge the members into one `Readonly`, a type
+      // `expectType` tells apart from the one `mergeRecords` gives.
+      // ts-codemod-ignore-next-line convert-to-readonly
+      expectType<
+        TypeOf<typeof Merged>,
+        Readonly<{ meta: Readonly<{ a: number }> & Readonly<{ b: string }> }>
+      >('=');
+
+      assert.deepStrictEqual(Merged.defaultValue, { meta: { a: 0, b: '' } });
+
+      assert.deepStrictEqual(Merged.fill({ meta: { a: 1 } }), {
+        meta: { a: 1, b: '' },
+      });
+
+      const withExcess = { meta: { a: 1, b: '', z: 0 } } as const;
+
+      assert.deepStrictEqual(Merged.prune(withExcess), {
+        meta: { a: 1, b: '' },
+      });
+    });
+
+    test('an optional record key keeps an undefined default', () => {
+      const Merged = mergeRecords([
+        record({
+          meta: optional(record({ a: number() }), {
+            forceUndefinedDefault: true,
+          }),
+        }),
+        record({
+          meta: optional(record({ b: string() }), {
+            forceUndefinedDefault: true,
+          }),
+        }),
+      ]);
+
+      // `convert-to-readonly` would merge the members into one `Readonly`, a type
+      // `expectType` tells apart from the one `mergeRecords` gives.
+      // ts-codemod-ignore-next-line convert-to-readonly
+      expectType<
+        TypeOf<typeof Merged>,
+        Readonly<{ meta?: Readonly<{ a: number }> & Readonly<{ b: string }> }>
+      >('=');
+
+      assert.deepStrictEqual(Merged.defaultValue, { meta: undefined });
+
+      assert.isTrue(Merged.is({ meta: { a: 1, b: '' } }));
+
+      assert.isFalse(Merged.is({ meta: { a: 1 } }));
+    });
+
+    test('the same member in both records is kept as it is', () => {
+      const tag = enumType(['a', 'b']);
+
+      const Merged = mergeRecords([
+        record({ tag, x: number() }),
+        record({ tag, y: number() }),
+      ]);
+
+      expectType<
+        TypeOf<typeof Merged>,
+        Readonly<{ x: number; tag: 'a' | 'b'; y: number }>
+      >('=');
+
+      assert.deepStrictEqual(
+        toJsonSchema(Merged),
+        Result.ok({
+          $schema: 'https://json-schema.org/draft/2020-12/schema',
+          type: 'object',
+          properties: {
+            tag: { enum: ['a', 'b'] },
+            x: { type: 'number' },
+            y: { type: 'number' },
+          },
+          required: ['tag', 'x', 'y'],
+        }),
+      );
+    });
+
+    test('the JSON schema of a listed key lists the values every member accepts', () => {
+      const Merged = mergeRecords([
+        record({ tag: enumType(['b', 'c']) }),
+        record({ tag: enumType(['a', 'b']) }),
+      ]);
+
+      expectType<TypeOf<typeof Merged>, Readonly<{ tag: 'b' }>>('=');
+
+      assert.deepStrictEqual(
+        toJsonSchema(Merged),
+        Result.ok({
+          $schema: 'https://json-schema.org/draft/2020-12/schema',
+          type: 'object',
+          properties: { tag: { const: 'b' } },
+          required: ['tag'],
+        }),
+      );
+
+      const Several = mergeRecords([
+        record({ tag: enumType(['a', 'b', 'c']) }),
+        record({ tag: enumType(['c', 'b']) }),
+      ]);
+
+      expectType<TypeOf<typeof Several>, Readonly<{ tag: 'b' | 'c' }>>('=');
+
+      assert.deepStrictEqual(
+        toJsonSchema(Several),
+        Result.ok({
+          $schema: 'https://json-schema.org/draft/2020-12/schema',
+          type: 'object',
+          properties: { tag: { enum: ['c', 'b'] } },
+          required: ['tag'],
+        }),
+      );
+    });
+
+    test('a single value in common that a literal cannot hold is listed by an enum', () => {
+      const Merged = mergeRecords([
+        record({ k: enumType([undefined, 'a']) }),
+        record({ k: enumType(['b', undefined]) }),
+      ]);
+
+      expectType<TypeOf<typeof Merged>, Readonly<{ k: undefined }>>('=');
+
+      assert.isTrue(Merged.is({ k: undefined }));
+
+      assert.isFalse(Merged.is({ k: 'a' }));
+
+      assert.deepStrictEqual(Merged.defaultValue, { k: undefined });
+
+      assert.isTrue(Merged.is(Merged.defaultValue));
+    });
+
+    test('a value a union lists twice is listed once', () => {
+      const Merged = mergeRecords([
+        record({ k: string() }),
+        record({ k: union([literal('a'), enumType(['a'])]) }),
+      ]);
+
+      expectType<TypeOf<typeof Merged>, Readonly<{ k: 'a' }>>('=');
+
+      assert.deepStrictEqual(
+        toJsonSchema(Merged),
+        Result.ok({
+          $schema: 'https://json-schema.org/draft/2020-12/schema',
+          type: 'object',
+          properties: { k: { const: 'a' } },
+          required: ['k'],
+        }),
+      );
+    });
+
+    test('an optional copy of the member a record declares adds nothing to require', () => {
+      const R = record({ n: number() });
+
+      const Merged = mergeRecords([R, partial(R)]);
+
+      expectType<TypeOf<typeof Merged>, Readonly<{ n: number }>>('=');
+
+      assert.lengthOf(Result.unwrapErrThrow(Merged.validate({ n: 'x' })), 1);
+
+      assert.isFalse(Merged.is({}));
+
+      assert.deepStrictEqual(
+        toJsonSchema(Merged),
+        Result.ok({
+          $schema: 'https://json-schema.org/draft/2020-12/schema',
+          type: 'object',
+          properties: { n: { type: 'number' } },
+          required: ['n'],
+        }),
+      );
+
+      const Reversed = mergeRecords([partial(R), R]);
+
+      expectType<TypeOf<typeof Reversed>, Readonly<{ n: number }>>('=');
+
+      assert.isFalse(Reversed.is({}));
+
+      assert.isTrue(Reversed.is({ n: 1 }));
+    });
+
+    test('a union of records merged with its optional copy keeps its variants', () => {
+      // 101 variants, whose square passes the bound on variants.
+      const U = union(
+        Arr.toUnshifted(record({ kind: literal(100) }))(
+          Arr.map(Arr.seq(asUint32(100)), (i) => record({ kind: literal(i) })),
+        ),
+      );
+
+      const O = record({ inner: U });
+
+      const Merged = mergeRecords([O, partial(O)]);
+
+      // `convert-to-readonly` would merge the members into one `Readonly`, a type
+      // `expectType` tells apart from the one `mergeRecords` gives.
+      // ts-codemod-ignore-next-line convert-to-readonly
+      expectType<
+        TypeOf<typeof Merged>,
+        Readonly<{
+          inner:
+            | Readonly<{ kind: 100 }>
+            | Readonly<{ kind: Uint32 }>
+            | (Readonly<{ kind: 100 }> & Readonly<{ kind: Uint32 }>)
+            | (Readonly<{ kind: Uint32 }> & Readonly<{ kind: 100 }>);
+        }>
+      >('=');
+
+      assert.isTrue(Merged.is({ inner: { kind: 100 } }));
+
+      assert.isFalse(Merged.is({}));
+    });
+
+    test('an annotated copy of a member is required with it, its annotations kept', () => {
+      const N = number();
+
+      const Merged = mergeRecords([
+        record({ n: annotate(N, { description: 'd' }) }),
+        record({ n: N }),
+      ]);
+
+      expectType<TypeOf<typeof Merged>, Readonly<{ n: number }>>('=');
+
+      assert.include(JSON.stringify(toJsonSchema(Merged)), '"description":"d"');
+    });
+
+    test('the copy kept for an optional key is one that forces an undefined default', () => {
+      const Inner = record({ id: number() });
+
+      const Merged = mergeRecords([
+        record({ c: optional(Inner, { forceUndefinedDefault: true }) }),
+        record({ c: optional(Inner) }),
+      ]);
+
+      expectType<
+        TypeOf<typeof Merged>,
+        Readonly<{ c?: Readonly<{ id: number }> }>
+      >('=');
+
+      assert.deepStrictEqual(Merged.defaultValue, { c: undefined });
+    });
+
+    test('the copy kept for a required key is one that does not force an undefined default', () => {
+      const N = number(3);
+
+      const Forced = required(
+        record({ k: optional(N, { forceUndefinedDefault: true }) }),
+      );
+
+      const Merged = mergeRecords([record({ k: N }), Forced]);
+
+      expectType<TypeOf<typeof Merged>, Readonly<{ k: number }>>('=');
+
+      assert.deepStrictEqual(Merged.defaultValue, { k: 3 });
+
+      const Reversed = mergeRecords([Forced, record({ k: N })]);
+
+      expectType<TypeOf<typeof Reversed>, Readonly<{ k: number }>>('=');
+
+      assert.deepStrictEqual(Reversed.defaultValue, { k: 3 });
+    });
+
+    test('a member declared again, or a copy of it, counts where it is last declared', () => {
+      const N = number(1);
+
+      const M = number(2);
+
+      const Again = mergeRecords([
+        record({ k: N }),
+        record({ k: M }),
+        record({ k: N }),
+      ]);
+
+      expectType<TypeOf<typeof Again>, Readonly<{ k: number }>>('=');
+
+      // The members are `M` and `N`, in that order, and the default search
+      // starts from the last.
+      assert.deepStrictEqual(Again.defaultValue, { k: 1 });
+
+      const Copy = mergeRecords([
+        record({ k: N }),
+        record({ k: M }),
+        required(record({ k: optional(N) })),
+      ]);
+
+      expectType<TypeOf<typeof Copy>, Readonly<{ k: number }>>('=');
+
+      assert.deepStrictEqual(Copy.defaultValue, { k: 1 });
+
+      // The required `N` is kept over its optional copy, last.
+      const OptionalCopy = mergeRecords([
+        record({ k: N }),
+        record({ k: M }),
+        record({ k: optional(N) }),
+      ]);
+
+      expectType<TypeOf<typeof OptionalCopy>, Readonly<{ k: number }>>('=');
+
+      assert.deepStrictEqual(OptionalCopy.defaultValue, { k: 1 });
+
+      assert.isFalse(OptionalCopy.is({}));
+    });
+
+    describe('records whose merge at a shared key passes the bound on variants', () => {
+      // 101 variants: two of them merged make 10,201.
+      const variants = (prefix: string): Type<unknown> =>
+        union(
+          Arr.toUnshifted(record({ [`${prefix}_first`]: number() }))(
+            Arr.map(Arr.seq(asUint32(100)), (i) =>
+              record({ [`${prefix}${i.toString()}`]: number() }),
+            ),
+          ),
+        );
+
+      test('throw when the merge is built, each time', () => {
+        const build = (): void => {
+          const _merged = mergeRecords([
+            record({ p: variants('a') }),
+            record({ p: variants('b') }),
+          ]);
+
+          expectType<TypeOf<typeof _merged>, Readonly<{ p: unknown }>>('=');
+        };
+
+        expect(build).toThrow('exceeding the limit of 10000');
+
+        expect(build).toThrow('exceeding the limit of 10000');
+      });
+
+      test('are not merged in the search for a default that comes before them', () => {
+        const Merged = mergeRecords([
+          record({ v: union([record({ p: variants('a') }), number()]) }),
+          record({ v: union([record({ p: variants('b') }), number()]) }),
+        ]);
+
+        expectType<
+          TypeOf<typeof Merged>,
+          Readonly<{
+            v: (number | Readonly<{ p: unknown }>) &
+              (number | Readonly<{ p: unknown }>);
+          }>
+        >('=');
+
+        assert.deepStrictEqual(Merged.defaultValue, { v: 0 });
+
+        assert.deepStrictEqual(Merged.fill({ v: 'x' }), { v: 0 });
+      });
+
+      test('throw when the search for a default reaches them', () => {
+        const Merged = mergeRecords([
+          record({
+            v: union([
+              record({ p: variants('a') }),
+              record({ q: number() }),
+              literal('x'),
+            ]),
+          }),
+          record({
+            v: union([
+              record({ p: variants('b') }),
+              record({ r: number() }),
+              literal('y'),
+            ]),
+          }),
+        ]);
+
+        expectType<
+          TypeOf<typeof Merged>,
+          Readonly<{
+            v: ('x' | Readonly<{ p: unknown } | { q: number }>) &
+              ('y' | Readonly<{ p: unknown } | { r: number }>);
+          }>
+        >('=');
+
+        // No member's default nor branch default is accepted by the other, so
+        // the search reaches the merged record branches. The merge of the `p`
+        // branches, the first combination, passes the bound.
+        expect(() => Merged.defaultValue).toThrow(
+          'exceeding the limit of 10000',
+        );
+
+        assert.isTrue(Merged.is({ v: { p: { a_first: 0 }, r: 0 } }));
+      });
+    });
+
+    test('a listed key whose other member wraps a union with a recursion is built without resolving it', () => {
+      const Branch = union([
+        literal('a'),
+        record({ next: recursion('Self', () => Self) }),
+      ]);
+
+      const Merged = mergeRecords([
+        record({ k: enumType(['a', 'b']) }),
+        record({ k: intersection([Branch], Branch) }),
+      ]);
+
+      expectType<
+        TypeOf<typeof Merged>,
+        Readonly<{ k: ('a' | 'b') & ('a' | Readonly<{ next: unknown }>) }>
+      >('=');
+
+      const Self: Type<unknown> = Merged;
+
+      assert.isTrue(Self.is({ k: 'a' }));
+
+      assert.isFalse(Self.is({ k: 'b' }));
+    });
+
+    test('a key of recursions with defaults of their own takes those defaults', () => {
+      const tree = (name: string): Type<unknown> => {
+        const T: Type<unknown> = recursion(
+          name,
+          () =>
+            union([
+              record({ kind: literal('node'), child: T }),
+              record({ kind: literal('leaf') }),
+            ]),
+          { defaultValue: { kind: 'leaf' } },
+        );
+
+        return T;
+      };
+
+      const Merged = mergeRecords([
+        record({ t: tree('A') }),
+        record({ t: tree('B') }),
+      ]);
+
+      expectType<TypeOf<typeof Merged>, Readonly<{ t: unknown }>>('=');
+
+      assert.deepStrictEqual(Merged.defaultValue, { t: { kind: 'leaf' } });
+
+      assert.deepStrictEqual(Merged.fill({ t: { kind: 'node' } }), {
+        t: { kind: 'node', child: { kind: 'leaf' } },
+      });
+    });
+
+    test('a key of records shared by several variants is merged once', () => {
+      const N1 = union([record({ a: number() }), record({ b: number() })]);
+
+      const N2 = union([record({ c: number() }), record({ d: number() })]);
+
+      const Merged = mergeRecords([
+        union([
+          record({ k: literal('x'), n: N1 }),
+          record({ k: literal('y'), n: N1 }),
+        ]),
+        record({ n: N2 }),
+      ]);
+
+      // `convert-to-readonly` would merge the members into one `Readonly`, a type
+      // `expectType` tells apart from the one `mergeRecords` gives.
+      // ts-codemod-ignore-next-line convert-to-readonly
+      expectType<
+        TypeOf<typeof Merged>,
+        | Readonly<{
+            n: (Readonly<{ a: number }> | Readonly<{ b: number }>) &
+              (Readonly<{ c: number }> | Readonly<{ d: number }>);
+            k: 'x';
+          }>
+        | Readonly<{
+            n: (Readonly<{ a: number }> | Readonly<{ b: number }>) &
+              (Readonly<{ c: number }> | Readonly<{ d: number }>);
+            k: 'y';
+          }>
+      >('=');
+
+      const keyMembers =
+        Merged.structure?.kind === 'union'
+          ? Arr.map(Merged.structure.memberTypes, (variant) =>
+              variant.structure?.kind === 'record'
+                ? variant.structure.shape['n']
+                : undefined,
+            )
+          : ([] as const);
+
+      assert.lengthOf(keyMembers, 2);
+
+      assert.isDefined(keyMembers[0]);
+
+      assert.strictEqual(keyMembers[0], keyMembers[1]);
+
+      assert.isTrue(Merged.is({ k: 'y', n: { b: 0, c: 0 } }));
+    });
+
+    test('the JSON schema of any other key requires every member', () => {
+      const Merged = mergeRecords([
+        record({ n: int() }),
+        record({ n: number() }),
+      ]);
+
+      expectType<TypeOf<typeof Merged>, Readonly<{ n: Int }>>('=');
+
+      assert.deepStrictEqual(
+        toJsonSchema(Merged),
+        Result.ok({
+          $schema: 'https://json-schema.org/draft/2020-12/schema',
+          type: 'object',
+          properties: {
+            n: {
+              allOf: [
+                { type: 'integer', 'x-brand': 'Int' },
+                { type: 'number' },
+              ],
+            },
+          },
+          required: ['n'],
+        }),
+      );
+    });
+
+    test('a key that a union variant declares too', () => {
+      const Merged = mergeRecords([
+        Base,
+        union([
+          record({ k: literal('x'), id: number() }),
+          record({ k: literal('y') }),
+        ]),
+      ]);
+
+      expectType<
+        TypeOf<typeof Merged>,
+        Readonly<
+          | { id: Int; tag: 'a' | 'b'; k: 'x' }
+          | { id: Int; tag: 'a' | 'b'; k: 'y' }
+        >
+      >('=');
+
+      assert.isFalse(Merged.is({ k: 'x', id: 1.5, tag: 'a' }));
+
+      assert.isTrue(Merged.is({ k: 'x', id: 1, tag: 'a' }));
+
+      assert.isFalse(Merged.is({ k: 'y', id: 1.5, tag: 'a' }));
+
+      assert.isTrue(Merged.is({ k: 'y', id: 1, tag: 'a' }));
+    });
+
+    test("under excessProperty: 'reject'", () => {
+      const Merged = mergeRecords([strictRecord(Base.shape), Loose]);
+
+      expectType<TypeOf<typeof Merged>, Readonly<{ id: Int; tag: 'b' }>>('=');
+
+      assert.isFalse(Merged.is({ id: 1.5, tag: 'c' }));
+
+      assert.isTrue(Merged.is({ id: 1, tag: 'b' }));
+
+      assert.isFalse(Merged.is({ id: 1, tag: 'b', extra: 0 }));
+    });
+
+    test('a key that holds a record in both is the merge of the two records', () => {
+      const Merged = mergeRecords([
+        record({ meta: record({ a: number() }) }),
+        record({ meta: record({ b: string() }) }),
+      ]);
+
+      expectType<
+        TypeOf<typeof Merged>,
+        Readonly<{ meta: Readonly<{ a: number; b: string }> }>
+      >('~=');
+
+      assert.isTrue(Merged.is({ meta: { a: 1, b: 'x' } }));
+
+      assert.isFalse(Merged.is({ meta: { a: 1 } }));
+
+      assert.isFalse(Merged.is({ meta: { b: 'x' } }));
+
+      assert.deepStrictEqual(Merged.defaultValue, { meta: { a: 0, b: '' } });
+
+      assert.deepStrictEqual(Merged.fill({ meta: { a: 5 } }), {
+        meta: { a: 5, b: '' },
+      });
+    });
+
+    test('the key is optional only when every record makes it optional', () => {
+      const BothOptional = mergeRecords([
+        record({ n: optional(number()) }),
+        record({ n: optional(int()) }),
+      ]);
+
+      expectType<TypeOf<typeof BothOptional>, Readonly<{ n?: Int }>>('=');
+
+      assert.isTrue(BothOptional.is({}));
+
+      assert.isTrue(BothOptional.is({ n: 1 }));
+
+      assert.isFalse(BothOptional.is({ n: 1.5 }));
+
+      assert.isTrue(BothOptional.is(BothOptional.defaultValue));
+
+      const OneOptional = mergeRecords([
+        record({ n: optional(number()) }),
+        record({ n: int() }),
+      ]);
+
+      expectType<TypeOf<typeof OneOptional>, Readonly<{ n: Int }>>('=');
+
+      assert.isFalse(OneOptional.is({}));
+
+      assert.isTrue(OneOptional.is({ n: 1 }));
+
+      assert.isFalse(OneOptional.is({ n: 1.5 }));
+    });
+
+    test('a union member is not asked for its default while the merge is built', () => {
+      // `Later` is not initialized yet while the merge is built, and the
+      // union's default and `fill` run its default type's.
+      const Merged = mergeRecords([
+        record({ k: union([literal('a'), literal('b')]) }),
+        required(
+          record({
+            k: optional(
+              union([literal('a'), literal('b')], {
+                defaultType: recursion('Later', () => Later),
+              }),
+              { forceUndefinedDefault: true },
+            ),
+          }),
+        ),
+      ]);
+
+      expectType<TypeOf<typeof Merged>, Readonly<{ k: 'a' | 'b' }>>('=');
+
+      const Later: Type<'a' | 'b'> = enumType(['b', 'a']);
+
+      // The first of the values every member accepts: no `enumType` or
+      // `literal` among the members gives one of its own.
+      assert.deepStrictEqual(Merged.defaultValue, { k: 'a' });
+
+      assert.deepStrictEqual(Merged.fill({ k: 'z' }), { k: 'a' });
+
+      assert.isFalse(Merged.is({}));
+    });
+
+    test('a recursion member is not resolved when the merge is built', () => {
+      type Node = Readonly<{ id: number; next?: Node }>;
+
+      // `Node` is not initialized yet while the merge is built, and reading the
+      // second member's default would resolve it.
+      const Merged = mergeRecords([
+        record({
+          id: number(),
+          next: optional(
+            recursion('Node', () => Node),
+            { forceUndefinedDefault: true },
+          ),
+        }),
+        record({ next: optional(recursion('Node', () => Node)) }),
+      ]);
+
+      expectType<TypeOf<typeof Merged>, Node>('=');
+
+      const Node: Type<Node> = Merged;
+
+      assert.isTrue(Node.is({ id: 0, next: { id: 1 } }));
+
+      assert.isFalse(Node.is({ id: 0, next: { id: 'x' } }));
+
+      // The first member's forced `undefined` ends the recursion that reading
+      // the second member's default would start.
+      assert.deepStrictEqual(Node.defaultValue, { id: 0, next: undefined });
+    });
+
+    test('an optional key whose members default to undefined', () => {
+      type Node = Readonly<{ id: number; next?: Node }>;
+
+      const Merged = mergeRecords([
+        record({
+          id: number(),
+          next: optional(
+            recursion('Node', () => Node),
+            { forceUndefinedDefault: true },
+          ),
+        }),
+        record({
+          next: optional(
+            recursion('Node', () => Node),
+            { forceUndefinedDefault: true },
+          ),
+        }),
+      ]);
+
+      expectType<TypeOf<typeof Merged>, Node>('=');
+
+      const Node: Type<Node> = Merged;
+
+      assert.deepStrictEqual(Node.defaultValue, { id: 0, next: undefined });
+
+      assert.isTrue(Node.is(Node.defaultValue));
     });
   });
 });
