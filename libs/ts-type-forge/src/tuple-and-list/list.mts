@@ -1,4 +1,4 @@
-import type { IsFixedLengthList } from '../condition/index.mjs';
+import type { IsUnion } from '../condition/index.mjs';
 import type { Tuple } from './tuple.mjs';
 
 export namespace List {
@@ -36,7 +36,9 @@ export namespace List {
 
   /**
    * Gets a new tuple/array type containing all elements of `A` except the last one.
-   * Delegates to `Tuple.ButLast`.
+   * Delegates to `Tuple.ButLast` for a tuple of one length. A tuple with a rest
+   * or an optional element yields an unsized array of its elements, since the
+   * result may lack any of its positional elements.
    * @template A - The readonly array or tuple type.
    * @returns A new type with the last element removed.
    * @example
@@ -45,13 +47,22 @@ export namespace List {
    * type BL2 = List.ButLast<readonly string[]>; // readonly string[] (unchanged for general arrays)
    * type BL3 = List.ButLast<[1]>; // readonly []
    * type BL4 = List.ButLast<[]>; // readonly []
+   * type BL5 = List.ButLast<readonly [1, ...string[]]>; // readonly (string | 1)[]
    * ```
    */
-  export type ButLast<A extends readonly unknown[]> = Tuple.ButLast<A>;
+  export type ButLast<A extends readonly unknown[]> = A extends unknown
+    ? ListShape<A> extends 'exact'
+      ? Tuple.ButLast<A>
+      : ListShape<A> extends 'array'
+        ? Readonly<A>
+        : readonly A[number][]
+    : never;
 
   /**
    * Gets a new tuple/array type containing all elements of `A` except the first one.
-   * Delegates to `Tuple.Tail`.
+   * A required first element is removed exactly, whatever follows it
+   * (`[1, ...string[]]` gives `readonly string[]`). Any other tuple with a rest
+   * or an optional element yields an unsized array of its elements.
    * @template A - The readonly array or tuple type.
    * @returns A new type with the first element removed.
    * @example
@@ -60,14 +71,27 @@ export namespace List {
    * type T2 = List.Tail<readonly string[]>; // readonly string[] (unchanged for general arrays)
    * type T3 = List.Tail<[1]>; // readonly []
    * type T4 = List.Tail<[]>; // readonly []
+   * type T5 = List.Tail<readonly [...string[], 1]>; // readonly (string | 1)[]
    * ```
    */
-  export type Tail<A extends readonly unknown[]> = Tuple.Tail<A>;
+  export type Tail<A extends readonly unknown[]> =
+    // A tuple intersected with a brand matches here too, with `R` read as
+    // `unknown[]`, since variadic `infer` does not see through an intersection.
+    // `unknown` claims nothing, and `ConstrainedList` is the namespace that
+    // reads a branded array.
+    A extends readonly [unknown, ...infer R]
+      ? Readonly<R>
+      : ListShape<A> extends 'exact' | 'array'
+        ? Tuple.Tail<A>
+        : readonly A[number][];
 
   /**
    * Reverses the order of elements in a readonly array or tuple `L`.
    * For fixed-length tuples, it returns a tuple with elements in reverse order.
    * For general arrays, it returns a readonly array of the same element type.
+   * Required leading elements of a tuple with a rest or an optional element
+   * move to the end; what is left before them is an unsized array of its
+   * elements.
    * @template L - The readonly array or tuple type.
    * @returns A new type with elements reversed.
    * @example
@@ -75,23 +99,28 @@ export namespace List {
    * type R1 = List.Reverse<[1, 2, 3]>; // readonly [3, 2, 1]
    * type R2 = List.Reverse<readonly string[]>; // readonly string[]
    * type R3 = List.Reverse<[]>; // readonly []
+   * type R4 = List.Reverse<readonly [1, 2?]>; // readonly [...(2 | undefined)[], 1]
    * ```
    */
   export type Reverse<L extends readonly unknown[]> = L extends readonly []
     ? readonly []
-    : IsFixedLengthList<L> extends true
+    : ListShape<L> extends 'exact'
       ? Tuple.Reverse<L>
       : L extends readonly [unknown, ...(readonly unknown[])]
         ? readonly [...Reverse<Tail<L>>, Head<L>]
-        : Readonly<L>;
+        : ListShape<L> extends 'array'
+          ? Readonly<L>
+          : readonly L[number][];
 
   /**
    * Takes the first `N` elements from a readonly array or tuple `T`.
-   * If `T` is a tuple, it returns a new tuple containing the first `N` elements.
-   * If `T` is a general array, it returns the original array type `T`.
+   * If `T` is a tuple of one length, it returns a new tuple containing the first `N` elements.
+   * If `T` is a plain array (`E[]` or `readonly E[]`), it returns `T`.
+   * A tuple with a rest or an optional element yields an unsized array of its
+   * elements, which every possible result satisfies.
    * @template N - The number of elements to take.
    * @template T - The readonly array or tuple type.
-   * @returns A new type containing the first `N` elements (for tuples) or `T` (for arrays).
+   * @returns A new type containing the first `N` elements (for tuples of one length) or `T` (for plain arrays).
    * @example
    * ```ts
    * type TK1 = List.Take<2, [1, 2, 3]>; // readonly [1, 2]
@@ -100,15 +129,27 @@ export namespace List {
    * ```
    */
   export type Take<N extends number, T extends readonly unknown[]> =
-    IsFixedLengthList<T> extends true ? Tuple.Take<N, T> : T;
+    // A tuple with a rest or an optional element is widened even when its
+    // required prefix already covers `N` (`Take<1, [string, ...string[]]>` is
+    // `readonly string[]`, not non-empty): sound, though less precise than it
+    // could be, as `ListShape` says.
+    T extends unknown
+      ? ListShape<T> extends 'exact'
+        ? Tuple.Take<N, T>
+        : ListShape<T> extends 'array'
+          ? T
+          : readonly T[number][]
+      : never;
 
   /**
    * Skips the first `N` elements from a readonly array or tuple `T`.
-   * If `T` is a tuple, it returns a new tuple containing the elements after the first `N`.
-   * If `T` is a general array, it returns the original array type `T`.
+   * If `T` is a tuple of one length, it returns a new tuple containing the elements after the first `N`.
+   * If `T` is a plain array (`E[]` or `readonly E[]`), it returns `T`.
+   * A tuple with a rest or an optional element yields an unsized array of its
+   * elements, which every possible result satisfies.
    * @template N - The number of elements to skip.
    * @template T - The readonly array or tuple type.
-   * @returns A new type containing elements after the first `N` (for tuples) or `T` (for arrays).
+   * @returns A new type containing elements after the first `N` (for tuples of one length) or `T` (for plain arrays).
    * @example
    * ```ts
    * type SK1 = List.Skip<1, [1, 2, 3]>; // readonly [2, 3]
@@ -116,16 +157,26 @@ export namespace List {
    * type SK3 = List.Skip<1, readonly string[]>; // readonly string[]
    * ```
    */
-  export type Skip<N extends number, T extends readonly unknown[]> =
-    IsFixedLengthList<T> extends true ? Tuple.Skip<N, T> : T;
+  export type Skip<
+    N extends number,
+    T extends readonly unknown[],
+  > = T extends unknown
+    ? ListShape<T> extends 'exact'
+      ? Tuple.Skip<N, T>
+      : ListShape<T> extends 'array'
+        ? T
+        : readonly T[number][]
+    : never;
 
   /**
    * Takes the last `N` elements from a readonly array or tuple `T`.
-   * If `T` is a tuple, it returns a new tuple containing the last `N` elements.
-   * If `T` is a general array, it returns the original array type `T`.
+   * If `T` is a tuple of one length, it returns a new tuple containing the last `N` elements.
+   * If `T` is a plain array (`E[]` or `readonly E[]`), it returns `T`.
+   * A tuple with a rest or an optional element yields an unsized array of its
+   * elements, which every possible result satisfies.
    * @template N - The number of elements to take.
    * @template T - The readonly array or tuple type.
-   * @returns A new type containing the last `N` elements (for tuples) or `T` (for arrays).
+   * @returns A new type containing the last `N` elements (for tuples of one length) or `T` (for plain arrays).
    * @example
    * ```ts
    * type TL1 = List.TakeLast<2, [1, 2, 3]>; // readonly [2, 3]
@@ -133,16 +184,26 @@ export namespace List {
    * type TL3 = List.TakeLast<2, readonly string[]>; // readonly string[]
    * ```
    */
-  export type TakeLast<N extends number, T extends readonly unknown[]> =
-    IsFixedLengthList<T> extends true ? Tuple.TakeLast<N, T> : T;
+  export type TakeLast<
+    N extends number,
+    T extends readonly unknown[],
+  > = T extends unknown
+    ? ListShape<T> extends 'exact'
+      ? Tuple.TakeLast<N, T>
+      : ListShape<T> extends 'array'
+        ? T
+        : readonly T[number][]
+    : never;
 
   /**
    * Skips the last `N` elements from a readonly array or tuple `T`.
-   * If `T` is a tuple, it returns a new tuple containing the elements before the last `N`.
-   * If `T` is a general array, it returns the original array type `T`.
+   * If `T` is a tuple of one length, it returns a new tuple containing the elements before the last `N`.
+   * If `T` is a plain array (`E[]` or `readonly E[]`), it returns `T`.
+   * A tuple with a rest or an optional element yields an unsized array of its
+   * elements, which every possible result satisfies.
    * @template N - The number of elements to skip.
    * @template T - The readonly array or tuple type.
-   * @returns A new type containing elements before the last `N` (for tuples) or `T` (for arrays).
+   * @returns A new type containing elements before the last `N` (for tuples of one length) or `T` (for plain arrays).
    * @example
    * ```ts
    * type SL1 = List.SkipLast<1, [1, 2, 3]>; // readonly [1, 2]
@@ -150,13 +211,22 @@ export namespace List {
    * type SL3 = List.SkipLast<1, readonly string[]>; // readonly string[]
    * ```
    */
-  export type SkipLast<N extends number, T extends readonly unknown[]> =
-    IsFixedLengthList<T> extends true ? Tuple.SkipLast<N, T> : T;
+  export type SkipLast<
+    N extends number,
+    T extends readonly unknown[],
+  > = T extends unknown
+    ? ListShape<T> extends 'exact'
+      ? Tuple.SkipLast<N, T>
+      : ListShape<T> extends 'array'
+        ? T
+        : readonly T[number][]
+    : never;
 
   /**
    * Creates a new array/tuple type where the element at index `I` in `T` is replaced with type `V`.
-   * If `T` is a tuple, it returns a new tuple type with the element at `I` updated.
-   * If `T` is a general array, it returns a general array type `readonly (T[number] | V)[]`.
+   * If `T` is a tuple of one length, it returns a new tuple type with the element at `I` updated.
+   * If `T` is a general array, it returns a general array type `readonly (T[number] | V)[]`,
+   * and so does a tuple with a rest or an optional element.
    * @template I - The index to update (must be a valid index for `T` if `T` is a tuple).
    * @template V - The new type for the element at index `I`.
    * @template T - The readonly array or tuple type.
@@ -168,10 +238,15 @@ export namespace List {
    * // type SA3 = List.SetAt<2, 'x', [1, 2]>; // Error if I is out of bounds for tuple
    * ```
    */
-  export type SetAt<I extends number, V, T extends readonly unknown[]> =
-    IsFixedLengthList<T> extends true
+  export type SetAt<
+    I extends number,
+    V,
+    T extends readonly unknown[],
+  > = T extends unknown
+    ? ListShape<T> extends 'exact'
       ? Tuple.SetAt<I, V, T>
-      : readonly (T[number] | V)[];
+      : readonly (T[number] | V)[]
+    : never;
 
   /**
    * Flattens a nested readonly array/tuple `T` by one level.
@@ -236,10 +311,15 @@ export namespace List {
 
   /**
    * Partitions a readonly array or tuple `T` into sub-arrays/tuples of length `N`.
-   * Delegates to `Tuple.Partition`.
-   * @template N - The desired size of each partition (must be a positive integer literal).
+   * Delegates to `Tuple.Partition` for a tuple of one length. A plain array or
+   * a tuple with a rest or an optional element yields an unsized array of
+   * unsized chunks, `readonly (readonly T[number][])[]`, and a chunk size of
+   * `0` yields `never` for every input.
+   * @template N - The desired size of each partition. Only a single positive
+   * literal gives chunks of length `N`; a union or `number` gives unsized chunks.
    * @template T - The readonly array or tuple type to partition.
-   * @returns A readonly array/tuple where each element is a sub-array/tuple of length `N`.
+   * @returns For a tuple of one length and a single literal `N`, a readonly tuple
+   * of chunks of length `N` (the last may be shorter); otherwise as described above.
    * @example
    * ```ts
    * type P1 = List.Partition<2, [1, 2, 3, 4, 5]>; // readonly [[1, 2], [3, 4], [5]]
@@ -251,8 +331,55 @@ export namespace List {
   export type Partition<
     N extends number,
     T extends readonly unknown[],
-  > = Tuple.Partition<N, T>;
+  > = T extends unknown
+    ? ListShape<T> extends 'exact'
+      ? Tuple.Partition<N, T>
+      : [N] extends [0]
+        ? never // as `Tuple.Partition` answers a chunk size of 0
+        : readonly (readonly T[number][])[]
+    : never;
 }
+
+/**
+ * @internal How much of a list's shape its type pins. Read one union member at
+ * a time: the operations above distribute over `T` before asking, so each
+ * member of a union keeps its own answer.
+ *
+ * - `'exact'`: a tuple of one length, every element required. The only shape
+ *   the `Tuple` operations walk element by element.
+ * - `'array'`: an unsized array with no positional element (`readonly E[]`),
+ *   which every slice of itself satisfies. `Take`, `Skip`, `TakeLast` and
+ *   `SkipLast` return `T` as given and `ButLast`, `Tail` and `Reverse` return
+ *   `Readonly<T>`, each as before. `Partition` answers unsized chunks of its
+ *   elements, as for `'mixed'`.
+ * - `'mixed'`: a tuple with an optional element or a rest element. A slice of
+ *   one does not in general satisfy the tuple itself (`ButLast` of
+ *   `[1, ...string[]]` may be empty), so `ButLast`, `Take`, `Skip`,
+ *   `TakeLast`, `SkipLast` and `SetAt` answer a readonly unsized array of its
+ *   elements. `Tail` and `Reverse` do so only for one with no required first
+ *   element. `Partition` answers unsized chunks of them. An unsized array
+ *   intersected with a brand lands here too, since
+ *   `readonly T[number][]` is not assignable to it, and so loses the brand: a
+ *   brand may state a minimum length that a slice no longer has.
+ *
+ * Each operation spells out this dispatch itself rather than sharing a helper:
+ * the exact answer is a different `Tuple` operation in each, and a type alias
+ * cannot take another generic alias as a parameter.
+ *
+ * Widening every `'mixed'` input is sound but gives up answers that some of
+ * them could keep exactly: a required first or last element (`Take<1>` of
+ * `[string, ...string[]]` is non-empty, `ButLast` of `[...string[], 1]` is
+ * `string[]`), an index inside the required prefix (`Take<1, [1, 2?]>`), or a
+ * `SetAt`, which changes no length. Each operation would need a derivation of
+ * its own, and only `Tail` and `Reverse` keep a required first element today.
+ */
+type ListShape<T extends readonly unknown[]> = number extends T['length']
+  ? readonly T[number][] extends Readonly<T>
+    ? 'array'
+    : 'mixed'
+  : IsUnion<T['length']> extends true
+    ? 'mixed'
+    : 'exact';
 
 /**
  * @internal

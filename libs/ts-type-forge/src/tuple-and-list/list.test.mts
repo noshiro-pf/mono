@@ -12,9 +12,32 @@ import type { List } from './list.mjs';
 
   expectType<List.ButLast<readonly [1, 2, 3]>, readonly [1, 2]>('=');
 
+  // A tuple with a rest or an optional element may be shorter than its
+  // positional elements suggest, so the result is an unsized array of its
+  // elements, which every possible result satisfies.
   expectType<
     List.ButLast<readonly [1, 2, 3, ...(readonly number[])]>,
-    readonly [1, 2, 3, ...(readonly number[])]
+    readonly number[]
+  >('=');
+
+  expectType<List.ButLast<readonly [1, ...string[]]>, readonly (1 | string)[]>(
+    '=',
+  );
+
+  expectType<readonly [], List.ButLast<readonly [1, ...string[]]>>('<=');
+
+  expectType<List.ButLast<readonly [1, 2?]>, readonly (1 | 2 | undefined)[]>(
+    '=',
+  );
+
+  expectType<readonly [], List.ButLast<readonly [1, 2?]>>('<=');
+
+  expectType<List.ButLast<readonly string[]>, readonly string[]>('=');
+
+  // Each member of a union keeps its own answer.
+  expectType<
+    List.ButLast<readonly [1, 2] | readonly string[]>,
+    readonly [1] | readonly string[]
   >('=');
 }
 
@@ -167,6 +190,28 @@ import type { List } from './list.mjs';
     List.Partition<2, readonly [1, 2, 3, 4]>,
     readonly [readonly [1, 2], readonly [3, 4]]
   >('=');
+
+  expectType<
+    List.Partition<2, readonly string[]>,
+    readonly (readonly string[])[]
+  >('=');
+
+  expectType<
+    List.Partition<2, readonly [1, ...string[]]>,
+    readonly (readonly (1 | string)[])[]
+  >('=');
+
+  expectType<
+    List.Partition<1, readonly [1, 2?]>,
+    readonly (readonly (1 | 2 | undefined)[])[]
+  >('=');
+
+  // A chunk size of 0 is `never`, whatever the input's shape.
+  expectType<List.Partition<0, readonly string[]>, never>('=');
+
+  expectType<List.Partition<0, readonly [1, ...string[]]>, never>('=');
+
+  expectType<List.Partition<0, readonly [1, 2]>, never>('=');
 }
 
 // ── reverse ─────────────────────────
@@ -183,6 +228,20 @@ import type { List } from './list.mjs';
 
   expectType<List.Reverse<readonly number[]>, readonly number[]>('=');
 
+  expectType<List.Reverse<readonly [1?]>, readonly (1 | undefined)[]>('=');
+
+  expectType<
+    List.Reverse<readonly [1, 2?]>,
+    readonly [...(2 | undefined)[], 1]
+  >('=');
+
+  expectType<readonly [1], List.Reverse<readonly [1, 2?]>>('<=');
+
+  expectType<
+    List.Reverse<readonly [1, ...string[]]>,
+    readonly [...string[], 1]
+  >('=');
+
   expectType<
     List.Reverse<readonly [1, 2, ...(readonly number[])]>,
     readonly [...number[], 2, 1]
@@ -198,6 +257,16 @@ import type { List } from './list.mjs';
   expectType<List.SetAt<1, 999, readonly [1, 2, 3]>, readonly [1, 999, 3]>('=');
 
   expectType<List.SetAt<0, 999, readonly [1, 2, 3]>, readonly [999, 2, 3]>('=');
+
+  expectType<
+    List.SetAt<0, 999, readonly [1, 2?]>,
+    readonly (1 | 2 | 999 | undefined)[]
+  >('=');
+
+  expectType<
+    List.SetAt<0, 999, readonly [1, 2] | readonly [3]>,
+    readonly [999, 2] | readonly [999]
+  >('=');
 }
 
 // ── skip-last ─────────────────────────
@@ -213,6 +282,25 @@ import type { List } from './list.mjs';
   expectType<List.SkipLast<5, readonly [1, 2, 3]>, readonly []>('=');
 
   expectType<List.SkipLast<5, readonly number[]>, readonly number[]>('=');
+
+  expectType<
+    List.SkipLast<1, readonly [1, ...string[]]>,
+    readonly (1 | string)[]
+  >('=');
+
+  expectType<readonly [], List.SkipLast<1, readonly [1, ...string[]]>>('<=');
+
+  expectType<
+    List.SkipLast<1, readonly [1, 2?]>,
+    readonly (1 | 2 | undefined)[]
+  >('=');
+
+  expectType<readonly [1], List.SkipLast<1, readonly [1, 2?]>>('<=');
+
+  expectType<
+    List.SkipLast<1, readonly [1, 2] | readonly [3]>,
+    readonly [1] | readonly []
+  >('=');
 }
 
 // ── skip ─────────────────────────
@@ -228,6 +316,28 @@ import type { List } from './list.mjs';
   expectType<List.Skip<5, readonly [1, 2, 3]>, readonly []>('=');
 
   expectType<List.Skip<5, readonly number[]>, readonly number[]>('=');
+
+  expectType<List.Skip<2, readonly [1, ...string[]]>, readonly (1 | string)[]>(
+    '=',
+  );
+
+  expectType<readonly [string], List.Skip<2, readonly [1, ...string[]]>>('<=');
+
+  expectType<List.Skip<1, readonly [1?, 2?]>, readonly (1 | 2 | undefined)[]>(
+    '=',
+  );
+
+  expectType<readonly [2], List.Skip<1, readonly [1?, 2?]>>('<=');
+
+  expectType<
+    List.Skip<1, readonly [1, 2] | readonly [3]>,
+    readonly [2] | readonly []
+  >('=');
+
+  expectType<
+    List.Skip<1, readonly [1, 2] | readonly [3, ...string[]]>,
+    readonly [2] | readonly (3 | string)[]
+  >('=');
 }
 
 // ── tail ─────────────────────────
@@ -242,6 +352,23 @@ import type { List } from './list.mjs';
     List.Tail<readonly [1, 2, 3, ...(readonly number[])]>,
     readonly [2, 3, ...(readonly number[])]
   >('=');
+
+  // A required first element is removed exactly, whatever follows it.
+  expectType<List.Tail<readonly [1, ...string[]]>, readonly string[]>('=');
+
+  expectType<List.Tail<readonly [1, 2?]>, readonly [(2 | undefined)?]>('=');
+
+  expectType<List.Tail<readonly [...string[], 1]>, readonly (string | 1)[]>(
+    '=',
+  );
+
+  expectType<readonly [], List.Tail<readonly [...string[], 1]>>('<=');
+
+  expectType<List.Tail<readonly [1?, 2?]>, readonly (1 | 2 | undefined)[]>('=');
+
+  expectType<readonly [2], List.Tail<readonly [1?, 2?]>>('<=');
+
+  expectType<List.Tail<readonly string[]>, readonly string[]>('=');
 }
 
 // ── take-last ─────────────────────────
@@ -257,6 +384,27 @@ import type { List } from './list.mjs';
   expectType<List.TakeLast<2, readonly number[]>, readonly number[]>('=');
 
   expectType<List.TakeLast<0, readonly number[]>, readonly number[]>('=');
+
+  expectType<
+    List.TakeLast<1, readonly [1, ...string[]]>,
+    readonly (1 | string)[]
+  >('=');
+
+  expectType<readonly [string], List.TakeLast<1, readonly [1, ...string[]]>>(
+    '<=',
+  );
+
+  expectType<
+    List.TakeLast<1, readonly [1, 2?]>,
+    readonly (1 | 2 | undefined)[]
+  >('=');
+
+  expectType<readonly [2], List.TakeLast<1, readonly [1, 2?]>>('<=');
+
+  expectType<
+    List.TakeLast<1, readonly [1, 2] | readonly [3]>,
+    readonly [2] | readonly [3]
+  >('=');
 }
 
 // ── take ─────────────────────────
@@ -272,6 +420,67 @@ import type { List } from './list.mjs';
   expectType<List.Take<2, readonly number[]>, readonly number[]>('=');
 
   expectType<List.Take<0, readonly number[]>, readonly number[]>('=');
+
+  expectType<List.Take<2, string[]>, string[]>('=');
+
+  // An unsized array intersected with a brand is classed with the tuples that
+  // have a rest element, and loses the brand.
+  expectType<
+    List.Take<1, readonly string[] & Readonly<{ brand: 'x' }>>,
+    readonly string[]
+  >('=');
+
+  expectType<
+    List.Tail<readonly string[] & Readonly<{ brand: 'x' }>>,
+    readonly string[]
+  >('=');
+
+  expectType<
+    List.Reverse<readonly string[] & Readonly<{ brand: 'x' }>>,
+    readonly string[]
+  >('=');
+
+  expectType<
+    List.ButLast<readonly string[] & Readonly<{ brand: 'x' }>>,
+    readonly string[]
+  >('=');
+
+  expectType<
+    List.Skip<1, readonly string[] & Readonly<{ brand: 'x' }>>,
+    readonly string[]
+  >('=');
+
+  expectType<
+    List.TakeLast<1, readonly string[] & Readonly<{ brand: 'x' }>>,
+    readonly string[]
+  >('=');
+
+  expectType<
+    List.SkipLast<1, readonly string[] & Readonly<{ brand: 'x' }>>,
+    readonly string[]
+  >('=');
+
+  expectType<List.Take<2, any>, any>('=');
+
+  expectType<List.Take<1, readonly [1?, 2?]>, readonly (1 | 2 | undefined)[]>(
+    '=',
+  );
+
+  expectType<readonly [], List.Take<1, readonly [1?, 2?]>>('<=');
+
+  expectType<List.Take<1, readonly [1, ...string[]]>, readonly (1 | string)[]>(
+    '=',
+  );
+
+  expectType<
+    List.Take<1, readonly [1, 2] | readonly [3, ...string[]]>,
+    readonly [1] | readonly (3 | string)[]
+  >('=');
+
+  expectType<
+    List.Take<1, readonly [1, 2] | readonly [3, 4, 5]>,
+    readonly [1] | readonly [3]
+  >('=');
 }
 
 // ── zip ─────────────────────────

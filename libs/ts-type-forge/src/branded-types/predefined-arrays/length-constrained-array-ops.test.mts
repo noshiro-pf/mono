@@ -497,6 +497,14 @@ expectType<
   BoundedLengthArray<2, 5, readonly [1 | 2 | 3 | 4 | 5, string]>
 >('=');
 
+// A tuple with an optional element pins no one length, so only the brand is
+// recomputed: its shortest length does not stand in for the value's.
+type BrandedOptionalTuple = MinLengthArray<1, number> & readonly [1, 2?];
+
+expectType<2, ConstrainedList.Last<BrandedOptionalTuple>>('<=');
+
+expectType<2, ConstrainedList.Reverse<BrandedOptionalTuple>[0]>('<=');
+
 /* Head / Last / Partition / Flatten */
 
 expectType<ConstrainedList.Head<BrandedFiveTuple>, 1>('=');

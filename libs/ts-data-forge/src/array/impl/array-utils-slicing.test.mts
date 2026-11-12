@@ -1,4 +1,4 @@
-import type { MinLengthArray } from 'ts-type-forge';
+import type { MinLengthArray, NonEmptyTuple } from 'ts-type-forge';
 import { expectType } from '../../expect-type.mjs';
 import { asMinLengthArray } from './array-utils-length-bounded-array-cast.mjs';
 import {
@@ -54,6 +54,16 @@ describe('Arr slicing', () => {
       assert.deepStrictEqual(bl, [1, 2]);
     });
 
+    test('a hand-written non-empty tuple type may give an empty result', () => {
+      const names: NonEmptyTuple<string> = ['only'] as const;
+
+      const result = butLast(names);
+
+      expectType<typeof result, readonly string[]>('=');
+
+      assert.deepStrictEqual(result, []);
+    });
+
     test('should return all elements except the last', () => {
       const array = [1, 2, 3, 4] as const;
 
@@ -86,6 +96,20 @@ describe('Arr slicing', () => {
   });
 
   describe(take, () => {
+    {
+      // A tuple with a rest element is widened, even where the result is
+      // non-empty.
+      const names: NonEmptyTuple<string> = ['a', 'b'] as const;
+
+      const t = take(names, 1);
+
+      expectType<typeof t, readonly string[]>('=');
+
+      test('a hand-written non-empty tuple type', () => {
+        assert.deepStrictEqual(t, ['a']);
+      });
+    }
+
     {
       const xs = [1, 2, 3] as const;
 

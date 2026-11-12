@@ -1,9 +1,10 @@
 import type {
   IsFixedLengthList,
   IsNever,
+  IsUnion,
   TypeExtends,
 } from '../../condition/index.mjs';
-import type { BoolAnd } from '../../others/index.mjs';
+import type { BoolAnd, BoolNot } from '../../others/index.mjs';
 import type {
   List,
   MakeTuple,
@@ -30,10 +31,9 @@ import type {
  *
  * `List` decides what it can say about a result from whether the input is a
  * fixed-length tuple. A length-constrained array is not one — its `length` is
- * `number` — so `List` falls back to returning the input type unchanged, which
- * is not merely imprecise but **wrong** for the operations that shorten:
- * `List.Take<2, MinLengthArray<5, E>>` claims the two-element result still has
- * at least five. Every operation here instead recovers the input's bounds from
+ * `number` — so `List` cannot read the bounds the brand states:
+ * `List.Take<2, MinLengthArray<5, E>>` is `readonly E[]`, though the result has
+ * exactly two. Every operation here instead recovers the input's bounds from
  * the brand, applies that operation's effect on them, and rebuilds the
  * constraint.
  *
@@ -446,11 +446,17 @@ type MaterializeTuple<
  * @internal Whether `Ar` pins one exact length, short enough to be worth
  * rebuilding positionally.
  *
- * A pure brand never does — its `length` is `number` — so the structural
- * refinement is skipped and the brand answer stands alone.
+ * A pure brand never does — its `length` is `number` — and neither does a
+ * tuple with an optional element, whose `length` is a union (rebuilt, it would
+ * stop at its shortest length). The structural refinement is then skipped and
+ * the brand answer stands alone, even where a required position could have
+ * been kept (`Head` answers `Ar[number]`, not `Ar[0]`). The bounds the brand
+ * answer starts from still read such a `length` as exact
+ * (`EffectiveMinLengthOf` / `EffectiveMaxLengthOf`), which is a separate
+ * limit of those helpers.
  */
 type PinsExactTuple<Ar extends readonly unknown[]> = BoolAnd<
-  IsFixedLengthList<Ar>,
+  BoolAnd<IsFixedLengthList<Ar>, BoolNot<IsUnion<Ar['length']>>>,
   TypeExtends<Ar['length'], UintRangeInclusive<0, StructuralOpCap>>
 >;
 

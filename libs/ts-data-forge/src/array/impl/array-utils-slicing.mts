@@ -96,7 +96,10 @@ export function take<
   num: N,
 ): HasLengthConstraint<Ar> extends true
   ? readonly Ar[number][]
-  : N extends StructuralPrefixLength
+  : // `List.Take` widens a tuple with a rest or an optional element, so a
+    // literal `N` up to the cap loses the non-emptiness the fallback below
+    // keeps for a larger `N` (`take(nonEmpty, 1)` is `readonly E[]`).
+    N extends StructuralPrefixLength
     ? List.Take<N, Ar>
     : N extends SizeType.ArgArrPositive
       ? Ar extends NonEmptyTuple<unknown>
@@ -110,7 +113,9 @@ export function take<N extends SizeType.ArgArr>(
   array: Ar,
 ) => HasLengthConstraint<Ar> extends true
   ? readonly Ar[number][]
-  : N extends StructuralPrefixLength
+  : // As in the first overload, `List.Take` widens a tuple with a rest or an
+    // optional element, non-empty or not.
+    N extends StructuralPrefixLength
     ? List.Take<N, Ar>
     : N extends SizeType.ArgArrPositive
       ? Ar extends NonEmptyTuple<unknown>
@@ -157,7 +162,9 @@ export function takeLast<
   num: N,
 ): HasLengthConstraint<Ar> extends true
   ? readonly Ar[number][]
-  : N extends StructuralPrefixLength
+  : // As in `take`, `List.TakeLast` widens a tuple with a rest or an optional
+    // element, non-empty or not.
+    N extends StructuralPrefixLength
     ? List.TakeLast<N, Ar>
     : N extends SizeType.ArgArrPositive
       ? Ar extends NonEmptyTuple<unknown>
@@ -171,7 +178,9 @@ export function takeLast<N extends SizeType.ArgArr>(
   array: Ar,
 ) => HasLengthConstraint<Ar> extends true
   ? readonly Ar[number][]
-  : N extends StructuralPrefixLength
+  : // As in `take`, `List.TakeLast` widens a tuple with a rest or an optional
+    // element, non-empty or not.
+    N extends StructuralPrefixLength
     ? List.TakeLast<N, Ar>
     : N extends SizeType.ArgArrPositive
       ? Ar extends NonEmptyTuple<unknown>

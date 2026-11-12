@@ -5,6 +5,7 @@ import type { List } from 'ts-type-forge';
 type R1 = List.Reverse<[1, 2, 3]>; // readonly [3, 2, 1]
 type R2 = List.Reverse<readonly string[]>; // readonly string[]
 type R3 = List.Reverse<[]>; // readonly []
+type R4 = List.Reverse<readonly [1, 2?]>; // readonly [...(2 | undefined)[], 1]
 
 // embed-sample-code-ignore-below
-export type { R1, R2, R3 };
+export type { R1, R2, R3, R4 };
