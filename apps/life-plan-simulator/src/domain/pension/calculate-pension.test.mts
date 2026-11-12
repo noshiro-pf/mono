@@ -109,3 +109,42 @@ describe(calculatePension, () => {
     },
   );
 });
+
+describe('calculatePension の報酬比例部分の元になる年収', () => {
+  test('月給 65 万円でも、保険料のかかる賞与の分は数えること', () => {
+    // 650,000 × 12 + 1,500,000（標準賞与額の上限）
+    assert.strictEqual(averageFor(7_800_000, 1_500_000), 9_300_000);
+  });
+
+  test('賞与は保険料と同じく 1 回 150 万円までしか数えないこと', () => {
+    // 400,000 × 12 + 1,500,000
+    assert.strictEqual(averageFor(4_800_000, 2_000_000), 6_300_000);
+  });
+
+  test('月給は標準報酬月額の上限で頭打ちにすること', () => {
+    // 650,000 × 12、賞与なし
+    assert.strictEqual(averageFor(9_600_000, 0), 7_800_000);
+  });
+});
+
+/** The average yearly income the benefit counts, for one salary row from age 22 to 60. */
+const averageFor = (annualBase: number, annualBonus: number): number =>
+  calculatePension({
+    birth: parseYearMonthOr('1990-04', 0),
+    salaryHistory: resolveSalaryHistory(
+      [
+        {
+          id: 1,
+          start: '2012-04',
+          annualBase,
+          companyDcMonthly: 0,
+          idecoMonthly: 0,
+          annualBonus,
+        },
+      ],
+      0,
+    ),
+    retirementAge: 60,
+    basicPensionMonths: 480,
+    yieldRetired: 0,
+  }).averageAnnualIncome;

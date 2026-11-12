@@ -70,9 +70,6 @@ export const basicPensionFullMonths = 480;
 /** 老齢厚生年金（報酬比例部分）の乗率。 */
 export const welfarePensionCoefficient = 0.005_481;
 
-/** 老齢厚生年金の計算に入れる年収の上限（円）。標準報酬月額の上限に近い値。 */
-export const welfarePensionAnnualIncomeCap = 7_800_000;
-
 /** 老齢厚生年金の加入年数を数え始める年齢。 */
 export const welfarePensionCountFromAge = 22;
 
