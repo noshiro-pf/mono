@@ -510,10 +510,12 @@ export namespace TsDataForgeInternals {
         ...values: readonly ElementTypeWithSmallInt[]
       ): ElementType => clampOrCastFn(Math.max(...values));
 
+      // Floored before the clamp, as `div` is: a negative exponent gives a
+      // fraction, which `fromNumber` would otherwise round.
       const pow = (
         x: ElementTypeWithSmallInt,
         y: ElementTypeWithSmallInt,
-      ): ElementType => clampOrCastFn(x ** y);
+      ): ElementType => clampOrCastFn(Math.floor(x ** y));
 
       const add = (
         x: ElementTypeWithSmallInt,
