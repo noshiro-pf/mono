@@ -173,6 +173,11 @@ const LONGER_TIMEOUTS: ReadonlyRecord<string, LongerTimeout> = {
     minutes: 20,
     reason: 'a measurement takes 10 to 14 minutes on the runner',
   },
+  'synstate-next-benchmark.yml#measure': {
+    minutes: 120,
+    reason:
+      'it measures every library in every scenario several times, each in a process of its own: half an hour in a cloud container with three processes each, an estimate until a run on the runner is timed; dispatched by hand, it holds no merge',
+  },
   'code-check.yml#coverage-main': {
     minutes: 20,
     reason:

@@ -99,6 +99,12 @@ workflows:
         - 'actions/setup-node@v7.1.0'
         - 'actions/upload-artifact@v7.0.2'
         - 'pnpm/action-setup@v6.1.0'
+    '.github/workflows/synstate-next-benchmark.yml':
+        - 'actions/cache@v5.1.0'
+        - 'actions/checkout@v7.0.1'
+        - 'actions/setup-node@v7.1.0'
+        - 'actions/upload-artifact@v7.0.2'
+        - 'pnpm/action-setup@v6.1.0'
     '.github/workflows/verify-lockfile.yml':
         - 'actions/checkout@v7.0.1'
     '.github/workflows/verify-published-packages.yml':
