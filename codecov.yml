@@ -93,6 +93,8 @@ component_management:
       paths: ['libs/synstate-router/**']
     - component_id: synstate-router-dom
       paths: ['libs/synstate-router-dom/**']
+    - component_id: synstate-router-preact
+      paths: ['libs/synstate-router-preact/**']
     - component_id: synstate-router-react
       paths: ['libs/synstate-router-react/**']
     - component_id: ts-codemod-lib

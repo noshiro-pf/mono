@@ -1186,6 +1186,7 @@ const generateSpace = async (
  */
 const notYetPublished: ReadonlySet<string> = new Set<string>([
   'eslint-plugin-ts-restrictions',
+  'synstate-router-preact',
 ]);
 
 const typesOnlyPackages: ReadonlySet<string> = new Set<string>([
