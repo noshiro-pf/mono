@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { renderToString } from 'react-dom/server';
+import { renderToStaticMarkup } from 'react-dom/server';
 import { source } from 'synstate';
 import {
   createReducer,
@@ -7,6 +7,9 @@ import {
   useObservableValue,
 } from '../src/index.mjs';
 
+// `renderToStaticMarkup` rather than `renderToString`, whose markup gains a
+// `data-reactroot` attribute before React 18: synstate-react-hooks-compat runs
+// these tests on React 16.8 and 17 too. Both read the server snapshot alike.
 describe('server rendering', () => {
   test('useObservableValue renders the current value', () => {
     const count$ = source<number>(3);
@@ -18,7 +21,7 @@ describe('server rendering', () => {
     };
 
     assert.strictEqual(
-      renderToString(React.createElement(Count)),
+      renderToStaticMarkup(React.createElement(Count)),
       '<span>3</span>',
     );
   });
@@ -33,7 +36,7 @@ describe('server rendering', () => {
     };
 
     assert.strictEqual(
-      renderToString(React.createElement(Count)),
+      renderToStaticMarkup(React.createElement(Count)),
       '<span>-1</span>',
     );
   });
@@ -48,7 +51,7 @@ describe('server rendering', () => {
     };
 
     assert.strictEqual(
-      renderToString(React.createElement(Status)),
+      renderToStaticMarkup(React.createElement(Status)),
       '<span>ready</span>',
     );
   });
@@ -66,7 +69,7 @@ describe('server rendering', () => {
     };
 
     assert.strictEqual(
-      renderToString(React.createElement(Count)),
+      renderToStaticMarkup(React.createElement(Count)),
       '<span>10</span>',
     );
   });

@@ -25,6 +25,42 @@ type ProjectOverrides = DeepReadonly<{
   globalSetup?: string[];
 }>;
 
+type BrowserOptions = ProjectOverrides &
+  DeepReadonly<{
+    /**
+     * The browser provider, e.g. `playwright()`. Passed in rather than chosen
+     * here so that a package testing in a browser declares the driver it needs,
+     * instead of inheriting it from this directory.
+     */
+    provider: BrowserProvider;
+    /**
+     * Every third-party module the browser tests reach, named up front.
+     *
+     * Vite optimizes these and nothing else (`noDiscovery`, below). With
+     * discovery on, a module its scan missed — one imported by a workspace
+     * sibling rather than by a test file, or by a test file the scan had not
+     * reached — was optimized on first import instead, which reloaded the page
+     * mid-run and dropped the tests still loading. Now an ES module left out is
+     * served as it is, and a CommonJS one fails to load ("does not provide an
+     * export named …"), failing the run; add it here.
+     * `vitest > expect-type` is one: Vitest imports it.
+     *
+     * A module the package does not itself depend on has to be named through
+     * the sibling that does — `'ts-fortress > @sindresorhus/is'` — because a
+     * bare name is resolved from the package root, where pnpm has not put it.
+     *
+     * Measured on `synstate`, deleting its `node_modules/.vite` before each
+     * run: 6 of 6 runs pass with the list, 4 of 4 fail without it.
+     * Warm, it passes either way — which is why this failed only in CI.
+     */
+    optimizeDepsInclude?: string[];
+    /**
+     * Defaults to `false` — see the comment on the emitted option. Pass `true`
+     * to opt out and run the browser tests in parallel.
+     */
+    fileParallelism?: boolean;
+  }>;
+
 /**
  * Builds the Vitest config for a package whose configs live under
  * `<package-root>/configs`.
@@ -58,43 +94,7 @@ export const defineViteConfig = ({
   };
   node?: ProjectOverrides;
   /** Pass `false` for a package with no browser tests. */
-  browser?:
-    | false
-    | (ProjectOverrides & {
-        /**
-         * The browser provider, e.g. `playwright()`. Passed in rather than
-         * chosen here so that a package testing in a browser declares the
-         * driver it needs, instead of inheriting it from this directory.
-         */
-        provider: BrowserProvider;
-        /**
-         * Every third-party module the browser tests reach, named up front.
-         *
-         * Vite optimizes these and nothing else (`noDiscovery`, below). With
-         * discovery on, a module its scan missed — one imported by a workspace
-         * sibling rather than by a test file, or by a test file the scan had
-         * not reached — was optimized on first import instead, which reloaded
-         * the page mid-run and dropped the tests still loading. Now an ES
-         * module left out is served as it is, and a CommonJS one fails to load
-         * ("does not provide an export named …"), failing the run; add it here.
-         * `vitest > expect-type` is one: Vitest imports it.
-         *
-         * A module the package does not itself depend on has to be named
-         * through the sibling that does — `'ts-fortress > @sindresorhus/is'` —
-         * because a bare name is resolved from the package root, where pnpm has
-         * not put it.
-         *
-         * Measured on `synstate`, deleting its `node_modules/.vite` before each
-         * run: 6 of 6 runs pass with the list, 4 of 4 fail without it.
-         * Warm, it passes either way — which is why this failed only in CI.
-         */
-        optimizeDepsInclude?: string[];
-        /**
-         * Defaults to `false` — see the comment on the emitted option. Pass
-         * `true` to opt out and run the browser tests in parallel.
-         */
-        fileParallelism?: boolean;
-      });
+  browser?: false | BrowserOptions;
 }>) => {
   if (passWithNoTests === true && hasTestFiles(packageRoot)) {
     throw new Error(
@@ -137,36 +137,7 @@ export const defineViteConfig = ({
   const browserProject =
     browser === false || browser === undefined
       ? undefined
-      : ({
-          test: {
-            name: 'Browser',
-            alias: castMutable(alias),
-            ...projectConfig(packageRoot, browser),
-            // Browser mode fetches each test file over the Vite dev server, and
-            // requesting them one at a time narrows the window in which a
-            // mid-run reload can catch a file in flight. `optimizeDepsInclude`
-            // is what removes the reload itself; see the comment there.
-            fileParallelism: browser.fileParallelism ?? false,
-            // https://vitest.dev/config/browser/playwright
-            browser: {
-              enabled: true,
-              headless: true,
-              screenshotFailures: false,
-              provider: castMutable(browser.provider),
-              instances: [{ browser: 'chromium' }],
-            },
-          },
-          optimizeDeps: {
-            include: castMutable(browser.optimizeDepsInclude),
-            // No discovery: Vite optimizes `include` and nothing else, so a
-            // module missing from it is never optimized on first import, which
-            // reloaded the page and dropped the tests still loading — with a
-            // cold cache, as in CI, blueprint-synstate ran 40 of its 346 tests
-            // and passed (#3421). An ES module missing from it is served as it
-            // is; a CommonJS one fails to load, and fails the run.
-            noDiscovery: true,
-          },
-        } as const satisfies TestProjectConfiguration);
+      : defineBrowserProject({ packageRoot, alias, browser });
 
   const projects: readonly TestProjectConfiguration[] =
     browserProject === undefined
@@ -196,6 +167,66 @@ export const defineViteConfig = ({
     },
   } as const satisfies ViteUserConfig;
 };
+
+/**
+ * The browser project of {@link defineViteConfig}, named `name`. A package
+ * calls it itself only for a browser project besides that one, such as
+ * `synstate-react-hooks-compat`'s on older React versions; its `name` starts
+ * with `Browser` so that `--project='Browser*'`, its `check:test:browser`, runs
+ * them all.
+ */
+export const defineBrowserProject = ({
+  packageRoot,
+  name = 'Browser',
+  alias,
+  browser,
+}: DeepReadonly<{
+  /** The package's root directory. */
+  packageRoot: string;
+  name?: `Browser${string}`;
+  alias?: InlineConfig['alias'];
+  browser: BrowserOptions;
+}>) =>
+  ({
+    test: {
+      name,
+      alias: castMutable(alias),
+      ...projectConfig(packageRoot, browser),
+      // Browser mode fetches each test file over the Vite dev server, and
+      // requesting them one at a time narrows the window in which a
+      // mid-run reload can catch a file in flight. `optimizeDepsInclude`
+      // is what removes the reload itself; see the comment there.
+      fileParallelism: browser.fileParallelism ?? false,
+      // https://vitest.dev/config/browser/playwright
+      browser: {
+        enabled: true,
+        headless: true,
+        screenshotFailures: false,
+        provider: castMutable(browser.provider),
+        instances: [{ browser: 'chromium' }],
+      },
+    },
+    optimizeDeps: {
+      include: castMutable(browser.optimizeDepsInclude),
+      // No discovery: Vite optimizes `include` and nothing else, so a module
+      // missing from it is never optimized on first import, which reloaded the
+      // page and dropped the tests still loading — with a cold cache, as in CI,
+      // blueprint-synstate ran 40 of its 346 tests and passed (#3421). An ES
+      // module missing from it is served as it is; a CommonJS one fails to
+      // load, and fails the run.
+      noDiscovery: true,
+    },
+  }) as const satisfies TestProjectConfiguration;
+
+/**
+ * A project's `exclude` when the package passes none; one that passes its own
+ * and means to keep these spreads them into it.
+ */
+export const defaultExclude = Object.freeze([
+  '**/*.d.mts',
+  '**/index.mts',
+  'src/entry-point.mts',
+] as const);
 
 /**
  * Whether the package has a test: a `*.test.*` file under `src/` or `test/`, or
@@ -268,11 +299,10 @@ const projectConfig = (packageRoot: string, overrides?: ProjectOverrides) =>
       'test/**/*.test.mts',
       'samples/**/*.mts',
     ],
-    exclude: castMutable(overrides?.exclude) ?? [
-      '**/*.d.mts',
-      '**/index.mts',
-      'src/entry-point.mts',
-    ],
+    // A copy, so that Vitest, which adds the command line's `--exclude` to the
+    // array it is given, cannot change `defaultExclude` for the projects after
+    // it.
+    exclude: Array.from(overrides?.exclude ?? defaultExclude),
     testTimeout: overrides?.testTimeout,
     setupFiles: castMutable(overrides?.setupFiles),
     globalSetup: castMutable(overrides?.globalSetup),
