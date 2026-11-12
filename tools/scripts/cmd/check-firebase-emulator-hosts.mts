@@ -83,7 +83,8 @@ export const checkFirebaseEmulatorHosts = async (): Promise<
  * Those under `docs/` (the slide decks' Hosting redirects) are left out with
  * those under `experimental/`: `code-check.yml`, where `check:root:*` runs,
  * skips a diff that touches only `docs/`, so the pull request that broke one
- * would pass and the next unrelated one would fail.
+ * would pass and the next unrelated one would fail. The decks' redirects are
+ * `check:prose:firebase-redirects`'s, which runs on every diff.
  */
 export const isFirebaseConfig = (relativePath: string): boolean =>
   path.posix.basename(relativePath) === 'firebase.json' &&
