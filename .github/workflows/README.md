@@ -489,10 +489,20 @@ up to date with it (an earlier run made while the branch was behind has a
 skipped aggregate and is not a verdict), and on a `push` to the default branch.
 The candidates are runs of every event, since a pull request's verdict is what a
 push to `main` reuses, and a dispatched queue layer's is what the pull request
-rebased onto `main` reuses: the calling workflow's latest 100 completed runs, a
-few days here, matched on the runs API's `head_commit.tree_id`. A matching run
-further back is not found and the checks simply run, as they do the first time a
-tree is seen.
+rebased onto `main` reuses: the calling workflow's latest 100 successful runs
+and its latest 100 failed runs, matched on the runs API's `head_commit.tree_id`.
+The latest 100 runs of any conclusion would be mostly the `skipped` ones each
+push under `skip-ci` leaves, and reach back under an hour; 100 successes reach
+back hours, and 100 failures usually further. The two pages reach back to
+different times, so when a conclusion has more runs than its page holds, a run
+of the other conclusion last updated before the smallest `updated_at` on that
+page is left out and its tree checked again: a later run of the first conclusion
+on that tree could be past the page, and a verdict reused over a later opposite
+one is a wrong verdict, where checking again costs only runner time. A run past
+the page that finished after that cutoff (a long run, or one re-run long after
+it was created) still goes unseen, so the verdict before it can still be reused;
+"Re-run all jobs" re-examines it. A matching run further back is not found and
+the checks simply run, as they do the first time a tree is seen.
 
 A check inside a workflow that runs and reads only the diff —
 `fix:codemod:affected`, and the `check:prose` guards that read a change
@@ -557,15 +567,16 @@ the next pull request in the queue was starting its checks. So the pull
 request's run keeps them as artifacts (`coverage-<index>`,
 `synstate-benchmark-<run id>`), and the push takes them instead.
 
-The lookup is `.github/actions/find-run-of-tree`: the newest completed run of
-the same workflow on the checked-out commit's tree, from this repository's own
-branches, whose gate recorded its verdict as one about the tree, and that still
-holds a matching artifact. By the tree, as a verdict is, and not by
-`reused_from`, because the run whose verdict was reused may itself have reused
-one and then holds nothing. A fork's run is never taken: its artifacts come from
-workflow files the fork wrote. `coverage-main` takes only a successful run,
-since a failed one kept no reports; `benchmark` takes a failed one too, because
-what fails there is the committed tables, not the measurement.
+The lookup is `.github/actions/find-run-of-tree`: the newest run, among the
+latest 100 of each conclusion it takes, of the same workflow on the checked-out
+commit's tree, from this repository's own branches, whose gate recorded its
+verdict as one about the tree, and that still holds a matching artifact. By the
+tree, as a verdict is, and not by `reused_from`, because the run whose verdict
+was reused may itself have reused one and then holds nothing. A fork's run is
+never taken: its artifacts come from workflow files the fork wrote.
+`coverage-main` takes only a successful run, since a failed one kept no reports;
+`benchmark` takes a failed one too, because what fails there is the committed
+tables, not the measurement.
 
 Where no run of the tree holds the artifact — it expired, or the merge bypassed
 the checks — the job produces it as it used to, so the lookup can only save
