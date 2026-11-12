@@ -1,6 +1,7 @@
 import * as path from 'node:path';
 import { Arr, isRecord, isString, Result } from 'ts-data-forge';
 import { getWorkspacePackages } from 'ts-repo-utils';
+import { readsForgottenExports } from '../../lib/forgotten-exports-scope.mjs';
 import { projectRootPath } from '../../project-root-path.mjs';
 import { readGateList } from '../workflow-steps.mjs';
 import { readManifestDependencies, type PackageInfo } from './plan.mjs';
@@ -9,13 +10,26 @@ import { readManifestDependencies, type PackageInfo } from './plan.mjs';
 export const readPackages = async (): Promise<readonly PackageInfo[]> => {
   const workspace = await getWorkspacePackages(projectRootPath);
 
-  return workspace.map((pkg) => ({
-    name: pkg.name,
-    dir: path.relative(projectRootPath, pkg.path).split(path.sep).join('/'),
-    scripts: new Set(scriptsOf(pkg.packageJson).keys()),
-    isPrivate: isRecord(pkg.packageJson) && pkg.packageJson['private'] === true,
-    ...readManifestDependencies(pkg.packageJson),
-  }));
+  return workspace.map((pkg) => {
+    const dir = path
+      .relative(projectRootPath, pkg.path)
+      .split(path.sep)
+      .join('/');
+
+    return {
+      name: pkg.name,
+      dir,
+      scripts: new Set(scriptsOf(pkg.packageJson).keys()),
+      isPrivate:
+        isRecord(pkg.packageJson) && pkg.packageJson['private'] === true,
+      ...readManifestDependencies(pkg.packageJson),
+      forgottenExportsRead: readsForgottenExports({
+        name: pkg.name,
+        dir,
+        manifest: pkg.packageJson,
+      }),
+    };
+  });
 };
 
 /** A manifest's string-valued `scripts`, by name. */

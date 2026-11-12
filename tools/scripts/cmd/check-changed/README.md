@@ -44,8 +44,11 @@ by case. In order:
    read what its package declares: the synstate docs measure synstate's bundle
    and embed its JSDoc, the hooks packages re-export what it exports. Such a
    package is built first (`build`) when an import of it resolves to `dist/`, so
-   that they read it rebuilt; a dependent the diff touches runs its generator
-   again after the build.
+   that they read it rebuilt, and so is each changed package it is built against
+   (named by a `workspace:` range in its `dependencies` or `peerDependencies`,
+   directly or through an unchanged member), even when that package's imports
+   resolve to its sources; a dependent the diff touches runs its generator again
+   after the build.
 3. **Fixers**: the codemod as CI runs it, `fix:codemod:affected` with
    `CODEMOD_DIFF_BASE` set to the base, for any change the code gate lets
    through: over the diff and the untracked files, or over everything when what
@@ -57,8 +60,13 @@ by case. In order:
    nobody changed. `fix:codemod:affected` formats too, but not when the codemod
    fails.
 4. **Checks**: per package `check:types`, `check:test` (with coverage turned on
-   where the package has a `check:test:cov`) and `check:sumi`, and `check:ext`
-   in every touched package, a document change included; the `check:root:*`
+   where the package has a `check:test:cov`) and `check:sumi`;
+   `check:forgotten-exports` over each changed package it reads
+   (`tools/scripts/lib/forgotten-exports-scope.mts`) and those alone, after
+   building them and the changed packages they are built against, in build order
+   and after the fixers, which can rewrite a declaration (CI reads every package
+   after `ws:build`); `check:ext` in every touched package, a document change
+   included; the `check:root:*`
    guards in parallel for any change the code gate lets through, as CI runs
    them, and the root program's `check:root:types`, `lint` and `test` only for
    what the root `tsconfig.json` reads (`tools/`, the root configuration, any
@@ -146,6 +154,7 @@ strict-lib generators, which rewrite thousands of files, are
 (`ws:check:types:strict-lib`, each TypeScript minor over its generated lib).
 Browser tests, end-to-end tests, the Firestore rules tests (`check:test:rules`,
 which need Java; a diff touching a package's `firestore.rules`, `test/` or rules
-config prints a note naming the command, `rules-tests.mts`), `ws:check:dist` and
-`check:forgotten-exports` are not run, nor is `check:cspell` over the whole
-tree, so a `words` entry that the diff made dead is not found.
+config prints a note naming the command, `rules-tests.mts`) and `ws:check:dist`
+are not run, nor is `check:forgotten-exports` over a package whose code the diff
+does not change, nor `check:cspell` over the whole tree, so a `words` entry that
+the diff made dead is not found.

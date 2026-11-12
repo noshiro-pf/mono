@@ -4,15 +4,17 @@ import {
   Arr,
   isNotUndefined,
   isRecord,
-  isString,
   memoizeFunction,
-  Obj,
   Result,
   unknownToString,
 } from 'ts-data-forge';
 import { getWorkspacePackages, isDirectlyExecuted } from 'ts-repo-utils';
 import type { DeepReadonly, NonEmptyTuple } from 'ts-type-forge';
 import * as ts from 'typescript';
+import {
+  FORGOTTEN_EXPORTS_PRIVATE_READ,
+  forgottenExportsEntryPoints,
+} from '../lib/forgotten-exports-scope.mjs';
 import { projectRootPath } from '../project-root-path.mjs';
 
 /**
@@ -59,26 +61,45 @@ import { projectRootPath } from '../project-root-path.mjs';
  *
  * The packages read are every published one under `libs/` whose `exports` name
  * a `types` file (a command-line tool's name none), and the private ones of
- * `PRIVATE_PACKAGES_READ`, built: it needs the `dist/` of each, so CI runs it
- * after `ws:build`, beside `ws:check:dist`, not in `check:root`, whose
- * `ws:build:deps` leaves out a package no other one links.
+ * `FORGOTTEN_EXPORTS_PRIVATE_READ`, as `forgottenExportsEntryPoints` in
+ * `../lib/forgotten-exports-scope.mts` says, built: it needs the `dist/` of
+ * each, so CI runs it after `ws:build`, beside `ws:check:dist`, not in
+ * `check:root`, whose `ws:build:deps` leaves out a package no other one links.
+ *
+ * Given directories (repository-relative, as `check-changed` passes those of
+ * the packages whose code a diff changed, after building them), it reads those
+ * packages alone, and fails on a directory that is not one it reads, so that a
+ * caller choosing them by another rule finds out rather than checking nothing.
+ *
+ * ```sh
+ * pnpm run check:forgotten-exports                  # every package read
+ * pnpm run check:forgotten-exports libs/synstate    # that one
+ * ```
  */
-export const checkForgottenExports = async (): Promise<
-  Result<number, string>
-> => {
+export const checkForgottenExports = async (
+  directories: readonly string[] = [],
+): Promise<Result<number, string>> => {
   const packages = await getWorkspacePackages(projectRootPath);
 
-  const { enrolled, stale } = packagesRead(
+  const { enrolled: everyPackage, stale } = packagesRead(
     packages,
     projectRootPath,
-    PRIVATE_PACKAGES_READ,
+    FORGOTTEN_EXPORTS_PRIVATE_READ,
   );
 
   if (Arr.isNonEmpty(stale)) {
     return Result.err(
-      `PRIVATE_PACKAGES_READ names ${stale.join(', ')}, which is not a private package with a types file: remove it from the list, or make it a private package with a types file again.`,
+      `FORGOTTEN_EXPORTS_PRIVATE_READ names ${stale.join(', ')}, which is not a private package with a types file: remove it from the list, or make it a private package with a types file again.`,
     );
   }
+
+  const selected = selectPackages(everyPackage, directories, projectRootPath);
+
+  if (Result.isErr(selected)) {
+    return selected;
+  }
+
+  const enrolled = selected.value;
 
   // One host for every package: each program then parses the standard library
   // and a sibling's declarations once, not once per package.
@@ -133,21 +154,43 @@ export const checkForgottenExports = async (): Promise<
 };
 
 /**
- * Every `types` file an `exports` value names, in order, without duplicates: a
- * string ending in `.d.mts`, `.d.cts` or `.d.ts`, and the value of every
- * `types` condition, but under an `internal` subpath (`./internal`,
- * `./dom/internal`). A path with a `*` is a pattern, not a file, and is left
- * out.
+ * The packages of `enrolled` in `directories` (relative to `rootDir`), or all
+ * of them when none is given; an error naming each directory that holds none of
+ * them.
  */
-export const typesEntryPoints = (exportsField: unknown): readonly string[] =>
-  Arr.uniq(
-    typesPathsIn(
-      isRecord(exportsField)
-        ? Obj.filter(exportsField, (_value, key) => !isInternalSubpath(key))
-        : exportsField,
-      false,
-    ),
-  ).filter((file) => !file.includes('*'));
+export const selectPackages = <P extends Readonly<{ path: string }>>(
+  enrolled: readonly P[],
+  directories: readonly string[],
+  rootDir: string,
+): Result<readonly P[], string> => {
+  if (Arr.isEmpty(directories)) {
+    return Result.ok(enrolled);
+  }
+
+  // Both sides through `path.resolve`: a workspace path read with `/`
+  // separators on Windows would not match one it resolved otherwise.
+  const enrolledPaths = new Set<string>(
+    enrolled.map((pkg) => path.resolve(pkg.path)),
+  );
+
+  const wanted = new Set<string>(
+    directories.map((directory) => path.resolve(rootDir, directory)),
+  );
+
+  const unread = directories.filter(
+    (directory) => !enrolledPaths.has(path.resolve(rootDir, directory)),
+  );
+
+  if (Arr.isNonEmpty(unread)) {
+    return Result.err(
+      `${unread.join(', ')}: not a package check:forgotten-exports reads (forgottenExportsEntryPoints in tools/scripts/lib/forgotten-exports-scope.mts says which).`,
+    );
+  }
+
+  return Result.ok(
+    enrolled.filter((pkg) => wanted.has(path.resolve(pkg.path))),
+  );
+};
 
 /**
  * The packages read, each with its entry points, absolute: a published one
@@ -177,20 +220,24 @@ export const packagesRead = (
         ? pkg.packageJson
         : ({} as const);
 
-      const entryPoints = typesEntryPoints(manifest['exports']).map((entry) =>
-        path.resolve(pkg.path, entry),
+      const entryPoints = forgottenExportsEntryPoints(
+        {
+          name: pkg.name,
+          dir: path.relative(rootDir, pkg.path).split(path.sep).join('/'),
+          manifest,
+        },
+        privateRead,
       );
 
-      const isPrivate = manifest['private'] === true;
-
-      const read =
-        Arr.isNonEmpty(entryPoints) &&
-        (isPrivate
-          ? privateRead.has(pkg.name)
-          : path.relative(rootDir, pkg.path).startsWith(`libs${path.sep}`));
-
-      if (read) {
-        yield { name: pkg.name, path: pkg.path, entryPoints, isPrivate };
+      if (Arr.isNonEmpty(entryPoints)) {
+        yield {
+          name: pkg.name,
+          path: pkg.path,
+          entryPoints: entryPoints.map((entry) =>
+            path.resolve(pkg.path, entry),
+          ),
+          isPrivate: manifest['private'] === true,
+        };
       }
     }
   });
@@ -496,12 +543,6 @@ export const findForgottenExports = (
   return mut_findings;
 };
 
-/** The private packages read, as if published: they replace published ones. */
-const PRIVATE_PACKAGES_READ: ReadonlySet<string> = new Set<string>([
-  'synstate-dom-next',
-  'synstate-next',
-]);
-
 export type Finding = Readonly<{
   /** The declaration file the exported declaration is in. */
   file: string;
@@ -529,8 +570,6 @@ export type Finding = Readonly<{
   bareInternalTag: boolean;
 }>;
 
-const DECLARATION_FILE = /\.d\.[cm]?ts$/u;
-
 const COMPILER_OPTIONS: ts.CompilerOptions = {
   noEmit: true,
   module: ts.ModuleKind.NodeNext,
@@ -543,10 +582,6 @@ const COMPILER_OPTIONS: ts.CompilerOptions = {
 
 const NAMESPACE_LIKE = ts.SymbolFlags.Module | ts.SymbolFlags.Enum;
 
-/** Whether an `exports` key is a subpath with an `internal` segment. */
-const isInternalSubpath = (key: string): boolean =>
-  key.startsWith('./') && key.split('/').includes('internal');
-
 /**
  * Whether `child` of `parent` only computes a type: the `A extends B` of a
  * conditional type, the `as` clause of a mapped type, or a `typeof` query.
@@ -557,24 +592,6 @@ const onlyComputes = (parent: ts.Node, child: ts.Node): boolean =>
   (ts.isConditionalTypeNode(parent) &&
     (child === parent.checkType || child === parent.extendsType)) ||
   (ts.isMappedTypeNode(parent) && child === parent.nameType);
-
-const typesPathsIn = (value: unknown, isTypes: boolean): readonly string[] => {
-  if (isString(value)) {
-    return isTypes || DECLARATION_FILE.test(value) ? [value] : [];
-  }
-
-  if (Arr.isArray(value)) {
-    return value.flatMap((item: unknown) => typesPathsIn(item, isTypes));
-  }
-
-  if (isRecord(value)) {
-    return Object.entries(value).flatMap(([key, item]) =>
-      typesPathsIn(item, key === 'types'),
-    );
-  }
-
-  return [];
-};
 
 const lastNameOf = (name: ts.Node): ts.Node =>
   ts.isQualifiedName(name)
@@ -869,9 +886,10 @@ const asyncFilter = async <A,>(
 };
 
 if (isDirectlyExecuted(import.meta.url)) {
-  const result = await checkForgottenExports().catch((error: unknown) =>
-    Result.err(unknownToString(error)),
-  );
+  // `pnpm run check:forgotten-exports -- <dir>` passes the `--` on.
+  const result = await checkForgottenExports(
+    Arr.skip(process.argv, 2).filter((argument) => argument !== '--'),
+  ).catch((error: unknown) => Result.err(unknownToString(error)));
 
   if (Result.isErr(result)) {
     console.error(result.value);

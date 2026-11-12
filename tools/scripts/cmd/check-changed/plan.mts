@@ -160,6 +160,7 @@ export const classifyChanges = ({
         ),
       )
       .toSorted((a, b) => a.dir.localeCompare(b.dir)),
+    members: packages,
     areas: mut_areas,
     ignored: mut_ignored,
   };
@@ -173,7 +174,8 @@ export const classifyChanges = ({
  * - **Generators next**, one package at a time; `main.mts` fails the run when
  *   one changes the tree, naming the generator and the files. After those of
  *   the touched packages, those of every member that declares one whose code
- *   changed, which is built first when they read its `dist/`.
+ *   changed, which is built first when they read its `dist/`, with the
+ *   changed packages it is built against.
  * - **Then the fixers**: the codemod, the formatter over what it reprinted,
  *   and `fix:lint` over the result; then the checks, and the formatter once
  *   more for what the fixers wrote (`fix:fmt:full` instead when Prettier's own
@@ -203,12 +205,34 @@ export const buildPlan = ({
   /** The changed files that still exist and are not ignored, for cspell. */
   spellChecked: readonly string[];
 }>): readonly Step[] => {
-  const { packages, dependents, areas } = classification;
+  const { packages, dependents, areas, members } = classification;
 
   const code = packages.filter(({ code: isCode }) => isCode);
 
   const dependentGenerators = dependents.filter(({ scripts }) =>
     scripts.has('gen'),
+  );
+
+  const changed = code.map(({ pkg }) => pkg);
+
+  const builtForGenerators = changedBuildsFor(
+    changed.filter((pkg) =>
+      dependentGenerators.some(({ workspaceDependencies }) =>
+        workspaceDependencies.has(pkg.name),
+      ),
+    ),
+    changed,
+    members,
+  );
+
+  const forgottenExportsRead = changed.filter(
+    ({ forgottenExportsRead: read }) => read,
+  );
+
+  const builtForForgottenExports = changedBuildsFor(
+    forgottenExportsRead,
+    changed,
+    members,
   );
 
   return [
@@ -218,19 +242,10 @@ export const buildPlan = ({
 
     // A generator can read a package it declares: the docs measure its bundle
     // and embed its JSDoc, the hooks packages re-export what it exports. Those
-    // that read its build output read it rebuilt, and a dependent the diff
-    // touches runs its generator again for that reason.
-    ...inBuildOrder(
-      code
-        .map(({ pkg }) => pkg)
-        .filter(
-          (pkg) =>
-            pkg.exportsBuild &&
-            dependentGenerators.some(({ workspaceDependencies }) =>
-              workspaceDependencies.has(pkg.name),
-            ),
-        ),
-    ).flatMap((pkg) => packageStep(pkg, 'build', 'build')),
+    // that read its build output read it rebuilt, with the changed packages it
+    // is built against, and a dependent the diff touches runs its generator
+    // again for that reason.
+    ...builtForGenerators.flatMap((pkg) => packageStep(pkg, 'build', 'build')),
 
     ...dependentGenerators.map(
       (pkg) =>
@@ -304,6 +319,42 @@ export const buildPlan = ({
       ),
       ...packageStep(pkg, 'check', 'check:sumi'),
     ]),
+
+    // `check:forgotten-exports` reads the built declarations, so each changed
+    // package it reads is built here, with the changed packages it is built
+    // against, in build order. That is after the fixers, which can rewrite a
+    // declaration (a build for the generators above ran before them). Then the
+    // check reads the read packages alone. CI runs it over every package after
+    // `ws:build`, so a public type left unexported was otherwise first found on
+    // the queue layer. It runs for any code change of the package, a test's
+    // included, and the build type-checks `src/` again after `check:types`:
+    // that is what reading `dist/` costs, and telling a declaration's change
+    // from the rest would be a second build system. A failed build is reported
+    // as a failure of its own, ahead of whatever the check then reads.
+    ...(Arr.isNonEmpty(forgottenExportsRead)
+      ? Arr.toPushed(
+          builtForForgottenExports.flatMap((pkg) =>
+            packageStep(pkg, 'build', 'build'),
+          ),
+          {
+            title: `check:forgotten-exports (${forgottenExportsRead
+              .map(({ name }) => name)
+              .join(', ')})`,
+            kind: 'check',
+            cwd: '.',
+            // The script asserts every member's links built
+            // (`assert-deps-built.mts --workspace`): that is the
+            // `ws:build:deps` the README says check-changed needs before it
+            // starts, and what every package's own checks here assume.
+            args: [
+              'run',
+              'check:forgotten-exports',
+              ...forgottenExportsRead.map(({ dir }) => dir),
+            ],
+            narrows: 'check:forgotten-exports',
+          } as const,
+        )
+      : []),
 
     // Every file in a package counts, a document included: CI runs it in
     // `style-check.yml`, whose gate drops nothing but `experimental/`.
@@ -423,6 +474,13 @@ export type PackageInfo = Readonly<{
   buildDependencies: ReadonlySet<string>;
   /** Whether an import of it resolves to its build output (`dist/`). */
   exportsBuild: boolean;
+  /**
+   * Whether `check:forgotten-exports` reads it (`readsForgottenExports` in
+   * `tools/scripts/lib/forgotten-exports-scope.mts`). Read from the manifest
+   * when the members are, as `exportsBuild` is, so that the plan stays a
+   * function of facts and never parses a manifest itself.
+   */
+  forgottenExportsRead: boolean;
 }>;
 
 /**
@@ -552,6 +610,12 @@ export type Classification = Readonly<{
    * or not.
    */
   dependents: readonly PackageInfo[];
+  /**
+   * Every workspace member, which `classifyChanges` is given: the build order
+   * passes through members the diff does not change. Carried here, with what
+   * the diff touches, so that a plan is a function of one classification.
+   */
+  members: readonly PackageInfo[];
   areas: ReadonlySet<Area>;
   ignored: readonly string[];
 }>;
@@ -672,11 +736,24 @@ const packageStep = (
     : ([] as const);
 
 /**
- * The packages in an order `ws:build` could build them in: each after those of
- * them it names in `dependencies` or `peerDependencies`, ties in the order
- * given.
+ * What has to be built, in an order `ws:build` could build it in, for `targets`
+ * to be read against the diff: each package of `changed` that exports its build
+ * and that is one of `targets` or that they reach through `buildDependencies`
+ * in `members`, through a member the diff does not change too. Each comes after
+ * what it reaches. A target that exports its sources is not built, but what it
+ * reaches is.
  */
-const inBuildOrder = (pkgs: readonly PackageInfo[]): readonly PackageInfo[] => {
+const changedBuildsFor = (
+  targets: readonly PackageInfo[],
+  changed: readonly PackageInfo[],
+  members: readonly PackageInfo[],
+): readonly PackageInfo[] => {
+  const byName = new Map(members.map((member) => [member.name, member]));
+
+  const wanted = new Set<string>(
+    changed.filter(({ exportsBuild }) => exportsBuild).map(({ name }) => name),
+  );
+
   const mut_ordered: PackageInfo[] = [];
 
   const mut_visited = new Set<string>();
@@ -688,16 +765,20 @@ const inBuildOrder = (pkgs: readonly PackageInfo[]): readonly PackageInfo[] => {
 
     mut_visited.add(pkg.name);
 
-    for (const dependency of pkgs) {
-      if (pkg.buildDependencies.has(dependency.name)) {
+    for (const name of pkg.buildDependencies) {
+      const dependency = byName.get(name);
+
+      if (dependency !== undefined) {
         visit(dependency);
       }
     }
 
-    mut_ordered.push(pkg);
+    if (wanted.has(pkg.name)) {
+      mut_ordered.push(pkg);
+    }
   };
 
-  for (const pkg of pkgs) {
+  for (const pkg of targets) {
     visit(pkg);
   }
 

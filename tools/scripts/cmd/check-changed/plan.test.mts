@@ -16,20 +16,25 @@ const pkg = (
     workspaceDependencies = [],
     buildDependencies = [],
     exportsBuild = false,
+    isPrivate = false,
+    forgottenExportsRead = false,
   }: Readonly<{
     workspaceDependencies?: readonly string[];
     buildDependencies?: readonly string[];
     exportsBuild?: boolean;
+    isPrivate?: boolean;
+    forgottenExportsRead?: boolean;
   }> = {},
 ): PackageInfo =>
   ({
     name: dir.slice(dir.lastIndexOf('/') + 1),
     dir,
     scripts: new Set(scripts),
-    isPrivate: false,
+    isPrivate,
     workspaceDependencies: new Set(workspaceDependencies),
     buildDependencies: new Set(buildDependencies),
     exportsBuild,
+    forgottenExportsRead,
   }) as const;
 
 const packages = [
@@ -45,6 +50,7 @@ const packages = [
   pkg('strict-lib/v7.0', ['gen:lib', 'check:types']),
   pkg('libs/synstate', ['gen', 'build', 'check:types'], {
     exportsBuild: true,
+    forgottenExportsRead: true,
   }),
   pkg('libs/synstate-react-hooks', ['gen', 'build', 'check:types'], {
     workspaceDependencies: ['synstate'],
@@ -53,7 +59,12 @@ const packages = [
   pkg('apps/synstate-docs', ['gen', 'check:types'], {
     workspaceDependencies: ['synstate', 'synstate-react-hooks'],
   }),
-  pkg('apps/react-utils', ['gen', 'build', 'check:types']),
+  pkg('apps/react-utils', ['gen', 'build', 'check:types'], {
+    workspaceDependencies: ['react-base'],
+    buildDependencies: ['react-base'],
+  }),
+  // Declared by react-utils alone, no generator's own.
+  pkg('libs/react-base', ['build', 'check:types'], { exportsBuild: true }),
   pkg('apps/react-app', ['gen', 'check:types'], {
     workspaceDependencies: ['react-utils'],
   }),
@@ -68,7 +79,64 @@ const packages = [
   pkg('apps/leaf-docs', ['gen'], {
     workspaceDependencies: ['leaf', 'a-leaf-user'],
   }),
-  pkg('libs/lonely', ['build', 'check:types'], { exportsBuild: true }),
+  pkg('libs/lonely', ['build', 'check:types'], {
+    exportsBuild: true,
+    forgottenExportsRead: true,
+  }),
+  pkg('libs/private-lib', ['build', 'check:types'], {
+    exportsBuild: true,
+    isPrivate: true,
+  }),
+  // Private, and read by check:forgotten-exports all the same.
+  pkg('libs/synstate-next', ['build', 'check:types'], {
+    exportsBuild: true,
+    isPrivate: true,
+    forgottenExportsRead: true,
+  }),
+  pkg('apps/app-with-dist', ['build', 'check:types'], { exportsBuild: true }),
+  // A pair with no dependent generator, the user sorting first.
+  pkg('libs/z-base', ['build', 'check:types'], {
+    exportsBuild: true,
+    forgottenExportsRead: true,
+  }),
+  pkg('libs/y-user', ['build', 'check:types'], {
+    workspaceDependencies: ['z-base'],
+    buildDependencies: ['z-base'],
+    exportsBuild: true,
+    forgottenExportsRead: true,
+  }),
+  // Read, and built against private-lib, which is not.
+  pkg('libs/x-on-private', ['build', 'check:types'], {
+    workspaceDependencies: ['private-lib'],
+    buildDependencies: ['private-lib'],
+    exportsBuild: true,
+    forgottenExportsRead: true,
+  }),
+  // Read, and built against a package its imports reach as sources.
+  pkg('libs/v-on-source', ['build', 'check:types'], {
+    workspaceDependencies: ['source-lib'],
+    buildDependencies: ['source-lib'],
+    exportsBuild: true,
+    forgottenExportsRead: true,
+  }),
+  pkg('libs/source-lib', ['build', 'check:types']),
+  // A chain through a member no test changes, the top sorting first.
+  pkg('libs/c-top', ['build', 'check:types'], {
+    workspaceDependencies: ['m-middle'],
+    buildDependencies: ['m-middle'],
+    exportsBuild: true,
+    forgottenExportsRead: true,
+  }),
+  pkg('libs/m-middle', ['build', 'check:types'], {
+    workspaceDependencies: ['d-bottom'],
+    buildDependencies: ['d-bottom'],
+    exportsBuild: true,
+    forgottenExportsRead: true,
+  }),
+  pkg('libs/d-bottom', ['build', 'check:types'], {
+    exportsBuild: true,
+    forgottenExportsRead: true,
+  }),
   pkg('apps/no-gen', ['check:types'], {
     workspaceDependencies: ['synstate', 'lonely'],
   }),
@@ -636,19 +704,29 @@ describe('buildPlan', () => {
     assert.notInclude(commands, 'apps/react-utils: run build');
   });
 
-  test('a package with no dependent generator is not built', () => {
-    assert.notInclude(
-      commandsOf(['libs/lonely/src/index.mts']).join('\n'),
-      'run build',
+  test('a package with no dependent generator is built once, for check:forgotten-exports alone', () => {
+    const commands = commandsOf(['libs/lonely/src/index.mts']);
+
+    const builds = commands.filter((command) => command.endsWith('run build'));
+
+    assert.deepStrictEqual(builds, ['libs/lonely: run build']);
+
+    assert.strictEqual(
+      commands[commands.indexOf('libs/lonely: run build') + 1],
+      'run check:forgotten-exports libs/lonely',
     );
   });
 
-  test('the builds run in dependency order, not directory order', () => {
+  test('the builds for the generators run in dependency order, not directory order', () => {
+    const commands = commandsOf([
+      'libs/a-leaf-user/src/index.mts',
+      'libs/leaf/src/index.mts',
+    ]);
+
     assert.deepStrictEqual(
-      commandsOf([
-        'libs/a-leaf-user/src/index.mts',
-        'libs/leaf/src/index.mts',
-      ]).filter((command) => command.endsWith('run build')),
+      commands
+        .slice(0, commands.indexOf('apps/leaf-docs: run gen'))
+        .filter((command) => command.endsWith('run build')),
       ['libs/leaf: run build', 'libs/a-leaf-user: run build'],
     );
   });
@@ -659,6 +737,181 @@ describe('buildPlan', () => {
     assert.notInclude(commands, 'libs/synstate: run build');
 
     assert.notInclude(commands, 'apps/synstate-docs: run gen');
+  });
+
+  test('a changed package check:forgotten-exports reads is built after its checks, then checked alone', () => {
+    const commands = commandsOf(['libs/lonely/src/index.mts']);
+
+    assert.deepStrictEqual(
+      commands.slice(
+        commands.indexOf('libs/lonely: run check:types'),
+        commands.indexOf('run check:forgotten-exports libs/lonely') + 1,
+      ),
+      [
+        'libs/lonely: run check:types',
+        'libs/lonely: run build',
+        'run check:forgotten-exports libs/lonely',
+      ],
+    );
+  });
+
+  test('a package the generators built is built again after the fixers, which can rewrite it', () => {
+    const commands = commandsOf(['libs/synstate/src/index.mts']);
+
+    assert.deepStrictEqual(
+      commands.filter((command) => command.endsWith('run build')),
+      ['libs/synstate: run build', 'libs/synstate: run build'],
+    );
+
+    const lastBuild = commands.lastIndexOf('libs/synstate: run build');
+
+    assert.isAbove(lastBuild, commands.indexOf('run fix:codemod:affected'));
+
+    assert.strictEqual(
+      commands[lastBuild + 1],
+      'run check:forgotten-exports libs/synstate',
+    );
+  });
+
+  test('check:forgotten-exports builds in dependency order and reads every changed package in one run', () => {
+    const files = [
+      'libs/y-user/src/index.mts',
+      'libs/z-base/src/index.mts',
+    ] as const;
+
+    const commands = commandsOf(files);
+
+    const check = commands.indexOf(
+      'run check:forgotten-exports libs/y-user libs/z-base',
+    );
+
+    assert.deepStrictEqual(commands.slice(check - 2, check), [
+      'libs/z-base: run build',
+      'libs/y-user: run build',
+    ]);
+
+    const steps = plan(files);
+
+    assert.deepStrictEqual(
+      steps.filter(({ narrows }) => narrows === 'check:forgotten-exports')
+        .length,
+      1,
+    );
+  });
+
+  test('a changed package a read one is built against is built first, and not read', () => {
+    const commands = commandsOf([
+      'libs/x-on-private/src/index.mts',
+      'libs/private-lib/src/index.mts',
+    ]);
+
+    const check = commands.indexOf(
+      'run check:forgotten-exports libs/x-on-private',
+    );
+
+    assert.deepStrictEqual(commands.slice(check - 2, check), [
+      'libs/private-lib: run build',
+      'libs/x-on-private: run build',
+    ]);
+  });
+
+  test('the builds follow a dependency through a member the diff does not change, which is not built', () => {
+    const commands = commandsOf([
+      'libs/c-top/src/index.mts',
+      'libs/d-bottom/src/index.mts',
+    ]);
+
+    assert.deepStrictEqual(
+      commands.filter((command) => command.endsWith('run build')),
+      ['libs/d-bottom: run build', 'libs/c-top: run build'],
+    );
+  });
+
+  test('an unchanged dependency of a changed package is not built', () => {
+    assert.deepStrictEqual(
+      commandsOf(['libs/y-user/src/index.mts']).filter((command) =>
+        command.endsWith('run build'),
+      ),
+      ['libs/y-user: run build'],
+    );
+  });
+
+  test('a changed package a read one builds against as sources is not built', () => {
+    assert.deepStrictEqual(
+      commandsOf([
+        'libs/v-on-source/src/index.mts',
+        'libs/source-lib/src/index.mts',
+      ]).filter((command) => command.endsWith('run build')),
+      ['libs/v-on-source: run build'],
+    );
+  });
+
+  test('a changed package no read one is built against is not built', () => {
+    assert.deepStrictEqual(
+      commandsOf([
+        'libs/lonely/src/index.mts',
+        'apps/app-with-dist/src/index.mts',
+        'libs/private-lib/src/index.mts',
+      ]).filter((command) => command.endsWith('run build')),
+      ['libs/lonely: run build'],
+    );
+  });
+
+  test('a generator reading a package that exports its sources gets what that package is built against', () => {
+    const commands = commandsOf([
+      'apps/react-utils/src/index.mts',
+      'libs/react-base/src/index.mts',
+    ]);
+
+    assert.deepStrictEqual(
+      commands
+        .slice(0, commands.indexOf('apps/react-app: run gen'))
+        .filter((command) => command.endsWith('run build')),
+      ['libs/react-base: run build'],
+    );
+  });
+
+  test('the builds for a generator take in the changed packages it is built against', () => {
+    const commands = commandsOf([
+      'libs/leaf/src/index.mts',
+      'libs/a-leaf-user/src/index.mts',
+    ]);
+
+    assert.deepStrictEqual(
+      commands
+        .slice(0, commands.indexOf('apps/leaf-docs: run gen'))
+        .filter((command) => command.endsWith('run build')),
+      ['libs/leaf: run build', 'libs/a-leaf-user: run build'],
+    );
+  });
+
+  test('a private package alone, which the check does not read, is not built', () => {
+    assert.notInclude(
+      commandsOf(['libs/private-lib/src/index.mts']).join('\n'),
+      'run build',
+    );
+  });
+
+  test('check:forgotten-exports reads a private package only when the package info says it does', () => {
+    assert.include(
+      commandsOf(['libs/synstate-next/src/index.mts']),
+      'run check:forgotten-exports libs/synstate-next',
+    );
+
+    assert.notInclude(
+      commandsOf(['libs/private-lib/src/index.mts']).join('\n'),
+      'check:forgotten-exports',
+    );
+  });
+
+  test.each([
+    // A package the package info says the check does not read.
+    'libs/ts-data-forge/src/array.mts',
+    'apps/app-with-dist/src/index.mts',
+    // A document: the declarations do not change.
+    'libs/lonely/README.md',
+  ] as const)('%s runs no check:forgotten-exports', (file) => {
+    assert.notInclude(commandsOf([file]).join('\n'), 'check:forgotten-exports');
   });
 
   test('prose alone does not regenerate them', () => {

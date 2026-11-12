@@ -300,12 +300,6 @@ export const CI_ONLY: readonly CiOnly[] = [
   },
   {
     directory: '.',
-    scriptName: 'check:forgotten-exports',
-    reason:
-      'Reads the `dist/` of every published package, which only `ws:build` writes for every package; run it by hand after building what the diff changes.',
-  },
-  {
-    directory: '.',
     scriptName: 'verify:npm-packages',
     reason:
       'Packs and installs every published package. Its committed `local/` copies, and the removal from both spaces of the project of a package that is gone, are `gen:verify-npm-packages`, which check-changed runs.',
