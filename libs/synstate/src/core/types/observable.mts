@@ -67,7 +67,10 @@ type CreateObservableType<A, Kind extends ObservableKind> = Readonly<{
    * and `onComplete` once the observable completes. A value the first call
    * writes to the observable itself is passed on once more, after that call has
    * returned, unless the call disposed the scope the subscription is made in.
-   * A subscription made while a scope runs ends with the scope.
+   * A subscription made while a scope runs ends with the scope. One made while
+   * the observable is calling its subscribers is not called again by that
+   * delivery: `subscribe` has given it the current value, and the observable
+   * calls it from the next value on.
    */
   subscribe: (onNext: (v: A) => void, onComplete?: () => void) => Subscription;
 
