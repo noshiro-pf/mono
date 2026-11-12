@@ -3,8 +3,8 @@
 `CLAUDE.md` ("Commits and pull requests") says a pull request is reviewed with
 `/code-review` before it is opened and before any later amend is pushed. This
 file is the procedure: what to do before the first round so that it finds
-little, how each round is run, when the loop ends, and when it is put to the
-user.
+little, how each round is run, when the loop ends, and the few points at which
+it is put to the user.
 
 Every round is a full review of whatever it is given. The loop is cheapest
 when the first round finds little and each later round is given little: a
@@ -84,11 +84,13 @@ round dismissed, costs as much as the first.
   deferred aside (the end of this file). A finding a later round raises again
   that the ledger already dismisses is not a new finding: do not investigate it
   again. If its reason belongs at the site and is not there yet (below), write
-  it there, checking only that the reason still describes the code; a reason
-  that no longer does makes the finding a new one.
+  it there, unless the round ends the loop, checking only that the reason still
+  describes the code; a reason that no longer does makes the finding a new one.
   A later round cannot tell whether a fix broke what a dismissal relied on, so
   check that when writing the fix, widen the next round if it did, and correct
-  or remove a comment at the site that no longer holds.
+  or remove a comment at the site that no longer holds. A comment written for a
+  dismissal or a deferral goes in with a round's fixes, so the next round reads
+  it; the round that ends the loop writes none ("When the loop ends").
     - **A reason about the code goes at the site too.** No reviewer reads the
       ledger, so a dismissal written there alone is raised again by any later
       round that reads the code, which spends its reading on it and makes the
@@ -104,6 +106,21 @@ round dismissed, costs as much as the first.
       as `CLAUDE.md` ("What belongs in this file") says of any rule.
       If the comment is awkward to write because the reason does not hold up
       once written down beside the code, fix the finding instead.
+    - **So does a deferred finding, stated as a limit of the code.** A finding
+      deferred to an issue is raised again by every round that reads its code,
+      until a comment there says the limit is known. Write what the code does
+      not handle yet and why that is acceptable until it does, as a plain
+      comment at the site; the issue, filed once the pull request exists, names
+      that comment, so whoever fixes the issue removes it. "Left for a
+      follow-up" is no more a reason than "dismissed in review". The places the
+      next bullet names, which take no comment, keep it in the ledger alone.
+    - **A trivial finding is dismissed, and its reason goes to the site once it
+      comes back.** A preference — a name, an equivalent way to write the same
+      thing, hardening against input the types already rule out — is dismissed
+      with its reason in the ledger rather than fixed: a fix for a preference is
+      itself read by the next round, which may prefer something else. When a
+      later round raises one again, in the same words or new ones, write its
+      reason at the site as above.
     - **The ledger alone keeps a reason about scope, or one with no site to
       carry it.** A finding dismissed as out of scope and not worth fixing at
       all says nothing about the code: a comment would state it of this pull
@@ -139,53 +156,74 @@ round dismissed, costs as much as the first.
     under **Deferred** with no tag; `review-findings-digest` counts deferrals by
     tag, and one written in any other shape as one with none.
 
-- **Ask what would have caught it** ([`checks-over-fixes.md`](./checks-over-fixes.md)) for each finding
-  that could recur, and add the check or say why there is none.
+- **Ask what would have caught it**
+  ([`checks-over-fixes.md`](./checks-over-fixes.md)) for each finding that could
+  recur, and add the check or say why there is none.
 
 ## When the loop ends
 
-No number of rounds ends the loop; what is left for a next round to read does.
-A later round reads only what the round before it changed, unless it is widened,
-and every fix is read by the next round but the wording fixes of the round that
-ends the loop. The loop ends at the first round whose findings, if it has any,
-are each one of:
+The loop ends at the first round that leaves nothing to do: every finding it
+raises, if it raises any, can be left as it is. The session judges that, finding
+by finding, and does not put it to the user. A finding can be left as it is when
+it is:
 
-- wording — phrasing, typos, how a comment is laid out — fixed, and not reviewed
-  again. A claim that is wrong is not wording, wherever it is written:
-  a false sentence in a README is a finding like any other;
-- dismissed, newly or because the ledger already dismisses it, with its reason
-  where "Keep a ledger" puts it: at the site the finding names, in the ledger
-  alone, or in `mono-security`. A comment the round writes to record a dismissal
-  is a fix like any other, read by the next round, so a round that writes one
-  does not end the loop;
+- dismissed, newly or because the ledger already dismisses it — a design chosen
+  on purpose, a known limit, or a trivial preference as "Keep a ledger"
+  describes;
 - deferred as out of scope and worth fixing on its own, as "Fix it here unless
-  it is out of scope" says.
+  it is out of scope" says;
+- wording whose fix is mechanical — a typo, notation, how a comment is laid out.
+  A claim that is wrong is not wording, wherever it is written: a false sentence
+  in a README is a finding like any other.
+
+Any other finding — a defect real input reaches, a false claim, a check that
+does not check what it says — is fixed, and the next round reads the fix,
+however late it is raised. A security finding is handled as the end of this file
+says.
+
+**The round that ends the loop changes nothing but its wording.** Its mechanical
+wording fixes are made and not reviewed again. Its dismissals and deferrals go
+to the ledger alone, even where "Keep a ledger" would put a comment at the site:
+a comment is a change, and a change after the last round is one no round reads.
+Where a reason must reach whoever edits the code next, because without it the
+next edit would undo a deliberate choice, write the comment and run one more
+round, which reads only that comment. A round with anything to fix ends nothing:
+its wording fixes go in with the rest and are read by the next round.
 
 Ending the loop is never a reason to defer a finding. One in scope is fixed here
 and read by the next round, however late it is raised: an issue split off to end
 the loop is a second change reviewed and checked from the start.
 
-**A loop that stops converging is put to the user.** A round that is not widened
+**The loop runs to its end without asking whether to go on.** The user can
+rarely judge that better than the session, which has read every round, so do not
+stop after the fourth round, or any other, to ask. A round that is not widened
 reads only the previous round's fixes, so each should find less than the one
-before. Rounds are numbered within their loop. Below, a fix is any fix but a
-wording one, a comment recording a dismissal included, counted once per finding
-it answers.
-When either of these holds, stop and ask in the thread whether to go on, split
-the change or rework it, unless an earlier answer of the user's already covers
-this round ("go on through round eight"); ask before making the round's fixes,
-and instead of reviewing again or deferring:
+before; when rounds stop shrinking, act on the cause:
 
-- a round from the fourth on asks for more fixes than the round before it did.
-  A widened round is compared with nothing, since it reads the whole diff again;
-  the round after it is compared with it;
-- any round from the sixth on, widened or not, asks for a fix at all.
+- **A finding that comes back** — dismissed or deferred, or a preference raised
+  again in new words — has no comment at its site yet. In a round that has
+  something else to fix, write it, as "Keep a ledger" says, so the next round
+  reads that the code is as intended; a round with nothing else to fix ends the
+  loop instead.
+- **Fixes that break what they touch** were too narrow: widen the next round to
+  the whole diff, and fix the cause rather than each symptom a round names.
+- **A finding about what the change should do** is asked in the thread, as "Fix
+  it here unless it is out of scope" says — the choice of design is the user's.
+  It usually means the design was not settled before the code (see "Before
+  writing code").
 
-Stopping to ask is not ending the loop, and no answer leaves a fix unread. Go
-on, and the round's fixes are made and read by the next round; split, and each
-part is a pull request with its findings and a loop of its own; rework, and a
-new loop reads the whole diff. A loop that stops converging usually means the
-design was not settled before the code (see "Before writing code"), or the fixes
-keep breaking what they touch.
+**A loop stops at its twentieth round.** Rounds are numbered within their loop,
+a widened round included. The limit comes from the record: of the 290 pull
+requests with a `## Review` section among the last 300 merged up to 2026-11-12,
+half took 3 rounds or fewer, 95% took 9 or fewer and all but three took 19 or
+fewer, counting every loop each ran (`pnpm run review-findings-digest -- --last
+300`). Revise it from the same digest when the record moves. When the twentieth
+round still has a finding that cannot be left, do not make its fixes — no round
+would read them — and neither open the pull request nor push the amend: put the
+findings left to the user, each with the fix you would make, and ask whether to
+go on, split the change or rework it. Go on, and the loop keeps its numbering up
+to the limit the user gives; split, and each part is a pull request with a loop
+of its own; rework, and a new loop reads the whole diff.
 
 ## What counts as a round
 
