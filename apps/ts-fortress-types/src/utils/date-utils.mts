@@ -4,7 +4,6 @@ import type {
   DayOfWeekIndex,
   HoursEnum,
   Index,
-  IntWithSmallInt,
   MinutesEnum,
   MonthEnum,
   ReadonlyRecord,
@@ -130,50 +129,6 @@ export namespace DateUtils {
 
     return mut_next;
   };
-
-  /** A copy with the hour replaced. */
-  export const setLocaleHours =
-    (hours: HoursEnum) =>
-    (date: Date): Date => {
-      const mut_next = new Date(date);
-
-      mut_next.setHours(hours);
-
-      return mut_next;
-    };
-
-  /** A copy with the minute replaced. */
-  export const setLocaleMinutes =
-    (minutes: MinutesEnum) =>
-    (date: Date): Date => {
-      const mut_next = new Date(date);
-
-      mut_next.setMinutes(minutes);
-
-      return mut_next;
-    };
-
-  /** A copy with the day of the month replaced by `updater`'s result. */
-  export const updateLocaleDate =
-    (updater: (date: DateEnum) => DateEnum) =>
-    (date: Date): Date => {
-      const mut_next = new Date(date);
-
-      mut_next.setDate(updater(getLocaleDate(date)));
-
-      return mut_next;
-    };
-
-  /**
-   * A copy `months` months later (earlier when negative), carried across years.
-   * The day of the month is clamped to the last day of the target month, so 31
-   * January plus one month is the end of February rather than early March.
-   * `months` is an integer: a count computed at run time goes through `asInt`.
-   */
-  export const addLocaleMonths =
-    (months: IntWithSmallInt) =>
-    (date: Date): Date =>
-      withLocaleYearMonth(date, date.getFullYear(), date.getMonth() + months);
 
   /** Builds a `Date` from local-time parts, taking the month as 1-12. */
   export const create = (

@@ -1,10 +1,12 @@
 import {
+  addDays,
+  addMonths,
   toDateTimeValue,
   wallClockOf,
   type DatePickerShortcut,
+  type WallClock,
 } from 'blueprint-synstate';
-import { DateUtils } from 'ts-fortress-types';
-import { addDays, endOfDay } from '../utils/index.mjs';
+import { endOfDay } from '../utils/index.mjs';
 
 /**
  * The answer-deadline picker's shortcuts, counted from `today` and ending at
@@ -13,23 +15,23 @@ import { addDays, endOfDay } from '../utils/index.mjs';
  */
 export const createAnswerDeadlineShortcuts = (
   today: Date,
-): readonly DatePickerShortcut[] =>
-  shortcuts.map(({ label, shift }) => ({
-    value: toDateTimeValue(wallClockOf(endOfDay(shift(today)))),
+): readonly DatePickerShortcut[] => {
+  const clock = wallClockOf(today);
+
+  return shortcuts.map(({ label, shift }) => ({
+    value: toDateTimeValue(endOfDay(shift(clock))),
     label,
     includeTime: true,
   }));
+};
 
 const shortcuts = [
-  { label: 'Today', shift: addDays(0) },
-  { label: 'Tomorrow', shift: addDays(1) },
-  { label: '1 week later', shift: addDays(7) },
-  { label: '2 week later', shift: addDays(14) },
-  {
-    label: '1 month later',
-    shift: DateUtils.addLocaleMonths(1),
-  },
+  { label: 'Today', shift: (clock) => clock },
+  { label: 'Tomorrow', shift: (clock) => addDays(clock, 1) },
+  { label: '1 week later', shift: (clock) => addDays(clock, 7) },
+  { label: '2 week later', shift: (clock) => addDays(clock, 14) },
+  { label: '1 month later', shift: (clock) => addMonths(clock, 1) },
 ] as const satisfies readonly Readonly<{
   label: string;
-  shift: (date: Date) => Date;
+  shift: (clock: WallClock) => WallClock;
 }>[];

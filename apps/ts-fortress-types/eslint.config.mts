@@ -68,7 +68,7 @@ export default [
         {
           selector: restrictedDateSetterCall('Month', 2),
           message:
-            'Pass the day too, clamped to the target month, or the day rolls into the next month; `DateUtils.setLocaleMonth` and `addLocaleMonths` do.',
+            'Pass the day too, clamped to the target month, or the day rolls into the next month; `DateUtils.setLocaleMonth` does.',
         },
         {
           selector: restrictedDateSetterCall('FullYear', 3),
