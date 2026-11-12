@@ -102,5 +102,6 @@ export type {
   TypeStructure,
   TypeStructureKind,
   UnknownShape,
+  UnknownType,
   WithShape,
 } from './type.mjs';

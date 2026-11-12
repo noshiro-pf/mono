@@ -36,6 +36,11 @@ import type { BoolOr, IsAny, IsUnknown } from 'ts-type-forge';
 export const isArray = <E,>(value: E): value is FilterArray<E> =>
   Array.isArray(value);
 
+/**
+ * @internal What `isArray` narrows a value to: a consumer narrows by calling
+ * `isArray`, and from TypeScript 5.5 a function that returns `isArray(value)`
+ * has the predicate inferred.
+ */
 type FilterArray<T> = T extends T
   ? BoolOr<IsUnknown<T>, IsAny<T>> extends true
     ? Cast<readonly unknown[], T>

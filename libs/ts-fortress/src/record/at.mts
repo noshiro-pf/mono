@@ -190,6 +190,9 @@ export function at(
  * The type {@link at} returns for a key of a shape-carrying record type: the
  * shape's own member type, or — for an optional member — the `T | undefined`
  * the runtime builds, still carrying the member's constraints.
+ *
+ * @internal The `Type` `at` returns, computed from the arguments, which a
+ * consumer gets from the call.
  */
 type ShapeMemberType<S extends UnknownShape, K extends keyof S> =
   S[K] extends Readonly<{ optional: true }>

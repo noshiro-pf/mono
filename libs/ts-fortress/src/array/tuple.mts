@@ -9,6 +9,10 @@ import {
   type ValidationError,
 } from '../utils/index.mjs';
 
+/**
+ * @internal What the `Type` `tuple` returns validates, computed from the
+ * arguments; a consumer reads it with `TypeOf<ReturnType<typeof tuple<…>>>`.
+ */
 type MapTuple<T extends readonly UnknownType[]> = Readonly<{
   [K in keyof T]: TypeOf<T[K]>;
 }>;

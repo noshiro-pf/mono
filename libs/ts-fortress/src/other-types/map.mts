@@ -16,6 +16,10 @@ import {
   type ValidationError,
 } from '../utils/index.mjs';
 
+/**
+ * @internal What the `Type` `MapType` returns validates; a consumer reads it
+ * with `TypeOf<ReturnType<typeof MapType<…>>>`.
+ */
 type MapResultType<K extends UnknownType, V extends UnknownType> = ReadonlyMap<
   TypeOf<K>,
   TypeOf<V>

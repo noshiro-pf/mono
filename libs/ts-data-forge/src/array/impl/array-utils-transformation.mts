@@ -918,7 +918,12 @@ const scanImpl = <E, S>(
   return mut_result;
 };
 
-/** The result of sorting `Ar`: same elements, same length, same bounds. */
+/**
+ * The result of sorting `Ar`: same elements, same length, same bounds.
+ *
+ * @internal The type `toSorted` returns, computed from its arguments, which a
+ * consumer gets from the call.
+ */
 type SortedResult<Ar extends readonly unknown[]> =
   HasLengthConstraint<Ar> extends true
     ? ChangeArrayElement<Ar, Ar[number]>
@@ -951,6 +956,9 @@ const flatImpl = (
  *
  * Falls back to {@link NonEmptyArray} when `N` is not a bound the brand can
  * express, which keeps that lower bound in every case.
+ *
+ * @internal A step of the type `partition` returns, which a consumer gets from
+ * the call.
  */
 type PartitionChunk<N, E> = N extends SupportedLength
   ? BoundedLengthArray<1, N, E>
@@ -979,6 +987,9 @@ export const chunk = partition;
  * ...Ar2]`, additionally branded as {@link NonEmptyArray} when either input is
  * a non-empty tuple (a plain non-empty tuple or a branded `NonEmptyArray`, both
  * of which extend `NonEmptyTuple<unknown>`).
+ *
+ * @internal The type `concat` returns, computed from its arguments; a consumer
+ * spells `ReturnType<typeof concat<…>>`.
  */
 type ConcatResult<
   Ar1 extends readonly unknown[],

@@ -36,7 +36,7 @@ export type IsUnion<U> = IsUnionImpl<U, U>;
  * Do not use directly.
  * @template U - The original type being checked.
  * @template M - The distributed member of `U`.
- * @internal
+ * @internal A step of `IsUnion`; a consumer spells `IsUnion`.
  */
 type IsUnionImpl<U, M extends U> =
   // Exclude `never` explicitly, as it behaves strangely in distributive types.

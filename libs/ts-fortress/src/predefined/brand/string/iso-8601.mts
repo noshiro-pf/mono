@@ -14,8 +14,8 @@ export type Iso8601 = Brand<NonEmptyString, 'Iso8601'>;
  * @link https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects/Date/toISOString
  * @link https://tc39.es/ecma262/multipage/numbers-and-dates.html#sec-date-time-string-format
  */
-export const iso8601 = (options?: ISO8601ValidatorOption): Type<Iso8601> => {
-  const filledOptions = ISO8601ValidatorOption.fill(options);
+export const iso8601 = (options?: Iso8601ValidatorOption): Type<Iso8601> => {
+  const filledOptions = Iso8601ValidatorOption.fill(options);
 
   const is = isISO8601(filledOptions);
 
@@ -27,21 +27,28 @@ export const iso8601 = (options?: ISO8601ValidatorOption): Type<Iso8601> => {
   });
 };
 
-type ISO8601ValidatorOption = Readonly<{
+/**
+ * The options {@link iso8601} takes, all or none: `strict` rejects a calendar
+ * date that does not exist (`2009-02-29`), `strictSeparator` a separator
+ * between date and time other than `T`, and `defaultValue` is the type's
+ * default. Left out, both checks are off and the default is the time the module
+ * was loaded.
+ */
+export type Iso8601ValidatorOption = Readonly<{
   strict: boolean;
   strictSeparator: boolean;
   defaultValue: string;
 }>;
 
 // Annotated rather than inferred, so that declaration emit writes
-// `Type<ISO8601ValidatorOption>` instead of expanding the codec structurally —
+// `Type<Iso8601ValidatorOption>` instead of expanding the codec structurally —
 // around a hundred lines of it, for a const this module does not export.
 //
 // The `UnknownType` trap is handled by the hand-written type above rather than
-// by this annotation: deriving it as `TypeOf<typeof ISO8601ValidatorOption>` is
+// by this annotation: deriving it as `TypeOf<typeof Iso8601ValidatorOption>` is
 // what failed the `.d.mts` check, because the structural form the emit produces
 // does not satisfy that bound (see the note on `UnknownType`).
-const ISO8601ValidatorOption: Type<ISO8601ValidatorOption> = record({
+const Iso8601ValidatorOption: Type<Iso8601ValidatorOption> = record({
   /**
    *  If strict is true, date strings with invalid dates like 2009-02-29 will be invalid.
    */
@@ -119,9 +126,9 @@ const isValidDate = (str: string): boolean => {
 };
 
 const isISO8601 =
-  (options?: Partial<StrictOmit<ISO8601ValidatorOption, 'defaultValue'>>) =>
+  (options?: Partial<StrictOmit<Iso8601ValidatorOption, 'defaultValue'>>) =>
   (str: string): str is Iso8601 => {
-    const filledOptions = ISO8601ValidatorOption.fill(options);
+    const filledOptions = Iso8601ValidatorOption.fill(options);
 
     const check = filledOptions.strictSeparator
       ? regexpIso8601StrictSeparator.test(str)

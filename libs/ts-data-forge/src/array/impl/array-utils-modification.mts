@@ -455,6 +455,10 @@ const toInsertedImpl = <E, const V = E>(
     newValue,
   ) as unknown as NonEmptyArray<E | V>;
 
+/**
+ * @internal A step of the type `toInserted` returns, which a consumer gets from
+ * the call.
+ */
 type CastToNumber<T> = T extends number ? T : never;
 
 const toRemovedImpl = <E,>(
@@ -516,6 +520,9 @@ const toRangeFilledImpl = <E, const V>(
  * widened all of them — `Arr.set(t, i, 'x')` with `i: 0 | 2` on
  * `readonly [1, 2, 3]` now keeps the middle element at `2` rather than
  * reporting `2 | 'x'`.
+ *
+ * @internal The type `set` and `toUpdated` return, computed from their
+ * arguments, which a consumer gets from the call.
  */
 type ReplacedAt<
   Ar extends readonly unknown[],

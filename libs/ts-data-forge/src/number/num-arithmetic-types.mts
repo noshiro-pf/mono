@@ -109,6 +109,7 @@ type NegateSign<S extends Sign> = SignFromFacts<Le0<S>, Ge0<S>, Ne0<S>>;
 
 // --- sign combination per operation ------------------------------------------
 
+/** @internal A step of `AddResult`; a consumer spells `AddResult`. */
 type AddSign<A extends Sign, B extends Sign> = SignFromFacts<
   BoolAnd<Ge0<A>, Ge0<B>>,
   BoolAnd<Le0<A>, Le0<B>>,
@@ -118,6 +119,7 @@ type AddSign<A extends Sign, B extends Sign> = SignFromFacts<
   >
 >;
 
+/** @internal A step of `SubResult`; a consumer spells `SubResult`. */
 type SubSign<A extends Sign, B extends Sign> = AddSign<A, NegateSign<B>>;
 
 /** Sign of a product/quotient, parameterized by the `!= 0` fact of the result. */
@@ -131,16 +133,25 @@ type MulSignWithNe0<
   ne0
 >;
 
+/** @internal A step of `MulResult`; a consumer spells `MulResult`. */
 type MulSign<A extends Sign, B extends Sign> = MulSignWithNe0<
   A,
   B,
   BoolAnd<Ne0<A>, Ne0<B>>
 >;
 
-/** Exact division: nonzero dividend over nonzero divisor stays nonzero. */
+/**
+ * Exact division: nonzero dividend over nonzero divisor stays nonzero.
+ *
+ * @internal A step of `DivResult`; a consumer spells `DivResult`.
+ */
 type DivSign<A extends Sign, B extends Sign> = MulSignWithNe0<A, B, Ne0<A>>;
 
-/** Floor division: flooring can land on `0`, so the result is never `!= 0`. */
+/**
+ * Floor division: flooring can land on `0`, so the result is never `!= 0`.
+ *
+ * @internal A step of `DivIntResult`; a consumer spells `DivIntResult`.
+ */
 type DivIntSign<A extends Sign, B extends Sign> = MulSignWithNe0<A, B, false>;
 
 // --- level combination per operation -----------------------------------------
@@ -156,17 +167,30 @@ type LooserLevel<LA extends Level, LB extends Level> = 'number' extends LA | LB
 
 type WidenSafeIntToInt<T> = T extends 'safeint' ? 'int' : T;
 
-/** `+`/`-`/`*`: looser level, widening `safeint -> int` (overflow may occur). */
+/**
+ * `+`/`-`/`*`: looser level, widening `safeint -> int` (overflow may occur).
+ *
+ * @internal A step of `AddResult`, `SubResult` and `MulResult`; a consumer
+ * spells those.
+ */
 type AddMulLevel<LA extends Level, LB extends Level> = WidenSafeIntToInt<
   LooserLevel<LA, LB>
 >;
 
-/** Exact division yields a (possibly fractional) finite number. */
+/**
+ * Exact division yields a (possibly fractional) finite number.
+ *
+ * @internal A step of `DivResult`; a consumer spells `DivResult`.
+ */
 type DivLevel<LA extends Level, LB extends Level> = 'number' extends LA | LB
   ? 'number'
   : 'finite';
 
-/** Floor division yields an integer; the safe range is preserved. */
+/**
+ * Floor division yields an integer; the safe range is preserved.
+ *
+ * @internal A step of `DivIntResult`; a consumer spells `DivIntResult`.
+ */
 type DivIntLevel<LA extends Level, LB extends Level> = 'number' extends LA | LB
   ? 'number'
   : [LA] extends ['safeint']
@@ -225,6 +249,10 @@ type ReconstructSafeInt<S extends Sign> = S extends 'pos'
           ? NonZeroSafeInt
           : SafeInt;
 
+/**
+ * @internal A step of `AddResult`, `SubResult`, `MulResult`, `DivResult` and
+ * `DivIntResult`; a consumer spells those.
+ */
 type Reconstruct<S extends Sign, L extends Level> = L extends 'safeint'
   ? ReconstructSafeInt<S>
   : L extends 'int'

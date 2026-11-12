@@ -97,6 +97,10 @@ export const mergeRecords = <
   }) as MergeRecordsType<Types>;
 };
 
+/**
+ * @internal The `Type` `mergeRecords` returns, computed from the arguments; a
+ * consumer spells `ReturnType<typeof mergeRecords<…>>`.
+ */
 type MergeRecordsType<Types extends readonly Type<UnknownRecord>[]> = Type<
   MergedExactValue<Types>
 >;

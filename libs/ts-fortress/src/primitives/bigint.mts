@@ -15,21 +15,19 @@ import {
   type NumericConstraintViolation,
 } from '../utils/index.mjs';
 
-type NumberType = bigint;
-
 export function bigint(
-  defaultValue?: NumberType,
-): ConstrainedType<NumberType, BigintConstraintsOf<NoConstraints>>;
+  defaultValue?: bigint,
+): ConstrainedType<bigint, BigintConstraintsOf<NoConstraints>>;
 
-export function bigint<N extends NumberType, const C extends Constraints>(
+export function bigint<N extends bigint, const C extends BigintTypeConstraints>(
   defaultValue: N & DefaultValueType<N, C>,
   constraints: C,
-): ConstrainedType<NumberType, BigintConstraintsOf<C>>;
+): ConstrainedType<bigint, BigintConstraintsOf<C>>;
 
 export function bigint(
-  defaultValue: NumberType = 0n,
-  constraints?: Constraints,
-): ConstrainedType<NumberType, BigintConstraintsOf<Constraints>> {
+  defaultValue: bigint = 0n,
+  constraints?: BigintTypeConstraints,
+): ConstrainedType<bigint, BigintConstraintsOf<BigintTypeConstraints>> {
   const baseType = createPrimitiveType({
     typeName: 'bigint',
     defaultValue,
@@ -37,10 +35,10 @@ export function bigint(
     structure: STRUCTURE,
   });
 
-  const constraintValues = fillConstraints<Required<Constraints>, Constraints>(
-    bigintConstraintKeys,
-    constraints,
-  );
+  const constraintValues = fillConstraints<
+    Required<BigintTypeConstraints>,
+    BigintTypeConstraints
+  >(bigintConstraintKeys, constraints);
 
   if (constraints === undefined || Arr.isEmpty(Object.keys(constraints))) {
     return attachConstraints(baseType, constraintValues);
@@ -66,7 +64,7 @@ export function bigint(
       refine({
         baseType,
         defaultValue,
-        is: (value): value is NumberType =>
+        is: (value): value is bigint =>
           Result.isOk(constraintsPredicate(value)),
         typeName: 'bigint',
         getConstraintDetails: (value) => {
@@ -87,7 +85,10 @@ export function bigint(
   );
 }
 
-type Constraints = Partial<
+/**
+ * The set of constraints accepted by {@link bigint}.
+ */
+export type BigintTypeConstraints = Partial<
   Readonly<{
     nonZero: true;
     negative: true;
@@ -95,21 +96,16 @@ type Constraints = Partial<
     positive: true;
     nonPositive: true;
 
-    gt: NumberType;
-    gte: NumberType;
-    min: NumberType;
-    lt: NumberType;
-    lte: NumberType;
-    max: NumberType;
-    multipleOf: NumberType;
-    step: NumberType;
+    gt: bigint;
+    gte: bigint;
+    min: bigint;
+    lt: bigint;
+    lte: bigint;
+    max: bigint;
+    multipleOf: bigint;
+    step: bigint;
   }>
 >;
-
-/**
- * The set of constraints accepted by {@link bigint}.
- */
-export type BigintTypeConstraints = Constraints;
 
 /**
  * The constraint values carried by a {@link bigint} type created with the
@@ -117,11 +113,11 @@ export type BigintTypeConstraints = Constraints;
  * `C` gives it and `undefined` for the keys `C` leaves out.
  */
 export type BigintConstraintsOf<C extends BigintTypeConstraints> =
-  FillConstraints<Required<Constraints>, C>;
+  FillConstraints<Required<BigintTypeConstraints>, C>;
 
 /**
- * Every key of {@link Constraints}, in the order the runtime predicate checks
- * them. The `expectType` below keeps it in step with the type.
+ * Every key of {@link BigintTypeConstraints}, in the order the runtime predicate
+ * checks them. The `expectType` below keeps it in step with the type.
  */
 const bigintConstraintKeys = [
   'nonZero',
@@ -137,88 +133,97 @@ const bigintConstraintKeys = [
   'max',
   'multipleOf',
   'step',
-] as const satisfies readonly (keyof Constraints)[];
+] as const satisfies readonly (keyof BigintTypeConstraints)[];
 
-expectType<ArrayElement<typeof bigintConstraintKeys>, keyof Constraints>('=');
+expectType<
+  ArrayElement<typeof bigintConstraintKeys>,
+  keyof BigintTypeConstraints
+>('=');
 
+/**
+ * @internal The type `defaultValue` must have for the constraints `C`, a step
+ * of a parameter type, which a caller meets with the argument it passes.
+ */
 type DefaultValueType<
-  N extends NumberType,
-  C extends Constraints,
+  N extends bigint,
+  C extends BigintTypeConstraints,
 > = DefaultValueWhenNonZeroIsOn<N, C> &
   DefaultValueWhenNegativeIsOn<N, C> &
   DefaultValueWhenNonNegativeIsOn<N, C> &
   DefaultValueWhenPositiveIsOn<N, C> &
   DefaultValueWhenNonPositiveIsOn<N, C>;
 
-type DefaultValueWhenNonZeroIsOn<N extends NumberType, C extends Constraints> =
-  C extends Readonly<{ nonZero: true }> ? NonZeroNumber<N> : NumberType;
+type DefaultValueWhenNonZeroIsOn<
+  N extends bigint,
+  C extends BigintTypeConstraints,
+> = C extends Readonly<{ nonZero: true }> ? NonZeroNumber<N> : bigint;
 
-type DefaultValueWhenNegativeIsOn<N extends NumberType, C extends Constraints> =
-  C extends Readonly<{ negative: true }> ? NegativeNumber<N> : NumberType;
+type DefaultValueWhenNegativeIsOn<
+  N extends bigint,
+  C extends BigintTypeConstraints,
+> = C extends Readonly<{ negative: true }> ? NegativeNumber<N> : bigint;
 
 type DefaultValueWhenNonNegativeIsOn<
-  N extends NumberType,
-  C extends Constraints,
-> =
-  C extends Readonly<{ nonNegative: true }> ? NonNegativeNumber<N> : NumberType;
+  N extends bigint,
+  C extends BigintTypeConstraints,
+> = C extends Readonly<{ nonNegative: true }> ? NonNegativeNumber<N> : bigint;
 
-type DefaultValueWhenPositiveIsOn<N extends NumberType, C extends Constraints> =
-  C extends Readonly<{ positive: true }> ? PositiveNumber<N> : NumberType;
+type DefaultValueWhenPositiveIsOn<
+  N extends bigint,
+  C extends BigintTypeConstraints,
+> = C extends Readonly<{ positive: true }> ? PositiveNumber<N> : bigint;
 
 type DefaultValueWhenNonPositiveIsOn<
-  N extends NumberType,
-  C extends Constraints,
-> =
-  C extends Readonly<{ nonPositive: true }> ? NonPositiveNumber<N> : NumberType;
+  N extends bigint,
+  C extends BigintTypeConstraints,
+> = C extends Readonly<{ nonPositive: true }> ? NonPositiveNumber<N> : bigint;
 
-type NonZeroNumber<N extends NumberType> = NumberType extends N
-  ? NumberType
+type NonZeroNumber<N extends bigint> = bigint extends N
+  ? bigint
   : IsZero<N> extends true
     ? never
     : N;
 
-type NegativeNumber<N extends NumberType> = NumberType extends N
-  ? NumberType
+type NegativeNumber<N extends bigint> = bigint extends N
+  ? bigint
   : IsNegative<N> extends true
     ? N
     : never;
 
-type NonNegativeNumber<N extends NumberType> = NumberType extends N
-  ? NumberType
+type NonNegativeNumber<N extends bigint> = bigint extends N
+  ? bigint
   : IsNonNegative<N> extends true
     ? N
     : never;
 
-type PositiveNumber<N extends NumberType> = NumberType extends N
-  ? NumberType
+type PositiveNumber<N extends bigint> = bigint extends N
+  ? bigint
   : IsPositive<N> extends true
     ? N
     : never;
 
-type NonPositiveNumber<N extends NumberType> = NumberType extends N
-  ? NumberType
+type NonPositiveNumber<N extends bigint> = bigint extends N
+  ? bigint
   : IsNonPositive<N> extends true
     ? N
     : never;
 
-type IsZero<N extends NumberType> = `${N}` extends '0' ? true : false;
+type IsZero<N extends bigint> = `${N}` extends '0' ? true : false;
 
-type IsNonZero<N extends NumberType> = IsZero<N> extends true ? false : true;
+type IsNonZero<N extends bigint> = IsZero<N> extends true ? false : true;
 
-type IsNegative<N extends NumberType> = `${N}` extends `-${string}`
-  ? true
-  : false;
+type IsNegative<N extends bigint> = `${N}` extends `-${string}` ? true : false;
 
-type IsNonNegative<N extends NumberType> =
+type IsNonNegative<N extends bigint> =
   IsNegative<N> extends true ? false : true;
 
-type IsPositive<N extends NumberType> = BoolAnd<IsNonZero<N>, IsNonNegative<N>>;
+type IsPositive<N extends bigint> = BoolAnd<IsNonZero<N>, IsNonNegative<N>>;
 
-type IsNonPositive<N extends NumberType> = BoolNot<IsPositive<N>>;
+type IsNonPositive<N extends bigint> = BoolNot<IsPositive<N>>;
 
 const createConstraintsPredicate =
-  (constraints: Constraints) =>
-  (value: NumberType): Result<true, NumericConstraintViolation> => {
+  (constraints: BigintTypeConstraints) =>
+  (value: bigint): Result<true, NumericConstraintViolation> => {
     const {
       nonZero,
       negative,
@@ -327,7 +332,7 @@ const createConstraintsPredicate =
   };
 
 const defaultValueErrorMessage = (
-  value: NumberType,
+  value: bigint,
   violation: NumericConstraintViolation,
 ): string =>
   `defaultValue [${value}] for bigint does not satisfy the constraint ${violation.constraint} = ${violation.value}` as const;

@@ -54,10 +54,7 @@ describe(typesEntryPoints, () => {
 });
 
 describe(packagesRead, () => {
-  const lists = {
-    privateRead: new Set<string>(['private-read', 'made-public']),
-    pending: new Set<string>(['published']),
-  } as const;
+  const privateRead = new Set<string>(['private-read', 'made-public']);
 
   const withTypes = {
     exports: { '.': { types: './dist/index.d.mts' } },
@@ -89,7 +86,7 @@ describe(packagesRead, () => {
         },
       ],
       '/r',
-      lists,
+      privateRead,
     );
 
     assert.deepStrictEqual(
@@ -101,7 +98,7 @@ describe(packagesRead, () => {
     assert.deepStrictEqual(stale, ['made-public']);
   });
 
-  test('reads no package without a types file, and reports a list naming one', () => {
+  test('reads no package without a types file, and reports a name of the private list that is no private package read', () => {
     const { enrolled, stale } = packagesRead(
       [
         { name: 'published', path: '/r/libs/published', packageJson: {} },
@@ -112,12 +109,12 @@ describe(packagesRead, () => {
         },
       ],
       '/r',
-      lists,
+      privateRead,
     );
 
     assert.deepStrictEqual(enrolled, []);
 
-    assert.deepStrictEqual(stale, ['private-read', 'made-public', 'published']);
+    assert.deepStrictEqual(stale, ['private-read', 'made-public']);
   });
 });
 

@@ -125,4 +125,9 @@ export function* range(
   }
 }
 
+/**
+ * @internal The bound of the small integers `range`'s parameters take as
+ * literals, a step of their types: a consumer passes an argument and has no
+ * need to name it.
+ */
 type MaxInt = 512;

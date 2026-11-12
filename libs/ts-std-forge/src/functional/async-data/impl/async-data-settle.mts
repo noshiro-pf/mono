@@ -29,7 +29,7 @@ import { ok } from './async-data-ok.mjs';
 export function settle<S, E, R extends UnknownResult>(
   data: AsyncData<S, E>,
   result: R,
-): Settled<S, E, R>;
+): SettleResult<S, E, R>;
 
 // Curried version
 //
@@ -38,11 +38,11 @@ export function settle<S, E, R extends UnknownResult>(
 // the success type, which comes from the data instead.
 export function settle<R extends UnknownResult>(
   result: R,
-): <S, E>(data: AsyncData<S, E>) => Settled<S, E, R>;
+): <S, E>(data: AsyncData<S, E>) => SettleResult<S, E, R>;
 
 export function settle<S, E, R extends UnknownResult>(
   ...args: readonly [data: AsyncData<S, E>, result: R] | readonly [result: R]
-): Settled<S, E, R> | ((data: AsyncData<S, E>) => Settled<S, E, R>) {
+): SettleResult<S, E, R> | ((data: AsyncData<S, E>) => SettleResult<S, E, R>) {
   switch (args.length) {
     case 2: {
       const [data, result] = args;
@@ -58,13 +58,17 @@ export function settle<S, E, R extends UnknownResult>(
   }
 }
 
-type Settled<S, E, R extends UnknownResult> =
+/**
+ * What `settle` returns for an `AsyncData<S, E>` and a `Result` `R`: `Ok` of
+ * `S` or `R`'s success type, or `AsyncErr` of `E` or `R`'s error type.
+ */
+export type SettleResult<S, E, R extends UnknownResult> =
   Ok<S | Result.UnwrapOk<R>> | AsyncErr<S, E | Result.UnwrapErr<R>>;
 
 const settleImpl = <S, E, R extends UnknownResult>(
   data: AsyncData<S, E>,
   result: R,
-): Settled<S, E, R> =>
+): SettleResult<S, E, R> =>
   Result.isOk(result)
     ? // eslint-disable-next-line total-functions/no-unsafe-type-assertion
       ok(result.value as Result.UnwrapOk<R>)

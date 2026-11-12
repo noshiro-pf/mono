@@ -83,6 +83,7 @@ expectType<
   'value' | 'map' | 'mapNullable'
 >('=');
 
+/** @internal A step of `Pipe`; a consumer spells `Pipe`. */
 type PipeBase<A> = Readonly<{
   /** The current value being piped. */
   value: A;
@@ -107,6 +108,7 @@ type PipeBase<A> = Readonly<{
   map: <B>(fn: (a: A) => B) => Pipe<B>;
 }>;
 
+/** @internal A step of `Pipe`; a consumer spells `Pipe`. */
 type PipeMapNullable<A> = Readonly<{
   /**
    * Maps the current value only if it's not null or undefined. If the current
@@ -136,6 +138,7 @@ type PipeMapNullable<A> = Readonly<{
   mapNullable: <B>(fn: (a: NonNullable<A>) => B) => Pipe<B | undefined>;
 }>;
 
+/** @internal A step of `Pipe`; a consumer spells `Pipe`. */
 type PipeMapOptional<A extends UnknownOptional> = Readonly<{
   /**
    * Maps the value inside an Optional using Optional.map semantics. If the

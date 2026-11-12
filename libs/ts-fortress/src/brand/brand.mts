@@ -11,6 +11,10 @@ import { createType, type ValidationError } from '../utils/index.mjs';
 
 export type { Brand } from 'ts-type-forge';
 
+/**
+ * @internal A step of the type `brand` returns, which a consumer gets from the
+ * call.
+ */
 type ArrayToUnion<A extends readonly unknown[]> = A extends readonly []
   ? never
   : A[number];
