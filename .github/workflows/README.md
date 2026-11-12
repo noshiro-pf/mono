@@ -663,7 +663,7 @@ each caller passes it as `result-job: <name>-result / result`.
   files. For a `fix:` or `gen:` entry that is the check: the command rewrites,
   and a dirty tree is the failure. `pnpm run check-all` runs the same entries,
   read from these workflows, through the same runner. `strict-lib-gen.yml` still
-  ends in `pnpm run z:assert-repo-is-clean`.
+  checks the tree with `pnpm run z:assert-repo-is-clean`, after its generators.
 - **A matrix entry is a root script.** `pnpm run check:root:ci-commands` asks
   whether any entry duplicates another and whether any check script runs
   nowhere. What a script body cannot show is declared in `DECLARED_COVERAGE`;
@@ -686,8 +686,8 @@ each caller passes it as `result-job: <name>-result / result`.
   seconds of setup, then about 45 for `ws:build:deps` or 105 for `ws:build` — so
   a job split in two costs that once more and buys nothing but a shorter wait
   for a pull request checked alone, which happens only when the queue is empty.
-  So the check workflows run thirteen jobs a pull request (code-check's seven,
-  style-check's two, node-version-compatibility's two, strict-lib-gen's two; the
+  So the check workflows run twelve jobs a pull request (code-check's seven,
+  style-check's two, node-version-compatibility's two, strict-lib-gen's one; the
   benchmark's job, about a minute when its baseline hits, is one more): a short
   check rides along with a longer one rather than taking a runner of its own,
   and a job is split only when its p90 comes near the timeout. The longest,
