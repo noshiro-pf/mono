@@ -94,7 +94,9 @@ One harness per TypeScript minor (`strict-ts-lib-vX.Y-source`), a shared
 converter (`scripts-common/`), and per version the published bundle
 `output/lib/` (`strict-ts-lib-vX.Y`) plus `output/lib-files*/`,
 `output/diff-from-*/` and `temp/copied/`. Details in
-`docs/strict-typescript-lib-integration.md`. Rules with no error behind them:
+`docs/strict-typescript-lib-integration.md`. A changeset names the `-source`
+harnesses, never a bundle, which `strict-lib:gen:packages` stamps back
+(`check:prose:fixed-releases`). Rules with no error behind them:
 
 - **`output/lib` ships as laid out.** The `@typescript/lib-*` links resolve
   into it through a workspace symlink; nothing may be rearranged at pack time.
@@ -102,10 +104,6 @@ converter (`scripts-common/`), and per version the published bundle
   per-group `package.json` under `libs/` stay tracked.** The diffs are how
   converter changes are judged; the per-group manifests are what lets each
   harness resolve `@typescript/lib-<group>` by name.
-- **A changeset names all twelve `-source` harnesses, never a bundle.** A
-  bundle bump is stamped back by `strict-lib:gen:packages` and the release
-  silently does not happen; the `fixed` group aligns versions but a
-  changeset's text reaches only the packages it names.
 - **The generator is `gen:lib`, not `gen`.** A `gen` there would be run by
   `ws:gen` and wipes `output/lib-files*`.
 - Converter changes are committed with their output (`strict-lib-gen.yml`
