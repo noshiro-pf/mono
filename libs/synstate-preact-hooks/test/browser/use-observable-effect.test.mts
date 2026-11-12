@@ -1,4 +1,5 @@
 import { act, renderHook } from '@testing-library/preact';
+import { h, render } from 'preact';
 import * as Preact from 'preact/hooks';
 import { source, type Observable } from 'synstate';
 import { useObservableEffect } from '../../src/index.mjs';
@@ -21,6 +22,9 @@ describe(useObservableEffect, () => {
       count$.next(2);
     });
 
+    // Not in `act`: `renderHook`'s `unmount` is a bare `render(null, …)`, as an
+    // application unmounts, and preact 11 runs an effect's cleanup only after
+    // the next frame (#3917). Wrapped, both versions clean up at once.
     unmount();
 
     await act(() => {
@@ -28,6 +32,34 @@ describe(useObservableEffect, () => {
     });
 
     assert.deepStrictEqual(mut_seen, [1, 2]);
+  });
+
+  test('delivers nothing right after a bare unmount (#3917)', async () => {
+    const count$ = source<number>();
+
+    const mut_seen: number[] = [];
+
+    const Subscriber = (): null => {
+      useObservableEffect(count$, (value) => {
+        mut_seen.push(value);
+      });
+
+      return null;
+    };
+
+    const container = document.createElement('div');
+
+    await act(() => {
+      render(h(Subscriber, {}), container);
+    });
+
+    count$.next(1);
+
+    render(null, container);
+
+    count$.next(2);
+
+    assert.deepStrictEqual(mut_seen, [1]);
   });
 
   test('does not re-subscribe when the component re-renders', async () => {
