@@ -67,7 +67,7 @@ numeric input の設計を考える上で、まず React の **controlled compon
   };
   ```
 
-![text-input](https://github.com/noshiro-pf/mono/blob/develop/articles/numeric-input-interface/text-input.png?raw=true)
+![text-input](https://github.com/noshiro-pf/mono/blob/754974bba99242f75bdff426aa56d326b9cdf7ef/articles/numeric-input-interface/text-input.png?raw=true)
 
 controlled component による実装では form の最新の値は state に常に反映されるため、その値を使った処理は単にその state 変数を使うだけですが、 uncontrolled component による実装では form の値は DOM に保持されており、必要なとき（上の例では submit を押したとき）に ref を介して最新の値を "pull" する必要があります。
 `<input />` 要素の場合、 controlled mode とは `value` プロパティの方を使って state を常に入力欄に反映し onChange で変更を即 state に反映する実装方式、 uncontrolled mode とは `defaultValue` プロパティの方を使って初期値のみ設定し、以後は ref を経由して DOM に保持されている値を取り出したり（pull）、更新したりする実装方式となります。
@@ -205,7 +205,7 @@ UI状態の管理をシンプルにしたくて controlled numeric input にし�
 
 例えば、スライダーのような要素と数値入力欄を同期させたいユースケースがあるとします。
 
-![slider-input](https://github.com/noshiro-pf/mono/blob/develop/articles/numeric-input-interface/numeric-input-with-slider.png?raw=true)
+![slider-input](https://github.com/noshiro-pf/mono/blob/754974bba99242f75bdff426aa56d326b9cdf7ef/articles/numeric-input-interface/numeric-input-with-slider.png?raw=true)
 
 このとき、数値データの state は本来これらを束ねる親コンポーネントに一つだけ持てばよいはずですが、 numeric input が内部に state を持っていると状態の二重管理が発生し、親子間で状態を同期するための処理が発生します。ステートフルなコンポーネントを親子に組み合わせデータを同期させようとすると、状態管理が複雑になってしまい、下手な実装をすると親子間の状態更新で無限ループが起こってしまう危険もあります[^infinite_loop]。
 
@@ -274,7 +274,7 @@ https://playcode.io/2136118
 
 [^1]: 参考： [TypeScript の Type Branding をより便利に活用する方法のまとめ](https://zenn.dev/noshiro_piko/articles/typescript-branded-type-int)
 
-![numeric-input-architecture](https://github.com/noshiro-pf/mono/blob/develop/articles/numeric-input-interface/numeric-input-architecture.jpg?raw=true)
+![numeric-input-architecture](https://github.com/noshiro-pf/mono/blob/754974bba99242f75bdff426aa56d326b9cdf7ef/articles/numeric-input-interface/numeric-input-architecture.jpg?raw=true)
 
 ### 実装例 A
 

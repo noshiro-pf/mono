@@ -64,12 +64,12 @@ $A$ は $\sum_{i = 0}^{N-1} A[i] = 0$ を満たす．
 
 これに対し貪欲アルゴリズムを適用すると、
 
-![step1](https://github.com/noshiro-pf/mono/blob/develop/articles/settlement-process-minimization-algorithm/1.png?raw=true =400x)
-![step2](https://github.com/noshiro-pf/mono/blob/develop/articles/settlement-process-minimization-algorithm/2.png?raw=true =400x)
-![step3](https://github.com/noshiro-pf/mono/blob/develop/articles/settlement-process-minimization-algorithm/3.png?raw=true =400x)
-![step4](https://github.com/noshiro-pf/mono/blob/develop/articles/settlement-process-minimization-algorithm/4.png?raw=true =400x)
-![step5](https://github.com/noshiro-pf/mono/blob/develop/articles/settlement-process-minimization-algorithm/5.png?raw=true =400x)
-![step6](https://github.com/noshiro-pf/mono/blob/develop/articles/settlement-process-minimization-algorithm/6.png?raw=true =400x)
+![step1](https://github.com/noshiro-pf/mono/blob/754974bba99242f75bdff426aa56d326b9cdf7ef/articles/settlement-process-minimization-algorithm/1.png?raw=true =400x)
+![step2](https://github.com/noshiro-pf/mono/blob/754974bba99242f75bdff426aa56d326b9cdf7ef/articles/settlement-process-minimization-algorithm/2.png?raw=true =400x)
+![step3](https://github.com/noshiro-pf/mono/blob/754974bba99242f75bdff426aa56d326b9cdf7ef/articles/settlement-process-minimization-algorithm/3.png?raw=true =400x)
+![step4](https://github.com/noshiro-pf/mono/blob/754974bba99242f75bdff426aa56d326b9cdf7ef/articles/settlement-process-minimization-algorithm/4.png?raw=true =400x)
+![step5](https://github.com/noshiro-pf/mono/blob/754974bba99242f75bdff426aa56d326b9cdf7ef/articles/settlement-process-minimization-algorithm/5.png?raw=true =400x)
+![step6](https://github.com/noshiro-pf/mono/blob/754974bba99242f75bdff426aa56d326b9cdf7ef/articles/settlement-process-minimization-algorithm/6.png?raw=true =400x)
 
 という 3 回の送金で精算が完了します。
 テーブルで表すと以下のようになります。

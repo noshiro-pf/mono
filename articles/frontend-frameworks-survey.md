@@ -226,7 +226,7 @@ export class CounterComponent {
 - [Virtual DOM](https://vuejs.org/guide/extras/rendering-mechanism.html#virtual-dom) を使用
   - render function の実行結果である仮想DOMツリーの差分のみを Real DOM に適用するシステム。
 
-![virtual-dom](https://github.com/noshiro-pf/mono/blob/develop/articles/frontend-frameworks/virtual-dom.png?raw=true)
+![virtual-dom](https://github.com/noshiro-pf/mono/blob/754974bba99242f75bdff426aa56d326b9cdf7ef/articles/frontend-frameworks/virtual-dom.png?raw=true)
 
 ### [Ember](https://emberjs.com/)
 
@@ -269,8 +269,8 @@ export default class CounterComponent extends Component {
 - 特徴
   - React の影響を受けたフレームワーク
   - 仮想 DOM を使わず独自のリアクティヴシステムを採用しておりパフォーマンスに優れる
-    ![benchmark1](https://github.com/noshiro-pf/mono/blob/develop/articles/frontend-frameworks/benchmark1.png?raw=true)
-    ![benchmark2](https://github.com/noshiro-pf/mono/blob/develop/articles/frontend-frameworks/benchmark2.png?raw=true)
+    ![benchmark1](https://github.com/noshiro-pf/mono/blob/754974bba99242f75bdff426aa56d326b9cdf7ef/articles/frontend-frameworks/benchmark1.png?raw=true)
+    ![benchmark2](https://github.com/noshiro-pf/mono/blob/754974bba99242f75bdff426aa56d326b9cdf7ef/articles/frontend-frameworks/benchmark2.png?raw=true)
 
 ```tsx
 import { onCleanup, createSignal } from 'solid-js';

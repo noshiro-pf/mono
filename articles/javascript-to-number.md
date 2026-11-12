@@ -20,7 +20,7 @@ published: true
 
 ## 実行結果のまとめ
 
-![javascript-to-number-table](https://github.com/noshiro-pf/mono/blob/develop/articles/javascript-to-number-table.png?raw=true)
+![javascript-to-number-table](https://github.com/noshiro-pf/mono/blob/754974bba99242f75bdff426aa56d326b9cdf7ef/articles/javascript-to-number-table.png?raw=true)
 
 （["parseInt vs unary plus, when to use which? (Stackoverflow)"](https://stackoverflow.com/questions/17106681/parseint-vs-unary-plus-when-to-use-which/17106702#17106702?newreg=6a1d4706ff50425ca16bd5ec2f6e80e0) より）
 

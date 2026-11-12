@@ -32,7 +32,7 @@ Codemod（コードモッド）とは、**"Code Modification"（コード修正�
 
 多くのcodemodツールは、コードを単なるテキストとして扱うのではなく、**AST (Abstract Syntax Tree - 抽象構文木)** を利用します。
 
-![AST](https://github.com/noshiro-pf/mono/blob/develop/articles/typescript-codemod-development.png?raw=true)
+![AST](https://github.com/noshiro-pf/mono/blob/754974bba99242f75bdff426aa56d326b9cdf7ef/articles/typescript-codemod-development.png?raw=true)
 
 （図1： https://efcl.info/2016/03/06/ast-first-step/ より引用）
 
@@ -454,7 +454,7 @@ const g = (arg1: number, arg2: number): void => [];
 
 コードの細かいスタイルは prettier などのフォーマッターで正規化されていることを前提としても良いと考えていましたが、 prettier は AST に対して決定論的な動作をする関数ではない（例えば2行以上の空行は1行にまとめてくれるが空行が無いところに空行を新たに挟むわけではなかったり、改行位置が元のコードのスタイル依存になるケースがあったりする）ため、元コードのスタイルを維持する実装はどうしてもこのように自前である程度行う必要があります。ソースコード文字列の一意なスタイルを決めてくれる決定論的なフォーマットツールが現れたとしたら、このあたりの事情も変わる可能性があります。
 
-元のコードのスタイルをなるべく維持するために空行を `'//--empty-line--4c6654a3-456f-49b8-b1ca-720d17638f04'` のような他と被らなさそうなコメント文字列に置換して後で戻す（[`emptyLineEncoder`](https://github.com/noshiro-pf/mono/blob/develop/experimental/ts-codemod-lib/src/utils/empty-line-encoder.mts) ）、という実装でこれは解決できました[^empty-line-encoder]。
+元のコードのスタイルをなるべく維持するために空行を `'//--empty-line--4c6654a3-456f-49b8-b1ca-720d17638f04'` のような他と被らなさそうなコメント文字列に置換して後で戻す（[`emptyLineEncoder`](https://github.com/noshiro-pf/mono/blob/754974bba99242f75bdff426aa56d326b9cdf7ef/experimental/ts-codemod-lib-by-ts-compiler/src/utils/empty-line-encoder.mts) ）、という実装でこれは解決できました[^empty-line-encoder]。
 
 [^empty-line-encoder]: 空行は複数行コメント `/* ... */` の中に現れることもあり得ますが、 `//` は複数行コメント中に現れても無害であることを利用しています。 調査中に https://github.com/Serj-Tm/ts-empty-line-encoder という実装も見つけましたが、 marker に `/* empty-line */` のような文字列を使ってしまっているため、 `/* ... */` の中に空行が現れる場合に入れ子になってしまい上手く動きません。
 
@@ -481,7 +481,7 @@ https://github.com/microsoft/TypeScript/issues/843#issuecomment-1875957228
 `ts.createScanner` が出力する token 列の比較で大部分は洗い出せましたが、一部、コメント部分が1トークンにパースされず他のノードに紛れ込んでしまうケースも生じたため、そういったケースは token をさらに文字列 diff アルゴリズムで分割しコメントを洗い出す実装も行いました。
 しかし、どこまで頑張っても、欠落したコメント文字列を前後どちらのノードに紐づけるべきかは結局ヒューリスティクスにしかならないため、試してみると次から次へと例外が見つかってしまいました。相当頑張って実装してみたのですが、元のコード中のコメント位置を codemod 前後で維持することはこの方針ではほぼ不可能に思えました。
 
-[^attach-trivia]: https://github.com/noshiro-pf/mono/blob/develop/experimental/ts-codemod-lib/src/functions/transform-source-code.mts
+[^attach-trivia]: TypeScript Compiler API 版の `transform-source-code.mts` での実装（このファイルは現在残っていません）。
 
 ここに来て、最初に調査していた `recast` などのツールが「元のコードスタイル（フォーマット、コメント、括弧など）を可能な限り保持したままコードを再生成する」ことを謳っていた理由がより身に染みて分かってきます。 prettier などでフォーマットする前提ならコードの細かいスタイルの変化は無視できる問題だと思っていましたが、コメントの事を考えるとそうでもなかったのです。
 
@@ -501,11 +501,11 @@ ts-morph を最初触った時は、ノードの置換処理だけは `node.repl
 
 まだ公開のための準備中の段階のためテストが十分できていませんが、実装した codemod ツールです。
 
-TypeScript Compiler API で作った不完全作：
-https://github.com/noshiro-pf/mono/blob/develop/experimental/ts-codemod-lib
+TypeScript Compiler API で作った不完全作（コメントを付け直す実装を加える前の版）：
+https://github.com/noshiro-pf/mono/tree/754974bba99242f75bdff426aa56d326b9cdf7ef/experimental/ts-codemod-lib-by-ts-compiler
 
 ts-morph で実装し直したもの
-https://github.com/noshiro-pf/mono/blob/develop/packages/utils/ts-codemod-lib
+https://github.com/noshiro-pf/mono/tree/754974bba99242f75bdff426aa56d326b9cdf7ef/libs/ts-codemod-lib
 
 この実装コードを見れば、このような readonly 化の context 情報（state）を引数に含む相互再帰関数により実装された transformer 実装は ts-morph でないとやりづらい理由が分かってもらえるかもしれません。
 Readonly 化 codemod ツールの実装詳細についての説明はほぼ省きましたが、機会があれば別記事で紹介しようかなと思っています。
