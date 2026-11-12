@@ -2,7 +2,7 @@
 import type { WidenLiteral } from 'ts-type-forge';
 import { Optional, pipe } from '../functional/index.mjs';
 import { asUint32 } from '../number/index.mjs';
-import { tp, unknownToString } from '../others/index.mjs';
+import { tp } from '../others/index.mjs';
 import type { MapSetKeyType, SizeType } from '../types.mjs';
 
 /**
@@ -974,7 +974,6 @@ class IMapMappedClass<K, V, KM extends MapSetKeyType>
   readonly #map: ReadonlyMap<KM, V>;
   readonly #toKey: (a: K) => KM;
   readonly #fromKey: (k: KM) => K;
-  readonly #showNotFoundMessage: boolean;
 
   /**
    * Constructs an IMapMappedClass instance with custom key transformation.
@@ -984,24 +983,18 @@ class IMapMappedClass<K, V, KM extends MapSetKeyType>
    *   Must be deterministic and produce unique values for unique keys.
    * @param fromKey A function that converts a primitive key KM back to the
    *   custom key K. Should be the inverse of the toKey function.
-   * @param showNotFoundMessage Whether to log warning messages when operations
-   *   are performed on non-existent keys. Useful for debugging. Defaults to
-   *   false for production use.
    * @internal Use IMapMapped.create() instead of calling this constructor directly.
    */
   constructor(
     iterable: Iterable<readonly [K, V]>,
     toKey: (a: K) => KM,
     fromKey: (k: KM) => K,
-    showNotFoundMessage: boolean = false,
   ) {
     this.#map = new Map(Array.from(iterable, ([k, v]) => [toKey(k), v]));
 
     this.#toKey = toKey;
 
     this.#fromKey = fromKey;
-
-    this.#showNotFoundMessage = showNotFoundMessage;
   }
 
   /** @inheritdoc */
@@ -1055,20 +1048,10 @@ class IMapMappedClass<K, V, KM extends MapSetKeyType>
 
   /** @inheritdoc */
   delete(key: K): IMapMapped<K, V, KM> {
-    if (!this.has(key)) {
-      if (this.#showNotFoundMessage) {
-        console.warn(
-          `IMapMapped.delete: key not found: ${unknownToString(this.#toKey(key))}`,
-        );
-      }
-
-      return this;
-    }
-
     // Through the native collection, which compares keys with SameValueZero as
     // `has` and `get` do; a rebuild comparing with `Object.is` left a `-0` key
     // unmatched.
-    return this.withMutations([{ type: 'delete', key }]);
+    return this.has(key) ? this.withMutations([{ type: 'delete', key }]) : this;
   }
 
   /** @inheritdoc */
@@ -1086,22 +1069,12 @@ class IMapMappedClass<K, V, KM extends MapSetKeyType>
 
   /** @inheritdoc */
   update(key: K, updater: (value: V) => V): IMapMapped<K, V, KM> {
-    const curr = this.get(key);
-
-    if (Optional.isNone(curr)) {
-      if (this.#showNotFoundMessage) {
-        console.warn(
-          `IMapMapped.update: key not found: ${unknownToString(this.#toKey(key))}`,
-        );
-      }
-
-      return this;
-    }
-
     // Through the native collection, which compares keys with SameValueZero as
     // `has` and `get` do; a rebuild comparing with `Object.is` left a `-0` key
     // unmatched.
-    return this.withMutations([{ type: 'update', key, updater }]);
+    return Optional.isNone(this.get(key))
+      ? this
+      : this.withMutations([{ type: 'update', key, updater }]);
   }
 
   /** @inheritdoc */
@@ -1138,12 +1111,6 @@ class IMapMappedClass<K, V, KM extends MapSetKeyType>
           // Presence is `has` alone, as in `update`: a stored value may itself
           // be `undefined`.
           if (!mut_result.has(key)) {
-            if (this.#showNotFoundMessage) {
-              console.warn(
-                `IMapMapped.withMutations::update: key not found: ${unknownToString(key)}`,
-              );
-            }
-
             break;
           }
 
