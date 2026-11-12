@@ -34,6 +34,13 @@ export type RouterBrowser = Readonly<{
    * returns `true`. Left out, the router cannot hold those.
    */
   onBeforeUnload?: (prevents: () => boolean) => () => void;
+  /**
+   * `document.startViewTransition`: captures the page, runs `update`, and
+   * animates to the page drawn once the Promise `update` returns settles. Left
+   * out, or where the browser has none, a navigation that asks for a View
+   * Transition is made without one.
+   */
+  startViewTransition?: (update: () => Promise<void>) => void;
   /** Runs `callback` once the new page has been drawn. */
   afterRender: (callback: () => void) => void;
   scrollToTop: () => void;
@@ -81,6 +88,8 @@ export type MemoryBrowser = RouterBrowser &
     scrolls: () => readonly string[];
     /** The document's title. */
     title: () => string;
+    /** The View Transitions started so far, oldest first. */
+    viewTransitions: () => readonly ('finished' | 'running')[];
     /**
      * Fires `beforeunload`, as a reload would, and returns whether a listener
      * asked to stay.
@@ -98,6 +107,12 @@ export type MemoryBrowserOptions = Readonly<{
   restoresScroll?: boolean;
   /** The document's title at first: `''` when left out. */
   title?: string;
+  /**
+   * Whether the browser has View Transitions: `startViewTransition` then runs
+   * the update in a later task, as a browser does once it has captured the
+   * page. `false` when left out.
+   */
+  viewTransitions?: boolean;
   /**
    * The browser's `observeDocument`, which a test calls from where it draws an
    * element or scrolls. Left out, the browser has none.
@@ -155,6 +170,8 @@ export const createMemoryBrowser = (
   const mut_listeners = new Set<() => void>();
 
   const mut_unloadListeners = new Set<() => boolean>();
+
+  const mut_transitions: ('finished' | 'running')[] = [];
 
   const entry = (): Entry =>
     mut_history.entries[mut_history.index] ?? {
@@ -248,6 +265,25 @@ export const createMemoryBrowser = (
         mut_unloadListeners.delete(listener);
       };
     },
+    ...(options?.viewTransitions === true
+      ? {
+          startViewTransition: (update: () => Promise<void>) => {
+            const index = mut_transitions.length;
+
+            mut_transitions.push('running');
+
+            setTimeout(() => {
+              update()
+                .then(() => {
+                  mut_transitions[index] = 'finished';
+                })
+                .catch(() => {
+                  mut_transitions[index] = 'finished';
+                });
+            }, 0);
+          },
+        }
+      : {}),
     afterRender: (callback) => {
       setTimeout(callback, 0);
     },
@@ -276,6 +312,7 @@ export const createMemoryBrowser = (
     url,
     scrolls: () => Array.from(mut_scrolls),
     title: () => mut_title.current,
+    viewTransitions: () => Array.from(mut_transitions),
     unload: () =>
       Array.from(mut_unloadListeners).some((prevents) => prevents()),
   };

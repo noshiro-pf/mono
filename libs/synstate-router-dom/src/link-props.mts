@@ -10,5 +10,10 @@ export type LinkProps = Readonly<{
   to: Href | ExternalHref | Bindable<Href | ExternalHref>;
   /** Replace the current history entry instead of adding one. */
   replace?: boolean;
+  /**
+   * Make the navigation inside a View Transition
+   * (`document.startViewTransition`); ignored where the browser has none.
+   */
+  viewTransition?: boolean;
 }> &
   StrictOmit<JSX.IntrinsicElements['a'], 'href'>;

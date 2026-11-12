@@ -1,3 +1,4 @@
+import { isNonNullObject } from 'ts-data-forge';
 import type { RouterBrowser } from '../browser.mjs';
 import { isRestoredLoad } from './restored-load.mjs';
 import { withHash } from './with-hash.mjs';
@@ -43,6 +44,30 @@ export const globalBrowser = (): RouterBrowser =>
       return () => {
         globalThis.removeEventListener('beforeunload', listener);
       };
+    },
+    startViewTransition: (update) => {
+      const start: unknown = Reflect.get(document, 'startViewTransition');
+
+      if (typeof start === 'function') {
+        // Called on the document, as the method expects.
+        const transition: unknown = Reflect.apply(start, document, [update]);
+
+        // A transition skipped by a newer one rejects `ready`, which nothing
+        // here reads: it would surface as an unhandled rejection.
+        const ready: unknown = isNonNullObject(transition)
+          ? Reflect.get(transition, 'ready')
+          : undefined;
+
+        const catchReady: unknown = isNonNullObject(ready)
+          ? Reflect.get(ready, 'catch')
+          : undefined;
+
+        if (typeof catchReady === 'function') {
+          Reflect.apply(catchReady, ready, [() => {}]);
+        }
+      } else {
+        update().catch(() => {});
+      }
     },
     afterRender: (callback) => {
       // A DOM without frames (jsdom) has none to wait for.
