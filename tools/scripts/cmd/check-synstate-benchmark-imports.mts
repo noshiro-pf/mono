@@ -3,6 +3,7 @@ import { Arr, isRecord, Result, unknownToString } from 'ts-data-forge';
 import { getWorkspacePackages, isDirectlyExecuted } from 'ts-repo-utils';
 import * as ts from 'typescript';
 import { RUNTIME_DEPENDENCY_FIELDS } from '../lib/dependency-fields.mjs';
+import { packageNameOf } from '../lib/package-name.mjs';
 import { listTrackedFiles, readRepositoryFile } from '../lib/repo-files.mjs';
 import { projectRootPath } from '../project-root-path.mjs';
 
@@ -93,19 +94,6 @@ export const isDigestedByKey = (file: string): boolean => {
 /** Whether a tracked path is a benchmark source this reads the imports of. */
 export const isBenchmarkSource = (file: string): boolean =>
   CODE_FILE.test(file) && isDigestedByKey(file);
-
-/** The package a bare import specifier names, or `undefined` for any other. */
-export const packageNameOf = (specifier: string): string | undefined => {
-  if (/^[./]/u.test(specifier) || specifier.startsWith('node:')) {
-    return undefined;
-  }
-
-  const segments = specifier.split('/');
-
-  return specifier.startsWith('@')
-    ? Arr.take(segments, 2).join('/')
-    : segments[0];
-};
 
 /**
  * The workspace packages `root` reaches through the runtime dependency fields

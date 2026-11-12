@@ -3,10 +3,12 @@ import { ignoredBy, readGateList } from '../workflow-steps.mjs';
 import {
   buildPlan,
   classifyChanges,
+  isLintToolchain,
   isSpellCheckedByCi,
   readManifestDependencies,
   stepEnvironment,
   type PackageInfo,
+  type Step,
 } from './plan.mjs';
 
 const pkg = (
@@ -18,12 +20,14 @@ const pkg = (
     exportsBuild = false,
     isPrivate = false,
     forgottenExportsRead = false,
+    lintImports = [],
   }: Readonly<{
     workspaceDependencies?: readonly string[];
     buildDependencies?: readonly string[];
     exportsBuild?: boolean;
     isPrivate?: boolean;
     forgottenExportsRead?: boolean;
+    lintImports?: readonly string[];
   }> = {},
 ): PackageInfo =>
   ({
@@ -35,6 +39,7 @@ const pkg = (
     buildDependencies: new Set(buildDependencies),
     exportsBuild,
     forgottenExportsRead,
+    lintImports: new Set(lintImports),
   }) as const;
 
 const packages = [
@@ -140,6 +145,25 @@ const packages = [
   pkg('apps/no-gen', ['check:types'], {
     workspaceDependencies: ['synstate', 'lonely'],
   }),
+  // An ESLint plugin, built against a rule kit and a helper that sort after it,
+  // and loaded by one app's `fix:lint`.
+  pkg('libs/eslint-plugin-demo', ['build', 'fix:lint', 'check:types'], {
+    workspaceDependencies: ['eslint-rule-demo', 'lint-helper'],
+    buildDependencies: ['eslint-rule-demo', 'lint-helper'],
+    exportsBuild: true,
+    // Its own config loads its build, as `eslint-config-typed`'s does.
+    lintImports: ['eslint-plugin-demo'],
+  }),
+  pkg('libs/eslint-rule-demo', ['build', 'fix:lint', 'check:types'], {
+    exportsBuild: true,
+  }),
+  pkg('libs/lint-helper', ['build', 'fix:lint', 'check:types'], {
+    exportsBuild: true,
+  }),
+  pkg('apps/lint-user', ['fix:lint', 'check:types'], {
+    workspaceDependencies: ['eslint-plugin-demo'],
+    lintImports: ['eslint-plugin-demo'],
+  }),
 ] as const;
 
 const rootScripts = [
@@ -177,9 +201,47 @@ const plan = (files: readonly string[], coverage = true) =>
     spellChecked: files,
   });
 
+const describeStep = ({ cwd, args }: Step): string =>
+  `${cwd === '.' ? '' : `${cwd}: `}${args.join(' ')}` as const;
+
+/** The index of `command` in `commands`, failing when it is not there. */
+const at = (commands: readonly string[], command: string): number => {
+  assert.include(commands, command);
+
+  return commands.indexOf(command);
+};
+
+/** The last index of `command` in `commands`, failing when it is not there. */
+const lastAt = (commands: readonly string[], command: string): number => {
+  assert.include(commands, command);
+
+  return commands.lastIndexOf(command);
+};
+
+const lints = (commands: readonly string[]): readonly string[] =>
+  commands.filter((command) => command.endsWith('run fix:lint'));
+
 const commandsOf = (files: readonly string[], coverage = true) =>
-  plan(files, coverage).map(
-    ({ cwd, args }) => `${cwd === '.' ? '' : `${cwd}: `}${args.join(' ')}`,
+  plan(files, coverage).map(describeStep);
+
+/** The commands planned for `files` over a workspace of `members` alone. */
+const planCommands = (
+  members: readonly PackageInfo[],
+  files: readonly string[],
+): readonly string[] =>
+  buildPlan({
+    classification: classifyChanges({ files, packages: members, proseGate }),
+    base: 'abc123',
+    rootScripts,
+    coverage: true,
+    spellChecked: [],
+  }).map(describeStep);
+
+/** Whether the root's own lint runs for a change to `file`. */
+const rootLint = (file: string): boolean =>
+  commandsOf([file]).some(
+    (command) =>
+      command.startsWith('exec run-p') && command.includes('check:root:lint'),
   );
 
 describe('the code gate, read through readGateList', () => {
@@ -257,8 +319,12 @@ describe('classifyChanges', () => {
     const result = classify(['libs/ts-data-forge/src/array.mts']);
 
     assert.deepStrictEqual(
-      result.packages.map(({ pkg: { dir }, code }) => ({ dir, code })),
-      [{ dir: 'libs/ts-data-forge', code: true }],
+      result.packages.map(({ pkg: { dir }, code, emitted }) => ({
+        dir,
+        code,
+        emitted,
+      })),
+      [{ dir: 'libs/ts-data-forge', code: true, emitted: true }],
     );
 
     assert.deepStrictEqual(sortedAreas(result), [
@@ -725,7 +791,7 @@ describe('buildPlan', () => {
 
     assert.deepStrictEqual(
       commands
-        .slice(0, commands.indexOf('apps/leaf-docs: run gen'))
+        .slice(0, at(commands, 'apps/leaf-docs: run gen'))
         .filter((command) => command.endsWith('run build')),
       ['libs/leaf: run build', 'libs/a-leaf-user: run build'],
     );
@@ -765,7 +831,7 @@ describe('buildPlan', () => {
 
     const lastBuild = commands.lastIndexOf('libs/synstate: run build');
 
-    assert.isAbove(lastBuild, commands.indexOf('run fix:codemod:affected'));
+    assert.isAbove(lastBuild, at(commands, 'run fix:codemod:affected'));
 
     assert.strictEqual(
       commands[lastBuild + 1],
@@ -865,7 +931,7 @@ describe('buildPlan', () => {
 
     assert.deepStrictEqual(
       commands
-        .slice(0, commands.indexOf('apps/react-app: run gen'))
+        .slice(0, at(commands, 'apps/react-app: run gen'))
         .filter((command) => command.endsWith('run build')),
       ['libs/react-base: run build'],
     );
@@ -879,7 +945,7 @@ describe('buildPlan', () => {
 
     assert.deepStrictEqual(
       commands
-        .slice(0, commands.indexOf('apps/leaf-docs: run gen'))
+        .slice(0, at(commands, 'apps/leaf-docs: run gen'))
         .filter((command) => command.endsWith('run build')),
       ['libs/leaf: run build', 'libs/a-leaf-user: run build'],
     );
@@ -918,6 +984,403 @@ describe('buildPlan', () => {
     assert.notInclude(
       commandsOf(['verify-npm-packages/README.md']),
       'run gen:verify-npm-packages',
+    );
+  });
+});
+
+describe('the ESLint toolchain', () => {
+  test.each([
+    ['eslint-config-typed', true],
+    ['eslint-plugin-ts-data-forge', true],
+    ['eslint-rule-forge', true],
+    ['ts-data-forge', false],
+    ['eslint', false],
+    ['prettier-plugin-eslint-x', false],
+    ['@sumi-lang/eslint-config', true],
+    ['@scope/eslint-plugin', true],
+    ['@scope/eslint-plugin-x', true],
+    ['@scope/eslint-configs', false],
+  ] as const)('%s is part of it: %s', (name, expected) => {
+    assert.strictEqual(isLintToolchain(name), expected);
+  });
+
+  test('a change to what a plugin emits builds it after the codemod, then lints it and what loads it', () => {
+    const commands = commandsOf(['libs/eslint-plugin-demo/src/index.mts']);
+
+    const build = at(commands, 'libs/eslint-plugin-demo: run build');
+
+    assert.isAbove(build, at(commands, 'run fix:codemod:affected'));
+
+    assert.deepStrictEqual(lints(commands.slice(build)), [
+      'apps/lint-user: run fix:lint',
+      'libs/eslint-plugin-demo: run fix:lint',
+    ]);
+
+    assert.deepStrictEqual(lints(commands.slice(0, build)), []);
+
+    assert.notInclude(commands, 'run ws:fix:lint');
+  });
+
+  test('a change to a rule kit lints what loads a plugin built against it', () => {
+    const commands = commandsOf(['libs/eslint-rule-demo/src/index.mts']);
+
+    assert.deepStrictEqual(lints(commands), [
+      'apps/lint-user: run fix:lint',
+      'libs/eslint-plugin-demo: run fix:lint',
+      'libs/eslint-rule-demo: run fix:lint',
+    ]);
+
+    assert.deepStrictEqual(
+      commands
+        .slice(0, at(commands, 'apps/lint-user: run fix:lint'))
+        .filter((command) => command.endsWith('run build')),
+      ['libs/eslint-rule-demo: run build'],
+    );
+  });
+
+  test('what a changed plugin is built against is built first, when the diff changes that too', () => {
+    const commands = commandsOf([
+      'libs/eslint-plugin-demo/src/index.mts',
+      'libs/lint-helper/src/index.mts',
+    ]);
+
+    assert.deepStrictEqual(
+      commands
+        .slice(0, at(commands, 'apps/lint-user: run fix:lint'))
+        .filter((command) => command.endsWith('run build')),
+      ['libs/lint-helper: run build', 'libs/eslint-plugin-demo: run build'],
+    );
+  });
+
+  test('a changed plugin loading another changed one is linted after both are built', () => {
+    const commands = commandsOf([
+      'libs/eslint-plugin-demo/src/index.mts',
+      'libs/eslint-rule-demo/src/index.mts',
+    ]);
+
+    assert.isAbove(
+      at(commands, 'libs/eslint-plugin-demo: run fix:lint'),
+      lastAt(commands, 'libs/eslint-rule-demo: run build'),
+    );
+  });
+
+  test('what loads a plugin built against a changed rule kit through a member outside the toolchain is linted', () => {
+    const members = [
+      pkg('libs/eslint-rule-x', ['build', 'fix:lint'], { exportsBuild: true }),
+      pkg('libs/helper', ['build'], {
+        workspaceDependencies: ['eslint-rule-x'],
+        buildDependencies: ['eslint-rule-x'],
+        exportsBuild: true,
+      }),
+      pkg('libs/eslint-plugin-x', ['build', 'fix:lint'], {
+        workspaceDependencies: ['helper'],
+        buildDependencies: ['helper'],
+        exportsBuild: true,
+      }),
+      pkg('apps/user', ['fix:lint'], {
+        workspaceDependencies: ['eslint-plugin-x'],
+        lintImports: ['eslint-plugin-x'],
+      }),
+      pkg('apps/other', ['fix:lint']),
+    ] as const;
+
+    assert.include(
+      planCommands(members, ['libs/eslint-rule-x/src/index.mts']),
+      'apps/user: run fix:lint',
+    );
+  });
+
+  test.each([
+    'libs/eslint-plugin-demo/test/rule.test.mts',
+    'libs/eslint-plugin-demo/src/rule.test.mts',
+    'libs/eslint-plugin-demo/configs/vitest.config.mts',
+    'libs/eslint-plugin-demo/eslint.config.mts',
+  ] as const)('%s lints its own package alone', (file) => {
+    const commands = commandsOf([file]);
+
+    assert.deepStrictEqual(lints(commands), [
+      'libs/eslint-plugin-demo: run fix:lint',
+    ]);
+
+    assert.notInclude(commands, 'libs/eslint-plugin-demo: run build');
+  });
+
+  test.each([
+    'libs/eslint-plugin-demo/package.json',
+    'libs/eslint-plugin-demo/configs/tsconfig.build.json',
+    'libs/eslint-plugin-demo/scripts/cmd/build.mts',
+  ] as const)('%s, which its build reads, lints what loads it', (file) => {
+    assert.include(commandsOf([file]), 'apps/lint-user: run fix:lint');
+  });
+
+  test('strict-lib, whose config loads it too, is linted', () => {
+    assert.include(
+      commandsOf(['libs/eslint-plugin-demo/src/index.mts']),
+      'run strict-lib:check:lint',
+    );
+
+    assert.notInclude(
+      commandsOf(['libs/lint-helper/src/index.mts']),
+      'run strict-lib:check:lint',
+    );
+  });
+
+  test('strict-lib is linted once when it changed too', () => {
+    assert.lengthOf(
+      commandsOf([
+        'libs/eslint-plugin-demo/src/index.mts',
+        'strict-lib/scripts-common/convert.mts',
+      ]).filter((command) => command === 'run strict-lib:check:lint'),
+      1,
+    );
+  });
+
+  test('the root program, which loads it too, runs its own checks', () => {
+    assert.isTrue(rootLint('libs/eslint-plugin-demo/src/index.mts'));
+
+    assert.isFalse(rootLint('libs/eslint-plugin-demo/test/rule.test.mts'));
+  });
+
+  test('a changed package an unchanged plugin is built against is built before what loads the plugin is linted', () => {
+    const commands = commandsOf([
+      'libs/eslint-rule-demo/src/index.mts',
+      'libs/lint-helper/src/index.mts',
+    ]);
+
+    assert.isBelow(
+      at(commands, 'libs/lint-helper: run build'),
+      at(commands, 'apps/lint-user: run fix:lint'),
+    );
+  });
+
+  test('a toolchain package exporting its sources loads what it declares in devDependencies, an app does not', () => {
+    const members = [
+      pkg('libs/eslint-plugin-x', ['build', 'fix:lint'], {
+        exportsBuild: true,
+      }),
+      // Exports its sources, so its imports run from wherever it declares them.
+      pkg('languages/x/eslint-config', ['fix:lint'], {
+        workspaceDependencies: ['eslint-plugin-x'],
+        lintImports: ['eslint-plugin-x'],
+      }),
+      pkg('languages/x/user', ['fix:lint'], {
+        workspaceDependencies: ['eslint-config'],
+        lintImports: ['eslint-config'],
+      }),
+      // Declares the plugin to lint itself.
+      pkg('apps/app-x', ['fix:lint'], {
+        workspaceDependencies: ['eslint-plugin-x'],
+        lintImports: ['eslint-plugin-x'],
+      }),
+      pkg('apps/app-x-user', ['fix:lint'], {
+        workspaceDependencies: ['app-x'],
+      }),
+    ] as const;
+
+    assert.deepStrictEqual(
+      lints(planCommands(members, ['libs/eslint-plugin-x/src/index.mts'])),
+      [
+        'apps/app-x: run fix:lint',
+        'languages/x/eslint-config: run fix:lint',
+        'languages/x/user: run fix:lint',
+        'libs/eslint-plugin-x: run fix:lint',
+      ],
+    );
+  });
+
+  test('a member exporting its sources is followed through what it declares in dependencies', () => {
+    const members = [
+      pkg('libs/eslint-rule-x', ['build', 'fix:lint'], { exportsBuild: true }),
+      // As `@sumi-lang/oxlint-config` names `eslint-rule-forge`.
+      pkg('languages/x/oxlint-config', ['fix:lint'], {
+        workspaceDependencies: ['eslint-rule-x'],
+        buildDependencies: ['eslint-rule-x'],
+      }),
+      pkg('languages/x/cli', ['fix:lint'], {
+        workspaceDependencies: ['oxlint-config'],
+        buildDependencies: ['oxlint-config'],
+      }),
+      pkg('libs/cli-user', ['fix:lint'], {
+        workspaceDependencies: ['cli'],
+        lintImports: ['cli'],
+      }),
+      // Names the rule kit in `devDependencies` alone, to lint itself.
+      pkg('languages/x/tool', ['fix:lint'], {
+        workspaceDependencies: ['eslint-rule-x'],
+        lintImports: ['eslint-rule-x'],
+      }),
+      pkg('libs/tool-user', ['fix:lint'], {
+        workspaceDependencies: ['tool'],
+        lintImports: ['tool'],
+      }),
+    ] as const;
+
+    const commands = planCommands(members, [
+      'libs/eslint-rule-x/src/index.mts',
+    ]);
+
+    assert.include(commands, 'libs/cli-user: run fix:lint');
+
+    assert.include(commands, 'languages/x/tool: run fix:lint');
+
+    assert.notInclude(commands, 'libs/tool-user: run fix:lint');
+  });
+
+  test('a toolchain package check:forgotten-exports reads is built again after the lint, which can rewrite it', () => {
+    const members = [
+      pkg('libs/eslint-plugin-x', ['build', 'fix:lint'], {
+        exportsBuild: true,
+        forgottenExportsRead: true,
+      }),
+      pkg('apps/user', ['fix:lint'], {
+        workspaceDependencies: ['eslint-plugin-x'],
+        lintImports: ['eslint-plugin-x'],
+      }),
+    ] as const;
+
+    const commands = planCommands(members, [
+      'libs/eslint-plugin-x/src/index.mts',
+    ]);
+
+    const lint = lastAt(commands, 'libs/eslint-plugin-x: run fix:lint');
+
+    assert.isBelow(at(commands, 'libs/eslint-plugin-x: run build'), lint);
+
+    assert.isAbove(lastAt(commands, 'libs/eslint-plugin-x: run build'), lint);
+
+    assert.isBelow(
+      lastAt(commands, 'libs/eslint-plugin-x: run build'),
+      at(commands, 'run check:forgotten-exports libs/eslint-plugin-x'),
+    );
+  });
+
+  test('a toolchain package a read package is built against is built again after the lint, one none reaches only before it', () => {
+    const members = [
+      pkg('libs/eslint-rule-x', ['build', 'fix:lint'], { exportsBuild: true }),
+      pkg('libs/eslint-plugin-y', ['build', 'fix:lint'], {
+        exportsBuild: true,
+      }),
+      pkg('libs/reader', ['build', 'fix:lint'], {
+        workspaceDependencies: ['eslint-rule-x'],
+        buildDependencies: ['eslint-rule-x'],
+        exportsBuild: true,
+        forgottenExportsRead: true,
+      }),
+      pkg('apps/user', ['fix:lint'], {
+        lintImports: ['eslint-rule-x', 'eslint-plugin-y'],
+      }),
+    ] as const;
+
+    const commands = planCommands(members, [
+      'libs/eslint-rule-x/src/index.mts',
+      'libs/eslint-plugin-y/src/index.mts',
+      'libs/reader/src/index.mts',
+    ]);
+
+    const builds = (name: string): number =>
+      commands.filter((command) => command === `libs/${name}: run build`)
+        .length;
+
+    assert.strictEqual(builds('eslint-rule-x'), 2);
+
+    assert.strictEqual(builds('eslint-plugin-y'), 1);
+  });
+
+  test('a document under src/ is not what it emits', () => {
+    assert.notInclude(
+      commandsOf([
+        'libs/eslint-plugin-demo/test/rule.test.mts',
+        'libs/eslint-plugin-demo/src/notes.md',
+      ]),
+      'apps/lint-user: run fix:lint',
+    );
+  });
+
+  test('a change outside it lints the changed package alone', () => {
+    assert.deepStrictEqual(
+      lints(commandsOf(['libs/lint-helper/src/index.mts'])),
+      ['libs/lint-helper: run fix:lint'],
+    );
+  });
+
+  test('a document change to it lints nothing', () => {
+    assert.deepStrictEqual(
+      lints(commandsOf(['libs/eslint-plugin-demo/README.md'])),
+      [],
+    );
+  });
+
+  test('a changed package a source-exporting config runs with from devDependencies is built before the lint', () => {
+    const members = [
+      pkg('libs/helper', ['build', 'fix:lint'], { exportsBuild: true }),
+      pkg('languages/x/eslint-config', ['fix:lint'], {
+        workspaceDependencies: ['helper'],
+      }),
+      pkg('languages/x/user', ['fix:lint'], {
+        lintImports: ['eslint-config'],
+      }),
+    ] as const;
+
+    const commands = planCommands(members, [
+      'libs/helper/src/index.mts',
+      'languages/x/eslint-config/src/index.mts',
+    ]);
+
+    assert.isBelow(
+      at(commands, 'libs/helper: run build'),
+      at(commands, 'languages/x/user: run fix:lint'),
+    );
+  });
+
+  test('a change behind a package a config imports, outside the toolchain, lints what imports it and runs the root checks', () => {
+    const members = [
+      // As `@sumi-lang/checker` under `@sumi-lang/cli`.
+      pkg('languages/x/checker', ['fix:lint']),
+      pkg('languages/x/cli', ['fix:lint'], {
+        workspaceDependencies: ['checker'],
+        buildDependencies: ['checker'],
+      }),
+      pkg('libs/cli-user', ['fix:lint'], { lintImports: ['cli'] }),
+    ] as const;
+
+    const commands = planCommands(members, [
+      'languages/x/checker/src/index.mts',
+    ]);
+
+    assert.include(commands, 'libs/cli-user: run fix:lint');
+
+    assert.isTrue(
+      commands.some(
+        (command) =>
+          command.startsWith('exec run-p') &&
+          command.includes('check:root:lint'),
+      ),
+    );
+  });
+
+  test('a changed package a config imports under another name lints what imports it, and is not followed further', () => {
+    const members = [
+      // Imported by a config, as `@sumi-lang/cli` or `ts-data-forge` is.
+      pkg('libs/data-lib', ['build', 'fix:lint'], { exportsBuild: true }),
+      pkg('libs/eslint-config-y', ['build', 'fix:lint'], {
+        workspaceDependencies: ['data-lib'],
+        buildDependencies: ['data-lib'],
+        exportsBuild: true,
+      }),
+      pkg('apps/a', ['fix:lint'], { lintImports: ['data-lib'] }),
+      pkg('apps/b', ['fix:lint'], { lintImports: ['eslint-config-y'] }),
+    ] as const;
+
+    const commands = planCommands(members, ['libs/data-lib/src/index.mts']);
+
+    assert.deepStrictEqual(lints(commands), [
+      'apps/a: run fix:lint',
+      'libs/data-lib: run fix:lint',
+    ]);
+
+    assert.isBelow(
+      at(commands, 'libs/data-lib: run build'),
+      at(commands, 'apps/a: run fix:lint'),
     );
   });
 });
