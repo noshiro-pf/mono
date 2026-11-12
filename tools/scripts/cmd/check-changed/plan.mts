@@ -35,7 +35,10 @@ export const classifyChanges = ({
   packages: readonly PackageInfo[];
   proseGate: readonly string[];
 }>): Classification => {
-  const mut_touched = new Map<string, { pkg: PackageInfo; code: boolean }>();
+  const mut_touched = new Map<
+    string,
+    { pkg: PackageInfo; code: boolean; emitted: boolean }
+  >();
 
   const mut_areas = new Set<Area>();
 
@@ -138,9 +141,17 @@ export const classifyChanges = ({
       continue;
     }
 
-    const entry = mut_touched.get(pkg.dir) ?? { pkg, code: false };
+    const entry = mut_touched.get(pkg.dir) ?? {
+      pkg,
+      code: false,
+      emitted: false,
+    };
 
-    mut_touched.set(pkg.dir, { pkg, code: entry.code || !prose });
+    mut_touched.set(pkg.dir, {
+      pkg,
+      code: entry.code || !prose,
+      emitted: entry.emitted || (!prose && isBuildInput(pkg.dir, file)),
+    });
   }
 
   const codeChanged: ReadonlySet<string> = new Set<string>(
@@ -229,6 +240,8 @@ export const buildPlan = ({
     ({ forgottenExportsRead: read }) => read,
   );
 
+  const linted = lintedPackages(code, members);
+
   const builtForForgottenExports = changedBuildsFor(
     forgottenExportsRead,
     changed,
@@ -301,7 +314,20 @@ export const buildPlan = ({
         ]
       : []),
 
-    ...code.flatMap(({ pkg }) => packageStep(pkg, 'fix', 'fix:lint')),
+    // A package's `fix:lint` loads from `dist/` what its config imports, and
+    // what that runs with, so a change there can fail a package the diff does
+    // not touch, as CI's `ws:fix:lint` finds after `ws:build`. As there, the
+    // changed ones are built first (after the codemod, which can rewrite them),
+    // and then the packages whose configs import them linted with the other
+    // changed ones, one step each as every package step here, so that each
+    // failure is reported and names its package (`ws:fix:lint` is
+    // `pnpm --recursive`, which stops at the first). A fix the lint makes to a
+    // package built here is left in the tree, which `main.mts` names, as CI
+    // would. A failed build is reported as a failure of its own, ahead of what
+    // the lint then reads.
+    ...linted.builds.flatMap((pkg) => packageStep(pkg, 'build', 'build')),
+
+    ...linted.packages.flatMap((pkg) => packageStep(pkg, 'fix', 'fix:lint')),
 
     ...code.flatMap(({ pkg }) => [
       ...packageStep(pkg, 'check', 'check:types'),
@@ -330,7 +356,9 @@ export const buildPlan = ({
     // included, and the build type-checks `src/` again after `check:types`:
     // that is what reading `dist/` costs, and telling a declaration's change
     // from the rest would be a second build system. A failed build is reported
-    // as a failure of its own, ahead of whatever the check then reads.
+    // as a failure of its own, ahead of whatever the check then reads. A
+    // package built for the lint above is built again here when a read package
+    // reaches it, as `fix:lint` ran in between and can rewrite it.
     ...(Arr.isNonEmpty(forgottenExportsRead)
       ? Arr.toPushed(
           builtForForgottenExports.flatMap((pkg) =>
@@ -360,7 +388,27 @@ export const buildPlan = ({
     // `style-check.yml`, whose gate drops nothing but `experimental/`.
     ...packages.flatMap(({ pkg }) => packageStep(pkg, 'check', 'check:ext')),
 
-    ...rootSteps({ areas, rootScripts, coverage }),
+    // The root program loads the same (its `eslint.config.mts`) and type-checks
+    // every member's config, so such a change asks for the root's own checks:
+    // its lint, and its type check, which reads what the configs import. Its
+    // tests come with them, as the area runs the three together. For any such
+    // change: the root manifest is not among the members a plan reads, and what
+    // the root does not load costs these checks alone.
+    ...rootSteps({
+      areas: linted.lintInputChanged
+        ? new Set<Area>([...areas, 'root'])
+        : areas,
+      rootScripts,
+      coverage,
+    }),
+
+    // strict-lib's config loads the same toolchain, and CI lints it on every
+    // run. For any such change, as for the root's checks above. Its config's
+    // imports are not read, as it is not a member: a package it alone imports
+    // would not count as one a config imports.
+    ...(linted.lintInputChanged && !areas.has('strict-lib')
+      ? [rootStep('check', 'strict-lib:check:lint')]
+      : []),
 
     ...(areas.has('strict-lib')
       ? [
@@ -455,6 +503,25 @@ export const isSpellCheckedByCi = (file: string): boolean =>
   file.startsWith('.github/') ||
   file.split('/').every((segment) => !segment.startsWith('.'));
 
+/**
+ * Whether a member is part of the ESLint toolchain a package's `fix:lint`
+ * loads: a shareable config (`eslint-config-*`), a plugin (`eslint-plugin-*`)
+ * or what rules are written with (`eslint-rule-*`), scoped or not, by the names
+ * npm gives them, which a new one takes too. What one is built against is
+ * loaded with it; a package a config imports under another name
+ * (`@sumi-lang/cli`, `ts-data-forge`) is loaded alone.
+ */
+export const isLintToolchain = (name: string): boolean => {
+  const unscoped = name.startsWith('@')
+    ? name.slice(name.indexOf('/') + 1)
+    : name;
+
+  return LINT_TOOLCHAIN_KINDS.some(
+    (kind) =>
+      unscoped === `eslint-${kind}` || unscoped.startsWith(`eslint-${kind}-`),
+  );
+};
+
 export type PackageInfo = Readonly<{
   name: string;
   /** Repository-relative, `/`-separated, no trailing slash. */
@@ -481,6 +548,12 @@ export type PackageInfo = Readonly<{
    * function of facts and never parses a manifest itself.
    */
   forgottenExportsRead: boolean;
+  /**
+   * The packages its `eslint.config*.mts` imports by name (`readLintImports` in
+   * `packages.mts`), which its `fix:lint` loads. Read when the members are, so
+   * that the plan never reads a file itself.
+   */
+  lintImports: ReadonlySet<string>;
 }>;
 
 /**
@@ -604,7 +677,17 @@ export const AREAS = [
 export type Area = (typeof AREAS)[number];
 
 export type Classification = Readonly<{
-  packages: readonly Readonly<{ pkg: PackageInfo; code: boolean }>[];
+  packages: readonly Readonly<{
+    pkg: PackageInfo;
+    code: boolean;
+    /**
+     * Whether what its build emits can have changed: a file its build reads or
+     * its manifest. A manifest edit that emits nothing new, a version bump,
+     * counts too: telling the fields apart would be a second reading of what a
+     * build depends on.
+     */
+    emitted: boolean;
+  }>[];
   /**
    * The members that declare a package whose code changed, touched by the diff
    * or not.
@@ -641,6 +724,8 @@ export type Step = Readonly<{
    */
   narrows?: string;
 }>;
+
+const LINT_TOOLCHAIN_KINDS = ['config', 'plugin', 'rule'] as const;
 
 const rootStep = (kind: StepKind, script: string): Step =>
   ({
@@ -852,3 +937,148 @@ const MANIFEST_FILES: ReadonlySet<string> = new Set<string>([
 ]);
 
 const BUILD_OUTPUT = /^(?:\.\/)?dist\//u;
+
+/**
+ * The members a member runs with: what its build is ordered by, or, for a
+ * toolchain package that exports its sources (`@sumi-lang/eslint-config`),
+ * whatever it declares, `devDependencies` included. Not so for any other such
+ * member: an app declares the toolchain to lint itself, not to be loaded by a
+ * lint.
+ */
+const runsWith = (pkg: PackageInfo): ReadonlySet<string> =>
+  pkg.exportsBuild || !isLintToolchain(pkg.name)
+    ? pkg.buildDependencies
+    : pkg.workspaceDependencies;
+
+/**
+ * The names of `seeds` and of every member of `through` that runs with one of
+ * them ({@link runsWith}), through other such members too.
+ */
+const loadersOf = (
+  seeds: readonly PackageInfo[],
+  through: readonly PackageInfo[],
+): ReadonlySet<string> => {
+  const mut_loaded = new Set<string>(seeds.map(({ name }) => name));
+
+  const reach = (): void => {
+    const next = through.filter(
+      (pkg) =>
+        !mut_loaded.has(pkg.name) &&
+        Array.from(runsWith(pkg)).some((name) => mut_loaded.has(name)),
+    );
+
+    if (!Arr.isNonEmpty(next)) {
+      return;
+    }
+
+    for (const pkg of next) {
+      mut_loaded.add(pkg.name);
+    }
+
+    reach();
+  };
+
+  reach();
+
+  return mut_loaded;
+};
+
+/**
+ * What `fix:lint` runs in, and what is built for it. A lint loads from `dist/`
+ * the packages a member's config imports (`lintImports`) and what those run
+ * with. With no change to that, the packages whose code changed. With one, the
+ * `packages` linted are every changed one and every member whose config imports
+ * a package that loads a changed one, and the `builds` are the changed packages
+ * those imported packages are built against, in build order.
+ *
+ * What loads a changed package is found walking backwards over what each member
+ * runs with ({@link runsWith}) in two passes. From the changed toolchain
+ * packages ({@link isLintToolchain}), through any member. From every changed
+ * package, through members outside the toolchain alone, so that a change to
+ * `@sumi-lang/checker` reaches `@sumi-lang/cli`, which configs import, but a
+ * change to `ts-data-forge` does not take in `eslint-config-typed`, which is
+ * built against it: that would lint every package for a rule's verdict its
+ * helpers seldom change.
+ */
+const lintedPackages = (
+  code: Classification['packages'],
+  members: readonly PackageInfo[],
+): Readonly<{
+  /** Whether a package a config imports changed what a lint loads of it. */
+  lintInputChanged: boolean;
+  builds: readonly PackageInfo[];
+  packages: readonly PackageInfo[];
+}> => {
+  const changed = code.map(({ pkg }) => pkg);
+
+  const emitted = code
+    .filter(({ emitted: isEmitted }) => isEmitted)
+    .map(({ pkg }) => pkg);
+
+  const loadedFromToolchain = loadersOf(
+    emitted.filter(({ name }) => isLintToolchain(name)),
+    members,
+  );
+
+  const loaded = new Set<string>([
+    ...loadedFromToolchain,
+    ...loadersOf(
+      emitted,
+      members.filter(({ name }) => !isLintToolchain(name)),
+    ),
+  ]);
+
+  const imported = members.filter(
+    ({ name }) =>
+      loaded.has(name) &&
+      members.some(({ lintImports }) => lintImports.has(name)),
+  );
+
+  if (Arr.isEmpty(imported)) {
+    return { lintInputChanged: false, builds: [], packages: changed };
+  }
+
+  const changedNames = new Set<string>(changed.map(({ name }) => name));
+
+  const importedNames = new Set<string>(imported.map(({ name }) => name));
+
+  const running = members.map((pkg) => ({
+    ...pkg,
+    buildDependencies: runsWith(pkg),
+  }));
+
+  return {
+    lintInputChanged: true,
+    // What the imported packages run with, a source-exporting one's
+    // `devDependencies` included, as their builds are ordered by it.
+    builds: changedBuildsFor(
+      running.filter(
+        ({ name }) => importedNames.has(name) || loadedFromToolchain.has(name),
+      ),
+      changed,
+      running,
+    ),
+    packages: members
+      .filter(
+        (pkg) =>
+          changedNames.has(pkg.name) ||
+          Array.from(pkg.lintImports).some((name) => importedNames.has(name)),
+      )
+      .toSorted((a, b) => a.dir.localeCompare(b.dir)),
+  };
+};
+
+/**
+ * Whether `file` is one a package's build reads (`configs/tsconfig.build.json`
+ * and `scripts/cmd/build.mts`, over `src/` less the `*.test.mts` that
+ * configuration excludes), or its manifest: by the convention, not each
+ * configuration, so what one includes outside `src/` (`ts-type-forge`'s
+ * `minimal-lib.d.mts`) is not counted.
+ */
+const isBuildInput = (dir: string, file: string): boolean =>
+  [
+    `${dir}/package.json`,
+    `${dir}/configs/tsconfig.build.json`,
+    `${dir}/scripts/cmd/build.mts`,
+  ].includes(file) ||
+  (file.startsWith(`${dir}/src/`) && !file.endsWith('.test.mts'));

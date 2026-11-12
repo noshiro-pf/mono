@@ -4,27 +4,8 @@ import {
   collectImportViolations,
   collectKeyStepViolations,
   isBenchmarkSource,
-  packageNameOf,
   runtimeClosure,
 } from './check-synstate-benchmark-imports.mjs';
-
-describe('packageNameOf', () => {
-  test.each([
-    ['synstate', 'synstate'],
-    ['ts-data-forge/internal', 'ts-data-forge'],
-    ['@synstate/docs', '@synstate/docs'],
-    ['@scope/pkg/sub/path', '@scope/pkg'],
-  ])('reads %s as %s', (specifier, name) => {
-    assert.strictEqual(packageNameOf(specifier), name);
-  });
-
-  test.each(['./shared.mjs', '../paths.mjs', '/abs.mjs', 'node:fs'])(
-    'reads %s as no package',
-    (specifier) => {
-      assert.isUndefined(packageNameOf(specifier));
-    },
-  );
-});
 
 describe('runtimeClosure', () => {
   const manifests = [

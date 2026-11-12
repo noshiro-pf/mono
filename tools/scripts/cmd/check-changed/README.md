@@ -58,7 +58,22 @@ by case. In order:
    takes off the parentheses the codemod adds when it reprints a type: CI lints
    only the formatted tree, and a lint rule judging them would fail on a line
    nobody changed. `fix:codemod:affected` formats too, but not when the codemod
-   fails.
+   fails. A package's `fix:lint` loads from `dist/` what its
+   `eslint.config*.mts` imports at run time, through the modules of the
+   repository it imports too (as TypeScript resolves them), and what those run
+   with. So when what a package emits changes (its `src/` less tests,
+   `configs/tsconfig.build.json`, `scripts/cmd/build.mts` or manifest), what a
+   config imports that runs with it is built first, as far as the diff changed
+   it, and `fix:lint` then runs in every changed package and every member whose
+   config imports one, and the root program's checks and strict-lib's lint run
+   too.
+   What runs with a changed package is followed through any member from an
+   ESLint config, plugin or rule package (`eslint-config-*`, `eslint-plugin-*`,
+   `eslint-rule-*`, scoped or not), and through the others alone from any other
+   package, so that a change to `@sumi-lang/checker` lints what imports
+   `@sumi-lang/cli` and one to `ts-data-forge` does not lint every package
+   through `eslint-config-typed`. An extensionless or directory import is not
+   followed (`resolveModule` in `packages.mts` says why).
 4. **Checks**: per package `check:types`, `check:test` (with coverage turned on
    where the package has a `check:test:cov`) and `check:sumi`;
    `check:forgotten-exports` over each changed package it reads
@@ -139,10 +154,11 @@ the fact: a failed matrix job of `code-check.yml` or `style-check.yml` says in
 its summary which of its commands this would have run for the diff
 (`../check-changed-gap.mts`).
 
-What depends on a changed package is not built or checked beyond its generators,
-so a stale `dist/` in a dependent goes unnoticed; build first (`ws:build:deps`)
-after a change other packages consume. Nor are the packages a change to
-`tools/configs/` configures; the run says which `ws:*` commands to reach for.
+What depends on a changed package is not built or checked beyond its generators
+and, for what an ESLint config imports, its `fix:lint`, so a stale `dist/` in a
+dependent goes unnoticed; build first (`ws:build:deps`) after a change other
+packages consume. Nor are the packages a change to `tools/configs/` configures;
+the run says which `ws:*` commands to reach for.
 `verify:npm-packages` (pack, install and run the smoke checks) does not run
 either: a change to `verify-npm-packages/smoke/` is regenerated into its
 `local/` copies, not run.

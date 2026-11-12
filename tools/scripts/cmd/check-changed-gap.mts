@@ -176,7 +176,7 @@ const GROUPS: readonly Readonly<{ name: GroupName; meaning: string }>[] = [
   {
     name: 'In packages whose code this diff does not touch',
     meaning:
-      '`check-changed` runs the code checks of the packages whose code a diff touches, and the generators of those it touches by documents and of those that declare a changed one. A failure here is in a package the change reached another way, a dependent most often: build (`pnpm run ws:build:deps`) and run the `ws:*` command for it.',
+      '`check-changed` runs the code checks of the packages whose code a diff touches, the generators of those it touches by documents and of those that declare a changed one, and the `fix:lint` of those whose ESLint config imports a package that a change reaches. A failure here is in a package the change reached another way, a dependent most often: build (`pnpm run ws:build:deps`) and run the `ws:*` command for it.',
   },
   {
     name: 'Not planned for this diff',

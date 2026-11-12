@@ -196,14 +196,15 @@ describe('codeTouched', () => {
         buildDependencies: new Set<string>(),
         exportsBuild: false,
         forgottenExportsRead: false,
+        lintImports: new Set<string>(),
       }) as const;
 
     assert.deepStrictEqual(
       Array.from(
         codeTouched({
           packages: [
-            { pkg: pkg('libs/code'), code: true },
-            { pkg: pkg('libs/readme'), code: false },
+            { pkg: pkg('libs/code'), code: true, emitted: true },
+            { pkg: pkg('libs/readme'), code: false, emitted: false },
           ],
           dependents: [],
           members: [],
