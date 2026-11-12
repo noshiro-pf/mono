@@ -95,6 +95,61 @@ describe('EventScheduleAppLocalStorage with working storage', () => {
   });
 });
 
+describe('EventScheduleAppLocalStorage answer table width', () => {
+  test('restores nothing from empty storage', () => {
+    stubWindow({
+      localStorage: storageWith({ getItem: () => null, setItem: () => {} }),
+    });
+
+    const restored =
+      EventScheduleAppLocalStorage.restoreAnswerTableIsFullWidth();
+
+    assert.isTrue(Result.isOk(restored));
+
+    expect(restored.value).toBeUndefined();
+  });
+
+  test('restores what it saved', () => {
+    const mut_items = new Map<string, string>();
+
+    stubWindow({
+      localStorage: storageWith({
+        getItem: (key) => mut_items.get(key) ?? null,
+        setItem: (key, value) => {
+          mut_items.set(key, value);
+        },
+      }),
+    });
+
+    for (const value of [true, false]) {
+      assert.isTrue(
+        Result.isOk(
+          EventScheduleAppLocalStorage.saveAnswerTableIsFullWidth(value),
+        ),
+      );
+
+      const restored =
+        EventScheduleAppLocalStorage.restoreAnswerTableIsFullWidth();
+
+      assert.isTrue(Result.isOk(restored));
+
+      expect(restored.value).toBe(value);
+    }
+  });
+
+  test('returns an error for a stored value that is not a boolean', () => {
+    stubWindow({
+      localStorage: storageWith({ getItem: () => 'yes', setItem: () => {} }),
+    });
+
+    assert.isTrue(
+      Result.isErr(
+        EventScheduleAppLocalStorage.restoreAnswerTableIsFullWidth(),
+      ),
+    );
+  });
+});
+
 const stubWindow = (win: unknown): void => {
   vi.stubGlobal('window', win);
 

@@ -165,6 +165,10 @@ export const answerPageDictionary = {
     weight: '回答の優先度',
     refresh: '更新',
     saveScreenShot: '画像として保存',
+    tableFullWidth: {
+      expand: '表を全幅で表示',
+      shrink: '表示幅を戻す',
+    },
     displayOnlyCandidateDatesWithZeroPoorIcon: '✕が0個の候補日程のみ表示',
     displayOnlyCandidateDatesOfRank1to3: 'スコア上位3位まで表示',
     detailedFilterSettingsButton: '日程絞り込みの詳細設定',

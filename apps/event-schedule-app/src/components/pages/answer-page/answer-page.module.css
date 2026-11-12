@@ -112,3 +112,40 @@
   left: 0;
   transform-origin: center;
 }
+
+/*
+ * A container, so that the full-width toggle can tell whether the page has
+ * any room to widen into.
+ */
+.page {
+  container-type: inline-size;
+}
+
+/*
+ * The page's width: each card 1200px at most, centred (the cards' own 10px
+ * margins included). The answers section leaves it when the table is shown
+ * full width, for reading many answers side by side.
+ */
+.page > :not(.fullWidth) {
+  padding-inline: max(0px, calc((100% - 1220px) / 2));
+}
+
+/*
+ * A flex item like its siblings, and a flex container itself, so that the
+ * button inside sits on no line box and lines up with them.
+ */
+.fullWidthToggle {
+  display: flex;
+}
+
+/*
+ * Hidden where the page already spans the screen: at the 1220px of the padding
+ * above, which it has to follow. Just above that a press widens the table by
+ * little, but the toggle stays: hidden there, a full width kept from a wider
+ * screen could not be turned off.
+ */
+@container (max-width: 1220px) {
+  .fullWidthToggle {
+    display: none;
+  }
+}

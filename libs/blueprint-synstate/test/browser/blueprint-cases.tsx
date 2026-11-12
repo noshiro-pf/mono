@@ -209,6 +209,8 @@ const allIcons = [
   'less-than-or-equal-to',
   'lock',
   'log-out',
+  'maximize',
+  'minimize',
   'moon',
   'plus',
   'refresh',

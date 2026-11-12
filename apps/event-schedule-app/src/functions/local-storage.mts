@@ -17,12 +17,17 @@ type EventSchedulePicked = StrictPick<
 const attachSuffix = (key: string): string =>
   `${key}--event-schedule-app--2dc690b2-4b9b-49c3-921b-8c2a9451e415` as const;
 
-type Store = DeepReadonly<{ createEventPage: EventSchedule }>;
+type Store = DeepReadonly<{
+  createEventPage: EventSchedule;
+  /** Whether the answer page's table spans the screen rather than the page. */
+  answerTableIsFullWidth: boolean;
+}>;
 
 type StoreKeys = ReadonlyRecord<keyof Store, string>;
 
 const keys: StoreKeys = {
   createEventPage: attachSuffix('createEventPage'),
+  answerTableIsFullWidth: attachSuffix('answerTableIsFullWidth'),
 } as const;
 
 /**
@@ -90,7 +95,41 @@ const saveCreateEventPageTemp = (
     : save(keys.createEventPage, str.value ?? '');
 };
 
+const restoreAnswerTableIsFullWidth = (): Result<
+  boolean | undefined,
+  string
+> => {
+  const fromDb = restore(keys.answerTableIsFullWidth);
+
+  if (Result.isErr(fromDb)) {
+    return fromDb;
+  }
+
+  switch (fromDb.value) {
+    case undefined:
+      return Result.ok(undefined);
+
+    case 'true':
+      return Result.ok(true);
+
+    case 'false':
+      return Result.ok(false);
+
+    default:
+      return Result.err(
+        `answerTableIsFullWidth is neither true nor false: ${fromDb.value}`,
+      );
+  }
+};
+
+const saveAnswerTableIsFullWidth = (
+  isFullWidth: boolean,
+): Result<undefined, string> =>
+  save(keys.answerTableIsFullWidth, isFullWidth ? 'true' : 'false');
+
 export const EventScheduleAppLocalStorage = {
   restoreCreateEventPageTemp,
   saveCreateEventPageTemp,
+  restoreAnswerTableIsFullWidth,
+  saveAnswerTableIsFullWidth,
 } as const;

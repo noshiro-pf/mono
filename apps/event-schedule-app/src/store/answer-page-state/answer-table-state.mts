@@ -1,15 +1,16 @@
 import { UserName } from 'event-schedule-app-shared';
 import {
-  type InitializedObservable,
   createBooleanState,
   derive,
   map,
+  type InitializedObservable,
 } from 'synstate';
 import {
   Arr,
   IMapMapped,
   Num,
   Optional,
+  Result,
   expectType,
   ifThen,
   mapNullable,
@@ -27,6 +28,7 @@ import {
   createScore,
   datetimeRangeFromMapKey,
   datetimeRangeToMapKey,
+  type EventScheduleAppLocalStorage,
 } from '../../functions/index.mjs';
 import type {
   AnswerTableCell,
@@ -41,6 +43,11 @@ export type AnswerTableDeps = Readonly<{
     AnswerFilterAndSort,
     'answersFiltered$' | 'filterState$' | 'sortKeyAndOrder$'
   >;
+  /** Where the table's width survives a reload. */
+  storage: Readonly<{
+    restoreTableIsFullWidth: (typeof EventScheduleAppLocalStorage)['restoreAnswerTableIsFullWidth'];
+    saveTableIsFullWidth: (typeof EventScheduleAppLocalStorage)['saveAnswerTableIsFullWidth'];
+  }>;
 }>;
 
 /**
@@ -429,16 +436,36 @@ export const createAnswerTableStore = (deps: AnswerTableDeps): AnswerTable => {
   const [detailedFilterIsOpen$, { toggle: toggleDetailedFilter }] =
     createBooleanState(false);
 
+  // Read once, when the app starts, not on each visit: a tab keeps the width it
+  // shows, and a toggle in it saves what that tab then shows, which is the
+  // reader's latest choice even when another tab saved a different one.
+  const [tableIsFullWidth$, { toggle: toggleTableIsFullWidthState }] =
+    createBooleanState(restoreTableIsFullWidth(deps.storage));
+
+  const toggleTableIsFullWidth = (): boolean => {
+    const next = toggleTableIsFullWidthState();
+
+    const saveResult = deps.storage.saveTableIsFullWidth(next);
+
+    if (Result.isErr(saveResult)) {
+      console.warn(saveResult.value);
+    }
+
+    return next;
+  };
+
   return {
     tableBodyValuesFiltered$,
     detailedFilterIsOpen$,
     dateStringIsMinimized$,
     answerIconIsHidden$,
     tableIsMinimized$,
+    tableIsFullWidth$,
     toggleDetailedFilter,
     toggleDateStringIsMinimized,
     toggleAnswerIconIsHidden,
     toggleTableIsMinimized,
+    toggleTableIsFullWidth,
   } as const;
 };
 
@@ -461,8 +488,31 @@ export type AnswerTable = Readonly<{
   dateStringIsMinimized$: InitializedObservable<boolean>;
   answerIconIsHidden$: InitializedObservable<boolean>;
   tableIsMinimized$: InitializedObservable<boolean>;
+  /**
+   * Whether the answers section spans the screen rather than the page's width,
+   * kept in storage: whoever widens it once is reading many answers side by
+   * side, and would otherwise widen it on every visit.
+   */
+  tableIsFullWidth$: InitializedObservable<boolean>;
   toggleDetailedFilter: () => boolean;
   toggleDateStringIsMinimized: () => boolean;
   toggleAnswerIconIsHidden: () => boolean;
   toggleTableIsMinimized: () => boolean;
+  /** Flips the width, saves it, and returns the new value. */
+  toggleTableIsFullWidth: () => boolean;
 }>;
+
+/** The stored width, or the page's width when storage has none or fails. */
+const restoreTableIsFullWidth = (
+  storage: AnswerTableDeps['storage'],
+): boolean => {
+  const restored = storage.restoreTableIsFullWidth();
+
+  if (Result.isErr(restored)) {
+    console.warn(restored.value);
+
+    return false;
+  }
+
+  return restored.value ?? false;
+};

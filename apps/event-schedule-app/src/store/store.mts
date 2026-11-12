@@ -124,6 +124,12 @@ export const { answersFiltered$ } = AnswerFilterAndSortStore;
 export const AnswerTableStore = createAnswerTableStore({
   eventSchedule$,
   filterAndSort: AnswerFilterAndSortStore,
+  storage: {
+    restoreTableIsFullWidth:
+      EventScheduleAppLocalStorage.restoreAnswerTableIsFullWidth,
+    saveTableIsFullWidth:
+      EventScheduleAppLocalStorage.saveAnswerTableIsFullWidth,
+  },
 });
 
 export const AnswerPageStore = createAnswerPageStore({
