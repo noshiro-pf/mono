@@ -15,17 +15,33 @@ import {
 import type { Size } from './intent.mjs';
 
 /** One tab of {@link Tabs}. */
-export type TabProps<T extends string> = Readonly<{
-  id: T;
-  title: string;
-  /**
-   * Mounted while the tab is chosen. Left out, the tab is a title alone, as in
-   * a navbar whose content is drawn elsewhere, and controls no panel.
-   */
-  panel?: JSX.Element;
-  /** On the tab's title. */
-  'data-e2e'?: string;
-}>;
+export type TabProps<T extends string> = Readonly<
+  {
+    id: T;
+    title: string;
+    /** On the tab's title. */
+    'data-e2e'?: string;
+  } & (
+    | {
+        /**
+         * Mounted while the tab is chosen. Left out, the tab is a title alone,
+         * as in a navbar whose content is drawn elsewhere.
+         */
+        panel?: JSX.Element;
+        panelId?: undefined;
+      }
+    | {
+        panel?: undefined;
+        /**
+         * For a title alone: the `id` of the element, drawn elsewhere, that the
+         * tab controls, written as its `aria-controls`. Give that element
+         * `role="tabpanel"`, and `aria-labelledby` the chosen tab's
+         * {@link tabTitleId}.
+         */
+        panelId: string;
+      }
+  )
+>;
 
 type Props<T extends string> = Readonly<{
   /** Makes the ids of the titles and panels, which say which is whose. */
@@ -107,14 +123,16 @@ export const Tabs = <T extends string>({
       {tabs.map((tab) => {
         const selected = mapBindable(selectedTabId, (t) => t === tab.id);
 
-        // A title alone controls nothing, so it says neither what nor whether
-        // it is expanded.
+        // A title alone controls the panel it names, if any, which it neither
+        // shows nor hides, so it does not say whether it is expanded.
         const controlsPanel = tab.panel !== undefined;
+
+        const controls = controlsPanel ? panelId(id, tab.id) : tab.panelId;
 
         return (
           <div
             aria-controls={
-              controlsPanel ? constant(panelId(id, tab.id)) : undefined
+              controls === undefined ? undefined : constant(controls)
             }
             aria-disabled={constant('false')}
             aria-expanded={controlsPanel ? selected : undefined}
@@ -126,7 +144,7 @@ export const Tabs = <T extends string>({
                 : constant(tab['data-e2e'])
             }
             data-tab-id={constant<string>(tab.id)}
-            id={constant(titleId(id, tab.id))}
+            id={constant(tabTitleId(id, tab.id))}
             role={constant('tab')}
             tabIndex={mapBindable(selected, (s) => (s ? 0 : -1))}
             onClick={() => {
@@ -147,7 +165,7 @@ export const Tabs = <T extends string>({
           then={
             <div
               aria-hidden={constant('false')}
-              aria-labelledby={constant(titleId(id, tab.id))}
+              aria-labelledby={constant(tabTitleId(id, tab.id))}
               class={constant('bp6-tab-panel')}
               id={constant(panelId(id, tab.id))}
               role={constant('tabpanel')}
@@ -161,9 +179,13 @@ export const Tabs = <T extends string>({
   </div>
 );
 
-/** Blueprint's ids for a tab's title and panel. */
-const titleId = (parentId: string, tabId: string): string =>
-  `bp6-tab-title_${parentId}_${tabId}` as const;
+/**
+ * The `id` of a tab's title, as Blueprint makes it from the `id` of its
+ * {@link Tabs} and its own: what a panel drawn elsewhere is labelled by.
+ */
+export const tabTitleId = (tabsId: string, tabId: string): string =>
+  `bp6-tab-title_${tabsId}_${tabId}` as const;
 
+/** Blueprint's id for a tab's panel. */
 const panelId = (parentId: string, tabId: string): string =>
   `bp6-tab-panel_${parentId}_${tabId}` as const;

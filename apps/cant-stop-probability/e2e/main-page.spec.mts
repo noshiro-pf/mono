@@ -168,7 +168,18 @@ test(
   async ({ page }) => {
     await page.goto('/');
 
-    await page.getByRole('tab', { name: '残存列確率' }).click();
+    const tab = page.getByRole('tab', { name: '残存列確率' });
+
+    await tab.click();
+
+    // The content below is the panel the tab controls, named by it.
+    const panel = page.getByRole('tabpanel', { name: '残存列確率' });
+
+    await expect.soft(panel).toBeVisible();
+
+    await expect.soft(panel).toHaveAttribute('id', 'cant-stop-panel');
+
+    await expect.soft(tab).toHaveAttribute('aria-controls', 'cant-stop-panel');
 
     await expect.soft(page.getByTestId('filter-input')).toBeHidden();
 

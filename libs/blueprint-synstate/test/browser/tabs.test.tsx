@@ -1,4 +1,5 @@
-import { Tabs } from 'blueprint-synstate';
+import { Tabs, tabTitleId } from 'blueprint-synstate';
+import { map } from 'synstate';
 import { constant } from 'synstate-dom';
 import { all, controlled, mountInto, one, press } from './helpers.mjs';
 
@@ -143,6 +144,54 @@ describe(Tabs, () => {
     );
 
     titleA.click();
+
+    assert.isNull(container.querySelector('.bp6-tab-panel'));
+
+    unmount();
+  });
+
+  test('a tab with no panel names the panel drawn elsewhere, which its title labels', () => {
+    const { value$, onChange } = controlled('a');
+
+    const { container, unmount } = mountInto(() => (
+      <>
+        <Tabs
+          id={'nav'}
+          selectedTabId={value$}
+          tabs={[
+            { id: 'a', title: 'A', panelId: 'content' },
+            { id: 'b', title: 'B', panelId: 'content' },
+          ]}
+          onChange={onChange}
+        />
+        <div
+          aria-labelledby={value$.pipe(map((tab) => tabTitleId('nav', tab)))}
+          id={constant('content')}
+          role={constant('tabpanel')}
+        />
+      </>
+    ));
+
+    const [titleA, titleB] = all(container, '.bp6-tab');
+
+    assert.isDefined(titleA);
+
+    assert.isDefined(titleB);
+
+    assert.strictEqual(titleA.getAttribute('aria-controls'), 'content');
+
+    assert.strictEqual(titleB.getAttribute('aria-controls'), 'content');
+
+    // No panel of its own to show or hide.
+    assert.isFalse(titleA.hasAttribute('aria-expanded'));
+
+    const content = one(container, '#content');
+
+    assert.strictEqual(content.getAttribute('aria-labelledby'), titleA.id);
+
+    titleB.click();
+
+    assert.strictEqual(content.getAttribute('aria-labelledby'), titleB.id);
 
     assert.isNull(container.querySelector('.bp6-tab-panel'));
 
