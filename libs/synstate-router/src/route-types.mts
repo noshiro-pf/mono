@@ -256,7 +256,18 @@ export type HrefOptions<SearchCodecs> = Readonly<{
 }> &
   ([keyof SearchCodecs] extends [never]
     ? unknown
-    : Readonly<{ search?: RouteSearchInput<SearchCodecs> }>);
+    : Readonly<{
+        search?: RouteSearchInput<SearchCodecs>;
+        /**
+         * Search values carried over from another page's search, `from`, for
+         * the `keys` this page declares too: a filter kept across pages. A
+         * value given in `search` wins; one absent from `from` is left out.
+         */
+        retain?: Readonly<{
+          from: RouteSearchInput<SearchCodecs>;
+          keys: readonly (keyof SearchCodecs & string)[];
+        }>;
+      }>);
 
 export type HrefFunction<ParamCodecs, SearchCodecs> = [
   keyof ParamCodecs,
