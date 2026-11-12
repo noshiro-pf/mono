@@ -89,7 +89,14 @@ export type GeneratedIntrinsicElements = Readonly<{
 }> &
   Readonly<{ [K in SvgTagName]: SvgElementProps<SVGElementTagNameMap[K]> }>;
 
-type ReflectedProps<E> = Readonly<{
+/**
+ * One optional `Bindable` per writable boolean, number and string property of
+ * `E` that the binding can set, by the attribute of its name or as a property
+ * (`id`, `disabled`, `value`, `tabIndex`, …), `aria*` and `on*` aside: the part
+ * of {@link HtmlElementProps} read off the element type, which says which take
+ * `undefined`.
+ */
+export type ReflectedProps<E> = Readonly<{
   [K in keyof E as ReflectedKey<E, K>]?: Bindable<
     K extends PropertyName ? NonNullable<E[K]> : NonNullable<E[K]> | undefined
   >;
@@ -121,17 +128,18 @@ type IsWritable<E, K extends keyof E> =
     : true;
 
 /**
- * Writable primitive properties that are not attributes, or that are props of
- * their own (`class`, `style`). The binding would pass them to `setAttribute`,
- * which makes an attribute nothing reads (#2934): the parts of `<a>`'s `href`
- * (`hash` … `username`), the text of `<a>`, `<option>`, `<script>` and
- * `<title>` (`text`), media playback state (`currentTime` … `volume`), and form
- * control state (`returnValue` … `length`), and the obsolete `ch` and `chOff`
- * of table cells, whose attributes are `char` and `charoff`. A property written
- * as a property is in `propertyNames`, and one whose attribute is spelt
- * differently in `attributeNameOf`. `test/browser/reflected-keys.test.tsx`
- * binds every key that is left and reads the property back in Chromium, from
- * the list `gen:reflected-keys` writes from these types.
+ * Writable primitive properties that are not attributes, or that a prop of its
+ * own sets (`className`, which `class` sets). The binding would pass them to
+ * `setAttribute`, which makes an attribute nothing reads (#2934): the parts of
+ * `<a>`'s `href` (`hash` … `username`), the text of `<a>`, `<option>`,
+ * `<script>` and `<title>` (`text`), media playback state (`currentTime` …
+ * `volume`), and form control state (`returnValue` … `length`), and the
+ * obsolete `ch` and `chOff` of table cells, whose attributes are `char` and
+ * `charoff`. A property written as a property is in `propertyNames`, and one
+ * whose attribute is spelt differently in `attributeNameOf`.
+ * `test/browser/reflected-keys.test.tsx` binds every key that is left and reads
+ * the property back in Chromium, from the list `gen:reflected-keys` writes from
+ * these types.
  *
  * The keys are left out of every element, so a name that is an attribute on
  * most elements and not on a few is in `ElementExcludedKey` instead, and one
@@ -182,3 +190,5 @@ type ExcludedKey =
  */
 type ElementExcludedKey<E> =
   TypeEq<E, HTMLStyleElement> extends true ? 'disabled' : never;
+
+export type { SvgTagName } from '../internal/index.mjs';

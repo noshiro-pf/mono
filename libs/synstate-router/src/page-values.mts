@@ -39,7 +39,11 @@ export type PageValues<
 }> &
   PageState<M>;
 
-/** The history state, on a page that declares one. */
+/**
+ * The history state, on a page that declares one.
+ *
+ * @internal A consumer reads it as `PageValues<M>['state']`.
+ */
 type PageState<M> =
   M extends Readonly<{ state: infer S }> ? Readonly<{ state: S }> : unknown;
 

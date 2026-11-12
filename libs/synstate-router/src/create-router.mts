@@ -9,12 +9,7 @@ import {
   type Observable,
 } from 'synstate';
 import { Arr, isNonNullObject, isRecord, Optional } from 'ts-data-forge';
-import type {
-  DeepReadonly,
-  ReadonlyRecord,
-  RelaxedExclude,
-  StrictOmit,
-} from 'ts-type-forge';
+import type { DeepReadonly, RelaxedExclude, StrictOmit } from 'ts-type-forge';
 import type { RouterBrowser } from './browser.mjs';
 import { matchRoutes } from './define-routes.mjs';
 import type { PageMatch } from './href-with-search.mjs';
@@ -39,7 +34,7 @@ import { matchedBranch } from './matched-branch.mjs';
 import type {
   AnyRouteNode,
   AnyRoutes,
-  AnySearchCodec,
+  AnySearchCodecs,
   RouteBranch,
   RouteDefinitions,
   RouteMatch,
@@ -283,8 +278,6 @@ export type Router<R extends AnyRoutes> = Readonly<{
    */
   dispose: () => void;
 }>;
-
-type AnySearchCodecs = ReadonlyRecord<string, AnySearchCodec>;
 
 /** Rejects, by type, a node that declares no search to set. */
 export type DeclaresSearch<S extends AnySearchCodecs> = [keyof S] extends [
@@ -1716,3 +1709,5 @@ const scrollTargetOf = (
       ? Optional.none
       : Optional.some('top');
 };
+
+export type { TrailingSlash } from './internal/index.mjs';

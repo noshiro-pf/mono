@@ -91,6 +91,10 @@ export type AsyncChildObservableHooks = SyncChildObservableHooks &
     flush?: () => void;
   }>;
 
+/**
+ * @internal The part `ChildObservableConfig` and
+ * `InitializedChildObservableConfig` share; a consumer spells those.
+ */
 type ChildObservableConfigBase<P extends NonEmptyUnknownList> = Readonly<{
   parents: Wrap<P>;
 
