@@ -1,9 +1,12 @@
+import { Optional } from 'ts-data-forge';
 import type { SafeUint } from 'ts-type-forge';
 import {
   counter,
+  createState,
   filter,
   map,
   merge,
+  source,
   take,
   type Observable,
 } from '../../src/index.mjs';
@@ -81,3 +84,31 @@ export const mergeTestCases: readonly [StreamTestCase<number | string>] = [
 for (const c of mergeTestCases) {
   testStream(c);
 }
+
+describe('merge of an initialized source', () => {
+  test('holds no value until a source emits', () => {
+    const [state$, setState] = createState(1);
+
+    const events$ = source<string>();
+
+    const merged$ = merge([state$, events$]);
+
+    assert.isTrue(Optional.isNone(merged$.getSnapshot()));
+
+    const mut_history: (number | string)[] = [];
+
+    merged$.subscribe((value) => {
+      mut_history.push(value);
+    });
+
+    assert.deepStrictEqual(mut_history, []);
+
+    events$.next('a');
+
+    assert.deepStrictEqual(merged$.getSnapshot(), Optional.some('a'));
+
+    setState(2);
+
+    assert.deepStrictEqual(mut_history, ['a', 2]);
+  });
+});

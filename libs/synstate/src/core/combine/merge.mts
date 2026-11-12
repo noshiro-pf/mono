@@ -8,7 +8,9 @@ import { Optional, expectType } from 'ts-data-forge';
 import type { ArrayElement, NonEmptyTuple } from 'ts-type-forge';
 import { SyncChildObservableClass } from '../class/index.mjs';
 import { source } from '../create/index.mjs';
+import { withInitialValue } from '../operators/index.mjs';
 import type {
+  InitializedObservable,
   MergeObservable,
   MergeObservableRefined,
   NonEmptyUnknownList,
@@ -21,6 +23,8 @@ import type {
 /**
  * Merges multiple observables into a single observable that emits all values from all sources.
  * Emits whenever any source observable emits a value.
+ * It holds no value until a source emits, even when its sources hold one.
+ * Pipe `withInitialValue` after it where a value is needed from the start.
  *
  * @template OS - Tuple type of source observables
  * @param parents - Array of observables to merge
@@ -114,4 +118,19 @@ if (import.meta.vitest !== undefined) {
   const _m = merge([r1, r2]);
 
   expectType<typeof _m, SyncChildObservable<number | string>>('<=');
+
+  // Initialized sources do not make the merged observable initialized.
+  const a$: InitializedObservable<number> = source<number>().pipe(
+    withInitialValue(1),
+  );
+
+  const _m2 = merge([a$, source<string>()]);
+
+  expectType<typeof _m2, Observable<number | string>>('<=');
+
+  expectType<typeof _m2, InitializedObservable<number | string>>('!<=');
+
+  const _m3 = merge([a$, a$]);
+
+  expectType<typeof _m3, InitializedObservable<number>>('!<=');
 }
