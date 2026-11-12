@@ -1,28 +1,20 @@
-import * as fs from 'node:fs';
 import * as path from 'node:path';
-import {
-  Arr,
-  hasKey,
-  isNonNullObject,
-  isRecord,
-  memoizeFunction,
-  Result,
-  unknownToString,
-} from 'ts-data-forge';
+import { Arr, Result, unknownToString } from 'ts-data-forge';
 import * as t from 'ts-fortress';
 import { isDirectlyExecuted } from 'ts-repo-utils';
 import * as ts from 'typescript';
 import {
-  listLibraryDirs,
-  listTrackedFiles,
-  readRepositoryFile,
-} from '../lib/repo-files.mjs';
+  cachedModuleReader,
+  readWorkspacePackages,
+  walkImports,
+  type Closure,
+} from '../lib/import-closure.mjs';
+import { listTrackedFiles, readRepositoryFile } from '../lib/repo-files.mjs';
 import {
   readShellScript,
   type ShellAssignment,
 } from '../lib/shell-commands.mjs';
 import { readWorkflowJobs } from '../lib/workflow-jobs.mjs';
-import { projectRootPath } from '../project-root-path.mjs';
 
 /**
  * Fails when a path pattern in `restart-unblock-prs.yml` and what its command
@@ -81,7 +73,7 @@ export const checkRestartUnblockPrsPaths = (): Promise<
     );
 
     // Each command is walked twice, and the two share most of their files.
-    const readCached = memoizeFunction(readSource, (file: string) => file);
+    const reader = cachedModuleReader();
 
     const reports = COMMANDS.map(({ variable, entry }) => {
       const pattern = patterns.get(variable);
@@ -93,7 +85,7 @@ export const checkRestartUnblockPrsPaths = (): Promise<
       return Result.safeTry(function* () {
         const closure = yield* Result.safeUnwrap(
           walkImports(entry, {
-            readSource: readCached,
+            ...reader,
             workspacePackages,
             follows: (directory) => pattern.test(`${directory}/src/`),
           }),
@@ -103,7 +95,7 @@ export const checkRestartUnblockPrsPaths = (): Promise<
         // import at startup as well.
         const everything = yield* Result.safeUnwrap(
           walkImports(entry, {
-            readSource: readCached,
+            ...reader,
             workspacePackages,
             follows: () => true,
           }),
@@ -233,105 +225,6 @@ export const parsePatterns = (
   return Result.ok(mut_patterns);
 };
 
-/**
- * Every module reachable from `entry` by static import or re-export, type-only
- * ones included (a change there is still a change to the file), by paths from
- * the repository root.
- *
- * A relative specifier is resolved as the repository writes them, `.mjs` for
- * the `.mts` beside it. A bare one naming a workspace package is entered at its
- * `src/` entry when `follows` says so, and otherwise listed in `unfollowed`;
- * either way it is listed, as written, in `workspaceImports`. Anything else
- * (`node:*`, a third-party package) is not ours to restart for.
- */
-export const walkImports = (
-  entry: string,
-  {
-    readSource: read,
-    workspacePackages,
-    follows,
-  }: Readonly<{
-    readSource: (relativePath: string) => string | undefined;
-    workspacePackages: ReadonlyMap<string, string>;
-    follows: (directory: string) => boolean;
-  }>,
-): Result<Closure, string> => {
-  const mut_files = new Set<string>();
-
-  const mut_unfollowed = new Set<string>();
-
-  const mut_workspaceImports = new Set<string>();
-
-  const mut_queue: string[] = [entry];
-
-  while (Arr.isNonEmpty(mut_queue)) {
-    const file = mut_queue.pop();
-
-    if (file === undefined || mut_files.has(file)) {
-      continue;
-    }
-
-    const source = read(file);
-
-    if (source === undefined) {
-      return Result.err(
-        file === entry
-          ? `${entry} could not be read.`
-          : `${file}, imported on the way from ${entry}, could not be read.`,
-      );
-    }
-
-    mut_files.add(file);
-
-    for (const { fileName: specifier } of ts.preProcessFile(source, true, true)
-      .importedFiles) {
-      if (specifier.startsWith('.')) {
-        mut_queue.push(
-          path.posix
-            .join(path.posix.dirname(file), specifier)
-            .replace(/\.mjs$/u, '.mts'),
-        );
-
-        continue;
-      }
-
-      const packageName = toPackageName(specifier);
-
-      const directory = workspacePackages.get(packageName);
-
-      if (directory === undefined) {
-        continue;
-      }
-
-      mut_workspaceImports.add(specifier);
-
-      if (!follows(directory)) {
-        mut_unfollowed.add(packageName);
-
-        continue;
-      }
-
-      const packageEntry = PACKAGE_ENTRIES.map(
-        (name) => `${directory}/src/${name}`,
-      ).find((candidate) => read(candidate) !== undefined);
-
-      if (packageEntry === undefined) {
-        return Result.err(
-          `${packageName} has none of ${PACKAGE_ENTRIES.join(', ')} under ${directory}/src/.`,
-        );
-      }
-
-      mut_queue.push(packageEntry);
-    }
-  }
-
-  return Result.ok({
-    files: Array.from(mut_files).toSorted(),
-    unfollowed: Array.from(mut_unfollowed).toSorted(),
-    workspaceImports: Array.from(mut_workspaceImports).toSorted(),
-  });
-};
-
 /** What is wrong with one pattern, as one message per problem. */
 export const findViolations = ({
   variable,
@@ -392,13 +285,6 @@ export const findViolations = ({
       ),
   ];
 };
-
-export type Closure = Readonly<{
-  files: readonly string[];
-  unfollowed: readonly string[];
-  /** Every bare specifier naming a workspace package, as written. */
-  workspaceImports: readonly string[];
-}>;
 
 /**
  * The module names `tsconfig.tsx.json` maps, read as `tsc` reads the file
@@ -494,9 +380,6 @@ const LEFT_OUT = [
   'ts-type-forge',
 ] as const;
 
-/** A package's source entry, in the order `CLAUDE.md` names them. */
-const PACKAGE_ENTRIES = ['entry-point.mts', 'index.mts'] as const;
-
 const EXPANSION = /\$\{(?<name>[a-z_]+)\}/gu;
 
 /**
@@ -546,54 +429,6 @@ const expandAssignments = (
 /** The workflow's own filter on the changed files, before any pattern. */
 const isModule = (file: string): boolean =>
   file.endsWith('.mts') && !file.endsWith('.test.mts');
-
-const toPackageName = (specifier: string): string => {
-  const segments = specifier.split('/');
-
-  return specifier.startsWith('@')
-    ? Arr.take(segments, 2).join('/')
-    : (segments[0] ?? specifier);
-};
-
-const readSource = (relativePath: string): string | undefined => {
-  try {
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
-    return fs.readFileSync(path.resolve(projectRootPath, relativePath), 'utf8');
-  } catch {
-    return undefined;
-  }
-};
-
-/** Every workspace library, by package name, to its directory from the root. */
-const readWorkspacePackages = async (): Promise<
-  Result<ReadonlyMap<string, string>, string>
-> =>
-  Result.safeTry(async function* () {
-    const directories = yield* Result.safeUnwrap(await listLibraryDirs());
-
-    const mut_packages = new Map<string, string>();
-
-    for (const directory of directories) {
-      const relativeDirectory = path.relative(projectRootPath, directory);
-
-      const manifest = yield* Result.safeUnwrap(
-        await readRepositoryFile(`${relativeDirectory}/package.json`),
-      );
-
-      const parsed: unknown = JSON.parse(manifest);
-
-      const name =
-        isNonNullObject(parsed) && isRecord(parsed) && hasKey(parsed, 'name')
-          ? parsed.name
-          : undefined;
-
-      if (typeof name === 'string') {
-        mut_packages.set(name, relativeDirectory);
-      }
-    }
-
-    return Result.ok(mut_packages);
-  });
 
 const formatViolations = (violations: readonly string[]): string =>
   [
