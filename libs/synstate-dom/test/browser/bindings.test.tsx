@@ -510,6 +510,157 @@ describe('controlled checked', () => {
   });
 });
 
+/** Picks `value` on `select` as a user would: the value, then `change`. */
+const choose = (mut_select: HTMLSelectElement, value: string): void => {
+  mut_select.value = value;
+
+  mut_select.dispatchEvent(new Event('change', { bubbles: true }));
+};
+
+const selectOptions = (): JSX.Element => (
+  <>
+    <option value={constant('a')}>{constant('A')}</option>
+    <option value={constant('b')}>{constant('B')}</option>
+  </>
+);
+
+const mountSelect = (
+  app: () => JSX.Element,
+): Readonly<{ select: HTMLSelectElement; unmount: () => void }> => {
+  const container = document.createElement('div');
+
+  document.body.append(container);
+
+  const unmountApp = render(app, container);
+
+  const select = container.querySelector('select');
+
+  assert.isNotNull(select);
+
+  return {
+    select,
+    unmount: () => {
+      unmountApp();
+
+      container.remove();
+    },
+  };
+};
+
+describe('controlled select value (#3411)', () => {
+  test('a refused choice is drawn as the bound value again', async () => {
+    const mut_seen: string[] = [];
+
+    const { select, unmount } = mountSelect(() => (
+      <select
+        value={constant('a')}
+        onChange={(event) => {
+          mut_seen.push(event.currentTarget.value);
+        }}
+      >
+        {selectOptions()}
+      </select>
+    ));
+
+    choose(select, 'b');
+
+    // The handler sees the user's choice, which is undone only after it.
+    assert.deepStrictEqual(mut_seen, ['b']);
+
+    await nextFrame();
+
+    assert.strictEqual(select.value, 'a');
+
+    unmount();
+  });
+
+  test('a taken choice stays', async () => {
+    const [value$, setValue] = createState('a');
+
+    const { select, unmount } = mountSelect(() => (
+      <select
+        value={value$}
+        onChange={(event) => {
+          setValue(event.currentTarget.value);
+        }}
+      >
+        {selectOptions()}
+      </select>
+    ));
+
+    choose(select, 'b');
+
+    await nextFrame();
+
+    assert.strictEqual(select.value, 'b');
+
+    unmount();
+  });
+
+  test('a handler that stops the event does not keep the refused choice', async () => {
+    const { select, unmount } = mountSelect(() => (
+      <select
+        value={constant('a')}
+        onChange={(event) => {
+          event.stopImmediatePropagation();
+        }}
+      >
+        {selectOptions()}
+      </select>
+    ));
+
+    choose(select, 'b');
+
+    await nextFrame();
+
+    assert.strictEqual(select.value, 'a');
+
+    unmount();
+  });
+
+  test('a text input and a textarea stay one way', async () => {
+    const container = document.createElement('div');
+
+    document.body.append(container);
+
+    const unmount = render(
+      () => (
+        <>
+          <input value={constant('bound')} />
+          <textarea value={constant('bound')} />
+        </>
+      ),
+      container,
+    );
+
+    const mut_input = container.querySelector('input');
+
+    const mut_textarea = container.querySelector('textarea');
+
+    assert.isNotNull(mut_input);
+
+    assert.isNotNull(mut_textarea);
+
+    mut_input.value = 'typed';
+
+    mut_input.dispatchEvent(new Event('change', { bubbles: true }));
+
+    mut_textarea.value = 'typed';
+
+    mut_textarea.dispatchEvent(new Event('change', { bubbles: true }));
+
+    await nextFrame();
+
+    assert.strictEqual(mut_input.value, 'typed');
+
+    assert.strictEqual(mut_textarea.value, 'typed');
+
+    unmount();
+
+    container.remove();
+  });
+});
+
 describe('class', () => {
   test('takes a string', () => {
     const [name$, setName] = createState('a b');

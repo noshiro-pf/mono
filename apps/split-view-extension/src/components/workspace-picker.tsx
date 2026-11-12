@@ -1,5 +1,6 @@
 import {
   createBooleanState,
+  createState,
   derive,
   map,
   type InitializedObservable,
@@ -76,6 +77,18 @@ export const WorkspacePicker = ({
     pendingSwitches: 0,
   };
 
+  /**
+   * The last choice made in the select while switches run, which it shows
+   * meanwhile, so a second step from the keyboard starts from it. Once the last
+   * has run, the select shows the split view on screen, which is not the choice
+   * when the switch failed. The select's `value` is controlled (synstate-dom
+   * puts a `<select>` back to its bound value after `change`), so this is what
+   * keeps the choice shown.
+   */
+  const [pendingChoice$, setPendingChoice] = createState<string | undefined>(
+    undefined,
+  );
+
   const active$ = derive([activeId, registry], (id, list) =>
     list.entries.find((entry) => entry.id === id),
   );
@@ -129,22 +142,23 @@ export const WorkspacePicker = ({
         title={constant(
           'The split view shown in this tab. Alt+1..9 switches too.',
         )}
-        value={activeId.pipe(map((id) => id ?? ''))}
+        value={derive(
+          [pendingChoice$, activeId],
+          (pending, id) => pending ?? id ?? '',
+        )}
         onChange={(changeEvent) => {
-          const mut_select = changeEvent.currentTarget;
+          const choice = changeEvent.currentTarget.value;
 
-          // The choice stays shown while switches run, so a second step from
-          // the keyboard starts from it. Once the last has run, the select
-          // shows the split view on screen, which is not the choice when the
-          // switch failed.
           mut_state.pendingSwitches += 1;
 
-          onSwitch(mut_select.value)
+          setPendingChoice(choice);
+
+          onSwitch(choice)
             .finally(() => {
               mut_state.pendingSwitches -= 1;
 
               if (mut_state.pendingSwitches === 0) {
-                mut_select.value = activeId.getSnapshot().value ?? '';
+                setPendingChoice(undefined);
               }
             })
             .catch(console.error);
