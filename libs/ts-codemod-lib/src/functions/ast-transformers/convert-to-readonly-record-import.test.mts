@@ -108,13 +108,23 @@ describe('convertToReadonlyTransformer imports the ReadonlyRecord it writes', ()
   test.each([
     "import { foo } from './foo.mjs';\r\nexport type Foo = Record<string, typeof foo>;\r\n",
     'export type Foo = Record<string, number>;\r\n',
-    "import type {\r\n  DeepReadonly,\r\n} from 'ts-type-forge';\r\nexport type Foo = DeepReadonly<{ a: 1 }> | Record<string, number>;\r\n",
   ])('an import takes the CRLF line breaks of the file: %j', (source) => {
     const output = transform(source);
 
     expect(output).toMatch(/\bReadonlyRecord\b.*\} from 'ts-type-forge'/u);
 
     expect(output).not.toMatch(/[^\r]\n/u);
+  });
+
+  test('a name merged into a multi-line import takes its own CRLF line', () => {
+    // Only the import is pinned: how the union below it is reprinted is #3259.
+    expect(
+      transform(
+        "import type {\r\n  DeepReadonly,\r\n} from 'ts-type-forge';\r\nexport type Foo = DeepReadonly<{ a: 1 }> | Record<string, number>;\r\n",
+      ),
+    ).toMatch(
+      /^import type \{\r\n {2}DeepReadonly,\r\n {2}ReadonlyRecord,\r\n\} from 'ts-type-forge';\r\n/u,
+    );
   });
 
   test.each([
