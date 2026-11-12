@@ -128,7 +128,7 @@ Firebase をバックエンドとして使い続けるアプリ（`algo-app`、
 エミュレータの設定を持ち、`hosting` は持たない。`algo-app` は公開していなかった
 ので、`hosting` は redirect を置かずに消した。
 
-`pnpm run check:root:firebase-redirects` が、Pages に載るものの `firebase.json`
+`pnpm run check:prose:firebase-redirects` が、Pages に載るものの `firebase.json`
 が redirect 以外を host していないこと（規則はどれも Pages の URL の中への
 301 で、最後が catch-all）と、2 つのファイルが対で揃っていることを確かめる。
 
