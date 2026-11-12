@@ -23,18 +23,19 @@
   // Passed explicitly: `tsx --tsconfig ../../tools/configs/tsconfig.tsx.json`.
   // Only affects that process; type-checking uses each package's own tsconfig.
   "compilerOptions": {
-    "baseUrl": "../..",
     "paths": {
-      "ts-type-forge": ["libs/ts-type-forge/src/index.mts"],
-      "ts-data-forge": ["libs/ts-data-forge/src/entry-point.mts"],
-      "ts-std-forge": ["libs/ts-std-forge/src/entry-point.mts"],
-      "ts-repo-utils": ["libs/ts-repo-utils/src/entry-point.mts"],
-      "ts-codemod-lib": ["libs/ts-codemod-lib/src/entry-point.mts"],
-      "ts-fortress": ["libs/ts-fortress/src/entry-point.mts"],
-      "octokit-safe-types": ["libs/octokit-safe-types/src/entry-point.mts"],
-      "pr-merge-queue": ["libs/pr-merge-queue/src/entry-point.mts"],
-      "pr-report-core": ["libs/pr-report-core/src/entry-point.mts"],
-      "pr-report-core-v2": ["libs/pr-report-core-v2/src/entry-point.mts"]
+      "ts-type-forge": ["../../libs/ts-type-forge/src/index.mts"],
+      "ts-data-forge": ["../../libs/ts-data-forge/src/entry-point.mts"],
+      "ts-std-forge": ["../../libs/ts-std-forge/src/entry-point.mts"],
+      "ts-repo-utils": ["../../libs/ts-repo-utils/src/entry-point.mts"],
+      "ts-codemod-lib": ["../../libs/ts-codemod-lib/src/entry-point.mts"],
+      "ts-fortress": ["../../libs/ts-fortress/src/entry-point.mts"],
+      "octokit-safe-types": [
+        "../../libs/octokit-safe-types/src/entry-point.mts"
+      ],
+      "pr-merge-queue": ["../../libs/pr-merge-queue/src/entry-point.mts"],
+      "pr-report-core": ["../../libs/pr-report-core/src/entry-point.mts"],
+      "pr-report-core-v2": ["../../libs/pr-report-core-v2/src/entry-point.mts"]
     }
   }
 }
