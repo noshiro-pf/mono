@@ -6,6 +6,8 @@
  * CSS Module beside it.
  */
 @import '@blueprintjs/core/lib/css/blueprint.css';
+/* Keyboard focus rings only; after Blueprint's style sheets. */
+@import 'blueprint-synstate/focus-visible.css';
 
 body {
   margin: 0;

@@ -1,0 +1,22 @@
+/*
+ * Blueprint draws a focus ring on `:focus`, so a tab or button clicked with the
+ * mouse keeps one; this shows the ring for keyboard focus only, as Blueprint's
+ * `FocusStyleManager.onlyShowFocusOnTabs()` does with a class on the body, and
+ * as that does, not inside `.bp6-focus-style-manager-ignore`. A checkbox, radio
+ * or switch draws its ring on the indicator after its hidden input.
+ *
+ * A text field matches `:focus-visible` however it is focused, as it shows a
+ * caret, so one without Blueprint's `bp6-input`, which draws its focus as a
+ * shadow instead, keeps its ring on a click.
+ *
+ * Import it after Blueprint's style sheets: its selectors outweigh Blueprint
+ * 6's focus rules, and coming later it also wins over any of equal weight. An
+ * app's rule that keeps a ring on mouse focus for one control has to outweigh
+ * it too: above (0,3,0), or (0,5,1) for an indicator.
+ */
+:focus:not(:focus-visible):not(.bp6-focus-style-manager-ignore *),
+.bp6-control
+  input:focus:not(:focus-visible):not(.bp6-focus-style-manager-ignore *)
+  ~ .bp6-control-indicator {
+  outline: none;
+}

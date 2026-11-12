@@ -10,7 +10,9 @@
   },
   "license": "Apache-2.0",
   "author": "noshiro-pf <noshiro.pf@gmail.com>",
-  "sideEffects": false,
+  "sideEffects": [
+    "./css/*.css"
+  ],
   "type": "module",
   "exports": {
     ".": {
@@ -18,11 +20,13 @@
         "types": "./dist/index.d.mts",
         "default": "./dist/index.mjs"
       }
-    }
+    },
+    "./focus-visible.css": "./css/focus-visible.css"
   },
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.mts",
   "files": [
+    "css",
     "src",
     "dist",
     "README.md",

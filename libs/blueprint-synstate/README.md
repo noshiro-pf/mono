@@ -14,6 +14,12 @@ Import Blueprint's style sheets as a Blueprint app does; the components here nee
 @import '@blueprintjs/datetime/lib/css/blueprint-datetime.css';
 ```
 
+Blueprint draws a focus ring on `:focus`, so a button or tab clicked with the mouse keeps one. To show it for keyboard focus only, as Blueprint React's `FocusStyleManager.onlyShowFocusOnTabs()` does, import this package's `focus-visible.css` after them. As Blueprint's, it leaves the ring inside `.bp6-focus-style-manager-ignore`:
+
+```css
+@import 'blueprint-synstate/focus-visible.css';
+```
+
 A date and time to the minute, with the calendar in Japanese:
 
 ```tsx

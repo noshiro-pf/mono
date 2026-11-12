@@ -3,14 +3,8 @@
 /* import these first because they're the base layer */
 @import '@blueprintjs/core/lib/css/blueprint.css';
 
-/*
- * Blueprint draws a focus ring on `:focus`, so a button clicked with the mouse
- * keeps one; only keyboard focus is shown here. After the `blueprint.css`
- * import, which it ties with on specificity.
- */
-:focus:not(:focus-visible) {
-  outline: none;
-}
+/* Keyboard focus rings only; after Blueprint's style sheets. */
+@import 'blueprint-synstate/focus-visible.css';
 
 body {
   margin: 0;

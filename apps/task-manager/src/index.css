@@ -14,6 +14,8 @@
 
 @import '@blueprintjs/core/lib/css/blueprint.css';
 @import '@blueprintjs/datetime/lib/css/blueprint-datetime.css';
+/* Keyboard focus rings only; after Blueprint's style sheets. */
+@import 'blueprint-synstate/focus-visible.css';
 
 /*
  * The titles are the reader's, Japanese as often as not. On the English
