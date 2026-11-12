@@ -1,9 +1,13 @@
 import * as fs from 'node:fs/promises';
 import * as os from 'node:os';
 import * as path from 'node:path';
+import { Result } from 'ts-data-forge';
+import type { ReadonlyRecord } from 'ts-type-forge';
 import {
   findOrphanedSmokeSources,
+  publishablePackagesOf,
   removeStaleProjects,
+  spacesToPrune,
 } from './verify-npm-packages.mjs';
 
 describe(removeStaleProjects, () => {
@@ -48,7 +52,7 @@ describe(removeStaleProjects, () => {
 
     const removed = await removeStaleProjects(spaceDir, ['@scope/kept']);
 
-    assert.deepStrictEqual(removed, ['@other', '@scope/gone']);
+    assert.deepStrictEqual(removed, ['@other/gone', '@scope/gone']);
 
     assert.deepStrictEqual(await listNames(packagesDir), ['@scope']);
 
@@ -67,12 +71,49 @@ describe(removeStaleProjects, () => {
     assert.deepStrictEqual(await listNames(packagesDir), ['kept']);
   });
 
-  test('removes nothing when told about no package at all', async () => {
-    const { spaceDir, packagesDir } = await makeSpace(['a']);
+  test('names the projects of a scope no package is in, not the scope', async () => {
+    const { spaceDir, packagesDir } = await makeSpace([
+      '@old/x',
+      '@old/y',
+      'kept',
+    ]);
 
-    assert.deepStrictEqual(await removeStaleProjects(spaceDir, []), []);
+    const removed = await removeStaleProjects(spaceDir, ['kept']);
 
-    assert.deepStrictEqual(await listNames(packagesDir), ['a']);
+    assert.deepStrictEqual(removed, ['@old/x', '@old/y']);
+
+    assert.deepStrictEqual(await listNames(packagesDir), ['kept']);
+  });
+
+  test('leaves a scope directory that holds no project, known or not', async () => {
+    const { spaceDir, packagesDir } = await makeSpace(['kept']);
+
+    for (const scope of ['@scope', '@old']) {
+      // eslint-disable-next-line security/detect-non-literal-fs-filename
+      await fs.mkdir(path.join(packagesDir, scope));
+    }
+
+    const removed = await removeStaleProjects(spaceDir, ['@scope/new', 'kept']);
+
+    assert.deepStrictEqual(removed, []);
+
+    assert.deepStrictEqual(await listNames(packagesDir), [
+      '@old',
+      '@scope',
+      'kept',
+    ]);
+  });
+
+  test('removes a stray file whose name starts like a scope', async () => {
+    const { spaceDir, packagesDir } = await makeSpace(['kept']);
+
+    await writeEmptyJson(path.join(packagesDir, '@stray'));
+
+    const removed = await removeStaleProjects(spaceDir, ['kept']);
+
+    assert.deepStrictEqual(removed, ['@stray']);
+
+    assert.deepStrictEqual(await listNames(packagesDir), ['kept']);
   });
 
   test('fails rather than removing nothing when packages/ cannot be read', async () => {
@@ -92,6 +133,54 @@ describe(removeStaleProjects, () => {
     assert.deepStrictEqual(await removeStaleProjects(spaceDir, ['a']), []);
   });
 });
+
+describe(spacesToPrune, () => {
+  test('a local run prunes both spaces, the local one first', () => {
+    assert.deepStrictEqual(spacesToPrune('local'), ['local', 'published']);
+  });
+
+  test('a published run prunes only its own space, never local', () => {
+    assert.deepStrictEqual(spacesToPrune('published'), ['published']);
+  });
+});
+
+describe(publishablePackagesOf, () => {
+  test('keeps the packages not marked private, sorted by name', () => {
+    const result = publishablePackagesOf([
+      workspacePackage('b', {}),
+      workspacePackage('hidden', { private: true }),
+      workspacePackage('a', { private: false }),
+    ]);
+
+    assert.isTrue(Result.isOk(result));
+
+    assert.deepStrictEqual(
+      result.value.map(({ name }) => name),
+      ['a', 'b'],
+    );
+  });
+
+  test('fails when the workspace holds no publishable package', () => {
+    const result = publishablePackagesOf([
+      workspacePackage('hidden', { private: true }),
+    ]);
+
+    assert.isTrue(Result.isErr(result));
+
+    assert.include(result.value, 'No publishable package');
+  });
+});
+
+const workspacePackage = (
+  name: string,
+  packageJson: ReadonlyRecord<string, boolean>,
+): Parameters<typeof publishablePackagesOf>[0][number] =>
+  ({
+    name,
+    path: `/workspace/${name}`,
+    packageJson,
+    dependencies: {},
+  }) as const;
 
 const writeEmptyJson = async (file: string): Promise<void> => {
   // eslint-disable-next-line security/detect-non-literal-fs-filename

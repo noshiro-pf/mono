@@ -1,3 +1,4 @@
+import type { Dirent } from 'node:fs';
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import {
@@ -15,8 +16,15 @@ import {
   formatFilesGlob,
   getWorkspacePackages,
   isDirectlyExecuted,
+  type Package,
 } from 'ts-repo-utils';
-import type { JsonValue, MutableRecord, ReadonlyRecord } from 'ts-type-forge';
+import type {
+  JsonValue,
+  MutableRecord,
+  NonEmptyArray,
+  NonEmptyTuple,
+  ReadonlyRecord,
+} from 'ts-type-forge';
 import { projectRootPath } from '../project-root-path.mjs';
 
 /**
@@ -45,9 +53,15 @@ export const verifyNpmPackages = async (
   target: Target,
   options?: Readonly<{ updatePins?: boolean }>,
 ): Promise<Result<undefined, string>> => {
-  const spaceDir = path.resolve(verifyDir, target);
+  const spaceDir = spaceDirOf(target);
 
-  const packages = await readPublishablePackages();
+  const publishable = await readPublishablePackages();
+
+  if (Result.isErr(publishable)) {
+    return publishable;
+  }
+
+  const packages = publishable.value;
 
   console.info(`Verifying ${packages.length} packages against "${target}".\n`);
 
@@ -68,7 +82,7 @@ export const verifyNpmPackages = async (
     }
   }
 
-  const generated = await generateSpace(target, spaceDir, packages, {
+  const generated = await generateSpace(target, packages, {
     updatePins: options?.updatePins ?? false,
   });
 
@@ -111,12 +125,15 @@ export const verifyNpmPackages = async (
 export const generateLocalSpace = async (): Promise<
   Result<undefined, string>
 > => {
-  const generated = await generateSpace(
-    'local',
-    path.resolve(verifyDir, 'local'),
-    await readPublishablePackages(),
-    { updatePins: false },
-  );
+  const publishable = await readPublishablePackages();
+
+  if (Result.isErr(publishable)) {
+    return publishable;
+  }
+
+  const generated = await generateSpace('local', publishable.value, {
+    updatePins: false,
+  });
 
   return Result.map(generated, () => undefined);
 };
@@ -141,6 +158,21 @@ export const findOrphanedSmokeSources = (
 };
 
 /**
+ * The spaces a run for `target` removes stale projects from, its own first.
+ *
+ * A `local` run prunes `published` too: the rest of that space needs the
+ * registry, but which projects it may hold does not, and nothing that runs on a
+ * pull request regenerates it. That is what makes the pull request removing a
+ * package remove both of its projects, rather than leave the published one for
+ * the next `pnpm-update` to delete in a patch its allow-list refuses. A
+ * `published` run, which `pnpm-update` makes, touches only its own space.
+ */
+export const spacesToPrune = (target: Target): readonly Target[] =>
+  target === 'local'
+    ? (['local', 'published'] as const)
+    : (['published'] as const);
+
+/**
  * Removes every entry under `<spaceDir>/packages/` that is not the project of
  * one of `packageNames`, and returns their names, sorted.
  *
@@ -152,33 +184,24 @@ export const findOrphanedSmokeSources = (
  * `notYetPublished` leaves out of the published space is left out on purpose,
  * and one after a missing check was simply not reached.
  *
- * An empty `packageNames` removes nothing: it says the workspace was misread,
- * not that every project is stale (`generateSpace` refuses it outright). A
- * scope directory left with no project is removed with them; the names returned
- * are still the projects'.
+ * `packageNames` is never empty, which the type holds: an empty list would say
+ * the workspace was misread, not that every project is stale, and
+ * `readPublishablePackages` refuses it before anything is packed or written.
+ *
+ * A directory whose name starts with `@` is a scope, whose projects are one
+ * level down (`packages/@scope/name/`), whether or not any package is in it:
+ * the names returned are always the projects', so a scope no package is in any
+ * longer is reported as each project it held. A scope directory left with no
+ * project is removed with them; one that held none is left alone, since it
+ * removes no project and git does not see an empty directory.
  */
 export const removeStaleProjects = async (
   spaceDir: string,
-  packageNames: readonly string[],
+  packageNames: NonEmptyTuple<string>,
 ): Promise<readonly string[]> => {
-  if (!Arr.isNonEmpty(packageNames)) {
-    return [];
-  }
-
   const packagesDir = path.resolve(spaceDir, 'packages');
 
   const keep = new Set<string>(packageNames);
-
-  // A scoped package's project is `packages/@scope/name/`, one level down.
-  const scopes = new Set<string>(
-    Arr.generate(function* () {
-      for (const name of packageNames) {
-        if (name.startsWith('@')) {
-          yield name.split('/', 1)[0] ?? name;
-        }
-      }
-    }),
-  );
 
   const mut_stale: string[] = [];
 
@@ -186,27 +209,32 @@ export const removeStaleProjects = async (
   // project is stale.
   const mut_toRemove: string[] = [];
 
-  for (const entry of await readNamesIfAny(packagesDir)) {
-    if (!scopes.has(entry)) {
-      if (!keep.has(entry)) {
-        mut_stale.push(entry);
+  for (const entry of await readEntriesIfAny(packagesDir)) {
+    if (!entry.isDirectory() || !entry.name.startsWith('@')) {
+      if (!keep.has(entry.name)) {
+        mut_stale.push(entry.name);
 
-        mut_toRemove.push(entry);
+        mut_toRemove.push(entry.name);
       }
 
       continue;
     }
 
-    const childNames = await readNamesIfAny(path.resolve(packagesDir, entry));
+    const childNames = await readNamesIfAny(
+      path.resolve(packagesDir, entry.name),
+    );
 
-    const children = childNames.map((child) => `${entry}/${child}`);
+    const children = childNames.map((child) => `${entry.name}/${child}`);
 
     const staleChildren = children.filter((name) => !keep.has(name));
 
     mut_stale.push(...staleChildren);
 
-    if (staleChildren.length === children.length) {
-      mut_toRemove.push(entry);
+    if (
+      Arr.isNonEmpty(staleChildren) &&
+      staleChildren.length === children.length
+    ) {
+      mut_toRemove.push(entry.name);
     } else {
       mut_toRemove.push(...staleChildren);
     }
@@ -223,16 +251,49 @@ export const removeStaleProjects = async (
 };
 
 /**
+ * The workspace packages not marked `private`, sorted by name, or an error when
+ * there are none: that says the workspace was misread, and it is refused here,
+ * before anything is packed, written or removed, so that no later step needs a
+ * guard of its own.
+ */
+export const publishablePackagesOf = (
+  workspacePackages: readonly Package[],
+): Result<NonEmptyArray<PackageToCheck>, string> => {
+  const packages = workspacePackages
+    .filter(
+      (pkg) => isRecord(pkg.packageJson) && pkg.packageJson['private'] !== true,
+    )
+    .map((pkg) => ({
+      name: pkg.name,
+      path: pkg.path,
+      manifest: pkg.packageJson,
+    }))
+    // Sorted because the generated files are committed and CI checks the
+    // working tree is clean. `getWorkspacePackages` reads the directories
+    // concurrently and hands them back in whatever order they finished, so
+    // without this the `overrides` block of the generated `pnpm-workspace.yaml`
+    // is shuffled on every run and the repository never looks clean twice.
+    .toSorted((a, b) => a.name.localeCompare(b.name));
+
+  return Arr.isNonEmpty(packages)
+    ? Result.ok(packages)
+    : Result.err(
+        'No publishable package was found in the workspace, so it was misread; nothing was packed, written or removed.',
+      );
+};
+
+const spaceDirOf = (target: Target): string => path.resolve(verifyDir, target);
+
+/**
  * `removeStaleProjects` for one space, saying what it removed.
  */
 const pruneSpace = async (
   target: Target,
-  spaceDir: string,
-  packages: readonly PackageToCheck[],
+  packages: NonEmptyArray<PackageToCheck>,
 ): Promise<void> => {
   const removed = await removeStaleProjects(
-    spaceDir,
-    packages.map((pkg) => pkg.name),
+    spaceDirOf(target),
+    Arr.map(packages, (pkg) => pkg.name),
   );
 
   if (Arr.isNonEmpty(removed)) {
@@ -246,10 +307,10 @@ const pruneSpace = async (
  * The entries of `dir`, or none when it does not exist. Any other failure is
  * thrown: reading nothing would leave every stale project in place unnoticed.
  */
-const readNamesIfAny = async (dir: string): Promise<readonly string[]> => {
+const readEntriesIfAny = async (dir: string): Promise<readonly Dirent[]> => {
   try {
     // eslint-disable-next-line security/detect-non-literal-fs-filename
-    return await fs.readdir(dir);
+    return await fs.readdir(dir, { withFileTypes: true });
   } catch (error: unknown) {
     if (isRecord(error) && error['code'] === 'ENOENT') {
       return [];
@@ -257,6 +318,16 @@ const readNamesIfAny = async (dir: string): Promise<readonly string[]> => {
 
     throw error;
   }
+};
+
+/**
+ * The names of the entries of `dir`, or none when it does not exist — see
+ * `readEntriesIfAny`.
+ */
+const readNamesIfAny = async (dir: string): Promise<readonly string[]> => {
+  const entries = await readEntriesIfAny(dir);
+
+  return entries.map(({ name }) => name);
 };
 
 /**
@@ -928,22 +999,17 @@ const writeJson = async (file: string, value: unknown): Promise<void> => {
 /**
  * Writes the space: one project per package, each depending only on that
  * package and the peers it needs, with the shared check copied in. A `local`
- * run also prunes the `published` space — see the comment at the pruning.
+ * run also prunes the `published` space — see `spacesToPrune`.
  *
  * The files are generated and committed, so that CI's repository-is-clean check
  * fails if `verify-npm-packages/smoke/` and the spaces ever disagree.
  */
 const generateSpace = async (
   target: Target,
-  spaceDir: string,
-  packages: readonly PackageToCheck[],
+  packages: NonEmptyArray<PackageToCheck>,
   options: Readonly<{ updatePins: boolean }>,
 ): Promise<Result<readonly PackageToCheck[], string>> => {
-  if (!Arr.isNonEmpty(packages)) {
-    return Result.err(
-      'No publishable package was found in the workspace, so it was misread; nothing was written or removed.',
-    );
-  }
+  const spaceDir = spaceDirOf(target);
 
   const orphans = findOrphanedSmokeSources(
     await readNamesIfAny(smokeDir),
@@ -963,24 +1029,9 @@ const generateSpace = async (
   // Before writing, so that a run that fails partway still removes what is
   // stale, and before formatting, so that a removal is part of what this run
   // writes and the dirty-tree check reports it like any other generated change.
-  //
-  // A `local` run prunes `published` too: the rest of that space needs the
-  // registry, but which projects it may hold does not, and nothing that runs on
-  // a pull request regenerates it. That is what makes the pull request removing
-  // a package remove both of its projects, rather than leave the published one
-  // for the next `pnpm-update` to delete in a patch its allow-list refuses. A
-  // `published` run, which `pnpm-update` makes, touches only its own space.
-  const spacesToPrune: readonly Target[] =
-    target === 'local'
-      ? (['local', 'published'] as const)
-      : (['published'] as const);
-
-  for (const space of spacesToPrune) {
-    await pruneSpace(
-      space,
-      space === target ? spaceDir : path.resolve(verifyDir, space),
-      packages,
-    );
+  // Which spaces: `spacesToPrune`.
+  for (const space of spacesToPrune(target)) {
+    await pruneSpace(space, packages);
   }
 
   // eslint-disable-next-line security/detect-non-literal-fs-filename
@@ -1219,30 +1270,10 @@ const runChecks = async (
     : Result.ok(undefined);
 };
 
+/** `publishablePackagesOf` the workspace. */
 const readPublishablePackages = async (): Promise<
-  readonly PackageToCheck[]
-> => {
-  const packages = await getWorkspacePackages(projectRootPath);
-
-  return (
-    packages
-      .filter(
-        (pkg) =>
-          isRecord(pkg.packageJson) && pkg.packageJson['private'] !== true,
-      )
-      .map((pkg) => ({
-        name: pkg.name,
-        path: pkg.path,
-        manifest: pkg.packageJson,
-      }))
-      // Sorted because the generated files are committed and CI checks the
-      // working tree is clean. `getWorkspacePackages` reads the directories
-      // concurrently and hands them back in whatever order they finished, so
-      // without this the `overrides` block of the generated `pnpm-workspace.yaml`
-      // is shuffled on every run and the repository never looks clean twice.
-      .toSorted((a, b) => a.name.localeCompare(b.name))
-  );
-};
+  Result<NonEmptyArray<PackageToCheck>, string>
+> => publishablePackagesOf(await getWorkspacePackages(projectRootPath));
 
 if (isDirectlyExecuted(import.meta.url)) {
   const target: Target = process.argv.includes('--published')
