@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "dependencies": {
-    "preact": ">=10.0.0",
+    "preact": ">=10.9.0",
     "synstate-preact-hooks": "file:../../../.tarballs/synstate-preact-hooks.tgz"
   }
 }

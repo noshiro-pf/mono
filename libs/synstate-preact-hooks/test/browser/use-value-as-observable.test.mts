@@ -1,5 +1,5 @@
 import { render, renderHook } from '@testing-library/preact';
-import { h, type JSX } from 'preact';
+import { h, render as preactRender, type JSX } from 'preact';
 import * as Preact from 'preact/hooks';
 import type { Observable } from 'synstate';
 import { useValueAsObservable } from '../../src/index.mjs';
@@ -35,9 +35,32 @@ describe(useValueAsObservable, () => {
 
     assert.isFalse(observable$.isCompleted);
 
+    // Not in `act`: see `use-observable-effect.test.mts` (#3917).
     unmount();
 
     assert.isTrue(observable$.isCompleted);
+  });
+
+  test('is completed right after a bare unmount (#3917)', () => {
+    const mut_captured: { observable: Observable<number> | undefined } = {
+      observable: undefined,
+    };
+
+    const Owner = (): null => {
+      mut_captured.observable = useValueAsObservable(0);
+
+      return null;
+    };
+
+    const container = document.createElement('div');
+
+    preactRender(h(Owner, {}), container);
+
+    assert.isFalse(mut_captured.observable?.isCompleted ?? true);
+
+    preactRender(null, container);
+
+    assert.isTrue(mut_captured.observable?.isCompleted ?? false);
   });
 
   test('emits the initial value once', () => {

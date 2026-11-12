@@ -14,7 +14,9 @@ export const useValueAsObservable = <A,>(input: A): Observable<A> => {
     [],
   );
 
-  Preact.useEffect(
+  // A layout effect, whose cleanup runs as the component unmounts in preact 10
+  // and 11; an effect's is deferred to after the next frame in 11.
+  Preact.useLayoutEffect(
     // eslint-disable-next-line unicorn/consistent-function-scoping
     () => () => {
       state.complete();

@@ -80,7 +80,7 @@
     "ts-repo-utils": "workspace:*"
   },
   "peerDependencies": {
-    "preact": ">=10.0.0"
+    "preact": ">=10.9.0"
   },
   "engines": {
     "node": ">=22.23.4",
