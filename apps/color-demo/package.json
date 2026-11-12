@@ -33,6 +33,7 @@
   },
   "dependencies": {
     "@fontsource/roboto": "^5.3.0",
+    "mui-look": "workspace:*",
     "synstate": "workspace:*",
     "synstate-dom": "workspace:*",
     "ts-data-forge": "workspace:*",

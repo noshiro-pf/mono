@@ -201,6 +201,53 @@ test(
 );
 
 test(
+  'the arrow keys move the focus between the tabs, and Enter selects one',
+  { tag: '@smoke' },
+  async ({ page }) => {
+    await page.goto('/');
+
+    const tabs = page.getByTestId('tabs');
+
+    // Only the selected tab is in the tab order.
+    await expect
+      .soft(tabs.getByTestId('tab-0'))
+      .toHaveAttribute('tabindex', '0');
+
+    await expect
+      .soft(tabs.getByTestId('tab-1'))
+      .toHaveAttribute('tabindex', '-1');
+
+    await tabs.getByTestId('tab-0').focus();
+
+    await page.keyboard.press('ArrowRight');
+
+    await expect.soft(tabs.getByTestId('tab-1')).toBeFocused();
+
+    // Moving the focus selects nothing, as in MUI.
+    await expect
+      .soft(tabs.getByTestId('tab-0'))
+      .toHaveAttribute('aria-selected', 'true');
+
+    await page.keyboard.press('ArrowLeft');
+
+    await page.keyboard.press('ArrowLeft');
+
+    // From the first tab, ArrowLeft wraps around to the last one.
+    await expect.soft(tabs.getByTestId('tab-4')).toBeFocused();
+
+    await page.keyboard.press('Enter');
+
+    await expect
+      .soft(tabs.getByTestId('tab-4'))
+      .toHaveAttribute('aria-selected', 'true');
+
+    await expect
+      .soft(tabs.getByTestId('tab-4'))
+      .toHaveAttribute('tabindex', '0');
+  },
+);
+
+test(
   'the browser history moves between tabs',
   { tag: '@smoke' },
   async ({ page }) => {

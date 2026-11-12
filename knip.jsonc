@@ -424,6 +424,13 @@
       "project": ["**/*.mts"],
     },
 
+    // Not an Astro site like the entry below assumes: a single entry point,
+    // imported from source by profile and color-demo.
+    "apps/mui-look": {
+      "entry": ["src/index.mts", "scripts/**/*.mts", "configs/*.mts"],
+      "project": ["**/*.{mts,tsx}"],
+    },
+
     // Not an Astro site like the entry below assumes: a single entry point.
     "apps/numeric-input-utils": {
       "entry": ["src/index.mts"],
