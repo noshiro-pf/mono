@@ -630,11 +630,99 @@ const encloses = (
 ): boolean =>
   outer.range[0] <= inner.range[0] && inner.range[1] <= outer.range[1];
 
+/** Whether `node` is the accumulator, through type wrappers. */
+const isAccumulator = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  node: TSESTree.Node,
+  accumulatorName: string,
+): boolean => {
+  const target = skipTypeWrappers(node);
+
+  return (
+    target.type === AST_NODE_TYPES.Identifier && target.name === accumulatorName
+  );
+};
+
 /**
- * Whether the callback's body appends to its own accumulator at all — the
- * O(n²) shape this rule reports, in either spelling and whatever it appends.
+ * Where a `reduce` callback's result copies its accumulator, the one match both
+ * {@link appendsToItsAccumulator} and {@link accumulationOf} read, which differ
+ * only in what they ask of it:
+ *
+ * - an array literal, with the positions of the elements that spread the
+ *   accumulator (`[...acc, x]`, `[x, ...acc]`); a bare `acc` element, as in
+ *   `[acc, x]`, nests it and costs nothing per step;
+ * - `Arr.toPushed(acc, …)`, matched on the method name as the rest of this
+ *   rule matches `slice` and `at`; the curried `Arr.toPushed(acc)` takes it as
+ *   the value to push, so the accumulator must not be its only argument.
+ */
+const copySiteOf = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  expression: TSESTree.Node,
+  accumulatorName: string,
+): CopySite | undefined => {
+  if (expression.type === AST_NODE_TYPES.ArrayExpression) {
+    return {
+      kind: 'array',
+      array: expression,
+      spreadsAt: expression.elements.flatMap((element, index) =>
+        element?.type === AST_NODE_TYPES.SpreadElement &&
+        isAccumulator(element.argument, accumulatorName)
+          ? [index]
+          : [],
+      ),
+    };
+  }
+
+  if (
+    expression.type === AST_NODE_TYPES.CallExpression &&
+    expression.callee.type === AST_NODE_TYPES.MemberExpression &&
+    !expression.callee.computed &&
+    expression.callee.property.type === AST_NODE_TYPES.Identifier &&
+    expression.callee.property.name === 'toPushed'
+  ) {
+    const [target] = expression.arguments;
+
+    return target !== undefined &&
+      target.type !== AST_NODE_TYPES.SpreadElement &&
+      isAccumulator(target, accumulatorName)
+      ? { kind: 'toPushed', call: expression, target: skipTypeWrappers(target) }
+      : undefined;
+  }
+
+  return undefined;
+};
+
+/**
+ * What a callback returns: its expression body, or the argument of the single
+ * `return` its block holds; `undefined` for a block that does anything else.
+ */
+const returnedExpressionOf = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  callback: TSESTree.ArrowFunctionExpression | TSESTree.FunctionExpression,
+): TSESTree.Node | undefined => {
+  const { body } = callback;
+
+  if (body.type !== AST_NODE_TYPES.BlockStatement) {
+    return body;
+  }
+
+  const [statement] = body.body;
+
+  return Arr.isFixedLengthArray(1, body.body) &&
+    statement?.type === AST_NODE_TYPES.ReturnStatement &&
+    statement.argument !== null
+    ? statement.argument
+    : undefined;
+};
+
+/**
+ * Whether the callback appends to its own accumulator at all — the O(n²)
+ * shape this rule reports, in either spelling, wherever the copy puts the
+ * accumulator and whatever it appends: a spread of it at any position, through
+ * type wrappers, as an expression body or the single `return` of a block.
  * Deliberately looser than {@link accumulationOf}: appending two values per
- * step is still worth reporting, it is only the rewrite that cannot express it.
+ * step, or prepending, is still worth reporting; it is only the rewrite that
+ * cannot express it.
  */
 const appendsToItsAccumulator = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
@@ -642,38 +730,39 @@ const appendsToItsAccumulator = (
 ): boolean => {
   const [accumulatorParam] = callback.params;
 
-  if (accumulatorParam?.type !== AST_NODE_TYPES.Identifier) {
+  const returned = returnedExpressionOf(callback);
+
+  if (
+    returned === undefined ||
+    accumulatorParam?.type !== AST_NODE_TYPES.Identifier
+  ) {
     return false;
   }
 
-  const { body } = callback;
-
-  // In an array literal only `...acc` copies the accumulator; a bare `acc`
-  // element, as in `[acc, x]`, nests it and costs nothing per step. Likewise
-  // `Arr.toPushed(acc, x)` copies it, while the curried `Arr.toPushed(acc)`
-  // takes it as the value to push.
-  const copied =
-    body.type === AST_NODE_TYPES.ArrayExpression
-      ? body.elements[0]?.type === AST_NODE_TYPES.SpreadElement
-        ? body.elements[0].argument
-        : undefined
-      : body.type === AST_NODE_TYPES.CallExpression &&
-          body.callee.type === AST_NODE_TYPES.MemberExpression &&
-          !body.callee.computed &&
-          body.callee.property.type === AST_NODE_TYPES.Identifier &&
-          body.callee.property.name === 'toPushed' &&
-          body.arguments.length >= 2 &&
-          body.arguments[0]?.type !== AST_NODE_TYPES.SpreadElement
-        ? body.arguments[0]
-        : undefined;
-
-  const target = copied === undefined ? undefined : skipTypeWrappers(copied);
+  const site = copySiteOf(skipTypeWrappers(returned), accumulatorParam.name);
 
   return (
-    target?.type === AST_NODE_TYPES.Identifier &&
-    target.name === accumulatorParam.name
+    site !== undefined &&
+    (site.kind === 'array'
+      ? Arr.isNonEmpty(site.spreadsAt)
+      : site.call.arguments.length >= 2)
   );
 };
+
+type CopySite = Readonly<
+  | {
+      kind: 'array';
+      array: TSESTree.ArrayExpression;
+      /** The indices of the elements that spread the accumulator. */
+      spreadsAt: readonly number[];
+    }
+  | {
+      kind: 'toPushed';
+      call: TSESTree.CallExpression;
+      /** The accumulator, its type wrappers taken off. */
+      target: TSESTree.Node;
+    }
+>;
 
 /**
  * The append this `reduce` callback performs, or `undefined` when its body is
@@ -689,59 +778,50 @@ const accumulationOf = (
 ): Accumulation | undefined => {
   const [accumulatorParam] = callback.params;
 
-  if (accumulatorParam?.type !== AST_NODE_TYPES.Identifier) {
+  // The rewrite keeps to an expression body as written: a block, or a type
+  // wrapper around the copy (`[...acc, x] as T`), is reported without a fix.
+  if (
+    accumulatorParam?.type !== AST_NODE_TYPES.Identifier ||
+    callback.body.type === AST_NODE_TYPES.BlockStatement
+  ) {
     return undefined;
   }
 
-  const { body } = callback;
+  const site = copySiteOf(callback.body, accumulatorParam.name);
 
-  // `[...acc, ELEMENT]` — exactly one spread and one new value, since `scan`
-  // appends exactly one per step.
-  if (body.type === AST_NODE_TYPES.ArrayExpression) {
-    if (!Arr.isFixedLengthArray(2, body.elements)) {
+  if (site === undefined) {
+    return undefined;
+  }
+
+  // `[...acc, ELEMENT]` — exactly one spread, first, and one new value, since
+  // `scan` appends exactly one per step.
+  if (site.kind === 'array') {
+    if (!Arr.isFixedLengthArray(2, site.array.elements)) {
       return undefined;
     }
 
-    const [spread, element] = body.elements;
+    const [spread, appended] = site.array.elements;
 
-    const spreadTarget =
-      spread?.type === AST_NODE_TYPES.SpreadElement
-        ? skipTypeWrappers(spread.argument)
-        : undefined;
-
-    return element === null ||
-      element.type === AST_NODE_TYPES.SpreadElement ||
-      spreadTarget?.type !== AST_NODE_TYPES.Identifier ||
-      spreadTarget.name !== accumulatorParam.name
+    return appended === null ||
+      site.spreadsAt[0] !== 0 ||
+      spread?.type !== AST_NODE_TYPES.SpreadElement ||
+      appended.type === AST_NODE_TYPES.SpreadElement
       ? undefined
-      : { accumulatorParam, accumulatorRef: spreadTarget, element };
+      : {
+          accumulatorParam,
+          accumulatorRef: skipTypeWrappers(spread.argument),
+          element: appended,
+        };
   }
 
-  // `Arr.toPushed(acc, ELEMENT)`, matched on the method name as the rest of
-  // this rule matches `slice` and `at`.
-  if (body.type === AST_NODE_TYPES.CallExpression) {
-    const { callee } = body;
-
-    if (
-      callee.type !== AST_NODE_TYPES.MemberExpression ||
-      callee.computed ||
-      callee.property.type !== AST_NODE_TYPES.Identifier ||
-      callee.property.name !== 'toPushed' ||
-      !Arr.isFixedLengthArray(2, body.arguments)
-    ) {
-      return undefined;
-    }
-
-    const [wrappedTarget, element] = body.arguments;
-
-    const target = skipTypeWrappers(wrappedTarget);
-
-    return element.type === AST_NODE_TYPES.SpreadElement ||
-      target.type !== AST_NODE_TYPES.Identifier ||
-      target.name !== accumulatorParam.name
-      ? undefined
-      : { accumulatorParam, accumulatorRef: target, element };
+  // `Arr.toPushed(acc, ELEMENT)`.
+  if (!Arr.isFixedLengthArray(2, site.call.arguments)) {
+    return undefined;
   }
 
-  return undefined;
+  const [, element] = site.call.arguments;
+
+  return element.type === AST_NODE_TYPES.SpreadElement
+    ? undefined
+    : { accumulatorParam, accumulatorRef: site.target, element };
 };
