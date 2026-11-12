@@ -331,7 +331,8 @@ jobs:
           # job that holds the key — `pnpm install` and
           # `verify:npm-packages:published:update` write manifests, the
           # lockfile and the catalog, and the latter also the published
-          # projects' checks (below), `update-changeset` writes one changeset,
+          # projects' checks and types-only projects' `tsconfig` files
+          # (below), `update-changeset` writes one changeset,
           # `update-actions` moves the action pins in the workflows and in
           # the composite actions under `.github/actions/` — the two places
           # `mature-updates.mts` reads; a third has to be named in both, or
@@ -378,6 +379,23 @@ jobs:
           # it is invoked. Keep it in step with the steps of `update`: a path
           # a new step legitimately writes fails this job until it is named.
           smoke_copy='^verify-npm-packages/published/packages/([^/]+)/\1\.m[jt]s$'
+          # A published types-only project's `tsconfig.json` and
+          # `tsconfig.paths.json` are generated (`generateSpace` in
+          # tools/scripts/cmd/verify-npm-packages.mts) and, like the check,
+          # regenerated on pull requests in the local space alone, so `--update`
+          # rewrites them here. Allowed, and held to the local space's below.
+          tsconfig_copy='^verify-npm-packages/published/packages/[^/]+/tsconfig(\.paths)?\.json$'
+          # Whether a file is JSON: UTF-8 read strictly, a byte order mark
+          # kept so that it is refused, then `JSON.parse`, which refuses what
+          # jq would read (`NaN`, trailing text). Exits 3 for a file that is
+          # not JSON and prints nothing then, since the error would quote
+          # text from the patch into this job's log; any other failure of
+          # node is its own, and shows.
+          strict_json='const decoder = new TextDecoder("utf-8", { fatal: true, ignoreBOM: true }); const bytes = require("node:fs").readFileSync(process.argv[1]); try { JSON.parse(decoder.decode(bytes)); } catch (error) { if (error instanceof SyntaxError || error?.code === "ERR_ENCODING_INVALID_ENCODED_DATA") process.exit(3); throw error; }'
+          # A JSON text as the events of its parse, layout taken out and every
+          # key kept, in order and however often it occurs (`--stream`);
+          # nothing for an empty text.
+          json_events='[inputs] | if length == 0 then empty else . end'
           # Read once, on a line of its own: `git diff` failing stops the step
           # here, where at the head of a pipeline that ends in `|| true` it
           # would read as a patch that carries nothing.
@@ -389,7 +407,8 @@ jobs:
             | grep -Ev '^\.github/workflows/([^/]+\.ya?ml|actions\.lock)$' \
             | grep -Ev '^\.github/actions/(.+/)?action\.ya?ml$' \
             | grep -Ev '^tools/configs/release-binaries\.json$' \
-            | grep -Ev "$smoke_copy" || true)"
+            | grep -Ev "$smoke_copy" \
+            | grep -Ev "$tsconfig_copy" || true)"
 
           if [ -n "$unexpected" ]; then
             echo '::error::The patch carries paths a dependency update does not write, so it is not one; refusing to commit it.'
@@ -420,6 +439,79 @@ jobs:
               exit 1
             fi
           done < <(printf '%s\n' "$changed" | grep -E "$smoke_copy" || true)
+
+          # A `tsconfig` runs nothing, and the published check regenerates it
+          # before its `tsc` reads it, but this job commits it to main, where
+          # its `extends`, `include` and `paths` are what anyone reading the
+          # space takes for the generator's, so it is held as the check is: it
+          # has no hand-written source, and the local space's, made by the same
+          # function from the same inputs and kept current by every pull
+          # request, is what it has to be (`smokeTsconfig` takes the package's
+          # name alone, not the space). A staged copy has to be JSON
+          # (`strict_json`), and then the events of its parse the local one's
+          # (`json_events`: keys keep their order, which `paths` can depend
+          # on, and a key given twice stays twice, as TypeScript reads both),
+          # not its bytes, since the published space is formatted by the
+          # Prettier this run may have moved and HEAD's local one by the one
+          # before. A copy that is not a regular file, one deleted, one that is
+          # not JSON, one that differs, and one whose local counterpart HEAD
+          # does not have (a project that is not types-only has none) are all
+          # refused. Kept apart from the loop above, which holds a check to a
+          # source of another name, by bytes.
+          # Each staged copy is written here, as its bytes, for both parsers:
+          # a shell variable would drop a NUL.
+          blob_file="$(mktemp "${RUNNER_TEMP}/tsconfig.XXXXXX")"
+          trap 'rm -f "$blob_file"' EXIT
+          not_local() {
+            echo "::error::${copy} is not ${local_copy} as HEAD has it; refusing to commit it."
+            exit 1
+          }
+          while IFS= read -r copy; do
+            [ -n "$copy" ] || continue
+            local_copy="verify-npm-packages/local/${copy#verify-npm-packages/published/}"
+            # Not in a pipeline, so that git failing is told apart from a copy
+            # with no mode.
+            if ! entry="$(git ls-files --stage -- ":(literal)${copy}")"; then
+              echo "::error::git could not list ${copy}; refusing to commit it."
+              exit 1
+            fi
+            # The one entry, for the copy itself, of a regular file: a copy
+            # the patch deletes has none, a link or an executable has another
+            # mode (120000, 100755), and a directory put in its place lists
+            # the files under it. The index is built by `git apply` and
+            # `git add -A`, so no path is in conflict.
+            if [[ "$entry" != "100644 "+([0-9a-f])$' 0\t'"$copy" ]]; then
+              not_local
+            fi
+            # A blob that cannot be read is git's failure, not a verdict on
+            # the file.
+            if ! git show ":${copy}" >"$blob_file"; then
+              echo "::error::git could not read ${copy}; refusing to commit it."
+              exit 1
+            fi
+            status=0
+            node -e "$strict_json" "$blob_file" || status=$?
+            case "$status" in
+              0) ;;
+              3)
+                echo "::error::${copy} is not JSON; refusing to commit it."
+                exit 1
+                ;;
+              *)
+                echo "::error::node could not check ${copy} (exit ${status}); refusing to commit it."
+                exit 1
+                ;;
+            esac
+            # The staged text's parse errors go nowhere, as node's do for a
+            # file that is not JSON. HEAD's, a file main holds, show, and so
+            # does git's reason when it cannot give HEAD's copy (a project
+            # that is not types-only has none), which is a refusal below.
+            staged="$(jq -cn --stream "$json_events" <"$blob_file" 2>/dev/null || true)"
+            expected="$(git show "HEAD:${local_copy}" | jq -cn --stream "$json_events" || true)"
+            if [ -z "$staged" ] || [ "$staged" != "$expected" ]; then
+              not_local
+            fi
+          done < <(printf '%s\n' "$changed" | grep -E "$tsconfig_copy" || true)
 
           # The pin file decides which binary every `check:root` downloads and
           # runs, and `update-release-binaries` changes only its `version` and

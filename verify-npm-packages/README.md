@@ -86,7 +86,9 @@ published/packages/<pkg>/ 同上。依存指定が違い、コピーは smoke/ �
 
 `pnpm-update` workflow の `commit` ジョブは、パッチに入ったコピーが `main` の
 `smoke/` にあるものと 1 バイトも違わないことを確かめてからコミットする（`smoke/`
-自体はパッチに入れられない）。
+自体はパッチに入れられない）。型だけのパッケージの `published/` の `tsconfig.json`
+と `tsconfig.paths.json` も同じ関数で生成されるのでパッチに入ってよく、同じジョブが
+`main` の `local/` の同じファイルと JSON として同じことを確かめる。
 
 アサーションを足すときの手順は次のとおり。
 

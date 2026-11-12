@@ -298,9 +298,10 @@ place those action pins are written, rather than every job that takes the steps.
 - **Composite actions live under `.github/actions/`**, which is where
   `update-actions` reads pins besides the workflows, and the only other path
   under `.github/` that `pnpm-update.yml`'s `commit` job accepts in its patch
-  (outside it, the manifests, `pnpm-lock.yaml`, `actions.lock`, a changeset and
-  `tools/configs/release-binaries.json`). An action anywhere else keeps its pins
-  where they are, and nothing reports it.
+  (outside it, the manifests, `pnpm-lock.yaml`, `actions.lock`, a changeset,
+  `tools/configs/release-binaries.json`, and the published projects' checks and
+  `tsconfig` files under `verify-npm-packages/published/`). An action anywhere
+  else keeps its pins where they are, and nothing reports it.
 
 ### The gate: `check-gates.yml`
 

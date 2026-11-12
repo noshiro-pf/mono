@@ -1,7 +1,7 @@
 import * as fs from 'node:fs/promises';
 import * as os from 'node:os';
 import * as path from 'node:path';
-import { Obj, Result } from 'ts-data-forge';
+import { Arr, Obj, Result } from 'ts-data-forge';
 import { runFile, type ProcessResult } from '../lib/child-process.mjs';
 import { readWorkflowJobs } from '../lib/workflow-jobs.mjs';
 import { projectRootPath } from '../project-root-path.mjs';
@@ -209,6 +209,393 @@ describe('the path check of pnpm-update.yml', () => {
     expect(result.status, result.stderr).toBe(129);
   });
 
+  // #4034: a types-only project's `tsconfig` is generated as the local
+  // space's is, and refreshed here.
+  test('accepts the tsconfig files of a published project refreshed from the local space', async () => {
+    const result = await runPathCheck(async (repo) => {
+      await write(
+        repo,
+        `${PUBLISHED}/types/tsconfig.json`,
+        '{\n  "compilerOptions": { "strict": true }\n}\n',
+      );
+
+      await write(
+        repo,
+        `${PUBLISHED}/strict-ts-lib-v7.0/tsconfig.paths.json`,
+        '{ "paths": "current" }\n',
+      );
+    });
+
+    expect(result.status, result.stdout).toBe(0);
+  });
+
+  test('accepts the tsconfig of a types-only project new to the published space', async () => {
+    const result = await runPathCheck(async (repo) => {
+      await write(repo, `${PUBLISHED}/fresh-types/package.json`, '{}\n');
+
+      await write(
+        repo,
+        `${PUBLISHED}/fresh-types/tsconfig.json`,
+        '{"fresh":true}\n',
+      );
+    });
+
+    expect(result.status, result.stdout).toBe(0);
+  });
+
+  test('refuses a tsconfig that is not what the local space holds', async () => {
+    const result = await runPathCheck(async (repo) => {
+      await write(
+        repo,
+        `${PUBLISHED}/types/tsconfig.json`,
+        '{"include":["../../../../**"]}\n',
+      );
+    });
+
+    expect(result.status).toBe(1);
+
+    expect(result.stdout).toContain(
+      `${PUBLISHED}/types/tsconfig.json is not ${LOCAL}/types/tsconfig.json as HEAD has it`,
+    );
+  });
+
+  // A valid value followed by more is not JSON, though jq reads the value.
+  test('refuses a tsconfig that is the local JSON and more', async () => {
+    const result = await runPathCheck(async (repo) => {
+      await write(
+        repo,
+        `${PUBLISHED}/types/tsconfig.json`,
+        '{"compilerOptions":{"strict":true}}\n// trailing\n',
+      );
+    });
+
+    expect(result.status).toBe(1);
+
+    expect(result.stdout).toContain(
+      `${PUBLISHED}/types/tsconfig.json is not JSON`,
+    );
+  });
+
+  test('refuses a tsconfig whose keys are in another order', async () => {
+    const result = await runPathCheck(
+      async (repo) => {
+        await write(
+          repo,
+          `${PUBLISHED}/strict-ts-lib-v7.0/tsconfig.paths.json`,
+          '{"b":1,"paths":"current"}\n',
+        );
+      },
+      async (repo) => {
+        await write(
+          repo,
+          `${LOCAL}/strict-ts-lib-v7.0/tsconfig.paths.json`,
+          '{"paths":"current","b":1}\n',
+        );
+      },
+    );
+
+    expect(result.status).toBe(1);
+
+    expect(result.stdout).toContain(
+      `${PUBLISHED}/strict-ts-lib-v7.0/tsconfig.paths.json is not ${LOCAL}/strict-ts-lib-v7.0/tsconfig.paths.json as HEAD has it`,
+    );
+  });
+
+  test('refuses a blank tsconfig as not JSON', async () => {
+    const result = await runPathCheck(async (repo) => {
+      await write(repo, `${PUBLISHED}/pkg/tsconfig.json`, '\n');
+    });
+
+    expect(result.status).toBe(1);
+
+    expect(result.stdout).toContain(
+      `${PUBLISHED}/pkg/tsconfig.json is not JSON`,
+    );
+  });
+
+  // `git show` prints a link's target and a file's text alike.
+  test.each(['link', 'executable'] as const)(
+    'refuses a tsconfig that is a %s',
+    async (mode) => {
+      const result = await runPathCheck(async (repo) => {
+        const file = path.join(repo, PUBLISHED, 'types', 'tsconfig.json');
+
+        await fs.rm(file);
+
+        if (mode === 'link') {
+          // eslint-disable-next-line security/detect-non-literal-fs-filename
+          await fs.symlink('{"compilerOptions":{"strict":true}}', file);
+        } else {
+          await write(
+            repo,
+            `${PUBLISHED}/types/tsconfig.json`,
+            '{"compilerOptions":{"strict":true}}\n',
+          );
+
+          // eslint-disable-next-line security/detect-non-literal-fs-filename
+          await fs.chmod(file, 0o755);
+        }
+      });
+
+      expect(result.status).toBe(1);
+
+      expect(result.stdout).toContain(
+        `${PUBLISHED}/types/tsconfig.json is not ${LOCAL}/types/tsconfig.json as HEAD has it`,
+      );
+    },
+  );
+
+  // TypeScript merges both `compilerOptions`, so the second must not hide the
+  // first.
+  test('refuses a tsconfig that gives a key twice', async () => {
+    const result = await runPathCheck(async (repo) => {
+      await write(
+        repo,
+        `${PUBLISHED}/types/tsconfig.json`,
+        '{"compilerOptions":{"noCheck":true},"compilerOptions":{"strict":true}}\n',
+      );
+    });
+
+    expect(result.status).toBe(1);
+
+    expect(result.stdout).toContain(
+      `${PUBLISHED}/types/tsconfig.json is not ${LOCAL}/types/tsconfig.json as HEAD has it`,
+    );
+  });
+
+  // jq reads `NaN`, which JSON does not have, as null.
+  test('refuses a tsconfig that is not JSON though jq reads it', async () => {
+    const result = await runPathCheck(
+      async (repo) => {
+        await write(
+          repo,
+          `${PUBLISHED}/types/tsconfig.json`,
+          '{"compilerOptions":{"strict":NaN}}\n',
+        );
+      },
+      async (repo) => {
+        await write(
+          repo,
+          `${LOCAL}/types/tsconfig.json`,
+          '{"compilerOptions":{"strict":null}}\n',
+        );
+      },
+    );
+
+    expect(result.status).toBe(1);
+
+    expect(result.stdout).toContain(
+      `${PUBLISHED}/types/tsconfig.json is not JSON`,
+    );
+  });
+
+  // The workflow names the files by a pattern of its own. Read from disk, not
+  // as git tracks them: a file the generator has just written and nobody has
+  // staged yet is one the next update would carry.
+  test('names every tsconfig the generator writes into either space', async () => {
+    const script = await readPathCheck();
+
+    const pattern = /^tsconfig_copy='(?<pattern>.*)'$/mu.exec(script)?.groups?.[
+      'pattern'
+    ];
+
+    assert.isDefined(pattern);
+
+    // The local space too: a pull request regenerates it alone, so a file name
+    // new to the generator shows there first, and the next update would carry
+    // it into the published space. Each as the published path it becomes.
+    const perSpace = await Promise.all(
+      [PUBLISHED, LOCAL].map(async (space) => {
+        const root = path.resolve(projectRootPath, space);
+
+        // eslint-disable-next-line security/detect-non-literal-fs-filename
+        const projects = await fs.readdir(root, { withFileTypes: true });
+
+        const perProject = await Promise.all(
+          projects
+            .filter((entry) => entry.isDirectory())
+            .map(async ({ name }) => {
+              // eslint-disable-next-line security/detect-non-literal-fs-filename
+              const entries = await fs.readdir(path.join(root, name));
+
+              // A directory with no manifest is what an earlier run left
+              // behind, as the test of the checks' sources says.
+              return entries.includes('package.json')
+                ? entries
+                    .filter((file) => /^tsconfig.*\.json$/u.test(file))
+                    .map((file) => `${PUBLISHED}/${name}/${file}`)
+                : [];
+            }),
+        );
+
+        return perProject.flat();
+      }),
+    );
+
+    const files = Arr.uniq(perSpace.flat());
+
+    assert.isNotEmpty(files);
+
+    // eslint-disable-next-line security/detect-non-literal-regexp
+    const matches = new RegExp(pattern, 'u');
+
+    for (const file of files) {
+      expect(file).toMatch(matches);
+    }
+  });
+
+  test('refuses an empty tsconfig', async () => {
+    const result = await runPathCheck(async (repo) => {
+      await write(repo, `${PUBLISHED}/types/tsconfig.json`, '');
+    });
+
+    expect(result.status).toBe(1);
+
+    expect(result.stdout).toContain(
+      `${PUBLISHED}/types/tsconfig.json is not JSON`,
+    );
+  });
+
+  test('refuses a tsconfig that starts with a byte order mark', async () => {
+    const result = await runPathCheck(async (repo) => {
+      await write(
+        repo,
+        `${PUBLISHED}/types/tsconfig.json`,
+        `${BYTE_ORDER_MARK}{"compilerOptions":{"strict":true}}\n`,
+      );
+    });
+
+    expect(result.status).toBe(1);
+
+    expect(result.stdout).toContain(
+      `${PUBLISHED}/types/tsconfig.json is not JSON`,
+    );
+  });
+
+  // A failure of node itself is not a verdict on the file.
+  test('says so when node cannot check a tsconfig', async () => {
+    const result = await runPathCheck(
+      async (repo) => {
+        await write(
+          repo,
+          `${PUBLISHED}/types/tsconfig.json`,
+          '{"compilerOptions":{"strict":true}}\n',
+        );
+      },
+      undefined,
+      { failingNode: true },
+    );
+
+    expect(result.status).toBe(1);
+
+    expect(result.stdout).toContain(
+      `node could not check ${PUBLISHED}/types/tsconfig.json (exit 1)`,
+    );
+  });
+
+  // git's failure is not a verdict on the file.
+  test('says so when git cannot read a staged tsconfig', async () => {
+    const result = await runPathCheck(
+      async (repo) => {
+        await write(
+          repo,
+          `${PUBLISHED}/types/tsconfig.json`,
+          '{"compilerOptions":{"strict":"unreadable"}}\n',
+        );
+      },
+      undefined,
+      { unreadableStaged: `${PUBLISHED}/types/tsconfig.json` },
+    );
+
+    expect(result.status).toBe(1);
+
+    expect(result.stdout).toContain(
+      `git could not read ${PUBLISHED}/types/tsconfig.json`,
+    );
+  });
+
+  // The pathspec of the copy also matches a directory of that name.
+  test('refuses a directory put in place of a tsconfig', async () => {
+    const result = await runPathCheck(async (repo) => {
+      await fs.rm(path.join(repo, PUBLISHED, 'types', 'tsconfig.json'));
+
+      await write(
+        repo,
+        `${PUBLISHED}/types/tsconfig.json/package.json`,
+        '{}\n',
+      );
+    });
+
+    expect(result.status).toBe(1);
+
+    expect(result.stdout).toContain(
+      `${PUBLISHED}/types/tsconfig.json is not ${LOCAL}/types/tsconfig.json as HEAD has it`,
+    );
+  });
+
+  // A shell variable would drop it, and the text left would pass.
+  test('refuses a tsconfig holding a NUL', async () => {
+    const result = await runPathCheck(async (repo) => {
+      await write(
+        repo,
+        `${PUBLISHED}/types/tsconfig.json`,
+        '{"compilerOptions":{"str\0ict":true}}\n',
+      );
+    });
+
+    expect(result.status).toBe(1);
+
+    expect(result.stdout).toContain(
+      `${PUBLISHED}/types/tsconfig.json is not JSON`,
+    );
+  });
+
+  test('refuses a tsconfig that is not UTF-8', async () => {
+    const result = await runPathCheck(async (repo) => {
+      // eslint-disable-next-line security/detect-non-literal-fs-filename
+      await fs.writeFile(
+        path.join(repo, PUBLISHED, 'types', 'tsconfig.json'),
+        Buffer.from(
+          '{"compilerOptions":{"strict":true},"x":"\u{FF}"}\n',
+          'latin1',
+        ),
+      );
+    });
+
+    expect(result.status).toBe(1);
+
+    expect(result.stdout).toContain(
+      `${PUBLISHED}/types/tsconfig.json is not JSON`,
+    );
+  });
+
+  // Only a types-only project has one, in either space.
+  test('refuses a tsconfig the local space does not have', async () => {
+    const result = await runPathCheck(async (repo) => {
+      await write(repo, `${PUBLISHED}/pkg/tsconfig.json`, '{}\n');
+    });
+
+    expect(result.status).toBe(1);
+
+    expect(result.stdout).toContain(
+      `${PUBLISHED}/pkg/tsconfig.json is not ${LOCAL}/pkg/tsconfig.json as HEAD has it`,
+    );
+  });
+
+  test('refuses a deleted tsconfig', async () => {
+    const result = await runPathCheck(async (repo) => {
+      await fs.rm(
+        path.join(repo, PUBLISHED, 'strict-ts-lib-v7.0', 'tsconfig.paths.json'),
+      );
+    });
+
+    expect(result.status).toBe(1);
+
+    expect(result.stdout).toContain(
+      `${PUBLISHED}/strict-ts-lib-v7.0/tsconfig.paths.json is not ${LOCAL}/strict-ts-lib-v7.0/tsconfig.paths.json as HEAD has it`,
+    );
+  });
+
   test('refuses a check in the local space', async () => {
     const result = await runPathCheck(async (repo) => {
       await write(repo, `${LOCAL}/pkg/pkg.mjs`, 'current pkg\n');
@@ -225,6 +612,8 @@ const SMOKE = 'verify-npm-packages/smoke';
 const PUBLISHED = 'verify-npm-packages/published/packages';
 
 const LOCAL = 'verify-npm-packages/local/packages';
+
+const BYTE_ORDER_MARK = String.fromCodePoint(0xfe_ff);
 
 /**
  * The environment the scratch repository's `git` runs in: no settings of
@@ -243,8 +632,8 @@ const scratchGitEnv = (): NodeJS.ProcessEnv =>
 /**
  * The lines of the `commit` job's script that decide which paths a patch may
  * carry: from the pattern naming a published check to the end of the loop that
- * holds each one to `smoke/`. Read from the workflow so that what is tested is
- * what runs.
+ * holds each published `tsconfig` to the local space's. Read from the workflow
+ * so that what is tested is what runs.
  */
 const readPathCheck = async (): Promise<string> => {
   // eslint-disable-next-line security/detect-non-literal-fs-filename
@@ -268,11 +657,20 @@ const readPathCheck = async (): Promise<string> => {
 
   const start = lines.findIndex((line) => line.startsWith('smoke_copy='));
 
-  const end = lines.findIndex(
-    (line, index) => index > start && line.startsWith('done < <('),
+  assert.isAtLeast(start, 0);
+
+  // The last loop before the pin file's check: the one holding the copies of a
+  // check to `smoke/`, then the one holding a `tsconfig` to the local space.
+  const pins = lines.findIndex(
+    (line, index) => index > start && line.startsWith('pins='),
   );
 
-  assert.isAtLeast(start, 0);
+  const end = lines.findLastIndex(
+    (line, index) => index < pins && line.startsWith('done < <('),
+  );
+
+  // The pin file's check (`pins=`) follows the loops; a rename shows here.
+  assert.isAbove(pins, start);
 
   assert.isAbove(end, start);
 
@@ -312,10 +710,25 @@ const makeScratchDir = async (): Promise<string> => {
 const runPathCheck = async (
   change: (root: string) => Promise<void>,
   base: (root: string) => Promise<void> = async () => {},
+  {
+    failingNode = false,
+    unreadableStaged,
+  }: Readonly<{ failingNode?: boolean; unreadableStaged?: string }> = {},
 ): Promise<ProcessResult> => {
   const script = await readPathCheck();
 
   const repo = await makeScratchDir();
+
+  // The block's temporary files go here, and so does a `node` that fails, first
+  // on the PATH, when asked for.
+  const tools = await makeScratchDir();
+
+  if (failingNode) {
+    await write(tools, 'bin/node', '#!/bin/sh\nexit 1\n');
+
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
+    await fs.chmod(path.join(tools, 'bin', 'node'), 0o755);
+  }
 
   const git = async (...args: readonly string[]): Promise<void> => {
     const result = await runFile(
@@ -363,6 +776,32 @@ const runPathCheck = async (
 
   await write(repo, `${LOCAL}/pkg/pkg.mjs`, 'stale pkg\n');
 
+  await write(
+    repo,
+    `${LOCAL}/types/tsconfig.json`,
+    '{"compilerOptions":{"strict":true}}\n',
+  );
+
+  await write(
+    repo,
+    `${LOCAL}/strict-ts-lib-v7.0/tsconfig.paths.json`,
+    '{"paths":"current"}\n',
+  );
+
+  await write(repo, `${LOCAL}/fresh-types/tsconfig.json`, '{"fresh":true}\n');
+
+  await write(
+    repo,
+    `${PUBLISHED}/types/tsconfig.json`,
+    '{"compilerOptions":{"strict":false}}\n',
+  );
+
+  await write(
+    repo,
+    `${PUBLISHED}/strict-ts-lib-v7.0/tsconfig.paths.json`,
+    '{"paths":"stale"}\n',
+  );
+
   await base(repo);
 
   await git('add', '-A');
@@ -373,9 +812,39 @@ const runPathCheck = async (
 
   await git('add', '-A');
 
+  // Staged as an object the repository does not have (its id hashed and not
+  // written), so that reading it fails however git stores its objects.
+  if (unreadableStaged !== undefined) {
+    const hashed = await runFile('git', ['hash-object', '--stdin'], {
+      cwd: repo,
+      env: scratchGitEnv(),
+      input: 'never written\n',
+    });
+
+    expect(hashed.status, hashed.stderr).toBe(0);
+
+    await git(
+      'update-index',
+      '--cacheinfo',
+      `100644,${hashed.stdout.trim()},${unreadableStaged}`,
+    );
+  }
+
   // As GitHub runs a `run:` block that names no shell.
-  return runFile('bash', ['-e', '-c', script], {
+  const checked = await runFile('bash', ['-e', '-c', script], {
     cwd: repo,
-    env: scratchGitEnv(),
+    env: {
+      ...scratchGitEnv(),
+      RUNNER_TEMP: tools,
+      PATH: `${path.join(tools, 'bin')}${path.delimiter}${process.env['PATH'] ?? ''}`,
+    },
   });
+
+  // The block removes what it wrote there, whichever way it ended.
+  // eslint-disable-next-line security/detect-non-literal-fs-filename
+  const left = await fs.readdir(tools);
+
+  expect(left.filter((name) => name !== 'bin')).toStrictEqual([]);
+
+  return checked;
 };
