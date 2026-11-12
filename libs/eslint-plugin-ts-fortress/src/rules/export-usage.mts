@@ -309,7 +309,9 @@ const collectStatementEdges = (
 /**
  * `import('./a.mjs')` and `require('./a.mjs')` hand the whole module over, so
  * each counts as a use of every export. `typeof import('./a.mjs')` is a type
- * node rather than a call and is not one.
+ * node rather than a call and is not one. Only a string-literal specifier is
+ * read: `require(path)` names no file, and counting it as a use of every export
+ * in the program would turn the rule off wherever one is written.
  */
 const collectDynamicImportEdges = (
   sourceFile: ts.SourceFile,
@@ -342,14 +344,49 @@ const collectDynamicImportEdges = (
  * The file a module specifier resolves to, through the resolution the program
  * already did. `undefined` for a module that is not a file of the program — a
  * package, an ambient `declare module`, a path that does not resolve.
+ *
+ * TypeScript resolves the argument of a `require()` call only in a JavaScript
+ * file, so in a `.ts`, `.cts` or `.mts` file the checker has no symbol for it.
+ * That specifier is resolved here as Node would resolve a `require`, in
+ * CommonJS mode, and taken when it names a file of the program.
  */
 const resolveModule = (
+  program: ts.Program,
   checker: ts.TypeChecker,
   moduleSpecifier: ts.Expression,
-): string | undefined =>
-  checker
+): string | undefined => {
+  const resolved = checker
     .getSymbolAtLocation(moduleSpecifier)
     ?.declarations?.find(ts.isSourceFile)?.fileName;
+
+  if (resolved !== undefined || !ts.isStringLiteralLike(moduleSpecifier)) {
+    return resolved;
+  }
+
+  const { parent } = moduleSpecifier;
+
+  if (
+    !ts.isCallExpression(parent) ||
+    !ts.isIdentifier(parent.expression) ||
+    parent.expression.text !== 'require'
+  ) {
+    return undefined;
+  }
+
+  const fileName = ts.resolveModuleName(
+    moduleSpecifier.text,
+    moduleSpecifier.getSourceFile().fileName,
+    program.getCompilerOptions(),
+    ts.sys,
+    undefined,
+    undefined,
+    ts.ModuleKind.CommonJS,
+  ).resolvedModule?.resolvedFileName;
+
+  return fileName === undefined
+    ? undefined
+    : program.getSourceFile(fileName)?.fileName;
+};
 
 /** Every file's import edges, keyed by the file they point at. */
 const importEdges = (
@@ -369,7 +406,7 @@ const importEdges = (
     moduleSpecifier: ts.Expression,
     ...edges: readonly ImportEdge[]
   ): void => {
-    const target = resolveModule(checker, moduleSpecifier);
+    const target = resolveModule(program, checker, moduleSpecifier);
 
     if (target === undefined) {
       return;
