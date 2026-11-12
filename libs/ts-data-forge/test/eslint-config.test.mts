@@ -9,7 +9,7 @@ import { defineImportProbe } from '../../../tools/configs/eslint-import-probe.mj
 describe('eslint.config.mts', () => {
   const restrictedImportLines = defineImportProbe({
     packageRoot: path.resolve(import.meta.dirname, '..'),
-    sourcePath: 'src/object/object.mts',
+    sourcePath: 'src/object/__probe__.mts',
   });
 
   test('refuses the Arr object and self-imports in src/', async () => {
@@ -70,7 +70,7 @@ describe('eslint.config.mts', () => {
         'export const used = [A, B, C];',
         '',
       ].join('\n'),
-      'src/number/branded-types/negative-int.mts',
+      'src/number/branded-types/__probe__.mts',
     );
 
     assert.deepStrictEqual(lines, [1, 2]);

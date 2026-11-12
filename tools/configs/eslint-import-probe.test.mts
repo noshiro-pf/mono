@@ -47,6 +47,26 @@ describe(defineImportProbe, () => {
     });
   }, 60_000);
 
+  test('throws on a path an existing file occupies', async () => {
+    await withPackage(async (packageRoot) => {
+      // A path the config lints, so that only the existence check refuses it.
+      // eslint-disable-next-line security/detect-non-literal-fs-filename
+      await fs.mkdir(path.join(packageRoot, 'src'));
+
+      // eslint-disable-next-line security/detect-non-literal-fs-filename
+      await fs.writeFile(path.join(packageRoot, 'src/existing.mjs'), '');
+
+      const probe = defineImportProbe({
+        packageRoot,
+        sourcePath: 'src/existing.mjs',
+      });
+
+      await expect(probe("import { b } from 'refused';")).rejects.toThrow(
+        /src\/existing\.mjs exists; name one where nothing does/u,
+      );
+    });
+  }, 60_000);
+
   test('throws on a path the config ignores', async () => {
     await withPackage(async (packageRoot) => {
       const probe = defineImportProbe({
