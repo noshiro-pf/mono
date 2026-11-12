@@ -49,7 +49,7 @@ table to the check workflows):
 | `coverage-pr (<artifact>)`                 | Uploads reports an earlier run kept, for Codecov alone; it holds no merge, and nothing in the branch fixes it                                       |
 | `Validate PR title`                        | The PR title is not Conventional Commits — `PATCH /pulls/{n}`                                                                                       |
 | `Validate commit messages`                 | A commit message is not English — amend it                                                                                                          |
-| `Validate commit count`                    | The branch is more than one commit — squash it, see below                                                                                           |
+| `Validate commit count`                    | The branch is more than one commit of its own — squash it, see below                                                                                |
 | `Validate code owners`                     | Someone other than an owner changed a path `.github/CODEOWNERS` lists — not yours to fix: an owner reads and approves it, and the worker re-runs it |
 
 `Validate PR title` is required because a squash merge takes the PR title as
@@ -60,9 +60,14 @@ instead.
 
 `Validate commit count` is the same rule about the other half of the squash
 commit: the branch's subjects become its body, so the branch is one commit.
-Squash with `git reset --soft "$(git merge-base HEAD origin/main)" && git commit`
-in the worktree. If the message is not obvious from the PR title and body,
-stop and ask.
+The head of a pull request below it that has already merged is not counted; the
+job's summary names each. The worker restacks such a branch itself; on one it
+set aside, run the `git rebase --onto` the summary prints first, or their
+changes join the squash. A summary that asks for a re-run means a read failed or
+lagged a push: re-run the job before squashing anything. Squash with
+`git reset --soft "$(git merge-base HEAD origin/main)" && git commit` in the
+worktree. If the message is not obvious from the PR title and body, stop and
+ask.
 
 - `code-check (z:ci:code-check:dist-and-verify)` and
   `style-check (z:ci:style-check:format-and-doc)` run `pnpm run ws:build` first

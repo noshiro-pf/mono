@@ -163,45 +163,165 @@ jobs:
       # repository keeps.
       #
       # Read through the API, as the job above does. `.commits` on the pull
-      # request itself is the total — the commit list endpoint caps at 250,
-      # and a count is all this needs.
+      # request itself is the total — the commit list endpoint caps at 250 —
+      # and a count is all a branch of one commit needs; a longer one is read
+      # commit by commit below.
       #
       # A stacked pull request (CLAUDE.md, "Commits and pull requests") is
       # based on the layer below, so `.commits` is its own commit, and this
       # workflow, filtered to `main`, does not run on it at all. When the layer
-      # below merges, GitHub moves its base to `main`, and until it is rebased
-      # (unless GitHub rebased it in that move) it still carries the original
-      # commit of the layer that was squashed into `main`: the count reads 2
-      # and this context is red. `unblock-prs` rebases a layer before it arms
-      # auto-merge, so nothing merges in that window.
+      # below merges, GitHub deletes its branch and moves this one's base to
+      # `main` (an `edited` event), and until `unblock-prs` or `auto-rebase`
+      # restacks it the branch still carries the layer's own commit, which
+      # `main` holds only as its squash: the count reads 2. Every stacked
+      # merge used to turn this context red, and notify, for the minutes
+      # until that restack.
+      #
+      # So a commit that is the head of another pull request, merged into
+      # `main`, is not counted: it is the layer below, not this
+      # branch's work, and the restack drops it. Only that exact case is
+      # excused, on a branch of at most 20 commits. A commit merely contained
+      # in a merged pull request, the head of one still open, and the head of
+      # one merged into some other branch (a layer armed by mistake and merged
+      # into the layer below it) count as before, and the excuse never makes
+      # the count pass on its own: what is left must still be one commit.
+      #
+      # It does not ask which branch this one was moved off, only that the
+      # commit is such a head: the REST timeline does not say what a base
+      # change was between, and the `edited` payload says it only on that one
+      # event, not on the label events that re-run this job later. Nor is
+      # such a head ever merged by the queue: its squash is on `main` and
+      # not on this branch, so the branch is behind, and `unblock-prs`
+      # rebases a branch that is behind before it arms auto-merge, dropping
+      # the commit (`--onto` from the merged head after a move, a plain
+      # rebase's patch match otherwise); the ruleset's up-to-date rule
+      # (`repo-settings/README.md`) keeps anyone else from merging it behind.
+      # Squashed by bypass before then, the merged layer's subject would land
+      # in the body.
+      #
+      # The pull request association is written when a commit is pushed to a
+      # pull request, long before the merge, and `merged_at` is the merged
+      # pull request's own record, set before GitHub deletes its branch and
+      # so before the move that fires this run.
       - name: Check that the branch is a single commit
         env:
           GH_TOKEN: ${{ github.token }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         run: |
-          count="$(gh api "repos/${GITHUB_REPOSITORY}/pulls/${PR_NUMBER}" --jq '.commits')"
+          if ! read -r count head_sha < <(gh api "repos/${GITHUB_REPOSITORY}/pulls/${PR_NUMBER}" --jq '"\(.commits) \(.head.sha)"') ||
+            ! [[ "${count}" =~ ^[0-9]+$ ]]; then
+            summary='Could not read how many commits the branch has; re-run the job.'
+            echo "::error::${summary}"
+            echo "${summary}" >>"${GITHUB_STEP_SUMMARY}"
+            exit 1
+          fi
 
           if [ "${count}" -eq 1 ]; then
             echo 'The branch is a single commit.'
             exit 0
           fi
 
+          # A restack leaves a handful of commits, so a branch of more than 20
+          # fails below without a scan. Up to that, every commit is looked up,
+          # one call each, even past the second of the branch's own, so that
+          # the summary can say how many it has and every merged head it
+          # carries. If any read fails, the list is not as long as the count
+          # above, or the head read with that count is not the one this run is
+          # for, nothing is excused and the summary asks for a re-run rather
+          # than a squash, which could fold an unread merged layer in: a failed
+          # or lagging read is rare, and a re-run settles it where a guess
+          # either way could be wrong. (A run older than the latest push stays
+          # red on its own head, which is no longer the pull request's; the
+          # newer push's run decides.)
+          #
+          # A merged pull request's head stays associated with it after the
+          # squash merge, though the commit itself never reaches `main`, so
+          # the lookup below finds the layer in the very case it is for.
+          own=0
+          merged_layers=''
+          last_layer=''
+          unread=false
+          if [ "${count}" -ge 2 ] && [ "${count}" -le 20 ]; then
+            if ! commits="$(gh api "repos/${GITHUB_REPOSITORY}/pulls/${PR_NUMBER}/commits?per_page=100" --jq '.[].sha')"; then
+              echo "::warning::Could not read the branch's commits."
+              unread=true
+              commits=''
+            elif [ "${head_sha}" != "${HEAD_SHA}" ] || [ "$(wc -l <<<"${commits}")" -ne "${count}" ] || ! grep -qxF "${HEAD_SHA}" <<<"${commits}"; then
+              echo "::warning::The pull request reads as ${count} commits up to ${head_sha:0:7}, which does not match its commit list or ${HEAD_SHA:0:7}, the head this run is for."
+              unread=true
+              commits=''
+            fi
+            while read -r sha; do
+              if [ -z "${sha}" ]; then
+                continue
+              fi
+              # The pull request into `main` (the only base this workflow runs
+              # on), other than this one, that merged with exactly this commit
+              # as its head, if any.
+              if ! layer="$(
+                SHA="${sha}" gh api "repos/${GITHUB_REPOSITORY}/commits/${sha}/pulls?per_page=100" \
+                  --jq '[.[] | select(.merged_at != null and .base.ref == "main" and .number != (env.PR_NUMBER | tonumber) and .head.sha == env.SHA) | .number] | first // empty' \
+                  </dev/null
+              )"; then
+                echo "::warning::Could not read the pull requests of ${sha:0:7}."
+                unread=true
+                break
+              fi
+              if [ -n "${layer}" ]; then
+                merged_layers="${merged_layers:+${merged_layers}, }#${layer} (${sha:0:7})"
+                last_layer="${sha}"
+              else
+                own=$((own + 1))
+              fi
+            done <<<"${commits}"
+
+            if [ "${unread}" = false ] && [ -n "${merged_layers}" ] && [ "${own}" -eq 1 ]; then
+              notice="The branch is one commit of its own. It also carries what merged below it, as the head of ${merged_layers}, which the restack drops."
+              echo "::notice::${notice}"
+              echo "${notice}" >>"${GITHUB_STEP_SUMMARY}"
+              exit 0
+            fi
+          fi
+
           summary="A pull request is squashed into a single commit before it is merged, and this one has ${count}."
+          if [ "${unread}" = true ]; then
+            summary="${summary} Its commits could not all be read, or the reads lagged a push, so none was excused as a merged layer below it: re-run the job before squashing anything."
+          elif [ -n "${merged_layers}" ]; then
+            summary="${summary} ${own} of them are its own; the rest merged below it, as the head of ${merged_layers}, and are not counted."
+          fi
           echo "::error::${summary}"
           echo "${summary}"
+          if [ "${unread}" = true ]; then
+            echo "${summary}" >>"${GITHUB_STEP_SUMMARY}"
+            exit 1
+          fi
           # shellcheck disable=SC2016 # literal backticks and $(…), not substitutions
           {
             echo "${summary}"
             echo
-            echo 'Squash them into one whose message is what `main` should keep:'
-            echo
-            echo '```bash'
-            echo 'git fetch origin main'
-            echo 'git reset --soft "$(git merge-base HEAD origin/main)"'
-            echo 'git commit'
-            echo '```'
-            echo
-            echo 'then force-push.'
+            if [ -n "${merged_layers}" ]; then
+              echo 'Restack it first, cutting at the merged head its own commits sit on (as a rule the last one listed; `git log` shows it), or their changes join the squash:'
+              echo
+              echo '```bash'
+              echo 'git fetch origin main'
+              echo "git rebase --onto origin/main ${last_layer}"
+              echo '```'
+              echo
+            fi
+            if [ -n "${merged_layers}" ] && [ "${own}" -eq 0 ]; then
+              echo 'Nothing is left of its own after that: close the pull request rather than squash.'
+            else
+              echo 'Squash them into one whose message is what `main` should keep:'
+              echo
+              echo '```bash'
+              echo 'git fetch origin main'
+              echo 'git reset --soft "$(git merge-base HEAD origin/main)"'
+              echo 'git commit'
+              echo '```'
+              echo
+              echo 'then force-push.'
+            fi
           } >>"${GITHUB_STEP_SUMMARY}"
           exit 1
 

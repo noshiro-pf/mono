@@ -174,11 +174,11 @@ no `@example` tag.
 ## Repository settings
 
 **Editing a file under `repo-settings/` passes CI and changes nothing** until
-`repo-settings:apply` is run by hand. `repo-settings/README.md` has that and
-the rest: what `backup` can silently turn a drift into, why an environment is
+`repo-settings:apply` is run by hand. `repo-settings/README.md` has that and the
+rest: what `backup` can silently turn a drift into, why an environment is
 declared and applied before the workflow naming it merges, and what
-`rulesets/main.json` asks of a new job, a renamed context, the admin bypass
-and `.github/CODEOWNERS`.
+`rulesets/main.json` asks of a new job, a renamed context, the admin bypass, the
+up-to-date rule and `.github/CODEOWNERS`.
 
 ## CI
 

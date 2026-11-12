@@ -47,6 +47,13 @@
   request が rebase されるまで全部 blocked に見えることを見込んでおく。
 - **squash merge が必須で、admin の bypass は `pull_request` モードだけ。**
   bypass を広げないこと。直接 push を検査するものは無い。
+- **`strict_required_status_checks_policy` は `true` のままにする。** 下の層が
+  マージされて `main` に移った stacked pull request は、その層の squash 前の
+  コミットを持ったままでも `Validate commit count` を通る（`lint-pull-request.yml`
+  の `commit-count` ジョブ）。そのブランチは `main` より behind なので、この
+  up-to-date の規則が積み直し前のマージを止めている。admin の bypass はこの規則も
+  越えるので、積み直し前の stacked pull request を bypass でマージしないこと。
+  squash の本文に下の層の subject が残る。
 - **`require_code_owner_review` は `false` のままにする。** `.github/CODEOWNERS`
   をマージゲートにしているのは ruleset ではなく、必須チェック
   `Validate code owners`（`lint-pull-request.yml` の `code-owners` ジョブ）。挙がったパスを触る pull request は、作り手と
