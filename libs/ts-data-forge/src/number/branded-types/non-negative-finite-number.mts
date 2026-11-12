@@ -122,7 +122,7 @@ export const NonNegativeFiniteNumber = {
    *
    * Unlike `asNonNegativeFiniteNumber`, this is total: out-of-range inputs are
    * clamped to the nearest representable `NonNegativeFiniteNumber` instead of
-   * throwing.
+   * throwing, `NaN` included, which becomes `MIN_VALUE`.
    *
    * @param value - The value to convert
    * @returns The value as a `NonNegativeFiniteNumber`

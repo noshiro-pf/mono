@@ -104,7 +104,8 @@ export const NonNegativeInt16 = {
    * MAX_VALUE]`.
    *
    * Unlike `asNonNegativeInt16`, this is total: out-of-range inputs are clamped
-   * to the nearest representable `NonNegativeInt16` instead of throwing.
+   * to the nearest representable `NonNegativeInt16` instead of throwing, `NaN`
+   * included, which becomes `MIN_VALUE`.
    *
    * @param value - The value to convert
    * @returns The value as a `NonNegativeInt16`

@@ -104,7 +104,8 @@ export const PositiveUint32 = {
    * MAX_VALUE]`.
    *
    * Unlike `asPositiveUint32`, this is total: out-of-range inputs are clamped
-   * to the nearest representable `PositiveUint32` instead of throwing.
+   * to the nearest representable `PositiveUint32` instead of throwing, `NaN`
+   * included, which becomes `MIN_VALUE`.
    *
    * @param value - The value to convert
    * @returns The value as a `PositiveUint32`

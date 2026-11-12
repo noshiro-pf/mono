@@ -112,7 +112,8 @@ export const Int16 = {
    * integer and saturating the result into the range `[MIN_VALUE, MAX_VALUE]`.
    *
    * Unlike `asInt16`, this is total: out-of-range inputs are clamped to the
-   * nearest representable `Int16` instead of throwing.
+   * nearest representable `Int16` instead of throwing, `NaN` included, which
+   * becomes `MIN_VALUE`.
    *
    * @param value - The value to convert
    * @returns The value as an `Int16`

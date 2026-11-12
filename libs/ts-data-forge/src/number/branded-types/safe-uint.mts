@@ -100,7 +100,8 @@ export const SafeUint = {
    * integer and saturating the result into the range `[MIN_VALUE, MAX_VALUE]`.
    *
    * Unlike `asSafeUint`, this is total: out-of-range inputs are clamped to the
-   * nearest representable `SafeUint` instead of throwing.
+   * nearest representable `SafeUint` instead of throwing, `NaN` included, which
+   * becomes `MIN_VALUE`.
    *
    * @param value - The value to convert
    * @returns The value as a `SafeUint`
