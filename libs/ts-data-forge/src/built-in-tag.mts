@@ -28,6 +28,14 @@ export const isSet = (value: unknown): value is ReadonlySet<unknown> =>
 export const isTypedArray = (value: unknown): value is TypedArray =>
   typedArrayTags.has(tagOf(value));
 
+export const isArrayBuffer = (
+  value: unknown,
+): value is ArrayBuffer | SharedArrayBuffer =>
+  tagOf(value) === 'ArrayBuffer' || tagOf(value) === 'SharedArrayBuffer';
+
+export const isDataView = (value: unknown): value is DataView =>
+  tagOf(value) === 'DataView';
+
 type TypedArray =
   | Int8Array
   | Uint8Array
