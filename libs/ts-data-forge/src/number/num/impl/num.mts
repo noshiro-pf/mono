@@ -47,8 +47,10 @@ import type {
 export const from: (n: unknown) => number = Number;
 
 /**
- * Safely parses a base-10 integer from a string, returning a {@link Result}
- * that is `Ok<Int>` for valid input and `Err<Error>` otherwise.
+ * Safely parses an integer from a string, returning a {@link Result} that is
+ * `Ok<Int>` for valid input and `Err<Error>` otherwise: the number `Number`
+ * reads from the string, truncated toward zero (`SafeNumber.parseInteger` in
+ * ts-std-forge, which says exactly what is accepted).
  *
  * This is a stricter alternative to both `parseInt` and `Number`:
  *
@@ -57,13 +59,12 @@ export const from: (n: unknown) => number = Number;
  * - Unlike `Number('')` / `Number('   ')` (which return `0`), empty or
  *   whitespace-only input yields `Err`.
  *
- * The empty-string case is rejected by delegating to `parseInt` (which returns
- * `NaN` there) rather than hard-coding a check, while the trailing-garbage case
- * is rejected via `Number`. Valid input is truncated toward zero, so `'12.9'`
- * becomes `12` and `'-3.5'` becomes `-3`.
+ * Valid input is truncated toward zero, so `'12.9'` becomes `12`, `'-3.5'`
+ * becomes `-3` and `'.5'` becomes `0`. What `Number` reads is accepted, so the
+ * hexadecimal, binary and octal literals are too (`'0x1F'` → `31`).
  *
- * Only base 10 is supported. Use `Result.unwrapOk` (optionally with a
- * `?? Number.NaN` fallback) or `Result.unwrapOkOr` to get a plain number back.
+ * Use `Result.unwrapOk` (optionally with a `?? Number.NaN` fallback) or
+ * `Result.unwrapOkOr` to get a plain number back.
  *
  * @example
  *
@@ -126,9 +127,7 @@ export const safeParseInt = (s: string): Result<Int, Error> =>
     // eslint-disable-next-line total-functions/no-unsafe-type-assertion
     ok: (n) => Result.ok(n as Int),
     err: () =>
-      Result.err(
-        new Error(`safeParseInt: "${s}" is not a valid base-10 integer`),
-      ),
+      Result.err(new Error(`safeParseInt: "${s}" is not a valid integer`)),
   });
 
 /**

@@ -1,16 +1,19 @@
 import { Result } from '../../functional/index.mjs';
 
 /**
- * Parses a string as a base-10 integer — the alternative to calling
- * `Number(str)` / `Number.parseInt(str, 10)` for integers. (Named
- * `parseInteger` rather than `parseInt` because a declaration named after a
- * global shadows it — the very thing Sumi forbids.)
+ * Parses a string as an integer: the number `Number(str)` reads from it,
+ * truncated toward zero — the alternative to calling `Number(str)` /
+ * `Number.parseInt(str, 10)` for integers. (Named `parseInteger` rather than
+ * `parseInt` because a declaration named after a global shadows it — the very
+ * thing Sumi forbids.)
  *
- * `Number.parseInt` ignores trailing non-numeric characters (`'123abc'` →
- * `123`) and `Number` coerces blank input to `0`. The input is accepted only
- * when both `Number` and `Number.parseInt` agree it is a finite number, and the
- * `Number` result is truncated toward zero — which rejects blank input and
- * trailing garbage, and turns `'-12.9'` into `-12`.
+ * What is accepted is exactly what `Number` reads as a finite number: decimal
+ * with an optional sign, fraction and exponent (`'-12.9'` → `-12`, `'.5'` →
+ * `0`, `'1e3'` → `1000`), and the unsigned hexadecimal, binary and octal
+ * literals (`'0x1F'` → `31`, `'0b11'` → `3`, `'0o17'` → `15`), with surrounding
+ * whitespace. A signed one (`'-0x10'`) is `NaN` to `Number`, so it fails here
+ * too. The input fails when it is blank, has trailing garbage (`'123abc'`,
+ * which `Number.parseInt` would read as `123`) or is not finite (`'1e400'`).
  *
  * This is the single implementation of the conversion: ts-data-forge's
  * `Num.safeParseInt` delegates here since D-49 (c) and only adds its own
@@ -42,8 +45,8 @@ import { Result } from '../../functional/index.mjs';
  * @returns `Ok<number>` with the parsed integer — a plain `number`, not
  *   ts-type-forge's `Int` brand, because ts-std-forge does not use branded
  *   number types (D-26 / D-39) — or
- *   `Err<{ kind: 'invalid-integer', input }>` when the input is blank, has
- *   trailing garbage, or is not a finite number.
+ *   `Err<{ kind: 'invalid-integer', input }>` when `Number` reads no finite
+ *   number from it, or it is blank.
  */
 export const parseInteger = (
   value: string,
@@ -53,15 +56,12 @@ export const parseInteger = (
   // raw `Number` call is what this function exists to wrap.
   const viaNumber = Number(value);
 
-  // `Number('')` / `Number('   ')` は 0 を返すが、`parseInt` は NaN を返す。
-  // 末尾不正文字（'12abc' 等）は `Number` 側が NaN にするので、両者が共に
-  // 有効な場合のみ採用することで空文字・空白のみ・末尾不正をまとめて弾く。
-  // `Number('1e400')` は Infinity だが `parseInt('1e400', 10)` は 1 なので、
-  // 両者の一致だけでは Infinity が整数として通ってしまう(Num.safeParseInt の
-  // 穴)。有限性も要求する。
-  return Number.isNaN(viaNumber) ||
-    !Number.isFinite(viaNumber) ||
-    Number.isNaN(Number.parseInt(value, 10))
+  // `Number('')` / `Number('   ')` は 0 を返すので、空白だけの入力は先に弾く
+  // （`trim` が除く空白は `Number` が無視する空白と同じ）。末尾不正文字
+  // （'12abc' 等）は `Number` が NaN にし、`Number('1e400')` は Infinity なので
+  // 有限性も要求する。以前は `parseInt` との一致で空白を弾いていたが、それは
+  // `parseInt('.5', 10)` が NaN であるため '.5' まで弾いていた（#2952）。
+  return value.trim() === '' || !Number.isFinite(viaNumber)
     ? Result.err({ kind: 'invalid-integer', input: value })
     : Result.ok(Math.trunc(viaNumber));
 };
