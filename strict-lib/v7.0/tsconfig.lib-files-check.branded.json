@@ -3,6 +3,8 @@
   "include": ["./output/lib-files-branded"],
   "files": [
     "../configs/tsconfig/lib-check-entry.branded.ts",
+    "../configs/tsconfig/lib-check-entry.branded.since-5.6.ts",
+    "../configs/tsconfig/lib-check-entry.branded.since-5.8.ts",
     "../configs/tsconfig/lib-check-entry.intl-digits.ts"
   ],
   "exclude": ["./output/lib-files-branded/lib.webworker.d.ts"]

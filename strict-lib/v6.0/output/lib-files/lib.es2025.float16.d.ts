@@ -31,7 +31,7 @@ interface Float16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   /**
    * The size in bytes of each element in the array.
    */
-  readonly BYTES_PER_ELEMENT: number;
+  readonly BYTES_PER_ELEMENT: 2;
 
   /**
    * The ArrayBuffer instance referenced by the array.
@@ -74,7 +74,7 @@ interface Float16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
    * If thisArg is omitted, undefined is used as the this value.
    */
   every(
-    predicate: (value: number, index: number, array: this) => unknown,
+    predicate: (value: number, index: number, array: this) => boolean,
     thisArg?: unknown,
   ): boolean;
 
@@ -96,7 +96,7 @@ interface Float16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
    * If thisArg is omitted, undefined is used as the this value.
    */
   filter(
-    predicate: (value: number, index: number, array: this) => unknown,
+    predicate: (value: number, index: number, array: this) => boolean,
     thisArg?: unknown,
   ): Float16Array<ArrayBuffer>;
 
@@ -142,7 +142,7 @@ interface Float16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
     thisArg?: unknown,
   ): S | undefined;
   findLast(
-    predicate: (value: number, index: number, array: this) => unknown,
+    predicate: (value: number, index: number, array: this) => boolean,
     thisArg?: unknown,
   ): number | undefined;
 
@@ -156,7 +156,7 @@ interface Float16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
    * predicate. If it is not provided, undefined is used instead.
    */
   findLastIndex(
-    predicate: (value: number, index: number, array: this) => unknown,
+    predicate: (value: number, index: number, array: this) => boolean,
     thisArg?: unknown,
   ): number;
 
@@ -344,7 +344,7 @@ interface Float16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
    * If thisArg is omitted, undefined is used as the this value.
    */
   some(
-    predicate: (value: number, index: number, array: this) => unknown,
+    predicate: (value: number, index: number, array: this) => boolean,
     thisArg?: unknown,
   ): boolean;
 
@@ -411,7 +411,7 @@ interface Float16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
    */
   with(index: number, value: number): Float16Array<ArrayBuffer>;
 
-  readonly [index: number]: number;
+  [index: number]: number;
 
   [Symbol.iterator](): ArrayIterator<number>;
 
@@ -452,7 +452,7 @@ interface Float16ArrayConstructor {
   /**
    * The size in bytes of each element in the array.
    */
-  readonly BYTES_PER_ELEMENT: number;
+  readonly BYTES_PER_ELEMENT: 2;
 
   /**
    * Returns a new array from a set of elements.
@@ -482,7 +482,7 @@ interface Float16ArrayConstructor {
    * Creates an array from an array-like or iterable object.
    * @param elements An iterable object to convert to an array.
    */
-  from(elements: Iterable<number>): Float16Array<ArrayBuffer>;
+  from<T extends number>(arrayLike: Iterable<T>): Float16Array<ArrayBuffer>;
 
   /**
    * Creates an array from an array-like or iterable object.

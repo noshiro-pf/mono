@@ -34,7 +34,7 @@ export const convertLibEsNextIterator =
             ),
             replaceWithNoMatchCheck(
               'drop(count: number): IteratorObject<T, undefined, unknown>;',
-              `drop(limit: ${brandedNumber.ArraySizeArgNonNegative}): IteratorObject<T, undefined, unknown>;`,
+              `drop(count: ${brandedNumber.ArraySizeArgNonNegative}): IteratorObject<T, undefined, unknown>;`,
             ),
             replaceWithNoMatchCheck(
               'flatMap<U>(callback: (value: T, index: number) => Iterator<U, unknown, undefined> | Iterable<U, unknown, undefined>): IteratorObject<U, undefined, unknown>;',
