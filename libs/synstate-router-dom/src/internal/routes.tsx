@@ -5,7 +5,12 @@ import {
   withInitialValue,
   type InitializedObservable,
 } from 'synstate';
-import { createAfterUpdate, mountable, type JSX } from 'synstate-dom';
+import {
+  createAfterUpdate,
+  mountable,
+  mountSwitch,
+  type JSX,
+} from 'synstate-dom';
 import {
   matchAt,
   pageValues,
@@ -19,7 +24,6 @@ import {
 } from 'synstate-router';
 import { isNonNullObject, Optional } from 'ts-data-forge';
 import type { RouterComponents } from '../create-router-components.mjs';
-import { mountSwitch } from './mount-switch.mjs';
 
 /** `Routes` bound to `router` (`RouterComponents['Routes']`). */
 export const createRoutes = <R extends AnyRoutes>(

@@ -393,6 +393,7 @@ export const render = (
 - `MatchOptional`（`Optional<T>`）と `MatchResult`（`Result<T, E>`）を用意する。ts-data-forge の型にそろえる。
 - 子の関数には中身の型に絞った `InitializedObservable<T>` を渡す。タグ（Some / None、Ok / Err）が変わったときだけ分岐を作り直し、同じタグの間は渡した Observable に新しい中身を流す。この Observable は `For` の行と同じく `value` から派生させ（`filter` で同じタグの値だけを通して中身を取り出す）、伝播中に書き込まない。
 - 汎用の `Match`（判別共用体の `type` で分ける）は、`MatchOptional` と `MatchResult` を作った後に形を決める。
+- `If`・`Match` 系が共通に使う、値の関数（キー）で分岐を選ぶ低レベルの `mountSwitch(value, keyOf, branch)` は公開する。キーが変わったときだけ分岐を作り直し、「8.1」の挿入前の更新の扱いもそのまま持つ。synstate-router-dom の `Routes` はこれでルートごとに分岐を切り替える（#3112。以前は写しを持っていて、#2935 と #3141 の扱いが抜けていた）。
 
 ### 8.4 `For`
 

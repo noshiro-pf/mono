@@ -1,5 +1,5 @@
 import { map } from 'synstate';
-import { constant, type Constant } from 'synstate-dom';
+import { constant, type Constant, type JSX } from 'synstate-dom';
 import { asSafeInt, expectType, type SafeInt } from 'ts-data-forge';
 import { afterUpdate, mountInto, routes, setup } from './fixture.js';
 
@@ -320,6 +320,46 @@ describe('Routes', () => {
     await afterUpdate();
 
     assert.deepStrictEqual(browser.scrolls(), ['top', 'top']);
+
+    unmount();
+  });
+
+  test('follows a navigation a later sibling makes while the page is still mounting (#2935)', () => {
+    const {
+      router,
+      bound: { Routes },
+    } = setup('/');
+
+    // Mounted after `Routes` in the same element, so it runs while the switch's
+    // anchor is not yet in any parent.
+    const NavigateOnMount = (): JSX.Element => {
+      router.push(routes.settings.href());
+
+      return <span />;
+    };
+
+    const { container, unmount } = mountInto(() => (
+      <div>
+        <Routes
+          cases={{
+            home: () => <p>{page('home')}</p>,
+            products: () => <p>{page('products')}</p>,
+            'products.new': () => <p>{page('new')}</p>,
+            'products.item': () => <p>{page('item')}</p>,
+            settings: () => <p>{page('settings')}</p>,
+            drafts: undefined,
+          }}
+          notFound={<p>{page('not found')}</p>}
+        />
+        <NavigateOnMount />
+      </div>
+    ));
+
+    assert.strictEqual(container.textContent, 'settings');
+
+    router.push(routes.home.href());
+
+    assert.strictEqual(container.textContent, 'home');
 
     unmount();
   });
