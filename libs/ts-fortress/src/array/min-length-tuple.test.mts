@@ -1,5 +1,5 @@
 // @sumi-expect-error-file null/no-null-literal
-import { expectType, Result } from 'ts-data-forge';
+import { Arr, asUint32, expectType, Result } from 'ts-data-forge';
 import type { MinLengthTuple } from 'ts-type-forge';
 import { number } from '../primitives/index.mjs';
 import type { TypeOf } from '../type.mjs';
@@ -199,10 +199,40 @@ describe(minLengthTuple, () => {
   });
 
   describe('fill', () => {
-    test('keeps numeric entries and trims extras', () => {
+    test('keeps every entry of an array that is long enough', () => {
       const ys: unknown = [4, 5, 6, 7] as const;
 
-      assert.deepStrictEqual(xs.fill(ys), [4, 5, 6]);
+      assert.deepStrictEqual(xs.fill(ys), [4, 5, 6, 7]);
+    });
+
+    test('a valid value of exactly the minimum length stays valid and unchanged', () => {
+      const ys: unknown = [4, 5, 6] as const;
+
+      assert.isTrue(xs.is(ys));
+
+      const filled = xs.fill(ys);
+
+      assert.isTrue(xs.is(filled));
+
+      assert.deepStrictEqual(filled, ys);
+    });
+
+    test('fills an invalid entry past the minimum', () => {
+      const ys: unknown = [4, 5, 6, 'x'] as const;
+
+      assert.deepStrictEqual(xs.fill(ys), [4, 5, 6, 0]);
+    });
+
+    test('fills the holes of a sparse array that is long enough', () => {
+      // The hole is the input under test.
+      // @sumi-expect-error banned-syntax/no-sparse-array
+      const ys: unknown = [4, , 6, 7] as const;
+
+      const filled = xs.fill(ys);
+
+      assert.deepStrictEqual(filled, [4, 0, 6, 7]);
+
+      assert.isTrue(xs.is(filled));
     });
 
     test('fills missing or invalid entries', () => {
@@ -242,6 +272,44 @@ describe(minLengthTuple, () => {
       assert.isTrue(dyn.is([0, 0, 0, 0, 0]));
 
       assert.isFalse(dyn.is([0, 0, 0, 0]));
+    });
+
+    test('fill keeps every entry of an array that is long enough', () => {
+      const ys: unknown = [1, 2, 3, 4, 5, 6, 7] as const;
+
+      assert.deepStrictEqual(dyn.fill(ys), [1, 2, 3, 4, 5, 6, 7]);
+    });
+
+    test('fill of a valid value stays valid and unchanged', () => {
+      const ys: unknown = Arr.seq(asUint32(101));
+
+      assert.isTrue(big.is(ys));
+
+      const filled = big.fill(ys);
+
+      assert.isTrue(big.is(filled));
+
+      assert.deepStrictEqual(filled, ys);
+    });
+
+    test('fill fills an invalid entry past the minimum', () => {
+      const ys: unknown = [1, 2, 3, 4, 5, 'x'] as const;
+
+      assert.deepStrictEqual(dyn.fill(ys), [1, 2, 3, 4, 5, 0]);
+    });
+
+    test('fill rejects a size that is not a length, whatever the input length', () => {
+      const bad = minLengthTuple(2.5, number());
+
+      expect(() => bad.fill([1, 2])).toThrow(TypeError);
+
+      expect(() => bad.fill([1, 2, 3])).toThrow(TypeError);
+    });
+
+    test('fill still pads an array that is too short', () => {
+      const ys: unknown = [1, 'x'] as const;
+
+      assert.deepStrictEqual(dyn.fill(ys), [1, 0, 0, 0, 0]);
     });
   });
 });
