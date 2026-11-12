@@ -117,12 +117,21 @@ describe('prefer-canonical-array-slicing', () => {
           declare const xs: readonly number[];
           const ys = xs.toSpliced(0, 1);
         `,
-        output: dedent`
-          import { Arr } from 'ts-data-forge';
-          declare const xs: readonly number[];
-          const ys = Arr.tail(xs);
-        `,
-        errors: [{ messageId: 'preferCanonicalArraySlicing' }],
+        errors: [
+          {
+            messageId: 'preferCanonicalArraySlicingUnfixed',
+            suggestions: [
+              {
+                messageId: 'suggestCanonicalArraySlicing',
+                output: dedent`
+                  import { Arr } from 'ts-data-forge';
+                  declare const xs: readonly number[];
+                  const ys = Arr.tail(xs);
+                `,
+              },
+            ],
+          },
+        ],
       },
       {
         name: 'xs.slice(1) → Arr.tail(xs)',
@@ -130,12 +139,21 @@ describe('prefer-canonical-array-slicing', () => {
           declare const xs: readonly number[];
           const ys = xs.slice(1);
         `,
-        output: dedent`
-          import { Arr } from 'ts-data-forge';
-          declare const xs: readonly number[];
-          const ys = Arr.tail(xs);
-        `,
-        errors: [{ messageId: 'preferCanonicalArraySlicing' }],
+        errors: [
+          {
+            messageId: 'preferCanonicalArraySlicingUnfixed',
+            suggestions: [
+              {
+                messageId: 'suggestCanonicalArraySlicing',
+                output: dedent`
+                  import { Arr } from 'ts-data-forge';
+                  declare const xs: readonly number[];
+                  const ys = Arr.tail(xs);
+                `,
+              },
+            ],
+          },
+        ],
       },
       {
         name: 'xs.filter((_, i) => i >= 1) → Arr.tail(xs)',
@@ -143,12 +161,21 @@ describe('prefer-canonical-array-slicing', () => {
           declare const xs: readonly number[];
           const ys = xs.filter((_, i) => i >= 1);
         `,
-        output: dedent`
-          import { Arr } from 'ts-data-forge';
-          declare const xs: readonly number[];
-          const ys = Arr.tail(xs);
-        `,
-        errors: [{ messageId: 'preferCanonicalArraySlicing' }],
+        errors: [
+          {
+            messageId: 'preferCanonicalArraySlicingUnfixed',
+            suggestions: [
+              {
+                messageId: 'suggestCanonicalArraySlicing',
+                output: dedent`
+                  import { Arr } from 'ts-data-forge';
+                  declare const xs: readonly number[];
+                  const ys = Arr.tail(xs);
+                `,
+              },
+            ],
+          },
+        ],
       },
       {
         name: 'xs.filter((_, i) => i > 0) → Arr.tail(xs)',
@@ -156,12 +183,21 @@ describe('prefer-canonical-array-slicing', () => {
           declare const xs: readonly number[];
           const ys = xs.filter((_, i) => i > 0);
         `,
-        output: dedent`
-          import { Arr } from 'ts-data-forge';
-          declare const xs: readonly number[];
-          const ys = Arr.tail(xs);
-        `,
-        errors: [{ messageId: 'preferCanonicalArraySlicing' }],
+        errors: [
+          {
+            messageId: 'preferCanonicalArraySlicingUnfixed',
+            suggestions: [
+              {
+                messageId: 'suggestCanonicalArraySlicing',
+                output: dedent`
+                  import { Arr } from 'ts-data-forge';
+                  declare const xs: readonly number[];
+                  const ys = Arr.tail(xs);
+                `,
+              },
+            ],
+          },
+        ],
       },
       {
         name: 'xs.filter((_, i) => i !== 0) → Arr.tail(xs)',
@@ -169,12 +205,21 @@ describe('prefer-canonical-array-slicing', () => {
           declare const xs: readonly number[];
           const ys = xs.filter((_, i) => i !== 0);
         `,
-        output: dedent`
-          import { Arr } from 'ts-data-forge';
-          declare const xs: readonly number[];
-          const ys = Arr.tail(xs);
-        `,
-        errors: [{ messageId: 'preferCanonicalArraySlicing' }],
+        errors: [
+          {
+            messageId: 'preferCanonicalArraySlicingUnfixed',
+            suggestions: [
+              {
+                messageId: 'suggestCanonicalArraySlicing',
+                output: dedent`
+                  import { Arr } from 'ts-data-forge';
+                  declare const xs: readonly number[];
+                  const ys = Arr.tail(xs);
+                `,
+              },
+            ],
+          },
+        ],
       },
       {
         name: 'flipped operand order (0 < i) is also recognized',
@@ -182,12 +227,21 @@ describe('prefer-canonical-array-slicing', () => {
           declare const xs: readonly number[];
           const ys = xs.filter((_, i) => 0 < i);
         `,
-        output: dedent`
-          import { Arr } from 'ts-data-forge';
-          declare const xs: readonly number[];
-          const ys = Arr.tail(xs);
-        `,
-        errors: [{ messageId: 'preferCanonicalArraySlicing' }],
+        errors: [
+          {
+            messageId: 'preferCanonicalArraySlicingUnfixed',
+            suggestions: [
+              {
+                messageId: 'suggestCanonicalArraySlicing',
+                output: dedent`
+                  import { Arr } from 'ts-data-forge';
+                  declare const xs: readonly number[];
+                  const ys = Arr.tail(xs);
+                `,
+              },
+            ],
+          },
+        ],
       },
       {
         name: 'Arr.skip(xs, 1) → Arr.tail(xs)',
@@ -196,12 +250,21 @@ describe('prefer-canonical-array-slicing', () => {
           declare const xs: readonly number[];
           const ys = Arr.skip(xs, 1);
         `,
-        output: dedent`
-          import { Arr } from 'ts-data-forge';
-          declare const xs: readonly number[];
-          const ys = Arr.tail(xs);
-        `,
-        errors: [{ messageId: 'preferCanonicalArraySlicing' }],
+        errors: [
+          {
+            messageId: 'preferCanonicalArraySlicingUnfixed',
+            suggestions: [
+              {
+                messageId: 'suggestCanonicalArraySlicing',
+                output: dedent`
+                  import { Arr } from 'ts-data-forge';
+                  declare const xs: readonly number[];
+                  const ys = Arr.tail(xs);
+                `,
+              },
+            ],
+          },
+        ],
       },
       {
         name: 'aliased import: A.skip(xs, 1) → A.tail(xs)',
@@ -210,12 +273,21 @@ describe('prefer-canonical-array-slicing', () => {
           declare const xs: readonly number[];
           const ys = A.skip(xs, 1);
         `,
-        output: dedent`
-          import { Arr as A } from 'ts-data-forge';
-          declare const xs: readonly number[];
-          const ys = A.tail(xs);
-        `,
-        errors: [{ messageId: 'preferCanonicalArraySlicing' }],
+        errors: [
+          {
+            messageId: 'preferCanonicalArraySlicingUnfixed',
+            suggestions: [
+              {
+                messageId: 'suggestCanonicalArraySlicing',
+                output: dedent`
+                  import { Arr as A } from 'ts-data-forge';
+                  declare const xs: readonly number[];
+                  const ys = A.tail(xs);
+                `,
+              },
+            ],
+          },
+        ],
       },
       // ---- skip N ----
       {
@@ -304,12 +376,21 @@ describe('prefer-canonical-array-slicing', () => {
           declare const xs: readonly number[];
           const ys = xs.toSpliced(-1);
         `,
-        output: dedent`
-          import { Arr } from 'ts-data-forge';
-          declare const xs: readonly number[];
-          const ys = Arr.butLast(xs);
-        `,
-        errors: [{ messageId: 'preferCanonicalArraySlicing' }],
+        errors: [
+          {
+            messageId: 'preferCanonicalArraySlicingUnfixed',
+            suggestions: [
+              {
+                messageId: 'suggestCanonicalArraySlicing',
+                output: dedent`
+                  import { Arr } from 'ts-data-forge';
+                  declare const xs: readonly number[];
+                  const ys = Arr.butLast(xs);
+                `,
+              },
+            ],
+          },
+        ],
       },
       {
         name: 'xs.slice(0, -1) → Arr.butLast(xs)',
@@ -317,12 +398,21 @@ describe('prefer-canonical-array-slicing', () => {
           declare const xs: readonly number[];
           const ys = xs.slice(0, -1);
         `,
-        output: dedent`
-          import { Arr } from 'ts-data-forge';
-          declare const xs: readonly number[];
-          const ys = Arr.butLast(xs);
-        `,
-        errors: [{ messageId: 'preferCanonicalArraySlicing' }],
+        errors: [
+          {
+            messageId: 'preferCanonicalArraySlicingUnfixed',
+            suggestions: [
+              {
+                messageId: 'suggestCanonicalArraySlicing',
+                output: dedent`
+                  import { Arr } from 'ts-data-forge';
+                  declare const xs: readonly number[];
+                  const ys = Arr.butLast(xs);
+                `,
+              },
+            ],
+          },
+        ],
       },
       {
         name: 'xs.filter((_, i) => i < xs.length - 1) → Arr.butLast(xs)',
@@ -330,12 +420,21 @@ describe('prefer-canonical-array-slicing', () => {
           declare const xs: readonly number[];
           const ys = xs.filter((_, i) => i < xs.length - 1);
         `,
-        output: dedent`
-          import { Arr } from 'ts-data-forge';
-          declare const xs: readonly number[];
-          const ys = Arr.butLast(xs);
-        `,
-        errors: [{ messageId: 'preferCanonicalArraySlicing' }],
+        errors: [
+          {
+            messageId: 'preferCanonicalArraySlicingUnfixed',
+            suggestions: [
+              {
+                messageId: 'suggestCanonicalArraySlicing',
+                output: dedent`
+                  import { Arr } from 'ts-data-forge';
+                  declare const xs: readonly number[];
+                  const ys = Arr.butLast(xs);
+                `,
+              },
+            ],
+          },
+        ],
       },
       {
         name: 'xs.filter((_, i) => i !== xs.length - 1) → Arr.butLast(xs)',
@@ -343,12 +442,21 @@ describe('prefer-canonical-array-slicing', () => {
           declare const xs: readonly number[];
           const ys = xs.filter((_, i) => i !== xs.length - 1);
         `,
-        output: dedent`
-          import { Arr } from 'ts-data-forge';
-          declare const xs: readonly number[];
-          const ys = Arr.butLast(xs);
-        `,
-        errors: [{ messageId: 'preferCanonicalArraySlicing' }],
+        errors: [
+          {
+            messageId: 'preferCanonicalArraySlicingUnfixed',
+            suggestions: [
+              {
+                messageId: 'suggestCanonicalArraySlicing',
+                output: dedent`
+                  import { Arr } from 'ts-data-forge';
+                  declare const xs: readonly number[];
+                  const ys = Arr.butLast(xs);
+                `,
+              },
+            ],
+          },
+        ],
       },
       {
         name: 'Arr.skipLast(xs, 1) → Arr.butLast(xs)',
@@ -357,12 +465,21 @@ describe('prefer-canonical-array-slicing', () => {
           declare const xs: readonly number[];
           const ys = Arr.skipLast(xs, 1);
         `,
-        output: dedent`
-          import { Arr } from 'ts-data-forge';
-          declare const xs: readonly number[];
-          const ys = Arr.butLast(xs);
-        `,
-        errors: [{ messageId: 'preferCanonicalArraySlicing' }],
+        errors: [
+          {
+            messageId: 'preferCanonicalArraySlicingUnfixed',
+            suggestions: [
+              {
+                messageId: 'suggestCanonicalArraySlicing',
+                output: dedent`
+                  import { Arr } from 'ts-data-forge';
+                  declare const xs: readonly number[];
+                  const ys = Arr.butLast(xs);
+                `,
+              },
+            ],
+          },
+        ],
       },
       // ---- skipLast N ----
       {
@@ -558,32 +675,41 @@ describe('prefer-canonical-array-slicing', () => {
           declare const obj: { items: readonly number[] };
           const ys = obj.items.filter((_, i) => i < obj.items.length - 1);
         `,
-        output: dedent`
-          import { Arr } from 'ts-data-forge';
-          declare const obj: { items: readonly number[] };
-          const ys = Arr.butLast(obj.items);
-        `,
-        errors: [{ messageId: 'preferCanonicalArraySlicing' }],
+        errors: [
+          {
+            messageId: 'preferCanonicalArraySlicingUnfixed',
+            suggestions: [
+              {
+                messageId: 'suggestCanonicalArraySlicing',
+                output: dedent`
+                  import { Arr } from 'ts-data-forge';
+                  declare const obj: { items: readonly number[] };
+                  const ys = Arr.butLast(obj.items);
+                `,
+              },
+            ],
+          },
+        ],
       },
       {
         name: 'the import is inserted only once for multiple fixes',
         code: dedent`
           declare const xs: readonly number[];
-          const ys = xs.slice(1);
-          const zs = xs.slice(0, -1);
+          const ys = xs.slice(2);
+          const zs = xs.slice(0, -2);
         `,
         output: [
           dedent`
             import { Arr } from 'ts-data-forge';
             declare const xs: readonly number[];
-            const ys = Arr.tail(xs);
-            const zs = xs.slice(0, -1);
+            const ys = Arr.skip(xs, 2);
+            const zs = xs.slice(0, -2);
           `,
           dedent`
             import { Arr } from 'ts-data-forge';
             declare const xs: readonly number[];
-            const ys = Arr.tail(xs);
-            const zs = Arr.butLast(xs);
+            const ys = Arr.skip(xs, 2);
+            const zs = Arr.skipLast(xs, 2);
           `,
         ],
         errors: [
@@ -637,25 +763,44 @@ describe('prefer-canonical-array-slicing through type wrappers', () => {
           const b = xs.slice(0 satisfies number, -1 as number);
           const c = xs.toSpliced(2 satisfies number);
         `,
-        output: [
-          dedent`
-            import { Arr } from 'ts-data-forge';
-            declare const xs: readonly number[];
-            const a = Arr.tail(xs);
-            const b = xs.slice(0 satisfies number, -1 as number);
-            const c = xs.toSpliced(2 satisfies number);
-          `,
-          dedent`
-            import { Arr } from 'ts-data-forge';
-            declare const xs: readonly number[];
-            const a = Arr.tail(xs);
-            const b = Arr.butLast(xs);
-            const c = Arr.take(xs, 2);
-          `,
-        ],
+        output: dedent`
+          import { Arr } from 'ts-data-forge';
+          declare const xs: readonly number[];
+          const a = xs.slice(1 as number);
+          const b = xs.slice(0 satisfies number, -1 as number);
+          const c = Arr.take(xs, 2);
+        `,
         errors: [
-          { messageId: 'preferCanonicalArraySlicing' },
-          { messageId: 'preferCanonicalArraySlicing' },
+          {
+            messageId: 'preferCanonicalArraySlicingUnfixed',
+            suggestions: [
+              {
+                messageId: 'suggestCanonicalArraySlicing',
+                output: dedent`
+                  import { Arr } from 'ts-data-forge';
+                  declare const xs: readonly number[];
+                  const a = Arr.tail(xs);
+                  const b = xs.slice(0 satisfies number, -1 as number);
+                  const c = xs.toSpliced(2 satisfies number);
+                `,
+              },
+            ],
+          },
+          {
+            messageId: 'preferCanonicalArraySlicingUnfixed',
+            suggestions: [
+              {
+                messageId: 'suggestCanonicalArraySlicing',
+                output: dedent`
+                  import { Arr } from 'ts-data-forge';
+                  declare const xs: readonly number[];
+                  const a = xs.slice(1 as number);
+                  const b = Arr.butLast(xs);
+                  const c = xs.toSpliced(2 satisfies number);
+                `,
+              },
+            ],
+          },
           { messageId: 'preferCanonicalArraySlicing' },
         ],
       },
@@ -665,12 +810,21 @@ describe('prefer-canonical-array-slicing through type wrappers', () => {
           declare const xs: readonly number[];
           const ys = xs.filter((_, i) => (i satisfies number) >= 1);
         `,
-        output: dedent`
-          import { Arr } from 'ts-data-forge';
-          declare const xs: readonly number[];
-          const ys = Arr.tail(xs);
-        `,
-        errors: [{ messageId: 'preferCanonicalArraySlicing' }],
+        errors: [
+          {
+            messageId: 'preferCanonicalArraySlicingUnfixed',
+            suggestions: [
+              {
+                messageId: 'suggestCanonicalArraySlicing',
+                output: dedent`
+                  import { Arr } from 'ts-data-forge';
+                  declare const xs: readonly number[];
+                  const ys = Arr.tail(xs);
+                `,
+              },
+            ],
+          },
+        ],
       },
       {
         name: 'a wrapped receiver and item keep their wrappers',
@@ -680,24 +834,29 @@ describe('prefer-canonical-array-slicing through type wrappers', () => {
           const ys = (xs satisfies readonly number[]).slice(1);
           const zs = [...xs!, v!];
         `,
-        output: [
-          dedent`
-            import { Arr } from 'ts-data-forge';
-            declare const xs: readonly number[];
-            declare const v: number | undefined;
-            const ys = Arr.tail(xs satisfies readonly number[]);
-            const zs = [...xs!, v!];
-          `,
-          dedent`
-            import { Arr } from 'ts-data-forge';
-            declare const xs: readonly number[];
-            declare const v: number | undefined;
-            const ys = Arr.tail(xs satisfies readonly number[]);
-            const zs = Arr.toPushed(xs!, v!);
-          `,
-        ],
+        output: dedent`
+          import { Arr } from 'ts-data-forge';
+          declare const xs: readonly number[];
+          declare const v: number | undefined;
+          const ys = (xs satisfies readonly number[]).slice(1);
+          const zs = Arr.toPushed(xs!, v!);
+        `,
         errors: [
-          { messageId: 'preferCanonicalArraySlicing' },
+          {
+            messageId: 'preferCanonicalArraySlicingUnfixed',
+            suggestions: [
+              {
+                messageId: 'suggestCanonicalArraySlicing',
+                output: dedent`
+                  import { Arr } from 'ts-data-forge';
+                  declare const xs: readonly number[];
+                  declare const v: number | undefined;
+                  const ys = Arr.tail(xs satisfies readonly number[]);
+                  const zs = [...xs!, v!];
+                `,
+              },
+            ],
+          },
           { messageId: 'preferCanonicalArraySlicing' },
         ],
       },
@@ -707,12 +866,21 @@ describe('prefer-canonical-array-slicing through type wrappers', () => {
           declare const xs: readonly number[];
           const ys = xs.filter((_, i) => (i >= 1) satisfies boolean);
         `,
-        output: dedent`
-          import { Arr } from 'ts-data-forge';
-          declare const xs: readonly number[];
-          const ys = Arr.tail(xs);
-        `,
-        errors: [{ messageId: 'preferCanonicalArraySlicing' }],
+        errors: [
+          {
+            messageId: 'preferCanonicalArraySlicingUnfixed',
+            suggestions: [
+              {
+                messageId: 'suggestCanonicalArraySlicing',
+                output: dedent`
+                  import { Arr } from 'ts-data-forge';
+                  declare const xs: readonly number[];
+                  const ys = Arr.tail(xs);
+                `,
+              },
+            ],
+          },
+        ],
       },
       {
         name: 'a wrapped `xs.length - N`, and a wrapped `.length` or receiver inside it',
@@ -727,23 +895,53 @@ describe('prefer-canonical-array-slicing through type wrappers', () => {
           dedent`
             import { Arr } from 'ts-data-forge';
             declare const xs: readonly number[];
-            const a = Arr.butLast(xs);
+            const a = xs.slice(0, (xs.length - 1) as number);
             const b = xs.slice(0, (xs as readonly number[]).length - 1);
-            const c = xs.filter((_, i) => i < (xs.length satisfies number) - 2);
+            const c = Arr.skipLast(xs, 2);
             const d = xs.toSpliced(0, xs!.length - 2);
           `,
           dedent`
             import { Arr } from 'ts-data-forge';
             declare const xs: readonly number[];
-            const a = Arr.butLast(xs);
-            const b = Arr.butLast(xs);
+            const a = xs.slice(0, (xs.length - 1) as number);
+            const b = xs.slice(0, (xs as readonly number[]).length - 1);
             const c = Arr.skipLast(xs, 2);
             const d = Arr.takeLast(xs, 2);
           `,
         ],
         errors: [
-          { messageId: 'preferCanonicalArraySlicing' },
-          { messageId: 'preferCanonicalArraySlicing' },
+          {
+            messageId: 'preferCanonicalArraySlicingUnfixed',
+            suggestions: [
+              {
+                messageId: 'suggestCanonicalArraySlicing',
+                output: dedent`
+                  import { Arr } from 'ts-data-forge';
+                  declare const xs: readonly number[];
+                  const a = Arr.butLast(xs);
+                  const b = xs.slice(0, (xs as readonly number[]).length - 1);
+                  const c = xs.filter((_, i) => i < (xs.length satisfies number) - 2);
+                  const d = xs.toSpliced(0, xs!.length - 2);
+                `,
+              },
+            ],
+          },
+          {
+            messageId: 'preferCanonicalArraySlicingUnfixed',
+            suggestions: [
+              {
+                messageId: 'suggestCanonicalArraySlicing',
+                output: dedent`
+                  import { Arr } from 'ts-data-forge';
+                  declare const xs: readonly number[];
+                  const a = xs.slice(0, (xs.length - 1) as number);
+                  const b = Arr.butLast(xs);
+                  const c = xs.filter((_, i) => i < (xs.length satisfies number) - 2);
+                  const d = xs.toSpliced(0, xs!.length - 2);
+                `,
+              },
+            ],
+          },
           { messageId: 'preferCanonicalArraySlicing' },
           { messageId: 'preferCanonicalArraySlicing' },
         ],
@@ -755,22 +953,27 @@ describe('prefer-canonical-array-slicing through type wrappers', () => {
           const a = (xs satisfies readonly number[]).slice(0, xs.length - 1);
           const b = xs.toSpliced((xs.length as number), 0, 1);
         `,
-        output: [
-          dedent`
-            import { Arr } from 'ts-data-forge';
-            declare const xs: readonly number[];
-            const a = Arr.butLast(xs satisfies readonly number[]);
-            const b = xs.toSpliced((xs.length as number), 0, 1);
-          `,
-          dedent`
-            import { Arr } from 'ts-data-forge';
-            declare const xs: readonly number[];
-            const a = Arr.butLast(xs satisfies readonly number[]);
-            const b = Arr.toPushed(xs, 1);
-          `,
-        ],
+        output: dedent`
+          import { Arr } from 'ts-data-forge';
+          declare const xs: readonly number[];
+          const a = (xs satisfies readonly number[]).slice(0, xs.length - 1);
+          const b = Arr.toPushed(xs, 1);
+        `,
         errors: [
-          { messageId: 'preferCanonicalArraySlicing' },
+          {
+            messageId: 'preferCanonicalArraySlicingUnfixed',
+            suggestions: [
+              {
+                messageId: 'suggestCanonicalArraySlicing',
+                output: dedent`
+                  import { Arr } from 'ts-data-forge';
+                  declare const xs: readonly number[];
+                  const a = Arr.butLast(xs satisfies readonly number[]);
+                  const b = xs.toSpliced((xs.length as number), 0, 1);
+                `,
+              },
+            ],
+          },
           { messageId: 'preferCanonicalArraySlicing' },
         ],
       },
@@ -815,12 +1018,12 @@ describe('prefer-canonical-array-slicing and the import it adds', () => {
         code: dedent`
           import * as tdf from 'ts-data-forge';
           declare const xs: readonly number[];
-          const ys = xs.slice(1);
+          const ys = xs.slice(2);
         `,
         output: dedent`
           import * as tdf from 'ts-data-forge';
           declare const xs: readonly number[];
-          const ys = tdf.Arr.tail(xs);
+          const ys = tdf.Arr.skip(xs, 2);
         `,
         errors: [{ messageId: 'preferCanonicalArraySlicing' }],
       },
@@ -829,33 +1032,44 @@ describe('prefer-canonical-array-slicing and the import it adds', () => {
         code: dedent`
           import { asInt } from 'ts-data-forge';
           declare const xs: readonly number[];
-          const ys = xs.slice(1);
+          const ys = xs.slice(2);
         `,
         output: dedent`
           import { asInt, Arr } from 'ts-data-forge';
           declare const xs: readonly number[];
-          const ys = Arr.tail(xs);
+          const ys = Arr.skip(xs, 2);
         `,
         errors: [{ messageId: 'preferCanonicalArraySlicing' }],
       },
       {
-        name: 'no fix when an import type binds the name',
+        name: 'neither fix nor suggestion when an import type binds the name',
         code: dedent`
           import type { Arr } from 'ts-data-forge';
           declare const xs: readonly number[];
-          const ys = xs.slice(1);
+          const ys = xs.slice(2);
+          const zs = xs.slice(1);
         `,
         output: null,
-        errors: [{ messageId: 'preferCanonicalArraySlicing' }],
+        errors: [
+          { messageId: 'preferCanonicalArraySlicing' },
+          { messageId: 'preferCanonicalArraySlicingUnfixed', suggestions: [] },
+        ],
       },
       {
-        name: 'no fix where a local binding takes the name',
+        name: 'neither fix nor suggestion where a local binding takes the name',
         code: dedent`
           declare const xs: readonly number[];
-          const f = (Arr: unknown) => xs.slice(1);
+          const f = (Arr: unknown) => [xs.slice(2), xs.slice(1)];
         `,
         output: null,
-        errors: [{ messageId: 'preferCanonicalArraySlicing' }],
+        errors: [
+          { messageId: 'preferCanonicalArraySlicing' },
+          {
+            messageId: 'preferCanonicalArraySlicingUnfixed',
+            data: { replacement: 'Arr.tail(xs)' },
+            suggestions: [],
+          },
+        ],
       },
       {
         name: 'sees `Arr.skip` and `ns.Arr.skip` through type wrappers',
@@ -866,16 +1080,37 @@ describe('prefer-canonical-array-slicing and the import it adds', () => {
           const a = (Arr as typeof Arr).skip(xs, 1);
           const b = (tdf satisfies typeof tdf).Arr.skipLast(xs, 1);
         `,
-        output: dedent`
-          import { Arr } from 'ts-data-forge';
-          import * as tdf from 'ts-data-forge';
-          declare const xs: readonly number[];
-          const a = Arr.tail(xs);
-          const b = Arr.butLast(xs);
-        `,
         errors: [
-          { messageId: 'preferCanonicalArraySlicing' },
-          { messageId: 'preferCanonicalArraySlicing' },
+          {
+            messageId: 'preferCanonicalArraySlicingUnfixed',
+            suggestions: [
+              {
+                messageId: 'suggestCanonicalArraySlicing',
+                output: dedent`
+                  import { Arr } from 'ts-data-forge';
+                  import * as tdf from 'ts-data-forge';
+                  declare const xs: readonly number[];
+                  const a = Arr.tail(xs);
+                  const b = (tdf satisfies typeof tdf).Arr.skipLast(xs, 1);
+                `,
+              },
+            ],
+          },
+          {
+            messageId: 'preferCanonicalArraySlicingUnfixed',
+            suggestions: [
+              {
+                messageId: 'suggestCanonicalArraySlicing',
+                output: dedent`
+                  import { Arr } from 'ts-data-forge';
+                  import * as tdf from 'ts-data-forge';
+                  declare const xs: readonly number[];
+                  const a = (Arr as typeof Arr).skip(xs, 1);
+                  const b = Arr.butLast(xs);
+                `,
+              },
+            ],
+          },
         ],
       },
       {
@@ -883,12 +1118,12 @@ describe('prefer-canonical-array-slicing and the import it adds', () => {
         code: dedent`
           import { type Arr, asInt } from 'ts-data-forge';
           declare const xs: readonly number[];
-          const ys = xs.slice(1);
+          const ys = xs.slice(2);
         `,
         output: dedent`
           import { Arr, asInt } from 'ts-data-forge';
           declare const xs: readonly number[];
-          const ys = Arr.tail(xs);
+          const ys = Arr.skip(xs, 2);
         `,
         errors: [{ messageId: 'preferCanonicalArraySlicing' }],
       },
@@ -897,13 +1132,13 @@ describe('prefer-canonical-array-slicing and the import it adds', () => {
         code: dedent`
           'use client';
           declare const xs: readonly number[];
-          const ys = xs.slice(1);
+          const ys = xs.slice(2);
         `,
         output: dedent`
           'use client';
           import { Arr } from 'ts-data-forge';
           declare const xs: readonly number[];
-          const ys = Arr.tail(xs);
+          const ys = Arr.skip(xs, 2);
         `,
         errors: [{ messageId: 'preferCanonicalArraySlicing' }],
       },
@@ -912,35 +1147,148 @@ describe('prefer-canonical-array-slicing and the import it adds', () => {
         code: dedent`
           import * as tdf from 'ts-data-forge';
           declare const xs: readonly number[];
-          const f = (tdf: unknown) => xs.slice(1);
+          const f = (tdf: unknown) => xs.slice(2);
         `,
         output: dedent`
           import { Arr } from 'ts-data-forge';
           import * as tdf from 'ts-data-forge';
           declare const xs: readonly number[];
-          const f = (tdf: unknown) => Arr.tail(xs);
+          const f = (tdf: unknown) => Arr.skip(xs, 2);
         `,
         errors: [
           {
             messageId: 'preferCanonicalArraySlicing',
-            data: { replacement: 'Arr.tail(xs)' },
+            data: { replacement: 'Arr.skip(xs, 2)' },
           },
         ],
       },
       {
-        name: 'no fix where a local binding shadows the namespace import and another import takes `Arr`',
+        name: 'neither fix nor suggestion where a local binding shadows the namespace import and another import takes `Arr`',
         code: dedent`
           import * as tdf from 'ts-data-forge';
           import { Arr } from 'other';
           declare const xs: readonly number[];
-          const f = (tdf: unknown) => xs.slice(1);
+          const f = (tdf: unknown) => [xs.slice(2), xs.slice(1)];
         `,
         output: null,
         errors: [
           {
             messageId: 'preferCanonicalArraySlicing',
-            data: { replacement: 'Arr.tail(xs)' },
+            data: { replacement: 'Arr.skip(xs, 2)' },
           },
+          {
+            messageId: 'preferCanonicalArraySlicingUnfixed',
+            data: { replacement: 'Arr.tail(xs)' },
+            suggestions: [],
+          },
+        ],
+      },
+      {
+        name: 'the rewrite to Arr.tail is only suggested for a tuple too',
+        code: dedent`
+          declare const xs: readonly [1, 2, 3];
+          const ys = xs.slice(1);
+        `,
+        errors: [
+          {
+            messageId: 'preferCanonicalArraySlicingUnfixed',
+            suggestions: [
+              {
+                messageId: 'suggestCanonicalArraySlicing',
+                output: dedent`
+                  import { Arr } from 'ts-data-forge';
+                  declare const xs: readonly [1, 2, 3];
+                  const ys = Arr.tail(xs);
+                `,
+              },
+            ],
+          },
+        ],
+      },
+      {
+        name: 'the rewrite to Arr.butLast is only suggested for a non-empty array too',
+        code: dedent`
+          declare const xs: readonly [string, ...string[]];
+          const ys = xs.slice(0, -1);
+        `,
+        errors: [
+          {
+            messageId: 'preferCanonicalArraySlicingUnfixed',
+            suggestions: [
+              {
+                messageId: 'suggestCanonicalArraySlicing',
+                output: dedent`
+                  import { Arr } from 'ts-data-forge';
+                  declare const xs: readonly [string, ...string[]];
+                  const ys = Arr.butLast(xs);
+                `,
+              },
+            ],
+          },
+        ],
+      },
+      {
+        name: 'the rewrite to Arr.tail is only suggested for a mutable array and a type parameter',
+        code: dedent`
+          declare const xs: string[];
+          const ys = xs.slice(1);
+          const f = <A extends readonly string[]>(zs: A) => zs.slice(1);
+        `,
+        errors: [
+          {
+            messageId: 'preferCanonicalArraySlicingUnfixed',
+            suggestions: [
+              {
+                messageId: 'suggestCanonicalArraySlicing',
+                output: dedent`
+                  import { Arr } from 'ts-data-forge';
+                  declare const xs: string[];
+                  const ys = Arr.tail(xs);
+                  const f = <A extends readonly string[]>(zs: A) => zs.slice(1);
+                `,
+              },
+            ],
+          },
+          {
+            messageId: 'preferCanonicalArraySlicingUnfixed',
+            suggestions: [
+              {
+                messageId: 'suggestCanonicalArraySlicing',
+                output: dedent`
+                  import { Arr } from 'ts-data-forge';
+                  declare const xs: string[];
+                  const ys = xs.slice(1);
+                  const f = <A extends readonly string[]>(zs: A) => Arr.tail(zs);
+                `,
+              },
+            ],
+          },
+        ],
+      },
+      {
+        name: 'slice(2) and slice(0, -2) are still fixed: Arr.skip and Arr.skipLast compile',
+        code: dedent`
+          declare const xs: readonly string[];
+          const ys = xs.slice(2);
+          const zs = xs.slice(0, -2);
+        `,
+        output: [
+          dedent`
+            import { Arr } from 'ts-data-forge';
+            declare const xs: readonly string[];
+            const ys = Arr.skip(xs, 2);
+            const zs = xs.slice(0, -2);
+          `,
+          dedent`
+            import { Arr } from 'ts-data-forge';
+            declare const xs: readonly string[];
+            const ys = Arr.skip(xs, 2);
+            const zs = Arr.skipLast(xs, 2);
+          `,
+        ],
+        errors: [
+          { messageId: 'preferCanonicalArraySlicing' },
+          { messageId: 'preferCanonicalArraySlicing' },
         ],
       },
     ],
