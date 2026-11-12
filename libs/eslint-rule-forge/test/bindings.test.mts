@@ -179,6 +179,113 @@ ruleTester.run(
   },
 );
 
+// Cases that repeat ones of the list above with the same answer are here so
+// that this list can be read without that one.
+ruleTester.run(
+  'hasForeignBinding, for a type reference',
+  probeRule((context, argument) =>
+    hasForeignBinding(
+      context.sourceCode,
+      argument,
+      'f',
+      'm',
+      'type',
+    ).toString(),
+  ),
+  {
+    valid: [],
+    invalid: [
+      {
+        name: 'unbound',
+        code: 'probe(0);',
+        errors: [{ messageId: 'result', data: { result: 'false' } }],
+      },
+      {
+        name: 'the module’s own import',
+        code: dedent`
+          import { f } from 'm';
+          probe(0);
+        `,
+        errors: [{ messageId: 'result', data: { result: 'false' } }],
+      },
+      {
+        name: 'the module’s namespace import under that name',
+        code: dedent`
+          import * as f from 'm';
+          probe(0);
+        `,
+        errors: [{ messageId: 'result', data: { result: 'false' } }],
+      },
+      {
+        name: 'an import from another module',
+        code: dedent`
+          import { f } from 'other';
+          probe(0);
+        `,
+        errors: [{ messageId: 'result', data: { result: 'true' } }],
+      },
+      {
+        name: 'a declaration in the file',
+        code: 'const f = 1; probe(0);',
+        errors: [{ messageId: 'result', data: { result: 'true' } }],
+      },
+      {
+        name: 'a type parameter around the node',
+        code: 'function g<f>() { probe(0); }',
+        errors: [{ messageId: 'result', data: { result: 'true' } }],
+      },
+      {
+        name: 'a local type alias around the node',
+        code: 'function g() { type f = number; probe(0); }',
+        errors: [{ messageId: 'result', data: { result: 'true' } }],
+      },
+      {
+        name: 'a local interface around the node',
+        code: 'function g() { interface f {} probe(0); }',
+        errors: [{ messageId: 'result', data: { result: 'true' } }],
+      },
+      {
+        name: 'a type parameter in front of the module’s namespace import',
+        code: dedent`
+          import * as f from 'm';
+          function g<f>() { probe(0); }
+        `,
+        errors: [{ messageId: 'result', data: { result: 'true' } }],
+      },
+      {
+        name: 'a type parameter in front of the module’s import',
+        code: dedent`
+          import { f } from 'm';
+          function g<f>() { probe(0); }
+        `,
+        errors: [{ messageId: 'result', data: { result: 'true' } }],
+      },
+      {
+        name: 'a type parameter elsewhere',
+        code: dedent`
+          import { f } from 'm';
+          function g<f>() {}
+          probe(0);
+        `,
+        errors: [{ messageId: 'result', data: { result: 'false' } }],
+      },
+      {
+        name: 'a parameter, which captures no type and counts all the same',
+        code: dedent`
+          import { f } from 'm';
+          const g = (f: number) => probe(f);
+        `,
+        errors: [{ messageId: 'result', data: { result: 'true' } }],
+      },
+      {
+        name: 'a top-level type alias',
+        code: 'type f = number; probe(0);',
+        errors: [{ messageId: 'result', data: { result: 'true' } }],
+      },
+    ],
+  },
+);
+
 ruleTester.run(
   'isRuntimeBound',
   probeRule((context, argument) =>

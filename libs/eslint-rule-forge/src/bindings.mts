@@ -68,21 +68,40 @@ export const isRuntimeBound = (
  * would refer to that binding instead.
  *
  * The innermost binding decides: an import from `moduleName` at the top of the
- * file does not help a name a function shadows around `node`. A binding with no
- * value meaning inside the file — a type parameter, a local type alias or
- * interface — is passed over, since a type does not shadow a value or the head
- * of a qualified name. At the top of the file it still counts: the import a fix
- * adds there conflicts with it when the export has a type meaning too. A fix
- * that writes the name alone in a type position, where such a binding does
- * capture it, has to check for one itself.
+ * file does not help a name a function shadows around `node`. `position` says
+ * which bindings can be that one, by the reference the fix writes the name as:
+ *
+ * - `'value'` (the default) — a reference the scope manager does not mark
+ *   `isTypeReference`, such as `f()`, the `ns` of `ns.f` or the `ns` of
+ *   `typeof ns.x`. A binding with no value meaning inside the file — a type
+ *   parameter, a local type alias or interface — is passed over, since a type
+ *   does not shadow a value. At the top of the file it still counts: the import
+ *   a fix adds there conflicts with it when the export has a type meaning too.
+ * - `'type'` — a reference it does mark `isTypeReference`, such as a type name,
+ *   the `ns` of `ns.Type`, or the `f` of `export { f }`, which is a value as
+ *   well. No binding is passed over, at any level: a type-only binding, which
+ *   the scope manager resolves such a reference to, counts, and so does one with
+ *   a value meaning alone (a parameter, a `const`), though a reference that is a
+ *   type and nothing else does not resolve to it. The answer can then be `true`
+ *   where the name the fix writes would still resolve to the import.
  */
 export const hasForeignBinding = (
   sourceCode: TSESLint.SourceCode,
   node: TSESTree.Node,
   name: string,
   moduleName: string | readonly string[],
+  position: 'value' | 'type' = 'value',
 ): boolean => {
-  const variable = findShadowingVariable(sourceCode.getScope(node), name);
+  const variable = findVariableFrom(
+    sourceCode.getScope(node),
+    name,
+    // A binding with a value meaning alone counts in 'type' too: passing it over
+    // would allow `t.Type` under a parameter `t`, which resolves to the import
+    // but leaves the parameter shadowing it, and counting it can only withhold
+    // a fix.
+    (candidate, declaredIn) =>
+      position === 'type' || !isTypeOnly(candidate) || isTopLevel(declaredIn),
+  );
 
   const moduleNames: readonly string[] =
     typeof moduleName === 'string' ? ([moduleName] as const) : moduleName;
@@ -130,21 +149,6 @@ const findVariableFrom = (
       ? undefined
       : findVariableFrom(scope.upper, name, accept);
 };
-
-/**
- * The innermost variable named `name` from `scope` outwards that a value of
- * that name written in `scope` would meet: one with a value meaning, or any at
- * the top of the file.
- */
-const findShadowingVariable = (
-  scope: TSESLint.Scope.Scope,
-  name: string,
-): TSESLint.Scope.Variable | undefined =>
-  findVariableFrom(
-    scope,
-    name,
-    (variable, declaredIn) => !isTypeOnly(variable) || isTopLevel(declaredIn),
-  );
 
 /** Whether `node` is a declaration written with `declare`. */
 const isDeclared = (node: TSESTree.Node): boolean =>
