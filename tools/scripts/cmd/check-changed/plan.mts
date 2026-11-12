@@ -30,11 +30,17 @@ export const classifyChanges = ({
   files,
   packages,
   proseGate,
+  generatorReaders,
 }: Readonly<{
   /** Repository-relative, `/`-separated. */
   files: readonly string[];
   packages: readonly PackageInfo[];
   proseGate: readonly string[];
+  /**
+   * By member directory, the changed files outside it that its generators
+   * import (`generatorReadersOf` in `generator-entries.mts`).
+   */
+  generatorReaders: ReadonlyMap<string, readonly string[]>;
 }>): Classification => {
   const mut_touched = new Map<
     string,
@@ -180,6 +186,15 @@ export const classifyChanges = ({
         ),
       )
       .toSorted((a, b) => a.dir.localeCompare(b.dir)),
+    generatorReaders: Arr.generate(function* () {
+      for (const pkg of packages) {
+        const read = generatorReaders.get(pkg.dir);
+
+        if (read !== undefined && !mut_touched.has(pkg.dir)) {
+          yield { pkg, files: read };
+        }
+      }
+    }),
     members: packages,
     areas: mut_areas,
     ignored: mut_ignored,
@@ -306,6 +321,25 @@ export const buildPlan = ({
           args: ['run', 'gen'],
         }) as const,
     ),
+
+    // A generator that imports a changed file outside its package, a shared
+    // module under `tools/configs/` most often: found from the import graph of
+    // what its `gen` runs, and run unless it ran above.
+    ...classification.generatorReaders
+      .filter(
+        ({ pkg }) =>
+          pkg.scripts.has('gen') &&
+          dependentGenerators.every(({ dir }) => dir !== pkg.dir),
+      )
+      .map(
+        ({ pkg, files }) =>
+          ({
+            title: `${pkg.name}: gen (imports ${files.join(', ')})`,
+            kind: 'generate',
+            cwd: pkg.dir,
+            args: ['run', 'gen'],
+          }) as const,
+      ),
 
     ...(areas.has('manifest') || areas.has('deps-graph')
       ? [rootStep('generate', 'gen:deps-graph')]
@@ -573,6 +607,13 @@ export type PackageInfo = Readonly<{
    * fields `ws:build` orders its stages by.
    */
   buildDependencies: ReadonlySet<string>;
+  /**
+   * The members it may run, by package name: the names a run-time field
+   * (`dependencies`, `optionalDependencies`, `peerDependencies`) gives whose
+   * range, as pnpm installs it, is `workspace:`. The rule and its limits are at
+   * `runtimeMembers` in {@link readManifestDependencies}.
+   */
+  runtimeMembers: ReadonlySet<string>;
   /** Whether an import of it resolves to its build output (`dist/`). */
   exportsBuild: boolean;
   /**
@@ -592,14 +633,28 @@ export type PackageInfo = Readonly<{
 
 /**
  * What {@link PackageInfo} reads from a manifest's dependency fields and entry
- * points. A range counts when it is `workspace:`, the only way a member names
- * another.
+ * points. A range counts when it is `workspace:`, which is what links a member
+ * to another; for `runtimeMembers`, the range a name is installed with.
+ *
+ * `runtimeMembers` is the names a run-time field gives whose range, as
+ * installed, is `workspace:`: what pnpm links to the member's own directory.
+ * So a peer given a plain range counts when a `workspace:` devDependency
+ * supplies it, as synstate-dom's `synstate` is, and not when a plain
+ * `dependencies` or `optionalDependencies` entry overrides that. Counted though
+ * pnpm may not link it: a `workspace:` peer marked optional in
+ * `peerDependenciesMeta`. Missed: a peer resolved through the root's
+ * `node_modules` alone, a member named by a `link:` or `file:` range, and the
+ * target of a `workspace:` alias (`"a": "workspace:b@*"` counts `a`, the key,
+ * not `b`).
  */
 export const readManifestDependencies = (
   manifest: unknown,
 ): StrictPick<
   PackageInfo,
-  'workspaceDependencies' | 'buildDependencies' | 'exportsBuild'
+  | 'workspaceDependencies'
+  | 'buildDependencies'
+  | 'runtimeMembers'
+  | 'exportsBuild'
 > => {
   const membersIn = (fields: readonly string[]): ReadonlySet<string> =>
     new Set(
@@ -619,6 +674,24 @@ export const readManifestDependencies = (
         : [],
     );
 
+  // Each name's range as pnpm installs it: a later field over an earlier one,
+  // in the order pnpm merges them.
+  const effectiveRange = new Map<string, string>(
+    INSTALL_ORDER.flatMap((field) => {
+      const ranges = isRecord(manifest) ? manifest[field] : undefined;
+
+      return isRecord(ranges)
+        ? Arr.generate(function* () {
+            for (const [name, range] of Object.entries(ranges)) {
+              if (isString(range)) {
+                yield [name, range] as const;
+              }
+            }
+          })
+        : [];
+    }),
+  );
+
   return {
     workspaceDependencies: membersIn([
       'dependencies',
@@ -626,6 +699,15 @@ export const readManifestDependencies = (
       'peerDependencies',
     ]),
     buildDependencies: membersIn(['dependencies', 'peerDependencies']),
+    runtimeMembers: new Set<string>(
+      RUN_FIELDS.flatMap((field) =>
+        isRecord(manifest) && isRecord(manifest[field])
+          ? Object.keys(manifest[field])
+          : [],
+      ).filter(
+        (name) => effectiveRange.get(name)?.startsWith('workspace:') === true,
+      ),
+    ),
     exportsBuild: entryPointTargets(manifest).some((target) =>
       BUILD_OUTPUT.test(target),
     ),
@@ -731,6 +813,14 @@ export type Classification = Readonly<{
    * or not.
    */
   dependents: readonly PackageInfo[];
+  /**
+   * The members the diff does not touch whose generators import a changed file
+   * outside them, with those files: their `gen` runs, as a dependent's does.
+   */
+  generatorReaders: readonly Readonly<{
+    pkg: PackageInfo;
+    files: readonly string[];
+  }>[];
   /**
    * Every workspace member, which `classifyChanges` is given: the build order
    * passes through members the diff does not change. Carried here, with what
@@ -957,6 +1047,28 @@ const FORMAT_CONFIG: ReadonlySet<string> = new Set<string>([
 const CONFIGS_SEGMENT = /(?:^|\/)configs\//u;
 
 const TYPESCRIPT_FILE = /\.(?:ts|mts|tsx)$/u;
+
+/**
+ * The dependency fields in the order pnpm merges them into what it installs: a
+ * later one's range for a name wins.
+ */
+const INSTALL_ORDER = [
+  'peerDependencies',
+  'devDependencies',
+  'dependencies',
+  'optionalDependencies',
+] as const;
+
+/**
+ * The fields of {@link INSTALL_ORDER} whose packages a member runs. Its own
+ * list rather than `RUNTIME_DEPENDENCY_FIELDS`, which says what changesets
+ * bumps a dependent through and may change for changesets' reasons.
+ */
+const RUN_FIELDS = [
+  'peerDependencies',
+  'dependencies',
+  'optionalDependencies',
+] as const;
 
 /**
  * What `check:published-deps` lints: TypeScript under the `src/` of a `libs/`

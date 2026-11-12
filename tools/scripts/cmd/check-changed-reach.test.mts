@@ -14,6 +14,7 @@ const pkg = (dir: string, scripts: readonly string[]): PackageInfo =>
     isPrivate: false,
     workspaceDependencies: new Set<string>(),
     buildDependencies: new Set<string>(),
+    runtimeMembers: new Set<string>(),
     exportsBuild: false,
     forgottenExportsRead: false,
     lintImports: new Set<string>(),

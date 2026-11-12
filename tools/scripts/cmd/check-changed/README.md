@@ -51,7 +51,11 @@ by case. In order:
    (named by a `workspace:` range in its `dependencies` or `peerDependencies`,
    directly or through an unchanged member), even when that package's imports
    resolve to its sources; a dependent the diff touches runs its generator again
-   after the build.
+   after the build. Then `gen` in every member whose generators import a changed
+   file outside it — a shared module under `tools/configs/`, such as
+   `gen-eslint-plugin-rule-types.mts` or `gen-css-module-types.mts` — found from
+   the import graph of the scripts its `gen` runs (`generator-entries.mts`), not
+   from a list.
 3. **Fixers**: the codemod as CI runs it, `fix:codemod:affected` with
    `CODEMOD_DIFF_BASE` set to the base, for any change the code gate lets
    through: over the diff and the untracked files, or over everything when what
