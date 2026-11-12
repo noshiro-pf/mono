@@ -1,13 +1,6 @@
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
-import {
-  Arr,
-  asUint32,
-  hasKey,
-  Json,
-  Result,
-  unknownToString,
-} from 'ts-data-forge';
+import { Arr, asUint32, hasKey, Result, unknownToString } from 'ts-data-forge';
 import { getWorkspacePackages, isDirectlyExecuted } from 'ts-repo-utils';
 import type { MutableRecord, ReadonlyRecord, StrictPick } from 'ts-type-forge';
 import {
@@ -21,7 +14,10 @@ import {
   readScripts,
 } from '../lib/manifest-scripts.mjs';
 import { optionValues, readPnpmRun, readRunAll } from '../lib/pnpm-command.mjs';
-import { listWorkflowFiles } from '../lib/repo-files.mjs';
+import {
+  listWorkflowFiles,
+  readRootPackageScripts,
+} from '../lib/repo-files.mjs';
 import { readShellCommands } from '../lib/shell-commands.mjs';
 import {
   expandVariable,
@@ -1036,31 +1032,11 @@ export const readMatrixInclude = (
   );
 };
 
-export const readRootManifest = async (): Promise<Result<Manifest, string>> => {
-  const manifestPath = path.join(projectRootPath, 'package.json');
-
-  const contents = await Result.fromPromise(
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
-    fs.readFile(manifestPath, 'utf8'),
-  );
-
-  if (Result.isErr(contents)) {
-    return Result.err(
-      `Failed to read package.json: ${unknownToString(contents.value)}`,
-    );
-  }
-
-  const parsed = Json.parse(contents.value);
-
-  return Result.isErr(parsed)
-    ? Result.err(
-        `Failed to parse package.json: ${unknownToString(parsed.value)}`,
-      )
-    : Result.ok({
-        directory: ROOT_DIRECTORY,
-        scripts: readScripts(parsed.value),
-      });
-};
+export const readRootManifest = async (): Promise<Result<Manifest, string>> =>
+  Result.map(await readRootPackageScripts(), (scripts) => ({
+    directory: ROOT_DIRECTORY,
+    scripts,
+  }));
 
 /**
  * A path selector against a directory, one `/`-separated segment at a time:
