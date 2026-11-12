@@ -29,4 +29,4 @@ The app used to be on Firebase Hosting at `my-portfolio-app-4f8be.web.app`.
 Until that project is deleted, `firebase.json` holds only a redirect from there
 to the same path on Pages, deployed by hand with
 `pnpm dlx firebase-tools deploy --only hosting`; delete it and `.firebaserc`
-with the project. `pnpm run check:root:firebase-redirects` checks the pair.
+with the project. `pnpm run check:prose:firebase-redirects` checks the pair.

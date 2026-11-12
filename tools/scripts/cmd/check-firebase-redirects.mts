@@ -39,6 +39,11 @@ import { projectRootPath } from '../project-root-path.mjs';
  * directory holding the two files. `public` is only there because Hosting
  * requires one; the redirect comes before static files, so nothing in it is
  * ever served.
+ *
+ * It is a `check:prose` guard because it reads the decks under `docs/`, and
+ * `code-check.yml`, where `check:root:*` runs, skips a diff of `docs/` alone:
+ * the pull request that broke a deck's redirect would pass, and the next
+ * unrelated one would fail.
  */
 export const checkFirebaseRedirects = async (): Promise<
   Result<number, string>
