@@ -2,54 +2,45 @@ import dedent from 'dedent';
 import * as fs from 'node:fs/promises';
 import * as os from 'node:os';
 import * as path from 'node:path';
+import { Result } from 'ts-data-forge';
 import type { ReadonlyRecord, StrictPick } from 'ts-type-forge';
 import {
   findForgottenExports,
   packagesRead,
-  typesEntryPoints,
+  selectPackages,
   type Finding,
 } from './check-forgotten-exports.mjs';
 
-describe(typesEntryPoints, () => {
-  test('reads every types condition and declaration path, once each, but an internal one', () => {
+describe(selectPackages, () => {
+  const enrolled = [
+    { name: 'a', path: '/r/libs/a' },
+    { name: 'b', path: '/r/libs/b' },
+  ] as const;
+
+  test('every package when no directory is given', () => {
     assert.deepStrictEqual(
-      typesEntryPoints({
-        '.': {
-          import: { types: './dist/index.d.mts', default: './dist/index.mjs' },
-        },
-        './internal': {
-          import: {
-            types: './dist/internal.d.mts',
-            default: './dist/internal.mjs',
-          },
-        },
-        './again': './dist/index.d.mts',
-        './extra': { types: './dist/extra.d.mts' },
-        './package.json': './package.json',
-      }),
-      ['./dist/index.d.mts', './dist/extra.d.mts'],
+      selectPackages(enrolled, [], '/r'),
+      Result.ok(enrolled),
     );
   });
 
-  test('leaves out an internal subpath, which semantic versioning does not cover', () => {
+  test('the packages in the directories given, a trailing slash or not', () => {
     assert.deepStrictEqual(
-      typesEntryPoints({
-        './internal': { types: './dist/internal.d.mts' },
-        './dom/internal': './dist/dom/internal.d.mts',
-        './internal/dom': './dist/internal/dom.d.mts',
-        './internals': './dist/internals.d.mts',
-      }),
-      ['./dist/internals.d.mts'],
+      selectPackages(enrolled, ['libs/b/'], '/r'),
+      Result.ok([{ name: 'b', path: '/r/libs/b' }]),
     );
   });
 
-  test('leaves out a pattern and a field that is not an object', () => {
-    assert.deepStrictEqual(
-      typesEntryPoints({ './*': { types: './dist/*.d.mts' } }),
-      [],
+  test('names each directory that holds no package read', () => {
+    const selected = selectPackages(
+      enrolled,
+      ['libs/a', 'apps/app', 'libs/private'],
+      '/r',
     );
 
-    assert.deepStrictEqual(typesEntryPoints(undefined), []);
+    assert.isTrue(Result.isErr(selected));
+
+    assert.include(selected.value, 'apps/app, libs/private: not a package');
   });
 });
 

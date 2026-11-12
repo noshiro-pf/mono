@@ -15,6 +15,7 @@ const pkg = (dir: string, scripts: readonly string[]): PackageInfo =>
     workspaceDependencies: new Set<string>(),
     buildDependencies: new Set<string>(),
     exportsBuild: false,
+    forgottenExportsRead: false,
   }) as const;
 
 const packages = [

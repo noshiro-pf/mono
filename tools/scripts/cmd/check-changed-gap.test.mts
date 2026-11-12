@@ -195,6 +195,7 @@ describe('codeTouched', () => {
         workspaceDependencies: new Set<string>(),
         buildDependencies: new Set<string>(),
         exportsBuild: false,
+        forgottenExportsRead: false,
       }) as const;
 
     assert.deepStrictEqual(
@@ -205,6 +206,7 @@ describe('codeTouched', () => {
             { pkg: pkg('libs/readme'), code: false },
           ],
           dependents: [],
+          members: [],
           areas: new Set<Area>(),
           ignored: [],
         }),
