@@ -649,17 +649,14 @@ export const roundAt = (
 };
 
 /**
- * Rounds a number to the nearest integer using bitwise operations.
- *
- * This function uses a bitwise OR trick for potentially faster rounding.
- * Note: This implementation rounds half up for positive numbers but may behave
- * differently for negative numbers compared to Math.round.
+ * Rounds a number to the nearest integer, halves toward positive infinity (as
+ * `Math.round` does): `2.5` becomes `3` and `-2.5` becomes `-2`.
  *
  * @param num - The number to round
  * @returns The rounded integer as an Int branded type
  */
 // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-export const roundToInt = (num: number): Int => Math.trunc(num + 0.5) as Int;
+export const roundToInt = (num: number): Int => Math.round(num) as Int;
 
 /**
  * Creates a reusable rounding function with a fixed precision.
