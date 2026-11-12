@@ -1,5 +1,5 @@
 import { createPreferSafeParseFloat } from 'eslint-rule-forge';
-import { TS_STD_FORGE_MODULE } from './constants.mjs';
+import { EQUIVALENT_MODULES, TS_STD_FORGE_MODULE } from './constants.mjs';
 
 /**
  * The ts-data-forge rule of the same shape names `Num.safeParseFloat`, which
@@ -9,6 +9,7 @@ import { TS_STD_FORGE_MODULE } from './constants.mjs';
  */
 export const preferSafeNumberParse = createPreferSafeParseFloat({
   moduleName: TS_STD_FORGE_MODULE,
+  equivalentModules: EQUIVALENT_MODULES,
   namespace: 'SafeNumber',
   method: 'parse',
 });

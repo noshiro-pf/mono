@@ -4,7 +4,7 @@ import {
   type TSESTree,
 } from '@typescript-eslint/utils';
 import * as ts from 'typescript';
-import { bindValueImportsAt } from '../imports.mjs';
+import { bindValueImportsAt, type EquivalentModule } from '../imports.mjs';
 import { getArgumentText } from '../parentheses.mjs';
 import {
   isIdentifierNamed,
@@ -25,9 +25,15 @@ import {
  */
 export const createPreferIsRecordAndHasKey = ({
   moduleName,
+  equivalentModules = [],
 }: Readonly<{
   /** The module that exports `isRecord` and `hasKey`. */
   moduleName: string;
+  /**
+   * Modules that export some of its exports as the same declarations; an
+   * import of one of them from there is reused rather than refused.
+   */
+  equivalentModules?: readonly EquivalentModule[];
 }>): TSESLint.RuleModule<
   | 'useIsRecordAndHasKey'
   | 'useHasKey'
@@ -212,14 +218,19 @@ export const createPreferIsRecordAndHasKey = ({
 
           // Bound once for each shape of rewrite: a file may import `hasKey`
           // but not `isRecord`, which only the rewrites that need it add.
-          const withIsRecordAt = bindValueImportsAt(sourceCode, moduleName, [
-            'isRecord',
-            'hasKey',
-          ]);
+          const withIsRecordAt = bindValueImportsAt(
+            sourceCode,
+            moduleName,
+            ['isRecord', 'hasKey'],
+            equivalentModules,
+          );
 
-          const hasKeyOnlyAt = bindValueImportsAt(sourceCode, moduleName, [
-            'hasKey',
-          ]);
+          const hasKeyOnlyAt = bindValueImportsAt(
+            sourceCode,
+            moduleName,
+            ['hasKey'],
+            equivalentModules,
+          );
 
           for (const {
             node,

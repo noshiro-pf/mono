@@ -692,6 +692,134 @@ ruleTester.run('bindValueImportsAt', probeBindingAt(['f', 'h']), {
   ],
 });
 
+// `e` re-exports both names `m` exports; `p` only `f`.
+const equivalentModules = [
+  { moduleName: 'e', exportNames: ['f', 'h'] },
+  { moduleName: 'p', exportNames: ['f'] },
+] as const;
+
+const probeEquivalentBindingAt = (
+  names: readonly string[],
+): ReturnType<typeof probeRule> =>
+  probeRule(
+    (context, argument) =>
+      bindValueImportsAt(
+        context.sourceCode,
+        'm',
+        names,
+        equivalentModules,
+      )(argument)?.localNames.join(', ') ?? '(none)',
+    (context, fixer, argument) =>
+      bindValueImportsAt(
+        context.sourceCode,
+        'm',
+        names,
+        equivalentModules,
+      )(argument)?.edits(fixer) ?? [],
+  );
+
+ruleTester.run(
+  'bindValueImportsAt with equivalent modules',
+  probeEquivalentBindingAt(['f', 'h']),
+  {
+    valid: [],
+    invalid: [
+      {
+        name: "an equivalent module's import is reused, and takes the name to add",
+        code: dedent`
+          import { f as g } from 'e';
+          probe(0);
+        `,
+        output: dedent`
+          import { f as g, h } from 'e';
+          probe(0);
+        `,
+        errors: [{ messageId: 'result', data: { result: 'g, h' } }],
+      },
+      {
+        name: "the module's own import takes the name to add first",
+        code: dedent`
+          import { f } from 'e';
+          import { a } from 'm';
+          probe(0);
+        `,
+        output: dedent`
+          import { f } from 'e';
+          import { a, h } from 'm';
+          probe(0);
+        `,
+        errors: [{ messageId: 'result', data: { result: 'f, h' } }],
+      },
+      {
+        name: 'a name the equivalent module does not export goes into a new import',
+        code: dedent`
+          import { f } from 'p';
+          probe(0);
+        `,
+        output: dedent`
+          import { h } from 'm';
+          import { f } from 'p';
+          probe(0);
+        `,
+        errors: [{ messageId: 'result', data: { result: 'f, h' } }],
+      },
+      {
+        name: 'refused when a name the module does not share binds it',
+        code: dedent`
+          import { h } from 'p';
+          probe(0);
+        `,
+        output: null,
+        errors: [{ messageId: 'result', data: { result: '(none)' } }],
+      },
+      {
+        name: "written through an equivalent module's namespace that exports every name",
+        code: dedent`
+          import * as en from 'e';
+          probe(0);
+        `,
+        output: null,
+        errors: [{ messageId: 'result', data: { result: 'en.f, en.h' } }],
+      },
+      {
+        name: 'a namespace that does not export every name is passed over',
+        code: dedent`
+          import * as pn from 'p';
+          probe(0);
+        `,
+        output: dedent`
+          import { f, h } from 'm';
+          import * as pn from 'p';
+          probe(0);
+        `,
+        errors: [{ messageId: 'result', data: { result: 'f, h' } }],
+      },
+      {
+        name: "the module's own namespace comes first",
+        code: dedent`
+          import * as en from 'e';
+          import * as ns from 'm';
+          probe(0);
+        `,
+        output: null,
+        errors: [{ messageId: 'result', data: { result: 'ns.f, ns.h' } }],
+      },
+      {
+        name: "an equivalent module's inline `type` import is dropped",
+        code: dedent`
+          import { type f } from 'e';
+          probe(0);
+        `,
+        output: dedent`
+          import { f, h } from 'e';
+          probe(0);
+        `,
+        errors: [{ messageId: 'result', data: { result: 'f, h' } }],
+      },
+    ],
+  },
+);
+
 ruleTester.run(
   'addTypeImports',
   probeRule(

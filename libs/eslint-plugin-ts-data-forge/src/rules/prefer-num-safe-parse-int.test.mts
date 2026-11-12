@@ -62,6 +62,28 @@ describe('prefer-num-safe-parse-int', () => {
         errors: [{ messageId: 'useSafeParseInt', suggestions: [] }],
       },
       {
+        name: 'reuses `Result` imported from ts-std-forge, which shares it',
+        code: dedent`
+          import { Result } from 'ts-std-forge';
+          const a = parseInt('1e3');
+        `,
+        errors: [
+          {
+            messageId: 'useSafeParseInt',
+            suggestions: [
+              {
+                messageId: 'replaceWithSafeParse',
+                output: dedent`
+                  import { Num } from 'ts-data-forge';
+                  import { Result } from 'ts-std-forge';
+                  const a = Result.unwrapOkOr(Num.safeParseInt('1e3'), Number.NaN);
+                `,
+              },
+            ],
+          },
+        ],
+      },
+      {
         // The replacement reads these strings differently ('1e3' is 1000, not
         // 1; '12px' is NaN, not 12), so it is offered, never applied by
         // --fix

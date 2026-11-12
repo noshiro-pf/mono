@@ -23,6 +23,12 @@ report the same code twice with conflicting fixes or suggestions. Pick the
 package the code actually depends on: `ts-std-forge` alone, or `ts-data-forge` (which
 brings `ts-std-forge` with it, and whose rules point at the branded API).
 
+Neither choice loses the imports from the other package. What `ts-data-forge`
+re-exports from `ts-std-forge` (`isRecord`, `hasKey`, `isNonNullObject`,
+`Result`, …) is the same declaration imported from either, and the rules of both
+plugins treat it so: they report the same code, and a fix reuses the import the
+file already has, from whichever package, rather than adding a second one.
+
 The rest of `eslint-plugin-ts-data-forge` — the branded number and array
 rules, `prefer-obj-over-entries-round-trip`, the nullish-guard rules — has no
 counterpart here, because the API it names never moved.

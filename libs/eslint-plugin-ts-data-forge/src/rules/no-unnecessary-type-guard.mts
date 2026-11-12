@@ -15,7 +15,11 @@ import {
 import { isString } from 'ts-data-forge';
 import type { DeepReadonly, ReadonlyRecord } from 'ts-type-forge';
 import * as ts from 'typescript';
-import { TS_DATA_FORGE_MODULE, TS_STD_FORGE_MODULE } from './constants.mjs';
+import {
+  SHARED_EXPORTS,
+  TS_DATA_FORGE_MODULE,
+  TS_STD_FORGE_MODULE,
+} from './constants.mjs';
 import { tsDataForgeValueAtByName } from './import-binding.mjs';
 
 type Options = readonly [
@@ -142,6 +146,9 @@ const GUARD_SPECS: DeepReadonly<ReadonlyRecord<string, GuardSpec>> = {
   'AsyncData.isSettled': { kind: 'variant', tags: [OK_TAG, ERR_TAG] },
 } as const;
 
+/** What ts-data-forge re-exports from ts-std-forge, read through either. */
+const sharedExports: ReadonlySet<string> = new Set(SHARED_EXPORTS);
+
 const DEFERRED_OR_OPAQUE_FLAGS =
   ts.TypeFlags.Any |
   ts.TypeFlags.Unknown |
@@ -214,15 +221,33 @@ export const noUnnecessaryTypeGuard: TSESLint.RuleModule<MessageIds, Options> =
         TS_DATA_FORGE_MODULE,
       );
 
-      const resolveGuard = buildCalleeResolver(tsDataForgeImports);
+      const resolveTsDataForge = buildCalleeResolver(tsDataForgeImports);
 
-      // The algebraic data types are ts-std-forge's; ts-data-forge only
-      // re-exports them and tells new code to import them from there. Their
-      // variant guards (`Optional.isNone`, …) are the only guards read from it:
-      // every member spec is one, and the tags they read are the same.
-      const resolveStdForgeOwner = buildCalleeResolver(
+      // What ts-data-forge re-exports from ts-std-forge (`isRecord`,
+      // `Optional`, …) is the same declaration imported from either, so it is
+      // read through both; nothing else is, as only ts-data-forge's own guards
+      // have specs.
+      const resolveTsStdForge = buildCalleeResolver(
         getImportDeclarations(program, TS_STD_FORGE_MODULE),
       );
+
+      const resolveGuard = (
+        // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+        callee: TSESTree.Expression,
+      ): ResolvedCallee | undefined => {
+        const fromTsDataForge = resolveTsDataForge(callee);
+
+        if (fromTsDataForge !== undefined) {
+          return fromTsDataForge;
+        }
+
+        const fromTsStdForge = resolveTsStdForge(callee);
+
+        return fromTsStdForge !== undefined &&
+          isSharedExport(fromTsStdForge.canonicalName)
+          ? fromTsStdForge
+          : undefined;
+      };
 
       // `Optional.isNone(x)`, `tf.Optional.isNone(x)`: a guard that is a member
       // of an exported object, named `Optional.isNone` in `GUARD_SPECS`.
@@ -240,8 +265,7 @@ export const noUnnecessaryTypeGuard: TSESLint.RuleModule<MessageIds, Options> =
           return undefined;
         }
 
-        const owner =
-          resolveGuard(member.object) ?? resolveStdForgeOwner(member.object);
+        const owner = resolveGuard(member.object);
 
         return owner === undefined
           ? undefined
@@ -930,3 +954,5 @@ const isSideEffectFreeArg = (node: DeepReadonly<TSESTree.Node>): boolean => {
       return false;
   }
 };
+
+const isSharedExport = (name: string): boolean => sharedExports.has(name);

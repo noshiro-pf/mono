@@ -5,7 +5,7 @@ import {
 } from '@typescript-eslint/utils';
 import type { ReadonlyRecord } from 'ts-type-forge';
 import * as ts from 'typescript';
-import { bindValueImportsAt } from '../imports.mjs';
+import { bindValueImportsAt, type EquivalentModule } from '../imports.mjs';
 import { getArgumentText } from '../parentheses.mjs';
 import {
   isIdentifierNamed,
@@ -26,6 +26,11 @@ export type SafeParseRuleConfig = Readonly<{
    * `Result<number, …>`.
    */
   method: string;
+  /**
+   * Modules that export some of the module's exports as the same declarations; an
+   * import of one of them from there is reused rather than refused.
+   */
+  equivalentModules?: readonly EquivalentModule[];
 }>;
 
 /**
@@ -109,7 +114,12 @@ const isStringType = (type: ts.Type): boolean => {
 };
 
 const createSafeParseRule = <MessageId extends string>(
-  { moduleName, namespace, method }: SafeParseRuleConfig,
+  {
+    moduleName,
+    namespace,
+    method,
+    equivalentModules = [],
+  }: SafeParseRuleConfig,
   messageId: MessageId,
   {
     messages,
@@ -192,6 +202,7 @@ const createSafeParseRule = <MessageId extends string>(
             sourceCode,
             moduleName,
             requiredImports,
+            equivalentModules,
           );
 
           // A suggestion, never an autofix: the replacement parses some

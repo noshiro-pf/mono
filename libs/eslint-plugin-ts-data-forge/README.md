@@ -64,6 +64,21 @@ export default [
 ];
 ```
 
+## Imports from `ts-std-forge`
+
+`ts-data-forge` re-exports part of [`ts-std-forge`](https://www.npmjs.com/package/ts-std-forge)
+unchanged — `Optional`, `Result`, `pipe`, `isRecord`, `hasKey`,
+`isNonNullObject` and the rest of what moved there — and tells new code to
+import those from `ts-std-forge`. Every rule here treats such a name the same
+whichever of the two packages it is imported from: it reports the same code, and
+its fix reuses the import the file already has rather than adding a second one.
+A name only `ts-data-forge` exports (`Arr`, `Num`, `isString`, …) is read from
+`ts-data-forge` alone.
+
+Use this plugin or [`eslint-plugin-ts-std-forge`](https://www.npmjs.com/package/eslint-plugin-ts-std-forge)
+on a file, not both: their overlapping rules would report the same code twice.
+This one is for code that depends on `ts-data-forge`.
+
 ## Rules
 
 | Rule                                   | Description                                                                                                                                                                                                                                                                                                                                                                                 |
