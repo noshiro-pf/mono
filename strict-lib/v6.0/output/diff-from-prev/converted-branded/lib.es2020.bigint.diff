@@ -1,5 +1,5 @@
 diff --git a/v5.9/output/lib-files-branded/lib.es2020.bigint.d.ts b/v6.0/output/lib-files-branded/lib.es2020.bigint.d.ts
-index ed84b3271d05aab2aa2e79c0084c1a3d21b9f265..cda47bf3d6b7e009803fae3d34a2b68b441aa5ea 100644
+index c6bc654d0a6b074f7b5be2c6229f6e2bb674e1f3..3e0626e5fdbcb9490eb41b8f2b80b85f342c1ae0 100644
 --- a/v5.9/output/lib-files-branded/lib.es2020.bigint.d.ts
 +++ b/v6.0/output/lib-files-branded/lib.es2020.bigint.d.ts
 @@ -7,7 +7,7 @@ License at http://www.apache.org/licenses/LICENSE-2.0

@@ -1,5 +1,5 @@
 diff --git a/v5.9/output/lib-files-branded/lib.es2018.intl.d.ts b/v6.0/output/lib-files-branded/lib.es2018.intl.d.ts
-index e7c4e849dc94f3d1153c831684bd18d74830de39..066584f874f2d885fa673d320ae1249852f7f848 100644
+index ab67df302f341115be9e74351e6679c0ba7db3fd..386d203817d3c8ad9106d622d1fb09ecfeb94ad7 100644
 --- a/v5.9/output/lib-files-branded/lib.es2018.intl.d.ts
 +++ b/v6.0/output/lib-files-branded/lib.es2018.intl.d.ts
 @@ -7,7 +7,7 @@ License at http://www.apache.org/licenses/LICENSE-2.0

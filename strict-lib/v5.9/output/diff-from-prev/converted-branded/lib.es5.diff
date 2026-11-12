@@ -1,5 +1,5 @@
 diff --git a/v5.8/output/lib-files-branded/lib.es5.d.ts b/v5.9/output/lib-files-branded/lib.es5.d.ts
-index c15b9c601989e21c47dfa5ef5c8bca90c93f6a7c..c941e48c0128e6df73da3bd6834db6146816b4e1 100644
+index f1afdc8f6c62ca22f98c8b1bb62ddbc8fb6cb1e0..4dfa84c3f524b61c98c58d0bb6d0241344054b1f 100644
 --- a/v5.8/output/lib-files-branded/lib.es5.d.ts
 +++ b/v5.9/output/lib-files-branded/lib.es5.d.ts
 @@ -1385,6 +1385,7 @@ interface JSON {

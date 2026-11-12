@@ -1,5 +1,5 @@
 diff --git a/v5.6/output/lib-files/lib.es2020.bigint.d.ts b/v5.7/output/lib-files/lib.es2020.bigint.d.ts
-index 2faae6b6a913a53f88756bc6baa27f8eedf5abf9..3e414a01a0c9fd16699d4435380010fcf698aa70 100644
+index 1c5bd18874622ce8f50d4f828d44660ed60638b9..646d79891e888b52f16b7d5e33fa1ffa7ba0dbfa 100644
 --- a/v5.6/output/lib-files/lib.es2020.bigint.d.ts
 +++ b/v5.7/output/lib-files/lib.es2020.bigint.d.ts
 @@ -26,7 +26,7 @@ and limitations under the License.

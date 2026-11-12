@@ -1,5 +1,5 @@
 diff --git a/v5.7/output/lib-files-branded/lib.es2020.bigint.d.ts b/v5.8/output/lib-files-branded/lib.es2020.bigint.d.ts
-index 61d391c1aeff19467dd7bca8b89c7156c75e2ad2..ed84b3271d05aab2aa2e79c0084c1a3d21b9f265 100644
+index db5134e2a5d7ee3183528987c33a888bbc885ff5..c6bc654d0a6b074f7b5be2c6229f6e2bb674e1f3 100644
 --- a/v5.7/output/lib-files-branded/lib.es2020.bigint.d.ts
 +++ b/v5.8/output/lib-files-branded/lib.es2020.bigint.d.ts
 @@ -546,6 +546,11 @@ interface BigInt64ArrayConstructor {
