@@ -88,7 +88,7 @@ U の中で作られたノードは、作られた後に親が U で値を出し
 
 ### complete したノードへの書き込み
 
-complete したノードの `startUpdate` は、上の 1〜6 も値の書き込みも行わずに戻ります。子が別の親の下でまだ生きていても、complete したノードから値は届きません。`fromSubscribable` の購読対象が `unsubscribe` の後も値を渡してくる場合や、`createRootObservable` や `createAsyncChildObservable` の `init` が受け取った `startUpdate` を complete の後で呼ぶ場合がこれに当たります。この判定はほかのどの処理よりも先に行うので、伝播中の書き込みの警告（ルート）も出ません。`setNext` も同じ判定をし、自分を complete した後のカスタム演算子が呼んでも何も書きません。`dispose` が complete したことにするのは teardown の後なので、teardown の中で出た値（`flush` のないカスタムのルートが `onComplete` で出す最後の値や、`unsubscribe` の最中に購読対象が渡してくる値）は、これまでどおり complete より先に子と購読者に届きます。complete の後に `onComplete` で登録した teardown はすぐに走り、その中で出た値は無視されます。
+complete したノードの `startUpdate` は、上の 1〜6 も値の書き込みも行わずに戻ります。子が別の親の下でまだ生きていても、complete したノードから値は届きません。`fromSubscribable` の購読対象が `unsubscribe` の後も値を渡してくる場合や、`createRootObservable` や `createAsyncChildObservable` の `init` が受け取った `startUpdate` を complete の後で呼ぶ場合がこれに当たります。この判定はほかのどの処理よりも先に行うので、伝播中の書き込みの警告（ルート）も出ません。`setNext` も同じ判定をし、自分を complete した後のカスタム演算子が呼んでも何も書きません。`dispose` が complete したことにするのは teardown の後なので、teardown の中で出た値（`flush` のないカスタムのルートが `onComplete` で出す最後の値や、`unsubscribe` の最中に購読対象が渡してくる値）は、これまでどおり complete より先に子と購読者に届きます。ただし `fromSubscribable` の購読対象がエラーを報告した後は、その `Err` が最後の値なので、`unsubscribe` の最中に渡してくる値も無視します。complete の後に `onComplete` で登録した teardown はすぐに走り、その中で出た値は無視されます。
 
 ### 誰も観測していない書き込み
 

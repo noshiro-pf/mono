@@ -8,6 +8,12 @@ description: 'Converts any subscribable object into a SynState Observable.'
 {/* jsdoc-description */}
 Converts any subscribable object into a SynState Observable.
 Works with objects that have a subscribe(onNext, onError, onComplete) method.
+
+Each value is passed on as `Result.ok(value)`. An error is passed on as
+`Result.err(error)` and ends the observable, as an error ends an RxJS or
+TC39-style observable and a rejection ends `fromPromise`: the observable
+completes after the `Err`, unsubscribes from the subscribable, and ignores
+anything the subscribable passes on later.
 {/* /jsdoc-description */}
 
 ## Example
