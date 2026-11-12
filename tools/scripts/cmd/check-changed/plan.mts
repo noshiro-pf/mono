@@ -531,12 +531,18 @@ export type PackageInfo = Readonly<{
   isPrivate: boolean;
   /**
    * The workspace members its manifest names in `dependencies`,
-   * `devDependencies` or `peerDependencies`.
+   * `devDependencies` or `peerDependencies`, by any range.
    */
   workspaceDependencies: ReadonlySet<string>;
   /**
-   * The workspace members in `dependencies` and `peerDependencies` alone, the
-   * fields `ws:build` orders its stages by.
+   * The workspace members in `dependencies` and `peerDependencies` alone, by
+   * any range: the edges `ws:build` orders its stages by. `devDependencies` stay
+   * out, though a member they name is linked from the workspace too: some of
+   * the toolchain and test helpers they name depend back on the packages they
+   * serve (`synstate` tests against `synstate-react-hooks`, which depends on
+   * `synstate`), so they close cycles that have no build order, and
+   * {@link changedBuildsFor} would cut each at whichever package it reached
+   * first, building a package before what it depends on.
    */
   buildDependencies: ReadonlySet<string>;
   /** Whether an import of it resolves to its build output (`dist/`). */
@@ -558,11 +564,17 @@ export type PackageInfo = Readonly<{
 
 /**
  * What {@link PackageInfo} reads from a manifest's dependency fields and entry
- * points. A range counts when it is `workspace:`, the only way a member names
- * another.
+ * points. A name counts when it is one of `members`, whatever its range: a
+ * package names a member as a peer by a semver range (`"synstate": ">=8.0.0"`)
+ * and links it through a `workspace:*` devDependency, and `ws:build`
+ * (`getWorkspacePackages` in `ts-repo-utils`) orders its stages by that edge as
+ * by any other. The edge is the peer's, not the devDependency's: why
+ * `devDependencies` never order a build is on
+ * {@link PackageInfo.buildDependencies}.
  */
 export const readManifestDependencies = (
   manifest: unknown,
+  members: ReadonlySet<string>,
 ): StrictPick<
   PackageInfo,
   'workspaceDependencies' | 'buildDependencies' | 'exportsBuild'
@@ -576,8 +588,7 @@ export const readManifestDependencies = (
             return isRecord(ranges)
               ? Object.entries(ranges)
                   .filter(
-                    ([, range]) =>
-                      isString(range) && range.startsWith('workspace:'),
+                    ([name, range]) => isString(range) && members.has(name),
                   )
                   .map(([name]) => name)
               : [];
