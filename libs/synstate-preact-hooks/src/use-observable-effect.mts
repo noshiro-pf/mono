@@ -26,13 +26,31 @@ export const useObservableEffect = <A,>(
   // boundary, or to suspend) leaves its function here until the next render.
   mut_subscriptionFnRef.current = subscriptionFn;
 
+  const mut_stopRef = Preact.useRef<(() => void) | undefined>(undefined);
+
   Preact.useEffect(() => {
     const s = observable$.subscribe((v) => {
       mut_subscriptionFnRef.current(v);
     });
 
-    return () => {
+    const stop = (): void => {
       s.unsubscribe();
     };
+
+    mut_stopRef.current = stop;
+
+    return stop;
   }, [observable$]);
+
+  // A layout effect's cleanup runs as the component unmounts in preact 10 and
+  // 11; an effect's is deferred to after the next frame in 11, and values
+  // emitted meanwhile would reach the unmounted component. Unsubscribing twice
+  // does nothing, so the effect's own cleanup may run as well.
+  Preact.useLayoutEffect(
+    // eslint-disable-next-line unicorn/consistent-function-scoping
+    () => () => {
+      mut_stopRef.current?.();
+    },
+    [],
+  );
 };
