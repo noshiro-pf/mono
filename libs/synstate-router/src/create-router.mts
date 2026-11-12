@@ -8,7 +8,7 @@ import {
   type InitializedObservable,
   type Observable,
 } from 'synstate';
-import { isNonNullObject, isRecord, Optional } from 'ts-data-forge';
+import { Arr, isNonNullObject, isRecord, Optional } from 'ts-data-forge';
 import type {
   DeepReadonly,
   ReadonlyRecord,
@@ -150,6 +150,13 @@ export type Router<R extends AnyRoutes> = Readonly<{
   location: InitializedObservable<RouterLocation>;
 
   /**
+   * The last redirects the router followed, oldest first, up to
+   * {@link maxRedirectRecords}: for a devtools panel, to tell why a URL was
+   * left.
+   */
+  redirects: InitializedObservable<readonly RedirectRecord[]>;
+
+  /**
    * Whether an asynchronous `redirect` is being awaited: `match` shows the page
    * before it until it settles.
    */
@@ -286,6 +293,17 @@ export type DeclaresSearch<S extends AnySearchCodecs> = [keyof S] extends [
   ? 'synstate-router: this node declares no search'
   : unknown;
 
+/** How many of the last redirects `router.redirects` keeps. */
+export const maxRedirectRecords = 10;
+
+/** A redirect the router followed. */
+export type RedirectRecord = Readonly<{
+  /** The URL asked for. */
+  from: string;
+  /** The URL `redirect` sent it to. */
+  to: string;
+}>;
+
 /** How many redirects in a row the router follows. */
 export const maxRedirects = 10;
 
@@ -344,6 +362,16 @@ export const createRouter = <R extends AnyRoutes>(
       basePath,
       canonicalPathname(href.slice(0, pathEnd), trailingSlash),
     )}${href.slice(pathEnd)}`;
+  };
+
+  const [redirects$, setRedirects, { getSnapshot: redirectsSoFar }] = untracked(
+    () => createState<readonly RedirectRecord[]>([]),
+  );
+
+  const recordRedirect = (record: RedirectRecord): void => {
+    setRedirects(
+      Arr.toPushed(redirectsSoFar(), record).slice(-maxRedirectRecords),
+    );
   };
 
   /**
@@ -409,6 +437,8 @@ export const createRouter = <R extends AnyRoutes>(
 
         return found;
       }
+
+      recordRedirect({ from: url.href, to: next.href });
 
       return mapSettled(
         resolve(next, redirects + 1, signal).settled,
@@ -1422,6 +1452,7 @@ export const createRouter = <R extends AnyRoutes>(
     location,
     pending: pending$,
     ready: ready$,
+    redirects: redirects$,
     get branch() {
       return branchOf();
     },

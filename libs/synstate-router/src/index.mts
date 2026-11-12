@@ -1,6 +1,7 @@
 export * from './browser.mjs';
 export * from './create-router.mjs';
 export * from './define-routes.mjs';
+export * from './describe-routes.mjs';
 export * from './history-state.mjs';
 export * from './href-with-search.mjs';
 export * from './href.mjs';
