@@ -244,7 +244,7 @@ const AnswerPageOk = ({
   const answerIcons$ = eventScheduleDefined$.pipe(map((e) => e.answerIcons));
 
   return (
-    <>
+    <div class={constant(styles.page)}>
       <div class={constant(styles.answerLaterWrapper)}>
         <If
           cond={showAnswerLaterButton$}
@@ -268,7 +268,14 @@ const AnswerPageOk = ({
           />
         </ButtonsWrapperAlignEnd>
       </Section>
-      <Section sectionTitle={dc.answers.title}>
+      <Section
+        // Derived here, as the page's other bindings are: the scope the page is
+        // mounted in disposes what its render derives when it is left.
+        class={AnswerTableStore.tableIsFullWidth$.pipe(
+          map((full) => (full ? styles.fullWidth : '')),
+        )}
+        sectionTitle={dc.answers.title}
+      >
         <div class={constant(styles.calendarWrapper)}>
           <MultipleDatePicker
             holidaysJpDefinition={holidaysJpDefinition$}
@@ -300,6 +307,31 @@ const AnswerPageOk = ({
               text={constant(dc.answers.saveScreenShot)}
               onClick={saveScreenShot}
             />
+            {/*
+              Hidden through a wrapper rather than a class on the button:
+              Blueprint's `.bp6-button` sets `display` with a selector as
+              specific, so which one wins would rest on style sheet order.
+            */}
+            <div class={constant(styles.fullWidthToggle)}>
+              <Button
+                // No `aria-pressed`: the label says what a press does and
+                // changes with the state, which a pressed state would
+                // contradict.
+                data-e2e={constant('toggle-table-full-width')}
+                icon={AnswerTableStore.tableIsFullWidth$.pipe(
+                  map((full) => (full ? 'minimize' : 'maximize')),
+                )}
+                intent={'none'}
+                text={AnswerTableStore.tableIsFullWidth$.pipe(
+                  map((full) =>
+                    full
+                      ? dc.answers.tableFullWidth.shrink
+                      : dc.answers.tableFullWidth.expand,
+                  ),
+                )}
+                onClick={AnswerTableStore.toggleTableIsFullWidth}
+              />
+            </div>
           </ButtonsWrapperNowrap>
         </div>
 
@@ -548,7 +580,7 @@ const AnswerPageOk = ({
           }}
         </For>
       </div>
-    </>
+    </div>
   );
 };
 

@@ -12,9 +12,15 @@ export declare const filterButtonsWrapper: string;
 
 export declare const flex: string;
 
+export declare const fullWidth: string;
+
+export declare const fullWidthToggle: string;
+
 export declare const iconDescriptionWrapper: string;
 
 export declare const noteForPointOfFair: string;
+
+export declare const page: string;
 
 export declare const requiredParticipantIconWrapper: string;
 

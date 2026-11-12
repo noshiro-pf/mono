@@ -1,11 +1,19 @@
 import { Button, Card } from 'blueprint-synstate';
-import { constant, type Child, type JSX } from 'synstate-dom';
+import {
+  constant,
+  mapBindable,
+  type Bindable,
+  type Child,
+  type JSX,
+} from 'synstate-dom';
 import { SectionTitle } from '../atoms/index.mjs';
 import * as styles from './section.module.css';
 
 type Props = Readonly<{
   sectionTitle?: string;
   onCloseClick?: () => void;
+  /** Classes for the wrapper round the card, after its own. */
+  class?: Bindable<string>;
   children: Child;
 }>;
 
@@ -14,8 +22,17 @@ export const Section = ({
   children,
   sectionTitle,
   onCloseClick,
+  class: className,
 }: Props): JSX.Element => (
-  <div class={constant(styles.section)}>
+  <div
+    class={
+      className === undefined
+        ? constant(styles.section)
+        : mapBindable(className, (c) =>
+            c === '' ? styles.section : `${styles.section} ${c}`,
+          )
+    }
+  >
     <Card elevation={1}>
       <div class={constant(styles.header)}>
         {sectionTitle === undefined ? (

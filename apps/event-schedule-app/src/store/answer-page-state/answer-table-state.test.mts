@@ -1,5 +1,6 @@
 import { EventSchedule, type Answer } from 'event-schedule-app-shared';
 import { createState } from 'synstate';
+import { Result } from 'ts-data-forge';
 import { AnswerFilterState } from '../../functions/index.mjs';
 import {
   createAnswerTableStore,
@@ -40,6 +41,66 @@ describe(createAnswerTableStore, () => {
 
     assert.isTrue(store.toggleDetailedFilter());
   });
+
+  test('the table starts at the width storage kept and saves each change', () => {
+    const { store, saved } = setup({ storedTableIsFullWidth: true });
+
+    assert.isTrue(store.tableIsFullWidth$.getSnapshot().value);
+
+    assert.isFalse(store.toggleTableIsFullWidth());
+
+    assert.isFalse(store.tableIsFullWidth$.getSnapshot().value);
+
+    assert.deepStrictEqual(saved, [false]);
+  });
+
+  test('the table starts at the page width when storage has nothing', () => {
+    assert.isFalse(
+      setup({
+        storedTableIsFullWidth: undefined,
+      }).store.tableIsFullWidth$.getSnapshot().value,
+    );
+  });
+
+  test('the table starts at the page width, with a warning, when storage cannot be read', () => {
+    const consoleWarn = vi
+      .spyOn(console, 'warn')
+      .mockImplementation(() => undefined);
+
+    onTestFinished(() => {
+      consoleWarn.mockRestore();
+    });
+
+    assert.isFalse(
+      setup({
+        storedTableIsFullWidth: 'blocked',
+      }).store.tableIsFullWidth$.getSnapshot().value,
+    );
+
+    expect(consoleWarn).toHaveBeenCalledExactlyOnceWith(
+      'SecurityError: The operation is insecure.',
+    );
+  });
+
+  test('the toggle still flips, with a warning, when storage cannot be written', () => {
+    const consoleWarn = vi
+      .spyOn(console, 'warn')
+      .mockImplementation(() => undefined);
+
+    onTestFinished(() => {
+      consoleWarn.mockRestore();
+    });
+
+    const { store } = setup({ saveFails: true });
+
+    assert.isTrue(store.toggleTableIsFullWidth());
+
+    assert.isTrue(store.tableIsFullWidth$.getSnapshot().value);
+
+    expect(consoleWarn).toHaveBeenCalledExactlyOnceWith(
+      'QuotaExceededError: The quota has been exceeded.',
+    );
+  });
 });
 
 const dayOf = (date: number): unknown =>
@@ -51,9 +112,19 @@ const dayOf = (date: number): unknown =>
     },
   }) as const;
 
-const setup = (): Readonly<{
+const setup = ({
+  storedTableIsFullWidth,
+  saveFails = false,
+}: Readonly<{
+  /** What storage holds; `'blocked'` for storage that cannot be read. */
+  storedTableIsFullWidth?: boolean | 'blocked';
+  /** Whether storage refuses each write. */
+  saveFails?: boolean;
+}> = {}): Readonly<{
   store: AnswerTable;
   setSort: (sort: readonly ['date' | 'score', 'asc' | 'desc']) => void;
+  /** Each value the store saved, in order. */
+  saved: readonly boolean[];
 }> => {
   const [eventSchedule$] = createState<EventSchedule | undefined>(
     EventSchedule.fill({
@@ -70,10 +141,27 @@ const setup = (): Readonly<{
 
   const [answersFiltered$] = createState<readonly Answer[] | undefined>([]);
 
+  const mut_saved: boolean[] = [];
+
   const store = createAnswerTableStore({
     eventSchedule$,
     filterAndSort: { answersFiltered$, filterState$, sortKeyAndOrder$ },
+    storage: {
+      restoreTableIsFullWidth: () =>
+        storedTableIsFullWidth === 'blocked'
+          ? Result.err('SecurityError: The operation is insecure.')
+          : Result.ok(storedTableIsFullWidth),
+      saveTableIsFullWidth: (value) => {
+        if (saveFails) {
+          return Result.err('QuotaExceededError: The quota has been exceeded.');
+        }
+
+        mut_saved.push(value);
+
+        return Result.ok(undefined);
+      },
+    },
   });
 
-  return { store, setSort } as const;
+  return { store, setSort, saved: mut_saved } as const;
 };
