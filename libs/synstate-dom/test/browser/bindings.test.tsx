@@ -1,5 +1,6 @@
 import { createState, just, map } from 'synstate';
 import { constant, render, type JSX } from 'synstate-dom';
+import { Obj } from 'ts-data-forge';
 
 const mountInto = (
   app: () => JSX.Element,
@@ -234,6 +235,49 @@ describe('properties', () => {
     setChecked(true);
 
     assert.strictEqual(checkbox?.checked, true);
+  });
+});
+
+describe('value is bound after the other props (#3940)', () => {
+  // The props are written out of order on purpose: a range or number input fits
+  // its value to the `type`, `min`, `max` and `step` it has when the value is
+  // written, so `value` has to come last whatever the order.
+  test.each([
+    ['max', { value: '150', type: 'range', max: '200' }, '150'],
+    ['min', { value: '-5', type: 'range', min: '-10' }, '-5'],
+    ['step', { value: '0.5', type: 'range', step: '0.5' }, '0.5'],
+    ['type', { value: '150', max: '200', type: 'range' }, '150'],
+  ] as const)(
+    'a range input with value written before %s reads back the bound value',
+    (_, props, expected) => {
+      const { container } = mountInto(() => (
+        <input {...Obj.map(props, constant)} />
+      ));
+
+      assert.strictEqual(container.querySelector('input')?.value, expected);
+    },
+  );
+
+  test('a number input and a select still read back theirs', () => {
+    const { container } = mountInto(() => (
+      <>
+        <input
+          {...{
+            value: constant('7'),
+            type: constant('number'),
+            max: constant('9'),
+          }}
+        />
+        <select value={constant('b')}>
+          <option value={constant('a')}>{constant('a')}</option>
+          <option value={constant('b')}>{constant('b')}</option>
+        </select>
+      </>
+    ));
+
+    assert.strictEqual(container.querySelector('input')?.value, '7');
+
+    assert.strictEqual(container.querySelector('select')?.value, 'b');
   });
 });
 
