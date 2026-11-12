@@ -1,11 +1,11 @@
 # TypeScript coding rules
 
 The coding conventions of this repository with their reasons and examples.
-`CLAUDE.md` keeps only a summary of them ("Testing", "Coding style",
-"Libraries"); this file is where the examples live. Most rules are enforced by
-the shared ESLint configuration (`libs/eslint-config-typed`), and the rule id
-is named beside each one. Where the error invites `eslint-disable`, the
-intended fix is shown under "Troubleshooting".
+`CLAUDE.md` ("Testing", "Coding style", "Libraries") keeps only a summary of
+them; this file is where the examples live. Most rules are enforced by the
+shared ESLint configuration (`libs/eslint-config-typed`), and the rule id is
+named beside each one. Where the error invites `eslint-disable`, the intended
+fix is shown under "Troubleshooting".
 
 ## Important patterns
 
