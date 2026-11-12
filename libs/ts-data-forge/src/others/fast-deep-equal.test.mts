@@ -881,3 +881,33 @@ describe(fastDeepEqual, () => {
     });
   });
 });
+
+describe('fastDeepEqual over ArrayBuffer and DataView (#3967)', () => {
+  const bytes = (...xs: readonly number[]): ArrayBuffer =>
+    Uint8Array.from(xs).buffer;
+
+  test('buffers are compared by their bytes', () => {
+    assert.isFalse(fastDeepEqual(bytes(1), bytes(2)));
+
+    assert.isFalse(fastDeepEqual(new ArrayBuffer(1), new ArrayBuffer(1024)));
+
+    assert.isTrue(fastDeepEqual(bytes(1, 2), bytes(1, 2)));
+  });
+
+  test('views are compared by the bytes they see', () => {
+    assert.isFalse(
+      fastDeepEqual(new DataView(bytes(1)), new DataView(bytes(2, 3))),
+    );
+
+    assert.isTrue(
+      fastDeepEqual(
+        new DataView(bytes(9, 1, 2), 1),
+        new DataView(bytes(1, 2, 9), 0, 2),
+      ),
+    );
+  });
+
+  test('a record differing only in a buffer is not equal', () => {
+    assert.isFalse(fastDeepEqual({ body: bytes(1) }, { body: bytes(2) }));
+  });
+});
