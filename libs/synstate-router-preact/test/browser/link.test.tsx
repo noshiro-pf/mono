@@ -4,9 +4,16 @@ import {
   render,
   screen as testScreen,
 } from '@testing-library/preact';
-import { externalHref } from 'synstate-router';
-import { expectType } from 'ts-data-forge';
-import type { LinkProps } from '../../src/index.mjs';
+import {
+  createMemoryBrowser,
+  createRouter,
+  defineRoutes,
+  externalHref,
+  historyState,
+  type Router,
+} from 'synstate-router';
+import { expectType, Optional } from 'ts-data-forge';
+import { createPreactRouter, type LinkProps } from '../../src/index.mjs';
 import { nextTask, routes, setup } from './fixture.js';
 
 /**
@@ -236,5 +243,66 @@ describe('Link', () => {
     await act(nextTask);
 
     assert.strictEqual(router.match.getSnapshot().value.route, 'home');
+  });
+});
+
+/** Routes whose `checkout` page declares a history state (#3859). */
+const stateRoutes = defineRoutes({
+  home: { segment: '' },
+  checkout: {
+    state: historyState.custom<number>({
+      decode: (raw) =>
+        typeof raw === 'number' ? Optional.some(raw) : Optional.none,
+      encode: (step) => step,
+    }),
+  },
+});
+
+type StateRouter = Router<typeof stateRoutes>;
+
+/** A router on {@link stateRoutes}, at the test page's origin. */
+const stateSetup = (): StateRouter => {
+  const start = new URL('/', globalThis.location.origin);
+
+  return createRouter(stateRoutes, {
+    browser: createMemoryBrowser(start.href),
+  });
+};
+
+const checkoutStep = (router: StateRouter): number | undefined => {
+  const m = router.match.getSnapshot().value;
+
+  return m.route === 'checkout' ? m.state : undefined;
+};
+
+describe('Link with a history state', () => {
+  test('opens the page with it, and back and forward restore it', async () => {
+    const router = stateSetup();
+
+    const { Link } = createPreactRouter(router);
+
+    const { getByRole, unmount } = render(
+      <Link state={3} to={stateRoutes.checkout.href()}>
+        {'checkout'}
+      </Link>,
+    );
+
+    await act(() => {
+      fireEvent.click(getByRole('link'));
+    });
+
+    assert.strictEqual(checkoutStep(router), 3);
+
+    await act(() => {
+      router.push(stateRoutes.home.href());
+
+      router.back();
+    });
+
+    await nextTask();
+
+    assert.strictEqual(checkoutStep(router), 3);
+
+    unmount();
   });
 });

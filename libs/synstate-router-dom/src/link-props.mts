@@ -11,6 +11,13 @@ export type LinkProps = Readonly<{
   /** Replace the current history entry instead of adding one. */
   replace?: boolean;
   /**
+   * The history state to write with the navigation, as `router.push(href, {
+   * state })` takes it: the value the destination page's `state` codec
+   * encodes. A click the browser handles (a modifier key, `target`,
+   * `download`, an `ExternalHref`) writes none.
+   */
+  state?: unknown;
+  /**
    * Make the navigation inside a View Transition
    * (`document.startViewTransition`); ignored where the browser has none.
    */
