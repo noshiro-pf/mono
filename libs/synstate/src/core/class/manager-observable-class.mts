@@ -45,8 +45,22 @@ export class ManagerObservableClass<
       endPropagation();
     }
   }
-  /** Emits `nextValue` and propagates it to the descendants. */
+  /**
+   * Emits `nextValue` and propagates it to the descendants; does nothing once
+   * the observable has completed.
+   */
   protected startUpdate(nextValue: A): void {
+    // A completed observable emits nothing more, whatever still calls this: a
+    // subscribable that goes on after `unsubscribe`, a callback queued before
+    // the completion. Its children may be live, under other parents. `setNext`
+    // checks too, but `setNextIfUnobserved` below does not, and this check also
+    // keeps the update from being opened. The call is ignored rather than
+    // reported, as `source.next` ignores one after completion: a source that
+    // cannot be stopped at once calls late with nothing wrong.
+    if (this.isCompleted) {
+      return;
+    }
+
     // Nothing to propagate to (a branch no `switchMap` follows, a state written
     // before anything subscribes): the update is the value alone, and opening
     // one would cost more than storing it.

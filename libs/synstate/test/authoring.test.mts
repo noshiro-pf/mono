@@ -329,6 +329,270 @@ describe('custom operators and creators', () => {
     assert.isTrue(obs$.isCompleted);
   });
 
+  // The tests from here to the `setNext` one each spell out their own
+  // observable, and `combine` where one observes it, rather than sharing a
+  // helper, so that a case reads, and fails, on its own.
+  test('startUpdate kept from init emits nothing after complete()', () => {
+    let mut_startUpdate: ((value: number) => void) | undefined = undefined;
+
+    const obs$ = createRootObservable<number>(
+      { initialValue: Optional.none },
+      ({ startUpdate }) => {
+        mut_startUpdate = startUpdate;
+
+        return {};
+      },
+    );
+
+    const emit = (value: number): void => {
+      mut_startUpdate?.(value);
+    };
+
+    // `combine` stays live after `obs$` completes: it has another parent.
+    const combined$ = combine([obs$, source('x')]);
+
+    const mut_history: (readonly [number, string])[] = [];
+
+    combined$.subscribe((value) => {
+      mut_history.push(value);
+    });
+
+    emit(1);
+
+    obs$.complete();
+
+    emit(2);
+
+    assert.isTrue(obs$.isCompleted);
+
+    assert.isFalse(combined$.isCompleted);
+
+    assert.deepStrictEqual(obs$.getSnapshot(), Optional.some(1));
+
+    assert.deepStrictEqual(mut_history, [[1, 'x']]);
+  });
+
+  test('startUpdate kept from init stores nothing after complete(), with nothing observing', () => {
+    let mut_startUpdate: ((value: number) => void) | undefined = undefined;
+
+    const obs$ = createRootObservable<number>(
+      { initialValue: Optional.some(0) },
+      ({ startUpdate }) => {
+        mut_startUpdate = startUpdate;
+
+        return {};
+      },
+    );
+
+    const emit = (value: number): void => {
+      mut_startUpdate?.(value);
+    };
+
+    const tokenBefore = obs$.updateToken;
+
+    obs$.complete();
+
+    emit(1);
+
+    assert.deepStrictEqual(obs$.getSnapshot(), Optional.some(0));
+
+    assert.strictEqual(obs$.updateToken, tokenBefore);
+  });
+
+  test('startUpdate kept from an async child init stores nothing after complete(), with nothing observing', () => {
+    // The one test that reaches the check in `ManagerObservableClass`: a root's
+    // own `startUpdate` returns before it.
+    const num$ = source<number>();
+
+    let mut_startUpdate: ((value: number) => void) | undefined = undefined;
+
+    const obs$: Observable<number> = createAsyncChildObservable(
+      { parents: [num$], initialValue: Optional.some<number>(0) },
+      ({ startUpdate }) => {
+        mut_startUpdate = startUpdate;
+
+        return {
+          tryUpdate: () => {},
+        };
+      },
+    );
+
+    const emit = (value: number): void => {
+      mut_startUpdate?.(value);
+    };
+
+    const tokenBefore = obs$.updateToken;
+
+    obs$.complete();
+
+    emit(1);
+
+    assert.deepStrictEqual(obs$.getSnapshot(), Optional.some(0));
+
+    assert.strictEqual(obs$.updateToken, tokenBefore);
+  });
+
+  test('startUpdate kept from an async child init emits nothing after complete()', () => {
+    const num$ = source<number>();
+
+    let mut_startUpdate: ((value: number) => void) | undefined = undefined;
+
+    const obs$: Observable<number> = createAsyncChildObservable(
+      { parents: [num$], initialValue: Optional.none },
+      ({ startUpdate }) => {
+        mut_startUpdate = startUpdate;
+
+        return {
+          tryUpdate: () => {},
+        };
+      },
+    );
+
+    const emit = (value: number): void => {
+      mut_startUpdate?.(value);
+    };
+
+    // `combine` stays live after `obs$` completes: it has another parent.
+    const combined$ = combine([obs$, source('x')]);
+
+    const mut_history: (readonly [number, string])[] = [];
+
+    combined$.subscribe((value) => {
+      mut_history.push(value);
+    });
+
+    emit(1);
+
+    obs$.complete();
+
+    emit(2);
+
+    assert.isTrue(obs$.isCompleted);
+
+    assert.isFalse(combined$.isCompleted);
+
+    assert.deepStrictEqual(obs$.getSnapshot(), Optional.some(1));
+
+    assert.deepStrictEqual(mut_history, [[1, 'x']]);
+  });
+
+  test('a value a teardown emits reaches the children before the completion', () => {
+    const obs$ = createRootObservable<number>(
+      { initialValue: Optional.some(0) },
+      ({ startUpdate, onComplete }) => {
+        onComplete(() => {
+          startUpdate(1);
+        });
+
+        return {};
+      },
+    );
+
+    const mut_events: unknown[] = [];
+
+    obs$.subscribe(
+      () => {},
+      () => {
+        mut_events.push('complete');
+      },
+    );
+
+    // `combine` stays live after `obs$` completes: it has another parent.
+    combine([obs$, source('x')]).subscribe(([value]) => {
+      mut_events.push(value);
+    });
+
+    obs$.complete();
+
+    assert.isTrue(obs$.isCompleted);
+
+    assert.deepStrictEqual(mut_events, [0, 1, 'complete']);
+  });
+
+  test('what a teardown registered after completion emits is ignored', () => {
+    let mut_tools:
+      | Readonly<{
+          startUpdate: (value: number) => void;
+          onComplete: (teardown: () => void) => void;
+        }>
+      | undefined = undefined;
+
+    const obs$ = createRootObservable<number>(
+      { initialValue: Optional.some(0) },
+      ({ startUpdate, onComplete }) => {
+        mut_tools = { startUpdate, onComplete };
+
+        return {};
+      },
+    );
+
+    let mut_lateTeardownRan = false;
+
+    const registerLate = (): void => {
+      mut_tools?.onComplete(() => {
+        mut_lateTeardownRan = true;
+
+        mut_tools?.startUpdate(1);
+      });
+    };
+
+    // `combine` stays live after `obs$` completes: it has another parent.
+    const mut_history: (readonly [number, string])[] = [];
+
+    combine([obs$, source('x')]).subscribe((value) => {
+      mut_history.push(value);
+    });
+
+    obs$.complete();
+
+    registerLate();
+
+    assert.isTrue(mut_lateTeardownRan);
+
+    assert.deepStrictEqual(obs$.getSnapshot(), Optional.some(0));
+
+    assert.deepStrictEqual(mut_history, [[0, 'x']]);
+  });
+
+  test('setNext called after the operator completed itself emits nothing', () => {
+    const num$ = source<number>();
+
+    const obs$: Observable<number> = createSyncChildObservable(
+      { parents: [num$], initialValue: Optional.none },
+      ({ setNext, complete }) =>
+        (updateToken) => {
+          const sn = num$.getSnapshot();
+
+          if (num$.updateToken !== updateToken || Optional.isNone(sn)) {
+            return;
+          }
+
+          if (Optional.unwrap(sn) >= 2) {
+            complete();
+          }
+
+          setNext(Optional.unwrap(sn), updateToken);
+        },
+    );
+
+    // `combine` stays live after `obs$` completes: it has another parent.
+    const mut_history: (readonly [number, string])[] = [];
+
+    combine([obs$, source('x')]).subscribe((value) => {
+      mut_history.push(value);
+    });
+
+    num$.next(1);
+
+    num$.next(2);
+
+    assert.isTrue(obs$.isCompleted);
+
+    assert.deepStrictEqual(obs$.getSnapshot(), Optional.some(1));
+
+    assert.deepStrictEqual(mut_history, [[1, 'x']]);
+  });
+
   test('a custom async operator passes on what it holds on complete, not on dispose', () => {
     vi.useFakeTimers();
 

@@ -1,7 +1,9 @@
-import { Result } from 'ts-data-forge';
+import { Optional, Result } from 'ts-data-forge';
+import { combine } from '../combine/index.mjs';
 import { take } from '../operators/index.mjs';
 import type { Subscribable } from '../types/index.mjs';
 import { fromSubscribable } from './from-subscribable.mjs';
+import { source } from './source.mjs';
 
 describe(fromSubscribable, () => {
   test('complete() unsubscribes from the subscribable once', () => {
@@ -18,6 +20,126 @@ describe(fromSubscribable, () => {
     emit(1);
 
     assert.isTrue(observable$.isCompleted);
+  });
+
+  test('a value the subscribable emits after complete() is neither stored nor propagated', () => {
+    // A subscribable whose `unsubscribe` does not stop it, as one calling back
+    // from a task queued before `unsubscribe` was called does.
+    let mut_onNext: ((value: number) => void) | undefined = undefined;
+
+    const emit = (value: number): void => {
+      mut_onNext?.(value);
+    };
+
+    const observable$ = fromSubscribable<number>({
+      subscribe: (onNext) => {
+        mut_onNext = onNext;
+
+        return { unsubscribe: () => {} };
+      },
+    });
+
+    // `combine` stays live after `observable$` completes: it has another
+    // parent.
+    const combined$ = combine([observable$, source('x')]);
+
+    const mut_history: (readonly [Result<number, unknown>, string])[] = [];
+
+    combined$.subscribe((value) => {
+      mut_history.push(value);
+    });
+
+    emit(1);
+
+    observable$.complete();
+
+    emit(2);
+
+    assert.isTrue(observable$.isCompleted);
+
+    assert.isFalse(combined$.isCompleted);
+
+    assert.deepStrictEqual(
+      observable$.getSnapshot(),
+      Optional.some(Result.ok(1)),
+    );
+
+    assert.deepStrictEqual(mut_history, [[Result.ok(1), 'x']]);
+  });
+
+  test('an error the subscribable reports after complete() is neither stored nor propagated', () => {
+    let mut_onError: ((error?: unknown) => void) | undefined = undefined;
+
+    const fail = (error: unknown): void => {
+      mut_onError?.(error);
+    };
+
+    const observable$ = fromSubscribable<number>({
+      subscribe: (_onNext, onError) => {
+        mut_onError = onError;
+
+        return { unsubscribe: () => {} };
+      },
+    });
+
+    const mut_history: Result<number, unknown>[] = [];
+
+    combine([observable$, source('x')]).subscribe(([result]) => {
+      mut_history.push(result);
+    });
+
+    observable$.complete();
+
+    fail('late');
+
+    assert.deepStrictEqual(observable$.getSnapshot(), Optional.none);
+
+    assert.deepStrictEqual(mut_history, []);
+  });
+
+  test('a value delivered from inside unsubscribe reaches subscribers and children before the completion', () => {
+    let mut_onNext: ((value: number) => void) | undefined = undefined;
+
+    const observable$ = fromSubscribable<number>({
+      subscribe: (onNext) => {
+        mut_onNext = onNext;
+
+        return {
+          unsubscribe: () => {
+            mut_onNext?.(9);
+          },
+        };
+      },
+    });
+
+    // `combine` stays live, so the completion of `observable$`, which the
+    // subscriber hears, is recorded in both lists.
+    const mut_subscriberEvents: (Result<number, unknown> | 'complete')[] = [];
+
+    const mut_combineEvents: (Result<number, unknown> | 'complete')[] = [];
+
+    observable$.subscribe(
+      (result) => {
+        mut_subscriberEvents.push(result);
+      },
+      () => {
+        mut_subscriberEvents.push('complete');
+
+        mut_combineEvents.push('complete');
+      },
+    );
+
+    combine([observable$, source('x')]).subscribe(([result]) => {
+      mut_combineEvents.push(result);
+    });
+
+    observable$.complete();
+
+    assert.isTrue(observable$.isCompleted);
+
+    assert.deepStrictEqual(mut_subscriberEvents, [Result.ok(9), 'complete']);
+
+    assert.deepStrictEqual(mut_combineEvents, [Result.ok(9), 'complete']);
   });
 
   test('dispose() unsubscribes from the subscribable', () => {

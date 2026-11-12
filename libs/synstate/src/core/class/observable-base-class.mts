@@ -221,6 +221,12 @@ export class ObservableBaseClass<
    * visited for it again.
    */
   protected setNext(nextValue: A, updateToken: UpdateToken): void {
+    // A completed observable emits nothing more: a custom operator may call
+    // `setNext` after completing itself, in `tryUpdate` or later.
+    if (this.#mut_isCompleted) {
+      return;
+    }
+
     this.#mut_updateToken = updateToken;
 
     this.#mut_snapshot = Optional.some(nextValue);
@@ -257,6 +263,8 @@ export class ObservableBaseClass<
    * that it emitted.
    */
   protected setNextIfUnobserved(nextValue: A): boolean {
+    // No completed check, unlike `setNext`: its one caller, `startUpdate`,
+    // makes it first.
     if (this.hasChild || this.hasSubscriber) {
       return false;
     }
@@ -328,6 +336,16 @@ export class ObservableBaseClass<
       return;
     }
 
+    // `isCompleted` turns true after the teardown, so a teardown that throws
+    // leaves the observable as it was, and a value the teardown makes it emit
+    // (the last value of a custom root, which has no `flush`, or one a
+    // subscribable delivers from inside `unsubscribe`) still propagates.
+    // Re-entry is not guarded yet: a `complete()` a subscriber calls on hearing
+    // that value runs every teardown again, without end if one emits every
+    // time. It takes a teardown that emits and a subscriber that completes this
+    // observable on that value. A guard has to settle too what a retry after a
+    // teardown that throws runs again, and when a teardown registered during
+    // the teardown runs.
     this.teardown();
 
     this.#mut_isCompleted = true;

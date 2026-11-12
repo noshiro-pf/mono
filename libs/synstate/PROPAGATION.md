@@ -86,6 +86,10 @@ U の中で作られたノードは、作られた後に親が U で値を出し
 5. `closeUpdate(token)`（`finally`）：例外で残ったスロットを空にし、`isOpen` を偽にして、`level` を 1 減らす。
 6. `endPropagation()`（`finally`）：一番外側なら、`runAfterPropagation` で延期した処理を走らせる。
 
+### complete したノードへの書き込み
+
+complete したノードの `startUpdate` は、上の 1〜6 も値の書き込みも行わずに戻ります。子が別の親の下でまだ生きていても、complete したノードから値は届きません。`fromSubscribable` の購読対象が `unsubscribe` の後も値を渡してくる場合や、`createRootObservable` や `createAsyncChildObservable` の `init` が受け取った `startUpdate` を complete の後で呼ぶ場合がこれに当たります。この判定はほかのどの処理よりも先に行うので、伝播中の書き込みの警告（ルート）も出ません。`setNext` も同じ判定をし、自分を complete した後のカスタム演算子が呼んでも何も書きません。`dispose` が complete したことにするのは teardown の後なので、teardown の中で出た値（`flush` のないカスタムのルートが `onComplete` で出す最後の値や、`unsubscribe` の最中に購読対象が渡してくる値）は、これまでどおり complete より先に子と購読者に届きます。complete の後に `onComplete` で登録した teardown はすぐに走り、その中で出た値は無視されます。
+
 ### 誰も観測していない書き込み
 
 子も購読者もないノードへの書き込み（`switchMap` が追っていない branch、まだ誰も購読も派生もしていない state など。派生した子があれば、その子が観測されていなくても通常の更新になります）は、上の 1〜6 を行いません。届ける相手がいないので、値と `issueUnqueuedToken()` が返す新しいトークンを書いて戻ります（`setNextIfUnobserved`）。そのトークンにはキューがありませんが、子がいないので `enqueueChildren` に渡されることはなく、`setNext` に渡されることもありません。トークンを毎回作るのは、`updateToken` を保存して比べる利用者に、書き込みがあったことを見せるためです。伝播中の書き込みの警告（ルート）は、この判定の前に行います。

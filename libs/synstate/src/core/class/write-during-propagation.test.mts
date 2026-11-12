@@ -219,6 +219,39 @@ describe('a write to a root observable while an update is propagating (#2336)', 
 
     assert.deepStrictEqual(warn, []);
   });
+
+  test('does not warn of a write to a completed root, which it ignores', async () => {
+    // A subscribable that goes on calling back after `unsubscribe`.
+    let mut_onNext: ((value: number) => void) | undefined = undefined;
+
+    const emit = (value: number): void => {
+      mut_onNext?.(value);
+    };
+
+    const completed$ = fromSubscribable<number>({
+      subscribe: (onNext) => {
+        mut_onNext = onNext;
+
+        return { unsubscribe: () => {} };
+      },
+    });
+
+    completed$.complete();
+
+    const [a$, setA] = createState(0);
+
+    a$.subscribe((a) => {
+      emit(a);
+    });
+
+    const warn = await captureWarnings(() => {
+      setA(1);
+    });
+
+    assert.deepStrictEqual(warn, []);
+
+    assert.deepStrictEqual(completed$.getSnapshot(), Optional.none);
+  });
 });
 
 describe('a stateful operator updates its state before setNext, which a write from a subscriber re-enters', () => {
