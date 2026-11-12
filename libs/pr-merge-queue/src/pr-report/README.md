@@ -66,6 +66,16 @@ pnpm run pr-report -- --merged-limit 5  # その最大件数
 pnpm run pr-report -- --issues-limit 10 # open な issue の最大件数
 ```
 
+**`pnpm run pr-report` で実行すればプロキシ配下でも動きます。** Node の
+`fetch` は `HTTPS_PROXY` を自動では見ないため、`pr-merge-queue` のコマンドを実
+行するルートのスクリプトはどれも `NODE_USE_ENV_PROXY=1` を付けています
+（`check:root:proxy-scripts` がスクリプトの文面から、読み取れる範囲で確かめま
+す。どこまで読めるかはチェックのコメントにあります）。コマンドのファイルを直
+接実行するときは自分で付けてください（ルートのスクリプトの `NODE_OPTIONS` は
+undici の実験的機能の警告を消しているだけです）。`NODE_USE_ENV_PROXY=1` が無
+いと Claude Code のクラウドセッションではプロキシを迂回して
+`401 Bad credentials` になり、トークンの問題に見えます。
+
 `--merged-days`（既定 7）と `--merged-limit`（既定 20）は日数と件数の両方から
 掛かります。上限は「入らないから」ではなく「読めなくなるから」で、20件を超えた
 あたりからこのセクションは一覧ではなく履歴になります。
@@ -194,6 +204,16 @@ pnpm run pr-report -- --merged-days 3   # how far back "recently merged" goes
 pnpm run pr-report -- --merged-limit 5  # and how many it lists
 pnpm run pr-report -- --issues-limit 10 # how many open issues it lists
 ```
+
+Run as `pnpm run pr-report`, it works behind a proxy: Node's `fetch` does not
+read `HTTPS_PROXY` on its own, so the root script sets `NODE_USE_ENV_PROXY=1`,
+as every root script running a `pr-merge-queue` command does
+(`check:root:proxy-scripts` checks this from each script's text, as far as the
+text shows a command; its comments say how far). If you run the command file
+directly, set `NODE_USE_ENV_PROXY=1` yourself (the root script's `NODE_OPTIONS`
+only silences undici's warning about an experimental feature). Without the
+variable, a Claude Code cloud session's request bypasses the proxy and fails
+with `401 Bad credentials`, which reads like a token problem and is not one.
 
 The merged section is bounded twice, by days (7) and by count (20). The cap is
 about reading rather than about fitting: past twenty the section stops being

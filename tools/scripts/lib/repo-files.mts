@@ -4,9 +4,11 @@
 
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
-import { Arr, Result, unknownToString } from 'ts-data-forge';
+import { Arr, Json, Result, unknownToString } from 'ts-data-forge';
 import { $, glob } from 'ts-repo-utils';
+import type { ReadonlyRecord } from 'ts-type-forge';
 import { projectRootPath } from '../project-root-path.mjs';
+import { readScripts } from './manifest-scripts.mjs';
 
 /** Where the workflows are, relative to the repository root. */
 export const WORKFLOW_GLOB = '.github/workflows/*.yml';
@@ -72,6 +74,25 @@ export const readRepositoryFile = async (
         `Failed to read ${relativePath}: ${unknownToString(result.value)}`,
       )
     : Result.ok(result.value);
+};
+
+/** The root `package.json`'s `scripts`, as {@link readScripts} reads them. */
+export const readRootPackageScripts = async (): Promise<
+  Result<ReadonlyRecord<string, string>, string>
+> => {
+  const contents = await readRepositoryFile('package.json');
+
+  if (Result.isErr(contents)) {
+    return contents;
+  }
+
+  const parsed = Json.parse(contents.value);
+
+  return Result.isErr(parsed)
+    ? Result.err(
+        `Failed to parse package.json: ${unknownToString(parsed.value)}`,
+      )
+    : Result.ok(readScripts(parsed.value));
 };
 
 /** The tracked files, and every directory that holds one. */

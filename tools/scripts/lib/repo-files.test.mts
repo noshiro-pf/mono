@@ -1,11 +1,23 @@
 // cspell:ignore qiita
 
+import { Result } from 'ts-data-forge';
 import {
   hasPath,
   isRepositoryProse,
   isSitePage,
+  readRootPackageScripts,
   toTree,
 } from './repo-files.mjs';
+
+describe(readRootPackageScripts, () => {
+  test("reads the root package.json's scripts", async () => {
+    const scripts = await readRootPackageScripts();
+
+    assert.isTrue(Result.isOk(scripts));
+
+    assert.isString(scripts.value['check:root:test']);
+  });
+});
 
 describe('toTree and hasPath', () => {
   const tree = toTree(['libs/pkg/src/a.mts', 'README.md']);
