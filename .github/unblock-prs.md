@@ -2,10 +2,11 @@
 
 # The `unblock-prs` skill in this repository
 
-What the skill (`libs/pr-merge-queue/claude-plugin/skills/unblock-prs/`,
-linked into `.claude/skills/`) leaves to the repository. `CLAUDE.md` holds
-too, above all "Session rules" and "Commits and pull requests": a fix is
-amended onto the branch's one commit, and `pnpm run fmt` runs on it.
+What the skill (`libs/pr-merge-queue/claude-plugin/skills/unblock-prs/`, linked
+into `.claude/skills/`) leaves to the repository.
+`CLAUDE.md` ("Session rules" and "Commits and pull requests" above all) holds
+too: a fix is amended onto the branch's one commit, and `pnpm run fmt` runs on
+it.
 
 ## Commands
 

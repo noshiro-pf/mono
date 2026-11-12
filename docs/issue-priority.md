@@ -49,7 +49,7 @@ open な issue はどれも、**優先度の段を表す `priority:<段>` ラベ
       ものは `B`。
 2. **セキュリティは `A`。** ただし深刻なもの（認証・権限の回避、個人情報の
    漏洩、悪用の手順として読めるもの）は公開 issue にしない。`CLAUDE.md` の
-   「Security findings」のとおり `noshiro-pf/mono-security` に書く。ここに残すのは
+   「Security findings」節のとおり `noshiro-pf/mono-security` に書く。ここに残すのは
    ハードニングのような軽微なもので、`B` か `C` にする。
 3. **機能追加よりバグ修正を高くする。** ただしバグの段は、それを踏む人がいるかで
    決める。

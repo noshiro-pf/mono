@@ -35,6 +35,20 @@ describe('collectCitations', () => {
     );
   });
 
+  test('reads a heading in parentheses after the name', () => {
+    assert.deepStrictEqual(
+      collectCitations('`CLAUDE.md` ("Lint rules") asks every reader'),
+      ['Lint rules'],
+    );
+
+    assert.deepStrictEqual(
+      collectCitations(
+        'CLAUDE.md ("Testing", "Coding style" and "Libraries").',
+      ),
+      ['Testing', 'Coding style', 'Libraries'],
+    );
+  });
+
   test('reads a run of headings after one mention of the file', () => {
     assert.deepStrictEqual(
       collectCitations(
