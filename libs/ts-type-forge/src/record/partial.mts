@@ -16,7 +16,12 @@ import type {
  * ```ts
  * type Data = { a: number; b: string; c: boolean };
  * type PartiallyPartialData = PartiallyPartial<Data, 'a' | 'b'>;
- * // Result: { a?: number; b?: string; c: boolean }
+ *
+ * expectType<
+ *   PartiallyPartialData,
+ *   // Result:
+ *   { a?: number; b?: string; c: boolean }
+ * >('=');
  * ```
  */
 export type PartiallyPartial<T, K extends keyof T> = MergeIntersection<
@@ -32,7 +37,12 @@ export type PartiallyPartial<T, K extends keyof T> = MergeIntersection<
  * ```ts
  * type Data = { a: number; b: string; c: boolean };
  * type PartiallyOptionalData = PartiallyOptional<Data, 'a' | 'b'>;
- * // Result: { a?: number; b?: string; c: boolean }
+ *
+ * expectType<
+ *   PartiallyOptionalData,
+ *   // Result:
+ *   { a?: number; b?: string; c: boolean }
+ * >('=');
  * ```
  */
 export type PartiallyOptional<T, K extends keyof T> = PartiallyPartial<T, K>;
@@ -47,7 +57,12 @@ export type PartiallyOptional<T, K extends keyof T> = PartiallyPartial<T, K>;
  * ```ts
  * type Data = { a: number; b: string; c: boolean };
  * type PartiallyNullableData = PartiallyNullable<Data, 'a' | 'b'>;
- * // Result: { a: number | undefined; b: string | undefined; c: boolean }
+ *
+ * expectType<
+ *   PartiallyNullableData,
+ *   // Result:
+ *   { a: number | undefined; b: string | undefined; c: boolean }
+ * >('=');
  * ```
  */
 export type PartiallyNullable<T, K extends keyof T> = MergeIntersection<
@@ -64,7 +79,12 @@ export type PartiallyNullable<T, K extends keyof T> = MergeIntersection<
  * ```ts
  * type Data = { a?: number; b?: string; c?: boolean };
  * type PartiallyRequiredData = PartiallyRequired<Data, 'a' | 'b'>;
- * // Result: { a: number; b: string; c?: boolean }
+ *
+ * expectType<
+ *   PartiallyRequiredData,
+ *   // Result:
+ *   { a: number; b: string; c?: boolean }
+ * >('=');
  * ```
  */
 export type PartiallyRequired<T, K extends keyof T> = MergeIntersection<

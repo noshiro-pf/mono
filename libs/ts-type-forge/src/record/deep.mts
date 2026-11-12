@@ -21,13 +21,18 @@ import type {
  * ```ts
  * type Data = { a: number; b: { c: string[]; d: Map<number, boolean> } };
  * type ReadonlyData = DeepReadonly<Data>;
- * // Result: {
- * //   readonly a: number;
- * //   readonly b: {
- * //     readonly c: readonly string[];
- * //     readonly d: ReadonlyMap<number, boolean>;
- * //   };
- * // }
+ *
+ * expectType<
+ *   ReadonlyData,
+ *   // Result:
+ *   {
+ *     readonly a: number;
+ *     readonly b: {
+ *       readonly c: readonly string[];
+ *       readonly d: ReadonlyMap<number, boolean>;
+ *     };
+ *   }
+ * >('=');
  * ```
  */
 export type DeepReadonly<T> = T extends Primitive
@@ -63,7 +68,12 @@ export type DeepReadonly<T> = T extends Primitive
  * ```ts
  * type ReadonlyData = Readonly<{ a: number; b: { c: readonly string[] } }>;
  * type MutableData = DeepMutable<ReadonlyData>;
- * // Result: { a: number; b: { c: string[] } }
+ *
+ * expectType<
+ *   MutableData,
+ *   // Result:
+ *   { a: number; b: { c: string[] } }
+ * >('=');
  * ```
  */
 export type DeepMutable<T> = T extends Primitive
@@ -148,7 +158,12 @@ export type DeepPartial<T> = T extends Primitive
  * ```ts
  * type PartialData = { a?: number; b?: { c?: string[] } };
  * type RequiredData = DeepRequired<PartialData>;
- * // Result: { a: number; b: { c: string[] } }
+ *
+ * expectType<
+ *   RequiredData,
+ *   // Result:
+ *   { a: number; b: { c: string[] } }
+ * >('=');
  * ```
  */
 export type DeepRequired<T> = T extends Primitive
