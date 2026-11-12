@@ -3,8 +3,8 @@
 // Every harness's `tsconfig.lib-files-check.branded.json` names this file next
 // to `output/lib-files-branded`, so it is checked by all twelve TypeScript
 // minors against the branded declarations alone. The plain flavor types these
-// calls `number`, which is why the assertions live apart from
-// `lib-check-entry.ts`.
+// calls `number`, and makes the results of `Object.fromEntries` mutable, which
+// is why the assertions live apart from `lib-check-entry.ts`.
 
 import type {
   FiniteNumber,
@@ -234,3 +234,81 @@ export const absTypes = [
 
 // @ts-expect-error `Math.abs(-32768)` is `32768`, past `Int16`'s upper bound.
 export const absOfInt16AsInt16: Int16 = Math.abs(int16);
+
+/**
+ * #2877 — the cases of `lib-check-entry.object-from-entries.ts`, in this
+ * flavor, whose `Object.fromEntries` results are readonly.
+ */
+export const fromEntriesTypes = (
+  k: 'x' | 'y',
+  map: ReadonlyMap<'a' | 'b', number>,
+  s: string,
+  indexSignatureMap: ReadonlyMap<`a-${string}` | `b-${string}`, number>,
+  openStringMap: ReadonlyMap<'a' | (string & {}), number>,
+): readonly true[] => {
+  const distinctKeys = Object.fromEntries([
+    ['x', 1],
+    ['y', 3],
+  ]);
+
+  const repeatedKey = Object.fromEntries([
+    ['x', 1],
+    ['x', 2],
+  ]);
+
+  const unionKey = Object.fromEntries([[k, 1]]);
+
+  const unionKeyAfterLiteral = Object.fromEntries([
+    ['x', 1],
+    [k, 2],
+  ]);
+
+  const literalKeyAfterUnion = Object.fromEntries([
+    [k, 1],
+    ['x', 2],
+  ]);
+
+  const mapWithUnionKey = Object.fromEntries(map);
+
+  const indexSignatureKey = Object.fromEntries([[s, 1]]);
+
+  const mapWithIndexSignatureKeys = Object.fromEntries(indexSignatureMap);
+
+  const mapWithOpenStringKey = Object.fromEntries(openStringMap);
+
+  return [
+    true satisfies TypeEq<
+      typeof distinctKeys,
+      { readonly x: 1; readonly y: 3 }
+    >,
+    true satisfies TypeEq<typeof repeatedKey, { readonly x: 2 }>,
+    true satisfies TypeEq<typeof unionKey, { readonly x?: 1; readonly y?: 1 }>,
+    true satisfies TypeEq<
+      typeof unionKeyAfterLiteral,
+      { readonly x: 1 | 2; readonly y?: 2 }
+    >,
+    true satisfies TypeEq<
+      typeof literalKeyAfterUnion,
+      { readonly y?: 1; readonly x: 2 }
+    >,
+    true satisfies TypeEq<
+      typeof mapWithUnionKey,
+      { readonly a?: number; readonly b?: number }
+    >,
+    true satisfies TypeEq<
+      typeof indexSignatureKey,
+      { readonly [k: string]: 1 }
+    >,
+    true satisfies TypeEq<
+      typeof mapWithIndexSignatureKeys,
+      {
+        readonly [k: `a-${string}`]: number;
+        readonly [k: `b-${string}`]: number;
+      }
+    >,
+    true satisfies TypeEq<
+      (typeof mapWithOpenStringKey)['a'],
+      number | undefined
+    >,
+  ];
+};
