@@ -28,6 +28,12 @@ export type AnyRestParamCodec = Readonly<{
   encode: (value: never) => RestSegments;
 }>;
 
+/** Any history state codec, whatever its value type. */
+export type AnyHistoryStateCodec = Readonly<{
+  decode: (raw: unknown) => Optional<unknown>;
+  encode: (value: never) => unknown;
+}>;
+
 /** Any search codec, whatever its value type. */
 export type AnySearchCodec = Readonly<{
   decode: (raw: never) => unknown;
@@ -50,6 +56,13 @@ export type RouteDefinition = Readonly<{
   search?: ReadonlyRecord<string, AnySearchCodec>;
   /** `false` for a node that is not a page of its own, such as a layout. */
   page?: false;
+  /**
+   * The history state of this page (`historyState.custom` or
+   * `historyState.schema`): written with `push(href, { state })`, read back
+   * typed as the match's `state`, and restored by back and forward. Not
+   * inherited, and absent from the match of a page that declares none.
+   */
+  state?: AnyHistoryStateCodec;
   /**
    * Data of the node's own, typed as written: a breadcrumb's label, say. The
    * node exposes it as `meta`, and the matched branch lists it
@@ -89,7 +102,8 @@ export type ReservedRouteKey =
   | 'params'
   | 'pattern'
   | 'search'
-  | 'segment';
+  | 'segment'
+  | 'state';
 
 // Validation: maps a mistake to a type whose name says what is wrong
 
@@ -209,6 +223,13 @@ type DisplayPattern<Path extends string> = Path extends '' ? '/' : Path;
 
 type MetaOf<D> = D extends Readonly<{ meta: infer M }> ? M : undefined;
 
+type OwnState<D> =
+  D extends Readonly<{
+    state: Readonly<{ encode: (value: infer T) => unknown }>;
+  }>
+    ? Readonly<{ state: T | undefined }>
+    : unknown;
+
 /** The path parameters of a node, its ancestors' included. */
 export type RouteParams<ParamCodecs> = Readonly<{
   [K in keyof ParamCodecs]: ParamValue<ParamCodecs[K]>;
@@ -246,11 +267,16 @@ export type HrefFunction<ParamCodecs, SearchCodecs> = [
       options?: HrefOptions<SearchCodecs>,
     ) => Href;
 
-/** A location to match: a pathname without the base path, and a query. */
+/**
+ * A location to match: a pathname without the base path, a query, and the
+ * history entry's state as the browser stores it.
+ */
 export type RouteLocation = Readonly<{
   pathname: string;
   /** With or without the leading `?`. */
   search?: string;
+  /** The entry's raw state, which the page's `state` codec reads. */
+  state?: unknown;
 }>;
 
 // Nodes: what `defineRoutes` returns
@@ -363,7 +389,8 @@ type PageMatches<Ds, ParentId extends string, ParamCodecs, SearchCodecs> = {
             route: JoinId<ParentId, K>;
             params: RouteParams<ParamCodecs & OwnParamCodecs<Ds[K]>>;
             search: RouteSearch<SearchCodecs & OwnSearchCodecs<Ds[K]>>;
-          }>)
+          }> &
+            OwnState<Ds[K]>)
     | (Ds[K] extends Readonly<{ children: infer C }>
         ? PageMatches<
             C,

@@ -1,6 +1,10 @@
 import type { FixedLengthTuple, ReadonlyRecord } from 'ts-type-forge';
 import type { Href } from '../href.mjs';
-import type { RouteDefinitions, RouteLocation } from '../route-types.mjs';
+import type {
+  AnyHistoryStateCodec,
+  RouteDefinitions,
+  RouteLocation,
+} from '../route-types.mjs';
 
 /** Where the compiled tree is kept on the object `defineRoutes` returns. */
 export const routeTreeKey: unique symbol = Symbol('synstate-router/route-tree');
@@ -10,6 +14,8 @@ export type RouteTree<D extends RouteDefinitions> = Readonly<{
   definition: D;
   /** Resolves a location against the whole tree. */
   resolve: (location: RouteLocation) => ResolvedLocation;
+  /** The history state codec the page declares, if any. */
+  stateCodecOf: (page: string) => AnyHistoryStateCodec | undefined;
 }>;
 
 /** What the whole tree resolves a location to. */
@@ -23,6 +29,8 @@ export type ResolvedLocation = Readonly<
       pathname: string;
       params: ReadonlyRecord<string, unknown>;
       search: ReadonlyRecord<string, unknown>;
+      /** Present when the page declares a state, `undefined` for none. */
+      state?: unknown;
     }
 >;
 

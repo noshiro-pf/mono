@@ -11,6 +11,11 @@ export type RouterBrowser = Readonly<{
   /** The current URL. */
   location: Readonly<{ href: string }>;
   history: Readonly<{
+    /**
+     * The current entry's state, which the router reads a page's typed `state`
+     * from. Left out, no page has one.
+     */
+    state?: unknown;
     pushState: (data: unknown, unused: string, url: string) => void;
     replaceState: (data: unknown, unused: string, url: string) => void;
     /** Moves through the history; the URL changes when `popstate` fires. */
@@ -127,8 +132,8 @@ export const createMemoryBrowser = (
 ): MemoryBrowser => {
   const hasElement = options?.hasElement ?? (() => true);
 
-  const mut_history: { entries: readonly URL[]; index: number } = {
-    entries: [new URL(href)],
+  const mut_history: { entries: readonly Entry[]; index: number } = {
+    entries: [{ url: new URL(href), state: null }],
     index: 0,
   };
 
@@ -138,8 +143,13 @@ export const createMemoryBrowser = (
 
   const mut_listeners = new Set<() => void>();
 
-  const url = (): URL =>
-    mut_history.entries[mut_history.index] ?? new URL(href);
+  const entry = (): Entry =>
+    mut_history.entries[mut_history.index] ?? {
+      url: new URL(href),
+      state: null,
+    };
+
+  const url = (): URL => entry().url;
 
   const firePopstate = (): void => {
     for (const listener of mut_listeners) {
@@ -147,7 +157,7 @@ export const createMemoryBrowser = (
     }
   };
 
-  const pushEntry = (next: Readonly<URL>): void => {
+  const pushEntry = (next: Entry): void => {
     mut_history.entries = Arr.toPushed(
       mut_history.entries.slice(0, mut_history.index + 1),
       next,
@@ -163,14 +173,17 @@ export const createMemoryBrowser = (
       },
     },
     history: {
-      pushState: (_data, _unused, next) => {
-        pushEntry(new URL(next, url()));
+      get state() {
+        return entry().state;
       },
-      replaceState: (_data, _unused, next) => {
-        mut_history.entries = mut_history.entries.with(
-          mut_history.index,
-          new URL(next, url()),
-        );
+      pushState: (data, _unused, next) => {
+        pushEntry({ url: new URL(next, url()), state: cloneState(data) });
+      },
+      replaceState: (data, _unused, next) => {
+        mut_history.entries = mut_history.entries.with(mut_history.index, {
+          url: new URL(next, url()),
+          state: cloneState(data),
+        });
       },
       go: (delta) => {
         setTimeout(() => {
@@ -198,7 +211,8 @@ export const createMemoryBrowser = (
       const next = withHash(url().href, hash);
 
       if (next.href !== url().href) {
-        pushEntry(next);
+        // A fragment navigation's new entry has no state, as in a browser.
+        pushEntry({ url: next, state: null });
 
         firePopstate();
       }
@@ -241,3 +255,13 @@ export const createMemoryBrowser = (
     title: () => mut_title.current,
   };
 };
+
+/** A history entry of the memory browser. */
+type Entry = Readonly<{ url: Readonly<URL>; state: unknown }>;
+
+/**
+ * The state as a browser stores it: a structured clone, so that a test sees the
+ * copy the router would read back, and `undefined` as `null`.
+ */
+const cloneState = (data: unknown): unknown =>
+  data === undefined ? null : structuredClone(data);

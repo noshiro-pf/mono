@@ -15,6 +15,7 @@ import {
   type RouteTree,
 } from './internal/index.mjs';
 import type {
+  AnyHistoryStateCodec,
   AnyParamCodec,
   AnyRestParamCodec,
   AnyRoutes,
@@ -80,7 +81,21 @@ export const defineRoutes = <const D extends RouteDefinitions>(
     return Optional.isSome(found) ? found.value.page.id : undefined;
   };
 
-  const tree: RouteTree<RouteDefinitions> = { definition, resolve } as const;
+  const stateCodecs: ReadonlyMap<string, AnyHistoryStateCodec> = new Map(
+    Arr.generate(function* () {
+      for (const page of pagesOf(root)) {
+        if (page.state !== undefined) {
+          yield [page.id, page.state] as const;
+        }
+      }
+    }),
+  );
+
+  const tree: RouteTree<RouteDefinitions> = {
+    definition,
+    resolve,
+    stateCodecOf: (page) => stateCodecs.get(page),
+  } as const;
 
   const routes: AnyRoutes = {
     ...buildNodes(root, { tree, resolve, resolvePage }),
@@ -122,6 +137,7 @@ export const matchRoutes = <R extends AnyRoutes>(
           route: resolved.page,
           params: resolved.params,
           search: resolved.search,
+          ...(hasKey(resolved, 'state') ? { state: resolved.state } : {}),
         } as const);
 
   // eslint-disable-next-line total-functions/no-unsafe-type-assertion -- the resolver reads values with the codecs the type is computed from
@@ -147,7 +163,11 @@ type Context = Readonly<{
 }>;
 
 /** A page, as the resolver needs it. */
-type Page = Readonly<{ id: string; search: SearchEntries }>;
+type Page = Readonly<{
+  id: string;
+  search: SearchEntries;
+  state: AnyHistoryStateCodec | undefined;
+}>;
 
 type CompiledNode = Context &
   Readonly<{
@@ -198,6 +218,7 @@ const reservedKeys: ReadonlySet<string> = new Set<ReservedRouteKey>([
   'pattern',
   'search',
   'segment',
+  'state',
 ]);
 
 // Compiling
@@ -440,7 +461,7 @@ const compileNode = (
   const page: Page | undefined =
     definition.page === false
       ? undefined
-      : ({ id, search: context.search } as const);
+      : ({ id, search: context.search, state: definition.state } as const);
 
   const children = compileChildren(definition.children ?? {}, context);
 
@@ -467,6 +488,13 @@ const compileChildren = (
   Object.entries(definitions).map(([key, definition]) =>
     compileNode(key, definition, parent),
   );
+
+/** Every page of the tree. */
+const pagesOf = (nodes: readonly CompiledNode[]): readonly Page[] =>
+  nodes.flatMap((node) => [
+    ...(node.page === undefined ? [] : [node.page]),
+    ...pagesOf(node.children),
+  ]);
 
 // Resolving
 
@@ -603,6 +631,17 @@ const readSearch = (
   );
 };
 
+/** The entry's state read by the page's codec; `undefined` when it has none. */
+const readState = (codec: AnyHistoryStateCodec, raw: unknown): unknown => {
+  if (raw === undefined || raw === null) {
+    return undefined;
+  }
+
+  const decoded = codec.decode(raw);
+
+  return Optional.isSome(decoded) ? decoded.value : undefined;
+};
+
 const resolveLocation = (
   rootLevel: Level,
   location: RouteLocation,
@@ -628,6 +667,9 @@ const resolveLocation = (
     pathname,
     params: Object.fromEntries(params),
     search: readSearch(page, location.search ?? ''),
+    ...(page.state === undefined
+      ? {}
+      : { state: readState(page.state, location.state) }),
   };
 };
 
