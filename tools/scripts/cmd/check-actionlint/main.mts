@@ -15,6 +15,7 @@ import {
   releaseBinaryCacheDir,
   type ReleaseBinaryPin,
 } from '../../lib/release-binaries.mjs';
+import { listActionFiles } from '../../lib/repo-files.mjs';
 import { projectRootPath } from '../../project-root-path.mjs';
 import {
   extractRunScripts,
@@ -689,22 +690,15 @@ const lintWorkflowTextBinary: LintWorkflowText = async (
 const readCompositeActions = async (): Promise<
   Result<readonly Readonly<{ path: string; text: string }>[], string>
 > => {
-  // Where the composite actions are kept (see "Setup" in
-  // .github/workflows/README.md); none at all is an empty list.
-  const files = await glob('.github/actions/**/action.{yml,yaml}', {
-    cwd: projectRootPath,
-    absolute: true,
-  });
+  const files = await listActionFiles();
 
   if (Result.isErr(files)) {
-    return Result.err(
-      `❌ Could not list the composite actions: ${unknownToString(files.value)}`,
-    );
+    return Result.err(`❌ ${files.value}`);
   }
 
   const texts = await Result.fromPromise(
     Promise.all(
-      files.value.toSorted().map(async (file) => ({
+      files.value.map(async (file) => ({
         path: path.relative(projectRootPath, file),
         // eslint-disable-next-line security/detect-non-literal-fs-filename -- a file the glob listed.
         text: await fs.readFile(file, 'utf8'),

@@ -145,13 +145,15 @@ jobs:
     timeout-minutes: 5
 
     permissions:
-      contents: read
       issues: write
 
     steps:
       - name: Open or update the tracking issue
         env:
           GH_TOKEN: ${{ github.token }}
+          # No checkout here, so `gh` cannot read the repository from git
+          # (`check:root:gh-needs-repo`).
+          GH_REPO: ${{ github.repository }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
           set -euo pipefail

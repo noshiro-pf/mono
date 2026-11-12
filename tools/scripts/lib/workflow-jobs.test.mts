@@ -2,6 +2,7 @@ import dedent from 'dedent';
 import { Result } from 'ts-data-forge';
 import {
   matrixValues,
+  readCompositeActionSteps,
   readConcurrencyGroup,
   readMatrix,
   readTriggerTypes,
@@ -105,7 +106,7 @@ describe('readWorkflowJobs', () => {
     assert.strictEqual(other?.steps[0]?.workingDirectory, 'apps/w');
   });
 
-  test('reads what a job calls, and each job’s and step’s name and `if:`', () => {
+  test('reads what a job calls, and each job’s and step’s name and `if:`, and what a step uses', () => {
     const [caller, job] = jobs(dedent`
       jobs:
         gates:
@@ -117,6 +118,10 @@ describe('readWorkflowJobs', () => {
           steps:
             - name: Named
               if: failure()
+              uses: actions/checkout@v6.0.0
+              with:
+                path: sub
+                fetch-depth: 0
             - id: unnamed
               run: pnpm run x
             - if: false
@@ -140,6 +145,15 @@ describe('readWorkflowJobs', () => {
         { name: 'Named', condition: 'failure()' },
         { name: 'unnamed', condition: undefined },
         { name: undefined, condition: 'false' },
+      ],
+    );
+
+    assert.deepStrictEqual(
+      job?.steps.map((step) => [step.uses, step.with] as const),
+      [
+        ['actions/checkout@v6.0.0', { path: 'sub', 'fetch-depth': '0' }],
+        [undefined, {}],
+        [undefined, {}],
       ],
     );
   });
@@ -424,6 +438,91 @@ describe('readWorkflowStrings', () => {
         "github.event_name == 'pull_request'",
         'echo one',
       ]),
+    );
+  });
+});
+
+describe('readWorkflowJobs shell', () => {
+  test('reads a step’s `shell`, else its job’s default, else the workflow’s', () => {
+    const [first, second] = jobs(dedent`
+      defaults:
+        run:
+          shell: pwsh
+      jobs:
+        a:
+          steps:
+            - run: x
+            - shell: python
+              run: y
+        b:
+          defaults:
+            run:
+              shell: bash
+          steps:
+            - run: z
+    `);
+
+    assert.deepStrictEqual(
+      [...(first?.steps ?? []), ...(second?.steps ?? [])].map(
+        ({ shell }) => shell,
+      ),
+      ['pwsh', 'python', 'bash'],
+    );
+  });
+});
+
+describe('readCompositeActionSteps', () => {
+  test('reads each step of `runs.steps` as a job’s step is read', () => {
+    assert.deepStrictEqual(
+      readCompositeActionSteps(dedent`
+        name: Find
+        runs:
+          using: composite
+          steps:
+            - uses: actions/checkout@v6.0.0
+              if: inputs.checkout == 'true'
+              with:
+                fetch-depth: 0
+            - id: find
+              shell: bash
+              working-directory: sub
+              env:
+                GH_REPO: o/r
+              run: gh pr view 1
+      `),
+      Result.ok([
+        {
+          name: undefined,
+          condition: "inputs.checkout == 'true'",
+          uses: 'actions/checkout@v6.0.0',
+          with: { 'fetch-depth': '0' },
+          run: undefined,
+          env: {},
+          workingDirectory: undefined,
+          shell: undefined,
+        },
+        {
+          name: 'find',
+          condition: undefined,
+          uses: undefined,
+          with: {},
+          run: 'gh pr view 1',
+          env: { GH_REPO: 'o/r' },
+          workingDirectory: 'sub',
+          shell: 'bash',
+        },
+      ]),
+    );
+  });
+
+  test('reads an action of another kind as having no steps', () => {
+    assert.deepStrictEqual(
+      readCompositeActionSteps(dedent`
+        runs:
+          using: node24
+          main: index.js
+      `),
+      Result.ok([]),
     );
   });
 });
