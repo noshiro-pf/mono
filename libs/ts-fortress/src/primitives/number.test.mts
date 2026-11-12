@@ -1,5 +1,5 @@
 // @sumi-expect-error-file null/no-null-literal
-import { expectType, Result } from 'ts-data-forge';
+import { Arr, asUint32, expectType, Result } from 'ts-data-forge';
 import type {
   NegativeInt,
   NegativeNumber,
@@ -450,6 +450,8 @@ describe('number with constraints', () => {
 
       assert.isFalse(type.is(3));
 
+      assert.isFalse(type.is(0.5));
+
       expect(() => number(5, { multipleOf: 0 })).toThrow('multipleOf = 0');
     });
   });
@@ -478,7 +480,86 @@ describe('number with constraints', () => {
 
       assert.isFalse(type.is(2));
 
+      assert.isFalse(type.is(0.5));
+
       expect(() => number(5, { step: 0 })).toThrow('step = 0');
+    });
+  });
+
+  describe('multipleOf and step with a decimal divisor', () => {
+    const cases = [
+      [0.3, 0.1, true],
+      [0.7, 0.1, true],
+      [1.1, 0.1, true],
+      [0.07, 0.01, true],
+      [4.35, 0.05, true],
+      [3.3, 1.1, true],
+      [-0.3, 0.1, true],
+      [0.3, -0.1, true],
+      [123_456_789_012.35, 0.01, true],
+      [0.35, 0.1, false],
+      [0.300_000_000_000_000_04, 0.1, false],
+      [5.5e-7, 1e-7, false],
+      [5e-7, 1e-7, true],
+      [6, 3, true],
+      [7, 3, false],
+      [1e21, 1e20, true],
+      [2 ** 53, 2, true],
+      // A divisor beyond the safe integers is checked by the exact remainder.
+      [2 ** 70, 2 ** 60, true],
+      [2 ** 70, 3 * 2 ** 60, false],
+      [Number.POSITIVE_INFINITY, 0.1, false],
+      [Number.NaN, 0.1, false],
+      // Scaled by 100, 38929320443932.09 is 3892932044393209, which is odd,
+      // while `Math.round(value * 100)` is 3892932044393210, which is even.
+      [38_929_320_443_932.09, 0.02, false],
+      [38_929_320_443_932.08, 0.02, true],
+      // A value whose floating-point remainder is 0 passes, whatever it is
+      // written as: `768 * 1.1` is 844.8000000000001 and `3 * 1.1` is
+      // 3.3000000000000003, neither a multiple of 1.1 as written.
+      [844.8, 1.1, true],
+      [768 * 1.1, 1.1, true],
+      [3 * 1.1, 1.1, true],
+      [9 * Number.MIN_VALUE, 3 * Number.MIN_VALUE, true],
+      // This row records the limit, not the answer wanted: 123456789012345.67
+      // is a multiple of 0.01, but scaled by 100 it is not a safe integer, so
+      // the floating-point remainder answers, as it did before.
+      [123_456_789_012_345.67, 0.01, false],
+    ] as const;
+
+    test.each(cases)(
+      'multipleOf: whether %d is a multiple of %d is %s',
+      (value, divisor, expected) => {
+        assert.strictEqual(
+          number(0, { multipleOf: divisor }).is(value),
+          expected,
+        );
+      },
+    );
+
+    test.each(cases)(
+      'step: whether %d is a multiple of %d is %s',
+      (value, divisor, expected) => {
+        assert.strictEqual(number(0, { step: divisor }).is(value), expected);
+      },
+    );
+
+    test('step 0.01 accepts every hundredth from 0 to 10', () => {
+      const type = number(0, { step: 0.01 });
+
+      const rejected = Arr.seq(asUint32(1001)).filter((k) => !type.is(k / 100));
+
+      assert.deepStrictEqual(rejected, []);
+    });
+
+    test('checks the default value by the same rule', () => {
+      expect(() => number(0.3, { multipleOf: 0.1 })).not.toThrow();
+
+      expect(() => number(0.3, { step: 0.1 })).not.toThrow();
+
+      expect(() => number(0.35, { multipleOf: 0.1 })).toThrow(
+        'multipleOf = 0.1',
+      );
     });
   });
 
