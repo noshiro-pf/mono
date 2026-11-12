@@ -62,6 +62,7 @@
     "check:root:ci-job-shape": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-ci-job-shape.mts",
     "check:root:codecov-builds": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-codecov-builds.mts",
     "check:root:deps-built-guard": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-deps-built-guard.mts",
+    "check:root:dispatch-default-branch": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-dispatch-default-branch.mts",
     "check:root:dispatch-inputs": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-dispatch-inputs.mts",
     "check:root:dist-lib-replacement": "node ./tools/scripts/cmd/assert-deps-built.mts --workspace && tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-dist-lib-replacement.mts",
     "check:root:doc-generators": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-doc-generators.mts",

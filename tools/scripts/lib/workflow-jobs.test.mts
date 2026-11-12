@@ -4,6 +4,7 @@ import {
   matrixValues,
   readMatrix,
   readWorkflowJobs,
+  readWorkflowTriggers,
   type WorkflowJob,
 } from './workflow-jobs.mjs';
 
@@ -139,8 +140,63 @@ describe('readWorkflowJobs', () => {
     );
   });
 
+  test('reads a job’s `if:` as written and its `needs:`, one or a list', () => {
+    const [first, second, third] = jobs(dedent`
+      jobs:
+        a:
+          if: >-
+            github.ref == 'refs/heads/main'
+        b:
+          needs: a
+        c:
+          needs: [a, b]
+          if: always()
+    `);
+
+    assert.strictEqual(first?.condition, "github.ref == 'refs/heads/main'");
+
+    assert.deepStrictEqual(first?.needs, []);
+
+    assert.strictEqual(second?.condition, undefined);
+
+    assert.deepStrictEqual(second?.needs, ['a']);
+
+    assert.strictEqual(third?.condition, 'always()');
+
+    assert.deepStrictEqual(third?.needs, ['a', 'b']);
+  });
+
   test('a file YAML cannot parse is an error, not no jobs', () => {
     assert.isTrue(Result.isErr(readWorkflowJobs('jobs:\n  a: [\n')));
+  });
+});
+
+describe('readWorkflowTriggers', () => {
+  test('reads `on:` as a mapping, a list or one event', () => {
+    assert.deepStrictEqual(
+      readWorkflowTriggers(dedent`
+        on:
+          schedule:
+            - cron: '17 20 * * 1'
+          workflow_dispatch:
+        jobs: {}
+      `),
+      Result.ok(['schedule', 'workflow_dispatch']),
+    );
+
+    assert.deepStrictEqual(
+      readWorkflowTriggers('on: [push, workflow_dispatch]\n'),
+      Result.ok(['push', 'workflow_dispatch']),
+    );
+
+    assert.deepStrictEqual(
+      readWorkflowTriggers('on: push\n'),
+      Result.ok(['push']),
+    );
+  });
+
+  test('a file YAML cannot parse is an error, not no triggers', () => {
+    assert.isTrue(Result.isErr(readWorkflowTriggers('on: [\n')));
   });
 });
 

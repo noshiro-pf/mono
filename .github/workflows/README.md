@@ -910,6 +910,11 @@ can only narrow what the App already holds), so that the push triggers the
   that has an update, so there is only ever one open. A run of either that finds
   nothing to change pushes nothing, and closes the open pull request instead
   (`close-obsolete`), since `main` already has what it carries.
+- **Run on the default branch only.** The job that builds the branch carries
+  `if: github.ref == format('refs/heads/{0}', …default_branch…)`, and the jobs
+  after it are skipped with it; a dispatch on another ref would otherwise open
+  that ref's commits, which nobody reviewed, into `main` under the bot's title
+  (`check:root:dispatch-default-branch`).
 - **Authenticate the push inline** (`https://x-access-token:${GH_TOKEN}@…`),
   so the token is never written to git config.
 - **Name the lease.** `--force-with-lease` with no value compares against the
