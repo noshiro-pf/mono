@@ -11,6 +11,7 @@ import {
 import { isNonNullObject, Optional } from 'ts-data-forge';
 import type { UnknownRecord } from 'ts-type-forge';
 import type { RoutesProps } from '../routes-props.mjs';
+import { CaseErrorBoundary } from './case-error-boundary.js';
 import { RoutesCase } from './routes-case.js';
 import { useObservableValue } from './use-observable-value.mjs';
 
@@ -27,6 +28,7 @@ export const createRoutes = <R extends AnyRoutes>(
     cases,
     notFound,
     pending,
+    error,
   }: RoutesProps<R, N>): React.JSX.Element => {
     const m = useObservableValue(router.match);
 
@@ -46,12 +48,21 @@ export const createRoutes = <R extends AnyRoutes>(
       <>{pending}</>
     ) : selected === undefined ? (
       <>{notFound}</>
-    ) : (
+    ) : error === undefined ? (
       <RoutesCase
         key={selected.key}
         draw={selected.draw}
         values={selected.values}
       />
+    ) : (
+      // Keyed as the case is: another route mounts a new boundary.
+      <CaseErrorBoundary
+        key={selected.key}
+        error={error}
+        resetKey={selected.values}
+      >
+        <RoutesCase draw={selected.draw} values={selected.values} />
+      </CaseErrorBoundary>
     );
   };
 

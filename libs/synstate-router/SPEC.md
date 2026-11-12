@@ -307,6 +307,7 @@ export const App = (): React.JSX.Element => (
 - レイアウトは `under` と `prefix` で入れ子にする（「6. synstate-dom との連携」と同じ規則）。
 - `useRouteMatch()`: `RouteMatch<R>` を返す。`switch (m.route)` と `default: m satisfies never` でも網羅できる。内部は `useSyncExternalStore`。`router.match` は構造的に同じなら流さないので、snapshot の参照が安定し余分な再描画を生まない。
 - case の引数と `useAt(node)` の中身は `withSearch(patch): Href` も持つ。今のルートと params のまま search の一部だけ変えた `Href` を作る（一覧の絞り込みリンクの多くはこれで書ける）。
+- `Routes` の `error` は、case が描画中に投げたときにその case の代わりに描く要素（`({ error, retry }) => ReactNode`）。各 case を error boundary で包むので、`Routes` の外にあるレイアウトは描かれたまま残る。別のルートへ、または同じルートでも params や search が変わる遷移で消え（壊れたページを離れれば消える）、`retry()` は case をもう一度描く。省略すると、これまでどおり `Routes` より上の boundary に届く（#3432）。
 - データの 404（params は正しいが対象がない）はルーターの状態にしない。ページが `notFound` と同じ部品を描く。URL は変えない。
 - `useBranch()` は `router.branch` の値を返す。パンくずやタイトルに使う。
 - `useAt(node)` は `Optional<{ params; search }>`、`useIsActive(node, { exact? })` は `boolean` を返す。
@@ -375,6 +376,8 @@ const App = (): JSX.Element => (
 />
 ```
 
+- case ごとの error boundary は持たない（#3432）。synstate-dom には描画中の例外を受け止めて代わりを描く仕組みがなく、case は一度呼ばれて DOM を作った後は Observable の購読で更新されるので、React の再描画のような「描画中」がない。購読の中の例外は synstate の伝播の問題として扱う。
+
 ### 6.2 `Link`
 
 ```tsx
@@ -438,7 +441,7 @@ const App = (): JSX.Element => (
 | ルートごとの非同期ガード（認証など）   | `clientMiddleware` / loader 内の `redirect`                               | `beforeLoad`                                                    | v1.1 で入れた（[#3429](https://github.com/noshiro-pf/mono/issues/3429)）。`redirect` が Promise を返せる形（「4.2」の 2）。ノードに宣言するガードは採らなかった                |
 | 任意深さの catch-all（`/docs/*`）      | `*`                                                                       | `$`（splat）                                                    | v1.1 で入れた（[#3430](https://github.com/noshiro-pf/mono/issues/3430)）。`param.rest` として枝の末尾だけに許す（「3.1」「3.3」）                                              |
 | 省略可能セグメント                     | `:lang?`                                                                  | `{-$lang}`                                                      | 入れない（[#3431](https://github.com/noshiro-pf/mono/issues/3431)）。無しと有りの 2 ノードで表す書き方を「3.1」と README に書いた                                              |
-| ルートごとのエラー表示                 | `ErrorBoundary`                                                           | `errorComponent`                                                | v1.1（[#3432](https://github.com/noshiro-pf/mono/issues/3432)）。React 版 `Routes` に case ごとの error boundary                                                               |
+| ルートごとのエラー表示                 | `ErrorBoundary`                                                           | `errorComponent`                                                | v1.1 で入れた（[#3432](https://github.com/noshiro-pf/mono/issues/3432)）。React 版 `Routes` の `error`（「5」）。synstate-dom 版は持たない（「6.1」）                          |
 | コード分割（遅延読み込み）             | `lazy`（data mode）、route module ごと（framework mode）                  | `autoCodeSplitting` / `createLazyRoute`                         | v1.1（[#3433](https://github.com/noshiro-pf/mono/issues/3433)）。React は `React.lazy` を case に書けば動くので、書き方と例を先に整える                                        |
 | 型付きの履歴 state                     | `state`（型なし）                                                         | `state`（`HistoryState` の拡張で全体に 1 つの型）               | v1.1 で入れた（[#3434](https://github.com/noshiro-pf/mono/issues/3434)）。ページに codec を宣言する形（「3.4」）                                                               |
 | パンくず・ルートの静的データ           | `handle` + `useMatches`                                                   | `staticData` + `useMatches`                                     | v1.1 で入れた（[#3435](https://github.com/noshiro-pf/mono/issues/3435)）。ノードに型付き `meta` を置き、`router.branch`・`useBranch` で一致した枝を読む（「3.2」「4.1」「5」） |
