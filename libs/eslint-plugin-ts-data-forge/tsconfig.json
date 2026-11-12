@@ -19,8 +19,11 @@
       "eslint-plugin-ts-data-forge": ["./src/index.mts"]
     }
   },
-  // `./test` holds only probes: `strict-lib-active.mts`, which fails when the
-  // replacement above stops happening, and `arr-tail-ts2590.mts`, whose header
-  // says what it watches. It is not published — `files` lists `src` and `dist`.
+  // `./test` holds no test, only files this type check is the test of:
+  // `strict-lib-active.mts`, the probe that fails when the replacement above
+  // stops happening, `arr-tail-ts2590.mts`, whose header says what it watches,
+  // and `range-for-loop-fix-output.mts`, the fixes of `prefer-range-for-loop`
+  // compiled against `range`. It is not published — `files` lists `src` and
+  // `dist`.
   "include": ["./samples", "./src", "./test", "./scripts", "./configs"]
 }

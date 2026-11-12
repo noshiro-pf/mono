@@ -57,15 +57,20 @@ export default [
 
   {
     files: ['test/**/*.mts', '**/*.test.mts'],
-    /* The two probes sit under `test/` but are not tests: each holds
-       `@ts-expect-error` directives that stop compiling when what they watch
-       changes (`strict-lib-active.mts`: the strict standard library stops
-       being applied; `arr-tail-ts2590.mts`: see its header), and the
-       `export` is what keeps each declaration from being an unused local,
-       whose error would satisfy the directive instead. The no-export rule
-       below is about test files, so it — and the loosened rules beside it —
-       do not apply here. */
-    ignores: ['test/strict-lib-active.mts', 'test/arr-tail-ts2590.mts'],
+    /* Three files sit under `test/` but are not tests: each holds
+       `@ts-expect-error` lines that `check:types` reads —
+       `strict-lib-active.mts` stops compiling if the strict standard library
+       stops being applied, `arr-tail-ts2590.mts` as its header says, and
+       `range-for-loop-fix-output.mts` if `range` stops agreeing with what
+       `prefer-range-for-loop` fixes — and the `export` is what keeps their
+       declarations from being unused locals, whose error would satisfy the
+       directive instead. The no-export rule below is about test files, so it
+       — and the loosened rules beside it — do not apply to them. */
+    ignores: [
+      'test/strict-lib-active.mts',
+      'test/arr-tail-ts2590.mts',
+      'test/range-for-loop-fix-output.mts',
+    ],
     rules: defineKnownRules({
       '@typescript-eslint/no-empty-object-type': 'off',
       '@typescript-eslint/no-explicit-any': 'off',

@@ -19,6 +19,7 @@ import {
   SHARED_EXPORTS,
   TS_DATA_FORGE_MODULE,
   TS_STD_FORGE_MODULE,
+  TS_TYPE_FORGE_BRAND_MARKER,
 } from './constants.mjs';
 import { tsDataForgeValueAtByName } from './import-binding.mjs';
 
@@ -56,14 +57,6 @@ type GuardSpec = DeepReadonly<
   | { kind: 'record' }
   | { kind: 'variant'; tags: string[] }
 >;
-
-/**
- * Internal marker property attached to every `ts-type-forge` branded type. Its
- * presence (together with the `MinLength` brand key) lets us recognize a
- * `NonEmptyString` without holding a reference to the type itself.
- */
-const BRAND_MARKER_PROPERTY =
-  'TSTypeForgeInternals--edd2f9ce-7ca5-45b0-9d1a-bd61b9b5d9c3';
 
 /**
  * Brand key carried by `MinLengthString<N>` — and therefore by
@@ -915,7 +908,9 @@ const isGuaranteedNonEmptyString = (
     return type.value !== '';
   }
 
-  if (type.getProperty(BRAND_MARKER_PROPERTY) === undefined) {
+  // The marker, with the `MinLength` brand key, recognizes a `NonEmptyString`
+  // without a reference to the type itself.
+  if (type.getProperty(TS_TYPE_FORGE_BRAND_MARKER) === undefined) {
     return false;
   }
 

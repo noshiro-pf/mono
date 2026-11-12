@@ -48,6 +48,14 @@ export const SHARED_EXPORTS = [
   'unknownToString',
 ] as const;
 
+/**
+ * The internal marker property every ts-type-forge branded type carries. A type
+ * with the brand keys and not this one is a look-alike that ts-type-forge's own
+ * brands do not accept.
+ */
+export const TS_TYPE_FORGE_BRAND_MARKER =
+  'TSTypeForgeInternals--edd2f9ce-7ca5-45b0-9d1a-bd61b9b5d9c3';
+
 /** The type flags of every primitive type but `void`. */
 export const primitiveTypeFlags =
   ts.TypeFlags.StringLike |
