@@ -118,7 +118,8 @@ export const NegativeSafeInt = {
    * MAX_VALUE]`.
    *
    * Unlike `asNegativeSafeInt`, this is total: out-of-range inputs are clamped
-   * to the nearest representable `NegativeSafeInt` instead of throwing.
+   * to the nearest representable `NegativeSafeInt` instead of throwing, `NaN`
+   * included, which becomes `MIN_VALUE`.
    *
    * @param value - The value to convert
    * @returns The value as a `NegativeSafeInt`

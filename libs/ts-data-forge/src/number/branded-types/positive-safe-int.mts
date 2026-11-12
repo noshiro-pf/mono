@@ -160,7 +160,8 @@ export const PositiveSafeInt = {
    * MAX_VALUE]`.
    *
    * Unlike `asPositiveSafeInt`, this is total: out-of-range inputs are clamped
-   * to the nearest representable `PositiveSafeInt` instead of throwing.
+   * to the nearest representable `PositiveSafeInt` instead of throwing, `NaN`
+   * included, which becomes `MIN_VALUE`.
    *
    * @example
    *

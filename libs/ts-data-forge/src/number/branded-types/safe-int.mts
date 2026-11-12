@@ -168,7 +168,8 @@ export const SafeInt = {
    * integer and saturating the result into the range `[MIN_VALUE, MAX_VALUE]`.
    *
    * Unlike `asSafeInt`, this is total: out-of-range inputs are clamped to the
-   * nearest representable `SafeInt` instead of throwing.
+   * nearest representable `SafeInt` instead of throwing, `NaN` included, which
+   * becomes `MIN_VALUE`.
    *
    * @example
    *
