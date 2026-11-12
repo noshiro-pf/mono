@@ -58,7 +58,7 @@ const min_ = (...values: readonly Int8[]): Int8 => asInt8(Math.min(...values));
 
 const max_ = (...values: readonly Int8[]): Int8 => asInt8(Math.max(...values));
 
-const pow = (x: Int8, y: Int8): Int8 => fromNumber(x ** y);
+const pow = (x: Int8, y: Int8): Int8 => fromNumber(Math.floor(x ** y));
 
 const add = (x: Int8, y: Int8): Int8 => fromNumber(x + y);
 
