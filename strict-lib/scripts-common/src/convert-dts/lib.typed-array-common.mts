@@ -59,9 +59,10 @@ export type TypedArrayElemType =
 
 // Note: `Float16` is intentionally omitted here. This list drives the iteration
 // over typed-array interfaces declared in `lib.es5.d.ts`; the `Float16Array`
-// interface lives in its own `lib.esnext.float16.d.ts` (added in
-// TS 5.8) and is converted separately by `convertLibEsnextFloat16`. Hence the
-// assertion below is `<=` (subset) rather than `=`.
+// interface lives in its own `lib.esnext.float16.d.ts` (added in TS 5.8;
+// `lib.es2025.float16.d.ts` from TS 6.0) and is converted separately by
+// `convertLibEsnextFloat16`. Hence the assertion below is `<=` (subset) rather
+// than `=`.
 export const typedArrayNumberElemTypes = [
   'Int8',
   'Uint8',

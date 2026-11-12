@@ -60,6 +60,7 @@ const packages = [
   pkg('apps/profile', ['fix:lint', 'check:types', 'check:test']),
   pkg('languages/sumi/checker', ['check:types', 'check:sumi']),
   pkg('strict-lib/v7.0', ['gen:lib', 'check:types']),
+  pkg('strict-lib/scripts-common', ['check:test', 'check:test:cov']),
   pkg('libs/synstate', ['gen', 'build', 'check:types'], {
     exportsBuild: true,
     forgottenExportsRead: true,
@@ -380,6 +381,7 @@ describe('classifyChanges', () => {
     assert.deepStrictEqual(sortedAreas(result), [
       'root-guards',
       'strict-lib',
+      'strict-lib-code',
       'strict-lib-output',
     ]);
   });
@@ -405,6 +407,19 @@ describe('classifyChanges', () => {
         classify([file]).areas.has('strict-lib-output'),
         expected,
       );
+    },
+  );
+
+  test.each([
+    ['strict-lib/README.md', ['strict-lib']],
+    [
+      'strict-lib/v5.1/output/diff-from-prev/summary.txt',
+      ['strict-lib', 'strict-lib-output'],
+    ],
+  ] as const)(
+    '%s, which the code gate ignores, is no strict-lib code',
+    (file, expected) => {
+      assert.deepStrictEqual(sortedAreas(classify([file])), expected);
     },
   );
 
@@ -784,6 +799,18 @@ describe('buildPlan', () => {
         .filter((cwd) => ['libs/synstate', 'apps/synstate-docs'].includes(cwd)),
       ['libs/synstate', 'apps/synstate-docs'],
     );
+  });
+
+  test('a generated strict-lib file the code gate ignores runs the generators, not the tests', () => {
+    const commands = commandsOf([
+      'strict-lib/v5.1/output/diff-from-prev/summary.txt',
+    ]);
+
+    assert.include(commands, 'run strict-lib:gen:with-codemod-fixed');
+
+    assert.include(commands, 'run strict-lib:gen:version-diff');
+
+    assert.notInclude(commands, 'strict-lib/scripts-common: run check:test');
   });
 
   test('a change to the strict-lib tooling alone runs no generator', () => {
@@ -1352,6 +1379,38 @@ describe('the ESLint toolchain', () => {
     assert.notInclude(
       commandsOf(['libs/lint-helper/src/index.mts']),
       'run strict-lib:check:lint',
+    );
+  });
+
+  test("strict-lib's tests run for a change to it that the code gate lets through", () => {
+    assert.include(
+      commandsOf(['strict-lib/scripts-common/src/convert.mts']),
+      'strict-lib/scripts-common: run check:test',
+    );
+
+    assert.include(
+      commandsOf(['strict-lib/v7.0/scripts/gen.mts']),
+      'strict-lib/scripts-common: run check:test',
+    );
+
+    assert.notInclude(
+      commandsOf(['libs/eslint-plugin-demo/src/index.mts']),
+      'strict-lib/scripts-common: run check:test',
+    );
+
+    // A document alone, which CI's code gate does not let through.
+    assert.notInclude(
+      commandsOf(['strict-lib/docs/design.md']),
+      'strict-lib/scripts-common: run check:test',
+    );
+
+    // Its document beside code elsewhere.
+    assert.notInclude(
+      commandsOf([
+        'strict-lib/docs/design.md',
+        'libs/eslint-plugin-demo/src/index.mts',
+      ]),
+      'strict-lib/scripts-common: run check:test',
     );
   });
 

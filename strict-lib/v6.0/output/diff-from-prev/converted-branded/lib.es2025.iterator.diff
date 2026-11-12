@@ -1,9 +1,9 @@
 diff --git a/v6.0/output/lib-files-branded/lib.es2025.iterator.d.ts b/v6.0/output/lib-files-branded/lib.es2025.iterator.d.ts
 new file mode 100644
-index 0000000000000000000000000000000000000000..7f4f87e3479684ed6025af2b8cabbb8e5e88eac8
+index 0000000000000000000000000000000000000000..dd2c44a1c2c8e009727e74499682cdeb814a4490
 --- /dev/null
 +++ b/v6.0/output/lib-files-branded/lib.es2025.iterator.d.ts
-@@ -0,0 +1,192 @@
+@@ -0,0 +1,202 @@
 +/*! *****************************************************************************
 +Copyright (c) Microsoft Corporation. All rights reserved.
 +Licensed under the Apache License, Version 2.0 (the "License"); you may not use
@@ -63,7 +63,7 @@ index 0000000000000000000000000000000000000000..7f4f87e3479684ed6025af2b8cabbb8e
 +     * @param callbackfn A function that accepts up to two arguments to be used to transform values from the underlying iterator.
 +     */
 +    map<U>(
-+      callbackfn: (value: T, index: number) => U,
++      callbackfn: (value: T, index: NumberType.ArraySize) => U,
 +    ): IteratorObject<U, undefined, unknown>;
 +
 +    /**
@@ -71,7 +71,7 @@ index 0000000000000000000000000000000000000000..7f4f87e3479684ed6025af2b8cabbb8e
 +     * @param predicate A function that accepts up to two arguments to be used to test values from the underlying iterator.
 +     */
 +    filter<S extends T>(
-+      predicate: (value: T, index: number) => value is S,
++      predicate: (value: T, index: NumberType.ArraySize) => value is S,
 +    ): IteratorObject<S, undefined, unknown>;
 +
 +    /**
@@ -79,20 +79,24 @@ index 0000000000000000000000000000000000000000..7f4f87e3479684ed6025af2b8cabbb8e
 +     * @param predicate A function that accepts up to two arguments to be used to test values from the underlying iterator.
 +     */
 +    filter(
-+      predicate: (value: T, index: number) => unknown,
++      predicate: (value: T, index: NumberType.ArraySize) => unknown,
 +    ): IteratorObject<T, undefined, unknown>;
 +
 +    /**
 +     * Creates an iterator whose values are the values from this iterator, stopping once the provided limit is reached.
 +     * @param limit The maximum number of values to yield.
 +     */
-+    take(limit: number): IteratorObject<T, undefined, unknown>;
++    take(
++      limit: NumberType.ArraySizeArgNonNegative,
++    ): IteratorObject<T, undefined, unknown>;
 +
 +    /**
 +     * Creates an iterator whose values are the values from this iterator after skipping the provided count.
 +     * @param count The number of values to drop.
 +     */
-+    drop(count: number): IteratorObject<T, undefined, unknown>;
++    drop(
++      count: NumberType.ArraySizeArgNonNegative,
++    ): IteratorObject<T, undefined, unknown>;
 +
 +    /**
 +     * Creates an iterator whose values are the result of applying the callback to the values from this iterator and then flattening the resulting iterators or iterables.
@@ -101,7 +105,7 @@ index 0000000000000000000000000000000000000000..7f4f87e3479684ed6025af2b8cabbb8e
 +    flatMap<U>(
 +      callback: (
 +        value: T,
-+        index: number,
++        index: NumberType.ArraySize,
 +      ) => Iterator<U, unknown, undefined> | Iterable<U, unknown, undefined>,
 +    ): IteratorObject<U, undefined, unknown>;
 +
@@ -114,14 +118,14 @@ index 0000000000000000000000000000000000000000..7f4f87e3479684ed6025af2b8cabbb8e
 +      callbackfn: (
 +        previousValue: T,
 +        currentValue: T,
-+        currentIndex: number,
++        currentIndex: NumberType.ArraySize,
 +      ) => T,
 +    ): T;
 +    reduce(
 +      callbackfn: (
 +        previousValue: T,
 +        currentValue: T,
-+        currentIndex: number,
++        currentIndex: NumberType.ArraySize,
 +      ) => T,
 +      initialValue: T,
 +    ): T;
@@ -135,7 +139,7 @@ index 0000000000000000000000000000000000000000..7f4f87e3479684ed6025af2b8cabbb8e
 +      callbackfn: (
 +        previousValue: U,
 +        currentValue: T,
-+        currentIndex: number,
++        currentIndex: NumberType.ArraySize,
 +      ) => U,
 +      initialValue: U,
 +    ): U;
@@ -149,7 +153,7 @@ index 0000000000000000000000000000000000000000..7f4f87e3479684ed6025af2b8cabbb8e
 +     * Performs the specified action for each element in the iterator.
 +     * @param callbackfn A function that accepts up to two arguments. forEach calls the callbackfn function one time for each element in the iterator.
 +     */
-+    forEach(callbackfn: (value: T, index: number) => void): void;
++    forEach(callbackfn: (value: T, index: NumberType.ArraySize) => void): void;
 +
 +    /**
 +     * Determines whether the specified callback function returns true for any element of this iterator.
@@ -157,7 +161,9 @@ index 0000000000000000000000000000000000000000..7f4f87e3479684ed6025af2b8cabbb8e
 +     * the predicate function for each element in this iterator until the predicate returns a value
 +     * true, or until the end of the iterator.
 +     */
-+    some(predicate: (value: T, index: number) => unknown): boolean;
++    some(
++      predicate: (value: T, index: NumberType.ArraySize) => unknown,
++    ): boolean;
 +
 +    /**
 +     * Determines whether all the members of this iterator satisfy the specified test.
@@ -165,7 +171,9 @@ index 0000000000000000000000000000000000000000..7f4f87e3479684ed6025af2b8cabbb8e
 +     * the predicate function for each element in this iterator until the predicate returns
 +     * false, or until the end of this iterator.
 +     */
-+    every(predicate: (value: T, index: number) => unknown): boolean;
++    every(
++      predicate: (value: T, index: NumberType.ArraySize) => unknown,
++    ): boolean;
 +
 +    /**
 +     * Returns the value of the first element in this iterator where predicate is true, and undefined
@@ -175,9 +183,11 @@ index 0000000000000000000000000000000000000000..7f4f87e3479684ed6025af2b8cabbb8e
 +     * immediately returns that element value. Otherwise, find returns undefined.
 +     */
 +    find<S extends T>(
-+      predicate: (value: T, index: number) => value is S,
++      predicate: (value: T, index: NumberType.ArraySize) => value is S,
 +    ): S | undefined;
-+    find(predicate: (value: T, index: number) => unknown): T | undefined;
++    find(
++      predicate: (value: T, index: NumberType.ArraySize) => unknown,
++    ): T | undefined;
 +
 +    readonly [Symbol.toStringTag]: string;
 +  }
