@@ -26,8 +26,9 @@
   デプロイしたら終わりで、継続的なデプロイは要らない。
 
 workflow は対象のアプリと project を `TARGETS` に明示的に書いている。アプリを
-足すときは、`TARGETS` と `workflow_dispatch` の選択肢と下のロールの付与を揃え、
-ルールが次に変わるまで何もデプロイされないので一度手で dispatch する。
+足すときは、上の表と `TARGETS` と `workflow_dispatch` の選択肢と、下の
+「project ごとのロール」を揃え、ルールが次に変わるまで何もデプロイされないので
+一度手で dispatch する。
 `TARGETS` の `rulesTests` には、アプリに `check:test:rules` があるかを書く。
 `package.json` と食い違っていればテストの job が落ち、何もデプロイしない。
 
@@ -63,20 +64,30 @@ workflow が、どの ref と environment で動いているか」を書いた O
   Google Cloud 側の窓口。ここでは GitHub Actions 用の `github` を 1 つ置く。
 - **provider**：pool の中で、どの発行元（`token.actions.githubusercontent.com`）
   を信じ、どんなトークンだけを通すか（attribute condition）を決める設定。
-  `noshiro-pf-mono` は、このリポジトリの `deploy-firestore.yml` が `main` で
-  `firebase-deploy` environment を名指して動いたときのトークンだけを通す。
+  `noshiro-pf-mono` は、このリポジトリの workflow が `main` で動いたときの
+  トークンのうち、environment と workflow の組が次の 2 つのどちらかのものだけを
+  通す：`firebase-deploy` と `deploy-firestore.yml`、`event-schedule-app-deploy`
+  と `deploy-event-schedule-app.yml`（`docs/event-schedule-app-deploy.md`）。
+  トークンの `environment` は `attribute.environment` に写す。
 - **サービスアカウント**：人ではなくプログラムが使う Google アカウント。
-  `firestore-deploy@noshiro-pf-ci.iam.gserviceaccount.com` に 3 つの project の
-  ルールとインデックスを更新するロールだけを付け、provider を通った workflow
-  だけがこのアカウントになりすませる。
+  `firestore-deploy@noshiro-pf-ci.iam.gserviceaccount.com` に、上の表の project の
+  ルールとインデックスを更新するロールだけを付ける。なりすませるのは
+  `attribute.environment` が `firebase-deploy` のトークンだけで、
+  `event-schedule-app-deploy` のトークンは、同じ provider を通っても
+  `docs/event-schedule-app-deploy.md` のサービスアカウントにしかなれない。
 
 ### 一度だけ行う設定
 
 pool とサービスアカウントは、デプロイ専用の GCP project `noshiro-pf-ci` に置く
-（2026-10-29 に下の手順で作成済み。`firebaserules` などの 3 つの API は
-2026-10-30 に足した）。アプリの project のどれかに置くと、その
-project を消したときにほかのアプリのデプロイまで止まるため。作り直すときや
-アプリを足すときは、同じ手順を使う。
+（作成済み）。アプリの project のどれかに置くと、その project を消したときに
+ほかのアプリのデプロイまで止まるため。下は空の `noshiro-pf-ci` から作るときの
+手順で、アプリを足すときには要らない（「project ごとのロール」だけでよい）。
+空から作るときは、このあと「project ごとのロール」と、
+`docs/event-schedule-app-deploy.md` の「一度だけ行う設定」も行う
+（`event-schedule-app-deploy` のサービスアカウントも `noshiro-pf-ci` にある）。
+
+既にある provider の写し方や条件を変えるときは、下の provider のコマンドだけを、
+`create-oidc` を `update-oidc` に変えて走らせる。
 
 ```sh
 HOST_PROJECT=noshiro-pf-ci
@@ -101,24 +112,33 @@ gcloud iam workload-identity-pools create github \
 gcloud iam workload-identity-pools providers create-oidc noshiro-pf-mono \
   --project "$HOST_PROJECT" --location global --workload-identity-pool github \
   --issuer-uri https://token.actions.githubusercontent.com \
-  --attribute-mapping 'google.subject=assertion.sub,attribute.repository=assertion.repository' \
-  --attribute-condition "assertion.repository_id == '285301950' && assertion.repository_owner_id == '46040697' && assertion.ref == 'refs/heads/main' && assertion.environment == 'firebase-deploy' && assertion.workflow_ref.startsWith('noshiro-pf/mono/.github/workflows/deploy-firestore.yml@')"
+  --attribute-mapping 'google.subject=assertion.sub,attribute.repository=assertion.repository,attribute.environment=assertion.environment' \
+  --attribute-condition "assertion.repository_id == '285301950' && assertion.repository_owner_id == '46040697' && assertion.ref == 'refs/heads/main' && ((assertion.environment == 'firebase-deploy' && assertion.workflow_ref.startsWith('noshiro-pf/mono/.github/workflows/deploy-firestore.yml@')) || (assertion.environment == 'event-schedule-app-deploy' && assertion.workflow_ref.startsWith('noshiro-pf/mono/.github/workflows/deploy-event-schedule-app.yml@')))"
 
 gcloud iam service-accounts create firestore-deploy \
   --project "$HOST_PROJECT" --display-name "Firestore deploy from GitHub Actions"
 
 gcloud iam service-accounts add-iam-policy-binding "$SA" \
   --project "$HOST_PROJECT" --role roles/iam.workloadIdentityUser \
-  --member "principalSet://iam.googleapis.com/projects/${HOST_NUMBER}/locations/global/workloadIdentityPools/github/attribute.repository/noshiro-pf/mono"
+  --member "principalSet://iam.googleapis.com/projects/${HOST_NUMBER}/locations/global/workloadIdentityPools/github/attribute.environment/firebase-deploy"
+```
 
-for project in algo-app-45270 life-plan-simulator-9eab3 task-manager-app-d0cae; do
-  gcloud iam roles create firebaseProjectGetter --project "$project" \
-    --title "Firebase project getter" --permissions firebase.projects.get --stage GA
-  for role in roles/firebaserules.admin roles/datastore.indexAdmin roles/serviceusage.serviceUsageConsumer \
-    "projects/${project}/roles/firebaseProjectGetter"; do
-    gcloud projects add-iam-policy-binding "$project" \
-      --member "serviceAccount:${SA}" --role "$role" --condition None
-  done
+### project ごとのロール
+
+`firestore-deploy` がデプロイする project（上の表）ごとに 1 回ずつ、`PROJECT` を
+変えて走らせる。アプリを足すときに GCP 側で要るのは、足す project でのこの
+1 回だけ。
+
+```sh
+SA=firestore-deploy@noshiro-pf-ci.iam.gserviceaccount.com
+PROJECT=algo-app-45270
+
+gcloud iam roles create firebaseProjectGetter --project "$PROJECT" \
+  --title "Firebase project getter" --permissions firebase.projects.get --stage GA
+for role in roles/firebaserules.admin roles/datastore.indexAdmin roles/serviceusage.serviceUsageConsumer \
+  "projects/${PROJECT}/roles/firebaseProjectGetter"; do
+  gcloud projects add-iam-policy-binding "$PROJECT" \
+    --member "serviceAccount:${SA}" --role "$role" --condition None
 done
 ```
 

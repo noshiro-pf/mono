@@ -75,13 +75,11 @@ Hosting と Functions のロールは `deploy-firestore.yml` からは使えな�
 
 ## 認証
 
-仕組みは `docs/firestore-deploy.md` の「認証」と同じ（pool `github`、provider
-`noshiro-pf-mono`、GCP project `noshiro-pf-ci`）。違うのは、provider が
-トークンの `environment` を `attribute.environment` に写し、サービスアカウントを
-その値に結び付けること。`firebase-deploy` を名指すトークンは
-`firestore-deploy` にだけ、`event-schedule-app-deploy` を名指すトークンは
-`event-schedule-app-deploy` にだけなれる。provider の条件は、environment と
-workflow の組を 2 つだけ通す。
+仕組みは `docs/firestore-deploy.md` の「認証」と同じで、pool `github` と
+provider `noshiro-pf-mono`（GCP project `noshiro-pf-ci`）もそこのものを使う。
+provider が通すトークンと属性の写し方はそこに書いてある。この workflow の
+サービスアカウント `event-schedule-app-deploy` には、`attribute.environment` が
+`event-schedule-app-deploy` のトークンだけがなれる。
 
 **API の利用は、デプロイ先の `event-schedule-app` に数える。** サービスアカウントで
 呼んだ API は、何もしなければそのアカウントの project（`noshiro-pf-ci`）の利用に
@@ -96,47 +94,31 @@ firebase-tools はすべての呼び出しに `x-goog-user-project` を付ける
 
 ### 一度だけ行う設定
 
-この workflow をマージする前に、上から順に行う。provider を先に変えるのは、
-新しい結び付けが `attribute.environment` を要るから。古い結び付け
-（`attribute.repository`）を外すのは、新しいものを足したあとにする。そうすれば
-`deploy-firestore.yml` が止まる時間は無い。
+pool と provider は `docs/firestore-deploy.md` の「一度だけ行う設定」が作る
+（作成済み）。ここにあるのは、この workflow のサービスアカウントとそのロール
+だけ。上から順に行う。
 
 ```sh
-# リポジトリのルートで走らせる（6 が apps/event-schedule-app を名指す）。
+# リポジトリのルートで走らせる（4 が apps/event-schedule-app を名指す）。
 HOST_PROJECT=noshiro-pf-ci
 HOST_NUMBER="$(gcloud projects describe "$HOST_PROJECT" --format='value(projectNumber)')"
 POOL="projects/${HOST_NUMBER}/locations/global/workloadIdentityPools/github"
-FIRESTORE_SA="firestore-deploy@${HOST_PROJECT}.iam.gserviceaccount.com"
 SA="event-schedule-app-deploy@${HOST_PROJECT}.iam.gserviceaccount.com"
 PROJECT=event-schedule-app
 
-# 1. provider：environment を属性に写し、2 つの組を通す。
-gcloud iam workload-identity-pools providers update-oidc noshiro-pf-mono \
-  --project "$HOST_PROJECT" --location global --workload-identity-pool github \
-  --attribute-mapping 'google.subject=assertion.sub,attribute.repository=assertion.repository,attribute.environment=assertion.environment' \
-  --attribute-condition "assertion.repository_id == '285301950' && assertion.repository_owner_id == '46040697' && assertion.ref == 'refs/heads/main' && ((assertion.environment == 'firebase-deploy' && assertion.workflow_ref.startsWith('noshiro-pf/mono/.github/workflows/deploy-firestore.yml@')) || (assertion.environment == 'event-schedule-app-deploy' && assertion.workflow_ref.startsWith('noshiro-pf/mono/.github/workflows/deploy-event-schedule-app.yml@')))"
-
-# 2. firestore-deploy を environment に結び付け直す（足してから外す）。
-gcloud iam service-accounts add-iam-policy-binding "$FIRESTORE_SA" \
-  --project "$HOST_PROJECT" --role roles/iam.workloadIdentityUser \
-  --member "principalSet://iam.googleapis.com/${POOL}/attribute.environment/firebase-deploy"
-gcloud iam service-accounts remove-iam-policy-binding "$FIRESTORE_SA" \
-  --project "$HOST_PROJECT" --role roles/iam.workloadIdentityUser \
-  --member "principalSet://iam.googleapis.com/${POOL}/attribute.repository/noshiro-pf/mono"
-
-# 3. 新しいサービスアカウント。
+# 1. サービスアカウント。
 gcloud iam service-accounts create event-schedule-app-deploy \
   --project "$HOST_PROJECT" --display-name "event-schedule-app deploy from GitHub Actions"
 gcloud iam service-accounts add-iam-policy-binding "$SA" \
   --project "$HOST_PROJECT" --role roles/iam.workloadIdentityUser \
   --member "principalSet://iam.googleapis.com/${POOL}/attribute.environment/event-schedule-app-deploy"
 
-# 4. noshiro-pf-ci で API を足すことはしない。デプロイの呼び出しは
+# 2. noshiro-pf-ci で API を足すことはしない。デプロイの呼び出しは
 #    GOOGLE_CLOUD_QUOTA_PROJECT で event-schedule-app に数える（上の「認証」）。
 #    noshiro-pf-ci は課金アカウントを持たず、Cloud Build・Artifact Registry・
 #    Cloud Scheduler・Secret Manager を有効にできない。
 
-# 5. event-schedule-app の project でのロール。
+# 3. event-schedule-app の project でのロール。
 gcloud iam roles create firebaseProjectGetter --project "$PROJECT" \
   --title "Firebase project getter" \
   --permissions firebase.projects.get,resourcemanager.projects.get --stage GA
@@ -157,7 +139,7 @@ gcloud iam service-accounts add-iam-policy-binding "${PROJECT}@appspot.gservicea
 gcloud secrets add-iam-policy-binding RUNTIME_CONFIG --project "$PROJECT" \
   --role roles/secretmanager.viewer --member "serviceAccount:${SA}"
 
-# 6. Artifact Registry の cleanup policy。無いと、非対話のデプロイは関数を
+# 4. Artifact Registry の cleanup policy。無いと、非対話のデプロイは関数を
 #    デプロイしたあとで失敗する（手で一度だけ）。firebase-tools は
 #    apps/event-schedule-app の devDependency なので、そのディレクトリで走らせる
 #    （ルートの `pnpm exec firebase` は "Command "firebase" not found" になる）。
