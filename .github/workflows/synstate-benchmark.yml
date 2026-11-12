@@ -13,7 +13,9 @@ name: SynState Benchmark
 #   reads every workspace package SynState is built from, and a hand-kept
 #   list of those would miss the next one, while a docs page changes no
 #   number it measures. The list takes back apps/synstate-docs/src/data, so
-#   that a diff of the committed tables alone is judged too.
+#   that a diff of the committed tables alone is judged too, and the
+#   documents a unit test reads, for node-version-compatibility.yml, which
+#   shares it; for those this runs for nothing.
 # - On `main` the job runs even when the verdict is reused, because that run
 #   is what stores the baseline the next pull request is compared with. The
 #   aggregate still reports the reused verdict. What it stores is the

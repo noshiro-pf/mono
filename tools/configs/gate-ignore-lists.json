@@ -12,7 +12,11 @@
     ".markdownlint-cli2.mjs",
     "**.md",
     "**.txt",
-    "!apps/*/src/"
+    "!apps/*/src/",
+    "!libs/eslint-config-typed/docs/rule-rationale.md",
+    "!libs/eslint-plugin-ts-std-forge/README.md",
+    "!libs/github-settings-as-code/README.md",
+    "!libs/pr-merge-queue/src/unblock-prs/README.md"
   ],
   "runtime": [
     "experimental/",
@@ -27,7 +31,11 @@
     ".markdownlint-cli2.mjs",
     "**.md",
     "**.txt",
-    "!apps/synstate-docs/src/data/"
+    "!apps/synstate-docs/src/data/",
+    "!libs/eslint-config-typed/docs/rule-rationale.md",
+    "!libs/eslint-plugin-ts-std-forge/README.md",
+    "!libs/github-settings-as-code/README.md",
+    "!libs/pr-merge-queue/src/unblock-prs/README.md"
   ],
   "style": ["experimental/"],
   "strict-lib": [
