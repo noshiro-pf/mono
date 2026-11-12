@@ -64,6 +64,48 @@ assert.strictEqual(
 - **`useRouteMatch`**, **`useBranch`** (the matched nodes with their `meta`, for a breadcrumb), **`useAt(node)`** and **`useIsActive(node, { exact })`** read the router's observables with `useSyncExternalStore`, whose server snapshot is the same value, so a router on a memory browser renders on a server.
 - **Scrolling**: `Routes` makes the navigation's scroll in a layout effect, once the new page is in the document. A page behind `Suspense`, such as a `React.lazy` case, commits its fallback first; the router then waits for the fragment's element and scrolls to it once the page draws it.
 
+## A page loaded later
+
+The route tree holds no components, so a case can return a `React.lazy` page under its own `Suspense` boundary: the page is split out of the main bundle, and the layouts around `Routes` stay drawn while it loads. A link to a fragment of such a page scrolls once the page draws the element.
+
+```tsx
+const routes = defineRoutes({
+    home: { segment: '' },
+    reports: {},
+});
+
+const router = createRouter(routes, {
+    browser: createMemoryBrowser('https://example.com/reports/'),
+});
+
+const { Routes } = createReactRouter(router);
+
+// In an application: `React.lazy(() => import('./reports-page.js'))`, which
+// the bundler splits into a chunk of its own.
+const ReportsPage = React.lazy(
+    async () =>
+        new Promise<Readonly<{ default: () => React.JSX.Element }>>(() => {
+            // Never settles here, so that the fallback is what is drawn.
+        }),
+);
+
+const pages: PageCases<typeof routes, 'home' | 'reports'> = {
+    home: () => <h1>{'Home'}</h1>,
+    // The case itself is the `Suspense` boundary: the layouts around `Routes`
+    // stay drawn while the page loads.
+    reports: () => (
+        <React.Suspense fallback={<p>{'Loading…'}</p>}>
+            <ReportsPage />
+        </React.Suspense>
+    ),
+} as const;
+
+assert.strictEqual(
+    renderToStaticMarkup(<Routes cases={pages} />),
+    '<p>Loading…</p>',
+);
+```
+
 ## Installation
 
 ```sh

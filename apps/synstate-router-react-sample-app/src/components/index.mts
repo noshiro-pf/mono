@@ -2,7 +2,6 @@ export * from './app.js';
 export * from './home-page.js';
 export * from './nav-link.js';
 export * from './not-found-page.js';
-export * from './notifications-tab.js';
 export * from './product-list-page.js';
 export * from './product-page.js';
 export * from './products-section.js';
