@@ -239,6 +239,12 @@ describe('Arr modifications', () => {
       assert.deepStrictEqual(result, [0, 0, 0, 0, 0]);
     });
 
+    test('an empty array stays empty', () => {
+      assert.deepStrictEqual(toFilled([], 0), []);
+
+      assert.deepStrictEqual(toFilled(0)([] as readonly number[]), []);
+    });
+
     test('should work with curried version', () => {
       const fillWithZero = toFilled(0);
 
