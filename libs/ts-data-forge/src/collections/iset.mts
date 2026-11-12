@@ -5,7 +5,6 @@ import type {
   WidenLiteral,
 } from 'ts-type-forge';
 import { asUint32 } from '../number/index.mjs';
-import { unknownToString } from '../others/index.mjs';
 import type { MapSetKeyType, SizeType } from '../types.mjs';
 
 /**
@@ -725,21 +724,15 @@ export namespace ISet {
  */
 class ISetClass<K extends MapSetKeyType> implements ISet<K>, Iterable<K> {
   readonly #set: ReadonlySet<K>;
-  readonly #showNotFoundMessage: boolean;
 
   /**
    * Constructs an ISetClass instance with the given elements.
    *
    * @param iterable An iterable of elements to populate the set.
-   * @param showNotFoundMessage Whether to log warning messages when operations
-   *   are performed on non-existent elements. Useful for debugging. Defaults to
-   *   false for production use.
    * @internal Use ISet.create() instead of calling this constructor directly.
    */
-  constructor(iterable: Iterable<K>, showNotFoundMessage: boolean = false) {
+  constructor(iterable: Iterable<K>) {
     this.#set = new Set(iterable);
-
-    this.#showNotFoundMessage = showNotFoundMessage;
   }
 
   /** @inheritdoc */
@@ -793,20 +786,10 @@ class ISetClass<K extends MapSetKeyType> implements ISet<K>, Iterable<K> {
 
   /** @inheritdoc */
   delete(key: K): ISet<K> {
-    if (!this.has(key)) {
-      if (this.#showNotFoundMessage) {
-        const keyStr = unknownToString(key);
-
-        console.warn(`ISet.delete: key not found: ${keyStr}`);
-      }
-
-      return this;
-    }
-
     // Through the native collection, which compares keys with SameValueZero as
     // `has` and `get` do; a rebuild comparing with `Object.is` left a `-0` key
     // unmatched.
-    return this.withMutations([{ type: 'delete', key }]);
+    return this.has(key) ? this.withMutations([{ type: 'delete', key }]) : this;
   }
 
   /** @inheritdoc */

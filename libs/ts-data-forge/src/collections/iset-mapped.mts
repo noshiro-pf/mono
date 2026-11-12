@@ -5,7 +5,6 @@ import type {
   WidenLiteral,
 } from 'ts-type-forge';
 import { asUint32 } from '../number/index.mjs';
-import { unknownToString } from '../others/index.mjs';
 import type { MapSetKeyType, SizeType } from '../types.mjs';
 
 /**
@@ -1185,7 +1184,6 @@ class ISetMappedClass<K, KM extends MapSetKeyType>
   readonly #set: ReadonlySet<KM>;
   readonly #toKey: (a: K) => KM;
   readonly #fromKey: (k: KM) => K;
-  readonly #showNotFoundMessage: boolean;
 
   /**
    * Constructs an ISetMappedClass instance with custom element transformation.
@@ -1195,24 +1193,18 @@ class ISetMappedClass<K, KM extends MapSetKeyType>
    *   KM. Must be deterministic and produce unique values for unique elements.
    * @param fromKey A function that converts a primitive key KM back to the
    *   custom element K. Should be the inverse of the toKey function.
-   * @param showNotFoundMessage Whether to log warning messages when operations
-   *   are performed on non-existent elements. Useful for debugging. Defaults to
-   *   false for production use.
    * @internal Use ISetMapped.create() instead of calling this constructor directly.
    */
   constructor(
     iterable: Iterable<K>,
     toKey: (a: K) => KM,
     fromKey: (k: KM) => K,
-    showNotFoundMessage: boolean = false,
   ) {
     this.#set = new Set(Array.from(iterable, toKey));
 
     this.#toKey = toKey;
 
     this.#fromKey = fromKey;
-
-    this.#showNotFoundMessage = showNotFoundMessage;
   }
 
   /** @inheritdoc */
@@ -1276,20 +1268,10 @@ class ISetMappedClass<K, KM extends MapSetKeyType>
 
   /** @inheritdoc */
   delete(key: K): ISetMapped<K, KM> {
-    if (!this.has(key)) {
-      if (this.#showNotFoundMessage) {
-        console.warn(
-          `ISetMapped.delete: key not found: ${unknownToString(this.#toKey(key))}`,
-        );
-      }
-
-      return this;
-    }
-
     // Through the native collection, which compares keys with SameValueZero as
     // `has` and `get` do; a rebuild comparing with `Object.is` left a `-0` key
     // unmatched.
-    return this.withMutations([{ type: 'delete', key }]);
+    return this.has(key) ? this.withMutations([{ type: 'delete', key }]) : this;
   }
 
   /** @inheritdoc */
