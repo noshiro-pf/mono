@@ -524,12 +524,13 @@ const ROOT_DIRECTORY = '.';
 
 /**
  * A workflow is one of the repository's checks when it triggers on
- * `pull_request`, which is exactly the six named in CLAUDE.md.
- * `lint-pull-request.yml` and `skip-ci-label.yml` use `pull_request_target` and
- * run no repository command; `check-gates.yml` is reached through
- * `workflow_call`. The rest — the release, the dependency updates, the Pages
- * deploy — run commands that nothing about a pull request depends on, so a
- * check only they reach is a check no pull request gets.
+ * `pull_request`: the six that `check-gates.yml` gates, `verify-lockfile.yml`
+ * and `link-check.yml`. `lint-pull-request.yml`, `code-owners.yml` and
+ * `skip-ci-label.yml` use `pull_request_target` and run no repository command;
+ * `check-gates.yml` is reached through `workflow_call`. The rest — the release,
+ * the dependency updates, the Pages deploy — run commands that nothing about a
+ * pull request depends on, so a check only they reach is a check no pull
+ * request gets.
  */
 const PULL_REQUEST_EVENT = 'pull_request';
 

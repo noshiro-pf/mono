@@ -1,8 +1,8 @@
 // cspell:ignore esac
 
 /**
- * `lint-pull-request.yml`'s `code-owners` job against `pr-report-core`'s
- * reading of the same `CODEOWNERS`.
+ * `code-owners.yml`'s `code-owners` job against `pr-report-core`'s reading of
+ * the same `CODEOWNERS`.
  *
  * The job runs on `pull_request_target` without a checkout, so it matches the
  * file in its own shell rather than through `pr-report-core`, which is what the
@@ -21,7 +21,7 @@ import { codeOwnerReview, parseCodeOwners, pushersOf } from 'pr-report-core';
 import { isRecord, isString } from 'ts-data-forge';
 import { projectRootPath } from '../project-root-path.mjs';
 
-describe('the code-owners job of lint-pull-request.yml', () => {
+describe('the code-owners job of code-owners.yml', () => {
   const codeOwners = [
     '# enforced-by: Validate code owners',
     '/.github/workflows/ @owner',
@@ -338,7 +338,7 @@ const readText = async (file: string): Promise<string> =>
 /** The `run:` block of the job's one step, as the runner gets it. */
 const jobScript = async (): Promise<string> => {
   const workflow = await readText(
-    path.join(projectRootPath, '.github/workflows/lint-pull-request.yml'),
+    path.join(projectRootPath, '.github/workflows/code-owners.yml'),
   );
 
   const lines = workflow.split('\n');
@@ -349,7 +349,7 @@ const jobScript = async (): Promise<string> => {
     (line, index) => index > job && line === '        run: |',
   );
 
-  // lint-pull-request.yml has a code-owners job, and the job a run block.
+  // code-owners.yml has a code-owners job, and the job a run block.
   assert.isAbove(job, -1);
 
   assert.isAbove(run, job);

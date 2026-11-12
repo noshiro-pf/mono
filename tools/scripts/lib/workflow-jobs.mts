@@ -67,14 +67,11 @@ export const readWorkflowJobs = (
         name,
         displayName: isString(displayName) ? displayName : undefined,
         uses: isString(uses) ? uses : undefined,
+        with: readEnv(record['with']),
         condition: scalarText(record['if']),
         hasRunner: record['runs-on'] !== undefined,
         timeoutMinutes: scalarText(timeoutMinutes),
-        needs: isString(needs)
-          ? [needs]
-          : Arr.isArray(needs)
-            ? needs.filter(isString)
-            : [],
+        needs: stringList(needs),
         matrix: isRecord(strategy) ? strategy['matrix'] : undefined,
         env: { ...workflowEnv, ...readEnv(record['env']) },
         steps: Arr.isArray(steps)
@@ -113,13 +110,39 @@ export const readWorkflowTriggers = (
   Result.map(parseWorkflow(text), (workflow) => {
     const on = isRecord(workflow) ? workflow['on'] : undefined;
 
-    return isString(on)
-      ? [on]
-      : Arr.isArray(on)
-        ? on.filter(isString)
-        : isRecord(on)
-          ? Object.keys(on)
-          : [];
+    return isRecord(on) ? Object.keys(on) : stringList(on);
+  });
+
+/**
+ * The `types:` a workflow's `on.<event>` lists, as written; empty when the
+ * event names none.
+ */
+export const readTriggerTypes = (
+  text: string,
+  event: string,
+): Result<readonly string[], string> =>
+  Result.map(parseWorkflow(text), (workflow) => {
+    const on = isRecord(workflow) ? workflow['on'] : undefined;
+
+    const filters = isRecord(on) ? on[event] : undefined;
+
+    const types = isRecord(filters) ? filters['types'] : undefined;
+
+    return stringList(types);
+  });
+
+/** A workflow's top-level `concurrency.group`, as written; else undefined. */
+export const readConcurrencyGroup = (
+  text: string,
+): Result<string | undefined, string> =>
+  Result.map(parseWorkflow(text), (workflow) => {
+    const concurrency = isRecord(workflow)
+      ? workflow['concurrency']
+      : undefined;
+
+    const group = isRecord(concurrency) ? concurrency['group'] : concurrency;
+
+    return isString(group) ? group : undefined;
   });
 
 /**
@@ -274,6 +297,8 @@ export type WorkflowJob = Readonly<{
   displayName: string | undefined;
   /** The reusable workflow the job calls (`uses:`), as written. */
   uses: string | undefined;
+  /** The inputs it passes to that workflow (`with:`), scalars as text. */
+  with: ReadonlyRecord<string, string>;
   /** The job's `if:` as written, a folded one joined; absent without one. */
   condition: string | undefined;
   /** The jobs its `needs:` names, one or a list. */
@@ -356,6 +381,14 @@ const readScalars = (
 
     return text === undefined ? Optional.none : Optional.some(text);
   });
+
+/** A value YAML writes as one string or a list of them; else none. */
+const stringList = (value: unknown): readonly string[] =>
+  isString(value)
+    ? ([value] as const)
+    : Arr.isArray(value)
+      ? value.filter(isString)
+      : ([] as const);
 
 /** An `env:` mapping, its scalar values as strings. */
 const readEnv = (env: unknown): ReadonlyRecord<string, string> =>

@@ -37,7 +37,7 @@
   足さなければ、動きはするが何も止めない。マトリクスのエントリを増やす分には
   何も要らない。required にしてあるコンテキストは、集約ジョブ（`*-result`）か、
   リポジトリのコードを走らせないもの（`no-skip-ci-label` の commit status、
-  `lint-pull-request.yml` の 4 つのジョブ、`verify-lockfile.yml` の
+  `code-owners.yml` の `Validate code owners` ジョブ、`verify-lockfile.yml` の
   `verify-lockfile` ジョブ）のどちらかで、作業そのものをする
   ジョブは一つも入っていない。理由は `.github/workflows/README.md` の
   「The aggregate job」と `CLAUDE.md` の「CI」節。
@@ -45,11 +45,20 @@
   「 Expected — waiting 」のまま。** 改名するときは ruleset bypass でマージし、
   `pnpm run repo-settings:apply rulesets` を実行し、そのあと open な pull
   request が rebase されるまで全部 blocked に見えることを見込んでおく。
+  ただし旧名のジョブが残り、`if:` で skip されうるとき（ジョブを集約の下へ移す
+  ときなど）は順序を逆にし、先に apply してから bypass でマージする。逆の順では
+  そのあいだ旧名の `skipped` が必須チェックを満たしてしまう。新しい context は
+  その workflow が判定するイベントで付き、それまでは「 Expected — waiting 」の
+  まま。`lint-pull-request.yml` なら、`skip-ci` の付いているものは label が外れた
+  とき（`unblock-prs` が外す）に付くが、付いていないもの（キューに入って
+  auto-merge が張られたものなど）にはイベントが来ないので、bypass でマージした
+  あとに手で label を付け外しする（マージ前の付け外しは `main` の古い workflow
+  を走らせるだけ）。
 - **squash merge が必須で、admin の bypass は `pull_request` モードだけ。**
   bypass を広げないこと。直接 push を検査するものは無い。
 - **`require_code_owner_review` は `false` のままにする。** `.github/CODEOWNERS`
   をマージゲートにしているのは ruleset ではなく、必須チェック
-  `Validate code owners`（`lint-pull-request.yml` の `code-owners` ジョブ）。挙がったパスを触る pull request は、作り手と
+  `Validate code owners`（`code-owners.yml` の `code-owners` ジョブ）。挙がったパスを触る pull request は、作り手と
   ブランチに push した全員が所有者であるか、所有者が head を approve していなければ赤になる。ruleset の
   規則は作り手を区別できず、作者は自分の pull request を approve できないので、
   `true` にすると owner 自身の pull request がそのパスでは毎回 ruleset bypass

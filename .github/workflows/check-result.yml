@@ -11,9 +11,10 @@ on:
       needs:
         description: >-
           `toJSON(needs)` of the calling job, which names `gates` (the
-          check-gates.yml job) and the jobs that do the work. Every need but
-          `gates` has to succeed. A need that outputs `no_verdict: 'true'`
-          skips this job, as the gate's `should_run: false` does.
+          check-gates.yml job), where the workflow has one, and the jobs
+          that do the work. Every need but `gates` has to succeed. A need
+          that outputs `no_verdict: 'true'` skips this job, as the gate's
+          `should_run: false` does.
         type: string
         required: true
 
@@ -22,13 +23,19 @@ jobs:
   # calling job that GitHub skips reports a check run under its own name
   # alone, and `<caller> / result` — the required context — would then never
   # arrive at all. So the caller calls, and this job skips, which reports
-  # that context as `skipped` without booting a runner. The one exception is
-  # a label event under `skip-ci`, where the caller skips on purpose to leave
-  # the last verdict standing — README.md, "A label event under `skip-ci`".
+  # that context as `skipped` without booting a runner. The one exception in
+  # the check workflows is a label event under `skip-ci`, where the caller
+  # skips on purpose to leave the last verdict standing — README.md, "A label
+  # event under `skip-ci`". `lint-pull-request.yml`'s caller skips on more
+  # events under the label; its jobs comment says which and why.
   #
   # `always()`, because without a status function the job carries an implicit
   # `success()`, and a cancelled run would then read `skipped` — satisfied —
   # rather than red.
+  #
+  # The `skip-ci` clause names `pull_request` on purpose: under
+  # `lint-pull-request.yml`'s `pull_request_target` a run that reaches this
+  # job judges under the label, and has to report its verdict, not `skipped`.
   result:
     if: >-
       always() &&

@@ -18,6 +18,7 @@ workflows:
         - 'actions/upload-artifact@v7.0.2'
         - 'codecov/codecov-action@v7.1.1'
         - 'pnpm/action-setup@v6.1.0'
+    '.github/workflows/code-owners.yml': []
     '.github/workflows/deploy-event-schedule-app.yml':
         - 'actions/cache@v5.1.0'
         - 'actions/checkout@v7.0.1'

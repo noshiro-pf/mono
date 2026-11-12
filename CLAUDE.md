@@ -188,9 +188,9 @@ aggregates, `skip-ci`, what a job that holds a key may do, and what a new
 workflow has to be wired to. A workflow's own comments say only what is
 particular to it. Here is only what a session has to act on.
 
-- **The required contexts** (`repo-settings/rulesets/main.json`) are the six
-  `*-result / result` aggregates, the `no-skip-ci-label` status, the four
-  `lint-pull-request.yml` jobs and `verify-lockfile`. None does work, because a
+- **The required contexts** (`repo-settings/rulesets/main.json`) are the seven
+  `*-result / result` aggregates, the `no-skip-ci-label` status,
+  `Validate code owners` and `verify-lockfile`. None does work, because a
   skipped job satisfies a required check. A new matrix entry needs nothing; a
   new job or workflow needs its aggregate context added there, or it runs and
   blocks nothing. A red aggregate names the jobs that did not pass; open the
@@ -198,10 +198,11 @@ particular to it. Here is only what a session has to act on.
 - **A push to `main` runs the check workflows too.** A merged tree that
   already has a verdict costs one gate job; one that has none, as a bypass
   merge can land, is checked in full. Nothing needs running by hand.
-- **`skip-ci`** skips the check workflows (the lint jobs still run); the
-  `no-skip-ci-label` status (`skip-ci-label.yml`) holds the merge while it is
-  on. Taking it off is what starts the checks. Any label event re-runs them,
-  so add other labels before pushing or after the checks report.
+- **`skip-ci`** skips the check workflows and, mostly, the lint's title and
+  commit checks (`lint-pull-request.yml` says when); the `no-skip-ci-label`
+  status (`skip-ci-label.yml`) holds the merge while it is on. Taking it off is
+  what starts the checks. Any label event re-runs them, so add other labels
+  before pushing or after the checks report.
 - `skip-ci`, `merge-queued`, `blocks-release` and `auto-rebase` exist only
   on GitHub; the strings are in the workflows and
   `libs/pr-report-core/src/labels.mts`. Change them everywhere or nowhere.
@@ -329,8 +330,9 @@ ingest the feed). Outside reports come through private vulnerability reporting
   **Do not teach a script the proxy's `ccr/` route**: not GitHub's API, it
   answers 404 from anywhere else, a code path dead everywhere it would run.
 - **The `opened` run the label cancels leaves red `*-result` checks and "check
-  failed" notifications naming nothing — ignore them**; they stay until
-  `skip-ci` comes off, and `pr-report` marks them stale.
+  failed" notifications naming nothing — ignore them** (not the lint's: the
+  label cancels no run of it); they stay until `skip-ci` comes off, and
+  `pr-report` marks them stale.
 - Taking `skip-ci` off is how CI is asked for; `unblock-prs` takes it off only
   from a `merge-queued` pull request, mostly checked by then on its queue layer,
   whose verdict it reuses. **Queueing one is that label alone** — `unblock-prs`

@@ -159,13 +159,14 @@ const COMMAND_NAMED: ReadonlySet<string> = new Set<string>([
 /**
  * Whether a workflow's jobs are checks a queued pull request waits on: one
  * gated by `check-gates.yml`, as every check workflow is, or the pull request
- * lint, which is not.
+ * lint and the code owners' check, which are not.
  */
 export const isCheckWorkflow = ({
   file,
   text,
 }: Readonly<{ file: string; text: string }>): boolean =>
   file === 'lint-pull-request.yml' ||
+  file === 'code-owners.yml' ||
   /^\s+uses: \.\/\.github\/workflows\/check-gates\.yml\s*$/mu.test(text);
 
 const GUIDE = '.github/unblock-prs.md';

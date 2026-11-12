@@ -937,9 +937,9 @@ describe('headChecksOf, then summarizeChecks', () => {
     assert.strictEqual(summary.verdict, 'failing');
   });
 
-  // Sibling jobs with no aggregate after them, as `lint-pull-request.yml`'s
-  // are: one still queued is not a re-run, and does not hold back the red of
-  // another.
+  // Sibling jobs with no aggregate after them, a shape no workflow here has now
+  // and any may take: one still queued is not a re-run, and does not hold back
+  // the red of another.
   test('fails on a red of the round still running while its sibling jobs are queued', () => {
     const summary = summarize([
       checkRun('code-check-result / result', 'COMPLETED', 'FAILURE', null, {
