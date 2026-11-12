@@ -134,6 +134,16 @@ export const collectEventSettingsPageDiff = (
 const map = (a: string, b: string): string =>
   `"${a}" ${dict.common.mapTo} "${b}"` as const;
 
+/**
+ * What of a schedule the list of its dates is written from: the dates and how
+ * they are specified, and not the offset, so an edit of the offset alone lists
+ * no date.
+ */
+type ScheduleDates = StrictPick<
+  EventSchedule,
+  'datetimeRangeList' | 'datetimeSpecification'
+>;
+
 type EventSchedulePaths = StrictExclude<
   RecordPaths<EventSchedule>,
   readonly []
@@ -239,7 +249,9 @@ const notificationSettingsDiff = (
 
 const tilde = dict.common.tilde;
 
-const datetimeRange2str = (
+// A range as the diff lists it: the times its specification shows, and no
+// others.
+const datetimeRangeAsSpecified = (
   datetimeSpecification: EventSchedule['datetimeSpecification'],
   datetimeRange: DatetimeRange,
 ): string =>
@@ -256,26 +268,26 @@ const datetimeRange2str = (
 
     startAndEndSpecified: `${ymd2str(datetimeRange.ymd)} ${hm2str(
       datetimeRange.timeRange.start,
-    )}${tilde}${hm2str(datetimeRange.timeRange.end)} `,
+    )}${tilde}${hm2str(datetimeRange.timeRange.end)}`,
   });
 
 const datetimeRangeListDiff = (
-  a: StrictPick<EventSchedule, 'datetimeRangeList' | 'datetimeSpecification'>,
-  b: StrictPick<EventSchedule, 'datetimeRangeList' | 'datetimeSpecification'>,
+  prev: ScheduleDates,
+  curr: ScheduleDates,
 ): ReadonlyRecord<'added' | 'deleted', readonly string[]> | undefined => {
-  const setA = ISetMapped.create(
-    a.datetimeRangeList,
+  const prevSet = ISetMapped.create(
+    prev.datetimeRangeList,
     datetimeRangeToMapKey,
     datetimeRangeFromMapKey,
   );
 
-  const setB = ISetMapped.create(
-    b.datetimeRangeList,
+  const currSet = ISetMapped.create(
+    curr.datetimeRangeList,
     datetimeRangeToMapKey,
     datetimeRangeFromMapKey,
   );
 
-  const diff = ISetMapped.diff(setA, setB);
+  const diff = ISetMapped.diff(prevSet, currSet);
 
   if (diff.added.isEmpty && diff.deleted.isEmpty) {
     return undefined;
@@ -285,8 +297,14 @@ const datetimeRangeListDiff = (
 
   const deleted = diff.deleted.toArray();
 
+  // An added range is one of `curr`'s and a deleted one is one of `prev`'s, so
+  // each is written as the schedule it belongs to specifies its dates.
   return {
-    added: added.map((e) => datetimeRange2str(a.datetimeSpecification, e)),
-    deleted: deleted.map((e) => datetimeRange2str(b.datetimeSpecification, e)),
+    added: added.map((e) =>
+      datetimeRangeAsSpecified(curr.datetimeSpecification, e),
+    ),
+    deleted: deleted.map((e) =>
+      datetimeRangeAsSpecified(prev.datetimeSpecification, e),
+    ),
   };
 };
