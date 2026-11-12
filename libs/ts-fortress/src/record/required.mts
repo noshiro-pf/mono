@@ -91,6 +91,10 @@ type RequiredValue<
     ? Readonly<Required<R>>
     : PartiallyRequired<R, ArrayElement<KeysToBeRequired>>;
 
+// An optional member's `undefined` default (forced with
+// `forceUndefinedDefault`) is kept, though the required key does not accept it:
+// `required` has always kept a member's default, and another one needs a value
+// of the member, which only some types list.
 /**
  * Makes an optional property required by removing the optional flag.
  */
