@@ -3371,6 +3371,12 @@ importers:
 
   libs/better-preact-use-state:
     devDependencies:
+      '@testing-library/preact':
+        specifier: 'catalog:'
+        version: 3.2.4(preact@10.29.8)
+      '@vitest/browser-playwright':
+        specifier: 'catalog:'
+        version: 5.0.5(playwright@1.64.1)(vite@8.3.5(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))(vitest@5.0.5)
       eslint:
         specifier: 'catalog:'
         version: 10.13.0(jiti@2.7.0)(supports-color@7.2.0)
@@ -3386,6 +3392,9 @@ importers:
       npm-run-all2:
         specifier: 'catalog:'
         version: 9.0.4
+      playwright:
+        specifier: 'catalog:'
+        version: 1.64.1
       preact:
         specifier: 'catalog:'
         version: 10.29.8(preact-render-to-string@6.8.1)
@@ -3410,9 +3419,21 @@ importers:
 
   libs/better-react-use-state:
     devDependencies:
+      '@testing-library/dom':
+        specifier: 'catalog:'
+        version: 10.4.2
+      '@testing-library/react':
+        specifier: 'catalog:'
+        version: 16.3.3(@testing-library/dom@10.4.2)(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
       '@types/react':
         specifier: 'catalog:'
         version: 19.3.0
+      '@types/react-dom':
+        specifier: 'catalog:'
+        version: 19.3.0(@types/react@19.3.0)
+      '@vitest/browser-playwright':
+        specifier: 'catalog:'
+        version: 5.0.5(playwright@1.64.1)(vite@8.3.5(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))(vitest@5.0.5)
       eslint:
         specifier: 'catalog:'
         version: 10.13.0(jiti@2.7.0)(supports-color@7.2.0)
@@ -3428,6 +3449,9 @@ importers:
       npm-run-all2:
         specifier: 'catalog:'
         version: 9.0.4
+      playwright:
+        specifier: 'catalog:'
+        version: 1.64.1
       prettier:
         specifier: 'catalog:'
         version: 3.9.10
@@ -3440,6 +3464,9 @@ importers:
       react:
         specifier: 'catalog:'
         version: 19.3.1
+      react-dom:
+        specifier: 'catalog:'
+        version: 19.3.1(react@19.3.1)
       ts-data-forge:
         specifier: workspace:*
         version: link:../ts-data-forge

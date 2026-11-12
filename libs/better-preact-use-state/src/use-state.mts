@@ -12,9 +12,14 @@ export const useState = <T,>(
 ] => {
   const [state, setState] = Preact.useState<T>(initialState);
 
+  // The value the state was created with, read once as `useState` reads it, so
+  // that `resetState` neither follows a later argument nor changes identity
+  // when one is passed (an object literal is a new one on every render).
+  const [initial] = Preact.useState<T>(initialState);
+
   const resetState = Preact.useCallback(() => {
-    setState(() => initialState);
-  }, [initialState]);
+    setState(() => initial);
+  }, [initial]);
 
   const updateState = Preact.useCallback((updateFn: (v: T) => T) => {
     setState(updateFn);
