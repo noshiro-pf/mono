@@ -150,6 +150,7 @@
     "strict-lib:gen:version-diff": "tsx --tsconfig \"$PWD/tools/configs/tsconfig.tsx.json\" ./strict-lib/scripts/cmd/gen-version-diff.mts",
     "strict-lib:gen:with-codemod-fixed": "tsx --tsconfig \"$PWD/tools/configs/tsconfig.tsx.json\" ./strict-lib/scripts/cmd/ws-gen-with-codemod-fixed-stages.mts",
     "strict-lib:publish": "tsx --tsconfig \"$PWD/tools/configs/tsconfig.tsx.json\" ./strict-lib/scripts/cmd/dist-npm-publish.mts",
+    "submit-chrome-extension": "node ./tools/scripts/cmd/submit-chrome-extension.mts",
     "unblock-prs": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./libs/pr-merge-queue/src/cmd/unblock-prs.mts",
     "update-actions": "node ./tools/scripts/cmd/mature-updates.mts actions",
     "update-changeset": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/changeset-for-dependency-update.mts",
