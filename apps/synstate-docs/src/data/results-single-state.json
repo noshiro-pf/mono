@@ -6,13 +6,13 @@
     "environment": {
       "runner": "github-actions",
       "runnerImage": "ubuntu24",
-      "node": "v26.12.1",
+      "node": "v26.13.0",
       "platform": "Linux 7.0.0-1017-azure",
       "arch": "x64",
-      "cpu": "AMD EPYC 7763 64-Core Processor",
-      "measuredOn": "2026-10-31",
+      "cpu": "AMD EPYC 9V74 80-Core Processor",
+      "measuredOn": "2026-11-14",
       "libraries": {
-        "synstate": "6.1.1",
+        "synstate": "9.0.0",
         "rxjs": "7.8.2",
         "jotai": "3.0.1",
         "mobx": "7.1.0",
@@ -27,75 +27,75 @@
   "rows": [
     {
       "label": "SynState",
-      "median": 4.47,
-      "min": 4.34,
-      "max": 5.12,
-      "p95": 4.72,
-      "opsPerSec": 22370156
+      "median": 7.3,
+      "min": 6.93,
+      "max": 9,
+      "p95": 7.71,
+      "opsPerSec": 13701507
     },
     {
       "label": "RxJS",
-      "median": 4.26,
-      "min": 4.12,
-      "max": 4.41,
-      "p95": 4.41,
-      "opsPerSec": 23452501
+      "median": 3.17,
+      "min": 3.11,
+      "max": 3.33,
+      "p95": 3.24,
+      "opsPerSec": 31546931
     },
     {
       "label": "MobX",
-      "median": 54.94,
-      "min": 54.65,
-      "max": 55.56,
-      "p95": 55.26,
-      "opsPerSec": 1820046
+      "median": 40.21,
+      "min": 39.88,
+      "max": 44.16,
+      "p95": 40.57,
+      "opsPerSec": 2486820
     },
     {
       "label": "Jotai",
-      "median": 183.23,
-      "min": 181.66,
-      "max": 185.21,
-      "p95": 184.69,
-      "opsPerSec": 545767
+      "median": 134.13,
+      "min": 130.8,
+      "max": 138.71,
+      "p95": 138.41,
+      "opsPerSec": 745530
     },
     {
       "label": "Redux",
-      "median": 118.9,
-      "min": 118.23,
-      "max": 120.38,
-      "p95": 119.76,
-      "opsPerSec": 841033
+      "median": 94.4,
+      "min": 93.23,
+      "max": 98.27,
+      "p95": 97.27,
+      "opsPerSec": 1059295
     },
     {
       "label": "Solid",
-      "median": 29.05,
-      "min": 28.73,
-      "max": 38.71,
-      "p95": 34.29,
-      "opsPerSec": 3441912
+      "median": 16.86,
+      "min": 16.65,
+      "max": 17.15,
+      "p95": 17.06,
+      "opsPerSec": 5932495
     },
     {
       "label": "Preact Signals",
-      "median": 5.28,
-      "min": 5.17,
-      "max": 5.39,
-      "p95": 5.38,
-      "opsPerSec": 18937192
+      "median": 4.21,
+      "min": 4.12,
+      "max": 6.26,
+      "p95": 6.23,
+      "opsPerSec": 23728063
     },
     {
       "label": "Zustand",
-      "median": 5.48,
-      "min": 5.4,
-      "max": 6.08,
-      "p95": 5.7,
-      "opsPerSec": 18254713
+      "median": 4.42,
+      "min": 4.31,
+      "max": 4.76,
+      "p95": 4.65,
+      "opsPerSec": 22630089
     },
     {
       "label": "Valtio",
-      "median": 46.87,
-      "min": 46.5,
-      "max": 47.68,
-      "p95": 47.65,
-      "opsPerSec": 2133427
+      "median": 30.64,
+      "min": 30.49,
+      "max": 34.8,
+      "p95": 30.87,
+      "opsPerSec": 3263259
     }
   ]
 }

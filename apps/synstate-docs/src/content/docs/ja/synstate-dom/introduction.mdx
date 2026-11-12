@@ -21,7 +21,7 @@ synstate-dom はまだバージョン 0.x なので、マイナーリリース�
 
 synstate-dom は SynState のランタイムに最も直接つながる UI ライブラリで、それがこのライブラリの存在理由です。
 
-- **SynState の速さがそのまま画面に届きます。** [ベンチマークの概要](/mono/synstate/ja/guides/library-comparison/benchmark/#このページの読み方)では、SynState はどのシナリオでも最速のライブラリの {/* bench:summary/synstate-worst-over-fastest */}2.7{/* /bench */} 倍以内に収まります。{/* bench:summary/synstate-alone-in-single-digits */}すべてのシナリオで計測したライブラリのうち、最悪のケースでも1桁倍に収まるのは SynState だけです{/* /bench */}。synstate-dom はそのグラフと DOM の間に何も挟みません。
+- **SynState の速さがそのまま画面に届きます。** [ベンチマークの概要](/mono/synstate/ja/guides/library-comparison/benchmark/#このページの読み方)では、SynState はどのシナリオでも最速のライブラリの {/* bench:summary/synstate-worst-over-fastest */}4.7{/* /bench */} 倍以内に収まります。{/* bench:summary/synstate-alone-in-single-digits */}すべてのシナリオで計測したライブラリのうち、最悪のケースでも1桁倍に収まるのは SynState だけです{/* /bench */}。synstate-dom はそのグラフと DOM の間に何も挟みません。
 - **シンプルな API で、遅くなる場面が少ない。** synstate-dom は、ベンチマークの 1 行だけで勝つための書き方を増やさず、1 つのことに 1 つの書き方を保ちます。変換した値はどこに束縛するときも `source$.pipe(map(fn))` です。js-framework-benchmark の操作では、最も遅い操作でも最速のライブラリの {/* benchmark:worst/synstate-dom */}1.56{/* /benchmark */} 倍です。{/* benchmark:placement/behind */}Solid・Preact・Preact + Signals には及びません{/* /benchmark */}が、最も遅い操作が {/* benchmark:worst/react */}3.79{/* /benchmark */} 倍の React を大きく下回ります。詳しくは[ベンチマーク](/mono/synstate-dom/ja/background/benchmark/#結果の読み方)を見てください。
 - **コンポーネントは一度だけ実行されます。** マウント時に呼ばれて DOM の記述を返し、その後は二度と呼ばれません。メモ化するものはなく、変わる値はコンポーネントの本体ではなく Observable から読みます。
 - **更新は末端へ直接届きます。** 変更は SynState のグリッチのない 1 回の伝搬でグラフを通り、synstate-dom がそれを束縛された各ノードに書き込みます。差分を取ることはなく、古い入力と新しい入力の混ざった値をノードが表示することもありません。
