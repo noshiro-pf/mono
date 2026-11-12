@@ -31,3 +31,14 @@ export const scenarioDir = path.resolve(
  * deeper.
  */
 export const resultsDir = path.resolve(workspaceRootPath, 'src/data');
+
+/**
+ * Whether a file under {@link resultsDir}, or a copy of it, is a table a runner
+ * writes (`writeBenchmarkResults`): `results.json` or `results-<scenario>.json`.
+ */
+export const isResultsTable = (file: string): boolean =>
+  file.startsWith('results') && file.endsWith('.json');
+
+/** The Markdown table a runner writes beside each {@link isResultsTable}. */
+export const isResultsMarkdown = (file: string): boolean =>
+  file.startsWith('results') && file.endsWith('.md');

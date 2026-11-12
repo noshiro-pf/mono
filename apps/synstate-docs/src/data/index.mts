@@ -2,8 +2,8 @@
  * The committed measurements: a baseline `synstate-benchmark.yml` measured on
  * its pinned runner, committed from its artifact. The workflow fails on `main`
  * once a later baseline has drifted from them beyond run-to-run noise, or
- * measures a library or point they lack or no longer has one they show
- * (`scripts/benchmark/check-drift.mts`).
+ * measures a scenario, library or point they lack or no longer has one they
+ * show (`scripts/benchmark/check-drift.mts`).
  * `pnpm --filter @synstate/docs run benchmark` writes the same files locally.
  * Beside them, hand-written, the colour each chart draws a results label in
  * (`library-colors.mts`), which the charts and `gen:benchmark-doc` share, and
