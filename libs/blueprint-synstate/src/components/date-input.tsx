@@ -65,7 +65,6 @@ type Props = StrictOmit<DatePickerOptions, 'shortcuts'> &
     /** The value read from typed text; {@link parseDateText} if omitted. */
     parseDate?: (text: string) => Optional<WallClock>;
     invalidDateMessage?: string;
-    outOfRangeMessage?: string;
   }>;
 
 /**
@@ -85,9 +84,16 @@ type Props = StrictOmit<DatePickerOptions, 'shortcuts'> &
  * - While focused, the input shows what is typed; text that reads as a date
  *   in range becomes the value as it is typed, and Enter takes any date it
  *   reads. Otherwise it shows the value, or the error message for a value
- *   that is not a date or is out of range, drawn as an error.
+ *   that is not a date, drawn as an error, as a value out of range is (see
+ *   below).
  * - Picking a day closes the calendar with `closeOnSelection`, unless the
  *   month or the time changed with it.
+ *
+ * Unlike Blueprint's, a value out of range is shown as its date, drawn as an
+ * error, rather than as "Out of range": `minDate` and `maxDate` say what can be
+ * picked and typed, and a value stored outside them, as Enter or a saved
+ * document can give, still reads as itself. The calendar is given no value for
+ * it, so that changing the month moves no day into the range in its place.
  *
  * Unlike Blueprint's, Escape in the field or the calendar while the calendar is
  * open is kept from the page, so that the `<dialog>` it is in stays open and
@@ -108,7 +114,6 @@ export const DateInput = ({
   formatDate,
   parseDate,
   invalidDateMessage = 'Invalid date',
-  outOfRangeMessage = 'Out of range',
   shortcuts,
   ...pickerOptions
 }: Props): JSX.Element => {
@@ -143,10 +148,18 @@ export const DateInput = ({
 
       return Optional.isNone(clock)
         ? { text: invalidDateMessage, error: true }
-        : isDayInRange(clock.value, min, max)
-          ? { text: format(clock.value), error: false }
-          : { text: outOfRangeMessage, error: true };
+        : {
+            text: format(clock.value),
+            error: !isDayInRange(clock.value, min, max),
+          };
     }),
+  );
+
+  // What the calendar is given: none for a value out of range, which a change
+  // of month would move into the range in its place. A day or a time picked
+  // then is taken as from no value: a day at midnight, a time on today.
+  const pickerValue$ = derive([value$, shown$], (current, shown) =>
+    shown.error ? '' : current,
   );
 
   const [isOpen$, setOpen] = createState(false);
@@ -171,21 +184,24 @@ export const DateInput = ({
     focused ? typed : shown.text,
   );
 
+  // Blueprint's `shouldShowErrorStyling`: not while a correction is being
+  // typed, the text no longer what is shown for the value. Unlike Blueprint's,
+  // which shows a message for a value out of range, the value's own date is
+  // drawn as an error while focused too, until the text changes.
+  const showsError$ = derive(
+    [shown$, focused$, typed$],
+    (shown, focused, typed) =>
+      shown.error && (!focused || typed === shown.text),
+  );
+
   const targetClass$ = derive(
-    [open$, shown$, focused$, typed$, disabled$],
-    (open, shown, focused, typed, isDisabled) =>
+    [open$, showsError$, disabled$],
+    (open, showsError, isDisabled) =>
       [
         'bp6-input-group',
         ...(fill ? ['bp6-fill'] : []),
         ...(isDisabled ? ['bp6-disabled'] : []),
-        // Blueprint's `shouldShowErrorStyling`: not while a correction is being
-        // typed.
-        ...(shown.error &&
-        (!focused ||
-          typed === invalidDateMessage ||
-          typed === outOfRangeMessage)
-          ? ['bp6-intent-danger']
-          : []),
+        ...(showsError ? ['bp6-intent-danger'] : []),
         'bp6-date-input',
         'bp6-popover-target',
         ...(open ? ['bp6-popover-open'] : []),
@@ -231,6 +247,9 @@ export const DateInput = ({
       return;
     }
 
+    // The stored value, as Blueprint's compares, though the calendar is given
+    // none for one out of range: a day picked from it in another month keeps
+    // the calendar open, as a time set from it does.
     const previous = parseWallClock(value$.getSnapshot().value);
 
     const stayOpen =
@@ -295,9 +314,7 @@ export const DateInput = ({
           shortcuts={typeof shortcuts === 'function' ? shortcuts() : shortcuts}
           selectedShortcutIndex={shortcutIndex$}
           onShortcutChange={setShortcutIndex}
-          value={derive([value$, shown$], (current, shown) =>
-            shown.error ? '' : current,
-          )}
+          value={pickerValue$}
           onChange={(next) => {
             changeFromPicker(next, false);
           }}
@@ -329,6 +346,12 @@ export const DateInput = ({
             mut_elements.input = input;
           }}
           aria-controls={constant(popoverId)}
+          // A value out of range reads as its date, so the error is said here
+          // as well as drawn. Absent rather than `false` otherwise, as on
+          // Blueprint's input.
+          aria-invalid={showsError$.pipe(
+            map((showsError) => showsError || undefined),
+          )}
           aria-expanded={open$}
           aria-haspopup={constant('menu')}
           autocomplete={constant('off')}

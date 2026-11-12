@@ -383,8 +383,10 @@ test(
 
     await row.click();
 
-    // The date, not 「Out of range」.
+    // The date, within the range the field takes.
     await expect.soft(dueDate).toHaveValue(text);
+
+    await expect.soft(dueDate).not.toHaveAttribute('aria-invalid');
   },
 );
 
