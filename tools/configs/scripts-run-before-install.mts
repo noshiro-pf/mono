@@ -18,5 +18,6 @@ export const scriptsRunBeforeInstall = [
   'tools/scripts/cmd/claude-code-post-edit.mts',
   'tools/scripts/cmd/firebase-deploy-plan.mts',
   'tools/scripts/cmd/mature-updates.mts',
+  'tools/scripts/cmd/submit-chrome-extension.mts',
   'tools/scripts/cmd/workflow-steps.mts',
 ] as const;
