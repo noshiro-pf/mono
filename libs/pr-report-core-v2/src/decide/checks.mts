@@ -108,6 +108,24 @@ export const checkRunStates = (
   );
 };
 
+/**
+ * The workflow run whose failed jobs a re-run of the check `name` asks for: the
+ * run of the suite its winning check run belongs to, or `undefined` when no
+ * such check run or round was read.
+ */
+export const workflowRunOf = (
+  checks: HeadChecks,
+  name: string,
+): number | undefined => {
+  const run = winningRuns(checks.runs).get(name);
+
+  return run === undefined
+    ? undefined
+    : checks.rounds.find(
+        ({ checkSuiteId }) => checkSuiteId === run.checkSuiteId,
+      )?.runId;
+};
+
 /** Of the runs of each name, the one GitHub answers with ({@link outranks}). */
 export const winningRuns = <
   R extends CheckRunRank & Readonly<{ name: string }>,

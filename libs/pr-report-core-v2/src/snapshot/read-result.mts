@@ -16,14 +16,16 @@ export type Read<A> = Result<A, ReadError>;
  * Why a part was not read.
  *
  * - `rate-limited` — GitHub's primary or secondary limit, whatever the status
- *   (a 403 or 429 with `retry-after` or `x-ratelimit-remaining: 0`, or a 200
+ *   (a 429, a 403 with `retry-after` or `x-ratelimit-remaining: 0`, or a 200
  *   whose GraphQL `errors` say `RATE_LIMITED`); it passes.
- * - `unavailable` — a 5xx, a timeout, a dropped connection; it passes.
+ * - `unavailable` — a 5xx, a 408 or other timeout, a dropped connection; it
+ *   passes.
  * - `refused` — any other 4xx, a GraphQL `errors` entry of type `FORBIDDEN` or
  *   `NOT_FOUND` (what REST answers 403 or 404 for), or GraphQL refused by a
  *   proxy; it does not pass on its own.
- * - `malformed` — an answer of a shape nobody expected, or a GraphQL `errors`
- *   entry of any other type (partial data with it is dropped).
+ * - `malformed` — an answer of a shape nobody expected, a GraphQL `errors`
+ *   entry of any other type (partial data with it is dropped), or a URL not
+ *   asked because it is not plainly GitHub's API.
  * - `skipped` — a part this reader does not offer at all, such as the native
  *   stack of a pull request, which only GraphQL serves, for a REST reader.
  *   Never a choice made from what the plan

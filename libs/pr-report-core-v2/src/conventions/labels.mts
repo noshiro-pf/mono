@@ -55,10 +55,10 @@ export const IssueLabel = {
  * Issue labels that keep an issue from `run-issue-resolver` whatever its tier.
  */
 export const NOT_FOR_RESOLVER_LABELS = [
-  'question',
-  'wontfix',
   'duplicate',
   'invalid',
+  'question',
+  'wontfix',
   'pending',
 ] as const;
 

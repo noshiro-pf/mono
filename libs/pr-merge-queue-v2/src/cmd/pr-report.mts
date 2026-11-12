@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 
-import * as http from 'node:http';
 import { Arr, Result, unknownToString } from 'ts-data-forge';
 import {
   HELP,
@@ -14,7 +13,7 @@ import {
   ghAuthToken,
   manifestUrl,
   originUrl,
-  proxiedFetchTransport,
+  processFetchTransport,
 } from '../github/index.mjs';
 
 const options = parseOptions(Arr.skip(process.argv, 2));
@@ -26,16 +25,7 @@ if (Result.isErr(options)) {
 }
 
 const main = async (chosen: Options): Promise<void> => {
-  const transport = proxiedFetchTransport(
-    process.env,
-    {
-      setGlobalProxyFromEnv:
-        typeof http.setGlobalProxyFromEnv === 'function'
-          ? http.setGlobalProxyFromEnv
-          : undefined,
-    },
-    fetch,
-  );
+  const transport = processFetchTransport();
 
   if (Result.isErr(transport)) {
     console.error(transport.value);

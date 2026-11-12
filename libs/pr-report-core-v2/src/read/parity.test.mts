@@ -78,6 +78,13 @@ const shared: Routes = {
     [],
   ),
   '/repos/o/n/git/matching-refs/heads/queue/pr-?per_page=100': ok([]),
+  [`/repos/o/n/git/commits/${TIP}`]: ok({
+    sha: TIP,
+    message: 'tip',
+    tree: { sha: 'tip-tree' },
+    committer: { date: '2026-11-09T00:00:00Z' },
+    parents: [],
+  }),
   // What the pull request closes, as an issue named: open, not in the list.
   '/repos/o/n/issues/3': ok({
     number: 3,
@@ -114,6 +121,7 @@ const restRoutes: Routes = {
     number: 7,
     title: 'fix: a thing',
     body: BODY,
+    body_html: BODY_HTML,
     user: { login: 'author' },
     html_url: 'https://github.com/o/n/pull/7',
     draft: false,

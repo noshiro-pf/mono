@@ -121,6 +121,12 @@ const WorkflowRunSchema = t.record({
   status: t.union([t.string(), t.nullType]),
   run_started_at: t.union([t.string(), t.nullType]),
   head_branch: t.union([t.string(), t.nullType]),
+  path: t.string(),
+  event: t.string(),
+  conclusion: t.union([t.string(), t.nullType]),
+  created_at: t.string(),
+  updated_at: t.string(),
+  html_url: t.string(),
 });
 
 const WorkflowRunsSchema = t.record({
@@ -182,4 +188,11 @@ const roundFactsOf = (
     completed: run.status === 'completed',
     attemptStartedAt: run.run_started_at ?? undefined,
     headBranch: run.head_branch ?? '',
+    path: run.path,
+    event: run.event,
+    status: run.status ?? '',
+    conclusion: run.conclusion?.toLowerCase(),
+    createdAt: run.created_at,
+    updatedAt: run.updated_at,
+    url: run.html_url,
   }) as const;

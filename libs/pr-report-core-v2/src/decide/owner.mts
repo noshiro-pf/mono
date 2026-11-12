@@ -23,19 +23,26 @@ import {
 } from './set-aside.mjs';
 
 /**
+ * Whether the queue covers a pull request with `labels`: `merge-queued`, or
+ * `auto-rebase` with `skip-ci`. One the queue does not cover has no owner.
+ */
+export const isQueueCovered = (labels: readonly string[]): boolean =>
+  hasLabel(labels, PullRequestLabel.mergeQueued) ||
+  (hasLabel(labels, PullRequestLabel.autoRebase) &&
+    hasLabel(labels, PullRequestLabel.skipCi));
+
+/**
  * Who moves `pr` next, or `undefined` for a pull request the queue does not
  * cover: neither `merge-queued` nor `auto-rebase` with `skip-ci`.
  */
 export const queueOwner = (pr: OwnerFacts): QueueOwner | undefined => {
-  const queued = hasLabel(pr.labels, PullRequestLabel.mergeQueued);
-
-  const autoRebased =
-    hasLabel(pr.labels, PullRequestLabel.autoRebase) &&
-    hasLabel(pr.labels, PullRequestLabel.skipCi);
-
-  if (!queued && !autoRebased) {
+  // `decideQueue` asks first too, to leave the comments unread alone; the rule
+  // is `isQueueCovered`'s either way.
+  if (!isQueueCovered(pr.labels)) {
     return undefined;
   }
+
+  const queued = hasLabel(pr.labels, PullRequestLabel.mergeQueued);
 
   if (
     pr.claim?.kind === 'standing' &&

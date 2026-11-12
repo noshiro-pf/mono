@@ -2,6 +2,7 @@ import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import {
   issueClaimHolds,
+  issueClaimLapsesAt,
   parseIssueClaimComment,
   PLANNED_ISSUE_CLAIM_LIFETIME_MS,
   writeIssueClaimComment,
@@ -95,6 +96,23 @@ describe(issueClaimHolds, () => {
     assert.isFalse(issueClaimHolds(STARTED, AT - 6 * MINUTE));
 
     assert.isFalse(issueClaimHolds(PLANNED, AT - 6 * MINUTE));
+  });
+
+  test('neither holds from a time that does not exist', () => {
+    const at = '2026-13-40T00:00:00Z';
+
+    assert.isFalse(issueClaimHolds({ ...STARTED, at }, AT));
+
+    assert.isFalse(issueClaimHolds({ ...PLANNED, at }, AT));
+  });
+});
+
+describe(issueClaimLapsesAt, () => {
+  test('a planned claim lapses after its lifetime, a started one never', () => {
+    assert.deepStrictEqual(
+      [issueClaimLapsesAt('started', AT), issueClaimLapsesAt('planned', AT)],
+      [undefined, AT + PLANNED_ISSUE_CLAIM_LIFETIME_MS],
+    );
   });
 });
 

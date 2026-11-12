@@ -9,9 +9,10 @@ import type { HttpAnswer, HttpRequest, Transport } from './transport.mjs';
 
 /**
  * Answers each request with the answer recorded for its URL, path and query
- * after `https://api.github.com` (or `POST /graphql` with the first route whose
- * key the body's query contains); an unrecorded one fails, naming it. `sent`
- * lists what was asked, in order.
+ * after `https://api.github.com`, prefixed by its method and a space when it is
+ * no `GET` (`PATCH /issues/comments/1`), or, for `POST /graphql`, the first
+ * route `graphql:<text>` whose text the body's query contains; an unrecorded
+ * one fails, naming it. `sent` lists what was asked, in order.
  */
 export const recordedTransport = (
   routes: ReadonlyRecord<string, HttpAnswer | readonly HttpAnswer[]>,
@@ -84,7 +85,11 @@ const keyOf = (
   request: HttpRequest,
   routes: ReadonlyRecord<string, unknown>,
 ): string | undefined => {
-  if (request.method === 'POST') {
+  const path = request.url.startsWith(API)
+    ? request.url.slice(API.length)
+    : request.url;
+
+  if (path === '/graphql' && request.method === 'POST') {
     return Object.keys(routes).find(
       (key) =>
         key.startsWith('graphql:') &&
@@ -92,9 +97,8 @@ const keyOf = (
     );
   }
 
-  const path = request.url.startsWith(API)
-    ? request.url.slice(API.length)
-    : request.url;
+  const route =
+    request.method === 'GET' ? path : (`${request.method} ${path}` as const);
 
-  return hasKey(routes, path) ? path : undefined;
+  return hasKey(routes, route) ? route : undefined;
 };

@@ -18,8 +18,10 @@ otherwise:
   only where REST has no equivalent (drafts, auto-merge), saying so plainly when
   that step is refused. The worker and the page read GraphQL.
 - **Comments are trusted only from the token's own account.**
-- `--dry-run` prints the steps and writes nothing. `-h`, `--help` prints the
-  usage. Exit 0 on success, 1 on a refusal or failure, with the reason.
+- `--dry-run` prints the steps and writes nothing. It makes the checks a run
+  makes before its first write, and exits 1, with the reason, when one refuses
+  or cannot be made. `-h`, `--help` prints the usage. Exit 0 on success, 1 on a
+  refusal or failure, with the reason.
 - **Idempotent**: each step is skipped when it is already done, so a run that
   failed half way is finished by running it again.
 
@@ -58,7 +60,19 @@ auto-merge**.
   B exists, B's own `Merge-After:` (and what its closing issues add) is checked
   for A; naming A stops before A is written. Otherwise A's `Merge-After:` line
   gets B (or one is written at the top), unless it names B already, and B's body
-  opens with the `Merges before` line.
+  then carries the `Merges before` line, under its `Merge-After:` line or at the
+  top.
+- **Changed in v2**: one open already is listed again after the push; one closed
+  meanwhile stops the run before it is labelled or written into, and one that
+  cannot be listed is taken as it was. The labels go on as soon as the pull
+  request exists, before a draft is marked ready and before any body is written,
+  so that a run failing in between leaves it held; two open pull requests from
+  the branch are refused rather than the first taken; and the open pull requests
+  the closing issues' order is looked for among are read to the list's end,
+  where v1 read the first hundred. The `Merges before` line goes into B's body
+  once every A names B, so that a run refused before then leaves no line saying
+  they do, and goes into a
+  B open already too.
 
 ## `pr-description`
 
@@ -81,7 +95,10 @@ A body is refused by `push`, `create`, `check` and `open-pr --body-file` when:
   original opening under no heading lets the translation add one);
 - a `#N` is in one half only (not counting code, tables, declarations, nor a
   pull request's closing keywords);
-- the translation holds code, a table, an image, or a `Merge-After:` line;
+- the translation's fenced code blocks are not the original's, one for one, in
+  order and unchanged but for their indentation (so either half reads on its
+  own; #3814);
+- the translation holds a table, an image, or a `Merge-After:` line;
 - either half holds a trailer (`Start-After:`, `Claude-Session:`, a pull
   request's closing keyword): trailers go after the `---` rule. In an issue a
   closing keyword is prose (`push` asks GitHub which the number is);
@@ -92,7 +109,10 @@ A body is refused by `push`, `create`, `check` and `open-pr --body-file` when:
   `.`, `,`, `;` or `:`;
 - an item under a `**Deferred**` line of `## Review` does not open with
   `(predates)`, `(another change)` or `(too large)`, or the line has neither
-  items nor `none`.
+  items nor `none`;
+- with `pullRequestDescription.openingHeading` set, a pull request's original
+  does not open with `## <openingHeading>`, declarations, the `--merge-before`
+  note and HTML comments aside (#3814). Issues are not asked.
 
 Review line, one of:
 
@@ -102,16 +122,23 @@ Review at `high`, 2 rounds.
 Self-review at `high`, 1 round.
 ```
 
-`push` also refuses when the description changed on GitHub since the `pull`, and
-when one half changed and the other did not (trailing spaces, blank-line runs
-and the `Merge-After:` line do not count); `--wording-only` lets one half change
-alone. `push` refreshes `<f>.pulled`.
+`pull` refuses to write over an edit in `<f>` that was never pushed, and warns
+when the description as pulled would be refused. `push` also refuses when the
+description changed on GitHub since the `pull`, and when one half changed and
+the other did not (trailing spaces, blank-line runs and the `Merge-After:` line
+do not count); `--wording-only` lets one half change alone. `push` refreshes
+`<f>.pulled`.
 
 `create` needs `--priority`, refuses a `priority:` `--label` and `close`, and
 refuses while an open issue's title is close to the new one
 (`DUPLICATE_THRESHOLD`), listing them, unless each is named with
 `--not-duplicate`. `similar` lists open issues with a close title and those
 naming a `--keyword` as written.
+
+A number that answers as another repository's (an issue transferred away) is
+refused, since a push would land there (**Changed in v2**: v1 followed the
+redirect). The command does not ask whose the token is, so an installation's
+token serves.
 
 Without `translation.heading`: `read` prints whole, `push` and `create` write as
 is; `push` still refuses a description changed since the `pull`.
@@ -148,13 +175,17 @@ could not be read). The skill reads it; its shape does not change.
 ## `claim-pr`
 
 ```text
-claim-pr <n> --by <claimant> [--release]
+claim-pr <n> --by <claimant> [--release] [--repo <owner/name>]
 ```
+
+(**New in v2**: `--repo`.)
 
 Writes (or renews) the claim comment, then reads back after a pause: of two
 writing at once, the oldest claim comment wins and the other exits 1. Refused
 when the owner is not `skill`, or someone else's claim holds. `--release`
-rewrites it as released.
+rewrites it as released, and a number that names no pull request is refused.
+(**New in v2**: a closed pull request is released too, where v1 refused it, for
+one reopened would find the claim holding again.)
 
 ## `push-fixed-pr`
 
@@ -166,8 +197,14 @@ Refused unless the owner is `skill` and the holding claim is `--by`'s, and, on a
 `generatedBranches` branch set aside `rebase-failed`, when the commit is a
 hand-resolved conflict (it names `rebuild` instead). Puts `skip-ci` on if it is
 not, pushes `<commit>` leased against the claimed head, and carries the stacked
-layers along (skipping one someone else claimed), with the worker's own push and
-restack code.
+layers along (skipping one a claim holds on, the claimant's own included, which
+a restack would end, and one whose comments cannot be read, a claim on it
+unknown; for the claimant's own it prints the
+`git rebase --onto <target> <the head below as read> <its head>` to move it by:
+the target exact when the push moved the layer below, a placeholder when it did
+not, and none when the layer below is the claimant's too, whose own push prints
+it), with the worker's own push and restack code.
+(**New in v2**: a fork's branch is refused, as the worker never pushes to one.)
 
 ## `rework-pr`
 
@@ -177,14 +214,28 @@ rework-pr done (--requeue | --review) [--dry-run]
 ```
 
 On the current branch's pull request. Both refuse one someone claimed, or one
-set aside for a skill (that is `claim-pr` and `push-fixed-pr`).
+set aside for a skill (that is `claim-pr` and `push-fixed-pr`), and one whose
+comments cannot be read. (**Changed in v2**: a GraphQL refusal is told by how
+the answer is classified, `refused`, not by matching its message; a 408 and a
+429 are not refusals.)
 
-- **`start`**: `skip-ci` on, `merge-queued` off (recording GitHub's unlabel
-  event under the clone's git directory), auto-merge disarmed, draft. Without
+- **`start`**: `skip-ci` on; `merge-queued` off, recording GitHub's unlabel
+  event under the clone's git directory (**Changed in v2**: the event must be
+  newer than every one listed before the label came off, so that an older
+  unlabel shown early is not taken for it); auto-merge disarmed; draft. Without
   GraphQL: held by the labels alone, and said; armed and not disarmable fails.
+  The queue is read before any of it, as v1 does, though with the checks
+  (**Changed in v2**), which makes the read, and the window before the hold,
+  longer.
 - **`done`**: refuses uncommitted changes and untracked files not ignored;
-  pushes `--force-with-lease --force-if-includes`; carries the stacked layers
-  along (skipping a claimed one); marks it ready; then
+  refuses a head on GitHub the local branch never had (its reflog), as
+  `--force-if-includes` does, a dry run included, and fails, without a refusal,
+  when that history cannot be read (no reflog); pushes the commit checked out
+  with the worker's leased push, leased against the head the queue read
+  (**Changed in v2**: v1 pushed `--force-with-lease --force-if-includes` against
+  the remote-tracking branch, and could not tell a push whose answer was lost
+  from one that failed); carries the stacked layers along (skipping one a claim
+  holds on, or whose comments cannot be read); marks it ready; then
     - `--requeue`: puts `merge-queued` back last, only if `start` took it off
       and that unlabel is still the label's last event;
     - `--review`: leaves `merge-queued` off for the author to queue again.
@@ -192,18 +243,27 @@ set aside for a skill (that is `claim-pr` and `push-fixed-pr`).
 ## `report-unowned-prs`
 
 ```text
-report-unowned-prs [--dry-run]
+report-unowned-prs [--dry-run] [--repo <owner/name>]
 ```
 
 Files one issue (`conventions.md`) per queued pull request whose owner is
-`none`, unless an open issue of this account already carries its marker (every
-page of issues read).
+`none`, unless an open issue of this account already carries its marker
+(anywhere in its body, every page of issues read), one at a time. Reads no issue
+when no owner is `none`. A queued pull request whose owner could not be read is
+said apart (one the queue does not cover has no owner, read or not), and so is
+one nobody owns whose comments could not be read: it is filed by a run that
+reads them, so that the one report carries them. Exits 1, after filing all it
+can, when an issue could not be filed, the issues could not be listed (then
+nothing is filed), or an owner or those comments could not be read (**Changed in
+v2**: v1 passed over an unread owner and exited 0 for each).
 
 ## `start-issue`
 
 ```text
-start-issue <n> --by <claimant> [--plan | --release] [--force]
+start-issue <n> --by <claimant> [--plan | --release] [--force] [--repo <owner/name>]
 ```
+
+(**New in v2**: `--repo`.)
 
 - default: write a `started` claim, read back after a pause (the oldest claim
   wins), then add `in-progress` and take `planned` off;
@@ -218,15 +278,15 @@ is renewed, a plan becomes a start). `--force` goes past a refusal.
 ## `startable-issues`
 
 ```text
-startable-issues [--limit <n>] [--author <login>]... [--theme <name>] [--by <claimant>]
+startable-issues [--limit <n>] [--author <login>]... [--theme <name>] [--by <claimant>] [--repo <owner/name>]
 ```
 
-Lists the issues to start next, writing nothing. Startable: start state `ready`
-or `free`, not `in-progress` or `planned` (by label or **live claim**, v2), no
-open pull request closes it, written by `--author` (default the token's
-account), none of `question`, `wontfix`, `duplicate`, `invalid`, `pending`,
-`priority:hold`, `priority:close`, and not left by a `run-issue-resolver`
-session (its record).
+Lists the issues to start next, writing nothing (**New in v2**: `--repo`, as
+every other command takes it). Startable: start state `ready` or `free`, not
+`in-progress` or `planned` (by label or **live claim**, v2), no open pull
+request closes it, written by `--author` (default the token's account), none of
+`duplicate`, `invalid`, `question`, `wontfix`, `pending`, `priority:hold`,
+`priority:close`, and not left by a `run-issue-resolver` session (its record).
 
 Themes: the scope a title starts with (`feat(synstate): …`), with the package
 that scope lives in, and the packages its body names by path. Order without
@@ -268,11 +328,14 @@ run-unblock-prs-skill --max-budget-usd <usd> [--model <m>] [--skill <name>]
 Reads the queue as the skill's first step does, with no model. Starts one
 session per pull request that is the skill's and unclaimed, in the skill's
 order, the next as soon as one ends; looks again every `--interval-min` once
-none is left. Files `report-unowned-prs` itself. A pull request a session ended
-on without fixing is not handed on again until its head or set-aside reason
-changes; at most three sessions per pull request per run. A session that failed
-before spending is retried next look (the first such stops the command). A claim
-a session left standing is released when it ends. The skill:
+none is left. Files `report-unowned-prs` itself, once per pull request nobody
+owns while it runs; a run that could not file or read everything is asked again
+next round (**Changed in v2**: v1 matched its text for the numbers it failed;
+nothing is ever filed twice). A pull request a session ended on without fixing
+is not handed on again until its head or set-aside reason changes; at most three
+sessions per pull request per run. A session that failed before spending is
+retried next look (the first such stops the command). A claim a session left
+standing is released when it ends. The skill:
 `unblock-prs` when `.claude/skills/unblock-prs/` exists, else
 `pr-merge-queue:unblock-prs`.
 

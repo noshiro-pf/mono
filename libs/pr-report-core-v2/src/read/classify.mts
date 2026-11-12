@@ -10,8 +10,9 @@ import type { HttpAnswered } from './transport.mjs';
 
 /**
  * The {@link ReadError} an HTTP answer stands for, or `undefined` for a 2xx.
- * The rate limits answer 403 or 429, told from a refusal by `retry-after` or
- * `x-ratelimit-remaining: 0`.
+ * The rate limits answer 429, or 403 told from a refusal by `retry-after` or
+ * `x-ratelimit-remaining: 0`; a 408 is a timeout, which may pass when asked
+ * again, as a 5xx may. Only `refused` goes on being refused.
  */
 export const classifyHttp = (
   what: string,
@@ -26,14 +27,15 @@ export const classifyHttp = (
   const message = `${status}: ${messageOf(answer.body)}` as const;
 
   if (
-    (status === 403 || status === 429) &&
-    (headers['retry-after'] !== undefined ||
-      headers['x-ratelimit-remaining'] === '0')
+    status === 429 ||
+    (status === 403 &&
+      (headers['retry-after'] !== undefined ||
+        headers['x-ratelimit-remaining'] === '0'))
   ) {
     return { kind: 'rate-limited', what, message };
   }
 
-  return status >= 500
+  return status === 408 || status >= 500
     ? { kind: 'unavailable', what, message }
     : { kind: 'refused', what, message };
 };

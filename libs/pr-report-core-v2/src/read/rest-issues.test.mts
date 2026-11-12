@@ -32,7 +32,7 @@ const issueJson = (number: number, extra: UnknownRecord = {}): UnknownRecord =>
     labels: [],
     created_at: '2026-11-01T00:00:00Z',
     updated_at: '2026-11-02T00:00:00Z',
-    comments: 0,
+    comments: 1,
     ...extra,
   }) as const;
 
@@ -44,7 +44,8 @@ const closedPull = (
   ({
     number,
     title: `pr ${number}`,
-    body: 'Closes #3',
+    body_html:
+      '<p><span class="issue-keyword tooltipped">Closes</span> <a data-hovercard-type="issue" data-url="https://github.com/o/n/issues/3" href="https://github.com/o/n/issues/3">#3</a></p>',
     user: { login: 'author' },
     html_url: `https://github.com/o/n/pull/${number}`,
     labels: [],
@@ -63,7 +64,8 @@ const NEXT = `${OPEN}&page=2` as const;
 const perIssue = (number: number): Routes =>
   ({
     [`/repos/o/n/issues/${number}/dependencies/blocked_by?per_page=100`]: ok([
-      { number: 1 },
+      { number: 1, repository_url: 'https://api.github.com/repos/o/n' },
+      { number: 2, repository_url: 'https://api.github.com/repos/o/other' },
     ]),
     [`/repos/o/n/issues/${number}/comments?per_page=100`]: ok([
       {
@@ -101,6 +103,7 @@ describe(readOpenIssues, () => {
 
     expect(issue?.body).toBe('');
 
+    // #2 is another repository's, whose number names something else here.
     assert.deepStrictEqual(issue?.blockedBy, Result.ok([1]));
 
     assert.deepStrictEqual(
@@ -109,6 +112,56 @@ describe(readOpenIssues, () => {
         : Result.map(issue.comments, (c) => c.length),
       Result.ok(1),
     );
+  });
+
+  test('asks what blocks an issue unless its summary says nothing does', async () => {
+    const { transport, sent } = recordedTransport({
+      [OPEN]: ok([
+        issueJson(5, {
+          comments: 0,
+          issue_dependencies_summary: { total_blocked_by: 0 },
+        }),
+        issueJson(6, { comments: 0, issue_dependencies_summary: null }),
+        issueJson(7, {
+          comments: 0,
+          issue_dependencies_summary: { total_blocked_by: 1 },
+        }),
+      ]),
+      '/repos/o/n/issues/6/dependencies/blocked_by?per_page=100': ok([]),
+      '/repos/o/n/issues/7/dependencies/blocked_by?per_page=100': ok([
+        { number: 1, repository_url: 'https://api.github.com/repos/o/n' },
+      ]),
+    });
+
+    const read = await readOpenIssues(
+      { transport, owner: 'o', name: 'n', token: 'token' },
+      { limit: 10, viewer: Result.ok('me') },
+    );
+
+    assert.isTrue(Result.isOk(read));
+
+    assert.deepStrictEqual(
+      read.value.issues.map(({ blockedBy }) => blockedBy),
+      [Result.ok([]), Result.ok([]), Result.ok([1])],
+    );
+
+    expect(
+      sent.map(({ url }) => url).filter((url) => url.includes('blocked_by')),
+    ).toHaveLength(2);
+  });
+
+  test('reads no comments of an issue that has none', async () => {
+    const read = await readOpenIssues(
+      contextOf({
+        [OPEN]: ok([issueJson(5, { comments: 0 })]),
+        '/repos/o/n/issues/5/dependencies/blocked_by?per_page=100': ok([]),
+      }),
+      { limit: 10, viewer: Result.ok('me') },
+    );
+
+    assert.isTrue(Result.isOk(read));
+
+    assert.deepStrictEqual(read.value.issues[0]?.comments, Result.ok([]));
   });
 
   test('stops at the limit and says the list is cut short', async () => {
@@ -299,6 +352,23 @@ describe(readNumbers, () => {
 });
 
 describe(readMerged, () => {
+  test('asks the list with its rendering', async () => {
+    const { transport, sent } = recordedTransport({
+      '/repos/o/n/pulls?state=closed&sort=updated&direction=desc&per_page=100':
+        ok([]),
+    });
+
+    await readMerged(
+      { transport, owner: 'o', name: 'n', token: 'token' },
+      { limit: 2, days: 3, nowEpochMs: Date.parse('2026-11-10T00:00:00Z') },
+    );
+
+    assert.strictEqual(
+      sent[0]?.headers['accept'],
+      'application/vnd.github.full+json',
+    );
+  });
+
   test('keeps the latest merged within the window, up to the limit', async () => {
     const read = await readMerged(
       contextOf({

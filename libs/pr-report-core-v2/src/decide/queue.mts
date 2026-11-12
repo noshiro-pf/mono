@@ -6,6 +6,7 @@
  */
 
 import { Arr, Result } from 'ts-data-forge';
+import type { StrictPick } from 'ts-type-forge';
 import {
   findRecord,
   hasLabel,
@@ -48,7 +49,8 @@ import {
   type IssueStartState,
   type ReferenceStatus,
 } from './issues.mjs';
-import { queueOwner, type QueueOwner } from './owner.mjs';
+import { stackedLayerParent } from './layers.mjs';
+import { isQueueCovered, queueOwner, type QueueOwner } from './owner.mjs';
 import {
   reviewHold,
   reviewStateOf,
@@ -153,30 +155,28 @@ export const decideQueue = (
           }),
         );
 
-    const comments = Result.map(pr.comments, (own) =>
-      readQueueComments(own, {
-        headSha: pr.headSha,
-        baseTip: defaultBranchTip,
-        nowEpochMs,
-      }),
-    );
+    const comments = queueCommentsOf(pr, defaultBranchTip, nowEpochMs);
 
-    const owner = Result.map(comments, (read) =>
-      queueOwner({
-        labels,
-        isDraft: pr.isDraft,
-        fromFork: pr.fromFork,
-        headRef: pr.headRef,
-        headSha: pr.headSha,
-        baseRef: pr.baseRef,
-        defaultBranch,
-        stackedOn,
-        inCycle: graph.cyclic.has(pr.number),
-        setAside: read.setAside?.says,
-        claim: read.claim?.says,
-        nowEpochMs,
-      }),
-    );
+    // One the queue does not cover has no owner, read or not: its comments
+    // unread are no owner unread.
+    const owner: Read<QueueOwner | undefined> = !isQueueCovered(labels)
+      ? Result.ok(undefined)
+      : Result.map(comments, (read) =>
+          queueOwner({
+            labels,
+            isDraft: pr.isDraft,
+            fromFork: pr.fromFork,
+            headRef: pr.headRef,
+            headSha: pr.headSha,
+            baseRef: pr.baseRef,
+            defaultBranch,
+            stackedOn,
+            inCycle: graph.cyclic.has(pr.number),
+            setAside: read.setAside?.says,
+            claim: read.claim?.says,
+            nowEpochMs,
+          }),
+        );
 
     const before = queueStanding(
       {
@@ -242,8 +242,32 @@ export const decideQueue = (
     }),
   );
 
+  // What checking ahead may stack right above the pull request each is on: one
+  // its review would hold, or only a bypass merges, would not be released from
+  // its layer once it is a candidate, and one whose review is unread may be
+  // either.
+  const stackedAbove = Arr.generate(function* () {
+    for (const { facts, blockedBy, standing } of decided) {
+      const on = stackedLayerParent(
+        { fromFork: facts.fromFork, blockedBy },
+        standing,
+      );
+
+      if (on === undefined) {
+        continue;
+      }
+
+      const hold = holdOf(facts, reviewRules);
+
+      if (Result.isOk(hold) && hold.value === undefined) {
+        yield { number: facts.number, on } as const;
+      }
+    }
+  });
+
   return Result.ok({
     graph,
+    stackedAbove,
     forest: buildForest(
       decided.map(({ facts, blockedBy }) => ({
         number: facts.number,
@@ -268,6 +292,20 @@ export const decideQueue = (
     issues: decideIssues(snapshot, pulls, closes, nowEpochMs),
   });
 };
+
+/**
+ * The set-aside and the claim on `pr` as the decision reads them, with the
+ * default branch at `baseTip`, at `nowEpochMs`: what the worker reads them by
+ * too before it decides, so the two never disagree on what is held.
+ */
+export const queueCommentsOf = (
+  pr: StrictPick<PullRequestFacts, 'comments' | 'headSha'>,
+  baseTip: string,
+  nowEpochMs: number,
+): Read<QueueComments> =>
+  Result.map(pr.comments, (own) =>
+    readQueueComments(own, { headSha: pr.headSha, baseTip, nowEpochMs }),
+  );
 
 /** The names of `labels`, which every decision reads labels by. */
 export const labelNames = (
@@ -321,6 +359,13 @@ export type QueueDecision = Readonly<{
   pullRequests: readonly PullRequestDecision[];
   /** The candidates, in the order the worker picks them. */
   candidates: readonly number[];
+  /**
+   * The queued pull requests stacked on another that checking ahead stacks
+   * right above it (`stackedLayerParent`), with the one each is on, in the
+   * order read. Each is checked there, never released: it is a candidate once
+   * that one has merged.
+   */
+  stackedAbove: readonly Readonly<{ number: number; on: number }>[];
   issues: Read<readonly IssueDecision[]>;
 }>;
 

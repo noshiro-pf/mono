@@ -15,8 +15,9 @@ So far it holds:
   comment records, instants.
 - `src/decide/`: the pure decisions — check verdicts, the merge graph, set-aside
   rules, the queue owner, review holds, standings and candidate order, issue
-  start states and tiers — and `decideQueue`, which composes them over one
-  snapshot as the page, `pr-report` and the worker all read them.
+  start states and tiers, startable issues and their themes — and `decideQueue`,
+  which composes them over one snapshot as the page, `pr-report` and the worker
+  all read them.
 
 v1's tests are ported beside each module as fixtures; where a rule changed on
 purpose, the specification marks it **Changed in v2**.

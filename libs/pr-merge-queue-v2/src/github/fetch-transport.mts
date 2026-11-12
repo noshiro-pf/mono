@@ -1,6 +1,6 @@
 /**
  * The reader's transport over `fetch`. Behind a proxy, Node's `fetch` uses it
- * only once told to; a command builds this through `proxiedFetchTransport`
+ * only once told to; a command builds this through `processFetchTransport`
  * (`proxy.mts`), which tells a Node of 25.4 or later.
  */
 
@@ -22,6 +22,10 @@ export const fetchTransport =
         method: request.method,
         headers: request.headers,
         ...(request.body === undefined ? {} : { body: request.body }),
+        // A write is not followed to where a redirect points: a repository
+        // renamed, or an issue transferred, since it was read would have it
+        // land somewhere not asked for. Answered 3xx, it is refused instead.
+        redirect: request.method === 'GET' ? 'follow' : 'manual',
         signal: AbortSignal.timeout(options.timeoutMs),
       });
 

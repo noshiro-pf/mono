@@ -1,6 +1,8 @@
 import {
+  codeFenceBlocks,
   isDeclarationLine,
   parseMergeAfter,
+  parseMergesBefore,
   parseStartAfter,
 } from './declarations.mjs';
 
@@ -25,6 +27,19 @@ describe(isDeclarationLine, () => {
     assert.isFalse(isDeclarationLine('see Merge-After: #1', 'merge-after'));
 
     assert.isFalse(isDeclarationLine('Merge After: #1', 'merge-after'));
+  });
+});
+
+describe(parseMergesBefore, () => {
+  test('reads the numbers of the first Merges before line outside a code block', () => {
+    assert.deepStrictEqual(
+      parseMergesBefore(
+        '```\nMerges before #1.\n```\nMerges before #7, #8, whose `Merge-After:` names this one.\nMerges before #9.',
+      ),
+      [7, 8],
+    );
+
+    assert.deepStrictEqual(parseMergesBefore('Merge-After: #4'), []);
   });
 });
 
@@ -216,5 +231,29 @@ describe(parseStartAfter, () => {
       parseStartAfter(['```md', 'Start-After: #2113', '```', ''].join('\n')),
       [],
     );
+  });
+});
+
+describe(codeFenceBlocks, () => {
+  test('cuts each fenced block as written, one left open through the end', () => {
+    const body = [
+      'prose',
+      '  ```ts',
+      '  const a = 1;',
+      '  ```',
+      '~~~~',
+      '```',
+      'inside',
+      '~~~~',
+      '```x```',
+      '```',
+      'open',
+    ].join('\n');
+
+    assert.deepStrictEqual(codeFenceBlocks(body), [
+      '  ```ts\n  const a = 1;\n  ```',
+      '~~~~\n```\ninside\n~~~~',
+      '```\nopen',
+    ]);
   });
 });

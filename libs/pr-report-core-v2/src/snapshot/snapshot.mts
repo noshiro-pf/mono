@@ -11,7 +11,7 @@ import type {
   MergedPullRequestFacts,
   ReferenceFacts,
 } from './issues.mjs';
-import type { QueueLayerFacts } from './layers.mjs';
+import type { QueueLayersFacts } from './layers.mjs';
 import type { PullRequestFacts } from './pull-request.mjs';
 import type { Read } from './read-result.mjs';
 import type { BranchRequirements, RepositoryFacts } from './repository.mjs';
@@ -58,7 +58,7 @@ export type Snapshot = Readonly<{
    */
   references: Read<ReadonlyMap<number, ReferenceFacts>>;
   merged: Read<readonly MergedPullRequestFacts[]>;
-  queueLayers: Read<readonly QueueLayerFacts[]>;
+  queueLayers: Read<QueueLayersFacts>;
   /**
    * Where each branch's tip is, by `git ls-remote --heads`: a head GitHub shows
    * that the branch is not at is a push GitHub dropped.

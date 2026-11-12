@@ -5,15 +5,10 @@
  */
 
 import {
-  branchTipsNotRead,
   decideQueue,
-  OPEN_PULLS_PATH,
   readContextOf,
-  readSnapshotRest,
   requirementsOfRules,
-  restLeadingItems,
   type BranchRequirements,
-  type ReadError,
   type RepoRef,
   type Snapshot,
   type Transport,
@@ -21,8 +16,9 @@ import {
 import { Result, unknownToString } from 'ts-data-forge';
 import * as t from 'ts-fortress';
 import type { ReadonlyRecord, StrictOmit } from 'ts-type-forge';
-import { resolveRepo, resolveToken } from '../../github/index.mjs';
+import { messageOf, resolveRepo, resolveToken } from '../../github/index.mjs';
 import type { Options } from './options.mjs';
+import { readCappedSnapshot } from './queue.mjs';
 import { renderMarkdown, renderTerminal } from './render.mjs';
 import { buildReport, type PrReport } from './report.mjs';
 
@@ -86,39 +82,15 @@ export const readReport = async (
     token: Result.unwrapOkOr(token, undefined),
   });
 
-  // Counted before the snapshot fans out to a dozen requests for each. The cap
-  // is this command's, so the reader does not carry it; the count costs a page
-  // or two that the snapshot then reads again.
-  const open = await restLeadingItems(
-    context,
-    'the open pull requests',
-    OPEN_PULLS_PATH,
-    t.array(t.unknown()),
-    () => true,
-    MAX_OPEN_PULLS + 1,
-  );
-
-  if (Result.isErr(open)) {
-    return Result.err(messageOf(open.value));
-  }
-
-  if (open.value.items.length > MAX_OPEN_PULLS) {
-    return Result.err(
-      `more than ${MAX_OPEN_PULLS} pull requests are open, which is more than a report covers`,
-    );
-  }
-
-  const snapshot = await readSnapshotRest(context, {
+  const snapshot = await readCappedSnapshot(context, {
     nowEpochMs: world.nowEpochMs,
     issuesLimit: options.issuesLimit,
     mergedLimit: options.mergedLimit,
     mergedDays: options.mergedDays,
-    follow: [],
-    readBranchTips: branchTipsNotRead,
   });
 
   if (Result.isErr(snapshot)) {
-    return Result.err(messageOf(snapshot.value));
+    return snapshot;
   }
 
   // The snapshot read what GitHub enforces too, two requests, so that one reader
@@ -199,18 +171,8 @@ export const isSameRepo = (a: RepoRef, b: RepoRef): boolean =>
   a.owner.toLowerCase() === b.owner.toLowerCase() &&
   a.name.toLowerCase() === b.name.toLowerCase();
 
-/** A read error as the one line the command fails with. */
-export const messageOf = (error: ReadError): string =>
-  `cannot read ${error.what} (${error.kind}): ${error.message}` as const;
-
 /** Where a repository declares its default branch's ruleset. */
 export const RULESET_PATH = 'repo-settings/rulesets/main.json';
-
-/**
- * How many open pull requests a report covers: each fans out to a dozen
- * requests, and past this one run spends most of an hour's rate limit.
- */
-export const MAX_OPEN_PULLS = 100;
 
 const RulesetSchema = t.record({ rules: t.array(t.unknown()) });
 

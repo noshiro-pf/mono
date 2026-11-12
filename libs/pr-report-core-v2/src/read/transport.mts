@@ -31,7 +31,7 @@ export type Transport = (request: HttpRequest) => Promise<HttpAnswer>;
 
 /** One request to GitHub. */
 export type HttpRequest = Readonly<{
-  method: 'GET' | 'POST';
+  method: 'DELETE' | 'GET' | 'PATCH' | 'POST' | 'PUT';
   url: string;
   headers: ReadonlyRecord<string, string>;
   body: string | undefined;

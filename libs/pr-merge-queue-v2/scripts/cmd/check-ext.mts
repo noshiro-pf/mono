@@ -7,6 +7,9 @@ await assertExt({
     {
       path: path.resolve(projectRootPath, './src'),
       extension: '.mts',
+      // The schema of `.github/unblock-prs.json`, which `gen:config-schema`
+      // writes beside the type it is generated from.
+      ignorePatterns: ['**/*.schema.json'],
     },
     {
       path: path.resolve(projectRootPath, './scripts'),

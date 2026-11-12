@@ -290,3 +290,66 @@ is `in-progress`, a live `planned` one is `planned`.
 One `priority:<tier>` label per issue: `S`, `A`, `B`, `C`, `D`, `hold`,
 `close`. Two or more is `several`. The order sessions start them in is `S`, `A`,
 `B`, `C`, none, `D`; `hold` and `close` are not started.
+
+## Startable issues
+
+What `startable-issues` lists and `run-issue-resolver` hands out. An open issue
+is startable when its start state is `ready` or `free` (so no live claim, no
+`in-progress` or `planned` label and no open pull request closing it), and then
+it is sorted into one of four:
+
+- **foreign**: not written by one of the authors asked for (logins compared
+  case-insensitively); a session acts on what the issue says with no person in
+  between;
+- **held**: labelled `duplicate`, `invalid`, `question`, `wontfix`, `pending`,
+  `priority:hold` or `priority:close`;
+- **left**: a `run-issue-resolver` session ended on it with no pull request, and
+  its `updatedAt` is still what the record says (a record with no instant holds
+  it until removed);
+- **fresh**: the rest, by tier (above), then the lowest number.
+
+## Issue themes
+
+Which part of the repository an issue is about, so that one session takes
+related issues together and two sessions keep apart. Two pull requests from
+different sessions that conflict mostly change the same package, and their
+titles name the same scope only about half the time; so a theme is read from the
+title's scope and from the packages the body names by path, together.
+
+- **Its themes**, sorted: the title's scope (`<scope>: …`, `type(<scope>): …`
+  with a Conventional Commits type or `ci`, `[<scope>] …`; a comma separates
+  several), plus `ci` for a `ci` type, plus every `libs/<x>`, `apps/<x>` and
+  `languages/<x>/` the body names (a file directly under `libs/` or `apps/` is
+  not a package), plus `strict-lib` and `repo-settings` for paths under them.
+  A lower-case one-word head that is no type (`bug: …`, also `tools: …` and
+  `synstate: …`) names no theme; any other head of name characters (`\w`, `@`,
+  `.`, `/`, `:`, `-`) is a scope. `tools`, `tools/…` and `check:…` scopes are
+  one theme, `tooling`. This grammar is v1's, quirks included; refining it moves
+  some issue's themes for another, a decision of its own.
+  Lower case; a leading `libs/` or `apps/` is dropped. Neither `ci` nor
+  `tooling` is read from a path: nearly every issue cites a guard or a workflow.
+- **Its primary themes**: the title's scopes, plus the package a body path lives
+  in when a segment of the path's rest (extension dropped) is one of those
+  scopes (`unblock-prs:` with `libs/pr-merge-queue/src/unblock-prs/…` gives
+  `pr-merge-queue` too); with no scope in the title, all its themes. What a
+  started issue holds back is these: a body names in passing the packages it
+  reads, and holding all of them would leave half the issues to nobody.
+- **A theme named** (`--theme`) takes itself and its family: `synstate` takes
+  `synstate-dom`, not `eslint-plugin-synstate`.
+- **Held themes**: the primary themes of each `in-progress` issue someone other
+  than the asker is on: one whose live claim names another claimant, one with no
+  claim, or one whose comments are unread (with a note: holding a theme back by
+  mistake costs less than two sessions on one). With no asker, every
+  `in-progress` issue holds its themes.
+- **Order, no theme named**: every fresh `S` first, whatever its themes. Of the
+  rest, one with a primary theme that is held is held back, named with the
+  themes that hold it. The others go theme by theme: the first left is a seed,
+  followed by every one with a theme among the seed's primary themes (a `D` only
+  after a `D` seed), then the next seed.
+- **Order, a theme named**: the fresh issues in that theme alone, in tier order,
+  so its own `S` come first and another theme's `S` do not; nothing is held
+  back, since the person chose the theme, but the issues another session started
+  in it are named.
+- **Starting together** (`run-issue-resolver`): an `S` always; any other only
+  when none of its primary themes is one of those already started in the same
+  pick, and none is held.

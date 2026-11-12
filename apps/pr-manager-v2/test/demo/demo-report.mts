@@ -8,6 +8,7 @@ import {
   type IssueFacts,
   type Label,
   type MergedPullRequestFacts,
+  type MovedHead,
   type PullRequestFacts,
   type Snapshot,
 } from 'pr-report-core-v2';
@@ -149,6 +150,18 @@ const demoSnapshot = (nowMs: number): Snapshot => {
           completed: state !== 'running',
           attemptStartedAt: ago(30),
           headBranch: `feature/${number}`,
+          path: '.github/workflows/code-check.yml',
+          event: 'pull_request',
+          status: state === 'running' ? 'in_progress' : 'completed',
+          conclusion:
+            state === 'running'
+              ? undefined
+              : state === 'failed'
+                ? 'failure'
+                : 'success',
+          createdAt: ago(30),
+          updatedAt: ago(25),
+          url: `https://github.com/noshiro-pf/mono/actions/runs/${number * 1000}`,
         },
       ],
     };
@@ -402,17 +415,22 @@ const demoSnapshot = (nowMs: number): Snapshot => {
       requireConversationResolution: false,
     }),
     merged: Result.ok(merged),
-    queueLayers: Result.ok([
-      {
-        branch: 'queue/pr-3832',
-        origin: { number: 3832, builtFromHead: shaOf(3832) },
-        sha: 'a'.repeat(40),
-        tree: 'b'.repeat(40),
-        parentTree: 'c'.repeat(40),
-        committedAt: ago(4),
-        checks: Result.ok(checks(3832, 'running')),
-      },
-    ]),
+    queueLayers: Result.ok({
+      baseTree: 'd'.repeat(40),
+      movedHeads: new Map<number, MovedHead>(),
+      layers: [
+        {
+          branch: 'queue/pr-3832',
+          origin: { number: 3832, builtFromHead: shaOf(3832) },
+          sha: 'a'.repeat(40),
+          tree: 'b'.repeat(40),
+          parent: 'e'.repeat(40),
+          parentTree: 'c'.repeat(40),
+          committedAt: ago(4),
+          checks: Result.ok(checks(3832, 'running')),
+        },
+      ],
+    }),
   });
 };
 

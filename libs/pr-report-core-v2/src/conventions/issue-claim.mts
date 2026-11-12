@@ -55,13 +55,25 @@ export const issueClaimHolds = (
 ): boolean => {
   const at = epochMsOf(claim.at);
 
-  return (
-    at !== undefined &&
-    at - CLAIM_CLOCK_SKEW_MS <= nowEpochMs &&
-    (claim.state === 'started' ||
-      nowEpochMs < at + PLANNED_ISSUE_CLAIM_LIFETIME_MS)
-  );
+  if (at === undefined || nowEpochMs < at - CLAIM_CLOCK_SKEW_MS) {
+    return false;
+  }
+
+  const lapses = issueClaimLapsesAt(claim.state, at);
+
+  return lapses === undefined || nowEpochMs < lapses;
 };
+
+/**
+ * When an issue claim in `state` made at `atEpochMs` (its `at`, parsed) lapses,
+ * in epoch milliseconds: a `planned` one after
+ * {@link PLANNED_ISSUE_CLAIM_LIFETIME_MS}; a `started` one never.
+ */
+export const issueClaimLapsesAt = (
+  state: IssueClaim['state'],
+  atEpochMs: number,
+): number | undefined =>
+  state === 'planned' ? atEpochMs + PLANNED_ISSUE_CLAIM_LIFETIME_MS : undefined;
 
 /** How long a `planned` issue claim lasts when it is not written again. */
 export const PLANNED_ISSUE_CLAIM_LIFETIME_MS = 24 * 60 * 60_000;

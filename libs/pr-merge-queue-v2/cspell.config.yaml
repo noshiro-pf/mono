@@ -1,0 +1,13 @@
+version: '0.2'
+# Inherit the repository-wide settings. Required: when cspell runs with
+# this directory as its cwd, it stops at the nearest config and would
+# otherwise lose the root dictionaries and ignorePaths.
+import:
+  - '../../.cspell.config.yaml'
+words:
+  # Percent-encoded `refs/heads/feature`, in the routes the command tests
+  # answer.
+  - Fheads
+  - Ffeature
+  # git's `rerere` (reuse recorded resolution), which run.mts pins off.
+  - rerere
