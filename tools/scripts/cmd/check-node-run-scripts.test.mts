@@ -4,12 +4,22 @@ import dedent from 'dedent';
 import { Result } from 'ts-data-forge';
 import type { ReadonlyRecord } from 'ts-type-forge';
 import {
+  commonJsLoaderLines,
   hookCommands,
   judgeNodeRuns,
   nodeLoadViolations,
   nodeRunFilesOf,
   readCompositeSteps,
+  readNodeOptions,
+  runsOf,
+  runtimeSpecifiers,
+  selectCommandFiles,
+  shellScriptsOf,
 } from './check-node-run-scripts.mjs';
+
+// Every reading of node's arguments needs these, so a Node whose help this
+// cannot read fails the file as a whole, with the reason.
+const nodeOptions = Result.unwrapThrow(await readNodeOptions());
 
 const at = (
   directory: string,
@@ -19,6 +29,7 @@ const at = (
     directory,
     variables: {},
     exists: (file) => existing.includes(file),
+    nodeOptions,
   }) as const;
 
 const filesOf =
@@ -82,15 +93,67 @@ describe(nodeRunFilesOf, () => {
     );
   });
 
-  test('reports a word that may be an option value instead of the script', () => {
-    const result = nodeRunFilesOf(
-      'node --test-reporter spec --test ./tools/a.test.mts',
-      at(''),
+  test('gives an option node --help does not list no word of its own', () => {
+    // V8's options, `--stack-size` among them, take a value after `=` alone.
+    assert.deepStrictEqual(
+      nodeRunFilesOf(
+        dedent`
+          node --stack-size=2000 ./tools/a.mts
+          node --allow-natives-syntax ./tools/b.mts
+          node --security-revert CVE-0 ./tools/c.mts
+        `,
+        at(''),
+      ),
+      Result.ok(['tools/a.mts', 'tools/b.mts', 'tools/c.mts']),
     );
+  });
 
-    assert.isTrue(Result.isErr(result));
+  test('reports a script read from standard input, which it cannot name', () => {
+    for (const script of [
+      'node --input-type=module-typescript - < ./tools/a.mts',
+      'node -- - ./tools/a.mts',
+    ]) {
+      const result = nodeRunFilesOf(script, at(''));
 
-    assert.include(result.value, 'spec');
+      assert.isTrue(Result.isErr(result));
+
+      assert.include(result.value, 'standard input');
+    }
+
+    // Under `--test`, `-` is a test file's name, not an option.
+    assert.deepStrictEqual(
+      nodeRunFilesOf('node --test - ./a.test.mts', at('')),
+      Result.ok(['a.test.mts']),
+    );
+  });
+
+  test('reads every word after `--` as no option', () => {
+    assert.deepStrictEqual(
+      nodeRunFilesOf(
+        dedent`
+          node -- -x.mts
+          node --test -- ./a.test.mts -b.test.mts
+        `,
+        at(''),
+      ),
+      Result.ok(['-x.mts', 'a.test.mts', '-b.test.mts']),
+    );
+  });
+
+  test("takes the value of an option node lists as taking one, and no other's", () => {
+    assert.deepStrictEqual(
+      nodeRunFilesOf(
+        dedent`
+          node --watch-path ./src ./tools/a.mts
+          node --test-reporter spec --test ./tools/b.test.mts
+          node --no-warnings ./x.mjs ./arg.mts
+          node --enable-source-maps dist/cli.mjs src/c.mts
+          node --no-experimental-transform-types x.mjs ./d.mts
+        `,
+        at(''),
+      ),
+      Result.ok(['tools/a.mts', 'tools/b.test.mts']),
+    );
   });
 
   test('runs every file after --test', () => {
@@ -119,6 +182,46 @@ describe(nodeRunFilesOf, () => {
     );
   });
 
+  test('reads node called by its path', () => {
+    assert.deepStrictEqual(
+      nodeRunFilesOf(
+        dedent`
+          /opt/node/bin/node ./tools/a.mts
+          "$NODE_DIR"/bin/node ./tools/b.mts
+        `,
+        { ...at(''), variables: { NODE_DIR: '/opt/node' } },
+      ),
+      Result.ok(['tools/a.mts', 'tools/b.mts']),
+    );
+  });
+
+  test("ignores what node runs after preloading tsx's ES module loader, which compiles it", () => {
+    assert.deepStrictEqual(
+      nodeRunFilesOf(
+        dedent`
+          node --import=tsx ./tools/a.mts 'src/**/*.{ts,tsx}'
+          node --import tsx ./tools/b.mts
+          node --import tsx/esm ./tools/c.mts
+          node --import ./node_modules/tsx/dist/esm/index.mjs ./tools/e.mts
+          node --import ./node_modules/tsx/dist/loader.mjs ./tools/h.mts
+          node --import ./node_modules/tsx/dist/esm/api/index.mjs ./tools/i.mts
+          node --import ./tsx-like.mts ./tools/d.mts
+          node -r tsx/cjs ./tools/f.mts
+          node --import=./setup=x.mts ./tools/g.mts
+        `,
+        at(''),
+      ),
+      Result.ok([
+        'tools/i.mts',
+        'tsx-like.mts',
+        'tools/d.mts',
+        'tools/f.mts',
+        'setup=x.mts',
+        'tools/g.mts',
+      ]),
+    );
+  });
+
   test("reads node's options, a preloaded module among them", () => {
     assert.deepStrictEqual(
       nodeRunFilesOf(
@@ -126,6 +229,16 @@ describe(nodeRunFilesOf, () => {
         at(''),
       ),
       Result.ok(['hook.mts', 'x.mts']),
+    );
+  });
+
+  test('expands a variable as it stands where node runs', () => {
+    assert.deepStrictEqual(
+      nodeRunFilesOf(
+        'f=./tools/a.mts; node "$f"; f=./x.mjs; f=./tools/b.mts',
+        at(''),
+      ),
+      Result.ok(['tools/a.mts']),
     );
   });
 
@@ -137,6 +250,7 @@ describe(nodeRunFilesOf, () => {
           directory: '',
           variables: { CLAUDE_PROJECT_DIR: '.' },
           exists: () => true,
+          nodeOptions,
         },
       ),
       Result.ok(['tools/scripts/cmd/hook.mts']),
@@ -175,6 +289,59 @@ describe(nodeRunFilesOf, () => {
 });
 
 describe(nodeLoadViolations, () => {
+  test('reports a module named at runtime rather than skipping it', () => {
+    expect(
+      nodeLoadViolations('a.mts', {
+        read: filesOf({ 'a.mts': 'const m = await import(name);' }),
+        packagesInstalled: true,
+      }),
+    ).toHaveLength(1);
+  });
+
+  test('reports a CommonJS loader by its line, a member or a pattern included, before the install and after it', () => {
+    const read = filesOf({
+      'a.mts': "import * as fs from 'node:fs';\nconst m = require('node:fs');",
+      'b.mts': dedent`
+        export const c = manifest.exports.require;
+        export const { require: d } = manifest.exports;
+      `,
+      'c.mts': dedent`
+        import * as m from 'node:module';
+        module.require('yaml');
+        m.createRequire(import.meta.url);
+      `,
+    });
+
+    // Before the install and after it, a loader is reported by its line
+    // (a.mts), data named `require` too (b.mts), and so is a loader called as a
+    // member or reached through a namespace import (c.mts).
+    for (const packagesInstalled of [false, true]) {
+      for (const [file, lines] of [
+        ['a.mts', [2]],
+        ['b.mts', [1, 2]],
+        ['c.mts', [2, 3]],
+      ] as const) {
+        expect(
+          nodeLoadViolations(file, { read, packagesInstalled }).map(
+            (violation) => violation.split(': ', 1)[0],
+          ),
+        ).toStrictEqual(lines.map((line) => `${file}:${line}`));
+      }
+    }
+  });
+
+  test('points a CommonJS loader report to the doc that says why data counts', () => {
+    const [message] = nodeLoadViolations('a.mts', {
+      read: filesOf({ 'a.mts': 'export const c = manifest.exports.require;' }),
+      packagesInstalled: true,
+    });
+
+    assert.include(
+      message,
+      `\`${commonJsLoaderLines.name}\` in tools/scripts/cmd/check-node-run-scripts.mts`,
+    );
+  });
+
   test('accepts node: builtins and a top-level import type', () => {
     assert.deepStrictEqual(
       nodeLoadViolations('a.mts', {
@@ -418,6 +585,240 @@ describe(hookCommands, () => {
         },
       }),
       ['a', 'b'],
+    );
+  });
+});
+
+describe(runtimeSpecifiers, () => {
+  test.each([
+    ["import * as fs from 'node:fs';", ['node:fs']],
+    ["import 'ts-data-forge';", ['ts-data-forge']],
+    ["import {} from 'ts-type-forge';", ['ts-type-forge']],
+    ["export { Arr } from 'ts-data-forge';", ['ts-data-forge']],
+    ["const m = await import('ts-data-forge');", ['ts-data-forge']],
+    ['const m = await import(`ts-data-forge`);', ['ts-data-forge']],
+    ['const m = await import(name);', [undefined]],
+    // eslint-disable-next-line no-template-curly-in-string -- the template is the input.
+    ['const m = await import(`${name}`);', [undefined]],
+    // A CommonJS loader is `commonJsLoaderLines`'.
+    ["const m = require('ts-data-forge');", []],
+    ['import {\n  a, // don\'t\n  b,\n} from "./x.mjs";', ['./x.mjs']],
+  ] as const)('reads %s as importing %j', (text, expected) => {
+    expect(runtimeSpecifiers(text)).toStrictEqual(expected);
+  });
+});
+
+describe(commonJsLoaderLines, () => {
+  test.each([
+    ["const m = require('ts-data-forge');", [1]],
+    ["const m = (0, require)('ts-data-forge');", [1]],
+    [
+      "import { createRequire } from 'node:module';\nconst req = createRequire(import.meta.url);\nreq('yaml');",
+      [1, 2],
+    ],
+    [
+      "import { 'createRequire' as cr } from 'node:module';\ncr(import.meta.url)('yaml');",
+      [1],
+    ],
+    ["import * as m from 'node:module';\nm.createRequire;", [2]],
+    // A member counts on any object, data included, as the doc says.
+    ['const c = entry.exports.require;', [1]],
+    ["(module).require('yaml');", [1]],
+    ['const r = module.require;', [1]],
+    ["(0, globalThis['require'])('yaml');", [1]],
+    ["if (typeof module.require === 'function') {}", []],
+    ['export { foo as require };', []],
+    ["export { createRequire as load } from 'node:module';", [1]],
+    ["export { require } from './shim.mjs';", [1]],
+    ["export { foo as require } from './m.mjs';", []],
+    ['typeof (0, require);', []],
+    ["import * as m from 'node:module';\nm[('createRequire')];", [2]],
+    ["const { createRequire } = await import('node:module');", [1]],
+    ['const { require: r } = globalThis;', [1]],
+    ["const { ['require' as const]: r } = globalThis;", [1]],
+    ['let r;\n({ require: r } = globalThis);', [2]],
+    ['const { require: { cache } } = module;', [1]],
+    // A name written to takes nothing out, declared or assigned.
+    ['const [require] = list;', []],
+    ['const { ...require } = g;', []],
+    ['function f([require]) {}', []],
+    ['const { a: require } = g;', []],
+    ['let require;\n({ a: require } = g);', []],
+    ['let require;\n[require] = xs;', []],
+    ['let require;\nrequire = x;', []],
+    ['let require;\n(require) = x;', []],
+    ['let require;\n[(require)] = xs;', []],
+    ['let require;\nfor (require of xs) {}', []],
+    ['let require;\nfor (require in o) {}', []],
+    ['let require;\nfor ((require) in o) {}', []],
+    ['let require;\nfor ((require) of xs) {}', []],
+    ['let require;\n[...require] = xs;', []],
+    ['let require;\n[...(require)] = xs;', []],
+    ['let require;\n({ a: (require) } = g);', []],
+    ["export * as require from './m.mjs';", []],
+    ['export default require;', [1]],
+    ['const C = class require {};', []],
+    // A default value is read, in a pattern or not.
+    ['let a;\n[a = require] = xs;', [2]],
+    ['const [a = require] = xs;', [1]],
+    ["module.require('yaml');", [1]],
+    ['const r = require;', [1]],
+    ['const o = { require };', [1]],
+    ['export { require };', [1]],
+    // Names as written, not values: what a variable holds is not read.
+    ["const k = 'require';\nglobalThis[k];", []],
+    ["globalThis['re' + 'quire'];", []],
+    // A key of an object literal, a declared member and `typeof` load nothing.
+    ["const o = { require: './a.cjs', ['createRequire']: 1 };", []],
+    ["if (typeof require === 'undefined') {}", []],
+    ['class A {\n  get require() {}\n  set createRequire(v) {}\n}', []],
+    ['require: for (;;) {\n  break require;\n}', []],
+  ] as const)(
+    'finds %s naming a CommonJS loader on lines %j',
+    (text, expected) => {
+      expect(commonJsLoaderLines(text)).toStrictEqual(expected);
+    },
+  );
+});
+
+/** The files `node` is given in the scripts `file` holds. */
+const filesRun = (
+  file: string,
+  text: string,
+  manifestDirectories: ReadonlySet<string> = new Set<string>(),
+): readonly string[] => {
+  const sources = shellScriptsOf(file, text, manifestDirectories);
+
+  assert.isTrue(Result.isOk(sources));
+
+  const { runs, problems } = runsOf(sources.value, {
+    exists: () => true,
+    nodeOptions,
+  });
+
+  assert.deepStrictEqual(problems, []);
+
+  return runs.map(({ file: run }) => run);
+};
+
+describe(shellScriptsOf, () => {
+  test('reads a shell script whole, from the root', () => {
+    assert.deepStrictEqual(
+      filesRun('scripts/setup.sh', 'set -eu\nf=./tools/a.mts\nnode "$f"\n'),
+      ['tools/a.mts'],
+    );
+  });
+
+  test('reads each script of a manifest outside the workspace, from its directory', () => {
+    assert.deepStrictEqual(
+      filesRun(
+        'verify-npm-packages/x/package.json',
+        JSON.stringify({
+          scripts: { a: 'f=./a.mts', b: 'node ./b.mts', c: 1 },
+        }),
+      ),
+      ['verify-npm-packages/x/b.mts'],
+    );
+  });
+
+  test('decodes a hook command before it is read as a shell script', () => {
+    // A continuation written inside JSON: a backslash, then an escaped newline.
+    const settings = String.raw`{ "hooks": { "Stop": [{ "hooks": [{ "type": "command", "command": "node \\\n  \"$CLAUDE_PROJECT_DIR/tools/a.mts\"" }] }] } }`;
+
+    assert.deepStrictEqual(filesRun('.claude/settings.json', settings), [
+      'tools/a.mts',
+    ]);
+  });
+
+  test('reads every run of a workflow, a multi-line one included', () => {
+    const workflow = dedent`
+      on: push
+      jobs:
+        x:
+          runs-on: ubuntu-latest
+          steps:
+            - run: |
+                pnpm install
+                node ./tools/b.mts
+    `;
+
+    assert.deepStrictEqual(filesRun('.github/workflows/x.yml', workflow), [
+      'tools/b.mts',
+    ]);
+  });
+
+  test("reads a shell script under a manifest of its own, which runs from its caller's directory, as running no node", () => {
+    const manifests = new Set<string>([
+      '.',
+      'apps/foo',
+      'verify-npm-packages/x',
+    ]);
+
+    // One that runs none passes; `apps/foobar` is no part of `apps/foo`, and is
+    // read from the root.
+    assert.deepStrictEqual(
+      filesRun('apps/foo/deploy.sh', 'firebase deploy\n', manifests),
+      [],
+    );
+
+    assert.deepStrictEqual(
+      filesRun('apps/foobar/run.sh', 'node ./a.mts\n', manifests),
+      ['a.mts'],
+    );
+
+    for (const file of ['apps/foo/run.sh', 'verify-npm-packages/x/run.sh']) {
+      const sources = shellScriptsOf(
+        file,
+        'node ./scripts/gen.mts\n',
+        manifests,
+      );
+
+      assert.isTrue(Result.isOk(sources));
+
+      const { runs, problems } = runsOf(sources.value, {
+        exists: () => true,
+        nodeOptions,
+      });
+
+      assert.deepStrictEqual(runs, []);
+
+      assert.lengthOf(problems, 1);
+
+      assert.include(problems[0], file);
+    }
+  });
+
+  test('reads nothing from another file', () => {
+    assert.deepStrictEqual(filesRun('docs/x.md', 'node ./tools/a.mts'), []);
+  });
+});
+
+describe(selectCommandFiles, () => {
+  test("reads every command file but a member's manifest, and nothing in experimental/", () => {
+    assert.deepStrictEqual(
+      selectCommandFiles(
+        [
+          'package.json',
+          'setup.sh',
+          'apps/foo/package.json',
+          'apps/foo/run.sh',
+          'verify-npm-packages/x/package.json',
+          '.github/workflows/ci.yml',
+          '.github/actions/setup/action.yml',
+          '.claude/settings.json',
+          'experimental/old.sh',
+          'docs/x.md',
+        ],
+        new Set<string>(['.', 'apps/foo']),
+      ),
+      [
+        'setup.sh',
+        'apps/foo/run.sh',
+        'verify-npm-packages/x/package.json',
+        '.github/workflows/ci.yml',
+        '.github/actions/setup/action.yml',
+        '.claude/settings.json',
+      ],
     );
   });
 });
