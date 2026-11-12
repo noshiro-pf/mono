@@ -20,7 +20,10 @@ import { tsDataForgeValueAt } from './import-binding.mjs';
 
 type Options = readonly [];
 
-type MessageIds = 'preferCanonicalArraySlicing';
+type MessageIds =
+  | 'preferCanonicalArraySlicing'
+  | 'preferCanonicalArraySlicingUnfixed'
+  | 'suggestCanonicalArraySlicing';
 
 /**
  * A canonical ts-data-forge `Arr` operation a detected pattern is rewritten to:
@@ -185,13 +188,18 @@ export const preferCanonicalArraySlicing: TSESLint.RuleModule<
     type: 'suggestion',
     docs: {
       description:
-        'Unify non-mutating array element addition/removal patterns (`slice` / `toSpliced` / `filter` / `concat` / spread) into the corresponding ts-data-forge functions: `Arr.tail`, `Arr.skip`, `Arr.take`, `Arr.butLast`, `Arr.skipLast`, `Arr.takeLast`, `Arr.toUnshifted`, `Arr.toPushed`.',
+        'Unify non-mutating array element addition/removal patterns (`slice` / `toSpliced` / `filter` / `concat` / spread) into the corresponding ts-data-forge functions: `Arr.tail`, `Arr.skip`, `Arr.take`, `Arr.butLast`, `Arr.skipLast`, `Arr.takeLast`, `Arr.toUnshifted`, `Arr.toPushed`. A rewrite to `Arr.tail` or `Arr.butLast` is a suggestion, not a fix: the call can fail to compile with TS2590 (https://github.com/noshiro-pf/mono/issues/2994).',
     },
     fixable: 'code',
+    hasSuggestions: true,
     schema: [],
     messages: {
       preferCanonicalArraySlicing:
         'Replace with `{{replacement}}` from ts-data-forge.',
+      preferCanonicalArraySlicingUnfixed:
+        'Replace with `{{replacement}}` from ts-data-forge. Not fixed automatically: the call can fail to compile (TS2590) where it has a contextual type, such as an annotation or an argument. Bind its result to an unannotated `const` first there.',
+      suggestCanonicalArraySlicing:
+        'Replace with `{{replacement}}` (can fail to compile where the call has a contextual type).',
     },
     defaultOptions: [],
   },
@@ -860,23 +868,64 @@ export const preferCanonicalArraySlicing: TSESLint.RuleModule<
             nodeInfo.xsText,
           );
 
-          context.report({
-            node: nodeInfo.node,
-            messageId: 'preferCanonicalArraySlicing',
-            data: { replacement },
-            fix:
-              arr === undefined
-                ? null
-                : (fixer) => [
-                    ...arr.edits(fixer),
-                    fixer.replaceText(nodeInfo.node, replacement),
-                  ],
-          });
+          const fix: TSESLint.ReportFixFunction | null =
+            arr === undefined
+              ? null
+              : (fixer) => [
+                  ...arr.edits(fixer),
+                  fixer.replaceText(nodeInfo.node, replacement),
+                ];
+
+          if (isSuggestionOnly(nodeInfo.op)) {
+            context.report({
+              node: nodeInfo.node,
+              messageId: 'preferCanonicalArraySlicingUnfixed',
+              data: { replacement },
+              suggest:
+                fix === null
+                  ? []
+                  : [
+                      {
+                        messageId: 'suggestCanonicalArraySlicing',
+                        data: { replacement },
+                        fix,
+                      },
+                    ],
+            });
+          } else {
+            context.report({
+              node: nodeInfo.node,
+              messageId: 'preferCanonicalArraySlicing',
+              data: { replacement },
+              fix,
+            });
+          }
         }
       },
     };
   },
 } as const;
+
+// `--fix` never rewrites to `Arr.tail` or `Arr.butLast` until
+// https://github.com/noshiro-pf/mono/issues/2994 fixes the types. The call
+// fails to compile with TS2590, "Expression produces a union type that is too
+// complex to represent", in each position tried that gives it a contextual
+// type: an annotation, an argument, a declared return type, `as`, `satisfies`
+// and a destructuring, on a plain array, a tuple or a type parameter alike
+// (each checked as the only such call in its program; with several, TypeScript
+// reports only some). Without a contextual type it compiles. The rule does not
+// ask the checker whether a call has one: a position wrongly taken for safe
+// breaks the build, while a fix withheld costs a click on the suggestion. The
+// other six functions do not fail this way. `test/arr-tail-ts2590.mts` watches
+// only a plain array under an annotation.
+//
+// The suggestion is offered wherever the fix could be made, since only a person
+// applies it, never `--fix`. The pattern is still reported, `Arr.skip(xs, 1)`
+// and `Arr.skipLast(xs, 1)` included, since the canonical form is the one the
+// fix will write again once the types are fixed. The message names the form
+// that compiles, an unannotated `const` holding the result.
+const isSuggestionOnly = (op: CopyOp): boolean =>
+  op.fn === 'tail' || op.fn === 'butLast';
 
 /** The call `op` is rewritten to, writing `Arr` as `arrRef`. */
 const toReplacementText = (
