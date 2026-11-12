@@ -71,6 +71,8 @@ component_management:
       paths: ['libs/eslint-plugin-ts-data-forge/**']
     - component_id: eslint-plugin-ts-fortress
       paths: ['libs/eslint-plugin-ts-fortress/**']
+    - component_id: eslint-plugin-ts-restrictions
+      paths: ['libs/eslint-plugin-ts-restrictions/**']
     - component_id: eslint-plugin-ts-type-forge
       paths: ['libs/eslint-plugin-ts-type-forge/**']
     - component_id: github-settings-as-code

@@ -1,0 +1,420 @@
+import parser from '@typescript-eslint/parser';
+import { RuleTester } from '@typescript-eslint/rule-tester';
+import dedent from 'dedent';
+import { preferLogicalOverBooleanTernary } from './prefer-logical-over-boolean-ternary.mjs';
+
+const tester = new RuleTester({
+  languageOptions: {
+    parser,
+    parserOptions: {
+      ecmaVersion: 2022,
+      sourceType: 'module',
+      projectService: {
+        allowDefaultProject: ['*.ts*'],
+      },
+      tsconfigRootDir: `${import.meta.dirname}/../..`,
+    },
+  },
+});
+
+describe('prefer-logical-over-boolean-ternary', () => {
+  tester.run(
+    'prefer-logical-over-boolean-ternary',
+    preferLogicalOverBooleanTernary,
+    {
+      valid: [
+        {
+          name: 'both branches literal is no-unneeded-ternary’s',
+          code: dedent`
+            declare const a: boolean;
+            const x = a ? true : false;
+          `,
+        },
+        {
+          name: 'no boolean literal branch',
+          code: dedent`
+            declare const a: boolean, b: string, c: string;
+            const x = a ? b : c;
+          `,
+        },
+        {
+          name: '`a ? true : b` keeps `true` where `a || b` would give `a`',
+          code: dedent`
+            declare const a: number, b: boolean;
+            const x = a ? true : b;
+          `,
+        },
+        {
+          name: '`a ? b : false` gives `false` where `a && b` would give `a`',
+          code: dedent`
+            declare const a: string, b: boolean;
+            const x = a ? b : false;
+          `,
+        },
+        {
+          name: 'the negation of a non-boolean negation would be `!!a`',
+          code: dedent`
+            declare const a: number, b: boolean;
+            const x = !a ? false : b;
+          `,
+        },
+        {
+          name: 'the negation of a comparison that may be NaN',
+          code: dedent`
+            declare const a: number, b: boolean;
+            const x = a < 1 ? false : b;
+          `,
+        },
+        {
+          name: 'in JSX, not when the other branch is not a boolean: `&&` / `||` take only booleans there',
+          filename: 'file.tsx',
+          code: dedent`
+            declare const a: boolean, b: string, c: boolean;
+            const e = <input value={a ? false : b} />;
+            const f = <input value={a ? b : false} />;
+            const g = <input value={a ? true : b} />;
+            const h = <div>{c ? (a ? false : b) : null}</div>;
+          `,
+        },
+      ],
+      invalid: [
+        {
+          name: 'a ? true : b',
+          code: dedent`
+            declare const a: boolean, b: string;
+            const x = a ? true : b;
+          `,
+          output: dedent`
+            declare const a: boolean, b: string;
+            const x = a || b;
+          `,
+          errors: [{ messageId: 'preferLogical' }],
+        },
+        {
+          name: 'a ? false : b, whatever a is',
+          code: dedent`
+            declare const a: number, b: string;
+            const x = a ? false : b;
+          `,
+          output: dedent`
+            declare const a: number, b: string;
+            const x = !a && b;
+          `,
+          errors: [{ messageId: 'preferLogical' }],
+        },
+        {
+          name: 'a ? b : false',
+          code: dedent`
+            declare const a: boolean, b: string;
+            const x = a ? b : false;
+          `,
+          output: dedent`
+            declare const a: boolean, b: string;
+            const x = a && b;
+          `,
+          errors: [{ messageId: 'preferLogical' }],
+        },
+        {
+          name: 'a ? b : true, whatever a is',
+          code: dedent`
+            declare const a: number, b: boolean;
+            const x = a ? b : true;
+          `,
+          output: dedent`
+            declare const a: number, b: boolean;
+            const x = !a || b;
+          `,
+          errors: [{ messageId: 'preferLogical' }],
+        },
+        {
+          name: '!a ? false : b',
+          code: dedent`
+            declare const a: boolean, b: string;
+            const x = !a ? false : b;
+          `,
+          output: dedent`
+            declare const a: boolean, b: string;
+            const x = a && b;
+          `,
+          errors: [{ messageId: 'preferLogical' }],
+        },
+        {
+          name: '!a ? true : b',
+          code: dedent`
+            declare const a: number, b: boolean;
+            const x = !a ? true : b;
+          `,
+          output: dedent`
+            declare const a: number, b: boolean;
+            const x = !a || b;
+          `,
+          errors: [{ messageId: 'preferLogical' }],
+        },
+        {
+          name: 'a comparison is negated by inverting it',
+          code: dedent`
+            declare const a: number, b: boolean;
+            const x = a === 1 ? false : b;
+          `,
+          output: dedent`
+            declare const a: number, b: boolean;
+            const x = a !== 1 && b;
+          `,
+          errors: [{ messageId: 'preferLogical' }],
+        },
+        {
+          name: 'a comparison that cannot be NaN is negated by inverting it',
+          code: dedent`
+            declare const a: string, b: boolean;
+            const x = a < 'm' ? b : true;
+          `,
+          output: dedent`
+            declare const a: string, b: boolean;
+            const x = a >= 'm' || b;
+          `,
+          errors: [{ messageId: 'preferLogical' }],
+        },
+        {
+          name: 'a call is negated with !',
+          code: dedent`
+            declare const f: () => number, b: boolean;
+            const x = f() ? false : b;
+          `,
+          output: dedent`
+            declare const f: () => number, b: boolean;
+            const x = !f() && b;
+          `,
+          errors: [{ messageId: 'preferLogical' }],
+        },
+        {
+          name: 'a logical test is negated by De Morgan',
+          code: dedent`
+            declare const a: boolean, b: boolean, c: string;
+            const x = a || b ? false : c;
+            const y = a && b ? c : true;
+          `,
+          output: dedent`
+            declare const a: boolean, b: boolean, c: string;
+            const x = !a && !b && c;
+            const y = !a || !b || c;
+          `,
+          errors: [
+            { messageId: 'preferLogical' },
+            { messageId: 'preferLogical' },
+          ],
+        },
+        {
+          name: 'operands of lower precedence are parenthesized',
+          code: dedent`
+            declare const a: boolean, b: boolean, c: boolean;
+            declare const d: string | undefined;
+            const x = a ? false : b || c;
+            const y = a ? true : d ?? 'e';
+          `,
+          output: dedent`
+            declare const a: boolean, b: boolean, c: boolean;
+            declare const d: string | undefined;
+            const x = !a && (b || c);
+            const y = a || (d ?? 'e');
+          `,
+          errors: [
+            { messageId: 'preferLogical' },
+            { messageId: 'preferLogical' },
+          ],
+        },
+        {
+          name: 'in JSX, when both branches are booleans',
+          filename: 'file.tsx',
+          code: dedent`
+            declare const a: boolean, b: boolean;
+            const e = <input disabled={a ? true : b} />;
+            const f = <input disabled={a ? false : b} />;
+            const g = <div>{a ? b : false}</div>;
+          `,
+          output: dedent`
+            declare const a: boolean, b: boolean;
+            const e = <input disabled={a || b} />;
+            const f = <input disabled={!a && b} />;
+            const g = <div>{a && b}</div>;
+          `,
+          errors: [
+            { messageId: 'preferLogical' },
+            { messageId: 'preferLogical' },
+            { messageId: 'preferLogical' },
+          ],
+        },
+        {
+          name: 'the prefer-ternary shape `a ? true : b ? c : d`',
+          code: dedent`
+            declare const a: boolean, b: boolean, c: string, d: string;
+            const x = a ? true : b ? c : d;
+          `,
+          output: dedent`
+            declare const a: boolean, b: boolean, c: string, d: string;
+            const x = a || (b ? c : d);
+          `,
+          errors: [{ messageId: 'preferLogical' }],
+        },
+      ],
+    },
+  );
+});
+
+describe('prefer-logical-over-boolean-ternary through type wrappers', () => {
+  tester.run(
+    'prefer-logical-over-boolean-ternary',
+    preferLogicalOverBooleanTernary,
+    {
+      valid: [
+        {
+          name: 'a cast to `boolean` does not make the test one',
+          code: dedent`
+            declare const n: number, b: boolean;
+            const x = (n as unknown as boolean) ? true : b;
+            const y = (n as unknown as boolean) ? b : false;
+          `,
+        },
+        {
+          name: 'in JSX, a cast does not make the other branch a boolean',
+          filename: 'file.tsx',
+          code: dedent`
+            declare const a: boolean, n: number;
+            const e = <input disabled={a ? false : (n as unknown as boolean)} />;
+          `,
+        },
+        {
+          name: 'a cast widening a boolean is the author saying it may be something else',
+          code: dedent`
+            declare const a: boolean, b: boolean;
+            const x = (a as boolean | number) ? true : b;
+            const y = (a as boolean | number) ? b : false;
+          `,
+        },
+        {
+          name: 'a cast widening a never-NaN brand to `number` keeps the comparison',
+          code: dedent`
+            type ValidNumber = number & Readonly<{ NaNValue: false }>;
+            declare const v: ValidNumber, b: boolean;
+            const x = (v as number) < 1 ? false : b;
+          `,
+        },
+        {
+          name: 'in JSX, a cast widening the other branch makes it not a boolean',
+          filename: 'file.tsx',
+          code: dedent`
+            declare const a: boolean, b: boolean;
+            const e = <input disabled={a ? false : (b as boolean | number)} />;
+          `,
+        },
+      ],
+      invalid: [
+        {
+          name: 'a boolean literal wrapped in `satisfies` or `as const`',
+          code: dedent`
+            declare const a: boolean, b: boolean;
+            const w = a ? (false satisfies boolean) : b;
+            const x = a ? (true satisfies boolean) : b;
+            const y = a ? b : (false as const);
+            const z = a ? b : (true as boolean);
+          `,
+          output: dedent`
+            declare const a: boolean, b: boolean;
+            const w = !a && b;
+            const x = a || b;
+            const y = a && b;
+            const z = !a || b;
+          `,
+          errors: [
+            { messageId: 'preferLogical' },
+            { messageId: 'preferLogical' },
+            { messageId: 'preferLogical' },
+            { messageId: 'preferLogical' },
+          ],
+        },
+        {
+          name: 'two literal branches that no-unneeded-ternary does not see for the wrapper',
+          code: dedent`
+            declare const a: boolean;
+            declare const n: number;
+            const x = a ? (true satisfies boolean) : false;
+            const y = n === 0 ? false : (true as const);
+          `,
+          output: dedent`
+            declare const a: boolean;
+            declare const n: number;
+            const x = a;
+            const y = n !== 0;
+          `,
+          errors: [
+            { messageId: 'preferLogical' },
+            { messageId: 'preferLogical' },
+          ],
+        },
+        {
+          name: 'a wrapped test is negated whole',
+          code: dedent`
+            declare const a: boolean, b: boolean;
+            const x = (a satisfies boolean) ? false : b;
+          `,
+          output: dedent`
+            declare const a: boolean, b: boolean;
+            const x = !(a satisfies boolean) && b;
+          `,
+          errors: [{ messageId: 'preferLogical' }],
+        },
+        {
+          name: 'a test that is a boolean at every layer',
+          code: dedent`
+            declare const a: true, b: boolean;
+            const x = (a satisfies boolean) ? true : b;
+            const y = (a as boolean) ? b : false;
+          `,
+          output: dedent`
+            declare const a: true, b: boolean;
+            const x = a satisfies boolean || b;
+            const y = a as boolean && b;
+          `,
+          errors: [
+            { messageId: 'preferLogical' },
+            { messageId: 'preferLogical' },
+          ],
+        },
+      ],
+    },
+  );
+});
+
+describe('prefer-logical-over-boolean-ternary with parenthesized operands', () => {
+  tester.run(
+    'prefer-logical-over-boolean-ternary',
+    preferLogicalOverBooleanTernary,
+    {
+      valid: [],
+      invalid: [
+        {
+          name: 'the parentheses in the source do not stand in for the ones the new operator needs',
+          code: dedent`
+            declare const a: boolean, b: boolean, c: boolean;
+            const w = (a || b) ? false : c;
+            const x = (a || b) ? c : false;
+            const y = a ? false : (b || c);
+            const z = a ? (b || c) : true;
+          `,
+          output: dedent`
+            declare const a: boolean, b: boolean, c: boolean;
+            const w = !a && !b && c;
+            const x = (a || b) && c;
+            const y = !a && (b || c);
+            const z = !a || b || c;
+          `,
+          errors: [
+            { messageId: 'preferLogical' },
+            { messageId: 'preferLogical' },
+            { messageId: 'preferLogical' },
+            { messageId: 'preferLogical' },
+          ],
+        },
+      ],
+    },
+  );
+});

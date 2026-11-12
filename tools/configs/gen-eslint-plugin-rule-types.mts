@@ -1,6 +1,6 @@
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
-import { Arr, unknownToString } from 'ts-data-forge';
+import { Arr, hasKey, isRecord, unknownToString } from 'ts-data-forge';
 import { Result } from 'ts-repo-utils';
 import type { ReadonlyRecord } from 'ts-type-forge';
 import { formatPackage } from './format-package.mjs';
@@ -231,6 +231,12 @@ type RuleInfo = Readonly<{
   /** `meta.schema`, embedded as JSON in the `Options` JSDoc. */
   schema: unknown;
   hasOptions: boolean;
+  /**
+   * The schema is one object describing the whole options list rather than an
+   * array of per-option schemas, so every element is an option of its own
+   * (`['error', 'A', 'B']`).
+   */
+  isVariadic: boolean;
 }>;
 
 const toPascalCase = (kebabCase: string): string =>
@@ -254,6 +260,12 @@ const toRuleInfo = (name: string, meta: RuleMeta): RuleInfo => {
     hasOptions: Arr.isArray(schema)
       ? Arr.isNonEmpty(schema)
       : schema !== undefined && schema !== false,
+    // A tuple-form `items` gives each position its own schema, so it is not a
+    // list of like options; only its first is typed, as for an array schema.
+    isVariadic:
+      !Arr.isArray(schema) &&
+      isRecord(schema) &&
+      !(hasKey(schema, 'items') && Arr.isArray(schema.items)),
   };
 };
 
@@ -317,14 +329,20 @@ const generateRuleNamespace = (rule: RuleInfo): readonly string[] =>
     ...(rule.hasOptions
       ? ([
           ...generateSchemaJsdoc(rule.schema),
-          `  export type Options = NonNullable<RuleOptionsOf<'${rule.name}'>[0]>;`,
+          // `Options` is always one option, so that `…RulesOption` means the
+          // same for every rule. A variadic rule's entry repeats it; any other
+          // takes it once and whole, never spread: ESLint hands
+          // `['error', ['a', 'b']]` to the rule as `[['a', 'b']]`.
+          rule.isVariadic
+            ? (`  export type Options = RuleOptionsOf<'${rule.name}'>[number];` as const)
+            : (`  export type Options = NonNullable<RuleOptionsOf<'${rule.name}'>[0]>;` as const),
           '',
           '  export type RuleEntry =',
           "    | 'off'",
           '    | Linter.Severity',
-          // `Options` is the first option whole, so it is never spread: ESLint
-          // hands `['error', ['a', 'b']]` to the rule as `[['a', 'b']]`.
-          '    | readonly [Linter.StringSeverity, Options];',
+          rule.isVariadic
+            ? ('    | readonly [Linter.StringSeverity, ...Options[]];' as const)
+            : ('    | readonly [Linter.StringSeverity, Options];' as const),
         ] as const)
       : (['  export type RuleEntry = Linter.StringSeverity;'] as const)),
     '}',

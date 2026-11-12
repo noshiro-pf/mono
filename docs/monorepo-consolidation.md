@@ -216,9 +216,9 @@ CLI が import する `cmd-ts` / `dedent` / `ts-repo-utils` が `peerDependencie
 
 具体例:
 
-- `@types/estree`（`eslint-config-typed`）— 公開 `.d.mts` には露出しないが、
-  `src/plugins/ts-restrictions/rules/no-restricted-syntax.mts` が import する。
-  → `dependencies`
+- `@types/micromatch`（`eslint-plugin-ts-restrictions`）— 公開 `.d.mts` には
+  露出しないが、`src/rules/no-ragged-comment-wrap.mts` が `micromatch` を import
+  する。→ `dependencies`
 - `@types/micromatch`（`ts-repo-utils`）— 同様。`src/functions/gen-index.mts` の
   `import micromatch from 'micromatch'` に型を与える。→ `dependencies`
 - `tsx`（`ts-repo-utils`）— `src/` から一切参照されない。→ `devDependencies`

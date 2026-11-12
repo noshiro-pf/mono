@@ -3476,9 +3476,6 @@ importers:
       '@stylistic/eslint-plugin':
         specifier: ^5.10.0
         version: 5.10.0(eslint@10.13.0(jiti@2.7.0)(supports-color@7.2.0))
-      '@types/estree':
-        specifier: ^1.0.9
-        version: 1.0.9
       '@typescript-eslint/eslint-plugin':
         specifier: ^8.72.0
         version: 8.72.0(@typescript-eslint/parser@8.72.0(eslint@10.13.0(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0)(typescript@6.0.3))(eslint@10.13.0(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0)(typescript@6.0.3)
@@ -3494,9 +3491,6 @@ importers:
       '@vitest/eslint-plugin':
         specifier: ^1.6.27
         version: 1.6.27(@typescript-eslint/eslint-plugin@8.72.0(@typescript-eslint/parser@8.72.0(eslint@10.13.0(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0)(typescript@6.0.3))(eslint@10.13.0(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0)(typescript@6.0.3))(eslint@10.13.0(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0)(typescript@6.0.3)(vitest@5.0.5)
-      editorconfig-without-wasm:
-        specifier: ^0.0.7
-        version: 0.0.7
       eslint:
         specifier: ^10.13.0
         version: 10.13.0(jiti@2.7.0)(supports-color@7.2.0)
@@ -3560,6 +3554,9 @@ importers:
       eslint-plugin-testing-library:
         specifier: ^7.16.2
         version: 7.16.2(eslint@10.13.0(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0)(typescript@6.0.3)
+      eslint-plugin-ts-restrictions:
+        specifier: workspace:^
+        version: link:../eslint-plugin-ts-restrictions
       eslint-plugin-unicorn:
         specifier: ^78.0.0
         version: 78.0.0(eslint@10.13.0(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0)(typescript@6.0.3)
@@ -3843,6 +3840,67 @@ importers:
       ts-fortress:
         specifier: workspace:*
         version: link:../ts-fortress
+      ts-repo-utils:
+        specifier: workspace:*
+        version: link:../ts-repo-utils
+
+  libs/eslint-plugin-ts-restrictions:
+    dependencies:
+      '@types/micromatch':
+        specifier: ^4.0.10
+        version: 4.0.10
+      '@typescript-eslint/utils':
+        specifier: ^8.72.0
+        version: 8.72.0(eslint@10.13.0(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0)(typescript@6.0.3)
+      editorconfig-without-wasm:
+        specifier: ^0.0.7
+        version: 0.0.7
+      eslint-rule-forge:
+        specifier: workspace:^
+        version: link:../eslint-rule-forge
+      micromatch:
+        specifier: ^4.0.8
+        version: 4.0.8
+      ts-data-forge:
+        specifier: workspace:^
+        version: link:../ts-data-forge
+      ts-type-forge:
+        specifier: workspace:^
+        version: link:../ts-type-forge
+      typescript:
+        specifier: '>=5.0.0 <7.0.0'
+        version: 6.0.3
+    devDependencies:
+      '@typescript-eslint/parser':
+        specifier: 'catalog:'
+        version: 8.72.0(eslint@10.13.0(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0)(typescript@6.0.3)
+      '@typescript-eslint/rule-tester':
+        specifier: 'catalog:'
+        version: 8.72.0(eslint@10.13.0(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0)(typescript@6.0.3)
+      dedent:
+        specifier: 'catalog:'
+        version: 1.7.2(babel-plugin-macros@3.1.0)
+      eslint:
+        specifier: 'catalog:'
+        version: 10.13.0(jiti@2.7.0)(supports-color@7.2.0)
+      eslint-config-typed:
+        specifier: workspace:*
+        version: link:../eslint-config-typed
+      eslint-plugin-ts-data-forge:
+        specifier: workspace:*
+        version: link:../eslint-plugin-ts-data-forge
+      eslint-plugin-ts-type-forge:
+        specifier: workspace:*
+        version: link:../eslint-plugin-ts-type-forge
+      prettier:
+        specifier: 'catalog:'
+        version: 3.9.10
+      prettier-plugin-organize-imports:
+        specifier: 'catalog:'
+        version: 4.3.0(prettier@3.9.10)(typescript@6.0.3)
+      prettier-plugin-packagejson:
+        specifier: 'catalog:'
+        version: 3.0.2(prettier@3.9.10)
       ts-repo-utils:
         specifier: workspace:*
         version: link:../ts-repo-utils

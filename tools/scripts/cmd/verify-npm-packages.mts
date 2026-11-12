@@ -1184,7 +1184,9 @@ const generateSpace = async (
  * checkout — a version that does not have it. Removing the entry then only pins
  * the breakage. Wait for the release that fixes it.
  */
-const notYetPublished: ReadonlySet<string> = new Set<string>();
+const notYetPublished: ReadonlySet<string> = new Set<string>([
+  'eslint-plugin-ts-restrictions',
+]);
 
 const typesOnlyPackages: ReadonlySet<string> = new Set<string>([
   'ts-type-forge',
