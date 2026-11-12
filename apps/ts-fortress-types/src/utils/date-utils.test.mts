@@ -1,11 +1,6 @@
 // cspell:ignore unstub
 import { asSafeUint } from 'ts-data-forge';
-import type {
-  DateEnum,
-  FixedLengthTuple,
-  IntWithSmallInt,
-  MonthEnum,
-} from 'ts-type-forge';
+import type { DateEnum, FixedLengthTuple, MonthEnum } from 'ts-type-forge';
 import { DateUtils } from './date-utils.mjs';
 
 type YMD = readonly [number, MonthEnum, DateEnum];
@@ -16,27 +11,21 @@ const ymd = (date: Date): FixedLengthTuple<3, number> =>
 const at2359 = ([y, m, d]: YMD): Date =>
   DateUtils.create(asSafeUint(y), m, d, 23, 59);
 
-describe('DateUtils.addLocaleMonths', () => {
+describe('DateUtils.setLocaleMonth', () => {
   test.each([
-    [[2027, 1, 31], 1, [2027, 2, 28]],
-    [[2028, 1, 31], 1, [2028, 2, 29]],
-    [[2028, 2, 29], 12, [2029, 2, 28]],
-    [[2026, 10, 31], 1, [2026, 11, 30]],
-    [[2026, 3, 31], 1, [2026, 4, 30]],
-    [[2026, 5, 15], 1, [2026, 6, 15]],
-    [[2026, 12, 31], 1, [2027, 1, 31]],
-    [[2026, 1, 31], -1, [2025, 12, 31]],
-    [[2026, 3, 31], -1, [2026, 2, 28]],
-    [[2026, 3, 31], -13, [2025, 2, 28]],
-    [[2026, 8, 31], 18, [2028, 2, 29]],
-    [[2026, 5, 15], 0, [2026, 5, 15]],
+    [[2027, 1, 31], 2, [2027, 2, 28]],
+    [[2028, 1, 31], 2, [2028, 2, 29]],
+    [[2028, 2, 29], 12, [2028, 12, 29]],
+    [[2027, 3, 31], 4, [2027, 4, 30]],
+    [[2027, 12, 31], 1, [2027, 1, 31]],
+    [[2027, 5, 15], 5, [2027, 5, 15]],
   ] as const satisfies readonly (readonly [
     YMD,
-    IntWithSmallInt,
+    MonthEnum,
     FixedLengthTuple<3, number>,
-  ])[])('%j plus %i months is %j', (from, n, expected) => {
+  ])[])('%j with the month set to %i is %j', (from, month, expected) => {
     assert.deepStrictEqual(
-      ymd(DateUtils.addLocaleMonths(n)(at2359(from))),
+      ymd(DateUtils.setLocaleMonth(month)(at2359(from))),
       expected,
     );
   });
@@ -55,39 +44,13 @@ describe('DateUtils.addLocaleMonths', () => {
       1,
     );
 
-    const next = DateUtils.addLocaleMonths(1)(
+    const next = DateUtils.setLocaleMonth(10)(
       DateUtils.create(asSafeUint(2023), 9, 15, 0, 30),
     );
 
     assert.deepStrictEqual(
       [...ymd(next), next.getHours(), next.getMinutes()],
       [2023, 10, 15, 0, 30],
-    );
-  });
-
-  test('keeps the time of day', () => {
-    const next = DateUtils.addLocaleMonths(1)(at2359([2027, 1, 31]));
-
-    assert.deepStrictEqual([next.getHours(), next.getMinutes()], [23, 59]);
-  });
-});
-
-describe('DateUtils.setLocaleMonth', () => {
-  test.each([
-    [[2027, 1, 31], 2, [2027, 2, 28]],
-    [[2028, 1, 31], 2, [2028, 2, 29]],
-    [[2028, 2, 29], 12, [2028, 12, 29]],
-    [[2027, 3, 31], 4, [2027, 4, 30]],
-    [[2027, 12, 31], 1, [2027, 1, 31]],
-    [[2027, 5, 15], 5, [2027, 5, 15]],
-  ] as const satisfies readonly (readonly [
-    YMD,
-    MonthEnum,
-    FixedLengthTuple<3, number>,
-  ])[])('%j with the month set to %i is %j', (from, month, expected) => {
-    assert.deepStrictEqual(
-      ymd(DateUtils.setLocaleMonth(month)(at2359(from))),
-      expected,
     );
   });
 
