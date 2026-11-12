@@ -120,7 +120,7 @@ Updates the state by passing a function `updateFn` that takes the current state 
 resetState: () => void;
 ```
 
-Resets the state to the initial value.
+Resets the state to the value it was created with: the first render's `initialState`, as `useState` reads it, whatever is passed later. Its identity never changes.
 
 ### `useBoolState`
 
@@ -169,7 +169,7 @@ Sets the state to `false`.
 resetState: () => void;
 ```
 
-Resets the state to the initial value.
+Resets the state to the value it was created with: the first render's `initialState`, as `useState` reads it, whatever is passed later. Its identity never changes.
 
 #### `toggleState`
 
