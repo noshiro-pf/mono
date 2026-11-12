@@ -186,6 +186,7 @@ const routes = defineRoutes({
 
 - エントリーに state がない、または decode できないときは `undefined`（検索パラメータの「ない」と同じ考え方）。`state` を宣言しないページの match には `state` キー自体がない。
 - 継承しない。宣言したページだけのもの。
+- バインディングの `Link` も `state` を受け取り、ルーターに回すクリックで `push` / `replace` に渡す（#3859）。修飾キー・`target`・`download`・`ExternalHref` などブラウザに任せるクリックでは何も書かない。
 - `push`・`replace` に state を渡さなければ、新しいエントリーの state は `null`。`setSearch` は同じページなので今の state を保つ。末尾スラッシュの正規化の `replaceState` も保つ。リダイレクトした先には渡さない（state は頼まれた URL のページのものなので）。`state` を宣言しないページに渡した値は書かない。
 - `state` を渡した fragment だけの遷移は `location.hash` への代入ではなく `pushState` にする（代入では state を書けないため）。
 - encode の結果はブラウザが structured clone で保存するので、関数やクラスのインスタンスを含めない。`createMemoryBrowser` も structured clone で保存し、テストがブラウザと同じ写しを読むようにする。
@@ -316,7 +317,7 @@ export const App = (): React.JSX.Element => (
 - `RouterDevtools`（#3439）は、場所、match、ルートツリー（コアの `describeRoutes(routes)` が返す id・pattern・params・search・page の一覧。一致した枝に `aria-current`）、最後のリダイレクトを表示する開発用のパネル。本番のバンドルに入れないため、`import.meta.env.DEV` の分岐の中で `React.lazy` と `import()` で読む（synstate-router-react-sample-app の `main.tsx`）。本番ビルドではバンドラーがその分岐ごと落とす。ブラウザ拡張にしなかったのは、部品なら依存も配布の手順も増えないため。synstate-dom 版は、要望が出たら同じ `describeRoutes` と Observable の上に作る。
 - `useBranch()` は `router.branch` の値を返す。パンくずやタイトルに使う。
 - `useAt(node)` は `Optional<{ params; search }>`、`useIsActive(node, { exact? })` は `boolean` を返す。
-- `Link`: `to: Href | ExternalHref`、`replace?`、残りは `<a>` の props。クリック判定はコアの `handleLinkClick(router, event)` を呼ぶだけで、synstate-dom 版と同じ規則（「6.2 `Link`」）が 1 箇所にある。
+- `Link`: `to: Href | ExternalHref`、`replace?`、`state?`（「3.4」）、残りは `<a>` の props。クリック判定はコアの `handleLinkClick(router, event)` を呼ぶだけで、synstate-dom 版と同じ規則（「6.2 `Link`」）が 1 箇所にある。
 - ナビゲーションはイベントハンドラーから `router.push(href)` を呼ぶ。`useNavigate` のような hook は作らない（`router` は普通の値で、どこからでも呼べる）。
 - React の context も module augmentation も使わない。`createReactRouter(router)` の戻り値が `typeof routes` から型を受け取るので、TanStack Router の `Register` のような全体登録は要らず、テストでは memory browser の router から作ればよい。
 
@@ -396,7 +397,7 @@ const App = (): JSX.Element => (
 <Link to={externalHref('https://example.com/')}>{constant('外部')}</Link>
 ```
 
-- `to: Href | ExternalHref | Bindable<Href | ExternalHref>`、`replace?: boolean`、残りは `<a>` の props。変わらない遷移先は `constant` で包まずに書ける。`ExternalHref` は同じ origin でもルーターに回さない。`href` 属性には、`Href` なら `router.toUrl(to)`（ベースパス付き）を、`ExternalHref` ならその URL をそのまま書くので、新しいタブで開く・コピーするなどブラウザの動作はそのまま。
+- `to: Href | ExternalHref | Bindable<Href | ExternalHref>`、`replace?: boolean`、`state?: unknown`（遷移先のページの履歴 state。「3.4」）、残りは `<a>` の props。変わらない遷移先は `constant` で包まずに書ける。`ExternalHref` は同じ origin でもルーターに回さない。`href` 属性には、`Href` なら `router.toUrl(to)`（ベースパス付き）を、`ExternalHref` ならその URL をそのまま書くので、新しいタブで開く・コピーするなどブラウザの動作はそのまま。
 - クリックをルーターに回すのは、主ボタンで、修飾キーがなく、`target` が `_self` かなしで、`download` がなく、同じ origin の `Href` のときだけ。
 - tiny-router の不具合を繰り返さない: アンカーは `currentTarget` から読む（#2954、アイコンを押しても SPA 遷移）。今と同じ URL かどうかは、どちらも正規形（「4.2」の 4）にした絶対 URL 同士で比べ、同じなら `replace` にする（#2956）。同じページ内の fragment だけの移動も `router.push` に渡す。`push` はそれを `location` へのブラウザ自身の fragment navigation にするので、スクロール・`hashchange`・`:target` が残り（#3033）、まだ実行していないスクロールもその fragment へ向け直せる（その場合、要素はまだ描かれていないので `:target` は付かない）。`replace` の `Link` は「4.2」の 6 のとおり `replaceState` とルーター自身のスクロールになる。それぞれにブラウザテストを付ける。
 

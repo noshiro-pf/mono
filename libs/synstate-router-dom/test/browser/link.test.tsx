@@ -1,7 +1,17 @@
 import { createState, map } from 'synstate';
 import { constant } from 'synstate-dom';
-import { externalHref, type ExternalHref, type Href } from 'synstate-router';
-import { asSafeInt } from 'ts-data-forge';
+import {
+  createMemoryBrowser,
+  createRouter,
+  defineRoutes,
+  externalHref,
+  historyState,
+  type ExternalHref,
+  type Href,
+  type Router,
+} from 'synstate-router';
+import { asSafeInt, Optional } from 'ts-data-forge';
+import { createRouterComponents } from '../../src/index.mjs';
 import { mountInto, nextTask, routes, setup } from './fixture.js';
 
 /**
@@ -389,6 +399,81 @@ describe('Link', () => {
     assert.strictEqual(mut_refs.length, 1);
 
     assert.instanceOf(mut_refs[0], HTMLAnchorElement);
+
+    unmount();
+  });
+});
+
+/** Routes whose `checkout` page declares a history state (#3859). */
+const stateRoutes = defineRoutes({
+  home: { segment: '' },
+  checkout: {
+    state: historyState.custom<number>({
+      decode: (raw) =>
+        typeof raw === 'number' ? Optional.some(raw) : Optional.none,
+      encode: (step) => step,
+    }),
+  },
+});
+
+type StateRouter = Router<typeof stateRoutes>;
+
+/** A router on {@link stateRoutes}, at the test page's origin. */
+const stateSetup = (): StateRouter => {
+  const start = new URL('/', globalThis.location.origin);
+
+  return createRouter(stateRoutes, {
+    browser: createMemoryBrowser(start.href),
+  });
+};
+
+const checkoutStep = (router: StateRouter): number | undefined => {
+  const m = router.match.getSnapshot().value;
+
+  return m.route === 'checkout' ? m.state : undefined;
+};
+
+describe('Link with a history state', () => {
+  test('opens the page with it, and back and forward restore it', async () => {
+    const router = stateSetup();
+
+    const { Link } = createRouterComponents(router);
+
+    const { container, unmount } = mountInto(() => (
+      <Link state={3} to={stateRoutes.checkout.href()}>
+        {constant('checkout')}
+      </Link>
+    ));
+
+    click(anchorIn(container));
+
+    assert.strictEqual(checkoutStep(router), 3);
+
+    router.push(stateRoutes.home.href());
+
+    router.back();
+
+    await nextTask();
+
+    assert.strictEqual(checkoutStep(router), 3);
+
+    unmount();
+  });
+
+  test('a click the browser handles writes no state', () => {
+    const router = stateSetup();
+
+    const { Link } = createRouterComponents(router);
+
+    const { container, unmount } = mountInto(() => (
+      <Link state={3} to={stateRoutes.checkout.href()}>
+        {constant('checkout')}
+      </Link>
+    ));
+
+    click(anchorIn(container), { ctrlKey: true });
+
+    assert.strictEqual(router.match.getSnapshot().value.route, 'home');
 
     unmount();
   });
