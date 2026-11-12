@@ -81,6 +81,7 @@ workflows:
         - 'actions/upload-artifact@v7.0.2'
         - 'changesets/action@v2.1.2'
         - 'pnpm/action-setup@v6.1.0'
+    '.github/workflows/report-scheduled-failure.yml': []
     '.github/workflows/restart-unblock-prs.yml': []
     '.github/workflows/skip-ci-label.yml': []
     '.github/workflows/strict-lib-gen.yml':

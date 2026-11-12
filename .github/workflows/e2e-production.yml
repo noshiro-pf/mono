@@ -7,8 +7,8 @@ name: E2E (production)
 #
 # It reports no required status check: its verdict is a function of the live
 # site and of Firebase, not of the tree, so it would hold merges for things
-# no pull request can fix. A failed scheduled run mails whoever last changed
-# the schedule.
+# no pull request can fix. A failed scheduled run opens or extends an issue,
+# through report-scheduled-failure.yml.
 #
 # The tests write to the production Firestore and put back what they write;
 # `apps/event-schedule-app/e2e/production.spec.mts` says how.
