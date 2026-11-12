@@ -220,6 +220,11 @@ const ReleaseBinaryPinSchema = t.record({
     t.string(),
     t.record({ name: t.string(), sha256: t.string() }),
   ),
+  /**
+   * The version chosen by hand to stay pinned, and why: the scheduled update
+   * leaves the tool alone (`mature-updates.mts release-binaries --keep`).
+   */
+  keep: t.optional(t.record({ version: t.string(), reason: t.string() })),
 });
 
 export type ReleaseBinaryPin = t.TypeOf<typeof ReleaseBinaryPinSchema>;
