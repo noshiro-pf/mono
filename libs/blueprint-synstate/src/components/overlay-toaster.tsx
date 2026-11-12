@@ -70,13 +70,19 @@ export type Toaster = Readonly<{
    */
   show: (props: ToastProps, key?: string) => string;
   dismiss: (key: string) => void;
-  /** Dismisses every toast, and those waiting to be shown. */
+  /**
+   * Dismisses every toast, calling the `onDismiss` of each still shown with
+   * `false`, and drops those waiting to be shown, which were never shown.
+   */
   clear: () => void;
   /** The toasts shown, newest first. */
   getToasts: () => readonly ShownToast[];
   /**
    * Takes the toaster out of the page, with its toasts and those waiting to be
-   * shown. A toast shown after this is ignored.
+   * shown, as {@link Toaster.clear} does: the `onDismiss` of each toast still
+   * shown is called with `false`, and those waiting are dropped. A toast shown
+   * after this, with a key or without, is ignored. Blueprint's toaster has no
+   * `remove`: it goes as it is unmounted.
    */
   remove: () => void;
 }>;
@@ -128,32 +134,47 @@ export const createToaster = (
     queueTimer: ReturnType<typeof setTimeout> | undefined;
     /** `remove` has been called: a toast shown from now on is ignored. */
     removed: boolean;
+    /**
+     * The rows whose `onDismiss` is running, which a `dismiss`, `clear` or
+     * `remove` it makes does not dismiss again.
+     */
+    dismissing: Set<number>;
   } = {
     keyId: 0,
     rowId: 0,
     queue: [],
     queueTimer: undefined,
     removed: false,
+    dismissing: new Set<number>(),
   };
 
   const shown = (): readonly Row[] =>
     rows$.getSnapshot().value.filter(({ leaving }) => !leaving);
 
+  /**
+   * Shows `toast` at once, dismissing first the oldest past `maxToasts`, as
+   * Blueprint's `dismissIfAtLimit`; unless that dismissal removed the toaster.
+   */
   const showNow = (toast: ShownToast): void => {
+    // Not those already on their way out, whose `onDismiss` may show this.
+    const rows = shown().filter(({ id }) => !mut_toaster.dismissing.has(id));
+
+    if (maxToasts !== undefined && rows.length >= maxToasts) {
+      const oldest = rows.at(-1);
+
+      if (oldest !== undefined) {
+        dismissRows(({ id }) => id === oldest.id, false);
+      }
+
+      if (mut_toaster.removed) {
+        return;
+      }
+    }
+
     const isFirst = !hasOpened$.getSnapshot().value;
 
     if (isFirst) {
       container.append(root);
-    }
-
-    const rows = shown();
-
-    if (maxToasts !== undefined && rows.length === maxToasts) {
-      const oldest = rows.at(-1);
-
-      if (oldest !== undefined) {
-        dismiss(oldest.toast.key, false);
-      }
     }
 
     const row: Row = {
@@ -177,11 +198,23 @@ export const createToaster = (
       if (next === undefined) {
         mut_toaster.queueTimer = undefined;
       } else {
+        runQueue();
+
         showNow(next);
 
-        runQueue();
+        keepSpacing();
       }
     }, queueDelay);
+  };
+
+  /**
+   * Arms the queue's timer again when a `clear` an `onDismiss` made while a
+   * toast was being shown took it away, so that the next still waits.
+   */
+  const keepSpacing = (): void => {
+    if (!mut_toaster.removed && mut_toaster.queueTimer === undefined) {
+      runQueue();
+    }
   };
 
   const replace = (toast: ShownToast): boolean => {
@@ -216,18 +249,24 @@ export const createToaster = (
 
     if (key === undefined) {
       mut_toaster.keyId += 1;
-    } else if (replace(toast)) {
-      return toast.key;
     }
 
+    // Neither shown nor put in place of one, as from an `onDismiss` that
+    // `remove` calls.
     if (mut_toaster.removed) {
       return toast.key;
     }
 
+    if (key !== undefined && replace(toast)) {
+      return toast.key;
+    }
+
     if (mut_toaster.queueTimer === undefined) {
+      runQueue();
+
       showNow(toast);
 
-      runQueue();
+      keepSpacing();
     } else {
       mut_toaster.queue.push(toast);
     }
@@ -235,38 +274,68 @@ export const createToaster = (
     return toast.key;
   };
 
-  const dismiss = (key: string, didTimeoutExpire: boolean): void => {
-    const rows = rows$.getSnapshot().value;
+  /**
+   * Calls the `onDismiss` of the rows `dismissed` picks, then marks them as
+   * leaving, as Blueprint's calls it while the toast is still listed. A row
+   * whose `onDismiss` is running is not picked again by what that callback
+   * does; a toast it shows stays.
+   */
+  const dismissRows = (
+    dismissed: (row: Row) => boolean,
+    didTimeoutExpire: boolean,
+  ): void => {
+    const leaving = shown().filter(
+      (row) => !mut_toaster.dismissing.has(row.id) && dismissed(row),
+    );
 
-    for (const row of rows) {
-      if (!row.leaving && row.toast.key === key) {
-        row.toast.onDismiss?.(didTimeoutExpire);
-      }
+    if (Arr.isEmpty(leaving)) {
+      return;
     }
 
+    for (const { id } of leaving) {
+      mut_toaster.dismissing.add(id);
+    }
+
+    callOnDismiss(leaving, didTimeoutExpire);
+
+    for (const { id } of leaving) {
+      mut_toaster.dismissing.delete(id);
+    }
+
+    if (mut_toaster.removed) {
+      return;
+    }
+
+    // A row whose toast a callback replaced, by showing one with its key, stays
+    // with the new toast.
+    const toastOf = new Map(leaving.map((row) => [row.id, row.toast]));
+
     setRows(
-      rows.map((row) =>
-        !row.leaving && row.toast.key === key ? { ...row, leaving: true } : row,
-      ),
+      rows$
+        .getSnapshot()
+        .value.map((row) =>
+          toastOf.get(row.id) === row.toast ? { ...row, leaving: true } : row,
+        ),
     );
   };
 
-  const clear = (): void => {
+  const dismiss = (key: string, didTimeoutExpire: boolean): void => {
+    dismissRows((row) => row.toast.key === key, didTimeoutExpire);
+  };
+
+  const dropQueue = (): void => {
     clearTimeout(mut_toaster.queueTimer);
 
     mut_toaster.queueTimer = undefined;
 
     mut_toaster.queue = [];
+  };
 
-    const rows = rows$.getSnapshot().value;
+  /** Drops the toasts waiting, and dismisses those shown. */
+  const clear = (): void => {
+    dropQueue();
 
-    for (const row of rows) {
-      if (!row.leaving) {
-        row.toast.onDismiss?.(false);
-      }
-    }
-
-    setRows(rows.map((row) => (row.leaving ? row : { ...row, leaving: true })));
+    dismissRows(() => true, false);
   };
 
   const removeRow = (id: number): void => {
@@ -297,19 +366,28 @@ export const createToaster = (
     clear,
     getToasts: () => shown().map(({ toast }) => toast),
     remove: () => {
+      if (mut_toaster.removed) {
+        return;
+      }
+
       mut_toaster.removed = true;
 
-      clearTimeout(mut_toaster.queueTimer);
+      dropQueue();
 
-      mut_toaster.queueTimer = undefined;
+      // Those a `dismiss` or `clear` is already telling are left to it.
+      const shownRows = shown().filter(
+        ({ id }) => !mut_toaster.dismissing.has(id),
+      );
 
-      mut_toaster.queue = [];
-
+      // Out of the page first, with nothing left for a callback to dismiss,
+      // clear or show again.
       unmount();
 
       setRows([]);
 
       root.remove();
+
+      callOnDismiss(shownRows, false);
     },
   };
 };
@@ -330,6 +408,30 @@ const queueDelay = 50;
 
 /** `$pt-transition-duration * 3 + $pt-transition-duration / 2`. */
 const transitionDuration = 350;
+
+/**
+ * Calls each row's `onDismiss`, the next still called when one throws, which is
+ * reported as an uncaught error would be.
+ */
+const callOnDismiss = (
+  rows: readonly Row[],
+  didTimeoutExpire: boolean,
+): void => {
+  for (const row of rows) {
+    try {
+      row.toast.onDismiss?.(didTimeoutExpire);
+    } catch (error: unknown) {
+      // As an uncaught error, where `reportError` is not, as in Node.js.
+      if (typeof globalThis.reportError === 'function') {
+        globalThis.reportError(error);
+      } else {
+        queueMicrotask(() => {
+          throw error;
+        });
+      }
+    }
+  }
+};
 
 /**
  * Blueprint's `Toast`, as `Overlay2` decorates it: its timeout waits while the
