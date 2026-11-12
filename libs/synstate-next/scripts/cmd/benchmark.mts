@@ -223,6 +223,35 @@ const scenarios: readonly Scenario[] = [
     },
   },
   {
+    // More than two parents take the general path, which reads every parent on
+    // each write; one and two parents are unrolled. `fn` names one parameter,
+    // so that no rest array is built, and returns the value written, so that
+    // the subscriber runs.
+    name: 'one of 100 states written, all read by one derive',
+    operations: 1000,
+    setup: (library) => {
+      const states = Array.from({ length: 100 }, () => library.state(0));
+
+      library.subscribe(
+        library.derive(
+          states.map((s) => s.node),
+          (first = 0) => first,
+        ),
+        sink,
+      );
+
+      const written = states[0];
+
+      if (written === undefined) {
+        throw new Error('no state to write');
+      }
+
+      return (i) => {
+        written.set(i + 1);
+      };
+    },
+  },
+  {
     name: '50 diamonds in a row',
     operations: 1000,
     setup: (library) => {
