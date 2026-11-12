@@ -31,10 +31,10 @@ import {
  *   they are — `isRepositoryProse` in `tools/scripts/lib/repo-files.mts` says
  *   which those are and why the rest are left out. The docs sites' own pages
  *   are left out too: their relative links are routes of the built site, not
- *   paths in the tree. Only the inline form `[text](path)` with no title is
- *   read; a reference definition, a link with a title and an HTML `href` are
- *   not. A link inside code — a fence or a code span — is an example and is
- *   not read either.
+ *   paths in the tree. A relative link is read in four forms: `[text](path)`,
+ *   with or without a title, a reference definition `[label]: path`, and the
+ *   `href` of an HTML `<a>` or the `src` of an `<img>`. A link inside code — a
+ *   fence or a code span — is an example and is not read.
  *
  * The tracked tree, not the file system, is what a link is resolved against,
  * because GitHub has only what is committed: a link to an untracked `dist/`
@@ -120,9 +120,9 @@ export const checkMonoLinks = async (): Promise<
 };
 
 /**
- * Every link in `fileText` that this check resolves, in the order they are
- * read. `relativePath` is the file's path from the repository root; it is what
- * a relative link is resolved from and what decides whether relative links are
+ * Every link in `fileText` that this check resolves, line by line.
+ * `relativePath` is the file's path from the repository root; it is what a
+ * relative link is resolved from and what decides whether relative links are
  * read at all.
  */
 export const findMonoLinks = (
@@ -138,10 +138,9 @@ export const findMonoLinks = (
     ).filter((link) => link !== undefined),
     // A link written in code is an example of one, and is not rendered.
     ...(readsRelative && !fenced
-      ? Array.from(
-          withoutCodeSpans(text).matchAll(MARKDOWN_RELATIVE_LINK),
-          (matched) => toRelativeLink(matched[0], line, relativePath),
-        ).filter((link) => link !== undefined)
+      ? relativeDestinations(withoutCodeSpans(text))
+          .map((destination) => toRelativeLink(destination, line, relativePath))
+          .filter((link) => link !== undefined)
       : []),
   ]);
 };
@@ -231,12 +230,38 @@ const MONO_URL =
 /** What comes before a path in {@link MONO_URL}. */
 const BRANCH_SEGMENT = '/main/';
 
+/** A Markdown link or image with no title: `[x](./a.md)`. */
+const MARKDOWN_LINK = /\]\(([^\s()]+)\)/gu;
+
+/** `[x](./a.md "title")`, `[x](a.md 'title')`, `[x](a.md (title))`. */
+const TITLED_LINK = /\]\(([^\s()]+)\s+(?:"[^"]*"|'[^']*'|\([^()]*\))\s*\)/gu;
+
 /**
- * A Markdown link or image whose destination is a relative path: not a URL with
- * a scheme (`https:`, `mailto:`), not an anchor in the same document, not a
- * path from a site's root, not `<…>`.
+ * `[x]: ./a.md`, `[x]: <./a.md> "title"`. Not a footnote (`[^1]: …`), and
+ * nothing but an optional title may follow the destination, so
+ * `[x]: See the docs` is prose.
  */
-const MARKDOWN_RELATIVE_LINK = /\]\((?![a-z][\d+.a-z-]*:|[#/<])[^\s()]+\)/giu;
+const REFERENCE_DEFINITION =
+  // Read by its line alone: a line of this shape that continues a paragraph is
+  // read too, though it is prose, and fails only on a path that does not exist;
+  // a definition behind `>` or indented four spaces or more is not read.
+  /^ {0,3}\[(?!\^)[^\]]+\]:\s*<?([^\s>]+)>?(?:\s+"[^"]*"|\s+'[^']*'|\s+\([^()]*\)|)\s*$/gu;
+
+/** `<a href="./a.md">`, `<img src="img/a.png" />`. */
+const HTML_LINK =
+  // Read by its line alone, and quoted: a tag split over lines, `href = "…"`
+  // with spaces and an unquoted value are not read. Only the first `href` or
+  // `src` of a tag is read, and as written: a character reference (`&amp;`) is
+  // not decoded, and one inside an earlier attribute's value is read in place
+  // of the real one.
+  /<(?:a|img)\b[^>]*?\s(?:href|src)=(?:"([^"]+)"|'([^']+)')/giu;
+
+/**
+ * The start of a destination that is not a relative path: a URL scheme
+ * (`https:`, `mailto:`), an anchor in the same document, a path from a site's
+ * root, `<…>`.
+ */
+const NOT_RELATIVE = /^(?:[a-z][\d+.a-z-]*:|[#/<])/iu;
 
 const DIGITS = /^\d+$/u;
 
@@ -326,14 +351,27 @@ const toAbsoluteLink = (
     : { line, written, target, lines: toLineRange(fragment) };
 };
 
+/**
+ * The relative destinations of the links on one line, form by form; each
+ * pattern captures the destination in group 1, or in group 2 for an HTML
+ * attribute in single quotes.
+ */
+const relativeDestinations = (lineText: string): readonly string[] =>
+  [MARKDOWN_LINK, TITLED_LINK, REFERENCE_DEFINITION, HTML_LINK]
+    .flatMap((pattern) =>
+      Array.from(
+        lineText.matchAll(pattern),
+        (matched) => matched[1] ?? matched[2],
+      ),
+    )
+    .filter((destination) => destination !== undefined)
+    .filter((destination) => !NOT_RELATIVE.test(destination));
+
 const toRelativeLink = (
-  matchedText: string,
+  written: string,
   line: number,
   relativePath: string,
 ): MonoLink | undefined => {
-  // `](` and `)`.
-  const written = matchedText.slice(2, -1);
-
   const { linkPath, fragment } = splitFragment(written);
 
   const target = path.posix
