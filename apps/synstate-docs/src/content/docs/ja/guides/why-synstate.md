@@ -7,7 +7,7 @@ sidebar:
 
 ## シンプルに始められ、必要に応じてパワフルに
 
-SynState は Web フロントエンド向けの状態管理ライブラリです。ほとんどのユースケースでは、`createState`、`createReducer`、そして `combine` や `map` のようなシンプルなコンビネーターだけで十分です — React の `useState` / `useReducer` と同じくらい直感的でありながら、グローバル状態を管理できるクリーンで最小限の API です。例えば、[シンプルなカウンター](/mono/synstate/ja/examples/react/#グローバルカウンター)はわずか数行で実装できます：
+SynState は Web フロントエンド向けの状態管理ライブラリです。ほとんどのユースケースでは、`createState`、`createReducer`、そして `derive` や `map` のようなシンプルなコンビネーターだけで十分です — React の `useState` / `useReducer` と同じくらい直感的でありながら、グローバル状態を管理できるクリーンで最小限の API です。例えば、[シンプルなカウンター](/mono/synstate/ja/examples/react/#グローバルカウンター)はわずか数行で実装できます：
 
 ```tsx
 import { createState } from 'synstate-react-hooks';
@@ -49,7 +49,7 @@ SynState はこれを**深さ順伝搬**アルゴリズムで解決していま�
 
 ## React Compiler と完全互換
 
-SynState のすべてのリアクティブ計算（`combine`、`map`、`filter` など）は React のレンダリングサイクルの**外側**で完了します。コンポーネントは `useSyncExternalStore`（React のファーストクラス API）を通じて値を読み取るだけであり、レンダリング中に暗黙的な副作用を持ちません — Proxy ベースの追跡も、プロパティアクセスによる隠れたサブスクリプションもありません。そのため、React Compiler はこれらのコンポーネントを安全に解析・メモ化でき、[React Compiler](https://react.dev/learn/react-compiler) の自動メモ化と完全に整合します。
+SynState のすべてのリアクティブ計算（`derive`、`map`、`filter` など）は React のレンダリングサイクルの**外側**で完了します。コンポーネントは `useSyncExternalStore`（React のファーストクラス API）を通じて値を読み取るだけであり、レンダリング中に暗黙的な副作用を持ちません — Proxy ベースの追跡も、プロパティアクセスによる隠れたサブスクリプションもありません。そのため、React Compiler はこれらのコンポーネントを安全に解析・メモ化でき、[React Compiler](https://react.dev/learn/react-compiler) の自動メモ化と完全に整合します。
 
 MobX の `observer()` HOC はレンダリング中に observable へのアクセスを追跡するため、React Compiler のメモ化と衝突し、`"use no memo"` ディレクティブによる opt-out が必要です。SynState ではこのような回避策は不要です。
 

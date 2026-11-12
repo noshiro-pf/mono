@@ -1,6 +1,6 @@
 --- en/06-reactive-table.mts
 +++ ja/06-reactive-table.mts
-@@ -34,18 +34,18 @@
+@@ -33,18 +33,18 @@
    Promise.resolve(Response.json(serverRows));
  // embed-sample-code-ignore-above
  
@@ -24,16 +24,16 @@
  const tableDataResult = fromPromise(
    fetch('/api/rows').then((r) => {
      if (!r.ok) {
-@@ -56,7 +56,7 @@
+@@ -55,7 +55,7 @@
    }),
  );
  
 -// Derived: debounced filters → filtered rows (only when data loaded successfully)
 +// 派生： デバウンスされたフィルター → フィルタ結果（データ取得成功時のみ）
- const headerValues = combine([filterName, filterEmail, filterGender]).pipe(
-   debounce(300),
- );
-@@ -65,7 +65,7 @@
+ const headerValues = derive(
+   [filterName, filterEmail, filterGender],
+   (nameQuery, emailQuery, genderQuery) => ({
+@@ -69,7 +69,7 @@
    [headerValues, tableDataResult],
    (filters, result) =>
      Result.isErr(result)
@@ -41,8 +41,8 @@
 +      ? [] // エラー時は空テーブルを表示
        : result.value.filter(
            (row) =>
-             row.name.includes(filters[0]) &&
-@@ -74,26 +74,26 @@
+             row.name.includes(filters.name) &&
+@@ -78,26 +78,26 @@
          ),
  );
  
@@ -74,7 +74,7 @@
  const tableSliced = derive(
    [filteredRows, currentPage, itemsPerPage],
    (rows, page, perPage) => {
-@@ -102,10 +102,10 @@
+@@ -106,10 +106,10 @@
    },
  );
  

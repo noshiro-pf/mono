@@ -1,4 +1,4 @@
-import { combine, filter, map, type InitializedObservable } from 'synstate';
+import { derive, filter, map, type InitializedObservable } from 'synstate';
 import { Result } from 'ts-data-forge';
 import type { StrictPick } from 'ts-type-forge';
 import { dict } from '../../constants/index.mjs';
@@ -89,31 +89,30 @@ export const createUpdatePasswordPageStore = <
   const { state: newPasswordIsOpen$, toggle: toggleNewPasswordLock } =
     createToggleState([dialogClosed$]);
 
-  const state = combine([
-    formState$,
-    enterButtonDisabled$,
-    oldPasswordFormIntent$,
-    newPasswordFormIntent$,
-    oldPasswordIsOpen$,
-    newPasswordIsOpen$,
-  ]).pipe(
-    map(
-      ([
-        formState,
-        enterButtonDisabled,
-        oldPasswordFormIntent,
-        newPasswordFormIntent,
-        oldPasswordIsOpen,
-        newPasswordIsOpen,
-      ]) => ({
-        formState,
-        enterButtonDisabled,
-        oldPasswordFormIntent,
-        newPasswordFormIntent,
-        oldPasswordIsOpen,
-        newPasswordIsOpen,
-      }),
-    ),
+  const state = derive(
+    [
+      formState$,
+      enterButtonDisabled$,
+      oldPasswordFormIntent$,
+      newPasswordFormIntent$,
+      oldPasswordIsOpen$,
+      newPasswordIsOpen$,
+    ],
+    (
+      formState,
+      enterButtonDisabled,
+      oldPasswordFormIntent,
+      newPasswordFormIntent,
+      oldPasswordIsOpen,
+      newPasswordIsOpen,
+    ) => ({
+      formState,
+      enterButtonDisabled,
+      oldPasswordFormIntent,
+      newPasswordFormIntent,
+      oldPasswordIsOpen,
+      newPasswordIsOpen,
+    }),
   );
 
   const submit = async (user: User): Promise<void> => {

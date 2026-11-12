@@ -1,5 +1,5 @@
 import {
-  combine,
+  derive,
   map,
   scan,
   source,
@@ -48,12 +48,9 @@ export const createSynStateThroughputAdapter = (): SpringAdapter => {
       if (Arr.isEmpty(mut_stages)) {
         mut_subscription = head.pipe(map((pos) => [pos])).subscribe(onEmit);
       } else {
-        // `as const` needs a literal, and `combine` needs the tuple type only
-        // the literal produces.
+        // `derive` needs the tuple type only the literal produces.
         // eslint-disable-next-line ts-data-forge/prefer-canonical-array-slicing
-        const allPoints = combine([head, ...mut_stages]).pipe(
-          map((points) => points),
-        );
+        const allPoints = derive([head, ...mut_stages], (...points) => points);
 
         mut_subscription = allPoints.subscribe(onEmit);
       }

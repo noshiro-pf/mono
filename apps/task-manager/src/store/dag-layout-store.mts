@@ -86,9 +86,9 @@
  */
 
 import {
-  combine,
   createEventEmitter,
   createState,
+  derive,
   empty,
   map,
   merge,
@@ -366,37 +366,33 @@ export const createDagLayoutStore = <H, F>(
    * The tasks of 「アーク」 and 「タイル」, in their order — sorted with every
    * node there, for the status each has.
    */
-  const diagramOrder = combine([
-    deps.state,
-    deps.diagramSort,
-    deps.stateTime,
-    deps.hidden,
-  ]).pipe(
-    map(([state, sort, now, hidden]) =>
+  const diagramOrder = derive(
+    [deps.state, deps.diagramSort, deps.stateTime, deps.hidden],
+    (state, sort, now, hidden) =>
       diagramTaskIds(state, sort, now).filter((id) => !hidden.has(id)),
-    ),
   );
 
   /**
    * The nodes of 「アーク」, in their order: the tasks in `diagramOrder`,
    * and the milestones among them.
    */
-  const arcOrder = combine([diagramOrder, deps.state, deps.hidden]).pipe(
-    map(([ids, state, hidden]) =>
-      arcDiagramIds(ids, withoutNodes(state, hidden)),
-    ),
+  const arcOrder = derive(
+    [diagramOrder, deps.state, deps.hidden],
+    (ids, state, hidden) => arcDiagramIds(ids, withoutNodes(state, hidden)),
   );
 
-  const membership = combine([deps.state, deps.groups, deps.hidden]).pipe(
-    map(([state, groups, hidden]) => groupMembership(state, groups, hidden)),
+  const membership = derive(
+    [deps.state, deps.groups, deps.hidden],
+    (state, groups, hidden) => groupMembership(state, groups, hidden),
   );
 
-  const arcNodes = combine([arcOrder, deps.nodeSize]).pipe(
-    map(([ids, size]) => arcDiagramNodes(ids, size)),
+  const arcNodes = derive([arcOrder, deps.nodeSize], (ids, size) =>
+    arcDiagramNodes(ids, size),
   );
 
-  const tileNodes = combine([diagramOrder, tileWidth, deps.nodeSize]).pipe(
-    map(([ids, width, size]) => tileDiagramNodes(ids, width, size)),
+  const tileNodes = derive(
+    [diagramOrder, tileWidth, deps.nodeSize],
+    (ids, width, size) => tileDiagramNodes(ids, width, size),
   );
 
   let mut_viewMode = deps.viewMode.getSnapshot().value;
@@ -1431,7 +1427,7 @@ export const createDagLayoutStore = <H, F>(
   // Apart from the rest, because the layout is asked for again when the
   // arrangement it hands out changes.
   const storedFollowed = whileStarted(() =>
-    combine([deps.stored, deps.defaultDirection]).pipe(
+    derive([deps.stored, deps.defaultDirection], (...values) => values).pipe(
       following(([stored, defaultDirection]) => {
         followStored(stored, defaultDirection);
       }),
@@ -1451,21 +1447,24 @@ export const createDagLayoutStore = <H, F>(
 
   const inputsFollowed = whileStarted(() =>
     merge([
-      combine([
-        deps.state,
-        arrangement,
-        deps.active,
-        deps.nodeSize,
-        deps.hidden,
-        membership,
-      ]).pipe(
+      derive(
+        [
+          deps.state,
+          arrangement,
+          deps.active,
+          deps.nodeSize,
+          deps.hidden,
+          membership,
+        ],
+        (...values) => values,
+      ).pipe(
         following(([state, { direction }, active, size, hidden, groups]) => {
           followLayoutInput(state, direction, active, size, hidden, groups);
         }),
       ),
       // In 「アーク」 and 「タイル」, the nodes are shown moving into place as
       // soon as there are any, without waiting for ELK to lay out the DAG.
-      combine([deps.active, arcNodes, tileNodes]).pipe(
+      derive([deps.active, arcNodes, tileNodes], (...values) => values).pipe(
         following(([active]) => {
           if (active && !isArrangeable(mut_viewMode)) {
             introduce();
@@ -1473,7 +1472,10 @@ export const createDagLayoutStore = <H, F>(
         }),
       ),
       // Turned off, or less motion asked for, in the middle of one.
-      combine([deps.animationSetting, deps.reducedMotion]).pipe(
+      derive(
+        [deps.animationSetting, deps.reducedMotion],
+        (...values) => values,
+      ).pipe(
         following(() => {
           if (!animationAllowed()) {
             finishAnimation();

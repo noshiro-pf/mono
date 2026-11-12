@@ -22,7 +22,7 @@ Click and drag on each canvas to draw a trail. Each dot is placed by the library
 mousePos (source: {x, y})
   ├── derivedX = map(pos => pos.x)
   ├── derivedY = map(pos => pos.y)
-  └── combine([derivedX, derivedY])
+  └── derive([derivedX, derivedY], (x, y) => ({ x, y }))
         └── draw dot at {x, y} + check consistency
 ```
 
@@ -37,7 +37,7 @@ Each emitted position is compared to the latest mouse position:
 
 | Library            | Glitches | Why                                                                                                                 |
 | ------------------ | -------- | ------------------------------------------------------------------------------------------------------------------- |
-| **SynState**       | 0        | `derivedX` and `derivedY` are both recomputed, in depth order, before `combine` and before any subscriber           |
+| **SynState**       | 0        | `derivedX` and `derivedY` are both recomputed, in depth order, before `derive` and before any subscriber            |
 | **RxJS**           | Many     | `combineLatest` emits as soon as `derivedX` changes, while `derivedY` still holds the previous position, then again |
 | **Jotai**          | 0        | The subscribed atom is recomputed when it is read, after both inputs                                                |
 | **MobX**           | 0        | The `reaction` reads the `computed` values after the action that moved the mouse, when every input is up to date    |
@@ -60,9 +60,9 @@ A glitch-free library, SynState among them, rules these out at the library level
 
 ## Deep Dependency Chain: Propagation Under Load
 
-This demo builds the same reactive graph in each of six libraries: a **depth-$N$ chain** of stateful nodes where each depends on the previous, with a final combine/derive that reads all $N+1$ outputs.
+This demo builds the same reactive graph in each of six libraries: a **depth-$N$ chain** of stateful nodes where each depends on the previous, with a final node that reads all $N+1$ outputs.
 
-A snake tail follows the mouse — each segment is a stage in the chain that smoothly follows the previous stage via linear interpolation (lerp). To draw the full snake, all $N+1$ outputs (head + $N$ stages) are collected into a single `combine`:
+A snake tail follows the mouse — each segment is a stage in the chain that smoothly follows the previous stage via linear interpolation (lerp). To draw the full snake, all $N+1$ outputs (head + $N$ stages) are collected into a single node (`derive` in SynState):
 
 <DeepChainDepGraph />
 
@@ -93,7 +93,7 @@ Each library writes a stateful stage in its own idiom, shown in the second colum
 
 | Library            | Stages in this demo                                   | Subscriber calls per mouse event | Work per event |
 | ------------------ | ----------------------------------------------------- | -------------------------------- | -------------- |
-| **SynState**       | `scan` operators, pushed in depth order from the root | **1** (`combine`)                | $O(N)$         |
+| **SynState**       | `scan` operators, pushed in depth order from the root | **1** (`derive`)                 | $O(N)$         |
 | **RxJS**           | `scan` operators, pushed depth-first per subscription | **$N+1$** (`combineLatest`)      | $O(N^2)$       |
 | **Jotai**          | `selectAtom` atoms, each derived from the one before  | **1** (`store.sub`)              | $O(N)$         |
 | **MobX**           | Boxes that one `reaction` writes in a single action   | **1** (`autorun`)                | $O(N)$         |

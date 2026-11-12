@@ -1,4 +1,4 @@
-import { combine, map, type InitializedObservable } from 'synstate';
+import { derive, map, type InitializedObservable } from 'synstate';
 import { constant, type JSX } from 'synstate-dom';
 import { Arr } from 'ts-data-forge';
 import type { RectSize } from 'ts-utils-additional';
@@ -35,10 +35,13 @@ const balloonSize: RectSize = {
 export const SelectAnswerBalloon = ({ props }: Props): JSX.Element => {
   // Only these two of `props` change how the cards look; the rest, such as
   // where the balloon is, need not draw them again.
-  const choice = combine([
-    props.pipe(map(({ cardColor }) => cardColor)),
-    props.pipe(map(({ selectedNumber }) => selectedNumber)),
-  ]);
+  const choice = derive(
+    [
+      props.pipe(map(({ cardColor }) => cardColor)),
+      props.pipe(map(({ selectedNumber }) => selectedNumber)),
+    ],
+    (...values) => values,
+  );
 
   return (
     <div

@@ -1,7 +1,7 @@
 import {
   type InitializedObservable,
   type Observable,
-  combine,
+  derive,
   map,
 } from 'synstate';
 import {
@@ -88,13 +88,9 @@ export const createMultipleDatePickerState = (
     map(({ year, month }) => generateCalendar(year, month)),
   );
 
-  const calendarCells$ = combine([
-    dates$,
-    selectedDatesSet$,
-    calendarCurrentPage$,
-    holidaysJpDefinition$,
-  ]).pipe(
-    map(([dates, selectedDatesSet, { month }, holidays]) =>
+  const calendarCells$ = derive(
+    [dates$, selectedDatesSet$, calendarCurrentPage$, holidaysJpDefinition$],
+    (dates, selectedDatesSet, { month }, holidays) =>
       dates.map((week) =>
         week.map((ymd): CalendarCell => {
           const dayValue: DayOfWeekIndex = ymd2day(ymd);
@@ -117,7 +113,6 @@ export const createMultipleDatePickerState = (
           };
         }),
       ),
-    ),
   );
 
   const selectedDatesDispatch = mapNullable(

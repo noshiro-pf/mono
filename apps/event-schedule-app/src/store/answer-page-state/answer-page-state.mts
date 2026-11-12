@@ -1,10 +1,10 @@
 import { Answer, UserId, UserName } from 'event-schedule-app-shared';
 import {
-  combine,
   createBooleanState,
   createEventEmitter,
   createState,
   createState as createStateBase,
+  derive,
   filter,
   map,
   pluck,
@@ -118,12 +118,9 @@ export const createAnswerPageStore = (deps: AnswerPageDeps): AnswerPage => {
     [
       // Cleared to the event's empty answer by `resetAnswerBeingEdited`, and
       // again whenever the event changes after that.
-      combine([emptyAnswerSelection$, resetAnswerBeingEditedAction$]).pipe(
-        map(
-          ([emptyAnswer]) =>
-            (_: Answer) =>
-              emptyAnswer,
-        ),
+      derive(
+        [emptyAnswerSelection$, resetAnswerBeingEditedAction$],
+        (emptyAnswer) => (_: Answer) => emptyAnswer,
       ),
     ],
   );
@@ -203,52 +200,40 @@ export const createAnswerPageStore = (deps: AnswerPageDeps): AnswerPage => {
       )
       .pipe(filter(isNotUndefined));
 
-  const theNameIsAlreadyUsed$: InitializedObservable<boolean> = combine([
-    deps.answers.answers$,
-    answerBeingEdited$,
-    selectedAnswerUserName$,
-  ]).pipe(
-    map(([answers, answerBeingEdited, selectedAnswerUserName]) =>
+  const theNameIsAlreadyUsed$: InitializedObservable<boolean> = derive(
+    [deps.answers.answers$, answerBeingEdited$, selectedAnswerUserName$],
+    (answers, answerBeingEdited, selectedAnswerUserName) =>
       theNameIsAlreadyUsedFn(
         answerBeingEdited.user.name,
         answers ?? [],
         selectedAnswerUserName,
       ),
-    ),
   );
 
-  const userNameIsInvalid$: InitializedObservable<boolean> = combine([
-    answerBeingEdited$,
-    theNameIsAlreadyUsed$,
-  ]).pipe(
-    map(
-      ([answerBeingEdited, theNameIsAlreadyUsed]) =>
-        answerBeingEdited.user.name === '' || theNameIsAlreadyUsed,
-    ),
+  const userNameIsInvalid$: InitializedObservable<boolean> = derive(
+    [answerBeingEdited$, theNameIsAlreadyUsed$],
+    (answerBeingEdited, theNameIsAlreadyUsed) =>
+      answerBeingEdited.user.name === '' || theNameIsAlreadyUsed,
   );
 
-  const submitButtonIsDisabled$: InitializedObservable<boolean> = combine([
-    answerBeingEdited$,
-    selectedAnswerSavedState$,
-    userNameIsInvalid$,
-  ]).pipe(
-    map(
-      ([answerBeingEdited, selectedAnswerSaved, userNameIsInvalid]) =>
-        userNameIsInvalid ||
-        fastDeepEqual(selectedAnswerSaved, answerBeingEdited),
-    ),
+  const submitButtonIsDisabled$: InitializedObservable<boolean> = derive(
+    [answerBeingEdited$, selectedAnswerSavedState$, userNameIsInvalid$],
+    (answerBeingEdited, selectedAnswerSaved, userNameIsInvalid) =>
+      userNameIsInvalid ||
+      fastDeepEqual(selectedAnswerSaved, answerBeingEdited),
   );
 
   const answerSelectionMap$: InitializedObservable<
     IMapMapped<DatetimeRange, AnswerSelectionValue, DatetimeRangeMapKey>
-  > = combine([
-    answerBeingEdited$,
-    deps.eventSchedule$
-      .pipe(filter(isNotUndefined))
-      .pipe(pluck('datetimeRangeList'))
-      .pipe(withInitialValue<readonly DatetimeRange[]>([])),
-  ]).pipe(
-    map(([{ selection }, datetimeRangeList]) => {
+  > = derive(
+    [
+      answerBeingEdited$,
+      deps.eventSchedule$
+        .pipe(filter(isNotUndefined))
+        .pipe(pluck('datetimeRangeList'))
+        .pipe(withInitialValue<readonly DatetimeRange[]>([])),
+    ],
+    ({ selection }, datetimeRangeList) => {
       const entries: DeepReadonly<[DatetimeRange, AnswerSelectionValue][]> =
         Arr.concat(
           datetimeRangeList.map((d) => [
@@ -267,7 +252,7 @@ export const createAnswerPageStore = (deps: AnswerPageDeps): AnswerPage => {
         AnswerSelectionValue,
         DatetimeRangeMapKey
       >(entries, datetimeRangeToMapKey, datetimeRangeFromMapKey);
-    }),
+    },
   );
 
   /* callbacks */
@@ -658,80 +643,79 @@ export const createAnswerPageStore = (deps: AnswerPageDeps): AnswerPage => {
         onCheck: (checked: boolean) => void;
       }[]
     >
-  > = combine([deps.eventSchedule$, answerSelectionMap$]).pipe(
-    map(
-      ([e, answerSelectionMap]) =>
-        mapNullable(e, (eventSchedule) =>
-          eventSchedule.datetimeRangeList.map(
-            (d) =>
-              ({
-                key: datetimeRange2str(d),
-                datetimeRange: d,
-                answerSelectionValue: Optional.toNullable(
-                  answerSelectionMap.get(d),
-                ) ?? {
-                  iconId: 'none',
-                  point: defaultIconPoint.none,
-                  comment: '',
-                },
-                buttons: {
-                  good: {
-                    description: eventSchedule.answerIcons.good.description,
-                    onClick: () => {
-                      answerBeingEditedDispatch({
-                        type: 'cell-icon',
-                        datetimeRange: d,
-                        icon: 'good',
-                        fairPoint: eventSchedule.answerIcons.fair.point,
-                      });
-                    },
-                  },
-                  fair: {
-                    description: eventSchedule.answerIcons.fair.description,
-                    onClick: () => {
-                      answerBeingEditedDispatch({
-                        type: 'cell-icon',
-                        datetimeRange: d,
-                        icon: 'fair',
-                        fairPoint: eventSchedule.answerIcons.fair.point,
-                      });
-                    },
-                  },
-                  poor: {
-                    description: eventSchedule.answerIcons.poor.description,
-                    onClick: () => {
-                      answerBeingEditedDispatch({
-                        type: 'cell-icon',
-                        datetimeRange: d,
-                        icon: 'poor',
-                        fairPoint: eventSchedule.answerIcons.fair.point,
-                      });
-                    },
+  > = derive(
+    [deps.eventSchedule$, answerSelectionMap$],
+    (e, answerSelectionMap) =>
+      mapNullable(e, (eventSchedule) =>
+        eventSchedule.datetimeRangeList.map(
+          (d) =>
+            ({
+              key: datetimeRange2str(d),
+              datetimeRange: d,
+              answerSelectionValue: Optional.toNullable(
+                answerSelectionMap.get(d),
+              ) ?? {
+                iconId: 'none',
+                point: defaultIconPoint.none,
+                comment: '',
+              },
+              buttons: {
+                good: {
+                  description: eventSchedule.answerIcons.good.description,
+                  onClick: () => {
+                    answerBeingEditedDispatch({
+                      type: 'cell-icon',
+                      datetimeRange: d,
+                      icon: 'good',
+                      fairPoint: eventSchedule.answerIcons.fair.point,
+                    });
                   },
                 },
-                onPointChange: (point: AnswerIconPoint) => {
-                  answerBeingEditedDispatch({
-                    type: 'cell-point',
-                    datetimeRange: d,
-                    point,
-                  });
+                fair: {
+                  description: eventSchedule.answerIcons.fair.description,
+                  onClick: () => {
+                    answerBeingEditedDispatch({
+                      type: 'cell-icon',
+                      datetimeRange: d,
+                      icon: 'fair',
+                      fairPoint: eventSchedule.answerIcons.fair.point,
+                    });
+                  },
                 },
-                onCommentChange: (comment: string) => {
-                  answerBeingEditedDispatch({
-                    type: 'cell-comment',
-                    datetimeRange: d,
-                    comment,
-                  });
+                poor: {
+                  description: eventSchedule.answerIcons.poor.description,
+                  onClick: () => {
+                    answerBeingEditedDispatch({
+                      type: 'cell-icon',
+                      datetimeRange: d,
+                      icon: 'poor',
+                      fairPoint: eventSchedule.answerIcons.fair.point,
+                    });
+                  },
                 },
-                onCheck: (checked: boolean) => {
-                  updateCheckboxesState((set) =>
-                    checked ? set.add(d) : set.delete(d),
-                  );
-                },
-              }) as const,
-          ),
-        ) ?? [],
-    ),
+              },
+              onPointChange: (point: AnswerIconPoint) => {
+                answerBeingEditedDispatch({
+                  type: 'cell-point',
+                  datetimeRange: d,
+                  point,
+                });
+              },
+              onCommentChange: (comment: string) => {
+                answerBeingEditedDispatch({
+                  type: 'cell-comment',
+                  datetimeRange: d,
+                  comment,
+                });
+              },
+              onCheck: (checked: boolean) => {
+                updateCheckboxesState((set) =>
+                  checked ? set.add(d) : set.delete(d),
+                );
+              },
+            }) as const,
+        ),
+      ) ?? [],
   );
 
   const onCheckAll = (checked: boolean): void => {

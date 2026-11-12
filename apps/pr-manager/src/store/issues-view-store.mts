@@ -42,8 +42,8 @@
  */
 
 import {
-  combine,
   createState,
+  derive,
   map,
   skipIfNoChange,
   type InitializedObservable,
@@ -155,13 +155,14 @@ export const createIssuesViewStore = (
 
     const zoomSaving = zoom.subscribe(deps.saveZoom);
 
-    const reading = combine([deps.issues, deps.moreIssues]).subscribe(
-      ([issues, more]) => {
-        if (issues.endCursor !== undefined && more.type === 'idle') {
-          deps.loadMoreIssues();
-        }
-      },
-    );
+    const reading = derive(
+      [deps.issues, deps.moreIssues],
+      (...values) => values,
+    ).subscribe(([issues, more]) => {
+      if (issues.endCursor !== undefined && more.type === 'idle') {
+        deps.loadMoreIssues();
+      }
+    });
 
     return () => {
       saving.unsubscribe();
@@ -174,22 +175,18 @@ export const createIssuesViewStore = (
 
   const withoutDone = deps.graph.pipe(map(omitDone));
 
-  const graph = combine([withoutDone, deps.filter])
-    .pipe(map(([open, filter]) => omitFilteredIssues(open, filter)))
-    .pipe(skipIfNoChange(fastDeepEqual));
+  const graph = derive([withoutDone, deps.filter], (open, filter) =>
+    omitFilteredIssues(open, filter),
+  ).pipe(skipIfNoChange(fastDeepEqual));
 
-  const counts = combine([deps.graph, deps.filter])
-    .pipe(
-      map(([full, filter]) =>
-        countIssueFilter(
-          full.nodes.filter(isListedIssue),
-          NODE_FACTS,
-          () => true,
-          filter,
-        ),
-      ),
-    )
-    .pipe(skipIfNoChange(fastDeepEqual));
+  const counts = derive([deps.graph, deps.filter], (full, filter) =>
+    countIssueFilter(
+      full.nodes.filter(isListedIssue),
+      NODE_FACTS,
+      () => true,
+      filter,
+    ),
+  ).pipe(skipIfNoChange(fastDeepEqual));
 
   const parts = graph.pipe(map(layoutConnected));
 
@@ -198,24 +195,20 @@ export const createIssuesViewStore = (
   // 100% puts them back under the rest.
   const [kept, setKept] = createState<GridPlacement | undefined>(undefined);
 
-  const placement = combine([parts, zoom, dagBox, kept])
-    .pipe(
-      map(([laidOut, current, box, held]) =>
-        current.type === 'fit'
-          ? fitPlacement(laidOut, box)
-          : (held ?? defaultPlacement(laidOut)),
-      ),
-    )
-    .pipe(skipIfNoChange(fastDeepEqual));
+  const placement = derive(
+    [parts, zoom, dagBox, kept],
+    (laidOut, current, box, held) =>
+      current.type === 'fit'
+        ? fitPlacement(laidOut, box)
+        : (held ?? defaultPlacement(laidOut)),
+  ).pipe(skipIfNoChange(fastDeepEqual));
 
-  const layout = combine([parts, placement]).pipe(
-    map(([laidOut, placed]) => placeGrid(laidOut, placed)),
+  const layout = derive([parts, placement], (laidOut, placed) =>
+    placeGrid(laidOut, placed),
   );
 
-  const dagScale = combine([zoom, layout, dagBox]).pipe(
-    map(([current, laidOut, box]) =>
-      current.type === 'fit' ? fitScale(laidOut, box) : current.scale,
-    ),
+  const dagScale = derive([zoom, layout, dagBox], (current, laidOut, box) =>
+    current.type === 'fit' ? fitScale(laidOut, box) : current.scale,
   );
 
   const dagFitted = zoom.pipe(map(({ type }) => type === 'fit'));
@@ -265,18 +258,14 @@ export const createIssueGraph = ({
   /** `https://github.com/owner/name`, for a number nobody described. */
   repoUrl: string;
 }>): InitializedObservable<IssueGraph> =>
-  combine([issues, entries])
-    .pipe(
-      map(([read, pulls]) =>
-        buildIssueGraph({
-          repoUrl,
-          issues: read.items,
-          referenced: read.referenced,
-          pulls,
-        }),
-      ),
-    )
-    .pipe(skipIfNoChange(fastDeepEqual));
+  derive([issues, entries], (read, pulls) =>
+    buildIssueGraph({
+      repoUrl,
+      issues: read.items,
+      referenced: read.referenced,
+      pulls,
+    }),
+  ).pipe(skipIfNoChange(fastDeepEqual));
 
 const NODE_FACTS: IssueFacts<IssueGraphNode> = {
   priority: (node) => node.priority,

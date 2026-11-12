@@ -127,8 +127,10 @@ export type InitializedChildObservableConfig<
 
 /**
  * Creates a sync-child observable: one derived from `parents` that emits, if at
- * all, in the same update as they do. `map`, `filter`, `combine` and the other
- * synchronous operators are built with it.
+ * all, in the same update as they do. It is how a custom synchronous operator
+ * is written: it wraps the base class that the built-in ones, such as `map`,
+ * `filter` and `derive`, extend, so a custom operator takes part in an update
+ * as they do.
  *
  * `init` runs during construction and receives the tools. It returns
  * `tryUpdate`, which is called with the token of every update in which some
@@ -161,7 +163,7 @@ export type InitializedChildObservableConfig<
  *
  * const num$ = source<number>();
  *
- * const pair$ = combine([num$, double(num$)]);
+ * const pair$ = derive([num$, double(num$)], (n, d) => [n, d] as const);
  *
  * const valueHistory: FixedLengthTuple<2, number>[] = [];
  *
@@ -173,7 +175,7 @@ export type InitializedChildObservableConfig<
  *
  * num$.next(2);
  *
- * // `double` joins the same update as `num$`, so `combine` sees no [2, 2].
+ * // `double` joins the same update as `num$`, so `derive` sees no [2, 2].
  * assert.deepStrictEqual(valueHistory, [
  *   [1, 2],
  *   [2, 4],

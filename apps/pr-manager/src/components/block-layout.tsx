@@ -1,4 +1,4 @@
-import { combine, map, type InitializedObservable } from 'synstate';
+import { derive, map, type InitializedObservable } from 'synstate';
 import { constant, If, type JSX } from 'synstate-dom';
 import type { ReadonlyRecord } from 'ts-type-forge';
 import {
@@ -50,8 +50,8 @@ export const BlockLayout = ({ blocks }: Props): JSX.Element => {
   const shownIn = (
     column: (layout: Layout) => readonly BlockId[],
   ): InitializedObservable<readonly ShownPane[]> =>
-    combine([layout$, absent$]).pipe(
-      map(([layout, absent]) => shownPanesOf(layout, column(layout), absent)),
+    derive([layout$, absent$], (layout, absent) =>
+      shownPanesOf(layout, column(layout), absent),
     );
 
   return (

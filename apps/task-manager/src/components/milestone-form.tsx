@@ -1,4 +1,4 @@
-import { combine, map, type InitializedObservable } from 'synstate';
+import { derive, map, type InitializedObservable } from 'synstate';
 import { constant, If, type JSX } from 'synstate-dom';
 import type { RelaxedExtract } from 'ts-type-forge';
 import { m } from '../i18n/index.mjs';
@@ -33,24 +33,19 @@ type Props = Readonly<{
  * drafted and what it still waits for, and its description last.
  */
 export const MilestoneForm = ({ editor }: Props): JSX.Element => {
-  const checks$ = combine([dataStore.state, editor]).pipe(
-    map(([state, { ref, rows }]) => validateRows(state, ref, rows)),
+  const checks$ = derive([dataStore.state, editor], (state, { ref, rows }) =>
+    validateRows(state, ref, rows),
   );
 
-  const insight$ = combine([
-    dataStore.state,
-    editor,
-    checks$,
-    clockStore.now,
-  ]).pipe(
-    map(([state, { ref, draft }, checks, now]) =>
+  const insight$ = derive(
+    [dataStore.state, editor, checks$, clockStore.now],
+    (state, { ref, draft }, checks, now) =>
       milestoneDraftInsight(
         state,
         ref.id,
         { ...draft, dependencies: validDependencies(checks) },
         now,
       ),
-    ),
   );
 
   return (

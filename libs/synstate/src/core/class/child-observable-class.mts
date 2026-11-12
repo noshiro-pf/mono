@@ -50,7 +50,7 @@ type ChildObservableConfig<A, P extends NonEmptyUnknownList> = Readonly<{
 
 /**
  * An observable derived from `parents` that emits, if at all, in the same
- * update as they do (`map`, `filter`, `combine`, …).
+ * update as they do (`map`, `filter`, `derive`, …).
  *
  * A subclass overrides `tryUpdate`, and, when it holds something to release,
  * `teardown`; its constructor ends with `this.attach()`, once everything

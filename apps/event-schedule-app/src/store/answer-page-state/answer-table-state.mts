@@ -1,8 +1,8 @@
 import { UserName } from 'event-schedule-app-shared';
 import {
   type InitializedObservable,
-  combine,
   createBooleanState,
+  derive,
   map,
 } from 'synstate';
 import {
@@ -93,12 +93,13 @@ export const createAnswerTableStore = (deps: AnswerTableDeps): AnswerTable => {
         DatetimeRangeMapKey
       >
     | undefined
-  > = combine([
-    deps.eventSchedule$,
-    answerSelectionMapFn$,
-    deps.filterAndSort.answersFiltered$,
-  ]).pipe(
-    map(([eventSchedule, answerSelectionMapFn, answers]) =>
+  > = derive(
+    [
+      deps.eventSchedule$,
+      answerSelectionMapFn$,
+      deps.filterAndSort.answersFiltered$,
+    ],
+    (eventSchedule, answerSelectionMapFn, answers) =>
       eventSchedule === undefined || answers === undefined
         ? undefined
         : createAnswerTable(
@@ -106,7 +107,6 @@ export const createAnswerTableStore = (deps: AnswerTableDeps): AnswerTable => {
             eventSchedule.datetimeRangeList,
             answers,
           ),
-    ),
   );
 
   // sum of (good, fair, poor)
@@ -117,23 +117,24 @@ export const createAnswerTableStore = (deps: AnswerTableDeps): AnswerTable => {
         DatetimeRangeMapKey
       >
     | undefined
-  > = combine([deps.eventSchedule$, answerTable$]).pipe(
-    map(([eventSchedule, answerTable]) =>
+  > = derive(
+    [deps.eventSchedule$, answerTable$],
+    (eventSchedule, answerTable) =>
       eventSchedule === undefined || answerTable === undefined
         ? undefined
         : createAnswerSummary(eventSchedule.datetimeRangeList, answerTable),
-    ),
   );
 
   const scores$: InitializedObservable<
     IMapMapped<DatetimeRange, number, DatetimeRangeMapKey> | undefined
-  > = combine([
-    deps.eventSchedule$,
-    answerSummary$,
-    answerTable$,
-    deps.filterAndSort.answersFiltered$,
-  ]).pipe(
-    map(([eventSchedule, answerSummary, answerTable, answers]) =>
+  > = derive(
+    [
+      deps.eventSchedule$,
+      answerSummary$,
+      answerTable$,
+      deps.filterAndSort.answersFiltered$,
+    ],
+    (eventSchedule, answerSummary, answerTable, answers) =>
       eventSchedule === undefined ||
       answerSummary === undefined ||
       answerTable === undefined ||
@@ -145,7 +146,6 @@ export const createAnswerTableStore = (deps: AnswerTableDeps): AnswerTable => {
             answerTable,
             answers,
           ),
-    ),
   );
 
   const datetimeRangeList$ = deps.eventSchedule$.pipe(
@@ -156,18 +156,15 @@ export const createAnswerTableStore = (deps: AnswerTableDeps): AnswerTable => {
     map((eventSchedule) => eventSchedule?.datetimeRangeList.toReversed()),
   );
 
-  const datetimeRangeListSortedByScores$ = combine([
-    deps.eventSchedule$,
-    scores$,
-  ]).pipe(
-    map(([eventSchedule, scores]) =>
+  const datetimeRangeListSortedByScores$ = derive(
+    [deps.eventSchedule$, scores$],
+    (eventSchedule, scores) =>
       eventSchedule === undefined || scores === undefined
         ? undefined
         : Arr.toSortedBy(
             eventSchedule.datetimeRangeList,
             (d) => Optional.toNullable(scores.get(d)) ?? 0,
           ),
-    ),
   );
 
   const datetimeRangeListSortedByScoresReversed$ =
@@ -177,29 +174,28 @@ export const createAnswerTableStore = (deps: AnswerTableDeps): AnswerTable => {
       ),
     );
 
-  const datetimeRangeListReordered$ = combine([
-    deps.filterAndSort.sortKeyAndOrder$,
-    datetimeRangeList$,
-    datetimeRangeListReversed$,
-    datetimeRangeListSortedByScores$,
-    datetimeRangeListSortedByScoresReversed$,
-  ]).pipe(
-    map(
-      ([
-        [sortKey, sortOrder],
-        datetimeRangeList,
-        datetimeRangeListReversed,
-        datetimeRangeListSortedByScores,
-        datetimeRangeListSortedByScoresReversed,
-      ]) =>
-        sortKey === 'date'
-          ? sortOrder === 'asc'
-            ? datetimeRangeList
-            : datetimeRangeListReversed
-          : sortOrder === 'asc'
-            ? datetimeRangeListSortedByScores
-            : datetimeRangeListSortedByScoresReversed,
-    ),
+  const datetimeRangeListReordered$ = derive(
+    [
+      deps.filterAndSort.sortKeyAndOrder$,
+      datetimeRangeList$,
+      datetimeRangeListReversed$,
+      datetimeRangeListSortedByScores$,
+      datetimeRangeListSortedByScoresReversed$,
+    ],
+    (
+      [sortKey, sortOrder],
+      datetimeRangeList,
+      datetimeRangeListReversed,
+      datetimeRangeListSortedByScores,
+      datetimeRangeListSortedByScoresReversed,
+    ) =>
+      sortKey === 'date'
+        ? sortOrder === 'asc'
+          ? datetimeRangeList
+          : datetimeRangeListReversed
+        : sortOrder === 'asc'
+          ? datetimeRangeListSortedByScores
+          : datetimeRangeListSortedByScoresReversed,
   );
 
   const datetimeRangeToTableRowValuesMap$: InitializedObservable<
@@ -217,86 +213,84 @@ export const createAnswerTableStore = (deps: AnswerTableDeps): AnswerTable => {
         string
       >
     | undefined
-  > = combine([
-    datetimeRangeList$,
-    scores$,
-    answerSummary$,
-    answerTable$,
-    deps.eventSchedule$,
-    deps.filterAndSort.answersFiltered$,
-  ]).pipe(
-    map(
-      ([
-        datetimeRangeList,
-        scores,
-        answerSummary,
-        answerTable,
-        eventSchedule,
-        answers,
-      ]) =>
-        datetimeRangeList === undefined ||
-        scores === undefined ||
-        answerSummary === undefined ||
-        answerTable === undefined ||
-        eventSchedule === undefined ||
-        answers === undefined
-          ? undefined
-          : IMapMapped.create(
-              datetimeRangeList.map((datetimeRange) => {
-                const score =
-                  Optional.toNullable(scores.get(datetimeRange)) ?? 0;
+  > = derive(
+    [
+      datetimeRangeList$,
+      scores$,
+      answerSummary$,
+      answerTable$,
+      deps.eventSchedule$,
+      deps.filterAndSort.answersFiltered$,
+    ],
+    (
+      datetimeRangeList,
+      scores,
+      answerSummary,
+      answerTable,
+      eventSchedule,
+      answers,
+    ) =>
+      datetimeRangeList === undefined ||
+      scores === undefined ||
+      answerSummary === undefined ||
+      answerTable === undefined ||
+      eventSchedule === undefined ||
+      answers === undefined
+        ? undefined
+        : IMapMapped.create(
+            datetimeRangeList.map((datetimeRange) => {
+              const score = Optional.toNullable(scores.get(datetimeRange)) ?? 0;
 
-                const answerTableRow: readonly AnswerTableCell[] | undefined =
-                  pipe(
-                    Optional.toNullable(answerTable.get(datetimeRange)),
-                  ).mapNullable((row) =>
-                    Arr.zip(
-                      row,
-                      answers.map((a) => a.weight),
-                    ).map(([[iconId, point, comment], weight]) => ({
-                      iconId,
-                      point,
-                      showPoint: match(iconId, {
-                        good: point !== eventSchedule.answerIcons.good.point,
-                        fair: point !== eventSchedule.answerIcons.fair.point,
-                        poor: point !== eventSchedule.answerIcons.poor.point,
-                        none: false,
-                      }),
-                      weight,
-                      comment,
-                    })),
-                  ).value;
+              const answerTableRow: readonly AnswerTableCell[] | undefined =
+                pipe(
+                  Optional.toNullable(answerTable.get(datetimeRange)),
+                ).mapNullable((row) =>
+                  Arr.zip(
+                    row,
+                    answers.map((a) => a.weight),
+                  ).map(([[iconId, point, comment], weight]) => ({
+                    iconId,
+                    point,
+                    showPoint: match(iconId, {
+                      good: point !== eventSchedule.answerIcons.good.point,
+                      fair: point !== eventSchedule.answerIcons.fair.point,
+                      poor: point !== eventSchedule.answerIcons.poor.point,
+                      none: false,
+                    }),
+                    weight,
+                    comment,
+                  })),
+                ).value;
 
-                const value: DeepReadonly<{
-                  key: string;
-                  datetimeRange: DatetimeRange;
-                  score: number;
-                  answerSummaryRow: FixedLengthTuple<3, number> | undefined;
-                  answerTableRow: AnswerTableCell[] | undefined;
-                  /** The row's background, by its score. */
-                  backgroundColor: string | undefined;
-                }> = {
-                  key: datetimeRange2str(datetimeRange),
-                  datetimeRange,
-                  score,
-                  answerSummaryRow: Optional.toNullable(
-                    answerSummary.get(datetimeRange),
-                  ),
-                  answerTableRow,
-                  backgroundColor:
-                    score === 1
-                      ? answerTableColor.perfectColor
-                      : score >= answerTableColor.goodThreshold
-                        ? answerTableColor.goodColor
-                        : undefined,
-                } as const;
+              const value: DeepReadonly<{
+                key: string;
+                datetimeRange: DatetimeRange;
+                score: number;
+                answerSummaryRow: FixedLengthTuple<3, number> | undefined;
+                answerTableRow: AnswerTableCell[] | undefined;
+                /** The row's background, by its score. */
+                backgroundColor: string | undefined;
+              }> = {
+                key: datetimeRange2str(datetimeRange),
+                datetimeRange,
+                score,
+                answerSummaryRow: Optional.toNullable(
+                  answerSummary.get(datetimeRange),
+                ),
+                answerTableRow,
+                backgroundColor:
+                  score === 1
+                    ? answerTableColor.perfectColor
+                    : score >= answerTableColor.goodThreshold
+                      ? answerTableColor.goodColor
+                      : undefined,
+              } as const;
 
-                return tp(datetimeRange, value);
-              }),
-              datetimeRangeToMapKey,
-              datetimeRangeFromMapKey,
-            ),
-    ),
+              return tp(datetimeRange, value);
+            }),
+            datetimeRangeToMapKey,
+            datetimeRangeFromMapKey,
+          ),
   );
 
   const tableBodyValues$: InitializedObservable<
@@ -311,11 +305,9 @@ export const createAnswerTableStore = (deps: AnswerTableDeps): AnswerTable => {
         backgroundColor: string | undefined;
       }[]
     >
-  > = combine([
-    datetimeRangeListReordered$,
-    datetimeRangeToTableRowValuesMap$,
-  ]).pipe(
-    map(([datetimeRangeListReordered, datetimeRangeToTableRowValuesMap]) =>
+  > = derive(
+    [datetimeRangeListReordered$, datetimeRangeToTableRowValuesMap$],
+    (datetimeRangeListReordered, datetimeRangeToTableRowValuesMap) =>
       datetimeRangeListReordered === undefined ||
       datetimeRangeToTableRowValuesMap === undefined
         ? []
@@ -325,15 +317,15 @@ export const createAnswerTableStore = (deps: AnswerTableDeps): AnswerTable => {
               datetimeRangeToTableRowValuesMap.get(datetimeRange),
             )!,
           ),
-    ),
   );
 
-  const tableBodyValuesFiltered$ = combine([
-    tableBodyValues$,
-    deps.filterAndSort.filterState$,
-    deps.filterAndSort.answersFiltered$,
-  ]).pipe(
-    map(([tableBodyValues, filterState, answers]) => {
+  const tableBodyValuesFiltered$ = derive(
+    [
+      tableBodyValues$,
+      deps.filterAndSort.filterState$,
+      deps.filterAndSort.answersFiltered$,
+    ],
+    (tableBodyValues, filterState, answers) => {
       const tableBodyValuesFiltered = tableBodyValues.filter((row) => {
         const { answerTableRow, answerSummaryRow, score, datetimeRange } = row;
 
@@ -422,7 +414,7 @@ export const createAnswerTableStore = (deps: AnswerTableDeps): AnswerTable => {
           // スコア上位のみ表示
           scoreThreshold === undefined || row.score >= scoreThreshold,
       );
-    }),
+    },
   );
 
   const [tableIsMinimized$, { toggle: toggleTableIsMinimized }] =

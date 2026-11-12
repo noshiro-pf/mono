@@ -1,4 +1,4 @@
-import { combine, map } from 'synstate';
+import { derive, map } from 'synstate';
 import {
   constant,
   createAfterUpdate,
@@ -42,9 +42,11 @@ export const EditEventScheduleEmailVerified = (): JSX.Element => {
   // read anew or the confirmed email changes.
   const afterUpdate = createAfterUpdate();
 
-  combine([eventSchedule$, emailVerified$]).subscribe(() => {
-    afterUpdate(resetState);
-  });
+  derive([eventSchedule$, emailVerified$], (...values) => values).subscribe(
+    () => {
+      afterUpdate(resetState);
+    },
+  );
 
   return (
     <>

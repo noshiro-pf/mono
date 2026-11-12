@@ -1,5 +1,5 @@
 // cspell:ignore Untab
-import { combine, map, type InitializedObservable } from 'synstate';
+import { derive, map, type InitializedObservable } from 'synstate';
 import {
   constant,
   If,
@@ -56,15 +56,10 @@ export const ViewSettingsRow = ({
 }: Props): JSX.Element => {
   const blockName = BLOCK_NAMES[id];
 
-  const row$ = combine([
-    layoutStore.layout,
-    ids$,
-    index$,
-    reader.features,
-  ]).pipe(
-    map(([layout, ids, index, features]) =>
+  const row$ = derive(
+    [layoutStore.layout, ids$, index$, reader.features],
+    (layout, ids, index, features) =>
       rowOf(layout, ids, index, id, absentBlocks(features)),
-    ),
   );
 
   // Read when pressed, so that a handler never acts on a place it was drawn at

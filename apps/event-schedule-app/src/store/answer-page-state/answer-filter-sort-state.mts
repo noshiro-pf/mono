@@ -1,8 +1,8 @@
 import type { TagInputValue } from 'blueprint-synstate';
 import {
   type InitializedObservable,
-  combine,
   createState,
+  derive,
   filter,
   map,
   skipIfNoChange,
@@ -316,68 +316,67 @@ export const createAnswerFilterAndSortStore = (
         >;
       }[]
     >
-  > = combine([deps.answers$, filterState$]).pipe(
-    map(
-      ([answers, filterState]) =>
-        answers?.map((ans) => ({
-          key: ans.id,
-          username: ans.user.name,
-          checkState: {
-            good: {
-              checked: !filterState.iconOfSpecifiedRespondent.falseKeys.has([
+  > = derive(
+    [deps.answers$, filterState$],
+    (answers, filterState) =>
+      answers?.map((ans) => ({
+        key: ans.id,
+        username: ans.user.name,
+        checkState: {
+          good: {
+            checked: !filterState.iconOfSpecifiedRespondent.falseKeys.has([
+              ans.user.name,
+              'good',
+            ]),
+            onCheck: (value: boolean) => {
+              setIconOfSpecifiedRespondentCheckState(
                 ans.user.name,
                 'good',
-              ]),
-              onCheck: (value: boolean) => {
-                setIconOfSpecifiedRespondentCheckState(
-                  ans.user.name,
-                  'good',
-                  value,
-                );
-              },
-            },
-            fair: {
-              checked: !filterState.iconOfSpecifiedRespondent.falseKeys.has([
-                ans.user.name,
-                'fair',
-              ]),
-              onCheck: (value: boolean) => {
-                setIconOfSpecifiedRespondentCheckState(
-                  ans.user.name,
-                  'fair',
-                  value,
-                );
-              },
-            },
-            poor: {
-              checked: !filterState.iconOfSpecifiedRespondent.falseKeys.has([
-                ans.user.name,
-                'poor',
-              ]),
-              onCheck: (value: boolean) => {
-                setIconOfSpecifiedRespondentCheckState(
-                  ans.user.name,
-                  'poor',
-                  value,
-                );
-              },
-            },
-            none: {
-              checked: !filterState.iconOfSpecifiedRespondent.falseKeys.has([
-                ans.user.name,
-                'none',
-              ]),
-              onCheck: (value: boolean) => {
-                setIconOfSpecifiedRespondentCheckState(
-                  ans.user.name,
-                  'none',
-                  value,
-                );
-              },
+                value,
+              );
             },
           },
-        })) ?? [],
-    ),
+          fair: {
+            checked: !filterState.iconOfSpecifiedRespondent.falseKeys.has([
+              ans.user.name,
+              'fair',
+            ]),
+            onCheck: (value: boolean) => {
+              setIconOfSpecifiedRespondentCheckState(
+                ans.user.name,
+                'fair',
+                value,
+              );
+            },
+          },
+          poor: {
+            checked: !filterState.iconOfSpecifiedRespondent.falseKeys.has([
+              ans.user.name,
+              'poor',
+            ]),
+            onCheck: (value: boolean) => {
+              setIconOfSpecifiedRespondentCheckState(
+                ans.user.name,
+                'poor',
+                value,
+              );
+            },
+          },
+          none: {
+            checked: !filterState.iconOfSpecifiedRespondent.falseKeys.has([
+              ans.user.name,
+              'none',
+            ]),
+            onCheck: (value: boolean) => {
+              setIconOfSpecifiedRespondentCheckState(
+                ans.user.name,
+                'none',
+                value,
+              );
+            },
+          },
+        },
+      })) ?? [],
   );
 
   const respondentCheckState$: InitializedObservable<
@@ -388,20 +387,19 @@ export const createAnswerFilterAndSortStore = (
         checkState: { checked: boolean; onCheck: (value: boolean) => void };
       }[]
     >
-  > = combine([deps.answers$, filterState$]).pipe(
-    map(
-      ([answers, filterState]) =>
-        answers?.map((ans) => ({
-          key: ans.id,
-          username: ans.user.name,
-          checkState: {
-            checked: !filterState.respondent.falseKeys.has(ans.user.name),
-            onCheck: (value: boolean) => {
-              setRespondentCheckState(ans.user.name, value);
-            },
+  > = derive(
+    [deps.answers$, filterState$],
+    (answers, filterState) =>
+      answers?.map((ans) => ({
+        key: ans.id,
+        username: ans.user.name,
+        checkState: {
+          checked: !filterState.respondent.falseKeys.has(ans.user.name),
+          onCheck: (value: boolean) => {
+            setRespondentCheckState(ans.user.name, value);
           },
-        })) ?? [],
-    ),
+        },
+      })) ?? [],
   );
 
   const setOnlyFilledDate = (checked: boolean): void => {
@@ -596,188 +594,183 @@ export const createAnswerFilterAndSortStore = (
 
   const dc = dict.answerPage.answers.tagInput;
 
-  const tags$: InitializedObservable<readonly FilterTag[]> = combine([
-    sortKeyAndOrder$,
-    filterState$,
-  ]).pipe(
-    map(
-      ([
-        sortKeyAndOrder,
-        {
-          iconState,
-          filledDateOnly,
-          rank,
-          scoreRange,
-          dateRange,
-          dayOfWeek,
-          iconOfSpecifiedRespondent,
-          respondent,
-          ..._rest
-        },
-      ]) => {
-        expectType<keyof typeof _rest, never>('=');
-
-        return [
-          {
-            value: dc.sort(...sortKeyAndOrder),
-            props: {
-              intent: 'success' as const,
-              onRemove: resetSortOrderAndKey,
-            },
-          },
-
-          dateRange.enabled &&
-          dateRange.value.start !== undefined &&
-          dateRange.value.end !== undefined
-            ? {
-                value: dc.dateRange(dateRange.value.start, dateRange.value.end),
-                props: {
-                  intent: 'primary' as const,
-                  onRemove: () => {
-                    setEnabledFilteringByDateRange(false);
-                  },
-                },
-              }
-            : undefined,
-
-          dayOfWeek.enabled
-            ? {
-                value: dc.dayOfWeek(dayOfWeek.value),
-                props: {
-                  intent: 'primary' as const,
-                  onRemove: () => {
-                    setEnabledFilteringByDayOfWeek(false);
-                  },
-                },
-              }
-            : undefined,
-
-          rank.enabled
-            ? {
-                value: dc.rank(rank.value),
-                props: {
-                  intent: 'primary' as const,
-                  onRemove: () => {
-                    setEnabledFilteringByRank(false);
-                  },
-                },
-              }
-            : undefined,
-
-          scoreRange.enabled
-            ? {
-                value: dc.scoreRange(scoreRange.value),
-                props: {
-                  intent: 'primary' as const,
-                  onRemove: () => {
-                    setEnabledFilteringByScoreRange(false);
-                  },
-                },
-              }
-            : undefined,
-
-          iconState.good.enabled
-            ? {
-                value: dc.good(iconState.good.min, iconState.good.max),
-                props: {
-                  intent: 'primary' as const,
-                  onRemove: () => {
-                    disableFilteringByIcon('good');
-                  },
-                },
-              }
-            : undefined,
-          iconState.fair.enabled
-            ? {
-                value: dc.fair(iconState.fair.min, iconState.fair.max),
-                props: {
-                  intent: 'primary' as const,
-                  onRemove: () => {
-                    disableFilteringByIcon('fair');
-                  },
-                },
-              }
-            : undefined,
-          iconState.poor.enabled
-            ? {
-                value: dc.poor(iconState.poor.min, iconState.poor.max),
-                props: {
-                  intent: 'primary' as const,
-                  onRemove: () => {
-                    disableFilteringByIcon('poor');
-                  },
-                },
-              }
-            : undefined,
-          iconState.goodPlusFair.enabled
-            ? {
-                value: dc.goodPlusFair(
-                  iconState.goodPlusFair.min,
-                  iconState.goodPlusFair.max,
-                ),
-                props: {
-                  intent: 'primary' as const,
-                  onRemove: () => {
-                    disableFilteringByIcon('goodPlusFair');
-                  },
-                },
-              }
-            : undefined,
-          iconState.fairPlusPoor.enabled
-            ? {
-                value: dc.fairPlusPoor(
-                  iconState.fairPlusPoor.min,
-                  iconState.fairPlusPoor.max,
-                ),
-                props: {
-                  intent: 'primary' as const,
-                  onRemove: () => {
-                    disableFilteringByIcon('fairPlusPoor');
-                  },
-                },
-              }
-            : undefined,
-
-          filledDateOnly
-            ? {
-                value:
-                  dict.answerPage.detailedFilter.filterItems.filledDateOnly,
-                props: {
-                  intent: 'none' as const,
-                  'data-e2e': 'filled-date-only-tag',
-                  onRemove: () => {
-                    setOnlyFilledDate(false);
-                  },
-                },
-              }
-            : undefined,
-
-          iconOfSpecifiedRespondent.enabled
-            ? {
-                value: dc.iconOfSpecifiedRespondent,
-                props: {
-                  intent: 'none' as const,
-                  onRemove: () => {
-                    setEnabledFilteringByIconOfSpecifiedRespondent(false);
-                  },
-                },
-              }
-            : undefined,
-
-          respondent.enabled
-            ? {
-                value: dc.respondent,
-                props: {
-                  intent: 'none' as const,
-                  onRemove: () => {
-                    setEnabledFilteringByRespondent(false);
-                  },
-                },
-              }
-            : undefined,
-        ].filter(isNotUndefined);
+  const tags$: InitializedObservable<readonly FilterTag[]> = derive(
+    [sortKeyAndOrder$, filterState$],
+    (
+      sortKeyAndOrder,
+      {
+        iconState,
+        filledDateOnly,
+        rank,
+        scoreRange,
+        dateRange,
+        dayOfWeek,
+        iconOfSpecifiedRespondent,
+        respondent,
+        ..._rest
       },
-    ),
+    ) => {
+      expectType<keyof typeof _rest, never>('=');
+
+      return [
+        {
+          value: dc.sort(...sortKeyAndOrder),
+          props: {
+            intent: 'success' as const,
+            onRemove: resetSortOrderAndKey,
+          },
+        },
+
+        dateRange.enabled &&
+        dateRange.value.start !== undefined &&
+        dateRange.value.end !== undefined
+          ? {
+              value: dc.dateRange(dateRange.value.start, dateRange.value.end),
+              props: {
+                intent: 'primary' as const,
+                onRemove: () => {
+                  setEnabledFilteringByDateRange(false);
+                },
+              },
+            }
+          : undefined,
+
+        dayOfWeek.enabled
+          ? {
+              value: dc.dayOfWeek(dayOfWeek.value),
+              props: {
+                intent: 'primary' as const,
+                onRemove: () => {
+                  setEnabledFilteringByDayOfWeek(false);
+                },
+              },
+            }
+          : undefined,
+
+        rank.enabled
+          ? {
+              value: dc.rank(rank.value),
+              props: {
+                intent: 'primary' as const,
+                onRemove: () => {
+                  setEnabledFilteringByRank(false);
+                },
+              },
+            }
+          : undefined,
+
+        scoreRange.enabled
+          ? {
+              value: dc.scoreRange(scoreRange.value),
+              props: {
+                intent: 'primary' as const,
+                onRemove: () => {
+                  setEnabledFilteringByScoreRange(false);
+                },
+              },
+            }
+          : undefined,
+
+        iconState.good.enabled
+          ? {
+              value: dc.good(iconState.good.min, iconState.good.max),
+              props: {
+                intent: 'primary' as const,
+                onRemove: () => {
+                  disableFilteringByIcon('good');
+                },
+              },
+            }
+          : undefined,
+        iconState.fair.enabled
+          ? {
+              value: dc.fair(iconState.fair.min, iconState.fair.max),
+              props: {
+                intent: 'primary' as const,
+                onRemove: () => {
+                  disableFilteringByIcon('fair');
+                },
+              },
+            }
+          : undefined,
+        iconState.poor.enabled
+          ? {
+              value: dc.poor(iconState.poor.min, iconState.poor.max),
+              props: {
+                intent: 'primary' as const,
+                onRemove: () => {
+                  disableFilteringByIcon('poor');
+                },
+              },
+            }
+          : undefined,
+        iconState.goodPlusFair.enabled
+          ? {
+              value: dc.goodPlusFair(
+                iconState.goodPlusFair.min,
+                iconState.goodPlusFair.max,
+              ),
+              props: {
+                intent: 'primary' as const,
+                onRemove: () => {
+                  disableFilteringByIcon('goodPlusFair');
+                },
+              },
+            }
+          : undefined,
+        iconState.fairPlusPoor.enabled
+          ? {
+              value: dc.fairPlusPoor(
+                iconState.fairPlusPoor.min,
+                iconState.fairPlusPoor.max,
+              ),
+              props: {
+                intent: 'primary' as const,
+                onRemove: () => {
+                  disableFilteringByIcon('fairPlusPoor');
+                },
+              },
+            }
+          : undefined,
+
+        filledDateOnly
+          ? {
+              value: dict.answerPage.detailedFilter.filterItems.filledDateOnly,
+              props: {
+                intent: 'none' as const,
+                'data-e2e': 'filled-date-only-tag',
+                onRemove: () => {
+                  setOnlyFilledDate(false);
+                },
+              },
+            }
+          : undefined,
+
+        iconOfSpecifiedRespondent.enabled
+          ? {
+              value: dc.iconOfSpecifiedRespondent,
+              props: {
+                intent: 'none' as const,
+                onRemove: () => {
+                  setEnabledFilteringByIconOfSpecifiedRespondent(false);
+                },
+              },
+            }
+          : undefined,
+
+        respondent.enabled
+          ? {
+              value: dc.respondent,
+              props: {
+                intent: 'none' as const,
+                onRemove: () => {
+                  setEnabledFilteringByRespondent(false);
+                },
+              },
+            }
+          : undefined,
+      ].filter(isNotUndefined);
+    },
   );
 
   const tagValues$: InitializedObservable<readonly TagInputValue[]> =
@@ -791,12 +784,12 @@ export const createAnswerFilterAndSortStore = (
     resetState();
   };
 
-  const answersFiltered$ = combine([deps.answers$, filterState$]).pipe(
-    map(([answers, filterState]) =>
+  const answersFiltered$ = derive(
+    [deps.answers$, filterState$],
+    (answers, filterState) =>
       answers?.filter(
         (a) => !filterState.respondent.falseKeys.has(a.user.name),
       ),
-    ),
   );
 
   return {

@@ -1,4 +1,4 @@
-import { type InitializedObservable, combine, filter, map } from 'synstate';
+import { type InitializedObservable, derive, filter, map } from 'synstate';
 import { Result } from 'ts-data-forge';
 import type { StrictPick } from 'ts-type-forge';
 import { dict } from '../../constants/index.mjs';
@@ -81,28 +81,27 @@ export const createDeleteAccountPageStore = <
   const { state: passwordIsOpenState$, toggle: togglePasswordLock } =
     createToggleState([dialogClosed$]);
 
-  const state = combine([
-    formState$,
-    enterButtonDisabled$,
-    emailFormIntent$,
-    passwordFormIntent$,
-    passwordIsOpenState$,
-  ]).pipe(
-    map(
-      ([
-        formState,
-        enterButtonDisabled,
-        emailFormIntent,
-        passwordFormIntent,
-        passwordIsOpen,
-      ]) => ({
-        formState,
-        enterButtonDisabled,
-        emailFormIntent,
-        passwordFormIntent,
-        passwordIsOpen,
-      }),
-    ),
+  const state = derive(
+    [
+      formState$,
+      enterButtonDisabled$,
+      emailFormIntent$,
+      passwordFormIntent$,
+      passwordIsOpenState$,
+    ],
+    (
+      formState,
+      enterButtonDisabled,
+      emailFormIntent,
+      passwordFormIntent,
+      passwordIsOpen,
+    ) => ({
+      formState,
+      enterButtonDisabled,
+      emailFormIntent,
+      passwordFormIntent,
+      passwordIsOpen,
+    }),
   );
 
   const submit = async (user: User): Promise<void> => {

@@ -871,7 +871,7 @@ export const runBenchmark = (n: number): number => {
 
 ## Scenario: Deep Chain Throughput
 
-The first two scenarios use fixed-size graphs. This scenario matches the [Throughput interactive demo](/mono/synstate/guides/library-comparison/interactive-demo/#throughput-per-update-overhead-under-load): a depth-$M$ `scan` chain where each stage lerps toward the previous stage, with a `combine` that reads **all $M+1$ outputs**. $K$ source updates are pushed synchronously per measurement — simulating $K$ updates per animation frame.
+The first two scenarios use fixed-size graphs. This scenario matches the [Throughput interactive demo](/mono/synstate/guides/library-comparison/interactive-demo/#throughput-per-update-overhead-under-load): a depth-$M$ `scan` chain where each stage lerps toward the previous stage, with a `derive` (`combineLatest` in RxJS) that reads **all $M+1$ outputs**. $K$ source updates are pushed synchronously per measurement — simulating $K$ updates per animation frame.
 
 The following diagram shows the graph structure at $M = 3$. In the actual benchmark, $M$ ranges from $50$ to $200$:
 
@@ -895,7 +895,7 @@ The following diagram shows the graph structure at $M = 3$. In the actual benchm
 
 Each of these $M+1$ `combineLatest` emissions invokes the subscriber, which processes $M+1$ values → **$O(M)$ work per call**. So a single source update costs $O(M) \times (M+1)$ = **$O(M^2)$**.
 
-SynState's `combine` is visited only after every one of its parents has settled for the update — **1 subscriber call per source update, $O(M)$ total**.
+SynState's `derive` is visited only after every one of its parents has settled for the update — **1 subscriber call per source update, $O(M)$ total**.
 :::
 
 ### Results

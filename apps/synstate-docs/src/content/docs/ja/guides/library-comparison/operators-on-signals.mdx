@@ -128,9 +128,7 @@ export const createSearchView = (): SearchView => {
     );
 
     // ページに表示するもの: 入力欄のクエリと、リストがどのクエリの結果か。
-    const view = combine([query, searchState]).pipe(
-        map(([q, state]) => showView(q, state)),
-    );
+    const view = derive([query, searchState], showView);
 
     const viewLog: string[] = [];
 

@@ -1,5 +1,5 @@
 import { HtmlSelect } from 'blueprint-synstate';
-import { combine, map, type InitializedObservable } from 'synstate';
+import { derive, map, type InitializedObservable } from 'synstate';
 import { constant, For, If, MatchOptional, type JSX } from 'synstate-dom';
 import { Arr, Optional } from 'ts-data-forge';
 import type { RelaxedExclude } from 'ts-type-forge';
@@ -89,25 +89,21 @@ const BulkEditForm = ({
   );
 
   // Every label the tasks have, in the order first met.
-  const labels$ = combine([dataStore.state, editor]).pipe(
-    map(([{ tasks }, { refs }]) => {
-      const taskIds = new Set(
-        Arr.generate(function* () {
-          for (const ref of refs) {
-            if (ref.kind === 'task') {
-              yield ref.id;
-            }
+  const labels$ = derive([dataStore.state, editor], ({ tasks }, { refs }) => {
+    const taskIds = new Set(
+      Arr.generate(function* () {
+        for (const ref of refs) {
+          if (ref.kind === 'task') {
+            yield ref.id;
           }
-        }),
-      );
+        }
+      }),
+    );
 
-      return Arr.uniq(
-        tasks
-          .filter(({ id }) => taskIds.has(id))
-          .flatMap((task) => task.labels),
-      );
-    }),
-  );
+    return Arr.uniq(
+      tasks.filter(({ id }) => taskIds.has(id)).flatMap((task) => task.labels),
+    );
+  });
 
   return (
     <form
@@ -213,10 +209,10 @@ const BulkEditForm = ({
                             )}
                           >
                             <input
-                              checked={combine([editor, label$]).pipe(
-                                map(([{ removeLabels }, label]) =>
+                              checked={derive(
+                                [editor, label$],
+                                ({ removeLabels }, label) =>
                                   removeLabels.includes(label),
-                                ),
                               )}
                               class={constant('bp6-control-input')}
                               data-e2e={constant('bulk-remove-label')}

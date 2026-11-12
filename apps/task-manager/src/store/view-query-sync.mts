@@ -5,7 +5,7 @@
  * `store.mts`'s; this only writes, and only when the URL says something else.
  */
 
-import { combine, type InitializedObservable } from 'synstate';
+import { derive, type InitializedObservable } from 'synstate';
 import {
   NO_DAG_FILTER,
   withDagFilterQuery,
@@ -34,11 +34,10 @@ export type ViewQuerySync = Readonly<{
 export const createViewQuerySync = (deps: ViewQuerySyncDeps): ViewQuerySync =>
   ({
     start: () => {
-      const subscription = combine([
-        deps.view,
-        deps.mode,
-        deps.filter,
-      ]).subscribe(([view, mode, filter]) => {
+      const subscription = derive(
+        [deps.view, deps.mode, deps.filter],
+        (...values) => values,
+      ).subscribe(([view, mode, filter]) => {
         const current = deps.read();
 
         const next = withDagFilterQuery(

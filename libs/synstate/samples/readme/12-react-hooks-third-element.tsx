@@ -33,7 +33,7 @@ const Counter = (): React.JSX.Element => {
 
 // `state` is the same InitializedObservable<number> that the core synstate
 // package's createState returns as its first element.
-// You can use it with pipe, combine, subscribe, etc.
+// You can use it with pipe, derive, subscribe, etc.
 state.subscribe((value) => {
   console.log('count changed:', value);
 });

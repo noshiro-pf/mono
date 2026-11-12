@@ -1,4 +1,4 @@
-import { combine, map } from 'synstate';
+import { derive, map } from 'synstate';
 import {
   constant,
   deriveBindable,
@@ -55,8 +55,8 @@ export const DagFilterField = (): JSX.Element => {
             <For items={groups} key={(group) => group.id}>
               {(group$) => (
                 <Choice
-                  checked={combine([filter, group$]).pipe(
-                    map(([f, { id }]) => f.groups.includes(id)),
+                  checked={derive([filter, group$], (f, { id }) =>
+                    f.groups.includes(id),
                   )}
                   e2e={'dag-filter-group'}
                   title={group$.pipe(map(({ title }) => title))}
@@ -87,8 +87,8 @@ export const DagFilterField = (): JSX.Element => {
             <For items={labels$} key={(label) => label}>
               {(label$) => (
                 <Choice
-                  checked={combine([filter, label$]).pipe(
-                    map(([f, label]) => f.labels.includes(label)),
+                  checked={derive([filter, label$], (f, label) =>
+                    f.labels.includes(label),
                   )}
                   e2e={'dag-filter-label'}
                   title={label$}

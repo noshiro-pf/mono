@@ -1,4 +1,4 @@
-import { combine, createState, map } from 'synstate';
+import { createState, derive, map } from 'synstate';
 
 // embed-sample-code-ignore-below
 if (import.meta.vitest !== undefined) {
@@ -12,7 +12,7 @@ if (import.meta.vitest !== undefined) {
 
     const D = A.pipe(map((n) => n * 100)); // depth 1
 
-    const BDR = combine([B, D, R]); // depth 2
+    const BDR = derive([B, D, R], (b, d, r) => [b, d, r]); // depth 2
 
     // A write from a subscriber: an update nested in the one that reached D.
     D.subscribe((d) => {

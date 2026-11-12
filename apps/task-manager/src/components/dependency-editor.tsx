@@ -1,9 +1,4 @@
-import {
-  combine,
-  createState,
-  map,
-  type InitializedObservable,
-} from 'synstate';
+import { createState, derive, map, type InitializedObservable } from 'synstate';
 import { constant, For, If, type JSX } from 'synstate-dom';
 import { Arr } from 'ts-data-forge';
 import type { Dependency, NodeRef } from '../domain/index.mjs';
@@ -49,19 +44,13 @@ export const DependencyEditor = ({
 }: Props): JSX.Element => {
   const [showDone$, setShowDone] = createState(false);
 
-  const options$ = combine([dataStore.state, editor]).pipe(
-    map(([state, { ref }]) => dependencySourceOptions(state, ref)),
+  const options$ = derive([dataStore.state, editor], (state, { ref }) =>
+    dependencySourceOptions(state, ref),
   );
 
-  const rows$ = combine([
-    dataStore.state,
-    editor,
-    checks,
-    unmet,
-    options$,
-    showDone$,
-  ]).pipe(
-    map(([state, { rows }, rowChecks, unmetNow, options, showDone]) =>
+  const rows$ = derive(
+    [dataStore.state, editor, checks, unmet, options$, showDone$],
+    (state, { rows }, rowChecks, unmetNow, options, showDone) =>
       rows.map((row, index): DependencyRowView => {
         const check = rowChecks.find(({ key }) => key === row.key);
 
@@ -79,7 +68,6 @@ export const DependencyEditor = ({
           options: shownSourceOptions(options, showDone, row.source),
         };
       }),
-    ),
   );
 
   return (

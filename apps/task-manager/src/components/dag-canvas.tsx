@@ -1,6 +1,6 @@
 import {
-  combine,
   createState,
+  derive,
   map,
   onScopeDispose,
   type InitializedObservable,
@@ -256,8 +256,9 @@ export const DagCanvas = ({ layout, toolbar }: Props): JSX.Element => {
     selectedEdge: selectedEdge$,
     lasso: lasso$,
     viewFrom: viewFrom$,
-    pointed: combine([hovered$, focused$]).pipe(
-      map(([hovered, focused]) => hovered ?? focused),
+    pointed: derive(
+      [hovered$, focused$],
+      (hovered, focused) => hovered ?? focused,
     ),
   });
 
@@ -522,7 +523,10 @@ export const DagCanvas = ({ layout, toolbar }: Props): JSX.Element => {
     map(({ nodes }) => nodes.map(({ id }) => id).join(' ')),
   );
 
-  combine([structureKey, dagLayoutStore.fitRequests, mode]).subscribe(() => {
+  derive(
+    [structureKey, dagLayoutStore.fitRequests, mode],
+    (...values) => values,
+  ).subscribe(() => {
     if (mut_fitted.queued) {
       return;
     }
@@ -955,8 +959,8 @@ export const DagCanvas = ({ layout, toolbar }: Props): JSX.Element => {
     });
   };
 
-  const tileFrameShown = combine([mode, tileFrame$]).pipe(
-    map(([current, frame]) => (current === 'tile' ? frame : undefined)),
+  const tileFrameShown = derive([mode, tileFrame$], (current, frame) =>
+    current === 'tile' ? frame : undefined,
   );
 
   // In 「タイル」, the rows are cut off at the toolbar's bottom edge as they
@@ -968,8 +972,9 @@ export const DagCanvas = ({ layout, toolbar }: Props): JSX.Element => {
     ),
   );
 
-  const thumb = combine([tileFrameShown, animated, transform$, tileNodes]).pipe(
-    map(([frame, moved, current, tiles]) => {
+  const thumb = derive(
+    [tileFrameShown, animated, transform$, tileNodes],
+    (frame, moved, current, tiles) => {
       if (frame === undefined || moved !== undefined) {
         return undefined;
       }
@@ -984,7 +989,7 @@ export const DagCanvas = ({ layout, toolbar }: Props): JSX.Element => {
       return at === undefined
         ? undefined
         : ({ top: frame.topInset + at.top, height: at.height } as const);
-    }),
+    },
   );
 
   const { arrangeable } = scene;
@@ -1025,25 +1030,17 @@ export const DagCanvas = ({ layout, toolbar }: Props): JSX.Element => {
         data-animating={animated.pipe(
           map((moved) => (moved !== undefined).toString()),
         )}
-        data-connect={combine([handle$, connecting$]).pipe(
-          map(([handle, arrow]) =>
-            (handle !== undefined || arrow !== undefined).toString(),
-          ),
+        data-connect={derive([handle$, connecting$], (handle, arrow) =>
+          (handle !== undefined || arrow !== undefined).toString(),
         )}
         data-e2e={constant('dag-canvas')}
-        data-lasso={combine([arrangeable, lassoTool$]).pipe(
-          map(([canArrange, tool]) =>
-            (canArrange && tool !== undefined).toString(),
-          ),
+        data-lasso={derive([arrangeable, lassoTool$], (canArrange, tool) =>
+          (canArrange && tool !== undefined).toString(),
         )}
         data-mode={mode}
-        data-motion={combine([
-          animationSettingStore.setting,
-          reducedMotionStore.matches,
-        ]).pipe(
-          map(([setting, reduced]) =>
-            shouldAnimate(setting, reduced).toString(),
-          ),
+        data-motion={derive(
+          [animationSettingStore.setting, reducedMotionStore.matches],
+          (setting, reduced) => shouldAnimate(setting, reduced).toString(),
         )}
         // In 「タイル」, focusable — by Tab, or by a press on it — as a
         // scrolled box is, so that its keys work with no task focused.
@@ -1267,12 +1264,10 @@ export const DagCanvas = ({ layout, toolbar }: Props): JSX.Element => {
           type={constant('button')}
           onClick={pressFit}
         >
-          {combine([mode, arcZoom$]).pipe(
-            map(([current, zoom]) =>
-              current === 'arc' && zoom === 'whole'
-                ? m.dag.actualSize
-                : m.dag.fitAll,
-            ),
+          {derive([mode, arcZoom$], (current, zoom) =>
+            current === 'arc' && zoom === 'whole'
+              ? m.dag.actualSize
+              : m.dag.fitAll,
           )}
         </button>
       </div>

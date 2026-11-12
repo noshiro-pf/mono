@@ -1,4 +1,4 @@
-import { combine, map } from 'synstate';
+import { derive, map } from 'synstate';
 import { constant, If, type JSX } from 'synstate-dom';
 import { Arr } from 'ts-data-forge';
 import { m } from '../i18n/index.mjs';
@@ -19,11 +19,10 @@ import { TaskTable } from './task-table.js';
  * screen, cards on a phone — and the milestones under them.
  */
 export const ListView = (): JSX.Element => {
-  const rows$ = combine([
-    dataStore.state,
-    clockStore.now,
-    listSettingsStore.settings,
-  ]).pipe(map(([state, now, settings]) => buildTaskRows(state, now, settings)));
+  const rows$ = derive(
+    [dataStore.state, clockStore.now, listSettingsStore.settings],
+    (state, now, settings) => buildTaskRows(state, now, settings),
+  );
 
   return (
     <main class={constant('list-view')} data-e2e={constant('list-view')}>

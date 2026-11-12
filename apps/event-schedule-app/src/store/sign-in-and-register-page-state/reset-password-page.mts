@@ -1,4 +1,4 @@
-import { type InitializedObservable, combine, filter, map } from 'synstate';
+import { type InitializedObservable, derive, filter, map } from 'synstate';
 import type { Href } from 'synstate-router';
 import { Optional, Result } from 'ts-data-forge';
 import type { StrictPick } from 'ts-type-forge';
@@ -52,16 +52,13 @@ export const createResetPasswordPageStore = (
     map((st) => (st.email.error === undefined ? 'primary' : 'danger')),
   );
 
-  const state = combine([
-    formState$,
-    enterButtonDisabled$,
-    emailFormIntent$,
-  ]).pipe(
-    map(([formState, enterButtonDisabled, emailFormIntent]) => ({
+  const state = derive(
+    [formState$, enterButtonDisabled$, emailFormIntent$],
+    (formState, enterButtonDisabled, emailFormIntent) => ({
       formState,
       enterButtonDisabled,
       emailFormIntent,
-    })),
+    }),
   );
 
   const submit = async (pageToBack: Href | undefined): Promise<void> => {

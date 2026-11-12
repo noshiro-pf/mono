@@ -7,12 +7,11 @@
  */
 
 import {
-  combine,
   createState,
   createValueEmitter,
+  derive,
   empty,
   filter,
-  map,
   mapTo,
   merge,
   switchMap,
@@ -65,14 +64,15 @@ export const createDagSelectionStore = (
   // subscriber of it, which would be a write while that update propagates.
   const chosen = merge([chose, dropped]).pipe(withInitialValue(NONE_CHOSEN));
 
-  const selected = combine([chosen, deps.state, deps.hidden]).pipe(
-    map(([ids, state, hidden]) => {
+  const selected = derive(
+    [chosen, deps.state, deps.hidden],
+    (ids, state, hidden) => {
       const there = new Set(listNodes(state).map(({ id }) => id));
 
       const kept = ids.filter((id) => there.has(id) && !hidden.has(id));
 
       return kept.length === ids.length ? ids : kept;
-    }),
+    },
   );
 
   const clear = (): void => {

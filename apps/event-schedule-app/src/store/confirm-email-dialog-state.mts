@@ -1,5 +1,5 @@
 import {
-  combine,
+  derive,
   filter,
   type InitializedObservable,
   map,
@@ -43,15 +43,11 @@ export const createConfirmEmailDialogStore = (
 ): ConfirmEmailDialog => {
   const dc = dict.answerPage.eventInfo.verifyEmailDialog;
 
-  const isOpen$ = combine([
-    deps.editEventSchedule.emailVerified$,
-    deps.eventSchedule$,
-  ]).pipe(
-    map(
-      ([emailVerified, eventSchedule]) =>
-        eventSchedule?.notificationSettings !== 'none' &&
-        emailVerified === undefined,
-    ),
+  const isOpen$ = derive(
+    [deps.editEventSchedule.emailVerified$, deps.eventSchedule$],
+    (emailVerified, eventSchedule) =>
+      eventSchedule?.notificationSettings !== 'none' &&
+      emailVerified === undefined,
   );
 
   const [formState$, dispatch, { getSnapshot: getFormStateSnapshot }] =
@@ -77,16 +73,13 @@ export const createConfirmEmailDialogStore = (
     map((st) => (st.email.error === undefined ? 'primary' : 'danger')),
   );
 
-  const state = combine([
-    formState$,
-    enterButtonDisabled$,
-    emailFormIntent$,
-  ]).pipe(
-    map(([formState, enterButtonDisabled, emailFormIntent]) => ({
+  const state = derive(
+    [formState$, enterButtonDisabled$, emailFormIntent$],
+    (formState, enterButtonDisabled, emailFormIntent) => ({
       formState,
       enterButtonDisabled,
       emailFormIntent,
-    })),
+    }),
   );
 
   const submit = async (eventId: string, email: string): Promise<void> => {

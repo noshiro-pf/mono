@@ -13,9 +13,9 @@
  */
 
 import {
-  combine,
   source as createSource,
   createState,
+  derive,
   filter,
   fromSubscribable,
   just,
@@ -252,22 +252,19 @@ export const createDataStore = (deps: DataDeps): DataStore => {
     .pipe(map(({ value }) => value))
     .pipe(skipIfNoChange());
 
-  const projectLoad = combine([loaded, fedGroups, fedLayout])
-    .pipe(
-      map(
-        ([
-          { status, failed },
-          { fed: groupsFed },
-          { fed: layoutFed },
-        ]): ProjectLoad =>
-          failed || groupsFed === 'failed' || layoutFed === 'failed'
-            ? 'failed'
-            : status === 'ready' && groupsFed === 'fed' && layoutFed === 'fed'
-              ? 'loaded'
-              : 'loading',
-      ),
-    )
-    .pipe(skipIfNoChange());
+  const projectLoad = derive(
+    [loaded, fedGroups, fedLayout],
+    (
+      { status, failed },
+      { fed: groupsFed },
+      { fed: layoutFed },
+    ): ProjectLoad =>
+      failed || groupsFed === 'failed' || layoutFed === 'failed'
+        ? 'failed'
+        : status === 'ready' && groupsFed === 'fed' && layoutFed === 'fed'
+          ? 'loaded'
+          : 'loading',
+  );
 
   const currentRepository = (): Repository | undefined => {
     const repository = followed.getSnapshot().value;

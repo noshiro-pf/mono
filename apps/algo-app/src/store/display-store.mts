@@ -3,7 +3,7 @@
  * things are on the screen. Nothing here is written; it is all derived.
  */
 
-import { combine, map, type InitializedObservable } from 'synstate';
+import { type InitializedObservable, derive } from 'synstate';
 import type { StrictPick } from 'ts-type-forge';
 import type { Rect } from 'ts-utils-additional';
 import { getCardDirection } from '../functions/index.mjs';
@@ -51,10 +51,9 @@ export type DisplayStore = Readonly<{
 }>;
 
 export const createDisplayStore = (deps: DisplayDeps): DisplayStore => {
-  const myPlayerIndex: InitializedObservable<PlayerIndex | undefined> = combine(
+  const myPlayerIndex: InitializedObservable<PlayerIndex | undefined> = derive(
     [deps.room, deps.myName],
-  ).pipe(
-    map(([room, myName]) => {
+    (room, myName) => {
       if (room === undefined || myName === undefined) {
         return undefined;
       }
@@ -70,41 +69,34 @@ export const createDisplayStore = (deps: DisplayDeps): DisplayStore => {
       );
 
       return undefined;
-    }),
+    },
   );
 
-  const isMyTurn: InitializedObservable<boolean> = combine([
-    deps.gameState,
-    myPlayerIndex,
-  ]).pipe(
-    map(
-      ([gameState, playerIndex]) =>
-        gameState.currentPlayerIndex === playerIndex,
-    ),
+  const isMyTurn: InitializedObservable<boolean> = derive(
+    [deps.gameState, myPlayerIndex],
+    (gameState, playerIndex) => gameState.currentPlayerIndex === playerIndex,
   );
 
-  const displayValues: InitializedObservable<DisplayValues> = combine([
-    deps.gameState,
-    myPlayerIndex,
-  ]).pipe(
-    map(([gameState, playerIndex]) =>
+  const displayValues: InitializedObservable<DisplayValues> = derive(
+    [deps.gameState, myPlayerIndex],
+    (gameState, playerIndex) =>
       mapToDisplayValue({
         gameState,
         myPlayerIndex: playerIndex ?? 0,
         onCardClick: deps.onCardClick,
       }),
-    ),
   );
 
-  const turnPlayerHighlighterPosition = combine([
-    deps.playerNamePositions,
-    displayValues,
-  ]).pipe(map(([namePositions, values]) => namePositions?.[values.turnPlayer]));
+  const turnPlayerHighlighterPosition = derive(
+    [deps.playerNamePositions, displayValues],
+    (namePositions, values) => namePositions?.[values.turnPlayer],
+  );
 
   const confirmTossBalloonProps: InitializedObservable<
     ConfirmTossBalloonProps | undefined
-  > = combine([isMyTurn, deps.gameState, deps.cardPositions]).pipe(
-    map(([myTurn, gameState, cardPositions]) => {
+  > = derive(
+    [isMyTurn, deps.gameState, deps.cardPositions],
+    (myTurn, gameState, cardPositions) => {
       if (!myTurn) {
         return undefined;
       }
@@ -133,18 +125,14 @@ export const createDisplayStore = (deps: DisplayDeps): DisplayStore => {
           deps.onTossSubmit();
         },
       };
-    }),
+    },
   );
 
   const selectAnswerBalloonProps: InitializedObservable<
     SelectAnswerBalloonProps | undefined
-  > = combine([
-    isMyTurn,
-    deps.gameState,
-    deps.cardPositions,
-    displayValues,
-  ]).pipe(
-    map(([myTurn, gameState, cardPositions, values]) => {
+  > = derive(
+    [isMyTurn, deps.gameState, deps.cardPositions, displayValues],
+    (myTurn, gameState, cardPositions, values) => {
       if (!myTurn) {
         return undefined;
       }
@@ -179,13 +167,14 @@ export const createDisplayStore = (deps: DisplayDeps): DisplayStore => {
           gameState.cardChosenToAttack === undefined ||
           gameState.cardChosenToBeAttacked === undefined,
       };
-    }),
+    },
   );
 
   const decidedAnswerBalloonProps: InitializedObservable<
     DecidedAnswerBalloonProps | undefined
-  > = combine([deps.cardPositions, deps.gameState, displayValues]).pipe(
-    map(([cardPositions, gameState, values]) => {
+  > = derive(
+    [deps.cardPositions, deps.gameState, displayValues],
+    (cardPositions, gameState, values) => {
       if (cardPositions === undefined) {
         return undefined;
       }
@@ -210,7 +199,7 @@ export const createDisplayStore = (deps: DisplayDeps): DisplayStore => {
         card: gameState.answerSelected,
         showSymbol: gameState.judgeResult,
       };
-    }),
+    },
   );
 
   return {

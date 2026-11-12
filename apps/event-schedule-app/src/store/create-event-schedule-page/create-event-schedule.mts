@@ -5,12 +5,11 @@ import {
 } from 'event-schedule-app-shared';
 import {
   type InitializedObservable,
-  combine,
   createBooleanState,
   createState,
   debounce,
+  derive,
   filter,
-  map,
   skip,
 } from 'synstate';
 import {
@@ -73,13 +72,11 @@ export const createCreateEventScheduleStore = (
       fireAuthUser$: deps.auth.fireAuthUser$,
     });
 
-  const hasNoChanges$: InitializedObservable<boolean> = combine([
-    baseline$,
-    commonState$,
-  ]).pipe(
+  const hasNoChanges$: InitializedObservable<boolean> = derive(
+    [baseline$, commonState$],
     // The form is compared as it would be saved: normalized, and written by
     // whoever is signed in. The empty form as built is neither.
-    map(([baseline, { eventScheduleNormalized }]) =>
+    (baseline, { eventScheduleNormalized }) =>
       fastDeepEqual(
         normalizeEventSchedule({
           ...baseline,
@@ -87,7 +84,6 @@ export const createCreateEventScheduleStore = (
         }),
         eventScheduleNormalized,
       ),
-    ),
   );
 
   const resetAllState = (): void => {

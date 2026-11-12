@@ -1,5 +1,5 @@
 import { HtmlSelect } from 'blueprint-synstate';
-import { combine, map, type InitializedObservable } from 'synstate';
+import { derive, map, type InitializedObservable } from 'synstate';
 import { constant, If, type JSX } from 'synstate-dom';
 import type { RelaxedExtract } from 'ts-type-forge';
 import { priorities, progresses } from '../domain/index.mjs';
@@ -39,24 +39,19 @@ type Props = Readonly<{
  * progress — so the effect of a change is visible before it is saved.
  */
 export const TaskForm = ({ editor }: Props): JSX.Element => {
-  const checks$ = combine([dataStore.state, editor]).pipe(
-    map(([state, { ref, rows }]) => validateRows(state, ref, rows)),
+  const checks$ = derive([dataStore.state, editor], (state, { ref, rows }) =>
+    validateRows(state, ref, rows),
   );
 
-  const insight$ = combine([
-    dataStore.state,
-    editor,
-    checks$,
-    clockStore.now,
-  ]).pipe(
-    map(([state, { ref, draft }, checks, now]) =>
+  const insight$ = derive(
+    [dataStore.state, editor, checks$, clockStore.now],
+    (state, { ref, draft }, checks, now) =>
       taskDraftInsight(
         state,
         ref.id,
         { progress: draft.progress, dependencies: validDependencies(checks) },
         now,
       ),
-    ),
   );
 
   const known$ = dataStore.state.pipe(map(labelsByUse));

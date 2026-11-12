@@ -1,7 +1,7 @@
 import { Button } from 'blueprint-synstate';
 import {
-  combine,
   createState,
+  derive,
   filter,
   map,
   type InitializedObservable,
@@ -57,7 +57,7 @@ export const SetTimesPopoverContent = ({
 
   // The time range starts from the list's each time the popover opens, as the
   // content Blueprint mounted on each opening did; the days stay as they were.
-  combine([isOpen, initialValue])
+  derive([isOpen, initialValue], (...values) => values)
     .pipe(filter(([open]) => open))
     .pipe(map(([, value]) => value))
     .subscribe((value) => {

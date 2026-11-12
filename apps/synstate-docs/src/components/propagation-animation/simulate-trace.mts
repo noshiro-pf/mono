@@ -20,9 +20,11 @@ export const traceNodesOf = (name: TraceScenarioName): readonly TraceNode[] =>
 /**
  * Runs a scenario's writes through a model of synstate's propagation
  * (`propagation-state.mts`, `setNext`, and the `tryUpdate` of `map`, `filter`
- * and `combine`), recording every field it reads or writes. Returns the steps
- * of each write, each list starting from the state the write starts in.
+ * and `derive`), recording every field it reads or writes. Returns the steps of
+ * each write, each list starting from the state the write starts in.
  */
+// Nothing compares this model with the library yet: the tests of the samples in
+// libs/synstate/samples/docs-site/tracing-an-update/ run the library alone.
 export const traceUpdates = (
   name: TraceScenarioName,
 ): readonly (readonly TraceStep[])[] => {
@@ -425,7 +427,7 @@ export const traceUpdates = (
 
     const operator = n.def.operator;
 
-    if (operator.kind === 'combine') {
+    if (operator.kind === 'derive') {
       const emitted = parents.filter((p) => p.updateToken === token);
 
       const tokens = parents
@@ -433,17 +435,31 @@ export const traceUpdates = (
         .join(', ');
 
       if (Arr.isEmpty(emitted)) {
-        skip(id, [call, 'cb1'], {
+        skip(id, [call, 'dv1', 'dv2'], {
           en: `${tokens}: no parent emitted in ${token}, so ${id} returns without setNext.`,
           ja: `${tokens}：${token} で発行した親がないので、${id} は setNext せずに戻ります。`,
         });
       } else {
-        const value = parents.map((p) => numberOf(p.snapshot));
+        const values = parents.map((p) => numberOf(p.snapshot));
 
-        setNext(id, value, [call, 'cb1', 'cb2'], {
-          en: `${tokens}: ${emitted.map((p) => p.def.id).join(' and ')} emitted in ${token}, so ${id} combines the latest value of every parent, emitted in ${token} or not: [${value.join(', ')}].`,
-          ja: `${tokens}：${emitted.map((p) => p.def.id).join('、')} が ${token} で発行しているので、${id} は（${token} で発行したかどうかにかかわらず）すべての親の最新値を組み合わせます：[${value.join(', ')}]。`,
-        });
+        const result = operator.apply(values);
+
+        const computed =
+          operator.formula === undefined
+            ? show(result)
+            : (`${operator.formula(values)} = ${show(result)}` as const);
+
+        const called = {
+          en: `${tokens}: ${emitted.map((p) => p.def.id).join(' and ')} emitted in ${token}, so ${id} calls its projection with the latest value of every parent, emitted in ${token} or not: ${computed}.`,
+          ja: `${tokens}：${emitted.map((p) => p.def.id).join('、')} が ${token} で発行しているので、${id} は（${token} で発行したかどうかにかかわらず）すべての親の最新値で射影関数を呼びます：${computed}。`,
+        } as const;
+
+        setNextUnlessHeld(
+          id,
+          result,
+          [call, 'dv1', 'dv2', 'dv3', 'dv4'],
+          called,
+        );
       }
     } else if (first !== undefined && operator.kind !== 'root') {
       const p = first.def.id;
@@ -474,10 +490,12 @@ export const traceUpdates = (
 
         const result = operator.apply(v);
 
-        setNext(id, result, [call, 'mp1', 'mp2'], {
+        const mapped = {
           en: `${p}.updateToken is ${token}, so ${p} emitted in this update: ${id} maps its value, ${operator.formula(v)} = ${result.toString()}.`,
           ja: `${p}.updateToken は ${token} なので、${p} はこの更新で発行しています。${id} はその値を変換します：${operator.formula(v)} = ${result.toString()}。`,
-        });
+        } as const;
+
+        setNextUnlessHeld(id, result, [call, 'mp1', 'mp2', 'mp3'], mapped);
       }
     }
 
@@ -492,6 +510,42 @@ export const traceUpdates = (
     mut_run.skipped.add(id);
 
     record({ code, activeNode: id, caption });
+  };
+
+  /**
+   * The end of `map`'s and `derive`'s `tryUpdate`: a result `Object.is` the
+   * value the node holds is not passed on.
+   */
+  const setNextUnlessHeld = (
+    id: string,
+    result: Value,
+    code: readonly CodeLineId[],
+    caption: LocalizedText,
+  ): void => {
+    const held = nodeOf(id).snapshot;
+
+    if (Object.is(result, held)) {
+      skip(id, code, {
+        en: `${caption.en} That is the value ${id} already holds, so it returns without setNext.`,
+        ja: `${caption.ja}これは ${id} が既に持っている値なので、setNext せずに戻ります。`,
+      });
+    } else if (typeof result !== 'number' && show(result) === show(held)) {
+      // The caption is about the library, where BDR's projection
+      // `(b, d, r) => [b, d, r]` builds a new array. The model's apply returns
+      // the values array, which is new on every call too, so Object.is fails
+      // here for the same reason. Comparing what show renders stands in for
+      // comparing the elements with Object.is, which differs only for -0, a
+      // value no scenario holds.
+      setNext(id, result, code, {
+        en: `${caption.en} The projection built a new array, so it is not Object.is the equal one ${id} holds, and setNext runs.`,
+        ja: `${caption.ja}射影関数は新しい配列を作ったので、${id} が持っている等しい配列と Object.is では等しくならず、setNext が走ります。`,
+      });
+    } else {
+      setNext(id, result, code, {
+        en: `${caption.en} That differs from ${show(held)}, which ${id} held.`,
+        ja: `${caption.ja}${id} が持っていた ${show(held)} とは異なります。`,
+      });
+    }
   };
 
   /** `UpdateQueue.drain`, with the end of each bucket told in the next step. */
@@ -930,21 +984,30 @@ export const traceCode = [
   ['cl2', '  this.#isOpen = false; this.#queuedDespiteMark = undefined;'],
   ['cl3', '}'],
   ['b4', ''],
-  ['h5', '// tryUpdate(token) of map, filter and combine'],
+  ['h5', '// tryUpdate(token) of map, filter and derive'],
   ['mp1', 'map:     if (parent.updateToken !== token) return;'],
-  ['mp2', '         this.setNext(mapFn(parent.value), token);'],
+  ['mp2', '         const next = mapFn(parent.value);'],
+  [
+    'mp3',
+    '         if (!this.equals(this.value, next)) this.setNext(next, token);',
+  ],
   ['fl1', 'filter:  if (parent.updateToken !== token) return;'],
   [
     'fl2',
     '         if (predicate(parent.value)) this.setNext(parent.value, token);',
   ],
   [
-    'cb1',
-    'combine: if (parents.every((parent) => parent.updateToken !== token)) return;',
+    'dv1',
+    'derive:  parents.forEach((parent, i) => { this.values[i] = parent.value; });',
   ],
   [
-    'cb2',
-    '         this.setNext(parents.map((parent) => parent.value), token);',
+    'dv2',
+    '         if (parents.every((parent) => parent.updateToken !== token)) return;',
+  ],
+  ['dv3', '         const next = project(...this.values);'],
+  [
+    'dv4',
+    '         if (!this.equals(this.value, next)) this.setNext(next, token);',
   ],
 ] as const satisfies readonly CodeLine[];
 
@@ -955,7 +1018,15 @@ type Value = number | readonly number[];
 type Operator = Readonly<
   | { kind: 'root' }
   | { kind: 'filter' }
-  | { kind: 'combine' }
+  | {
+      kind: 'derive';
+      apply: (values: readonly number[]) => Value;
+      /**
+       * The computation, as `10 + 0`; left out where the projection only
+       * collects the values, whose result says it all.
+       */
+      formula?: (values: readonly number[]) => string;
+    }
   | {
       kind: 'map';
       apply: (value: Value) => number;
@@ -997,8 +1068,8 @@ const timesFormula =
 
 const traceScenarios: ReadonlyRecord<TraceScenarioName, Scenario> = {
   /**
-   * The filter diamond of "How SynState Solved the Glitch", with `combine` and
-   * the `map` after it as the two nodes they are.
+   * The filter diamond of "How SynState Solved the Glitch", its `derive` one
+   * node.
    */
   filterDiamond: {
     nodes: [
@@ -1030,26 +1101,15 @@ const traceScenarios: ReadonlyRecord<TraceScenarioName, Scenario> = {
         initialValue: 0,
       },
       {
-        id: 'BD',
+        id: 'C',
         depth: 2,
         parents: ['B', 'D'],
-        op: 'combine([B, D])',
-        x: 260,
-        operator: { kind: 'combine' },
-        initialValue: [0, 0],
-      },
-      {
-        id: 'C',
-        depth: 3,
-        parents: ['BD'],
-        op: 'map(([b, d]) => b + d)',
+        op: 'derive([B, D], (b, d) => b + d)',
         x: 260,
         operator: {
-          kind: 'map',
-          apply: (value) =>
-            typeof value === 'number' ? value : Arr.sum(value),
-          formula: (value) =>
-            typeof value === 'number' ? value.toString() : value.join(' + '),
+          kind: 'derive',
+          apply: Arr.sum,
+          formula: (values) => values.join(' + '),
         },
         initialValue: 0,
       },
@@ -1120,9 +1180,12 @@ const traceScenarios: ReadonlyRecord<TraceScenarioName, Scenario> = {
         id: 'BDR',
         depth: 2,
         parents: ['B', 'D', 'R'],
-        op: 'combine([B, D, R])',
+        op: 'derive([B, D, R], (b, d, r) => [b, d, r])',
         x: 330,
-        operator: { kind: 'combine' },
+        operator: {
+          kind: 'derive',
+          apply: (values) => values,
+        },
         initialValue: [0, 0, 0],
         subscriber: { kind: 'log' },
       },

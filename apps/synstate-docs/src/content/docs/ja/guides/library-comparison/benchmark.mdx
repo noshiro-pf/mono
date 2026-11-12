@@ -871,7 +871,7 @@ export const runBenchmark = (n: number): number => {
 
 ## シナリオ： ディープチェーンスループット
 
-最初の2つのシナリオは固定サイズのグラフを使用しています。このシナリオは[スループットのインタラクティブデモ](/mono/synstate/ja/guides/library-comparison/interactive-demo/#スループット-負荷時の更新ごとのオーバーヘッド)と同じトポロジーを使用します： depth-$M$ の `scan` チェーンで、各ステージが前のステージに向かって lerp し、`combine` が**すべての $M+1$ 個の出力**を読み取ります。$K$ 回のソース更新を同期的に実行します（アニメーションフレームあたり $K$ 回の更新をシミュレート）。
+最初の2つのシナリオは固定サイズのグラフを使用しています。このシナリオは[スループットのインタラクティブデモ](/mono/synstate/ja/guides/library-comparison/interactive-demo/#スループット-負荷時の更新ごとのオーバーヘッド)と同じトポロジーを使用します： depth-$M$ の `scan` チェーンで、各ステージが前のステージに向かって lerp し、`derive`（RxJS では `combineLatest`）が**すべての $M+1$ 個の出力**を読み取ります。$K$ 回のソース更新を同期的に実行します（アニメーションフレームあたり $K$ 回の更新をシミュレート）。
 
 以下の図は $M = 3$ の場合のグラフ構造です。実際のベンチマークでは $M$ は $50$〜$200$ です：
 
@@ -895,7 +895,7 @@ export const runBenchmark = (n: number): number => {
 
 $M+1$ 回の `combineLatest` 発行のそれぞれが subscriber を呼び出し、subscriber は $M+1$ 個の値を処理します → **呼び出し1回あたり $O(M)$**。したがってソース1回の更新コストは $O(M) \times (M+1)$ = **$O(M^2)$** です。
 
-SynState の `combine` は、すべての親がその更新で確定してから訪れられるため、**ソース更新1回あたり subscriber 呼び出し1回、合計 $O(M)$** です。
+SynState の `derive` は、すべての親がその更新で確定してから訪れられるため、**ソース更新1回あたり subscriber 呼び出し1回、合計 $O(M)$** です。
 :::
 
 ### 結果

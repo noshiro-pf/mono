@@ -1,5 +1,5 @@
 import {
-  combine,
+  derive,
   filter,
   type InitializedObservable,
   map,
@@ -70,14 +70,9 @@ export const createDeleteAccountCreatedWithGoogleStore = <
     [dialogClosed$.pipe(map(() => ({ type: 'reset' }) as const))],
   );
 
-  const enterButtonDisabled$ = combine([
-    formState$,
-    deps.auth.fireAuthUser$,
-  ]).pipe(
-    map(
-      ([formState, fireAuthUser]) =>
-        formState.inputValue !== fireAuthUser?.email,
-    ),
+  const enterButtonDisabled$ = derive(
+    [formState$, deps.auth.fireAuthUser$],
+    (formState, fireAuthUser) => formState.inputValue !== fireAuthUser?.email,
   );
 
   const [isWaitingResponseState, dispatchIsWaitingResponse] =
@@ -99,25 +94,19 @@ export const createDeleteAccountCreatedWithGoogleStore = <
     map((st) => (st.error === undefined ? 'primary' : 'danger')),
   );
 
-  const state = combine([
-    formState$,
-    enterButtonDisabled$,
-    isWaitingResponseState,
-    emailFormIntent$,
-  ]).pipe(
-    map(
-      ([
-        formState,
-        enterButtonDisabled,
-        isWaitingResponse,
-        emailFormIntent,
-      ]) => ({
-        formState,
-        enterButtonDisabled,
-        isWaitingResponse,
-        emailFormIntent,
-      }),
-    ),
+  const state = derive(
+    [
+      formState$,
+      enterButtonDisabled$,
+      isWaitingResponseState,
+      emailFormIntent$,
+    ],
+    (formState, enterButtonDisabled, isWaitingResponse, emailFormIntent) => ({
+      formState,
+      enterButtonDisabled,
+      isWaitingResponse,
+      emailFormIntent,
+    }),
   );
 
   const submit = async (user: User): Promise<void> => {
