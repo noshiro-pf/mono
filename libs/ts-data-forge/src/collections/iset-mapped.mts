@@ -1286,15 +1286,10 @@ class ISetMappedClass<K, KM extends MapSetKeyType>
       return this;
     }
 
-    const keyMapped = this.#toKey(key);
-
-    return ISetMapped.create(
-      Array.from(this.#set)
-        .filter((k) => !Object.is(k, keyMapped))
-        .map(this.#fromKey),
-      this.#toKey,
-      this.#fromKey,
-    );
+    // Through the native collection, which compares keys with SameValueZero as
+    // `has` and `get` do; a rebuild comparing with `Object.is` left a `-0` key
+    // unmatched.
+    return this.withMutations([{ type: 'delete', key }]);
   }
 
   /** @inheritdoc */
