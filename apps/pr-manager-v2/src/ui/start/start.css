@@ -1,0 +1,41 @@
+@layer components {
+  .start-page {
+    max-width: 40rem;
+    margin: 0 auto;
+    padding: 48px 16px;
+  }
+
+  .start-lead {
+    color: var(--ink-2);
+  }
+
+  .repo-form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: end;
+  }
+
+  .repo-form-label {
+    display: flex;
+    flex: 1 1 18rem;
+    flex-direction: column;
+    gap: 4px;
+    font-weight: 600;
+  }
+
+  .repo-form input {
+    border: 1px solid var(--baseline);
+    border-radius: 6px;
+    background: var(--surface);
+    padding: 6px 8px;
+    font: inherit;
+    color: inherit;
+  }
+
+  .repo-form-error {
+    flex-basis: 100%;
+    margin: 0;
+    color: var(--critical);
+  }
+}

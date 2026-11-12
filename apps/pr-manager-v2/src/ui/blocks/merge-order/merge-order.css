@@ -1,0 +1,176 @@
+@layer components {
+  .on-github {
+    font-size: 0.85rem;
+  }
+
+  /* The counts and filters: a row of their own under the title. */
+  .filters {
+    display: flex;
+    flex-basis: 100%;
+    flex-wrap: wrap;
+    gap: 8px 16px;
+    align-items: center;
+  }
+
+  /* The tree: each level indented with a guide line. */
+  .tree {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .tree > li {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .tree-children {
+    margin-left: 10px;
+    border-left: 2px solid var(--hairline);
+    padding-left: 12px;
+  }
+
+  .repeated {
+    color: var(--ink-2);
+    font-size: 0.85rem;
+  }
+
+  .card {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    border: 1px solid var(--hairline);
+    border-radius: var(--radius);
+    background: var(--surface);
+    padding: 8px 12px;
+    min-width: 0;
+  }
+
+  .card-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 8px;
+    align-items: baseline;
+    font-size: 0.85rem;
+  }
+
+  .card-heading {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px 8px;
+    align-items: baseline;
+    overflow-wrap: anywhere;
+  }
+
+  .card-number {
+    color: var(--ink-3);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .card-title {
+    color: var(--ink-1);
+    font-weight: 600;
+  }
+
+  .split-view {
+    font-size: 0.8rem;
+    white-space: nowrap;
+  }
+
+  .card-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: 0.85rem;
+  }
+
+  /* A session's title, or its URL, cut with an ellipsis. */
+  .session {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .issue-state[data-state='open'] {
+    color: var(--good);
+  }
+
+  .issue-state[data-state='closed'] {
+    color: var(--merged);
+  }
+
+  .branch {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    overflow-wrap: anywhere;
+  }
+
+  .note {
+    color: var(--ink-2);
+  }
+
+  .divergence {
+    display: inline-flex;
+    gap: 4px;
+    align-items: center;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+  }
+
+  .divergence-bars {
+    display: inline-flex;
+    width: 96px;
+    height: 8px;
+    border-left: 0;
+  }
+
+  .divergence-side {
+    display: flex;
+    flex: 1;
+  }
+
+  .divergence-behind {
+    justify-content: flex-end;
+    border-right: 1px solid var(--ink-3);
+  }
+
+  .divergence-behind > span {
+    background: var(--behind);
+  }
+
+  .divergence-ahead > span {
+    background: var(--ahead);
+  }
+
+  .cycles {
+    margin-top: 16px;
+  }
+
+  .cycles h3 {
+    margin: 0 0 4px;
+    font-size: 0.95rem;
+  }
+
+  .cycle {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    border-left: 3px solid var(--serious);
+    padding-left: 10px;
+  }
+
+  .cycle + .cycle {
+    margin-top: 12px;
+  }
+
+  /* Only the title stays in view on a narrow screen. */
+  @media (width < 40rem) {
+    .block-title:has(.filters) {
+      position: static;
+    }
+  }
+}

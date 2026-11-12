@@ -26,6 +26,7 @@ export const appDevPorts = {
   'life-plan-simulator': 5197,
   'mahjong-calculator-app': 5192,
   'pr-manager': 5194,
+  'pr-manager-v2': 5203,
   profile: 5193,
   // Not a dev server: the pages its e2e shows in panes (`z:e2e-pages`).
   'split-view-extension': 5202,
