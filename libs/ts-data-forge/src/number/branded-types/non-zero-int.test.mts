@@ -212,3 +212,31 @@ describe('NonZeroInt test', () => {
     });
   });
 });
+
+describe('NonZeroInt.random over a span wider than Number.MAX_VALUE (#3961)', () => {
+  test('random() over the default range is not a constant', () => {
+    const xs = Array.from({ length: 20 }, () => NonZeroInt.random());
+
+    const distinct = new Set<number>(xs);
+
+    expect(distinct.size).toBeGreaterThan(1);
+
+    for (const x of xs) {
+      assert.isTrue(isNonZeroInt(x));
+    }
+  });
+
+  test('random(min, max) stays in a range wider than Number.MAX_VALUE', () => {
+    const xs = Array.from({ length: 20 }, () =>
+      NonZeroInt.random(asNonZeroInt(-1e308), asNonZeroInt(1e308)),
+    );
+
+    const distinct = new Set<number>(xs);
+
+    expect(distinct.size).toBeGreaterThan(1);
+
+    for (const x of xs) {
+      assert.isTrue(-1e308 <= x && x <= 1e308);
+    }
+  });
+});
