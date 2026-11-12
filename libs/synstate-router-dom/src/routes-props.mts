@@ -42,6 +42,12 @@ export type RoutesProps<
 > = Readonly<{
   /** Mounted when no case draws the location. Defaults to nothing. */
   notFound?: JSX.Element;
+  /**
+   * Mounted until the router is `ready`: while an asynchronous `redirect` for
+   * the URL the document was loaded at is awaited, no page is mounted. Defaults
+   * to nothing.
+   */
+  pending?: JSX.Element;
 }> &
   (
     | Readonly<{

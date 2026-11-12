@@ -1,4 +1,5 @@
 import {
+  combine,
   filter,
   map,
   withInitialValue,
@@ -45,7 +46,7 @@ export const createRoutes = <R extends AnyRoutes>(
       .pipe(map((some) => some.value))
       .pipe(withInitialValue(values));
 
-  return ({ prefix, under, cases, notFound }) =>
+  return ({ prefix, under, cases, notFound, pending }) =>
     mountable(() => {
       /**
        * The key in `cases` of the case that draws `m`: the top-level node's
@@ -78,30 +79,47 @@ export const createRoutes = <R extends AnyRoutes>(
           : undefined;
       };
 
-      const nodes = mountSwitch(router.match, keyOf, (key, current) => {
-        const draw: unknown =
-          key === undefined ? undefined : Reflect.get(cases, key);
+      // No page is mounted until the router is ready.
+      const shown = combine([router.ready, router.match]);
 
-        if (key === undefined || current.route === undefined || !isCase(draw)) {
-          return notFound;
-        }
+      const nodes = mountSwitch(
+        shown,
+        ([ready, m]) => (ready ? keyOf(m) : pendingKey),
+        (key, [, current]) => {
+          if (key === pendingKey) {
+            return pending;
+          }
 
-        // eslint-disable-next-line total-functions/no-unsafe-type-assertion -- `route` is not undefined, which a generic match does not narrow by
-        const page = current as PageMatch<R>;
+          const draw: unknown =
+            key === undefined ? undefined : Reflect.get(cases, key);
 
-        if (prefix !== true) {
-          return draw(pageValues$(key, page));
-        }
+          if (
+            key === undefined ||
+            current.route === undefined ||
+            !isCase(draw)
+          ) {
+            return notFound;
+          }
 
-        // The page is below its own top-level node, so this is some.
-        const node: unknown = Reflect.get(router.routes, key);
+          // eslint-disable-next-line total-functions/no-unsafe-type-assertion -- `route` is not undefined, which a generic match does not narrow by
+          const page = current as PageMatch<R>;
 
-        const values = isRouteNode(node) ? matchAt(node, page) : Optional.none;
+          if (prefix !== true) {
+            return draw(pageValues$(key, page));
+          }
 
-        return isRouteNode(node) && Optional.isSome(values)
-          ? draw(nodeValues$(node, values.value))
-          : notFound;
-      });
+          // The page is below its own top-level node, so this is some.
+          const node: unknown = Reflect.get(router.routes, key);
+
+          const values = isRouteNode(node)
+            ? matchAt(node, page)
+            : Optional.none;
+
+          return isRouteNode(node) && Optional.isSome(values)
+            ? draw(nodeValues$(node, values.value))
+            : notFound;
+        },
+      );
 
       // The new page is in the document once the update has finished: make the
       // navigation's scroll then, before the next paint. Each mounted `Routes`
@@ -116,6 +134,9 @@ export const createRoutes = <R extends AnyRoutes>(
       return nodes;
     });
 };
+
+/** The key of what is mounted before the router is ready. */
+const pendingKey: unique symbol = Symbol('synstate-router-dom/pending');
 
 /** A case of `Routes`, which the types gave the values it is called with. */
 const isCase = (value: unknown): value is (values$: unknown) => JSX.Element =>

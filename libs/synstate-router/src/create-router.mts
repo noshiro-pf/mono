@@ -1,4 +1,5 @@
 import {
+  combine,
   createScope,
   createState,
   keepEqualParts,
@@ -95,11 +96,22 @@ export type RouterOptions<R extends AnyRoutes> = Readonly<{
    * a `push`, `replace` or `setSearch` goes to, not the one the browser is at
    * yet. A redirect from a URL that matches no page can carry its query and
    * hash with it.
+   *
+   * It may answer asynchronously (a session to check): until the Promise
+   * settles, `match` keeps the page it shows and nothing is written to the
+   * history, `pending` is `true`, and on the first load `ready` is `false`, so
+   * that a binding's `Routes` draws no page for a URL that may redirect. A
+   * navigation made meanwhile wins: the stale answer is dropped and
+   * `context.signal` aborted. A rejected Promise is reported with
+   * `console.error` and read as no redirect.
    */
   redirect?: (
     match: RouteMatch<R>,
     location: RouterLocation,
-  ) => Href | undefined;
+    // An `AbortSignal` is the platform's, with listeners of its own.
+    // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types -- see above
+    context: RedirectContext,
+  ) => Href | PromiseLike<Href | undefined> | undefined;
 }>;
 
 /**
@@ -126,6 +138,19 @@ export type Router<R extends AnyRoutes> = Readonly<{
 
   /** The URL itself, for query parameters no route declares. */
   location: InitializedObservable<RouterLocation>;
+
+  /**
+   * Whether an asynchronous `redirect` is being awaited: `match` shows the page
+   * before it until it settles.
+   */
+  pending: InitializedObservable<boolean>;
+
+  /**
+   * Whether the first location has settled. `false` only while an asynchronous
+   * `redirect` for the URL the document was loaded at is awaited; a binding's
+   * `Routes` draws no page until then.
+   */
+  ready: InitializedObservable<boolean>;
 
   /**
    * The nodes from the top of the tree down to the page, with their `meta` and
@@ -311,15 +336,29 @@ export const createRouter = <R extends AnyRoutes>(
     )}${href.slice(pathEnd)}`;
   };
 
-  /** Where `start` leads: canonicalized, and redirected while asked. */
-  const resolve = (start: Readonly<URL>, redirects: number): Snapshot<R> => {
+  /**
+   * Where `start` leads: canonicalized, and redirected while asked. `found` is
+   * the URL's own page, before any redirect; `settled` is where the redirects
+   * end, a Promise once `redirect` answers asynchronously. Without `signal`,
+   * `redirect` is not asked: a blocker is asked about the destination asked
+   * for.
+   */
+  const resolve = (
+    start: Readonly<URL>,
+    redirects: number,
+    // An `AbortSignal` is the platform's, with listeners of its own.
+    // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types -- see above
+    signal: AbortSignal | undefined,
+  ): Resolution<R> => {
     const inside = stripBasePath(basePath, start.pathname);
 
     if (Optional.isNone(inside)) {
-      return snapshotOf(start, start.pathname, {
+      const outside = snapshotOf<R>(start, start.pathname, {
         route: undefined,
         pathname: start.pathname,
       });
+
+      return { found: outside, settled: outside };
     }
 
     const pathname = canonicalPathname(inside.value, trailingSlash);
@@ -338,29 +377,56 @@ export const createRouter = <R extends AnyRoutes>(
       matchRoutes(routes, { pathname, search: url.search }),
     );
 
+    if (redirect === undefined || signal === undefined) {
+      return { found, settled: found };
+    }
+
+    const afterAnswer = (to: Href | undefined): Settled<R> => {
+      if (to === undefined) {
+        return found;
+      }
+
+      const next = new URL(toUrl(to), url);
+
+      if (next.href === url.href) {
+        return found;
+      }
+
+      if (redirects >= maxRedirects) {
+        console.error(
+          `synstate-router: stopped after ${maxRedirects} redirects in a row, at ${url.href} (next: ${next.href})`,
+        );
+
+        return found;
+      }
+
+      return mapSettled(
+        resolve(next, redirects + 1, signal).settled,
+        (s) => ({ ...s, redirected: true }) as const,
+      );
+    };
+
     // The location handed over is the one the snapshot keeps, the same object
     // `router.location` passes on, read-only by its type.
-    const to = redirect?.(found.match, found.location);
+    const answer = redirect(found.match, found.location, { signal });
 
-    if (to === undefined) {
-      return found;
+    if (!isAnswerLater(answer)) {
+      return { found, settled: afterAnswer(answer) };
     }
 
-    const next = new URL(toUrl(to), url);
+    return {
+      found,
+      settled: Promise.resolve(answer)
+        .then(afterAnswer)
+        .catch((error: unknown) => {
+          console.error(
+            `synstate-router: redirect rejected at ${url.href}; the page is shown`,
+            error,
+          );
 
-    if (next.href === url.href) {
-      return found;
-    }
-
-    if (redirects >= maxRedirects) {
-      console.error(
-        `synstate-router: stopped after ${maxRedirects} redirects in a row, at ${url.href} (next: ${next.href})`,
-      );
-
-      return found;
-    }
-
-    return { ...resolve(next, redirects + 1), redirected: true } as const;
+          return found;
+        }),
+    };
   };
 
   /**
@@ -420,20 +486,19 @@ export const createRouter = <R extends AnyRoutes>(
   const mut_index = { current: 0 };
 
   /**
-   * The current URL, rewritten first when it is not where it leads. An entry
-   * the router has not written yet (the first one, or one a fragment navigation
-   * of the browser's own added) is given `indexForNew`.
+   * The snapshot of the entry the browser is at, `entry`, at `current`, where
+   * the redirects led to `resolved`: the URL is rewritten first when it is not
+   * where it leads, and an entry the router has not written yet (the first one,
+   * or one a fragment navigation of the browser's own added) is given its
+   * position.
    */
-  const read = (indexForNew: number): Snapshot<R> => {
-    const current = new URL(browser.location.href);
-
-    const entry = readEntry(browser.history.state);
-
-    const snapshot = withState(resolve(current, 0), entry.state);
-
-    const index = entry.index ?? indexForNew;
-
-    mut_index.current = index;
+  const applyRead = (
+    current: Readonly<URL>,
+    entry: HistoryEntry,
+    index: number,
+    resolved: Snapshot<R>,
+  ): Snapshot<R> => {
+    const snapshot = withState(resolved, entry.state);
 
     if (snapshot.location.href !== current.href || entry.index === undefined) {
       // Canonicalizing keeps the entry's state; a redirect drops it.
@@ -447,24 +512,151 @@ export const createRouter = <R extends AnyRoutes>(
     return snapshot;
   };
 
+  // Resolutions in flight: each new one supersedes the last, whose answer is
+  // dropped and whose signal is aborted.
+  const mut_pass: {
+    generation: number;
+    controller: AbortController | undefined;
+  } = { generation: 0, controller: undefined };
+
+  const beginPass = (): Readonly<{
+    generation: number;
+    signal: AbortSignal;
+  }> => {
+    mut_pass.controller?.abort();
+
+    const controller = new AbortController();
+
+    mut_pass.controller = controller;
+
+    mut_pass.generation += 1;
+
+    return { generation: mut_pass.generation, signal: controller.signal };
+  };
+
+  const startIndex = (): number => {
+    const entry = readEntry(browser.history.state);
+
+    return entry.index ?? 0;
+  };
+
+  mut_index.current = startIndex();
+
+  const initialUrl = new URL(browser.location.href);
+
+  const initialEntry = readEntry(browser.history.state);
+
+  const initialPass = beginPass();
+
+  const initial = resolve(initialUrl, 0, initialPass.signal);
+
+  const initialSettled = initial.settled;
+
   // Every observable of the router is made outside every scope: the router
   // outlives a component, a test or a `scope.run` that happened to create it,
   // and so does what `at` and `isActive` cache.
   const [snapshot$, setSnapshot, { getSnapshot }] = untracked(() =>
-    createState(read(0), {
-      // The entry's state is not in the URL: a replace to the same URL with
-      // another state is a change.
-      equals: (a, b) =>
-        a.location.href === b.location.href &&
-        valuesEqual(
-          Reflect.get(a.match, 'state'),
-          Reflect.get(b.match, 'state'),
-        ),
-    }),
+    createState(
+      isSettledLater(initialSettled)
+        ? // Shown by nobody: `ready` is false until it settles.
+          withState(initial.found, initialEntry.state)
+        : applyRead(
+            initialUrl,
+            initialEntry,
+            mut_index.current,
+            initialSettled,
+          ),
+      {
+        // The entry's state is not in the URL: a replace to the same URL with
+        // another state is a change.
+        equals: (a, b) =>
+          a.location.href === b.location.href &&
+          valuesEqual(
+            Reflect.get(a.match, 'state'),
+            Reflect.get(b.match, 'state'),
+          ),
+      },
+    ),
   );
 
+  const [pending$, setPending] = untracked(() =>
+    createState(isSettledLater(initialSettled)),
+  );
+
+  const [ready$, setReady] = untracked(() =>
+    createState(!isSettledLater(initialSettled)),
+  );
+
+  /**
+   * Runs `then` with where `settled` leads: at once, or once it settles unless
+   * a newer resolution has begun since.
+   */
+  const whenSettled = (
+    generation: number,
+    settled: Settled<R>,
+    then: (resolved: Snapshot<R>) => void,
+  ): void => {
+    if (!isSettledLater(settled)) {
+      mut_pass.controller = undefined;
+
+      setPending(false);
+
+      then(settled);
+
+      setReady(true);
+
+      return;
+    }
+
+    setPending(true);
+
+    settled
+      .then((resolved) => {
+        if (generation !== mut_pass.generation || mut_router.disposed) {
+          return;
+        }
+
+        mut_pass.controller = undefined;
+
+        setPending(false);
+
+        then(resolved);
+
+        setReady(true);
+      })
+      .catch((error: unknown) => {
+        console.error('synstate-router: a navigation failed', error);
+      });
+  };
+
+  if (isSettledLater(initialSettled)) {
+    const initialIndex = mut_index.current;
+
+    whenSettled(initialPass.generation, initialSettled, (resolved) => {
+      setSnapshot(applyRead(initialUrl, initialEntry, initialIndex, resolved));
+    });
+  }
+
+  /** Reads the entry the browser is at, after `popstate` or a fragment navigation. */
   const update = (): void => {
-    setSnapshot(read(mut_index.current + 1));
+    const current = new URL(browser.location.href);
+
+    const entry = readEntry(browser.history.state);
+
+    const index = entry.index ?? mut_index.current + 1;
+
+    // The browser is at this entry already, whatever the redirect answers.
+    mut_index.current = index;
+
+    const pass = beginPass();
+
+    whenSettled(
+      pass.generation,
+      resolve(current, 0, pass.signal).settled,
+      (resolved) => {
+        setSnapshot(applyRead(current, entry, index, resolved));
+      },
+    );
   };
 
   const match = untracked(() =>
@@ -504,10 +696,11 @@ export const createRouter = <R extends AnyRoutes>(
   const declaresTitle = definesTitle(routes[routeTreeKey].definition);
 
   const stopTitle = untracked(() =>
-    match.subscribe((m) => {
+    combine([ready$, match]).subscribe(([ready, m]) => {
       const { documentTitle } = browser;
 
-      if (documentTitle === undefined || !declaresTitle) {
+      // Not ready: the page may redirect, and its title is not shown either.
+      if (documentTitle === undefined || !declaresTitle || !ready) {
         return;
       }
 
@@ -727,10 +920,9 @@ export const createRouter = <R extends AnyRoutes>(
 
     const current = new URL(browser.location.href);
 
-    // Resolved here and again by the navigation: `redirect` is a function of
-    // the match and location it is given, so asking it twice changes nothing,
-    // and only a router with a blocker pays for it.
-    const to = resolve(new URL(toUrl(href), current), 0);
+    // The destination asked for: `redirect` is asked by the navigation, once
+    // the blockers have let it through.
+    const to = resolve(new URL(toUrl(href), current), 0, undefined).found;
 
     if (to.location.href === current.href) {
       return false;
@@ -768,7 +960,7 @@ export const createRouter = <R extends AnyRoutes>(
 
     if (delta !== 0 && !mut_block.letThrough && mut_blockers.size > 0) {
       const to = withState(
-        resolve(new URL(browser.location.href), 0),
+        resolve(new URL(browser.location.href), 0, undefined).found,
         readEntry(browser.history.state).state,
       );
 
@@ -885,11 +1077,31 @@ export const createRouter = <R extends AnyRoutes>(
       return;
     }
 
-    // Where the target leads after redirects. A push to where the location
-    // already is, before or after them, replaces the entry instead of adding
-    // one.
-    const resolved = resolve(target, 0);
+    const pass = beginPass();
 
+    whenSettled(
+      pass.generation,
+      resolve(target, 0, pass.signal).settled,
+      (resolved) => {
+        commit(resolved, before, current, target, replace, scrolls, entryState);
+      },
+    );
+  };
+
+  /**
+   * Writes the navigation to `target`, which the redirects led to `resolved`.
+   * A push to where the location already is, before or after them, replaces the
+   * entry instead of adding one.
+   */
+  const commit = (
+    resolved: Snapshot<R>,
+    before: RouterLocation,
+    current: Readonly<URL>,
+    target: Readonly<URL>,
+    replace: boolean,
+    scrolls: boolean,
+    entryState: EntryState,
+  ): void => {
     const raw =
       entryState.kind === 'value'
         ? encodeStateFor(resolved, entryState.value)
@@ -1146,6 +1358,8 @@ export const createRouter = <R extends AnyRoutes>(
     routes,
     match,
     location,
+    pending: pending$,
+    ready: ready$,
     get branch() {
       return branchOf();
     },
@@ -1177,6 +1391,10 @@ export const createRouter = <R extends AnyRoutes>(
 
       browser.removeEventListener('popstate', onPopstate);
 
+      mut_pass.controller?.abort();
+
+      mut_pass.controller = undefined;
+
       for (const blocker of mut_blockers) {
         blocker.setState(idle);
       }
@@ -1206,6 +1424,44 @@ type Snapshot<R extends AnyRoutes> = Readonly<{
 }>;
 
 type ScrollTarget = 'top' | Readonly<{ id: string }>;
+
+/** What `redirect` is given beside the match and the location. */
+export type RedirectContext = Readonly<{
+  /**
+   * Aborted when the answer is no longer wanted: a newer navigation began, or
+   * the router was disposed. A check that fetches can pass it on.
+   */
+  signal: AbortSignal;
+}>;
+
+type Settled<R extends AnyRoutes> = Snapshot<R> | Promise<Snapshot<R>>;
+
+type Resolution<R extends AnyRoutes> = Readonly<{
+  /** The URL's own page, before any redirect. */
+  found: Snapshot<R>;
+  /** Where the redirects end. */
+  settled: Settled<R>;
+}>;
+
+/** Whether the redirects end later; the router makes every such one a Promise. */
+const isSettledLater = <R extends AnyRoutes>(
+  settled: Settled<R>,
+): settled is Promise<Snapshot<R>> =>
+  // A snapshot has no `then`.
+  typeof Reflect.get(settled, 'then') === 'function';
+
+const mapSettled = <R extends AnyRoutes>(
+  settled: Settled<R>,
+  f: (s: Snapshot<R>) => Snapshot<R>,
+): Settled<R> => (isSettledLater(settled) ? settled.then(f) : f(settled));
+
+/** Whether `redirect` answered asynchronously. */
+const isAnswerLater = (
+  answer: Href | PromiseLike<Href | undefined> | undefined,
+): answer is PromiseLike<Href | undefined> =>
+  isNonNullObject(answer) && typeof Reflect.get(answer, 'then') === 'function';
+
+type HistoryEntry = Readonly<{ index: number | undefined; state: unknown }>;
 
 /** What a blocker is asked about. */
 export type NavigationAttempt<R extends AnyRoutes> = Readonly<{
@@ -1254,9 +1510,7 @@ const indexKey = 'synstateRouterIndex';
  * state. One the router did not write has no position, and its whole state is
  * the page's.
  */
-const readEntry = (
-  raw: unknown,
-): Readonly<{ index: number | undefined; state: unknown }> => {
+const readEntry = (raw: unknown): HistoryEntry => {
   if (isRecord(raw)) {
     const index: unknown = raw[indexKey];
 

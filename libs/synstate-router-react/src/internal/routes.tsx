@@ -26,8 +26,11 @@ export const createRoutes = <R extends AnyRoutes>(
     under,
     cases,
     notFound,
+    pending,
   }: RoutesProps<R, N>): React.JSX.Element => {
     const m = useObservableValue(router.match);
+
+    const ready = useObservableValue(router.ready);
 
     // The new page is in the document now: make the navigation's scroll.
     React.useLayoutEffect(() => {
@@ -39,7 +42,9 @@ export const createRoutes = <R extends AnyRoutes>(
       [m, prefix, under, cases],
     );
 
-    return selected === undefined ? (
+    return !ready ? (
+      <>{pending}</>
+    ) : selected === undefined ? (
       <>{notFound}</>
     ) : (
       <RoutesCase

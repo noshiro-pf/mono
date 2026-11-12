@@ -33,6 +33,12 @@ export type RoutesProps<
 > = Readonly<{
   /** Drawn when no case draws the location. Defaults to nothing. */
   notFound?: React.ReactNode;
+  /**
+   * Drawn until the router is `ready`: while an asynchronous `redirect` for the
+   * URL the document was loaded at is awaited, no page is drawn. Defaults to
+   * nothing.
+   */
+  pending?: React.ReactNode;
 }> &
   (
     | Readonly<{
