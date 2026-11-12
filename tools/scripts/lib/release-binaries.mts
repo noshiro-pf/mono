@@ -87,6 +87,30 @@ export const parseReleaseBinaryPins = (
     : Result.ok(pins.value);
 };
 
+/** The pins of `tools/configs/release-binaries.json`, read and checked. */
+export const readReleaseBinaryPins = async (): Promise<
+  Result<ReadonlyRecord<string, ReleaseBinaryPin>, string>
+> => {
+  const text = await Result.fromPromise(
+    // eslint-disable-next-line security/detect-non-literal-fs-filename -- a fixed path inside the repository.
+    fs.readFile(releaseBinaryPinsPath, 'utf8'),
+  );
+
+  if (Result.isErr(text)) {
+    return Result.err(
+      `❌ Could not read ${releaseBinaryPinsPath}: ${unknownToString(text.value)}`,
+    );
+  }
+
+  const json = Result.fromThrowable(() => JSON.parse(text.value) as unknown);
+
+  return Result.isErr(json)
+    ? Result.err(
+        `❌ ${releaseBinaryPinsPath} is not JSON: ${unknownToString(json.value)}`,
+      )
+    : parseReleaseBinaryPins(json.value);
+};
+
 /** `<process.platform>-<process.arch>`, the keys of a pin's `assets`. */
 export const platformKey = (platform: string, arch: string): string =>
   `${platform}-${arch}` as const;
@@ -114,7 +138,8 @@ export const installReleaseBinary = async (
  * stalled response is cut off after a minute, and a failure worth repeating —
  * no answer, a 5xx, a 429 — is tried twice more, a second and then three
  * seconds later; a 404 is not. It honours `HTTPS_PROXY` only under
- * `NODE_USE_ENV_PROXY=1`, which the `check:root:actionlint` script sets.
+ * `NODE_USE_ENV_PROXY=1`, which the `check:root:actionlint`,
+ * `check:root:shellcheck` and `check:root:test` scripts set.
  */
 export const downloadWithFetch = async (url: string): Promise<Uint8Array> => {
   const attempt = async (): Promise<
