@@ -86,7 +86,8 @@
     "synstate": "workspace:*",
     "ts-data-forge": "workspace:*",
     "ts-repo-utils": "workspace:*",
-    "typescript": "catalog:"
+    "typescript": "catalog:",
+    "vitest": "catalog:"
   },
   "peerDependencies": {
     "synstate": ">=9.0.0",
