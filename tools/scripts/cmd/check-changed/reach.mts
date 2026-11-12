@@ -315,17 +315,7 @@ export const CI_ONLY: readonly CiOnly[] = [
     directory: 'strict-lib/',
     scriptName: 'check:types',
     reason:
-      "Each harness type-checks its TypeScript minor over the lib its generators write, which are `strict-lib-gen.yml`'s; check-changed runs the tooling's `strict-lib:check:types`.",
-  },
-  {
-    directory: '.',
-    scriptName: 'strict-lib:gen:with-codemod-fixed',
-    reason: 'Rewrites thousands of files under `strict-lib/`.',
-  },
-  {
-    directory: '.',
-    scriptName: 'strict-lib:gen:version-diff',
-    reason: 'As `strict-lib:gen:with-codemod-fixed`.',
+      "Each harness type-checks its TypeScript minor over the lib its generators write. These checks are nine tenths of `ws:check:types`, and `strict-lib-gen.yml` runs them; check-changed runs the tooling's `strict-lib:check:types`, and the generators for a change that reaches them.",
   },
 ] as const;
 

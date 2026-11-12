@@ -28,17 +28,20 @@ by case. In order:
 
 1. **Format** the diff (`z:format-diff-from <base>`), so that a generator's
    own `fix:fmt` is not later blamed for formatting a hand-edited file.
-2. **Generators**: `gen` in every touched package, `gen:deps-graph` for a
-   manifest, the lockfile, its generator or its output, `gen:license-files` for
-   a manifest, the lockfile, a `LICENSE` or its generator, and
-   `gen:verify-npm-packages` for any change that is not prose alone, since its
-   committed `local/` copies are written from `smoke/`, the manifests and the
-   generator's own code (it also removes a gone package's project from
-   `published/`). **A generator that changes the tree fails the run**, naming
-   itself and the files; that is the dirty tree CI's `assert-repo-is-clean`
-   reports with no hint which generator wrote it. Only the run in which it
-   writes fails: a later run cannot tell its output, left uncommitted, from a
-   hand edit, so commit it before moving on.
+2. **Generators**: for the strict-lib converter or its output, first
+   `strict-lib:gen:with-codemod-fixed` and `strict-lib:gen:version-diff` (see
+   below), ahead of the other generators, some of which read what they write;
+   `gen` in every touched package,
+   `gen:deps-graph` for a manifest, the lockfile, its generator or its output,
+   `gen:license-files` for a manifest, the lockfile, a `LICENSE` or its
+   generator, and `gen:verify-npm-packages` for any change that is not prose
+   alone, since its committed `local/` copies are written from `smoke/`, the
+   manifests and the generator's own code (it also removes a gone package's
+   project from `published/`). **A generator that changes the tree fails the
+   run**, naming itself and the files; that is the dirty tree CI's
+   `assert-repo-is-clean` reports with no hint which generator wrote it. Only
+   the run in which it writes fails: a later run cannot tell its output, left
+   uncommitted, from a hand edit, so commit it before moving on.
    After the touched packages' own, `gen` runs in every member that declares (in
    any dependency field) a package whose code changed, since a generator can
    read what its package declares: the synstate docs measure synstate's bundle
@@ -85,11 +88,11 @@ by case. In order:
    guards in parallel for any change the code gate lets through, as CI runs
    them, and the root program's `check:root:types`, `lint` and `test` only for
    what the root `tsconfig.json` reads (`tools/`, the root configuration, any
-   `configs/`, `eslint.config*.mts` or `vite.config.mts`); `strict-lib:*` for
-   `strict-lib/`; `check:knip` for any change the code gate lets through, as CI
-   runs it, and `check:published-deps` for a manifest or for what it lints (a
-   published package's `src/`, an `eslint.config.mts`); `check:md` for prose;
-   `check:prose` always; cspell over the changed files, and
+   `configs/`, `eslint.config*.mts` or `vite.config.mts`); the `strict-lib:`
+   checks for `strict-lib/`; `check:knip` for any change the code gate lets
+   through, as CI runs it, and `check:published-deps` for a manifest or for what
+   it lints (a published package's `src/`, an `eslint.config.mts`); `check:md`
+   for prose; `check:prose` always; cspell over the changed files, and
    `check:cspell:changeset` for a changeset (the whole `check:cspell` instead
    when a `cspell.config.yaml` changed).
 5. **Format** again, for what the fixers wrote (`fix:fmt:full` instead when
@@ -163,12 +166,19 @@ the run says which `ws:*` commands to reach for.
 `verify:npm-packages` (pack, install and run the smoke checks) does not run
 either: a change to `verify-npm-packages/smoke/` is regenerated into its
 `local/` copies, not run.
-Under `strict-lib/` only the tooling's type check, lint and oxfmt run, and
+Under `strict-lib/` the tooling's type check, lint and oxfmt run, and
 `gen:verify-npm-packages`, which copies the published bundles' manifests (a
-manifest or `LICENSE` there runs the generators that read one, as anywhere); the
-strict-lib generators, which rewrite thousands of files, are
-`strict-lib-gen.yml`'s, and so are the harnesses' own type checks
-(`ws:check:types:strict-lib`, each TypeScript minor over its generated lib).
+manifest or `LICENSE` there runs the generators that read one, as anywhere). A
+diff that reaches the converter or its output — `strict-lib/scripts-common/`,
+`strict-lib/scripts/`, oxfmt's configuration there, or a harness
+`strict-lib/v<X.Y>/` — also runs the generators as `strict-lib-gen.yml` does,
+`strict-lib:gen:with-codemod-fixed` and then `strict-lib:gen:version-diff`
+(about two and a half minutes), and fails when they change the tree. It does not
+run a package's `gen` that reads what they write (the synstate-dom packages'
+reflected keys, from the strict `lib.dom`) unless the diff touches that package
+or changes the code of one it declares; CI's `ws:gen` finds that one stale. The
+harnesses' own type checks (`ws:check:types:strict-lib`, each TypeScript minor
+over its generated lib) are `strict-lib-gen.yml`'s.
 Browser tests, end-to-end tests, the Firestore rules tests (`check:test:rules`,
 which need Java; a diff touching a package's `firestore.rules`, `test/` or rules
 config prints a note naming the command, `rules-tests.mts`) and `ws:check:dist`

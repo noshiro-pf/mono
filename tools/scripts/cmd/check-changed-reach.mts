@@ -355,6 +355,7 @@ const ROOT_SAMPLES = [
   '.changeset/sample.md',
   'repo-settings/sample.json',
   'strict-lib/sample.mts',
+  'strict-lib/scripts-common/sample.mts',
 ] as const;
 
 if (isDirectlyExecuted(import.meta.url)) {

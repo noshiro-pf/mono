@@ -317,7 +317,7 @@ ESLint 設定は root の `eslint.config.mts` 1 つに集約し、per-package �
 
 ## 8. 検証
 
-strict-lib 専用の `check-all` は持たない（上流から来た `scripts/cmd/check-all.mts` は、存在しない root script を呼ぶまま何からも呼ばれていなかったので削除した）。生成は `.github/workflows/strict-lib-gen.yml` が全バージョン分やり直して作業ツリーが変わらないことを確かめ、生成 lib の型チェックは各ハーネスの `check:types` を `ws:check:types` が走らせる。cspell・markdownlint・lint・format はリポジトリ全体のチェック（root の `check-all` / `check-changed` と CI）が受け持つ。
+strict-lib 専用の `check-all` は持たない（上流から来た `scripts/cmd/check-all.mts` は、存在しない root script を呼ぶまま何からも呼ばれていなかったので削除した）。生成は `.github/workflows/strict-lib-gen.yml` が全バージョン分やり直して作業ツリーが変わらないことを確かめる。converter か出力（`scripts-common/`・`scripts/`・oxfmt の設定・各ハーネス）に触れる差分では `check-changed` も同じ 2 つのコマンド（`strict-lib:gen:with-codemod-fixed` と `strict-lib:gen:version-diff`）を走らせ、ツリーが変われば失敗する。生成 lib の型チェック（各ハーネスの `check:types`）は、`strict-lib-gen.yml` の別ジョブが `ws:check:types:strict-lib` で走らせる。cspell・markdownlint・lint・format はリポジトリ全体のチェック（root の `check-all` / `check-changed` と CI）が受け持つ。
 
 ## 9. CI / 公開
 
