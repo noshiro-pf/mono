@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url';
 // The space this check is allowed to resolve within, set by the runner.
 const spaceRoot = process.env['VERIFY_SPACE_ROOT'];
 
+/** @type {import('node:module').ResolveHook} */
 export const resolve = async (specifier, context, nextResolve) => {
   const result = await nextResolve(specifier, context);
 

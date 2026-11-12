@@ -5,6 +5,8 @@ import starlight from '@astrojs/starlight';
 import { defineConfig } from 'astro/config';
 import rehypeKatex from 'rehype-katex';
 import remarkMath from 'remark-math';
+// A moved file or a renamed export still fails when this config loads.
+// @ts-expect-error TS5097, the `.mts` extension, which Node.js needs here
 import { appDevPort } from '../../tools/configs/app-dev-ports.mts';
 import {
   preactComponentDirs,

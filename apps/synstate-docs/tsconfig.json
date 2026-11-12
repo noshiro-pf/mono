@@ -7,6 +7,7 @@
     "libReplacement": true
   },
   "include": [
+    "./astro.config.mjs",
     "./samples",
     "./src",
     "./test",
@@ -14,5 +15,7 @@
     "./configs",
     "./e2e"
   ],
+  // It imports `astro:content`, a module only Astro's own type generation
+  // declares, so `tsc` cannot resolve it.
   "exclude": ["./src/content.config.ts"]
 }

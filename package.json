@@ -104,6 +104,7 @@
     "check:root:ts-expression-wrappers": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-ts-expression-wrappers.mts",
     "check:root:tsconfig-lib-replacement": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-tsconfig-lib-replacement.mts",
     "check:root:tsconfig-paths": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-tsconfig-paths.mts",
+    "check:root:type-check-coverage": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-type-check-coverage.mts",
     "check:root:types": "node ./tools/scripts/cmd/assert-deps-built.mts && tsc -p ./tsconfig.json --noEmit",
     "check:root:workflow-event-name": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-workflow-event-name.mts",
     "check:root:workflow-timeouts": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-workflow-timeouts.mts",

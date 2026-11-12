@@ -1018,8 +1018,9 @@ const ROOT_PROGRAM_CHECKS: ReadonlySet<string> = new Set<string>([
 /**
  * Whether the root program reads a path: tools/, the root configuration, and
  * what the root `tsconfig.json` includes from anywhere (`configs/`,
- * `eslint.config*.mts`, `vite.config.mts`, `.markdownlint-cli2.mjs`). Taking in
- * too much costs a slower run; too little, a type error CI finds first.
+ * `eslint.config*.mts`, `vite.config.mts`, `.markdownlint-cli2.mjs`,
+ * `verify-npm-packages/isolate*.mjs`). Taking in too much costs a slower run;
+ * too little, a type error CI finds first.
  */
 const isRootProgramFile = (file: string): boolean => {
   const name = basename(file);
@@ -1027,6 +1028,7 @@ const isRootProgramFile = (file: string): boolean => {
   return (
     file.startsWith('tools/') ||
     file === '.markdownlint-cli2.mjs' ||
+    /^verify-npm-packages\/isolate[^/]*\.mjs$/u.test(file) ||
     (!file.includes('/') &&
       (name.endsWith('.json') || name.endsWith('.mts'))) ||
     name === 'vite.config.mts' ||
