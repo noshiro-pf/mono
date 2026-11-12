@@ -40,3 +40,8 @@ files needs the asset `name` templates in the pin file edited first.
 
 A finding that is wrong for its line is disabled on the command it names:
 `# shellcheck disable=SC<number> # why`.
+
+`check:root:shellcheck` (`../check-shellcheck.mts`) runs the same pinned
+shellcheck over the tracked `*.sh` and `*.bash` files, the scripts of every
+`package.json` and the commands of `.github/unblock-prs.json`, outside
+`experimental/` and `docs/`.

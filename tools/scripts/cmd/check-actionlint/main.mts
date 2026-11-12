@@ -10,10 +10,9 @@ import { plural } from '../../lib/plural.mjs';
 import {
   downloadWithFetch,
   installReleaseBinary,
-  parseReleaseBinaryPins,
   platformKey,
+  readReleaseBinaryPins,
   releaseBinaryCacheDir,
-  releaseBinaryPinsPath,
   type ReleaseBinaryPin,
 } from '../../lib/release-binaries.mjs';
 import { projectRootPath } from '../../project-root-path.mjs';
@@ -720,32 +719,9 @@ const readCompositeActions = async (): Promise<
     : Result.ok(texts.value);
 };
 
-const readPins = async (): Promise<
-  Result<ReadonlyRecord<string, ReleaseBinaryPin>, string>
-> => {
-  const text = await Result.fromPromise(
-    // eslint-disable-next-line security/detect-non-literal-fs-filename -- a fixed path inside the repository.
-    fs.readFile(releaseBinaryPinsPath, 'utf8'),
-  );
-
-  if (Result.isErr(text)) {
-    return Result.err(
-      `❌ Could not read ${releaseBinaryPinsPath}: ${unknownToString(text.value)}`,
-    );
-  }
-
-  const json = Result.fromThrowable(() => JSON.parse(text.value) as unknown);
-
-  return Result.isErr(json)
-    ? Result.err(
-        `❌ ${releaseBinaryPinsPath} is not JSON: ${unknownToString(json.value)}`,
-      )
-    : parseReleaseBinaryPins(json.value);
-};
-
 if (isDirectlyExecuted(import.meta.url)) {
   const [pins, compositeActions, copy] = await Promise.all([
-    readPins(),
+    readReleaseBinaryPins(),
     readCompositeActions(),
     copyGithubDirAsLocalForm(),
   ]);

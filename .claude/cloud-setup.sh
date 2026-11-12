@@ -73,6 +73,8 @@ fi
 # trusts the proxy's CA, and Node 26 exits 9 when `NODE_USE_SYSTEM_CA` is set
 # beside it.
 echo "export PATH=\"${node_dir}/bin:\$PATH\"" > "$env_file"
+# Nothing to follow: the file is the one line written just above.
+# shellcheck source=/dev/null
 . "$env_file"
 
 # Assigned first: `set -e` ignores a substitution that fails inside an
