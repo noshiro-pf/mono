@@ -78,7 +78,8 @@
   cursor: not-allowed;
 }
 
-.root input:focus ~ span {
+/* Keyboard focus only, as `blueprint-synstate/focus-visible.css` does for Blueprint's. */
+.root input:focus-visible ~ span {
   outline: rgba(45, 114, 210, 0.6) solid 2px;
   outline-offset: 2px;
   -moz-outline-radius: 6px;

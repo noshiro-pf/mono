@@ -6,6 +6,18 @@
   display: flex;
   align-items: center;
   flex-wrap: wrap;
+
+  /*
+   * Its items fill its 30px height from the top of the page, so Blueprint's
+   * ring, drawn 2px outside, loses its top edge; and its dark blue hides on
+   * this background. Drawn inside, in white, which shows on the bar and on the
+   * blue create button alike; Blueprint's `bp6-dark` blue is under 2:1 on that
+   * button, and `bp6-dark` on the bar would restyle its buttons too.
+   */
+  & :focus-visible {
+    outline-color: #fff;
+    outline-offset: -2px;
+  }
 }
 
 .row {
