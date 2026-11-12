@@ -4,18 +4,20 @@ import {
   type TSESTree,
 } from '@typescript-eslint/utils';
 import {
+  composedOf,
   getArgumentText,
   getImportDeclarations,
   getImportedLocalName,
+  matchEmptinessComparison,
   skipTypeWrappers,
 } from 'eslint-rule-forge';
 import type { MutableRecord, ReadonlyRecord } from 'ts-type-forge';
 import { TS_DATA_FORGE_MODULE } from './constants.mjs';
+import { preferArrEmptinessGuard } from './prefer-arr-emptiness-guard.mjs';
 import { preferArrIsBoundedLengthArray } from './prefer-arr-is-bounded-length-array.mjs';
 import { preferArrIsFixedLengthArray } from './prefer-arr-is-fixed-length-array.mjs';
 import { preferArrIsMaxLengthArray } from './prefer-arr-is-max-length-array.mjs';
 import { preferArrIsMinLengthArray } from './prefer-arr-is-min-length-array.mjs';
-import { preferArrIsNonEmpty } from './prefer-arr-is-non-empty.mjs';
 
 type Options = readonly [];
 
@@ -24,6 +26,7 @@ type MessageIds =
   | 'useIsBoundedLengthArray'
   | 'useIsFixedLengthArray'
   | 'useIsMaxLengthArray'
+  | 'useIsEmpty'
   | 'useIsMinLengthArray'
   | 'useIsNonEmpty';
 
@@ -34,10 +37,14 @@ type MessageIds =
  * merges their visitors, so every case they already cover (type-aware array
  * checks, `Arr` import insertion, the `&&`-bounded-range special case) keeps
  * behaving exactly as before, and their co-located tests keep exercising them
- * directly.
+ * directly. The emptiness checks are `preferArrEmptinessGuard`'s, the factory
+ * ts-std-forge's `prefer-safe-array-length-guard` is built with too: here the
+ * other rules leave them to it ({@link leavingEmptinessChecks}), and
+ * `composedOf` records it, so that a test of ts-std-forge's plugin can check
+ * the two share it.
  */
 const COMPARISON_RULES = [
-  preferArrIsNonEmpty,
+  preferArrEmptinessGuard,
   preferArrIsMinLengthArray,
   preferArrIsMaxLengthArray,
   preferArrIsBoundedLengthArray,
@@ -47,7 +54,8 @@ const COMPARISON_RULES = [
 const MESSAGES = {
   useCanonicalGuard:
     'Replace `{{arrName}}.{{guard}}({{boundsText}})` with `{{arrName}}.{{replacement}}(...)`: the bound makes the two guards equivalent.',
-  useIsNonEmpty: preferArrIsNonEmpty.meta.messages.useIsNonEmpty,
+  useIsEmpty: preferArrEmptinessGuard.meta.messages.useIsEmpty,
+  useIsNonEmpty: preferArrEmptinessGuard.meta.messages.useIsNonEmpty,
   useIsMinLengthArray:
     preferArrIsMinLengthArray.meta.messages.useIsMinLengthArray,
   useIsMaxLengthArray:
@@ -106,7 +114,7 @@ const GUARD_REWRITES = [
 export const preferCanonicalLengthGuard: TSESLint.RuleModule<
   MessageIds,
   Options
-> = {
+> = composedOf(COMPARISON_RULES, {
   meta: {
     type: 'suggestion',
     docs: {
@@ -128,7 +136,9 @@ export const preferCanonicalLengthGuard: TSESLint.RuleModule<
     );
 
     const comparisonVisitors = COMPARISON_RULES.map((rule) =>
-      rule.create(context),
+      rule === preferArrEmptinessGuard
+        ? rule.create(context)
+        : leavingEmptinessChecks(rule.create(context)),
     );
 
     if (arrLocalName === undefined) {
@@ -181,7 +191,32 @@ export const preferCanonicalLengthGuard: TSESLint.RuleModule<
       },
     ]);
   },
-} as const;
+});
+
+/**
+ * `visitor` with its `BinaryExpression` handler passing over the comparisons
+ * `preferArrEmptinessGuard` rewrites, so that `xs.length >= 1` is reported
+ * once, as `Arr.isNonEmpty(xs)`, rather than also as
+ * `Arr.isMinLengthArray(1, xs)`. Applied here rather than in each rule, so that
+ * a length rule added to `COMPARISON_RULES` leaves them too.
+ */
+const leavingEmptinessChecks = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  visitor: TSESLint.RuleListener,
+): TSESLint.RuleListener => {
+  const handler = visitor.BinaryExpression;
+
+  return handler === undefined
+    ? visitor
+    : {
+        ...visitor,
+        BinaryExpression: (node) => {
+          if (matchEmptinessComparison(node) === undefined) {
+            handler(node);
+          }
+        },
+      };
+};
 
 /**
  * Combines several rule listeners into one, calling every handler registered

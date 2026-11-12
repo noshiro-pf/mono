@@ -61,7 +61,7 @@ namespace PreferSafeArrayIsArray {
 }
 
 /**
- * @description Replace an emptiness check on an array (`xs.length === 0`, `xs.length > 0`, `xs.length >= 1`, `xs.length !== 0`) with `SafeArray.isEmpty(xs)` / `SafeArray.isNonEmpty(xs)` from ts-std-forge.
+ * @description Replace an emptiness check on an array (`xs.length === 0`, `xs.length <= 0`, `xs.length < 1`; `xs.length !== 0`, `xs.length > 0`, `xs.length >= 1`) with `SafeArray.isEmpty(xs)` / `SafeArray.isNonEmpty(xs)` from ts-std-forge.
  *
  *  ```md
  *  | key        | value      |
@@ -113,6 +113,23 @@ namespace PreferSafeNumberParseInteger {
   export type RuleEntry = Linter.StringSeverity;
 }
 
+/**
+ * @description Remove a side-effect-only `import 'ts-std-forge';`, which binds no name and, the package being `sideEffects: false`, does nothing.
+ *
+ *  ```md
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  | fixable    | code       |
+ *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
+ */
+namespace NoSideEffectImport {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
 export type EslintTsStdForgeRules = Readonly<{
   'ts-std-forge/prefer-is-non-null-object': PreferIsNonNullObject.RuleEntry;
   'ts-std-forge/prefer-is-record-and-has-key': PreferIsRecordAndHasKey.RuleEntry;
@@ -120,6 +137,7 @@ export type EslintTsStdForgeRules = Readonly<{
   'ts-std-forge/prefer-safe-array-length-guard': PreferSafeArrayLengthGuard.RuleEntry;
   'ts-std-forge/prefer-safe-number-parse': PreferSafeNumberParse.RuleEntry;
   'ts-std-forge/prefer-safe-number-parse-integer': PreferSafeNumberParseInteger.RuleEntry;
+  'ts-std-forge/no-side-effect-import': NoSideEffectImport.RuleEntry;
 }>;
 
 export type EslintTsStdForgeRulesOption = ReadonlyRecord<never, never>;

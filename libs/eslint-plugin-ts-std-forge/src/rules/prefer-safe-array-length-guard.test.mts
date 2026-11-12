@@ -53,6 +53,32 @@ describe('prefer-safe-array-length-guard', () => {
     ],
     invalid: [
       {
+        name: 'xs.length <= 0 becomes isEmpty',
+        code: dedent`
+          declare const xs: readonly number[];
+          const ok = xs.length <= 0;
+        `,
+        output: dedent`
+          import { SafeArray } from 'ts-std-forge';
+          declare const xs: readonly number[];
+          const ok = SafeArray.isEmpty(xs);
+        `,
+        errors: [{ messageId: 'useIsEmpty' }],
+      },
+      {
+        name: 'xs.length < 1 becomes isEmpty',
+        code: dedent`
+          declare const xs: readonly number[];
+          const ok = xs.length < 1;
+        `,
+        output: dedent`
+          import { SafeArray } from 'ts-std-forge';
+          declare const xs: readonly number[];
+          const ok = SafeArray.isEmpty(xs);
+        `,
+        errors: [{ messageId: 'useIsEmpty' }],
+      },
+      {
         name: 'xs.length === 0 becomes isEmpty',
         code: dedent`
           declare const xs: readonly number[];
@@ -96,7 +122,7 @@ describe('prefer-safe-array-length-guard', () => {
             data: {
               original: 'xs.length === 0',
               arrayName: 'xs',
-              safeArray: 'tsf.SafeArray',
+              namespace: 'tsf.SafeArray',
             },
           },
         ],
@@ -360,7 +386,7 @@ describe('prefer-safe-array-length-guard and the import it adds', () => {
             data: {
               original: 'xs.length > 0',
               arrayName: 'xs',
-              safeArray: 'SA',
+              namespace: 'SA',
             },
           },
         ],
@@ -389,7 +415,7 @@ describe('prefer-safe-array-length-guard and the import it adds', () => {
             data: {
               original: 'xs.length > 0',
               arrayName: 'xs',
-              safeArray: 'SafeArray',
+              namespace: 'SafeArray',
             },
           },
         ],
@@ -408,7 +434,7 @@ describe('prefer-safe-array-length-guard and the import it adds', () => {
             data: {
               original: 'xs.length > 0',
               arrayName: 'xs',
-              safeArray: 'SafeArray',
+              namespace: 'SafeArray',
             },
           },
         ],

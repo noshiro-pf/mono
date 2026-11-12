@@ -65,6 +65,7 @@
     "@typescript-eslint/rule-tester": "catalog:",
     "dedent": "catalog:",
     "eslint-config-typed": "workspace:*",
+    "eslint-plugin-ts-data-forge": "workspace:*",
     "eslint-plugin-ts-fortress": "workspace:*",
     "eslint-plugin-ts-type-forge": "workspace:*",
     "prettier": "catalog:",
