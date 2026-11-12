@@ -271,7 +271,9 @@ export function countBy<
 >(
   array: Ar,
   grouper: (value: Ar[number], index: ArrayIndex<Ar>) => G,
-): IMap<G, ArrayIndex<Ar>>;
+  // A count ranges over `0 … N`, one past the last index: the index type of the
+  // tuple extended by one element. For a plain array this is `SizeType.Arr`.
+): IMap<G, ArrayIndex<readonly [...Ar, 0]>>;
 
 export function countBy<E, G extends MapSetKeyType>(
   grouper: (value: E, index: SizeType.Arr) => G,

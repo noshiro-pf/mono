@@ -320,12 +320,20 @@ describe('Arr reducing value', () => {
 
     const result = countBy(xs, (a) => a.x);
 
-    expectType<typeof result, IMap<1 | 2 | 3, 0 | 1 | 2 | 3 | 4 | 5>>('=');
+    expectType<typeof result, IMap<1 | 2 | 3, 0 | 1 | 2 | 3 | 4 | 5 | 6>>('=');
+
+    test('the count of a tuple can be its length (#3965)', () => {
+      const counts = countBy(['a', 'a', 'a'] as const, (x) => x);
+
+      expectType<typeof counts, IMap<'a', 0 | 1 | 2 | 3>>('=');
+
+      assert.deepStrictEqual(counts.get('a'), Optional.some(3));
+    });
 
     test('case 1', () => {
       assert.deepStrictEqual(
         result,
-        IMap.create<1 | 2 | 3, 0 | 1 | 2 | 3 | 4 | 5>([
+        IMap.create<1 | 2 | 3, 0 | 1 | 2 | 3 | 4 | 5 | 6>([
           [1, 3],
           [2, 2],
           [3, 1],
