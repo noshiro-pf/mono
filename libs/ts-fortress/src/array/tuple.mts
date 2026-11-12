@@ -1,5 +1,11 @@
 import { Arr, memoizeFunction, Result } from 'ts-data-forge';
-import type { Type, TypeOf, UnknownType } from '../type.mjs';
+import {
+  asType,
+  structureOf,
+  type Type,
+  type TypeOf,
+  type UnknownType,
+} from '../type.mjs';
 import {
   createAssertFn,
   createCastFn,
@@ -30,8 +36,8 @@ export const tuple = <const A extends readonly UnknownType[]>(
   const typeName = options?.typeName ?? 'tuple';
 
   const getDefaultValue = memoizeFunction(
-    // `types` is bound by `UnknownType` (payload `any`), so element accessors are
-    // typed `any` inside this generic body; the outer signature keeps it precise.
+    // `types` is bound by `UnknownType`, so an element's `defaultValue` is
+    // `unknown` inside this generic body; the outer signature keeps it precise.
 
     (): MapTuple<A> => Arr.map(types, (t) => t.defaultValue),
   );
@@ -88,7 +94,7 @@ export const tuple = <const A extends readonly UnknownType[]>(
         // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
         (types.map((t, i) => t.fill(a[i])) as MapTuple<A>);
 
-  const prune = (a: T): T => Arr.map(types, (t, i) => t.prune(a[i]));
+  const prune = (a: T): T => Arr.map(types, (t, i) => asType(t).prune(a[i]));
 
   return {
     typeName,
@@ -101,6 +107,6 @@ export const tuple = <const A extends readonly UnknownType[]>(
     is: createIsFn(validate),
     assertIs: createAssertFn(validate),
     cast: createCastFn(validate),
-    structure: { kind: 'tuple', elementTypes: types },
+    structure: structureOf({ kind: 'tuple', elementTypes: types }),
   } satisfies Type<T> as Type<T>;
 };

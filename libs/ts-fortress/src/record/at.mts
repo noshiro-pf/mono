@@ -11,10 +11,11 @@ import { undefinedType } from '../primitives/index.mjs';
 import {
   expandShapeStructure,
   recordViewOf,
+  type ShapeByBound,
   tupleElementTypesOf,
   type Type,
   type TypeOf,
-  type UnknownShape,
+  type UnknownType,
   type WithShape,
 } from '../type.mjs';
 import { isOptionalProperty } from './optional.mjs';
@@ -48,10 +49,16 @@ import { isOptionalProperty } from './optional.mjs';
  * ```
  */
 export function at<
-  const S extends UnknownShape,
+  const S extends ShapeByBound,
   const K extends keyof S & string,
 >(
-  recordType: Type<UnknownRecord> & WithShape<S>,
+  recordType: UnknownType &
+    WithShape<S> &
+    Readonly<
+      // Limits this overload to codecs of a record: the bound types
+      // `defaultValue` as `unknown`, a codec types it as its value type.
+      { defaultValue: UnknownRecord }
+    >,
   key: K,
 ): ShapeMemberType<S, K>;
 
@@ -111,7 +118,12 @@ export function at<
 >(tupleType: Type<T>, index: N): Type<T[N]>;
 
 export function at(
-  type: Type<UnknownRecord> | Type<readonly unknown[]>,
+  // Every overload's first parameter has to be assignable to this one. The
+  // first overload's is built on the bound, so that it takes a codec
+  // declaration emit wrote out structurally. `Type<unknown>` does not accept
+  // the bound, because its `prune` takes `never`. So this parameter is the
+  // bound too.
+  type: UnknownType,
   keyOrIndex: string | number,
 ): Type<unknown> {
   // --- Tuple index access ---
@@ -194,7 +206,7 @@ export function at(
  * @internal The `Type` `at` returns, computed from the arguments, which a
  * consumer gets from the call.
  */
-type ShapeMemberType<S extends UnknownShape, K extends keyof S> =
+type ShapeMemberType<S extends ShapeByBound, K extends keyof S> =
   S[K] extends Readonly<{ optional: true }>
     ? Type<TypeOf<S[K]> | undefined> & ConstraintsCarrierOf<S[K]>
     : S[K];

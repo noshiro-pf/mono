@@ -32,15 +32,27 @@ const nativeTsc = path.resolve(
 const checkDist = async (): Promise<void> => {
   await ensureDistTestPackageLink();
 
-  await runTsc(
-    path.resolve(workspaceRootPath, './test/dist_/named/tsconfig.json'),
-    'named imports',
-  );
+  // Two programs that share nothing, so they run side by side. Each reports its
+  // own failure and the process exits only once both have finished, so that one
+  // failing neither cuts the other's diagnostics short nor leaves its compiler
+  // running.
+  const passed = await Promise.all([
+    runTsc(
+      path.resolve(workspaceRootPath, './test/dist_/named/tsconfig.json'),
+      'named imports',
+    ),
+    checkDeclarationEmit(),
+  ]);
+
+  if (passed.some((ok) => !ok)) {
+    process.exit(1);
+  }
 
   console.info('✅ dist output checks passed.\n');
 };
 
-const runTsc = async (project: string, label: string): Promise<void> => {
+/** Whether the program type-checks; a failure is reported here. */
+const runTsc = async (project: string, label: string): Promise<boolean> => {
   console.info(`Type-checking the dist output (${label})...`);
 
   const result = await $(`node "${nativeTsc}" -p "${project}"`);
@@ -50,10 +62,52 @@ const runTsc = async (project: string, label: string): Promise<void> => {
       `dist output type check (${label}) failed: ${result.value.message}`,
     );
 
-    process.exit(1);
+    return false;
   }
 
   console.info(`✓ dist output type check (${label}) passed.\n`);
+
+  return true;
+};
+
+/**
+ * Emits the declarations of a module that declares codecs the way a consumer
+ * does, and type-checks what was emitted: an inferred codec type is written out
+ * structurally by declaration emit, and only a compilation of the emitted file
+ * asks the package's bounds to accept that form.
+ */
+const checkDeclarationEmit = async (): Promise<boolean> => {
+  // Emitted afresh, so that a module removed from the directory does not leave
+  // its declarations behind to be checked.
+  await fs.rm(
+    path.resolve(
+      workspaceRootPath,
+      './test/dist_/node_modules/.declaration-emit',
+    ),
+    { recursive: true, force: true },
+  );
+
+  const emitted = await runTsc(
+    path.resolve(
+      workspaceRootPath,
+      './test/dist_/declaration-emit/tsconfig.json',
+    ),
+    'declaration emit of a consumer module',
+  );
+
+  // The module failing its own check is the failure to report; what tsc emitted
+  // for it anyway is not checked on top of that.
+  if (!emitted) {
+    return false;
+  }
+
+  return runTsc(
+    path.resolve(
+      workspaceRootPath,
+      './test/dist_/declaration-emit/tsconfig.emitted.json',
+    ),
+    'the emitted declarations',
+  );
 };
 
 /**

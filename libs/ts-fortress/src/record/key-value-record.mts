@@ -1,6 +1,12 @@
 import { Arr, isRecord, Obj, Optional, Result } from 'ts-data-forge';
 import type { ReadonlyRecord } from 'ts-type-forge';
-import type { Type, TypeOf, UnknownType } from '../type.mjs';
+import {
+  asType,
+  structureOf,
+  type Type,
+  type TypeOf,
+  type UnknownType,
+} from '../type.mjs';
 import {
   createAssertFn,
   createCastFn,
@@ -110,7 +116,7 @@ export const keyValueRecord = <K extends Type<string>, V extends UnknownType>(
   const prune = (a: T): T =>
     // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
     Obj.filterMap(a, (v, k) =>
-      keyType.is(k) ? Optional.some(valueType.prune(v)) : Optional.none,
+      keyType.is(k) ? Optional.some(asType(valueType).prune(v)) : Optional.none,
     ) as T;
 
   return {
@@ -122,6 +128,6 @@ export const keyValueRecord = <K extends Type<string>, V extends UnknownType>(
     is: createIsFn(validate),
     assertIs: createAssertFn(validate),
     cast: createCastFn(validate),
-    structure: { kind: 'keyValueRecord', keyType, valueType },
+    structure: structureOf({ kind: 'keyValueRecord', keyType, valueType }),
   };
 };

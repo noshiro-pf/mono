@@ -1,6 +1,12 @@
 import { isSet } from '@sindresorhus/is';
 import { Arr, memoizeFunction, Result } from 'ts-data-forge';
-import type { Type, TypeOf, UnknownType } from '../type.mjs';
+import {
+  asType,
+  structureOf,
+  type Type,
+  type TypeOf,
+  type UnknownType,
+} from '../type.mjs';
 import {
   createAssertFn,
   createCastFn,
@@ -73,7 +79,7 @@ export const SetType = <T extends UnknownType>(
       : new Set(Array.from(a).filter((v) => elementType.is(v)));
 
   const prune = (a: S): S =>
-    new Set(Array.from(a, (e) => elementType.prune(e)));
+    new Set(Array.from(a, (e) => asType(elementType).prune(e)));
 
   return {
     typeName,
@@ -86,6 +92,6 @@ export const SetType = <T extends UnknownType>(
     is: createIsFn(validate),
     assertIs: createAssertFn(validate),
     cast: createCastFn(validate),
-    structure: { kind: 'set', elementType },
+    structure: structureOf({ kind: 'set', elementType }),
   };
 };

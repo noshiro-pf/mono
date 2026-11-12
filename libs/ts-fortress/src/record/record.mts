@@ -15,12 +15,14 @@ import type {
   TypeEq,
   UnknownRecord,
 } from 'ts-type-forge';
-import type {
-  ExcessPropertyOption,
-  Type,
-  TypeOf,
-  UnknownShape,
-  WithShape,
+import {
+  asType,
+  structureOf,
+  type ExcessPropertyOption,
+  type ShapeByBound,
+  type Type,
+  type TypeOf,
+  type WithShape,
 } from '../type.mjs';
 import {
   createAssertFn,
@@ -32,7 +34,7 @@ import {
 } from '../utils/index.mjs';
 
 export const record = <
-  const S extends UnknownShape,
+  const S extends ShapeByBound,
   const EP extends ExcessPropertyOption = 'allow',
 >(
   shape: S,
@@ -202,7 +204,7 @@ export const record = <
         }
       }
 
-      return Optional.some(v.prune(rec[k]));
+      return Optional.some(asType(v).prune(rec[k]));
     }) as V;
   };
 
@@ -218,7 +220,7 @@ export const record = <
     assertIs: createAssertFn(validate),
     cast: createCastFn(validate),
     shape,
-    structure: { kind: 'record', shape, excessProperty: ep },
+    structure: structureOf({ kind: 'record', shape, excessProperty: ep }),
   } satisfies Type<V> & WithShape<S> as Type<V> & WithShape<S>;
 };
 
@@ -226,7 +228,7 @@ export const record = <
  * Creates a strict record type that rejects excess properties.
  * This is an alias for `record(shape, { excessProperty: 'reject' })`.
  */
-export const strictRecord = <const S extends UnknownShape>(
+export const strictRecord = <const S extends ShapeByBound>(
   shape: S,
   options?: Partial<Readonly<{ typeName: string }>>,
 ): Type<RecordTypeFromShape<S>> & WithShape<S> =>
@@ -244,15 +246,15 @@ export const strictRecord = <const S extends UnknownShape>(
  * computed from the shape; a consumer reads it with
  * `TypeOf<ReturnType<typeof record<…>>>`.
  */
-type RecordTypeFromShape<S extends UnknownShape> =
+type RecordTypeFromShape<S extends ShapeByBound> =
   TsFortressInternal.RecordTypeFromShapeImpl<S>;
 
 namespace TsFortressInternal {
-  export type RecordTypeFromShapeImpl<S extends UnknownShape> =
+  export type RecordTypeFromShapeImpl<S extends ShapeByBound> =
     RecordTypeFromShapeImplSub<S, OptionalTypeKeys<S>>;
 
   type RecordTypeFromShapeImplSub<
-    S extends UnknownShape,
+    S extends ShapeByBound,
     OptionalKeys extends keyof S,
   > =
     TypeEq<OptionalKeys, never> extends true
@@ -271,7 +273,7 @@ namespace TsFortressInternal {
             >
           >;
 
-  type OptionalTypeKeys<S extends UnknownShape> = {
+  type OptionalTypeKeys<S extends ShapeByBound> = {
     [K in keyof S]: S[K] extends Readonly<{ optional: true }> ? K : never;
   }[keyof S];
 }

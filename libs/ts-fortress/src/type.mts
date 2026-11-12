@@ -1,6 +1,12 @@
 import { Arr, Obj, type Result } from 'ts-data-forge';
 import { panic } from 'ts-std-forge';
-import type { Primitive, ReadonlyRecord, StrictExtract } from 'ts-type-forge';
+import type {
+  Primitive,
+  ReadonlyRecord,
+  StrictExtract,
+  StrictOmit,
+  UnknownRecord,
+} from 'ts-type-forge';
 import type { ValidationError } from './utils/index.mjs';
 
 /**
@@ -165,24 +171,24 @@ export type TypeStructure = Readonly<
     }
   | {
       kind: 'keyValueRecord';
-      keyType: UnknownType;
-      valueType: UnknownType;
+      keyType: Type<unknown>;
+      valueType: Type<unknown>;
     }
   | {
       kind: 'array';
-      elementType: UnknownType;
+      elementType: Type<unknown>;
       minLength: number | undefined;
       maxLength: number | undefined;
     }
-  | { kind: 'tuple'; elementTypes: readonly UnknownType[] }
-  | { kind: 'union'; memberTypes: readonly UnknownType[] }
-  | { kind: 'intersection'; memberTypes: readonly UnknownType[] }
-  | { kind: 'map'; keyType: UnknownType; valueType: UnknownType }
-  | { kind: 'set'; elementType: UnknownType }
-  | { kind: 'refine'; baseType: UnknownType }
+  | { kind: 'tuple'; elementTypes: readonly Type<unknown>[] }
+  | { kind: 'union'; memberTypes: readonly Type<unknown>[] }
+  | { kind: 'intersection'; memberTypes: readonly Type<unknown>[] }
+  | { kind: 'map'; keyType: Type<unknown>; valueType: Type<unknown> }
+  | { kind: 'set'; elementType: Type<unknown> }
+  | { kind: 'refine'; baseType: Type<unknown> }
   | {
       kind: 'brand';
-      baseType: UnknownType;
+      baseType: Type<unknown>;
       brandKeys: readonly string[];
       brandFalseKeys: readonly string[];
       refined: boolean;
@@ -190,7 +196,7 @@ export type TypeStructure = Readonly<
   | {
       kind: 'recursion';
       typeName: string;
-      resolve: () => UnknownType;
+      resolve: () => Type<unknown>;
     }
 >;
 
@@ -237,31 +243,94 @@ export const copyTypeByDescriptors = (
 };
 
 /**
- * The bound used wherever a codec is accepted without caring which value type
- * it validates — `<T extends UnknownType>`, {@link UnknownShape}, and the
- * element bounds of `union` / `tuple` / `intersection`.
+ * The bound used where a codec is accepted without caring which value type it
+ * validates, such as the type parameter of {@link TypeOf}, the element bounds
+ * of `union` / `tuple` / `intersection`, and the members of the shape `record`,
+ * `strictRecord` and {@link WithShape} take.
  *
- * It is plainly `Type<unknown>`; no `any` is involved, so a value typed by it
- * stays checked.
+ * It is `Type<unknown>` with one member loosened: `prune` takes `never`, so the
+ * bound asks only that `prune` exist. No `any` is involved, so a value typed by
+ * it stays checked. It is exported for a caller's own bound,
+ * `<C extends UnknownType>`, which accepts a codec imported from another
+ * package's declarations where `<C extends Type<unknown>>` might not (below).
+ * {@link TypeStructure} and {@link UnknownShape}, which a caller reads, are
+ * typed `Type`.
  *
- * NOTE — one way to break this bound, worth knowing before it bites:
- * `prune` is `<B extends A>(a: B) => A`, so relating it to
- * `<B extends unknown>(a: B) => unknown` unifies the two type parameters and
- * leaves the target's `B` unconstrained, which `B extends A` will not accept.
- * Within a module that never matters, because `typeof someCodec` is still the
- * `Type<A>` alias and the compiler compares the two instantiations directly.
- * Declaration emit is where it shows: an *inferred* codec type is written out
- * structurally, the alias is gone, and the structural form no longer satisfies
- * this bound.
+ * Why `prune` is loosened: it is `<B extends A>(a: B) => A`, and relating that
+ * to `Type<unknown>`'s `<B extends unknown>(a: B) => unknown` unifies the two
+ * type parameters and leaves the target's `B` unconstrained, which
+ * `B extends A` will not accept. Within a module that never shows, because
+ * `typeof someCodec` is still the `Type<A>` alias and the compiler compares the
+ * two instantiations by variance. Declaration emit is where it would: an
+ * *inferred* codec type (`const X = record({ ... })`) is written out
+ * structurally in the `.d.mts`, the alias is gone, and against plain
+ * `Type<unknown>` a module-scope `TypeOf<typeof X>` then fails the
+ * declaration's own type check (TS2344). A parameter of `never` accepts any
+ * `prune`, generic or not, so the structural form satisfies the bound too.
+ * `test/dist_/declaration-emit` holds it.
  *
- * In practice that means a module-scope `TypeOf<typeof someRecordConst>` fails
- * the `.d.mts` type check once the declaration is emitted. Annotate the const
- * (`const X: Type<Shape> = record({ ... })`) so the alias survives emit — see
- * `predefined/brand/string/iso-8601.mts`. `test/dist_` is what catches it.
+ * The cost: a value typed by the bound is not a `Type<unknown>`. Its `prune`
+ * cannot be called, and it cannot be passed where `Type<unknown>` is asked for.
+ *
+ * NOTE — the trap is closed only for bounds written with `UnknownType`. A bound
+ * written as `<C extends Type<unknown>>` still rejects a structurally emitted
+ * codec, for the reason above; there either the bound is rewritten with
+ * `UnknownType`, or the const is annotated
+ * (`const X: Type<Shape> = record({ ... })`) so that the alias survives emit.
+ * `type.test.mts` pins that the structural form satisfies `UnknownType` and not
+ * `Type<unknown>`.
  */
-export type UnknownType = Type<unknown>;
+// Inside this package, `asType` widens a value typed by the bound back to
+// `Type<unknown>`.
+export type UnknownType = StrictOmit<Type<unknown>, 'prune'> &
+  Readonly<{ prune: (a: never) => unknown }>;
+
+/**
+ * @internal Reads a codec typed by the bound {@link UnknownType} as the
+ * `Type<unknown>` it is, so that its `prune` can be called and it can be
+ * passed where `Type<unknown>` is asked for.
+ */
+// A real call in `dist/`, like `structureOf` below: the strip pass removes
+// identity calls by bare name in every library, and neither name is one no
+// other package could give a function that does something.
+export const asType = (type: UnknownType): Type<unknown> =>
+  // The bound differs from `Type<unknown>` only in the parameter of `prune`,
+  // which it types `never` for the sake of declaration emit. Every codec's
+  // `prune` takes a value of its own type and is handed one that its own
+  // `validate` / `is` accepted, or — in `prune` implementations — one the
+  // caller's `B extends A` already vouches for.
+  // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
+  type as Type<unknown>;
+
+/**
+ * @internal The {@link TypeStructure} of a combinator whose member types are
+ * typed by the bound {@link UnknownType}.
+ *
+ * `TypeStructure` is what a caller reads, so its members are `Type<unknown>`:
+ * someone walking `type.structure` passes them on as codecs and may call
+ * `prune` on them. A combinator holds its members by the bound, which says
+ * less, and this is where the two meet.
+ */
+export const structureOf = (structure: StructureByBound): TypeStructure =>
+  // As in `asType`: the two differ only in the parameter of `prune`.
+  // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
+  structure as TypeStructure;
 
 export type TypeOf<A extends UnknownType> = A['defaultValue'];
+
+/** {@link TypeStructure} with every member type typed by the bound. */
+type StructureByBound = ByBound<TypeStructure>;
+
+type ByBound<T> =
+  T extends Type<unknown>
+    ? UnknownType
+    : T extends () => infer R
+      ? () => ByBound<R>
+      : T extends readonly (infer E)[]
+        ? readonly ByBound<E>[]
+        : T extends UnknownRecord
+          ? Readonly<{ [K in keyof T]: ByBound<T[K]> }>
+          : T;
 
 /**
  * Controls how excess properties (keys not in shape) are handled.
@@ -278,11 +347,19 @@ export type ExcessPropertyOption = 'allow' | 'reject';
  * The shape a record type is built from: a record of property names to the
  * {@link Type} validating each one.
  *
- * It is the bound of the `shape` argument of `record` / `strictRecord`, and the
+ * It is what the `shape` argument of `record` / `strictRecord` takes, and the
  * type argument of the {@link WithShape} those return, so naming it is what
  * lets a caller write its own helper over a record type's shape.
  */
-export type UnknownShape = ReadonlyRecord<string, UnknownType>;
+export type UnknownShape = ReadonlyRecord<string, Type<unknown>>;
+
+/**
+ * @internal {@link UnknownShape} as a bound: what `record` and
+ * {@link WithShape} ask of a shape, its members typed by {@link UnknownType}
+ * so that a shape written out structurally by declaration emit satisfies it.
+ * Every `UnknownShape` is one.
+ */
+export type ShapeByBound = ReadonlyRecord<string, UnknownType>;
 
 /**
  * The carrier of the shape a record type was built from.
@@ -292,7 +369,7 @@ export type UnknownShape = ReadonlyRecord<string, UnknownType>;
  * record type itself (`User.shape.age.constraints.max`, or the equivalent
  * `at(User, 'age').constraints.max`).
  */
-export type WithShape<S extends UnknownShape> = Readonly<{ shape: S }>;
+export type WithShape<S extends ShapeByBound> = Readonly<{ shape: S }>;
 
 /** @internal Shape structure that can represent union and intersection */
 export type ShapeStructure = Readonly<
@@ -406,7 +483,7 @@ export const recordViewOf = (type: UnknownType): RecordView | undefined =>
 /** @internal The element types of a `tuple`, if the type is one. */
 export const tupleElementTypesOf = (
   type: UnknownType,
-): readonly UnknownType[] | undefined =>
+): readonly Type<unknown>[] | undefined =>
   type.structure?.kind === 'tuple' ? type.structure.elementTypes : undefined;
 
 /**

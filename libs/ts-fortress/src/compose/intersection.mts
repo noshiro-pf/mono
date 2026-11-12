@@ -9,7 +9,9 @@ import {
 } from 'ts-data-forge';
 import type { Intersection, NonEmptyTuple } from 'ts-type-forge';
 import {
+  asType,
   recordViewOf,
+  structureOf,
   type Type,
   type TypeOf,
   type UnknownType,
@@ -85,7 +87,7 @@ export const intersection = <const Types extends NonEmptyTuple<UnknownType>>(
         // see `mergePruned`). Every member is a record type here, so each
         // pruned result is a record.
         // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
-        (types.map((t) => t.prune(a)).reduce(mergePruned, {}) as T)
+        (types.map((t) => asType(t).prune(a)).reduce(mergePruned, {}) as T)
       : // Non-record intersections (e.g. branded primitives) have no excess
         // paths to remove.
         a;
@@ -99,7 +101,7 @@ export const intersection = <const Types extends NonEmptyTuple<UnknownType>>(
     is,
     assertIs: createAssertFn(validate),
     cast: createCastFn(validate),
-    structure: { kind: 'intersection', memberTypes: types },
+    structure: structureOf({ kind: 'intersection', memberTypes: types }),
   } as const;
 
   return baseType;
