@@ -14,9 +14,14 @@ import type {
   Subscription,
   UpdateToken,
 } from '../types/index.mjs';
+import { maxDepth } from '../utils/index.mjs';
 
 /**
  * Skips all values from the source observable until the notifier observable emits.
+ * In an update that reaches both the source and the notifier (both derive from one
+ * observable), this observable hears the notifier first: if the notifier emits in
+ * that update, or has completed by then, the source's value in that update is
+ * passed on.
  *
  * @template A - The type of values from the source
  * @param notifier - An observable that signals when to start emitting
@@ -80,6 +85,8 @@ class SkipUntilObservableClass<A>
   constructor(parentObservable: Observable<A>, notifier: Observable<unknown>) {
     super({
       parents: [parentObservable],
+      // Deeper than the notifier too, as in `TakeUntilObservableClass`.
+      depth: 1 + maxDepth([parentObservable, notifier]),
       initialValue: Optional.none,
     });
 
@@ -99,6 +106,9 @@ class SkipUntilObservableClass<A>
         this.#mut_subscription = undefined;
       };
 
+      // A notifier that completes without emitting stops the skipping too,
+      // which the description above, the README and the reference pages do not
+      // say yet.
       this.#mut_subscription = notifier.subscribe(stopSkipping, stopSkipping);
     }
 

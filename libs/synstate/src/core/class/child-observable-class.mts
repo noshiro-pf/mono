@@ -36,12 +36,8 @@ type ChildObservableConfig<A, P extends NonEmptyUnknownList> = Readonly<{
   parents: Wrap<P>;
 
   /**
-   * Defaults to one more than the deepest parent. An update reaches observables
-   * in ascending depth, so an observable `tryUpdate` reads with `getSnapshot`
-   * without being its child (`withCurrentValueFrom`'s second source) has to be
-   * shallower than this one too, or this one reads its value from before the
-   * update: pass `1 + Math.max(...)` over both then. Either is raised to the
-   * floor of the scope it is created in (`createScope`'s `after`).
+   * As `depth` of `createSyncChildObservable`'s config
+   * (`ChildObservableConfigBase` in `create-child-observable.mts`) says.
    */
   depth?: number;
 
@@ -66,6 +62,12 @@ export class SyncChildObservableClass<A, const P extends NonEmptyUnknownList>
   constructor({ parents, depth, initialValue }: ChildObservableConfig<A, P>) {
     super({
       kind: 'sync child',
+      // A passed depth is not checked against the parents'. As deep as a
+      // parent, this observable is dropped by an update that parent emits in;
+      // shallower, it is left in a bucket that update has visited, and a later
+      // update visits it out of order, perhaps twice; as shallow as the node
+      // that started the update, or shallower, queueing it throws a TypeError
+      // that names neither this observable nor its depth.
       depth: depth === undefined ? childDepth(parents) : atScopeFloor(depth),
       initialValue,
     });
@@ -146,6 +148,7 @@ export class AsyncChildObservableClass<A, const P extends NonEmptyUnknownList>
   constructor({ parents, depth, initialValue }: ChildObservableConfig<A, P>) {
     super({
       kind: 'async child',
+      // Unchecked, as in `SyncChildObservableClass`'s constructor.
       depth: depth === undefined ? childDepth(parents) : atScopeFloor(depth),
       initialValue,
     });

@@ -11,6 +11,10 @@ import { colors } from '../../../components/constants.mjs';
 {/* jsdoc-description */}
 Emits values from the source until the notifier observable emits.
 When the notifier emits, this observable completes.
+In an update that reaches both the source and the notifier (both derive from one
+observable), this observable hears the notifier first: if the notifier emits in
+that update, or has completed by then, the source's value in that update is not
+passed on.
 {/* /jsdoc-description */}
 
 ## Marble Diagram

@@ -46,7 +46,7 @@ export const double = (src: Observable<number>): Observable<number> =>
 
 ### depth と、親でない observable を読む場合
 
-更新は `depth` の昇順に observable へ届きます。これが SynState のグリッチ対策で、子が親を読む時点では親はもう値を出しています。子の `depth` は、省略すると一番深い親の `depth` に 1 を足した値になります。省略しても渡しても、`createScope(parent, { after })` で作ったスコープの中では、そのスコープの下限まで引き上げられます。`withCurrentValueFrom` は、2 つ目の observable から派生せずに `getSnapshot` で読みます。こうした observable よりも深くないと、更新前の値を読んでしまいます。その場合は `depth` を自分で渡してください。
+更新は `depth` の昇順に observable へ届きます。これが SynState のグリッチ対策で、子が親を読む時点では親はもう値を出しています。子の `depth` は、省略すると一番深い親の `depth` に 1 を足した値になります。省略しても渡しても、`createScope(parent, { after })` で作ったスコープの中では、そのスコープの下限まで引き上げられます。`withCurrentValueFrom` は、2 つ目の observable から派生せずに `getSnapshot` で読みます。こうした observable よりも深くないと、更新前の値を読んでしまいます。その場合は `depth` を自分で渡してください。規則の全体は [SynState がグリッチを解決した方法](/mono/synstate/ja/internals/how-synstate-solved-the-glitch/#深さごとのバケットに分けたキュー) にあります。
 
 ```ts
 createSyncChildObservable(

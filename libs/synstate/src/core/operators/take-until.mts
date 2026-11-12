@@ -14,10 +14,15 @@ import type {
   TakeUntilOperatorObservable,
   UpdateToken,
 } from '../types/index.mjs';
+import { maxDepth } from '../utils/index.mjs';
 
 /**
  * Emits values from the source until the notifier observable emits.
  * When the notifier emits, this observable completes.
+ * In an update that reaches both the source and the notifier (both derive from one
+ * observable), this observable hears the notifier first: if the notifier emits in
+ * that update, or has completed by then, the source's value in that update is not
+ * passed on.
  *
  * @template A - The type of values from the source
  * @param notifier - An observable that signals when to complete
@@ -83,6 +88,14 @@ class TakeUntilObservableClass<A>
   constructor(parentObservable: Observable<A>, notifier: Observable<unknown>) {
     super({
       parents: [parentObservable],
+      // Deeper than the notifier too, so that a notifier emitting in the same
+      // update as the source has been heard before this observable is visited,
+      // however deep it is. Raised to the scope's floor by the constructor.
+      // Computed here, as `withCurrentValueFrom` does, because the config names
+      // no observable to follow besides the parents. A deep notifier makes this
+      // observable, and what derives from it, as deep, which costs an update an
+      // empty bucket for each extra level.
+      depth: 1 + maxDepth([parentObservable, notifier]),
       initialValue: parentObservable.getSnapshot(),
     });
 
@@ -91,7 +104,9 @@ class TakeUntilObservableClass<A>
     };
 
     // A notifier that already holds a value completes this observable inside
-    // `subscribe`, before the subscription is stored.
+    // `subscribe`, before the subscription is stored. A notifier that completes
+    // without emitting completes it too, which the description above, the
+    // README and the reference pages do not say yet.
     this.#subscription = notifier.subscribe(complete, complete);
 
     if (this.isCompleted) {

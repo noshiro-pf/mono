@@ -11,6 +11,7 @@ import { colors } from '../../../../components/constants.mjs';
 {/* jsdoc-description */}
 通知用 Observable が発行するまで、ソースからの値を発行します。
 通知用 Observable が発行すると、この Observable は完了します。
+ソースと通知用 Observable の両方に届く更新（両者が同じ Observable から派生している場合）では、この Observable は通知用 Observable を先に聞きます。その更新で通知用 Observable が発行するか、それまでに完了していれば、その更新でのソースの値は発行されません。
 {/* /jsdoc-description */}
 
 ## Marble Diagram

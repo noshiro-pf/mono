@@ -34,7 +34,8 @@ type CreateObservableType<A, Kind extends ObservableKind> = Readonly<{
    * One more than the deepest observable this one is derived from, or more when
    * it is created in a scope made with `after` (`createScope`); 0 for a root.
    * An update reaches observables in ascending depth, so every parent has
-   * emitted before its child reads it.
+   * emitted before its child reads it. Some operators are deeper still; `depth`
+   * in `createSyncChildObservable`'s config gives the rule.
    */
   depth: Kind extends 'root' ? 0 : number;
 

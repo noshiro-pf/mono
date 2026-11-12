@@ -99,12 +99,19 @@ type ChildObservableConfigBase<P extends NonEmptyUnknownList> = Readonly<{
   parents: Wrap<P>;
 
   /**
-   * Defaults to one more than the deepest parent. An update reaches observables
-   * in ascending depth, so an observable `tryUpdate` reads with `getSnapshot`
-   * without being its child (`withCurrentValueFrom`'s second source) has to be
-   * shallower than this one too, or this one reads its value from before the
-   * update: pass `1 + Math.max(...)` over both then. Either is raised to the
-   * floor of the scope it is created in (`createScope`'s `after`).
+   * Defaults to one more than the deepest parent. A depth passed has to be
+   * greater than every parent's; nothing checks it. Defaulted or passed, it is
+   * raised to one more than the deepest `after` (`createScope`) of the scope
+   * this observable is created in and the scopes that scope is nested in.
+   *
+   * An update visits observables in ascending depth, and those of equal depth
+   * in the order it queued them. An observable `tryUpdate` depends on without
+   * being a parent, reading it with `getSnapshot` or hearing it through
+   * `subscribe` in the same update (as `withCurrentValueFrom` and `takeUntil`
+   * do), has to be shallower too, or the update may visit this one before that
+   * observable has emitted: pass one more than the deepest of it and the
+   * parents then. An async child that starts an update of its own on hearing an
+   * observable (`switchMap` with its inner one) does not depend on it so.
    */
   depth?: number;
 }>;
