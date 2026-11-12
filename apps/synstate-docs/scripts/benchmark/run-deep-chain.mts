@@ -23,6 +23,11 @@ const VERIFY_DEPTH = 3;
 /** The updates {@link assertReacts} drives an adapter through. */
 const VERIFY_UPDATES = 10;
 
+/**
+ * The sweep points, in the column order the page's chart and tables use. Not
+ * listed cheapest first (`K=1000, M=50` before `K=100, M=100`), so the sweep is
+ * told which points dominate which (`costlier` below).
+ */
 const PARAMS: readonly (readonly [k: number, depth: number])[] = [
   [100, 50],
   [500, 50],
@@ -236,5 +241,10 @@ await runSeriesSweep({
       return () => runOnce(adapter, k, depth);
     };
   },
+  // A round is K updates through M stages, so a point with at least as many of
+  // both is at least as much work. A point is skipped only after one it
+  // dominates went over five seconds; the few small points JIT state reorders,
+  // by about a millisecond, are nowhere near that.
+  costlier: ([kA, mA], [kB, mB]) => kA >= kB && mA >= mB,
   resultsFile: 'results-deep-chain.md',
 });

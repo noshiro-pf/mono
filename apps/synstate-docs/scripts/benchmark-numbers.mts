@@ -1444,8 +1444,21 @@ const everyPoint = (
 const reduxOverSynStateCascaded = (): readonly FixedLengthTuple<2, number>[] =>
   everyPoint(cascadedDiamond, 'Redux', 'SynState');
 
+/**
+ * Where `label` first timed out. Read beside {@link lastMeasuredLabel} as "the
+ * last point it survived, then the timeout", so it fails where a point after
+ * the first timeout was measured, as a sweep with a `costlier` rule allows.
+ */
 const firstTimeoutLabel = (data: SeriesData, label: string): string => {
-  const index = row(data, label).values.indexOf(null);
+  const { values } = row(data, label);
+
+  const index = values.indexOf(null);
+
+  if (index !== -1 && values.findLastIndex((v) => v !== null) > index) {
+    throw new Error(
+      `❌ ${label} completes a point after its first timeout, so "the last point before it timed out" is not one point`,
+    );
+  }
 
   const xLabel = index === -1 ? undefined : data.xLabels[index];
 
