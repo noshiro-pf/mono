@@ -19,13 +19,66 @@ import packageJson from './package.json' with { type: 'json' };
 
 const thisDir = import.meta.dirname;
 
-/** The workspace packages this app depends on, which `e2e/` may not import. */
-const workspacePackages = Object.entries({
-  ...packageJson.dependencies,
-  ...packageJson.devDependencies,
-})
-  .filter(([, range]) => range.startsWith('workspace:'))
+/**
+ * The workspace packages this app depends on, which nothing the daily
+ * production e2e job loads may import at run time.
+ */
+// Every field of dependencies, so that one declared later is read too.
+const workspacePackages = Object.entries(packageJson)
+  .filter(([field]) => /dependencies$/iu.test(field))
+  .flatMap(([, ranges]) => Object.entries(ranges))
+  .filter(
+    ([, range]) => typeof range === 'string' && range.startsWith('workspace:'),
+  )
   .map(([name]) => name);
+
+// Not `RegExp.escape`: `check:test` loads this config through
+// `test/eslint-config.test.mts`, and runs on Node.js versions older than 24.
+const escapeRegExp = (text: string): string =>
+  text.replaceAll(/[$()*+.?[\\\]^{|}]/gu, String.raw`\$&`);
+
+/**
+ * The rules for a file the daily production e2e job loads.
+ *
+ * `.github/workflows/e2e-production.yml` installs this app alone and builds
+ * nothing, and Playwright imports its config and every spec before it filters
+ * by tag, so one of them that imports a workspace package at run time, or a
+ * module that does, fails the job with "Cannot find module". Types are erased
+ * and may still be imported. The `ts-data-forge` rules ask for imports these
+ * files cannot make.
+ *
+ * @param relativeImports What the file may not reach by a relative path.
+ */
+// `no-restricted-imports` reads `import` and `export … from` declarations. A
+// dynamic `import()` or a `createRequire` is not seen by it, and nothing here
+// refuses one: a known limit of this guard.
+const productionE2eRules = (
+  relativeImports: Readonly<{ regex: string; message: string }>,
+): FlatConfig['rules'] =>
+  defineKnownRules({
+    ...Object.fromEntries(
+      Object.keys(eslintPluginTsDataForge.configs.recommended.rules).map(
+        (rule) => [rule, 'off'] as const,
+      ),
+    ),
+    'no-restricted-imports': [
+      'error',
+      mergeRestrictedImportsOptions(restrictedImportsOptions, {
+        patterns: [
+          {
+            // The name alone or a subpath of it (`ts-data-forge/array`), which
+            // resolves into the same `dist/` nothing built. A pattern rather than
+            // `paths`, which matches the whole specifier only.
+            regex: `^(?:${workspacePackages.map(escapeRegExp).join('|')})(?:/|$)`,
+            allowTypeImports: true,
+            message:
+              'The daily production e2e job builds no workspace package; write the helper out in this file.',
+          },
+          { ...relativeImports, allowTypeImports: true },
+        ],
+      }),
+    ],
+  });
 
 export default [
   {
@@ -122,39 +175,32 @@ export default [
     }),
   },
   eslintConfigForPlaywright(['e2e/**']),
+  // The files of this app the daily production e2e job loads; see
+  // `productionE2eRules`. After every other block that sets
+  // `no-restricted-imports`, since a later one would replace these options,
+  // and after the shared config's, which turns the rule off for `*.config.*`.
+  // `test/eslint-config.test.mts` holds all three.
   {
-    // `.github/workflows/e2e-production.yml` installs this app alone and
-    // builds nothing, and Playwright imports every spec before it filters by
-    // tag, so a spec that imports a workspace package at run time, or a module
-    // of `src/` that does, fails the daily job with "Cannot find module".
-    // Types are erased and may still be imported. The `ts-data-forge` rules
-    // ask for imports these files cannot make.
     files: ['e2e/**'],
-    rules: defineKnownRules({
-      ...Object.fromEntries(
-        Object.keys(eslintPluginTsDataForge.configs.recommended.rules).map(
-          (rule) => [rule, 'off'] as const,
-        ),
-      ),
-      'no-restricted-imports': [
-        'error',
-        mergeRestrictedImportsOptions(restrictedImportsOptions, {
-          paths: workspacePackages.map((name) => ({
-            name,
-            allowTypeImports: true,
-            message:
-              'The daily production e2e job builds no workspace package; write the helper out in the spec.',
-          })),
-          patterns: [
-            {
-              regex: String.raw`^\.\./`,
-              allowTypeImports: true,
-              message:
-                'The daily production e2e job builds no workspace package, and a module outside `e2e/` may import one; keep run-time imports within `e2e/`.',
-            },
-          ],
-        }),
-      ],
+    rules: productionE2eRules({
+      // Any `..` segment, so that `./../src/` is one too. `e2e/` is flat, so
+      // every `..` leaves it. In a subdirectory, should one be added, this
+      // refuses a `../` that stays inside too: such a layout needs this
+      // pattern changed, as the message says, not disabled.
+      regex: String.raw`(?:^|/)\.\.(?:/|$)`,
+      message:
+        'The daily production e2e job builds no workspace package, and a module outside `e2e/` may import one; keep run-time imports within `e2e/`, with no `..` in the path. `e2e/` is flat; a subdirectory needs the pattern of the `e2e/**` block in eslint.config.mts changed.',
+    }),
+  },
+  {
+    // This file alone: `test/eslint-config.test.mts` fails when this `files`
+    // reaches another module of `configs/`. With no relative import, the specs
+    // are all of this app the job's import declarations reach.
+    files: ['configs/playwright.production.config.mts'],
+    rules: productionE2eRules({
+      regex: String.raw`^\.{1,2}(?:/|$)`,
+      message:
+        'The daily production e2e job builds no workspace package, and a module of this app may import one; import no module of this app here.',
     }),
   },
 

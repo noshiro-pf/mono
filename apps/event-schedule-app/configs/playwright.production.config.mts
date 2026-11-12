@@ -1,6 +1,5 @@
 import { defineConfig, devices } from '@playwright/test';
 import * as path from 'node:path';
-import { workspaceRootPath } from '../scripts/workspace-root-path.mjs';
 
 /**
  * The end-to-end tests against the deployed app, run daily by
@@ -15,13 +14,15 @@ import { workspaceRootPath } from '../scripts/workspace-root-path.mjs';
  * out against `pnpm run dev` and the emulators before they meet production.
  */
 export default defineConfig({
-  testDir: path.resolve(workspaceRootPath, 'e2e'),
+  // Not `workspaceRootPath`: this file imports no module of this app (see
+  // `productionE2eRules` in `eslint.config.mts`).
+  testDir: path.resolve(import.meta.dirname, '../e2e'),
 
   // Playwright imports every spec before it filters by tag, and the daily job
-  // installs this app alone and builds nothing, so no spec under `e2e/` may
-  // import a workspace package at run time; one that does fails the job with
-  // "Cannot find module". The `e2e/**` block of `eslint.config.mts` says so
-  // where the import is written.
+  // installs this app alone and builds nothing, so neither a spec under `e2e/`
+  // nor this file may import a workspace package at run time; one that does
+  // fails the job with "Cannot find module". `productionE2eRules` in
+  // `eslint.config.mts` says so where the import is written.
   grep: /@smoke|@production/u,
 
   // One worker, for the reason the shared config gives, and because the
