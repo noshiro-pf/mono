@@ -6,10 +6,11 @@
  *
  * The root `eslint.config.mts` turns every `ts-data-forge` lint rule off for
  * these, because each rule's fix writes an import of the package. Its test
- * holds the list to the scripts a manifest, workflow, composite action, hook or
- * shell script runs under plain `node`, fails one that loads anything but
- * `node:*` once its types are erased, and fails a line-level disable or an
- * inline configuration of one of those rules.
+ * holds the list to the root `tools/` scripts `check:root:node-run-scripts`
+ * finds plain `node` running, less those it lets load packages, and fails a
+ * line-level disable or an inline configuration of one of those rules, and one
+ * that loads anything but `node:*`: a relative file it loaded would be linted
+ * with those rules on.
  */
 export const scriptsRunBeforeInstall = [
   'tools/scripts/cmd/assert-deps-built.mts',
