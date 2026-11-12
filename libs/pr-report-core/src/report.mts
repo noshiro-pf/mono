@@ -243,8 +243,8 @@ const NO_DECLARATIONS: IssueDeclarations = {
 
 /**
  * The issues a pull request closes that may still declare an order: any not
- * known to be closed. One read from the body without a token has an `unknown`
- * state, and is given the benefit of the doubt.
+ * known to be closed. One known only from a closing keyword in the body has an
+ * `unknown` state, and is given the benefit of the doubt.
  */
 const notKnownClosed = (
   linkedIssues: PullRequestFacts['linkedIssues'],

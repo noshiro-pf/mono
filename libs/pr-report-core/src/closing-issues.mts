@@ -22,8 +22,8 @@ export type ClosingIssueNode = Readonly<{
  * **Only this repository's.** A pull request can close an issue anywhere, and a
  * report lists each as `#N` — which for another repository's issue names a
  * different issue of this one, and for a private repository's may put a title
- * the report's reader cannot see into a report someone else reads. The body
- * parser `pr-report` falls back on without a token draws the same line.
+ * the report's reader cannot see into a report someone else reads.
+ * {@link closingKeywordIssuesIn} draws the same line.
  *
  * `null` entries are skipped rather than rejected: one issue the token may not
  * see is no reason to lose the rest.

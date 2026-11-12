@@ -87,10 +87,21 @@ undici の実験的機能の警告を消しているだけです）。`NODE_USE_
 す（PR 1本あたり約3リクエスト = 20本程度まで。issue 一覧は全体で1リクエスト）。
 
 トークンがあると変わるのは2点だけです。レート制限が 5000/hour になることと、
-閉じる issue を GraphQL の `closingIssuesReferences`（サイドバーで手動リンクした
-ものを含む、GitHub 自身のリスト）から読むこと。無認証のときは body の
-`Closes #12` 等のキーワードから読むので、手動リンクは見えません。その旨はレポート
-の末尾に自分で書きます。
+閉じる issue に GraphQL の `closingIssuesReferences`（サイドバーで手動リンクした
+ものを含む、GitHub 自身のリスト）が加わること。
+
+open な PR が閉じる issue は、トークンの有無によらず**2つの出どころを合わせて**
+読みます。GitHub のリストにある issue（タイトルと状態つき）を先に、続けて body の
+`Closes #12` 等のキーワードが閉じる issue のうちリストに無いもの（番号だけ）を
+並べます。どちらか一方では足りません。手動リンクは body に無く、default branch
+以外を base にした PR（stack の上の層）のキーワードは `closingIssuesReferences`
+に載らないからです。キーワードは GitHub がレンダリングした `body_html` の印から
+読み（`start-issue`・`open-pr`・`unblock-prs` と同じ読み方）、`body_html` の無い
+応答だけテキストから読みます。GraphQL からリストを得られないとき（無認証のとき、
+またはトークンがあっても問い合わせからリストを得られなかったとき）はキーワードだ
+けなので、手動リンクは見えません。レポートの末尾にその旨を書くのは無認証のときだ
+けです。唯一の例外は `x-ratelimit-remaining` ヘッダーが 0 の拒否で、そのときはレ
+ポートの代わりにエラーになります。
 
 ### 判定の決まりごと
 
@@ -219,12 +230,25 @@ The merged section is bounded twice, by days (7) and by count (20). The cap is
 about reading rather than about fitting: past twenty the section stops being
 a list and starts being an archive.
 
-`GH_TOKEN` or `GITHUB_TOKEN`, in that order, is used when set. Without one the public API
-allows 60 requests an hour — about twenty pull requests at roughly three
-requests each, which one report a day fits inside — and the issue links are
-the ones the bodies declare with a closing keyword rather than GitHub's own
+`GH_TOKEN` or `GITHUB_TOKEN`, in that order, is used when set. Without one the
+public API allows 60 requests an hour — about twenty pull requests at roughly
+three requests each, which one report a day fits inside — and the issue links
+are the ones the bodies declare with a closing keyword, without GitHub's own
 list, which only GraphQL serves. The report says so at the bottom when it ran
-that way.
+that way. With a token whose GraphQL query yields no list, the links are the
+keywords alone too, and the report does not say so. The one exception is a
+refusal whose `x-ratelimit-remaining` header reads 0, which replaces the report
+with an error.
+
+The issues an open pull request closes are read from both sources and joined,
+with a token or without: the ones GitHub's list holds, with their titles and
+states, then the ones the body closes by keyword that the list does not hold, by
+number alone. Neither is enough: a link made by hand in the sidebar is in no
+body, and `closingIssuesReferences` lists a keyword only on a pull request into
+the default branch, so the upper layer of a stack has an empty list. The
+keywords are read from the marks in GitHub's rendering of the body
+(`body_html`), as `start-issue`, `open-pr` and `unblock-prs` read them, and from
+the text only for an answer without the rendering.
 
 Five rules decide the verdicts. `skipped` is counted as met, because GitHub
 counts it so, but reported as `skipped` rather than folded into `passed`.

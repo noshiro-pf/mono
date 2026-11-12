@@ -3,6 +3,7 @@
 import {
   anyRunInProgress,
   closingIssuesIn,
+  closingKeywordIssuesIn,
   epochMsOf,
   parseMergeAfter,
   readBranchRequirements,
@@ -55,6 +56,9 @@ const PullRequestSchema = t.record({
   number: t.number(),
   title: t.string(),
   body: t.union([t.string(), t.nullType]),
+  // GitHub's rendering of the body, sent only for the `full` media type, which
+  // the open list alone asks for: where the closing keywords are read.
+  body_html: t.optional(t.union([t.string(), t.nullType])),
   draft: t.boolean(),
   html_url: t.string(),
   updated_at: t.string(),
@@ -298,8 +302,8 @@ export type IssueBody = Readonly<{
  * Unauthenticated works because the repository is public, and one report a day
  * fits inside the 60 requests an hour an anonymous caller gets — roughly three
  * per pull request, for the comparison and the two kinds of check.
- * A token raises that to 5000 and, through one GraphQL query, replaces the
- * issue links read out of the bodies with the ones GitHub itself holds.
+ * A token raises that to 5000 and, through one GraphQL query, adds the issue
+ * links GitHub itself holds to the ones read out of the bodies.
  */
 export const createClient = (
   token: string | undefined,
@@ -316,17 +320,18 @@ export const createClient = (
 
   /**
    * One call. A body makes it a POST, which is only ever the GraphQL query —
-   * everything else this reads is a GET, so there is nothing to configure.
+   * everything else this reads is a GET, so the media type is all there is to
+   * configure.
    */
   const request = async (
     route: string,
-    body?: string,
+    { accept = JSON_MEDIA_TYPE, body }: RequestOptions = {},
   ): Promise<Result<string, string>> => {
     const response = await send({
       url: `${baseUrl}${route}`,
       method: body === undefined ? 'GET' : 'POST',
       token,
-      accept: 'application/vnd.github+json',
+      accept,
       body,
     });
 
@@ -350,8 +355,9 @@ export const createClient = (
   const getJson = async <A,>(
     route: string,
     schema: t.Type<A>,
+    accept?: MediaType,
   ): Promise<Result<A, string>> => {
-    const text = await request(route);
+    const text = await request(route, { accept });
 
     return Result.isErr(text) ? text : parseJson(text.value, schema, route);
   };
@@ -547,6 +553,11 @@ export const createClient = (
    * which includes a link made by hand and so knows more than the body does.
    * Only GraphQL exposes it, and GraphQL refuses an anonymous caller, which is
    * why this is the one thing a token buys.
+   *
+   * It also knows less: a closing keyword is listed only for a pull request
+   * into the default branch, so a stacked one answers an empty list. That is
+   * why `linkedIssuesOf` joins this with the keywords rather than taking it as
+   * the answer.
    */
   const closingIssues = async (
     repo: RepoRef,
@@ -566,13 +577,12 @@ export const createClient = (
       '}',
     ].join('\n');
 
-    const answered = await request(
-      '/graphql',
-      JSON.stringify({
+    const answered = await request('/graphql', {
+      body: JSON.stringify({
         query,
         variables: { owner: repo.owner, name: repo.name },
       }),
-    );
+    });
 
     if (Result.isErr(answered)) {
       return new Map<number, readonly LinkedIssue[]>();
@@ -826,6 +836,9 @@ export const createClient = (
             baseRef: pr.base.ref,
             mergedAt: pr.merged_at ?? '',
             labels: labelsOf(pr.labels),
+            // The text, not the rendering: this list is only displayed, so a
+            // keyword read differently from GitHub costs a line of display,
+            // whereas the rendering would enlarge the answer for every report.
             linkedIssues: parseClosingIssueRefs(pr.body ?? '', repo).map(
               (number) => ({
                 number,
@@ -846,6 +859,7 @@ export const createClient = (
       const listed = await getJson(
         `/repos/${repo.owner}/${repo.name}/pulls?state=open&per_page=${PAGE_SIZE}&sort=created&direction=asc`,
         PullRequestListSchema,
+        FULL_MEDIA_TYPE,
       );
 
       if (Result.isErr(listed)) {
@@ -910,14 +924,7 @@ export const createClient = (
           comparison: compared.comparison,
           reported: checks.reported,
           checksRunning: checks.running,
-          linkedIssues:
-            linked.get(pr.number) ??
-            parseClosingIssueRefs(body, repo).map((number) => ({
-              number,
-              title: '',
-              url: `https://github.com/${repo.owner}/${repo.name}/issues/${number}`,
-              state: 'unknown' as const,
-            })),
+          linkedIssues: linkedIssuesOf(repo, pr, linked.get(pr.number)),
         });
       }
 
@@ -934,6 +941,69 @@ export const createClient = (
         : Result.err(unreadable);
     },
   };
+};
+
+const JSON_MEDIA_TYPE = 'application/vnd.github+json';
+
+/**
+ * The media type whose answer carries `body_html` beside `body`. It nearly
+ * doubles the size of the open list, which is why only that list asks for it.
+ */
+// Every caller of `facts` pays for it, the ones that never read `linkedIssues`
+// included, so that every caller gets an open pull request's `linkedIssues`
+// read the same way: an option to skip the rendering would make the field
+// GitHub's reading for one caller and the text's for another, a difference no
+// type shows.
+const FULL_MEDIA_TYPE = 'application/vnd.github.full+json';
+
+type MediaType = typeof FULL_MEDIA_TYPE | typeof JSON_MEDIA_TYPE;
+
+type RequestOptions = Readonly<{
+  accept?: MediaType | undefined;
+  body?: string | undefined;
+}>;
+
+/**
+ * The issues an open pull request closes: the ones GitHub links
+ * (`closingIssuesReferences`, with their titles and states), then the ones its
+ * body closes by keyword that GitHub did not link, of which only the number is
+ * known.
+ *
+ * Both are read for every pull request, because neither holds the other: a link
+ * made by hand is in no body, and a keyword on a stacked pull request is in no
+ * `closingIssuesReferences`. The keywords come from GitHub's rendering, as
+ * `start-issue`, `open-pr` and `unblock-prs` read them, so that the report
+ * cannot disagree with them about what closes what; the text is read only for
+ * an answer that carries no rendering.
+ */
+const linkedIssuesOf = (
+  repo: RepoRef,
+  pr: Readonly<{ body: string | null; body_html?: string | null | undefined }>,
+  linked: readonly LinkedIssue[] | undefined,
+): readonly LinkedIssue[] => {
+  const known = new Set((linked ?? []).map(({ number }) => number));
+
+  // GitHub always sends the rendering for the `full` media type, so the text is
+  // read only behind something that drops it. It is read rather than taken as
+  // "no keyword" because of which way each is wrong: an issue reported as
+  // closed by nobody is handed out as startable, while a keyword the text reads
+  // and GitHub would not costs one issue left waiting.
+  const byKeyword =
+    pr.body_html === undefined || pr.body_html === null
+      ? parseClosingIssueRefs(pr.body ?? '', repo)
+      : closingKeywordIssuesIn(repo, pr.body_html);
+
+  return [
+    ...(linked ?? []),
+    ...byKeyword
+      .filter((number) => !known.has(number))
+      .map((number) => ({
+        number,
+        title: '',
+        url: `https://github.com/${repo.owner}/${repo.name}/issues/${number}`,
+        state: 'unknown' as const,
+      })),
+  ];
 };
 
 /**

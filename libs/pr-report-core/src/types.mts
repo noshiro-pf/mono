@@ -66,8 +66,9 @@ export type Label = Readonly<{
 export type LinkedIssue = Readonly<{
   number: number;
   /**
-   * Empty when the issue was read from the body without a token, or GitHub
-   * would not describe it.
+   * Empty when the issue is known only from a closing keyword in the body —
+   * GitHub's own list did not hold it, or was not read — or GitHub would not
+   * describe it.
    */
   title: string;
   url: string;
@@ -78,7 +79,7 @@ export type LinkedIssue = Readonly<{
 export type PullRequestFacts = Readonly<{
   number: number;
   title: string;
-  /** Where `Merge-After:` and the closing keywords are read from. */
+  /** Where `Merge-After:` is read from. */
   body: string;
   author: string;
   isDraft: boolean;
