@@ -1389,3 +1389,12 @@ describe('immutability', () => {
     expect(difference.size).toBe(2);
   });
 });
+
+describe('ISet.delete with the key -0 (#3963)', () => {
+  test('delete(-0) deletes the element 0', () => {
+    assert.deepStrictEqual(
+      Array.from(ISet.create<number>([0, 1]).delete(-0)),
+      [1],
+    );
+  });
+});

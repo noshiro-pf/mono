@@ -1065,44 +1065,23 @@ class IMapMappedClass<K, V, KM extends MapSetKeyType>
       return this;
     }
 
-    const keyMapped = this.#toKey(key);
-
-    return IMapMapped.create(
-      Array.from(this.#map)
-        .filter(([km]) => !Object.is(km, keyMapped))
-        .map(([km, v]) => tp(this.#fromKey(km), v)),
-      this.#toKey,
-      this.#fromKey,
-    );
+    // Through the native collection, which compares keys with SameValueZero as
+    // `has` and `get` do; a rebuild comparing with `Object.is` left a `-0` key
+    // unmatched.
+    return this.withMutations([{ type: 'delete', key }]);
   }
 
   /** @inheritdoc */
   set(key: K, value: V): IMapMapped<K, V, KM> {
     const curr = this.get(key);
 
-    if (Optional.isSome(curr) && value === curr.value) {
-      return this;
-    }
-
-    const keyMapped = this.#toKey(key);
-
-    if (!this.has(key)) {
-      return IMapMapped.create(
-        [...this.#map, tp(keyMapped, value)].map(([km, v]) =>
-          tp(this.#fromKey(km), v),
-        ),
-        this.#toKey,
-        this.#fromKey,
-      );
-    }
-
-    return IMapMapped.create(
-      Array.from(this.#map, ([km, v]) =>
-        tp(this.#fromKey(km), Object.is(km, keyMapped) ? value : v),
-      ),
-      this.#toKey,
-      this.#fromKey,
-    );
+    // Through the native collection, which compares keys with SameValueZero as
+    // `has` and `get` do (a rebuild comparing with `Object.is` left a `-0` key
+    // unmatched), and whose `set` appends a new key and keeps the position of
+    // an existing one.
+    return Optional.isSome(curr) && value === curr.value
+      ? this
+      : this.withMutations([{ type: 'set', key, value }]);
   }
 
   /** @inheritdoc */
@@ -1119,18 +1098,10 @@ class IMapMappedClass<K, V, KM extends MapSetKeyType>
       return this;
     }
 
-    const keyMapped = this.#toKey(key);
-
-    return IMapMapped.create(
-      Array.from(this.#map, ([km, v]) =>
-        tp(
-          this.#fromKey(km),
-          Object.is(km, keyMapped) ? updater(curr.value) : v,
-        ),
-      ),
-      this.#toKey,
-      this.#fromKey,
-    );
+    // Through the native collection, which compares keys with SameValueZero as
+    // `has` and `get` do; a rebuild comparing with `Object.is` left a `-0` key
+    // unmatched.
+    return this.withMutations([{ type: 'update', key, updater }]);
   }
 
   /** @inheritdoc */
