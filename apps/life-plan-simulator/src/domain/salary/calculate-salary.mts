@@ -187,6 +187,45 @@ const residentTaxFrom = (grossAfterIdecoLastYear: number): number => {
   );
 };
 
+/**
+ * 賞与の源泉徴収税額。ふつうは社会保険料等控除後の賞与に、前月の社会保険料等
+ * 控除後の給与から算出率の表で引いた率を掛ける。ただし前月に給与が無いとき、
+ * または賞与が前月の給与の 10 倍を超えるときは算出率の表を使わず、賞与の
+ * 1/6（計算期間が 6 か月を超えるなら 1/12）を前月の給与に足して月額表に
+ * 当てはめた税額から前月の給与の税額を引き、6 倍（12 倍）する。賞与は年に
+ * 1 回なので、計算期間は 12 か月として 1/12 と 12 倍を使う。
+ */
+const bonusWithholdingTax = ({
+  taxableBonus,
+  hasPreviousSalary,
+  previousAmount,
+}: Readonly<{
+  /** 社会保険料等控除後の賞与。 */
+  taxableBonus: number;
+  hasPreviousSalary: boolean;
+  /** 前月の社会保険料等控除後の給与等の金額。 */
+  previousAmount: number;
+}>): number => {
+  if (taxableBonus <= 0) {
+    return 0;
+  }
+
+  if (hasPreviousSalary && taxableBonus <= previousAmount * 10) {
+    return taxableBonus * bonusWithholdingRate(previousAmount);
+  }
+
+  const previous = hasPreviousSalary ? previousAmount : 0;
+
+  return (
+    (monthlyWithholdingTax(previous + taxableBonus / BONUS_PERIOD_MONTHS) -
+      monthlyWithholdingTax(previous)) *
+    BONUS_PERIOD_MONTHS
+  );
+};
+
+/** 賞与の計算期間（月）。賞与は年に 1 回、1 月に支給する。 */
+const BONUS_PERIOD_MONTHS = 12;
+
 const calculateSalaryMonth = (
   salary: SalaryLookup,
   month: MonthIndex,
@@ -217,22 +256,22 @@ const calculateSalaryMonth = (
 
   const previous = socialInsuranceAt(salary, month - 1);
 
-  const bonusIncomeTax =
-    bonus === 0
-      ? 0
-      : (bonus -
-          bonusHealthInsurance -
-          bonusWelfarePension -
-          bonusEmploymentInsurance) *
-        // 算出率の表は「前月の社会保険料等控除後の給与等の金額」で引く。給与から
-        // 天引きする iDeCo の掛金（小規模企業共済等掛金）も社会保険料等に入る
-        // ので、月額表と同じく iDeCo の掛金を引いた額から引く。
-        bonusWithholdingRate(
-          grossAfterIdecoAt(salary, month - 1) -
-            previous.healthInsurance -
-            previous.welfarePension -
-            previous.employmentInsurance,
-        );
+  const bonusIncomeTax = bonusWithholdingTax({
+    taxableBonus:
+      bonus -
+      bonusHealthInsurance -
+      bonusWelfarePension -
+      bonusEmploymentInsurance,
+    hasPreviousSalary: grossAt(salary, month - 1) > 0,
+    // 算出率の表は「前月の社会保険料等控除後の給与等の金額」で引く。給与から
+    // 天引きする iDeCo の掛金（小規模企業共済等掛金）も社会保険料等に入る
+    // ので、月額表と同じく iDeCo の掛金を引いた額から引く。
+    previousAmount:
+      grossAfterIdecoAt(salary, month - 1) -
+      previous.healthInsurance -
+      previous.welfarePension -
+      previous.employmentInsurance,
+  });
 
   return {
     month,
