@@ -1,5 +1,5 @@
 diff --git a/v5.1/output/lib-files-branded/lib.es2015.core.d.ts b/v5.2/output/lib-files-branded/lib.es2015.core.d.ts
-index 389b61bbddd067996aa5386965760d43f35a0c5a..74dc1014a46e3b0830a99a509c6b2e9a3defe3fc 100644
+index 950a4ab6f2f1ab8fa8670a3f32fea4ecd396a601..e996e9a46656179ca99f660bbdd56a28050217b9 100644
 --- a/v5.1/output/lib-files-branded/lib.es2015.core.d.ts
 +++ b/v5.2/output/lib-files-branded/lib.es2015.core.d.ts
 @@ -87,12 +87,12 @@ interface Array<T> {

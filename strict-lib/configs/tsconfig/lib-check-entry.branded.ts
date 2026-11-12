@@ -312,3 +312,26 @@ export const fromEntriesTypes = (
     >,
   ];
 };
+
+/**
+ * #2921 — `String#repeat` took a bare `SafeUint`, so a literal count needed
+ * `asSafeUint`. It takes `StringSizeArgNonNegative`, as `includes` does: an
+ * integer literal from 0 to 39 or any `SafeUint` is accepted, a larger, negative
+ * or fractional literal is not. `'a'.repeat(0)` pins the lower end, which a
+ * positive-only type would lose; `'a'.repeat(40)` pins `WithSmallInt`'s bound,
+ * which the changelog states, so raising it in ts-type-forge fails here. Only
+ * `repeat` is asserted: it is the parameter that regressed, and covering every
+ * branded parameter is a guard of its own.
+ */
+export const repeatCounts = (count: SafeUint): readonly string[] => [
+  'a'.repeat(0),
+  'a'.repeat(3),
+  'a'.repeat(39),
+  'a'.repeat(count),
+  // @ts-expect-error a literal past 39 needs `asSafeUint`
+  'a'.repeat(40),
+  // @ts-expect-error a negative count throws a RangeError
+  'a'.repeat(-1),
+  // @ts-expect-error a fractional count is not an integer
+  'a'.repeat(1.5),
+];

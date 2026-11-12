@@ -558,7 +558,7 @@ interface String {
    * the empty string is returned.
    * @param count number of copies to append
    */
-  repeat(count: import('ts-type-forge').SafeUint): string;
+  repeat(count: NumberType.StringSizeArgNonNegative): string;
 
   /**
    * Returns true if the sequence of elements of searchString converted to a String is the
