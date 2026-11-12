@@ -436,20 +436,20 @@ cannot decide:
   `ws:build`.
 - No bundler: libraries build with `tsc` plus the strip pass. Nothing depends
   on `rollup`.
-- Shared devDependency versions live in the `catalog:` of
-  `pnpm-workspace.yaml`; published `dependencies` / `peerDependencies` keep
-  literal ranges. `update.ignoreDeps` is the one place a dependency is held
-  back; `update.githubActions` stays `false` (action pins move within their
-  major through `update-actions`, held to `minimumReleaseAge` via GitHub
-  Releases; a major waits for a human).
+- A devDependency several packages share gets an entry in the `catalog:` of
+  `pnpm-workspace.yaml`. `check:root:dependency-specifiers` holds the `catalog:`
+  and `workspace:` specifiers; which of `workspace:^` / `~` / `*` is the range
+  to publish is left to judgement.
+- `update.ignoreDeps` is the one place a dependency is held back;
+  `update.githubActions` stays `false` (action pins move within their major
+  through `update-actions`, held to `minimumReleaseAge` via GitHub Releases; a
+  major waits for a human).
 - `update-packages` filters out `strict-lib/v*/output/lib`, whose manifests
   are generated with a `^<major>.0.0` range.
-- **Do not put `pnpm` on `minimumReleaseAgeExclude`**; `pnpm-update.yml` picks
-  a mature pnpm through `mature-updates.mts pnpm` instead. What that list asks
-  of an entry, and where a reason has to go so that pruning cannot take it
-  away, is written above it in `pnpm-workspace.yaml`.
-- Workspace dependencies use `workspace:^` / `workspace:~` / `workspace:*`
-  matching the range to publish; `devDependencies` use `workspace:*`.
+- **Do not put `pnpm` on `minimumReleaseAgeExclude`**; `pnpm-update.yml` picks a
+  mature pnpm through `mature-updates.mts pnpm` instead. What that list asks of
+  an entry, and where a reason has to go so that pruning cannot take it away, is
+  written above it in `pnpm-workspace.yaml`.
 - **The strict standard library is one root devDependency**
   (`strict-ts-lib-v7.0`) linked into `node_modules/@typescript/` by the root
   `prepare`. Do not reintroduce `@typescript/lib-*` in `paths`,

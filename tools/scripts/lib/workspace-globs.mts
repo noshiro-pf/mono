@@ -16,18 +16,30 @@ import { projectRootPath } from '../project-root-path.mjs';
 export const readPnpmWorkspaceGlobs = async (): Promise<
   Result<readonly string[], string>
 > => {
+  const content = await readPnpmWorkspaceFile();
+
+  return Result.isErr(content)
+    ? content
+    : parseWorkspacePackages(content.value);
+};
+
+/**
+ * The text of `pnpm-workspace.yaml`, for a guard that reads more of it than the
+ * globs.
+ */
+export const readPnpmWorkspaceFile = async (): Promise<
+  Result<string, string>
+> => {
   const content = await Result.fromPromise(
     // eslint-disable-next-line security/detect-non-literal-fs-filename
     fs.readFile(path.join(projectRootPath, PNPM_WORKSPACE_FILE_NAME), 'utf8'),
   );
 
-  if (Result.isErr(content)) {
-    return Result.err(
-      `Failed to read ${PNPM_WORKSPACE_FILE_NAME}: ${unknownToString(content.value)}`,
-    );
-  }
-
-  return parseWorkspacePackages(content.value);
+  return Result.isErr(content)
+    ? Result.err(
+        `Failed to read ${PNPM_WORKSPACE_FILE_NAME}: ${unknownToString(content.value)}`,
+      )
+    : content;
 };
 
 /**
