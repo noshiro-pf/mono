@@ -116,13 +116,11 @@ converter (`scripts-common/`), and per version the published bundle
 ### `experimental/`
 
 The pre-2026 monorepo plus standalone repositories imported before deletion;
-inventory in `docs/experimental-inventory.md`. Nothing here is installed,
-built or checked, and a diff touching only it skips every workflow.
+inventory in `docs/experimental-inventory.md`. Nothing here is installed, built
+or checked, and a diff touching only it skips the check workflows.
 
 - Do not add it to the workspace, and do not fix code here in unrelated work.
-- Importing into it and reviving from it follow `experimental/README.md`;
-  above all, no `package.json` or lockfile stays here, because Dependabot
-  alerts on them and no setting excludes a directory.
+- Importing into it and reviving from it follow `experimental/README.md`.
 
 ## Commands
 

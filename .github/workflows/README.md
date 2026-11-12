@@ -822,7 +822,9 @@ caller to skip, so they carry no `skip-ci` condition and run on every event.
 They read the API for seconds, and a job still queued or running is `pending`,
 which holds the merge as well. `verify-lockfile.yml`'s one job is the same kind
 of context for the same reasons, and does not run on label events at all, so
-taking `skip-ci` off would not bring back a run it had skipped.
+taking `skip-ci` off would not bring back a run it had skipped. Running on every
+pull request with a checkout, it is also where a `package.json` or lockfile
+under `experimental/` is refused: every gate skips the diff that adds one.
 
 ## `pull_request_target`
 
