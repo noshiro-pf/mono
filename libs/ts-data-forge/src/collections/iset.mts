@@ -803,7 +803,10 @@ class ISetClass<K extends MapSetKeyType> implements ISet<K>, Iterable<K> {
       return this;
     }
 
-    return ISet.create(Array.from(this.#set).filter((k) => !Object.is(k, key)));
+    // Through the native collection, which compares keys with SameValueZero as
+    // `has` and `get` do; a rebuild comparing with `Object.is` left a `-0` key
+    // unmatched.
+    return this.withMutations([{ type: 'delete', key }]);
   }
 
   /** @inheritdoc */

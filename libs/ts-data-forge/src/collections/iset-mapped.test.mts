@@ -1262,3 +1262,16 @@ describe('ISetMapped additional functionality with complex types', () => {
     });
   });
 });
+
+describe('ISetMapped.delete with a key mapped to -0 (#3963)', () => {
+  test('delete deletes the element stored under 0', () => {
+    assert.deepStrictEqual(
+      Array.from(
+        ISetMapped.create([{ v: 0 }, { v: 1 }], toKey, fromKey).delete({
+          v: -0,
+        }),
+      ),
+      [{ v: 1 }],
+    );
+  });
+});

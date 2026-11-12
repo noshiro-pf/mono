@@ -1054,3 +1054,27 @@ describe('IMapMapped.toRawMap', () => {
     expect(rawMap.get('admin_2')).toBe('Bob');
   });
 });
+
+describe('IMapMapped writes with a key mapped to -0 (#3963)', () => {
+  const map = IMapMapped.create<Readonly<{ v: number }>, string, number>(
+    [[{ v: 0 }, 'a']],
+    toKey,
+    fromKey,
+  );
+
+  test('delete deletes the entry stored under 0', () => {
+    assert.deepStrictEqual(Array.from(map.delete({ v: -0 })), []);
+  });
+
+  test('set replaces the value stored under 0', () => {
+    assert.deepStrictEqual(Array.from(map.set({ v: -0 }, 'b')), [
+      [{ v: 0 }, 'b'],
+    ]);
+  });
+
+  test('update updates the value stored under 0', () => {
+    assert.deepStrictEqual(Array.from(map.update({ v: -0 }, () => 'c')), [
+      [{ v: 0 }, 'c'],
+    ]);
+  });
+});
