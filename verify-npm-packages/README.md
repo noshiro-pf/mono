@@ -38,7 +38,7 @@ CI の走らせ方はこの性質に合わせてある。
 ```text
 smoke/<package>.mjs      チェック本体。ここだけが手で書かれている
 local/packages/<pkg>/    生成物: package.json と smoke/ のコピー
-published/packages/<pkg>/ 同上、依存指定だけが違う
+published/packages/<pkg>/ 同上。依存指定が違い、コピーは smoke/ より古いことがある
 ```
 
 `<pkg>/` はそれぞれが独立した pnpm workspace root で、`pnpm-workspace.yaml` と
@@ -48,28 +48,55 @@ published/packages/<pkg>/ 同上、依存指定だけが違う
 
 **チェックを直すときは `smoke/` を直す。** `local/` `published/` 配下は
 `tools/scripts/cmd/verify-npm-packages.mts` が生成し、コミットもされている。
-生成物と `smoke/` がずれると CI の「作業ツリーが汚れていないか」チェックが落ちる。
+`local/` の生成物と `smoke/` がずれると CI の「作業ツリーが汚れていないか」チェックが落ちる。
 どの公開対象の package にも対応しない `smoke/` のファイル（package の名前を
 変えたり、削除したり、private にしたりした後に残ったもの）があると、生成が
 そのファイルを名指して失敗する。何も実行しないのに生きたチェックに見えるので、
 削除するか、今チェックする package の名前に変える。
 
-**ただし、まだリリースしていない API のアサーションを足したときは `published/`
-を再生成しない。** 再生成すると、ピンの指す公開済みバージョンにはまだ無い名前を
-import することになり、`SyntaxError: does not provide an export named ...` で
-`verify-published` が落ちる。**ここに存在しない API を書けるのは `local/` だけ**
-で、それが 2 つの空間の違いそのもの。手順は次のとおり。
+### `published/` のチェックは `smoke/` より古くてよい
+
+`published/packages/<pkg>/<pkg>.mjs` は、**そのピンのバージョンで最後に通った
+チェック**で、`published/` の実行（`verify:npm-packages:published`）が走らせるのは
+`smoke/` ではなくこのコミット済みのコピー。`smoke/` には、まだリリースしていない API
+のアサーションを書ける。`local/` はこのチェックアウトから pack するのでその API を
+持つが、ピンの指す公開済みバージョンには無く、同じチェックを走らせると
+`SyntaxError: does not provide an export named ...` で落ちる。**ここに存在しない API
+を書けるのは `local/` だけ**で、それが 2 つの空間の違いそのもの。
+
+そのため生成は空間で違う。
+
+|              | `<pkg>.mjs` をいつ書くか                                                              |
+| :----------- | :------------------------------------------------------------------------------------ |
+| `local/`     | 生成のたびに `smoke/` から上書きする                                                  |
+| `published/` | project にチェックがまだ無いとき（npm に出たばかりのパッケージ）と、`--update` のとき |
+
+`--update`（`verify:npm-packages:published:update`、`pnpm-update` workflow が実行する）
+は、ピンを動かして install した後、コピーが `smoke/` と違うパッケージごとに `smoke/`
+のチェックを新しいピンで走らせる。通ればコピーを置き換え、落ちればコミット済みの
+コピーに戻して `kept the committed check of <pkg>` と、新しいチェックの出力を表示する。
+これは「その API がまだリリースされていない」とみなして失敗にはしない。コピーは、
+その API を持つバージョンにピンが動いた回に追いつく。ただしこの実行には、まさに
+その箇所が壊れているリリースと区別がつかない。リリースしたはずなのにコピーが
+追いつかないときは、`pnpm-update` の実行ログでその出力を読む。
+
+`published/` のチェックは生成のときに整形もしない。この実行が書いてよいのは `smoke/`
+にあるバイト列だけで、同じ実行で上がった Prettier が書き直したコピーは、もう `smoke/`
+のバイト列ではない。
+
+`pnpm-update` workflow の `commit` ジョブは、パッチに入ったコピーが `main` の
+`smoke/` にあるものと 1 バイトも違わないことを確かめてからコミットする（`smoke/`
+自体はパッチに入れられない）。
+
+アサーションを足すときの手順は次のとおり。
 
 1. `smoke/<pkg>.mjs` にアサーションを足す
-2. `pnpm run gen:verify-npm-packages`（`check-changed` も実行する）で `local/` だけを再生成してコミットし、`pnpm run verify:npm-packages` で実際にインストールして動かす
-3. `published/<pkg>` は**触らない**
+2. `pnpm run gen:verify-npm-packages`（`check-changed` も実行する）で `local/` を再生成してコミットし、`pnpm run verify:npm-packages` で実際にインストールして動かす
+3. `published/<pkg>` は**触らない**。手で `smoke/` を写すと、`published/` に差分が
+   できて `verify-published` が走り、古いピンに対して落ちる
 
-`published/` の生成物が古いままでも「作業ツリーが汚れていないか」は落ちない。
-`local/` を再生成するのは `verify:npm-packages`、`published/` を再生成するのは
-`verify:npm-packages:published` で、後者が CI で走るのは
-`verify-npm-packages/published/` に差分があるときだけ — つまり触らなければ走らない。
-`published/` は次にピンが動くとき（`pnpm-update` の `--update`）に、新しい API を
-持つバージョンと一緒に追いつく。
+`pnpm run verify:npm-packages:published` を手元で走らせても、`smoke/` が先に進んで
+いるだけなら作業ツリーは変わらない。
 
 `local/` の生成物はこのチェックアウトの manifest だけで決まる（tarball のパスに
 バージョンは入らず、peer 範囲は workspace から読む）。pack も install もせずに
@@ -82,8 +109,8 @@ import することになり、`SyntaxError: does not provide an export named ..
 `packages/<name>/` を消す（改名・削除・private 化されたパッケージの残骸）。
 `published/` の残りはレジストリを読まないと書けないが、何を残してよいかは読まずに
 決まるので、`local/` を生成する `gen:verify-npm-packages` と `verify:npm-packages`
-は `published/` からもそれを消す（上の「`published/` を再生成するのは
-`verify:npm-packages:published`」の唯一の例外）。そうしないとパッケージを消した
+は `published/` からもそれを消す（`local/` の生成が `published/` に触れる唯一の
+場合）。そうしないとパッケージを消した
 PR では `published/` の残骸が残り、次の `pnpm-update` のパッチにその削除が入って
 弾かれる。逆に `verify:npm-packages:published` は `local/` に触れない。
 

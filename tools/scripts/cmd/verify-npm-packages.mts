@@ -39,7 +39,8 @@ import { projectRootPath } from '../project-root-path.mjs';
  *   `verify-npm-packages/published/packages/<name>/package.json` — what
  *   consumers have, as of the last time `--update` (run by `pnpm-update`)
  *   moved the pins to `latest`. A new release reaches it only then (see
- *   `publishedVersionPin`).
+ *   `publishedVersionPin`), and the check it runs is the one committed beside
+ *   the pin (see `writeCheckCopy`).
  *
  * Both exist because they answer different questions. `local` fails on a
  * regression before it ships; `published` fails when something already released
@@ -106,8 +107,144 @@ export const verifyNpmPackages = async (
 
   console.info('ok\n');
 
-  return withoutRootLibLinks(() => runChecks(spaceDir, included));
+  return withoutRootLibLinks(async () => {
+    if (target === 'published' && options?.updatePins === true) {
+      await refreshPublishedChecks(spaceDir, included, { smokeDir, runCheck });
+    }
+
+    // Every project again, the ones just refreshed included: the list this
+    // prints is then each project's check as it will be committed, and what
+    // that costs is one more run of the few checks that moved.
+    return runChecks(spaceDir, included);
+  });
 };
+
+/**
+ * Writes a project's check, `content` being the one under `smoke/` — unless the
+ * project is a published one that already has a check, which is left as it is.
+ *
+ * A check under `smoke/` may assert an API that is not released yet: the
+ * `local` space, packed from this checkout, has it, and the version a published
+ * project pins does not. So a published project keeps the check that last
+ * passed on its pin, committed, and that is the one a published run executes;
+ * `refreshPublishedChecks` is what moves it forward. Copied on every run, as it
+ * used to be, a published run executed assertions the pinned version could not
+ * meet, and left the tree dirty with copies no dependency update may commit.
+ *
+ * A project with no check is a package new to npm, which has nothing older to
+ * keep.
+ */
+export const writeCheckCopy = async (
+  target: Target,
+  file: string,
+  content: string,
+): Promise<void> => {
+  if (target === 'published' && (await fileExists(file))) {
+    return;
+  }
+
+  await writeFile(file, content);
+};
+
+/**
+ * Brings each published project's check up to the one under `smoke/`, where
+ * that one passes on the version now installed, and returns the names of the
+ * packages whose committed check was kept because it does not.
+ *
+ * Run by `--update`, after the install and before the checks: the pins have
+ * just moved, so a check written ahead of a release may pass now. One that
+ * still fails is taken to be an assertion for something not on npm yet, so the
+ * committed bytes go back and the run goes on to execute those. A check that is
+ * already the one under `smoke/` is not run here at all.
+ */
+export const refreshPublishedChecks = async (
+  spaceDir: string,
+  packages: readonly PackageToCheck[],
+  {
+    smokeDir: sourceDir,
+    runCheck: run,
+  }: Readonly<{
+    smokeDir: string;
+    runCheck: (
+      space: string,
+      pkg: PackageToCheck,
+    ) => Promise<Result<undefined, string>>;
+  }>,
+): Promise<readonly string[]> => {
+  const mut_kept: string[] = [];
+
+  for (const pkg of packages) {
+    const copy = path.resolve(
+      spaceDir,
+      'packages',
+      pkg.name,
+      smokeFileName(pkg.name),
+    );
+
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
+    const current = await fs.readFile(
+      path.resolve(sourceDir, smokeSourceName(pkg.name)),
+      'utf8',
+    );
+
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
+    const committed = await fs.readFile(copy, 'utf8');
+
+    if (current === committed) {
+      continue;
+    }
+
+    await writeFile(copy, current);
+
+    // The trial copy stays only once its check has passed: a `run` that throws
+    // must not leave in the tree, for the next step to bundle, a check that
+    // never passed on the pin. A run killed here cannot put it back, and the
+    // copy then shows as a change to a tracked file; `git checkout` undoes it.
+    let mut_tried: Result<undefined, string> | undefined = undefined;
+
+    try {
+      mut_tried = await run(spaceDir, pkg);
+    } finally {
+      if (mut_tried === undefined || Result.isErr(mut_tried)) {
+        await writeFile(copy, committed);
+      }
+    }
+
+    if (Result.isOk(mut_tried)) {
+      continue;
+    }
+
+    mut_kept.push(pkg.name);
+
+    // A release that is broken where the new check looks fails here just as an
+    // API not released yet does, and nothing in the failure tells them apart.
+    // It is not a failure of this run either way — the committed check goes on
+    // guarding the pin, and the `local` space runs the new one on every branch
+    // — so what the check reported is printed for whoever reads why a copy
+    // stays behind.
+    console.info(
+      `  kept the committed check of ${pkg.name}: the one under smoke/ does not pass on the pinned version yet.\n${indent(mut_tried.value)}`,
+    );
+  }
+
+  return mut_kept;
+};
+
+/**
+ * The files of a space that a generation formats: everything it writes, a
+ * published project's check aside.
+ *
+ * The generated files are committed, and CI checks the working tree is clean.
+ * Formatting them means regenerating never shows up as a diff just because
+ * `JSON.stringify` and Prettier disagree about line breaks.
+ *
+ * A published project's check is left out: a run may change it only to the
+ * bytes `smoke/` has, which is the one change to it `pnpm-update.yml` commits.
+ * Reprinted — by a Prettier the same run has just updated — a copy would enter
+ * the patch as something else.
+ */
+export const generatedFilesGlob = (target: Target, spaceDir: string): string =>
+  `${spaceDir}/**/*.${target === 'published' ? '{json,yaml}' : '{json,mjs,mts,yaml}'}` as const;
 
 /**
  * Writes the committed files of the `local` space, and removes from both spaces
@@ -282,6 +419,27 @@ export const publishablePackagesOf = (
       );
 };
 
+/**
+ * The strict standard library packages all share one check, because they only
+ * differ by the TypeScript minor they were generated from — and what is being
+ * verified is the same for each: that the published tarball's `libs/` layout is
+ * what `libReplacement` asks for.
+ */
+export const smokeSourceName = (packageName: string): string =>
+  isStrictLibPackage(packageName)
+    ? 'strict-ts-lib.mts'
+    : smokeFileName(packageName);
+
+/**
+ * A package that publishes types only is checked by compiling against it rather
+ * than importing it — there is nothing to import. Its check is written as
+ * `.mts`, and the presence of that file is what selects the mode.
+ */
+export const smokeFileName = (packageName: string): string =>
+  isTypesOnly(packageName)
+    ? (`${packageName}.mts` as const)
+    : (`${packageName}.mjs` as const);
+
 const spaceDirOf = (target: Target): string => path.resolve(verifyDir, target);
 
 /**
@@ -303,6 +461,10 @@ const pruneSpace = async (
   }
 };
 
+/** Whether a file system call failed because the path is not there. */
+const isNotFound = (error: unknown): boolean =>
+  isRecord(error) && error['code'] === 'ENOENT';
+
 /**
  * The entries of `dir`, or none when it does not exist. Any other failure is
  * thrown: reading nothing would leave every stale project in place unnoticed.
@@ -312,7 +474,7 @@ const readEntriesIfAny = async (dir: string): Promise<readonly Dirent[]> => {
     // eslint-disable-next-line security/detect-non-literal-fs-filename
     return await fs.readdir(dir, { withFileTypes: true });
   } catch (error: unknown) {
-    if (isRecord(error) && error['code'] === 'ENOENT') {
+    if (isNotFound(error)) {
       return [];
     }
 
@@ -356,20 +518,38 @@ const withoutRootLibLinks = async (
     );
   }
 
-  const result = await check();
+  // In a `finally`, so that a `check` that throws does not leave the links
+  // removed: they are the repository's own, and every later `tsc` in this
+  // checkout reads them. `undefined` is that throw, which is on its way out
+  // already, so a failure to restore can only be printed beside it.
+  let mut_result: Result<undefined, string> | undefined = undefined;
 
-  const relinked = await $('pnpm run z:link-strict-lib', {
-    silent: true,
-    cwd: projectRootPath,
-  });
+  try {
+    mut_result = await check();
+  } finally {
+    const relinked = await $('pnpm run z:link-strict-lib', {
+      silent: true,
+      cwd: projectRootPath,
+    });
 
-  if (Result.isErr(relinked)) {
-    return Result.err(
-      `Could not restore the repository's own @typescript/lib-* links (run \`pnpm run z:link-strict-lib\`): ${relinked.value.message}`,
-    );
+    if (Result.isErr(relinked)) {
+      const message =
+        `Could not restore the repository's own @typescript/lib-* links (run \`pnpm run z:link-strict-lib\`): ${relinked.value.message}` as const;
+
+      if (mut_result === undefined) {
+        console.error(message);
+      } else {
+        // After what the checks said, not in place of it.
+        mut_result = Result.err(
+          Result.isErr(mut_result)
+            ? `${mut_result.value}\n${message}`
+            : message,
+        );
+      }
+    }
   }
 
-  return result;
+  return mut_result;
 };
 
 /**
@@ -436,7 +616,7 @@ const smokeDir = path.resolve(verifyDir, 'smoke');
 
 const tarballDir = path.resolve(verifyDir, '.tarballs');
 
-type PackageToCheck = Readonly<{
+export type PackageToCheck = Readonly<{
   name: string;
   path: string;
   manifest: JsonValue;
@@ -885,27 +1065,6 @@ const publishedVersionPin = async (
 };
 
 /**
- * A package that publishes types only is checked by compiling against it rather
- * than importing it — there is nothing to import. Its check is written as
- * `.mts`, and the presence of that file is what selects the mode.
- */
-const smokeFileName = (packageName: string): string =>
-  isTypesOnly(packageName)
-    ? (`${packageName}.mts` as const)
-    : (`${packageName}.mjs` as const);
-
-/**
- * The strict standard library packages all share one check, because they only
- * differ by the TypeScript minor they were generated from — and what is being
- * verified is the same for each: that the published tarball's `libs/` layout is
- * what `libReplacement` asks for.
- */
-const smokeSourceName = (packageName: string): string =>
-  isStrictLibPackage(packageName)
-    ? 'strict-ts-lib.mts'
-    : smokeFileName(packageName);
-
-/**
  * The `compilerOptions` a strict standard library package's own README tells a
  * consumer to write beside the linker. Nothing for a package that is not one.
  *
@@ -987,6 +1146,24 @@ const hasPathsRoute = (packageName: string): boolean => {
   return major !== undefined && major >= 7;
 };
 
+/**
+ * Whether `file` is there. Any failure but its absence is thrown: reading one
+ * as "not there" would overwrite a check that could not be looked at.
+ */
+const fileExists = async (file: string): Promise<boolean> => {
+  try {
+    await fs.access(file);
+
+    return true;
+  } catch (error: unknown) {
+    if (isNotFound(error)) {
+      return false;
+    }
+
+    throw error;
+  }
+};
+
 const writeFile = async (file: string, content: string): Promise<void> => {
   // eslint-disable-next-line security/detect-non-literal-fs-filename
   await fs.writeFile(file, content);
@@ -998,11 +1175,13 @@ const writeJson = async (file: string, value: unknown): Promise<void> => {
 
 /**
  * Writes the space: one project per package, each depending only on that
- * package and the peers it needs, with the shared check copied in. A `local`
- * run also prunes the `published` space — see `spacesToPrune`.
+ * package and the peers it needs, with the shared check copied in — always in
+ * the `local` space, and in the `published` one only into a project that has
+ * none (see `writeCheckCopy`). A `local` run also prunes the `published` space
+ * — see `spacesToPrune`.
  *
  * The files are generated and committed, so that CI's repository-is-clean check
- * fails if `verify-npm-packages/smoke/` and the spaces ever disagree.
+ * fails if `verify-npm-packages/smoke/` and the `local` space ever disagree.
  */
 const generateSpace = async (
   target: Target,
@@ -1110,7 +1289,11 @@ const generateSpace = async (
       break;
     }
 
-    await writeFile(path.resolve(dir, smokeFileName(pkg.name)), content);
+    await writeCheckCopy(
+      target,
+      path.resolve(dir, smokeFileName(pkg.name)),
+      content,
+    );
 
     if (!isTypesOnly(pkg.name)) {
       continue;
@@ -1133,14 +1316,10 @@ const generateSpace = async (
     }
   }
 
-  // The generated files are committed, and CI checks the working tree is clean.
-  // Formatting them here means regenerating never shows up as a diff just
-  // because `JSON.stringify` and Prettier disagree about line breaks.
+  // Which files, and why not a published project's check: `generatedFilesGlob`.
   const formatted = await formatFilesGlob(
-    `${spaceDir}/**/*.{json,mjs,mts,yaml}`,
-    {
-      silent: true,
-    },
+    generatedFilesGlob(target, spaceDir),
+    { silent: true },
   );
 
   if (Result.isErr(formatted)) {
@@ -1201,6 +1380,70 @@ const indent = (text: string): string =>
     .map((line) => `      ${line}`)
     .join('\n');
 
+/**
+ * Runs one project's check against what is installed in it, and returns what
+ * the command reported when it fails.
+ */
+const runCheck = async (
+  spaceDir: string,
+  pkg: PackageToCheck,
+): Promise<Result<undefined, string>> => {
+  const dir = path.resolve(spaceDir, 'packages', pkg.name);
+
+  const file = smokeFileName(pkg.name);
+
+  // `--import isolate.mjs` refuses any resolution outside the project — its own
+  // `node_modules` and nothing above. These projects sit inside the monorepo,
+  // so without it Node walks up into the repository's own `node_modules` and a
+  // package missing a dependency finds it there — the check then passes on a
+  // package a consumer cannot use.
+  // Through NODE_OPTIONS rather than an argument, so that a check which spawns
+  // the package's own executable — several do — carries the boundary into that
+  // child process too.
+  const isolation =
+    `VERIFY_SPACE_ROOT=${dir} NODE_OPTIONS='--import ${path.resolve(verifyDir, 'isolate.mjs')}'` as const;
+
+  const tsc = (tsconfig: string): string =>
+    `${path.resolve(dir, 'node_modules', '.bin', 'tsc')} --noEmit -p ${path.resolve(dir, tsconfig)}` as const;
+
+  // A strict standard library is set up by the linker it ships, exactly as its
+  // README instructs — which makes the linker itself part of what is under
+  // test. `--dir` because the linker is run from the repository root rather
+  // than from the project, and under pnpm it cannot tell where it was installed
+  // from its own path — a consumer running `npx` in their project needs
+  // neither.
+  const linker =
+    `${path.resolve(dir, 'node_modules', '.bin', `${pkg.name}-link`)} --dir ${dir}` as const;
+
+  // The `paths` route goes first, after removing any links an earlier run left:
+  // with them in place, the name lookup would replace the libs on its own and
+  // the route would pass whether `paths` worked or not.
+  const pathsRoute = hasPathsRoute(pkg.name)
+    ? (`${linker} --unlink && ${tsc(PATHS_TSCONFIG)} && ` as const)
+    : '';
+
+  const cmd = isStrictLibPackage(pkg.name)
+    ? (`${pathsRoute}${linker} && ${tsc('tsconfig.json')}` as const)
+    : file.endsWith('.mts')
+      ? tsc('tsconfig.json')
+      : (`${isolation} node ${path.resolve(dir, file)}` as const);
+
+  // From the project directory, which is where a consumer runs their own build.
+  // It is not cosmetic: TypeScript 5.0 resolves `@typescript/lib-*` relative to
+  // the current directory rather than to the config that asked for it, so run
+  // from anywhere else the replacement silently does not happen and the probe
+  // stops erroring.
+  //
+  // `1>&2` because `tsc` reports its diagnostics on stdout, while the error
+  // handed back carries only stderr: a failed compile read as "Command failed"
+  // and nothing else.
+  const result = await $(`{ ${cmd}; } 1>&2`, { silent: true, cwd: dir });
+
+  return Result.isErr(result)
+    ? Result.err(result.value.message)
+    : Result.ok(undefined);
+};
+
 const runChecks = async (
   spaceDir: string,
   packages: readonly PackageToCheck[],
@@ -1210,57 +1453,12 @@ const runChecks = async (
   const mut_failures: string[] = [];
 
   for (const pkg of packages) {
-    const dir = path.resolve(spaceDir, 'packages', pkg.name);
-
-    const file = smokeFileName(pkg.name);
-
-    // `--import isolate.mjs` refuses any resolution outside the project — its
-    // own `node_modules` and nothing above. These projects sit inside the
-    // monorepo, so without it Node walks up into the repository's own
-    // `node_modules` and a package missing a dependency finds it there — the
-    // check then passes on a package a consumer cannot use.
-    // Through NODE_OPTIONS rather than an argument, so that a check which
-    // spawns the package's own executable — several do — carries the boundary
-    // into that child process too.
-    const isolation =
-      `VERIFY_SPACE_ROOT=${dir} NODE_OPTIONS='--import ${path.resolve(verifyDir, 'isolate.mjs')}'` as const;
-
-    const tsc = (tsconfig: string): string =>
-      `${path.resolve(dir, 'node_modules', '.bin', 'tsc')} --noEmit -p ${path.resolve(dir, tsconfig)}` as const;
-
-    // A strict standard library is set up by the linker it ships, exactly as
-    // its README instructs — which makes the linker itself part of what is
-    // under test. `--dir` because the linker is run from the repository root
-    // rather than from the project, and under pnpm it cannot tell where it was
-    // installed from its own path — a consumer running `npx` in their project
-    // needs neither.
-    const linker =
-      `${path.resolve(dir, 'node_modules', '.bin', `${pkg.name}-link`)} --dir ${dir}` as const;
-
-    // The `paths` route goes first, after removing any links an earlier run
-    // left: with them in place, the name lookup would replace the libs on its
-    // own and the route would pass whether `paths` worked or not.
-    const pathsRoute = hasPathsRoute(pkg.name)
-      ? (`${linker} --unlink && ${tsc(PATHS_TSCONFIG)} && ` as const)
-      : '';
-
-    const cmd = isStrictLibPackage(pkg.name)
-      ? (`${pathsRoute}${linker} && ${tsc('tsconfig.json')}` as const)
-      : file.endsWith('.mts')
-        ? tsc('tsconfig.json')
-        : (`${isolation} node ${path.resolve(dir, file)}` as const);
-
-    // From the project directory, which is where a consumer runs their own
-    // build. It is not cosmetic: TypeScript 5.0 resolves `@typescript/lib-*`
-    // relative to the current directory rather than to the config that asked
-    // for it, so run from anywhere else the replacement silently does not
-    // happen and the probe stops erroring.
-    const result = await $(cmd, { silent: true, cwd: dir });
+    const result = await runCheck(spaceDir, pkg);
 
     if (Result.isErr(result)) {
       mut_failures.push(pkg.name);
 
-      console.error(`  ✗ ${pkg.name}\n${indent(result.value.message)}`);
+      console.error(`  ✗ ${pkg.name}\n${indent(result.value)}`);
     } else {
       console.info(`  ✓ ${pkg.name}`);
     }
