@@ -19,9 +19,9 @@ name: synstate-next Benchmark
 #
 # Not a check workflow: it reports no required context, and calls neither
 # `check-gates.yml` nor `check-result.yml`. A measurement is a decision to
-# republish the page, not a property of a tree, and it is long: half an hour
-# in a cloud container with three processes per library. Dispatch it on the
-# branch whose code is to be measured: the run measures the dispatched ref.
+# republish the page, not a property of a tree, and it is long. Dispatch it
+# on the branch whose code is to be measured: the run measures the
+# dispatched ref.
 on:
   workflow_dispatch:
 

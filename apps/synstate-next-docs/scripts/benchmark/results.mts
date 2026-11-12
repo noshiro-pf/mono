@@ -21,6 +21,14 @@ export const parseResults = (
 
 const BenchmarkResultsSchema = t.record({
   environment: t.record({
+    /**
+     * `github-actions` when `synstate-next-benchmark.yml` measured it, `local`
+     * otherwise; `check:root:synstate-benchmark-runner` refuses a committed
+     * `local`, as it does synstate's tables.
+     */
+    runner: t.enumType(['github-actions', 'local']),
+    /** The runner image, such as `ubuntu24`; `null` when run locally. */
+    runnerImage: t.union([t.string(), t.nullType]),
     node: t.string(),
     os: t.string(),
     cpu: t.string(),

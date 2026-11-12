@@ -26,7 +26,7 @@ import {
   type Scenario,
   scenarios,
 } from './scenarios.mjs';
-import { medianOverRounds, timeEntry } from './time-entry.mjs';
+import { medianOverRounds, ROUNDS, timeEntry } from './time-entry.mjs';
 
 /**
  * Measures every scenario of the benchmark page and writes what it measured to
@@ -71,6 +71,12 @@ const main = async (): Promise<void> => {
   const today = new Date();
 
   const environment = {
+    // As synstate's documentation records it (its `environment.mts`).
+    runner:
+      process.env['GITHUB_ACTIONS'] === 'true'
+        ? ('github-actions' as const)
+        : ('local' as const),
+    runnerImage: process.env['ImageOS'] ?? process.env['RUNNER_IMAGE'] ?? null,
     node: process.version,
     os: `${os.type()} ${os.release()} (${process.arch})`,
     cpu: os.cpus()[0]?.model ?? 'unknown',
@@ -112,9 +118,6 @@ const main = async (): Promise<void> => {
 
   console.info(`\nWrote ${shown}`);
 };
-
-/** How many times each library is measured, each in a new process. */
-const rounds = 3;
 
 /**
  * Set to the runner's pid in a process it starts to measure one library. The
@@ -242,7 +245,7 @@ const measureInChild = (
   });
 
 /**
- * Measures each library of `scenario` in a process of its own, {@link rounds}
+ * Measures each library of `scenario` in a process of its own, {@link ROUNDS}
  * times. The libraries alternate, and which goes first turns from round to
  * round, so that a slow stretch of the machine falls on all of them.
  */
@@ -251,7 +254,7 @@ const measureScenario = async (scenario: Scenario): Promise<ScenarioResult> => {
 
   const mut_runs: (readonly [number, EntryResult])[] = [];
 
-  for (const round of Arr.seq(rounds)) {
+  for (const round of Arr.seq(ROUNDS)) {
     for (const index of round % 2 === 0 ? indices : indices.toReversed()) {
       mut_runs.push([index, await measureInChild(scenario, index)]);
     }
@@ -305,7 +308,7 @@ const readLibraryVersions = async (): Promise<
 > => {
   const mut_versions = new Map<string, string>();
 
-  // About fifty lookups, once per run of half an hour: not worth a cache.
+  // About fifty lookups, once per run of over an hour: not worth a cache.
   for (const { entries } of scenarios) {
     for (const { label, file } of entries) {
       if (isSubject(label)) {
