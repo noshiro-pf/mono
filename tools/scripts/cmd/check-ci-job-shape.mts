@@ -20,11 +20,11 @@ import {
   matrixValues,
   readMatrix,
   readWorkflowJobs,
+  triggersOn,
   type WorkflowJob,
 } from '../lib/workflow-jobs.mjs';
 import { projectRootPath } from '../project-root-path.mjs';
 import { MATRIX_WORKFLOWS } from './check-all.mjs';
-import { parseWorkflowTriggers } from './check-workflow-event-name.mjs';
 
 /**
  * Holds the check workflows to the shape that keeps a local run and CI in step:
@@ -55,8 +55,7 @@ export const checkCiJobShape = (): Promise<Result<number, string>> =>
             .split(path.sep)
             .join('/'),
           text,
-          isCheck:
-            parseWorkflowTriggers(text).triggerEvents.includes('pull_request'),
+          isCheck: triggersOn(text, 'pull_request'),
         };
       }),
     );

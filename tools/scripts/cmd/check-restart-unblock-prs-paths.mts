@@ -17,6 +17,11 @@ import {
   listTrackedFiles,
   readRepositoryFile,
 } from '../lib/repo-files.mjs';
+import {
+  readShellScript,
+  type ShellAssignment,
+} from '../lib/shell-commands.mjs';
+import { readWorkflowJobs } from '../lib/workflow-jobs.mjs';
 import { projectRootPath } from '../project-root-path.mjs';
 
 /**
@@ -142,63 +147,70 @@ export const checkRestartUnblockPrsPaths = (): Promise<
 
 /**
  * The patterns named by `variables`, read from the shell assignments of the
- * workflow's `run:` block with each `${name}` expanded from an assignment above
- * it, and compiled as JavaScript regular expressions — the alternation, `\.`
- * and anchors the workflow writes for `grep -E` mean the same there.
+ * workflow's `run:` scripts with each `${name}` expanded from an assignment
+ * above it in the same script, and compiled as JavaScript regular expressions —
+ * the alternation, `\.` and anchors the workflow writes for `grep -E` mean the
+ * same there.
  *
- * Read with a line scanner, as `check-workflow-event-name.mts` reads triggers:
- * the assignments are one per line and a YAML parser would add nothing.
+ * Read through `tools/scripts/lib/workflow-jobs.mts` and the shell reader of
+ * `tools/scripts/lib/shell-commands.mts`, so that an assignment is read as the
+ * shell reads it: several on a line, one with a trailing comment, or a step in
+ * flow style. A variable another step assigned is not expanded, as the shell of
+ * this step would not see it; one that more than one step assigns is an error,
+ * since which the workflow uses depends on the step.
  */
 export const parsePatterns = (
   workflowFile: string,
   variables: readonly string[],
 ): Result<ReadonlyMap<string, RegExp>, string> => {
-  const mut_values = new Map<string, string>();
+  const jobs = readWorkflowJobs(workflowFile);
 
-  for (const line of workflowFile.split('\n')) {
-    const matched = ASSIGNMENT.exec(line);
+  if (Result.isErr(jobs)) {
+    return jobs;
+  }
 
-    const name = matched?.groups?.['name'];
+  const mut_sources = new Map<string, string>();
 
-    const value = matched?.groups?.['value'];
-
-    if (name === undefined || value === undefined) {
-      continue;
-    }
-
-    const unknownNames = Array.from(
-      value.matchAll(EXPANSION),
-      (expansion) => expansion.groups?.['name'] ?? '',
-    ).filter((expanded) => !mut_values.has(expanded));
-
-    if (Arr.isNonEmpty(unknownNames)) {
-      if (variables.includes(name)) {
-        return Result.err(
-          `${name} expands \${${unknownNames[0]}}, which no line above it assigns.`,
-        );
+  for (const { steps } of jobs.value) {
+    for (const { run } of steps) {
+      if (run === undefined) {
+        continue;
       }
 
-      continue;
-    }
+      const { values, unresolved } = expandAssignments(
+        readShellScript(run).assignments,
+      );
 
-    // Split and joined rather than `replace`d: the values hold `$`, which a
-    // replacement string would read as a pattern of its own.
-    mut_values.set(
-      name,
-      value
-        .matchAll(EXPANSION)
-        .reduce(
-          (expandedValue, [whole, expanded = '']) =>
-            expandedValue.split(whole).join(mut_values.get(expanded) ?? ''),
-          value,
-        ),
-    );
+      for (const variable of variables) {
+        const unknownName = unresolved.get(variable);
+
+        if (unknownName !== undefined) {
+          return Result.err(
+            `${variable} expands \${${unknownName}}, which no line above it assigns.`,
+          );
+        }
+
+        const value = values.get(variable);
+
+        if (value === undefined) {
+          continue;
+        }
+
+        if (mut_sources.has(variable)) {
+          return Result.err(
+            `${variable} is assigned in more than one step, so which pattern the workflow uses depends on the step.`,
+          );
+        }
+
+        mut_sources.set(variable, value);
+      }
+    }
   }
 
   const mut_patterns = new Map<string, RegExp>();
 
   for (const variable of variables) {
-    const source = mut_values.get(variable);
+    const source = mut_sources.get(variable);
 
     if (source === undefined) {
       return Result.err(`The workflow assigns no ${variable}.`);
@@ -483,10 +495,51 @@ const LEFT_OUT = [
 /** A package's source entry, in the order `CLAUDE.md` names them. */
 const PACKAGE_ENTRIES = ['entry-point.mts', 'index.mts'] as const;
 
-const ASSIGNMENT =
-  /^\s*(?<name>[a-z_]+)=(?<quote>['"])(?<value>.*)\k<quote>\s*$/u;
-
 const EXPANSION = /\$\{(?<name>[a-z_]+)\}/gu;
+
+/**
+ * The values of a script's assignments, in order, each `${name}` replaced by
+ * the value assigned above it; and, apart, each assignment that expands a name
+ * none above it assigns, with that name, which is left out of the values.
+ */
+const expandAssignments = (
+  assignments: readonly ShellAssignment[],
+): Readonly<{
+  values: ReadonlyMap<string, string>;
+  unresolved: ReadonlyMap<string, string>;
+}> => {
+  const mut_values = new Map<string, string>();
+
+  const mut_unresolved = new Map<string, string>();
+
+  for (const { name, value } of assignments) {
+    const unknownName = Array.from(
+      value.matchAll(EXPANSION),
+      (expansion) => expansion.groups?.['name'] ?? '',
+    ).find((expanded) => !mut_values.has(expanded));
+
+    if (unknownName !== undefined) {
+      mut_unresolved.set(name, unknownName);
+
+      continue;
+    }
+
+    // Split and joined rather than `replace`d: the values hold `$`, which a
+    // replacement string would read as a pattern of its own.
+    mut_values.set(
+      name,
+      value
+        .matchAll(EXPANSION)
+        .reduce(
+          (expandedValue, [whole, expanded = '']) =>
+            expandedValue.split(whole).join(mut_values.get(expanded) ?? ''),
+          value,
+        ),
+    );
+  }
+
+  return { values: mut_values, unresolved: mut_unresolved };
+};
 
 /** The workflow's own filter on the changed files, before any pattern. */
 const isModule = (file: string): boolean =>

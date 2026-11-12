@@ -4,6 +4,7 @@ import { Arr, Num, Result, unknownToString } from 'ts-data-forge';
 import { isDirectlyExecuted } from 'ts-repo-utils';
 import type { ReadonlyRecord } from 'ts-type-forge';
 import { listWorkflowFiles } from '../lib/repo-files.mjs';
+import { readWorkflowJobs } from '../lib/workflow-jobs.mjs';
 import { projectRootPath } from '../project-root-path.mjs';
 
 /**
@@ -47,61 +48,21 @@ export const checkWorkflowTimeouts = (): Promise<
   });
 
 /**
- * The jobs of one workflow, read with a line scanner rather than a YAML parser
- * — as `check-workflow-event-name.mts` reads the `on:` block. A job is a key
- * indented one level below a bare `jobs:`, and what is read of it are its own
- * keys, one level further in.
+ * The jobs of one workflow, read through `tools/scripts/lib/workflow-jobs.mts`,
+ * so that a job in flow style or with quoted keys is read as GitHub reads it:
+ * whether each has a runner, and its own `timeout-minutes` (a step's is not the
+ * job's).
  */
-export const parseWorkflowJobs = (workflowFile: string): readonly Job[] => {
-  const lines = workflowFile.split('\n');
-
-  const blockIndex = lines.findIndex((line) => line.trimEnd() === 'jobs:');
-
-  if (blockIndex === -1) {
-    return [];
-  }
-
-  const rest = lines.slice(blockIndex + 1);
-
-  const endIndex = rest.findIndex(
-    (line) => line !== '' && !line.startsWith(' ') && !line.startsWith('#'),
+export const parseWorkflowJobs = (
+  workflowFile: string,
+): Result<readonly Job[], string> =>
+  Result.map(readWorkflowJobs(workflowFile), (jobs) =>
+    jobs.map(({ name, hasRunner, timeoutMinutes }) => ({
+      jobId: name,
+      runsOnRunner: hasRunner,
+      timeout: timeoutMinutes,
+    })),
   );
-
-  const block = endIndex === -1 ? rest : rest.slice(0, endIndex);
-
-  const mut_jobs: Job[] = [];
-
-  for (const line of block) {
-    const jobKey = /^ {2}(?<jobId>[\w-]+):\s*$/u.exec(line)?.groups?.['jobId'];
-
-    if (jobKey !== undefined) {
-      mut_jobs.push({ jobId: jobKey, runsOnRunner: false, timeout: undefined });
-
-      continue;
-    }
-
-    const current = mut_jobs.at(-1);
-
-    if (current === undefined) {
-      continue;
-    }
-
-    if (/^ {4}runs-on:/u.test(line)) {
-      mut_jobs[mut_jobs.length - 1] = { ...current, runsOnRunner: true };
-
-      continue;
-    }
-
-    const timeout = /^ {4}timeout-minutes:\s*(?<value>\S+)/u.exec(line)
-      ?.groups?.['value'];
-
-    if (timeout !== undefined) {
-      mut_jobs[mut_jobs.length - 1] = { ...current, timeout };
-    }
-  }
-
-  return mut_jobs;
-};
 
 /**
  * What is wrong with the timeouts, as one message per problem, each prefixed by
@@ -235,11 +196,19 @@ const readWorkflow = async (
     fs.readFile(workflowPath, 'utf8'),
   );
 
-  return Result.isErr(result)
-    ? Result.err(
-        `Failed to read ${relativePath}: ${unknownToString(result.value)}`,
-      )
-    : Result.ok({ relativePath, jobs: parseWorkflowJobs(result.value) });
+  if (Result.isErr(result)) {
+    return Result.err(
+      `Failed to read ${relativePath}: ${unknownToString(result.value)}`,
+    );
+  }
+
+  return Result.map(
+    Result.mapErr(
+      parseWorkflowJobs(result.value),
+      (message) => `${relativePath}: ${message}`,
+    ),
+    (jobs) => ({ relativePath, jobs }),
+  );
 };
 
 const readWorkflows = async (

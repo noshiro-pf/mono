@@ -1,4 +1,5 @@
 import dedent from 'dedent';
+import { Result } from 'ts-data-forge';
 import {
   collectBuildCountViolations,
   collectCoveragePrViolations,
@@ -40,7 +41,37 @@ const codecovFile = dedent`
 
 describe('countCoverageEntries', () => {
   test('counts the entries that set coverage to true, not a comment naming it', () => {
-    assert.strictEqual(countCoverageEntries(workflowFile), 2);
+    assert.deepStrictEqual(countCoverageEntries(workflowFile), Result.ok(2));
+  });
+
+  test('counts a flow-style entry and a quoted key, as YAML reads them', () => {
+    assert.deepStrictEqual(
+      countCoverageEntries(dedent`
+        jobs:
+          code-check:
+            strategy:
+              matrix:
+                include:
+                  - { command: shard-1, coverage: true }
+                  - "command": shard-2
+                    "coverage": true
+                  - command: lint
+      `),
+      Result.ok(2),
+    );
+  });
+
+  test('a matrix whose entries are not in the file is an error', () => {
+    assert.isTrue(
+      Result.isErr(
+        countCoverageEntries(dedent`
+          jobs:
+            code-check:
+              strategy:
+                matrix: \${{ fromJSON(needs.plan.outputs.matrix) }}
+        `),
+      ),
+    );
   });
 });
 

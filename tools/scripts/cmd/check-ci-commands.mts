@@ -29,10 +29,10 @@ import {
   matrixValues,
   readMatrix,
   readWorkflowJobs,
+  triggersOn,
   type Matrix,
 } from '../lib/workflow-jobs.mjs';
 import { projectRootPath } from '../project-root-path.mjs';
-import { parseWorkflowTriggers } from './check-workflow-event-name.mjs';
 
 /**
  * Asks both directions of the same question about the check workflows: is any
@@ -1303,9 +1303,7 @@ const readWorkflow = async (
     );
   }
 
-  const { triggerEvents } = parseWorkflowTriggers(contents.value);
-
-  if (!triggerEvents.includes(PULL_REQUEST_EVENT)) {
+  if (!triggersOn(contents.value, PULL_REQUEST_EVENT)) {
     return Result.ok(undefined);
   }
 
