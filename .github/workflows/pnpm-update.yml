@@ -194,10 +194,16 @@ jobs:
 
       # The published half of `verify-npm-packages` pins exact versions, and
       # this is where they move — a release shows up as a reviewable diff
-      # rather than as an unrelated branch starting to fail. `continue-on-error`
-      # because the step also runs the checks: a package that is broken on npm
-      # should not stop the dependency update, and verify-published-packages.yml
-      # reports it on the resulting pull request anyway.
+      # rather than as an unrelated branch starting to fail. It also brings
+      # each project's check up to the one under `verify-npm-packages/smoke/`,
+      # where that one passes on the moved pin, and keeps the committed check
+      # where it does not, printing what the new one reported: that is taken
+      # to be an assertion for an API not released yet, which this step cannot
+      # tell from a release broken in that very place.
+      # `continue-on-error` because the step also runs the checks: a package
+      # that is broken on npm should not stop the dependency update, and
+      # verify-published-packages.yml reports it on the resulting pull request
+      # anyway.
       - name: Refresh the published-package pins
         continue-on-error: true
         run: pnpm run verify:npm-packages:published:update
@@ -324,7 +330,8 @@ jobs:
           # code runs, so the set of paths it carries is checked here, in the
           # job that holds the key — `pnpm install` and
           # `verify:npm-packages:published:update` write manifests, the
-          # lockfile and the catalog, `update-changeset` writes one changeset,
+          # lockfile and the catalog, and the latter also the published
+          # projects' checks (below), `update-changeset` writes one changeset,
           # `update-actions` moves the action pins in the workflows and in
           # the composite actions under `.github/actions/` — the two places
           # `mature-updates.mts` reads; a third has to be named in both, or
@@ -348,29 +355,71 @@ jobs:
           # dropping those paths quietly would leave the run looking ordinary.
           # `--no-renames` so a rename is two paths and both are read. An
           # unusual path arrives quoted and matches nothing, which fails in
-          # the safe direction; so does anything not named below, including a
-          # `verify-npm-packages/published/` smoke program left behind by a
-          # `smoke/` edit nothing regenerated — that is a `style-check`
-          # failure on main, and it reads here as a patch to look at.
+          # the safe direction; so does anything not named below.
+          #
+          # A published project's check,
+          # `verify-npm-packages/published/packages/<name>/<name>.mjs` (`.mts`
+          # for a types-only package), is expected in the patch. It is a copy
+          # of the hand-written `verify-npm-packages/smoke/<name>.mjs`, and
+          # main holds it stale on purpose: a pull request that asserts an API
+          # not released yet regenerates the local space alone
+          # (verify-npm-packages/README.md), and `--update` in `update` is
+          # what brings the copy forward, once the new check passes on the
+          # moved pin. So the path is allowed, and what it holds is checked
+          # after the list.
+          # A scoped package's project is a directory deeper and its check
+          # matches nothing, which refuses it: none is published, and
+          # tools/scripts/cmd/verify-npm-packages.mts, which names a check's
+          # file after the package, cannot write one for it either.
           #
           # The list is inline because a `run:` block is the workflow
           # definition GitHub resolved for the event, which nothing on a
           # runner can rewrite, while a file in the working tree is read when
           # it is invoked. Keep it in step with the steps of `update`: a path
           # a new step legitimately writes fails this job until it is named.
-          unexpected="$(git diff --cached --name-only --no-renames \
+          smoke_copy='^verify-npm-packages/published/packages/([^/]+)/\1\.m[jt]s$'
+          # Read once, on a line of its own: `git diff` failing stops the step
+          # here, where at the head of a pipeline that ends in `|| true` it
+          # would read as a patch that carries nothing.
+          changed="$(git diff --cached --name-only --no-renames)"
+          unexpected="$(printf '%s\n' "$changed" \
             | grep -Ev '^(pnpm-lock\.yaml|pnpm-workspace\.yaml)$' \
             | grep -Ev '(^|/)package\.json$' \
             | grep -Ev '^\.changeset/[^/]+\.md$' \
             | grep -Ev '^\.github/workflows/([^/]+\.ya?ml|actions\.lock)$' \
             | grep -Ev '^\.github/actions/(.+/)?action\.ya?ml$' \
-            | grep -Ev '^tools/configs/release-binaries\.json$' || true)"
+            | grep -Ev '^tools/configs/release-binaries\.json$' \
+            | grep -Ev "$smoke_copy" || true)"
 
           if [ -n "$unexpected" ]; then
             echo '::error::The patch carries paths a dependency update does not write, so it is not one; refusing to commit it.'
             printf '%s\n' "$unexpected"
             exit 1
           fi
+
+          # A published project's check is a program the pull request runs, and
+          # the one path here whose content a person wrote. The hand-written
+          # one under `smoke/` is not a path the patch may carry, so the copy
+          # has to be the blob HEAD has there: what it says was reviewed on
+          # main. A copy that differs, one deleted, and one whose `smoke/`
+          # source HEAD does not have are all refused. The strict standard
+          # libraries share one source (`smokeSourceName` in
+          # tools/scripts/cmd/verify-npm-packages.mts).
+          while IFS= read -r copy; do
+            [ -n "$copy" ] || continue
+            name="$(basename "$(dirname "$copy")")"
+            case "$name" in
+              strict-ts-lib-v*) source='strict-ts-lib.mts' ;;
+              *) source="$(basename "$copy")" ;;
+            esac
+            # Empty for a copy the patch deletes: `|| true` so that `-e` leaves
+            # the refusal to the message below.
+            blob="$(git rev-parse --verify --quiet ":${copy}" || true)"
+            if [ -z "$blob" ] || [ "$blob" != "$(git rev-parse --verify --quiet "HEAD:verify-npm-packages/smoke/${source}")" ]; then
+              echo "::error::${copy} is not a copy of verify-npm-packages/smoke/${source} as HEAD has it; refusing to commit it."
+              exit 1
+            fi
+          done < <(printf '%s\n' "$changed" | grep -E "$smoke_copy" || true)
 
           # The pin file decides which binary every `check:root` downloads and
           # runs, and `update-release-binaries` changes only its `version` and

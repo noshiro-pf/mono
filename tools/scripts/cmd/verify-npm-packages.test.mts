@@ -5,9 +5,12 @@ import { Result } from 'ts-data-forge';
 import type { ReadonlyRecord } from 'ts-type-forge';
 import {
   findOrphanedSmokeSources,
+  generatedFilesGlob,
   publishablePackagesOf,
+  refreshPublishedChecks,
   removeStaleProjects,
   spacesToPrune,
+  writeCheckCopy,
 } from './verify-npm-packages.mjs';
 
 describe(removeStaleProjects, () => {
@@ -170,6 +173,251 @@ describe(publishablePackagesOf, () => {
     assert.include(result.value, 'No publishable package');
   });
 });
+
+describe(writeCheckCopy, () => {
+  test('leaves the check a published project already has', async () => {
+    const file = path.join(await makeTempDir(), 'pkg.mjs');
+
+    await writeText(file, 'committed\n');
+
+    await writeCheckCopy('published', file, 'current\n');
+
+    assert.strictEqual(await readText(file), 'committed\n');
+  });
+
+  test('writes the check of a published project that has none', async () => {
+    const file = path.join(await makeTempDir(), 'pkg.mjs');
+
+    await writeCheckCopy('published', file, 'current\n');
+
+    assert.strictEqual(await readText(file), 'current\n');
+  });
+
+  test('overwrites the check of a local project', async () => {
+    const file = path.join(await makeTempDir(), 'pkg.mjs');
+
+    await writeText(file, 'committed\n');
+
+    await writeCheckCopy('local', file, 'current\n');
+
+    assert.strictEqual(await readText(file), 'current\n');
+  });
+
+  test('fails rather than overwriting a check it cannot look at', async () => {
+    const notADirectory = path.join(await makeTempDir(), 'file');
+
+    await writeText(notADirectory, '');
+
+    // `ENOTDIR`, which is not the file being absent — and from the look at the
+    // file, not from a write that went ahead and failed the same way.
+    await expect(
+      writeCheckCopy(
+        'published',
+        path.join(notADirectory, 'pkg.mjs'),
+        'current\n',
+      ),
+    ).rejects.toThrow(/ENOTDIR: not a directory, access/u);
+  });
+});
+
+describe(generatedFilesGlob, () => {
+  test('formats every file a local generation writes', () => {
+    assert.strictEqual(
+      generatedFilesGlob('local', '/space'),
+      '/space/**/*.{json,mjs,mts,yaml}',
+    );
+  });
+
+  test("leaves a published project's check out of what is formatted", () => {
+    assert.strictEqual(
+      generatedFilesGlob('published', '/space'),
+      '/space/**/*.{json,yaml}',
+    );
+  });
+});
+
+describe(refreshPublishedChecks, () => {
+  test('replaces the copy with a new check that passes', async () => {
+    const { spaceDir, smokeDir, copy } = await makeCheck('pkg', {
+      committed: 'committed\n',
+      current: 'current\n',
+    });
+
+    const mut_ran: string[] = [];
+
+    const kept = await refreshPublishedChecks(spaceDir, [pkgNamed('pkg')], {
+      smokeDir,
+      runCheck: async (_, pkg) => {
+        mut_ran.push(`${pkg.name}: ${await readText(copy)}`);
+
+        return Result.ok(undefined);
+      },
+    });
+
+    assert.deepStrictEqual(kept, []);
+
+    // The check that ran is the new one, in the project's own file.
+    assert.deepStrictEqual(mut_ran, ['pkg: current\n']);
+
+    assert.strictEqual(await readText(copy), 'current\n');
+  });
+
+  test('leaves the committed bytes when the new check fails', async () => {
+    const info = vi.spyOn(console, 'info').mockImplementation(() => {});
+
+    onTestFinished(() => {
+      info.mockRestore();
+    });
+
+    const { spaceDir, smokeDir, copy } = await makeCheck('pkg', {
+      committed: 'committed\n',
+      current: 'current\n',
+    });
+
+    const mut_ran: string[] = [];
+
+    const kept = await refreshPublishedChecks(spaceDir, [pkgNamed('pkg')], {
+      smokeDir,
+      runCheck: async () => {
+        mut_ran.push(await readText(copy));
+
+        return Result.err('does not provide an export named x');
+      },
+    });
+
+    assert.deepStrictEqual(kept, ['pkg']);
+
+    assert.deepStrictEqual(mut_ran, ['current\n']);
+
+    assert.strictEqual(await readText(copy), 'committed\n');
+
+    // What the check reported is printed with the notice, for whoever reads why
+    // the copy stays behind.
+    expect(info).toHaveBeenCalledWith(
+      expect.stringMatching(
+        /kept the committed check of pkg.*\n\s+does not provide an export named x$/u,
+      ),
+    );
+  });
+
+  test('leaves the committed bytes when running the new check throws', async () => {
+    const { spaceDir, smokeDir, copy } = await makeCheck('pkg', {
+      committed: 'committed\n',
+      current: 'current\n',
+    });
+
+    await expect(
+      refreshPublishedChecks(spaceDir, [pkgNamed('pkg')], {
+        smokeDir,
+        // Thrown before any promise exists, which a handler on the returned
+        // promise alone would miss.
+        runCheck: () => {
+          throw new Error('spawn failed');
+        },
+      }),
+    ).rejects.toThrow('spawn failed');
+
+    assert.strictEqual(await readText(copy), 'committed\n');
+  });
+
+  test('does not run a check that is already the one under smoke/', async () => {
+    const { spaceDir, smokeDir, copy } = await makeCheck('pkg', {
+      committed: 'same\n',
+      current: 'same\n',
+    });
+
+    const mut_ran: string[] = [];
+
+    const kept = await refreshPublishedChecks(spaceDir, [pkgNamed('pkg')], {
+      smokeDir,
+      runCheck: (_, pkg) => {
+        mut_ran.push(pkg.name);
+
+        return Promise.resolve(Result.ok(undefined));
+      },
+    });
+
+    assert.deepStrictEqual(kept, []);
+
+    assert.deepStrictEqual(mut_ran, []);
+
+    assert.strictEqual(await readText(copy), 'same\n');
+  });
+
+  test('reads the one check the strict standard libraries share', async () => {
+    const spaceDir = await makeTempDir();
+
+    const smokeDir = await makeTempDir();
+
+    const copy = path.join(
+      spaceDir,
+      'packages',
+      'strict-ts-lib-v7.0',
+      'strict-ts-lib-v7.0.mts',
+    );
+
+    await writeText(copy, 'committed\n');
+
+    await writeText(path.join(smokeDir, 'strict-ts-lib.mts'), 'current\n');
+
+    const kept = await refreshPublishedChecks(
+      spaceDir,
+      [pkgNamed('strict-ts-lib-v7.0')],
+      { smokeDir, runCheck: () => Promise.resolve(Result.ok(undefined)) },
+    );
+
+    assert.deepStrictEqual(kept, []);
+
+    assert.strictEqual(await readText(copy), 'current\n');
+  });
+});
+
+const pkgNamed = (
+  name: string,
+): Readonly<{ name: string; path: string; manifest: null }> =>
+  ({ name, path: '', manifest: null }) as const;
+
+const makeTempDir = async (): Promise<string> => {
+  const dir = await fs.mkdtemp(
+    path.join(os.tmpdir(), 'verify-npm-packages-test-'),
+  );
+
+  onTestFinished(async () => {
+    await fs.rm(dir, { recursive: true, force: true });
+  });
+
+  return dir;
+};
+
+const writeText = async (file: string, content: string): Promise<void> => {
+  // eslint-disable-next-line security/detect-non-literal-fs-filename
+  await fs.mkdir(path.dirname(file), { recursive: true });
+
+  // eslint-disable-next-line security/detect-non-literal-fs-filename
+  await fs.writeFile(file, content);
+};
+
+/** A published project holding `committed`, and a `smoke/` holding `current`. */
+const makeCheck = async (
+  name: string,
+  { committed, current }: Readonly<{ committed: string; current: string }>,
+): Promise<Readonly<{ spaceDir: string; smokeDir: string; copy: string }>> => {
+  const spaceDir = await makeTempDir();
+
+  const smokeDir = await makeTempDir();
+
+  const copy = path.join(spaceDir, 'packages', name, `${name}.mjs`);
+
+  await writeText(copy, committed);
+
+  await writeText(path.join(smokeDir, `${name}.mjs`), current);
+
+  return { spaceDir, smokeDir, copy };
+};
+
+const readText = (file: string): Promise<string> =>
+  // eslint-disable-next-line security/detect-non-literal-fs-filename
+  fs.readFile(file, 'utf8');
 
 const workspacePackage = (
   name: string,
