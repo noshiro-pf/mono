@@ -11,7 +11,7 @@ import { readReport } from '../pr-report/index.mjs';
 import {
   attemptedFile,
   issueNumbers,
-  ISSUES_LIMIT,
+  ISSUES_READ,
   issuesByTheme,
   loadAttempted,
   orderByTheme,
@@ -104,9 +104,7 @@ export const startableIssues = async (
   const [read, listed] = await Promise.all([
     readReport({
       repo: `${context.value.repo.owner}/${context.value.repo.name}`,
-      mergedDays: 1,
-      mergedLimit: 1,
-      issuesLimit: ISSUES_LIMIT,
+      ...ISSUES_READ,
     }),
     readIssueBodies(context.value),
   ]);

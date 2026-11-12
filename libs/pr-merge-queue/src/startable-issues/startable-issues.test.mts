@@ -1,6 +1,20 @@
-import type { ReportIssue } from 'pr-report-core';
+import type { PrReport, ReportIssue } from 'pr-report-core';
 import { Result } from 'ts-data-forge';
-import type { IssueSurvey } from '../run-issue-resolver/index.mjs';
+import type { ReadonlyRecord, StrictOmit } from 'ts-type-forge';
+import {
+  checkRoutesAsked,
+  failingRequiredCheck,
+  FAKE_REPO,
+  fakeGitHub,
+  fakePullRequest,
+  type FakeRoutes,
+} from '../../test/index.mjs';
+import {
+  createClient,
+  readReportWith,
+  type ReadReportOptions,
+} from '../pr-report/index.mjs';
+import { ISSUES_READ, type IssueSurvey } from '../run-issue-resolver/index.mjs';
 import {
   parseStartableIssuesArgs,
   renderStartable,
@@ -293,3 +307,101 @@ describe(parseStartableIssuesArgs, () => {
     );
   });
 });
+
+// What `startableIssues` lists is decided from the report's issues alone, so
+// that it can leave the pull requests' checks unread.
+describe('the issues startable-issues reads', () => {
+  test('are read with no required context, comparison, check, status or workflow run', async () => {
+    const { requested } = await reportThrough(ISSUES_READ);
+
+    assert.deepStrictEqual(checkRoutesAsked(requested), []);
+  });
+
+  test('are the same whether the checks are read or not', async () => {
+    const without = await reportThrough(ISSUES_READ);
+
+    const withChecks = await reportThrough({ ...ISSUES_READ, checks: true });
+
+    assert.deepStrictEqual(without.report.issues, withChecks.report.issues);
+
+    // #10 closed by the open pull request, #11 blocked by it, and the pull
+    // request failing and behind where its checks are read: a fixture whose
+    // facts decide something of the issues, and differ by the checks.
+    assert.deepStrictEqual(
+      without.report.issues.map(({ number, start }) => ({ number, start })),
+      [
+        { number: 11, start: 'blocked' },
+        { number: 10, start: 'in-progress' },
+      ],
+    );
+
+    assert.strictEqual(withChecks.report.entries[0]?.checks.verdict, 'failing');
+
+    assert.strictEqual(withChecks.report.entries[0]?.comparison?.behindBy, 3);
+  });
+});
+
+/** An open issue, as the open list answers it. */
+const openIssue = (
+  number: number,
+  body: string,
+  updatedAt: string,
+): ReadonlyRecord<string, unknown> =>
+  ({
+    number,
+    title: `feat: thing ${number}`,
+    body,
+    html_url: `https://github.com/o/r/issues/${number}`,
+    created_at: UPDATED,
+    updated_at: updatedAt,
+    comments: 0,
+    user: { login: 'owner' },
+    labels: [],
+  }) as const;
+
+/**
+ * The open pull request closing #10, failing the required check and behind its
+ * base, and the open issues #10 and #11, which starts after #10.
+ */
+const behindAndFailing: FakeRoutes = (request) => {
+  const { url } = request;
+
+  if (url.includes('/pulls?state=open')) {
+    return { body: [fakePullRequest({ body: 'Closes #10' })] };
+  }
+
+  if (url.includes('/issues?state=open')) {
+    return {
+      body: [
+        openIssue(11, 'Start-After: #10', '2026-01-03T00:00:00Z'),
+        openIssue(10, '', '2026-01-02T00:00:00Z'),
+      ],
+    };
+  }
+
+  return url.includes('/compare/')
+    ? { body: { ahead_by: 0, behind_by: 3, commits: [] } }
+    : failingRequiredCheck(request);
+};
+
+/**
+ * The report read from {@link behindAndFailing} with `options`, and the path of
+ * every request it took.
+ */
+const reportThrough = async (
+  options: StrictOmit<ReadReportOptions, 'repo'>,
+): Promise<Readonly<{ report: PrReport; requested: readonly string[] }>> => {
+  const github = await fakeGitHub(behindAndFailing);
+
+  const read = await readReportWith(
+    createClient('token', github.baseUrl),
+    FAKE_REPO,
+    options,
+  );
+
+  await github.close();
+
+  assert.isTrue(Result.isOk(read));
+
+  return { report: read.value.report, requested: github.requested };
+};

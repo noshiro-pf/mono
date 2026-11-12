@@ -8,7 +8,8 @@ import {
   type ReportIssue,
 } from 'pr-report-core';
 import { Arr } from 'ts-data-forge';
-import type { StrictPick } from 'ts-type-forge';
+import type { StrictOmit, StrictPick } from 'ts-type-forge';
+import type { ReadReportOptions } from '../pr-report/index.mjs';
 
 /**
  * Picks the issues a session may start, in the order it takes them.
@@ -132,10 +133,18 @@ export const issueNumbers = (list: readonly number[]): string =>
   list.map((number) => `#${number}`).join(', ');
 
 /**
- * How many open issues a survey reads: up to a thousand, rather than the
- * report's thirty, since the oldest are as startable as the newest.
+ * What a survey of the issues reads of the report, `startable-issues`' included:
+ * up to a thousand open issues, rather than the report's thirty, since the
+ * oldest are as startable as the newest; the merged list as short as it goes;
+ * and no pull request's comparison or check states, which decide nothing of an
+ * issue and cost about four requests each.
  */
-export const ISSUES_LIMIT = 1000;
+export const ISSUES_READ = {
+  mergedDays: 1,
+  mergedLimit: 1,
+  issuesLimit: 1000,
+  checks: false,
+} as const satisfies StrictOmit<ReadReportOptions, 'repo'>;
 
 /**
  * Labels that say an issue is not to be started as it stands: a question to

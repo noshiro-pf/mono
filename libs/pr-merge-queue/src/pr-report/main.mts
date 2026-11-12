@@ -17,10 +17,10 @@ import {
   tokenFromEnv,
 } from '../lib/index.mjs';
 import { createClient, type Client } from './github.mjs';
+import { readOpenPulls } from './open-pulls.mjs';
 import type { Format, Options } from './options.mjs';
 import { ownersOf } from './queue.mjs';
 import { renderMarkdown, renderTerminal } from './render.mjs';
-import { readRequiredContexts } from './repo-settings.mjs';
 
 /**
  * Reports the state of every open pull request, in one page.
@@ -89,44 +89,37 @@ export const prReport = async (
  * being started.
  */
 export const readReport = async (
-  options: StrictOmit<Options, 'format'>,
+  options: ReadReportOptions,
 ): Promise<Result<ReadReport, string>> => {
   const repo = await resolveRepo(options.repo);
 
-  if (Result.isErr(repo)) {
-    return repo;
+  return Result.isErr(repo)
+    ? repo
+    : readReportWith(createClient(tokenFromEnv()), repo.value, options);
+};
+
+/** {@link readReport} of `repo`, through `client`. */
+export const readReportWith = async (
+  client: Client,
+  repo: RepoRef,
+  // `true` by default where `readQueueState`'s is `false`: the report is what
+  // prints the check verdicts, and nothing that reads the queue's owners does.
+  { checks = true, ...options }: StrictOmit<ReadReportOptions, 'repo'>,
+): Promise<Result<ReadReport, string>> => {
+  const open = await readOpenPulls(client, repo, checks);
+
+  if (Result.isErr(open)) {
+    return open;
   }
 
-  const client = createClient(tokenFromEnv());
-
-  const defaultBranch = await client.defaultBranch(repo.value);
-
-  if (Result.isErr(defaultBranch)) {
-    return defaultBranch;
-  }
-
-  const required = await readRequiredContexts(
-    client,
-    repo.value,
-    defaultBranch.value,
-  );
-
-  if (Result.isErr(required)) {
-    return required;
-  }
-
-  const facts = await client.facts(repo.value);
-
-  if (Result.isErr(facts)) {
-    return facts;
-  }
+  const { defaultBranch, required, pulls } = open.value;
 
   // One more request, and the one section that is not about what is open:
   // what landed. A report that only lists the queue cannot answer "did the
   // thing I queued yesterday go in", which is the first question a reader of a
   // daily report has.
   const merged = await client.merged(
-    repo.value,
+    repo,
     options.mergedDays,
     options.mergedLimit,
   );
@@ -137,7 +130,7 @@ export const readReport = async (
 
   // And one more for what is open that is not a pull request, so that "what is
   // there to do" is answered in one place rather than two.
-  const issues = await client.issues(repo.value, options.issuesLimit);
+  const issues = await client.issues(repo, options.issuesLimit);
 
   if (Result.isErr(issues)) {
     return issues;
@@ -148,25 +141,25 @@ export const readReport = async (
   // inherits as a merge order.
   const issueDeclarations = await declarationsOf(
     client,
-    repo.value,
-    facts.value,
+    repo,
+    pulls,
     issues.value,
   );
 
   // And one for each thing the issues' `Start-After:` names that is neither a
   // listed issue nor an open pull request, to say where it stands.
   const references = await client.references(
-    repo.value,
-    namedBeyond(facts.value, issues.value),
+    repo,
+    namedBeyond(pulls, issues.value),
   );
 
   const report = buildReport({
-    repo: repo.value,
-    defaultBranch: defaultBranch.value,
+    repo,
+    defaultBranch,
     generatedAt: isoSeconds(currentEpochMs()),
-    required: required.value,
+    required,
     authenticated: client.authenticated,
-    pulls: facts.value,
+    pulls,
     merged: merged.value,
     mergedWithinDays: options.mergedDays,
     issues: issues.value,
@@ -177,19 +170,39 @@ export const readReport = async (
 
   return Result.ok({
     client,
-    repo: repo.value,
-    defaultBranch: defaultBranch.value,
-    pulls: facts.value,
+    repo,
+    defaultBranch,
+    pulls,
     report,
   });
 };
+
+export type ReadReportOptions = StrictOmit<Options, 'format'> &
+  Readonly<{
+    /**
+     * Whether the required contexts and every open pull request's comparison
+     * and check states are read (`readOpenPulls`), which only the check
+     * verdicts, the counts ahead and behind and the summary's failing and
+     * behind need. `false` for a caller that reads none of those, such as one
+     * that reads the issues alone; `true` when not given.
+     */
+    checks?: boolean;
+  }>;
 
 export type ReadReport = Readonly<{
   client: Client;
   repo: RepoRef;
   defaultBranch: string;
-  /** What the report was built from. */
+  /**
+   * What the report was built from. Read with `checks: false`, these carry no
+   * comparison and no check state.
+   */
   pulls: readonly PullRequestFacts[];
+  /**
+   * Built with `checks: false`, it requires nothing, and its entries' check
+   * verdicts and the summary's failing and behind are made from nothing read
+   * and mean nothing.
+   */
   report: PrReport;
 }>;
 

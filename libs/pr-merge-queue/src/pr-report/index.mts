@@ -2,6 +2,7 @@ export * from './checks-unreadable.mjs';
 export * from './github.mjs';
 export * from './linked-issues.mjs';
 export * from './main.mjs';
+export * from './open-pulls.mjs';
 export * from './options.mjs';
 export * from './queue.mjs';
 export * from './render.mjs';

@@ -235,9 +235,10 @@ export type Client = Readonly<{
     branch: string,
   ) => Promise<Result<readonly string[], string>>;
   /**
-   * The open pull requests. With `{ checks: false }`, one list and one GraphQL
-   * query rather than about three requests per pull request: no comparison and
-   * no check is read, for a caller that wants only who owns what.
+   * The open pull requests. With `{ checks: false }`, one list, and one
+   * GraphQL query with a token, rather than about four requests per pull
+   * request: no comparison and no check is read, for a caller that reads
+   * neither.
    */
   facts: (
     repo: RepoRef,
