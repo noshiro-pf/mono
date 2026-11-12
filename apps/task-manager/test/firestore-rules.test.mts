@@ -103,6 +103,14 @@ const cases = (): readonly Case[] => {
           actor: alice,
           operation: (db) =>
             db.collection(`projects/alice/${collection}`).get(),
+          // `settings` holds one document, which the app reads by its path;
+          // listing the collection could return any other, which no rule allows.
+          expected: collection === 'settings' ? 'denied' : 'allowed',
+        },
+        {
+          name: `reads ${docPath}`,
+          actor: alice,
+          operation: (db) => db.doc(docPath).get(),
           expected: 'allowed',
         },
         {
@@ -113,6 +121,20 @@ const cases = (): readonly Case[] => {
         },
       ] as const satisfies readonly Case[];
     }),
+
+    // `settings/dagLayout` is the one settings document the rules allow.
+    {
+      name: 'the owner is refused a read of projects/alice/settings/other',
+      actor: alice,
+      operation: (db) => db.doc('projects/alice/settings/other').get(),
+      expected: 'denied',
+    },
+    {
+      name: 'the owner is refused a write of projects/alice/settings/other',
+      actor: alice,
+      operation: (db) => db.doc('projects/alice/settings/other').set({ a: 1 }),
+      expected: 'denied',
+    },
 
     // A project one is a member of.
     {

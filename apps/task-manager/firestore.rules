@@ -72,7 +72,8 @@ service cloud.firestore {
         allow read, write: if canAccess(projectId);
       }
 
-      match /settings/{docId} {
+      // The one settings document the app stores; another is a change here.
+      match /settings/dagLayout {
         allow read, write: if canAccess(projectId);
       }
     }
