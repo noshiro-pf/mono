@@ -1,5 +1,5 @@
 diff --git a/v5.3/output/lib-files/lib.webworker.d.ts b/v5.4/output/lib-files/lib.webworker.d.ts
-index 7692f69b30753cf98d34920d75c2dfad1e880fc2..2d27a9a77940b4327adae123befabede80e15a68 100644
+index ab123f0ecdd4a20be4e43a1eb9f2c13f7cf3d313..4ad80c6ee04c4e41f96cf7ff3666b1b4c2abd41c 100644
 --- a/v5.3/output/lib-files/lib.webworker.d.ts
 +++ b/v5.4/output/lib-files/lib.webworker.d.ts
 @@ -188,7 +188,7 @@ interface EcdsaParams extends Algorithm {
@@ -802,7 +802,7 @@ index 7692f69b30753cf98d34920d75c2dfad1e880fc2..2d27a9a77940b4327adae123befabede
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebTransportDatagramDuplexStream/readable) */
    readonly readable: ReadableStream;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WebTransportDatagramDuplexStream/writable) */
-@@ -10864,44 +10965,44 @@ declare var XMLHttpRequestUpload: {
+@@ -10867,44 +10968,44 @@ declare var XMLHttpRequestUpload: {
  
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/console) */
  interface Console {
@@ -866,7 +866,7 @@ index 7692f69b30753cf98d34920d75c2dfad1e880fc2..2d27a9a77940b4327adae123befabede
    warn(...data: readonly unknown[]): void;
  }
  
-@@ -10916,11 +11017,11 @@ declare namespace WebAssembly {
+@@ -10919,11 +11020,11 @@ declare namespace WebAssembly {
      (message?: string): CompileError;
    };
  
@@ -881,7 +881,7 @@ index 7692f69b30753cf98d34920d75c2dfad1e880fc2..2d27a9a77940b4327adae123befabede
      valueOf(): ValueTypeMap[T];
    }
  
-@@ -10932,9 +11033,9 @@ declare namespace WebAssembly {
+@@ -10935,9 +11036,9 @@ declare namespace WebAssembly {
      ): Global<T>;
    };
  
@@ -893,7 +893,7 @@ index 7692f69b30753cf98d34920d75c2dfad1e880fc2..2d27a9a77940b4327adae123befabede
      readonly exports: Exports;
    }
  
-@@ -10951,11 +11052,11 @@ declare namespace WebAssembly {
+@@ -10954,11 +11055,11 @@ declare namespace WebAssembly {
      (message?: string): LinkError;
    };
  
@@ -908,7 +908,7 @@ index 7692f69b30753cf98d34920d75c2dfad1e880fc2..2d27a9a77940b4327adae123befabede
      grow(delta: number): number;
    }
  
-@@ -10964,17 +11065,17 @@ declare namespace WebAssembly {
+@@ -10967,17 +11068,17 @@ declare namespace WebAssembly {
      new (descriptor: MemoryDescriptor): Memory;
    };
  
@@ -930,7 +930,7 @@ index 7692f69b30753cf98d34920d75c2dfad1e880fc2..2d27a9a77940b4327adae123befabede
      imports(moduleObject: Module): ModuleImportDescriptor[];
    };
  
-@@ -10986,15 +11087,15 @@ declare namespace WebAssembly {
+@@ -10989,15 +11090,15 @@ declare namespace WebAssembly {
      (message?: string): RuntimeError;
    };
  
@@ -951,7 +951,7 @@ index 7692f69b30753cf98d34920d75c2dfad1e880fc2..2d27a9a77940b4327adae123befabede
      set(index: number, value?: unknown): void;
    }
  
-@@ -11054,13 +11155,13 @@ declare namespace WebAssembly {
+@@ -11057,13 +11158,13 @@ declare namespace WebAssembly {
    type Imports = Record<string, ModuleImports>;
    type ModuleImports = Record<string, ImportValue>;
    type ValueType = keyof ValueTypeMap;
@@ -968,7 +968,7 @@ index 7692f69b30753cf98d34920d75c2dfad1e880fc2..2d27a9a77940b4327adae123befabede
    function instantiate(
      bytes: BufferSource,
      importObject?: Imports,
-@@ -11069,12 +11170,12 @@ declare namespace WebAssembly {
+@@ -11072,12 +11173,12 @@ declare namespace WebAssembly {
      moduleObject: Module,
      importObject?: Imports,
    ): Promise<Instance>;
@@ -983,7 +983,7 @@ index 7692f69b30753cf98d34920d75c2dfad1e880fc2..2d27a9a77940b4327adae123befabede
    function validate(bytes: BufferSource): boolean;
  }
  
-@@ -11184,6 +11285,10 @@ declare var onmessage:
+@@ -11187,6 +11288,10 @@ declare var onmessage:
  declare var onmessageerror:
    | ((this: DedicatedWorkerGlobalScope, ev: MessageEvent) => unknown)
    | null;
@@ -994,7 +994,7 @@ index 7692f69b30753cf98d34920d75c2dfad1e880fc2..2d27a9a77940b4327adae123befabede
  /**
   * Aborts dedicatedWorkerGlobal.
   *
-@@ -11328,7 +11433,9 @@ declare function structuredClone<T = unknown>(
+@@ -11331,7 +11436,9 @@ declare function structuredClone<T = unknown>(
    value: T,
    options?: StructuredSerializeOptions,
  ): T;
@@ -1004,7 +1004,7 @@ index 7692f69b30753cf98d34920d75c2dfad1e880fc2..2d27a9a77940b4327adae123befabede
  declare function requestAnimationFrame(callback: FrameRequestCallback): number;
  declare function addEventListener<
    K extends keyof DedicatedWorkerGlobalScopeEventMap,
-@@ -11436,7 +11543,6 @@ type Transferable =
+@@ -11439,7 +11546,6 @@ type Transferable =
    | VideoFrame
    | ArrayBuffer;
  type Uint32List = Uint32Array | readonly GLuint[];
@@ -1012,7 +1012,7 @@ index 7692f69b30753cf98d34920d75c2dfad1e880fc2..2d27a9a77940b4327adae123befabede
  type XMLHttpRequestBodyInit =
    | Blob
    | BufferSource
-@@ -11626,6 +11732,7 @@ type RequestDestination =
+@@ -11629,6 +11735,7 @@ type RequestDestination =
    | 'worker'
    | 'xslt';
  type RequestMode = 'cors' | 'navigate' | 'no-cors' | 'same-origin';

@@ -1,5 +1,5 @@
 diff --git a/v5.6/output/lib-files/lib.webworker.d.ts b/v5.7/output/lib-files/lib.webworker.d.ts
-index ea44b85af9a44c078e0a5d77ef5275d4ff88ed59..5d666e9b990ce7383b1421a44d6e7eb721a90465 100644
+index 3d4ec42676973e1201e1da973b46ab665de35c96..bde0fcc6ab1c5af7aa469004880c92ef84991091 100644
 --- a/v5.6/output/lib-files/lib.webworker.d.ts
 +++ b/v5.7/output/lib-files/lib.webworker.d.ts
 @@ -71,6 +71,59 @@ interface AudioConfiguration {
@@ -632,7 +632,7 @@ index ea44b85af9a44c078e0a5d77ef5275d4ff88ed59..5d666e9b990ce7383b1421a44d6e7eb7
    fetch(input: RequestInfo | URL, init?: RequestInit): Promise<Response>;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/queueMicrotask) */
    queueMicrotask(callback: VoidFunction): void;
-@@ -10963,7 +11270,7 @@ interface Console {
+@@ -10966,7 +11273,7 @@ interface Console {
    clear(): void;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/count_static) */
    count(label?: string): void;
@@ -641,7 +641,7 @@ index ea44b85af9a44c078e0a5d77ef5275d4ff88ed59..5d666e9b990ce7383b1421a44d6e7eb7
    countReset(label?: string): void;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/debug_static) */
    debug(...data: readonly unknown[]): void;
-@@ -10975,9 +11282,9 @@ interface Console {
+@@ -10978,9 +11285,9 @@ interface Console {
    error(...data: readonly unknown[]): void;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/group_static) */
    group(...data: readonly unknown[]): void;
@@ -653,7 +653,7 @@ index ea44b85af9a44c078e0a5d77ef5275d4ff88ed59..5d666e9b990ce7383b1421a44d6e7eb7
    groupEnd(): void;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/info_static) */
    info(...data: readonly unknown[]): void;
-@@ -10987,9 +11294,9 @@ interface Console {
+@@ -10990,9 +11297,9 @@ interface Console {
    table(tabularData?: unknown, properties?: readonly string[]): void;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/time_static) */
    time(label?: string): void;
@@ -665,7 +665,7 @@ index ea44b85af9a44c078e0a5d77ef5275d4ff88ed59..5d666e9b990ce7383b1421a44d6e7eb7
    timeLog(label?: string, ...data: readonly unknown[]): void;
    timeStamp(label?: string): void;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/trace_static) */
-@@ -11169,6 +11476,14 @@ declare namespace WebAssembly {
+@@ -11172,6 +11479,14 @@ declare namespace WebAssembly {
    function validate(bytes: BufferSource): boolean;
  }
  
@@ -680,7 +680,7 @@ index ea44b85af9a44c078e0a5d77ef5275d4ff88ed59..5d666e9b990ce7383b1421a44d6e7eb7
  interface EncodedVideoChunkOutputCallback {
    (chunk: EncodedVideoChunk, metadata?: EncodedVideoChunkMetadata): void;
  }
-@@ -11277,7 +11592,7 @@ declare var onmessageerror:
+@@ -11280,7 +11595,7 @@ declare var onmessageerror:
    | null;
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/DedicatedWorkerGlobalScope/rtctransform_event) */
  declare const onrtctransform:
@@ -689,7 +689,7 @@ index ea44b85af9a44c078e0a5d77ef5275d4ff88ed59..5d666e9b990ce7383b1421a44d6e7eb7
    | null;
  /**
   * Aborts dedicatedWorkerGlobal.
-@@ -11399,7 +11714,7 @@ declare function createImageBitmap(
+@@ -11402,7 +11717,7 @@ declare function createImageBitmap(
    sh: number,
    options?: ImageBitmapOptions,
  ): Promise<ImageBitmap>;
@@ -698,7 +698,7 @@ index ea44b85af9a44c078e0a5d77ef5275d4ff88ed59..5d666e9b990ce7383b1421a44d6e7eb7
  declare function fetch(
    input: RequestInfo | URL,
    init?: RequestInit,
-@@ -11462,7 +11777,6 @@ declare function removeEventListener(
+@@ -11465,7 +11780,6 @@ declare function removeEventListener(
  type AlgorithmIdentifier = Algorithm | string;
  type AllowSharedBufferSource = ArrayBuffer | ArrayBufferView;
  type BigInteger = Uint8Array;
@@ -706,7 +706,7 @@ index ea44b85af9a44c078e0a5d77ef5275d4ff88ed59..5d666e9b990ce7383b1421a44d6e7eb7
  type BlobPart = BufferSource | Blob | string;
  type BodyInit = ReadableStream | XMLHttpRequestBodyInit;
  type BufferSource = ArrayBufferView | ArrayBuffer;
-@@ -11533,6 +11847,7 @@ type Transferable =
+@@ -11536,6 +11850,7 @@ type Transferable =
    | ReadableStream
    | WritableStream
    | TransformStream
@@ -714,7 +714,7 @@ index ea44b85af9a44c078e0a5d77ef5275d4ff88ed59..5d666e9b990ce7383b1421a44d6e7eb7
    | VideoFrame
    | ArrayBuffer;
  type Uint32List = Uint32Array | readonly GLuint[];
-@@ -11543,8 +11858,18 @@ type XMLHttpRequestBodyInit =
+@@ -11546,8 +11861,18 @@ type XMLHttpRequestBodyInit =
    | URLSearchParams
    | string;
  type AlphaOption = 'discard' | 'keep';
@@ -733,7 +733,7 @@ index ea44b85af9a44c078e0a5d77ef5275d4ff88ed59..5d666e9b990ce7383b1421a44d6e7eb7
  type CSSMathOperator =
    | 'clamp'
    | 'invert'
-@@ -11603,6 +11928,7 @@ type ColorGamut = 'p3' | 'rec2020' | 'srgb';
+@@ -11606,6 +11931,7 @@ type ColorGamut = 'p3' | 'rec2020' | 'srgb';
  type ColorSpaceConversion = 'default' | 'none';
  type CompressionFormat = 'deflate' | 'deflate-raw' | 'gzip';
  type DocumentVisibilityState = 'hidden' | 'visible';
@@ -741,7 +741,7 @@ index ea44b85af9a44c078e0a5d77ef5275d4ff88ed59..5d666e9b990ce7383b1421a44d6e7eb7
  type EncodedVideoChunkType = 'delta' | 'key';
  type EndingType = 'native' | 'transparent';
  type FileSystemHandleKind = 'directory' | 'file';
-@@ -11671,13 +11997,15 @@ type OffscreenRenderingContextId =
+@@ -11674,13 +12000,15 @@ type OffscreenRenderingContextId =
    | 'webgl'
    | 'webgl2'
    | 'webgpu';

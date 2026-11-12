@@ -1,5 +1,5 @@
 diff --git a/v5.3/output/lib-files/lib.dom.d.ts b/v5.4/output/lib-files/lib.dom.d.ts
-index 4793be407cbfb4b4da9a10935e68d6e19a7ae1f1..56c49c140d9cd2459fe531379fa39660154fb94c 100644
+index 0f4f64608ede43bc079315a92a7d463e3e9752cf..ef4452dff8c4af162042ae68e9bce6c31423c2ed 100644
 --- a/v5.3/output/lib-files/lib.dom.d.ts
 +++ b/v5.4/output/lib-files/lib.dom.d.ts
 @@ -142,6 +142,7 @@ interface AuthenticationExtensionsClientInputs {
@@ -1459,7 +1459,7 @@ index 4793be407cbfb4b4da9a10935e68d6e19a7ae1f1..56c49c140d9cd2459fe531379fa39660
    onunload: ((this: WindowEventHandlers, ev: Event) => unknown) | null;
    addEventListener<K extends keyof WindowEventHandlersEventMap>(
      type: K,
-@@ -32758,44 +32976,44 @@ declare const XSLTProcessor: {
+@@ -32761,44 +32979,44 @@ declare const XSLTProcessor: {
  
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/console) */
  interface Console {
@@ -1523,7 +1523,7 @@ index 4793be407cbfb4b4da9a10935e68d6e19a7ae1f1..56c49c140d9cd2459fe531379fa39660
    warn(...data: readonly unknown[]): void;
  }
  
-@@ -32803,10 +33021,13 @@ declare var console: Console;
+@@ -32806,10 +33024,13 @@ declare var console: Console;
  
  /** Holds useful CSS-related methods. No object with this interface are implemented: it contains only static methods and therefore is a utilitarian interface. */
  declare namespace CSS {
@@ -1537,7 +1537,7 @@ index 4793be407cbfb4b4da9a10935e68d6e19a7ae1f1..56c49c140d9cd2459fe531379fa39660
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSS/factory_functions_static) */
    function ch(value: number): CSSUnitValue;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSS/factory_functions_static) */
-@@ -32853,8 +33074,10 @@ declare namespace CSS {
+@@ -32856,8 +33077,10 @@ declare namespace CSS {
    function fr(value: number): CSSUnitValue;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSS/factory_functions_static) */
    function grad(value: number): CSSUnitValue;
@@ -1548,7 +1548,7 @@ index 4793be407cbfb4b4da9a10935e68d6e19a7ae1f1..56c49c140d9cd2459fe531379fa39660
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSS/factory_functions_static) */
    function lvb(value: number): CSSUnitValue;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSS/factory_functions_static) */
-@@ -32883,10 +33106,15 @@ declare namespace CSS {
+@@ -32886,10 +33109,15 @@ declare namespace CSS {
    function px(value: number): CSSUnitValue;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSS/factory_functions_static) */
    function rad(value: number): CSSUnitValue;
@@ -1564,7 +1564,7 @@ index 4793be407cbfb4b4da9a10935e68d6e19a7ae1f1..56c49c140d9cd2459fe531379fa39660
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSS/factory_functions_static) */
    function s(value: number): CSSUnitValue;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSS/supports_static) */
-@@ -32929,11 +33157,11 @@ declare namespace WebAssembly {
+@@ -32932,11 +33160,11 @@ declare namespace WebAssembly {
      (message?: string): CompileError;
    };
  
@@ -1579,7 +1579,7 @@ index 4793be407cbfb4b4da9a10935e68d6e19a7ae1f1..56c49c140d9cd2459fe531379fa39660
      valueOf(): ValueTypeMap[T];
    }
  
-@@ -32945,9 +33173,9 @@ declare namespace WebAssembly {
+@@ -32948,9 +33176,9 @@ declare namespace WebAssembly {
      ): Global<T>;
    };
  
@@ -1591,7 +1591,7 @@ index 4793be407cbfb4b4da9a10935e68d6e19a7ae1f1..56c49c140d9cd2459fe531379fa39660
      readonly exports: Exports;
    }
  
-@@ -32964,11 +33192,11 @@ declare namespace WebAssembly {
+@@ -32967,11 +33195,11 @@ declare namespace WebAssembly {
      (message?: string): LinkError;
    };
  
@@ -1606,7 +1606,7 @@ index 4793be407cbfb4b4da9a10935e68d6e19a7ae1f1..56c49c140d9cd2459fe531379fa39660
      grow(delta: number): number;
    }
  
-@@ -32977,17 +33205,17 @@ declare namespace WebAssembly {
+@@ -32980,17 +33208,17 @@ declare namespace WebAssembly {
      new (descriptor: MemoryDescriptor): Memory;
    };
  
@@ -1628,7 +1628,7 @@ index 4793be407cbfb4b4da9a10935e68d6e19a7ae1f1..56c49c140d9cd2459fe531379fa39660
      imports(moduleObject: Module): ModuleImportDescriptor[];
    };
  
-@@ -32999,15 +33227,15 @@ declare namespace WebAssembly {
+@@ -33002,15 +33230,15 @@ declare namespace WebAssembly {
      (message?: string): RuntimeError;
    };
  
@@ -1649,7 +1649,7 @@ index 4793be407cbfb4b4da9a10935e68d6e19a7ae1f1..56c49c140d9cd2459fe531379fa39660
      set(index: number, value?: unknown): void;
    }
  
-@@ -33067,13 +33295,13 @@ declare namespace WebAssembly {
+@@ -33070,13 +33298,13 @@ declare namespace WebAssembly {
    type Imports = Record<string, ModuleImports>;
    type ModuleImports = Record<string, ImportValue>;
    type ValueType = keyof ValueTypeMap;
@@ -1666,7 +1666,7 @@ index 4793be407cbfb4b4da9a10935e68d6e19a7ae1f1..56c49c140d9cd2459fe531379fa39660
    function instantiate(
      bytes: BufferSource,
      importObject?: Imports,
-@@ -33082,12 +33310,12 @@ declare namespace WebAssembly {
+@@ -33085,12 +33313,12 @@ declare namespace WebAssembly {
      moduleObject: Module,
      importObject?: Imports,
    ): Promise<Instance>;
@@ -1681,7 +1681,7 @@ index 4793be407cbfb4b4da9a10935e68d6e19a7ae1f1..56c49c140d9cd2459fe531379fa39660
    function validate(bytes: BufferSource): boolean;
  }
  
-@@ -33622,6 +33850,14 @@ declare const ondevicemotion:
+@@ -33625,6 +33853,14 @@ declare const ondevicemotion:
  declare const ondeviceorientation:
    | ((this: Window, ev: DeviceOrientationEvent) => unknown)
    | null;
@@ -1696,7 +1696,7 @@ index 4793be407cbfb4b4da9a10935e68d6e19a7ae1f1..56c49c140d9cd2459fe531379fa39660
  /**
   * @deprecated
   *
-@@ -33824,7 +34060,9 @@ declare function toString(): string;
+@@ -33827,7 +34063,9 @@ declare function toString(): string;
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/dispatchEvent)
   */
  declare function dispatchEvent(event: Event): boolean;
@@ -1706,7 +1706,7 @@ index 4793be407cbfb4b4da9a10935e68d6e19a7ae1f1..56c49c140d9cd2459fe531379fa39660
  declare function requestAnimationFrame(callback: FrameRequestCallback): number;
  /**
   * Fires when the user aborts the download.
-@@ -33851,8 +34089,10 @@ declare const onanimationstart:
+@@ -33854,8 +34092,10 @@ declare const onanimationstart:
    | null;
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Element/auxclick_event) */
  declare const onauxclick: ((this: Window, ev: MouseEvent) => unknown) | null;
@@ -1718,7 +1718,7 @@ index 4793be407cbfb4b4da9a10935e68d6e19a7ae1f1..56c49c140d9cd2459fe531379fa39660
  /**
   * Fires when the object loses the input focus.
   * @param ev The focus event.
-@@ -33992,7 +34232,7 @@ declare const onformdata: ((this: Window, ev: FormDataEvent) => unknown) | null;
+@@ -33995,7 +34235,7 @@ declare const onformdata: ((this: Window, ev: FormDataEvent) => unknown) | null;
  declare const ongotpointercapture:
    | ((this: Window, ev: PointerEvent) => unknown)
    | null;
@@ -1727,7 +1727,7 @@ index 4793be407cbfb4b4da9a10935e68d6e19a7ae1f1..56c49c140d9cd2459fe531379fa39660
  declare const oninput: ((this: Window, ev: Event) => unknown) | null;
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/HTMLInputElement/invalid_event) */
  declare const oninvalid: ((this: Window, ev: Event) => unknown) | null;
-@@ -34046,7 +34286,7 @@ declare const onloadedmetadata: ((this: Window, ev: Event) => unknown) | null;
+@@ -34049,7 +34289,7 @@ declare const onloadedmetadata: ((this: Window, ev: Event) => unknown) | null;
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/HTMLMediaElement/loadstart_event)
   */
  declare const onloadstart: ((this: Window, ev: Event) => unknown) | null;
@@ -1736,7 +1736,7 @@ index 4793be407cbfb4b4da9a10935e68d6e19a7ae1f1..56c49c140d9cd2459fe531379fa39660
  declare const onlostpointercapture:
    | ((this: Window, ev: PointerEvent) => unknown)
    | null;
-@@ -34366,7 +34606,11 @@ declare const onstorage: ((this: Window, ev: StorageEvent) => unknown) | null;
+@@ -34369,7 +34609,11 @@ declare const onstorage: ((this: Window, ev: StorageEvent) => unknown) | null;
  declare var onunhandledrejection:
    | ((this: Window, ev: PromiseRejectionEvent) => unknown)
    | null;
@@ -1749,7 +1749,7 @@ index 4793be407cbfb4b4da9a10935e68d6e19a7ae1f1..56c49c140d9cd2459fe531379fa39660
  declare const onunload: ((this: Window, ev: Event) => unknown) | null;
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/localStorage) */
  declare const localStorage: Storage;
-@@ -34540,6 +34784,7 @@ type OnErrorEventHandler = OnErrorEventHandlerNonNull | null;
+@@ -34543,6 +34787,7 @@ type OnErrorEventHandler = OnErrorEventHandlerNonNull | null;
  type OptionalPostfixToken<T extends string> = ` ${T}` | '';
  type OptionalPrefixToken<T extends string> = `${T} ` | '';
  type PerformanceEntryList = readonly PerformanceEntry[];
@@ -1757,7 +1757,7 @@ index 4793be407cbfb4b4da9a10935e68d6e19a7ae1f1..56c49c140d9cd2459fe531379fa39660
  type ReadableStreamController<T> =
    | ReadableStreamDefaultController<T>
    | ReadableByteStreamController;
-@@ -34784,6 +35029,7 @@ type HardwareAcceleration =
+@@ -34787,6 +35032,7 @@ type HardwareAcceleration =
    | 'prefer-hardware'
    | 'prefer-software';
  type HdrMetadataType = 'smpteSt2086' | 'smpteSt2094-10' | 'smpteSt2094-40';
@@ -1765,7 +1765,7 @@ index 4793be407cbfb4b4da9a10935e68d6e19a7ae1f1..56c49c140d9cd2459fe531379fa39660
  type IDBCursorDirection = 'next' | 'nextunique' | 'prev' | 'prevunique';
  type IDBRequestReadyState = 'done' | 'pending';
  type IDBTransactionDurability = 'default' | 'relaxed' | 'strict';
-@@ -34969,6 +35215,7 @@ type RTCStatsType =
+@@ -34972,6 +35218,7 @@ type RTCStatsType =
    | 'data-channel'
    | 'inbound-rtp'
    | 'local-candidate'
@@ -1773,7 +1773,7 @@ index 4793be407cbfb4b4da9a10935e68d6e19a7ae1f1..56c49c140d9cd2459fe531379fa39660
    | 'media-source'
    | 'outbound-rtp'
    | 'peer-connection'
-@@ -35021,6 +35268,7 @@ type RequestDestination =
+@@ -35024,6 +35271,7 @@ type RequestDestination =
    | 'worker'
    | 'xslt';
  type RequestMode = 'cors' | 'navigate' | 'no-cors' | 'same-origin';

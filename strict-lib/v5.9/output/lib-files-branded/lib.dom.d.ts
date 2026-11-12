@@ -29653,7 +29653,7 @@ interface Request extends Body {
    *
    * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Request/method)
    */
-  readonly method: import('ts-type-forge').HTTPRequestMethod;
+  readonly method: string;
   /**
    * The **`mode`** read-only property of the Request interface contains the mode of the request (e.g., `cors`, `no-cors`, `same-origin`, or `navigate`.) This is used to determine if cross-origin requests lead to valid responses, and which properties of the response are readable.
    *
@@ -43664,9 +43664,12 @@ interface XMLHttpRequest extends XMLHttpRequestEventTarget {
    *
    * [MDN Reference](https://developer.mozilla.org/docs/Web/API/XMLHttpRequest/open)
    */
-  open(method: 'post' | 'get' | 'dialog', url: string | URL): void;
   open(
-    method: 'post' | 'get' | 'dialog',
+    method: import('ts-type-forge').HTTPRequestMethod | (string & {}),
+    url: string | URL,
+  ): void;
+  open(
+    method: import('ts-type-forge').HTTPRequestMethod | (string & {}),
     url: string | URL,
     async: boolean,
     username?: string | null,

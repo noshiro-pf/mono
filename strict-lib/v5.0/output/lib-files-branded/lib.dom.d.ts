@@ -15179,7 +15179,7 @@ interface Request extends Body {
   /** Returns a boolean indicating whether or not request can outlive the global in which it was created. */
   readonly keepalive: boolean;
   /** Returns request's HTTP method, which is "GET" by default. */
-  readonly method: import('ts-type-forge').HTTPRequestMethod;
+  readonly method: string;
   /** Returns the mode associated with request, which is a string indicating whether the request will use CORS, or will be restricted to same-origin URLs. */
   readonly mode: RequestMode;
   /** Returns the redirect mode associated with request, which is a string indicating how redirects for the request will be handled during fetching. A request will follow redirects by default. */
@@ -23448,9 +23448,12 @@ interface XMLHttpRequest extends XMLHttpRequestEventTarget {
    *
    * Throws an "InvalidAccessError" DOMException if async is false, current global object is a Window object, and the timeout attribute is not zero or the responseType attribute is not the empty string.
    */
-  open(method: 'post' | 'get' | 'dialog', url: string | URL): void;
   open(
-    method: 'post' | 'get' | 'dialog',
+    method: import('ts-type-forge').HTTPRequestMethod | (string & {}),
+    url: string | URL,
+  ): void;
+  open(
+    method: import('ts-type-forge').HTTPRequestMethod | (string & {}),
     url: string | URL,
     async: boolean,
     username?: string | null,

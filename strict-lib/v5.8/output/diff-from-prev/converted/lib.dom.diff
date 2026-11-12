@@ -1,5 +1,5 @@
 diff --git a/v5.7/output/lib-files/lib.dom.d.ts b/v5.8/output/lib-files/lib.dom.d.ts
-index ebe0fd6a05b7ebd5d04c970b5a676723541aeb8e..158f7b99d2a85f66af7203dfe97e1425a2de70e3 100644
+index e4b13e5cc58d5e9339ac6b922ad32f37364898a4..b1506e93cf05a0e2da3ea79ba187210df2e50cd4 100644
 --- a/v5.7/output/lib-files/lib.dom.d.ts
 +++ b/v5.8/output/lib-files/lib.dom.d.ts
 @@ -792,6 +792,26 @@ interface ImageDataSettings {
@@ -2298,7 +2298,7 @@ index ebe0fd6a05b7ebd5d04c970b5a676723541aeb8e..158f7b99d2a85f66af7203dfe97e1425
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WritableStreamDefaultWriter/abort) */
    abort(reason?: unknown): Promise<void>;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WritableStreamDefaultWriter/close) */
-@@ -34515,17 +35187,9 @@ declare const orientation: number;
+@@ -34518,17 +35190,9 @@ declare const orientation: number;
  declare const outerHeight: number;
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/outerWidth) */
  declare const outerWidth: number;
@@ -2318,7 +2318,7 @@ index ebe0fd6a05b7ebd5d04c970b5a676723541aeb8e..158f7b99d2a85f66af7203dfe97e1425
  declare const pageYOffset: number;
  /**
   * Refers to either the parent WindowProxy, or itself.
-@@ -34741,7 +35405,7 @@ declare const onbeforetoggle: ((this: Window, ev: Event) => unknown) | null;
+@@ -34744,7 +35408,7 @@ declare const onbeforetoggle: ((this: Window, ev: Event) => unknown) | null;
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Element/blur_event)
   */
  declare const onblur: ((this: Window, ev: FocusEvent) => unknown) | null;
@@ -2327,7 +2327,7 @@ index ebe0fd6a05b7ebd5d04c970b5a676723541aeb8e..158f7b99d2a85f66af7203dfe97e1425
  declare const oncancel: ((this: Window, ev: Event) => unknown) | null;
  /**
   * Occurs when playback is possible, but would require further buffering.
-@@ -34768,7 +35432,7 @@ declare const onchange: ((this: Window, ev: Event) => unknown) | null;
+@@ -34771,7 +35435,7 @@ declare const onchange: ((this: Window, ev: Event) => unknown) | null;
  declare const onclick: ((this: Window, ev: MouseEvent) => unknown) | null;
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/HTMLDialogElement/close_event) */
  declare const onclose: ((this: Window, ev: Event) => unknown) | null;
@@ -2336,7 +2336,7 @@ index ebe0fd6a05b7ebd5d04c970b5a676723541aeb8e..158f7b99d2a85f66af7203dfe97e1425
  declare const oncontextlost: ((this: Window, ev: Event) => unknown) | null;
  /**
   * Fires when the user clicks the right mouse button in the client area, opening the context menu.
-@@ -35113,7 +35777,7 @@ declare const onsuspend: ((this: Window, ev: Event) => unknown) | null;
+@@ -35116,7 +35780,7 @@ declare const onsuspend: ((this: Window, ev: Event) => unknown) | null;
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/HTMLMediaElement/timeupdate_event)
   */
  declare const ontimeupdate: ((this: Window, ev: Event) => unknown) | null;
@@ -2345,7 +2345,7 @@ index ebe0fd6a05b7ebd5d04c970b5a676723541aeb8e..158f7b99d2a85f66af7203dfe97e1425
  declare const ontoggle: ((this: Window, ev: Event) => unknown) | null;
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Element/touchcancel_event) */
  declare const ontouchcancel:
-@@ -35235,10 +35899,14 @@ declare var ononline: ((this: Window, ev: Event) => unknown) | null;
+@@ -35238,10 +35902,14 @@ declare var ononline: ((this: Window, ev: Event) => unknown) | null;
  declare const onpagehide:
    | ((this: Window, ev: PageTransitionEvent) => unknown)
    | null;
@@ -2360,7 +2360,7 @@ index ebe0fd6a05b7ebd5d04c970b5a676723541aeb8e..158f7b99d2a85f66af7203dfe97e1425
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/popstate_event) */
  declare const onpopstate: ((this: Window, ev: PopStateEvent) => unknown) | null;
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/rejectionhandled_event) */
-@@ -35281,11 +35949,11 @@ declare var performance: Performance;
+@@ -35284,11 +35952,11 @@ declare var performance: Performance;
  declare function atob(data: string): string;
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/btoa) */
  declare function btoa(data: string): string;
@@ -2375,7 +2375,7 @@ index ebe0fd6a05b7ebd5d04c970b5a676723541aeb8e..158f7b99d2a85f66af7203dfe97e1425
  declare function createImageBitmap(
    image: ImageBitmapSource,
    options?: ImageBitmapOptions,
-@@ -35303,23 +35971,23 @@ declare function fetch(
+@@ -35306,23 +35974,23 @@ declare function fetch(
    input: RequestInfo | URL,
    init?: RequestInit,
  ): Promise<Response>;
@@ -2404,7 +2404,7 @@ index ebe0fd6a05b7ebd5d04c970b5a676723541aeb8e..158f7b99d2a85f66af7203dfe97e1425
  declare function structuredClone<T = unknown>(
    value: T,
    options?: StructuredSerializeOptions,
-@@ -35413,6 +36081,7 @@ type IDBValidKey =
+@@ -35416,6 +36084,7 @@ type IDBValidKey =
    | BufferSource
    | readonly IDBValidKey[];
  type ImageBitmapSource = CanvasImageSource | Blob | ImageData;
@@ -2412,7 +2412,7 @@ index ebe0fd6a05b7ebd5d04c970b5a676723541aeb8e..158f7b99d2a85f66af7203dfe97e1425
  type Int32List = Int32Array | readonly GLint[];
  type LineAndPositionSetting = number | AutoKeyword;
  type MediaProvider = MediaStream | MediaSource | Blob;
-@@ -35429,6 +36098,7 @@ type OnErrorEventHandler = OnErrorEventHandlerNonNull | null;
+@@ -35432,6 +36101,7 @@ type OnErrorEventHandler = OnErrorEventHandlerNonNull | null;
  type OptionalPostfixToken<T extends string> = ` ${T}` | '';
  type OptionalPrefixToken<T extends string> = `${T} ` | '';
  type PerformanceEntryList = readonly PerformanceEntry[];
@@ -2420,7 +2420,7 @@ index ebe0fd6a05b7ebd5d04c970b5a676723541aeb8e..158f7b99d2a85f66af7203dfe97e1425
  type PublicKeyCredentialJSON = unknown;
  type RTCRtpTransform = RTCRtpScriptTransform;
  type ReadableStreamController<T> =
-@@ -35466,6 +36136,7 @@ type Transferable =
+@@ -35469,6 +36139,7 @@ type Transferable =
    | TransformStream
    | AudioData
    | VideoFrame
@@ -2428,7 +2428,7 @@ index ebe0fd6a05b7ebd5d04c970b5a676723541aeb8e..158f7b99d2a85f66af7203dfe97e1425
    | ArrayBuffer;
  type Uint32List = Uint32Array | readonly GLuint[];
  type VibratePattern = number | readonly number[];
-@@ -35755,6 +36426,7 @@ type NavigationTimingType =
+@@ -35758,6 +36429,7 @@ type NavigationTimingType =
    | 'navigate'
    | 'prerender'
    | 'reload';
@@ -2436,7 +2436,7 @@ index ebe0fd6a05b7ebd5d04c970b5a676723541aeb8e..158f7b99d2a85f66af7203dfe97e1425
  type NotificationDirection = 'auto' | 'ltr' | 'rtl';
  type NotificationPermission = 'default' | 'denied' | 'granted';
  type OffscreenRenderingContextId =
-@@ -35775,7 +36447,9 @@ type PanningModelType = 'HRTF' | 'equalpower';
+@@ -35778,7 +36450,9 @@ type PanningModelType = 'HRTF' | 'equalpower';
  type PaymentComplete = 'fail' | 'success' | 'unknown';
  type PaymentShippingType = 'delivery' | 'pickup' | 'shipping';
  type PermissionName =
@@ -2446,7 +2446,7 @@ index ebe0fd6a05b7ebd5d04c970b5a676723541aeb8e..158f7b99d2a85f66af7203dfe97e1425
    | 'midi'
    | 'notifications'
    | 'persistent-storage'
-@@ -35800,6 +36474,7 @@ type RTCDegradationPreference =
+@@ -35803,6 +36477,7 @@ type RTCDegradationPreference =
    | 'balanced'
    | 'maintain-framerate'
    | 'maintain-resolution';
@@ -2454,7 +2454,7 @@ index ebe0fd6a05b7ebd5d04c970b5a676723541aeb8e..158f7b99d2a85f66af7203dfe97e1425
  type RTCDtlsTransportState =
    | 'closed'
    | 'connected'
-@@ -35828,6 +36503,7 @@ type RTCIceConnectionState =
+@@ -35831,6 +36506,7 @@ type RTCIceConnectionState =
  type RTCIceGathererState = 'complete' | 'gathering' | 'new';
  type RTCIceGatheringState = 'complete' | 'gathering' | 'new';
  type RTCIceProtocol = 'tcp' | 'udp';
@@ -2462,7 +2462,7 @@ index ebe0fd6a05b7ebd5d04c970b5a676723541aeb8e..158f7b99d2a85f66af7203dfe97e1425
  type RTCIceTcpCandidateType = 'active' | 'passive' | 'so';
  type RTCIceTransportPolicy = 'all' | 'relay';
  type RTCIceTransportState =
-@@ -35846,6 +36522,7 @@ type RTCPeerConnectionState =
+@@ -35849,6 +36525,7 @@ type RTCPeerConnectionState =
    | 'failed'
    | 'new';
  type RTCPriorityType = 'high' | 'low' | 'medium' | 'very-low';

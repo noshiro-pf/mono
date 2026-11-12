@@ -1,5 +1,5 @@
 diff --git a/v5.8/output/lib-files/lib.webworker.d.ts b/v5.9/output/lib-files/lib.webworker.d.ts
-index 23242dd9908cb7ac6ca958197bd22fb8b660ff26..19d81ccfbb0b1ae655a81d70e2068c5296d2d713 100644
+index 90e6fdfd6508583f9ac18b0a36e102082c99363d..689d78f32f7aa3fff74cabc790a5dc4326dee84a 100644
 --- a/v5.8/output/lib-files/lib.webworker.d.ts
 +++ b/v5.9/output/lib-files/lib.webworker.d.ts
 @@ -90,7 +90,7 @@ interface AudioDataInit {
@@ -6924,7 +6924,7 @@ index 23242dd9908cb7ac6ca958197bd22fb8b660ff26..19d81ccfbb0b1ae655a81d70e2068c52
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Request/method)
     */
-   readonly method: import('ts-type-forge').HTTPRequestMethod;
+   readonly method: string;
    /**
 -   * Returns the mode associated with request, which is a string indicating whether the request will use CORS, or will be restricted to same-origin URLs.
 +   * The **`mode`** read-only property of the Request interface contains the mode of the request (e.g., `cors`, `no-cors`, `same-origin`, or `navigate`.) This is used to determine if cross-origin requests lead to valid responses, and which properties of the response are readable.
@@ -9855,7 +9855,7 @@ index 23242dd9908cb7ac6ca958197bd22fb8b660ff26..19d81ccfbb0b1ae655a81d70e2068c52
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/XMLHttpRequest/open)
     */
-@@ -11351,27 +14535,19 @@ interface XMLHttpRequest extends XMLHttpRequestEventTarget {
+@@ -11354,27 +14538,19 @@ interface XMLHttpRequest extends XMLHttpRequestEventTarget {
      password?: string | null,
    ): void;
    /**
@@ -9886,7 +9886,7 @@ index 23242dd9908cb7ac6ca958197bd22fb8b660ff26..19d81ccfbb0b1ae655a81d70e2068c52
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/XMLHttpRequest/setRequestHeader)
     */
-@@ -11423,7 +14599,11 @@ interface XMLHttpRequestEventTargetEventMap {
+@@ -11426,7 +14602,11 @@ interface XMLHttpRequestEventTargetEventMap {
    timeout: ProgressEvent<XMLHttpRequestEventTarget>;
  }
  
@@ -9899,7 +9899,7 @@ index 23242dd9908cb7ac6ca958197bd22fb8b660ff26..19d81ccfbb0b1ae655a81d70e2068c52
  interface XMLHttpRequestEventTarget extends EventTarget {
    onabort: ((this: XMLHttpRequest, ev: ProgressEvent) => unknown) | null;
    onerror: ((this: XMLHttpRequest, ev: ProgressEvent) => unknown) | null;
-@@ -11465,7 +14645,11 @@ declare var XMLHttpRequestEventTarget: {
+@@ -11468,7 +14648,11 @@ declare var XMLHttpRequestEventTarget: {
    new (): XMLHttpRequestEventTarget;
  };
  
@@ -9912,7 +9912,7 @@ index 23242dd9908cb7ac6ca958197bd22fb8b660ff26..19d81ccfbb0b1ae655a81d70e2068c52
  interface XMLHttpRequestUpload extends XMLHttpRequestEventTarget {
    addEventListener<K extends keyof XMLHttpRequestEventTargetEventMap>(
      type: K,
-@@ -11500,51 +14684,6 @@ declare var XMLHttpRequestUpload: {
+@@ -11503,51 +14687,6 @@ declare var XMLHttpRequestUpload: {
    new (): XMLHttpRequestUpload;
  };
  
@@ -9964,7 +9964,7 @@ index 23242dd9908cb7ac6ca958197bd22fb8b660ff26..19d81ccfbb0b1ae655a81d70e2068c52
  declare namespace WebAssembly {
    interface CompileError extends Error {}
  
-@@ -11554,7 +14693,7 @@ declare namespace WebAssembly {
+@@ -11557,7 +14696,7 @@ declare namespace WebAssembly {
      (message?: string): CompileError;
    };
  
@@ -9973,7 +9973,7 @@ index 23242dd9908cb7ac6ca958197bd22fb8b660ff26..19d81ccfbb0b1ae655a81d70e2068c52
    interface Global<T extends ValueType = ValueType> {
      value: ValueTypeMap[T];
      valueOf(): ValueTypeMap[T];
-@@ -11568,9 +14707,9 @@ declare namespace WebAssembly {
+@@ -11571,9 +14710,9 @@ declare namespace WebAssembly {
      ): Global<T>;
    };
  
@@ -9985,7 +9985,7 @@ index 23242dd9908cb7ac6ca958197bd22fb8b660ff26..19d81ccfbb0b1ae655a81d70e2068c52
      readonly exports: Exports;
    }
  
-@@ -11587,11 +14726,11 @@ declare namespace WebAssembly {
+@@ -11590,11 +14729,11 @@ declare namespace WebAssembly {
      (message?: string): LinkError;
    };
  
@@ -10000,7 +10000,7 @@ index 23242dd9908cb7ac6ca958197bd22fb8b660ff26..19d81ccfbb0b1ae655a81d70e2068c52
      grow(delta: number): number;
    }
  
-@@ -11600,17 +14739,17 @@ declare namespace WebAssembly {
+@@ -11603,17 +14742,17 @@ declare namespace WebAssembly {
      new (descriptor: MemoryDescriptor): Memory;
    };
  
@@ -10022,7 +10022,7 @@ index 23242dd9908cb7ac6ca958197bd22fb8b660ff26..19d81ccfbb0b1ae655a81d70e2068c52
      imports(moduleObject: Module): ModuleImportDescriptor[];
    };
  
-@@ -11622,15 +14761,15 @@ declare namespace WebAssembly {
+@@ -11625,15 +14764,15 @@ declare namespace WebAssembly {
      (message?: string): RuntimeError;
    };
  
@@ -10043,7 +10043,7 @@ index 23242dd9908cb7ac6ca958197bd22fb8b660ff26..19d81ccfbb0b1ae655a81d70e2068c52
      set(index: number, value?: unknown): void;
    }
  
-@@ -11690,13 +14829,13 @@ declare namespace WebAssembly {
+@@ -11693,13 +14832,13 @@ declare namespace WebAssembly {
    type Imports = Record<string, ModuleImports>;
    type ModuleImports = Record<string, ImportValue>;
    type ValueType = keyof ValueTypeMap;
@@ -10060,7 +10060,7 @@ index 23242dd9908cb7ac6ca958197bd22fb8b660ff26..19d81ccfbb0b1ae655a81d70e2068c52
    function instantiate(
      bytes: BufferSource,
      importObject?: Imports,
-@@ -11705,15 +14844,141 @@ declare namespace WebAssembly {
+@@ -11708,15 +14847,141 @@ declare namespace WebAssembly {
      moduleObject: Module,
      importObject?: Imports,
    ): Promise<Instance>;
@@ -10204,7 +10204,7 @@ index 23242dd9908cb7ac6ca958197bd22fb8b660ff26..19d81ccfbb0b1ae655a81d70e2068c52
  interface AudioDataOutputCallback {
    (output: AudioData): void;
  }
-@@ -11730,8 +14995,8 @@ interface FrameRequestCallback {
+@@ -11733,8 +14998,8 @@ interface FrameRequestCallback {
    (time: DOMHighResTimeStamp): void;
  }
  
@@ -10215,7 +10215,7 @@ index 23242dd9908cb7ac6ca958197bd22fb8b660ff26..19d81ccfbb0b1ae655a81d70e2068c52
  }
  
  interface OnErrorEventHandlerNonNull {
-@@ -11815,7 +15080,7 @@ interface WebCodecsErrorCallback {
+@@ -11818,7 +15083,7 @@ interface WebCodecsErrorCallback {
  }
  
  /**
@@ -10224,7 +10224,7 @@ index 23242dd9908cb7ac6ca958197bd22fb8b660ff26..19d81ccfbb0b1ae655a81d70e2068c52
   *
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/DedicatedWorkerGlobalScope/name)
   */
-@@ -11825,13 +15090,13 @@ declare const onrtctransform:
+@@ -11828,13 +15093,13 @@ declare const onrtctransform:
    | ((this: DedicatedWorkerGlobalScope, ev: RTCTransformEvent) => unknown)
    | null;
  /**
@@ -10240,7 +10240,7 @@ index 23242dd9908cb7ac6ca958197bd22fb8b660ff26..19d81ccfbb0b1ae655a81d70e2068c52
   *
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/DedicatedWorkerGlobalScope/postMessage)
   */
-@@ -11844,19 +15109,19 @@ declare function postMessage(
+@@ -11847,19 +15112,19 @@ declare function postMessage(
    options?: StructuredSerializeOptions,
  ): void;
  /**
@@ -10263,7 +10263,7 @@ index 23242dd9908cb7ac6ca958197bd22fb8b660ff26..19d81ccfbb0b1ae655a81d70e2068c52
   *
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/WorkerGlobalScope/navigator)
   */
-@@ -11886,19 +15151,19 @@ declare var onunhandledrejection:
+@@ -11889,19 +15154,19 @@ declare var onunhandledrejection:
    | ((this: DedicatedWorkerGlobalScope, ev: PromiseRejectionEvent) => unknown)
    | null;
  /**
@@ -10286,7 +10286,7 @@ index 23242dd9908cb7ac6ca958197bd22fb8b660ff26..19d81ccfbb0b1ae655a81d70e2068c52
   *
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/dispatchEvent)
   */
-@@ -12013,21 +15278,24 @@ declare function removeEventListener(
+@@ -12016,21 +15281,24 @@ declare function removeEventListener(
    options?: boolean | EventListenerOptions,
  ): void;
  type AlgorithmIdentifier = Algorithm | string;
@@ -10315,7 +10315,7 @@ index 23242dd9908cb7ac6ca958197bd22fb8b660ff26..19d81ccfbb0b1ae655a81d70e2068c52
  type FormDataEntryValue = File | string;
  type GLbitfield = number;
  type GLboolean = boolean;
-@@ -12054,7 +15322,8 @@ type IDBValidKey =
+@@ -12057,7 +15325,8 @@ type IDBValidKey =
    | readonly IDBValidKey[];
  type ImageBitmapSource = CanvasImageSource | Blob | ImageData;
  type ImageBufferSource = AllowSharedBufferSource | ReadableStream;
@@ -10325,7 +10325,7 @@ index 23242dd9908cb7ac6ca958197bd22fb8b660ff26..19d81ccfbb0b1ae655a81d70e2068c52
  type MessageEventSource = MessagePort | ServiceWorker;
  type NamedCurve = string;
  type OffscreenRenderingContext =
-@@ -12090,7 +15359,7 @@ type Transferable =
+@@ -12093,7 +15362,7 @@ type Transferable =
    | VideoFrame
    | RTCDataChannel
    | ArrayBuffer;
@@ -10334,7 +10334,7 @@ index 23242dd9908cb7ac6ca958197bd22fb8b660ff26..19d81ccfbb0b1ae655a81d70e2068c52
  type XMLHttpRequestBodyInit =
    | Blob
    | BufferSource
-@@ -12167,6 +15436,7 @@ type CodecState = 'closed' | 'configured' | 'unconfigured';
+@@ -12170,6 +15439,7 @@ type CodecState = 'closed' | 'configured' | 'unconfigured';
  type ColorGamut = 'p3' | 'rec2020' | 'srgb';
  type ColorSpaceConversion = 'default' | 'none';
  type CompressionFormat = 'deflate' | 'deflate-raw' | 'gzip';
@@ -10342,7 +10342,7 @@ index 23242dd9908cb7ac6ca958197bd22fb8b660ff26..19d81ccfbb0b1ae655a81d70e2068c52
  type DocumentVisibilityState = 'hidden' | 'visible';
  type EncodedAudioChunkType = 'delta' | 'key';
  type EncodedVideoChunkType = 'delta' | 'key';
-@@ -12229,6 +15499,7 @@ type LatencyMode = 'quality' | 'realtime';
+@@ -12232,6 +15502,7 @@ type LatencyMode = 'quality' | 'realtime';
  type LockMode = 'exclusive' | 'shared';
  type MediaDecodingType = 'file' | 'media-source' | 'webrtc';
  type MediaEncodingType = 'record' | 'webrtc';

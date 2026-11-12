@@ -1442,15 +1442,6 @@
  }
  
  /** This Fetch API interface represents a resource request. */
-@@ -3663,7 +3716,7 @@ interface Request extends Body {
-   /** Returns a boolean indicating whether or not request can outlive the global in which it was created. */
-   readonly keepalive: boolean;
-   /** Returns request's HTTP method, which is "GET" by default. */
--  readonly method: string;
-+  readonly method: import('ts-type-forge').HTTPRequestMethod;
-   /** Returns the mode associated with request, which is a string indicating whether the request will use CORS, or will be restricted to same-origin URLs. */
-   readonly mode: RequestMode;
-   /** Returns the redirect mode associated with request, which is a string indicating how redirects for the request will be handled during fetching. A request will follow redirects by default. */
 @@ -3736,14 +3789,14 @@ interface ServiceWorkerEventMap extends AbstractWorkerEventMap {
   * Available only in secure contexts.
   */
@@ -2152,19 +2143,22 @@
    /**
     * Returns response as text.
     *
-@@ -7595,9 +7663,9 @@ interface XMLHttpRequest extends XMLHttpRequestEventTarget {
+@@ -7595,9 +7663,12 @@ interface XMLHttpRequest extends XMLHttpRequestEventTarget {
     *
     * Throws an "InvalidAccessError" DOMException if async is false, current global object is a Window object, and the timeout attribute is not zero or the responseType attribute is not the empty string.
     */
 -  open(method: string, url: string | URL): void;
-+  open(method: 'post' | 'get' | 'dialog', url: string | URL): void;
    open(
 -    method: string,
-+    method: 'post' | 'get' | 'dialog',
++    method: import('ts-type-forge').HTTPRequestMethod | (string & {}),
++    url: string | URL,
++  ): void;
++  open(
++    method: import('ts-type-forge').HTTPRequestMethod | (string & {}),
      url: string | URL,
      async: boolean,
      username?: string | null,
-@@ -7630,7 +7698,7 @@ interface XMLHttpRequest extends XMLHttpRequestEventTarget {
+@@ -7630,7 +7701,7 @@ interface XMLHttpRequest extends XMLHttpRequestEventTarget {
    readonly DONE: 4;
    addEventListener<K extends keyof XMLHttpRequestEventMap>(
      type: K,
@@ -2173,7 +2167,7 @@
      options?: boolean | AddEventListenerOptions,
    ): void;
    addEventListener(
-@@ -7640,7 +7708,7 @@ interface XMLHttpRequest extends XMLHttpRequestEventTarget {
+@@ -7640,7 +7711,7 @@ interface XMLHttpRequest extends XMLHttpRequestEventTarget {
    ): void;
    removeEventListener<K extends keyof XMLHttpRequestEventMap>(
      type: K,
@@ -2182,7 +2176,7 @@
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -7671,19 +7739,19 @@ interface XMLHttpRequestEventTargetEventMap {
+@@ -7671,19 +7742,19 @@ interface XMLHttpRequestEventTargetEventMap {
  }
  
  interface XMLHttpRequestEventTarget extends EventTarget {
@@ -2210,7 +2204,7 @@
      options?: boolean | AddEventListenerOptions,
    ): void;
    addEventListener(
-@@ -7696,7 +7764,7 @@ interface XMLHttpRequestEventTarget extends EventTarget {
+@@ -7696,7 +7767,7 @@ interface XMLHttpRequestEventTarget extends EventTarget {
      listener: (
        this: XMLHttpRequestEventTarget,
        ev: XMLHttpRequestEventTargetEventMap[K],
@@ -2219,7 +2213,7 @@
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -7717,7 +7785,7 @@ interface XMLHttpRequestUpload extends XMLHttpRequestEventTarget {
+@@ -7717,7 +7788,7 @@ interface XMLHttpRequestUpload extends XMLHttpRequestEventTarget {
      listener: (
        this: XMLHttpRequestUpload,
        ev: XMLHttpRequestEventTargetEventMap[K],
@@ -2228,7 +2222,7 @@
      options?: boolean | AddEventListenerOptions,
    ): void;
    addEventListener(
-@@ -7730,7 +7798,7 @@ interface XMLHttpRequestUpload extends XMLHttpRequestEventTarget {
+@@ -7730,7 +7801,7 @@ interface XMLHttpRequestUpload extends XMLHttpRequestEventTarget {
      listener: (
        this: XMLHttpRequestUpload,
        ev: XMLHttpRequestEventTargetEventMap[K],
@@ -2237,7 +2231,7 @@
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -7746,26 +7814,26 @@ declare var XMLHttpRequestUpload: {
+@@ -7746,26 +7817,26 @@ declare var XMLHttpRequestUpload: {
  };
  
  interface Console {
@@ -2277,7 +2271,7 @@
  }
  
  declare var console: Console;
-@@ -7773,34 +7841,34 @@ declare var console: Console;
+@@ -7773,34 +7844,34 @@ declare var console: Console;
  declare namespace WebAssembly {
    interface CompileError extends Error {}
  
@@ -2319,7 +2313,7 @@
      prototype: LinkError;
      new (message?: string): LinkError;
      (message?: string): LinkError;
-@@ -7811,14 +7879,14 @@ declare namespace WebAssembly {
+@@ -7811,14 +7882,14 @@ declare namespace WebAssembly {
      grow(delta: number): number;
    }
  
@@ -2336,7 +2330,7 @@
      prototype: Module;
      new (bytes: BufferSource): Module;
      customSections(moduleObject: Module, sectionName: string): ArrayBuffer[];
-@@ -7828,7 +7896,7 @@ declare namespace WebAssembly {
+@@ -7828,7 +7899,7 @@ declare namespace WebAssembly {
  
    interface RuntimeError extends Error {}
  
@@ -2345,7 +2339,7 @@
      prototype: RuntimeError;
      new (message?: string): RuntimeError;
      (message?: string): RuntimeError;
-@@ -7836,14 +7904,14 @@ declare namespace WebAssembly {
+@@ -7836,14 +7907,14 @@ declare namespace WebAssembly {
  
    interface Table {
      readonly length: number;
@@ -2365,7 +2359,7 @@
    };
  
    interface GlobalDescriptor {
-@@ -7918,7 +7986,7 @@ interface FrameRequestCallback {
+@@ -7918,7 +7989,7 @@ interface FrameRequestCallback {
  }
  
  interface LockGrantedCallback {
@@ -2374,7 +2368,7 @@
  }
  
  interface OnErrorEventHandlerNonNull {
-@@ -7928,14 +7996,14 @@ interface OnErrorEventHandlerNonNull {
+@@ -7928,14 +7999,14 @@ interface OnErrorEventHandlerNonNull {
      lineno?: number,
      colno?: number,
      error?: Error,
@@ -2391,7 +2385,7 @@
    (chunk: T): number;
  }
  
-@@ -7944,7 +8012,7 @@ interface TransformerFlushCallback<O> {
+@@ -7944,7 +8015,7 @@ interface TransformerFlushCallback<O> {
  }
  
  interface TransformerStartCallback<O> {
@@ -2400,7 +2394,7 @@
  }
  
  interface TransformerTransformCallback<I, O> {
-@@ -7955,7 +8023,7 @@ interface TransformerTransformCallback<I, O> {
+@@ -7955,7 +8026,7 @@ interface TransformerTransformCallback<I, O> {
  }
  
  interface UnderlyingSinkAbortCallback {
@@ -2409,7 +2403,7 @@
  }
  
  interface UnderlyingSinkCloseCallback {
-@@ -7963,7 +8031,7 @@ interface UnderlyingSinkCloseCallback {
+@@ -7963,7 +8034,7 @@ interface UnderlyingSinkCloseCallback {
  }
  
  interface UnderlyingSinkStartCallback {
@@ -2418,7 +2412,7 @@
  }
  
  interface UnderlyingSinkWriteCallback<W> {
-@@ -7974,7 +8042,7 @@ interface UnderlyingSinkWriteCallback<W> {
+@@ -7974,7 +8045,7 @@ interface UnderlyingSinkWriteCallback<W> {
  }
  
  interface UnderlyingSourceCancelCallback {
@@ -2427,7 +2421,7 @@
  }
  
  interface UnderlyingSourcePullCallback<R> {
-@@ -7982,7 +8050,7 @@ interface UnderlyingSourcePullCallback<R> {
+@@ -7982,7 +8053,7 @@ interface UnderlyingSourcePullCallback<R> {
  }
  
  interface UnderlyingSourceStartCallback<R> {
@@ -2436,7 +2430,7 @@
  }
  
  interface VoidFunction {
-@@ -7990,19 +8058,22 @@ interface VoidFunction {
+@@ -7990,19 +8061,22 @@ interface VoidFunction {
  }
  
  /** Returns dedicatedWorkerGlobal's name, i.e. the value given to the Worker constructor. Primarily useful for debugging. */
@@ -2464,7 +2458,7 @@
    options?: StructuredSerializeOptions,
  ): void;
  /** Dispatches a synthetic event event to target and returns true if either event's cancelable attribute value is false or its preventDefault() method was not invoked, and false otherwise. */
-@@ -8012,22 +8083,22 @@ declare var location: WorkerLocation;
+@@ -8012,22 +8086,22 @@ declare var location: WorkerLocation;
  /** Returns workerGlobal's WorkerNavigator object. */
  declare var navigator: WorkerNavigator;
  declare var onerror:
@@ -2493,7 +2487,7 @@
    | null;
  /** Returns workerGlobal. */
  declare var self: WorkerGlobalScope & typeof globalThis;
-@@ -8035,7 +8106,7 @@ declare var self: WorkerGlobalScope & typeof globalThis;
+@@ -8035,7 +8109,7 @@ declare var self: WorkerGlobalScope & typeof globalThis;
  declare function importScripts(...urls: (string | URL)[]): void;
  /** Dispatches a synthetic event event to target and returns true if either event's cancelable attribute value is false or its preventDefault() method was not invoked, and false otherwise. */
  declare function dispatchEvent(event: Event): boolean;
@@ -2502,7 +2496,7 @@
  /** Available only in secure contexts. */
  declare var caches: CacheStorage;
  declare var crossOriginIsolated: boolean;
-@@ -8065,21 +8136,21 @@ declare function fetch(
+@@ -8065,21 +8139,21 @@ declare function fetch(
    init?: RequestInit,
  ): Promise<Response>;
  declare function queueMicrotask(callback: VoidFunction): void;
@@ -2529,7 +2523,7 @@
  declare function cancelAnimationFrame(handle: number): void;
  declare function requestAnimationFrame(callback: FrameRequestCallback): number;
  declare function addEventListener<
-@@ -8089,7 +8160,7 @@ declare function addEventListener<
+@@ -8089,7 +8163,7 @@ declare function addEventListener<
    listener: (
      this: DedicatedWorkerGlobalScope,
      ev: DedicatedWorkerGlobalScopeEventMap[K],
@@ -2538,7 +2532,7 @@
    options?: boolean | AddEventListenerOptions,
  ): void;
  declare function addEventListener(
-@@ -8104,7 +8175,7 @@ declare function removeEventListener<
+@@ -8104,7 +8178,7 @@ declare function removeEventListener<
    listener: (
      this: DedicatedWorkerGlobalScope,
      ev: DedicatedWorkerGlobalScopeEventMap[K],
@@ -2547,7 +2541,7 @@
    options?: boolean | EventListenerOptions,
  ): void;
  declare function removeEventListener(
-@@ -8122,7 +8193,7 @@ type CanvasImageSource = ImageBitmap | OffscreenCanvas;
+@@ -8122,7 +8196,7 @@ type CanvasImageSource = ImageBitmap | OffscreenCanvas;
  type DOMHighResTimeStamp = number;
  type EpochTimeStamp = number;
  type EventListenerOrEventListenerObject = EventListener | EventListenerObject;
@@ -2556,7 +2550,7 @@
  type FormDataEntryValue = File | string;
  type GLbitfield = number;
  type GLboolean = boolean;
-@@ -8137,10 +8208,18 @@ type GLsizeiptr = number;
+@@ -8137,10 +8211,18 @@ type GLsizeiptr = number;
  type GLuint = number;
  type GLuint64 = number;
  type HashAlgorithmIdentifier = AlgorithmIdentifier;
@@ -2578,7 +2572,7 @@
  type MessageEventSource = MessagePort | ServiceWorker;
  type NamedCurve = string;
  type OffscreenRenderingContext =
-@@ -8149,7 +8228,7 @@ type OffscreenRenderingContext =
+@@ -8149,7 +8231,7 @@ type OffscreenRenderingContext =
    | WebGLRenderingContext
    | WebGL2RenderingContext;
  type OnErrorEventHandler = OnErrorEventHandlerNonNull | null;
@@ -2587,7 +2581,7 @@
  type PushMessageDataInit = BufferSource | string;
  type ReadableStreamController<T> =
    | ReadableStreamDefaultController<T>
-@@ -8171,8 +8250,8 @@ type Transferable =
+@@ -8171,8 +8253,8 @@ type Transferable =
    | WritableStream
    | TransformStream
    | ArrayBuffer;

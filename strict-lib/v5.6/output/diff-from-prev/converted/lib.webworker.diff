@@ -1,5 +1,5 @@
 diff --git a/v5.5/output/lib-files/lib.webworker.d.ts b/v5.6/output/lib-files/lib.webworker.d.ts
-index c03c1a0aae55648e2e0860c19a2221adf334277d..ea44b85af9a44c078e0a5d77ef5275d4ff88ed59 100644
+index 1ce4c025bed284462df8e109c240d755b3997e24..3d4ec42676973e1201e1da973b46ab665de35c96 100644
 --- a/v5.5/output/lib-files/lib.webworker.d.ts
 +++ b/v5.6/output/lib-files/lib.webworker.d.ts
 @@ -345,10 +345,6 @@ interface ImageEncodeOptions {
@@ -433,7 +433,7 @@ index c03c1a0aae55648e2e0860c19a2221adf334277d..ea44b85af9a44c078e0a5d77ef5275d4
    onunhandledrejection:
      | ((this: WorkerGlobalScope, ev: PromiseRejectionEvent) => unknown)
      | null;
-@@ -10985,7 +10963,7 @@ interface Console {
+@@ -10988,7 +10966,7 @@ interface Console {
    clear(): void;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/count_static) */
    count(label?: string): void;
@@ -442,7 +442,7 @@ index c03c1a0aae55648e2e0860c19a2221adf334277d..ea44b85af9a44c078e0a5d77ef5275d4
    countReset(label?: string): void;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/debug_static) */
    debug(...data: readonly unknown[]): void;
-@@ -10997,9 +10975,9 @@ interface Console {
+@@ -11000,9 +10978,9 @@ interface Console {
    error(...data: readonly unknown[]): void;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/group_static) */
    group(...data: readonly unknown[]): void;
@@ -454,7 +454,7 @@ index c03c1a0aae55648e2e0860c19a2221adf334277d..ea44b85af9a44c078e0a5d77ef5275d4
    groupEnd(): void;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/info_static) */
    info(...data: readonly unknown[]): void;
-@@ -11009,9 +10987,9 @@ interface Console {
+@@ -11012,9 +10990,9 @@ interface Console {
    table(tabularData?: unknown, properties?: readonly string[]): void;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/time_static) */
    time(label?: string): void;
@@ -466,7 +466,7 @@ index c03c1a0aae55648e2e0860c19a2221adf334277d..ea44b85af9a44c078e0a5d77ef5275d4
    timeLog(label?: string, ...data: readonly unknown[]): void;
    timeStamp(label?: string): void;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/trace_static) */
-@@ -11033,9 +11011,7 @@ declare namespace WebAssembly {
+@@ -11036,9 +11014,7 @@ declare namespace WebAssembly {
  
    /** [MDN Reference](https://developer.mozilla.org/docs/WebAssembly/JavaScript_interface/Global) */
    interface Global<T extends ValueType = ValueType> {
@@ -476,7 +476,7 @@ index c03c1a0aae55648e2e0860c19a2221adf334277d..ea44b85af9a44c078e0a5d77ef5275d4
      valueOf(): ValueTypeMap[T];
    }
  
-@@ -11356,9 +11332,11 @@ declare var onoffline:
+@@ -11359,9 +11335,11 @@ declare var onoffline:
  declare var ononline:
    | ((this: DedicatedWorkerGlobalScope, ev: Event) => unknown)
    | null;
@@ -488,7 +488,7 @@ index c03c1a0aae55648e2e0860c19a2221adf334277d..ea44b85af9a44c078e0a5d77ef5275d4
  declare var onunhandledrejection:
    | ((this: DedicatedWorkerGlobalScope, ev: PromiseRejectionEvent) => unknown)
    | null;
-@@ -11385,24 +11363,24 @@ declare const fonts: FontFaceSet;
+@@ -11388,24 +11366,24 @@ declare const fonts: FontFaceSet;
  /**
   * Available only in secure contexts.
   *
@@ -522,7 +522,7 @@ index c03c1a0aae55648e2e0860c19a2221adf334277d..ea44b85af9a44c078e0a5d77ef5275d4
  declare function btoa(data: string): string;
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/clearInterval) */
  declare function clearInterval(id: number | undefined): void;
-@@ -11551,6 +11529,7 @@ type Transferable =
+@@ -11554,6 +11532,7 @@ type Transferable =
    | OffscreenCanvas
    | ImageBitmap
    | MessagePort
