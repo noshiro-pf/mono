@@ -1,9 +1,17 @@
 import { act, render, renderHook } from '@testing-library/react';
 import * as React from 'react';
-import type { Observable } from 'synstate';
+import type { InitializedObservable, Observable } from 'synstate';
+import { expectType } from 'ts-data-forge';
 import { useObservableValue, useValueAsObservable } from '../../src/index.mjs';
 
 describe(useValueAsObservable, () => {
+  test('returns an observable that holds a value (#3981)', () => {
+    expectType<
+      ReturnType<typeof useValueAsObservable<number>>,
+      InitializedObservable<number>
+    >('=');
+  });
+
   test('keeps one observable across re-renders and pushes each new value into it', () => {
     const { result, rerender } = renderHook(
       ({ value }: Readonly<{ value: number }>) => useValueAsObservable(value),

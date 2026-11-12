@@ -1,10 +1,18 @@
 import { render, renderHook } from '@testing-library/preact';
 import { h, render as preactRender, type JSX } from 'preact';
 import * as Preact from 'preact/hooks';
-import type { Observable } from 'synstate';
+import type { InitializedObservable, Observable } from 'synstate';
+import { expectType } from 'ts-data-forge';
 import { useValueAsObservable } from '../../src/index.mjs';
 
 describe(useValueAsObservable, () => {
+  test('returns an observable that holds a value (#3981)', () => {
+    expectType<
+      ReturnType<typeof useValueAsObservable<number>>,
+      InitializedObservable<number>
+    >('=');
+  });
+
   test('keeps one observable and pushes each new value into it', () => {
     const { result, rerender } = renderHook(
       ({ value }: Readonly<{ value: number }>) => useValueAsObservable(value),
