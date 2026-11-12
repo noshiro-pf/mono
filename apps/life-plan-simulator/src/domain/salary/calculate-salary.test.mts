@@ -3,6 +3,8 @@ import { calculateSalary, resolveSalaryHistory } from './calculate-salary.mjs';
 
 const ym = (s: string): number => parseYearMonthOr(s, 0);
 
+type SalaryMonthOf = ReturnType<typeof calculateSalary>[number] | undefined;
+
 describe(calculateSalary, () => {
   const history = resolveSalaryHistory(
     [
@@ -63,6 +65,28 @@ describe(calculateSalary, () => {
       (600_000 - 29_940 - 54_900 - 3300) * 0.040_84,
       1e-6,
     );
+  });
+
+  test('賞与の算出率は前月の iDeCo の掛金を引いた給与から引くこと', () => {
+    // 306,000 - 14,970 - 27,450 - 1,683 = 261,897 円は 6.126% の行、
+    // iDeCo の 23,000 円を引いた 238,897 円は 4.084% の行。
+    const withoutIdeco = januaryWith(0);
+
+    const withIdeco = januaryWith(23_000);
+
+    assert.isDefined(withoutIdeco);
+
+    assert.isDefined(withIdeco);
+
+    const taxableBonus =
+      600_000 -
+      withIdeco.bonusHealthInsurance -
+      withIdeco.bonusWelfarePension -
+      withIdeco.bonusEmploymentInsurance;
+
+    assert.closeTo(withoutIdeco.bonusIncomeTax, taxableBonus * 0.061_26, 1e-6);
+
+    assert.closeTo(withIdeco.bonusIncomeTax, taxableBonus * 0.040_84, 1e-6);
   });
 
   test('標準報酬月額の上限より大きい賞与も標準賞与額で保険料を求めること', () => {
@@ -129,3 +153,25 @@ describe(resolveSalaryHistory, () => {
     assert.strictEqual(entry?.annualIncome, 6_760_000);
   });
 });
+
+/** January 2027 of a salary of 306,000 yen a month with the given iDeCo contribution. */
+const januaryWith = (idecoMonthly: number): SalaryMonthOf =>
+  calculateSalary(
+    {
+      history: resolveSalaryHistory(
+        [
+          {
+            id: 1,
+            start: '2025-01',
+            annualBase: 3_672_000,
+            companyDcMonthly: 0,
+            idecoMonthly,
+            annualBonus: 600_000,
+          },
+        ],
+        0,
+      ),
+      retirementMonth: ym('2030-12'),
+    },
+    [ym('2027-01')],
+  )[0];
