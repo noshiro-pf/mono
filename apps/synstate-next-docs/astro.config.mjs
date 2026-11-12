@@ -6,7 +6,7 @@ export default defineConfig({
   site: 'https://noshiro-pf.github.io',
   // Served beside the synstate documentation, from this repository's Pages.
   // `tools/scripts/cmd/build-pages-site.mts` copies `dist/` to the same
-  // directory, so the two have to agree.
+  // directory (`check:root:astro-site-base`).
   base: '/mono/synstate-next/',
   integrations: [
     starlight({
