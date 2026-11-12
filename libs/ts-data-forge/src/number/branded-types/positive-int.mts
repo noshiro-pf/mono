@@ -152,7 +152,8 @@ export const PositiveInt = {
    * MAX_VALUE]`.
    *
    * Unlike `asPositiveInt`, this is total: out-of-range inputs are clamped to
-   * the nearest representable `PositiveInt` instead of throwing.
+   * the nearest representable `PositiveInt` instead of throwing, `NaN`
+   * included, which becomes `MIN_VALUE`.
    *
    * @example
    *

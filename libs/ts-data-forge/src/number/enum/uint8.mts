@@ -118,7 +118,8 @@ export const Uint8 = {
    * integer and saturating the result into the range `[MIN_VALUE, MAX_VALUE]`.
    *
    * Unlike `asUint8`, this is total: out-of-range inputs are clamped to the
-   * nearest representable `Uint8` instead of throwing.
+   * nearest representable `Uint8` instead of throwing, `NaN` included, which
+   * becomes `MIN_VALUE`.
    *
    * @param value - The value to convert
    * @returns The value as an `Uint8`

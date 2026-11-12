@@ -118,7 +118,8 @@ export const NonZeroInt16 = {
    * MAX_VALUE]`.
    *
    * Unlike `asNonZeroInt16`, this is total: out-of-range inputs are clamped to
-   * the nearest representable `NonZeroInt16` instead of throwing.
+   * the nearest representable `NonZeroInt16` instead of throwing, `NaN`
+   * included, which becomes `MIN_VALUE`.
    *
    * @param value - The value to convert
    * @returns The value as a `NonZeroInt16`

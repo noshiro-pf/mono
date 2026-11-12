@@ -215,3 +215,13 @@ describe('Uint32 test', () => {
     });
   });
 });
+
+describe('Uint32 saturation (#3960)', () => {
+  test('fromNumber saturates +Infinity to MAX_VALUE', () => {
+    expect(Uint32.fromNumber(Number.POSITIVE_INFINITY)).toBe(4_294_967_295);
+  });
+
+  test('an operation that overflows to Infinity saturates to MAX_VALUE', () => {
+    expect(Uint32.pow(asUint32(2), asUint32(2000))).toBe(4_294_967_295);
+  });
+});
