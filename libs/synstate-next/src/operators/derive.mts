@@ -99,18 +99,33 @@ class DeriveClass<B> extends DerivedClass<B> {
 
   readonly #equals: (current: B, next: B) => boolean;
 
+  /**
+   * The parents' values, rewritten by every recompute, for three or more
+   * parents; `undefined` for fewer: `recompute` reads one and two without it,
+   * and a derive of no parents never recomputes. `fn` receives them spread, as arguments of
+   * its own, so nothing it is given changes later and this node builds no array
+   * per update (a rest parameter of `fn` still builds its own).
+   */
+  readonly #mut_values: unknown[] | undefined;
+
   constructor(
     parents: readonly ObservableClass<unknown>[],
     fn: (...values: readonly unknown[]) => B,
     equals: (current: B, next: B) => boolean,
   ) {
-    const initial = readAll(parents);
+    // Read here, before `super`, so that a `fn` that throws leaves no node
+    // among the parents' children. A parent with no value leaves `noValue` in
+    // its place, which every recompute overwrites before `fn` reads it.
+    const mut_values = parents.map((parent): unknown => parent.current);
 
-    super(parents, initial === undefined ? noValue : fn(...initial));
+    super(parents, mut_values.includes(noValue) ? noValue : fn(...mut_values));
 
     this.#fn = fn;
 
     this.#equals = equals;
+
+    // Kept only for three or more parents; see the field.
+    this.#mut_values = parents.length > 2 ? mut_values : undefined;
   }
 
   override recompute(): boolean {
@@ -150,13 +165,30 @@ class DeriveClass<B> extends DerivedClass<B> {
       }
 
       default: {
-        const values = readAll(ps);
+        const mut_values = this.#mut_values;
 
-        if (values === undefined) {
+        // Never `undefined` here; see the field.
+        if (mut_values === undefined) {
           return false;
         }
 
-        mut_next = this.#fn(...values);
+        const { length } = ps;
+
+        // Indexed: `entries()` builds an iterator on every recompute, and a
+        // `for…of` with a counter measured slower still.
+        // eslint-disable-next-line ts-data-forge/prefer-range-for-loop
+        for (let mut_i = 0; mut_i < length; mut_i += 1) {
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          const v = ps[mut_i]!.current;
+
+          if (v === noValue) {
+            return false;
+          }
+
+          mut_values[mut_i] = v;
+        }
+
+        mut_next = this.#fn(...mut_values);
       }
     }
 
@@ -171,25 +203,6 @@ class DeriveClass<B> extends DerivedClass<B> {
     return true;
   }
 }
-
-/** The parents' values, or `undefined` while one of them holds none. */
-const readAll = (
-  parents: readonly ObservableClass<unknown>[],
-): readonly unknown[] | undefined => {
-  const mut_values: unknown[] = [];
-
-  for (const parent of parents) {
-    const v = parent.current;
-
-    if (v === noValue) {
-      return undefined;
-    }
-
-    mut_values.push(v);
-  }
-
-  return mut_values;
-};
 
 class MergeClass extends DerivedClass<unknown> {
   constructor(parents: readonly ObservableClass<unknown>[]) {

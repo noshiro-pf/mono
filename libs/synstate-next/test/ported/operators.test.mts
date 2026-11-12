@@ -684,6 +684,73 @@ describe(derive, () => {
     assert.notStrictEqual(seen[0], seen[1]);
   });
 
+  test('with three or more parents, each emission is an array of its own', () => {
+    const a = state(1);
+
+    const b = state(10);
+
+    const c = state(100);
+
+    const seen = collect(derive([a, b, c], (...values) => values));
+
+    a.set(2);
+
+    c.set(200);
+
+    assert.deepStrictEqual(seen, [
+      [1, 10, 100],
+      [2, 10, 100],
+      [2, 10, 200],
+    ]);
+
+    assert.notStrictEqual(seen[1], seen[2]);
+  });
+
+  test('with three or more parents, a parent with no value holds it back, and the others are read again once it has one', () => {
+    const a = source<number>();
+
+    const b = state(1);
+
+    const c = state(10);
+
+    // `a` comes first, so that a read stops before reaching the others.
+    const seen = collect(derive([a, b, c], (x, y, z) => x + y + z));
+
+    b.set(2);
+
+    c.set(20);
+
+    a.emit(100);
+
+    b.set(3);
+
+    assert.deepStrictEqual(seen, [122, 123]);
+  });
+
+  test('with three or more parents, a parent with no value after the others holds back the first value', () => {
+    const a = state(1);
+
+    const b = state(10);
+
+    const c = source<number>();
+
+    const d = derive([a, b, c], (x, y, z) => x + y + z);
+
+    assert.isTrue(Optional.isNone(d.getSnapshot()));
+
+    const seen = collect(d);
+
+    c.emit(100);
+
+    assert.deepStrictEqual(seen, [111]);
+  });
+
+  test('with no parents, holds the value of fn', () => {
+    const d = derive([], () => 1);
+
+    assert.deepStrictEqual(collect(d), [1]);
+  });
+
   test('types, and the value of initialized parents', () => {
     const s1: Observable<1> = source<1>();
 
