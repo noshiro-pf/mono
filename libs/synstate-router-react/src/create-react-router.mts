@@ -2,6 +2,8 @@ import type * as React from 'react';
 import type {
   AnyRouteNode,
   AnyRoutes,
+  BlockerState,
+  NavigationAttempt,
   RouteBranch,
   RouteMatch,
   RouteNodeValues,
@@ -11,6 +13,7 @@ import type { Optional } from 'ts-data-forge';
 import {
   createLink,
   createRoutes,
+  createUseBlocker,
   useObservableValue,
 } from './internal/index.mjs';
 import type { LinkProps } from './link-props.mjs';
@@ -44,6 +47,16 @@ export type ReactRouter<R extends AnyRoutes> = Readonly<{
    */
   useBranch: () => RouteBranch<R>;
 
+  /**
+   * Blocks leaving the page while `shouldBlock` says so (`router.block`), for
+   * as long as the component is mounted, and returns the blocker's state:
+   * `'blocked'` with `proceed` and `reset` while a navigation waits for the
+   * user's answer. The latest `shouldBlock` is asked each time.
+   */
+  useBlocker: (
+    shouldBlock: (attempt: NavigationAttempt<R>) => boolean,
+  ) => BlockerState<R>;
+
   /** `router.at(node)`'s value. */
   useAt: <N extends AnyRouteNode>(node: N) => Optional<RouteNodeValues<N>>;
 
@@ -67,6 +80,7 @@ export const createReactRouter = <R extends AnyRoutes>(
     Link: createLink(router),
     useRouteMatch: () => useObservableValue(router.match),
     useBranch: () => useObservableValue(router.branch),
+    useBlocker: createUseBlocker(router),
     useAt: (node) => useObservableValue(router.at(node)),
     useIsActive: (node, options) =>
       useObservableValue(router.isActive(node, options)),

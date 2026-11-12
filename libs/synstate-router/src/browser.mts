@@ -28,6 +28,12 @@ export type RouterBrowser = Readonly<{
   setHash: (hash: string) => void;
   addEventListener: (type: 'popstate', listener: () => void) => void;
   removeEventListener: (type: 'popstate', listener: () => void) => void;
+  /**
+   * Listens to `beforeunload` until the returned function is called: a reload,
+   * a URL typed in or the tab closed asks the user first while `prevents`
+   * returns `true`. Left out, the router cannot hold those.
+   */
+  onBeforeUnload?: (prevents: () => boolean) => () => void;
   /** Runs `callback` once the new page has been drawn. */
   afterRender: (callback: () => void) => void;
   scrollToTop: () => void;
@@ -75,6 +81,11 @@ export type MemoryBrowser = RouterBrowser &
     scrolls: () => readonly string[];
     /** The document's title. */
     title: () => string;
+    /**
+     * Fires `beforeunload`, as a reload would, and returns whether a listener
+     * asked to stay.
+     */
+    unload: () => boolean;
   }>;
 
 export type MemoryBrowserOptions = Readonly<{
@@ -142,6 +153,8 @@ export const createMemoryBrowser = (
   const mut_title = { current: options?.title ?? '' };
 
   const mut_listeners = new Set<() => void>();
+
+  const mut_unloadListeners = new Set<() => boolean>();
 
   const entry = (): Entry =>
     mut_history.entries[mut_history.index] ?? {
@@ -225,6 +238,16 @@ export const createMemoryBrowser = (
     removeEventListener: (_type, listener) => {
       mut_listeners.delete(listener);
     },
+    onBeforeUnload: (prevents) => {
+      // A new function each time, as each listener is its own.
+      const listener = (): boolean => prevents();
+
+      mut_unloadListeners.add(listener);
+
+      return () => {
+        mut_unloadListeners.delete(listener);
+      };
+    },
     afterRender: (callback) => {
       setTimeout(callback, 0);
     },
@@ -253,6 +276,8 @@ export const createMemoryBrowser = (
     url,
     scrolls: () => Array.from(mut_scrolls),
     title: () => mut_title.current,
+    unload: () =>
+      Array.from(mut_unloadListeners).some((prevents) => prevents()),
   };
 };
 

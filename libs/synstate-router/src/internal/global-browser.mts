@@ -23,6 +23,27 @@ export const globalBrowser = (): RouterBrowser =>
     removeEventListener: (type, listener) => {
       globalThis.removeEventListener(type, listener);
     },
+    onBeforeUnload: (prevents) => {
+      // The event is the browser's, written to as it asks.
+      // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types -- see above
+      const listener = (event: BeforeUnloadEvent): void => {
+        if (!prevents()) {
+          return;
+        }
+
+        // Both, for the browsers that still read `returnValue`.
+        event.preventDefault();
+
+        // eslint-disable-next-line functional/immutable-data, @typescript-eslint/no-deprecated -- the event's own property, which some browsers still read
+        event.returnValue = '';
+      };
+
+      globalThis.addEventListener('beforeunload', listener);
+
+      return () => {
+        globalThis.removeEventListener('beforeunload', listener);
+      };
+    },
     afterRender: (callback) => {
       // A DOM without frames (jsdom) has none to wait for.
       if (typeof requestAnimationFrame === 'function') {
