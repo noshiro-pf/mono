@@ -40,6 +40,7 @@
     },
     {
       "matches": ["https://github.com/*"],
+      "all_frames": true,
       "run_at": "document_idle",
       "js": ["github-button.js"]
     }

@@ -291,6 +291,11 @@ Two things outside the extension depend on it, so they are fixed:
   up as soon as the page is no longer that pull request's conversation.
   The outcome stays on the button for 3s: labelled, already labelled, no picker,
   no such label, not saved, or left the pull request.
+- **G5.** The GitHub content script runs in every frame. In a pane of a split
+  view (`window.self !== window.top`; GitHub refuses to be framed anywhere else)
+  there is no G1 button, and G4's is shown only while the pane is on a pull
+  request's conversation tab — it never moves the pane to another tab.
+  The context menu's look-up is answered by the top frame alone.
 
 ## 10. Framing
 
