@@ -17,4 +17,10 @@ export {
   firstFixerOf,
   planAutoFix,
   type AutoFixConfig,
+  type AutoFixPlan,
+  type GeneratedBranch,
+  type RegenerateConfig,
+  type SpeculateConfig,
+  type UnblockPrsConfig,
+  type UnblockPrsConfigFile,
 } from './unblock-prs/index.mjs';

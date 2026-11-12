@@ -539,13 +539,11 @@ const PRIVATE_PACKAGES_READ: ReadonlySet<string> = new Set<string>([
  * pull request stacked on the one adding this check, which removes it here.
  */
 const PENDING_PACKAGES: ReadonlySet<string> = new Set<string>([
-  'pr-merge-queue',
   'synstate',
   'synstate-dom',
   'synstate-router',
   'ts-data-forge',
   'ts-fortress',
-  'ts-repo-utils',
   'ts-std-forge',
   'ts-type-forge',
 ]);

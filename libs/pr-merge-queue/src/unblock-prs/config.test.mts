@@ -10,7 +10,7 @@ import {
   ConfigFileSchema,
   configOf,
   readConfig,
-  type ConfigFile,
+  type UnblockPrsConfigFile,
 } from './config.mjs';
 
 describe(readConfig, () => {
@@ -297,8 +297,8 @@ describe('config.schema.json', () => {
 });
 
 const autoFixFile = (
-  autoFix: Partial<NonNullable<ConfigFile['autoFix']>>,
-): ConfigFile =>
+  autoFix: Partial<NonNullable<UnblockPrsConfigFile['autoFix']>>,
+): UnblockPrsConfigFile =>
   ({
     $schema: undefined,
     autoFix: {

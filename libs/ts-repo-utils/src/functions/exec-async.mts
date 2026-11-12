@@ -7,20 +7,31 @@ import {
 } from 'node:child_process';
 import { Result } from 'ts-data-forge';
 
-type ExecOptionsCustom = Readonly<{
+/** What `$` adds to Node.js's `exec` options. */
+export type ShellExtraOptions = Readonly<{
+  /** Whether to leave the command and its output unprinted. */
   silent?: boolean;
 }>;
 
-type ExecOptionsWithStringEncoding = ChildProcessExecOptionsWithStringEncoding &
-  ExecOptionsCustom;
+/** The options of `$` when it gives its output as a string. */
+export type ShellOptionsWithStringEncoding =
+  ChildProcessExecOptionsWithStringEncoding & ShellExtraOptions;
 
-type ExecOptionsWithBufferEncoding = ChildProcessExecOptionsWithBufferEncoding &
-  ExecOptionsCustom;
+/** The options of `$` when it gives its output as a `Buffer`. */
+export type ShellOptionsWithBufferEncoding =
+  ChildProcessExecOptionsWithBufferEncoding & ShellExtraOptions;
+
+/**
+ * The options `$` takes: with a buffer `encoding` its output is a `Buffer`,
+ * otherwise a string.
+ */
+export type ShellOptions =
+  ShellOptionsWithStringEncoding | ShellOptionsWithBufferEncoding;
 
 type NormalizedExecOptions = ChildProcessExecOptions &
   Readonly<{ encoding?: BufferEncoding | 'buffer' | null }>;
 
-export type ExecOptions = ChildProcessExecOptions & ExecOptionsCustom;
+export type ExecOptions = ChildProcessExecOptions & ShellExtraOptions;
 
 export type ExecResult<T extends string | Buffer> = Result<
   Readonly<{ stdout: T; stderr: T }>,
@@ -50,30 +61,26 @@ export type ExecResult<T extends string | Buffer> = Result<
 export function $(
   command: string,
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  options?: ExecOptionsWithStringEncoding,
+  options?: ShellOptionsWithStringEncoding,
 ): Promise<ExecResult<string>>;
 
 export function $(
   command: string,
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  options: ExecOptionsWithBufferEncoding,
+  options: ShellOptionsWithBufferEncoding,
 ): Promise<ExecResult<Buffer>>;
 
-export function $<
-  TOptions extends
-    ExecOptionsWithBufferEncoding | ExecOptionsWithStringEncoding | undefined =
-    undefined,
->(
+export function $<TOptions extends ShellOptions | undefined = undefined>(
   command: string,
   options?: TOptions,
 ): Promise<
-  ExecResult<TOptions extends ExecOptionsWithBufferEncoding ? Buffer : string>
+  ExecResult<TOptions extends ShellOptionsWithBufferEncoding ? Buffer : string>
 >;
 
 export function $(
   command: string,
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  options?: ExecOptionsWithStringEncoding | ExecOptionsWithBufferEncoding,
+  options?: ShellOptions,
 ): Promise<ExecResult<string | Buffer>> {
   const { silent = false, ...restOptions } = options ?? {};
 

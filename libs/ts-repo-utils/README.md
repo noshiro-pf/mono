@@ -272,9 +272,12 @@ When running in GitHub Actions, the command appends `should_run=true` or `should
 
 ### Command Execution
 
-#### `$(command: string, options?: ExecOptions): Promise<ExecResult>`
+#### `$(command, options?)`
 
-Executes a shell command asynchronously with type-safe results.
+Executes a shell command asynchronously with type-safe results. Its output is a `string`, or a `Buffer` when `options` asks for one:
+
+- `$(command: string, options?: ShellOptionsWithStringEncoding): Promise<ExecResult<string>>`
+- `$(command: string, options: ShellOptionsWithBufferEncoding): Promise<ExecResult<Buffer>>`, for `encoding: 'buffer'` or `null`
 
 ```tsx
 import { $, Result } from 'ts-repo-utils';
@@ -425,7 +428,7 @@ type CheckExtConfig = Readonly<{
 
 ### Result Utilities
 
-#### `createResultAssert(options): (config) => Promise<TOk>`
+#### `createResultAssert<Config, Ok, Err>(options): (config: Config) => Promise<Ok>`
 
 Creates an assert-style wrapper around a function that returns a `Result`, exiting the process with a non-zero code when the underlying function yields an error. The wrapper keeps success handling customizable while reusing the composable Result-based variant elsewhere.
 

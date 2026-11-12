@@ -750,9 +750,10 @@ matrix の job まで読みます。どの失敗なら直せるか、何を実�
 （install）と該当する `run` を実行し、書いたものを PR の 1 commit に amend して
 push します。ブランチのコードを動かすので、auto-fix と同じく作者が queue した PR
 だけが対象で、`auto-rebase` だけの PR は今までどおり見送ります。`run` の
-`$1`〜`$9` は `path` のキャプチャです。生成器が、PR が変えたファイルを rebase 先
-のままに戻したとき（`--preserve` された手書きの barrel など）は、PR の側が失われる
-ので見送ります。手書きのファイルも conflict していれば今までどおり見送り、どれが
+`$1`〜`$9` は `path` のキャプチャで、シェル用にクォートして埋め込みます。生成器
+が、PR が変えたファイルを rebase 先のままに戻したとき（`--preserve` された手書き
+の barrel など）は、PR の側が失われるので見送ります。
+手書きのファイルも conflict していれば今までどおり見送り、どれが
 生成し直せたかを見送りコメントに書きます。`before` が失敗したとき（ネットワーク
 など）は PR のせいとはせず、ほかの失敗と同じくそのサイクルを終えます（見送りは
 `main` が動くか再試行で解けます）。`--no-auto-fix` は
@@ -1881,16 +1882,17 @@ and the matching `run` are run, and what they wrote is amended onto the pull
 request's one commit and pushed. This runs the branch's own code, so, as with
 the auto-fix, only a pull request its author has queued gets it; one labelled
 `auto-rebase` alone is set aside as before. In `run`, `$1` to `$9` are `path`'s
-capture groups. A generator that leaves a file the pull request changed as the
-base has it (a hand-written barrel kept by `--preserve`, say) loses the pull
-request's side, so that is set aside. A conflict that also takes in a
-hand-written file is set aside as before, and the set-aside comment names which
-files could have been generated again. A failed `before` (the network, say) is
-not the pull request's: it ends the cycle like any such failure, and the
-set-aside clears when `main` moves or a retry is asked for. `--no-auto-fix`
-turns this off too. For the install, the rebase's worktree goes where the
-auto-fix's does, not under the OS temp directory. This repository declares
-`docs/package-dependencies.md` and the `index.mts` barrels under `src/` (#3592).
+capture groups, shell-quoted. A generator that leaves a file the pull request
+changed as the base has it (a hand-written barrel kept by `--preserve`, say)
+loses the pull request's side, so that is set aside.
+A conflict that also takes in a hand-written file is set aside as before, and
+the set-aside comment names which files could have been generated again. A
+failed `before` (the network, say) is not the pull request's: it ends the cycle
+like any such failure, and the set-aside clears when `main` moves or a retry is
+asked for. `--no-auto-fix` turns this off too. For the install, the rebase's
+worktree goes where the auto-fix's does, not under the OS temp directory. This
+repository declares `docs/package-dependencies.md` and the `index.mts` barrels
+under `src/` (#3592).
 
 `generatedBranches` in the same file lists the branches the repository
 generates, lockfile and all (a dependency update): `branch` is the name and

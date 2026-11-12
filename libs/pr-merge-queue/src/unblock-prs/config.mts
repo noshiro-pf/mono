@@ -31,7 +31,7 @@ export const CONFIG_PATH = UNBLOCK_PRS_CONFIG_PATH;
  */
 export const readConfig = async (
   root?: string,
-): Promise<Result<Config | undefined, string>> => {
+): Promise<Result<UnblockPrsConfig | undefined, string>> => {
   const file = path.join(root ?? (await repoRoot()), CONFIG_PATH);
 
   if (!(await exists(file))) {
@@ -45,9 +45,9 @@ export const readConfig = async (
 
 /** {@link readConfig}'s validation, after the JSON has been parsed. */
 export const configOf = (
-  file: ConfigFile,
+  file: UnblockPrsConfigFile,
   source: string,
-): Result<Config, string> => {
+): Result<UnblockPrsConfig, string> => {
   const generatedBranches = file.generatedBranches ?? [];
 
   const translation = file.translation?.heading;
@@ -336,10 +336,18 @@ export const ConfigFileSchema = t.annotate(
   },
 );
 
-export type ConfigFile = t.TypeOf<typeof ConfigFileSchema>;
+/** `.github/unblock-prs.json` as written: its patterns are strings. */
+export type UnblockPrsConfigFile = t.TypeOf<typeof ConfigFileSchema>;
 
-export type Config = Readonly<{
+/**
+ * unblock-prs's configuration, as {@link configOf} makes it from the parsed
+ * `.github/unblock-prs.json`: its patterns compiled, `generatedBranches` empty
+ * and its other optional parts `undefined` when absent.
+ */
+export type UnblockPrsConfig = Readonly<{
+  /** How a failure that is only a fixer's diff is fixed, when it is. */
   autoFix: AutoFixConfig | undefined;
+  /** The branches the repository builds rather than writes. */
   generatedBranches: readonly GeneratedBranch[];
   /** The heading descriptions are translated under, when they are. */
   translation: string | undefined;
@@ -353,17 +361,30 @@ export type Config = Readonly<{
 
 /** The files the repository generates whole, and how each is written again. */
 export type RegenerateConfig = Readonly<{
+  /** Commands run first, before any generator (an install). */
   before: readonly string[];
+  /**
+   * The first whose `path` matches a conflicted file writes it again with
+   * `run`, where `$1` to `$9` are the path's capture groups, shell-quoted.
+   */
   generators: readonly Readonly<{ path: RegExp; run: string }>[];
 }>;
 
+/** Checking queued pull requests ahead of their turn. */
 export type SpeculateConfig = Readonly<{
+  /** The check workflows dispatched on each layer (`code-check.yml`). */
   workflows: readonly string[];
+  /** How many queued pull requests are checked ahead at most, the first included. */
   depth: number;
 }>;
 
 /** A branch the repository builds rather than writes. */
-export type GeneratedBranch = Readonly<{ branch: string; rebuild: string }>;
+export type GeneratedBranch = Readonly<{
+  /** The pull request's head branch, exactly. */
+  branch: string;
+  /** How the branch is built again from the tip of the default branch. */
+  rebuild: string;
+}>;
 
 export type AutoFixConfig = Readonly<{
   ignore: readonly RegExp[];
