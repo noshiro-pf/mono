@@ -1,3 +1,4 @@
+import type { ReadonlyRecord } from 'ts-type-forge';
 import { projectRootPath } from '../../project-root-path.mjs';
 import { ignoredBy, readGateList } from '../workflow-steps.mjs';
 import {
@@ -1385,16 +1386,37 @@ describe('the ESLint toolchain', () => {
   });
 });
 
+/**
+ * A member of the peer-range fixture, its facts read from `manifest`. The user
+ * is read by check:forgotten-exports and the base is not, so the base is built
+ * for it, as `x-on-private`'s dependency is.
+ */
+const peerMember = (
+  dir: string,
+  manifest: ReadonlyRecord<string, unknown>,
+  forgottenExportsRead: boolean,
+): PackageInfo =>
+  ({
+    ...pkg(dir, ['build', 'check:types'], { forgottenExportsRead }),
+    ...readManifestDependencies(
+      { ...manifest, main: 'dist/index.mjs' },
+      new Set<string>(['a-peer-user', 'z-peer-base']),
+    ),
+  }) as const;
+
 describe('readManifestDependencies', () => {
   test('reads the workspace members of each field, and whether dist/ is exported', () => {
-    const facts = readManifestDependencies({
-      dependencies: { a: 'workspace:^', external: '^1.0.0' },
-      peerDependencies: { b: 'workspace:*' },
-      devDependencies: { c: 'workspace:*', d: 'catalog:' },
-      exports: {
-        '.': { types: './dist/index.d.mts', default: './dist/index.mjs' },
+    const facts = readManifestDependencies(
+      {
+        dependencies: { a: 'workspace:^', external: '^1.0.0' },
+        peerDependencies: { b: 'workspace:*' },
+        devDependencies: { c: 'workspace:*', d: 'catalog:' },
+        exports: {
+          '.': { types: './dist/index.d.mts', default: './dist/index.mjs' },
+        },
       },
-    });
+      new Set<string>(['a', 'b', 'c']),
+    );
 
     assert.deepStrictEqual(Array.from(facts.workspaceDependencies), [
       'a',
@@ -1407,6 +1429,40 @@ describe('readManifestDependencies', () => {
     assert.isTrue(facts.exportsBuild);
   });
 
+  test('reads a member named by a semver range, as ws:build orders it', () => {
+    const facts = readManifestDependencies(
+      {
+        peerDependencies: { synstate: '>=8.0.0', react: '>=18' },
+        devDependencies: { synstate: 'workspace:*' },
+      },
+      new Set<string>(['synstate']),
+    );
+
+    assert.deepStrictEqual(Array.from(facts.buildDependencies), ['synstate']);
+  });
+
+  test('a member peer declared by a >= range is built first', () => {
+    const commands = planCommands(
+      [
+        peerMember(
+          'libs/a-peer-user',
+          {
+            peerDependencies: { 'z-peer-base': '>=1.0.0' },
+            devDependencies: { 'z-peer-base': 'workspace:*' },
+          },
+          true,
+        ),
+        peerMember('libs/z-peer-base', {}, false),
+      ],
+      ['libs/a-peer-user/src/index.mts', 'libs/z-peer-base/src/index.mts'],
+    );
+
+    assert.deepStrictEqual(
+      commands.filter((command) => command.endsWith('run build')),
+      ['libs/z-peer-base: run build', 'libs/a-peer-user: run build'],
+    );
+  });
+
   test.each([
     [{ exports: './src/index.mts' }, false],
     [{ main: 'dist/index.mjs' }, true],
@@ -1414,7 +1470,7 @@ describe('readManifestDependencies', () => {
     ['not a manifest', false],
   ] as const)('%j exports its build: %s', (manifest, expected) => {
     assert.strictEqual(
-      readManifestDependencies(manifest).exportsBuild,
+      readManifestDependencies(manifest, new Set<string>()).exportsBuild,
       expected,
     );
   });

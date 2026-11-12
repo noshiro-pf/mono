@@ -65,6 +65,13 @@ export const findMissingChangesets = ({
  * and `peerDependencies`, passing only through private ones: what it bundles,
  * since a private package is published by nobody. A released package on the way
  * is not passed through, as it ships what it reaches itself.
+ *
+ * A private package named as a peer counts too, whatever its range. No consumer
+ * can install a private package, so a released package that names one reaches
+ * its users only with that code inside it; whether its build puts it there (a
+ * `libs/` package built with `tsc` bundles nothing) is the package's to get
+ * right, and counting it errs towards asking for a changeset. No released
+ * package names a private one as a peer today.
  */
 export const bundledPrivatePackages = (
   packages: readonly WorkspacePackage[],
@@ -110,7 +117,7 @@ export type WorkspacePackage = Readonly<{
   name: string;
   dir: string;
   isPrivate: boolean;
-  /** The workspace members in `dependencies` and `peerDependencies`. */
+  /** The workspace members in `dependencies` and `peerDependencies`, by any range. */
   buildDependencies: ReadonlySet<string>;
 }>;
 
