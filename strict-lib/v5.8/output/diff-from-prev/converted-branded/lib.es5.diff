@@ -1,5 +1,5 @@
 diff --git a/v5.7/output/lib-files-branded/lib.es5.d.ts b/v5.8/output/lib-files-branded/lib.es5.d.ts
-index dace387b1e96aaa1416263d5ff9f0ec1bc43cdb9..8e4ea9bc9ce4e146b77065f5cfcce0b38fb8c680 100644
+index 4244e1373a6d1de425e5d6d56846712f043110af..7ab19143d3aa3f3de718614b65323920462eb79c 100644
 --- a/v5.7/output/lib-files-branded/lib.es5.d.ts
 +++ b/v5.8/output/lib-files-branded/lib.es5.d.ts
 @@ -856,7 +856,7 @@ interface Math {
@@ -11,7 +11,7 @@ index dace387b1e96aaa1416263d5ff9f0ec1bc43cdb9..8e4ea9bc9ce4e146b77065f5cfcce0b3
     * @param y A numeric expression representing the cartesian y-coordinate.
     * @param x A numeric expression representing the cartesian x-coordinate.
     */
-@@ -1528,8 +1528,8 @@ interface ReadonlyArray<T> {
+@@ -1530,8 +1530,8 @@ interface ReadonlyArray<T> {
    ): boolean;
    /**
     * Performs the specified action for each element in an array.
@@ -22,7 +22,7 @@ index dace387b1e96aaa1416263d5ff9f0ec1bc43cdb9..8e4ea9bc9ce4e146b77065f5cfcce0b3
     */
    forEach(
      callbackfn: (
-@@ -1732,7 +1732,7 @@ interface Array<T> {
+@@ -1734,7 +1734,7 @@ interface Array<T> {
     * This method mutates the array and returns a reference to the same array.
     * @param compareFn Function used to determine the order of the elements. It is expected to return
     * a negative value if the first argument is less than the second argument, zero if they're equal, and a positive
@@ -31,7 +31,7 @@ index dace387b1e96aaa1416263d5ff9f0ec1bc43cdb9..8e4ea9bc9ce4e146b77065f5cfcce0b3
     * ```ts
     * [11,2,22,1].sort((a, b) => a - b)
     * ```
-@@ -1833,8 +1833,8 @@ interface Array<T> {
+@@ -1835,8 +1835,8 @@ interface Array<T> {
    ): boolean;
    /**
     * Performs the specified action for each element in an array.
@@ -42,7 +42,7 @@ index dace387b1e96aaa1416263d5ff9f0ec1bc43cdb9..8e4ea9bc9ce4e146b77065f5cfcce0b3
     */
    forEach(
      callbackfn: (
-@@ -2559,9 +2559,9 @@ interface Int8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+@@ -2561,9 +2561,9 @@ interface Int8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
  
    /**
     * Performs the specified action for each element in an array.
@@ -54,7 +54,7 @@ index dace387b1e96aaa1416263d5ff9f0ec1bc43cdb9..8e4ea9bc9ce4e146b77065f5cfcce0b3
     * If thisArg is omitted, undefined is used as the this value.
     */
    forEach(
-@@ -2577,7 +2577,7 @@ interface Int8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+@@ -2579,7 +2579,7 @@ interface Int8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
     * Returns the index of the first occurrence of a value in an array.
     * @param searchElement The value to locate in the array.
     * @param fromIndex The array index at which to begin the search. If fromIndex is omitted, the
@@ -63,7 +63,7 @@ index dace387b1e96aaa1416263d5ff9f0ec1bc43cdb9..8e4ea9bc9ce4e146b77065f5cfcce0b3
     */
    indexOf(
      searchElement: import('ts-type-forge').Int8,
-@@ -2813,6 +2813,11 @@ interface Int8ArrayConstructor {
+@@ -2815,6 +2815,11 @@ interface Int8ArrayConstructor {
      byteOffset?: NumberType.TypedArraySizeArgNonNegative,
      length?: NumberType.TypedArraySizeArgNonNegative,
    ): Int8Array<TArrayBuffer>;
@@ -75,7 +75,7 @@ index dace387b1e96aaa1416263d5ff9f0ec1bc43cdb9..8e4ea9bc9ce4e146b77065f5cfcce0b3
    new (
      array: ArrayLike<import('ts-type-forge').Int8> | ArrayBuffer,
    ): Int8Array<ArrayBuffer>;
-@@ -2830,7 +2835,7 @@ interface Int8ArrayConstructor {
+@@ -2832,7 +2837,7 @@ interface Int8ArrayConstructor {
  
    /**
     * Creates an array from an array-like or iterable object.
@@ -84,7 +84,7 @@ index dace387b1e96aaa1416263d5ff9f0ec1bc43cdb9..8e4ea9bc9ce4e146b77065f5cfcce0b3
     */
    from(
      arrayLike: ArrayLike<import('ts-type-forge').Int8>,
-@@ -2838,7 +2843,7 @@ interface Int8ArrayConstructor {
+@@ -2840,7 +2845,7 @@ interface Int8ArrayConstructor {
  
    /**
     * Creates an array from an array-like or iterable object.
@@ -93,7 +93,7 @@ index dace387b1e96aaa1416263d5ff9f0ec1bc43cdb9..8e4ea9bc9ce4e146b77065f5cfcce0b3
     * @param mapfn A mapping function to call on every element of the array.
     * @param thisArg Value of 'this' used to invoke the mapfn.
     */
-@@ -2975,9 +2980,9 @@ interface Uint8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+@@ -2977,9 +2982,9 @@ interface Uint8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
  
    /**
     * Performs the specified action for each element in an array.
@@ -105,7 +105,7 @@ index dace387b1e96aaa1416263d5ff9f0ec1bc43cdb9..8e4ea9bc9ce4e146b77065f5cfcce0b3
     * If thisArg is omitted, undefined is used as the this value.
     */
    forEach(
-@@ -2993,7 +2998,7 @@ interface Uint8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+@@ -2995,7 +3000,7 @@ interface Uint8Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
     * Returns the index of the first occurrence of a value in an array.
     * @param searchElement The value to locate in the array.
     * @param fromIndex The array index at which to begin the search. If fromIndex is omitted, the
@@ -114,7 +114,7 @@ index dace387b1e96aaa1416263d5ff9f0ec1bc43cdb9..8e4ea9bc9ce4e146b77065f5cfcce0b3
     */
    indexOf(
      searchElement: import('ts-type-forge').Uint8,
-@@ -3233,6 +3238,11 @@ interface Uint8ArrayConstructor {
+@@ -3235,6 +3240,11 @@ interface Uint8ArrayConstructor {
      byteOffset?: NumberType.TypedArraySizeArgNonNegative,
      length?: NumberType.TypedArraySizeArgNonNegative,
    ): Uint8Array<TArrayBuffer>;
@@ -126,7 +126,7 @@ index dace387b1e96aaa1416263d5ff9f0ec1bc43cdb9..8e4ea9bc9ce4e146b77065f5cfcce0b3
    new (
      array: ArrayLike<import('ts-type-forge').Uint8> | ArrayBuffer,
    ): Uint8Array<ArrayBuffer>;
-@@ -3252,7 +3262,7 @@ interface Uint8ArrayConstructor {
+@@ -3254,7 +3264,7 @@ interface Uint8ArrayConstructor {
  
    /**
     * Creates an array from an array-like or iterable object.
@@ -135,7 +135,7 @@ index dace387b1e96aaa1416263d5ff9f0ec1bc43cdb9..8e4ea9bc9ce4e146b77065f5cfcce0b3
     */
    from(
      arrayLike: ArrayLike<import('ts-type-forge').Uint8>,
-@@ -3260,7 +3270,7 @@ interface Uint8ArrayConstructor {
+@@ -3262,7 +3272,7 @@ interface Uint8ArrayConstructor {
  
    /**
     * Creates an array from an array-like or iterable object.
@@ -144,7 +144,7 @@ index dace387b1e96aaa1416263d5ff9f0ec1bc43cdb9..8e4ea9bc9ce4e146b77065f5cfcce0b3
     * @param mapfn A mapping function to call on every element of the array.
     * @param thisArg Value of 'this' used to invoke the mapfn.
     */
-@@ -3402,9 +3412,9 @@ interface Uint8ClampedArray<
+@@ -3404,9 +3414,9 @@ interface Uint8ClampedArray<
  
    /**
     * Performs the specified action for each element in an array.
@@ -156,7 +156,7 @@ index dace387b1e96aaa1416263d5ff9f0ec1bc43cdb9..8e4ea9bc9ce4e146b77065f5cfcce0b3
     * If thisArg is omitted, undefined is used as the this value.
     */
    forEach(
-@@ -3420,7 +3430,7 @@ interface Uint8ClampedArray<
+@@ -3422,7 +3432,7 @@ interface Uint8ClampedArray<
     * Returns the index of the first occurrence of a value in an array.
     * @param searchElement The value to locate in the array.
     * @param fromIndex The array index at which to begin the search. If fromIndex is omitted, the
@@ -165,7 +165,7 @@ index dace387b1e96aaa1416263d5ff9f0ec1bc43cdb9..8e4ea9bc9ce4e146b77065f5cfcce0b3
     */
    indexOf(
      searchElement: import('ts-type-forge').Uint8,
-@@ -3660,6 +3670,11 @@ interface Uint8ClampedArrayConstructor {
+@@ -3662,6 +3672,11 @@ interface Uint8ClampedArrayConstructor {
      byteOffset?: NumberType.TypedArraySizeArgNonNegative,
      length?: NumberType.TypedArraySizeArgNonNegative,
    ): Uint8ClampedArray<TArrayBuffer>;
@@ -177,7 +177,7 @@ index dace387b1e96aaa1416263d5ff9f0ec1bc43cdb9..8e4ea9bc9ce4e146b77065f5cfcce0b3
    new (
      array: ArrayLike<import('ts-type-forge').Uint8> | ArrayBuffer,
    ): Uint8ClampedArray<ArrayBuffer>;
-@@ -3679,7 +3694,7 @@ interface Uint8ClampedArrayConstructor {
+@@ -3681,7 +3696,7 @@ interface Uint8ClampedArrayConstructor {
  
    /**
     * Creates an array from an array-like or iterable object.
@@ -186,7 +186,7 @@ index dace387b1e96aaa1416263d5ff9f0ec1bc43cdb9..8e4ea9bc9ce4e146b77065f5cfcce0b3
     */
    from(
      arrayLike: ArrayLike<import('ts-type-forge').Uint8>,
-@@ -3687,7 +3702,7 @@ interface Uint8ClampedArrayConstructor {
+@@ -3689,7 +3704,7 @@ interface Uint8ClampedArrayConstructor {
  
    /**
     * Creates an array from an array-like or iterable object.
@@ -195,7 +195,7 @@ index dace387b1e96aaa1416263d5ff9f0ec1bc43cdb9..8e4ea9bc9ce4e146b77065f5cfcce0b3
     * @param mapfn A mapping function to call on every element of the array.
     * @param thisArg Value of 'this' used to invoke the mapfn.
     */
-@@ -3827,9 +3842,9 @@ interface Int16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+@@ -3829,9 +3844,9 @@ interface Int16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
  
    /**
     * Performs the specified action for each element in an array.
@@ -207,7 +207,7 @@ index dace387b1e96aaa1416263d5ff9f0ec1bc43cdb9..8e4ea9bc9ce4e146b77065f5cfcce0b3
     * If thisArg is omitted, undefined is used as the this value.
     */
    forEach(
-@@ -3845,7 +3860,7 @@ interface Int16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+@@ -3847,7 +3862,7 @@ interface Int16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
     * Returns the index of the first occurrence of a value in an array.
     * @param searchElement The value to locate in the array.
     * @param fromIndex The array index at which to begin the search. If fromIndex is omitted, the
@@ -216,7 +216,7 @@ index dace387b1e96aaa1416263d5ff9f0ec1bc43cdb9..8e4ea9bc9ce4e146b77065f5cfcce0b3
     */
    indexOf(
      searchElement: import('ts-type-forge').Int16,
-@@ -4085,6 +4100,11 @@ interface Int16ArrayConstructor {
+@@ -4087,6 +4102,11 @@ interface Int16ArrayConstructor {
      byteOffset?: NumberType.TypedArraySizeArgNonNegative,
      length?: NumberType.TypedArraySizeArgNonNegative,
    ): Int16Array<TArrayBuffer>;
@@ -228,7 +228,7 @@ index dace387b1e96aaa1416263d5ff9f0ec1bc43cdb9..8e4ea9bc9ce4e146b77065f5cfcce0b3
    new (
      array: ArrayLike<import('ts-type-forge').Int16> | ArrayBuffer,
    ): Int16Array<ArrayBuffer>;
-@@ -4104,7 +4124,7 @@ interface Int16ArrayConstructor {
+@@ -4106,7 +4126,7 @@ interface Int16ArrayConstructor {
  
    /**
     * Creates an array from an array-like or iterable object.
@@ -237,7 +237,7 @@ index dace387b1e96aaa1416263d5ff9f0ec1bc43cdb9..8e4ea9bc9ce4e146b77065f5cfcce0b3
     */
    from(
      arrayLike: ArrayLike<import('ts-type-forge').Int16>,
-@@ -4112,7 +4132,7 @@ interface Int16ArrayConstructor {
+@@ -4114,7 +4134,7 @@ interface Int16ArrayConstructor {
  
    /**
     * Creates an array from an array-like or iterable object.
@@ -246,7 +246,7 @@ index dace387b1e96aaa1416263d5ff9f0ec1bc43cdb9..8e4ea9bc9ce4e146b77065f5cfcce0b3
     * @param mapfn A mapping function to call on every element of the array.
     * @param thisArg Value of 'this' used to invoke the mapfn.
     */
-@@ -4252,9 +4272,9 @@ interface Uint16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+@@ -4254,9 +4274,9 @@ interface Uint16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
  
    /**
     * Performs the specified action for each element in an array.
@@ -258,7 +258,7 @@ index dace387b1e96aaa1416263d5ff9f0ec1bc43cdb9..8e4ea9bc9ce4e146b77065f5cfcce0b3
     * If thisArg is omitted, undefined is used as the this value.
     */
    forEach(
-@@ -4270,7 +4290,7 @@ interface Uint16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+@@ -4272,7 +4292,7 @@ interface Uint16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
     * Returns the index of the first occurrence of a value in an array.
     * @param searchElement The value to locate in the array.
     * @param fromIndex The array index at which to begin the search. If fromIndex is omitted, the
@@ -267,7 +267,7 @@ index dace387b1e96aaa1416263d5ff9f0ec1bc43cdb9..8e4ea9bc9ce4e146b77065f5cfcce0b3
     */
    indexOf(
      searchElement: import('ts-type-forge').Uint16,
-@@ -4510,6 +4530,11 @@ interface Uint16ArrayConstructor {
+@@ -4512,6 +4532,11 @@ interface Uint16ArrayConstructor {
      byteOffset?: NumberType.TypedArraySizeArgNonNegative,
      length?: NumberType.TypedArraySizeArgNonNegative,
    ): Uint16Array<TArrayBuffer>;
@@ -279,7 +279,7 @@ index dace387b1e96aaa1416263d5ff9f0ec1bc43cdb9..8e4ea9bc9ce4e146b77065f5cfcce0b3
    new (
      array: ArrayLike<import('ts-type-forge').Uint16> | ArrayBuffer,
    ): Uint16Array<ArrayBuffer>;
-@@ -4529,7 +4554,7 @@ interface Uint16ArrayConstructor {
+@@ -4531,7 +4556,7 @@ interface Uint16ArrayConstructor {
  
    /**
     * Creates an array from an array-like or iterable object.
@@ -288,7 +288,7 @@ index dace387b1e96aaa1416263d5ff9f0ec1bc43cdb9..8e4ea9bc9ce4e146b77065f5cfcce0b3
     */
    from(
      arrayLike: ArrayLike<import('ts-type-forge').Uint16>,
-@@ -4537,7 +4562,7 @@ interface Uint16ArrayConstructor {
+@@ -4539,7 +4564,7 @@ interface Uint16ArrayConstructor {
  
    /**
     * Creates an array from an array-like or iterable object.
@@ -297,7 +297,7 @@ index dace387b1e96aaa1416263d5ff9f0ec1bc43cdb9..8e4ea9bc9ce4e146b77065f5cfcce0b3
     * @param mapfn A mapping function to call on every element of the array.
     * @param thisArg Value of 'this' used to invoke the mapfn.
     */
-@@ -4676,9 +4701,9 @@ interface Int32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+@@ -4678,9 +4703,9 @@ interface Int32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
  
    /**
     * Performs the specified action for each element in an array.
@@ -309,7 +309,7 @@ index dace387b1e96aaa1416263d5ff9f0ec1bc43cdb9..8e4ea9bc9ce4e146b77065f5cfcce0b3
     * If thisArg is omitted, undefined is used as the this value.
     */
    forEach(
-@@ -4694,7 +4719,7 @@ interface Int32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+@@ -4696,7 +4721,7 @@ interface Int32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
     * Returns the index of the first occurrence of a value in an array.
     * @param searchElement The value to locate in the array.
     * @param fromIndex The array index at which to begin the search. If fromIndex is omitted, the
@@ -318,7 +318,7 @@ index dace387b1e96aaa1416263d5ff9f0ec1bc43cdb9..8e4ea9bc9ce4e146b77065f5cfcce0b3
     */
    indexOf(
      searchElement: import('ts-type-forge').Int32,
-@@ -4934,6 +4959,11 @@ interface Int32ArrayConstructor {
+@@ -4936,6 +4961,11 @@ interface Int32ArrayConstructor {
      byteOffset?: NumberType.TypedArraySizeArgNonNegative,
      length?: NumberType.TypedArraySizeArgNonNegative,
    ): Int32Array<TArrayBuffer>;
@@ -330,7 +330,7 @@ index dace387b1e96aaa1416263d5ff9f0ec1bc43cdb9..8e4ea9bc9ce4e146b77065f5cfcce0b3
    new (
      array: ArrayLike<import('ts-type-forge').Int32> | ArrayBuffer,
    ): Int32Array<ArrayBuffer>;
-@@ -4953,7 +4983,7 @@ interface Int32ArrayConstructor {
+@@ -4955,7 +4985,7 @@ interface Int32ArrayConstructor {
  
    /**
     * Creates an array from an array-like or iterable object.
@@ -339,7 +339,7 @@ index dace387b1e96aaa1416263d5ff9f0ec1bc43cdb9..8e4ea9bc9ce4e146b77065f5cfcce0b3
     */
    from(
      arrayLike: ArrayLike<import('ts-type-forge').Int32>,
-@@ -4961,7 +4991,7 @@ interface Int32ArrayConstructor {
+@@ -4963,7 +4993,7 @@ interface Int32ArrayConstructor {
  
    /**
     * Creates an array from an array-like or iterable object.
@@ -348,7 +348,7 @@ index dace387b1e96aaa1416263d5ff9f0ec1bc43cdb9..8e4ea9bc9ce4e146b77065f5cfcce0b3
     * @param mapfn A mapping function to call on every element of the array.
     * @param thisArg Value of 'this' used to invoke the mapfn.
     */
-@@ -5101,9 +5131,9 @@ interface Uint32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+@@ -5103,9 +5133,9 @@ interface Uint32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
  
    /**
     * Performs the specified action for each element in an array.
@@ -360,7 +360,7 @@ index dace387b1e96aaa1416263d5ff9f0ec1bc43cdb9..8e4ea9bc9ce4e146b77065f5cfcce0b3
     * If thisArg is omitted, undefined is used as the this value.
     */
    forEach(
-@@ -5119,7 +5149,7 @@ interface Uint32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+@@ -5121,7 +5151,7 @@ interface Uint32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
     * Returns the index of the first occurrence of a value in an array.
     * @param searchElement The value to locate in the array.
     * @param fromIndex The array index at which to begin the search. If fromIndex is omitted, the
@@ -369,7 +369,7 @@ index dace387b1e96aaa1416263d5ff9f0ec1bc43cdb9..8e4ea9bc9ce4e146b77065f5cfcce0b3
     */
    indexOf(
      searchElement: import('ts-type-forge').Uint32,
-@@ -5359,6 +5389,11 @@ interface Uint32ArrayConstructor {
+@@ -5361,6 +5391,11 @@ interface Uint32ArrayConstructor {
      byteOffset?: NumberType.TypedArraySizeArgNonNegative,
      length?: NumberType.TypedArraySizeArgNonNegative,
    ): Uint32Array<TArrayBuffer>;
@@ -381,7 +381,7 @@ index dace387b1e96aaa1416263d5ff9f0ec1bc43cdb9..8e4ea9bc9ce4e146b77065f5cfcce0b3
    new (
      array: ArrayLike<import('ts-type-forge').Uint32> | ArrayBuffer,
    ): Uint32Array<ArrayBuffer>;
-@@ -5378,7 +5413,7 @@ interface Uint32ArrayConstructor {
+@@ -5380,7 +5415,7 @@ interface Uint32ArrayConstructor {
  
    /**
     * Creates an array from an array-like or iterable object.
@@ -390,7 +390,7 @@ index dace387b1e96aaa1416263d5ff9f0ec1bc43cdb9..8e4ea9bc9ce4e146b77065f5cfcce0b3
     */
    from(
      arrayLike: ArrayLike<import('ts-type-forge').Uint32>,
-@@ -5386,7 +5421,7 @@ interface Uint32ArrayConstructor {
+@@ -5388,7 +5423,7 @@ interface Uint32ArrayConstructor {
  
    /**
     * Creates an array from an array-like or iterable object.
@@ -399,7 +399,7 @@ index dace387b1e96aaa1416263d5ff9f0ec1bc43cdb9..8e4ea9bc9ce4e146b77065f5cfcce0b3
     * @param mapfn A mapping function to call on every element of the array.
     * @param thisArg Value of 'this' used to invoke the mapfn.
     */
-@@ -5526,9 +5561,9 @@ interface Float32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+@@ -5528,9 +5563,9 @@ interface Float32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
  
    /**
     * Performs the specified action for each element in an array.
@@ -411,7 +411,7 @@ index dace387b1e96aaa1416263d5ff9f0ec1bc43cdb9..8e4ea9bc9ce4e146b77065f5cfcce0b3
     * If thisArg is omitted, undefined is used as the this value.
     */
    forEach(
-@@ -5544,7 +5579,7 @@ interface Float32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+@@ -5546,7 +5581,7 @@ interface Float32Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
     * Returns the index of the first occurrence of a value in an array.
     * @param searchElement The value to locate in the array.
     * @param fromIndex The array index at which to begin the search. If fromIndex is omitted, the
@@ -420,7 +420,7 @@ index dace387b1e96aaa1416263d5ff9f0ec1bc43cdb9..8e4ea9bc9ce4e146b77065f5cfcce0b3
     */
    indexOf(
      searchElement: import('ts-type-forge').Float32,
-@@ -5784,6 +5819,11 @@ interface Float32ArrayConstructor {
+@@ -5786,6 +5821,11 @@ interface Float32ArrayConstructor {
      byteOffset?: NumberType.TypedArraySizeArgNonNegative,
      length?: NumberType.TypedArraySizeArgNonNegative,
    ): Float32Array<TArrayBuffer>;
@@ -432,7 +432,7 @@ index dace387b1e96aaa1416263d5ff9f0ec1bc43cdb9..8e4ea9bc9ce4e146b77065f5cfcce0b3
    new (
      array: ArrayLike<import('ts-type-forge').Float32> | ArrayBuffer,
    ): Float32Array<ArrayBuffer>;
-@@ -5803,7 +5843,7 @@ interface Float32ArrayConstructor {
+@@ -5805,7 +5845,7 @@ interface Float32ArrayConstructor {
  
    /**
     * Creates an array from an array-like or iterable object.
@@ -441,7 +441,7 @@ index dace387b1e96aaa1416263d5ff9f0ec1bc43cdb9..8e4ea9bc9ce4e146b77065f5cfcce0b3
     */
    from(
      arrayLike: ArrayLike<import('ts-type-forge').Float32>,
-@@ -5811,7 +5851,7 @@ interface Float32ArrayConstructor {
+@@ -5813,7 +5853,7 @@ interface Float32ArrayConstructor {
  
    /**
     * Creates an array from an array-like or iterable object.
@@ -450,7 +450,7 @@ index dace387b1e96aaa1416263d5ff9f0ec1bc43cdb9..8e4ea9bc9ce4e146b77065f5cfcce0b3
     * @param mapfn A mapping function to call on every element of the array.
     * @param thisArg Value of 'this' used to invoke the mapfn.
     */
-@@ -5951,9 +5991,9 @@ interface Float64Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+@@ -5953,9 +5993,9 @@ interface Float64Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
  
    /**
     * Performs the specified action for each element in an array.
@@ -462,7 +462,7 @@ index dace387b1e96aaa1416263d5ff9f0ec1bc43cdb9..8e4ea9bc9ce4e146b77065f5cfcce0b3
     * If thisArg is omitted, undefined is used as the this value.
     */
    forEach(
-@@ -5969,7 +6009,7 @@ interface Float64Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
+@@ -5971,7 +6011,7 @@ interface Float64Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
     * Returns the index of the first occurrence of a value in an array.
     * @param searchElement The value to locate in the array.
     * @param fromIndex The array index at which to begin the search. If fromIndex is omitted, the
@@ -471,7 +471,7 @@ index dace387b1e96aaa1416263d5ff9f0ec1bc43cdb9..8e4ea9bc9ce4e146b77065f5cfcce0b3
     */
    indexOf(
      searchElement: import('ts-type-forge').Float64,
-@@ -6209,6 +6249,11 @@ interface Float64ArrayConstructor {
+@@ -6211,6 +6251,11 @@ interface Float64ArrayConstructor {
      byteOffset?: NumberType.TypedArraySizeArgNonNegative,
      length?: NumberType.TypedArraySizeArgNonNegative,
    ): Float64Array<TArrayBuffer>;
@@ -483,7 +483,7 @@ index dace387b1e96aaa1416263d5ff9f0ec1bc43cdb9..8e4ea9bc9ce4e146b77065f5cfcce0b3
    new (
      array: ArrayLike<import('ts-type-forge').Float64> | ArrayBuffer,
    ): Float64Array<ArrayBuffer>;
-@@ -6228,7 +6273,7 @@ interface Float64ArrayConstructor {
+@@ -6230,7 +6275,7 @@ interface Float64ArrayConstructor {
  
    /**
     * Creates an array from an array-like or iterable object.
@@ -492,7 +492,7 @@ index dace387b1e96aaa1416263d5ff9f0ec1bc43cdb9..8e4ea9bc9ce4e146b77065f5cfcce0b3
     */
    from(
      arrayLike: ArrayLike<import('ts-type-forge').Float64>,
-@@ -6236,7 +6281,7 @@ interface Float64ArrayConstructor {
+@@ -6238,7 +6283,7 @@ interface Float64ArrayConstructor {
  
    /**
     * Creates an array from an array-like or iterable object.

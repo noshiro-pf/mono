@@ -14,6 +14,7 @@ import type {
   Int,
   Int16,
   Int32,
+  NaNType,
   NegativeFiniteNumber,
   NegativeInt32,
   NegativeInt,
@@ -405,3 +406,38 @@ export const badBigIndex = Atomics.waitAsync(bigInt64s, plainNumber, bigInt64);
 
 // @ts-expect-error A plain `bigint` is no `BigInt64`.
 export const badBigValue = Atomics.waitAsync(bigInt64s, index, plainBigInt);
+
+/**
+ * #4013 — every `Date` timestamp was typed `SafeUint`, yet the runtime returns
+ * a negative number for any date before 1970: `new Date('1960-01-01')
+ * .getTime()` and `Date.UTC(1960, 0)` are `-315619200000`, and
+ * `new Date(-62198755200000).getUTCFullYear()` is `-1`. `Date.parse` also
+ * returns `NaN` for a string it cannot read, which is its only way to report
+ * one. `Date.now()` stays `SafeUint`: the present is after 1970. Like the other
+ * getters, `getTime()` assumes a valid date and leaves `NaN` out.
+ *
+ * `RegExp.prototype[Symbol.search]` returns `-1` when nothing matches, as
+ * `String.prototype.search` does.
+ */
+export const dateTypes = [
+  true satisfies TypeEq<ReturnType<Date['getTime']>, SafeInt>,
+  true satisfies TypeEq<ReturnType<Date['valueOf']>, SafeInt>,
+  true satisfies TypeEq<ReturnType<typeof Date.parse>, NaNType | SafeInt>,
+  // `Date.UTC` has an ES5 overload and, from TypeScript 5.2 on, an ES2017 one
+  // (`monthIndex` optional) in a lib file read after `lib.es5.d.ts`. A call
+  // tries the later-declared overload first and `ReturnType` reads it too, so
+  // from 5.2 on no call reaches the ES5 overload and this asserts the ES2017
+  // one; v5.0 and v5.1 have the ES5 overload alone, so the twelve harnesses
+  // between them assert both.
+  true satisfies TypeEq<ReturnType<typeof Date.UTC>, SafeInt>,
+  true satisfies TypeEq<ReturnType<Date['getFullYear']>, SafeInt>,
+  true satisfies TypeEq<ReturnType<Date['getUTCFullYear']>, SafeInt>,
+  true satisfies TypeEq<ReturnType<typeof Date.now>, SafeUint>,
+  true satisfies TypeEq<
+    ReturnType<RegExp[typeof Symbol.search]>,
+    NumberType.StringSearchResult
+  >,
+] as const;
+
+// @ts-expect-error `new Date('1960-01-01').getTime()` is `-315619200000`.
+export const timestampBefore1970: SafeUint = new Date('1960-01-01').getTime();

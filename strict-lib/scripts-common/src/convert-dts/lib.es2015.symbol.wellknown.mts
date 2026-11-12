@@ -36,9 +36,14 @@ export const convertEs2015SymbolWellknown =
         replaceWithinInterface({
           name: 'RegExp',
           mapFn: composeMonoTypeFns(
+            // `String#search(searcher)`, declared in this lib file, keeps
+            // `number`: a searcher's `[Symbol.search]` may return any number,
+            // and the overload does not take its return type from the searcher.
+            // It is merged ahead of the ES5 `search(regexp)`, so
+            // `'abc'.search(/x/)` is typed `number`, not `StringSearchResult`.
             replaceWithNoMatchCheck(
               '[Symbol.search](string: string): number;',
-              `[Symbol.search](string: string): ${brandedNumber.StringSize};`,
+              `[Symbol.search](string: string): ${brandedNumber.StringSearchResult};`,
             ),
             replaceWithNoMatchCheck(
               'limit?: number',
