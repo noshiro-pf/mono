@@ -21,7 +21,7 @@ describe('checkJobsOf', () => {
           name: code-check (\${{ matrix.command }})
           runs-on: ubuntu-latest
 
-        strict-lib-types:
+        example-job:
           runs-on: ubuntu-latest
 
         semantic-pull-request:
@@ -34,7 +34,7 @@ describe('checkJobsOf', () => {
 
     assert.deepStrictEqual(checkJobsOf(`${workflow}\n`), [
       'code-check',
-      'strict-lib-types',
+      'example-job',
       'Validate PR title',
     ]);
   });

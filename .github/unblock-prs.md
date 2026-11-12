@@ -43,8 +43,7 @@ table to the check workflows):
 | :----------------------------------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `test-node-versions (<target>, <command>)` | `pnpm run ws:build` then `pnpm run <command>` on that Node                                                                                          |
 | `verify-published`                         | `pnpm run verify:npm-packages:published`                                                                                                            |
-| `strict-lib-gen`                           | `pnpm run strict-lib:gen:with-codemod-fixed` then `pnpm run strict-lib:gen:version-diff`, then look for a dirty tree                                |
-| `strict-lib-types`                         | `pnpm run ws:build:deps` then `pnpm run ws:check:types:strict-lib`                                                                                  |
+| `strict-lib-gen`                           | Several commands in one job, in an order that matters: see the `strict-lib-gen` bullet below                                                        |
 | `benchmark`                                | Read its failure: drifted tables are replaced by the files of the run's `synstate-benchmark-to-commit-<run id>` artifact, as its message says       |
 | `coverage-main`                            | Runs on `main` alone, never on a pull request                                                                                                       |
 | `coverage-pr (<artifact>)`                 | Uploads reports an earlier run kept, for Codecov alone; it holds no merge, and nothing in the branch fixes it                                       |
@@ -74,10 +73,22 @@ stop and ask.
 - A `code-check` or `style-check` job is one
   `pnpm run z:ci-job --build <build> --command <entry>`, which builds, runs the
   entry and fails when a step changed the tree, naming it; run that to reproduce
-  one (`strict-lib-gen` still ends with `z:assert-repo-is-clean`). So
+  one (`strict-lib-gen` is not one: see its own bullet below). So
   `z:ci:style-check:checks-and-generators` (its markdownlint, oxfmt, generators
   and `ws:gen`), `z:ci:style-check:format-and-doc` (Prettier and `ws:doc`),
   `fix:codemod:affected` and the `ws:fix:lint` halves fail by _changing_ files.
+- `strict-lib-gen` is one job. Reproduce it with no `dist/` (a fresh
+  `git worktree add` has none: CI builds nothing before the generator, and a
+  `dist/` left by an earlier build can let it pass here) and nothing uncommitted
+  (the clean-tree check reads all of it):
+  `pnpm install --frozen-lockfile`,
+  `pnpm run strict-lib:gen:with-codemod-fixed`,
+  `pnpm run strict-lib:gen:version-diff` and `pnpm run z:assert-repo-is-clean`;
+  then, only if that passed, `pnpm run ws:build:deps` and
+  `pnpm run ws:check:types:strict-lib`. The type checks read `output/lib`
+  through the copies a `pnpm install` puts in `node_modules`, and the generator
+  ends with one, which copies what it wrote; so a tree put back by hand after it
+  needs `pnpm install --frozen-lockfile` again before them.
 - `code-check` jobs gate on the `code` list of
   `tools/configs/gate-ignore-lists.json`, `node-version-compatibility` jobs on
   its `runtime` list, and `style-check` jobs on its `style` list
