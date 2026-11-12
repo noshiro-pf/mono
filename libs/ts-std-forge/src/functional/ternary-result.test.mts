@@ -250,6 +250,18 @@ describe('TernaryResult test', () => {
     assert.isTrue(TernaryResult.isErr(rejected));
   });
 
+  test('fromThrowable keeps a thrown DOMException as the Err value', () => {
+    const exception = new DOMException('quota', 'QuotaExceededError');
+
+    const result = TernaryResult.fromThrowable(() => {
+      throw exception;
+    });
+
+    assert.isTrue(TernaryResult.isErr(result));
+
+    expect(result.value).toBe(exception);
+  });
+
   test('fromThrowable converts thrown values', () => {
     assert.deepStrictEqual(
       TernaryResult.fromThrowable(() => 5),

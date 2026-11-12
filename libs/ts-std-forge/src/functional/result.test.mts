@@ -930,6 +930,18 @@ describe('Result test', () => {
       expect(error.message).toBe(errorMessage);
     });
 
+    test('should return Err holding a thrown DOMException itself', () => {
+      const exception = new DOMException('quota', 'QuotaExceededError');
+
+      const result = Result.fromThrowable(() => {
+        throw exception;
+      });
+
+      assert.isTrue(Result.isErr(result));
+
+      expect(result.value).toBe(exception);
+    });
+
     test('should return Err when function throws string', () => {
       const errorMessage = 'String error';
 

@@ -10,6 +10,35 @@ describe(unknownToString, () => {
     expect(JSON.stringify(value)).toBe('"aaaaa"');
   });
 
+  test('DOMException', () => {
+    expect(unknownToString(new DOMException('m', 'AbortError'))).toBe('m');
+  });
+
+  test('an error whose message is not a string gives it converted', () => {
+    expect(
+      unknownToString(Object.assign(new Error('m'), { message: 404 })),
+    ).toBe('404');
+  });
+
+  test('an object re-pointed at DOMException.prototype is not an error to it', () => {
+    expect(
+      unknownToString(Object.setPrototypeOf({}, DOMException.prototype)),
+    ).toBe('{}');
+  });
+
+  test('an error whose message getter throws gives an empty message', () => {
+    const error = new Error('m');
+
+    // eslint-disable-next-line functional/immutable-data
+    Object.defineProperty(error, 'message', {
+      get: () => {
+        throw new Error('no message');
+      },
+    });
+
+    expect(unknownToString(error)).toBe('');
+  });
+
   test('number', () => {
     expect(unknownToString(1)).toBe('1');
 

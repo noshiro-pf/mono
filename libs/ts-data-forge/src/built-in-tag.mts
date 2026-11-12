@@ -3,8 +3,9 @@
  * the `Object.prototype.toString` tag as `@sindresorhus/is` reads it, so that
  * each answers as it did when this package depended on that one: an object from
  * another realm is recognized, which `instanceof` misses, and an error-like
- * plain object is not. ts-std-forge keeps the same guards for itself; neither
- * package exports them.
+ * plain object is not. ts-std-forge keeps its own, `isError` among them, which
+ * this package reaches through `Result.fromThrowable`; neither package exports
+ * them.
  *
  * They replace that dependency because `@sindresorhus/is` keeps most of itself
  * in a bundle that imports any one of its guards.
@@ -12,9 +13,6 @@
  * Not part of the package's API: `gen:index:src` leaves this file out of the
  * barrel.
  */
-
-export const isError = (value: unknown): value is Error =>
-  tagOf(value) === 'Error';
 
 export const isRegExp = (value: unknown): value is RegExp =>
   tagOf(value) === 'RegExp';

@@ -1,4 +1,4 @@
-import { AsyncResult, Result } from '../functional/index.mjs';
+import { AsyncResult, Result, TernaryResult } from '../functional/index.mjs';
 import { createPanicError, isPanicError, markAsPanic } from './panic-error.mjs';
 
 describe(createPanicError, () => {
@@ -108,6 +108,60 @@ describe('boundary functions rethrow a panic', () => {
 
     assert.isTrue(
       Result.isErr(await Result.fromPromise(Promise.reject(new Error('r')))),
+    );
+  });
+
+  test('the boundaries rethrow a DOMException marked as a panic, the same object', async () => {
+    const exception = markAsPanic(
+      new DOMException('quota', 'QuotaExceededError'),
+    );
+
+    await expect(
+      Promise.resolve().then(() =>
+        Result.fromThrowable(() => {
+          throw exception;
+        }),
+      ),
+    ).rejects.toBe(exception);
+
+    await expect(Result.fromPromise(Promise.reject(exception))).rejects.toBe(
+      exception,
+    );
+
+    await expect(
+      AsyncResult.fromPromise(Promise.reject(exception)),
+    ).rejects.toBe(exception);
+
+    await expect(
+      AsyncResult.fromThrowable(() => Promise.reject(exception)),
+    ).rejects.toBe(exception);
+  });
+
+  test('TernaryResult.fromThrowable', () => {
+    expect(() =>
+      TernaryResult.fromThrowable(() => {
+        throw createPanicError('boom');
+      }),
+    ).toThrow('boom');
+
+    assert.isTrue(
+      TernaryResult.isErr(
+        TernaryResult.fromThrowable(() => {
+          throw new Error('recoverable');
+        }),
+      ),
+    );
+  });
+
+  test('TernaryResult.fromPromise', async () => {
+    await expect(
+      TernaryResult.fromPromise(Promise.reject(createPanicError('boom'))),
+    ).rejects.toThrow('boom');
+
+    assert.isTrue(
+      TernaryResult.isErr(
+        await TernaryResult.fromPromise(Promise.reject(new Error('r'))),
+      ),
     );
   });
 

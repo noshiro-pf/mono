@@ -71,7 +71,7 @@ export const unknownToString = (
         }
 
         if (isError(value)) {
-          return value.message;
+          return errorMessage(value);
         }
 
         const prettyPrintObject = options?.prettyPrintObject === true;
@@ -103,9 +103,28 @@ export const unknownToString = (
           : JSON.stringify(value);
       } catch (error) {
         return isError(error)
-          ? error.message
+          ? errorMessage(error)
           : '[Circular or Non-serializable]';
       }
     }
+  }
+};
+
+/**
+ * An error's message, a non-string one converted, or `''` where it has none or
+ * reading it throws: an `Error` may carry a `message` of any type, or an own
+ * `message` getter that throws.
+ */
+const errorMessage = (error: Readonly<Error>): string => {
+  try {
+    const message: unknown = error.message;
+
+    return typeof message === 'string'
+      ? message
+      : message === undefined
+        ? ''
+        : unknownToString(message);
+  } catch {
+    return '';
   }
 };

@@ -510,6 +510,22 @@ describe('Arr reducing value', () => {
       expect(result.value).toBe('Hello World');
     });
 
+    test('keeps a DOMException an element throws as the Err value', () => {
+      const exception = new DOMException('m', 'AbortError');
+
+      const element = {
+        toString: (): string => {
+          throw exception;
+        },
+      } as const;
+
+      const result = join([element]);
+
+      assert.isTrue(Result.isErr(result));
+
+      expect(result.value).toBe(exception);
+    });
+
     test('should handle empty separator', () => {
       const arr = ['a', 'b', 'c'] as const;
 
