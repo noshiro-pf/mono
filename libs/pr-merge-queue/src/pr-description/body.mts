@@ -17,6 +17,8 @@ import {
   codeFenceBlocks,
   isDeclarationLine,
   outsideCodeFences,
+  parseMergeAfter,
+  parseStartAfter,
   REVIEW_SECTION_HEADING,
 } from 'pr-report-core';
 import { Arr, Num, Result } from 'ts-data-forge';
@@ -141,6 +143,11 @@ export const splitDescription = (
  *   `## <openingHeading>`, declarations and the `--merge-before` note aside:
  *   the section that says what the change is about and why, for a reader who
  *   has not read the issue ({@link openingProblem}).
+ * - Every `Merge-After:` and `Start-After:` line, the trailers included, names
+ *   a `#N`, and no line is meant as one that the tools do not read as one, its
+ *   key behind a list marker or emphasis, or emphasis before its colon
+ *   ({@link meantKey}): either is a line its writer meant as an order
+ *   that the tools read as none.
  */
 export const checkDescription = (
   parts: DescriptionParts,
@@ -244,6 +251,12 @@ export const checkDescription = (
     kind === 'pull-request' && openingHeading !== undefined
       ? openingProblem(parts.original, original, openingHeading)
       : undefined,
+    // A misplaced line that also names nothing is named by this rule and by the
+    // one about its place: moved where it belongs, it still names nothing.
+    // A line in its place is named by this rule alone.
+    ...[original, translation, visibleLines(parts.trailers)].flatMap(
+      lineDeclarationProblems,
+    ),
   ].filter((problem) => problem !== undefined);
 };
 
@@ -326,6 +339,14 @@ export const readableDescription = (
     .join('\n\n')}\n`;
 };
 
+/**
+ * Why a `Merge-After:` or `Start-After:` line of `text` is read as no order,
+ * one sentence for each such line outside code fences (`lineDeclarationProblems`).
+ * The one rule `descriptionProblems` applies with no translation configured.
+ */
+export const declarationProblems = (text: string): readonly string[] =>
+  lineDeclarationProblems(visibleLines(text.replaceAll('\r\n', '\n')));
+
 type Heading = Readonly<{ level: number; text: string }>;
 
 /** At most three spaces: four or more make an indented code block. */
@@ -339,6 +360,30 @@ const TABLE_ROW = /^[^\S\n]*\|/u;
 const IMAGE = /!\[[^\]]*\]\(/u;
 
 const MERGE_AFTER = /^[^\S\n]*merge-after[^\S\n]*:/iu;
+
+/** Spaces, bullets and emphasis, which may open a line before its key. */
+const LEAD = /^[\s*+_-]*/u;
+
+/** An ordered list item's number, or a task box, either after {@link LEAD}. */
+const ORDERED = /^\d{1,9}[.)]/u;
+
+const TASK_BOX = /^\[[ xX]\]/u;
+
+/** A key and its colon, with spaces or emphasis between them. */
+const KEY_AND_COLON = /^(?<key>(?:merge|start)-after)[\s*_]*:/iu;
+
+const DECLARATION_KEYS = ['merge-after', 'start-after'] as const;
+
+type DeclarationKey = (typeof DECLARATION_KEYS)[number];
+
+// No hint that an example goes in a fence: `lineDeclarationProblems` says why.
+const DECLARATION_FORM =
+  'a declaration line opens with the key and a colon (":"), with nothing but whitespace before the key or between it and the colon';
+
+const KEY_NAME = {
+  'merge-after': 'Merge-After',
+  'start-after': 'Start-After',
+} as const;
 
 const isDeclaration = (line: string): boolean =>
   isDeclarationLine(line, 'merge-after') ||
@@ -436,6 +481,81 @@ const opensWithProse = (lines: readonly string[]): boolean => {
 /** `text`'s lines with fenced code blanked out; `text` is LF only, as {@link splitDescription} leaves it. */
 const visibleLines = (text: string): readonly string[] =>
   outsideCodeFences(text).split('\n');
+
+/** `text` with its {@link LEAD} taken off. */
+const lead = (text: string): string => text.replace(LEAD, '');
+
+/**
+ * The key of a line meant as a `Merge-After:` or `Start-After:` declaration
+ * that is no declaration line (`isDeclarationLine`), asked only of a line that
+ * is not one: the key behind a list marker (a bullet, a number, a task box) or
+ * emphasis, or emphasis between the key and its colon. Two hyphens right before
+ * the key make it a flag (`- --merge-after: …`), which is prose. The prefix is
+ * taken off in steps, each one flat pattern, so that nothing can backtrack.
+ * Indentation is taken off like spaces, a line indented four columns included:
+ * the readers read an indented declaration line as one, so an indented block is
+ * no example to them, and a nested list item is indented four columns here. An
+ * example goes in a fence, the one place no line of it is read.
+ *
+ * Other lines the readers skip pass on purpose, since each is also how ordinary
+ * prose opens: a quote (`> Merge-After: #5`) cites a declaration without making
+ * it, a code span names the key, a heading titles a section about it, link text
+ * points somewhere, a full-width colon ends the key in a Japanese sentence, and
+ * strikethrough withdraws a declaration. The width was measured against every
+ * open issue and pull request and 400 closed ones, none of which it refuses.
+ */
+const meantKey = (line: string): DeclarationKey | undefined => {
+  const rest = lead(
+    lead(lead(line).replace(ORDERED, '')).replace(TASK_BOX, ''),
+  );
+
+  if (line.slice(0, line.length - rest.length).endsWith('--')) {
+    return undefined;
+  }
+
+  const key = KEY_AND_COLON.exec(rest)?.groups?.['key']?.toLowerCase();
+
+  return DECLARATION_KEYS.find((k) => k === key);
+};
+
+/**
+ * {@link declarationProblems} over `lines`, which are {@link visibleLines}, so
+ * that a line in a code fence is blank. A declaration line that names no `#N`
+ * waits for nothing, and one meant as a declaration that is not one
+ * ({@link meantKey}) is not read at all, so in either case the issue is
+ * started, or the pull request merged, before what its writer meant it to wait
+ * for. A line is read by the readers' own `parseMergeAfter` /
+ * `parseStartAfter`, so that what this calls naming nothing is what they read
+ * as nothing.
+ *
+ * Neither refusal hints that an example goes in a fence (the README says how
+ * one is written): a line refused here is far likelier a declaration written
+ * wrong than an example, and such a hint leads its writer to hide a real
+ * declaration, which is the early start or merge this check exists to prevent.
+ */
+const lineDeclarationProblems = (lines: readonly string[]): readonly string[] =>
+  lines.flatMap((line) => {
+    const key = DECLARATION_KEYS.find((k) => isDeclarationLine(line, k));
+
+    if (key === undefined) {
+      const meant = meantKey(line);
+
+      return meant === undefined
+        ? []
+        : [
+            `"${line.trim()}" is not read as a ${KEY_NAME[meant]}: line; ${DECLARATION_FORM}`,
+          ];
+    }
+
+    const named =
+      key === 'merge-after' ? parseMergeAfter(line) : parseStartAfter(line);
+
+    return Arr.isNonEmpty(named)
+      ? []
+      : [
+          `"${line.trim()}" names nothing; a ${KEY_NAME[key]}: line names this repository's issues and pull requests as #N, and a URL, an owner/repo#N or a bare number on it is not read`,
+        ];
+  });
 
 /** `text` with each HTML comment blanked, its line breaks kept. */
 const withoutComments = (text: string): string =>

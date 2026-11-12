@@ -1,9 +1,41 @@
 import { descriptionProblems } from './main.mjs';
 
 describe(descriptionProblems, () => {
-  test('takes any body when no heading is configured', () => {
+  test('takes a body whose declarations name a #N when no heading is configured', () => {
     assert.isUndefined(
       descriptionProblems('A.', undefined, 'pull-request', undefined),
+    );
+  });
+
+  test('refuses a declaration that names nothing when no heading is configured', () => {
+    for (const body of [
+      'A.\n\nStart-After: 3877\n',
+      'A.\r\n\r\nStart-After: 3877\r\n',
+    ]) {
+      const problems = descriptionProblems(body, undefined, 'issue', undefined);
+
+      assert.include(problems, 'the description cannot be posted as it is:');
+
+      assert.include(problems, '"Start-After: 3877" names nothing');
+    }
+
+    assert.include(
+      descriptionProblems(
+        '- Merge-After: #5\n\nA.',
+        undefined,
+        'pull-request',
+        undefined,
+      ),
+      '"- Merge-After: #5" is not read as a Merge-After: line',
+    );
+
+    assert.isUndefined(
+      descriptionProblems(
+        'A.\n\n```\nStart-After: 3\n```\n\nStart-After: #4',
+        undefined,
+        'issue',
+        undefined,
+      ),
     );
   });
 

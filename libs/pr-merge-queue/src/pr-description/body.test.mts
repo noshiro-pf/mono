@@ -846,6 +846,148 @@ describe(checkDescription, () => {
   });
 });
 
+/** An issue's description whose trailers, after the `---` rule, end with `line`. */
+const withTrailer = (line: string): DescriptionParts =>
+  split(`A.\n\n## 日本語\n\nあ。\n\n---\n\n${line}`);
+
+// The whole sentence is asserted, as for the file's other rules, so that a
+// change to what a refusal tells its writer is seen in the tests.
+const namesNothing = (line: string, key: string): string =>
+  `"${line}" names nothing; a ${key}: line names this repository's issues and pull requests as #N, and a URL, an owner/repo#N or a bare number on it is not read` as const;
+
+const decorated = (line: string, key: string): string =>
+  `"${line}" is not read as a ${key}: line; a declaration line opens with the key and a colon (":"), with nothing but whitespace before the key or between it and the colon` as const;
+
+describe('checkDescription on declaration lines', () => {
+  test.each([
+    'Start-After: #3877',
+    'Start-After: #1, #2',
+    'Merge-After: #5 (the layer below)',
+    // A quoted line cites a declaration without making one.
+    '> Merge-After: #5',
+    // A code span is how prose names the key.
+    '`Start-After: #5`',
+    'The Start-After: line of #12 is read by start-issue.',
+    '```\nStart-After: 3\n```',
+    // A flag, not a key: a list marker is followed by a space.
+    '- --merge-after: takes a number',
+    '- `Start-After:` lines are read by start-issue.',
+    // Link text, a letter before the key, and a Japanese sentence's full-width
+    // colon are prose.
+    '[Start-After: #5](https://example.com)',
+    'x Start-After: notes',
+    'Start-After：の行は #N だけを読む',
+    // Strikethrough withdraws a declaration.
+    '~~Merge-After: #5~~',
+  ])('passes %j', (line) => {
+    assert.deepStrictEqual(checkDescription(withTrailer(line), 'issue'), []);
+  });
+
+  test.each([
+    ['Start-After: 3877', namesNothing('Start-After: 3877', 'Start-After')],
+    [
+      'Start-After: https://github.com/noshiro-pf/mono/pull/3877',
+      namesNothing(
+        'Start-After: https://github.com/noshiro-pf/mono/pull/3877',
+        'Start-After',
+      ),
+    ],
+    [
+      'Start-After: noshiro-pf/mono#3877',
+      namesNothing('Start-After: noshiro-pf/mono#3877', 'Start-After'),
+    ],
+    ['Start-After:', namesNothing('Start-After:', 'Start-After')],
+    ['merge-after : 5', namesNothing('merge-after : 5', 'Merge-After')],
+    [
+      '**Start-After:** #3877',
+      decorated('**Start-After:** #3877', 'Start-After'),
+    ],
+    ['- Start-After: #3877', decorated('- Start-After: #3877', 'Start-After')],
+    ['_Merge-After_: #5', decorated('_Merge-After_: #5', 'Merge-After')],
+    ['+ Merge-After: #5', decorated('+ Merge-After: #5', 'Merge-After')],
+    [
+      '1. Start-After: #3877',
+      decorated('1. Start-After: #3877', 'Start-After'),
+    ],
+    [
+      '- [ ] Start-After: #3877',
+      decorated('- [ ] Start-After: #3877', 'Start-After'),
+    ],
+    [
+      'Start-After**:** #3877',
+      decorated('Start-After**:** #3877', 'Start-After'),
+    ],
+    ['-Start-After: #5', decorated('-Start-After: #5', 'Start-After')],
+    [
+      '\u{3000}- Start-After: #5',
+      decorated('- Start-After: #5', 'Start-After'),
+    ],
+    ['Start-After **:** #5', decorated('Start-After **:** #5', 'Start-After')],
+    // Indented four columns, as a nested list item is here.
+    ['    - Merge-After: #5', decorated('- Merge-After: #5', 'Merge-After')],
+    ['\t- Start-After: #5', decorated('- Start-After: #5', 'Start-After')],
+  ])('refuses %j after the rule', (line, problem) => {
+    assert.deepStrictEqual(checkDescription(withTrailer(line), 'issue'), [
+      problem,
+    ]);
+  });
+
+  test('refuses a Merge-After: with a URL at the top of a pull request', () => {
+    const line = 'Merge-After: https://github.com/noshiro-pf/mono/pull/5';
+
+    assert.deepStrictEqual(
+      checkDescription(
+        split(`${line}\n\nA.\n\n## 日本語\n\nあ。`),
+        'pull-request',
+      ),
+      [namesNothing(line, 'Merge-After')],
+    );
+  });
+
+  test('refuses a decorated key in either half, and no heading', () => {
+    // Both name #5 and have one heading each, so that the halves mirror.
+    assert.deepStrictEqual(
+      checkDescription(
+        split(
+          'A.\n\n- Merge-After: #5\n\n## Merge-After: how it is read\n\n## 日本語\n\nあ。\n\n* Start-After: #5\n\n### Merge-After: の読み方',
+        ),
+        'pull-request',
+      ),
+      [
+        decorated('- Merge-After: #5', 'Merge-After'),
+        decorated('* Start-After: #5', 'Start-After'),
+      ],
+    );
+  });
+
+  test('looks at no declaration line in a fenced block among the trailers', () => {
+    assert.deepStrictEqual(
+      checkDescription(
+        withTrailer(
+          '```md\nStart-After: 3\n- Merge-After: #5\n```\nStart-After: #4',
+        ),
+        'issue',
+      ),
+      [],
+    );
+  });
+
+  test('judges a body with CRLF line ends as its LF form', () => {
+    const body = 'A.\n\n## 日本語\n\nあ。\n\n---\n\nStart-After: 3877';
+
+    const problems = checkDescription(split(body), 'issue');
+
+    assert.deepStrictEqual(
+      checkDescription(split(body.replaceAll('\n', '\r\n')), 'issue'),
+      problems,
+    );
+
+    assert.deepStrictEqual(problems, [
+      namesNothing('Start-After: 3877', 'Start-After'),
+    ]);
+  });
+});
+
 describe('checkDescription with an opening heading', () => {
   test('passes an original that opens with the heading', () => {
     assert.deepStrictEqual(

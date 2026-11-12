@@ -13,6 +13,7 @@ import { readConfig } from '../unblock-prs/index.mjs';
 import {
   changedParts,
   checkDescription,
+  declarationProblems,
   descriptionKindOf,
   readableDescription,
   splitDescription,
@@ -97,12 +98,14 @@ export const runDescription = async (
 };
 
 /**
- * Why `body` may not be posted, or `undefined` when it may: with a translation
- * heading configured, a body whose halves do not mirror each other, or that has
- * a trailer or a `## Review` out of its place, or a pull request's that does
- * not open with `openingHeading` when one is given (`./body.mts`); what is a
- * trailer depends on whether `body` is an issue's or a pull request's.
- * `open-pr --body-file` asks the same before it pushes.
+ * Why `body` may not be posted, or `undefined` when it may: a `Merge-After:` or
+ * `Start-After:` line read as no order, whatever the configuration
+ * (`declarationProblems`); and with a translation heading configured, a body
+ * whose halves do not mirror each other, or that has a trailer or a `## Review`
+ * out of its place, or a pull request's that does not open with
+ * `openingHeading` when one is given (`./body.mts`); what is a trailer depends
+ * on whether `body` is an issue's or a pull request's. `open-pr --body-file`
+ * asks the same before it pushes.
  */
 export const descriptionProblems = (
   body: string,
@@ -111,24 +114,24 @@ export const descriptionProblems = (
   openingHeading: string | undefined,
 ): string | undefined => {
   if (heading === undefined) {
-    return undefined;
+    return problemList(declarationProblems(body));
   }
 
   const parts = splitDescription(body, heading);
 
-  if (Result.isErr(parts)) {
-    return parts.value;
-  }
-
-  const problems = checkDescription(parts.value, kind, openingHeading);
-
-  return Arr.isNonEmpty(problems)
-    ? `the description cannot be posted as it is:\n${problems.map((p) => `- ${p}`).join('\n')}`
-    : undefined;
+  return Result.isErr(parts)
+    ? parts.value
+    : problemList(checkDescription(parts.value, kind, openingHeading));
 };
 
 /** The file a pulled description's original state is kept in. */
 export const pulledPath = (file: string): string => `${file}.pulled` as const;
+
+/** `problems` as one refusal, or `undefined` when there are none. */
+const problemList = (problems: readonly string[]): string | undefined =>
+  Arr.isNonEmpty(problems)
+    ? (`the description cannot be posted as it is:\n${problems.map((p) => `- ${p}`).join('\n')}` as const)
+    : undefined;
 
 /** GitHub keeps what its editor sent, CRLF included. */
 const lf = (text: string): string => text.replaceAll('\r\n', '\n');
@@ -194,12 +197,6 @@ const check = async (
   openingHeading: string | undefined,
   kind: DescriptionKind,
 ): Promise<Result<string, string>> => {
-  if (heading === undefined) {
-    return Result.err(
-      'no translation heading in .github/unblock-prs.json: there is nothing to check a description against',
-    );
-  }
-
   const body = await readText(file);
 
   if (Result.isErr(body)) {
@@ -215,7 +212,10 @@ const check = async (
 
   return problems === undefined
     ? Result.ok(
-        `${file}: the original and its translation mirror each other, the deferred findings give their reasons${openingHeading === undefined || kind === 'issue' ? '' : `, and the original opens with "## ${openingHeading}"`}`,
+        heading === undefined
+          ? // With no translation, the declaration lines are all there is to check.
+            `${file}: each Merge-After: and Start-After: line names a #N (no translation heading is configured, so nothing else is checked)`
+          : `${file}: the original and its translation mirror each other, the deferred findings give their reasons${openingHeading === undefined || kind === 'issue' ? '' : `, and the original opens with "## ${openingHeading}"`}`,
       )
     : Result.err(`${file}: ${problems}`);
 };
