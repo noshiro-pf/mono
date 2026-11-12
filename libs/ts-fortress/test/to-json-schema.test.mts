@@ -16,6 +16,20 @@ describe(t.toJsonSchema, () => {
       ['a string literal', t.literal('a'), { const: 'a' }],
       ['a number literal', t.literal(1), { const: 1 }],
       ['an enum', t.enumType(['a', 'b', 3]), { enum: ['a', 'b', 3] }],
+      [
+        'an enum that allows any string',
+        t.enumType(['a', 'b'], { allowAnyString: true }),
+        { type: 'string' },
+      ],
+      [
+        'an enum that allows any string, named and with a default',
+        t.enumType(['a', 'b'], {
+          allowAnyString: true,
+          typeName: 'AOrB',
+          defaultValue: 'b',
+        }),
+        { type: 'string' },
+      ],
     ] as const)('%s', (_, type, expected) => {
       assert.deepStrictEqual(schemaOf(type), expected);
     });
