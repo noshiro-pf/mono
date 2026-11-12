@@ -1,4 +1,5 @@
 import viteReact from '@vitejs/plugin-react';
+import { transform } from 'esbuild';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { Arr, hasKey, isRecord } from 'ts-data-forge';
@@ -54,11 +55,9 @@ export const defineViteAppConfig = ({
    *
    * Left off by the Firebase-hosted apps, which are served at the root of their
    * own domain.
-   *
-   * Given, it also brings {@link staleBuildRecovery}: the next deploy of the
-   * Pages site removes the chunks of this build.
    */
   base?: string;
+
   /**
    * The app's screens, as paths below `base` (`/create/`, `/plan/edit/`):
    * the build writes a copy of `index.html` at each, so that GitHub Pages,
@@ -88,7 +87,10 @@ export const defineViteAppConfig = ({
 
     plugins: [
       ...(framework === 'react' ? [viteReact({ jsxImportSource })] : []),
-      ...(base === undefined ? [] : [staleBuildRecovery(base)]),
+      // Every app: the next deploy removes the chunks of this build, on the
+      // Pages site and on Firebase Hosting alike. (The Chrome extensions, whose
+      // chunks ship in their package, do not build through this config.)
+      staleBuildRecovery(),
       ...(routePaths === undefined ? [] : [routeEntryPages(routePaths)]),
     ],
   };
@@ -136,62 +138,42 @@ export const writeRouteEntryPages = (
  * Recovers the page from a chunk an older build left behind, and fails the
  * build on an `import()` it would not recover from.
  *
- * Every push to `main` replaces the whole Pages site, so a page opened from the
- * browser's cache can run a build whose chunks are no longer served. What the
- * page does then is `stale-build-recovery.mts`; this puts it in the entry
- * chunk, as a module script ahead of the app's own in `index.html`, so it
- * listens before any of the app's own code runs. It learns of a failed `import()`
- * from Vite's preload helper, which wraps the `import()` calls Vite can see the
- * target of; {@link unwrappedDynamicImports} is what fails the build on any
- * other.
+ * A deploy replaces the site, so a page opened from the browser's cache can run
+ * a build whose chunks are no longer served. What the page does then is
+ * `stale-build-recovery.mts`; this compiles it into a classic script,
+ * `stale-build-recovery.js` under `base` (a name without a hash, so that the
+ * `index.html` of any build finds it), and loads it first in `<head>`, so that
+ * it listens before the app's module graph is even fetched: a missing entry
+ * chunk, or a chunk the entry imports statically, fails before any module of
+ * the graph could listen. It learns of a failed `import()` from Vite's preload
+ * helper, which wraps the `import()` calls Vite can see the target of;
+ * {@link unwrappedDynamicImports} is what fails the build on any other.
  *
  * Build-only: the dev server serves every module itself, from no older build.
  */
-export const staleBuildRecovery = (base: string): VitePlugin =>
-  ({
+export const staleBuildRecovery = (): VitePlugin => {
+  const mut_resolved = { base: '/' };
+
+  return {
     name: 'vite-app-config:stale-build-recovery',
     apply: 'build',
-    resolveId: (id) => (id === RECOVERY_SRC ? RECOVERY_ID : undefined),
-    load: (id) =>
-      id === RECOVERY_ID
-        ? [
-            `import { installStaleBuildRecovery } from ${JSON.stringify(RECOVERY_MODULE)};`,
-            `installStaleBuildRecovery(${JSON.stringify(`stale-build-reloaded-at:${base}`)});`,
-          ].join('\n')
-        : undefined,
-    // A tag of the `pre` hook is written into the page before Vite bundles its
-    // scripts, so the recovery is bundled with them, and `head-prepend` puts it
-    // first in document order.
+    configResolved: (config) => {
+      mut_resolved.base = config.base;
+    },
     transformIndexHtml: {
-      order: 'pre',
-      handler: (html) => ({
-        html,
-        tags: [
-          {
-            tag: 'script',
-            attrs: { type: 'module', src: RECOVERY_SRC },
-            injectTo: 'head-prepend',
-          },
-        ],
-      }),
+      order: 'post',
+      handler: () => [
+        {
+          tag: 'script',
+          attrs: { src: `${mut_resolved.base}${RECOVERY_FILE}` },
+          injectTo: 'head-prepend',
+        },
+      ],
     },
     generateBundle: {
       order: 'post',
-      handler: (_options, bundle): void => {
-        const outputs = Object.values(bundle);
-
-        const holdsRecovery = outputs.some(
-          (output) =>
-            output.type === 'chunk' && output.moduleIds.includes(RECOVERY_ID),
-        );
-
-        if (!holdsRecovery) {
-          throw new Error(
-            'stale-build-recovery: no chunk of the build holds the recovery that was put into index.html.',
-          );
-        }
-
-        const unwrapped = outputs.flatMap((output) =>
+      async handler(_options, bundle): Promise<void> {
+        const unwrapped = Object.values(bundle).flatMap((output) =>
           // Most chunks have no import() at all, and parsing is not free.
           output.type === 'chunk' && output.code.includes('import(')
             ? unwrappedDynamicImports(output.code).map(
@@ -207,9 +189,41 @@ export const staleBuildRecovery = (base: string): VitePlugin =>
             )(unwrapped.map((line) => `  ${line}`)).join('\n'),
           );
         }
+
+        // eslint-disable-next-line unicorn/no-this-outside-of-class -- Rollup's plugin context, which is how a plugin emits a file.
+        this.emitFile({
+          type: 'asset',
+          fileName: RECOVERY_FILE,
+          source: await recoveryScript(
+            `stale-build-reloaded-at:${mut_resolved.base}`,
+          ),
+        });
       },
     },
-  }) as const;
+  };
+};
+
+/**
+ * `stale-build-recovery.mts` as the classic script the page loads: types taken
+ * off, its exports dropped into one function scope, and the recovery installed
+ * under `storageKey` (see `installStaleBuildRecovery`).
+ */
+export const recoveryScript = async (storageKey: string): Promise<string> => {
+  const source = fs.readFileSync(RECOVERY_MODULE, 'utf8');
+
+  const { code } = await transform(
+    `${source}\ninstallStaleBuildRecovery(${JSON.stringify(storageKey)});\n`,
+    {
+      loader: 'ts',
+      format: 'iife',
+      target: 'es2020',
+      minify: true,
+      legalComments: 'none',
+    },
+  );
+
+  return code;
+};
 
 /**
  * The `import()` calls in a built chunk that Vite's preload helper does not
@@ -262,10 +276,8 @@ export const unwrappedDynamicImports = (code: string): readonly string[] => {
   return mut_found;
 };
 
-/** The `src` `index.html` names the recovery by, and the module behind it. */
-const RECOVERY_SRC = '/@stale-build-recovery';
-
-const RECOVERY_ID = '\0vite-app-config:stale-build-recovery';
+/** The file the recovery is emitted as, under `base`, and its source. */
+const RECOVERY_FILE = 'stale-build-recovery.js';
 
 const RECOVERY_MODULE = path.resolve(
   import.meta.dirname,
