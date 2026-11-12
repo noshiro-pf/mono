@@ -187,3 +187,31 @@ describe('FiniteNumber saturation (#3960)', () => {
     ).toBe(-Number.MAX_VALUE);
   });
 });
+
+describe('FiniteNumber.random over a span wider than Number.MAX_VALUE (#3961)', () => {
+  test('random() over the default range is not a constant', () => {
+    const xs = Array.from({ length: 20 }, () => FiniteNumber.random());
+
+    const distinct = new Set<number>(xs);
+
+    expect(distinct.size).toBeGreaterThan(1);
+
+    for (const x of xs) {
+      assert.isTrue(FiniteNumber.is(x));
+    }
+  });
+
+  test('random(min, max) stays in a range wider than Number.MAX_VALUE', () => {
+    const xs = Array.from({ length: 20 }, () =>
+      FiniteNumber.random(asFiniteNumber(-1e308), asFiniteNumber(1e308)),
+    );
+
+    const distinct = new Set<number>(xs);
+
+    expect(distinct.size).toBeGreaterThan(1);
+
+    for (const x of xs) {
+      assert.isTrue(-1e308 <= x && x <= 1e308);
+    }
+  });
+});
