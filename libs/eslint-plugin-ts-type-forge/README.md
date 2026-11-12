@@ -132,7 +132,16 @@ better as-is than `FixedLengthTuple<1, V>`.
   would silently drop the labels;
 - optional members (`readonly [V, V?]`) and rest-only tuples (`[...V[]]`);
 - files that already bind the target name to something else (a local alias, or
-  an import from another module).
+  an import from another module);
+- tuples whose element types lead back to the declaration they sit in — a type
+  alias, an interface, a class, a function or a variable — directly or through
+  other declarations of the file, because the rewrite can make that type
+  circular (and every use of it `any`). Any such cycle counts, so a few tuples
+  whose rewrite would compile, such as
+  `interface Tree { kids: readonly [Tree, Tree] }`, are left alone too. A cycle
+  closed through a module this file does not declare itself (with
+  `declare module`) is not followed, and such a tuple is still rewritten unless
+  a name it reaches happens to match a declaration of this file.
 
 ### `prefer-canonical-mutable-record`
 
