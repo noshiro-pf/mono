@@ -154,6 +154,106 @@ describe('findMonoLinks', () => {
     );
   });
 
+  test('resolves a relative link with a title', () => {
+    assert.deepStrictEqual(
+      targetsOf(dedent`
+        [a](./a.md "title"), [b](b.md 'title') and [c](c.md (title)).
+        [x](https://example.com "t"), [y](#here "t") and [z](/guides/ "t") are not read.
+      `),
+      ['libs/synstate/a.md', 'libs/synstate/b.md', 'libs/synstate/c.md'],
+    );
+  });
+
+  test('resolves a reference definition to a relative path', () => {
+    assert.deepStrictEqual(
+      targetsOf(dedent`
+        [x]: ./a.md
+          [y]: <../b/c.md> "t"
+        [z]: https://example.com
+        [v]: /guides/
+        [u]: #here
+        [^note]: text here
+        [^1]: word
+        [w]: See [this](https://example.com).
+      `),
+      ['libs/synstate/a.md', 'libs/b/c.md'],
+    );
+  });
+
+  test('resolves a relative href or src of an HTML link or image', () => {
+    assert.deepStrictEqual(
+      targetsOf(dedent`
+        <a href="./a.md">x</a>
+        <img alt="" src="img/a.png" />
+        <a href="/abs">abs</a>, <a href="#f">f</a>
+        <a href='https://example.com'>e</a>, <a href='/abs'>a</a>, <a href='#f'>f</a>
+        <a href="it's.md">y</a> <a href='say-"hi".md'>z</a>
+      `),
+      [
+        'libs/synstate/a.md',
+        'libs/synstate/img/a.png',
+        "libs/synstate/it's.md",
+        'libs/synstate/say-"hi".md',
+      ],
+    );
+  });
+
+  test('leaves a titled link, a definition and an HTML link in code alone', () => {
+    assert.deepStrictEqual(
+      targetsOf(dedent`
+        \`[a](./gone.md "t")\`, \`<a href="./gone.md">\`
+
+        \`\`\`md
+        [b](./gone.md "t")
+        [c]: ./gone.md
+        <img src="./gone.png" />
+        \`\`\`
+      `),
+      [],
+    );
+  });
+
+  test('leaves an HTML link on a site page alone', () => {
+    assert.deepStrictEqual(
+      targetsOf(
+        '→ <a href="../products">Products</a>',
+        'apps/profile/src/assets/biography.mdx',
+      ),
+      [],
+    );
+  });
+
+  test('fails each new form at its line only when its target is missing', async () => {
+    const links = findMonoLinks(
+      dedent`
+        [a](./README.md "t") [b](./gone-a.md "t")
+        [c]: ./README.md
+        [d]: ./gone-b.md
+        <a href="./README.md">e</a> <img src="./gone-c.png" />
+      `,
+      'libs/synstate/README.md',
+    );
+
+    const tree = toTree(['libs/synstate/README.md']);
+
+    const reasons = await Promise.all(
+      links.map(async (link) => ({
+        line: link.line,
+        written: link.written,
+        reason: await brokenReason(link, tree, new Map<string, number>()),
+      })),
+    );
+
+    assert.deepStrictEqual(reasons, [
+      { line: 1, written: './README.md', reason: undefined },
+      { line: 1, written: './gone-a.md', reason: 'no such path on main' },
+      { line: 2, written: './README.md', reason: undefined },
+      { line: 3, written: './gone-b.md', reason: 'no such path on main' },
+      { line: 4, written: './README.md', reason: undefined },
+      { line: 4, written: './gone-c.png', reason: 'no such path on main' },
+    ]);
+  });
+
   test('leaves the relative links of a record alone', () => {
     assert.deepStrictEqual(
       targetsOf('[old](./gone.mts)', 'libs/synstate/CHANGELOG.md'),
