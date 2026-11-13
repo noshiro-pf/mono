@@ -11,21 +11,32 @@ describe(parseActionDocs, () => {
     const pending = { type: 'cancelToss', timestamp: null } as const;
 
     assert.deepStrictEqual(
-      parseActionDocs([{ data: () => committed }, { data: () => pending }]),
-      [committed, pending],
+      parseActionDocs([
+        { id: 'c', data: () => committed },
+        { id: 'p', data: () => pending },
+      ]),
+      [
+        { id: 'c', action: committed },
+        { id: 'p', action: pending },
+      ],
     );
   });
 
   test('throws on a timestamp that is not one at all', () => {
     expect(() =>
-      parseActionDocs([{ data: () => ({ type: 'submitToss', timestamp: 0 }) }]),
+      parseActionDocs([
+        { id: 'x', data: () => ({ type: 'submitToss', timestamp: 0 }) },
+      ]),
     ).toThrow();
   });
 
   test('throws on the server timestamp sentinel, which is only written', () => {
     expect(() =>
       parseActionDocs([
-        { data: () => ({ type: 'submitToss', timestamp: serverTimestamp() }) },
+        {
+          id: 'x',
+          data: () => ({ type: 'submitToss', timestamp: serverTimestamp() }),
+        },
       ]),
     ).toThrow('FieldValue timestamp');
   });

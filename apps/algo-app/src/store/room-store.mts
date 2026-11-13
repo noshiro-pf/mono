@@ -16,7 +16,11 @@ import {
 import { Arr, Result } from 'ts-data-forge';
 import type { RoomApi } from '../api/index.mjs';
 import { newRoom } from '../functions/index.mjs';
-import type { GameStateActionFromDb, Room } from '../types/index.mjs';
+import type {
+  ActionRecord,
+  GameStateActionFromDb,
+  Room,
+} from '../types/index.mjs';
 
 export type RoomDeps = Readonly<{
   api: RoomApi;
@@ -27,7 +31,9 @@ export type RoomStore = Readonly<{
   /** Whether the database has no room by the id watched. */
   isRoomMissing: InitializedObservable<boolean>;
   /** Every action of the room, oldest first, each time the database has more. */
-  actionsFromDb: SynstateObservable<readonly GameStateActionFromDb[]>;
+  actionsFromDb: SynstateObservable<
+    readonly ActionRecord<GameStateActionFromDb>[]
+  >;
   /** Watches this room instead of the one before it, once started. */
   setRoomId: (roomId: string) => void;
   myName: InitializedObservable<string | undefined>;
@@ -76,7 +82,8 @@ export const createRoomStore = (deps: RoomDeps): RoomStore => {
 
   const [isRoomMissing, setIsRoomMissing] = createState<boolean>(false);
 
-  const actionsFromDb = source<readonly GameStateActionFromDb[]>();
+  const actionsFromDb =
+    source<readonly ActionRecord<GameStateActionFromDb>[]>();
 
   const [myName, setMyName] = createState<string | undefined>(undefined);
 
