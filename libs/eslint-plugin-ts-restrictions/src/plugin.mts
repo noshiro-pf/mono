@@ -14,7 +14,6 @@ const recommendedRules = {
   'ts-restrictions/check-destructuring-completeness': 'error',
   'ts-restrictions/explicit-collection-type-arguments': 'error',
   'ts-restrictions/function-order': 'error',
-  'ts-restrictions/jsx-boolean-logical-operands': 'error',
   'ts-restrictions/no-clock-read-at-module-load': 'error',
   'ts-restrictions/no-date-only-string-to-date': 'error',
   'ts-restrictions/no-detached-jsdoc': 'error',
@@ -33,7 +32,6 @@ const recommendedRules = {
   'ts-restrictions/prefer-optional-chain-over-ternary': 'error',
   'ts-restrictions/prefer-range-in-number-line-order': 'error',
   'ts-restrictions/prefer-ternary': ['error', 'only-single-line'],
-  'ts-restrictions/require-ime-guard-on-enter': 'error',
 } as const satisfies Partial<
   ReadonlyRecord<`ts-restrictions/${keyof typeof tsRestrictionsRules}`, unknown>
 >;

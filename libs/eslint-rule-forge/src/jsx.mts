@@ -1,6 +1,6 @@
 import { AST_NODE_TYPES, type TSESTree } from '@typescript-eslint/utils';
-import { isTypeWrapper } from 'eslint-rule-forge';
 import type { DeepReadonly } from 'ts-type-forge';
+import { isTypeWrapper } from './type-wrappers.mjs';
 
 /**
  * Where `node`'s value ends up in JSX, if it does: rendered as a child, or
@@ -15,11 +15,13 @@ import type { DeepReadonly } from 'ts-type-forge';
 export const jsxValuePositionOf = (
   node: DeepReadonly<TSESTree.Node>,
 ): JsxValuePosition | undefined => {
-  const { parent } = node;
-
-  if (parent === undefined) {
+  // The root has no parent: ESLint gives a `Program` `null` there, which its
+  // type does not admit, so the root is told by its type.
+  if (node.type === AST_NODE_TYPES.Program) {
     return undefined;
   }
+
+  const { parent } = node;
 
   if (parent.type === AST_NODE_TYPES.JSXExpressionContainer) {
     return parent.parent.type === AST_NODE_TYPES.JSXAttribute

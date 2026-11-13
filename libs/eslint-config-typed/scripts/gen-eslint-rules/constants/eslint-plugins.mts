@@ -193,6 +193,12 @@ export const eslintPlugins = {
     rulePrefix: 'ts-restrictions/',
     outputFileName: 'eslint-ts-restrictions-rules.mts',
   },
+  EslintTsUiRestrictionsRules: {
+    typeName: 'EslintTsUiRestrictionsRules',
+    pluginName: 'eslint-plugin-ts-ui-restrictions',
+    rulePrefix: 'ts-ui-restrictions/',
+    outputFileName: 'eslint-ts-ui-restrictions-rules.mts',
+  },
 } as const satisfies ReadonlyRecord<
   string,
   Readonly<{

@@ -8,13 +8,13 @@ import {
 import {
   asNode,
   createGetLayerTypes,
+  isSameReference,
   isTypeWrapper,
   skipTypeWrappers,
 } from 'eslint-rule-forge';
 import { Arr } from 'ts-data-forge';
 import type { DeepReadonly } from 'ts-type-forge';
 import * as ts from 'typescript';
-import { isSameReference } from './reference-utils.mjs';
 
 type Options = readonly [];
 

@@ -93,23 +93,6 @@ namespace FunctionOrder {
 }
 
 /**
- * @description Require booleans on both sides of `&&` and `||` whose value is rendered or passed in JSX, and write the rest as a ternary (`{a && <X />}` → `{a ? <X /> : undefined}`).
- *
- *  ```md
- *  | key        | value   |
- *  | :--------- | :------ |
- *  | type       | problem |
- *  | deprecated | false   |
- *  | fixable    | code    |
- *  ```
- *
- * @internal Reached by indexing the rules record by the rule's name.
- */
-namespace JsxBooleanLogicalOperands {
-  export type RuleEntry = Linter.StringSeverity;
-}
-
-/**
  * @description Disallow reading the clock (`Date.now()`, `new Date()`) when a module loads, which keeps that moment for as long as the module lives
  *
  *  ```md
@@ -699,13 +682,65 @@ namespace PreferTernary {
 }
 
 /**
+ * @description `promise/prefer-catch`, its fix offered only as a suggestion: Prefer `catch` to `then(a, b)`/`then(null, b)` for handling errors.
+ * @link https://github.com/eslint-community/eslint-plugin-promise/blob/main/docs/rules/prefer-catch.md
+ *
+ *  ```md
+ *  | key            | value      |
+ *  | :------------- | :--------- |
+ *  | type           | suggestion |
+ *  | deprecated     | false      |
+ *  | hasSuggestions | true       |
+ *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
+ */
+namespace PreferCatch {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
+ * @description Prefer `globalThis` over `window`, `self` and `global` (`unicorn/prefer-global-this`), except for members `typeof globalThis` lacks — under the strict standard library, a window's own globals such as `history`
+ *
+ *  ```md
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  | fixable    | code       |
+ *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
+ */
+namespace PreferGlobalThis {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
+ * @description Require booleans on both sides of `&&` and `||` whose value is rendered or passed in JSX, and write the rest as a ternary (`{a && <X />}` → `{a ? <X /> : undefined}`).
+ *
+ *  ```md
+ *  | key        | value   |
+ *  | :--------- | :------ |
+ *  | type       | problem |
+ *  | deprecated | true    |
+ *  | fixable    | code    |
+ *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
+ */
+namespace JsxBooleanLogicalOperands {
+  export type RuleEntry = 0;
+}
+
+/**
  * @description Require a keyboard handler that compares `event.key` or `event.code` with `'Enter'` or `'Escape'` to check the same event for input method composition
  *
  *  ```md
  *  | key        | value   |
  *  | :--------- | :------ |
  *  | type       | problem |
- *  | deprecated | false   |
+ *  | deprecated | true    |
  *  ```
  *
  * @internal Reached by indexing the rules record by the rule's name.
@@ -744,61 +779,13 @@ namespace RequireImeGuardOnEnter {
    * ]
    * ```
    */
-  export type Options = Readonly<{
-    /**
-     * Names of functions that, called with the event, tell an input method's key down: the exported name for a named or namespace import, the name it is called by for anything else (default: `["isImeKeyDown"]`)
-     */
-    guardFunctions?: readonly string[];
-    /**
-     * The keys whose comparisons need the check (default: `["Enter", "Escape"]`)
-     */
-    keys?: readonly ('Enter' | 'Escape')[];
-  }>;
-
-  export type RuleEntry =
-    'off' | Linter.Severity | readonly [Linter.StringSeverity, Options];
-}
-
-/**
- * @description `promise/prefer-catch`, its fix offered only as a suggestion: Prefer `catch` to `then(a, b)`/`then(null, b)` for handling errors.
- * @link https://github.com/eslint-community/eslint-plugin-promise/blob/main/docs/rules/prefer-catch.md
- *
- *  ```md
- *  | key            | value      |
- *  | :------------- | :--------- |
- *  | type           | suggestion |
- *  | deprecated     | false      |
- *  | hasSuggestions | true       |
- *  ```
- *
- * @internal Reached by indexing the rules record by the rule's name.
- */
-namespace PreferCatch {
-  export type RuleEntry = Linter.StringSeverity;
-}
-
-/**
- * @description Prefer `globalThis` over `window`, `self` and `global` (`unicorn/prefer-global-this`), except for members `typeof globalThis` lacks — under the strict standard library, a window's own globals such as `history`
- *
- *  ```md
- *  | key        | value      |
- *  | :--------- | :--------- |
- *  | type       | suggestion |
- *  | deprecated | false      |
- *  | fixable    | code       |
- *  ```
- *
- * @internal Reached by indexing the rules record by the rule's name.
- */
-namespace PreferGlobalThis {
-  export type RuleEntry = Linter.StringSeverity;
+  export type RuleEntry = 0;
 }
 
 export type EslintTsRestrictionsRules = Readonly<{
   'ts-restrictions/check-destructuring-completeness': CheckDestructuringCompleteness.RuleEntry;
   'ts-restrictions/explicit-collection-type-arguments': ExplicitCollectionTypeArguments.RuleEntry;
   'ts-restrictions/function-order': FunctionOrder.RuleEntry;
-  'ts-restrictions/jsx-boolean-logical-operands': JsxBooleanLogicalOperands.RuleEntry;
   'ts-restrictions/no-clock-read-at-module-load': NoClockReadAtModuleLoad.RuleEntry;
   'ts-restrictions/no-date-only-string-to-date': NoDateOnlyStringToDate.RuleEntry;
   'ts-restrictions/no-detached-jsdoc': NoDetachedJsdoc.RuleEntry;
@@ -819,9 +806,12 @@ export type EslintTsRestrictionsRules = Readonly<{
   'ts-restrictions/prefer-optional-chain-over-ternary': PreferOptionalChainOverTernary.RuleEntry;
   'ts-restrictions/prefer-range-in-number-line-order': PreferRangeInNumberLineOrder.RuleEntry;
   'ts-restrictions/prefer-ternary': PreferTernary.RuleEntry;
-  'ts-restrictions/require-ime-guard-on-enter': RequireImeGuardOnEnter.RuleEntry;
   'ts-restrictions/prefer-catch': PreferCatch.RuleEntry;
   'ts-restrictions/prefer-global-this': PreferGlobalThis.RuleEntry;
+
+  // deprecated
+  'ts-restrictions/jsx-boolean-logical-operands': JsxBooleanLogicalOperands.RuleEntry;
+  'ts-restrictions/require-ime-guard-on-enter': RequireImeGuardOnEnter.RuleEntry;
 }>;
 
 export type EslintTsRestrictionsRulesOption = Readonly<{
@@ -832,5 +822,4 @@ export type EslintTsRestrictionsRulesOption = Readonly<{
   'ts-restrictions/no-restricted-cast-name': NoRestrictedCastName.Options;
   'ts-restrictions/no-restricted-syntax': NoRestrictedSyntax.Options;
   'ts-restrictions/prefer-ternary': PreferTernary.Options;
-  'ts-restrictions/require-ime-guard-on-enter': RequireImeGuardOnEnter.Options;
 }>;

@@ -75,6 +75,8 @@ component_management:
       paths: ['libs/eslint-plugin-ts-restrictions/**']
     - component_id: eslint-plugin-ts-type-forge
       paths: ['libs/eslint-plugin-ts-type-forge/**']
+    - component_id: eslint-plugin-ts-ui-restrictions
+      paths: ['libs/eslint-plugin-ts-ui-restrictions/**']
     - component_id: github-settings-as-code
       paths: ['libs/github-settings-as-code/**']
     - component_id: octokit-safe-types
