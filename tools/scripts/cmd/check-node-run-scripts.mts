@@ -16,7 +16,7 @@ import { isDirectlyExecuted } from 'ts-repo-utils';
 import type { ReadonlyRecord } from 'ts-type-forge';
 import * as ts from 'typescript';
 import { parse } from 'yaml';
-import { runFile } from '../lib/child-process.mjs';
+import { describeFailure, runFile } from '../lib/child-process.mjs';
 import { readScripts } from '../lib/manifest-scripts.mjs';
 import {
   isUnderExperimental,
@@ -540,13 +540,7 @@ export const readNodeOptions = async (): Promise<
   const help = await runFile(process.execPath, ['--help']);
 
   if (help.status !== 0) {
-    const reason = unknownToString(
-      help.error ??
-        help.signal ??
-        `exited with ${help.status ?? 'no status'}: ${help.stderr.trim()}`,
-    );
-
-    return Result.err(`\`node --help\` failed: ${reason}`);
+    return Result.err(`\`node --help\` failed: ${describeFailure(help)}`);
   }
 
   const options = new Map(

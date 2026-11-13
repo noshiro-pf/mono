@@ -113,6 +113,36 @@ export const runInherited = (
     });
   });
 
+/**
+ * What went wrong with a process {@link runFile} or {@link runInherited} ran,
+ * for a message that follows "failed: ": the error when it did not start (or
+ * timed out, or overran `maxBuffer`), else the signal that stopped it, else its
+ * exit status with the `stderr` it wrote, trimmed, when there is any. Never
+ * empty, as `stderr` alone is for a process that wrote nothing.
+ */
+export const describeFailure = (
+  result: Readonly<{
+    status: InheritedResult['status'];
+    signal: InheritedResult['signal'];
+    error: Readonly<{ message: string }> | undefined;
+    stderr?: string;
+  }>,
+): string => {
+  if (result.error !== undefined) {
+    return result.error.message;
+  }
+
+  if (result.signal !== null) {
+    return `killed by ${result.signal}`;
+  }
+
+  const stderr = result.stderr?.trim() ?? '';
+
+  return stderr === ''
+    ? `exited with ${result.status ?? 'no status'}`
+    : `exited with ${result.status ?? 'no status'}: ${stderr}`;
+};
+
 export type ProcessResult = InheritedResult &
   Readonly<{
     stdout: string;

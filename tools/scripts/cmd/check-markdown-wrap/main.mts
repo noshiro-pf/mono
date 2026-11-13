@@ -3,7 +3,7 @@ import * as path from 'node:path';
 import * as prettier from 'prettier';
 import { Arr, Result, unknownToString } from 'ts-data-forge';
 import { isDirectlyExecuted } from 'ts-repo-utils';
-import { runFile } from '../../lib/child-process.mjs';
+import { describeFailure, runFile } from '../../lib/child-process.mjs';
 import { resolveDiffBase } from '../../lib/diff-base.mjs';
 import { parseAddedLines } from '../../lib/diff-lines.mjs';
 import { isRepositoryProse } from '../../lib/repo-files.mjs';
@@ -101,7 +101,7 @@ const git = async (
 
   return result.status === 0
     ? Result.ok(result.stdout)
-    : Result.err(`git ${args.join(' ')} failed: ${result.stderr.trim()}`);
+    : Result.err(`git ${args.join(' ')} failed: ${describeFailure(result)}`);
 };
 
 /**

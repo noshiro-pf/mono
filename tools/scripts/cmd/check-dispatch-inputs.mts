@@ -9,7 +9,7 @@ import {
   parseWorkflow,
   workflowTriggers,
 } from '../lib/workflow-jobs.mjs';
-import { projectRootPath } from '../project-root-path.mjs';
+import { pathFromRoot, projectRootPath } from '../project-root-path.mjs';
 
 /**
  * Holds every workflow that calls `check-gates.yml` to a `workflow_dispatch`
@@ -29,10 +29,7 @@ export const checkDispatchInputs = (): Promise<Result<number, string>> =>
 
     const workflows = await Promise.all(
       paths.map(async (workflowPath) => ({
-        relativePath: path
-          .relative(projectRootPath, workflowPath)
-          .split(path.sep)
-          .join('/'),
+        relativePath: pathFromRoot(workflowPath),
         // eslint-disable-next-line security/detect-non-literal-fs-filename -- a workflow file listWorkflowFiles found.
         text: await fs.readFile(workflowPath, 'utf8'),
       })),

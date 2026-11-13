@@ -2,7 +2,7 @@ import * as fs from 'node:fs/promises';
 import * as util from 'node:util';
 import { Arr, asPositiveUint32, Result, unknownToString } from 'ts-data-forge';
 import { isDirectlyExecuted } from 'ts-repo-utils';
-import { runInherited } from '../lib/child-process.mjs';
+import { describeFailure, runInherited } from '../lib/child-process.mjs';
 import { plural } from '../lib/plural.mjs';
 import {
   diffSnapshots,
@@ -286,7 +286,7 @@ const firstFailedDiff = async (
 
     if (failed) {
       console.error(
-        `git diff of the changed files failed: ${unknownToString(result.error ?? result.signal ?? result.status)}`,
+        `git diff of the changed files failed: ${describeFailure(result)}`,
       );
 
       return index;

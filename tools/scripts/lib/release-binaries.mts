@@ -7,7 +7,7 @@ import { Arr, Result, unknownToString } from 'ts-data-forge';
 import * as t from 'ts-fortress';
 import type { ReadonlyRecord } from 'ts-type-forge';
 import { projectRootPath } from '../project-root-path.mjs';
-import { runFile } from './child-process.mjs';
+import { describeFailure, runFile } from './child-process.mjs';
 
 /**
  * Binaries a command runs that npm does not distribute, pinned in
@@ -438,7 +438,7 @@ const install = async ({
 
   if (extracted.error !== undefined || extracted.status !== 0) {
     return Result.err(
-      `❌ Could not extract ${binary} from ${archivePath}: ${extracted.error?.message ?? extracted.stderr}`,
+      `❌ Could not extract ${binary} from ${archivePath}: ${describeFailure(extracted)}`,
     );
   }
 

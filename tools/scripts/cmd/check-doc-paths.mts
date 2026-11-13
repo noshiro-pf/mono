@@ -11,7 +11,7 @@ import {
 } from 'ts-data-forge';
 import { isDirectlyExecuted } from 'ts-repo-utils';
 import type { StrictOmit } from 'ts-type-forge';
-import { runFile } from '../lib/child-process.mjs';
+import { describeFailure, runFile } from '../lib/child-process.mjs';
 import {
   codeSpanRanges,
   codeSpans,
@@ -601,14 +601,8 @@ const listGitIgnored = async (
     },
   );
 
-  if (result.error !== undefined) {
-    return Result.err(
-      `git check-ignore could not run: ${unknownToString(result.error)}`,
-    );
-  }
-
   if (result.status !== 0 && result.status !== 1) {
-    return Result.err(`git check-ignore failed: ${result.stderr.trim()}`);
+    return Result.err(`git check-ignore failed: ${describeFailure(result)}`);
   }
 
   const ignored = result.stdout

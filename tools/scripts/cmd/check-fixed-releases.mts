@@ -17,7 +17,7 @@ import {
   type ChangesetBump,
   type ReleasePackage,
 } from '../lib/changesets.mjs';
-import { projectRootPath } from '../project-root-path.mjs';
+import { projectRootPath, toPosixPath } from '../project-root-path.mjs';
 
 /**
  * A line for each changeset that names part of a `fixed` group of
@@ -96,7 +96,7 @@ export const strictLibBundles = (
         ({ name, dir, isPrivate }) =>
           !isPrivate &&
           !grouped.has(name) &&
-          dir.split(path.sep).join('/').startsWith('strict-lib/'),
+          toPosixPath(dir).startsWith('strict-lib/'),
       )
       .map(({ name }) => name),
   );

@@ -6,7 +6,7 @@ import ts from 'typescript';
 import { readsForgottenExports } from '../../lib/forgotten-exports-scope.mjs';
 import { packageNameOf } from '../../lib/package-name.mjs';
 import { skipExpressionWrappers } from '../../lib/ts-expression-wrappers.mjs';
-import { projectRootPath } from '../../project-root-path.mjs';
+import { pathFromRoot, projectRootPath } from '../../project-root-path.mjs';
 import { readGateList } from '../workflow-steps.mjs';
 import { readManifestDependencies, type PackageInfo } from './plan.mjs';
 
@@ -33,10 +33,7 @@ export const readPackages = async (): Promise<readonly PackageInfo[]> => {
   );
 
   return workspace.map((pkg, index) => {
-    const dir = path
-      .relative(projectRootPath, pkg.path)
-      .split(path.sep)
-      .join('/');
+    const dir = pathFromRoot(pkg.path);
 
     return {
       name: pkg.name,
