@@ -1,5 +1,10 @@
 import { onScopeDispose } from 'synstate';
-import { appendTo, mountThenInsert } from '../internal/index.mjs';
+import {
+  appendTo,
+  holdsSvgContent,
+  mountThenInsert,
+  mountUnder,
+} from '../internal/index.mjs';
 import { mountChild, mountable, type Child, type JSX } from '../jsx/index.mjs';
 
 /**
@@ -19,11 +24,11 @@ export const Portal = ({
   children: Child;
 }>): JSX.Element =>
   mountable(() => {
-    const nodes = mountThenInsert(
-      mountChild,
-      children,
-      appendTo,
-      target ?? document.body,
+    const into = target ?? document.body;
+
+    // Where the children go, not where `Portal` is written.
+    const nodes = mountUnder(holdsSvgContent(into), () =>
+      mountThenInsert(mountChild, children, appendTo, into),
     );
 
     onScopeDispose(() => {

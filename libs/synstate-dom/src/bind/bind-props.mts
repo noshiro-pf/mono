@@ -6,6 +6,7 @@ import {
   attributeNameOf,
   bindValue,
   propertyNames,
+  svgTwinTagNames,
 } from '../internal/index.mjs';
 import { listenInScope } from '../scope/index.mjs';
 
@@ -273,6 +274,8 @@ const controlledKeyOn = (
 /** The elements bound by {@link bindControlled}. */
 const controlled = new WeakMap<ControlledElement, Controlled>();
 
+const svgTwinTagNameSet: ReadonlySet<string> = new Set<string>(svgTwinTagNames);
+
 /** `onClick`, `onPointerDown`: `on` and an upper-case letter. */
 const isEventKey = (key: string): boolean => /^on[A-Z]/u.test(key);
 
@@ -325,10 +328,20 @@ const bindProp = (element: Element, key: string, value: unknown): void => {
 
   const name = attributeNameOf[key] ?? key;
 
-  const write = name.startsWith('aria-') ? writeAriaAttribute : writeAttribute;
+  // `setAttribute` lower-cases a name only on an HTML element. The props of the
+  // four tags HTML and SVG share are typed from the HTML elements (`tabIndex`),
+  // and their SVG attributes are all lower-case.
+  const attributeName =
+    element instanceof SVGElement && svgTwinTagNameSet.has(element.localName)
+      ? name.toLowerCase()
+      : name;
+
+  const write = attributeName.startsWith('aria-')
+    ? writeAriaAttribute
+    : writeAttribute;
 
   bindValue(value, (v) => {
-    write(element, name, v);
+    write(element, attributeName, v);
   });
 };
 

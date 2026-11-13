@@ -8,7 +8,6 @@ import {
 } from '../dag/index.mjs';
 import type { DagNodeRecord } from './dag-canvas-scene.mjs';
 import { dagNodeHandlers } from './dag-node-handlers.mjs';
-import { SvgTitle } from './svg-title.js';
 
 type Props = Readonly<{
   record: InitializedObservable<DagNodeRecord<MilestoneNodeView>>;
@@ -53,7 +52,7 @@ export const DagMilestoneNode = ({ record }: Props): JSX.Element => {
       onClick={openNode}
       onKeyDown={onKeyDown}
     >
-      <SvgTitle>
+      <title>
         {record.pipe(
           map(({ view: v, size }) =>
             size === 'compact' && v.date !== undefined
@@ -61,7 +60,7 @@ export const DagMilestoneNode = ({ record }: Props): JSX.Element => {
               : v.title,
           ),
         )}
-      </SvgTitle>
+      </title>
       <polygon
         class={constant('dag-node-shape')}
         points={record.pipe(map((r) => hexagonOf(r.node)))}

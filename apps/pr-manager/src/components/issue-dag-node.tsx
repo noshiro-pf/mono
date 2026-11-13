@@ -11,7 +11,6 @@ import type { IssueGraphNode } from '../issue-graph.mjs';
 import { numberPillWidth, wrapTitle } from '../node-title.mjs';
 import { isRingedTier } from '../priority.mjs';
 import { describeNode } from './issue-dag-states.mjs';
-import { SvgLink } from './svg-elements.js';
 
 /** A node and the top-left corner it is drawn at. */
 export type PlacedNode = Readonly<{
@@ -49,10 +48,16 @@ export const IssueDagNode = ({ placed$ }: Props): JSX.Element => {
   const lines$ = placed$.pipe(map(({ node }) => linesOf(node)));
 
   return (
-    <SvgLink
-      href={url}
-      title={placed$.pipe(map(({ node }) => describeNode(node)))}
+    // Opens in a tab of its own, as every link on the page does
+    // (`external-link.tsx`); its tooltip is the SVG `<title>` inside it, which
+    // is what an SVG element has instead of a `title` attribute.
+    <a
+      class={constant('issue-dag-link')}
+      href={constant(url)}
+      rel={constant('noreferrer')}
+      target={constant('_blank')}
     >
+      <title>{placed$.pipe(map(({ node }) => describeNode(node)))}</title>
       <g
         class={constant('issue-dag-node')}
         data-kind={constant(kind)}
@@ -161,7 +166,7 @@ export const IssueDagNode = ({ placed$ }: Props): JSX.Element => {
           }
         />
       </g>
-    </SvgLink>
+    </a>
   );
 };
 

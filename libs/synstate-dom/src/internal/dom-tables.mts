@@ -40,9 +40,9 @@ export const attributeNameOf: ReadonlyRecord<string, string> = {
 } as const;
 
 /**
- * The tags created in the SVG namespace: those of `SVGElementTagNameMap` that
- * HTML does not also have. `a`, `script`, `style` and `title` are created as
- * HTML elements wherever they appear.
+ * The tags created in the SVG namespace wherever they appear: those of
+ * `SVGElementTagNameMap` that HTML does not also have. The four HTML has too
+ * are {@link svgTwinTagNames}.
  */
 export const svgTagNames = [
   'animate',
@@ -110,6 +110,13 @@ export const svgTagNames = [
 >[];
 
 export type SvgTagName = (typeof svgTagNames)[number];
+
+/**
+ * The tags both HTML and SVG have: created in the SVG namespace under SVG
+ * content (`isMountingInSvg`), and as HTML elements anywhere else. Their SVG
+ * attributes are all lower-case, as `setAttribute` writes an HTML element's.
+ */
+export const svgTwinTagNames = ['a', 'script', 'style', 'title'] as const;
 
 /**
  * The attributes an SVG element takes. SVG properties are animated values
