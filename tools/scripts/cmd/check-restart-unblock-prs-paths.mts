@@ -434,9 +434,18 @@ export const parseSourceMapped = (
     );
   }
 
-  const { baseUrl = '.', paths } = validated.value.compilerOptions;
+  const { baseUrl, paths } = validated.value.compilerOptions;
 
-  const base = path.posix.join(path.posix.dirname(TSX_TSCONFIG_PATH), baseUrl);
+  // TypeScript 6 deprecates `baseUrl`, and TypeScript 7 ignores it and resolves
+  // `paths` from the configuration file's own directory, which is what this
+  // reads them against.
+  if (baseUrl !== undefined) {
+    return Result.err(
+      `${TSX_TSCONFIG_PATH} sets \`baseUrl\`, which TypeScript 7 ignores; remove it and write \`paths\` relative to the configuration file.`,
+    );
+  }
+
+  const base = path.posix.dirname(TSX_TSCONFIG_PATH);
 
   return Result.ok(
     Object.entries(paths)
@@ -453,6 +462,7 @@ export const parseSourceMapped = (
 
 const TsxTsconfigSchema = t.record({
   compilerOptions: t.record({
+    // Read only to refuse it (`parseSourceMapped`).
     baseUrl: t.optional(t.string()),
     paths: t.keyValueRecord(t.string(), t.array(t.string())),
   }),
