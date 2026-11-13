@@ -1,5 +1,12 @@
 import { createState, derive, map, onScopeDispose } from 'synstate';
-import { constant, For, If, listenInScope, type JSX } from 'synstate-dom';
+import {
+  constant,
+  For,
+  If,
+  isImeKeyDown,
+  listenInScope,
+  type JSX,
+} from 'synstate-dom';
 import {
   Arr,
   fastDeepEqual,
@@ -1062,7 +1069,8 @@ export const App = (): JSX.Element => {
   listenInScope(globalThis, 'keydown', (keyboardEvent) => {
     if (
       keyboardEvent instanceof KeyboardEvent &&
-      keyboardEvent.key === 'Escape'
+      keyboardEvent.key === 'Escape' &&
+      !isImeKeyDown(keyboardEvent)
     ) {
       abandonMove();
     }

@@ -55,7 +55,12 @@ export const isSameReference = (
         isSameReference(left.object, right.object);
 };
 
-const staticPropertyName = (
+/**
+ * The name a member access reads when it can be known statically: `y` for `x.y`
+ * and `x['y']`, `#y` for `x.#y`, `'0'` for `x[0]`; `undefined` for a computed
+ * name it cannot evaluate.
+ */
+export const staticPropertyName = (
   node: DeepReadonly<TSESTree.MemberExpression>,
 ): string | undefined => {
   if (!node.computed) {

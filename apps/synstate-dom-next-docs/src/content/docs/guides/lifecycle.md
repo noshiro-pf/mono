@@ -139,6 +139,7 @@ A component is called once, so what another library would run in an effect is st
 import {
     constant,
     createAfterUpdate,
+    isImeKeyDown,
     listenInScope,
     type JSX,
 } from 'synstate-dom-next';
@@ -159,7 +160,11 @@ export const SearchBox = (): JSX.Element => {
 
     // Removed with the owner, so a closed branch leaves no listener behind.
     listenInScope(globalThis, 'keydown', (event) => {
-        if (event instanceof KeyboardEvent && event.key === 'Escape') {
+        if (
+            event instanceof KeyboardEvent &&
+            event.key === 'Escape' &&
+            !isImeKeyDown(event)
+        ) {
             setQuery('');
         }
     });

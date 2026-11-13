@@ -895,8 +895,13 @@ export const DagCanvas = ({ layout, toolbar }: Props): JSX.Element => {
         break;
 
       // Unless it gives up an arrow being drawn, which is all it does then.
+      // The Escape that cancels what an input method is composing is the input
+      // method's.
       case 'Escape':
-        if (mut_gesture.start?.grab?.kind !== 'connect') {
+        if (
+          !isImeKeyDown(pressed) &&
+          mut_gesture.start?.grab?.kind !== 'connect'
+        ) {
           dagSelectionStore.clear();
         }
 
