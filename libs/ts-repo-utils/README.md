@@ -840,7 +840,7 @@ await runCmdInStagesAcrossWorkspaces({
 
 #### `runCmdInParallelAcrossWorkspaces(options): Promise<void>`
 
-Executes an npm script command across all workspace packages in parallel. Uses fail-fast behavior - stops execution immediately when any package fails.
+Executes an npm script command across all workspace packages in parallel. Uses fail-fast behavior: on the first failure it stops the scripts still running, as `executeParallel` does, and exits the process with code 1.
 
 ```tsx
 import { runCmdInParallelAcrossWorkspaces } from 'ts-repo-utils';
@@ -889,7 +889,9 @@ type Package = Readonly<{
 
 #### `executeParallel(packages, scriptName, concurrency?): Promise<readonly Readonly<{ code?: number; skipped?: boolean }>[]>`
 
-Executes an npm script across multiple packages in parallel with a concurrency limit. Lower-level function used by `runCmdInParallelAcrossWorkspaces`.
+Executes an npm script across multiple packages in parallel with a concurrency limit. Lower-level function used by `runCmdInParallelAcrossWorkspaces`. Resolves to each package's result in the order of `packages`.
+
+On the first failure — a script that exits with a code other than 0, or one killed by a signal — it starts no further script, stops the scripts still running, waits for them to exit, and then rejects with that failure, so that nothing is still writing when the caller reads it. A script is stopped with `SIGTERM` to it and every process it started, as `ps` lists them, and `SIGKILL` to what is left after 5 seconds, or up to about 9 when `ps` fails or does not answer (`taskkill /T /F` on Windows). If `ps` cannot list the processes within 2 seconds when the stop starts, only the scripts' shells are signalled. If it lists them at the start, but neither the read at the end of the 5 seconds nor the one made after it succeeds, only the shells still running get `SIGKILL`. On Windows, if `taskkill` fails or has not answered within 30 seconds, the shell is killed if it is still running. In each case a warning says that what the scripts started may be left running. A process that is no longer under the script's shell, such as one it left in the background after its shell exited, is not stopped, and the script's output is no longer waited for a second after that. `executeParallel` reports only the failure, not the scripts it stopped, though npm may still print its own error for a script it was running.
 
 ```tsx
 import { executeParallel, getWorkspacePackages } from 'ts-repo-utils';
@@ -916,7 +918,7 @@ await executeStages(packages, 'build', 4);
 - Automatic dependency graph construction
 - Topological sorting for correct build order
 - Parallel execution within each stage
-- Fail-fast behavior on errors
+- Fail-fast behavior on errors: the failing stage's scripts still running are stopped, as `executeParallel` does, and no later stage starts
 - Circular dependency detection
 
 ## Common Patterns

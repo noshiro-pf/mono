@@ -7,7 +7,8 @@ import { defaultDependencyFields, type DependencyField } from './types.mjs';
  * Executes a npm script command across all workspace packages in dependency
  * order stages. Packages are grouped into stages where each stage contains
  * packages whose dependencies have been completed in previous stages. Uses
- * fail-fast behavior - stops execution immediately when any package fails.
+ * fail-fast behavior: on the first failure it stops the scripts still
+ * running, as {@link executeStages} does, and exits the process with code 1.
  *
  * @param options - Configuration options for the staged execution
  * @param options.rootPackageJsonDir - The directory containing the root
@@ -22,7 +23,8 @@ import { defaultDependencyFields, type DependencyField } from './types.mjs';
  *   `['dependencies', 'peerDependencies']` to order by what has to be built
  *   first and ignore development-only edges.
  * @returns A promise that resolves when all stages have completed execution
- *   successfully, or rejects immediately on first failure
+ *   successfully; on a failure the process exits once the scripts still
+ *   running have stopped
  */
 export const runCmdInStagesAcrossWorkspaces = async ({
   rootPackageJsonDir,

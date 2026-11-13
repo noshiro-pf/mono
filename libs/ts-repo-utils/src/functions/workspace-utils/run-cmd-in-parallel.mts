@@ -4,7 +4,8 @@ import { getWorkspacePackages } from './get-workspace-packages.mjs';
 
 /**
  * Executes a npm script command across all workspace packages in parallel. Uses
- * fail-fast behavior - stops execution immediately when any package fails.
+ * fail-fast behavior: on the first failure it stops the scripts still
+ * running, as {@link executeParallel} does, and exits the process with code 1.
  *
  * @param options - Configuration options for the parallel execution
  * @param options.rootPackageJsonDir - The directory containing the root
@@ -15,7 +16,8 @@ import { getWorkspacePackages } from './get-workspace-packages.mjs';
  * @param options.filterWorkspacePattern - Optional function to filter packages
  *   by name
  * @returns A promise that resolves when all packages have completed execution
- *   successfully, or rejects immediately on first failure
+ *   successfully; on a failure the process exits once the scripts still
+ *   running have stopped
  */
 export const runCmdInParallelAcrossWorkspaces = async ({
   rootPackageJsonDir,
