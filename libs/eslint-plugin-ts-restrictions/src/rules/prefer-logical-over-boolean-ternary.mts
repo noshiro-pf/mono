@@ -9,14 +9,14 @@ import {
   createGetLayerTypes,
   isComparison,
   isTypeWrapper,
+  jsxValuePositionOf,
   needsParenthesesAsOperandOf,
+  type NegationContext,
   negationOf,
   skipTypeWrappers,
-  type NegationContext,
 } from 'eslint-rule-forge';
 import type { DeepReadonly } from 'ts-type-forge';
 import * as ts from 'typescript';
-import { jsxValuePositionOf } from './jsx-utils.mjs';
 
 type Options = readonly [];
 
@@ -54,7 +54,7 @@ type MessageIds = 'preferLogical';
  * writes `a ? (true as boolean) : false` as `a` and the reverse as `!a`.
  * One whose value is rendered or passed in JSX is rewritten only when its other
  * branch is a boolean too: there `&&` and `||` take booleans on both sides
- * (`ts-restrictions/jsx-boolean-logical-operands`), so `{a ? false : <X />}`
+ * (`ts-ui-restrictions/jsx-boolean-logical-operands`), so `{a ? false : <X />}`
  * stays a ternary.
  */
 export const preferLogicalOverBooleanTernary: TSESLint.RuleModule<

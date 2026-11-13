@@ -26,6 +26,7 @@ export * from './eslint-total-functions-rules.mjs';
 export * from './eslint-tree-shakable-rules.mjs';
 export * from './eslint-ts-data-forge-rules.mjs';
 export * from './eslint-ts-restrictions-rules.mjs';
+export * from './eslint-ts-ui-restrictions-rules.mjs';
 export * from './eslint-unicorn-rules.mjs';
 export * from './eslint-vitest-coding-style-rules.mjs';
 export * from './eslint-vitest-rules.mjs';

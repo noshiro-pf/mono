@@ -33,7 +33,7 @@ truthiness（暗黙の boolean 変換）を言語から排除する。`@typescri
 
 ## 強制手段
 
-- Sumi lint: `strict-boolean-expressions`(全 allow オプション off)+ `no-unused-expressions` + `ts-restrictions/jsx-boolean-logical-operands`。「オペランドの副作用禁止」は完全な静的検査が難しいため段階導入（まず関数呼び出しをオペランドに置くことへの警告から）。
+- Sumi lint: `strict-boolean-expressions`(全 allow オプション off)+ `no-unused-expressions` + `ts-ui-restrictions/jsx-boolean-logical-operands`。「オペランドの副作用禁止」は完全な静的検査が難しいため段階導入（まず関数呼び出しをオペランドに置くことへの警告から）。
 
 ## TS へ戻るときの影響
 

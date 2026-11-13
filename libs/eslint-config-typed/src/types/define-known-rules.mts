@@ -28,6 +28,7 @@ import type {
   EslintTreeShakableRules,
   EslintTsDataForgeRules,
   EslintTsRestrictionsRules,
+  EslintTsUiRestrictionsRules,
   EslintUnicornRules,
   EslintVitestCodingStyleRules,
   EslintVitestRules,
@@ -43,6 +44,7 @@ import type { EslintSynstateDomA11yRules } from './synstate-dom-a11y-rules.mjs';
  */
 export type KnownRules = DeepReadonly<
   EslintTsRestrictionsRules &
+    EslintTsUiRestrictionsRules &
     EslintArrayFuncRules &
     EslintCypressRules &
     EslintFunctionalRules &

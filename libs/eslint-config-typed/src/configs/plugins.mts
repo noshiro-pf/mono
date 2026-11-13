@@ -62,6 +62,7 @@ import {
   eslintPluginTotalFunctions,
   eslintPluginTreeShakable,
   eslintPluginTsRestrictions,
+  eslintPluginTsUiRestrictions,
   eslintPluginVitestCodingStyle,
   withSynstateDomConstants,
 } from '../plugins/index.mjs';
@@ -97,6 +98,7 @@ export const plugins: ReadonlyRecord<
   | 'total-functions'
   | 'strict-dependencies'
   | 'ts-restrictions'
+  | 'ts-ui-restrictions'
   | 'react-coding-style'
   | 'immer-coding-style'
   | 'vitest-coding-style',
@@ -140,6 +142,7 @@ export const plugins: ReadonlyRecord<
   'total-functions': eslintPluginTotalFunctions,
   'strict-dependencies': eslintPluginStrictDependencies,
   'ts-restrictions': eslintPluginTsRestrictions,
+  'ts-ui-restrictions': eslintPluginTsUiRestrictions,
   'react-coding-style': eslintPluginReactCodingStyle,
   'immer-coding-style': eslintPluginImmerCodingStyle,
   'vitest-coding-style': eslintPluginVitestCodingStyle,

@@ -13,6 +13,7 @@ import {
   eslintTotalFunctionsRules,
   eslintTreeShakableRules,
   eslintTsRestrictionsRules,
+  eslintTsUiRestrictionsRules,
   eslintUnicornRules,
   typescriptEslintRules,
 } from '../rules/index.mjs';
@@ -55,6 +56,7 @@ export const eslintConfigForTypeScript = ({
         ...eslintTreeShakableRules,
         ...eslintPluginSortDestructureKeysRules,
         ...eslintTsRestrictionsRules,
+        ...eslintTsUiRestrictionsRules,
 
         'strict-dependencies/strict-dependencies': ['error', []],
 

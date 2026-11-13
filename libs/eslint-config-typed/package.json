@@ -107,6 +107,7 @@
     "eslint-plugin-sort-destructure-keys": "^3.0.0",
     "eslint-plugin-testing-library": "^7.16.2",
     "eslint-plugin-ts-restrictions": "workspace:^",
+    "eslint-plugin-ts-ui-restrictions": "workspace:^",
     "eslint-plugin-unicorn": "^78.0.0",
     "eslint-rule-forge": "workspace:^",
     "globals": "^17.13.0",
