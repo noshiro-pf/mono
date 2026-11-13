@@ -105,15 +105,39 @@ describe('markdownLines', () => {
 });
 
 describe('codeSpans', () => {
-  test('reads spans of one and of two backticks', () => {
+  test('reads spans of one and of two backticks, as CommonMark shows them', () => {
+    // One space at each end of a span is stripped when both are there.
     assert.deepStrictEqual(codeSpans('`a` and `` b `` and ``c`d``'), [
       'a',
-      ' b ',
+      'b',
+      'c`d',
     ]);
+  });
+
+  test('reads a shorter run of backticks as part of the span (#3264)', () => {
+    assert.deepStrictEqual(codeSpans('Write `` `docs/gone.md` `` there'), [
+      '`docs/gone.md`',
+    ]);
+  });
+
+  test('reads an escaped backtick as text (#3264)', () => {
+    assert.deepStrictEqual(codeSpans('\\`docs/gone.md`'), []);
+
+    assert.deepStrictEqual(codeSpans('\\`docs/gone.md\\` and `x`'), ['x']);
+  });
+
+  test('keeps spaces that are not at both ends, and a span of spaces', () => {
+    assert.deepStrictEqual(codeSpans('` a` and `  `'), [' a', '  ']);
   });
 
   test('reads nothing from an unclosed span', () => {
     assert.deepStrictEqual(codeSpans('`a and b'), []);
+  });
+
+  test('agrees with codeSpanRanges on every span', () => {
+    const line = 'x `` a`b `` y `c` \\`d` e';
+
+    assert.strictEqual(codeSpans(line).length, codeSpanRanges(line).length);
   });
 });
 
@@ -122,6 +146,20 @@ describe('withoutCodeSpans', () => {
     assert.strictEqual(
       withoutCodeSpans('see `[x](./a.md)` and [y](./b.md)'),
       'see  and [y](./b.md)',
+    );
+  });
+
+  test('takes out a span holding a shorter run of backticks whole (#3264)', () => {
+    assert.strictEqual(
+      withoutCodeSpans('see `` `[x](./a.md)` `` and [y](./b.md)'),
+      'see  and [y](./b.md)',
+    );
+  });
+
+  test('leaves an escaped backtick and what follows it as text (#3264)', () => {
+    assert.strictEqual(
+      withoutCodeSpans('see \\`[x](./a.md)\\` and `y`.'),
+      'see \\`[x](./a.md)\\` and .',
     );
   });
 });
