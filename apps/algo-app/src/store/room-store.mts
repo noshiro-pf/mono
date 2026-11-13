@@ -13,7 +13,7 @@ import {
   type InitializedObservable,
   type Observable as SynstateObservable,
 } from 'synstate';
-import { Result } from 'ts-data-forge';
+import { Arr, Result } from 'ts-data-forge';
 import type { RoomApi } from '../api/index.mjs';
 import { newRoom } from '../functions/index.mjs';
 import type { GameStateActionFromDb, Room } from '../types/index.mjs';
@@ -24,6 +24,8 @@ export type RoomDeps = Readonly<{
 
 export type RoomStore = Readonly<{
   room: InitializedObservable<Room | undefined>;
+  /** Whether the database has no room by the id watched. */
+  isRoomMissing: InitializedObservable<boolean>;
   /** Every action of the room, oldest first, each time the database has more. */
   actionsFromDb: SynstateObservable<readonly GameStateActionFromDb[]>;
   /** Watches this room instead of the one before it, once started. */
@@ -53,7 +55,15 @@ export type RoomStore = Readonly<{
   }>;
   joinRoom: Readonly<{
     isWaitingResponse: InitializedObservable<boolean>;
-    dispatch: (roomId: string, username: string) => Promise<void>;
+    /**
+     * Adds this player to the room watched and takes the name, which it
+     * resolves with, the spaces at its ends taken off; or resolves with why it
+     * could not, adding no one and taking no name.
+     */
+    dispatch: (
+      roomId: string,
+      username: string,
+    ) => Promise<Result<string, JoinRoomError>>;
   }>;
   /** Starts watching the room the id names; returns what stops it. */
   start: () => () => void;
@@ -63,6 +73,8 @@ export const createRoomStore = (deps: RoomDeps): RoomStore => {
   const [roomId, setRoomId] = createState<string | undefined>(undefined);
 
   const [room, setRoom] = createState<Room | undefined>(undefined);
+
+  const [isRoomMissing, setIsRoomMissing] = createState<boolean>(false);
 
   const actionsFromDb = source<readonly GameStateActionFromDb[]>();
 
@@ -141,17 +153,33 @@ export const createRoomStore = (deps: RoomDeps): RoomStore => {
     const [isWaitingResponse, { setState: setIsWaitingResponse }] =
       createBooleanState(false);
 
-    const dispatch = async (id: string, username: string): Promise<void> => {
+    const dispatch = async (
+      id: string,
+      username: string,
+    ): Promise<Result<string, JoinRoomError>> => {
+      const name = username.trim();
+
+      const refused = refusalOf(room.getSnapshot().value, id, name);
+
+      if (refused !== undefined) {
+        return Result.err(refused);
+      }
+
       setIsWaitingResponse(true);
 
-      // A player who could not be added still goes on as that name.
-      await Result.fromPromise(
-        deps.api.addPlayer(id, { name: username, online: true }),
+      const added = await Result.fromPromise(
+        deps.api.addPlayer(id, { name, online: true }),
       );
 
-      setMyName(username);
-
       setIsWaitingResponse(false);
+
+      if (Result.isErr(added)) {
+        return Result.err('addFailed');
+      }
+
+      setMyName(name);
+
+      return Result.ok(name);
     };
 
     return { isWaitingResponse, dispatch } as const;
@@ -183,7 +211,13 @@ export const createRoomStore = (deps: RoomDeps): RoomStore => {
 
       stopWatching();
 
-      mut_watching.stopRoom = deps.api.watchRoom(id, setRoom);
+      setIsRoomMissing(false);
+
+      mut_watching.stopRoom = deps.api.watchRoom(id, (watched) => {
+        setIsRoomMissing(watched === undefined);
+
+        setRoom(watched);
+      });
 
       mut_watching.stopActions = deps.api.watchActions(id, (actions) => {
         actionsFromDb.next(actions);
@@ -199,6 +233,7 @@ export const createRoomStore = (deps: RoomDeps): RoomStore => {
 
   return {
     room,
+    isRoomMissing,
     actionsFromDb,
     setRoomId,
     myName,
@@ -214,3 +249,30 @@ export const createRoomStore = (deps: RoomDeps): RoomStore => {
  * so that they open the room as that player.
  */
 export type CreatedRoom = Readonly<{ room: Room; myName: string }>;
+
+/** Why a player could not join a room. */
+export type JoinRoomError =
+  'nameBlank' | 'roomMissing' | 'roomFull' | 'nameTaken' | 'addFailed';
+
+/** How many players a room seats: one per `PlayerIndex`. */
+const maxPlayers = 4;
+
+/**
+ * Why `name` cannot join the room `id` names as `current` holds it, or
+ * `undefined` when it can. The name is the player's identity, so one already in
+ * the room would share that player's seat.
+ */
+const refusalOf = (
+  current: Room | undefined,
+  id: string,
+  name: string,
+): JoinRoomError | undefined =>
+  name === ''
+    ? 'nameBlank'
+    : current?.id !== id
+      ? 'roomMissing'
+      : Arr.isMinLengthArray(maxPlayers, current.players)
+        ? 'roomFull'
+        : current.players.some((player) => player.name === name)
+          ? 'nameTaken'
+          : undefined;

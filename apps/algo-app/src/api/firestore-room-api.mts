@@ -48,6 +48,12 @@ export const createFirestoreRoomApi = (
       onSnapshot(doc(firestore, paths.rooms, roomId), (d) => {
         const data = d.data();
 
+        if (data === undefined) {
+          onChange(undefined);
+
+          return;
+        }
+
         assertIsRoomRemote(data);
 
         onChange(convertRoomRemoteToRoom(data, d.id));
