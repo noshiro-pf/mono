@@ -1,6 +1,7 @@
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import { Arr, isRecord, Result, unknownToString } from 'ts-data-forge';
+import { isDirectlyExecuted } from 'ts-repo-utils';
 import type { ReadonlyRecord } from 'ts-type-forge';
 import { preprocessCSS, resolveConfig, type ResolvedConfig } from 'vite';
 
@@ -23,8 +24,12 @@ import { preprocessCSS, resolveConfig, type ResolvedConfig } from 'vite';
  * Components import a stylesheet as `import * as styles from
  * './x.module.css'`, so that a class name never shadows a local binding. A
  * package that uses CSS Modules sets `allowArbitraryExtensions` in its
- * `tsconfig.json`, and its `scripts/cmd/gen-css-module-types.mts` is the call
- * site and nothing else.
+ * `tsconfig.json` and runs this module with its own directory
+ * ({@link packageInputsOf}):
+ *
+ * ```json
+ * "gen:css-module-types": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../tools/configs/gen-css-module-types.mts ."
+ * ```
  */
 export const genCssModuleTypes = async ({
   srcDir,
@@ -124,6 +129,29 @@ export const genCssModuleTypes = async ({
   }
 
   return Result.ok(undefined);
+};
+
+/**
+ * What {@link genCssModuleTypes} reads for the package whose directory is the
+ * one argument, resolved against `cwd`: its `src/` and its
+ * `configs/vite.config.mts`, the layout every package on CSS Modules has.
+ */
+export const packageInputsOf = (
+  args: readonly string[],
+  cwd: string,
+): Result<Readonly<{ srcDir: string; viteConfigFile: string }>, string> => {
+  if (!Arr.isFixedLengthArray(1, args)) {
+    return Result.err(
+      `gen-css-module-types takes one argument, the package directory; got ${args.length}.`,
+    );
+  }
+
+  const packageDir = path.resolve(cwd, args[0]);
+
+  return Result.ok({
+    srcDir: path.join(packageDir, 'src'),
+    viteConfigFile: path.join(packageDir, 'configs', 'vite.config.mts'),
+  });
 };
 
 /**
@@ -306,3 +334,17 @@ const readIfExists = async (file: string): Promise<string | undefined> =>
 
     throw error;
   });
+
+if (isDirectlyExecuted(import.meta.url)) {
+  const inputs = packageInputsOf(Arr.skip(process.argv, 2), process.cwd());
+
+  const result = Result.isErr(inputs)
+    ? inputs
+    : await genCssModuleTypes(inputs.value);
+
+  if (Result.isErr(result)) {
+    console.error(result.value);
+
+    process.exit(1);
+  }
+}

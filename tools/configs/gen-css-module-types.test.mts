@@ -9,6 +9,7 @@ import {
   cssModuleExports,
   declarationPathOf,
   genCssModuleTypes,
+  packageInputsOf,
   resolveCssModulesConfig,
 } from './gen-css-module-types.mjs';
 
@@ -175,6 +176,36 @@ describe('declarationPathOf', () => {
 });
 
 /* eslint-disable security/detect-non-literal-fs-filename -- every path is under a temporary directory the test creates */
+
+describe('packageInputsOf', () => {
+  test("reads a package's src/ and configs/vite.config.mts from its directory (#3410)", () => {
+    const packageDir = path.resolve('/repo/apps/x');
+
+    assert.deepStrictEqual(
+      packageInputsOf(['apps/x'], path.resolve('/repo')),
+      Result.ok({
+        srcDir: path.join(packageDir, 'src'),
+        viteConfigFile: path.join(packageDir, 'configs/vite.config.mts'),
+      }),
+    );
+  });
+
+  test('takes the directory relative to where it runs, "." included', () => {
+    assert.deepStrictEqual(
+      Result.map(
+        packageInputsOf(['.'], path.resolve('/repo/apps/x')),
+        (inputs) => inputs.srcDir,
+      ),
+      Result.ok(path.resolve('/repo/apps/x/src')),
+    );
+  });
+
+  test('fails without exactly one argument', () => {
+    assert.isTrue(Result.isErr(packageInputsOf([], '/repo')));
+
+    assert.isTrue(Result.isErr(packageInputsOf(['a', 'b'], '/repo')));
+  });
+});
 
 describe('genCssModuleTypes', () => {
   test('writes a declaration beside each stylesheet and deletes a stale generated one', async () => {
