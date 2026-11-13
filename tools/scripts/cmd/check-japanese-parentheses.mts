@@ -9,7 +9,7 @@ import {
   readRepositoryFile,
   TEXT_EXTENSIONS,
 } from '../lib/repo-files.mjs';
-import { projectRootPath } from '../project-root-path.mjs';
+import { pathFromRoot, projectRootPath } from '../project-root-path.mjs';
 
 /**
  * Fails when Japanese prose encloses Japanese text in halfwidth parentheses
@@ -461,7 +461,7 @@ const formatViolations = (offending: readonly VisitedFile[]): string => {
     'Run `pnpm run fix:japanese-parentheses` to rewrite them. A pair is reported',
     'only when it encloses Japanese and touches Japanese; a pair around a purely',
     'Latin run is not asked about. The rule and what it never reads are in the',
-    `header of ${path.relative(projectRootPath, import.meta.filename)}.`,
+    `header of ${pathFromRoot(import.meta.filename)}.`,
   ].join('\n');
 };
 

@@ -7,7 +7,7 @@ import * as ts from 'typescript';
 import { matchScriptNames, readScripts } from '../lib/manifest-scripts.mjs';
 import { readPnpmRun, readRunAll } from '../lib/pnpm-command.mjs';
 import { readShellCommands } from '../lib/shell-commands.mjs';
-import { projectRootPath } from '../project-root-path.mjs';
+import { pathFromRoot, projectRootPath } from '../project-root-path.mjs';
 
 /**
  * Fails when a package's `doc` writes a committed file through a generator its
@@ -438,10 +438,7 @@ const main = async (): Promise<number> => {
 
   const violations = packages.flatMap((pkg) =>
     findDocOnlyGenerators({
-      packageDir: path
-        .relative(projectRootPath, pkg.path)
-        .split(path.sep)
-        .join('/'),
+      packageDir: pathFromRoot(pkg.path),
       scripts: readScripts(pkg.packageJson),
       readSource: (file) => {
         try {
