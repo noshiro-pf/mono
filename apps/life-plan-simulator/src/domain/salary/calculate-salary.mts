@@ -1,3 +1,4 @@
+import { Arr, Num } from 'ts-data-forge';
 import type { StrictOmit } from 'ts-type-forge';
 import { residentTaxRate } from '../../data/index.mjs';
 import type { SalaryHistoryEntry } from '../input/index.mjs';
@@ -24,9 +25,11 @@ import {
  *
  * - 月給（額面）は年収の推移の表から引き、退職する月（`retirementMonth`）の
  *   翌月から 0。賞与は毎年 1 月に支給する。
- * - 健康保険料・厚生年金保険料は、4〜6 月の月給（額面）の平均を標準報酬として
- *   その年の 9 月から翌年 8 月まで使う（定時決定）。賞与の分は等級を使わず、
- *   標準賞与額に料率を掛ける。
+ * - 健康保険料・厚生年金保険料は給与の出る月だけ引く。4〜6 月のうちいまの在職
+ *   期間に入る月の月給（額面）の平均を標準報酬としてその年の 9 月から翌年 8 月
+ *   まで使い（定時決定）、在職期間にまだ定時決定が無ければ在職期間の最初の
+ *   月の月給を使う（資格取得時決定）。賞与の分は等級を使わず、標準賞与額に
+ *   料率を掛ける。
  * - 所得税は月額表、住民税は 12 か月前の月給からの概算。
  */
 export const calculateSalary = (
@@ -111,16 +114,55 @@ export type SalaryMonth = Readonly<{
 type SalaryLookup = Readonly<{
   entryAt: (month: MonthIndex) => ResolvedSalaryEntry | undefined;
   isEmployed: (month: MonthIndex) => boolean;
+  /**
+   * `month` を含む、月給のある行が続く期間（在職期間）の最初の行。`month` の
+   * 行が無いか月給が無いとき、または退職した後は `undefined`。
+   */
+  joinedAt: (month: MonthIndex) => ResolvedSalaryEntry | undefined;
 }>;
+
+/**
+ * 年収の推移の各行に、その行が入る在職期間の最初の行を付ける。月給の無い行は
+ * 在職期間を区切り、`joined` は `undefined`。開始月が同じ行は最後の行だけが
+ * 使われる（`findLatestStarted`）ので、ほかは在職期間を区切らないように除く。
+ * `history` は `resolveSalaryHistory` が開始月の昇順に並べたもの。
+ */
+const withEmploymentPeriods = (
+  history: readonly ResolvedSalaryEntry[],
+): readonly Readonly<{
+  start: MonthIndex;
+  entry: ResolvedSalaryEntry;
+  joined: ResolvedSalaryEntry | undefined;
+}>[] => {
+  const effective = history.filter(
+    (entry, i) => history[i + 1]?.start !== entry.start,
+  );
+
+  let mut_joined: ResolvedSalaryEntry | undefined = undefined;
+
+  return effective.map((entry) => {
+    mut_joined = entry.monthlyGross > 0 ? (mut_joined ?? entry) : undefined;
+
+    return { start: entry.start, entry, joined: mut_joined };
+  });
+};
 
 const salaryLookup = ({
   history,
   retirementMonth,
-}: SalaryParams): SalaryLookup =>
-  ({
-    entryAt: (month) => findLatestStarted(history, month),
-    isEmployed: (month) => month <= retirementMonth,
-  }) as const;
+}: SalaryParams): SalaryLookup => {
+  // 年収の推移は数行なので、引くたびに線形に探す。
+  const periods = withEmploymentPeriods(history);
+
+  const isEmployed = (month: MonthIndex): boolean => month <= retirementMonth;
+
+  return {
+    entryAt: (month) => findLatestStarted(periods, month)?.entry,
+    isEmployed,
+    joinedAt: (month) =>
+      isEmployed(month) ? findLatestStarted(periods, month)?.joined : undefined,
+  } as const;
+};
 
 const grossAt = (salary: SalaryLookup, month: MonthIndex): number =>
   salary.isEmployed(month) ? (salary.entryAt(month)?.monthlyGross ?? 0) : 0;
@@ -136,23 +178,37 @@ const grossAfterIdecoAt = (salary: SalaryLookup, month: MonthIndex): number => {
 };
 
 /**
- * `month` に適用される標準報酬の元になる額: 9 月以降はその年の、8 月以前は
- * 前の年の 4〜6 月の月給（額面）の平均。
+ * `month` に適用される標準報酬の元になる額。給与の無い月は被保険者でないので
+ * 0。ほかは 9 月以降はその年の、8 月以前は前の年の 4〜6 月のうち、いまの在職
+ * 期間に入る月の月給（額面）の平均（定時決定）。4〜6 月のどれも在職期間に
+ * 入らなければ（7 月以降の就職、または在職期間の最初の定時決定の前）、在職期間
+ * の最初の月の月給（資格取得時決定）。6 月の就職は定時決定の対象外だが、6 月
+ * だけの平均は資格取得時決定と同じ額になる。
  */
 const standardRemunerationBase = (
   salary: SalaryLookup,
   month: MonthIndex,
 ): number => {
+  const joined = salary.joinedAt(month);
+
+  if (joined === undefined) {
+    return 0;
+  }
+
   const year = monthOf(month) < 9 ? yearOf(month) - 1 : yearOf(month);
 
   const april = year * 12 + 3;
 
-  const sum =
-    grossAt(salary, april) +
-    grossAt(salary, april + 1) +
-    grossAt(salary, april + 2);
+  const inPeriod = [april, april + 1, april + 2]
+    // 在職期間は最初の行の開始月で決まる。
+    .filter((m) => salary.joinedAt(m)?.start === joined.start)
+    .map((m) => grossAt(salary, m));
 
-  return sum / 3;
+  const monthsInPeriod = inPeriod.length;
+
+  return Num.isNonZero(monthsInPeriod)
+    ? Num.div(Arr.sum(inPeriod), monthsInPeriod)
+    : joined.monthlyGross;
 };
 
 const socialInsuranceAt = (
@@ -243,6 +299,9 @@ const calculateSalaryMonth = (
 
   const residentTax = residentTaxFrom(grossAfterIdecoAt(salary, month - 12));
 
+  // 賞与には、月給の無い行のものにも健康保険料・厚生年金保険料を掛け、老齢
+  // 厚生年金もその賞与を数える。月給の無い月は被保険者でないが、賞与だけを
+  // 外すと年金の側と食い違うので、両方そろえて直すまでこのままにする。
   const bonus =
     monthOf(month) === 1 && salary.isEmployed(month)
       ? (salary.entryAt(month)?.annualBonus ?? 0)

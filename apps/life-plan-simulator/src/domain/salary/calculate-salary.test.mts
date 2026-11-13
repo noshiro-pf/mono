@@ -1,4 +1,9 @@
-import { monthlyWithholdingTax } from '../tax/index.mjs';
+import type { SalaryHistoryEntry } from '../input/index.mjs';
+import {
+  healthInsurancePremium,
+  monthlyWithholdingTax,
+  welfarePensionPremium,
+} from '../tax/index.mjs';
 import { parseYearMonthOr } from '../year-month/index.mjs';
 import { calculateSalary, resolveSalaryHistory } from './calculate-salary.mjs';
 
@@ -21,9 +26,9 @@ describe(calculateSalary, () => {
     0,
   );
 
-  const [september, january, november] = calculateSalary(
+  const [september, january] = calculateSalary(
     { history, retirementMonth: ym('2027-10') },
-    [ym('2026-09'), ym('2027-01'), ym('2027-11')],
+    [ym('2026-09'), ym('2027-01')],
   );
 
   test('月給から社会保険料と税金を引いた手取りを求めること', () => {
@@ -181,16 +186,205 @@ describe(calculateSalary, () => {
     assert.closeTo(bigBonusJanuary.bonusWelfarePension, 137_250, 1e-6);
   });
 
-  test('退職した翌月から給与は 0 で、保険料と住民税は残ること', () => {
-    assert.isDefined(november);
+  test('退職する月までは保険料を引き、翌月から給与も保険料も 0 で、住民税は残ること', () => {
+    const [lastMonth, nextMonth, august] = calculateSalary(
+      { history, retirementMonth: ym('2027-10') },
+      [ym('2027-10'), ym('2027-11'), ym('2028-08')],
+    );
 
-    assert.strictEqual(november.gross, 0);
+    assert.isDefined(lastMonth);
 
-    assert.strictEqual(november.healthInsurance, 14_970);
+    assert.strictEqual(lastMonth.gross, 300_000);
 
-    assert.closeTo(november.residentTax, 8500, 1e-9);
+    assert.strictEqual(lastMonth.healthInsurance, 14_970);
 
-    assert.isTrue(november.net < 0);
+    assert.strictEqual(lastMonth.welfarePension, 27_450);
+
+    for (const month of [nextMonth, august]) {
+      assert.isDefined(month);
+
+      assert.strictEqual(month.gross, 0);
+
+      assert.strictEqual(month.healthInsurance, 0);
+
+      assert.strictEqual(month.welfarePension, 0);
+
+      assert.closeTo(month.residentTax, 8500, 1e-9);
+
+      assert.closeTo(month.net, -8500, 1e-9);
+    }
+  });
+
+  test('4 月に退職すれば、その年の 9 月の保険料は 0 であること', () => {
+    // 4〜6 月の一部だけに給与が出た年でも、退職した後の 9 月は保険料を引かない。
+    const [afterRegularDecision] = calculateSalary(
+      { history, retirementMonth: ym('2027-04') },
+      [ym('2027-09')],
+    );
+
+    assert.isDefined(afterRegularDecision);
+
+    assert.strictEqual(afterRegularDecision.healthInsurance, 0);
+
+    assert.strictEqual(afterRegularDecision.welfarePension, 0);
+  });
+
+  test('最初の定時決定の前は、最初に給与が出た月の月給で保険料を求めること', () => {
+    const [firstMonth, august] = calculateSalary(
+      { history, retirementMonth: ym('2027-10') },
+      [ym('2025-01'), ym('2025-08')],
+    );
+
+    for (const month of [firstMonth, august]) {
+      assert.isDefined(month);
+
+      assert.strictEqual(month.healthInsurance, 14_970);
+
+      assert.strictEqual(month.welfarePension, 27_450);
+
+      assert.strictEqual(month.incomeTax, 6750);
+    }
+  });
+
+  test('7 月に就職すれば、翌年の 8 月まで就職した月の月給の等級を使うこと', () => {
+    const [firstSeptember, august] = calculateSalary(
+      {
+        history: salaryFrom('2025-07', 3_600_000, 0),
+        retirementMonth: ym('2030-12'),
+      },
+      [ym('2025-09'), ym('2026-08')],
+    );
+
+    for (const month of [firstSeptember, august]) {
+      assert.isDefined(month);
+
+      assert.strictEqual(month.healthInsurance, 14_970);
+
+      assert.strictEqual(month.welfarePension, 27_450);
+    }
+  });
+
+  test('5 月に就職すれば、9 月からは 5・6 月の 2 か月の平均の等級を使うこと', () => {
+    const [september2025] = calculateSalary(
+      {
+        history: resolveSalaryHistory(
+          [
+            salaryRow(1, '2025-05', 3_600_000),
+            salaryRow(2, '2025-06', 4_320_000),
+          ],
+          0,
+        ),
+        retirementMonth: ym('2030-12'),
+      },
+      [ym('2025-09')],
+    );
+
+    assert.isDefined(september2025);
+
+    // (300,000 + 360,000) / 2 = 330,000 円（3 か月で割れば 220,000 円）
+    assert.strictEqual(
+      september2025.healthInsurance,
+      healthInsurancePremium(330_000),
+    );
+
+    assert.strictEqual(
+      september2025.welfarePension,
+      welfarePensionPremium(330_000),
+    );
+  });
+
+  test('給与の無い期間は保険料を引かず、7 月に就職し直せばその月の月給の等級を使うこと', () => {
+    const [gap, rejoined, august] = calculateSalary(
+      {
+        history: resolveSalaryHistory(
+          [
+            salaryRow(1, '2025-01', 3_600_000),
+            salaryRow(2, '2026-01', 0),
+            salaryRow(3, '2027-07', 6_000_000),
+          ],
+          0,
+        ),
+        retirementMonth: ym('2030-12'),
+      },
+      [ym('2026-03'), ym('2027-07'), ym('2028-08')],
+    );
+
+    assert.isDefined(gap);
+
+    assert.strictEqual(gap.healthInsurance, 0);
+
+    assert.strictEqual(gap.welfarePension, 0);
+
+    for (const month of [rejoined, august]) {
+      assert.isDefined(month);
+
+      assert.strictEqual(
+        month.healthInsurance,
+        healthInsurancePremium(500_000),
+      );
+
+      assert.strictEqual(month.welfarePension, welfarePensionPremium(500_000));
+    }
+  });
+
+  test('定時決定は、4〜6 月のうちいまの在職期間に入る月だけを平均すること', () => {
+    const [september2025] = calculateSalary(
+      {
+        history: resolveSalaryHistory(
+          [
+            salaryRow(1, '2025-01', 3_600_000),
+            salaryRow(2, '2025-05', 0),
+            salaryRow(3, '2025-06', 7_200_000),
+          ],
+          0,
+        ),
+        retirementMonth: ym('2030-12'),
+      },
+      [ym('2025-09')],
+    );
+
+    assert.isDefined(september2025);
+
+    // 6 月の 600,000 円だけ（前の在職期間の 4 月も入れれば 450,000 円）
+    assert.strictEqual(
+      september2025.healthInsurance,
+      healthInsurancePremium(600_000),
+    );
+
+    assert.strictEqual(
+      september2025.welfarePension,
+      welfarePensionPremium(600_000),
+    );
+  });
+
+  test('開始月が同じ行は、月給を引く行と同じ行から保険料を求めること', () => {
+    const [firstMonth] = calculateSalary(
+      {
+        history: resolveSalaryHistory(
+          [
+            salaryRow(1, '2025-01', 3_600_000),
+            salaryRow(2, '2025-01', 6_000_000),
+          ],
+          0,
+        ),
+        retirementMonth: ym('2030-12'),
+      },
+      [ym('2025-01')],
+    );
+
+    assert.isDefined(firstMonth);
+
+    assert.strictEqual(firstMonth.gross, 500_000);
+
+    assert.strictEqual(
+      firstMonth.healthInsurance,
+      healthInsurancePremium(500_000),
+    );
+
+    assert.strictEqual(
+      firstMonth.welfarePension,
+      welfarePensionPremium(500_000),
+    );
   });
 });
 
@@ -238,22 +432,26 @@ const januaryWith = (idecoMonthly: number): SalaryMonthOf =>
     [ym('2027-01')],
   )[0];
 
+/** One row of a salary history, with no DC or iDeCo contribution. */
+const salaryRow = (
+  id: number,
+  start: string,
+  annualBase: number,
+  annualBonus: number = 0,
+): SalaryHistoryEntry =>
+  ({
+    id,
+    start,
+    annualBase,
+    companyDcMonthly: 0,
+    idecoMonthly: 0,
+    annualBonus,
+  }) as const;
+
 /** A salary history of one entry, with no DC or iDeCo contribution. */
 const salaryFrom = (
   start: string,
   annualBase: number,
   annualBonus: number,
 ): ReturnType<typeof resolveSalaryHistory> =>
-  resolveSalaryHistory(
-    [
-      {
-        id: 1,
-        start,
-        annualBase,
-        companyDcMonthly: 0,
-        idecoMonthly: 0,
-        annualBonus,
-      },
-    ],
-    0,
-  );
+  resolveSalaryHistory([salaryRow(1, start, annualBase, annualBonus)], 0);
