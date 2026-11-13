@@ -112,3 +112,105 @@ describe('merge of an initialized source', () => {
     assert.deepStrictEqual(mut_history, ['a', 2]);
   });
 });
+
+// Each parent below is `n$` or derives from it, so a write to `n$` reaches, in
+// one update, every parent that emits for it, and `merge` emits once per update.
+describe('merge of parents that emit in the same update', () => {
+  test('passes on the value of the first parent in the array', () => {
+    const n$ = source<number>();
+
+    const a$ = n$.pipe(map((x) => `a${x}`));
+
+    const b$ = n$.pipe(map((x) => `b${x}`));
+
+    const mut_history: string[] = [];
+
+    merge([a$, b$]).subscribe((value) => {
+      mut_history.push(value);
+    });
+
+    n$.next(1);
+
+    n$.next(2);
+
+    assert.deepStrictEqual(mut_history, ['a1', 'a2']);
+  });
+
+  test('takes the first parent by array order, not by creation order', () => {
+    const n$ = source<number>();
+
+    const a$ = n$.pipe(map((x) => `a${x}`));
+
+    const b$ = n$.pipe(map((x) => `b${x}`));
+
+    const mut_history: string[] = [];
+
+    merge([b$, a$]).subscribe((value) => {
+      mut_history.push(value);
+    });
+
+    n$.next(1);
+
+    n$.next(2);
+
+    assert.deepStrictEqual(mut_history, ['b1', 'b2']);
+  });
+
+  test('passes over a parent that does not emit in the update', () => {
+    const n$ = source<number>();
+
+    const a$ = n$.pipe(map((x) => `a${x}`));
+
+    const even$ = n$
+      .pipe(filter((x) => x % 2 === 0))
+      .pipe(map((x) => `even${x}`));
+
+    const mut_history: string[] = [];
+
+    merge([even$, a$]).subscribe((value) => {
+      mut_history.push(value);
+    });
+
+    n$.next(1);
+
+    n$.next(2);
+
+    assert.deepStrictEqual(mut_history, ['a1', 'even2']);
+  });
+
+  test('takes `n$` over a parent mapped from it when `n$` is first in the array', () => {
+    const n$ = source<number>();
+
+    const a$ = n$.pipe(map((x) => `a${x}`));
+
+    const mut_history: (number | string)[] = [];
+
+    merge([n$, a$]).subscribe((value) => {
+      mut_history.push(value);
+    });
+
+    n$.next(1);
+
+    n$.next(2);
+
+    assert.deepStrictEqual(mut_history, [1, 2]);
+  });
+
+  test('takes a parent mapped from `n$` over `n$` when it is first in the array', () => {
+    const n$ = source<number>();
+
+    const a$ = n$.pipe(map((x) => `a${x}`));
+
+    const mut_history: (number | string)[] = [];
+
+    merge([a$, n$]).subscribe((value) => {
+      mut_history.push(value);
+    });
+
+    n$.next(1);
+
+    n$.next(2);
+
+    assert.deepStrictEqual(mut_history, ['a1', 'a2']);
+  });
+});

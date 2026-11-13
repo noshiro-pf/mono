@@ -2,17 +2,19 @@
 prev: false
 next: false
 title: merge
-description: 'Merges multiple observables into a single observable that emits all values from all sources.'
+description: 'Merges several observables into one that emits whenever any of them emits, at most once per update.'
 ---
 
 import { MarbleDiagram } from '../../../components/marble-diagram/marble-diagram';
 import { colors } from '../../../components/constants.mjs';
 
 {/* jsdoc-description */}
-Merges multiple observables into a single observable that emits all values from all sources.
-Emits whenever any source observable emits a value.
+Merges several observables into one that emits whenever any of them emits, at most once per update.
 It holds no value until a source emits, even when its sources hold one.
 Pipe `withInitialValue` after it where a value is needed from the start.
+
+When several sources emit in the same update, for example an observable and what is mapped from it, `merge` passes on the value of the first of them in the order of `parents`, and the other values of that update are not passed on.
+Use `combine` or `derive` to read them together.
 {/* /jsdoc-description */}
 
 ## Marble Diagram
@@ -58,8 +60,7 @@ Pipe `withInitialValue` after it where a value is needed from the start.
 //
 //  Explanation:
 //  - merge combines multiple observables into one
-//  - Emits values from any source as they arrive
-//  - Order is preserved based on emission time
+//  - events$ emits c1, k1, c2 and k2 in the order they are written, each in its own update
 
 const clicks$ = source<string>();
 
