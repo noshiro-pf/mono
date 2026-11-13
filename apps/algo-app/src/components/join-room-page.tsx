@@ -4,9 +4,10 @@ import {
   type InitializedObservable,
 } from 'synstate';
 import { constant, deriveBindable, If, type JSX } from 'synstate-dom';
+import { Result } from 'ts-data-forge';
 import { dictionary, roomPage } from '../constants/index.mjs';
 import { router } from '../router.mjs';
-import { roomStore } from '../store/index.mjs';
+import { roomStore, type JoinRoomError } from '../store/index.mjs';
 import { Button, Input, Spinner } from './bp/index.mjs';
 import * as styles from './room-form.module.css';
 
@@ -28,6 +29,21 @@ export const JoinRoomPage = ({ roomId }: Props): JSX.Element => {
 
   const [showPasswordError, { setTrue: setShowPasswordError }] =
     createBooleanState(false);
+
+  const [joinError, setJoinError] = createState<JoinRoomError | undefined>(
+    undefined,
+  );
+
+  // A missing room is said before any try, since nothing can join it.
+  const errorMessage = deriveBindable(
+    [joinError, roomStore.isRoomMissing],
+    (error, isRoomMissing) =>
+      isRoomMissing
+        ? dc.errors.roomMissing
+        : error === undefined
+          ? ''
+          : dc.errors[error],
+  );
 
   const room = roomStore.room;
 
@@ -53,12 +69,21 @@ export const JoinRoomPage = ({ roomId }: Props): JSX.Element => {
     // that the room and the URL hold the same name.
     const name = getUsername().toWellFormed();
 
+    setJoinError(undefined);
+
     // Navigated once the join has settled rather than from a subscriber, so the
-    // router is not written to while the store's update propagates.
+    // router is not written to while the store's update propagates. A join that
+    // failed stays here and says why.
     roomStore.joinRoom
       .dispatch(id, name)
-      .then(() => {
-        router.push(roomPage(id, name));
+      .then((joined) => {
+        if (Result.isErr(joined)) {
+          setJoinError(joined.value);
+
+          return;
+        }
+
+        router.push(roomPage(id, joined.value));
       })
       .catch(console.error);
   };
@@ -115,6 +140,14 @@ export const JoinRoomPage = ({ roomId }: Props): JSX.Element => {
             />
           </Button>
         </div>
+        <If
+          cond={deriveBindable([errorMessage], (message) => message !== '')}
+          then={
+            <div class={constant(styles.error)} role={constant('alert')}>
+              {errorMessage}
+            </div>
+          }
+        />
       </div>
     </div>
   );

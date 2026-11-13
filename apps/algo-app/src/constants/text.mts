@@ -41,5 +41,13 @@ export const dictionary = {
       label: 'あなたの名前',
     },
     button: '入室',
+    errors: {
+      nameBlank: '名前を入力してください。',
+      roomMissing: 'この部屋は見つかりません。URL を確かめてください。',
+      roomFull: 'この部屋は満員です。',
+      nameTaken: 'この名前はこの部屋で使われています。別の名前にしてください。',
+      addFailed:
+        '入室できませんでした。通信を確かめて、もう一度試してください。',
+    },
   },
 } as const;

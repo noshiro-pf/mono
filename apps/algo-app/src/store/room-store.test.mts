@@ -269,7 +269,7 @@ describe(createRoomStore, () => {
   });
 
   test('joinRoom adds the player to the room and takes the name', async () => {
-    const { store, api } = setup();
+    const { store, api } = watchingRoom(['alice']);
 
     const pending = store.joinRoom.dispatch('a', 'bob');
 
@@ -287,25 +287,106 @@ describe(createRoomStore, () => {
 
     added.resolve();
 
-    await pending;
+    assert.deepStrictEqual(await pending, Result.ok('bob'));
 
     assert.strictEqual(store.myName.getSnapshot().value, 'bob');
 
     assert.isFalse(store.joinRoom.isWaitingResponse.getSnapshot().value);
   });
 
-  test('joinRoom takes the name even when the player could not be added', async () => {
-    const { store, api } = setup();
+  test('joinRoom joins by the name with the spaces at its ends taken off (#2616)', async () => {
+    const { store, api } = watchingRoom(['alice']);
+
+    const pending = store.joinRoom.dispatch('a', '  bob ');
+
+    api.addedPlayers[0]?.resolve();
+
+    assert.deepStrictEqual(await pending, Result.ok('bob'));
+
+    assert.deepStrictEqual(api.addedPlayers[0]?.player, {
+      name: 'bob',
+      online: true,
+    });
+  });
+
+  test('joinRoom fails, and takes no name, when the player could not be added (#2616)', async () => {
+    const { store, api } = watchingRoom(['alice']);
 
     const pending = store.joinRoom.dispatch('a', 'bob');
 
     api.addedPlayers[0]?.reject(new Error('offline'));
 
-    await pending;
+    assert.deepStrictEqual(await pending, Result.err('addFailed'));
 
-    assert.strictEqual(store.myName.getSnapshot().value, 'bob');
+    assert.isUndefined(store.myName.getSnapshot().value);
 
     assert.isFalse(store.joinRoom.isWaitingResponse.getSnapshot().value);
+  });
+
+  test.each([
+    [
+      'a room that already has four players',
+      ['p', 'q', 'r', 's'],
+      'bob',
+      'roomFull',
+    ],
+    ['a name already in the room', ['alice', 'bob'], 'bob', 'nameTaken'],
+    [
+      'a name already in the room, once trimmed',
+      ['alice', 'bob'],
+      ' bob ',
+      'nameTaken',
+    ],
+    ['a name that is blank once trimmed', ['alice'], ' \t', 'nameBlank'],
+  ] as const)(
+    'joinRoom refuses %s, adding no one and taking no name (#2616)',
+    async (_case, players, name, reason) => {
+      const { store, api } = watchingRoom(players);
+
+      assert.deepStrictEqual(
+        await store.joinRoom.dispatch('a', name),
+        Result.err(reason),
+      );
+
+      assert.deepStrictEqual(api.addedPlayers, []);
+
+      assert.isUndefined(store.myName.getSnapshot().value);
+    },
+  );
+
+  test('a room id with no document is a missing room, which joinRoom refuses (#2616)', async () => {
+    const { store, api } = setup();
+
+    store.start();
+
+    store.setRoomId('gone');
+
+    assert.isFalse(store.isRoomMissing.getSnapshot().value);
+
+    api.emitRoom('gone', undefined);
+
+    assert.isTrue(store.isRoomMissing.getSnapshot().value);
+
+    assert.deepStrictEqual(
+      await store.joinRoom.dispatch('gone', 'bob'),
+      Result.err('roomMissing'),
+    );
+
+    assert.deepStrictEqual(api.addedPlayers, []);
+  });
+
+  test('a room that appears is no longer missing', () => {
+    const { store, api } = setup();
+
+    store.start();
+
+    store.setRoomId('a');
+
+    api.emitRoom('a', undefined);
+
+    api.emitRoom('a', roomWithId('a'));
+
+    assert.isFalse(store.isRoomMissing.getSnapshot().value);
   });
 });
 
@@ -313,7 +394,7 @@ type FakeApi = Readonly<{
   api: RoomApi;
   /** What is watched now, as `room:<id>` and `actions:<id>`. */
   watching: () => readonly string[];
-  emitRoom: (roomId: string, room: Room) => void;
+  emitRoom: (roomId: string, room: Room | undefined) => void;
   emitActions: (
     roomId: string,
     actions: readonly GameStateActionFromDb[],
@@ -332,7 +413,7 @@ type FakeApi = Readonly<{
 }>;
 
 const fakeApi = (): FakeApi => {
-  const mut_roomWatchers = new Map<string, (room: Room) => void>();
+  const mut_roomWatchers = new Map<string, (room: Room | undefined) => void>();
 
   const mut_actionWatchers = new Map<
     string,
@@ -408,3 +489,21 @@ const roomWithId = (id: string): Room =>
     ...newRoom(undefined, { name: 'alice', online: true }),
     id,
   }) as const;
+
+/** A store started on room `a`, which holds a player of each of `names`. */
+const watchingRoom = (
+  names: readonly string[],
+): Readonly<{ store: RoomStore; api: FakeApi }> => {
+  const { store, api } = setup();
+
+  store.start();
+
+  store.setRoomId('a');
+
+  api.emitRoom('a', {
+    ...roomWithId('a'),
+    players: names.map((name) => ({ name, online: true })),
+  });
+
+  return { store, api };
+};
