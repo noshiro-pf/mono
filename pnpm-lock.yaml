@@ -5551,6 +5551,49 @@ importers:
         specifier: 4.6.7
         version: 4.6.7
 
+  libs/ts-fsm-forge:
+    dependencies:
+      ts-data-forge:
+        specifier: workspace:^
+        version: link:../ts-data-forge
+      ts-type-forge:
+        specifier: workspace:^
+        version: link:../ts-type-forge
+      typescript:
+        specifier: '>=5.0'
+        version: 6.0.3
+    devDependencies:
+      dedent:
+        specifier: 'catalog:'
+        version: 1.7.2(babel-plugin-macros@3.1.0)
+      eslint:
+        specifier: 'catalog:'
+        version: 10.13.0(jiti@2.7.0)(supports-color@7.2.0)
+      eslint-config-typed:
+        specifier: workspace:*
+        version: link:../eslint-config-typed
+      eslint-plugin-ts-data-forge:
+        specifier: workspace:*
+        version: link:../eslint-plugin-ts-data-forge
+      eslint-plugin-ts-type-forge:
+        specifier: workspace:*
+        version: link:../eslint-plugin-ts-type-forge
+      npm-run-all2:
+        specifier: 'catalog:'
+        version: 9.0.4
+      prettier:
+        specifier: 'catalog:'
+        version: 3.9.10
+      prettier-plugin-organize-imports:
+        specifier: 'catalog:'
+        version: 4.3.0(prettier@3.9.10)(typescript@6.0.3)
+      prettier-plugin-packagejson:
+        specifier: 'catalog:'
+        version: 3.0.2(prettier@3.9.10)
+      ts-repo-utils:
+        specifier: workspace:*
+        version: link:../ts-repo-utils
+
   libs/ts-repo-utils:
     dependencies:
       '@nodelib/fs.walk':
