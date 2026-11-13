@@ -21,6 +21,15 @@ export const listWorkflowFiles = async (): Promise<
   Result<readonly string[], string>
 > => listSorted(WORKFLOW_GLOB);
 
+/**
+ * Every action's `action.yml` under `.github/actions/`, composite or not,
+ * absolute and sorted: where they are kept (see "Setup" in
+ * `.github/workflows/README.md`). None at all is an empty list.
+ */
+export const listActionFiles = async (): Promise<
+  Result<readonly string[], string>
+> => listSorted('.github/actions/**/action.{yml,yaml}');
+
 /** The directory of every published package (`libs/*`), absolute and sorted. */
 export const listLibraryDirs = async (): Promise<
   Result<readonly string[], string>

@@ -12,12 +12,14 @@ import { parse } from 'yaml';
 
 /**
  * A workflow's jobs, read by a YAML parser: each job's matrix as written, what
- * it `uses:`, its `if:`, and its steps' names, `if:`, `run:` scripts and
- * `env:`. The guards that ask what CI runs (`check-ci-commands.mts`,
- * `check-ci-job-shape.mts`) and `check-all.mts`, which runs the matrices, read
- * workflows through this, so that a quoted or folded value, a flow-style
- * mapping, a comment after `include:` or an entry that starts with `- name:` is
- * read the same way by all three — and the way GitHub reads it. What a `run:`
+ * it `uses:`, its `if:`, whether it runs in a `container:`, and its steps'
+ * names, `if:`, `uses:` and `with:`, `run:` scripts, `shell`,
+ * `working-directory` and `env:`. The guards that ask what CI runs
+ * (`check-ci-commands.mts`, `check-ci-job-shape.mts`) and `check-all.mts`,
+ * which runs the matrices, read workflows through this, so that a quoted or
+ * folded value, a flow-style mapping, a comment after `include:` or an entry
+ * that starts with `- name:` is read the same way by all three — and the way
+ * GitHub reads it. What a `run:`
  * script runs is `shell-commands.mts`'s.
  */
 export const readWorkflowJobs = (
@@ -37,7 +39,7 @@ export const readWorkflowJobs = (
 
   const workflowEnv = readEnv(workflow['env']);
 
-  const workflowDirectory = defaultDirectory(workflow);
+  const workflowDefaults = runDefaults(workflow, NO_RUN_DEFAULTS);
 
   const jobs = workflow['jobs'];
 
@@ -53,7 +55,7 @@ export const readWorkflowJobs = (
 
       const steps = record['steps'];
 
-      const jobDirectory = defaultDirectory(record) ?? workflowDirectory;
+      const jobDefaults = runDefaults(record, workflowDefaults);
 
       const displayName = record['name'];
 
@@ -70,35 +72,37 @@ export const readWorkflowJobs = (
         with: readEnv(record['with']),
         condition: scalarText(record['if']),
         hasRunner: record['runs-on'] !== undefined,
+        hasContainer:
+          isRecord(record['container']) ||
+          (isString(record['container']) && record['container'] !== ''),
         timeoutMinutes: scalarText(timeoutMinutes),
         needs: stringList(needs),
         matrix: isRecord(strategy) ? strategy['matrix'] : undefined,
         env: { ...workflowEnv, ...readEnv(record['env']) },
         steps: Arr.isArray(steps)
-          ? steps.map((step: unknown) => {
-              const stepRecord = isRecord(step) ? step : ({} as const);
-
-              const run = stepRecord['run'];
-
-              const directory = stepRecord['working-directory'];
-
-              const stepName = stepRecord['name'] ?? stepRecord['id'];
-
-              return {
-                name: isString(stepName) ? stepName : undefined,
-                condition: scalarText(stepRecord['if']),
-                run: isString(run) ? run : undefined,
-                env: readEnv(stepRecord['env']),
-                workingDirectory: isString(directory)
-                  ? directory
-                  : jobDirectory,
-              };
-            })
+          ? steps.map((step: unknown) => readStep(step, jobDefaults))
           : [],
       };
     }),
   );
 };
+
+/**
+ * A composite action's `runs.steps`, each read as {@link readWorkflowJobs}
+ * reads a job's. An action of another kind (`node24`, `docker`) has none.
+ */
+export const readCompositeActionSteps = (
+  text: string,
+): Result<readonly WorkflowStep[], string> =>
+  Result.map(parseWorkflow(text), (action) => {
+    const runs = isRecord(action) ? action['runs'] : undefined;
+
+    const steps = isRecord(runs) ? runs['steps'] : undefined;
+
+    return Arr.isArray(steps)
+      ? steps.map((step: unknown) => readStep(step, NO_RUN_DEFAULTS))
+      : [];
+  });
 
 /**
  * The events a workflow's `on:` names, however it is written: one event, a
@@ -314,6 +318,8 @@ export type WorkflowJob = Readonly<{
    * (`uses:`) does not.
    */
   hasRunner: boolean;
+  /** Whether it runs its steps in a `container:`. */
+  hasContainer: boolean;
   /** Its `timeout-minutes` as written (`15` reads `'15'`); absent when none. */
   timeoutMinutes: string | undefined;
   /** `strategy.matrix` as written: a mapping, an expression, or absent. */
@@ -328,6 +334,10 @@ export type WorkflowStep = Readonly<{
   name: string | undefined;
   /** The step's `if:` as written, a folded one joined; absent without one. */
   condition: string | undefined;
+  /** The action the step runs (`uses:`), as written; absent for a `run:`. */
+  uses: string | undefined;
+  /** The inputs it gives that action (`with:`), its scalar values as strings. */
+  with: ReadonlyRecord<string, string>;
   run: string | undefined;
   env: ReadonlyRecord<string, string>;
   /**
@@ -335,12 +345,23 @@ export type WorkflowStep = Readonly<{
    * else the workflow's.
    */
   workingDirectory: string | undefined;
+  /**
+   * The step's `shell`, or else its job's `defaults.run` one, or else the
+   * workflow's; absent when none is given (`bash` on a Linux runner).
+   */
+  shell: string | undefined;
 }>;
 
 export type Matrix = Readonly<{
   include: readonly ReadonlyRecord<string, string>[];
   lists: ReadonlyRecord<string, readonly string[]>;
 }>;
+
+/** No `defaults.run`: what a workflow's own defaults fall back to. */
+const NO_RUN_DEFAULTS: RunDefaults = {
+  directory: undefined,
+  shell: undefined,
+} as const;
 
 const MATRIX_REFERENCE = /^\$\{\{\s*matrix\.(?<key>[\w-]+)\s*\}\}$/u;
 
@@ -361,18 +382,32 @@ export const parseWorkflow = (text: string): Result<unknown, string> => {
     : parsed;
 };
 
-/** The `defaults.run.working-directory` of a workflow or a job. */
-const defaultDirectory = (
+/**
+ * The `defaults.run` of a workflow or a job — its `working-directory` and its
+ * `shell` — each falling back to `outer`'s.
+ */
+const runDefaults = (
   mapping: ReadonlyRecord<string, unknown>,
-): string | undefined => {
+  outer: RunDefaults,
+): RunDefaults => {
   const defaults = mapping['defaults'];
 
   const run = isRecord(defaults) ? defaults['run'] : undefined;
 
   const directory = isRecord(run) ? run['working-directory'] : undefined;
 
-  return isString(directory) ? directory : undefined;
+  const shell = isRecord(run) ? run['shell'] : undefined;
+
+  return {
+    directory: isString(directory) ? directory : outer.directory,
+    shell: isString(shell) ? shell : outer.shell,
+  };
 };
+
+type RunDefaults = Readonly<{
+  directory: string | undefined;
+  shell: string | undefined;
+}>;
 
 /** A YAML scalar as the string GitHub substitutes for it; else undefined. */
 const scalarText = (value: unknown): string | undefined =>
@@ -403,3 +438,31 @@ const stringList = (value: unknown): readonly string[] =>
 /** An `env:` mapping, its scalar values as strings. */
 const readEnv = (env: unknown): ReadonlyRecord<string, string> =>
   isRecord(env) ? readScalars(env) : ({} as const);
+
+/** One step, its `working-directory` and `shell` falling back to `defaults`. */
+const readStep = (step: unknown, defaults: RunDefaults): WorkflowStep => {
+  const stepRecord = isRecord(step) ? step : ({} as const);
+
+  const run = stepRecord['run'];
+
+  const stepUses = stepRecord['uses'];
+
+  const stepWith = stepRecord['with'];
+
+  const directory = stepRecord['working-directory'];
+
+  const shell = stepRecord['shell'];
+
+  const stepName = stepRecord['name'] ?? stepRecord['id'];
+
+  return {
+    name: isString(stepName) ? stepName : undefined,
+    condition: scalarText(stepRecord['if']),
+    uses: isString(stepUses) ? stepUses : undefined,
+    with: isRecord(stepWith) ? readScalars(stepWith) : {},
+    run: isString(run) ? run : undefined,
+    env: readEnv(stepRecord['env']),
+    workingDirectory: isString(directory) ? directory : defaults.directory,
+    shell: isString(shell) ? shell : defaults.shell,
+  };
+};

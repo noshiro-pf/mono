@@ -1031,13 +1031,14 @@ Nothing checks this; a review does.
   `check:root:dispatch-inputs`, `check:root:lint-pull-request-groups`,
   `check:root:scheduled-failure-report` (a workflow with a `schedule:` trigger
   is named in `report-scheduled-failure.yml`, which turns its failed runs into
-  an issue). `fmt` and `check:cspell` read it too; CI itself runs nothing on a
-  workflow change until the pull request runs.
+  an issue), `check:root:gh-needs-repo`. `fmt` and `check:cspell` read it too;
+  CI itself runs nothing on a workflow change until the pull request runs.
   `check:root:actionlint` also lints the composite actions' steps, which
-  actionlint does not read on its own, and reads a `$/` action as `./`, the only
-  form the pinned actionlint knows. It downloads the actionlint and shellcheck
-  that `tools/configs/release-binaries.json` pins, so it needs nothing
-  installed; `pnpm-update.yml` moves those pins.
+  actionlint does not read on its own (`check:root:gh-needs-repo` reads them
+  too), and reads a `$/` action as `./`, the only form the pinned actionlint
+  knows. It downloads the actionlint and shellcheck that
+  `tools/configs/release-binaries.json` pins, so it needs nothing installed;
+  `pnpm-update.yml` moves those pins.
 - **`.github/workflows/` and `.github/actions/` are owned in
   `.github/CODEOWNERS`**, which `code-owners.yml` enforces in the ruleset's
   place: a change there by anyone but the owner waits for the owner's approval,

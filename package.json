@@ -70,6 +70,7 @@
     "check:root:firebase-emulator-hosts": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-firebase-emulator-hosts.mts",
     "check:root:firebase-redirects": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-firebase-redirects.mts",
     "check:root:format-scripts": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-format-scripts.mts",
+    "check:root:gh-needs-repo": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-gh-needs-repo.mts",
     "check:root:knip-config": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-knip-config.mts",
     "check:root:licenses": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-licenses.mts",
     "check:root:lint": "node ./tools/scripts/cmd/assert-deps-built.mts && oxlint tools/scripts tools/configs && pnpm run z:eslint './tools/{scripts,configs}/**/*.mts' --fix",
