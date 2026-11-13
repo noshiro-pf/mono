@@ -1,11 +1,14 @@
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
-import { Arr, hasKey, isRecord, Result, unknownToString } from 'ts-data-forge';
+import { Arr, isRecord, Result, unknownToString } from 'ts-data-forge';
 import { isDirectlyExecuted } from 'ts-repo-utils';
-import { parse } from 'yaml';
 import { plural } from '../lib/plural.mjs';
 import { listWorkflowFiles } from '../lib/repo-files.mjs';
-import { CHECK_GATES_WORKFLOW } from '../lib/workflow-jobs.mjs';
+import {
+  CHECK_GATES_WORKFLOW,
+  parseWorkflow,
+  workflowTriggers,
+} from '../lib/workflow-jobs.mjs';
 import { projectRootPath } from '../project-root-path.mjs';
 
 /**
@@ -35,9 +38,7 @@ export const checkDispatchInputs = (): Promise<Result<number, string>> =>
       })),
     );
 
-    const violations = yield* Result.safeUnwrap(
-      findDispatchInputViolations(workflows),
-    );
+    const violations = findDispatchInputViolations(workflows);
 
     const configured = yield* Result.safeUnwrap(await readSpeculateWorkflows());
 
@@ -84,35 +85,33 @@ export const speculateWorkflowViolations = (
 };
 
 /**
- * What is wrong with the workflows, one message each, and how many call the
- * gate. None calling it is itself an error: the gate is called by its path, and
- * a rename that left this reading nothing would pass it with nothing checked.
+ * What is wrong with the workflows that call the gate, one message each,
+ * prefixed with the file, and the callers' file names. A workflow that does not
+ * name the gate is not parsed, so a syntax error in one is left to the guards
+ * that read it. None calling it is itself an error: the gate is called by its
+ * path, and a rename that left this reading nothing would pass it with nothing
+ * checked.
  */
 export const findDispatchInputViolations = (
   workflows: readonly Readonly<{ relativePath: string; text: string }>[],
-): Result<
-  Readonly<{ callerNames: readonly string[]; messages: readonly string[] }>,
-  string
-> => {
-  const parsed = workflows.map(({ relativePath, text }) => ({
-    relativePath,
-    workflow: Result.mapErr(
-      Result.fromThrowable((): unknown => parse(text)),
-      (error) => `${relativePath}: ${unknownToString(error)}`,
-    ),
-  }));
+): Readonly<{
+  callerNames: readonly string[];
+  messages: readonly string[];
+}> => {
+  const parsed = workflows
+    .filter(({ text }) => text.includes(CHECK_GATES_WORKFLOW))
+    .map(({ relativePath, text }) => ({
+      relativePath,
+      workflow: parseWorkflow(text),
+    }));
 
   const unparsed = Arr.generate(function* () {
-    for (const { workflow } of parsed) {
+    for (const { relativePath, workflow } of parsed) {
       if (Result.isErr(workflow)) {
-        yield workflow.value;
+        yield { relativePath, error: workflow.value };
       }
     }
   });
-
-  if (Arr.isNonEmpty(unparsed)) {
-    return Result.err(unparsed.join('\n'));
-  }
 
   const callers = Arr.generate(function* () {
     for (const { relativePath, workflow } of parsed) {
@@ -122,39 +121,48 @@ export const findDispatchInputViolations = (
     }
   });
 
-  if (!Arr.isNonEmpty(callers)) {
-    return Result.err(`No workflow calls ${CHECK_GATES_WORKFLOW}.`);
-  }
-
-  return Result.ok({
-    callerNames: callers.map(({ relativePath }) =>
+  return {
+    // A file that names the gate but does not parse is reported below, and
+    // still counted, so that `speculate.workflows` is not told it names a
+    // workflow that does not call the gate.
+    callerNames: [...callers, ...unparsed].map(({ relativePath }) =>
       path.posix.basename(relativePath),
     ),
-    messages: callers.flatMap(({ relativePath, workflow }) =>
-      dispatchInputViolations(workflow).map(
-        (message) => `${relativePath}: ${message}`,
+    messages: [
+      ...unparsed.map(({ relativePath, error }) => `${relativePath}: ${error}`),
+      ...(Arr.isNonEmpty(callers) || Arr.isNonEmpty(unparsed)
+        ? []
+        : [
+            `No workflow calls ${CHECK_GATES_WORKFLOW}: the gate is found by that path, so a rename leaves nothing for this guard to check.`,
+          ]),
+      ...callers.flatMap(({ relativePath, workflow }) =>
+        dispatchInputViolations(workflow).map(
+          (message) => `${relativePath}: ${message}`,
+        ),
       ),
-    ),
-  });
+    ],
+  };
 };
 
 /**
  * What is wrong with one parsed workflow's `workflow_dispatch`, one message
- * each: it has to be a trigger, and declare no input, since a queue dispatches
- * every check workflow with none (README.md, "Triggers").
+ * each: it has to be a trigger, in any form `on:` takes, and declare no input,
+ * since a queue dispatches every check workflow with none (README.md,
+ * "Triggers").
  */
 export const dispatchInputViolations = (
   workflow: unknown,
 ): readonly string[] => {
-  const on = isRecord(workflow) ? workflow['on'] : undefined;
-
-  if (!isRecord(on) || !hasKey(on, 'workflow_dispatch')) {
+  if (!workflowTriggers(workflow).includes('workflow_dispatch')) {
     return [
-      'it does not trigger on `workflow_dispatch` (as a key of `on:`), so a queue cannot dispatch it.',
+      'it does not trigger on `workflow_dispatch`, so a queue cannot dispatch it.',
     ];
   }
 
-  const dispatch = on.workflow_dispatch;
+  const on = isRecord(workflow) ? workflow['on'] : undefined;
+
+  // Only the mapping form can declare inputs.
+  const dispatch = isRecord(on) ? on['workflow_dispatch'] : undefined;
 
   const inputs = isRecord(dispatch) ? dispatch['inputs'] : undefined;
 
@@ -219,14 +227,14 @@ if (isDirectlyExecuted(import.meta.url)) {
     Result.err(unknownToString(error)),
   );
 
+  // Each message says what is wrong on its own, so no header frames them all as
+  // one kind of failure.
   if (Result.isErr(result)) {
     console.error(
-      [
-        '❌ The workflows that call check-gates.yml do not all take a dispatch with',
-        '   no inputs, as the queue sends (README.md, "Triggers"):',
-        '',
-        result.value,
-      ].join('\n'),
+      result.value
+        .split('\n')
+        .map((message) => `❌ ${message}`)
+        .join('\n'),
     );
 
     process.exit(1);

@@ -110,17 +110,20 @@ export const readWorkflowJobs = (
 export const readWorkflowTriggers = (
   text: string,
 ): Result<readonly string[], string> =>
-  Result.map(parseWorkflow(text), (workflow) => {
-    const on = isRecord(workflow) ? workflow['on'] : undefined;
+  Result.map(parseWorkflow(text), workflowTriggers);
 
-    return isString(on)
-      ? [on]
-      : Arr.isArray(on)
-        ? on.filter(isString)
-        : isRecord(on)
-          ? Object.keys(on)
-          : [];
-  });
+/** {@link readWorkflowTriggers} of a workflow {@link parseWorkflow} parsed. */
+export const workflowTriggers = (workflow: unknown): readonly string[] => {
+  const on = isRecord(workflow) ? workflow['on'] : undefined;
+
+  return isString(on)
+    ? [on]
+    : Arr.isArray(on)
+      ? on.filter(isString)
+      : isRecord(on)
+        ? Object.keys(on)
+        : [];
+};
 
 /**
  * Whether a workflow triggers on `event`, by {@link readWorkflowTriggers}. A
@@ -316,7 +319,11 @@ const MATRIX_REFERENCE = /^\$\{\{\s*matrix\.(?<key>[\w-]+)\s*\}\}$/u;
 const VARIABLE_REFERENCE =
   /^\$(?:\{(?<braced>[A-Za-z_]\w*)\}|(?<bare>[A-Za-z_]\w*))$/u;
 
-const parseWorkflow = (text: string): Result<unknown, string> => {
+/**
+ * A workflow file as YAML, or what is wrong with it in one line: the parser's
+ * first, which names the position.
+ */
+export const parseWorkflow = (text: string): Result<unknown, string> => {
   const parsed = Result.fromThrowable((): unknown => parse(text));
 
   return Result.isErr(parsed)
