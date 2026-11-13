@@ -106,13 +106,27 @@ export function minLengthTuple<A>(
         Result.ok(a as unknown as T);
   };
 
-  const fill: Type<T>['fill'] = (a) =>
-    Arr.isArray(a)
-      ? Arr.map(
-          Arr.seq(asUint32(size)),
-          (i) => elementType.fill(a[i]) satisfies A,
-        )
-      : getDefaultValue();
+  const fill: Type<T>['fill'] = (a) => {
+    if (!Arr.isArray(a)) {
+      return getDefaultValue();
+    }
+
+    // Every element of the input is kept, and a shorter one is padded up to
+    // `size`. The indices are walked rather than the array mapped, because
+    // `map` skips the holes of a sparse array and would leave them unfilled:
+    // a hole is not an `A`, so the result is dense and as large as the input's
+    // `length` says, however few entries a sparse input holds.
+    // One pass over the indices, where the `Arr.map(Arr.seq(n), …)` of the
+    // sibling validators builds an index array first: the input may be long.
+    // `asUint32(size)` runs before the lengths are compared, so that a `size`
+    // that is not a length throws for an array of any length and never reaches
+    // `Array.from`, which would take a `NaN` `length` as 0 and drop the input.
+    // The input's own `length` is used as it is, since only a `Proxy` could
+    // report one that is not a length.
+    const length = Math.max(a.length, asUint32(size));
+
+    return Array.from({ length }, (_, i) => elementType.fill(a[i]) satisfies A);
+  };
 
   const prune = (a: T): T => a.map((el) => elementType.prune(el));
 
