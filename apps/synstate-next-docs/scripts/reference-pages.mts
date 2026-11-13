@@ -85,6 +85,10 @@ export const referencePages: readonly ReferencePage[] = [
     'withInitialValue',
     'operators/with-initial-value.mts',
   ]),
+  page('operators', 'drop-initial-value', [
+    'dropInitialValue',
+    'operators/drop-initial-value.mts',
+  ]),
   page('operators', 'with-current-value-from', [
     'withCurrentValueFrom',
     'operators/with-current-value-from.mts',

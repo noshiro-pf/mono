@@ -1,0 +1,50 @@
+---
+title: dropInitialValue
+description: 'Holds no value when created, whatever the source holds, and passes on every value the source emits after that.'
+---
+
+{/* reference:jsdoc */}
+
+Holds no value when created, whatever the source holds, and passes on every value the source emits after that. Unlike `skip(1)`, which drops the first emission of a source that holds no value, it drops only a value held at the start.
+
+{/* /reference */}
+
+{/* reference:operator-kind */}
+
+Its result may hold no value even when the source holds one: `pipe` gives an `Observable` ([`DropInitialValueOperator`](/mono/synstate-next/guides/deriving-values/#pipe)).
+
+{/* /reference */}
+
+## Example
+
+```tsx
+import { dropInitialValue, state } from 'synstate-next';
+import { Optional } from 'ts-std-forge';
+
+const eventId = state('event-1');
+
+// Reacts to a change of the id, not to the id held at the start.
+const eventIdChanged = eventId.pipe(dropInitialValue());
+
+const mut_fetched: string[] = [];
+
+eventIdChanged.subscribe((id) => {
+    mut_fetched.push(id);
+});
+
+assert.isTrue(Optional.isNone(eventIdChanged.getSnapshot()));
+
+assert.deepStrictEqual(mut_fetched, []);
+
+eventId.set('event-2');
+
+assert.deepStrictEqual(mut_fetched, ['event-2']);
+```
+
+## See also
+
+- [`withInitialValue`](/mono/synstate-next/reference/operators/with-initial-value/)
+- [Deriving values](/mono/synstate-next/guides/deriving-values/)
+- [All APIs](/mono/synstate-next/reference/)
+
+[Source on GitHub](https://github.com/noshiro-pf/mono/blob/main/libs/synstate-next/src/operators/drop-initial-value.mts)

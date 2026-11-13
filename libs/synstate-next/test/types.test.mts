@@ -4,6 +4,7 @@ import {
   createOwner,
   createSource,
   derive,
+  dropInitialValue,
   filter,
   keepEqualParts,
   map,
@@ -190,6 +191,16 @@ describe('types', () => {
     const _skipped = s.pipe(skip(1));
 
     expectType<typeof _skipped, Observable<number>>('=');
+
+    const _dropped = s.pipe(dropInitialValue());
+
+    expectType<typeof _dropped, Observable<number>>('=');
+
+    expectType<typeof _dropped, InitializedObservable<number>>('!<=');
+
+    const _droppedOfNone = e.pipe(dropInitialValue());
+
+    expectType<typeof _droppedOfNone, Observable<string>>('=');
 
     const _whiles = s
       .pipe(takeWhile((x) => x > 0))
