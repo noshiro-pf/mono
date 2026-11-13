@@ -19,6 +19,7 @@ import {
   forgetOpenSplitViewTab,
   headerRuleIdForTab,
   installHeaderRule,
+  installInitiatorRule,
   maxEventLogEntries,
   moveOpenSplitViewTab,
   paneIdOfAnswer,
@@ -59,10 +60,10 @@ chrome.action.onClicked.addListener(() => {
 
 chrome.runtime.onInstalled.addListener((details) => {
   // The rule that covers every frame this extension opens. It is a *dynamic*
-  // rule, so it outlives the browser session and does not depend on a page of
-  // ours being open — but it is re-asserted here and on startup because an
-  // extension update clears nothing else about it.
-  ensureInitiatorRule().catch(console.error);
+  // rule, so it outlives the browser session, and an extension update leaves it
+  // as an older build wrote it: it is written afresh here, on every install and
+  // update, so that a change to it in the source reaches every user.
+  installInitiatorRule().catch(console.error);
 
   createContextMenus().catch(console.error);
 

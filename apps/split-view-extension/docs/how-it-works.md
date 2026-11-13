@@ -185,7 +185,11 @@ why the second half is needed at all.
   part of a `chrome-extension://` URL is the extension id, so this matches every
   frame _this extension opens_, in any tab. Dynamic rules outlive the browser
   session, so it is in place before any page of ours is, and no tab id enters
-  into it. An `iframe` in an ordinary page stays blocked, as it should.
+  into it. An `iframe` in an ordinary page stays blocked, as it should. Because
+  it also outlives an extension update, the service worker rewrites it on every
+  install and update (`installInitiatorRule`), so a change to it in the source
+  reaches a rule an older build left behind; a page load only installs it when
+  it is missing.
 - A **session** rule scoped to the split view's tab — for a link clicked
   _inside_ a pane, which the site initiates rather than us, and which the
   initiator-scoped rule therefore does not see.
