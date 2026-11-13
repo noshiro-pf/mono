@@ -178,7 +178,7 @@ type ElementProps<E extends Element> = Readonly<
 - **`ref`** は要素を作った直後、子をマウントする前に 1 回呼ぶ。属性・プロパティの束縛もイベントの登録もまだ行われていない（「6.3」）。
 - 真偽属性（`disabled` など）は `Bindable<boolean>` で受け、`false` で属性を外す。
 - **イベントの props 名**は、イベント名が小文字の 1 語（`pointerdown`）で単語の境目が分からないので、イベント名から props 名（`onPointerDown`）への対応表を型で持つ。表が `HTMLElementEventMap` と `SVGElementEventMap` のキーをすべて覆うことはテストで確かめる。実行時は props 名を小文字にすればイベント名に戻るので、表を読まない。
-- **SVG** の要素は `SVGElementTagNameMap` のうち HTML に無いタグを SVG の名前空間で作る。`a`・`script`・`style`・`title` は HTML にもあるので、どこに書いても HTML の要素になる。SVG のプロパティは `SVGAnimatedLength` などで属性の型を読み取れないので、受け付ける属性は一覧で持つ。一覧の各名前は、その属性を持つ要素に束縛すると DOM のインターフェース（`SVGAnimated*`）か、表示属性なら計算済みスタイルに効くことをブラウザのテストで確かめる。`setAttribute` は SVG の要素では大文字と小文字を区別するので、綴りや大文字小文字を誤った名前（`viewbox`）はそこで落ちる。
+- **SVG** の要素は `SVGElementTagNameMap` のうち HTML に無いタグを SVG の名前空間で作る。`a`・`script`・`style`・`title` は HTML にもあるので、名前空間はマウントする場所で決める（#3941）。`foreignObject` 以外の SVG の要素の下では SVG の、それ以外では HTML の要素になり、HTML のパーサーや React と同じ結果になる。子をマウントする要素、`render`、`Portal`、`For` と切り替え（`If` など）の更新という、親を知っているマウントの入り口がそれぞれ「SVG の下か」を設定し、要素を作るときにそれを読む。手でマウントした記述はどこにも属さないので HTML になる。この 4 つのタグの props の型は HTML の要素のもののままで、SVG の下では `ref` に `SVGAElement` などが渡る（React の型と同じ）。SVG の属性はすべて小文字なので、SVG として作ったこの 4 つでは属性名を小文字にしてから書く（`tabIndex` は `tabindex`）。SVG のプロパティは `SVGAnimatedLength` などで属性の型を読み取れないので、受け付ける属性は一覧で持つ。一覧の各名前は、その属性を持つ要素に束縛すると DOM のインターフェース（`SVGAnimated*`）か、表示属性なら計算済みスタイルに効くことをブラウザのテストで確かめる。`setAttribute` は SVG の要素では大文字と小文字を区別するので、綴りや大文字小文字を誤った名前（`viewbox`）はそこで落ちる。
 
 生成した型がエディタの補完と型検査で重すぎないかを、最初の実装で `tsc --extendedDiagnostics` で測る。
 
@@ -215,7 +215,7 @@ type MountedNodes = Node | readonly Node[];
 
 `mount()` は常に呼び出し側のスコープの `run` の中で呼ばれる。
 
-- **要素**: `document.createElement`（SVG は名前空間付き）→ `ref` → 子を順にマウントして append し、マウント中に保留された更新を適用する（「8.1」）→ 属性・プロパティ・イベントの束縛（「7」）。子を先にするのは、`<select>` の `value` が書かれる時点で `<option>` がそろっているようにするためである。同じ理由で、束縛は props を書いた順に行うが、`value` だけはほかのすべての props の後に束縛する（「7.1」）。要素ごとにスコープは作らない。
+- **要素**: `document.createElement`（SVG は名前空間付き。`a`・`script`・`style`・`title` は SVG の下なら SVG。「5.2」）→ `ref` → 子を順にマウントして append し、マウント中に保留された更新を適用する（「8.1」）→ 属性・プロパティ・イベントの束縛（「7」）。子を先にするのは、`<select>` の `value` が書かれる時点で `<option>` がそろっているようにするためである。同じ理由で、束縛は props を書いた順に行うが、`value` だけはほかのすべての props の後に束縛する（「7.1」）。要素ごとにスコープは作らない。
 - **コンポーネント**: 関数を `props` で 1 回呼び、返った `Mountable` をマウントする。コンポーネントごとにスコープは作らない（「6.4」）。
 - **子要素**: `Mountable` はマウント、`Bindable<string | number>` は Text ノード（「7.2」）、配列は平坦化して順に処理する。
 
