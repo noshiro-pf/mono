@@ -6,6 +6,7 @@ import {
   checkDescription,
   descriptionKindOf,
   readableDescription,
+  reviewOpeningAdditions,
   reviewOpeningOf,
   reviewOpeningRounds,
   splitDescription,
@@ -1009,6 +1010,37 @@ describe(reviewOpeningRounds, () => {
   test('reads no total from another form', () => {
     assert.isUndefined(
       reviewOpeningRounds('Three rounds of `/code-review high`.'),
+    );
+  });
+});
+
+describe(reviewOpeningAdditions, () => {
+  test.each([
+    ['`/code-review high`, 3 rounds; then 2 rounds on the amend.', 2],
+    ['`/code-review high`, 11 rounds, and 4 more on resolving the restack.', 4],
+    ['`/code-review high`, 2 rounds, and 1 more round on the fix.', 1],
+    ['`/code-review high`, 3 rounds: 2 before opening and 1 on the amend.', 0],
+    [
+      '`/code-review high`, 76 rounds: per-command loops, then 22 rounds over the whole diff.',
+      0,
+    ],
+    [
+      '`/code-review high`, 9 rounds: a first loop of 4 rounds, then a new loop of 5 rounds.',
+      0,
+    ],
+    ['`/code-review high`, 4 rounds. Round 1 raised 2 more questions.', 0],
+    ['`/code-review high`, 4 rounds', 0],
+    ['Review at `xhigh`, 12 rounds; then the amend.', 0],
+  ] as const)('reads %j as adding %i', (line, expected) => {
+    assert.strictEqual(reviewOpeningAdditions(line), expected);
+  });
+
+  test('reads no addition from another form', () => {
+    assert.strictEqual(
+      reviewOpeningAdditions(
+        'Three rounds of `/code-review high`, then 2 rounds.',
+      ),
+      0,
     );
   });
 });
