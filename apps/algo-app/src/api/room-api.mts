@@ -18,9 +18,12 @@ export type RoomApi = Readonly<{
   addAction: (roomId: string, action: GameStateActionToWrite) => Promise<void>;
   /**
    * Calls `onChange` with the room now and on every change, until the returned
-   * function is called.
+   * function is called; with `undefined` while there is no room by that id.
    */
-  watchRoom: (roomId: string, onChange: (room: Room) => void) => () => void;
+  watchRoom: (
+    roomId: string,
+    onChange: (room: Room | undefined) => void,
+  ) => () => void;
   /**
    * Calls `onChange` with every action of the room, oldest first, now and on
    * every change, until the returned function is called. Their timestamps are
