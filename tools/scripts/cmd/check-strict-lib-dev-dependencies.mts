@@ -2,7 +2,7 @@ import * as path from 'node:path';
 import { Arr, hasKey, isRecord, Result, unknownToString } from 'ts-data-forge';
 import { getWorkspacePackages, isDirectlyExecuted } from 'ts-repo-utils';
 import { RUNTIME_DEPENDENCY_FIELDS } from '../lib/dependency-fields.mjs';
-import { projectRootPath } from '../project-root-path.mjs';
+import { pathFromRoot, projectRootPath } from '../project-root-path.mjs';
 
 /**
  * Fails when a strict-lib workspace member other than a published bundle — the
@@ -27,10 +27,7 @@ export const checkStrictLibDevDependencies = async (): Promise<
 
   const members = selectStrictLibMembers(
     packages.map((pkg) => ({
-      relativePath: path
-        .relative(projectRootPath, path.join(pkg.path, 'package.json'))
-        .split(path.sep)
-        .join('/'),
+      relativePath: pathFromRoot(path.join(pkg.path, 'package.json')),
       manifest: pkg.packageJson,
     })),
   );

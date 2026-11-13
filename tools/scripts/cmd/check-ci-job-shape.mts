@@ -1,5 +1,4 @@
 import * as fs from 'node:fs/promises';
-import * as path from 'node:path';
 import { Arr, Result, unknownToString } from 'ts-data-forge';
 import { isDirectlyExecuted } from 'ts-repo-utils';
 import {
@@ -23,7 +22,7 @@ import {
   triggersOn,
   type WorkflowJob,
 } from '../lib/workflow-jobs.mjs';
-import { projectRootPath } from '../project-root-path.mjs';
+import { pathFromRoot } from '../project-root-path.mjs';
 import { MATRIX_WORKFLOWS } from './check-all.mjs';
 
 /**
@@ -50,10 +49,7 @@ export const checkCiJobShape = (): Promise<Result<number, string>> =>
         const text = await fs.readFile(workflowPath, 'utf8');
 
         return {
-          relativePath: path
-            .relative(projectRootPath, workflowPath)
-            .split(path.sep)
-            .join('/'),
+          relativePath: pathFromRoot(workflowPath),
           text,
           isCheck: triggersOn(text, 'pull_request'),
         };

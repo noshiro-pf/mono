@@ -15,7 +15,7 @@ import {
   FORGOTTEN_EXPORTS_PRIVATE_READ,
   forgottenExportsEntryPoints,
 } from '../lib/forgotten-exports-scope.mjs';
-import { projectRootPath } from '../project-root-path.mjs';
+import { pathFromRoot, projectRootPath } from '../project-root-path.mjs';
 
 /**
  * Fails when a declaration that a package's entry points export names a type
@@ -223,7 +223,7 @@ export const packagesRead = (
       const entryPoints = forgottenExportsEntryPoints(
         {
           name: pkg.name,
-          dir: path.relative(rootDir, pkg.path).split(path.sep).join('/'),
+          dir: pathFromRoot(pkg.path, rootDir),
           manifest,
         },
         privateRead,

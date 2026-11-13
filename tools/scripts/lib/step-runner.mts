@@ -4,7 +4,7 @@ import * as path from 'node:path';
 import { Arr } from 'ts-data-forge';
 import type { ReadonlyRecord } from 'ts-type-forge';
 import { projectRootPath } from '../project-root-path.mjs';
-import { runFile } from './child-process.mjs';
+import { describeFailure, runFile } from './child-process.mjs';
 
 /**
  * What `check-changed`, `z:ci-job` and `check-all` share to run a step: one
@@ -99,7 +99,7 @@ export const git = async (
   });
 
   if (result.status !== 0) {
-    throw new Error(`git ${args.join(' ')} failed:\n${result.stderr}`);
+    throw new Error(`git ${args.join(' ')} failed: ${describeFailure(result)}`);
   }
 
   return result.stdout;

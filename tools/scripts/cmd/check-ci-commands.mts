@@ -32,7 +32,7 @@ import {
   triggersOn,
   type Matrix,
 } from '../lib/workflow-jobs.mjs';
-import { projectRootPath } from '../project-root-path.mjs';
+import { pathFromRoot, projectRootPath } from '../project-root-path.mjs';
 
 /**
  * Asks both directions of the same question about the check workflows: is any
@@ -967,10 +967,7 @@ export const readManifests = async (): Promise<
     .map((workspacePackage): Manifest => ({
       name: workspacePackage.name,
       // `/`-separated, as check-changed names directories.
-      directory: path
-        .relative(projectRootPath, workspacePackage.path)
-        .split(path.sep)
-        .join('/'),
+      directory: pathFromRoot(workspacePackage.path),
       scripts: readScripts(workspacePackage.packageJson),
     }))
     .toSorted((a, b) => a.directory.localeCompare(b.directory));

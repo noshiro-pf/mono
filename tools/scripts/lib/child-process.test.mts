@@ -1,5 +1,5 @@
 import * as path from 'node:path';
-import { runFile, runInherited } from './child-process.mjs';
+import { describeFailure, runFile, runInherited } from './child-process.mjs';
 
 /** `node -e script`: a child whose behavior each test writes out. */
 const node = (script: string): readonly [string, readonly string[]] =>
@@ -110,5 +110,48 @@ describe(runInherited, () => {
     assert.isNull(result.status);
 
     assert.isDefined(result.error);
+  });
+});
+
+describe(describeFailure, () => {
+  const ended = {
+    status: null,
+    signal: null,
+    stdout: '',
+    stderr: '',
+    error: undefined,
+  } as const;
+
+  test('names the error of a process that did not start (#4031)', () => {
+    assert.strictEqual(
+      describeFailure({ ...ended, error: new Error('spawn nope ENOENT') }),
+      'spawn nope ENOENT',
+    );
+  });
+
+  test('names the signal that stopped it', () => {
+    assert.strictEqual(
+      describeFailure({ ...ended, signal: 'SIGKILL' }),
+      'killed by SIGKILL',
+    );
+  });
+
+  test('gives the status, with stderr trimmed when there is any', () => {
+    assert.strictEqual(
+      describeFailure({ ...ended, status: 128, stderr: 'fatal: bad\n' }),
+      'exited with 128: fatal: bad',
+    );
+
+    assert.strictEqual(
+      describeFailure({ ...ended, status: 2, stderr: ' \n' }),
+      'exited with 2',
+    );
+  });
+
+  test('reads a result with no output, as runInherited gives', () => {
+    assert.strictEqual(
+      describeFailure({ status: 1, signal: null, error: undefined }),
+      'exited with 1',
+    );
   });
 });

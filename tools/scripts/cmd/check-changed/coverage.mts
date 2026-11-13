@@ -1,5 +1,6 @@
 import * as path from 'node:path';
 import { Arr, Num, Result } from 'ts-data-forge';
+import { pathFromRoot, toPosixPath } from '../../project-root-path.mjs';
 
 /**
  * Line hits from an `lcov.info`, by repository-relative path.
@@ -26,7 +27,7 @@ export const parseLcov = ({
 }>): ReadonlyMap<string, ReadonlyMap<number, number>> => {
   const mut_result = new Map<string, Map<number, number>>();
 
-  const packagePrefix = toPosix(path.relative(rootDir, packageDir));
+  const packagePrefix = pathFromRoot(packageDir, rootDir);
 
   const mut_current: { hits: Map<number, number> | undefined } = {
     hits: undefined,
@@ -41,11 +42,11 @@ export const parseLcov = ({
       const absolute = path.isAbsolute(source)
         ? source
         : packagePrefix !== '' &&
-            toPosix(source).startsWith(`${packagePrefix}/`)
+            toPosixPath(source).startsWith(`${packagePrefix}/`)
           ? path.resolve(rootDir, source)
           : path.resolve(packageDir, source);
 
-      const file = toPosix(path.relative(rootDir, absolute));
+      const file = pathFromRoot(absolute, rootDir);
 
       const hits = mut_result.get(file) ?? new Map<number, number>();
 
@@ -116,7 +117,5 @@ export const uncoveredChangedLines = ({
 /** A capture of `\d+`, or `NaN` for anything else. */
 const toInt = (digits: string | undefined): number =>
   Result.unwrapOkOr(Num.safeParseInt(digits ?? ''), Number.NaN);
-
-const toPosix = (p: string): string => p.split(path.sep).join('/');
 
 const DA_RECORD = /^DA:(\d+),(\d+)/u;

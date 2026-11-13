@@ -5,7 +5,7 @@ import { getWorkspacePackages, glob, isDirectlyExecuted } from 'ts-repo-utils';
 import type { ReadonlyRecord } from 'ts-type-forge';
 import * as ts from 'typescript';
 import { readScripts } from '../lib/manifest-scripts.mjs';
-import { projectRootPath } from '../project-root-path.mjs';
+import { projectRootPath, toPosixPath } from '../project-root-path.mjs';
 
 /**
  * Fails when a workspace member formats with Prettier other than through
@@ -72,7 +72,7 @@ export const checkFormatScripts = async (): Promise<Result<number, string>> => {
  * how any of its scripts runs `format-package.mts`.
  */
 export const expectedFixFmtFull = (dir: string): string => {
-  const up = path.posix.relative(dir.split(path.sep).join('/'), '.');
+  const up = path.posix.relative(toPosixPath(dir), '.');
 
   return `tsx --tsconfig ${up}/tools/configs/tsconfig.tsx.json ${up}/tools/scripts/cmd/format-package.mts`;
 };

@@ -8,7 +8,7 @@ import { Arr, Json, Result, unknownToString } from 'ts-data-forge';
 import * as t from 'ts-fortress';
 import { isDirectlyExecuted } from 'ts-repo-utils';
 import { closingStdin } from '../lib/child-process.mjs';
-import { projectRootPath } from '../project-root-path.mjs';
+import { pathFromRoot, projectRootPath } from '../project-root-path.mjs';
 
 /**
  * Writes each package's LICENSE from the license its own `package.json`
@@ -412,8 +412,7 @@ const readManifest = (
     : Result.ok(validated.value);
 };
 
-const toRepoRelative = (absolute: string): string =>
-  path.relative(projectRootPath, absolute).split(path.sep).join('/');
+const toRepoRelative = (absolute: string): string => pathFromRoot(absolute);
 
 const execFileAsync = util.promisify(execFile);
 

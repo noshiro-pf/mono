@@ -1,5 +1,5 @@
 import { projectRootPath } from '../project-root-path.mjs';
-import { runFile } from './child-process.mjs';
+import { describeFailure, runFile } from './child-process.mjs';
 
 /**
  * The commit the `check:prose` guards that read a change compare the tree with:
@@ -50,7 +50,7 @@ export const resolveDiffBase = async (
     throw new Error(
       [
         `Could not find the commit to ${purpose}: ${variable} is`,
-        `not set, and \`git merge-base HEAD origin/main\` failed: ${mergeBase.stderr.trim()}`,
+        `not set, and \`git merge-base HEAD origin/main\` failed: ${describeFailure(mergeBase)}`,
         `Fetch origin/main, or set ${variable} to the base of the change.`,
       ].join('\n'),
     );
