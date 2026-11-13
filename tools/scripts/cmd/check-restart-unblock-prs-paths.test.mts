@@ -375,12 +375,11 @@ describe('parseSourceMapped', () => {
         {
           // A comment, as the real file has.
           "compilerOptions": {
-            "baseUrl": "../..",
             "paths": {
-              "core": ["libs/core/src/entry-point.mts"],
-              "gone": ["libs/gone/src/entry-point.mts"],
-              "second": ["libs/second/src/x.mts", "libs/core/src/entry-point.mts"],
-              "core/*": ["libs/core/src/*"],
+              "core": ["../../libs/core/src/entry-point.mts"],
+              "gone": ["../../libs/gone/src/entry-point.mts"],
+              "second": ["../../libs/second/src/x.mts", "../../libs/core/src/entry-point.mts"],
+              "core/*": ["../../libs/core/src/*"],
             },
           },
         }
@@ -399,11 +398,29 @@ describe('parseSourceMapped', () => {
     assert.include(Result.unwrapErr(mapped), 'could not be parsed');
   });
 
-  test('fails on a file with no paths', () => {
+  test('fails on a baseUrl, which TypeScript 7 ignores (#4030)', () => {
     const mapped = parseSourceMapped(
-      '{ "compilerOptions": { "baseUrl": "../.." } }',
+      dedent`
+        {
+          "compilerOptions": {
+            "baseUrl": "../..",
+            "paths": { "core": ["libs/core/src/entry-point.mts"] },
+          },
+        }
+      `,
       isSource,
     );
+
+    assert.isTrue(Result.isErr(mapped));
+
+    assert.include(
+      Result.unwrapErr(mapped),
+      'write `paths` relative to the configuration file',
+    );
+  });
+
+  test('fails on a file with no paths', () => {
+    const mapped = parseSourceMapped('{ "compilerOptions": {} }', isSource);
 
     assert.isTrue(Result.isErr(mapped));
 
