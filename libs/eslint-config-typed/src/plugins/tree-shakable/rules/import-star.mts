@@ -9,7 +9,7 @@ export const importStarRule: TSESLint.RuleModule<MessageIds> = {
     type: 'problem',
     docs: {
       description:
-        'Forbits non-tree-shakable access to module name space objects.',
+        'Forbid non-tree-shakable access to module name space objects.',
     },
     messages: {
       'non-tree-shakable-access':

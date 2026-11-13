@@ -1,4 +1,4 @@
-import type { ESLintPlugin } from '../../../types/index.mjs';
+import type { ESLintPlugin } from '../types.mjs';
 import { mutPrefixedDraftRule } from './mut-prefixed-draft.mjs';
 import { preferCurriedProduceRule } from './prefer-curried-produce.mjs';
 
