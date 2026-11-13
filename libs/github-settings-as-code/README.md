@@ -44,6 +44,10 @@ repo-settings backup
 repo-settings apply --owner noshiro-pf --repo ts-repo-utils
 ```
 
+A command line the CLI does not understand is refused before anything is sent to
+GitHub, with the help: an option it does not have (there is no `--dry-run`);
+`--owner` or `--repo` without a value or with an empty one; or a third argument.
+
 `backup` rewrites the settings files themselves from what GitHub currently has —
 there is one copy of each resource, not a declaration and a mirror of it.
 `apply` reads the values back from GitHub afterwards and rewrites the files with
