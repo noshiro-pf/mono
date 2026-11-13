@@ -5,6 +5,7 @@ export { readQueueState, type QueueState } from './pr-report/index.mjs';
 export {
   DEFERRAL_REASONS,
   deferralReasonOf,
+  reviewOpeningAdditions,
   reviewOpeningOf,
   reviewOpeningRounds,
   type DeferralReason,
