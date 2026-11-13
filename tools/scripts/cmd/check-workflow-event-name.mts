@@ -19,7 +19,7 @@ import { projectRootPath } from '../project-root-path.mjs';
  * symptom: nothing errors, nothing is red, and the expression quietly stops
  * being a condition.
  *
- * Three workflows here are built on one: `cancel-in-progress` is written as
+ * Several workflows here are built on one: `cancel-in-progress` is written as
  * `${{ github.event_name == 'pull_request' }}` (or `'pull_request_target'`)
  * rather than `true` so that a run of their other triggers is left alone.
  * Left naming the old event after a trigger moves, that expression turns

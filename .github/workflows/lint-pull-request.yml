@@ -2,13 +2,12 @@
 
 name: Lint Pull Request
 
-# Four checks on the pull request itself rather than on its tree: the title,
-# the commit messages, the commit count, and the code owners' approval. Each
-# job's name is its required context. `pull_request_target`, and why nothing
-# here checks the branch out,
-# is in README.md under "`pull_request_target`"; why these jobs run under
-# `skip-ci` when every other check skips is under "`skip-ci` and
-# `no-skip-ci-label`" there.
+# Three checks on the pull request itself rather than on its tree: the title,
+# the commit messages and the commit count, one required context between them,
+# `lint-pull-request-result / result`. The code owners' approval is
+# `code-owners.yml`. `pull_request_target`, and why nothing here checks the
+# branch out, is in README.md under "`pull_request_target`". How `skip-ci`
+# holds the three is above the jobs below.
 
 on:
   pull_request_target:
@@ -21,20 +20,35 @@ on:
       - '!archive/**'
     types:
       - opened
-      # Title, body or base branch — the one check workflow that reads
-      # `edited`, because the title is its input. A body edit re-runs every
-      # job as well, and has to: a job skipped on "the title did not change"
-      # would report `skipped` for a required context and supersede a red
-      # title check with a satisfied one.
+      # Title, body or base branch; the title is what this workflow reads it
+      # for. Under `skip-ci` an edit that leaves the title alone judges nothing
+      # (see above the jobs); otherwise every edit re-runs all three.
       - edited
       - synchronize
       - labeled
       - unlabeled
 
 # The title is edited and the branch pushed to in bursts; only the last state
-# is worth a run.
+# is worth a run, and a newer run cancels the older one. The older run's
+# aggregate, `always()`, still reports red on the head it was judging, until a
+# judging run on that head replaces it; after a push that head is no longer the
+# pull request's. Under `skip-ci`, an event that judges nothing (a label, a
+# push, or an edit that leaves the title alone) runs in a group of its own, one
+# per run, so that it never cancels or replaces a run that judges (the `opened`
+# run `open-pr`'s labels arrive seconds after, a title edit's, or the
+# `unlabeled` run `unblock-prs` starts while the run for its push may still be
+# on its way) and no other run cancels it: cancelled before its jobs' `if` was
+# read, it would leave them `cancelled` rather than `skipped`, and its aggregate
+# red.
 concurrency:
-  group: ${{ github.workflow }}-${{ case(github.event_name == 'pull_request_target', github.event.pull_request.number, github.ref) }}
+  group: >-
+    ${{ github.workflow }}-${{ case(github.event_name == 'pull_request_target', github.event.pull_request.number, github.ref) }}${{
+      case(
+        contains(github.event.pull_request.labels.*.name, 'skip-ci') &&
+        !(github.event.action == 'opened' ||
+          (github.event.action == 'edited' && github.event.changes.title != '')),
+        format('-idle-{0}', github.run_id),
+        '') }}
   cancel-in-progress: ${{ github.event_name == 'pull_request_target' }}
 
 permissions:
@@ -57,25 +71,47 @@ env:
   LC_ALL: C.UTF-8
 
 jobs:
-  # No `skip-ci` condition, unlike every other check. Each job here is its own
-  # required context, and a job skipped by its `if` reports `skipped` under
-  # that name, which supersedes the verdict it had: putting `skip-ci` on a
-  # pull request whose title check was red would satisfy that check in the
-  # seconds before `no-skip-ci-label` turns `pending`. The aggregates in the
-  # check workflows avoid this by skipping their caller instead, which these
-  # jobs, having no caller, cannot. They read the API for seconds, so running
-  # them always costs next to nothing and always reports a real verdict.
+  # The title, the commit messages and the commit count are judged by one
+  # required context, `lint-pull-request-result / result`, which calls
+  # `check-result.yml` as the check workflows do, so that `skip-ci` holds
+  # these three the way it holds those.
   #
-  # A fifth check goes into an aggregate rather than beside these: move the
-  # first three jobs behind one `lint-pull-request-result` that calls
-  # `check-result.yml` the way the check workflows do, and make that one
-  # required context. Each job added here is otherwise one more context in
-  # `repo-settings/rulesets/main.json`, which takes `repo-settings:apply` by
-  # hand before it holds anything. `code-owners` stays a context of its own
-  # either way: `.github/CODEOWNERS` names it as the check that enforces the
-  # file, and the merge queue tells its failure from the others' by that name.
+  # Under `skip-ci`, the three jobs and their caller skip on the events that
+  # bring no new title, and the aggregate reports nothing. Taking the label
+  # off runs them, and `unblock-prs` does that after it has restacked the
+  # branch. Never reporting `skipped` is the point: a skipped aggregate would
+  # satisfy the required context while `no-skip-ci-label` may still say
+  # `success`.
+  #
+  # - `labeled` / `unlabeled`: the last verdict stands, as in the check
+  #   workflows ("A label event under `skip-ci`" in README.md).
+  # - `synchronize`: the new head has no verdict, which holds it.
+  # - `edited` without a title change: a body edit changes nothing judged
+  #   here, and a base change is the case this exists for. When the layer
+  #   below merges, GitHub moves this pull request onto `main` while its
+  #   branch still holds that layer's own commit, which the commit count would
+  #   read as a second one until the restack. The workflow reads only pull
+  #   requests into `main`, and a layer's head was pushed while it was based
+  #   on the layer below, so that head has no verdict, which holds it.
+  #
+  # A title edit runs the three under `skip-ci` too, so that a title edited in
+  # the seconds after the label went on is judged rather than left on the
+  # verdict given to the old one. On a layer moved onto `main` and not yet
+  # restacked, that verdict is the commit count's red until the restack.
+  #
+  # A new check joins the aggregate's `needs` and takes the anchor as its
+  # `if`.
   semantic-pull-request:
     name: Validate PR title
+    # The events that judge, named once: the other two jobs take this by its
+    # anchor and the aggregate skips when they do. The concurrency group at
+    # the top writes its negation under `skip-ci` by hand, since a YAML anchor
+    # cannot reach into an expression;
+    # `pnpm run check:root:lint-pull-request-groups` keeps the two fitting.
+    if: &judges >-
+      !contains(github.event.pull_request.labels.*.name, 'skip-ci') ||
+      github.event.action == 'opened' ||
+      (github.event.action == 'edited' && github.event.changes.title != '')
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -108,6 +144,7 @@ jobs:
 
   commit-messages:
     name: Validate commit messages
+    if: *judges
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -151,6 +188,7 @@ jobs:
 
   commit-count:
     name: Validate commit count
+    if: *judges
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -171,9 +209,10 @@ jobs:
       # workflow, filtered to `main`, does not run on it at all. When the layer
       # below merges, GitHub moves its base to `main`, and until it is rebased
       # (unless GitHub rebased it in that move) it still carries the original
-      # commit of the layer that was squashed into `main`: the count reads 2
-      # and this context is red. `unblock-prs` rebases a layer before it arms
-      # auto-merge, so nothing merges in that window.
+      # commit of the layer that was squashed into `main`, so the count would
+      # read 2. Under `skip-ci` this job does not run on that move (see above
+      # the jobs); without the label it does, and is red until `unblock-prs`
+      # or `auto-rebase` restacks the branch.
       - name: Check that the branch is a single commit
         env:
           GH_TOKEN: ${{ github.token }}
@@ -205,251 +244,21 @@ jobs:
           } >>"${GITHUB_STEP_SUMMARY}"
           exit 1
 
-  # `.github/CODEOWNERS`, enforced here rather than by the ruleset's
-  # `require_code_owner_review`: every changed path it gives owners needs its
-  # author, and everyone who pushed to its branch, to be among them, or one of
-  # them to have approved the head. The
-  # ruleset's rule cannot tell the author apart — GitHub does not let an author
-  # approve their own pull request — so under it the owner's own pull requests
-  # merged only by a ruleset bypass, while what the file guards against is
-  # someone else's: a bot's (`pnpm-update.yml` opens one queued, to auto-merge)
-  # or a fork's. Why each path is listed is in the file.
-  #
-  # The file is read as the base branch has it, so a pull request cannot
-  # rewrite the rules it is judged by. `pr-report-core` (`code-owners.mts`)
-  # works out the same wait for the merge queue and the Pull Requests Manager,
-  # from the `enforced-by:` line at the file's head, which names this job.
-  #
-  # An approval given after this ran does not re-run it: no event this
-  # workflow can take carries a review (`pull_request_review` runs the pull
-  # request's own copy of the workflow, which would let it judge itself).
-  # `unblock-prs` re-runs the failed jobs of a queued pull request that has
-  # since been approved; anything else is re-run by hand.
-  code-owners:
-    name: Validate code owners
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    steps:
-      # The file, the changed files and the reviews from the API, as the jobs
-      # above read the commits: nothing from the pull request is checked out or
-      # run. A rename counts from both ends, since moving a workflow away
-      # changes what runs as surely as editing it.
-      - name: Check that an owner wrote or approved every owned path
-        env:
-          GH_TOKEN: ${{ github.token }}
-          PR_NUMBER: ${{ github.event.pull_request.number }}
-          AUTHOR: ${{ github.event.pull_request.user.login }}
-          BASE_SHA: ${{ github.event.pull_request.base.sha }}
-          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
-          HEAD_REF: ${{ github.event.pull_request.head.ref }}
-          HEAD_REPO: ${{ github.event.pull_request.head.repo.full_name }}
-          CHANGED_FILES: ${{ github.event.pull_request.changed_files }}
-          # How long to wait before reading the branch's pushes again.
-          PUSHES_RETRY_SECONDS: '6'
-        run: |
-          fail() {
-            echo "::error::${1}"
-            printf '%s\n' "${1}" >>"${GITHUB_STEP_SUMMARY}"
-            if [ -n "${2:-}" ]; then
-              printf '%s' "${2}"
-              {
-                echo
-                echo '```text'
-                printf '%s' "${2}"
-                echo '```'
-              } >>"${GITHUB_STEP_SUMMARY}"
-            fi
-            exit 1
-          }
-
-          if ! gh api "repos/${GITHUB_REPOSITORY}/contents/.github/CODEOWNERS?ref=${BASE_SHA}" --jq '.content' >codeowners.b64; then
-            fail "Cannot read .github/CODEOWNERS at the base, ${BASE_SHA}."
-          fi
-          base64 -d codeowners.b64 >codeowners.txt
-
-          # One rule per line: the pattern, then its owners as lower-case
-          # logins. Only the shapes the file's header allows are read; any
-          # other line makes the file unreadable here, which fails rather than
-          # leaving its paths unowned.
-          patterns=()
-          owners=()
-          unreadable=''
-          # `|| [ -n … ]`: a last line with no newline after it is still a rule.
-          while IFS= read -r line || [ -n "${line}" ]; do
-            line="${line%%#*}"
-            read -r -a fields <<<"${line}"
-            [ "${#fields[@]}" -gt 0 ] || continue
-            pattern="${fields[0]}"
-            case "${pattern}" in
-              /*[*?[\\!]* | /) unreadable="${unreadable}${line}"$'\n'; continue ;;
-              /*) ;;
-              *) unreadable="${unreadable}${line}"$'\n'; continue ;;
-            esac
-            list=''
-            for owner in "${fields[@]:1}"; do
-              case "${owner}" in
-                @*/* | @ | [!@]*) unreadable="${unreadable}${line}"$'\n'; continue 2 ;;
-              esac
-              list="${list} ${owner#@}"
-            done
-            patterns+=("${pattern#/}")
-            owners+=("$(printf '%s' "${list# }" | tr '[:upper:]' '[:lower:]')")
-          done <codeowners.txt
-
-          if [ -n "${unreadable}" ]; then
-            # shellcheck disable=SC2016 # literal backticks, not command substitution
-            fail '.github/CODEOWNERS has lines this check cannot read: a pattern must start with `/` and hold no wildcard, and an owner must be one `@login`.' "${unreadable}"
-          fi
-
-          # The owners of a path: those of the last pattern that matches it. A
-          # pattern ending in `/` owns what is under it; any other owns itself
-          # and what is under it, as `pr-report-core` reads it.
-          owners_of() {
-            local i match=''
-            for i in "${!patterns[@]}"; do
-              case "${patterns[i]}" in
-                */) case "${1}" in "${patterns[i]}"*) match="${owners[i]}" ;; esac ;;
-                *) case "${1}" in "${patterns[i]}" | "${patterns[i]}"/*) match="${owners[i]}" ;; esac ;;
-              esac
-            done
-            printf '%s' "${match}"
-          }
-
-          # One line per changed file: its name, then a tab and its old name if
-          # it was renamed. `@tsv` escapes a tab, a newline or a backslash in a
-          # name, so that a line is exactly one file and the count below cannot
-          # be padded by a name holding newlines. An escaped name still matches
-          # what it did: no pattern this reads holds any of the three.
-          gh api --paginate "repos/${GITHUB_REPOSITORY}/pulls/${PR_NUMBER}/files?per_page=100" \
-            --jq '.[] | [.filename, (.previous_filename // empty)] | @tsv' >changed-files.txt
-
-          # The endpoint lists at most 3,000 files. Fewer than the pull request
-          # changed would leave the rest unread, so that fails rather than
-          # passes, and so does a count the payload did not carry.
-          listed="$(wc -l <changed-files.txt)"
-          case "${CHANGED_FILES}" in
-            '' | *[!0-9]*)
-              fail "The event carries no count of changed files (\"${CHANGED_FILES}\"), so whether the ${listed} listed are all of them cannot be told."
-              ;;
-          esac
-          if [ "${listed}" -lt "${CHANGED_FILES}" ]; then
-            fail "The pull request changes ${CHANGED_FILES} files and the API listed ${listed}, so whether an owned path is among them cannot be told."
-          fi
-
-          # Who approves: each reviewer's latest review that is not a comment,
-          # as GitHub counts it, and as `pr-report-core` reads it. A push that
-          # changes the diff dismisses an approval (the ruleset's
-          # `dismiss_stale_reviews_on_push`), so one still standing is of what
-          # the head holds; a rebase that changes nothing keeps it.
-          gh api --paginate "repos/${GITHUB_REPOSITORY}/pulls/${PR_NUMBER}/reviews?per_page=100" \
-            --jq '.[] | select(.state != "COMMENTED" and .state != "PENDING") | [((.user.login // "") | ascii_downcase), .state] | join("\t")' >reviews.txt
-          approved=' '
-          while IFS=$'\t' read -r login state; do
-            approved="${approved// "${login}" / }"
-            if [ "${state}" = 'APPROVED' ]; then
-              approved="${approved}${login} "
-            fi
-          done <reviews.txt
-
-          author="$(printf '%s' "${AUTHOR}" | tr '[:upper:]' '[:lower:]')"
-
-          # Who wrote the head: the author and everyone who pushed to the
-          # branch. The author stands for a path they own only where every
-          # writer owns it too; otherwise a commit another writer pushed to the
-          # owner's branch would pass as the owner's — and one pushed and then
-          # rewritten away still counts, since nothing here can tell what the
-          # rewrite kept. Read from the repository's activity, which names each
-          # push's actor (the timeline does not): every push since the branch
-          # was last created, chained `before` to `after`, ending at the head.
-          # One page is read, newest first, and replayed oldest first from the
-          # last creation in it, as `readPushers` in `unblock-prs` reads it for
-          # `pushersOf` in `pr-report-core`. Anything short of that leaves the
-          # writers untold, and the author stands for nothing: a gap, an actor
-          # missing, a creation older than that page or than the activity
-          # GitHub keeps, or a fork's branch, whose pushes are not this
-          # repository's. A push is recorded as it
-          # lands, which can trail this event, so a chain short of the head is
-          # read again a few times. Read once, and only for a path the author
-          # owns that no owner has approved: nothing else depends on it.
-          writers=''
-          writers_read=false
-          read_writers() {
-            writers_read=true
-            [ "${HEAD_REPO}" = "${GITHUB_REPOSITORY}" ] || return 0
-            local attempt type before after actor chain pushers
-            for attempt in 1 2 3 4 5; do
-              if gh api -X GET "repos/${GITHUB_REPOSITORY}/activity" \
-                -f ref="refs/heads/${HEAD_REF}" -f direction=desc -f per_page=100 \
-                --jq 'reverse | .[] | [.activity_type, .before, .after, ((.actor.login // "") | ascii_downcase)] | @tsv' \
-                </dev/null >activity.txt; then
-                chain=''
-                pushers=''
-                while IFS=$'\t' read -r type before after actor; do
-                  case "${type}" in
-                    branch_creation)
-                      if [ -n "${actor}" ]; then
-                        chain="${after}" pushers="${actor}"
-                      else
-                        chain='untold' pushers=''
-                      fi
-                      ;;
-                    branch_deletion) chain='' pushers='' ;;
-                    push | force_push)
-                      if [ -n "${chain}" ] && [ "${before}" = "${chain}" ] && [ -n "${actor}" ]; then
-                        chain="${after}" pushers="${pushers} ${actor}"
-                      else
-                        chain='untold'
-                      fi
-                      ;;
-                  esac
-                done <activity.txt
-                if [ -n "${pushers}" ] && [ "${chain}" = "${HEAD_SHA}" ]; then
-                  writers="$(printf '%s %s' "${author}" "${pushers}" | tr -s ' ' '\n' | sort -u | tr '\n' ' ')"
-                  writers="${writers# }"
-                  return 0
-                fi
-              fi
-              if [ "${attempt}" -lt 5 ]; then
-                sleep "${PUSHES_RETRY_SECONDS}"
-              fi
-            done
-          }
-
-          waiting=''
-          while IFS=$'\t' read -r name old_name; do
-            for file in "${name}" "${old_name}"; do
-              [ -n "${file}" ] || continue
-              file_owners="$(owners_of "${file}")"
-              [ -n "${file_owners}" ] || continue
-              for owner in ${file_owners}; do
-                case "${approved}" in *" ${owner} "*) continue 2 ;; esac
-              done
-              case " ${file_owners} " in
-                *" ${author} "*)
-                  [ "${writers_read}" = true ] || read_writers
-                  if [ -n "${writers}" ]; then
-                    every_writer_owns=true
-                    for writer in ${writers}; do
-                      case " ${file_owners} " in *" ${writer} "*) ;; *) every_writer_owns=false ;; esac
-                    done
-                    [ "${every_writer_owns}" = false ] || continue
-                  fi
-                  ;;
-              esac
-              waiting="${waiting}${file} (@${file_owners// / @})"$'\n'
-            done
-          done <changed-files.txt
-
-          if [ -z "${waiting}" ]; then
-            echo "Every owned path is approved by an owner, or owned by ${AUTHOR} and everyone who pushed to the branch."
-            exit 0
-          fi
-
-          if [ "${writers_read}" = false ]; then
-            pushed_by=''
-          elif [ -n "${writers}" ]; then
-            pushed_by=" ${AUTHOR} stands for a path they own only where everyone who pushed to the branch owns it too: it was written by ${writers% } (a push counts even once rewritten away)."
-          else
-            pushed_by=" ${AUTHOR} stands for a path they own only where everyone who pushed to the branch owns it too, and who did cannot be told."
-          fi
-          fail "No owner has approved these.${pushed_by} An owner's approval, then a re-run of this job, lets it merge:" "$(printf '%s' "${waiting}" | sort -u)"$'\n'
+  # The one required context of the three jobs above.
+  lint-pull-request-result:
+    needs:
+      - semantic-pull-request
+      - commit-messages
+      - commit-count
+    # Skipped with the jobs, by their shared condition, and only then: a
+    # failed or cancelled job still gets a verdict. Every need takes
+    # `&judges` alone; one with a condition of its own would skip this job
+    # with it and leave the head with no verdict.
+    #
+    # `check-result.yml` skips on `skip-ci` only for `pull_request`, never for
+    # this workflow's `pull_request_target`: a run that judges under the label
+    # must report its verdict, not `skipped`.
+    if: always() && !contains(needs.*.result, 'skipped')
+    uses: ./.github/workflows/check-result.yml
+    with:
+      needs: ${{ toJSON(needs) }}

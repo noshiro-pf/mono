@@ -8,10 +8,10 @@ name: Verify Lockfile
 # kept current is in README.md under "Action pins and the lockfile".
 #
 # Its one job is its own required context (`verify-lockfile` in
-# `repo-settings/rulesets/main.json`), as the `lint-pull-request.yml` jobs are,
-# rather than a gate and an aggregate: it runs no repository code — the
-# extension reads the workflow files as data — and takes seconds, so it runs
-# on every event and always reports a real verdict. That is also why it carries
+# `repo-settings/rulesets/main.json`), rather than a gate and an aggregate:
+# it runs no repository code — the extension reads the workflow files as data
+# — and takes seconds, so it runs on every event it takes and always reports a
+# real verdict. That is also why it carries
 # no `skip-ci` condition and no `paths` filter: either would leave the
 # required context `skipped`, or never reported, on a head nothing verified,
 # and since this workflow does not run on `unlabeled`, taking `skip-ci` off

@@ -13,30 +13,31 @@ GitHub shows a `.github/README.md` in place of the root one.
 
 ## Inventory
 
-| Workflow                         | Runs on                                | Reports a required context                     |
-| :------------------------------- | :------------------------------------- | :--------------------------------------------- |
-| `code-check.yml`                 | pull requests; `push` to `main`        | `code-check-result / result`                   |
-| `style-check.yml`                | pull requests; `push` to `main`        | `style-check-result / result`                  |
-| `strict-lib-gen.yml`             | pull requests; `push` to `main`        | `strict-lib-gen-result / result`               |
-| `node-version-compatibility.yml` | pull requests; `push` to `main`        | `test-node-versions-result / result`           |
-| `verify-published-packages.yml`  | pull requests; `push` to `main`        | `verify-published-result / result`             |
-| `synstate-benchmark.yml`         | pull requests; `push` to `main`        | `synstate-benchmark-result / result`           |
-| `check-gates.yml`                | `workflow_call`, from the six above    | none; it is the gate the six share             |
-| `check-result.yml`               | `workflow_call`, from the six above    | the six above; it is their aggregate           |
-| `skip-ci-label.yml`              | `pull_request_target`                  | the `no-skip-ci-label` commit status           |
-| `lint-pull-request.yml`          | `pull_request_target`                  | its four jobs, by name                         |
-| `verify-lockfile.yml`            | pull requests; `push` to `main`        | `verify-lockfile`, its one job                 |
-| `release.yml`                    | `push` to `main`                       | none                                           |
-| `pnpm-update.yml`                | schedule                               | none; opens/closes `chore/pnpm-update`         |
-| `node-support-update.yml`        | schedule                               | none; opens/closes `chore/node-support-update` |
-| `deploy-pages.yml`               | `push` to `main`                       | none                                           |
-| `deploy-firestore.yml`           | `push` to `main`; `workflow_dispatch`  | none                                           |
-| `deploy-event-schedule-app.yml`  | `push` to `main`; `workflow_dispatch`  | none                                           |
-| `restart-unblock-prs.yml`        | `push` to `main`                       | none; files the author's restart TODO          |
-| `issue-closed-labels.yml`        | `issues` closed                        | none; releases the closed issue's start        |
-| `link-check.yml`                 | pull requests, path-filtered; schedule | none; other people's servers decide it         |
-| `e2e-production.yml`             | schedule; `workflow_dispatch`          | none; the live sites decide it                 |
-| `synstate-next-benchmark.yml`    | `workflow_dispatch`                    | none; uploads a measurement to commit          |
+| Workflow                         | Runs on                                    | Reports a required context                        |
+| :------------------------------- | :----------------------------------------- | :------------------------------------------------ |
+| `code-check.yml`                 | pull requests; `push` to `main`            | `code-check-result / result`                      |
+| `style-check.yml`                | pull requests; `push` to `main`            | `style-check-result / result`                     |
+| `strict-lib-gen.yml`             | pull requests; `push` to `main`            | `strict-lib-gen-result / result`                  |
+| `node-version-compatibility.yml` | pull requests; `push` to `main`            | `test-node-versions-result / result`              |
+| `verify-published-packages.yml`  | pull requests; `push` to `main`            | `verify-published-result / result`                |
+| `synstate-benchmark.yml`         | pull requests; `push` to `main`            | `synstate-benchmark-result / result`              |
+| `check-gates.yml`                | `workflow_call`, from the six above        | none; it is the gate the six share                |
+| `check-result.yml`               | `workflow_call`, from the six and the lint | the six above and the lint; it is their aggregate |
+| `skip-ci-label.yml`              | `pull_request_target`                      | the `no-skip-ci-label` commit status              |
+| `lint-pull-request.yml`          | `pull_request_target`                      | `lint-pull-request-result / result`               |
+| `code-owners.yml`                | `pull_request_target`                      | `Validate code owners`, its one job               |
+| `verify-lockfile.yml`            | pull requests; `push` to `main`            | `verify-lockfile`, its one job                    |
+| `release.yml`                    | `push` to `main`                           | none                                              |
+| `pnpm-update.yml`                | schedule                                   | none; opens/closes `chore/pnpm-update`            |
+| `node-support-update.yml`        | schedule                                   | none; opens/closes `chore/node-support-update`    |
+| `deploy-pages.yml`               | `push` to `main`                           | none                                              |
+| `deploy-firestore.yml`           | `push` to `main`; `workflow_dispatch`      | none                                              |
+| `deploy-event-schedule-app.yml`  | `push` to `main`; `workflow_dispatch`      | none                                              |
+| `restart-unblock-prs.yml`        | `push` to `main`                           | none; files the author's restart TODO             |
+| `issue-closed-labels.yml`        | `issues` closed                            | none; releases the closed issue's start           |
+| `link-check.yml`                 | pull requests, path-filtered; schedule     | none; other people's servers decide it            |
+| `e2e-production.yml`             | schedule; `workflow_dispatch`              | none; the live sites decide it                    |
+| `synstate-next-benchmark.yml`    | `workflow_dispatch`                        | none; uploads a measurement to commit             |
 
 The required contexts are listed in `repo-settings/rulesets/main.json`. Every
 one of them is either an aggregate job (see "The aggregate job") or a job that
@@ -161,11 +162,13 @@ would apply to pull request runs as well, and GitHub rejects it alongside
 Queued rather than parallel is also nothing a push run needs: each reads only
 its own tree and its own `github.event.before`.
 
-Two workflows outside this shape, `skip-ci-label.yml` and
-`lint-pull-request.yml`, do write
+The workflows outside this shape, `skip-ci-label.yml`, `lint-pull-request.yml`,
+`code-owners.yml` and `link-check.yml`, do write
 `cancel-in-progress: ${{ github.event_name == '…' }}`, so that a run of their
-other triggers is left alone. The event name in that expression has to be one
-the workflow triggers on, or the expression is a constant and
+other triggers is left alone. `lint-pull-request.yml` also gives each run that
+judges nothing under `skip-ci` a group of its own, so that it never cancels a
+run that judges, nor is cancelled. The event name in that expression has to be
+one the workflow triggers on, or the expression is a constant and
 `cancel-in-progress` is silently off; `pnpm run check:root:workflow-event-name`
 holds the two in agreement, and a workflow whose trigger moves
 (`pull_request_target`) moves the name with it.
@@ -621,31 +624,39 @@ are in it, and `skip-ci` is in the event, which the called workflow reads as
 its own.
 
 **The skips are on the called job, never on the calling one.** A calling job
-that GitHub skips reports one check run under its own name, `<name>-result`,
-and the required `<name>-result / result` would never arrive: "Expected —
-waiting", blocking forever. So the caller carries `if: always()` and nothing
-else, and `check-result.yml`'s job-level `if` holds the skips that are not
-failures: `skip-ci`, a branch behind `main`, `should_run: false`, and any need
-that outputs `no_verdict: 'true'` (`verify-published-packages.yml`, whose job
-answers the diff question itself). They are job-level on purpose: the
-aggregate then reports `skipped`, grey and satisfying the required check,
-rather than red, and boots no runner. Something else holds the merge in each
-case (see "The gate"). That `if` starts with `always()` too, because a called
-job with no status function carries an implicit `success()`, and a cancelled
-run would then read `skipped` rather than red.
+that GitHub skips reports one check run under its own name, `<name>-result`, and
+the required `<name>-result / result` would never arrive: "Expected — waiting",
+blocking forever. So the caller carries `if: always()` and nothing else (the
+exceptions are named below), and `check-result.yml`'s job-level `if` holds the
+skips that are not failures:
+`skip-ci` (on a `pull_request` event only: under `lint-pull-request.yml`'s
+`pull_request_target` a run that reaches the job judges under the label), a
+branch behind `main`, `should_run: false`, and any need that outputs
+`no_verdict: 'true'` (`verify-published-packages.yml`, whose job answers the
+diff question itself). They are job-level on purpose: the aggregate then reports
+`skipped`, grey and satisfying the required check, rather than red, and boots no
+runner. Something else holds the merge in each case (see "The gate").
+That `if` starts with `always()` too, because a called job with no status
+function carries an implicit `success()`, and a cancelled run would then read
+`skipped` rather than red.
 
-The one skip on the calling job is deliberate: a `labeled` or `unlabeled`
-event while `skip-ci` is on. There, leaving `<name>-result / result` as it was
-is the point, and it never blocks forever — a commit that reached such an
-event has had its aggregate reported by the event that brought it, and taking
-the label off reports a new one. "A label event under `skip-ci`" says why.
+The one skip on the calling job in the check workflows is deliberate: a
+`labeled` or `unlabeled` event while `skip-ci` is on. There, leaving
+`<name>-result / result` as it was is the point, and it never blocks forever — a
+commit that reached such an event has had its aggregate reported by the event
+that brought it, and taking the label off reports a new one. "A label event
+under `skip-ci`" says why.
+`lint-pull-request.yml`'s caller also skips under the label on a push, which
+leaves the new head with no aggregate until the label comes off or the title is
+edited, and on an edit that leaves the title alone, which leaves the head with
+whatever it had. Its jobs comment says why.
 
 The step reads the gate's `reused_result` first (`success` passes, `failure`
-fails and says to use "Re-run all jobs"), then requires every need but
-`gates` to have succeeded, and a red aggregate names the jobs that did not,
-with their results. `gates` is left out because a gate that fails to answer
-fails open. The need has to be named `gates`, and a caller that names no
-other job fails rather than passes.
+fails and says to use "Re-run all jobs"), then requires every need but `gates`
+to have succeeded, and a red aggregate names the jobs that did not, with their
+results. `gates` is left out because a gate that fails to answer fails open. The
+need has to be named `gates` in a workflow that has one (`lint-pull-request.yml`
+has none), and a caller that names no other job fails rather than passes.
 
 `check-gates.yml` finds an earlier verdict by the aggregate's job name, so
 each caller passes it as `result-job: <name>-result / result`.
@@ -755,19 +766,21 @@ Node version is the check itself.
 ## `skip-ci` and `no-skip-ci-label`
 
 `skip-ci` on a pull request skips the six check workflows; every gated job
-carries the label condition and boots no runner. The four
-`lint-pull-request.yml` jobs and `verify-lockfile` run regardless (see "A label
-event under `skip-ci`"). GitHub has no label-based merge block, so on its own
-the label would leave a pull request that nothing checked looking exactly like
-one that passed. The block is `skip-ci-label.yml`: it writes a required commit
-status, `no-skip-ci-label`, on every head commit, `pending` while the label is
-on and `success` without it.
+carries the label condition and boots no runner. `lint-pull-request.yml` skips
+its title and commit checks on every event but `opened`, a title edit and the
+`unlabeled` that takes the label off; `code-owners.yml` runs regardless, and
+`verify-lockfile` on every event it takes (see "A label event under `skip-ci`").
+GitHub has no label-based merge block, so on its own the label would leave a
+pull request that nothing checked looking exactly like one that passed. The
+block is `skip-ci-label.yml`:
+it writes a required commit status, `no-skip-ci-label`, on every head commit,
+`pending` while the label is on and `success` without it.
 
-- **It is what holds a labelled pull request.** The aggregates report
-  `skipped` on a commit pushed while the label is on (a pull request nobody
-  is checking yet should read grey, not broken), and a skipped required check
-  is satisfied. Removing the workflow, or its context from
-  `repo-settings/rulesets/main.json`, leaves `skip-ci` skipping every check
+- **It is what holds a labelled pull request.** The aggregates report `skipped`
+  on a commit pushed while the label is on (a pull request nobody is checking
+  yet should read grey, not broken; the lint aggregate reports nothing), and a
+  skipped required check is satisfied. Removing the workflow, or its context
+  from `repo-settings/rulesets/main.json`, leaves `skip-ci` skipping every check
   with nothing holding the merge.
 - **A commit status, not a job's check run.** A check run concludes the way
   the job ends, and none of those is right: skipped and success satisfy the
@@ -818,31 +831,36 @@ cancels it now stays until the label comes off, where the `labeled` run used
 to replace it with `skipped`. `pr-report` reads both the same way: `paused`,
 its red marked stale.
 
-`lint-pull-request.yml`'s four jobs are their own required contexts, with no
-caller to skip, so they carry no `skip-ci` condition and run on every event.
-They read the API for seconds, and a job still queued or running is `pending`,
-which holds the merge as well. `verify-lockfile.yml`'s one job is the same kind
-of context for the same reasons, and does not run on label events at all, so
-taking `skip-ci` off would not bring back a run it had skipped. Running on every
-pull request with a checkout, it is also where a `package.json` or lockfile
-under `experimental/` is refused: every gate skips the diff that adds one.
+`lint-pull-request.yml` judges the title, the commit messages and the commit
+count through `lint-pull-request-result / result` and skips its caller the same
+way, on a push and on any edit that leaves the title alone (a base change, a
+body edit) as well as a label event: a stacked layer moved onto `main` still
+holds the merged layer's commit until it is restacked. A title edit runs the
+three under `skip-ci` too; the jobs comment there says which events skip and
+why. `code-owners.yml`'s one job is its own required context, with no caller to
+skip, so it carries no `skip-ci` condition and runs on every event. It reads the
+API for seconds, and a job still queued or running is `pending`, which holds the
+merge as well. `verify-lockfile.yml`'s one job is the same kind of context for
+the same reasons, and does not run on label events at all, so taking `skip-ci`
+off would not bring back a run it had skipped. Running on every pull request
+with a checkout, it is also where a `package.json` or lockfile under
+`experimental/` is refused: every gate skips the diff that adds one.
 
 ## `pull_request_target`
 
-Two workflows run on `pull_request_target` rather than `pull_request`:
-`skip-ci-label.yml` and `lint-pull-request.yml`. It runs the
+Three workflows run on `pull_request_target` rather than `pull_request`:
+`skip-ci-label.yml`, `lint-pull-request.yml` and `code-owners.yml`. It runs the
 workflow file as it exists on the base branch, and its token is the base
 repository's whatever the head is. Under `pull_request` the file that runs is
-the one on the pull request's own head, so the branch a check is deciding
-about would be the branch supplying the decision; and a run from a fork gets a
+the one on the pull request's own head, so the branch a check is deciding about
+would be the branch supplying the decision; and a run from a fork gets a
 read-only token whatever `permissions:` says.
 
 The usual hazard, a writable token in a job that runs the branch's code, is
-answered the same way in both: **the job checks nothing out from the pull
-request and executes nothing from its tree.** It reads the pull request from
-the event payload or through the API, and runs only its own `run:` blocks,
-which the event resolved from the base branch. A step added to either keeps
-to this.
+answered the same way in all three: **the job checks nothing out from the pull
+request and executes nothing from its tree.** It reads the pull request from the
+event payload or through the API, and runs only its own `run:` blocks, which the
+event resolved from the base branch. A step added to any of them keeps to this.
 
 ## Jobs that hold a key
 
@@ -1009,19 +1027,20 @@ Nothing checks this; a review does.
 - **Local guards that read this directory**: `check:root:actionlint`,
   `check:root:ci-commands`, `check:root:workflow-event-name`,
   `check:root:node-support`, `check:root:restart-unblock-prs-paths`,
-  `check:root:dispatch-inputs`. `fmt` and `check:cspell` read it too; CI itself
-  runs nothing on a workflow change until the pull request runs.
+  `check:root:dispatch-inputs`, `check:root:lint-pull-request-groups`. `fmt` and
+  `check:cspell` read it too; CI itself runs nothing on a workflow change until
+  the pull request runs.
   `check:root:actionlint` also lints the composite actions' steps, which
   actionlint does not read on its own, and reads a `$/` action as `./`, the only
   form the pinned actionlint knows. It downloads the actionlint and shellcheck
   that `tools/configs/release-binaries.json` pins, so it needs nothing
   installed; `pnpm-update.yml` moves those pins.
 - **`.github/workflows/` and `.github/actions/` are owned in
-  `.github/CODEOWNERS`**, which `lint-pull-request.yml`'s `code-owners` job
-  enforces in the ruleset's place: a change there by anyone but the owner waits
-  for the owner's approval, so a bot's pull request that touches either does not
-  auto-merge, while the owner's own needs no bypass — unless someone else pushed
-  to its branch, which the job reads from the repository's activity. The action
-  pins and the lockfile are the one thing a bot writes there.
+  `.github/CODEOWNERS`**, which `code-owners.yml` enforces in the ruleset's
+  place: a change there by anyone but the owner waits for the owner's approval,
+  so a bot's pull request that touches either does not auto-merge, while the
+  owner's own needs no bypass — unless someone else pushed to its branch, which
+  the job reads from the repository's activity. The action pins and the lockfile
+  are the one thing a bot writes there.
 - **A changed `uses:` is followed by `gh actions-lock`** (see "Action pins and
   the lockfile").

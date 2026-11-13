@@ -4,7 +4,7 @@
 #
 # 上の行が、このファイルを誰が強制しているかの宣言。`main` の ruleset は
 # `require_code_owner_review` を有効にしていない。代わりに必須チェック
-# `Validate code owners`（`lint-pull-request.yml` の `code-owners` ジョブ）が、
+# `Validate code owners`（`code-owners.yml` の `code-owners` ジョブ）が、
 # ここに挙がったパスを触る pull request を、作り手とブランチに push した全員が
 # そのパスの所有者であるか、所有者が approve していない限り赤にする。`pr-report-core` はこの行を読み、名前のチェックが ruleset の必須
 # チェックにあるときに同じ規則で承認待ちを数える（`code-owners.mts`）。

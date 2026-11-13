@@ -52,8 +52,17 @@ table to the check workflows):
 | `Validate commit count`                    | The branch is more than one commit — squash it, see below                                                                                           |
 | `Validate code owners`                     | Someone other than an owner changed a path `.github/CODEOWNERS` lists — not yours to fix: an owner reads and approves it, and the worker re-runs it |
 
-`Validate PR title` is required because a squash merge takes the PR title as
-the commit title (`squash_merge_commit_title: PR_TITLE`), so the fix is the
+A red `lint-pull-request-result / result` names its failed jobs by id:
+`semantic-pull-request`, `commit-messages` and `commit-count` are the rows
+`Validate PR title`, `Validate commit messages` and `Validate commit count`.
+Under `skip-ci`, a run for a push, a label or an edit that leaves the title
+alone shows the three as `skipped`, which is neither a pass nor a fail: the
+verdict is the aggregate's, which a label or such an edit leaves as it was and a
+push leaves missing until the label comes off or the title is edited.
+
+`Validate PR title` holds the merge (through
+`lint-pull-request-result / result`) because a squash merge takes the PR title
+as the commit title (`squash_merge_commit_title: PR_TITLE`), so the fix is the
 title itself, not the branch. It checks Conventional Commits and English;
 `skip-ci` in a title means nothing to any workflow, which reads the label
 instead.

@@ -1,0 +1,293 @@
+name: Code Owners
+
+# `Validate code owners`, a required context of its own: what it enforces and
+# how is above the job. `pull_request_target`, and why nothing here checks the
+# branch out, is in README.md under "`pull_request_target`".
+#
+# Its own workflow rather than a job of `lint-pull-request.yml`, whose runs are
+# split into two concurrency groups by whether they judge under `skip-ci`. This
+# job judges on every event, so it needs the one group per pull request that
+# lets the newest run's reading of the reviews and pushes be the one that
+# stands. No `skip-ci` condition, for the reason `verify-lockfile.yml` gives:
+# a job skipped by its `if` reports `skipped` under the required context's own
+# name, and it runs in seconds.
+
+on:
+  pull_request_target:
+    branches:
+      - 'main'
+      # Frozen snapshots, never merged back; see `lint-pull-request.yml`.
+      - '!archive/**'
+    types:
+      - opened
+      # The base branch changes what the pull request changes.
+      - edited
+      - synchronize
+      # Adding or removing any label is the cheapest way to have the reviews
+      # read again by hand.
+      - labeled
+      - unlabeled
+
+# Bursts of events; only the last state is worth a run.
+concurrency:
+  group: ${{ github.workflow }}-${{ case(github.event_name == 'pull_request_target', github.event.pull_request.number, github.ref) }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request_target' }}
+
+permissions:
+  contents: read
+  pull-requests: read
+
+env:
+  # So that the job's `tr`, `sort -u` and `case` patterns read logins and paths
+  # the same way on any runner.
+  LC_ALL: C.UTF-8
+
+jobs:
+  # `.github/CODEOWNERS`, enforced here rather than by the ruleset's
+  # `require_code_owner_review`: every changed path it gives owners needs its
+  # author, and everyone who pushed to its branch, to be among them, or one of
+  # them to have approved the head. The
+  # ruleset's rule cannot tell the author apart — GitHub does not let an author
+  # approve their own pull request — so under it the owner's own pull requests
+  # merged only by a ruleset bypass, while what the file guards against is
+  # someone else's: a bot's (`pnpm-update.yml` opens one queued, to auto-merge)
+  # or a fork's. Why each path is listed is in the file.
+  #
+  # The file is read as the base branch has it, so a pull request cannot
+  # rewrite the rules it is judged by. `pr-report-core` (`code-owners.mts`)
+  # works out the same wait for the merge queue and the Pull Requests Manager,
+  # from the `enforced-by:` line at the file's head, which names this job.
+  #
+  # An approval given after this ran does not re-run it: no event this
+  # workflow can take carries a review (`pull_request_review` runs the pull
+  # request's own copy of the workflow, which would let it judge itself).
+  # `unblock-prs` re-runs the failed jobs of a queued pull request that has
+  # since been approved; anything else is re-run by hand.
+  code-owners:
+    name: Validate code owners
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      # The file, the changed files and the reviews from the API, as
+      # `lint-pull-request.yml` reads the commits: nothing from the pull
+      # request is checked out or run. A rename counts from both ends, since
+      # moving a workflow away changes what runs as surely as editing it.
+      - name: Check that an owner wrote or approved every owned path
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          AUTHOR: ${{ github.event.pull_request.user.login }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          HEAD_REF: ${{ github.event.pull_request.head.ref }}
+          HEAD_REPO: ${{ github.event.pull_request.head.repo.full_name }}
+          CHANGED_FILES: ${{ github.event.pull_request.changed_files }}
+          # How long to wait before reading the branch's pushes again.
+          PUSHES_RETRY_SECONDS: '6'
+        run: |
+          fail() {
+            echo "::error::${1}"
+            printf '%s\n' "${1}" >>"${GITHUB_STEP_SUMMARY}"
+            if [ -n "${2:-}" ]; then
+              printf '%s' "${2}"
+              {
+                echo
+                echo '```text'
+                printf '%s' "${2}"
+                echo '```'
+              } >>"${GITHUB_STEP_SUMMARY}"
+            fi
+            exit 1
+          }
+
+          if ! gh api "repos/${GITHUB_REPOSITORY}/contents/.github/CODEOWNERS?ref=${BASE_SHA}" --jq '.content' >codeowners.b64; then
+            fail "Cannot read .github/CODEOWNERS at the base, ${BASE_SHA}."
+          fi
+          base64 -d codeowners.b64 >codeowners.txt
+
+          # One rule per line: the pattern, then its owners as lower-case
+          # logins. Only the shapes the file's header allows are read; any
+          # other line makes the file unreadable here, which fails rather than
+          # leaving its paths unowned.
+          patterns=()
+          owners=()
+          unreadable=''
+          # `|| [ -n … ]`: a last line with no newline after it is still a rule.
+          while IFS= read -r line || [ -n "${line}" ]; do
+            line="${line%%#*}"
+            read -r -a fields <<<"${line}"
+            [ "${#fields[@]}" -gt 0 ] || continue
+            pattern="${fields[0]}"
+            case "${pattern}" in
+              /*[*?[\\!]* | /) unreadable="${unreadable}${line}"$'\n'; continue ;;
+              /*) ;;
+              *) unreadable="${unreadable}${line}"$'\n'; continue ;;
+            esac
+            list=''
+            for owner in "${fields[@]:1}"; do
+              case "${owner}" in
+                @*/* | @ | [!@]*) unreadable="${unreadable}${line}"$'\n'; continue 2 ;;
+              esac
+              list="${list} ${owner#@}"
+            done
+            patterns+=("${pattern#/}")
+            owners+=("$(printf '%s' "${list# }" | tr '[:upper:]' '[:lower:]')")
+          done <codeowners.txt
+
+          if [ -n "${unreadable}" ]; then
+            # shellcheck disable=SC2016 # literal backticks, not command substitution
+            fail '.github/CODEOWNERS has lines this check cannot read: a pattern must start with `/` and hold no wildcard, and an owner must be one `@login`.' "${unreadable}"
+          fi
+
+          # The owners of a path: those of the last pattern that matches it. A
+          # pattern ending in `/` owns what is under it; any other owns itself
+          # and what is under it, as `pr-report-core` reads it.
+          owners_of() {
+            local i match=''
+            for i in "${!patterns[@]}"; do
+              case "${patterns[i]}" in
+                */) case "${1}" in "${patterns[i]}"*) match="${owners[i]}" ;; esac ;;
+                *) case "${1}" in "${patterns[i]}" | "${patterns[i]}"/*) match="${owners[i]}" ;; esac ;;
+              esac
+            done
+            printf '%s' "${match}"
+          }
+
+          # One line per changed file: its name, then a tab and its old name if
+          # it was renamed. `@tsv` escapes a tab, a newline or a backslash in a
+          # name, so that a line is exactly one file and the count below cannot
+          # be padded by a name holding newlines. An escaped name still matches
+          # what it did: no pattern this reads holds any of the three.
+          gh api --paginate "repos/${GITHUB_REPOSITORY}/pulls/${PR_NUMBER}/files?per_page=100" \
+            --jq '.[] | [.filename, (.previous_filename // empty)] | @tsv' >changed-files.txt
+
+          # The endpoint lists at most 3,000 files. Fewer than the pull request
+          # changed would leave the rest unread, so that fails rather than
+          # passes, and so does a count the payload did not carry.
+          listed="$(wc -l <changed-files.txt)"
+          case "${CHANGED_FILES}" in
+            '' | *[!0-9]*)
+              fail "The event carries no count of changed files (\"${CHANGED_FILES}\"), so whether the ${listed} listed are all of them cannot be told."
+              ;;
+          esac
+          if [ "${listed}" -lt "${CHANGED_FILES}" ]; then
+            fail "The pull request changes ${CHANGED_FILES} files and the API listed ${listed}, so whether an owned path is among them cannot be told."
+          fi
+
+          # Who approves: each reviewer's latest review that is not a comment,
+          # as GitHub counts it, and as `pr-report-core` reads it. A push that
+          # changes the diff dismisses an approval (the ruleset's
+          # `dismiss_stale_reviews_on_push`), so one still standing is of what
+          # the head holds; a rebase that changes nothing keeps it.
+          gh api --paginate "repos/${GITHUB_REPOSITORY}/pulls/${PR_NUMBER}/reviews?per_page=100" \
+            --jq '.[] | select(.state != "COMMENTED" and .state != "PENDING") | [((.user.login // "") | ascii_downcase), .state] | join("\t")' >reviews.txt
+          approved=' '
+          while IFS=$'\t' read -r login state; do
+            approved="${approved// "${login}" / }"
+            if [ "${state}" = 'APPROVED' ]; then
+              approved="${approved}${login} "
+            fi
+          done <reviews.txt
+
+          author="$(printf '%s' "${AUTHOR}" | tr '[:upper:]' '[:lower:]')"
+
+          # Who wrote the head: the author and everyone who pushed to the
+          # branch. The author stands for a path they own only where every
+          # writer owns it too; otherwise a commit another writer pushed to the
+          # owner's branch would pass as the owner's — and one pushed and then
+          # rewritten away still counts, since nothing here can tell what the
+          # rewrite kept. Read from the repository's activity, which names each
+          # push's actor (the timeline does not): every push since the branch
+          # was last created, chained `before` to `after`, ending at the head.
+          # One page is read, newest first, and replayed oldest first from the
+          # last creation in it, as `readPushers` in `unblock-prs` reads it for
+          # `pushersOf` in `pr-report-core`. Anything short of that leaves the
+          # writers untold, and the author stands for nothing: a gap, an actor
+          # missing, a creation older than that page or than the activity
+          # GitHub keeps, or a fork's branch, whose pushes are not this
+          # repository's. A push is recorded as it
+          # lands, which can trail this event, so a chain short of the head is
+          # read again a few times. Read once, and only for a path the author
+          # owns that no owner has approved: nothing else depends on it.
+          writers=''
+          writers_read=false
+          read_writers() {
+            writers_read=true
+            [ "${HEAD_REPO}" = "${GITHUB_REPOSITORY}" ] || return 0
+            local attempt type before after actor chain pushers
+            for attempt in 1 2 3 4 5; do
+              if gh api -X GET "repos/${GITHUB_REPOSITORY}/activity" \
+                -f ref="refs/heads/${HEAD_REF}" -f direction=desc -f per_page=100 \
+                --jq 'reverse | .[] | [.activity_type, .before, .after, ((.actor.login // "") | ascii_downcase)] | @tsv' \
+                </dev/null >activity.txt; then
+                chain=''
+                pushers=''
+                while IFS=$'\t' read -r type before after actor; do
+                  case "${type}" in
+                    branch_creation)
+                      if [ -n "${actor}" ]; then
+                        chain="${after}" pushers="${actor}"
+                      else
+                        chain='untold' pushers=''
+                      fi
+                      ;;
+                    branch_deletion) chain='' pushers='' ;;
+                    push | force_push)
+                      if [ -n "${chain}" ] && [ "${before}" = "${chain}" ] && [ -n "${actor}" ]; then
+                        chain="${after}" pushers="${pushers} ${actor}"
+                      else
+                        chain='untold'
+                      fi
+                      ;;
+                  esac
+                done <activity.txt
+                if [ -n "${pushers}" ] && [ "${chain}" = "${HEAD_SHA}" ]; then
+                  writers="$(printf '%s %s' "${author}" "${pushers}" | tr -s ' ' '\n' | sort -u | tr '\n' ' ')"
+                  writers="${writers# }"
+                  return 0
+                fi
+              fi
+              if [ "${attempt}" -lt 5 ]; then
+                sleep "${PUSHES_RETRY_SECONDS}"
+              fi
+            done
+          }
+
+          waiting=''
+          while IFS=$'\t' read -r name old_name; do
+            for file in "${name}" "${old_name}"; do
+              [ -n "${file}" ] || continue
+              file_owners="$(owners_of "${file}")"
+              [ -n "${file_owners}" ] || continue
+              for owner in ${file_owners}; do
+                case "${approved}" in *" ${owner} "*) continue 2 ;; esac
+              done
+              case " ${file_owners} " in
+                *" ${author} "*)
+                  [ "${writers_read}" = true ] || read_writers
+                  if [ -n "${writers}" ]; then
+                    every_writer_owns=true
+                    for writer in ${writers}; do
+                      case " ${file_owners} " in *" ${writer} "*) ;; *) every_writer_owns=false ;; esac
+                    done
+                    [ "${every_writer_owns}" = false ] || continue
+                  fi
+                  ;;
+              esac
+              waiting="${waiting}${file} (@${file_owners// / @})"$'\n'
+            done
+          done <changed-files.txt
+
+          if [ -z "${waiting}" ]; then
+            echo "Every owned path is approved by an owner, or owned by ${AUTHOR} and everyone who pushed to the branch."
+            exit 0
+          fi
+
+          if [ "${writers_read}" = false ]; then
+            pushed_by=''
+          elif [ -n "${writers}" ]; then
+            pushed_by=" ${AUTHOR} stands for a path they own only where everyone who pushed to the branch owns it too: it was written by ${writers% } (a push counts even once rewritten away)."
+          else
+            pushed_by=" ${AUTHOR} stands for a path they own only where everyone who pushed to the branch owns it too, and who did cannot be told."
+          fi
+          fail "No owner has approved these.${pushed_by} An owner's approval, then a re-run of this job, lets it merge:" "$(printf '%s' "${waiting}" | sort -u)"$'\n'

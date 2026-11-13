@@ -2,7 +2,9 @@ import dedent from 'dedent';
 import { Result } from 'ts-data-forge';
 import {
   matrixValues,
+  readConcurrencyGroup,
   readMatrix,
+  readTriggerTypes,
   readWorkflowJobs,
   readWorkflowStrings,
   readWorkflowTriggers,
@@ -142,6 +144,29 @@ describe('readWorkflowJobs', () => {
     );
   });
 
+  test('reads the inputs a job passes to the workflow it calls, as text', () => {
+    const [caller, job] = jobs(dedent`
+      jobs:
+        result:
+          uses: ./.github/workflows/check-result.yml
+          with:
+            needs: \${{ toJSON(needs) }}
+            attempts: 3
+            strict: true
+        work:
+          runs-on: ubuntu-latest
+    `);
+
+    assert.deepStrictEqual(caller?.with, {
+      // eslint-disable-next-line no-template-curly-in-string -- a GitHub Actions expression, not a template.
+      needs: '${{ toJSON(needs) }}',
+      attempts: '3',
+      strict: 'true',
+    });
+
+    assert.deepStrictEqual(job?.with, {});
+  });
+
   test('reads a job’s `if:` as written and its `needs:`, one or a list', () => {
     const [first, second, third] = jobs(dedent`
       jobs:
@@ -218,6 +243,78 @@ describe('readWorkflowTriggers', () => {
 
   test('a file YAML cannot parse is an error, not no triggers', () => {
     assert.isTrue(Result.isErr(readWorkflowTriggers('on: [\n')));
+  });
+});
+
+describe('readTriggerTypes', () => {
+  test('reads an event’s `types:` as a list or one type', () => {
+    assert.deepStrictEqual(
+      readTriggerTypes(
+        dedent`
+          on:
+            pull_request_target:
+              branches: [main]
+              types:
+                - opened
+                - edited
+            push:
+              types: completed
+        `,
+        'pull_request_target',
+      ),
+      Result.ok(['opened', 'edited']),
+    );
+
+    assert.deepStrictEqual(
+      readTriggerTypes('on:\n  push:\n    types: completed\n', 'push'),
+      Result.ok(['completed']),
+    );
+  });
+
+  test('an event with no `types:`, or not named, has none', () => {
+    assert.deepStrictEqual(
+      readTriggerTypes('on: [push]\n', 'push'),
+      Result.ok([]),
+    );
+
+    assert.deepStrictEqual(
+      readTriggerTypes('on:\n  push:\n', 'pull_request'),
+      Result.ok([]),
+    );
+  });
+
+  test('a file YAML cannot parse is an error', () => {
+    assert.isTrue(Result.isErr(readTriggerTypes('on: [\n', 'push')));
+  });
+});
+
+describe('readConcurrencyGroup', () => {
+  test('reads the group of a mapping, or a bare string', () => {
+    assert.deepStrictEqual(
+      readConcurrencyGroup(dedent`
+        concurrency:
+          group: ci-\${{ github.ref }}
+          cancel-in-progress: true
+      `),
+      // eslint-disable-next-line no-template-curly-in-string -- a GitHub Actions expression, not a template.
+      Result.ok('ci-${{ github.ref }}'),
+    );
+
+    assert.deepStrictEqual(
+      readConcurrencyGroup('concurrency: ci\n'),
+      Result.ok('ci'),
+    );
+  });
+
+  test('no concurrency is no group', () => {
+    assert.deepStrictEqual(
+      readConcurrencyGroup('jobs: {}\n'),
+      Result.ok(undefined),
+    );
+  });
+
+  test('a file YAML cannot parse is an error', () => {
+    assert.isTrue(Result.isErr(readConcurrencyGroup('concurrency: [\n')));
   });
 });
 

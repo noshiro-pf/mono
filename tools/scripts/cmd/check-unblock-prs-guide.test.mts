@@ -96,6 +96,8 @@ describe('isCheckWorkflow', () => {
 
     assert.isTrue(isCheckWorkflow({ file: 'lint-pull-request.yml', text: '' }));
 
+    assert.isTrue(isCheckWorkflow({ file: 'code-owners.yml', text: '' }));
+
     assert.isFalse(
       isCheckWorkflow({ file: 'release.yml', text: 'jobs:\n  release:\n' }),
     );
