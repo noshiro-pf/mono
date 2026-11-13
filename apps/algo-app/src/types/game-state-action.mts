@@ -1,5 +1,5 @@
 import { Timestamp, type FieldValue } from 'firebase/firestore';
-import { expectType } from 'ts-data-forge';
+import { expectType, Result } from 'ts-data-forge';
 import * as t from 'ts-fortress';
 import type { StrictOmit } from 'ts-type-forge';
 import { cardTypeDef } from './card-type.mjs';
@@ -96,22 +96,31 @@ export type ActionRecord<A extends GameStateAction> = Readonly<{
   action: A;
 }>;
 
+/**
+ * `a` as an action read back, or what is wrong with it: not an action, or one
+ * whose `timestamp` is neither a `Timestamp` nor `null`.
+ */
+export const validateGameStateActionFromDb = (
+  a: unknown,
+): Result<GameStateActionFromDb, string> => {
+  const validated = gameStateActionTypeDef.validate(a);
+
+  if (Result.isErr(validated)) {
+    return Result.err(t.validationErrorsToMessages(validated.value).join(' '));
+  }
+
+  const { timestamp } = validated.value;
+
+  return timestamp === null || timestamp instanceof Timestamp
+    ? Result.ok({ ...validated.value, timestamp })
+    : Result.err(
+        'An action read back has a FieldValue timestamp, not a Timestamp or null.',
+      );
+};
+
 export const assertIsGameStateAction: (
   a: unknown,
 ) => asserts a is GameStateAction = gameStateActionTypeDef.assertIs;
-
-export const assertIsGameStateActionFromDb: (
-  a: unknown,
-) => asserts a is GameStateActionFromDb = (a) => {
-  assertIsGameStateAction(a);
-
-  if (a.timestamp !== null && !(a.timestamp instanceof Timestamp)) {
-    // What is left is a `FieldValue`, which is only ever written.
-    throw new TypeError(
-      'An action read back has a FieldValue timestamp, not a Timestamp or null.',
-    );
-  }
-};
 
 expectType<GameStateAction, Readonly<{ type: string }>>('<=');
 
