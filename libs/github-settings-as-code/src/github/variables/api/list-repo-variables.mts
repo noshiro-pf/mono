@@ -1,18 +1,19 @@
 import type { EndpointKeys } from 'octokit-safe-types';
-import type { DeepReadonly } from 'ts-type-forge';
 import { octokitHeaders, OWNER, REPO } from '../../constants.mjs';
 import { octokit } from '../../octokit.mjs';
+import {
+  listVariablesWith,
+  type RepoVariable,
+} from './list-variables-with.mjs';
 
-export const listRepoVariables = async (): Promise<
-  DeepReadonly<
-    {
-      name: string;
-      value: string;
-      created_at: string;
-      updated_at: string;
-    }[]
-  >
-> => {
+/** The repository's variables, every page of them, sorted by name. */
+export const listRepoVariables = async (): Promise<readonly RepoVariable[]> =>
+  listVariablesWith(getVariablesPage);
+
+const getVariablesPage = async (
+  page: number,
+  perPage: number,
+): Promise<readonly RepoVariable[]> => {
   // https://docs.github.com/ja/rest/actions/variables?apiVersion=2022-11-28#list-repository-variables
   const result = await octokit.request(
     'GET /repos/{owner}/{repo}/actions/variables' satisfies EndpointKeys,
@@ -20,10 +21,10 @@ export const listRepoVariables = async (): Promise<
       owner: OWNER,
       repo: REPO,
       headers: octokitHeaders,
+      per_page: perPage,
+      page,
     },
   );
 
-  // `getAllEnvironments` と同じく名前順に整えて返す。宣言ファイルの中身が API
-  // の返す順に左右されると、値が変わっていない日にも diff が出る。
-  return result.data.variables.toSorted((a, b) => a.name.localeCompare(b.name));
+  return result.data.variables;
 };
