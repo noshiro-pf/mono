@@ -9,19 +9,19 @@ This page times synstate-next and eight other state libraries on the same graphs
 
 <!-- benchmark:summary -->
 
-| Scenario                                             | Fastest                     | synstate-next ÷ fastest | Slowest | Slowest ÷ fastest |
-| :--------------------------------------------------- | :-------------------------- | ----------------------: | :------ | ----------------: |
-| [Single state](#single-state)                        | RxJS                        |                    2.3× | Jotai   |               56× |
-| [Derived chain](#derived-chain)                      | RxJS                        |                    2.6× | Jotai   |              133× |
-| [Diamond](#diamond)                                  | RxJS                        |                    1.2× | Jotai   |               68× |
-| [Deep chain](#deep-chain) (K=1000, M=200)            | Redux                       |                    2.3× | RxJS    |              592× |
-| [Cascaded diamond](#cascaded-diamond) (N=20)         | synstate-next               |                    1.0× | RxJS    |         > 20,324× |
-| [Conditional fan-out](#conditional-fan-out) (B=1000) | Solid                       |                    1.7× | Redux   |              219× |
-| [Unchanged value](#unchanged-value) (W=50)           | RxJS (distinctUntilChanged) |                    1.7× | Redux   |            > 654× |
+| Scenario                                             | Fastest                     | synstate-next ÷ fastest | Slowest | Slowest ÷ fastest | synstate-next ÷ synstate |
+| :--------------------------------------------------- | :-------------------------- | ----------------------: | :------ | ----------------: | -----------------------: |
+| [Single state](#single-state)                        | RxJS                        |                    1.7× | Jotai   |               42× |                     1.2× |
+| [Derived chain](#derived-chain)                      | RxJS                        |                    2.1× | Jotai   |              102× |                     1.1× |
+| [Diamond](#diamond)                                  | RxJS                        |                    1.1× | Jotai   |               60× |                     0.8× |
+| [Deep chain](#deep-chain) (K=1000, M=200)            | Redux                       |                    2.3× | RxJS    |              200× |                     0.8× |
+| [Cascaded diamond](#cascaded-diamond) (N=20)         | synstate-next               |                    1.0× | RxJS    |         > 19,082× |                     0.7× |
+| [Conditional fan-out](#conditional-fan-out) (B=1000) | Solid                       |                    1.8× | Redux   |              210× |                     0.6× |
+| [Unchanged value](#unchanged-value) (W=50)           | RxJS (distinctUntilChanged) |                    1.4× | Redux   |              527× |                     1.1× |
 
 <!-- /benchmark -->
 
-In no scenario does synstate-next take more than <!-- benchmark:subject-worst-over-fastest -->2.6×<!-- /benchmark --> as long as the fastest library there, while the slowest library in each takes at least <!-- benchmark:slowest-over-fastest-least -->56×<!-- /benchmark --> as long. A ratio marked `>` belongs to a library that did not finish within <!-- benchmark:timeout -->5,000<!-- /benchmark --> ms, counted as if it had taken exactly that long.
+In no scenario does synstate-next take more than <!-- benchmark:subject-worst-over-fastest -->2.3×<!-- /benchmark --> as long as the fastest library there, while the slowest library in each takes at least <!-- benchmark:slowest-over-fastest-least -->42×<!-- /benchmark --> as long. A ratio marked `>` belongs to a library that did not finish within <!-- benchmark:timeout -->5,000<!-- /benchmark --> ms, counted as if it had taken exactly that long.
 
 Read the other way round, the same figures give each library its worst case: the scenario where it is furthest from the fastest library, and how far.
 
@@ -29,32 +29,35 @@ Read the other way round, the same figures give each library its worst case: the
 
 | Library           | Scenario where it trails most                | Fastest there               | Library ÷ fastest |
 | :---------------- | :------------------------------------------- | :-------------------------- | ----------------: |
-| **synstate-next** | [Derived chain](#derived-chain)              | RxJS                        |              2.6× |
-| RxJS              | [Cascaded diamond](#cascaded-diamond) (N=20) | synstate-next               |         > 20,324× |
-| MobX              | [Deep chain](#deep-chain) (K=1000, M=200)    | Redux                       |              121× |
-| Jotai             | [Unchanged value](#unchanged-value) (W=50)   | RxJS (distinctUntilChanged) |              288× |
-| Redux             | [Unchanged value](#unchanged-value) (W=50)   | RxJS (distinctUntilChanged) |            > 654× |
+| **synstate-next** | [Deep chain](#deep-chain) (K=1000, M=200)    | Redux                       |              2.3× |
+| RxJS              | [Cascaded diamond](#cascaded-diamond) (N=20) | synstate-next               |         > 19,082× |
+| MobX              | [Deep chain](#deep-chain) (K=1000, M=200)    | Redux                       |              122× |
+| Jotai             | [Unchanged value](#unchanged-value) (W=50)   | RxJS (distinctUntilChanged) |              260× |
+| Redux             | [Unchanged value](#unchanged-value) (W=50)   | RxJS (distinctUntilChanged) |              527× |
 | Solid             | [Unchanged value](#unchanged-value) (W=50)   | RxJS (distinctUntilChanged) |               45× |
 | Preact Signals    | [Unchanged value](#unchanged-value) (W=50)   | RxJS (distinctUntilChanged) |               18× |
 | Zustand           | [Single state](#single-state)                | RxJS                        |              1.3× |
-| Valtio            | [Single state](#single-state)                | RxJS                        |               10× |
+| Valtio            | [Single state](#single-state)                | RxJS                        |               11× |
 
 <!-- /benchmark -->
 
-synstate-next trails most in <!-- benchmark:subject-worst-scenario -->[Derived chain](#derived-chain)<!-- /benchmark -->; in its worst case, every other library measured in all seven scenarios takes at least <!-- benchmark:others-worst-least -->18×<!-- /benchmark --> as long as the fastest. Zustand and Valtio take part in the single state only (see [Keeping the comparison fair](#keeping-the-comparison-fair)), so their worst case is over that scenario alone. In the conditional fan-out, synstate-next and RxJS are counted in their `switchMap` form; the rows written naively are shown in that scenario but left out of this summary.
+synstate-next trails most in <!-- benchmark:subject-worst-scenario -->[Deep chain](#deep-chain) (K=1000, M=200)<!-- /benchmark -->; in its worst case, every other library measured in all seven scenarios takes at least <!-- benchmark:others-worst-least -->18×<!-- /benchmark --> as long as the fastest. Zustand and Valtio take part in the single state only (see [Keeping the comparison fair](#keeping-the-comparison-fair)), so their worst case is over that scenario alone. In the conditional fan-out, synstate-next and RxJS are counted in their `switchMap` form; the rows written naively are shown in that scenario but left out of this summary.
+
+Every scenario also measures synstate, the library synstate-next is to replace, in the same run and from the same code as its own documentation's benchmark. Its rows show what the rewrite changed: the last column of the summary divides synstate-next's time by synstate's, where below 1.0× is faster. Being the same library's earlier generation, synstate is left out of the fastest, the slowest and the worst cases.
 
 :::note[How these numbers are produced]
-`pnpm --filter synstate-next-docs run benchmark` measures every scenario and rewrites the tables and figures on this page. Each library is measured three times, each time in a Node.js process of its own, with every library in production mode. Where a sentence on this page no longer holds for a new measurement, the command stops and names it. The code is in [the documentation package](https://github.com/noshiro-pf/mono/tree/main/apps/synstate-next-docs/scripts/benchmark).
+`pnpm --filter synstate-next-docs run benchmark` measures every scenario and rewrites the tables and figures on this page; the published figures come from the `synstate-next-benchmark.yml` workflow, which runs it on a GitHub-hosted runner, so that the ratios between libraries are those of the same kind of machine as synstate's documentation. Each library is measured <!-- benchmark:rounds -->7<!-- /benchmark --> times, each time in a Node.js process of its own, with every library in production mode. Where a sentence on this page no longer holds for a new measurement, the command stops and names it. The code is in [the documentation package](https://github.com/noshiro-pf/mono/tree/main/apps/synstate-next-docs/scripts/benchmark).
 
 <!-- benchmark:environment -->
 
-|           |                                                                                                                                          |
-| :-------- | :--------------------------------------------------------------------------------------------------------------------------------------- |
-| Node.js   | v26.13.0                                                                                                                                 |
-| OS        | Linux 6.18.44-fc-v338 (x64)                                                                                                              |
-| CPU       | Intel(R) Xeon(R) Processor @ 2.10GHz                                                                                                     |
-| Libraries | rxjs 7.8.2, mobx 7.1.0, jotai 3.0.1, @reduxjs/toolkit 2.13.0, solid-js 1.9.17, @preact/signals-core 1.14.4, zustand 5.0.15, valtio 2.3.2 |
-| Measured  | 2026-11-10                                                                                                                               |
+|           |                                                                                                                                                          |
+| :-------- | :------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Runner    | GitHub Actions (ubuntu24)                                                                                                                                |
+| Node.js   | v26.13.0                                                                                                                                                 |
+| OS        | Linux 7.0.0-1017-azure (x64)                                                                                                                             |
+| CPU       | AMD EPYC 7763 64-Core Processor                                                                                                                          |
+| Libraries | synstate 8.0.0, rxjs 7.8.2, mobx 7.1.0, jotai 3.0.1, @reduxjs/toolkit 2.13.0, solid-js 1.9.17, @preact/signals-core 1.14.4, zustand 5.0.15, valtio 2.3.2 |
+| Measured  | 2026-11-12                                                                                                                                               |
 
 <!-- /benchmark -->
 
@@ -69,15 +72,16 @@ One state, one subscriber, nothing derived: the floor every other scenario build
 
 | Library           | Median (ms) | p95 (ms) | Updates per second | ÷ synstate-next |
 | :---------------- | ----------: | -------: | -----------------: | --------------: |
-| **synstate-next** |        9.16 |     15.8 |         10,921,252 |            1.0× |
-| RxJS              |        4.04 |     5.53 |         24,781,922 |            0.4× |
-| MobX              |        53.4 |     63.8 |          1,872,833 |            5.8× |
-| Jotai             |         226 |      301 |            442,759 |             25× |
-| Redux             |         126 |      192 |            796,400 |             14× |
-| Solid             |        26.4 |     45.4 |          3,783,141 |            2.9× |
-| Preact Signals    |        6.19 |     10.4 |         16,146,027 |            0.7× |
-| Zustand           |        5.39 |     7.13 |         18,551,614 |            0.6× |
-| Valtio            |        40.9 |     65.4 |          2,443,481 |            4.5× |
+| **synstate-next** |        7.09 |     7.42 |         14,111,559 |            1.0× |
+| synstate          |        5.68 |     6.65 |         17,618,812 |            0.8× |
+| RxJS              |        4.26 |     4.45 |         23,476,140 |            0.6× |
+| MobX              |        57.2 |     59.4 |          1,749,330 |            8.1× |
+| Jotai             |         181 |      185 |            553,011 |             26× |
+| Redux             |         118 |      123 |            845,495 |             17× |
+| Solid             |        28.8 |     31.7 |          3,477,704 |            4.1× |
+| Preact Signals    |        5.33 |     5.68 |         18,758,720 |            0.8× |
+| Zustand           |        5.58 |     6.45 |         17,928,862 |            0.8× |
+| Valtio            |        46.8 |     47.7 |          2,137,397 |            6.6× |
 
 <!-- /benchmark -->
 
@@ -316,13 +320,14 @@ The state is doubled, and the result doubled again, with one subscriber at the e
 
 | Library           | Median (ms) | p95 (ms) | Updates per second | ÷ synstate-next |
 | :---------------- | ----------: | -------: | -----------------: | --------------: |
-| **synstate-next** |        17.2 |     25.2 |          5,800,950 |            1.0× |
-| RxJS              |        6.71 |     11.5 |         14,913,449 |            0.4× |
-| MobX              |         138 |      221 |            723,922 |            8.0× |
-| Jotai             |         890 |    1,058 |            112,399 |             52× |
-| Redux             |         363 |      461 |            275,158 |             21× |
-| Solid             |        83.7 |      103 |          1,194,833 |            4.9× |
-| Preact Signals    |        16.2 |     27.2 |          6,166,906 |            0.9× |
+| **synstate-next** |        15.8 |     18.1 |          6,346,503 |            1.0× |
+| synstate          |        15.0 |     17.2 |          6,667,307 |            1.0× |
+| RxJS              |        7.33 |     7.68 |         13,644,575 |            0.5× |
+| MobX              |         111 |      113 |            900,280 |            7.0× |
+| Jotai             |         749 |      769 |            133,526 |             48× |
+| Redux             |         289 |      304 |            345,779 |             18× |
+| Solid             |        87.5 |     89.4 |          1,143,379 |            5.6× |
+| Preact Signals    |        15.0 |     17.2 |          6,665,744 |            1.0× |
 
 <!-- /benchmark -->
 
@@ -557,19 +562,20 @@ The state is doubled and tripled, and the two are added: two paths from one stat
 
 | Library           | Median (ms) | p95 (ms) | Updates per second | ÷ synstate-next |
 | :---------------- | ----------: | -------: | -----------------: | --------------: |
-| **synstate-next** |        22.8 |     38.9 |          4,384,550 |            1.0× |
-| RxJS              |        18.6 |     27.2 |          5,363,206 |            0.8× |
-| MobX              |         161 |      198 |            622,329 |            7.0× |
-| Jotai             |       1,276 |    1,549 |             78,386 |             56× |
-| Redux             |         442 |      520 |            226,284 |             19× |
-| Solid             |         102 |      136 |            983,900 |            4.5× |
-| Preact Signals    |        25.1 |     43.1 |          3,981,898 |            1.1× |
+| **synstate-next** |        21.2 |     22.1 |          4,727,067 |            1.0× |
+| synstate          |        25.4 |     31.5 |          3,941,890 |            1.2× |
+| RxJS              |        18.4 |     19.0 |          5,429,040 |            0.9× |
+| MobX              |         143 |      146 |            698,530 |            6.8× |
+| Jotai             |       1,106 |    1,121 |             90,424 |             52× |
+| Redux             |         362 |      384 |            276,237 |             17× |
+| Solid             |         108 |      115 |            923,381 |            5.1× |
+| Preact Signals    |        22.3 |     23.9 |          4,479,429 |            1.1× |
 
 <!-- /benchmark -->
 
 ### What the first three scenarios show
 
-On these small graphs the time is mostly what a library does for each write, and synstate-next takes at most <!-- benchmark:small-graphs-subject-over-fastest-max -->2.6×<!-- /benchmark --> as long as the fastest library in each. The fastest do less per write. RxJS passes each value straight on to the next `subscribe`, with no step that orders the update, which is also why its subscriber sees a mix of an old and a new value in the diamond. Preact Signals computes a value only when something reads it. synstate-next computes every value a write reaches, parents before children, before it calls any subscriber, so that each subscriber sees every value up to date and is called once. Solid, MobX, Jotai and Redux take longer than synstate-next in all three.
+On these small graphs the time is mostly what a library does for each write, and synstate-next takes at most <!-- benchmark:small-graphs-subject-over-fastest-max -->2.1×<!-- /benchmark --> as long as the fastest library in each. The fastest do less per write. RxJS passes each value straight on to the next `subscribe`, with no step that orders the update, which is also why its subscriber sees a mix of an old and a new value in the diamond. Preact Signals computes a value only when something reads it. synstate-next computes every value a write reaches, parents before children, before it calls any subscriber, so that each subscriber sees every value up to date and is called once. Solid, MobX, Jotai and Redux take longer than synstate-next in all three.
 
 ### Implementations
 
@@ -821,19 +827,20 @@ A head point followed by $M$ stages, each moving a small step towards the stage 
 
 | Library           | K=100, M=50 (ms) | K=500, M=50 (ms) | K=1000, M=50 (ms) | K=100, M=100 (ms) | K=500, M=100 (ms) | K=1000, M=100 (ms) | K=500, M=200 (ms) | K=1000, M=200 (ms) |
 | :---------------- | ---------------: | ---------------: | ----------------: | ----------------: | ----------------: | -----------------: | ----------------: | -----------------: |
-| **synstate-next** |             0.82 |             1.99 |              4.01 |              0.61 |              3.37 |               6.96 |              6.60 |               13.1 |
-| RxJS              |             8.81 |             42.8 |              83.6 |              69.4 |               367 |                717 |             1,716 |              3,437 |
-| MobX              |             17.4 |             84.1 |               166 |              33.7 |               174 |                333 |               344 |                703 |
-| Jotai             |             25.1 |              120 |               222 |              47.2 |               231 |                469 |               482 |                930 |
-| Redux             |             0.56 |             2.87 |              5.88 |              0.76 |              3.72 |               5.46 |              8.24 |               5.80 |
-| Solid             |             1.86 |             7.08 |              13.3 |              2.63 |              13.0 |               29.2 |              29.5 |               61.2 |
-| Preact Signals    |             1.31 |             2.25 |              3.65 |              0.63 |              3.35 |               9.22 |              9.09 |               18.0 |
+| **synstate-next** |             0.96 |             1.80 |              3.31 |              0.55 |              2.99 |               5.89 |              5.85 |               11.9 |
+| synstate          |             1.42 |             3.39 |              3.66 |              0.66 |              3.74 |               7.48 |              7.17 |               14.4 |
+| RxJS              |             7.61 |             30.6 |              56.3 |              22.5 |               130 |                238 |               508 |              1,031 |
+| MobX              |             16.8 |             79.6 |               158 |              31.8 |               157 |                317 |               314 |                628 |
+| Jotai             |             23.5 |             99.5 |               198 |              39.3 |               197 |                395 |               404 |                802 |
+| Redux             |             0.71 |             3.16 |              4.64 |              0.76 |              4.25 |               5.61 |              7.35 |               5.15 |
+| Solid             |             3.48 |             6.52 |              12.8 |              2.45 |              12.4 |               28.4 |              27.9 |               55.3 |
+| Preact Signals    |             1.63 |             1.60 |              2.96 |              0.50 |              2.46 |               8.54 |              8.28 |               17.2 |
 
 <!-- /benchmark -->
 
 ### What the results show
 
-When the chain gets four times deeper ($M = 50 \to 200$ at $K = 1000$), synstate-next takes <!-- benchmark:deep-chain-subject-growth -->3.3×<!-- /benchmark --> as long and RxJS <!-- benchmark:deep-chain-rxjs-growth -->41×<!-- /benchmark -->. Of all the libraries, RxJS's time grows the most as the chain gets deeper. synstate-next computes each stage once per move and calls the subscriber once. RxJS's `combineLatest` emits each time one of its $M + 1$ inputs moves, so its subscriber is called $M + 1$ times per move, each time with $M + 1$ points. Redux, MobX and Preact Signals advance the whole chain in one loop inside a reducer, reaction or effect, so their rows time a loop rather than a chain of derived values (see [Keeping the comparison fair](#keeping-the-comparison-fair)).
+When the chain gets four times deeper ($M = 50 \to 200$ at $K = 1000$), synstate-next takes <!-- benchmark:deep-chain-subject-growth -->3.6×<!-- /benchmark --> as long and RxJS <!-- benchmark:deep-chain-rxjs-growth -->18×<!-- /benchmark -->. Of all the libraries, RxJS's time grows the most as the chain gets deeper. synstate-next computes each stage once per move and calls the subscriber once. RxJS's `combineLatest` emits each time one of its $M + 1$ inputs moves, so its subscriber is called $M + 1$ times per move, each time with $M + 1$ points. Redux, MobX and Preact Signals advance the whole chain in one loop inside a reducer, reaction or effect, so their rows time a loop rather than a chain of derived values (see [Keeping the comparison fair](#keeping-the-comparison-fair)).
 
 ### Implementation
 
@@ -934,13 +941,14 @@ $N$ diamonds in a row: each splits the value before it in two and adds the two b
 
 | Library           | N=2 (ms) | N=4 (ms) | N=6 (ms) | N=8 (ms) | N=10 (ms) | N=12 (ms) | N=14 (ms) | N=16 (ms) | N=18 (ms) | N=20 (ms) |
 | :---------------- | -------: | -------: | -------: | -------: | --------: | --------: | --------: | --------: | --------: | --------: |
-| **synstate-next** |     0.22 |     0.23 |     0.35 |     0.19 |      0.22 |      0.18 |      0.19 |      0.23 |      0.23 |      0.25 |
-| RxJS              |     0.26 |     1.38 |     5.10 |     30.6 |       172 |     1,065 |   > 5,000 |   > 5,000 |   > 5,000 |   > 5,000 |
-| MobX              |     0.94 |     1.02 |     0.80 |     0.90 |      0.87 |      1.03 |      1.24 |      1.30 |      1.44 |      1.60 |
-| Jotai             |     3.23 |     5.67 |     7.45 |     9.52 |      12.0 |      10.9 |      12.3 |      14.2 |      20.4 |      21.7 |
-| Redux             |     1.49 |     1.51 |     1.60 |     2.17 |      2.22 |      3.39 |      3.67 |      3.53 |      3.88 |      4.42 |
-| Solid             |     0.59 |     0.55 |     0.79 |     0.85 |      1.00 |      0.92 |      0.99 |      1.11 |      1.23 |      1.40 |
-| Preact Signals    |     0.16 |     0.15 |     0.21 |     0.24 |      0.29 |      0.25 |      0.29 |      0.32 |      0.35 |      0.37 |
+| **synstate-next** |     0.23 |     0.17 |     0.40 |     0.34 |      0.36 |      0.19 |      0.19 |      0.23 |      0.26 |      0.26 |
+| synstate          |     0.42 |     0.22 |     0.58 |     0.78 |      0.89 |      0.53 |      0.30 |      0.35 |      0.38 |      0.40 |
+| RxJS              |     0.23 |     1.39 |     3.80 |     25.8 |       132 |       702 |   > 5,000 |   > 5,000 |   > 5,000 |   > 5,000 |
+| MobX              |     0.88 |     1.74 |     1.18 |     0.98 |      0.78 |      0.89 |      1.00 |      1.12 |      1.24 |      1.39 |
+| Jotai             |     4.23 |     5.15 |     7.58 |     9.23 |      12.4 |      10.1 |      11.7 |      13.4 |      19.2 |      21.1 |
+| Redux             |     1.75 |     1.18 |     1.38 |     1.80 |      1.97 |      3.09 |      2.72 |      3.08 |      3.38 |      3.80 |
+| Solid             |     0.52 |     0.73 |     1.65 |     1.41 |      1.14 |      0.84 |      0.96 |      1.09 |      1.23 |      1.36 |
+| Preact Signals    |     0.16 |     0.25 |     0.37 |     0.46 |      0.45 |      0.44 |      0.37 |      0.28 |      0.33 |      0.36 |
 
 <!-- /benchmark -->
 
@@ -992,21 +1000,23 @@ $B$ branches and a selector that picks one of them; the result is the picked bra
 
 | Library                          | B=2 (ms) | B=5 (ms) | B=10 (ms) | B=20 (ms) | B=50 (ms) | B=100 (ms) | B=200 (ms) | B=500 (ms) | B=1000 (ms) |
 | :------------------------------- | -------: | -------: | --------: | --------: | --------: | ---------: | ---------: | ---------: | ----------: |
-| **synstate-next (switchMap)**    |     1.76 |     1.54 |      1.29 |      1.19 |      1.27 |       1.33 |       1.36 |       1.36 |        1.63 |
-| **synstate-next (naive derive)** |     15.6 |     17.2 |      19.6 |      36.6 |      46.3 |       71.5 |        138 |        381 |       1,023 |
-| RxJS (switchMap)                 |     3.13 |     3.07 |      2.88 |      2.86 |      2.85 |       2.91 |       2.89 |       3.01 |        3.49 |
-| RxJS (naive combineLatest)       |     11.0 |     8.24 |      8.44 |      8.11 |      9.30 |       11.7 |       15.1 |       26.8 |        54.0 |
-| MobX                             |     1.53 |     1.51 |      1.34 |      1.37 |      1.39 |       1.41 |       1.39 |       1.49 |        1.51 |
-| Jotai                            |      168 |      158 |       152 |       153 |       153 |        152 |        158 |        156 |         174 |
-| Redux                            |      115 |      120 |       118 |       113 |       133 |        132 |        139 |        171 |         210 |
-| Solid                            |     0.82 |     0.76 |      0.82 |      0.76 |      0.77 |       0.77 |       0.82 |       0.85 |        0.96 |
-| Preact Signals                   |     2.03 |     1.73 |      1.89 |      1.81 |      1.78 |       1.72 |       1.65 |       1.82 |        2.73 |
+| **synstate-next (switchMap)**    |     1.22 |     1.19 |      1.13 |      1.14 |      1.21 |       1.15 |       1.18 |       1.24 |        1.42 |
+| **synstate-next (naive derive)** |     11.8 |     13.0 |      14.9 |      18.2 |      29.9 |       47.3 |       84.2 |        198 |         380 |
+| synstate (switchMap)             |     2.43 |     2.11 |      1.86 |      1.78 |      1.81 |       1.84 |       1.95 |       2.36 |        2.46 |
+| synstate (naive derive)          |     11.0 |     11.7 |      14.5 |      20.2 |      38.5 |       69.1 |        134 |        321 |         673 |
+| RxJS (switchMap)                 |     3.33 |     2.92 |      2.88 |      2.86 |      2.92 |       2.91 |       2.94 |       3.07 |        3.24 |
+| RxJS (naive combineLatest)       |     8.50 |     8.52 |      9.07 |      8.98 |      10.0 |       11.0 |       16.2 |       30.0 |        57.7 |
+| MobX                             |     1.55 |     1.49 |      1.44 |      1.43 |      1.44 |       1.43 |       1.44 |       1.46 |        1.51 |
+| Jotai                            |      139 |      139 |       139 |       139 |       139 |        139 |        139 |        139 |         138 |
+| Redux                            |      113 |      112 |       115 |       114 |       116 |        124 |        125 |        145 |         170 |
+| Solid                            |     0.79 |     1.00 |      0.74 |      0.74 |      0.74 |       0.75 |       0.77 |       0.85 |        0.81 |
+| Preact Signals                   |     1.09 |     1.06 |      0.97 |      1.03 |      1.05 |       1.00 |       1.00 |       1.15 |        1.35 |
 
 <!-- /benchmark -->
 
 ### What the results show
 
-Written with `switchMap`, synstate-next's time does not grow with $B$. `switchMap` follows the picked branch only, so a write to branch 1 reaches nothing, and the time stays between <!-- benchmark:fan-out-switch-map-range -->1.19–1.76<!-- /benchmark --> ms at every $B$, as it does for MobX, Solid and Preact Signals, which follow only what was read. Written naively, with a `derive` over every branch, each write computes the `derive` again from all $B$ values, and at <!-- benchmark:fan-out-summary-point -->$B = 1000$<!-- /benchmark --> that takes <!-- benchmark:fan-out-naive-over-fastest -->1,066×<!-- /benchmark --> as long as the fastest library. The scenario never changes the selector, so it does not time switching branches.
+Written with `switchMap`, synstate-next's time does not grow with $B$. `switchMap` follows the picked branch only, so a write to branch 1 reaches nothing, and the time stays between <!-- benchmark:fan-out-switch-map-range -->1.13–1.42<!-- /benchmark --> ms at every $B$, as it does for MobX, Solid and Preact Signals, which follow only what was read. Written naively, with a `derive` over every branch, each write computes the `derive` again from all $B$ values, and at <!-- benchmark:fan-out-summary-point -->$B = 1000$<!-- /benchmark --> that takes <!-- benchmark:fan-out-naive-over-fastest -->472×<!-- /benchmark --> as long as the fastest library. The scenario never changes the selector, so it does not time switching branches.
 
 ### Implementations
 
@@ -1435,20 +1445,21 @@ One state, a `bucket` computed from it that changes on one write in 1000, and $W
 
 | Library                               | W=1 (ms) | W=2 (ms) | W=5 (ms) | W=10 (ms) | W=20 (ms) | W=50 (ms) | W=100 (ms) | W=200 (ms) | W=500 (ms) | W=1000 (ms) |
 | :------------------------------------ | -------: | -------: | -------: | --------: | --------: | --------: | ---------: | ---------: | ---------: | ----------: |
-| **synstate-next**                     |     12.4 |     12.2 |     12.3 |      12.0 |      12.1 |      12.6 |       12.5 |       13.3 |       25.3 |        22.6 |
-| RxJS (distinctUntilChanged)           |     13.8 |     8.01 |     7.03 |      12.1 |      9.55 |      7.65 |       8.14 |       10.4 |       12.7 |        17.0 |
-| RxJS (naive, no distinctUntilChanged) |     22.1 |     24.0 |     28.4 |      53.2 |      90.4 |       215 |        389 |        721 |      1,692 |       3,442 |
-| MobX                                  |     58.5 |     74.2 |      126 |       221 |       374 |       787 |      1,380 |      2,683 |    > 5,000 |     > 5,000 |
-| Jotai                                 |      513 |      593 |      740 |       828 |     1,129 |     2,204 |      4,401 |    > 5,000 |    > 5,000 |     > 5,000 |
-| Redux                                 |      341 |      463 |      717 |     1,258 |     2,088 |   > 5,000 |    > 5,000 |    > 5,000 |    > 5,000 |     > 5,000 |
-| Solid                                 |     40.8 |     47.6 |     66.3 |       100 |       181 |       345 |        780 |      1,465 |      3,631 |     > 5,000 |
-| Preact Signals                        |     9.02 |     12.6 |     21.8 |      34.9 |      64.8 |       136 |        272 |        533 |      1,267 |       2,610 |
+| **synstate-next**                     |     10.5 |     10.6 |     10.4 |      10.2 |      10.3 |      10.5 |       10.8 |       11.4 |       13.8 |        19.9 |
+| synstate                              |     9.02 |     9.19 |     8.86 |      8.85 |      9.16 |      9.32 |       9.53 |       9.99 |       12.3 |        17.0 |
+| RxJS (distinctUntilChanged)           |     7.58 |     7.41 |     7.24 |      7.31 |      7.27 |      7.64 |       7.83 |       8.64 |       10.8 |        15.2 |
+| RxJS (naive, no distinctUntilChanged) |     17.6 |     19.7 |     30.5 |      49.0 |      91.2 |       181 |        345 |        680 |      1,885 |       4,017 |
+| MobX                                  |     68.4 |     78.8 |      112 |       168 |       288 |       619 |      1,167 |      2,265 |    > 5,000 |     > 5,000 |
+| Jotai                                 |      457 |      506 |      573 |       714 |     1,001 |     1,989 |      3,684 |    > 5,000 |    > 5,000 |     > 5,000 |
+| Redux                                 |      284 |      361 |      565 |       932 |     1,746 |     4,024 |    > 5,000 |    > 5,000 |    > 5,000 |     > 5,000 |
+| Solid                                 |     48.3 |     52.8 |     69.0 |      97.8 |       164 |       342 |        649 |      1,285 |      3,473 |     > 5,000 |
+| Preact Signals                        |     7.75 |     10.1 |     17.5 |      30.4 |      57.5 |       138 |        285 |        580 |      1,546 |       3,306 |
 
 <!-- /benchmark -->
 
 ### What the results show
 
-synstate-next's `map` compares the bucket with its previous value, and a value that does not change stops there: 999 writes in 1000 reach no view, and the time stays between <!-- benchmark:unchanged-subject-range -->12.0–25.3<!-- /benchmark --> ms from $W = 1$ to $W = 1000$, as RxJS's does with `distinctUntilChanged`. Preact Signals, Solid, MobX and Jotai also keep an unchanged value from reaching a subscriber, but a write first marks every view below the state as possibly out of date, and each view is checked before the unchanged bucket is found. Redux calls every subscriber on every write. The rows of Preact Signals, Solid, MobX, Jotai, Redux and RxJS without `distinctUntilChanged` grow with $W$.
+synstate-next's `map` compares the bucket with its previous value, and a value that does not change stops there: 999 writes in 1000 reach no view, and the time stays between <!-- benchmark:unchanged-subject-range -->10.2–19.9<!-- /benchmark --> ms from $W = 1$ to $W = 1000$, as RxJS's does with `distinctUntilChanged`. Preact Signals, Solid, MobX and Jotai also keep an unchanged value from reaching a subscriber, but a write first marks every view below the state as possibly out of date, and each view is checked before the unchanged bucket is found. Redux calls every subscriber on every write. The rows of Preact Signals, Solid, MobX, Jotai, Redux and RxJS without `distinctUntilChanged` grow with $W$.
 
 ### Implementations
 
@@ -1753,9 +1764,9 @@ export const runBenchmark = (k: number, width: number): number => {
 
 ## Methodology
 
-- **Runs**: the first three scenarios run $N = 100{,}000$ writes 5 times unmeasured and 20 times measured; the table shows the median, p95 and updates per second of all 60 measured runs, three processes of 20. The others run each point 2 times unmeasured and up to 5 times measured, and show the median of each process's median.
-- **Timeout**: within a round, a run longer than <!-- benchmark:timeout -->5,000<!-- /benchmark --> ms ends its point, and no larger point is measured in that round (in the deep chain, one at least as large in both $K$ and $M$). A point shows as `>` when most of the three rounds did not finish it.
-- **Isolation**: each library is measured in a Node.js process of its own, three times, in an order that changes from one time to the next. V8 optimizes a function for the shapes it has seen, so in a shared process a library would inherit what the ones before it taught it.
+- **Runs**: the first three scenarios run $N = 100{,}000$ writes 5 times unmeasured and 20 times measured; the table shows the median, p95 and updates per second of all <!-- benchmark:stats-runs -->140<!-- /benchmark --> measured runs, <!-- benchmark:rounds -->7<!-- /benchmark --> processes of 20. The others run each point 2 times unmeasured and up to 5 times measured, and show the median of each process's median.
+- **Timeout**: within a round, a run longer than <!-- benchmark:timeout -->5,000<!-- /benchmark --> ms ends its point, and no larger point is measured in that round (in the deep chain, one at least as large in both $K$ and $M$). A point shows as `>` when most of the <!-- benchmark:rounds -->7<!-- /benchmark --> rounds did not finish it.
+- **Isolation**: each library is measured in a Node.js process of its own, <!-- benchmark:rounds -->7<!-- /benchmark --> times, in an order that changes from one time to the next. V8 optimizes a function for the shapes it has seen, so in a shared process a library would inherit what the ones before it taught it.
 - **Checked before timed**: each library's result is checked before it is timed, so that a library computing nothing is not timed as a fast one.
 - **Builds**: `NODE_ENV=production`, so that no library runs its development-only checks. Valtio's ES module build reads `import.meta.env.MODE`, which Node does not define; its few development checks run when a subscription is made, not on each write.
 

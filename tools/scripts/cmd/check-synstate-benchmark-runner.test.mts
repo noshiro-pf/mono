@@ -1,6 +1,7 @@
 import {
   collectRunnerViolations,
   isResultsTable,
+  NEXT_RESULTS,
 } from './check-synstate-benchmark-runner.mjs';
 
 const table = (recorded: unknown): unknown =>
@@ -80,6 +81,55 @@ describe('collectRunnerViolations', () => {
     assert.include(violations[0], 'not a string');
   });
 
+  test("reads synstate-next's results file, whose environment is at the top", () => {
+    assert.deepStrictEqual(
+      collectRunnerViolations([
+        {
+          file: NEXT_RESULTS,
+          content: {
+            environment: environmentOf('github-actions'),
+            scenarios: {},
+          },
+        },
+      ]),
+      [],
+    );
+
+    const violations = collectRunnerViolations([
+      {
+        file: NEXT_RESULTS,
+        content: { environment: environmentOf('local'), scenarios: {} },
+      },
+    ]);
+
+    assert.strictEqual(violations.length, 1);
+
+    assert.include(violations[0], NEXT_RESULTS);
+
+    assert.include(violations[0], '"local"');
+  });
+
+  test('looks for the environment where the path says, not where the content has one', () => {
+    const violations = collectRunnerViolations([
+      {
+        file: 'apps/synstate-docs/src/data/results.json',
+        content: { environment: environmentOf('github-actions'), rows: [] },
+      },
+      {
+        file: NEXT_RESULTS,
+        content: table(environmentOf('github-actions')),
+      },
+    ]);
+
+    assert.strictEqual(violations.length, 2);
+
+    assert.include(violations[0], '`meta.environment`');
+
+    assert.include(violations[1], NEXT_RESULTS);
+
+    assert.include(violations[1], '(`environment`)');
+  });
+
   test('names a file that is not an object', () => {
     const violations = collectRunnerViolations([
       { file: 'results.json', content: [] },
@@ -105,6 +155,20 @@ describe('isResultsTable', () => {
 
     assert.isFalse(
       isResultsTable('apps/synstate-docs/src/data/library-colors.mts'),
+    );
+  });
+
+  test("takes synstate-next's results file and nothing else beside it", () => {
+    assert.isTrue(
+      isResultsTable('apps/synstate-next-docs/src/data/benchmark-results.json'),
+    );
+
+    assert.isFalse(
+      isResultsTable('apps/synstate-next-docs/src/data/results.json'),
+    );
+
+    assert.isFalse(
+      isResultsTable('apps/synstate-next-docs/src/data/library-colors.mts'),
     );
   });
 

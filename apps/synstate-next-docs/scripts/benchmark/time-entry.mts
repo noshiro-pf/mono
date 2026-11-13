@@ -168,6 +168,16 @@ export const deepChainLabels: readonly string[] = deepChainPoints.map(
   ([k, m]) => `K=${k.toString()}, M=${m.toString()}`,
 );
 
+/**
+ * How many times `run-benchmark.mts` measures each library in a scenario, each
+ * time in a new process. A library's speed differs from one process to the next
+ * by up to twice, as V8 happens to optimize it, so three were too few for the
+ * median to say which is usual. Odd, so that a sweep point's median over the
+ * rounds is a time one round measured, and a point is never left with half its
+ * rounds finished ({@link medianOverRounds}).
+ */
+export const ROUNDS = 7;
+
 /** The updates a `stats` scenario makes per run. */
 export const STATS_UPDATES = 100_000;
 
@@ -182,7 +192,10 @@ type Module = ReadonlyRecord<string, unknown>;
 
 const STATS_WARMUP = 5;
 
-const STATS_RUNS = 20;
+export const STATS_RUNS = 20;
+
+/** How many times a `stats` scenario measures each library over a run. */
+export const STATS_RUNS_PER_ROW = ROUNDS * STATS_RUNS;
 
 const SWEEP_WARMUP = 2;
 

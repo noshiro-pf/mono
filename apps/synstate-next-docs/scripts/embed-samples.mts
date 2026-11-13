@@ -4,7 +4,7 @@ import { Arr, isRecord, Result } from 'ts-data-forge';
 import { isDirectlyExecuted } from 'ts-repo-utils';
 // eslint-disable-next-line import-x/no-relative-packages
 import { embedExamplesInMarkdown } from '../../../tools/configs/embed-examples-in-markdown.mjs';
-import { isSubject, scenarios } from './benchmark/scenarios.mjs';
+import { isPredecessor, isSubject, scenarios } from './benchmark/scenarios.mjs';
 import { referencePages } from './reference-pages.mjs';
 import { workspaceRootPath } from './workspace-root-path.mjs';
 
@@ -29,7 +29,11 @@ const synstateSamples = '../../../synstate/samples/docs-site';
  */
 const benchmarkListings = scenarios.flatMap(({ entries, listsOthers }) =>
   entries
-    .filter(({ label }) => listsOthers || isSubject(label))
+    // synstate's code is its own documentation's, nearly line for line
+    // synstate-next's; the page does not show it.
+    .filter(
+      ({ label }) => isSubject(label) || (listsOthers && !isPredecessor(label)),
+    )
     .map(({ file }) =>
       path.relative(samplesDir, file).split(path.sep).join('/'),
     ),

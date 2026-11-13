@@ -5,7 +5,12 @@ import { defineViteConfig } from '../../../tools/configs/vite-config.mjs';
 export default defineViteConfig({
   packageRoot: workspaceRootPath,
   coverage: {
-    include: ['scripts/reference-text.mts'],
+    include: [
+      'scripts/reference-text.mts',
+      'scripts/embed-benchmark.mts',
+      'scripts/benchmark/scenarios.mts',
+      'scripts/benchmark/time-entry.mts',
+    ],
   },
   node: {
     include: ['scripts/**/*.test.mts'],

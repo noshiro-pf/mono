@@ -14,14 +14,22 @@ import {
 } from './benchmark/results.mjs';
 import {
   isNaiveForm,
+  isPredecessor,
   isSubject,
   libraryOf,
+  predecessorOf,
   resultsPath,
   type ScenarioId,
   scenarios,
   subjectLabel,
 } from './benchmark/scenarios.mjs';
-import { median, STATS_UPDATES, TIMEOUT_MS } from './benchmark/time-entry.mjs';
+import {
+  median,
+  ROUNDS,
+  STATS_RUNS_PER_ROW,
+  STATS_UPDATES,
+  TIMEOUT_MS,
+} from './benchmark/time-entry.mjs';
 import { workspaceRootPath } from './workspace-root-path.mjs';
 
 /**
@@ -129,11 +137,16 @@ type Cell = Readonly<{ label: string; ms: number | null }>;
 /** A scenario as the summary reads it. */
 type ScenarioSummary = Readonly<{
   id: ScenarioId;
-  /** The rows the summary compares: every one but the naive forms. */
+  /**
+   * The rows the summary compares: every one but the naive forms and
+   * synstate's.
+   */
   cells: readonly Cell[];
   fastest: Cell & Readonly<{ ms: number }>;
   slowest: Cell;
   subject: Cell & Readonly<{ ms: number }>;
+  /** synstate's row in the form of `subject`. */
+  predecessor: Cell;
 }>;
 
 type Analysis = Readonly<{
@@ -197,6 +210,7 @@ const texts = {
     subjectOverFastest: 'synstate-next ÷ fastest',
     slowest: 'Slowest',
     slowestOverFastest: 'Slowest ÷ fastest',
+    subjectOverPredecessor: 'synstate-next ÷ synstate',
     library: 'Library',
     trailsMost: 'Scenario where it trails most',
     fastestThere: 'Fastest there',
@@ -206,6 +220,7 @@ const texts = {
     perSecond: 'Updates per second',
     overSubject: '÷ synstate-next',
     msHeader: (label: string) => `${label} (ms)`,
+    runner: 'Runner',
     libraries: 'Libraries',
     measuredOn: 'Measured',
   },
@@ -215,6 +230,7 @@ const texts = {
     subjectOverFastest: 'synstate-next ÷ 最速',
     slowest: '最遅',
     slowestOverFastest: '最遅 ÷ 最速',
+    subjectOverPredecessor: 'synstate-next ÷ synstate',
     library: 'ライブラリ',
     trailsMost: '最も遅れるシナリオ',
     fastestThere: 'そこでの最速',
@@ -224,6 +240,7 @@ const texts = {
     perSecond: '1 秒あたりの更新',
     overSubject: '÷ synstate-next',
     msHeader: (label: string) => `${label} (ms)`,
+    runner: '実行環境',
     libraries: 'ライブラリ',
     measuredOn: '計測日',
   },
@@ -306,6 +323,36 @@ const claims: readonly Claim[] = [
   },
 ] as const;
 
+/**
+ * The first row of a `stats` scenario measured other than
+ * {@link STATS_RUNS_PER_ROW} times. The page states how many times each library
+ * was measured from `ROUNDS` and `STATS_RUNS`, so a file measured with others
+ * would contradict it.
+ */
+export const miscountedRow = (
+  result: ScenarioResult,
+): Readonly<{ label: string; times: readonly number[] }> | undefined =>
+  result.kind === 'stats'
+    ? result.rows.find(({ times }) => times.length !== STATS_RUNS_PER_ROW)
+    : undefined;
+
+/**
+ * A ratio as the tables show it: one decimal from 0.1 to 10, a whole number
+ * above, and one significant figure below 0.1, where one decimal would read as
+ * 0.0× (the column dividing synstate-next by synstate can go there). Written
+ * out in full however small, never in exponent notation.
+ */
+export const formatRatio = (ratio: number, timedOut: boolean): string => {
+  const text =
+    ratio < 0.095
+      ? ratio.toLocaleString('en-US', { maximumSignificantDigits: 1 })
+      : ratio < 9.95
+        ? ratio.toFixed(1)
+        : Math.round(ratio).toLocaleString('en-US');
+
+  return `${timedOut ? '> ' : ''}${text}×`;
+};
+
 /** A cell's time for ratios: a timeout counts as exactly the timeout. */
 const msOf = (cell: Cell): number => cell.ms ?? TIMEOUT_MS;
 
@@ -338,6 +385,10 @@ const cellsAt = (
   );
 };
 
+/** What an error about the results file asks for. */
+const REMEASURE =
+  'measure again: dispatch `synstate-next-benchmark.yml` on the branch, or run `pnpm run benchmark` to try a change locally';
+
 const analyse = (results: BenchmarkResults): Result<Analysis, string> => {
   const missing = scenarios.filter(
     ({ id }) => results.scenarios[id] === undefined,
@@ -345,7 +396,7 @@ const analyse = (results: BenchmarkResults): Result<Analysis, string> => {
 
   if (Arr.isNonEmpty(missing)) {
     return Result.err(
-      `no results for ${missing.map(({ id }) => id).join(', ')}; run \`pnpm run benchmark\``,
+      `no results for ${missing.map(({ id }) => id).join(', ')}; ${REMEASURE}`,
     );
   }
 
@@ -364,7 +415,15 @@ const analyse = (results: BenchmarkResults): Result<Analysis, string> => {
 
     if (JSON.stringify(measured) !== JSON.stringify(expected)) {
       return Result.err(
-        `${id} was measured with ${measured.join(', ')}, not ${expected.join(', ')}; run \`pnpm run benchmark\``,
+        `${id} was measured with ${measured.join(', ')}, not ${expected.join(', ')}; ${REMEASURE}`,
+      );
+    }
+
+    const miscounted = miscountedRow(result);
+
+    if (miscounted !== undefined) {
+      return Result.err(
+        `${id}: ${miscounted.label} has ${miscounted.times.length.toString()} measured runs, not ${STATS_RUNS_PER_ROW.toString()} (ROUNDS × STATS_RUNS); ${REMEASURE}`,
       );
     }
 
@@ -374,7 +433,9 @@ const analyse = (results: BenchmarkResults): Result<Analysis, string> => {
       return Result.err(`${id}: ${cells.value}`);
     }
 
-    const compared = cells.value.filter(({ label }) => !isNaiveForm(label));
+    const compared = cells.value.filter(
+      ({ label }) => !isNaiveForm(label) && !isPredecessor(label),
+    );
 
     const finished = Arr.generate(function* () {
       for (const cell of compared) {
@@ -398,12 +459,23 @@ const analyse = (results: BenchmarkResults): Result<Analysis, string> => {
       return Result.err(`${id}: synstate-next or every library timed out`);
     }
 
+    const predecessorRowLabel = predecessorOf(subject.label);
+
+    const predecessor = cells.value.find(
+      ({ label }) => label === predecessorRowLabel,
+    );
+
+    if (predecessor === undefined) {
+      return Result.err(`${id}: no row ${predecessorRowLabel}`);
+    }
+
     mut_summaries.push({
       id,
       cells: compared,
       fastest: fastest.value,
       slowest: slowest.value,
       subject,
+      predecessor,
     });
   }
 
@@ -504,14 +576,6 @@ const scenarioLink = (id: ScenarioId, locale: Locale): string => {
   return `[${name}](#${anchor})${point === undefined ? '' : ` (${point})`}`;
 };
 
-/** A ratio as the tables show it: two significant figures up to 10. */
-const formatRatio = (ratio: number, timedOut: boolean): string => {
-  const text =
-    ratio < 9.95 ? ratio.toFixed(1) : Math.round(ratio).toLocaleString('en-US');
-
-  return `${timedOut ? '> ' : ''}${text}×`;
-};
-
 const formatMs = (ms: number | null): string =>
   ms === null
     ? (`> ${TIMEOUT_MS.toLocaleString('en-US')}` as const)
@@ -565,6 +629,12 @@ const environmentTable = (
     ['', ''],
     ['l', 'l'],
     [
+      [
+        t.runner,
+        environment.runner === 'github-actions'
+          ? `GitHub Actions (${environment.runnerImage ?? 'unknown image'})`
+          : environment.runner,
+      ],
       ['Node.js', environment.node],
       ['OS', environment.os],
       ['CPU', environment.cpu],
@@ -638,14 +708,17 @@ const render = (
       t.subjectOverFastest,
       t.slowest,
       t.slowestOverFastest,
+      t.subjectOverPredecessor,
     ],
-    ['l', 'l', 'r', 'l', 'r'],
+    ['l', 'l', 'r', 'l', 'r', 'r'],
     analysis.summaries.map((s) => [
       scenarioLink(s.id, locale),
       s.fastest.label,
       formatRatio(over(s.subject.ms, s.fastest.ms), false),
       s.slowest.label,
       formatRatio(over(msOf(s.slowest), s.fastest.ms), s.slowest.ms === null),
+      // A timed-out synstate makes the ratio an upper bound.
+      `${s.predecessor.ms === null ? '< ' : ''}${formatRatio(over(s.subject.ms, msOf(s.predecessor)), false)}`,
     ]),
   );
 
@@ -787,6 +860,8 @@ const render = (
     ),
     'fan-out-switch-map-range': inline(msRange(switchMapRow)),
     timeout: inline(TIMEOUT_MS.toLocaleString('en-US')),
+    rounds: inline(ROUNDS.toString()),
+    'stats-runs': inline(STATS_RUNS_PER_ROW.toString()),
     ...scenarioTables,
   };
 };
