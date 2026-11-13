@@ -3,6 +3,7 @@ import { Arr } from 'ts-data-forge';
 import type { DeepReadonly } from 'ts-type-forge';
 import * as ts from 'typescript';
 import type { ChangesetBump } from '../../lib/changesets.mjs';
+import { PACKAGE_ENTRY_FILES } from '../../lib/repo-files.mjs';
 
 /**
  * The names a package's public entry exports, through its barrels: each
@@ -119,7 +120,7 @@ export const findPatchExportChanges = async ({
         return [];
       }
 
-      const candidates = ENTRY_FILES.map((file) => `${dir}/${file}`);
+      const candidates = PACKAGE_ENTRY_FILES.map((file) => `${dir}/${file}`);
 
       const present = await Promise.all(
         candidates.map(async (file) => (await readAtHead(file)) !== undefined),
@@ -163,9 +164,6 @@ export const findPatchExportChanges = async ({
 
   return warnings.flat();
 };
-
-/** The public entries a package may have, the first that exists being it. */
-const ENTRY_FILES = ['src/entry-point.mts', 'src/index.mts'] as const;
 
 const quoteList = (names: readonly string[]): string =>
   names.map((name) => `\`${name}\``).join(', ');

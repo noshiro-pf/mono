@@ -44,7 +44,7 @@ const Counter = (): Preact.JSX.Element => {
 };
 ```
 
-### `fromSignal(signal)` — Signal to Observable
+### `fromSignal(sig)` — Signal to Observable
 
 Converts a Preact Signal into a synstate observable, allowing you to apply synstate's operator chain.
 

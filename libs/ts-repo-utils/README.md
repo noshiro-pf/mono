@@ -359,7 +359,7 @@ const exists = await pathExists('./src/index.ts');
 console.log(exists satisfies boolean); // true or false
 ```
 
-#### `assertPathExists(filePath: string, description?: string): Promise<void>`
+#### `assertPathExists(filePath: string, description?): Promise<void>`
 
 Validates that a path exists and exits with code 1 if it doesn't.
 
@@ -370,9 +370,11 @@ import { assertPathExists } from 'ts-repo-utils';
 await assertPathExists('./src/index.ts', 'Entry point file');
 ```
 
-#### `checkExt(config: CheckExtConfig): Promise<Result<undefined, Readonly<{ message: string; files: readonly string[] }>>>`
+#### `checkExt(config: CheckExtConfig): Promise<Result<undefined, CheckExtError>>`
 
 Runs the extension validation and reports findings without exiting the process. Useful when you want to combine extension checks with other validations or surface the failure information in a custom way.
+
+On failure the error is a `CheckExtError`: a `message` summarizing the failure and the `files` with an incorrect extension.
 
 ```tsx
 import { Result } from 'ts-data-forge';
@@ -392,7 +394,7 @@ if (Result.isErr(result)) {
 }
 ```
 
-#### `assertExt(config: CheckExtConfig): Promise<void>`
+#### `assertExt(config)`
 
 Validates that all files in specified directories have the correct extensions. Exits with code 1 if any files have incorrect extensions.
 
@@ -488,7 +490,7 @@ This helper uses `fs.rm` with `recursive` cleanup before calling `fs.mkdir`, so 
 
 ### Git Repository Utilities
 
-#### `repoIsDirty(): Promise<boolean>`
+#### `repoIsDirty(options?): Promise<boolean>`
 
 Checks if the repository has uncommitted changes.
 
@@ -502,7 +504,7 @@ if (isDirty) {
 }
 ```
 
-#### `assertRepoIsClean(): Promise<void>`
+#### `assertRepoIsClean(options?): Promise<void>`
 
 Checks if the repository is clean and exits with code 1 if it has uncommitted changes (shows changes and diff).
 (Function version of the `assert-repo-is-clean` command)
@@ -642,7 +644,7 @@ await formatFilesGlob('src/**/*.ts', {
 - `ignoreUnknown?` - Skip files without a Prettier parser instead of erroring (default: true)
 - `ignore?` - Custom function to ignore files (default: built-in ignore list)
 
-#### `formatUncommittedFiles(options?): Promise<Result>`
+#### `formatUncommittedFiles(options?)`
 
 Formats only files that have been changed according to git status.
 (Function version of the `format-uncommitted` command)
@@ -683,7 +685,7 @@ type Ret = Promise<
 >;
 ```
 
-#### `formatDiffFrom(base: string, options?): Promise<Result>`
+#### `formatDiffFrom(base: string, options?)`
 
 Formats only files that differ from the specified base branch or commit.
 (Function version of the `format-diff-from` command)
@@ -859,7 +861,7 @@ await runCmdInParallelAcrossWorkspaces({
 - `concurrency?` - Maximum packages to process simultaneously (default: 3)
 - `filterWorkspacePattern?` - Optional function to filter packages by name
 
-#### `getWorkspacePackages(rootPackageJsonDir): Promise<readonly Package[]>`
+#### `getWorkspacePackages(rootPackageJsonDir, dependencyFields?): Promise<readonly Package[]>`
 
 Retrieves all workspace packages from a monorepo based on the workspace patterns defined in the root package.json file.
 
@@ -885,7 +887,7 @@ type Package = Readonly<{
 }>;
 ```
 
-#### `executeParallel(packages, scriptName, concurrency?): Promise<readonly Result[]>`
+#### `executeParallel(packages, scriptName, concurrency?): Promise<readonly Readonly<{ code?: number; skipped?: boolean }>[]>`
 
 Executes an npm script across multiple packages in parallel with a concurrency limit. Lower-level function used by `runCmdInParallelAcrossWorkspaces`.
 
