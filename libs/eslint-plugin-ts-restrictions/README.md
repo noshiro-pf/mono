@@ -5,6 +5,8 @@ not do what it says (a date-only string read as UTC midnight, a `string` spread
 into characters, a clock read once when a module loads), and rules that rewrite
 code into one plain form (`??` where it cannot change behavior, an optional
 chain for a nullish ternary, a range check in number-line order).
+Rules about code that runs a user interface, keyboard events and JSX, are in
+[`eslint-plugin-ts-ui-restrictions`](https://www.npmjs.com/package/eslint-plugin-ts-ui-restrictions).
 
 These are the `ts-restrictions/*` rules of
 [`eslint-config-typed`](https://www.npmjs.com/package/eslint-config-typed),
@@ -119,7 +121,6 @@ plugin objects under the same name (`Cannot redefine plugin`).
 | `check-destructuring-completeness`    | Ensure all properties are destructured from an object when explicitly requested                                                                                                                                                                                                                         |   ✓    |   ✓   |     |
 | `explicit-collection-type-arguments`  | Require explicit type arguments on `new Set` / `new Map` / `new WeakSet` / `new WeakMap` called with no argument or an array literal                                                                                                                                                                    |   ✓    |   ✓   | 🔧  |
 | `function-order`                      | Require a module's exported functions before its non-exported helpers, and a helper before the helpers that call it                                                                                                                                                                                     |   ✓    |       | 🔧  |
-| `jsx-boolean-logical-operands`        | Require booleans on both sides of `&&` and `\|\|` whose value is rendered or passed in JSX, and write the rest as a ternary (`{a && <X />}` → `{a ? <X /> : undefined}`).                                                                                                                               |   ✓    |   ✓   | 🔧  |
 | `no-clock-read-at-module-load`        | Disallow reading the clock (`Date.now()`, `new Date()`) when a module loads, which keeps that moment for as long as the module lives                                                                                                                                                                    |   ✓    |       |     |
 | `no-date-only-string-to-date`         | Disallow a date-only string (`YYYY-MM-DD`) read by `new Date` or `Date.parse`, which take it as midnight UTC rather than local midnight                                                                                                                                                                 |   ✓    |   ✓   |     |
 | `no-detached-jsdoc`                   | Disallow a JSDoc block that TypeScript attaches to no node, so that it documents nothing                                                                                                                                                                                                                |   ✓    |       |     |
@@ -140,7 +141,6 @@ plugin objects under the same name (`Cannot redefine plugin`).
 | `prefer-optional-chain-over-ternary`  | Replace a ternary that yields `undefined` for a nullish value and an access on it otherwise by an optional chain (`x == null ? undefined : x.b` → `x?.b`).                                                                                                                                              |   ✓    |   ✓   | 🔧  |
 | `prefer-range-in-number-line-order`   | Write a range check in the order of the number line (`x >= min && max >= x` → `min <= x && x <= max`, `min > x \|\| x > max` → `x < min \|\| max < x`).                                                                                                                                                 |   ✓    |       | 🔧  |
 | `prefer-ternary`                      | Prefer ternary expressions over `if` statements, and chains of them, that only choose what to return or assign.                                                                                                                                                                                         |   ✓    |       | 🔧  |
-| `require-ime-guard-on-enter`          | Require a keyboard handler that compares `event.key` or `event.code` with `'Enter'` or `'Escape'` to check the same event for input method composition                                                                                                                                                  |   ✓    |   ✓   |     |
 
 `no-restricted-syntax` and `no-restricted-cast-name` report nothing until they
 are told what to restrict, so the preset leaves them off.

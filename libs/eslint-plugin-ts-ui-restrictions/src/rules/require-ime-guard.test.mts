@@ -1,7 +1,7 @@
 import parser from '@typescript-eslint/parser';
 import { RuleTester } from '@typescript-eslint/rule-tester';
 import dedent from 'dedent';
-import { requireImeGuardOnEnter } from './require-ime-guard-on-enter.mjs';
+import { requireImeGuard } from './require-ime-guard.mjs';
 
 const tester = new RuleTester({
   languageOptions: {
@@ -34,8 +34,8 @@ const reactKeyboardEvent = dedent`
   }>;
 `;
 
-describe('require-ime-guard-on-enter', () => {
-  tester.run('require-ime-guard-on-enter', requireImeGuardOnEnter, {
+describe('require-ime-guard', () => {
+  tester.run('require-ime-guard', requireImeGuard, {
     valid: [
       {
         name: 'an isComposing check in the same condition',
@@ -412,8 +412,8 @@ describe('require-ime-guard-on-enter', () => {
   });
 });
 
-describe('require-ime-guard-on-enter through type wrappers', () => {
-  tester.run('require-ime-guard-on-enter', requireImeGuardOnEnter, {
+describe('require-ime-guard through type wrappers', () => {
+  tester.run('require-ime-guard', requireImeGuard, {
     valid: [
       {
         name: 'the guard argument wrapped',
@@ -497,8 +497,8 @@ describe('require-ime-guard-on-enter through type wrappers', () => {
   });
 });
 
-describe('require-ime-guard-on-enter through locals and collections', () => {
-  tester.run('require-ime-guard-on-enter', requireImeGuardOnEnter, {
+describe('require-ime-guard through locals and collections', () => {
+  tester.run('require-ime-guard', requireImeGuard, {
     valid: [
       {
         name: 'a key read into a local, guarded',
@@ -871,8 +871,8 @@ describe('require-ime-guard-on-enter through locals and collections', () => {
   });
 });
 
-describe('require-ime-guard-on-enter with imported guards', () => {
-  tester.run('require-ime-guard-on-enter', requireImeGuardOnEnter, {
+describe('require-ime-guard with imported guards', () => {
+  tester.run('require-ime-guard', requireImeGuard, {
     valid: [
       {
         name: 'an aliased import of the guard',
@@ -1086,8 +1086,8 @@ describe('require-ime-guard-on-enter with imported guards', () => {
   });
 });
 
-describe('require-ime-guard-on-enter on Escape', () => {
-  tester.run('require-ime-guard-on-enter', requireImeGuardOnEnter, {
+describe('require-ime-guard on Escape', () => {
+  tester.run('require-ime-guard', requireImeGuard, {
     valid: [
       {
         name: 'an Escape comparison, guarded',

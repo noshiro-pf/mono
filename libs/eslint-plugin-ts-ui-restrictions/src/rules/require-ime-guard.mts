@@ -10,13 +10,14 @@ import {
   buildCalleeResolver,
   createGetLayerTypes,
   isRuntimeBound,
+  isSameReference,
   isShadowedCallee,
   skipTypeWrappers,
+  staticPropertyName,
 } from 'eslint-rule-forge';
 import { Arr } from 'ts-data-forge';
 import type { DeepReadonly } from 'ts-type-forge';
 import * as ts from 'typescript';
-import { isSameReference, staticPropertyName } from './reference-utils.mjs';
 
 type Options = readonly [
   Readonly<{
@@ -89,319 +90,318 @@ type MessageIds = 'missingImeGuard' | 'missingImeGuardOnEscape';
  * from an input method, but the rule cannot tell the element from the handler;
  * the guard costs nothing there, so add it rather than turning the rule off.
  */
-export const requireImeGuardOnEnter: TSESLint.RuleModule<MessageIds, Options> =
-  {
-    meta: {
-      type: 'problem',
-      docs: {
-        description:
-          "Require a keyboard handler that compares `event.key` or `event.code` with `'Enter'` or `'Escape'` to check the same event for input method composition",
-      },
-      schema: [
-        {
-          type: 'object',
-          properties: {
-            guardFunctions: {
-              type: 'array',
-              items: { type: 'string' },
-              description:
-                'Names of functions that, called with the event, tell an input method\'s key down: the exported name for a named or namespace import, the name it is called by for anything else (default: `["isImeKeyDown"]`)',
-            },
-            keys: {
-              type: 'array',
-              items: { type: 'string', enum: ['Enter', 'Escape'] },
-              uniqueItems: true,
-              description:
-                'The keys whose comparisons need the check (default: `["Enter", "Escape"]`)',
-            },
-          },
-          additionalProperties: false,
-        },
-      ],
-      messages: {
-        missingImeGuard:
-          "This compares the key with 'Enter' but nothing checks the event for input method composition, so the Enter that confirms a conversion acts too. Leave the event alone when `isImeKeyDown(event)` (from `synstate-dom`; `isImeKeyDown(event.nativeEvent)` for a React event) is true, which also covers Safari's Enter after `compositionend`; `isComposing` alone does not.",
-        missingImeGuardOnEscape:
-          "This compares the key with 'Escape' but nothing checks the event for input method composition, so the Escape that cancels a conversion acts too, closing or discarding what the user only meant to leave the conversion of. Leave the event alone when `isImeKeyDown(event)` (from `synstate-dom`; `isImeKeyDown(event.nativeEvent)` for a React event) is true, which also covers Safari's Escape after `compositionend`; `isComposing` alone does not.",
-      },
-      defaultOptions: [{}],
+export const requireImeGuard: TSESLint.RuleModule<MessageIds, Options> = {
+  meta: {
+    type: 'problem',
+    docs: {
+      description:
+        "Require a keyboard handler that compares `event.key` or `event.code` with `'Enter'` or `'Escape'` to check the same event for input method composition",
     },
+    schema: [
+      {
+        type: 'object',
+        properties: {
+          guardFunctions: {
+            type: 'array',
+            items: { type: 'string' },
+            description:
+              'Names of functions that, called with the event, tell an input method\'s key down: the exported name for a named or namespace import, the name it is called by for anything else (default: `["isImeKeyDown"]`)',
+          },
+          keys: {
+            type: 'array',
+            items: { type: 'string', enum: ['Enter', 'Escape'] },
+            uniqueItems: true,
+            description:
+              'The keys whose comparisons need the check (default: `["Enter", "Escape"]`)',
+          },
+        },
+        additionalProperties: false,
+      },
+    ],
+    messages: {
+      missingImeGuard:
+        "This compares the key with 'Enter' but nothing checks the event for input method composition, so the Enter that confirms a conversion acts too. Leave the event alone when `isImeKeyDown(event)` (from `synstate-dom`; `isImeKeyDown(event.nativeEvent)` for a React event) is true, which also covers Safari's Enter after `compositionend`; `isComposing` alone does not.",
+      missingImeGuardOnEscape:
+        "This compares the key with 'Escape' but nothing checks the event for input method composition, so the Escape that cancels a conversion acts too, closing or discarding what the user only meant to leave the conversion of. Leave the event alone when `isImeKeyDown(event)` (from `synstate-dom`; `isImeKeyDown(event.nativeEvent)` for a React event) is true, which also covers Safari's Escape after `compositionend`; `isComposing` alone does not.",
+    },
+    defaultOptions: [{}],
+  },
 
-    create: (context) => {
-      const guardFunctions: ReadonlySet<string> = new Set(
-        context.options[0]?.guardFunctions ?? defaultGuardFunctions,
+  create: (context) => {
+    const guardFunctions: ReadonlySet<string> = new Set(
+      context.options[0]?.guardFunctions ?? defaultGuardFunctions,
+    );
+
+    const checkedKeys: ReadonlySet<CheckedKey> = new Set(
+      context.options[0]?.keys ?? allCheckedKeys,
+    );
+
+    const { sourceCode } = context;
+
+    const importDeclarations = sourceCode.ast.body.filter(
+      (node): node is TSESTree.ImportDeclaration =>
+        node.type === AST_NODE_TYPES.ImportDeclaration,
+    );
+
+    const importedModules = importDeclarations.map(
+      (declaration) => declaration.source.value,
+    );
+
+    const resolveImportedCallee = buildCalleeResolver(importDeclarations);
+
+    const parserServices = ESLintUtils.getParserServices(context);
+
+    const getLayerTypes = createGetLayerTypes(parserServices);
+
+    const checker = parserServices.program.getTypeChecker();
+
+    // `event?.key` reads the key of a `KeyboardEvent | undefined`.
+    // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+    const isEventType = (type: ts.Type): boolean => {
+      if ((type.flags & ts.TypeFlags.Any) !== 0) {
+        return false;
+      }
+
+      const event = checker.getApparentType(checker.getNonNullableType(type));
+
+      // A union has a property only when every member has it.
+      if (event.isUnion()) {
+        return event.types.some(isEventType);
+      }
+
+      return (
+        event.getProperty('isComposing') !== undefined ||
+        event.getProperty('nativeEvent') !== undefined
       );
+    };
 
-      const checkedKeys: ReadonlySet<CheckedKey> = new Set(
-        context.options[0]?.keys ?? allCheckedKeys,
-      );
+    const isEventLike = (node: DeepReadonly<TSESTree.Expression>): boolean =>
+      getLayerTypes(node).some(isEventType);
 
-      const { sourceCode } = context;
+    const mut_comparisons: DeepReadonly<{
+      report: TSESTree.Node;
+      event: TSESTree.Node;
+      key: CheckedKey;
+    }>[] = [];
 
-      const importDeclarations = sourceCode.ast.body.filter(
-        (node): node is TSESTree.ImportDeclaration =>
-          node.type === AST_NODE_TYPES.ImportDeclaration,
-      );
+    // The expressions a check is made on: `event` for `event.isComposing` and
+    // `isImeKeyDown(event)`.
+    const mut_checked: DeepReadonly<TSESTree.Node>[] = [];
 
-      const importedModules = importDeclarations.map(
-        (declaration) => declaration.source.value,
-      );
+    // The standard `Set`: not a value the file declares or imports. A type, an
+    // interface or a `declare const` of that name leaves it the standard one.
+    const isStandardSet = (
+      callee: DeepReadonly<TSESTree.Identifier>,
+    ): boolean => !isRuntimeBound(sourceCode, asNode(callee), 'Set');
 
-      const resolveImportedCallee = buildCalleeResolver(importDeclarations);
+    const keyReadEvent = (
+      keyRead: DeepReadonly<TSESTree.Node>,
+    ): DeepReadonly<TSESTree.Expression> | undefined =>
+      eventOfKeyRead(sourceCode, keyRead, maxConstDepth);
 
-      const parserServices = ESLintUtils.getParserServices(context);
+    // `event` is the object the key is read from, from `keyReadEvent`, and
+    // `key` one the `keys` option checks: each caller filters by the option.
+    const addEventComparison = (
+      report: DeepReadonly<TSESTree.Node>,
+      event: DeepReadonly<TSESTree.Expression>,
+      key: CheckedKey,
+    ): void => {
+      if (isEventLike(event)) {
+        mut_comparisons.push({
+          report,
+          event: referenceThroughConsts(sourceCode, event, maxConstDepth),
+          key,
+        });
+      }
+    };
 
-      const getLayerTypes = createGetLayerTypes(parserServices);
+    // The key is told first, so that a comparison of anything else costs no
+    // scope lookup.
+    const addComparison = (
+      report: DeepReadonly<TSESTree.Node>,
+      keyRead: DeepReadonly<TSESTree.Node>,
+      key: CheckedKey | undefined,
+    ): void => {
+      if (key === undefined || !checkedKeys.has(key)) {
+        return;
+      }
 
-      const checker = parserServices.program.getTypeChecker();
+      const event = keyReadEvent(keyRead);
 
-      // `event?.key` reads the key of a `KeyboardEvent | undefined`.
-      // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-      const isEventType = (type: ts.Type): boolean => {
-        if ((type.flags & ts.TypeFlags.Any) !== 0) {
-          return false;
-        }
+      if (event !== undefined) {
+        addEventComparison(report, event, key);
+      }
+    };
 
-        const event = checker.getApparentType(checker.getNonNullableType(type));
+    // The name the callee is exported under when it calls a named or namespace
+    // import, so that an alias is seen through and another export bound to a
+    // guard's name is not taken for the guard; its own name otherwise, an
+    // import of `default` included, since `default` names nothing to check it
+    // against. A `guardFunctions` entry therefore names what a module exports:
+    // a local alias listed there does not match the import it renames, or
+    // `import { other as isImeKeyDown }` would.
+    const calleeName = (
+      callee: DeepReadonly<TSESTree.Expression>,
+    ): string | undefined => {
+      const inner = skipTypeWrappers(callee);
 
-        // A union has a property only when every member has it.
-        if (event.isUnion()) {
-          return event.types.some(isEventType);
-        }
+      const spelled =
+        inner.type === AST_NODE_TYPES.Identifier
+          ? inner.name
+          : inner.type === AST_NODE_TYPES.MemberExpression
+            ? staticPropertyName(inner)
+            : undefined;
 
-        return (
-          event.getProperty('isComposing') !== undefined ||
-          event.getProperty('nativeEvent') !== undefined
-        );
-      };
+      const resolved = resolveImportedCallee(asNode(callee));
 
-      const isEventLike = (node: DeepReadonly<TSESTree.Expression>): boolean =>
-        getLayerTypes(node).some(isEventType);
+      if (resolved === undefined || resolved.canonicalName === 'default') {
+        return spelled;
+      }
 
-      const mut_comparisons: DeepReadonly<{
-        report: TSESTree.Node;
-        event: TSESTree.Node;
-        key: CheckedKey;
-      }>[] = [];
+      // Neither name is a guard, so whichever the call goes by, it is none;
+      // the scope lookup below is spared for most imported calls.
+      if (
+        !guardFunctions.has(resolved.canonicalName) &&
+        !guardFunctions.has(spelled ?? '')
+      ) {
+        return resolved.canonicalName;
+      }
 
-      // The expressions a check is made on: `event` for `event.isComposing` and
-      // `isImeKeyDown(event)`.
-      const mut_checked: DeepReadonly<TSESTree.Node>[] = [];
+      return isShadowedCallee(sourceCode, resolved, importedModules)
+        ? spelled
+        : resolved.canonicalName;
+    };
 
-      // The standard `Set`: not a value the file declares or imports. A type, an
-      // interface or a `declare const` of that name leaves it the standard one.
-      const isStandardSet = (
-        callee: DeepReadonly<TSESTree.Identifier>,
-      ): boolean => !isRuntimeBound(sourceCode, asNode(callee), 'Set');
+    const isGuardCallee = (
+      callee: DeepReadonly<TSESTree.Expression>,
+    ): boolean => guardFunctions.has(calleeName(callee) ?? '');
 
-      const keyReadEvent = (
-        keyRead: DeepReadonly<TSESTree.Node>,
-      ): DeepReadonly<TSESTree.Expression> | undefined =>
-        eventOfKeyRead(sourceCode, keyRead, maxConstDepth);
-
-      // `event` is the object the key is read from, from `keyReadEvent`, and
-      // `key` one the `keys` option checks: each caller filters by the option.
-      const addEventComparison = (
-        report: DeepReadonly<TSESTree.Node>,
-        event: DeepReadonly<TSESTree.Expression>,
-        key: CheckedKey,
-      ): void => {
-        if (isEventLike(event)) {
-          mut_comparisons.push({
-            report,
-            event: referenceThroughConsts(sourceCode, event, maxConstDepth),
-            key,
-          });
-        }
-      };
-
-      // The key is told first, so that a comparison of anything else costs no
-      // scope lookup.
-      const addComparison = (
-        report: DeepReadonly<TSESTree.Node>,
-        keyRead: DeepReadonly<TSESTree.Node>,
-        key: CheckedKey | undefined,
-      ): void => {
-        if (key === undefined || !checkedKeys.has(key)) {
+    return {
+      BinaryExpression: (node) => {
+        if (!comparisonOperators.has(node.operator)) {
           return;
         }
 
+        const rightKey = checkedKeyOf(node.right);
+
+        if (rightKey !== undefined) {
+          addComparison(node, node.left, rightKey);
+        } else {
+          addComparison(node, node.right, checkedKeyOf(node.left));
+        }
+      },
+
+      SwitchCase: (node) => {
+        if (node.test !== null) {
+          addComparison(
+            node.test,
+            node.parent.discriminant,
+            checkedKeyOf(node.test),
+          );
+        }
+      },
+
+      MemberExpression: (node) => {
+        // Every member access is named, a computed one by `getStaticValue`, so
+        // that `event[`isComposing`]` counts as `event.isComposing` does.
+        if (staticPropertyName(node) === 'isComposing') {
+          mut_checked.push(node.object);
+        }
+      },
+
+      CallExpression: (node) => {
+        if (isGuardCallee(node.callee)) {
+          mut_checked.push(
+            ...node.arguments.flatMap((arg) =>
+              arg.type === AST_NODE_TYPES.SpreadElement
+                ? []
+                : [withoutChain(arg)],
+            ),
+          );
+
+          return;
+        }
+
+        const keyRead = node.arguments[0];
+
+        const collection = collectionOfMembershipTest(node.callee);
+
+        if (
+          collection === undefined ||
+          keyRead === undefined ||
+          keyRead.type === AST_NODE_TYPES.SpreadElement
+        ) {
+          return;
+        }
+
+        // What reads no key is left before the collection is read, and the type
+        // query that tells an event (in addEventComparison) comes last.
         const event = keyReadEvent(keyRead);
 
-        if (event !== undefined) {
-          addEventComparison(report, event, key);
-        }
-      };
-
-      // The name the callee is exported under when it calls a named or
-      // namespace import, so that an alias is seen through and another export
-      // bound to a guard's name is not taken for the guard; its own name
-      // otherwise, an import of `default` included, since `default` names
-      // nothing to check it against. A `guardFunctions` entry therefore names
-      // what a module exports: a local alias listed there does not match the
-      // import it renames, or `import { other as isImeKeyDown }` would.
-      const calleeName = (
-        callee: DeepReadonly<TSESTree.Expression>,
-      ): string | undefined => {
-        const inner = skipTypeWrappers(callee);
-
-        const spelled =
-          inner.type === AST_NODE_TYPES.Identifier
-            ? inner.name
-            : inner.type === AST_NODE_TYPES.MemberExpression
-              ? staticPropertyName(inner)
-              : undefined;
-
-        const resolved = resolveImportedCallee(asNode(callee));
-
-        if (resolved === undefined || resolved.canonicalName === 'default') {
-          return spelled;
+        if (event === undefined) {
+          return;
         }
 
-        // Neither name is a guard, so whichever the call goes by, it is none;
-        // the scope lookup below is spared for most imported calls.
-        if (
-          !guardFunctions.has(resolved.canonicalName) &&
-          !guardFunctions.has(spelled ?? '')
-        ) {
-          return resolved.canonicalName;
+        const values = literalStringsOf(
+          sourceCode,
+          isStandardSet,
+          collection,
+          maxConstDepth,
+        );
+
+        // A collection holding both keys is reported once, under the first key
+        // the `keys` option checks.
+        const key = allCheckedKeys.find(
+          (candidate) =>
+            checkedKeys.has(candidate) &&
+            values.some((value) => checkedKeyOfValue(value) === candidate),
+        );
+
+        if (key !== undefined) {
+          addEventComparison(node, event, key);
+        }
+      },
+
+      'Program:exit': () => {
+        if (Arr.isEmpty(mut_comparisons)) {
+          return;
         }
 
-        return isShadowedCallee(sourceCode, resolved, importedModules)
-          ? spelled
-          : resolved.canonicalName;
-      };
-
-      const isGuardCallee = (
-        callee: DeepReadonly<TSESTree.Expression>,
-      ): boolean => guardFunctions.has(calleeName(callee) ?? '');
-
-      return {
-        BinaryExpression: (node) => {
-          if (!comparisonOperators.has(node.operator)) {
-            return;
-          }
-
-          const rightKey = checkedKeyOf(node.right);
-
-          if (rightKey !== undefined) {
-            addComparison(node, node.left, rightKey);
-          } else {
-            addComparison(node, node.right, checkedKeyOf(node.left));
-          }
-        },
-
-        SwitchCase: (node) => {
-          if (node.test !== null) {
-            addComparison(
-              node.test,
-              node.parent.discriminant,
-              checkedKeyOf(node.test),
-            );
-          }
-        },
-
-        MemberExpression: (node) => {
-          // Every member access is named, a computed one by `getStaticValue`,
-          // so that `event[`isComposing`]` counts as `event.isComposing` does.
-          if (staticPropertyName(node) === 'isComposing') {
-            mut_checked.push(node.object);
-          }
-        },
-
-        CallExpression: (node) => {
-          if (isGuardCallee(node.callee)) {
-            mut_checked.push(
-              ...node.arguments.flatMap((arg) =>
-                arg.type === AST_NODE_TYPES.SpreadElement
-                  ? []
-                  : [withoutChain(arg)],
-              ),
-            );
-
-            return;
-          }
-
-          const keyRead = node.arguments[0];
-
-          const collection = collectionOfMembershipTest(node.callee);
-
-          if (
-            collection === undefined ||
-            keyRead === undefined ||
-            keyRead.type === AST_NODE_TYPES.SpreadElement
-          ) {
-            return;
-          }
-
-          // What reads no key is left before the collection is read, and the
-          // type query that tells an event (in addEventComparison) comes last.
-          const event = keyReadEvent(keyRead);
-
-          if (event === undefined) {
-            return;
-          }
-
-          const values = literalStringsOf(
+        const checks = mut_checked.map((rawChecked) => {
+          const checked = referenceThroughConsts(
             sourceCode,
-            isStandardSet,
-            collection,
+            rawChecked,
             maxConstDepth,
           );
 
-          // A collection holding both keys is reported once, under the first key
-          // the `keys` option checks.
-          const key = allCheckedKeys.find(
-            (candidate) =>
-              checkedKeys.has(candidate) &&
-              values.some((value) => checkedKeyOfValue(value) === candidate),
+          return {
+            checked,
+            variable: variableOf(sourceCode, checked),
+          } as const;
+        });
+
+        for (const { report, event, key } of mut_comparisons) {
+          const eventVariable = variableOf(sourceCode, event);
+
+          const isChecked = checks.some(
+            ({ checked, variable }) =>
+              isCheckOf(checked, event) && variable === eventVariable,
           );
 
-          if (key !== undefined) {
-            addEventComparison(node, event, key);
+          if (!isChecked) {
+            context.report({
+              loc: report.loc,
+              messageId:
+                key === 'Escape'
+                  ? 'missingImeGuardOnEscape'
+                  : 'missingImeGuard',
+            });
           }
-        },
-
-        'Program:exit': () => {
-          if (Arr.isEmpty(mut_comparisons)) {
-            return;
-          }
-
-          const checks = mut_checked.map((rawChecked) => {
-            const checked = referenceThroughConsts(
-              sourceCode,
-              rawChecked,
-              maxConstDepth,
-            );
-
-            return {
-              checked,
-              variable: variableOf(sourceCode, checked),
-            } as const;
-          });
-
-          for (const { report, event, key } of mut_comparisons) {
-            const eventVariable = variableOf(sourceCode, event);
-
-            const isChecked = checks.some(
-              ({ checked, variable }) =>
-                isCheckOf(checked, event) && variable === eventVariable,
-            );
-
-            if (!isChecked) {
-              context.report({
-                loc: report.loc,
-                messageId:
-                  key === 'Escape'
-                    ? 'missingImeGuardOnEscape'
-                    : 'missingImeGuard',
-              });
-            }
-          }
-        },
-      };
-    },
-  } as const;
+        }
+      },
+    };
+  },
+} as const;
 
 const defaultGuardFunctions = ['isImeKeyDown'] as const;
 

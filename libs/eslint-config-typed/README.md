@@ -529,6 +529,7 @@ Pre-configured rule sets that can be imported and customized:
 | **`eslintTreeShakableRules`**              | `eslint-plugin-tree-shakable`          | Tree-shaking optimization rules                        |
 | **`eslintStylisticRules`**                 | `@stylistic/eslint-plugin`             | Stylistic formatting rules disabled to mirror Prettier |
 | **`eslintTsRestrictionsRules`**            | `eslint-plugin-ts-restrictions`        | Restrict some syntax in TypeScript                     |
+| **`eslintTsUiRestrictionsRules`**          | `eslint-plugin-ts-ui-restrictions`     | Keyboard handler and JSX pitfalls in UI code           |
 | **`eslintNRules`**                         | `eslint-plugin-n`                      | Node.js-specific rules                                 |
 | **`eslintReactRules`**                     | `eslint-plugin-react`                  | React-specific rules                                   |
 | **`eslintReactHooksRules`**                | `eslint-plugin-react-hooks`            | React Hooks rules                                      |
@@ -589,6 +590,7 @@ The shape of the rule option varies depending on the rule, so please check the c
 
 - Its rules are published on their own as [`eslint-plugin-ts-restrictions`](https://www.npmjs.com/package/eslint-plugin-ts-restrictions), which depends on none of the third-party ESLint plugins this package brings in. Use that package to get the rules without the rest of this config. This package's `eslintPluginTsRestrictions` is that plugin plus `prefer-catch` and `prefer-global-this` (below), which wrap rules of `eslint-plugin-promise` and `eslint-plugin-unicorn` and so stay here. Register one or the other under `ts-restrictions`, not both: ESLint refuses two different plugin objects under one name.
 - Provides the `ts-restrictions/*` rules; `eslintTsRestrictionsRules` lists each one with the severity the preset sets. `ts-restrictions/no-restricted-syntax` duplicates ESLint's `no-restricted-syntax` rule.
+- `ts-restrictions/jsx-boolean-logical-operands` and `ts-restrictions/require-ime-guard-on-enter` moved to `ts-ui-restrictions` (below). Their old ids stay registered until the next major, deprecated and off in the preset, so that a config or an `eslint-disable` comment naming one still loads.
 - Can be used to set the error level to `error` or `warn` as needed.
 - Some rules are an upstream rule wrapped: `ts-restrictions/prefer-global-this` is `unicorn/prefer-global-this` without the reports `globalThis` cannot answer, and `ts-restrictions/prefer-catch` is `promise/prefer-catch` with its fix offered only as a suggestion, because the fix rewrites `p.then(a, b)` into `p.catch(b).then(a)`, which runs `a` after a rejection too. The preset turns each upstream rule off beside its wrapper. A rule whose `--fix` turns out to change what code does is wrapped the same way (`suggestionOnly` in `src/plugins/ts-restrictions/rules/suggestion-only.mts`) rather than turned off, so that its reports stay.
 
@@ -624,6 +626,13 @@ export default [
     },
 ] satisfies readonly FlatConfig[];
 ```
+
+#### ts-ui-restrictions
+
+**`eslintPluginTsUiRestrictions`** - Custom ESLint plugin with rules for code that runs a user interface
+
+- The plugin of [`eslint-plugin-ts-ui-restrictions`](https://www.npmjs.com/package/eslint-plugin-ts-ui-restrictions), registered as it is, so its `recommended` preset can be used beside this config.
+- Provides `ts-ui-restrictions/jsx-boolean-logical-operands`, which requires booleans on both sides of `&&` and `||` whose value JSX renders (`{count && <List />}` renders `0`) and asks for a ternary otherwise, and `ts-ui-restrictions/require-ime-guard`, which asks a keyboard handler that acts on Enter or Escape to leave an input method's conversion alone. `eslintTsUiRestrictionsRules` turns both on.
 
 #### vitest-coding-style
 
