@@ -42,22 +42,74 @@ describe(calculateHousingLoanDeduction, () => {
 });
 
 describe(housingLoanDeductionConditions, () => {
-  test('住宅の種別と子育て世帯かで借入限度額が決まること', () => {
-    assert.deepStrictEqual(
-      housingLoanDeductionConditions({
-        principal: 0,
-        termYears: 35,
-        start: '2030-01',
-        initialRate: 0,
-        rateIncreasePer5Years: 0,
-        maxRate: 0,
-        houseType: 'zeh',
-        houseCondition: 'used',
-        childRearing: true,
-      }),
-      { limit: 40_000_000, years: 10 },
-    );
-  });
+  // 表は令和 6・7 年入居の値なので `start` もその年にする。関数は `start` を
+  // 読まず、入居年で引き分けていない。
+  const loan = {
+    principal: 0,
+    termYears: 35,
+    start: '2025-01',
+    initialRate: 0,
+    rateIncreasePer5Years: 0,
+    maxRate: 0,
+    houseType: 'zeh',
+    houseCondition: 'new',
+    childRearing: false,
+  } as const;
+
+  test.each([
+    ['long-life', false, 45_000_000],
+    ['long-life', true, 50_000_000],
+    ['zeh', false, 35_000_000],
+    ['zeh', true, 45_000_000],
+    ['energy-efficient', false, 30_000_000],
+    ['energy-efficient', true, 40_000_000],
+  ] as const)(
+    '新築の %s は子育て世帯か（%s）で借入限度額 %i 円・13 年であること',
+    (houseType, childRearing, limit) => {
+      assert.deepStrictEqual(
+        housingLoanDeductionConditions({ ...loan, houseType, childRearing }),
+        { limit, years: 13 },
+      );
+    },
+  );
+
+  test.each([false, true])(
+    '新築のその他の住宅は子育て世帯か（%s）によらず控除が無いこと',
+    (childRearing) => {
+      assert.deepStrictEqual(
+        housingLoanDeductionConditions({
+          ...loan,
+          houseType: 'other',
+          childRearing,
+        }),
+        { limit: 0, years: 0 },
+      );
+    },
+  );
+
+  test.each([
+    ['long-life', false, 30_000_000],
+    ['long-life', true, 30_000_000],
+    ['zeh', false, 30_000_000],
+    ['zeh', true, 30_000_000],
+    ['energy-efficient', false, 30_000_000],
+    ['energy-efficient', true, 30_000_000],
+    ['other', false, 20_000_000],
+    ['other', true, 20_000_000],
+  ] as const)(
+    '中古の %s は子育て世帯か（%s）によらず借入限度額 %i 円・10 年であること',
+    (houseType, childRearing, limit) => {
+      assert.deepStrictEqual(
+        housingLoanDeductionConditions({
+          ...loan,
+          houseType,
+          houseCondition: 'used',
+          childRearing,
+        }),
+        { limit, years: 10 },
+      );
+    },
+  );
 });
 
 describe(monthlyRateIncreaseFrom5Years, () => {
