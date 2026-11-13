@@ -69,6 +69,16 @@ export const resolveSalaryHistory = (
     })),
   );
 
+/**
+ * 1 か月分の月給（iDeCo の掛金を除く）に対する住民税の課税所得（月額）の概算。
+ * 給与所得控除を 2〜3 割、基礎控除などを年 150 万円と見る。
+ */
+export const residentTaxableIncomeFrom = (grossAfterIdeco: number): number => {
+  const employmentIncomeRatio = grossAfterIdeco > 8_500_000 / 12 ? 0.8 : 0.7;
+
+  return Math.max(0, grossAfterIdeco * employmentIncomeRatio - 1_500_000 / 12);
+};
+
 export type SalaryParams = Readonly<{
   history: readonly ResolvedSalaryEntry[];
   /** 最後に給与が出る月 */
@@ -229,19 +239,10 @@ const socialInsuranceAt = (
 };
 
 /**
- * 住民税（月額）の概算。給与所得控除を 2〜3 割、基礎控除などを年 150 万円と
- * 見て、12 か月前の月給（iDeCo の掛金を除く）から求める。
+ * 住民税（月額）の概算。12 か月前の月給（iDeCo の掛金を除く）から求める。
  */
-const residentTaxFrom = (grossAfterIdecoLastYear: number): number => {
-  const ref = grossAfterIdecoLastYear;
-
-  const employmentIncomeRatio = ref > 8_500_000 / 12 ? 0.8 : 0.7;
-
-  return Math.max(
-    0,
-    (ref * employmentIncomeRatio - 1_500_000 / 12) * residentTaxRate,
-  );
-};
+const residentTaxFrom = (grossAfterIdecoLastYear: number): number =>
+  residentTaxableIncomeFrom(grossAfterIdecoLastYear) * residentTaxRate;
 
 /**
  * 賞与の源泉徴収税額。ふつうは社会保険料等控除後の賞与に、前月の社会保険料等

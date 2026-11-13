@@ -95,6 +95,15 @@ export const pensionSocialInsuranceRate = 0.1;
 /** 住宅ローン控除の控除率。 */
 export const housingLoanDeductionRate = 0.007;
 
+/**
+ * 住宅ローン控除のうち、所得税から引ききれずに翌年度の住民税から引ける額の
+ * 課税総所得金額等に対する割合。
+ */
+export const housingLoanDeductionResidentTaxRate = 0.05;
+
+/** 住宅ローン控除のうち、翌年度の住民税から引ける額の上限（円）。 */
+export const housingLoanDeductionResidentTaxCap = 97_500;
+
 /** 住宅の種別。`id` は保存する入力値に使うので変えない。 */
 export const housingTypes = [
   { id: 'long-life', label: '長期優良住宅・低炭素住宅' },
