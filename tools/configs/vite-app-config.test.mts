@@ -2,9 +2,10 @@ import * as fs from 'node:fs';
 import * as os from 'node:os';
 import * as path from 'node:path';
 import { hasKey, isRecord } from 'ts-data-forge';
-import { build } from 'vite';
+import { build, parseSync } from 'vite';
 import {
   defineViteAppConfig,
+  recoveryScript,
   staleBuildRecovery,
   unwrappedDynamicImports,
   writeRouteEntryPages,
@@ -93,21 +94,26 @@ const withApp = async (
 };
 
 /**
- * Builds the app at `root` with the recovery, and gives the entry chunk: the
- * one script the built `index.html` names.
+ * Builds the app at `root` with the recovery, and gives the built `index.html`,
+ * the entry chunk (the one module script it names) and the recovery script.
  */
-const buildApp = async (root: string): Promise<string> => {
+const buildApp = async (
+  root: string,
+): Promise<Readonly<{ html: string; entry: string; recovery: string }>> => {
   await build({
     root,
     base: '/mono/app/',
     logLevel: 'silent',
     configFile: false,
     build: { outDir: path.join(root, 'build'), emptyOutDir: true },
-    plugins: [staleBuildRecovery('/mono/app/')],
+    plugins: [staleBuildRecovery()],
   });
 
-  // eslint-disable-next-line security/detect-non-literal-fs-filename
-  const html = fs.readFileSync(path.join(root, 'build', 'index.html'), 'utf8');
+  const read = (file: string): string =>
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
+    fs.readFileSync(path.join(root, 'build', file), 'utf8');
+
+  const html = read('index.html');
 
   const scripts = Array.from(
     html.matchAll(
@@ -122,8 +128,11 @@ const buildApp = async (root: string): Promise<string> => {
 
   assert.isDefined(entry);
 
-  // eslint-disable-next-line security/detect-non-literal-fs-filename
-  return fs.readFileSync(path.join(root, 'build', entry), 'utf8');
+  return {
+    html,
+    entry: read(entry),
+    recovery: read('stale-build-recovery.js'),
+  };
 };
 
 /** The names of the plugins `config` lists directly. */
@@ -135,19 +144,25 @@ const pluginNames = (
   );
 
 describe(staleBuildRecovery, () => {
-  test('listens for a failed chunk before the app runs', async () => {
+  test('loads the recovery first, as a classic script outside the hashed graph', async () => {
     await withApp(
       "console.log('app');\nawait import('./later.js');\n",
       async (root) => {
-        const entry = await buildApp(root);
+        const { html, entry, recovery } = await buildApp(root);
 
-        const listening = entry.indexOf('stale-build-reloaded-at:/mono/app/');
+        const loaded = html.indexOf(
+          '<script src="/mono/app/stale-build-recovery.js"></script>',
+        );
 
-        expect(listening).toBeGreaterThanOrEqual(0);
+        expect(loaded).toBeGreaterThanOrEqual(0);
 
-        expect(listening).toBeLessThan(entry.indexOf('console.log(`app`)'));
+        expect(loaded).toBeLessThan(html.indexOf('<script type="module"'));
 
-        assert.include(entry, 'addEventListener(`vite:preloadError`');
+        assert.include(recovery, 'stale-build-reloaded-at:/mono/app/');
+
+        assert.include(recovery, 'vite:preloadError');
+
+        assert.notInclude(entry, 'stale-build-reloaded-at');
       },
     );
   });
@@ -163,27 +178,42 @@ describe(staleBuildRecovery, () => {
     );
   });
 
-  test('is added for an app published to Pages, and only then', () => {
+  test('is added to every app, on Pages or at the root of its own host', () => {
     const packageRoot = path.resolve(
       import.meta.dirname,
       '../../apps/catan-dice',
     );
 
-    assert.include(
-      pluginNames(
-        defineViteAppConfig({
-          packageRoot,
-          framework: 'preact',
-          base: '/mono/catan-dice/',
-        }),
-      ),
-      'vite-app-config:stale-build-recovery',
-    );
+    for (const config of [
+      defineViteAppConfig({
+        packageRoot,
+        framework: 'preact',
+        base: '/mono/catan-dice/',
+      }),
+      defineViteAppConfig({ packageRoot, framework: 'preact' }),
+    ]) {
+      assert.include(
+        pluginNames(config),
+        'vite-app-config:stale-build-recovery',
+      );
+    }
+  });
+});
 
-    assert.notInclude(
-      pluginNames(defineViteAppConfig({ packageRoot, framework: 'preact' })),
-      'vite-app-config:stale-build-recovery',
-    );
+describe(recoveryScript, () => {
+  test('is a classic script that installs the recovery under its key', async () => {
+    const script = await recoveryScript('stale-build-reloaded-at:/');
+
+    // A module's `export` or `import` would not parse as a classic script.
+    const { errors } = parseSync('recovery.js', script, {
+      sourceType: 'script',
+    });
+
+    assert.deepStrictEqual(errors, []);
+
+    assert.include(script, '"stale-build-reloaded-at:/"');
+
+    assert.include(script, 'addEventListener("error"');
   });
 });
 

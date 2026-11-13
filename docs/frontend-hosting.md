@@ -65,11 +65,22 @@ base を付けた URL を書く。synstate-router では `Link` と `router.toUr
 
 ## デプロイで消えた chunk
 
-`main` への push ごとにサイト全体が置き換わり、前のビルドの chunk は配信され
-なくなる。ブラウザのキャッシュから開いたページは古いビルドのまま動き、その
-`import()` が失敗する。`base` を渡したアプリには `vite-app-config.mts` の
-`staleBuildRecovery` が入り、そのときページを 1 回だけ読み直す（タブとアプリ
-ごとに 1 分に 1 回まで。中身は `tools/configs/stale-build-recovery.mts`）。
+デプロイのたびにサイトが置き換わり（Pages は `main` への push ごとにサイト
+全体が、Firebase Hosting はそのアプリのサイトが）、前のビルドの chunk は配信
+されなくなる。ブラウザのキャッシュから開いたページは古いビルドのまま動き、
+読み込む chunk が見つからない。`vite-app-config.mts` の `staleBuildRecovery` は
+すべてのアプリに入り、そのときページを 1 回だけ読み直す（タブとアプリごとに
+1 分に 1 回まで。中身は `tools/configs/stale-build-recovery.mts`）。
+
+- ハッシュの付かない classic script `stale-build-recovery.js` として
+  `<head>` の先頭で読み込むので、entry chunk やそれが静的に import する chunk が
+  無いときも働く（module script の要素に出る `error` を聞く）。
+- 読み直す前にページを取り直し、配信中のビルドの entry script が動いている
+  ものと違うときだけ読み直す。配信中のビルドのままの失敗（評価中に throw した
+  モジュール、一時的な通信の失敗）では、読者がページでしていたことを失わない。
+- オフラインやサイトに届かないときは、オンラインに戻ってから確かめる。
+  読者がページを離れ始めた後（`pagehide`）は何もしない。
+
 Vite の preload helper が包まない `import()`（パスを計算するもの）はこの回復を
 通らないので、ビルドが失敗する。`import()` にはパスを文字列で書く。
 
