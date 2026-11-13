@@ -19,24 +19,19 @@ import { projectRootPath } from '../project-root-path.mjs';
  * stop enforcing anything — no error, just a weaker check. That is the failure
  * this exists to make loud.
  */
-export const checkStrictLibLinks = async (): Promise<
-  Result<number, string>
-> => {
-  const scopeDir = path.resolve(projectRootPath, 'node_modules', SCOPE);
+export const checkStrictLibLinks = async (
+  root: string = projectRootPath,
+): Promise<Result<number, string>> => {
+  const scopeDir = path.resolve(root, 'node_modules', SCOPE);
 
-  const libsDir = path.resolve(
-    projectRootPath,
-    'node_modules',
-    BUNDLE_NAME,
-    'libs',
-  );
+  const libsDir = path.resolve(root, 'node_modules', BUNDLE_NAME, 'libs');
 
   // eslint-disable-next-line security/detect-non-literal-fs-filename
   const groups = await fs.readdir(libsDir).catch(() => undefined);
 
   if (groups === undefined) {
     return Result.err(
-      `${BUNDLE_NAME} is not installed: ${path.relative(projectRootPath, libsDir)} does not exist.`,
+      `${BUNDLE_NAME} is not installed: ${path.relative(root, libsDir)} does not exist.`,
     );
   }
 
@@ -47,21 +42,46 @@ export const checkStrictLibLinks = async (): Promise<
       // eslint-disable-next-line security/detect-non-literal-fs-filename
       const resolved = await fs.realpath(link).catch(() => undefined);
 
-      return { group, link, resolved };
+      // Resolved too, so that a bundle reached through a symlink (pnpm's store)
+      // compares equal to a link that resolves into the same place.
+      // eslint-disable-next-line security/detect-non-literal-fs-filename
+      const expected = await fs.realpath(path.resolve(libsDir, group));
+
+      return { group, resolved, expected } as const;
     }),
   );
 
-  const offenders = checked
+  const missing = checked
     .filter(({ resolved }) => resolved === undefined)
-    .map(({ group }) => group);
+    .map(({ group }) => `  ${SCOPE}/lib-${group}`);
 
-  if (Arr.isNonEmpty(offenders)) {
+  const misdirected = Arr.generate(function* () {
+    for (const { group, resolved, expected } of checked) {
+      if (resolved !== undefined && resolved !== expected) {
+        yield `  ${SCOPE}/lib-${group} points at ${displayPath(root, resolved)}, expected ${displayPath(root, expected)}`;
+      }
+    }
+  });
+
+  if (Arr.isNonEmpty(missing) || Arr.isNonEmpty(misdirected)) {
     return Result.err(
       [
-        `${offenders.length} of ${groups.length} \`${SCOPE}/lib-*\` link(s) are missing:`,
-        '',
-        ...offenders.map((group) => `  ${SCOPE}/lib-${group}`),
-        '',
+        ...(Arr.isNonEmpty(missing)
+          ? [
+              `${missing.length} of ${groups.length} \`${SCOPE}/lib-*\` link(s) are missing:`,
+              '',
+              ...missing,
+              '',
+            ]
+          : []),
+        ...(Arr.isNonEmpty(misdirected)
+          ? [
+              `${misdirected.length} of ${groups.length} \`${SCOPE}/lib-*\` link(s) point somewhere other than ${BUNDLE_NAME}:`,
+              '',
+              ...misdirected,
+              '',
+            ]
+          : []),
         'Run `pnpm run z:link-strict-lib` to restore them. `pnpm install`',
         'does it too, through the root `prepare` script.',
       ].join('\n'),
@@ -79,6 +99,15 @@ export const checkStrictLibLinks = async (): Promise<
 const BUNDLE_NAME = 'strict-ts-lib-v7.0';
 
 const SCOPE = '@typescript';
+
+/** A path under `root` relative to it, and any other as it is. */
+const displayPath = (root: string, target: string): string => {
+  const relative = path.relative(root, target);
+
+  return relative.startsWith('..') || path.isAbsolute(relative)
+    ? target
+    : relative;
+};
 
 if (isDirectlyExecuted(import.meta.url)) {
   const result = await checkStrictLibLinks().catch((error: unknown) =>
