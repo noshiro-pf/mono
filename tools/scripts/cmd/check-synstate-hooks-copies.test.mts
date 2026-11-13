@@ -1,6 +1,9 @@
 import {
   compareWithReference,
   filesOf,
+  isSharedFile,
+  scriptsFile,
+  substitute,
 } from './check-synstate-hooks-copies.mjs';
 
 describe(compareWithReference, () => {
@@ -52,6 +55,33 @@ describe(compareWithReference, () => {
     );
   });
 
+  test('compares the files after the substitutions, on both sides (#3752)', () => {
+    const substitutions = [
+      [/synstate-preact-hooks/gu, 'synstate-react-hooks'],
+      [/\bawait act\(/gu, 'act('],
+    ] as const;
+
+    assert.deepStrictEqual(
+      compareWithReference(
+        new Map<string, string>([
+          ['test/a.test.mts', "import 'synstate-react-hooks';\nact(() => {});"],
+          ['test/b.test.mts', 'act(fixed);'],
+        ]),
+        new Map<string, string>([
+          [
+            'test/a.test.mts',
+            "import 'synstate-preact-hooks';\nawait act(() => {});",
+          ],
+          ['test/b.test.mts', 'await act(notFixed);'],
+        ]),
+        {},
+        substitutions,
+      ),
+      // A fix to the reference that the copy lacks is still a difference.
+      ['test/b.test.mts: contents differ'],
+    );
+  });
+
   test('reports a listed departure the files no longer show', () => {
     assert.deepStrictEqual(
       compareWithReference(
@@ -87,5 +117,54 @@ describe(filesOf, () => {
       ]),
       ['src/a.mts', 'test/a.test.mts'],
     );
+  });
+});
+
+describe(substitute, () => {
+  test('applies every substitution in order', () => {
+    assert.strictEqual(
+      substitute("await act(x); test('t', async () => {});", [
+        [/\bawait act\(/gu, 'act('],
+        [/(?<=\btest\('[^']*', )async (?=\(\) =>)/gu, ''],
+      ]),
+      "act(x); test('t', () => {});",
+    );
+  });
+});
+
+describe(isSharedFile, () => {
+  test('takes the shared directories, samples/ and the root configurations (#3752)', () => {
+    const shared: readonly string[] = [
+      'src/a.mts',
+      'test/browser/a.test.mts',
+      'scripts/cmd/x.mts',
+      'configs/vitest.config.mts',
+      'samples/readme/01.tsx',
+      'eslint.config.mts',
+      'tsconfig.json',
+      'tsconfig.sumi.json',
+    ] as const;
+
+    assert.deepStrictEqual(shared.filter(isSharedFile), shared);
+
+    assert.deepStrictEqual(
+      ['README.md', 'CHANGELOG.md', 'package.json', 'docs/x.md'].filter(
+        isSharedFile,
+      ),
+      [],
+    );
+  });
+});
+
+describe(scriptsFile, () => {
+  test("is the package's scripts, one per line in a stable order (#3752)", () => {
+    assert.strictEqual(
+      scriptsFile('{ "name": "p", "scripts": { "b": "y", "a": "x" } }'),
+      '{\n  "a": "x",\n  "b": "y"\n}\n',
+    );
+  });
+
+  test('is empty braces for a package with none', () => {
+    assert.strictEqual(scriptsFile('{ "name": "p" }'), '{}\n');
   });
 });

@@ -1,4 +1,4 @@
-import { Arr, Result, unknownToString } from 'ts-data-forge';
+import { Arr, isRecord, Result, unknownToString } from 'ts-data-forge';
 import { isDirectlyExecuted } from 'ts-repo-utils';
 import type { ReadonlyRecord } from 'ts-type-forge';
 import { readRepositoryFile } from '../lib/repo-files.mjs';
@@ -13,11 +13,14 @@ import { git, isRegularFile, splitZ } from '../lib/step-runner.mjs';
  * where that difference reaches. A fix applied to one copy and not the others
  * ships two behaviors of the same hook, and nothing else notices.
  *
- * Every file under {@link SHARED_DIRS} of a package must exist in
- * {@link REFERENCE} and in that package with the same contents, unless the
- * package's entry in {@link COPIES} names it, says how it departs, and why. An
- * entry whose file no longer departs that way fails too, so the list cannot
- * outlive its reasons.
+ * Every shared file of a package ({@link isSharedFile}: its sources, tests,
+ * scripts, configurations, samples and root configuration files, and the
+ * scripts of its `package.json` as {@link SCRIPTS_FILE}) must exist in
+ * {@link REFERENCE} and in that package with the same contents, once the
+ * package's mechanical substitutions (its name, `preact` for `react`, …) are
+ * applied to both, unless the package's entry in {@link COPIES} names it, says
+ * how it departs, and why. An entry whose file no longer departs that way fails
+ * too, so the list cannot outlive its reasons.
  *
  * The files are those git would commit: tracked or untracked but not ignored,
  * and not deleted from the working tree. So a new file is compared before it is
@@ -41,9 +44,12 @@ export const checkSynstateHooksCopies = async (): Promise<
   ]);
 
   const findings = copies.flatMap(({ copy, files }) =>
-    compareWithReference(reference, files, copy.departures).map(
-      (finding) => `${copy.dir}: ${finding}`,
-    ),
+    compareWithReference(
+      reference,
+      files,
+      copy.departures,
+      copy.substitutions,
+    ).map((finding) => `${copy.dir}: ${finding}`),
   );
 
   if (Arr.isNonEmpty(findings)) {
@@ -53,14 +59,17 @@ export const checkSynstateHooksCopies = async (): Promise<
         '',
         ...findings.map((finding) => `  ${finding}`),
         '',
-        'Apply the change to every package. A file that has to depart from',
-        "the reference on purpose goes in the package's departures in",
-        'tools/scripts/cmd/check-synstate-hooks-copies.mts, with the reason.',
+        'Apply the change to every package. A difference every file of a package',
+        "has (a name, an import) goes in the package's substitutions, and a file",
+        'that has to depart from the reference on purpose in its departures, with',
+        'the reason, both in tools/scripts/cmd/check-synstate-hooks-copies.mts.',
       ].join('\n'),
     );
   }
 
-  return Result.ok(listed.length);
+  return Result.ok(
+    copies.reduce((count, { files }) => count + files.size, reference.size),
+  );
 };
 
 /**
@@ -72,12 +81,18 @@ export const checkSynstateHooksCopies = async (): Promise<
  *   their path inside the package.
  * @param copy The same for the package compared with it.
  * @param departures The paths allowed to depart from the reference, and how.
+ * @param substitutions Applied to both sides before they are compared
+ *   ({@link substitute}).
  */
 export const compareWithReference = (
   reference: ReadonlyMap<string, string>,
   copy: ReadonlyMap<string, string>,
   departures: ReadonlyRecord<string, Departure>,
+  substitutions: Substitutions = [],
 ): readonly string[] => {
+  const normalized = (text: string | undefined): string | undefined =>
+    text === undefined ? undefined : substitute(text, substitutions);
+
   const everyPath = new Set<string>([
     ...reference.keys(),
     ...copy.keys(),
@@ -89,7 +104,10 @@ export const compareWithReference = (
   );
 
   return paths.flatMap((file): readonly string[] => {
-    const found = departureOf(reference.get(file), copy.get(file));
+    const found = departureOf(
+      normalized(reference.get(file)),
+      normalized(copy.get(file)),
+    );
 
     const listed = departures[file];
 
@@ -132,6 +150,50 @@ export const filesOf = (
   );
 };
 
+/**
+ * `text` with each substitution of a copy applied in order: the copy's spelling
+ * of something the reference spells otherwise, replaced by the reference's, so
+ * that what is left to compare is what the copy does differently.
+ */
+export const substitute = (
+  text: string,
+  substitutions: Substitutions,
+): string =>
+  substitutions.reduce(
+    // A function, so that the replacement is taken as written, `$` and all.
+    (mut_text, [pattern, replacement]) =>
+      mut_text.replaceAll(pattern, () => replacement),
+    text,
+  );
+
+/** Whether a path inside a package is one of the files compared. */
+export const isSharedFile = (file: string): boolean =>
+  SHARED_DIRS.some((dir) => file.startsWith(`${dir}/`)) ||
+  SHARED_ROOT_FILE.test(file);
+
+/**
+ * The scripts of a package's `package.json`, as the text compared under
+ * {@link SCRIPTS_FILE}: one per line, sorted by name, so that an order the
+ * packages happen to differ in is not a difference.
+ */
+export const scriptsFile = (packageJson: string): string => {
+  const manifest: unknown = JSON.parse(packageJson);
+
+  const scripts = isRecord(manifest) ? manifest['scripts'] : undefined;
+
+  const entries = isRecord(scripts)
+    ? Arr.toSorted(Object.entries(scripts), ([a], [b]) => a.localeCompare(b))
+    : ([] as const);
+
+  return `${JSON.stringify(Object.fromEntries(entries), undefined, 2)}\n`;
+};
+
+/**
+ * A copy's substitutions: a pattern, `g`-flagged, and the text that replaces
+ * each match, as written.
+ */
+export type Substitutions = readonly (readonly [RegExp, string])[];
+
 /** How a file of a copy departs from the reference on purpose. */
 export type Departure = Readonly<{
   /**
@@ -146,10 +208,20 @@ export type Departure = Readonly<{
 const REFERENCE = 'libs/synstate-react-hooks';
 
 /** The directories of each package whose files are compared. */
-const SHARED_DIRS = ['src', 'test', 'scripts', 'configs'] as const;
+const SHARED_DIRS = ['src', 'test', 'scripts', 'configs', 'samples'] as const;
 
-/** A path inside a package that {@link SHARED_DIRS} covers. */
-type SharedPath = `${(typeof SHARED_DIRS)[number]}/${string}`;
+/** The files at the root of each package that are compared. */
+const SHARED_ROOT_FILE = /^(?:eslint\.config\.mts|tsconfig[\w.-]*\.json)$/u;
+
+/** The name the scripts of `package.json` are compared under. */
+const SCRIPTS_FILE = 'package.json (scripts)';
+
+/** A path inside a package that is compared. */
+type SharedPath =
+  | `${(typeof SHARED_DIRS)[number]}/${string}`
+  | 'eslint.config.mts'
+  | `tsconfig${string}.json`
+  | typeof SCRIPTS_FILE;
 
 /**
  * The packages compared with {@link REFERENCE}, each with the files that depart
@@ -158,6 +230,7 @@ type SharedPath = `${(typeof SHARED_DIRS)[number]}/${string}`;
 const COPIES = [
   {
     dir: 'libs/synstate-react-hooks-compat',
+    substitutions: [[/synstate-react-hooks-compat/gu, 'synstate-react-hooks']],
     departures: {
       'src/react-version-hooks.mts': {
         kind: 'differs',
@@ -171,17 +244,49 @@ const COPIES = [
       },
       'configs/vitest.config.mts': {
         kind: 'differs',
-        reason: "The alias names the package's own name.",
+        reason:
+          "The alias is longer by the package name's `-compat`, so Prettier wraps it.",
       },
       'scripts/cmd/embed-examples.mts': {
         kind: 'differs',
         reason:
           "The useObservableValue README sample is the reference package's alone.",
       },
+      'samples/readme/03-use-observable-value.tsx': {
+        kind: 'reference only',
+        reason:
+          "The useObservableValue README sample is the reference package's alone.",
+      },
+      'eslint.config.mts': {
+        kind: 'differs',
+        reason:
+          'It allows use-sync-external-store/shim, and, being no Sumi dogfood target, does not turn off the rules Sumi covers.',
+      },
+      'tsconfig.sumi.json': {
+        kind: 'reference only',
+        reason: 'Not a Sumi dogfood target.',
+      },
+      [SCRIPTS_FILE]: {
+        kind: 'differs',
+        reason: 'No check:sumi: not a Sumi dogfood target.',
+      },
     },
   },
   {
     dir: 'libs/synstate-preact-hooks',
+    substitutions: [
+      [/synstate-preact-hooks/gu, 'synstate-react-hooks'],
+      [/@testing-library\/preact\b/gu, '@testing-library/react'],
+      // Preact's `act` returns a promise to await, so a test that calls it is
+      // `async`.
+      [/\bawait act\(/gu, 'act('],
+      [/(?<=\btest\((?:'[^']*'|"[^"]*"|`[^`]*`), )async (?=\(\) =>)/gu, ''],
+      [
+        /import type \* as Preact from 'preact';/gu,
+        "import type * as React from 'react';",
+      ],
+      [/\bPreact\.JSX\b/gu, 'React.JSX'],
+    ],
     departures: {
       'src/react-version-hooks.mts': {
         kind: 'reference only',
@@ -200,21 +305,15 @@ const COPIES = [
         kind: 'differs',
         reason: 'Written against preact/hooks.',
       },
-      'test/browser/create-state.test.mts': {
-        kind: 'differs',
-        reason: 'Renders with @testing-library/preact.',
-      },
       'test/browser/use-observable-effect.test.mts': {
         kind: 'differs',
-        reason: 'Renders with @testing-library/preact.',
-      },
-      'test/browser/use-observable-value.test.mts': {
-        kind: 'differs',
-        reason: 'Renders with @testing-library/preact.',
+        reason:
+          'Unmounts with a bare render(null, …), whose effect cleanup preact 11 runs a frame later (#3917), and tests that case.',
       },
       'test/browser/use-value-as-observable.test.mts': {
         kind: 'differs',
-        reason: 'Renders with @testing-library/preact.',
+        reason:
+          'Tests the Preact implementation, which has no StrictMode and completes its observable without a timer.',
       },
       'test/browser/hydrate.test.mts': {
         kind: 'reference only',
@@ -228,19 +327,38 @@ const COPIES = [
       },
       'configs/vitest.config.mts': {
         kind: 'differs',
-        reason:
-          'The alias names the package, and the browser tests optimize Preact.',
+        reason: 'The browser tests optimize Preact rather than React.',
       },
       'scripts/cmd/embed-examples.mts': {
         kind: 'differs',
         reason:
           "The useObservableValue README sample is the reference package's alone.",
       },
+      'samples/readme/03-use-observable-value.tsx': {
+        kind: 'reference only',
+        reason:
+          "The useObservableValue README sample is the reference package's alone.",
+      },
+      'tsconfig.json': {
+        kind: 'differs',
+        reason: "JSX is compiled for Preact's runtime (jsxImportSource).",
+      },
+      'tsconfig.sumi.json': {
+        kind: 'differs',
+        reason:
+          'Needs no dom lib: its useValueAsObservable completes without setTimeout.',
+      },
+      [SCRIPTS_FILE]: {
+        kind: 'differs',
+        reason:
+          'gen:index:src excludes no react-version-hooks.mts, which the package does not have.',
+      },
     },
   },
 ] as const satisfies readonly Readonly<{
   dir: string;
-  departures: ReadonlyRecord<SharedPath, Departure>;
+  substitutions: Substitutions;
+  departures: Partial<ReadonlyRecord<SharedPath, Departure>>;
 }>[];
 
 const MESSAGE = {
@@ -265,9 +383,9 @@ const departureOf = (
         : 'differs';
 
 /**
- * The files of every package's {@link SHARED_DIRS} that git would commit,
- * repository-relative: tracked, or untracked and not ignored, and present in
- * the working tree.
+ * The files of every package that git would commit, repository-relative:
+ * tracked, or untracked and not ignored, and present in the working tree.
+ * {@link readSharedFiles} keeps the shared ones.
  */
 const listSharedFiles = async (): Promise<readonly string[]> =>
   splitZ(
@@ -278,29 +396,38 @@ const listSharedFiles = async (): Promise<readonly string[]> =>
       '--others',
       '--exclude-standard',
       '--',
-      ...Arr.toUnshifted(REFERENCE)(COPIES.map((copy) => copy.dir)).flatMap(
-        (dir) => SHARED_DIRS.map((shared) => `${dir}/${shared}`),
-      ),
+      ...Arr.toUnshifted(REFERENCE)(COPIES.map((copy) => copy.dir)),
     ]),
   ).filter(isRegularFile);
 
 /**
- * The shared files of a package, keyed by their path inside it. A file that
- * cannot be read throws, which the caller reports.
+ * The shared files of a package, keyed by their path inside it, and its scripts
+ * under {@link SCRIPTS_FILE}. A file that cannot be read throws, which the
+ * caller reports.
  */
 const readSharedFiles = async (
   dir: string,
   listed: readonly string[],
 ): Promise<ReadonlyMap<string, string>> =>
   new Map<string, string>(
-    await Promise.all(
-      filesOf(dir, listed).map(
-        async (file) =>
-          [
-            file,
-            Result.unwrapThrow(await readRepositoryFile(`${dir}/${file}`)),
-          ] as const,
+    Arr.toPushed(
+      await Promise.all(
+        filesOf(dir, listed)
+          .filter(isSharedFile)
+          .map(
+            async (file) =>
+              [
+                file,
+                Result.unwrapThrow(await readRepositoryFile(`${dir}/${file}`)),
+              ] as const,
+          ),
       ),
+      [
+        SCRIPTS_FILE,
+        scriptsFile(
+          Result.unwrapThrow(await readRepositoryFile(`${dir}/package.json`)),
+        ),
+      ],
     ),
   );
 

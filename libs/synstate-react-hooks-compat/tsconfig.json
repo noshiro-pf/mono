@@ -4,6 +4,11 @@
     "../../tools/configs/tsconfig/tsconfig.vite.json"
   ],
   "compilerOptions": {
+    // Opted into the strict standard library. Both TypeScript 6 and 7 default
+    // `libReplacement` to false, so the `@typescript/lib-*` links the root
+    // `prepare` script writes do nothing without it. Stated here, with a probe:
+    // `check:root:tsconfig-lib-replacement` requires both. See
+    // docs/strict-typescript-lib-integration.md.
     "libReplacement": true,
 
     // `samples/` imports this package by its own name, the way a consumer
