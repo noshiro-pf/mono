@@ -11,8 +11,10 @@ import type {
   Room,
 } from '../types/index.mjs';
 import {
+  createRoomDeadlineMs,
   createRoomStore,
   type CreatedRoom,
+  type RoomDeps,
   type RoomStore,
 } from './room-store.mjs';
 
@@ -235,6 +237,63 @@ describe(createRoomStore, () => {
     assert.strictEqual(store.myName.getSnapshot().value, 'alice');
   });
 
+  test('createRoom whose save does not settle, as offline, fails at the deadline (#3295)', async () => {
+    const { store, api, timers } = setup();
+
+    const mut_responses: CreatedRoom[] = [];
+
+    store.createRoom.response.subscribe((created) => {
+      mut_responses.push(created);
+    });
+
+    const pending = store.createRoom.dispatch({
+      username: 'alice',
+      password: undefined,
+    });
+
+    assert.deepStrictEqual(
+      timers.map(([delayMs]) => delayMs),
+      [createRoomDeadlineMs],
+    );
+
+    timers[0]?.[1]();
+
+    const result = await pending;
+
+    assert.isTrue(Result.isErr(result));
+
+    assert.isFalse(store.createRoom.isWaitingResponse.getSnapshot().value);
+
+    assert.isTrue(store.createRoom.hasFailed.getSnapshot().value);
+
+    // The write lands later: the player was told it failed, so it is not
+    // opened, and the failure stays.
+    api.addedRooms[0]?.resolve('late-id');
+
+    await Promise.resolve();
+
+    assert.deepStrictEqual(mut_responses, []);
+
+    assert.isUndefined(store.myName.getSnapshot().value);
+
+    assert.isTrue(store.createRoom.hasFailed.getSnapshot().value);
+  });
+
+  test('createRoom that settles in time cancels its deadline (#3295)', async () => {
+    const { store, api, cancelled } = setup();
+
+    const pending = store.createRoom.dispatch({
+      username: 'alice',
+      password: undefined,
+    });
+
+    api.addedRooms[0]?.resolve('new-id');
+
+    await pending;
+
+    assert.strictEqual(cancelled(), 1);
+  });
+
   test('createRoom whose save throws instead of rejecting fails the same way', async () => {
     const error = new Error('invalid-argument');
 
@@ -247,6 +306,7 @@ describe(createRoomStore, () => {
           throw error;
         },
       },
+      setTimer: fakeTimers().setTimer,
     });
 
     const mut_responses: CreatedRoom[] = [];
@@ -483,10 +543,48 @@ const fakeApi = (): FakeApi => {
   };
 };
 
-const setup = (): Readonly<{ store: RoomStore; api: FakeApi }> => {
+const fakeTimers = (): Readonly<{
+  setTimer: RoomDeps['setTimer'];
+  calls: readonly (readonly [number, () => void])[];
+  cancelled: () => number;
+}> => {
+  const mut_calls: (readonly [number, () => void])[] = [];
+
+  const mut_cancelled = { count: 0 };
+
+  const cancel = (): void => {
+    mut_cancelled.count += 1;
+  };
+
+  return {
+    setTimer: (delayMs, run) => {
+      mut_calls.push([delayMs, run]);
+
+      return cancel;
+    },
+    calls: mut_calls,
+    cancelled: () => mut_cancelled.count,
+  };
+};
+
+const setup = (): Readonly<{
+  store: RoomStore;
+  api: FakeApi;
+  /** Each `setTimer` call, as its arguments. */
+  timers: readonly (readonly [number, () => void])[];
+  /** How many timers were cancelled. */
+  cancelled: () => number;
+}> => {
   const api = fakeApi();
 
-  return { store: createRoomStore({ api: api.api }), api } as const;
+  const timers = fakeTimers();
+
+  return {
+    store: createRoomStore({ api: api.api, setTimer: timers.setTimer }),
+    api,
+    timers: timers.calls,
+    cancelled: timers.cancelled,
+  } as const;
 };
 
 const roomWithId = (id: string): Room =>
