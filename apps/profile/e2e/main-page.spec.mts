@@ -350,3 +350,57 @@ test(
       .toHaveAttribute('href', 'https://github.com/noshiro-pf');
   },
 );
+
+test(
+  'each tab has its own document title (#3919)',
+  { tag: '@smoke' },
+  async ({ page }) => {
+    await page.goto('/mono/profile/skills/');
+
+    await expect.soft(page).toHaveTitle('スキル | noshiro-pf のプロフィール');
+
+    await page.getByTestId('tabs').getByTestId('tab-3').click();
+
+    await expect.soft(page).toHaveTitle('製作物 | noshiro-pf のプロフィール');
+
+    // The root redirects to the first tab, and takes its title.
+    await page.goto('/');
+
+    await expect.soft(page).toHaveTitle('経歴 | noshiro-pf のプロフィール');
+  },
+);
+
+test(
+  'a tab change runs in a view transition (#3919)',
+  { tag: '@smoke' },
+  async ({ page }) => {
+    const mut_calls: string[] = [];
+
+    await page.exposeFunction('reportViewTransition', () => {
+      mut_calls.push(page.url());
+    });
+
+    await page.addInitScript(() => {
+      const start = document.startViewTransition.bind(document);
+
+      // Runs in the page, where wrapping the browser's own method is the only
+      // way to see it called.
+      // eslint-disable-next-line functional/immutable-data
+      document.startViewTransition = (update) => {
+        // @ts-expect-error exposed by page.exposeFunction above
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+        window.reportViewTransition();
+
+        return start(update);
+      };
+    });
+
+    await page.goto('/mono/profile/career/');
+
+    await page.getByTestId('tabs').getByTestId('tab-2').click();
+
+    await expect.soft(page).toHaveURL(/\/mono\/profile\/skills\/$/u);
+
+    expect.soft(mut_calls).toHaveLength(1);
+  },
+);
