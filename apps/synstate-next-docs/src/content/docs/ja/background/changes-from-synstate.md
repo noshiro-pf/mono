@@ -32,6 +32,7 @@ synstate-next は、次のメジャーバージョンで synstate を置き換�
 - **`take(n)` と `skip(n)` は、ソースが最初に持っている値も数えます。** `state(0).pipe(take(1))` は `0` を持ち、その後は何も流しません。synstate はその後の値だけを数えていました。
 - **`takeUntil` と `skipUntil` は、作られた後の notifier の流出に反応します。** notifier がすでに持っている値は流出ではありません。notifier が流したのと同じ更新でソースが流した値は、`takeUntil` では落とし、`skipUntil` では通します。
 - **`withBufferedFrom` は、作られた後に相手が流したものを溜めます。** synstate は、相手が持っていた値を最初のバッファに入れていました。
+- **`merge` は、値が最後に与えられた親の値から始めます**（1 回の更新で与えられた値どうしでは最初の親のもの）。そのため、state を merge したものは新しい subscriber をすぐに呼びます。synstate のものは、親が流すまで値を持ちませんでした。イベントのストリームのままにするには、merge を `dropInitialValue()` で終えてください。`withInitialValue` はソースが既に持っている値を保つので、synstate から移した `merge([…]).pipe(withInitialValue(x))` は `x` ではなく merge の値から始まります。
 - **`filter` と `skipWhile` の述語が受け取るのは値だけで**、添字は受け取りません。数えるなら `scan` です。
 - **1 つの `map` で書けるオペレーターはなくなりました。** `mapTo`（イベントに対する `equals: () => false` 付きの `map`）、`pluck` と `getKey`、`attachIndex` と `withIndex`（`scan`）、`mapOptional`・`unwrapOptional`・`mapResultOk`・`mapResultErr`・`unwrapResultOk`・`unwrapResultErr` です。
 - **別名はなくなりました。** `withLatestFrom`（`withCurrentValueFrom`）、`withBuffered`（`withBufferedFrom`）、`distinctUntilChanged`（`skipIfNoChange`）、`flatMap`（`mergeMap`）です。

@@ -7,7 +7,7 @@ import MarbleDiagram from '../../../../components/MarbleDiagram.astro';
 
 {/* reference:jsdoc */}
 
-Emits the value of whichever parent emitted in this update (the first of them, if several did). Holds no value until one emits.
+Emits the value of whichever parent emitted in this update (the first of them, if several did). Starts from the value of the parent whose value was given last, by the same rule: of values given in one update, the first parent's. Holds no value while no parent holds one.
 
 {/* /reference */}
 

@@ -231,7 +231,9 @@ describe('graphs that are not cycles', () => {
 
     assert.deepStrictEqual(seen, [10, 14, 15]);
 
-    assert.deepStrictEqual(merged, [3, 3]);
+    // `merge` starts from `left`: its value and `b`'s were given before any
+    // update, so they count as equal, and the first parent's is taken.
+    assert.deepStrictEqual(merged, [2, 3, 3]);
   });
 });
 
@@ -285,9 +287,9 @@ describe('a write nothing observes', () => {
 
     a.set(6);
 
-    // `merge` passes on the parent that emitted in each update, never the value
-    // `a` was given while nothing observed it.
-    assert.deepStrictEqual(merged, [1, 6]);
+    // `merge` starts from the value given last, `a`'s, which nothing observed;
+    // after that it passes on the parent that emitted in each update.
+    assert.deepStrictEqual(merged, [5, 1, 6]);
 
     assert.deepStrictEqual(derived, [
       [5, 0],

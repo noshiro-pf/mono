@@ -44,6 +44,8 @@ export type DerivedNode = {
   readonly bornAt: number;
   /** The `writeCount` at its latest emission; see `enqueueChildren`. */
   emittedAt: number;
+  /** When the value it holds was given; see `birthValueAt`. */
+  valueAt: number;
   readonly children: readonly QueuedNode[] | undefined;
   /** Recomputes; returns whether the value changed. */
   recompute: () => boolean;
@@ -79,6 +81,14 @@ const mut_state = {
   epoch: 1,
   /** Counts the emissions; see `enqueueChildren`. */
   writeCount: 0,
+  /** Numbers the updates; see `birthValueAt`. */
+  update: 0,
+  /**
+   * Whether a write made during a flush was given the next update's number,
+   * which the next round, or the end of the flush, then takes; see
+   * `emissionValueAt`.
+   */
+  nextUpdateTaken: false,
   /** Counts the rounds that took `pending`; see `isPending`. */
   pendingGeneration: 1,
   phase: 'idle' as Phase,
@@ -165,6 +175,26 @@ export const writeCount = (): number => mut_state.writeCount;
  */
 export const isDraining = (): boolean => mut_state.phase === 'drain';
 
+/**
+ * When a value given now, rather than emitted, was given: the `valueAt` of a node
+ * created holding one that it did not compute from its parents. `merge` compares
+ * these to start from the value given last, so they order every value a node
+ * can hold.
+ *
+ * An update is numbered `u` when it starts: a write outside a batch, the
+ * outermost batch, or a round of the writes made during a flush. Its values are
+ * at `2u`, so all of one update are equal and `merge` takes the first of them
+ * in `parents`, as it does for an update after it is created. A node created in
+ * a batch or in the drain belongs to that update, at `2u`; one created between
+ * updates, or by an effect once the round's values are settled, comes after
+ * them, at `2u + 1`.
+ */
+export const birthValueAt = (): number =>
+  mut_state.phase === 'drain' ||
+  (mut_state.phase === 'idle' && mut_state.batchDepth > 0)
+    ? 2 * mut_state.update
+    : 2 * mut_state.update + 1;
+
 /** Whether `node` emitted outside the drain and waits for the next round. */
 export const isPending = (node: DerivedNode): boolean =>
   node.queuedAt === -mut_state.pendingGeneration;
@@ -195,12 +225,6 @@ export const afterNextRound = (emitter: QueuedEmitter): void => {
 
   mut_state.afterNextRoundLength += 1;
 };
-
-/** A node holding an exception for an effect to take; see `holdUntilUpdateEnds`. */
-export type HoldsFailure = Readonly<{
-  /** Reports the exception, if no effect took it, and lets it go. */
-  reportUnclaimed: () => void;
-}>;
 
 /**
  * Has `holder` report its exception once the flush under way ends, if no effect
@@ -273,9 +297,12 @@ export const enqueueChildren = (node: DerivedNode): void => {
 /**
  * Marks `node` as having emitted outside the drain, and propagates unless a
  * batch or a flush is under way. `hasObserver` false is the fast path: there is
- * nothing to reach, so the write costs one increment.
+ * nothing to reach, so the write costs numbering its value and one increment.
  */
 export const emit = (node: DerivedNode, hasObserver: boolean): void => {
+  // eslint-disable-next-line functional/immutable-data
+  node.valueAt = emissionValueAt();
+
   if (!hasObserver) {
     mut_state.epoch += 1;
 
@@ -315,6 +342,10 @@ export const emit = (node: DerivedNode, hasObserver: boolean): void => {
  * Batches nest; the outermost one propagates.
  */
 export const batch = <R,>(fn: (this: unknown) => R): R => {
+  if (mut_state.batchDepth === 0 && mut_state.phase === 'idle') {
+    mut_state.update += 1;
+  }
+
   mut_state.batchDepth += 1;
 
   try {
@@ -327,6 +358,35 @@ export const batch = <R,>(fn: (this: unknown) => R): R => {
     }
   }
 };
+
+/**
+ * The `valueAt` of a value emitted now outside the drain. A write while nothing
+ * runs starts an update of its own; one in a batch belongs to the batch's. One
+ * made during a flush (by an effect, or applied after a round) belongs to the
+ * round after: `flushRounds` numbers that round when it starts, or the update
+ * at the end when no round comes, because nothing observes what was written.
+ * A round's pending writes all come from one of the two cases: those made
+ * before the flush are the update that started it, the others claimed this.
+ */
+const emissionValueAt = (): number => {
+  if (mut_state.phase === 'idle') {
+    if (mut_state.batchDepth === 0) {
+      mut_state.update += 1;
+    }
+
+    return 2 * mut_state.update;
+  }
+
+  mut_state.nextUpdateTaken = true;
+
+  return 2 * (mut_state.update + 1);
+};
+
+/** A node holding an exception for an effect to take; see `holdUntilUpdateEnds`. */
+export type HoldsFailure = Readonly<{
+  /** Reports the exception, if no effect took it, and lets it go. */
+  reportUnclaimed: () => void;
+}>;
 
 /** Numbers an emission of `node`; see `enqueueChildren`. */
 const stampEmission = (node: DerivedNode): void => {
@@ -407,6 +467,9 @@ const drain = (): void => {
       node.changedAt = epoch;
 
       stampEmission(node);
+
+      // eslint-disable-next-line functional/immutable-data
+      node.valueAt = 2 * mut_state.update;
 
       enqueueChildren(node);
     }
@@ -602,6 +665,14 @@ const flushRounds = (): void => {
       }
 
       if (mut_state.pendingLength > 0) {
+        // Writes made during the flush claimed this round's number; those made
+        // before it are the update that started the flush.
+        if (mut_state.nextUpdateTaken) {
+          mut_state.update += 1;
+
+          mut_state.nextUpdateTaken = false;
+        }
+
         mut_state.epoch += 1;
 
         mut_state.pendingGeneration += 1;
@@ -679,6 +750,12 @@ const flushRounds = (): void => {
     mut_failure = keepFirst(mut_failure, error);
   } finally {
     mut_state.phase = 'idle';
+
+    if (mut_state.nextUpdateTaken) {
+      mut_state.update += 1;
+
+      mut_state.nextUpdateTaken = false;
+    }
 
     // eslint-disable-next-line ts-data-forge/prefer-range-for-loop
     for (let mut_i = 0; mut_i < mut_state.holdersLength; mut_i += 1) {

@@ -65,7 +65,7 @@ Compute the value you need in `fn` itself: it is computed once, and an unchanged
 
 ## `merge` and `zip`
 
-`merge(parents)` emits whatever any parent emitted (the first of them, if several did in one update). `zip(parents)` pairs the n-th values of each parent, waiting for the slowest:
+`merge(parents)` emits whatever any parent emitted (the first of them, if several did in one update), and starts from the value of the parent whose value was given last, by the same rule; end it in `dropInitialValue()` for an event stream that should not. `zip(parents)` pairs the n-th values of each parent, waiting for the slowest:
 
 ```tsx
 import { createValueEmitter, merge, zip } from 'synstate-next';

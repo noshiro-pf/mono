@@ -33,6 +33,14 @@ no longer holds.
   its round recomputes it, so one made in that batch below it sees that
   emission: it read the derived node's value from before the write. A node with
   several parents asks `emittedNow(parent)` for the same reason.
+- **Each value knows the update it was given in.** Updates are numbered as they
+  start (a write outside a batch, the outermost batch, each later round of a
+  flush), and a node records the number of the update its value comes from in
+  `valueAt`: when it emits, when it is created holding a value it was given,
+  and, when it computes its first value from its parents', theirs. `merge` reads
+  it once, when created, to start from the value given last. The cost is one
+  increment per update and one write per emission, an unobserved write's
+  included.
 - **A node that is done leaves its parents.** A `take`, `takeWhile` or
   `takeUntil` that will pass nothing more takes itself out of its parents'
   children, keeping its value, so that they neither visit it nor keep it alive.
@@ -231,6 +239,13 @@ from the prototype; the packages are to be measured again in
   `skipUntil`.
 - `withBufferedFrom` buffers what the other observable emits after it was
   created; synstate put the value it held into the first buffer.
+- `merge` starts from the value of the parent whose value was given last, of
+  those given in one update the first parent's; synstate's held nothing until a
+  parent emitted, so a merge of states now calls a new subscriber at once. A
+  merge that has to stay an event stream ends in `dropInitialValue()`. And
+  `withInitialValue` keeps a value its source already holds, which synstate's
+  did not, so a `merge([…]).pipe(withInitialValue(x))` ported from synstate
+  starts from the merged value rather than `x`.
 - The operators that are one `map` are gone: `mapTo`, `pluck` and its alias
   `getKey`, `attachIndex` and its alias `withIndex` (a `scan`), `mapOptional`,
   `unwrapOptional`, `mapResultOk`, `mapResultErr`, `unwrapResultOk`,

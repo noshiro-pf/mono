@@ -630,6 +630,201 @@ describe(skipIfNoChange, () => {
   });
 });
 
+describe(merge, () => {
+  test('holds `undefined` when that is the value a parent holds', () => {
+    const merged = merge([source<number>(), state(undefined)]);
+
+    assert.deepStrictEqual(merged.getSnapshot(), Optional.some(undefined));
+  });
+
+  test('holds nothing when no parent holds a value', () => {
+    const merged = merge([source<number>(), source<string>()]);
+
+    assert.isTrue(Optional.isNone(merged.getSnapshot()));
+  });
+
+  test('holds the value of the one parent that holds one, and passes it on', () => {
+    const merged = merge([source<number>(), state('a')]);
+
+    assert.deepStrictEqual(merged.getSnapshot(), Optional.some('a'));
+
+    assert.deepStrictEqual(collect(merged), ['a']);
+  });
+
+  test('holds the value written last, whichever parent is first', () => {
+    const a = state(1);
+
+    const b = state(2);
+
+    a.set(3);
+
+    assert.deepStrictEqual(merge([a, b]).getSnapshot(), Optional.some(3));
+
+    assert.deepStrictEqual(merge([b, a]).getSnapshot(), Optional.some(3));
+
+    b.subscribe(() => {});
+
+    b.set(4);
+
+    assert.deepStrictEqual(merge([a, b]).getSnapshot(), Optional.some(4));
+  });
+
+  test('holds the first in parents among the values of one update', () => {
+    const s = state(0);
+
+    const left = s.pipe(map((x) => x + 1));
+
+    const right = s.pipe(map((x) => x * 10));
+
+    left.subscribe(() => {});
+
+    right.subscribe(() => {});
+
+    s.set(1);
+
+    assert.deepStrictEqual(
+      merge([left, right]).getSnapshot(),
+      Optional.some(2),
+    );
+
+    assert.deepStrictEqual(
+      merge([right, left]).getSnapshot(),
+      Optional.some(10),
+    );
+  });
+
+  test('counts the writes of one batch as one update, observed or not', () => {
+    const a = state(0);
+
+    const b = state(0);
+
+    const c = state(0);
+
+    const d = state(0);
+
+    c.subscribe(() => {});
+
+    d.subscribe(() => {});
+
+    batch(() => {
+      a.set(1);
+
+      b.set(2);
+
+      c.set(3);
+
+      d.set(4);
+    });
+
+    assert.deepStrictEqual(merge([b, a]).getSnapshot(), Optional.some(2));
+
+    assert.deepStrictEqual(merge([d, a, c]).getSnapshot(), Optional.some(4));
+
+    assert.deepStrictEqual(merge([c, b, d]).getSnapshot(), Optional.some(3));
+  });
+
+  test('counts a write made by a subscriber as an update after the one it saw', () => {
+    const a = state(0);
+
+    const b = state(0);
+
+    a.subscribe((v) => {
+      if (v === 1) {
+        b.set(10);
+      }
+    });
+
+    a.set(1);
+
+    assert.deepStrictEqual(merge([b, a]).getSnapshot(), Optional.some(10));
+
+    assert.deepStrictEqual(merge([a, b]).getSnapshot(), Optional.some(10));
+
+    // A later write is later still, though no round took the subscriber's.
+    a.set(2);
+
+    assert.deepStrictEqual(merge([b, a]).getSnapshot(), Optional.some(2));
+  });
+
+  test('counts each queued emission of a source as an update of its own', () => {
+    const events = source<number>();
+
+    const b = state(0);
+
+    events.subscribe(() => {});
+
+    b.subscribe(() => {});
+
+    batch(() => {
+      events.emit(1);
+
+      b.set(5);
+
+      // Delivered in the round after the batch's, so later than `b`'s write.
+      events.emit(2);
+    });
+
+    assert.deepStrictEqual(merge([b, events]).getSnapshot(), Optional.some(2));
+  });
+
+  test('takes a value derived after a later write as old as its source', () => {
+    const a = state(1);
+
+    const b = state(2);
+
+    a.set(10);
+
+    b.set(20);
+
+    const derived = a.pipe(map((x) => x + 1));
+
+    assert.deepStrictEqual(
+      merge([derived, b]).getSnapshot(),
+      Optional.some(20),
+    );
+  });
+
+  test('takes a value created after a write as newer', () => {
+    const a = state(1);
+
+    a.set(2);
+
+    const b = state(5);
+
+    assert.deepStrictEqual(merge([a, b]).getSnapshot(), Optional.some(5));
+  });
+
+  test('counts what a batch creates and writes as one update', () => {
+    const a = state(0);
+
+    const [first, second] = batch(() => {
+      a.set(1);
+
+      const b = state(5);
+
+      return [merge([a, b]), merge([b, a])] as const;
+    });
+
+    assert.deepStrictEqual(first.getSnapshot(), Optional.some(1));
+
+    assert.deepStrictEqual(second.getSnapshot(), Optional.some(5));
+  });
+
+  test('starts from the first parent when no update came between their values', () => {
+    const a = state(1);
+
+    const b = state(2);
+
+    const seen = collect(merge([a, b]));
+
+    b.set(3);
+
+    a.set(4);
+
+    assert.deepStrictEqual(seen, [1, 3, 4]);
+  });
+});
+
 describe(zip, () => {
   test('pairs the n-th values of every parent', () => {
     const a = source<number>();
@@ -822,14 +1017,14 @@ describe('a node made in a batch after a write', () => {
     batch(() => {
       a.set(1);
 
-      merge([a]).subscribe((v) => {
+      a.pipe(dropInitialValue()).subscribe((v) => {
         mut_inBatch.push(v);
       });
     });
 
     const mut_after: number[] = [];
 
-    merge([a]).subscribe((v) => {
+    a.pipe(dropInitialValue()).subscribe((v) => {
       mut_after.push(v);
     });
 

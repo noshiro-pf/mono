@@ -65,7 +65,7 @@ assert.deepStrictEqual(mut_pairs, ['100 × 2', '50 × 4']);
 
 ## `merge` と `zip`
 
-`merge(parents)` は、どれかの親が流した値をそのまま流します（1 回の更新で複数が流したときは、その最初のもの）。`zip(parents)` は各親の n 番目の値を組にし、いちばん遅い親を待ちます。
+`merge(parents)` は、どれかの親が流した値をそのまま流します（1 回の更新で複数が流したときは、その最初のもの）。作られた時点では、同じ規則で、値が最後に与えられた親の値から始めます。そうしたくないイベントのストリームは `dropInitialValue()` で終えてください。`zip(parents)` は各親の n 番目の値を組にし、いちばん遅い親を待ちます。
 
 ```tsx
 import { createValueEmitter, merge, zip } from 'synstate-next';
