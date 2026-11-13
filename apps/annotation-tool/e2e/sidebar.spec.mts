@@ -1,5 +1,10 @@
 import { expect, type Locator, test } from '@playwright/test';
-import { labelButton, labelButtons, selectedLabelButton } from './locators.mjs';
+import {
+  labelButton,
+  labelButtons,
+  selectedLabelButton,
+  visibilityToggle,
+} from './locators.mjs';
 
 const labelNames = [
   'Ant',
@@ -46,24 +51,53 @@ test(
   async ({ page }) => {
     await page.goto('/');
 
-    const eye = visibilityIcon(labelButton(page, 'Dog'));
+    const eye = visibilityIcon(visibilityToggle(page, 'Dog'));
 
     await expect.soft(eye).toHaveAttribute('data-icon', 'eye-open');
 
-    await labelButton(page, 'Dog').getByTestId('visibility-toggle').click();
+    await visibilityToggle(page, 'Dog').click();
 
     await expect.soft(eye).toHaveAttribute('data-icon', 'eye-off');
 
     // Only Dog's eye changed, and Ant is still the selected label.
     await expect
-      .soft(visibilityIcon(labelButton(page, 'Ant')))
+      .soft(visibilityIcon(visibilityToggle(page, 'Ant')))
       .toHaveAttribute('data-icon', 'eye-open');
 
     await expect.soft(selectedLabelButton(page)).toHaveText(['Ant']);
 
-    await labelButton(page, 'Dog').getByTestId('visibility-toggle').click();
+    await visibilityToggle(page, 'Dog').click();
 
     await expect.soft(eye).toHaveAttribute('data-icon', 'eye-open');
+  },
+);
+
+test(
+  'the eye is a button of its own, which the keyboard toggles and which says whether the label is shown (#3409)',
+  { tag: '@smoke' },
+  async ({ page }) => {
+    await page.goto('/');
+
+    const toggle = visibilityToggle(page, 'Dog');
+
+    await expect.soft(toggle).toHaveAttribute('aria-pressed', 'true');
+
+    await toggle.focus();
+
+    await page.keyboard.press('Enter');
+
+    await expect.soft(toggle).toHaveAttribute('aria-pressed', 'false');
+
+    await expect
+      .soft(visibilityIcon(toggle))
+      .toHaveAttribute('data-icon', 'eye-off');
+
+    await page.keyboard.press('Space');
+
+    await expect.soft(toggle).toHaveAttribute('aria-pressed', 'true');
+
+    // Toggling it selects no label.
+    await expect.soft(selectedLabelButton(page)).toHaveText(['Ant']);
   },
 );
 
@@ -93,8 +127,6 @@ test(
   },
 );
 
-/** The eye icon of a label button, which assistive technology does not see. */
-const visibilityIcon = (button: Locator): Locator =>
-  button
-    .getByTestId('visibility-toggle')
-    .getByRole('img', { includeHidden: true });
+/** The icon of a label's eye, which assistive technology does not see. */
+const visibilityIcon = (toggle: Locator): Locator =>
+  toggle.getByRole('img', { includeHidden: true });
