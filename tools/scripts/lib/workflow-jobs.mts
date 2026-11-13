@@ -369,8 +369,8 @@ const VARIABLE_REFERENCE =
   /^\$(?:\{(?<braced>[A-Za-z_]\w*)\}|(?<bare>[A-Za-z_]\w*))$/u;
 
 /**
- * A workflow's text parsed as every guard reading workflows through this module
- * parses it, or what YAML said of it.
+ * A workflow file as YAML, or what is wrong with it in one line: the parser's
+ * first, which names the position.
  */
 export const parseWorkflow = (text: string): Result<unknown, string> => {
   const parsed = Result.fromThrowable((): unknown => parse(text));
