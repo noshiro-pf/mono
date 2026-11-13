@@ -878,6 +878,12 @@ fieldset {
   font-size: 12px;
 }
 
+/* An `output` (the status while importing) is inline by default; drawn as the
+   `p` hints beside it are. */
+output.settings-hint {
+  display: block;
+}
+
 .dag-controls {
   position: absolute;
   right: max(12px, env(safe-area-inset-right));
