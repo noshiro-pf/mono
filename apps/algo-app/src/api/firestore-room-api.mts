@@ -8,6 +8,7 @@ import {
   onSnapshot,
   orderBy,
   query,
+  setDoc,
   updateDoc,
 } from 'firebase/firestore';
 import type { DeepReadonly } from 'ts-type-forge';
@@ -38,9 +39,9 @@ export const createFirestoreRoomApi = (
       updateDoc(doc(firestore, paths.rooms, roomId), {
         players: arrayUnion(player),
       }),
-    addAction: async (roomId, action) => {
-      await addDoc(
-        collection(firestore, paths.rooms, roomId, paths.actions),
+    addAction: async (roomId, { id, action }) => {
+      await setDoc(
+        doc(firestore, paths.rooms, roomId, paths.actions, id),
         action,
       );
     },

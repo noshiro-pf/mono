@@ -2,9 +2,10 @@
  * The game as this player sees it: the actions played here and those the
  * database has, merged into one list and folded into a `GameState`.
  *
- * An action played here is written to the room through `deps.addAction`; the
- * follow-ups of an answer are timed with `deps.setTimer`, and the auto play
- * with `deps.counter`, so the tests can run both by hand.
+ * An action played here is written to the room through `deps.addAction`, as a
+ * document whose id `deps.newActionId` makes, so that it is known when it is
+ * read back. The follow-ups of an answer are timed with `deps.setTimer`, and
+ * the auto play with `deps.counter`, so the tests can run both by hand.
  */
 
 import { serverTimestamp } from 'firebase/firestore';
@@ -31,15 +32,12 @@ import {
   isNotUndefined,
   type SizeType,
 } from 'ts-data-forge';
-import type {
-  DeepReadonly,
-  NonEmptyTuple,
-  SafeUintWithSmallInt,
-} from 'ts-type-forge';
+import type { NonEmptyTuple, SafeUintWithSmallInt } from 'ts-type-forge';
 import { time } from '../constants/index.mjs';
 import { returnFalse } from '../return-boolean.mjs';
 import { gameStateReducer, initialGameState } from '../state/index.mjs';
 import type {
+  ActionRecord,
   Card,
   GameState,
   GameStateAction,
@@ -51,8 +49,15 @@ import type {
 
 export type GameStateDeps = Readonly<{
   room: SynstateObservable<Room | undefined>;
-  actionsFromDb: SynstateObservable<readonly GameStateActionFromDb[]>;
-  addAction: (roomId: string, action: GameStateActionToWrite) => Promise<void>;
+  actionsFromDb: SynstateObservable<
+    readonly ActionRecord<GameStateActionFromDb>[]
+  >;
+  addAction: (
+    roomId: string,
+    record: ActionRecord<GameStateActionToWrite>,
+  ) => Promise<void>;
+  /** A new id, unique across every client, for an action played here. */
+  newActionId: () => string;
   /** Runs `run` after `delayMs`; returns what cancels it. */
   setTimer: (delayMs: number, run: () => void) => () => void;
   /** Counts up from 0 every `ms`. */
@@ -86,71 +91,72 @@ export type GameStateStore = Readonly<{
 }>;
 
 export const createGameStateStore = (deps: GameStateDeps): GameStateStore => {
-  const localGameStateActionSource = source<GameStateActionToWrite>();
+  const localRecordSource = source<ActionRecord<GameStateActionToWrite>>();
 
   const gameStateDispatcher = (action: GameStateActionToWrite): void => {
-    localGameStateActionSource.next(action);
+    localRecordSource.next({ id: deps.newActionId(), action });
   };
 
-  const gameStateActionMerged: SynstateObservable<readonly GameStateAction[]> =
-    merge([
-      localGameStateActionSource.pipe(
-        map((a) => ({ type: 'local', value: a }) as const),
-      ),
-      deps.actionsFromDb.pipe(
-        map((a) => ({ type: 'remote', value: a }) as const),
-      ),
-    ] as const)
-      .pipe(
-        scan<
-          DeepReadonly<
-            | { type: 'local'; value: GameStateAction }
-            | { type: 'remote'; value: GameStateAction[] }
-          >,
-          DeepReadonly<{
-            newCommits: GameStateAction[];
-            commitsPlayed: GameStateAction[];
-          }>
-        >(
-          ({ commitsPlayed }, action) => {
-            if (returnFalse()) {
-              console.log(commitsPlayed, action);
+  // The game is the room's actions in the server's order, then those played
+  // here that the server does not hold yet, folded from the start: an action
+  // another player commits while one of these is pending may come before it,
+  // and each is applied once, in that order, by its id.
+  const actionsInOrder: InitializedObservable<
+    readonly ActionRecord<GameStateAction>[]
+  > = merge([
+    localRecordSource.pipe(map((r) => ({ type: 'local', value: r }) as const)),
+    deps.actionsFromDb.pipe(
+      map((rs) => ({ type: 'remote', value: rs }) as const),
+    ),
+  ] as const)
+    .pipe(
+      scan<
+        Readonly<
+          | {
+              type: 'local';
+              value: ActionRecord<GameStateActionToWrite>;
             }
-
-            switch (action.type) {
-              case 'local':
-                return {
-                  newCommits: [action.value],
-                  commitsPlayed: Arr.toPushed(commitsPlayed, action.value),
-                };
-              case 'remote':
-                return action.value.length <= commitsPlayed.length
-                  ? {
-                      commitsPlayed,
-                      newCommits: [],
-                    } // ローカルの方が進んでいるときは無視
-                  : {
-                      newCommits: Arr.skip(
-                        action.value,
-                        Arr.length(commitsPlayed),
-                      ),
-                      commitsPlayed: action.value,
-                    };
+          | {
+              type: 'remote';
+              value: readonly ActionRecord<GameStateActionFromDb>[];
             }
-          },
-          {
-            newCommits: [],
-            commitsPlayed: [],
-          },
-        ),
-      )
-      .pipe(map((s) => s.newCommits));
+        >,
+        Readonly<{
+          remote: readonly ActionRecord<GameStateAction>[];
+          pending: readonly ActionRecord<GameStateAction>[];
+        }>
+      >(
+        ({ remote, pending }, received) => {
+          switch (received.type) {
+            case 'local':
+              return { remote, pending: Arr.toPushed(pending, received.value) };
 
-  const gameState: InitializedObservable<GameState> =
-    gameStateActionMerged.pipe(scan(gameStateReducer, initialGameState));
+            case 'remote': {
+              const held = new Set<string>(received.value.map((r) => r.id));
+
+              return {
+                remote: received.value,
+                pending: pending.filter((r) => !held.has(r.id)),
+              };
+            }
+          }
+        },
+        { remote: [], pending: [] },
+      ),
+    )
+    .pipe(map(({ remote, pending }) => Arr.concat(remote, pending)));
+
+  const gameState: InitializedObservable<GameState> = actionsInOrder.pipe(
+    map((records) =>
+      gameStateReducer(
+        initialGameState,
+        records.map(({ action }) => action),
+      ),
+    ),
+  );
 
   const gameStateAction: SynstateObservable<GameStateActionToWrite> =
-    localGameStateActionSource;
+    localRecordSource.pipe(map((r) => r.action));
 
   const onCardClick = (card: Card, playerDirectionFromMe: NWES): void => {
     switch (playerDirectionFromMe) {
@@ -240,20 +246,20 @@ export const createGameStateStore = (deps: GameStateDeps): GameStateStore => {
     // before the room is known are written, in order, once it is.
     const knownRoom = deps.room.pipe(filter(isNotUndefined));
 
-    const playedHere = localGameStateActionSource.pipe(
-      scan<GameStateActionToWrite, readonly GameStateActionToWrite[]>(
-        (played, action) => Arr.toPushed(played, action),
-        [],
-      ),
+    const playedHere = localRecordSource.pipe(
+      scan<
+        ActionRecord<GameStateActionToWrite>,
+        readonly ActionRecord<GameStateActionToWrite>[]
+      >((played, record) => Arr.toPushed(played, record), []),
     );
 
     const writing = combine([knownRoom, playedHere])
       .pipe(
         scan<
-          readonly [Room, readonly GameStateActionToWrite[]],
-          DeepReadonly<{
+          readonly [Room, readonly ActionRecord<GameStateActionToWrite>[]],
+          Readonly<{
             roomId: string | undefined;
-            toWrite: GameStateActionToWrite[];
+            toWrite: readonly ActionRecord<GameStateActionToWrite>[];
             numWritten: SizeType.Arr;
           }>
         >(
@@ -270,11 +276,11 @@ export const createGameStateStore = (deps: GameStateDeps): GameStateStore => {
           return;
         }
 
-        for (const localAction of toWrite) {
-          Result.fromPromise(deps.addAction(roomId, localAction))
+        for (const record of toWrite) {
+          Result.fromPromise(deps.addAction(roomId, record))
             .then(() => {
               if (returnFalse()) {
-                console.log(roomId, localAction);
+                console.log(roomId, record);
               }
             })
             .catch((error: unknown) => {

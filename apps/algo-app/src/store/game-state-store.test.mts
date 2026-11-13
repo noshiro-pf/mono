@@ -2,6 +2,7 @@ import { Timestamp } from 'firebase/firestore';
 import { createState, source } from 'synstate';
 import { newRoom } from '../functions/index.mjs';
 import type {
+  ActionRecord,
   Card,
   GameStateActionFromDb,
   GameStateActionToWrite,
@@ -42,25 +43,83 @@ describe(createGameStateStore, () => {
     assert.deepStrictEqual(played, []);
   });
 
-  test('plays only the actions from the database that were not played here', () => {
+  test('plays an action played here once, when the database echoes it', () => {
     const { store, actionsFromDb } = setup();
 
     store.onCardClick(black6, 'S');
 
-    // The database echoes the action played here; played twice, the second
-    // `selectMyCard` of the same card would unselect it.
-    actionsFromDb.next([selectMyCard(black6)]);
+    // Played twice, the second `selectMyCard` of the same card would unselect
+    // it.
+    actionsFromDb.next([record('local-0', selectMyCard(black6))]);
 
     assert.deepStrictEqual(
       store.gameState.getSnapshot().value.cardChosenToToss,
       black6,
     );
 
-    actionsFromDb.next([selectMyCard(black6), selectMyCard(white7)]);
+    actionsFromDb.next([
+      record('local-0', selectMyCard(black6)),
+      record('remote-b', selectMyCard(white7)),
+    ]);
 
     assert.deepStrictEqual(
       store.gameState.getSnapshot().value.cardChosenToToss,
       white7,
+    );
+  });
+
+  test("applies another player's action that commits before a pending one here first, and each once (#3284)", () => {
+    const { store, actionsFromDb } = setup();
+
+    store.onCardClick(black6, 'S');
+
+    // B's action committed first; the pending one sorts after it.
+    actionsFromDb.next([
+      record('remote-b', selectMyCard(white7)),
+      record('local-0', selectMyCard(black6)),
+    ]);
+
+    assert.deepStrictEqual(
+      store.gameState.getSnapshot().value.cardChosenToToss,
+      black6,
+    );
+  });
+
+  test('keeps an action played here that the database does not hold yet after the others (#3284)', () => {
+    const { store, actionsFromDb } = setup();
+
+    store.onCardClick(black6, 'S');
+
+    actionsFromDb.next([record('remote-b', selectMyCard(white7))]);
+
+    // white7, then the pending black6 on top of it.
+    assert.deepStrictEqual(
+      store.gameState.getSnapshot().value.cardChosenToToss,
+      black6,
+    );
+
+    actionsFromDb.next([]);
+
+    assert.deepStrictEqual(
+      store.gameState.getSnapshot().value.cardChosenToToss,
+      black6,
+    );
+  });
+
+  test('writes each action as the document its id names', () => {
+    const { store, setRoom, written } = setup();
+
+    setRoom(roomWithId('a'));
+
+    store.start();
+
+    store.onTossCancel();
+
+    store.onTossSubmit();
+
+    assert.deepStrictEqual(
+      written.map(([, { id }]) => id),
+      ['local-0', 'local-1'],
     );
   });
 
@@ -195,10 +254,10 @@ type Setup = Readonly<{
   store: GameStateStore;
   setRoom: (room: Room | undefined) => void;
   actionsFromDb: Readonly<{
-    next: (actions: readonly GameStateActionFromDb[]) => void;
+    next: (actions: readonly ActionRecord<GameStateActionFromDb>[]) => void;
   }>;
   /** Each `addAction` call, as its arguments. */
-  written: readonly (readonly [string, GameStateActionToWrite])[];
+  written: readonly (readonly [string, ActionRecord<GameStateActionToWrite>])[];
   /** The type of each action played here, in order. */
   played: readonly GameStateActionToWrite['type'][];
   timers: readonly (readonly [number, () => void])[];
@@ -211,11 +270,17 @@ const cancelNothing = (): void => undefined;
 const setup = (): Setup => {
   const [roomState, setRoom] = createState<Room | undefined>(undefined);
 
-  const actionsFromDb = source<readonly GameStateActionFromDb[]>();
+  const actionsFromDb =
+    source<readonly ActionRecord<GameStateActionFromDb>[]>();
 
   const ticks = source<number>();
 
-  const mut_written: (readonly [string, GameStateActionToWrite])[] = [];
+  const mut_written: (readonly [
+    string,
+    ActionRecord<GameStateActionToWrite>,
+  ])[] = [];
+
+  const mut_nextId = { current: 0 };
 
   const mut_played: GameStateActionToWrite['type'][] = [];
 
@@ -224,10 +289,17 @@ const setup = (): Setup => {
   const store = createGameStateStore({
     room: roomState,
     actionsFromDb,
-    addAction: (roomId, action) => {
-      mut_written.push([roomId, action]);
+    addAction: (roomId, written) => {
+      mut_written.push([roomId, written]);
 
       return Promise.resolve();
+    },
+    newActionId: () => {
+      const id = `local-${mut_nextId.current}` as const;
+
+      mut_nextId.current += 1;
+
+      return id;
     },
     setTimer: (delayMs, run) => {
       mut_timers.push([delayMs, run]);
@@ -270,10 +342,15 @@ const selectMyCard = (card: Card): GameStateActionFromDb =>
     card,
   }) as const;
 
+const record = (
+  id: string,
+  action: GameStateActionFromDb,
+): ActionRecord<GameStateActionFromDb> => ({ id, action }) as const;
+
 const writtenTypes = (
   written: Setup['written'],
 ): readonly (readonly [string, GameStateActionToWrite['type']])[] =>
-  written.map(([roomId, action]) => [roomId, action.type] as const);
+  written.map(([roomId, { action }]) => [roomId, action.type] as const);
 
 const roomWithId = (id: string): Room =>
   ({
