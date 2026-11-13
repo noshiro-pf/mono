@@ -8,8 +8,8 @@ import {
 } from 'pr-report-core';
 import { Arr, Result } from 'ts-data-forge';
 import { currentEpochMs, resolveRepo, tokenFromEnv } from '../lib/index.mjs';
-import { createClient } from './github.mjs';
-import { readRequiredContexts } from './repo-settings.mjs';
+import { createClient, type Client } from './github.mjs';
+import { readOpenPulls } from './open-pulls.mjs';
 
 /**
  * Who moves each open pull request in the queue next (`pr-report-core`'s
@@ -53,6 +53,10 @@ export const ownersOf = (
 export type QueueState = Readonly<{
   repo: RepoRef;
   defaultBranch: string;
+  /**
+   * Read without `checks: true`, nothing is required, and its entries' check
+   * verdicts and comparisons are made from nothing read and mean nothing.
+   */
   decided: DecidedEntries;
   queue: ReadonlyMap<number, QueueComments>;
   owners: ReadonlyMap<number, QueueOwner>;
@@ -64,70 +68,57 @@ export type QueueState = Readonly<{
  * is the one `unblock-prs` writes as: without one no comment is trusted, and
  * there is no owner to read. `token` is for a command that resolved its own
  * (`gh auth token` included); otherwise it comes from the environment.
- * `checks: false` leaves out every pull request's comparison and check states,
- * which no owner reads, for a command that must not wait for them: its entries
- * then say nothing of either.
+ * `checks: true` reads the required contexts and every pull request's
+ * comparison and check states too (`readOpenPulls`), which no owner reads;
+ * without it the entries say nothing of either.
  */
 export const readQueueState = async (
   repoOption?: string,
   {
     token = tokenFromEnv(),
-    checks = true,
+    checks,
   }: Readonly<{ token?: string | undefined; checks?: boolean }> = {},
 ): Promise<Result<QueueState, string>> => {
   const repo = await resolveRepo(repoOption);
 
-  if (Result.isErr(repo)) {
-    return repo;
-  }
+  return Result.isErr(repo)
+    ? repo
+    : readQueueStateWith(createClient(token), repo.value, { checks });
+};
 
-  const client = createClient(token);
-
+/** {@link readQueueState} of `repo`, through `client`. */
+export const readQueueStateWith = async (
+  client: Client,
+  repo: RepoRef,
+  { checks = false }: Readonly<{ checks?: boolean | undefined }> = {},
+): Promise<Result<QueueState, string>> => {
   if (!client.authenticated) {
     return Result.err(
       'no GH_TOKEN or GITHUB_TOKEN: the queue comments, and so the owners, cannot be read',
     );
   }
 
-  const defaultBranch = await client.defaultBranch(repo.value);
+  const open = await readOpenPulls(client, repo, checks);
 
-  if (Result.isErr(defaultBranch)) {
-    return defaultBranch;
+  if (Result.isErr(open)) {
+    return open;
   }
 
-  const required = await readRequiredContexts(
-    client,
-    repo.value,
-    defaultBranch.value,
-  );
+  const { defaultBranch, required, pulls } = open.value;
 
-  if (Result.isErr(required)) {
-    return required;
-  }
-
-  const facts = await client.facts(repo.value, { checks });
-
-  if (Result.isErr(facts)) {
-    return facts;
-  }
-
-  const queue = await client.queueComments(
-    repo.value,
-    defaultBranch.value,
-    facts.value,
-  );
+  const queue = await client.queueComments(repo, defaultBranch, pulls);
 
   const decided = buildEntries({
-    required: required.value,
-    defaultBranch: defaultBranch.value,
-    pulls: facts.value,
+    required,
+    defaultBranch,
+    pulls,
   });
 
   return Result.ok({
-    repo: repo.value,
-    defaultBranch: defaultBranch.value,
+    repo,
+    defaultBranch,
     decided,
     queue,
-    owners: ownersOf(decided, queue, defaultBranch.value, currentEpochMs()),
+    owners: ownersOf(decided, queue, defaultBranch, currentEpochMs()),
   });
 };

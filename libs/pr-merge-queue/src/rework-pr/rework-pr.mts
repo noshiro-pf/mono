@@ -1026,7 +1026,6 @@ const readStanding = async (
 ): Promise<Result<ReworkStanding, string>> => {
   const queue = await readQueueState(`${api.repo.owner}/${api.repo.name}`, {
     token: api.token,
-    checks: false,
   });
 
   return Result.isErr(queue)

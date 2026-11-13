@@ -1,6 +1,11 @@
-import { createServer, type Server } from 'node:http';
 import type { LinkedIssue } from 'pr-report-core';
 import { Result } from 'ts-data-forge';
+import {
+  FAKE_REPO,
+  fakeGitHub,
+  fakePullRequest,
+  type FakeRoutes,
+} from '../../test/index.mjs';
 import { createClient } from './github.mjs';
 
 describe(createClient, () => {
@@ -90,7 +95,7 @@ describe(createClient, () => {
   });
 });
 
-const repo = { owner: 'o', name: 'r' } as const;
+const repo = FAKE_REPO;
 
 /** What the fake GitHub answers for its one open pull request. */
 type Answers = Readonly<{
@@ -116,83 +121,58 @@ const byGraphQl = (number: number): LinkedIssue =>
     state: 'open',
   }) as const;
 
-/** A fake GitHub, and the path of every request it has been sent. */
-const listening = async (
-  answers: Answers,
-): Promise<Readonly<{ server: Server; requested: readonly string[] }>> => {
-  const mut_requested: string[] = [];
-
-  const server = createServer((request, response) => {
-    mut_requested.push(request.url ?? '');
-
+/** A fake GitHub answering `answers` for its one open pull request. */
+const answering =
+  (answers: Answers): FakeRoutes =>
+  (request) => {
     if (request.url === '/graphql') {
-      if (answers.linked === 'refused') {
-        response.writeHead(403);
-
-        response.end(JSON.stringify({ message: 'Forbidden' }));
-
-        return;
-      }
-
-      response.end(
-        JSON.stringify({
-          data: {
-            repository: {
-              pullRequests: {
-                nodes: [
-                  {
-                    number: 1,
-                    closingIssuesReferences: {
-                      nodes: answers.linked.map((number) => ({
-                        ...byGraphQl(number),
-                        state: 'OPEN',
-                        repository: {
-                          nameWithOwner: `${repo.owner}/${repo.name}`,
+      return answers.linked === 'refused'
+        ? { status: 403, body: { message: 'Forbidden' } }
+        : {
+            body: {
+              data: {
+                repository: {
+                  pullRequests: {
+                    nodes: [
+                      {
+                        number: 1,
+                        closingIssuesReferences: {
+                          nodes: answers.linked.map((number) => ({
+                            ...byGraphQl(number),
+                            state: 'OPEN',
+                            repository: {
+                              nameWithOwner: `${repo.owner}/${repo.name}`,
+                            },
+                          })),
                         },
-                      })),
-                    },
+                      },
+                    ],
                   },
-                ],
+                },
               },
             },
-          },
-        }),
-      );
+          };
+    }
 
-      return;
+    if (!request.url.includes('/pulls?state=open')) {
+      return undefined;
     }
 
     const full =
-      request.headers.accept === 'application/vnd.github.full+json' &&
+      request.accept === 'application/vnd.github.full+json' &&
       answers.html !== undefined;
 
-    response.end(
-      JSON.stringify([
-        {
-          number: 1,
+    return {
+      body: [
+        fakePullRequest({
           title: 'A stacked pull request',
           body: answers.text ?? 'No keyword here.',
           ...(full ? { body_html: answers.html } : {}),
-          draft: false,
-          html_url: 'https://github.com/o/r/pull/1',
-          updated_at: '2026-01-01T00:00:00Z',
-          user: { login: 'someone' },
-          labels: [],
-          merged_at: null,
-          auto_merge: null,
-          head: { ref: 'b', sha: 'abc', repo: { full_name: 'o/r' } },
           base: { ref: 'a' },
-        },
-      ]),
-    );
-  });
-
-  await new Promise<void>((resolve) => {
-    server.listen(0, '127.0.0.1', resolve);
-  });
-
-  return { server, requested: mut_requested };
-};
+        }),
+      ],
+    };
+  };
 
 /**
  * The `linkedIssues` of the one open pull request, read through a client from a
@@ -208,27 +188,19 @@ const readThrough = async (
     requested: readonly string[];
   }>
 > => {
-  const { server, requested } = await listening(answers);
+  const github = await fakeGitHub(answering(answers));
 
-  const address = server.address();
-
-  // A string only for a server listening on a pipe, which this one is not.
-  assert.isTrue(address !== null && typeof address !== 'string');
-
-  const facts = await createClient(
-    token,
-    `http://127.0.0.1:${address.port}`,
-  ).facts(repo, { checks: false });
-
-  await new Promise((resolve) => {
-    server.close(resolve);
+  const facts = await createClient(token, github.baseUrl).facts(repo, {
+    checks: false,
   });
+
+  await github.close();
 
   assert.isTrue(Result.isOk(facts));
 
   return {
     linkedIssues: facts.value.flatMap(({ linkedIssues }) => linkedIssues),
-    requested,
+    requested: github.requested,
   };
 };
 

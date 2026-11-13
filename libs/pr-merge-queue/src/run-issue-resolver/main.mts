@@ -60,7 +60,7 @@ import {
 } from './session.mjs';
 import {
   issueNumbers,
-  ISSUES_LIMIT,
+  ISSUES_READ,
   passedOverNotes,
   surveyIssues,
   type IssueCandidate,
@@ -502,9 +502,7 @@ const survey = async (
   // by the time this reads it.
   const read = await readReport({
     repo: `${context.repo.owner}/${context.repo.name}`,
-    mergedDays: 1,
-    mergedLimit: 1,
-    issuesLimit: ISSUES_LIMIT,
+    ...ISSUES_READ,
   });
 
   if (Result.isErr(read)) {
