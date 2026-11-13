@@ -107,11 +107,17 @@ export const readWorkflowJobs = (
 export const readWorkflowTriggers = (
   text: string,
 ): Result<readonly string[], string> =>
-  Result.map(parseWorkflow(text), (workflow) => {
-    const on = isRecord(workflow) ? workflow['on'] : undefined;
+  Result.map(parseWorkflow(text), triggersOf);
 
-    return isRecord(on) ? Object.keys(on) : stringList(on);
-  });
+/**
+ * {@link readWorkflowTriggers} of a workflow already parsed, for a guard that
+ * reads other keys of it too.
+ */
+export const triggersOf = (workflow: unknown): readonly string[] => {
+  const on = isRecord(workflow) ? workflow['on'] : undefined;
+
+  return isRecord(on) ? Object.keys(on) : stringList(on);
+};
 
 /**
  * The `types:` a workflow's `on.<event>` lists, as written; empty when the
@@ -341,7 +347,11 @@ const MATRIX_REFERENCE = /^\$\{\{\s*matrix\.(?<key>[\w-]+)\s*\}\}$/u;
 const VARIABLE_REFERENCE =
   /^\$(?:\{(?<braced>[A-Za-z_]\w*)\}|(?<bare>[A-Za-z_]\w*))$/u;
 
-const parseWorkflow = (text: string): Result<unknown, string> => {
+/**
+ * A workflow's text parsed as every guard reading workflows through this module
+ * parses it, or what YAML said of it.
+ */
+export const parseWorkflow = (text: string): Result<unknown, string> => {
   const parsed = Result.fromThrowable((): unknown => parse(text));
 
   return Result.isErr(parsed)

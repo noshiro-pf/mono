@@ -1,0 +1,166 @@
+name: Report scheduled failure
+
+# Turns a failed scheduled run into an issue. A scheduled run that fails mails
+# whoever last changed its schedule and tells nobody else; pnpm-update.yml
+# failed three runs in a row that way. One open issue per workflow, a comment
+# per failed run after the first.
+#
+# Holds `issues: write` and runs nothing from the tree: no checkout, only the
+# event payload and `gh api`. `workflow_run` runs this file as the default
+# branch has it.
+
+on:
+  workflow_run:
+    # The `name:` of each workflow with a `schedule:` trigger, which
+    # `check:root:scheduled-failure-report` holds to the workflows: a name
+    # that matches no workflow would drop out without a word.
+    workflows:
+      - pnpm update
+      - E2E (production)
+      - Link Check
+      - Node.js Support Update
+    types:
+      - completed
+
+permissions: {}
+
+# No `concurrency`: each run reports one failed run, and a shared group would
+# let GitHub replace a waiting one. So two reports of one workflow that overlap,
+# such as a failed run and its re-run by hand failing within the same minute,
+# can each find no issue and open one; the second is closed by hand.
+
+jobs:
+  # node-support-update.yml's `canary-report` also files a failed canary, with
+  # its own instructions; this reports the same run again by name, because the
+  # run can fail in `update` too, which only this reports. The entry names the
+  # failed jobs so the two are told apart.
+  report:
+    name: Open or extend the failure issue
+    # `timed_out` and `startup_failure` too: a run that ends either way has
+    # failed as quietly as one whose steps fail. `cancelled` too, which is how
+    # GitHub may conclude a run a job's `timeout-minutes` cut off; the step
+    # leaves one out only when its jobs, read in full, show no failure and no
+    # timeout, since `cancelled` is also a run a person stopped or a
+    # concurrency group replaced. Not a run of a file GitHub cannot read as a
+    # workflow: it is named by its path, which matches no name above.
+    # `check:root:actionlint` catches such a file before it merges, and
+    # `check:root:scheduled-failure-report` one that is not YAML.
+    if: >-
+      github.event.workflow_run.event == 'schedule' &&
+      contains(fromJSON('["failure", "timed_out", "startup_failure", "cancelled"]'), github.event.workflow_run.conclusion)
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    permissions:
+      actions: read # to name the jobs that failed
+      checks: read # to tell a job that timed out from one cancelled
+      issues: write
+
+    # The script has no test of its own: it stays inline, as the header says,
+    # and a harness for it would need a fake `gh` larger than the step. It was
+    # run with such a fake against runs of this repository: one with a job
+    # that timed out, cancelled ones, a plain failure, and one whose jobs
+    # cannot be read.
+    steps:
+      - name: Open or extend the issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+          WORKFLOW: ${{ github.event.workflow_run.name }}
+          RUN_URL: ${{ github.event.workflow_run.html_url }}
+          RUN_ID: ${{ github.event.workflow_run.id }}
+          RUN_ATTEMPT: ${{ github.event.workflow_run.run_attempt }}
+          CONCLUSION: ${{ github.event.workflow_run.conclusion }}
+        run: |
+          set -euo pipefail
+
+          # The jobs of this attempt, read once: a failed run re-run by hand
+          # reports again, and its entry says which attempt it is. They only
+          # add to the entry, so a failure to read them is said there rather
+          # than stopping the report.
+          if jobs="$(gh api --paginate \
+            "repos/${GITHUB_REPOSITORY}/actions/runs/${RUN_ID}/attempts/${RUN_ATTEMPT}/jobs?per_page=100" \
+            --jq '.jobs[]' | jq -sc '.')"; then
+            jobs_read=true
+          else
+            jobs='[]'
+            jobs_read=false
+          fi
+
+          # A job past its `timeout-minutes` ends `cancelled`, and its check run
+          # carries an annotation saying it "exceeded the maximum execution
+          # time" (worded more than one way). A sibling a fail-fast matrix
+          # stopped, or a job a person cancelled, carries none.
+          timed_out=()
+          annotations_read=true
+          # Only a job that got a runner can have timed out: one cancelled
+          # while it waited has none (its `started_at` is set all the same, and
+          # a timed-out one may list no steps). One that got a runner and has
+          # no check run to read is reported as not checked.
+          if cancelled_jobs="$(jq -r '.[] | select(.conclusion == "cancelled" and (.runner_name // "") != "")
+            | [.id, ((.check_run_url // "") | sub("^https://api\\.github\\.com/"; ""))] | @tsv' <<<"$jobs")"; then
+            while IFS=$'\t' read -r job check_run; do
+              # A here-string of nothing is still one empty line.
+              [[ -n "$job" ]] || continue
+              if [[ -n "$check_run" ]] && messages="$(gh api --paginate "${check_run}/annotations" --jq '.[].message')"; then
+                if grep -qF 'exceeded the maximum execution time' <<<"$messages"; then
+                  timed_out+=("$job")
+                fi
+              else
+                annotations_read=false
+              fi
+            done <<<"$cancelled_jobs"
+          else
+            annotations_read=false
+          fi
+
+          if [[ "$CONCLUSION" == cancelled && "$jobs_read" == true &&
+            "$annotations_read" == true && "${#timed_out[@]}" -eq 0 ]] &&
+            jq -e 'all(.[]; .conclusion != "failure" and .conclusion != "timed_out")' <<<"$jobs" >/dev/null; then
+            echo 'Cancelled, and no job of it failed or timed out: nothing to report.'
+            exit 0
+          fi
+
+          # Each job with its conclusion, `timed out` for a cancelled one that
+          # did.
+          failed="$(jq -r --args '
+            [.[] | select(.conclusion == "failure" or .conclusion == "timed_out" or .conclusion == "cancelled")
+              | "\(.name) (\(if .conclusion == "cancelled" and (.id | tostring | IN($ARGS.positional[])) then "timed out" else .conclusion end))"]
+            | join("; ")' "${timed_out[@]}" <<<"$jobs")"
+          if [[ "$jobs_read" == false ]]; then
+            failed='the jobs could not be listed'
+          elif [[ "$annotations_read" == false ]]; then
+            failed="${failed}; a cancelled job could not be checked for a timeout"
+          fi
+
+          # The marker names the workflow, so the open issue is found by it
+          # alone: a title edited by hand still matches.
+          marker="<!-- report-scheduled-failure: ${WORKFLOW} -->"
+          entry="Failed (${CONCLUSION}, attempt ${RUN_ATTEMPT}): ${RUN_URL} (${failed:-no job reported a failure})"
+
+          number="$(gh api --paginate -X GET "repos/${GITHUB_REPOSITORY}/issues" \
+            -f state=open -f 'creator=github-actions[bot]' -f per_page=100 |
+            jq -rs --arg m "$marker" \
+              '[.[][] | select(.pull_request == null and ((.body // "") | contains($m)))][0].number // empty')"
+
+          if [[ -n "$number" ]]; then
+            gh api --method POST "repos/${GITHUB_REPOSITORY}/issues/${number}/comments" \
+              -f "body=${entry}" >/dev/null
+            echo "Added this run to #${number}."
+            exit 0
+          fi
+
+          body="$(printf '%s\n' \
+            "The scheduled run of \`${WORKFLOW}\` failed. The entry below and each comment after it is one failed run. Close this once a scheduled run passes again; the next failure opens a new issue." \
+            '' \
+            "${entry}" \
+            '' \
+            '## 日本語' \
+            '' \
+            "\`${WORKFLOW}\` のスケジュール実行が失敗した。上のエントリと以降のコメントがそれぞれ失敗した実行 1 回分。スケジュール実行が再び通ったらこの issue を閉じる。次に失敗すれば新しい issue が立つ。" \
+            '' \
+            "${marker}")"
+          gh api --method POST "repos/${GITHUB_REPOSITORY}/issues" \
+            -f "title=Scheduled workflow failing: ${WORKFLOW}" -f "body=${body}" \
+            -f "assignees[]=${GITHUB_REPOSITORY_OWNER}" \
+            -f 'labels[]=priority:A' \
+            --jq '"Opened #\(.number)."'

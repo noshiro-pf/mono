@@ -38,6 +38,7 @@ GitHub shows a `.github/README.md` in place of the root one.
 | `link-check.yml`                 | pull requests, path-filtered; schedule     | none; other people's servers decide it            |
 | `e2e-production.yml`             | schedule; `workflow_dispatch`              | none; the live sites decide it                    |
 | `synstate-next-benchmark.yml`    | `workflow_dispatch`                        | none; uploads a measurement to commit             |
+| `report-scheduled-failure.yml`   | `workflow_run` of the scheduled ones       | none; files a failed scheduled run as an issue    |
 
 The required contexts are listed in `repo-settings/rulesets/main.json`. Every
 one of them is either an aggregate job (see "The aggregate job") or a job that
@@ -1027,9 +1028,11 @@ Nothing checks this; a review does.
 - **Local guards that read this directory**: `check:root:actionlint`,
   `check:root:ci-commands`, `check:root:workflow-event-name`,
   `check:root:node-support`, `check:root:restart-unblock-prs-paths`,
-  `check:root:dispatch-inputs`, `check:root:lint-pull-request-groups`. `fmt` and
-  `check:cspell` read it too; CI itself runs nothing on a workflow change until
-  the pull request runs.
+  `check:root:dispatch-inputs`, `check:root:lint-pull-request-groups`,
+  `check:root:scheduled-failure-report` (a workflow with a `schedule:` trigger
+  is named in `report-scheduled-failure.yml`, which turns its failed runs into
+  an issue). `fmt` and `check:cspell` read it too; CI itself runs nothing on a
+  workflow change until the pull request runs.
   `check:root:actionlint` also lints the composite actions' steps, which
   actionlint does not read on its own, and reads a `$/` action as `./`, the only
   form the pinned actionlint knows. It downloads the actionlint and shellcheck

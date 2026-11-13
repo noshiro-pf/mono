@@ -31,7 +31,8 @@ on:
       - '.github/workflows/link-check.yml'
 
   # A URL dies without a commit here, so `main` is asked again every week. A
-  # failed run mails whoever last changed this schedule.
+  # failed run opens or extends an issue, through
+  # report-scheduled-failure.yml.
   schedule:
     - cron: '0 0 * * 1'
 
