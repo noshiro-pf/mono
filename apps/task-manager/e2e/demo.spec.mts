@@ -478,6 +478,48 @@ test('moves a task’s progress', { tag: '@smoke' }, async ({ page }) => {
 });
 
 test(
+  'takes a suggested label by the keyboard alone, from a listbox of options (#3920)',
+  { tag: '@smoke' },
+  async ({ page }) => {
+    await page.goto(LIST);
+
+    await page
+      .getByTestId('task-row')
+      .filter({ hasText: '利用者向けドキュメントを書く' })
+      .click();
+
+    const dialog = page.getByTestId('node-dialog');
+
+    const box = dialog.getByRole('combobox', { name: /ラベル/u });
+
+    await box.focus();
+
+    await page.keyboard.type('u');
+
+    // A popup of the combobox, by role, whatever element draws it.
+    const listbox = dialog.getByRole('listbox');
+
+    await expect.soft(box).toHaveAttribute('aria-expanded', 'true');
+
+    await expect.soft(listbox.getByRole('option')).toHaveText(['UI']);
+
+    await page.keyboard.press('ArrowDown');
+
+    await expect
+      .soft(listbox.getByRole('option', { name: 'UI' }))
+      .toHaveAttribute('aria-selected', 'true');
+
+    await page.keyboard.press('Enter');
+
+    await expect
+      .soft(dialog.getByTestId('label-chip'))
+      .toHaveText(['ドキュメント', 'UI']);
+
+    await expect.soft(box).toBeFocused();
+  },
+);
+
+test(
   'suggests the labels in use, and edits a task’s labels as chips',
   { tag: '@smoke' },
   async ({ page }) => {
