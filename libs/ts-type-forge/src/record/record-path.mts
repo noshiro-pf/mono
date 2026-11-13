@@ -141,6 +141,8 @@ export type RecordUpdated<
  * @template R - The record or tuple type.
  * @template Path - The path to the value (from `Paths<R>`).
  * @returns The type of the value at the specified path. Returns `R` if `Path` is `[]`.
+ * Includes `undefined` when the path goes through an optional or nullable property,
+ * or through a member of a union that does not have the rest of the path.
  * @example
  * ```ts
  * type Data = { a: { b: [string, boolean] } };
@@ -153,20 +155,27 @@ export type RecordValueAtPath<
   R,
   Path extends RecordPaths<R>,
 > = Path extends readonly [infer Head, ...infer Rest] // Deconstruct the path
-  ? Head extends keyof R // Is the head a valid key/index?
-    ? Rest extends RecordPaths<R[Head]> // Is the rest a valid path within the nested value?
-      ? RecordValueAtPath<R[Head], Rest> // Recurse into the nested value
-      : never // Invalid rest path
-    : never // Invalid head key/index
+  ? // A union R is read one member at a time, as RecordPaths lists its paths
+    R extends undefined | null
+    ? undefined // A nullish parent holds nothing
+    : // A member with an index signature, or an array, has every key it admits,
+      // so it adds its element type, not `undefined`, though the entry may be missing.
+      Head extends keyof R // Does this member have the head key/index?
+      ? Rest extends RecordPaths<R[Head]> // Does the nested value have the rest of the path?
+        ? RecordValueAtPath<R[Head], Rest> // Recurse into the nested value
+        : undefined // Another member of a union has the path; this one holds nothing there
+      : undefined // Another member of a union has the key; this one holds nothing there
   : R; // Base case: empty path returns the current record/value R
 
 /**
  * Extracts the type of the value at a specific `Path` within a nested record `R`.
- * Allows `number` as an index type for arrays. May include `undefined` in the result
- * if the path involves a `number` index (as array elements might not exist at runtime).
+ * Allows `number` as an index type for arrays.
  * @template R - The record or array type.
  * @template Path - The path to the value (from `PathsWithIndex<R>`).
- * @returns The type of the value at the specified path, potentially including `undefined`. Returns `R` if `Path` is `[]`.
+ * @returns The type of the value at the specified path. Returns `R` if `Path` is `[]`.
+ * Includes `undefined` when the last path element is the type `number` or `string`,
+ * when the path goes through an optional or nullable property, or through a member
+ * of a union that does not have the rest of the path.
  * @example
  * ```ts
  * type Data = { a: { b: string[]; c: number } };
@@ -282,7 +291,9 @@ type RecordUpdatedImplRecordCase<
             : R[Key]; // Otherwise, keep the original value type
         }
       : never // Invalid rest path
-    : never // Invalid head key
+    : // A member of a union R without the head key is dropped here, not kept
+      // unchanged, so the result lacks the members the path does not reach.
+      never
   : never; // Path should not be empty here (handled in RecordUpdated)
 
 /**
@@ -307,7 +318,7 @@ type RecordUpdatedImplTupleCase<
 
 /**
  * @internal Recursive implementation helper for `RecordValueAtPathWithIndex`.
- * Tracks the last path element to determine if `undefined` should be added for `number` indices.
+ * Tracks the last path element to determine if `undefined` should be added for a `number` or `string` index.
  * @template R - The current record/value being traversed.
  * @template Path - The remaining path.
  * @template LastPathElement - The previous path element processed (key or index).
@@ -318,13 +329,21 @@ type RecordValueAtPathWithIndexImpl<
   Path extends RecordPathsWithIndex<R>,
   LastPathElement,
 > = Path extends readonly [infer Head, ...infer Rest] // Deconstruct the path
-  ? Head extends keyof R // Is the head a valid key/index?
-    ? Rest extends RecordPathsWithIndex<R[Head]> // Is the rest a valid path within the nested value?
-      ? // Recurse, passing the nested value, rest of path, and current head as the new LastPathElement
-        RecordValueAtPathWithIndexImpl<R[Head], Rest, Head>
-      : never // Invalid rest path
-    : never // Invalid head key/index
-  : // Base case: Path is empty, determine return type based on LastPathElement
+  ? // The same walk as `RecordValueAtPath`, over `RecordPathsWithIndex` and with
+    // `LastPathElement`; merging the two is left to the fix of the index limit below.
+    // A union R is read one member at a time, as RecordPathsWithIndex lists its paths
+    R extends undefined | null
+    ? undefined // A nullish parent holds nothing
+    : Head extends keyof R // Does this member have the head key/index?
+      ? Rest extends RecordPathsWithIndex<R[Head]> // Does the nested value have the rest of the path?
+        ? // Recurse, passing the nested value, rest of path, and current head as the new LastPathElement
+          RecordValueAtPathWithIndexImpl<R[Head], Rest, Head>
+        : undefined // Another member of a union has the path; this one holds nothing there
+      : undefined // Another member of a union has the key; this one holds nothing there
+  : // Base case: Path is empty, determine return type based on LastPathElement.
+    // Only a last element of the type `number` or `string` adds `undefined`: a
+    // literal index into an array (`0` for a `string[]`) or an index earlier in the
+    // path (`['a', number, 'x']`) does not, though the element it reads may be missing.
     number extends LastPathElement // Was the last step accessing an array with `number` index?
     ? R | undefined // Yes, the value might be undefined at runtime
     : string extends LastPathElement // Was the last step accessing via `string` index signature?

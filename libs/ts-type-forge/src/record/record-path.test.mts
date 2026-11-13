@@ -8,6 +8,7 @@ import type {
   RecordPathsWithIndex,
   RecordUpdated,
   RecordValueAtPath,
+  RecordValueAtPathWithIndex,
   TSTypeForgeInternals_RecordPathPrefixes,
 } from './record-path.mjs';
 
@@ -637,4 +638,129 @@ expectType<TSTypeForgeInternals_RecordPathPrefixes<[]>, readonly []>('=');
   expectType<RecordValueAtPath<R0, readonly ['z', 2, 'f', 0]>, 6>('=');
 
   expectType<RecordValueAtPath<R0, readonly ['z', 2, 'f', 1]>, 7>('=');
+}
+
+// ── a path through an optional, nullable or union parent ─────────────────────────
+{
+  type R0 = Readonly<{ a?: Readonly<{ c: 1; d?: Readonly<{ e: 2 }> }> }>;
+
+  expectType<RecordValueAtPath<R0, readonly ['a', 'c']>, 1 | undefined>('=');
+
+  expectType<RecordValueAtPath<R0, readonly ['a', 'd', 'e']>, 2 | undefined>(
+    '=',
+  );
+
+  expectType<
+    RecordValueAtPath<
+      Readonly<{ n: Readonly<{ x: 1 }> | null }>,
+      readonly ['n', 'x']
+    >,
+    1 | undefined
+  >('=');
+
+  expectType<
+    RecordValueAtPath<
+      Readonly<{ u: Readonly<{ k: 1 }> | Readonly<{ k: 2; z: 3 }> }>,
+      readonly ['u', 'k']
+    >,
+    1 | 2
+  >('=');
+
+  // A member of a union that does not have the rest of the path holds nothing there.
+  expectType<
+    RecordValueAtPath<
+      Readonly<{ u: Readonly<{ k: 1 }> | Readonly<{ k: 2; z: 3 }> }>,
+      readonly ['u', 'z']
+    >,
+    3 | undefined
+  >('=');
+
+  expectType<
+    RecordValueAtPath<
+      Readonly<{ p: Readonly<{ x: 1 }> | 'none' }>,
+      readonly ['p', 'x']
+    >,
+    1 | undefined
+  >('=');
+
+  expectType<
+    RecordValueAtPath<
+      Readonly<{ u: Readonly<{ k: 1 }> | Readonly<{ k: Readonly<{ x: 2 }> }> }>,
+      readonly ['u', 'k', 'x']
+    >,
+    2 | undefined
+  >('=');
+
+  expectType<
+    RecordValueAtPath<
+      Readonly<{ a: Readonly<{ b: readonly [string, boolean] }> }>,
+      readonly ['a', 'b', 0]
+    >,
+    string
+  >('=');
+
+  expectType<
+    RecordValueAtPathWithIndex<
+      Readonly<{ a?: Readonly<{ c: readonly number[] }> }>,
+      readonly ['a', 'c', number]
+    >,
+    number | undefined
+  >('=');
+
+  expectType<
+    RecordValueAtPathWithIndex<
+      Readonly<{ n: Readonly<{ x: 1 }> | null }>,
+      readonly ['n', 'x']
+    >,
+    1 | undefined
+  >('=');
+
+  expectType<
+    RecordValueAtPathWithIndex<
+      Readonly<{ u: Readonly<{ k: 1 }> | Readonly<{ k: 2; z: 3 }> }>,
+      readonly ['u', 'z']
+    >,
+    3 | undefined
+  >('=');
+
+  expectType<
+    RecordValueAtPathWithIndex<
+      Readonly<{ u: Readonly<{ k: 1 }> | Readonly<{ k: Readonly<{ x: 2 }> }> }>,
+      readonly ['u', 'k', 'x']
+    >,
+    2 | undefined
+  >('=');
+
+  expectType<
+    RecordValueAtPathWithIndex<
+      Readonly<{ r: Readonly<Record<string, 1>> }>,
+      readonly ['r', string]
+    >,
+    1 | undefined
+  >('=');
+
+  expectType<
+    RecordValueAtPathWithIndex<
+      Readonly<{ a: Readonly<{ b: readonly string[] }> }>,
+      readonly ['a', 'b', number]
+    >,
+    string | undefined
+  >('=');
+
+  expectType<
+    RecordPathAndValueTypeTuple<Readonly<{ a?: Readonly<{ c: 1 }> }>>,
+    | readonly [readonly [], Readonly<{ a?: Readonly<{ c: 1 }> }>]
+    | readonly [readonly ['a'], Readonly<{ c: 1 }> | undefined]
+    | readonly [readonly ['a', 'c'], 1 | undefined]
+  >('=');
+
+  type U = Readonly<{ u: Readonly<{ k: 1 }> | Readonly<{ k: 2; z: 3 }> }>;
+
+  expectType<
+    RecordPathAndValueTypeTuple<U>,
+    | readonly [readonly [], U]
+    | readonly [readonly ['u'], Readonly<{ k: 1 }> | Readonly<{ k: 2; z: 3 }>]
+    | readonly [readonly ['u', 'k'], 1 | 2]
+    | readonly [readonly ['u', 'z'], 3 | undefined]
+  >('=');
 }
