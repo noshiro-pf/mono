@@ -87,12 +87,14 @@ export const convertLibEs2020Sharedmemory =
           `wait(typedArray: ${typedArrayRef('BigInt64Array', tsLibShape)}, index: ${brandedNumber.TypedArraySizeArg}, value: ${brandedNumber.BigInt64}, timeout?: number)`,
         ),
 
+        // `index` and `count`: as for the `Int32Array` overload in
+        // `lib.es2017.sharedmemory.mts`.
         replaceWithNoMatchCheck(
           new RegExp(
             String.raw`notify\(\s*typedArray:\s*${typedArrayRefRegexSource('BigInt64Array')},\s*index:\s*number,\s*count\?:\s*number,?\s*\):\s*number`,
             'gu',
           ),
-          `notify(typedArray: ${typedArrayRef('BigInt64Array', tsLibShape)}, index: ${brandedNumber.TypedArraySizeArg}, count?: ${brandedNumber.SafeUint}): ${brandedNumber.SafeUint}`,
+          `notify(typedArray: ${typedArrayRef('BigInt64Array', tsLibShape)}, index: ${brandedNumber.TypedArraySizeArg}, count?: ${brandedNumber.TypedArraySizeArgNonNegative}): ${brandedNumber.SafeUint}`,
         ),
       ),
     ).value;

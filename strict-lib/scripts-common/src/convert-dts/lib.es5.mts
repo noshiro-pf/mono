@@ -182,7 +182,7 @@ export const convertLibEs5 =
           name: 'ArrayBufferConstructor',
           mapFn: replaceWithNoMatchCheck(
             'byteLength: number',
-            `byteLength: ${options.brandedNumber.TypedArraySize}`,
+            `byteLength: ${options.brandedNumber.TypedArraySizeArgNonNegative}`,
           ),
         }),
         replaceWithinInterface({

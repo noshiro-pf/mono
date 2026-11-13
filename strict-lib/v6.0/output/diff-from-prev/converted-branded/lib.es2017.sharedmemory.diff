@@ -1,5 +1,5 @@
 diff --git a/v5.9/output/lib-files-branded/lib.es2017.sharedmemory.d.ts b/v6.0/output/lib-files-branded/lib.es2017.sharedmemory.d.ts
-index be052cfbfc69262698879e70538e16301d2d6ed6..26c0b73e95e43c8fb90662ca41056d155aa9e339 100644
+index 261c971b45f04429e9b34fde4d31e7f5b361e03b..c6a97bb8fc59429c1ee4b04e1aa0bf95c6286945 100644
 --- a/v5.9/output/lib-files-branded/lib.es2017.sharedmemory.d.ts
 +++ b/v6.0/output/lib-files-branded/lib.es2017.sharedmemory.d.ts
 @@ -7,7 +7,7 @@ License at http://www.apache.org/licenses/LICENSE-2.0

@@ -518,14 +518,16 @@ interface Float16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
 
 interface Float16ArrayConstructor {
   readonly prototype: Float16Array<ArrayBufferLike>;
-  new (length?: NumberType.TypedArraySize): Float16Array<ArrayBuffer>;
+  new (
+    length?: NumberType.TypedArraySizeArgNonNegative,
+  ): Float16Array<ArrayBuffer>;
   new (
     array: ArrayLike<import('ts-type-forge').Float16> | Iterable<number>,
   ): Float16Array<ArrayBuffer>;
   new <TArrayBuffer extends ArrayBufferLike = ArrayBuffer>(
     buffer: TArrayBuffer,
-    byteOffset?: NumberType.TypedArraySize,
-    length?: NumberType.TypedArraySize,
+    byteOffset?: NumberType.TypedArraySizeArgNonNegative,
+    length?: NumberType.TypedArraySizeArgNonNegative,
   ): Float16Array<TArrayBuffer>;
 
   /**

@@ -1,5 +1,5 @@
 diff --git a/v5.1/output/lib-files-branded/lib.es5.d.ts b/v5.2/output/lib-files-branded/lib.es5.d.ts
-index 22aa7305c947cbfe6732c0fd0cb6561053f3c40d..d54676be4da23c5b9c2f0af1b3c57bd10c4809d0 100644
+index 626deb11a4df8e0006778af74cbad5c8305b692e..bccd2985de0ef0e86374f9a39de901c7d8e4cf0b 100644
 --- a/v5.1/output/lib-files-branded/lib.es5.d.ts
 +++ b/v5.2/output/lib-files-branded/lib.es5.d.ts
 @@ -2163,6 +2163,15 @@ type Uncapitalize<S extends string> = intrinsic;

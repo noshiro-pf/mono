@@ -116,7 +116,7 @@ export const convertLibEs2020Bigint =
         replaceWithNoMatchCheck(
           //
           'length?: number',
-          `length?: ${config.brandedNumber.TypedArraySize}`,
+          `length?: ${config.brandedNumber.TypedArraySizeArgNonNegative}`,
         ),
         replaceWithNoMatchCheck(
           'BYTES_PER_ELEMENT: number;',

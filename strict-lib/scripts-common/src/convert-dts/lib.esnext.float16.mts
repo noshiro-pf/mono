@@ -33,7 +33,8 @@ const arrayIteratorAlt = '(?:Array|Iterable)Iterator';
  * brandings those files apply to the other typed arrays:
  *
  * - Element type -> `Float16`;
- * - Sizes/indices -> `TypedArraySize` / `TypedArraySizeArg`;
+ * - Sizes/indices -> `TypedArraySize` / `TypedArraySizeArg` /
+ *   `TypedArraySizeArgNonNegative`;
  * - Search results -> `TypedArraySearchResult`;
  * - `BYTES_PER_ELEMENT` -> `2`;
  * - Iterators -> `ArrayIterator`. The `Float16` brand comes from ts-type-forge
@@ -159,12 +160,12 @@ export const convertLibEsnextFloat16 = (
           mapFn: composeMonoTypeFns(
             replaceWithNoMatchCheck(
               'byteOffset?: number',
-              `byteOffset?: ${brandedNumber.TypedArraySize}`,
+              `byteOffset?: ${brandedNumber.TypedArraySizeArgNonNegative}`,
               { onNotFound: 'off' },
             ),
             replaceWithNoMatchCheck(
               'length?: number',
-              `length?: ${brandedNumber.TypedArraySize}`,
+              `length?: ${brandedNumber.TypedArraySizeArgNonNegative}`,
               { onNotFound: 'off' },
             ),
             replaceWithNoMatchCheck(

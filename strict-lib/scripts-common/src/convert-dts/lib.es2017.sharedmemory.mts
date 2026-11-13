@@ -160,12 +160,15 @@ export const convertLibEs2017Sharedmemory =
           `wait(typedArray: ${typedArrayRef('Int32Array', tsLibShape)}, index: ${brandedNumber.TypedArraySizeArg}, value: ${brandedNumber.Int32}, timeout?: number)`,
         ),
 
+        // `index` takes `TypedArraySizeArg`, as every `Atomics` index here
+        // does, which admits a negative value that throws a RangeError.
+        // `count` admits no `Infinity`; leaving it out has that effect.
         replaceWithNoMatchCheck(
           new RegExp(
             String.raw`notify\(\s*typedArray:\s*${typedArrayRefRegexSource('Int32Array')},\s*index:\s*number,\s*count\?:\s*number,?\s*\):\s*number`,
             'gu',
           ),
-          `notify(typedArray: ${typedArrayRef('Int32Array', tsLibShape)}, index: ${brandedNumber.TypedArraySizeArg}, count?: ${brandedNumber.SafeUint}): ${brandedNumber.SafeUint}`,
+          `notify(typedArray: ${typedArrayRef('Int32Array', tsLibShape)}, index: ${brandedNumber.TypedArraySizeArg}, count?: ${brandedNumber.TypedArraySizeArgNonNegative}): ${brandedNumber.SafeUint}`,
         ),
       ),
     ).value;

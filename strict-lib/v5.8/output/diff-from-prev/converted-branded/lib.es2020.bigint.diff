@@ -1,20 +1,20 @@
 diff --git a/v5.7/output/lib-files-branded/lib.es2020.bigint.d.ts b/v5.8/output/lib-files-branded/lib.es2020.bigint.d.ts
-index db5134e2a5d7ee3183528987c33a888bbc885ff5..c6bc654d0a6b074f7b5be2c6229f6e2bb674e1f3 100644
+index 794514400325308d315ffc02cb074865a117a214..845296381f0997412b811dfa108c4838ff75c91c 100644
 --- a/v5.7/output/lib-files-branded/lib.es2020.bigint.d.ts
 +++ b/v5.8/output/lib-files-branded/lib.es2020.bigint.d.ts
-@@ -546,6 +546,11 @@ interface BigInt64ArrayConstructor {
+@@ -548,6 +548,11 @@ interface BigInt64ArrayConstructor {
      byteOffset?: NumberType.TypedArraySizeArgNonNegative,
-     length?: NumberType.TypedArraySize,
+     length?: NumberType.TypedArraySizeArgNonNegative,
    ): BigInt64Array<TArrayBuffer>;
 +  new (
 +    buffer: ArrayBuffer,
 +    byteOffset?: NumberType.TypedArraySizeArgNonNegative,
-+    length?: NumberType.TypedArraySize,
++    length?: NumberType.TypedArraySizeArgNonNegative,
 +  ): BigInt64Array<ArrayBuffer>;
    new (
      array: ArrayLike<import('ts-type-forge').BigInt64> | ArrayBuffer,
    ): BigInt64Array<ArrayBuffer>;
-@@ -563,16 +568,15 @@ interface BigInt64ArrayConstructor {
+@@ -565,16 +570,15 @@ interface BigInt64ArrayConstructor {
  
    /**
     * Creates an array from an array-like or iterable object.
@@ -34,7 +34,7 @@ index db5134e2a5d7ee3183528987c33a888bbc885ff5..c6bc654d0a6b074f7b5be2c6229f6e2b
     * @param mapfn A mapping function to call on every element of the array.
     * @param thisArg Value of 'this' used to invoke the mapfn.
     */
-@@ -584,6 +588,29 @@ interface BigInt64ArrayConstructor {
+@@ -586,6 +590,29 @@ interface BigInt64ArrayConstructor {
      ) => import('ts-type-forge').BigInt64,
      thisArg?: unknown,
    ): BigInt64Array<ArrayBuffer>;
@@ -64,19 +64,19 @@ index db5134e2a5d7ee3183528987c33a888bbc885ff5..c6bc654d0a6b074f7b5be2c6229f6e2b
  }
  declare const BigInt64Array: BigInt64ArrayConstructor;
  
-@@ -961,6 +988,11 @@ interface BigUint64ArrayConstructor {
+@@ -965,6 +992,11 @@ interface BigUint64ArrayConstructor {
      byteOffset?: NumberType.TypedArraySizeArgNonNegative,
-     length?: NumberType.TypedArraySize,
+     length?: NumberType.TypedArraySizeArgNonNegative,
    ): BigUint64Array<TArrayBuffer>;
 +  new (
 +    buffer: ArrayBuffer,
 +    byteOffset?: NumberType.TypedArraySizeArgNonNegative,
-+    length?: NumberType.TypedArraySize,
++    length?: NumberType.TypedArraySizeArgNonNegative,
 +  ): BigUint64Array<ArrayBuffer>;
    new (
      array: ArrayLike<import('ts-type-forge').BigUint64> | ArrayBuffer,
    ): BigUint64Array<ArrayBuffer>;
-@@ -978,11 +1010,18 @@ interface BigUint64ArrayConstructor {
+@@ -982,11 +1014,18 @@ interface BigUint64ArrayConstructor {
  
    /**
     * Creates an array from an array-like or iterable object.
@@ -97,7 +97,7 @@ index db5134e2a5d7ee3183528987c33a888bbc885ff5..c6bc654d0a6b074f7b5be2c6229f6e2b
    from<U>(
      arrayLike: ArrayLike<U>,
      mapfn: (
-@@ -990,7 +1029,30 @@ interface BigUint64ArrayConstructor {
+@@ -994,7 +1033,30 @@ interface BigUint64ArrayConstructor {
        k: NumberType.TypedArraySize,
      ) => import('ts-type-forge').BigUint64,
      thisArg?: unknown,

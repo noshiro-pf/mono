@@ -1,5 +1,5 @@
 diff --git a/v5.9/output/lib-files-branded/lib.es2020.bigint.d.ts b/v6.0/output/lib-files-branded/lib.es2020.bigint.d.ts
-index c6bc654d0a6b074f7b5be2c6229f6e2bb674e1f3..3e0626e5fdbcb9490eb41b8f2b80b85f342c1ae0 100644
+index 845296381f0997412b811dfa108c4838ff75c91c..72efb327df10fe1648b9eba139747ffa5af25bad 100644
 --- a/v5.9/output/lib-files-branded/lib.es2020.bigint.d.ts
 +++ b/v6.0/output/lib-files-branded/lib.es2020.bigint.d.ts
 @@ -7,7 +7,7 @@ License at http://www.apache.org/licenses/LICENSE-2.0
@@ -38,7 +38,7 @@ index c6bc654d0a6b074f7b5be2c6229f6e2bb674e1f3..3e0626e5fdbcb9490eb41b8f2b80b85f
     * @param searchElement The value to locate in the array.
     * @param fromIndex The array index at which to begin the search. If fromIndex is omitted, the
     * search starts at index 0.
-@@ -763,7 +761,7 @@ interface BigUint64Array<
+@@ -765,7 +763,7 @@ interface BigUint64Array<
    ): boolean;
  
    /**
@@ -47,7 +47,7 @@ index c6bc654d0a6b074f7b5be2c6229f6e2bb674e1f3..3e0626e5fdbcb9490eb41b8f2b80b85f
     * @param searchElement The value to locate in the array.
     * @param fromIndex The array index at which to begin the search. If fromIndex is omitted, the
     * search starts at index 0.
-@@ -784,7 +782,7 @@ interface BigUint64Array<
+@@ -786,7 +784,7 @@ interface BigUint64Array<
    keys(): ArrayIterator<NumberType.TypedArraySize>;
  
    /**
