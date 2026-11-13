@@ -86,6 +86,16 @@ export type GameStateActionFromDb = WithTimestamp<
   Timestamp | null
 >;
 
+/**
+ * An action with the id of the document it is written as. The id is made where
+ * the action is played, so that the action read back can be told from another
+ * player's, whatever order the server puts them in.
+ */
+export type ActionRecord<A extends GameStateAction> = Readonly<{
+  id: string;
+  action: A;
+}>;
+
 export const assertIsGameStateAction: (
   a: unknown,
 ) => asserts a is GameStateAction = gameStateActionTypeDef.assertIs;

@@ -20,6 +20,7 @@ export const gameStateStore = createGameStateStore({
   room: roomStore.room,
   actionsFromDb: roomStore.actionsFromDb,
   addAction: roomApi.addAction,
+  newActionId: () => crypto.randomUUID(),
   setTimer: (delayMs, run) => {
     const timer = setTimeout(run, delayMs);
 
