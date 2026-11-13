@@ -17,8 +17,10 @@ import {
   isCallSignatureDeclaration,
   isConstructorTypeNode,
   isFunctionExpression,
+  isFunctionLike,
   isFunctionTypeNode,
   isIdentifier,
+  isInferTypeNode,
   isMappedTypeNode,
   isMethodSignature,
   isParameter,
@@ -93,20 +95,29 @@ export const noHiddenTypeAssertions = createRule({
      * and `'none'` nowhere. Comparing symbols rather than names keeps a type
      * parameter of an inner function type, or an `infer` type, that shadows it
      * from counting as a use; the name is compared first only to spare the
-     * checker. The type parameters of an inner signature or `infer` type are
-     * not entered: `<U extends T>(u: U) => U` hands back the `U` its caller
-     * passes, not a `T`. That misses `<U extends T>() => U`, whose `U` falls
-     * back to `T`. A mapped type's is entered, since `{ [K in keyof T]: … }`
-     * reads `T`. With `skipNoInfer`, the argument of `NoInfer<…>`, which infers
-     * nothing, is not entered either. Unbounded: a type annotation is a finite
-     * syntax tree, and recursion is only as deep as it is nested.
+     * checker.
+     *
+     * The constraint and default of an inner type parameter are entered on the
+     * `'parameter'` side always, since an argument written for them ties the
+     * type parameter down, and on the `'return'` side unless a value parameter
+     * of the inner signature uses the inner one: `<U extends T>(u: U) => U`
+     * hands back the `U` its caller passes, not a `T`, but `<U extends T>() =>
+     * U` and `infer U extends T` fall back to `T` with nothing to infer from. A
+     * mapped type's is entered, since `{ [K in keyof T]: … }` reads `T`. On the
+     * `'parameter'` side the argument of `NoInfer<…>`, which infers nothing, is
+     * not entered. Unbounded: a type annotation is a finite syntax tree, and
+     * recursion is only as deep as it is nested.
      */
     const useOfTypeParameter = (
       node: Node,
       typeParameter: TsSymbol,
-      skipNoInfer: boolean,
+      side: 'parameter' | 'return',
     ): TypeParameterUse => {
-      if (isTypeParameterDeclaration(node) && !isMappedTypeNode(node.parent)) {
+      if (
+        side === 'return' &&
+        isTypeParameterDeclaration(node) &&
+        isInferredFromItsParameters(node)
+      ) {
         return 'none';
       }
 
@@ -118,7 +129,7 @@ export const noHiddenTypeAssertions = createRule({
           return 'direct';
         }
 
-        if (skipNoInfer && isNoInfer(node.typeName)) {
+        if (side === 'parameter' && isNoInfer(node.typeName)) {
           return 'none';
         }
       }
@@ -133,7 +144,7 @@ export const noHiddenTypeAssertions = createRule({
       let mut_use: TypeParameterUse = 'none';
 
       forEachChild(node, (child) => {
-        const use = useOfTypeParameter(child, typeParameter, skipNoInfer);
+        const use = useOfTypeParameter(child, typeParameter, side);
 
         if (use === 'direct' && !inCallbackParameter) {
           mut_use = 'direct';
@@ -149,6 +160,34 @@ export const noHiddenTypeAssertions = createRule({
       });
 
       return mut_use;
+    };
+
+    /**
+     * Whether a call of the signature that declares `declaration` infers it
+     * from an argument: one of the signature's value parameters uses it. Not
+     * one of a mapped type, whose key ranges over what its constraint reads, or
+     * of an `infer` type, which has no value parameters.
+     */
+    const isInferredFromItsParameters = (
+      declaration: TypeParameterDeclaration,
+    ): boolean => {
+      const { parent } = declaration;
+
+      if (isMappedTypeNode(parent) || isInferTypeNode(parent)) {
+        return false;
+      }
+
+      const symbol = checker.getSymbolAtLocation(declaration.name);
+
+      return (
+        symbol !== undefined &&
+        isFunctionLike(parent) &&
+        parent.parameters.some(
+          (parameter) =>
+            parameter.type !== undefined &&
+            useOfTypeParameter(parameter.type, symbol, 'parameter') !== 'none',
+        )
+      );
     };
 
     /** Whether `name` is the standard library's `NoInfer`. */
@@ -191,7 +230,7 @@ export const noHiddenTypeAssertions = createRule({
 
         if (
           symbol === undefined ||
-          useOfTypeParameter(returnType, symbol, false) === 'none'
+          useOfTypeParameter(returnType, symbol, 'return') === 'none'
         ) {
           return [];
         }
@@ -201,7 +240,7 @@ export const noHiddenTypeAssertions = createRule({
             const use =
               parameter.type === undefined
                 ? 'none'
-                : useOfTypeParameter(parameter.type, symbol, true);
+                : useOfTypeParameter(parameter.type, symbol, 'parameter');
 
             return use === 'none'
               ? []
