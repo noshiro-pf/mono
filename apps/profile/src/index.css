@@ -47,3 +47,12 @@
     border-bottom: solid 2px #cda354;
   }
 }
+
+/* The browser does not honour reduced motion in a view transition by itself. */
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none;
+  }
+}
