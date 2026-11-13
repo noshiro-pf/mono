@@ -739,6 +739,56 @@ describe(Popover, () => {
     assert.deepStrictEqual(mut_closes, ['mouseleave']);
   });
 
+  test.each([
+    { into: 'an element of its content', selector: '.bp6-popover .inside' },
+    {
+      // It takes the focus itself (a `tabindex`) while the popover enforces the
+      // focus, as a click on its padding gives it.
+      into: 'its transition container',
+      selector: '.bp6-popover-transition-container',
+    },
+  ])(
+    'opened by hovering, opens as its target takes the focus and stays open as the focus moves into $into',
+    async ({ selector }) => {
+      const { host } = mounted(() => (
+        <div>
+          <Popover
+            content={<Button class={'inside'} text={constant('Inside')} />}
+            interactionKind={'hover'}
+          >
+            <Button text={constant('Target')} />
+          </Popover>
+          <Button text={constant('Elsewhere')} />
+        </div>
+      ));
+
+      const [target, elsewhere] = Array.from(host.querySelectorAll('button'));
+
+      assert.isDefined(target);
+
+      assert.isDefined(elsewhere);
+
+      await userEvent.hover(elsewhere);
+
+      target.focus();
+
+      await transitioned();
+
+      const next = document.querySelector<HTMLElement>(selector);
+
+      assert.isNotNull(next);
+
+      next.focus();
+
+      assert.strictEqual(document.activeElement, next);
+
+      // Past its close delay and its transition, which a close would have run.
+      await transitioned(800);
+
+      assert.isNotNull(document.querySelector('.bp6-popover .inside'));
+    },
+  );
+
   test('never opens while disabled', async () => {
     const { host } = mounted(() => (
       <Popover content={<Menu>{[]}</Menu>} disabled={constant(true)}>
@@ -905,6 +955,121 @@ describe(Tooltip, () => {
       document.querySelector('.bp6-popover-enter, .bp6-popover-enter-active'),
     );
   });
+
+  test('shows while its target has the focus, and hides as the focus leaves', async () => {
+    const { host } = mounted(() => (
+      <div>
+        <Tooltip content={constant('Hint')}>
+          <Button text={constant('Target')} />
+        </Tooltip>
+        <Button text={constant('Elsewhere')} />
+      </div>
+    ));
+
+    const [target, elsewhere] = Array.from(host.querySelectorAll('button'));
+
+    assert.isDefined(target);
+
+    assert.isDefined(elsewhere);
+
+    // The pointer an earlier test left over the stage's middle stays off it.
+    await userEvent.hover(elsewhere);
+
+    target.focus();
+
+    await transitioned();
+
+    assert.strictEqual(
+      document.querySelector('.bp6-tooltip')?.textContent,
+      'Hint',
+    );
+
+    elsewhere.focus();
+
+    await transitioned();
+
+    assert.isNull(document.querySelector('.bp6-tooltip'));
+  });
+
+  test.each([
+    {
+      // The page loses the focus, as to another browser tab, with the target
+      // still its active element, and the browser focuses it again as the tab
+      // is shown again. A headless page keeps its window's focus, so the
+      // window's `blur` is dispatched, before the target's own `blur`: a
+      // browser keeps the target active as the window's comes, which a `blur()`
+      // by hand does not.
+      as: 'the page gets the focus back',
+      pageLoses: true,
+      showsAgain: false,
+    },
+    {
+      // The focus goes to `body`, as by a click on a blank part of the page,
+      // and comes back to the target, as by Tab.
+      as: 'the focus comes back from `body`',
+      pageLoses: false,
+      showsAgain: true,
+    },
+  ])(
+    'after the focus leaves its target for no element, shows again as $as: $showsAgain',
+    async ({ pageLoses, showsAgain }) => {
+      const { host } = mounted(() => (
+        <div>
+          <Tooltip content={constant('Hint')}>
+            <Button text={constant('Target')} />
+          </Tooltip>
+          <Button text={constant('Elsewhere')} />
+        </div>
+      ));
+
+      const [target, elsewhere] = Array.from(host.querySelectorAll('button'));
+
+      assert.isDefined(target);
+
+      assert.isDefined(elsewhere);
+
+      await userEvent.hover(elsewhere);
+
+      target.focus();
+
+      await transitioned();
+
+      assert.isNotNull(document.querySelector('.bp6-tooltip'));
+
+      if (pageLoses) {
+        globalThis.dispatchEvent(new FocusEvent('blur'));
+      }
+
+      target.blur();
+
+      await transitioned();
+
+      assert.isNull(document.querySelector('.bp6-tooltip'));
+
+      target.focus();
+
+      await transitioned();
+
+      assert.strictEqual(
+        document.querySelector('.bp6-tooltip') !== null,
+        showsAgain,
+      );
+
+      // Only that one focus is the page's own: the next from no element opens
+      // it.
+      elsewhere.focus();
+
+      elsewhere.blur();
+
+      await transitioned();
+
+      target.focus();
+
+      await transitioned();
+
+      assert.isNotNull(document.querySelector('.bp6-tooltip'));
+    },
+  );
 
   test('hides by Escape, though it has no focus', async () => {
     const { host } = mounted(() => (
