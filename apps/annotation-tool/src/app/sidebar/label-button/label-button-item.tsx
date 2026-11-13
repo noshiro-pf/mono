@@ -37,17 +37,22 @@ export const LabelButtonItem = ({
 
   const contrastColor = higherContrastTextColorHsl(hsl);
 
+  // One pill in the label's colour, holding two buttons side by side: the
+  // label's, and the eye's, since a button inside a button is invalid.
   return (
-    <div class={constant(styles.item)}>
+    <div
+      class={constant(styles.item)}
+      style={{
+        'background-color': constant(color),
+        color: constant(contrastColor),
+      }}
+    >
       <button
         aria-pressed={mapBindable(isSelected, (selected) =>
           selected ? 'true' : 'false',
         )}
         class={constant(styles.button)}
-        style={{
-          'background-color': constant(color),
-          color: constant(contrastColor),
-        }}
+        data-e2e={constant('label-button')}
         type={constant('button')}
         onClick={() => {
           handlers.selectLabel(label.id);
@@ -62,24 +67,25 @@ export const LabelButtonItem = ({
           )}
         />
         <div class={constant(styles.text)}>{constant(label.name)}</div>
-        {/* eslint-disable-next-line synstate-dom-a11y/click-events-have-key-events, synstate-dom-a11y/no-static-element-interactions -- reached by pointer only, as before the move to synstate-dom: a button here would be one inside another */}
-        <div
-          class={constant(styles.visibilityToggle)}
-          data-e2e={constant('visibility-toggle')}
-          onClick={(event) => {
-            handlers.flipLabelVisibility(label.id);
-
-            // Not a click on the label's button as well.
-            event.stopPropagation();
-          }}
-        >
-          <Icon
-            icon={mapBindable(isVisible, (visible) =>
-              visible ? 'eye-open' : 'eye-off',
-            )}
-            size={20}
-          />
-        </div>
+      </button>
+      <button
+        aria-label={constant(`Show ${label.name}`)}
+        aria-pressed={mapBindable(isVisible, (visible) =>
+          visible ? 'true' : 'false',
+        )}
+        class={constant(styles.visibilityToggle)}
+        data-e2e={constant('visibility-toggle')}
+        type={constant('button')}
+        onClick={() => {
+          handlers.flipLabelVisibility(label.id);
+        }}
+      >
+        <Icon
+          icon={mapBindable(isVisible, (visible) =>
+            visible ? 'eye-open' : 'eye-off',
+          )}
+          size={20}
+        />
       </button>
     </div>
   );

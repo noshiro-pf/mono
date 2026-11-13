@@ -222,14 +222,16 @@ const toChannel = (digits: string): number =>
   Result.unwrapOkOr(Num.safeParseFloat(digits), Number.NaN);
 
 /**
- * The colour of a label's button, which is the colour its boxes are drawn in.
+ * The colour of the pill a label's button sits in, which is the colour its
+ * boxes are drawn in.
  */
 const labelColor = async (
   page: DeepReadonly<Page>,
   labelName: string,
 ): Promise<Rgb> => {
   const css = await labelButton(page, labelName).evaluate(
-    (button) => getComputedStyle(button).backgroundColor,
+    (button) =>
+      getComputedStyle(button.parentElement ?? button).backgroundColor,
   );
 
   const channels = /^rgb\((?<r>\d+), (?<g>\d+), (?<b>\d+)\)$/u.exec(
@@ -241,9 +243,7 @@ const labelColor = async (
     channels['g'] === undefined ||
     channels['b'] === undefined
   ) {
-    throw new Error(
-      `The button of ${labelName} is not an opaque colour: ${css}`,
-    );
+    throw new Error(`The pill of ${labelName} is not an opaque colour: ${css}`);
   }
 
   return [
