@@ -34,9 +34,10 @@ type Props<T extends string> = Readonly<{
 
 /**
  * Blueprint's `SegmentedControl` as a `radiogroup`: one {@link Button} per
- * option, the chosen one solid and the rest minimal. Only the chosen one is in
- * the tab order, and the arrow keys choose the one before or after it, wrapping
- * round, as with radio buttons.
+ * option, the chosen one solid and the rest minimal. One option is in the tab
+ * order: the chosen one, or, when none is chosen or the chosen one is disabled,
+ * the first that is not disabled. The arrow keys choose the one before or after
+ * the focused one, wrapping round, as with radio buttons.
  */
 export const SegmentedControl = <T extends string>({
   options,
@@ -50,74 +51,91 @@ export const SegmentedControl = <T extends string>({
   class: className,
   'aria-label': ariaLabel,
   'data-e2e': e2e,
-}: Props<T>): JSX.Element => (
-  <div
-    aria-label={ariaLabel}
-    class={classObject([
-      'bp6-segmented-control',
-      fill && 'bp6-fill',
-      inline && 'bp6-inline',
-      className,
-    ])}
-    data-e2e={e2e}
-    role={constant('radiogroup')}
-    onKeyDown={(event) => {
-      const direction = arrowDirection(event.key);
+}: Props<T>): JSX.Element => {
+  // The one option in the tab order: the chosen one, or, when none is chosen or
+  // the chosen one is disabled, the first that is not disabled.
+  // The group's `disabled` is left out: every button is disabled then, and a
+  // disabled button takes no focus whatever its `tabindex`.
+  const tabStop = mapBindable(
+    value,
+    (v) =>
+      (
+        options.find((o) => o.value === v && o.disabled !== true) ??
+        options.find((o) => o.disabled !== true)
+      )?.value,
+  );
 
-      if (direction === undefined) {
-        return;
-      }
+  return (
+    <div
+      aria-label={ariaLabel}
+      class={classObject([
+        'bp6-segmented-control',
+        fill && 'bp6-fill',
+        inline && 'bp6-inline',
+        className,
+      ])}
+      data-e2e={e2e}
+      role={constant('radiogroup')}
+      onKeyDown={(event) => {
+        const direction = arrowDirection(event.key);
 
-      const focused =
-        document.activeElement instanceof HTMLButtonElement
-          ? document.activeElement
-          : undefined;
+        if (direction === undefined) {
+          return;
+        }
 
-      const enabled = Array.from(
-        event.currentTarget.querySelectorAll<HTMLButtonElement>(
-          'button:not(:disabled)',
-        ),
-      );
+        const focused =
+          document.activeElement instanceof HTMLButtonElement
+            ? document.activeElement
+            : undefined;
 
-      const index = focused === undefined ? -1 : enabled.indexOf(focused);
+        const enabled = Array.from(
+          event.currentTarget.querySelectorAll<HTMLButtonElement>(
+            'button:not(:disabled)',
+          ),
+        );
 
-      if (index < 0) {
-        return;
-      }
+        const index = focused === undefined ? -1 : enabled.indexOf(focused);
 
-      event.preventDefault();
+        if (index < 0) {
+          return;
+        }
 
-      const next = enabled[stepAround(index, direction, enabled.length)];
+        event.preventDefault();
 
-      next?.click();
+        const next = enabled[stepAround(index, direction, enabled.length)];
 
-      next?.focus();
-    }}
-  >
-    {options.map((option) => {
-      const selected = mapBindable(value, (v) => v === option.value);
+        next?.click();
 
-      return (
-        <Button
-          aria-checked={selected}
-          data-e2e={
-            option['data-e2e'] === undefined
-              ? undefined
-              : constant(option['data-e2e'])
-          }
-          disabled={option.disabled === true ? constant(true) : disabled}
-          intent={intent}
-          role={'radio'}
-          size={size}
-          tabIndex={mapBindable(selected, (s) => (s ? 0 : -1))}
-          text={constant(option.label ?? option.value)}
-          variant={mapBindable(selected, (s) => (s ? 'solid' : 'minimal'))}
-          {...(option.icon === undefined ? {} : { icon: option.icon })}
-          onClick={() => {
-            onValueChange(option.value);
-          }}
-        />
-      );
-    })}
-  </div>
-);
+        next?.focus();
+      }}
+    >
+      {options.map((option) => {
+        const selected = mapBindable(value, (v) => v === option.value);
+
+        return (
+          <Button
+            aria-checked={selected}
+            data-e2e={
+              option['data-e2e'] === undefined
+                ? undefined
+                : constant(option['data-e2e'])
+            }
+            disabled={option.disabled === true ? constant(true) : disabled}
+            intent={intent}
+            role={'radio'}
+            size={size}
+            tabIndex={mapBindable(tabStop, (stop) =>
+              stop === option.value ? 0 : -1,
+            )}
+            text={constant(option.label ?? option.value)}
+            variant={mapBindable(selected, (s) => (s ? 'solid' : 'minimal'))}
+            {...(option.icon === undefined ? {} : { icon: option.icon })}
+            onClick={() => {
+              onValueChange(option.value);
+            }}
+          />
+        );
+      })}
+    </div>
+  );
+};

@@ -135,6 +135,21 @@ const noPanelControlled = (line: string): string =>
     .replace(/\[aria-controls=#missing\]/u, '')
     .replace(/\[aria-expanded=(?:true|false)\]/u, '');
 
+/**
+ * Where Blueprint leaves nothing in the tab order, this library keeps one item
+ * there so that the control can be reached by the keyboard: the first title of
+ * `Tabs` with no tab chosen, and the first enabled option of a
+ * `SegmentedControl` with none chosen and the first disabled, or with the
+ * chosen option disabled. Blueprint's `SegmentedControl` gives `tabindex=0` to
+ * the chosen option, or with none chosen to the first, and its `Button` turns
+ * that into `-1` on a disabled one. For a case with one item that can take the
+ * focus.
+ */
+const fallbackTabStop = (line: string): string =>
+  /^\s*(?:div\.bp6-tab\[|button\.(?![\w.-]*\.bp6-disabled\b))/u.test(line)
+    ? line.replace('[tabindex=-1]', '[tabindex=0]')
+    : line;
+
 /** A date for Blueprint React's pickers, which take a `Date`. */
 const blueprintDate = (isoLocal: string): Date => new Date(isoLocal);
 
@@ -805,6 +820,81 @@ export const cases: readonly Case[] = [
     ),
   ],
   [
+    'SegmentedControl with none chosen',
+    {
+      element: () =>
+        h(Blueprint.SegmentedControl, {
+          options: [
+            { value: 'a', label: 'A' },
+            { value: 'b', label: 'B' },
+          ],
+          value: 'z',
+          onValueChange: ignore,
+        }),
+      deliberate: [],
+    },
+    () => (
+      <SegmentedControl
+        options={[
+          { value: 'a', label: 'A' },
+          { value: 'b', label: 'B' },
+        ]}
+        value={constant('z')}
+        onValueChange={ignore}
+      />
+    ),
+  ],
+  [
+    'SegmentedControl with none chosen and the first disabled',
+    {
+      element: () =>
+        h(Blueprint.SegmentedControl, {
+          options: [
+            { value: 'a', label: 'A', disabled: true },
+            { value: 'b', label: 'B' },
+          ],
+          value: 'z',
+          onValueChange: ignore,
+        }),
+      deliberate: [fallbackTabStop],
+    },
+    () => (
+      <SegmentedControl
+        options={[
+          { value: 'a', label: 'A', disabled: true },
+          { value: 'b', label: 'B' },
+        ]}
+        value={constant('z')}
+        onValueChange={ignore}
+      />
+    ),
+  ],
+  [
+    'SegmentedControl with the chosen option disabled',
+    {
+      element: () =>
+        h(Blueprint.SegmentedControl, {
+          options: [
+            { value: 'a', label: 'A', disabled: true },
+            { value: 'b', label: 'B' },
+          ],
+          value: 'a',
+          onValueChange: ignore,
+        }),
+      deliberate: [fallbackTabStop],
+    },
+    () => (
+      <SegmentedControl
+        options={[
+          { value: 'a', label: 'A', disabled: true },
+          { value: 'b', label: 'B' },
+        ]}
+        value={constant('a')}
+        onValueChange={ignore}
+      />
+    ),
+  ],
+  [
     'Tabs',
     {
       // Without the animated indicator, and with the chosen panel alone in the
@@ -833,6 +923,32 @@ export const cases: readonly Case[] = [
           { id: 'a', title: 'A', panel: <div /> },
           { id: 'b', title: 'B', panel: <div /> },
         ]}
+        onChange={ignore}
+      />
+    ),
+  ],
+  [
+    'Tabs with none chosen',
+    {
+      element: () =>
+        h(
+          Blueprint.Tabs,
+          {
+            id: 'u',
+            selectedTabId: 'z',
+            animate: false,
+            renderActiveTabPanelOnly: true,
+            onChange: ignore,
+          },
+          h(Blueprint.Tab, { id: 'a', title: 'A', panel: h('div') }),
+        ),
+      deliberate: [fallbackTabStop],
+    },
+    () => (
+      <Tabs
+        id={'u'}
+        selectedTabId={constant('z')}
+        tabs={[{ id: 'a', title: 'A', panel: <div /> }]}
         onChange={ignore}
       />
     ),

@@ -103,6 +103,42 @@ describe(Tabs, () => {
     unmount();
   });
 
+  test('whenever no tab is chosen, the first title is in the tab order', () => {
+    const { value$, onChange } = controlled('');
+
+    const { container, unmount } = mountInto(() => (
+      <Tabs
+        id={'sheets'}
+        selectedTabId={value$}
+        tabs={tabs}
+        onChange={onChange}
+      />
+    ));
+
+    const titles = all(container, '.bp6-tab');
+
+    assert.deepStrictEqual(
+      titles.map((t) => t.tabIndex),
+      [0, -1, -1],
+    );
+
+    titles[2]?.click();
+
+    assert.deepStrictEqual(
+      titles.map((t) => t.tabIndex),
+      [-1, -1, 0],
+    );
+
+    onChange('gone');
+
+    assert.deepStrictEqual(
+      titles.map((t) => t.tabIndex),
+      [0, -1, -1],
+    );
+
+    unmount();
+  });
+
   test('a tab with no panel is a title alone, beside one with a panel', () => {
     const { value$, onChange } = controlled('a');
 
