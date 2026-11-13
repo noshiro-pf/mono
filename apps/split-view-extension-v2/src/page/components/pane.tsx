@@ -11,6 +11,7 @@ import {
   createAfterUpdate,
   For,
   If,
+  isImeKeyDown,
   listenInScope,
   type JSX,
 } from 'synstate-dom';
@@ -381,7 +382,11 @@ export const PaneFrame = ({
     });
 
     listenInScope(globalThis, 'keydown', (event) => {
-      if (event instanceof KeyboardEvent && event.key === 'Escape') {
+      if (
+        event instanceof KeyboardEvent &&
+        event.key === 'Escape' &&
+        !isImeKeyDown(event)
+      ) {
         closeMenu();
       }
     });

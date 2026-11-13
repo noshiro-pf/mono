@@ -5,7 +5,14 @@ import {
   onScopeDispose,
   type InitializedObservable,
 } from 'synstate';
-import { constant, For, If, listenInScope, type JSX } from 'synstate-dom';
+import {
+  constant,
+  For,
+  If,
+  isImeKeyDown,
+  listenInScope,
+  type JSX,
+} from 'synstate-dom';
 import { Arr } from 'ts-data-forge';
 import {
   computeGeometry,
@@ -207,7 +214,11 @@ export const Stage = ({
   });
 
   listenInScope(globalThis, 'keydown', (event) => {
-    if (event instanceof KeyboardEvent && event.key === 'Escape') {
+    if (
+      event instanceof KeyboardEvent &&
+      event.key === 'Escape' &&
+      !isImeKeyDown(event)
+    ) {
       setMove(undefined);
     }
   });

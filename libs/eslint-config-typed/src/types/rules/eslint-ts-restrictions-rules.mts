@@ -699,7 +699,7 @@ namespace PreferTernary {
 }
 
 /**
- * @description Require a keyboard handler that compares `event.key` or `event.code` with `'Enter'` to check the same event for input method composition
+ * @description Require a keyboard handler that compares `event.key` or `event.code` with `'Enter'` or `'Escape'` to check the same event for input method composition
  *
  *  ```md
  *  | key        | value   |
@@ -724,7 +724,19 @@ namespace RequireImeGuardOnEnter {
    *         "items": {
    *           "type": "string"
    *         },
-   *         "description": "Names of functions that, called with the event, tell an input method's key down (default: `[\"isImeKeyDown\"]`)"
+   *         "description": "Names of functions that, called with the event, tell an input method's key down: the exported name for a named or namespace import, the name it is called by for anything else (default: `[\"isImeKeyDown\"]`)"
+   *       },
+   *       "keys": {
+   *         "type": "array",
+   *         "items": {
+   *           "type": "string",
+   *           "enum": [
+   *             "Enter",
+   *             "Escape"
+   *           ]
+   *         },
+   *         "uniqueItems": true,
+   *         "description": "The keys whose comparisons need the check (default: `[\"Enter\", \"Escape\"]`)"
    *       }
    *     },
    *     "additionalProperties": false
@@ -734,9 +746,13 @@ namespace RequireImeGuardOnEnter {
    */
   export type Options = Readonly<{
     /**
-     * Names of functions that, called with the event, tell an input method's key down (default: `["isImeKeyDown"]`)
+     * Names of functions that, called with the event, tell an input method's key down: the exported name for a named or namespace import, the name it is called by for anything else (default: `["isImeKeyDown"]`)
      */
     guardFunctions?: readonly string[];
+    /**
+     * The keys whose comparisons need the check (default: `["Enter", "Escape"]`)
+     */
+    keys?: readonly ('Enter' | 'Escape')[];
   }>;
 
   export type RuleEntry =
