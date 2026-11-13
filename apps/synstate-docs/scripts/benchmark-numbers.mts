@@ -1897,6 +1897,29 @@ const medianOf = (values: readonly number[]): number | undefined =>
   values.toSorted((a, b) => a - b)[Math.floor(divide(values.length, 2))];
 
 /**
+ * `pairs` with each measurement under {@link NOISE_FLOOR_MS} read as that
+ * floor, for a sentence about how two rows compare across a sweep. Below it,
+ * one re-measurement on a shared runner has put a point several times off its
+ * neighbors, and the deep chain's $K=100$ points are under 1.5 ms on both
+ * sides, so their ratio is noise; read at the floor, two such points are level.
+ * Every point is kept, and a side that grows past the floor is compared with
+ * the other side's floor, so a real gap at a point the sentence covers still
+ * shows, as at least its ratio to the floor: 4 ms against 0.4 ms is judged as 4
+ * against 1.5. What is lost is how far below the floor the faster side was,
+ * which is what the noise there does not tell.
+ */
+const floored = (
+  pairs: readonly FixedLengthTuple<2, number>[],
+): readonly FixedLengthTuple<2, number>[] =>
+  pairs.map(
+    ([numerator, denominator]) =>
+      [
+        Math.max(numerator, NOISE_FLOOR_MS),
+        Math.max(denominator, NOISE_FLOOR_MS),
+      ] as const,
+  );
+
+/**
  * The median of the `pairs`' ratios, for "stays close to SynState as N grows,
  * typically N× its time". Not the furthest pair, which the sentence used to
  * quote as a bound at every point: the pairs it is used on are both below a
@@ -1910,22 +1933,38 @@ const medianOf = (values: readonly number[]): number | undefined =>
  * magnitude no longer makes; and a ratio whose later half of the sweep is more
  * than {@link FLAT_WITHIN}× its earlier half, which no longer stays close as
  * $N$ grows. `pairs` are in sweep order, as {@link everyPoint} yields them.
+ *
+ * The trend is judged on the pairs {@link floored}, the quoted factor on the
+ * pairs as measured. A half of a short sweep is a handful of points, so one
+ * sub-millisecond point several times off its neighbors moves its median, and
+ * two flat rows under a millisecond have read as a ratio more than doubling
+ * across the sweep; read at the floor they are level, while a side that grows
+ * past it still shows as a growing ratio.
  */
 const typicalFactor = (
   sentence: string,
   pairs: readonly FixedLengthTuple<2, number>[],
 ): string => {
-  const ratios = pairs.map(([numerator, denominator]) =>
-    divide(numerator, denominator),
-  );
+  const ratiosOf = (
+    of: readonly FixedLengthTuple<2, number>[],
+  ): readonly number[] =>
+    of.map(([numerator, denominator]) => divide(numerator, denominator));
+
+  const ratios = ratiosOf(pairs);
+
+  // While both rows stay under the floor, every floored ratio is 1 and no trend
+  // is seen, however the raw ratio moves: there it is what the runner's noise
+  // decides, not the libraries. The quoted factor and the `TYPICAL_AT_MOST`
+  // bound still read the raw ratios.
+  const flooredRatios = ratiosOf(floored(pairs));
 
   const half = Math.floor(divide(ratios.length, 2));
 
   const value = medianOf(ratios);
 
-  const earlier = medianOf(ratios.slice(0, half));
+  const earlier = medianOf(flooredRatios.slice(0, half));
 
-  const later = medianOf(ratios.slice(ratios.length - half));
+  const later = medianOf(flooredRatios.slice(flooredRatios.length - half));
 
   if (value === undefined || earlier === undefined || later === undefined) {
     throw new Error(
@@ -2149,6 +2188,11 @@ const rowTrend = (
   label: string,
   words: Partial<ReadonlyRecord<Trend, Localized>>,
 ): Localized => {
+  // Not read at `NOISE_FLOOR_MS` yet, unlike `typicalFactor`: a row whose
+  // three-point medians are both under that floor can still read as growing or
+  // falling on noise alone. Flooring it also means changing the check below on
+  // the quoted medians, which would then show a flat row as two figures further
+  // apart than flat allows.
   const [start, end] = endMedians(data, label);
 
   const { trend, wording } = trendBetween(sentence, start, end, words);
@@ -2205,29 +2249,6 @@ const rowsTrend = (
 type Trend = 'falls' | 'flat' | 'grows';
 
 const FLAT_WITHIN = 2;
-
-/**
- * `pairs` with each measurement under {@link NOISE_FLOOR_MS} read as that
- * floor, for a sentence about how two rows compare across a sweep. Below it,
- * one re-measurement on a shared runner has put a point several times off its
- * neighbors, and the deep chain's $K=100$ points are under 1.5 ms on both
- * sides, so their ratio is noise; read at the floor, two such points are level.
- * Every point is kept, and a side that grows past the floor is compared with
- * the other side's floor, so a real gap at a point the sentence covers still
- * shows, as at least its ratio to the floor: 4 ms against 0.4 ms is judged as 4
- * against 1.5. What is lost is how far below the floor the faster side was,
- * which is what the noise there does not tell.
- */
-const floored = (
-  pairs: readonly FixedLengthTuple<2, number>[],
-): readonly FixedLengthTuple<2, number>[] =>
-  pairs.map(
-    ([numerator, denominator]) =>
-      [
-        Math.max(numerator, NOISE_FLOOR_MS),
-        Math.max(denominator, NOISE_FLOOR_MS),
-      ] as const,
-  );
 
 const NOISE_FLOOR_MS = 1.5;
 
