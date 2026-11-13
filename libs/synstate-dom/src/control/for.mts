@@ -15,8 +15,10 @@ import { toObservable, type Bindable } from '../constant/index.mjs';
 import {
   applyWhenAttached,
   bindValue,
+  holdsSvgContent,
   insertBefore,
   mountThenInsert,
+  mountUnder,
 } from '../internal/index.mjs';
 import { mountable, toNodes, type JSX } from '../jsx/index.mjs';
 import { longestIncreasingSubsequence } from './longest-increasing-subsequence.mjs';
@@ -222,6 +224,10 @@ export const For = <T,>({
 
       let mut_next: ChildNode = anchor;
 
+      // An update runs outside the parent's mount, so it reads where the rows
+      // go.
+      const inSvg = holdsSvgContent(anchor.parentNode);
+
       for (const rowKey of entries.order.toReversed()) {
         const existing = mut_rows.get(rowKey);
 
@@ -232,11 +238,15 @@ export const For = <T,>({
             continue;
           }
 
-          const [start] = mountThenInsert(
-            (e: Entry<T>) => createRow(rowKey, e),
-            entry,
-            insertBefore,
-            mut_next,
+          const next = mut_next;
+
+          const [start] = mountUnder(inSvg, () =>
+            mountThenInsert(
+              (e: Entry<T>) => createRow(rowKey, e),
+              entry,
+              insertBefore,
+              next,
+            ),
           );
 
           if (start !== undefined) {

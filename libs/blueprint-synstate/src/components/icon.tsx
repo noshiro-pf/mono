@@ -50,8 +50,7 @@ type Props = Readonly<
  *
  * Hidden from assistive technology, always: each icon here sits on a control
  * whose own label says what it does. Blueprint gives the SVG a `<title>`
- * instead where it is told to, which synstate-dom would create in the HTML
- * namespace rather than the SVG one.
+ * instead where it is told to; this takes no `title` prop.
  */
 export const Icon = ({
   class: className,

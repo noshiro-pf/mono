@@ -2,7 +2,6 @@ import { type InitializedObservable, map } from 'synstate';
 import { constant, type JSX } from 'synstate-dom';
 import type { DagArcRecord } from './dag-canvas-scene.mjs';
 import { DagEdgeLabel } from './dag-edge-label.js';
-import { SvgTitle } from './svg-title.js';
 
 type Props = Readonly<{
   record: InitializedObservable<DagArcRecord>;
@@ -28,7 +27,7 @@ export const DagArcEdge = ({ record }: Props): JSX.Element => {
       data-to={record.pipe(map(({ arc }) => arc.to))}
       role={constant('img')}
     >
-      <SvgTitle>{name}</SvgTitle>
+      <title>{name}</title>
       <path
         class={constant('dag-edge-line')}
         d={record.pipe(map(({ arc }) => arc.path))}

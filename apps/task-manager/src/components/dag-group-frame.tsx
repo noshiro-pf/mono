@@ -4,7 +4,6 @@ import { frameTitle, GROUP_HEADER, GROUP_PADDING } from '../dag/index.mjs';
 import { m } from '../i18n/index.mjs';
 import { groupEditorStore } from '../store/index.mjs';
 import type { DagFrameRecord } from './dag-canvas-scene.mjs';
-import { SvgTitle } from './svg-title.js';
 
 type Props = Readonly<{
   record: InitializedObservable<DagFrameRecord>;
@@ -66,7 +65,7 @@ export const DagGroupFrame = ({ record }: Props): JSX.Element => {
           groupEditorStore.open(id);
         }}
       >
-        <SvgTitle>{title}</SvgTitle>
+        <title>{title}</title>
         <rect
           class={constant('dag-group-header-area')}
           height={constant(GROUP_HEADER)}

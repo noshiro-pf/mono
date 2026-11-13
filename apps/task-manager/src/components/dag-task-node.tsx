@@ -9,7 +9,6 @@ import { m } from '../i18n/index.mjs';
 import { priorityLabels } from '../view-model/index.mjs';
 import type { DagNodeRecord } from './dag-canvas-scene.mjs';
 import { dagNodeHandlers } from './dag-node-handlers.mjs';
-import { SvgTitle } from './svg-title.js';
 
 type Props = Readonly<{
   record: InitializedObservable<DagNodeRecord<TaskNodeView>>;
@@ -63,7 +62,7 @@ export const DagTaskNode = ({ record }: Props): JSX.Element => {
       onClick={openNode}
       onKeyDown={onKeyDown}
     >
-      <SvgTitle>
+      <title>
         {record.pipe(
           map(({ view: v, size }) =>
             size === 'compact'
@@ -71,7 +70,7 @@ export const DagTaskNode = ({ record }: Props): JSX.Element => {
               : v.title,
           ),
         )}
-      </SvgTitle>
+      </title>
       <g class={constant('dag-node-body')}>
         <If
           cond={record.pipe(map((r) => r.view.priority === 1))}
