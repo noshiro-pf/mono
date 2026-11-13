@@ -285,6 +285,37 @@ export const reviewOpeningRounds = (line: string): number | undefined => {
 };
 
 /**
+ * The rounds a `## Review` section's opening adds after the total
+ * {@link reviewOpeningRounds} reads, in the same sentence: each `<N> more`
+ * (`, and 4 more on the restack`) and `then <N> round(s)`
+ * (`; then 2 rounds on the amend`). `0` when the opening is not in that form,
+ * when the sentence ends at the total, and when a colon follows the total,
+ * since what comes after a colon divides the total rather than adding to it
+ * (`76 rounds: per-command loops, then 22 rounds over the whole diff`). A later
+ * sentence adds nothing.
+ */
+export const reviewOpeningAdditions = (line: string): number => {
+  const opening = REVIEW_OPENING.exec(line.trimEnd())?.[0];
+
+  if (opening === undefined) {
+    return 0;
+  }
+
+  // The opening ends at the punctuation after the total, or at the line's end.
+  const rest = line.trimEnd().slice(opening.length - 1);
+
+  if (!/^[,;]/u.test(rest)) {
+    return 0;
+  }
+
+  const sentence = rest.split(SENTENCE_END, 1)[0] ?? '';
+
+  return Array.from(sentence.matchAll(REVIEW_OPENING_ADDITION), (match) =>
+    Num.safeParseInt(match.groups?.['then'] ?? match.groups?.['more'] ?? ''),
+  ).reduce((sum, parsed) => sum + (Result.isOk(parsed) ? parsed.value : 0), 0);
+};
+
+/**
  * Which halves differ between two versions of a description. Trailing spaces,
  * runs of blank lines, the `Merge-After:` line and trailer lines do not count:
  * the first two change nothing a reader sees, the third is a declaration,
@@ -351,6 +382,13 @@ const isTrailerLine = (line: string): boolean =>
 /** What {@link reviewOpeningRounds} reads. */
 const REVIEW_OPENING =
   /^ {0,3}(?:`\/code-review (?:low|medium|high|xhigh|max)`|(?:Self-review|Review) at `(?:low|medium|high|xhigh|max)`), (?<count>1(?= round\b)|(?:[2-9]|[1-9]\d+)(?= rounds\b)) rounds?(?:[.,;:]|$)/u;
+
+/** What {@link reviewOpeningAdditions} reads as adding rounds. */
+const REVIEW_OPENING_ADDITION =
+  /\bthen (?<then>\d+) (?:more )?rounds?\b|\b(?<more>\d+) more\b/gu;
+
+/** The end of a sentence: a full stop followed by a space or the line's end. */
+const SENTENCE_END = /\.(?:\s|$)/u;
 
 const REVIEW_OPENING_RULE =
   'it opens with the level and the total of rounds in digits, as "`/code-review high`, 3 rounds.", "Review at `high`, 2 rounds." or "Self-review at `high`, 1 round."';

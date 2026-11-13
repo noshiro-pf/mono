@@ -113,7 +113,10 @@ description も、次の `push` で訳文に同じものを置きます。
   レビューは、別のレビューの仕組みなら ``Review at `high`, 2 rounds.``、
   セルフレビューなら ``Self-review at `high`, 1 round.``）で始まっていない。行は
   ピリオド、カンマ、セミコロン、コロンの後に続けてかまいません。
-  `review-findings-digest` はこの行から合計を読みます。この形より前に書いた
+  `review-findings-digest` はこの行から合計を読み、合計の直後がコロンでなければ、
+  同じ文が合計の後に `<N> more` や `then <N> rounds` で足すラウンドを加えます
+  （`` `/code-review high`, 11 rounds, and 4 more on the restack. `` は 15）。
+  この形より前に書いた
   description は、両方の最初の行を直すか、原文だけを直して `--wording-only` で
   `push` します。
 - 原文の `## Review` の `**Deferred**` の行の下の項目（箇条書きか番号付き）が、
@@ -234,7 +237,10 @@ blocks are in the original alone gets them in the translation too.
   with no `/code-review`, ``Review at `high`, 2 rounds.`` when another review
   mechanism ran and ``Self-review at `high`, 1 round.`` when none did), the line
   going on, if at all, after a period, comma, semicolon or colon:
-  `review-findings-digest` reads the total from it. A description written before
+  `review-findings-digest` reads the total from it, and adds the rounds the same
+  sentence adds after it with `<N> more` or `then <N> rounds` unless a colon
+  follows the total (`` `/code-review high`, 11 rounds, and 4 more on the
+restack. `` is 15). A description written before
   this form has its opening fixed in both halves, or in the original alone with
   `push --wording-only`.
 - an item (bulleted or numbered) under a `**Deferred**` line in the original's
