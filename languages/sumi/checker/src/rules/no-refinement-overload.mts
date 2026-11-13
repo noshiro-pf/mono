@@ -41,11 +41,12 @@ import type { Rule } from '../engine/index.mjs';
  *    the syntax: `?`, an initializer and `...`.
  * 2. **`typeof`** — at some position, the `typeof` classes the two parameter
  *    types map to do not intersect. A union is the union of its members'; an
- *    intersection is its primitive members' (a branded `number & { brand }`
- *    is `number`); an object type with a call or construct signature is
- *    `function` and any other is `object`; a type parameter is judged by its
- *    constraint, and one without is every class. A position one signature
- *    may leave out counts as `undefined` for it.
+ *    intersection with members that are not only objects is theirs, less
+ *    `undefined` when it has an object member too (a branded
+ *    `number & { brand }` is `number`); an object type with a call or
+ *    construct signature is `function` and any other is `object`; a type
+ *    parameter is judged by its constraint, and one without is every class. A
+ *    position one signature may leave out counts as `undefined` for it.
  * 3. **A tag** — at some position, both types have a property whose types are
  *    unions of literals with no value in common (a discriminated union).
  *
@@ -263,14 +264,27 @@ const typeofClasses = (
   if (type.isIntersectionType()) {
     // A member with no call signature does not rule out a function, so members
     // are intersected as "object or function" and the whole decides between the
-    // two.
-    const classes = type
+    // two. When another member may be something else, a member that can only be
+    // an object rules out nothing but `undefined`, since it can be intersected
+    // with any primitive (a brand): `number & { brand }` is `number`.
+    const members = type
       .getTypes()
-      .map((member) => widenObject(typeofClasses(checker, member)))
+      .map((member) => widenObject(typeofClasses(checker, member)));
+
+    const objectsAlone = members.every((member) =>
+      member.isSubsetOf(objectOrFunction),
+    );
+
+    const classes = members
+      .map((member) =>
+        !objectsAlone && member.isSubsetOf(objectOrFunction)
+          ? definedClasses
+          : member,
+      )
       .reduce((acc, member) => acc.intersection(member), allClasses);
 
     return classes.has('function') && classes.has('object')
-      ? objectClasses(checker, type)
+      ? classes.difference(objectOrFunction).union(objectClasses(checker, type))
       : classes;
   }
 
@@ -494,6 +508,15 @@ const allClasses: ReadonlySet<TypeofClass> = new Set<TypeofClass>([
 ]);
 
 /** The flags that fix a type's `typeof` class by themselves. */
+const definedClasses: ReadonlySet<TypeofClass> = allClasses.difference(
+  new Set<TypeofClass>(['undefined']),
+);
+
+const objectOrFunction: ReadonlySet<TypeofClass> = new Set<TypeofClass>([
+  'function',
+  'object',
+]);
+
 const primitiveClasses: readonly (readonly [TypeFlags, TypeofClass])[] = [
   [TypeFlags.StringLike, 'string'],
   [TypeFlags.NumberLike, 'number'],
