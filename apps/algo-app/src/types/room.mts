@@ -1,4 +1,4 @@
-import { expectType, tp } from 'ts-data-forge';
+import { expectType, Result, tp } from 'ts-data-forge';
 import * as t from 'ts-fortress';
 import type { FixedLengthTuple, StrictOmit } from 'ts-type-forge';
 import { cardTypeDef } from './card-type.mjs';
@@ -55,8 +55,11 @@ export type Room = StrictOmit<RoomRemote, 'playerCards'> &
 
 expectType<(typeof roomStateList)[number], Room['state']>('=');
 
-export const assertIsRoomRemote: (a: unknown) => asserts a is RoomRemote =
-  roomRemoteTypeDef.assertIs;
+/** `a` as a room document read back, or what is wrong with it. */
+export const validateRoomRemote = (a: unknown): Result<RoomRemote, string> =>
+  Result.mapErr(roomRemoteTypeDef.validate(a), (errors) =>
+    t.validationErrorsToMessages(errors).join(' '),
+  );
 
 export const convertRoomRemoteToRoom = (
   roomRemote: RoomRemote,
