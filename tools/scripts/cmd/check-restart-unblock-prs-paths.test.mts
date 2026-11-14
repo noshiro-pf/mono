@@ -1,11 +1,10 @@
 import dedent from 'dedent';
 import { Arr, Result } from 'ts-data-forge';
+import type { Closure } from '../lib/import-closure.mjs';
 import {
   findViolations,
   parsePatterns,
   parseSourceMapped,
-  walkImports,
-  type Closure,
 } from './check-restart-unblock-prs-paths.mjs';
 
 describe('parsePatterns', () => {
@@ -121,124 +120,6 @@ describe('parsePatterns', () => {
         ),
       ),
     );
-  });
-});
-
-describe('walkImports', () => {
-  const sources: ReadonlyMap<string, string> = new Map<string, string>([
-    [
-      'libs/q/src/cmd/worker.mts',
-      dedent`
-        import { Result } from 'ts-data-forge';
-        import * as fs from 'node:fs';
-        import { run } from '../worker/index.mjs';
-      `,
-    ],
-    [
-      'libs/q/src/worker/index.mts',
-      dedent`
-        export * from './main.mjs';
-      `,
-    ],
-    [
-      'libs/q/src/worker/main.mts',
-      dedent`
-        import { report } from 'core';
-        import { log } from '../lib/index.mjs';
-        import type { Options } from './types.mjs';
-      `,
-    ],
-    ['libs/q/src/worker/types.mts', 'export type Options = {};'],
-    ['libs/q/src/lib/index.mts', "export * from './log.mjs';"],
-    ['libs/q/src/lib/log.mts', "import 'dedent';"],
-    ['libs/core/src/entry-point.mts', "import { Arr } from 'ts-data-forge';"],
-  ]);
-
-  const workspacePackages: ReadonlyMap<string, string> = new Map<
-    string,
-    string
-  >([
-    ['core', 'libs/core'],
-    ['ts-data-forge', 'libs/ts-data-forge'],
-  ]);
-
-  const walk = (
-    follows: (directory: string) => boolean,
-  ): Result<Closure, string> =>
-    walkImports('libs/q/src/cmd/worker.mts', {
-      readSource: (relativePath) => sources.get(relativePath),
-      workspacePackages,
-      follows,
-    });
-
-  test('collects every file reached, through barrels and type imports', () => {
-    const closure = Result.unwrapOk(
-      walk((directory) => directory === 'libs/core'),
-    );
-
-    assert.deepStrictEqual(closure?.files, [
-      'libs/core/src/entry-point.mts',
-      'libs/q/src/cmd/worker.mts',
-      'libs/q/src/lib/index.mts',
-      'libs/q/src/lib/log.mts',
-      'libs/q/src/worker/index.mts',
-      'libs/q/src/worker/main.mts',
-      'libs/q/src/worker/types.mts',
-    ]);
-  });
-
-  test('lists the workspace packages it reached and did not follow', () => {
-    const closure = Result.unwrapOk(
-      walk((directory) => directory === 'libs/core'),
-    );
-
-    assert.deepStrictEqual(closure?.unfollowed, ['ts-data-forge']);
-  });
-
-  test('lists every workspace import as written, followed or not', () => {
-    const closure = Result.unwrapOk(
-      walkImports('libs/q/src/cmd/sub.mts', {
-        readSource: (relativePath) =>
-          relativePath === 'libs/q/src/cmd/sub.mts'
-            ? dedent`
-              import { Arr } from 'ts-data-forge/array';
-              import { report } from 'core';
-              import dedent from 'dedent';
-            `
-            : sources.get(relativePath),
-        workspacePackages,
-        follows: (directory) => directory === 'libs/core',
-      }),
-    );
-
-    assert.deepStrictEqual(closure?.workspaceImports, [
-      'core',
-      'ts-data-forge',
-      'ts-data-forge/array',
-    ]);
-  });
-
-  test('does not enter a workspace package it is not told to follow', () => {
-    const closure = Result.unwrapOk(walk(() => false));
-
-    assert.isDefined(closure);
-
-    assert.notInclude(closure.files, 'libs/core/src/entry-point.mts');
-
-    assert.deepStrictEqual(closure.unfollowed, ['core', 'ts-data-forge']);
-  });
-
-  test('fails on a relative import that resolves to no file', () => {
-    const result = walkImports('libs/q/src/cmd/broken.mts', {
-      readSource: (relativePath) =>
-        relativePath === 'libs/q/src/cmd/broken.mts'
-          ? "import { x } from '../missing/index.mjs';"
-          : undefined,
-      workspacePackages,
-      follows: () => false,
-    });
-
-    assert.isTrue(Result.isErr(result));
   });
 });
 
