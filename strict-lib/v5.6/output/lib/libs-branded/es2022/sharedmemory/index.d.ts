@@ -33,8 +33,8 @@ interface Atomics {
    */
   waitAsync(
     typedArray: Int32Array,
-    index: number,
-    value: number,
+    index: NumberType.TypedArraySizeArgNonNegative,
+    value: import('ts-type-forge').Int32,
     timeout?: number,
   ):
     | { readonly async: false; readonly value: 'not-equal' | 'timed-out' }
@@ -50,8 +50,8 @@ interface Atomics {
    */
   waitAsync(
     typedArray: BigInt64Array,
-    index: number,
-    value: bigint,
+    index: NumberType.TypedArraySizeArgNonNegative,
+    value: import('ts-type-forge').BigInt64,
     timeout?: number,
   ):
     | { readonly async: false; readonly value: 'not-equal' | 'timed-out' }

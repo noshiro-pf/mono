@@ -1,13 +1,17 @@
 {
   "extends": "./configs/tsconfig/tsconfig.type-check.json",
   "compilerOptions": {
-    "types": ["node"]
+    // The generator's tests (`scripts-common/src/**/*.test.mts`) use Vitest's
+    // globals. One program checks the generator and its tests, as a package's
+    // own `tsconfig.json` does, so the globals are declared for both.
+    "types": ["node", "eslint-config-typed/vitest-globals"]
   },
   "include": [
     "./scripts/**/*",
     "./configs/**/*",
     "./eslint.config.mts",
     "./scripts-common/src/**/*.mts",
+    "./scripts-common/configs/**/*.mts",
     "./v*/scripts/**/*.mts"
   ],
   // The entries the harnesses' `tsconfig.lib-check*.json` type-check against

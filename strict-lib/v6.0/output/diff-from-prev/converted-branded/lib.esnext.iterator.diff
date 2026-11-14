@@ -1,6 +1,6 @@
 diff --git a/v5.9/output/lib-files-branded/lib.esnext.iterator.d.ts b/v5.9/output/lib-files-branded/lib.esnext.iterator.d.ts
 deleted file mode 100644
-index aa477f3a68ed75f4c49e49f0794d9838b143b46d..0000000000000000000000000000000000000000
+index 491e8ac3d01bbc5d93f92759bc1c0494d14b359d..0000000000000000000000000000000000000000
 --- a/v5.9/output/lib-files-branded/lib.esnext.iterator.d.ts
 +++ /dev/null
 @@ -1,204 +0,0 @@
@@ -97,7 +97,7 @@ index aa477f3a68ed75f4c49e49f0794d9838b143b46d..00000000000000000000000000000000
 -     * @param count The number of values to drop.
 -     */
 -    drop(
--      limit: NumberType.ArraySizeArgNonNegative,
+-      count: NumberType.ArraySizeArgNonNegative,
 -    ): IteratorObject<T, undefined, unknown>;
 -
 -    /**

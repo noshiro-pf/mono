@@ -91,7 +91,7 @@ declare global {
      * @param count The number of values to drop.
      */
     drop(
-      limit: NumberType.ArraySizeArgNonNegative,
+      count: NumberType.ArraySizeArgNonNegative,
     ): IteratorObject<T, undefined, unknown>;
 
     /**

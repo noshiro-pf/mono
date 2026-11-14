@@ -9,7 +9,8 @@
 // Every harness's `tsconfig.lib-check.json` and
 // `tsconfig.lib-check.webworker.json` name this file, so one assertion added
 // here is checked by all twelve TypeScript minors in both flavors. One that
-// holds only from TypeScript 5.4 on goes in `lib-check-entry.since-5.4.ts`.
+// holds only from TypeScript 5.4 on goes in `lib-check-entry.since-5.4.ts`, and
+// one that holds only from 5.8 on in `lib-check-entry.since-5.8.ts`.
 
 import type { Int16 } from 'ts-type-forge';
 

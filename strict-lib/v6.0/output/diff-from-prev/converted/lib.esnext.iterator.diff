@@ -1,6 +1,6 @@
 diff --git a/v5.9/output/lib-files/lib.esnext.iterator.d.ts b/v5.9/output/lib-files/lib.esnext.iterator.d.ts
 deleted file mode 100644
-index c31e70e74478e9001ef89a8b5627dfc009c6b4bf..0000000000000000000000000000000000000000
+index 40b7cf54a003c275a493295a63fcae665f2d81b3..0000000000000000000000000000000000000000
 --- a/v5.9/output/lib-files/lib.esnext.iterator.d.ts
 +++ /dev/null
 @@ -1,194 +0,0 @@
@@ -94,7 +94,7 @@ index c31e70e74478e9001ef89a8b5627dfc009c6b4bf..00000000000000000000000000000000
 -     * Creates an iterator whose values are the values from this iterator after skipping the provided count.
 -     * @param count The number of values to drop.
 -     */
--    drop(limit: number): IteratorObject<T, undefined, unknown>;
+-    drop(count: number): IteratorObject<T, undefined, unknown>;
 -
 -    /**
 -     * Creates an iterator whose values are the result of applying the callback to the values from this iterator and then flattening the resulting iterators or iterables.

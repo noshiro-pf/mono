@@ -88,7 +88,7 @@ declare global {
      * Creates an iterator whose values are the values from this iterator after skipping the provided count.
      * @param count The number of values to drop.
      */
-    drop(limit: number): IteratorObject<T, undefined, unknown>;
+    drop(count: number): IteratorObject<T, undefined, unknown>;
 
     /**
      * Creates an iterator whose values are the result of applying the callback to the values from this iterator and then flattening the resulting iterators or iterables.
