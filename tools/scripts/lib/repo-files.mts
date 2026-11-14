@@ -184,6 +184,15 @@ export type Tree = Readonly<{
 }>;
 
 /**
+ * The files a package's public entry may be, relative to the package, the first
+ * that exists being it (`CLAUDE.md`, "Repository layout").
+ */
+export const PACKAGE_ENTRY_FILES = [
+  'src/entry-point.mts',
+  'src/index.mts',
+] as const;
+
+/**
  * The extensions of the files whose text a person writes and a reader sees —
  * documents, code and its comments, configuration, and the markup of the sites'
  * components. Everything else is binary or generated.
