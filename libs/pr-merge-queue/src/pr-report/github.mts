@@ -25,17 +25,18 @@ import {
   type RepoRef,
   type WorkflowRound,
 } from 'pr-report-core';
-import { Arr, Result } from 'ts-data-forge';
+import { Arr, asUint32, Result } from 'ts-data-forge';
 import * as t from 'ts-fortress';
-import { currentEpochMs, parseJson, send } from '../lib/index.mjs';
+import {
+  collectPages,
+  currentEpochMs,
+  parseJson,
+  send,
+} from '../lib/index.mjs';
 import { describeUnreadableChecks } from './checks-unreadable.mjs';
 import { parseClosingIssueRefs } from './linked-issues.mjs';
 
-/**
- * How many pull requests are read. A repository with more open than this has a
- * different problem than an unreadable report, so this fails loudly rather than
- * paginating and reporting half of it as the whole.
- */
+/** The most GitHub answers in one page of a paged list. */
 const PAGE_SIZE = 100;
 
 /**
@@ -193,6 +194,10 @@ const ClosingIssuesSchema = t.record({
   data: t.record({
     repository: t.record({
       pullRequests: t.record({
+        pageInfo: t.record({
+          hasNextPage: t.boolean(),
+          endCursor: t.union([t.string(), t.nullType]),
+        }),
         nodes: t.array(
           t.record({
             number: t.number(),
@@ -235,10 +240,10 @@ export type Client = Readonly<{
     branch: string,
   ) => Promise<Result<readonly string[], string>>;
   /**
-   * The open pull requests. With `{ checks: false }`, one list, and one
-   * GraphQL query with a token, rather than about four requests per pull
-   * request: no comparison and no check is read, for a caller that reads
-   * neither.
+   * The open pull requests. With `{ checks: false }`, one page of the list,
+   * and one page of a GraphQL query with a token, per hundred pull requests,
+   * rather than about four requests per pull request: no comparison and no
+   * check is read, for a caller that reads neither.
    */
   facts: (
     repo: RepoRef,
@@ -303,8 +308,9 @@ export type IssueBody = Readonly<{
  * Unauthenticated works because the repository is public, and one report a day
  * fits inside the 60 requests an hour an anonymous caller gets — roughly three
  * per pull request, for the comparison and the two kinds of check.
- * A token raises that to 5000 and, through one GraphQL query, adds the issue
- * links GitHub itself holds to the ones read out of the bodies.
+ * A token raises that to 5000 and, through a GraphQL query read a hundred pull
+ * requests a page, adds the issue links GitHub itself holds to the ones read
+ * out of the bodies.
  */
 export const createClient = (
   token: string | undefined,
@@ -534,9 +540,13 @@ export const createClient = (
       return [];
     }
 
-    const listed = await getJson(
-      `/repos/${repo.owner}/${repo.name}/issues/${issue.number}/dependencies/blocked_by?per_page=${PAGE_SIZE}`,
-      BlockedByListSchema,
+    const listed = await collectPages(
+      async (page) =>
+        getJson(
+          `/repos/${repo.owner}/${repo.name}/issues/${issue.number}/dependencies/blocked_by?per_page=${PAGE_SIZE}&page=${page}`,
+          BlockedByListSchema,
+        ),
+      PAGE_SIZE,
     );
 
     const own =
@@ -547,6 +557,37 @@ export const createClient = (
       : listed.value
           .filter(({ repository_url: url }) => url.toLowerCase() === own)
           .map(({ number }) => number);
+  };
+
+  /**
+   * Every open pull request, oldest first, across as many pages as it takes.
+   * Any page that cannot be read fails the whole list: the first pages reported
+   * as the whole queue would hide the rest from every command that reads it.
+   */
+  const openPulls = async (
+    repo: RepoRef,
+  ): Promise<
+    Result<readonly t.TypeOf<typeof PullRequestListSchema>[number][], string>
+  > => {
+    const listed = await collectPages(
+      async (page) =>
+        getJson(
+          `/repos/${repo.owner}/${repo.name}/pulls?state=open&per_page=${PAGE_SIZE}&sort=created&direction=asc&page=${page}`,
+          PullRequestListSchema,
+          FULL_MEDIA_TYPE,
+        ),
+      PAGE_SIZE,
+    );
+
+    // Paging by offset, oldest first, the list can move while it is read, as
+    // every list read through `collectPages` can. One closed among the pages
+    // already read leaves the one at a page's edge out of that run; one
+    // reopened there is itself left out, and repeats one at a page's edge,
+    // which is dropped here. One opened goes on the end and moves nothing.
+    // Reading it again is the fix for any of them.
+    return Result.isErr(listed)
+      ? Result.err(`the open pull requests: ${listed.value}`)
+      : Result.ok(Arr.uniqBy(listed.value, ({ number }) => number));
   };
 
   /**
@@ -562,11 +603,13 @@ export const createClient = (
    */
   const closingIssues = async (
     repo: RepoRef,
+    openCount: number,
   ): Promise<ReadonlyMap<number, readonly LinkedIssue[]>> => {
     const query = [
-      'query($owner: String!, $name: String!) {',
+      'query($owner: String!, $name: String!, $after: String) {',
       '  repository(owner: $owner, name: $name) {',
-      `    pullRequests(states: OPEN, first: ${PAGE_SIZE}) {`,
+      `    pullRequests(states: OPEN, first: ${PAGE_SIZE}, after: $after) {`,
+      '      pageInfo { hasNextPage endCursor }',
       '      nodes {',
       '        number',
       '        closingIssuesReferences(first: 10) {',
@@ -578,29 +621,52 @@ export const createClient = (
       '}',
     ].join('\n');
 
-    const answered = await request('/graphql', {
-      body: JSON.stringify({
-        query,
-        variables: { owner: repo.owner, name: repo.name },
-      }),
-    });
+    const mut_linked = new Map<number, readonly LinkedIssue[]>();
 
-    if (Result.isErr(answered)) {
-      return new Map<number, readonly LinkedIssue[]>();
+    // A page that fails keeps the pages before it: the pull requests it would
+    // have covered fall back to their keywords, as every one does when GraphQL
+    // refuses outright.
+    let mut_after: string | null = null;
+
+    // A bound rather than a `while (true)`, as for {@link MAX_CHECK_RUN_PAGES}:
+    // the pages the REST list just took, and one for any opened since.
+    const maxPages = asUint32(Math.floor(openCount / PAGE_SIZE) + 2);
+
+    for (const _page of Arr.seq(maxPages)) {
+      const answered = await request('/graphql', {
+        body: JSON.stringify({
+          query,
+          variables: { owner: repo.owner, name: repo.name, after: mut_after },
+        }),
+      });
+
+      if (Result.isErr(answered)) {
+        break;
+      }
+
+      const parsed = parseJson(answered.value, ClosingIssuesSchema, '/graphql');
+
+      if (Result.isErr(parsed)) {
+        break;
+      }
+
+      const { nodes, pageInfo } = parsed.value.data.repository.pullRequests;
+
+      for (const node of nodes) {
+        mut_linked.set(
+          node.number,
+          closingIssuesIn(repo, node.closingIssuesReferences.nodes),
+        );
+      }
+
+      if (!pageInfo.hasNextPage || pageInfo.endCursor === null) {
+        break;
+      }
+
+      mut_after = pageInfo.endCursor;
     }
 
-    const parsed = parseJson(answered.value, ClosingIssuesSchema, '/graphql');
-
-    if (Result.isErr(parsed)) {
-      return new Map<number, readonly LinkedIssue[]>();
-    }
-
-    return new Map(
-      parsed.value.data.repository.pullRequests.nodes.map((node) => [
-        node.number,
-        closingIssuesIn(repo, node.closingIssuesReferences.nodes),
-      ]),
-    );
+    return mut_linked;
   };
 
   return {
@@ -643,11 +709,15 @@ export const createClient = (
       const mut_read = new Map<number, QueueComments>();
 
       for (const pr of pulls) {
-        // The first page, oldest first: each comment is edited in place, so it
-        // stays where it was first posted.
-        const listed = await getJson(
-          `/repos/${repo.owner}/${repo.name}/issues/${pr.number}/comments?per_page=${PAGE_SIZE}`,
-          CommentListSchema,
+        // Every page, oldest first: each comment is edited in place, so it
+        // stays where it was first posted, behind as many others as came after.
+        const listed = await collectPages(
+          async (page) =>
+            getJson(
+              `/repos/${repo.owner}/${repo.name}/issues/${pr.number}/comments?per_page=${PAGE_SIZE}&page=${page}`,
+              CommentListSchema,
+            ),
+          PAGE_SIZE,
         );
 
         if (Result.isOk(listed)) {
@@ -857,26 +927,18 @@ export const createClient = (
     facts: async (repo, options) => {
       const readsChecks = options?.checks ?? true;
 
-      const listed = await getJson(
-        `/repos/${repo.owner}/${repo.name}/pulls?state=open&per_page=${PAGE_SIZE}&sort=created&direction=asc`,
-        PullRequestListSchema,
-        FULL_MEDIA_TYPE,
-      );
+      // The links after the list rather than beside it: the list says how far
+      // to page them, and a list that fails spends nothing on them.
+      const listed = await openPulls(repo);
 
       if (Result.isErr(listed)) {
         return listed;
       }
 
-      if (Arr.isFixedLengthArray(PAGE_SIZE, listed.value)) {
-        return Result.err(
-          `There are at least ${PAGE_SIZE} open pull requests; this reads one page and would report a part of them as the whole.`,
-        );
-      }
-
       const linked =
         token === undefined
           ? new Map<number, readonly LinkedIssue[]>()
-          : await closingIssues(repo);
+          : await closingIssues(repo, listed.value.length);
 
       const mut_facts: PullRequestFacts[] = [];
 

@@ -1,6 +1,12 @@
-import { RE_RUN_GRACE_MS } from 'pr-report-core';
+// cspell:ignore unstub
+import { queueGraph, RE_RUN_GRACE_MS } from 'pr-report-core';
+import { Result } from 'ts-data-forge';
+import * as t from 'ts-fortress';
+import type { ReadonlyRecord } from 'ts-type-forge';
+import { parseJson, type ApiContext } from '../lib/index.mjs';
 import {
   latestMergedHead,
+  listPullRequests,
   pullRequestOfNode,
   pushersOfPage,
   rerunOf,
@@ -75,6 +81,171 @@ describe(pullRequestOfNode, () => {
     });
   });
 });
+
+describe(listPullRequests, () => {
+  test('reads every page, following the cursor, newest first', async () => {
+    const asked = stubOpenPages([[openNode(3), openNode(2)], [openNode(1)]]);
+
+    try {
+      const listed = await listPullRequests(LIST_API);
+
+      assert.isTrue(Result.isOk(listed));
+
+      assert.deepStrictEqual(
+        listed.value.map(({ number }) => number),
+        [3, 2, 1],
+      );
+
+      assert.deepStrictEqual(asked, [null, 'c1']);
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
+
+  test('fails the whole list when a later page cannot be read, rather than give the first pages as the whole', async () => {
+    stubOpenPages([[openNode(3), openNode(2)], undefined]);
+
+    try {
+      assert.isTrue(Result.isErr(await listPullRequests(LIST_API)));
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
+
+  // The oldest pull requests are on the last page. Read as the whole, the first
+  // page made one there merged: what named it in `Merge-After` went first, and
+  // its `blocks-release` no longer held the version pull request.
+  test('keeps a pull request on a later page open to the order the queue reads', async () => {
+    stubOpenPages([
+      [
+        openNode(3, { body: 'Merge-After: #1' }),
+        openNode(2, { labels: ['merge-queued', 'skip-ci'] }),
+      ],
+      [openNode(1, { labels: ['merge-queued', 'blocks-release'] })],
+    ]);
+
+    try {
+      const listed = await listPullRequests(LIST_API);
+
+      assert.isTrue(Result.isOk(listed));
+
+      const graph = queueGraph(
+        listed.value.map((pr) => ({
+          number: pr.number,
+          body: pr.body,
+          isDraft: pr.isDraft,
+          labels: pr.labels.map(({ name }) => name),
+          headRef: pr.headRefName,
+          baseRef: pr.baseRefName,
+          fromFork: pr.isCrossRepository,
+        })),
+        'main',
+      );
+
+      assert.isTrue(graph.openNumbers.has(1));
+
+      assert.deepStrictEqual(graph.dependencies.get(3), [1]);
+
+      assert.deepStrictEqual(
+        graph.releaseBlockers.map(({ number }) => number),
+        [1],
+      );
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
+});
+
+const LIST_API: ApiContext = {
+  repo: { owner: 'noshiro-pf', name: 'mono' },
+  token: 'token',
+} as const;
+
+/** An open pull request as `listPullRequests`'s query answers it. */
+const openNode = (
+  number: number,
+  overrides: Readonly<{ body?: string; labels?: readonly string[] }> = {},
+): ReadonlyRecord<string, unknown> =>
+  ({
+    number,
+    id: `PR_${number.toString()}`,
+    title: `pull request ${number.toString()}`,
+    body: overrides.body ?? '',
+    state: 'OPEN',
+    headRefName: `branch-${number.toString()}`,
+    headRefOid: 'a'.repeat(40),
+    baseRefName: 'main',
+    isCrossRepository: false,
+    isDraft: false,
+    mergeStateStatus: 'BEHIND',
+    autoMergeRequest: null,
+    labels: {
+      nodes: (overrides.labels ?? ['merge-queued']).map((name) => ({ name })),
+    },
+  }) as const;
+
+/**
+ * `fetch` answering the open pull requests in pages, newest first: `pages[0]`
+ * for no cursor, `pages[i]` for the cursor `c<i>`, and an error for a page that
+ * is `undefined`. Resolves to the cursors asked for, in order.
+ */
+const stubOpenPages = (
+  pages: readonly (readonly ReadonlyRecord<string, unknown>[] | undefined)[],
+): readonly (string | null)[] => {
+  const cursors = pages.map((_, index) =>
+    index === 0 ? null : `c${index.toString()}`,
+  );
+
+  const mut_asked: (string | null)[] = [];
+
+  vi.stubGlobal(
+    'fetch',
+    (_url: string, init?: Readonly<{ body?: unknown }>): Promise<Response> => {
+      const sent = parseJson(
+        typeof init?.body === 'string' ? init.body : '',
+        t.record({
+          variables: t.record({ after: t.optional(t.string()) }),
+        }),
+        'the request',
+      );
+
+      const after = Result.isOk(sent)
+        ? (sent.value.variables.after ?? null)
+        : null;
+
+      mut_asked.push(after);
+
+      const index = cursors.indexOf(after);
+
+      const page = pages[index];
+
+      return Promise.resolve(
+        new Response(
+          JSON.stringify(
+            page === undefined
+              ? { errors: [{ message: 'boom' }] }
+              : {
+                  data: {
+                    repository: {
+                      pullRequests: {
+                        pageInfo: {
+                          hasNextPage: index + 1 < pages.length,
+                          endCursor: cursors[index + 1] ?? null,
+                        },
+                        nodes: page,
+                      },
+                    },
+                  },
+                },
+          ),
+          { status: 200 },
+        ),
+      );
+    },
+  );
+
+  return mut_asked;
+};
 
 describe(latestMergedHead, () => {
   test('is the pull request merged last, and ignores one closed unmerged', () => {
