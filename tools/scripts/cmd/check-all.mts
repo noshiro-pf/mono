@@ -13,6 +13,7 @@ import {
   resolveScriptInvocations,
 } from './check-ci-commands.mjs';
 import { runJob } from './ci-job.mjs';
+import { ignoredBy, readGateList } from './workflow-steps.mjs';
 
 /**
  * Runs, one after another, the entries of the matrices of `code-check.yml` and
@@ -35,11 +36,12 @@ import { runJob } from './ci-job.mjs';
  *   `synstate-benchmark.yml`.
  * - A build an earlier entry already ran (`ws:build` covers `ws:build:deps`)
  *   is not run again while the tree stays as it left it, and one that failed
- *   is not run again either: the entries naming it are reported as not run.
+ *   is not run again either, nor one that covers it (`ws:build` after a failed
+ *   `ws:build:deps`): the entries naming either are reported as not run.
  *   CI's jobs start from a clean tree each; here an entry that rewrote the
- *   tree is reported, the next one runs on what it left, and the builds are
- *   run afresh from then on, so that no entry reads a `dist/` older than the
- *   sources it was built from.
+ *   tree is reported, the next one runs on what it left, and, if it wrote a
+ *   file a build reads, the builds are run afresh from then on, so that no
+ *   entry reads a `dist/` older than the sources it was built from.
  * - `fix:codemod:affected` runs in full, as on a manual CI run, because
  *   `CODEMOD_DIFF_BASE` is not set.
  * - Every step runs with `CI=true`, as in CI: Playwright then serves the
@@ -111,6 +113,18 @@ const checkAll = async (): Promise<number> => {
     return 0;
   }
 
+  // Read here rather than before the dry run, which never reads it; the list
+  // itself is held valid by the `check:root` guards that read it.
+  const codeGate = readGateList('code', projectRootPath);
+
+  if (!codeGate.ok) {
+    console.error(codeGate.message);
+
+    return 2;
+  }
+
+  const unreadByBuilds = ignoredBy(codeGate.value);
+
   console.info('Installing dependencies...');
 
   if ((await spawnPnpm({ args: ['install'], cwd: '.', env: {} })) !== 0) {
@@ -135,9 +149,17 @@ const checkAll = async (): Promise<number> => {
     const plan = planBuild(mut_state.builds, build);
 
     if (plan.kind === 'failed') {
-      mut_failures.push(
-        `${command} was not run: its build, ${plan.build}, failed above.`,
-      );
+      const message = notRunMessage({
+        command,
+        build: plan.build,
+        failed: plan.failed,
+        where: 'above',
+      });
+
+      // Under the entry's header now, and with the failures at the end.
+      console.info(message);
+
+      mut_failures.push(message);
 
       mut_notRun.push(run);
 
@@ -156,15 +178,18 @@ const checkAll = async (): Promise<number> => {
       build: needed,
       failed: outcome.buildFailed,
       wrote: outcome.wrote,
+      readByBuilds: (file) => !unreadByBuilds(file),
     });
 
     mut_failures.push(...outcome.failures);
 
     // Its own build failing leaves the command not run, as a later entry's is.
-    if (outcome.buildFailed) {
-      mut_failures.push(
-        `${command} was not run: its build, ${needed ?? ''}, failed.`,
-      );
+    if (needed !== undefined && outcome.buildFailed) {
+      const message = notRunMessage({ command, build: needed, where: 'here' });
+
+      console.info(message);
+
+      mut_failures.push(message);
 
       mut_notRun.push(run);
     } else {
@@ -227,7 +252,7 @@ export const selectEntries = (
 
   const mut_named = new Set<string>();
 
-  for (const entry of entries) {
+  for (const [index, entry] of entries.entries()) {
     const { command } = entry;
 
     if (command === undefined) {
@@ -248,7 +273,7 @@ export const selectEntries = (
     ] as const;
 
     if (all || Arr.isEmpty(entryNeeds)) {
-      mut_run.push({ command, build });
+      mut_run.push({ command, build, entry: index });
 
       continue;
     }
@@ -256,7 +281,11 @@ export const selectEntries = (
     const parts = resolveScriptInvocations(scripts[command] ?? '').local;
 
     if (Arr.isEmpty(parts)) {
-      mut_skipped.push({ command, needs: entryNeeds.join(' and ') });
+      mut_skipped.push({
+        command,
+        needs: entryNeeds.join(' and '),
+        entry: index,
+      });
 
       continue;
     }
@@ -265,11 +294,16 @@ export const selectEntries = (
       const partNeeds = needs[part];
 
       if (partNeeds === undefined) {
-        mut_run.push({ command: part, build, partOf: command });
+        mut_run.push({ command: part, build, partOf: command, entry: index });
       } else {
         mut_named.add(part);
 
-        mut_skipped.push({ command: part, partOf: command, needs: partNeeds });
+        mut_skipped.push({
+          command: part,
+          partOf: command,
+          needs: partNeeds,
+          entry: index,
+        });
       }
     }
   }
@@ -287,14 +321,47 @@ export const selectEntries = (
   return { run: mut_run, skipped: mut_skipped };
 };
 
+/**
+ * Why an entry or part was not run: its build failed here, or failed for an
+ * earlier entry, or a build its own covers ({@link BUILD_COVERS}) failed
+ * earlier, which its own would too.
+ */
+export const notRunMessage = ({
+  command,
+  build,
+  ...when
+}: Readonly<
+  {
+    command: string;
+    /** The entry's build. */
+    build: string;
+  } & (
+    | { where: 'here' }
+    | {
+        where: 'above';
+        /** The build that failed: `build` itself or one it covers. */
+        failed: string;
+      }
+  )
+>): string =>
+  when.where === 'here'
+    ? (`${command} was not run: its build, ${build}, failed.` as const)
+    : when.failed === build
+      ? (`${command} was not run: its build, ${build}, failed above.` as const)
+      : (`${command} was not run: its build, ${build}, covers ${when.failed}, which failed above.` as const);
+
 /** How a skipped entry or part is listed. */
 export const describeSkipped = ({ command, partOf, needs }: Skipped): string =>
   `${command}${partOf === undefined ? '' : `, part of ${partOf}`} (needs ${needs}; run with --all)` as const;
 
 /**
  * What ran against what the matrices hold, by entry: a bundle opened into its
- * parts counts as one entry rather than its parts as entries; one whose build
- * failed counts as not run, and one whose every part was skipped as skipped.
+ * parts counts as one entry rather than its parts as entries, and as run once
+ * any part of it ran; one that ran nothing because its build failed counts as
+ * not run, and one whose every part was skipped as skipped.
+ * Entries are told apart by their place among the matrix entries, not by their
+ * command, so that two matrices listing one command count as two, and an entry
+ * run whole is not taken for a bundle of its name.
  */
 export const summarizeRun = ({
   entries,
@@ -315,17 +382,17 @@ export const summarizeRun = ({
 
   const partsRan = ran.length - ranWhole;
 
-  const ranEntries = new Set<string>(ran.map(entryOf));
+  const ranEntries = new Set<number>(ran.map(({ entry }) => entry));
 
   // An entry part of which ran is counted as run; one that ran nothing and
   // whose build failed, as not run.
-  const notRunEntries = Arr.uniq(notRun.map(entryOf)).filter(
+  const notRunEntries = Arr.uniq(notRun.map(({ entry }) => entry)).filter(
     (entry) => !ranEntries.has(entry),
   );
 
-  const counted = new Set<string>([...ranEntries, ...notRunEntries]);
+  const counted = new Set<number>([...ranEntries, ...notRunEntries]);
 
-  const skippedWhole = Arr.uniq(skipped.map(entryOf)).filter(
+  const skippedWhole = Arr.uniq(skipped.map(({ entry }) => entry)).filter(
     (entry) => !counted.has(entry),
   ).length;
 
@@ -348,22 +415,32 @@ export const summarizeRun = ({
  * Whether an entry's build is to run: not when there is none or an earlier
  * entry ran it or a build that covers it ({@link BUILD_COVERS}), and not when
  * it failed or a build it covers did, whose entries are then reported rather
- * than run.
+ * than run, naming the build that failed.
  */
 export const planBuild = (
   { built, failed }: BuildMemory,
   build: string | undefined,
-): Readonly<{ kind: 'none' } | { kind: 'run' | 'failed'; build: string }> => {
+): Readonly<
+  | { kind: 'none' }
+  | { kind: 'run'; build: string }
+  | {
+      kind: 'failed';
+      build: string;
+      /** The build that failed: `build` itself or one it covers. */
+      failed: string;
+    }
+> => {
   if (build === undefined) {
     return { kind: 'none' };
   }
 
   // A build fails as what it builds failed, and is done as what builds it was.
-  if (
-    failed.has(build) ||
-    (BUILD_COVERS.get(build) ?? []).some((covered) => failed.has(covered))
-  ) {
-    return { kind: 'failed', build };
+  const failedBuild = Arr.toUnshifted(build)(
+    BUILD_COVERS.get(build) ?? [],
+  ).find((candidate) => failed.has(candidate));
+
+  if (failedBuild !== undefined) {
+    return { kind: 'failed', build, failed: failedBuild };
   }
 
   return built.has(build) ||
@@ -376,11 +453,15 @@ export const planBuild = (
 
 /**
  * The memory after an entry: its build, if it ran one, as built or failed; and
- * nothing at all once the entry changed the tree, since a build from before may
- * then be older than its sources (`ws:gen` before `ws:doc`). A build that
- * failed leaves no other built either: a package's build empties its `dist/`
- * before it writes, so a failure partway can take out what an earlier build
- * wrote.
+ * nothing else once the entry changed a file a build reads, since a build from
+ * before may then be older than its sources (`ws:gen` before `ws:doc`). A write
+ * no build reads (a formatted Markdown file) keeps the memory.
+ *
+ * A build that failed is remembered as failed whatever it wrote: the entry ran
+ * nothing after it, so what it wrote is its own, and a build writes no source
+ * (`CLAUDE.md`, "Build"), so running it again would fail again. It leaves no
+ * other built either: a package's build empties its `dist/` before it writes,
+ * so a failure partway can take out what an earlier build wrote.
  */
 export const rememberBuild = (
   memory: BuildMemory,
@@ -388,21 +469,24 @@ export const rememberBuild = (
     build,
     failed,
     wrote,
+    readByBuilds,
   }: Readonly<{
     build: string | undefined;
     failed: boolean;
     wrote: readonly string[];
+    /** Whether a build reads a path (what the code gate does not ignore). */
+    readByBuilds: (file: string) => boolean;
   }>,
 ): BuildMemory =>
-  Arr.isNonEmpty(wrote)
-    ? NO_BUILDS
-    : build === undefined
-      ? memory
-      : failed
-        ? ({
-            built: new Set<string>(),
-            failed: new Set<string>([...memory.failed, build]),
-          } as const)
+  build !== undefined && failed
+    ? ({
+        built: new Set<string>(),
+        failed: new Set<string>([...memory.failed, build]),
+      } as const)
+    : wrote.some(readByBuilds)
+      ? NO_BUILDS
+      : build === undefined
+        ? memory
         : ({
             built: new Set<string>([...memory.built, build]),
             failed: memory.failed,
@@ -433,6 +517,11 @@ type Run = Readonly<{
   build: string | undefined;
   /** The bundle a part was opened out of. */
   partOf?: string;
+  /**
+   * The place of its matrix entry among those `selectEntries` was given, which
+   * tells it apart; `summarizeRun` is given the same entries.
+   */
+  entry: number;
 }>;
 
 type Skipped = Readonly<{
@@ -440,6 +529,8 @@ type Skipped = Readonly<{
   partOf?: string;
   /** What it needs that this machine lacks, in words. */
   needs: string;
+  /** As {@link Run}'s. */
+  entry: number;
 }>;
 
 type EntrySelection = Readonly<{
@@ -466,12 +557,6 @@ export const MATRIX_WORKFLOWS = [
   '.github/workflows/code-check.yml',
   '.github/workflows/style-check.yml',
 ] as const;
-
-/** The matrix entry a run or a skip belongs to. */
-const entryOf = ({
-  command,
-  partOf,
-}: Readonly<{ command: string; partOf?: string }>): string => partOf ?? command;
 
 if (isDirectlyExecuted(import.meta.url)) {
   const exitCode = await checkAll().catch((error: unknown) => {

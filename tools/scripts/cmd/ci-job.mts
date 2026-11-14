@@ -7,6 +7,7 @@ import { plural } from '../lib/plural.mjs';
 import {
   diffSnapshots,
   git,
+  isRegularFile,
   snapshotTree,
   spawnPnpm,
   splitZ,
@@ -77,7 +78,13 @@ export const runJob = async ({
 
   const wrote = Arr.uniq(mut_results.flatMap((result) => result.wrote));
 
-  await printWrites(writesToShow({ written: wrote, changedAtStart: initial }));
+  await printWrites(
+    writesToShow({
+      written: wrote,
+      changedAtStart: initial,
+      cleanStart: requireCleanStart,
+    }),
+  );
 
   return {
     failures: [
@@ -134,22 +141,29 @@ export const commandFailedAnnotation = (failure: string): string =>
  * Of the files the steps wrote, those whose diff is the steps' alone, and those
  * changed before the first step too, whose diff from the index would show edits
  * that were already on the tree (a local run's, or an earlier `check-all`
- * entry's) as the steps' own.
+ * entry's) as the steps' own. On a checkout that started clean (CI's,
+ * `cleanStart`) every write is shown: a file changed before the first step was
+ * changed by the setup or `pnpm install`, which the job fails for anyway, and
+ * its diff from the index is exactly what they and the steps wrote.
  */
 export const writesToShow = ({
   written,
   changedAtStart,
+  cleanStart,
 }: Readonly<{
   written: readonly string[];
   changedAtStart: ReadonlyMap<string, string>;
+  cleanStart: boolean;
 }>): Readonly<{
   shown: readonly string[];
   alreadyChanged: readonly string[];
 }> =>
-  ({
-    shown: written.filter((file) => !changedAtStart.has(file)),
-    alreadyChanged: written.filter((file) => changedAtStart.has(file)),
-  }) as const;
+  cleanStart
+    ? ({ shown: written, alreadyChanged: [] } as const)
+    : ({
+        shown: written.filter((file) => !changedAtStart.has(file)),
+        alreadyChanged: written.filter((file) => changedAtStart.has(file)),
+      } as const);
 
 /**
  * The `git` invocations that print what the steps wrote: one `git diff` per
@@ -159,19 +173,35 @@ export const writesToShow = ({
  * alone would leave out (`z:assert-repo-is-clean` showed them by `git add -N`
  * first; this leaves the index alone). The new files past those are named, not
  * shown, so that a generator writing a directory of them does not bury the
- * failure under their content.
+ * failure under their content; so is a new path that is not a regular file (the
+ * `dir/` of an untracked nested repository), which `git diff --no-index` cannot
+ * read and answers with the same exit code 1 as a difference.
  */
 export const diffInvocations = ({
   files,
   untracked,
+  isFile,
 }: Readonly<{
   files: readonly string[];
   untracked: ReadonlySet<string>;
+  /** Whether a path is a regular file now. */
+  isFile: (file: string) => boolean;
 }>): Readonly<{
   invocations: readonly (readonly string[])[];
   newFilesNotShown: readonly string[];
 }> => {
   const newFiles = files.filter((file) => untracked.has(file));
+
+  // The first regular files, without asking about the rest: a generator can
+  // write thousands. A regular file git still cannot read (no read permission,
+  // or removed after the stat) gets exit code 1 too and counts as shown, and a
+  // path a step created and a later one removed lands in a tracked batch that
+  // prints nothing for it, as does a tracked file a later step put back as the
+  // index has it; none of them is named below, and the job's failure names
+  // every path the steps wrote whatever is shown here.
+  const shownNew = new Set<string>(
+    Iterator.from(newFiles).filter(isFile).take(NEW_FILES_SHOWN),
+  );
 
   return {
     invocations: [
@@ -179,13 +209,71 @@ export const diffInvocations = ({
         files.filter((file) => !untracked.has(file)),
         DIFF_BATCH,
       ).map((batch) => [...DIFF_ARGS, '--', ...batch]),
-      ...newFiles
-        .slice(0, NEW_FILES_SHOWN)
-        .map((file) => [...DIFF_ARGS, '--no-index', '--', '/dev/null', file]),
+      ...Array.from(shownNew, (file) => [
+        ...DIFF_ARGS,
+        '--no-index',
+        '--',
+        '/dev/null',
+        file,
+      ]),
     ],
-    newFilesNotShown: newFiles.slice(NEW_FILES_SHOWN),
+    newFilesNotShown: newFiles.filter((file) => !shownNew.has(file)),
   };
 };
+
+/**
+ * The files whose diff was not shown: those of every invocation that failed
+ * (each ends in its files, after the `--`), wherever it stood among the others,
+ * which still ran, and then the new files not diffed at all.
+ */
+export const filesNotShown = ({
+  invocations,
+  outcomes,
+  newFilesNotShown,
+}: Readonly<{
+  invocations: readonly (readonly string[])[];
+  /** What each invocation did, by index. */
+  outcomes: readonly DiffOutcome[];
+  newFilesNotShown: readonly string[];
+}>): readonly string[] =>
+  [
+    ...invocations
+      .filter((_, index) => outcomes[index] === 'failed')
+      .flatMap(pathsOf),
+    ...newFilesNotShown,
+  ] as const;
+
+/**
+ * The paths an invocation diffs: those after its `--`, `/dev/null` aside.
+ * Every invocation {@link diffInvocations} builds has its `--` before the first
+ * path, so a path named `--` is a path here.
+ */
+export const pathsOf = (args: readonly string[]): readonly string[] =>
+  args.slice(args.indexOf('--') + 1).filter((file) => file !== '/dev/null');
+
+/**
+ * The heading over the files whose diff is not shown: "more" only when some
+ * diff was shown above it.
+ */
+export const notShownHeading = (count: number, anyShown: boolean): string =>
+  anyShown
+    ? (`And ${plural(count, 'more file')} whose diff is not shown:` as const)
+    : (`${plural(count, 'file')} whose diff is not shown:` as const);
+
+/**
+ * What a `git diff --exit-code` did ({@link DIFF_ARGS}): printed a diff (exit
+ * 1), printed nothing (exit 0), or failed to run or exited otherwise.
+ */
+export const diffOutcome = (
+  result: Readonly<{ status: number | null; error?: unknown }>,
+): DiffOutcome =>
+  result.error !== undefined
+    ? 'failed'
+    : result.status === DIFFERENCES_FOUND
+      ? 'shown'
+      : result.status === 0
+        ? 'empty'
+        : 'failed';
 
 /** A tree already changed before the job's first step. */
 export const dirtyStartFailures = (
@@ -242,6 +330,8 @@ export type JobOutcome = Readonly<{
   wrote: readonly string[];
 }>;
 
+export type DiffOutcome = 'shown' | 'empty' | 'failed';
+
 export type StepResult = Readonly<{
   title: string;
   exitCode: number;
@@ -259,11 +349,16 @@ const DIFF_ARGS = [
   '--no-pager',
   '--literal-pathspecs',
   'diff',
+  '--exit-code',
   '--no-ext-diff',
   '--no-color',
 ] as const;
 
-/** `git diff --no-index` exits 1 when the two sides differ, as a new file does. */
+/**
+ * `git diff --exit-code` (which `--no-index` implies) exits 1 when it printed a
+ * difference, as a new file has, and 0 when it printed nothing. `--no-index`
+ * exits 1 too on a path it cannot read (see {@link diffInvocations}).
+ */
 const DIFFERENCES_FOUND = 1;
 
 const USAGE =
@@ -271,40 +366,41 @@ const USAGE =
 
 /**
  * Runs each `git diff` in turn, its output going straight to the log, and
- * returns the index of the first that failed, or -1. One at a time, so the
- * diffs do not interleave.
+ * returns what each did ({@link diffOutcome}). One at a time, so the diffs do
+ * not interleave; every one, so that one that fails hides no other's diff.
  */
-const firstFailedDiff = async (
+const runDiffs = async (
   invocations: readonly (readonly string[])[],
-): Promise<number> => {
+): Promise<readonly DiffOutcome[]> => {
+  const mut_outcomes: DiffOutcome[] = [];
+
   for (const [index, args] of invocations.entries()) {
     const result = await runInherited('git', args, { cwd: projectRootPath });
 
-    const failed =
-      result.error !== undefined ||
-      (result.status !== 0 && result.status !== DIFFERENCES_FOUND);
+    const outcome = diffOutcome(result);
 
-    if (failed) {
+    mut_outcomes.push(outcome);
+
+    if (outcome === 'failed') {
       console.error(
-        `git diff of the changed files failed: ${unknownToString(result.error ?? result.signal ?? result.status)}`,
+        `git diff invocation ${index + 1} of ${invocations.length} (${plural(pathsOf(args).length, 'path')}) failed: ${unknownToString(result.error ?? result.signal ?? result.status)}`,
       );
-
-      return index;
     }
   }
 
-  return -1;
+  return mut_outcomes;
 };
 
 /**
  * Prints the diffs of `files`; the files whose diff it did not show, the new
- * ones past the first few, and every one a failed git left out.
+ * ones past the first few or not regular files, and every one a failed git left
+ * out; and whether any diff was shown.
  */
 const printDiffs = async (
   files: readonly string[],
-): Promise<readonly string[]> => {
+): Promise<Readonly<{ notShown: readonly string[]; anyShown: boolean }>> => {
   if (Arr.isEmpty(files)) {
-    return [];
+    return { notShown: [], anyShown: false };
   }
 
   const untracked = await Result.fromPromise(
@@ -330,26 +426,21 @@ const printDiffs = async (
       `git ls-files of the changed files failed: ${unknownToString(untracked.value)}`,
     );
 
-    return files;
+    return { notShown: files, anyShown: false };
   }
 
   const { invocations, newFilesNotShown } = diffInvocations({
     files,
     untracked: untracked.value,
+    isFile: isRegularFile,
   });
 
-  const failedAt = await firstFailedDiff(invocations);
+  const outcomes = await runDiffs(invocations);
 
-  // Every invocation ends in its files, after the `--`.
-  return failedAt === -1
-    ? newFilesNotShown
-    : [
-        ...invocations
-          .slice(failedAt)
-          .flatMap((args) => args.slice(args.indexOf('--') + 1))
-          .filter((file) => file !== '/dev/null'),
-        ...newFilesNotShown,
-      ];
+  return {
+    notShown: filesNotShown({ invocations, outcomes, newFilesNotShown }),
+    anyShown: outcomes.includes('shown'),
+  };
 };
 
 /**
@@ -364,13 +455,10 @@ const printWrites = async ({
   shown,
   alreadyChanged,
 }: ReturnType<typeof writesToShow>): Promise<void> => {
-  const notShown = await printDiffs(shown);
+  const { notShown, anyShown } = await printDiffs(shown);
 
   for (const [heading, files] of [
-    [
-      `And ${plural(notShown.length, 'more file')} whose diff is not shown:`,
-      notShown,
-    ],
+    [notShownHeading(notShown.length, anyShown), notShown],
     [
       'Changed before the first step too, so their diff is not shown (it would hold the edits already there):',
       alreadyChanged,

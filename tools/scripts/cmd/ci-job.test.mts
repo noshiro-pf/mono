@@ -1,14 +1,19 @@
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
+import { Arr } from 'ts-data-forge';
 import { projectRootPath } from '../project-root-path.mjs';
 import {
   COMMAND_FAILED_ANNOTATION,
   commandFailedAnnotation,
   commandFailureOf,
   diffInvocations,
+  diffOutcome,
   dirtyStartFailures,
+  filesNotShown,
   jobFailures,
   jobSteps,
+  notShownHeading,
+  pathsOf,
   writesToShow,
 } from './ci-job.mjs';
 
@@ -165,6 +170,7 @@ describe('writesToShow', () => {
       writesToShow({
         written: ['docs/a.md', 'libs/a/src/index.mts'],
         changedAtStart: new Map<string, string>([['docs/a.md', 'abc']]),
+        cleanStart: false,
       }),
       { shown: ['libs/a/src/index.mts'], alreadyChanged: ['docs/a.md'] },
     );
@@ -175,8 +181,23 @@ describe('writesToShow', () => {
       writesToShow({
         written: ['docs/a.md'],
         changedAtStart: new Map<string, string>(),
+        cleanStart: false,
       }),
       { shown: ['docs/a.md'], alreadyChanged: [] },
+    );
+  });
+
+  // In CI the checkout starts clean, so a file changed before the first step
+  // was changed by the setup, and its diff from the index is the setup's and
+  // the step's writes, nothing else.
+  test('on a checkout required to start clean, a file the setup changed is diffed too', () => {
+    assert.deepStrictEqual(
+      writesToShow({
+        written: ['docs/a.md', 'libs/a/src/index.mts'],
+        changedAtStart: new Map<string, string>([['docs/a.md', 'abc']]),
+        cleanStart: true,
+      }),
+      { shown: ['docs/a.md', 'libs/a/src/index.mts'], alreadyChanged: [] },
     );
   });
 });
@@ -186,6 +207,7 @@ describe('diffInvocations', () => {
     '--no-pager',
     '--literal-pathspecs',
     'diff',
+    '--exit-code',
     '--no-ext-diff',
     '--no-color',
   ] as const;
@@ -196,6 +218,7 @@ describe('diffInvocations', () => {
       diffInvocations({
         files: ['docs/a.md', 'docs/new.md'],
         untracked: new Set<string>(['docs/new.md']),
+        isFile: () => true,
       }),
       {
         invocations: [
@@ -211,9 +234,11 @@ describe('diffInvocations', () => {
     const files = Array.from({ length: 501 }, (_, i) => `f${i}`);
 
     assert.deepStrictEqual(
-      diffInvocations({ files, untracked: new Set<string>() }).invocations.map(
-        (args) => args.length - base.length - 1,
-      ),
+      diffInvocations({
+        files,
+        untracked: new Set<string>(),
+        isFile: () => true,
+      }).invocations.map((args) => args.length - base.length - 1),
       [500, 1],
     );
   });
@@ -226,10 +251,120 @@ describe('diffInvocations', () => {
     const { invocations, newFilesNotShown } = diffInvocations({
       files,
       untracked: new Set<string>(files),
+      isFile: () => true,
     });
 
     assert.lengthOf(invocations, 20);
 
     assert.deepStrictEqual(newFilesNotShown, ['new/f20', 'new/f21']);
+  });
+
+  // `git diff --no-index` exits 1 on a path it cannot read, as on a difference,
+  // so the path would be neither shown nor named.
+  test('a new path that is not a regular file is named, not diffed', () => {
+    assert.deepStrictEqual(
+      diffInvocations({
+        files: ['docs/new.md', 'sub/'],
+        untracked: new Set<string>(['docs/new.md', 'sub/']),
+        isFile: (file) => file !== 'sub/',
+      }),
+      {
+        invocations: [
+          [...base, '--no-index', '--', '/dev/null', 'docs/new.md'],
+        ],
+        newFilesNotShown: ['sub/'],
+      },
+    );
+  });
+
+  test('a path that is not a regular file takes none of the 20 places', () => {
+    const files = Array.from({ length: 21 }, (_, i) => `new/f${i}`);
+
+    const { invocations, newFilesNotShown } = diffInvocations({
+      files: Arr.toUnshifted('sub/')(files),
+      untracked: new Set<string>(Arr.toUnshifted('sub/')(files)),
+      isFile: (file) => file !== 'sub/',
+    });
+
+    assert.lengthOf(invocations, 20);
+
+    assert.deepStrictEqual(newFilesNotShown, ['sub/', 'new/f20']);
+  });
+});
+
+describe('filesNotShown', () => {
+  const invocations = [
+    ['diff', '--', 'a', 'b'],
+    ['diff', '--', 'c'],
+    ['diff', '--no-index', '--', '/dev/null', 'new'],
+  ] as const;
+
+  // One failed git hides no later diff: the others ran, and only its files are
+  // named.
+  test('names the files of each failed invocation alone, wherever it stands', () => {
+    assert.deepStrictEqual(
+      filesNotShown({
+        invocations,
+        outcomes: ['failed', 'shown', 'failed'],
+        newFilesNotShown: ['more'],
+      }),
+      ['a', 'b', 'new', 'more'],
+    );
+  });
+
+  test('with none failed, only the new files not diffed', () => {
+    assert.deepStrictEqual(
+      filesNotShown({
+        invocations,
+        outcomes: ['shown', 'empty', 'shown'],
+        newFilesNotShown: ['more'],
+      }),
+      ['more'],
+    );
+  });
+});
+
+describe('notShownHeading', () => {
+  test('says "more" only below a diff that was shown', () => {
+    assert.strictEqual(
+      notShownHeading(2, true),
+      'And 2 more files whose diff is not shown:',
+    );
+
+    // After a failed `git ls-files`, nothing was shown above it.
+    assert.strictEqual(
+      notShownHeading(2, false),
+      '2 files whose diff is not shown:',
+    );
+  });
+});
+
+describe('diffOutcome', () => {
+  // `--exit-code` is what tells a diff printed from none.
+  test('exit 1 printed a diff, exit 0 nothing, anything else failed', () => {
+    assert.strictEqual(diffOutcome({ status: 1, error: undefined }), 'shown');
+
+    assert.strictEqual(diffOutcome({ status: 0, error: undefined }), 'empty');
+
+    assert.strictEqual(
+      diffOutcome({ status: 128, error: undefined }),
+      'failed',
+    );
+
+    assert.strictEqual(
+      diffOutcome({ status: null, error: new Error('spawn git ENOENT') }),
+      'failed',
+    );
+  });
+});
+
+describe('pathsOf', () => {
+  test('the paths after the `--`, not the `/dev/null` a new file is diffed from', () => {
+    assert.deepStrictEqual(
+      pathsOf(['diff', '--no-index', '--', '/dev/null', 'docs/new.md']),
+      ['docs/new.md'],
+    );
+
+    assert.deepStrictEqual(pathsOf(['diff', '--', 'a', 'b']), ['a', 'b']);
   });
 });
