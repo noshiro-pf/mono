@@ -28,6 +28,10 @@ export const readPackages = async (): Promise<readonly PackageInfo[]> => {
     ),
   );
 
+  const members: ReadonlySet<string> = new Set<string>(
+    workspace.map(({ name }) => name),
+  );
+
   return workspace.map((pkg, index) => {
     const dir = path
       .relative(projectRootPath, pkg.path)
@@ -40,7 +44,7 @@ export const readPackages = async (): Promise<readonly PackageInfo[]> => {
       scripts: new Set(scriptsOf(pkg.packageJson).keys()),
       isPrivate:
         isRecord(pkg.packageJson) && pkg.packageJson['private'] === true,
-      ...readManifestDependencies(pkg.packageJson),
+      ...readManifestDependencies(pkg.packageJson, members),
       forgottenExportsRead: readsForgottenExports({
         name: pkg.name,
         dir,
