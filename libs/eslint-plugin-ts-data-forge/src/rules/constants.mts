@@ -2,6 +2,9 @@ import * as ts from 'typescript';
 
 export const TS_DATA_FORGE_MODULE = 'ts-data-forge';
 
+/** Where the types ts-data-forge re-exports, the branded numbers among them, are defined. */
+export const TS_TYPE_FORGE_MODULE = 'ts-type-forge';
+
 /** Where the algebraic data types ts-data-forge re-exports are defined. */
 export const TS_STD_FORGE_MODULE = 'ts-std-forge';
 
