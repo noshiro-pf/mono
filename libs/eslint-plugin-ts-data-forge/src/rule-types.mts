@@ -212,7 +212,7 @@ namespace PreferRangeForLoop {
 }
 
 /**
- * @description Replace `Object.hasOwn(obj, key)` or `key in obj` with `isRecord(obj) && hasKey(obj, key)` from ts-data-forge
+ * @description Replace `Object.hasOwn(obj, key)` or `key in obj` with `isRecord(obj) && hasKey(obj, key)`, and `Reflect.has(obj, key)` on a plain record with `hasKey(obj, key)`, from ts-data-forge
  *
  *  ```md
  *  | key            | value      |

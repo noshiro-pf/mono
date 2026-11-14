@@ -91,7 +91,14 @@ ruleTester.run(
   'createPreferIsRecordAndHasKey',
   createPreferIsRecordAndHasKey({ moduleName: 'my-lib' }),
   {
-    valid: [],
+    valid: [
+      {
+        name: 'leaves Reflect.has alone without type information',
+        code: dedent`
+          const ok = Reflect.has(obj, 'a');
+        `,
+      },
+    ],
     invalid: [
       {
         name: 'suggests, from the module it is given, keeping isRecord without type information',

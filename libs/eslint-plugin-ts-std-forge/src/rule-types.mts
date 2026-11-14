@@ -26,7 +26,7 @@ namespace PreferIsNonNullObject {
 }
 
 /**
- * @description Replace `Object.hasOwn(obj, key)` or `key in obj` with `isRecord(obj) && hasKey(obj, key)` from ts-std-forge
+ * @description Replace `Object.hasOwn(obj, key)` or `key in obj` with `isRecord(obj) && hasKey(obj, key)`, and `Reflect.has(obj, key)` on a plain record with `hasKey(obj, key)`, from ts-std-forge
  *
  *  ```md
  *  | key            | value      |

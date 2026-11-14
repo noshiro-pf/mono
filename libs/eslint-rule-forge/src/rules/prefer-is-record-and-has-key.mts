@@ -4,6 +4,7 @@ import {
   type TSESTree,
 } from '@typescript-eslint/utils';
 import * as ts from 'typescript';
+import { isRuntimeBound } from '../bindings.mjs';
 import { bindValueImportsAt, type EquivalentModule } from '../imports.mjs';
 import { getArgumentText } from '../parentheses.mjs';
 import {
@@ -16,13 +17,18 @@ import { builtBy } from './rule-factory.mjs';
 /**
  * Builds a rule that replaces `Object.hasOwn(obj, key)` and `key in obj` with
  * `isRecord(obj) && hasKey(obj, key)` imported from `moduleName`, or with
- * `hasKey(obj, key)` alone when `obj` is already a record.
+ * `hasKey(obj, key)` alone when `obj` is already a record, and
+ * `Reflect.has(obj, key)` on a plain record with `hasKey(obj, key)`.
  *
  * `key in obj` is fixed only on an object type literal or a mapped type with a
  * string index signature; anywhere else the rewrite is a suggestion, because
  * `hasKey` checks own properties where `in` walks the prototype chain
  * (`'then' in promise`, `'size' in map`, a class method) and `isRecord` rejects
  * the functions `in` accepts.
+ *
+ * `Reflect.has(obj, key)`, which answers as `key in obj` does, is reported only
+ * on a plain record, and fixed or suggested there as `key in obj` is; anywhere
+ * else reading the prototype chain is what it is for.
  */
 export const createPreferIsRecordAndHasKey = ({
   moduleName,
@@ -48,7 +54,7 @@ export const createPreferIsRecordAndHasKey = ({
     meta: {
       type: 'suggestion',
       docs: {
-        description: `Replace \`Object.hasOwn(obj, key)\` or \`key in obj\` with \`isRecord(obj) && hasKey(obj, key)\` from ${moduleName}`,
+        description: `Replace \`Object.hasOwn(obj, key)\` or \`key in obj\` with \`isRecord(obj) && hasKey(obj, key)\`, and \`Reflect.has(obj, key)\` on a plain record with \`hasKey(obj, key)\`, from ${moduleName}`,
       },
       fixable: 'code',
       hasSuggestions: true,
@@ -134,29 +140,51 @@ export const createPreferIsRecordAndHasKey = ({
       const mut_nodesToFix: {
         node: TSESTree.CallExpression | TSESTree.BinaryExpression;
         /**
-         * Whether the node is `key in obj`, which reads the prototype chain
-         * that `hasKey` does not.
+         * Whether the node is `key in obj` or `Reflect.has(obj, key)`, which
+         * read the prototype chain that `hasKey` does not.
          */
-        isIn: boolean;
+        readsPrototypeChain: boolean;
         objExpression: TSESTree.Expression;
         keyExpression: TSESTree.Expression;
       }[] = [];
 
       return {
-        // Handle Object.hasOwn(obj, key)
+        // Handle Object.hasOwn(obj, key) and Reflect.has(obj, key)
         CallExpression: (node) => {
           const callee = skipTypeWrappers(node.callee);
 
           if (
             callee.type !== AST_NODE_TYPES.MemberExpression ||
-            !isIdentifierNamed(callee.object, 'Object') ||
-            callee.property.type !== AST_NODE_TYPES.Identifier ||
-            callee.property.name !== 'hasOwn'
+            callee.computed ||
+            callee.property.type !== AST_NODE_TYPES.Identifier
           ) {
             return;
           }
 
-          // Check arguments: Object.hasOwn(obj, key)
+          const isReflectHas =
+            isIdentifierNamed(callee.object, 'Reflect') &&
+            callee.property.name === 'has';
+
+          const isObjectHasOwn =
+            isIdentifierNamed(callee.object, 'Object') &&
+            callee.property.name === 'hasOwn';
+
+          const globalName = isReflectHas
+            ? 'Reflect'
+            : isObjectHasOwn
+              ? 'Object'
+              : undefined;
+
+          // A `Reflect` or `Object` value the file binds is not the global; a
+          // type of that name does not hide it.
+          if (
+            globalName === undefined ||
+            isRuntimeBound(sourceCode, node, globalName)
+          ) {
+            return;
+          }
+
+          // Check arguments: Object.hasOwn(obj, key), Reflect.has(obj, key)
           if (node.arguments.length !== 2) {
             return;
           }
@@ -173,14 +201,21 @@ export const createPreferIsRecordAndHasKey = ({
           if (
             objArg.type === AST_NODE_TYPES.SpreadElement ||
             keyArg.type === AST_NODE_TYPES.SpreadElement ||
-            mayBeArray(objArg)
+            mayBeArray(objArg) ||
+            // Off a plain record, `Reflect.has` reads the prototype chain on
+            // purpose. On one, it is taken at its type, as `in` is: an object
+            // typed as a record that has a prototype of its own
+            // (`Object.create(proto)`, a Proxy) is not told apart. Both
+            // predicates run again in `Program:exit`, a second walk only for
+            // the `Reflect.has` calls that reach it.
+            (isReflectHas && !(isKnownRecord(objArg) && isPlainObject(objArg)))
           ) {
             return;
           }
 
           mut_nodesToFix.push({
             node,
-            isIn: false,
+            readsPrototypeChain: isReflectHas,
             objExpression: objArg,
             keyExpression: keyArg,
           });
@@ -206,7 +241,7 @@ export const createPreferIsRecordAndHasKey = ({
 
           mut_nodesToFix.push({
             node,
-            isIn: true,
+            readsPrototypeChain: true,
             objExpression,
             keyExpression,
           });
@@ -235,7 +270,7 @@ export const createPreferIsRecordAndHasKey = ({
 
           for (const {
             node,
-            isIn,
+            readsPrototypeChain,
             objExpression,
             keyExpression,
           } of mut_nodesToFix) {
@@ -257,6 +292,10 @@ export const createPreferIsRecordAndHasKey = ({
 
             const keyText = getArgumentText(sourceCode, keyExpression);
 
+            // Known limit: with a key typed `string`, `hasKey` narrows a record
+            // to `never` where it answers `false`, which `in`, `Object.hasOwn`
+            // and `Reflect.has` do not, so code there that reads or writes the
+            // record stops type-checking after the fix.
             const fixable =
               binding !== undefined &&
               hasKeyName !== undefined &&
@@ -289,22 +328,25 @@ export const createPreferIsRecordAndHasKey = ({
 
             // Off a plain record the object may be a class instance, a
             // built-in or a function, and the rewrite is the author's
-            // decision.
-            const inSuggestOnly =
-              isIn &&
+            // decision. `Reflect.has` shares `in`'s message, since it reads the
+            // same prototype chain.
+            const prototypeSuggestOnly =
+              readsPrototypeChain &&
               (needsIsRecord ||
                 !isPlainObject(objExpression) ||
                 namesObjectPrototypeMember(keyExpression));
 
             // `Object.hasOwn` accepts a function, and `isRecord` does not.
             const hasOwnSuggestOnly =
-              !isIn && needsIsRecord && !cannotBeCallable(objExpression);
+              !readsPrototypeChain &&
+              needsIsRecord &&
+              !cannotBeCallable(objExpression);
 
-            const suggestOnly = inSuggestOnly || hasOwnSuggestOnly;
+            const suggestOnly = prototypeSuggestOnly || hasOwnSuggestOnly;
 
             context.report({
               node,
-              messageId: inSuggestOnly
+              messageId: prototypeSuggestOnly
                 ? 'inReadsPrototypeChain'
                 : hasOwnSuggestOnly
                   ? 'hasOwnAcceptsFunctions'
@@ -317,7 +359,7 @@ export const createPreferIsRecordAndHasKey = ({
                 suggestOnly && fix !== null
                   ? [
                       {
-                        messageId: inSuggestOnly
+                        messageId: prototypeSuggestOnly
                           ? 'suggestOwnPropertyCheck'
                           : 'suggestRecordCheck',
                         data,
@@ -365,6 +407,8 @@ const namesObjectPrototypeMember = (
 ): boolean => {
   const key = skipTypeWrappers(wrapped);
 
+  // Known limit: only the syntax is read, so a key whose type is such a literal
+  // without being one (`const k = 'toString'`, `` `constructor` ``) is fixed.
   return (
     key.type === AST_NODE_TYPES.Literal &&
     typeof key.value === 'string' &&

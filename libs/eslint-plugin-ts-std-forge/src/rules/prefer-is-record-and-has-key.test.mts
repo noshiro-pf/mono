@@ -794,3 +794,264 @@ describe('prefer-is-record-and-has-key on `key in obj` outside a record type', (
     ],
   });
 });
+
+// `Reflect.has` reads the prototype chain as `in` does, so it is reported only
+// where `key in obj` is fixed: on a plain record, where it is an own-property
+// check written the long way. Anywhere else it is what is meant.
+describe('prefer-is-record-and-has-key on Reflect.has', () => {
+  tester.run('prefer-is-record-and-has-key', preferIsRecordAndHasKey, {
+    valid: [
+      {
+        name: 'an interface, which a class or a built-in may implement',
+        code: dedent`
+          interface Store {
+            [key: string]: unknown;
+            getItem(key: string): unknown;
+          }
+          declare const store: Store;
+          const ok = Reflect.has(store, 'getItem');
+        `,
+      },
+      {
+        name: 'a class instance',
+        code: dedent`
+          class Bag {
+            [key: string]: unknown;
+            render(): void {}
+          }
+          declare const bag: Bag;
+          const ok = Reflect.has(bag, 'render');
+        `,
+      },
+      {
+        name: 'a mapped type over a class',
+        code: dedent`
+          class Bag {
+            [key: string]: unknown;
+            render(): void {}
+          }
+          declare const bag: Readonly<Bag>;
+          const ok = Reflect.has(bag, 'render');
+        `,
+      },
+      {
+        name: 'a built-in',
+        code: dedent`
+          declare const value: Promise<number>;
+          const ok = Reflect.has(value, 'then');
+        `,
+      },
+      {
+        name: 'a function',
+        code: dedent`
+          declare const fn: () => void;
+          const ok = Reflect.has(fn, 'name');
+        `,
+      },
+      {
+        name: 'an array',
+        code: dedent`
+          declare const xs: readonly number[];
+          const ok = Reflect.has(xs, '0');
+        `,
+      },
+      {
+        name: 'object',
+        code: dedent`
+          declare const o: object;
+          const ok = Reflect.has(o, 'type');
+        `,
+      },
+      {
+        name: 'an unknown value narrowed to object',
+        code: dedent`
+          declare const value: unknown;
+          const ok = typeof value === 'object' && value !== null && Reflect.has(value, 'type');
+        `,
+      },
+      {
+        name: 'a plain object type without a string index signature',
+        code: dedent`
+          declare const obj: { readonly a?: number };
+          const ok = Reflect.has(obj, 'a');
+        `,
+      },
+      {
+        name: 'a record widened by `as` to a class instance',
+        code: dedent`
+          class Bag {
+            [key: string]: unknown;
+            render(): void {}
+          }
+          declare const rec: Readonly<Record<string, unknown>>;
+          const ok = Reflect.has(rec as Bag, 'render');
+        `,
+      },
+      {
+        name: 'a value cast to a record, which its own type does not vouch for',
+        code: dedent`
+          declare const value: unknown;
+          const ok = Reflect.has(value as Record<string, unknown>, 'k');
+        `,
+      },
+      {
+        name: 'another Reflect method, or a computed member',
+        code: dedent`
+          declare const rec: Readonly<Record<string, unknown>>;
+          declare const has: 'has';
+          declare const hasOwn: 'keys';
+          const a = Reflect.get(rec, 'k');
+          const b = Reflect[has](rec, 'k');
+          const c = Object[hasOwn](rec, 'k');
+        `,
+      },
+      {
+        name: 'a Reflect or an Object the file declares',
+        code: dedent`
+          declare const rec: Readonly<Record<string, unknown>>;
+          const f = (Reflect: { has: (o: object, k: string) => boolean }): boolean =>
+            Reflect.has(rec, 'k');
+          const g = (Object: { hasOwn: (o: object, k: string) => boolean }): boolean =>
+            Object.hasOwn(rec, 'k');
+        `,
+      },
+      {
+        name: 'the wrong number of arguments, or a spread',
+        code: dedent`
+          declare const rec: Readonly<Record<string, unknown>>;
+          declare const args: readonly [Readonly<Record<string, unknown>>, string];
+          const a = Reflect.has(rec);
+          const b = Reflect.has(...args);
+        `,
+      },
+    ],
+    invalid: [
+      {
+        name: 'a plain record is fixed to hasKey',
+        code: dedent`
+          declare const rec: Readonly<Record<string, number>>;
+          declare const key: string;
+          const ok = Reflect.has(rec, key);
+        `,
+        output: dedent`
+          import { hasKey } from 'ts-std-forge';
+          declare const rec: Readonly<Record<string, number>>;
+          declare const key: string;
+          const ok = hasKey(rec, key);
+        `,
+        errors: [{ messageId: 'useHasKey' }],
+      },
+      {
+        name: 'a type named Reflect, which does not hide the global',
+        code: dedent`
+          type Reflect = number;
+          declare const rec: Readonly<Record<string, number>>;
+          const ok = Reflect.has(rec, 'k');
+        `,
+        output: dedent`
+          import { hasKey } from 'ts-std-forge';
+          type Reflect = number;
+          declare const rec: Readonly<Record<string, number>>;
+          const ok = hasKey(rec, 'k');
+        `,
+        errors: [{ messageId: 'useHasKey' }],
+      },
+      {
+        name: 'a negated check, reusing the hasKey import',
+        code: dedent`
+          import { hasKey } from 'ts-std-forge';
+
+          declare const rec: Record<string, number>;
+          const ok = !Reflect.has(rec, 'a') && hasKey(rec, 'b');
+        `,
+        output: dedent`
+          import { hasKey } from 'ts-std-forge';
+
+          declare const rec: Record<string, number>;
+          const ok = !hasKey(rec, 'a') && hasKey(rec, 'b');
+        `,
+        errors: [{ messageId: 'useHasKey' }],
+      },
+      {
+        name: 'an object read with side effects, which hasKey reads once too',
+        code: dedent`
+          declare const getRec: () => Readonly<Record<string, unknown>>;
+          const ok = Reflect.has(getRec(), 'k');
+        `,
+        output: dedent`
+          import { hasKey } from 'ts-std-forge';
+          declare const getRec: () => Readonly<Record<string, unknown>>;
+          const ok = hasKey(getRec(), 'k');
+        `,
+        errors: [{ messageId: 'useHasKey' }],
+      },
+      {
+        name: 'a literal key naming a member of `Object.prototype` gets a suggestion',
+        code: dedent`
+          declare const rec: Readonly<Record<string, unknown>>;
+          const ok = Reflect.has(rec, 'toString');
+        `,
+        output: null,
+        errors: [
+          {
+            messageId: 'inReadsPrototypeChain',
+            suggestions: [
+              {
+                messageId: 'suggestOwnPropertyCheck',
+                output: dedent`
+                  import { hasKey } from 'ts-std-forge';
+                  declare const rec: Readonly<Record<string, unknown>>;
+                  const ok = hasKey(rec, 'toString');
+                `,
+              },
+            ],
+          },
+        ],
+      },
+      {
+        name: 'reads Reflect, the object and the key through type wrappers',
+        code: dedent`
+          declare const rec: Record<string, number>;
+          const a = (Reflect as typeof Reflect).has(rec satisfies Record<string, number>, 'k');
+          const b = Reflect.has!(rec!, 'k');
+          const c = (<typeof Reflect>Reflect).has(rec, 'constructor' as const);
+        `,
+        output: [
+          dedent`
+            import { hasKey } from 'ts-std-forge';
+            declare const rec: Record<string, number>;
+            const a = hasKey(rec satisfies Record<string, number>, 'k');
+            const b = Reflect.has!(rec!, 'k');
+            const c = (<typeof Reflect>Reflect).has(rec, 'constructor' as const);
+          `,
+          dedent`
+            import { hasKey } from 'ts-std-forge';
+            declare const rec: Record<string, number>;
+            const a = hasKey(rec satisfies Record<string, number>, 'k');
+            const b = hasKey(rec!, 'k');
+            const c = (<typeof Reflect>Reflect).has(rec, 'constructor' as const);
+          `,
+        ],
+        errors: [
+          { messageId: 'useHasKey' },
+          { messageId: 'useHasKey' },
+          {
+            messageId: 'inReadsPrototypeChain',
+            suggestions: [
+              {
+                messageId: 'suggestOwnPropertyCheck',
+                output: dedent`
+                  import { hasKey } from 'ts-std-forge';
+                  declare const rec: Record<string, number>;
+                  const a = (Reflect as typeof Reflect).has(rec satisfies Record<string, number>, 'k');
+                  const b = Reflect.has!(rec!, 'k');
+                  const c = hasKey(rec, 'constructor' as const);
+                `,
+              },
+            ],
+          },
+        ],
+      },
+    ],
+  });
+});
