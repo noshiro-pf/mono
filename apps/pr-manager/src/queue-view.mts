@@ -194,7 +194,8 @@ export type QueueView = Readonly<{
   base: string;
   /**
    * Running first, then the candidates in the order they would be picked if
-   * each merged, with what waits only for those among them, then the rest.
+   * each merged, with what waits only for those among them, then the rest by
+   * number, each after what it waits for among them.
    */
   slots: readonly QueueSlot[];
   outside: readonly OutsideNode[];
@@ -303,9 +304,11 @@ export const queueViewOf = ({
 
   const pickedNumbers = new Set(picked.map(({ facts }) => facts.number));
 
-  const rest = byNumber.filter(
-    ({ standing, facts }) =>
-      waitOf(standing) !== 'none' && !pickedNumbers.has(facts.number),
+  const rest = afterWhatEachWaitsOn(
+    byNumber.filter(
+      ({ standing, facts }) =>
+        waitOf(standing) !== 'none' && !pickedNumbers.has(facts.number),
+    ),
   );
 
   const slotLayers = slotLayersOf(
@@ -719,6 +722,64 @@ const pickOrder = ({
   }
 };
 
+/** What one waits for other pull requests merging to end its wait. */
+const waitedOn = (standing: QueueStanding): readonly number[] => {
+  switch (standing.kind) {
+    case 'stacked':
+      return [standing.on];
+
+    case 'waiting':
+      return standing.on;
+
+    case 'release-blocked':
+      return standing.by.map(({ number }) => number);
+
+    case 'ignore':
+    case 'unactionable':
+    case 'owned':
+    case 'native-stack':
+    case 'release-stale':
+    case 'merge-state':
+    case 'candidate':
+    case 'in-flight':
+    case 'failing':
+    case 'held':
+    case 'needs':
+      return [];
+  }
+};
+
+/**
+ * `pending` in its order, save that each comes after what it waits for among
+ * them (`waitedOn`), however far down the order that is: one never picked still
+ * waits for it, and the row is to read as it would be released. Where the rest
+ * wait on one another round and round, the first of them goes next.
+ */
+const afterWhatEachWaitsOn = (
+  pending: readonly Decided[],
+): readonly Decided[] => {
+  const mut_ordered: Decided[] = [];
+
+  let mut_left = pending;
+
+  while (Arr.isNonEmpty(mut_left)) {
+    const left: ReadonlySet<number> = new Set(
+      mut_left.map(({ facts }) => facts.number),
+    );
+
+    const next =
+      mut_left.find(({ standing }) =>
+        waitedOn(standing).every((n) => !left.has(n)),
+      ) ?? mut_left[0];
+
+    mut_ordered.push(next);
+
+    mut_left = mut_left.filter((each) => each !== next);
+  }
+
+  return mut_ordered;
+};
+
 /** What `queueStanding` decides from, as the page read it. */
 const factsOf = ({ entry, mergeable }: QueuePull): QueueFacts =>
   ({
@@ -943,33 +1004,6 @@ const sayLayer = (
         note: 'to check',
         detail: `${branch}: the worker dispatches its checks once every layer below is green or has started all its jobs, and none is red`,
       };
-  }
-};
-
-/** What one waits for other pull requests merging to end its wait. */
-const waitedOn = (standing: QueueStanding): readonly number[] => {
-  switch (standing.kind) {
-    case 'stacked':
-      return [standing.on];
-
-    case 'waiting':
-      return standing.on;
-
-    case 'release-blocked':
-      return standing.by.map(({ number }) => number);
-
-    case 'ignore':
-    case 'unactionable':
-    case 'owned':
-    case 'native-stack':
-    case 'release-stale':
-    case 'merge-state':
-    case 'candidate':
-    case 'in-flight':
-    case 'failing':
-    case 'held':
-    case 'needs':
-      return [];
   }
 };
 
