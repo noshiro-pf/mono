@@ -1,18 +1,16 @@
 {
   // Type-checks the built `dist/` output through the real package.json
   // `exports` map, via named imports
-  // (`import { X } from 'ts-repo-utils'`): `scripts/cmd/build.mts`
-  // materializes a minimal `test/dist/node_modules/ts-repo-utils`
+  // (`import { X } from 'ts-repo-utils'`): `scripts/cmd/check-dist.mts`
+  // materializes a minimal `test/dist_/node_modules/ts-repo-utils`
   // package (package.json + dist), so module resolution here behaves exactly
-  // like an external consumer's.
+  // like an external consumer's, and runs the native compiler on this file.
   //
-  // Deliberately self-contained (no `extends`, no test-library dependencies)
-  // and conservative, so that older TypeScript versions can run it in the
-  // compatibility matrix
-  // (.github/workflows/typescript-version-compatibility.yml).
-  // `types: []` prevents auto-inclusion of node_modules/@types: the
-  // repository's @types/node requires a recent TypeScript and would produce
-  // unrelated lib-conflict errors on the older compilers in the matrix.
+  // Deliberately self-contained (no `extends`, no test-library dependencies).
+  // `skipLibCheck` stays off: what is under test is the package's `.d.mts`,
+  // which is what that option skips (`check:root:dist-test-lib-check`).
+  // `types: []` keeps node_modules/@types out: a consumer has only what the
+  // package declares.
   "compilerOptions": {
     "strict": true,
     "noEmit": true,
@@ -22,12 +20,6 @@
     "lib": ["ESNext", "DOM"],
     "types": [],
     "noUncheckedIndexedAccess": true,
-    // skipLibCheck: unlike the leaf typescript-template, this package's public
-    // types transitively pull in ts-data-forge / @types/node `.d.mts` that use
-    // lib features newer than the oldest matrix compiler (TS 5.1). Real
-    // consumers run with skipLibCheck; enabling it here keeps the check
-    // focused on whether THIS package's own emitted types parse under old TS.
-    "skipLibCheck": true,
     "noUnusedLocals": false
   },
   "include": ["./*.mts"]

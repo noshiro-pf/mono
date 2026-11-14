@@ -1,0 +1,19 @@
+{
+  // Second half of the declaration-emit check: type-checks the `.d.mts` files
+  // `tsconfig.json` emitted into `../node_modules/.declaration-emit`, as a consumer of a package built
+  // on ts-fortress compiles them. `skipLibCheck` must stay off: the files
+  // under test are declaration files, which is what that option skips.
+  "compilerOptions": {
+    "strict": true,
+    "noEmit": true,
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "target": "ESNext",
+    "lib": ["ESNext", "DOM"],
+    "types": [],
+    "noUncheckedIndexedAccess": true
+  },
+  "include": ["../node_modules/.declaration-emit/*.d.mts"],
+  // `exclude` defaults to `node_modules`, which is where the files are.
+  "exclude": []
+}

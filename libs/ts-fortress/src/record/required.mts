@@ -12,9 +12,9 @@ import {
   flattenShapeStructure,
   recordViewOf,
   type ExcessPropertyOption,
+  type ShapeByBound,
   type Type,
   type TypeOf,
-  type UnknownShape,
   type UnknownType,
 } from '../type.mjs';
 import { toUnionKeyString } from '../utils/index.mjs';
@@ -64,7 +64,7 @@ export const required = <
 
   const requiredShape = Obj.map(shape, (v, k) =>
     keysToBeRequired.has(k) ? makeRequired(v) : v,
-  ) satisfies UnknownShape;
+  ) satisfies ShapeByBound;
 
   // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
   return record(requiredShape, {

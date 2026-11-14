@@ -1,0 +1,26 @@
+{
+  // First half of the declaration-emit check: emits the declarations of the
+  // modules here, which import the built package by name, into
+  // `../node_modules/.declaration-emit` — untracked, and outside what the
+  // package's own `tsconfig.json` reads, so that `check:dist` writes nothing
+  // `check:types` compiles. `tsconfig.emitted.json` then type-checks what was
+  // emitted.
+  //
+  // A codec whose type is inferred is written out structurally in a `.d.mts`,
+  // and nothing type-checks that form while the source is compiled: only a
+  // second compilation, of the emitted file, does.
+  "compilerOptions": {
+    "strict": true,
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "outDir": "../node_modules/.declaration-emit",
+    "rootDir": ".",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "target": "ESNext",
+    "lib": ["ESNext", "DOM"],
+    "types": [],
+    "noUncheckedIndexedAccess": true
+  },
+  "include": ["./*.mts"]
+}

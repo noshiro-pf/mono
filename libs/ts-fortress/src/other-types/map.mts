@@ -6,7 +6,13 @@ import {
   tp,
   unknownToString,
 } from 'ts-data-forge';
-import type { Type, TypeOf, UnknownType } from '../type.mjs';
+import {
+  asType,
+  structureOf,
+  type Type,
+  type TypeOf,
+  type UnknownType,
+} from '../type.mjs';
 import {
   createAssertFn,
   createCastFn,
@@ -110,7 +116,9 @@ export const MapType = <K extends UnknownType, V extends UnknownType>(
 
   const prune = (a: M): M =>
     new Map(
-      Array.from(a, ([k, v]) => tp(keyType.prune(k), valueType.prune(v))),
+      Array.from(a, ([k, v]) =>
+        tp(asType(keyType).prune(k), asType(valueType).prune(v)),
+      ),
     );
 
   return {
@@ -124,6 +132,6 @@ export const MapType = <K extends UnknownType, V extends UnknownType>(
     is: createIsFn(validate),
     assertIs: createAssertFn(validate),
     cast: createCastFn(validate),
-    structure: { kind: 'map', keyType, valueType },
+    structure: structureOf({ kind: 'map', keyType, valueType }),
   };
 };

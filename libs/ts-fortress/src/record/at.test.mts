@@ -253,6 +253,29 @@ describe(at, () => {
         at(number(), 'x');
       }).toThrow('Expected a record type');
     });
+
+    test('takes a codec by its shape only when its `defaultValue` is a record', () => {
+      const shaped = {
+        ...string(),
+        shape: { x: number(0, { max: 10 }) },
+      } as const;
+
+      // The same object with a record `defaultValue` (see the first `at`
+      // overload) is taken by the shape overload: the return type `10` is the
+      // shape member's constraint, which no other overload returns. So the
+      // directive below is about `defaultValue`. Neither object has the record
+      // `structure` the run time reads, so both calls throw.
+      const recordDefault = { ...shaped, defaultValue: { x: 0 } } as const;
+
+      expect((): 10 => at(recordDefault, 'x').constraints.max).toThrow(
+        'Expected a record type',
+      );
+
+      expect(() => {
+        // @ts-expect-error a shape on a `string` codec, whose `defaultValue` is not a record
+        at(shaped, 'x');
+      }).toThrow('Expected a record type');
+    });
   });
 
   // `at` expands the full shape structure to resolve a key. Intersecting unions

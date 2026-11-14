@@ -1,18 +1,18 @@
 {
   // Type-checks the built `dist/` output through the real package.json
   // `exports` map, via named imports
-  // (`import { X } from 'pr-merge-queue'`): `scripts/cmd/build.mts`
-  // materializes a minimal `test/dist/node_modules/pr-merge-queue`
+  // (`import { X } from 'pr-merge-queue'`): `scripts/cmd/check-dist.mts`
+  // materializes a minimal `test/dist_/node_modules/pr-merge-queue`
   // package (package.json + dist), so module resolution here behaves exactly
-  // like an external consumer's.
+  // like an external consumer's, and runs the native compiler on this file.
   //
-  // Deliberately self-contained (no `extends`, no test-library dependencies)
-  // and conservative, so that older TypeScript versions can run it in the
-  // compatibility matrix
-  // (.github/workflows/typescript-version-compatibility.yml).
-  // `types: []` prevents auto-inclusion of node_modules/@types: the
-  // repository's @types/node requires a recent TypeScript and would produce
-  // unrelated lib-conflict errors on the older compilers in the matrix.
+  // Deliberately self-contained (no `extends`, no test-library dependencies).
+  // `skipLibCheck` stays off: what is under test is the package's `.d.mts`,
+  // which is what that option skips (`check:root:dist-test-lib-check`).
+  // `types` names `node` and nothing else: the package's own declarations
+  // import Node's (`dist/lib/cli-args.d.mts` reads `node:util`), and they are
+  // type-checked here, so Node's types have to resolve; everything else under
+  // node_modules/@types stays out.
   "compilerOptions": {
     "strict": true,
     "noEmit": true,
@@ -20,15 +20,9 @@
     "moduleResolution": "NodeNext",
     "target": "ESNext",
     "lib": ["ESNext", "DOM"],
-    "types": [],
+    "types": ["node"],
     "noUncheckedIndexedAccess": true,
-    "noUnusedLocals": false,
-    // Transitive typed dependencies (e.g. ts-data-forge) ship `.d.mts` that
-    // uses newer lib types (ArrayIterator, etc.); real consumers resolve them
-    // with skipLibCheck (often the default). Skipping lib checks here keeps
-    // this a cross-version *resolution/usage* test of our public API rather
-    // than a re-check of every dependency's declarations on older compilers.
-    "skipLibCheck": true
+    "noUnusedLocals": false
   },
   "include": ["./*.mts"]
 }

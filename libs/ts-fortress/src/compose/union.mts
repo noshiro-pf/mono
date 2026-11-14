@@ -9,8 +9,10 @@ import {
 } from 'ts-data-forge';
 import type { ArrayElement, NonEmptyTuple, StrictPick } from 'ts-type-forge';
 import {
+  asType,
   flattenShapeStructure,
   recordViewOf,
+  structureOf,
   tupleElementTypesOf,
   type Type,
   type TypeOf,
@@ -75,7 +77,7 @@ export const union = <const Types extends NonEmptyTuple<UnknownType>>(
    * default value *is* one of the union's values. The compiler cannot see that:
    * `types[0]` resolves against the bound
    * `readonly [UnknownType, ...UnknownType[]]`, so which member it is has
-   * already been erased to `Type<unknown>` here.
+   * already been erased to the bound here.
    *
    * Asserting the whole `UnionType<Types>` instead would be unsound, because
    * that also promises `is` and `prune`, and the first member answers both only
@@ -239,7 +241,7 @@ export const union = <const Types extends NonEmptyTuple<UnknownType>>(
       ? a
       : // A member of the union prunes to a member of the union.
         // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
-        (matched.prune(a) as T);
+        (asType(matched).prune(a) as T);
   };
 
   const baseType = {
@@ -253,7 +255,7 @@ export const union = <const Types extends NonEmptyTuple<UnknownType>>(
     is,
     assertIs: createAssertFn(validate),
     cast: createCastFn(validate),
-    structure: { kind: 'union', memberTypes: types },
+    structure: structureOf({ kind: 'union', memberTypes: types }),
   } as const satisfies Type<T>;
 
   return baseType as UnionType<Types>;

@@ -44,10 +44,8 @@ export type Iso8601ValidatorOption = Readonly<{
 // `Type<Iso8601ValidatorOption>` instead of expanding the codec structurally —
 // around a hundred lines of it, for a const this module does not export.
 //
-// The `UnknownType` trap is handled by the hand-written type above rather than
-// by this annotation: deriving it as `TypeOf<typeof Iso8601ValidatorOption>` is
-// what failed the `.d.mts` check, because the structural form the emit produces
-// does not satisfy that bound (see the note on `UnknownType`).
+// The type above is hand-written because the annotation needs it to exist
+// first: `TypeOf<typeof Iso8601ValidatorOption>` would be circular here.
 const Iso8601ValidatorOption: Type<Iso8601ValidatorOption> = record({
   /**
    *  If strict is true, date strings with invalid dates like 2009-02-29 will be invalid.

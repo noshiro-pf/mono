@@ -9,9 +9,9 @@ import type {
 } from 'ts-type-forge';
 import {
   type ExcessPropertyOption,
+  type ShapeByBound,
   type Type,
   type TypeOf,
-  type UnknownShape,
   flattenShapeStructure,
   recordViewOf,
 } from '../type.mjs';
@@ -62,7 +62,7 @@ export const partial = <
 
   const partialShape = Obj.map(shape, (v, k) =>
     keysToBeOptional.has(k) ? optional(v) : v,
-  ) satisfies UnknownShape;
+  ) satisfies ShapeByBound;
 
   // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
   return record(partialShape, {
