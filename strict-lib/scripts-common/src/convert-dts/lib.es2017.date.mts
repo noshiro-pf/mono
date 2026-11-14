@@ -47,10 +47,12 @@ export const convertLibEs2017Date =
               'ms?: number',
               'ms?: MillisecondsEnum',
             ),
+            // Returns `SafeInt` without `NaNType`, like the ES5 overload; the
+            // reason is beside its replacement in `lib.es5-date.mts`.
             replaceWithNoMatchCheck(
               //
               '): number;',
-              `): ${brandedNumber.SafeUint};`,
+              `): ${brandedNumber.SafeInt};`,
             ),
           ),
         }),

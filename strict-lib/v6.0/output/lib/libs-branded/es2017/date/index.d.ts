@@ -39,5 +39,5 @@ interface DateConstructor {
     minutes?: import('ts-type-forge').MinutesEnum,
     seconds?: import('ts-type-forge').SecondsEnum,
     ms?: import('ts-type-forge').MillisecondsEnum,
-  ): import('ts-type-forge').SafeUint;
+  ): import('ts-type-forge').SafeInt;
 }

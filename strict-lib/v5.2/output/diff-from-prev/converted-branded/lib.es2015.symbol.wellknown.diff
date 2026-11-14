@@ -1,5 +1,5 @@
 diff --git a/v5.1/output/lib-files-branded/lib.es2015.symbol.wellknown.d.ts b/v5.2/output/lib-files-branded/lib.es2015.symbol.wellknown.d.ts
-index 4bf119a0355f596eac14470a5eb41b12cada74bb..82627f3ae5016e824f4f69401a1460a64570cff8 100644
+index 5a19ddbf528197151cfc9ab5ff61099c8a819ede..e07c43a4ecae8b14c2e152f72ff56a138a4b0e2a 100644
 --- a/v5.1/output/lib-files-branded/lib.es2015.symbol.wellknown.d.ts
 +++ b/v5.2/output/lib-files-branded/lib.es2015.symbol.wellknown.d.ts
 @@ -143,7 +143,7 @@ interface Map<K, V> {

@@ -221,7 +221,7 @@ interface RegExp {
    *
    * @param string The string to search within.
    */
-  [Symbol.search](string: string): NumberType.StringSize;
+  [Symbol.search](string: string): NumberType.StringSearchResult;
 
   /**
    * Returns an array of substrings that were delimited by strings in the original input that
