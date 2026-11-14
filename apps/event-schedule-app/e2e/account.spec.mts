@@ -299,8 +299,8 @@ test(
 
 /**
  * `ts-data-forge`'s `isRecord`, written out: the daily job against production
- * imports every spec and builds no workspace package (see the `e2e/**` block in
- * `eslint.config.mts`).
+ * imports every spec and builds no workspace package (see `productionE2eRules`
+ * in `eslint.config.mts`).
  */
 const isObject = (u: unknown): u is ReadonlyRecord<string, unknown> =>
   typeof u === 'object' && u !== null && !Array.isArray(u);

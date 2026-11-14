@@ -67,6 +67,45 @@ describe(defineImportProbe, () => {
     });
   }, 60_000);
 
+  test('lints under an existing path listed in existingPaths', async () => {
+    await withPackage(async (packageRoot) => {
+      // eslint-disable-next-line security/detect-non-literal-fs-filename
+      await fs.mkdir(path.join(packageRoot, 'src'));
+
+      // eslint-disable-next-line security/detect-non-literal-fs-filename
+      await fs.writeFile(path.join(packageRoot, 'src/existing.mjs'), '');
+
+      const probe = defineImportProbe({
+        packageRoot,
+        sourcePath: 'src/a.mjs',
+        existingPaths: ['src/existing.mjs'],
+      });
+
+      const lines = await probe(
+        "import { b } from 'refused';",
+        'src/existing.mjs',
+      );
+
+      assert.deepStrictEqual(lines, [1]);
+    });
+  }, 60_000);
+
+  test('throws on a path listed in existingPaths where nothing is', async () => {
+    await withPackage(async (packageRoot) => {
+      const probe = defineImportProbe({
+        packageRoot,
+        sourcePath: 'src/a.mjs',
+        existingPaths: ['src/gone.mjs'],
+      });
+
+      await expect(
+        probe("import { b } from 'refused';", 'src/gone.mjs'),
+      ).rejects.toThrow(
+        /src\/gone\.mjs is in existingPaths and does not exist/u,
+      );
+    });
+  }, 60_000);
+
   test('throws on a path the config ignores', async () => {
     await withPackage(async (packageRoot) => {
       const probe = defineImportProbe({
