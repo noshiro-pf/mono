@@ -546,6 +546,84 @@ describe('string with constraints', () => {
         /^defaultValue "abc" for string does not satisfy the constraint regex = \^\\d\+\$$/u,
       );
     });
+
+    test('a global regex gives the same answer for the same value every time', () => {
+      const re = /a/gu;
+
+      const type = string('ab', { regex: re });
+
+      assert.isTrue(type.is('ab'));
+
+      assert.isTrue(type.is('ab'));
+
+      assert.isTrue(type.is('ab'));
+
+      assert.isTrue(type.is('ba'));
+
+      assert.isFalse(type.is('xb'));
+
+      assert.isTrue(type.is('ab'));
+
+      assert.strictEqual(re.lastIndex, 0);
+    });
+
+    test('a global regex leaves the lastIndex the caller set', () => {
+      const re = /a/gu;
+
+      const type = string('ab', { regex: re });
+
+      re.exec('xxa');
+
+      assert.strictEqual(re.lastIndex, 3);
+
+      assert.isTrue(type.is('ab'));
+
+      assert.isFalse(type.is('xb'));
+
+      assert.strictEqual(re.lastIndex, 3);
+    });
+
+    test('a sticky regex matches from index 0 only, every time', () => {
+      const type = string('ab', { regex: /a/uy });
+
+      assert.isTrue(type.is('ab'));
+
+      assert.isTrue(type.is('ab'));
+
+      assert.isFalse(type.is('ba'));
+
+      assert.isFalse(type.is('ba'));
+
+      assert.isTrue(type.is('ab'));
+    });
+
+    test('a sticky regex matches from index 0 whatever lastIndex the caller set, and keeps it', () => {
+      const re = /a/uy;
+
+      const type = string('ab', { regex: re });
+
+      re.exec('ab');
+
+      assert.strictEqual(re.lastIndex, 1);
+
+      assert.isTrue(type.is('ab'));
+
+      assert.isFalse(type.is('ba'));
+
+      assert.strictEqual(re.lastIndex, 1);
+    });
+
+    test('validate of a non-matching value reports the regex source with a global regex', () => {
+      const type = string('ab', { regex: /a/gu });
+
+      assert.isTrue(Result.isOk(type.validate('ab')));
+
+      expect(messageOf(type, 'xb')).toBe(
+        'Error: expected a string matching /a/ but "xb" was passed.',
+      );
+
+      assert.isTrue(Result.isOk(type.validate('ab')));
+    });
   });
 
   describe('complex constraints', () => {

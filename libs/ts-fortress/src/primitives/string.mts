@@ -401,7 +401,11 @@ const createConstraintsPredicate =
           ? Result.err({ constraint: 'uppercase', value: true } as const)
           : lowercase === true && value !== value.toLowerCase()
             ? Result.err({ constraint: 'lowercase', value: true } as const)
-            : regex !== undefined && !regex.test(value)
+            : // Not `regex.test(value)`: a global or sticky regex starts at its
+              // `lastIndex` and moves it, so the answer would depend on the
+              // value tested before. `search` always starts at 0 and puts
+              // `lastIndex` back.
+              regex !== undefined && value.search(regex) === -1
               ? Result.err({
                   constraint: 'regex',
                   value: regex.source,
