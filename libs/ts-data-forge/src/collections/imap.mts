@@ -808,26 +808,23 @@ class IMapClass<K extends MapSetKeyType, V>
       return this;
     }
 
-    return IMap.create(
-      Array.from(this.#map).filter(([k]) => !Object.is(k, key)),
-    );
+    // Through the native collection, which compares keys with SameValueZero as
+    // `has` and `get` do; a rebuild comparing with `Object.is` left a `-0` key
+    // unmatched.
+    return this.withMutations([{ type: 'delete', key }]);
   }
 
   /** @inheritdoc */
   set(key: K, value: V): IMap<K, V> {
     const curr = this.get(key);
 
-    if (Optional.isSome(curr) && value === curr.value) {
-      return this; // has no changes
-    }
-
-    if (!this.has(key)) {
-      return IMap.create([...this.#map, tp(key, value)]);
-    }
-
-    return IMap.create(
-      Array.from(this.#map, ([k, v]) => tp(k, Object.is(k, key) ? value : v)),
-    );
+    // Through the native collection, which compares keys with SameValueZero as
+    // `has` and `get` do (a rebuild comparing with `Object.is` left a `-0` key
+    // unmatched), and whose `set` appends a new key and keeps the position of
+    // an existing one.
+    return Optional.isSome(curr) && value === curr.value
+      ? this
+      : this.withMutations([{ type: 'set', key, value }]);
   }
 
   /** @inheritdoc */
@@ -844,11 +841,10 @@ class IMapClass<K extends MapSetKeyType, V>
       return this;
     }
 
-    return IMap.create(
-      Array.from(this.#map, ([k, v]) =>
-        tp(k, Object.is(k, key) ? updater(curr.value) : v),
-      ),
-    );
+    // Through the native collection, which compares keys with SameValueZero as
+    // `has` and `get` do; a rebuild comparing with `Object.is` left a `-0` key
+    // unmatched.
+    return this.withMutations([{ type: 'update', key, updater }]);
   }
 
   /** @inheritdoc */
