@@ -243,18 +243,90 @@ jobs:
 
           # Runs of every event, not only this one's: a pull request's verdict
           # is what a push to main reuses. `head_commit.tree_id` is the tree of
-          # each run's head, so matching costs no request per run. Runs still
-          # in progress have no verdict, and a cancelled run's red aggregate is
-          # not one; `success` / `failure` is also what a run whose every job
-          # was skipped concludes, which the job filter below takes care of.
-          if ! run_ids="$(gh api "repos/${GITHUB_REPOSITORY}/actions/workflows/${workflow_file}/runs?status=completed&per_page=100" \
-            --jq '.workflow_runs[]
-              | select(.conclusion == "success" or .conclusion == "failure")
-              | select(.head_commit.tree_id == env.TREE_SHA)
-              | select(.head_repository.full_name == env.GITHUB_REPOSITORY)
-              | .id' 2>&1)"; then
-            run_the_checks "Could not list earlier runs of ${workflow_file}, so the checks run: ${run_ids}"
-          fi
+          # each run's head, so matching costs no request per run. Asked by
+          # conclusion, each list cut to the time the other reaches, as
+          # "Reusing a verdict" in README.md says and why. Runs still in
+          # progress have no verdict, and a cancelled run's red aggregate is
+          # not one; a run can conclude `success` with its aggregate skipped (a
+          # branch behind main), which the job filter below takes care of.
+          # Captured with `2>&1`, as every gh call in this step is, for the
+          # error message; only whole lines of the form the `--jq` filter prints
+          # are read from it below. The step's other gh captures are read as
+          # they come, relying on gh writing nothing beside its output when it
+          # succeeds.
+          listed=''
+          for listed_as in success failure; do
+            # LISTED is read by the `--jq` filter, which takes no `--arg`. A
+            # cutoff with no timestamp prints as `cutoff <conclusion> null`,
+            # which fails the timestamp match and runs the checks (see
+            # `unreadable`).
+            if ! page="$(LISTED="${listed_as}" gh api "repos/${GITHUB_REPOSITORY}/actions/workflows/${workflow_file}/runs?status=${listed_as}&per_page=100&exclude_pull_requests=true" \
+              --jq '(if .total_count > (.workflow_runs | length)
+                  then [.workflow_runs[].updated_at | select(. != null)] | min | "cutoff \(env.LISTED) \(.)"
+                  else empty end),
+                (.workflow_runs[]
+                  | select(.head_commit.tree_id == env.TREE_SHA)
+                  | select(.head_repository.full_name == env.GITHUB_REPOSITORY)
+                  | "run \(env.LISTED) \(.id) \(.updated_at)")' 2>&1)"; then
+              run_the_checks "Could not list earlier runs of ${workflow_file}, so the checks run: ${page}"
+            fi
+            listed="${listed}${page}"$'\n'
+          done
+
+          # A run of one conclusion last updated before the other list's
+          # cutoff is left out. ISO 8601 timestamps in UTC compare as strings,
+          # byte by byte in the C locale, which the `sort` of the verdicts below
+          # relies on too.
+          export LC_ALL=C
+          timestamp='[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z'
+
+          # A `run` or `cutoff` line in another form (a timestamp in a new
+          # shape, a matching run with no `updated_at`, a partial page with no
+          # timestamp at all) is not guessed at: the checks run, and the
+          # warning shows on the run's page, since a change in the API's form
+          # would make every lookup give up the same way. A run with no
+          # `updated_at` elsewhere on a partial page is left out of its
+          # cutoff, which can only move the cutoff later and so leave out
+          # more.
+          unreadable() {
+            run_the_checks "::warning::Could not read ${2} from \"${1//%/%25}\" in the runs of ${workflow_file}, so the checks run."
+          }
+
+          success_cutoff=''
+          failure_cutoff=''
+          run_ids=' '
+          while read -r line; do
+            if [[ "${line}" =~ ^cutoff\ (success|failure)\ (${timestamp})$ ]]; then
+              case "${BASH_REMATCH[1]}" in
+                success) success_cutoff="${BASH_REMATCH[2]}" ;;
+                failure) failure_cutoff="${BASH_REMATCH[2]}" ;;
+              esac
+            elif [[ "${line}" == cutoff* ]]; then
+              # A cutoff left unread would keep every run of the other
+              # conclusion however old, so a verdict a later run overturned
+              # could be reused.
+              unreadable "${line}" 'the reach of the earlier runs'
+            fi
+          done <<<"${listed}"
+          while read -r line; do
+            if [[ ! "${line}" =~ ^run\ (success|failure)\ ([0-9]+)\ (${timestamp})$ ]]; then
+              # A run left unread could be the newest verdict on the tree, so
+              # an older one it overturned would be reused.
+              if [[ "${line}" == run* ]]; then
+                unreadable "${line}" 'an earlier run'
+              fi
+              continue
+            fi
+            case "${BASH_REMATCH[1]}" in
+              success) other_cutoff="${failure_cutoff}" ;;
+              failure) other_cutoff="${success_cutoff}" ;;
+            esac
+            run_id="${BASH_REMATCH[2]}"
+            # A run re-run between the two requests can be listed under both.
+            if [[ ! "${BASH_REMATCH[3]}" < "${other_cutoff}" && "${run_ids}" != *" ${run_id} "* ]]; then
+              run_ids="${run_ids}${run_id} "
+            fi
+          done <<<"${listed}"
 
           verdicts=''
           for run_id in ${run_ids}; do

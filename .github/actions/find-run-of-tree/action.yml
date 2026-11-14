@@ -10,7 +10,8 @@ name: Find an earlier run of this tree
 # checks reported) and then holds no artifact at all.
 
 description: >-
-  The id of the newest completed run of a workflow, on the tree of the
+  The id of the newest run among the latest 100 successful runs of a workflow
+  (and, with `any`, its latest 100 failed runs), on the tree of the
   checked-out commit and from this repository's own branches, that holds an
   unexpired artifact whose name matches a pattern. Empty when there is none,
   or when the lookup fails, which the caller reads as "produce it here".
@@ -69,17 +70,35 @@ runs:
         fi
         export TREE_SHA
 
-        # Newest first. A fork's run is never taken: its artifacts are made by
-        # workflow files the fork wrote.
-        if ! run_ids="$(gh api "repos/${GITHUB_REPOSITORY}/actions/workflows/${WORKFLOW}/runs?status=completed&per_page=100" \
-          --jq '.workflow_runs[]
-            | select(.id != (env.GITHUB_RUN_ID | tonumber))
-            | select(.conclusion == "success" or (env.CONCLUSION == "any" and .conclusion == "failure"))
-            | select(.head_commit.tree_id == env.TREE_SHA)
-            | select(.head_repository.full_name == env.GITHUB_REPOSITORY)
-            | .id' 2>&1)"; then
-          produce_it_here "Could not list the runs of ${WORKFLOW}: ${run_ids}"
+        # Newest first (a run's id grows with its creation), asked by
+        # conclusion as check-gates.yml asks ("Reusing a verdict" in README.md
+        # says why). Unlike a verdict, an artifact is as good from any run on
+        # the tree, so no run is left out for its age, and "newest" is the
+        # newest on the pages read. A fork's run is never taken: its artifacts
+        # are made by workflow files the fork wrote.
+        conclusions='success'
+        if [ "${CONCLUSION}" = any ]; then
+          conclusions='success failure'
         fi
+        pages=''
+        for conclusion in ${conclusions}; do
+          if ! page="$(gh api "repos/${GITHUB_REPOSITORY}/actions/workflows/${WORKFLOW}/runs?status=${conclusion}&per_page=100&exclude_pull_requests=true" \
+            --jq '.workflow_runs[]
+              | select(.id != (env.GITHUB_RUN_ID | tonumber))
+              | select(.head_commit.tree_id == env.TREE_SHA)
+              | select(.head_repository.full_name == env.GITHUB_REPOSITORY)
+              | "run \(.id)"' 2>&1)"; then
+            produce_it_here "Could not list the runs of ${WORKFLOW}: ${page}"
+          fi
+          pages="${pages}${page}"$'\n'
+        done
+        # Only lines of the form the `--jq` filter prints; one in another form
+        # is passed over, which costs at most producing the artifact again
+        # (check-gates.yml gives up on a `run` line it cannot read instead,
+        # since a verdict passed over can let an older one be reused). A run
+        # re-run between the two requests can be listed under both
+        # conclusions; `sort -u` keeps it once.
+        run_ids="$(sed -n 's/^run \([0-9][0-9]*\)$/\1/p' <<<"${pages}" | sort -rnu)"
 
         for run_id in ${run_ids}; do
           # As check-gates.yml reuses a verdict: only from a run whose gate
@@ -103,4 +122,4 @@ runs:
           fi
         done
 
-        produce_it_here "No completed run of ${WORKFLOW} on tree ${TREE_SHA} holds an artifact matching ${ARTIFACT_PATTERN}."
+        produce_it_here "Among the latest 100 runs of ${WORKFLOW} of each conclusion read (${conclusions}), none on tree ${TREE_SHA} whose gate judged the tree holds an artifact matching ${ARTIFACT_PATTERN}."
