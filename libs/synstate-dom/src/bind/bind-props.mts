@@ -170,7 +170,7 @@ const radioGroupOf = (input: HTMLInputElement): readonly HTMLInputElement[] => {
  * that sets them back. The listener is a capturing one, which runs before the
  * element's own handlers, so no handler on the element can stop it.
  */
-const controlledOf = (element: HTMLInputElement): Controlled => {
+const controlledOf = (element: ControlledElement): Controlled => {
   const existing = controlled.get(element);
 
   if (existing !== undefined) {
@@ -192,8 +192,10 @@ const controlledOf = (element: HTMLInputElement): Controlled => {
 
   const onChange = (): void => {
     requestAnimationFrame(() => {
-      for (const input of radioGroupOf(element)) {
-        controlled.get(input)?.restore();
+      for (const target of element instanceof HTMLInputElement
+        ? radioGroupOf(element)
+        : [element]) {
+        controlled.get(target)?.restore();
       }
     });
   };
@@ -210,15 +212,16 @@ const controlledOf = (element: HTMLInputElement): Controlled => {
 };
 
 /**
- * `checked` and `indeterminate` are controlled (SPEC.md 7.2): after a `change`,
- * the element is drawn as the bound values again, so a change its owner did not
- * take undoes itself. This waits for the next frame, after every handler of the
- * event, the ancestors' included, has seen the user's change, and before it is
- * painted. Checking a radio button unchecks the others of its group with no
- * event on them, so a change on one sets back every bound button of the group.
+ * `checked` and `indeterminate` of an `<input>` and `value` of a `<select>` are
+ * controlled (SPEC.md 7.2): after a `change`, the element is drawn as the bound
+ * values again, so a change its owner did not take undoes itself. This waits
+ * for the next frame, after every handler of the event, the ancestors'
+ * included, has seen the user's change, and before it is painted. Checking a
+ * radio button unchecks the others of its group with no event on them, so a
+ * change on one sets back every bound button of the group.
  */
 const bindControlled = (
-  element: HTMLInputElement,
+  element: ControlledElement,
   key: ControlledKey,
   value: Bindable<unknown>,
 ): void => {
@@ -237,7 +240,9 @@ const bindControlled = (
   });
 };
 
-type ControlledKey = 'checked' | 'indeterminate';
+type ControlledKey = 'checked' | 'indeterminate' | 'value';
+
+type ControlledElement = HTMLInputElement | HTMLSelectElement;
 
 type Controlled = Readonly<{
   add: (key: ControlledKey, restore: () => void) => void;
@@ -245,11 +250,28 @@ type Controlled = Readonly<{
   restore: () => void;
 }>;
 
-const isControlledKey = (key: string): key is ControlledKey =>
-  key === 'checked' || key === 'indeterminate';
+/**
+ * `key` when it is controlled on `element`: `checked` and `indeterminate` on an
+ * `<input>`, and `value` on a `<select>` alone. A `<select>` has no draft and no
+ * composition, so every `change` is a finished choice, as a checkbox's is; an
+ * `<input>` or `<textarea>` bound one way keeps what is being typed, which a
+ * draft committed on `change` or blur, or an IME composition, needs.
+ */
+const controlledKeyOn = (
+  element: ControlledElement,
+  key: string,
+): ControlledKey | undefined =>
+  key === 'value'
+    ? element instanceof HTMLSelectElement
+      ? key
+      : undefined
+    : (key === 'checked' || key === 'indeterminate') &&
+        element instanceof HTMLInputElement
+      ? key
+      : undefined;
 
 /** The elements bound by {@link bindControlled}. */
-const controlled = new WeakMap<HTMLInputElement, Controlled>();
+const controlled = new WeakMap<ControlledElement, Controlled>();
 
 /** `onClick`, `onPointerDown`: `on` and an upper-case letter. */
 const isEventKey = (key: string): boolean => /^on[A-Z]/u.test(key);
@@ -280,10 +302,17 @@ const bindProp = (element: Element, key: string, value: unknown): void => {
     return;
   }
 
-  if (isControlledKey(key) && element instanceof HTMLInputElement) {
-    bindControlled(element, key, value);
+  if (
+    element instanceof HTMLInputElement ||
+    element instanceof HTMLSelectElement
+  ) {
+    const controlledKey = controlledKeyOn(element, key);
 
-    return;
+    if (controlledKey !== undefined) {
+      bindControlled(element, controlledKey, value);
+
+      return;
+    }
   }
 
   if (propertyNameSet.has(key)) {
