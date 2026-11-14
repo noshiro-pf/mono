@@ -1,5 +1,14 @@
 # eslint-plugin-synstate
 
+## 0.7.2
+
+### Patch Changes
+
+- Updated dependencies [82d252e]
+- Updated dependencies [eb39008]
+    - eslint-rule-forge@0.11.0
+    - ts-type-forge@9.2.7
+
 ## 0.7.1
 
 ### Patch Changes

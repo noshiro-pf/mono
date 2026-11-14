@@ -1,5 +1,41 @@
 # strict-ts-lib-v5.3-source
 
+## 0.6.11
+
+### Patch Changes
+
+- c02ee5a: `XMLHttpRequest#open` takes any HTTP method token: its `method` is
+  `HTTPRequestMethod | (string & {})`, where it was the `<form method>` values
+  `'post' | 'get' | 'dialog'`. `xhr.open('POST', url)`, `'PUT'`, `'patch'` and a
+  custom token such as `'PROPFIND'` now type-check, and the union keeps the
+  upper-case methods as literal members.
+
+    `Request#method` is `string`, as in TypeScript's own lib, where it was the
+    upper-case `HTTPRequestMethod`. Fetch upper-cases only some standard methods and
+    passes any other token through as written, so `'patch'` and `'PROPFIND'` are
+    possible values.
+
+- 50a6476: The `minimumFractionDigits` / `maximumFractionDigits` options of
+  `Intl.NumberFormat`, `Intl.PluralRules`, `Number#toLocaleString` and
+  `BigInt#toLocaleString`, and the same fields of the resolved options, are
+  `UintRangeInclusive<0, 100>`, where they were capped at 20. ECMA-402 raised the
+  limit to 100 in its 2023 edition, so `{ maximumFractionDigits: 30 }` now
+  type-checks. Integer and significant digits keep their range of 1–21.
+- 7057096: In the branded flavor, `String#repeat`'s `count` is
+  `NumberType.StringSizeArgNonNegative`, as `includes`, `startsWith` and
+  `endsWith` take, where it was a bare `SafeUint`. An integer literal from 0 to
+  39, such as `'-'.repeat(3)`, type-checks again without `asSafeUint`; a larger
+  one still needs it, and a negative or fractional one is rejected.
+- 1e7b334: In the branded flavor, the `length`, `byteOffset` and `byteLength` parameters of
+  the typed-array, `DataView` and ES5 `ArrayBuffer` constructors, and
+  `Atomics.notify`'s `count`, are `NumberType.TypedArraySizeArgNonNegative`, as
+  `new SharedArrayBuffer(8)` takes, where they were a bare `TypedArraySize` or
+  `SafeUint` (the `BigInt64Array` and `BigUint64Array` `byteOffset` already took
+  it). An integer literal from 0 to 39, such as `new Uint8Array(4)` or
+  `new DataView(buffer, 0, 8)`, type-checks without a cast; a larger one still
+  needs one, and a negative one is rejected. `Float16Array`'s constructor takes
+  the same in the versions whose `Float16Array` declarations are converted.
+
 ## 0.6.10
 
 ### Patch Changes

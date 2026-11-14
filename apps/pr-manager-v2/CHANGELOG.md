@@ -1,5 +1,17 @@
 # pr-manager-v2
 
+## 0.0.2
+
+### Patch Changes
+
+- Updated dependencies [39c95f1]
+    - ts-fortress@13.0.1
+    - split-view-link@0.0.3
+    - pr-report-core-v2@0.0.1
+    - synstate@9.0.0
+    - synstate-dom@0.11.0
+    - ts-data-forge@15.0.0
+
 ## 0.0.1
 
 ### Patch Changes

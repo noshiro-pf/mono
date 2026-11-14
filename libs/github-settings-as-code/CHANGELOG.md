@@ -1,5 +1,18 @@
 # [2.1.0](https://github.com/noshiro-pf/github-settings-as-code/compare/v2.0.1...v2.1.0) (2026-08-09)
 
+## 4.0.10
+
+### Patch Changes
+
+- e8259fd: Read every page of the repository's Actions variables. The list was read in one request, which GitHub answers ten to a page, so with more than ten variables `backup variables` dropped the rest from the declaration and `apply variables` sent `POST` for an existing variable and stopped on `409 Already exists`.
+- 5e5d725: `repo-settings` refuses a command line it does not understand — an unknown option such as `--dry-run`; `--owner` or `--repo` without a value or with an empty one; or a third argument — before anything is sent to GitHub, instead of ignoring it and applying anyway.
+- Updated dependencies [eb39008]
+- Updated dependencies [39c95f1]
+- Updated dependencies [1cc22f9]
+    - ts-type-forge@9.2.7
+    - ts-fortress@13.0.1
+    - ts-repo-utils@11.0.1
+
 ## 4.0.9
 
 ### Patch Changes

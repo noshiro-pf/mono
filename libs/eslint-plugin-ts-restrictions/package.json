@@ -1,6 +1,6 @@
 {
   "name": "eslint-plugin-ts-restrictions",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "private": false,
   "description": "ESLint rules for TypeScript that eslint-config-typed enables, published on their own with few dependencies.",
   "keywords": [

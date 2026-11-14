@@ -1,5 +1,22 @@
 # event-schedule-app
 
+## 0.0.40
+
+### Patch Changes
+
+- Updated dependencies [b93e33d]
+- Updated dependencies [6449ece]
+- Updated dependencies [39c95f1]
+    - blueprint-synstate@0.12.1
+    - ts-fortress@13.0.1
+    - event-schedule-app-shared@0.0.25
+    - ts-fortress-types@0.0.26
+    - synstate@9.0.0
+    - synstate-dom@0.11.0
+    - synstate-router@0.4.0
+    - synstate-router-dom@0.3.0
+    - ts-data-forge@15.0.0
+
 ## 0.0.39
 
 ### Patch Changes
