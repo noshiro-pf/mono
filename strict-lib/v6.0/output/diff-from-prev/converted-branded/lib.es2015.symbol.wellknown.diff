@@ -1,5 +1,5 @@
 diff --git a/v5.9/output/lib-files-branded/lib.es2015.symbol.wellknown.d.ts b/v6.0/output/lib-files-branded/lib.es2015.symbol.wellknown.d.ts
-index fb32418c7940597663e2774916e46fa990883999..8118c78d9043235bd84c4ccbccf3d6012b850f50 100644
+index 1475936760f36e6b96393a41ff8bbab2e5a71c34..3243fd75d459ec02e1414721a73fc4841695989c 100644
 --- a/v5.9/output/lib-files-branded/lib.es2015.symbol.wellknown.d.ts
 +++ b/v6.0/output/lib-files-branded/lib.es2015.symbol.wellknown.d.ts
 @@ -7,7 +7,7 @@ License at http://www.apache.org/licenses/LICENSE-2.0

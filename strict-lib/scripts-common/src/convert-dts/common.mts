@@ -213,7 +213,11 @@ const brandedNumbers = [
   'NewArrayMaxSize',
 
   // YearEnum is not present in ts-type-forge globals; we add it as an alias of
-  // SafeUint inside the generated `declare namespace NumberType`.
+  // SafeInt inside the generated `declare namespace NumberType`. A bare brand
+  // takes no number literal, so the branded flavor rejects `new Date(2020, 0)`
+  // and `Date.UTC(2020, 0)` until the year is cast. The size arguments take
+  // literals through `WithSmallInt`, a union of small literals (-40 to 39 by
+  // default) that does not reach the years in use.
   'YearEnum',
 
   ...brandedNumberFromTypeUtils,
@@ -311,7 +315,7 @@ export const brandedNumberTypeDefString = (): string => {
 
       export type ${NewArrayMaxSize} = ${ArraySize};
 
-      export type ${YearEnum} = ${SafeUint};
+      export type ${YearEnum} = ${SafeInt};
     }
   `;
 };
