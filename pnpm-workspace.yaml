@@ -1,8 +1,9 @@
 # Single source of truth for the versions of shared devDependencies.
 # A package writes `"eslint": "catalog:"` instead of a version, so the
 # declaration stays in the package that needs it while the version stays here.
-# Only devDependencies use the catalog: a published package's dependencies and
-# peerDependencies are its own API surface, so their ranges stay literal.
+# A devDependency with an entry here uses `catalog:`. A published package's
+# other dependency fields do not: they are its own API surface, so their ranges
+# stay its own. check:root:dependency-specifiers holds both.
 catalog:
   '@playwright/test': 1.64.1
   '@preact/signals': 2.11.3
