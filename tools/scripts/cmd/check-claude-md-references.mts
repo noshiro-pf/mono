@@ -15,10 +15,12 @@ import { listTrackedFiles, readRepositoryFile } from '../lib/repo-files.mjs';
  * pointers had accumulated by the time this was written, all from one pass that
  * shortened the headings.
  *
- * A citation is read in five shapes, and nothing else is read at all:
+ * A citation is read in six shapes, and nothing else is read at all:
  *
  * - `CLAUDE.md, "Dependencies"` — and the run of headings that may follow it,
  *   as `CLAUDE.md`'s: "A", "B" and "C".
+ * - `CLAUDE.md ("Dependencies")`, the same run in parentheses directly after
+ *   the name.
  * - `"Dependencies" in CLAUDE.md`, with an optional `the root` before the
  *   name.
  * - `CLAUDE.md の「CI」節`, where the trailing 節 is what makes it a citation
@@ -136,8 +138,11 @@ const HEADING = /^#{1,6}\s+(?<heading>.+)$/u;
 /** The file naming itself, before the headings it goes on to quote. */
 const MENTION = /`?CLAUDE\.md`?(?:'s)?[:,]?(?: の)?/gu;
 
-/** One quoted heading and what joins it to the next: `"A", ` or `"B" and `. */
-const QUOTED_HEAD = /^ ?"(?<heading>[^"\n]+)" ?(?:,|and)? ?/u;
+/**
+ * One quoted heading and what joins it to the next: `"A", ` or `"B" and `; the
+ * run may sit in parentheses, as in `CLAUDE.md ("A", "B")`.
+ */
+const QUOTED_HEAD = /^ ?\(?"(?<heading>[^"\n]+)"\)? ?(?:,|and)? ?/u;
 
 /** `"A" in CLAUDE.md`, and `"A" in the root `CLAUDE.md``. */
 const CITATION_LEADING =
