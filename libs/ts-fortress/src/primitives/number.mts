@@ -121,7 +121,28 @@ export type NumberTypeConstraints = Partial<
     lt: number;
     lte: number;
     max: number;
+
+    /**
+     * The value must be an integer multiple of this number; `0` admits only
+     * `0`.
+     *
+     * A value passes when its floating-point remainder `value % multipleOf` is
+     * `0`, or when it is a multiple as the decimals both are written as (their
+     * shortest round-trip notation): both are scaled by the power of ten that
+     * makes them integers, and the integers are divided. So with `0.1`, `0.3`
+     * passes although `0.3 % 0.1` is `0.09999999999999998`, while `0.35` does
+     * not; with `1.1`, `3 * 1.1`, written `3.3000000000000003`, passes since
+     * its remainder is `0`. The decimal comparison needs both scaled integers
+     * to be safe integers; when one is not (`123456789012345.67` with `0.01`,
+     * say), the remainder alone decides.
+     */
     multipleOf: number;
+
+    /**
+     * The same check as `multipleOf`: a multiple counted from `0`, whatever
+     * `min` is, whereas an `<input>` with a `min` counts its `step` from that
+     * `min`.
+     */
     step: number;
   }>
 >;
@@ -396,9 +417,127 @@ type IsPositive<N extends number> = BoolAnd<IsNonZero<N>, IsNonNegative<N>>;
 
 type IsNonPositive<N extends number> = BoolNot<IsPositive<N>>;
 
-const createConstraintsPredicate =
-  (constraints: NumberTypeConstraints) =>
-  (value: number): Result<true, NumericConstraintViolation> => {
+type DecimalNotation = Readonly<{
+  digits: number;
+  places: number;
+}>;
+
+/**
+ * The shortest round-trip notation of the finite `n` as the integer `digits`
+ * and the number of `places` its decimal point sits left of their end, so that
+ * `n` is `digits / 10 ** places`. `places` is negative for an exponent notation
+ * such as `1e+21`. `digits` is exact while it is a safe integer.
+ */
+const decimalNotationOf = (n: number): DecimalNotation => {
+  const [mantissa = '', exponent = '0'] = n.toString().split('e', 2);
+
+  const [integerPart = '', fraction = ''] = mantissa.split('.', 2);
+
+  // Both strings come from `Number.prototype.toString` of a finite number and
+  // always parse. Were one not to, falling back to `NaN`, rather than throwing
+  // in a validator, makes the decimal comparison fail and leaves only the
+  // remainder able to accept the value.
+  return {
+    digits: Result.unwrapOkOr(
+      Num.safeParseFloat(`${integerPart}${fraction}`),
+      Number.NaN,
+    ),
+    places:
+      fraction.length -
+      Result.unwrapOkOr(Num.safeParseFloat(exponent), Number.NaN),
+  };
+};
+
+/**
+ * `notation` scaled to an integer of `places` decimal places, for `places` no
+ * less than `notation.places`. A result that is a safe integer is exact: the
+ * digits and the power of ten are then exact, and so is their product.
+ */
+const scaleNotation = (notation: DecimalNotation, places: number): number =>
+  notation.digits * 10 ** (places - notation.places);
+
+/**
+ * A predicate for whether a number is an integer multiple of `divisor`, which
+ * works out what it reads from `divisor` once rather than for every value. With
+ * no divisor, every number passes.
+ *
+ * A zero divisor admits only zero, the one multiple of zero. The remainder
+ * cannot say so, since `value % 0` is NaN for every value, zero included.
+ *
+ * A value whose floating-point remainder is `0` passes: it is an exact multiple
+ * of the divisor as the binary numbers both are, which is all that is asked of
+ * a safe-integer divisor, or of one that is not finite. For any other divisor
+ * the remainder is not enough, since `0.3 % 0.1` is `0.09999999999999998`, so a
+ * decimal divisor such as `0.1` or `0.01` would reject most of its own
+ * multiples. A value the remainder rejects is therefore also compared in
+ * decimal: the value and the divisor are read as integers scaled by the same
+ * power of ten, from the digits of their shortest round-trip notation (what a
+ * literal or a JSON number is written with), and the remainder is taken of
+ * those integers. The digits are read rather than computed by rounding
+ * `value * 10 ** places`, which lands on an adjacent integer for some values
+ * near `Number.MAX_SAFE_INTEGER`. When a scaled integer is not a safe integer,
+ * or both are integers, the floating-point remainder has already answered.
+ */
+const multipleOfPredicate = (
+  divisor: number | undefined,
+): ((value: number) => boolean) => {
+  if (divisor === undefined) {
+    return () => true;
+  }
+
+  if (!Num.isNonZero(divisor)) {
+    return (value) => value === 0;
+  }
+
+  if (Number.isSafeInteger(divisor) || !Number.isFinite(divisor)) {
+    return (value) => Num.rem(value, divisor) === 0;
+  }
+
+  const divisorNotation = decimalNotationOf(divisor);
+
+  return (value) => {
+    if (Num.rem(value, divisor) === 0) {
+      return true;
+    }
+
+    if (!Number.isFinite(value)) {
+      return false;
+    }
+
+    // Only a value the remainder rejects pays for reading its notation. A type
+    // with both `multipleOf` and `step` may read it twice, which is not worth
+    // sharing between the two predicates.
+    const valueNotation = decimalNotationOf(value);
+
+    // `places` is not positive only for an integer divisor beyond the safe
+    // integers and an integer value, whose remainder is exact.
+    const places = Math.max(valueNotation.places, divisorNotation.places);
+
+    const scaledValue = scaleNotation(valueNotation, places);
+
+    const scaledDivisor = scaleNotation(divisorNotation, places);
+
+    return (
+      places > 0 &&
+      Number.isSafeInteger(scaledValue) &&
+      Number.isSafeInteger(scaledDivisor) &&
+      // Always true here: the divisor is non-zero, and `places` is at least
+      // `divisorNotation.places`, so its digits are scaled up, never down to
+      // zero. It narrows the type `Num.rem` asks.
+      Num.isNonZero(scaledDivisor) &&
+      Num.rem(scaledValue, scaledDivisor) === 0
+    );
+  };
+};
+
+const createConstraintsPredicate = (
+  constraints: NumberTypeConstraints,
+): ((value: number) => Result<true, NumericConstraintViolation>) => {
+  const isMultipleOfMultipleOf = multipleOfPredicate(constraints.multipleOf);
+
+  const isMultipleOfStep = multipleOfPredicate(constraints.step);
+
+  return (value) => {
     const {
       finite,
       int,
@@ -484,42 +623,23 @@ const createConstraintsPredicate =
     }
     /* eslint-enable ts-restrictions/no-negated-comparison */
 
-    // `value % 0` throws a RangeError, so the zero divisor is handled
-    // separately: it only admits zero.
-    if (multipleOf !== undefined) {
-      if (!Num.isNonZero(multipleOf)) {
-        if (value !== 0) {
-          return Result.err({
-            constraint: 'multipleOf',
-            value: multipleOf.toString(),
-          } as const);
-        }
-      } else if (Num.rem(value, multipleOf) !== 0) {
-        return Result.err({
-          constraint: 'multipleOf',
-          value: multipleOf.toString(),
-        } as const);
-      }
+    if (multipleOf !== undefined && !isMultipleOfMultipleOf(value)) {
+      return Result.err({
+        constraint: 'multipleOf',
+        value: multipleOf.toString(),
+      } as const);
     }
 
-    if (step !== undefined) {
-      if (!Num.isNonZero(step)) {
-        if (value !== 0) {
-          return Result.err({
-            constraint: 'step',
-            value: step.toString(),
-          } as const);
-        }
-      } else if (Num.rem(value, step) !== 0) {
-        return Result.err({
-          constraint: 'step',
-          value: step.toString(),
-        } as const);
-      }
+    if (step !== undefined && !isMultipleOfStep(value)) {
+      return Result.err({
+        constraint: 'step',
+        value: step.toString(),
+      } as const);
     }
 
     return Result.ok(true);
   };
+};
 
 const defaultValueErrorMessage = (
   value: number,

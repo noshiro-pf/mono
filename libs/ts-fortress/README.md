@@ -348,7 +348,7 @@ Numeric constraints cover:
 
 - Range: `gt`, `gte`, `min`, `lt`, `lte`, `max`
 - Sign helpers: `positive`, `nonNegative`, `negative`, `nonPositive`
-- Divisibility: `multipleOf`, `step`
+- Divisibility: `multipleOf`, `step` — a value passes when its floating-point remainder is `0` or when it is a multiple as the decimals both are written as, so `t.number(0, { step: 0.01 })` accepts `0.07` and `1.1` although `0.07 % 0.01` is not `0`. The decimal comparison needs the value and the divisor, scaled to integers by their decimal places, to be safe integers; beyond that the remainder alone decides.
 
 ### Bigint constraints
 
