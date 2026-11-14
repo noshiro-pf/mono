@@ -1,10 +1,8 @@
 import { asPositiveSafeInt } from 'ts-data-forge';
 import { periodRateOf } from 'ts-utils-additional';
 import {
-  housingConditions,
-  housingLoanDeductionChildRearingBonus,
   housingLoanDeductionRate,
-  housingTypes,
+  housingLoanDeductionTable,
 } from '../../data/index.mjs';
 import type { SimulationInput } from '../input/index.mjs';
 import { monthOf, type MonthIndex } from '../year-month/index.mjs';
@@ -44,22 +42,15 @@ export const calculateHousingLoanDeduction = (
   return mut_result;
 };
 
-/** 住宅の種別などから借入限度額と控除期間を求める。 */
+/** 新築 / 中古・住宅の種別・子育て世帯かから借入限度額と控除期間を求める。 */
 export const housingLoanDeductionConditions = (
   loan: SimulationInput['housingLoan'],
 ): HousingLoanDeductionConditions => {
-  const baseLimit =
-    housingTypes.find((h) => h.id === loan.houseType)?.limit ?? 0;
+  const row = housingLoanDeductionTable[loan.houseCondition][loan.houseType];
 
   return {
-    limit:
-      baseLimit === 0
-        ? 0
-        : baseLimit +
-          (loan.childRearing ? housingLoanDeductionChildRearingBonus : 0),
-    years:
-      housingConditions.find((c) => c.id === loan.houseCondition)
-        ?.deductionYears ?? 0,
+    limit: loan.childRearing ? row.childRearingLimit : row.limit,
+    years: row.years,
   };
 };
 

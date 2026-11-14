@@ -3,6 +3,8 @@
  * ここにまとめている。制度が改定されたらここを直す。
  */
 
+import type { ReadonlyRecord } from 'ts-type-forge';
+
 /** 雇用保険料率（労働者負担、一般の事業）。 */
 export const employmentInsuranceRate = 0.0055;
 
@@ -93,25 +95,67 @@ export const pensionSocialInsuranceRate = 0.1;
 /** 住宅ローン控除の控除率。 */
 export const housingLoanDeductionRate = 0.007;
 
-/**
- * 住宅の種別ごとの住宅ローン控除の借入限度額（円）。
- * `id` は保存する入力値に使うので変えない。
- */
+/** 住宅の種別。`id` は保存する入力値に使うので変えない。 */
 export const housingTypes = [
-  { id: 'long-life', label: '長期優良住宅・低炭素住宅', limit: 45_000_000 },
-  { id: 'zeh', label: 'ZEH 水準省エネ住宅', limit: 35_000_000 },
-  { id: 'energy-efficient', label: '省エネ基準適合住宅', limit: 30_000_000 },
-  { id: 'other', label: 'その他の住宅', limit: 0 },
+  { id: 'long-life', label: '長期優良住宅・低炭素住宅' },
+  { id: 'zeh', label: 'ZEH 水準省エネ住宅' },
+  { id: 'energy-efficient', label: '省エネ基準適合住宅' },
+  { id: 'other', label: 'その他の住宅' },
 ] as const;
 
-/** 子育て世帯・若者夫婦世帯の借入限度額の上乗せ（円）。 */
-export const housingLoanDeductionChildRearingBonus = 5_000_000;
-
-/** 新築 / 中古ごとの住宅ローン控除の控除期間（年）。 */
+/** 新築 / 中古。`id` は保存する入力値に使うので変えない。 */
 export const housingConditions = [
-  { id: 'new', label: '新築', deductionYears: 13 },
-  { id: 'used', label: '中古', deductionYears: 10 },
+  { id: 'new', label: '新築' },
+  { id: 'used', label: '中古' },
 ] as const;
+
+// 入力できないので扱わない例外: 新築のその他の住宅のうち令和 5 年までに建築確認を
+// 受けたもの（令和 7 年までの入居に限る）と、新築と同じ扱いの買取再販の認定住宅等。
+// 中古にも `childRearingLimit` を持たせるのは、入居年で引き分けるときに令和 8 年
+// 以降の中古の上乗せをそのまま書けるようにするため。
+/**
+ * 住宅ローン控除の借入限度額（円）と控除期間（年）。令和 6・7 年入居の値。
+ * 入居年で引き分けていないので、ほかの年の入居にもこの値を使い、その入居では
+ * 実際の控除と合わないことがある。
+ * `childRearingLimit` は子育て世帯・若者夫婦世帯の借入限度額で、上乗せは新築だけ。
+ * 新築のその他の住宅は控除が無い。
+ */
+export const housingLoanDeductionTable = {
+  new: {
+    'long-life': {
+      limit: 45_000_000,
+      childRearingLimit: 50_000_000,
+      years: 13,
+    },
+    zeh: { limit: 35_000_000, childRearingLimit: 45_000_000, years: 13 },
+    'energy-efficient': {
+      limit: 30_000_000,
+      childRearingLimit: 40_000_000,
+      years: 13,
+    },
+    other: { limit: 0, childRearingLimit: 0, years: 0 },
+  },
+  used: {
+    'long-life': {
+      limit: 30_000_000,
+      childRearingLimit: 30_000_000,
+      years: 10,
+    },
+    zeh: { limit: 30_000_000, childRearingLimit: 30_000_000, years: 10 },
+    'energy-efficient': {
+      limit: 30_000_000,
+      childRearingLimit: 30_000_000,
+      years: 10,
+    },
+    other: { limit: 20_000_000, childRearingLimit: 20_000_000, years: 10 },
+  },
+} as const satisfies ReadonlyRecord<
+  (typeof housingConditions)[number]['id'],
+  ReadonlyRecord<
+    (typeof housingTypes)[number]['id'],
+    Readonly<{ limit: number; childRearingLimit: number; years: number }>
+  >
+>;
 
 /** 退職所得控除: 勤続 20 年までは 1 年あたり 40 万円、超えた分は 70 万円。 */
 export const retirementIncomeDeduction = {
