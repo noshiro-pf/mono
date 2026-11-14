@@ -103,5 +103,7 @@ component_management:
       paths: ['libs/ts-data-forge/**']
     - component_id: ts-fortress
       paths: ['libs/ts-fortress/**']
+    - component_id: ts-fsm-forge
+      paths: ['libs/ts-fsm-forge/**']
     - component_id: ts-repo-utils
       paths: ['libs/ts-repo-utils/**']

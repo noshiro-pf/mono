@@ -1,0 +1,10 @@
+{
+  "name": "verify-ts-fsm-forge",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "ts-fsm-forge": "file:../../../.tarballs/ts-fsm-forge.tgz",
+    "typescript": ">=5.0"
+  }
+}
