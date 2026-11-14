@@ -192,3 +192,11 @@ describe('Int8 test', () => {
     });
   });
 });
+
+describe('Int8.pow floors a fractional result (#3968)', () => {
+  test('as div does', () => {
+    expect(Int8.pow(asInt8(2), asInt8(-1))).toBe(0);
+
+    expect(Int8.pow(asInt8(-2), asInt8(-1))).toBe(-1);
+  });
+});

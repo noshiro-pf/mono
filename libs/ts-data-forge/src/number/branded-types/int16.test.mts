@@ -241,3 +241,9 @@ describe('Int16 saturation (#3960)', () => {
     expect(Int16.fromNumber(Number.NEGATIVE_INFINITY)).toBe(-32_768);
   });
 });
+
+describe('Int16.pow floors a fractional result (#3968)', () => {
+  test('as div does', () => {
+    expect(Int16.pow(asInt16(-2), asInt16(-1))).toBe(-1);
+  });
+});
