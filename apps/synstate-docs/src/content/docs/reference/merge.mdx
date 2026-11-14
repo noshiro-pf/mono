@@ -11,6 +11,8 @@ import { colors } from '../../../components/constants.mjs';
 {/* jsdoc-description */}
 Merges multiple observables into a single observable that emits all values from all sources.
 Emits whenever any source observable emits a value.
+It holds no value until a source emits, even when its sources hold one.
+Pipe `withInitialValue` after it where a value is needed from the start.
 {/* /jsdoc-description */}
 
 ## Marble Diagram

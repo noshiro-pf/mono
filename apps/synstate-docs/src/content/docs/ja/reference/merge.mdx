@@ -11,6 +11,8 @@ import { colors } from '../../../../components/constants.mjs';
 {/* jsdoc-description */}
 複数の Observable を、すべてのソースからのすべての値を発行する単一の Observable にマージします。
 いずれかのソース Observable が値を発行するたびに発行します。
+ソースが値を保持していても、いずれかのソースが値を発行するまでは値を保持しません。
+最初から値が必要な場合は、後ろに `withInitialValue` を pipe します。
 {/* /jsdoc-description */}
 
 ## Marble Diagram

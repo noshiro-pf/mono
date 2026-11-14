@@ -79,26 +79,6 @@ namespace SynStateInternals {
   export type EveryInitialized<OS extends NonEmptyTuple<Observable<unknown>>> =
     OS extends NonEmptyTuple<InitializedObservable<unknown>> ? true : false;
 
-  type IsInitialized<O> = readonly [O] extends readonly [
-    InitializedObservable<unknown>,
-  ]
-    ? true
-    : false;
-
-  /** Evaluates true | false as true instead of boolean */
-  type LogicalValue<B extends boolean> = readonly [B] extends readonly [true]
-    ? true
-    : readonly [B] extends readonly [false]
-      ? false
-      : true;
-
-  type SomeInitializedImpl<OS extends Observable<unknown>> =
-    // union distribution
-    LogicalValue<OS extends OS ? IsInitialized<OS> : never>;
-
-  export type SomeInitialized<OS extends NonEmptyTuple<Observable<unknown>>> =
-    SomeInitializedImpl<OS[number]>;
-
   type InitializedCombineObservableImpl<A extends NonEmptyUnknownList> =
     InitializedSyncChildObservable<A, A>;
 
@@ -133,18 +113,8 @@ namespace SynStateInternals {
       ? InitializedZipObservableImpl<Cast<Unwrap<OS>>>
       : ZipObservableImpl<Unwrap<OS>>;
 
-  type InitializedMergeObservableImpl<P extends NonEmptyUnknownList> =
-    InitializedSyncChildObservable<ArrayElement<P>, P>;
-
   export type MergeObservableImpl<P extends NonEmptyUnknownList> =
     SyncChildObservable<ArrayElement<P>, P>;
-
-  export type MergeObservableRefinedImpl<
-    OS extends NonEmptyTuple<Observable<unknown>>,
-  > =
-    SomeInitialized<OS> extends true
-      ? InitializedMergeObservableImpl<Cast<Unwrap<OS>>>
-      : MergeObservableImpl<Unwrap<OS>>;
 }
 
 expectType<SynStateInternals.EveryInitialized<readonly [Observable<1>]>, false>(
@@ -168,29 +138,6 @@ expectType<
     readonly [Observable<1>, InitializedObservable<2>]
   >,
   false
->('=');
-
-expectType<SynStateInternals.SomeInitialized<readonly [Observable<1>]>, false>(
-  '=',
-);
-
-expectType<
-  SynStateInternals.SomeInitialized<readonly [InitializedObservable<1>]>,
-  true
->('=');
-
-expectType<
-  SynStateInternals.SomeInitialized<
-    readonly [InitializedObservable<1>, InitializedObservable<2>]
-  >,
-  true
->('=');
-
-expectType<
-  SynStateInternals.SomeInitialized<
-    readonly [Observable<1>, InitializedObservable<2>]
-  >,
-  true
 >('=');
 
 export type CombineObservable<A extends NonEmptyUnknownList> =
@@ -220,9 +167,14 @@ export type ZipObservableRefined<
 export type MergeObservable<A extends NonEmptyUnknownList> =
   SynStateInternals.MergeObservableImpl<A>;
 
+/**
+ * What `merge` returns for the sources `OS`. `merge` holds no value until a
+ * source emits, even when its sources hold one, so this is never an
+ * `InitializedObservable`.
+ */
 export type MergeObservableRefined<
   OS extends NonEmptyTuple<Observable<unknown>>,
-> = SynStateInternals.MergeObservableRefinedImpl<OS>;
+> = MergeObservable<Unwrap<OS>>;
 
 export type MapOperatorObservable<A, B> = SyncChildObservable<B, readonly [A]>;
 
