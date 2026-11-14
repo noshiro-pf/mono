@@ -1,6 +1,6 @@
 {
   "name": "synstate-router-dom",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "description": "synstate-dom bindings for synstate-router: exhaustive Routes that rebuild only on a new route, and a Link that takes no plain string",
   "repository": {
     "type": "git",
@@ -76,9 +76,9 @@
     "ts-repo-utils": "workspace:*"
   },
   "peerDependencies": {
-    "synstate": ">=8.0.0",
-    "synstate-dom": ">=0.10.0",
-    "synstate-router": ">=0.3.0"
+    "synstate": ">=9.0.0",
+    "synstate-dom": ">=0.11.0",
+    "synstate-router": ">=0.4.0"
   },
   "engines": {
     "node": ">=22.23.4",

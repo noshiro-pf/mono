@@ -1,5 +1,46 @@
 # pr-merge-queue
 
+## 0.13.0
+
+### Minor Changes
+
+- ff9ee47: `unblock-prs` now checks a queued pull request stacked on another one ahead of its turn, right above that one's queue layer, instead of only candidates on `main`: with `main <- A <- B` both `merge-queued`, B's layer is built from A's head on top of A's, checked, and released only once A has merged, when its verdict is already there. A layer whose pull request's head moved to a commit with the layer's tree, as releasing A does to B, is kept. `pr-report-core` exports `withStackedAbove` and `stackedLayerParent`, which the Pull Requests Manager's queue reads the same way.
+
+### Patch Changes
+
+- 25cd897: `pr-description` (and so `open-pr --body-file` and `pr-description create`) refuses a `Merge-After:` or `Start-After:` line that names no `#N`, such as `Start-After: 3877` or one naming only a URL or `owner/repo#N`, and a line meant as a declaration that the readers do not take as one: its key behind a list marker or emphasis (`**Start-After:** #5`, `- Start-After: #5`), or emphasis between the key and its colon. Each was a description that meant an order and declared none. The trailers after the `---` rule are checked too, and so is a description in a repository with no `translation.heading`, where `pr-description check` now checks this rule alone instead of stopping. A quote, inline code, a heading, link text, strikethrough, a full-width colon and a flag such as `--merge-after` are left alone.
+- fff06e0: Export the types `configOf` and `planAutoFix` name: `UnblockPrsConfig` and `UnblockPrsConfigFile` (unblock-prs's configuration, and the shape of its `.github/unblock-prs.json`), `AutoFixPlan`, `GeneratedBranch`, `RegenerateConfig` and `SpeculateConfig`.
+- 7cf44aa: Read every page of open pull requests in `pr-report`'s queue read, so that the commands built on it (`pr-report`, `report-unowned-prs`, `claim-pr`, `push-fixed-pr`, `rework-pr`, `run-unblock-prs-skill`, `run-issue-resolver` and `startable-issues`) no longer refuse to run once 100 or more pull requests are open. Without a token, a report that reads checks still has 60 requests an hour, roughly three per pull request.
+
+    `unblock-prs` now reads every open pull request in its survey, where it read the newest 100 and left the rest out silently: past 100 open, the oldest queued pull requests were never picked, and the queue read each one left out as merged, so a pull request naming it in `Merge-After` could merge first and its `blocks-release` no longer held the release. `start-issue` and `open-pr` read every page of the open pull requests when they look for the ones that close an issue, and `claim-pr`, `pr-report` and `open-pr` read every page of a pull request's comments and of an issue's `blocked_by` dependencies.
+
+- 240b963: `startable-issues`, `run-issue-resolver`'s survey of the issues, `claim-pr`, `push-fixed-pr`, `report-unowned-prs` and `run-unblock-prs-skill` no longer read every open pull request's comparison, check runs, workflow runs and commit statuses, about four requests each, or the contexts the default branch requires, which none of them used: with fifty open pull requests that was over two minutes before any of them said anything. `readQueueState` now leaves them out unless called with `checks: true`. Without it, its queue requires no context and its entries' check verdicts and comparisons mean nothing, while the owners it returns are the same either way. `pr-report` reads them as before.
+- 37ad35d: `pr-report` no longer loses the issues a stacked pull request closes when it runs with a token. GitHub's `closingIssuesReferences` lists a closing keyword only for a pull request into the default branch, and the report took its empty list as the answer; it now joins that list with the keywords GitHub marked in the rendered body, for every open pull request. `startable-issues` and `run-issue-resolver`, which decide from the report, therefore stop offering an issue that only a stacked pull request closes. Where the report reads a body's text (the merged list, and an answer without the rendering), a closing keyword followed by this repository's issue URL now counts whatever the case of the owner and repository names in it.
+- 9b52ae3: Requires the `ts-fortress` release in which the package's own declarations type-check. They declare codecs with inferred types, which `ts-fortress` rejected with TS2344 for a consumer compiling with `skipLibCheck: false`; nothing in the package's `dist/` changes.
+- 53b3638: The `unblock-prs` skill describes checking ahead on queue layers: a pull request set aside because its layer failed is fixed from the set-aside comment, which links the layer's run, since its own checks are the skipped ones of `skip-ci` and the report's `checks.failed` is empty.
+- Updated dependencies [2f758a4]
+- Updated dependencies [ae57625]
+- Updated dependencies [e9340d0]
+- Updated dependencies [a6d03ea]
+- Updated dependencies [a6d03ea]
+- Updated dependencies [e7b459f]
+- Updated dependencies [ff9ee47]
+- Updated dependencies [d5640ce]
+- Updated dependencies [9b52ae3]
+- Updated dependencies [bf5b643]
+- Updated dependencies [7d6f898]
+- Updated dependencies [9b52ae3]
+- Updated dependencies [3ce9fd4]
+- Updated dependencies [a6d03ea]
+- Updated dependencies [442792e]
+- Updated dependencies [fff06e0]
+- Updated dependencies [40645fa]
+    - ts-type-forge@9.2.6
+    - ts-data-forge@15.0.0
+    - ts-fortress@13.0.0
+    - ts-repo-utils@11.0.0
+    - pr-report-core@0.8.0
+
 ## 0.12.0
 
 ### Minor Changes

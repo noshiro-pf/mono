@@ -1,5 +1,26 @@
 # eslint-plugin-synstate
 
+## 0.7.1
+
+### Patch Changes
+
+- b1aa42c: `no-write-during-propagation`, following a setter imported from another file, now also sees through a type wrapper around a namespace import of synstate, as in `(s satisfies typeof s).createState(0)`.
+- Updated dependencies [1e5abc2]
+- Updated dependencies [2f758a4]
+- Updated dependencies [ae57625]
+- Updated dependencies [47af2c3]
+- Updated dependencies [e9340d0]
+- Updated dependencies [a6d03ea]
+- Updated dependencies [a6d03ea]
+- Updated dependencies [e7b459f]
+- Updated dependencies [d3a20c8]
+- Updated dependencies [7d6f898]
+- Updated dependencies [40645fa]
+- Updated dependencies [b1aa42c]
+    - eslint-rule-forge@0.10.0
+    - ts-type-forge@9.2.6
+    - ts-std-forge@0.6.0
+
 ## 0.7.0
 
 ### Minor Changes

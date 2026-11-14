@@ -1,5 +1,0 @@
----
-'eslint-plugin-ts-data-forge': patch
----
-
-`no-unnecessary-type-guard` recognizes the variants of the unwrapped `Optional` (whose `Some` / `None` carry a type-only discriminant instead of `$$tag`), as well as those of earlier versions. On an argument that may be an unwrapped `Optional`, which at runtime is the value it holds, it no longer judges a guard that asks what kind of value it is (`isString`, `isRecord`, `isNonEmptyString`, ...), where it used to judge the object an `Optional` was. Nor does it judge one that asks about `undefined` / `null` (`isNonNullish`, `isNull`, ...), since a `Some` of `undefined` or `null` is that value; `Optional.isSome` / `isNone` are judged as before. Another type's variant guard (`Result.isOk`, ...) on an `Optional` is judged by what the `Optional` is at runtime: a `Some<Ok<T>>` is the `Ok` itself, so `Result.isOk` on it is always true, while `None` or a `Some` of a primitive is never an `Ok`; the rule does not judge a `Some` that holds another `Some`.

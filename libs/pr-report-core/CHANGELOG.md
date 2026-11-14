@@ -1,5 +1,28 @@
 # pr-report-core
 
+## 0.8.0
+
+### Minor Changes
+
+- ff9ee47: `unblock-prs` now checks a queued pull request stacked on another one ahead of its turn, right above that one's queue layer, instead of only candidates on `main`: with `main <- A <- B` both `merge-queued`, B's layer is built from A's head on top of A's, checked, and released only once A has merged, when its verdict is already there. A layer whose pull request's head moved to a commit with the layer's tree, as releasing A does to B, is kept. `pr-report-core` exports `withStackedAbove` and `stackedLayerParent`, which the Pull Requests Manager's queue reads the same way.
+
+### Patch Changes
+
+- 9b52ae3: Requires the `ts-fortress` release in which the package's own declarations type-check. They declare codecs with inferred types, which `ts-fortress` rejected with TS2344 for a consumer compiling with `skipLibCheck: false`; nothing in the package's `dist/` changes.
+- Updated dependencies [e9340d0]
+- Updated dependencies [a6d03ea]
+- Updated dependencies [a6d03ea]
+- Updated dependencies [e7b459f]
+- Updated dependencies [d5640ce]
+- Updated dependencies [bf5b643]
+- Updated dependencies [7d6f898]
+- Updated dependencies [9b52ae3]
+- Updated dependencies [3ce9fd4]
+- Updated dependencies [a6d03ea]
+- Updated dependencies [442792e]
+    - ts-data-forge@15.0.0
+    - ts-fortress@13.0.0
+
 ## 0.7.0
 
 ### Minor Changes

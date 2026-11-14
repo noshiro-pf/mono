@@ -4,9 +4,9 @@
   "private": true,
   "type": "module",
   "dependencies": {
-    "synstate": ">=8.0.0",
-    "synstate-dom": ">=0.10.0",
-    "synstate-router": ">=0.3.0",
+    "synstate": ">=9.0.0",
+    "synstate-dom": ">=0.11.0",
+    "synstate-router": ">=0.4.0",
     "synstate-router-dom": "file:../../../.tarballs/synstate-router-dom.tgz"
   }
 }

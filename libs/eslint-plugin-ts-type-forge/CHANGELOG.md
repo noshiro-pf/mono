@@ -1,5 +1,25 @@
 # eslint-plugin-ts-type-forge
 
+## 0.8.25
+
+### Patch Changes
+
+- ce64435: `prefer-canonical-length-constrained-tuple` no longer rewrites a tuple whose cycle runs through an interface, a class, a function, a variable (destructured or not, including through its initializer), an enum, a namespace member, a global, or a module declared in the file with `declare module` — reached by name, by a qualified name (`N.X`, `typeof v.x`, `globalThis.X`, `typeof this.x`), through `extends`, through a type parameter's default, with `typeof`, or through `import('m')` (as a type or an expression), `import … from 'm'`, `export … from 'm'`, `import x = require('m')` or `import X = N.Y` — since the rewrite would make the type circular. A tuple in an interface, class, function or variable declaration is now checked against the declaration it sits in as well, so some tuples there whose rewrite would have compiled (`interface Tree { kids: readonly [Tree, Tree] }`, a class method returning `readonly [Vec, Vec]`) are left as they are, as are tuples reaching any member of a declared module that names them.
+- Updated dependencies [1e5abc2]
+- Updated dependencies [2f758a4]
+- Updated dependencies [ae57625]
+- Updated dependencies [47af2c3]
+- Updated dependencies [e9340d0]
+- Updated dependencies [a6d03ea]
+- Updated dependencies [e7b459f]
+- Updated dependencies [d3a20c8]
+- Updated dependencies [d5640ce]
+- Updated dependencies [40645fa]
+- Updated dependencies [b1aa42c]
+    - eslint-rule-forge@0.10.0
+    - ts-type-forge@9.2.6
+    - ts-data-forge@15.0.0
+
 ## 0.8.24
 
 ### Patch Changes

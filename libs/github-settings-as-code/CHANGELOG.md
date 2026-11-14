@@ -1,5 +1,33 @@
 # [2.1.0](https://github.com/noshiro-pf/github-settings-as-code/compare/v2.0.1...v2.1.0) (2026-08-09)
 
+## 4.0.9
+
+### Patch Changes
+
+- a739052: `repo-settings apply` no longer fails in a repository without `repo-settings/rulesets/` or `repo-settings/environments/`: a target whose directory or file is absent is left untouched, as Pages and Dependabot alerts already were, and `apply all` goes on to the next target instead of stopping at a missing directory. The repository, Actions and variables targets skip a missing `settings.json` the same way.
+- 204eca0: `repo-settings apply` writes the applied values back to the file each ruleset or environment was declared in, so renaming one no longer leaves a second file holding the same id, and an environment whose name differs from GitHub's only in case keeps its file. A created ruleset's id is written back as soon as it is created, so a later failure no longer makes the next `apply` create it again. The ruleset list is read across every page and leaves out the organization's and enterprise's rulesets, for both `apply` and `backup`.
+- Updated dependencies [2f758a4]
+- Updated dependencies [ae57625]
+- Updated dependencies [e9340d0]
+- Updated dependencies [a6d03ea]
+- Updated dependencies [a6d03ea]
+- Updated dependencies [e7b459f]
+- Updated dependencies [d5640ce]
+- Updated dependencies [9b52ae3]
+- Updated dependencies [bf5b643]
+- Updated dependencies [7d6f898]
+- Updated dependencies [9b52ae3]
+- Updated dependencies [3ce9fd4]
+- Updated dependencies [a6d03ea]
+- Updated dependencies [442792e]
+- Updated dependencies [fff06e0]
+- Updated dependencies [40645fa]
+    - ts-type-forge@9.2.6
+    - ts-data-forge@15.0.0
+    - ts-fortress@13.0.0
+    - ts-repo-utils@11.0.0
+    - octokit-safe-types@1.2.29
+
 ## 4.0.8
 
 ### Patch Changes

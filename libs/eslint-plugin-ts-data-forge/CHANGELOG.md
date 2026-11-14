@@ -1,5 +1,34 @@
 # eslint-plugin-ts-data-forge
 
+## 0.12.0
+
+### Minor Changes
+
+- 47af2c3: Every rule treats what `ts-data-forge` re-exports from `ts-std-forge` the same whichever package it is imported from. `no-unnecessary-type-guard` now checks `isRecord` imported from `ts-std-forge`, and the fixes of `prefer-is-non-null-object`, `prefer-is-record-and-has-key`, `prefer-num-safe-parse-int`, `prefer-num-safe-parse-float`, `prefer-obj-over-entries-round-trip` and the other rules that write such a name reuse an import of it from `ts-std-forge` instead of offering no fix.
+- d3a20c8: `prefer-canonical-length-guard` builds its emptiness checks with `eslint-rule-forge`'s `createPreferEmptinessGuard`, the factory `eslint-plugin-ts-std-forge` uses too. `xs.length !== 0` now becomes `Arr.isNonEmpty(xs)` rather than `!Arr.isEmpty(xs)`, `xs.length < 1` is reported as `Arr.isEmpty(xs)`, and `xs.length === 0`, `<= 0` and `>= 1` reach `Arr.isEmpty` / `Arr.isNonEmpty` in one fix instead of two.
+- 989e95c: `no-unnecessary-type-guard` now checks the variant guards of `Optional`, `Result`, `TernaryResult` and `AsyncData` imported from `ts-std-forge` (by name, under an alias or through a namespace), where those types are defined, as it already did for the same guards imported from `ts-data-forge`.
+
+### Patch Changes
+
+- e9340d0: `no-unnecessary-type-guard` recognizes the variants of the unwrapped `Optional` by the `unique symbol` keys of their type-only properties, declared in `ts-std-forge-keys`, including through a mapped type that remaps keys.
+- a6d03ea: `no-unnecessary-type-guard` recognizes the variants of the unwrapped `Optional` (whose `Some` / `None` carry a type-only discriminant instead of `$$tag`), as well as those of earlier versions. On an argument that may be an unwrapped `Optional`, which at runtime is the value it holds, it no longer judges a guard that asks what kind of value it is (`isString`, `isRecord`, `isNonEmptyString`, ...), where it used to judge the object an `Optional` was. Nor does it judge one that asks about `undefined` / `null` (`isNonNullish`, `isNull`, ...), since a `Some` of `undefined` or `null` is that value; `Optional.isSome` / `isNone` are judged as before. Another type's variant guard (`Result.isOk`, ...) on an `Optional` is judged by what the `Optional` is at runtime: a `Some<Ok<T>>` is the `Ok` itself, so `Result.isOk` on it is always true, while `None` or a `Some` of a primitive is never an `Ok`; the rule does not judge a `Some` that holds another `Some`.
+- 26cdc39: `prefer-arr-scan` now reports a `reduce` that copies its accumulator in the shapes it missed: a spread of the accumulator at a later position (`[x, ...acc]`, `[...head, ...acc, x]`), a body wrapped in `as` or `satisfies`, and a block body or function expression whose single statement returns the copy. Those are reported without a fix; the fix stays with the `[...acc, x]` and `Arr.toPushed(acc, x)` expression bodies `scan` can express.
+- 92bba92: `prefer-canonical-array-slicing` no longer autofixes a rewrite to `Arr.tail` or `Arr.butLast` (`xs.slice(1)`, `xs.slice(0, -1)`, `Arr.skip(xs, 1)`, `Arr.skipLast(xs, 1)`, and the `toSpliced` and index `filter` forms of the same two). The rewritten call can fail to compile with TS2590, "Expression produces a union type that is too complex to represent", where it has a contextual type, such as an annotation or an argument, so `--fix` turned code that compiled into code that did not. The pattern is still reported, with a message that names the form that compiles (bind the result to an unannotated `const` first), and the rewrite is offered as a suggestion. Rewrites to the other six functions are fixed as before.
+- Updated dependencies [1e5abc2]
+- Updated dependencies [2f758a4]
+- Updated dependencies [ae57625]
+- Updated dependencies [47af2c3]
+- Updated dependencies [e9340d0]
+- Updated dependencies [a6d03ea]
+- Updated dependencies [e7b459f]
+- Updated dependencies [d3a20c8]
+- Updated dependencies [d5640ce]
+- Updated dependencies [40645fa]
+- Updated dependencies [b1aa42c]
+    - eslint-rule-forge@0.10.0
+    - ts-type-forge@9.2.6
+    - ts-data-forge@15.0.0
+
 ## 0.11.2
 
 ### Patch Changes

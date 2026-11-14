@@ -1,6 +1,6 @@
 {
   "name": "pr-merge-queue-v2",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "private": true,
   "description": "From-scratch rebuild of pr-merge-queue: the merge queue's commands, worker and unattended loops, over pr-report-core-v2 (not published)",
   "repository": {

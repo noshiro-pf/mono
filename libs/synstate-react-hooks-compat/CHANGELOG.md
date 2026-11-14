@@ -1,5 +1,31 @@
 # synstate-react-hooks-compat
 
+## 9.0.0
+
+### Major Changes
+
+- a6d03ea: Released with synstate 9, which these packages are used beside: an observable's `getSnapshot()` and `initialValue` are `Optional`s of ts-data-forge 15, unwrapped at runtime, so read them with `Optional.unwrap` instead of `.value`. The hooks themselves are unchanged, but for one consequence of `Optional.unwrapOr` no longer replacing a held `undefined` / `null`: `toSignal(observable$, fallback)` on an observable whose current value is `undefined` or `null` now starts at that value instead of `fallback`.
+
+### Patch Changes
+
+- Updated dependencies [2f758a4]
+- Updated dependencies [ae57625]
+- Updated dependencies [e9340d0]
+- Updated dependencies [a6d03ea]
+- Updated dependencies [e7b459f]
+- Updated dependencies [430b433]
+- Updated dependencies [553a883]
+- Updated dependencies [a34ddd2]
+- Updated dependencies [a9163fe]
+- Updated dependencies [6722a9e]
+- Updated dependencies [593ca51]
+- Updated dependencies [dcf7544]
+- Updated dependencies [d5640ce]
+- Updated dependencies [40645fa]
+    - ts-type-forge@9.2.6
+    - ts-data-forge@15.0.0
+    - synstate@9.0.0
+
 ## 8.0.1
 
 ### Patch Changes

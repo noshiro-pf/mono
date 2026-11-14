@@ -5,8 +5,8 @@
   "type": "module",
   "dependencies": {
     "preact": ">=10.0.0",
-    "synstate": ">=8.0.0",
-    "synstate-router": ">=0.2.1",
+    "synstate": ">=9.0.0",
+    "synstate-router": ">=0.4.0",
     "synstate-router-preact": "file:../../../.tarballs/synstate-router-preact.tgz"
   }
 }

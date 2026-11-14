@@ -1,5 +1,47 @@
 # synstate
 
+## 9.0.0
+
+### Major Changes
+
+- a6d03ea: `Optional` no longer wraps its value in an object. A `Some` is the value itself at runtime and `None` is one reserved string, so an `Optional` held in an array, a map or state costs no allocation: against the previous release, storing a million `Optional.some` values took 1/7 to 1/3 of the memory and reading them back ran about 5 times faster in a benchmark, and short `map` / `unwrapOr` pipelines ran 20–30% faster.
+
+    Breaking changes:
+
+    - `Some` and `None` no longer have `$$tag` or `value` properties. Read the value with `Optional.unwrap` (or `unwrapOr`, `unwrapThrow`, `expectToBe`, `match`) instead of `.value`: `Optional.isSome(o) ? o.value : d` becomes `Optional.isSome(o) ? Optional.unwrap(o) : d`. The `Some` / `None` types still tell the two apart at compile time, through type-only properties that do not exist at runtime.
+    - `Optional.isOptional` is removed. A `Some` is its value, so any value other than the `None` string is a valid `Some` at runtime and no check can tell an `Optional` from a value that is not one. Likewise `Optional.isSome` tells a `Some` from `None` in a value typed as an `Optional`; it does not validate untrusted input.
+    - `pipe(x).mapOptional` exists at runtime for every value; the type still offers it only when `x` is an `Optional`.
+    - `AsyncData.isAsyncData` checks that a pending or failed value has a `previous` key, without checking what it holds (a `Some` of `undefined` is `undefined`).
+    - `AsyncData.pending` and `AsyncData.err` tell an omitted `previous` from one passed by the number of arguments rather than by a default parameter, so `AsyncData.pending(Optional.some(undefined))` keeps its `Some`. Passing `undefined` for `previous` no longer type-checks: omit it, or pass `Optional.none`.
+    - `Optional.unwrapOr` returns the value of a `Some` holding `null` or `undefined`; it used to return the default.
+    - An `Optional` made by an earlier version (`{ $$tag, value }`) is not one to this version: values do not mix across the change, and a type error says so where TypeScript sees both.
+
+    Nested `Optional`s keep working: `Optional.some(Optional.none)` is a `Some` holding `None`, and `Optional.unwrap(Optional.some(x))` is `x` whatever `x` is. A `Some` of a value that is not a reserved string is that value, so `Optional.some(Optional.some(5))` and `Optional.some(5)` are the same runtime value, while reserved strings (those that start with `"ts-std-forge::Optional/"`) are rewritten and keep each level of nesting apart; a string equal to an `Optional`'s runtime value is held as that `Optional` (`Optional.some("ts-std-forge::Optional/n0")` is `Optional.some(Optional.none)`). Falsy and nullish values are held as themselves: `Optional.some(0)` is `0` and `Optional.some(undefined)` is `undefined` at runtime, unlike before, when an `Optional` was always a truthy object. So do not test an `Optional` with truthiness, `??`, `?.` or a default parameter, which take such a `Some` for a missing value; test it with `Optional.isSome` / `isNone`, never with `typeof` either: a `Some` of a string is a string. For the same reason an API that branches on the kind of value it is given acts on the value a `Some` holds (`await` resolves a `Some` of a thenable, React's `useState` calls a `Some` of a function, `concat` spreads a `Some` of an array), and as a `WeakMap` key a `Some` is its value: `None` and a `Some` of a primitive throw (a non-registered symbol aside), and a `Some` of an object is the same key as that object. An `Optional` still survives `structuredClone`, `postMessage` and a JSON round trip, the last as far as JSON keeps the value it holds (a `Some` of `Infinity` comes back as `null`, as `Infinity` alone does, and a `Some` of `undefined` is dropped from an object, as `undefined` is). Two copies of the package agree on the representation, so values pass between them.
+
+    In synstate, `getSnapshot()` and `initialValue` are `Optional`s, so the same change applies to them. Anything that compares values with `Object.is` now sees `Optional.some(x)` twice for the same `x` as the same value, where it used to get a new object each time: an operator's result (`map(() => Optional.some(id))`, `mapOptional`, `derive`), `skipIfNoChange` and a `createState` setter no longer emit or notify when the `Some` holds the very same `x` as before, and React's state bails out as it does for any unchanged value.
+
+### Patch Changes
+
+- 430b433: An observable no longer emits once it has completed, whatever still reaches it. A `fromSubscribable` whose subscribable called back after `complete()` (after `unsubscribe` had returned, or from a callback queued before the completion), or a `startUpdate` kept from `createRootObservable`'s `init` or from a `createAsyncChildObservable` and called after `complete()`, used to store the value and pass it on to children still live under another parent (`combine`, `derive`, `merge`, `zip`, `withCurrentValueFrom`), which then emitted a value from an observable reporting `isCompleted`. Such a value is now ignored, and a subscriber writing it no longer prints the write-during-propagation warning, since nothing is written. The same holds for a `setNext` a custom operator calls after completing itself. What is emitted while `complete()` runs the teardowns, before the observable counts as completed, is unaffected. A teardown registered with `onComplete` once the observable has completed runs at once, as before, and what it emits is now ignored too.
+- 553a883: The README and the `createSyncChildObservable` example use `derive` where they used `combine`: `derive(parents, (a, b) => ...)` computes one value from several observables in one step, and `combine` is `derive` with a projection that collects the values. The `createSyncChildObservable` description no longer says `map`, `filter` and `combine` are built with it; it wraps the base class they extend.
+- a34ddd2: `fromSubscribable` now completes after the subscribable reports an error. The error is still passed on as a `Result.err`, and it is the last value: the observable completes, unsubscribes from the subscribable, and ignores anything the subscribable passes on afterwards, as an error ends an RxJS or TC39-style observable and as a rejection ends `fromPromise`. Before, the observable stayed open after the `Err`, so `collectToArray` on it never resolved, a `mergeMap` kept each inner `fromSubscribable` that ended in an error until the `mergeMap` itself completed, and nothing derived from it completed. A hand-written subscribable that calls `onError` and then goes on calling `onNext` now loses those later values.
+- a9163fe: `merge` is no longer typed as an `InitializedObservable` when one of its sources is initialized. It holds no value until a source emits, even when its sources hold one, so `merge([state$, events$]).getSnapshot().value` type-checked as the value type and read `undefined` until a source emitted. What `merge` returns is now always typed as an uninitialized `Observable`, so code that needs the initialized type from it no longer compiles; pipe `withInitialValue` after `merge` where a value is needed from the start.
+- 6722a9e: The documentation of `merge` now says what it emits when several of its sources emit in the same update, for example an observable and what is mapped from it: it emits once, with the value of the first of them in the order of `parents`, and the other values of that update are not passed on. It no longer says that `merge` emits all values from all sources. The behavior is unchanged.
+- 593ca51: A subscriber added to an observable while that observable is calling its subscribers (one of them subscribed to it) is now called once for the value being delivered, by `subscribe`, and from the next value on by the observable. It used to be called a second time with the same value, and when the call that added it also wrote a newer value, that second call delivered the older value last. An operator that subscribes for you is affected in the same way: a `switchMap` or `mergeMap` that subscribes to its inner observable while that observable is calling its subscribers no longer emits the value twice, and a `withBufferedFrom` that subscribes to the buffered observable while that observable is calling its subscribers no longer buffers the value twice.
+- dcf7544: `takeUntil(notifier)` and `skipUntil(notifier)` hear the notifier first in an update that reaches both the source and the notifier (both derive from one observable), however deep the notifier is: if the notifier emits in that update, or has completed by then, `takeUntil` completes without passing the source's value in that update on, and `skipUntil` passes that value on. Until now, with a notifier deeper than the operator, or as deep and queued after it, `takeUntil` passed that value on and `skipUntil` dropped it. Both operators now take a `depth` greater than the notifier's as well as the source's.
+- Updated dependencies [2f758a4]
+- Updated dependencies [ae57625]
+- Updated dependencies [e9340d0]
+- Updated dependencies [a6d03ea]
+- Updated dependencies [a6d03ea]
+- Updated dependencies [e7b459f]
+- Updated dependencies [d5640ce]
+- Updated dependencies [7d6f898]
+- Updated dependencies [40645fa]
+    - ts-type-forge@9.2.6
+    - ts-std-forge@0.6.0
+    - ts-data-forge@15.0.0
+
 ## 8.0.0
 
 ### Major Changes
