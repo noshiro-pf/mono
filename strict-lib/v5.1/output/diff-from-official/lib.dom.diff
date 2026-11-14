@@ -7795,15 +7795,6 @@
  }
  
  declare var ReportBody: {
-@@ -21720,7 +21961,7 @@ interface Request extends Body {
-    *
-    * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Request/method)
-    */
--  readonly method: string;
-+  readonly method: import('ts-type-forge').HTTPRequestMethod;
-   /**
-    * Returns the mode associated with request, which is a string indicating whether the request will use CORS, or will be restricted to same-origin URLs.
-    *
 @@ -21776,7 +22017,7 @@ interface ResizeObserver {
    unobserve(target: Element): void;
  }
@@ -11749,19 +11740,22 @@
    /**
     * Returns response as text.
     *
-@@ -31915,9 +32260,9 @@ interface XMLHttpRequest extends XMLHttpRequestEventTarget {
+@@ -31915,9 +32260,12 @@ interface XMLHttpRequest extends XMLHttpRequestEventTarget {
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/XMLHttpRequest/open)
     */
 -  open(method: string, url: string | URL): void;
-+  open(method: 'post' | 'get' | 'dialog', url: string | URL): void;
    open(
 -    method: string,
-+    method: 'post' | 'get' | 'dialog',
++    method: import('ts-type-forge').HTTPRequestMethod | (string & {}),
++    url: string | URL,
++  ): void;
++  open(
++    method: import('ts-type-forge').HTTPRequestMethod | (string & {}),
      url: string | URL,
      async: boolean,
      username?: string | null,
-@@ -31956,7 +32301,7 @@ interface XMLHttpRequest extends XMLHttpRequestEventTarget {
+@@ -31956,7 +32304,7 @@ interface XMLHttpRequest extends XMLHttpRequestEventTarget {
    readonly DONE: 4;
    addEventListener<K extends keyof XMLHttpRequestEventMap>(
      type: K,
@@ -11770,7 +11764,7 @@
      options?: boolean | AddEventListenerOptions,
    ): void;
    addEventListener(
-@@ -31966,7 +32311,7 @@ interface XMLHttpRequest extends XMLHttpRequestEventTarget {
+@@ -31966,7 +32314,7 @@ interface XMLHttpRequest extends XMLHttpRequestEventTarget {
    ): void;
    removeEventListener<K extends keyof XMLHttpRequestEventMap>(
      type: K,
@@ -11779,7 +11773,7 @@
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -31998,19 +32343,19 @@ interface XMLHttpRequestEventTargetEventMap {
+@@ -31998,19 +32346,19 @@ interface XMLHttpRequestEventTargetEventMap {
  
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/XMLHttpRequestEventTarget) */
  interface XMLHttpRequestEventTarget extends EventTarget {
@@ -11807,7 +11801,7 @@
      options?: boolean | AddEventListenerOptions,
    ): void;
    addEventListener(
-@@ -32023,7 +32368,7 @@ interface XMLHttpRequestEventTarget extends EventTarget {
+@@ -32023,7 +32371,7 @@ interface XMLHttpRequestEventTarget extends EventTarget {
      listener: (
        this: XMLHttpRequestEventTarget,
        ev: XMLHttpRequestEventTargetEventMap[K],
@@ -11816,7 +11810,7 @@
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -32045,7 +32390,7 @@ interface XMLHttpRequestUpload extends XMLHttpRequestEventTarget {
+@@ -32045,7 +32393,7 @@ interface XMLHttpRequestUpload extends XMLHttpRequestEventTarget {
      listener: (
        this: XMLHttpRequestUpload,
        ev: XMLHttpRequestEventTargetEventMap[K],
@@ -11825,7 +11819,7 @@
      options?: boolean | AddEventListenerOptions,
    ): void;
    addEventListener(
-@@ -32058,7 +32403,7 @@ interface XMLHttpRequestUpload extends XMLHttpRequestEventTarget {
+@@ -32058,7 +32406,7 @@ interface XMLHttpRequestUpload extends XMLHttpRequestEventTarget {
      listener: (
        this: XMLHttpRequestUpload,
        ev: XMLHttpRequestEventTargetEventMap[K],
@@ -11834,7 +11828,7 @@
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -32083,7 +32428,7 @@ interface XMLSerializer {
+@@ -32083,7 +32431,7 @@ interface XMLSerializer {
    serializeToString(root: Node): string;
  }
  
@@ -11843,7 +11837,7 @@
    prototype: XMLSerializer;
    new (): XMLSerializer;
  };
-@@ -32095,7 +32440,7 @@ declare var XMLSerializer: {
+@@ -32095,7 +32443,7 @@ declare var XMLSerializer: {
   */
  interface XPathEvaluator extends XPathEvaluatorBase {}
  
@@ -11852,7 +11846,7 @@
    prototype: XPathEvaluator;
    new (): XPathEvaluator;
  };
-@@ -32132,7 +32477,7 @@ interface XPathExpression {
+@@ -32132,7 +32480,7 @@ interface XPathExpression {
    ): XPathResult;
  }
  
@@ -11861,7 +11855,7 @@
    prototype: XPathExpression;
    new (): XPathExpression;
  };
-@@ -32173,7 +32518,7 @@ interface XPathResult {
+@@ -32173,7 +32521,7 @@ interface XPathResult {
    readonly FIRST_ORDERED_NODE_TYPE: 9;
  }
  
@@ -11870,7 +11864,7 @@
    prototype: XPathResult;
    new (): XPathResult;
    readonly ANY_TYPE: 0;
-@@ -32197,7 +32542,7 @@ interface XSLTProcessor {
+@@ -32197,7 +32545,7 @@ interface XSLTProcessor {
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/XSLTProcessor/clearParameters) */
    clearParameters(): void;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/XSLTProcessor/getParameter) */
@@ -11879,7 +11873,7 @@
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/XSLTProcessor/importStylesheet) */
    importStylesheet(style: Node): void;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/XSLTProcessor/removeParameter) */
-@@ -32208,7 +32553,7 @@ interface XSLTProcessor {
+@@ -32208,7 +32556,7 @@ interface XSLTProcessor {
    setParameter(
      namespaceURI: string | null,
      localName: string,
@@ -11888,7 +11882,7 @@
    ): void;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/XSLTProcessor/transformToDocument) */
    transformToDocument(source: Node): Document;
-@@ -32216,7 +32561,7 @@ interface XSLTProcessor {
+@@ -32216,7 +32564,7 @@ interface XSLTProcessor {
    transformToFragment(source: Node, output: Document): DocumentFragment;
  }
  
@@ -11897,7 +11891,7 @@
    prototype: XSLTProcessor;
    new (): XSLTProcessor;
  };
-@@ -32224,7 +32569,7 @@ declare var XSLTProcessor: {
+@@ -32224,7 +32572,7 @@ declare var XSLTProcessor: {
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/console) */
  interface Console {
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/assert) */
@@ -11906,7 +11900,7 @@
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/clear) */
    clear(): void;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/count) */
-@@ -32232,36 +32577,36 @@ interface Console {
+@@ -32232,36 +32580,36 @@ interface Console {
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/countReset) */
    countReset(label?: string): void;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/debug) */
@@ -11955,7 +11949,7 @@
  }
  
  declare var console: Console;
-@@ -32364,7 +32709,7 @@ declare namespace CSS {
+@@ -32364,7 +32712,7 @@ declare namespace CSS {
  declare namespace WebAssembly {
    interface CompileError extends Error {}
  
@@ -11964,7 +11958,7 @@
      prototype: CompileError;
      new (message?: string): CompileError;
      (message?: string): CompileError;
-@@ -32373,14 +32718,14 @@ declare namespace WebAssembly {
+@@ -32373,14 +32721,14 @@ declare namespace WebAssembly {
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/WebAssembly/Global) */
    interface Global {
      /** [MDN Reference](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/WebAssembly/Global/value) */
@@ -11983,7 +11977,7 @@
    };
  
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/WebAssembly/Instance) */
-@@ -32389,14 +32734,14 @@ declare namespace WebAssembly {
+@@ -32389,14 +32737,14 @@ declare namespace WebAssembly {
      readonly exports: Exports;
    }
  
@@ -12000,7 +11994,7 @@
      prototype: LinkError;
      new (message?: string): LinkError;
      (message?: string): LinkError;
-@@ -32410,7 +32755,7 @@ declare namespace WebAssembly {
+@@ -32410,7 +32758,7 @@ declare namespace WebAssembly {
      grow(delta: number): number;
    }
  
@@ -12009,7 +12003,7 @@
      prototype: Memory;
      new (descriptor: MemoryDescriptor): Memory;
    };
-@@ -32418,7 +32763,7 @@ declare namespace WebAssembly {
+@@ -32418,7 +32766,7 @@ declare namespace WebAssembly {
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/WebAssembly/Module) */
    interface Module {}
  
@@ -12018,7 +12012,7 @@
      prototype: Module;
      new (bytes: BufferSource): Module;
      /** [MDN Reference](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/WebAssembly/Module/customSections) */
-@@ -32431,7 +32776,7 @@ declare namespace WebAssembly {
+@@ -32431,7 +32779,7 @@ declare namespace WebAssembly {
  
    interface RuntimeError extends Error {}
  
@@ -12027,7 +12021,7 @@
      prototype: RuntimeError;
      new (message?: string): RuntimeError;
      (message?: string): RuntimeError;
-@@ -32442,16 +32787,16 @@ declare namespace WebAssembly {
+@@ -32442,16 +32790,16 @@ declare namespace WebAssembly {
      /** [MDN Reference](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/WebAssembly/Table/length) */
      readonly length: number;
      /** [MDN Reference](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/WebAssembly/Table/get) */
@@ -12049,7 +12043,7 @@
    };
  
    interface GlobalDescriptor {
-@@ -32531,7 +32876,7 @@ interface BlobCallback {
+@@ -32531,7 +32879,7 @@ interface BlobCallback {
  }
  
  interface CustomElementConstructor {
@@ -12058,7 +12052,7 @@
  }
  
  interface DecodeErrorCallback {
-@@ -32555,7 +32900,7 @@ interface FileCallback {
+@@ -32555,7 +32903,7 @@ interface FileCallback {
  }
  
  interface FileSystemEntriesCallback {
@@ -12067,7 +12061,7 @@
  }
  
  interface FileSystemEntryCallback {
-@@ -32575,11 +32920,14 @@ interface IdleRequestCallback {
+@@ -32575,11 +32923,14 @@ interface IdleRequestCallback {
  }
  
  interface IntersectionObserverCallback {
@@ -12084,7 +12078,7 @@
  }
  
  interface MediaSessionActionHandler {
-@@ -32587,7 +32935,7 @@ interface MediaSessionActionHandler {
+@@ -32587,7 +32938,7 @@ interface MediaSessionActionHandler {
  }
  
  interface MutationCallback {
@@ -12093,7 +12087,7 @@
  }
  
  interface NotificationPermissionCallback {
-@@ -32605,7 +32953,7 @@ interface OnErrorEventHandlerNonNull {
+@@ -32605,7 +32956,7 @@ interface OnErrorEventHandlerNonNull {
      lineno?: number,
      colno?: number,
      error?: Error,
@@ -12102,7 +12096,7 @@
  }
  
  interface PerformanceObserverCallback {
-@@ -32620,7 +32968,7 @@ interface PositionErrorCallback {
+@@ -32620,7 +32971,7 @@ interface PositionErrorCallback {
    (positionError: GeolocationPositionError): void;
  }
  
@@ -12111,7 +12105,7 @@
    (chunk: T): number;
  }
  
-@@ -32637,11 +32985,11 @@ interface RemotePlaybackAvailabilityCallback {
+@@ -32637,11 +32988,11 @@ interface RemotePlaybackAvailabilityCallback {
  }
  
  interface ReportingObserverCallback {
@@ -12125,7 +12119,7 @@
  }
  
  interface TransformerFlushCallback<O> {
-@@ -32649,7 +32997,7 @@ interface TransformerFlushCallback<O> {
+@@ -32649,7 +33000,7 @@ interface TransformerFlushCallback<O> {
  }
  
  interface TransformerStartCallback<O> {
@@ -12134,7 +12128,7 @@
  }
  
  interface TransformerTransformCallback<I, O> {
-@@ -32660,7 +33008,7 @@ interface TransformerTransformCallback<I, O> {
+@@ -32660,7 +33011,7 @@ interface TransformerTransformCallback<I, O> {
  }
  
  interface UnderlyingSinkAbortCallback {
@@ -12143,7 +12137,7 @@
  }
  
  interface UnderlyingSinkCloseCallback {
-@@ -32668,7 +33016,7 @@ interface UnderlyingSinkCloseCallback {
+@@ -32668,7 +33019,7 @@ interface UnderlyingSinkCloseCallback {
  }
  
  interface UnderlyingSinkStartCallback {
@@ -12152,7 +12146,7 @@
  }
  
  interface UnderlyingSinkWriteCallback<W> {
-@@ -32679,7 +33027,7 @@ interface UnderlyingSinkWriteCallback<W> {
+@@ -32679,7 +33030,7 @@ interface UnderlyingSinkWriteCallback<W> {
  }
  
  interface UnderlyingSourceCancelCallback {
@@ -12161,7 +12155,7 @@
  }
  
  interface UnderlyingSourcePullCallback<R> {
-@@ -32687,7 +33035,7 @@ interface UnderlyingSourcePullCallback<R> {
+@@ -32687,7 +33038,7 @@ interface UnderlyingSourcePullCallback<R> {
  }
  
  interface UnderlyingSourceStartCallback<R> {
@@ -12170,7 +12164,7 @@
  }
  
  interface VideoFrameOutputCallback {
-@@ -32959,13 +33307,13 @@ type ElementTagNameMap = HTMLElementTagNameMap &
+@@ -32959,13 +33310,13 @@ type ElementTagNameMap = HTMLElementTagNameMap &
      Exclude<keyof SVGElementTagNameMap, keyof HTMLElementTagNameMap>
    >;
  
@@ -12187,7 +12181,7 @@
    new (
      text?: string,
      value?: string,
-@@ -32978,47 +33326,47 @@ declare var Option: {
+@@ -32978,47 +33329,47 @@ declare var Option: {
   *
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/navigator)
   */
@@ -12248,7 +12242,7 @@
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/location) */
  declare var location: Location;
  /**
-@@ -33026,13 +33374,13 @@ declare var location: Location;
+@@ -33026,13 +33377,13 @@ declare var location: Location;
   *
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/locationbar)
   */
@@ -12264,7 +12258,7 @@
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/name) */
  /** @deprecated */
  declare const name: void;
-@@ -33043,47 +33391,49 @@ declare var navigator: Navigator;
+@@ -33043,47 +33394,49 @@ declare var navigator: Navigator;
   *
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/devicemotion_event)
   */
@@ -12325,7 +12319,7 @@
  /**
   * Refers to either the parent WindowProxy, or itself.
   *
-@@ -33091,63 +33441,63 @@ declare var pageYOffset: number;
+@@ -33091,63 +33444,63 @@ declare var pageYOffset: number;
   *
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/parent)
   */
@@ -12407,7 +12401,7 @@
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/blur) */
  declare function blur(): void;
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/cancelIdleCallback) */
-@@ -33205,12 +33555,12 @@ declare function open(
+@@ -33205,12 +33558,12 @@ declare function open(
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/postMessage)
   */
  declare function postMessage(
@@ -12423,7 +12417,7 @@
    options?: WindowPostMessageOptions,
  ): void;
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/print) */
-@@ -33262,144 +33612,146 @@ declare function requestAnimationFrame(callback: FrameRequestCallback): number;
+@@ -33262,144 +33615,146 @@ declare function requestAnimationFrame(callback: FrameRequestCallback): number;
   *
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/HTMLMediaElement/abort_event)
   */
@@ -12602,7 +12596,7 @@
  /**
   * Fires when an error occurs during object loading.
   * @param ev The event.
-@@ -33413,24 +33765,24 @@ declare var onerror: OnErrorEventHandler;
+@@ -33413,24 +33768,24 @@ declare var onerror: OnErrorEventHandler;
   *
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Element/focus_event)
   */
@@ -12634,7 +12628,7 @@
  /**
   * Fires when the user presses an alphanumeric key.
   * @param ev The event.
-@@ -33438,45 +33790,45 @@ declare var onkeydown: ((this: Window, ev: KeyboardEvent) => any) | null;
+@@ -33438,45 +33793,45 @@ declare var onkeydown: ((this: Window, ev: KeyboardEvent) => any) | null;
   *
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Element/keypress_event)
   */
@@ -12688,7 +12682,7 @@
    | null;
  /**
   * Fires when the user clicks the object with either mouse button.
-@@ -33484,111 +33836,125 @@ declare var onlostpointercapture:
+@@ -33484,111 +33839,125 @@ declare var onlostpointercapture:
   *
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Element/mousedown_event)
   */
@@ -12840,7 +12834,7 @@
    | null;
  /**
   * Occurs when the seek operation ends.
-@@ -33596,87 +33962,87 @@ declare var onsecuritypolicyviolation:
+@@ -33596,87 +33965,87 @@ declare var onsecuritypolicyviolation:
   *
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/HTMLMediaElement/seeked_event)
   */
@@ -12955,7 +12949,7 @@
    | null;
  /**
   * Occurs when the volume is changed, or playback is muted or unmuted.
-@@ -33684,90 +34050,104 @@ declare var ontransitionstart:
+@@ -33684,90 +34053,104 @@ declare var ontransitionstart:
   *
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/HTMLMediaElement/volumechange_event)
   */
@@ -13090,7 +13084,7 @@
  /**
   * Available only in secure contexts.
   *
-@@ -33815,29 +34195,29 @@ declare function fetch(
+@@ -33815,29 +34198,29 @@ declare function fetch(
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/queueMicrotask) */
  declare function queueMicrotask(callback: VoidFunction): void;
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/reportError) */
@@ -13126,7 +13120,7 @@
    options?: boolean | AddEventListenerOptions,
  ): void;
  declare function addEventListener(
-@@ -33847,7 +34227,7 @@ declare function addEventListener(
+@@ -33847,7 +34230,7 @@ declare function addEventListener(
  ): void;
  declare function removeEventListener<K extends keyof WindowEventMap>(
    type: K,
@@ -13135,7 +13129,7 @@
    options?: boolean | EventListenerOptions,
  ): void;
  declare function removeEventListener(
-@@ -33874,16 +34254,19 @@ type CanvasImageSource =
+@@ -33874,16 +34257,19 @@ type CanvasImageSource =
    | OffscreenCanvas
    | VideoFrame;
  type ClipboardItemData = Promise<string | Blob>;
@@ -13158,7 +13152,7 @@
  type FormDataEntryValue = File | string;
  type GLbitfield = number;
  type GLboolean = boolean;
-@@ -33900,10 +34283,18 @@ type GLuint64 = number;
+@@ -33900,10 +34286,18 @@ type GLuint64 = number;
  type HTMLOrSVGImageElement = HTMLImageElement | SVGImageElement;
  type HTMLOrSVGScriptElement = HTMLScriptElement | SVGScriptElement;
  type HashAlgorithmIdentifier = AlgorithmIdentifier;
@@ -13180,7 +13174,7 @@
  type LineAndPositionSetting = number | AutoKeyword;
  type MediaProvider = MediaStream | MediaSource | Blob;
  type MessageEventSource = WindowProxy | MessagePort | ServiceWorker;
-@@ -33916,7 +34307,7 @@ type OffscreenRenderingContext =
+@@ -33916,7 +34310,7 @@ type OffscreenRenderingContext =
    | WebGL2RenderingContext;
  type OnBeforeUnloadEventHandler = OnBeforeUnloadEventHandlerNonNull | null;
  type OnErrorEventHandler = OnErrorEventHandlerNonNull | null;
@@ -13189,7 +13183,7 @@
  type ReadableStreamController<T> =
    | ReadableStreamDefaultController<T>
    | ReadableByteStreamController;
-@@ -33931,7 +34322,7 @@ type RenderingContext =
+@@ -33931,7 +34325,7 @@ type RenderingContext =
    | ImageBitmapRenderingContext
    | WebGLRenderingContext
    | WebGL2RenderingContext;
@@ -13198,7 +13192,7 @@
  type RequestInfo = Request | string;
  type TexImageSource =
    | ImageBitmap
-@@ -33951,8 +34342,8 @@ type Transferable =
+@@ -33951,8 +34345,8 @@ type Transferable =
    | TransformStream
    | VideoFrame
    | ArrayBuffer;

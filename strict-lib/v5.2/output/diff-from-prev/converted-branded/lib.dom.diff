@@ -1,5 +1,5 @@
 diff --git a/v5.1/output/lib-files-branded/lib.dom.d.ts b/v5.2/output/lib-files-branded/lib.dom.d.ts
-index 530f1d413294bab74295b88dbf9b4f66a8421e93..af251d7d9f2f032e311d855e40352483edc6a220 100644
+index 319b65e59b629b8c6eb5aadb2850b8d62e00cb00..9fbdcbae35b25f36df460232538d0785d89c47b1 100644
 --- a/v5.1/output/lib-files-branded/lib.dom.d.ts
 +++ b/v5.2/output/lib-files-branded/lib.dom.d.ts
 @@ -756,6 +756,7 @@ interface Keyframe {
@@ -707,7 +707,7 @@ index 530f1d413294bab74295b88dbf9b4f66a8421e93..af251d7d9f2f032e311d855e40352483
  /**
   * Events that occur due to the user moving a mouse wheel or similar input device.
   *
-@@ -32617,96 +32796,120 @@ declare var console: Console;
+@@ -32620,96 +32799,120 @@ declare var console: Console;
  
  /** Holds useful CSS-related methods. No object with this interface are implemented: it contains only static methods and therefore is a utilitarian interface. */
  declare namespace CSS {
@@ -861,7 +861,7 @@ index 530f1d413294bab74295b88dbf9b4f66a8421e93..af251d7d9f2f032e311d855e40352483
    function vw(value: number): CSSUnitValue;
  }
  
-@@ -32720,16 +32923,19 @@ declare namespace WebAssembly {
+@@ -32723,16 +32926,19 @@ declare namespace WebAssembly {
    };
  
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/WebAssembly/Global) */
@@ -885,7 +885,7 @@ index 530f1d413294bab74295b88dbf9b4f66a8421e93..af251d7d9f2f032e311d855e40352483
    };
  
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/WebAssembly/Instance) */
-@@ -32806,9 +33012,9 @@ declare namespace WebAssembly {
+@@ -32809,9 +33015,9 @@ declare namespace WebAssembly {
      new (descriptor: TableDescriptor, value?: unknown): Table;
    };
  
@@ -897,7 +897,7 @@ index 530f1d413294bab74295b88dbf9b4f66a8421e93..af251d7d9f2f032e311d855e40352483
    }
  
    interface MemoryDescriptor {
-@@ -32834,6 +33040,16 @@ declare namespace WebAssembly {
+@@ -32837,6 +33043,16 @@ declare namespace WebAssembly {
      maximum?: number;
    }
  
@@ -914,7 +914,7 @@ index 530f1d413294bab74295b88dbf9b4f66a8421e93..af251d7d9f2f032e311d855e40352483
    interface WebAssemblyInstantiatedSource {
      instance: Instance;
      module: Module;
-@@ -32841,19 +33057,12 @@ declare namespace WebAssembly {
+@@ -32844,19 +33060,12 @@ declare namespace WebAssembly {
  
    type ImportExportKind = 'function' | 'global' | 'memory' | 'table';
    type TableKind = 'anyfunc' | 'externref';
@@ -935,7 +935,7 @@ index 530f1d413294bab74295b88dbf9b4f66a8421e93..af251d7d9f2f032e311d855e40352483
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/WebAssembly/compile) */
    function compile(bytes: BufferSource): Promise<Module>;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/WebAssembly/compileStreaming) */
-@@ -33763,7 +33972,7 @@ declare const onended: ((this: Window, ev: Event) => unknown) | null;
+@@ -33766,7 +33975,7 @@ declare const onended: ((this: Window, ev: Event) => unknown) | null;
   * Fires when an error occurs during object loading.
   * @param ev The event.
   *
@@ -944,7 +944,7 @@ index 530f1d413294bab74295b88dbf9b4f66a8421e93..af251d7d9f2f032e311d855e40352483
   */
  declare var onerror: OnErrorEventHandler;
  /**
-@@ -33959,6 +34168,8 @@ declare const onresize: ((this: Window, ev: UIEvent) => unknown) | null;
+@@ -33962,6 +34171,8 @@ declare const onresize: ((this: Window, ev: UIEvent) => unknown) | null;
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Document/scroll_event)
   */
  declare const onscroll: ((this: Window, ev: Event) => unknown) | null;
@@ -953,7 +953,7 @@ index 530f1d413294bab74295b88dbf9b4f66a8421e93..af251d7d9f2f032e311d855e40352483
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Document/securitypolicyviolation_event) */
  declare const onsecuritypolicyviolation:
    | ((this: Window, ev: SecurityPolicyViolationEvent) => unknown)
-@@ -34243,6 +34454,14 @@ declare function removeEventListener(
+@@ -34246,6 +34457,14 @@ declare function removeEventListener(
    options?: boolean | EventListenerOptions,
  ): void;
  type AlgorithmIdentifier = Algorithm | string;
@@ -968,7 +968,7 @@ index 530f1d413294bab74295b88dbf9b4f66a8421e93..af251d7d9f2f032e311d855e40352483
  type BigInteger = Uint8Array;
  type BinaryData = ArrayBuffer | ArrayBufferView;
  type BlobPart = BufferSource | Blob | string;
-@@ -34314,6 +34533,8 @@ type OffscreenRenderingContext =
+@@ -34317,6 +34536,8 @@ type OffscreenRenderingContext =
    | WebGL2RenderingContext;
  type OnBeforeUnloadEventHandler = OnBeforeUnloadEventHandlerNonNull | null;
  type OnErrorEventHandler = OnErrorEventHandlerNonNull | null;
@@ -977,7 +977,7 @@ index 530f1d413294bab74295b88dbf9b4f66a8421e93..af251d7d9f2f032e311d855e40352483
  type PerformanceEntryList = readonly PerformanceEntry[];
  type ReadableStreamController<T> =
    | ReadableStreamDefaultController<T>
-@@ -34372,6 +34593,57 @@ type AudioContextLatencyCategory = 'balanced' | 'interactive' | 'playback';
+@@ -34375,6 +34596,57 @@ type AudioContextLatencyCategory = 'balanced' | 'interactive' | 'playback';
  type AudioContextState = 'closed' | 'running' | 'suspended';
  type AuthenticatorAttachment = 'cross-platform' | 'platform';
  type AuthenticatorTransport = 'ble' | 'hybrid' | 'internal' | 'nfc' | 'usb';
@@ -1035,7 +1035,7 @@ index 530f1d413294bab74295b88dbf9b4f66a8421e93..af251d7d9f2f032e311d855e40352483
  type AutoKeyword = 'auto';
  type AutomationRate = 'a-rate' | 'k-rate';
  type AvcBitstreamFormat = 'annexb' | 'avc';
-@@ -34583,15 +34855,6 @@ type OffscreenRenderingContextId =
+@@ -34586,15 +34858,6 @@ type OffscreenRenderingContextId =
    | 'webgl'
    | 'webgl2'
    | 'webgpu';
@@ -1051,7 +1051,7 @@ index 530f1d413294bab74295b88dbf9b4f66a8421e93..af251d7d9f2f032e311d855e40352483
  type OrientationType =
    | 'landscape-primary'
    | 'landscape-secondary'
-@@ -34708,7 +34971,6 @@ type RTCStatsType =
+@@ -34711,7 +34974,6 @@ type RTCStatsType =
    | 'remote-candidate'
    | 'remote-inbound-rtp'
    | 'remote-outbound-rtp'
@@ -1059,7 +1059,7 @@ index 530f1d413294bab74295b88dbf9b4f66a8421e93..af251d7d9f2f032e311d855e40352483
    | 'transport';
  type ReadableStreamReaderMode = 'byob';
  type ReadableStreamType = 'bytes';
-@@ -34825,6 +35087,8 @@ type VideoPixelFormat =
+@@ -34828,6 +35090,8 @@ type VideoPixelFormat =
  type VideoTransferCharacteristics = 'bt709' | 'iec61966-2-1' | 'smpte170m';
  type WakeLockType = 'screen';
  type WebGLPowerPreference = 'default' | 'high-performance' | 'low-power';

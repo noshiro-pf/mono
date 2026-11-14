@@ -1718,15 +1718,6 @@
  }
  
  declare var ReportBody: {
-@@ -5693,7 +5748,7 @@ interface Request extends Body {
-    *
-    * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Request/method)
-    */
--  readonly method: string;
-+  readonly method: import('ts-type-forge').HTTPRequestMethod;
-   /**
-    * Returns the mode associated with request, which is a string indicating whether the request will use CORS, or will be restricted to same-origin URLs.
-    *
 @@ -5769,7 +5824,7 @@ declare var Response: {
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Response/error_static) */
    error(): Response;
@@ -2575,19 +2566,22 @@
    /**
     * Returns response as text.
     *
-@@ -10735,9 +10805,9 @@ interface XMLHttpRequest extends XMLHttpRequestEventTarget {
+@@ -10735,9 +10805,12 @@ interface XMLHttpRequest extends XMLHttpRequestEventTarget {
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/XMLHttpRequest/open)
     */
 -  open(method: string, url: string | URL): void;
-+  open(method: 'post' | 'get' | 'dialog', url: string | URL): void;
    open(
 -    method: string,
-+    method: 'post' | 'get' | 'dialog',
++    method: import('ts-type-forge').HTTPRequestMethod | (string & {}),
++    url: string | URL,
++  ): void;
++  open(
++    method: import('ts-type-forge').HTTPRequestMethod | (string & {}),
      url: string | URL,
      async: boolean,
      username?: string | null,
-@@ -10776,7 +10846,7 @@ interface XMLHttpRequest extends XMLHttpRequestEventTarget {
+@@ -10776,7 +10849,7 @@ interface XMLHttpRequest extends XMLHttpRequestEventTarget {
    readonly DONE: 4;
    addEventListener<K extends keyof XMLHttpRequestEventMap>(
      type: K,
@@ -2596,7 +2590,7 @@
      options?: boolean | AddEventListenerOptions,
    ): void;
    addEventListener(
-@@ -10786,7 +10856,7 @@ interface XMLHttpRequest extends XMLHttpRequestEventTarget {
+@@ -10786,7 +10859,7 @@ interface XMLHttpRequest extends XMLHttpRequestEventTarget {
    ): void;
    removeEventListener<K extends keyof XMLHttpRequestEventMap>(
      type: K,
@@ -2605,7 +2599,7 @@
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -10818,19 +10888,19 @@ interface XMLHttpRequestEventTargetEventMap {
+@@ -10818,19 +10891,19 @@ interface XMLHttpRequestEventTargetEventMap {
  
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/XMLHttpRequestEventTarget) */
  interface XMLHttpRequestEventTarget extends EventTarget {
@@ -2633,7 +2627,7 @@
      options?: boolean | AddEventListenerOptions,
    ): void;
    addEventListener(
-@@ -10843,7 +10913,7 @@ interface XMLHttpRequestEventTarget extends EventTarget {
+@@ -10843,7 +10916,7 @@ interface XMLHttpRequestEventTarget extends EventTarget {
      listener: (
        this: XMLHttpRequestEventTarget,
        ev: XMLHttpRequestEventTargetEventMap[K],
@@ -2642,7 +2636,7 @@
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -10865,7 +10935,7 @@ interface XMLHttpRequestUpload extends XMLHttpRequestEventTarget {
+@@ -10865,7 +10938,7 @@ interface XMLHttpRequestUpload extends XMLHttpRequestEventTarget {
      listener: (
        this: XMLHttpRequestUpload,
        ev: XMLHttpRequestEventTargetEventMap[K],
@@ -2651,7 +2645,7 @@
      options?: boolean | AddEventListenerOptions,
    ): void;
    addEventListener(
-@@ -10878,7 +10948,7 @@ interface XMLHttpRequestUpload extends XMLHttpRequestEventTarget {
+@@ -10878,7 +10951,7 @@ interface XMLHttpRequestUpload extends XMLHttpRequestEventTarget {
      listener: (
        this: XMLHttpRequestUpload,
        ev: XMLHttpRequestEventTargetEventMap[K],
@@ -2660,7 +2654,7 @@
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -10896,7 +10966,7 @@ declare var XMLHttpRequestUpload: {
+@@ -10896,7 +10969,7 @@ declare var XMLHttpRequestUpload: {
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/console) */
  interface Console {
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/assert_static) */
@@ -2669,7 +2663,7 @@
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/clear_static) */
    clear(): void;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/count_static) */
-@@ -10904,36 +10974,36 @@ interface Console {
+@@ -10904,36 +10977,36 @@ interface Console {
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/countReset_static) */
    countReset(label?: string): void;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/debug_static) */
@@ -2718,7 +2712,7 @@
  }
  
  declare var console: Console;
-@@ -10941,7 +11011,7 @@ declare var console: Console;
+@@ -10941,7 +11014,7 @@ declare var console: Console;
  declare namespace WebAssembly {
    interface CompileError extends Error {}
  
@@ -2727,7 +2721,7 @@
      prototype: CompileError;
      new (message?: string): CompileError;
      (message?: string): CompileError;
-@@ -10955,7 +11025,7 @@ declare namespace WebAssembly {
+@@ -10955,7 +11028,7 @@ declare namespace WebAssembly {
      valueOf(): ValueTypeMap[T];
    }
  
@@ -2736,7 +2730,7 @@
      prototype: Global;
      new <T extends ValueType = ValueType>(
        descriptor: GlobalDescriptor<T>,
-@@ -10969,14 +11039,14 @@ declare namespace WebAssembly {
+@@ -10969,14 +11042,14 @@ declare namespace WebAssembly {
      readonly exports: Exports;
    }
  
@@ -2753,7 +2747,7 @@
      prototype: LinkError;
      new (message?: string): LinkError;
      (message?: string): LinkError;
-@@ -10990,7 +11060,7 @@ declare namespace WebAssembly {
+@@ -10990,7 +11063,7 @@ declare namespace WebAssembly {
      grow(delta: number): number;
    }
  
@@ -2762,7 +2756,7 @@
      prototype: Memory;
      new (descriptor: MemoryDescriptor): Memory;
    };
-@@ -10998,7 +11068,7 @@ declare namespace WebAssembly {
+@@ -10998,7 +11071,7 @@ declare namespace WebAssembly {
    /** [MDN Reference](https://developer.mozilla.org/docs/WebAssembly/JavaScript_interface/Module) */
    interface Module {}
  
@@ -2771,7 +2765,7 @@
      prototype: Module;
      new (bytes: BufferSource): Module;
      /** [MDN Reference](https://developer.mozilla.org/docs/WebAssembly/JavaScript_interface/Module/customSections_static) */
-@@ -11011,7 +11081,7 @@ declare namespace WebAssembly {
+@@ -11011,7 +11084,7 @@ declare namespace WebAssembly {
  
    interface RuntimeError extends Error {}
  
@@ -2780,7 +2774,7 @@
      prototype: RuntimeError;
      new (message?: string): RuntimeError;
      (message?: string): RuntimeError;
-@@ -11022,16 +11092,16 @@ declare namespace WebAssembly {
+@@ -11022,16 +11095,16 @@ declare namespace WebAssembly {
      /** [MDN Reference](https://developer.mozilla.org/docs/WebAssembly/JavaScript_interface/Table/length) */
      readonly length: number;
      /** [MDN Reference](https://developer.mozilla.org/docs/WebAssembly/JavaScript_interface/Table/get) */
@@ -2802,7 +2796,7 @@
    };
  
    interface GlobalDescriptor<T extends ValueType = ValueType> {
-@@ -11064,7 +11134,7 @@ declare namespace WebAssembly {
+@@ -11064,7 +11137,7 @@ declare namespace WebAssembly {
  
    interface ValueTypeMap {
      anyfunc: Function;
@@ -2811,7 +2805,7 @@
      f32: number;
      f64: number;
      i32: number;
-@@ -11118,7 +11188,7 @@ interface FrameRequestCallback {
+@@ -11118,7 +11191,7 @@ interface FrameRequestCallback {
  }
  
  interface LockGrantedCallback {
@@ -2820,7 +2814,7 @@
  }
  
  interface OnErrorEventHandlerNonNull {
-@@ -11128,19 +11198,19 @@ interface OnErrorEventHandlerNonNull {
+@@ -11128,19 +11201,19 @@ interface OnErrorEventHandlerNonNull {
      lineno?: number,
      colno?: number,
      error?: Error,
@@ -2843,7 +2837,7 @@
  }
  
  interface TransformerFlushCallback<O> {
-@@ -11148,7 +11218,7 @@ interface TransformerFlushCallback<O> {
+@@ -11148,7 +11221,7 @@ interface TransformerFlushCallback<O> {
  }
  
  interface TransformerStartCallback<O> {
@@ -2852,7 +2846,7 @@
  }
  
  interface TransformerTransformCallback<I, O> {
-@@ -11159,7 +11229,7 @@ interface TransformerTransformCallback<I, O> {
+@@ -11159,7 +11232,7 @@ interface TransformerTransformCallback<I, O> {
  }
  
  interface UnderlyingSinkAbortCallback {
@@ -2861,7 +2855,7 @@
  }
  
  interface UnderlyingSinkCloseCallback {
-@@ -11167,7 +11237,7 @@ interface UnderlyingSinkCloseCallback {
+@@ -11167,7 +11240,7 @@ interface UnderlyingSinkCloseCallback {
  }
  
  interface UnderlyingSinkStartCallback {
@@ -2870,7 +2864,7 @@
  }
  
  interface UnderlyingSinkWriteCallback<W> {
-@@ -11178,7 +11248,7 @@ interface UnderlyingSinkWriteCallback<W> {
+@@ -11178,7 +11251,7 @@ interface UnderlyingSinkWriteCallback<W> {
  }
  
  interface UnderlyingSourceCancelCallback {
@@ -2879,7 +2873,7 @@
  }
  
  interface UnderlyingSourcePullCallback<R> {
-@@ -11186,7 +11256,7 @@ interface UnderlyingSourcePullCallback<R> {
+@@ -11186,7 +11259,7 @@ interface UnderlyingSourcePullCallback<R> {
  }
  
  interface UnderlyingSourceStartCallback<R> {
@@ -2888,7 +2882,7 @@
  }
  
  interface VideoFrameOutputCallback {
-@@ -11206,18 +11276,18 @@ interface WebCodecsErrorCallback {
+@@ -11206,18 +11279,18 @@ interface WebCodecsErrorCallback {
   *
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/DedicatedWorkerGlobalScope/name)
   */
@@ -2912,7 +2906,7 @@
    | null;
  /**
   * Aborts dedicatedWorkerGlobal.
-@@ -11230,9 +11300,12 @@ declare function close(): void;
+@@ -11230,9 +11303,12 @@ declare function close(): void;
   *
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/DedicatedWorkerGlobalScope/postMessage)
   */
@@ -2927,7 +2921,7 @@
    options?: StructuredSerializeOptions,
  ): void;
  /**
-@@ -11255,25 +11328,25 @@ declare var location: WorkerLocation;
+@@ -11255,25 +11331,25 @@ declare var location: WorkerLocation;
  declare var navigator: WorkerNavigator;
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WorkerGlobalScope/error_event) */
  declare var onerror:
@@ -2959,7 +2953,7 @@
    | null;
  /**
   * Returns workerGlobal.
-@@ -11294,7 +11367,7 @@ declare function importScripts(...urls: (string | URL)[]): void;
+@@ -11294,7 +11370,7 @@ declare function importScripts(...urls: (string | URL)[]): void;
   */
  declare function dispatchEvent(event: Event): boolean;
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Document/fonts) */
@@ -2968,7 +2962,7 @@
  /**
   * Available only in secure contexts.
   *
-@@ -11342,21 +11415,21 @@ declare function fetch(
+@@ -11342,21 +11418,21 @@ declare function fetch(
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/queueMicrotask) */
  declare function queueMicrotask(callback: VoidFunction): void;
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/reportError) */
@@ -2994,7 +2988,7 @@
    value: T,
    options?: StructuredSerializeOptions,
  ): T;
-@@ -11371,7 +11444,7 @@ declare function addEventListener<
+@@ -11371,7 +11447,7 @@ declare function addEventListener<
    listener: (
      this: DedicatedWorkerGlobalScope,
      ev: DedicatedWorkerGlobalScopeEventMap[K],
@@ -3003,7 +2997,7 @@
    options?: boolean | AddEventListenerOptions,
  ): void;
  declare function addEventListener(
-@@ -11386,7 +11459,7 @@ declare function removeEventListener<
+@@ -11386,7 +11462,7 @@ declare function removeEventListener<
    listener: (
      this: DedicatedWorkerGlobalScope,
      ev: DedicatedWorkerGlobalScopeEventMap[K],
@@ -3012,7 +3006,7 @@
    options?: boolean | EventListenerOptions,
  ): void;
  declare function removeEventListener(
-@@ -11410,7 +11483,7 @@ type DOMHighResTimeStamp = number;
+@@ -11410,7 +11486,7 @@ type DOMHighResTimeStamp = number;
  type EpochTimeStamp = number;
  type EventListenerOrEventListenerObject = EventListener | EventListenerObject;
  type FileSystemWriteChunkType = BufferSource | Blob | string | WriteParams;
@@ -3021,7 +3015,7 @@
  type FormDataEntryValue = File | string;
  type GLbitfield = number;
  type GLboolean = boolean;
-@@ -11425,10 +11498,18 @@ type GLsizeiptr = number;
+@@ -11425,10 +11501,18 @@ type GLsizeiptr = number;
  type GLuint = number;
  type GLuint64 = number;
  type HashAlgorithmIdentifier = AlgorithmIdentifier;
@@ -3043,7 +3037,7 @@
  type MessageEventSource = MessagePort | ServiceWorker;
  type NamedCurve = string;
  type OffscreenRenderingContext =
-@@ -11437,7 +11518,7 @@ type OffscreenRenderingContext =
+@@ -11437,7 +11521,7 @@ type OffscreenRenderingContext =
    | WebGLRenderingContext
    | WebGL2RenderingContext;
  type OnErrorEventHandler = OnErrorEventHandlerNonNull | null;
@@ -3052,7 +3046,7 @@
  type PushMessageDataInit = BufferSource | string;
  type ReadableStreamController<T> =
    | ReadableStreamDefaultController<T>
-@@ -11448,7 +11529,7 @@ type ReadableStreamReadResult<T> =
+@@ -11448,7 +11532,7 @@ type ReadableStreamReadResult<T> =
  type ReadableStreamReader<T> =
    | ReadableStreamDefaultReader<T>
    | ReadableStreamBYOBReader;
@@ -3061,7 +3055,7 @@
  type RequestInfo = Request | string;
  type TexImageSource = ImageBitmap | ImageData | OffscreenCanvas | VideoFrame;
  type TimerHandler = string | Function;
-@@ -11461,7 +11542,7 @@ type Transferable =
+@@ -11461,7 +11545,7 @@ type Transferable =
    | TransformStream
    | VideoFrame
    | ArrayBuffer;

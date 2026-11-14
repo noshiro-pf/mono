@@ -7002,14 +7002,14 @@
    onicegatheringstatechange:
 -    | ((this: RTCPeerConnection, ev: Event) => any)
 +    | ((this: RTCPeerConnection, ev: Event) => unknown)
++    | null;
++  onnegotiationneeded: ((this: RTCPeerConnection, ev: Event) => unknown) | null;
++  onsignalingstatechange:
++    | ((this: RTCPeerConnection, ev: Event) => unknown)
      | null;
 -  onnegotiationneeded: ((this: RTCPeerConnection, ev: Event) => any) | null;
 -  onsignalingstatechange: ((this: RTCPeerConnection, ev: Event) => any) | null;
 -  ontrack: ((this: RTCPeerConnection, ev: RTCTrackEvent) => any) | null;
-+  onnegotiationneeded: ((this: RTCPeerConnection, ev: Event) => unknown) | null;
-+  onsignalingstatechange:
-+    | ((this: RTCPeerConnection, ev: Event) => unknown)
-+    | null;
 +  ontrack: ((this: RTCPeerConnection, ev: RTCTrackEvent) => unknown) | null;
    readonly pendingLocalDescription: RTCSessionDescription | null;
    readonly pendingRemoteDescription: RTCSessionDescription | null;
@@ -7314,15 +7314,6 @@
    prototype: RemotePlayback;
    new (): RemotePlayback;
  };
-@@ -14936,7 +15177,7 @@ interface Request extends Body {
-   /** Returns a boolean indicating whether or not request can outlive the global in which it was created. */
-   readonly keepalive: boolean;
-   /** Returns request's HTTP method, which is "GET" by default. */
--  readonly method: string;
-+  readonly method: import('ts-type-forge').HTTPRequestMethod;
-   /** Returns the mode associated with request, which is a string indicating whether the request will use CORS, or will be restricted to same-origin URLs. */
-   readonly mode: RequestMode;
-   /** Returns the redirect mode associated with request, which is a string indicating how redirects for the request will be handled during fetching. A request will follow redirects by default. */
 @@ -14963,7 +15204,7 @@ interface ResizeObserver {
    unobserve(target: Element): void;
  }
@@ -11024,19 +11015,22 @@
    /**
     * Returns response as text.
     *
-@@ -23105,9 +23444,9 @@ interface XMLHttpRequest extends XMLHttpRequestEventTarget {
+@@ -23105,9 +23444,12 @@ interface XMLHttpRequest extends XMLHttpRequestEventTarget {
     *
     * Throws an "InvalidAccessError" DOMException if async is false, current global object is a Window object, and the timeout attribute is not zero or the responseType attribute is not the empty string.
     */
 -  open(method: string, url: string | URL): void;
-+  open(method: 'post' | 'get' | 'dialog', url: string | URL): void;
    open(
 -    method: string,
-+    method: 'post' | 'get' | 'dialog',
++    method: import('ts-type-forge').HTTPRequestMethod | (string & {}),
++    url: string | URL,
++  ): void;
++  open(
++    method: import('ts-type-forge').HTTPRequestMethod | (string & {}),
      url: string | URL,
      async: boolean,
      username?: string | null,
-@@ -23140,7 +23479,7 @@ interface XMLHttpRequest extends XMLHttpRequestEventTarget {
+@@ -23140,7 +23482,7 @@ interface XMLHttpRequest extends XMLHttpRequestEventTarget {
    readonly DONE: 4;
    addEventListener<K extends keyof XMLHttpRequestEventMap>(
      type: K,
@@ -11045,7 +11039,7 @@
      options?: boolean | AddEventListenerOptions,
    ): void;
    addEventListener(
-@@ -23150,7 +23489,7 @@ interface XMLHttpRequest extends XMLHttpRequestEventTarget {
+@@ -23150,7 +23492,7 @@ interface XMLHttpRequest extends XMLHttpRequestEventTarget {
    ): void;
    removeEventListener<K extends keyof XMLHttpRequestEventMap>(
      type: K,
@@ -11054,7 +11048,7 @@
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -23181,19 +23520,19 @@ interface XMLHttpRequestEventTargetEventMap {
+@@ -23181,19 +23523,19 @@ interface XMLHttpRequestEventTargetEventMap {
  }
  
  interface XMLHttpRequestEventTarget extends EventTarget {
@@ -11082,7 +11076,7 @@
      options?: boolean | AddEventListenerOptions,
    ): void;
    addEventListener(
-@@ -23206,7 +23545,7 @@ interface XMLHttpRequestEventTarget extends EventTarget {
+@@ -23206,7 +23548,7 @@ interface XMLHttpRequestEventTarget extends EventTarget {
      listener: (
        this: XMLHttpRequestEventTarget,
        ev: XMLHttpRequestEventTargetEventMap[K],
@@ -11091,7 +11085,7 @@
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -23227,7 +23566,7 @@ interface XMLHttpRequestUpload extends XMLHttpRequestEventTarget {
+@@ -23227,7 +23569,7 @@ interface XMLHttpRequestUpload extends XMLHttpRequestEventTarget {
      listener: (
        this: XMLHttpRequestUpload,
        ev: XMLHttpRequestEventTargetEventMap[K],
@@ -11100,7 +11094,7 @@
      options?: boolean | AddEventListenerOptions,
    ): void;
    addEventListener(
-@@ -23240,7 +23579,7 @@ interface XMLHttpRequestUpload extends XMLHttpRequestEventTarget {
+@@ -23240,7 +23582,7 @@ interface XMLHttpRequestUpload extends XMLHttpRequestEventTarget {
      listener: (
        this: XMLHttpRequestUpload,
        ev: XMLHttpRequestEventTargetEventMap[K],
@@ -11109,7 +11103,7 @@
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -23260,7 +23599,7 @@ interface XMLSerializer {
+@@ -23260,7 +23602,7 @@ interface XMLSerializer {
    serializeToString(root: Node): string;
  }
  
@@ -11118,7 +11112,7 @@
    prototype: XMLSerializer;
    new (): XMLSerializer;
  };
-@@ -23268,7 +23607,7 @@ declare var XMLSerializer: {
+@@ -23268,7 +23610,7 @@ declare var XMLSerializer: {
  /** The XPathEvaluator interface allows to compile and evaluate XPath expressions. */
  interface XPathEvaluator extends XPathEvaluatorBase {}
  
@@ -11127,7 +11121,7 @@
    prototype: XPathEvaluator;
    new (): XPathEvaluator;
  };
-@@ -23297,7 +23636,7 @@ interface XPathExpression {
+@@ -23297,7 +23639,7 @@ interface XPathExpression {
    ): XPathResult;
  }
  
@@ -11136,7 +11130,7 @@
    prototype: XPathExpression;
    new (): XPathExpression;
  };
-@@ -23325,7 +23664,7 @@ interface XPathResult {
+@@ -23325,7 +23667,7 @@ interface XPathResult {
    readonly FIRST_ORDERED_NODE_TYPE: 9;
  }
  
@@ -11145,7 +11139,7 @@
    prototype: XPathResult;
    new (): XPathResult;
    readonly ANY_TYPE: 0;
-@@ -23343,45 +23682,45 @@ declare var XPathResult: {
+@@ -23343,45 +23685,45 @@ declare var XPathResult: {
  /** An XSLTProcessor applies an XSLT stylesheet transformation to an XML document to produce a new XML document as output. It has methods to load the XSLT stylesheet, to manipulate <xsl:param> parameter values, and to apply the transformation to documents. */
  interface XSLTProcessor {
    clearParameters(): void;
@@ -11207,7 +11201,7 @@
  }
  
  declare var console: Console;
-@@ -23396,34 +23735,34 @@ declare namespace CSS {
+@@ -23396,34 +23738,34 @@ declare namespace CSS {
  declare namespace WebAssembly {
    interface CompileError extends Error {}
  
@@ -11249,7 +11243,7 @@
      prototype: LinkError;
      new (message?: string): LinkError;
      (message?: string): LinkError;
-@@ -23434,14 +23773,14 @@ declare namespace WebAssembly {
+@@ -23434,14 +23776,14 @@ declare namespace WebAssembly {
      grow(delta: number): number;
    }
  
@@ -11266,7 +11260,7 @@
      prototype: Module;
      new (bytes: BufferSource): Module;
      customSections(moduleObject: Module, sectionName: string): ArrayBuffer[];
-@@ -23451,7 +23790,7 @@ declare namespace WebAssembly {
+@@ -23451,7 +23793,7 @@ declare namespace WebAssembly {
  
    interface RuntimeError extends Error {}
  
@@ -11275,7 +11269,7 @@
      prototype: RuntimeError;
      new (message?: string): RuntimeError;
      (message?: string): RuntimeError;
-@@ -23459,14 +23798,14 @@ declare namespace WebAssembly {
+@@ -23459,14 +23801,14 @@ declare namespace WebAssembly {
  
    interface Table {
      readonly length: number;
@@ -11295,7 +11289,7 @@
    };
  
    interface GlobalDescriptor {
-@@ -23541,7 +23880,7 @@ interface BlobCallback {
+@@ -23541,7 +23883,7 @@ interface BlobCallback {
  }
  
  interface CustomElementConstructor {
@@ -11304,7 +11298,7 @@
  }
  
  interface DecodeErrorCallback {
-@@ -23561,7 +23900,7 @@ interface FileCallback {
+@@ -23561,7 +23903,7 @@ interface FileCallback {
  }
  
  interface FileSystemEntriesCallback {
@@ -11313,7 +11307,7 @@
  }
  
  interface FileSystemEntryCallback {
-@@ -23581,11 +23920,14 @@ interface IdleRequestCallback {
+@@ -23581,11 +23923,14 @@ interface IdleRequestCallback {
  }
  
  interface IntersectionObserverCallback {
@@ -11330,7 +11324,7 @@
  }
  
  interface MediaSessionActionHandler {
-@@ -23593,7 +23935,7 @@ interface MediaSessionActionHandler {
+@@ -23593,7 +23938,7 @@ interface MediaSessionActionHandler {
  }
  
  interface MutationCallback {
@@ -11339,7 +11333,7 @@
  }
  
  interface NotificationPermissionCallback {
-@@ -23611,7 +23953,7 @@ interface OnErrorEventHandlerNonNull {
+@@ -23611,7 +23956,7 @@ interface OnErrorEventHandlerNonNull {
      lineno?: number,
      colno?: number,
      error?: Error,
@@ -11348,7 +11342,7 @@
  }
  
  interface PerformanceObserverCallback {
-@@ -23626,7 +23968,7 @@ interface PositionErrorCallback {
+@@ -23626,7 +23971,7 @@ interface PositionErrorCallback {
    (positionError: GeolocationPositionError): void;
  }
  
@@ -11357,7 +11351,7 @@
    (chunk: T): number;
  }
  
-@@ -23643,7 +23985,7 @@ interface RemotePlaybackAvailabilityCallback {
+@@ -23643,7 +23988,7 @@ interface RemotePlaybackAvailabilityCallback {
  }
  
  interface ResizeObserverCallback {
@@ -11366,7 +11360,7 @@
  }
  
  interface TransformerFlushCallback<O> {
-@@ -23651,7 +23993,7 @@ interface TransformerFlushCallback<O> {
+@@ -23651,7 +23996,7 @@ interface TransformerFlushCallback<O> {
  }
  
  interface TransformerStartCallback<O> {
@@ -11375,7 +11369,7 @@
  }
  
  interface TransformerTransformCallback<I, O> {
-@@ -23662,7 +24004,7 @@ interface TransformerTransformCallback<I, O> {
+@@ -23662,7 +24007,7 @@ interface TransformerTransformCallback<I, O> {
  }
  
  interface UnderlyingSinkAbortCallback {
@@ -11384,7 +11378,7 @@
  }
  
  interface UnderlyingSinkCloseCallback {
-@@ -23670,7 +24012,7 @@ interface UnderlyingSinkCloseCallback {
+@@ -23670,7 +24015,7 @@ interface UnderlyingSinkCloseCallback {
  }
  
  interface UnderlyingSinkStartCallback {
@@ -11393,7 +11387,7 @@
  }
  
  interface UnderlyingSinkWriteCallback<W> {
-@@ -23681,7 +24023,7 @@ interface UnderlyingSinkWriteCallback<W> {
+@@ -23681,7 +24026,7 @@ interface UnderlyingSinkWriteCallback<W> {
  }
  
  interface UnderlyingSourceCancelCallback {
@@ -11402,7 +11396,7 @@
  }
  
  interface UnderlyingSourcePullCallback<R> {
-@@ -23689,7 +24031,7 @@ interface UnderlyingSourcePullCallback<R> {
+@@ -23689,7 +24034,7 @@ interface UnderlyingSourcePullCallback<R> {
  }
  
  interface UnderlyingSourceStartCallback<R> {
@@ -11411,7 +11405,7 @@
  }
  
  interface VideoFrameRequestCallback {
-@@ -23952,13 +24294,13 @@ type ElementTagNameMap = HTMLElementTagNameMap &
+@@ -23952,13 +24297,13 @@ type ElementTagNameMap = HTMLElementTagNameMap &
      Exclude<keyof SVGElementTagNameMap, keyof HTMLElementTagNameMap>
    >;
  
@@ -11428,7 +11422,7 @@
    new (
      text?: string,
      value?: string,
-@@ -23967,79 +24309,81 @@ declare var Option: {
+@@ -23967,79 +24312,81 @@ declare var Option: {
    ): HTMLOptionElement;
  };
  /** @deprecated This is a legacy alias of `navigator`. */
@@ -11554,7 +11548,7 @@
  declare function blur(): void;
  declare function cancelIdleCallback(handle: number): void;
  /** @deprecated */
-@@ -24074,12 +24418,12 @@ declare function open(
+@@ -24074,12 +24421,12 @@ declare function open(
   * Throws a "DataCloneError" DOMException if transfer array contains duplicate objects or if message could not be cloned.
   */
  declare function postMessage(
@@ -11570,7 +11564,7 @@
    options?: WindowPostMessageOptions,
  ): void;
  declare function print(): void;
-@@ -24109,101 +24453,103 @@ declare function requestAnimationFrame(callback: FrameRequestCallback): number;
+@@ -24109,101 +24456,103 @@ declare function requestAnimationFrame(callback: FrameRequestCallback): number;
   * Fires when the user aborts the download.
   * @param ev The event.
   */
@@ -11706,7 +11700,7 @@
  /**
   * Fires when an error occurs during object loading.
   * @param ev The event.
-@@ -24213,240 +24559,268 @@ declare var onerror: OnErrorEventHandler;
+@@ -24213,240 +24562,268 @@ declare var onerror: OnErrorEventHandler;
   * Fires when the object receives focus.
   * @param ev The event.
   */
@@ -12013,21 +12007,18 @@
 -  | ((this: Window, ev: BeforeUnloadEvent) => any)
 +declare const onwebkittransitionend:
 +  | ((this: Window, ev: Event) => unknown)
-+  | null;
+   | null;
+-declare var ongamepadconnected:
+-  | ((this: Window, ev: GamepadEvent) => any)
 +declare const onwheel: ((this: Window, ev: WheelEvent) => unknown) | null;
 +declare const onafterprint: ((this: Window, ev: Event) => unknown) | null;
 +declare const onbeforeprint: ((this: Window, ev: Event) => unknown) | null;
 +declare const onbeforeunload:
 +  | ((this: Window, ev: BeforeUnloadEvent) => unknown)
    | null;
--declare var ongamepadconnected:
--  | ((this: Window, ev: GamepadEvent) => any)
-+declare const ongamepadconnected:
-+  | ((this: Window, ev: GamepadEvent) => unknown)
-   | null;
 -declare var ongamepaddisconnected:
 -  | ((this: Window, ev: GamepadEvent) => any)
-+declare const ongamepaddisconnected:
++declare const ongamepadconnected:
 +  | ((this: Window, ev: GamepadEvent) => unknown)
    | null;
 -declare var onhashchange: ((this: Window, ev: HashChangeEvent) => any) | null;
@@ -12039,6 +12030,9 @@
 -declare var onpagehide: ((this: Window, ev: PageTransitionEvent) => any) | null;
 -declare var onpageshow: ((this: Window, ev: PageTransitionEvent) => any) | null;
 -declare var onpopstate: ((this: Window, ev: PopStateEvent) => any) | null;
++declare const ongamepaddisconnected:
++  | ((this: Window, ev: GamepadEvent) => unknown)
++  | null;
 +declare const onhashchange:
 +  | ((this: Window, ev: HashChangeEvent) => unknown)
 +  | null;
@@ -12073,7 +12067,7 @@
  /** Available only in secure contexts. */
  declare var caches: CacheStorage;
  declare var crossOriginIsolated: boolean;
-@@ -24476,25 +24850,25 @@ declare function fetch(
+@@ -24476,25 +24853,25 @@ declare function fetch(
    init?: RequestInit,
  ): Promise<Response>;
  declare function queueMicrotask(callback: VoidFunction): void;
@@ -12106,7 +12100,7 @@
    options?: boolean | AddEventListenerOptions,
  ): void;
  declare function addEventListener(
-@@ -24504,7 +24878,7 @@ declare function addEventListener(
+@@ -24504,7 +24881,7 @@ declare function addEventListener(
  ): void;
  declare function removeEventListener<K extends keyof WindowEventMap>(
    type: K,
@@ -12115,7 +12109,7 @@
    options?: boolean | EventListenerOptions,
  ): void;
  declare function removeEventListener(
-@@ -24527,15 +24901,18 @@ type CanvasImageSource =
+@@ -24527,15 +24904,18 @@ type CanvasImageSource =
    | ImageBitmap
    | OffscreenCanvas;
  type ClipboardItemData = Promise<string | Blob>;
@@ -12137,7 +12131,7 @@
  type FormDataEntryValue = File | string;
  type GLbitfield = number;
  type GLboolean = boolean;
-@@ -24552,10 +24929,18 @@ type GLuint64 = number;
+@@ -24552,10 +24932,18 @@ type GLuint64 = number;
  type HTMLOrSVGImageElement = HTMLImageElement | SVGImageElement;
  type HTMLOrSVGScriptElement = HTMLScriptElement | SVGScriptElement;
  type HashAlgorithmIdentifier = AlgorithmIdentifier;
@@ -12159,7 +12153,7 @@
  type LineAndPositionSetting = number | AutoKeyword;
  type MediaProvider = MediaStream | MediaSource | Blob;
  type MessageEventSource = WindowProxy | MessagePort | ServiceWorker;
-@@ -24568,7 +24953,7 @@ type OffscreenRenderingContext =
+@@ -24568,7 +24956,7 @@ type OffscreenRenderingContext =
    | WebGL2RenderingContext;
  type OnBeforeUnloadEventHandler = OnBeforeUnloadEventHandlerNonNull | null;
  type OnErrorEventHandler = OnErrorEventHandlerNonNull | null;
@@ -12168,7 +12162,7 @@
  type ReadableStreamController<T> =
    | ReadableStreamDefaultController<T>
    | ReadableByteStreamController;
-@@ -24600,8 +24985,8 @@ type Transferable =
+@@ -24600,8 +24988,8 @@ type Transferable =
    | WritableStream
    | TransformStream
    | ArrayBuffer;

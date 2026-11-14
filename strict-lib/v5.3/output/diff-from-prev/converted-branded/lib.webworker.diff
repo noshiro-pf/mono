@@ -1,5 +1,5 @@
 diff --git a/v5.2/output/lib-files-branded/lib.webworker.d.ts b/v5.3/output/lib-files-branded/lib.webworker.d.ts
-index 699fb266fd13361c13327c68623ff1abed126302..38fae52c6169a2504bb799a350efb90f2272a0cf 100644
+index 6c9e898a4c351342066fbe33d840916df59c6fd4..96bd35777293f67deaeba13c8bfec37fb9fe80bf 100644
 --- a/v5.2/output/lib-files-branded/lib.webworker.d.ts
 +++ b/v5.3/output/lib-files-branded/lib.webworker.d.ts
 @@ -6264,7 +6264,16 @@ interface SubtleCrypto {

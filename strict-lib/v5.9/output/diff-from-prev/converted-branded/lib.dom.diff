@@ -1,5 +1,5 @@
 diff --git a/v5.8/output/lib-files-branded/lib.dom.d.ts b/v5.9/output/lib-files-branded/lib.dom.d.ts
-index bb2e57feb89e0fffcd2ebb6aa858ef93d0189453..a6a37a491960b8c54a94296b8303915b5123c932 100644
+index 067e53b88dd9e3a9dcf7b27022a09959ae0c5cbc..2b588f344cc06253f32881adff5118e68a8d7ff4 100644
 --- a/v5.8/output/lib-files-branded/lib.dom.d.ts
 +++ b/v5.9/output/lib-files-branded/lib.dom.d.ts
 @@ -145,7 +145,7 @@ interface AudioDataInit {
@@ -23063,7 +23063,7 @@ index bb2e57feb89e0fffcd2ebb6aa858ef93d0189453..a6a37a491960b8c54a94296b8303915b
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Request/method)
     */
-   readonly method: import('ts-type-forge').HTTPRequestMethod;
+   readonly method: string;
    /**
 -   * Returns the mode associated with request, which is a string indicating whether the request will use CORS, or will be restricted to same-origin URLs.
 +   * The **`mode`** read-only property of the Request interface contains the mode of the request (e.g., `cors`, `no-cors`, `same-origin`, or `navigate`.) This is used to determine if cross-origin requests lead to valid responses, and which properties of the response are readable.
@@ -31948,7 +31948,7 @@ index bb2e57feb89e0fffcd2ebb6aa858ef93d0189453..a6a37a491960b8c54a94296b8303915b
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/XMLHttpRequest/open)
     */
-@@ -33976,27 +43673,19 @@ interface XMLHttpRequest extends XMLHttpRequestEventTarget {
+@@ -33979,27 +43676,19 @@ interface XMLHttpRequest extends XMLHttpRequestEventTarget {
      password?: string | null,
    ): void;
    /**
@@ -31979,7 +31979,7 @@ index bb2e57feb89e0fffcd2ebb6aa858ef93d0189453..a6a37a491960b8c54a94296b8303915b
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/XMLHttpRequest/setRequestHeader)
     */
-@@ -34048,7 +43737,11 @@ interface XMLHttpRequestEventTargetEventMap {
+@@ -34051,7 +43740,11 @@ interface XMLHttpRequestEventTargetEventMap {
    timeout: ProgressEvent<XMLHttpRequestEventTarget>;
  }
  
@@ -31992,7 +31992,7 @@ index bb2e57feb89e0fffcd2ebb6aa858ef93d0189453..a6a37a491960b8c54a94296b8303915b
  interface XMLHttpRequestEventTarget extends EventTarget {
    onabort: ((this: XMLHttpRequest, ev: ProgressEvent) => unknown) | null;
    onerror: ((this: XMLHttpRequest, ev: ProgressEvent) => unknown) | null;
-@@ -34090,7 +43783,11 @@ declare var XMLHttpRequestEventTarget: {
+@@ -34093,7 +43786,11 @@ declare var XMLHttpRequestEventTarget: {
    new (): XMLHttpRequestEventTarget;
  };
  
@@ -32005,7 +32005,7 @@ index bb2e57feb89e0fffcd2ebb6aa858ef93d0189453..a6a37a491960b8c54a94296b8303915b
  interface XMLHttpRequestUpload extends XMLHttpRequestEventTarget {
    addEventListener<K extends keyof XMLHttpRequestEventTargetEventMap>(
      type: K,
-@@ -34126,12 +43823,16 @@ declare var XMLHttpRequestUpload: {
+@@ -34129,12 +43826,16 @@ declare var XMLHttpRequestUpload: {
  };
  
  /**
@@ -32024,7 +32024,7 @@ index bb2e57feb89e0fffcd2ebb6aa858ef93d0189453..a6a37a491960b8c54a94296b8303915b
    serializeToString(root: Node): string;
  }
  
-@@ -34141,7 +43842,7 @@ declare const XMLSerializer: {
+@@ -34144,7 +43845,7 @@ declare const XMLSerializer: {
  };
  
  /**
@@ -32033,7 +32033,7 @@ index bb2e57feb89e0fffcd2ebb6aa858ef93d0189453..a6a37a491960b8c54a94296b8303915b
   *
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/XPathEvaluator)
   */
-@@ -34175,12 +43876,16 @@ interface XPathEvaluatorBase {
+@@ -34178,12 +43879,16 @@ interface XPathEvaluatorBase {
  }
  
  /**
@@ -32052,7 +32052,7 @@ index bb2e57feb89e0fffcd2ebb6aa858ef93d0189453..a6a37a491960b8c54a94296b8303915b
    evaluate(
      contextNode: Node,
      type?: number,
-@@ -34194,28 +43899,64 @@ declare const XPathExpression: {
+@@ -34197,28 +43902,64 @@ declare const XPathExpression: {
  };
  
  /**
@@ -32127,7 +32127,7 @@ index bb2e57feb89e0fffcd2ebb6aa858ef93d0189453..a6a37a491960b8c54a94296b8303915b
    snapshotItem(index: number): Node | null;
    readonly ANY_TYPE: 0;
    readonly NUMBER_TYPE: 1;
-@@ -34245,30 +43986,62 @@ declare const XPathResult: {
+@@ -34248,30 +43989,62 @@ declare const XPathResult: {
  };
  
  /**
@@ -32199,7 +32199,7 @@ index bb2e57feb89e0fffcd2ebb6aa858ef93d0189453..a6a37a491960b8c54a94296b8303915b
    transformToFragment(source: Node, output: Document): DocumentFragment;
  }
  
-@@ -34277,54 +44050,13 @@ declare const XSLTProcessor: {
+@@ -34280,54 +44053,13 @@ declare const XSLTProcessor: {
    new (): XSLTProcessor;
  };
  
@@ -32260,7 +32260,7 @@ index bb2e57feb89e0fffcd2ebb6aa858ef93d0189453..a6a37a491960b8c54a94296b8303915b
    const highlights: HighlightRegistry;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSS/factory_functions_static) */
    function Hz(value: number): CSSUnitValue;
-@@ -34369,7 +44101,11 @@ declare namespace CSS {
+@@ -34372,7 +44104,11 @@ declare namespace CSS {
    function dvw(value: number): CSSUnitValue;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSS/factory_functions_static) */
    function em(value: number): CSSUnitValue;
@@ -32273,7 +32273,7 @@ index bb2e57feb89e0fffcd2ebb6aa858ef93d0189453..a6a37a491960b8c54a94296b8303915b
    function escape(ident: string): string;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSS/factory_functions_static) */
    function ex(value: number): CSSUnitValue;
-@@ -34411,7 +44147,11 @@ declare namespace CSS {
+@@ -34414,7 +44150,11 @@ declare namespace CSS {
    function rad(value: number): CSSUnitValue;
    function rcap(value: number): CSSUnitValue;
    function rch(value: number): CSSUnitValue;
@@ -32286,7 +32286,7 @@ index bb2e57feb89e0fffcd2ebb6aa858ef93d0189453..a6a37a491960b8c54a94296b8303915b
    function registerProperty(definition: PropertyDefinition): void;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSS/factory_functions_static) */
    function rem(value: number): CSSUnitValue;
-@@ -34420,7 +44160,11 @@ declare namespace CSS {
+@@ -34423,7 +44163,11 @@ declare namespace CSS {
    function rlh(value: number): CSSUnitValue;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSS/factory_functions_static) */
    function s(value: number): CSSUnitValue;
@@ -32299,7 +32299,7 @@ index bb2e57feb89e0fffcd2ebb6aa858ef93d0189453..a6a37a491960b8c54a94296b8303915b
    function supports(property: string, value: string): boolean;
    function supports(conditionText: string): boolean;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSS/factory_functions_static) */
-@@ -34460,7 +44204,7 @@ declare namespace WebAssembly {
+@@ -34463,7 +44207,7 @@ declare namespace WebAssembly {
      (message?: string): CompileError;
    };
  
@@ -32308,7 +32308,7 @@ index bb2e57feb89e0fffcd2ebb6aa858ef93d0189453..a6a37a491960b8c54a94296b8303915b
    interface Global<T extends ValueType = ValueType> {
      value: ValueTypeMap[T];
      valueOf(): ValueTypeMap[T];
-@@ -34474,9 +44218,9 @@ declare namespace WebAssembly {
+@@ -34477,9 +44221,9 @@ declare namespace WebAssembly {
      ): Global<T>;
    };
  
@@ -32320,7 +32320,7 @@ index bb2e57feb89e0fffcd2ebb6aa858ef93d0189453..a6a37a491960b8c54a94296b8303915b
      readonly exports: Exports;
    }
  
-@@ -34493,11 +44237,11 @@ declare namespace WebAssembly {
+@@ -34496,11 +44240,11 @@ declare namespace WebAssembly {
      (message?: string): LinkError;
    };
  
@@ -32335,7 +32335,7 @@ index bb2e57feb89e0fffcd2ebb6aa858ef93d0189453..a6a37a491960b8c54a94296b8303915b
      grow(delta: number): number;
    }
  
-@@ -34506,20 +44250,20 @@ declare namespace WebAssembly {
+@@ -34509,20 +44253,20 @@ declare namespace WebAssembly {
      new (descriptor: MemoryDescriptor): Memory;
    };
  
@@ -32360,7 +32360,7 @@ index bb2e57feb89e0fffcd2ebb6aa858ef93d0189453..a6a37a491960b8c54a94296b8303915b
      imports(moduleObject: Module): readonly ModuleImportDescriptor[];
    };
  
-@@ -34531,15 +44275,15 @@ declare namespace WebAssembly {
+@@ -34534,15 +44278,15 @@ declare namespace WebAssembly {
      (message?: string): RuntimeError;
    };
  
@@ -32381,7 +32381,7 @@ index bb2e57feb89e0fffcd2ebb6aa858ef93d0189453..a6a37a491960b8c54a94296b8303915b
      set(index: number, value?: unknown): void;
    }
  
-@@ -34599,13 +44343,13 @@ declare namespace WebAssembly {
+@@ -34602,13 +44346,13 @@ declare namespace WebAssembly {
    type Imports = Record<string, ModuleImports>;
    type ModuleImports = Record<string, ImportValue>;
    type ValueType = keyof ValueTypeMap;
@@ -32398,7 +32398,7 @@ index bb2e57feb89e0fffcd2ebb6aa858ef93d0189453..a6a37a491960b8c54a94296b8303915b
    function instantiate(
      bytes: BufferSource,
      importObject?: Imports,
-@@ -34614,15 +44358,141 @@ declare namespace WebAssembly {
+@@ -34617,15 +44361,141 @@ declare namespace WebAssembly {
      moduleObject: Module,
      importObject?: Imports,
    ): Promise<Instance>;
@@ -32542,7 +32542,7 @@ index bb2e57feb89e0fffcd2ebb6aa858ef93d0189453..a6a37a491960b8c54a94296b8303915b
  interface AudioDataOutputCallback {
    (output: AudioData): void;
  }
-@@ -34686,8 +44556,8 @@ interface IntersectionObserverCallback {
+@@ -34689,8 +44559,8 @@ interface IntersectionObserverCallback {
    ): void;
  }
  
@@ -32553,7 +32553,7 @@ index bb2e57feb89e0fffcd2ebb6aa858ef93d0189453..a6a37a491960b8c54a94296b8303915b
  }
  
  interface MediaSessionActionHandler {
-@@ -35092,63 +44962,115 @@ declare const Option: {
+@@ -35095,63 +44965,115 @@ declare const Option: {
   */
  declare const clientInformation: Navigator;
  /**
@@ -32684,7 +32684,7 @@ index bb2e57feb89e0fffcd2ebb6aa858ef93d0189453..a6a37a491960b8c54a94296b8303915b
  declare var navigator: Navigator;
  /**
   * Available only in secure contexts.
-@@ -35182,143 +45104,239 @@ declare const ondeviceorientationabsolute:
+@@ -35185,143 +45107,239 @@ declare const ondeviceorientationabsolute:
  declare const onorientationchange:
    | ((this: Window, ev: Event) => unknown)
    | null;
@@ -32966,7 +32966,7 @@ index bb2e57feb89e0fffcd2ebb6aa858ef93d0189453..a6a37a491960b8c54a94296b8303915b
   *
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/postMessage)
   */
-@@ -35331,43 +45349,76 @@ declare function postMessage(
+@@ -35334,43 +45352,76 @@ declare function postMessage(
    message: unknown,
    options?: WindowPostMessageOptions,
  ): void;
@@ -33053,7 +33053,7 @@ index bb2e57feb89e0fffcd2ebb6aa858ef93d0189453..a6a37a491960b8c54a94296b8303915b
   *
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/dispatchEvent)
   */
-@@ -35376,12 +45427,7 @@ declare function dispatchEvent(event: Event): boolean;
+@@ -35379,12 +45430,7 @@ declare function dispatchEvent(event: Event): boolean;
  declare function cancelAnimationFrame(handle: number): void;
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/DedicatedWorkerGlobalScope/requestAnimationFrame) */
  declare function requestAnimationFrame(callback: FrameRequestCallback): number;
@@ -33067,7 +33067,7 @@ index bb2e57feb89e0fffcd2ebb6aa858ef93d0189453..a6a37a491960b8c54a94296b8303915b
  declare const onabort: ((this: Window, ev: UIEvent) => unknown) | null;
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Element/animationcancel_event) */
  declare const onanimationcancel:
-@@ -35400,54 +45446,35 @@ declare const onanimationstart:
+@@ -35403,54 +45449,35 @@ declare const onanimationstart:
    | ((this: Window, ev: AnimationEvent) => unknown)
    | null;
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Element/auxclick_event) */
@@ -33137,7 +33137,7 @@ index bb2e57feb89e0fffcd2ebb6aa858ef93d0189453..a6a37a491960b8c54a94296b8303915b
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/HTMLCanvasElement/contextrestored_event) */
  declare const oncontextrestored: ((this: Window, ev: Event) => unknown) | null;
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Element/copy_event) */
-@@ -35456,91 +45483,31 @@ declare const oncopy: ((this: Window, ev: ClipboardEvent) => unknown) | null;
+@@ -35459,91 +45486,31 @@ declare const oncopy: ((this: Window, ev: ClipboardEvent) => unknown) | null;
  declare const oncuechange: ((this: Window, ev: Event) => unknown) | null;
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Element/cut_event) */
  declare const oncut: ((this: Window, ev: ClipboardEvent) => unknown) | null;
@@ -33241,7 +33241,7 @@ index bb2e57feb89e0fffcd2ebb6aa858ef93d0189453..a6a37a491960b8c54a94296b8303915b
  declare const onfocus: ((this: Window, ev: FocusEvent) => unknown) | null;
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/HTMLFormElement/formdata_event) */
  declare const onformdata: ((this: Window, ev: FormDataEvent) => unknown) | null;
-@@ -35552,121 +45519,49 @@ declare const ongotpointercapture:
+@@ -35555,121 +45522,49 @@ declare const ongotpointercapture:
  declare const oninput: ((this: Window, ev: Event) => unknown) | null;
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/HTMLInputElement/invalid_event) */
  declare const oninvalid: ((this: Window, ev: Event) => unknown) | null;
@@ -33377,7 +33377,7 @@ index bb2e57feb89e0fffcd2ebb6aa858ef93d0189453..a6a37a491960b8c54a94296b8303915b
  declare const onplaying: ((this: Window, ev: Event) => unknown) | null;
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Element/pointercancel_event) */
  declare const onpointercancel:
-@@ -35696,37 +45591,23 @@ declare const onpointerout:
+@@ -35699,37 +45594,23 @@ declare const onpointerout:
  declare const onpointerover:
    | ((this: Window, ev: PointerEvent) => unknown)
    | null;
@@ -33424,7 +33424,7 @@ index bb2e57feb89e0fffcd2ebb6aa858ef93d0189453..a6a37a491960b8c54a94296b8303915b
  declare const onscroll: ((this: Window, ev: Event) => unknown) | null;
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Document/scrollend_event) */
  declare const onscrollend: ((this: Window, ev: Event) => unknown) | null;
-@@ -35734,26 +45615,11 @@ declare const onscrollend: ((this: Window, ev: Event) => unknown) | null;
+@@ -35737,26 +45618,11 @@ declare const onscrollend: ((this: Window, ev: Event) => unknown) | null;
  declare const onsecuritypolicyviolation:
    | ((this: Window, ev: SecurityPolicyViolationEvent) => unknown)
    | null;
@@ -33454,7 +33454,7 @@ index bb2e57feb89e0fffcd2ebb6aa858ef93d0189453..a6a37a491960b8c54a94296b8303915b
  declare const onselect: ((this: Window, ev: Event) => unknown) | null;
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Document/selectionchange_event) */
  declare const onselectionchange: ((this: Window, ev: Event) => unknown) | null;
-@@ -35761,31 +45627,16 @@ declare const onselectionchange: ((this: Window, ev: Event) => unknown) | null;
+@@ -35764,31 +45630,16 @@ declare const onselectionchange: ((this: Window, ev: Event) => unknown) | null;
  declare const onselectstart: ((this: Window, ev: Event) => unknown) | null;
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/HTMLSlotElement/slotchange_event) */
  declare const onslotchange: ((this: Window, ev: Event) => unknown) | null;
@@ -33490,7 +33490,7 @@ index bb2e57feb89e0fffcd2ebb6aa858ef93d0189453..a6a37a491960b8c54a94296b8303915b
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Element/touchcancel_event) */
  declare const ontouchcancel:
    | ((this: Window, ev: TouchEvent) => unknown)
-@@ -35822,19 +45673,9 @@ declare const ontransitionrun:
+@@ -35825,19 +45676,9 @@ declare const ontransitionrun:
  declare const ontransitionstart:
    | ((this: Window, ev: TransitionEvent) => unknown)
    | null;
@@ -33512,7 +33512,7 @@ index bb2e57feb89e0fffcd2ebb6aa858ef93d0189453..a6a37a491960b8c54a94296b8303915b
  declare const onwaiting: ((this: Window, ev: Event) => unknown) | null;
  /**
   * @deprecated This is a legacy alias of `onanimationend`.
-@@ -35907,13 +45748,15 @@ declare const onpagehide:
+@@ -35910,13 +45751,15 @@ declare const onpagehide:
    | ((this: Window, ev: PageTransitionEvent) => unknown)
    | null;
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/pagereveal_event) */
@@ -33530,7 +33530,7 @@ index bb2e57feb89e0fffcd2ebb6aa858ef93d0189453..a6a37a491960b8c54a94296b8303915b
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/popstate_event) */
  declare const onpopstate: ((this: Window, ev: PopStateEvent) => unknown) | null;
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/rejectionhandled_event) */
-@@ -36022,7 +45865,9 @@ declare function removeEventListener(
+@@ -36025,7 +45868,9 @@ declare function removeEventListener(
    options?: boolean | EventListenerOptions,
  ): void;
  type AlgorithmIdentifier = Algorithm | string;
@@ -33541,7 +33541,7 @@ index bb2e57feb89e0fffcd2ebb6aa858ef93d0189453..a6a37a491960b8c54a94296b8303915b
  type AutoFill =
    | AutoFillBase
    | `${OptionalPrefixToken<AutoFillSection>}${OptionalPrefixToken<AutoFillAddressKind>}${AutoFillField}${OptionalPostfixToken<AutoFillCredentialField>}`;
-@@ -36031,10 +45876,10 @@ type AutoFillField =
+@@ -36034,10 +45879,10 @@ type AutoFillField =
    | `${OptionalPrefixToken<AutoFillContactKind>}${AutoFillContactField}`;
  type AutoFillSection = `section-${string}`;
  type Base64URLString = string;
@@ -33554,7 +33554,7 @@ index bb2e57feb89e0fffcd2ebb6aa858ef93d0189453..a6a37a491960b8c54a94296b8303915b
  type COSEAlgorithmIdentifier = number;
  type CSSKeywordish = string | CSSKeywordValue;
  type CSSNumberish = number | CSSNumericValue;
-@@ -36056,11 +45901,12 @@ type ConstrainDOMString =
+@@ -36059,11 +45904,12 @@ type ConstrainDOMString =
    | ConstrainDOMStringParameters;
  type ConstrainDouble = number | ConstrainDoubleRange;
  type ConstrainULong = number | ConstrainULongRange;
@@ -33568,7 +33568,7 @@ index bb2e57feb89e0fffcd2ebb6aa858ef93d0189453..a6a37a491960b8c54a94296b8303915b
  type FormDataEntryValue = File | string;
  type GLbitfield = number;
  type GLboolean = boolean;
-@@ -36089,7 +45935,8 @@ type IDBValidKey =
+@@ -36092,7 +45938,8 @@ type IDBValidKey =
    | readonly IDBValidKey[];
  type ImageBitmapSource = CanvasImageSource | Blob | ImageData;
  type ImageBufferSource = AllowSharedBufferSource | ReadableStream;
@@ -33578,7 +33578,7 @@ index bb2e57feb89e0fffcd2ebb6aa858ef93d0189453..a6a37a491960b8c54a94296b8303915b
  type LineAndPositionSetting = number | AutoKeyword;
  type MediaProvider = MediaStream | MediaSource | Blob;
  type MessageEventSource = WindowProxy | MessagePort | ServiceWorker;
-@@ -36145,7 +45992,7 @@ type Transferable =
+@@ -36148,7 +45995,7 @@ type Transferable =
    | VideoFrame
    | RTCDataChannel
    | ArrayBuffer;
@@ -33587,7 +33587,7 @@ index bb2e57feb89e0fffcd2ebb6aa858ef93d0189453..a6a37a491960b8c54a94296b8303915b
  type VibratePattern = number | readonly number[];
  type WindowProxy = Window;
  type XMLHttpRequestBodyInit =
-@@ -36165,7 +46012,7 @@ type AttestationConveyancePreference =
+@@ -36168,7 +46015,7 @@ type AttestationConveyancePreference =
    | 'indirect'
    | 'none';
  type AudioContextLatencyCategory = 'balanced' | 'interactive' | 'playback';
@@ -33596,7 +33596,7 @@ index bb2e57feb89e0fffcd2ebb6aa858ef93d0189453..a6a37a491960b8c54a94296b8303915b
  type AudioSampleFormat =
    | 'f32'
    | 'f32-planar'
-@@ -36304,6 +46151,7 @@ type ColorSpaceConversion = 'default' | 'none';
+@@ -36307,6 +46154,7 @@ type ColorSpaceConversion = 'default' | 'none';
  type CompositeOperation = 'accumulate' | 'add' | 'replace';
  type CompositeOperationOrAuto = 'accumulate' | 'add' | 'auto' | 'replace';
  type CompressionFormat = 'deflate' | 'deflate-raw' | 'gzip';
@@ -33604,7 +33604,7 @@ index bb2e57feb89e0fffcd2ebb6aa858ef93d0189453..a6a37a491960b8c54a94296b8303915b
  type CredentialMediationRequirement =
    | 'conditional'
    | 'optional'
-@@ -36325,6 +46173,7 @@ type EncodedVideoChunkType = 'delta' | 'key';
+@@ -36328,6 +46176,7 @@ type EncodedVideoChunkType = 'delta' | 'key';
  type EndOfStreamError = 'decode' | 'network';
  type EndingType = 'native' | 'transparent';
  type FileSystemHandleKind = 'directory' | 'file';
@@ -33612,7 +33612,7 @@ index bb2e57feb89e0fffcd2ebb6aa858ef93d0189453..a6a37a491960b8c54a94296b8303915b
  type FillMode = 'auto' | 'backwards' | 'both' | 'forwards' | 'none';
  type FontDisplay = 'auto' | 'block' | 'fallback' | 'optional' | 'swap';
  type FontFaceLoadStatus = 'error' | 'loaded' | 'loading' | 'unloaded';
-@@ -36388,6 +46237,7 @@ type KeyUsage =
+@@ -36391,6 +46240,7 @@ type KeyUsage =
  type LatencyMode = 'quality' | 'realtime';
  type LineAlignSetting = 'center' | 'end' | 'start';
  type LockMode = 'exclusive' | 'shared';
@@ -33620,7 +33620,7 @@ index bb2e57feb89e0fffcd2ebb6aa858ef93d0189453..a6a37a491960b8c54a94296b8303915b
  type MIDIPortConnectionState = 'closed' | 'open' | 'pending';
  type MIDIPortDeviceState = 'connected' | 'disconnected';
  type MIDIPortType = 'input' | 'output';
-@@ -36572,6 +46422,7 @@ type ReadableStreamReaderMode = 'byob';
+@@ -36575,6 +46425,7 @@ type ReadableStreamReaderMode = 'byob';
  type ReadableStreamType = 'bytes';
  type ReadyState = 'closed' | 'ended' | 'open';
  type RecordingState = 'inactive' | 'paused' | 'recording';

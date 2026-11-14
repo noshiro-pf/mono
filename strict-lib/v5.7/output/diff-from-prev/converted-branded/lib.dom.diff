@@ -1,5 +1,5 @@
 diff --git a/v5.6/output/lib-files-branded/lib.dom.d.ts b/v5.7/output/lib-files-branded/lib.dom.d.ts
-index 19b0d9295607a3c74bb749995bd35fc6cd6449c1..75bfbbecd592920d51037f4aa3e02e82e6cd98ce 100644
+index 46b2b0cfcf5805ea004a4b887b404440f6f34701..c8076284b31c5665d273241d083f61a0f297f6f7 100644
 --- a/v5.6/output/lib-files-branded/lib.dom.d.ts
 +++ b/v5.7/output/lib-files-branded/lib.dom.d.ts
 @@ -32,6 +32,19 @@ interface AddEventListenerOptions extends EventListenerOptions {
@@ -2629,7 +2629,7 @@ index 19b0d9295607a3c74bb749995bd35fc6cd6449c1..75bfbbecd592920d51037f4aa3e02e82
    fetch(input: RequestInfo | URL, init?: RequestInit): Promise<Response>;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/queueMicrotask) */
    queueMicrotask(callback: VoidFunction): void;
-@@ -32535,7 +33486,11 @@ interface XPathEvaluatorBase {
+@@ -32538,7 +33489,11 @@ interface XPathEvaluatorBase {
      expression: string,
      resolver?: XPathNSResolver | null,
    ): XPathExpression;
@@ -2642,7 +2642,7 @@ index 19b0d9295607a3c74bb749995bd35fc6cd6449c1..75bfbbecd592920d51037f4aa3e02e82
    createNSResolver(nodeResolver: Node): Node;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Document/evaluate) */
    evaluate(
-@@ -32658,7 +33613,7 @@ interface Console {
+@@ -32661,7 +33616,7 @@ interface Console {
    clear(): void;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/count_static) */
    count(label?: string): void;
@@ -2651,7 +2651,7 @@ index 19b0d9295607a3c74bb749995bd35fc6cd6449c1..75bfbbecd592920d51037f4aa3e02e82
    countReset(label?: string): void;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/debug_static) */
    debug(...data: readonly unknown[]): void;
-@@ -32670,9 +33625,9 @@ interface Console {
+@@ -32673,9 +33628,9 @@ interface Console {
    error(...data: readonly unknown[]): void;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/group_static) */
    group(...data: readonly unknown[]): void;
@@ -2663,7 +2663,7 @@ index 19b0d9295607a3c74bb749995bd35fc6cd6449c1..75bfbbecd592920d51037f4aa3e02e82
    groupEnd(): void;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/info_static) */
    info(...data: readonly unknown[]): void;
-@@ -32682,9 +33637,9 @@ interface Console {
+@@ -32685,9 +33640,9 @@ interface Console {
    table(tabularData?: unknown, properties?: readonly string[]): void;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/time_static) */
    time(label?: string): void;
@@ -2675,7 +2675,7 @@ index 19b0d9295607a3c74bb749995bd35fc6cd6449c1..75bfbbecd592920d51037f4aa3e02e82
    timeLog(label?: string, ...data: readonly unknown[]): void;
    timeStamp(label?: string): void;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/trace_static) */
-@@ -32996,6 +33951,10 @@ declare namespace WebAssembly {
+@@ -32999,6 +33954,10 @@ declare namespace WebAssembly {
    function validate(bytes: BufferSource): boolean;
  }
  
@@ -2686,7 +2686,7 @@ index 19b0d9295607a3c74bb749995bd35fc6cd6449c1..75bfbbecd592920d51037f4aa3e02e82
  interface BlobCallback {
    (blob: Blob | null): void;
  }
-@@ -33012,6 +33971,10 @@ interface DecodeSuccessCallback {
+@@ -33015,6 +33974,10 @@ interface DecodeSuccessCallback {
    (decodedData: AudioBuffer): void;
  }
  
@@ -2697,7 +2697,7 @@ index 19b0d9295607a3c74bb749995bd35fc6cd6449c1..75bfbbecd592920d51037f4aa3e02e82
  interface EncodedVideoChunkOutputCallback {
    (chunk: EncodedVideoChunk, metadata?: EncodedVideoChunkMetadata): void;
  }
-@@ -33163,10 +34126,6 @@ interface UnderlyingSourceStartCallback<R> {
+@@ -33166,10 +34129,6 @@ interface UnderlyingSourceStartCallback<R> {
    (controller: ReadableStreamController<R>): unknown;
  }
  
@@ -2708,7 +2708,7 @@ index 19b0d9295607a3c74bb749995bd35fc6cd6449c1..75bfbbecd592920d51037f4aa3e02e82
  interface VideoFrameOutputCallback {
    (output: VideoFrame): void;
  }
-@@ -33175,6 +34134,10 @@ interface VideoFrameRequestCallback {
+@@ -33178,6 +34137,10 @@ interface VideoFrameRequestCallback {
    (now: DOMHighResTimeStamp, metadata: VideoFrameCallbackMetadata): void;
  }
  
@@ -2719,7 +2719,7 @@ index 19b0d9295607a3c74bb749995bd35fc6cd6449c1..75bfbbecd592920d51037f4aa3e02e82
  interface VoidFunction {
    (): void;
  }
-@@ -34342,7 +35305,7 @@ declare function createImageBitmap(
+@@ -34345,7 +35308,7 @@ declare function createImageBitmap(
    sh: number,
    options?: ImageBitmapOptions,
  ): Promise<ImageBitmap>;
@@ -2728,7 +2728,7 @@ index 19b0d9295607a3c74bb749995bd35fc6cd6449c1..75bfbbecd592920d51037f4aa3e02e82
  declare function fetch(
    input: RequestInfo | URL,
    init?: RequestInit,
-@@ -34399,8 +35362,8 @@ type AutoFillField =
+@@ -34402,8 +35365,8 @@ type AutoFillField =
    | AutoFillNormalField
    | `${OptionalPrefixToken<AutoFillContactKind>}${AutoFillContactField}`;
  type AutoFillSection = `section-${string}`;
@@ -2738,7 +2738,7 @@ index 19b0d9295607a3c74bb749995bd35fc6cd6449c1..75bfbbecd592920d51037f4aa3e02e82
  type BlobPart = BufferSource | Blob | string;
  type BodyInit = ReadableStream | XMLHttpRequestBodyInit;
  type BufferSource = ArrayBufferView | ArrayBuffer;
-@@ -34473,6 +35436,7 @@ type OnErrorEventHandler = OnErrorEventHandlerNonNull | null;
+@@ -34476,6 +35439,7 @@ type OnErrorEventHandler = OnErrorEventHandlerNonNull | null;
  type OptionalPostfixToken<T extends string> = ` ${T}` | '';
  type OptionalPrefixToken<T extends string> = `${T} ` | '';
  type PerformanceEntryList = readonly PerformanceEntry[];
@@ -2746,7 +2746,7 @@ index 19b0d9295607a3c74bb749995bd35fc6cd6449c1..75bfbbecd592920d51037f4aa3e02e82
  type RTCRtpTransform = RTCRtpScriptTransform;
  type ReadableStreamController<T> =
    | ReadableStreamDefaultController<T>
-@@ -34507,6 +35471,7 @@ type Transferable =
+@@ -34510,6 +35474,7 @@ type Transferable =
    | ReadableStream
    | WritableStream
    | TransformStream
@@ -2754,7 +2754,7 @@ index 19b0d9295607a3c74bb749995bd35fc6cd6449c1..75bfbbecd592920d51037f4aa3e02e82
    | VideoFrame
    | ArrayBuffer;
  type Uint32List = Uint32Array | readonly GLuint[];
-@@ -34530,6 +35495,15 @@ type AttestationConveyancePreference =
+@@ -34533,6 +35498,15 @@ type AttestationConveyancePreference =
    | 'none';
  type AudioContextLatencyCategory = 'balanced' | 'interactive' | 'playback';
  type AudioContextState = 'closed' | 'running' | 'suspended';
@@ -2770,7 +2770,7 @@ index 19b0d9295607a3c74bb749995bd35fc6cd6449c1..75bfbbecd592920d51037f4aa3e02e82
  type AuthenticatorAttachment = 'cross-platform' | 'platform';
  type AuthenticatorTransport = 'ble' | 'hybrid' | 'internal' | 'nfc' | 'usb';
  type AutoFillAddressKind = 'billing' | 'shipping';
-@@ -34596,6 +35570,7 @@ type BiquadFilterType =
+@@ -34599,6 +35573,7 @@ type BiquadFilterType =
    | 'lowshelf'
    | 'notch'
    | 'peaking';
@@ -2778,7 +2778,7 @@ index 19b0d9295607a3c74bb749995bd35fc6cd6449c1..75bfbbecd592920d51037f4aa3e02e82
  type CSSMathOperator =
    | 'clamp'
    | 'invert'
-@@ -34674,6 +35649,7 @@ type DisplayCaptureSurfaceType = 'browser' | 'monitor' | 'window';
+@@ -34677,6 +35652,7 @@ type DisplayCaptureSurfaceType = 'browser' | 'monitor' | 'window';
  type DistanceModelType = 'exponential' | 'inverse' | 'linear';
  type DocumentReadyState = 'complete' | 'interactive' | 'loading';
  type DocumentVisibilityState = 'hidden' | 'visible';
@@ -2786,7 +2786,7 @@ index 19b0d9295607a3c74bb749995bd35fc6cd6449c1..75bfbbecd592920d51037f4aa3e02e82
  type EncodedVideoChunkType = 'delta' | 'key';
  type EndOfStreamError = 'decode' | 'network';
  type EndingType = 'native' | 'transparent';
-@@ -34794,6 +35770,7 @@ type OffscreenRenderingContextId =
+@@ -34797,6 +35773,7 @@ type OffscreenRenderingContextId =
    | 'webgl'
    | 'webgl2'
    | 'webgpu';
@@ -2794,7 +2794,7 @@ index 19b0d9295607a3c74bb749995bd35fc6cd6449c1..75bfbbecd592920d51037f4aa3e02e82
  type OrientationType =
    | 'landscape-primary'
    | 'landscape-secondary'
-@@ -34803,13 +35780,15 @@ type OscillatorType = 'custom' | 'sawtooth' | 'sine' | 'square' | 'triangle';
+@@ -34806,13 +35783,15 @@ type OscillatorType = 'custom' | 'sawtooth' | 'sine' | 'square' | 'triangle';
  type OverSampleType = '2x' | '4x' | 'none';
  type PanningModelType = 'HRTF' | 'equalpower';
  type PaymentComplete = 'fail' | 'success' | 'unknown';

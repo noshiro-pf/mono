@@ -36,18 +36,14 @@ export const convertLibDomCommon =
           'readonly any[]',
           'readonly unknown[]',
         ),
-        replaceWithinInterface({
-          name: 'Request',
-          mapFn: replaceWithNoMatchCheck(
-            'readonly method: string;',
-            'readonly method: HTTPRequestMethod;',
-          ),
-        }), // https://developer.mozilla.org/ja/docs/Web/HTML/Element/form#method
+        // Any method token is accepted; the literal members are what an editor
+        // completes from. `CONNECT` and `TRACE`, which `open` rejects, stay
+        // among them: `string & {}` accepts them all the same.
         replaceWithinInterface({
           name: 'XMLHttpRequest',
           mapFn: replaceWithNoMatchCheck(
             'method: string',
-            "method: 'post' | 'get' | 'dialog'",
+            'method: HTTPRequestMethod | (string & {})',
           ),
         }),
 

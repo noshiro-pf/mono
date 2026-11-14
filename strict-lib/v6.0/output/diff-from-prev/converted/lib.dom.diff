@@ -1,5 +1,5 @@
 diff --git a/v5.9/output/lib-files/lib.dom.d.ts b/v6.0/output/lib-files/lib.dom.d.ts
-index 9b1b7b6353ffe57c547508a6e9ada5463b83b636..e8e6b8687312e23c72d81232d5ae66181fde4601 100644
+index 2243161456516c0cd910c1b2f76f3f832b1e1ebc..f5fce0bdd8b29c33949e6b399f65f0ad9c194965 100644
 --- a/v5.9/output/lib-files/lib.dom.d.ts
 +++ b/v6.0/output/lib-files/lib.dom.d.ts
 @@ -7,7 +7,7 @@ License at http://www.apache.org/licenses/LICENSE-2.0
@@ -40748,7 +40748,7 @@ index 9b1b7b6353ffe57c547508a6e9ada5463b83b636..e8e6b8687312e23c72d81232d5ae6618
 -   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Request/method)
 +   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Navigation/canGoBack)
     */
--  readonly method: import('ts-type-forge').HTTPRequestMethod;
+-  readonly method: string;
 +  readonly canGoBack: boolean;
    /**
 -   * The **`mode`** read-only property of the Request interface contains the mode of the request (e.g., `cors`, `no-cors`, `same-origin`, or `navigate`.) This is used to determine if cross-origin requests lead to valid responses, and which properties of the response are readable.
@@ -51016,7 +51016,7 @@ index 9b1b7b6353ffe57c547508a6e9ada5463b83b636..e8e6b8687312e23c72d81232d5ae6618
 +   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Request/method)
     */
 -  text: string;
-+  readonly method: import('ts-type-forge').HTTPRequestMethod;
++  readonly method: string;
    /**
 -   * The **`voice`** property of the SpeechSynthesisUtterance interface gets and sets the voice that will be used to speak the utterance.
 +   * The **`mode`** read-only property of the Request interface contains the mode of the request (e.g., cors, no-cors, same-origin, or navigate.) This is used to determine if cross-origin requests lead to valid responses, and which properties of the response are readable.
@@ -63184,7 +63184,7 @@ index 9b1b7b6353ffe57c547508a6e9ada5463b83b636..e8e6b8687312e23c72d81232d5ae6618
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -43552,148 +40685,224 @@ interface XMLDocument extends Document {
+@@ -43552,151 +40685,224 @@ interface XMLDocument extends Document {
      listener: EventListenerOrEventListenerObject,
      options?: boolean | EventListenerOptions,
    ): void;
@@ -63431,9 +63431,12 @@ index 9b1b7b6353ffe57c547508a6e9ada5463b83b636..e8e6b8687312e23c72d81232d5ae6618
 -   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/XMLHttpRequest/open)
 +   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/SpeechSynthesis/cancel)
     */
--  open(method: 'post' | 'get' | 'dialog', url: string | URL): void;
 -  open(
--    method: 'post' | 'get' | 'dialog',
+-    method: import('ts-type-forge').HTTPRequestMethod | (string & {}),
+-    url: string | URL,
+-  ): void;
+-  open(
+-    method: import('ts-type-forge').HTTPRequestMethod | (string & {}),
 -    url: string | URL,
 -    async: boolean,
 -    username?: string | null,
@@ -63489,7 +63492,7 @@ index 9b1b7b6353ffe57c547508a6e9ada5463b83b636..e8e6b8687312e23c72d81232d5ae6618
      options?: boolean | AddEventListenerOptions,
    ): void;
    addEventListener(
-@@ -43701,9 +40910,12 @@ interface XMLHttpRequest extends XMLHttpRequestEventTarget {
+@@ -43704,9 +40910,12 @@ interface XMLHttpRequest extends XMLHttpRequestEventTarget {
      listener: EventListenerOrEventListenerObject,
      options?: boolean | AddEventListenerOptions,
    ): void;
@@ -63504,7 +63507,7 @@ index 9b1b7b6353ffe57c547508a6e9ada5463b83b636..e8e6b8687312e23c72d81232d5ae6618
      options?: boolean | EventListenerOptions,
    ): void;
    removeEventListener(
-@@ -43713,83 +40925,167 @@ interface XMLHttpRequest extends XMLHttpRequestEventTarget {
+@@ -43716,83 +40925,167 @@ interface XMLHttpRequest extends XMLHttpRequestEventTarget {
    ): void;
  }
  
@@ -63733,7 +63736,7 @@ index 9b1b7b6353ffe57c547508a6e9ada5463b83b636..e8e6b8687312e23c72d81232d5ae6618
      ) => unknown,
      options?: boolean | AddEventListenerOptions,
    ): void;
-@@ -43798,11 +41094,11 @@ interface XMLHttpRequestUpload extends XMLHttpRequestEventTarget {
+@@ -43801,11 +41094,11 @@ interface XMLHttpRequestUpload extends XMLHttpRequestEventTarget {
      listener: EventListenerOrEventListenerObject,
      options?: boolean | AddEventListenerOptions,
    ): void;
@@ -63748,7 +63751,7 @@ index 9b1b7b6353ffe57c547508a6e9ada5463b83b636..e8e6b8687312e23c72d81232d5ae6618
      ) => unknown,
      options?: boolean | EventListenerOptions,
    ): void;
-@@ -43813,1674 +41109,9593 @@ interface XMLHttpRequestUpload extends XMLHttpRequestEventTarget {
+@@ -43816,1647 +41109,9567 @@ interface XMLHttpRequestUpload extends XMLHttpRequestEventTarget {
    ): void;
  }
  
@@ -63895,100 +63898,77 @@ index 9b1b7b6353ffe57c547508a6e9ada5463b83b636..e8e6b8687312e23c72d81232d5ae6618
 + * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Storage)
   */
 -interface XPathResult {
+-  /**
+-   * The read-only **`booleanValue`** property of the The return value is the boolean value of the `XPathResult` returned by In case XPathResult.resultType is not `BOOLEAN_TYPE`, a The following example shows the use of the `booleanValue` property.
+-   *
+-   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/XPathResult/booleanValue)
+-   */
+-  readonly booleanValue: boolean;
+-  /**
+-   * The read-only **`invalidIteratorState`** property of the is `true` if XPathResult.resultType is `UNORDERED_NODE_ITERATOR_TYPE` or `ORDERED_NODE_ITERATOR_TYPE` and the document has been modified since this result was returned.
+-   *
+-   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/XPathResult/invalidIteratorState)
+-   */
+-  readonly invalidIteratorState: boolean;
 +interface Storage {
    /**
--   * The read-only **`booleanValue`** property of the The return value is the boolean value of the `XPathResult` returned by In case XPathResult.resultType is not `BOOLEAN_TYPE`, a The following example shows the use of the `booleanValue` property.
+-   * The read-only **`numberValue`** property of the The return value is the numeric value of the `XPathResult` returned by In case XPathResult.resultType is not `NUMBER_TYPE`, a The following example shows the use of the `numberValue` property.
 +   * The **`length`** read-only property of the Storage interface returns the number of data items stored in a given Storage object.
     *
--   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/XPathResult/booleanValue)
+-   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/XPathResult/numberValue)
 +   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Storage/length)
     */
--  readonly booleanValue: boolean;
+-  readonly numberValue: number;
 +  readonly length: number;
    /**
--   * The read-only **`invalidIteratorState`** property of the is `true` if XPathResult.resultType is `UNORDERED_NODE_ITERATOR_TYPE` or `ORDERED_NODE_ITERATOR_TYPE` and the document has been modified since this result was returned.
+-   * The read-only **`resultType`** property of the the type constants.
 +   * The **`clear()`** method of the Storage interface clears all keys stored in a given Storage object.
     *
--   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/XPathResult/invalidIteratorState)
+-   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/XPathResult/resultType)
 +   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Storage/clear)
     */
--  readonly invalidIteratorState: boolean;
+-  readonly resultType: number;
 +  clear(): void;
    /**
--   * The read-only **`numberValue`** property of the The return value is the numeric value of the `XPathResult` returned by In case XPathResult.resultType is not `NUMBER_TYPE`, a The following example shows the use of the `numberValue` property.
+-   * The read-only **`singleNodeValue`** property of the `null` in case no node was matched of a result with `FIRST_ORDERED_NODE_TYPE`.
 +   * The **`getItem()`** method of the Storage interface, when passed a key name, will return that key's value, or null if the key does not exist, in the given Storage object.
     *
--   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/XPathResult/numberValue)
+-   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/XPathResult/singleNodeValue)
 +   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Storage/getItem)
     */
--  readonly numberValue: number;
+-  readonly singleNodeValue: Node | null;
 +  getItem(key: string): string | null;
    /**
--   * The read-only **`resultType`** property of the the type constants.
+-   * The read-only **`snapshotLength`** property of the snapshot.
 +   * The **`key()`** method of the Storage interface, when passed a number n, returns the name of the nth key in a given Storage object. The order of keys is user-agent defined, so you should not rely on it.
     *
--   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/XPathResult/resultType)
+-   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/XPathResult/snapshotLength)
 +   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Storage/key)
     */
--  readonly resultType: number;
+-  readonly snapshotLength: number;
 +  key(index: number): string | null;
    /**
--   * The read-only **`singleNodeValue`** property of the `null` in case no node was matched of a result with `FIRST_ORDERED_NODE_TYPE`.
+-   * The read-only **`stringValue`** property of the The return value is the string value of the `XPathResult` returned by In case XPathResult.resultType is not `STRING_TYPE`, a The following example shows the use of the `stringValue` property.
 +   * The **`removeItem()`** method of the Storage interface, when passed a key name, will remove that key from the given Storage object if it exists. The Storage interface of the Web Storage API provides access to a particular domain's session or local storage.
     *
--   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/XPathResult/singleNodeValue)
+-   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/XPathResult/stringValue)
 +   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Storage/removeItem)
     */
--  readonly singleNodeValue: Node | null;
+-  readonly stringValue: string;
 +  removeItem(key: string): void;
    /**
--   * The read-only **`snapshotLength`** property of the snapshot.
+-   * The **`iterateNext()`** method of the next node from it or `null` if there are no more nodes.
 +   * The **`setItem()`** method of the Storage interface, when passed a key name and value, will add that key to the given Storage object, or update that key's value if it already exists.
     *
--   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/XPathResult/snapshotLength)
+-   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/XPathResult/iterateNext)
 +   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Storage/setItem)
     */
--  readonly snapshotLength: number;
-+  setItem(key: string, value: string): void;
-+  [name: string]: unknown;
-+}
-+
-+declare const Storage: {
-+  prototype: Storage;
-+  new (): Storage;
-+};
-+
-+/**
-+ * The **`StorageEvent`** interface is implemented by the storage event, which is sent to a window when a storage area the window has access to is changed within the context of another document.
-+ *
-+ * [MDN Reference](https://developer.mozilla.org/docs/Web/API/StorageEvent)
-+ */
-+interface StorageEvent extends Event {
-   /**
--   * The read-only **`stringValue`** property of the The return value is the string value of the `XPathResult` returned by In case XPathResult.resultType is not `STRING_TYPE`, a The following example shows the use of the `stringValue` property.
-+   * The **`key`** property of the StorageEvent interface returns the key for the storage item that was changed.
-    *
--   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/XPathResult/stringValue)
-+   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/StorageEvent/key)
-    */
--  readonly stringValue: string;
-+  readonly key: string | null;
-   /**
--   * The **`iterateNext()`** method of the next node from it or `null` if there are no more nodes.
-+   * The **`newValue`** property of the StorageEvent interface returns the new value of the storage item whose value was changed.
-    *
--   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/XPathResult/iterateNext)
-+   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/StorageEvent/newValue)
-    */
 -  iterateNext(): Node | null;
-+  readonly newValue: string | null;
-   /**
+-  /**
 -   * The **`snapshotItem()`** method of the `null` in case the index is not within the range of nodes.
-+   * The **`oldValue`** property of the StorageEvent interface returns the original value of the storage item whose value changed.
-    *
+-   *
 -   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/XPathResult/snapshotItem)
-+   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/StorageEvent/oldValue)
-    */
+-   */
 -  snapshotItem(index: number): Node | null;
 -  readonly ANY_TYPE: 0;
 -  readonly NUMBER_TYPE: 1;
@@ -64000,35 +63980,8 @@ index 9b1b7b6353ffe57c547508a6e9ada5463b83b636..e8e6b8687312e23c72d81232d5ae6618
 -  readonly ORDERED_NODE_SNAPSHOT_TYPE: 7;
 -  readonly ANY_UNORDERED_NODE_TYPE: 8;
 -  readonly FIRST_ORDERED_NODE_TYPE: 9;
-+  readonly oldValue: string | null;
-+  /**
-+   * The **`storageArea`** property of the StorageEvent interface returns the storage object that was affected.
-+   *
-+   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/StorageEvent/storageArea)
-+   */
-+  readonly storageArea: Storage | null;
-+  /**
-+   * The **`url`** property of the StorageEvent interface returns the URL of the document whose storage changed.
-+   *
-+   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/StorageEvent/url)
-+   */
-+  readonly url: string;
-+  /**
-+   * The **`StorageEvent.initStorageEvent()`** method is used to initialize the value of a StorageEvent.
-+   * @deprecated
-+   *
-+   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/StorageEvent/initStorageEvent)
-+   */
-+  initStorageEvent(
-+    type: string,
-+    bubbles?: boolean,
-+    cancelable?: boolean,
-+    key?: string | null,
-+    oldValue?: string | null,
-+    newValue?: string | null,
-+    url?: string | URL,
-+    storageArea?: Storage | null,
-+  ): void;
++  setItem(key: string, value: string): void;
++  [name: string]: unknown;
  }
  
 -declare const XPathResult: {
@@ -64044,134 +63997,124 @@ index 9b1b7b6353ffe57c547508a6e9ada5463b83b636..e8e6b8687312e23c72d81232d5ae6618
 -  readonly ORDERED_NODE_SNAPSHOT_TYPE: 7;
 -  readonly ANY_UNORDERED_NODE_TYPE: 8;
 -  readonly FIRST_ORDERED_NODE_TYPE: 9;
-+declare const StorageEvent: {
-+  prototype: StorageEvent;
-+  new (type: string, eventInitDict?: StorageEventInit): StorageEvent;
++declare const Storage: {
++  prototype: Storage;
++  new (): Storage;
  };
  
  /**
 - * An **`XSLTProcessor`** applies an XSLT stylesheet transformation to an XML document to produce a new XML document as output.
-+ * The **`StorageManager`** interface of the Storage API provides an interface for managing persistence permissions and estimating available storage. You can get a reference to this interface using either navigator.storage or WorkerNavigator.storage.
-+ * Available only in secure contexts.
++ * The **`StorageEvent`** interface is implemented by the storage event, which is sent to a window when a storage area the window has access to is changed within the context of another document.
   *
 - * [MDN Reference](https://developer.mozilla.org/docs/Web/API/XSLTProcessor)
-+ * [MDN Reference](https://developer.mozilla.org/docs/Web/API/StorageManager)
++ * [MDN Reference](https://developer.mozilla.org/docs/Web/API/StorageEvent)
   */
 -interface XSLTProcessor {
-+interface StorageManager {
++interface StorageEvent extends Event {
    /**
 -   * The `clearParameters()` method of the XSLTProcessor interface removes all parameters (`<xsl:param>`) and their values from the stylesheet imported in the processor.
-+   * The **`estimate()`** method of the StorageManager interface asks the Storage Manager for how much storage the current origin takes up (usage), and how much space is available (quota).
++   * The **`key`** property of the StorageEvent interface returns the key for the storage item that was changed.
     *
 -   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/XSLTProcessor/clearParameters)
-+   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/StorageManager/estimate)
++   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/StorageEvent/key)
     */
 -  clearParameters(): void;
-+  estimate(): Promise<StorageEstimate>;
++  readonly key: string | null;
    /**
 -   * The `getParameter()` method of the XSLTProcessor interface returns the value of a parameter (`<xsl:param>`) from the stylesheet imported in the processor.
-+   * The **`getDirectory()`** method of the StorageManager interface is used to obtain a reference to a FileSystemDirectoryHandle object allowing access to a directory and its contents, stored in the origin private file system (OPFS).
++   * The **`newValue`** property of the StorageEvent interface returns the new value of the storage item whose value was changed.
     *
 -   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/XSLTProcessor/getParameter)
-+   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/StorageManager/getDirectory)
++   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/StorageEvent/newValue)
     */
 -  getParameter(namespaceURI: string | null, localName: string): unknown;
-+  getDirectory(): Promise<FileSystemDirectoryHandle>;
++  readonly newValue: string | null;
    /**
 -   * The `importStylesheet()` method of the XSLTProcessor interface imports an XSLT stylesheet for the processor.
-+   * The **`persist()`** method of the StorageManager interface requests permission to use persistent storage, and returns a Promise that resolves to true if permission is granted and bucket mode is persistent, and false otherwise. The browser may or may not honor the request, depending on browser-specific rules. (For more details, see the guide to Storage quotas and eviction criteria.)
++   * The **`oldValue`** property of the StorageEvent interface returns the original value of the storage item whose value changed.
     *
 -   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/XSLTProcessor/importStylesheet)
-+   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/StorageManager/persist)
++   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/StorageEvent/oldValue)
     */
 -  importStylesheet(style: Node): void;
-+  persist(): Promise<boolean>;
++  readonly oldValue: string | null;
    /**
 -   * The `removeParameter()` method of the XSLTProcessor interface removes the parameter (`<xsl:param>`) and its value from the stylesheet imported in the processor.
-+   * The **`persisted()`** method of the StorageManager interface returns a Promise that resolves to true if your site's storage bucket is persistent.
++   * The **`storageArea`** property of the StorageEvent interface returns the storage object that was affected.
     *
 -   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/XSLTProcessor/removeParameter)
-+   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/StorageManager/persisted)
++   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/StorageEvent/storageArea)
     */
 -  removeParameter(namespaceURI: string | null, localName: string): void;
-+  persisted(): Promise<boolean>;
-+}
-+
-+declare var StorageManager: {
-+  prototype: StorageManager;
-+  new (): StorageManager;
-+};
-+
-+/**
-+ * The **`StylePropertyMap`** interface of the CSS Typed Object Model API provides a representation of a CSS declaration block that is an alternative to CSSStyleDeclaration.
-+ *
-+ * [MDN Reference](https://developer.mozilla.org/docs/Web/API/StylePropertyMap)
-+ */
-+interface StylePropertyMap extends StylePropertyMapReadOnly {
++  readonly storageArea: Storage | null;
    /**
 -   * The `reset()` method of the XSLTProcessor interface removes all parameters (`<xsl:param>`) and the XSLT stylesheet from the processor.
-+   * The **`append()`** method of the StylePropertyMap interface adds the passed CSS value to the StylePropertyMap with the given property.
++   * The **`url`** property of the StorageEvent interface returns the URL of the document whose storage changed.
     *
 -   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/XSLTProcessor/reset)
-+   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/StylePropertyMap/append)
++   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/StorageEvent/url)
     */
 -  reset(): void;
-+  append(property: string, ...values: (CSSStyleValue | string)[]): void;
++  readonly url: string;
    /**
 -   * The `setParameter()` method of the XSLTProcessor interface sets the value of a parameter (`<xsl:param>`) in the stylesheet imported in the processor.
-+   * The **`clear()`** method of the StylePropertyMap interface removes all declarations in the StylePropertyMap.
++   * The **`StorageEvent.initStorageEvent()`** method is used to initialize the value of a StorageEvent.
++   * @deprecated
     *
 -   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/XSLTProcessor/setParameter)
-+   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/StylePropertyMap/clear)
++   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/StorageEvent/initStorageEvent)
     */
 -  setParameter(
 -    namespaceURI: string | null,
 -    localName: string,
 -    value: unknown,
--  ): void;
-+  clear(): void;
-   /**
++  initStorageEvent(
++    type: string,
++    bubbles?: boolean,
++    cancelable?: boolean,
++    key?: string | null,
++    oldValue?: string | null,
++    newValue?: string | null,
++    url?: string | URL,
++    storageArea?: Storage | null,
+   ): void;
+-  /**
 -   * The `transformToDocument()` method of the XSLTProcessor interface transforms the provided Node source to a Document using the XSLT stylesheet associated with `XSLTProcessor`.
-+   * The **`delete()`** method of the StylePropertyMap interface removes the CSS declaration with the given property.
-    *
+-   *
 -   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/XSLTProcessor/transformToDocument)
-+   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/StylePropertyMap/delete)
-    */
+-   */
 -  transformToDocument(source: Node): Document;
-+  delete(property: string): void;
-   /**
+-  /**
 -   * The `transformToFragment()` method of the XSLTProcessor interface transforms a provided Node source to a DocumentFragment using the XSLT stylesheet associated with the `XSLTProcessor`.
-+   * The **`set()`** method of the StylePropertyMap interface changes the CSS declaration with the given property.
-    *
+-   *
 -   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/XSLTProcessor/transformToFragment)
-+   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/StylePropertyMap/set)
-    */
+-   */
 -  transformToFragment(source: Node, output: Document): DocumentFragment;
-+  set(property: string, ...values: (CSSStyleValue | string)[]): void;
  }
  
 -declare const XSLTProcessor: {
 -  prototype: XSLTProcessor;
 -  new (): XSLTProcessor;
-+declare const StylePropertyMap: {
-+  prototype: StylePropertyMap;
-+  new (): StylePropertyMap;
++declare const StorageEvent: {
++  prototype: StorageEvent;
++  new (type: string, eventInitDict?: StorageEventInit): StorageEvent;
  };
  
 -/** The **`CSS`** interface holds useful CSS-related methods. */
 -declare namespace CSS {
 +/**
-+ * The **`StylePropertyMapReadOnly`** interface of the CSS Typed Object Model API provides a read-only representation of a CSS declaration block that is an alternative to CSSStyleDeclaration. Retrieve an instance of this interface using Element.computedStyleMap().
++ * The **`StorageManager`** interface of the Storage API provides an interface for managing persistence permissions and estimating available storage. You can get a reference to this interface using either navigator.storage or WorkerNavigator.storage.
++ * Available only in secure contexts.
 + *
-+ * [MDN Reference](https://developer.mozilla.org/docs/Web/API/StylePropertyMapReadOnly)
++ * [MDN Reference](https://developer.mozilla.org/docs/Web/API/StorageManager)
 + */
-+interface StylePropertyMapReadOnly {
++interface StorageManager {
    /**
 -   * The static, read-only **`highlights`** property of the CSS interface provides access to the `HighlightRegistry` used to style arbitrary text ranges using the css_custom_highlight_api.
-+   * The **`size`** read-only property of the StylePropertyMapReadOnly interface returns an unsigned long integer containing the size of the StylePropertyMapReadOnly object.
++   * The **`estimate()`** method of the StorageManager interface asks the Storage Manager for how much storage the current origin takes up (usage), and how much space is available (quota).
     *
 -   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSS/highlights_static)
-+   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/StylePropertyMapReadOnly/size)
++   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/StorageManager/estimate)
     */
 -  const highlights: HighlightRegistry;
 -  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSS/factory_functions_static) */
@@ -64217,13 +64160,13 @@ index 9b1b7b6353ffe57c547508a6e9ada5463b83b636..e8e6b8687312e23c72d81232d5ae6618
 -  function dvw(value: number): CSSUnitValue;
 -  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSS/factory_functions_static) */
 -  function em(value: number): CSSUnitValue;
-+  readonly size: number;
++  estimate(): Promise<StorageEstimate>;
    /**
 -   * The **`CSS.escape()`** static method returns a string containing the escaped string passed as parameter, mostly for use as part of a CSS selector.
-+   * The **`get()`** method of the StylePropertyMapReadOnly interface returns a CSSStyleValue object for the first value of the specified property.
++   * The **`getDirectory()`** method of the StorageManager interface is used to obtain a reference to a FileSystemDirectoryHandle object allowing access to a directory and its contents, stored in the origin private file system (OPFS).
     *
 -   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSS/escape_static)
-+   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/StylePropertyMapReadOnly/get)
++   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/StorageManager/getDirectory)
     */
 -  function escape(ident: string): string;
 -  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSS/factory_functions_static) */
@@ -64266,13 +64209,13 @@ index 9b1b7b6353ffe57c547508a6e9ada5463b83b636..e8e6b8687312e23c72d81232d5ae6618
 -  function rad(value: number): CSSUnitValue;
 -  function rcap(value: number): CSSUnitValue;
 -  function rch(value: number): CSSUnitValue;
-+  get(property: string): undefined | CSSStyleValue;
++  getDirectory(): Promise<FileSystemDirectoryHandle>;
    /**
 -   * The **`CSS.registerProperty()`** static method registers custom properties, allowing for property type checking, default values, and properties that do or do not inherit their value.
-+   * The **`getAll()`** method of the StylePropertyMapReadOnly interface returns an array of CSSStyleValue objects containing the values for the provided property.
++   * The **`persist()`** method of the StorageManager interface requests permission to use persistent storage, and returns a Promise that resolves to true if permission is granted and bucket mode is persistent, and false otherwise. The browser may or may not honor the request, depending on browser-specific rules. (For more details, see the guide to Storage quotas and eviction criteria.)
     *
 -   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSS/registerProperty_static)
-+   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/StylePropertyMapReadOnly/getAll)
++   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/StorageManager/persist)
     */
 -  function registerProperty(definition: PropertyDefinition): void;
 -  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSS/factory_functions_static) */
@@ -64282,13 +64225,13 @@ index 9b1b7b6353ffe57c547508a6e9ada5463b83b636..e8e6b8687312e23c72d81232d5ae6618
 -  function rlh(value: number): CSSUnitValue;
 -  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSS/factory_functions_static) */
 -  function s(value: number): CSSUnitValue;
-+  getAll(property: string): CSSStyleValue[];
++  persist(): Promise<boolean>;
    /**
 -   * The **`CSS.supports()`** static method returns a boolean value indicating if the browser supports a given CSS feature, or not.
-+   * The **`has()`** method of the StylePropertyMapReadOnly interface indicates whether the specified property is in the StylePropertyMapReadOnly object.
++   * The **`persisted()`** method of the StorageManager interface returns a Promise that resolves to true if your site's storage bucket is persistent.
     *
 -   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSS/supports_static)
-+   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/StylePropertyMapReadOnly/has)
++   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/StorageManager/persisted)
     */
 -  function supports(property: string, value: string): boolean;
 -  function supports(conditionText: string): boolean;
@@ -64318,15 +64261,7 @@ index 9b1b7b6353ffe57c547508a6e9ada5463b83b636..e8e6b8687312e23c72d81232d5ae6618
 -  function vmin(value: number): CSSUnitValue;
 -  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSS/factory_functions_static) */
 -  function vw(value: number): CSSUnitValue;
-+  has(property: string): boolean;
-+  forEach(
-+    callbackfn: (
-+      value: readonly CSSStyleValue[],
-+      key: string,
-+      parent: StylePropertyMapReadOnly,
-+    ) => void,
-+    thisArg?: unknown,
-+  ): void;
++  persisted(): Promise<boolean>;
  }
  
 -declare namespace WebAssembly {
@@ -64497,96 +64432,189 @@ index 9b1b7b6353ffe57c547508a6e9ada5463b83b636..e8e6b8687312e23c72d81232d5ae6618
 -  /** [MDN Reference](https://developer.mozilla.org/docs/WebAssembly/Reference/JavaScript_interface/validate_static) */
 -  function validate(bytes: BufferSource): boolean;
 -}
-+declare var StylePropertyMapReadOnly: {
-+  prototype: StylePropertyMapReadOnly;
-+  new (): StylePropertyMapReadOnly;
++declare var StorageManager: {
++  prototype: StorageManager;
++  new (): StorageManager;
 +};
  
 -/** The **`console`** object provides access to the debugging console (e.g., the Web console in Firefox). */
  /**
 - * The **`console`** object provides access to the debugging console (e.g., the Web console in Firefox).
-+ * An object implementing the **`StyleSheet`** interface represents a single style sheet. CSS style sheets will further implement the more specialized CSSStyleSheet interface.
++ * The **`StylePropertyMap`** interface of the CSS Typed Object Model API provides a representation of a CSS declaration block that is an alternative to CSSStyleDeclaration.
   *
 - * [MDN Reference](https://developer.mozilla.org/docs/Web/API/console)
-+ * [MDN Reference](https://developer.mozilla.org/docs/Web/API/StyleSheet)
++ * [MDN Reference](https://developer.mozilla.org/docs/Web/API/StylePropertyMap)
   */
 -interface Console {
--  /**
++interface StylePropertyMap extends StylePropertyMapReadOnly {
+   /**
 -   * The **`console.assert()`** static method writes an error message to the console if the assertion is false.
--   *
++   * The **`append()`** method of the StylePropertyMap interface adds the passed CSS value to the StylePropertyMap with the given property.
+    *
 -   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/assert_static)
--   */
++   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/StylePropertyMap/append)
+    */
 -  assert(condition?: boolean, ...data: readonly unknown[]): void;
--  /**
++  append(property: string, ...values: (CSSStyleValue | string)[]): void;
+   /**
 -   * The **`console.clear()`** static method clears the console if possible.
--   *
++   * The **`clear()`** method of the StylePropertyMap interface removes all declarations in the StylePropertyMap.
+    *
 -   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/clear_static)
--   */
--  clear(): void;
-+interface StyleSheet {
++   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/StylePropertyMap/clear)
+    */
+   clear(): void;
    /**
 -   * The **`console.count()`** static method logs the number of times that this particular call to `count()` has been called.
-+   * The **`disabled`** property of the StyleSheet interface determines whether the style sheet is prevented from applying to the document.
++   * The **`delete()`** method of the StylePropertyMap interface removes the CSS declaration with the given property.
     *
 -   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/count_static)
-+   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/StyleSheet/disabled)
++   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/StylePropertyMap/delete)
     */
 -  count(label?: string): void;
-+  disabled: boolean;
++  delete(property: string): void;
    /**
 -   * The **`console.countReset()`** static method resets counter used with console/count_static.
-+   * The **`href`** property of the StyleSheet interface returns the location of the style sheet.
++   * The **`set()`** method of the StylePropertyMap interface changes the CSS declaration with the given property.
     *
 -   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/countReset_static)
-+   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/StyleSheet/href)
++   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/StylePropertyMap/set)
     */
 -  countReset(label?: string): void;
-+  readonly href: string | null;
++  set(property: string, ...values: (CSSStyleValue | string)[]): void;
++}
++
++declare const StylePropertyMap: {
++  prototype: StylePropertyMap;
++  new (): StylePropertyMap;
++};
++
++/**
++ * The **`StylePropertyMapReadOnly`** interface of the CSS Typed Object Model API provides a read-only representation of a CSS declaration block that is an alternative to CSSStyleDeclaration. Retrieve an instance of this interface using Element.computedStyleMap().
++ *
++ * [MDN Reference](https://developer.mozilla.org/docs/Web/API/StylePropertyMapReadOnly)
++ */
++interface StylePropertyMapReadOnly {
    /**
 -   * The **`console.debug()`** static method outputs a message to the console at the 'debug' log level.
-+   * The read-only **`media`** property of the StyleSheet interface contains a MediaList object representing the intended destination media for style information.
++   * The **`size`** read-only property of the StylePropertyMapReadOnly interface returns an unsigned long integer containing the size of the StylePropertyMapReadOnly object.
     *
 -   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/debug_static)
-+   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/StyleSheet/media)
++   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/StylePropertyMapReadOnly/size)
     */
 -  debug(...data: readonly unknown[]): void;
++  readonly size: number;
+   /**
+-   * The **`console.dir()`** static method displays a list of the properties of the specified JavaScript object.
++   * The **`get()`** method of the StylePropertyMapReadOnly interface returns a CSSStyleValue object for the first value of the specified property.
+    *
+-   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/dir_static)
++   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/StylePropertyMapReadOnly/get)
+    */
+-  dir(item?: unknown, options?: unknown): void;
++  get(property: string): undefined | CSSStyleValue;
+   /**
+-   * The **`console.dirxml()`** static method displays an interactive tree of the descendant elements of the specified XML/HTML element.
++   * The **`getAll()`** method of the StylePropertyMapReadOnly interface returns an array of CSSStyleValue objects containing the values for the provided property.
+    *
+-   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/dirxml_static)
++   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/StylePropertyMapReadOnly/getAll)
+    */
+-  dirxml(...data: readonly unknown[]): void;
++  getAll(property: string): CSSStyleValue[];
+   /**
+-   * The **`console.error()`** static method outputs a message to the console at the 'error' log level.
++   * The **`has()`** method of the StylePropertyMapReadOnly interface indicates whether the specified property is in the StylePropertyMapReadOnly object.
+    *
+-   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/error_static)
++   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/StylePropertyMapReadOnly/has)
+    */
+-  error(...data: readonly unknown[]): void;
++  has(property: string): boolean;
++  forEach(
++    callbackfn: (
++      value: readonly CSSStyleValue[],
++      key: string,
++      parent: StylePropertyMapReadOnly,
++    ) => void,
++    thisArg?: unknown,
++  ): void;
++}
++
++declare var StylePropertyMapReadOnly: {
++  prototype: StylePropertyMapReadOnly;
++  new (): StylePropertyMapReadOnly;
++};
++
++/**
++ * An object implementing the **`StyleSheet`** interface represents a single style sheet. CSS style sheets will further implement the more specialized CSSStyleSheet interface.
++ *
++ * [MDN Reference](https://developer.mozilla.org/docs/Web/API/StyleSheet)
++ */
++interface StyleSheet {
+   /**
+-   * The **`console.group()`** static method creates a new inline group in the Web console log, causing any subsequent console messages to be indented by an additional level, until console/groupEnd_static is called.
++   * The **`disabled`** property of the StyleSheet interface determines whether the style sheet is prevented from applying to the document.
+    *
+-   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/group_static)
++   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/StyleSheet/disabled)
+    */
+-  group(...data: readonly unknown[]): void;
++  disabled: boolean;
+   /**
+-   * The **`console.groupCollapsed()`** static method creates a new inline group in the console.
++   * The **`href`** property of the StyleSheet interface returns the location of the style sheet.
+    *
+-   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/groupCollapsed_static)
++   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/StyleSheet/href)
+    */
+-  groupCollapsed(...data: readonly unknown[]): void;
++  readonly href: string | null;
+   /**
+-   * The **`console.groupEnd()`** static method exits the current inline group in the console.
++   * The read-only **`media`** property of the StyleSheet interface contains a MediaList object representing the intended destination media for style information.
+    *
+-   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/groupEnd_static)
++   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/StyleSheet/media)
+    */
+-  groupEnd(): void;
 +  get media(): MediaList;
 +  set media(mediaText: string);
    /**
--   * The **`console.dir()`** static method displays a list of the properties of the specified JavaScript object.
+-   * The **`console.info()`** static method outputs a message to the console at the 'info' log level.
 +   * The **`ownerNode`** property of the StyleSheet interface returns the node that associates this style sheet with the document.
     *
--   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/dir_static)
+-   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/info_static)
 +   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/StyleSheet/ownerNode)
     */
--  dir(item?: unknown, options?: unknown): void;
+-  info(...data: readonly unknown[]): void;
 +  readonly ownerNode: Element | ProcessingInstruction | null;
    /**
--   * The **`console.dirxml()`** static method displays an interactive tree of the descendant elements of the specified XML/HTML element.
+-   * The **`console.log()`** static method outputs a message to the console.
 +   * The **`parentStyleSheet`** property of the StyleSheet interface returns the style sheet, if any, that is including the given style sheet.
     *
--   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/dirxml_static)
+-   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/log_static)
 +   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/StyleSheet/parentStyleSheet)
     */
--  dirxml(...data: readonly unknown[]): void;
+-  log(...data: readonly unknown[]): void;
 +  readonly parentStyleSheet: CSSStyleSheet | null;
    /**
--   * The **`console.error()`** static method outputs a message to the console at the 'error' log level.
+-   * The **`console.table()`** static method displays tabular data as a table.
 +   * The **`title`** property of the StyleSheet interface returns the advisory title of the current style sheet.
     *
--   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/error_static)
+-   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/table_static)
 +   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/StyleSheet/title)
     */
--  error(...data: readonly unknown[]): void;
+-  table(tabularData?: unknown, properties?: readonly string[]): void;
 +  readonly title: string | null;
    /**
--   * The **`console.group()`** static method creates a new inline group in the Web console log, causing any subsequent console messages to be indented by an additional level, until console/groupEnd_static is called.
+-   * The **`console.time()`** static method starts a timer you can use to track how long an operation takes.
 +   * The **`type`** property of the StyleSheet interface specifies the style sheet language for the given style sheet.
     *
--   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/group_static)
+-   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/time_static)
 +   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/StyleSheet/type)
     */
--  group(...data: readonly unknown[]): void;
+-  time(label?: string): void;
 +  readonly type: string;
 +}
 +
@@ -64602,174 +64630,34 @@ index 9b1b7b6353ffe57c547508a6e9ada5463b83b636..e8e6b8687312e23c72d81232d5ae6618
 + */
 +interface StyleSheetList {
    /**
--   * The **`console.groupCollapsed()`** static method creates a new inline group in the console.
+-   * The **`console.timeEnd()`** static method stops a timer that was previously started by calling console/time_static.
 +   * The **`length`** read-only property of the StyleSheetList interface returns the number of CSSStyleSheet objects in the collection.
     *
--   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/groupCollapsed_static)
+-   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/timeEnd_static)
 +   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/StyleSheetList/length)
     */
--  groupCollapsed(...data: readonly unknown[]): void;
+-  timeEnd(label?: string): void;
 +  readonly length: number;
    /**
--   * The **`console.groupEnd()`** static method exits the current inline group in the console.
+-   * The **`console.timeLog()`** static method logs the current value of a timer that was previously started by calling console/time_static.
 +   * The **`item()`** method of the StyleSheetList interface returns a single CSSStyleSheet object.
     *
--   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/groupEnd_static)
-+   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/StyleSheetList/item)
-    */
--  groupEnd(): void;
-+  item(index: number): CSSStyleSheet | null;
-+  [index: number]: CSSStyleSheet;
-+}
-+
-+declare const StyleSheetList: {
-+  prototype: StyleSheetList;
-+  new (): StyleSheetList;
-+};
-+
-+/**
-+ * The **`SubmitEvent`** interface defines the object used to represent an HTML form's submit event. This event is fired at the <form> when the form's submit action is invoked.
-+ *
-+ * [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubmitEvent)
-+ */
-+interface SubmitEvent extends Event {
-   /**
--   * The **`console.info()`** static method outputs a message to the console at the 'info' log level.
-+   * The read-only **`submitter`** property found on the SubmitEvent interface specifies the submit button or other element that was invoked to cause the form to be submitted.
-    *
--   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/info_static)
-+   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubmitEvent/submitter)
-    */
--  info(...data: readonly unknown[]): void;
-+  readonly submitter: HTMLElement | null;
-+}
-+
-+declare const SubmitEvent: {
-+  prototype: SubmitEvent;
-+  new (type: string, eventInitDict?: SubmitEventInit): SubmitEvent;
-+};
-+
-+/**
-+ * The **`SubtleCrypto`** interface of the Web Crypto API provides a number of low-level cryptographic functions.
-+ * Available only in secure contexts.
-+ *
-+ * [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto)
-+ */
-+interface SubtleCrypto {
-   /**
--   * The **`console.log()`** static method outputs a message to the console.
-+   * The **`decrypt()`** method of the SubtleCrypto interface decrypts some encrypted data. It takes as arguments a key to decrypt with, some optional extra parameters, and the data to decrypt (also known as "ciphertext"). It returns a Promise which will be fulfilled with the decrypted data (also known as "plaintext").
-    *
--   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/log_static)
-+   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/decrypt)
-    */
--  log(...data: readonly unknown[]): void;
-+  decrypt(
-+    algorithm:
-+      | AlgorithmIdentifier
-+      | RsaOaepParams
-+      | AesCtrParams
-+      | AesCbcParams
-+      | AesGcmParams,
-+    key: CryptoKey,
-+    data: BufferSource,
-+  ): Promise<ArrayBuffer>;
-   /**
--   * The **`console.table()`** static method displays tabular data as a table.
-+   * The **`deriveBits()`** method of the SubtleCrypto interface can be used to derive an array of bits from a base key.
-    *
--   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/table_static)
-+   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/deriveBits)
-    */
--  table(tabularData?: unknown, properties?: readonly string[]): void;
-+  deriveBits(
-+    algorithm:
-+      | AlgorithmIdentifier
-+      | EcdhKeyDeriveParams
-+      | HkdfParams
-+      | Pbkdf2Params,
-+    baseKey: CryptoKey,
-+    length?: number | null,
-+  ): Promise<ArrayBuffer>;
-   /**
--   * The **`console.time()`** static method starts a timer you can use to track how long an operation takes.
-+   * The **`deriveKey()`** method of the SubtleCrypto interface can be used to derive a secret key from a master key.
-    *
--   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/time_static)
-+   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/deriveKey)
-    */
--  time(label?: string): void;
-+  deriveKey(
-+    algorithm:
-+      | AlgorithmIdentifier
-+      | EcdhKeyDeriveParams
-+      | HkdfParams
-+      | Pbkdf2Params,
-+    baseKey: CryptoKey,
-+    derivedKeyType:
-+      | AlgorithmIdentifier
-+      | AesDerivedKeyParams
-+      | HmacImportParams
-+      | HkdfParams
-+      | Pbkdf2Params,
-+    extractable: boolean,
-+    keyUsages: readonly KeyUsage[],
-+  ): Promise<CryptoKey>;
-   /**
--   * The **`console.timeEnd()`** static method stops a timer that was previously started by calling console/time_static.
-+   * The **`digest()`** method of the SubtleCrypto interface generates a digest of the given data, using the specified hash function. A digest is a short fixed-length value derived from some variable-length input. Cryptographic digests should exhibit collision-resistance, meaning that it's hard to come up with two different inputs that have the same digest value.
-    *
--   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/timeEnd_static)
-+   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/digest)
-    */
--  timeEnd(label?: string): void;
-+  digest(
-+    algorithm: AlgorithmIdentifier,
-+    data: BufferSource,
-+  ): Promise<ArrayBuffer>;
-   /**
--   * The **`console.timeLog()`** static method logs the current value of a timer that was previously started by calling console/time_static.
-+   * The **`encrypt()`** method of the SubtleCrypto interface encrypts data.
-    *
 -   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/timeLog_static)
-+   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/encrypt)
++   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/StyleSheetList/item)
     */
 -  timeLog(label?: string, ...data: readonly unknown[]): void;
 -  timeStamp(label?: string): void;
-+  encrypt(
-+    algorithm:
-+      | AlgorithmIdentifier
-+      | RsaOaepParams
-+      | AesCtrParams
-+      | AesCbcParams
-+      | AesGcmParams,
-+    key: CryptoKey,
-+    data: BufferSource,
-+  ): Promise<ArrayBuffer>;
-   /**
+-  /**
 -   * The **`console.trace()`** static method outputs a stack trace to the console.
-+   * The **`exportKey()`** method of the SubtleCrypto interface exports a key: that is, it takes as input a CryptoKey object and gives you the key in an external, portable format.
-    *
+-   *
 -   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/trace_static)
-+   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/exportKey)
-    */
+-   */
 -  trace(...data: readonly unknown[]): void;
-+  exportKey(format: 'jwk', key: CryptoKey): Promise<JsonWebKey>;
-+  exportKey(
-+    format: Exclude<KeyFormat, 'jwk'>,
-+    key: CryptoKey,
-+  ): Promise<ArrayBuffer>;
-+  exportKey(
-+    format: KeyFormat,
-+    key: CryptoKey,
-+  ): Promise<ArrayBuffer | JsonWebKey>;
-   /**
+-  /**
 -   * The **`console.warn()`** static method outputs a warning message to the console at the 'warning' log level.
-+   * The **`generateKey()`** method of the SubtleCrypto interface is used to generate a new key (for symmetric algorithms) or key pair (for public-key algorithms).
-    *
+-   *
 -   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/warn_static)
-+   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/generateKey)
-    */
+-   */
 -  warn(...data: readonly unknown[]): void;
 -}
 -
@@ -64789,22 +64677,144 @@ index 9b1b7b6353ffe57c547508a6e9ada5463b83b636..e8e6b8687312e23c72d81232d5ae6618
 -
 -interface DecodeErrorCallback {
 -  (error: DOMException): void;
--}
--
++  item(index: number): CSSStyleSheet | null;
++  [index: number]: CSSStyleSheet;
+ }
+ 
 -interface DecodeSuccessCallback {
 -  (decodedData: AudioBuffer): void;
 -}
--
++declare const StyleSheetList: {
++  prototype: StyleSheetList;
++  new (): StyleSheetList;
++};
+ 
 -interface EncodedAudioChunkOutputCallback {
 -  (output: EncodedAudioChunk, metadata?: EncodedAudioChunkMetadata): void;
--}
--
++/**
++ * The **`SubmitEvent`** interface defines the object used to represent an HTML form's submit event. This event is fired at the <form> when the form's submit action is invoked.
++ *
++ * [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubmitEvent)
++ */
++interface SubmitEvent extends Event {
++  /**
++   * The read-only **`submitter`** property found on the SubmitEvent interface specifies the submit button or other element that was invoked to cause the form to be submitted.
++   *
++   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubmitEvent/submitter)
++   */
++  readonly submitter: HTMLElement | null;
+ }
+ 
 -interface EncodedVideoChunkOutputCallback {
 -  (chunk: EncodedVideoChunk, metadata?: EncodedVideoChunkMetadata): void;
 -}
--
++declare const SubmitEvent: {
++  prototype: SubmitEvent;
++  new (type: string, eventInitDict?: SubmitEventInit): SubmitEvent;
++};
+ 
 -interface ErrorCallback {
 -  (err: DOMException): void;
++/**
++ * The **`SubtleCrypto`** interface of the Web Crypto API provides a number of low-level cryptographic functions.
++ * Available only in secure contexts.
++ *
++ * [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto)
++ */
++interface SubtleCrypto {
++  /**
++   * The **`decrypt()`** method of the SubtleCrypto interface decrypts some encrypted data. It takes as arguments a key to decrypt with, some optional extra parameters, and the data to decrypt (also known as "ciphertext"). It returns a Promise which will be fulfilled with the decrypted data (also known as "plaintext").
++   *
++   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/decrypt)
++   */
++  decrypt(
++    algorithm:
++      | AlgorithmIdentifier
++      | RsaOaepParams
++      | AesCtrParams
++      | AesCbcParams
++      | AesGcmParams,
++    key: CryptoKey,
++    data: BufferSource,
++  ): Promise<ArrayBuffer>;
++  /**
++   * The **`deriveBits()`** method of the SubtleCrypto interface can be used to derive an array of bits from a base key.
++   *
++   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/deriveBits)
++   */
++  deriveBits(
++    algorithm:
++      | AlgorithmIdentifier
++      | EcdhKeyDeriveParams
++      | HkdfParams
++      | Pbkdf2Params,
++    baseKey: CryptoKey,
++    length?: number | null,
++  ): Promise<ArrayBuffer>;
++  /**
++   * The **`deriveKey()`** method of the SubtleCrypto interface can be used to derive a secret key from a master key.
++   *
++   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/deriveKey)
++   */
++  deriveKey(
++    algorithm:
++      | AlgorithmIdentifier
++      | EcdhKeyDeriveParams
++      | HkdfParams
++      | Pbkdf2Params,
++    baseKey: CryptoKey,
++    derivedKeyType:
++      | AlgorithmIdentifier
++      | AesDerivedKeyParams
++      | HmacImportParams
++      | HkdfParams
++      | Pbkdf2Params,
++    extractable: boolean,
++    keyUsages: readonly KeyUsage[],
++  ): Promise<CryptoKey>;
++  /**
++   * The **`digest()`** method of the SubtleCrypto interface generates a digest of the given data, using the specified hash function. A digest is a short fixed-length value derived from some variable-length input. Cryptographic digests should exhibit collision-resistance, meaning that it's hard to come up with two different inputs that have the same digest value.
++   *
++   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/digest)
++   */
++  digest(
++    algorithm: AlgorithmIdentifier,
++    data: BufferSource,
++  ): Promise<ArrayBuffer>;
++  /**
++   * The **`encrypt()`** method of the SubtleCrypto interface encrypts data.
++   *
++   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/encrypt)
++   */
++  encrypt(
++    algorithm:
++      | AlgorithmIdentifier
++      | RsaOaepParams
++      | AesCtrParams
++      | AesCbcParams
++      | AesGcmParams,
++    key: CryptoKey,
++    data: BufferSource,
++  ): Promise<ArrayBuffer>;
++  /**
++   * The **`exportKey()`** method of the SubtleCrypto interface exports a key: that is, it takes as input a CryptoKey object and gives you the key in an external, portable format.
++   *
++   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/exportKey)
++   */
++  exportKey(format: 'jwk', key: CryptoKey): Promise<JsonWebKey>;
++  exportKey(
++    format: Exclude<KeyFormat, 'jwk'>,
++    key: CryptoKey,
++  ): Promise<ArrayBuffer>;
++  exportKey(
++    format: KeyFormat,
++    key: CryptoKey,
++  ): Promise<ArrayBuffer | JsonWebKey>;
++  /**
++   * The **`generateKey()`** method of the SubtleCrypto interface is used to generate a new key (for symmetric algorithms) or key pair (for public-key algorithms).
++   *
++   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/SubtleCrypto/generateKey)
++   */
 +  generateKey(
 +    algorithm: 'Ed25519' | { name: 'Ed25519' },
 +    extractable: boolean,
@@ -65032,22 +65042,6 @@ index 9b1b7b6353ffe57c547508a6e9ada5463b83b636..e8e6b8687312e23c72d81232d5ae6618
 -interface LockGrantedCallback<T> {
 -  (lock: Lock | null): T;
 -}
--
--interface MediaSessionActionHandler {
--  (details: MediaSessionActionDetails): void;
--}
--
--interface MutationCallback {
--  (mutations: readonly MutationRecord[], observer: MutationObserver): void;
--}
--
--interface NotificationPermissionCallback {
--  (permission: NotificationPermission): void;
--}
--
--interface OnBeforeUnloadEventHandlerNonNull {
--  (event: Event): string | null;
--}
 +declare var TaskSignal: {
 +  prototype: TaskSignal;
 +  new (): TaskSignal;
@@ -65059,14 +65053,8 @@ index 9b1b7b6353ffe57c547508a6e9ada5463b83b636..e8e6b8687312e23c72d81232d5ae6618
 +  any(signals: readonly AbortSignal[], init?: TaskSignalAnyInit): TaskSignal;
 +};
  
--interface OnErrorEventHandlerNonNull {
--  (
--    event: Event | string,
--    source?: string,
--    lineno?: number,
--    colno?: number,
--    error?: Error,
--  ): unknown;
+-interface MediaSessionActionHandler {
+-  (details: MediaSessionActionDetails): void;
 +/**
 + * The **`Text`** interface represents a text node in a DOM tree.
 + *
@@ -65087,16 +65075,16 @@ index 9b1b7b6353ffe57c547508a6e9ada5463b83b636..e8e6b8687312e23c72d81232d5ae6618
 +  splitText(offset: number): Text;
  }
  
--interface PerformanceObserverCallback {
--  (entries: PerformanceObserverEntryList, observer: PerformanceObserver): void;
+-interface MutationCallback {
+-  (mutations: readonly MutationRecord[], observer: MutationObserver): void;
 -}
 +declare const Text: {
 +  prototype: Text;
 +  new (data?: string): Text;
 +};
  
--interface PositionCallback {
--  (position: GeolocationPosition): void;
+-interface NotificationPermissionCallback {
+-  (permission: NotificationPermission): void;
 +/**
 + * The **`TextDecoder`** interface represents a decoder for a specific text encoding, such as UTF-8, ISO-8859-2, or GBK. A decoder takes an array of bytes as input and returns a JavaScript string.
 + *
@@ -65111,16 +65099,22 @@ index 9b1b7b6353ffe57c547508a6e9ada5463b83b636..e8e6b8687312e23c72d81232d5ae6618
 +  decode(input?: AllowSharedBufferSource, options?: TextDecodeOptions): string;
  }
  
--interface PositionErrorCallback {
--  (positionError: GeolocationPositionError): void;
+-interface OnBeforeUnloadEventHandlerNonNull {
+-  (event: Event): string | null;
 -}
 +declare var TextDecoder: {
 +  prototype: TextDecoder;
 +  new (label?: string, options?: TextDecoderOptions): TextDecoder;
 +};
  
--interface QueuingStrategySize<T = unknown> {
--  (chunk: T): number;
+-interface OnErrorEventHandlerNonNull {
+-  (
+-    event: Event | string,
+-    source?: string,
+-    lineno?: number,
+-    colno?: number,
+-    error?: Error,
+-  ): unknown;
 +interface TextDecoderCommon {
 +  /**
 +   * Returns encoding's name, lowercased.
@@ -65142,8 +65136,8 @@ index 9b1b7b6353ffe57c547508a6e9ada5463b83b636..e8e6b8687312e23c72d81232d5ae6618
 +  readonly ignoreBOM: boolean;
  }
  
--interface RTCPeerConnectionErrorCallback {
--  (error: DOMException): void;
+-interface PerformanceObserverCallback {
+-  (entries: PerformanceObserverEntryList, observer: PerformanceObserver): void;
 +/**
 + * The **`TextDecoderStream`** interface of the Encoding API converts a stream of text in a binary encoding, such as UTF-8 etc., to a stream of strings. It is the streaming equivalent of TextDecoder. It implements the same shape as a TransformStream, allowing it to be used in ReadableStream.pipeThrough() and similar methods.
 + *
@@ -65156,16 +65150,16 @@ index 9b1b7b6353ffe57c547508a6e9ada5463b83b636..e8e6b8687312e23c72d81232d5ae6618
 +  readonly writable: WritableStream<BufferSource>;
  }
  
--interface RTCSessionDescriptionCallback {
--  (description: RTCSessionDescriptionInit): void;
+-interface PositionCallback {
+-  (position: GeolocationPosition): void;
 -}
 +declare var TextDecoderStream: {
 +  prototype: TextDecoderStream;
 +  new (label?: string, options?: TextDecoderOptions): TextDecoderStream;
 +};
  
--interface RemotePlaybackAvailabilityCallback {
--  (available: boolean): void;
+-interface PositionErrorCallback {
+-  (positionError: GeolocationPositionError): void;
 +/**
 + * The **`TextEncoder`** interface enables you to encode a JavaScript string using UTF-8.
 + *
@@ -65189,16 +65183,16 @@ index 9b1b7b6353ffe57c547508a6e9ada5463b83b636..e8e6b8687312e23c72d81232d5ae6618
 +  ): TextEncoderEncodeIntoResult;
  }
  
--interface ReportingObserverCallback {
--  (reports: readonly Report[], observer: ReportingObserver): void;
+-interface QueuingStrategySize<T = unknown> {
+-  (chunk: T): number;
 -}
 +declare var TextEncoder: {
 +  prototype: TextEncoder;
 +  new (): TextEncoder;
 +};
  
--interface ResizeObserverCallback {
--  (entries: readonly ResizeObserverEntry[], observer: ResizeObserver): void;
+-interface RTCPeerConnectionErrorCallback {
+-  (error: DOMException): void;
 +interface TextEncoderCommon {
 +  /**
 +   * Returns "utf-8".
@@ -65208,8 +65202,8 @@ index 9b1b7b6353ffe57c547508a6e9ada5463b83b636..e8e6b8687312e23c72d81232d5ae6618
 +  readonly encoding: string;
  }
  
--interface TransformerFlushCallback<O> {
--  (controller: TransformStreamDefaultController<O>): void | PromiseLike<void>;
+-interface RTCSessionDescriptionCallback {
+-  (description: RTCSessionDescriptionInit): void;
 +/**
 + * The **`TextEncoderStream`** interface of the Encoding API converts a stream of strings into bytes in the UTF-8 encoding. It is the streaming equivalent of TextEncoder. It implements the same shape as a TransformStream, allowing it to be used in ReadableStream.pipeThrough() and similar methods.
 + *
@@ -65222,19 +65216,16 @@ index 9b1b7b6353ffe57c547508a6e9ada5463b83b636..e8e6b8687312e23c72d81232d5ae6618
 +  readonly writable: WritableStream<string>;
  }
  
--interface TransformerStartCallback<O> {
--  (controller: TransformStreamDefaultController<O>): unknown;
+-interface RemotePlaybackAvailabilityCallback {
+-  (available: boolean): void;
 -}
 +declare var TextEncoderStream: {
 +  prototype: TextEncoderStream;
 +  new (): TextEncoderStream;
 +};
  
--interface TransformerTransformCallback<I, O> {
--  (
--    chunk: I,
--    controller: TransformStreamDefaultController<O>,
--  ): void | PromiseLike<void>;
+-interface ReportingObserverCallback {
+-  (reports: readonly Report[], observer: ReportingObserver): void;
 +/**
 + * The **`TextEvent`** interface is a legacy UI event interface for reporting changes to text UI elements.
 + * @deprecated
@@ -65264,8 +65255,8 @@ index 9b1b7b6353ffe57c547508a6e9ada5463b83b636..e8e6b8687312e23c72d81232d5ae6618
 +  ): void;
  }
  
--interface UnderlyingSinkAbortCallback {
--  (reason?: unknown): void | PromiseLike<void>;
+-interface ResizeObserverCallback {
+-  (entries: readonly ResizeObserverEntry[], observer: ResizeObserver): void;
 -}
 +/** @deprecated */
 +declare const TextEvent: {
@@ -65273,8 +65264,12 @@ index 9b1b7b6353ffe57c547508a6e9ada5463b83b636..e8e6b8687312e23c72d81232d5ae6618
 +  new (): TextEvent;
 +};
  
--interface UnderlyingSinkCloseCallback {
--  (): void | PromiseLike<void>;
+-interface TransformerFlushCallback<O> {
+-  (controller: TransformStreamDefaultController<O>): void | PromiseLike<void>;
+-}
+-
+-interface TransformerStartCallback<O> {
+-  (controller: TransformStreamDefaultController<O>): unknown;
 +/**
 + * The **`TextMetrics`** interface represents the dimensions of a piece of text in the canvas; a TextMetrics instance can be retrieved using the CanvasRenderingContext2D.measureText() method.
 + *
@@ -65355,25 +65350,25 @@ index 9b1b7b6353ffe57c547508a6e9ada5463b83b636..e8e6b8687312e23c72d81232d5ae6618
 +  readonly width: number;
  }
  
--interface UnderlyingSinkStartCallback {
--  (controller: WritableStreamDefaultController): unknown;
+-interface TransformerTransformCallback<I, O> {
+-  (
+-    chunk: I,
+-    controller: TransformStreamDefaultController<O>,
+-  ): void | PromiseLike<void>;
 -}
 +declare var TextMetrics: {
 +  prototype: TextMetrics;
 +  new (): TextMetrics;
 +};
  
--interface UnderlyingSinkWriteCallback<W> {
--  (
--    chunk: W,
--    controller: WritableStreamDefaultController,
--  ): void | PromiseLike<void>;
+-interface UnderlyingSinkAbortCallback {
+-  (reason?: unknown): void | PromiseLike<void>;
 +interface TextTrackEventMap {
 +  cuechange: Event;
  }
  
--interface UnderlyingSourceCancelCallback {
--  (reason?: unknown): void | PromiseLike<void>;
+-interface UnderlyingSinkCloseCallback {
+-  (): void | PromiseLike<void>;
 +/**
 + * The **`TextTrack`** interface of the WebVTT API represents a text track associated with a media element.
 + *
@@ -65464,23 +65459,26 @@ index 9b1b7b6353ffe57c547508a6e9ada5463b83b636..e8e6b8687312e23c72d81232d5ae6618
 +  ): void;
  }
  
--interface UnderlyingSourcePullCallback<R> {
--  (controller: ReadableStreamController<R>): void | PromiseLike<void>;
+-interface UnderlyingSinkStartCallback {
+-  (controller: WritableStreamDefaultController): unknown;
 -}
 +declare const TextTrack: {
 +  prototype: TextTrack;
 +  new (): TextTrack;
 +};
  
--interface UnderlyingSourceStartCallback<R> {
--  (controller: ReadableStreamController<R>): unknown;
+-interface UnderlyingSinkWriteCallback<W> {
+-  (
+-    chunk: W,
+-    controller: WritableStreamDefaultController,
+-  ): void | PromiseLike<void>;
 +interface TextTrackCueEventMap {
 +  enter: Event;
 +  exit: Event;
  }
  
--interface VideoFrameOutputCallback {
--  (output: VideoFrame): void;
+-interface UnderlyingSourceCancelCallback {
+-  (reason?: unknown): void | PromiseLike<void>;
 +/**
 + * The **`TextTrackCue`** interface of the WebVTT API is the abstract base class for the various derived cue types, such as VTTCue and DataCue; you will work with these derived types rather than the base class.
 + *
@@ -65543,16 +65541,13 @@ index 9b1b7b6353ffe57c547508a6e9ada5463b83b636..e8e6b8687312e23c72d81232d5ae6618
 +  ): void;
  }
  
--interface VideoFrameRequestCallback {
--  (now: DOMHighResTimeStamp, metadata: VideoFrameCallbackMetadata): void;
--}
+-interface UnderlyingSourcePullCallback<R> {
+-  (controller: ReadableStreamController<R>): void | PromiseLike<void>;
 +declare const TextTrackCue: {
 +  prototype: TextTrackCue;
 +  new (): TextTrackCue;
 +};
- 
--interface ViewTransitionUpdateCallback {
--  (): unknown;
++
 +/**
 + * The **`TextTrackCueList`** interface of the WebVTT API is an array-like object that represents a dynamically updating list of TextTrackCue objects.
 + *
@@ -65574,20 +65569,276 @@ index 9b1b7b6353ffe57c547508a6e9ada5463b83b636..e8e6b8687312e23c72d81232d5ae6618
 +  [index: number]: TextTrackCue;
  }
  
--interface VoidFunction {
--  (): void;
--}
+-interface UnderlyingSourceStartCallback<R> {
+-  (controller: ReadableStreamController<R>): unknown;
 +declare const TextTrackCueList: {
 +  prototype: TextTrackCueList;
 +  new (): TextTrackCueList;
 +};
- 
--interface WebCodecsErrorCallback {
--  (error: DOMException): void;
++
 +interface TextTrackListEventMap {
 +  addtrack: TrackEvent;
 +  change: Event;
 +  removetrack: TrackEvent;
+ }
+ 
+-interface VideoFrameOutputCallback {
+-  (output: VideoFrame): void;
++/**
++ * The **`TextTrackList`** interface is used to represent a list of the text tracks defined for the associated video or audio element, with each track represented by a separate TextTrack object in the list.
++ *
++ * [MDN Reference](https://developer.mozilla.org/docs/Web/API/TextTrackList)
++ */
++interface TextTrackList extends EventTarget {
++  /**
++   * The read-only TextTrackList property **`length`** returns the number of entries in the TextTrackList, each of which is a TextTrack representing one track in the media element.
++   *
++   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/TextTrackList/length)
++   */
++  readonly length: number;
++  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/TextTrackList/addtrack_event) */
++  onaddtrack: ((this: TextTrackList, ev: TrackEvent) => unknown) | null;
++  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/TextTrackList/change_event) */
++  onchange: ((this: TextTrackList, ev: Event) => unknown) | null;
++  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/TextTrackList/removetrack_event) */
++  onremovetrack: ((this: TextTrackList, ev: TrackEvent) => unknown) | null;
++  /**
++   * The TextTrackList method **`getTrackById()`** returns the first TextTrack object from the track list whose id matches the specified string. This lets you find a specified track if you know its ID string.
++   *
++   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/TextTrackList/getTrackById)
++   */
++  getTrackById(id: string): TextTrack | null;
++  addEventListener<K extends keyof TextTrackListEventMap>(
++    type: K,
++    listener: (this: TextTrackList, ev: TextTrackListEventMap[K]) => unknown,
++    options?: boolean | AddEventListenerOptions,
++  ): void;
++  addEventListener(
++    type: string,
++    listener: EventListenerOrEventListenerObject,
++    options?: boolean | AddEventListenerOptions,
++  ): void;
++  removeEventListener<K extends keyof TextTrackListEventMap>(
++    type: K,
++    listener: (this: TextTrackList, ev: TextTrackListEventMap[K]) => unknown,
++    options?: boolean | EventListenerOptions,
++  ): void;
++  removeEventListener(
++    type: string,
++    listener: EventListenerOrEventListenerObject,
++    options?: boolean | EventListenerOptions,
++  ): void;
++  [index: number]: TextTrack;
+ }
+ 
+-interface VideoFrameRequestCallback {
+-  (now: DOMHighResTimeStamp, metadata: VideoFrameCallbackMetadata): void;
++declare const TextTrackList: {
++  prototype: TextTrackList;
++  new (): TextTrackList;
++};
++
++/**
++ * When loading a media resource for use by an <audio> or <video> element, the **`TimeRanges`** interface is used for representing the time ranges of the media resource that have been buffered, the time ranges that have been played, and the time ranges that are seekable.
++ *
++ * [MDN Reference](https://developer.mozilla.org/docs/Web/API/TimeRanges)
++ */
++interface TimeRanges {
++  /**
++   * The **`TimeRanges.length`** read-only property returns the number of ranges in the object.
++   *
++   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/TimeRanges/length)
++   */
++  readonly length: number;
++  /**
++   * The **`end()`** method of the TimeRanges interface returns the time offset (in seconds) at which a specified time range ends.
++   *
++   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/TimeRanges/end)
++   */
++  end(index: number): number;
++  /**
++   * The **`start()`** method of the TimeRanges interface returns the time offset (in seconds) at which a specified time range begins.
++   *
++   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/TimeRanges/start)
++   */
++  start(index: number): number;
+ }
+ 
+-interface ViewTransitionUpdateCallback {
+-  (): unknown;
++declare const TimeRanges: {
++  prototype: TimeRanges;
++  new (): TimeRanges;
++};
++
++/**
++ * The **`ToggleEvent`** interface represents an event that fires when a popover element is toggled between being shown and hidden.
++ *
++ * [MDN Reference](https://developer.mozilla.org/docs/Web/API/ToggleEvent)
++ */
++interface ToggleEvent extends Event {
++  /**
++   * The **`newState`** read-only property of the ToggleEvent interface is a string representing the state the element is transitioning to.
++   *
++   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/ToggleEvent/newState)
++   */
++  readonly newState: string;
++  /**
++   * The **`oldState`** read-only property of the ToggleEvent interface is a string representing the state the element is transitioning from.
++   *
++   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/ToggleEvent/oldState)
++   */
++  readonly oldState: string;
++  /**
++   * The **`source`** read-only property of the ToggleEvent interface is an Element object instance representing the HTML popover control element that initiated the toggle.
++   *
++   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/ToggleEvent/source)
++   */
++  readonly source: Element | null;
+ }
+ 
+-interface VoidFunction {
+-  (): void;
++declare const ToggleEvent: {
++  prototype: ToggleEvent;
++  new (type: string, eventInitDict?: ToggleEventInit): ToggleEvent;
++};
++
++/**
++ * The **`Touch`** interface represents a single contact point on a touch-sensitive device. The contact point is commonly a finger or stylus and the device may be a touchscreen or trackpad.
++ *
++ * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Touch)
++ */
++interface Touch {
++  /**
++   * The **`Touch.clientX`** read-only property returns the X coordinate of the touch point relative to the viewport, not including any scroll offset.
++   *
++   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Touch/clientX)
++   */
++  readonly clientX: number;
++  /**
++   * The **`Touch.clientY`** read-only property returns the Y coordinate of the touch point relative to the browser's viewport, not including any scroll offset.
++   *
++   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Touch/clientY)
++   */
++  readonly clientY: number;
++  /**
++   * The **`Touch.force`** read-only property returns the amount of pressure the user is applying to the touch surface for a Touch point.
++   *
++   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Touch/force)
++   */
++  readonly force: number;
++  /**
++   * The **`Touch.identifier`** returns a value uniquely identifying this point of contact with the touch surface. This value remains consistent for every event involving this finger's (or stylus's) movement on the surface until it is lifted off the surface.
++   *
++   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Touch/identifier)
++   */
++  readonly identifier: number;
++  /**
++   * The **`Touch.pageX`** read-only property returns the X coordinate of the touch point relative to the viewport, including any scroll offset.
++   *
++   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Touch/pageX)
++   */
++  readonly pageX: number;
++  /**
++   * The **`Touch.pageY`** read-only property returns the Y coordinate of the touch point relative to the viewport, including any scroll offset.
++   *
++   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Touch/pageY)
++   */
++  readonly pageY: number;
++  /**
++   * The **`radiusX`** read-only property of the Touch interface returns the X radius of the ellipse that most closely circumscribes the area of contact with the touch surface. The value is in CSS pixels of the same scale as Touch.screenX.
++   *
++   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Touch/radiusX)
++   */
++  readonly radiusX: number;
++  /**
++   * The **`radiusY`** read-only property of the Touch interface returns the Y radius of the ellipse that most closely circumscribes the area of contact with the touch surface. The value is in CSS pixels of the same scale as Touch.screenX.
++   *
++   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Touch/radiusY)
++   */
++  readonly radiusY: number;
++  /**
++   * The **`rotationAngle`** read-only property of the Touch interface returns the rotation angle, in degrees, of the contact area ellipse defined by Touch.radiusX and Touch.radiusY. The value may be between 0 and 90. Together, these three values describe an ellipse that approximates the size and shape of the area of contact between the user and the screen. This may be a relatively large ellipse representing the contact between a fingertip and the screen or a small area representing the tip of a stylus, for example.
++   *
++   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Touch/rotationAngle)
++   */
++  readonly rotationAngle: number;
++  /**
++   * Returns the X coordinate of the touch point relative to the screen, not including any scroll offset.
++   *
++   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Touch/screenX)
++   */
++  readonly screenX: number;
++  /**
++   * Returns the Y coordinate of the touch point relative to the screen, not including any scroll offset.
++   *
++   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Touch/screenY)
++   */
++  readonly screenY: number;
++  /**
++   * The read-only **`target`** property of the Touch interface returns the (EventTarget) on which the touch contact started when it was first placed on the surface, even if the touch point has since moved outside the interactive area of that element or even been removed from the document. Note that if the target element is removed from the document, events will still be targeted at it, and hence won't necessarily bubble up to the window or document anymore. If there is any risk of an element being removed while it is being touched, the best practice is to attach the touch listeners directly to the target.
++   *
++   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Touch/target)
++   */
++  readonly target: EventTarget;
+ }
+ 
+-interface WebCodecsErrorCallback {
+-  (error: DOMException): void;
++declare const Touch: {
++  prototype: Touch;
++  new (touchInitDict: TouchInit): Touch;
++};
++
++/**
++ * The **`TouchEvent`** interface represents an UIEvent which is sent when the state of contacts with a touch-sensitive surface changes. This surface can be a touch screen or trackpad, for example. The event can describe one or more points of contact with the screen and includes support for detecting movement, addition and removal of contact points, and so forth.
++ *
++ * [MDN Reference](https://developer.mozilla.org/docs/Web/API/TouchEvent)
++ */
++interface TouchEvent extends UIEvent {
++  /**
++   * The read-only **`altKey`** property of the TouchEvent interface returns a boolean value indicating whether or not the alt (Alternate) key is enabled when the touch event is created. If the alt key is enabled, the attribute's value is true. Otherwise, it is false.
++   *
++   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/TouchEvent/altKey)
++   */
++  readonly altKey: boolean;
++  /**
++   * The **`changedTouches`** read-only property is a TouchList whose touch points (Touch objects) varies depending on the event type, as follows:
++   *
++   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/TouchEvent/changedTouches)
++   */
++  readonly changedTouches: TouchList;
++  /**
++   * The read-only **`ctrlKey`** property of the TouchEvent interface returns a boolean value indicating whether the control (Control) key is enabled when the touch event is created. If this key is enabled, the attribute's value is true. Otherwise, it is false.
++   *
++   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/TouchEvent/ctrlKey)
++   */
++  readonly ctrlKey: boolean;
++  /**
++   * The read-only **`metaKey`** property of the TouchEvent interface returns a boolean value indicating whether or not the Meta key is enabled when the touch event is created. If this key is enabled, the attribute's value is true. Otherwise, it is false.
++   *
++   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/TouchEvent/metaKey)
++   */
++  readonly metaKey: boolean;
++  /**
++   * The read-only **`shiftKey`** property of the TouchEvent interface returns a boolean value indicating whether or not the shift key is enabled when the touch event is created. If this key is enabled, the attribute's value is true. Otherwise, it is false.
++   *
++   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/TouchEvent/shiftKey)
++   */
++  readonly shiftKey: boolean;
++  /**
++   * The **`targetTouches`** read-only property is a TouchList listing all the Touch objects for touch points that are still in contact with the touch surface and whose touchstart event occurred inside the same target element as the current target element.
++   *
++   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/TouchEvent/targetTouches)
++   */
++  readonly targetTouches: TouchList;
++  /**
++   * **`touches`** is a read-only TouchList listing all the Touch objects for touch points that are currently in contact with the touch surface, regardless of whether or not they've changed or what their target element was at touchstart time.
++   *
++   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/TouchEvent/touches)
++   */
++  readonly touches: TouchList;
  }
  
 -interface HTMLElementTagNameMap {
@@ -65703,53 +65954,8 @@ index 9b1b7b6353ffe57c547508a6e9ada5463b83b636..e8e6b8687312e23c72d81232d5ae6618
 -  var: HTMLElement;
 -  video: HTMLVideoElement;
 -  wbr: HTMLElement;
-+/**
-+ * The **`TextTrackList`** interface is used to represent a list of the text tracks defined for the associated video or audio element, with each track represented by a separate TextTrack object in the list.
-+ *
-+ * [MDN Reference](https://developer.mozilla.org/docs/Web/API/TextTrackList)
-+ */
-+interface TextTrackList extends EventTarget {
-+  /**
-+   * The read-only TextTrackList property **`length`** returns the number of entries in the TextTrackList, each of which is a TextTrack representing one track in the media element.
-+   *
-+   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/TextTrackList/length)
-+   */
-+  readonly length: number;
-+  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/TextTrackList/addtrack_event) */
-+  onaddtrack: ((this: TextTrackList, ev: TrackEvent) => unknown) | null;
-+  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/TextTrackList/change_event) */
-+  onchange: ((this: TextTrackList, ev: Event) => unknown) | null;
-+  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/TextTrackList/removetrack_event) */
-+  onremovetrack: ((this: TextTrackList, ev: TrackEvent) => unknown) | null;
-+  /**
-+   * The TextTrackList method **`getTrackById()`** returns the first TextTrack object from the track list whose id matches the specified string. This lets you find a specified track if you know its ID string.
-+   *
-+   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/TextTrackList/getTrackById)
-+   */
-+  getTrackById(id: string): TextTrack | null;
-+  addEventListener<K extends keyof TextTrackListEventMap>(
-+    type: K,
-+    listener: (this: TextTrackList, ev: TextTrackListEventMap[K]) => unknown,
-+    options?: boolean | AddEventListenerOptions,
-+  ): void;
-+  addEventListener(
-+    type: string,
-+    listener: EventListenerOrEventListenerObject,
-+    options?: boolean | AddEventListenerOptions,
-+  ): void;
-+  removeEventListener<K extends keyof TextTrackListEventMap>(
-+    type: K,
-+    listener: (this: TextTrackList, ev: TextTrackListEventMap[K]) => unknown,
-+    options?: boolean | EventListenerOptions,
-+  ): void;
-+  removeEventListener(
-+    type: string,
-+    listener: EventListenerOrEventListenerObject,
-+    options?: boolean | EventListenerOptions,
-+  ): void;
-+  [index: number]: TextTrack;
- }
- 
+-}
+-
 -interface HTMLElementDeprecatedTagNameMap {
 -  acronym: HTMLElement;
 -  applet: HTMLUnknownElement;
@@ -65780,37 +65986,8 @@ index 9b1b7b6353ffe57c547508a6e9ada5463b83b636..e8e6b8687312e23c72d81232d5ae6618
 -  strike: HTMLElement;
 -  tt: HTMLElement;
 -  xmp: HTMLPreElement;
-+declare const TextTrackList: {
-+  prototype: TextTrackList;
-+  new (): TextTrackList;
-+};
-+
-+/**
-+ * When loading a media resource for use by an <audio> or <video> element, the **`TimeRanges`** interface is used for representing the time ranges of the media resource that have been buffered, the time ranges that have been played, and the time ranges that are seekable.
-+ *
-+ * [MDN Reference](https://developer.mozilla.org/docs/Web/API/TimeRanges)
-+ */
-+interface TimeRanges {
-+  /**
-+   * The **`TimeRanges.length`** read-only property returns the number of ranges in the object.
-+   *
-+   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/TimeRanges/length)
-+   */
-+  readonly length: number;
-+  /**
-+   * The **`end()`** method of the TimeRanges interface returns the time offset (in seconds) at which a specified time range ends.
-+   *
-+   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/TimeRanges/end)
-+   */
-+  end(index: number): number;
-+  /**
-+   * The **`start()`** method of the TimeRanges interface returns the time offset (in seconds) at which a specified time range begins.
-+   *
-+   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/TimeRanges/start)
-+   */
-+  start(index: number): number;
- }
- 
+-}
+-
 -interface SVGElementTagNameMap {
 -  a: SVGAElement;
 -  animate: SVGAnimateElement;
@@ -65876,7 +66053,11 @@ index 9b1b7b6353ffe57c547508a6e9ada5463b83b636..e8e6b8687312e23c72d81232d5ae6618
 -  use: SVGUseElement;
 -  view: SVGViewElement;
 -}
--
++declare const TouchEvent: {
++  prototype: TouchEvent;
++  new (type: string, eventInitDict?: TouchEventInit): TouchEvent;
++};
+ 
 -interface MathMLElementTagNameMap {
 -  annotation: MathMLElement;
 -  'annotation-xml': MathMLElement;
@@ -65908,8 +66089,27 @@ index 9b1b7b6353ffe57c547508a6e9ada5463b83b636..e8e6b8687312e23c72d81232d5ae6618
 -  munder: MathMLElement;
 -  munderover: MathMLElement;
 -  semantics: MathMLElement;
--}
--
++/**
++ * The **`TouchList`** interface represents a list of contact points on a touch surface. For example, if the user has three fingers on the touch surface (such as a screen or trackpad), the corresponding TouchList object would have one Touch object for each finger, for a total of three entries.
++ *
++ * [MDN Reference](https://developer.mozilla.org/docs/Web/API/TouchList)
++ */
++interface TouchList {
++  /**
++   * The **`length`** read-only property indicates the number of items (touch points) in a given TouchList.
++   *
++   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/TouchList/length)
++   */
++  readonly length: number;
++  /**
++   * The **`item()`** method returns the Touch object at the specified index in the TouchList.
++   *
++   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/TouchList/item)
++   */
++  item(index: number): Touch | null;
++  [index: number]: Touch;
+ }
+ 
 -/** @deprecated Directly use HTMLElementTagNameMap or SVGElementTagNameMap as appropriate, instead. */
 -type ElementTagNameMap = HTMLElementTagNameMap &
 -  Pick<
@@ -65930,234 +66130,19 @@ index 9b1b7b6353ffe57c547508a6e9ada5463b83b636..e8e6b8687312e23c72d81232d5ae6618
 -    defaultSelected?: boolean,
 -    selected?: boolean,
 -  ): HTMLOptionElement;
-+declare const TimeRanges: {
-+  prototype: TimeRanges;
-+  new (): TimeRanges;
++declare const TouchList: {
++  prototype: TouchList;
++  new (): TouchList;
  };
 +
  /**
 - * @deprecated This is a legacy alias of `navigator`.
-- *
-- * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/navigator)
-- */
--declare const clientInformation: Navigator;
--/**
-- * The **`Window.closed`** read-only property indicates whether the referenced window is closed or not.
-+ * The **`ToggleEvent`** interface represents an event that fires when a popover element is toggled between being shown and hidden.
-  *
-- * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/closed)
-+ * [MDN Reference](https://developer.mozilla.org/docs/Web/API/ToggleEvent)
-  */
--declare const closed: boolean;
-+interface ToggleEvent extends Event {
-+  /**
-+   * The **`newState`** read-only property of the ToggleEvent interface is a string representing the state the element is transitioning to.
-+   *
-+   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/ToggleEvent/newState)
-+   */
-+  readonly newState: string;
-+  /**
-+   * The **`oldState`** read-only property of the ToggleEvent interface is a string representing the state the element is transitioning from.
-+   *
-+   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/ToggleEvent/oldState)
-+   */
-+  readonly oldState: string;
-+  /**
-+   * The **`source`** read-only property of the ToggleEvent interface is an Element object instance representing the HTML popover control element that initiated the toggle.
-+   *
-+   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/ToggleEvent/source)
-+   */
-+  readonly source: Element | null;
-+}
-+
-+declare const ToggleEvent: {
-+  prototype: ToggleEvent;
-+  new (type: string, eventInitDict?: ToggleEventInit): ToggleEvent;
-+};
-+
- /**
-- * The **`cookieStore`** read-only property of the Window interface returns a reference to the CookieStore object for the current document context.
-+ * The **`Touch`** interface represents a single contact point on a touch-sensitive device. The contact point is commonly a finger or stylus and the device may be a touchscreen or trackpad.
-  *
-- * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/cookieStore)
-+ * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Touch)
-  */
--declare const cookieStore: CookieStore;
-+interface Touch {
-+  /**
-+   * The **`Touch.clientX`** read-only property returns the X coordinate of the touch point relative to the viewport, not including any scroll offset.
-+   *
-+   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Touch/clientX)
-+   */
-+  readonly clientX: number;
-+  /**
-+   * The **`Touch.clientY`** read-only property returns the Y coordinate of the touch point relative to the browser's viewport, not including any scroll offset.
-+   *
-+   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Touch/clientY)
-+   */
-+  readonly clientY: number;
-+  /**
-+   * The **`Touch.force`** read-only property returns the amount of pressure the user is applying to the touch surface for a Touch point.
-+   *
-+   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Touch/force)
-+   */
-+  readonly force: number;
-+  /**
-+   * The **`Touch.identifier`** returns a value uniquely identifying this point of contact with the touch surface. This value remains consistent for every event involving this finger's (or stylus's) movement on the surface until it is lifted off the surface.
-+   *
-+   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Touch/identifier)
-+   */
-+  readonly identifier: number;
-+  /**
-+   * The **`Touch.pageX`** read-only property returns the X coordinate of the touch point relative to the viewport, including any scroll offset.
-+   *
-+   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Touch/pageX)
-+   */
-+  readonly pageX: number;
-+  /**
-+   * The **`Touch.pageY`** read-only property returns the Y coordinate of the touch point relative to the viewport, including any scroll offset.
-+   *
-+   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Touch/pageY)
-+   */
-+  readonly pageY: number;
-+  /**
-+   * The **`radiusX`** read-only property of the Touch interface returns the X radius of the ellipse that most closely circumscribes the area of contact with the touch surface. The value is in CSS pixels of the same scale as Touch.screenX.
-+   *
-+   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Touch/radiusX)
-+   */
-+  readonly radiusX: number;
-+  /**
-+   * The **`radiusY`** read-only property of the Touch interface returns the Y radius of the ellipse that most closely circumscribes the area of contact with the touch surface. The value is in CSS pixels of the same scale as Touch.screenX.
-+   *
-+   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Touch/radiusY)
-+   */
-+  readonly radiusY: number;
-+  /**
-+   * The **`rotationAngle`** read-only property of the Touch interface returns the rotation angle, in degrees, of the contact area ellipse defined by Touch.radiusX and Touch.radiusY. The value may be between 0 and 90. Together, these three values describe an ellipse that approximates the size and shape of the area of contact between the user and the screen. This may be a relatively large ellipse representing the contact between a fingertip and the screen or a small area representing the tip of a stylus, for example.
-+   *
-+   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Touch/rotationAngle)
-+   */
-+  readonly rotationAngle: number;
-+  /**
-+   * Returns the X coordinate of the touch point relative to the screen, not including any scroll offset.
-+   *
-+   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Touch/screenX)
-+   */
-+  readonly screenX: number;
-+  /**
-+   * Returns the Y coordinate of the touch point relative to the screen, not including any scroll offset.
-+   *
-+   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Touch/screenY)
-+   */
-+  readonly screenY: number;
-+  /**
-+   * The read-only **`target`** property of the Touch interface returns the (EventTarget) on which the touch contact started when it was first placed on the surface, even if the touch point has since moved outside the interactive area of that element or even been removed from the document. Note that if the target element is removed from the document, events will still be targeted at it, and hence won't necessarily bubble up to the window or document anymore. If there is any risk of an element being removed while it is being touched, the best practice is to attach the touch listeners directly to the target.
-+   *
-+   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Touch/target)
-+   */
-+  readonly target: EventTarget;
-+}
-+
-+declare const Touch: {
-+  prototype: Touch;
-+  new (touchInitDict: TouchInit): Touch;
-+};
-+
- /**
-- * The **`customElements`** read-only property of the Window interface returns a reference to the CustomElementRegistry object, which can be used to register new custom elements and get information about previously registered custom elements.
-+ * The **`TouchEvent`** interface represents an UIEvent which is sent when the state of contacts with a touch-sensitive surface changes. This surface can be a touch screen or trackpad, for example. The event can describe one or more points of contact with the screen and includes support for detecting movement, addition and removal of contact points, and so forth.
-  *
-- * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/customElements)
-+ * [MDN Reference](https://developer.mozilla.org/docs/Web/API/TouchEvent)
-  */
--declare const customElements: CustomElementRegistry;
-+interface TouchEvent extends UIEvent {
-+  /**
-+   * The read-only **`altKey`** property of the TouchEvent interface returns a boolean value indicating whether or not the alt (Alternate) key is enabled when the touch event is created. If the alt key is enabled, the attribute's value is true. Otherwise, it is false.
-+   *
-+   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/TouchEvent/altKey)
-+   */
-+  readonly altKey: boolean;
-+  /**
-+   * The **`changedTouches`** read-only property is a TouchList whose touch points (Touch objects) varies depending on the event type, as follows:
-+   *
-+   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/TouchEvent/changedTouches)
-+   */
-+  readonly changedTouches: TouchList;
-+  /**
-+   * The read-only **`ctrlKey`** property of the TouchEvent interface returns a boolean value indicating whether the control (Control) key is enabled when the touch event is created. If this key is enabled, the attribute's value is true. Otherwise, it is false.
-+   *
-+   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/TouchEvent/ctrlKey)
-+   */
-+  readonly ctrlKey: boolean;
-+  /**
-+   * The read-only **`metaKey`** property of the TouchEvent interface returns a boolean value indicating whether or not the Meta key is enabled when the touch event is created. If this key is enabled, the attribute's value is true. Otherwise, it is false.
-+   *
-+   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/TouchEvent/metaKey)
-+   */
-+  readonly metaKey: boolean;
-+  /**
-+   * The read-only **`shiftKey`** property of the TouchEvent interface returns a boolean value indicating whether or not the shift key is enabled when the touch event is created. If this key is enabled, the attribute's value is true. Otherwise, it is false.
-+   *
-+   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/TouchEvent/shiftKey)
-+   */
-+  readonly shiftKey: boolean;
-+  /**
-+   * The **`targetTouches`** read-only property is a TouchList listing all the Touch objects for touch points that are still in contact with the touch surface and whose touchstart event occurred inside the same target element as the current target element.
-+   *
-+   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/TouchEvent/targetTouches)
-+   */
-+  readonly targetTouches: TouchList;
-+  /**
-+   * **`touches`** is a read-only TouchList listing all the Touch objects for touch points that are currently in contact with the touch surface, regardless of whether or not they've changed or what their target element was at touchstart time.
-+   *
-+   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/TouchEvent/touches)
-+   */
-+  readonly touches: TouchList;
-+}
-+
-+declare const TouchEvent: {
-+  prototype: TouchEvent;
-+  new (type: string, eventInitDict?: TouchEventInit): TouchEvent;
-+};
-+
- /**
-- * The **`devicePixelRatio`** of Window interface returns the ratio of the resolution in _physical pixels_ to the resolution in _CSS pixels_ for the current display device.
-+ * The **`TouchList`** interface represents a list of contact points on a touch surface. For example, if the user has three fingers on the touch surface (such as a screen or trackpad), the corresponding TouchList object would have one Touch object for each finger, for a total of three entries.
-  *
-- * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/devicePixelRatio)
-+ * [MDN Reference](https://developer.mozilla.org/docs/Web/API/TouchList)
-  */
--declare const devicePixelRatio: number;
-+interface TouchList {
-+  /**
-+   * The **`length`** read-only property indicates the number of items (touch points) in a given TouchList.
-+   *
-+   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/TouchList/length)
-+   */
-+  readonly length: number;
-+  /**
-+   * The **`item()`** method returns the Touch object at the specified index in the TouchList.
-+   *
-+   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/TouchList/item)
-+   */
-+  item(index: number): Touch | null;
-+  [index: number]: Touch;
-+}
-+
-+declare const TouchList: {
-+  prototype: TouchList;
-+  new (): TouchList;
-+};
-+
- /**
-- * **`window.document`** returns a reference to the document contained in the window.
 + * The **`TrackEvent`** interface of the HTML DOM API is used for events which represent changes to a set of available tracks on an HTML media element; these events are addtrack and removetrack.
   *
-- * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/document)
+- * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/navigator)
 + * [MDN Reference](https://developer.mozilla.org/docs/Web/API/TrackEvent)
   */
--declare const document: Document;
+-declare const clientInformation: Navigator;
 +interface TrackEvent extends Event {
 +  /**
 +   * The read-only **`track`** property of the TrackEvent interface specifies the media track object to which the event applies.
@@ -66173,14 +66158,13 @@ index 9b1b7b6353ffe57c547508a6e9ada5463b83b636..e8e6b8687312e23c72d81232d5ae6618
 +};
 +
  /**
-- * The read-only Window property **`event`** returns the Event which is currently being handled by the site's code.
-- * @deprecated
+- * The **`Window.closed`** read-only property indicates whether the referenced window is closed or not.
 + * The **`TransformStream`** interface of the Streams API represents a concrete implementation of the pipe chain transform stream concept.
   *
-- * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/event)
+- * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/closed)
 + * [MDN Reference](https://developer.mozilla.org/docs/Web/API/TransformStream)
   */
--declare const event: Event | undefined;
+-declare const closed: boolean;
 +interface TransformStream<I = unknown, O = unknown> {
 +  /**
 +   * The **`readable`** read-only property of the TransformStream interface returns the ReadableStream instance controlled by this TransformStream. This stream emits the transformed output data.
@@ -66206,14 +66190,13 @@ index 9b1b7b6353ffe57c547508a6e9ada5463b83b636..e8e6b8687312e23c72d81232d5ae6618
 +};
 +
  /**
-- * The `external` property of the Window API returns an instance of the `External` interface, which was intended to contain functions related to adding external search providers to the browser.
-- * @deprecated
+- * The **`cookieStore`** read-only property of the Window interface returns a reference to the CookieStore object for the current document context.
 + * The **`TransformStreamDefaultController`** interface of the Streams API provides methods to manipulate the associated ReadableStream and WritableStream.
   *
-- * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/external)
+- * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/cookieStore)
 + * [MDN Reference](https://developer.mozilla.org/docs/Web/API/TransformStreamDefaultController)
   */
--declare const external: External;
+-declare const cookieStore: CookieStore;
 +interface TransformStreamDefaultController<O = unknown> {
 +  /**
 +   * The **`desiredSize`** read-only property of the TransformStreamDefaultController interface returns the desired size to fill the queue of the associated ReadableStream.
@@ -66247,13 +66230,13 @@ index 9b1b7b6353ffe57c547508a6e9ada5463b83b636..e8e6b8687312e23c72d81232d5ae6618
 +};
 +
  /**
-- * The **`Window.frameElement`** property returns the element (such as iframe or object) in which the window is embedded.
+- * The **`customElements`** read-only property of the Window interface returns a reference to the CustomElementRegistry object, which can be used to register new custom elements and get information about previously registered custom elements.
 + * The **`TransitionEvent`** interface represents events providing information related to transitions.
   *
-- * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/frameElement)
+- * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/customElements)
 + * [MDN Reference](https://developer.mozilla.org/docs/Web/API/TransitionEvent)
   */
--declare const frameElement: Element | null;
+-declare const customElements: CustomElementRegistry;
 +interface TransitionEvent extends Event {
 +  /**
 +   * The **`TransitionEvent.elapsedTime`** read-only property is a float giving the amount of time the animation has been running, in seconds, when this event fired. This value is not affected by the transition-delay property.
@@ -66284,13 +66267,13 @@ index 9b1b7b6353ffe57c547508a6e9ada5463b83b636..e8e6b8687312e23c72d81232d5ae6618
 +};
 +
  /**
-- * Returns the window itself, which is an array-like object, listing the direct sub-frames of the current window.
+- * The **`devicePixelRatio`** of Window interface returns the ratio of the resolution in _physical pixels_ to the resolution in _CSS pixels_ for the current display device.
 + * The **`TreeWalker`** object represents the nodes of a document subtree and a position within them.
   *
-- * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/frames)
+- * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/devicePixelRatio)
 + * [MDN Reference](https://developer.mozilla.org/docs/Web/API/TreeWalker)
   */
--declare const frames: WindowProxy;
+-declare const devicePixelRatio: number;
 +interface TreeWalker {
 +  /**
 +   * The **`TreeWalker.currentNode`** property represents the Node which the TreeWalker is currently pointing at.
@@ -66366,13 +66349,13 @@ index 9b1b7b6353ffe57c547508a6e9ada5463b83b636..e8e6b8687312e23c72d81232d5ae6618
 +};
 +
  /**
-- * The `Window.history` read-only property returns a reference to the History object, which provides an interface for manipulating the browser _session history_ (pages visited in the tab or frame that the current page is loaded in).
+- * **`window.document`** returns a reference to the document contained in the window.
 + * The **`UIEvent`** interface represents simple user interface events. It is part of the UI Events API, which includes various event types and interfaces related to user interactions.
   *
-- * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/history)
+- * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/document)
 + * [MDN Reference](https://developer.mozilla.org/docs/Web/API/UIEvent)
   */
--declare const history: History;
+-declare const document: Document;
 +interface UIEvent extends Event {
 +  /**
 +   * The **`UIEvent.detail`** read-only property, when non-zero, provides the current (or next, depending on the event) click count.
@@ -66414,12 +66397,44 @@ index 9b1b7b6353ffe57c547508a6e9ada5463b83b636..e8e6b8687312e23c72d81232d5ae6618
 +};
 +
  /**
-- * The read-only **`innerHeight`** property of the including the height of the horizontal scroll bar, if present.
+- * The read-only Window property **`event`** returns the Event which is currently being handled by the site's code.
+- * @deprecated
 + * The **`URL`** interface is used to parse, construct, normalize, and encode URLs. It works by providing properties which allow you to easily read and modify the components of a URL.
   *
-- * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/innerHeight)
+- * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/event)
 + * [MDN Reference](https://developer.mozilla.org/docs/Web/API/URL)
   */
+-declare const event: Event | undefined;
+-/**
+- * The `external` property of the Window API returns an instance of the `External` interface, which was intended to contain functions related to adding external search providers to the browser.
+- * @deprecated
+- *
+- * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/external)
+- */
+-declare const external: External;
+-/**
+- * The **`Window.frameElement`** property returns the element (such as iframe or object) in which the window is embedded.
+- *
+- * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/frameElement)
+- */
+-declare const frameElement: Element | null;
+-/**
+- * Returns the window itself, which is an array-like object, listing the direct sub-frames of the current window.
+- *
+- * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/frames)
+- */
+-declare const frames: WindowProxy;
+-/**
+- * The `Window.history` read-only property returns a reference to the History object, which provides an interface for manipulating the browser _session history_ (pages visited in the tab or frame that the current page is loaded in).
+- *
+- * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/history)
+- */
+-declare const history: History;
+-/**
+- * The read-only **`innerHeight`** property of the including the height of the horizontal scroll bar, if present.
+- *
+- * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/innerHeight)
+- */
 -declare const innerHeight: number;
 -/**
 - * The read-only Window property **`innerWidth`** returns the interior width of the window in pixels (that is, the width of the window's layout viewport).
@@ -67016,7 +67031,8 @@ index 9b1b7b6353ffe57c547508a6e9ada5463b83b636..e8e6b8687312e23c72d81232d5ae6618
 - * @deprecated
 - *
 - * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/orientationchange_event)
-- */
++ * [MDN Reference](https://developer.mozilla.org/docs/Web/API/VideoDecoder)
+  */
 -declare const onorientationchange:
 -  | ((this: Window, ev: Event) => unknown)
 -  | null;
@@ -67033,41 +67049,6 @@ index 9b1b7b6353ffe57c547508a6e9ada5463b83b636..e8e6b8687312e23c72d81232d5ae6618
 - * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/orientation)
 - */
 -declare const orientation: number;
--/**
-- * The **`originAgentCluster`** read-only property of the Window interface returns `true` if this window belongs to an _origin-keyed agent cluster_: this means that the operating system has provided dedicated resources (for example an operating system process) to this window's origin that are not shared with windows from other origins.
-- *
-- * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/originAgentCluster)
-- */
--declare const originAgentCluster: boolean;
--/**
-- * The **`Window.outerHeight`** read-only property returns the height in pixels of the whole browser window, including any sidebar, window chrome, and window-resizing borders/handles.
-- *
-- * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/outerHeight)
-+ * [MDN Reference](https://developer.mozilla.org/docs/Web/API/VideoDecoder)
-  */
--declare const outerHeight: number;
--/**
-- * **`Window.outerWidth`** read-only property returns the width of the outside of the browser window.
-- *
-- * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/outerWidth)
-- */
--declare const outerWidth: number;
--/** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/scrollX) */
--declare const pageXOffset: number;
--/** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/scrollY) */
--declare const pageYOffset: number;
--/**
-- * The **`Window.parent`** property is a reference to the parent of the current window or subframe.
-- *
-- * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/parent)
-- */
--declare const parent: WindowProxy;
--/**
-- * Returns the `personalbar` object.
-- *
-- * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/personalbar)
-- */
--declare const personalbar: BarProp;
 +interface VideoDecoder extends EventTarget {
 +  /**
 +   * The **`decodeQueueSize`** read-only property of the VideoDecoder interface returns the number of pending decode requests in the queue.
@@ -67151,14 +67132,14 @@ index 9b1b7b6353ffe57c547508a6e9ada5463b83b636..e8e6b8687312e23c72d81232d5ae6618
 +}
 +
  /**
-- * The Window property **`screen`** returns a reference to the screen object associated with the window.
+- * The **`originAgentCluster`** read-only property of the Window interface returns `true` if this window belongs to an _origin-keyed agent cluster_: this means that the operating system has provided dedicated resources (for example an operating system process) to this window's origin that are not shared with windows from other origins.
 + * The **`VideoEncoder`** interface of the WebCodecs API encodes VideoFrame objects into EncodedVideoChunks.
 + * Available only in secure contexts.
   *
-- * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/screen)
+- * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/originAgentCluster)
 + * [MDN Reference](https://developer.mozilla.org/docs/Web/API/VideoEncoder)
   */
--declare const screen: Screen;
+-declare const originAgentCluster: boolean;
 +interface VideoEncoder extends EventTarget {
 +  /**
 +   * The **`encodeQueueSize`** read-only property of the VideoEncoder interface returns the number of pending encode requests in the queue.
@@ -67238,13 +67219,13 @@ index 9b1b7b6353ffe57c547508a6e9ada5463b83b636..e8e6b8687312e23c72d81232d5ae6618
 +};
 +
  /**
-- * The **`Window.screenLeft`** read-only property returns the horizontal distance, in CSS pixels, from the left border of the user's browser viewport to the left side of the screen.
+- * The **`Window.outerHeight`** read-only property returns the height in pixels of the whole browser window, including any sidebar, window chrome, and window-resizing borders/handles.
 + * The **`VideoFrame`** interface of the Web Codecs API represents a frame of a video.
   *
-- * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/screenLeft)
+- * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/outerHeight)
 + * [MDN Reference](https://developer.mozilla.org/docs/Web/API/VideoFrame)
   */
--declare const screenLeft: number;
+-declare const outerHeight: number;
 +interface VideoFrame {
 +  /**
 +   * The **`codedHeight`** property of the VideoFrame interface returns the height of the VideoFrame in pixels, potentially including non-visible padding, and prior to considering potential ratio adjustments.
@@ -67342,13 +67323,17 @@ index 9b1b7b6353ffe57c547508a6e9ada5463b83b636..e8e6b8687312e23c72d81232d5ae6618
 +};
 +
  /**
-- * The **`Window.screenTop`** read-only property returns the vertical distance, in CSS pixels, from the top border of the user's browser viewport to the top side of the screen.
+- * **`Window.outerWidth`** read-only property returns the width of the outside of the browser window.
 + * A **`VideoPlaybackQuality`** object is returned by the HTMLVideoElement.getVideoPlaybackQuality() method and contains metrics that can be used to determine the playback quality of a video.
   *
-- * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/screenTop)
+- * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/outerWidth)
 + * [MDN Reference](https://developer.mozilla.org/docs/Web/API/VideoPlaybackQuality)
   */
--declare const screenTop: number;
+-declare const outerWidth: number;
+-/** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/scrollX) */
+-declare const pageXOffset: number;
+-/** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/scrollY) */
+-declare const pageYOffset: number;
 +interface VideoPlaybackQuality {
 +  /**
 +   * The VideoPlaybackQuality interface's read-only **`corruptedVideoFrames`** property the number of corrupted video frames that have been received since the <video> element was last loaded or reloaded.
@@ -67383,13 +67368,13 @@ index 9b1b7b6353ffe57c547508a6e9ada5463b83b636..e8e6b8687312e23c72d81232d5ae6618
 +};
 +
  /**
-- * The **`Window.screenX`** read-only property returns the horizontal distance, in CSS pixels, of the left border of the user's browser viewport to the left side of the screen.
+- * The **`Window.parent`** property is a reference to the parent of the current window or subframe.
 + * The **`ViewTimeline`** interface of the Web Animations API represents a view progress timeline (see CSS scroll-driven animations for more details).
   *
-- * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/screenX)
+- * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/parent)
 + * [MDN Reference](https://developer.mozilla.org/docs/Web/API/ViewTimeline)
   */
--declare const screenX: number;
+-declare const parent: WindowProxy;
 +interface ViewTimeline extends ScrollTimeline {
 +  /**
 +   * The **`endOffset`** read-only property of the ViewTimeline interface returns a CSSNumericValue representing the ending (100% progress) scroll position of the timeline as an offset from the start of the overflowing section of content in the scroller.
@@ -67417,13 +67402,13 @@ index 9b1b7b6353ffe57c547508a6e9ada5463b83b636..e8e6b8687312e23c72d81232d5ae6618
 +};
 +
  /**
-- * The **`Window.screenY`** read-only property returns the vertical distance, in CSS pixels, of the top border of the user's browser viewport to the top edge of the screen.
+- * Returns the `personalbar` object.
 + * The **`ViewTransition`** interface of the View Transition API represents an active view transition, and provides functionality to react to the transition reaching different states (e.g., ready to run the animation, or animation finished) or skip the transition altogether.
   *
-- * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/screenY)
+- * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/personalbar)
 + * [MDN Reference](https://developer.mozilla.org/docs/Web/API/ViewTransition)
   */
--declare const screenY: number;
+-declare const personalbar: BarProp;
 +interface ViewTransition {
 +  /**
 +   * The **`finished`** read-only property of the ViewTransition interface is a Promise that fulfills once the transition animation is finished, and the new page view is visible and interactive to the user.
@@ -67463,13 +67448,13 @@ index 9b1b7b6353ffe57c547508a6e9ada5463b83b636..e8e6b8687312e23c72d81232d5ae6618
 +};
 +
  /**
-- * The read-only **`scrollX`** property of the Window interface returns the number of pixels by which the document is currently scrolled horizontally.
+- * The Window property **`screen`** returns a reference to the screen object associated with the window.
 + * The **`ViewTransitionTypeSet`** interface of the View Transition API is a set-like object representing the types of an active view transition. This enables the types to be queried or modified on-the-fly during a transition.
   *
-- * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/scrollX)
+- * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/screen)
 + * [MDN Reference](https://developer.mozilla.org/docs/Web/API/ViewTransitionTypeSet)
   */
--declare const scrollX: number;
+-declare const screen: Screen;
 +interface ViewTransitionTypeSet {
 +  forEach(
 +    callbackfn: (
@@ -67492,13 +67477,13 @@ index 9b1b7b6353ffe57c547508a6e9ada5463b83b636..e8e6b8687312e23c72d81232d5ae6618
 +}
 +
  /**
-- * The read-only **`scrollY`** property of the Window interface returns the number of pixels by which the document is currently scrolled vertically.
+- * The **`Window.screenLeft`** read-only property returns the horizontal distance, in CSS pixels, from the left border of the user's browser viewport to the left side of the screen.
 + * The **`VisualViewport`** interface of the CSSOM view API represents the visual viewport for a given window. For a page containing iframes, each iframe, as well as the containing page, will have a unique window object. Each window on a page will have a unique VisualViewport representing the properties associated with that window.
   *
-- * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/scrollY)
+- * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/screenLeft)
 + * [MDN Reference](https://developer.mozilla.org/docs/Web/API/VisualViewport)
   */
--declare const scrollY: number;
+-declare const screenLeft: number;
 +interface VisualViewport extends EventTarget {
 +  /**
 +   * The **`height`** read-only property of the VisualViewport interface returns the height of the visual viewport, in CSS pixels, or 0 if current document is not fully active.
@@ -67574,13 +67559,13 @@ index 9b1b7b6353ffe57c547508a6e9ada5463b83b636..e8e6b8687312e23c72d81232d5ae6618
 +};
 +
  /**
-- * Returns the `scrollbars` object.
+- * The **`Window.screenTop`** read-only property returns the vertical distance, in CSS pixels, from the top border of the user's browser viewport to the top side of the screen.
 + * The **`WEBGL_color_buffer_float`** extension is part of the WebGL API and adds the ability to render to 32-bit floating-point color buffers.
   *
-- * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/scrollbars)
+- * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/screenTop)
 + * [MDN Reference](https://developer.mozilla.org/docs/Web/API/WEBGL_color_buffer_float)
   */
--declare const scrollbars: BarProp;
+-declare const screenTop: number;
 +interface WEBGL_color_buffer_float {
 +  readonly RGBA32F_EXT: 0x8814;
 +  readonly FRAMEBUFFER_ATTACHMENT_COMPONENT_TYPE_EXT: 0x8211;
@@ -67588,13 +67573,13 @@ index 9b1b7b6353ffe57c547508a6e9ada5463b83b636..e8e6b8687312e23c72d81232d5ae6618
 +}
 +
  /**
-- * The **`Window.self`** read-only property returns the window itself, as a WindowProxy.
+- * The **`Window.screenX`** read-only property returns the horizontal distance, in CSS pixels, of the left border of the user's browser viewport to the left side of the screen.
 + * The **`WEBGL_compressed_texture_astc`** extension is part of the WebGL API and exposes Adaptive Scalable Texture Compression (ASTC) compressed texture formats to WebGL.
   *
-- * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/self)
+- * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/screenX)
 + * [MDN Reference](https://developer.mozilla.org/docs/Web/API/WEBGL_compressed_texture_astc)
   */
--declare var self: Window & typeof globalThis;
+-declare const screenX: number;
 +interface WEBGL_compressed_texture_astc {
 +  /**
 +   * The **`WEBGL_compressed_texture_astc.getSupportedProfiles()`** method returns an array of strings containing the names of the ASTC profiles supported by the implementation.
@@ -67633,12 +67618,42 @@ index 9b1b7b6353ffe57c547508a6e9ada5463b83b636..e8e6b8687312e23c72d81232d5ae6618
 +}
 +
  /**
-- * The `speechSynthesis` read-only property of the Window object returns a SpeechSynthesis object, which is the entry point into using Web Speech API speech synthesis functionality.
+- * The **`Window.screenY`** read-only property returns the vertical distance, in CSS pixels, of the top border of the user's browser viewport to the top edge of the screen.
 + * The **`WEBGL_compressed_texture_etc`** extension is part of the WebGL API and exposes 10 ETC/EAC compressed texture formats.
   *
-- * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/speechSynthesis)
+- * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/screenY)
 + * [MDN Reference](https://developer.mozilla.org/docs/Web/API/WEBGL_compressed_texture_etc)
   */
+-declare const screenY: number;
+-/**
+- * The read-only **`scrollX`** property of the Window interface returns the number of pixels by which the document is currently scrolled horizontally.
+- *
+- * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/scrollX)
+- */
+-declare const scrollX: number;
+-/**
+- * The read-only **`scrollY`** property of the Window interface returns the number of pixels by which the document is currently scrolled vertically.
+- *
+- * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/scrollY)
+- */
+-declare const scrollY: number;
+-/**
+- * Returns the `scrollbars` object.
+- *
+- * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/scrollbars)
+- */
+-declare const scrollbars: BarProp;
+-/**
+- * The **`Window.self`** read-only property returns the window itself, as a WindowProxy.
+- *
+- * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/self)
+- */
+-declare var self: Window & typeof globalThis;
+-/**
+- * The `speechSynthesis` read-only property of the Window object returns a SpeechSynthesis object, which is the entry point into using Web Speech API speech synthesis functionality.
+- *
+- * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/speechSynthesis)
+- */
 -declare const speechSynthesis: SpeechSynthesis;
 -/**
 - * The **`status`** property of the bar at the bottom of the browser window.
@@ -68206,33 +68221,6 @@ index 9b1b7b6353ffe57c547508a6e9ada5463b83b636..e8e6b8687312e23c72d81232d5ae6618
 -declare const oncancel: ((this: Window, ev: Event) => unknown) | null;
 -/** [MDN Reference](https://developer.mozilla.org/docs/Web/API/HTMLMediaElement/canplay_event) */
 -declare const oncanplay: ((this: Window, ev: Event) => unknown) | null;
--/** [MDN Reference](https://developer.mozilla.org/docs/Web/API/HTMLMediaElement/canplaythrough_event) */
--declare const oncanplaythrough: ((this: Window, ev: Event) => unknown) | null;
--/** [MDN Reference](https://developer.mozilla.org/docs/Web/API/HTMLElement/change_event) */
--declare const onchange: ((this: Window, ev: Event) => unknown) | null;
--/** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Element/click_event) */
--declare const onclick: ((this: Window, ev: PointerEvent) => unknown) | null;
--/** [MDN Reference](https://developer.mozilla.org/docs/Web/API/HTMLDialogElement/close_event) */
--declare const onclose: ((this: Window, ev: Event) => unknown) | null;
--/** [MDN Reference](https://developer.mozilla.org/docs/Web/API/HTMLCanvasElement/contextlost_event) */
--declare const oncontextlost: ((this: Window, ev: Event) => unknown) | null;
--/** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Element/contextmenu_event) */
--declare const oncontextmenu:
--  | ((this: Window, ev: PointerEvent) => unknown)
--  | null;
--/** [MDN Reference](https://developer.mozilla.org/docs/Web/API/HTMLCanvasElement/contextrestored_event) */
--declare const oncontextrestored: ((this: Window, ev: Event) => unknown) | null;
--/** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Element/copy_event) */
--declare const oncopy: ((this: Window, ev: ClipboardEvent) => unknown) | null;
--/** [MDN Reference](https://developer.mozilla.org/docs/Web/API/HTMLTrackElement/cuechange_event) */
--declare const oncuechange: ((this: Window, ev: Event) => unknown) | null;
--/** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Element/cut_event) */
--declare const oncut: ((this: Window, ev: ClipboardEvent) => unknown) | null;
--/** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Element/dblclick_event) */
--declare const ondblclick: ((this: Window, ev: MouseEvent) => unknown) | null;
--/** [MDN Reference](https://developer.mozilla.org/docs/Web/API/HTMLElement/drag_event) */
--declare const ondrag: ((this: Window, ev: DragEvent) => unknown) | null;
--/** [MDN Reference](https://developer.mozilla.org/docs/Web/API/HTMLElement/dragend_event) */
 +interface WebGL2RenderingContext
 +  extends
 +    WebGL2RenderingContextBase,
@@ -72670,9 +72658,12 @@ index 9b1b7b6353ffe57c547508a6e9ada5463b83b636..e8e6b8687312e23c72d81232d5ae6618
 +   *
 +   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/XMLHttpRequest/open)
 +   */
-+  open(method: 'post' | 'get' | 'dialog', url: string | URL): void;
 +  open(
-+    method: 'post' | 'get' | 'dialog',
++    method: import('ts-type-forge').HTTPRequestMethod | (string & {}),
++    url: string | URL,
++  ): void;
++  open(
++    method: import('ts-type-forge').HTTPRequestMethod | (string & {}),
 +    url: string | URL,
 +    async: boolean,
 +    username?: string | null,
@@ -74623,39 +74614,19 @@ index 9b1b7b6353ffe57c547508a6e9ada5463b83b636..e8e6b8687312e23c72d81232d5ae6618
 +declare const oncancel: ((this: Window, ev: Event) => unknown) | null;
 +/** [MDN Reference](https://developer.mozilla.org/docs/Web/API/HTMLMediaElement/canplay_event) */
 +declare const oncanplay: ((this: Window, ev: Event) => unknown) | null;
-+/** [MDN Reference](https://developer.mozilla.org/docs/Web/API/HTMLMediaElement/canplaythrough_event) */
-+declare const oncanplaythrough: ((this: Window, ev: Event) => unknown) | null;
-+/** [MDN Reference](https://developer.mozilla.org/docs/Web/API/HTMLElement/change_event) */
-+declare const onchange: ((this: Window, ev: Event) => unknown) | null;
-+/** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Element/click_event) */
-+declare const onclick: ((this: Window, ev: PointerEvent) => unknown) | null;
-+/** [MDN Reference](https://developer.mozilla.org/docs/Web/API/HTMLDialogElement/close_event) */
-+declare const onclose: ((this: Window, ev: Event) => unknown) | null;
+ /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/HTMLMediaElement/canplaythrough_event) */
+ declare const oncanplaythrough: ((this: Window, ev: Event) => unknown) | null;
+ /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/HTMLElement/change_event) */
+@@ -45465,6 +50678,8 @@ declare const onchange: ((this: Window, ev: Event) => unknown) | null;
+ declare const onclick: ((this: Window, ev: PointerEvent) => unknown) | null;
+ /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/HTMLDialogElement/close_event) */
+ declare const onclose: ((this: Window, ev: Event) => unknown) | null;
 +/** [MDN Reference](https://developer.mozilla.org/docs/Web/API/HTMLElement/command_event) */
 +declare const oncommand: ((this: Window, ev: Event) => unknown) | null;
-+/** [MDN Reference](https://developer.mozilla.org/docs/Web/API/HTMLCanvasElement/contextlost_event) */
-+declare const oncontextlost: ((this: Window, ev: Event) => unknown) | null;
-+/** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Element/contextmenu_event) */
-+declare const oncontextmenu:
-+  | ((this: Window, ev: PointerEvent) => unknown)
-+  | null;
-+/** [MDN Reference](https://developer.mozilla.org/docs/Web/API/HTMLCanvasElement/contextrestored_event) */
-+declare const oncontextrestored: ((this: Window, ev: Event) => unknown) | null;
-+/** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Element/copy_event) */
-+declare const oncopy: ((this: Window, ev: ClipboardEvent) => unknown) | null;
-+/** [MDN Reference](https://developer.mozilla.org/docs/Web/API/HTMLTrackElement/cuechange_event) */
-+declare const oncuechange: ((this: Window, ev: Event) => unknown) | null;
-+/** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Element/cut_event) */
-+declare const oncut: ((this: Window, ev: ClipboardEvent) => unknown) | null;
-+/** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Element/dblclick_event) */
-+declare const ondblclick: ((this: Window, ev: MouseEvent) => unknown) | null;
-+/** [MDN Reference](https://developer.mozilla.org/docs/Web/API/HTMLElement/drag_event) */
-+declare const ondrag: ((this: Window, ev: DragEvent) => unknown) | null;
-+/** [MDN Reference](https://developer.mozilla.org/docs/Web/API/HTMLElement/dragend_event) */
- declare const ondragend: ((this: Window, ev: DragEvent) => unknown) | null;
- /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/HTMLElement/dragenter_event) */
- declare const ondragenter: ((this: Window, ev: DragEvent) => unknown) | null;
-@@ -45509,7 +50724,7 @@ declare const ongotpointercapture:
+ /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/HTMLCanvasElement/contextlost_event) */
+ declare const oncontextlost: ((this: Window, ev: Event) => unknown) | null;
+ /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Element/contextmenu_event) */
+@@ -45512,7 +50727,7 @@ declare const ongotpointercapture:
    | ((this: Window, ev: PointerEvent) => unknown)
    | null;
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Element/input_event) */
@@ -74664,7 +74635,7 @@ index 9b1b7b6353ffe57c547508a6e9ada5463b83b636..e8e6b8687312e23c72d81232d5ae6618
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/HTMLInputElement/invalid_event) */
  declare const oninvalid: ((this: Window, ev: Event) => unknown) | null;
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Element/keydown_event) */
-@@ -45763,7 +50978,7 @@ declare var onunhandledrejection:
+@@ -45766,7 +50981,7 @@ declare var onunhandledrejection:
    | ((this: Window, ev: PromiseRejectionEvent) => unknown)
    | null;
  /**
@@ -74673,7 +74644,7 @@ index 9b1b7b6353ffe57c547508a6e9ada5463b83b636..e8e6b8687312e23c72d81232d5ae6618
   *
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/unload_event)
   */
-@@ -45788,6 +51003,8 @@ declare var isSecureContext: boolean;
+@@ -45791,6 +51006,8 @@ declare var isSecureContext: boolean;
  declare var origin: string;
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/performance) */
  declare var performance: Performance;
@@ -74682,7 +74653,7 @@ index 9b1b7b6353ffe57c547508a6e9ada5463b83b636..e8e6b8687312e23c72d81232d5ae6618
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/atob) */
  declare function atob(data: string): string;
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/btoa) */
-@@ -45888,6 +51105,10 @@ type CanvasImageSource =
+@@ -45891,6 +51108,10 @@ type CanvasImageSource =
  type ClipboardItemData = Promise<string | Blob>;
  type ClipboardItems = readonly ClipboardItem[];
  type ConstrainBoolean = boolean | ConstrainBooleanParameters;
@@ -74693,7 +74664,7 @@ index 9b1b7b6353ffe57c547508a6e9ada5463b83b636..e8e6b8687312e23c72d81232d5ae6618
  type ConstrainDOMString =
    | string
    | readonly string[]
-@@ -45913,6 +51134,44 @@ type GLsizei = number;
+@@ -45916,6 +51137,44 @@ type GLsizei = number;
  type GLsizeiptr = number;
  type GLuint = number;
  type GLuint64 = number;
@@ -74738,7 +74709,7 @@ index 9b1b7b6353ffe57c547508a6e9ada5463b83b636..e8e6b8687312e23c72d81232d5ae6618
  type HTMLOrSVGImageElement = HTMLImageElement | SVGImageElement;
  type HTMLOrSVGScriptElement = HTMLScriptElement | SVGScriptElement;
  type HashAlgorithmIdentifier = AlgorithmIdentifier;
-@@ -45939,15 +51198,16 @@ type OffscreenRenderingContext =
+@@ -45942,15 +51201,16 @@ type OffscreenRenderingContext =
    | OffscreenCanvasRenderingContext2D
    | ImageBitmapRenderingContext
    | WebGLRenderingContext
@@ -74758,7 +74729,7 @@ index 9b1b7b6353ffe57c547508a6e9ada5463b83b636..e8e6b8687312e23c72d81232d5ae6618
  type ReadableStreamController<T> =
    | ReadableStreamDefaultController<T>
    | ReadableByteStreamController;
-@@ -45961,9 +51221,16 @@ type RenderingContext =
+@@ -45964,9 +51224,16 @@ type RenderingContext =
    | CanvasRenderingContext2D
    | ImageBitmapRenderingContext
    | WebGLRenderingContext
@@ -74776,7 +74747,7 @@ index 9b1b7b6353ffe57c547508a6e9ada5463b83b636..e8e6b8687312e23c72d81232d5ae6618
  type TexImageSource =
    | ImageBitmap
    | ImageData
-@@ -45985,6 +51252,7 @@ type Transferable =
+@@ -45988,6 +51255,7 @@ type Transferable =
    | VideoFrame
    | RTCDataChannel
    | ArrayBuffer;
@@ -74784,7 +74755,7 @@ index 9b1b7b6353ffe57c547508a6e9ada5463b83b636..e8e6b8687312e23c72d81232d5ae6618
  type Uint32List = Uint32Array<ArrayBufferLike> | readonly GLuint[];
  type VibratePattern = number | readonly number[];
  type WindowProxy = Window;
-@@ -45994,6 +51262,7 @@ type XMLHttpRequestBodyInit =
+@@ -45997,6 +51265,7 @@ type XMLHttpRequestBodyInit =
    | FormData
    | URLSearchParams
    | string;
@@ -74792,7 +74763,7 @@ index 9b1b7b6353ffe57c547508a6e9ada5463b83b636..e8e6b8687312e23c72d81232d5ae6618
  type AlignSetting = 'center' | 'end' | 'left' | 'right' | 'start';
  type AlphaOption = 'discard' | 'keep';
  type AnimationPlayState = 'finished' | 'idle' | 'paused' | 'running';
-@@ -46172,6 +51441,252 @@ type FontDisplay = 'auto' | 'block' | 'fallback' | 'optional' | 'swap';
+@@ -46175,6 +51444,252 @@ type FontDisplay = 'auto' | 'block' | 'fallback' | 'optional' | 'swap';
  type FontFaceLoadStatus = 'error' | 'loaded' | 'loading' | 'unloaded';
  type FontFaceSetLoadStatus = 'loaded' | 'loading';
  type FullscreenNavigationUI = 'auto' | 'hide' | 'show';
@@ -75045,7 +75016,7 @@ index 9b1b7b6353ffe57c547508a6e9ada5463b83b636..e8e6b8687312e23c72d81232d5ae6618
  type GamepadHapticEffectType = 'dual-rumble' | 'trigger-rumble';
  type GamepadHapticsResult = 'complete' | 'preempted';
  type GamepadMappingType = '' | 'standard' | 'xr-standard';
-@@ -46212,6 +51727,7 @@ type IDBCursorDirection = 'next' | 'nextunique' | 'prev' | 'prevunique';
+@@ -46215,6 +51730,7 @@ type IDBCursorDirection = 'next' | 'nextunique' | 'prev' | 'prevunique';
  type IDBRequestReadyState = 'done' | 'pending';
  type IDBTransactionDurability = 'default' | 'relaxed' | 'strict';
  type IDBTransactionMode = 'readonly' | 'readwrite' | 'versionchange';
@@ -75053,7 +75024,7 @@ index 9b1b7b6353ffe57c547508a6e9ada5463b83b636..e8e6b8687312e23c72d81232d5ae6618
  type ImageOrientation = 'flipY' | 'from-image' | 'none';
  type ImageSmoothingQuality = 'high' | 'low' | 'medium';
  type InsertPosition = 'afterbegin' | 'afterend' | 'beforebegin' | 'beforeend';
-@@ -46271,11 +51787,10 @@ type MediaSessionAction =
+@@ -46274,11 +51790,10 @@ type MediaSessionAction =
    | 'stop';
  type MediaSessionPlaybackState = 'none' | 'paused' | 'playing';
  type MediaStreamTrackState = 'ended' | 'live';
@@ -75069,7 +75040,7 @@ index 9b1b7b6353ffe57c547508a6e9ada5463b83b636..e8e6b8687312e23c72d81232d5ae6618
  type NavigationType = 'push' | 'reload' | 'replace' | 'traverse';
  type NotificationDirection = 'auto' | 'ltr' | 'rtl';
  type NotificationPermission = 'default' | 'denied' | 'granted';
-@@ -46286,6 +51801,15 @@ type OffscreenRenderingContextId =
+@@ -46289,6 +51804,15 @@ type OffscreenRenderingContextId =
    | 'webgl2'
    | 'webgpu';
  type OpusBitstreamFormat = 'ogg' | 'opus';
@@ -75085,7 +75056,7 @@ index 9b1b7b6353ffe57c547508a6e9ada5463b83b636..e8e6b8687312e23c72d81232d5ae6618
  type OrientationType =
    | 'landscape-primary'
    | 'landscape-secondary'
-@@ -46331,7 +51855,6 @@ type RTCDtlsTransportState =
+@@ -46334,7 +51858,6 @@ type RTCDtlsTransportState =
    | 'connecting'
    | 'failed'
    | 'new';
@@ -75093,7 +75064,7 @@ index 9b1b7b6353ffe57c547508a6e9ada5463b83b636..e8e6b8687312e23c72d81232d5ae6618
  type RTCErrorDetailType =
    | 'data-channel-failure'
    | 'dtls-failure'
-@@ -46393,7 +51916,6 @@ type RTCStatsIceCandidatePairState =
+@@ -46396,7 +51919,6 @@ type RTCStatsIceCandidatePairState =
    | 'failed'
    | 'frozen'
    | 'in-progress'
@@ -75101,7 +75072,7 @@ index 9b1b7b6353ffe57c547508a6e9ada5463b83b636..e8e6b8687312e23c72d81232d5ae6618
    | 'succeeded'
    | 'waiting';
  type RTCStatsType =
-@@ -46472,6 +51994,8 @@ type ResponseType =
+@@ -46475,6 +51997,8 @@ type ResponseType =
    | 'error'
    | 'opaque'
    | 'opaqueredirect';
@@ -75110,7 +75081,7 @@ index 9b1b7b6353ffe57c547508a6e9ada5463b83b636..e8e6b8687312e23c72d81232d5ae6618
  type ScrollBehavior = 'auto' | 'instant' | 'smooth';
  type ScrollLogicalPosition = 'center' | 'end' | 'nearest' | 'start';
  type ScrollRestoration = 'auto' | 'manual';
-@@ -46488,6 +52012,15 @@ type ServiceWorkerState =
+@@ -46491,6 +52015,15 @@ type ServiceWorkerState =
  type ServiceWorkerUpdateViaCache = 'all' | 'imports' | 'none';
  type ShadowRootMode = 'closed' | 'open';
  type SlotAssignmentMode = 'manual' | 'named';
@@ -75126,7 +75097,7 @@ index 9b1b7b6353ffe57c547508a6e9ada5463b83b636..e8e6b8687312e23c72d81232d5ae6618
  type SpeechSynthesisErrorCode =
    | 'audio-busy'
    | 'audio-hardware'
-@@ -46501,6 +52034,7 @@ type SpeechSynthesisErrorCode =
+@@ -46504,6 +52037,7 @@ type SpeechSynthesisErrorCode =
    | 'synthesis-unavailable'
    | 'text-too-long'
    | 'voice-unavailable';
@@ -75134,7 +75105,7 @@ index 9b1b7b6353ffe57c547508a6e9ada5463b83b636..e8e6b8687312e23c72d81232d5ae6618
  type TextTrackKind =
    | 'captions'
    | 'chapters'
-@@ -46539,3 +52073,1012 @@ type XMLHttpRequestResponseType =
+@@ -46542,3 +52076,1012 @@ type XMLHttpRequestResponseType =
    | 'document'
    | 'json'
    | 'text';

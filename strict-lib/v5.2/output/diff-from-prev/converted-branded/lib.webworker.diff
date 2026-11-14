@@ -1,5 +1,5 @@
 diff --git a/v5.1/output/lib-files-branded/lib.webworker.d.ts b/v5.2/output/lib-files-branded/lib.webworker.d.ts
-index e91c5f3dc8f9f02f3f9f8c53ad665f2f6f82496d..699fb266fd13361c13327c68623ff1abed126302 100644
+index 548cb34028068f9dcdf9a92bbd3ce72d0b792a85..6c9e898a4c351342066fbe33d840916df59c6fd4 100644
 --- a/v5.1/output/lib-files-branded/lib.webworker.d.ts
 +++ b/v5.2/output/lib-files-branded/lib.webworker.d.ts
 @@ -459,7 +459,7 @@ interface NotificationOptions {
@@ -379,7 +379,7 @@ index e91c5f3dc8f9f02f3f9f8c53ad665f2f6f82496d..699fb266fd13361c13327c68623ff1ab
  /**
   * This ServiceWorker API interface represents the scope of a service worker client that is a document in a browser context, controlled by an active worker. The service worker client independently selects and uses a service worker for its own loading and sub-resources.
   *
-@@ -10776,16 +10912,19 @@ declare namespace WebAssembly {
+@@ -10779,16 +10915,19 @@ declare namespace WebAssembly {
    };
  
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/WebAssembly/Global) */
@@ -403,7 +403,7 @@ index e91c5f3dc8f9f02f3f9f8c53ad665f2f6f82496d..699fb266fd13361c13327c68623ff1ab
    };
  
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/WebAssembly/Instance) */
-@@ -10862,9 +11001,9 @@ declare namespace WebAssembly {
+@@ -10865,9 +11004,9 @@ declare namespace WebAssembly {
      new (descriptor: TableDescriptor, value?: unknown): Table;
    };
  
@@ -415,7 +415,7 @@ index e91c5f3dc8f9f02f3f9f8c53ad665f2f6f82496d..699fb266fd13361c13327c68623ff1ab
    }
  
    interface MemoryDescriptor {
-@@ -10890,6 +11029,16 @@ declare namespace WebAssembly {
+@@ -10893,6 +11032,16 @@ declare namespace WebAssembly {
      maximum?: number;
    }
  
@@ -432,7 +432,7 @@ index e91c5f3dc8f9f02f3f9f8c53ad665f2f6f82496d..699fb266fd13361c13327c68623ff1ab
    interface WebAssemblyInstantiatedSource {
      instance: Instance;
      module: Module;
-@@ -10897,19 +11046,12 @@ declare namespace WebAssembly {
+@@ -10900,19 +11049,12 @@ declare namespace WebAssembly {
  
    type ImportExportKind = 'function' | 'global' | 'memory' | 'table';
    type TableKind = 'anyfunc' | 'externref';
@@ -453,7 +453,7 @@ index e91c5f3dc8f9f02f3f9f8c53ad665f2f6f82496d..699fb266fd13361c13327c68623ff1ab
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/WebAssembly/compile) */
    function compile(bytes: BufferSource): Promise<Module>;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/WebAssembly/compileStreaming) */
-@@ -11217,6 +11359,7 @@ declare function removeEventListener(
+@@ -11220,6 +11362,7 @@ declare function removeEventListener(
    options?: boolean | EventListenerOptions,
  ): void;
  type AlgorithmIdentifier = Algorithm | string;
@@ -461,7 +461,7 @@ index e91c5f3dc8f9f02f3f9f8c53ad665f2f6f82496d..699fb266fd13361c13327c68623ff1ab
  type BigInteger = Uint8Array;
  type BinaryData = ArrayBuffer | ArrayBufferView;
  type BlobPart = BufferSource | Blob | string;
-@@ -11515,6 +11658,8 @@ type VideoPixelFormat =
+@@ -11518,6 +11661,8 @@ type VideoPixelFormat =
    | 'RGBX';
  type VideoTransferCharacteristics = 'bt709' | 'iec61966-2-1' | 'smpte170m';
  type WebGLPowerPreference = 'default' | 'high-performance' | 'low-power';

@@ -1,5 +1,5 @@
 diff --git a/v5.5/output/lib-files-branded/lib.dom.d.ts b/v5.6/output/lib-files-branded/lib.dom.d.ts
-index 8dbd784da7c35f03fb09ca37cd3edcda1a44f45b..19b0d9295607a3c74bb749995bd35fc6cd6449c1 100644
+index b3d912feeb0861304dff7cb05bd18f8e8dbcd05d..46b2b0cfcf5805ea004a4b887b404440f6f34701 100644
 --- a/v5.5/output/lib-files-branded/lib.dom.d.ts
 +++ b/v5.6/output/lib-files-branded/lib.dom.d.ts
 @@ -602,6 +602,11 @@ interface GetAnimationsOptions {
@@ -2891,7 +2891,7 @@ index 8dbd784da7c35f03fb09ca37cd3edcda1a44f45b..19b0d9295607a3c74bb749995bd35fc6
    btoa(data: string): string;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/clearInterval) */
    clearInterval(id: number | undefined): void;
-@@ -33168,7 +32658,7 @@ interface Console {
+@@ -33171,7 +32661,7 @@ interface Console {
    clear(): void;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/count_static) */
    count(label?: string): void;
@@ -2900,7 +2900,7 @@ index 8dbd784da7c35f03fb09ca37cd3edcda1a44f45b..19b0d9295607a3c74bb749995bd35fc6
    countReset(label?: string): void;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/debug_static) */
    debug(...data: readonly unknown[]): void;
-@@ -33180,9 +32670,9 @@ interface Console {
+@@ -33183,9 +32673,9 @@ interface Console {
    error(...data: readonly unknown[]): void;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/group_static) */
    group(...data: readonly unknown[]): void;
@@ -2912,7 +2912,7 @@ index 8dbd784da7c35f03fb09ca37cd3edcda1a44f45b..19b0d9295607a3c74bb749995bd35fc6
    groupEnd(): void;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/info_static) */
    info(...data: readonly unknown[]): void;
-@@ -33192,9 +32682,9 @@ interface Console {
+@@ -33195,9 +32685,9 @@ interface Console {
    table(tabularData?: unknown, properties?: readonly string[]): void;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/time_static) */
    time(label?: string): void;
@@ -2924,7 +2924,7 @@ index 8dbd784da7c35f03fb09ca37cd3edcda1a44f45b..19b0d9295607a3c74bb749995bd35fc6
    timeLog(label?: string, ...data: readonly unknown[]): void;
    timeStamp(label?: string): void;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/trace_static) */
-@@ -33345,9 +32835,7 @@ declare namespace WebAssembly {
+@@ -33348,9 +32838,7 @@ declare namespace WebAssembly {
  
    /** [MDN Reference](https://developer.mozilla.org/docs/WebAssembly/JavaScript_interface/Global) */
    interface Global<T extends ValueType = ValueType> {
@@ -2934,7 +2934,7 @@ index 8dbd784da7c35f03fb09ca37cd3edcda1a44f45b..19b0d9295607a3c74bb749995bd35fc6
      valueOf(): ValueTypeMap[T];
    }
  
-@@ -33675,6 +33163,10 @@ interface UnderlyingSourceStartCallback<R> {
+@@ -33678,6 +33166,10 @@ interface UnderlyingSourceStartCallback<R> {
    (controller: ReadableStreamController<R>): unknown;
  }
  
@@ -2945,7 +2945,7 @@ index 8dbd784da7c35f03fb09ca37cd3edcda1a44f45b..19b0d9295607a3c74bb749995bd35fc6
  interface VideoFrameOutputCallback {
    (output: VideoFrame): void;
  }
-@@ -34293,7 +33785,7 @@ declare const onbeforetoggle: ((this: Window, ev: Event) => unknown) | null;
+@@ -34296,7 +33788,7 @@ declare const onbeforetoggle: ((this: Window, ev: Event) => unknown) | null;
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Element/blur_event)
   */
  declare const onblur: ((this: Window, ev: FocusEvent) => unknown) | null;
@@ -2954,7 +2954,7 @@ index 8dbd784da7c35f03fb09ca37cd3edcda1a44f45b..19b0d9295607a3c74bb749995bd35fc6
  declare const oncancel: ((this: Window, ev: Event) => unknown) | null;
  /**
   * Occurs when playback is possible, but would require further buffering.
-@@ -34320,6 +33812,8 @@ declare const onchange: ((this: Window, ev: Event) => unknown) | null;
+@@ -34323,6 +33815,8 @@ declare const onchange: ((this: Window, ev: Event) => unknown) | null;
  declare const onclick: ((this: Window, ev: MouseEvent) => unknown) | null;
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/HTMLDialogElement/close_event) */
  declare const onclose: ((this: Window, ev: Event) => unknown) | null;
@@ -2963,7 +2963,7 @@ index 8dbd784da7c35f03fb09ca37cd3edcda1a44f45b..19b0d9295607a3c74bb749995bd35fc6
  /**
   * Fires when the user clicks the right mouse button in the client area, opening the context menu.
   * @param ev The mouse event.
-@@ -34327,6 +33821,8 @@ declare const onclose: ((this: Window, ev: Event) => unknown) | null;
+@@ -34330,6 +33824,8 @@ declare const onclose: ((this: Window, ev: Event) => unknown) | null;
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Element/contextmenu_event)
   */
  declare const oncontextmenu: ((this: Window, ev: MouseEvent) => unknown) | null;
@@ -2972,7 +2972,7 @@ index 8dbd784da7c35f03fb09ca37cd3edcda1a44f45b..19b0d9295607a3c74bb749995bd35fc6
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Element/copy_event) */
  declare const oncopy: ((this: Window, ev: ClipboardEvent) => unknown) | null;
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/HTMLTrackElement/cuechange_event) */
-@@ -34479,7 +33975,7 @@ declare const onloadedmetadata: ((this: Window, ev: Event) => unknown) | null;
+@@ -34482,7 +33978,7 @@ declare const onloadedmetadata: ((this: Window, ev: Event) => unknown) | null;
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/HTMLMediaElement/loadstart_event)
   */
  declare const onloadstart: ((this: Window, ev: Event) => unknown) | null;
@@ -2981,7 +2981,7 @@ index 8dbd784da7c35f03fb09ca37cd3edcda1a44f45b..19b0d9295607a3c74bb749995bd35fc6
  declare const onlostpointercapture:
    | ((this: Window, ev: PointerEvent) => unknown)
    | null;
-@@ -34810,24 +34306,24 @@ declare const localStorage: Storage;
+@@ -34813,24 +34309,24 @@ declare const localStorage: Storage;
  /**
   * Available only in secure contexts.
   *
@@ -3015,7 +3015,7 @@ index 8dbd784da7c35f03fb09ca37cd3edcda1a44f45b..19b0d9295607a3c74bb749995bd35fc6
  declare function btoa(data: string): string;
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/clearInterval) */
  declare function clearInterval(id: number | undefined): void;
-@@ -35007,6 +34503,7 @@ type Transferable =
+@@ -35010,6 +34506,7 @@ type Transferable =
    | OffscreenCanvas
    | ImageBitmap
    | MessagePort

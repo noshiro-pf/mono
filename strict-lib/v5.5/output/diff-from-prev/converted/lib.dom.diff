@@ -1,5 +1,5 @@
 diff --git a/v5.4/output/lib-files/lib.dom.d.ts b/v5.5/output/lib-files/lib.dom.d.ts
-index 56c49c140d9cd2459fe531379fa39660154fb94c..63f4b615ea7026ad1d153334d9fb0d8cfd86a610 100644
+index ef4452dff8c4af162042ae68e9bce6c31423c2ed..d9d4a3b919f5dac45b494481422ad1089553521d 100644
 --- a/v5.4/output/lib-files/lib.dom.d.ts
 +++ b/v5.5/output/lib-files/lib.dom.d.ts
 @@ -225,6 +225,9 @@ interface ChannelSplitterOptions extends AudioNodeOptions {
@@ -611,7 +611,7 @@ index 56c49c140d9cd2459fe531379fa39660154fb94c..63f4b615ea7026ad1d153334d9fb0d8c
    blur(): void;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/cancelIdleCallback) */
    cancelIdleCallback(handle: number): void;
-@@ -33954,7 +34136,11 @@ declare const visualViewport: VisualViewport | null;
+@@ -33957,7 +34139,11 @@ declare const visualViewport: VisualViewport | null;
  declare const window: Window & typeof globalThis;
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/alert) */
  declare function alert(message?: unknown): void;
@@ -624,7 +624,7 @@ index 56c49c140d9cd2459fe531379fa39660154fb94c..63f4b615ea7026ad1d153334d9fb0d8c
  declare function blur(): void;
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/cancelIdleCallback) */
  declare function cancelIdleCallback(handle: number): void;
-@@ -34993,8 +35179,7 @@ type FontDisplay = 'auto' | 'block' | 'fallback' | 'optional' | 'swap';
+@@ -34996,8 +35182,7 @@ type FontDisplay = 'auto' | 'block' | 'fallback' | 'optional' | 'swap';
  type FontFaceLoadStatus = 'error' | 'loaded' | 'loading' | 'unloaded';
  type FontFaceSetLoadStatus = 'loaded' | 'loading';
  type FullscreenNavigationUI = 'auto' | 'hide' | 'show';

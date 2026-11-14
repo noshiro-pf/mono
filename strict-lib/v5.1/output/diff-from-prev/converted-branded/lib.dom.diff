@@ -1,5 +1,5 @@
 diff --git a/v5.0/output/lib-files-branded/lib.dom.d.ts b/v5.1/output/lib-files-branded/lib.dom.d.ts
-index ce2fe2049a21e9778e9221fd0ab91a91e002ca9f..530f1d413294bab74295b88dbf9b4f66a8421e93 100644
+index eaeabd54dc1ffc0f3f26fb1ef56bf71d14701a4a..319b65e59b629b8c6eb5aadb2850b8d62e00cb00 100644
 --- a/v5.0/output/lib-files-branded/lib.dom.d.ts
 +++ b/v5.1/output/lib-files-branded/lib.dom.d.ts
 @@ -157,6 +157,10 @@ interface AuthenticatorSelectionCriteria {
@@ -16139,7 +16139,7 @@ index ce2fe2049a21e9778e9221fd0ab91a91e002ca9f..530f1d413294bab74295b88dbf9b4f66
 +   *
 +   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Request/method)
 +   */
-   readonly method: import('ts-type-forge').HTTPRequestMethod;
+   readonly method: string;
 -  /** Returns the mode associated with request, which is a string indicating whether the request will use CORS, or will be restricted to same-origin URLs. */
 +  /**
 +   * Returns the mode associated with request, which is a string indicating whether the request will use CORS, or will be restricted to same-origin URLs.
@@ -21718,9 +21718,9 @@ index ce2fe2049a21e9778e9221fd0ab91a91e002ca9f..530f1d413294bab74295b88dbf9b4f66
 +   *
 +   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/XMLHttpRequest/open)
     */
-   open(method: 'post' | 'get' | 'dialog', url: string | URL): void;
    open(
-@@ -23460,12 +32276,16 @@ interface XMLHttpRequest extends XMLHttpRequestEventTarget {
+     method: import('ts-type-forge').HTTPRequestMethod | (string & {}),
+@@ -23463,12 +32279,16 @@ interface XMLHttpRequest extends XMLHttpRequestEventTarget {
     * Acts as if the `Content-Type` header value for a response is mime. (It does not change the header.)
     *
     * Throws an "InvalidStateError" DOMException if state is loading or done.
@@ -21737,7 +21737,7 @@ index ce2fe2049a21e9778e9221fd0ab91a91e002ca9f..530f1d413294bab74295b88dbf9b4f66
     */
    send(body?: Document | XMLHttpRequestBodyInit | null): void;
    /**
-@@ -23474,6 +32294,8 @@ interface XMLHttpRequest extends XMLHttpRequestEventTarget {
+@@ -23477,6 +32297,8 @@ interface XMLHttpRequest extends XMLHttpRequestEventTarget {
     * Throws an "InvalidStateError" DOMException if either state is not opened or the send() flag is set.
     *
     * Throws a "SyntaxError" DOMException if name is not a header name or if value is not a header value.
@@ -21746,7 +21746,7 @@ index ce2fe2049a21e9778e9221fd0ab91a91e002ca9f..530f1d413294bab74295b88dbf9b4f66
     */
    setRequestHeader(name: string, value: string): void;
    readonly UNSENT: 0;
-@@ -23523,6 +32345,7 @@ interface XMLHttpRequestEventTargetEventMap {
+@@ -23526,6 +32348,7 @@ interface XMLHttpRequestEventTargetEventMap {
    timeout: ProgressEvent<XMLHttpRequestEventTarget>;
  }
  
@@ -21754,7 +21754,7 @@ index ce2fe2049a21e9778e9221fd0ab91a91e002ca9f..530f1d413294bab74295b88dbf9b4f66
  interface XMLHttpRequestEventTarget extends EventTarget {
    onabort: ((this: XMLHttpRequest, ev: ProgressEvent) => unknown) | null;
    onerror: ((this: XMLHttpRequest, ev: ProgressEvent) => unknown) | null;
-@@ -23564,6 +32387,7 @@ declare var XMLHttpRequestEventTarget: {
+@@ -23567,6 +32390,7 @@ declare var XMLHttpRequestEventTarget: {
    new (): XMLHttpRequestEventTarget;
  };
  
@@ -21762,7 +21762,7 @@ index ce2fe2049a21e9778e9221fd0ab91a91e002ca9f..530f1d413294bab74295b88dbf9b4f66
  interface XMLHttpRequestUpload extends XMLHttpRequestEventTarget {
    addEventListener<K extends keyof XMLHttpRequestEventTargetEventMap>(
      type: K,
-@@ -23598,8 +32422,13 @@ declare var XMLHttpRequestUpload: {
+@@ -23601,8 +32425,13 @@ declare var XMLHttpRequestUpload: {
    new (): XMLHttpRequestUpload;
  };
  
@@ -21777,7 +21777,7 @@ index ce2fe2049a21e9778e9221fd0ab91a91e002ca9f..530f1d413294bab74295b88dbf9b4f66
    serializeToString(root: Node): string;
  }
  
-@@ -23608,7 +32437,11 @@ declare const XMLSerializer: {
+@@ -23611,7 +32440,11 @@ declare const XMLSerializer: {
    new (): XMLSerializer;
  };
  
@@ -21790,7 +21790,7 @@ index ce2fe2049a21e9778e9221fd0ab91a91e002ca9f..530f1d413294bab74295b88dbf9b4f66
  interface XPathEvaluator extends XPathEvaluatorBase {}
  
  declare const XPathEvaluator: {
-@@ -23617,11 +32450,14 @@ declare const XPathEvaluator: {
+@@ -23620,11 +32453,14 @@ declare const XPathEvaluator: {
  };
  
  interface XPathEvaluatorBase {
@@ -21806,7 +21806,7 @@ index ce2fe2049a21e9778e9221fd0ab91a91e002ca9f..530f1d413294bab74295b88dbf9b4f66
    evaluate(
      expression: string,
      contextNode: Node,
-@@ -23631,8 +32467,13 @@ interface XPathEvaluatorBase {
+@@ -23634,8 +32470,13 @@ interface XPathEvaluatorBase {
    ): XPathResult;
  }
  
@@ -21821,7 +21821,7 @@ index ce2fe2049a21e9778e9221fd0ab91a91e002ca9f..530f1d413294bab74295b88dbf9b4f66
    evaluate(
      contextNode: Node,
      type?: number,
-@@ -23645,16 +32486,29 @@ declare const XPathExpression: {
+@@ -23648,16 +32489,29 @@ declare const XPathExpression: {
    new (): XPathExpression;
  };
  
@@ -21852,7 +21852,7 @@ index ce2fe2049a21e9778e9221fd0ab91a91e002ca9f..530f1d413294bab74295b88dbf9b4f66
    snapshotItem(index: number): Node | null;
    readonly ANY_TYPE: 0;
    readonly NUMBER_TYPE: 1;
-@@ -23683,19 +32537,31 @@ declare const XPathResult: {
+@@ -23686,19 +32540,31 @@ declare const XPathResult: {
    readonly FIRST_ORDERED_NODE_TYPE: 9;
  };
  
@@ -21885,7 +21885,7 @@ index ce2fe2049a21e9778e9221fd0ab91a91e002ca9f..530f1d413294bab74295b88dbf9b4f66
    transformToFragment(source: Node, output: Document): DocumentFragment;
  }
  
-@@ -23704,26 +32570,46 @@ declare const XSLTProcessor: {
+@@ -23707,26 +32573,46 @@ declare const XSLTProcessor: {
    new (): XSLTProcessor;
  };
  
@@ -21932,7 +21932,7 @@ index ce2fe2049a21e9778e9221fd0ab91a91e002ca9f..530f1d413294bab74295b88dbf9b4f66
    warn(...data: readonly unknown[]): void;
  }
  
-@@ -23731,9 +32617,97 @@ declare var console: Console;
+@@ -23734,9 +32620,97 @@ declare var console: Console;
  
  /** Holds useful CSS-related methods. No object with this interface are implemented: it contains only static methods and therefore is a utilitarian interface. */
  declare namespace CSS {
@@ -22030,7 +22030,7 @@ index ce2fe2049a21e9778e9221fd0ab91a91e002ca9f..530f1d413294bab74295b88dbf9b4f66
  }
  
  declare namespace WebAssembly {
-@@ -23745,8 +32719,11 @@ declare namespace WebAssembly {
+@@ -23748,8 +32722,11 @@ declare namespace WebAssembly {
      (message?: string): CompileError;
    };
  
@@ -22042,7 +22042,7 @@ index ce2fe2049a21e9778e9221fd0ab91a91e002ca9f..530f1d413294bab74295b88dbf9b4f66
      valueOf(): unknown;
    }
  
-@@ -23755,7 +32732,9 @@ declare namespace WebAssembly {
+@@ -23758,7 +32735,9 @@ declare namespace WebAssembly {
      new (descriptor: GlobalDescriptor, v?: unknown): Global;
    };
  
@@ -22052,7 +22052,7 @@ index ce2fe2049a21e9778e9221fd0ab91a91e002ca9f..530f1d413294bab74295b88dbf9b4f66
      readonly exports: Exports;
    }
  
-@@ -23772,8 +32751,11 @@ declare namespace WebAssembly {
+@@ -23775,8 +32754,11 @@ declare namespace WebAssembly {
      (message?: string): LinkError;
    };
  
@@ -22064,7 +22064,7 @@ index ce2fe2049a21e9778e9221fd0ab91a91e002ca9f..530f1d413294bab74295b88dbf9b4f66
      grow(delta: number): number;
    }
  
-@@ -23782,16 +32764,20 @@ declare namespace WebAssembly {
+@@ -23785,16 +32767,20 @@ declare namespace WebAssembly {
      new (descriptor: MemoryDescriptor): Memory;
    };
  
@@ -22085,7 +22085,7 @@ index ce2fe2049a21e9778e9221fd0ab91a91e002ca9f..530f1d413294bab74295b88dbf9b4f66
      imports(moduleObject: Module): readonly ModuleImportDescriptor[];
    };
  
-@@ -23803,10 +32789,15 @@ declare namespace WebAssembly {
+@@ -23806,10 +32792,15 @@ declare namespace WebAssembly {
      (message?: string): RuntimeError;
    };
  
@@ -22101,7 +22101,7 @@ index ce2fe2049a21e9778e9221fd0ab91a91e002ca9f..530f1d413294bab74295b88dbf9b4f66
      set(index: number, value?: unknown): void;
    }
  
-@@ -23863,10 +32854,13 @@ declare namespace WebAssembly {
+@@ -23866,10 +32857,13 @@ declare namespace WebAssembly {
    type ImportValue = ExportValue | number;
    type Imports = Record<string, ModuleImports>;
    type ModuleImports = Record<string, ImportValue>;
@@ -22115,7 +22115,7 @@ index ce2fe2049a21e9778e9221fd0ab91a91e002ca9f..530f1d413294bab74295b88dbf9b4f66
    function instantiate(
      bytes: BufferSource,
      importObject?: Imports,
-@@ -23875,10 +32869,12 @@ declare namespace WebAssembly {
+@@ -23878,10 +32872,12 @@ declare namespace WebAssembly {
      moduleObject: Module,
      importObject?: Imports,
    ): Promise<Instance>;
@@ -22128,7 +22128,7 @@ index ce2fe2049a21e9778e9221fd0ab91a91e002ca9f..530f1d413294bab74295b88dbf9b4f66
    function validate(bytes: BufferSource): boolean;
  }
  
-@@ -23898,6 +32894,10 @@ interface DecodeSuccessCallback {
+@@ -23901,6 +32897,10 @@ interface DecodeSuccessCallback {
    (decodedData: AudioBuffer): void;
  }
  
@@ -22139,7 +22139,7 @@ index ce2fe2049a21e9778e9221fd0ab91a91e002ca9f..530f1d413294bab74295b88dbf9b4f66
  interface ErrorCallback {
    (err: DOMException): void;
  }
-@@ -23991,6 +32991,10 @@ interface RemotePlaybackAvailabilityCallback {
+@@ -23994,6 +32994,10 @@ interface RemotePlaybackAvailabilityCallback {
    (available: boolean): void;
  }
  
@@ -22150,7 +22150,7 @@ index ce2fe2049a21e9778e9221fd0ab91a91e002ca9f..530f1d413294bab74295b88dbf9b4f66
  interface ResizeObserverCallback {
    (entries: readonly ResizeObserverEntry[], observer: ResizeObserver): void;
  }
-@@ -24041,6 +33045,10 @@ interface UnderlyingSourceStartCallback<R> {
+@@ -24044,6 +33048,10 @@ interface UnderlyingSourceStartCallback<R> {
    (controller: ReadableStreamController<R>): unknown;
  }
  
@@ -22161,7 +22161,7 @@ index ce2fe2049a21e9778e9221fd0ab91a91e002ca9f..530f1d413294bab74295b88dbf9b4f66
  interface VideoFrameRequestCallback {
    (now: DOMHighResTimeStamp, metadata: VideoFrameCallbackMetadata): void;
  }
-@@ -24049,6 +33057,10 @@ interface VoidFunction {
+@@ -24052,6 +33060,10 @@ interface VoidFunction {
    (): void;
  }
  
@@ -22172,7 +22172,7 @@ index ce2fe2049a21e9778e9221fd0ab91a91e002ca9f..530f1d413294bab74295b88dbf9b4f66
  interface HTMLElementTagNameMap {
    a: HTMLAnchorElement;
    abbr: HTMLElement;
-@@ -24133,6 +33145,7 @@ interface HTMLElementTagNameMap {
+@@ -24136,6 +33148,7 @@ interface HTMLElementTagNameMap {
    s: HTMLElement;
    samp: HTMLElement;
    script: HTMLScriptElement;
@@ -22180,7 +22180,7 @@ index ce2fe2049a21e9778e9221fd0ab91a91e002ca9f..530f1d413294bab74295b88dbf9b4f66
    section: HTMLElement;
    select: HTMLSelectElement;
    slot: HTMLSlotElement;
-@@ -24315,99 +33328,221 @@ declare const Option: {
+@@ -24318,99 +33331,221 @@ declare const Option: {
      selected?: boolean,
    ): HTMLOptionElement;
  };
@@ -22423,7 +22423,7 @@ index ce2fe2049a21e9778e9221fd0ab91a91e002ca9f..530f1d413294bab74295b88dbf9b4f66
  declare function open(
    url?: string | URL,
    target?: string,
-@@ -24423,6 +33558,8 @@ declare function open(
+@@ -24426,6 +33561,8 @@ declare function open(
   * If the origin of the target window doesn't match the given target origin, the message is discarded, to avoid information leakage. To send the message to the target regardless of origin, set the target origin to "*".
   *
   * Throws a "DataCloneError" DOMException if transfer array contains duplicate objects or if message could not be cloned.
@@ -22432,7 +22432,7 @@ index ce2fe2049a21e9778e9221fd0ab91a91e002ca9f..530f1d413294bab74295b88dbf9b4f66
   */
  declare function postMessage(
    message: unknown,
-@@ -24433,413 +33570,618 @@ declare function postMessage(
+@@ -24436,413 +33573,618 @@ declare function postMessage(
    message: unknown,
    options?: WindowPostMessageOptions,
  ): void;
@@ -23059,7 +23059,7 @@ index ce2fe2049a21e9778e9221fd0ab91a91e002ca9f..530f1d413294bab74295b88dbf9b4f66
  declare function createImageBitmap(
    image: ImageBitmapSource,
    options?: ImageBitmapOptions,
-@@ -24852,26 +34194,33 @@ declare function createImageBitmap(
+@@ -24855,26 +34197,33 @@ declare function createImageBitmap(
    sh: number,
    options?: ImageBitmapOptions,
  ): Promise<ImageBitmap>;
@@ -23096,7 +23096,7 @@ index ce2fe2049a21e9778e9221fd0ab91a91e002ca9f..530f1d413294bab74295b88dbf9b4f66
  declare const sessionStorage: Storage;
  declare function addEventListener<K extends keyof WindowEventMap>(
    type: K,
-@@ -24900,13 +34249,17 @@ type BlobPart = BufferSource | Blob | string;
+@@ -24903,13 +34252,17 @@ type BlobPart = BufferSource | Blob | string;
  type BodyInit = ReadableStream | XMLHttpRequestBodyInit;
  type BufferSource = ArrayBufferView | ArrayBuffer;
  type COSEAlgorithmIdentifier = number;
@@ -23116,7 +23116,7 @@ index ce2fe2049a21e9778e9221fd0ab91a91e002ca9f..530f1d413294bab74295b88dbf9b4f66
  type ClipboardItemData = Promise<string | Blob>;
  type ClipboardItems = readonly ClipboardItem[];
  type ConstrainBoolean = boolean | ConstrainBooleanParameters;
-@@ -24919,6 +34272,7 @@ type ConstrainULong = number | ConstrainULongRange;
+@@ -24922,6 +34275,7 @@ type ConstrainULong = number | ConstrainULongRange;
  type DOMHighResTimeStamp = number;
  type EpochTimeStamp = number;
  type EventListenerOrEventListenerObject = EventListener | EventListenerObject;
@@ -23124,7 +23124,7 @@ index ce2fe2049a21e9778e9221fd0ab91a91e002ca9f..530f1d413294bab74295b88dbf9b4f66
  type Float32List = Float32Array | readonly GLfloat[];
  type FormDataEntryValue = File | string;
  type GLbitfield = number;
-@@ -24975,6 +34329,7 @@ type RenderingContext =
+@@ -24978,6 +34332,7 @@ type RenderingContext =
    | ImageBitmapRenderingContext
    | WebGLRenderingContext
    | WebGL2RenderingContext;
@@ -23132,7 +23132,7 @@ index ce2fe2049a21e9778e9221fd0ab91a91e002ca9f..530f1d413294bab74295b88dbf9b4f66
  type RequestInfo = Request | string;
  type TexImageSource =
    | ImageBitmap
-@@ -24982,7 +34337,8 @@ type TexImageSource =
+@@ -24985,7 +34340,8 @@ type TexImageSource =
    | HTMLImageElement
    | HTMLCanvasElement
    | HTMLVideoElement
@@ -23142,7 +23142,7 @@ index ce2fe2049a21e9778e9221fd0ab91a91e002ca9f..530f1d413294bab74295b88dbf9b4f66
  type TimerHandler = string | Function;
  type Transferable =
    | OffscreenCanvas
-@@ -24991,6 +34347,7 @@ type Transferable =
+@@ -24994,6 +34350,7 @@ type Transferable =
    | ReadableStream
    | WritableStream
    | TransformStream
@@ -23150,7 +23150,7 @@ index ce2fe2049a21e9778e9221fd0ab91a91e002ca9f..530f1d413294bab74295b88dbf9b4f66
    | ArrayBuffer;
  type Uint32List = Uint32Array | readonly GLuint[];
  type VibratePattern = number | readonly number[];
-@@ -25002,6 +34359,7 @@ type XMLHttpRequestBodyInit =
+@@ -25005,6 +34362,7 @@ type XMLHttpRequestBodyInit =
    | URLSearchParams
    | string;
  type AlignSetting = 'center' | 'end' | 'left' | 'right' | 'start';
@@ -23158,7 +23158,7 @@ index ce2fe2049a21e9778e9221fd0ab91a91e002ca9f..530f1d413294bab74295b88dbf9b4f66
  type AnimationPlayState = 'finished' | 'idle' | 'paused' | 'running';
  type AnimationReplaceState = 'active' | 'persisted' | 'removed';
  type AppendMode = 'segments' | 'sequence';
-@@ -25016,6 +34374,7 @@ type AuthenticatorAttachment = 'cross-platform' | 'platform';
+@@ -25019,6 +34377,7 @@ type AuthenticatorAttachment = 'cross-platform' | 'platform';
  type AuthenticatorTransport = 'ble' | 'hybrid' | 'internal' | 'nfc' | 'usb';
  type AutoKeyword = 'auto';
  type AutomationRate = 'a-rate' | 'k-rate';
@@ -23166,7 +23166,7 @@ index ce2fe2049a21e9778e9221fd0ab91a91e002ca9f..530f1d413294bab74295b88dbf9b4f66
  type BinaryType = 'arraybuffer' | 'blob';
  type BiquadFilterType =
    | 'allpass'
-@@ -25026,6 +34385,22 @@ type BiquadFilterType =
+@@ -25029,6 +34388,22 @@ type BiquadFilterType =
    | 'lowshelf'
    | 'notch'
    | 'peaking';
@@ -23189,7 +23189,7 @@ index ce2fe2049a21e9778e9221fd0ab91a91e002ca9f..530f1d413294bab74295b88dbf9b4f66
  type CanPlayTypeResult = '' | 'maybe' | 'probably';
  type CanvasDirection = 'inherit' | 'ltr' | 'rtl';
  type CanvasFillRule = 'evenodd' | 'nonzero';
-@@ -25066,11 +34441,17 @@ type CanvasTextRendering =
+@@ -25069,11 +34444,17 @@ type CanvasTextRendering =
  type ChannelCountMode = 'clamped-max' | 'explicit' | 'max';
  type ChannelInterpretation = 'discrete' | 'speakers';
  type ClientTypes = 'all' | 'sharedworker' | 'window' | 'worker';
@@ -23208,7 +23208,7 @@ index ce2fe2049a21e9778e9221fd0ab91a91e002ca9f..530f1d413294bab74295b88dbf9b4f66
  type DOMParserSupportedType =
    | 'application/xhtml+xml'
    | 'application/xml'
-@@ -25082,6 +34463,7 @@ type DisplayCaptureSurfaceType = 'browser' | 'monitor' | 'window';
+@@ -25085,6 +34466,7 @@ type DisplayCaptureSurfaceType = 'browser' | 'monitor' | 'window';
  type DistanceModelType = 'exponential' | 'inverse' | 'linear';
  type DocumentReadyState = 'complete' | 'interactive' | 'loading';
  type DocumentVisibilityState = 'hidden' | 'visible';
@@ -23216,7 +23216,7 @@ index ce2fe2049a21e9778e9221fd0ab91a91e002ca9f..530f1d413294bab74295b88dbf9b4f66
  type EndOfStreamError = 'decode' | 'network';
  type EndingType = 'native' | 'transparent';
  type FileSystemHandleKind = 'directory' | 'file';
-@@ -25091,6 +34473,8 @@ type FontFaceLoadStatus = 'error' | 'loaded' | 'loading' | 'unloaded';
+@@ -25094,6 +34476,8 @@ type FontFaceLoadStatus = 'error' | 'loaded' | 'loading' | 'unloaded';
  type FontFaceSetLoadStatus = 'loaded' | 'loading';
  type FullscreenNavigationUI = 'auto' | 'hide' | 'show';
  type GamepadHapticActuatorType = 'vibration';
@@ -23225,7 +23225,7 @@ index ce2fe2049a21e9778e9221fd0ab91a91e002ca9f..530f1d413294bab74295b88dbf9b4f66
  type GamepadMappingType = '' | 'standard' | 'xr-standard';
  type GlobalCompositeOperation =
    | 'color'
-@@ -25119,12 +34503,16 @@ type GlobalCompositeOperation =
+@@ -25122,12 +34506,16 @@ type GlobalCompositeOperation =
    | 'source-out'
    | 'source-over'
    | 'xor';
@@ -23243,7 +23243,7 @@ index ce2fe2049a21e9778e9221fd0ab91a91e002ca9f..530f1d413294bab74295b88dbf9b4f66
  type ImageSmoothingQuality = 'high' | 'low' | 'medium';
  type InsertPosition = 'afterbegin' | 'afterend' | 'beforebegin' | 'beforeend';
  type IterationCompositeOperation = 'accumulate' | 'replace';
-@@ -25139,6 +34527,7 @@ type KeyUsage =
+@@ -25142,6 +34530,7 @@ type KeyUsage =
    | 'unwrapKey'
    | 'verify'
    | 'wrapKey';
@@ -23251,7 +23251,7 @@ index ce2fe2049a21e9778e9221fd0ab91a91e002ca9f..530f1d413294bab74295b88dbf9b4f66
  type LineAlignSetting = 'center' | 'end' | 'start';
  type LockMode = 'exclusive' | 'shared';
  type MIDIPortConnectionState = 'closed' | 'open' | 'pending';
-@@ -25380,7 +34769,7 @@ type ResponseType =
+@@ -25383,7 +34772,7 @@ type ResponseType =
    | 'error'
    | 'opaque'
    | 'opaqueredirect';
@@ -23260,7 +23260,7 @@ index ce2fe2049a21e9778e9221fd0ab91a91e002ca9f..530f1d413294bab74295b88dbf9b4f66
  type ScrollLogicalPosition = 'center' | 'end' | 'nearest' | 'start';
  type ScrollRestoration = 'auto' | 'manual';
  type ScrollSetting = '' | 'up';
-@@ -25420,11 +34809,24 @@ type TouchType = 'direct' | 'stylus';
+@@ -25423,11 +34812,24 @@ type TouchType = 'direct' | 'stylus';
  type TransferFunction = 'hlg' | 'pq' | 'srgb';
  type UserVerificationRequirement = 'discouraged' | 'preferred' | 'required';
  type VideoColorPrimaries = 'bt470bg' | 'bt709' | 'smpte170m';

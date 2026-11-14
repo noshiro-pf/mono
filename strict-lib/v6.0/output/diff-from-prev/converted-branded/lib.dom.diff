@@ -1,5 +1,5 @@
 diff --git a/v5.9/output/lib-files-branded/lib.dom.d.ts b/v6.0/output/lib-files-branded/lib.dom.d.ts
-index a6a37a491960b8c54a94296b8303915b5123c932..5d070a4f5ec18a08ae9d76e6be25e9802e794799 100644
+index 2b588f344cc06253f32881adff5118e68a8d7ff4..6a72398e300882ccd451b14f4ccd8319bcaf0b36 100644
 --- a/v5.9/output/lib-files-branded/lib.dom.d.ts
 +++ b/v6.0/output/lib-files-branded/lib.dom.d.ts
 @@ -7,7 +7,7 @@ License at http://www.apache.org/licenses/LICENSE-2.0
@@ -40750,7 +40750,7 @@ index a6a37a491960b8c54a94296b8303915b5123c932..5d070a4f5ec18a08ae9d76e6be25e980
 -   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Request/method)
 +   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Navigation/canGoBack)
     */
--  readonly method: import('ts-type-forge').HTTPRequestMethod;
+-  readonly method: string;
 +  readonly canGoBack: boolean;
    /**
 -   * The **`mode`** read-only property of the Request interface contains the mode of the request (e.g., `cors`, `no-cors`, `same-origin`, or `navigate`.) This is used to determine if cross-origin requests lead to valid responses, and which properties of the response are readable.
@@ -51030,7 +51030,7 @@ index a6a37a491960b8c54a94296b8303915b5123c932..5d070a4f5ec18a08ae9d76e6be25e980
 +   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Request/method)
     */
 -  text: string;
-+  readonly method: import('ts-type-forge').HTTPRequestMethod;
++  readonly method: string;
    /**
 -   * The **`voice`** property of the SpeechSynthesisUtterance interface gets and sets the voice that will be used to speak the utterance.
 +   * The **`mode`** read-only property of the Request interface contains the mode of the request (e.g., cors, no-cors, same-origin, or navigate.) This is used to determine if cross-origin requests lead to valid responses, and which properties of the response are readable.
@@ -64082,7 +64082,7 @@ index a6a37a491960b8c54a94296b8303915b5123c932..5d070a4f5ec18a08ae9d76e6be25e980
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/XMLHttpRequest/getAllResponseHeaders)
     */
-@@ -43685,7 +48739,7 @@ interface XMLHttpRequest extends XMLHttpRequestEventTarget {
+@@ -43688,7 +48742,7 @@ interface XMLHttpRequest extends XMLHttpRequestEventTarget {
     */
    send(body?: Document | XMLHttpRequestBodyInit | null): void;
    /**
@@ -64091,7 +64091,7 @@ index a6a37a491960b8c54a94296b8303915b5123c932..5d070a4f5ec18a08ae9d76e6be25e980
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/XMLHttpRequest/setRequestHeader)
     */
-@@ -43738,7 +48792,7 @@ interface XMLHttpRequestEventTargetEventMap {
+@@ -43741,7 +48795,7 @@ interface XMLHttpRequestEventTargetEventMap {
  }
  
  /**
@@ -64100,7 +64100,7 @@ index a6a37a491960b8c54a94296b8303915b5123c932..5d070a4f5ec18a08ae9d76e6be25e980
   *
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/XMLHttpRequestEventTarget)
   */
-@@ -43784,7 +48838,7 @@ declare var XMLHttpRequestEventTarget: {
+@@ -43787,7 +48841,7 @@ declare var XMLHttpRequestEventTarget: {
  };
  
  /**
@@ -64109,7 +64109,7 @@ index a6a37a491960b8c54a94296b8303915b5123c932..5d070a4f5ec18a08ae9d76e6be25e980
   *
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/XMLHttpRequestUpload)
   */
-@@ -43823,7 +48877,7 @@ declare var XMLHttpRequestUpload: {
+@@ -43826,7 +48880,7 @@ declare var XMLHttpRequestUpload: {
  };
  
  /**
@@ -64118,7 +64118,7 @@ index a6a37a491960b8c54a94296b8303915b5123c932..5d070a4f5ec18a08ae9d76e6be25e980
   *
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/XMLSerializer)
   */
-@@ -43842,7 +48896,7 @@ declare const XMLSerializer: {
+@@ -43845,7 +48899,7 @@ declare const XMLSerializer: {
  };
  
  /**
@@ -64127,7 +64127,7 @@ index a6a37a491960b8c54a94296b8303915b5123c932..5d070a4f5ec18a08ae9d76e6be25e980
   *
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/XPathEvaluator)
   */
-@@ -43882,7 +48936,7 @@ interface XPathEvaluatorBase {
+@@ -43885,7 +48939,7 @@ interface XPathEvaluatorBase {
   */
  interface XPathExpression {
    /**
@@ -64136,7 +64136,7 @@ index a6a37a491960b8c54a94296b8303915b5123c932..5d070a4f5ec18a08ae9d76e6be25e980
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/XPathExpression/evaluate)
     */
-@@ -43905,55 +48959,55 @@ declare const XPathExpression: {
+@@ -43908,55 +48962,55 @@ declare const XPathExpression: {
   */
  interface XPathResult {
    /**
@@ -64201,7 +64201,7 @@ index a6a37a491960b8c54a94296b8303915b5123c932..5d070a4f5ec18a08ae9d76e6be25e980
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/XPathResult/snapshotItem)
     */
-@@ -43986,43 +49040,43 @@ declare const XPathResult: {
+@@ -43989,43 +49043,43 @@ declare const XPathResult: {
  };
  
  /**
@@ -64252,7 +64252,7 @@ index a6a37a491960b8c54a94296b8303915b5123c932..5d070a4f5ec18a08ae9d76e6be25e980
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/XSLTProcessor/setParameter)
     */
-@@ -44032,13 +49086,13 @@ interface XSLTProcessor {
+@@ -44035,13 +49089,13 @@ interface XSLTProcessor {
      value: unknown,
    ): void;
    /**
@@ -64268,7 +64268,7 @@ index a6a37a491960b8c54a94296b8303915b5123c932..5d070a4f5ec18a08ae9d76e6be25e980
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/XSLTProcessor/transformToFragment)
     */
-@@ -44050,10 +49104,10 @@ declare const XSLTProcessor: {
+@@ -44053,10 +49107,10 @@ declare const XSLTProcessor: {
    new (): XSLTProcessor;
  };
  
@@ -64281,7 +64281,7 @@ index a6a37a491960b8c54a94296b8303915b5123c932..5d070a4f5ec18a08ae9d76e6be25e980
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/CSS/highlights_static)
     */
-@@ -44196,6 +49250,7 @@ declare namespace CSS {
+@@ -44199,6 +49253,7 @@ declare namespace CSS {
  }
  
  declare namespace WebAssembly {
@@ -64289,7 +64289,7 @@ index a6a37a491960b8c54a94296b8303915b5123c932..5d070a4f5ec18a08ae9d76e6be25e980
    interface CompileError extends Error {}
  
    const CompileError: {
-@@ -44204,7 +49259,46 @@ declare namespace WebAssembly {
+@@ -44207,7 +49262,46 @@ declare namespace WebAssembly {
      (message?: string): CompileError;
    };
  
@@ -64337,7 +64337,7 @@ index a6a37a491960b8c54a94296b8303915b5123c932..5d070a4f5ec18a08ae9d76e6be25e980
    interface Global<T extends ValueType = ValueType> {
      value: ValueTypeMap[T];
      valueOf(): ValueTypeMap[T];
-@@ -44218,9 +49312,17 @@ declare namespace WebAssembly {
+@@ -44221,9 +49315,17 @@ declare namespace WebAssembly {
      ): Global<T>;
    };
  
@@ -64357,7 +64357,7 @@ index a6a37a491960b8c54a94296b8303915b5123c932..5d070a4f5ec18a08ae9d76e6be25e980
      readonly exports: Exports;
    }
  
-@@ -44229,6 +49331,7 @@ declare namespace WebAssembly {
+@@ -44232,6 +49334,7 @@ declare namespace WebAssembly {
      new (module: Module, importObject?: Imports): Instance;
    };
  
@@ -64365,7 +64365,7 @@ index a6a37a491960b8c54a94296b8303915b5123c932..5d070a4f5ec18a08ae9d76e6be25e980
    interface LinkError extends Error {}
  
    const LinkError: {
-@@ -44237,12 +49340,26 @@ declare namespace WebAssembly {
+@@ -44240,12 +49343,26 @@ declare namespace WebAssembly {
      (message?: string): LinkError;
    };
  
@@ -64396,7 +64396,7 @@ index a6a37a491960b8c54a94296b8303915b5123c932..5d070a4f5ec18a08ae9d76e6be25e980
    }
  
    const Memory: {
-@@ -44250,23 +49367,40 @@ declare namespace WebAssembly {
+@@ -44253,23 +49370,40 @@ declare namespace WebAssembly {
      new (descriptor: MemoryDescriptor): Memory;
    };
  
@@ -64442,7 +64442,7 @@ index a6a37a491960b8c54a94296b8303915b5123c932..5d070a4f5ec18a08ae9d76e6be25e980
    interface RuntimeError extends Error {}
  
    const RuntimeError: {
-@@ -44275,16 +49409,36 @@ declare namespace WebAssembly {
+@@ -44278,16 +49412,36 @@ declare namespace WebAssembly {
      (message?: string): RuntimeError;
    };
  
@@ -64488,7 +64488,7 @@ index a6a37a491960b8c54a94296b8303915b5123c932..5d070a4f5ec18a08ae9d76e6be25e980
    }
  
    const Table: {
-@@ -44292,14 +49446,31 @@ declare namespace WebAssembly {
+@@ -44295,14 +49449,31 @@ declare namespace WebAssembly {
      new (descriptor: TableDescriptor, value?: unknown): Table;
    };
  
@@ -64522,7 +64522,7 @@ index a6a37a491960b8c54a94296b8303915b5123c932..5d070a4f5ec18a08ae9d76e6be25e980
      shared?: boolean;
    }
  
-@@ -44315,9 +49486,14 @@ declare namespace WebAssembly {
+@@ -44318,9 +49489,14 @@ declare namespace WebAssembly {
    }
  
    interface TableDescriptor {
@@ -64539,7 +64539,7 @@ index a6a37a491960b8c54a94296b8303915b5123c932..5d070a4f5ec18a08ae9d76e6be25e980
    }
  
    interface ValueTypeMap {
-@@ -44330,29 +49506,42 @@ declare namespace WebAssembly {
+@@ -44333,29 +49509,42 @@ declare namespace WebAssembly {
      v128: never;
    }
  
@@ -64584,7 +64584,7 @@ index a6a37a491960b8c54a94296b8303915b5123c932..5d070a4f5ec18a08ae9d76e6be25e980
    ): Promise<WebAssemblyInstantiatedSource>;
    function instantiate(
      moduleObject: Module,
-@@ -44362,9 +49551,13 @@ declare namespace WebAssembly {
+@@ -44365,9 +49554,13 @@ declare namespace WebAssembly {
    function instantiateStreaming(
      source: Response | PromiseLike<Response>,
      importObject?: Imports,
@@ -64599,7 +64599,7 @@ index a6a37a491960b8c54a94296b8303915b5123c932..5d070a4f5ec18a08ae9d76e6be25e980
  }
  
  /** The **`console`** object provides access to the debugging console (e.g., the Web console in Firefox). */
-@@ -44375,7 +49568,7 @@ declare namespace WebAssembly {
+@@ -44378,7 +49571,7 @@ declare namespace WebAssembly {
   */
  interface Console {
    /**
@@ -64608,7 +64608,7 @@ index a6a37a491960b8c54a94296b8303915b5123c932..5d070a4f5ec18a08ae9d76e6be25e980
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/assert_static)
     */
-@@ -44387,61 +49580,61 @@ interface Console {
+@@ -44390,61 +49583,61 @@ interface Console {
     */
    clear(): void;
    /**
@@ -64680,7 +64680,7 @@ index a6a37a491960b8c54a94296b8303915b5123c932..5d070a4f5ec18a08ae9d76e6be25e980
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/info_static)
     */
-@@ -44459,23 +49652,24 @@ interface Console {
+@@ -44462,23 +49655,24 @@ interface Console {
     */
    table(tabularData?: unknown, properties?: readonly string[]): void;
    /**
@@ -64708,7 +64708,7 @@ index a6a37a491960b8c54a94296b8303915b5123c932..5d070a4f5ec18a08ae9d76e6be25e980
    timeStamp(label?: string): void;
    /**
     * The **`console.trace()`** static method outputs a stack trace to the console.
-@@ -44484,7 +49678,7 @@ interface Console {
+@@ -44487,7 +49681,7 @@ interface Console {
     */
    trace(...data: readonly unknown[]): void;
    /**
@@ -64717,7 +64717,7 @@ index a6a37a491960b8c54a94296b8303915b5123c932..5d070a4f5ec18a08ae9d76e6be25e980
     *
     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/warn_static)
     */
-@@ -44568,6 +49762,14 @@ interface MutationCallback {
+@@ -44571,6 +49765,14 @@ interface MutationCallback {
    (mutations: readonly MutationRecord[], observer: MutationObserver): void;
  }
  
@@ -64732,7 +64732,7 @@ index a6a37a491960b8c54a94296b8303915b5123c932..5d070a4f5ec18a08ae9d76e6be25e980
  interface NotificationPermissionCallback {
    (permission: NotificationPermission): void;
  }
-@@ -44622,6 +49824,10 @@ interface ResizeObserverCallback {
+@@ -44625,6 +49827,10 @@ interface ResizeObserverCallback {
    (entries: readonly ResizeObserverEntry[], observer: ResizeObserver): void;
  }
  
@@ -64743,7 +64743,7 @@ index a6a37a491960b8c54a94296b8303915b5123c932..5d070a4f5ec18a08ae9d76e6be25e980
  interface TransformerFlushCallback<O> {
    (controller: TransformStreamDefaultController<O>): void | PromiseLike<void>;
  }
-@@ -44902,6 +50108,7 @@ interface SVGElementTagNameMap {
+@@ -44905,6 +50111,7 @@ interface SVGElementTagNameMap {
  }
  
  interface MathMLElementTagNameMap {
@@ -64751,7 +64751,7 @@ index a6a37a491960b8c54a94296b8303915b5123c932..5d070a4f5ec18a08ae9d76e6be25e980
    annotation: MathMLElement;
    'annotation-xml': MathMLElement;
    maction: MathMLElement;
-@@ -44968,7 +50175,7 @@ declare const clientInformation: Navigator;
+@@ -44971,7 +50178,7 @@ declare const clientInformation: Navigator;
   */
  declare const closed: boolean;
  /**
@@ -64760,7 +64760,7 @@ index a6a37a491960b8c54a94296b8303915b5123c932..5d070a4f5ec18a08ae9d76e6be25e980
   *
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/cookieStore)
   */
-@@ -44980,7 +50187,7 @@ declare const cookieStore: CookieStore;
+@@ -44983,7 +50190,7 @@ declare const cookieStore: CookieStore;
   */
  declare const customElements: CustomElementRegistry;
  /**
@@ -64769,7 +64769,7 @@ index a6a37a491960b8c54a94296b8303915b5123c932..5d070a4f5ec18a08ae9d76e6be25e980
   *
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/devicePixelRatio)
   */
-@@ -44992,80 +50199,86 @@ declare const devicePixelRatio: number;
+@@ -44995,80 +50202,86 @@ declare const devicePixelRatio: number;
   */
  declare const document: Document;
  /**
@@ -64868,7 +64868,7 @@ index a6a37a491960b8c54a94296b8303915b5123c932..5d070a4f5ec18a08ae9d76e6be25e980
  /**
   * The **`Window.navigator`** read-only property returns a reference to the Navigator object, which has methods and properties about the application running the script.
   *
-@@ -45105,20 +50318,20 @@ declare const onorientationchange:
+@@ -45108,20 +50321,20 @@ declare const onorientationchange:
    | ((this: Window, ev: Event) => unknown)
    | null;
  /**
@@ -64892,7 +64892,7 @@ index a6a37a491960b8c54a94296b8303915b5123c932..5d070a4f5ec18a08ae9d76e6be25e980
   *
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/originAgentCluster)
   */
-@@ -45130,7 +50343,7 @@ declare const originAgentCluster: boolean;
+@@ -45133,7 +50346,7 @@ declare const originAgentCluster: boolean;
   */
  declare const outerHeight: number;
  /**
@@ -64901,7 +64901,7 @@ index a6a37a491960b8c54a94296b8303915b5123c932..5d070a4f5ec18a08ae9d76e6be25e980
   *
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/outerWidth)
   */
-@@ -45146,13 +50359,13 @@ declare const pageYOffset: number;
+@@ -45149,13 +50362,13 @@ declare const pageYOffset: number;
   */
  declare const parent: WindowProxy;
  /**
@@ -64917,7 +64917,7 @@ index a6a37a491960b8c54a94296b8303915b5123c932..5d070a4f5ec18a08ae9d76e6be25e980
   *
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/screen)
   */
-@@ -45182,62 +50395,62 @@ declare const screenX: number;
+@@ -45185,62 +50398,62 @@ declare const screenX: number;
   */
  declare const screenY: number;
  /**
@@ -64990,7 +64990,7 @@ index a6a37a491960b8c54a94296b8303915b5123c932..5d070a4f5ec18a08ae9d76e6be25e980
   *
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/visualViewport)
   */
-@@ -45249,7 +50462,7 @@ declare const visualViewport: VisualViewport | null;
+@@ -45252,7 +50465,7 @@ declare const visualViewport: VisualViewport | null;
   */
  declare const window: Window & typeof globalThis;
  /**
@@ -64999,7 +64999,7 @@ index a6a37a491960b8c54a94296b8303915b5123c932..5d070a4f5ec18a08ae9d76e6be25e980
   *
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/alert)
   */
-@@ -45268,7 +50481,7 @@ declare function blur(): void;
+@@ -45271,7 +50484,7 @@ declare function blur(): void;
   */
  declare function cancelIdleCallback(handle: number): void;
  /**
@@ -65008,7 +65008,7 @@ index a6a37a491960b8c54a94296b8303915b5123c932..5d070a4f5ec18a08ae9d76e6be25e980
   * @deprecated
   *
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/captureEvents)
-@@ -45281,19 +50494,19 @@ declare function captureEvents(): void;
+@@ -45284,19 +50497,19 @@ declare function captureEvents(): void;
   */
  declare function close(): void;
  /**
@@ -65031,7 +65031,7 @@ index a6a37a491960b8c54a94296b8303915b5123c932..5d070a4f5ec18a08ae9d76e6be25e980
   *
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/getComputedStyle)
   */
-@@ -45326,7 +50539,7 @@ declare function moveBy(x: number, y: number): void;
+@@ -45329,7 +50542,7 @@ declare function moveBy(x: number, y: number): void;
   */
  declare function moveTo(x: number, y: number): void;
  /**
@@ -65040,7 +65040,7 @@ index a6a37a491960b8c54a94296b8303915b5123c932..5d070a4f5ec18a08ae9d76e6be25e980
   *
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/open)
   */
-@@ -45336,7 +50549,7 @@ declare function open(
+@@ -45339,7 +50552,7 @@ declare function open(
    features?: string,
  ): WindowProxy | null;
  /**
@@ -65049,7 +65049,7 @@ index a6a37a491960b8c54a94296b8303915b5123c932..5d070a4f5ec18a08ae9d76e6be25e980
   *
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/postMessage)
   */
-@@ -45350,13 +50563,13 @@ declare function postMessage(
+@@ -45353,13 +50566,13 @@ declare function postMessage(
    options?: WindowPostMessageOptions,
  ): void;
  /**
@@ -65065,7 +65065,7 @@ index a6a37a491960b8c54a94296b8303915b5123c932..5d070a4f5ec18a08ae9d76e6be25e980
   *
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/prompt)
   */
-@@ -45369,7 +50582,7 @@ declare function prompt(message?: string, _default?: string): string | null;
+@@ -45372,7 +50585,7 @@ declare function prompt(message?: string, _default?: string): string | null;
   */
  declare function releaseEvents(): void;
  /**
@@ -65074,7 +65074,7 @@ index a6a37a491960b8c54a94296b8303915b5123c932..5d070a4f5ec18a08ae9d76e6be25e980
   *
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/requestIdleCallback)
   */
-@@ -45418,7 +50631,7 @@ declare function scrollTo(x: number, y: number): void;
+@@ -45421,7 +50634,7 @@ declare function scrollTo(x: number, y: number): void;
  declare function stop(): void;
  declare function toString(): string;
  /**
@@ -65083,7 +65083,7 @@ index a6a37a491960b8c54a94296b8303915b5123c932..5d070a4f5ec18a08ae9d76e6be25e980
   *
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/dispatchEvent)
   */
-@@ -45469,6 +50682,8 @@ declare const onchange: ((this: Window, ev: Event) => unknown) | null;
+@@ -45472,6 +50685,8 @@ declare const onchange: ((this: Window, ev: Event) => unknown) | null;
  declare const onclick: ((this: Window, ev: PointerEvent) => unknown) | null;
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/HTMLDialogElement/close_event) */
  declare const onclose: ((this: Window, ev: Event) => unknown) | null;
@@ -65092,7 +65092,7 @@ index a6a37a491960b8c54a94296b8303915b5123c932..5d070a4f5ec18a08ae9d76e6be25e980
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/HTMLCanvasElement/contextlost_event) */
  declare const oncontextlost: ((this: Window, ev: Event) => unknown) | null;
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Element/contextmenu_event) */
-@@ -45516,7 +50731,7 @@ declare const ongotpointercapture:
+@@ -45519,7 +50734,7 @@ declare const ongotpointercapture:
    | ((this: Window, ev: PointerEvent) => unknown)
    | null;
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Element/input_event) */
@@ -65101,7 +65101,7 @@ index a6a37a491960b8c54a94296b8303915b5123c932..5d070a4f5ec18a08ae9d76e6be25e980
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/HTMLInputElement/invalid_event) */
  declare const oninvalid: ((this: Window, ev: Event) => unknown) | null;
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Element/keydown_event) */
-@@ -45770,7 +50985,7 @@ declare var onunhandledrejection:
+@@ -45773,7 +50988,7 @@ declare var onunhandledrejection:
    | ((this: Window, ev: PromiseRejectionEvent) => unknown)
    | null;
  /**
@@ -65110,7 +65110,7 @@ index a6a37a491960b8c54a94296b8303915b5123c932..5d070a4f5ec18a08ae9d76e6be25e980
   *
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/unload_event)
   */
-@@ -45795,6 +51010,8 @@ declare var isSecureContext: boolean;
+@@ -45798,6 +51013,8 @@ declare var isSecureContext: boolean;
  declare var origin: string;
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/performance) */
  declare var performance: Performance;
@@ -65119,7 +65119,7 @@ index a6a37a491960b8c54a94296b8303915b5123c932..5d070a4f5ec18a08ae9d76e6be25e980
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/atob) */
  declare function atob(data: string): string;
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/btoa) */
-@@ -45895,6 +51112,10 @@ type CanvasImageSource =
+@@ -45898,6 +51115,10 @@ type CanvasImageSource =
  type ClipboardItemData = Promise<string | Blob>;
  type ClipboardItems = readonly ClipboardItem[];
  type ConstrainBoolean = boolean | ConstrainBooleanParameters;
@@ -65130,7 +65130,7 @@ index a6a37a491960b8c54a94296b8303915b5123c932..5d070a4f5ec18a08ae9d76e6be25e980
  type ConstrainDOMString =
    | string
    | readonly string[]
-@@ -45920,6 +51141,44 @@ type GLsizei = number;
+@@ -45923,6 +51144,44 @@ type GLsizei = number;
  type GLsizeiptr = number;
  type GLuint = number;
  type GLuint64 = number;
@@ -65175,7 +65175,7 @@ index a6a37a491960b8c54a94296b8303915b5123c932..5d070a4f5ec18a08ae9d76e6be25e980
  type HTMLOrSVGImageElement = HTMLImageElement | SVGImageElement;
  type HTMLOrSVGScriptElement = HTMLScriptElement | SVGScriptElement;
  type HashAlgorithmIdentifier = AlgorithmIdentifier;
-@@ -45946,15 +51205,16 @@ type OffscreenRenderingContext =
+@@ -45949,15 +51208,16 @@ type OffscreenRenderingContext =
    | OffscreenCanvasRenderingContext2D
    | ImageBitmapRenderingContext
    | WebGLRenderingContext
@@ -65195,7 +65195,7 @@ index a6a37a491960b8c54a94296b8303915b5123c932..5d070a4f5ec18a08ae9d76e6be25e980
  type ReadableStreamController<T> =
    | ReadableStreamDefaultController<T>
    | ReadableByteStreamController;
-@@ -45968,9 +51228,16 @@ type RenderingContext =
+@@ -45971,9 +51231,16 @@ type RenderingContext =
    | CanvasRenderingContext2D
    | ImageBitmapRenderingContext
    | WebGLRenderingContext
@@ -65213,7 +65213,7 @@ index a6a37a491960b8c54a94296b8303915b5123c932..5d070a4f5ec18a08ae9d76e6be25e980
  type TexImageSource =
    | ImageBitmap
    | ImageData
-@@ -45992,6 +51259,7 @@ type Transferable =
+@@ -45995,6 +51262,7 @@ type Transferable =
    | VideoFrame
    | RTCDataChannel
    | ArrayBuffer;
@@ -65221,7 +65221,7 @@ index a6a37a491960b8c54a94296b8303915b5123c932..5d070a4f5ec18a08ae9d76e6be25e980
  type Uint32List = Uint32Array<ArrayBufferLike> | readonly GLuint[];
  type VibratePattern = number | readonly number[];
  type WindowProxy = Window;
-@@ -46001,6 +51269,7 @@ type XMLHttpRequestBodyInit =
+@@ -46004,6 +51272,7 @@ type XMLHttpRequestBodyInit =
    | FormData
    | URLSearchParams
    | string;
@@ -65229,7 +65229,7 @@ index a6a37a491960b8c54a94296b8303915b5123c932..5d070a4f5ec18a08ae9d76e6be25e980
  type AlignSetting = 'center' | 'end' | 'left' | 'right' | 'start';
  type AlphaOption = 'discard' | 'keep';
  type AnimationPlayState = 'finished' | 'idle' | 'paused' | 'running';
-@@ -46179,6 +51448,252 @@ type FontDisplay = 'auto' | 'block' | 'fallback' | 'optional' | 'swap';
+@@ -46182,6 +51451,252 @@ type FontDisplay = 'auto' | 'block' | 'fallback' | 'optional' | 'swap';
  type FontFaceLoadStatus = 'error' | 'loaded' | 'loading' | 'unloaded';
  type FontFaceSetLoadStatus = 'loaded' | 'loading';
  type FullscreenNavigationUI = 'auto' | 'hide' | 'show';
@@ -65482,7 +65482,7 @@ index a6a37a491960b8c54a94296b8303915b5123c932..5d070a4f5ec18a08ae9d76e6be25e980
  type GamepadHapticEffectType = 'dual-rumble' | 'trigger-rumble';
  type GamepadHapticsResult = 'complete' | 'preempted';
  type GamepadMappingType = '' | 'standard' | 'xr-standard';
-@@ -46219,6 +51734,7 @@ type IDBCursorDirection = 'next' | 'nextunique' | 'prev' | 'prevunique';
+@@ -46222,6 +51737,7 @@ type IDBCursorDirection = 'next' | 'nextunique' | 'prev' | 'prevunique';
  type IDBRequestReadyState = 'done' | 'pending';
  type IDBTransactionDurability = 'default' | 'relaxed' | 'strict';
  type IDBTransactionMode = 'readonly' | 'readwrite' | 'versionchange';
@@ -65490,7 +65490,7 @@ index a6a37a491960b8c54a94296b8303915b5123c932..5d070a4f5ec18a08ae9d76e6be25e980
  type ImageOrientation = 'flipY' | 'from-image' | 'none';
  type ImageSmoothingQuality = 'high' | 'low' | 'medium';
  type InsertPosition = 'afterbegin' | 'afterend' | 'beforebegin' | 'beforeend';
-@@ -46278,11 +51794,10 @@ type MediaSessionAction =
+@@ -46281,11 +51797,10 @@ type MediaSessionAction =
    | 'stop';
  type MediaSessionPlaybackState = 'none' | 'paused' | 'playing';
  type MediaStreamTrackState = 'ended' | 'live';
@@ -65506,7 +65506,7 @@ index a6a37a491960b8c54a94296b8303915b5123c932..5d070a4f5ec18a08ae9d76e6be25e980
  type NavigationType = 'push' | 'reload' | 'replace' | 'traverse';
  type NotificationDirection = 'auto' | 'ltr' | 'rtl';
  type NotificationPermission = 'default' | 'denied' | 'granted';
-@@ -46293,6 +51808,15 @@ type OffscreenRenderingContextId =
+@@ -46296,6 +51811,15 @@ type OffscreenRenderingContextId =
    | 'webgl2'
    | 'webgpu';
  type OpusBitstreamFormat = 'ogg' | 'opus';
@@ -65522,7 +65522,7 @@ index a6a37a491960b8c54a94296b8303915b5123c932..5d070a4f5ec18a08ae9d76e6be25e980
  type OrientationType =
    | 'landscape-primary'
    | 'landscape-secondary'
-@@ -46338,7 +51862,6 @@ type RTCDtlsTransportState =
+@@ -46341,7 +51865,6 @@ type RTCDtlsTransportState =
    | 'connecting'
    | 'failed'
    | 'new';
@@ -65530,7 +65530,7 @@ index a6a37a491960b8c54a94296b8303915b5123c932..5d070a4f5ec18a08ae9d76e6be25e980
  type RTCErrorDetailType =
    | 'data-channel-failure'
    | 'dtls-failure'
-@@ -46400,7 +51923,6 @@ type RTCStatsIceCandidatePairState =
+@@ -46403,7 +51926,6 @@ type RTCStatsIceCandidatePairState =
    | 'failed'
    | 'frozen'
    | 'in-progress'
@@ -65538,7 +65538,7 @@ index a6a37a491960b8c54a94296b8303915b5123c932..5d070a4f5ec18a08ae9d76e6be25e980
    | 'succeeded'
    | 'waiting';
  type RTCStatsType =
-@@ -46479,6 +52001,8 @@ type ResponseType =
+@@ -46482,6 +52004,8 @@ type ResponseType =
    | 'error'
    | 'opaque'
    | 'opaqueredirect';
@@ -65547,7 +65547,7 @@ index a6a37a491960b8c54a94296b8303915b5123c932..5d070a4f5ec18a08ae9d76e6be25e980
  type ScrollBehavior = 'auto' | 'instant' | 'smooth';
  type ScrollLogicalPosition = 'center' | 'end' | 'nearest' | 'start';
  type ScrollRestoration = 'auto' | 'manual';
-@@ -46495,6 +52019,15 @@ type ServiceWorkerState =
+@@ -46498,6 +52022,15 @@ type ServiceWorkerState =
  type ServiceWorkerUpdateViaCache = 'all' | 'imports' | 'none';
  type ShadowRootMode = 'closed' | 'open';
  type SlotAssignmentMode = 'manual' | 'named';
@@ -65563,7 +65563,7 @@ index a6a37a491960b8c54a94296b8303915b5123c932..5d070a4f5ec18a08ae9d76e6be25e980
  type SpeechSynthesisErrorCode =
    | 'audio-busy'
    | 'audio-hardware'
-@@ -46508,6 +52041,7 @@ type SpeechSynthesisErrorCode =
+@@ -46511,6 +52044,7 @@ type SpeechSynthesisErrorCode =
    | 'synthesis-unavailable'
    | 'text-too-long'
    | 'voice-unavailable';
@@ -65571,7 +65571,7 @@ index a6a37a491960b8c54a94296b8303915b5123c932..5d070a4f5ec18a08ae9d76e6be25e980
  type TextTrackKind =
    | 'captions'
    | 'chapters'
-@@ -46546,3 +52080,1014 @@ type XMLHttpRequestResponseType =
+@@ -46549,3 +52083,1014 @@ type XMLHttpRequestResponseType =
    | 'document'
    | 'json'
    | 'text';

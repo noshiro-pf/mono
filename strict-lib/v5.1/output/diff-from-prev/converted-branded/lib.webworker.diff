@@ -1,5 +1,5 @@
 diff --git a/v5.0/output/lib-files-branded/lib.webworker.d.ts b/v5.1/output/lib-files-branded/lib.webworker.d.ts
-index 5564104ba85f93df6aac7e06735a425193e45157..e91c5f3dc8f9f02f3f9f8c53ad665f2f6f82496d 100644
+index 5783029148e24eec495e85fb93b302cbead4e3f6..548cb34028068f9dcdf9a92bbd3ce72d0b792a85 100644
 --- a/v5.0/output/lib-files-branded/lib.webworker.d.ts
 +++ b/v5.1/output/lib-files-branded/lib.webworker.d.ts
 @@ -71,11 +71,30 @@ interface AudioConfiguration {
@@ -4240,7 +4240,7 @@ index 5564104ba85f93df6aac7e06735a425193e45157..e91c5f3dc8f9f02f3f9f8c53ad665f2f
 +   *
 +   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/Request/method)
 +   */
-   readonly method: import('ts-type-forge').HTTPRequestMethod;
+   readonly method: string;
 -  /** Returns the mode associated with request, which is a string indicating whether the request will use CORS, or will be restricted to same-origin URLs. */
 +  /**
 +   * Returns the mode associated with request, which is a string indicating whether the request will use CORS, or will be restricted to same-origin URLs.
@@ -6961,9 +6961,9 @@ index 5564104ba85f93df6aac7e06735a425193e45157..e91c5f3dc8f9f02f3f9f8c53ad665f2f
 +   *
 +   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/XMLHttpRequest/open)
     */
-   open(method: 'post' | 'get' | 'dialog', url: string | URL): void;
    open(
-@@ -7679,12 +10575,16 @@ interface XMLHttpRequest extends XMLHttpRequestEventTarget {
+     method: import('ts-type-forge').HTTPRequestMethod | (string & {}),
+@@ -7682,12 +10578,16 @@ interface XMLHttpRequest extends XMLHttpRequestEventTarget {
     * Acts as if the `Content-Type` header value for a response is mime. (It does not change the header.)
     *
     * Throws an "InvalidStateError" DOMException if state is loading or done.
@@ -6980,7 +6980,7 @@ index 5564104ba85f93df6aac7e06735a425193e45157..e91c5f3dc8f9f02f3f9f8c53ad665f2f
     */
    send(body?: XMLHttpRequestBodyInit | null): void;
    /**
-@@ -7693,6 +10593,8 @@ interface XMLHttpRequest extends XMLHttpRequestEventTarget {
+@@ -7696,6 +10596,8 @@ interface XMLHttpRequest extends XMLHttpRequestEventTarget {
     * Throws an "InvalidStateError" DOMException if either state is not opened or the send() flag is set.
     *
     * Throws a "SyntaxError" DOMException if name is not a header name or if value is not a header value.
@@ -6989,7 +6989,7 @@ index 5564104ba85f93df6aac7e06735a425193e45157..e91c5f3dc8f9f02f3f9f8c53ad665f2f
     */
    setRequestHeader(name: string, value: string): void;
    readonly UNSENT: 0;
-@@ -7742,6 +10644,7 @@ interface XMLHttpRequestEventTargetEventMap {
+@@ -7745,6 +10647,7 @@ interface XMLHttpRequestEventTargetEventMap {
    timeout: ProgressEvent<XMLHttpRequestEventTarget>;
  }
  
@@ -6997,7 +6997,7 @@ index 5564104ba85f93df6aac7e06735a425193e45157..e91c5f3dc8f9f02f3f9f8c53ad665f2f
  interface XMLHttpRequestEventTarget extends EventTarget {
    onabort: ((this: XMLHttpRequest, ev: ProgressEvent) => unknown) | null;
    onerror: ((this: XMLHttpRequest, ev: ProgressEvent) => unknown) | null;
-@@ -7783,6 +10686,7 @@ declare var XMLHttpRequestEventTarget: {
+@@ -7786,6 +10689,7 @@ declare var XMLHttpRequestEventTarget: {
    new (): XMLHttpRequestEventTarget;
  };
  
@@ -7005,7 +7005,7 @@ index 5564104ba85f93df6aac7e06735a425193e45157..e91c5f3dc8f9f02f3f9f8c53ad665f2f
  interface XMLHttpRequestUpload extends XMLHttpRequestEventTarget {
    addEventListener<K extends keyof XMLHttpRequestEventTargetEventMap>(
      type: K,
-@@ -7817,26 +10721,46 @@ declare var XMLHttpRequestUpload: {
+@@ -7820,26 +10724,46 @@ declare var XMLHttpRequestUpload: {
    new (): XMLHttpRequestUpload;
  };
  
@@ -7052,7 +7052,7 @@ index 5564104ba85f93df6aac7e06735a425193e45157..e91c5f3dc8f9f02f3f9f8c53ad665f2f
    warn(...data: readonly unknown[]): void;
  }
  
-@@ -7851,8 +10775,11 @@ declare namespace WebAssembly {
+@@ -7854,8 +10778,11 @@ declare namespace WebAssembly {
      (message?: string): CompileError;
    };
  
@@ -7064,7 +7064,7 @@ index 5564104ba85f93df6aac7e06735a425193e45157..e91c5f3dc8f9f02f3f9f8c53ad665f2f
      valueOf(): unknown;
    }
  
-@@ -7861,7 +10788,9 @@ declare namespace WebAssembly {
+@@ -7864,7 +10791,9 @@ declare namespace WebAssembly {
      new (descriptor: GlobalDescriptor, v?: unknown): Global;
    };
  
@@ -7074,7 +7074,7 @@ index 5564104ba85f93df6aac7e06735a425193e45157..e91c5f3dc8f9f02f3f9f8c53ad665f2f
      readonly exports: Exports;
    }
  
-@@ -7878,8 +10807,11 @@ declare namespace WebAssembly {
+@@ -7881,8 +10810,11 @@ declare namespace WebAssembly {
      (message?: string): LinkError;
    };
  
@@ -7086,7 +7086,7 @@ index 5564104ba85f93df6aac7e06735a425193e45157..e91c5f3dc8f9f02f3f9f8c53ad665f2f
      grow(delta: number): number;
    }
  
-@@ -7888,16 +10820,20 @@ declare namespace WebAssembly {
+@@ -7891,16 +10823,20 @@ declare namespace WebAssembly {
      new (descriptor: MemoryDescriptor): Memory;
    };
  
@@ -7107,7 +7107,7 @@ index 5564104ba85f93df6aac7e06735a425193e45157..e91c5f3dc8f9f02f3f9f8c53ad665f2f
      imports(moduleObject: Module): readonly ModuleImportDescriptor[];
    };
  
-@@ -7909,10 +10845,15 @@ declare namespace WebAssembly {
+@@ -7912,10 +10848,15 @@ declare namespace WebAssembly {
      (message?: string): RuntimeError;
    };
  
@@ -7123,7 +7123,7 @@ index 5564104ba85f93df6aac7e06735a425193e45157..e91c5f3dc8f9f02f3f9f8c53ad665f2f
      set(index: number, value?: unknown): void;
    }
  
-@@ -7969,10 +10910,13 @@ declare namespace WebAssembly {
+@@ -7972,10 +10913,13 @@ declare namespace WebAssembly {
    type ImportValue = ExportValue | number;
    type Imports = Record<string, ModuleImports>;
    type ModuleImports = Record<string, ImportValue>;
@@ -7137,7 +7137,7 @@ index 5564104ba85f93df6aac7e06735a425193e45157..e91c5f3dc8f9f02f3f9f8c53ad665f2f
    function instantiate(
      bytes: BufferSource,
      importObject?: Imports,
-@@ -7981,13 +10925,19 @@ declare namespace WebAssembly {
+@@ -7984,13 +10928,19 @@ declare namespace WebAssembly {
      moduleObject: Module,
      importObject?: Imports,
    ): Promise<Instance>;
@@ -7157,7 +7157,7 @@ index 5564104ba85f93df6aac7e06735a425193e45157..e91c5f3dc8f9f02f3f9f8c53ad665f2f
  interface FrameRequestCallback {
    (time: DOMHighResTimeStamp): void;
  }
-@@ -8014,6 +10964,10 @@ interface QueuingStrategySize<T = unknown> {
+@@ -8017,6 +10967,10 @@ interface QueuingStrategySize<T = unknown> {
    (chunk: T): number;
  }
  
@@ -7168,7 +7168,7 @@ index 5564104ba85f93df6aac7e06735a425193e45157..e91c5f3dc8f9f02f3f9f8c53ad665f2f
  interface TransformerFlushCallback<O> {
    (controller: TransformStreamDefaultController<O>): void | PromiseLike<void>;
  }
-@@ -8060,21 +11014,43 @@ interface UnderlyingSourceStartCallback<R> {
+@@ -8063,21 +11017,43 @@ interface UnderlyingSourceStartCallback<R> {
    (controller: ReadableStreamController<R>): unknown;
  }
  
@@ -7215,7 +7215,7 @@ index 5564104ba85f93df6aac7e06735a425193e45157..e91c5f3dc8f9f02f3f9f8c53ad665f2f
  declare function postMessage(
    message: unknown,
    transfer: readonly Transferable[],
-@@ -8083,21 +11059,37 @@ declare function postMessage(
+@@ -8086,21 +11062,37 @@ declare function postMessage(
    message: unknown,
    options?: StructuredSerializeOptions,
  ): void;
@@ -7256,7 +7256,7 @@ index 5564104ba85f93df6aac7e06735a425193e45157..e91c5f3dc8f9f02f3f9f8c53ad665f2f
  declare var ononline:
    | ((this: DedicatedWorkerGlobalScope, ev: Event) => unknown)
    | null;
-@@ -8107,25 +11099,53 @@ declare var onrejectionhandled:
+@@ -8110,25 +11102,53 @@ declare var onrejectionhandled:
  declare var onunhandledrejection:
    | ((this: DedicatedWorkerGlobalScope, ev: PromiseRejectionEvent) => unknown)
    | null;
@@ -7314,7 +7314,7 @@ index 5564104ba85f93df6aac7e06735a425193e45157..e91c5f3dc8f9f02f3f9f8c53ad665f2f
  declare function createImageBitmap(
    image: ImageBitmapSource,
    options?: ImageBitmapOptions,
-@@ -8138,26 +11158,32 @@ declare function createImageBitmap(
+@@ -8141,26 +11161,32 @@ declare function createImageBitmap(
    sh: number,
    options?: ImageBitmapOptions,
  ): Promise<ImageBitmap>;
@@ -7350,7 +7350,7 @@ index 5564104ba85f93df6aac7e06735a425193e45157..e91c5f3dc8f9f02f3f9f8c53ad665f2f
  declare function cancelAnimationFrame(handle: number): void;
  declare function requestAnimationFrame(callback: FrameRequestCallback): number;
  declare function addEventListener<
-@@ -8196,10 +11222,15 @@ type BinaryData = ArrayBuffer | ArrayBufferView;
+@@ -8199,10 +11225,15 @@ type BinaryData = ArrayBuffer | ArrayBufferView;
  type BlobPart = BufferSource | Blob | string;
  type BodyInit = ReadableStream | XMLHttpRequestBodyInit;
  type BufferSource = ArrayBufferView | ArrayBuffer;
@@ -7367,7 +7367,7 @@ index 5564104ba85f93df6aac7e06735a425193e45157..e91c5f3dc8f9f02f3f9f8c53ad665f2f
  type Float32List = Float32Array | readonly GLfloat[];
  type FormDataEntryValue = File | string;
  type GLbitfield = number;
-@@ -8246,8 +11277,9 @@ type ReadableStreamReadResult<T> =
+@@ -8249,8 +11280,9 @@ type ReadableStreamReadResult<T> =
  type ReadableStreamReader<T> =
    | ReadableStreamDefaultReader<T>
    | ReadableStreamBYOBReader;
@@ -7378,7 +7378,7 @@ index 5564104ba85f93df6aac7e06735a425193e45157..e91c5f3dc8f9f02f3f9f8c53ad665f2f
  type TimerHandler = string | Function;
  type Transferable =
    | OffscreenCanvas
-@@ -8256,6 +11288,7 @@ type Transferable =
+@@ -8259,6 +11291,7 @@ type Transferable =
    | ReadableStream
    | WritableStream
    | TransformStream
@@ -7386,7 +7386,7 @@ index 5564104ba85f93df6aac7e06735a425193e45157..e91c5f3dc8f9f02f3f9f8c53ad665f2f
    | ArrayBuffer;
  type Uint32List = Uint32Array | readonly GLuint[];
  type VibratePattern = number | readonly number[];
-@@ -8265,7 +11298,25 @@ type XMLHttpRequestBodyInit =
+@@ -8268,7 +11301,25 @@ type XMLHttpRequestBodyInit =
    | FormData
    | URLSearchParams
    | string;
@@ -7412,7 +7412,7 @@ index 5564104ba85f93df6aac7e06735a425193e45157..e91c5f3dc8f9f02f3f9f8c53ad665f2f
  type CanvasDirection = 'inherit' | 'ltr' | 'rtl';
  type CanvasFillRule = 'evenodd' | 'nonzero';
  type CanvasFontKerning = 'auto' | 'none' | 'normal';
-@@ -8303,9 +11354,12 @@ type CanvasTextRendering =
+@@ -8306,9 +11357,12 @@ type CanvasTextRendering =
    | 'optimizeLegibility'
    | 'optimizeSpeed';
  type ClientTypes = 'all' | 'sharedworker' | 'window' | 'worker';
@@ -7425,7 +7425,7 @@ index 5564104ba85f93df6aac7e06735a425193e45157..e91c5f3dc8f9f02f3f9f8c53ad665f2f
  type EndingType = 'native' | 'transparent';
  type FileSystemHandleKind = 'directory' | 'file';
  type FontDisplay = 'auto' | 'block' | 'fallback' | 'optional' | 'swap';
-@@ -8339,12 +11393,16 @@ type GlobalCompositeOperation =
+@@ -8342,12 +11396,16 @@ type GlobalCompositeOperation =
    | 'source-out'
    | 'source-over'
    | 'xor';
@@ -7443,7 +7443,7 @@ index 5564104ba85f93df6aac7e06735a425193e45157..e91c5f3dc8f9f02f3f9f8c53ad665f2f
  type ImageSmoothingQuality = 'high' | 'low' | 'medium';
  type KeyFormat = 'jwk' | 'pkcs8' | 'raw' | 'spki';
  type KeyType = 'private' | 'public' | 'secret';
-@@ -8357,6 +11415,7 @@ type KeyUsage =
+@@ -8360,6 +11418,7 @@ type KeyUsage =
    | 'unwrapKey'
    | 'verify'
    | 'wrapKey';
@@ -7451,7 +7451,7 @@ index 5564104ba85f93df6aac7e06735a425193e45157..e91c5f3dc8f9f02f3f9f8c53ad665f2f
  type LockMode = 'exclusive' | 'shared';
  type MediaDecodingType = 'file' | 'media-source' | 'webrtc';
  type MediaEncodingType = 'record' | 'webrtc';
-@@ -8442,10 +11501,22 @@ type ServiceWorkerState =
+@@ -8445,10 +11504,22 @@ type ServiceWorkerState =
  type ServiceWorkerUpdateViaCache = 'all' | 'imports' | 'none';
  type TransferFunction = 'hlg' | 'pq' | 'srgb';
  type VideoColorPrimaries = 'bt470bg' | 'bt709' | 'smpte170m';

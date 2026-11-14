@@ -1,5 +1,5 @@
 diff --git a/v5.7/output/lib-files/lib.webworker.d.ts b/v5.8/output/lib-files/lib.webworker.d.ts
-index 5d666e9b990ce7383b1421a44d6e7eb721a90465..23242dd9908cb7ac6ca958197bd22fb8b660ff26 100644
+index bde0fcc6ab1c5af7aa469004880c92ef84991091..90e6fdfd6508583f9ac18b0a36e102082c99363d 100644
 --- a/v5.7/output/lib-files/lib.webworker.d.ts
 +++ b/v5.8/output/lib-files/lib.webworker.d.ts
 @@ -297,7 +297,7 @@ interface ExtendableMessageEventInit extends ExtendableEventInit {
@@ -639,7 +639,7 @@ index 5d666e9b990ce7383b1421a44d6e7eb721a90465..23242dd9908cb7ac6ca958197bd22fb8
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WritableStreamDefaultWriter/abort) */
    abort(reason?: unknown): Promise<void>;
    /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/WritableStreamDefaultWriter/close) */
-@@ -11582,14 +11820,6 @@ interface WebCodecsErrorCallback {
+@@ -11585,14 +11823,6 @@ interface WebCodecsErrorCallback {
   * [MDN Reference](https://developer.mozilla.org/docs/Web/API/DedicatedWorkerGlobalScope/name)
   */
  declare const name: string;
@@ -654,7 +654,7 @@ index 5d666e9b990ce7383b1421a44d6e7eb721a90465..23242dd9908cb7ac6ca958197bd22fb8
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/DedicatedWorkerGlobalScope/rtctransform_event) */
  declare const onrtctransform:
    | ((this: DedicatedWorkerGlobalScope, ev: RTCTransformEvent) => unknown)
-@@ -11697,11 +11927,11 @@ declare var performance: Performance;
+@@ -11700,11 +11930,11 @@ declare var performance: Performance;
  declare function atob(data: string): string;
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/btoa) */
  declare function btoa(data: string): string;
@@ -669,7 +669,7 @@ index 5d666e9b990ce7383b1421a44d6e7eb721a90465..23242dd9908cb7ac6ca958197bd22fb8
  declare function createImageBitmap(
    image: ImageBitmapSource,
    options?: ImageBitmapOptions,
-@@ -11719,23 +11949,23 @@ declare function fetch(
+@@ -11722,23 +11952,23 @@ declare function fetch(
    input: RequestInfo | URL,
    init?: RequestInit,
  ): Promise<Response>;
@@ -698,7 +698,7 @@ index 5d666e9b990ce7383b1421a44d6e7eb721a90465..23242dd9908cb7ac6ca958197bd22fb8
  declare function structuredClone<T = unknown>(
    value: T,
    options?: StructuredSerializeOptions,
-@@ -11744,6 +11974,14 @@ declare function structuredClone<T = unknown>(
+@@ -11747,6 +11977,14 @@ declare function structuredClone<T = unknown>(
  declare function cancelAnimationFrame(handle: number): void;
  /** [MDN Reference](https://developer.mozilla.org/docs/Web/API/DedicatedWorkerGlobalScope/requestAnimationFrame) */
  declare function requestAnimationFrame(callback: FrameRequestCallback): number;
@@ -713,7 +713,7 @@ index 5d666e9b990ce7383b1421a44d6e7eb721a90465..23242dd9908cb7ac6ca958197bd22fb8
  declare function addEventListener<
    K extends keyof DedicatedWorkerGlobalScopeEventMap,
  >(
-@@ -11815,6 +12053,7 @@ type IDBValidKey =
+@@ -11818,6 +12056,7 @@ type IDBValidKey =
    | BufferSource
    | readonly IDBValidKey[];
  type ImageBitmapSource = CanvasImageSource | Blob | ImageData;
@@ -721,7 +721,7 @@ index 5d666e9b990ce7383b1421a44d6e7eb721a90465..23242dd9908cb7ac6ca958197bd22fb8
  type Int32List = Int32Array | readonly GLint[];
  type MessageEventSource = MessagePort | ServiceWorker;
  type NamedCurve = string;
-@@ -11849,6 +12088,7 @@ type Transferable =
+@@ -11852,6 +12091,7 @@ type Transferable =
    | TransformStream
    | AudioData
    | VideoFrame
@@ -729,7 +729,7 @@ index 5d666e9b990ce7383b1421a44d6e7eb721a90465..23242dd9908cb7ac6ca958197bd22fb8
    | ArrayBuffer;
  type Uint32List = Uint32Array | readonly GLuint[];
  type XMLHttpRequestBodyInit =
-@@ -11999,7 +12239,9 @@ type OffscreenRenderingContextId =
+@@ -12002,7 +12242,9 @@ type OffscreenRenderingContextId =
    | 'webgpu';
  type OpusBitstreamFormat = 'ogg' | 'opus';
  type PermissionName =
@@ -739,7 +739,7 @@ index 5d666e9b990ce7383b1421a44d6e7eb721a90465..23242dd9908cb7ac6ca958197bd22fb8
    | 'midi'
    | 'notifications'
    | 'persistent-storage'
-@@ -12010,6 +12252,7 @@ type PermissionState = 'denied' | 'granted' | 'prompt';
+@@ -12013,6 +12255,7 @@ type PermissionState = 'denied' | 'granted' | 'prompt';
  type PredefinedColorSpace = 'display-p3' | 'srgb';
  type PremultiplyAlpha = 'default' | 'none' | 'premultiply';
  type PushEncryptionKeyName = 'auth' | 'p256dh';
