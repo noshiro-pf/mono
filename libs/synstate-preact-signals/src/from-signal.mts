@@ -8,8 +8,12 @@ import { source, type InitializedSourceObservable } from 'synstate';
  * This allows applying synstate's rich operator chain (e.g. `map`, `filter`,
  * `debounce`, `switchMap`) to values originating from Preact Signals.
  *
- * The bridge uses `effect()` from `@preact/signals` to track signal changes and
- * propagate them to the observable.
+ * The bridge subscribes to the signal with its `subscribe` method and passes
+ * each new value on to the observable. A signal that a subscriber or an
+ * operator of the observable reads is not tracked: only a change of the signal
+ * itself makes the observable emit. That needs `@preact/signals-core` 1.2.0 or
+ * later, which every `@preact/signals` from 1.1.0 depends on; with an older
+ * core such a read still makes the observable emit again.
  *
  * @returns A tuple of `[observable, dispose]`.
  *   - `observable` — an `InitializedSourceObservable` that mirrors the signal.
@@ -44,11 +48,32 @@ export const fromSignal = <A,>(
   observable: InitializedSourceObservable<A>,
   dispose: () => void,
 ] => {
-  const src = source<A>(sig.value);
+  // `peek`, so that a `fromSignal` called inside an effect or a computed does
+  // not make the enclosing effect or computed depend on the signal.
+  const src = source<A>(sig.peek());
 
-  const dispose = effect(() => {
-    src.next(sig.value);
-  });
+  const pass = (value: A): void => {
+    src.next(value);
+  };
+
+  // From `@preact/signals-core` 1.2.0, `subscribe` does not track what its
+  // callback reads, so a signal that a subscriber or a projection of the
+  // observable reads while `next` runs is not taken for a dependency of the
+  // bridge; core 1.1 tracks it, as an effect does. Core 1.0, which the peer
+  // range admits, has no `subscribe` although the installed types declare one,
+  // so the bridge follows the signal with an effect there rather than throw.
+  // Either calls back once before returning, with the signal's current value;
+  // nothing can have subscribed to the source yet, so no one sees what it held
+  // before.
+  // The bridge is not tied to the synstate scope `fromSignal` runs in: a scope
+  // that disposes the source leaves the subscription to the signal live until
+  // `dispose` is called.
+  const dispose =
+    typeof sig.subscribe === 'function'
+      ? sig.subscribe(pass)
+      : effect(() => {
+          pass(sig.value);
+        });
 
   return [src, dispose] as const;
 };
