@@ -152,7 +152,7 @@ export const eslintReactRules = {
   'react/static-property-placement': withDefaultOption('error'),
   'react/style-prop-object': withDefaultOption('error'),
   'react/void-dom-elements-no-children': 'error',
-  // Replaced by ts-restrictions/jsx-boolean-logical-operands, which reads the
+  // Replaced by ts-ui-restrictions/jsx-boolean-logical-operands, which reads the
   // operand types: this one reports `a && b` with two booleans as well.
   'react/jsx-no-leaked-render': 'off',
   'react/checked-requires-onchange-or-readonly': withDefaultOption('error'),

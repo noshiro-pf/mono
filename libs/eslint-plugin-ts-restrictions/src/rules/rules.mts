@@ -2,7 +2,6 @@ import type { ESLintPlugin } from '../types.mjs';
 import { checkDestructuringCompleteness } from './check-destructuring-completeness.mjs';
 import { explicitCollectionTypeArguments } from './explicit-collection-type-arguments.mjs';
 import { functionOrder } from './function-order.mjs';
-import { jsxBooleanLogicalOperands } from './jsx-boolean-logical-operands.mjs';
 import { noClockReadAtModuleLoad } from './no-clock-read-at-module-load.mjs';
 import { noDateOnlyStringToDate } from './no-date-only-string-to-date.mjs';
 import { noDetachedJsdoc } from './no-detached-jsdoc.mjs';
@@ -23,13 +22,11 @@ import { preferNullishCoalescingWhenSafe } from './prefer-nullish-coalescing-whe
 import { preferOptionalChainOverTernary } from './prefer-optional-chain-over-ternary.mjs';
 import { preferRangeInNumberLineOrder } from './prefer-range-in-number-line-order.mjs';
 import { preferTernary } from './prefer-ternary.mjs';
-import { requireImeGuardOnEnter } from './require-ime-guard-on-enter.mjs';
 
 export const tsRestrictionsRules = {
   'check-destructuring-completeness': checkDestructuringCompleteness,
   'explicit-collection-type-arguments': explicitCollectionTypeArguments,
   'function-order': functionOrder,
-  'jsx-boolean-logical-operands': jsxBooleanLogicalOperands,
   'no-clock-read-at-module-load': noClockReadAtModuleLoad,
   'no-date-only-string-to-date': noDateOnlyStringToDate,
   'no-detached-jsdoc': noDetachedJsdoc,
@@ -50,5 +47,4 @@ export const tsRestrictionsRules = {
   'prefer-optional-chain-over-ternary': preferOptionalChainOverTernary,
   'prefer-range-in-number-line-order': preferRangeInNumberLineOrder,
   'prefer-ternary': preferTernary,
-  'require-ime-guard-on-enter': requireImeGuardOnEnter,
 } as const satisfies ESLintPlugin['rules'];

@@ -8,7 +8,9 @@ export const eslintTsRestrictionsRules = {
   'ts-restrictions/no-restricted-cast-name': 'off',
   'ts-restrictions/explicit-collection-type-arguments': 'error',
   'ts-restrictions/function-order': 'error',
-  'ts-restrictions/jsx-boolean-logical-operands': 'error',
+  // Moved to `ts-ui-restrictions/jsx-boolean-logical-operands`; deprecated, and
+  // kept loadable until the next major.
+  'ts-restrictions/jsx-boolean-logical-operands': 0,
   'ts-restrictions/no-clock-read-at-module-load': withDefaultOption('error'),
   'ts-restrictions/no-date-only-string-to-date': withDefaultOption('error'),
   'ts-restrictions/no-negated-comparison': 'error',
@@ -29,7 +31,9 @@ export const eslintTsRestrictionsRules = {
   'ts-restrictions/prefer-optional-chain-over-ternary': 'error',
   'ts-restrictions/prefer-range-in-number-line-order': 'error',
   'ts-restrictions/prefer-ternary': ['error', 'only-single-line'],
-  'ts-restrictions/require-ime-guard-on-enter': withDefaultOption('error'),
+  // Moved to `ts-ui-restrictions/require-ime-guard`; deprecated, and kept
+  // loadable until the next major.
+  'ts-restrictions/require-ime-guard-on-enter': 0,
   'ts-restrictions/check-destructuring-completeness':
     withDefaultOption('error'),
 } as const satisfies EslintTsRestrictionsRules;

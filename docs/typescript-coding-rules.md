@@ -207,7 +207,7 @@ One component per file.
     - Avoid props spread and inline functions or objects.
     - Keep hook dependency arrays and call order exact.
     - `cond ? <Something /> : undefined`, not `cond && <Something />`
-      (`ts-restrictions/jsx-boolean-logical-operands`).
+      (`ts-ui-restrictions/jsx-boolean-logical-operands`).
     - No adjacent expressions to concatenate strings (`<div>{x}{y}</div>`);
       use a template literal: ``<div>{`${x}${y}`}</div>``.
 - Accessibility

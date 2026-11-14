@@ -4,10 +4,15 @@ import {
   type TSESLint,
   type TSESTree,
 } from '@typescript-eslint/utils';
-import { asNode, createGetLayerTypes, isTypeWrapper } from 'eslint-rule-forge';
+import {
+  asNode,
+  createGetLayerTypes,
+  isTypeWrapper,
+  jsxValuePositionOf,
+  type JsxValuePosition,
+} from 'eslint-rule-forge';
 import type { DeepReadonly } from 'ts-type-forge';
 import * as ts from 'typescript';
-import { jsxValuePositionOf, type JsxValuePosition } from './jsx-utils.mjs';
 
 type Options = readonly [];
 

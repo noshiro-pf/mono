@@ -101,23 +101,6 @@ namespace FunctionOrder {
 }
 
 /**
- * @description Require booleans on both sides of `&&` and `||` whose value is rendered or passed in JSX, and write the rest as a ternary (`{a && <X />}` → `{a ? <X /> : undefined}`).
- *
- *  ```md
- *  | key        | value   |
- *  | :--------- | :------ |
- *  | type       | problem |
- *  | deprecated | false   |
- *  | fixable    | code    |
- *  ```
- *
- * @internal Reached by indexing the rules record by the rule's name.
- */
-namespace JsxBooleanLogicalOperands {
-  export type RuleEntry = Linter.StringSeverity;
-}
-
-/**
  * @description Disallow reading the clock (`Date.now()`, `new Date()`) when a module loads, which keeps that moment for as long as the module lives
  *
  *  ```md
@@ -666,66 +649,10 @@ namespace PreferTernary {
     'off' | Linter.Severity | readonly [Linter.StringSeverity, Options];
 }
 
-/**
- * @description Require a keyboard handler that compares `event.key` or `event.code` with `'Enter'` or `'Escape'` to check the same event for input method composition
- *
- *  ```md
- *  | key        | value   |
- *  | :--------- | :------ |
- *  | type       | problem |
- *  | deprecated | false   |
- *  | fixable    | false   |
- *  ```
- *
- * @internal Reached by indexing the rules record by the rule's name.
- */
-namespace RequireImeGuardOnEnter {
-  /**
-   * ### schema
-   *
-   * ```json
-   * [
-   *   {
-   *     "type": "object",
-   *     "properties": {
-   *       "guardFunctions": {
-   *         "type": "array",
-   *         "items": {
-   *           "type": "string"
-   *         },
-   *         "description": "Names of functions that, called with the event, tell an input method's key down: the exported name for a named or namespace import, the name it is called by for anything else (default: `[\"isImeKeyDown\"]`)"
-   *       },
-   *       "keys": {
-   *         "type": "array",
-   *         "items": {
-   *           "type": "string",
-   *           "enum": [
-   *             "Enter",
-   *             "Escape"
-   *           ]
-   *         },
-   *         "uniqueItems": true,
-   *         "description": "The keys whose comparisons need the check (default: `[\"Enter\", \"Escape\"]`)"
-   *       }
-   *     },
-   *     "additionalProperties": false
-   *   }
-   * ]
-   * ```
-   */
-  export type Options = NonNullable<
-    RuleOptionsOf<'require-ime-guard-on-enter'>[0]
-  >;
-
-  export type RuleEntry =
-    'off' | Linter.Severity | readonly [Linter.StringSeverity, Options];
-}
-
 export type EslintTsRestrictionsRules = Readonly<{
   'ts-restrictions/check-destructuring-completeness': CheckDestructuringCompleteness.RuleEntry;
   'ts-restrictions/explicit-collection-type-arguments': ExplicitCollectionTypeArguments.RuleEntry;
   'ts-restrictions/function-order': FunctionOrder.RuleEntry;
-  'ts-restrictions/jsx-boolean-logical-operands': JsxBooleanLogicalOperands.RuleEntry;
   'ts-restrictions/no-clock-read-at-module-load': NoClockReadAtModuleLoad.RuleEntry;
   'ts-restrictions/no-date-only-string-to-date': NoDateOnlyStringToDate.RuleEntry;
   'ts-restrictions/no-detached-jsdoc': NoDetachedJsdoc.RuleEntry;
@@ -746,7 +673,6 @@ export type EslintTsRestrictionsRules = Readonly<{
   'ts-restrictions/prefer-optional-chain-over-ternary': PreferOptionalChainOverTernary.RuleEntry;
   'ts-restrictions/prefer-range-in-number-line-order': PreferRangeInNumberLineOrder.RuleEntry;
   'ts-restrictions/prefer-ternary': PreferTernary.RuleEntry;
-  'ts-restrictions/require-ime-guard-on-enter': RequireImeGuardOnEnter.RuleEntry;
 }>;
 
 export type EslintTsRestrictionsRulesOption = Readonly<{
@@ -757,7 +683,6 @@ export type EslintTsRestrictionsRulesOption = Readonly<{
   'ts-restrictions/no-restricted-cast-name': NoRestrictedCastName.Options;
   'ts-restrictions/no-restricted-syntax': NoRestrictedSyntax.Options;
   'ts-restrictions/prefer-ternary': PreferTernary.Options;
-  'ts-restrictions/require-ime-guard-on-enter': RequireImeGuardOnEnter.Options;
 }>;
 
 // If this assertion fails to type-check, this generated file has drifted from

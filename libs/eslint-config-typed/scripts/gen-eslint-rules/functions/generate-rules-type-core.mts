@@ -1,5 +1,6 @@
 import type { DeprecatedInfo } from '@eslint/core';
 import { tsDataForgeRules } from 'eslint-plugin-ts-data-forge';
+import { tsUiRestrictionsRules } from 'eslint-plugin-ts-ui-restrictions';
 import { builtinRules } from 'eslint/use-at-your-own-risk';
 import { compile, type Options } from 'json-schema-to-typescript';
 import { Arr, castDeepMutable, expectType } from 'ts-data-forge';
@@ -476,6 +477,10 @@ const getRules = async (
     case eslintPlugins.EslintTsRestrictionsRules.pluginName:
       // eslint-disable-next-line total-functions/no-unsafe-type-assertion
       return Object.entries(tsRestrictionsRules as unknown as Rules);
+
+    case eslintPlugins.EslintTsUiRestrictionsRules.pluginName:
+      // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+      return Object.entries(tsUiRestrictionsRules as unknown as Rules);
 
     case eslintPlugins.EslintReactCodingStyleRules.pluginName:
       // eslint-disable-next-line total-functions/no-unsafe-type-assertion

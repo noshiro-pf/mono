@@ -1365,6 +1365,7 @@ const generateSpace = async (
  */
 const notYetPublished: ReadonlySet<string> = new Set<string>([
   'eslint-plugin-ts-restrictions',
+  'eslint-plugin-ts-ui-restrictions',
   'synstate-router-preact',
   'ts-std-forge-keys',
 ]);
