@@ -12,8 +12,7 @@ if (import.meta.vitest !== undefined) {
     //
     //  Explanation:
     //  - merge combines multiple observables into one
-    //  - Emits values from any source as they arrive
-    //  - Order is preserved based on emission time
+    //  - events$ emits c1, k1, c2 and k2 in the order they are written, each in its own update
 
     const clicks$ = source<string>();
 

@@ -21,14 +21,16 @@ import type {
 } from '../types/index.mjs';
 
 /**
- * Merges multiple observables into a single observable that emits all values from all sources.
- * Emits whenever any source observable emits a value.
+ * Merges several observables into one that emits whenever any of them emits, at most once per update.
  * It holds no value until a source emits, even when its sources hold one.
  * Pipe `withInitialValue` after it where a value is needed from the start.
  *
+ * When several sources emit in the same update, for example an observable and what is mapped from it, `merge` passes on the value of the first of them in the order of `parents`, and the other values of that update are not passed on.
+ * Use `combine` or `derive` to read them together.
+ *
  * @template OS - Tuple type of source observables
  * @param parents - Array of observables to merge
- * @returns A merged observable emitting values from any source
+ * @returns The merged observable
  *
  * @example
  * ```ts
@@ -40,8 +42,7 @@ import type {
  * //
  * //  Explanation:
  * //  - merge combines multiple observables into one
- * //  - Emits values from any source as they arrive
- * //  - Order is preserved based on emission time
+ * //  - events$ emits c1, k1, c2 and k2 in the order they are written, each in its own update
  *
  * const clicks$ = source<string>();
  *
@@ -90,6 +91,12 @@ class MergeObservableClass<const P extends NonEmptyUnknownList>
   }
 
   override tryUpdate(updateToken: UpdateToken): void {
+    // The first parent in `parents` that emitted in this update wins and the
+    // others' values are dropped, as the JSDoc documents; that is intended, not
+    // a case to warn about. A parent that a nested update (a write during
+    // propagation, which synstate warns against) made emit again carries that
+    // update's token and is skipped, as in every node; the JSDoc, like every
+    // operator's, describes writes made outside an update.
     const parentToUse = this.parents.find(
       (o) => o.updateToken === updateToken && Optional.isSome(o.getSnapshot()),
     );
