@@ -1,5 +1,5 @@
 diff --git a/v5.7/output/lib-files-branded/lib.es5.d.ts b/v5.8/output/lib-files-branded/lib.es5.d.ts
-index 31a4853cd4c4ce4063913f5cfcbc5369cf25a762..c15b9c601989e21c47dfa5ef5c8bca90c93f6a7c 100644
+index e2eecfd0cc42ea10ba80fd7e27b2ee3dd028f42d..f1afdc8f6c62ca22f98c8b1bb62ddbc8fb6cb1e0 100644
 --- a/v5.7/output/lib-files-branded/lib.es5.d.ts
 +++ b/v5.8/output/lib-files-branded/lib.es5.d.ts
 @@ -856,7 +856,7 @@ interface Math {

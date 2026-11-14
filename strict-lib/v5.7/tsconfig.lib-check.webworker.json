@@ -4,6 +4,7 @@
     "../configs/tsconfig/lib-check-entry.ts",
     "../configs/tsconfig/lib-check-entry.array-includes.ts",
     "../configs/tsconfig/lib-check-entry.http-method.ts",
+    "../configs/tsconfig/lib-check-entry.intl-digits.ts",
     "../configs/tsconfig/lib-check-entry.object-from-entries.ts",
     "../configs/tsconfig/lib-check-entry.since-5.4.ts"
   ]

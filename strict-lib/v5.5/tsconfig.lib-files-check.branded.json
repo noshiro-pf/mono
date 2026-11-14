@@ -1,6 +1,9 @@
 {
   "extends": "../configs/tsconfig/tsconfig.lib-files-check.json",
   "include": ["./output/lib-files-branded"],
-  "files": ["../configs/tsconfig/lib-check-entry.branded.ts"],
+  "files": [
+    "../configs/tsconfig/lib-check-entry.branded.ts",
+    "../configs/tsconfig/lib-check-entry.intl-digits.ts"
+  ],
   "exclude": ["./output/lib-files-branded/lib.webworker.d.ts"]
 }

@@ -32,33 +32,26 @@ export const convertReturnTypeToUintRange: MonoTypeFunction<string> = (src) =>
         'maximumSignificantDigits?: number;',
         'maximumSignificantDigits?: UintRangeInclusive<1, 21>;',
       ),
+      // Fraction digits are 0–100 after ECMA-402 2023, in every lib file; an
+      // engine older than that edition throws a RangeError above 20. Each field
+      // has a call for the options and a regex for the resolved options, whose
+      // field is optional or required by lib file and version. The regexes take
+      // any whitespace after the colon.
       replaceWithNoMatchCheck(
         'minimumFractionDigits?: number | undefined',
-        'minimumFractionDigits?: UintRangeInclusive<0, 20> | undefined',
+        'minimumFractionDigits?: UintRangeInclusive<0, 100> | undefined',
       ),
       replaceWithNoMatchCheck(
-        'minimumFractionDigits?: number;',
-        'minimumFractionDigits?: UintRangeInclusive<0, 20>;',
-        { onNotFound: 'off' },
-      ),
-      replaceWithNoMatchCheck(
-        'minimumFractionDigits: number;',
-        'minimumFractionDigits: UintRangeInclusive<0, 20>;',
-        { onNotFound: 'off' },
+        /\b(minimumFractionDigits\??):\s*number;/gu,
+        '$1: UintRangeInclusive<0, 100>;',
       ),
       replaceWithNoMatchCheck(
         'maximumFractionDigits?: number | undefined',
-        'maximumFractionDigits?: UintRangeInclusive<0, 20> | undefined',
+        'maximumFractionDigits?: UintRangeInclusive<0, 100> | undefined',
       ),
       replaceWithNoMatchCheck(
-        'maximumFractionDigits?: number;',
-        'maximumFractionDigits?: UintRangeInclusive<0, 20>;',
-        { onNotFound: 'off' },
-      ),
-      replaceWithNoMatchCheck(
-        'maximumFractionDigits: number;',
-        'maximumFractionDigits: UintRangeInclusive<0, 20>;',
-        { onNotFound: 'off' },
+        /\b(maximumFractionDigits\??):\s*number;/gu,
+        '$1: UintRangeInclusive<0, 100>;',
       ),
     ),
   ).value;

@@ -6339,10 +6339,10 @@ declare namespace Intl {
       | import('ts-type-forge').UintRangeInclusive<1, 21>
       | undefined;
     readonly minimumFractionDigits?:
-      | import('ts-type-forge').UintRangeInclusive<0, 20>
+      | import('ts-type-forge').UintRangeInclusive<0, 100>
       | undefined;
     readonly maximumFractionDigits?:
-      | import('ts-type-forge').UintRangeInclusive<0, 20>
+      | import('ts-type-forge').UintRangeInclusive<0, 100>
       | undefined;
     readonly minimumSignificantDigits?:
       | import('ts-type-forge').UintRangeInclusive<1, 21>
@@ -6364,11 +6364,11 @@ declare namespace Intl {
     >;
     readonly minimumFractionDigits?: import('ts-type-forge').UintRangeInclusive<
       0,
-      20
+      100
     >;
     readonly maximumFractionDigits?: import('ts-type-forge').UintRangeInclusive<
       0,
-      20
+      100
     >;
     readonly minimumSignificantDigits?: import('ts-type-forge').UintRangeInclusive<
       1,

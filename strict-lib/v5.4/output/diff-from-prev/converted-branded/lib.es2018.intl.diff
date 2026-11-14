@@ -1,5 +1,5 @@
 diff --git a/v5.3/output/lib-files-branded/lib.es2018.intl.d.ts b/v5.4/output/lib-files-branded/lib.es2018.intl.d.ts
-index e52ec003f47d12fcb62201c19e70fb9a72ac5dd4..bd56604d62b79f3943f7d8326b793d49db7cef89 100644
+index 439296c1930a3c317bf2ae3f328e9ea4f7121cee..3c6831de16fe663b1053e899e3382f2811aa4bf0 100644
 --- a/v5.3/output/lib-files-branded/lib.es2018.intl.d.ts
 +++ b/v5.4/output/lib-files-branded/lib.es2018.intl.d.ts
 @@ -78,7 +78,7 @@ declare namespace Intl {

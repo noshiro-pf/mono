@@ -1,5 +1,5 @@
 diff --git a/v5.6/output/lib-files-branded/lib.es5.d.ts b/v5.7/output/lib-files-branded/lib.es5.d.ts
-index b8e4d9057523bf774c9db2fc27ba9d57d0159f9c..31a4853cd4c4ce4063913f5cfcbc5369cf25a762 100644
+index 40026693cee6b337486e24ed15b6d4f95555c0e8..e2eecfd0cc42ea10ba80fd7e27b2ee3dd028f42d 100644
 --- a/v5.6/output/lib-files-branded/lib.es5.d.ts
 +++ b/v5.7/output/lib-files-branded/lib.es5.d.ts
 @@ -2222,11 +2222,13 @@ interface ArrayBufferConstructor {
