@@ -1,8 +1,8 @@
 diff --git a/v5.1/output/lib-files-branded/lib.es5.d.ts b/v5.2/output/lib-files-branded/lib.es5.d.ts
-index 626deb11a4df8e0006778af74cbad5c8305b692e..bccd2985de0ef0e86374f9a39de901c7d8e4cf0b 100644
+index 5488caa4c9634baf40963e4464d9432a77781011..752816e1988b2078fa61177aa194103926a7c81c 100644
 --- a/v5.1/output/lib-files-branded/lib.es5.d.ts
 +++ b/v5.2/output/lib-files-branded/lib.es5.d.ts
-@@ -2163,6 +2163,15 @@ type Uncapitalize<S extends string> = intrinsic;
+@@ -2165,6 +2165,15 @@ type Uncapitalize<S extends string> = intrinsic;
   */
  interface ThisType<T> {}
  
@@ -18,7 +18,7 @@ index 626deb11a4df8e0006778af74cbad5c8305b692e..bccd2985de0ef0e86374f9a39de901c7
  /**
   * Represents a raw buffer of binary data, which is used to store data for the
   * different typed arrays. ArrayBuffers cannot be read from or written to directly,
-@@ -2437,7 +2446,7 @@ interface Int8Array {
+@@ -2439,7 +2448,7 @@ interface Int8Array {
     * @param target If target is negative, it is treated as length+target where length is the
     * length of the array.
     * @param start If start is negative, it is treated as length+start. If end is negative, it
@@ -27,7 +27,7 @@ index 626deb11a4df8e0006778af74cbad5c8305b692e..bccd2985de0ef0e86374f9a39de901c7
     * @param end If not specified, length of the this object is used as its default value.
     */
    copyWithin(
-@@ -2850,7 +2859,7 @@ interface Uint8Array {
+@@ -2852,7 +2861,7 @@ interface Uint8Array {
     * @param target If target is negative, it is treated as length+target where length is the
     * length of the array.
     * @param start If start is negative, it is treated as length+start. If end is negative, it
@@ -36,7 +36,7 @@ index 626deb11a4df8e0006778af74cbad5c8305b692e..bccd2985de0ef0e86374f9a39de901c7
     * @param end If not specified, length of the this object is used as its default value.
     */
    copyWithin(
-@@ -3267,7 +3276,7 @@ interface Uint8ClampedArray {
+@@ -3269,7 +3278,7 @@ interface Uint8ClampedArray {
     * @param target If target is negative, it is treated as length+target where length is the
     * length of the array.
     * @param start If start is negative, it is treated as length+start. If end is negative, it
@@ -45,7 +45,7 @@ index 626deb11a4df8e0006778af74cbad5c8305b692e..bccd2985de0ef0e86374f9a39de901c7
     * @param end If not specified, length of the this object is used as its default value.
     */
    copyWithin(
-@@ -3684,7 +3693,7 @@ interface Int16Array {
+@@ -3686,7 +3695,7 @@ interface Int16Array {
     * @param target If target is negative, it is treated as length+target where length is the
     * length of the array.
     * @param start If start is negative, it is treated as length+start. If end is negative, it
@@ -54,7 +54,7 @@ index 626deb11a4df8e0006778af74cbad5c8305b692e..bccd2985de0ef0e86374f9a39de901c7
     * @param end If not specified, length of the this object is used as its default value.
     */
    copyWithin(
-@@ -4101,7 +4110,7 @@ interface Uint16Array {
+@@ -4103,7 +4112,7 @@ interface Uint16Array {
     * @param target If target is negative, it is treated as length+target where length is the
     * length of the array.
     * @param start If start is negative, it is treated as length+start. If end is negative, it
@@ -63,7 +63,7 @@ index 626deb11a4df8e0006778af74cbad5c8305b692e..bccd2985de0ef0e86374f9a39de901c7
     * @param end If not specified, length of the this object is used as its default value.
     */
    copyWithin(
-@@ -4517,7 +4526,7 @@ interface Int32Array {
+@@ -4519,7 +4528,7 @@ interface Int32Array {
     * @param target If target is negative, it is treated as length+target where length is the
     * length of the array.
     * @param start If start is negative, it is treated as length+start. If end is negative, it
@@ -72,7 +72,7 @@ index 626deb11a4df8e0006778af74cbad5c8305b692e..bccd2985de0ef0e86374f9a39de901c7
     * @param end If not specified, length of the this object is used as its default value.
     */
    copyWithin(
-@@ -4934,7 +4943,7 @@ interface Uint32Array {
+@@ -4936,7 +4945,7 @@ interface Uint32Array {
     * @param target If target is negative, it is treated as length+target where length is the
     * length of the array.
     * @param start If start is negative, it is treated as length+start. If end is negative, it
@@ -81,7 +81,7 @@ index 626deb11a4df8e0006778af74cbad5c8305b692e..bccd2985de0ef0e86374f9a39de901c7
     * @param end If not specified, length of the this object is used as its default value.
     */
    copyWithin(
-@@ -5351,7 +5360,7 @@ interface Float32Array {
+@@ -5353,7 +5362,7 @@ interface Float32Array {
     * @param target If target is negative, it is treated as length+target where length is the
     * length of the array.
     * @param start If start is negative, it is treated as length+start. If end is negative, it
@@ -90,7 +90,7 @@ index 626deb11a4df8e0006778af74cbad5c8305b692e..bccd2985de0ef0e86374f9a39de901c7
     * @param end If not specified, length of the this object is used as its default value.
     */
    copyWithin(
-@@ -5768,7 +5777,7 @@ interface Float64Array {
+@@ -5770,7 +5779,7 @@ interface Float64Array {
     * @param target If target is negative, it is treated as length+target where length is the
     * length of the array.
     * @param start If start is negative, it is treated as length+start. If end is negative, it

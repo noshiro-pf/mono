@@ -998,9 +998,9 @@ interface Date {
   /** Returns a time as a string value appropriate to the host environment's current locale. */
   toLocaleTimeString(): string;
   /** Returns the stored time value in milliseconds since midnight, January 1, 1970 UTC. */
-  valueOf(): import('ts-type-forge').SafeUint;
+  valueOf(): import('ts-type-forge').SafeInt;
   /** Returns the stored time value in milliseconds since midnight, January 1, 1970 UTC. */
-  getTime(): import('ts-type-forge').SafeUint;
+  getTime(): import('ts-type-forge').SafeInt;
   /** Gets the year, using local time. */
   getFullYear(): NumberType.YearEnum;
   /** Gets the year using Universal Coordinated Time (UTC). */
@@ -1165,7 +1165,9 @@ interface DateConstructor {
    * Parses a string containing a date, and returns the number of milliseconds between that date and midnight, January 1, 1970.
    * @param s A date string
    */
-  parse(s: string): import('ts-type-forge').SafeUint;
+  parse(
+    s: string,
+  ): import('ts-type-forge').SafeInt | import('ts-type-forge').NaNType;
   /**
    * Returns the number of milliseconds between midnight, January 1, 1970 Universal Coordinated Time (UTC) (or GMT) and the specified date.
    * @param year The full year designation is required for cross-century date accuracy. If year is between 0 and 99 is used, then year is assumed to be 1900 + year.
@@ -1184,7 +1186,7 @@ interface DateConstructor {
     minutes?: import('ts-type-forge').MinutesEnum,
     seconds?: import('ts-type-forge').SecondsEnum,
     ms?: import('ts-type-forge').MillisecondsEnum,
-  ): import('ts-type-forge').SafeUint;
+  ): import('ts-type-forge').SafeInt;
   /** Returns the number of milliseconds elapsed since midnight, January 1, 1970 Universal Coordinated Time (UTC). */
   now(): import('ts-type-forge').SafeUint;
 }
@@ -6688,5 +6690,5 @@ declare namespace NumberType {
 
   export type NewArrayMaxSize = ArraySize;
 
-  export type YearEnum = import('ts-type-forge').SafeUint;
+  export type YearEnum = import('ts-type-forge').SafeInt;
 }
