@@ -317,11 +317,20 @@ export const restackBehind = async (
     nowEpochMs: number;
     /** How a conflict only in generated files is resolved, when it is. */
     regenerate: RegenerateConfig | undefined;
+    /**
+     * Only these, when given: a candidate whose commits conflict with the
+     * default branch, rebased ahead of its turn (`repair-ahead.mts`).
+     */
+    only?: ReadonlySet<number>;
   }>,
 ): Promise<
   Readonly<{ skipped: SkipRecords; outOfSync: OutOfSync; moved: boolean }>
 > => {
-  const targets = autoRebaseTargets(pullRequests, defaultBranch, context);
+  const targets = autoRebaseTargets(
+    pullRequests,
+    defaultBranch,
+    context,
+  ).filter((pr) => context.only?.has(pr.number) ?? true);
 
   if (!Arr.isNonEmpty(targets)) {
     return {

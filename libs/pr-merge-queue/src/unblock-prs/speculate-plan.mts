@@ -218,6 +218,27 @@ export const matchLayers = <L extends Layer>({
 };
 
 /**
+ * The red layers above the first that are not cleaned up (`dropFrom`, from
+ * `decideSpeculation`), each of a candidate: what the worker may repair ahead of
+ * its turn, while it waits for the first (`repair-ahead.mts`). A red first layer
+ * is its own pull request's set-aside, and one stacked on a candidate is on
+ * that one's branch rather than on the default branch, so neither is here.
+ */
+export const redAboveFirst = (
+  layers: readonly BuiltLayer[],
+  statuses: readonly LayerStatus[],
+  dropFrom: number | undefined,
+  candidates: ReadonlySet<number>,
+): readonly BuiltLayer[] =>
+  layers.filter(
+    (layer, index) =>
+      index > 0 &&
+      (dropFrom === undefined || index < dropFrom) &&
+      statuses[index]?.kind === 'red' &&
+      candidates.has(layer.number),
+  );
+
+/**
  * What cleaning up an invalid layer does with its runs and its branch. A layer's
  * runs diff against `main`, as a pull request's do, so a verdict they leave is
  * as true as that pull request's own run would be, and none has to be deleted:

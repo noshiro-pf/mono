@@ -373,6 +373,11 @@ export type LoopState = Readonly<{
   quiet: Quiet;
   /** `undefined` until the first survey, which has nothing to compare with. */
   stackedOn: StackedOn | undefined;
+  /**
+   * The head each pull request's fixers were last tried at ahead of its turn,
+   * or pushed (`repair-ahead.mts`), so that they are not run on it again.
+   */
+  triedAhead: ReadonlyMap<number, string>;
 }>;
 
 export type CycleResult = Readonly<{

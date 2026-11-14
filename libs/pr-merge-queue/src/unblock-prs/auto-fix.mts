@@ -60,8 +60,13 @@ export const autoFix = async (
   head: string,
   defaultBranch: string,
   config: AutoFixConfig | undefined,
+  /**
+   * The commit whose check runs say what failed: `head`, or the tip of its
+   * layer when it is fixed ahead of its turn (`repair-ahead.mts`).
+   */
+  checksAt: string = head,
 ): Promise<AutoFixed> => {
-  const runs = await listCheckRuns(api, head);
+  const runs = await listCheckRuns(api, checksAt);
 
   if (Result.isErr(runs)) {
     return declined(`cannot read the check runs: ${runs.value}`);
