@@ -2,6 +2,7 @@ import { Arr } from 'ts-data-forge';
 import * as tsm from 'ts-morph';
 import type { DeepReadonly } from 'ts-type-forge';
 import { hasDisableNextLineComment } from '../functions/index.mjs';
+import { isTypeAssertingWrapper } from '../utils/index.mjs';
 import type { TsMorphTransformer } from './types.mjs';
 
 const TRANSFORMER_NAME = 'enable-no-unchecked-indexed-access';
@@ -227,11 +228,9 @@ const isAlreadyAssertedOrGuarded = (
   outer: tsm.Node,
   parent: tsm.Node,
 ): boolean => {
-  if (
-    parent.isKind(tsm.SyntaxKind.NonNullExpression) ||
-    parent.isKind(tsm.SyntaxKind.AsExpression) ||
-    parent.isKind(tsm.SyntaxKind.TypeAssertionExpression)
-  ) {
+  // `satisfies` is left out on purpose: it checks the widened type rather than
+  // asserting it away, so `xs[0] satisfies number` still needs the `!`.
+  if (isTypeAssertingWrapper(parent)) {
     return true;
   }
 
