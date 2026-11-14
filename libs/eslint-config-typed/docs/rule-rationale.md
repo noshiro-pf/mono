@@ -26,7 +26,7 @@
 
 - 要素だけを使うなら `for (const x of xs)`。
 - 添字も要るなら `for (const [i, x] of xs.entries())`。
-- 数値の範囲を回すだけなら ts-data-forge の `range` を使い、`for (const i of range(0, n))` と書く。`range` は安全な整数しか受け取らないので、`n` がただの `number` なら `asSafeUint(n)` で変換して渡す。この書き換えは `ts-data-forge/prefer-range-for-loop` が自動修正するが、このルールはプリセットに含まれない。`eslint-plugin-ts-data-forge` を入れて `ts-data-forge` の名前で登録し、`eslintTsDataForgeRules` を加えたときにだけ働く（README の「ts-data-forge」の節を参照）。
+- 数値の範囲を回すだけなら ts-data-forge の `range` を使い、`for (const i of range(0, n))` と書く。`range` は安全な整数しか受け取らないので、`n` がただの `number` なら `asSafeUint(n)` で変換して渡す。この書き換えは `ts-data-forge/prefer-range-for-loop` が報告する。境界が `range` の受け取る型（`SafeInt` か、-512 から 511 までの整数リテラル）なら自動修正し、ただの `number` なら変換を選ぶのは書き手なので、提案（suggestion）にとどめる。ただし、このルールはプリセットに含まれない。`eslint-plugin-ts-data-forge` を入れて `ts-data-forge` の名前で登録し、`eslintTsDataForgeRules` を加えたときにだけ働く（README の「ts-data-forge」の節を参照）。
 
 ### 性能についての注記
 
