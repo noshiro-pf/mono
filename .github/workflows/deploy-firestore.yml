@@ -26,7 +26,7 @@ name: Deploy Firestore rules
 # that may only replace rules and indexes. The provider admits this workflow
 # on main only in the `firebase-deploy` environment, and only a token naming
 # that environment may act as the service account; the setup is in
-# docs/firestore-deploy.md and docs/event-schedule-app-deploy.md.
+# docs/firestore-deploy.md.
 
 on:
   push:
