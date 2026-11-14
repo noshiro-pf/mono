@@ -1,0 +1,5 @@
+---
+'synstate': patch
+---
+
+An observable no longer emits once it has completed, whatever still reaches it. A `fromSubscribable` whose subscribable called back after `complete()` (after `unsubscribe` had returned, or from a callback queued before the completion), or a `startUpdate` kept from `createRootObservable`'s `init` or from a `createAsyncChildObservable` and called after `complete()`, used to store the value and pass it on to children still live under another parent (`combine`, `derive`, `merge`, `zip`, `withCurrentValueFrom`), which then emitted a value from an observable reporting `isCompleted`. Such a value is now ignored, and a subscriber writing it no longer prints the write-during-propagation warning, since nothing is written. The same holds for a `setNext` a custom operator calls after completing itself. What is emitted while `complete()` runs the teardowns, before the observable counts as completed, is unaffected. A teardown registered with `onComplete` once the observable has completed runs at once, as before, and what it emits is now ignored too.

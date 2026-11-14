@@ -13,7 +13,10 @@ import { RootObservableClass } from './root-observable-class.mjs';
  * of `RootObservableClass` inherits.
  */
 export type RootObservableTools<A> = Readonly<{
-  /** Emits `nextValue` and propagates the update to all descendants. */
+  /**
+   * Emits `nextValue` and propagates the update to all descendants; does
+   * nothing once the observable has completed.
+   */
   startUpdate: (nextValue: A) => void;
 
   getSnapshot: () => Optional<A>;
@@ -25,10 +28,12 @@ export type RootObservableTools<A> = Readonly<{
 
   /**
    * Registers a teardown (clear timers, abort requests, remove listeners, …) to
-   * run at the beginning of `complete()`, in the order registered. Called from
+   * run at the beginning of `complete()`, in the order registered, before the
+   * observable counts as completed: what it emits still propagates. Called from
    * `init`, it lets the teardown close over what `init` creates.
    * Registered once the observable has completed — `init` may complete it
-   * synchronously first — the teardown runs at once.
+   * synchronously first — the teardown runs at once, and what it emits is
+   * ignored, as anything emitted after completion is.
    */
   onComplete: (teardown: () => void) => void;
 }>;

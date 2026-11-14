@@ -23,7 +23,10 @@ import {
  * only the observable being created may do to itself.
  */
 export type SyncChildObservableTools<A> = Readonly<{
-  /** Emits `nextValue` under `updateToken` and notifies subscribers. */
+  /**
+   * Emits `nextValue` under `updateToken` and notifies subscribers; does
+   * nothing once the observable has completed.
+   */
   setNext: (nextValue: A, updateToken: UpdateToken) => void;
 
   getSnapshot: () => Optional<A>;
@@ -41,7 +44,8 @@ export type SyncChildObservableTools<A> = Readonly<{
    * Registers a teardown (clear timers, unsubscribe inner observables, …) to
    * run when this observable completes or is disposed, in the order registered.
    * Called from `init`, it lets the teardown close over what `init` creates.
-   * Registered once the observable has completed, the teardown runs at once.
+   * Registered once the observable has completed, the teardown runs at once,
+   * and what it emits is ignored, as anything emitted after completion is.
    */
   onComplete: (teardown: () => void) => void;
 }>;
@@ -51,7 +55,10 @@ export type SyncChildObservableTools<A> = Readonly<{
  * Async children additionally start their own update propagation.
  */
 export type AsyncChildObservableTools<A> = Readonly<{
-  /** Emits `nextValue` and propagates the update to all descendants. */
+  /**
+   * Emits `nextValue` and propagates the update to all descendants; does
+   * nothing once the observable has completed.
+   */
   startUpdate: (nextValue: A) => void;
 }> &
   SyncChildObservableTools<A>;

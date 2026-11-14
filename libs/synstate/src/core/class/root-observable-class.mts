@@ -48,6 +48,14 @@ export class RootObservableClass<A>
    * once when it is a write from inside another update.
    */
   protected override startUpdate(nextValue: A): void {
+    // A completed root ignores the write (`ManagerObservableClass.startUpdate`),
+    // so there is nothing to warn about: the warning says the write propagates.
+    // The check is repeated here because the warning comes before the one
+    // there; a field read costs nothing next to the update it saves.
+    if (this.isCompleted) {
+      return;
+    }
+
     if (
       !this.#mut_hasWarned &&
       isPropagating() &&
