@@ -18,6 +18,7 @@ import {
   resolveRepo,
   resolveToken,
   rest,
+  restAllPages,
   sh,
   type ApiContext,
 } from '../lib/index.mjs';
@@ -325,8 +326,10 @@ export const missingInheritedOrder = async (
     return Result.ok({ body, missing: [] });
   }
 
-  const open = await rest(api, 'GET', '/pulls', BodiesListSchema, {
-    query: { state: 'open', per_page: '100' },
+  // Every page: a pull request whose `Start-After` this one inherits may be
+  // older than the newest hundred.
+  const open = await restAllPages(api, '/pulls', BodiesListSchema, {
+    query: { state: 'open' },
     withBodyHtml: true,
   });
 
@@ -462,12 +465,10 @@ const blockedByOf = async (
     return Result.ok([]);
   }
 
-  const listed = await rest(
+  const listed = await restAllPages(
     api,
-    'GET',
     `/issues/${issue}/dependencies/blocked_by`,
     t.array(t.record({ number: t.number(), repository_url: t.string() })),
-    { query: { per_page: '100' } },
   );
 
   const own =

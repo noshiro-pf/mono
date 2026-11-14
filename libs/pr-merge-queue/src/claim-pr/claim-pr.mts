@@ -16,6 +16,7 @@ import {
   resolveRepo,
   resolveToken,
   rest,
+  restAllPages,
   viewerLogin,
   type ApiContext,
 } from '../lib/index.mjs';
@@ -197,14 +198,12 @@ const readPullRequest = async (
     return tip;
   }
 
-  // The first page, oldest first: both comments are edited in place, so they
-  // stay where they were first posted.
-  const comments = await rest(
+  // Every page, oldest first: both comments are edited in place, so they stay
+  // where they were first posted, behind as many others as came after.
+  const comments = await restAllPages(
     context,
-    'GET',
     `/issues/${number}/comments`,
     CommentListSchema,
-    { query: { per_page: '100' } },
   );
 
   if (Result.isErr(comments)) {

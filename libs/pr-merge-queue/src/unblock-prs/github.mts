@@ -20,7 +20,7 @@ import {
   type NativeStackEntry,
   type RulesetRequirements,
 } from 'pr-report-core';
-import { Arr, isRecord, Result } from 'ts-data-forge';
+import { Arr, asUint32, isRecord, Result } from 'ts-data-forge';
 import * as t from 'ts-fortress';
 import {
   addLabel,
@@ -89,31 +89,65 @@ export const checkPreflight = async (
 };
 
 /**
- * The open pull requests, newest first, at most {@link OPEN_LIMIT} of them as
- * `gh pr list` read. GraphQL, because `mergeStateStatus` is not in REST.
+ * Every open pull request, newest first, a page of {@link OPEN_PAGE_SIZE} at a
+ * time. GraphQL, because `mergeStateStatus` is not in REST.
+ *
+ * Every page, and a page that cannot be read fails the whole list: the newest
+ * pages read as the whole would leave the oldest out of the queue, and the
+ * queue reads one missing as merged, so what named it in `Merge-After` would go
+ * first and its `blocks-release` would no longer hold the release.
  */
 export const listPullRequests = async (
   api: ApiContext,
-): Promise<Result<readonly PullRequest[], string>> =>
-  Result.map(
-    await askRepositoryOf(
+): Promise<Result<readonly PullRequest[], string>> => {
+  const query = [
+    'query($owner: String!, $name: String!, $after: String) {',
+    '  repository(owner: $owner, name: $name) {',
+    `    pullRequests(states: OPEN, first: ${OPEN_PAGE_SIZE}, after: $after, orderBy: { field: CREATED_AT, direction: DESC }) {`,
+    '      pageInfo { hasNextPage endCursor }',
+    `      nodes { ${PULL_REQUEST_FIELDS} }`,
+    '    }',
+    '  }',
+    '}',
+  ].join('\n');
+
+  const mut_listed: PullRequest[] = [];
+
+  let mut_after: string | undefined = undefined;
+
+  // A bound rather than a `while (true)`: a cursor that never ends would
+  // otherwise loop for ever.
+  for (const _page of Arr.seq(MAX_OPEN_PAGES)) {
+    const answered: Result<
+      t.TypeOf<typeof OpenPullRequestsPageSchema>,
+      string
+    > = await askRepositoryOf(
       api,
-      [
-        'query($owner: String!, $name: String!) {',
-        '  repository(owner: $owner, name: $name) {',
-        `    pullRequests(states: OPEN, first: ${OPEN_LIMIT}, orderBy: { field: CREATED_AT, direction: DESC }) {`,
-        `      nodes { ${PULL_REQUEST_FIELDS} }`,
-        '    }',
-        '  }',
-        '}',
-      ].join('\n'),
-      {},
-      t.record({
-        pullRequests: t.record({ nodes: t.array(PullRequestNodeSchema) }),
-      }),
-    ),
-    ({ pullRequests }) => pullRequests.nodes.map(pullRequestOfNode),
+      query,
+      mut_after === undefined ? {} : { after: mut_after },
+      OpenPullRequestsPageSchema,
+    );
+
+    if (Result.isErr(answered)) {
+      return Result.err(`the open pull requests: ${answered.value}`);
+    }
+
+    const page: t.TypeOf<typeof OpenPullRequestsPageSchema>['pullRequests'] =
+      answered.value.pullRequests;
+
+    mut_listed.push(...page.nodes.map(pullRequestOfNode));
+
+    if (!page.pageInfo.hasNextPage || page.pageInfo.endCursor === null) {
+      return Result.ok(mut_listed);
+    }
+
+    mut_after = page.pageInfo.endCursor;
+  }
+
+  return Result.err(
+    `the open pull requests: more than ${MAX_OPEN_PAGES.toString()} pages of ${OPEN_PAGE_SIZE.toString()}`,
   );
+};
 
 export const viewPullRequest = async (
   api: ApiContext,
@@ -148,8 +182,11 @@ export const pullRequestOfNode = (
     labels: node.labels.nodes,
   }) as const;
 
-/** How many open pull requests one survey reads, as many as `gh` did. */
-const OPEN_LIMIT = 100;
+/** GraphQL's largest page of a connection. */
+const OPEN_PAGE_SIZE = 100;
+
+/** A bound on the pages of open pull requests: 5000 of them. */
+const MAX_OPEN_PAGES = asUint32(50);
 
 /**
  * The fields of {@link PullRequestSchema}, read off it so that a field added
@@ -169,6 +206,17 @@ const PULL_REQUEST_FIELDS = Object.keys(PullRequestSchema.shape)
 const PullRequestNodeSchema = t.record({
   ...PullRequestSchema.shape,
   labels: t.record({ nodes: PullRequestSchema.shape.labels }),
+});
+
+/** One page of {@link listPullRequests}. */
+const OpenPullRequestsPageSchema = t.record({
+  pullRequests: t.record({
+    pageInfo: t.record({
+      hasNextPage: t.boolean(),
+      endCursor: t.union([t.string(), t.nullType]),
+    }),
+    nodes: t.array(PullRequestNodeSchema),
+  }),
 });
 
 /**

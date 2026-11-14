@@ -1,14 +1,223 @@
 import type { LinkedIssue } from 'pr-report-core';
-import { Result } from 'ts-data-forge';
+import { Arr, asUint32, Num, Result } from 'ts-data-forge';
+import * as t from 'ts-fortress';
 import {
+  FAKE_BASE_TIP,
+  FAKE_HEAD_SHA,
   FAKE_REPO,
   fakeGitHub,
   fakePullRequest,
   type FakeRoutes,
 } from '../../test/index.mjs';
+import { parseJson } from '../lib/index.mjs';
 import { createClient } from './github.mjs';
 
 describe(createClient, () => {
+  describe('the open pull requests', () => {
+    test('reads every page of them, past the first hundred', async () => {
+      const github = await fakeGitHub(openPages([100, 3]));
+
+      const facts = await createClient(undefined, github.baseUrl).facts(repo, {
+        checks: false,
+      });
+
+      await github.close();
+
+      assert.isTrue(Result.isOk(facts));
+
+      assert.deepStrictEqual(
+        facts.value.map(({ number }) => number),
+        Array.from(Arr.range(asUint32(1), asUint32(104))),
+      );
+    });
+
+    test('stops at the page that comes back short, asking no further', async () => {
+      const github = await fakeGitHub(openPages([100, 3]));
+
+      await createClient(undefined, github.baseUrl).facts(repo, {
+        checks: false,
+      });
+
+      await github.close();
+
+      assert.deepStrictEqual(
+        github.requested
+          .filter((url) => url.includes('/pulls?state=open'))
+          .map(pageOf),
+        [1, 2],
+      );
+    });
+
+    test('lists one moved onto the next page while they are read once', async () => {
+      // Pull request 100 appears at the end of the first page and again at the
+      // top of the second, as when an older one is reopened in between.
+      const github = await fakeGitHub(({ url }) =>
+        url.includes('/pulls?state=open')
+          ? {
+              body: (pageOf(url) === 1
+                ? Arr.range(asUint32(1), asUint32(101))
+                : [100, 101]
+              ).map((number) => fakePullRequest({ number })),
+            }
+          : undefined,
+      );
+
+      const facts = await createClient(undefined, github.baseUrl).facts(repo, {
+        checks: false,
+      });
+
+      await github.close();
+
+      assert.isTrue(Result.isOk(facts));
+
+      assert.deepStrictEqual(
+        facts.value.map(({ number }) => number),
+        Array.from(Arr.range(asUint32(1), asUint32(102))),
+      );
+    });
+
+    test('reads the empty page after exactly a hundred, and stops there', async () => {
+      const github = await fakeGitHub(openPages([100]));
+
+      const facts = await createClient(undefined, github.baseUrl).facts(repo, {
+        checks: false,
+      });
+
+      await github.close();
+
+      assert.isTrue(Result.isOk(facts));
+
+      assert.lengthOf(facts.value, 100);
+
+      assert.deepStrictEqual(
+        github.requested
+          .filter((url) => url.includes('/pulls?state=open'))
+          .map(pageOf),
+        [1, 2],
+      );
+    });
+
+    test('refuses when a page after the first cannot be read, rather than report part of them', async () => {
+      const github = await fakeGitHub(({ url }) =>
+        url.includes('/pulls?state=open')
+          ? pageOf(url) === 1
+            ? {
+                body: Arr.range(asUint32(1), asUint32(101)).map((number) =>
+                  fakePullRequest({ number }),
+                ),
+              }
+            : { status: 500, body: { message: 'Server Error' } }
+          : undefined,
+      );
+
+      const facts = await createClient(undefined, github.baseUrl).facts(repo, {
+        checks: false,
+      });
+
+      await github.close();
+
+      assert.isTrue(Result.isErr(facts));
+
+      assert.include(facts.value, 'the open pull requests');
+    });
+
+    test('keeps the links of the GraphQL pages read before one that fails', async () => {
+      const github = await fakeGitHub((request) => {
+        if (request.url === '/graphql') {
+          return cursorOf(request.body) === undefined
+            ? {
+                body: closingIssuesPage({
+                  numbers: [1],
+                  linkedTo: [12],
+                  endCursor: 'c1',
+                }),
+              }
+            : { status: 502, body: { message: 'Bad Gateway' } };
+        }
+
+        return request.url.includes('/pulls?state=open')
+          ? { body: [fakePullRequest({ number: 1 })] }
+          : undefined;
+      });
+
+      const facts = await createClient('token', github.baseUrl).facts(repo, {
+        checks: false,
+      });
+
+      await github.close();
+
+      assert.isTrue(Result.isOk(facts));
+
+      assert.deepStrictEqual(facts.value[0]?.linkedIssues, [byGraphQl(12)]);
+    });
+
+    test('reads the links GraphQL holds for one past its first hundred, by the cursor it gave', async () => {
+      const github = await fakeGitHub((request) => {
+        if (request.url === '/graphql') {
+          const after = cursorOf(request.body);
+
+          return {
+            body: closingIssuesPage(
+              after === undefined
+                ? { numbers: [1], linkedTo: [], endCursor: 'c1' }
+                : { numbers: [101], linkedTo: [12], endCursor: undefined },
+            ),
+          };
+        }
+
+        return openPages([100, 1])(request);
+      });
+
+      const facts = await createClient('token', github.baseUrl).facts(repo, {
+        checks: false,
+      });
+
+      await github.close();
+
+      assert.isTrue(Result.isOk(facts));
+
+      assert.deepStrictEqual(
+        facts.value.find(({ number }) => number === 101)?.linkedIssues,
+        [byGraphQl(12)],
+      );
+    });
+  });
+
+  describe('the queue comments', () => {
+    test('reads one on a later page, past a hundred others', async () => {
+      const setAside =
+        `<!-- unblock-prs:set-aside reason=checks-failed head=${FAKE_HEAD_SHA} base=${FAKE_BASE_TIP} -->` as const;
+
+      const github = await fakeGitHub(({ url }) =>
+        url.startsWith(`/repos/${repo.owner}/${repo.name}/issues/1/comments`)
+          ? {
+              body: url.endsWith('&page=1')
+                ? Arr.seq(asUint32(100)).map((index) => ({
+                    id: index + 1,
+                    body: 'Another comment.',
+                    user: { login: 'me' },
+                  }))
+                : url.endsWith('&page=2')
+                  ? [{ id: 101, body: setAside, user: { login: 'me' } }]
+                  : [],
+            }
+          : undefined,
+      );
+
+      const client = createClient('token', github.baseUrl);
+
+      const facts = await client.facts(repo, { checks: false });
+
+      assert.isTrue(Result.isOk(facts));
+
+      const read = await client.queueComments(repo, 'main', facts.value);
+
+      await github.close();
+
+      assert.strictEqual(read.get(1)?.setAside?.commentId, 101);
+    });
+  });
+
   describe('the issues an open pull request closes', () => {
     test('reads a keyword GitHub marked where GraphQL links nothing, as on a stacked pull request', async () => {
       assert.deepStrictEqual(
@@ -133,6 +342,7 @@ const answering =
               data: {
                 repository: {
                   pullRequests: {
+                    pageInfo: { hasNextPage: false, endCursor: null },
                     nodes: [
                       {
                         number: 1,
@@ -229,4 +439,90 @@ const byKeyword = (number: number): LinkedIssue =>
     title: '',
     url: `https://github.com/o/r/issues/${number}`,
     state: 'unknown',
+  }) as const;
+
+/** Which page of a paged list `url` asks for, 1 when it names none. */
+const pageOf = (url: string): number => {
+  const { searchParams } = new URL(url, 'http://localhost');
+
+  return Result.unwrapOkOr(
+    Num.safeParseFloat(searchParams.get('page') ?? '1'),
+    Number.NaN,
+  );
+};
+
+/**
+ * A fake GitHub's open list, `sizes[i]` pull requests on page `i + 1`, numbered
+ * from 1 in the order listed; an empty page past the last.
+ */
+const openPages =
+  (sizes: readonly number[]): FakeRoutes =>
+  ({ url }) => {
+    if (!url.includes('/pulls?state=open')) {
+      return undefined;
+    }
+
+    const page = pageOf(url);
+
+    const before = Arr.sum(sizes.slice(0, page - 1));
+
+    return {
+      body: Arr.range(
+        asUint32(before + 1),
+        asUint32(before + 1 + (sizes[page - 1] ?? 0)),
+      ).map((number) => fakePullRequest({ number })),
+    };
+  };
+
+/** The `after` variable a GraphQL request sent, `undefined` for none. */
+const cursorOf = (body: string | undefined): string | undefined => {
+  const parsed = parseJson(
+    body ?? '',
+    t.record({
+      variables: t.record({
+        after: t.union([t.string(), t.nullType]),
+      }),
+    }),
+    '/graphql',
+  );
+
+  return Result.isOk(parsed)
+    ? (parsed.value.variables.after ?? undefined)
+    : undefined;
+};
+
+/**
+ * One page of `ClosingIssues`: each of `numbers`, every one linking `linkedTo`,
+ * and `endCursor` for a page with another after it.
+ */
+const closingIssuesPage = ({
+  numbers,
+  linkedTo,
+  endCursor,
+}: Readonly<{
+  numbers: readonly number[];
+  linkedTo: readonly number[];
+  endCursor: string | undefined;
+}>): unknown =>
+  ({
+    data: {
+      repository: {
+        pullRequests: {
+          pageInfo: {
+            hasNextPage: endCursor !== undefined,
+            endCursor: endCursor ?? null,
+          },
+          nodes: numbers.map((number) => ({
+            number,
+            closingIssuesReferences: {
+              nodes: linkedTo.map((linked) => ({
+                ...byGraphQl(linked),
+                state: 'OPEN',
+                repository: { nameWithOwner: `${repo.owner}/${repo.name}` },
+              })),
+            },
+          })),
+        },
+      },
+    },
   }) as const;

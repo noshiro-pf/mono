@@ -269,8 +269,11 @@ ruleset（最新の `main` の上で必須チェックが全部緑）が別に�
 
 #### 1. survey
 
-GraphQL で open な PR を新しい順に100件まで取得します（`body` を含む — 順序をそこから読
-むため）。auto-merge が有効で `mergeStateStatus` が `UNKNOWN` の PR があれば
+GraphQL で open な PR を新しい順にすべて取得します（`body` を含む — 順序をそこから読
+むため）。100件ずつカーソルをたどって全ページを読み、読めないページが1つでもあれば
+一覧ごと失敗します。最初のページだけを全体とすると古い PR がキューから漏れ、漏れた
+PR はマージ済みとして読まれるので、それを `Merge-After` に挙げた PR が先に進み、その
+`blocks-release` もリリースを止めなくなるためです。auto-merge が有効で `mergeStateStatus` が `UNKNOWN` の PR があれば
 10秒おきに最大6回引き直します。GitHub が計算中の状態を「up-to-date」と誤読しな
 いためです。ただしそのような PR があるときは `git ls-remote --heads origin` で
 ブランチの先端も1回で読み、ブランチが GitHub の表示する head と違い、前の
@@ -1350,10 +1353,13 @@ exits immediately.
 
 #### 1. Survey
 
-GraphQL for the open pull requests, newest first and up to a hundred, `body`
-included — that is where the order is read from. While any armed one reports
-`mergeStateStatus: UNKNOWN` the list is fetched again, up to six times at
-ten-second intervals, so a state
+GraphQL for every open pull request, newest first, `body` included — that is
+where the order is read from. It follows the cursor a hundred at a time, and a
+page it cannot read fails the whole list: the first page read as the whole would
+leave the oldest out of the queue, and one left out reads as merged, so what
+named it in `Merge-After` would go first and its `blocks-release` would no
+longer hold the release. While any armed one reports `mergeStateStatus: UNKNOWN`
+the list is fetched again, up to six times at ten-second intervals, so a state
 GitHub is still computing is never read as up to date. When there is such a pull
 request, the branches' tips are read too, in one `git ls-remote --heads origin`,
 and one whose branch is not at the head GitHub shows, where an earlier survey

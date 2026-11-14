@@ -92,14 +92,32 @@ export const fakeGitHub = async (
 
     mut_requested.push(url);
 
-    const answer =
-      routes({ url, accept: request.headers.accept }) ?? defaultAnswer(url);
+    const mut_chunks: Buffer[] = [];
 
-    response.writeHead(answer.status ?? 200, {
-      'content-type': 'application/json',
+    request.on('data', (chunk: unknown) => {
+      if (Buffer.isBuffer(chunk)) {
+        mut_chunks.push(chunk);
+      } else if (typeof chunk === 'string') {
+        mut_chunks.push(Buffer.from(chunk, 'utf8'));
+      }
     });
 
-    response.end(JSON.stringify(answer.body));
+    request.on('end', () => {
+      const body = Buffer.concat(mut_chunks).toString('utf8');
+
+      const answer =
+        routes({
+          url,
+          accept: request.headers.accept,
+          body: body === '' ? undefined : body,
+        }) ?? defaultAnswer(url);
+
+      response.writeHead(answer.status ?? 200, {
+        'content-type': 'application/json',
+      });
+
+      response.end(JSON.stringify(answer.body));
+    });
   });
 
   await new Promise<void>((resolve) => {
@@ -135,8 +153,15 @@ export type FakeGitHub = Readonly<{
 /** An answer: JSON for `body`, sent with `status`, 200 when not given. */
 export type FakeAnswer = Readonly<{ status?: number; body: unknown }>;
 
-/** What a test is told of a request: its path and query, and its media type. */
-export type FakeRequest = Readonly<{ url: string; accept: string | undefined }>;
+/**
+ * What a test is told of a request: its path and query, its media type, and the
+ * body it sent (`undefined` for a GET).
+ */
+export type FakeRequest = Readonly<{
+  url: string;
+  accept: string | undefined;
+  body: string | undefined;
+}>;
 
 /**
  * The answer to a request a test answers itself, or `undefined` to leave it to
@@ -203,7 +228,16 @@ const defaultAnswer = (url: string): FakeAnswer => {
 
   if (pathname === '/graphql') {
     return {
-      body: { data: { repository: { pullRequests: { nodes: [] } } } },
+      body: {
+        data: {
+          repository: {
+            pullRequests: {
+              pageInfo: { hasNextPage: false, endCursor: null },
+              nodes: [],
+            },
+          },
+        },
+      },
     };
   }
 

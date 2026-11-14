@@ -142,8 +142,11 @@ open な PR が閉じる issue は、トークンの有無によらず**2つの�
 
 ### 限界
 
-- 1ページ（100件）しか読みません。それを超えたら数えるのをやめて失敗します。
-  半分を全体として報告しないためです。
+- open な PR の一覧はすべてのページを読み、読めないページがあれば失敗します。
+  一部を全体として報告しないためです。GraphQL が持つ issue のリンクは、読めない
+  ページがあるとそれより後の PR が本文のリンクだけになります。読んでいる間に PR
+  が閉じるか再び開くと、その回は PR が抜けることがあります。ページで読む一覧は
+  どれも同じです。
 - PR の check run か commit status を読めなかったときも、どの PR の何が読めなかったか
   を挙げて失敗します。読めないままだと、その PR の required context がすべて
   missing、判定が pending と出て、失敗している PR が CI 未開始に見えるからです。
@@ -273,10 +276,13 @@ state: a context added there and not yet applied is reported as missing on every
 pull request, which is a fair thing for a report to say.
 With `--repo` naming another repository, the file is not read.
 
-It reads one page of a hundred pull requests and fails rather than reporting a
-part of them as the whole. Pull requests on a `Merge-After` cycle are named in
-their own section instead of being drawn, since there is no position in a
-merge order to draw them at.
+It reads every page of open pull requests and fails rather than reporting a part
+of them as the whole when a page of that list cannot be read; a page of the
+issue links GraphQL holds that cannot be read leaves the pull requests past it
+with the links their bodies make. Pull requests closed or reopened while the
+pages are read can leave some out of that run, as with any list read by page.
+Pull requests on a `Merge-After` cycle are named in their own section instead of
+being drawn, since there is no position in a merge order to draw them at.
 
 It fails too when the check runs or the commit statuses of a pull request cannot
 be read, naming each pull request and what failed. Read as nothing, they would
