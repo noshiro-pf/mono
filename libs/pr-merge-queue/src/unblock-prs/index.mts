@@ -18,6 +18,7 @@ export * from './rebase.mjs';
 export * from './regenerate.mjs';
 export * from './release-failure.mjs';
 export * from './release.mjs';
+export * from './repair-ahead.mjs';
 export * from './set-aside-comment.mjs';
 export * from './set-aside-detail.mjs';
 export * from './skips.mjs';

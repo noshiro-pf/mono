@@ -52,6 +52,7 @@ import {
   movedHeads,
   numberOfLayerBranch,
   planDrop,
+  redAboveFirst,
   withMovedHeads,
   type BuiltLayer,
   type DesiredLayer,
@@ -145,13 +146,13 @@ export const speculate = async (
     ? toBuild
     : ([] as const);
 
-  const builtNow = Arr.isNonEmpty(buildable)
+  const { built: builtNow, conflicted } = Arr.isNonEmpty(buildable)
     ? await buildLayers(
         await withMergedUpstreams(api, buildable, candidates, defaultBranch),
         kept.at(-1)?.tip ?? baseSha,
         defaultBranch,
       )
-    : ([] as const);
+    : ({ built: [], conflicted: undefined } as const);
 
   const builtStatuses = await readStatusesOf(api, builtNow, config.workflows);
 
@@ -215,6 +216,7 @@ export const speculate = async (
         release: true,
         setAside: undefined,
         order: candidates,
+        ahead: NOTHING_AHEAD,
       };
     }
   }
@@ -290,10 +292,26 @@ export const speculate = async (
     );
   }
 
+  const candidateNumbers = new Set<number>(
+    candidates.map(({ number }) => number),
+  );
+
   return {
     stacked: Arr.isNonEmpty(layers),
     release: decided.release,
     order: candidates,
+    ahead: {
+      conflicted:
+        conflicted !== undefined && candidateNumbers.has(conflicted)
+          ? conflicted
+          : undefined,
+      red: redAboveFirst(
+        layers,
+        read.map(({ status }) => status),
+        decided.dropFrom,
+        candidateNumbers,
+      ),
+    },
     setAside:
       decided.setAside === undefined
         ? undefined
@@ -354,7 +372,25 @@ export type Speculation = Readonly<{
    * (`stackedFirst`), which the release step releases from (`releasing`).
    */
   order: readonly PullRequest[];
+  /**
+   * What the worker may repair ahead of its turn while it waits for the first
+   * layer (`repair-ahead.mts`): the candidate whose commits conflicted with the
+   * layers below, so that the stack stopped at it, and the red layers above the
+   * first that are not cleaned up.
+   */
+  ahead: Ahead;
 }>;
+
+/** {@link Speculation.ahead}. */
+export type Ahead = Readonly<{
+  conflicted: number | undefined;
+  red: readonly BuiltLayer[];
+}>;
+
+const NOTHING_AHEAD: Ahead = { conflicted: undefined, red: [] } as const;
+
+/** Why {@link buildLayer} could not build a layer whose commits conflict. */
+const CONFLICTS_BELOW = 'its commits conflict with the layers below it';
 
 /** Where the configured workflows stand on a layer. */
 type LayerReading = Readonly<{
@@ -712,7 +748,13 @@ const deleteRuns = async (
 const fallBack = (why: string, order: readonly PullRequest[]): Speculation => {
   log(`Not checking ahead this survey (${why}); releasing as usual.`);
 
-  return { stacked: false, release: true, setAside: undefined, order };
+  return {
+    stacked: false,
+    release: true,
+    setAside: undefined,
+    order,
+    ahead: NOTHING_AHEAD,
+  };
 };
 
 const buildLayer = async (
@@ -773,7 +815,7 @@ const buildLayer = async (
 
     await run('git reset --hard --quiet');
 
-    return Result.err('its commits conflict with the layers below it');
+    return Result.err(CONFLICTS_BELOW);
   }
 
   const messageFile = path.join(worktreeDir, '..', `layer-${layer.number}.txt`);
@@ -880,13 +922,16 @@ const withMergedUpstreams = async (
  * request it is stacked on, squashed into one commit carrying the trailer, and
  * pushes each to its branch. Stops at the first that cannot be built — its
  * commits conflict, or its head moved — since everything above it would carry
- * it.
+ * it; `conflicted` names it when its commits conflicted, unless it was built
+ * from an `upstream`.
  */
 const buildLayers = async (
   layers: readonly DesiredLayer[],
   base: string,
   defaultBranch: string,
-): Promise<readonly BuiltLayer[]> => {
+): Promise<
+  Readonly<{ built: readonly BuiltLayer[]; conflicted: number | undefined }>
+> => {
   // Beside auto-fix's worktrees, under the worker's own state directory.
   const worktreeDir = path.join(WORKTREE_ROOT, 'speculate');
 
@@ -901,16 +946,26 @@ const buildLayers = async (
       `Cannot check out ${base.slice(0, 10)} to build layers on: ${added.value}`,
     );
 
-    return [];
+    return { built: [], conflicted: undefined };
   }
 
   const mut_built: BuiltLayer[] = [];
+
+  let mut_conflicted: number | undefined = undefined;
 
   for (const layer of layers) {
     const built = await buildLayer(layer, defaultBranch, worktreeDir);
 
     if (Result.isErr(built)) {
       log(`#${layer.number}: not stacked this survey: ${built.value}`);
+
+      // One built from an `upstream` is stacked on another pull request, or
+      // still carries a merged layer's commits that its release rebases off
+      // with `--onto`: tested or rebased from its merge base with the default
+      // branch, those commits would read as a conflict of its own.
+      if (built.value === CONFLICTS_BELOW && layer.upstream === undefined) {
+        mut_conflicted = layer.number;
+      }
 
       break;
     }
@@ -920,7 +975,7 @@ const buildLayers = async (
 
   await removeWorktree(worktreeDir);
 
-  return mut_built;
+  return { built: mut_built, conflicted: mut_conflicted };
 };
 
 /**

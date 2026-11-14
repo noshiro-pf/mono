@@ -14,6 +14,7 @@ import {
   movedHeads,
   numberOfLayerBranch,
   planDrop,
+  redAboveFirst,
   releaseOrder,
   releasing,
   stackedFirst,
@@ -537,6 +538,59 @@ describe(matchLayers, () => {
   });
 });
 
+describe(redAboveFirst, () => {
+  const first = built(5, { parentTree: 'main-tree', tree: 't5' });
+
+  const second = built(3, { parentTree: 't5', tree: 't3' });
+
+  const third = built(9, { parentTree: 't3', tree: 't9' });
+
+  const candidates = new Set<number>([5, 3, 9]);
+
+  // The first layer's red is its own pull request's set-aside, not a repair.
+  test('is each red layer above the first that is not cleaned up', () => {
+    assert.deepStrictEqual(
+      redAboveFirst([first, second], [RUNNING, RED], undefined, candidates),
+      [second],
+    );
+
+    assert.deepStrictEqual(
+      redAboveFirst([first, second], [RED, RED], 1, candidates),
+      [],
+    );
+
+    assert.deepStrictEqual(
+      redAboveFirst([first, second, third], [GREEN, RED, RED], 2, candidates),
+      [second],
+    );
+  });
+
+  test('leaves out a layer still running or green', () => {
+    assert.deepStrictEqual(
+      redAboveFirst(
+        [first, second, third],
+        [RUNNING, GREEN, RUNNING],
+        undefined,
+        candidates,
+      ),
+      [],
+    );
+  });
+
+  // One stacked on a candidate is on that one's branch, not on `main`.
+  test('leaves out a layer of a pull request that is no candidate', () => {
+    assert.deepStrictEqual(
+      redAboveFirst(
+        [first, second],
+        [RUNNING, RED],
+        undefined,
+        new Set<number>([5]),
+      ),
+      [],
+    );
+  });
+});
+
 describe(planDrop, () => {
   const updatedMs = Date.parse('2026-11-01T00:00:00Z');
 
@@ -699,6 +753,12 @@ const movable = (): boolean => true;
 const GREEN: LayerStatus = { kind: 'green' } as const;
 
 const RUNNING: LayerStatus = { kind: 'running', queued: false } as const;
+
+const RED: LayerStatus = {
+  kind: 'red',
+  name: 'code-check',
+  link: 'https://example.invalid/run',
+} as const;
 
 const layer = (number: number): Readonly<{ number: number; head: string }> =>
   ({ number, head: HEAD }) as const;

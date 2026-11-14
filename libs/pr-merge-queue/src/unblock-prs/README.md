@@ -604,7 +604,8 @@ PR なら10分続いたところで triage の前に見送ります。候補の�
   受け持ちに数えません。消せなくても解放します。
   その場合は解放先で見送られることがあります。
 - 先頭より上の赤は、まだマージされていない（されないかもしれない）PR の上での
-  失敗です。その段は先頭になるまで待ちます。下の段がマージされれば `main` の
+  失敗です。その段は先頭になるまで待ちます（fixer で直せるものは、下の「先頭の
+  段を待つ間」のとおり先に直します）。下の段がマージされれば `main` の
   tree の上にあり、キューを離れれば作り直されます。その上には積まず、積んであ
   れば、下のとおり片付けます。
   下にまだ走っている段がある赤は、まだ誰のものとも言えません。すぐに見送っても、
@@ -614,6 +615,30 @@ PR なら10分続いたところで triage の前に見送ります。候補の�
   をその PR のせいにしてしまいます。
 - version PR、bypass でしかマージできない PR、fork の PR、コミットが下の段と
   衝突する PR では積むのを止め、その PR は従来どおり単独で解放されます。
+- **先頭の段を待つ間に、後ろの candidate を先に直します**（`repair-ahead.mts`）。
+  先頭の段の checks を待つ survey（解放も見送りもしない survey）に限ります。
+  どちらの修復も、下の段がどうなってもその PR 自身のものなので、先頭になるのを
+  待つ理由がないからです。直せるのは、「3a」が rebase できる PR（`skip-ci` 付き、
+  `main` が base、worker の担当）のうち、作者が `merge-queued` を付けたものだけで
+  す。どちらも PR のブランチのコードを走らせるからです。
+    - **積むのを止めた conflict** は、まず `main` と衝突するかを worktree なしで
+      調べます（`conflictsOnTip`）。衝突するなら「3a」と同じく rebase します。
+      生成ファイルだけの衝突は生成し直して解決し（`regenerate`）、それ以外は
+      `rebase-failed` で見送るので、skill がすぐに直し始めます。下の段とだけ衝突
+      するなら、相手はまだマージされていない PR なので、従来どおりそれを待ちます。
+      マージされた段のコミットをまだ持つ PR（解放時の rebase が `--onto` で外す
+      もの）は、そのコミットが衝突に見えるので、従来どおり解放に任せます。
+    - **先頭より上の赤い段**で、落ちたジョブがすべて fixer の受け持ちなら、段の
+      ジョブを読んで（`autoFix` の `checksAt`）その PR 自身の head で fixer を
+      走らせ、書いたものを1コミットに amend して push します。head 1つにつき1回
+      だけで、自分が push した head にはもう走らせません（head を覚えます）。fixer
+      は head だけを読むので、何も変わらなかったならその差分は下の段との組み合わせ
+      から来ており、毎回何かを書く fixer なら push が止まらないからです。そのとき段
+      は先頭になるまで待ち、そこで解放後の「4a」が直します。
+      push は `skip-ci` の下なのでマトリクスは走らず、古い head の段は片付けられ、
+      次の survey が新しい head で積み直します。修復には install や build が要る
+      ことがあり、その間に先頭の段が緑になれば、解放はその分だけ遅れます。先頭の段が
+      すでに緑で同じ survey に解放するときは、何も直さず従来どおりです。
 - もう有効でない段（head が動いた、見送られた、キューを離れた、マージされた、下
   の段が作り直された）は片付けます。candidate が1本もなくなったときも同様です。
   段と同じ tree のコミットへ動いた head は、ここでは動いたと数えません
@@ -826,7 +851,8 @@ matrix が作るどのチェックも受け持たないと `check:root:auto-fix-
 - 自動修正で push した head がまた落ちた。1回の watch につき1回までです。
 
 対象は watch している1本、つまりこのサイクルが pick した PR だけです。
-`merge-queued` で CI が落ちている他の PR には触れません。
+`merge-queued` で CI が落ちている他の PR には触れません。例外は順番より先の検証
+で赤くなった、先頭より上の段で、先頭の段を待つ間に同じ手順で直します（「3b」）。
 
 - **`ws:doc` は対象外です。** `doc` が書くのは untracked な出力で、tree を汚す
   のはその中で呼ばれる生成器（`ws:gen` でも走る）です。しかも実行に10分かか
@@ -1027,36 +1053,37 @@ code owner の承認待ちで止まっている PR は、変更したパスと `
 
 ### ファイル構成
 
-| ファイル                | 役割                                                          |
-| :---------------------- | :------------------------------------------------------------ |
-| `main.mts`              | ループ本体とコマンドライン（入口）                            |
-| `triage.mts`            | 1回の survey が各 PR について何を言うか（判定の読み込み）     |
-| `merge-after.mts`       | 宣言された順序が pick に何を言うか                            |
-| `stack.mts`             | stacked PR — いつ待たせ、いつ張り、何を運ぶか、いつ積み直すか |
-| `version-pr.mts`        | version PR と、それを止めているもの                           |
-| `rebase.mts`            | ブランチを動かす — worktree 内の rebase と `skip-ci` 除去     |
-| `release.mts`           | 解放されている PR を1本に保つ                                 |
-| `watch.mts`             | 1本をマージまでポーリング                                     |
-| `auto-fix.mts`          | fixer の差分だけの失敗を直して push                           |
-| `speculate.mts`         | 順番より先の検証 — 段の枝と run を読み、積み、dispatch する   |
-| `speculate-plan.mts`    | 順番より先の検証で何をするかの判断                            |
-| `config.mts`            | `.github/unblock-prs.json` を読む                             |
-| `quiet.mts`             | 何もない時にどれだけ待つか                                    |
-| `checks.mts`            | マージが何を待っているか                                      |
-| `claims.mts`            | セッションの claim のうち有効なもの                           |
-| `owner.mts`             | 各 PR の担当者（`pr-report-core` の `queueOwner`）            |
-| `github.mts`            | GitHub と `git` を読み書きするもの全部。判断はしない          |
-| `labels.mts`            | ラベルがその PR について何を言うか                            |
-| `skips.mts`             | 諦めた PR を何をもって覚え続けるか、comment との突き合わせ    |
-| `set-aside-comment.mts` | 見送りの comment の文章                                       |
-| `demotions.mts`         | green のまま止まった PR をいつまで最後に回すか                |
-| `unread.mts`            | 読めない解放済み PR を何回待ってから見送るか                  |
-| `out-of-sync.mts`       | GitHub が push を取りこぼした PR をいつ見送るか               |
-| `not-started.mts`       | check workflow が起動されなかった PR をいつ見送るか           |
-| `options.mts`           | コマンドライン                                                |
-| `types.mts`             | 共有される型とスキーマ                                        |
-| `constants.mts`         | 待ち時間と諦めるまでの回数                                    |
-| `util.mts`              | 停止シグナル                                                  |
+| ファイル                | 役割                                                             |
+| :---------------------- | :--------------------------------------------------------------- |
+| `main.mts`              | ループ本体とコマンドライン（入口）                               |
+| `triage.mts`            | 1回の survey が各 PR について何を言うか（判定の読み込み）        |
+| `merge-after.mts`       | 宣言された順序が pick に何を言うか                               |
+| `stack.mts`             | stacked PR — いつ待たせ、いつ張り、何を運ぶか、いつ積み直すか    |
+| `version-pr.mts`        | version PR と、それを止めているもの                              |
+| `rebase.mts`            | ブランチを動かす — worktree 内の rebase と `skip-ci` 除去        |
+| `release.mts`           | 解放されている PR を1本に保つ                                    |
+| `watch.mts`             | 1本をマージまでポーリング                                        |
+| `auto-fix.mts`          | fixer の差分だけの失敗を直して push                              |
+| `speculate.mts`         | 順番より先の検証 — 段の枝と run を読み、積み、dispatch する      |
+| `speculate-plan.mts`    | 順番より先の検証で何をするかの判断                               |
+| `repair-ahead.mts`      | 先頭の段を待つ間に、後ろの candidate の衝突と fixer の差分を直す |
+| `config.mts`            | `.github/unblock-prs.json` を読む                                |
+| `quiet.mts`             | 何もない時にどれだけ待つか                                       |
+| `checks.mts`            | マージが何を待っているか                                         |
+| `claims.mts`            | セッションの claim のうち有効なもの                              |
+| `owner.mts`             | 各 PR の担当者（`pr-report-core` の `queueOwner`）               |
+| `github.mts`            | GitHub と `git` を読み書きするもの全部。判断はしない             |
+| `labels.mts`            | ラベルがその PR について何を言うか                               |
+| `skips.mts`             | 諦めた PR を何をもって覚え続けるか、comment との突き合わせ       |
+| `set-aside-comment.mts` | 見送りの comment の文章                                          |
+| `demotions.mts`         | green のまま止まった PR をいつまで最後に回すか                   |
+| `unread.mts`            | 読めない解放済み PR を何回待ってから見送るか                     |
+| `out-of-sync.mts`       | GitHub が push を取りこぼした PR をいつ見送るか                  |
+| `not-started.mts`       | check workflow が起動されなかった PR をいつ見送るか              |
+| `options.mts`           | コマンドライン                                                   |
+| `types.mts`             | 共有される型とスキーマ                                           |
+| `constants.mts`         | 待ち時間と諦めるまでの回数                                       |
+| `util.mts`              | 停止シグナル                                                     |
 
 API を呼ぶ `rest()` / `graphqlQuery()`、`git` を走らせる `git()`、quoting の
 `sh()`、ログの `log()` は `open-pr` などほかのコマンドも使うので
@@ -1725,17 +1752,49 @@ Requests Manager draws the stack by).
   job whose run says its command failed is not one. It is released even if they
   cannot go, and may then be set aside there.
 - A red layer above the first failed on top of pull requests that have not
-  merged and may not. It waits until it is first: on `main`'s tree once the
-  layers below merge, or rebuilt if they leave the queue. Nothing is built above
-  it, and what already was is cleaned up as below. A red layer over one still
-  running is nobody's yet. Setting it aside at once would gain nothing over
-  green layers: the first is released in the same survey and watched until it
-  merges, building nothing meanwhile, and the red one is first on the survey
+  merged and may not. It waits until it is first (what its fixers can settle is
+  fixed sooner, as "While the first layer is waited for" says): on `main`'s tree
+  once the layers below merge, or rebuilt if they leave the queue. Nothing is
+  built above it, and what already was is cleaned up as below. A red layer over
+  one still running is nobody's yet. Setting it aside at once would gain nothing
+  over green layers: the first is released in the same survey and watched until
+  it merges, building nothing meanwhile, and the red one is first on the survey
   after. Over a layer still running, it would blame the pull request for what
   may be the failure of the one below.
 - The stack stops at the version pull request, one only a bypass merges, a
   fork's, or one whose commits conflict with the layers below; that one is
   released on its own, as before.
+- **While the first layer is waited for, the candidates behind it are repaired**
+  (`repair-ahead.mts`): only on a survey that waits for the first layer's
+  checks, releasing and setting aside nothing. Either repair is the pull
+  request's own whatever becomes of the layers below, so there is no reason to
+  wait until it is first. Only a pull request "3a" may rebase (`skip-ci`, based
+  on `main`, the worker's) that its author has queued is repaired, since both
+  run the branch's own code.
+    - **A conflict the stack stopped at** is first tested against `main` without
+      a worktree (`conflictsOnTip`). One that conflicts is rebased as "3a"
+      rebases: a conflict only in generated files is resolved by generating them
+      again (`regenerate`), and any other sets it aside `rebase-failed`, for the
+      skill to fix now. One that conflicts only with the layers below is with
+      pull requests that have not merged, and waits for them, as before. One
+      that still carries a merged layer's commits, which its release rebases off
+      with `--onto`, is left to its release as before, since those commits would
+      read as a conflict.
+    - **A red layer above the first** whose failures are all fixers' has those
+      fixers run on the pull request's own head, the failures read from the
+      layer's jobs (`autoFix`'s `checksAt`), and what they write amended onto
+      its one commit and pushed. Once a head, and never on a head a fix pushed:
+      the fixers read the head alone, so one that changed nothing found a diff
+      that comes of the layers below, and one that writes something on every run
+      would push for ever. The layer then waits until it is first, where "4a"
+      fixes it after the release.
+
+    Each push is under `skip-ci`, so no matrix runs; the layer at the old head
+    is cleaned up and the next survey stacks the new one. A repair may install
+    and build, and a first layer that turns green meanwhile is released that
+    much later. A survey that releases the first in the same turn repairs
+    nothing, as before.
+
 - A layer no longer valid (its head moved, its pull request set aside, merged or
   out of the queue, a layer below built again) is cleaned up, also when the
   queue has drained and no candidate is left. A head that moved to a commit with
@@ -1965,8 +2024,10 @@ count`, …). Pushing would run a matrix that fails anyway, so the whole of it
 - A command failed, or none of them changed anything.
 - The head the fix pushed failed again. It is once per watch.
 
-It applies to the one pull request being watched, the one this cycle picked,
-and never to the other queued pull requests whose checks are failing.
+It applies to the one pull request being watched, the one this cycle picked, and
+never to the other queued pull requests whose checks are failing. The exception
+is a red layer above the first, checked ahead of its turn, which is fixed the
+same way while the first layer is waited for ("3b").
 
 - **`ws:doc` is not a fixer.** What `doc` writes is untracked; what leaves the
   tree dirty is a generator it calls, which `ws:gen` runs too, and it takes ten
@@ -2193,6 +2254,7 @@ the pull request the other's and nobody moved it (#2267).
 | `auto-fix.mts`          | fixing and pushing a failure that is only a fixer's diff      |
 | `speculate.mts`         | checking ahead — reading, building and dispatching the layers |
 | `speculate-plan.mts`    | what checking ahead decides                                   |
+| `repair-ahead.mts`      | repairing the candidates behind the first layer while it runs |
 | `config.mts`            | reading `.github/unblock-prs.json`                            |
 | `quiet.mts`             | how long to sleep when there is nothing to do                 |
 | `checks.mts`            | what the merge is waiting for                                 |

@@ -61,6 +61,7 @@ import {
 } from './rebase.mjs';
 import { endsCycle } from './release-failure.mjs';
 import { firstInReleaseOrder, settleAfterRelease } from './release.mjs';
+import { pruneTriedAhead, repairAhead } from './repair-ahead.mjs';
 import {
   describeResolvedBy,
   resolvedCommentBody,
@@ -344,6 +345,7 @@ export const unblockPrs = async (
     baseSha: undefined,
     quiet: initialQuiet,
     stackedOn: undefined,
+    triedAhead: new Map<number, string>(),
   };
 
   while (!stopRequested()) {
@@ -1005,6 +1007,8 @@ const runCycle = async (
     { baseSha, defaultBranch },
   );
 
+  const triedAhead = pruneTriedAhead(before.triedAhead, pullRequests);
+
   const state = (
     nextSkipped: SkipRecords,
     nextDemoted: Demotions = demoted,
@@ -1019,6 +1023,7 @@ const runCycle = async (
       baseSha,
       quiet,
       stackedOn,
+      triedAhead,
     }) as const;
 
   // Waiting for runs, which the survey does not see move: kept at the active
@@ -1324,9 +1329,35 @@ const runCycle = async (
     }
 
     if (!speculation.release) {
+      if (speculation.setAside !== undefined) {
+        return {
+          state: waitingForRuns(mut_skipped),
+          next: 'survey',
+          settled: skipped,
+        };
+      }
+
+      // The wait for the first layer is the worker's to spend: the candidates
+      // behind it are repaired now rather than once they are first.
+      const repaired = await repairAhead(api, speculation.ahead, {
+        pullRequests,
+        defaultBranch,
+        baseSha,
+        skipped: mut_skipped,
+        outOfSync: mut_outOfSync,
+        owners: triaged.owners,
+        regenerate: regenerateConfig,
+        autoFix: autoFixConfig,
+        tried: triedAhead,
+      });
+
       return {
-        state: waitingForRuns(mut_skipped),
-        next: speculation.setAside === undefined ? 'idle' : 'survey',
+        state: {
+          ...waitingForRuns(repaired.skipped),
+          outOfSync: repaired.outOfSync,
+          triedAhead: repaired.tried,
+        },
+        next: repaired.moved ? 'survey' : 'idle',
         settled: skipped,
       };
     }
