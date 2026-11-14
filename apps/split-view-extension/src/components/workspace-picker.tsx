@@ -9,6 +9,7 @@ import {
   createAfterUpdate,
   For,
   If,
+  isImeKeyDown,
   listenInScope,
   type Bindable,
   type JSX,
@@ -111,7 +112,8 @@ export const WorkspacePicker = ({
     if (
       Optional.unwrap(editing$.getSnapshot()) &&
       keyboardEvent instanceof KeyboardEvent &&
-      keyboardEvent.key === 'Escape'
+      keyboardEvent.key === 'Escape' &&
+      !isImeKeyDown(keyboardEvent)
     ) {
       stopEditing();
     }

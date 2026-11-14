@@ -2,6 +2,7 @@ import { createState } from 'synstate';
 import {
   constant,
   createAfterUpdate,
+  isImeKeyDown,
   listenInScope,
   type JSX,
 } from 'synstate-dom';
@@ -20,7 +21,11 @@ export const SearchBox = (): JSX.Element => {
 
   // Removed with the scope, so a closed branch leaves no listener behind.
   listenInScope(globalThis, 'keydown', (event) => {
-    if (event instanceof KeyboardEvent && event.key === 'Escape') {
+    if (
+      event instanceof KeyboardEvent &&
+      event.key === 'Escape' &&
+      !isImeKeyDown(event)
+    ) {
       setQuery('');
     }
   });

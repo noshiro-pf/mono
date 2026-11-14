@@ -10,6 +10,7 @@ import {
   createAfterUpdate,
   For,
   If,
+  isImeKeyDown,
   listenInScope,
   type JSX,
 } from 'synstate-dom';
@@ -521,7 +522,8 @@ export const PaneFrame = ({
     listenInScope(globalThis, 'keydown', (keyboardEvent) => {
       if (
         keyboardEvent instanceof KeyboardEvent &&
-        keyboardEvent.key === 'Escape'
+        keyboardEvent.key === 'Escape' &&
+        !isImeKeyDown(keyboardEvent)
       ) {
         patchLoad({ menuOpen: false });
       }
