@@ -3,6 +3,7 @@ import { Arr, Result, unknownToString } from 'ts-data-forge';
 import { isDirectlyExecuted } from 'ts-repo-utils';
 import { plural } from '../lib/plural.mjs';
 import { git, splitZ } from '../lib/step-runner.mjs';
+import { readGeneratorReaders } from './check-changed/generator-entries.mjs';
 import { readPackages, readProseGate } from './check-changed/packages.mjs';
 import {
   buildPlan,
@@ -365,10 +366,17 @@ const main = async (): Promise<Result<string, string>> => {
     return proseGate;
   }
 
+  const generatorReaders = await readGeneratorReaders(files, packages);
+
+  if (Result.isErr(generatorReaders)) {
+    return generatorReaders;
+  }
+
   const classification = classifyChanges({
     files,
     packages,
     proseGate: proseGate.value,
+    generatorReaders: generatorReaders.value,
   });
 
   const plan = buildPlan({

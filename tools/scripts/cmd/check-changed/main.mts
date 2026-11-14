@@ -28,6 +28,7 @@ import {
 } from './commit-messages.mjs';
 import { parseLcov, uncoveredChangedLines } from './coverage.mjs';
 import { findPatchExportChanges } from './exports.mjs';
+import { readGeneratorReaders } from './generator-entries.mjs';
 import { readPackages, readProseGate, scriptsOf } from './packages.mjs';
 import {
   buildPlan,
@@ -89,10 +90,21 @@ const main = async (): Promise<number> => {
 
   const packages = await readPackages();
 
+  const generatorReaders = await readGeneratorReaders(changedFiles, packages);
+
+  if (Result.isErr(generatorReaders)) {
+    console.error(
+      `Could not read which generators import the changed files: ${generatorReaders.value}`,
+    );
+
+    return 2;
+  }
+
   const classification = classifyChanges({
     files: changedFiles,
     packages,
     proseGate: proseGate.value,
+    generatorReaders: generatorReaders.value,
   });
 
   const existing = await filterExisting(changedFiles);
@@ -497,6 +509,9 @@ const readText = async (file: string): Promise<string> => {
   return fs.readFile(absolute, 'utf8');
 };
 
+const readJson = async (file: string): Promise<unknown> =>
+  JSON.parse(await readText(file));
+
 const checkCommits = async (
   base: string,
 ): Promise<
@@ -736,9 +751,6 @@ const printSummary = ({
     ].join('\n'),
   );
 };
-
-const readJson = async (file: string): Promise<unknown> =>
-  JSON.parse(await readText(file));
 
 const LINT_PULL_REQUEST = '.github/workflows/lint-pull-request.yml';
 

@@ -107,8 +107,8 @@ export const runtimeImportSpecifiers = (
 
   // Every node, as an `import()` or `require()` may sit in any function; the
   // modules a config reaches are few. Not shared with the walk in
-  // `generator-inputs.test.mts`, which asks which static imports a generator's
-  // inputs reach, a question with other answers.
+  // `import-graph.mts`, which asks which static imports a generator's inputs
+  // reach, a question with other answers.
   const mut_specifiers: string[] = [];
 
   const visit = (node: ts.Node): void => {

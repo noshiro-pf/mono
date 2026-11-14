@@ -173,6 +173,10 @@ export const planReach = ({
       files: [file],
       packages,
       proseGate,
+      // A member whose generator imports the file runs its `gen`, which the
+      // sample path in that member already plans: no script is reached only
+      // this way.
+      generatorReaders: new Map<string, readonly string[]>(),
     });
 
     for (const area of classification.areas) {

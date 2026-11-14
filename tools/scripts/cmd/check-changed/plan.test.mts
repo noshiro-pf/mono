@@ -40,6 +40,7 @@ const pkg = (
     isPrivate,
     workspaceDependencies: new Set(workspaceDependencies),
     buildDependencies: new Set(buildDependencies),
+    runtimeMembers: new Set(buildDependencies),
     exportsBuild,
     forgottenExportsRead,
     lintImports: new Set(lintImports),
@@ -187,8 +188,15 @@ const proseGateResult = readGateList('code', projectRootPath);
 // message rather than failing the whole file at import.
 const proseGate = proseGateResult.ok ? proseGateResult.value : ([] as const);
 
+const noReaders = new Map<string, readonly string[]>();
+
 const classify = (files: readonly string[]) =>
-  classifyChanges({ files, packages, proseGate });
+  classifyChanges({
+    files,
+    packages,
+    proseGate,
+    generatorReaders: noReaders,
+  });
 
 const sortedAreas = (
   classification: Readonly<{ areas: ReadonlySet<string> }>,
@@ -233,7 +241,12 @@ const planCommands = (
   files: readonly string[],
 ): readonly string[] =>
   buildPlan({
-    classification: classifyChanges({ files, packages: members, proseGate }),
+    classification: classifyChanges({
+      files,
+      packages: members,
+      proseGate,
+      generatorReaders: noReaders,
+    }),
     base: 'abc123',
     rootScripts,
     coverage: true,
@@ -470,6 +483,7 @@ describe('the documents a unit test reads', () => {
           files: [document],
           packages: members,
           proseGate,
+          generatorReaders: noReaders,
         }),
         base: 'abc123',
         rootScripts: ['check:root:test'],
@@ -712,6 +726,44 @@ describe('buildPlan', () => {
     );
   });
 
+  test('a member whose generators import a changed file outside it runs its `gen`, once', () => {
+    const steps = buildPlan({
+      classification: classifyChanges({
+        files: ['tools/configs/gen-shared.mts', 'libs/synstate/src/x.mts'],
+        packages,
+        proseGate,
+        generatorReaders: new Map<string, readonly string[]>([
+          ['libs/ts-data-forge', ['tools/configs/gen-shared.mts']],
+          // Touched by the diff, so its own `gen` runs already.
+          ['libs/synstate', ['tools/configs/gen-shared.mts']],
+          // A dependent of synstate, so it runs as one.
+          ['apps/synstate-docs', ['tools/configs/gen-shared.mts']],
+        ]),
+      }),
+      base: 'abc123',
+      rootScripts,
+      coverage: false,
+      spellChecked: [],
+    });
+
+    const generators = steps
+      .filter(({ kind }) => kind === 'generate')
+      .map(({ title }) => title);
+
+    assert.include(
+      generators,
+      'ts-data-forge: gen (imports tools/configs/gen-shared.mts)',
+    );
+
+    assert.deepStrictEqual(
+      steps
+        .filter(({ kind, args }) => kind === 'generate' && args[1] === 'gen')
+        .map(({ cwd }) => cwd)
+        .filter((cwd) => ['libs/synstate', 'apps/synstate-docs'].includes(cwd)),
+      ['libs/synstate', 'apps/synstate-docs'],
+    );
+  });
+
   test('a change to the strict-lib tooling alone runs no generator', () => {
     const commands = commandsOf(['strict-lib/eslint.config.mts']);
 
@@ -779,6 +831,7 @@ describe('buildPlan', () => {
         files: ['libs/ext/README.md'],
         packages: [pkg('libs/ext', ['check:ext', 'check:types'])],
         proseGate,
+        generatorReaders: noReaders,
       }),
       base: 'abc123',
       rootScripts,
@@ -1544,8 +1597,8 @@ describe('readManifestDependencies', () => {
   test('reads the workspace members of each field, and whether dist/ is exported', () => {
     const facts = readManifestDependencies({
       dependencies: { a: 'workspace:^', external: '^1.0.0' },
-      peerDependencies: { b: 'workspace:*' },
-      devDependencies: { c: 'workspace:*', d: 'catalog:' },
+      peerDependencies: { b: 'workspace:*', e: '>=8.0.0', f: '>=1.0.0' },
+      devDependencies: { c: 'workspace:*', d: 'catalog:', e: 'workspace:*' },
       exports: {
         '.': { types: './dist/index.d.mts', default: './dist/index.mjs' },
       },
@@ -1554,12 +1607,77 @@ describe('readManifestDependencies', () => {
     assert.deepStrictEqual(Array.from(facts.workspaceDependencies), [
       'a',
       'c',
+      'e',
       'b',
     ]);
 
     assert.deepStrictEqual(Array.from(facts.buildDependencies), ['a', 'b']);
 
+    // Names a run-time field gives whose installed range is `workspace:`: `e` a
+    // plain peer a `workspace:` devDependency supplies; not `f`, a peer nothing
+    // supplies, nor `external`.
+    assert.deepStrictEqual(Array.from(facts.runtimeMembers).toSorted(), [
+      'a',
+      'b',
+      'e',
+    ]);
+
     assert.isTrue(facts.exportsBuild);
+  });
+
+  test.each([
+    [
+      'a plain `dependencies` entry over a `workspace:` devDependency',
+      {
+        dependencies: { foo: '^1.0.0' },
+        peerDependencies: { foo: '^1.0.0' },
+        devDependencies: { foo: 'workspace:*' },
+      },
+      [],
+    ],
+    [
+      'a plain `optionalDependencies` entry over a `workspace:` devDependency',
+      {
+        peerDependencies: { foo: '>=1' },
+        devDependencies: { foo: 'workspace:*' },
+        optionalDependencies: { foo: '^1' },
+      },
+      [],
+    ],
+    [
+      'a plain devDependency over a `workspace:` peer',
+      {
+        peerDependencies: { foo: 'workspace:*' },
+        devDependencies: { foo: '^1.0.0' },
+      },
+      [],
+    ],
+    [
+      'a plain `dependencies` entry with a `workspace:` devDependency and no peer',
+      {
+        dependencies: { bar: '^1.0.0' },
+        devDependencies: { bar: 'workspace:*' },
+      },
+      [],
+    ],
+    [
+      'a `workspace:` optional dependency',
+      { optionalDependencies: { opt: 'workspace:*' } },
+      ['opt'],
+    ],
+    [
+      'a `workspace:` optional dependency over a plain peer',
+      {
+        peerDependencies: { opt: '>=1' },
+        optionalDependencies: { opt: 'workspace:*' },
+      },
+      ['opt'],
+    ],
+  ] as const)('runtimeMembers for %s', (_, manifest, expected) => {
+    assert.deepStrictEqual(
+      Array.from(readManifestDependencies(manifest).runtimeMembers).toSorted(),
+      Array.from(expected),
+    );
   });
 
   test.each([
