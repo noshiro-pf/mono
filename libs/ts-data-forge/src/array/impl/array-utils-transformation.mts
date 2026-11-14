@@ -544,7 +544,7 @@ export function flat<
 >(array: Ar, depth?: D): readonly FlatArray<Ar, D>[];
 
 export function flat<D extends SafeUintWithSmallInt = 1>(
-  depth?: number,
+  depth?: D,
 ): <const Ar extends readonly unknown[]>(
   array: Ar,
 ) => readonly FlatArray<Ar, D>[];
