@@ -52,6 +52,8 @@ const rootScripts = [
   'strict-lib:check:types',
   'strict-lib:check:lint',
   'strict-lib:fix:fmt',
+  'strict-lib:gen:with-codemod-fixed',
+  'strict-lib:gen:version-diff',
 ] as const;
 
 const reach = planReach({ packages, proseGate, rootScripts });

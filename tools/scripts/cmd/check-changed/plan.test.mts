@@ -1,3 +1,4 @@
+import { Arr } from 'ts-data-forge';
 import { projectRootPath } from '../../project-root-path.mjs';
 import { TEST_DOCUMENTS } from '../check-test-documents.mjs';
 import { ignoredBy, readGateList } from '../workflow-steps.mjs';
@@ -360,8 +361,36 @@ describe('classifyChanges', () => {
 
     assert.deepStrictEqual(result.packages, []);
 
-    assert.deepStrictEqual(sortedAreas(result), ['root-guards', 'strict-lib']);
+    assert.deepStrictEqual(sortedAreas(result), [
+      'root-guards',
+      'strict-lib',
+      'strict-lib-output',
+    ]);
   });
+
+  test.each([
+    ['strict-lib/scripts-common/src/convert.mts', true],
+    ['strict-lib/scripts/cmd/gen-version-diff.mts', true],
+    ['strict-lib/v7.0/scripts/gen.mts', true],
+    ['strict-lib/v5.0/output/diff-from-prev/summary.txt', true],
+    ['strict-lib/v7.0/temp/copied/lib.es5.d.ts', true],
+    ['strict-lib/v7.0/CHANGELOG.md', true],
+    ['strict-lib/v7.0/package.json', true],
+    ['strict-lib/.oxfmtrc.json', true],
+    ['strict-lib/eslint.config.mts', false],
+    ['strict-lib/README.md', false],
+    ['strict-lib/docs/notes.md', false],
+    ['strict-lib/configs/tsconfig/tsconfig.lib-check.json', false],
+    ['strict-lib/tsconfig.tooling.json', false],
+  ] as const)(
+    '%s reaches what the strict-lib generators read or write: %s',
+    (file, expected) => {
+      assert.strictEqual(
+        classify([file]).areas.has('strict-lib-output'),
+        expected,
+      );
+    },
+  );
 
   test('experimental/ is ignored', () => {
     const result = classify(['experimental/old/a.ts']);
@@ -627,6 +656,70 @@ describe('buildPlan', () => {
     assert.include(commands, 'run check:knip');
 
     assert.include(commands, 'run check:published-deps');
+  });
+
+  test('a converter change runs the strict-lib generators, then the version diffs, as generators', () => {
+    const commands = commandsOf(['strict-lib/scripts-common/src/convert.mts']);
+
+    const generator = commands.indexOf('run strict-lib:gen:with-codemod-fixed');
+
+    const versionDiff = commands.indexOf('run strict-lib:gen:version-diff');
+
+    assert.isAbove(generator, -1);
+
+    assert.isAbove(versionDiff, generator);
+
+    assert.isAbove(commands.indexOf('run strict-lib:check:types'), versionDiff);
+
+    assert.isAbove(
+      commands.indexOf('run gen:verify-npm-packages'),
+      versionDiff,
+    );
+
+    assert.deepStrictEqual(
+      plan(['strict-lib/scripts-common/src/convert.mts'])
+        .filter(({ args }) => args[1]?.startsWith('strict-lib:gen') === true)
+        .map(({ kind }) => kind),
+      ['generate', 'generate'],
+    );
+  });
+
+  test('the strict-lib generators run before every other generator', () => {
+    const steps = plan([
+      'strict-lib/scripts-common/src/convert.mts',
+      'libs/synstate/src/x.mts',
+      'libs/synstate/package.json',
+    ]);
+
+    const generators = steps
+      .filter(({ kind }) => kind === 'generate')
+      .map(({ args }) => args[1]);
+
+    assert.deepStrictEqual(Arr.take(generators, 2), [
+      'strict-lib:gen:with-codemod-fixed',
+      'strict-lib:gen:version-diff',
+    ]);
+
+    assert.includeMembers(Arr.skip(generators, 2), [
+      'gen',
+      'gen:deps-graph',
+      'gen:verify-npm-packages',
+    ]);
+
+    assert.isBelow(
+      steps.findIndex(({ args }) => args[1] === 'strict-lib:gen:version-diff'),
+      steps.findIndex(({ kind }) => kind === 'build'),
+    );
+  });
+
+  test('a change to the strict-lib tooling alone runs no generator', () => {
+    const commands = commandsOf(['strict-lib/eslint.config.mts']);
+
+    assert.include(commands, 'run strict-lib:check:lint');
+
+    assert.notInclude(commands, 'run strict-lib:gen:with-codemod-fixed');
+
+    assert.notInclude(commands, 'run strict-lib:gen:version-diff');
   });
 
   test.each([
