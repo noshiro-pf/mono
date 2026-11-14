@@ -10,6 +10,10 @@ import { colors } from '../../../components/constants.mjs';
 
 {/* jsdoc-description */}
 Skips all values from the source observable until the notifier observable emits.
+In an update that reaches both the source and the notifier (both derive from one
+observable), this observable hears the notifier first: if the notifier emits in
+that update, or has completed by then, the source's value in that update is
+passed on.
 {/* /jsdoc-description */}
 
 ## Marble Diagram

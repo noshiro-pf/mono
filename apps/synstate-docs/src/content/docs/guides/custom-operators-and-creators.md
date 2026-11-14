@@ -46,7 +46,7 @@ With more than one parent, compare each parent's token: `derive` recomputes when
 
 ### Depth, and reading an observable that is not a parent
 
-An update reaches observables in ascending `depth`, which is how SynState avoids glitches: every parent has emitted before its child reads it. A child's `depth` defaults to one more than its deepest parent. Whether defaulted or passed, it is raised to the floor of a scope made with `createScope(parent, { after })` when the child is created in one. `withCurrentValueFrom` also reads a second observable with `getSnapshot` without being derived from it; such an observable has to be shallower too, or your observable reads its value from before the update. Pass `depth` yourself then.
+An update reaches observables in ascending `depth`, which is how SynState avoids glitches: every parent has emitted before its child reads it. A child's `depth` defaults to one more than its deepest parent. Whether defaulted or passed, it is raised to the floor of a scope made with `createScope(parent, { after })` when the child is created in one. `withCurrentValueFrom` also reads a second observable with `getSnapshot` without being derived from it; such an observable has to be shallower too, or your observable reads its value from before the update. Pass `depth` yourself then. [How SynState Solved the Glitch](/mono/synstate/internals/how-synstate-solved-the-glitch/#a-queue-bucketed-by-depth) states the rule in full.
 
 ```ts
 createSyncChildObservable(
