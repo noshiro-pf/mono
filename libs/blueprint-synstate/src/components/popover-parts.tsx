@@ -7,6 +7,7 @@ import {
   constant,
   createAfterUpdate,
   isImeKeyDown,
+  listenInScope,
   toObservable,
   type Bindable,
   type Child,
@@ -223,11 +224,32 @@ export const PopoverCore = ({
 
   const mut_elements: {
     target: HTMLElement | undefined;
-    popover: HTMLElement | undefined;
+    container: HTMLElement | undefined;
   } = {
     target: undefined,
-    popover: undefined,
+    container: undefined,
   };
+
+  // Whether the page itself lost the focus (another browser tab, another
+  // window, the browser's own controls) while the target had it: the browser
+  // focuses the target again as the page gets the focus back, and that opens
+  // nothing, as in Blueprint. Blueprint's `lostFocusOnSamePage` guesses this
+  // from a `relatedTarget` of `null`, which a click on a blank part of the page
+  // leaves too; the window's own `blur` is the page losing it, the target still
+  // its active element. The next focus of the target takes the mark off. Known
+  // limits: a Tab from the browser's controls back onto the target is taken for
+  // the page getting it back, as in Blueprint, and so is the first focus of the
+  // target from no element after the page got the focus back on another
+  // element. Each hover popover listens for itself, on the global window, as
+  // the package's overlays listen on the global document.
+  const mut_focus = { pageLeftFromTarget: false };
+
+  if (isHover) {
+    listenInScope(globalThis, 'blur', () => {
+      mut_focus.pageLeftFromTarget =
+        mut_elements.target?.contains(document.activeElement) === true;
+    });
+  }
 
   // Whether it was open as a click on the target began, before the target's own
   // handler had a say: Blueprint toggles from the `isOpen` it was drawn with,
@@ -334,20 +356,6 @@ export const PopoverCore = ({
         tabIndex={
           targetTabIndex === undefined ? undefined : constant(targetTabIndex)
         }
-        onBlur={(event) => {
-          if (!isHover) {
-            return;
-          }
-
-          if (
-            event.relatedTarget instanceof Node &&
-            mut_elements.popover?.contains(event.relatedTarget) === true
-          ) {
-            return;
-          }
-
-          leave(event);
-        }}
         onClick={(event) => {
           if (isHover || Optional.unwrap(disabled$.getSnapshot())) {
             return;
@@ -362,10 +370,47 @@ export const PopoverCore = ({
             event,
           );
         }}
-        onFocus={(event) => {
+        // `focusin` / `focusout`, which bubble as React's `onFocus` / `onBlur`
+        // do: what takes the focus is the element inside, not this wrapper.
+        // They are Blueprint's `handleTargetFocus` / `handleTargetBlur`, and
+        // keep its limits so that the port behaves as Blueprint does: the focus
+        // shares the pointer's `enter` / `leave` and its one `inside` flag, a
+        // move between two elements of the target leaves and enters again, a
+        // focus an overlay gives back as it closes counts as a focus, a move
+        // onto the overlay's focus traps is a leave, and the focus leaving the
+        // popover's content closes nothing, since no handler listens there.
+        // With `enforceFocus` on, a Tab off the target is pulled onto the
+        // overlay's focus trap and left there as the popover closes; `Tooltip`
+        // and the submenu of `MenuItem` turn it off.
+        onFocusIn={(event) => {
+          const pageReturns =
+            event.relatedTarget === null && mut_focus.pageLeftFromTarget;
+
+          mut_focus.pageLeftFromTarget = false;
+
+          if (pageReturns) {
+            return;
+          }
+
           if (isHover) {
             enter(event);
           }
+        }}
+        onFocusOut={(event) => {
+          if (!isHover) {
+            return;
+          }
+
+          // Into the popover's transition container, too: it takes the focus
+          // itself (a `tabindex`) when it enforces the focus.
+          if (
+            event.relatedTarget instanceof Node &&
+            mut_elements.container?.contains(event.relatedTarget) === true
+          ) {
+            return;
+          }
+
+          leave(event);
         }}
         onKeyDown={(event) => {
           if (isHover) {
@@ -392,6 +437,9 @@ export const PopoverCore = ({
         autoFocus={autoFocus ?? !isHover}
         canEscapeKeyClose={canEscapeKeyClose}
         canOutsideClickClose={interactionKind === 'click'}
+        containerRef={(container) => {
+          mut_elements.container = container;
+        }}
         content={content}
         enforceFocus={enforceFocus}
         getTarget={() => mut_elements.target}
@@ -401,9 +449,6 @@ export const PopoverCore = ({
         offset={offset}
         placement={placement}
         popoverClass={popoverClass}
-        popoverRef={(popover) => {
-          mut_elements.popover = popover;
-        }}
         shouldReturnFocusOnClose={!isHover}
         transitionDuration={transitionDuration}
         usePortal={usePortal}

@@ -74,7 +74,6 @@ export const PopoverFloat = ({
   onContainerMouseEnter,
   onContainerMouseLeave,
   containerRef,
-  popoverRef,
 }: PopoverFloatProps): JSX.Element => {
   const mut_elements: {
     container: HTMLElement | undefined;
@@ -208,8 +207,6 @@ export const PopoverFloat = ({
       mut_elements.popover = undefined;
 
       containerRef?.(undefined);
-
-      popoverRef?.(undefined);
     });
 
     return (
@@ -244,8 +241,6 @@ export const PopoverFloat = ({
         <div
           ref={(popover) => {
             mut_elements.popover = popover;
-
-            popoverRef?.(popover);
           }}
           class={classObject(
             [
@@ -367,8 +362,6 @@ export type PopoverFloatProps = Readonly<{
    * it goes.
    */
   containerRef?: (container: HTMLElement | undefined) => void;
-  /** Given `div.bp6-popover` as it is drawn, `undefined` as it goes. */
-  popoverRef?: (popover: HTMLElement | undefined) => void;
 }>;
 
 export type PopoverPlacement = Placement;
