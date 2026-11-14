@@ -1,5 +1,15 @@
 # split-view-extension
 
+## 0.10.1
+
+### Patch Changes
+
+- bc7bd89: An Escape that cancels what an input method is composing no longer gives up a pane being moved, closes a pane's menu or stops renaming a workspace.
+- split-view-link@0.0.3
+    - synstate@9.0.0
+    - synstate-dom@0.11.0
+    - ts-data-forge@15.0.0
+
 ## 0.10.0
 
 ### Minor Changes

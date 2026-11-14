@@ -1,5 +1,17 @@
 # blueprint-synstate
 
+## 0.12.1
+
+### Patch Changes
+
+- b93e33d: Keep one `SegmentedControl` option and one `Tabs` title in the tab order when none is chosen. A `SegmentedControl` whose `value` matches no option, or names a disabled one, now puts its first enabled option in the tab order; `Tabs` whose `selectedTabId` matches no tab puts its first title there.
+- 6449ece: Open a `Tooltip`, and a `Popover` opened by hovering, when its target takes keyboard focus, and close it when the focus leaves, as the README says. The target listened for `focus` and `blur`, which do not bubble from the element inside it that takes the focus. As in Blueprint, the page getting the focus back with the target still focused does not open it again.
+- Updated dependencies [eb39008]
+    - ts-type-forge@9.2.7
+    - synstate@9.0.0
+    - synstate-dom@0.11.0
+    - ts-data-forge@15.0.0
+
 ## 0.12.0
 
 ### Minor Changes

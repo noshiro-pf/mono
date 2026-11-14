@@ -1,5 +1,14 @@
 # synstate-preact-signals
 
+## 9.0.1
+
+### Patch Changes
+
+- 1cc22f9: The README's heading for `fromSignal` names its parameter `sig`, as the declaration does.
+- Updated dependencies [eb39008]
+    - ts-type-forge@9.2.7
+    - synstate@9.0.0
+
 ## 9.0.0
 
 ### Major Changes

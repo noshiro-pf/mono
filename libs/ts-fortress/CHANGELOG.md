@@ -1,5 +1,13 @@
 ## [11.0.2](https://github.com/noshiro-pf/ts-fortress/compare/v11.0.1...v11.0.2) (2026-07-24)
 
+## 13.0.1
+
+### Patch Changes
+
+- 39c95f1: `t.number`'s `multipleOf` and `step` accept the multiples of a decimal divisor such as `0.1` or `0.01`. They took the floating-point remainder, under which `0.3 % 0.1` is `0.09999999999999998`, so `step: 0.01` rejected 990 of the 1001 hundredths from `0` to `10` and `t.number(0.3, { multipleOf: 0.1 })` threw at construction. A value the remainder rejects is now also compared as the decimals the value and the divisor are written as: both are scaled to integers by the decimal places of their shortest notation and the integers are divided, where both are safe integers. Every value accepted before is still accepted. This also fixes the branded number constructors that take these constraints.
+- Updated dependencies [eb39008]
+    - ts-type-forge@9.2.7
+
 ## 13.0.0
 
 ### Major Changes

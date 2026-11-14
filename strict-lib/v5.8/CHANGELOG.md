@@ -1,5 +1,76 @@
 # strict-ts-lib-v5.8-source
 
+## 0.6.11
+
+### Patch Changes
+
+- c02ee5a: `XMLHttpRequest#open` takes any HTTP method token: its `method` is
+  `HTTPRequestMethod | (string & {})`, where it was the `<form method>` values
+  `'post' | 'get' | 'dialog'`. `xhr.open('POST', url)`, `'PUT'`, `'patch'` and a
+  custom token such as `'PROPFIND'` now type-check, and the union keeps the
+  upper-case methods as literal members.
+
+    `Request#method` is `string`, as in TypeScript's own lib, where it was the
+    upper-case `HTTPRequestMethod`. Fetch upper-cases only some standard methods and
+    passes any other token through as written, so `'patch'` and `'PROPFIND'` are
+    possible values.
+
+- 50a6476: The `minimumFractionDigits` / `maximumFractionDigits` options of
+  `Intl.NumberFormat`, `Intl.PluralRules`, `Number#toLocaleString` and
+  `BigInt#toLocaleString`, and the same fields of the resolved options, are
+  `UintRangeInclusive<0, 100>`, where they were capped at 20. ECMA-402 raised the
+  limit to 100 in its 2023 edition, so `{ maximumFractionDigits: 30 }` now
+  type-checks. Integer and significant digits keep their range of 1–21.
+- a487900: Three lib files reached no converter and shipped with upstream's types. They are
+  converted now:
+
+    - TypeScript 6.0 and 7.0: `Float16Array`, `Math.f16round` and
+      `DataView#getFloat16` / `setFloat16` (`lib.es2025.float16.d.ts`), the same
+      declarations as TypeScript 5.9's `lib.esnext.float16.d.ts`, are typed as in
+      5.9 in both flavors: `BYTES_PER_ELEMENT` is `2` and the predicates of `every`,
+      `filter` and the others return `boolean`, and the branded flavor brands the
+      elements, indices and sizes as for the other typed arrays.
+    - TypeScript 6.0 and 7.0: the iterator helpers (`lib.es2025.iterator.d.ts`) are
+      typed as in 5.9's `lib.esnext.iterator.d.ts`; in the branded flavor the
+      `index` of `map`, `filter` and the others and the counts of `take` and `drop`
+      are branded again.
+    - TypeScript 5.0 – 5.6, branded flavor: `Atomics.waitAsync`
+      (`lib.es2022.sharedmemory.d.ts`) takes the same `index` and `value` types as
+      in 5.7 and later.
+
+    The iterator helpers' `drop` takes `count`, as upstream names it, where 5.6 –
+    5.9 had renamed it `limit`.
+
+- cf4b9bc: Branded flavor: the `Date` timestamps no longer claim to be non-negative. A date
+  before 1970 has a negative timestamp, and a date before 1 BCE (year `0`) has a
+  negative year, so
+
+    - `Date#getTime()`, `Date#valueOf()` and `Date.UTC(...)` return `SafeInt`
+      instead of `SafeUint`;
+    - `Date.parse(s)` returns `SafeInt | NaNType`, since `NaN` is how it reports a
+      string it cannot read;
+    - `NumberType.YearEnum`, the type of `getFullYear()`, `getUTCFullYear()` and of
+      the `year` parameter of `new Date(...)` and `Date.UTC(...)`, is `SafeInt`.
+
+    `Date.now()` stays `SafeUint`. `RegExp#[Symbol.search]` returns
+    `NumberType.StringSearchResult` (`StringSize | -1`), since it returns `-1` when
+    nothing matches. The plain flavor is unchanged.
+
+- 7057096: In the branded flavor, `String#repeat`'s `count` is
+  `NumberType.StringSizeArgNonNegative`, as `includes`, `startsWith` and
+  `endsWith` take, where it was a bare `SafeUint`. An integer literal from 0 to
+  39, such as `'-'.repeat(3)`, type-checks again without `asSafeUint`; a larger
+  one still needs it, and a negative or fractional one is rejected.
+- 1e7b334: In the branded flavor, the `length`, `byteOffset` and `byteLength` parameters of
+  the typed-array, `DataView` and ES5 `ArrayBuffer` constructors, and
+  `Atomics.notify`'s `count`, are `NumberType.TypedArraySizeArgNonNegative`, as
+  `new SharedArrayBuffer(8)` takes, where they were a bare `TypedArraySize` or
+  `SafeUint` (the `BigInt64Array` and `BigUint64Array` `byteOffset` already took
+  it). An integer literal from 0 to 39, such as `new Uint8Array(4)` or
+  `new DataView(buffer, 0, 8)`, type-checks without a cast; a larger one still
+  needs one, and a negative one is rejected. `Float16Array`'s constructor takes
+  the same in the versions whose `Float16Array` declarations are converted.
+
 ## 0.6.10
 
 ### Patch Changes
