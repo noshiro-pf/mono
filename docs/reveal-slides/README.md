@@ -30,7 +30,7 @@
 `firebase.json` が旧 URL から Pages の同じパスへの redirect だけを持ち、その
 deck のディレクトリで `pnpm dlx firebase-tools@15 deploy --only hosting` で
 デプロイする。project を削除するときは、同じ変更で `firebase.json` と
-`.firebaserc` を消す（`pnpm run check:root:firebase-redirects` が中身と対を
+`.firebaserc` を消す（`pnpm run check:prose:firebase-redirects` が中身と対を
 確かめる）。
 
 `experimental/packages/slides/` から移した（#2576）。
