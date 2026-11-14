@@ -8,6 +8,7 @@ import {
   filter,
   keepEqualParts,
   map,
+  merge,
   onCleanup,
   pairwise,
   scan,
@@ -147,6 +148,37 @@ describe('types', () => {
     const _both = derive([s, kept], (x, y) => x + y);
 
     expectType<typeof _both, InitializedObservable<number>>('=');
+
+    const _merged = merge([s, source<string>()]);
+
+    expectType<typeof _merged, InitializedObservable<number | string>>('=');
+
+    const _mergedOfNone = merge([e, source<string>()]);
+
+    expectType<typeof _mergedOfNone, Observable<number | string>>('=');
+
+    const _mergedOfArray = merge(Arr.create(2, e));
+
+    expectType<typeof _mergedOfArray, Observable<number>>('=');
+
+    // An array may be empty, and an element typed as a union may hold nothing.
+    const initializedArray: readonly InitializedObservable<number>[] = [
+      s,
+    ] as const;
+
+    const _mergedOfInitializedArray = merge(initializedArray);
+
+    expectType<typeof _mergedOfInitializedArray, Observable<number>>('=');
+
+    const either = (): State<number> | Source<number> => e;
+
+    const _mergedOfUnion = merge([either()]);
+
+    expectType<typeof _mergedOfUnion, Observable<number>>('=');
+
+    const _mergedLater = merge([e, s]);
+
+    expectType<typeof _mergedLater, InitializedObservable<number>>('=');
 
     const _partial = derive([s, e], (x, y) => [x, y] as const);
 

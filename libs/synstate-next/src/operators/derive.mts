@@ -1,5 +1,6 @@
 import {
   DerivedClass,
+  latestHolder,
   noValue,
   toNode,
   view,
@@ -52,12 +53,42 @@ export const derive = <const P extends readonly Observable<unknown>[], B>(
   );
 
 /**
+ * Holds a value when some parent always holds one: an element of the tuple's
+ * leading part. An element typed as a union may be one that holds none, and an
+ * array of any length may be empty.
+ */
+export type MergedOf<P extends readonly Observable<unknown>[], B> =
+  SomeLeadingInitialized<P> extends true
+    ? InitializedObservable<B>
+    : Observable<B>;
+
+/**
+ * @internal A step of `MergedOf`, which is what a consumer spells.
+ *
+ * Whether an element of the leading part of `P` is an `InitializedObservable`.
+ * `H` is inferred, not a type parameter, so the check does not distribute over
+ * a union element.
+ */
+type SomeLeadingInitialized<P extends readonly unknown[]> = P extends readonly [
+  infer H,
+  ...infer R,
+]
+  ? [H] extends [InitializedObservable<unknown>]
+    ? true
+    : SomeLeadingInitialized<R>
+  : false;
+
+/**
  * Emits the value of whichever parent emitted in this update (the first of
- * them, if several did). Holds no value until one emits.
+ * them, if several did). Starts from the value of the parent whose value was
+ * given last, by the same rule: of values given in one update, the first
+ * parent's. Holds no value while no parent holds one.
  */
 export const merge = <const P extends readonly Observable<unknown>[]>(
   parents: P,
-): Observable<ValuesOf<P>[number]> => view(new MergeClass(parents.map(toNode)));
+): MergedOf<P, ValuesOf<P>[number]> =>
+  // The type follows the parents'; the class is the same either way.
+  view(new MergeClass(parents.map(toNode)));
 
 /**
  * @internal A step of `ValuesOf`, which is what a consumer spells.
@@ -204,9 +235,18 @@ class DeriveClass<B> extends DerivedClass<B> {
   }
 }
 
+/** The value `merge` starts from: not `??`, since a parent may hold `undefined`. */
+const startingValue = (
+  parents: readonly ObservableClass<unknown>[],
+): unknown => {
+  const holder = latestHolder(parents);
+
+  return holder === undefined ? noValue : holder.current;
+};
+
 class MergeClass extends DerivedClass<unknown> {
   constructor(parents: readonly ObservableClass<unknown>[]) {
-    super(parents, noValue);
+    super(parents, startingValue(parents));
   }
 
   override recompute(): boolean {

@@ -16,6 +16,7 @@ import {
 import {
   awaitsEffects,
   batch,
+  birthValueAt,
   currentEpoch,
   emit,
   holdUntilUpdateEnds,
@@ -75,6 +76,13 @@ export class ObservableClass<A> implements DerivedNode {
   // transformer-ignore-next-line convert-to-readonly
   emittedAt: number;
 
+  /**
+   * When the value held was given (`birthValueAt`): ordered across nodes, so
+   * that `merge` starts from the value given last.
+   */
+  // transformer-ignore-next-line convert-to-readonly
+  valueAt: number;
+
   // transformer-ignore-next-line convert-to-readonly
   disposed: boolean;
 
@@ -101,6 +109,8 @@ export class ObservableClass<A> implements DerivedNode {
     this.bornAt = writeCount();
 
     this.emittedAt = 0;
+
+    this.valueAt = birthValueAt();
 
     this.disposed = false;
 
@@ -434,6 +444,19 @@ export class DerivedClass<A> extends ObservableClass<A> {
 
     this.parents = parents;
 
+    // A value computed from the parents' is as old as the latest of them, not
+    // as new as this node: one given here (a seed while no parent holds a
+    // value) keeps the time of its birth.
+    if (initial !== noValue) {
+      const computedFrom = latestHolder(
+        reads === undefined ? parents : [...parents, ...reads],
+      );
+
+      if (computedFrom !== undefined) {
+        this.valueAt = computedFrom.valueAt;
+      }
+    }
+
     for (const parent of parents) {
       parent.addChild(this);
     }
@@ -486,6 +509,27 @@ export class DerivedClass<A> extends ObservableClass<A> {
     }
   }
 }
+
+/**
+ * Of `nodes`, the one holding the value given last (`valueAt`), the first of
+ * those given in the same update; `undefined` when none holds a value.
+ */
+export const latestHolder = (
+  nodes: readonly ObservableClass<unknown>[],
+): ObservableClass<unknown> | undefined => {
+  let mut_latest: ObservableClass<unknown> | undefined = undefined;
+
+  for (const node of nodes) {
+    if (
+      node.current !== noValue &&
+      (mut_latest === undefined || node.valueAt > mut_latest.valueAt)
+    ) {
+      mut_latest = node;
+    }
+  }
+
+  return mut_latest;
+};
 
 /**
  * A node below `source` that calls `check` in the drain each time `source`
