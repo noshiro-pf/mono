@@ -1,5 +1,13 @@
 ## [10.1.8](https://github.com/noshiro-pf/ts-repo-utils/compare/v10.1.7...v10.1.8) (2026-08-09)
 
+## 11.0.1
+
+### Patch Changes
+
+- 1cc22f9: The README's API headings no longer give parameters or return types that differ from the declarations: those of `repoIsDirty`, `assertRepoIsClean`, `getWorkspacePackages`, `checkExt`, `assertExt`, `executeParallel` and others had drifted.
+- Updated dependencies [eb39008]
+    - ts-type-forge@9.2.7
+
 ## 11.0.0
 
 ### Major Changes
