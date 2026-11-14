@@ -1,5 +1,20 @@
 # eslint-plugin-ts-data-forge
 
+## 0.13.0
+
+### Minor Changes
+
+- 82d252e: `prefer-is-record-and-has-key` (built by `createPreferIsRecordAndHasKey`) reports `Reflect.has(obj, key)` where `obj` is typed as a plain record (`Record<string, …>`), and fixes it to `hasKey(obj, key)`; a literal key naming a member of `Object.prototype` (`'toString'`) gets a suggestion instead, since `Reflect.has` finds it there and `hasKey` does not. On any other object — a class instance, an interface, a built-in, a function, `object` — `Reflect.has` is left alone. `Object.hasOwn` is no longer reported where `Object` is a value the file binds itself (a parameter, a variable, an import), nor as a computed member (`Object[name](…)`).
+
+### Patch Changes
+
+- aa9c9a3: `prefer-range-for-loop` fixes a loop only when the rewritten call type-checks. `range` takes a `SafeInt` or an integer literal from -512 to 511, so the fix for a `number` bound (a parameter, `const len = xs.length`, a literal of 512 or more) wrote code that did not compile; the rule now asks the type checker about the begin, the end and a variable step, which has to be positive (with a negative step, `range` runs while the value is above the end, where the loop runs while it is below), and offers the rewrite as a suggestion when one of them does not fit but a cast could make it. Without type information only integer-literal bounds fit. A loop gets neither when its head holds a comment, since the rewrite would delete it, or when the type of a bound or the step says it may be a bigint, a string or a number that is not a safe integer (`const half = 2.5`), which no cast makes a `SafeInt`, or the step one that is never positive (`const back = -1`, a `NegativeSafeInt`), with which `range` would not stop where the loop does; such a loop is reported with a message that says why. A loop is no longer reported when its begin or end is a literal no cast makes a `SafeInt` (a bigint, or a number that is not a safe integer: `2.5`, `1e20`), or when its step is a template literal, which concatenates like the string-literal steps it already left alone. It also fixes a loop whose end is a negative integer literal (`i < -5`), and reads the update through type wrappers (`i! += 2`, `(i as number)++`), as it already read the test.
+- Updated dependencies [82d252e]
+- Updated dependencies [eb39008]
+    - eslint-rule-forge@0.11.0
+    - ts-type-forge@9.2.7
+    - ts-data-forge@15.0.0
+
 ## 0.12.0
 
 ### Minor Changes

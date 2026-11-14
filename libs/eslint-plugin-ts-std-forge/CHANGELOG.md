@@ -1,5 +1,19 @@
 # eslint-plugin-ts-std-forge
 
+## 0.3.0
+
+### Minor Changes
+
+- 82d252e: `prefer-is-record-and-has-key` (built by `createPreferIsRecordAndHasKey`) reports `Reflect.has(obj, key)` where `obj` is typed as a plain record (`Record<string, …>`), and fixes it to `hasKey(obj, key)`; a literal key naming a member of `Object.prototype` (`'toString'`) gets a suggestion instead, since `Reflect.has` finds it there and `hasKey` does not. On any other object — a class instance, an interface, a built-in, a function, `object` — `Reflect.has` is left alone. `Object.hasOwn` is no longer reported where `Object` is a value the file binds itself (a parameter, a variable, an import), nor as a computed member (`Object[name](…)`).
+
+### Patch Changes
+
+- Updated dependencies [82d252e]
+- Updated dependencies [eb39008]
+    - eslint-rule-forge@0.11.0
+    - ts-type-forge@9.2.7
+    - ts-std-forge@0.6.0
+
 ## 0.2.0
 
 ### Minor Changes

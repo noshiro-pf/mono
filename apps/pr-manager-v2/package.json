@@ -1,6 +1,6 @@
 {
   "name": "pr-manager-v2",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "private": true,
   "description": "GitHub Pull Requests Manager, rebuilt — replaces apps/pr-manager once it does everything the spec lists",
   "repository": {

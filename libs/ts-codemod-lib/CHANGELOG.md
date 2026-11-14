@@ -1,5 +1,16 @@
 ## [2.2.5](https://github.com/noshiro-pf/ts-codemod-lib/compare/v2.2.4...v2.2.5) (2026-08-09)
 
+## 4.3.0
+
+### Minor Changes
+
+- 15d85ba: Add `isExpressionWrapper` and `isTypeAssertingWrapper`, which tell whether a ts-morph node is one of the wrappers an expression can sit in without changing its value (parentheses, `as`, `satisfies`, `!`, `<T>` and an instantiation expression), and whether it is one that asserts a type (`as`, `<T>`, `!`). `enableNoUncheckedIndexedAccessTransformer` now reads its "already asserted" test from the latter; its behavior is unchanged.
+
+### Patch Changes
+
+- Updated dependencies [eb39008]
+    - ts-type-forge@9.2.7
+
 ## 4.2.1
 
 ### Patch Changes

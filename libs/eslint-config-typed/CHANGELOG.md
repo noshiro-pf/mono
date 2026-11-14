@@ -1,5 +1,22 @@
 ## [5.8.4](https://github.com/noshiro-pf/eslint-config-typed/compare/v5.8.3...v5.8.4) (2026-08-09)
 
+## 7.13.0
+
+### Minor Changes
+
+- bc7bd89: `ts-restrictions/require-ime-guard-on-enter` checks Escape too, under the new message id `missingImeGuardOnEscape`: the Escape that cancels an input method's conversion closes a dialog or drops an edit just as the confirming Enter submits. The new `keys` option (default `["Enter", "Escape"]`) turns either off. The rule now also follows a key read into a `const` (`const key = event.key; key === 'Enter'`) and sees `includes` / `has` on a literal array or `Set`, or a `const` bound to one, that holds the key (`['Enter', ' '].includes(event.key)`). A guard function imported by name or through a namespace is matched by the name its module exports, so `import { isImeKeyDown as imeKey }` counts and another export imported as `isImeKeyDown` does not; an import of `default`, a local declaration and a method (`keys['isImeKeyDown'](event)` included) are matched by the name they are called by. A `guardFunctions` entry that named a renamed import by its local name (`imeKey` above) no longer matches it; name the export instead. A `const` bound to the event or to a member chain on it (`const native = event.nativeEvent`) is read as what it names, on the key's side and the guard's. A `new Set` counts only when `Set` is the standard one, not a value the file declares or imports. An optional chain in a guard's argument (`isImeKeyDown(event?.nativeEvent)`), inside a type wrapper or not, is read through.
+
+### Patch Changes
+
+- 82d252e: The description of `ts-data-forge/prefer-is-record-and-has-key` in the rule types names `Reflect.has(obj, key)`, which the rule now reports on a plain record.
+- aa9c9a3: The documentation of the `ts-data-forge/prefer-range-for-loop` rule type says the rule offers suggestions.
+- Updated dependencies [bc7bd89]
+- Updated dependencies [82d252e]
+- Updated dependencies [eb39008]
+    - eslint-plugin-ts-restrictions@1.1.0
+    - eslint-rule-forge@0.11.0
+    - ts-type-forge@9.2.7
+
 ## 7.12.0
 
 ### Minor Changes

@@ -1,5 +1,17 @@
 # annotation-tool
 
+## 0.0.34
+
+### Patch Changes
+
+- Updated dependencies [b93e33d]
+- Updated dependencies [6449ece]
+    - blueprint-synstate@0.12.1
+    - ts-utils-additional@0.0.15
+    - synstate@9.0.0
+    - synstate-dom@0.11.0
+    - ts-data-forge@15.0.0
+
 ## 0.0.33
 
 ### Patch Changes
