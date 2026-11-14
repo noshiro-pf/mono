@@ -37,7 +37,7 @@ if (import.meta.vitest !== undefined) {
                 const id = setTimeout(() => {
                   mut_timers.delete(id);
 
-                  ctx.emit(value.value);
+                  ctx.emit(Optional.unwrap(value));
                 }, milliseconds);
 
                 mut_timers.add(id);

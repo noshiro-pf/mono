@@ -12,6 +12,7 @@ import {
   type Child,
   type JSX,
 } from 'synstate-dom';
+import { Optional } from 'ts-data-forge';
 import { classObject } from '../internal/index.mjs';
 import {
   PopoverFloat,
@@ -201,7 +202,7 @@ export const PopoverCore = ({
   const enter = (event: Event): void => {
     mut_hover.inside = true;
 
-    if (!disabled$.getSnapshot().value) {
+    if (!Optional.unwrap(disabled$.getSnapshot())) {
       setOpenState(true, event, hoverOpenDelay);
     }
   };
@@ -254,7 +255,7 @@ export const PopoverCore = ({
       isHover &&
       targetTabIndex === undefined &&
       !element.hasAttribute('tabindex') &&
-      !disabled$.getSnapshot().value
+      !Optional.unwrap(disabled$.getSnapshot())
     ) {
       element.setAttribute('tabindex', '0');
     }
@@ -283,7 +284,7 @@ export const PopoverCore = ({
 
   // An element put in place of the target's, as by an `If`, is decorated too.
   const targetSwaps = new MutationObserver(() => {
-    decorateTarget(open$.getSnapshot().value);
+    decorateTarget(Optional.unwrap(open$.getSnapshot()));
   });
 
   onScopeDispose(() => {
@@ -291,7 +292,7 @@ export const PopoverCore = ({
   });
 
   afterUpdate(() => {
-    decorateTarget(open$.getSnapshot().value);
+    decorateTarget(Optional.unwrap(open$.getSnapshot()));
 
     if (mut_elements.target !== undefined) {
       targetSwaps.observe(mut_elements.target, { childList: true });
@@ -312,7 +313,7 @@ export const PopoverCore = ({
             target.addEventListener(
               'click',
               () => {
-                mut_click.wasOpen = open$.getSnapshot().value;
+                mut_click.wasOpen = Optional.unwrap(open$.getSnapshot());
               },
               { capture: true },
             );
@@ -348,14 +349,16 @@ export const PopoverCore = ({
           leave(event);
         }}
         onClick={(event) => {
-          if (isHover || disabled$.getSnapshot().value) {
+          if (isHover || Optional.unwrap(disabled$.getSnapshot())) {
             return;
           }
 
           // One keeping its own state toggles as it is now, as Blueprint's
           // updater does: no handler in the target can set that state.
           setOpenState(
-            !(isControlled ? mut_click.wasOpen : open$.getSnapshot().value),
+            !(isControlled
+              ? mut_click.wasOpen
+              : Optional.unwrap(open$.getSnapshot())),
             event,
           );
         }}

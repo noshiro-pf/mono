@@ -1,5 +1,6 @@
 import type { Optional, UnknownOptional } from '../optional.mjs';
-import { unwrap } from './optional-unwrap.mjs';
+import { isSome } from './optional-is-some.mjs';
+import { unwrapSome } from './optional-unwrap-some.mjs';
 import type { Unwrap } from './types.mjs';
 
 /**
@@ -67,4 +68,7 @@ export function unwrapOr<O extends UnknownOptional, D>(
 const unwrapOrImpl = <O extends UnknownOptional, D>(
   optional: O,
   defaultValue: D,
-): D | Unwrap<O> => unwrap(optional) ?? defaultValue;
+): D | Unwrap<O> =>
+  // Not `unwrap(optional) ?? defaultValue`, which would replace a Some holding
+  // `null` or `undefined` with the default.
+  isSome(optional) ? unwrapSome(optional) : defaultValue;

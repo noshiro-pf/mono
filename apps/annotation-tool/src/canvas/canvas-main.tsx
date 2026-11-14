@@ -11,7 +11,7 @@ import {
   type Bindable,
   type JSX,
 } from 'synstate-dom';
-import { Arr } from 'ts-data-forge';
+import { Arr, Optional } from 'ts-data-forge';
 import {
   hslaToRgba,
   type Hue,
@@ -119,7 +119,7 @@ export const CanvasMain = ({
       ...createGlobalPixiObjects({ app, canvasSize, canvasStyles }),
     };
 
-    attachPointerEventListener(hue$.getSnapshot().value);
+    attachPointerEventListener(Optional.unwrap(hue$.getSnapshot()));
   };
 
   hue$.subscribe(attachPointerEventListener);

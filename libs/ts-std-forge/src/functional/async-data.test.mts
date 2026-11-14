@@ -78,6 +78,24 @@ describe('AsyncData test', () => {
       expectType<typeof data, AsyncData<number, string>>('<=');
     });
 
+    test('a previous of Some(undefined) passed is kept, not taken for none passed', () => {
+      // A Some of `undefined` is `undefined` at runtime, which a default
+      // parameter would have replaced with None.
+      assert.isTrue(
+        Optional.isSome(AsyncData.pending(Optional.some(undefined)).previous),
+      );
+
+      assert.isTrue(
+        Optional.isSome(
+          AsyncData.err('boom', Optional.some(undefined)).previous,
+        ),
+      );
+
+      assert.isTrue(Optional.isNone(AsyncData.pending().previous));
+
+      assert.isTrue(Optional.isNone(AsyncData.err('boom').previous));
+    });
+
     test('an err is still an Err of Result', () => {
       expectType<AsyncErr<number, string>, Err<string>>('<=');
 
@@ -166,11 +184,31 @@ describe('AsyncData test', () => {
 
       assert.isFalse(AsyncData.isAsyncData({ $$tag: 'other' }));
 
+      // A missing `previous` tells a pending from something that is not one.
       assert.isFalse(
+        AsyncData.isAsyncData({ $$tag: 'ts-data-forge::AsyncData.pending' }),
+      );
+
+      // A `previous` of `undefined` is one: a Some of `undefined` is
+      // `undefined` at runtime.
+      assert.isTrue(
         AsyncData.isAsyncData({
           $$tag: 'ts-data-forge::AsyncData.pending',
-          previous: 1,
+          previous: undefined,
         }),
+      );
+
+      assert.isTrue(
+        AsyncData.isAsyncData(AsyncData.pending(Optional.some(undefined))),
+      );
+
+      // A `previous` of None or of a Some holding a falsy value is still one.
+      assert.isTrue(AsyncData.isAsyncData(AsyncData.pending(Optional.none)));
+
+      assert.isTrue(AsyncData.isAsyncData(AsyncData.pending(Optional.some(0))));
+
+      assert.isTrue(
+        AsyncData.isAsyncData(AsyncData.err('boom', Optional.some(''))),
       );
     });
   });
@@ -203,6 +241,19 @@ describe('AsyncData test', () => {
         AsyncData.map(AsyncData.err('boom', Optional.some(4)), double),
         AsyncData.err('boom', Optional.some(8)),
       );
+    });
+
+    test('keeps a previous value the function maps to undefined', () => {
+      const toUndefined = (): undefined => undefined;
+
+      const mapped = AsyncData.map(
+        AsyncData.pending(Optional.some(1)),
+        toUndefined,
+      );
+
+      assert.isTrue(AsyncData.isPending(mapped));
+
+      assert.isTrue(Optional.isSome(mapped.previous));
     });
 
     test('types', () => {
@@ -410,6 +461,14 @@ describe('AsyncData test', () => {
   });
 
   describe('transitions', () => {
+    test('toPending keeps an Ok of undefined as previous', () => {
+      // `previous` defaults to None; a Some holding `undefined` must not be
+      // taken for a missing argument.
+      const pending = AsyncData.toPending(AsyncData.ok(undefined));
+
+      assert.isTrue(Optional.isSome(AsyncData.latestOk(pending)));
+    });
+
     test('toPending keeps the latest Ok as previous', () => {
       assert.deepStrictEqual(
         AsyncData.toPending(AsyncData.idle),

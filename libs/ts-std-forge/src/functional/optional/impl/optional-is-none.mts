@@ -1,5 +1,5 @@
 import type { UnknownOptional } from '../optional.mjs';
-import { NoneTypeTagName } from './tag.mjs';
+import { noneValue } from './encoding.mjs';
 import type { NarrowToNone } from './types.mjs';
 
 /**
@@ -23,4 +23,4 @@ import type { NarrowToNone } from './types.mjs';
  */
 export const isNone = <O extends UnknownOptional>(
   optional: O,
-): optional is NarrowToNone<O> => optional.$$tag === NoneTypeTagName;
+): optional is NarrowToNone<O> => (optional as unknown) === noneValue;

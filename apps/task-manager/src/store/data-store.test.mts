@@ -1,4 +1,5 @@
 import { createState } from 'synstate';
+import { Optional } from 'ts-data-forge';
 import type { DagLayout, Point } from '../dag/index.mjs';
 import {
   asGroupId,
@@ -82,9 +83,12 @@ describe(createDataStore, () => {
   test('is empty and idle until somebody signs in', () => {
     const { store } = setup();
 
-    assert.deepStrictEqual(store.state.getSnapshot().value, EMPTY_STATE);
+    assert.deepStrictEqual(
+      Optional.unwrap(store.state.getSnapshot()),
+      EMPTY_STATE,
+    );
 
-    assert.strictEqual(store.status.getSnapshot().value, 'idle');
+    assert.strictEqual(Optional.unwrap(store.status.getSnapshot()), 'idle');
   });
 
   test('loads the repository of whoever signs in', () => {
@@ -92,9 +96,9 @@ describe(createDataStore, () => {
 
     setSession(signedIn(createMemoryRepository(initial)));
 
-    assert.deepStrictEqual(store.state.getSnapshot().value, initial);
+    assert.deepStrictEqual(Optional.unwrap(store.state.getSnapshot()), initial);
 
-    assert.strictEqual(store.status.getSnapshot().value, 'ready');
+    assert.strictEqual(Optional.unwrap(store.status.getSnapshot()), 'ready');
   });
 
   test('writes through the repository and reads the result back', async () => {
@@ -106,7 +110,10 @@ describe(createDataStore, () => {
 
     await Promise.resolve();
 
-    assert.strictEqual(store.state.getSnapshot().value.tasks[0]?.title, 'A2');
+    assert.strictEqual(
+      Optional.unwrap(store.state.getSnapshot()).tasks[0]?.title,
+      'A2',
+    );
   });
 
   test('deletes a node with the dependencies on it', async () => {
@@ -118,7 +125,7 @@ describe(createDataStore, () => {
 
     await Promise.resolve();
 
-    assert.deepStrictEqual(store.state.getSnapshot().value.tasks, [
+    assert.deepStrictEqual(Optional.unwrap(store.state.getSnapshot()).tasks, [
       { ...b, dependencies: [], updatedAt: 1000 },
     ]);
   });
@@ -135,7 +142,10 @@ describe(createDataStore, () => {
 
     await Promise.resolve();
 
-    assert.deepStrictEqual(store.state.getSnapshot().value.tasks, []);
+    assert.deepStrictEqual(
+      Optional.unwrap(store.state.getSnapshot()).tasks,
+      [],
+    );
   });
 
   test('deleting none writes nothing', async () => {
@@ -143,13 +153,13 @@ describe(createDataStore, () => {
 
     setSession(signedIn(createMemoryRepository(initial)));
 
-    const before = store.state.getSnapshot().value;
+    const before = Optional.unwrap(store.state.getSnapshot());
 
     store.deleteNodes([]);
 
     await Promise.resolve();
 
-    assert.strictEqual(store.state.getSnapshot().value, before);
+    assert.strictEqual(Optional.unwrap(store.state.getSnapshot()), before);
   });
 
   test('adds a dependency, onto the node as stored', async () => {
@@ -169,13 +179,16 @@ describe(createDataStore, () => {
 
     await Promise.resolve();
 
-    assert.deepStrictEqual(store.state.getSnapshot().value.tasks[0], {
-      ...a,
-      dependencies: [
-        { from: { kind: 'milestone', id: asMilestoneId('m') }, lagMs: 0 },
-      ],
-      updatedAt: 1000,
-    });
+    assert.deepStrictEqual(
+      Optional.unwrap(store.state.getSnapshot()).tasks[0],
+      {
+        ...a,
+        dependencies: [
+          { from: { kind: 'milestone', id: asMilestoneId('m') }, lagMs: 0 },
+        ],
+        updatedAt: 1000,
+      },
+    );
 
     assert.deepStrictEqual(errors, []);
   });
@@ -192,7 +205,7 @@ describe(createDataStore, () => {
 
     await Promise.resolve();
 
-    assert.deepStrictEqual(store.state.getSnapshot().value.tasks, [
+    assert.deepStrictEqual(Optional.unwrap(store.state.getSnapshot()).tasks, [
       a,
       { ...b, dependencies: [], updatedAt: 1000 },
     ]);
@@ -212,7 +225,7 @@ describe(createDataStore, () => {
 
     await Promise.resolve();
 
-    assert.deepStrictEqual(store.state.getSnapshot().value, initial);
+    assert.deepStrictEqual(Optional.unwrap(store.state.getSnapshot()), initial);
 
     assert.deepStrictEqual(errors, []);
   });
@@ -235,7 +248,7 @@ describe(createDataStore, () => {
 
     await Promise.resolve();
 
-    assert.deepStrictEqual(store.state.getSnapshot().value, initial);
+    assert.deepStrictEqual(Optional.unwrap(store.state.getSnapshot()), initial);
 
     assert.deepStrictEqual(errors, [
       '依存を追加できませんでした（すでに依存しています）。',
@@ -250,9 +263,12 @@ describe(createDataStore, () => {
 
     setSession({ type: 'signed-out', error: undefined, signingIn: false });
 
-    assert.deepStrictEqual(store.state.getSnapshot().value, EMPTY_STATE);
+    assert.deepStrictEqual(
+      Optional.unwrap(store.state.getSnapshot()),
+      EMPTY_STATE,
+    );
 
-    assert.strictEqual(store.status.getSnapshot().value, 'idle');
+    assert.strictEqual(Optional.unwrap(store.status.getSnapshot()), 'idle');
   });
 
   test('reports a write without a repository, and one that fails', async () => {
@@ -292,15 +308,17 @@ describe(createDataStore, () => {
     test('are none until somebody signs in, and that project’s after', () => {
       const { store, setSession } = setup();
 
-      assert.deepStrictEqual(store.groups.getSnapshot().value, []);
+      assert.deepStrictEqual(Optional.unwrap(store.groups.getSnapshot()), []);
 
       setSession(signedIn(createMemoryRepository(initial, undefined, [group])));
 
-      assert.deepStrictEqual(store.groups.getSnapshot().value, [group]);
+      assert.deepStrictEqual(Optional.unwrap(store.groups.getSnapshot()), [
+        group,
+      ]);
 
       setSession({ type: 'signed-out', error: undefined, signingIn: false });
 
-      assert.deepStrictEqual(store.groups.getSnapshot().value, []);
+      assert.deepStrictEqual(Optional.unwrap(store.groups.getSnapshot()), []);
     });
 
     test('puts a group, and a node into it and out again', async () => {
@@ -314,19 +332,26 @@ describe(createDataStore, () => {
 
       await Promise.resolve();
 
-      assert.deepStrictEqual(store.groups.getSnapshot().value, [group]);
+      assert.deepStrictEqual(Optional.unwrap(store.groups.getSnapshot()), [
+        group,
+      ]);
 
-      assert.deepStrictEqual(store.state.getSnapshot().value.tasks[0], {
-        ...a,
-        groupId: g,
-        updatedAt: 1000,
-      });
+      assert.deepStrictEqual(
+        Optional.unwrap(store.state.getSnapshot()).tasks[0],
+        {
+          ...a,
+          groupId: g,
+          updatedAt: 1000,
+        },
+      );
 
       store.setNodeGroup({ kind: 'task', id: asTaskId('a') }, undefined);
 
       await Promise.resolve();
 
-      assert.isUndefined(store.state.getSnapshot().value.tasks[0]?.groupId);
+      assert.isUndefined(
+        Optional.unwrap(store.state.getSnapshot()).tasks[0]?.groupId,
+      );
     });
 
     test('edits several nodes in one write, and writes nothing when nothing changes', async () => {
@@ -367,7 +392,7 @@ describe(createDataStore, () => {
 
       assert.strictEqual(mut_writes, 1);
 
-      const { tasks, milestones } = store.state.getSnapshot().value;
+      const { tasks, milestones } = Optional.unwrap(store.state.getSnapshot());
 
       assert.deepStrictEqual(
         tasks.map(({ progress, labels, groupId }) => ({
@@ -412,9 +437,9 @@ describe(createDataStore, () => {
 
       await Promise.resolve();
 
-      assert.deepStrictEqual(store.groups.getSnapshot().value, []);
+      assert.deepStrictEqual(Optional.unwrap(store.groups.getSnapshot()), []);
 
-      assert.deepStrictEqual(store.state.getSnapshot().value.tasks, [
+      assert.deepStrictEqual(Optional.unwrap(store.state.getSnapshot()).tasks, [
         { ...a, groupId: undefined, updatedAt: 1000 },
         b,
       ]);
@@ -431,15 +456,18 @@ describe(createDataStore, () => {
     test('is none until somebody signs in, and that project’s after', () => {
       const { store, setSession } = setup();
 
-      assert.isUndefined(store.dagLayout.getSnapshot().value);
+      assert.isUndefined(Optional.unwrap(store.dagLayout.getSnapshot()));
 
       setSession(signedIn(createMemoryRepository(initial, layout)));
 
-      assert.deepStrictEqual(store.dagLayout.getSnapshot().value, layout);
+      assert.deepStrictEqual(
+        Optional.unwrap(store.dagLayout.getSnapshot()),
+        layout,
+      );
 
       setSession({ type: 'signed-out', error: undefined, signingIn: false });
 
-      assert.isUndefined(store.dagLayout.getSnapshot().value);
+      assert.isUndefined(Optional.unwrap(store.dagLayout.getSnapshot()));
     });
 
     test('is written through the repository, stamped with the time', async () => {
@@ -466,7 +494,10 @@ describe(createDataStore, () => {
 
       assert.deepStrictEqual(mut_writes, [[layout, 1000]]);
 
-      assert.deepStrictEqual(store.dagLayout.getSnapshot().value, layout);
+      assert.deepStrictEqual(
+        Optional.unwrap(store.dagLayout.getSnapshot()),
+        layout,
+      );
     });
 
     test('reports a write that fails', async () => {
@@ -497,7 +528,8 @@ describe('the whole project of the data store', () => {
   test('has loaded only once the nodes, groups and layout all have', () => {
     const { store, setSession } = setup();
 
-    const load = (): ProjectLoad => store.projectLoad.getSnapshot().value;
+    const load = (): ProjectLoad =>
+      Optional.unwrap(store.projectLoad.getSnapshot());
 
     assert.strictEqual(load(), 'loading');
 
@@ -526,7 +558,7 @@ describe('the whole project of the data store', () => {
 
     setSession(signedIn(repository));
 
-    assert.strictEqual(store.status.getSnapshot().value, 'ready');
+    assert.strictEqual(Optional.unwrap(store.status.getSnapshot()), 'ready');
 
     assert.strictEqual(load(), 'loading');
 
@@ -555,7 +587,10 @@ describe('the whole project of the data store', () => {
       }),
     );
 
-    assert.strictEqual(store.projectLoad.getSnapshot().value, 'failed');
+    assert.strictEqual(
+      Optional.unwrap(store.projectLoad.getSnapshot()),
+      'failed',
+    );
 
     assert.deepStrictEqual(errors, ['グループを読み込めませんでした。']);
   });
@@ -574,7 +609,10 @@ describe('the whole project of the data store', () => {
       }),
     );
 
-    assert.strictEqual(store.projectLoad.getSnapshot().value, 'failed');
+    assert.strictEqual(
+      Optional.unwrap(store.projectLoad.getSnapshot()),
+      'failed',
+    );
   });
 
   test('is replaced through the repository', async () => {
@@ -591,7 +629,7 @@ describe('the whole project of the data store', () => {
       { state: initial, groups: [], dagLayout: undefined },
     );
 
-    assert.deepStrictEqual(store.state.getSnapshot().value, {
+    assert.deepStrictEqual(Optional.unwrap(store.state.getSnapshot()), {
       tasks: [a],
       milestones: [m],
     });

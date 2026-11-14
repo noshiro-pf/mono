@@ -708,8 +708,9 @@ npm 依存は要らない。
 | `mapOptional(x, f)`               | `pipe(x).mapNullable(f).value`              |
 | `ArrayOfLength`                   | `FixedLengthTuple`                          |
 
-`simpleBrandedNumber` は `ts-fortress` にあるが `@deprecated`（`brandedNumber`
-を使え）で、**引数もオプションオブジェクトに変わっている**。
+`simpleBrandedNumber` は `brandedNumber` の非推奨の別名で、このリポジトリでは
+`ts-fortress` の次の major に向けて削除済み。`brandedNumber` の**引数は
+オプションオブジェクト**である。
 
 ### `withSlash` を `tiny-router-observable` から export した
 

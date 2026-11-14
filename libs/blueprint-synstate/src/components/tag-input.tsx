@@ -10,7 +10,7 @@ import {
   type Child,
   type JSX,
 } from 'synstate-dom';
-import { Arr, Num } from 'ts-data-forge';
+import { Arr, Num, Optional } from 'ts-data-forge';
 import { classObject, intentClass } from '../internal/index.mjs';
 import { Icon, type IconName } from './icon.js';
 import type { Intent } from './intent.mjs';
@@ -119,7 +119,7 @@ export const TagInput = ({
 
   /** Blueprint's `removeIndexFromValues`, which Backspace and Delete call. */
   const removeAt = (index: number): void => {
-    const tag = values$.getSnapshot().value[index];
+    const tag = Optional.unwrap(values$.getSnapshot())[index];
 
     if (tag !== undefined) {
       onRemove?.(tag.value, index);
@@ -128,9 +128,9 @@ export const TagInput = ({
 
   /** Blueprint's `getNextActiveIndex`. */
   const nextActiveIndex = (direction: -1 | 1): number | undefined => {
-    const active = activeIndex$.getSnapshot().value;
+    const active = Optional.unwrap(activeIndex$.getSnapshot());
 
-    const { length } = values$.getSnapshot().value;
+    const { length } = Optional.unwrap(values$.getSnapshot());
 
     if (active === undefined) {
       return direction < 0 ? Num.clamp(length - 1, 0, length) : undefined;
@@ -140,7 +140,8 @@ export const TagInput = ({
   };
 
   const isValidIndex = (index: number | undefined): index is number =>
-    index !== undefined && index < values$.getSnapshot().value.length;
+    index !== undefined &&
+    index < Optional.unwrap(values$.getSnapshot()).length;
 
   const onKeyDown = (
     event: KeyboardEvent & Readonly<{ currentTarget: HTMLInputElement }>,
@@ -153,11 +154,14 @@ export const TagInput = ({
       return;
     }
 
-    if (selectionEnd !== 0 || !Arr.isNonEmpty(values$.getSnapshot().value)) {
+    if (
+      selectionEnd !== 0 ||
+      !Arr.isNonEmpty(Optional.unwrap(values$.getSnapshot()))
+    ) {
       return;
     }
 
-    const active = activeIndex$.getSnapshot().value;
+    const active = Optional.unwrap(activeIndex$.getSnapshot());
 
     const direction =
       event.key === 'ArrowLeft' ? -1 : event.key === 'ArrowRight' ? 1 : 0;
@@ -258,10 +262,10 @@ export const TagInput = ({
               minimal,
               removable,
               'data-e2e': tagE2e,
-            } = tag$.getSnapshot().value;
+            } = Optional.unwrap(tag$.getSnapshot());
 
             // Part of the key, so that it is the same for the row's life.
-            const index = index$.getSnapshot().value;
+            const index = Optional.unwrap(index$.getSnapshot());
 
             return (
               <Tag
@@ -275,7 +279,9 @@ export const TagInput = ({
                       onRemove: () => {
                         // As it is now: a tag drawn again under the same key
                         // may bring another.
-                        const onRemoveTag = tag$.getSnapshot().value.onRemove;
+                        const onRemoveTag = Optional.unwrap(
+                          tag$.getSnapshot(),
+                        ).onRemove;
 
                         if (onRemoveTag === undefined) {
                           removeAt(index);

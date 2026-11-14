@@ -1,3 +1,4 @@
+import { Optional } from 'ts-data-forge';
 import { createThemeStore, parseThemeSetting } from './theme-store.mjs';
 
 describe(parseThemeSetting, () => {
@@ -18,7 +19,10 @@ describe(createThemeStore, () => {
   test('starts from the stored setting and applies it at once', () => {
     const env = fakeEnvironment('dark', false);
 
-    assert.strictEqual(env.store.setting.getSnapshot().value, 'dark');
+    assert.strictEqual(
+      Optional.unwrap(env.store.setting.getSnapshot()),
+      'dark',
+    );
 
     const stop = env.store.start();
 

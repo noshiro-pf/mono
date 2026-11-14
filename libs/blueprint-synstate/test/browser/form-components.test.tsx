@@ -11,6 +11,7 @@ import {
 } from 'blueprint-synstate';
 import { createState, map } from 'synstate';
 import { constant, If } from 'synstate-dom';
+import { Optional } from 'ts-data-forge';
 import { mountInto, nextFrame, one, press, settle } from './helpers.mjs';
 
 describe(Button, () => {
@@ -324,7 +325,7 @@ describe(Switch, () => {
 
     input.click();
 
-    assert.isTrue(checked$.getSnapshot().value);
+    assert.isTrue(Optional.unwrap(checked$.getSnapshot()));
 
     assert.isTrue(input.checked);
 

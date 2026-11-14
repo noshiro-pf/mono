@@ -40,7 +40,7 @@ const setupFor = (): Readonly<{
   const Row = ({
     item$,
   }: Readonly<{ item$: InitializedObservable<Item> }>): JSX.Element => {
-    const { id } = item$.getSnapshot().value;
+    const { id } = Optional.unwrap(item$.getSnapshot());
 
     mut_calls.set(id, (mut_calls.get(id) ?? 0) + 1);
 
@@ -212,7 +212,7 @@ describe('updates deferred by the mounts For, If and Portal open themselves', ()
       () => (
         <ul>
           <For items={items$} key={(id) => id}>
-            {(id$) => <RowWithSwitch id={id$.getSnapshot().value} />}
+            {(id$) => <RowWithSwitch id={Optional.unwrap(id$.getSnapshot())} />}
           </For>
         </ul>
       ),
@@ -324,7 +324,7 @@ describe('updates deferred by the mounts For, If and Portal open themselves', ()
             then={
               <For items={items$} key={(id) => id}>
                 {(id$) => {
-                  mut_built.push(id$.getSnapshot().value);
+                  mut_built.push(Optional.unwrap(id$.getSnapshot()));
 
                   return <b>{id$.pipe(map((id) => id))}</b>;
                 }}
@@ -565,7 +565,7 @@ const setupSelfWritingFor = (
     });
 
     // Row `a` adds row `b` while it is mounted.
-    const current = items$.getSnapshot().value;
+    const current = Optional.unwrap(items$.getSnapshot());
 
     if (id === 'a' && !current.includes('b')) {
       setItems(Arr.toPushed(current, 'b'));
@@ -578,7 +578,7 @@ const setupSelfWritingFor = (
     rows: () => (
       <ul>
         <For items={items$} key={(id) => id}>
-          {(id$) => <Row id={id$.getSnapshot().value} />}
+          {(id$) => <Row id={Optional.unwrap(id$.getSnapshot())} />}
         </For>
       </ul>
     ),
@@ -704,7 +704,7 @@ describe('a write from inside the branch or row being mounted (#3141)', () => {
 
     // Each row adds the next key while it is mounted.
     const Row = ({ n }: Readonly<{ n: number }>): JSX.Element => {
-      setItems(Arr.toPushed(items$.getSnapshot().value, n + 1));
+      setItems(Arr.toPushed(Optional.unwrap(items$.getSnapshot()), n + 1));
 
       return <li />;
     };
@@ -714,7 +714,7 @@ describe('a write from inside the branch or row being mounted (#3141)', () => {
         () => (
           <ul>
             <For items={items$} key={(n) => n}>
-              {(n$) => <Row n={n$.getSnapshot().value} />}
+              {(n$) => <Row n={Optional.unwrap(n$.getSnapshot())} />}
             </For>
           </ul>
         ),

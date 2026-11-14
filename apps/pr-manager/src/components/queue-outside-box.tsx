@@ -1,5 +1,6 @@
 import { type InitializedObservable, map } from 'synstate';
 import { constant, type JSX } from 'synstate-dom';
+import { Optional } from 'ts-data-forge';
 import type { OutsideNode } from '../queue-view.mjs';
 import { ExternalLink } from './external-link.js';
 
@@ -23,7 +24,7 @@ export const QueueOutsideBox = ({
     href={node$.pipe(map((node) => node.url))}
     variant={'queue-link'}
     onEnter={() => {
-      onShow(node$.getSnapshot().value.number);
+      onShow(Optional.unwrap(node$.getSnapshot()).number);
     }}
     onLeave={onHide}
   >

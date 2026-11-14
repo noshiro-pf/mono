@@ -71,7 +71,7 @@ describe('Queue test', () => {
       assert.isTrue(Optional.isSome(result1));
 
       if (Optional.isSome(result1)) {
-        expect(result1.value).toBe(1);
+        expect(Optional.unwrap(result1)).toBe(1);
       }
 
       expect(q.size).toBe(initialSize - 1);
@@ -81,7 +81,7 @@ describe('Queue test', () => {
       assert.isTrue(Optional.isSome(result2));
 
       if (Optional.isSome(result2)) {
-        expect(result2.value).toBe(2);
+        expect(Optional.unwrap(result2)).toBe(2);
       }
 
       expect(q.size).toBe(initialSize - 2);
@@ -118,19 +118,25 @@ describe('Queue test', () => {
 
       let mut_result = q.dequeue(); // Dequeues 1 (first in)
 
-      assert.isTrue(Optional.isSome(mut_result) && mut_result.value === 1);
+      assert.isTrue(
+        Optional.isSome(mut_result) && Optional.unwrap(mut_result) === 1,
+      );
 
       expect(q.size).toBe(2);
 
       mut_result = q.dequeue(); // Dequeues 2
 
-      assert.isTrue(Optional.isSome(mut_result) && mut_result.value === 2);
+      assert.isTrue(
+        Optional.isSome(mut_result) && Optional.unwrap(mut_result) === 2,
+      );
 
       expect(q.size).toBe(1);
 
       mut_result = q.dequeue(); // Dequeues 3
 
-      assert.isTrue(Optional.isSome(mut_result) && mut_result.value === 3);
+      assert.isTrue(
+        Optional.isSome(mut_result) && Optional.unwrap(mut_result) === 3,
+      );
 
       expect(q.size).toBe(0);
 
@@ -148,15 +154,15 @@ describe('Queue test', () => {
 
       const result1 = q.dequeue(); // Dequeues 1 (first element)
 
-      assert.isTrue(Optional.isSome(result1) && result1.value === 1);
+      assert.isTrue(Optional.isSome(result1) && Optional.unwrap(result1) === 1);
 
       const result2 = q.dequeue(); // Dequeues 2
 
-      assert.isTrue(Optional.isSome(result2) && result2.value === 2);
+      assert.isTrue(Optional.isSome(result2) && Optional.unwrap(result2) === 2);
 
       const result3 = q.dequeue(); // Dequeues 3
 
-      assert.isTrue(Optional.isSome(result3) && result3.value === 3);
+      assert.isTrue(Optional.isSome(result3) && Optional.unwrap(result3) === 3);
 
       assert.isTrue(q.isEmpty);
     });
@@ -170,7 +176,9 @@ describe('Queue test', () => {
 
       const result1 = q.dequeue();
 
-      assert.isTrue(Optional.isSome(result1) && result1.value === 'A');
+      assert.isTrue(
+        Optional.isSome(result1) && Optional.unwrap(result1) === 'A',
+      );
 
       q.enqueue('C');
 
@@ -178,15 +186,21 @@ describe('Queue test', () => {
 
       const result2 = q.dequeue();
 
-      assert.isTrue(Optional.isSome(result2) && result2.value === 'B');
+      assert.isTrue(
+        Optional.isSome(result2) && Optional.unwrap(result2) === 'B',
+      );
 
       const result3 = q.dequeue();
 
-      assert.isTrue(Optional.isSome(result3) && result3.value === 'C');
+      assert.isTrue(
+        Optional.isSome(result3) && Optional.unwrap(result3) === 'C',
+      );
 
       const result4 = q.dequeue();
 
-      assert.isTrue(Optional.isSome(result4) && result4.value === 'D');
+      assert.isTrue(
+        Optional.isSome(result4) && Optional.unwrap(result4) === 'D',
+      );
 
       assert.isTrue(q.isEmpty);
     });
@@ -408,7 +422,7 @@ describe('Queue test', () => {
       for (const i of range(1, 21)) {
         const result = q.dequeue();
 
-        assert.isTrue(Optional.isSome(result) && result.value === i);
+        assert.isTrue(Optional.isSome(result) && Optional.unwrap(result) === i);
       }
 
       assert.isTrue(q.isEmpty);
@@ -459,7 +473,9 @@ describe('Queue test', () => {
 
         const result = q.dequeue();
 
-        assert.isTrue(Optional.isSome(result) && result.value === `item-${i}`);
+        assert.isTrue(
+          Optional.isSome(result) && Optional.unwrap(result) === `item-${i}`,
+        );
 
         assert.isTrue(q.isEmpty);
       }
@@ -494,14 +510,18 @@ describe('Queue test', () => {
       for (const i of range(0, 5)) {
         const result = q.dequeue();
 
-        assert.isTrue(Optional.isSome(result) && result.value.id === i);
+        assert.isTrue(
+          Optional.isSome(result) && Optional.unwrap(result).id === i,
+        );
       }
 
       // Remaining objects should still be accessible
       for (const i of range(5, 10)) {
         const result = q.dequeue();
 
-        assert.isTrue(Optional.isSome(result) && result.value.id === i);
+        assert.isTrue(
+          Optional.isSome(result) && Optional.unwrap(result).id === i,
+        );
       }
 
       assert.isTrue(q.isEmpty);
@@ -525,7 +545,7 @@ describe('Queue test', () => {
       for (const i of range(1, Uint32.add(elementCount, 1))) {
         const result = q.dequeue();
 
-        assert.isTrue(Optional.isSome(result) && result.value === i);
+        assert.isTrue(Optional.isSome(result) && Optional.unwrap(result) === i);
       }
 
       assert.isTrue(q.isEmpty);
@@ -558,7 +578,7 @@ describe('Queue test', () => {
           assert.isTrue(
             Optional.isSome(result) &&
               expected !== undefined &&
-              result.value === expected,
+              Optional.unwrap(result) === expected,
           );
         }
       }
@@ -569,7 +589,9 @@ describe('Queue test', () => {
       for (const expected of mut_expected) {
         const result = q.dequeue();
 
-        assert.isTrue(Optional.isSome(result) && result.value === expected);
+        assert.isTrue(
+          Optional.isSome(result) && Optional.unwrap(result) === expected,
+        );
       }
 
       assert.isTrue(q.isEmpty);
@@ -602,7 +624,7 @@ describe('Queue test', () => {
           assert.isTrue(
             Optional.isSome(result) &&
               expected !== undefined &&
-              result.value === expected,
+              Optional.unwrap(result) === expected,
           );
         }
       }
@@ -614,7 +636,9 @@ describe('Queue test', () => {
       for (const expected of mut_expected) {
         const result = q.dequeue();
 
-        assert.isTrue(Optional.isSome(result) && result.value === expected);
+        assert.isTrue(
+          Optional.isSome(result) && Optional.unwrap(result) === expected,
+        );
       }
 
       assert.isTrue(q.isEmpty);
@@ -631,7 +655,7 @@ describe('Queue test', () => {
       for (const i of range(1, asUint32(1001))) {
         const result = q.dequeue();
 
-        assert.isTrue(Optional.isSome(result) && result.value === i);
+        assert.isTrue(Optional.isSome(result) && Optional.unwrap(result) === i);
       }
 
       assert.isTrue(q.isEmpty);

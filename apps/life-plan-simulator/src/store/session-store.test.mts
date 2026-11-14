@@ -1,3 +1,4 @@
+import { Optional } from 'ts-data-forge';
 import {
   createMemoryRepository,
   type Backend,
@@ -58,13 +59,13 @@ describe(createSessionStore, () => {
 
     store.attach(backend);
 
-    assert.deepStrictEqual(store.session.getSnapshot().value, {
+    assert.deepStrictEqual(Optional.unwrap(store.session.getSnapshot()), {
       type: 'starting',
     });
 
     emit({ type: 'signed-in', userName: 'me', repository });
 
-    assert.deepStrictEqual(store.session.getSnapshot().value, {
+    assert.deepStrictEqual(Optional.unwrap(store.session.getSnapshot()), {
       type: 'signed-in',
       userName: 'me',
       repository,
@@ -72,7 +73,7 @@ describe(createSessionStore, () => {
 
     emit({ type: 'signed-out' });
 
-    assert.deepStrictEqual(store.session.getSnapshot().value, {
+    assert.deepStrictEqual(Optional.unwrap(store.session.getSnapshot()), {
       type: 'signed-out',
       error: undefined,
       signingIn: false,
@@ -92,7 +93,7 @@ describe(createSessionStore, () => {
 
     store.signIn();
 
-    assert.deepStrictEqual(store.session.getSnapshot().value, {
+    assert.deepStrictEqual(Optional.unwrap(store.session.getSnapshot()), {
       type: 'signed-out',
       error: undefined,
       signingIn: true,
@@ -102,7 +103,7 @@ describe(createSessionStore, () => {
 
     await Promise.resolve();
 
-    assert.deepStrictEqual(store.session.getSnapshot().value, {
+    assert.deepStrictEqual(Optional.unwrap(store.session.getSnapshot()), {
       type: 'signed-out',
       error: 'サインインできませんでした（boom）。',
       signingIn: false,
@@ -118,13 +119,19 @@ describe(createSessionStore, () => {
 
     store.signOut();
 
-    assert.strictEqual(store.signOutState.getSnapshot().value, 'waiting');
+    assert.strictEqual(
+      Optional.unwrap(store.signOutState.getSnapshot()),
+      'waiting',
+    );
 
     await flush();
 
     assert.deepStrictEqual(signOuts(), [false]);
 
-    assert.strictEqual(store.signOutState.getSnapshot().value, 'idle');
+    assert.strictEqual(
+      Optional.unwrap(store.signOutState.getSnapshot()),
+      'idle',
+    );
   });
 
   test('ignores another sign-out while one is in progress', async () => {
@@ -160,7 +167,10 @@ describe(createSessionStore, () => {
 
     assert.deepStrictEqual(signOuts(), [false]);
 
-    assert.strictEqual(store.signOutState.getSnapshot().value, 'unsent-writes');
+    assert.strictEqual(
+      Optional.unwrap(store.signOutState.getSnapshot()),
+      'unsent-writes',
+    );
 
     // Until somebody chooses, signing out again does nothing.
     store.signOut();
@@ -175,7 +185,10 @@ describe(createSessionStore, () => {
 
     assert.deepStrictEqual(signOuts(), [false, true]);
 
-    assert.strictEqual(store.signOutState.getSnapshot().value, 'idle');
+    assert.strictEqual(
+      Optional.unwrap(store.signOutState.getSnapshot()),
+      'idle',
+    );
   });
 
   test('stays signed in when writes not yet sent are kept', async () => {
@@ -194,7 +207,10 @@ describe(createSessionStore, () => {
 
     store.cancelSignOut();
 
-    assert.strictEqual(store.signOutState.getSnapshot().value, 'idle');
+    assert.strictEqual(
+      Optional.unwrap(store.signOutState.getSnapshot()),
+      'idle',
+    );
 
     store.discardUnsentWritesAndSignOut();
 
@@ -217,7 +233,10 @@ describe(createSessionStore, () => {
 
     await flush();
 
-    assert.strictEqual(store.signOutState.getSnapshot().value, 'idle');
+    assert.strictEqual(
+      Optional.unwrap(store.signOutState.getSnapshot()),
+      'idle',
+    );
 
     store.signOut();
 
@@ -237,6 +256,9 @@ describe(createSessionStore, () => {
 
     emit({ type: 'signed-out' });
 
-    assert.strictEqual(store.session.getSnapshot().value.type, 'starting');
+    assert.strictEqual(
+      Optional.unwrap(store.session.getSnapshot()).type,
+      'starting',
+    );
   });
 });

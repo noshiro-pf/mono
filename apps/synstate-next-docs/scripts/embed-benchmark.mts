@@ -472,8 +472,8 @@ const analyse = (results: BenchmarkResults): Result<Analysis, string> => {
     mut_summaries.push({
       id,
       cells: compared,
-      fastest: fastest.value,
-      slowest: slowest.value,
+      fastest: Optional.unwrap(fastest),
+      slowest: Optional.unwrap(slowest),
       subject,
       predecessor,
     });
@@ -505,7 +505,7 @@ const analyse = (results: BenchmarkResults): Result<Analysis, string> => {
       const found = Arr.maxBy(candidates, (c) => c.ratio);
 
       if (Optional.isSome(found)) {
-        yield found.value;
+        yield Optional.unwrap(found);
       }
     }
   });

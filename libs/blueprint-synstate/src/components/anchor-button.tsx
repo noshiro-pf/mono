@@ -7,6 +7,7 @@ import {
   type Bindable,
   type JSX,
 } from 'synstate-dom';
+import { Optional } from 'ts-data-forge';
 import type { StrictPick } from 'ts-type-forge';
 import {
   buttonClass,
@@ -132,7 +133,7 @@ export const AnchorButton = ({
       onKeyUp={(event) => {
         // Only the release of a press this button held back: the Enter that
         // confirmed a conversion is released as a plain Enter.
-        if (!isPressKey(event) || !keyHeld$.getSnapshot().value) {
+        if (!isPressKey(event) || !Optional.unwrap(keyHeld$.getSnapshot())) {
           return;
         }
 

@@ -1,4 +1,4 @@
-import { asSafeInt } from 'ts-data-forge';
+import { asSafeInt, Optional } from 'ts-data-forge';
 import {
   createMemoryBrowser,
   createRouter,
@@ -76,7 +76,7 @@ const guarded = (
 
 const route = (
   router: ReturnType<typeof createRouter<Routes>>,
-): string | undefined => router.match.getSnapshot().value.route;
+): string | undefined => Optional.unwrap(router.match.getSnapshot()).route;
 
 describe('an async redirect', () => {
   test('on the first load, the router is not ready until it settles, and no page is shown in between', async () => {
@@ -87,17 +87,17 @@ describe('an async redirect', () => {
       async () => session.promise,
     );
 
-    assert.isFalse(router.ready.getSnapshot().value);
+    assert.isFalse(Optional.unwrap(router.ready.getSnapshot()));
 
-    assert.isTrue(router.pending.getSnapshot().value);
+    assert.isTrue(Optional.unwrap(router.pending.getSnapshot()));
 
     session.settle(false);
 
     await nextTask();
 
-    assert.isTrue(router.ready.getSnapshot().value);
+    assert.isTrue(Optional.unwrap(router.ready.getSnapshot()));
 
-    assert.isFalse(router.pending.getSnapshot().value);
+    assert.isFalse(Optional.unwrap(router.pending.getSnapshot()));
 
     assert.strictEqual(route(router), 'signIn');
 
@@ -148,7 +148,7 @@ describe('an async redirect', () => {
     // An `async` function answers later even for a page it lets through.
     await nextTask();
 
-    assert.isTrue(router.ready.getSnapshot().value);
+    assert.isTrue(Optional.unwrap(router.ready.getSnapshot()));
 
     const mut_seen: (string | undefined)[] = [];
 
@@ -158,7 +158,7 @@ describe('an async redirect', () => {
 
     router.push(routes.account.href());
 
-    assert.isTrue(router.pending.getSnapshot().value);
+    assert.isTrue(Optional.unwrap(router.pending.getSnapshot()));
 
     assert.strictEqual(browser.url().pathname, '/');
 
@@ -170,7 +170,7 @@ describe('an async redirect', () => {
 
     assert.strictEqual(browser.url().pathname, '/account/');
 
-    assert.isFalse(router.pending.getSnapshot().value);
+    assert.isFalse(Optional.unwrap(router.pending.getSnapshot()));
 
     router.back();
 
@@ -253,7 +253,7 @@ describe('an async redirect', () => {
 
     assert.isTrue(mut_signals[0]?.aborted === true);
 
-    assert.isFalse(router.pending.getSnapshot().value);
+    assert.isFalse(Optional.unwrap(router.pending.getSnapshot()));
 
     session.settle(false);
 

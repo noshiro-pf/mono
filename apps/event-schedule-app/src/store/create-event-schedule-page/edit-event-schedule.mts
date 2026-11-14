@@ -6,7 +6,7 @@ import {
   mapTo,
   type InitializedObservable,
 } from 'synstate';
-import { Arr, fastDeepEqual, Obj, Result } from 'ts-data-forge';
+import { Arr, fastDeepEqual, Obj, Optional, Result } from 'ts-data-forge';
 import type { StrictPick } from 'ts-type-forge';
 import type { Api } from '../../api/index.mjs';
 import { dict, routes } from '../../constants/index.mjs';
@@ -197,7 +197,7 @@ export const createEditEventScheduleStore = (
   );
 
   const onBackToAnswerPage = (): void => {
-    const eventId = deps.router.eventId$.getSnapshot().value;
+    const eventId = Optional.unwrap(deps.router.eventId$.getSnapshot());
 
     if (eventId !== undefined) {
       deps.router.push(routes.event.answer.href({ eventId }));
@@ -205,9 +205,9 @@ export const createEditEventScheduleStore = (
   };
 
   const saveToDatabase = async (): Promise<void> => {
-    const commonState = commonState$.getSnapshot().value;
+    const commonState = Optional.unwrap(commonState$.getSnapshot());
 
-    const eventId = deps.router.eventId$.getSnapshot().value;
+    const eventId = Optional.unwrap(deps.router.eventId$.getSnapshot());
 
     const {
       eventScheduleNormalized,
@@ -226,7 +226,7 @@ export const createEditEventScheduleStore = (
     const res = await deps.api.event.update(
       eventId,
       keepIdentityOf(
-        eventScheduleFromDatabase$.getSnapshot().value,
+        Optional.unwrap(eventScheduleFromDatabase$.getSnapshot()),
         eventScheduleNormalized,
       ),
     );

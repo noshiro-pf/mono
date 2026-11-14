@@ -1,4 +1,5 @@
 import { createState } from 'synstate';
+import { Optional } from 'ts-data-forge';
 import { asGroupId, type Group, type GroupId } from '../domain/index.mjs';
 import {
   createGroupEditorStore,
@@ -61,7 +62,7 @@ describe(createGroupEditorStore, () => {
       },
     ]);
 
-    assert.deepStrictEqual(store.editor.getSnapshot().value, {
+    assert.deepStrictEqual(Optional.unwrap(store.editor.getSnapshot()), {
       type: 'closed',
     });
   });
@@ -71,7 +72,7 @@ describe(createGroupEditorStore, () => {
 
     store.open(asGroupId('g'));
 
-    assert.deepStrictEqual(store.editor.getSnapshot().value, {
+    assert.deepStrictEqual(Optional.unwrap(store.editor.getSnapshot()), {
       type: 'open',
       isNew: false,
       id: asGroupId('g'),
@@ -98,7 +99,7 @@ describe(createGroupEditorStore, () => {
 
     assert.deepStrictEqual(put, []);
 
-    const editor = store.editor.getSnapshot().value;
+    const editor = Optional.unwrap(store.editor.getSnapshot());
 
     assert.isTrue(editor.type === 'open');
 
@@ -110,7 +111,7 @@ describe(createGroupEditorStore, () => {
 
     store.open(asGroupId('gone'));
 
-    assert.deepStrictEqual(store.editor.getSnapshot().value, {
+    assert.deepStrictEqual(Optional.unwrap(store.editor.getSnapshot()), {
       type: 'closed',
     });
   });
@@ -126,7 +127,7 @@ describe(createGroupEditorStore, () => {
 
     assert.deepStrictEqual(deleted, [asGroupId('g')]);
 
-    assert.deepStrictEqual(store.editor.getSnapshot().value, {
+    assert.deepStrictEqual(Optional.unwrap(store.editor.getSnapshot()), {
       type: 'closed',
     });
   });

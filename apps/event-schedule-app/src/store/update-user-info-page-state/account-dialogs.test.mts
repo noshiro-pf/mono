@@ -1,6 +1,6 @@
 import { createState } from 'synstate';
 import { constant } from 'synstate-dom';
-import { Result } from 'ts-data-forge';
+import { Optional, Result } from 'ts-data-forge';
 import type { ReadonlyRecord } from 'ts-type-forge';
 import { dict } from '../../constants/index.mjs';
 import type {
@@ -23,20 +23,22 @@ describe(createUpdateUserInfoDialogStore, () => {
     dialog.changeEmail();
 
     assert.strictEqual(
-      dialog.openingDialogType$.getSnapshot().value,
+      Optional.unwrap(dialog.openingDialogType$.getSnapshot()),
       'updateEmail',
     );
 
     dialog.deleteAccount();
 
     assert.strictEqual(
-      dialog.openingDialogType$.getSnapshot().value,
+      Optional.unwrap(dialog.openingDialogType$.getSnapshot()),
       'deleteAccount',
     );
 
     dialog.closeDialog();
 
-    assert.isUndefined(dialog.openingDialogType$.getSnapshot().value);
+    assert.isUndefined(
+      Optional.unwrap(dialog.openingDialogType$.getSnapshot()),
+    );
   });
 });
 
@@ -61,7 +63,9 @@ describe(createDeleteAccountPageStore, () => {
       'deleteUser alice',
     ]);
 
-    assert.isUndefined(dialog.openingDialogType$.getSnapshot().value);
+    assert.isUndefined(
+      Optional.unwrap(dialog.openingDialogType$.getSnapshot()),
+    );
   });
 
   test('says the password is wrong, keeps the user and stays open', async () => {
@@ -85,10 +89,12 @@ describe(createDeleteAccountPageStore, () => {
       'reauthenticate alice cred(alice@example.com,wrong-password)',
     ]);
 
-    assert.isDefined(store.state.getSnapshot().value.formState.password.error);
+    assert.isDefined(
+      Optional.unwrap(store.state.getSnapshot()).formState.password.error,
+    );
 
     assert.strictEqual(
-      dialog.openingDialogType$.getSnapshot().value,
+      Optional.unwrap(dialog.openingDialogType$.getSnapshot()),
       'deleteAccount',
     );
   });
@@ -114,7 +120,9 @@ describe(createDeleteAccountPageStore, () => {
 
     await settle();
 
-    assert.isTrue(store.state.getSnapshot().value.formState.isWaitingResponse);
+    assert.isTrue(
+      Optional.unwrap(store.state.getSnapshot()).formState.isWaitingResponse,
+    );
 
     dialog.closeDialog();
 
@@ -126,7 +134,9 @@ describe(createDeleteAccountPageStore, () => {
       'reauthenticate alice cred(alice@example.com,password123)',
     ]);
 
-    assert.isFalse(store.state.getSnapshot().value.formState.isWaitingResponse);
+    assert.isFalse(
+      Optional.unwrap(store.state.getSnapshot()).formState.isWaitingResponse,
+    );
 
     assert.deepStrictEqual(reports.toasts(), []);
   });
@@ -177,10 +187,12 @@ describe(createDeleteAccountPageStore, () => {
 
     await settle();
 
-    assert.isTrue(store.state.getSnapshot().value.formState.isWaitingResponse);
+    assert.isTrue(
+      Optional.unwrap(store.state.getSnapshot()).formState.isWaitingResponse,
+    );
 
     assert.strictEqual(
-      dialog.openingDialogType$.getSnapshot().value,
+      Optional.unwrap(dialog.openingDialogType$.getSnapshot()),
       'deleteAccount',
     );
 
@@ -222,7 +234,9 @@ describe(createDeleteAccountPageStore, () => {
       'reauthenticate alice cred(alice@example.com,password123)',
     ]);
 
-    assert.isFalse(store.state.getSnapshot().value.formState.isWaitingResponse);
+    assert.isFalse(
+      Optional.unwrap(store.state.getSnapshot()).formState.isWaitingResponse,
+    );
 
     assert.deepStrictEqual(reports.toasts(), [
       ['danger', constant(dict.accountSettings.reauthenticate.message.error)],
@@ -262,7 +276,7 @@ describe(createDeleteAccountPageStore, () => {
 
     // The dialog opened meanwhile is not the one this submit closes.
     assert.strictEqual(
-      dialog.openingDialogType$.getSnapshot().value,
+      Optional.unwrap(dialog.openingDialogType$.getSnapshot()),
       'updateEmail',
     );
 
@@ -307,7 +321,9 @@ describe(createDeleteAccountCreatedWithGoogleStore, () => {
       'deleteUser alice',
     ]);
 
-    assert.isUndefined(dialog.openingDialogType$.getSnapshot().value);
+    assert.isUndefined(
+      Optional.unwrap(dialog.openingDialogType$.getSnapshot()),
+    );
   });
 
   test.each([
@@ -361,10 +377,12 @@ describe(createDeleteAccountCreatedWithGoogleStore, () => {
 
       // The dialog stays open so that re-authenticating can be tried again, and
       // is not waiting any more.
-      assert.isFalse(store.state.getSnapshot().value.isWaitingResponse);
+      assert.isFalse(
+        Optional.unwrap(store.state.getSnapshot()).isWaitingResponse,
+      );
 
       assert.strictEqual(
-        dialog.openingDialogType$.getSnapshot().value,
+        Optional.unwrap(dialog.openingDialogType$.getSnapshot()),
         'deleteAccountCreatedWithGoogle',
       );
 
@@ -399,7 +417,7 @@ describe(createDeleteAccountCreatedWithGoogleStore, () => {
 
     await settle();
 
-    assert.isTrue(store.state.getSnapshot().value.isWaitingResponse);
+    assert.isTrue(Optional.unwrap(store.state.getSnapshot()).isWaitingResponse);
 
     dialog.closeDialog();
 
@@ -409,7 +427,9 @@ describe(createDeleteAccountCreatedWithGoogleStore, () => {
 
     assert.deepStrictEqual(calls, ['reauthenticateWithGooglePopup alice']);
 
-    assert.isFalse(store.state.getSnapshot().value.isWaitingResponse);
+    assert.isFalse(
+      Optional.unwrap(store.state.getSnapshot()).isWaitingResponse,
+    );
 
     assert.deepStrictEqual(showToast.mock.calls, []);
   });
@@ -502,7 +522,7 @@ describe(createDeleteAccountCreatedWithGoogleStore, () => {
 
     await settle();
 
-    assert.isTrue(store.state.getSnapshot().value.isWaitingResponse);
+    assert.isTrue(Optional.unwrap(store.state.getSnapshot()).isWaitingResponse);
 
     assert.deepStrictEqual(showToast.mock.calls, []);
 
@@ -519,7 +539,9 @@ describe(createDeleteAccountCreatedWithGoogleStore, () => {
       'deleteUser alice',
     ]);
 
-    assert.isFalse(store.state.getSnapshot().value.isWaitingResponse);
+    assert.isFalse(
+      Optional.unwrap(store.state.getSnapshot()).isWaitingResponse,
+    );
   });
 
   test('stops quietly at a rejection after the dialog was closed', async () => {
@@ -559,7 +581,9 @@ describe(createDeleteAccountCreatedWithGoogleStore, () => {
 
     assert.deepStrictEqual(calls, ['reauthenticateWithGooglePopup alice']);
 
-    assert.isFalse(store.state.getSnapshot().value.isWaitingResponse);
+    assert.isFalse(
+      Optional.unwrap(store.state.getSnapshot()).isWaitingResponse,
+    );
 
     assert.deepStrictEqual(showToast.mock.calls, []);
 
@@ -595,11 +619,13 @@ describe(createDeleteAccountCreatedWithGoogleStore, () => {
 
     assert.deepStrictEqual(calls, ['reauthenticateWithGooglePopup alice']);
 
-    assert.isFalse(store.state.getSnapshot().value.isWaitingResponse);
+    assert.isFalse(
+      Optional.unwrap(store.state.getSnapshot()).isWaitingResponse,
+    );
 
     // As when re-authenticating returns an error: the dialog stays open.
     assert.strictEqual(
-      dialog.openingDialogType$.getSnapshot().value,
+      Optional.unwrap(dialog.openingDialogType$.getSnapshot()),
       'deleteAccountCreatedWithGoogle',
     );
 
@@ -621,7 +647,8 @@ describe(createUpdateDisplayNamePageStore, () => {
     dialog.changeUsername();
 
     assert.strictEqual(
-      store.state.getSnapshot().value.formState.displayName.inputValue,
+      Optional.unwrap(store.state.getSnapshot()).formState.displayName
+        .inputValue,
       'alice',
     );
 
@@ -636,7 +663,9 @@ describe(createUpdateDisplayNamePageStore, () => {
       'emitAuthStateChange',
     ]);
 
-    assert.isUndefined(dialog.openingDialogType$.getSnapshot().value);
+    assert.isUndefined(
+      Optional.unwrap(dialog.openingDialogType$.getSnapshot()),
+    );
   });
 
   test('closes no other dialog when this one was closed while saving', async () => {
@@ -658,7 +687,9 @@ describe(createUpdateDisplayNamePageStore, () => {
 
     await settle();
 
-    assert.isTrue(store.state.getSnapshot().value.formState.isWaitingResponse);
+    assert.isTrue(
+      Optional.unwrap(store.state.getSnapshot()).formState.isWaitingResponse,
+    );
 
     dialog.closeDialog();
 
@@ -675,7 +706,7 @@ describe(createUpdateDisplayNamePageStore, () => {
     ]);
 
     assert.strictEqual(
-      dialog.openingDialogType$.getSnapshot().value,
+      Optional.unwrap(dialog.openingDialogType$.getSnapshot()),
       'updatePassword',
     );
 
@@ -706,7 +737,9 @@ describe(createUpdateDisplayNamePageStore, () => {
 
     await settle();
 
-    assert.isFalse(store.state.getSnapshot().value.formState.isWaitingResponse);
+    assert.isFalse(
+      Optional.unwrap(store.state.getSnapshot()).formState.isWaitingResponse,
+    );
 
     assert.deepStrictEqual(reports.toasts(), [
       [
@@ -730,7 +763,7 @@ describe(createUpdateEmailPageStore, () => {
     dialog.changeEmail();
 
     assert.strictEqual(
-      store.state.getSnapshot().value.formState.email.inputValue,
+      Optional.unwrap(store.state.getSnapshot()).formState.email.inputValue,
       'alice@example.com',
     );
 
@@ -752,7 +785,9 @@ describe(createUpdateEmailPageStore, () => {
       ['success', constant(dict.accountSettings.updateEmail.message.linkSent)],
     ]);
 
-    assert.isUndefined(dialog.openingDialogType$.getSnapshot().value);
+    assert.isUndefined(
+      Optional.unwrap(dialog.openingDialogType$.getSnapshot()),
+    );
   });
 
   test('changes nothing when the dialog is closed while signing in again', async () => {
@@ -776,7 +811,9 @@ describe(createUpdateEmailPageStore, () => {
 
     await settle();
 
-    assert.isTrue(store.state.getSnapshot().value.formState.isWaitingResponse);
+    assert.isTrue(
+      Optional.unwrap(store.state.getSnapshot()).formState.isWaitingResponse,
+    );
 
     dialog.closeDialog();
 
@@ -788,7 +825,9 @@ describe(createUpdateEmailPageStore, () => {
       'reauthenticate alice cred(alice@example.com,password123)',
     ]);
 
-    assert.isFalse(store.state.getSnapshot().value.formState.isWaitingResponse);
+    assert.isFalse(
+      Optional.unwrap(store.state.getSnapshot()).formState.isWaitingResponse,
+    );
 
     assert.deepStrictEqual(reports.toasts(), []);
   });
@@ -814,7 +853,9 @@ describe(createUpdateEmailPageStore, () => {
 
     await settle();
 
-    assert.isFalse(store.state.getSnapshot().value.formState.isWaitingResponse);
+    assert.isFalse(
+      Optional.unwrap(store.state.getSnapshot()).formState.isWaitingResponse,
+    );
 
     assert.deepStrictEqual(reports.toasts(), [
       ['danger', constant(dict.accountSettings.updateEmail.message.error)],
@@ -891,7 +932,9 @@ describe(createUpdatePasswordPageStore, () => {
 
     await settle();
 
-    assert.isTrue(store.state.getSnapshot().value.formState.isWaitingResponse);
+    assert.isTrue(
+      Optional.unwrap(store.state.getSnapshot()).formState.isWaitingResponse,
+    );
 
     dialog.closeDialog();
 
@@ -903,7 +946,9 @@ describe(createUpdatePasswordPageStore, () => {
       'reauthenticate alice cred(alice@example.com,password123)',
     ]);
 
-    assert.isFalse(store.state.getSnapshot().value.formState.isWaitingResponse);
+    assert.isFalse(
+      Optional.unwrap(store.state.getSnapshot()).formState.isWaitingResponse,
+    );
 
     assert.deepStrictEqual(reports.toasts(), []);
   });
@@ -931,7 +976,9 @@ describe(createUpdatePasswordPageStore, () => {
 
     await settle();
 
-    assert.isFalse(store.state.getSnapshot().value.formState.isWaitingResponse);
+    assert.isFalse(
+      Optional.unwrap(store.state.getSnapshot()).formState.isWaitingResponse,
+    );
 
     assert.deepStrictEqual(reports.toasts(), [
       ['danger', constant(dict.accountSettings.updatePassword.message.error)],
@@ -957,7 +1004,8 @@ describe('a rejecting re-authentication in the email and password dialogs', () =
         store.enterClickHandler();
 
         return () =>
-          store.state.getSnapshot().value.formState.isWaitingResponse;
+          Optional.unwrap(store.state.getSnapshot()).formState
+            .isWaitingResponse;
       },
     },
     {
@@ -976,7 +1024,8 @@ describe('a rejecting re-authentication in the email and password dialogs', () =
         store.enterClickHandler();
 
         return () =>
-          store.state.getSnapshot().value.formState.isWaitingResponse;
+          Optional.unwrap(store.state.getSnapshot()).formState
+            .isWaitingResponse;
       },
     },
   ] as const)(
@@ -999,7 +1048,9 @@ describe('a rejecting re-authentication in the email and password dialogs', () =
       assert.isFalse(isWaitingResponse());
 
       // As for an error with no code it knows: the dialog closes.
-      assert.isUndefined(dialog.openingDialogType$.getSnapshot().value);
+      assert.isUndefined(
+        Optional.unwrap(dialog.openingDialogType$.getSnapshot()),
+      );
 
       assert.deepStrictEqual(reports.toasts(), [
         ['danger', constant(dict.accountSettings.reauthenticate.message.error)],

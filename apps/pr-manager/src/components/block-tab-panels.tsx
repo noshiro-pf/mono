@@ -1,5 +1,6 @@
 import { derive, map, type InitializedObservable } from 'synstate';
 import { constant, For, type JSX } from 'synstate-dom';
+import { Optional } from 'ts-data-forge';
 import type { ReadonlyRecord } from 'ts-type-forge';
 import type { BlockId, Pane } from '../layout.mjs';
 import { tabIdOf, tabPanelIdOf } from './block-tab-ids.mjs';
@@ -29,7 +30,7 @@ export const BlockTabPanels = ({
     <For items={ids$} key={(id) => id}>
       {(id$) => {
         // The key is the id, so the row's id is the one it was made with.
-        const id = id$.getSnapshot().value;
+        const id = Optional.unwrap(id$.getSnapshot());
 
         return (
           <div

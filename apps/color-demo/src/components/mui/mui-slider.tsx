@@ -1,6 +1,6 @@
 import { createState, type InitializedObservable, map } from 'synstate';
 import { constant, type JSX } from 'synstate-dom';
-import { Arr, asUint32, Num } from 'ts-data-forge';
+import { Arr, asUint32, Num, Optional } from 'ts-data-forge';
 import * as styles from './mui-slider.module.css';
 
 type Props = Readonly<{
@@ -57,7 +57,7 @@ export const MuiSlider = ({
   const label = value.pipe(map((v) => v.toString()));
 
   const change = (next: number): void => {
-    if (next !== value.getSnapshot().value) {
+    if (next !== Optional.unwrap(value.getSnapshot())) {
       onChange(next);
     }
   };
@@ -98,7 +98,7 @@ export const MuiSlider = ({
         root.querySelector<HTMLInputElement>(':scope input')?.focus();
       }}
       onPointerMove={(event) => {
-        if (dragging$.getSnapshot().value) {
+        if (Optional.unwrap(dragging$.getSnapshot())) {
           changeFromPointer(event.currentTarget, event.clientX);
         }
       }}

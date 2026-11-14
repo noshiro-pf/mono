@@ -1,10 +1,5 @@
 # Next major
 
-- Remove `simpleBrandedNumber` and `simpleBrandedString`.
-
-    Both have been deprecated aliases since 5.0.0. Use `brandedNumber` and
-    `brandedString`, which take the same arguments.
-
 ## Undecided
 
 - Hide the `optional` marker of `Type<A>` behind a symbol.

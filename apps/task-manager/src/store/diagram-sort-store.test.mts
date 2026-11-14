@@ -1,3 +1,4 @@
+import { Optional } from 'ts-data-forge';
 import type { SortSpec } from '../domain/index.mjs';
 import { DEFAULT_DIAGRAM_SORT } from '../view-model/index.mjs';
 import { createDiagramSortStore } from './diagram-sort-store.mjs';
@@ -28,7 +29,7 @@ describe(createDiagramSortStore, () => {
 
     const { store } = setup(initial);
 
-    assert.deepStrictEqual(store.sort.getSnapshot().value, initial);
+    assert.deepStrictEqual(Optional.unwrap(store.sort.getSnapshot()), initial);
   });
 
   test('edits the keys', () => {
@@ -46,7 +47,7 @@ describe(createDiagramSortStore, () => {
 
     store.removeKey(2);
 
-    assert.deepStrictEqual(store.sort.getSnapshot().value, [
+    assert.deepStrictEqual(Optional.unwrap(store.sort.getSnapshot()), [
       { key: 'priority', order: 'desc' },
       { key: 'status', order: 'asc' },
     ]);
@@ -58,7 +59,7 @@ describe(createDiagramSortStore, () => {
     store.addKey('title');
 
     assert.deepStrictEqual(
-      store.sort.getSnapshot().value,
+      Optional.unwrap(store.sort.getSnapshot()),
       DEFAULT_DIAGRAM_SORT,
     );
   });
@@ -68,7 +69,7 @@ describe(createDiagramSortStore, () => {
 
     store.removeKey(0);
 
-    assert.deepStrictEqual(store.sort.getSnapshot().value, []);
+    assert.deepStrictEqual(Optional.unwrap(store.sort.getSnapshot()), []);
   });
 
   test('saves every change', () => {

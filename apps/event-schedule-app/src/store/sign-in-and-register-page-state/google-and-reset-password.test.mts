@@ -1,5 +1,5 @@
 import { createMemoryBrowser, type Href } from 'synstate-router';
-import { Result } from 'ts-data-forge';
+import { Optional, Result } from 'ts-data-forge';
 import { routes } from '../../constants/index.mjs';
 import { createAppRouter } from '../router-store.mjs';
 import { createGoogleSignInStore } from './google-sign-in-state.mjs';
@@ -21,11 +21,15 @@ describe(createGoogleSignInStore, () => {
 
     store.googleSignInClickHandler();
 
-    assert.isTrue(store.googleSignInButtonDisabledState.getSnapshot().value);
+    assert.isTrue(
+      Optional.unwrap(store.googleSignInButtonDisabledState.getSnapshot()),
+    );
 
     await settle();
 
-    assert.isFalse(store.googleSignInButtonDisabledState.getSnapshot().value);
+    assert.isFalse(
+      Optional.unwrap(store.googleSignInButtonDisabledState.getSnapshot()),
+    );
 
     assert.strictEqual(browser.url().pathname, '/event/abc/');
 
@@ -56,7 +60,9 @@ describe(createGoogleSignInStore, () => {
 
     assert.strictEqual(browser.url().pathname, '/signIn/');
 
-    assert.isFalse(store.googleSignInButtonDisabledState.getSnapshot().value);
+    assert.isFalse(
+      Optional.unwrap(store.googleSignInButtonDisabledState.getSnapshot()),
+    );
 
     // Signed in all the same.
     assert.strictEqual(toasts.count(), 1);
@@ -147,7 +153,9 @@ describe(createResetPasswordPageStore, () => {
 
     assert.strictEqual(browser.url().pathname, '/signIn/');
 
-    assert.isFalse(store.state.getSnapshot().value.formState.isWaitingResponse);
+    assert.isFalse(
+      Optional.unwrap(store.state.getSnapshot()).formState.isWaitingResponse,
+    );
   });
 
   test('says when no such user exists, and stays', async () => {
@@ -172,7 +180,9 @@ describe(createResetPasswordPageStore, () => {
 
     await settle();
 
-    assert.isDefined(store.state.getSnapshot().value.formState.email.error);
+    assert.isDefined(
+      Optional.unwrap(store.state.getSnapshot()).formState.email.error,
+    );
 
     assert.strictEqual(browser.url().pathname, '/signIn/');
   });

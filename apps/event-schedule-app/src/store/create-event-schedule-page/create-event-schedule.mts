@@ -14,6 +14,7 @@ import {
 } from 'synstate';
 import {
   Arr,
+  Optional,
   Result,
   fastDeepEqual,
   isNotUndefined,
@@ -191,7 +192,7 @@ export const createCreateEventScheduleStore = (
     createState<string>('');
 
   const createEvent = async (): Promise<Result<undefined, string>> => {
-    const commonState = commonState$.getSnapshot().value;
+    const commonState = Optional.unwrap(commonState$.getSnapshot());
 
     const fireAuthUser = deps.auth.getFireAuthUserSnapshot();
 
@@ -238,7 +239,7 @@ export const createCreateEventScheduleStore = (
     setUrl(deps.router.absoluteUrlOf(routes.event.answer.href({ eventId })));
 
     // reset local storage
-    const baseline = baseline$.getSnapshot().value;
+    const baseline = Optional.unwrap(baseline$.getSnapshot());
 
     const resetResult = deps.storage.save({
       answerDeadline: baseline.answerDeadline,

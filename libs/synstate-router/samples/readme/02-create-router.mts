@@ -6,7 +6,7 @@ import {
   param,
   search,
 } from 'synstate-router';
-import { asSafeInt } from 'ts-data-forge';
+import { asSafeInt, Optional } from 'ts-data-forge';
 
 if (import.meta.vitest !== undefined) {
   test('README: createRouter', () => {
@@ -29,7 +29,7 @@ if (import.meta.vitest !== undefined) {
       browser: createMemoryBrowser('https://example.com/shop/'), // the window when left out
       // Applied before `match` shows a page, so no subscriber has to navigate.
       redirect: (m) =>
-        m.route === 'settings' && !signedIn.getSnapshot().value
+        m.route === 'settings' && !Optional.unwrap(signedIn.getSnapshot())
           ? routes.signIn.href()
           : undefined,
     });
@@ -37,7 +37,10 @@ if (import.meta.vitest !== undefined) {
     // `push` takes an `Href` only; `router.push('/settings/')` fails `tsc`.
     router.push(routes.settings.href());
 
-    assert.strictEqual(router.match.getSnapshot().value.route, 'signIn');
+    assert.strictEqual(
+      Optional.unwrap(router.match.getSnapshot()).route,
+      'signIn',
+    );
 
     // The URL the browser shows, below the base path.
     assert.strictEqual(
@@ -50,12 +53,12 @@ if (import.meta.vitest !== undefined) {
 
     router.push(routes.products.href());
 
-    assert.isTrue(inProducts.getSnapshot().value);
+    assert.isTrue(Optional.unwrap(inProducts.getSnapshot()));
 
     // Rewrites the search of a node, keeping the rest of the URL.
     router.setSearch(routes.products, (prev) => ({ ...prev, q: 'shoe' }));
 
-    assert.deepStrictEqual(router.match.getSnapshot().value, {
+    assert.deepStrictEqual(Optional.unwrap(router.match.getSnapshot()), {
       route: 'products',
       params: {},
       search: { q: 'shoe' },

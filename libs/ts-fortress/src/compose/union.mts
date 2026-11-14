@@ -4,6 +4,7 @@ import {
   hasKey,
   isRecord,
   memoizeFunction,
+  Optional,
   Result,
 } from 'ts-data-forge';
 import type { ArrayElement, NonEmptyTuple, StrictPick } from 'ts-type-forge';
@@ -196,11 +197,9 @@ export const union = <const Types extends NonEmptyTuple<UnknownType>>(
     // full member listing would. Members that tie with it are named alongside
     // it, and the first of them (in declaration order, as in `prune` and
     // `fill`) is the one whose errors are reported.
-    const closest = Arr.minBy(
-      candidates,
-      (candidate) => candidate,
-      compareByCloseness,
-    ).value;
+    const closest = Optional.unwrap(
+      Arr.minBy(candidates, (candidate) => candidate, compareByCloseness),
+    );
 
     const equallyClose = candidates.filter(
       (c) => c !== closest && compareByCloseness(c, closest) === 0,

@@ -1,3 +1,4 @@
+import { Optional } from 'ts-data-forge';
 import type { DagViewMode } from '../view-model/index.mjs';
 import { createDagViewModeStore } from './dag-view-mode-store.mjs';
 
@@ -25,7 +26,7 @@ describe(createDagViewModeStore, () => {
   test('starts from the mode read', () => {
     const { store } = setup('arc');
 
-    assert.strictEqual(store.mode.getSnapshot().value, 'arc');
+    assert.strictEqual(Optional.unwrap(store.mode.getSnapshot()), 'arc');
   });
 
   test('saves every change', () => {
@@ -37,6 +38,6 @@ describe(createDagViewModeStore, () => {
 
     assert.deepStrictEqual(saved, ['dag', 'arc', 'dag']);
 
-    assert.strictEqual(store.mode.getSnapshot().value, 'dag');
+    assert.strictEqual(Optional.unwrap(store.mode.getSnapshot()), 'dag');
   });
 });

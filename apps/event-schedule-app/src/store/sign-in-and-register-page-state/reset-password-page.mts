@@ -133,7 +133,7 @@ export const createResetPasswordPageStore = (
   };
 
   const enterClickHandler = (): void => {
-    if (enterButtonDisabled$.getSnapshot().value) {
+    if (Optional.unwrap(enterButtonDisabled$.getSnapshot())) {
       return;
     }
 

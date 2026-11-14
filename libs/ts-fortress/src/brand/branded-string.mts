@@ -21,10 +21,3 @@ export const brandedString = <K extends string>({
     brandKeys: [typeName],
     typeName,
   });
-
-/**
- * Same as brandedString
- *
- * @deprecated use `brandedString`
- */
-export const simpleBrandedString = brandedString;

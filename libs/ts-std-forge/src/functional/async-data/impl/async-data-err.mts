@@ -22,13 +22,14 @@ import type { AsyncErr } from '../async-data.mjs';
  * ```
  *
  * @param error The error.
- * @param previous The latest success value; `Optional.none` by default.
+ * @param previous The latest success value; `Optional.none` when omitted.
  */
 export const err = <const E, S = never>(
   error: E,
-  previous: Optional<S> = Optional.none,
+  // Not a default parameter, for the reason `pending` gives.
+  ...args: readonly [] | readonly [previous: Optional<S>]
 ): AsyncErr<S, E> =>
   ({
     ...Result.err(error),
-    previous,
+    previous: args.length === 0 ? Optional.none : args[0],
   }) as const;

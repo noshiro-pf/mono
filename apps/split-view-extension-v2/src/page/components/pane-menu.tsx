@@ -1,5 +1,6 @@
 import { map, type InitializedObservable } from 'synstate';
 import { constant, type JSX } from 'synstate-dom';
+import { Optional } from 'ts-data-forge';
 import { Icon, type IconName } from './icon.js';
 
 /** What a row of a pane's menu does, which also tells the rows apart. */
@@ -41,7 +42,7 @@ export const PaneMenuRow = ({
     title={item$.pipe(map((item) => item.title))}
     type={constant('button')}
     onClick={() => {
-      onChosen(item$.getSnapshot().value.choice);
+      onChosen(Optional.unwrap(item$.getSnapshot()).choice);
     }}
   >
     <Icon icon={item$.pipe(map((item) => item.icon))} />

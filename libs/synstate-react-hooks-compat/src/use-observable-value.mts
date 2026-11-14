@@ -53,14 +53,14 @@ export function useObservableValue<A, B = A>(
     [observable$],
   );
 
-  // The value itself rather than synstate's `Optional`, which is a new object
-  // on every emission, so that React renders nothing for an emission equal to
-  // the current value.
-  const getSnapshot = React.useCallback((): A | typeof NO_VALUE => {
-    const snapshot = observable$.getSnapshot();
-
-    return Optional.isSome(snapshot) ? snapshot.value : NO_VALUE;
-  }, [observable$]);
+  // The value itself, which is what the hook returns, or `NO_VALUE` while there
+  // is none. Equal values give equal snapshots under `Object.is`, so React
+  // renders nothing for an emission equal to the current value.
+  const getSnapshot = React.useCallback(
+    (): A | typeof NO_VALUE =>
+      Optional.unwrapOr(observable$.getSnapshot(), NO_VALUE),
+    [observable$],
+  );
 
   // `getSnapshot` doubles as `getServerSnapshot`, as in synstate-react-hooks
   // (#3639): an observable's value can be read synchronously on the server too.

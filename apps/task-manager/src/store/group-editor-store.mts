@@ -6,6 +6,7 @@
  */
 
 import { createState, type InitializedObservable } from 'synstate';
+import { Optional } from 'ts-data-forge';
 import type { RelaxedExtract } from 'ts-type-forge';
 import { asGroupId, type Group, type GroupId } from '../domain/index.mjs';
 import { m } from '../i18n/index.mjs';
@@ -55,7 +56,7 @@ export const createGroupEditorStore = (
     createState<GroupEditorState>(CLOSED);
 
   const findGroup = (id: GroupId): Group | undefined =>
-    deps.groups.getSnapshot().value.find((group) => group.id === id);
+    Optional.unwrap(deps.groups.getSnapshot()).find((group) => group.id === id);
 
   const openWith = (id: GroupId, title: string, isNew: boolean): void => {
     setEditor({

@@ -1,3 +1,4 @@
+import { Optional } from 'ts-data-forge';
 import {
   createMemoryBrowser,
   createRouter,
@@ -77,7 +78,10 @@ describe(handleLinkClick, () => {
 
     assert.deepStrictEqual(click('https://example.com/app/about/'), routed);
 
-    assert.strictEqual(router.match.getSnapshot().value.route, 'about');
+    assert.strictEqual(
+      Optional.unwrap(router.match.getSnapshot()).route,
+      'about',
+    );
 
     assert.strictEqual(browser.url().pathname, '/app/about/');
   });
@@ -168,7 +172,10 @@ describe(handleLinkClick, () => {
     });
 
     // The fragment replaced the about page's entry, so back is home.
-    assert.strictEqual(router.match.getSnapshot().value.route, 'home');
+    assert.strictEqual(
+      Optional.unwrap(router.match.getSnapshot()).route,
+      'home',
+    );
   });
 
   test('points a scroll still pending at a fragment clicked in the same frame', async () => {
@@ -201,7 +208,10 @@ describe(handleLinkClick, () => {
       setTimeout(resolve, 0);
     });
 
-    assert.strictEqual(router.match.getSnapshot().value.route, 'home');
+    assert.strictEqual(
+      Optional.unwrap(router.match.getSnapshot()).route,
+      'home',
+    );
 
     click('https://example.com/app/about/', {}, { replace: true });
 
@@ -212,6 +222,9 @@ describe(handleLinkClick, () => {
     });
 
     // The first entry was replaced, so there is none before it to go back to.
-    assert.strictEqual(router.match.getSnapshot().value.route, 'about');
+    assert.strictEqual(
+      Optional.unwrap(router.match.getSnapshot()).route,
+      'about',
+    );
   });
 });

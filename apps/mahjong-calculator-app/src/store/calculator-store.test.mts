@@ -1,4 +1,4 @@
-import { Result } from 'ts-data-forge';
+import { Optional, Result } from 'ts-data-forge';
 import type { TileName } from '../types/index.mjs';
 import {
   createCalculatorStore,
@@ -9,25 +9,37 @@ describe(createCalculatorStore, () => {
   test('starts with the default settings and an empty hand', () => {
     const { store } = setup();
 
-    assert.strictEqual(store.bakaze.getSnapshot().value, 'Ton');
+    assert.strictEqual(Optional.unwrap(store.bakaze.getSnapshot()), 'Ton');
 
-    assert.strictEqual(store.jikaze.getSnapshot().value, 'Ton');
+    assert.strictEqual(Optional.unwrap(store.jikaze.getSnapshot()), 'Ton');
 
-    assert.strictEqual(store.tehaiType.getSnapshot().value, 'normal');
+    assert.strictEqual(
+      Optional.unwrap(store.tehaiType.getSnapshot()),
+      'normal',
+    );
 
-    assert.strictEqual(store.turn.getSnapshot().value, 3);
+    assert.strictEqual(Optional.unwrap(store.turn.getSnapshot()), 3);
 
-    assert.strictEqual(store.maximizeTarget.getSnapshot().value, 'exp');
+    assert.strictEqual(
+      Optional.unwrap(store.maximizeTarget.getSnapshot()),
+      'exp',
+    );
 
-    assert.deepStrictEqual(store.doraIndicators.getSnapshot().value, ['Ton']);
+    assert.deepStrictEqual(
+      Optional.unwrap(store.doraIndicators.getSnapshot()),
+      ['Ton'],
+    );
 
-    assert.deepStrictEqual(store.hand.getSnapshot().value, []);
+    assert.deepStrictEqual(Optional.unwrap(store.hand.getSnapshot()), []);
 
-    assert.deepStrictEqual(store.revealedBlocks.getSnapshot().value, []);
+    assert.deepStrictEqual(
+      Optional.unwrap(store.revealedBlocks.getSnapshot()),
+      [],
+    );
 
-    assert.isUndefined(store.result.getSnapshot().value);
+    assert.isUndefined(Optional.unwrap(store.result.getSnapshot()));
 
-    assert.isFalse(store.isCalculating.getSnapshot().value);
+    assert.isFalse(Optional.unwrap(store.isCalculating.getSnapshot()));
   });
 
   test('two stores do not share their state', () => {
@@ -39,9 +51,9 @@ describe(createCalculatorStore, () => {
 
     first.addTile2Hand('Manzu1');
 
-    assert.strictEqual(second.bakaze.getSnapshot().value, 'Ton');
+    assert.strictEqual(Optional.unwrap(second.bakaze.getSnapshot()), 'Ton');
 
-    assert.deepStrictEqual(second.hand.getSnapshot().value, []);
+    assert.deepStrictEqual(Optional.unwrap(second.hand.getSnapshot()), []);
   });
 
   test('removes only the first of the same tiles from the hand', () => {
@@ -55,14 +67,14 @@ describe(createCalculatorStore, () => {
 
     store.removeTileFromHand('Pinzu2');
 
-    assert.deepStrictEqual(store.hand.getSnapshot().value, [
+    assert.deepStrictEqual(Optional.unwrap(store.hand.getSnapshot()), [
       'Manzu1',
       'Pinzu2',
     ]);
 
     store.removeTileFromHand('Chun');
 
-    assert.deepStrictEqual(store.hand.getSnapshot().value, [
+    assert.deepStrictEqual(Optional.unwrap(store.hand.getSnapshot()), [
       'Manzu1',
       'Pinzu2',
     ]);
@@ -73,7 +85,7 @@ describe(createCalculatorStore, () => {
 
     store.setHand(['Chun', 'Sozu1', 'Manzu9', 'Pinzu5', 'Manzu1']);
 
-    assert.deepStrictEqual(store.handSorted.getSnapshot().value, [
+    assert.deepStrictEqual(Optional.unwrap(store.handSorted.getSnapshot()), [
       'Manzu1',
       'Manzu9',
       'Pinzu5',
@@ -91,9 +103,10 @@ describe(createCalculatorStore, () => {
 
     store.removeRevealedBlock('Kotsu-Pinzu1');
 
-    assert.deepStrictEqual(store.revealedBlocks.getSnapshot().value, [
-      'Ankantsu-Sozu1',
-    ]);
+    assert.deepStrictEqual(
+      Optional.unwrap(store.revealedBlocks.getSnapshot()),
+      ['Ankantsu-Sozu1'],
+    );
 
     store.addDora('Haku');
 
@@ -101,12 +114,12 @@ describe(createCalculatorStore, () => {
 
     store.removeDora(1);
 
-    assert.deepStrictEqual(store.doraIndicators.getSnapshot().value, [
-      'Ton',
-      'Manzu3',
-    ]);
+    assert.deepStrictEqual(
+      Optional.unwrap(store.doraIndicators.getSnapshot()),
+      ['Ton', 'Manzu3'],
+    );
 
-    assert.strictEqual(store.numDoraTiles.getSnapshot().value, 2);
+    assert.strictEqual(Optional.unwrap(store.numDoraTiles.getSnapshot()), 2);
   });
 
   test('counts a revealed block as three tiles of the hand', () => {
@@ -118,7 +131,7 @@ describe(createCalculatorStore, () => {
 
     store.addRevealedBlock('Ankantsu-Sozu1');
 
-    assert.strictEqual(store.numHandTiles.getSnapshot().value, 10);
+    assert.strictEqual(Optional.unwrap(store.numHandTiles.getSnapshot()), 10);
   });
 
   test('leaves out the dora indicators, the hand and the revealed blocks from the remaining tiles', () => {
@@ -130,7 +143,7 @@ describe(createCalculatorStore, () => {
 
     store.addRevealedBlock('Ankantsu-Sozu1');
 
-    const remaining = store.numRemainingTiles.getSnapshot().value;
+    const remaining = Optional.unwrap(store.numRemainingTiles.getSnapshot());
 
     // One `Ton` is the dora indicator and one is in the hand.
     assert.strictEqual(remaining.Ton, 2);
@@ -152,11 +165,14 @@ describe(createCalculatorStore, () => {
     store.setHand(['Pinzu2', 'Manzu1', 'Pinzu2']);
 
     assert.strictEqual(
-      store.tenhoURL.getSnapshot().value,
+      Optional.unwrap(store.tenhoURL.getSnapshot()),
       'https://tenhou.net/2/?q=1m22p',
     );
 
-    assert.strictEqual(store.tsumoProbStr.getSnapshot().value, '1m,2p,2p');
+    assert.strictEqual(
+      Optional.unwrap(store.tsumoProbStr.getSnapshot()),
+      '1m,2p,2p',
+    );
   });
 
   test('clearHand empties the hand, the revealed blocks and the result, and keeps the settings', () => {
@@ -172,13 +188,16 @@ describe(createCalculatorStore, () => {
 
     store.clearHand();
 
-    assert.deepStrictEqual(store.hand.getSnapshot().value, []);
+    assert.deepStrictEqual(Optional.unwrap(store.hand.getSnapshot()), []);
 
-    assert.deepStrictEqual(store.revealedBlocks.getSnapshot().value, []);
+    assert.deepStrictEqual(
+      Optional.unwrap(store.revealedBlocks.getSnapshot()),
+      [],
+    );
 
-    assert.isUndefined(store.result.getSnapshot().value);
+    assert.isUndefined(Optional.unwrap(store.result.getSnapshot()));
 
-    assert.strictEqual(store.bakaze.getSnapshot().value, 'Nan');
+    assert.strictEqual(Optional.unwrap(store.bakaze.getSnapshot()), 'Nan');
   });
 
   test('resetAll puts every setting back', () => {
@@ -214,25 +233,37 @@ describe(createCalculatorStore, () => {
 
     store.resetAll();
 
-    assert.strictEqual(store.bakaze.getSnapshot().value, 'Ton');
+    assert.strictEqual(Optional.unwrap(store.bakaze.getSnapshot()), 'Ton');
 
-    assert.strictEqual(store.jikaze.getSnapshot().value, 'Ton');
+    assert.strictEqual(Optional.unwrap(store.jikaze.getSnapshot()), 'Ton');
 
-    assert.strictEqual(store.tehaiType.getSnapshot().value, 'normal');
+    assert.strictEqual(
+      Optional.unwrap(store.tehaiType.getSnapshot()),
+      'normal',
+    );
 
-    assert.strictEqual(store.turn.getSnapshot().value, 3);
+    assert.strictEqual(Optional.unwrap(store.turn.getSnapshot()), 3);
 
-    assert.strictEqual(store.maximizeTarget.getSnapshot().value, 'exp');
+    assert.strictEqual(
+      Optional.unwrap(store.maximizeTarget.getSnapshot()),
+      'exp',
+    );
 
-    assert.isTrue(store.flagOptions.getSnapshot().value.uradora);
+    assert.isTrue(Optional.unwrap(store.flagOptions.getSnapshot()).uradora);
 
-    assert.deepStrictEqual(store.doraIndicators.getSnapshot().value, ['Ton']);
+    assert.deepStrictEqual(
+      Optional.unwrap(store.doraIndicators.getSnapshot()),
+      ['Ton'],
+    );
 
-    assert.deepStrictEqual(store.hand.getSnapshot().value, []);
+    assert.deepStrictEqual(Optional.unwrap(store.hand.getSnapshot()), []);
 
-    assert.deepStrictEqual(store.revealedBlocks.getSnapshot().value, []);
+    assert.deepStrictEqual(
+      Optional.unwrap(store.revealedBlocks.getSnapshot()),
+      [],
+    );
 
-    assert.isUndefined(store.result.getSnapshot().value);
+    assert.isUndefined(Optional.unwrap(store.result.getSnapshot()));
   });
 
   test('setRandomHand takes 14 tiles from the shuffled wall without the dora indicators', () => {
@@ -257,7 +288,7 @@ describe(createCalculatorStore, () => {
     assert.strictEqual(wall.filter((tile) => tile === 'Manzu1').length, 3);
 
     // `shuffle` keeps the order here, so the hand is the head of the wall.
-    assert.deepStrictEqual(store.hand.getSnapshot().value, [
+    assert.deepStrictEqual(Optional.unwrap(store.hand.getSnapshot()), [
       'Manzu1',
       'Manzu1',
       'Manzu1',
@@ -274,9 +305,12 @@ describe(createCalculatorStore, () => {
       'Manzu4',
     ]);
 
-    assert.deepStrictEqual(store.revealedBlocks.getSnapshot().value, []);
+    assert.deepStrictEqual(
+      Optional.unwrap(store.revealedBlocks.getSnapshot()),
+      [],
+    );
 
-    assert.isUndefined(store.result.getSnapshot().value);
+    assert.isUndefined(Optional.unwrap(store.result.getSnapshot()));
   });
 
   test('setRandomHand takes the hand in the order the shuffle returns', () => {
@@ -284,7 +318,7 @@ describe(createCalculatorStore, () => {
 
     store.setRandomHand();
 
-    assert.deepStrictEqual(store.hand.getSnapshot().value, [
+    assert.deepStrictEqual(Optional.unwrap(store.hand.getSnapshot()), [
       'Chun',
       'Chun',
       'Chun',

@@ -31,6 +31,14 @@ describe(toSignal, () => {
     assert.strictEqual(countSignal.value, 7);
   });
 
+  test('starts at a held undefined rather than the fallback', () => {
+    const value$ = source<number | undefined>(undefined);
+
+    const valueSignal = toSignal(value$, -1);
+
+    assert.strictEqual(valueSignal.value, undefined);
+  });
+
   test('holds undefined until an observable without an initial value emits', () => {
     const count$ = source<number>();
 

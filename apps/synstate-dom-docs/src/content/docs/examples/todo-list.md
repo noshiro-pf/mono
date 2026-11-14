@@ -8,7 +8,7 @@ This is the larger sample from the README: an input, a list that appears once it
 ```tsx
 import { createState, map } from 'synstate';
 import { constant, For, If, render, type JSX } from 'synstate-dom';
-import { Arr } from 'ts-data-forge';
+import { Arr, Optional } from 'ts-data-forge';
 
 type Todo = Readonly<{ id: number; title: string; done: boolean }>;
 
@@ -81,8 +81,9 @@ const TodoApp = (): JSX.Element => {
                                             )}
                                             onChange={() => {
                                                 toggle(
-                                                    todo$.getSnapshot().value
-                                                        .id,
+                                                    Optional.unwrap(
+                                                        todo$.getSnapshot(),
+                                                    ).id,
                                                 );
                                             }}
                                         />

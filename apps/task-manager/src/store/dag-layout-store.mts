@@ -99,7 +99,7 @@ import {
   type KeepInitialValueOperator,
   type Observable as SynstateObservable,
 } from 'synstate';
-import { Arr, Num, unknownToString } from 'ts-data-forge';
+import { Arr, Num, Optional, unknownToString } from 'ts-data-forge';
 import {
   arcDiagramIds,
   arcDiagramNodes,
@@ -318,14 +318,14 @@ export const createDagLayoutStore = <H, F>(
 
   // The arrangement as stored, which is as made at 「標準」.
   let mut_stored: DagLayout = initialArrangement(
-    deps.stored.getSnapshot().value,
-    deps.defaultDirection.getSnapshot().value,
+    Optional.unwrap(deps.stored.getSnapshot()),
+    Optional.unwrap(deps.defaultDirection.getSnapshot()),
   );
 
   // The node size `mut_arrangement` is drawn at: that of the automatic layout
   // drawn with it, so that a new size moves nothing before ELK has laid the
   // graph out at it, and then everything together (`resize`).
-  let mut_drawnAt: NodeSize = deps.nodeSize.getSnapshot().value;
+  let mut_drawnAt: NodeSize = Optional.unwrap(deps.nodeSize.getSnapshot());
 
   // `mut_stored` as drawn at `mut_drawnAt`, spread out at 「大」
   // (`arrangementScale`), and moved since by a move not yet saved.
@@ -395,14 +395,15 @@ export const createDagLayoutStore = <H, F>(
     (ids, width, size) => tileDiagramNodes(ids, width, size),
   );
 
-  let mut_viewMode = deps.viewMode.getSnapshot().value;
+  let mut_viewMode = Optional.unwrap(deps.viewMode.getSnapshot());
 
-  let mut_nodeSize = deps.nodeSize.getSnapshot().value;
+  let mut_nodeSize = Optional.unwrap(deps.nodeSize.getSnapshot());
 
-  let mut_diagramOrder: readonly GraphNodeId[] =
-    diagramOrder.getSnapshot().value;
+  let mut_diagramOrder: readonly GraphNodeId[] = Optional.unwrap(
+    diagramOrder.getSnapshot(),
+  );
 
-  let mut_arcOrder = arcOrder.getSnapshot().value;
+  let mut_arcOrder = Optional.unwrap(arcOrder.getSnapshot());
 
   /**
    * Where the nodes of the DAG move from once the layout being computed is
@@ -472,7 +473,7 @@ export const createDagLayoutStore = <H, F>(
       resizeNodes(shown?.nodes ?? [], mut_nodeSize),
       shown?.edges ?? [],
       positions,
-      membership.getSnapshot().value,
+      Optional.unwrap(membership.getSnapshot()),
     );
   };
 
@@ -507,7 +508,7 @@ export const createDagLayoutStore = <H, F>(
    */
   const frozen = (
     next: DagLayout,
-    members: readonly LayoutGroup[] = membership.getSnapshot().value,
+    members: readonly LayoutGroup[] = Optional.unwrap(membership.getSnapshot()),
     replaced: ReadonlySet<GraphNodeId> = new Set<GraphNodeId>(),
   ): DagLayout => {
     const drawnNow = positionsOf(placed());
@@ -516,7 +517,9 @@ export const createDagLayoutStore = <H, F>(
 
     const nodePositions = new Map(
       Arr.generate(function* () {
-        for (const { id } of listNodes(deps.state.getSnapshot().value)) {
+        for (const { id } of listNodes(
+          Optional.unwrap(deps.state.getSnapshot()),
+        )) {
           const position =
             next.positions.get(id) ??
             (replaced.has(id) ? undefined : drawnNow.get(id)) ??
@@ -564,16 +567,16 @@ export const createDagLayoutStore = <H, F>(
         return placed();
 
       case 'arc':
-        return arcNodes.getSnapshot().value;
+        return Optional.unwrap(arcNodes.getSnapshot());
 
       case 'tile':
-        return tileNodes.getSnapshot().value;
+        return Optional.unwrap(tileNodes.getSnapshot());
     }
   };
 
   /** Whether the nodes are on screen, and have been shown moving into place. */
   const onScreen = (): boolean =>
-    mut_introduced && deps.active.getSnapshot().value;
+    mut_introduced && Optional.unwrap(deps.active.getSnapshot());
 
   const finishAnimation = (): void => {
     if (mut_frame !== undefined) {
@@ -637,8 +640,8 @@ export const createDagLayoutStore = <H, F>(
 
   const animationAllowed = (): boolean =>
     shouldAnimate(
-      deps.animationSetting.getSnapshot().value,
-      deps.reducedMotion.getSnapshot().value,
+      Optional.unwrap(deps.animationSetting.getSnapshot()),
+      Optional.unwrap(deps.reducedMotion.getSnapshot()),
     );
 
   /**
@@ -710,7 +713,7 @@ export const createDagLayoutStore = <H, F>(
 
     mut_introduced = true;
 
-    const madeAt = createdAtOf(deps.state.getSnapshot().value);
+    const madeAt = createdAtOf(Optional.unwrap(deps.state.getSnapshot()));
 
     const inOrder = nodes.toSorted((a, b) => {
       const byTime = (madeAt.get(a.id) ?? 0) - (madeAt.get(b.id) ?? 0);
@@ -953,8 +956,9 @@ export const createDagLayoutStore = <H, F>(
       return;
     }
 
-    const ids = (mut_viewMode === 'arc' ? arcOrder : diagramOrder).getSnapshot()
-      .value;
+    const ids = Optional.unwrap(
+      (mut_viewMode === 'arc' ? arcOrder : diagramOrder).getSnapshot(),
+    );
 
     const before = positionsOf(diagramNodesAt(mut_viewMode, ids, previous));
 
@@ -1017,11 +1021,14 @@ export const createDagLayoutStore = <H, F>(
       return;
     }
 
-    const before = positionsOf(tileNodes.getSnapshot().value);
+    const before = positionsOf(Optional.unwrap(tileNodes.getSnapshot()));
 
     setTileWidthState(available);
 
-    if (mut_viewMode !== 'tile' || !deps.active.getSnapshot().value) {
+    if (
+      mut_viewMode !== 'tile' ||
+      !Optional.unwrap(deps.active.getSnapshot())
+    ) {
       return;
     }
 
@@ -1032,7 +1039,7 @@ export const createDagLayoutStore = <H, F>(
       return;
     }
 
-    const after = positionsOf(tileNodes.getSnapshot().value);
+    const after = positionsOf(Optional.unwrap(tileNodes.getSnapshot()));
 
     if (!samePositions(before, after)) {
       animate(before, after);
@@ -1058,7 +1065,7 @@ export const createDagLayoutStore = <H, F>(
     position: Point,
     into: GroupId | undefined,
   ): void => {
-    const members = membership.getSnapshot().value;
+    const members = Optional.unwrap(membership.getSnapshot());
 
     const from = groupsByMember(members).get(id);
 
@@ -1103,7 +1110,7 @@ export const createDagLayoutStore = <H, F>(
 
     const nodes = placed();
 
-    const members = membership.getSnapshot().value;
+    const members = Optional.unwrap(membership.getSnapshot());
 
     const from = framesWith(nodes, members, current.groupPositions).get(id);
 

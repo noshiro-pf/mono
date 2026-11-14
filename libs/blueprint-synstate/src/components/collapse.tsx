@@ -9,7 +9,7 @@ import {
   type Child,
   type JSX,
 } from 'synstate-dom';
-import { Arr } from 'ts-data-forge';
+import { Arr, Optional } from 'ts-data-forge';
 import { classObject } from '../internal/index.mjs';
 
 type Props = Readonly<{
@@ -42,7 +42,7 @@ export const Collapse = ({
   const isOpen$ = toObservable(isOpen);
 
   const [phase$, setPhase] = createState<Phase>(
-    isOpen$.getSnapshot().value ? 'open' : 'closed',
+    Optional.unwrap(isOpen$.getSnapshot()) ? 'open' : 'closed',
   );
 
   // The body's height when last measured, which the closing body is moved up
@@ -132,7 +132,7 @@ export const Collapse = ({
   };
 
   const follow = (open: boolean): void => {
-    const phase = phase$.getSnapshot().value;
+    const phase = Optional.unwrap(phase$.getSnapshot());
 
     const settled = open
       ? phase === 'open' || phase === 'opening'
@@ -154,7 +154,7 @@ export const Collapse = ({
   // a change undone in the same task moves nothing.
   isOpen$.subscribe(() => {
     afterUpdate(() => {
-      follow(isOpen$.getSnapshot().value);
+      follow(Optional.unwrap(isOpen$.getSnapshot()));
     });
   });
 

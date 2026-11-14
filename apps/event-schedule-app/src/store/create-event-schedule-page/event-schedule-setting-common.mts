@@ -4,7 +4,7 @@ import {
   UserName,
 } from 'event-schedule-app-shared';
 import { type InitializedObservable, createState, derive, map } from 'synstate';
-import { Arr, Obj, mapNullable, pipe } from 'ts-data-forge';
+import { Arr, Obj, Optional, mapNullable, pipe } from 'ts-data-forge';
 import {
   answerDeadlineInitialValue,
   eventScheduleInitialValue,
@@ -126,14 +126,16 @@ export const createEventScheduleSettingStore = (
     ).mapNullable((a) => ({ ...a, email: '' })).value,
     valueToBeSetWhenTurnedOff: () => undefined,
     valueToBeSetWhenTurnedOn: () =>
-      initialNotificationSettingsWithEmailFilled$.getSnapshot().value,
+      Optional.unwrap(
+        initialNotificationSettingsWithEmailFilled$.getSnapshot(),
+      ),
   });
 
   // 回答期限をオフにしたら通知設定の回答期限関連のチェックもオフにする
   const toggleAnswerDeadlineSection = (): void => {
     toggleAnswerDeadlineSection_();
 
-    if (!useAnswerDeadline$.getSnapshot().value) {
+    if (!Optional.unwrap(useAnswerDeadline$.getSnapshot())) {
       updateNotificationSettingsWithEmail((prev) =>
         prev === undefined
           ? prev

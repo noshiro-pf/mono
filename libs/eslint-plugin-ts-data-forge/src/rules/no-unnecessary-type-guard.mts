@@ -94,6 +94,25 @@ const PENDING_TAG = 'ts-data-forge::AsyncData.pending';
 
 const TAG_PROPERTY = '$$tag';
 
+/**
+ * `Optional`'s variants carry no `$$tag`: a `Some` is its value unwrapped and
+ * `None` a reserved string, so the variant is named by a type-only property
+ * instead. Its values map to the tags the guards above are written in, so that
+ * an `Optional` from a ts-std-forge before the change (tagged) and one after it
+ * classify the same. A tagged `Optional` reaching a guard of the unwrapped
+ * version is a mix of the two, which neither supports; the rule judges each by
+ * its own type.
+ */
+const OPTIONAL_VARIANT_PROPERTY = 'ts-std-forge::Optional';
+
+/** The type-only property of an unwrapped `Some` that holds its value's type. */
+const OPTIONAL_VALUE_PROPERTY = 'ts-std-forge::Optional.value';
+
+const OPTIONAL_VARIANT_TAGS: ReadonlyRecord<string, string> = {
+  some: SOME_TAG,
+  none: NONE_TAG,
+} as const;
+
 const NULLISH_REPLACEMENTS_EXCLUDE: ReadonlyRecord<string, string> = {
   undefined: 'isNotUndefined',
   null: 'isNotNull',
@@ -575,8 +594,9 @@ const isGuaranteedRecord = (
 
 /**
  * The string literal a (non-union) type's `$$tag` property holds, or
- * `undefined` when it has none: `Some<number>` gives
- * `'ts-data-forge::Optional.some'`.
+ * `undefined` when it has none: `Ok<number>` gives `'ts-data-forge::Result.ok'`.
+ * An `Optional` variant, which has no `$$tag`, gives the tag its type-only key
+ * stands for (`Some<number>` gives `'ts-data-forge::Optional.some'`).
  */
 const variantTagOf = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
@@ -586,14 +606,35 @@ const variantTagOf = (
 ): string | undefined => {
   const tagSymbol = type.getProperty(TAG_PROPERTY);
 
-  if (tagSymbol === undefined) {
+  if (tagSymbol !== undefined) {
+    const tagType = checker.getTypeOfSymbol(tagSymbol);
+
+    return tagType.isStringLiteral() ? tagType.value : undefined;
+  }
+
+  const variantSymbol = type.getProperty(OPTIONAL_VARIANT_PROPERTY);
+
+  if (variantSymbol === undefined) {
     return undefined;
   }
 
-  const tagType = checker.getTypeOfSymbol(tagSymbol);
+  const variantType = checker.getTypeOfSymbol(variantSymbol);
 
-  return tagType.isStringLiteral() ? tagType.value : undefined;
+  return variantType.isStringLiteral()
+    ? OPTIONAL_VARIANT_TAGS[variantType.value]
+    : undefined;
 };
+
+/**
+ * A tag no variant guard names, for a value no variant guard but `Optional`'s
+ * accepts.
+ */
+const NO_VARIANT_TAG = '(no variant)';
+
+/** Whether `type` is a variant of the unwrapped `Optional` (see above). */
+// eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+const isUnwrappedOptional = (type: ts.Type): boolean =>
+  type.getProperty(OPTIONAL_VARIANT_PROPERTY) !== undefined;
 
 /** Classifies a single (non-union) type into a primitive {@link Atom}. */
 // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
@@ -641,6 +682,57 @@ const classifyAtom = (type: ts.Type): Atom => {
   }
 
   return 'other';
+};
+
+/** Whether `type` is the `None` variant of the unwrapped `Optional`. */
+// eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+const isNoneVariant = (type: ts.Type): boolean =>
+  isUnwrappedOptional(type) &&
+  type.getProperty(OPTIONAL_VALUE_PROPERTY) === undefined;
+
+/**
+ * The tag another type's variant guard (`Result.isOk`, ...) sees at runtime in
+ * a value of `type`. An unwrapped `Some` is the value it holds, so it shows that
+ * value's tag, and a primitive one none; `None`, and a `Some` of `None`, are
+ * reserved strings, which no such guard accepts. `undefined` stands for a
+ * member whose tag cannot be told.
+ *
+ * A `Some` that holds another `Some` gives no verdict. What it is at runtime
+ * depends on what the inner one holds (the innermost value itself, or a
+ * reserved string for `None` or a reserved string), and following that, even to
+ * a fixed depth, multiplies the work by the width of each held union and needs
+ * a cut for a type that holds itself. The rule leaves this rare case without a
+ * verdict rather than pay for it.
+ */
+const runtimeVariantTagsOf = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  type: ts.Type,
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  checker: ts.TypeChecker,
+): readonly (string | undefined)[] => {
+  if (!isUnwrappedOptional(type)) {
+    return [variantTagOf(type, checker)];
+  }
+
+  const valueSymbol = type.getProperty(OPTIONAL_VALUE_PROPERTY);
+
+  if (valueSymbol === undefined) {
+    return [NO_VARIANT_TAG]; // `None`
+  }
+
+  const held = collectUnionParts(checker.getTypeOfSymbol(valueSymbol));
+
+  return held === undefined
+    ? [undefined]
+    : held.map((p) =>
+        isUnwrappedOptional(p)
+          ? isNoneVariant(p)
+            ? NO_VARIANT_TAG // a `Some` of `None`
+            : undefined // a `Some` of a `Some`, not followed (see above)
+          : classifyAtom(p) === 'other'
+            ? variantTagOf(p, checker)
+            : NO_VARIANT_TAG,
+      );
 };
 
 /**
@@ -722,6 +814,14 @@ const verdictOf = (
     return undefined; // opaque / generic → bail conservatively
   }
 
+  if (parts.some(isUnwrappedOptional) && spec.kind !== 'variant') {
+    // An unwrapped `Optional` is typed as an object but is, at runtime, the
+    // value it holds (a `Some`, `undefined` and `null` included) or a string
+    // (`None`): of any kind, nullish too. A variant guard reads it through
+    // `runtimeVariantTagsOf`; no other guard can be judged on it.
+    return undefined;
+  }
+
   const inputAtoms = new Set(parts.map(classifyAtom));
 
   const hasMemberOutsideTarget = (atoms: readonly AtomKey[]): boolean => {
@@ -781,7 +881,13 @@ const verdictOf = (
           : undefined;
 
     case 'variant': {
-      const tags = parts.map((p) => variantTagOf(p, checker));
+      const isOptionalGuard = spec.tags.every(
+        (tag) => tag === SOME_TAG || tag === NONE_TAG,
+      );
+
+      const tags = isOptionalGuard
+        ? parts.map((p) => variantTagOf(p, checker))
+        : parts.flatMap((p) => runtimeVariantTagsOf(p, checker));
 
       if (!tags.every(isString)) {
         return undefined; // a member the tag does not identify

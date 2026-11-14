@@ -1,12 +1,12 @@
 --- en/02-simple-state-with-map.mts
 +++ ja/02-simple-state-with-map.mts
-@@ -4,19 +4,19 @@
+@@ -5,19 +5,19 @@
  
  const [count, setCount] = createState<number>(0);
  
 -// Read the current value
 +// 現在の値を取得
- console.log(count.getSnapshot().value); // 0
+ console.log(Optional.unwrap(count.getSnapshot())); // 0
  
 -// Derive new Observables using pipe
 +// pipe で新しい Observable を派生
@@ -24,7 +24,7 @@
  count.subscribe((value) => {
    console.log('count:', value); // 0, 1, 2, 3
  });
-@@ -29,7 +29,7 @@
+@@ -30,7 +30,7 @@
    console.log(value); // "(0, 0)", "(1, 2)", "(2, 4)", "(3, 6)"
  });
  

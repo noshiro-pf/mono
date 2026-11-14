@@ -1,3 +1,4 @@
+import { Optional } from 'ts-data-forge';
 import type { AnimationSetting } from '../view-model/index.mjs';
 import { createAnimationSettingStore } from './animation-setting-store.mjs';
 
@@ -25,7 +26,7 @@ describe(createAnimationSettingStore, () => {
   test('starts from the setting read', () => {
     const { store } = setup('off');
 
-    assert.strictEqual(store.setting.getSnapshot().value, 'off');
+    assert.strictEqual(Optional.unwrap(store.setting.getSnapshot()), 'off');
   });
 
   test('saves every change', () => {
@@ -37,6 +38,6 @@ describe(createAnimationSettingStore, () => {
 
     assert.deepStrictEqual(saved, ['auto', 'on', 'off']);
 
-    assert.strictEqual(store.setting.getSnapshot().value, 'off');
+    assert.strictEqual(Optional.unwrap(store.setting.getSnapshot()), 'off');
   });
 });

@@ -8,7 +8,7 @@ import {
   type Bindable,
   type JSX,
 } from 'synstate-dom';
-import { Arr, Num } from 'ts-data-forge';
+import { Arr, Num, Optional } from 'ts-data-forge';
 import type { MutableFixedLengthTuple, UintRange } from 'ts-type-forge';
 import { classObject, intentClass, parseInteger } from '../internal/index.mjs';
 import type { Intent } from './intent.mjs';
@@ -117,7 +117,7 @@ export const RangeSlider = ({
   const [layouts$, setLayouts] = createState(0);
 
   const relayout = (): void => {
-    setLayouts(layouts$.getSnapshot().value + 1);
+    setLayouts(Optional.unwrap(layouts$.getSnapshot()) + 1);
   };
 
   createAfterUpdate()(relayout);
@@ -149,14 +149,14 @@ export const RangeSlider = ({
         : labelRenderer(n, { isHandleTooltip });
 
   const valueAt = (index: HandleIndex): number =>
-    value$.getSnapshot().value[index];
+    Optional.unwrap(value$.getSnapshot())[index];
 
   /**
    * The range once the handle at `index` is at `next`, which stops at the other
    * handle: Blueprint's `getNewHandleValues` for two handles that lock.
    */
   const rangeWith = (index: HandleIndex, next: number): NumberRange => {
-    const [start, end] = value$.getSnapshot().value;
+    const [start, end] = Optional.unwrap(value$.getSnapshot());
 
     return index === 0
       ? [Math.min(next, end), end]
@@ -170,7 +170,7 @@ export const RangeSlider = ({
     if (!Number.isNaN(clamped) && clamped !== valueAt(index)) {
       const range = rangeWith(index, clamped);
 
-      const [start, end] = value$.getSnapshot().value;
+      const [start, end] = Optional.unwrap(value$.getSnapshot());
 
       if (range[0] !== start || range[1] !== end) {
         onChange?.(range);
@@ -220,7 +220,7 @@ export const RangeSlider = ({
         : (['touchend', 'touchcancel'] as const);
 
     const onMove = (event: MouseEvent | TouchEvent): void => {
-      if (!disabled$.getSnapshot().value) {
+      if (!Optional.unwrap(disabled$.getSnapshot())) {
         changeValue(index, clientToValue(index, clientXOf(event)));
       }
     };
@@ -270,7 +270,7 @@ export const RangeSlider = ({
     kind: 'mouse' | 'touch',
   ): void => {
     if (
-      disabled$.getSnapshot().value ||
+      Optional.unwrap(disabled$.getSnapshot()) ||
       (event.target instanceof Element &&
         event.target.closest('.bp6-slider-handle') !== null)
     ) {
@@ -343,7 +343,10 @@ export const RangeSlider = ({
         onKeyDown={(event) => {
           const direction = arrowDirectionOf(event.key);
 
-          if (direction === undefined || disabled$.getSnapshot().value) {
+          if (
+            direction === undefined ||
+            Optional.unwrap(disabled$.getSnapshot())
+          ) {
             return;
           }
 
@@ -353,19 +356,19 @@ export const RangeSlider = ({
         }}
         onKeyUp={(event) => {
           if (
-            !disabled$.getSnapshot().value &&
+            !Optional.unwrap(disabled$.getSnapshot()) &&
             arrowDirectionOf(event.key) !== undefined
           ) {
             onRelease?.(rangeWith(index, valueAt(index)));
           }
         }}
         onMouseDown={(event) => {
-          if (!disabled$.getSnapshot().value) {
+          if (!Optional.unwrap(disabled$.getSnapshot())) {
             beginMovement(index, event.clientX, 'mouse');
           }
         }}
         onTouchStart={(event) => {
-          if (!disabled$.getSnapshot().value) {
+          if (!Optional.unwrap(disabled$.getSnapshot())) {
             beginMovement(index, clientXOf(event), 'touch');
           }
         }}

@@ -442,7 +442,7 @@ assert.deepStrictEqual(
 );
 
 if (Optional.isSome(oldestPerson)) {
-    assert.isTrue(oldestPerson.value.name === 'Charlie');
+    assert.isTrue(Optional.unwrap(oldestPerson).name === 'Charlie');
 }
 ```
 

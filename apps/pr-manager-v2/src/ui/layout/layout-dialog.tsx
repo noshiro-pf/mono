@@ -1,6 +1,6 @@
 import { combine, map } from 'synstate';
 import { constant, For, If, type JSX } from 'synstate-dom';
-import { Arr } from 'ts-data-forge';
+import { Arr, Optional } from 'ts-data-forge';
 import {
   DEFAULT_LAYOUT,
   lineRange,
@@ -149,7 +149,7 @@ export const LayoutDialog = ({ layout }: Props): JSX.Element => {
                 {(id$) => (
                   <LayoutBlockRow
                     change={change}
-                    id={id$.getSnapshot().value}
+                    id={Optional.unwrap(id$.getSnapshot())}
                     state={state}
                   />
                 )}

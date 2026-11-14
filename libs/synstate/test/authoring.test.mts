@@ -24,7 +24,7 @@ const double = (src: Observable<number>): SyncChildObservable<number> =>
           return; // skip update
         }
 
-        setNext(sn.value * 2, updateToken);
+        setNext(Optional.unwrap(sn) * 2, updateToken);
       },
   );
 
@@ -52,7 +52,7 @@ const delay = (src: Observable<number>, ms: number): Observable<number> =>
         const t = setTimeout(() => {
           mut_timers.delete(t);
 
-          startUpdate(sn.value);
+          startUpdate(Optional.unwrap(sn));
         }, ms);
 
         mut_timers.add(t);
@@ -97,7 +97,7 @@ const debounceTime = (
           mut_timer = setTimeout(() => {
             mut_pending = Optional.none;
 
-            startUpdate(sn.value);
+            startUpdate(Optional.unwrap(sn));
           }, ms);
         },
         flush: () => {
@@ -106,7 +106,7 @@ const debounceTime = (
           reset();
 
           if (Optional.isSome(pending)) {
-            startUpdate(pending.value);
+            startUpdate(Optional.unwrap(pending));
           }
         },
       };
@@ -128,7 +128,7 @@ const followMain = (
           return; // skip update
         }
 
-        setNext(sn.value, updateToken);
+        setNext(Optional.unwrap(sn), updateToken);
       },
       canEmitNoMore: () => main.isCompleted,
     }),

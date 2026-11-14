@@ -9,7 +9,7 @@ import {
   type Bindable,
   type JSX,
 } from 'synstate-dom';
-import { Num, type IMapMapped } from 'ts-data-forge';
+import { Num, Optional, type IMapMapped } from 'ts-data-forge';
 import { dict } from '../../../constants/index.mjs';
 import {
   AnswerFilterAndSortStore,
@@ -133,7 +133,7 @@ export const AnswerTable = ({
                       variant={constant('minimal')}
                       onClick={() => {
                         AnswerPageStore.onAnswerClick(
-                          answer$.getSnapshot().value,
+                          Optional.unwrap(answer$.getSnapshot()),
                         );
                       }}
                     />
@@ -156,7 +156,7 @@ export const AnswerTable = ({
       <tbody>
         <For items={tableBodyValuesFiltered$} key={(row) => row.key}>
           {(row$) => {
-            const { datetimeRange } = row$.getSnapshot().value;
+            const { datetimeRange } = Optional.unwrap(row$.getSnapshot());
 
             return (
               <tr
@@ -267,7 +267,7 @@ const AnswerCell = ({
     {(iconId$) => (
       <div class={constant(styles.answerIconCell)}>
         <div class={constant(styles.iconAndString)}>
-          <CustomIcon iconName={iconId$.getSnapshot().value} />
+          <CustomIcon iconName={Optional.unwrap(iconId$.getSnapshot())} />
           <If
             cond={cell.pipe(map((c) => c.showPoint))}
             then={

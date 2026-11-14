@@ -5,6 +5,7 @@ import {
   type Observable,
   type SourceObservable,
 } from 'synstate';
+import { Optional } from 'ts-data-forge';
 
 export const useValueAsObservable = <A,>(input: A): Observable<A> => {
   const sourceObservable = Preact.useMemo<SourceObservable<A>>(source, []);
@@ -24,7 +25,7 @@ export const useValueAsObservable = <A,>(input: A): Observable<A> => {
 
   Preact.useEffect(() => {
     // The observable already holds the value it was created with.
-    if (!Object.is(state.getSnapshot().value, input)) {
+    if (!Object.is(Optional.unwrap(state.getSnapshot()), input)) {
       sourceObservable.next(input);
     }
   }, [input]);

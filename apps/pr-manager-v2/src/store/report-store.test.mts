@@ -1,5 +1,5 @@
 import { createState } from 'synstate';
-import { Result } from 'ts-data-forge';
+import { Optional, Result } from 'ts-data-forge';
 import { failed, pull, snapshot } from '../../test/index.mjs';
 import type { StoredToken } from '../github/index.mjs';
 import {
@@ -18,7 +18,10 @@ describe(createReportStore, () => {
 
     assert.strictEqual(reads(), 0);
 
-    assert.strictEqual(store.status.getSnapshot().value.kind, 'no-token');
+    assert.strictEqual(
+      Optional.unwrap(store.status.getSnapshot()).kind,
+      'no-token',
+    );
 
     setToken(TOKEN);
 
@@ -26,7 +29,7 @@ describe(createReportStore, () => {
 
     assert.strictEqual(reads(), 1);
 
-    assert.deepStrictEqual(store.status.getSnapshot().value, {
+    assert.deepStrictEqual(Optional.unwrap(store.status.getSnapshot()), {
       kind: 'ready',
       readAtMs: 0,
       reading: false,
@@ -34,7 +37,9 @@ describe(createReportStore, () => {
     });
 
     assert.isTrue(
-      Result.isOk(store.report.getSnapshot().value?.decision ?? Result.err(0)),
+      Result.isOk(
+        Optional.unwrap(store.report.getSnapshot())?.decision ?? Result.err(0),
+      ),
     );
   });
 
@@ -53,9 +58,9 @@ describe(createReportStore, () => {
 
     await flush();
 
-    assert.isDefined(store.report.getSnapshot().value);
+    assert.isDefined(Optional.unwrap(store.report.getSnapshot()));
 
-    const status = store.status.getSnapshot().value;
+    const status = Optional.unwrap(store.status.getSnapshot());
 
     assert.strictEqual(
       status.kind === 'ready' ? status.failure : undefined,
@@ -89,16 +94,18 @@ describe(createReportStore, () => {
 
     await flush();
 
-    const report = store.report.getSnapshot().value;
+    const report = Optional.unwrap(store.report.getSnapshot());
 
     assert.isTrue(Result.isOk(report?.snapshot.merged ?? Result.err(0)));
 
     assert.isTrue(
-      Result.isOk(store.runs.getSnapshot().value?.runs ?? Result.err(0)),
+      Result.isOk(
+        Optional.unwrap(store.runs.getSnapshot())?.runs ?? Result.err(0),
+      ),
     );
 
     assert.strictEqual(
-      store.runs.getSnapshot().value?.failure?.what,
+      Optional.unwrap(store.runs.getSnapshot())?.failure?.what,
       'the runs',
     );
 
@@ -122,7 +129,7 @@ describe(createReportStore, () => {
 
     await flush();
 
-    const report = store.report.getSnapshot().value;
+    const report = Optional.unwrap(store.report.getSnapshot());
 
     assert.isTrue(Result.isErr(report?.decision ?? Result.ok(0)));
 
@@ -156,17 +163,17 @@ describe(createReportStore, () => {
 
     await flush();
 
-    assert.isTrue(store.tokenRefused.getSnapshot().value);
+    assert.isTrue(Optional.unwrap(store.tokenRefused.getSnapshot()));
 
     mut_refuse = false;
 
     setToken({ value: 'another', place: 'session' });
 
-    assert.isFalse(store.tokenRefused.getSnapshot().value);
+    assert.isFalse(Optional.unwrap(store.tokenRefused.getSnapshot()));
 
     await flush();
 
-    assert.isFalse(store.tokenRefused.getSnapshot().value);
+    assert.isFalse(Optional.unwrap(store.tokenRefused.getSnapshot()));
   });
 
   test('reads on after drawing a read threw, and says so', async () => {
@@ -188,7 +195,7 @@ describe(createReportStore, () => {
 
     await flush();
 
-    const status = store.status.getSnapshot().value;
+    const status = Optional.unwrap(store.status.getSnapshot());
 
     assert.strictEqual(
       status.kind === 'ready' ? status.failure : undefined,
@@ -227,7 +234,7 @@ describe(createReportStore, () => {
 
     await flush();
 
-    const status = store.status.getSnapshot().value;
+    const status = Optional.unwrap(store.status.getSnapshot());
 
     assert.deepStrictEqual(
       status.kind === 'ready' ? [status.readAtMs, status.failure] : [],
@@ -244,7 +251,7 @@ describe(createReportStore, () => {
 
     await flush();
 
-    assert.isUndefined(store.report.getSnapshot().value);
+    assert.isUndefined(Optional.unwrap(store.report.getSnapshot()));
   });
 
   test('shows the runs read even when the snapshot failed', async () => {
@@ -256,10 +263,15 @@ describe(createReportStore, () => {
 
     await flush();
 
-    assert.strictEqual(store.status.getSnapshot().value.kind, 'failed');
+    assert.strictEqual(
+      Optional.unwrap(store.status.getSnapshot()).kind,
+      'failed',
+    );
 
     assert.isTrue(
-      Result.isOk(store.runs.getSnapshot().value?.runs ?? Result.err(0)),
+      Result.isOk(
+        Optional.unwrap(store.runs.getSnapshot())?.runs ?? Result.err(0),
+      ),
     );
   });
 
@@ -270,14 +282,17 @@ describe(createReportStore, () => {
 
     await flush();
 
-    assert.strictEqual(store.status.getSnapshot().value.kind, 'failed');
+    assert.strictEqual(
+      Optional.unwrap(store.status.getSnapshot()).kind,
+      'failed',
+    );
 
-    assert.isUndefined(store.report.getSnapshot().value);
+    assert.isUndefined(Optional.unwrap(store.report.getSnapshot()));
 
     // Read again, the reason stays on screen while the read is out.
     store.refresh();
 
-    const retrying = store.status.getSnapshot().value;
+    const retrying = Optional.unwrap(store.status.getSnapshot());
 
     assert.deepStrictEqual(
       retrying.kind === 'failed' ? [retrying.reading, isReading(retrying)] : [],
@@ -298,9 +313,12 @@ describe(createReportStore, () => {
 
     assert.strictEqual(reads(), 0);
 
-    assert.strictEqual(store.status.getSnapshot().value.kind, 'waiting');
+    assert.strictEqual(
+      Optional.unwrap(store.status.getSnapshot()).kind,
+      'waiting',
+    );
 
-    assert.isFalse(isReading(store.status.getSnapshot().value));
+    assert.isFalse(isReading(Optional.unwrap(store.status.getSnapshot())));
 
     setVisible(true);
 
@@ -385,9 +403,12 @@ describe(createReportStore, () => {
 
     await flush();
 
-    assert.isUndefined(store.report.getSnapshot().value);
+    assert.isUndefined(Optional.unwrap(store.report.getSnapshot()));
 
-    assert.strictEqual(store.status.getSnapshot().value.kind, 'first-read');
+    assert.strictEqual(
+      Optional.unwrap(store.status.getSnapshot()).kind,
+      'first-read',
+    );
   });
 
   test('empties the page when the token is cleared', async () => {
@@ -399,9 +420,12 @@ describe(createReportStore, () => {
 
     setToken(undefined);
 
-    assert.isUndefined(store.report.getSnapshot().value);
+    assert.isUndefined(Optional.unwrap(store.report.getSnapshot()));
 
-    assert.strictEqual(store.status.getSnapshot().value.kind, 'no-token');
+    assert.strictEqual(
+      Optional.unwrap(store.status.getSnapshot()).kind,
+      'no-token',
+    );
   });
 
   test('sends nothing a Refresh asked for once stopped', async () => {
@@ -442,7 +466,7 @@ describe(createReportStore, () => {
     await flush();
 
     assert.strictEqual(
-      store.budget.getSnapshot().value.rateLimit?.remaining,
+      Optional.unwrap(store.budget.getSnapshot()).rateLimit?.remaining,
       4900,
     );
   });

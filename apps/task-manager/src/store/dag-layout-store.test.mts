@@ -1,5 +1,5 @@
 import { createState } from 'synstate';
-import { Arr, Num } from 'ts-data-forge';
+import { Arr, Num, Optional } from 'ts-data-forge';
 import type { FixedLengthTuple } from 'ts-type-forge';
 import {
   ARC_NODE_GAP,
@@ -303,7 +303,7 @@ const setup = (
       mut_regrouped.push([id, groupId]);
 
       // As the repository does: the write comes back.
-      const current = state.getSnapshot().value;
+      const current = Optional.unwrap(state.getSnapshot());
 
       const next = regroupNode(current, nodeRefOf(id), groupId, 0);
 
@@ -404,13 +404,13 @@ const positions = (
 const animated = (
   store: DagLayoutStore,
 ): ReadonlyMap<GraphNodeId, Point> | undefined =>
-  store.animatedPositions.getSnapshot().value;
+  Optional.unwrap(store.animatedPositions.getSnapshot());
 
 /** How opaque the nodes fading in or out are, while the mode changes. */
 const opacities = (
   store: DagLayoutStore,
 ): ReadonlyMap<GraphNodeId, number> | undefined =>
-  store.animatedOpacities.getSnapshot().value;
+  Optional.unwrap(store.animatedOpacities.getSnapshot());
 
 /** Lets the promise of a resolved layout run its `then`. */
 const settle = (): Promise<void> => Promise.resolve();
@@ -457,7 +457,7 @@ const boxes = (
 
 /** The automatic layout, once there is one. */
 const readyLayout = (store: DagLayoutStore): GraphLayout | undefined => {
-  const current = store.autoLayout.getSnapshot().value;
+  const current = Optional.unwrap(store.autoLayout.getSnapshot());
 
   return current.type === 'ready' ? current.layout : undefined;
 };
@@ -471,13 +471,19 @@ const positionsOfLayout = (
 /** Where 「タイル」 draws each task when nothing moves. */
 const tilePlaces = (store: DagLayoutStore): ReadonlyMap<GraphNodeId, Point> =>
   new Map(
-    store.tileNodes.getSnapshot().value.map(({ id, x, y }) => [id, { x, y }]),
+    Optional.unwrap(store.tileNodes.getSnapshot()).map(({ id, x, y }) => [
+      id,
+      { x, y },
+    ]),
   );
 
 /** Where 「アーク」 draws each node when nothing moves. */
 const arcColumn = (store: DagLayoutStore): ReadonlyMap<GraphNodeId, Point> =>
   new Map(
-    store.arcNodes.getSnapshot().value.map(({ id, x, y }) => [id, { x, y }]),
+    Optional.unwrap(store.arcNodes.getSnapshot()).map(({ id, x, y }) => [
+      id,
+      { x, y },
+    ]),
   );
 
 /**
@@ -523,7 +529,10 @@ describe(createDagLayoutStore, () => {
 
       assert.strictEqual(deferred.requests.length, 0);
 
-      assert.strictEqual(store.autoLayout.getSnapshot().value.type, 'idle');
+      assert.strictEqual(
+        Optional.unwrap(store.autoLayout.getSnapshot()).type,
+        'idle',
+      );
 
       setActive(true);
 
@@ -537,7 +546,7 @@ describe(createDagLayoutStore, () => {
 
       await settle();
 
-      assert.deepStrictEqual(store.autoLayout.getSnapshot().value, {
+      assert.deepStrictEqual(Optional.unwrap(store.autoLayout.getSnapshot()), {
         type: 'ready',
         layout: laidOut(deferred.requests[0], 100),
       });
@@ -573,7 +582,7 @@ describe(createDagLayoutStore, () => {
 
       setState(two);
 
-      assert.deepStrictEqual(store.autoLayout.getSnapshot().value, {
+      assert.deepStrictEqual(Optional.unwrap(store.autoLayout.getSnapshot()), {
         type: 'computing',
         previous: laidOut(deferred.requests[0], 100),
       });
@@ -636,7 +645,7 @@ describe(createDagLayoutStore, () => {
 
       await settle();
 
-      assert.deepStrictEqual(store.autoLayout.getSnapshot().value, {
+      assert.deepStrictEqual(Optional.unwrap(store.autoLayout.getSnapshot()), {
         type: 'ready',
         layout: laidOut(deferred.requests[1], 100),
       });
@@ -648,14 +657,14 @@ describe(createDagLayoutStore, () => {
       const { store, setDefaultDirection, deferred, saved } = setup();
 
       assert.strictEqual(
-        store.arrangement.getSnapshot().value.direction,
+        Optional.unwrap(store.arrangement.getSnapshot()).direction,
         'right',
       );
 
       setDefaultDirection('down');
 
       assert.strictEqual(
-        store.arrangement.getSnapshot().value.direction,
+        Optional.unwrap(store.arrangement.getSnapshot()).direction,
         'down',
       );
 
@@ -676,7 +685,7 @@ describe(createDagLayoutStore, () => {
       setDefaultDirection('right');
 
       assert.strictEqual(
-        store.arrangement.getSnapshot().value.direction,
+        Optional.unwrap(store.arrangement.getSnapshot()).direction,
         'down',
       );
     });
@@ -736,7 +745,10 @@ describe(createDagLayoutStore, () => {
         },
       ]);
 
-      assert.deepStrictEqual(store.arrangement.getSnapshot().value, saved[0]);
+      assert.deepStrictEqual(
+        Optional.unwrap(store.arrangement.getSnapshot()),
+        saved[0],
+      );
     });
 
     test('dragged with others selected, moves them all as far and writes once', async () => {
@@ -794,7 +806,9 @@ describe(createDagLayoutStore, () => {
       store.nudgeNode('task:a', { x: 0, y: 40 });
 
       assert.deepStrictEqual(
-        store.arrangement.getSnapshot().value.positions.get('task:a'),
+        Optional.unwrap(store.arrangement.getSnapshot()).positions.get(
+          'task:a',
+        ),
         { x: 8, y: 40 },
       );
 
@@ -847,7 +861,10 @@ describe(createDagLayoutStore, () => {
 
       setStored(elsewhere);
 
-      assert.deepStrictEqual(store.arrangement.getSnapshot().value, elsewhere);
+      assert.deepStrictEqual(
+        Optional.unwrap(store.arrangement.getSnapshot()),
+        elsewhere,
+      );
     });
   });
 
@@ -869,7 +886,7 @@ describe(createDagLayoutStore, () => {
 
       await settle();
 
-      const fits = store.fitRequests.getSnapshot().value;
+      const fits = Optional.unwrap(store.fitRequests.getSnapshot());
 
       store.autoArrange();
 
@@ -884,7 +901,10 @@ describe(createDagLayoutStore, () => {
         },
       ]);
 
-      assert.strictEqual(store.fitRequests.getSnapshot().value, fits + 1);
+      assert.strictEqual(
+        Optional.unwrap(store.fitRequests.getSnapshot()),
+        fits + 1,
+      );
     });
 
     test('waits for a layout still being computed', async () => {
@@ -914,7 +934,7 @@ describe(createDagLayoutStore, () => {
 
       store.autoArrange();
 
-      const fits = store.fitRequests.getSnapshot().value;
+      const fits = Optional.unwrap(store.fitRequests.getSnapshot());
 
       setState(three);
 
@@ -935,7 +955,10 @@ describe(createDagLayoutStore, () => {
       // From where they were, as for 自動整列.
       assert.deepStrictEqual(animated(store)?.get('task:b'), { x: 100, y: 0 });
 
-      assert.strictEqual(store.fitRequests.getSnapshot().value, fits + 1);
+      assert.strictEqual(
+        Optional.unwrap(store.fitRequests.getSnapshot()),
+        fits + 1,
+      );
 
       clock.advance(ANIMATION_MS);
 
@@ -991,7 +1014,10 @@ describe(createDagLayoutStore, () => {
 
       assert.strictEqual(saved.length, writes);
 
-      assert.deepStrictEqual(store.arrangement.getSnapshot().value, imported);
+      assert.deepStrictEqual(
+        Optional.unwrap(store.arrangement.getSnapshot()),
+        imported,
+      );
     });
 
     test('writes nothing while nothing was ever saved', async () => {
@@ -1013,7 +1039,7 @@ describe(createDagLayoutStore, () => {
 
       store.moveNode('task:b', { x: 300, y: 0 });
 
-      const fits = store.fitRequests.getSnapshot().value;
+      const fits = Optional.unwrap(store.fitRequests.getSnapshot());
 
       setState(three);
 
@@ -1034,7 +1060,10 @@ describe(createDagLayoutStore, () => {
 
       assert.isUndefined(animated(store));
 
-      assert.strictEqual(store.fitRequests.getSnapshot().value, fits);
+      assert.strictEqual(
+        Optional.unwrap(store.fitRequests.getSnapshot()),
+        fits,
+      );
     });
 
     test('does not lay the DAG out again for a new direction', async () => {
@@ -1180,7 +1209,7 @@ describe(createDagLayoutStore, () => {
     test('moves the nodes to a layout written elsewhere, and fits it', async () => {
       const { store, setStored, clock } = await shown();
 
-      const fits = store.fitRequests.getSnapshot().value;
+      const fits = Optional.unwrap(store.fitRequests.getSnapshot());
 
       setStored({
         direction: 'right',
@@ -1199,7 +1228,10 @@ describe(createDagLayoutStore, () => {
         ]),
       );
 
-      assert.strictEqual(store.fitRequests.getSnapshot().value, fits + 1);
+      assert.strictEqual(
+        Optional.unwrap(store.fitRequests.getSnapshot()),
+        fits + 1,
+      );
 
       clock.advance(ANIMATION_MS * 2);
 
@@ -1472,9 +1504,10 @@ describe(createDagLayoutStore, () => {
 
       assert.deepStrictEqual(
         new Map(
-          store.arcNodes
-            .getSnapshot()
-            .value.map(({ id, x, y }) => [id, { x, y }]),
+          Optional.unwrap(store.arcNodes.getSnapshot()).map(({ id, x, y }) => [
+            id,
+            { x, y },
+          ]),
         ),
         arcPlaces,
       );
@@ -1485,7 +1518,7 @@ describe(createDagLayoutStore, () => {
         state: mixed,
       });
 
-      const fits = store.fitRequests.getSnapshot().value;
+      const fits = Optional.unwrap(store.fitRequests.getSnapshot());
 
       setViewMode('arc');
 
@@ -1495,7 +1528,10 @@ describe(createDagLayoutStore, () => {
       // Still a change of mode, for the view, with nothing to fade.
       assert.deepStrictEqual(opacities(store), new Map<GraphNodeId, number>());
 
-      assert.strictEqual(store.fitRequests.getSnapshot().value, fits + 1);
+      assert.strictEqual(
+        Optional.unwrap(store.fitRequests.getSnapshot()),
+        fits + 1,
+      );
 
       clock.advance(ANIMATION_MS / 2);
 
@@ -1562,7 +1598,7 @@ describe(createDagLayoutStore, () => {
       assert.deepStrictEqual(saved, []);
 
       assert.deepStrictEqual(
-        store.arrangement.getSnapshot().value.positions,
+        Optional.unwrap(store.arrangement.getSnapshot()).positions,
         new Map<GraphNodeId, Point>(),
       );
     });
@@ -1570,15 +1606,20 @@ describe(createDagLayoutStore, () => {
     test('says how far the switch has got, for the view to follow', async () => {
       const { store, clock, setViewMode } = await shown({ state: mixed });
 
-      assert.isUndefined(store.animationProgress.getSnapshot().value);
+      assert.isUndefined(
+        Optional.unwrap(store.animationProgress.getSnapshot()),
+      );
 
       setViewMode('arc');
 
-      assert.strictEqual(store.animationProgress.getSnapshot().value, 0);
+      assert.strictEqual(
+        Optional.unwrap(store.animationProgress.getSnapshot()),
+        0,
+      );
 
       clock.advance(ANIMATION_MS / 2);
 
-      const middle = store.animationProgress.getSnapshot().value;
+      const middle = Optional.unwrap(store.animationProgress.getSnapshot());
 
       assert.isDefined(middle);
 
@@ -1589,7 +1630,9 @@ describe(createDagLayoutStore, () => {
 
       clock.advance(ANIMATION_MS / 2);
 
-      assert.isUndefined(store.animationProgress.getSnapshot().value);
+      assert.isUndefined(
+        Optional.unwrap(store.animationProgress.getSnapshot()),
+      );
     });
 
     test('switched back halfway, turns round from where the nodes are drawn', async () => {
@@ -1616,7 +1659,7 @@ describe(createDagLayoutStore, () => {
         animationSetting: 'off',
       });
 
-      const fits = store.fitRequests.getSnapshot().value;
+      const fits = Optional.unwrap(store.fitRequests.getSnapshot());
 
       setViewMode('arc');
 
@@ -1626,7 +1669,10 @@ describe(createDagLayoutStore, () => {
 
       assert.isFalse(clock.pending());
 
-      assert.strictEqual(store.fitRequests.getSnapshot().value, fits + 1);
+      assert.strictEqual(
+        Optional.unwrap(store.fitRequests.getSnapshot()),
+        fits + 1,
+      );
     });
 
     test('stops a switch whose frames are too slow', async () => {
@@ -1667,7 +1713,7 @@ describe(createDagLayoutStore, () => {
 
       // ELK has not answered yet.
       assert.strictEqual(
-        store.autoLayout.getSnapshot().value.type,
+        Optional.unwrap(store.autoLayout.getSnapshot()).type,
         'computing',
       );
 
@@ -1825,7 +1871,7 @@ describe(createDagLayoutStore, () => {
 
       clock.advance(ANIMATION_MS);
 
-      const fits = store.fitRequests.getSnapshot().value;
+      const fits = Optional.unwrap(store.fitRequests.getSnapshot());
 
       setStored({
         direction: 'right',
@@ -1835,7 +1881,10 @@ describe(createDagLayoutStore, () => {
 
       assert.isUndefined(animated(store));
 
-      assert.strictEqual(store.fitRequests.getSnapshot().value, fits);
+      assert.strictEqual(
+        Optional.unwrap(store.fitRequests.getSnapshot()),
+        fits,
+      );
 
       // It is there on the way back.
       setViewMode('dag');
@@ -1843,7 +1892,9 @@ describe(createDagLayoutStore, () => {
       clock.advance(ANIMATION_MS);
 
       assert.deepStrictEqual(
-        store.arrangement.getSnapshot().value.positions.get('task:x'),
+        Optional.unwrap(store.arrangement.getSnapshot()).positions.get(
+          'task:x',
+        ),
         { x: 500, y: 500 },
       );
     });
@@ -1908,7 +1959,7 @@ describe(createDagLayoutStore, () => {
         state: mixed,
       });
 
-      const fits = store.fitRequests.getSnapshot().value;
+      const fits = Optional.unwrap(store.fitRequests.getSnapshot());
 
       setNodeSize('compact');
 
@@ -1928,7 +1979,10 @@ describe(createDagLayoutStore, () => {
         ]),
       );
 
-      assert.strictEqual(store.fitRequests.getSnapshot().value, fits + 1);
+      assert.strictEqual(
+        Optional.unwrap(store.fitRequests.getSnapshot()),
+        fits + 1,
+      );
 
       clock.advance(ANIMATION_MS / 2);
 
@@ -1947,7 +2001,7 @@ describe(createDagLayoutStore, () => {
       assert.deepStrictEqual(saved, []);
 
       assert.deepStrictEqual(
-        store.arrangement.getSnapshot().value.positions,
+        Optional.unwrap(store.arrangement.getSnapshot()).positions,
         new Map<GraphNodeId, Point>(),
       );
     });
@@ -1986,7 +2040,10 @@ describe(createDagLayoutStore, () => {
 
       assert.deepStrictEqual(saved, []);
 
-      assert.deepStrictEqual(store.arrangement.getSnapshot().value, stored);
+      assert.deepStrictEqual(
+        Optional.unwrap(store.arrangement.getSnapshot()),
+        stored,
+      );
     });
 
     test('moves nothing, and still fits, when every node was put somewhere', async () => {
@@ -2003,7 +2060,7 @@ describe(createDagLayoutStore, () => {
         stored,
       });
 
-      const fits = store.fitRequests.getSnapshot().value;
+      const fits = Optional.unwrap(store.fitRequests.getSnapshot());
 
       setNodeSize('compact');
 
@@ -2015,7 +2072,10 @@ describe(createDagLayoutStore, () => {
 
       assert.isFalse(clock.pending());
 
-      assert.strictEqual(store.fitRequests.getSnapshot().value, fits + 1);
+      assert.strictEqual(
+        Optional.unwrap(store.fitRequests.getSnapshot()),
+        fits + 1,
+      );
 
       assert.deepStrictEqual(saved, []);
     });
@@ -2027,7 +2087,7 @@ describe(createDagLayoutStore, () => {
       });
 
       assert.deepStrictEqual(
-        store.arrangement.getSnapshot().value.positions,
+        Optional.unwrap(store.arrangement.getSnapshot()).positions,
         spreadAtLarge,
       );
     });
@@ -2041,7 +2101,7 @@ describe(createDagLayoutStore, () => {
 
       // Nothing moves until the new layout is there.
       assert.deepStrictEqual(
-        store.arrangement.getSnapshot().value,
+        Optional.unwrap(store.arrangement.getSnapshot()),
         spreadStored,
       );
 
@@ -2056,7 +2116,7 @@ describe(createDagLayoutStore, () => {
       assert.isUndefined(animated(store));
 
       assert.deepStrictEqual(
-        store.arrangement.getSnapshot().value.positions,
+        Optional.unwrap(store.arrangement.getSnapshot()).positions,
         spreadAtLarge,
       );
 
@@ -2068,7 +2128,7 @@ describe(createDagLayoutStore, () => {
 
       // Drawn again from what is stored, not off by rounding.
       assert.deepStrictEqual(
-        store.arrangement.getSnapshot().value,
+        Optional.unwrap(store.arrangement.getSnapshot()),
         spreadStored,
       );
 
@@ -2088,7 +2148,7 @@ describe(createDagLayoutStore, () => {
       await settle();
 
       assert.deepStrictEqual(
-        store.arrangement.getSnapshot().value.positions,
+        Optional.unwrap(store.arrangement.getSnapshot()).positions,
         spreadAtLarge,
       );
     });
@@ -2114,13 +2174,16 @@ describe(createDagLayoutStore, () => {
         },
       ]);
 
-      const drawn = store.arrangement.getSnapshot().value;
+      const drawn = Optional.unwrap(store.arrangement.getSnapshot());
 
       assert.deepStrictEqual(drawn.positions.get('task:b'), { x: 50, y: 30 });
 
       setStored(saved[0]);
 
-      assert.strictEqual(store.arrangement.getSnapshot().value, drawn);
+      assert.strictEqual(
+        Optional.unwrap(store.arrangement.getSnapshot()),
+        drawn,
+      );
 
       assert.isUndefined(animated(store));
     });
@@ -2202,7 +2265,9 @@ describe(createDagLayoutStore, () => {
       clock.advance(ANIMATION_MS);
 
       assert.deepStrictEqual(
-        store.arrangement.getSnapshot().value.positions.get('task:c'),
+        Optional.unwrap(store.arrangement.getSnapshot()).positions.get(
+          'task:c',
+        ),
         { x: 240, y: 0 },
       );
     });
@@ -2246,7 +2311,7 @@ describe(createDagLayoutStore, () => {
 
       // Laid out at 「大」.
       assert.deepStrictEqual(
-        store.arrangement.getSnapshot().value.positions,
+        Optional.unwrap(store.arrangement.getSnapshot()).positions,
         spreadAtLarge,
       );
 
@@ -2257,7 +2322,7 @@ describe(createDagLayoutStore, () => {
       await settle();
 
       assert.deepStrictEqual(
-        store.arrangement.getSnapshot().value,
+        Optional.unwrap(store.arrangement.getSnapshot()),
         spreadStored,
       );
     });
@@ -2304,7 +2369,7 @@ describe(createDagLayoutStore, () => {
       assert.strictEqual(deferred.requests.length, requests);
 
       assert.deepStrictEqual(
-        store.arrangement.getSnapshot().value.positions,
+        Optional.unwrap(store.arrangement.getSnapshot()).positions,
         spreadAtLarge,
       );
     });
@@ -2364,7 +2429,7 @@ describe(createDagLayoutStore, () => {
 
       clock.advance(ANIMATION_MS);
 
-      const fits = store.fitRequests.getSnapshot().value;
+      const fits = Optional.unwrap(store.fitRequests.getSnapshot());
 
       setNodeSize('compact');
 
@@ -2386,16 +2451,19 @@ describe(createDagLayoutStore, () => {
       // Not a change of mode: nothing fades.
       assert.isUndefined(opacities(store));
 
-      assert.strictEqual(store.fitRequests.getSnapshot().value, fits + 1);
+      assert.strictEqual(
+        Optional.unwrap(store.fitRequests.getSnapshot()),
+        fits + 1,
+      );
 
       clock.advance(ANIMATION_MS);
 
       assert.isUndefined(animated(store));
 
       assert.deepStrictEqual(
-        store.arcNodes
-          .getSnapshot()
-          .value.map(({ id, y, height }) => [id, y, height] as const),
+        Optional.unwrap(store.arcNodes.getSnapshot()).map(
+          ({ id, y, height }) => [id, y, height] as const,
+        ),
         [
           ['task:y', 0, COMPACT_TASK_NODE_SIZE.height],
           [
@@ -2591,7 +2659,10 @@ describe(createDagLayoutStore, () => {
     test('lays nothing out until the width of the canvas is known', () => {
       const { store } = setup({ state: mixed });
 
-      assert.deepStrictEqual(store.tileNodes.getSnapshot().value, []);
+      assert.deepStrictEqual(
+        Optional.unwrap(store.tileNodes.getSnapshot()),
+        [],
+      );
     });
 
     test('follows the order the diagrams share, as アーク does', () => {
@@ -2602,12 +2673,12 @@ describe(createDagLayoutStore, () => {
       setDiagramSort([{ key: 'title', order: 'desc' }]);
 
       assert.deepStrictEqual(
-        store.tileNodes.getSnapshot().value.map(({ id }) => id),
+        Optional.unwrap(store.tileNodes.getSnapshot()).map(({ id }) => id),
         ['task:x', 'task:y'],
       );
 
       assert.deepStrictEqual(
-        store.arcNodes.getSnapshot().value.map(({ id }) => id),
+        Optional.unwrap(store.arcNodes.getSnapshot()).map(({ id }) => id),
         ['task:x', 'task:y', 'milestone:m'],
       );
     });
@@ -2619,7 +2690,7 @@ describe(createDagLayoutStore, () => {
       // A width given outside タイル moves nothing.
       assert.isUndefined(animated(store));
 
-      const fits = store.fitRequests.getSnapshot().value;
+      const fits = Optional.unwrap(store.fitRequests.getSnapshot());
 
       setViewMode('tile');
 
@@ -2637,7 +2708,10 @@ describe(createDagLayoutStore, () => {
         new Map<GraphNodeId, number>([['milestone:m', 1]]),
       );
 
-      assert.strictEqual(store.fitRequests.getSnapshot().value, fits + 1);
+      assert.strictEqual(
+        Optional.unwrap(store.fitRequests.getSnapshot()),
+        fits + 1,
+      );
 
       clock.advance(ANIMATION_MS / 2);
 
@@ -2691,7 +2765,7 @@ describe(createDagLayoutStore, () => {
       assert.deepStrictEqual(saved, []);
 
       assert.deepStrictEqual(
-        store.arrangement.getSnapshot().value.positions,
+        Optional.unwrap(store.arrangement.getSnapshot()).positions,
         new Map<GraphNodeId, Point>(),
       );
     });
@@ -2754,7 +2828,7 @@ describe(createDagLayoutStore, () => {
         animationSetting: 'off',
       });
 
-      const fits = store.fitRequests.getSnapshot().value;
+      const fits = Optional.unwrap(store.fitRequests.getSnapshot());
 
       setViewMode('tile');
 
@@ -2764,7 +2838,10 @@ describe(createDagLayoutStore, () => {
 
       assert.isFalse(clock.pending());
 
-      assert.strictEqual(store.fitRequests.getSnapshot().value, fits + 1);
+      assert.strictEqual(
+        Optional.unwrap(store.fitRequests.getSnapshot()),
+        fits + 1,
+      );
     });
 
     test('a new width moves the tasks to their new rows, writing nothing', async () => {
@@ -2775,7 +2852,7 @@ describe(createDagLayoutStore, () => {
 
       clock.advance(ANIMATION_MS);
 
-      const fits = store.fitRequests.getSnapshot().value;
+      const fits = Optional.unwrap(store.fitRequests.getSnapshot());
 
       store.setTileWidth(oneColumn);
 
@@ -2784,7 +2861,10 @@ describe(createDagLayoutStore, () => {
       // Not a change of mode: nothing fades, and the view stays where it is.
       assert.isUndefined(opacities(store));
 
-      assert.strictEqual(store.fitRequests.getSnapshot().value, fits);
+      assert.strictEqual(
+        Optional.unwrap(store.fitRequests.getSnapshot()),
+        fits,
+      );
 
       clock.advance(ANIMATION_MS / 2);
 
@@ -2919,7 +2999,7 @@ describe(createDagLayoutStore, () => {
     test('in アーク, a new order moves the tasks to their new places, writing nothing', async () => {
       const { store, clock, saved, setDiagramSort } = await shownIn('arc');
 
-      const fits = store.fitRequests.getSnapshot().value;
+      const fits = Optional.unwrap(store.fitRequests.getSnapshot());
 
       assert.deepStrictEqual(arcColumn(store), byTitle);
 
@@ -2931,7 +3011,10 @@ describe(createDagLayoutStore, () => {
       // Not a change of mode: nothing fades, and the view stays where it is.
       assert.isUndefined(opacities(store));
 
-      assert.strictEqual(store.fitRequests.getSnapshot().value, fits);
+      assert.strictEqual(
+        Optional.unwrap(store.fitRequests.getSnapshot()),
+        fits,
+      );
 
       clock.advance(ANIMATION_MS / 2);
 
@@ -2990,7 +3073,7 @@ describe(createDagLayoutStore, () => {
         state: mixed,
       });
 
-      const fits = store.fitRequests.getSnapshot().value;
+      const fits = Optional.unwrap(store.fitRequests.getSnapshot());
 
       setDiagramSort(titleDescending);
 
@@ -2998,7 +3081,10 @@ describe(createDagLayoutStore, () => {
 
       assert.isFalse(clock.pending());
 
-      assert.strictEqual(store.fitRequests.getSnapshot().value, fits);
+      assert.strictEqual(
+        Optional.unwrap(store.fitRequests.getSnapshot()),
+        fits,
+      );
 
       assert.deepStrictEqual(saved, []);
 
@@ -3151,7 +3237,7 @@ describe(createDagLayoutStore, () => {
       assert.isUndefined(animated(store));
 
       assert.deepStrictEqual(
-        store.tileNodes.getSnapshot().value.map(({ id }) => id),
+        Optional.unwrap(store.tileNodes.getSnapshot()).map(({ id }) => id),
         ['task:x', 'task:y'],
       );
     });
@@ -3205,7 +3291,9 @@ describe(createDagLayoutStore, () => {
       await settle();
 
       assert.deepStrictEqual(
-        store.arrangement.getSnapshot().value.positions.get('task:b'),
+        Optional.unwrap(store.arrangement.getSnapshot()).positions.get(
+          'task:b',
+        ),
         { x: 5, y: 5 },
       );
     });
@@ -3307,7 +3395,7 @@ describe(createDagLayoutStore, () => {
       });
 
       assert.deepStrictEqual(
-        store.arcNodes.getSnapshot().value.map(({ id }) => id),
+        Optional.unwrap(store.arcNodes.getSnapshot()).map(({ id }) => id),
         ['task:y', 'task:z'],
       );
     });
@@ -3360,13 +3448,13 @@ describe(createDagLayoutStore, () => {
     test('lists each group with the nodes in it that are drawn', () => {
       const { store, setHidden } = setup({ state: grouped, groups: [groupG] });
 
-      assert.deepStrictEqual(store.membership.getSnapshot().value, [
+      assert.deepStrictEqual(Optional.unwrap(store.membership.getSnapshot()), [
         { id: g, members: ['task:a'] },
       ]);
 
       setHidden(new Set<GraphNodeId>(['task:a']));
 
-      assert.deepStrictEqual(store.membership.getSnapshot().value, [
+      assert.deepStrictEqual(Optional.unwrap(store.membership.getSnapshot()), [
         { id: g, members: [] },
       ]);
     });
@@ -3424,7 +3512,9 @@ describe(createDagLayoutStore, () => {
       assert.strictEqual(saved.length, writes);
 
       assert.deepStrictEqual(
-        store.arrangement.getSnapshot().value.positions.get('task:b'),
+        Optional.unwrap(store.arrangement.getSnapshot()).positions.get(
+          'task:b',
+        ),
         { x: 50, y: 0 },
       );
     });
@@ -3436,7 +3526,7 @@ describe(createDagLayoutStore, () => {
 
       assert.deepStrictEqual(regrouped, [['task:a', undefined]]);
 
-      assert.deepStrictEqual(store.membership.getSnapshot().value, [
+      assert.deepStrictEqual(Optional.unwrap(store.membership.getSnapshot()), [
         { id: g, members: [] },
       ]);
     });

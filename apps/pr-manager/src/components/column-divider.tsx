@@ -1,4 +1,5 @@
 import { constant, type JSX } from 'synstate-dom';
+import { Optional } from 'ts-data-forge';
 import { splitAt, type LineIndex } from '../layout.mjs';
 import { layoutStore } from '../store/index.mjs';
 
@@ -23,7 +24,8 @@ type Props = Readonly<{
  */
 export const ColumnDivider = ({ position }: Props): JSX.Element => {
   const line = (): LineIndex =>
-    position === 'last' && layoutStore.layout.getSnapshot().value.columns === 3
+    position === 'last' &&
+    Optional.unwrap(layoutStore.layout.getSnapshot()).columns === 3
       ? 1
       : 0;
 

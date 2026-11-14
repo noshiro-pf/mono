@@ -1,6 +1,7 @@
 import { Icon } from 'blueprint-synstate';
 import { map } from 'synstate';
 import { constant, If, type JSX } from 'synstate-dom';
+import { Optional } from 'ts-data-forge';
 import { m } from '../i18n/index.mjs';
 import { dagFilterStore, narrowStore, uiStore } from '../store/index.mjs';
 import {
@@ -72,6 +73,6 @@ export const currentSettingsPlacement = (): SettingsPanelPlacement => {
   return settingsPanelPlacement(
     anchor ?? { bottom: 0, right: page.clientWidth },
     { width: page.clientWidth, height: page.clientHeight },
-    narrowStore.matches.getSnapshot().value,
+    Optional.unwrap(narrowStore.matches.getSnapshot()),
   );
 };

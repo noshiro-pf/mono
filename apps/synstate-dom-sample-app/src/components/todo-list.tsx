@@ -7,7 +7,7 @@ import {
   mapBindable,
   type JSX,
 } from 'synstate-dom';
-import { Arr } from 'ts-data-forge';
+import { Arr, Optional } from 'ts-data-forge';
 import {
   addTodo,
   clearDone,
@@ -80,7 +80,7 @@ export const TodoList = (): JSX.Element => {
                       type={constant('checkbox')}
                       checked={todo$.pipe(map((todo) => todo.done))}
                       onChange={() => {
-                        toggleTodo(todo$.getSnapshot().value.id);
+                        toggleTodo(Optional.unwrap(todo$.getSnapshot()).id);
                       }}
                     />
                     {index$.pipe(map((i) => `${i + 1}. `))}
@@ -92,7 +92,7 @@ export const TodoList = (): JSX.Element => {
                       map((todo) => `Remove ${todo.title}`),
                     )}
                     onClick={() => {
-                      removeTodo(todo$.getSnapshot().value.id);
+                      removeTodo(Optional.unwrap(todo$.getSnapshot()).id);
                     }}
                   >
                     {constant('×')}

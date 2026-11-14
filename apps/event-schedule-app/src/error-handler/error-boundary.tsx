@@ -13,7 +13,7 @@ import {
   getCurrentScope,
 } from 'synstate';
 import { constant, If, mapBindable, mountable, type JSX } from 'synstate-dom';
-import { Json, Result, unknownToString } from 'ts-data-forge';
+import { Json, Optional, Result, unknownToString } from 'ts-data-forge';
 import {
   ButtonsWrapperAlignEnd,
   maxWidthModalClass,
@@ -91,7 +91,7 @@ const ErrorScreen = ({ error }: Readonly<{ error: unknown }>): JSX.Element => {
             Json.stringify({
               error: unknownToString(error),
               errorInfo: undefined,
-              description: description$.getSnapshot().value,
+              description: Optional.unwrap(description$.getSnapshot()),
             }),
           ) ?? '',
       })

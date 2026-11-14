@@ -1,3 +1,4 @@
+import { Optional } from 'ts-data-forge';
 import { createAuthStore, type AuthStore } from './auth-store.mjs';
 
 describe(createAuthStore, () => {
@@ -16,13 +17,17 @@ describe(createAuthStore, () => {
 
     assert.strictEqual(store.getFireAuthUserSnapshot(), alice);
 
-    assert.isTrue(store.passwordProviderIncluded$.getSnapshot().value);
+    assert.isTrue(
+      Optional.unwrap(store.passwordProviderIncluded$.getSnapshot()),
+    );
 
     auth.emit(undefined);
 
     assert.isUndefined(store.getFireAuthUserSnapshot());
 
-    assert.isFalse(store.passwordProviderIncluded$.getSnapshot().value);
+    assert.isFalse(
+      Optional.unwrap(store.passwordProviderIncluded$.getSnapshot()),
+    );
   });
 
   test('a user signed in with Google only has no password provider', () => {
@@ -32,7 +37,9 @@ describe(createAuthStore, () => {
 
     auth.emit(fakeUser('bob', ['google.com']));
 
-    assert.isFalse(store.passwordProviderIncluded$.getSnapshot().value);
+    assert.isFalse(
+      Optional.unwrap(store.passwordProviderIncluded$.getSnapshot()),
+    );
   });
 
   test('stop ends the listening', () => {
@@ -84,7 +91,7 @@ describe(createAuthStore, () => {
 
     assert.deepStrictEqual(mut_names, ['Alice', 'Alicia']);
 
-    assert.strictEqual(store.email$.getSnapshot().value, null);
+    assert.strictEqual(Optional.unwrap(store.email$.getSnapshot()), null);
   });
 
   test('signs out, then goes to the sign-in page', async () => {

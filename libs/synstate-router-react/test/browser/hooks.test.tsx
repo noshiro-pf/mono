@@ -62,13 +62,19 @@ describe('hooks', () => {
 
     assert.isTrue(blocked.status === 'blocked' && blocked.to.route === 'home');
 
-    assert.strictEqual(router.match.getSnapshot().value.route, 'settings');
+    assert.strictEqual(
+      Optional.unwrap(router.match.getSnapshot()).route,
+      'settings',
+    );
 
     act(() => {
       blocked.proceed();
     });
 
-    assert.strictEqual(router.match.getSnapshot().value.route, 'home');
+    assert.strictEqual(
+      Optional.unwrap(router.match.getSnapshot()).route,
+      'home',
+    );
 
     assert.strictEqual(view.result.current.status, 'idle');
 
@@ -77,7 +83,10 @@ describe('hooks', () => {
     // Unmounted: nothing blocks.
     router.push(routes.settings.href());
 
-    assert.strictEqual(router.match.getSnapshot().value.route, 'settings');
+    assert.strictEqual(
+      Optional.unwrap(router.match.getSnapshot()).route,
+      'settings',
+    );
   });
 
   test('useBlocker asks the latest function', () => {
@@ -95,7 +104,10 @@ describe('hooks', () => {
       router.push(routes.home.href());
     });
 
-    assert.strictEqual(router.match.getSnapshot().value.route, 'home');
+    assert.strictEqual(
+      Optional.unwrap(router.match.getSnapshot()).route,
+      'home',
+    );
 
     view.rerender({ dirty: true });
 
@@ -103,7 +115,10 @@ describe('hooks', () => {
       router.push(routes.settings.href());
     });
 
-    assert.strictEqual(router.match.getSnapshot().value.route, 'home');
+    assert.strictEqual(
+      Optional.unwrap(router.match.getSnapshot()).route,
+      'home',
+    );
 
     assert.strictEqual(view.result.current.status, 'blocked');
   });
@@ -127,7 +142,7 @@ describe('hooks', () => {
 
     assert.isTrue(Optional.isSome(values));
 
-    assert.strictEqual(values.value.search.page, 1);
+    assert.strictEqual(Optional.unwrap(values).search.page, 1);
   });
 
   test('useIsActive is true at or below the node, or at it alone with exact', () => {

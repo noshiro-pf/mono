@@ -1,3 +1,4 @@
+import { Optional } from 'ts-data-forge';
 import { memoryStore } from '../../test/index.mjs';
 import { TOKEN_KEY } from '../github/index.mjs';
 import { createTokenStore } from './token-store.mjs';
@@ -12,7 +13,7 @@ describe(createTokenStore, () => {
 
     const store = createTokenStore({ device, session });
 
-    assert.isTrue(store.remember.getSnapshot().value);
+    assert.isTrue(Optional.unwrap(store.remember.getSnapshot()));
 
     store.setTyped('new');
 
@@ -29,7 +30,7 @@ describe(createTokenStore, () => {
       session: memoryStore(),
     });
 
-    assert.isFalse(none.remember.getSnapshot().value);
+    assert.isFalse(Optional.unwrap(none.remember.getSnapshot()));
 
     const session = memoryStore();
 
@@ -37,7 +38,7 @@ describe(createTokenStore, () => {
 
     const inSession = createTokenStore({ device: memoryStore(), session });
 
-    assert.isFalse(inSession.remember.getSnapshot().value);
+    assert.isFalse(Optional.unwrap(inSession.remember.getSnapshot()));
   });
 
   test('clears the box once the token is forgotten', () => {
@@ -49,7 +50,7 @@ describe(createTokenStore, () => {
 
     store.clear();
 
-    assert.isFalse(store.remember.getSnapshot().value);
+    assert.isFalse(Optional.unwrap(store.remember.getSnapshot()));
   });
 
   test('tokenValue stays quiet while only the place changes', () => {
@@ -80,6 +81,9 @@ describe(createTokenStore, () => {
 
     assert.deepStrictEqual(mut_seen, [undefined, 'a', 'b']);
 
-    assert.strictEqual(store.token.getSnapshot().value?.place, 'device');
+    assert.strictEqual(
+      Optional.unwrap(store.token.getSnapshot())?.place,
+      'device',
+    );
   });
 });

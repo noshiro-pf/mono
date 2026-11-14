@@ -1,5 +1,5 @@
 import { createState, source, type SourceObservable } from 'synstate';
-import { Result } from 'ts-data-forge';
+import { Optional, Result } from 'ts-data-forge';
 import { CLOCK_TICK_MS, POLL_INTERVAL_MS } from '../constants.mjs';
 import type { Answered } from '../graphql.mjs';
 import type {
@@ -29,7 +29,10 @@ describe(createReader, () => {
 
     assert.deepStrictEqual(loads, []);
 
-    assert.deepStrictEqual(reader.loadStatus.getSnapshot().value, LOADING);
+    assert.deepStrictEqual(
+      Optional.unwrap(reader.loadStatus.getSnapshot()),
+      LOADING,
+    );
   });
 
   test('reads at once with a token, and shows what it answers', async () => {
@@ -48,9 +51,12 @@ describe(createReader, () => {
 
     assert.deepStrictEqual(shown(reader), { status: READY, readAt: 1_000 });
 
-    assert.deepStrictEqual(reader.rateLimit.getSnapshot().value, LIMIT);
+    assert.deepStrictEqual(
+      Optional.unwrap(reader.rateLimit.getSnapshot()),
+      LIMIT,
+    );
 
-    assert.strictEqual(reader.nowMs.getSnapshot().value, 1_500);
+    assert.strictEqual(Optional.unwrap(reader.nowMs.getSnapshot()), 1_500);
   });
 
   test('draws the first read part by part, as its parts answer', async () => {
@@ -71,12 +77,12 @@ describe(createReader, () => {
 
     assert.deepStrictEqual(shown(reader), { status: READY, readAt: 1_000 });
 
-    assert.deepStrictEqual(reader.reading.getSnapshot().value, [
+    assert.deepStrictEqual(Optional.unwrap(reader.reading.getSnapshot()), [
       'merged',
       'issues',
     ]);
 
-    assert.strictEqual(reader.nowMs.getSnapshot().value, 1_200);
+    assert.strictEqual(Optional.unwrap(reader.nowMs.getSnapshot()), 1_200);
 
     await answer(
       loads,
@@ -85,9 +91,11 @@ describe(createReader, () => {
       LIMIT,
     );
 
-    assert.deepStrictEqual(reader.reading.getSnapshot().value, []);
+    assert.deepStrictEqual(Optional.unwrap(reader.reading.getSnapshot()), []);
 
-    assert.deepStrictEqual(reader.merged.getSnapshot().value, [MERGED]);
+    assert.deepStrictEqual(Optional.unwrap(reader.merged.getSnapshot()), [
+      MERGED,
+    ]);
   });
 
   test('replaces a report on screen whole, never part by part', async () => {
@@ -120,19 +128,22 @@ describe(createReader, () => {
 
     await answer(loads, 0, Result.err('refused'), LIMIT);
 
-    assert.deepStrictEqual(reader.loadStatus.getSnapshot().value, {
+    assert.deepStrictEqual(Optional.unwrap(reader.loadStatus.getSnapshot()), {
       type: 'ready',
       pollError: 'refused',
       refreshing: false,
     });
 
     // Nothing it asked for is coming any more.
-    assert.deepStrictEqual(reader.reading.getSnapshot().value, []);
+    assert.deepStrictEqual(Optional.unwrap(reader.reading.getSnapshot()), []);
 
-    assert.deepStrictEqual(reader.failed.getSnapshot().value.merged, {
-      message: 'refused',
-      kept: false,
-    });
+    assert.deepStrictEqual(
+      Optional.unwrap(reader.failed.getSnapshot()).merged,
+      {
+        message: 'refused',
+        kept: false,
+      },
+    );
   });
 
   test('drops the parts of a read for a token since forgotten', () => {
@@ -158,7 +169,10 @@ describe(createReader, () => {
 
     await answer(loads, 1, Result.err('network'), undefined);
 
-    assert.deepStrictEqual(reader.rateLimit.getSnapshot().value, LIMIT);
+    assert.deepStrictEqual(
+      Optional.unwrap(reader.rateLimit.getSnapshot()),
+      LIMIT,
+    );
   });
 
   test('polls while the tab is visible', async () => {
@@ -220,7 +234,10 @@ describe(createReader, () => {
 
     await answer(loads, 1, Result.ok(readAt(16_000)), budget(3970));
 
-    assert.strictEqual(reader.pollIntervalMs.getSnapshot().value, 90_000);
+    assert.strictEqual(
+      Optional.unwrap(reader.pollIntervalMs.getSnapshot()),
+      90_000,
+    );
 
     // The fifteen-second timer is gone, and the next read is 90 seconds on.
     assert.strictEqual(timers.running(POLL_INTERVAL_MS), 0);
@@ -263,7 +280,7 @@ describe(createReader, () => {
 
     assert.strictEqual(loads.length, 2);
 
-    assert.strictEqual(reader.nowMs.getSnapshot().value, 20_000);
+    assert.strictEqual(Optional.unwrap(reader.nowMs.getSnapshot()), 20_000);
   });
 
   // Each read costs the whole report's points, and a reader going back and forth
@@ -284,7 +301,7 @@ describe(createReader, () => {
 
     assert.strictEqual(loads.length, 1);
 
-    assert.strictEqual(reader.nowMs.getSnapshot().value, 5_000);
+    assert.strictEqual(Optional.unwrap(reader.nowMs.getSnapshot()), 5_000);
 
     assert.strictEqual(timers.running(POLL_INTERVAL_MS), 0);
 
@@ -340,7 +357,7 @@ describe(createReader, () => {
 
     await answer(loads, 1, Result.err('refused'), LIMIT);
 
-    assert.deepStrictEqual(reader.loadStatus.getSnapshot().value, {
+    assert.deepStrictEqual(Optional.unwrap(reader.loadStatus.getSnapshot()), {
       type: 'ready',
       pollError: 'refused',
       refreshing: false,
@@ -473,7 +490,7 @@ describe(createReader, () => {
 
     timers.fire(CLOCK_TICK_MS);
 
-    assert.strictEqual(reader.nowMs.getSnapshot().value, 42_000);
+    assert.strictEqual(Optional.unwrap(reader.nowMs.getSnapshot()), 42_000);
   });
 
   test('leaves the clock alone while the tab is hidden', () => {
@@ -487,7 +504,7 @@ describe(createReader, () => {
 
     timers.fire(CLOCK_TICK_MS);
 
-    assert.strictEqual(reader.nowMs.getSnapshot().value, 0);
+    assert.strictEqual(Optional.unwrap(reader.nowMs.getSnapshot()), 0);
   });
 
   // A poll answers every fifteen seconds whether or not anything changed.
@@ -510,7 +527,7 @@ describe(createReader, () => {
 
     assert.deepStrictEqual(written(), ['readAt']);
 
-    assert.strictEqual(reader.readAt.getSnapshot().value, 2_000);
+    assert.strictEqual(Optional.unwrap(reader.readAt.getSnapshot()), 2_000);
   });
 
   test('a part that a read changed is replaced, and the others are kept', async () => {
@@ -533,7 +550,9 @@ describe(createReader, () => {
       LIMIT,
     );
 
-    assert.deepStrictEqual(reader.merged.getSnapshot().value, [MERGED]);
+    assert.deepStrictEqual(Optional.unwrap(reader.merged.getSnapshot()), [
+      MERGED,
+    ]);
 
     assert.deepStrictEqual(written(), ['merged', 'readAt']);
   });
@@ -550,7 +569,7 @@ describe(createReader, () => {
       LIMIT,
     );
 
-    const [held] = reader.merged.getSnapshot().value;
+    const [held] = Optional.unwrap(reader.merged.getSnapshot());
 
     clock.set(3_000);
 
@@ -566,7 +585,7 @@ describe(createReader, () => {
       LIMIT,
     );
 
-    const [added, kept] = reader.merged.getSnapshot().value;
+    const [added, kept] = Optional.unwrap(reader.merged.getSnapshot());
 
     assert.strictEqual(added?.number, 8);
 
@@ -578,13 +597,13 @@ describe(createReader, () => {
 
     reader.start();
 
-    assert.deepStrictEqual(reader.loadStatus.getSnapshot().value, {
+    assert.deepStrictEqual(Optional.unwrap(reader.loadStatus.getSnapshot()), {
       type: 'loading',
     });
 
     await answer(loads, 0, Result.ok(readAt(1_000)), LIMIT);
 
-    const readyStatus = reader.loadStatus.getSnapshot().value;
+    const readyStatus = Optional.unwrap(reader.loadStatus.getSnapshot());
 
     assert.deepStrictEqual(readyStatus, READY);
 
@@ -594,7 +613,10 @@ describe(createReader, () => {
 
     await answer(loads, 1, Result.ok(readAt(2_000)), LIMIT);
 
-    assert.strictEqual(reader.loadStatus.getSnapshot().value, readyStatus);
+    assert.strictEqual(
+      Optional.unwrap(reader.loadStatus.getSnapshot()),
+      readyStatus,
+    );
 
     clock.set(5_000);
 
@@ -602,7 +624,7 @@ describe(createReader, () => {
 
     await answer(loads, 2, Result.err('refused'), LIMIT);
 
-    assert.deepStrictEqual(reader.loadStatus.getSnapshot().value, {
+    assert.deepStrictEqual(Optional.unwrap(reader.loadStatus.getSnapshot()), {
       type: 'ready',
       pollError: 'refused',
       refreshing: false,
@@ -623,9 +645,9 @@ describe(createReader, () => {
 
     setToken(undefined);
 
-    assert.deepStrictEqual(reader.merged.getSnapshot().value, []);
+    assert.deepStrictEqual(Optional.unwrap(reader.merged.getSnapshot()), []);
 
-    assert.strictEqual(reader.readAt.getSnapshot().value, 0);
+    assert.strictEqual(Optional.unwrap(reader.readAt.getSnapshot()), 0);
   });
 
   test('hands each read what the last one shown had, until the token changes', async () => {
@@ -649,9 +671,15 @@ describe(createReader, () => {
     );
 
     // Each panel says what of it failed; the page as a whole is not a failure.
-    assert.deepStrictEqual(reader.failed.getSnapshot().value, failed);
+    assert.deepStrictEqual(
+      Optional.unwrap(reader.failed.getSnapshot()),
+      failed,
+    );
 
-    assert.deepStrictEqual(reader.loadStatus.getSnapshot().value, READY);
+    assert.deepStrictEqual(
+      Optional.unwrap(reader.loadStatus.getSnapshot()),
+      READY,
+    );
 
     clock.set(2_000);
 
@@ -717,7 +745,7 @@ describe(createReader, () => {
     reader.refreshPane('merged');
 
     assert.deepStrictEqual(
-      reader.paneReading.getSnapshot().value,
+      Optional.unwrap(reader.paneReading.getSnapshot()),
       new Set<PaneRead>(['merged']),
     );
 
@@ -742,10 +770,12 @@ describe(createReader, () => {
       undefined,
     );
 
-    assert.deepStrictEqual(reader.merged.getSnapshot().value, [MERGED]);
+    assert.deepStrictEqual(Optional.unwrap(reader.merged.getSnapshot()), [
+      MERGED,
+    ]);
 
     // The page is said to be read when its pull requests were.
-    assert.strictEqual(reader.readAt.getSnapshot().value, 5_000);
+    assert.strictEqual(Optional.unwrap(reader.readAt.getSnapshot()), 5_000);
 
     reader.refreshPane('pulls');
 
@@ -786,7 +816,7 @@ describe(createReader, () => {
     // the next read of the page.
     await answer(sectionLoads, 0, Result.err('timed out'), undefined);
 
-    assert.deepStrictEqual(reader.loadStatus.getSnapshot().value, {
+    assert.deepStrictEqual(Optional.unwrap(reader.loadStatus.getSnapshot()), {
       type: 'ready',
       pollError: 'timed out',
       refreshing: false,
@@ -806,7 +836,7 @@ describe(createReader, () => {
 
     await answer(loads, 0, Result.ok(readAt(1_000)), LIMIT);
 
-    assert.strictEqual(reader.readAt.getSnapshot().value, 2_000);
+    assert.strictEqual(Optional.unwrap(reader.readAt.getSnapshot()), 2_000);
   });
 
   test('reads again when the token changes, and not when only where it is kept does', () => {
@@ -849,7 +879,7 @@ describe(createReader, () => {
 
     await settle();
 
-    assert.deepStrictEqual(reader.loadStatus.getSnapshot().value, {
+    assert.deepStrictEqual(Optional.unwrap(reader.loadStatus.getSnapshot()), {
       type: 'failed',
       message: 'boom',
     });
@@ -865,7 +895,7 @@ describe(createReader, () => {
       ['a'],
     );
 
-    assert.deepStrictEqual(reader.runs.getSnapshot().value, {
+    assert.deepStrictEqual(Optional.unwrap(reader.runs.getSnapshot()), {
       type: 'reading',
     });
 
@@ -874,7 +904,7 @@ describe(createReader, () => {
     // The runs do not wait for the report, nor the report for them.
     assert.deepStrictEqual(shown(reader), { status: LOADING, readAt: 0 });
 
-    assert.deepStrictEqual(reader.runs.getSnapshot().value, {
+    assert.deepStrictEqual(Optional.unwrap(reader.runs.getSnapshot()), {
       type: 'ready',
       list: RUNS,
       error: undefined,
@@ -898,7 +928,7 @@ describe(createReader, () => {
 
     await answerRuns(runsLoads, 0, Result.err('refused'));
 
-    assert.deepStrictEqual(reader.runs.getSnapshot().value, {
+    assert.deepStrictEqual(Optional.unwrap(reader.runs.getSnapshot()), {
       type: 'failed',
       message: 'refused',
     });
@@ -921,7 +951,7 @@ describe(createReader, () => {
 
     await answerRuns(runsLoads, 2, Result.err('spent'));
 
-    assert.deepStrictEqual(reader.runs.getSnapshot().value, {
+    assert.deepStrictEqual(Optional.unwrap(reader.runs.getSnapshot()), {
       type: 'ready',
       list: RUNS,
       error: 'spent',
@@ -971,7 +1001,7 @@ describe(createReader, () => {
 
     await answerRuns(runsLoads, 0, Result.ok(RUNS));
 
-    assert.deepStrictEqual(reader.runs.getSnapshot().value, {
+    assert.deepStrictEqual(Optional.unwrap(reader.runs.getSnapshot()), {
       type: 'ready',
       list: NO_RUNS,
       error: undefined,
@@ -989,7 +1019,7 @@ describe(createReader, () => {
 
     setToken(undefined);
 
-    assert.deepStrictEqual(reader.runs.getSnapshot().value, {
+    assert.deepStrictEqual(Optional.unwrap(reader.runs.getSnapshot()), {
       type: 'reading',
     });
 
@@ -1001,7 +1031,7 @@ describe(createReader, () => {
 
     await answerRuns(runsLoads, 1, Result.ok(RUNS));
 
-    assert.deepStrictEqual(reader.runs.getSnapshot().value, {
+    assert.deepStrictEqual(Optional.unwrap(reader.runs.getSnapshot()), {
       type: 'reading',
     });
   });
@@ -1017,7 +1047,10 @@ describe(createReader, () => {
 
     await settle();
 
-    assert.strictEqual(reader.runs.getSnapshot().value.type, 'failed');
+    assert.strictEqual(
+      Optional.unwrap(reader.runs.getSnapshot()).type,
+      'failed',
+    );
   });
 
   test('stop ends the timers and the listeners', () => {
@@ -1071,7 +1104,7 @@ describe(createReader, () => {
         [{ token: 'a', after: 'c1', first: ISSUES_PAGE_SIZE }],
       );
 
-      assert.deepStrictEqual(reader.moreIssues.getSnapshot().value, {
+      assert.deepStrictEqual(Optional.unwrap(reader.moreIssues.getSnapshot()), {
         type: 'loading',
       });
 
@@ -1079,9 +1112,12 @@ describe(createReader, () => {
 
       assert.deepStrictEqual(listed(reader), [1, 2]);
 
-      assert.strictEqual(reader.issues.getSnapshot().value.endCursor, 'c2');
+      assert.strictEqual(
+        Optional.unwrap(reader.issues.getSnapshot()).endCursor,
+        'c2',
+      );
 
-      assert.deepStrictEqual(reader.moreIssues.getSnapshot().value, {
+      assert.deepStrictEqual(Optional.unwrap(reader.moreIssues.getSnapshot()), {
         type: 'idle',
       });
 
@@ -1169,7 +1205,7 @@ describe(createReader, () => {
 
       assert.deepStrictEqual(listed(reader), [1, 2]);
 
-      assert.strictEqual(reader.readAt.getSnapshot().value, 2_000);
+      assert.strictEqual(Optional.unwrap(reader.readAt.getSnapshot()), 2_000);
     });
 
     test('a page a newer read already listed is dropped', async () => {
@@ -1212,7 +1248,7 @@ describe(createReader, () => {
 
       await answerIssues(issueLoads, 0, Result.err('network'));
 
-      assert.deepStrictEqual(reader.moreIssues.getSnapshot().value, {
+      assert.deepStrictEqual(Optional.unwrap(reader.moreIssues.getSnapshot()), {
         type: 'failed',
         message: 'network',
       });
@@ -1237,7 +1273,7 @@ describe(createReader, () => {
 
       assert.deepStrictEqual(listed(reader), [1]);
 
-      assert.deepStrictEqual(reader.moreIssues.getSnapshot().value, {
+      assert.deepStrictEqual(Optional.unwrap(reader.moreIssues.getSnapshot()), {
         type: 'idle',
       });
     });
@@ -1248,21 +1284,21 @@ describe(createReader, () => {
 
     reader.start();
 
-    assert.isTrue(reader.fetching.getSnapshot().value);
+    assert.isTrue(Optional.unwrap(reader.fetching.getSnapshot()));
 
     await answer(loads, 0, Result.ok(readAt(1_000)), LIMIT);
 
-    assert.isFalse(reader.fetching.getSnapshot().value);
+    assert.isFalse(Optional.unwrap(reader.fetching.getSnapshot()));
 
     timers.fire(POLL_INTERVAL_MS);
 
-    assert.isTrue(reader.fetching.getSnapshot().value);
+    assert.isTrue(Optional.unwrap(reader.fetching.getSnapshot()));
 
     loads[1]?.reject(new Error('boom'));
 
     await settle();
 
-    assert.isFalse(reader.fetching.getSnapshot().value);
+    assert.isFalse(Optional.unwrap(reader.fetching.getSnapshot()));
   });
 
   test('a load that throws rather than rejects is not a read left out for good', async () => {
@@ -1285,9 +1321,9 @@ describe(createReader, () => {
 
     await settle();
 
-    assert.isFalse(reader.fetching.getSnapshot().value);
+    assert.isFalse(Optional.unwrap(reader.fetching.getSnapshot()));
 
-    assert.deepStrictEqual(reader.loadStatus.getSnapshot().value, {
+    assert.deepStrictEqual(Optional.unwrap(reader.loadStatus.getSnapshot()), {
       type: 'failed',
       message: 'boom',
     });
@@ -1484,14 +1520,16 @@ const answerIssues = async (
 };
 
 const listed = (reader: Reader): readonly number[] =>
-  reader.issues.getSnapshot().value.items.map(({ number }) => number);
+  Optional.unwrap(reader.issues.getSnapshot()).items.map(
+    ({ number }) => number,
+  );
 
 const shown = (
   reader: Reader,
 ): Readonly<{ status: LoadStatus; readAt: number }> =>
   ({
-    status: reader.loadStatus.getSnapshot().value,
-    readAt: reader.readAt.getSnapshot().value,
+    status: Optional.unwrap(reader.loadStatus.getSnapshot()),
+    readAt: Optional.unwrap(reader.readAt.getSnapshot()),
   }) as const;
 
 /**

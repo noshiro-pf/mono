@@ -4,6 +4,7 @@ import {
   map,
   type InitializedObservable,
 } from 'synstate';
+import { Optional } from 'ts-data-forge';
 import {
   drawnColumns,
   type BlockId,
@@ -45,7 +46,7 @@ export const createLayoutStore = (
       deps.field.update(fn);
     },
     get: deps.field.get,
-    getAbsent: () => deps.absent.getSnapshot().value,
+    getAbsent: () => Optional.unwrap(deps.absent.getSnapshot()),
     dialogOpen,
     setDialogOpen: (open) => {
       setDialogOpen(open);

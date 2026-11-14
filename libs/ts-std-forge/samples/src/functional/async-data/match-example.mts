@@ -7,7 +7,9 @@ if (import.meta.vitest !== undefined) {
     const render = AsyncData.match({
       idle: () => 'Press the button',
       pending: (previous: Optional<number>) =>
-        Optional.isSome(previous) ? `Updating ${previous.value}` : 'Loading',
+        Optional.isSome(previous)
+          ? `Updating ${Optional.unwrap(previous)}`
+          : 'Loading',
       ok: (value: number) => `Value: ${value}`,
       err: (error: string) => `Failed: ${error}`,
     });

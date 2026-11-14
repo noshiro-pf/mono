@@ -3,6 +3,7 @@ import {
   onScopeDispose,
   type InitializedObservable,
 } from 'synstate';
+import { Optional } from 'ts-data-forge';
 import {
   draggedLeft,
   inWindow,
@@ -87,7 +88,7 @@ export const queueStripBox = (): Readonly<{
 
     const next = measured(list);
 
-    if (!sameStrip(next, strip$.getSnapshot().value)) {
+    if (!sameStrip(next, Optional.unwrap(strip$.getSnapshot()))) {
       setStrip(next);
     }
   };
@@ -147,7 +148,7 @@ export const queueStripBox = (): Readonly<{
         return;
       }
 
-      const strip = strip$.getSnapshot().value;
+      const strip = Optional.unwrap(strip$.getSnapshot());
 
       // Where the strip is now rather than as last measured: a frame grabbed
       // while a jump is still scrolling it stops under the pointer.
@@ -178,7 +179,7 @@ export const queueStripBox = (): Readonly<{
 
       list.scrollTo({
         left: draggedLeft(
-          strip$.getSnapshot().value,
+          Optional.unwrap(strip$.getSnapshot()),
           drag.from,
           fraction - drag.at,
         ),

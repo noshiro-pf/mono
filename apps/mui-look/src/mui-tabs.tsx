@@ -1,5 +1,6 @@
 import { type InitializedObservable, map } from 'synstate';
 import { constant, type JSX } from 'synstate-dom';
+import { Optional } from 'ts-data-forge';
 import { nextTabFocus } from './next-tab-focus.mjs';
 
 type Props = Readonly<{
@@ -73,7 +74,7 @@ export const MuiTabs = ({
             type={constant('button')}
             onClick={() => {
               // Only for a change of tab, as MUI's `onChange`.
-              if (tabIndex.getSnapshot().value !== index) {
+              if (Optional.unwrap(tabIndex.getSnapshot()) !== index) {
                 tabIndexChange(index);
               }
             }}

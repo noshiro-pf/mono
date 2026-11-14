@@ -54,7 +54,7 @@ if (import.meta.vitest !== undefined) {
     );
 
     if (Optional.isSome(oldestPerson)) {
-      assert.isTrue(oldestPerson.value.name === 'Charlie');
+      assert.isTrue(Optional.unwrap(oldestPerson).name === 'Charlie');
     }
 
     // embed-sample-code-ignore-below

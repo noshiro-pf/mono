@@ -95,7 +95,10 @@ export type LinkClickRouter = StrictPick<
  *   prevented: true,
  * });
  *
- * assert.strictEqual(router.match.getSnapshot().value.route, 'about');
+ * assert.strictEqual(
+ *   Optional.unwrap(router.match.getSnapshot()).route,
+ *   'about',
+ * );
  * ```
  */
 export const handleLinkClick = (
@@ -137,9 +140,9 @@ export const handleLinkClick = (
       : undefined;
 
   if (options?.replace === true) {
-    router.replace(href.value, pushOptions);
+    router.replace(Optional.unwrap(href), pushOptions);
   } else {
-    router.push(href.value, pushOptions);
+    router.push(Optional.unwrap(href), pushOptions);
   }
 
   return true;

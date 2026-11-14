@@ -1,5 +1,6 @@
 import type { ContextState, TreeNode } from 'pr-report-core';
 import { createState } from 'synstate';
+import { Optional } from 'ts-data-forge';
 import type { Entry } from '../load-report.mjs';
 import {
   DEFAULT_MERGE_ORDER_VIEW,
@@ -11,7 +12,7 @@ describe(createMergeOrderStore, () => {
   test('starts at the view it is given, and hands every change to save from start on', () => {
     const { store, saved } = setup(STORED);
 
-    assert.deepStrictEqual(store.view.getSnapshot().value, STORED);
+    assert.deepStrictEqual(Optional.unwrap(store.view.getSnapshot()), STORED);
 
     store.toggleStatus('queued');
 
@@ -40,55 +41,64 @@ describe(createMergeOrderStore, () => {
     setEntries([entry(1, ['merge-queued']), entry(2, ['priority:high'])]);
 
     assert.deepStrictEqual(
-      store.roots.getSnapshot().value.map(({ number }) => number),
+      Optional.unwrap(store.roots.getSnapshot()).map(({ number }) => number),
       [1, 2],
     );
 
-    assert.deepStrictEqual(store.counts.getSnapshot().value.open, {
+    assert.deepStrictEqual(Optional.unwrap(store.counts.getSnapshot()).open, {
       shown: 2,
       total: 2,
     });
 
-    assert.deepStrictEqual(store.counts.getSnapshot().value.priorities, {
-      high: { shown: 1, total: 1 },
-      mid: { shown: 0, total: 0 },
-      low: { shown: 0, total: 0 },
-      none: { shown: 1, total: 1 },
-    });
+    assert.deepStrictEqual(
+      Optional.unwrap(store.counts.getSnapshot()).priorities,
+      {
+        high: { shown: 1, total: 1 },
+        mid: { shown: 0, total: 0 },
+        low: { shown: 0, total: 0 },
+        none: { shown: 1, total: 1 },
+      },
+    );
 
     store.toggleStatus('queued');
 
     assert.deepStrictEqual(
-      store.roots.getSnapshot().value.map(({ number }) => number),
+      Optional.unwrap(store.roots.getSnapshot()).map(({ number }) => number),
       [2],
     );
 
-    assert.deepStrictEqual(store.counts.getSnapshot().value.open, {
+    assert.deepStrictEqual(Optional.unwrap(store.counts.getSnapshot()).open, {
       shown: 1,
       total: 2,
     });
 
-    assert.deepStrictEqual(store.counts.getSnapshot().value.priorities.none, {
-      shown: 0,
-      total: 1,
-    });
+    assert.deepStrictEqual(
+      Optional.unwrap(store.counts.getSnapshot()).priorities.none,
+      {
+        shown: 0,
+        total: 1,
+      },
+    );
 
     store.toggleOnly('queued');
 
     assert.deepStrictEqual(
-      store.roots.getSnapshot().value.map(({ number }) => number),
+      Optional.unwrap(store.roots.getSnapshot()).map(({ number }) => number),
       [1],
     );
 
-    assert.deepStrictEqual(store.counts.getSnapshot().value.open, {
+    assert.deepStrictEqual(Optional.unwrap(store.counts.getSnapshot()).open, {
       shown: 1,
       total: 2,
     });
 
-    assert.deepStrictEqual(store.counts.getSnapshot().value.priorities.high, {
-      shown: 0,
-      total: 1,
-    });
+    assert.deepStrictEqual(
+      Optional.unwrap(store.counts.getSnapshot()).priorities.high,
+      {
+        shown: 0,
+        total: 1,
+      },
+    );
   });
 
   test('switches the drafts off and back on', () => {
@@ -99,11 +109,11 @@ describe(createMergeOrderStore, () => {
     store.toggleDrafts();
 
     assert.deepStrictEqual(
-      store.roots.getSnapshot().value.map(({ number }) => number),
+      Optional.unwrap(store.roots.getSnapshot()).map(({ number }) => number),
       [2],
     );
 
-    assert.deepStrictEqual(store.counts.getSnapshot().value.drafts, {
+    assert.deepStrictEqual(Optional.unwrap(store.counts.getSnapshot()).drafts, {
       shown: 1,
       total: 1,
     });
@@ -111,7 +121,7 @@ describe(createMergeOrderStore, () => {
     store.toggleDrafts();
 
     assert.deepStrictEqual(
-      store.roots.getSnapshot().value.map(({ number }) => number),
+      Optional.unwrap(store.roots.getSnapshot()).map(({ number }) => number),
       [1, 2],
     );
   });
@@ -126,18 +136,19 @@ describe(createMergeOrderStore, () => {
     setQueue(false);
 
     assert.deepStrictEqual(
-      store.roots.getSnapshot().value.map(({ number }) => number),
+      Optional.unwrap(store.roots.getSnapshot()).map(({ number }) => number),
       [1, 2],
     );
 
-    assert.deepStrictEqual(store.view.getSnapshot().value.onlyStatuses, [
-      'queued',
-    ]);
+    assert.deepStrictEqual(
+      Optional.unwrap(store.view.getSnapshot()).onlyStatuses,
+      ['queued'],
+    );
 
     setQueue(true);
 
     assert.deepStrictEqual(
-      store.roots.getSnapshot().value.map(({ number }) => number),
+      Optional.unwrap(store.roots.getSnapshot()).map(({ number }) => number),
       [1],
     );
   });
@@ -149,7 +160,7 @@ describe(createMergeOrderStore, () => {
 
     store.toggleStatus('failing');
 
-    assert.deepStrictEqual(store.search.getSnapshot().value, {
+    assert.deepStrictEqual(Optional.unwrap(store.search.getSnapshot()), {
       qualifiers: ['-label:"merge-queued"'],
       unhidden: ['failing'],
       unpicked: [],
@@ -157,7 +168,7 @@ describe(createMergeOrderStore, () => {
 
     setQueue(false);
 
-    assert.deepStrictEqual(store.search.getSnapshot().value, {
+    assert.deepStrictEqual(Optional.unwrap(store.search.getSnapshot()), {
       qualifiers: [],
       unhidden: ['failing'],
       unpicked: [],

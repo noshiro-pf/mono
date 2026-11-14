@@ -327,7 +327,7 @@ export const maxFragmentWaitMs = 10_000;
  *
  * router.push(routes.products.item.href({ productId: asSafeInt(42) }));
  *
- * const m = router.match.getSnapshot().value;
+ * const m = Optional.unwrap(router.match.getSnapshot());
  *
  * assert.isTrue(m.route === 'products.item' && m.params.productId === 42);
  *
@@ -392,7 +392,7 @@ export const createRouter = <R extends AnyRoutes>(
       return { found: outside, settled: outside };
     }
 
-    const pathname = canonicalPathname(inside.value, trailingSlash);
+    const pathname = canonicalPathname(Optional.unwrap(inside), trailingSlash);
 
     // Set, not parsed from a string: a pathname that begins with `//` would
     // parse as another host.
@@ -484,7 +484,9 @@ export const createRouter = <R extends AnyRoutes>(
         ? Optional.none
         : codec.decode(raw);
 
-    const state = Optional.isSome(decoded) ? decoded.value : undefined;
+    const state = Optional.isSome(decoded)
+      ? Optional.unwrap(decoded)
+      : undefined;
 
     // eslint-disable-next-line total-functions/no-unsafe-type-assertion -- the page declares a state, so its match has one
     const withValue: RouteMatch<R> = { ...m, state } as RouteMatch<R>;
@@ -835,7 +837,10 @@ export const createRouter = <R extends AnyRoutes>(
     mut_scroll.pending = Optional.none;
 
     if (Optional.isNone(pending)) {
-      if (Optional.isSome(missed) && browser.scrollToFragment(missed.value)) {
+      if (
+        Optional.isSome(missed) &&
+        browser.scrollToFragment(Optional.unwrap(missed))
+      ) {
         forgetMissed();
       }
 
@@ -844,16 +849,18 @@ export const createRouter = <R extends AnyRoutes>(
 
     forgetMissed();
 
+    const target = Optional.unwrap(pending);
+
     // The top needs no element: a page still drawing its fallback is scrolled
     // to the top as well as the page itself would be.
-    if (pending.value === 'top') {
+    if (target === 'top') {
       browser.scrollToTop();
 
       return;
     }
 
-    if (!browser.scrollToFragment(pending.value.id)) {
-      waitFor(pending.value.id);
+    if (!browser.scrollToFragment(target.id)) {
+      waitFor(target.id);
     }
   };
 
@@ -1237,7 +1244,7 @@ export const createRouter = <R extends AnyRoutes>(
     const scrollTarget = scrollTargetOf(before, getSnapshot().location);
 
     if (Optional.isSome(scrollTarget)) {
-      scheduleScroll(scrollTarget.value);
+      scheduleScroll(Optional.unwrap(scrollTarget));
     }
   };
 
@@ -1265,7 +1272,7 @@ export const createRouter = <R extends AnyRoutes>(
     }
 
     // eslint-disable-next-line total-functions/no-unsafe-type-assertion -- read with the codecs of `node`
-    const before = (values.value as RouteValues<never, S>).search;
+    const before = (Optional.unwrap(values) as RouteValues<never, S>).search;
 
     const next = recipe(before);
 
@@ -1318,7 +1325,7 @@ export const createRouter = <R extends AnyRoutes>(
     }
 
     const m = matchRoutes(routes, {
-      pathname: inside.value,
+      pathname: Optional.unwrap(inside),
       search: parsed.search,
     });
 
@@ -1326,7 +1333,7 @@ export const createRouter = <R extends AnyRoutes>(
       ? Optional.none
       : Optional.some(
           toHref(
-            `${canonicalPathname(inside.value, 'always')}${parsed.search}${parsed.hash}`,
+            `${canonicalPathname(Optional.unwrap(inside), 'always')}${parsed.search}${parsed.hash}`,
           ),
         );
   };
@@ -1357,7 +1364,7 @@ export const createRouter = <R extends AnyRoutes>(
         if (
           mut_follow.subscribing &&
           Optional.isSome(held) &&
-          held.value === href
+          Optional.unwrap(held) === href
         ) {
           return;
         }

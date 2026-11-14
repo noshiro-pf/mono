@@ -1,5 +1,6 @@
 import { map, type InitializedObservable } from 'synstate';
 import { constant, If, type Child, type JSX } from 'synstate-dom';
+import { Optional } from 'ts-data-forge';
 import type { BlockId } from '../layout.mjs';
 import { layoutStore } from '../store/index.mjs';
 
@@ -67,7 +68,9 @@ export const LayoutBlock = ({
       return;
     }
 
-    const { share, next, nextShare } = placement$.getSnapshot().value;
+    const { share, next, nextShare } = Optional.unwrap(
+      placement$.getSnapshot(),
+    );
 
     if (share === undefined) {
       const { body } = mut_elements;
@@ -122,7 +125,7 @@ export const LayoutBlock = ({
   };
 
   const onDividerDoubleClick = (): void => {
-    const { share, next } = placement$.getSnapshot().value;
+    const { share, next } = Optional.unwrap(placement$.getSnapshot());
 
     if (share === undefined) {
       layoutStore.setHeight(id, undefined);

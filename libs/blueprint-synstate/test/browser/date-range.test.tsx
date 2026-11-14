@@ -598,7 +598,7 @@ const theirInput =
 
           return Optional.isSome(clock)
             ? blueprintDayOf(
-                `${clock.value.year.toString().padStart(4, '0')}-${clock.value.month.toString().padStart(2, '0')}-${clock.value.day.toString().padStart(2, '0')}`,
+                `${Optional.unwrap(clock).year.toString().padStart(4, '0')}-${Optional.unwrap(clock).month.toString().padStart(2, '0')}-${Optional.unwrap(clock).day.toString().padStart(2, '0')}`,
               )
             : new Date(Number.NaN);
         },
@@ -628,7 +628,7 @@ const ourInput =
           value={range$}
           onChange={(next) => {
             log(
-              `change ${showRange(range$.getSnapshot().value)} → ${showRange(next)}`,
+              `change ${showRange(Optional.unwrap(range$.getSnapshot()))} → ${showRange(next)}`,
             );
 
             setRange(next);
@@ -766,7 +766,7 @@ const ourPicker =
           value={range$}
           onChange={(next) => {
             log(
-              `change ${showRange(range$.getSnapshot().value)} → ${showRange(next)}`,
+              `change ${showRange(Optional.unwrap(range$.getSnapshot()))} → ${showRange(next)}`,
             );
 
             setRange(next);

@@ -1,6 +1,6 @@
 import { map, type InitializedObservable } from 'synstate';
 import { constant, deriveBindable, For, If, type JSX } from 'synstate-dom';
-import { Num } from 'ts-data-forge';
+import { Num, Optional } from 'ts-data-forge';
 import type { FixedLengthTuple } from 'ts-type-forge';
 import {
   NODE_HEIGHT,
@@ -42,7 +42,7 @@ type Props = Readonly<{ placed$: InitializedObservable<PlacedNode> }>;
  * where it stands, its title and its priority follow the graph.
  */
 export const IssueDagNode = ({ placed$ }: Props): JSX.Element => {
-  const { number, kind, url } = placed$.getSnapshot().value.node;
+  const { number, kind, url } = Optional.unwrap(placed$.getSnapshot()).node;
 
   const numberWidth = numberPillWidth(number);
 

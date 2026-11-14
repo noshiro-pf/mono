@@ -11,6 +11,7 @@ import {
   type Bindable,
   type JSX,
 } from 'synstate-dom';
+import { Optional } from 'ts-data-forge';
 import { DateUtils } from 'ts-fortress-types';
 import { createAnswerDeadlineShortcuts, dict } from '../../constants/index.mjs';
 import {
@@ -56,7 +57,7 @@ export const AnswerDeadlineDatepicker = ({
         // Counted from the day the calendar opens: the page may have been open
         // since an earlier day.
         shortcuts={() => {
-          if (isMobile$.getSnapshot().value) {
+          if (Optional.unwrap(isMobile$.getSnapshot())) {
             return undefined;
           }
 

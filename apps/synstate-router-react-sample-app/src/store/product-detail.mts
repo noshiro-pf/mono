@@ -26,7 +26,7 @@ export const productDetail$: SynstateObservable<
   .at(routes.products.item)
   .pipe(
     map((m): SafeInt | undefined =>
-      Optional.isSome(m) ? m.value.params.productId : undefined,
+      Optional.isSome(m) ? Optional.unwrap(m).params.productId : undefined,
     ),
   )
   // A move to `#reviews` on the same product asks for nothing.

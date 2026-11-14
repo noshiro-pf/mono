@@ -74,7 +74,4 @@ const fromOptionalImpl = <O extends UnknownOptional, E>(
   optional: O,
   error: E,
 ): Result<Optional.Unwrap<O>, E> =>
-  Optional.isSome(optional)
-    ? // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      ok(Optional.unwrap(optional)!)
-    : err(error);
+  Optional.isSome(optional) ? ok(Optional.unwrap(optional)) : err(error);

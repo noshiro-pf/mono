@@ -19,6 +19,7 @@ A plain value is not a `Bindable`. When a value never changes, you wrap it in `c
 ```tsx
 import { createState } from 'synstate';
 import { constant, type JSX } from 'synstate-dom';
+import { Optional } from 'ts-data-forge';
 
 const [count$] = createState(0);
 
@@ -32,13 +33,17 @@ export const Counter = (): JSX.Element => (
 // @ts-expect-error A plain string is not a Bindable: write constant('Hi').
 export const Plain = (): JSX.Element => <p>{'Hi'}</p>;
 
-// @ts-expect-error A snapshot would be written once and never updated.
-export const Stale = (): JSX.Element => <p>{count$.getSnapshot().value}</p>;
+export const Stale = (): JSX.Element => {
+    const count = Optional.unwrap(count$.getSnapshot());
+
+    // @ts-expect-error A snapshot would be written once and never updated.
+    return <p>{count}</p>;
+};
 ```
 
 `constant` just returns its argument. `Constant<T>` exists only in the types, so it costs nothing at run time. `constant('button')` keeps the literal type `Constant<'button'>`.
 
-The rule is there for the second error above. `{count$.getSnapshot().value}` reads the state once and writes a number that never updates. If plain values were accepted, it would compile and show the right number, right up until the first update. Here it does not compile at all.
+The rule is there for the second error above. `count`, read once with `Optional.unwrap(count$.getSnapshot())`, writes a number that never updates. If plain values were accepted, it would compile and show the right number, right up until the first update. Here it does not compile at all.
 
 Things that are not data take plain values: event handlers, `ref`, the `key` function of `For`, and functions that return children.
 

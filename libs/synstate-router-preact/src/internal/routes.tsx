@@ -94,7 +94,7 @@ const selectCase = <R extends AnyRoutes>(
 
     return Optional.isNone(nodeValues)
       ? undefined
-      : { key, draw: drawLayout, values: nodeValues.value };
+      : { key, draw: drawLayout, values: Optional.unwrap(nodeValues) };
   }
 
   if (under !== undefined && Optional.isNone(matchAt(under, page))) {

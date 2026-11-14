@@ -14,7 +14,7 @@ import {
   listenInScope,
   type JSX,
 } from 'synstate-dom';
-import { Arr, fastDeepEqual } from 'ts-data-forge';
+import { Arr, fastDeepEqual, Optional } from 'ts-data-forge';
 import type { ReadonlyRecord } from 'ts-type-forge';
 import {
   asFrameToPage,
@@ -97,7 +97,7 @@ export const PaneFrame = ({
   const compact$ = rect$.pipe(map(({ width }) => width < compactWidthPx));
 
   const [load$, , { updateState: updateLoad }] = createState(
-    initialPaneLoad(loadKeyOf(pane$.getSnapshot().value)),
+    initialPaneLoad(loadKeyOf(Optional.unwrap(pane$.getSnapshot()))),
   );
 
   const send = (event: PaneLoadEvent): void => {
@@ -164,7 +164,7 @@ export const PaneFrame = ({
    * the frame said, since the document that failed is that one.
    */
   const replaceFrame = (): void => {
-    const { leavingFor } = load$.getSnapshot().value;
+    const { leavingFor } = Optional.unwrap(load$.getSnapshot());
 
     if (leavingFor === undefined) {
       dispatch({ type: 'reload', paneId });
@@ -176,7 +176,7 @@ export const PaneFrame = ({
   const reload = (): void => {
     // Through the frame keeps its history; a frame that cannot answer is
     // replaced.
-    if (model$.getSnapshot().value.frameAnswers) {
+    if (Optional.unwrap(model$.getSnapshot()).frameAnswers) {
       command('reload');
     } else {
       replaceFrame();
@@ -184,7 +184,7 @@ export const PaneFrame = ({
   };
 
   const clearWorkers = (automatic: boolean): void => {
-    const { siteOrigin } = model$.getSnapshot().value;
+    const { siteOrigin } = Optional.unwrap(model$.getSnapshot());
 
     if (siteOrigin === undefined) {
       return;
@@ -192,7 +192,7 @@ export const PaneFrame = ({
 
     send({ type: 'clear-workers', origin: siteOrigin, automatic });
 
-    const { helperSerial } = load$.getSnapshot().value;
+    const { helperSerial } = Optional.unwrap(load$.getSnapshot());
 
     // A helper whose address is answered by the worker too never reports.
     later(noAnswerMs, () => {
@@ -201,7 +201,7 @@ export const PaneFrame = ({
   };
 
   const openInTab = (): void => {
-    const { target } = model$.getSnapshot().value;
+    const { target } = Optional.unwrap(model$.getSnapshot());
 
     if (target !== '') {
       chrome.tabs.create({ url: target }).catch(console.error);
@@ -212,7 +212,7 @@ export const PaneFrame = ({
     dispatch({
       type: 'set-sandboxed',
       paneId,
-      sandboxed: !pane$.getSnapshot().value.sandboxed,
+      sandboxed: !Optional.unwrap(pane$.getSnapshot()).sandboxed,
     });
   };
 
@@ -229,7 +229,7 @@ export const PaneFrame = ({
       clearWorkers(false);
     },
     'toggle-always-clear': () => {
-      const { alwaysClear, siteOrigin } = model$.getSnapshot().value;
+      const { alwaysClear, siteOrigin } = Optional.unwrap(model$.getSnapshot());
 
       if (siteOrigin !== undefined) {
         onToggleResetOrigin(siteOrigin, !alwaysClear);
@@ -328,7 +328,7 @@ export const PaneFrame = ({
     afterUpdate(() => {
       send({ type: 'load-key', loadKey });
 
-      const { loadSerial } = load$.getSnapshot().value;
+      const { loadSerial } = Optional.unwrap(load$.getSnapshot());
 
       later(noAnswerMs, () => {
         send({ type: 'waited-out', loadSerial });
@@ -362,7 +362,7 @@ export const PaneFrame = ({
 
     assign();
 
-    const { frameLoads } = load$.getSnapshot().value;
+    const { frameLoads } = Optional.unwrap(load$.getSnapshot());
 
     later(graceMs, () => {
       send({ type: 'grace-elapsed', frameLoads });
@@ -493,7 +493,8 @@ export const PaneFrame = ({
 
             onNavigate(
               paneId,
-              mut_refs.address?.value ?? address$.getSnapshot().value,
+              mut_refs.address?.value ??
+                Optional.unwrap(address$.getSnapshot()),
             );
           }}
         >
@@ -725,7 +726,7 @@ export const PaneFrame = ({
                 element.setAttribute('sandbox', sandboxTokens);
               }}
               class={constant('pane__helper')}
-              src={constant(helper$.getSnapshot().value.url)}
+              src={constant(Optional.unwrap(helper$.getSnapshot()).url)}
               title={constant('Service worker reset')}
               onLoad={() => {
                 postTo('helper', {
@@ -764,7 +765,7 @@ export const PaneFrame = ({
                     mut_refs.frame = element;
 
                     // Before `src`; a change is a new element, as the key says.
-                    if (shown$.getSnapshot().value.sandboxed) {
+                    if (Optional.unwrap(shown$.getSnapshot()).sandboxed) {
                       element.setAttribute('sandbox', sandboxTokens);
                     }
 

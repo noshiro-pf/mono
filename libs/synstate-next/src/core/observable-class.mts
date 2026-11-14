@@ -6,7 +6,7 @@
  * public types (`Observable`, `InitializedObservable`) are views of these
  * classes; `toNode` turns a public observable back into its class.
  */
-import { Optional, type Some } from 'ts-std-forge';
+import { Optional } from 'ts-std-forge';
 import { canPublishNow, EventQueue } from './event-queue.mjs';
 import {
   adoptIntoCurrentOwner,
@@ -30,12 +30,6 @@ import type { Observable, Operator, Unsubscribe } from './types.mjs';
 
 /** The value of a node that holds none yet. Never seen outside the package. */
 export const noValue: unique symbol = Symbol('synstate-next/no-value');
-
-/**
- * The last `Some` each node's `getSnapshot` built, holding that node's value;
- * see there.
- */
-const snapshots = new WeakMap<ObservableClass<unknown>, Some<unknown>>();
 
 export type NoValue = typeof noValue;
 
@@ -146,30 +140,13 @@ export class ObservableClass<A> implements DerivedNode {
 
   /**
    * The same `Some` while the value is the same, as `useSyncExternalStore`
-   * needs. Built when read, and kept aside in `snapshots` rather than in a
-   * field: propagation reads `current`, never this, so a node that is never
-   * read pays nothing. The `Some` kept holds the value read last until the next
-   * read or until the node is collected.
+   * needs: an `Optional` is unwrapped, so `Optional.some(v)` is `v` itself (or,
+   * for one of the few reserved strings, an equal string) and needs no cache.
    */
   getSnapshot(): Optional<A> {
     const v = this.current;
 
-    if (v === noValue) {
-      return Optional.none;
-    }
-
-    const kept = snapshots.get(this);
-
-    if (kept !== undefined && Object.is(kept.value, v)) {
-      // eslint-disable-next-line total-functions/no-unsafe-type-assertion -- `snapshots` holds this node's own value
-      return kept as Some<A>;
-    }
-
-    const snapshot = Optional.some(v);
-
-    snapshots.set(this, snapshot);
-
-    return snapshot;
+    return v === noValue ? Optional.none : Optional.some(v);
   }
 
   get value(): A {

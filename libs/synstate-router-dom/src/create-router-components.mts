@@ -7,6 +7,7 @@ import type {
   NavigationAttempt,
   Router,
 } from 'synstate-router';
+import { Optional } from 'ts-data-forge';
 import { createLink, createRoutes } from './internal/index.mjs';
 import type { LinkProps } from './link-props.mjs';
 import type { RoutesProps } from './routes-props.mjs';
@@ -54,6 +55,7 @@ export const createRouterComponents = <R extends AnyRoutes>(
     Link: createLink(router),
     blockWhile: (when, except) =>
       router.block(
-        (attempt) => when.getSnapshot().value && except?.(attempt) !== true,
+        (attempt) =>
+          Optional.unwrap(when.getSnapshot()) && except?.(attempt) !== true,
       ),
   }) as const;

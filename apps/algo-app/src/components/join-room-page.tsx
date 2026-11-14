@@ -4,6 +4,7 @@ import {
   type InitializedObservable,
 } from 'synstate';
 import { constant, deriveBindable, If, type JSX } from 'synstate-dom';
+import { Optional } from 'ts-data-forge';
 import { dictionary, roomPage } from '../constants/index.mjs';
 import { router } from '../router.mjs';
 import { roomStore } from '../store/index.mjs';
@@ -34,7 +35,7 @@ export const JoinRoomPage = ({ roomId }: Props): JSX.Element => {
   const loading = roomStore.joinRoom.isWaitingResponse;
 
   const onJoinRoomButtonClick = (): void => {
-    const currentRoom = room.getSnapshot().value;
+    const currentRoom = Optional.unwrap(room.getSnapshot());
 
     if (currentRoom === undefined) {
       return;
@@ -46,7 +47,7 @@ export const JoinRoomPage = ({ roomId }: Props): JSX.Element => {
       return;
     }
 
-    const id = roomId.getSnapshot().value;
+    const id = Optional.unwrap(roomId.getSnapshot());
 
     // The URL carries the name, and a lone surrogate (half of a pasted emoji)
     // cannot be written into one: it is replaced before the player joins, so

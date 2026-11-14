@@ -151,7 +151,7 @@ class AuditObservableClass<A>
     const sn = this.parents[0].getSnapshot();
 
     if (Optional.isSome(sn)) {
-      this.startUpdate(sn.value);
+      this.startUpdate(Optional.unwrap(sn));
     }
   }
 

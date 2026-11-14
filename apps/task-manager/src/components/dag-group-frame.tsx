@@ -1,5 +1,6 @@
 import { type InitializedObservable, map } from 'synstate';
 import { constant, isImeKeyDown, type JSX } from 'synstate-dom';
+import { Optional } from 'ts-data-forge';
 import { frameTitle, GROUP_HEADER, GROUP_PADDING } from '../dag/index.mjs';
 import { m } from '../i18n/index.mjs';
 import { groupEditorStore } from '../store/index.mjs';
@@ -18,7 +19,7 @@ type Props = Readonly<{
  * empty group is drawn the same, round nothing.
  */
 export const DagGroupFrame = ({ record }: Props): JSX.Element => {
-  const { id } = record.getSnapshot().value.frame;
+  const { id } = Optional.unwrap(record.getSnapshot()).frame;
 
   const title = record.pipe(map((r) => r.title));
 

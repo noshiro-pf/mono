@@ -5,33 +5,35 @@ import { Optional, type UnknownOptional } from './optional/index.mjs';
  * Creates a new pipe object that allows for chaining operations on a value.
  *
  * This function provides a fluent interface for applying transformations to
- * values, with intelligent method selection based on the input type:
+ * values. Its type offers the methods that suit the value's type:
  *
- * - For `Optional` values: Provides `mapOptional` for safe Optional
- *   transformations
- * - For other values: Provides `mapNullable` for null-safe transformations
- * - All types get the basic `map` method for general transformations
+ * - Every pipe: `map` for general transformations and `mapNullable` for
+ *   null-safe ones
+ * - `Optional` values also: `mapOptional` for safe Optional transformations
  *
- * The pipe maintains type safety throughout the chain, automatically selecting
- * the appropriate overload based on the current value type.
+ * The choice is the type's alone: at runtime every pipe has every method,
+ * because a `Some` is its value unwrapped and so cannot be told from a value
+ * that is not an `Optional`. Reaching `mapOptional` on such a value by a cast
+ * reads it as an `Optional`.
  *
  * @template A The type of the initial value to wrap in a pipe.
  * @param a The initial value to wrap in a pipe.
  * @returns A pipe object with chaining methods appropriate for the value type.
  */
 export const pipe = <const A,>(a: A): Pipe<A> =>
-  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   ({
     value: a,
     map: (fn) => pipe(fn(a)),
     mapNullable: (fn) => pipe(a == null ? undefined : fn(a)),
 
-    ...(Optional.isOptional(a)
-      ? {
-          mapOptional: (fn) => pipe(Optional.map(a, fn)),
-        }
-      : {}),
-  }) satisfies PipeImpl<A> as unknown as Pipe<A>;
+    // A `Some` is its value unwrapped, so `mapOptional` cannot be attached by
+    // inspecting `a`; the type `Pipe<A>` alone decides whether a caller can
+    // reach it. Attaching it to every pipe costs one closure per pipe, as `map`
+    // and `mapNullable` already do.
+    mapOptional: (fn) =>
+      // eslint-disable-next-line total-functions/no-unsafe-type-assertion -- reachable only where `Pipe<A>` offers `mapOptional`, i.e. `A` is an Optional
+      pipe(Optional.map(a as Cast<A, UnknownOptional>, fn)),
+  }) as const satisfies PipeImpl<A>;
 
 // `PipeBase<A>` is always present; the conditional only *adds* `mapOptional`
 // for Optional values. Two subtleties motivate this shape:
@@ -172,10 +174,13 @@ type PipeMapOptional<A extends UnknownOptional> = Readonly<{
 type Cast<T, U> = T & U;
 
 /** @internal */
+// `mapOptional` is optional although `pipe` always attaches it: the methods
+// return `pipe(...)`, typed `Pipe<B>`, which offers `mapOptional` only when `B`
+// is an Optional, and `PipeImpl<B>` must accept it.
 type PipeImpl<A> = Readonly<{
   value: A;
   map: <B>(fn: (a: A) => B) => PipeImpl<B>;
-  mapNullable?: <B>(fn: (a: NonNullable<A>) => B) => PipeImpl<B | undefined>;
+  mapNullable: <B>(fn: (a: NonNullable<A>) => B) => PipeImpl<B | undefined>;
   mapOptional?: <B>(
     fn: (a: Optional.Unwrap<Cast<A, UnknownOptional>>) => B,
   ) => PipeImpl<Optional<B>>;

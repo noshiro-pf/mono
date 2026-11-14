@@ -8,6 +8,7 @@ import {
   type Child,
   type JSX,
 } from 'synstate-dom';
+import { Optional } from 'ts-data-forge';
 import {
   absentBlocks,
   BLOCK_NAMES,
@@ -64,7 +65,7 @@ export const ViewSettingsRow = ({
 
   // Read when pressed, so that a handler never acts on a place it was drawn at
   // before a move.
-  const current = (): Row => row$.getSnapshot().value;
+  const current = (): Row => Optional.unwrap(row$.getSnapshot());
 
   const leftName = row$.pipe(
     map(({ columns }) => (column === 2 && columns === 3 ? 'middle' : 'left')),
@@ -172,7 +173,7 @@ export const ViewSettingsRow = ({
               layoutStore.setTabbed(
                 id,
                 !current().tabbed,
-                absentBlocks(reader.features.getSnapshot().value),
+                absentBlocks(Optional.unwrap(reader.features.getSnapshot())),
               );
             }}
           >
@@ -316,8 +317,8 @@ const MoveButton = ({
 /** Its part of the column, in the `fill` mode. */
 const ShareControls = ({ blockName, row$ }: ControlsProps): JSX.Element => {
   const shareNow = (): number =>
-    row$.getSnapshot().value.share ??
-    defaultShareOf(row$.getSnapshot().value.sizeKey);
+    Optional.unwrap(row$.getSnapshot()).share ??
+    defaultShareOf(Optional.unwrap(row$.getSnapshot()).sizeKey);
 
   return (
     <>
@@ -333,7 +334,7 @@ const ShareControls = ({ blockName, row$ }: ControlsProps): JSX.Element => {
         title={constant('Less')}
         onClick={() => {
           layoutStore.setShare(
-            row$.getSnapshot().value.sizeKey,
+            Optional.unwrap(row$.getSnapshot()).sizeKey,
             shareNow() - SHARE_STEP,
           );
         }}
@@ -346,7 +347,7 @@ const ShareControls = ({ blockName, row$ }: ControlsProps): JSX.Element => {
         title={constant('More')}
         onClick={() => {
           layoutStore.setShare(
-            row$.getSnapshot().value.sizeKey,
+            Optional.unwrap(row$.getSnapshot()).sizeKey,
             shareNow() + SHARE_STEP,
           );
         }}
@@ -364,7 +365,10 @@ const ShareControls = ({ blockName, row$ }: ControlsProps): JSX.Element => {
             class={constant('view-settings-small')}
             type={constant('button')}
             onClick={() => {
-              layoutStore.setShare(row$.getSnapshot().value.sizeKey, undefined);
+              layoutStore.setShare(
+                Optional.unwrap(row$.getSnapshot()).sizeKey,
+                undefined,
+              );
             }}
           >
             {constant('Usual')}
@@ -378,10 +382,10 @@ const ShareControls = ({ blockName, row$ }: ControlsProps): JSX.Element => {
 /** Its height, in the `natural` mode: its own, or what it holds. */
 const HeightControls = ({ blockName, row$ }: ControlsProps): JSX.Element => {
   const taller = (): void => {
-    const { height } = row$.getSnapshot().value;
+    const { height } = Optional.unwrap(row$.getSnapshot());
 
     layoutStore.setHeight(
-      row$.getSnapshot().value.sizeKey,
+      Optional.unwrap(row$.getSnapshot()).sizeKey,
       height === undefined ? FIRST_HEIGHT : height + HEIGHT_STEP,
     );
   };
@@ -418,8 +422,9 @@ const HeightControls = ({ blockName, row$ }: ControlsProps): JSX.Element => {
             title={constant('Shorter')}
             onClick={() => {
               layoutStore.setHeight(
-                row$.getSnapshot().value.sizeKey,
-                (row$.getSnapshot().value.height ?? FIRST_HEIGHT) - HEIGHT_STEP,
+                Optional.unwrap(row$.getSnapshot()).sizeKey,
+                (Optional.unwrap(row$.getSnapshot()).height ?? FIRST_HEIGHT) -
+                  HEIGHT_STEP,
               );
             }}
           >
@@ -440,7 +445,7 @@ const HeightControls = ({ blockName, row$ }: ControlsProps): JSX.Element => {
             type={constant('button')}
             onClick={() => {
               layoutStore.setHeight(
-                row$.getSnapshot().value.sizeKey,
+                Optional.unwrap(row$.getSnapshot()).sizeKey,
                 undefined,
               );
             }}

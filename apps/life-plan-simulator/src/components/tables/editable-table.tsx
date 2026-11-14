@@ -1,7 +1,7 @@
 import { Button, HtmlTable } from 'blueprint-synstate';
 import { map, type InitializedObservable } from 'synstate';
 import { constant, For, type Bindable, type JSX } from 'synstate-dom';
-import { Arr } from 'ts-data-forge';
+import { Arr, Optional } from 'ts-data-forge';
 import { NumberInput, TextInput, type NumberUnit } from '../fields/index.mjs';
 
 /**
@@ -66,7 +66,7 @@ export const EditableTable = <T extends Readonly<{ id: number }>>({
                     aria-label={constant(`${caption}の行を削除`)}
                     title={constant('削除')}
                     onClick={() => {
-                      const { id } = row$.getSnapshot().value;
+                      const { id } = Optional.unwrap(row$.getSnapshot());
 
                       update((rows) => rows.filter((r) => r.id !== id));
                     }}
@@ -132,7 +132,7 @@ const cell = <T extends Readonly<{ id: number }>>(
           size={'small'}
           value={row$.pipe(map(column.get))}
           onChange={(value) => {
-            updateRow(row$.getSnapshot().value.id, (row) =>
+            updateRow(Optional.unwrap(row$.getSnapshot()).id, (row) =>
               column.set(row, value),
             );
           }}
@@ -148,7 +148,7 @@ const cell = <T extends Readonly<{ id: number }>>(
           size={'small'}
           value={row$.pipe(map(column.get))}
           onChange={(value) => {
-            updateRow(row$.getSnapshot().value.id, (row) =>
+            updateRow(Optional.unwrap(row$.getSnapshot()).id, (row) =>
               column.set(row, value),
             );
           }}

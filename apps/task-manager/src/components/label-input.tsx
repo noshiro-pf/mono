@@ -13,7 +13,7 @@ import {
   isImeKeyDown,
   type JSX,
 } from 'synstate-dom';
-import { Arr, Num } from 'ts-data-forge';
+import { Arr, Num, Optional } from 'ts-data-forge';
 import { withLabelsAdded } from '../domain/index.mjs';
 import { m } from '../i18n/index.mjs';
 import {
@@ -112,7 +112,7 @@ export const LabelInput = ({
   };
 
   const add = (added: readonly string[]): void => {
-    const current = labels.getSnapshot().value;
+    const current = Optional.unwrap(labels.getSnapshot());
 
     const next = withLabelsAdded(current, added);
 
@@ -128,14 +128,14 @@ export const LabelInput = ({
   const follow = (text: string): void => {
     const { ended, rest } = splitTypedLabels(text);
 
-    add(spellAsInUse(ended, known.getSnapshot().value));
+    add(spellAsInUse(ended, Optional.unwrap(known.getSnapshot())));
 
     retype(rest);
   };
 
   /** Adds the labels of `text`, spelled as in use, and empties the box. */
   const commit = (text: string): void => {
-    add(spellAsInUse(parseLabels(text), known.getSnapshot().value));
+    add(spellAsInUse(parseLabels(text), Optional.unwrap(known.getSnapshot())));
 
     retype('');
   };
@@ -148,7 +148,9 @@ export const LabelInput = ({
   };
 
   const remove = (label: string): void => {
-    onChange(labels.getSnapshot().value.filter((each) => each !== label));
+    onChange(
+      Optional.unwrap(labels.getSnapshot()).filter((each) => each !== label),
+    );
   };
 
   const close = (): void => {
@@ -206,11 +208,11 @@ export const LabelInput = ({
 
     const typed = pressed.currentTarget.value;
 
-    const suggestions = suggestions$.getSnapshot().value;
+    const suggestions = Optional.unwrap(suggestions$.getSnapshot());
 
-    const active = active$.getSnapshot().value;
+    const active = Optional.unwrap(active$.getSnapshot());
 
-    const shown = shown$.getSnapshot().value;
+    const shown = Optional.unwrap(shown$.getSnapshot());
 
     switch (pressed.key) {
       case 'ArrowDown':
@@ -289,7 +291,7 @@ export const LabelInput = ({
       }
 
       case 'Backspace': {
-        const last = labels.getSnapshot().value.at(-1);
+        const last = Optional.unwrap(labels.getSnapshot()).at(-1);
 
         // Held down, what clears the box does not go on to the chips.
         if (typed !== '' || last === undefined || pressed.repeat) {
@@ -471,7 +473,7 @@ export const LabelInput = ({
                   tabIndex={constant(-1)}
                   onBlur={onBlur}
                   onClick={() => {
-                    choose(option$.getSnapshot().value.label);
+                    choose(Optional.unwrap(option$.getSnapshot()).label);
 
                     mut_box?.focus();
                   }}

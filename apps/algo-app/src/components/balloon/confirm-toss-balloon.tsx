@@ -1,5 +1,6 @@
 import { map, type InitializedObservable } from 'synstate';
 import { constant, type JSX } from 'synstate-dom';
+import { Optional } from 'ts-data-forge';
 import type { RectSize } from 'ts-utils-additional';
 import { dictionary } from '../../constants/index.mjs';
 import type { ConfirmTossBalloonProps } from '../../types/index.mjs';
@@ -82,7 +83,7 @@ export const ConfirmTossBalloon = ({ props }: Props): JSX.Element => {
           <div>
             <Button
               onClick={() => {
-                props.getSnapshot().value.cancel();
+                Optional.unwrap(props.getSnapshot()).cancel();
               }}
             >
               {constant(dictionary.cancel)}
@@ -91,7 +92,7 @@ export const ConfirmTossBalloon = ({ props }: Props): JSX.Element => {
           <div>
             <Button
               onClick={() => {
-                props.getSnapshot().value.submit();
+                Optional.unwrap(props.getSnapshot()).submit();
               }}
             >
               {constant(dictionary.submitToss)}

@@ -101,7 +101,7 @@ class WithCurrentValueFromObservableClass<A, B>
       }).map(({ me, par }) =>
         Optional.isNone(par) || Optional.isNone(me)
           ? Optional.none
-          : Optional.some([par.value, me.value] as const),
+          : Optional.some([Optional.unwrap(par), Optional.unwrap(me)] as const),
       ).value,
     });
 
@@ -125,6 +125,6 @@ class WithCurrentValueFromObservableClass<A, B>
       return; // skip update
     }
 
-    this.setNext([ps.value, curr.value], updateToken);
+    this.setNext([Optional.unwrap(ps), Optional.unwrap(curr)], updateToken);
   }
 }

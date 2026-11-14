@@ -130,7 +130,7 @@ export const DateRangeInput = ({
 
   const [state$, setState] = createState<State>(initialState);
 
-  const current = (): State => state$.getSnapshot().value;
+  const current = (): State => Optional.unwrap(state$.getSnapshot());
 
   const open$ = derive(
     [state$, disabled$],
@@ -177,7 +177,7 @@ export const DateRangeInput = ({
   const textOf = (day: string): string => {
     const clock = inRange(day);
 
-    return Optional.isSome(clock) ? format(clock.value) : '';
+    return Optional.isSome(clock) ? format(Optional.unwrap(clock)) : '';
   };
 
   /** Blueprint's `formatDateString`. */
@@ -190,8 +190,8 @@ export const DateRangeInput = ({
 
     return Optional.isNone(clock)
       ? invalidDateMessage
-      : ignoreRange || isDayInRange(clock.value, min, max)
-        ? format(clock.value)
+      : ignoreRange || isDayInRange(Optional.unwrap(clock), min, max)
+        ? format(Optional.unwrap(clock))
         : outOfRangeMessage;
   };
 
@@ -210,7 +210,9 @@ export const DateRangeInput = ({
 
     const clock = parse(text);
 
-    return Optional.isSome(clock) ? toDateValue(clock.value) : INVALID_DAY;
+    return Optional.isSome(clock)
+      ? toDateValue(Optional.unwrap(clock))
+      : INVALID_DAY;
   };
 
   /** Blueprint's `doBoundaryDatesOverlap`, against the value's other end. */
@@ -236,13 +238,17 @@ export const DateRangeInput = ({
 
   /** Blueprint's `getDateRangeForCallback`. */
   const rangeWith = (day: string, boundary: Boundary): DayRange => {
-    const other = endOf(otherOf(boundary), value$.getSnapshot().value);
+    const other = endOf(
+      otherOf(boundary),
+      Optional.unwrap(value$.getSnapshot()),
+    );
 
     return boundary === 'start' ? [day, other] : [other, day];
   };
 
   const isNextRangeValid = (day: string, boundary: Boundary): boolean =>
-    isValidInRange(day) && !overlaps(day, boundary, value$.getSnapshot().value);
+    isValidInRange(day) &&
+    !overlaps(day, boundary, Optional.unwrap(value$.getSnapshot()));
 
   /** Blueprint's `getSelectedRange`: what the calendar is given. */
   const selectedRange = (range: DayRange): DayRange => {
@@ -428,7 +434,10 @@ export const DateRangeInput = ({
         boundary,
         {
           focused: true,
-          input: shownOf(endOf(boundary, value$.getSnapshot().value), true),
+          input: shownOf(
+            endOf(boundary, Optional.unwrap(value$.getSnapshot())),
+            true,
+          ),
         },
       ),
     );
@@ -445,7 +454,7 @@ export const DateRangeInput = ({
         ...(field.input === undefined || field.input === ''
           ? {
               input: shownOf(
-                endOf(boundary, value$.getSnapshot().value),
+                endOf(boundary, Optional.unwrap(value$.getSnapshot())),
                 false,
               ),
             }
@@ -489,11 +498,11 @@ export const DateRangeInput = ({
     const isEntireTextSelected =
       input?.selectionStart === 0 && input.selectionEnd === input.value.length;
 
-    if (!isEntireTextSelected || !open$.getSnapshot().value) {
+    if (!isEntireTextSelected || !Optional.unwrap(open$.getSnapshot())) {
       return;
     }
 
-    const [start, end] = selectedRange(value$.getSnapshot().value);
+    const [start, end] = selectedRange(Optional.unwrap(value$.getSnapshot()));
 
     const shifted =
       nextDayByArrow(start, end, boundary, key, allowSingleDayRange) ??
@@ -531,7 +540,7 @@ export const DateRangeInput = ({
     const state = current();
 
     if (event.key === 'Escape') {
-      if (open$.getSnapshot().value) {
+      if (Optional.unwrap(open$.getSnapshot())) {
         event.preventDefault();
       }
 
@@ -584,7 +593,7 @@ export const DateRangeInput = ({
       return;
     }
 
-    const [start, end] = value$.getSnapshot().value;
+    const [start, end] = Optional.unwrap(value$.getSnapshot());
 
     changeFromPicker(last === 'start' ? [day, end] : [start, day], true);
   };
@@ -860,7 +869,9 @@ const isArrowKey = (key: string): key is ArrowKey =>
 const shiftDays = (day: string, days: number): string => {
   const clock = parseWallClock(day);
 
-  return Optional.isSome(clock) ? toDateValue(addDays(clock.value, days)) : day;
+  return Optional.isSome(clock)
+    ? toDateValue(addDays(Optional.unwrap(clock), days))
+    : day;
 };
 
 /** Blueprint's `shiftDateByArrowKey`, on a valid `YYYY-MM-DD`. */

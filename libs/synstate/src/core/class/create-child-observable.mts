@@ -157,7 +157,7 @@ export type InitializedChildObservableConfig<
  *           return; // `src` did not emit in this update
  *         }
  *
- *         setNext(sn.value * 2, updateToken);
+ *         setNext(Optional.unwrap(sn) * 2, updateToken);
  *       },
  *   );
  *

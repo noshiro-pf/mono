@@ -21,6 +21,7 @@ import {
   type ClassObject,
   type JSX,
 } from 'synstate-dom';
+import { Optional } from 'ts-data-forge';
 import { classObject, focusablesIn, isInside } from '../internal/index.mjs';
 
 export type OverlayProps = Readonly<{
@@ -151,7 +152,7 @@ export const Overlay = ({
       return;
     }
 
-    const current = phase$.getSnapshot().value;
+    const current = Optional.unwrap(phase$.getSnapshot());
 
     mut_target.showing = open;
 
@@ -549,7 +550,7 @@ const OverlayBody = ({
       hasBackdrop ||
       !canOutsideClickClose ||
       event === drawnDuring ||
-      !isOpen$.getSnapshot().value ||
+      !Optional.unwrap(isOpen$.getSnapshot()) ||
       isOverlayOrAbove(event.target)
     ) {
       return;
@@ -568,7 +569,7 @@ const OverlayBody = ({
       event.key !== 'Escape' ||
       isImeKeyDown(event) ||
       event.defaultPrevented ||
-      !isOpen$.getSnapshot().value ||
+      !Optional.unwrap(isOpen$.getSnapshot()) ||
       !isThisOnTop()
     ) {
       return;
@@ -609,7 +610,7 @@ const OverlayBody = ({
 
         // One during the exit is still the overlay's, though it has already
         // closed.
-        if (isOpen$.getSnapshot().value) {
+        if (Optional.unwrap(isOpen$.getSnapshot())) {
           onClose?.(event);
         }
 
@@ -658,7 +659,10 @@ const OverlayBody = ({
         <div
           class={transitionClass('bp6-overlay-backdrop')}
           onMouseDown={(event) => {
-            if (canOutsideClickClose && isOpen$.getSnapshot().value) {
+            if (
+              canOutsideClickClose &&
+              Optional.unwrap(isOpen$.getSnapshot())
+            ) {
               onClose?.(event);
             }
 
@@ -672,7 +676,7 @@ const OverlayBody = ({
 
             // Not into one the press has closed, which is on its way out.
             mut_backdropFrame.id = requestAnimationFrame(() => {
-              if (isOpen$.getSnapshot().value) {
+              if (Optional.unwrap(isOpen$.getSnapshot())) {
                 bringFocusInside();
               }
             });

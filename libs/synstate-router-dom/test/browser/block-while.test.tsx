@@ -1,4 +1,5 @@
 import { createState } from 'synstate';
+import { Optional } from 'ts-data-forge';
 import { routes, setup } from './fixture.js';
 
 describe('blockWhile', () => {
@@ -14,29 +15,47 @@ describe('blockWhile', () => {
 
     router.push(routes.home.href());
 
-    assert.strictEqual(router.match.getSnapshot().value.route, 'home');
+    assert.strictEqual(
+      Optional.unwrap(router.match.getSnapshot()).route,
+      'home',
+    );
 
     setDirty(true);
 
     router.push(routes.settings.href());
 
-    assert.strictEqual(router.match.getSnapshot().value.route, 'home');
+    assert.strictEqual(
+      Optional.unwrap(router.match.getSnapshot()).route,
+      'home',
+    );
 
-    assert.strictEqual(blocker.state.getSnapshot().value.status, 'blocked');
+    assert.strictEqual(
+      Optional.unwrap(blocker.state.getSnapshot()).status,
+      'blocked',
+    );
 
     // Let through by `except`.
     router.push(routes.drafts.href());
 
-    assert.strictEqual(router.match.getSnapshot().value.route, 'drafts');
+    assert.strictEqual(
+      Optional.unwrap(router.match.getSnapshot()).route,
+      'drafts',
+    );
 
     // The move that went through drops the one held.
-    assert.strictEqual(blocker.state.getSnapshot().value.status, 'idle');
+    assert.strictEqual(
+      Optional.unwrap(blocker.state.getSnapshot()).status,
+      'idle',
+    );
 
     blocker.dispose();
 
     router.push(routes.home.href());
 
-    assert.strictEqual(router.match.getSnapshot().value.route, 'home');
+    assert.strictEqual(
+      Optional.unwrap(router.match.getSnapshot()).route,
+      'home',
+    );
 
     router.dispose();
   });

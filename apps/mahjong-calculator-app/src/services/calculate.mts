@@ -1,4 +1,4 @@
-import { Arr, Json, Result } from 'ts-data-forge';
+import { Arr, Json, Optional, Result } from 'ts-data-forge';
 import packageJson from '../../package.json' with { type: 'json' };
 import {
   flagOptionsDef,
@@ -15,26 +15,35 @@ export const calculate = (): void => {
 
   calculatorStore.resetResult();
 
-  const hand = calculatorStore.handSorted.getSnapshot().value;
+  const hand = Optional.unwrap(calculatorStore.handSorted.getSnapshot());
 
-  const revealedBlocks = calculatorStore.revealedBlocks.getSnapshot().value;
+  const revealedBlocks = Optional.unwrap(
+    calculatorStore.revealedBlocks.getSnapshot(),
+  );
 
-  const turn = calculatorStore.turn.getSnapshot().value;
+  const turn = Optional.unwrap(calculatorStore.turn.getSnapshot());
 
-  const bakaze = calculatorStore.bakaze.getSnapshot().value;
+  const bakaze = Optional.unwrap(calculatorStore.bakaze.getSnapshot());
 
-  const jikaze = calculatorStore.jikaze.getSnapshot().value;
+  const jikaze = Optional.unwrap(calculatorStore.jikaze.getSnapshot());
 
-  const tehaiType = calculatorStore.tehaiType.getSnapshot().value;
+  const tehaiType = Optional.unwrap(calculatorStore.tehaiType.getSnapshot());
 
-  const doraIndicators = calculatorStore.doraIndicators.getSnapshot().value;
+  const doraIndicators = Optional.unwrap(
+    calculatorStore.doraIndicators.getSnapshot(),
+  );
 
-  const numRemainingTiles =
-    calculatorStore.numRemainingTiles.getSnapshot().value;
+  const numRemainingTiles = Optional.unwrap(
+    calculatorStore.numRemainingTiles.getSnapshot(),
+  );
 
-  const flagOptions = calculatorStore.flagOptions.getSnapshot().value;
+  const flagOptions = Optional.unwrap(
+    calculatorStore.flagOptions.getSnapshot(),
+  );
 
-  const maximizeTarget = calculatorStore.maximizeTarget.getSnapshot().value;
+  const maximizeTarget = Optional.unwrap(
+    calculatorStore.maximizeTarget.getSnapshot(),
+  );
 
   // cspell:disable
   const payload: ApiPayload = {

@@ -1,4 +1,5 @@
 import { createState } from 'synstate';
+import { Optional } from 'ts-data-forge';
 import {
   asMilestoneId,
   asTaskId,
@@ -32,7 +33,7 @@ const setup = (): Readonly<{
     store,
     setSelected,
     deleted: mut_deleted,
-    confirming: () => store.confirming.getSnapshot().value,
+    confirming: () => Optional.unwrap(store.confirming.getSnapshot()),
   };
 };
 

@@ -1,5 +1,5 @@
 import { createState } from 'synstate';
-import { Result } from 'ts-data-forge';
+import { Optional, Result } from 'ts-data-forge';
 import type { Answered } from '../graphql.mjs';
 import type { StoredToken } from '../token.mjs';
 import { dayKeyOf, type WeeklyActivity } from '../weekly-activity.mjs';
@@ -15,15 +15,21 @@ describe(createActivityStore, () => {
 
     store.openDialog();
 
-    assert.isTrue(store.open.getSnapshot().value);
+    assert.isTrue(Optional.unwrap(store.open.getSnapshot()));
 
-    assert.strictEqual(store.status.getSnapshot().value.type, 'loading');
+    assert.strictEqual(
+      Optional.unwrap(store.status.getSnapshot()).type,
+      'loading',
+    );
 
     answer(0, week(TODAY));
 
     await settle();
 
-    assert.strictEqual(store.status.getSnapshot().value.type, 'ready');
+    assert.strictEqual(
+      Optional.unwrap(store.status.getSnapshot()).type,
+      'ready',
+    );
 
     assert.strictEqual(loads.length, 1);
 
@@ -86,7 +92,10 @@ describe(createActivityStore, () => {
     assert.strictEqual(loads.length, 2);
 
     // Yesterday's week is not shown while the new one is read.
-    assert.strictEqual(store.status.getSnapshot().value.type, 'loading');
+    assert.strictEqual(
+      Optional.unwrap(store.status.getSnapshot()).type,
+      'loading',
+    );
   });
 
   test('midnight reads the new week while the dialog is open, and forgets it while closed', async () => {
@@ -114,7 +123,10 @@ describe(createActivityStore, () => {
 
     fireTimer();
 
-    assert.strictEqual(store.status.getSnapshot().value.type, 'idle');
+    assert.strictEqual(
+      Optional.unwrap(store.status.getSnapshot()).type,
+      'idle',
+    );
 
     assert.strictEqual(loads.length, 2);
   });
@@ -136,7 +148,10 @@ describe(createActivityStore, () => {
 
     await settle();
 
-    assert.strictEqual(store.status.getSnapshot().value.type, 'ready');
+    assert.strictEqual(
+      Optional.unwrap(store.status.getSnapshot()).type,
+      'ready',
+    );
   });
 
   test('a failed read says why, and can be tried again', async () => {
@@ -148,7 +163,7 @@ describe(createActivityStore, () => {
 
     await settle();
 
-    assert.deepStrictEqual(store.status.getSnapshot().value, {
+    assert.deepStrictEqual(Optional.unwrap(store.status.getSnapshot()), {
       type: 'failed',
       message: 'GitHub answered 502 Bad Gateway.',
     });
@@ -167,7 +182,7 @@ describe(createActivityStore, () => {
 
     await settle();
 
-    assert.deepStrictEqual(store.status.getSnapshot().value, {
+    assert.deepStrictEqual(Optional.unwrap(store.status.getSnapshot()), {
       type: 'failed',
       message: 'The connection was reset.',
     });
@@ -194,7 +209,7 @@ describe(createActivityStore, () => {
 
       await settle();
 
-      assert.deepStrictEqual(store.status.getSnapshot().value, {
+      assert.deepStrictEqual(Optional.unwrap(store.status.getSnapshot()), {
         type: 'failed',
         message: 'Could not count the week.',
       });
@@ -218,7 +233,7 @@ describe(createActivityStore, () => {
 
     await settle();
 
-    assert.deepStrictEqual(store.status.getSnapshot().value, {
+    assert.deepStrictEqual(Optional.unwrap(store.status.getSnapshot()), {
       type: 'failed',
       message: 'The connection was reset.',
     });
@@ -233,7 +248,7 @@ describe(createActivityStore, () => {
 
     await settle();
 
-    assert.deepStrictEqual(store.status.getSnapshot().value, {
+    assert.deepStrictEqual(Optional.unwrap(store.status.getSnapshot()), {
       type: 'failed',
       message: 'Invalid time value',
     });
@@ -254,7 +269,10 @@ describe(createActivityStore, () => {
 
     assert.strictEqual(loads.length, 2);
 
-    assert.strictEqual(store.status.getSnapshot().value.type, 'ready');
+    assert.strictEqual(
+      Optional.unwrap(store.status.getSnapshot()).type,
+      'ready',
+    );
   });
 
   test('with no token it says so rather than asking', () => {
@@ -264,7 +282,10 @@ describe(createActivityStore, () => {
 
     store.openDialog();
 
-    assert.strictEqual(store.status.getSnapshot().value.type, 'failed');
+    assert.strictEqual(
+      Optional.unwrap(store.status.getSnapshot()).type,
+      'failed',
+    );
 
     assert.strictEqual(loads.length, 0);
   });
@@ -284,7 +305,10 @@ describe(createActivityStore, () => {
 
     setToken({ value: 'other', store: 'session' });
 
-    assert.strictEqual(store.status.getSnapshot().value.type, 'idle');
+    assert.strictEqual(
+      Optional.unwrap(store.status.getSnapshot()).type,
+      'idle',
+    );
   });
 });
 
@@ -317,7 +341,7 @@ const week = (
 const todayMergedOf = (
   store: ReturnType<typeof createActivityStore>,
 ): number | undefined => {
-  const status = store.status.getSnapshot().value;
+  const status = Optional.unwrap(store.status.getSnapshot());
 
   return status.type === 'ready' ? status.activity.today.merged : undefined;
 };

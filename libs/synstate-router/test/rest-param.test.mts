@@ -186,11 +186,11 @@ describe('param.rest', () => {
       browser: createMemoryBrowser('https://example.com/docs/a/b/'),
     });
 
-    const before = router.match.getSnapshot().value;
+    const before = Optional.unwrap(router.match.getSnapshot());
 
     router.push(routes.docs.article.href({ path: ['a', 'b'] }, { hash: 'x' }));
 
-    const after = router.match.getSnapshot().value;
+    const after = Optional.unwrap(router.match.getSnapshot());
 
     assert.isTrue(
       before.route === 'docs.article' &&

@@ -149,8 +149,8 @@ export const DateInput = ({
       return Optional.isNone(clock)
         ? { text: invalidDateMessage, error: true }
         : {
-            text: format(clock.value),
-            error: !isDayInRange(clock.value, min, max),
+            text: format(Optional.unwrap(clock)),
+            error: !isDayInRange(Optional.unwrap(clock), min, max),
           };
     }),
   );
@@ -250,15 +250,19 @@ export const DateInput = ({
     // The stored value, as Blueprint's compares, though the calendar is given
     // none for one out of range: a day picked from it in another month keeps
     // the calendar open, as a time set from it does.
-    const previous = parseWallClock(value$.getSnapshot().value);
+    const previous = Optional.toNullable(
+      parseWallClock(Optional.unwrap(value$.getSnapshot())),
+    );
+
+    const nextValue = Optional.unwrap(nextClock);
 
     const stayOpen =
       !closeOnSelection ||
-      (Optional.isSome(previous) &&
-        (monthIndexOf(previous.value) !== monthIndexOf(nextClock.value) ||
+      (previous !== undefined &&
+        (monthIndexOf(previous) !== monthIndexOf(nextValue) ||
           (timePrecision === 'minute' &&
-            (previous.value.hour !== nextClock.value.hour ||
-              previous.value.minute !== nextClock.value.minute))));
+            (previous.hour !== nextValue.hour ||
+              previous.minute !== nextValue.minute))));
 
     setOpen(stayOpen);
 
@@ -270,7 +274,7 @@ export const DateInput = ({
     setFocused(stillFocused);
 
     if (stillFocused) {
-      setTyped(format(nextClock.value));
+      setTyped(format(nextValue));
     }
 
     onChange(next);
@@ -372,7 +376,7 @@ export const DateInput = ({
             setOpen(true);
           }}
           onFocus={(event) => {
-            setTyped(shown$.getSnapshot().value.text);
+            setTyped(Optional.unwrap(shown$.getSnapshot()).text);
 
             setFocused(true);
 
@@ -395,8 +399,11 @@ export const DateInput = ({
 
             const clock = parse(text);
 
-            if (Optional.isSome(clock) && isDayInRange(clock.value, min, max)) {
-              onChange(toValue(clock.value));
+            if (
+              Optional.isSome(clock) &&
+              isDayInRange(Optional.unwrap(clock), min, max)
+            ) {
+              onChange(toValue(Optional.unwrap(clock)));
             }
           }}
           onKeyDown={(event) => {
@@ -406,7 +413,7 @@ export const DateInput = ({
               return;
             }
 
-            const isOpen = open$.getSnapshot().value;
+            const isOpen = Optional.unwrap(open$.getSnapshot());
 
             switch (event.key) {
               case 'Tab': {
@@ -439,10 +446,10 @@ export const DateInput = ({
                 break;
 
               case 'Enter': {
-                const clock = parse(typed$.getSnapshot().value);
+                const clock = parse(Optional.unwrap(typed$.getSnapshot()));
 
                 if (Optional.isSome(clock)) {
-                  changeFromPicker(toValue(clock.value), true);
+                  changeFromPicker(toValue(Optional.unwrap(clock)), true);
                 }
 
                 break;

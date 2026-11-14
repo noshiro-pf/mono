@@ -9,7 +9,7 @@ import {
   withInitialValue,
   type Observable,
 } from 'synstate';
-import { Result } from 'ts-data-forge';
+import { Optional, Result } from 'ts-data-forge';
 import {
   debounceMs,
   fetchItems,
@@ -78,7 +78,7 @@ if (import.meta.vitest !== undefined) {
 
     return {
       setQuery,
-      getState: () => searchState.getSnapshot().value,
+      getState: () => Optional.unwrap(searchState.getSnapshot()),
       dispose,
     };
   });

@@ -131,7 +131,7 @@ describe('the value the source holds when the operator is created is projected',
 
     const s = a
       .pipe(filter(Optional.isSome))
-      .pipe(map((some) => some.value))
+      .pipe(map((some) => Optional.unwrap(some)))
       .pipe(switchMap((id) => just(`item ${id.toString()}`)));
 
     assert.deepStrictEqual(s.getSnapshot(), Optional.some('item 42'));

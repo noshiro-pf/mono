@@ -95,7 +95,8 @@ class TakeWhileObservableClass<A>
     const parentSnapshot = parentObservable.getSnapshot();
 
     const isTaking =
-      Optional.isNone(parentSnapshot) || predicate(parentSnapshot.value, -1);
+      Optional.isNone(parentSnapshot) ||
+      predicate(Optional.unwrap(parentSnapshot), -1);
 
     super({
       parents: [parentObservable],
@@ -126,8 +127,10 @@ class TakeWhileObservableClass<A>
 
     this.#mut_index = asSafeUint(this.#mut_index + 1);
 
-    if (this.#predicate(sn.value, this.#mut_index)) {
-      this.setNext(sn.value, updateToken);
+    const value = Optional.unwrap(sn);
+
+    if (this.#predicate(value, this.#mut_index)) {
+      this.setNext(value, updateToken);
     } else {
       this.complete();
     }

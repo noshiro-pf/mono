@@ -25,9 +25,9 @@ if (import.meta.vitest !== undefined) {
 
         // `emitted` tells which parent emitted in this update.
         if (Optional.isSome(a) && ctx.emitted(first)) {
-          ctx.set({ from: 'left', value: a.value });
+          ctx.set({ from: 'left', value: Optional.unwrap(a) });
         } else if (Optional.isSome(b) && ctx.emitted(second)) {
-          ctx.set({ from: 'right', value: b.value });
+          ctx.set({ from: 'right', value: Optional.unwrap(b) });
         }
       });
 

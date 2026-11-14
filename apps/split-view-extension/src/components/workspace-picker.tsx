@@ -13,6 +13,7 @@ import {
   type Bindable,
   type JSX,
 } from 'synstate-dom';
+import { Optional } from 'ts-data-forge';
 import type { WorkspaceRegistry } from '../state/index.mjs';
 import { Icon } from './icon.js';
 import { WorkspaceEditor } from './workspace-editor.js';
@@ -98,7 +99,7 @@ export const WorkspacePicker = ({
 
     if (
       root !== undefined &&
-      editing$.getSnapshot().value &&
+      Optional.unwrap(editing$.getSnapshot()) &&
       pointerEvent.target instanceof Node &&
       !root.contains(pointerEvent.target)
     ) {
@@ -108,7 +109,7 @@ export const WorkspacePicker = ({
 
   listenInScope(globalThis, 'keydown', (keyboardEvent) => {
     if (
-      editing$.getSnapshot().value &&
+      Optional.unwrap(editing$.getSnapshot()) &&
       keyboardEvent instanceof KeyboardEvent &&
       keyboardEvent.key === 'Escape'
     ) {
@@ -144,7 +145,8 @@ export const WorkspacePicker = ({
               mut_state.pendingSwitches -= 1;
 
               if (mut_state.pendingSwitches === 0) {
-                mut_select.value = activeId.getSnapshot().value ?? '';
+                mut_select.value =
+                  Optional.unwrap(activeId.getSnapshot()) ?? '';
               }
             })
             .catch(console.error);

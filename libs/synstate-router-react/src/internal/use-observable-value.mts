@@ -1,5 +1,6 @@
 import * as React from 'react';
 import type { InitializedObservable } from 'synstate';
+import { Optional } from 'ts-data-forge';
 
 /**
  * The current value of `observable`, re-rendering when it changes. The server
@@ -21,7 +22,7 @@ export const useObservableValue = <A,>(
   );
 
   const getSnapshot = React.useCallback(
-    (): A => observable.getSnapshot().value,
+    (): A => Optional.unwrap(observable.getSnapshot()),
     [observable],
   );
 

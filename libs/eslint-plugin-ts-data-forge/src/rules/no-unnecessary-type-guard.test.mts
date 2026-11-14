@@ -582,6 +582,22 @@ describe('no-unnecessary-type-guard through type wrappers', () => {
           const y = isNullish(x as string | null | undefined);
         `,
       },
+      {
+        name: 'isNonNullish on an Optional or undefined: a Some of null is null at runtime',
+        code: dedent`
+          import { isNonNullish, Optional } from 'ts-data-forge';
+          declare const x: Optional<string | null> | undefined;
+          const y = isNonNullish(x);
+        `,
+      },
+      {
+        name: 'isNull on an Optional, which a Some of null is at runtime',
+        code: dedent`
+          import { isNull, Optional } from 'ts-data-forge';
+          declare const x: Optional<null>;
+          const y = isNull(x);
+        `,
+      },
     ],
     invalid: [
       {
@@ -633,6 +649,56 @@ describe('no-unnecessary-type-guard through type wrappers', () => {
 describe('no-unnecessary-type-guard on the variant guards of Optional, Result, TernaryResult and AsyncData', () => {
   tester.run('no-unnecessary-type-guard', noUnnecessaryTypeGuard, {
     valid: [
+      {
+        name: 'Result.isOk on a Some of a Some of None, which the rule does not follow',
+        code: dedent`
+          import { Result, type None, type Some } from 'ts-data-forge';
+          declare const x: Some<Some<None>>;
+          const y = Result.isOk(x);
+        `,
+      },
+      {
+        name: 'Result.isOk on a Some of a Some of an Ok, which the rule does not follow',
+        code: dedent`
+          import { Result, type Ok, type Some } from 'ts-data-forge';
+          declare const x: Some<Some<Ok<number>>>;
+          const y = Result.isOk(x);
+        `,
+      },
+      {
+        name: 'Result.isOk on a Some whose held type keeps growing, which gives no verdict rather than recursing',
+        code: dedent`
+          import { Result, type Ok, type Some } from 'ts-data-forge';
+          interface D<T> extends Some<D<Some<T>> | Ok<number>> {}
+          declare const x: D<number>;
+          const y = Result.isOk(x);
+        `,
+      },
+      {
+        name: 'Result.isOk on a Some of an Optional of an Ok, which may be a Some of None',
+        code: dedent`
+          import { Result, type Ok, type Optional, type Some } from 'ts-data-forge';
+          declare const x: Some<Optional<Ok<number>>>;
+          const y = Result.isOk(x);
+        `,
+      },
+      {
+        name: 'Result.isOk on a Some that holds itself, which gives no verdict rather than recursing',
+        code: dedent`
+          import { Result, type Ok, type Some } from 'ts-data-forge';
+          interface R extends Some<R | Ok<number>> {}
+          declare const x: R;
+          const y = Result.isOk(x);
+        `,
+      },
+      {
+        name: 'Result.isOk on a Some of a Result, which is the Result itself at runtime',
+        code: dedent`
+          import { Result, type Some } from 'ts-data-forge';
+          declare const x: Some<Result<number, string>>;
+          const y = Result.isOk(x);
+        `,
+      },
       {
         name: 'Optional.isNone on an Optional',
         code: dedent`
@@ -785,11 +851,27 @@ describe('no-unnecessary-type-guard on the variant guards of Optional, Result, T
         `,
       },
       {
+        name: 'isString on an Optional<string>, which is a string at runtime whatever its object type says',
+        code: dedent`
+          import { isString, Optional } from 'ts-data-forge';
+          declare const x: Optional<string>;
+          const y = isString(x);
+        `,
+      },
+      {
+        name: 'isRecord on a Some, which is its value at runtime',
+        code: dedent`
+          import { isRecord, type Some } from 'ts-data-forge';
+          declare const x: Some<number>;
+          const y = isRecord(x);
+        `,
+      },
+      {
         name: 'a member of Optional that is not a variant guard',
         code: dedent`
           import { Optional, type Some } from 'ts-data-forge';
           declare const x: Some<number>;
-          const y = Optional.isOptional(x);
+          const y = Optional.toNullable(x);
         `,
       },
       {
@@ -819,6 +901,90 @@ describe('no-unnecessary-type-guard on the variant guards of Optional, Result, T
       },
     ],
     invalid: [
+      {
+        name: 'Result.isOk on a Some of None, which is a reserved string at runtime',
+        code: dedent`
+          import { Result, type None, type Some } from 'ts-data-forge';
+          declare const x: Some<None>;
+          const y = Result.isOk(x);
+        `,
+        output: dedent`
+          import { Result, type None, type Some } from 'ts-data-forge';
+          declare const x: Some<None>;
+          const y = false;
+        `,
+        errors: [{ messageId: 'alwaysFalse' }],
+      },
+      {
+        name: 'Result.isOk on a Some of an Ok, which is the Ok itself at runtime',
+        code: dedent`
+          import { Result, type Ok, type Some } from 'ts-data-forge';
+          declare const x: Some<Ok<number>>;
+          const y = Result.isOk(x);
+        `,
+        output: dedent`
+          import { Result, type Ok, type Some } from 'ts-data-forge';
+          declare const x: Some<Ok<number>>;
+          const y = true;
+        `,
+        errors: [{ messageId: 'alwaysTrue' }],
+      },
+      {
+        name: 'Result.isOk on None, which is a reserved string at runtime',
+        code: dedent`
+          import { Result, type None } from 'ts-data-forge';
+          declare const x: None;
+          const y = Result.isOk(x);
+        `,
+        output: dedent`
+          import { Result, type None } from 'ts-data-forge';
+          declare const x: None;
+          const y = false;
+        `,
+        errors: [{ messageId: 'alwaysFalse' }],
+      },
+      {
+        name: 'Result.isOk on a Some of a number, which is never an Ok at runtime',
+        code: dedent`
+          import { Result, type Some } from 'ts-data-forge';
+          declare const x: Some<number>;
+          const y = Result.isOk(x);
+        `,
+        output: dedent`
+          import { Result, type Some } from 'ts-data-forge';
+          declare const x: Some<number>;
+          const y = false;
+        `,
+        errors: [{ messageId: 'alwaysFalse' }],
+      },
+      {
+        name: "Optional.isSome on a Some of an Ok, which Optional's own guard still judges",
+        code: dedent`
+          import { Optional, type Ok, type Some } from 'ts-data-forge';
+          declare const x: Some<Ok<number>>;
+          const y = Optional.isSome(x);
+        `,
+        output: dedent`
+          import { Optional, type Ok, type Some } from 'ts-data-forge';
+          declare const x: Some<Ok<number>>;
+          const y = true;
+        `,
+        errors: [{ messageId: 'alwaysTrue' }],
+      },
+      {
+        name: "Optional.isNone on a Some of an Ok, which Optional's own guard still judges",
+        code: dedent`
+          import { Optional, type Ok, type Some } from 'ts-data-forge';
+          declare const x: Some<Ok<number>>;
+          const y = Optional.isNone(x);
+        `,
+        output: dedent`
+          import { Optional, type Ok, type Some } from 'ts-data-forge';
+          declare const x: Some<Ok<number>>;
+          const y = false;
+        `,
+        errors: [{ messageId: 'alwaysFalse' }],
+      },
       {
         name: 'Optional.isNone on a Some (always false)',
         code: dedent`

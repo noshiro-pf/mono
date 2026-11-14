@@ -17,7 +17,7 @@ import {
   mapBindable,
   type JSX,
 } from 'synstate-dom';
-import { Arr, Result, match } from 'ts-data-forge';
+import { Arr, Optional, Result, match } from 'ts-data-forge';
 import { dict } from '../../../constants/index.mjs';
 import { showToast } from '../../../functions/index.mjs';
 import {
@@ -171,7 +171,7 @@ export const EventListPage = (): JSX.Element => {
               <For items={mapBindable(listDrawing$, (d) => [d])} key={(d) => d}>
                 {(drawing$) => {
                   const { eventList, fireAuthUser, archiveOrUnArchive } =
-                    drawing$.getSnapshot().value;
+                    Optional.unwrap(drawing$.getSnapshot());
 
                   const user = (): User | undefined =>
                     fireAuthUser === undefined

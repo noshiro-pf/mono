@@ -1,6 +1,5 @@
 import type { UnknownRecord } from 'ts-type-forge';
 import { hasKey, isRecord } from '../../../guard/index.mjs';
-import { Optional } from '../../optional/index.mjs';
 import { Result } from '../../result/index.mjs';
 import type { UnknownAsyncData } from '../async-data.mjs';
 import { IdleTypeTagName, PendingTypeTagName } from './tag.mjs';
@@ -35,13 +34,17 @@ export const isAsyncData = (
 
   if (!Result.isResult(maybeAsyncData)) {
     return (
-      maybeAsyncData.$$tag === PendingTypeTagName &&
-      hasPreviousOptional(maybeAsyncData)
+      maybeAsyncData.$$tag === PendingTypeTagName && hasPrevious(maybeAsyncData)
     );
   }
 
-  return Result.isOk(maybeAsyncData) || hasPreviousOptional(maybeAsyncData);
+  return Result.isOk(maybeAsyncData) || hasPrevious(maybeAsyncData);
 };
 
-const hasPreviousOptional = (record: UnknownRecord): boolean =>
-  hasKey(record, 'previous') && Optional.isOptional(record.previous);
+// Whether the record has the key, not what it holds: a `Some` of `undefined` or
+// `null` is that value at runtime, so a `previous` holding it is nullish. An
+// AsyncData from a ts-std-forge before Optional was unwrapped, whose `previous`
+// is `{ $$tag, value }`, passes too: values from before that change do not mix
+// with these, here as anywhere.
+const hasPrevious = (record: UnknownRecord): boolean =>
+  hasKey(record, 'previous');

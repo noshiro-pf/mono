@@ -1,5 +1,6 @@
 import { map, type InitializedObservable } from 'synstate';
 import { constant, For, If, type JSX } from 'synstate-dom';
+import { Optional } from 'ts-data-forge';
 import {
   LARGE_NODE_LINE_HEIGHT,
   type LaidOutNode,
@@ -21,11 +22,11 @@ type Props = Readonly<{
  * lines. Opened and moved as a task is (`dag-node-handlers.mts`).
  */
 export const DagMilestoneNode = ({ record }: Props): JSX.Element => {
-  const { node: first } = record.getSnapshot().value;
+  const { node: first } = Optional.unwrap(record.getSnapshot());
 
   const { openNode, onKeyDown } = dagNodeHandlers(
-    record.getSnapshot().value.view.ref,
-    () => record.getSnapshot().value.movable,
+    Optional.unwrap(record.getSnapshot()).view.ref,
+    () => Optional.unwrap(record.getSnapshot()).movable,
   );
 
   return (

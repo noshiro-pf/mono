@@ -6,6 +6,7 @@ import {
 } from '@testing-library/react';
 import * as React from 'react';
 import { externalHref } from 'synstate-router';
+import { Optional } from 'ts-data-forge';
 import { nextTask, routes, setup } from './fixture.js';
 
 /**
@@ -44,7 +45,10 @@ describe('Link', () => {
 
     assert.strictEqual(mut_lastClick.prevented, true);
 
-    assert.strictEqual(router.match.getSnapshot().value.route, 'settings');
+    assert.strictEqual(
+      Optional.unwrap(router.match.getSnapshot()).route,
+      'settings',
+    );
   });
 
   test.each([
@@ -67,7 +71,10 @@ describe('Link', () => {
 
     assert.strictEqual(mut_lastClick.prevented, false);
 
-    assert.strictEqual(router.match.getSnapshot().value.route, 'home');
+    assert.strictEqual(
+      Optional.unwrap(router.match.getSnapshot()).route,
+      'home',
+    );
   });
 
   test('leaves target="_blank" and download to the browser', () => {
@@ -99,7 +106,10 @@ describe('Link', () => {
 
     assert.strictEqual(mut_lastClick.prevented, false);
 
-    assert.strictEqual(router.match.getSnapshot().value.route, 'home');
+    assert.strictEqual(
+      Optional.unwrap(router.match.getSnapshot()).route,
+      'home',
+    );
   });
 
   test('routes a click on an element inside the link (#2954)', () => {
@@ -120,7 +130,10 @@ describe('Link', () => {
 
     assert.strictEqual(mut_lastClick.prevented, true);
 
-    assert.strictEqual(router.match.getSnapshot().value.route, 'settings');
+    assert.strictEqual(
+      Optional.unwrap(router.match.getSnapshot()).route,
+      'settings',
+    );
   });
 
   test('replaces the entry for a link to the current URL (#2956)', async () => {
@@ -143,7 +156,10 @@ describe('Link', () => {
 
     await act(nextTask);
 
-    assert.strictEqual(router.match.getSnapshot().value.route, 'home');
+    assert.strictEqual(
+      Optional.unwrap(router.match.getSnapshot()).route,
+      'home',
+    );
   });
 
   test('makes a fragment of the current page a fragment navigation (#3033)', () => {
@@ -163,7 +179,10 @@ describe('Link', () => {
 
     assert.strictEqual(browser.url().hash, '#team');
 
-    assert.strictEqual(router.match.getSnapshot().value.route, 'settings');
+    assert.strictEqual(
+      Optional.unwrap(router.match.getSnapshot()).route,
+      'settings',
+    );
   });
 
   test('leaves an external URL to the browser and writes it as given', () => {
@@ -221,7 +240,10 @@ describe('Link', () => {
       fireEvent.click(testScreen.getByRole('link'));
     });
 
-    assert.strictEqual(router.match.getSnapshot().value.route, 'home');
+    assert.strictEqual(
+      Optional.unwrap(router.match.getSnapshot()).route,
+      'home',
+    );
   });
 
   test('replace routes without adding an entry', async () => {
@@ -246,6 +268,9 @@ describe('Link', () => {
 
     await act(nextTask);
 
-    assert.strictEqual(router.match.getSnapshot().value.route, 'home');
+    assert.strictEqual(
+      Optional.unwrap(router.match.getSnapshot()).route,
+      'home',
+    );
   });
 });

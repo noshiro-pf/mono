@@ -1,5 +1,6 @@
 import { DateRangeInput, type DayRange } from 'blueprint-synstate';
 import { constant, For, type JSX } from 'synstate-dom';
+import { Optional } from 'ts-data-forge';
 import { dict } from '../../../constants/index.mjs';
 import {
   formatDateInputText,
@@ -39,7 +40,7 @@ export const DetailedFilterDateRange = (): JSX.Element => (
         }
       >
         {(bounds$) => {
-          const bounds = bounds$.getSnapshot().value;
+          const bounds = Optional.unwrap(bounds$.getSnapshot());
 
           return (
             <DateRangeInput

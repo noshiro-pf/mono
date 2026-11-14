@@ -7,6 +7,7 @@ import {
   listenInScope,
   type JSX,
 } from 'synstate-dom';
+import { Optional } from 'ts-data-forge';
 import { entryOf, type SplitViewList } from '../../core/index.mjs';
 import type { Controller } from '../controller.mjs';
 import { Icon } from './icon.js';
@@ -47,7 +48,7 @@ export const ViewPicker = ({
   // frame's), closes it.
   listenInScope(globalThis, 'pointerdown', (event) => {
     if (
-      editing$.getSnapshot().value &&
+      Optional.unwrap(editing$.getSnapshot()) &&
       mut_refs.root !== undefined &&
       event.target instanceof Node &&
       !mut_refs.root.contains(event.target)
@@ -90,7 +91,8 @@ export const ViewPicker = ({
               mut_refs.pendingSwitches -= 1;
 
               if (mut_refs.pendingSwitches === 0) {
-                mut_select.value = shownId$.getSnapshot().value ?? '';
+                mut_select.value =
+                  Optional.unwrap(shownId$.getSnapshot()) ?? '';
               }
             })
             .catch(console.error);

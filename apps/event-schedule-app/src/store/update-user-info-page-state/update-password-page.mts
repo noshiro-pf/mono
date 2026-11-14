@@ -1,5 +1,5 @@
 import { derive, filter, map, type InitializedObservable } from 'synstate';
-import { Result } from 'ts-data-forge';
+import { Optional, Result } from 'ts-data-forge';
 import type { StrictPick } from 'ts-type-forge';
 import { dict } from '../../constants/index.mjs';
 import {
@@ -231,7 +231,9 @@ export const createUpdatePasswordPageStore = <
   };
 
   const enterClickHandler = (): void => {
-    const enterButtonDisabled = enterButtonDisabled$.getSnapshot().value;
+    const enterButtonDisabled = Optional.unwrap(
+      enterButtonDisabled$.getSnapshot(),
+    );
 
     const fireAuthUser = deps.auth.getFireAuthUserSnapshot();
 

@@ -1,4 +1,5 @@
 import html2canvas from 'html2canvas';
+import { Optional } from 'ts-data-forge';
 import { hand2String } from '../functions/index.mjs';
 import { calculatorStore } from '../store/index.mjs';
 import { downloadFile } from '../utils/index.mjs';
@@ -19,9 +20,11 @@ export const downloadProblemAsImage = async (): Promise<void> => {
     .toDataURL('image/png')
     .replace('image/png', 'image/octet-stream');
 
-  const handSorted = calculatorStore.handSorted.getSnapshot().value;
+  const handSorted = Optional.unwrap(calculatorStore.handSorted.getSnapshot());
 
-  const revealedBlocks = calculatorStore.revealedBlocks.getSnapshot().value;
+  const revealedBlocks = Optional.unwrap(
+    calculatorStore.revealedBlocks.getSnapshot(),
+  );
 
   downloadFile(src, `${hand2String(handSorted, revealedBlocks)}.png`);
 };

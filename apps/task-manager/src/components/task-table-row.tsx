@@ -1,5 +1,6 @@
 import { type InitializedObservable, map } from 'synstate';
 import { constant, If, type JSX } from 'synstate-dom';
+import { Optional } from 'ts-data-forge';
 import { editorStore } from '../store/index.mjs';
 import {
   formatEstimate,
@@ -43,7 +44,7 @@ export const TaskTableRow = ({ row }: Props): JSX.Element => (
         onClick={() => {
           editorStore.open({
             kind: 'task',
-            id: row.getSnapshot().value.task.id,
+            id: Optional.unwrap(row.getSnapshot()).task.id,
           });
         }}
       >

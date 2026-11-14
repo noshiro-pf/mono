@@ -6,6 +6,7 @@ import {
   type Observable,
   type SourceObservable,
 } from 'synstate';
+import { Optional } from 'ts-data-forge';
 
 /**
  * Returns an observable that holds `input` and emits each new `input` the
@@ -63,7 +64,7 @@ export const useValueAsObservable = <A,>(input: A): Observable<A> => {
     // The observable already holds the value it was created with.
     if (
       !observables.state.isCompleted &&
-      !Object.is(observables.state.getSnapshot().value, input)
+      !Object.is(Optional.unwrap(observables.state.getSnapshot()), input)
     ) {
       observables.source.next(input);
     }

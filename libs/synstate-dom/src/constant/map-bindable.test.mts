@@ -1,5 +1,5 @@
 import { createState, isObservable } from 'synstate';
-import { expectType } from 'ts-data-forge';
+import { expectType, Optional } from 'ts-data-forge';
 import type { Bindable } from './bindable.mjs';
 import { constant } from './constant.mjs';
 import { mapBindable } from './map-bindable.mjs';
@@ -29,10 +29,10 @@ describe(mapBindable, () => {
 
     const result$ = toObservable(result);
 
-    assert.strictEqual(result$.getSnapshot().value, 10);
+    assert.strictEqual(Optional.unwrap(result$.getSnapshot()), 10);
 
     setCount(2);
 
-    assert.strictEqual(result$.getSnapshot().value, 20);
+    assert.strictEqual(Optional.unwrap(result$.getSnapshot()), 20);
   });
 });

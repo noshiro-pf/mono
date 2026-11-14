@@ -1,7 +1,7 @@
 import { createState, map } from 'synstate';
 import { constant } from 'synstate-dom';
 import { externalHref, type ExternalHref, type Href } from 'synstate-router';
-import { asSafeInt } from 'ts-data-forge';
+import { asSafeInt, Optional } from 'ts-data-forge';
 import { mountInto, nextTask, routes, setup } from './fixture.js';
 
 /**
@@ -58,7 +58,10 @@ describe('Link', () => {
 
     assert.strictEqual(mut_lastClick.prevented, true);
 
-    assert.strictEqual(router.match.getSnapshot().value.route, 'settings');
+    assert.strictEqual(
+      Optional.unwrap(router.match.getSnapshot()).route,
+      'settings',
+    );
 
     unmount();
   });
@@ -83,7 +86,10 @@ describe('Link', () => {
 
     assert.strictEqual(mut_lastClick.prevented, false);
 
-    assert.strictEqual(router.match.getSnapshot().value.route, 'home');
+    assert.strictEqual(
+      Optional.unwrap(router.match.getSnapshot()).route,
+      'home',
+    );
 
     unmount();
   });
@@ -119,7 +125,10 @@ describe('Link', () => {
 
     assert.strictEqual(mut_lastClick.prevented, false);
 
-    assert.strictEqual(router.match.getSnapshot().value.route, 'home');
+    assert.strictEqual(
+      Optional.unwrap(router.match.getSnapshot()).route,
+      'home',
+    );
 
     unmount();
   });
@@ -144,7 +153,10 @@ describe('Link', () => {
 
     assert.strictEqual(mut_lastClick.prevented, true);
 
-    assert.strictEqual(router.match.getSnapshot().value.route, 'settings');
+    assert.strictEqual(
+      Optional.unwrap(router.match.getSnapshot()).route,
+      'settings',
+    );
 
     unmount();
   });
@@ -167,7 +179,10 @@ describe('Link', () => {
 
     await nextTask();
 
-    assert.strictEqual(router.match.getSnapshot().value.route, 'home');
+    assert.strictEqual(
+      Optional.unwrap(router.match.getSnapshot()).route,
+      'home',
+    );
 
     unmount();
   });
@@ -191,7 +206,10 @@ describe('Link', () => {
 
     assert.strictEqual(browser.url().hash, '#team');
 
-    assert.strictEqual(router.match.getSnapshot().value.route, 'settings');
+    assert.strictEqual(
+      Optional.unwrap(router.match.getSnapshot()).route,
+      'settings',
+    );
 
     unmount();
   });
@@ -234,7 +252,10 @@ describe('Link', () => {
 
     assert.strictEqual(mut_lastClick.prevented, false);
 
-    assert.strictEqual(router.match.getSnapshot().value.route, 'home');
+    assert.strictEqual(
+      Optional.unwrap(router.match.getSnapshot()).route,
+      'home',
+    );
 
     unmount();
   });
@@ -261,7 +282,10 @@ describe('Link', () => {
 
     click(anchor);
 
-    assert.strictEqual(router.match.getSnapshot().value.route, 'products.item');
+    assert.strictEqual(
+      Optional.unwrap(router.match.getSnapshot()).route,
+      'products.item',
+    );
 
     setTo(externalHref('https://example.com/'));
 
@@ -306,7 +330,10 @@ describe('Link', () => {
 
     assert.strictEqual(mut_lastClick.prevented, false);
 
-    assert.strictEqual(router.match.getSnapshot().value.route, 'home');
+    assert.strictEqual(
+      Optional.unwrap(router.match.getSnapshot()).route,
+      'home',
+    );
 
     setExternal(false);
 
@@ -314,7 +341,10 @@ describe('Link', () => {
 
     assert.strictEqual(mut_lastClick.prevented, true);
 
-    assert.strictEqual(router.match.getSnapshot().value.route, 'settings');
+    assert.strictEqual(
+      Optional.unwrap(router.match.getSnapshot()).route,
+      'settings',
+    );
 
     unmount();
   });
@@ -338,7 +368,10 @@ describe('Link', () => {
 
     click(anchorIn(container));
 
-    assert.strictEqual(router.match.getSnapshot().value.route, 'home');
+    assert.strictEqual(
+      Optional.unwrap(router.match.getSnapshot()).route,
+      'home',
+    );
 
     unmount();
   });
@@ -363,7 +396,10 @@ describe('Link', () => {
 
     await nextTask();
 
-    assert.strictEqual(router.match.getSnapshot().value.route, 'home');
+    assert.strictEqual(
+      Optional.unwrap(router.match.getSnapshot()).route,
+      'home',
+    );
 
     unmount();
   });

@@ -1,4 +1,5 @@
 import { constant, For, type JSX } from 'synstate-dom';
+import { Optional } from 'ts-data-forge';
 import type { DayOfWeekIndex } from 'ts-type-forge';
 import { daysOfWeekList } from '../../utils-ported/index.mjs';
 import * as styles from './multiple-date-picker.module.css';
@@ -15,7 +16,7 @@ export const WeekdaysHeader = ({ onClick }: Props): JSX.Element => (
     <div class={constant(styles.row)} role={constant('row')}>
       <For items={constant(daysOfWeekList.en)} key={(w) => w.name}>
         {(w$, index$) => {
-          const { name, abbr } = w$.getSnapshot().value;
+          const { name, abbr } = Optional.unwrap(w$.getSnapshot());
 
           return (
             // eslint-disable-next-line synstate-dom-a11y/click-events-have-key-events, synstate-dom-a11y/interactive-supports-focus, synstate-dom-a11y/prefer-tag-over-role -- recorded, not fixed, when jsx-a11y came to synstate-dom (#3764)
@@ -32,7 +33,7 @@ export const WeekdaysHeader = ({ onClick }: Props): JSX.Element => (
                   : () => {
                       onClick(
                         // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-                        index$.getSnapshot().value as DayOfWeekIndex,
+                        Optional.unwrap(index$.getSnapshot()) as DayOfWeekIndex,
                       );
                     }
               }

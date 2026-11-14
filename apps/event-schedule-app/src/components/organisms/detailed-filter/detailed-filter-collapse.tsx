@@ -1,6 +1,7 @@
 import { Collapse } from 'blueprint-synstate';
 import { map } from 'synstate';
 import { constant, For, type Bindable, type JSX } from 'synstate-dom';
+import { Optional } from 'ts-data-forge';
 import { dict } from '../../../constants/index.mjs';
 import { AnswerFilterAndSortStore } from '../../../store/index.mjs';
 import { CheckboxView } from '../../molecules/index.mjs';
@@ -76,9 +77,9 @@ export const DetailedFilterCollapse = ({ isOpen }: Props): JSX.Element => (
                       map((r) => (r.checkState.checked ? 'checked' : 'none')),
                     )}
                     onCheck={(checked) => {
-                      respondent$
-                        .getSnapshot()
-                        .value.checkState.onCheck(checked);
+                      Optional.unwrap(
+                        respondent$.getSnapshot(),
+                      ).checkState.onCheck(checked);
                     }}
                   />
                   <span>{respondent$.pipe(map((r) => r.username))}</span>

@@ -48,14 +48,14 @@ export function useObservableValue<A, B = A>(
     [observable$],
   );
 
-  // The value itself rather than synstate's `Optional`, which is a new object
-  // on every emission, so that Preact renders nothing for an emission equal to
-  // the current value.
-  const getSnapshot = PreactCompat.useCallback((): A | typeof NO_VALUE => {
-    const snapshot = observable$.getSnapshot();
-
-    return Optional.isSome(snapshot) ? snapshot.value : NO_VALUE;
-  }, [observable$]);
+  // The value itself, which is what the hook returns, or `NO_VALUE` while there
+  // is none. Equal values give equal snapshots under `Object.is`, so Preact
+  // renders nothing for an emission equal to the current value.
+  const getSnapshot = PreactCompat.useCallback(
+    (): A | typeof NO_VALUE =>
+      Optional.unwrapOr(observable$.getSnapshot(), NO_VALUE),
+    [observable$],
+  );
 
   const value = PreactCompat.useSyncExternalStore(subscribe, getSnapshot);
 

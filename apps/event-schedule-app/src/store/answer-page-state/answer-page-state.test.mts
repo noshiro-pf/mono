@@ -1,7 +1,7 @@
 import { Answer, EventSchedule } from 'event-schedule-app-shared';
 import { createState } from 'synstate';
 import { createMemoryBrowser } from 'synstate-router';
-import { Result } from 'ts-data-forge';
+import { Optional, Result } from 'ts-data-forge';
 import { createAppRouter } from '../router-store.mjs';
 import {
   createAnswerPageStore,
@@ -16,12 +16,12 @@ describe(createAnswerPageStore, () => {
     store.onAddAnswerButtonClick();
 
     assert.strictEqual(
-      store.answerBeingEditedSectionState$.getSnapshot().value,
+      Optional.unwrap(store.answerBeingEditedSectionState$.getSnapshot()),
       'creating',
     );
 
     assert.strictEqual(
-      store.answerBeingEdited$.getSnapshot().value.user.name,
+      Optional.unwrap(store.answerBeingEdited$.getSnapshot()).user.name,
       'alice',
     );
   });
@@ -32,7 +32,7 @@ describe(createAnswerPageStore, () => {
     store.onAnswerClick(answerOf('u2', 'bob'));
 
     assert.strictEqual(
-      store.answerBeingEditedSectionState$.getSnapshot().value,
+      Optional.unwrap(store.answerBeingEditedSectionState$.getSnapshot()),
       'hidden',
     );
   });
@@ -45,16 +45,19 @@ describe(createAnswerPageStore, () => {
     store.onAnswerClick(own);
 
     assert.strictEqual(
-      store.answerBeingEditedSectionState$.getSnapshot().value,
+      Optional.unwrap(store.answerBeingEditedSectionState$.getSnapshot()),
       'editing',
     );
 
-    assert.deepStrictEqual(store.answerBeingEdited$.getSnapshot().value, own);
+    assert.deepStrictEqual(
+      Optional.unwrap(store.answerBeingEdited$.getSnapshot()),
+      own,
+    );
 
     store.onAnswerClick(answerOf(null, 'carol'));
 
     assert.strictEqual(
-      store.answerBeingEdited$.getSnapshot().value.user.name,
+      Optional.unwrap(store.answerBeingEdited$.getSnapshot()).user.name,
       'carol',
     );
   });
@@ -71,7 +74,7 @@ describe(createAnswerPageStore, () => {
     assert.deepStrictEqual(calls, ['add abc dave', 'refetch']);
 
     assert.strictEqual(
-      store.answerBeingEditedSectionState$.getSnapshot().value,
+      Optional.unwrap(store.answerBeingEditedSectionState$.getSnapshot()),
       'hidden',
     );
 
@@ -126,13 +129,15 @@ describe(createAnswerPageStore, () => {
     store.toggleProtectedSection();
 
     assert.strictEqual(
-      store.answerBeingEdited$.getSnapshot().value.user.id,
+      Optional.unwrap(store.answerBeingEdited$.getSnapshot()).user.id,
       'u1',
     );
 
     store.toggleProtectedSection();
 
-    assert.isNull(store.answerBeingEdited$.getSnapshot().value.user.id);
+    assert.isNull(
+      Optional.unwrap(store.answerBeingEdited$.getSnapshot()).user.id,
+    );
   });
 
   test('the edit button goes to the event’s edit page', () => {

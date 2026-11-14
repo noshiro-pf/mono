@@ -1,5 +1,6 @@
 import { createState, map, type InitializedObservable } from 'synstate';
 import { constant, For, If, Portal, render, type JSX } from 'synstate-dom';
+import { Optional } from 'ts-data-forge';
 
 type Item = Readonly<{ id: string; name: string }>;
 
@@ -39,7 +40,7 @@ const setup = (
     item$: InitializedObservable<Item>;
     index$: InitializedObservable<number>;
   }>): JSX.Element => {
-    const { id } = item$.getSnapshot().value;
+    const { id } = Optional.unwrap(item$.getSnapshot());
 
     mut_calls.set(id, (mut_calls.get(id) ?? 0) + 1);
 
@@ -190,7 +191,7 @@ describe(For, () => {
               map((s) => {
                 mut_runs.current += 1;
 
-                return `${item$.getSnapshot().value}${s}`;
+                return `${Optional.unwrap(item$.getSnapshot())}${s}`;
               }),
             )}
           </b>
@@ -236,7 +237,7 @@ describe(For, () => {
 
     const { container } = mountInto(() => (
       <For items={shown$} key={(i) => i.id}>
-        {(item$) => <Row id={item$.getSnapshot().value.id} />}
+        {(item$) => <Row id={Optional.unwrap(item$.getSnapshot()).id} />}
       </For>
     ));
 
@@ -377,7 +378,7 @@ describe(For, () => {
                 map((s) => {
                   mut_runs.current += 1;
 
-                  return `${item$.getSnapshot().value}${s}`;
+                  return `${Optional.unwrap(item$.getSnapshot())}${s}`;
                 }),
               )}
             </li>

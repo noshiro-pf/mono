@@ -1,4 +1,5 @@
 import { createState } from 'synstate';
+import { Optional } from 'ts-data-forge';
 import {
   asMilestoneId,
   asTaskId,
@@ -87,7 +88,7 @@ const setup = (): Setup => {
 };
 
 const editorOf = ({ store }: Setup): EditorState =>
-  store.editor.getSnapshot().value;
+  Optional.unwrap(store.editor.getSnapshot());
 
 const rowsOf = (setupped: Setup): readonly DependencyRow[] => {
   const current = editorOf(setupped);

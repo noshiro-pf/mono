@@ -1,4 +1,5 @@
 import { For, mapBindable, type Bindable, type JSX } from 'synstate-dom';
+import { Optional } from 'ts-data-forge';
 import type { CardNumber } from '../../types/index.mjs';
 import {
   Card0,
@@ -29,7 +30,10 @@ export const CardFace = ({ number, color, textColor }: Props): JSX.Element => (
     key={(n) => n}
   >
     {(number$) =>
-      CardComponents[number$.getSnapshot().value]({ color, textColor })
+      CardComponents[Optional.unwrap(number$.getSnapshot())]({
+        color,
+        textColor,
+      })
     }
   </For>
 );

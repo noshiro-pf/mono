@@ -1,6 +1,6 @@
 import { Answer } from 'event-schedule-app-shared';
 import { createState } from 'synstate';
-import { Result } from 'ts-data-forge';
+import { Optional, Result } from 'ts-data-forge';
 import { createAnswersStore, type AnswersFetcher } from './answers.mjs';
 
 describe(createAnswersStore, () => {
@@ -15,7 +15,10 @@ describe(createAnswersStore, () => {
 
     await settle(0);
 
-    assert.deepStrictEqual(store.answers$.getSnapshot().value, answers);
+    assert.deepStrictEqual(
+      Optional.unwrap(store.answers$.getSnapshot()),
+      answers,
+    );
   });
 
   test('drops a request made within the throttle of the last', async () => {
@@ -59,11 +62,13 @@ describe(createAnswersStore, () => {
 
     assert.deepStrictEqual(reads, ['abc', 'abc']);
 
-    assert.isTrue(store.refreshButtonIsLoading$.getSnapshot().value);
+    assert.isTrue(Optional.unwrap(store.refreshButtonIsLoading$.getSnapshot()));
 
     await settle(0);
 
-    assert.isFalse(store.refreshButtonIsLoading$.getSnapshot().value);
+    assert.isFalse(
+      Optional.unwrap(store.refreshButtonIsLoading$.getSnapshot()),
+    );
   });
 
   test('the refresh button is disabled for the throttle after each read it asks for', async () => {
@@ -71,11 +76,15 @@ describe(createAnswersStore, () => {
 
     store.start();
 
-    assert.isTrue(store.refreshButtonIsDisabled$.getSnapshot().value);
+    assert.isTrue(
+      Optional.unwrap(store.refreshButtonIsDisabled$.getSnapshot()),
+    );
 
     await settle(throttleMs * 5);
 
-    assert.isFalse(store.refreshButtonIsDisabled$.getSnapshot().value);
+    assert.isFalse(
+      Optional.unwrap(store.refreshButtonIsDisabled$.getSnapshot()),
+    );
   });
 
   test('stop ends the reading', () => {

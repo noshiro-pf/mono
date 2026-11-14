@@ -3,7 +3,6 @@ export * from './optional-filter.mjs';
 export * from './optional-flat-map.mjs';
 export * from './optional-from-nullable.mjs';
 export * from './optional-is-none.mjs';
-export * from './optional-is-optional.mjs';
 export * from './optional-is-some.mjs';
 export * from './optional-map.mjs';
 export * from './optional-match.mjs';

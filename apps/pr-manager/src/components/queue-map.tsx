@@ -5,7 +5,7 @@ import {
   type InitializedObservable,
 } from 'synstate';
 import { constant, For, type JSX } from 'synstate-dom';
-import { Num } from 'ts-data-forge';
+import { Num, Optional } from 'ts-data-forge';
 import { inWindow, windowOf, type QueueStrip } from '../queue-strip.mjs';
 import type { QueueSlot } from '../queue-view.mjs';
 
@@ -118,7 +118,7 @@ export const QueueMap = ({
 
         mut_press.moved = false;
 
-        setGrabbed(inWindow(strip$.getSnapshot().value, fraction));
+        setGrabbed(inWindow(Optional.unwrap(strip$.getSnapshot()), fraction));
 
         onPress(fraction);
       }}

@@ -1,5 +1,6 @@
 import { derive, map, type InitializedObservable } from 'synstate';
 import { constant, For, If, type JSX } from 'synstate-dom';
+import { Optional } from 'ts-data-forge';
 import type { ReadonlyRecord } from 'ts-type-forge';
 import {
   defaultShareOf,
@@ -42,7 +43,7 @@ export const BlockColumn = ({ panes$, blocks }: Props): JSX.Element => {
         {(pane$, index$) => {
           // The key is the pane's first block, so the row's is the one it was
           // made with.
-          const id = pane$.getSnapshot().value.key;
+          const id = Optional.unwrap(pane$.getSnapshot()).key;
 
           const ids$ = pane$.pipe(map(({ ids }) => ids));
 

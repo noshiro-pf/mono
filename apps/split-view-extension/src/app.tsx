@@ -1,6 +1,12 @@
 import { createState, derive, map, onScopeDispose } from 'synstate';
 import { constant, For, If, listenInScope, type JSX } from 'synstate-dom';
-import { Arr, fastDeepEqual, Num, unknownToString } from 'ts-data-forge';
+import {
+  Arr,
+  fastDeepEqual,
+  Num,
+  Optional,
+  unknownToString,
+} from 'ts-data-forge';
 import {
   PaneDropIndicator,
   PaneFrame,
@@ -126,7 +132,7 @@ export const App = (): JSX.Element => {
    */
   onScopeDispose(
     watchWorkspaceRegistry((written) => {
-      if (!fastDeepEqual(written, registry$.getSnapshot().value)) {
+      if (!fastDeepEqual(written, Optional.unwrap(registry$.getSnapshot()))) {
         setRegistry(written);
       }
     }),
@@ -134,7 +140,7 @@ export const App = (): JSX.Element => {
 
   /** Writes the list to storage and to the page at once. */
   const commitRegistry = (next: WorkspaceRegistry): void => {
-    if (next === registry$.getSnapshot().value) {
+    if (next === Optional.unwrap(registry$.getSnapshot())) {
       return;
     }
 
@@ -251,7 +257,7 @@ export const App = (): JSX.Element => {
    * `tabs` permission guards, which are the URL, the title and the icon.
    */
   const noteThisTab = async (): Promise<void> => {
-    const { workspaceId } = session$.getSnapshot().value;
+    const { workspaceId } = Optional.unwrap(session$.getSnapshot());
 
     if (workspaceId === undefined) {
       return;
@@ -267,7 +273,7 @@ export const App = (): JSX.Element => {
 
     commitRegistry(
       setWorkspaceEntryPinned(
-        registry$.getSnapshot().value,
+        Optional.unwrap(registry$.getSnapshot()),
         workspaceId,
         tab.pinned,
       ),
@@ -312,9 +318,8 @@ export const App = (): JSX.Element => {
   const collectDiagnostics = async (): Promise<void> => {
     const tab = await chrome.tabs.getCurrent();
 
-    const paneUrls = session$
-      .getSnapshot()
-      .value.state.panes.map((pane) => pane.currentUrl ?? pane.url)
+    const paneUrls = Optional.unwrap(session$.getSnapshot())
+      .state.panes.map((pane) => pane.currentUrl ?? pane.url)
       .filter((url) => url !== '');
 
     setDiagnostics(await readRuleDiagnostics(tab?.id, paneUrls));
@@ -400,7 +405,7 @@ export const App = (): JSX.Element => {
 
     const request = mut_switches.requested;
 
-    const live = session$.getSnapshot().value;
+    const live = Optional.unwrap(session$.getSnapshot());
 
     if (live.workspaceId === workspaceId) {
       // Back to the one on screen while another loads: that one is dropped
@@ -440,7 +445,10 @@ export const App = (): JSX.Element => {
     }
 
     commitRegistry(
-      activateWorkspaceEntry(registry$.getSnapshot().value, workspaceId),
+      activateWorkspaceEntry(
+        Optional.unwrap(registry$.getSnapshot()),
+        workspaceId,
+      ),
     );
   };
 
@@ -453,7 +461,7 @@ export const App = (): JSX.Element => {
 
   /** Writes the layout on screen, for whatever reads storage next. */
   const saveShown = async (): Promise<void> => {
-    const live = session$.getSnapshot().value;
+    const live = Optional.unwrap(session$.getSnapshot());
 
     if (live.workspaceId !== undefined && isListed(live.workspaceId)) {
       await saveWorkspaceState(live.workspaceId, live.state);
@@ -466,9 +474,9 @@ export const App = (): JSX.Element => {
    * debounce, `pagehide` — would write its record back.
    */
   const isListed = (workspaceId: string): boolean =>
-    registry$
-      .getSnapshot()
-      .value.entries.some((entry) => entry.id === workspaceId);
+    Optional.unwrap(registry$.getSnapshot()).entries.some(
+      (entry) => entry.id === workspaceId,
+    );
 
   /**
    * Adds a split view and opens it in a tab of its own.
@@ -481,7 +489,7 @@ export const App = (): JSX.Element => {
   const createWorkspace = async (): Promise<void> => {
     const workspaceId = crypto.randomUUID();
 
-    const current = registry$.getSnapshot().value;
+    const current = Optional.unwrap(registry$.getSnapshot());
 
     const next = addWorkspaceEntry(current, {
       id: workspaceId,
@@ -521,7 +529,9 @@ export const App = (): JSX.Element => {
 
     showNotice(
       describeOpenedWorkspaces(
-        await openEveryWorkspaceInTabs(registry$.getSnapshot().value.entries),
+        await openEveryWorkspaceInTabs(
+          Optional.unwrap(registry$.getSnapshot()).entries,
+        ),
       ),
     );
   };
@@ -536,7 +546,7 @@ export const App = (): JSX.Element => {
   ): void => {
     commitRegistry(
       renameWorkspaceEntry(
-        registry$.getSnapshot().value,
+        Optional.unwrap(registry$.getSnapshot()),
         workspaceId,
         workspaceName,
       ),
@@ -545,7 +555,11 @@ export const App = (): JSX.Element => {
 
   const handleMoveWorkspace = (workspaceId: string, offset: number): void => {
     commitRegistry(
-      moveWorkspaceEntry(registry$.getSnapshot().value, workspaceId, offset),
+      moveWorkspaceEntry(
+        Optional.unwrap(registry$.getSnapshot()),
+        workspaceId,
+        offset,
+      ),
     );
   };
 
@@ -561,7 +575,7 @@ export const App = (): JSX.Element => {
   const handleRemoveWorkspace = (workspaceId: string): void => {
     const remove = async (): Promise<void> => {
       const without = removeWorkspaceEntry(
-        registry$.getSnapshot().value,
+        Optional.unwrap(registry$.getSnapshot()),
         workspaceId,
       );
 
@@ -592,7 +606,7 @@ export const App = (): JSX.Element => {
         return;
       }
 
-      if (session$.getSnapshot().value.workspaceId === workspaceId) {
+      if (Optional.unwrap(session$.getSnapshot()).workspaceId === workspaceId) {
         switchWorkspace(without.activeId, {
           history: 'replace',
           saveCurrent: false,
@@ -609,7 +623,7 @@ export const App = (): JSX.Element => {
 
     downloadJsonFile(
       'split-views.json',
-      await exportWorkspacesAsJson(registry$.getSnapshot().value),
+      await exportWorkspacesAsJson(Optional.unwrap(registry$.getSnapshot())),
     );
   };
 
@@ -620,7 +634,7 @@ export const App = (): JSX.Element => {
   const handleImportWorkspaces = (text: string): void => {
     const read = async (): Promise<void> => {
       const result = await importWorkspacesFromJson(
-        registry$.getSnapshot().value,
+        Optional.unwrap(registry$.getSnapshot()),
         text,
         Date.now(),
       );
@@ -639,7 +653,7 @@ export const App = (): JSX.Element => {
 
       // The workspace on screen is one of the ones that may have just been
       // overwritten in storage.
-      const { workspaceId } = session$.getSnapshot().value;
+      const { workspaceId } = Optional.unwrap(session$.getSnapshot());
 
       if (workspaceId === undefined) {
         return;
@@ -674,7 +688,10 @@ export const App = (): JSX.Element => {
     const entry =
       position === undefined
         ? undefined
-        : workspaceAtPosition(registry$.getSnapshot().value, position);
+        : workspaceAtPosition(
+            Optional.unwrap(registry$.getSnapshot()),
+            position,
+          );
 
     if (entry !== undefined) {
       switchWorkspace(entry.id, { history: 'push', saveCurrent: true });
@@ -733,7 +750,7 @@ export const App = (): JSX.Element => {
     }
 
     const splitOpen = async (): Promise<void> => {
-      const { workspaceId } = session$.getSnapshot().value;
+      const { workspaceId } = Optional.unwrap(session$.getSnapshot());
 
       // Asked each time: Chrome gives a discarded tab a new id.
       const tab = await chrome.tabs.getCurrent();
@@ -748,7 +765,7 @@ export const App = (): JSX.Element => {
 
       // The pane was named in the split view the menu was opened in; one
       // switched to meanwhile has panes of the same ids that are not it.
-      if (session$.getSnapshot().value.workspaceId !== workspaceId) {
+      if (Optional.unwrap(session$.getSnapshot()).workspaceId !== workspaceId) {
         return;
       }
 
@@ -850,11 +867,14 @@ export const App = (): JSX.Element => {
 
     ensureRule().catch(console.error);
 
-    const { workspaceId } = session$.getSnapshot().value;
+    const { workspaceId } = Optional.unwrap(session$.getSnapshot());
 
     if (workspaceId !== undefined) {
       commitRegistry(
-        activateWorkspaceEntry(registry$.getSnapshot().value, workspaceId),
+        activateWorkspaceEntry(
+          Optional.unwrap(registry$.getSnapshot()),
+          workspaceId,
+        ),
       );
     }
   });
@@ -890,7 +910,7 @@ export const App = (): JSX.Element => {
   // stop taking pointer events while it lasts: a pointer over an `iframe` is
   // the frame's, not ours.
   listenInScope(globalThis, 'pointermove', (pointerEvent) => {
-    const drag = drag$.getSnapshot().value;
+    const drag = Optional.unwrap(drag$.getSnapshot());
 
     const element = mut_stage.element;
 
@@ -928,7 +948,7 @@ export const App = (): JSX.Element => {
   });
 
   const endDrag = (): void => {
-    if (drag$.getSnapshot().value !== undefined) {
+    if (Optional.unwrap(drag$.getSnapshot()) !== undefined) {
       setDrag(undefined);
     }
   };
@@ -969,9 +989,9 @@ export const App = (): JSX.Element => {
   ):
     | Readonly<{ paneId: PaneId; target: PaneDropTarget | undefined }>
     | undefined => {
-    const move = move$.getSnapshot().value;
+    const move = Optional.unwrap(move$.getSnapshot());
 
-    const geometry = geometry$.getSnapshot().value;
+    const geometry = Optional.unwrap(geometry$.getSnapshot());
 
     const element = mut_stage.element;
 
@@ -1012,7 +1032,7 @@ export const App = (): JSX.Element => {
   });
 
   listenInScope(globalThis, 'pointerup', (pointerEvent) => {
-    if (move$.getSnapshot().value === undefined) {
+    if (Optional.unwrap(move$.getSnapshot()) === undefined) {
       return;
     }
 
@@ -1032,7 +1052,7 @@ export const App = (): JSX.Element => {
   });
 
   const abandonMove = (): void => {
-    if (move$.getSnapshot().value !== undefined) {
+    if (Optional.unwrap(move$.getSnapshot()) !== undefined) {
       setMove(undefined);
     }
   };
@@ -1191,7 +1211,7 @@ export const App = (): JSX.Element => {
           {(slot$) => (
             <PaneFrame
               dispatch={dispatch}
-              paneId={slot$.getSnapshot().value.paneId}
+              paneId={Optional.unwrap(slot$.getSnapshot()).paneId}
               resetOrigins={resetOrigins$}
               view$={slot$.pipe(map((slot) => slot.view))}
               onMoveStart={handleMoveStart}

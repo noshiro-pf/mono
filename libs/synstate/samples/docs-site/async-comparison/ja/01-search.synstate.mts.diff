@@ -3,7 +3,7 @@
 @@ -10,6 +10,7 @@
    type Observable,
  } from 'synstate';
- import { Result } from 'ts-data-forge';
+ import { Optional, Result } from 'ts-data-forge';
 +import { testSearch } from '../search-test-suite.mjs';
  import {
    debounceMs,

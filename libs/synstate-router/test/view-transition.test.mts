@@ -1,3 +1,4 @@
+import { Optional } from 'ts-data-forge';
 import {
   createMemoryBrowser,
   createRouter,
@@ -26,11 +27,17 @@ describe('viewTransition', () => {
     router.push(routes.about.href(), { viewTransition: true });
 
     // The browser captures the old page first, and runs the update later.
-    assert.strictEqual(router.match.getSnapshot().value.route, 'home');
+    assert.strictEqual(
+      Optional.unwrap(router.match.getSnapshot()).route,
+      'home',
+    );
 
     await nextTask();
 
-    assert.strictEqual(router.match.getSnapshot().value.route, 'about');
+    assert.strictEqual(
+      Optional.unwrap(router.match.getSnapshot()).route,
+      'about',
+    );
 
     assert.deepStrictEqual(browser.viewTransitions(), ['running']);
 
@@ -55,7 +62,10 @@ describe('viewTransition', () => {
 
     router.push(routes.about.href(), { viewTransition: true });
 
-    assert.strictEqual(router.match.getSnapshot().value.route, 'about');
+    assert.strictEqual(
+      Optional.unwrap(router.match.getSnapshot()).route,
+      'about',
+    );
 
     router.dispose();
   });
@@ -69,7 +79,10 @@ describe('viewTransition', () => {
 
     router.replace(routes.about.href());
 
-    assert.strictEqual(router.match.getSnapshot().value.route, 'about');
+    assert.strictEqual(
+      Optional.unwrap(router.match.getSnapshot()).route,
+      'about',
+    );
 
     assert.deepStrictEqual(browser.viewTransitions(), []);
 

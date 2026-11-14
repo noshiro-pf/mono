@@ -1,4 +1,5 @@
 import { isObservable } from 'synstate';
+import { Optional } from 'ts-data-forge';
 import type { Bindable } from '../constant/index.mjs';
 
 /**
@@ -25,7 +26,7 @@ export const bindValue = <T,>(
   }
 
   if (bindable.isCompleted) {
-    write(bindable.getSnapshot().value);
+    write(Optional.unwrap(bindable.getSnapshot()));
 
     return;
   }

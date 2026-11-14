@@ -1,5 +1,6 @@
 import { combine, map, type InitializedObservable } from 'synstate';
 import { constant, If, type JSX } from 'synstate-dom';
+import { Optional } from 'ts-data-forge';
 import {
   fitTitle,
   NODE_HEIGHT,
@@ -19,7 +20,7 @@ export const DagNodeShape = ({
 }>): JSX.Element => {
   const node = placed.pipe(map((p) => p.node));
 
-  const first = node.getSnapshot().value;
+  const first = Optional.unwrap(node.getSnapshot());
 
   const title = node.pipe(map((n) => fitTitle(n.title, TITLE_UNITS)));
 

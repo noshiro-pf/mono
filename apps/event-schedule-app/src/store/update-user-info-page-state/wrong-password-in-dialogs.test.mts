@@ -1,5 +1,5 @@
 import { createState } from 'synstate';
-import { Result } from 'ts-data-forge';
+import { Optional, Result } from 'ts-data-forge';
 import type { FixedLengthTuple } from 'ts-type-forge';
 import { dict } from '../../constants/index.mjs';
 import type {
@@ -45,7 +45,7 @@ describe(createDeleteAccountPageStore, () => {
 
       assert.deepStrictEqual(calls, ['reauthenticate']);
 
-      const { formState } = store.state.getSnapshot().value;
+      const { formState } = Optional.unwrap(store.state.getSnapshot());
 
       assert.strictEqual(formState.password.error, expected);
 
@@ -54,7 +54,7 @@ describe(createDeleteAccountPageStore, () => {
       assert.deepStrictEqual(toasts, []);
 
       assert.strictEqual(
-        dialog.openingDialogType$.getSnapshot().value,
+        Optional.unwrap(dialog.openingDialogType$.getSnapshot()),
         'deleteAccount',
       );
     },
@@ -77,7 +77,9 @@ describe(createDeleteAccountPageStore, () => {
 
     store.inputEmailHandler('alice@example.com');
 
-    const { formState, enterButtonDisabled } = store.state.getSnapshot().value;
+    const { formState, enterButtonDisabled } = Optional.unwrap(
+      store.state.getSnapshot(),
+    );
 
     assert.isUndefined(formState.password.error);
 
@@ -107,7 +109,9 @@ describe(createDeleteAccountPageStore, () => {
 
     assert.deepStrictEqual(toasts, [['danger', dc.error]]);
 
-    assert.isUndefined(dialog.openingDialogType$.getSnapshot().value);
+    assert.isUndefined(
+      Optional.unwrap(dialog.openingDialogType$.getSnapshot()),
+    );
   });
 });
 
@@ -133,7 +137,7 @@ describe(createUpdateEmailPageStore, () => {
 
       assert.deepStrictEqual(calls, ['reauthenticate']);
 
-      const { formState } = store.state.getSnapshot().value;
+      const { formState } = Optional.unwrap(store.state.getSnapshot());
 
       assert.strictEqual(formState.password.error, dc.wrongPassword);
 
@@ -142,7 +146,7 @@ describe(createUpdateEmailPageStore, () => {
       assert.deepStrictEqual(toasts, []);
 
       assert.strictEqual(
-        dialog.openingDialogType$.getSnapshot().value,
+        Optional.unwrap(dialog.openingDialogType$.getSnapshot()),
         'updateEmail',
       );
     },
@@ -172,7 +176,7 @@ describe(createUpdatePasswordPageStore, () => {
 
       assert.deepStrictEqual(calls, ['reauthenticate']);
 
-      const { formState } = store.state.getSnapshot().value;
+      const { formState } = Optional.unwrap(store.state.getSnapshot());
 
       assert.strictEqual(formState.oldPassword.error, dc.wrongPassword);
 
@@ -181,7 +185,7 @@ describe(createUpdatePasswordPageStore, () => {
       assert.deepStrictEqual(toasts, []);
 
       assert.strictEqual(
-        dialog.openingDialogType$.getSnapshot().value,
+        Optional.unwrap(dialog.openingDialogType$.getSnapshot()),
         'updatePassword',
       );
     },
@@ -210,7 +214,9 @@ describe(createUpdatePasswordPageStore, () => {
 
     assert.deepStrictEqual(toasts, [['danger', dc.error]]);
 
-    assert.isUndefined(dialog.openingDialogType$.getSnapshot().value);
+    assert.isUndefined(
+      Optional.unwrap(dialog.openingDialogType$.getSnapshot()),
+    );
   });
 });
 

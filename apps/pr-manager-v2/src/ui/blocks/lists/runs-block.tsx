@@ -31,7 +31,9 @@ export const runsBlock = (
       <>
         {constant('Running workflows')}
         {runs.pipe(
-          map((o) => (Optional.isSome(o) ? ` (${o.value.length})` : '')),
+          map((o) =>
+            Optional.isSome(o) ? ` (${Optional.unwrap(o).length})` : '',
+          ),
         )}
       </>
     ),

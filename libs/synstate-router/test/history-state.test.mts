@@ -60,7 +60,7 @@ const setup = (
 
 const current = (
   router: ReturnType<typeof createRouter<Routes>>,
-): RouteMatch<Routes> => router.match.getSnapshot().value;
+): RouteMatch<Routes> => Optional.unwrap(router.match.getSnapshot());
 
 describe('history state', () => {
   test('is typed on the page that declares it, and absent from the others', () => {
@@ -150,7 +150,7 @@ describe('history state', () => {
 
     const other = createRouter(routes, { browser });
 
-    const junk = other.match.getSnapshot().value;
+    const junk = Optional.unwrap(other.match.getSnapshot());
 
     assert.isTrue(junk.route === 'checkout');
 
@@ -166,7 +166,7 @@ describe('history state', () => {
 
     const router = createRouter(routes, { browser });
 
-    const m = router.match.getSnapshot().value;
+    const m = Optional.unwrap(router.match.getSnapshot());
 
     assert.isTrue(m.route === 'checkout');
 

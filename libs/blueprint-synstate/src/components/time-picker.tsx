@@ -78,7 +78,7 @@ export const TimePicker = ({
   // What is being typed into a field, until it is read.
   const [editing$, setEditing] = createState<Optional<Editing>>(Optional.none);
 
-  const currentTime = (): TimeOfDay => time$.getSnapshot().value;
+  const currentTime = (): TimeOfDay => Optional.unwrap(time$.getSnapshot());
 
   const commit = (unit: Unit, next: number): void => {
     const time = currentTime();
@@ -131,8 +131,8 @@ export const TimePicker = ({
 
   const renderInput = (unit: Unit): JSX.Element => {
     const text$ = derive([time$, editing$], (time, editing) =>
-      Optional.isSome(editing) && editing.value.unit === unit
-        ? editing.value.text
+      Optional.isSome(editing) && Optional.unwrap(editing).unit === unit
+        ? Optional.unwrap(editing).text
         : unit === 'hour'
           ? time.hour.toString()
           : pad2(time.minute),

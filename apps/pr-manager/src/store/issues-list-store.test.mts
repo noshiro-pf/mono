@@ -1,4 +1,5 @@
 import { createState } from 'synstate';
+import { Optional } from 'ts-data-forge';
 import { DEFAULT_ISSUE_FILTER } from '../issue-filter.mjs';
 import type { IssueGraph } from '../issue-graph.mjs';
 import {
@@ -12,7 +13,7 @@ describe(createIssuesListStore, () => {
   test('starts at the view it is given, and hands every change to save from start on', () => {
     const { store, saved } = setup(STORED);
 
-    assert.deepStrictEqual(store.view.getSnapshot().value, STORED);
+    assert.deepStrictEqual(Optional.unwrap(store.view.getSnapshot()), STORED);
 
     store.setSort('updated');
 
@@ -86,12 +87,12 @@ describe(createIssuesListStore, () => {
 
     assert.deepStrictEqual(numbersShown(store), [1]);
 
-    assert.deepStrictEqual(store.counts.getSnapshot().value.open, {
+    assert.deepStrictEqual(Optional.unwrap(store.counts.getSnapshot()).open, {
       shown: 1,
       total: 3,
     });
 
-    assert.deepStrictEqual(store.counts.getSnapshot().value.labels, [
+    assert.deepStrictEqual(Optional.unwrap(store.counts.getSnapshot()).labels, [
       {
         name: 'bug',
         color: 'ededed',
@@ -110,11 +111,11 @@ describe(createIssuesListStore, () => {
 
     store.setQuery('ISSUE 1');
 
-    assert.strictEqual(store.query.getSnapshot().value, 'ISSUE 1');
+    assert.strictEqual(Optional.unwrap(store.query.getSnapshot()), 'ISSUE 1');
 
     assert.deepStrictEqual(numbersShown(store), [1, 12]);
 
-    assert.deepStrictEqual(store.counts.getSnapshot().value.open, {
+    assert.deepStrictEqual(Optional.unwrap(store.counts.getSnapshot()).open, {
       shown: 2,
       total: 3,
     });
@@ -181,7 +182,7 @@ const setup = (
 const numbersShown = (
   store: ReturnType<typeof createIssuesListStore>,
 ): readonly number[] =>
-  store.items.getSnapshot().value.map(({ number }) => number);
+  Optional.unwrap(store.items.getSnapshot()).map(({ number }) => number);
 
 const issue = (number: number, labelNames: readonly string[]): IssueItem =>
   ({

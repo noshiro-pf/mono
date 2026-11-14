@@ -5,6 +5,7 @@ import {
   handleLinkClick,
   type LinkClickEvent,
 } from 'synstate-router';
+import { Optional } from 'ts-data-forge';
 
 if (import.meta.vitest !== undefined) {
   test('handleLinkClick', () => {
@@ -50,7 +51,10 @@ if (import.meta.vitest !== undefined) {
       prevented: true,
     });
 
-    assert.strictEqual(router.match.getSnapshot().value.route, 'about');
+    assert.strictEqual(
+      Optional.unwrap(router.match.getSnapshot()).route,
+      'about',
+    );
 
     // embed-sample-code-ignore-below
   });

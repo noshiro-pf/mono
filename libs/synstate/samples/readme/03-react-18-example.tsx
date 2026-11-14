@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { createState } from 'synstate';
+import { Optional } from 'ts-data-forge';
 
 const [userState, setUserState] = createState({
   name: '',
@@ -15,7 +16,7 @@ const subscribeUser = (onStoreChange: () => void): (() => void) => {
 };
 
 const getUser = (): Readonly<{ name: string; email: string }> =>
-  userState.getSnapshot().value;
+  Optional.unwrap(userState.getSnapshot());
 
 const UserProfile = (): React.JSX.Element => {
   // `getUser` doubles as `getServerSnapshot`, which server rendering and

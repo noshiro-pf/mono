@@ -1,5 +1,6 @@
 import { combine, map, type InitializedObservable } from 'synstate';
 import { constant, type JSX } from 'synstate-dom';
+import { Optional } from 'ts-data-forge';
 import {
   BLOCK_NAMES,
   withBoundaryMoved,
@@ -28,7 +29,9 @@ export const BoundaryLine = ({
   siblings: InitializedObservable<readonly DrawnGroup[]>;
 }>): JSX.Element => {
   const next = (): DrawnGroup | undefined =>
-    siblings.getSnapshot().value[index.getSnapshot().value + 1];
+    Optional.unwrap(siblings.getSnapshot())[
+      Optional.unwrap(index.getSnapshot()) + 1
+    ];
 
   return (
     <div
@@ -41,11 +44,11 @@ export const BoundaryLine = ({
         map((l) =>
           l.mode === 'fill'
             ? 'Drag to move height between the blocks; double-click to even them'
-            : `Drag to give ${BLOCK_NAMES[group.getSnapshot().value.head]} a height of its own; double-click for its natural height`,
+            : `Drag to give ${BLOCK_NAMES[Optional.unwrap(group.getSnapshot()).head]} a height of its own; double-click for its natural height`,
         ),
       )}
       onDblClick={() => {
-        const { head } = group.getSnapshot().value;
+        const { head } = Optional.unwrap(group.getSnapshot());
 
         const lower = next();
 
@@ -66,7 +69,7 @@ export const BoundaryLine = ({
 
         const lowerElement = event.currentTarget.nextElementSibling;
 
-        const { head, share } = group.getSnapshot().value;
+        const { head, share } = Optional.unwrap(group.getSnapshot());
 
         const fromY = event.clientY;
 

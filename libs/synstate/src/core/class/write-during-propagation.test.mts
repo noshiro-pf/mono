@@ -1,4 +1,4 @@
-import { Result } from 'ts-data-forge';
+import { Optional, Result } from 'ts-data-forge';
 import { panic } from 'ts-std-forge';
 import type { FixedLengthTuple } from 'ts-type-forge';
 import { createState } from '../../utils/index.mjs';
@@ -44,7 +44,7 @@ describe('a write to a root observable while an update is propagating (#2336)', 
       [10, 2],
     ]);
 
-    assert.strictEqual(b$.getSnapshot().value, 2);
+    assert.strictEqual(Optional.unwrap(b$.getSnapshot()), 2);
   });
 
   test('warns when a projection writes to a state', async () => {
@@ -143,7 +143,7 @@ describe('a write to a root observable while an update is propagating (#2336)', 
 
     assert.deepStrictEqual(warn, []);
 
-    assert.strictEqual(b$.getSnapshot().value, 1);
+    assert.strictEqual(Optional.unwrap(b$.getSnapshot()), 1);
   });
 
   test('does not warn when an operator emits an inner observable synchronously', async () => {

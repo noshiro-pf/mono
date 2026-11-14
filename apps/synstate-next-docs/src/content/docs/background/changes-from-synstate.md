@@ -7,7 +7,7 @@ synstate-next replaces synstate in its next major version. This page lists what 
 
 ## Reading and subscribing
 
-- **`getSnapshot()` returns an `Optional` as before**, the same object while the value is the same. An `InitializedObservable` has `.value`, which reads the value without building an `Optional`. There is no separate `hasValue`, as in synstate: `Optional.isSome(o.getSnapshot())` says whether an observable holds a value.
+- **`getSnapshot()` returns an `Optional` as before**, equal under `Object.is` while the value is the same. A snapshot is not always the value itself, though (a string that starts with the prefix `Optional.none` is made of is rewritten): read the value with `Optional.unwrap` rather than comparing a snapshot with a value. An `InitializedObservable` has `.value`, which reads the value without going through an `Optional`. There is no separate `hasValue`, as in synstate: `Optional.isSome(o.getSnapshot())` says whether an observable holds a value.
 - **`subscribe` returns the function that stops the subscription**, not a `{ unsubscribe }` object.
 - **`kind`, `depth` and `updateToken` are not public.** A node's depth still orders the update, but it is the library's own. `isCompleted` became `settled`; see the `complete` bullet below.
 

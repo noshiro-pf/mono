@@ -5,6 +5,7 @@ import {
   type Bindable,
   type JSX,
 } from 'synstate-dom';
+import { Optional } from 'ts-data-forge';
 import { dict } from '../../constants/index.mjs';
 import type { EventSettingsPageDiffResult } from '../../functions/index.mjs';
 import * as styles from './event-schedule-diff.module.css';
@@ -32,7 +33,7 @@ export const EventScheduleDiff = ({ diff }: Props): JSX.Element => (
       <div class={constant(styles.title)}>{constant(dc.title)}</div>
       <ul data-e2e={constant('diff-ul')}>
         <For items={mapBindable(diff, (d) => [d])} key={(d) => d}>
-          {(diff$) => <DiffItems diff={diff$.getSnapshot().value} />}
+          {(diff$) => <DiffItems diff={Optional.unwrap(diff$.getSnapshot())} />}
         </For>
       </ul>
     </div>

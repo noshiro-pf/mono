@@ -1,6 +1,6 @@
 import type { EventListItem } from 'event-schedule-app-shared';
 import { createState } from 'synstate';
-import { Result } from 'ts-data-forge';
+import { Optional, Result } from 'ts-data-forge';
 import { createEventListFilterStore } from '../event-list-page-state/index.mjs';
 import { createEventListStore, type EventListFetcher } from './event-list.mjs';
 
@@ -14,7 +14,7 @@ describe(createEventListStore, () => {
 
     assert.deepStrictEqual(reads, []);
 
-    assert.isUndefined(store.eventList$.getSnapshot().value);
+    assert.isUndefined(Optional.unwrap(store.eventList$.getSnapshot()));
   });
 
   test('reads the signed-in user’s list with the filters', async () => {
@@ -35,7 +35,7 @@ describe(createEventListStore, () => {
 
     await settle(0);
 
-    assert.deepStrictEqual(store.eventList$.getSnapshot().value, []);
+    assert.deepStrictEqual(Optional.unwrap(store.eventList$.getSnapshot()), []);
   });
 
   test('reads again when a filter changes, and on each press of the filter button', () => {

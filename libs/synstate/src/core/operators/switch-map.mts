@@ -237,7 +237,7 @@ class SwitchMapObservableClass<A, B>
       return; // skip update
     }
 
-    this.#project(sn.value, updateToken);
+    this.#project(Optional.unwrap(sn), updateToken);
   }
 
   protected override teardown(): void {

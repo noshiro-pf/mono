@@ -129,7 +129,7 @@ const Dag = (): JSX.Element => {
                   // The kind is in the key, so it is the one the row was made
                   // with.
                   marker-end={
-                    edge$.getSnapshot().value.kind === 'start-after'
+                    Optional.unwrap(edge$.getSnapshot()).kind === 'start-after'
                       ? constant('url(#issue-dag-arrow)')
                       : undefined
                   }

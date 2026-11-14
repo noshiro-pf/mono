@@ -8,6 +8,7 @@ import {
   type Bindable,
   type JSX,
 } from 'synstate-dom';
+import { Optional } from 'ts-data-forge';
 import { dict } from '../../constants/index.mjs';
 import type { NotificationSettingsWithEmail } from '../../types/index.mjs';
 import { isEmailString } from '../../utils-ported/index.mjs';
@@ -53,7 +54,7 @@ export const NotificationSettingsComponent = ({
 
   const update = (patch: Partial<NotificationSettingsWithEmail>): void => {
     onNotificationSettingsWithEmailChange({
-      ...settings$.getSnapshot().value,
+      ...Optional.unwrap(settings$.getSnapshot()),
       ...patch,
     });
   };

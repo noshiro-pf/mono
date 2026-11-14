@@ -5,7 +5,7 @@ import {
   map,
   merge,
 } from 'synstate';
-import { Result } from 'ts-data-forge';
+import { Optional, Result } from 'ts-data-forge';
 import type { StrictPick } from 'ts-type-forge';
 import type { Api } from '../api/index.mjs';
 import { dict } from '../constants/index.mjs';
@@ -89,7 +89,7 @@ export const createConfirmEmailDialogStore = (
       return;
     }
 
-    const visit = deps.router.editPageLeaves$.getSnapshot().value;
+    const visit = Optional.unwrap(deps.router.editPageLeaves$.getSnapshot());
 
     const verifyEmailResult = await deps.api.event.verifyEmail(eventId, email);
 
@@ -101,8 +101,8 @@ export const createConfirmEmailDialogStore = (
     // or moved to another event: the form was reset, and the answer is for a
     // visit already over.
     if (
-      deps.router.editPageLeaves$.getSnapshot().value !== visit ||
-      deps.router.eventId$.getSnapshot().value !== eventId
+      Optional.unwrap(deps.router.editPageLeaves$.getSnapshot()) !== visit ||
+      Optional.unwrap(deps.router.eventId$.getSnapshot()) !== eventId
     ) {
       return;
     }
@@ -140,11 +140,13 @@ export const createConfirmEmailDialogStore = (
   };
 
   const enterClickHandler = (): void => {
-    const eventId = deps.router.eventId$.getSnapshot().value;
+    const eventId = Optional.unwrap(deps.router.eventId$.getSnapshot());
 
     const formState = getFormStateSnapshot();
 
-    const enterButtonDisabled = enterButtonDisabled$.getSnapshot().value;
+    const enterButtonDisabled = Optional.unwrap(
+      enterButtonDisabled$.getSnapshot(),
+    );
 
     if (enterButtonDisabled) {
       return;

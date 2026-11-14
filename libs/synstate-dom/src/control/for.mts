@@ -349,7 +349,7 @@ const rowField = <T, A>(
           return;
         }
 
-        const entry = sn.value.byKey.get(rowKey);
+        const entry = Optional.unwrap(sn).byKey.get(rowKey);
 
         if (entry === undefined) {
           return;

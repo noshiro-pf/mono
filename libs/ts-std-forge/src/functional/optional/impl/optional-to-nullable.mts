@@ -1,6 +1,6 @@
 import type { UnknownOptional } from '../optional.mjs';
 import { isSome } from './optional-is-some.mjs';
-import { unwrap } from './optional-unwrap.mjs';
+import { unwrapSome } from './optional-unwrap-some.mjs';
 import type { Unwrap } from './types.mjs';
 
 /**
@@ -31,4 +31,5 @@ import type { Unwrap } from './types.mjs';
  */
 export const toNullable = <O extends UnknownOptional>(
   optional: O,
-): Unwrap<O> | undefined => (isSome(optional) ? unwrap(optional) : undefined);
+): Unwrap<O> | undefined =>
+  isSome(optional) ? unwrapSome(optional) : undefined;

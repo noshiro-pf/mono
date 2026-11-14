@@ -2,7 +2,7 @@
 // embed-sample-code-ignore-above
 import { createState, map } from 'synstate';
 import { constant, For, If, isImeKeyDown, type JSX } from 'synstate-dom';
-import { Arr } from 'ts-data-forge';
+import { Arr, Optional } from 'ts-data-forge';
 
 type Todo = Readonly<{ id: number; title: string; done: boolean }>;
 
@@ -56,7 +56,7 @@ export const TodoDemo = (): JSX.Element => (
                       type={constant('checkbox')}
                       checked={todo$.pipe(map((t) => t.done))}
                       onChange={() => {
-                        toggle(todo$.getSnapshot().value.id);
+                        toggle(Optional.unwrap(todo$.getSnapshot()).id);
                       }}
                     />
                     {todo$.pipe(map((t) => ` ${t.title}`))}
@@ -67,7 +67,7 @@ export const TodoDemo = (): JSX.Element => (
                   <button
                     type={constant('button')}
                     onClick={() => {
-                      remove(todo$.getSnapshot().value.id);
+                      remove(Optional.unwrap(todo$.getSnapshot()).id);
                     }}
                   >
                     {constant('Remove')}

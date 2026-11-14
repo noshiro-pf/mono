@@ -277,7 +277,7 @@ const describe = (search: Search): string => {
 ```tsx
 import { createState, map } from 'synstate';
 import { constant, For, If, isImeKeyDown, type JSX } from 'synstate-dom';
-import { Arr } from 'ts-data-forge';
+import { Arr, Optional } from 'ts-data-forge';
 
 type Todo = Readonly<{ id: number; title: string; done: boolean }>;
 
@@ -338,8 +338,9 @@ export const TodoDemo = (): JSX.Element => (
                                             )}
                                             onChange={() => {
                                                 toggle(
-                                                    todo$.getSnapshot().value
-                                                        .id,
+                                                    Optional.unwrap(
+                                                        todo$.getSnapshot(),
+                                                    ).id,
                                                 );
                                             }}
                                         />
@@ -354,7 +355,9 @@ export const TodoDemo = (): JSX.Element => (
                                         type={constant('button')}
                                         onClick={() => {
                                             remove(
-                                                todo$.getSnapshot().value.id,
+                                                Optional.unwrap(
+                                                    todo$.getSnapshot(),
+                                                ).id,
                                             );
                                         }}
                                     >

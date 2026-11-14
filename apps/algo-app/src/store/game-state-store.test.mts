@@ -1,5 +1,6 @@
 import { Timestamp } from 'firebase/firestore';
 import { createState, source } from 'synstate';
+import { Optional } from 'ts-data-forge';
 import { newRoom } from '../functions/index.mjs';
 import type {
   Card,
@@ -19,18 +20,22 @@ describe(createGameStateStore, () => {
     store.onCardClick(black6, 'S');
 
     assert.deepStrictEqual(
-      store.gameState.getSnapshot().value.cardChosenToToss,
+      Optional.unwrap(store.gameState.getSnapshot()).cardChosenToToss,
       black6,
     );
 
-    assert.isTrue(store.gameState.getSnapshot().value.confirmTossBalloonIsOpen);
+    assert.isTrue(
+      Optional.unwrap(store.gameState.getSnapshot()).confirmTossBalloonIsOpen,
+    );
 
     store.onTossCancel();
 
-    assert.isUndefined(store.gameState.getSnapshot().value.cardChosenToToss);
+    assert.isUndefined(
+      Optional.unwrap(store.gameState.getSnapshot()).cardChosenToToss,
+    );
 
     assert.isFalse(
-      store.gameState.getSnapshot().value.confirmTossBalloonIsOpen,
+      Optional.unwrap(store.gameState.getSnapshot()).confirmTossBalloonIsOpen,
     );
   });
 
@@ -52,14 +57,14 @@ describe(createGameStateStore, () => {
     actionsFromDb.next([selectMyCard(black6)]);
 
     assert.deepStrictEqual(
-      store.gameState.getSnapshot().value.cardChosenToToss,
+      Optional.unwrap(store.gameState.getSnapshot()).cardChosenToToss,
       black6,
     );
 
     actionsFromDb.next([selectMyCard(black6), selectMyCard(white7)]);
 
     assert.deepStrictEqual(
-      store.gameState.getSnapshot().value.cardChosenToToss,
+      Optional.unwrap(store.gameState.getSnapshot()).cardChosenToToss,
       white7,
     );
   });

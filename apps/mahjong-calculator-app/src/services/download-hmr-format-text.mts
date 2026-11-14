@@ -44,7 +44,7 @@ export const toHMRFormatText = ({
     // 3行目: 手牌の各牌の枚数
     toTiles34(hand).join(''),
     // 4行目: ドラ（※槓ドラ非対応）
-    toTiles34([doraHyouji2Dora[firstDraIndicator.value]]).join(''),
+    toTiles34([doraHyouji2Dora[Optional.unwrap(firstDraIndicator)]]).join(''),
     // 5行目: 捨牌
     Arr.newArray(18, -1).join(''),
   ].join('\n');
@@ -68,14 +68,17 @@ export const downloadHMRFormatText = (): Result<
   undefined,
   Readonly<{ type: 'doraIndicators-is-empty' } | { type: 'hand-is-empty' }>
 > => {
-  const hand = calculatorStore.handSorted.getSnapshot().value;
+  const hand = Optional.unwrap(calculatorStore.handSorted.getSnapshot());
 
-  const turn = calculatorStore.turn.getSnapshot().value;
+  const turn = Optional.unwrap(calculatorStore.turn.getSnapshot());
 
-  const doraIndicators = calculatorStore.doraIndicators.getSnapshot().value;
+  const doraIndicators = Optional.unwrap(
+    calculatorStore.doraIndicators.getSnapshot(),
+  );
 
-  const numRemainingTiles =
-    calculatorStore.numRemainingTiles.getSnapshot().value;
+  const numRemainingTiles = Optional.unwrap(
+    calculatorStore.numRemainingTiles.getSnapshot(),
+  );
 
   const result = toHMRFormatText({
     turn,

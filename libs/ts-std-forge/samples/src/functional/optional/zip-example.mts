@@ -11,7 +11,7 @@ if (import.meta.vitest !== undefined) {
     if (Optional.isSome(zipped)) {
       const expected: readonly [string, number] = ['left', 1] as const;
 
-      assert.deepStrictEqual(zipped.value, expected);
+      assert.deepStrictEqual(Optional.unwrap(zipped), expected);
     }
 
     const missing = Optional.zip(

@@ -1,5 +1,5 @@
 import { map } from 'synstate';
-import { Result } from 'ts-data-forge';
+import { Optional, Result } from 'ts-data-forge';
 import {
   defaultSimulationInput,
   simulate,
@@ -32,7 +32,7 @@ export const updateSection = <K extends keyof SimulationInput>(
  */
 export const exportCurrentPlan = ():
   Readonly<{ fileName: string; json: string }> | undefined => {
-  const plan = planStore.currentPlan.getSnapshot().value;
+  const plan = Optional.unwrap(planStore.currentPlan.getSnapshot());
 
   return plan === undefined
     ? undefined

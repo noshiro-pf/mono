@@ -5,7 +5,7 @@ import type { TypeOf } from '../type.mjs';
 import { validationErrorsToMessages } from '../utils/index.mjs';
 import { brandedNumber } from './branded-number.mjs';
 
-describe('simpleBrandedNumber', () => {
+describe(brandedNumber, () => {
   describe('with default value', () => {
     const userIdType = brandedNumber({
       typeName: 'UserId',

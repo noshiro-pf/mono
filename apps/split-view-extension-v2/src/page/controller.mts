@@ -6,7 +6,7 @@ import {
   type InitializedObservable,
 } from 'synstate';
 import { listenInScope } from 'synstate-dom';
-import { Arr, fastDeepEqual, unknownToString } from 'ts-data-forge';
+import { Arr, fastDeepEqual, Optional, unknownToString } from 'ts-data-forge';
 import {
   applyListOp,
   asSplitOpenRequest,
@@ -134,7 +134,7 @@ export const createController = (): Controller => {
 
   /** A change that returns the same workspace changes nothing at all. */
   const dispatch = (action: WorkspaceAction): void => {
-    const before = session$.getSnapshot().value.workspace;
+    const before = Optional.unwrap(session$.getSnapshot()).workspace;
 
     updateSession((current) => {
       const workspace = workspaceReducer(current.workspace, action);
@@ -147,7 +147,7 @@ export const createController = (): Controller => {
     // The one refusal a user can run into (spec L11) says so.
     if (
       action.type === 'split' &&
-      session$.getSnapshot().value.workspace === before &&
+      Optional.unwrap(session$.getSnapshot()).workspace === before &&
       before.panes.length >= maxPaneCount
     ) {
       showNotice(`A split view holds at most ${maxPaneCount} panes.`);
@@ -160,7 +160,7 @@ export const createController = (): Controller => {
    * the worker did not answer.
    */
   const changeList = async (op: ListOp): Promise<ListAnswer | undefined> => {
-    const current = list$.getSnapshot().value;
+    const current = Optional.unwrap(list$.getSnapshot());
 
     const local = applyListOp(current, op);
 
@@ -224,7 +224,7 @@ export const createController = (): Controller => {
 
   /** Whether the list still has `id`: a deleted one must not be saved back. */
   const isListed = (id: string): boolean =>
-    entryOf(list$.getSnapshot().value, id) !== undefined;
+    entryOf(Optional.unwrap(list$.getSnapshot()), id) !== undefined;
 
   const writeUrl = (
     id: string,
@@ -284,7 +284,7 @@ export const createController = (): Controller => {
 
   /** The layout on screen, written now (spec S1). */
   const saveShown = async (): Promise<void> => {
-    const { id, workspace } = session$.getSnapshot().value;
+    const { id, workspace } = Optional.unwrap(session$.getSnapshot());
 
     if (id !== undefined) {
       await save(id, workspace);
@@ -309,7 +309,7 @@ export const createController = (): Controller => {
   ): Promise<void> => {
     mut_switches.requested += 1;
 
-    if (session$.getSnapshot().value.id === id) {
+    if (Optional.unwrap(session$.getSnapshot()).id === id) {
       return;
     }
 
@@ -369,7 +369,12 @@ export const createController = (): Controller => {
     const id =
       answer?.kind === 'shown'
         ? answer.id
-        : resolveShown(list$.getSnapshot().value, show, show.now, false).id;
+        : resolveShown(
+            Optional.unwrap(list$.getSnapshot()),
+            show,
+            show.now,
+            false,
+          ).id;
 
     const workspace = request.workspace ?? (await loadWorkspace(id));
 
@@ -402,7 +407,7 @@ export const createController = (): Controller => {
     await saveShown();
 
     const { opened, alreadyOpen } = await openAllSplitViews(
-      list$.getSnapshot().value,
+      Optional.unwrap(list$.getSnapshot()),
       undefined,
     );
 
@@ -417,7 +422,7 @@ export const createController = (): Controller => {
     // Off this tab's list at once, which stops its saves; the worker takes the
     // layout away after the entry, so that nothing saves it back. A pending
     // save of another split view, the one on screen, still goes ahead.
-    if (session$.getSnapshot().value.id === id) {
+    if (Optional.unwrap(session$.getSnapshot()).id === id) {
       clearTimeout(mut_timers.save);
     }
 
@@ -432,7 +437,7 @@ export const createController = (): Controller => {
       now: Date.now(),
     });
 
-    const list = list$.getSnapshot().value;
+    const list = Optional.unwrap(list$.getSnapshot());
 
     const replacement = list.activeId ?? list.entries[0]?.id;
 
@@ -440,7 +445,7 @@ export const createController = (): Controller => {
       return;
     }
 
-    if (session$.getSnapshot().value.id === id) {
+    if (Optional.unwrap(session$.getSnapshot()).id === id) {
       await switchTo(replacement, { history: 'replace', save: false });
     }
   };
@@ -448,7 +453,7 @@ export const createController = (): Controller => {
   const exportBackup = async (): Promise<void> => {
     await saveShown();
 
-    const list = list$.getSnapshot().value;
+    const list = Optional.unwrap(list$.getSnapshot());
 
     const workspaces = await Promise.all(
       list.entries.map(async (entry) => ({
@@ -475,7 +480,7 @@ export const createController = (): Controller => {
       return;
     }
 
-    const shownId = session$.getSnapshot().value.id;
+    const shownId = Optional.unwrap(session$.getSnapshot()).id;
 
     // The view on screen, if imported, is not saved until the import has loaded
     // it, or its old layout would be written over the imported one; if not, it
@@ -513,7 +518,7 @@ export const createController = (): Controller => {
     );
 
     // The one on screen may be one that was just overwritten.
-    const { id } = session$.getSnapshot().value;
+    const { id } = Optional.unwrap(session$.getSnapshot());
 
     if (id === undefined || backedUp.every((entry) => entry.id !== id)) {
       return;
@@ -534,7 +539,7 @@ export const createController = (): Controller => {
     origin: string,
     enabled: boolean,
   ): Promise<void> => {
-    const current = resetOrigins$.getSnapshot().value;
+    const current = Optional.unwrap(resetOrigins$.getSnapshot());
 
     // Shown at once, then as the worker stored it (spec W10).
     setResetOrigins(
@@ -558,11 +563,11 @@ export const createController = (): Controller => {
    * another split view on screen, whose panes have the same ids.
    */
   const afterRules = async (change: () => void): Promise<void> => {
-    const { id } = session$.getSnapshot().value;
+    const { id } = Optional.unwrap(session$.getSnapshot());
 
     await ensureRules();
 
-    if (session$.getSnapshot().value.id === id) {
+    if (Optional.unwrap(session$.getSnapshot()).id === id) {
       change();
     }
   };
@@ -606,9 +611,8 @@ export const createController = (): Controller => {
   const collectDiagnostics = async (): Promise<void> => {
     const tab = await chrome.tabs.getCurrent();
 
-    const urls = session$
-      .getSnapshot()
-      .value.workspace.panes.map((pane) => pane.live.currentUrl ?? pane.url)
+    const urls = Optional.unwrap(session$.getSnapshot())
+      .workspace.panes.map((pane) => pane.live.currentUrl ?? pane.url)
       .filter((url) => url !== '');
 
     setDiagnostics(await readDiagnostics(tab?.id, urls));
@@ -616,7 +620,7 @@ export const createController = (): Controller => {
 
   /** Records this tab as showing its split view, and whether it is pinned. */
   const noteTab = async (): Promise<void> => {
-    const { id } = session$.getSnapshot().value;
+    const { id } = Optional.unwrap(session$.getSnapshot());
 
     const tab = await chrome.tabs.getCurrent();
 
@@ -648,7 +652,7 @@ export const createController = (): Controller => {
     const entry =
       position === undefined
         ? undefined
-        : entryAt(list$.getSnapshot().value, position);
+        : entryAt(Optional.unwrap(list$.getSnapshot()), position);
 
     if (entry !== undefined) {
       run(switchTo(entry.id, { history: 'push', save: true }));
@@ -661,7 +665,7 @@ export const createController = (): Controller => {
       list: (written) => {
         mut_listWrites.seen += 1;
 
-        if (!fastDeepEqual(written, list$.getSnapshot().value)) {
+        if (!fastDeepEqual(written, Optional.unwrap(list$.getSnapshot()))) {
           setList(written);
         }
       },
@@ -709,7 +713,7 @@ export const createController = (): Controller => {
 
     run(
       (async () => {
-        const { id } = session$.getSnapshot().value;
+        const { id } = Optional.unwrap(session$.getSnapshot());
 
         const tab = await chrome.tabs.getCurrent();
 
@@ -720,7 +724,7 @@ export const createController = (): Controller => {
         await ensureRules();
 
         // A switch meanwhile has panes of the same ids that are not these.
-        if (session$.getSnapshot().value.id === id) {
+        if (Optional.unwrap(session$.getSnapshot()).id === id) {
           dispatch({
             type: 'split',
             paneId: request.paneId,
@@ -795,7 +799,7 @@ export const createController = (): Controller => {
 
     run(ensureRules());
 
-    const { id } = session$.getSnapshot().value;
+    const { id } = Optional.unwrap(session$.getSnapshot());
 
     if (id !== undefined) {
       run(changeList({ kind: 'activate', id }));
@@ -817,7 +821,7 @@ export const createController = (): Controller => {
                 // address this would overwrite.
                 if (
                   (await save(id, workspace)) &&
-                  session$.getSnapshot().value.id === id
+                  Optional.unwrap(session$.getSnapshot()).id === id
                 ) {
                   writeUrl(id, workspace, 'replace');
                 }

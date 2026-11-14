@@ -38,13 +38,16 @@ describe(createHolidaysStore, () => {
 
     store.start();
 
-    assert.strictEqual(store.holidaysJpDefinition$.getSnapshot().value.size, 0);
+    assert.strictEqual(
+      Optional.unwrap(store.holidaysJpDefinition$.getSnapshot()).size,
+      0,
+    );
 
     resolve({ '2026-01-01': '元日', '2026-11-03': '文化の日' });
 
     await settle();
 
-    const holidays = store.holidaysJpDefinition$.getSnapshot().value;
+    const holidays = Optional.unwrap(store.holidaysJpDefinition$.getSnapshot());
 
     assert.strictEqual(holidays.size, 2);
 
@@ -72,7 +75,7 @@ describe(createHolidaysStore, () => {
 
     await settle();
 
-    const holidays = store.holidaysJpDefinition$.getSnapshot().value;
+    const holidays = Optional.unwrap(store.holidaysJpDefinition$.getSnapshot());
 
     assert.strictEqual(holidays.size, 1);
 
@@ -93,7 +96,10 @@ describe(createHolidaysStore, () => {
 
     await settle();
 
-    assert.strictEqual(store.holidaysJpDefinition$.getSnapshot().value.size, 0);
+    assert.strictEqual(
+      Optional.unwrap(store.holidaysJpDefinition$.getSnapshot()).size,
+      0,
+    );
   });
 
   test('drops an answer that arrives after stop', async () => {
@@ -110,7 +116,10 @@ describe(createHolidaysStore, () => {
 
     await settle();
 
-    assert.strictEqual(store.holidaysJpDefinition$.getSnapshot().value.size, 0);
+    assert.strictEqual(
+      Optional.unwrap(store.holidaysJpDefinition$.getSnapshot()).size,
+      0,
+    );
   });
 });
 

@@ -5,7 +5,7 @@ import {
   param,
   search,
 } from 'synstate-router';
-import { asSafeInt } from 'ts-data-forge';
+import { asSafeInt, Optional } from 'ts-data-forge';
 
 if (import.meta.vitest !== undefined) {
   test('createRouter', () => {
@@ -25,7 +25,7 @@ if (import.meta.vitest !== undefined) {
 
     router.push(routes.products.item.href({ productId: asSafeInt(42) }));
 
-    const m = router.match.getSnapshot().value;
+    const m = Optional.unwrap(router.match.getSnapshot());
 
     assert.isTrue(m.route === 'products.item' && m.params.productId === 42);
 

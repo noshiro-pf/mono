@@ -8,7 +8,7 @@ README に載せている大きい方のサンプルです。入力欄と、項�
 ```tsx
 import { createState, map } from 'synstate';
 import { constant, For, If, render, type JSX } from 'synstate-dom';
-import { Arr } from 'ts-data-forge';
+import { Arr, Optional } from 'ts-data-forge';
 
 type Todo = Readonly<{ id: number; title: string; done: boolean }>;
 
@@ -81,8 +81,9 @@ const TodoApp = (): JSX.Element => {
                                             )}
                                             onChange={() => {
                                                 toggle(
-                                                    todo$.getSnapshot().value
-                                                        .id,
+                                                    Optional.unwrap(
+                                                        todo$.getSnapshot(),
+                                                    ).id,
                                                 );
                                             }}
                                         />

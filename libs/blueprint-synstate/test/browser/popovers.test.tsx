@@ -17,6 +17,7 @@ import { flushSync } from 'react-dom';
 import { createRoot } from 'react-dom/client';
 import { createState } from 'synstate';
 import { constant, If, render, type JSX } from 'synstate-dom';
+import { Optional } from 'ts-data-forge';
 import { userEvent } from 'vitest/browser';
 import { mountBlueprint } from './blueprint-cases.js';
 import {
@@ -611,7 +612,7 @@ describe(Popover, () => {
     // target's own handler opened it, and so asks to open, not to close.
     assert.deepStrictEqual(mut_asked, [true]);
 
-    assert.isTrue(isOpen$.getSnapshot().value);
+    assert.isTrue(Optional.unwrap(isOpen$.getSnapshot()));
 
     assert.isNotNull(document.querySelector('.bp6-popover'));
 
@@ -622,7 +623,7 @@ describe(Popover, () => {
 
     assert.deepStrictEqual(mut_asked, [true, false, 'click']);
 
-    assert.isFalse(isOpen$.getSnapshot().value);
+    assert.isFalse(Optional.unwrap(isOpen$.getSnapshot()));
 
     assert.isNull(document.querySelector('.bp6-popover'));
   });

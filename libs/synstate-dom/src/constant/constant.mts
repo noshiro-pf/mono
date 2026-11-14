@@ -7,8 +7,8 @@ import { asConstant } from '../internal/index.mjs';
  * the type system: at run time it is the value itself.
  *
  * A slot that takes data accepts a `Constant<T>` but not a plain `T`, so that a
- * value read once and never updated (`count$.getSnapshot().value`) is a type
- * error rather than a binding that silently stays stale.
+ * value read once and never updated (`Optional.unwrap(count$.getSnapshot())`)
+ * is a type error rather than a binding that silently stays stale.
  */
 export type Constant<T> = Brand<T, 'synstate-dom/Constant'>;
 
@@ -19,6 +19,8 @@ export type Constant<T> = Brand<T, 'synstate-dom/Constant'>;
  * and a value that comes and goes is an `InitializedObservable<T | undefined>`.
  * An observable is rejected too, since wrapping one would bind it once.
  */
+// A `Some` of an observable is accepted on purpose, although it is the
+// observable itself at runtime: see `MatchOptional` for why and what follows.
 export const constant = <const T,>(
   value: T extends Observable<unknown> | null | undefined ? never : T,
 ): Constant<T> => asConstant<T>(value);

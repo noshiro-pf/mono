@@ -110,7 +110,7 @@ class TakeUntilObservableClass<A>
       return; // skip update
     }
 
-    this.setNext(sn.value, updateToken);
+    this.setNext(Optional.unwrap(sn), updateToken);
   }
 
   protected override teardown(): void {

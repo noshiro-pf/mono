@@ -1,4 +1,5 @@
 import { createState } from 'synstate';
+import { Optional } from 'ts-data-forge';
 import { defaultSimulationInput } from '../domain/index.mjs';
 import {
   createMemoryRepository,
@@ -61,7 +62,7 @@ const setUp = (
 const names = (
   store: ReturnType<typeof createPlanStore>,
 ): readonly string[] => {
-  const state = store.plans.getSnapshot().value;
+  const state = Optional.unwrap(store.plans.getSnapshot());
 
   return state.type === 'loaded' ? state.plans.map((p) => p.name) : [];
 };
@@ -71,12 +72,14 @@ describe(createPlanStore, () => {
     const repository = createMemoryRepository([plan('a', 1), plan('b', 2)]);
 
     assert.strictEqual(
-      setUp(repository, 'b').store.currentPlan.getSnapshot().value?.id,
+      Optional.unwrap(setUp(repository, 'b').store.currentPlan.getSnapshot())
+        ?.id,
       'b',
     );
 
     assert.strictEqual(
-      setUp(repository, 'gone').store.currentPlan.getSnapshot().value?.id,
+      Optional.unwrap(setUp(repository, 'gone').store.currentPlan.getSnapshot())
+        ?.id,
       'a',
     );
   });
@@ -86,11 +89,11 @@ describe(createPlanStore, () => {
 
     setSession({ type: 'signed-out', error: undefined, signingIn: false });
 
-    assert.deepStrictEqual(store.plans.getSnapshot().value, {
+    assert.deepStrictEqual(Optional.unwrap(store.plans.getSnapshot()), {
       type: 'loading',
     });
 
-    assert.isUndefined(store.currentPlan.getSnapshot().value);
+    assert.isUndefined(Optional.unwrap(store.currentPlan.getSnapshot()));
   });
 
   test('saves an edit to the open plan and keeps it on screen', async () => {
@@ -104,7 +107,7 @@ describe(createPlanStore, () => {
     }));
 
     assert.strictEqual(
-      store.input.getSnapshot().value.assumptions.initialCash,
+      Optional.unwrap(store.input.getSnapshot()).assumptions.initialCash,
       123,
     );
 
@@ -137,7 +140,7 @@ describe(createPlanStore, () => {
     store.selectPlan('b');
 
     assert.strictEqual(
-      store.input.getSnapshot().value.profile.birth,
+      Optional.unwrap(store.input.getSnapshot()).profile.birth,
       '1980-01',
     );
 
@@ -154,16 +157,22 @@ describe(createPlanStore, () => {
 
     store.addPlan('持ち家', input);
 
-    assert.strictEqual(store.currentPlan.getSnapshot().value?.name, '持ち家');
+    assert.strictEqual(
+      Optional.unwrap(store.currentPlan.getSnapshot())?.name,
+      '持ち家',
+    );
 
-    assert.deepStrictEqual(store.input.getSnapshot().value, input);
+    assert.deepStrictEqual(Optional.unwrap(store.input.getSnapshot()), input);
 
     // A file without a name gets the name a new plan would.
     store.addPlan(undefined, defaultSimulationInput);
 
     assert.deepStrictEqual(names(store), ['plan a', '持ち家', 'プラン 1']);
 
-    assert.strictEqual(store.currentPlan.getSnapshot().value?.name, 'プラン 1');
+    assert.strictEqual(
+      Optional.unwrap(store.currentPlan.getSnapshot())?.name,
+      'プラン 1',
+    );
   });
 
   test('creates, duplicates, renames and deletes plans', () => {
@@ -173,7 +182,10 @@ describe(createPlanStore, () => {
 
     assert.deepStrictEqual(names(store), ['plan a', 'プラン 1']);
 
-    assert.strictEqual(store.currentPlan.getSnapshot().value?.name, 'プラン 1');
+    assert.strictEqual(
+      Optional.unwrap(store.currentPlan.getSnapshot())?.name,
+      'プラン 1',
+    );
 
     store.renamePlan('  持ち家  ');
 
@@ -191,7 +203,10 @@ describe(createPlanStore, () => {
 
     assert.deepStrictEqual(names(store), ['plan a', '持ち家']);
 
-    assert.strictEqual(store.currentPlan.getSnapshot().value?.name, 'plan a');
+    assert.strictEqual(
+      Optional.unwrap(store.currentPlan.getSnapshot())?.name,
+      'plan a',
+    );
   });
 
   test('reports a write that fails', async () => {
@@ -210,11 +225,14 @@ describe(createPlanStore, () => {
 
     assert.deepStrictEqual(errors(), ['Could not save the plan']);
 
-    assert.include(store.writeError.getSnapshot().value, 'permission-denied');
+    assert.include(
+      Optional.unwrap(store.writeError.getSnapshot()),
+      'permission-denied',
+    );
 
     store.dismissWriteError();
 
-    assert.isUndefined(store.writeError.getSnapshot().value);
+    assert.isUndefined(Optional.unwrap(store.writeError.getSnapshot()));
   });
 });
 

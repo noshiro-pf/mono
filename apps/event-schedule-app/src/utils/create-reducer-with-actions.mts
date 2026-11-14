@@ -6,7 +6,7 @@ import {
   scan,
   type Observable as SynstateObservable,
 } from 'synstate';
-import { Arr, match } from 'ts-data-forge';
+import { Arr, match, Optional } from 'ts-data-forge';
 import type { Reducer } from 'ts-type-forge';
 
 /**
@@ -36,7 +36,7 @@ export const createReducerWithActions = <S, A>(
     scan(reducer, initialState),
   );
 
-  const getSnapshot = (): S => state.getSnapshot().value;
+  const getSnapshot = (): S => Optional.unwrap(state.getSnapshot());
 
   const dispatch = (action: A): S => {
     emit(action);

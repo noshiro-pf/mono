@@ -12,7 +12,7 @@
  */
 
 import { createState, type InitializedObservable } from 'synstate';
-import { Result } from 'ts-data-forge';
+import { Optional, Result } from 'ts-data-forge';
 import type { DeepReadonly, RelaxedExclude, StrictOmit } from 'ts-type-forge';
 import {
   asMilestoneId,
@@ -121,7 +121,8 @@ export const createEditorStore = (deps: EditorDeps): EditorStore => {
   const [editor, setEditor, { getSnapshot, updateState }] =
     createState<EditorState>(CLOSED);
 
-  const currentState = (): DomainState => deps.state.getSnapshot().value;
+  const currentState = (): DomainState =>
+    Optional.unwrap(deps.state.getSnapshot());
 
   const findTask = (id: TaskId): Task | undefined =>
     currentState().tasks.find((task) => task.id === id);

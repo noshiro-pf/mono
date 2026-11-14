@@ -5,7 +5,7 @@ import {
   type InitializedObservable,
 } from 'synstate';
 import { constant, For, If, type JSX } from 'synstate-dom';
-import { Num } from 'ts-data-forge';
+import { Num, Optional } from 'ts-data-forge';
 import type { QueueView } from '../../../domain/index.mjs';
 import { dragFrom } from '../../layout/index.mjs';
 import { QueueLayerBox } from './queue-layer-box.js';
@@ -111,7 +111,9 @@ export const QueueRow = ({ view }: Props): JSX.Element => {
 
               const mapWidth = box.width;
 
-              const { width, client, left } = metrics.getSnapshot().value;
+              const { width, client, left } = Optional.unwrap(
+                metrics.getSnapshot(),
+              );
 
               if (!Num.isNonZero(mapWidth) || !Num.isNonZero(width)) {
                 return;

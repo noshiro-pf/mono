@@ -1,6 +1,6 @@
 import { map, type InitializedObservable } from 'synstate';
 import { constant, For, type JSX } from 'synstate-dom';
-import { Num } from 'ts-data-forge';
+import { Num, Optional } from 'ts-data-forge';
 import {
   BLOCK_NAMES,
   type BlockId,
@@ -23,7 +23,7 @@ export const TabList = ({ group, select }: Props): JSX.Element => (
     class={constant('tab-list')}
     role={constant('tablist')}
     onKeyDown={(event) => {
-      const { tabs, shown } = group.getSnapshot().value;
+      const { tabs, shown } = Optional.unwrap(group.getSnapshot());
 
       const count = tabs.length;
 
@@ -61,7 +61,7 @@ export const TabList = ({ group, select }: Props): JSX.Element => (
   >
     <For items={group.pipe(map((g) => g.tabs))} key={(id) => id}>
       {(id$) => {
-        const id = id$.getSnapshot().value;
+        const id = Optional.unwrap(id$.getSnapshot());
 
         const selected = group.pipe(map((g) => g.shown === id));
 

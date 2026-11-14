@@ -45,7 +45,7 @@ import { createStateSource } from './state-source.mjs';
  *   { equals: fastDeepEqual },
  * );
  *
- * const before = filters.getSnapshot().value;
+ * const before = Optional.unwrap(filters.getSnapshot());
  *
  * // Derived state is recomputed only when the state really changes.
  * const query = filters.pipe(
@@ -60,7 +60,7 @@ import { createStateSource } from './state-source.mjs';
  *
  * setFilters({ label: 'bug', page: 1 }); // equal: nothing is passed on
  *
- * assert.strictEqual(filters.getSnapshot().value, before);
+ * assert.strictEqual(Optional.unwrap(filters.getSnapshot()), before);
  *
  * setFilters({ label: 'bug', page: 2 });
  *
@@ -97,7 +97,7 @@ import { createStateSource } from './state-source.mjs';
  *   pulls: [{ number: 1, title: 'one' }],
  * });
  *
- * const held = report.getSnapshot().value;
+ * const held = Optional.unwrap(report.getSnapshot());
  *
  * // An answer that changes nothing is not passed on at all.
  * setReport({
@@ -105,7 +105,7 @@ import { createStateSource } from './state-source.mjs';
  *   pulls: [{ number: 1, title: 'one' }],
  * });
  *
- * assert.strictEqual(report.getSnapshot().value, held);
+ * assert.strictEqual(Optional.unwrap(report.getSnapshot()), held);
  *
  * // An edited title: a new report and a new array, while the summary is the
  * // one held, so `summary` is not told of it.
@@ -114,9 +114,12 @@ import { createStateSource } from './state-source.mjs';
  *   pulls: [{ number: 1, title: 'one (edited)' }],
  * });
  *
- * assert.notStrictEqual(report.getSnapshot().value, held);
+ * assert.notStrictEqual(Optional.unwrap(report.getSnapshot()), held);
  *
- * assert.strictEqual(report.getSnapshot().value.summary, held.summary);
+ * assert.strictEqual(
+ *   Optional.unwrap(report.getSnapshot()).summary,
+ *   held.summary,
+ * );
  *
  * assert.deepStrictEqual(summaryHistory, [{ open: 0 }, { open: 1 }]);
  * ```

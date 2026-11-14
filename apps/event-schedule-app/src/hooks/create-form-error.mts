@@ -1,4 +1,5 @@
 import { map, type InitializedObservable } from 'synstate';
+import { Optional } from 'ts-data-forge';
 import { createReducerWithActions } from '../utils/index.mjs';
 
 /**
@@ -20,7 +21,7 @@ export const createFormError = (
   // writes, so the flag follows it in the update that changes it.
   const [state$, dispatch] = createReducerWithActions(
     reducer,
-    { shown: false, invalid: invalid$.getSnapshot().value },
+    { shown: false, invalid: Optional.unwrap(invalid$.getSnapshot()) },
     [invalid$.pipe(map((invalid): Action => ({ type: 'validity', invalid })))],
   );
 

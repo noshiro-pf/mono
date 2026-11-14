@@ -6,7 +6,7 @@ import {
   mapBindable,
   type JSX,
 } from 'synstate-dom';
-import { Result } from 'ts-data-forge';
+import { Optional, Result } from 'ts-data-forge';
 import { dict } from '../../../constants/index.mjs';
 import { EventScheduleStore, Router } from '../../../store/index.mjs';
 import { Header } from '../../organisms/index.mjs';
@@ -30,7 +30,7 @@ export const EditEventSchedule = (): JSX.Element => {
   return (
     <For items={mapBindable(status$, (s) => [s])} key={(s) => s}>
       {(status$_) => {
-        const status = status$_.getSnapshot().value;
+        const status = Optional.unwrap(status$_.getSnapshot());
 
         return status === 'not-found' ? (
           <NotFoundPage />

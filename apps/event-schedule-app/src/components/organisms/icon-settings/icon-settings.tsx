@@ -1,5 +1,6 @@
 import { map } from 'synstate';
 import { constant, toObservable, type Bindable, type JSX } from 'synstate-dom';
+import { Optional } from 'ts-data-forge';
 import { dict } from '../../../constants/index.mjs';
 import {
   iconListReducer,
@@ -24,7 +25,7 @@ export const AnswerIconSettingsComponent = ({
 
   const dispatch = (action: IconListReducerAction): void => {
     onAnswerIconsChange(
-      iconListReducer(answerIcons$.getSnapshot().value, action),
+      iconListReducer(Optional.unwrap(answerIcons$.getSnapshot()), action),
     );
   };
 

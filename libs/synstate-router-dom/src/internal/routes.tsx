@@ -47,7 +47,7 @@ export const createRoutes = <R extends AnyRoutes>(
     router
       .at(node)
       .pipe(filter(Optional.isSome))
-      .pipe(map((some) => some.value))
+      .pipe(map((some) => Optional.unwrap(some)))
       .pipe(withInitialValue(values));
 
   return ({ prefix, under, cases, notFound, pending }) =>
@@ -120,7 +120,7 @@ export const createRoutes = <R extends AnyRoutes>(
             : Optional.none;
 
           return isRouteNode(node) && Optional.isSome(values)
-            ? draw(nodeValues$(node, values.value))
+            ? draw(nodeValues$(node, Optional.unwrap(values)))
             : notFound;
         },
       );

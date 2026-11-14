@@ -5,6 +5,7 @@ import {
   type Bindable,
   type JSX,
 } from 'synstate-dom';
+import { Optional } from 'ts-data-forge';
 import type { SortSpec } from '../domain/index.mjs';
 import { m } from '../i18n/index.mjs';
 import {
@@ -26,7 +27,7 @@ export const SortKeyRow = ({
   count,
   actions,
 }: Props): JSX.Element => {
-  const currentIndex = (): number => index.getSnapshot().value;
+  const currentIndex = (): number => Optional.unwrap(index.getSnapshot());
 
   return (
     <li class={constant('sort-key-row')}>

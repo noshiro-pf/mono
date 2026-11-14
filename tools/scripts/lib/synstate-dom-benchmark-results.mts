@@ -1,6 +1,13 @@
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
-import { Arr, Num, Obj, Result, unknownToString } from 'ts-data-forge';
+import {
+  Arr,
+  Num,
+  Obj,
+  Optional,
+  Result,
+  unknownToString,
+} from 'ts-data-forge';
 import type { NonEmptyTuple, ReadonlyRecord } from 'ts-type-forge';
 import { projectRootPath } from '../project-root-path.mjs';
 import { type Embedded, embedInto, markerKeys } from './embed-markers.mjs';
@@ -210,8 +217,8 @@ export const englishList = (names: readonly string[]): string => {
   const init = Arr.butLast(names);
 
   return Arr.isNonEmpty(init)
-    ? `${init.join(', ')} and ${Arr.last(names).value}`
-    : Arr.last(names).value;
+    ? `${init.join(', ')} and ${Optional.unwrap(Arr.last(names))}`
+    : Optional.unwrap(Arr.last(names));
 };
 
 /** The marker key of a library's slowest operation: `worst/preact-signals`. */

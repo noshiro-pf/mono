@@ -1,3 +1,4 @@
+import { Optional } from 'ts-data-forge';
 import { createDagShowDoneStore } from './dag-show-done-store.mjs';
 
 const setup = (
@@ -24,7 +25,7 @@ describe(createDagShowDoneStore, () => {
   test('starts from the setting read', () => {
     const { store } = setup(true);
 
-    assert.isTrue(store.showDone.getSnapshot().value);
+    assert.isTrue(Optional.unwrap(store.showDone.getSnapshot()));
   });
 
   test('saves every change', () => {
@@ -36,6 +37,6 @@ describe(createDagShowDoneStore, () => {
 
     assert.deepStrictEqual(saved, [false, true, false]);
 
-    assert.isFalse(store.showDone.getSnapshot().value);
+    assert.isFalse(Optional.unwrap(store.showDone.getSnapshot()));
   });
 });

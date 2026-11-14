@@ -1,4 +1,5 @@
 import { source } from 'synstate';
+import { Optional } from 'ts-data-forge';
 import { createMediaStore } from './media-store.mjs';
 
 describe(createMediaStore, () => {
@@ -15,7 +16,7 @@ describe(createMediaStore, () => {
 
     change.next(undefined);
 
-    assert.isTrue(store.matches.getSnapshot().value);
+    assert.isTrue(Optional.unwrap(store.matches.getSnapshot()));
 
     stopMedia();
 
@@ -23,6 +24,6 @@ describe(createMediaStore, () => {
 
     change.next(undefined);
 
-    assert.isTrue(store.matches.getSnapshot().value);
+    assert.isTrue(Optional.unwrap(store.matches.getSnapshot()));
   });
 });

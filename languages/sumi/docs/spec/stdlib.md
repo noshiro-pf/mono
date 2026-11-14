@@ -18,6 +18,8 @@
 
 ## Optional / Result の現状 API(2026-08-27 調査)
 
+<!-- 2026-08-27 時点の調査記録。その後の変更（Optional.isOptional の削除など）は反映しない。 -->
+
 ts-data-forge の現状（すべて直接形 + カリー化形の二本立て）:
 
 - `Optional`: `some` / `none` / `fromNullable` / `toNullable` / `isSome` / `isNone` / `isOptional` / `map` / `flatMap` / `filter` / `orElse` / `zip`(2 引数のみ)/ `unwrap` / `unwrapOr` / `unwrapThrow` / `expectToBe`

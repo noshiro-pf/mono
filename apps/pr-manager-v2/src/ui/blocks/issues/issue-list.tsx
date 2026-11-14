@@ -1,6 +1,6 @@
 import { map, type InitializedObservable } from 'synstate';
 import { constant, For, If, type JSX } from 'synstate-dom';
-import { Arr } from 'ts-data-forge';
+import { Arr, Optional } from 'ts-data-forge';
 import {
   START_NAMES,
   START_SWITCHES,
@@ -95,7 +95,7 @@ export const IssueList = ({ view, store, now }: Props): JSX.Element => (
                 )}
                 type={constant('button')}
                 onClick={() => {
-                  const name = name$.getSnapshot().value;
+                  const name = Optional.unwrap(name$.getSnapshot());
 
                   store.update((prev) => ({
                     ...prev,
@@ -139,7 +139,7 @@ const isPicked = (
   name$: InitializedObservable<string>,
 ): InitializedObservable<boolean> =>
   settings.pipe(
-    map(({ labels }) => labels.includes(name$.getSnapshot().value)),
+    map(({ labels }) => labels.includes(Optional.unwrap(name$.getSnapshot()))),
   );
 
 const SORTS = [

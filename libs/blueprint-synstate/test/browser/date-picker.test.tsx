@@ -1,4 +1,5 @@
 import { DatePicker } from 'blueprint-synstate';
+import { Optional } from 'ts-data-forge';
 import {
   all,
   controlled,
@@ -170,7 +171,7 @@ describe(DatePicker, () => {
 
     await settle();
 
-    assert.strictEqual(value$.getSnapshot().value, '2026-09-27');
+    assert.strictEqual(Optional.unwrap(value$.getSnapshot()), '2026-09-27');
 
     assert.strictEqual(
       one<HTMLSelectElement>(container, 'select[name="months"]').value,

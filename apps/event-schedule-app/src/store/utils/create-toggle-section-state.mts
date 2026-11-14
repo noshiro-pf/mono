@@ -3,6 +3,7 @@ import {
   createBooleanState,
   createState,
 } from 'synstate';
+import { Optional } from 'ts-data-forge';
 
 export type ToggleSectionState<A> = Readonly<{
   toggleState$: InitializedObservable<boolean>;
@@ -97,7 +98,7 @@ const createToggleSectionStateManager = <A,>({
   };
 
   const toggle = (): void => {
-    if (toggleState$.getSnapshot().value) {
+    if (Optional.unwrap(toggleState$.getSnapshot())) {
       turnOff();
     } else {
       turnOn();

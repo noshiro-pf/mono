@@ -1,5 +1,5 @@
 import { createState } from 'synstate';
-import { Result } from 'ts-data-forge';
+import { Optional, Result } from 'ts-data-forge';
 import {
   nextMidnightMs,
   todayOf,
@@ -22,18 +22,27 @@ describe(createActivityStore, () => {
 
     store.openDialog();
 
-    assert.strictEqual(store.status.getSnapshot().value.kind, 'loading');
+    assert.strictEqual(
+      Optional.unwrap(store.status.getSnapshot()).kind,
+      'loading',
+    );
 
     await flush();
 
-    assert.strictEqual(store.status.getSnapshot().value.kind, 'ready');
+    assert.strictEqual(
+      Optional.unwrap(store.status.getSnapshot()).kind,
+      'ready',
+    );
 
     store.closeDialog();
 
     store.openDialog();
 
     // The same day: the week stays on screen while today is read again.
-    assert.strictEqual(store.status.getSnapshot().value.kind, 'ready');
+    assert.strictEqual(
+      Optional.unwrap(store.status.getSnapshot()).kind,
+      'ready',
+    );
 
     await flush();
 
@@ -49,7 +58,10 @@ describe(createActivityStore, () => {
 
     await flush();
 
-    assert.strictEqual(store.status.getSnapshot().value.kind, 'failed');
+    assert.strictEqual(
+      Optional.unwrap(store.status.getSnapshot()).kind,
+      'failed',
+    );
   });
 
   test('forgets the week at midnight while closed, and rereads while open', async () => {
@@ -65,7 +77,10 @@ describe(createActivityStore, () => {
 
     timers.advance(nextMidnightMs(START) - START);
 
-    assert.strictEqual(store.status.getSnapshot().value.kind, 'idle');
+    assert.strictEqual(
+      Optional.unwrap(store.status.getSnapshot()).kind,
+      'idle',
+    );
 
     store.openDialog();
 
@@ -77,7 +92,10 @@ describe(createActivityStore, () => {
 
     assert.strictEqual(reads(), 3);
 
-    assert.strictEqual(store.status.getSnapshot().value.kind, 'ready');
+    assert.strictEqual(
+      Optional.unwrap(store.status.getSnapshot()).kind,
+      'ready',
+    );
   });
 
   test('drops an answer a newer read overtook', async () => {
@@ -104,7 +122,7 @@ describe(createActivityStore, () => {
 
     await flush();
 
-    const status = store.status.getSnapshot().value;
+    const status = Optional.unwrap(store.status.getSnapshot());
 
     assert.strictEqual(
       status.kind === 'ready' ? status.activity.countedAtMs : undefined,

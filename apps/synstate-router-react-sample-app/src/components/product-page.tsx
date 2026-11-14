@@ -85,21 +85,26 @@ const viewOf = (
   return AsyncData.match(data, {
     idle: () => loading,
     pending: () => loading,
-    ok: (found) =>
-      Optional.isSome(found)
-        ? found.value.id !== productId
-          ? // An answer for another product: the store has not moved yet.
-            loading
-          : {
-              ...loading,
-              title: found.value.name,
-              product: found.value,
-              next:
-                found.value.next === undefined
-                  ? undefined
-                  : routes.products.item.href({ productId: found.value.next }),
-            }
-        : { ...loading, title: `No product ${productId}`, found: false },
+    ok: (found) => {
+      if (Optional.isNone(found)) {
+        return { ...loading, title: `No product ${productId}`, found: false };
+      }
+
+      const product = Optional.unwrap(found);
+
+      return product.id !== productId
+        ? // An answer for another product: the store has not moved yet.
+          loading
+        : {
+            ...loading,
+            title: product.name,
+            product,
+            next:
+              product.next === undefined
+                ? undefined
+                : routes.products.item.href({ productId: product.next }),
+          };
+    },
     err: () => ({
       ...loading,
       title: `Could not load product ${productId}`,

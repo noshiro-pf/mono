@@ -19,6 +19,7 @@ import {
   type InitializedObservable,
   type Observable as SynstateObservable,
 } from 'synstate';
+import { Optional } from 'ts-data-forge';
 import type { DomainState } from '../domain/index.mjs';
 import { nextTickDelay } from '../view-model/index.mjs';
 
@@ -81,7 +82,11 @@ export const createClockStore = <H,>(deps: ClockDeps<H>): ClockStore => {
 
       mut_timer = deps.setTimer(
         fireTimer,
-        nextTickDelay(deps.state.getSnapshot().value, current, deps.maxDelayMs),
+        nextTickDelay(
+          Optional.unwrap(deps.state.getSnapshot()),
+          current,
+          deps.maxDelayMs,
+        ),
       );
     });
 

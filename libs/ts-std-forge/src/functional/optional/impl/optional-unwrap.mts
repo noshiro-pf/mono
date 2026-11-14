@@ -1,6 +1,7 @@
 import type { Some } from '../../../adt-types.mjs';
 import type { UnknownOptional } from '../optional.mjs';
 import { isSome } from './optional-is-some.mjs';
+import { unwrapSome } from './optional-unwrap-some.mjs';
 import type { Unwrap } from './types.mjs';
 
 /**
@@ -37,8 +38,5 @@ export function unwrap<O extends UnknownOptional>(
 export function unwrap<O extends UnknownOptional>(
   optional: O,
 ): Unwrap<O> | undefined {
-  return isSome(optional)
-    ? // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-      (optional.value as Unwrap<O>)
-    : undefined;
+  return isSome(optional) ? unwrapSome(optional) : undefined;
 }

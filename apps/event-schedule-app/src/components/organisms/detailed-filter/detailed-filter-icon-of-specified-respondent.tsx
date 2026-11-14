@@ -6,6 +6,7 @@ import {
   mapBindable,
   type JSX,
 } from 'synstate-dom';
+import { Optional } from 'ts-data-forge';
 import type { ReadonlyRecord } from 'ts-type-forge';
 import { dict } from '../../../constants/index.mjs';
 import { AnswerFilterAndSortStore } from '../../../store/index.mjs';
@@ -84,9 +85,9 @@ export const DetailedFilterIconOfSpecifiedRespondent = (): JSX.Element => (
                     : 'none',
               )}
               onCheck={(checked) => {
-                respondent$
-                  .getSnapshot()
-                  .value.checkState[icon].onCheck(checked);
+                Optional.unwrap(respondent$.getSnapshot()).checkState[
+                  icon
+                ].onCheck(checked);
               }}
             />
           );

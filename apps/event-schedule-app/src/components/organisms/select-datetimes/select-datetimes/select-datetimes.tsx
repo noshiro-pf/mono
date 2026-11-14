@@ -6,7 +6,7 @@ import {
   type Bindable,
   type JSX,
 } from 'synstate-dom';
-import { asUint32 } from 'ts-data-forge';
+import { asUint32, Optional } from 'ts-data-forge';
 import { dict } from '../../../../constants/index.mjs';
 import { selectorOptions } from '../../../../functions/index.mjs';
 import { createSelectDatetimesState } from '../../../../hooks/index.mjs';
@@ -80,7 +80,7 @@ export const SelectDatetimes = ({
           <For items={datetimeList$} key={(_, index) => index}>
             {(datetimeRange$, index$) => {
               const index = (): ReturnType<typeof asUint32> =>
-                asUint32(index$.getSnapshot().value);
+                asUint32(Optional.unwrap(index$.getSnapshot()));
 
               return (
                 <SelectedDatetimeRow

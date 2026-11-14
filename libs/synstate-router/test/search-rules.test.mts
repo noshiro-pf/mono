@@ -99,7 +99,7 @@ describe('href: retain', () => {
 
     router.push(routes.products.href({ search: { q: 'shoe' } }));
 
-    const m = router.match.getSnapshot().value;
+    const m = Optional.unwrap(router.match.getSnapshot());
 
     assert.isTrue(m.route === 'products');
 
@@ -119,7 +119,9 @@ describe('href: retain', () => {
     );
 
     assert.isTrue(
-      router.isActive(routes.products, { exact: true }).getSnapshot().value,
+      Optional.unwrap(
+        router.isActive(routes.products, { exact: true }).getSnapshot(),
+      ),
     );
 
     // A push to where the location already is replaces the entry, so back
@@ -132,7 +134,10 @@ describe('href: retain', () => {
       setTimeout(resolve, 0);
     });
 
-    assert.strictEqual(router.match.getSnapshot().value.route, 'orders');
+    assert.strictEqual(
+      Optional.unwrap(router.match.getSnapshot()).route,
+      'orders',
+    );
 
     router.dispose();
   });

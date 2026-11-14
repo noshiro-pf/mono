@@ -1,4 +1,5 @@
 import { source } from 'synstate';
+import { Optional } from 'ts-data-forge';
 import type { ColorScheme, Theme } from '../theme.mjs';
 import { createThemeStore, type ThemeStore } from './theme-store.mjs';
 
@@ -22,15 +23,15 @@ describe(createThemeStore, () => {
 
     system.set('dark');
 
-    assert.strictEqual(store.system.getSnapshot().value, 'dark');
+    assert.strictEqual(Optional.unwrap(store.system.getSnapshot()), 'dark');
 
     store.choose('light');
 
-    assert.strictEqual(store.theme.getSnapshot().value, 'light');
+    assert.strictEqual(Optional.unwrap(store.theme.getSnapshot()), 'light');
 
     store.choose('dark');
 
-    assert.strictEqual(store.theme.getSnapshot().value, 'auto');
+    assert.strictEqual(Optional.unwrap(store.theme.getSnapshot()), 'auto');
   });
 
   test('stop ends the listener and the writes', () => {
@@ -44,7 +45,7 @@ describe(createThemeStore, () => {
 
     store.choose('dark');
 
-    assert.strictEqual(store.system.getSnapshot().value, 'light');
+    assert.strictEqual(Optional.unwrap(store.system.getSnapshot()), 'light');
 
     assert.deepStrictEqual(applied, ['auto']);
   });

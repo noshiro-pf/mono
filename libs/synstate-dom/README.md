@@ -54,7 +54,7 @@ Text in JSX is a `Bindable` too: write `constant('Add')`, not `Add`, so that a v
 ```tsx
 import { createState, map } from 'synstate';
 import { constant, For, If, render, type JSX } from 'synstate-dom';
-import { Arr } from 'ts-data-forge';
+import { Arr, Optional } from 'ts-data-forge';
 
 type Todo = Readonly<{ id: number; title: string; done: boolean }>;
 
@@ -127,8 +127,9 @@ const TodoApp = (): JSX.Element => {
                                             )}
                                             onChange={() => {
                                                 toggle(
-                                                    todo$.getSnapshot().value
-                                                        .id,
+                                                    Optional.unwrap(
+                                                        todo$.getSnapshot(),
+                                                    ).id,
                                                 );
                                             }}
                                         />

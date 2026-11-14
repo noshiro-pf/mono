@@ -1,5 +1,5 @@
 // cspell:ignore FFFD
-import { Result } from 'ts-data-forge';
+import { Optional, Result } from 'ts-data-forge';
 import type { StrictOmit } from 'ts-type-forge';
 import type { RoomApi } from '../api/index.mjs';
 import { roomPage } from '../constants/index.mjs';
@@ -25,7 +25,7 @@ describe(createRoomStore, () => {
 
     api.emitRoom('a', roomA);
 
-    assert.strictEqual(store.room.getSnapshot().value, roomA);
+    assert.strictEqual(Optional.unwrap(store.room.getSnapshot()), roomA);
 
     const mut_received: (readonly GameStateActionFromDb[])[] = [];
 
@@ -73,11 +73,11 @@ describe(createRoomStore, () => {
   test('setMyName names the player, as a page opened as that player does', () => {
     const { store } = setup();
 
-    assert.isUndefined(store.myName.getSnapshot().value);
+    assert.isUndefined(Optional.unwrap(store.myName.getSnapshot()));
 
     store.setMyName('bob');
 
-    assert.strictEqual(store.myName.getSnapshot().value, 'bob');
+    assert.strictEqual(Optional.unwrap(store.myName.getSnapshot()), 'bob');
   });
 
   test("createRoom saves a room with the player in it, and answers with it and the creator's name", async () => {
@@ -94,7 +94,9 @@ describe(createRoomStore, () => {
       password: 'secret',
     });
 
-    assert.isTrue(store.createRoom.isWaitingResponse.getSnapshot().value);
+    assert.isTrue(
+      Optional.unwrap(store.createRoom.isWaitingResponse.getSnapshot()),
+    );
 
     const [added] = api.addedRooms;
 
@@ -120,11 +122,13 @@ describe(createRoomStore, () => {
     // already are, not on its join form.
     assert.deepStrictEqual(mut_responses, [{ room: res, myName: 'alice' }]);
 
-    assert.strictEqual(store.myName.getSnapshot().value, 'alice');
+    assert.strictEqual(Optional.unwrap(store.myName.getSnapshot()), 'alice');
 
-    assert.isFalse(store.createRoom.isWaitingResponse.getSnapshot().value);
+    assert.isFalse(
+      Optional.unwrap(store.createRoom.isWaitingResponse.getSnapshot()),
+    );
 
-    assert.isFalse(store.createRoom.hasFailed.getSnapshot().value);
+    assert.isFalse(Optional.unwrap(store.createRoom.hasFailed.getSnapshot()));
   });
 
   test('createRoom names the creator in a form the room page URL can carry', async () => {
@@ -159,7 +163,10 @@ describe(createRoomStore, () => {
       ['alice\u{FFFD}'],
     );
 
-    assert.strictEqual(store.myName.getSnapshot().value, 'alice\u{FFFD}');
+    assert.strictEqual(
+      Optional.unwrap(store.myName.getSnapshot()),
+      'alice\u{FFFD}',
+    );
 
     // What Root opens, which throws on a name that is not well-formed.
     assert.strictEqual(
@@ -196,22 +203,26 @@ describe(createRoomStore, () => {
 
     assert.strictEqual(result.value, error);
 
-    assert.isFalse(store.createRoom.isWaitingResponse.getSnapshot().value);
+    assert.isFalse(
+      Optional.unwrap(store.createRoom.isWaitingResponse.getSnapshot()),
+    );
 
-    assert.isTrue(store.createRoom.hasFailed.getSnapshot().value);
+    assert.isTrue(Optional.unwrap(store.createRoom.hasFailed.getSnapshot()));
 
     assert.deepStrictEqual(mut_responses, []);
 
-    assert.isUndefined(store.myName.getSnapshot().value);
+    assert.isUndefined(Optional.unwrap(store.myName.getSnapshot()));
 
     const retried = store.createRoom.dispatch({
       username: 'alice',
       password: undefined,
     });
 
-    assert.isFalse(store.createRoom.hasFailed.getSnapshot().value);
+    assert.isFalse(Optional.unwrap(store.createRoom.hasFailed.getSnapshot()));
 
-    assert.isTrue(store.createRoom.isWaitingResponse.getSnapshot().value);
+    assert.isTrue(
+      Optional.unwrap(store.createRoom.isWaitingResponse.getSnapshot()),
+    );
 
     const retriedRoom = api.addedRooms[1];
 
@@ -227,7 +238,7 @@ describe(createRoomStore, () => {
       { room: result2.value, myName: 'alice' },
     ]);
 
-    assert.strictEqual(store.myName.getSnapshot().value, 'alice');
+    assert.strictEqual(Optional.unwrap(store.myName.getSnapshot()), 'alice');
   });
 
   test('createRoom whose save throws instead of rejecting fails the same way', async () => {
@@ -259,13 +270,15 @@ describe(createRoomStore, () => {
 
     assert.strictEqual(result.value, error);
 
-    assert.isFalse(store.createRoom.isWaitingResponse.getSnapshot().value);
+    assert.isFalse(
+      Optional.unwrap(store.createRoom.isWaitingResponse.getSnapshot()),
+    );
 
-    assert.isTrue(store.createRoom.hasFailed.getSnapshot().value);
+    assert.isTrue(Optional.unwrap(store.createRoom.hasFailed.getSnapshot()));
 
     assert.deepStrictEqual(mut_responses, []);
 
-    assert.isUndefined(store.myName.getSnapshot().value);
+    assert.isUndefined(Optional.unwrap(store.myName.getSnapshot()));
   });
 
   test('joinRoom adds the player to the room and takes the name', async () => {
@@ -273,9 +286,11 @@ describe(createRoomStore, () => {
 
     const pending = store.joinRoom.dispatch('a', 'bob');
 
-    assert.isTrue(store.joinRoom.isWaitingResponse.getSnapshot().value);
+    assert.isTrue(
+      Optional.unwrap(store.joinRoom.isWaitingResponse.getSnapshot()),
+    );
 
-    assert.isUndefined(store.myName.getSnapshot().value);
+    assert.isUndefined(Optional.unwrap(store.myName.getSnapshot()));
 
     const [added] = api.addedPlayers;
 
@@ -289,9 +304,11 @@ describe(createRoomStore, () => {
 
     await pending;
 
-    assert.strictEqual(store.myName.getSnapshot().value, 'bob');
+    assert.strictEqual(Optional.unwrap(store.myName.getSnapshot()), 'bob');
 
-    assert.isFalse(store.joinRoom.isWaitingResponse.getSnapshot().value);
+    assert.isFalse(
+      Optional.unwrap(store.joinRoom.isWaitingResponse.getSnapshot()),
+    );
   });
 
   test('joinRoom takes the name even when the player could not be added', async () => {
@@ -303,9 +320,11 @@ describe(createRoomStore, () => {
 
     await pending;
 
-    assert.strictEqual(store.myName.getSnapshot().value, 'bob');
+    assert.strictEqual(Optional.unwrap(store.myName.getSnapshot()), 'bob');
 
-    assert.isFalse(store.joinRoom.isWaitingResponse.getSnapshot().value);
+    assert.isFalse(
+      Optional.unwrap(store.joinRoom.isWaitingResponse.getSnapshot()),
+    );
   });
 });
 

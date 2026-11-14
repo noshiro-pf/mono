@@ -113,7 +113,7 @@ class DeriveObservableClass<const A extends NonEmptyUnknownList, B>
     const snapshots = Arr.map(parents, (p) => p.getSnapshot());
 
     const mut_values = Array.from(snapshots, (s): unknown =>
-      Optional.isSome(s) ? s.value : undefined,
+      Optional.unwrap(s),
     );
 
     super({
@@ -146,7 +146,7 @@ class DeriveObservableClass<const A extends NonEmptyUnknownList, B>
         return; // a parent has no value yet
       }
 
-      mut_values[mut_index] = snapshot.value;
+      mut_values[mut_index] = Optional.unwrap(snapshot);
 
       mut_index += 1;
 
@@ -163,7 +163,7 @@ class DeriveObservableClass<const A extends NonEmptyUnknownList, B>
 
     const held = this.getSnapshot();
 
-    if (Optional.isSome(held) && this.#equals(held.value, next)) {
+    if (Optional.isSome(held) && this.#equals(Optional.unwrap(held), next)) {
       return; // the result did not change
     }
 

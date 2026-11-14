@@ -18,7 +18,7 @@
  */
 
 import { createState, map, type InitializedObservable } from 'synstate';
-import { Result } from 'ts-data-forge';
+import { Optional, Result } from 'ts-data-forge';
 import type { DeepReadonly } from 'ts-type-forge';
 import type { DagLayout } from '../dag/index.mjs';
 import type { DomainState, Group } from '../domain/index.mjs';
@@ -98,7 +98,7 @@ export const createProjectFileStore = (
 
   /** The project as it stands, or why it cannot be had yet. */
   const current = (): Result<ProjectSnapshot, string> => {
-    switch (deps.load.getSnapshot().value) {
+    switch (Optional.unwrap(deps.load.getSnapshot())) {
       case 'loading':
         return Result.err(m.projectFile.stillLoading);
 
@@ -107,9 +107,9 @@ export const createProjectFileStore = (
 
       case 'loaded':
         return Result.ok({
-          state: deps.state.getSnapshot().value,
-          groups: deps.groups.getSnapshot().value,
-          dagLayout: deps.dagLayout.getSnapshot().value,
+          state: Optional.unwrap(deps.state.getSnapshot()),
+          groups: Optional.unwrap(deps.groups.getSnapshot()),
+          dagLayout: Optional.unwrap(deps.dagLayout.getSnapshot()),
         });
     }
   };
@@ -235,7 +235,7 @@ export const createProjectFileStore = (
     },
     start: () => {
       const mut_last: { load: ProjectLoad } = {
-        load: deps.load.getSnapshot().value,
+        load: Optional.unwrap(deps.load.getSnapshot()),
       };
 
       const subscription = deps.load.subscribe((load) => {

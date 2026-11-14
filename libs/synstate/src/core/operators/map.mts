@@ -113,11 +113,11 @@ class MapObservableClass<A, B>
       return; // skip update
     }
 
-    const next = this.#mapFn(sn.value);
+    const next = this.#mapFn(Optional.unwrap(sn));
 
     const held = this.getSnapshot();
 
-    if (Optional.isSome(held) && this.#equals(held.value, next)) {
+    if (Optional.isSome(held) && this.#equals(Optional.unwrap(held), next)) {
       return; // the result did not change
     }
 

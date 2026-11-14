@@ -200,8 +200,10 @@ export const createSignInPageStore = (deps: SignInPageDeps): SignInPage => {
 
   const enterClickHandler = (): void => {
     if (
-      enterButtonDisabled$.getSnapshot().value ||
-      deps.googleSignIn.googleSignInButtonDisabledState.getSnapshot().value
+      Optional.unwrap(enterButtonDisabled$.getSnapshot()) ||
+      Optional.unwrap(
+        deps.googleSignIn.googleSignInButtonDisabledState.getSnapshot(),
+      )
     ) {
       return;
     }

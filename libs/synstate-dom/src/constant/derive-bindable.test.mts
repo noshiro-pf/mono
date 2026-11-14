@@ -1,5 +1,5 @@
 import { createState, isChildObservable, isObservable, map } from 'synstate';
-import { expectType } from 'ts-data-forge';
+import { expectType, Optional } from 'ts-data-forge';
 import type { Bindable } from './bindable.mjs';
 import { constant } from './constant.mjs';
 import { deriveBindable } from './derive-bindable.mjs';
@@ -53,15 +53,15 @@ describe(deriveBindable, () => {
 
     const result$ = toObservable(result);
 
-    assert.strictEqual(result$.getSnapshot().value, '1-A');
+    assert.strictEqual(Optional.unwrap(result$.getSnapshot()), '1-A');
 
     setCount(2);
 
-    assert.strictEqual(result$.getSnapshot().value, '2-A');
+    assert.strictEqual(Optional.unwrap(result$.getSnapshot()), '2-A');
 
     setLabel('b');
 
-    assert.strictEqual(result$.getSnapshot().value, '2-B');
+    assert.strictEqual(Optional.unwrap(result$.getSnapshot()), '2-B');
   });
 
   test('observables give one observable, whose parents are the inputs', () => {
@@ -83,7 +83,7 @@ describe(deriveBindable, () => {
 
     setA(2);
 
-    assert.strictEqual(result$.getSnapshot().value, 4);
+    assert.strictEqual(Optional.unwrap(result$.getSnapshot()), 4);
 
     expect(fn).toHaveBeenCalledTimes(2);
   });

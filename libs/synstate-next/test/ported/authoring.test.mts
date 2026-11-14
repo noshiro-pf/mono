@@ -520,7 +520,7 @@ const double = (src: Observable<number>): Observable<number> =>
     const v = src.getSnapshot();
 
     if (Optional.isSome(v) && ctx.emitted(src)) {
-      ctx.set(v.value * 2);
+      ctx.set(Optional.unwrap(v) * 2);
     }
   });
 
@@ -549,7 +549,7 @@ const delay = (src: Observable<number>, ms: number): Observable<number> =>
         const t = setTimeout(() => {
           mut_timers.delete(t);
 
-          ctx.emit(v.value);
+          ctx.emit(Optional.unwrap(v));
         }, ms);
 
         mut_timers.add(t);
