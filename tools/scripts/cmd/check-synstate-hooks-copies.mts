@@ -171,7 +171,18 @@ const COPIES = [
       },
       'configs/vitest.config.mts': {
         kind: 'differs',
-        reason: "The alias names the package's own name.",
+        reason:
+          "The alias names the package's own name, and the browser tests also run on React 16.8 and 17.",
+      },
+      'test/legacy-react/hydrate.test.mts': {
+        kind: 'copy only',
+        reason:
+          'test/browser/hydrate.test.mts for React 16.8 and 17, which hydrate through ReactDOM.hydrate.',
+      },
+      'test/legacy-react/testing-library-react.mts': {
+        kind: 'copy only',
+        reason:
+          '@testing-library/react for the React 16.8 and 17 runs, which the reference package has no use for.',
       },
       'scripts/cmd/embed-examples.mts': {
         kind: 'differs',

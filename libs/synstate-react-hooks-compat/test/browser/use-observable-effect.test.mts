@@ -106,7 +106,7 @@ describe(useObservableEffect, () => {
     assert.deepStrictEqual(mut_seen, [2]);
   });
 
-  test('passes a value a layout effect of the same commit emits to the new callback', () => {
+  test('passes a value a layout effect of the same commit emits to the new callback, or on React 16.8 and 17 to the previous one', () => {
     const count$ = source<number>();
 
     const mut_seen: string[] = [];
@@ -127,6 +127,16 @@ describe(useObservableEffect, () => {
 
     rerender({ label: 'bb' });
 
-    assert.deepStrictEqual(mut_seen, ['a:1', 'bb:2']);
+    assert.deepStrictEqual(
+      mut_seen,
+      // synstate-react-hooks-compat runs these tests on React 16.8 and 17 too,
+      // which have no `useInsertionEffect`. There it keeps the callback current
+      // in a layout effect, which runs after this one, so the value goes to the
+      // previous callback (its README says so). Decided by whether React has
+      // `useInsertionEffect`, which is what synstate-react-hooks-compat's
+      // `src/react-version-hooks.mts` looks at, not by `React.version`.
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- React 16 and 17 have none, whatever the types say
+      React.useInsertionEffect === undefined ? ['a:1', 'a:2'] : ['a:1', 'bb:2'],
+    );
   });
 });

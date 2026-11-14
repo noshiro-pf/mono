@@ -95,6 +95,13 @@ update:
   # `tools/scripts/cmd/mature-updates.mts actions` を動かし、GitHub Releases の
   # `published_at` で同じ保留を適用する。下の `ignoreDeps` は actions には適用されない。
   githubActions: false
+  # `ignoreDeps` matches a dependency's real name, never the name an `npm:`
+  # alias installs it under (measured, pnpm 12.15), so it cannot hold back
+  # `libs/synstate-react-hooks-compat`'s React 16.8 and 17 (`react-16`,
+  # `react-dom-16`, `react-17`, `react-dom-17`, `@testing-library/react-12`)
+  # without holding back React itself. The root `update-packages` script
+  # excludes those by name instead (`'!react-16'` …); nothing checks that a new
+  # alias joins that list.
   ignoreDeps:
     - typescript
 

@@ -32,7 +32,7 @@
     "check:ext": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/cmd/check-ext.mts",
     "check:lint": "node ../../tools/scripts/cmd/assert-deps-built.mts && oxlint . && eslint .",
     "check:test": "node ../../tools/scripts/cmd/assert-deps-built.mts && pnpm run z:vitest:node run",
-    "check:test:browser": "node ../../tools/scripts/cmd/assert-deps-built.mts && pnpm run z:vitest --project='Browser' run",
+    "check:test:browser": "node ../../tools/scripts/cmd/assert-deps-built.mts && pnpm run z:vitest --project='Browser*' run",
     "check:test:cov": "node ../../tools/scripts/cmd/assert-deps-built.mts && pnpm run z:vitest run --coverage",
     "check:types": "node ../../tools/scripts/cmd/assert-deps-built.mts && node ../../node_modules/typescript-native/bin/tsc --noEmit",
     "check-all": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/cmd/check-all.mts",
@@ -68,6 +68,7 @@
   "devDependencies": {
     "@testing-library/dom": "catalog:",
     "@testing-library/react": "catalog:",
+    "@testing-library/react-12": "npm:@testing-library/react@12.1.5",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
     "@vitest/browser-playwright": "catalog:",
@@ -80,7 +81,11 @@
     "prettier-plugin-organize-imports": "catalog:",
     "prettier-plugin-packagejson": "catalog:",
     "react": "catalog:",
+    "react-16": "npm:react@16.8.0",
+    "react-17": "npm:react@17.0.2",
     "react-dom": "catalog:",
+    "react-dom-16": "npm:react-dom@16.8.0",
+    "react-dom-17": "npm:react-dom@17.0.2",
     "ts-repo-utils": "workspace:*"
   },
   "peerDependencies": {

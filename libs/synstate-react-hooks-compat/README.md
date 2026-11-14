@@ -8,6 +8,8 @@ Their options, such as `equals` (the second argument of `createState` and `creat
 
 This package provides the same API as [synstate-react-hooks](https://www.npmjs.com/package/synstate-react-hooks), but reads observables through [`use-sync-external-store/shim`](https://www.npmjs.com/package/use-sync-external-store), React's own `useSyncExternalStore` for React 16.8 and 17, so it also works with those versions. Use synstate-react-hooks if you are on React 18 or later.
 
+One thing differs on React 16.8 and 17, which have no `useInsertionEffect`: `useObservableEffect` keeps its callback current in a layout effect, so a value emitted in the same commit by a layout effect that React runs before it, such as one declared before it in the same component or one in a child component, reaches the previous render's callback.
+
 ## Installation
 
 ```bash

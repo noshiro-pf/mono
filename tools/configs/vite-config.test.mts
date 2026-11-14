@@ -1,8 +1,13 @@
+import { playwright } from '@vitest/browser-playwright';
 import * as fs from 'node:fs';
 import * as os from 'node:os';
 import * as path from 'node:path';
+import { Arr, isRecord } from 'ts-data-forge';
 import type { ReadonlyRecord } from 'ts-type-forge';
 import {
+  defaultExclude,
+  defineBrowserProject,
+  defineViteConfig,
   hasTestFiles,
   nodeProjectExclude,
   usesModuleMocks,
@@ -127,5 +132,73 @@ describe(nodeProjectExclude, () => {
       '**/index.mts',
       'test/browser/**',
     ]);
+  });
+});
+
+/** The `exclude` of each project in `defineViteConfig`'s `test.projects`. */
+const projectExcludes = (projects: readonly unknown[]): readonly unknown[] =>
+  projects.map((project) => {
+    assert.isTrue(isRecord(project) && isRecord(project['test']));
+
+    const exclude = project['test']['exclude'];
+
+    assert.isTrue(Arr.isArray(exclude));
+
+    return exclude;
+  });
+
+describe(defineViteConfig, () => {
+  test('gives each project an exclude array of its own built from defaultExclude, so that Vitest adding to one changes no other', () => {
+    const excludes = Arr.toPushed(
+      projectExcludes(
+        defineViteConfig({
+          packageRoot: '/package',
+          browser: { provider: playwright() },
+        }).test.projects,
+      ),
+      defineBrowserProject({
+        packageRoot: '/package',
+        browser: { provider: playwright() },
+      }).test.exclude,
+    );
+
+    const expected: readonly unknown[] = [
+      Arr.toPushed(defaultExclude, 'test/browser/**'),
+      Array.from(defaultExclude),
+      Array.from(defaultExclude),
+    ] as const;
+
+    assert.deepStrictEqual(excludes, expected);
+
+    const distinct = new Set(excludes);
+
+    assert.strictEqual(distinct.size, excludes.length);
+
+    assert.isTrue(excludes.every((exclude) => exclude !== defaultExclude));
+  });
+
+  test('gives each project an exclude array of its own when the package passes one', () => {
+    const exclude = ['skipped/**'] as const;
+
+    const excludes = projectExcludes(
+      defineViteConfig({
+        packageRoot: '/package',
+        node: { exclude },
+        browser: { provider: playwright(), exclude },
+      }).test.projects,
+    );
+
+    assert.deepStrictEqual(excludes, [
+      ['skipped/**', 'test/browser/**'],
+      ['skipped/**'],
+    ]);
+
+    assert.isTrue(excludes.every((e) => e !== exclude));
+  });
+});
+
+describe('defaultExclude', () => {
+  test('is frozen, so that a project handed it uncopied fails when Vitest adds to it', () => {
+    assert.isTrue(Object.isFrozen(defaultExclude));
   });
 });

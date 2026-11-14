@@ -438,10 +438,10 @@ cannot decide:
   `pnpm-workspace.yaml`. `check:root:dependency-specifiers` holds the `catalog:`
   and `workspace:` specifiers; which of `workspace:^` / `~` / `*` is the range
   to publish is left to judgement.
-- `update.ignoreDeps` is the one place a dependency is held back;
-  `update.githubActions` stays `false` (action pins move within their major
-  through `update-actions`, held to `minimumReleaseAge` via GitHub Releases; a
-  major waits for a human).
+- `update.ignoreDeps` is the one place a dependency is held back, save the
+  `npm:` aliases its comment names; `update.githubActions` stays `false` (action
+  pins move within their major through `update-actions`, held to
+  `minimumReleaseAge` via GitHub Releases; a major waits for a human).
 - `update-packages` filters out `strict-lib/v*/output/lib`, whose manifests
   are generated with a `^<major>.0.0` range.
 - **Do not put `pnpm` on `minimumReleaseAgeExclude`**; `pnpm-update.yml` picks a
