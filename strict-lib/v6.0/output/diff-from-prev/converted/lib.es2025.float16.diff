@@ -1,6 +1,6 @@
 diff --git a/v6.0/output/lib-files/lib.es2025.float16.d.ts b/v6.0/output/lib-files/lib.es2025.float16.d.ts
 new file mode 100644
-index 0000000000000000000000000000000000000000..183aa2a69ae4c7c31dbc2b9a9d4504b213dc40bc
+index 0000000000000000000000000000000000000000..77baabbcccd7d9b0fc9ff52768c0b20f2e013c3a
 --- /dev/null
 +++ b/v6.0/output/lib-files/lib.es2025.float16.d.ts
 @@ -0,0 +1,525 @@
@@ -37,7 +37,7 @@ index 0000000000000000000000000000000000000000..183aa2a69ae4c7c31dbc2b9a9d4504b2
 +  /**
 +   * The size in bytes of each element in the array.
 +   */
-+  readonly BYTES_PER_ELEMENT: number;
++  readonly BYTES_PER_ELEMENT: 2;
 +
 +  /**
 +   * The ArrayBuffer instance referenced by the array.
@@ -80,7 +80,7 @@ index 0000000000000000000000000000000000000000..183aa2a69ae4c7c31dbc2b9a9d4504b2
 +   * If thisArg is omitted, undefined is used as the this value.
 +   */
 +  every(
-+    predicate: (value: number, index: number, array: this) => unknown,
++    predicate: (value: number, index: number, array: this) => boolean,
 +    thisArg?: unknown,
 +  ): boolean;
 +
@@ -102,7 +102,7 @@ index 0000000000000000000000000000000000000000..183aa2a69ae4c7c31dbc2b9a9d4504b2
 +   * If thisArg is omitted, undefined is used as the this value.
 +   */
 +  filter(
-+    predicate: (value: number, index: number, array: this) => unknown,
++    predicate: (value: number, index: number, array: this) => boolean,
 +    thisArg?: unknown,
 +  ): Float16Array<ArrayBuffer>;
 +
@@ -148,7 +148,7 @@ index 0000000000000000000000000000000000000000..183aa2a69ae4c7c31dbc2b9a9d4504b2
 +    thisArg?: unknown,
 +  ): S | undefined;
 +  findLast(
-+    predicate: (value: number, index: number, array: this) => unknown,
++    predicate: (value: number, index: number, array: this) => boolean,
 +    thisArg?: unknown,
 +  ): number | undefined;
 +
@@ -162,7 +162,7 @@ index 0000000000000000000000000000000000000000..183aa2a69ae4c7c31dbc2b9a9d4504b2
 +   * predicate. If it is not provided, undefined is used instead.
 +   */
 +  findLastIndex(
-+    predicate: (value: number, index: number, array: this) => unknown,
++    predicate: (value: number, index: number, array: this) => boolean,
 +    thisArg?: unknown,
 +  ): number;
 +
@@ -350,7 +350,7 @@ index 0000000000000000000000000000000000000000..183aa2a69ae4c7c31dbc2b9a9d4504b2
 +   * If thisArg is omitted, undefined is used as the this value.
 +   */
 +  some(
-+    predicate: (value: number, index: number, array: this) => unknown,
++    predicate: (value: number, index: number, array: this) => boolean,
 +    thisArg?: unknown,
 +  ): boolean;
 +
@@ -417,7 +417,7 @@ index 0000000000000000000000000000000000000000..183aa2a69ae4c7c31dbc2b9a9d4504b2
 +   */
 +  with(index: number, value: number): Float16Array<ArrayBuffer>;
 +
-+  readonly [index: number]: number;
++  [index: number]: number;
 +
 +  [Symbol.iterator](): ArrayIterator<number>;
 +
@@ -458,7 +458,7 @@ index 0000000000000000000000000000000000000000..183aa2a69ae4c7c31dbc2b9a9d4504b2
 +  /**
 +   * The size in bytes of each element in the array.
 +   */
-+  readonly BYTES_PER_ELEMENT: number;
++  readonly BYTES_PER_ELEMENT: 2;
 +
 +  /**
 +   * Returns a new array from a set of elements.
@@ -488,7 +488,7 @@ index 0000000000000000000000000000000000000000..183aa2a69ae4c7c31dbc2b9a9d4504b2
 +   * Creates an array from an array-like or iterable object.
 +   * @param elements An iterable object to convert to an array.
 +   */
-+  from(elements: Iterable<number>): Float16Array<ArrayBuffer>;
++  from<T extends number>(arrayLike: Iterable<T>): Float16Array<ArrayBuffer>;
 +
 +  /**
 +   * Creates an array from an array-like or iterable object.

@@ -3,6 +3,7 @@ import {
   defineKnownRules,
   eslintConfigForNodeJs,
   eslintConfigForTypeScript,
+  eslintConfigForVitest,
   type FlatConfig,
 } from 'eslint-config-typed';
 import { eslintPluginTsDataForge } from 'eslint-plugin-ts-data-forge';
@@ -44,6 +45,7 @@ const toolingFiles = [
   'strict-lib/configs/**',
   'strict-lib/eslint.config.mts',
   'strict-lib/scripts-common/src/**',
+  'strict-lib/scripts-common/configs/**',
   'strict-lib/v*/scripts/**',
 ] as const;
 
@@ -114,6 +116,7 @@ const config: readonly FlatConfig[] = [
       'no-template-curly-in-string': 'off',
     }),
   },
+  eslintConfigForVitest(['strict-lib/scripts-common/src/**/*.test.mts']),
 ] as const;
 
 export default config;

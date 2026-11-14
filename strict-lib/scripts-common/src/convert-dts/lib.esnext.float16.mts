@@ -21,8 +21,9 @@ import {
 const arrayIteratorAlt = '(?:Array|Iterable)Iterator';
 
 /**
- * Converts `lib.esnext.float16.d.ts` (added in TS 5.8), which declares
- * `Float16Array`, `Float16ArrayConstructor`, `Math.f16round`, and the
+ * Converts `lib.esnext.float16.d.ts` (added in TS 5.8, and renamed
+ * `lib.es2025.float16.d.ts` in TS 6.0), which declares `Float16Array`,
+ * `Float16ArrayConstructor`, `Math.f16round`, and the
  * `DataView.getFloat16`/`setFloat16` augmentations.
  *
  * `Float16Array` is a number-element typed array structurally identical to

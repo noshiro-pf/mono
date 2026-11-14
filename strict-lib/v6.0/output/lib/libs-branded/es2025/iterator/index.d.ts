@@ -57,7 +57,7 @@ declare global {
      * @param callbackfn A function that accepts up to two arguments to be used to transform values from the underlying iterator.
      */
     map<U>(
-      callbackfn: (value: T, index: number) => U,
+      callbackfn: (value: T, index: NumberType.ArraySize) => U,
     ): IteratorObject<U, undefined, unknown>;
 
     /**
@@ -65,7 +65,7 @@ declare global {
      * @param predicate A function that accepts up to two arguments to be used to test values from the underlying iterator.
      */
     filter<S extends T>(
-      predicate: (value: T, index: number) => value is S,
+      predicate: (value: T, index: NumberType.ArraySize) => value is S,
     ): IteratorObject<S, undefined, unknown>;
 
     /**
@@ -73,20 +73,24 @@ declare global {
      * @param predicate A function that accepts up to two arguments to be used to test values from the underlying iterator.
      */
     filter(
-      predicate: (value: T, index: number) => unknown,
+      predicate: (value: T, index: NumberType.ArraySize) => unknown,
     ): IteratorObject<T, undefined, unknown>;
 
     /**
      * Creates an iterator whose values are the values from this iterator, stopping once the provided limit is reached.
      * @param limit The maximum number of values to yield.
      */
-    take(limit: number): IteratorObject<T, undefined, unknown>;
+    take(
+      limit: NumberType.ArraySizeArgNonNegative,
+    ): IteratorObject<T, undefined, unknown>;
 
     /**
      * Creates an iterator whose values are the values from this iterator after skipping the provided count.
      * @param count The number of values to drop.
      */
-    drop(count: number): IteratorObject<T, undefined, unknown>;
+    drop(
+      count: NumberType.ArraySizeArgNonNegative,
+    ): IteratorObject<T, undefined, unknown>;
 
     /**
      * Creates an iterator whose values are the result of applying the callback to the values from this iterator and then flattening the resulting iterators or iterables.
@@ -95,7 +99,7 @@ declare global {
     flatMap<U>(
       callback: (
         value: T,
-        index: number,
+        index: NumberType.ArraySize,
       ) => Iterator<U, unknown, undefined> | Iterable<U, unknown, undefined>,
     ): IteratorObject<U, undefined, unknown>;
 
@@ -108,14 +112,14 @@ declare global {
       callbackfn: (
         previousValue: T,
         currentValue: T,
-        currentIndex: number,
+        currentIndex: NumberType.ArraySize,
       ) => T,
     ): T;
     reduce(
       callbackfn: (
         previousValue: T,
         currentValue: T,
-        currentIndex: number,
+        currentIndex: NumberType.ArraySize,
       ) => T,
       initialValue: T,
     ): T;
@@ -129,7 +133,7 @@ declare global {
       callbackfn: (
         previousValue: U,
         currentValue: T,
-        currentIndex: number,
+        currentIndex: NumberType.ArraySize,
       ) => U,
       initialValue: U,
     ): U;
@@ -143,7 +147,7 @@ declare global {
      * Performs the specified action for each element in the iterator.
      * @param callbackfn A function that accepts up to two arguments. forEach calls the callbackfn function one time for each element in the iterator.
      */
-    forEach(callbackfn: (value: T, index: number) => void): void;
+    forEach(callbackfn: (value: T, index: NumberType.ArraySize) => void): void;
 
     /**
      * Determines whether the specified callback function returns true for any element of this iterator.
@@ -151,7 +155,9 @@ declare global {
      * the predicate function for each element in this iterator until the predicate returns a value
      * true, or until the end of the iterator.
      */
-    some(predicate: (value: T, index: number) => unknown): boolean;
+    some(
+      predicate: (value: T, index: NumberType.ArraySize) => unknown,
+    ): boolean;
 
     /**
      * Determines whether all the members of this iterator satisfy the specified test.
@@ -159,7 +165,9 @@ declare global {
      * the predicate function for each element in this iterator until the predicate returns
      * false, or until the end of this iterator.
      */
-    every(predicate: (value: T, index: number) => unknown): boolean;
+    every(
+      predicate: (value: T, index: NumberType.ArraySize) => unknown,
+    ): boolean;
 
     /**
      * Returns the value of the first element in this iterator where predicate is true, and undefined
@@ -169,9 +177,11 @@ declare global {
      * immediately returns that element value. Otherwise, find returns undefined.
      */
     find<S extends T>(
-      predicate: (value: T, index: number) => value is S,
+      predicate: (value: T, index: NumberType.ArraySize) => value is S,
     ): S | undefined;
-    find(predicate: (value: T, index: number) => unknown): T | undefined;
+    find(
+      predicate: (value: T, index: NumberType.ArraySize) => unknown,
+    ): T | undefined;
 
     readonly [Symbol.toStringTag]: string;
   }

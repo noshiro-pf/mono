@@ -31,7 +31,7 @@ interface Float16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   /**
    * The size in bytes of each element in the array.
    */
-  readonly BYTES_PER_ELEMENT: number;
+  readonly BYTES_PER_ELEMENT: 2;
 
   /**
    * The ArrayBuffer instance referenced by the array.
@@ -41,18 +41,20 @@ interface Float16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   /**
    * The length in bytes of the array.
    */
-  readonly byteLength: number;
+  readonly byteLength: NumberType.TypedArraySize;
 
   /**
    * The offset in bytes of the array.
    */
-  readonly byteOffset: number;
+  readonly byteOffset: NumberType.TypedArraySize;
 
   /**
    * Returns the item located at the specified index.
    * @param index The zero-based index of the desired code unit. A negative index will count back from the last item.
    */
-  at(index: number): number | undefined;
+  at(
+    index: NumberType.TypedArraySizeArg,
+  ): import('ts-type-forge').Float16 | undefined;
 
   /**
    * Returns the this object after copying a section of the array identified by start and end
@@ -63,7 +65,11 @@ interface Float16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
    * is treated as length+end.
    * @param end If not specified, length of the this object is used as its default value.
    */
-  copyWithin(target: number, start: number, end?: number): this;
+  copyWithin(
+    target: NumberType.TypedArraySizeArg,
+    start: NumberType.TypedArraySizeArg,
+    end?: NumberType.TypedArraySizeArg,
+  ): this;
 
   /**
    * Determines whether all the members of an array satisfy the specified test.
@@ -74,7 +80,11 @@ interface Float16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
    * If thisArg is omitted, undefined is used as the this value.
    */
   every(
-    predicate: (value: number, index: number, array: this) => unknown,
+    predicate: (
+      value: import('ts-type-forge').Float16,
+      index: NumberType.TypedArraySize,
+      array: this,
+    ) => boolean,
     thisArg?: unknown,
   ): boolean;
 
@@ -86,7 +96,11 @@ interface Float16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
    * @param end index to stop filling the array at. If end is negative, it is treated as
    * length+end.
    */
-  fill(value: number, start?: number, end?: number): this;
+  fill(
+    value: import('ts-type-forge').Float16,
+    start?: NumberType.TypedArraySizeArg,
+    end?: NumberType.TypedArraySizeArg,
+  ): this;
 
   /**
    * Returns the elements of an array that meet the condition specified in a callback function.
@@ -96,7 +110,11 @@ interface Float16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
    * If thisArg is omitted, undefined is used as the this value.
    */
   filter(
-    predicate: (value: number, index: number, array: this) => unknown,
+    predicate: (
+      value: import('ts-type-forge').Float16,
+      index: NumberType.TypedArraySize,
+      array: this,
+    ) => boolean,
     thisArg?: unknown,
   ): Float16Array<ArrayBuffer>;
 
@@ -110,9 +128,13 @@ interface Float16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
    * predicate. If it is not provided, undefined is used instead.
    */
   find(
-    predicate: (value: number, index: number, obj: this) => boolean,
+    predicate: (
+      value: import('ts-type-forge').Float16,
+      index: NumberType.TypedArraySize,
+      obj: this,
+    ) => boolean,
     thisArg?: unknown,
-  ): number | undefined;
+  ): import('ts-type-forge').Float16 | undefined;
 
   /**
    * Returns the index of the first element in the array where predicate is true, and -1
@@ -124,9 +146,13 @@ interface Float16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
    * predicate. If it is not provided, undefined is used instead.
    */
   findIndex(
-    predicate: (value: number, index: number, obj: this) => boolean,
+    predicate: (
+      value: import('ts-type-forge').Float16,
+      index: NumberType.TypedArraySize,
+      obj: this,
+    ) => boolean,
     thisArg?: unknown,
-  ): number;
+  ): NumberType.TypedArraySearchResult;
 
   /**
    * Returns the value of the last element in the array where predicate is true, and undefined
@@ -137,14 +163,22 @@ interface Float16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
    * @param thisArg If provided, it will be used as the this value for each invocation of
    * predicate. If it is not provided, undefined is used instead.
    */
-  findLast<S extends number>(
-    predicate: (value: number, index: number, array: this) => value is S,
+  findLast<S extends import('ts-type-forge').Float16>(
+    predicate: (
+      value: import('ts-type-forge').Float16,
+      index: NumberType.TypedArraySize,
+      array: this,
+    ) => value is S,
     thisArg?: unknown,
   ): S | undefined;
   findLast(
-    predicate: (value: number, index: number, array: this) => unknown,
+    predicate: (
+      value: import('ts-type-forge').Float16,
+      index: NumberType.TypedArraySize,
+      array: this,
+    ) => boolean,
     thisArg?: unknown,
-  ): number | undefined;
+  ): import('ts-type-forge').Float16 | undefined;
 
   /**
    * Returns the index of the last element in the array where predicate is true, and -1
@@ -156,9 +190,13 @@ interface Float16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
    * predicate. If it is not provided, undefined is used instead.
    */
   findLastIndex(
-    predicate: (value: number, index: number, array: this) => unknown,
+    predicate: (
+      value: import('ts-type-forge').Float16,
+      index: NumberType.TypedArraySize,
+      array: this,
+    ) => boolean,
     thisArg?: unknown,
-  ): number;
+  ): NumberType.TypedArraySearchResult;
 
   /**
    * Performs the specified action for each element in an array.
@@ -168,7 +206,11 @@ interface Float16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
    * If thisArg is omitted, undefined is used as the this value.
    */
   forEach(
-    callbackfn: (value: number, index: number, array: this) => void,
+    callbackfn: (
+      value: import('ts-type-forge').Float16,
+      index: NumberType.TypedArraySize,
+      array: this,
+    ) => void,
     thisArg?: unknown,
   ): void;
 
@@ -177,7 +219,10 @@ interface Float16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
    * @param searchElement The element to search for.
    * @param fromIndex The position in this array at which to begin searching for searchElement.
    */
-  includes(searchElement: number, fromIndex?: number): boolean;
+  includes(
+    searchElement: import('ts-type-forge').Float16,
+    fromIndex?: NumberType.TypedArraySizeArg,
+  ): boolean;
 
   /**
    * Returns the index of the first occurrence of a value in an array.
@@ -185,7 +230,10 @@ interface Float16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
    * @param fromIndex The array index at which to begin the search. If fromIndex is omitted, the
    * search starts at index 0.
    */
-  indexOf(searchElement: number, fromIndex?: number): number;
+  indexOf(
+    searchElement: import('ts-type-forge').Float16,
+    fromIndex?: NumberType.TypedArraySizeArg,
+  ): NumberType.TypedArraySearchResult;
 
   /**
    * Adds all the elements of an array separated by the specified separator string.
@@ -200,7 +248,10 @@ interface Float16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
    * @param fromIndex The array index at which to begin the search. If fromIndex is omitted, the
    * search starts at index 0.
    */
-  lastIndexOf(searchElement: number, fromIndex?: number): number;
+  lastIndexOf(
+    searchElement: import('ts-type-forge').Float16,
+    fromIndex?: NumberType.TypedArraySizeArg,
+  ): NumberType.TypedArraySearchResult;
 
   /**
    * The length of the array.
@@ -216,7 +267,11 @@ interface Float16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
    * If thisArg is omitted, undefined is used as the this value.
    */
   map(
-    callbackfn: (value: number, index: number, array: this) => number,
+    callbackfn: (
+      value: import('ts-type-forge').Float16,
+      index: NumberType.TypedArraySize,
+      array: this,
+    ) => import('ts-type-forge').Float16,
     thisArg?: unknown,
   ): Float16Array<ArrayBuffer>;
 
@@ -232,21 +287,21 @@ interface Float16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
    */
   reduce(
     callbackfn: (
-      previousValue: number,
-      currentValue: number,
-      currentIndex: number,
+      previousValue: import('ts-type-forge').Float16,
+      currentValue: import('ts-type-forge').Float16,
+      currentIndex: NumberType.TypedArraySize,
       array: this,
-    ) => number,
-  ): number;
+    ) => import('ts-type-forge').Float16,
+  ): import('ts-type-forge').Float16;
   reduce(
     callbackfn: (
-      previousValue: number,
-      currentValue: number,
-      currentIndex: number,
+      previousValue: import('ts-type-forge').Float16,
+      currentValue: import('ts-type-forge').Float16,
+      currentIndex: NumberType.TypedArraySize,
       array: this,
-    ) => number,
-    initialValue: number,
-  ): number;
+    ) => import('ts-type-forge').Float16,
+    initialValue: import('ts-type-forge').Float16,
+  ): import('ts-type-forge').Float16;
 
   /**
    * Calls the specified callback function for all the elements in an array. The return value of
@@ -261,8 +316,8 @@ interface Float16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   reduce<U>(
     callbackfn: (
       previousValue: U,
-      currentValue: number,
-      currentIndex: number,
+      currentValue: import('ts-type-forge').Float16,
+      currentIndex: NumberType.TypedArraySize,
       array: this,
     ) => U,
     initialValue: U,
@@ -280,21 +335,21 @@ interface Float16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
    */
   reduceRight(
     callbackfn: (
-      previousValue: number,
-      currentValue: number,
-      currentIndex: number,
+      previousValue: import('ts-type-forge').Float16,
+      currentValue: import('ts-type-forge').Float16,
+      currentIndex: NumberType.TypedArraySize,
       array: this,
-    ) => number,
-  ): number;
+    ) => import('ts-type-forge').Float16,
+  ): import('ts-type-forge').Float16;
   reduceRight(
     callbackfn: (
-      previousValue: number,
-      currentValue: number,
-      currentIndex: number,
+      previousValue: import('ts-type-forge').Float16,
+      currentValue: import('ts-type-forge').Float16,
+      currentIndex: NumberType.TypedArraySize,
       array: this,
-    ) => number,
-    initialValue: number,
-  ): number;
+    ) => import('ts-type-forge').Float16,
+    initialValue: import('ts-type-forge').Float16,
+  ): import('ts-type-forge').Float16;
 
   /**
    * Calls the specified callback function for all the elements in an array, in descending order.
@@ -309,8 +364,8 @@ interface Float16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
   reduceRight<U>(
     callbackfn: (
       previousValue: U,
-      currentValue: number,
-      currentIndex: number,
+      currentValue: import('ts-type-forge').Float16,
+      currentIndex: NumberType.TypedArraySize,
       array: this,
     ) => U,
     initialValue: U,
@@ -326,14 +381,20 @@ interface Float16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
    * @param array A typed or untyped array of values to set.
    * @param offset The index in the current array at which the values are to be written.
    */
-  set(array: ArrayLike<number>, offset?: number): void;
+  set(
+    array: ArrayLike<import('ts-type-forge').Float16>,
+    offset?: NumberType.TypedArraySizeArgNonNegative,
+  ): void;
 
   /**
    * Returns a section of an array.
    * @param start The beginning of the specified portion of the array.
    * @param end The end of the specified portion of the array. This is exclusive of the element at the index 'end'.
    */
-  slice(start?: number, end?: number): Float16Array<ArrayBuffer>;
+  slice(
+    start?: NumberType.TypedArraySizeArg,
+    end?: NumberType.TypedArraySizeArg,
+  ): Float16Array<ArrayBuffer>;
 
   /**
    * Determines whether the specified callback function returns true for any element of an array.
@@ -344,7 +405,11 @@ interface Float16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
    * If thisArg is omitted, undefined is used as the this value.
    */
   some(
-    predicate: (value: number, index: number, array: this) => unknown,
+    predicate: (
+      value: import('ts-type-forge').Float16,
+      index: NumberType.TypedArraySize,
+      array: this,
+    ) => boolean,
     thisArg?: unknown,
   ): boolean;
 
@@ -357,7 +422,12 @@ interface Float16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
    * [11,2,22,1].sort((a, b) => a - b)
    * ```
    */
-  sort(compareFn?: (a: number, b: number) => number): this;
+  sort(
+    compareFn?: (
+      a: import('ts-type-forge').Float16,
+      b: import('ts-type-forge').Float16,
+    ) => number,
+  ): this;
 
   /**
    * Gets a new Float16Array view of the ArrayBuffer store for this array, referencing the elements
@@ -365,7 +435,10 @@ interface Float16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
    * @param begin The index of the beginning of the array.
    * @param end The index of the end of the array.
    */
-  subarray(begin?: number, end?: number): Float16Array<TArrayBuffer>;
+  subarray(
+    begin?: NumberType.TypedArraySizeArg,
+    end?: NumberType.TypedArraySizeArg,
+  ): Float16Array<TArrayBuffer>;
 
   /**
    * Converts a number to a string by using the current locale.
@@ -391,7 +464,10 @@ interface Float16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
    * ```
    */
   toSorted(
-    compareFn?: (a: number, b: number) => number,
+    compareFn?: (
+      a: import('ts-type-forge').Float16,
+      b: import('ts-type-forge').Float16,
+    ) => number,
   ): Float16Array<ArrayBuffer>;
 
   /**
@@ -409,62 +485,77 @@ interface Float16Array<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
    * @param value The value to insert into the copied array.
    * @returns A copy of the original array with the inserted value.
    */
-  with(index: number, value: number): Float16Array<ArrayBuffer>;
+  with(
+    index: NumberType.TypedArraySizeArg,
+    value: import('ts-type-forge').Float16,
+  ): Float16Array<ArrayBuffer>;
 
-  readonly [index: number]: number;
+  [index: number]: import('ts-type-forge').Float16;
 
-  [Symbol.iterator](): ArrayIterator<number>;
+  [Symbol.iterator](): ArrayIterator<import('ts-type-forge').Float16>;
 
   /**
    * Returns an array of key, value pairs for every entry in the array
    */
-  entries(): ArrayIterator<readonly [number, number]>;
+  entries(): ArrayIterator<
+    readonly [NumberType.TypedArraySize, import('ts-type-forge').Float16]
+  >;
 
   /**
    * Returns an list of keys in the array
    */
-  keys(): ArrayIterator<number>;
+  keys(): ArrayIterator<NumberType.TypedArraySize>;
 
   /**
    * Returns an list of values in the array
    */
-  values(): ArrayIterator<number>;
+  values(): ArrayIterator<import('ts-type-forge').Float16>;
 
   readonly [Symbol.toStringTag]: 'Float16Array';
 }
 
 interface Float16ArrayConstructor {
   readonly prototype: Float16Array<ArrayBufferLike>;
-  new (length?: number): Float16Array<ArrayBuffer>;
-  new (array: ArrayLike<number> | Iterable<number>): Float16Array<ArrayBuffer>;
+  new (
+    length?: NumberType.TypedArraySizeArgNonNegative,
+  ): Float16Array<ArrayBuffer>;
+  new (
+    array: ArrayLike<import('ts-type-forge').Float16> | Iterable<number>,
+  ): Float16Array<ArrayBuffer>;
   new <TArrayBuffer extends ArrayBufferLike = ArrayBuffer>(
     buffer: TArrayBuffer,
-    byteOffset?: number,
-    length?: number,
+    byteOffset?: NumberType.TypedArraySizeArgNonNegative,
+    length?: NumberType.TypedArraySizeArgNonNegative,
   ): Float16Array<TArrayBuffer>;
   new (
     buffer: ArrayBuffer,
-    byteOffset?: number,
-    length?: number,
+    byteOffset?: NumberType.TypedArraySizeArgNonNegative,
+    length?: NumberType.TypedArraySizeArgNonNegative,
   ): Float16Array<ArrayBuffer>;
-  new (array: ArrayLike<number> | ArrayBuffer): Float16Array<ArrayBuffer>;
+  new (
+    array: ArrayLike<import('ts-type-forge').Float16> | ArrayBuffer,
+  ): Float16Array<ArrayBuffer>;
 
   /**
    * The size in bytes of each element in the array.
    */
-  readonly BYTES_PER_ELEMENT: number;
+  readonly BYTES_PER_ELEMENT: 2;
 
   /**
    * Returns a new array from a set of elements.
    * @param items A set of elements to include in the new array object.
    */
-  of(...items: readonly number[]): Float16Array<ArrayBuffer>;
+  of(
+    ...items: readonly import('ts-type-forge').Float16[]
+  ): Float16Array<ArrayBuffer>;
 
   /**
    * Creates an array from an array-like or iterable object.
    * @param arrayLike An array-like object to convert to an array.
    */
-  from(arrayLike: ArrayLike<number>): Float16Array<ArrayBuffer>;
+  from(
+    arrayLike: ArrayLike<import('ts-type-forge').Float16>,
+  ): Float16Array<ArrayBuffer>;
 
   /**
    * Creates an array from an array-like or iterable object.
@@ -474,7 +565,10 @@ interface Float16ArrayConstructor {
    */
   from<T>(
     arrayLike: ArrayLike<T>,
-    mapfn: (v: T, k: number) => number,
+    mapfn: (
+      v: T,
+      k: NumberType.TypedArraySize,
+    ) => import('ts-type-forge').Float16,
     thisArg?: unknown,
   ): Float16Array<ArrayBuffer>;
 
@@ -482,7 +576,7 @@ interface Float16ArrayConstructor {
    * Creates an array from an array-like or iterable object.
    * @param elements An iterable object to convert to an array.
    */
-  from(elements: Iterable<number>): Float16Array<ArrayBuffer>;
+  from<T extends number>(arrayLike: Iterable<T>): Float16Array<ArrayBuffer>;
 
   /**
    * Creates an array from an array-like or iterable object.
@@ -492,7 +586,10 @@ interface Float16ArrayConstructor {
    */
   from<T>(
     elements: Iterable<T>,
-    mapfn?: (v: T, k: number) => number,
+    mapfn?: (
+      v: T,
+      k: NumberType.TypedArraySize,
+    ) => import('ts-type-forge').Float16,
     thisArg?: unknown,
   ): Float16Array<ArrayBuffer>;
 }
@@ -503,7 +600,9 @@ interface Math {
    * Returns the nearest half precision float representation of a number.
    * @param x A numeric expression.
    */
-  f16round(x: number): number;
+  f16round(
+    x: number,
+  ): import('ts-type-forge').Float16 | import('ts-type-forge').NaNType;
 }
 
 interface DataView<TArrayBuffer extends ArrayBufferLike> {
@@ -513,7 +612,10 @@ interface DataView<TArrayBuffer extends ArrayBufferLike> {
    * @param byteOffset The place in the buffer at which the value should be retrieved.
    * @param littleEndian If false or undefined, a big-endian value should be read.
    */
-  getFloat16(byteOffset: number, littleEndian?: boolean): number;
+  getFloat16(
+    byteOffset: NumberType.TypedArraySizeArg,
+    littleEndian?: boolean,
+  ): import('ts-type-forge').Float16;
 
   /**
    * Stores an Float16 value at the specified byte offset from the start of the view.
@@ -521,5 +623,9 @@ interface DataView<TArrayBuffer extends ArrayBufferLike> {
    * @param value The value to set.
    * @param littleEndian If false or undefined, a big-endian value should be written.
    */
-  setFloat16(byteOffset: number, value: number, littleEndian?: boolean): void;
+  setFloat16(
+    byteOffset: NumberType.TypedArraySizeArg,
+    value: import('ts-type-forge').Float16,
+    littleEndian?: boolean,
+  ): void;
 }

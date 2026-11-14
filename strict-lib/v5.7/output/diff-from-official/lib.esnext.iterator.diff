@@ -16,15 +16,6 @@
  
  // NOTE: This is specified as what is essentially an unreachable module. All actual global declarations can be found
  //       in the `declare global` section, below. This is necessary as there is currently no way to declare an `abstract`
-@@ -81,7 +88,7 @@ declare global {
-      * Creates an iterator whose values are the values from this iterator after skipping the provided count.
-      * @param count The number of values to drop.
-      */
--    drop(count: number): IteratorObject<T, undefined, unknown>;
-+    drop(limit: number): IteratorObject<T, undefined, unknown>;
- 
-     /**
-      * Creates an iterator whose values are the result of applying the callback to the values from this iterator and then flattening the resulting iterators or iterables.
 @@ -183,5 +190,5 @@ declare global {
      ): IteratorObject<T, undefined, unknown>;
    }
