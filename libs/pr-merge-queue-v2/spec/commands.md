@@ -110,6 +110,13 @@ A body is refused by `push`, `create`, `check` and `open-pr --body-file` when:
 - an item under a `**Deferred**` line of `## Review` does not open with
   `(predates)`, `(another change)` or `(too large)`, or the line has neither
   items nor `none`;
+- a `Merge-After:` or `Start-After:` line outside code fences, the trailers
+  included, names no `#N` (a URL, `owner/repo#N` or a bare number is not read),
+  or a line meant as one is no declaration line: its key behind a list marker
+  (`-`, `+`, `*`, a number, a task box) or emphasis, or emphasis between the key
+  and its colon. A quote, inline code, a heading, link text, strikethrough, a
+  full-width colon and a flag (`--merge-after`) are left alone.
+  Checked without `translation.heading` too, by `check` as well (#3925);
 - with `pullRequestDescription.openingHeading` set, a pull request's original
   does not open with `## <openingHeading>`, declarations, the `--merge-before`
   note and HTML comments aside (#3814). Issues are not asked.
@@ -140,8 +147,9 @@ refused, since a push would land there (**Changed in v2**: v1 followed the
 redirect). The command does not ask whose the token is, so an installation's
 token serves.
 
-Without `translation.heading`: `read` prints whole, `push` and `create` write as
-is; `push` still refuses a description changed since the `pull`.
+Without `translation.heading`: `read` prints whole, `push`, `create` and `check`
+check only the `Merge-After:` and `Start-After:` lines; `push` still refuses a
+description changed since the `pull`.
 
 ## `pr-report`
 

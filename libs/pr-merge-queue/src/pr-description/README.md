@@ -102,6 +102,19 @@ description も、次の `push` で訳文に同じものを置きます。
   keyword では何もしないので、issue（`create`、issue への `push`、
   `check --issue`）ではただの文として扱い、`#N` も数えます。`push` は番号が
   issue か pull request かを GitHub から読みます。
+- `Merge-After:` か `Start-After:` の行（`---` 行より後のトレーラも含め、
+  コードブロックの外）が `#N` を1つも名指していない。または宣言のつもりで
+  書いたのに宣言の行になっていない：キーの前にリストの記号（`-`・`+`・`*`、
+  番号、チェックボックス）か強調（`*`・`_`）がある、キーとコロンの間に強調が
+  ある。読むのは `#N` だけで、URL、`owner/repo#N`、番号だけは読まず、
+  `**Start-After:** #5` や `- Start-After: #5` は宣言として読みません。どちらも
+  順序を書いたつもりで何も宣言していない本文で、issue は待つはずのものより先に
+  始められ、pull request は先にマージされます。引用（`> Merge-After: #5`）、
+  インラインコード、見出し、リンクの文字列、取り消し線、全角のコロン、
+  `--merge-after` のようなフラグは、ふつうの文の書き出しでもあるので対象外
+  です。宣言を例として示すときは、コードフェンスに入れます（字下げだけの
+  コードブロックの中の行は読まれます）。この規則だけは
+  `translation.heading` が無くても確かめます。
 - pull request の原文が `pullRequestDescription.openingHeading` の `##` 見出しで
   始まっていない（設定したときだけ。宣言の行と `--merge-before` の行は先に来て
   かまいません）。
@@ -136,8 +149,8 @@ description も、次の `push` で訳文に同じものを置きます。
 もう一度 `push` できます。
 
 `translation.heading` が無いリポジトリでは、`read` は本文をそのまま表示し、
-`push` と `create` は形を確かめずに書きます（`push` の、`pull` 後に変わって
-いないかの確認は残ります）。
+`push`・`create`・`check` は `Merge-After:`・`Start-After:` の行のほかは形を
+確かめません（`push` の、`pull` 後に変わっていないかの確認は残ります）。
 
 ## English
 
@@ -223,6 +236,19 @@ blocks are in the original alone gets them in the translation too.
   it is, so it appears once, after the `---` rule. GitHub acts on no closing
   keyword in an issue, so there (`create`, `push` to an issue, `check --issue`)
   one is prose and its `#N` counts; `push` asks GitHub which the number is;
+- a `Merge-After:` or `Start-After:` line outside code fences, the trailers
+  included, names no `#N`, or a line meant as one is no declaration line: its
+  key behind a list marker (`-`, `+`, `*`, a number, a task box) or emphasis
+  (`*`, `_`), or emphasis between the key and its colon. Only `#N` is read — a
+  URL, `owner/repo#N` and a bare number are not — and `**Start-After:** #5` or
+  `- Start-After: #5` is not read as a declaration at all. Either is a
+  description that meant an order and declared none: the issue is started, or
+  the pull request merged, before what it was to wait for. A quote
+  (`> Merge-After: #5`), inline code, a heading, link text, strikethrough, a
+  full-width colon and a flag such as `--merge-after` are left alone, each being
+  how ordinary prose opens too. An example of a declaration goes in a code fence
+  (a line in an indented code block is read). This rule is checked without
+  `translation.heading` too;
 - with `pullRequestDescription.openingHeading` set, a pull request's original
   does not open with that `##` heading, declarations and the `--merge-before`
   line aside;
@@ -255,6 +281,7 @@ one half change alone, for a typo or another change that changes no meaning.
 `<file>.pulled`; `push` refreshes `<file>.pulled` after writing, so a second
 edit pushes without a second pull.
 
-Without `translation.heading`, `read` prints the description whole, and
-`push` and `create` write it as it is; `push` still refuses one that changed
-on GitHub since the `pull`.
+Without `translation.heading`, `read` prints the description whole, and `push`,
+`create` and `check` check nothing of its shape but the `Merge-After:`
+and `Start-After:` lines; `push` still refuses one that changed on GitHub since
+the `pull`.
