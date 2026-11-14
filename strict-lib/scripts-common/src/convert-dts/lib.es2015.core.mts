@@ -83,6 +83,9 @@ export const convertLibEs2015Core =
               'clz32(x: number): number;',
               'clz32(x: number): UintRangeInclusive<0, 32>;',
             ),
+            // Bare brands reject literals: the branded flavor refuses
+            // `Math.imul(3, 5)`. `imul` converts any number with ToInt32, so
+            // whether it takes `number` or `WithSmallInt<Int32>` is still open.
             replaceWithNoMatchCheck(
               'imul(x: number, y: number): number;',
               `imul(x: ${brandedNumber.Int32}, y: ${brandedNumber.Int32}): ${brandedNumber.Int32};`,
@@ -214,7 +217,7 @@ export const convertLibEs2015Core =
             ),
             replaceWithNoMatchCheck(
               'repeat(count: number): string',
-              `repeat(count: ${brandedNumber.SafeUint}): string`,
+              `repeat(count: ${brandedNumber.StringSizeArgNonNegative}): string`,
             ),
             replaceWithNoMatchCheck(
               'includes(searchString: string, position?: number): boolean;',
@@ -234,6 +237,9 @@ export const convertLibEs2015Core =
         // StringConstructor
         replaceWithinInterface({
           name: 'StringConstructor',
+          // A bare brand rejects literals: the branded flavor refuses
+          // `String.fromCodePoint(65)`, which `WithSmallInt` (0–39) would not
+          // admit either, so what the parameter takes is still open.
           mapFn: replaceWithNoMatchCheck(
             'fromCodePoint(...codePoints: readonly number[]): string',
             `fromCodePoint(...codePoints: readonly ${brandedNumber.Uint32}[]): string`,
@@ -249,7 +255,7 @@ export const convertLibEs2015Core =
               'bold(): string;',
               'fixed(): string;',
               'fontcolor(color: string): string;',
-              `fontsize(size: ${brandedNumber.SafeUint}): string;`,
+              'fontsize(size: number): string;',
               'fontsize(size: string): string;',
               'italics(): string;',
               'link(url: string): string;',
