@@ -29,6 +29,7 @@ import { convertLibEs2016ArrayInclude } from './lib.es2016.array.include.mjs';
 import { convertLibEs2017Date } from './lib.es2017.date.mjs';
 import { convertLibEs2017Object } from './lib.es2017.object.mjs';
 import { convertLibEs2017Sharedmemory } from './lib.es2017.sharedmemory.mjs';
+import { convertLibEs2017String } from './lib.es2017.string.mjs';
 import { convertLibEs2019Array } from './lib.es2019.array.mjs';
 import { convertLibEs2019Object } from './lib.es2019.object.mjs';
 import { convertLibEs2019String } from './lib.es2019.string.mjs';
@@ -36,12 +37,14 @@ import { convertLibEs2020Bigint } from './lib.es2020.bigint.mjs';
 import { convertLibEs2020Sharedmemory } from './lib.es2020.sharedmemory.mjs';
 import { convertLibEs2022Array } from './lib.es2022.array.mjs';
 import { convertLibEs2022Object } from './lib.es2022.object.mjs';
+import { convertLibEs2022Sharedmemory } from './lib.es2022.sharedmemory.mjs';
 import { convertLibEs2023Array } from './lib.es2023.array.mjs';
 import { convertLibEs2024Arraybuffer } from './lib.es2024.arraybuffer.mjs';
 import { convertLibEs2024Sharedmemory } from './lib.es2024.sharedmemory.mjs';
 import { convertLibEs2025Collection } from './lib.es2025.collection.mjs';
 import { convertLibEsnextFloat16 } from './lib.esnext.float16.mjs';
 import { convertLibEsNextIterator } from './lib.esnext.iterator.mjs';
+import { isStubFile } from './stub-file.mjs';
 
 /**
  * The globals that `lib.dom.d.ts` and `lib.webworker.d.ts` both declare with
@@ -152,250 +155,7 @@ export const convert = (
           onNotFound: 'off',
         }),
 
-        skipForStubFile(
-          (() => {
-            switch (filename) {
-              case 'lib.decorators.d.ts':
-                // Wildcard rest parameters — see the note in `convertLibEs5`
-                // and the alias's own doc comment. `ensureEs5Reference` because
-                // the alias is declared in `lib.es5.d.ts`.
-                return composeMonoTypeFns(
-                  ensureEs5Reference,
-                  replaceWithNoMatchCheck(
-                    'Class extends abstract new (...args: unknown) => unknown = abstract new (...args: unknown) => unknown',
-                    `Class extends abstract new (...args: ${anyArgumentsRef}) => unknown = abstract new (...args: ${anyArgumentsRef}) => unknown`,
-                  ),
-                  replaceWithNoMatchCheck(
-                    'Value extends (this: This, ...args: unknown) => unknown = (this: This, ...args: unknown) => unknown',
-                    `Value extends (this: This, ...args: ${anyArgumentsRef}) => unknown = (this: This, ...args: ${anyArgumentsRef}) => unknown`,
-                  ),
-                );
-
-              case 'lib.dom.d.ts':
-                // TS 6.0 folded the former `lib.dom.iterable.d.ts` (now a
-                // stub) into `lib.dom.d.ts`, so its branded entries()/keys()
-                // iterator transforms must run here to keep parity with 5.x.
-                // Those transforms are tolerant and match nothing in the 5.x
-                // `lib.dom.d.ts`, so 5.x output is unchanged.
-                return composeMonoTypeFns(
-                  convertLibDom(options),
-                  convertLibDomIterable(options),
-                );
-
-              case 'lib.webworker.d.ts':
-                return convertLibDomCommon(options);
-
-              case 'lib.dom.iterable.d.ts':
-                return convertLibDomIterable(options);
-
-              case 'lib.es5.d.ts':
-                return convertLibEs5(options);
-
-              case 'lib.es2015.promise.d.ts':
-                // Resolve the `readonly -readonly` marker that the ts-morph
-                // codemod (transform-dts.mts) emits for `-readonly [K in ...]`
-                // mapped types: `readonly` for the readonly flavor, `-readonly`
-                // for the mutable one. (ts-morph runs config-independently, so
-                // it defers this choice to here.)
-                return options.config.returnType === 'readonly'
-                  ? replaceWithNoMatchCheck('readonly -readonly', 'readonly')
-                  : replaceWithNoMatchCheck('readonly -readonly', '-readonly');
-
-              case 'lib.es2015.collection.d.ts':
-                return convertLibEs2015Collection(options);
-
-              case 'lib.es2015.symbol.wellknown.d.ts':
-                return convertEs2015SymbolWellknown(options);
-
-              case 'lib.es2015.reflect.d.ts':
-                // Wildcard rest parameter — see the note in `convertLibEs5`.
-                return composeMonoTypeFns(
-                  ensureEs5Reference,
-                  replaceWithNoMatchCheck(
-                    'newTarget?: new (...args: unknown) => unknown',
-                    `newTarget?: new (...args: ${anyArgumentsRef}) => unknown`,
-                  ),
-                );
-
-              case 'lib.es2015.core.d.ts':
-                return convertLibEs2015Core(options);
-
-              case 'lib.es2015.iterable.d.ts':
-                return convertLibEs2015Iterable(options);
-
-              case 'lib.es2015.proxy.d.ts':
-                return options.config.returnType === 'readonly'
-                  ? idFn
-                  : replaceWithNoMatchCheck(
-                      '): { readonly proxy: T; readonly revoke: () => void }',
-                      '): { proxy: T; revoke: () => void }',
-                    );
-
-              case 'lib.es2015.generator.d.ts':
-                return replaceWithNoMatchCheck(
-                  'readonly length: number;',
-                  `readonly length: ${options.brandedNumber.ArraySize};`,
-                );
-
-              case 'lib.es2016.array.include.d.ts':
-                return convertLibEs2016ArrayInclude(options);
-
-              case 'lib.es2017.sharedmemory.d.ts':
-                return convertLibEs2017Sharedmemory(options);
-
-              case 'lib.es2017.object.d.ts':
-                return convertLibEs2017Object(options);
-
-              case 'lib.es2017.string.d.ts':
-                return convertLibEs2017String(options);
-
-              case 'lib.es2017.date.d.ts':
-                return convertLibEs2017Date(options);
-
-              case 'lib.es2018.intl.d.ts':
-                return convertReturnTypeToUintRange;
-
-              case 'lib.es2019.array.d.ts':
-                return convertLibEs2019Array(options);
-
-              case 'lib.es2019.object.d.ts':
-                return convertLibEs2019Object(options);
-
-              case 'lib.es2019.string.d.ts':
-                return convertLibEs2019String(options);
-
-              case 'lib.es2020.bigint.d.ts':
-                return convertLibEs2020Bigint(options);
-
-              case 'lib.es2020.number.d.ts':
-                // (Number.NEGATIVE_INFINITY).toLocaleString() が '-∞' になるためこの変更はできない。
-                // return replaceWithNoMatchCheck(
-                //   //
-                //   '): string;',
-                //   // eslint-disable-next-line no-template-curly-in-string
-                //   '): `${number}`;',
-                // );
-                return idFn;
-
-              case 'lib.es2020.promise.d.ts':
-                return composeMonoTypeFns(
-                  // Resolve the `readonly -readonly` marker that the ts-morph
-                  // codemod (transform-dts.mts) emits for `-readonly [K in ...]`
-                  // mapped types: `readonly` for the readonly flavor,
-                  // `-readonly` for the mutable one (see lib.es2015.promise).
-                  options.config.returnType === 'readonly'
-                    ? replaceWithNoMatchCheck('readonly -readonly', 'readonly')
-                    : replaceWithNoMatchCheck(
-                        'readonly -readonly',
-                        '-readonly',
-                      ),
-                  options.config.returnType === 'readonly'
-                    ? idFn
-                    : replaceWithNoMatchCheck(
-                        '): Promise<readonly PromiseSettledResult<Awaited<T>>[]>',
-                        '): Promise<PromiseSettledResult<Awaited<T>>[]>',
-                      ),
-                );
-
-              case 'lib.es2020.sharedmemory.d.ts':
-                return convertLibEs2020Sharedmemory(options);
-
-              case 'lib.es2021.weakref.d.ts':
-                // fix type errors
-                return replaceWithinInterface({
-                  name: 'WeakRefConstructor',
-                  mapFn: replaceWithNoMatchCheck(
-                    'readonly prototype: WeakRef<unknown>;',
-                    'readonly prototype: WeakRef<object>;',
-                  ),
-                });
-
-              case 'lib.es2021.intl.d.ts':
-                // use mutable array in return value (undo of batch replacement results)
-                return options.config.returnType === 'readonly'
-                  ? idFn
-                  : replaceWithNoMatchCheck(
-                      "readonly { readonly type: 'element' | 'literal'; readonly value: string }[]",
-                      "{ type: 'element' | 'literal'; value: string }[]",
-                    );
-
-              case 'lib.es2022.array.d.ts':
-                return convertLibEs2022Array(options);
-
-              case 'lib.es2022.object.d.ts':
-                return convertLibEs2022Object(options);
-
-              case 'lib.es2021.string.d.ts':
-                // `String.prototype.replaceAll`, whose replacement callback has
-                // to be typed the same way as `replace`'s.
-                return convertStringReplacerArgs;
-
-              case 'lib.es2022.string.d.ts':
-                return replaceWithNoMatchCheck(
-                  'at(index: number)',
-                  `at(index: ${options.brandedNumber.StringSizeArg})`,
-                );
-
-              case 'lib.es2022.regexp.d.ts':
-                return replaceWithNoMatchCheck(
-                  'number',
-                  options.brandedNumber.ArraySize,
-                );
-
-              case 'lib.es2023.array.d.ts':
-                return convertLibEs2023Array(options);
-
-              // TS 5.4–5.6 shipped `Map.groupBy` / `Object.groupBy` in
-              // `lib.esnext.{collection,object}.d.ts`; TS 5.7 promoted them to
-              // `lib.es2024.{collection,object}.d.ts`. Route both filenames
-              // through the same converter (tolerant for the esnext layout).
-              // The esnext file also carries `ReadonlySetLike` in TS 5.5–5.9,
-              // which TS 6.0 promoted to `lib.es2025.collection.d.ts`.
-              case 'lib.esnext.collection.d.ts':
-                return composeMonoTypeFns(
-                  convertGroupByCollection(options, true),
-                  convertLibEs2025Collection(options, true),
-                );
-
-              case 'lib.es2024.collection.d.ts':
-                return convertGroupByCollection(options, false);
-
-              case 'lib.es2025.collection.d.ts':
-                return convertLibEs2025Collection(options, false);
-
-              case 'lib.esnext.object.d.ts':
-                return convertGroupByObject(options, true);
-
-              case 'lib.es2024.object.d.ts':
-                return convertGroupByObject(options, false);
-
-              case 'lib.es2024.sharedmemory.d.ts':
-                return convertLibEs2024Sharedmemory(options);
-
-              case 'lib.es2024.arraybuffer.d.ts':
-                return convertLibEs2024Arraybuffer(options);
-
-              case 'lib.esnext.float16.d.ts':
-                return convertLibEsnextFloat16(options);
-
-              case 'lib.esnext.iterator.d.ts':
-                return convertLibEsNextIterator(options);
-
-              case 'lib.esnext.array.d.ts':
-                // TS 5.7 added an `index: number` parameter to `Array.fromAsync`'s
-                // mapFn; pre-5.7 lib has no index parameter so this rule is a no-op
-                // for older versions.
-                return replaceWithNoMatchCheck(
-                  'mapFn: (value: Awaited<T>, index: number) => U',
-                  `mapFn: (value: Awaited<T>, index: ${options.brandedNumber.ArraySize}) => U`,
-                  { onNotFound: 'off' },
-                );
-
-              default:
-                return idFn;
-            }
-          })(),
-        ),
+        skipForStubFile(perFileConverters.get(filename)?.(options) ?? idFn),
 
         options.config.returnType === 'readonly'
           ? idFn
@@ -420,6 +180,254 @@ export const convert = (
       ),
     ).value;
 };
+
+type PerFileConverter = (options: ConverterOptions) => MonoTypeFunction<string>;
+
+/**
+ * The rewrite of each lib file, chosen by its exact file name. A file not named
+ * here gets only the common transforms of {@link convert}.
+ *
+ * TypeScript renames a lib file when its proposal graduates, and a rewrite
+ * registered under the old name then silently stops running. The generator
+ * holds every version's file names against these keys (`movedWithoutConverter`)
+ * and refuses a file that looks like such a move, so a file of a registered
+ * feature that needs no rewrite is registered here as `() => idFn`, with the
+ * reason.
+ */
+const perFileConverters: ReadonlyMap<string, PerFileConverter> = new Map(
+  Object.entries<PerFileConverter>({
+    'lib.decorators.d.ts': () =>
+      // Wildcard rest parameters — see the note in `convertLibEs5` and the
+      // alias's own doc comment. `ensureEs5Reference` because the alias is
+      // declared in `lib.es5.d.ts`.
+      composeMonoTypeFns(
+        ensureEs5Reference,
+        replaceWithNoMatchCheck(
+          'Class extends abstract new (...args: unknown) => unknown = abstract new (...args: unknown) => unknown',
+          `Class extends abstract new (...args: ${anyArgumentsRef}) => unknown = abstract new (...args: ${anyArgumentsRef}) => unknown`,
+        ),
+        replaceWithNoMatchCheck(
+          'Value extends (this: This, ...args: unknown) => unknown = (this: This, ...args: unknown) => unknown',
+          `Value extends (this: This, ...args: ${anyArgumentsRef}) => unknown = (this: This, ...args: ${anyArgumentsRef}) => unknown`,
+        ),
+      ),
+
+    // TS 6.0 folded the former `lib.dom.iterable.d.ts` (now a stub) into
+    // `lib.dom.d.ts`, so its branded entries()/keys() iterator transforms must
+    // run here to keep parity with 5.x. Those transforms are tolerant and match
+    // nothing in the 5.x `lib.dom.d.ts`, so 5.x output is unchanged.
+    'lib.dom.d.ts': (options) =>
+      composeMonoTypeFns(
+        convertLibDom(options),
+        convertLibDomIterable(options),
+      ),
+
+    'lib.webworker.d.ts': convertLibDomCommon,
+
+    'lib.dom.iterable.d.ts': convertLibDomIterable,
+
+    'lib.es5.d.ts': convertLibEs5,
+
+    // Resolve the `readonly -readonly` marker that the ts-morph codemod
+    // (transform-dts.mts) emits for `-readonly [K in ...]` mapped types:
+    // `readonly` for the readonly flavor, `-readonly` for the mutable one.
+    // (ts-morph runs config-independently, so it defers this choice to here.)
+    'lib.es2015.promise.d.ts': (options) =>
+      options.config.returnType === 'readonly'
+        ? replaceWithNoMatchCheck('readonly -readonly', 'readonly')
+        : replaceWithNoMatchCheck('readonly -readonly', '-readonly'),
+
+    'lib.es2015.collection.d.ts': convertLibEs2015Collection,
+
+    'lib.es2015.symbol.wellknown.d.ts': convertEs2015SymbolWellknown,
+
+    // Wildcard rest parameter — see the note in `convertLibEs5`.
+    'lib.es2015.reflect.d.ts': () =>
+      composeMonoTypeFns(
+        ensureEs5Reference,
+        replaceWithNoMatchCheck(
+          'newTarget?: new (...args: unknown) => unknown',
+          `newTarget?: new (...args: ${anyArgumentsRef}) => unknown`,
+        ),
+      ),
+
+    'lib.es2015.core.d.ts': convertLibEs2015Core,
+
+    'lib.es2015.iterable.d.ts': convertLibEs2015Iterable,
+
+    'lib.es2015.proxy.d.ts': (options) =>
+      options.config.returnType === 'readonly'
+        ? idFn
+        : replaceWithNoMatchCheck(
+            '): { readonly proxy: T; readonly revoke: () => void }',
+            '): { proxy: T; revoke: () => void }',
+          ),
+
+    'lib.es2015.generator.d.ts': (options) =>
+      replaceWithNoMatchCheck(
+        'readonly length: number;',
+        `readonly length: ${options.brandedNumber.ArraySize};`,
+      ),
+
+    'lib.es2016.array.include.d.ts': convertLibEs2016ArrayInclude,
+
+    'lib.es2017.sharedmemory.d.ts': convertLibEs2017Sharedmemory,
+
+    'lib.es2017.object.d.ts': convertLibEs2017Object,
+
+    'lib.es2017.string.d.ts': convertLibEs2017String,
+
+    'lib.es2017.date.d.ts': convertLibEs2017Date,
+
+    // `Date.prototype.toLocale*String`'s `Intl` overloads, which take no number.
+    // Its feature name is that of `lib.es2017.date.d.ts` (`Date.UTC`), which
+    // TypeScript 5.0 and 5.1 do not ship.
+    'lib.es2020.date.d.ts': () => idFn,
+
+    'lib.es2018.intl.d.ts': () => convertReturnTypeToUintRange,
+
+    'lib.es2019.array.d.ts': convertLibEs2019Array,
+
+    'lib.es2019.object.d.ts': convertLibEs2019Object,
+
+    'lib.es2019.string.d.ts': convertLibEs2019String,
+
+    'lib.es2020.bigint.d.ts': convertLibEs2020Bigint,
+
+    // (Number.NEGATIVE_INFINITY).toLocaleString() が '-∞' になるためこの変更はできない。
+    // return replaceWithNoMatchCheck(
+    //   //
+    //   '): string;',
+    //   // eslint-disable-next-line no-template-curly-in-string
+    //   '): `${number}`;',
+    // );
+    'lib.es2020.number.d.ts': () => idFn,
+
+    'lib.es2020.promise.d.ts': (options) =>
+      composeMonoTypeFns(
+        // Resolve the `readonly -readonly` marker that the ts-morph codemod
+        // (transform-dts.mts) emits for `-readonly [K in ...]` mapped types:
+        // `readonly` for the readonly flavor, `-readonly` for the mutable one
+        // (see lib.es2015.promise).
+        options.config.returnType === 'readonly'
+          ? replaceWithNoMatchCheck('readonly -readonly', 'readonly')
+          : replaceWithNoMatchCheck('readonly -readonly', '-readonly'),
+        options.config.returnType === 'readonly'
+          ? idFn
+          : replaceWithNoMatchCheck(
+              '): Promise<readonly PromiseSettledResult<Awaited<T>>[]>',
+              '): Promise<PromiseSettledResult<Awaited<T>>[]>',
+            ),
+      ),
+
+    'lib.es2020.sharedmemory.d.ts': convertLibEs2020Sharedmemory,
+
+    // fix type errors
+    'lib.es2021.weakref.d.ts': () =>
+      replaceWithinInterface({
+        name: 'WeakRefConstructor',
+        mapFn: replaceWithNoMatchCheck(
+          'readonly prototype: WeakRef<unknown>;',
+          'readonly prototype: WeakRef<object>;',
+        ),
+      }),
+
+    // use mutable array in return value (undo of batch replacement results)
+    'lib.es2021.intl.d.ts': (options) =>
+      options.config.returnType === 'readonly'
+        ? idFn
+        : replaceWithNoMatchCheck(
+            "readonly { readonly type: 'element' | 'literal'; readonly value: string }[]",
+            "{ type: 'element' | 'literal'; value: string }[]",
+          ),
+
+    'lib.es2022.array.d.ts': convertLibEs2022Array,
+
+    'lib.es2022.object.d.ts': convertLibEs2022Object,
+
+    // `Atomics.waitAsync` in TS 5.0–5.6; TS 5.7 moved it to
+    // `lib.es2024.sharedmemory.d.ts`.
+    'lib.es2022.sharedmemory.d.ts': convertLibEs2022Sharedmemory,
+
+    // `String.prototype.replaceAll`, whose replacement callback has to be typed
+    // the same way as `replace`'s.
+    'lib.es2021.string.d.ts': () => convertStringReplacerArgs,
+
+    'lib.es2022.string.d.ts': (options) =>
+      replaceWithNoMatchCheck(
+        'at(index: number)',
+        `at(index: ${options.brandedNumber.StringSizeArg})`,
+      ),
+
+    'lib.es2022.regexp.d.ts': (options) =>
+      replaceWithNoMatchCheck('number', options.brandedNumber.ArraySize),
+
+    'lib.es2023.array.d.ts': convertLibEs2023Array,
+
+    // `WeakKeyTypes`'s `symbol` member, which has no number in it. Its feature
+    // name is that of `lib.es2024.collection.d.ts` (`Map.groupBy`, from TS 5.7)
+    // and `lib.es2025.collection.d.ts` (`ReadonlySetLike`, from TS 6.0).
+    'lib.es2023.collection.d.ts': () => idFn,
+
+    // TS 5.4–5.6 shipped `Map.groupBy` / `Object.groupBy` in
+    // `lib.esnext.{collection,object}.d.ts`; TS 5.7 promoted them to
+    // `lib.es2024.{collection,object}.d.ts`. Route both filenames through the
+    // same converter (tolerant for the esnext layout). The esnext file also
+    // carries `ReadonlySetLike` in TS 5.5–5.9, which TS 6.0 promoted to
+    // `lib.es2025.collection.d.ts`.
+    'lib.esnext.collection.d.ts': (options) =>
+      composeMonoTypeFns(
+        convertGroupByCollection(options, true),
+        convertLibEs2025Collection(options, true),
+      ),
+
+    'lib.es2024.collection.d.ts': (options) =>
+      convertGroupByCollection(options, false),
+
+    'lib.es2025.collection.d.ts': (options) =>
+      convertLibEs2025Collection(options, false),
+
+    'lib.esnext.object.d.ts': (options) => convertGroupByObject(options, true),
+
+    'lib.es2024.object.d.ts': (options) => convertGroupByObject(options, false),
+
+    'lib.es2024.sharedmemory.d.ts': convertLibEs2024Sharedmemory,
+
+    // `Atomics.pause` (TS 5.9), whose optional iteration hint is not a size or an
+    // index. Its feature name is that of `lib.es2022.sharedmemory.d.ts`, which
+    // TypeScript 5.9 does not ship.
+    'lib.esnext.sharedmemory.d.ts': () => idFn,
+
+    'lib.es2024.arraybuffer.d.ts': convertLibEs2024Arraybuffer,
+
+    // `Float16Array` and friends, added in TS 5.8 as `lib.esnext.float16.d.ts`
+    // and promoted in TS 6.0 to `lib.es2025.float16.d.ts`.
+    'lib.esnext.float16.d.ts': convertLibEsnextFloat16,
+
+    'lib.es2025.float16.d.ts': convertLibEsnextFloat16,
+
+    // The iterator helpers, added in TS 5.6 as `lib.esnext.iterator.d.ts` and
+    // promoted in TS 6.0 to `lib.es2025.iterator.d.ts`.
+    'lib.esnext.iterator.d.ts': convertLibEsNextIterator,
+
+    'lib.es2025.iterator.d.ts': convertLibEsNextIterator,
+
+    // TS 5.7 added an `index: number` parameter to `Array.fromAsync`'s mapFn;
+    // pre-5.7 lib has no index parameter so this rule is a no-op for older
+    // versions.
+    'lib.esnext.array.d.ts': (options) =>
+      replaceWithNoMatchCheck(
+        'mapFn: (value: Awaited<T>, index: number) => U',
+        `mapFn: (value: Awaited<T>, index: ${options.brandedNumber.ArraySize}) => U`,
+        { onNotFound: 'off' },
+      ),
+  }),
+);
+
+/** The lib file names {@link perFileConverters} has a rewrite for. */
+export const registeredLibFileNames: readonly string[] = Array.from(
+  perFileConverters.keys(),
+);
 
 /**
  * Converts `Map.groupBy` (the `MapConstructor.groupBy` static). This shipped in
@@ -479,43 +487,15 @@ const convertGroupByObject = (
 };
 
 /**
- * Brands the length parameter of `String.prototype.padStart` / `padEnd`.
- * TypeScript 7.0 renamed that parameter from `maxLength` to `targetLength`
- * (aligning the lib with the spec), so the spelling actually present in the
- * file is detected first; every lib file carries exactly one of the two.
- */
-const convertLibEs2017String =
-  ({ brandedNumber }: ConverterOptions): MonoTypeFunction<string> =>
-  (src) => {
-    const paramName = src.includes('targetLength: number')
-      ? 'targetLength'
-      : 'maxLength';
-
-    return replaceWithNoMatchCheck(
-      `${paramName}: number`,
-      `${paramName}: ${brandedNumber.StringSizeArgNonNegative}`,
-    )(src);
-  };
-
-/**
- * TypeScript 6.0 turned several lib files (`lib.dom.iterable.d.ts`,
- * `lib.dom.asynciterable.d.ts`, and their WebWorker counterparts) into stubs
- * whose real declarations were folded into the main `lib.dom.d.ts` /
- * `lib.webworker.d.ts`. Such a stub carries this marker comment in place of the
- * declarations the per-file transforms expect.
- */
-const stubFileMarker = 'contents are now included in the main types file';
-
-/**
  * Skip the given (per-file) transform for TypeScript 6.0 stub files, passing
  * their contents through unchanged, while the common transforms still run. Every
- * 5.x lib file is a non-stub and never contains {@link stubFileMarker}, so their
- * generated output is byte-for-byte unchanged.
+ * 5.x lib file is a non-stub ({@link isStubFile}), so their generated output is
+ * byte-for-byte unchanged.
  */
 const skipForStubFile =
   (fn: MonoTypeFunction<string>): MonoTypeFunction<string> =>
   (src) =>
-    src.includes(stubFileMarker) ? src : fn(src);
+    isStubFile(src) ? src : fn(src);
 
 /**
  * The notice that follows the Microsoft banner in every generated file. Each

@@ -4,9 +4,12 @@
 // to `output/lib-files-branded`, so it is checked by all twelve TypeScript
 // minors against the branded declarations alone. The plain flavor types these
 // calls `number`, and makes the results of `Object.fromEntries` mutable, which
-// is why the assertions live apart from `lib-check-entry.ts`.
+// is why the assertions live apart from `lib-check-entry.ts`. One that holds
+// only from TypeScript 5.6 or 5.8 on goes in
+// `lib-check-entry.branded.since-5.6.ts` or `….since-5.8.ts`.
 
 import type {
+  BigInt64,
   FiniteNumber,
   Int,
   Int16,
@@ -343,9 +346,10 @@ export const repeatCounts = (count: SafeUint): readonly string[] => [
  * as `new SharedArrayBuffer(8)` does: an integer literal from 0 to 39 or any
  * `SafeUint` is accepted, a larger or negative literal is not.
  * `new ArrayBuffer(8)` reaches the ES5 constructor in the versions before 5.7,
- * which have no ES2024 one. The rejected literals are asserted on `Uint8Array`
- * alone, since every parameter here takes the same alias. `Float16Array` is
- * not asserted: the versions before 5.8 do not declare it.
+ * which have no ES2024 one. The rejected literals are asserted here on
+ * `Uint8Array` alone, since every parameter takes the same alias.
+ * `Float16Array`, which the versions before 5.8 do not declare, is asserted in
+ * `lib-check-entry.branded.since-5.8.ts`.
  */
 export const typedArraySizeArgs = (
   buffer: ArrayBuffer,
@@ -367,3 +371,37 @@ export const typedArraySizeArgs = (
   // @ts-expect-error a negative offset throws a RangeError
   new Uint8Array(buffer, -1),
 ];
+
+/**
+ * #4012 — `Atomics.waitAsync` kept a `number` index and value in TypeScript
+ * 5.0–5.6, whose `lib.es2022.sharedmemory.d.ts` no converter was routed to;
+ * from 5.7 on the same declaration is in `lib.es2024.sharedmemory.d.ts`, which
+ * was. Each overload is called by name, since `Parameters` reads only the last.
+ */
+declare const int32Array: Int32Array;
+
+declare const bigInt64s: BigInt64Array;
+
+declare const plainNumber: number;
+
+declare const index: NumberType.TypedArraySizeArgNonNegative;
+
+declare const bigInt64: BigInt64;
+
+declare const plainBigInt: bigint;
+
+export const waitAsyncInt32 = Atomics.waitAsync(int32Array, index, int32);
+
+export const waitAsyncBigInt64 = Atomics.waitAsync(bigInt64s, index, bigInt64);
+
+// @ts-expect-error A plain `number` is no index.
+export const badIndex = Atomics.waitAsync(int32Array, plainNumber, int32);
+
+// @ts-expect-error A plain `number` is no `Int32`.
+export const badValue = Atomics.waitAsync(int32Array, index, plainNumber);
+
+// @ts-expect-error A plain `number` is no index.
+export const badBigIndex = Atomics.waitAsync(bigInt64s, plainNumber, bigInt64);
+
+// @ts-expect-error A plain `bigint` is no `BigInt64`.
+export const badBigValue = Atomics.waitAsync(bigInt64s, index, plainBigInt);

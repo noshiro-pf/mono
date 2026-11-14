@@ -5,36 +5,31 @@ import {
   replaceWithNoMatchCheck,
 } from '../functions/utils/node-utils.mjs';
 import type { ConverterOptions } from './common.mjs';
+import { convertLibEs2022Sharedmemory } from './lib.es2022.sharedmemory.mjs';
 
 export const convertLibEs2024Sharedmemory =
-  ({ brandedNumber }: ConverterOptions): MonoTypeFunction<string> =>
+  (options: ConverterOptions): MonoTypeFunction<string> =>
   (src) =>
     pipe(src).map(
       composeMonoTypeFns(
-        replaceWithNoMatchCheck(
-          'waitAsync(typedArray: Int32Array, index: number, value: number',
-          `waitAsync(typedArray: Int32Array, index: ${brandedNumber.TypedArraySizeArgNonNegative}, value: ${brandedNumber.Int32}`,
-        ),
-
-        replaceWithNoMatchCheck(
-          'waitAsync(typedArray: BigInt64Array, index: number, value: bigint',
-          `waitAsync(typedArray: BigInt64Array, index: ${brandedNumber.TypedArraySizeArgNonNegative}, value: ${brandedNumber.BigInt64}`,
-        ),
+        // `Atomics.waitAsync`, which TS 5.7 moved here from
+        // `lib.es2022.sharedmemory.d.ts`.
+        convertLibEs2022Sharedmemory(options),
         replaceWithNoMatchCheck(
           'byteLength: number',
-          `byteLength: ${brandedNumber.TypedArraySizeArgNonNegative}`,
+          `byteLength: ${options.brandedNumber.TypedArraySizeArgNonNegative}`,
         ),
         replaceWithNoMatchCheck(
           'get maxByteLength(): number;',
-          `get maxByteLength(): ${brandedNumber.TypedArraySize};`,
+          `get maxByteLength(): ${options.brandedNumber.TypedArraySize};`,
         ),
         replaceWithNoMatchCheck(
           'maxByteLength?: number',
-          `maxByteLength?: ${brandedNumber.TypedArraySizeArgNonNegative}`,
+          `maxByteLength?: ${options.brandedNumber.TypedArraySizeArgNonNegative}`,
         ),
         replaceWithNoMatchCheck(
           'newByteLength?: number',
-          `newByteLength?: ${brandedNumber.TypedArraySizeArgNonNegative}`,
+          `newByteLength?: ${options.brandedNumber.TypedArraySizeArgNonNegative}`,
         ),
       ),
     ).value;

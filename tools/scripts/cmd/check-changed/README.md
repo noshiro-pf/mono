@@ -93,7 +93,8 @@ by case. In order:
    them, and the root program's `check:root:types`, `lint` and `test` only for
    what the root `tsconfig.json` reads (`tools/`, the root configuration, any
    `configs/`, `eslint.config*.mts` or `vite.config.mts`); the `strict-lib:`
-   checks for `strict-lib/`; `check:knip` for any change the code gate lets
+   checks for `strict-lib/`, and its members' `check:test` for a path there the
+   code gate lets through; `check:knip` for any change the code gate lets
    through, as CI runs it, and `check:published-deps` for a manifest or for what
    it lints (a published package's `src/`, an `eslint.config.mts`); `check:md`
    for prose; `check:prose` always; cspell over the changed files, and
@@ -170,7 +171,8 @@ the run says which `ws:*` commands to reach for.
 `verify:npm-packages` (pack, install and run the smoke checks) does not run
 either: a change to `verify-npm-packages/smoke/` is regenerated into its
 `local/` copies, not run.
-Under `strict-lib/` the tooling's type check, lint and oxfmt run, and
+Under `strict-lib/` the tooling's type check, lint and oxfmt run, the members'
+`check:test` (the generator's tests) for a path the code gate lets through, and
 `gen:verify-npm-packages`, which copies the published bundles' manifests (a
 manifest or `LICENSE` there runs the generators that read one, as anywhere). A
 diff that reaches the converter or its output — `strict-lib/scripts-common/`,
