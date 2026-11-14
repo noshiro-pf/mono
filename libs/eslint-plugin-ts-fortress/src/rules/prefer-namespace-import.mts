@@ -1,6 +1,6 @@
 import {
   AST_NODE_TYPES,
-  TSESLint,
+  type TSESLint,
   type TSESTree,
 } from '@typescript-eslint/utils';
 import { getImportDeclarations, hasForeignBinding } from 'eslint-rule-forge';
@@ -194,17 +194,6 @@ const resolveMember = (
       : undefined;
 
 /**
- * Whether a type parameter, type alias or interface named `name` is in scope in
- * `scope`.
- */
-const hasTypeBinding = (scope: TSESLint.Scope.Scope, name: string): boolean =>
-  (scope.set
-    .get(name)
-    ?.defs.some((def) => def.type === TSESLint.Scope.DefinitionType.Type) ??
-    false) ||
-  (scope.upper !== null && hasTypeBinding(scope.upper, name));
-
-/**
  * How one reference to an imported binding is rewritten, or `undefined` when it
  * cannot be. `t.Type` reads as a qualified name in a type position just as it
  * reads as a member access in a value position.
@@ -217,22 +206,28 @@ const buildReferenceRewrite = (
 ): ReferenceRewrite | undefined => {
   const identifier = reference.identifier;
 
+  const parent = identifier.parent;
+
+  // `export { string }` names the binding rather than using it, and a member
+  // access is not a name — such a file has to be rewritten by hand.
+  if (parent.type === AST_NODE_TYPES.ExportSpecifier) {
+    return undefined;
+  }
+
   if (
     identifier.type !== AST_NODE_TYPES.Identifier ||
     // The namespace name has to mean the namespace import at every site the fix
     // writes it; a binding of the same name in scope would capture it instead.
+    // At a type reference that includes a type parameter or a local type: the
+    // scope manager resolves `t.Type` to it, so that `no-unused-vars` would
+    // call the namespace import unused.
     hasForeignBinding(
       sourceCode,
       identifier,
       namespaceName,
       TS_FORTRESS_MODULE,
-    ) ||
-    // `hasForeignBinding` passes over a type parameter or local type of the
-    // name. In a type position one captures the namespace name written alone,
-    // and the scope manager resolves `t.Type` to it too, so that
-    // `no-unused-vars` would call the namespace import unused.
-    (reference.isTypeReference &&
-      hasTypeBinding(sourceCode.getScope(identifier), namespaceName))
+      reference.isTypeReference ? 'type' : 'value',
+    )
   ) {
     return undefined;
   }
@@ -241,14 +236,6 @@ const buildReferenceRewrite = (
     memberName === undefined
       ? namespaceName
       : (`${namespaceName}.${memberName}` as const);
-
-  const parent = identifier.parent;
-
-  // `export { string }` names the binding rather than using it, and a member
-  // access is not a name — such a file has to be rewritten by hand.
-  if (parent.type === AST_NODE_TYPES.ExportSpecifier) {
-    return undefined;
-  }
 
   return {
     identifier,

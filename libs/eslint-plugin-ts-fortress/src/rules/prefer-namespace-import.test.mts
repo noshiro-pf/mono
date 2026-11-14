@@ -335,6 +335,33 @@ describe('prefer-namespace-import', () => {
         errors: [{ messageId: 'useNamespaceImport' }],
       },
       {
+        name: 'reports without a fix when a local type alias takes the name at a type reference',
+        code: dedent`
+          import type { Type } from 'ts-fortress';
+
+          const build = (): void => {
+            type t = number;
+            const schema: Type<string> | undefined = undefined;
+            console.log(schema);
+          };
+        `,
+        output: null,
+        errors: [{ messageId: 'useNamespaceImport' }],
+      },
+      {
+        name: 'reports without a fix when a parameter has the name at a type reference',
+        code: dedent`
+          import type { Type } from 'ts-fortress';
+
+          const build = (t: number): void => {
+            const schema: Type<string> | undefined = undefined;
+            console.log(t, schema);
+          };
+        `,
+        output: null,
+        errors: [{ messageId: 'useNamespaceImport' }],
+      },
+      {
         name: 'reports without a fix when a type parameter takes the name a default import becomes',
         code: dedent`
           import fortress from 'ts-fortress';

@@ -172,7 +172,7 @@ The range and the text of a node leave out the parentheses written around it.
 | `addTypeImports`           | the edits importing types: into an `import type { … }`, else as `type X` into another import                                                                        |
 | `addToImportBraces`        | a fix adding specifiers to a declaration's braces, empty ones included, or `undefined` without any                                                                  |
 | `inlineTypeQualifierRange` | the range that drops a specifier's inline `type` (`import { type A }`, `export { type A }`), keeping a comment after it                                             |
-| `hasForeignBinding`        | whether a name, at a node, is bound to something other than the module's import (a fix must give up); a nested type-only binding does not count                     |
+| `hasForeignBinding`        | whether a name, at a node, is bound to something other than the module's import (a fix must give up); a nested type-only binding counts only for a type reference   |
 | `isLocallyBound`           | whether a name, at a node, is declared in the file rather than a global or a standard-library type                                                                  |
 | `isRuntimeBound`           | whether a name, at a node, is a value the file creates at runtime, so that reading it cannot throw (not a global, `declare`d, a type-only import or a `const enum`) |
 | `hasCommentWithin`         | whether a comment inside a node lies in ranges a fix would delete (the fix must give up)                                                                            |
