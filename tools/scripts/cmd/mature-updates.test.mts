@@ -1229,6 +1229,17 @@ describe('release-binaries --to', () => {
 
         mut_requests.push(url.pathname);
 
+        // The list the scheduled run reads, on one page.
+        const list = /^\/repos\/([^/]+\/[^/]+)\/releases$/u.exec(url.pathname);
+
+        if (list?.[1] !== undefined) {
+          res.setHeader('content-type', 'application/json');
+
+          res.end(JSON.stringify(releasesByRepo[list[1]] ?? []));
+
+          return;
+        }
+
         const byTag =
           /^\/repos\/([^/]+\/[^/]+)\/releases\/tags\/([^/]+)$/u.exec(
             url.pathname,
@@ -1268,9 +1279,8 @@ describe('release-binaries --to', () => {
 
         const port = isNonNullObject(address) ? address.port : 0;
 
-        const run = (to: string): Promise<string> =>
-          // With the `--` that `pnpm run … -- --to` forwards.
-          runScript(['release-binaries', '--', '--to', to], {
+        const runWith = (args: readonly string[]): Promise<string> =>
+          runScript(Arr.toUnshifted('release-binaries')(args), {
             cwd: dir,
             binDir: dir,
             env: {
@@ -1278,6 +1288,28 @@ describe('release-binaries --to', () => {
               GH_TOKEN: 'fake-token',
             },
           });
+
+        const run = (
+          to: string,
+          ...extra: readonly string[]
+        ): Promise<string> =>
+          // With the `--` that `pnpm run … -- --to` forwards.
+          runWith(['--', '--to', to, ...extra]);
+
+        /** {@link runFailing} for any arguments after the command. */
+        const runWithFailing = async (
+          args: readonly string[],
+        ): Promise<string> => {
+          try {
+            await runWith(args);
+          } catch (error: unknown) {
+            return isRecord(error) && typeof error['stderr'] === 'string'
+              ? error['stderr']
+              : '';
+          }
+
+          throw new Error(`release-binaries ${args.join(' ')} passed`);
+        };
 
         /** What a run that must fail printed on stderr, once it has failed. */
         const runFailing = async (to: string): Promise<string> => {
@@ -1326,7 +1358,7 @@ describe('release-binaries --to', () => {
           ],
           [
             'jump@2.0',
-            'Usage: node mature-updates.mts release-binaries [--to <tool>@<x.y.z>]',
+            'Usage: node mature-updates.mts release-binaries [--to <tool>@<x.y.z> [--keep <reason>]]',
           ],
         ] as const) {
           // eslint-disable-next-line security/detect-non-literal-fs-filename
@@ -1399,6 +1431,72 @@ describe('release-binaries --to', () => {
           ...before,
           jump: pin('owner/jump', '1.7.11', '0'),
         });
+
+        // Kept there: --keep records why, and the scheduled run leaves it.
+        const reason = 'v1.8 breaks our workflows';
+
+        const kept = {
+          ...pin('owner/jump', '1.7.11', '0'),
+          keep: { version: '1.7.11', reason },
+        } as const;
+
+        assert.include(
+          await run('jump@1.7.11', '--keep', reason),
+          `jump (owner/jump): v1.7.11 unchanged (--to), kept (${reason})\n`,
+        );
+
+        assert.deepStrictEqual(readPins(), { ...before, jump: kept });
+
+        const scheduled = await runWith([]);
+
+        assert.include(
+          scheduled,
+          `jump (owner/jump): v1.7.11 kept by hand (${reason}); not moved.\n`,
+        );
+
+        // The other tool still moves on its own.
+        assert.deepStrictEqual(readPins(), {
+          other: pin('owner/other', '1.0.1', 'd'),
+          jump: kept,
+        });
+
+        // A --to without --keep lets it move again.
+        assert.include(
+          await run('jump@1.7.11'),
+          'jump (owner/jump): v1.7.11 unchanged (--to), no longer kept\n',
+        );
+
+        assert.deepStrictEqual(readPins(), {
+          other: pin('owner/other', '1.0.1', 'd'),
+          jump: pin('owner/jump', '1.7.11', '0'),
+        });
+
+        // A keep that no longer names the pinned version fails the run.
+        const stale = {
+          ...before,
+          jump: { ...kept, keep: { version: '1.7.12', reason } },
+        } as const;
+
+        // eslint-disable-next-line security/detect-non-literal-fs-filename
+        fs.writeFileSync(
+          configPath,
+          `${JSON.stringify(stale, undefined, 2)}\n`,
+        );
+
+        assert.include(
+          await runWithFailing([]),
+          'jump: "keep" names 1.7.12, and the pinned version is 1.7.11; pin it again with --to (and --keep, to keep it).',
+        );
+
+        assert.deepStrictEqual(readPins(), stale);
+
+        // --keep needs a reason.
+        assert.include(
+          await runWithFailing(['--to', 'jump@1.7.11', '--keep', ' ']),
+          'Usage: node mature-updates.mts release-binaries [--to <tool>@<x.y.z> [--keep <reason>]]',
+        );
+
+        assert.deepStrictEqual(readPins(), stale);
       } finally {
         server.closeAllConnections();
 

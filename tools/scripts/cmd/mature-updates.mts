@@ -20,6 +20,7 @@ import type { ReleaseBinaryPin } from '../lib/release-binaries.mjs';
  * node ./tools/scripts/cmd/mature-updates.mts actions           # the action pins
  * node ./tools/scripts/cmd/mature-updates.mts release-binaries  # tools/configs/release-binaries.json
  * node ./tools/scripts/cmd/mature-updates.mts release-binaries --to actionlint@2.0.0  # by hand
+ * node ./tools/scripts/cmd/mature-updates.mts release-binaries --to shellcheck@0.10.0 --keep 'why'  # and kept there
  * ```
  *
  * **`pnpm`** pins the newest pnpm that is already older than the hold.
@@ -82,7 +83,14 @@ import type { ReleaseBinaryPin } from '../lib/release-binaries.mjs';
  * reported rather than re-pinned. A release that renamed its assets needs the
  * `name` templates in the file edited first; the refusal names the asset it
  * looked for. A pin moved down is moved up again by the next scheduled run, to
- * the newest mature release of the line it is now on: the file records no hold.
+ * the newest mature release of the line it is now on, unless it is kept there.
+ *
+ * **`--keep <reason>`** after `--to` records that the version was chosen on
+ * purpose: the tool's entry gains `"keep": { "version", "reason" }`, and the
+ * scheduled run leaves a kept tool alone, saying why. A `--to` without `--keep`
+ * drops it, so `--to <tool>@<the pinned version>` lets the tool move on its own
+ * again. A `keep` whose version is not the pinned one — the version edited by
+ * hand — fails every run until the tool is pinned again with `--to`.
  *
  * **Run with `node`, not `tsx`.** The workflow calls this before
  * `pnpm install`, so nothing from `node_modules` exists yet — no `tsx`, no
@@ -142,7 +150,7 @@ export const main = async (argv: readonly string[]): Promise<void> => {
     case undefined:
     default: {
       console.error(
-        'Usage: node mature-updates.mts <pnpm | actions | release-binaries [--to <tool>@<x.y.z>]>',
+        'Usage: node mature-updates.mts <pnpm | actions | release-binaries [--to <tool>@<x.y.z> [--keep <reason>]]>',
       );
 
       process.exit(2);
@@ -521,11 +529,16 @@ export type GitHubApi = Readonly<{
 
 type ActionPinUpdate = Readonly<{ pin: ActionPin; tag: string }>;
 
-/** `release-binaries --to <tool>@<x.y.z>`. */
-export type ReleaseBinaryTarget = Readonly<{ name: string; version: string }>;
+/** `release-binaries --to <tool>@<x.y.z> [--keep <reason>]`. */
+export type ReleaseBinaryTarget = Readonly<{
+  name: string;
+  version: string;
+  /** Why the version is kept, which the scheduled run then leaves alone. */
+  keep?: string;
+}>;
 
 const releaseBinariesUsage =
-  'Usage: node mature-updates.mts release-binaries [--to <tool>@<x.y.z>]';
+  'Usage: node mature-updates.mts release-binaries [--to <tool>@<x.y.z> [--keep <reason>]]';
 
 // ---------------------------------------------------------------------------
 // `release-binaries`
@@ -563,12 +576,35 @@ export const updateReleaseBinaryPins = async (
     return pinByHand(configPath, tools, options.to, api, cutoff);
   }
 
+  const staleKeeps = tools.filter(
+    ({ pin, keep }) => keep !== undefined && keep.version !== pin.version,
+  );
+
+  if (staleKeeps.length > 0) {
+    return staleKeeps
+      .map(
+        ({ name, pin, keep }) =>
+          `${name}: "keep" names ${keep?.version ?? ''}, and the pinned version is ${pin.version}; pin it again with --to (and --keep, to keep it).`,
+      )
+      .join('\n');
+  }
+
   const mut_next: MutableRecord<string, unknown> = {};
 
   const mut_moved: string[] = [];
 
-  for (const { name, pin, raw } of tools) {
+  for (const { name, pin, raw, keep } of tools) {
     const currentTag = `v${pin.version}` as const;
+
+    if (keep !== undefined) {
+      console.log(
+        `${name} (${pin.repository}): ${currentTag} kept by hand (${keep.reason}); not moved.`,
+      );
+
+      mut_next[name] = raw;
+
+      continue;
+    }
 
     // Only `v<version>` tags: that is the tag the download URL is built from
     // (`tools/scripts/lib/release-binaries.mts`).
@@ -1168,7 +1204,7 @@ const movePin = (
   raw: ReadonlyRecord<string, unknown>,
   tag: string,
   digests: ReadonlyRecord<string, string>,
-): unknown => {
+): ReadonlyRecord<string, unknown> => {
   const assets = isRecord(raw['assets']) ? raw['assets'] : ({} as const);
 
   return {
@@ -1204,7 +1240,7 @@ const pinByHand = async (
     return `tools/configs/release-binaries.json pins no tool named "${to.name}".`;
   }
 
-  const { name, pin, raw } = tool;
+  const { name, pin, raw, keep } = tool;
 
   const tag = `v${to.version}` as const;
 
@@ -1249,17 +1285,37 @@ const pinByHand = async (
   // The same version with the same digests: a replaced one was refused above.
   const changed = currentTag !== tag;
 
+  const keepChanged =
+    keep?.reason !== to.keep ||
+    (to.keep !== undefined && keep?.version !== to.version);
+
   console.log(
-    `${name} (${pin.repository}): ${currentTag} ${changed ? `-> ${tag}` : 'unchanged'} (--to)`,
+    `${name} (${pin.repository}): ${currentTag} ${changed ? `-> ${tag}` : 'unchanged'} (--to)${
+      to.keep === undefined
+        ? keep === undefined
+          ? ''
+          : ', no longer kept'
+        : `, kept (${to.keep})`
+    }`,
   );
 
-  if (changed) {
+  if (changed || keepChanged) {
+    const moved = Object.fromEntries(
+      Object.entries(changed ? movePin(raw, tag, digests) : raw).filter(
+        ([key]) => key !== 'keep',
+      ),
+    );
+
     writePins(
       configPath,
       Object.fromEntries(
         tools.map((entry) => [
           entry.name,
-          entry.name === name ? movePin(raw, tag, digests) : entry.raw,
+          entry.name === name
+            ? to.keep === undefined
+              ? moved
+              : { ...moved, keep: { version: to.version, reason: to.keep } }
+            : entry.raw,
         ]),
       ),
     );
@@ -1284,9 +1340,21 @@ const parseToOption = (
     return undefined;
   }
 
+  const [toFlag, toValue, keepFlag, keepValue, ...rest] = args;
+
+  const keep =
+    keepFlag === undefined
+      ? undefined
+      : keepFlag === '--keep' &&
+          keepValue !== undefined &&
+          keepValue.trim() !== '' &&
+          rest.length === 0
+        ? keepValue
+        : 'invalid';
+
   const target =
-    args.length === 2 && args[0] === '--to' && args[1] !== undefined
-      ? /^(?<name>[^@\s]+)@(?<version>\S+)$/u.exec(args[1])?.groups
+    toFlag === '--to' && toValue !== undefined && keep !== 'invalid'
+      ? /^(?<name>[^@\s]+)@(?<version>\S+)$/u.exec(toValue)?.groups
       : undefined;
 
   const name = target?.['name'];
@@ -1297,7 +1365,7 @@ const parseToOption = (
     version === undefined ||
     parseStableVersion(version) === undefined
     ? 'invalid'
-    : { name, version };
+    : { name, version, ...(keep === undefined ? {} : { keep }) };
 };
 
 const parseReleaseBinaryPin = (raw: unknown): ReleaseBinaryPin | undefined => {
@@ -1345,6 +1413,8 @@ const parseReleaseBinaryPins = (
   name: string;
   pin: ReleaseBinaryPin;
   raw: ReadonlyRecord<string, unknown>;
+  /** Present when the version was chosen by hand to be kept (`--keep`). */
+  keep: Readonly<{ version: string; reason: string }> | undefined;
 }>[] => {
   if (!isRecord(json)) {
     throw new Error('tools/configs/release-binaries.json is not an object.');
@@ -1355,11 +1425,33 @@ const parseReleaseBinaryPins = (
 
     if (pin === undefined || !isRecord(raw)) {
       throw new Error(
-        `tools/configs/release-binaries.json: "${name}" is not { repository, version, binary, assets: { <platform>: { name, sha256 } } }.`,
+        `tools/configs/release-binaries.json: "${name}" is not { repository, version, binary, assets: { <platform>: { name, sha256 } }, keep?: { version, reason } }.`,
       );
     }
 
-    return { name, pin, raw };
+    const keep = raw['keep'];
+
+    if (keep === undefined) {
+      return { name, pin, raw, keep: undefined };
+    }
+
+    if (
+      !isRecord(keep) ||
+      typeof keep['version'] !== 'string' ||
+      typeof keep['reason'] !== 'string' ||
+      keep['reason'].trim() === ''
+    ) {
+      throw new Error(
+        `tools/configs/release-binaries.json: "${name}".keep is not { version, reason } with a reason.`,
+      );
+    }
+
+    return {
+      name,
+      pin,
+      raw,
+      keep: { version: keep['version'], reason: keep['reason'] },
+    };
   });
 };
 
