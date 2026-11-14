@@ -28,7 +28,6 @@ import {
   observableBrand,
   runUndoingOnThrow,
   runWithScope,
-  toSubscriber,
   type ScopeInternals,
   type ScopeSubscription,
 } from '../utils/index.mjs';
@@ -65,7 +64,7 @@ export class ObservableBaseClass<
   #mut_isCompleted: boolean;
   #mut_updateToken: UpdateToken;
   #mut_children: MutableSet<ChildNode> | undefined;
-  #mut_subscribers: MutableSet<Subscriber<A>> | undefined;
+  #mut_subscribers: MutableSet<OrderedSubscriber<A>> | undefined;
   #mut_scope: ScopeInternals | undefined;
   #mut_queuedFor: UpdateToken | undefined;
   readonly kind: Kind;
@@ -103,8 +102,8 @@ export class ObservableBaseClass<
   }
 
   /** Adds `subscriber`, making the set on the first one. */
-  #addSubscriber(subscriber: Subscriber<A>): void {
-    this.#mut_subscribers ??= new Set<Subscriber<A>>();
+  #addSubscriber(subscriber: OrderedSubscriber<A>): void {
+    this.#mut_subscribers ??= new Set<OrderedSubscriber<A>>();
 
     this.#mut_subscribers.add(subscriber);
   }
@@ -127,7 +126,11 @@ export class ObservableBaseClass<
     const scope = getCurrentScopeInternals();
 
     if (scope === undefined) {
-      const unscoped = toSubscriber(onNext, onComplete);
+      const unscoped: OrderedSubscriber<A> = {
+        onNext,
+        onComplete: onComplete ?? noop,
+        order: nextSubscriberOrder(),
+      } as const;
 
       this.#addSubscriber(unscoped);
 
@@ -207,7 +210,7 @@ export class ObservableBaseClass<
     this.#mut_children?.delete(child);
   }
 
-  deleteSubscriber(subscriber: Subscriber<A>): void {
+  deleteSubscriber(subscriber: OrderedSubscriber<A>): void {
     this.#mut_subscribers?.delete(subscriber);
   }
 
@@ -226,8 +229,21 @@ export class ObservableBaseClass<
       enqueueChildren(this.#mut_children, updateToken);
     }
 
-    if (this.#mut_subscribers !== undefined) {
-      for (const s of this.#mut_subscribers) {
+    if (this.#mut_subscribers === undefined) {
+      return;
+    }
+
+    // A subscriber added while these are called (one of them subscribed) has
+    // been given this value, or a newer one, by `subscribe` already, and
+    // iterating a `Set` reaches what is added to it: it is told from the next
+    // value on. Each one is tested, though the first added too late could end
+    // the loop: skipping costs a comparison for the few added meanwhile, and
+    // does not rest on every subscriber being numbered at the moment it is
+    // added.
+    const end = mut_subscriberOrder.next;
+
+    for (const s of this.#mut_subscribers) {
+      if (s.order < end) {
         s.onNext(nextValue);
       }
     }
@@ -407,6 +423,11 @@ export class ObservableBaseClass<
    * is passed to `onNext` as well, once, after the first call has returned,
    * unless that call disposed the scope the subscription is made in. If passing
    * it on throws, the subscription is ended before the exception goes on.
+   *
+   * A subscription made while the observable is calling its subscribers (one of
+   * them subscribed) is not called again by that delivery: `subscribe` has
+   * given it the current value, and the observable calls it from the next value
+   * on.
    */
   subscribe(onNext: (v: A) => void, onComplete?: () => void): Subscription {
     if (Optional.isNone(this.#mut_snapshot)) {
@@ -462,13 +483,14 @@ export class ObservableBaseClass<
  * ends on its own (`unsubscribe`, completion), so that a long-lived scope does
  * not keep every subscription it ever saw.
  */
-class ScopedSubscriber<A> implements Subscriber<A>, ScopeSubscription {
+class ScopedSubscriber<A> implements OrderedSubscriber<A>, ScopeSubscription {
   // Cleared once it ends, so that an entry its scope still lists until the next
   // compaction holds neither the observable nor the callbacks.
   #mut_observable: ObservableBaseClass<A, ObservableKind, number> | undefined;
   #mut_onNext: ((v: A) => void) | undefined;
   #mut_onComplete: (() => void) | undefined;
   readonly #scope: ScopeInternals;
+  readonly order: number;
 
   constructor(
     observable: ObservableBaseClass<A, ObservableKind, number>,
@@ -476,6 +498,8 @@ class ScopedSubscriber<A> implements Subscriber<A>, ScopeSubscription {
     onNext: (v: A) => void,
     onComplete: (() => void) | undefined,
   ) {
+    this.order = nextSubscriberOrder();
+
     this.#mut_observable = observable;
 
     this.#mut_onNext = onNext;
@@ -530,3 +554,25 @@ class ScopedSubscriber<A> implements Subscriber<A>, ScopeSubscription {
 }
 
 const noopSubscription: Subscription = { unsubscribe: () => {} } as const;
+
+const noop = (): void => {};
+
+/**
+ * A subscriber and when it was added, among all subscribers of this copy:
+ * `setNext` calls only those added before it started.
+ */
+type OrderedSubscriber<A> = Subscriber<A> & Readonly<{ order: number }>;
+
+// One counter for every observable, not one per node: a node is created for
+// every derived value of a UI and most never have a subscriber, so a field on
+// each would cost more than a counter that only grows. It stays exact for 2^53
+// subscriptions.
+const mut_subscriberOrder: { next: number } = { next: 0 };
+
+const nextSubscriberOrder = (): number => {
+  const order = mut_subscriberOrder.next;
+
+  mut_subscriberOrder.next = order + 1;
+
+  return order;
+};
