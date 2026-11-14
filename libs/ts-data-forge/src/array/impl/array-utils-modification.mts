@@ -7,7 +7,7 @@ import type {
   NonEmptyArray,
   UnknownBrand,
 } from 'ts-type-forge';
-import { asPositiveUint32 } from '../../number/index.mjs';
+import { asUint32 } from '../../number/index.mjs';
 import { castMutable } from '../../others/index.mjs';
 import type {
   ArgArrayIndex,
@@ -481,7 +481,7 @@ const toUnshiftedImpl = <Ar extends readonly unknown[], const V>(
   array.toSpliced(0, 0, newValue) as unknown as readonly [V, ...Ar];
 
 const toFilledImpl = <E,>(array: readonly E[], value: E): readonly E[] =>
-  create(asPositiveUint32(array.length), value);
+  create(asUint32(array.length), value);
 
 const toRangeFilledImpl = <E, const V>(
   array: readonly E[],
