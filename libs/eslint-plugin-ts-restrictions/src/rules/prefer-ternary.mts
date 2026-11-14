@@ -7,13 +7,13 @@ import {
 import {
   asNode,
   getRangeWithParens,
+  isSameReference,
   mayHaveEffect,
   parenthesesDepth,
   siblingOf,
 } from 'eslint-rule-forge';
 import { Arr } from 'ts-data-forge';
 import type { DeepReadonly } from 'ts-type-forge';
-import { isSameReference } from './reference-utils.mjs';
 
 type Options = readonly [('always' | 'only-single-line')?];
 

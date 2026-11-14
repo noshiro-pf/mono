@@ -156,6 +156,20 @@ The range and the text of a node leave out the parentheses written around it.
 | :------- | :----------------------------------------------------------------------------------------------------- |
 | `asNode` | a `DeepReadonly` node typed as the mutable one, for an API that takes a mutable node and only reads it |
 
+## References
+
+| Helper               | What it gives                                                                                                                               |
+| :------------------- | :------------------------------------------------------------------------------------------------------------------------------------------ |
+| `isSameReference`    | whether two expressions name the same variable or property (`x.y` and `x['y']`, `(x as T).y` and `x!.y`); a call never does                 |
+| `staticPropertyName` | the name a member access reads when it is known statically: `y` for `x.y` and `x['y']`, `#y` for `x.#y`, `'0'` for `x[0]`, else `undefined` |
+
+## JSX
+
+| Helper               | What it gives                                                                                                                                             |
+| :------------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `jsxValuePositionOf` | `'child'` or `'attribute'` when a node's value ends up in JSX through ternary branches, `&&` / `\|\|` / `??` operands and type wrappers, else `undefined` |
+| `JsxValuePosition`   | `'child' \| 'attribute'`                                                                                                                                  |
+
 ## Imports and bindings
 
 | Helper                     | What it gives                                                                                                                                                       |
