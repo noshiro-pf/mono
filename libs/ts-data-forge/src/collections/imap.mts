@@ -2,7 +2,7 @@
 import type { WidenLiteral } from 'ts-type-forge';
 import { Optional, pipe } from '../functional/index.mjs';
 import { asUint32 } from '../number/index.mjs';
-import { tp, unknownToString } from '../others/index.mjs';
+import { tp } from '../others/index.mjs';
 import type { MapSetKeyType, SizeType } from '../types.mjs';
 
 /**
@@ -727,24 +727,15 @@ class IMapClass<K extends MapSetKeyType, V>
   implements IMap<K, V>, Iterable<readonly [K, V]>
 {
   readonly #map: ReadonlyMap<K, V>;
-  readonly #showNotFoundMessage: boolean;
 
   /**
    * Constructs an IMapClass instance with the given entries.
    *
    * @param iterable An iterable of key-value pairs to populate the map.
-   * @param showNotFoundMessage Whether to log warning messages when operations
-   *   are performed on non-existent keys. Useful for debugging. Defaults to
-   *   false for production use.
    * @internal Use IMap.create() instead of calling this constructor directly.
    */
-  constructor(
-    iterable: Iterable<readonly [K, V]>,
-    showNotFoundMessage: boolean = false,
-  ) {
+  constructor(iterable: Iterable<readonly [K, V]>) {
     this.#map = new Map(iterable);
-
-    this.#showNotFoundMessage = showNotFoundMessage;
   }
 
   /** @inheritdoc */
@@ -798,20 +789,10 @@ class IMapClass<K extends MapSetKeyType, V>
 
   /** @inheritdoc */
   delete(key: K): IMap<K, V> {
-    if (!this.has(key)) {
-      if (this.#showNotFoundMessage) {
-        const keyStr = unknownToString(key);
-
-        console.warn(`IMap.delete: key not found: ${keyStr}`);
-      }
-
-      return this;
-    }
-
     // Through the native collection, which compares keys with SameValueZero as
     // `has` and `get` do; a rebuild comparing with `Object.is` left a `-0` key
     // unmatched.
-    return this.withMutations([{ type: 'delete', key }]);
+    return this.has(key) ? this.withMutations([{ type: 'delete', key }]) : this;
   }
 
   /** @inheritdoc */
@@ -829,22 +810,12 @@ class IMapClass<K extends MapSetKeyType, V>
 
   /** @inheritdoc */
   update(key: K, updater: (value: V) => V): IMap<K, V> {
-    const curr = this.get(key);
-
-    if (Optional.isNone(curr)) {
-      if (this.#showNotFoundMessage) {
-        const keyStr = unknownToString(key);
-
-        console.warn(`IMap.update: key not found: ${keyStr}`);
-      }
-
-      return this;
-    }
-
     // Through the native collection, which compares keys with SameValueZero as
     // `has` and `get` do; a rebuild comparing with `Object.is` left a `-0` key
     // unmatched.
-    return this.withMutations([{ type: 'update', key, updater }]);
+    return Optional.isNone(this.get(key))
+      ? this
+      : this.withMutations([{ type: 'update', key, updater }]);
   }
 
   /** @inheritdoc */
@@ -881,12 +852,6 @@ class IMapClass<K extends MapSetKeyType, V>
           // Presence is `has` alone, as in `update`: a stored value may itself
           // be `undefined`.
           if (!mut_result.has(key)) {
-            if (this.#showNotFoundMessage) {
-              const keyStr = unknownToString(key);
-
-              console.warn(`IMap.withMutations: key not found: ${keyStr}`);
-            }
-
             break;
           }
 
