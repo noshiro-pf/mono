@@ -40,6 +40,7 @@
     "check:prose:dependent-releases": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-dependent-releases.mts",
     "check:prose:doc-paths": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-doc-paths.mts",
     "check:prose:firebase-redirects": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-firebase-redirects.mts",
+    "check:prose:fixed-releases": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-fixed-releases.mts",
     "check:prose:hero-markdown": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-hero-markdown.mts",
     "check:prose:japanese-parentheses": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-japanese-parentheses.mts",
     "check:prose:japanese-terms": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-japanese-terms.mts",
