@@ -1,24 +1,9 @@
 #!/usr/bin/env node
 
 import 'dotenv/config';
-import * as util from 'node:util';
 import { Arr } from 'ts-data-forge';
 import type { ReadonlyRecord } from 'ts-type-forge';
-import {
-  COMMANDS,
-  HELP,
-  TARGETS,
-  type Command,
-  type Target,
-} from './cli-spec.mjs';
-
-const COMMAND_SET: ReadonlySet<string> = new Set(COMMANDS);
-
-const isCommand = (value: string): value is Command => COMMAND_SET.has(value);
-
-const TARGET_SET: ReadonlySet<string> = new Set(TARGETS);
-
-const isTarget = (value: string): value is Target => TARGET_SET.has(value);
+import { HELP, parseCliArgs, type Command, type Target } from './cli-spec.mjs';
 
 // NOTE: 明示的な型注釈を変数側に付けることで、呼び出し後に制御フローが到達
 // しないことを TypeScript に認識させる（ narrowing のために必要 ）。
@@ -32,33 +17,21 @@ const fail: (message: string) => never = (message) => {
   process.exit(1);
 };
 
-const { values, positionals } = util.parseArgs({
-  args: Arr.skip(process.argv, 2),
-  options: {
-    owner: { type: 'string' },
-    repo: { type: 'string' },
-    help: { type: 'boolean', short: 'h', default: false },
-  },
-  strict: false,
-  allowPositionals: true,
-});
+// NOTE: 未知のオプションや余分な引数は何も送る前に拒否する（ cli-spec.mts ）。
+const parsed = parseCliArgs(Arr.skip(process.argv, 2));
 
-if (values.help === true || Arr.isEmpty(positionals)) {
+if (parsed.type === 'help') {
   console.info(HELP);
 
   // Asking for help is not an error, even though being given no command is.
-  process.exit(values.help === true ? 0 : 1);
+  process.exit(parsed.requested ? 0 : 1);
 }
 
-const [commandArg, targetArg = 'all'] = positionals;
-
-if (commandArg === undefined || !isCommand(commandArg)) {
-  fail(`Unknown command: "${commandArg ?? ''}"`);
+if (parsed.type === 'error') {
+  fail(parsed.message);
 }
 
-if (!isTarget(targetArg)) {
-  fail(`Unknown target: "${targetArg}"`);
-}
+const { command: commandArg, target: targetArg } = parsed;
 
 // NOTE: ここで初めて設定モジュールを読み込む。 owner / repo の解決は import 時に
 // 走るため、 --help や引数エラーの時点では評価させたくない。

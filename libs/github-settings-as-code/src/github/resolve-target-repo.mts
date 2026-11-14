@@ -4,6 +4,7 @@ import * as path from 'node:path';
 import * as util from 'node:util';
 import { Arr, hasKey, isRecord, isString, Json } from 'ts-data-forge';
 import { Result } from 'ts-repo-utils';
+import { TARGET_REPO_OPTIONS } from '../target-repo-options.mjs';
 
 export type TargetRepo = Readonly<{
   owner: string;
@@ -57,7 +58,6 @@ export const resolveTargetRepo = async (): Promise<TargetRepo> => {
   return { owner, repo };
 };
 
-/** `strict: false` の解析結果は string | boolean | 配列 になりうるため絞り込む。 */
 const execFileAsync = util.promisify(execFile);
 
 /**
@@ -74,21 +74,23 @@ const closingStdin = <T,>(
   return running;
 };
 
+/** `strict: false` の解析結果は string | boolean | 配列 になりうるため絞り込む。 */
 const pickString = (value: unknown): string | undefined =>
   value !== '' && isString(value) ? value : undefined;
 
 /**
  * コマンドライン引数から `--owner` / `--repo` を読む。
  *
- * サブコマンドや他のフラグと共存できるよう `strict: false` で解析する。
+ * repo-settings CLI からは、 command line 全体が cli-spec.mts の parseCliArgs で
+ * 既に strict に検証されている。ここが `strict: false` なのは、 command や
+ * `--help` など他の引数と同じ process.argv から値だけを読むため。 src/github の
+ * モジュール（ apply.mts 、 backup.mts 、 read-*-contents.mts ）を直接実行した
+ * 場合は検証を通らず、未知のオプションは無視され、空の値は未指定として扱われる。
  */
 const fromCliArgs = (): Partial<TargetRepo> => {
   const { values } = util.parseArgs({
     args: Arr.skip(process.argv, 2),
-    options: {
-      owner: { type: 'string' },
-      repo: { type: 'string' },
-    },
+    options: TARGET_REPO_OPTIONS,
     strict: false,
     allowPositionals: true,
   });
@@ -99,6 +101,10 @@ const fromCliArgs = (): Partial<TargetRepo> => {
   };
 };
 
+// NOTE: 空の OWNER / REPO_NAME （未定義の CI 変数など）はまだ拒否せず、空文字列
+// のまま採用される。 --owner / --repo の空の値は cli-spec.mts が拒否するが、
+// 環境変数はそこを通らない。未設定扱いにして git remote origin に進むと別の
+// repository に書き込みうるため、直すなら拒否する。
 const fromEnv = (): Partial<TargetRepo> =>
   ({
     owner: process.env['OWNER'],
