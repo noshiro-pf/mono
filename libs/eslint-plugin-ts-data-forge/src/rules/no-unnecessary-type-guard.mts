@@ -102,11 +102,68 @@ const TAG_PROPERTY = '$$tag';
  * classify the same. A tagged `Optional` reaching a guard of the unwrapped
  * version is a mix of the two, which neither supports; the rule judges each by
  * its own type.
+ *
+ * The property is keyed by a `unique symbol` declared in ts-std-forge-keys. The
+ * checker names a property keyed by one `__@<declared name>@<id>`, the id
+ * differing from program to program, so the name's prefix finds it. Nothing
+ * narrower holds up: a mapped type that narrows the variant (`Partial`, `Pick`
+ * over a union) leaves no literal to check, the key's declaration is gone from
+ * a property a mapped type remaps (`as`), a declaration bundler moves it into
+ * another file, and the module that declares it can be installed or mapped
+ * anywhere. A type keyed by a user's own symbols of these names is taken for an
+ * Optional, and its guards judged (and autofixed) as an Optional's are. A
+ * TypeScript that names symbol-keyed properties otherwise fails this rule's
+ * Optional tests.
  */
-const OPTIONAL_VARIANT_PROPERTY = 'ts-std-forge::Optional';
+const OPTIONAL_VARIANT_KEY = 'optionalVariant';
 
 /** The type-only property of an unwrapped `Some` that holds its value's type. */
-const OPTIONAL_VALUE_PROPERTY = 'ts-std-forge::Optional.value';
+const OPTIONAL_VALUE_KEY = 'optionalValue';
+
+/**
+ * How the checker's name of a property keyed by each symbol starts, with no `@`
+ * after the declared name, so that a key a declaration bundler has renamed
+ * (`optionalVariant$1`) is found too.
+ */
+const OPTIONAL_VARIANT_PREFIX = `__@${OPTIONAL_VARIANT_KEY}` as const;
+
+const OPTIONAL_VALUE_PREFIX = `__@${OPTIONAL_VALUE_KEY}` as const;
+
+/** The flags of a primitive type (TypeScript keeps its own composite internal). */
+const PRIMITIVE_FLAGS =
+  ts.TypeFlags.StringLike |
+  ts.TypeFlags.NumberLike |
+  ts.TypeFlags.BigIntLike |
+  ts.TypeFlags.BooleanLike |
+  ts.TypeFlags.EnumLike |
+  ts.TypeFlags.ESSymbolLike |
+  ts.TypeFlags.VoidLike |
+  ts.TypeFlags.Null;
+
+/**
+ * The properties of an unwrapped `Optional` variant: both for a `Some`, the
+ * variant alone for `None`, neither for any other type.
+ */
+type OptionalKeys = Readonly<{
+  variant: ts.Symbol | undefined;
+  value: ts.Symbol | undefined;
+}>;
+
+/**
+ * {@link optionalKeysOf} by type: a guard reads a type's keys several times
+ * (whether it is an `Optional`, which variant, what it holds), and each read
+ * would otherwise list and scan all of its properties. A symbol key has no name
+ * `getProperty` can look up without its program-specific id, so each object
+ * type is scanned once, its properties listed; that cost, paid once per type a
+ * guard meets, is the price of recognizing the key at all.
+ */
+const mut_optionalKeysCache = new WeakMap<ts.Type, OptionalKeys>();
+
+/** The keys of a type that has neither. */
+const NO_OPTIONAL_KEYS: OptionalKeys = {
+  variant: undefined,
+  value: undefined,
+} as const;
 
 const OPTIONAL_VARIANT_TAGS: ReadonlyRecord<string, string> = {
   some: SOME_TAG,
@@ -593,6 +650,87 @@ const isGuaranteedRecord = (
   !checker.isTupleType(type);
 
 /**
+ * Whether the escaped name of a property is that of one keyed by the symbol
+ * `prefix` names: the declared name exactly, or renamed by a declaration
+ * bundler (`$1`, `_1`), then `@` and the id; not a symbol whose name merely starts
+ * with it (`optionalVariantKind`).
+ */
+const isKeyNamed = (escapedName: string, prefix: string): boolean => {
+  if (!escapedName.startsWith(prefix)) {
+    return false;
+  }
+
+  const segments = escapedName.slice(prefix.length).split('@');
+
+  return (
+    segments.length === 2 &&
+    (segments[0] === '' || /^[$_]\d+$/u.test(segments[0] ?? '')) &&
+    /^\d+$/u.test(segments[1] ?? '')
+  );
+};
+
+/**
+ * The properties of `type` keyed by ts-std-forge-keys' `unique symbol`s (see
+ * {@link OPTIONAL_VARIANT_KEY}).
+ */
+// One `find` per key rather than one loop for both: the scan runs once per
+// object type (`optionalKeysOf` caches it), and two finds say plainly what each
+// looks for.
+// eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+const keyedProperties = (type: ts.Type): OptionalKeys => {
+  const properties = type.getProperties();
+
+  // By the escaped name: a string key that spells `__@...` is escaped with a
+  // third underscore, so only a symbol key's escaped name starts with these.
+  return {
+    variant: properties.find((p) =>
+      isKeyNamed(p.escapedName.toString(), OPTIONAL_VARIANT_PREFIX),
+    ),
+    value: properties.find((p) =>
+      isKeyNamed(p.escapedName.toString(), OPTIONAL_VALUE_PREFIX),
+    ),
+  } as const;
+};
+
+/**
+ * Whether `type` is an object type, or an intersection with no primitive in it:
+ * a branded primitive (`string & { brand }`) is no Optional variant, and
+ * listing its properties builds one for each member of the primitive's apparent
+ * type, while `Some<S> & T` and `Some<S> & object` are variants.
+ */
+// eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+const isObjectLike = (type: ts.Type): boolean =>
+  (type.flags & ts.TypeFlags.Object) !== 0 ||
+  (type.isIntersection() &&
+    type.types.every((member) => (member.flags & PRIMITIVE_FLAGS) === 0));
+
+/** The properties of `type` keyed by ts-std-forge-keys' symbols. */
+const optionalKeysOf = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  type: ts.Type,
+): OptionalKeys => {
+  // Only an object (or an intersection with no primitive) can be a variant; a
+  // type parameter or another deferred type never gets here
+  // (`DEFERRED_OR_OPAQUE_FLAGS`), and a primitive's apparent type would only be
+  // scanned for nothing, or cached for nothing.
+  if (!isObjectLike(type)) {
+    return NO_OPTIONAL_KEYS;
+  }
+
+  const cached = mut_optionalKeysCache.get(type);
+
+  if (cached !== undefined) {
+    return cached;
+  }
+
+  const keys = keyedProperties(type);
+
+  mut_optionalKeysCache.set(type, keys);
+
+  return keys;
+};
+
+/**
  * The string literal a (non-union) type's `$$tag` property holds, or
  * `undefined` when it has none: `Ok<number>` gives `'ts-data-forge::Result.ok'`.
  * An `Optional` variant, which has no `$$tag`, gives the tag its type-only key
@@ -612,7 +750,7 @@ const variantTagOf = (
     return tagType.isStringLiteral() ? tagType.value : undefined;
   }
 
-  const variantSymbol = type.getProperty(OPTIONAL_VARIANT_PROPERTY);
+  const variantSymbol = optionalKeysOf(type).variant;
 
   if (variantSymbol === undefined) {
     return undefined;
@@ -632,9 +770,10 @@ const variantTagOf = (
 const NO_VARIANT_TAG = '(no variant)';
 
 /** Whether `type` is a variant of the unwrapped `Optional` (see above). */
-// eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-const isUnwrappedOptional = (type: ts.Type): boolean =>
-  type.getProperty(OPTIONAL_VARIANT_PROPERTY) !== undefined;
+const isUnwrappedOptional = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  type: ts.Type,
+): boolean => optionalKeysOf(type).variant !== undefined;
 
 /** Classifies a single (non-union) type into a primitive {@link Atom}. */
 // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
@@ -685,10 +824,16 @@ const classifyAtom = (type: ts.Type): Atom => {
 };
 
 /** Whether `type` is the `None` variant of the unwrapped `Optional`. */
-// eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-const isNoneVariant = (type: ts.Type): boolean =>
-  isUnwrappedOptional(type) &&
-  type.getProperty(OPTIONAL_VALUE_PROPERTY) === undefined;
+const isNoneVariant = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  type: ts.Type,
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  checker: ts.TypeChecker,
+): boolean =>
+  // The literal alone, not the missing value key: a mapped type can drop the
+  // value key of a `Some` (`Pick<Some<T>, keyof None>`), which is still its
+  // value.
+  variantTagOf(type, checker) === NONE_TAG;
 
 /**
  * The tag another type's variant guard (`Result.isOk`, ...) sees at runtime in
@@ -714,10 +859,10 @@ const runtimeVariantTagsOf = (
     return [variantTagOf(type, checker)];
   }
 
-  const valueSymbol = type.getProperty(OPTIONAL_VALUE_PROPERTY);
+  const valueSymbol = optionalKeysOf(type).value;
 
   if (valueSymbol === undefined) {
-    return [NO_VARIANT_TAG]; // `None`
+    return isNoneVariant(type, checker) ? [NO_VARIANT_TAG] : [undefined];
   }
 
   const held = collectUnionParts(checker.getTypeOfSymbol(valueSymbol));
@@ -726,7 +871,7 @@ const runtimeVariantTagsOf = (
     ? [undefined]
     : held.map((p) =>
         isUnwrappedOptional(p)
-          ? isNoneVariant(p)
+          ? isNoneVariant(p, checker)
             ? NO_VARIANT_TAG // a `Some` of `None`
             : undefined // a `Some` of a `Some`, not followed (see above)
           : classifyAtom(p) === 'other'

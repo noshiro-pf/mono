@@ -601,6 +601,36 @@ describe('no-unnecessary-type-guard through type wrappers', () => {
     ],
     invalid: [
       {
+        name: "isString on a type with a string key spelled as the checker names Optional's symbol key, which is no Optional",
+        code: dedent`
+          import { isString } from 'ts-data-forge';
+          declare const x: { readonly '__@optionalVariant@1': 'some' };
+          const y = isString(x);
+        `,
+        output: dedent`
+          import { isString } from 'ts-data-forge';
+          declare const x: { readonly '__@optionalVariant@1': 'some' };
+          const y = false;
+        `,
+        errors: [{ messageId: 'alwaysFalse' }],
+      },
+      {
+        name: "isString on a type keyed by a user's symbols whose names start as ts-std-forge-keys' do, which is no Optional",
+        code: dedent`
+          import { isString } from 'ts-data-forge';
+          declare const optionalVariantKind: unique symbol;
+          declare const x: { readonly [optionalVariantKind]: 'some' };
+          const y = isString(x);
+        `,
+        output: dedent`
+          import { isString } from 'ts-data-forge';
+          declare const optionalVariantKind: unique symbol;
+          declare const x: { readonly [optionalVariantKind]: 'some' };
+          const y = false;
+        `,
+        errors: [{ messageId: 'alwaysFalse' }],
+      },
+      {
         name: 'isNonNullish on a value whose `!` does not remove the null',
         code: dedent`
           import { isNonNullish, isNotNull } from 'ts-data-forge';
@@ -649,6 +679,61 @@ describe('no-unnecessary-type-guard through type wrappers', () => {
 describe('no-unnecessary-type-guard on the variant guards of Optional, Result, TernaryResult and AsyncData', () => {
   tester.run('no-unnecessary-type-guard', noUnnecessaryTypeGuard, {
     valid: [
+      {
+        name: "isString on a type keyed by symbols a declaration bundler renamed from ts-std-forge-keys' ($1, _1), which is taken for an Optional",
+        code: dedent`
+          import { isString } from 'ts-data-forge';
+          declare const optionalVariant$1: unique symbol;
+          declare const optionalValue_1: unique symbol;
+          declare const x: {
+            readonly [optionalVariant$1]: 'some';
+            readonly [optionalValue_1]: string;
+          };
+          const y = isString(x);
+        `,
+      },
+      {
+        name: "isString on a type keyed by a user's own symbol named as ts-std-forge-keys' is, which is taken for an Optional (by name alone)",
+        code: dedent`
+          import { isString } from 'ts-data-forge';
+          declare const optionalVariant: unique symbol;
+          declare const x: { readonly [optionalVariant]: 'some' };
+          const y = isString(x);
+        `,
+      },
+      {
+        name: 'isString on a Some intersected with object, which is still a Some',
+        code: dedent`
+          import { isString, type Some } from 'ts-data-forge';
+          declare const x: Some<string> & object;
+          const y = isString(x);
+        `,
+      },
+      {
+        name: 'isString on a Partial of a Some, whose variant is no longer a literal, which gives no verdict',
+        code: dedent`
+          import { isString, type Some } from 'ts-data-forge';
+          declare const x: Partial<Some<string>>;
+          const y = isString(x);
+        `,
+      },
+      {
+        name: 'isString on an Optional seen through a mapped type that remaps its keys, which gives no verdict',
+        code: dedent`
+          import { isString, type Some } from 'ts-data-forge';
+          type Remap<T> = { readonly [K in keyof T as K]: T[K] };
+          declare const x: Remap<Some<string>>;
+          const y = isString(x);
+        `,
+      },
+      {
+        name: 'Result.isOk on a Some whose value key a mapped type dropped, which is no None',
+        code: dedent`
+          import { Result, type None, type Ok, type Some } from 'ts-data-forge';
+          declare const x: Pick<Some<Ok<1>>, keyof None>;
+          const y = Result.isOk(x);
+        `,
+      },
       {
         name: 'Result.isOk on a Some of a Some of None, which the rule does not follow',
         code: dedent`

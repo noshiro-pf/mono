@@ -1,6 +1,13 @@
 /**
  * The runtime representation of `Optional`. Internal: not exported from the
- * package, and nothing outside `functional/optional/impl/` may depend on it.
+ * package, and nothing outside `functional/optional/impl/` may depend on it but
+ * `test/optional-encoding.test.mts`, which records what it writes.
+ *
+ * Changing what this file writes is a breaking change of ts-std-forge and a new
+ * major version of ts-std-forge-keys, which is what keeps the `Optional` types
+ * of two copies of ts-std-forge assignable to each other exactly while they
+ * read each other's values right; `test/optional-encoding.test.mts` holds the
+ * two together and says what to do when it fails.
  *
  * A `Some` is its value itself, with no object around it, and `None` is one
  * reserved string. Keeping the value unwrapped saves an allocation per `Some`,

@@ -6,6 +6,8 @@
  * exist.
  */
 
+import type { optionalValue, optionalVariant } from 'ts-std-forge-keys';
+
 // #region Optional
 /**
  * Represents the 'Some' variant of an Optional, containing a value.
@@ -29,23 +31,38 @@
  * as a `Some` of that object.
  *
  * The discriminant is one key with a literal per variant, as `$$tag` was, so
- * that `Some<S> & None` reduces to `never`. The keys are strings rather than
- * `unique symbol`s so that two copies of this package declare the same type,
- * which leaves them readable, and an object literal that has them assignable,
- * as `$$tag` was: only `Optional.some` and `Optional.none` make an Optional.
+ * that `Some<S> & None` reduces to `never`. The keys are `unique symbol`s that
+ * are declared and never defined (in ts-std-forge-keys), so that no object
+ * literal that writes them out passes for an Optional and no property access
+ * reads a `Some`'s value. The spread of an Optional keeps its type but not its
+ * value (`{ ...some }` is `{}` at runtime), so it is no Optional to trust. They
+ * are declared in a package of their own so that every copy of this package
+ * that depends on the same version of it declares the same `Optional`; that
+ * version changes with the runtime encoding, so two copies that read each
+ * other's Optionals wrongly declare types that are not assignable to each
+ * other.
+ *
+ * Each is an object type of its own rather than `Readonly<{ ... }>`, so that a
+ * consumer's declaration emit names it (`import("ts-std-forge").Some<1>`)
+ * instead of spelling its keys out, which it could not: the keys are not
+ * visible from the consumer's package. A type that has to be spelled out (the
+ * spread of an Optional, a mapped type over one that TypeScript expands) fails
+ * that emit with TS4023 and needs an annotation.
  *
  * @template S The type of the contained value.
  */
-export type Some<S> = Readonly<{
+// An object type of its own, not `Readonly<{ ... }>`: see above.
+// transformer-ignore-next-line convert-to-readonly
+export type Some<S> = {
   /** @internal Type-only discriminant; absent at runtime. */
-  'ts-std-forge::Optional': 'some';
+  readonly [optionalVariant]: 'some';
 
   /**
    * @internal Type-only; absent at runtime. Read the value with
    *   `Optional.unwrap`.
    */
-  'ts-std-forge::Optional.value': S;
-}>;
+  readonly [optionalValue]: S;
+};
 
 /**
  * Represents the 'None' variant of an Optional, indicating the absence of a
@@ -54,10 +71,12 @@ export type Some<S> = Readonly<{
  * At runtime `None` is one reserved string (see `Optional.none`). As with
  * {@link Some}, the property below exists only in the type.
  */
-export type None = Readonly<{
+// An object type of its own, not `Readonly<{ ... }>`: see `Some`.
+// transformer-ignore-next-line convert-to-readonly
+export type None = {
   /** @internal Type-only discriminant; absent at runtime. */
-  'ts-std-forge::Optional': 'none';
-}>;
+  readonly [optionalVariant]: 'none';
+};
 
 // #endregion Optional
 

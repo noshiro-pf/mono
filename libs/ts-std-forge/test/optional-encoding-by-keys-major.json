@@ -1,0 +1,36 @@
+{
+  "1": {
+    "none": "ts-std-forge::Optional/n0",
+    "samples": {
+      "0": "(itself)",
+      "1": "(itself)",
+      "undefined": "(itself)",
+      "null": "(itself)",
+      "false": "(itself)",
+      "-0": "(itself)",
+      "NaN": "(itself)",
+      "empty string": "(itself)",
+      "0n": "(itself)",
+      "none": "ts-std-forge::Optional/n1",
+      "some(none)": "ts-std-forge::Optional/n2",
+      "below the depth limit": "ts-std-forge::Optional/n999999999",
+      "at the depth limit": "ts-std-forge::Optional/rn999999999",
+      "over the depth limit": "ts-std-forge::Optional/rn1000000000",
+      "prefix, then n": "ts-std-forge::Optional/rn",
+      "prefix, then n01": "ts-std-forge::Optional/rn01",
+      "prefix, then fu": "ts-std-forge::Optional/rfu",
+      "prefix, then f0": "ts-std-forge::Optional/rf0",
+      "prefix, then rx": "ts-std-forge::Optional/rrx",
+      "prefix, then x": "ts-std-forge::Optional/rx",
+      "prefix": "ts-std-forge::Optional/r",
+      "plain string": "(itself)",
+      "Infinity": "(itself)",
+      "-Infinity": "(itself)",
+      "1n": "(itself)",
+      "true": "(itself)",
+      "object": "(itself)",
+      "symbol": "(itself)",
+      "function": "(itself)"
+    }
+  }
+}

@@ -1,0 +1,66 @@
+{
+  "name": "ts-std-forge-keys",
+  "version": "1.0.0",
+  "private": false,
+  "description": "The type-only keys of ts-std-forge's Optional, shared by every version of ts-std-forge that encodes Optional the same way.",
+  "keywords": [
+    "typescript",
+    "types",
+    "ts-std-forge"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/noshiro-pf/mono.git",
+    "directory": "libs/ts-std-forge-keys"
+  },
+  "license": "Apache-2.0",
+  "author": "noshiro-pf <noshiro.pf@gmail.com>",
+  "sideEffects": false,
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/entry-point.d.mts"
+      },
+      "default": {
+        "types": "./dist/entry-point.d.mts"
+      }
+    }
+  },
+  "types": "./dist/entry-point.d.mts",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/cmd/build.mts",
+    "check:ext": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/cmd/check-ext.mts",
+    "check:lint": "node ../../tools/scripts/cmd/assert-deps-built.mts && oxlint . && eslint .",
+    "check:types": "node ../../tools/scripts/cmd/assert-deps-built.mts && node ../../node_modules/typescript-native/bin/tsc --noEmit",
+    "fix:fmt": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/format-uncommitted.mts --cwd .",
+    "fix:fmt:diff": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/format-diff-from.mts origin/main --cwd .",
+    "fix:fmt:full": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../tools/scripts/cmd/format-package.mts",
+    "fix:lint": "node ../../tools/scripts/cmd/assert-deps-built.mts && oxlint . --fix && eslint . --fix",
+    "fmt": "pnpm run fix:fmt",
+    "watch:types": "node ../../node_modules/typescript-native/bin/tsc --noEmit --watch -p ./tsconfig.json"
+  },
+  "devDependencies": {
+    "eslint": "catalog:",
+    "eslint-config-typed": "workspace:*",
+    "eslint-plugin-ts-data-forge": "workspace:*",
+    "prettier": "catalog:",
+    "prettier-plugin-organize-imports": "catalog:",
+    "prettier-plugin-packagejson": "catalog:",
+    "ts-repo-utils": "workspace:*",
+    "tsx": "catalog:"
+  },
+  "engines": {
+    "node": ">=22.23.4",
+    "pnpm": ">=9.0.0"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  }
+}
