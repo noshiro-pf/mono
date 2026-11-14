@@ -1,6 +1,6 @@
 import type * as Discord from 'discord.js';
 import { ChannelType } from 'discord.js';
-import { Result, match } from 'ts-data-forge';
+import { Arr, Result, match } from 'ts-data-forge';
 import { emojis } from '../constants.mjs';
 import { firestoreApi } from '../firebase/index.mjs';
 import {
@@ -14,6 +14,7 @@ import {
   toUserId,
   type AnswerType,
 } from '../types/index.mjs';
+import { fetchMessagesById } from './fetch-messages-by-id.mjs';
 import { fixAnswerAndUpdateMessage } from './fix-answer.mjs';
 
 export const onMessageReactionAdd = async (
@@ -53,10 +54,6 @@ const onRefreshClick = async (
     );
   }
 
-  const messages = await channel.messages.fetch({
-    around: reactionFilled.message.id,
-  });
-
   const pollResult = await firestoreApi.getPollById(
     toPollId(reactionFilled.message.id),
   );
@@ -70,6 +67,13 @@ const onRefreshClick = async (
   if (poll === undefined) {
     return Result.err('poll not found');
   }
+
+  const messages = await fetchMessagesById(
+    (options) => channel.messages.fetch(options),
+    Arr.toUnshifted(poll.id)(
+      poll.dateOptions.map((dateOption) => dateOption.id),
+    ),
+  );
 
   const fixAnswerAndUpdateMessageResult = await fixAnswerAndUpdateMessage(
     messages,
@@ -127,31 +131,17 @@ const onMessageReactCommon = async (
     );
   }
 
-  const [
-    updateMessageReactionResult,
-    updatePollUpdatedAtResult,
-    messages,
-  ]: readonly [
-    Result<void, string>,
-    Result<void, string>,
-    Discord.Collection<string, Discord.Message>,
-  ] = await Promise.all([
-    firestoreApi.updateMessageReaction(
-      pollId,
-      dateOptionId,
-      action.value,
-      toUserId(user.id),
-      action.type,
-    ),
-    firestoreApi.updatePollUpdatedAt(pollId),
-    channel.messages.fetch({
-      after: dateOptionId,
-    }),
-  ]);
-
-  if (messages.size === 0) {
-    return Result.err('messages not found.');
-  }
+  const [updateMessageReactionResult, updatePollUpdatedAtResult] =
+    await Promise.all([
+      firestoreApi.updateMessageReaction(
+        pollId,
+        dateOptionId,
+        action.value,
+        toUserId(user.id),
+        action.type,
+      ),
+      firestoreApi.updatePollUpdatedAt(pollId),
+    ]);
 
   if (Result.isErr(updateMessageReactionResult)) {
     return updateMessageReactionResult;
@@ -184,17 +174,11 @@ const onMessageReactCommon = async (
 
   const userIdToDisplayName = userIdToDisplayNameResult.value;
 
-  const message: Discord.Message | undefined = messages.find(
-    (m) => m.id === resultPoll.id,
-  );
-
-  if (message === undefined) {
-    return Result.err(`message with id ${resultPoll.id} not found`);
-  }
-
+  // Edited by id with no fetch first, which saves a request on every vote; a
+  // deleted summary, which is rare, is reported by this edit.
   const result = await Result.fromPromise(
-    message
-      .edit({
+    channel.messages
+      .edit(pollId, {
         embeds: [rpCreateSummaryMessage(resultPoll, userIdToDisplayName)],
       })
       .then(() => undefined),

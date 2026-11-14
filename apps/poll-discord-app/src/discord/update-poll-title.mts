@@ -11,6 +11,7 @@ import {
   rpParseCommand,
 } from '../functions/index.mjs';
 import { toCommandMessageId, type UserId } from '../types/index.mjs';
+import { fetchMessagesById } from './fetch-messages-by-id.mjs';
 import { fixAnswerAndUpdateMessage } from './fix-answer.mjs';
 
 export const updatePollTitle = async (
@@ -76,9 +77,17 @@ export const updatePollTitle = async (
       message.guild,
       getUserIdsFromAnswers(poll.answers).toArray(),
     ),
-    channel.messages.fetch({
-      after: message.id,
-    }),
+    fetchMessagesById(
+      (options) => channel.messages.fetch(options),
+      // Unlike a refresh, a title edit also needs the title message. It is
+      // fetched rather than edited by id so that a deleted one is skipped
+      // instead of failing the edit.
+      [
+        pollId,
+        poll.titleMessageId,
+        ...poll.dateOptions.map((dateOption) => dateOption.id),
+      ],
+    ),
   ]);
 
   if (Result.isErr(userIdToDisplayNameResult)) {
@@ -89,6 +98,7 @@ export const updatePollTitle = async (
 
   const newPoll = { ...poll, title } as const;
 
+  // `find` by id costs nothing next to the requests for a poll's few messages.
   const [updateSummaryMessageResult, updateTitleMessageResult] =
     await Promise.all([
       Result.fromPromise(
@@ -109,5 +119,9 @@ export const updatePollTitle = async (
     ? updateSummaryMessageResult
     : Result.isErr(updateTitleMessageResult)
       ? updateTitleMessageResult
-      : fixAnswerAndUpdateMessage(messages, newPoll);
+      : // This edits the summary a second time and removes and re-adds its
+        // refresh reaction, which wastes requests on every title edit. Its
+        // setPoll is the only place the new title is saved, so a failure before
+        // it, such as a deleted summary, leaves Firestore with the old title.
+        fixAnswerAndUpdateMessage(messages, newPoll);
 };
