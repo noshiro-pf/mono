@@ -1,5 +1,27 @@
 ## [10.1.8](https://github.com/noshiro-pf/ts-repo-utils/compare/v10.1.7...v10.1.8) (2026-08-09)
 
+## 11.0.0
+
+### Major Changes
+
+- a6d03ea: The `Result` re-exported from ts-data-forge now comes from ts-data-forge 15, whose `Optional` is unwrapped at runtime: `Result.toOptional` returns, and `Result.fromOptional` takes, an `Optional` whose `Some` is the value itself, with no `value` or `$$tag` property. Read the value with `Optional.unwrap` (from ts-data-forge or ts-std-forge) instead of `.value`.
+
+### Minor Changes
+
+- fff06e0: Export the types `glob`, `$` and `createResultAssert` name: `GlobEntry`, `GlobOptions` and `GlobEntryOptions`; `ShellOptions`, the options `$` takes, with its two forms `ShellOptionsWithStringEncoding` and `ShellOptionsWithBufferEncoding` and `ShellExtraOptions` (the `silent` flag `$` adds to Node.js's); and `ResultProducer`.
+
+### Patch Changes
+
+- Updated dependencies [2f758a4]
+- Updated dependencies [ae57625]
+- Updated dependencies [e9340d0]
+- Updated dependencies [a6d03ea]
+- Updated dependencies [e7b459f]
+- Updated dependencies [d5640ce]
+- Updated dependencies [40645fa]
+    - ts-type-forge@9.2.6
+    - ts-data-forge@15.0.0
+
 ## 10.7.4
 
 ### Patch Changes

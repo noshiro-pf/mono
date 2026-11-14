@@ -1,6 +1,6 @@
 {
   "name": "synstate-next",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "private": true,
   "description": "From-scratch rebuild of synstate: integer epochs, effects after propagation, batch (not published)",
   "repository": {

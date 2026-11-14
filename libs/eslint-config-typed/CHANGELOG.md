@@ -1,5 +1,42 @@
 ## [5.8.4](https://github.com/noshiro-pf/eslint-config-typed/compare/v5.8.3...v5.8.4) (2026-08-09)
 
+## 7.12.0
+
+### Minor Changes
+
+- 7d63bd1: Export the types its exported values name: `KnownRules` (what `defineKnownRules` takes), `RestrictedImportsObjectOptions`, `NodeVersionGated`, `NodeVersionGatedApi` and `NodeVersionGatedStaticApi`.
+- be3c18d: The `ts-restrictions/*` rules are now also published on their own, as
+  `eslint-plugin-ts-restrictions`, for projects that want them without the
+  third-party ESLint plugins this package depends on. This package depends on that
+  one and registers the same rules under the same ids, so a config using
+  `eslintPluginTsRestrictions` or `eslintTsRestrictionsRules` needs no change.
+
+    `ts-restrictions/prefer-catch` and `ts-restrictions/prefer-global-this` stay in
+    this package only: they wrap rules of `eslint-plugin-promise` and
+    `eslint-plugin-unicorn`, which the standalone plugin does not depend on.
+    `editorconfig-without-wasm` is no longer a direct dependency; it comes through
+    the new package. `@types/estree` is dropped: nothing this package publishes
+    imports it any longer.
+
+### Patch Changes
+
+- 92bba92: The documentation comment of the `ts-data-forge/prefer-canonical-array-slicing` rule type says that a rewrite to `Arr.tail` or `Arr.butLast` is a suggestion, not a fix, as `eslint-plugin-ts-data-forge` now reports it.
+- Updated dependencies [1e5abc2]
+- Updated dependencies [2f758a4]
+- Updated dependencies [ae57625]
+- Updated dependencies [47af2c3]
+- Updated dependencies [e9340d0]
+- Updated dependencies [a6d03ea]
+- Updated dependencies [e7b459f]
+- Updated dependencies [d3a20c8]
+- Updated dependencies [d5640ce]
+- Updated dependencies [40645fa]
+- Updated dependencies [b1aa42c]
+    - eslint-rule-forge@0.10.0
+    - ts-type-forge@9.2.6
+    - ts-data-forge@15.0.0
+    - eslint-plugin-ts-restrictions@1.0.1
+
 ## 7.11.0
 
 ### Minor Changes

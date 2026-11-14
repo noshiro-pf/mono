@@ -1,5 +1,13 @@
 ## [7.2.1](https://github.com/noshiro-pf/ts-type-forge/compare/v7.2.0...v7.2.1) (2026-07-21)
 
+## 9.2.6
+
+### Patch Changes
+
+- 2f758a4: `List.Zip` now reads optional elements and elements after a rest exactly: `Zip<[1, 2], [string, ...string[], number]>` has two required pairs, `Zip<[1, 2, 3], [string, string?]>` has no third pair and no `undefined` in the second, and `Zip<[1, 2?], string[]>` no longer ends in an unsized rest. A type correction: results only become more precise, and a pair that may be missing is still never required.
+- ae57625: `Max` and `Min` now work for every member of `Uint10`, as documented. They recursed once per integer and hit TypeScript's limit of 1000 steps for a tail-recursive type, so `Max<1000>`, `Max<Uint10>` and `Min<1000>` failed with TS2589 ("Type instantiation is excessively deep"). They now step 32 at a time and then one at a time, at most 64 steps for any member: `Max<Uint10>` is `1023` and `Min<1023>` is `1023`.
+- 40645fa: The `@example` of `DeepOmit` gave a wrong result for a union of paths (it said `DeepOmit<Data, ['a', 'b'] | ['a', 'c']>` is `{ a: { d: boolean } }`; it is `{ a: {}; e: boolean }`). The example now omits `['a', 'b', 'c'] | ['e']` and asserts its result. It and the examples of `DeepPick`, `DeepMutable`, `DeepReadonly`, `DeepRequired`, `Mutable`, `PartiallyNullable`, `PartiallyOptional`, `PartiallyPartial` and `PartiallyRequired` state their results as `expectType` assertions, which the type check holds to the real types.
+
 ## 9.2.5
 
 ### Patch Changes

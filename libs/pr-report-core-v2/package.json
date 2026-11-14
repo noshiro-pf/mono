@@ -1,6 +1,6 @@
 {
   "name": "pr-report-core-v2",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "private": true,
   "description": "From-scratch rebuild of pr-report-core: the merge queue's snapshot of a repository, and in time its pure decisions and the readers that build the snapshot (not published)",
   "repository": {

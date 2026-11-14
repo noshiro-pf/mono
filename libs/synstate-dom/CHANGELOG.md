@@ -1,5 +1,33 @@
 # synstate-dom
 
+## 0.11.0
+
+### Minor Changes
+
+- a6d03ea: Require `synstate` 9 as a peer (and, for synstate-dom and blueprint-synstate, `ts-data-forge` 15). Its `Optional` is unwrapped at runtime (a `Some` is the value it holds), and these packages read the snapshots of observables through `Optional.unwrap`, which would misread the `{ $$tag, value }` object an earlier synstate returns. The peer ranges move with this release (`changeset version` raises the `>=` peer range of a released dependent to the dependency's new version). In synstate-dom, avoid giving `MatchOptional` a constant `Optional.some(observable$)`: a `Some` is its value at runtime, so it is read as `observable$` itself.
+- 1319948: `synstate-dom` exports `mountSwitch(value, keyOf, branch)`, the switch `If`, `MatchOptional` and `MatchResult` are built on: one branch at a time, rebuilt only when `keyOf` gives a different key. `synstate-router-dom`'s `Routes` now uses it instead of a copy of its own, which lacked the handling of updates that arrive before the switch is inserted: a navigation made by a component mounted after `Routes`, while the page was still mounting, was lost, and `Routes` kept showing the page it started on. `synstate-router-dom` now needs the `synstate-dom` release that exports `mountSwitch`: its peer range moves to that version, so update both together.
+
+### Patch Changes
+
+- 6c7a0d3: Export `ReflectedProps` and `SvgTagName`, which `HtmlElementProps` and `GeneratedIntrinsicElements` name.
+- Updated dependencies [2f758a4]
+- Updated dependencies [ae57625]
+- Updated dependencies [e9340d0]
+- Updated dependencies [a6d03ea]
+- Updated dependencies [e7b459f]
+- Updated dependencies [430b433]
+- Updated dependencies [553a883]
+- Updated dependencies [a34ddd2]
+- Updated dependencies [a9163fe]
+- Updated dependencies [6722a9e]
+- Updated dependencies [593ca51]
+- Updated dependencies [dcf7544]
+- Updated dependencies [d5640ce]
+- Updated dependencies [40645fa]
+    - ts-type-forge@9.2.6
+    - ts-data-forge@15.0.0
+    - synstate@9.0.0
+
 ## 0.10.0
 
 ### Minor Changes

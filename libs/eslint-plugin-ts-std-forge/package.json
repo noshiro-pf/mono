@@ -1,6 +1,6 @@
 {
   "name": "eslint-plugin-ts-std-forge",
-  "version": "0.1.23",
+  "version": "0.2.0",
   "private": false,
   "description": "ESLint rules that steer code toward ts-std-forge idioms.",
   "keywords": [

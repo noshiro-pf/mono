@@ -1,6 +1,6 @@
 {
   "name": "mui-look",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "private": true,
   "description": "The MUI-look parts the synstate-dom apps share, with their behavior and without their look",
   "repository": {

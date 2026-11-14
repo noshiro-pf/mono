@@ -1,5 +1,33 @@
 # split-view-extension
 
+## 0.10.0
+
+### Minor Changes
+
+- 2913123: On the pull requests of `noshiro-pf/mono`, a **＋ merge-queued** button beside **⧉ Split view** adds the `merge-queued` label to the pull request on screen, through GitHub's own label picker in the sidebar, as the signed-in user. Pressed on another tab of the pull request, it goes to the conversation tab first. It then says whether the label was added, was already there, or what stopped it.
+- 52d2d17: The **＋ merge-queued** button now shows in the panes of a split view too: a pane showing the conversation of a `noshiro-pf/mono` pull request has it at its own bottom left and adds the label through that pane's label picker. A pane never shows **⧉ Split view**, and never moves to the conversation tab on its own.
+
+### Patch Changes
+
+- Updated dependencies [e9340d0]
+- Updated dependencies [a6d03ea]
+- Updated dependencies [a6d03ea]
+- Updated dependencies [e7b459f]
+- Updated dependencies [430b433]
+- Updated dependencies [553a883]
+- Updated dependencies [1319948]
+- Updated dependencies [6c7a0d3]
+- Updated dependencies [a34ddd2]
+- Updated dependencies [a9163fe]
+- Updated dependencies [6722a9e]
+- Updated dependencies [593ca51]
+- Updated dependencies [dcf7544]
+- Updated dependencies [d5640ce]
+    - ts-data-forge@15.0.0
+    - synstate-dom@0.11.0
+    - synstate@9.0.0
+    - split-view-link@0.0.3
+
 ## 0.9.5
 
 ### Patch Changes

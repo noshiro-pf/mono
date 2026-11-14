@@ -1,5 +1,22 @@
 # ts-codemod-cli
 
+## 3.0.1
+
+### Patch Changes
+
+- Updated dependencies [d753bca]
+- Updated dependencies [e9340d0]
+- Updated dependencies [a6d03ea]
+- Updated dependencies [a6d03ea]
+- Updated dependencies [e7b459f]
+- Updated dependencies [d5640ce]
+- Updated dependencies [fff06e0]
+- Updated dependencies [e7d2c7b]
+- Updated dependencies [db78d75]
+    - ts-codemod-lib@4.2.1
+    - ts-data-forge@15.0.0
+    - ts-repo-utils@11.0.0
+
 ## 3.0.0
 
 ### Major Changes

@@ -1,5 +1,16 @@
 # resize-observer-react-hooks
 
+## 0.0.18
+
+### Patch Changes
+
+- Updated dependencies [e9340d0]
+- Updated dependencies [a6d03ea]
+- Updated dependencies [e7b459f]
+- Updated dependencies [d5640ce]
+    - ts-data-forge@15.0.0
+    - better-react-use-state@1.0.1
+
 ## 0.0.17
 
 ### Patch Changes

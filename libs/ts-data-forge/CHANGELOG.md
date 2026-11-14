@@ -1,5 +1,44 @@
 # ts-data-forge
 
+## 15.0.0
+
+### Major Changes
+
+- e9340d0: The type-only properties that tell `Some` from `None` are keyed by `unique symbol`s from the new types-only package `ts-std-forge-keys`, which are declared and never defined, and exported as types only: no code names them by accident: an object literal that writes them out does not type-check as an `Optional`, and a property access does not read a `Some`'s value. (Spreading an existing Optional copies its type, not its runtime value; the type of the spread is not an Optional to trust.) Two copies of ts-std-forge that depend on the same version of `ts-std-forge-keys` declare the same `Optional`; that version moves only when the runtime encoding of an Optional does, so copies that would read each other's Optionals wrongly also declare types that are not assignable to each other.
+
+    A package that compiles declarations names an Optional by its type (`Some<1>`, `Optional<number>`). Where its declaration emit would have to spell an Optional's properties out (the spread of an Optional, or a mapped type over one that TypeScript expands), it fails with TS4023, since the keys cannot be named from that package; annotate the declaration's type.
+
+- a6d03ea: `Optional` no longer wraps its value in an object. A `Some` is the value itself at runtime and `None` is one reserved string, so an `Optional` held in an array, a map or state costs no allocation: against the previous release, storing a million `Optional.some` values took 1/7 to 1/3 of the memory and reading them back ran about 5 times faster in a benchmark, and short `map` / `unwrapOr` pipelines ran 20–30% faster.
+
+    Breaking changes:
+
+    - `Some` and `None` no longer have `$$tag` or `value` properties. Read the value with `Optional.unwrap` (or `unwrapOr`, `unwrapThrow`, `expectToBe`, `match`) instead of `.value`: `Optional.isSome(o) ? o.value : d` becomes `Optional.isSome(o) ? Optional.unwrap(o) : d`. The `Some` / `None` types still tell the two apart at compile time, through type-only properties that do not exist at runtime.
+    - `Optional.isOptional` is removed. A `Some` is its value, so any value other than the `None` string is a valid `Some` at runtime and no check can tell an `Optional` from a value that is not one. Likewise `Optional.isSome` tells a `Some` from `None` in a value typed as an `Optional`; it does not validate untrusted input.
+    - `pipe(x).mapOptional` exists at runtime for every value; the type still offers it only when `x` is an `Optional`.
+    - `AsyncData.isAsyncData` checks that a pending or failed value has a `previous` key, without checking what it holds (a `Some` of `undefined` is `undefined`).
+    - `AsyncData.pending` and `AsyncData.err` tell an omitted `previous` from one passed by the number of arguments rather than by a default parameter, so `AsyncData.pending(Optional.some(undefined))` keeps its `Some`. Passing `undefined` for `previous` no longer type-checks: omit it, or pass `Optional.none`.
+    - `Optional.unwrapOr` returns the value of a `Some` holding `null` or `undefined`; it used to return the default.
+    - An `Optional` made by an earlier version (`{ $$tag, value }`) is not one to this version: values do not mix across the change, and a type error says so where TypeScript sees both.
+
+    Nested `Optional`s keep working: `Optional.some(Optional.none)` is a `Some` holding `None`, and `Optional.unwrap(Optional.some(x))` is `x` whatever `x` is. A `Some` of a value that is not a reserved string is that value, so `Optional.some(Optional.some(5))` and `Optional.some(5)` are the same runtime value, while reserved strings (those that start with `"ts-std-forge::Optional/"`) are rewritten and keep each level of nesting apart; a string equal to an `Optional`'s runtime value is held as that `Optional` (`Optional.some("ts-std-forge::Optional/n0")` is `Optional.some(Optional.none)`). Falsy and nullish values are held as themselves: `Optional.some(0)` is `0` and `Optional.some(undefined)` is `undefined` at runtime, unlike before, when an `Optional` was always a truthy object. So do not test an `Optional` with truthiness, `??`, `?.` or a default parameter, which take such a `Some` for a missing value; test it with `Optional.isSome` / `isNone`, never with `typeof` either: a `Some` of a string is a string. For the same reason an API that branches on the kind of value it is given acts on the value a `Some` holds (`await` resolves a `Some` of a thenable, React's `useState` calls a `Some` of a function, `concat` spreads a `Some` of an array), and as a `WeakMap` key a `Some` is its value: `None` and a `Some` of a primitive throw (a non-registered symbol aside), and a `Some` of an object is the same key as that object. An `Optional` still survives `structuredClone`, `postMessage` and a JSON round trip, the last as far as JSON keeps the value it holds (a `Some` of `Infinity` comes back as `null`, as `Infinity` alone does, and a `Some` of `undefined` is dropped from an object, as `undefined` is). Two copies of the package agree on the representation, so values pass between them.
+
+    In synstate, `getSnapshot()` and `initialValue` are `Optional`s, so the same change applies to them. Anything that compares values with `Object.is` now sees `Optional.some(x)` twice for the same `x` as the same value, where it used to get a new object each time: an operator's result (`map(() => Optional.some(id))`, `mapOptional`, `derive`), `skipIfNoChange` and a `createState` setter no longer emit or notify when the `Some` holds the very same `x` as before, and React's state bails out as it does for any unchanged value.
+
+### Patch Changes
+
+- e7b459f: `SafeNumber.parseInteger` (and `Num.safeParseInt`, which delegates to it) now accepts exactly what `Number` reads as a finite number, truncated toward zero, and its documentation says so. A leading-dot decimal such as `'.5'` or `'-.9'`, rejected before while `'0.5'` was accepted, now parses (to `0` / `-0`). The hexadecimal, binary and octal literals stay accepted, now documented rather than contradicting the "base-10" wording; `Num.safeParseInt`'s error message no longer says "base-10".
+- d5640ce: The `abs` documentation of `Int8` and of `NegativeInt`, `NegativeSafeInt` and `NegativeFiniteNumber` now names the type it returns (`AbsoluteValue<N>` for `Int8`, whose `abs(-128)` is `128`; the positive type for the negative ones) instead of saying the result keeps the module's brand.
+- Updated dependencies [2f758a4]
+- Updated dependencies [ae57625]
+- Updated dependencies [e9340d0]
+- Updated dependencies [a6d03ea]
+- Updated dependencies [a6d03ea]
+- Updated dependencies [e7b459f]
+- Updated dependencies [7d6f898]
+- Updated dependencies [40645fa]
+    - ts-type-forge@9.2.6
+    - ts-std-forge@0.6.0
+
 ## 14.13.0
 
 ### Minor Changes

@@ -1,5 +1,21 @@
 # eslint-rule-forge
 
+## 0.10.0
+
+### Minor Changes
+
+- 1e5abc2: `hasForeignBinding` takes, as an optional fifth argument, the kind of reference the name is written as: `'value'` (the default, as before) or `'type'`, for a reference the scope manager marks `isTypeReference`. For a type reference, a type parameter, a local type alias or a local interface of the name around the node now counts as a foreign binding, as it already did at the top of the file, so a fix that writes a name at one no longer has to look for those itself.
+- 47af2c3: `bindValueImports`, `bindValueImportsAt`, `createPreferIsNonNullObject`, `createPreferIsRecordAndHasKey`, `createPreferSafeParseInt` and `createPreferSafeParseFloat` take `equivalentModules` (the new `EquivalentModule` type): modules that export some of the module's exports as the same declarations. An import of one of those names from such a module is reused by the fix, and a name still to add joins that import when the file imports nothing from the module itself, where the fix used to be refused.
+- d3a20c8: Add `createPreferEmptinessGuard`, which rewrites a comparison of an array's length that only asks whether it is empty (`xs.length === 0`, `<= 0`, `< 1`, `!== 0`, `> 0`, `>= 1`, in either operand order) to `<namespace>.isEmpty(xs)` / `<namespace>.isNonEmpty(xs)`, and `matchEmptinessComparison`, which recognizes those comparisons. Every factory now records itself on the rule it builds: `ruleFactoriesOf(rule)` reads it, and `composedOf(parts, rule)` marks a rule that merges the visitors of others, so that two plugins can check that their counterpart rules share an implementation.
+- b1aa42c: Add `isTsTypeWrapper`, `skipTsTypeWrappers` and their node type `TsTypeWrapper`, the TypeScript compiler API counterparts of `isTypeWrapper` and `skipTypeWrappers`: they see through `as`, `!`, `satisfies`, `<T>` and parentheses on a `ts.Node`, for a rule that reads the program's own nodes through the type checker.
+
+### Patch Changes
+
+- Updated dependencies [2f758a4]
+- Updated dependencies [ae57625]
+- Updated dependencies [40645fa]
+    - ts-type-forge@9.2.6
+
 ## 0.9.0
 
 ### Minor Changes

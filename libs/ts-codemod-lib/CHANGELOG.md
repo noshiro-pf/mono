@@ -1,5 +1,22 @@
 ## [2.2.5](https://github.com/noshiro-pf/ts-codemod-lib/compare/v2.2.4...v2.2.5) (2026-08-09)
 
+## 4.2.1
+
+### Patch Changes
+
+- d753bca: `convert-to-readonly` keeps a comment written just before the `,` or `>` of a type argument when it rewrites `Set`, `Map`, `Record`, `ReadonlyRecord` or `Readonly<Record<…>>` (`Map<K /* x */, V /* y */>` becomes `ReadonlyMap<K /* x */, V /* y */>` instead of losing both), and a `// …` comment there keeps its line break.
+- e7d2c7b: When `convert-to-readonly` or `replace-record-with-unknown-record` adds a ts-type-forge type to an existing import that spans several lines, the new name goes on a line of its own, with the import's indentation and trailing-comma style and the file's line breaks, instead of landing on the last line and pulling the closing brace up.
+- db78d75: `replace-record-with-unknown-record` no longer imports `UnknownRecord` where the file cannot take it: a script (a `global.d.ts`, which an import would turn into a module) is left alone, and so is a file whose top level binds `UnknownRecord` to a value or a namespace; where `UnknownRecord` is already in scope it is written with no new import. It decides with the same check `convert-to-readonly` uses for `ReadonlyRecord`, now shared as `typeNameScope` and `typeNameUse`.
+- Updated dependencies [2f758a4]
+- Updated dependencies [ae57625]
+- Updated dependencies [e9340d0]
+- Updated dependencies [a6d03ea]
+- Updated dependencies [e7b459f]
+- Updated dependencies [d5640ce]
+- Updated dependencies [40645fa]
+    - ts-type-forge@9.2.6
+    - ts-data-forge@15.0.0
+
 ## 4.2.0
 
 ### Minor Changes

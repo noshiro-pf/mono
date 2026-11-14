@@ -1,5 +1,30 @@
 # eslint-plugin-ts-std-forge
 
+## 0.2.0
+
+### Minor Changes
+
+- d3a20c8: Add `no-side-effect-import` (in the recommended config), which removes `import 'ts-std-forge';`. `prefer-safe-array-length-guard` now also reports `xs.length <= 0` and `xs.length < 1` as `SafeArray.isEmpty(xs)`; it is built by `eslint-rule-forge`'s `createPreferEmptinessGuard`, as `eslint-plugin-ts-data-forge`'s `prefer-canonical-length-guard` is.
+
+### Patch Changes
+
+- 47af2c3: `prefer-is-non-null-object`, `prefer-is-record-and-has-key`, `prefer-safe-number-parse` and `prefer-safe-number-parse-integer` reuse `isNonNullObject`, `isRecord`, `hasKey` or `Result` imported from `ts-data-forge`, which re-exports them unchanged, instead of offering no fix.
+- Updated dependencies [1e5abc2]
+- Updated dependencies [2f758a4]
+- Updated dependencies [ae57625]
+- Updated dependencies [47af2c3]
+- Updated dependencies [e9340d0]
+- Updated dependencies [a6d03ea]
+- Updated dependencies [a6d03ea]
+- Updated dependencies [e7b459f]
+- Updated dependencies [d3a20c8]
+- Updated dependencies [7d6f898]
+- Updated dependencies [40645fa]
+- Updated dependencies [b1aa42c]
+    - eslint-rule-forge@0.10.0
+    - ts-type-forge@9.2.6
+    - ts-std-forge@0.6.0
+
 ## 0.1.23
 
 ### Patch Changes

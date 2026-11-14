@@ -1,5 +1,47 @@
 ## [11.0.2](https://github.com/noshiro-pf/ts-fortress/compare/v11.0.1...v11.0.2) (2026-07-24)
 
+## 13.0.0
+
+### Major Changes
+
+- a6d03ea: The `Result` re-exported from ts-data-forge now comes from ts-data-forge 15, whose `Optional` is unwrapped at runtime: `Result.toOptional` returns, and `Result.fromOptional` takes, an `Optional` whose `Some` is the value itself, with no `value` or `$$tag` property. Read the value with `Optional.unwrap` (from ts-data-forge or ts-std-forge) instead of `.value`.
+- a6d03ea: Remove `simpleBrandedNumber` and `simpleBrandedString`. Both have been deprecated aliases since 5.0.0. Use `brandedNumber` and `brandedString`, which take the same arguments.
+
+### Minor Changes
+
+- 7d6f898: Export the types the validators name: `UnknownType`, the option types of `iso8601` and `uuid` (`Iso8601ValidatorOption`, `UuidVersionAdditionalOption`, `UuidValidatorOption`), and `UuidOf`, the type `uuid` validates for a version. `number`, `bigint` and `string` now name `NumberTypeConstraints`, `BigintTypeConstraints` and `StringTypeConstraints` in their signatures, the exported names of the types they took already.
+
+### Patch Changes
+
+- bf5b643: `enumType(values, { allowAnyString: true })` without a string `defaultValue` now accepts any string, as its type says: it accepted only the listed members, and `fill` replaced any other string with the first, while with a string `defaultValue` it already accepted any string. Given a `defaultValue` or not, it is now a string type with the structure `{ kind: 'string' }`, so `toJsonSchema` writes `{ type: 'string' }` rather than an `enum` of the members, and its default is the first member unless a string is given.
+
+    Its validation errors change with it. Without a string `defaultValue`, an error had the details `{ kind: 'enum', values }` and the message `expected one of { red, green } but …`; it now has no details and the message `expected <string> type but …`, with a given `typeName` in place of `string`. Without a `typeName` either, its `typeName` was `enum` and is now `string`. With a string `defaultValue`, a given `typeName` is now kept, in `typeName` and in the messages, where both said `string`. It no longer carries the `constraints` record, all of whose entries were unset, that it had with a string `defaultValue`.
+
+    Any other `enumType` takes a `defaultValue` of `null` or `undefined` when the enum lists it, where the first member replaced it. A `defaultValue` it does not list that is neither `null` nor `undefined`, which only a value past the types can be, is now replaced by the first member, where it was kept as given, so that `defaultValue` and `fill` always satisfy `is`. An unlisted `null` or `undefined` was replaced already.
+
+    Every `enumType` now reads a `defaultValue` given in `options` exactly once, when the type is built. A getter that supplies it runs once and throws, if it throws, from `enumType` itself; before, it could run more than once, or not until the default was first needed, and a change to `options` made before then reached the type.
+
+- 9b52ae3: A module that exports a codec with an inferred type now emits declarations that type-check. `export const X = t.record({ … })` is written out structurally in the `.d.mts`, and that form did not satisfy the bound `t.TypeOf` and several combinators (`t.union`, `t.tuple`, `t.intersection`, `t.MapType`, `t.SetType`, `t.record`, `t.optional`, `t.annotate`, …) put on a codec, so `export type X = t.TypeOf<typeof X>` failed with TS2344 inside the emitted file for anyone compiling it with `skipLibCheck: false`. The bound no longer constrains the parameter of `prune`, which is what the structural form could not match. Packages already published with such declarations are repaired by installing this version.
+
+    `t.at(X, key)` on a record codec imported from another package's declarations now returns the member type the shape holds, constraints included, as it does in the module that declares `X`.
+
+    `t.Type`, `t.TypeStructure` and `t.UnknownShape` are as they were. `t.UnknownType` is the loosened bound itself: a bound of your own written as `<C extends t.UnknownType>` accepts a codec whose type another package's declarations wrote out structurally, which `<C extends t.Type<unknown>>` might not. A value typed by `t.UnknownType` is not a `t.Type<unknown>`: its `prune` cannot be called, and it cannot be passed where `t.Type<unknown>` is asked for. Two bounds still reject such a codec: `t.mergeRecords`, and a key of `t.keyValueRecord` narrower than `string`.
+
+- 3ce9fd4: `t.minLengthTuple(n, elementType).fill(value)` keeps every element of an array that already has `n` or more, each passed through the element type's `fill`, instead of cutting the array down to exactly `n` (`fill([1, 2, 3])` for a minimum of 2 is `[1, 2, 3]`, not `[1, 2]`). A shorter array is still padded up to `n`, as `t.minLengthArray` does. Code that relied on `fill` to cut a longer array down to `n` elements has to cut it itself.
+- 442792e: `t.string(defaultValue, { regex })` gives the same answer for the same value whatever flags the regex has. A regex with the `g` or `y` flag used to be tested from the `lastIndex` the previous call left, so `is` could return `false` for a matching value (with `/a/g` and the default `'ab'`, every `is('ab')` did). The value is now searched from index 0 and the regex's `lastIndex` is left as the caller set it; a sticky regex still has to match at index 0.
+- Updated dependencies [2f758a4]
+- Updated dependencies [ae57625]
+- Updated dependencies [e9340d0]
+- Updated dependencies [a6d03ea]
+- Updated dependencies [a6d03ea]
+- Updated dependencies [e7b459f]
+- Updated dependencies [d5640ce]
+- Updated dependencies [7d6f898]
+- Updated dependencies [40645fa]
+    - ts-type-forge@9.2.6
+    - ts-std-forge@0.6.0
+    - ts-data-forge@15.0.0
+
 ## 12.4.7
 
 ### Patch Changes

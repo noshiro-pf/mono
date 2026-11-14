@@ -1,5 +1,44 @@
 # blueprint-synstate
 
+## 0.12.0
+
+### Minor Changes
+
+- e0a9224: `blueprint-synstate/focus-visible.css`: imported after Blueprint's style sheets, it draws the focus ring for keyboard focus only, as Blueprint React's `FocusStyleManager.onlyShowFocusOnTabs()` does, so that a button, tab or checkbox clicked with the mouse keeps no ring; as Blueprint's, it leaves the ring inside `.bp6-focus-style-manager-ignore`.
+- 6dfcbe9: Add Blueprint's `maximize` and `minimize` icons.
+- 28d2ec0: `DateInput` shows a value outside `minDate` to `maxDate` as its date, drawn as an error, where it showed "Out of range" as Blueprint's does. The range says what can be picked and typed; a value stored outside it, as Enter on a typed date or a saved document can give, still reads as itself, and changing the month in the calendar leaves it as it is. The input carries `aria-invalid` while it draws the error, for a value that is not a date too.
+
+    Breaking: `DateInput`'s `outOfRangeMessage` is removed, as nothing shows it any more. `DateRangeInput` keeps its own.
+
+- f8a625b: A `Tab` with no `panel` takes `panelId`: the `id` of the element, drawn elsewhere, that it controls, written as its `aria-controls`, so that the content a navbar's tabs choose can be their `tabpanel`. `tabTitleId(tabsId, tabId)` gives the `id` of a tab's title, for that element's `aria-labelledby`.
+- a6d03ea: Require `synstate` 9 as a peer (and, for synstate-dom and blueprint-synstate, `ts-data-forge` 15). Its `Optional` is unwrapped at runtime (a `Some` is the value it holds), and these packages read the snapshots of observables through `Optional.unwrap`, which would misread the `{ $$tag, value }` object an earlier synstate returns. The peer ranges move with this release (`changeset version` raises the `>=` peer range of a released dependent to the dependency's new version). In synstate-dom, avoid giving `MatchOptional` a constant `Optional.some(observable$)`: a `Some` is its value at runtime, so it is read as `observable$` itself.
+
+### Patch Changes
+
+- 6250851: `DateInput` and `DateRangeInput` draw their popover with the code `Popover` and `Tooltip` use: Floating UI places it `bottom-start`, above the field where there is room there and not below, shifted to stay in the viewport, and the arrow and its transition are `Popover`'s. It is still drawn in place after the field and positioned `fixed`, so it keeps working inside a modal `<dialog>`. As Blueprint's, it is an overlay of its own while it is open: inside a `bp6-dark` element it carries `bp6-dark`, an enclosing `Dialog` or `Popover` does not hold the focus inside itself until the calendar closes, and an Escape pressed outside the calendar that nothing took, as with the focus on nothing in particular, closes the calendar and leaves the focus where it is. One in the calendar still gives the focus back to the field.
+- 02ebb3a: `Toaster.remove` calls the `onDismiss` of each toast still shown with `false`, as `clear` does, once the toaster is out of the page, and drops those waiting to be shown, as `clear` drops them; a second `remove` does nothing, and a toast shown after it is ignored, including one an `onDismiss` shows then. An `onDismiss` is called once however its callback dismisses, clears or removes again, and one that throws is reported without keeping the others from being called. A toast an `onDismiss` shows while `clear` runs stays, where it was dropped.
+- Updated dependencies [2f758a4]
+- Updated dependencies [ae57625]
+- Updated dependencies [e9340d0]
+- Updated dependencies [a6d03ea]
+- Updated dependencies [a6d03ea]
+- Updated dependencies [e7b459f]
+- Updated dependencies [430b433]
+- Updated dependencies [553a883]
+- Updated dependencies [1319948]
+- Updated dependencies [6c7a0d3]
+- Updated dependencies [a34ddd2]
+- Updated dependencies [a9163fe]
+- Updated dependencies [6722a9e]
+- Updated dependencies [593ca51]
+- Updated dependencies [dcf7544]
+- Updated dependencies [d5640ce]
+- Updated dependencies [40645fa]
+    - ts-type-forge@9.2.6
+    - ts-data-forge@15.0.0
+    - synstate-dom@0.11.0
+    - synstate@9.0.0
+
 ## 0.11.0
 
 ### Minor Changes
