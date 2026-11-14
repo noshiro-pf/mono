@@ -6,6 +6,11 @@
  *   |     |
  *   |     +-- email
  *   |
+ *   +-- internal/closingMail
+ *   |     |
+ *   |     +-- deadlineMillis
+ *   |     +-- claimId
+ *   |
  *   +-- answers
  *         |
  *         +-- answer1
@@ -20,4 +25,7 @@ export const firestorePaths = {
   internal: 'internal',
   values: 'values',
   email: 'email',
+  closingMail: 'closingMail',
+  deadlineMillis: 'deadlineMillis',
+  claimId: 'claimId',
 } as const;

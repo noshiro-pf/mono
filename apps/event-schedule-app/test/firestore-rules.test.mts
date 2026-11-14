@@ -490,6 +490,41 @@ const cases = (): readonly Case[] =>
       operation: (db) => deleteDoc(doc(db, 'events_v7/owned/internal/values')),
       expected: 'denied',
     },
+
+    // `internal/closingMail`: the functions' record of the "answers closed"
+    // mail, which no rule matches.
+    {
+      name: 'the author reads internal/closingMail',
+      actor: 'bob',
+      operation: (db) =>
+        getDoc(doc(db, 'events_v7/owned/internal/closingMail')),
+      expected: 'denied',
+    },
+    {
+      name: 'the author writes internal/closingMail',
+      actor: 'bob',
+      operation: (db) =>
+        setDoc(doc(db, 'events_v7/owned/internal/closingMail'), {
+          deadlineMillis: 0,
+        }),
+      expected: 'denied',
+    },
+    {
+      name: 'anyone writes internal/closingMail of an anonymous event',
+      actor: 'signed out',
+      operation: (db) =>
+        setDoc(doc(db, 'events_v7/anonymous/internal/closingMail'), {
+          deadlineMillis: 0,
+        }),
+      expected: 'denied',
+    },
+    {
+      name: 'the author deletes internal/closingMail',
+      actor: 'bob',
+      operation: (db) =>
+        deleteDoc(doc(db, 'events_v7/owned/internal/closingMail')),
+      expected: 'denied',
+    },
   ] as const;
 
 const alice = { id: 'alice', name: 'Alice' } as const;
@@ -555,6 +590,10 @@ const seed = async (): Promise<void> => {
 
     batch.set(db.doc('events_v7/owned/internal/values'), {
       email: 'bob@example.com',
+    });
+
+    batch.set(db.doc('events_v7/owned/internal/closingMail'), {
+      deadlineMillis: 0,
     });
 
     await batch.commit();

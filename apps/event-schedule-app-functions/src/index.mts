@@ -3,10 +3,10 @@ import { initializeApp } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
 import { https, logger, region } from 'firebase-functions/v1';
 import { DateUtils } from 'ts-fortress-types';
-import type { MinutesEnum } from 'ts-type-forge';
 import { runtimeConfig } from './env.mjs';
 import { fetchEventListOfUserImpl } from './fetch-event-list-of-user.mjs';
 import {
+  closingMailTimeoutSeconds,
   notifyAfterAnswerDeadline,
   notifyAnswerDeadline,
 } from './notify-answer-deadline.mjs';
@@ -24,7 +24,9 @@ import { verifyEmailImpl } from './verify-email.mjs';
 
 initializeApp();
 
-const regionSelected = region('asia-northeast2');
+const regionName = 'asia-northeast2';
+
+const regionSelected = region(regionName);
 
 /** For the functions that send mail, which is what reads `runtimeConfig`. */
 const regionSelectedWithConfig = regionSelected.runWith({
@@ -106,19 +108,25 @@ export const notifyAnswerDeadlineEveryday = regionSelectedWithConfig.pubsub
     notifyAnswerDeadline(db, eventTimeMillis(context.timestamp)),
   );
 
-const minutes: MinutesEnum = 10;
-
-export const notifyAfterAnswerDeadlineEveryMinutes =
-  regionSelectedWithConfig.pubsub
-    .schedule(`*/${minutes} * * * *`)
-    .timeZone(scheduleTimeZone)
-    .onRun((context) =>
-      notifyAfterAnswerDeadline(
-        db,
-        minutes,
-        eventTimeMillis(context.timestamp),
-      ),
-    );
+/**
+ * Every 10 minutes, which is how late the "answers closed" mail normally is,
+ * not which deadlines a run looks at: a run takes every deadline of the last
+ * day that has no mail yet (`notifyAfterAnswerDeadline`), so one that is
+ * skipped is made up for by the next.
+ *
+ * The time limit is given because the run budgets its work against it, and on a
+ * builder of this function's own, so that it is this function's alone.
+ */
+export const notifyAfterAnswerDeadlineEveryMinutes = region(regionName)
+  .runWith({
+    secrets: [runtimeConfig],
+    timeoutSeconds: closingMailTimeoutSeconds,
+  })
+  .pubsub.schedule('*/10 * * * *')
+  .timeZone(scheduleTimeZone)
+  .onRun((context) =>
+    notifyAfterAnswerDeadline(db, eventTimeMillis(context.timestamp)),
+  );
 
 // export const answerPagePreRender = functions
 //   .region('asia-northeast2')
