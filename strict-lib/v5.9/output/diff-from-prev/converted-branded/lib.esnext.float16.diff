@@ -1,15 +1,15 @@
 diff --git a/v5.8/output/lib-files-branded/lib.esnext.float16.d.ts b/v5.9/output/lib-files-branded/lib.esnext.float16.d.ts
-index ecfecefdae9dfd2b270de5236dd92a61134a108a..65582903599f86c0ed51900b713a50e576b785d7 100644
+index 422b25ce0ca210e76c42527ef2c3c41725bec6a0..d64514ad8ff2f11b7b07d40aa45f208d4f0fc7e5 100644
 --- a/v5.8/output/lib-files-branded/lib.esnext.float16.d.ts
 +++ b/v5.9/output/lib-files-branded/lib.esnext.float16.d.ts
-@@ -527,6 +527,14 @@ interface Float16ArrayConstructor {
-     byteOffset?: NumberType.TypedArraySize,
-     length?: NumberType.TypedArraySize,
+@@ -529,6 +529,14 @@ interface Float16ArrayConstructor {
+     byteOffset?: NumberType.TypedArraySizeArgNonNegative,
+     length?: NumberType.TypedArraySizeArgNonNegative,
    ): Float16Array<TArrayBuffer>;
 +  new (
 +    buffer: ArrayBuffer,
-+    byteOffset?: NumberType.TypedArraySize,
-+    length?: NumberType.TypedArraySize,
++    byteOffset?: NumberType.TypedArraySizeArgNonNegative,
++    length?: NumberType.TypedArraySizeArgNonNegative,
 +  ): Float16Array<ArrayBuffer>;
 +  new (
 +    array: ArrayLike<import('ts-type-forge').Float16> | ArrayBuffer,

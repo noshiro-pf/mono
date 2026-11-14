@@ -174,7 +174,7 @@ interface Atomics {
   notify(
     typedArray: BigInt64Array<ArrayBufferLike>,
     index: NumberType.TypedArraySizeArg,
-    count?: import('ts-type-forge').SafeUint,
+    count?: NumberType.TypedArraySizeArgNonNegative,
   ): import('ts-type-forge').SafeUint;
 
   /**

@@ -1,5 +1,5 @@
 diff --git a/v5.6/output/lib-files-branded/lib.es2020.bigint.d.ts b/v5.7/output/lib-files-branded/lib.es2020.bigint.d.ts
-index f58ae8370879618cc601d91f9eda49dc8d1405e2..db5134e2a5d7ee3183528987c33a888bbc885ff5 100644
+index adb8a22aa159e0ef059069fce58ab585168fcbcf..794514400325308d315ffc02cb074865a117a214 100644
 --- a/v5.6/output/lib-files-branded/lib.es2020.bigint.d.ts
 +++ b/v5.7/output/lib-files-branded/lib.es2020.bigint.d.ts
 @@ -26,7 +26,7 @@ and limitations under the License.
@@ -162,17 +162,19 @@ index f58ae8370879618cc601d91f9eda49dc8d1405e2..db5134e2a5d7ee3183528987c33a888b
  
    /** Yields each value in the array. */
    values(): ArrayIterator<import('ts-type-forge').BigInt64>;
-@@ -531,16 +533,22 @@ interface BigInt64Array {
+@@ -531,16 +533,24 @@ interface BigInt64Array {
  
    [index: number]: import('ts-type-forge').BigInt64;
  }
 -
  interface BigInt64ArrayConstructor {
 -  readonly prototype: BigInt64Array;
--  new (length?: NumberType.TypedArraySize): BigInt64Array;
+-  new (length?: NumberType.TypedArraySizeArgNonNegative): BigInt64Array;
 -  new (array: Iterable<import('ts-type-forge').BigInt64>): BigInt64Array;
 +  readonly prototype: BigInt64Array<ArrayBufferLike>;
-+  new (length?: NumberType.TypedArraySize): BigInt64Array<ArrayBuffer>;
++  new (
++    length?: NumberType.TypedArraySizeArgNonNegative,
++  ): BigInt64Array<ArrayBuffer>;
    new (
 -    buffer: ArrayBufferLike,
 +    array:
@@ -182,7 +184,7 @@ index f58ae8370879618cc601d91f9eda49dc8d1405e2..db5134e2a5d7ee3183528987c33a888b
 +  new <TArrayBuffer extends ArrayBufferLike = ArrayBuffer>(
 +    buffer: TArrayBuffer,
      byteOffset?: NumberType.TypedArraySizeArgNonNegative,
-     length?: NumberType.TypedArraySize,
+     length?: NumberType.TypedArraySizeArgNonNegative,
 -  ): BigInt64Array;
 +  ): BigInt64Array<TArrayBuffer>;
 +  new (
@@ -191,7 +193,7 @@ index f58ae8370879618cc601d91f9eda49dc8d1405e2..db5134e2a5d7ee3183528987c33a888b
  
    /** The size in bytes of each element in the array. */
    readonly BYTES_PER_ELEMENT: 8;
-@@ -549,7 +557,9 @@ interface BigInt64ArrayConstructor {
+@@ -549,7 +559,9 @@ interface BigInt64ArrayConstructor {
     * Returns a new array from a set of elements.
     * @param items A set of elements to include in the new array object.
     */
@@ -202,7 +204,7 @@ index f58ae8370879618cc601d91f9eda49dc8d1405e2..db5134e2a5d7ee3183528987c33a888b
  
    /**
     * Creates an array from an array-like or iterable object.
-@@ -557,7 +567,15 @@ interface BigInt64ArrayConstructor {
+@@ -557,7 +569,15 @@ interface BigInt64ArrayConstructor {
     * @param mapfn A mapping function to call on every element of the array.
     * @param thisArg Value of 'this' used to invoke the mapfn.
     */
@@ -219,7 +221,7 @@ index f58ae8370879618cc601d91f9eda49dc8d1405e2..db5134e2a5d7ee3183528987c33a888b
    from<U>(
      arrayLike: ArrayLike<U>,
      mapfn: (
-@@ -565,21 +583,22 @@ interface BigInt64ArrayConstructor {
+@@ -565,21 +585,22 @@ interface BigInt64ArrayConstructor {
        k: NumberType.TypedArraySize,
      ) => import('ts-type-forge').BigInt64,
      thisArg?: unknown,
@@ -246,7 +248,7 @@ index f58ae8370879618cc601d91f9eda49dc8d1405e2..db5134e2a5d7ee3183528987c33a888b
  
    /** The length in bytes of the array. */
    readonly byteLength: NumberType.TypedArraySize;
-@@ -619,7 +638,7 @@ interface BigUint64Array {
+@@ -619,7 +640,7 @@ interface BigUint64Array {
      predicate: (
        value: import('ts-type-forge').BigUint64,
        index: NumberType.TypedArraySize,
@@ -255,7 +257,7 @@ index f58ae8370879618cc601d91f9eda49dc8d1405e2..db5134e2a5d7ee3183528987c33a888b
      ) => boolean,
      thisArg?: unknown,
    ): boolean;
-@@ -649,10 +668,10 @@ interface BigUint64Array {
+@@ -649,10 +670,10 @@ interface BigUint64Array {
      predicate: (
        value: import('ts-type-forge').BigUint64,
        index: NumberType.TypedArraySize,
@@ -268,7 +270,7 @@ index f58ae8370879618cc601d91f9eda49dc8d1405e2..db5134e2a5d7ee3183528987c33a888b
  
    /**
     * Returns the value of the first element in the array where predicate is true, and undefined
-@@ -667,7 +686,7 @@ interface BigUint64Array {
+@@ -667,7 +688,7 @@ interface BigUint64Array {
      predicate: (
        value: import('ts-type-forge').BigUint64,
        index: NumberType.TypedArraySize,
@@ -277,7 +279,7 @@ index f58ae8370879618cc601d91f9eda49dc8d1405e2..db5134e2a5d7ee3183528987c33a888b
      ) => boolean,
      thisArg?: unknown,
    ): import('ts-type-forge').BigUint64 | undefined;
-@@ -685,7 +704,7 @@ interface BigUint64Array {
+@@ -685,7 +706,7 @@ interface BigUint64Array {
      predicate: (
        value: import('ts-type-forge').BigUint64,
        index: NumberType.TypedArraySize,
@@ -286,7 +288,7 @@ index f58ae8370879618cc601d91f9eda49dc8d1405e2..db5134e2a5d7ee3183528987c33a888b
      ) => boolean,
      thisArg?: unknown,
    ): NumberType.TypedArraySearchResult;
-@@ -701,7 +720,7 @@ interface BigUint64Array {
+@@ -701,7 +722,7 @@ interface BigUint64Array {
      callbackfn: (
        value: import('ts-type-forge').BigUint64,
        index: NumberType.TypedArraySize,
@@ -295,7 +297,7 @@ index f58ae8370879618cc601d91f9eda49dc8d1405e2..db5134e2a5d7ee3183528987c33a888b
      ) => void,
      thisArg?: unknown,
    ): void;
-@@ -763,10 +782,10 @@ interface BigUint64Array {
+@@ -763,10 +784,10 @@ interface BigUint64Array {
      callbackfn: (
        value: import('ts-type-forge').BigUint64,
        index: NumberType.TypedArraySize,
@@ -308,7 +310,7 @@ index f58ae8370879618cc601d91f9eda49dc8d1405e2..db5134e2a5d7ee3183528987c33a888b
  
    /**
     * Calls the specified callback function for all the elements in an array. The return value of
-@@ -783,7 +802,7 @@ interface BigUint64Array {
+@@ -783,7 +804,7 @@ interface BigUint64Array {
        previousValue: import('ts-type-forge').BigUint64,
        currentValue: import('ts-type-forge').BigUint64,
        currentIndex: NumberType.TypedArraySize,
@@ -317,7 +319,7 @@ index f58ae8370879618cc601d91f9eda49dc8d1405e2..db5134e2a5d7ee3183528987c33a888b
      ) => import('ts-type-forge').BigUint64,
    ): import('ts-type-forge').BigUint64;
  
-@@ -802,7 +821,7 @@ interface BigUint64Array {
+@@ -802,7 +823,7 @@ interface BigUint64Array {
        previousValue: U,
        currentValue: import('ts-type-forge').BigUint64,
        currentIndex: NumberType.TypedArraySize,
@@ -326,7 +328,7 @@ index f58ae8370879618cc601d91f9eda49dc8d1405e2..db5134e2a5d7ee3183528987c33a888b
      ) => U,
      initialValue: U,
    ): U;
-@@ -822,7 +841,7 @@ interface BigUint64Array {
+@@ -822,7 +843,7 @@ interface BigUint64Array {
        previousValue: import('ts-type-forge').BigUint64,
        currentValue: import('ts-type-forge').BigUint64,
        currentIndex: NumberType.TypedArraySize,
@@ -335,7 +337,7 @@ index f58ae8370879618cc601d91f9eda49dc8d1405e2..db5134e2a5d7ee3183528987c33a888b
      ) => import('ts-type-forge').BigUint64,
    ): import('ts-type-forge').BigUint64;
  
-@@ -841,7 +860,7 @@ interface BigUint64Array {
+@@ -841,7 +862,7 @@ interface BigUint64Array {
        previousValue: U,
        currentValue: import('ts-type-forge').BigUint64,
        currentIndex: NumberType.TypedArraySize,
@@ -344,7 +346,7 @@ index f58ae8370879618cc601d91f9eda49dc8d1405e2..db5134e2a5d7ee3183528987c33a888b
      ) => U,
      initialValue: U,
    ): U;
-@@ -867,7 +886,7 @@ interface BigUint64Array {
+@@ -867,7 +888,7 @@ interface BigUint64Array {
    slice(
      start?: NumberType.TypedArraySizeArg,
      end?: NumberType.TypedArraySizeArg,
@@ -353,7 +355,7 @@ index f58ae8370879618cc601d91f9eda49dc8d1405e2..db5134e2a5d7ee3183528987c33a888b
  
    /**
     * Determines whether the specified callback function returns true for any element of an array.
-@@ -881,7 +900,7 @@ interface BigUint64Array {
+@@ -881,7 +902,7 @@ interface BigUint64Array {
      predicate: (
        value: import('ts-type-forge').BigUint64,
        index: NumberType.TypedArraySize,
@@ -362,7 +364,7 @@ index f58ae8370879618cc601d91f9eda49dc8d1405e2..db5134e2a5d7ee3183528987c33a888b
      ) => boolean,
      thisArg?: unknown,
    ): boolean;
-@@ -906,7 +925,7 @@ interface BigUint64Array {
+@@ -906,7 +927,7 @@ interface BigUint64Array {
    subarray(
      begin?: NumberType.TypedArraySizeArg,
      end?: NumberType.TypedArraySizeArg,
@@ -371,7 +373,7 @@ index f58ae8370879618cc601d91f9eda49dc8d1405e2..db5134e2a5d7ee3183528987c33a888b
  
    /** Converts the array to a string by using the current locale. */
    toLocaleString(
-@@ -918,7 +937,7 @@ interface BigUint64Array {
+@@ -918,7 +939,7 @@ interface BigUint64Array {
    toString(): string;
  
    /** Returns the primitive value of the specified object. */
@@ -380,19 +382,21 @@ index f58ae8370879618cc601d91f9eda49dc8d1405e2..db5134e2a5d7ee3183528987c33a888b
  
    /** Yields each value in the array. */
    values(): ArrayIterator<import('ts-type-forge').BigUint64>;
-@@ -929,16 +948,22 @@ interface BigUint64Array {
+@@ -929,16 +950,24 @@ interface BigUint64Array {
  
    [index: number]: import('ts-type-forge').BigUint64;
  }
 -
  interface BigUint64ArrayConstructor {
 -  readonly prototype: BigUint64Array;
--  new (length?: NumberType.TypedArraySize): BigUint64Array;
+-  new (length?: NumberType.TypedArraySizeArgNonNegative): BigUint64Array;
 -  new (array: Iterable<import('ts-type-forge').BigUint64>): BigUint64Array;
 +  readonly prototype: BigUint64Array<ArrayBufferLike>;
-+  new (length?: NumberType.TypedArraySize): BigUint64Array<ArrayBuffer>;
    new (
 -    buffer: ArrayBufferLike,
++    length?: NumberType.TypedArraySizeArgNonNegative,
++  ): BigUint64Array<ArrayBuffer>;
++  new (
 +    array:
 +      | ArrayLike<import('ts-type-forge').BigUint64>
 +      | Iterable<import('ts-type-forge').BigUint64>,
@@ -400,7 +404,7 @@ index f58ae8370879618cc601d91f9eda49dc8d1405e2..db5134e2a5d7ee3183528987c33a888b
 +  new <TArrayBuffer extends ArrayBufferLike = ArrayBuffer>(
 +    buffer: TArrayBuffer,
      byteOffset?: NumberType.TypedArraySizeArgNonNegative,
-     length?: NumberType.TypedArraySize,
+     length?: NumberType.TypedArraySizeArgNonNegative,
 -  ): BigUint64Array;
 +  ): BigUint64Array<TArrayBuffer>;
 +  new (
@@ -409,7 +413,7 @@ index f58ae8370879618cc601d91f9eda49dc8d1405e2..db5134e2a5d7ee3183528987c33a888b
  
    /** The size in bytes of each element in the array. */
    readonly BYTES_PER_ELEMENT: 8;
-@@ -947,7 +972,9 @@ interface BigUint64ArrayConstructor {
+@@ -947,7 +976,9 @@ interface BigUint64ArrayConstructor {
     * Returns a new array from a set of elements.
     * @param items A set of elements to include in the new array object.
     */
@@ -420,7 +424,7 @@ index f58ae8370879618cc601d91f9eda49dc8d1405e2..db5134e2a5d7ee3183528987c33a888b
  
    /**
     * Creates an array from an array-like or iterable object.
-@@ -965,10 +992,9 @@ interface BigUint64ArrayConstructor {
+@@ -965,10 +996,9 @@ interface BigUint64ArrayConstructor {
      thisArg?: unknown,
    ): BigUint64Array;
  }

@@ -531,12 +531,12 @@ interface BigInt64Array {
 
 interface BigInt64ArrayConstructor {
   readonly prototype: BigInt64Array;
-  new (length?: NumberType.TypedArraySize): BigInt64Array;
+  new (length?: NumberType.TypedArraySizeArgNonNegative): BigInt64Array;
   new (array: Iterable<import('ts-type-forge').BigInt64>): BigInt64Array;
   new (
     buffer: ArrayBufferLike,
     byteOffset?: NumberType.TypedArraySizeArgNonNegative,
-    length?: NumberType.TypedArraySize,
+    length?: NumberType.TypedArraySizeArgNonNegative,
   ): BigInt64Array;
 
   /** The size in bytes of each element in the array. */
@@ -926,12 +926,12 @@ interface BigUint64Array {
 
 interface BigUint64ArrayConstructor {
   readonly prototype: BigUint64Array;
-  new (length?: NumberType.TypedArraySize): BigUint64Array;
+  new (length?: NumberType.TypedArraySizeArgNonNegative): BigUint64Array;
   new (array: Iterable<import('ts-type-forge').BigUint64>): BigUint64Array;
   new (
     buffer: ArrayBufferLike,
     byteOffset?: NumberType.TypedArraySizeArgNonNegative,
-    length?: NumberType.TypedArraySize,
+    length?: NumberType.TypedArraySizeArgNonNegative,
   ): BigUint64Array;
 
   /** The size in bytes of each element in the array. */

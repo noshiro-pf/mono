@@ -2225,7 +2225,7 @@ type ArrayBufferLike = ArrayBufferTypes[keyof ArrayBufferTypes];
 
 interface ArrayBufferConstructor {
   readonly prototype: ArrayBuffer;
-  new (byteLength: NumberType.TypedArraySize): ArrayBuffer;
+  new (byteLength: NumberType.TypedArraySizeArgNonNegative): ArrayBuffer;
   isView(arg: unknown): arg is ArrayBufferView;
 }
 declare const ArrayBuffer: ArrayBufferConstructor;
@@ -2431,8 +2431,8 @@ interface DataViewConstructor {
   readonly prototype: DataView;
   new (
     buffer: ArrayBufferLike,
-    byteOffset?: NumberType.TypedArraySize,
-    byteLength?: NumberType.TypedArraySize,
+    byteOffset?: NumberType.TypedArraySizeArgNonNegative,
+    byteLength?: NumberType.TypedArraySizeArgNonNegative,
   ): DataView;
 }
 declare const DataView: DataViewConstructor;
@@ -2809,14 +2809,14 @@ interface Int8Array {
 }
 interface Int8ArrayConstructor {
   readonly prototype: Int8Array;
-  new (length: NumberType.TypedArraySize): Int8Array;
+  new (length: NumberType.TypedArraySizeArgNonNegative): Int8Array;
   new (
     array: ArrayLike<import('ts-type-forge').Int8> | ArrayBufferLike,
   ): Int8Array;
   new (
     buffer: ArrayBufferLike,
-    byteOffset?: NumberType.TypedArraySize,
-    length?: NumberType.TypedArraySize,
+    byteOffset?: NumberType.TypedArraySizeArgNonNegative,
+    length?: NumberType.TypedArraySizeArgNonNegative,
   ): Int8Array;
 
   /**
@@ -3223,14 +3223,14 @@ interface Uint8Array {
 
 interface Uint8ArrayConstructor {
   readonly prototype: Uint8Array;
-  new (length: NumberType.TypedArraySize): Uint8Array;
+  new (length: NumberType.TypedArraySizeArgNonNegative): Uint8Array;
   new (
     array: ArrayLike<import('ts-type-forge').Uint8> | ArrayBufferLike,
   ): Uint8Array;
   new (
     buffer: ArrayBufferLike,
-    byteOffset?: NumberType.TypedArraySize,
-    length?: NumberType.TypedArraySize,
+    byteOffset?: NumberType.TypedArraySizeArgNonNegative,
+    length?: NumberType.TypedArraySizeArgNonNegative,
   ): Uint8Array;
 
   /**
@@ -3640,14 +3640,14 @@ interface Uint8ClampedArray {
 
 interface Uint8ClampedArrayConstructor {
   readonly prototype: Uint8ClampedArray;
-  new (length: NumberType.TypedArraySize): Uint8ClampedArray;
+  new (length: NumberType.TypedArraySizeArgNonNegative): Uint8ClampedArray;
   new (
     array: ArrayLike<import('ts-type-forge').Uint8> | ArrayBufferLike,
   ): Uint8ClampedArray;
   new (
     buffer: ArrayBufferLike,
-    byteOffset?: NumberType.TypedArraySize,
-    length?: NumberType.TypedArraySize,
+    byteOffset?: NumberType.TypedArraySizeArgNonNegative,
+    length?: NumberType.TypedArraySizeArgNonNegative,
   ): Uint8ClampedArray;
 
   /**
@@ -4057,14 +4057,14 @@ interface Int16Array {
 
 interface Int16ArrayConstructor {
   readonly prototype: Int16Array;
-  new (length: NumberType.TypedArraySize): Int16Array;
+  new (length: NumberType.TypedArraySizeArgNonNegative): Int16Array;
   new (
     array: ArrayLike<import('ts-type-forge').Int16> | ArrayBufferLike,
   ): Int16Array;
   new (
     buffer: ArrayBufferLike,
-    byteOffset?: NumberType.TypedArraySize,
-    length?: NumberType.TypedArraySize,
+    byteOffset?: NumberType.TypedArraySizeArgNonNegative,
+    length?: NumberType.TypedArraySizeArgNonNegative,
   ): Int16Array;
 
   /**
@@ -4474,14 +4474,14 @@ interface Uint16Array {
 
 interface Uint16ArrayConstructor {
   readonly prototype: Uint16Array;
-  new (length: NumberType.TypedArraySize): Uint16Array;
+  new (length: NumberType.TypedArraySizeArgNonNegative): Uint16Array;
   new (
     array: ArrayLike<import('ts-type-forge').Uint16> | ArrayBufferLike,
   ): Uint16Array;
   new (
     buffer: ArrayBufferLike,
-    byteOffset?: NumberType.TypedArraySize,
-    length?: NumberType.TypedArraySize,
+    byteOffset?: NumberType.TypedArraySizeArgNonNegative,
+    length?: NumberType.TypedArraySizeArgNonNegative,
   ): Uint16Array;
 
   /**
@@ -4890,14 +4890,14 @@ interface Int32Array {
 
 interface Int32ArrayConstructor {
   readonly prototype: Int32Array;
-  new (length: NumberType.TypedArraySize): Int32Array;
+  new (length: NumberType.TypedArraySizeArgNonNegative): Int32Array;
   new (
     array: ArrayLike<import('ts-type-forge').Int32> | ArrayBufferLike,
   ): Int32Array;
   new (
     buffer: ArrayBufferLike,
-    byteOffset?: NumberType.TypedArraySize,
-    length?: NumberType.TypedArraySize,
+    byteOffset?: NumberType.TypedArraySizeArgNonNegative,
+    length?: NumberType.TypedArraySizeArgNonNegative,
   ): Int32Array;
 
   /**
@@ -5307,14 +5307,14 @@ interface Uint32Array {
 
 interface Uint32ArrayConstructor {
   readonly prototype: Uint32Array;
-  new (length: NumberType.TypedArraySize): Uint32Array;
+  new (length: NumberType.TypedArraySizeArgNonNegative): Uint32Array;
   new (
     array: ArrayLike<import('ts-type-forge').Uint32> | ArrayBufferLike,
   ): Uint32Array;
   new (
     buffer: ArrayBufferLike,
-    byteOffset?: NumberType.TypedArraySize,
-    length?: NumberType.TypedArraySize,
+    byteOffset?: NumberType.TypedArraySizeArgNonNegative,
+    length?: NumberType.TypedArraySizeArgNonNegative,
   ): Uint32Array;
 
   /**
@@ -5724,14 +5724,14 @@ interface Float32Array {
 
 interface Float32ArrayConstructor {
   readonly prototype: Float32Array;
-  new (length: NumberType.TypedArraySize): Float32Array;
+  new (length: NumberType.TypedArraySizeArgNonNegative): Float32Array;
   new (
     array: ArrayLike<import('ts-type-forge').Float32> | ArrayBufferLike,
   ): Float32Array;
   new (
     buffer: ArrayBufferLike,
-    byteOffset?: NumberType.TypedArraySize,
-    length?: NumberType.TypedArraySize,
+    byteOffset?: NumberType.TypedArraySizeArgNonNegative,
+    length?: NumberType.TypedArraySizeArgNonNegative,
   ): Float32Array;
 
   /**
@@ -6132,14 +6132,14 @@ interface Float64Array {
 
 interface Float64ArrayConstructor {
   readonly prototype: Float64Array;
-  new (length: NumberType.TypedArraySize): Float64Array;
+  new (length: NumberType.TypedArraySizeArgNonNegative): Float64Array;
   new (
     array: ArrayLike<import('ts-type-forge').Float64> | ArrayBufferLike,
   ): Float64Array;
   new (
     buffer: ArrayBufferLike,
-    byteOffset?: NumberType.TypedArraySize,
-    length?: NumberType.TypedArraySize,
+    byteOffset?: NumberType.TypedArraySizeArgNonNegative,
+    length?: NumberType.TypedArraySizeArgNonNegative,
   ): Float64Array;
 
   /**

@@ -190,7 +190,7 @@ export const convertLibEs5_TypedArray =
             mapFn: composeMonoTypeFns(
               replaceWithNoMatchCheck(
                 'byteOffset?: number',
-                `byteOffset?: ${options.brandedNumber.TypedArraySize}`,
+                `byteOffset?: ${options.brandedNumber.TypedArraySizeArgNonNegative}`,
               ),
               replaceWithNoMatchCheck(
                 'BYTES_PER_ELEMENT: number;',
@@ -203,12 +203,12 @@ export const convertLibEs5_TypedArray =
               replaceWithNoMatchCheck(
                 //
                 'length: number',
-                `length: ${options.brandedNumber.TypedArraySize}`,
+                `length: ${options.brandedNumber.TypedArraySizeArgNonNegative}`,
               ),
               replaceWithNoMatchCheck(
                 //
                 'length?: number',
-                `length?: ${options.brandedNumber.TypedArraySize}`,
+                `length?: ${options.brandedNumber.TypedArraySizeArgNonNegative}`,
               ),
               replaceWithNoMatchCheck(
                 'mapfn: (v: T, k: number) => number,',
@@ -226,7 +226,7 @@ export const convertLibEs5_TypedArray =
           }),
         ]),
 
-        // DataView
+        // ArrayBuffer
         replaceWithinInterface({
           name: 'ArrayBuffer',
           mapFn: replaceWithNoMatchCheck(
@@ -236,6 +236,12 @@ export const convertLibEs5_TypedArray =
           ),
         }),
 
+        // DataView
+        //
+        // The `byteOffset` of the number accessors below takes
+        // `TypedArraySizeArg`, which admits a negative value that throws a
+        // RangeError, where the constructor's and the BigInt accessors' take
+        // `TypedArraySizeArgNonNegative`.
         replaceWithinInterface({
           name: 'DataView',
           mapFn: composeMonoTypeFns(
@@ -302,11 +308,11 @@ export const convertLibEs5_TypedArray =
           mapFn: composeMonoTypeFns(
             replaceWithNoMatchCheck(
               'byteLength?: number',
-              `byteLength?: ${options.brandedNumber.TypedArraySize}`,
+              `byteLength?: ${options.brandedNumber.TypedArraySizeArgNonNegative}`,
             ),
             replaceWithNoMatchCheck(
               'byteOffset?: number',
-              `byteOffset?: ${options.brandedNumber.TypedArraySize}`,
+              `byteOffset?: ${options.brandedNumber.TypedArraySizeArgNonNegative}`,
             ),
           ),
         }),

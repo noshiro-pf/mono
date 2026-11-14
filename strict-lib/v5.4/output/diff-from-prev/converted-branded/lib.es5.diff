@@ -1,5 +1,5 @@
 diff --git a/v5.3/output/lib-files-branded/lib.es5.d.ts b/v5.4/output/lib-files-branded/lib.es5.d.ts
-index dbc2be6973cc3020ff85495ffba9ace61316a104..e15152df15911195768c3659c39fe38ec964b024 100644
+index 7e0e501c94e61d235d27a2cb16c9ddcae677cd3a..41361441cae10e908e526af8a593c5e8e2eeaea6 100644
 --- a/v5.3/output/lib-files-branded/lib.es5.d.ts
 +++ b/v5.4/output/lib-files-branded/lib.es5.d.ts
 @@ -769,6 +769,7 @@ interface ImportCallOptions {

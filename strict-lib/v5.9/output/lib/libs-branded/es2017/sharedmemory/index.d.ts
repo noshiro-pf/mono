@@ -369,7 +369,7 @@ interface Atomics {
   notify(
     typedArray: Int32Array<ArrayBufferLike>,
     index: NumberType.TypedArraySizeArg,
-    count?: import('ts-type-forge').SafeUint,
+    count?: NumberType.TypedArraySizeArgNonNegative,
   ): import('ts-type-forge').SafeUint;
 
   /**

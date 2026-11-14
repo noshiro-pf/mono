@@ -1,9 +1,9 @@
 diff --git a/v5.8/output/lib-files-branded/lib.esnext.float16.d.ts b/v5.8/output/lib-files-branded/lib.esnext.float16.d.ts
 new file mode 100644
-index 0000000000000000000000000000000000000000..ecfecefdae9dfd2b270de5236dd92a61134a108a
+index 0000000000000000000000000000000000000000..422b25ce0ca210e76c42527ef2c3c41725bec6a0
 --- /dev/null
 +++ b/v5.8/output/lib-files-branded/lib.esnext.float16.d.ts
-@@ -0,0 +1,623 @@
+@@ -0,0 +1,625 @@
 +/*! *****************************************************************************
 +Copyright (c) Microsoft Corporation. All rights reserved.
 +Licensed under the Apache License, Version 2.0 (the "License"); you may not use
@@ -524,14 +524,16 @@ index 0000000000000000000000000000000000000000..ecfecefdae9dfd2b270de5236dd92a61
 +
 +interface Float16ArrayConstructor {
 +  readonly prototype: Float16Array<ArrayBufferLike>;
-+  new (length?: NumberType.TypedArraySize): Float16Array<ArrayBuffer>;
++  new (
++    length?: NumberType.TypedArraySizeArgNonNegative,
++  ): Float16Array<ArrayBuffer>;
 +  new (
 +    array: ArrayLike<import('ts-type-forge').Float16> | Iterable<number>,
 +  ): Float16Array<ArrayBuffer>;
 +  new <TArrayBuffer extends ArrayBufferLike = ArrayBuffer>(
 +    buffer: TArrayBuffer,
-+    byteOffset?: NumberType.TypedArraySize,
-+    length?: NumberType.TypedArraySize,
++    byteOffset?: NumberType.TypedArraySizeArgNonNegative,
++    length?: NumberType.TypedArraySizeArgNonNegative,
 +  ): Float16Array<TArrayBuffer>;
 +
 +  /**

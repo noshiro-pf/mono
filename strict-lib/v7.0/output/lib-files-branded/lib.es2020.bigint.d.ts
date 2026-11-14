@@ -533,7 +533,9 @@ interface BigInt64Array<
 }
 interface BigInt64ArrayConstructor {
   readonly prototype: BigInt64Array<ArrayBufferLike>;
-  new (length?: NumberType.TypedArraySize): BigInt64Array<ArrayBuffer>;
+  new (
+    length?: NumberType.TypedArraySizeArgNonNegative,
+  ): BigInt64Array<ArrayBuffer>;
   new (
     array:
       | ArrayLike<import('ts-type-forge').BigInt64>
@@ -542,12 +544,12 @@ interface BigInt64ArrayConstructor {
   new <TArrayBuffer extends ArrayBufferLike = ArrayBuffer>(
     buffer: TArrayBuffer,
     byteOffset?: NumberType.TypedArraySizeArgNonNegative,
-    length?: NumberType.TypedArraySize,
+    length?: NumberType.TypedArraySizeArgNonNegative,
   ): BigInt64Array<TArrayBuffer>;
   new (
     buffer: ArrayBuffer,
     byteOffset?: NumberType.TypedArraySizeArgNonNegative,
-    length?: NumberType.TypedArraySize,
+    length?: NumberType.TypedArraySizeArgNonNegative,
   ): BigInt64Array<ArrayBuffer>;
   new (
     array: ArrayLike<import('ts-type-forge').BigInt64> | ArrayBuffer,
@@ -975,7 +977,9 @@ interface BigUint64Array<
 }
 interface BigUint64ArrayConstructor {
   readonly prototype: BigUint64Array<ArrayBufferLike>;
-  new (length?: NumberType.TypedArraySize): BigUint64Array<ArrayBuffer>;
+  new (
+    length?: NumberType.TypedArraySizeArgNonNegative,
+  ): BigUint64Array<ArrayBuffer>;
   new (
     array:
       | ArrayLike<import('ts-type-forge').BigUint64>
@@ -984,12 +988,12 @@ interface BigUint64ArrayConstructor {
   new <TArrayBuffer extends ArrayBufferLike = ArrayBuffer>(
     buffer: TArrayBuffer,
     byteOffset?: NumberType.TypedArraySizeArgNonNegative,
-    length?: NumberType.TypedArraySize,
+    length?: NumberType.TypedArraySizeArgNonNegative,
   ): BigUint64Array<TArrayBuffer>;
   new (
     buffer: ArrayBuffer,
     byteOffset?: NumberType.TypedArraySizeArgNonNegative,
-    length?: NumberType.TypedArraySize,
+    length?: NumberType.TypedArraySizeArgNonNegative,
   ): BigUint64Array<ArrayBuffer>;
   new (
     array: ArrayLike<import('ts-type-forge').BigUint64> | ArrayBuffer,

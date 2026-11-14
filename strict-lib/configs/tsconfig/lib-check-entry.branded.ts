@@ -335,3 +335,35 @@ export const repeatCounts = (count: SafeUint): readonly string[] => [
   // @ts-expect-error a fractional count is not an integer
   'a'.repeat(1.5),
 ];
+
+/**
+ * #4014 — the size and offset parameters of the typed-array and `DataView`
+ * constructors, and `Atomics.notify`'s `count`, were bare brands, so
+ * `new Uint8Array(4)` needed a cast. They take `TypedArraySizeArgNonNegative`,
+ * as `new SharedArrayBuffer(8)` does: an integer literal from 0 to 39 or any
+ * `SafeUint` is accepted, a larger or negative literal is not.
+ * `new ArrayBuffer(8)` reaches the ES5 constructor in the versions before 5.7,
+ * which have no ES2024 one. The rejected literals are asserted on `Uint8Array`
+ * alone, since every parameter here takes the same alias. `Float16Array` is
+ * not asserted: the versions before 5.8 do not declare it.
+ */
+export const typedArraySizeArgs = (
+  buffer: ArrayBuffer,
+  size: SafeUint,
+): readonly unknown[] => [
+  new ArrayBuffer(8),
+  new Uint8Array(4),
+  new Float64Array(size),
+  new BigInt64Array(2),
+  new Uint8Array(buffer, 0, 4),
+  new BigInt64Array(buffer, 0, 1),
+  new DataView(buffer, 0, 8),
+  Atomics.notify(new Int32Array(new SharedArrayBuffer(8)), 0, 1),
+  Atomics.notify(new BigInt64Array(new SharedArrayBuffer(8)), 0, 1),
+  // @ts-expect-error a literal past 39 needs `asSafeUint`
+  new Uint8Array(40),
+  // @ts-expect-error a negative length throws a RangeError
+  new Uint8Array(-1),
+  // @ts-expect-error a negative offset throws a RangeError
+  new Uint8Array(buffer, -1),
+];
