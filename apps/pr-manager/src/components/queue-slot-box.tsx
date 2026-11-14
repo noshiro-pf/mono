@@ -16,8 +16,9 @@ type Props = Readonly<{
  * pill across the top edge as on the DAG's nodes, and a word on why it waits,
  * or what it is. One whose queue layer's checks are going has the running ring
  * as the running one does, and one whose are still to dispatch the queued dot:
- * those runs are what the worker is running meanwhile. The title is in it for a
- * screen reader, which the tooltip is hidden from.
+ * those runs are what the worker is running meanwhile. A note naming only what
+ * is not an open pull request, which it does not wait for, is struck out. The
+ * title is in it for a screen reader, which the tooltip is hidden from.
  */
 export const QueueSlotBox = ({ slot$, onShow, onHide }: Props): JSX.Element => (
   <ExternalLink
@@ -65,7 +66,10 @@ export const QueueSlotBox = ({ slot$, onShow, onHide }: Props): JSX.Element => (
     <If
       cond={slot$.pipe(map((slot) => slot.note !== undefined))}
       then={
-        <span class={constant('queue-note')}>
+        <span
+          class={constant('queue-note')}
+          data-settled={slot$.pipe(map((slot) => slot.noteSettled.toString()))}
+        >
           {slot$.pipe(map((slot) => slot.note ?? ''))}
         </span>
       }

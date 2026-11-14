@@ -106,6 +106,47 @@ export const tipSideOf = (
   return centre < strip.width / 2 ? 'start' : 'end';
 };
 
+/**
+ * Where a wheel turned over the strip scrolls it to: across, by what a vertical
+ * wheel turns, which a mouse wheel does without Shift held. `undefined` leaves
+ * the wheel to the page — where the strip cannot move that way, at an end or
+ * with nothing out of view, so that the page scrolls on past it rather than
+ * stopping under the pointer — and to the browser for a sideways gesture, which
+ * scrolls the strip itself, and a pinch (`ctrlKey`), which zooms.
+ */
+export const wheeledLeft = (
+  strip: QueueStrip,
+  wheel: QueueWheel,
+): number | undefined => {
+  // A page scrolled with the pointer passing over the strip scrolls the strip
+  // first, to its end, and the page only after: a mouse wheel cannot be told
+  // from a trackpad's vertical swipe, and turning a wheel over the strip to
+  // scroll it across is what this is for.
+  if (
+    wheel.ctrlKey ||
+    !overflows(strip) ||
+    Math.abs(wheel.deltaX) >= Math.abs(wheel.deltaY)
+  ) {
+    return undefined;
+  }
+
+  const left = scrollable(
+    strip,
+    strip.left + wheel.deltaY * pixelsPer(wheel.deltaMode, strip),
+  );
+
+  return Math.abs(left - strip.left) < 1 ? undefined : left;
+};
+
+/** What {@link wheeledLeft} reads of a `WheelEvent`. */
+export type QueueWheel = Readonly<{
+  deltaX: number;
+  deltaY: number;
+  /** `WheelEvent`'s: 0 for pixels, 1 for lines, 2 for pages. */
+  deltaMode: number;
+  ctrlKey: boolean;
+}>;
+
 /** The strip as last measured, in CSS pixels. */
 export type QueueStrip = Readonly<{
   /** How far it is scrolled. */
@@ -125,6 +166,25 @@ export const NO_STRIP: QueueStrip = {
   scrollWidth: 0,
   held: 0,
 } as const;
+
+/** A line of a wheel counted in lines, in pixels (`pixelsPer`). */
+const LINE_PIXELS = 20;
+
+// `WheelEvent`'s constants, which are not there to read outside a browser.
+const DOM_DELTA_LINE = 1;
+
+const DOM_DELTA_PAGE = 2;
+
+/**
+ * How many pixels a wheel's delta counts in its mode: a line about as high as
+ * the browser scrolls a page by per line, and a page what is in view.
+ */
+const pixelsPer = (deltaMode: number, strip: QueueStrip): number =>
+  deltaMode === DOM_DELTA_LINE
+    ? LINE_PIXELS
+    : deltaMode === DOM_DELTA_PAGE
+      ? strip.width
+      : 1;
 
 const scrolled = (strip: QueueStrip): boolean => strip.left >= 1;
 

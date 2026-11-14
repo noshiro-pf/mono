@@ -8,6 +8,7 @@ import {
   inWindow,
   NO_STRIP,
   scrollLeftAt,
+  wheeledLeft,
   type QueueStrip,
 } from '../queue-strip.mjs';
 import type { QueueMapRelease } from './queue-map.js';
@@ -43,6 +44,11 @@ export const queueStripBox = (): Readonly<{
    * a touch turns out to scroll the page, puts the strip back where it was.
    */
   release: (how: QueueMapRelease) => void;
+  /**
+   * A wheel turned over the strip or its map: a vertical one scrolls the strip
+   * across, where it can move that way (`wheeledLeft`).
+   */
+  wheel: (event: WheelEvent) => void;
 }> => {
   const mut_state: {
     list: HTMLElement | undefined;
@@ -193,6 +199,25 @@ export const queueStripBox = (): Readonly<{
       } else if (how === 'click' && drag.outside) {
         list.scrollTo({ left: drag.from, behavior: 'smooth' });
       }
+    },
+    wheel: (event) => {
+      const { list } = mut_state;
+
+      if (list === undefined) {
+        return;
+      }
+
+      // Measured now rather than as last measured: wheel events come faster
+      // than frames, and each moves on from where the one before left it.
+      const left = wheeledLeft(measured(list), event);
+
+      if (left === undefined) {
+        return;
+      }
+
+      event.preventDefault();
+
+      list.scrollTo({ left, behavior: 'instant' });
     },
   };
 };
