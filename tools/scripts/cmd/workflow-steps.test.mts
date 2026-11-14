@@ -9,6 +9,7 @@ import * as util from 'node:util';
 import { Arr, isRecord, isString } from 'ts-data-forge';
 import type { ReadonlyRecord } from 'ts-type-forge';
 import { closingStdin } from '../lib/child-process.mjs';
+import { TEST_DOCUMENTS } from './check-test-documents.mjs';
 import {
   firstFileToCheck,
   ignoredBy,
@@ -537,7 +538,25 @@ describe('the ignore lists', () => {
     );
   });
 
-  test("the repository's code list counts an app's pages and nothing else under **.md", () => {
+  // A unit test reads each of these, and unit tests run in code-check.yml and
+  // node-version-compatibility.yml alone, so a diff of the document alone is
+  // one both have to see (#4009; `check:root:test-documents` holds the table to
+  // the tests that read one).
+  test('a document a unit test reads runs the code and the Node.js checks', () => {
+    const code = readGateList('code', projectRoot);
+
+    const runtime = readGateList('runtime', projectRoot);
+
+    assert.isTrue(code.ok && runtime.ok);
+
+    for (const document of Object.values(TEST_DOCUMENTS)) {
+      assert.isFalse(ignoredBy(code.value)(document));
+
+      assert.isFalse(ignoredBy(runtime.value)(document));
+    }
+  });
+
+  test("the repository's code list counts an app's pages under **.md, and not a library's README such as ts-data-forge's", () => {
     const code = readGateList('code', projectRoot);
 
     const patterns = code.ok ? code.value : ([] as const);

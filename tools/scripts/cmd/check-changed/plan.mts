@@ -113,8 +113,12 @@ export const classifyChanges = ({
       continue;
     }
 
-    // A page an app builds is code to the gate (`!apps/*/src/`), and still
-    // Markdown, which `check:md` reads unless its `ignores` leave it out.
+    // A page an app builds (`!apps/*/src/`), or a document a unit test reads
+    // (`check:root:test-documents`), is code to the gate, and still Markdown,
+    // which `check:md` reads unless its `ignores` leave it out. Code, a
+    // document a test reads is planned as a change to its package's code (lint,
+    // type check, the codemod, its dependents' generators) where its tests are
+    // all it needs: that would take a kind of change of its own.
     if (prose || file.endsWith('.md')) {
       mut_areas.add('prose');
     }

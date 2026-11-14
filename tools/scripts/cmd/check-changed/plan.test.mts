@@ -1,5 +1,7 @@
 import { projectRootPath } from '../../project-root-path.mjs';
+import { TEST_DOCUMENTS } from '../check-test-documents.mjs';
 import { ignoredBy, readGateList } from '../workflow-steps.mjs';
+import { readPackages } from './packages.mjs';
 import {
   buildPlan,
   classifyChanges,
@@ -394,6 +396,11 @@ describe('classifyChanges', () => {
       'apps/synstate-docs/src/content/docs/ja/getting-started/installation.md',
       ['prose', 'root-guards'],
     ],
+    // A document a unit test reads (`check:root:test-documents`): code to the
+    // gate too, so that its package's tests run.
+    ...Object.values(TEST_DOCUMENTS).map(
+      (document) => [document, ['prose', 'root-guards']] as const,
+    ),
     ['.cspell.config.yaml', ['prose', 'spell-config']],
     ['libs/ts-data-forge/cspell.config.yaml', ['prose', 'spell-config']],
     ['.prettierrc', ['format-config', 'prose']],
@@ -407,6 +414,61 @@ describe('classifyChanges', () => {
   ] as const)('%s touches %j', (file, areas) => {
     assert.deepStrictEqual(sortedAreas(classify([file])), areas);
   });
+});
+
+// A document a unit test reads is taken back by the code gate so that its test
+// runs for a diff of it alone (`check:root:test-documents`); this asks the plan
+// itself, with the workspace as it is.
+// `assert.isTrue` takes no message in this repository's typings (TS2554), and
+// these failures need one: `expect(…, message).toBe(true)` instead.
+describe('the documents a unit test reads', () => {
+  test.each(Object.entries(TEST_DOCUMENTS))(
+    'a diff of the one %s reads runs that test',
+    async (testFile, document) => {
+      expect(
+        proseGateResult.ok,
+        'The code gate list could not be read; see the first test.',
+      ).toBe(true);
+
+      const members = await readPackages();
+
+      const member = members
+        .filter(({ dir }) => testFile.startsWith(`${dir}/`))
+        .toSorted((a, b) => b.dir.length - a.dir.length)[0];
+
+      const steps = buildPlan({
+        classification: classifyChanges({
+          files: [document],
+          packages: members,
+          proseGate,
+        }),
+        base: 'abc123',
+        rootScripts: ['check:root:test'],
+        coverage: false,
+        spellChecked: [],
+      });
+
+      // A test in a member runs by its `check:test`; one in no member is the
+      // root program's, which `check:root:test` runs when it is under
+      // tools/scripts/ or tools/configs/.
+      const runs =
+        member === undefined
+          ? /^tools\/(?:scripts|configs)\/.*\.test\.mts$/u.test(testFile) &&
+            steps.some(
+              ({ cwd, args }) =>
+                cwd === '.' && args.includes('check:root:test'),
+            )
+          : steps.some(
+              ({ cwd, args }) =>
+                cwd === member.dir && args.includes('check:test'),
+            );
+
+      expect(
+        runs,
+        `check-changed would not run ${testFile} for a diff of ${document} alone: keep the document in the test's workspace package, or the test in the document's (for a test of the root program, the test under tools/scripts/ or tools/configs/ and the document under tools/).`,
+      ).toBe(true);
+    },
+  );
 });
 
 describe('buildPlan', () => {

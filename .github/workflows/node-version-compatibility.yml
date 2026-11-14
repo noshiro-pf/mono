@@ -41,8 +41,11 @@ jobs:
     with:
       # What code-check.yml's list ignores, but for the app pages it takes
       # back: nothing in them depends on the Node.js version this matrix
-      # varies. tools/configs/gate-ignore-lists.json keeps both lists side by
-      # side (see "The ignore lists" in README.md).
+      # varies. Like that list, the runtime list takes back the documents a
+      # unit test reads, since this matrix runs the unit tests too, and it
+      # takes back the benchmark's tables for synstate-benchmark.yml.
+      # tools/configs/gate-ignore-lists.json keeps both lists side by side (see
+      # "The ignore lists" in README.md).
       diff-scope: runtime
       result-job: test-node-versions-result / result
 

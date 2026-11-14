@@ -427,11 +427,23 @@ comment of their own, so what they mean is here:
   packages' code on each Node.js and measure it. An app's page goes through that
   app's build, which `ws:build` runs there too, but nothing in it depends on the
   Node.js version and `code-check.yml` builds it, so `runtime` does not take
-  `apps/*/src/` back. It takes back `apps/synstate-docs/src/data/` alone:
-  the benchmark judges the tables there against its baseline, so a diff of the
-  tables alone is one it has to see. The ignore entries are written out in both
-  lists, and `workflow-steps.test.mts` fails when they differ, so an entry added
-  to one goes in the other.
+  `apps/*/src/` back. Of the apps it takes back `apps/synstate-docs/src/data/`
+  alone: the benchmark judges the tables there against its baseline, so a diff
+  of the tables alone is one it has to see. The ignore entries are written out
+  in both lists, and `workflow-steps.test.mts` fails when they differ, so an
+  entry added to one goes in the other.
+- **Both take back each Markdown document a unit test reads**, as `!` entries
+  naming the document: unit tests run in `code-check.yml` and
+  `node-version-compatibility.yml` alone, so a diff of the document alone is the
+  one the test judges, and skipped, the test would fail on the next pull request
+  that touched code. The benchmark, gated on `runtime` too, then runs for such a
+  diff as well. `check:root:test-documents` finds each test whose `readFile`
+  call names a `.md` path, and holds those tests to the table in
+  `tools/scripts/cmd/check-test-documents.mts` and each document of the table to
+  an exception naming it in both lists. Each `.md` exception of the lists has to
+  name a document of the table.
+  `tools/scripts/cmd/check-changed/plan.test.mts` holds that check-changed runs
+  each test for a diff of its document alone.
 - **`style`** (`style-check.yml`) drops `experimental/` and nothing else: its
   matrix checks markdown, `ws:doc` regenerates the package READMEs, and
   `ws:check:ext` globs every file under the directories it is given, so `code`
