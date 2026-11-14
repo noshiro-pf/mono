@@ -1,5 +1,10 @@
 import { Arr, Num } from 'ts-data-forge';
-import { capitalGainsTaxRate, nisaLifetimeLimit } from '../../data/index.mjs';
+import {
+  capitalGainsTaxRate,
+  housingLoanDeductionResidentTaxCap,
+  housingLoanDeductionResidentTaxRate,
+  nisaLifetimeLimit,
+} from '../../data/index.mjs';
 import {
   calculateDefinedContribution,
   type DefinedContributionResult,
@@ -26,6 +31,7 @@ import {
 } from '../pension/index.mjs';
 import {
   calculateSalary,
+  residentTaxableIncomeFrom,
   resolveSalaryHistory,
   type SalaryMonth,
 } from '../salary/index.mjs';
@@ -35,6 +41,7 @@ import {
   monthOfAge,
   parseYearMonth,
   parseYearMonthOr,
+  yearOf,
   type MonthIndex,
 } from '../year-month/index.mjs';
 
@@ -135,7 +142,7 @@ export const simulate = (input: SimulationInput): SimulationResult => {
     months,
   );
 
-  const housingLoan = simulateHousingLoan(input.housingLoan, start);
+  const housingLoan = simulateHousingLoan(input.housingLoan, start, salary);
 
   const oneOffIncomes = resolveOneOffs(input.oneOffIncomes);
 
@@ -306,6 +313,10 @@ export type SimulationResult = Readonly<{
 export type HousingLoanSimulation = Readonly<{
   start: MonthIndex;
   schedule: readonly MonthlyPaymentResult[];
+  /**
+   * 前年の税額で頭打ちにした控除額。前年が 1 年分シミュレーションに入っていない
+   * ときは頭打ちにしない（`cappedDeduction`）。
+   */
   deductions: readonly HousingLoanDeduction[];
 }>;
 
@@ -350,19 +361,99 @@ export type CashFlowMonth = Readonly<{
   cash: number;
 }>;
 
+type YearlySalaryTaxes = Readonly<{
+  /** シミュレーションの範囲に入っている月数 */
+  months: number;
+  /** 給与・賞与の源泉徴収税額の合計 */
+  incomeTax: number;
+  /**
+   * その年の月給に対する住民税の課税所得（翌年の住民税のもと）の、月ごとの概算
+   * の合計。賞与を数えない。
+   */
+  residentTaxableIncome: number;
+}>;
+
 const defaultBirth = 1990 * 12 + 3;
 
 const defaultStart = 2026 * 12;
 
+/**
+ * 住宅ローン控除は税額控除なので、前年（控除の対象の年）の所得税と、その年の
+ * 所得にかかる住民税から引ける分（課税総所得金額等の 5%、97,500 円まで）を
+ * 超えては受け取れない。税額はシミュレーターが給与から計算したもので、年末調整
+ * は見ない。
+ */
+const cappedDeduction = (
+  deduction: HousingLoanDeduction,
+  taxesByYear: ReadonlyMap<number, YearlySalaryTaxes>,
+): HousingLoanDeduction => {
+  const taxes = taxesByYear.get(yearOf(deduction.month) - 1);
+
+  // シミュレーションの範囲に 1 年分が入っていない年（開始前の年、1 月以外から
+  // 始まるときの開始の年、12 月以外で終わるときの終わりの年、終わりの後の年）は
+  // 税額が分からないので、頭打ちにしない。
+  if (taxes === undefined || taxes.months < 12) {
+    return deduction;
+  }
+
+  // 法令の 5% は課税総所得金額等にかかるが、シミュレーターは年ごとの課税所得を
+  // 持たないので、住民税の行と同じ月ごとの概算（`residentTaxableIncomeFrom`）を
+  // 前年の月給について足して代える。概算なので法令の額とは合わない（月ごとに
+  // 0 で打ち切って足すので年で見るより多めになることがあり、賞与を数えないので
+  // 少なめになる、など）。翌年の行は範囲に入るとは限らないので使わない。
+  const residentPart = Math.min(
+    housingLoanDeductionResidentTaxCap,
+    taxes.residentTaxableIncome * housingLoanDeductionResidentTaxRate,
+  );
+
+  // 年金の所得税・住民税は数えない（給与の無い年の控除は 0 になる）。源泉徴収
+  // 税額は復興特別所得税を含み、控除で減る所得税に合わせて復興特別所得税も還付
+  // されるので、所得税から引けるのは源泉徴収税額の全額まで（控除額そのものに
+  // 復興特別所得税の分を足すことはしない）。
+  return {
+    month: deduction.month,
+    amount: Math.min(deduction.amount, taxes.incomeTax + residentPart),
+  };
+};
+
+const yearlySalaryTaxes = (
+  salary: readonly SalaryMonth[],
+): ReadonlyMap<number, YearlySalaryTaxes> => {
+  const mut_result = new Map<number, YearlySalaryTaxes>();
+
+  for (const s of salary) {
+    const year = yearOf(s.month);
+
+    const prev = mut_result.get(year) ?? {
+      months: 0,
+      incomeTax: 0,
+      residentTaxableIncome: 0,
+    };
+
+    mut_result.set(year, {
+      months: prev.months + 1,
+      incomeTax: prev.incomeTax + s.incomeTax + s.bonusIncomeTax,
+      residentTaxableIncome:
+        prev.residentTaxableIncome +
+        residentTaxableIncomeFrom(s.grossAfterIdeco),
+    });
+  }
+
+  return mut_result;
+};
+
 const simulateHousingLoan = (
   loan: SimulationInput['housingLoan'],
   fallbackStart: MonthIndex,
+  salary: readonly SalaryMonth[],
 ): HousingLoanSimulation => {
   const start = parseYearMonthOr(loan.start, fallbackStart);
 
   if (loan.principal <= 0 || loan.termYears <= 0) {
     return { start, schedule: [], deductions: [] };
   }
+
+  const taxesByYear = yearlySalaryTaxes(salary);
 
   const schedule = calculateHousingLoan({
     principalAmount: loan.principal,
@@ -382,7 +473,7 @@ const simulateHousingLoan = (
       schedule,
       start,
       housingLoanDeductionConditions(loan),
-    ),
+    ).map((deduction) => cappedDeduction(deduction, taxesByYear)),
   };
 };
 
