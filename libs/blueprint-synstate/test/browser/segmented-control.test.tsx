@@ -81,4 +81,111 @@ describe(SegmentedControl, () => {
 
     unmount();
   });
+
+  test('with no option chosen, the first is in the tab order and an arrow key chooses from it', () => {
+    const { value$, onChange, changes } = controlled('');
+
+    const { container, unmount } = mountInto(() => (
+      <SegmentedControl
+        options={options}
+        value={value$}
+        onValueChange={onChange}
+      />
+    ));
+
+    const buttons = all<HTMLButtonElement>(container, 'button');
+
+    assert.deepStrictEqual(
+      buttons.map((b) => b.tabIndex),
+      [0, -1, -1],
+    );
+
+    buttons[0]?.focus();
+
+    press(buttons[0] ?? container, 'ArrowRight');
+
+    assert.deepStrictEqual(changes, ['dark']);
+
+    assert.deepStrictEqual(
+      buttons.map((b) => b.tabIndex),
+      [-1, 0, -1],
+    );
+
+    unmount();
+  });
+
+  test('a chosen option that is disabled leaves the first enabled one in the tab order', () => {
+    const { value$, onChange } = controlled('light');
+
+    const { container, unmount } = mountInto(() => (
+      <SegmentedControl
+        options={[
+          { value: 'light', disabled: true },
+          { value: 'dark', disabled: true },
+          { value: 'system' },
+        ]}
+        value={value$}
+        onValueChange={onChange}
+      />
+    ));
+
+    assert.deepStrictEqual(
+      all<HTMLButtonElement>(container, 'button').map((b) => [
+        b.tabIndex,
+        b.disabled,
+      ]),
+      [
+        [-1, true],
+        [-1, true],
+        [0, false],
+      ],
+    );
+
+    unmount();
+  });
+
+  test('with no option chosen and the first disabled, the first enabled one is in the tab order', () => {
+    const { value$, onChange } = controlled('');
+
+    const { container, unmount } = mountInto(() => (
+      <SegmentedControl
+        options={[
+          { value: 'light', disabled: true },
+          { value: 'dark' },
+          { value: 'system' },
+        ]}
+        value={value$}
+        onValueChange={onChange}
+      />
+    ));
+
+    assert.deepStrictEqual(
+      all<HTMLButtonElement>(container, 'button').map((b) => b.tabIndex),
+      [-1, 0, -1],
+    );
+
+    unmount();
+  });
+
+  test('with every option disabled, none is in the tab order', () => {
+    const { value$, onChange } = controlled('');
+
+    const { container, unmount } = mountInto(() => (
+      <SegmentedControl
+        options={[
+          { value: 'light', disabled: true },
+          { value: 'dark', disabled: true },
+        ]}
+        value={value$}
+        onValueChange={onChange}
+      />
+    ));
+
+    assert.deepStrictEqual(
+      all<HTMLButtonElement>(container, 'button').map((b) => b.tabIndex),
+      [-1, -1],
+    );
+
+    unmount();
+  });
 });
