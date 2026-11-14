@@ -773,8 +773,8 @@ For detailed information on all types, see the [Full API Reference](https://nosh
     - [RecordLeafPaths](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/record/record-path.mts#L87)
     - [RecordLeafPathsWithIndex](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/record/record-path.mts#L105)
     - [RecordUpdated](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/record/record-path.mts#L126)
-    - [RecordValueAtPath](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/record/record-path.mts#L152)
-    - [RecordValueAtPathWithIndex](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/record/record-path.mts#L178)
+    - [RecordValueAtPath](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/record/record-path.mts#L154)
+    - [RecordValueAtPathWithIndex](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/record/record-path.mts#L187)
 - src/tuple-and-list/array.mts
     - [MutableNonEmptyTuple](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/tuple-and-list/array.mts#L20)
     - [NonEmptyTuple](https://github.com/noshiro-pf/mono/blob/main/libs/ts-type-forge/src/tuple-and-list/array.mts#L35)
