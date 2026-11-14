@@ -10,6 +10,11 @@ description: '任意の subscribable オブジェクトを SynState の Observab
 任意の subscribable オブジェクトを SynState の Observable に変換します。
 subscribe(onNext, onError, onComplete) メソッドを持つオブジェクトに対応します。
 
+値は `Result.ok(value)` として流します。エラーは `Result.err(error)` として流し、
+それで observable は終わります。RxJS や TC39 案の observable がエラーで終わり、
+`fromPromise` が reject で終わるのと同じです。`Err` の後に complete し、
+subscribable の購読を解除し、その後に subscribable が渡してくるものは無視します。
+
 {/* /jsdoc-description */}
 
 ## 使用例
