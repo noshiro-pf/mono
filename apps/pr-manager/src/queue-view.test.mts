@@ -411,7 +411,7 @@ describe(queueViewOf, () => {
         }),
         // Open, and not queued.
         pull(5, { labels: [] }),
-        // Queued, and after #4 in the row, which waits for it.
+        // Queued, and moved ahead of #4, which waits for it.
         pull(6, {
           labels: [MERGE_QUEUED_LABEL, SKIP_CI_LABEL],
           body: 'Merge-After: #5',
@@ -426,8 +426,53 @@ describe(queueViewOf, () => {
         // Its turn comes once #1 merges.
         [3, undefined, [{ number: 1, span: 1 }]],
         [2, 'after #5', [{ number: 1, span: 2 }]],
-        [4, 'after #6', []],
         [6, 'after #5', []],
+        [4, undefined, [{ number: 6, span: 1 }]],
+      ],
+    );
+  });
+
+  test('puts what waits after what it waits for when neither is picked, a chain included', () => {
+    const view = queueViewOf(
+      input([
+        // Open, and not queued: nothing below is ever picked.
+        pull(1, { labels: [] }),
+        pull(2, {
+          labels: [MERGE_QUEUED_LABEL, SKIP_CI_LABEL],
+          body: 'Merge-After: #7',
+        }),
+        pull(3, {
+          labels: [MERGE_QUEUED_LABEL, SKIP_CI_LABEL],
+          body: 'Merge-After: #1',
+        }),
+        pull(4, {
+          labels: [MERGE_QUEUED_LABEL, SKIP_CI_LABEL],
+          body: 'Merge-After: #6',
+        }),
+        pull(5, {
+          labels: [MERGE_QUEUED_LABEL, SKIP_CI_LABEL],
+          body: 'Merge-After: #3',
+        }),
+        pull(6, {
+          labels: [MERGE_QUEUED_LABEL, SKIP_CI_LABEL],
+          body: 'Merge-After: #1',
+        }),
+        pull(7, {
+          labels: [MERGE_QUEUED_LABEL, SKIP_CI_LABEL],
+          baseRef: 'branch-6',
+        }),
+      ]),
+    );
+
+    assert.deepStrictEqual(
+      view.slots.map(({ number, note, arcs }) => [number, note, arcs]),
+      [
+        [3, 'after #1', []],
+        [5, undefined, [{ number: 3, span: 1 }]],
+        [6, 'after #1', []],
+        [4, undefined, [{ number: 6, span: 1 }]],
+        [7, undefined, [{ number: 6, span: 2 }]],
+        [2, undefined, [{ number: 7, span: 1 }]],
       ],
     );
   });
@@ -663,6 +708,31 @@ describe(queueViewOf, () => {
         [[], undefined],
         [[{ number: 2, span: 1 }], 'held by blocks-release on #2'],
         [[], 'a required check failed'],
+      ],
+    );
+  });
+
+  test('puts the release after what blocks it when that is never picked', () => {
+    const view = queueViewOf(
+      input([
+        pull(1, {
+          labels: [MERGE_QUEUED_LABEL, SKIP_CI_LABEL],
+          headRef: 'changeset-release/main',
+        }),
+        pull(2, {
+          labels: [MERGE_QUEUED_LABEL, SKIP_CI_LABEL, BLOCKS_RELEASE_LABEL],
+          body: 'Merge-After: #3',
+        }),
+        // Open, and not queued.
+        pull(3, { labels: [] }),
+      ]),
+    );
+
+    assert.deepStrictEqual(
+      view.slots.map(({ number, note, arcs }) => [number, note, arcs]),
+      [
+        [2, 'after #3', []],
+        [1, 'release', [{ number: 2, span: 1 }]],
       ],
     );
   });
