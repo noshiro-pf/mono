@@ -544,8 +544,20 @@ export namespace TsDataForgeInternals {
       const randomImpl = (
         min: number = MIN_VALUE,
         max: number = MAX_VALUE,
-      ): number =>
-        min + Math.floor((Math.max(max, min) - min + 1) * Math.random());
+      ): number => {
+        const hi = Math.max(max, min);
+
+        const count = hi - min + 1;
+
+        const r = Math.random();
+
+        // `hi - min` overflows to `Infinity` when the bounds are far apart (the
+        // defaults of `Int` are `±Number.MAX_VALUE`). The convex combination
+        // does not: its terms have opposite signs there.
+        return Number.isFinite(count)
+          ? min + Math.floor(count * r)
+          : Math.floor(min * (1 - r) + hi * r);
+      };
 
       // [-5, 5] -> floor(11 * Math.random()) + (-5)
       const random = (
@@ -748,7 +760,20 @@ export namespace TsDataForgeInternals {
       const randomImpl = (
         min: number = MIN_VALUE,
         max: number = MAX_VALUE,
-      ): number => min + (Math.max(max, min) - min) * Math.random();
+      ): number => {
+        const hi = Math.max(max, min);
+
+        const span = hi - min;
+
+        const r = Math.random();
+
+        // `hi - min` overflows to `Infinity` when the bounds are far apart (the
+        // defaults of `FiniteNumber` are `±Number.MAX_VALUE`). The convex
+        // combination does not: its terms have opposite signs there. A finite
+        // span keeps the plain formula, which returns exactly `min` when
+        // `min === hi`.
+        return Number.isFinite(span) ? min + span * r : min * (1 - r) + hi * r;
+      };
 
       const random = (min?: ElementType, max?: ElementType): ElementType =>
         clampOrCastFn(randomImpl(min, max));
