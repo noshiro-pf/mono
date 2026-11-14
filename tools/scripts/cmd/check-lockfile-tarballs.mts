@@ -5,18 +5,27 @@ import { isDirectlyExecuted } from 'ts-repo-utils';
 import { projectRootPath } from '../project-root-path.mjs';
 
 /**
- * Fails when `pnpm-lock.yaml` resolves any package from a URL.
+ * Fails when `pnpm-lock.yaml` resolves any package from anywhere but the
+ * registry or this repository.
  *
  * pnpm blocks URL dependencies in subdependencies by itself
- * (`ERR_PNPM_EXOTIC_SUBDEP`, on by default), but a **direct** URL dependency is
- * always allowed — and `pnpm-update` opens auto-merged pull requests, so
- * without something in its place one could arrive without review.
+ * (`ERR_PNPM_EXOTIC_SUBDEP`, on by default), but a **direct** URL or git
+ * dependency is always allowed — and `pnpm-update` opens auto-merged pull
+ * requests, so without something in its place one could arrive without review.
+ *
+ * It reads every `resolution:` and allows the two shapes the lockfile holds:
+ * `{integrity: …}` (the registry) and `{directory: …, type: directory}` for a
+ * relative directory inside the repository (the strict-lib bundles' per-group
+ * packages). Anything else is reported: a `tarball`, a git `commit` / `repo`, a
+ * directory that is absolute or leaves the repository, and a `resolution:` not
+ * written on one line, which would mean pnpm's layout changed and this should
+ * be taught it rather than pass. Looking for the fields of the shapes that are
+ * not allowed instead let a git dependency, which has no `tarball`, through.
  *
  * The strict standard library used to be the exception here: ~107
  * `@typescript/lib-*` release URLs, which forced `blockExoticSubdeps: false`
  * repository-wide and left this check to allow that one host. It ships as a
- * single package on the registry now, so the exception is gone and the rule is
- * the simple one: nothing is installed from a URL.
+ * single package on the registry now, so the exception is gone.
  */
 export const checkLockfileTarballs = async (): Promise<
   Result<number, string>
@@ -34,52 +43,91 @@ export const checkLockfileTarballs = async (): Promise<
     );
   }
 
-  const offenders = collectTarballs(lockfile.value);
+  const judged = judgeLockfile(lockfile.value);
 
-  if (!Arr.isNonEmpty(offenders)) {
-    return Result.ok(0);
-  }
-
-  return Result.err(
-    [
-      `${LOCKFILE_NAME} resolves ${offenders.length} package(s) from a URL:`,
-      '',
-      ...offenders.map(
-        ({ lineNumber, url }) => `  ${LOCKFILE_NAME}:${lineNumber}  ${url}`,
-      ),
-      '',
-      'A URL dependency skips the registry, the version range and',
-      '`minimumReleaseAge`. Install the package from the registry instead; if',
-      'a URL is genuinely the only channel, add the exception to this check in',
-      'the same pull request.',
-    ].join('\n'),
-  );
+  return judged.ok ? Result.ok(judged.count) : Result.err(judged.message);
 };
 
-type Tarball = Readonly<{
+/**
+ * The lockfile's verdict: the number of resolutions read, or what is wrong. No
+ * `resolution:` line at all is an error, since it means the reader read
+ * nothing.
+ */
+export const judgeLockfile = (
+  lockfile: string,
+): Readonly<{ ok: true; count: number } | { ok: false; message: string }> => {
+  const count = lockfile
+    .split('\n')
+    .filter((line) => RESOLUTION_PATTERN.test(line)).length;
+
+  if (count === 0) {
+    return {
+      ok: false,
+      message: `${LOCKFILE_NAME} has no \`resolution:\` line, so nothing was read. Teach this check the lockfile's new layout.`,
+    };
+  }
+
+  const offenders = findUnregisteredResolutions(lockfile);
+
+  if (!Arr.isNonEmpty(offenders)) {
+    return { ok: true, count };
+  }
+
+  return {
+    ok: false,
+    message: [
+      `${LOCKFILE_NAME} resolves ${offenders.length} package(s) from neither the registry nor this repository:`,
+      '',
+      ...offenders.map(
+        ({ lineNumber, resolution }) =>
+          `  ${LOCKFILE_NAME}:${lineNumber}  ${resolution}`,
+      ),
+      '',
+      'A URL, git or outside-directory dependency skips the registry, the',
+      'version range and `minimumReleaseAge`. Install the package from the',
+      'registry instead; if it is genuinely the only channel, add the exception',
+      'to this check in the same pull request. A resolution not on one line',
+      'means the lockfile layout changed: teach this check the new one.',
+    ].join('\n'),
+  };
+};
+
+/**
+ * Every `resolution:` that is not the registry's `{integrity: …}` or a relative
+ * directory inside the repository, with the line it sits on.
+ */
+export const findUnregisteredResolutions = (
+  lockfile: string,
+): readonly Resolution[] =>
+  lockfile.split('\n').flatMap((line, index) => {
+    const value = RESOLUTION_PATTERN.exec(line)?.groups?.['value'];
+
+    if (value === undefined || REGISTRY_PATTERN.test(value)) {
+      return [];
+    }
+
+    const directory = DIRECTORY_PATTERN.exec(value)?.groups?.['directory'];
+
+    return directory !== undefined &&
+      !directory.startsWith('/') &&
+      !directory.split('/').includes('..')
+      ? []
+      : [{ lineNumber: index + 1, resolution: value }];
+  });
+
+type Resolution = Readonly<{
   lineNumber: number;
-  url: string;
+  resolution: string;
 }>;
 
 const LOCKFILE_NAME = 'pnpm-lock.yaml';
 
-/**
- * Every URL-resolved package in the lockfile, with the line it sits on.
- *
- * pnpm writes the URL as the `tarball` field of a `resolution` mapping, and
- * only for packages it did not resolve from the registry, so matching the field
- * name is enough to find them all.
- */
-const collectTarballs = (lockfile: string): readonly Tarball[] =>
-  lockfile.split('\n').flatMap((line, index) => {
-    const matched = TARBALL_FIELD_PATTERN.exec(line);
+const RESOLUTION_PATTERN = /^\s+resolution:\s*(?<value>.*)$/u;
 
-    return matched?.[1] === undefined
-      ? []
-      : [{ lineNumber: index + 1, url: matched[1] }];
-  });
+const REGISTRY_PATTERN = /^\{integrity: [^\s,}]+\}$/u;
 
-const TARBALL_FIELD_PATTERN = /\btarball:\s*([^\s,}]+)/u;
+const DIRECTORY_PATTERN =
+  /^\{directory: (?<directory>[^\s,}]+), type: directory\}$/u;
 
 if (isDirectlyExecuted(import.meta.url)) {
   const result = await checkLockfileTarballs();
@@ -90,5 +138,7 @@ if (isDirectlyExecuted(import.meta.url)) {
     process.exit(1);
   }
 
-  console.info(`${LOCKFILE_NAME} resolves every package from the registry.`);
+  console.info(
+    `${LOCKFILE_NAME}: all ${result.value} resolution(s) are the registry or a directory inside the repository.`,
+  );
 }
