@@ -122,8 +122,8 @@ export const methodProse = (
     case 'fromNumber':
       return {
         description: isFloor
-          ? `Converts an arbitrary \`number\` into ${aT}, rounding to the nearest integer and saturating the result into the range \`[MIN_VALUE, MAX_VALUE]\`.\n\nUnlike \`as${t}\`, this is total: out-of-range inputs are clamped to the nearest representable \`${t}\` instead of throwing.`
-          : `Converts an arbitrary \`number\` into ${aT}, saturating it into the range \`[MIN_VALUE, MAX_VALUE]\`.\n\nUnlike \`as${t}\`, this is total: out-of-range inputs are clamped to the nearest representable \`${t}\` instead of throwing.`,
+          ? `Converts an arbitrary \`number\` into ${aT}, rounding to the nearest integer and saturating the result into the range \`[MIN_VALUE, MAX_VALUE]\`.\n\nUnlike \`as${t}\`, this is total: out-of-range inputs are clamped to the nearest representable \`${t}\` instead of throwing, \`NaN\` included, which becomes \`MIN_VALUE\`.`
+          : `Converts an arbitrary \`number\` into ${aT}, saturating it into the range \`[MIN_VALUE, MAX_VALUE]\`.\n\nUnlike \`as${t}\`, this is total: out-of-range inputs are clamped to the nearest representable \`${t}\` instead of throwing, \`NaN\` included, which becomes \`MIN_VALUE\`.`,
         hasExample: true,
         params: [{ name: 'value', desc: 'The value to convert' }],
         returns: `The value as ${aT}`,

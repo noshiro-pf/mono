@@ -227,3 +227,25 @@ describe('SafeInt test', () => {
     });
   });
 });
+
+describe('SafeInt saturation (#3960)', () => {
+  test('fromNumber saturates +Infinity to MAX_VALUE and -Infinity to MIN_VALUE', () => {
+    expect(SafeInt.fromNumber(Number.POSITIVE_INFINITY)).toBe(
+      Number.MAX_SAFE_INTEGER,
+    );
+
+    expect(SafeInt.fromNumber(Number.NEGATIVE_INFINITY)).toBe(
+      Number.MIN_SAFE_INTEGER,
+    );
+  });
+
+  test('fromNumber still sends NaN to MIN_VALUE', () => {
+    expect(SafeInt.fromNumber(Number.NaN)).toBe(Number.MIN_SAFE_INTEGER);
+  });
+
+  test('an operation that overflows to Infinity saturates to MAX_VALUE', () => {
+    expect(SafeInt.pow(asSafeInt(10), asSafeInt(400))).toBe(
+      Number.MAX_SAFE_INTEGER,
+    );
+  });
+});

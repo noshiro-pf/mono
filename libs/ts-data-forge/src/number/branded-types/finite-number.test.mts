@@ -175,3 +175,15 @@ describe('FiniteNumber test', () => {
     });
   });
 });
+
+describe('FiniteNumber saturation (#3960)', () => {
+  test('an operation that overflows to Infinity saturates to MAX_VALUE', () => {
+    expect(FiniteNumber.mul(asFiniteNumber(1e200), asFiniteNumber(1e200))).toBe(
+      Number.MAX_VALUE,
+    );
+
+    expect(
+      FiniteNumber.mul(asFiniteNumber(-1e200), asFiniteNumber(1e200)),
+    ).toBe(-Number.MAX_VALUE);
+  });
+});
