@@ -3,7 +3,8 @@
 // reveal.js comes from the CDN at a pinned version rather than from npm through
 // a bundler: these are talks already given, so nothing here is meant to move,
 // and with no build step a deck is the same files in a preview
-// (`pnpm dlx serve docs/reveal-slides`) and on the Pages site.
+// (`pnpm dlx serve docs/reveal-slides`) and on the Pages site. No tsconfig
+// names this file: `tsc` cannot resolve an import by URL.
 import Reveal from 'https://cdn.jsdelivr.net/npm/reveal.js@5.2.1/dist/reveal.esm.js';
 import Highlight from 'https://cdn.jsdelivr.net/npm/reveal.js@5.2.1/plugin/highlight/highlight.esm.js';
 import Markdown from 'https://cdn.jsdelivr.net/npm/reveal.js@5.2.1/plugin/markdown/markdown.esm.js';

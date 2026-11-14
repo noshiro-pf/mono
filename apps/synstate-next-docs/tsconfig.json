@@ -8,6 +8,8 @@
   },
   // The code blocks are samples in `libs/synstate-next/samples/docs-site/`,
   // type-checked and run as tests there.
-  "include": ["./configs", "./scripts", "./test"],
+  "include": ["./astro.config.mjs", "./configs", "./scripts", "./test"],
+  // It imports `astro:content`, a module only Astro's own type generation
+  // declares, so `tsc` cannot resolve it.
   "exclude": ["./src/content.config.ts"]
 }

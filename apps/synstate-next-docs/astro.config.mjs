@@ -1,5 +1,7 @@
 import starlight from '@astrojs/starlight';
 import { defineConfig } from 'astro/config';
+// A moved file or a renamed export still fails when this config loads.
+// @ts-expect-error TS5097, the `.mts` extension, which Node.js needs here
 import { groupTitles, referencePages } from './scripts/reference-pages.mts';
 
 export default defineConfig({
@@ -109,7 +111,13 @@ export default defineConfig({
             { slug: 'reference' },
             ...Object.entries(groupTitles.en).map(([group, label]) => ({
               label,
-              translations: { ja: groupTitles.ja[group] },
+              translations: {
+                // `Object.entries` widens the key to `string`; it is one of
+                // `groupTitles.en`'s, which `groupTitles.ja` shares.
+                ja: groupTitles.ja[
+                  /** @type {keyof typeof groupTitles.ja} */ (group)
+                ],
+              },
               collapsed: true,
               items: referencePages
                 .filter((p) => p.group === group)

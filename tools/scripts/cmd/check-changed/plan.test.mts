@@ -1,4 +1,6 @@
+import * as path from 'node:path';
 import { Arr } from 'ts-data-forge';
+import * as ts from 'typescript';
 import { projectRootPath } from '../../project-root-path.mjs';
 import { TEST_DOCUMENTS } from '../check-test-documents.mjs';
 import { ignoredBy, readGateList } from '../workflow-steps.mjs';
@@ -432,6 +434,7 @@ describe('classifyChanges', () => {
       ['published-source', 'root', 'root-guards'],
     ],
     ['.markdownlint-cli2.mjs', ['prose', 'root']],
+    ['verify-npm-packages/isolate-hooks.mjs', ['root', 'root-guards']],
     ['tools/scripts/cmd/check-changed/README.md', ['prose']],
     // Code to the gate, and still Markdown for `check:md`.
     [
@@ -455,6 +458,24 @@ describe('classifyChanges', () => {
     ['repo-settings/rulesets/main.json', ['repo-settings', 'root-guards']],
   ] as const)('%s touches %j', (file, areas) => {
     assert.deepStrictEqual(sortedAreas(classify([file])), areas);
+  });
+
+  test('every file the root tsconfig.json names touches the root program', () => {
+    const parsed = ts.getParsedCommandLineOfConfigFile(
+      path.join(projectRootPath, 'tsconfig.json'),
+      {},
+      { ...ts.sys, onUnRecoverableConfigFileDiagnostic: () => undefined },
+    );
+
+    assert.isDefined(parsed);
+
+    const missed = parsed.fileNames
+      .map((file) =>
+        path.relative(projectRootPath, file).replaceAll(path.sep, '/'),
+      )
+      .filter((file) => !classify([file]).areas.has('root'));
+
+    assert.deepStrictEqual(missed, []);
   });
 });
 

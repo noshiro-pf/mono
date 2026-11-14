@@ -11,6 +11,8 @@
     "jsx": "react-jsx",
     "jsxImportSource": "synstate-dom"
   },
-  "include": ["./samples", "./scripts", "./test"],
+  "include": ["./astro.config.mjs", "./samples", "./scripts", "./test"],
+  // It imports `astro:content`, a module only Astro's own type generation
+  // declares, so `tsc` cannot resolve it.
   "exclude": ["./src/content.config.ts"]
 }
