@@ -52,6 +52,7 @@ Each page gives the API's description, taken from its JSDoc, and an example that
 - [`skipIfNoChange`](/mono/synstate-next/reference/operators/skip-if-no-change/): Drops a value equal to the one held (`Object.is` unless `equals` says otherwise).
 - [`keepEqualParts`](/mono/synstate-next/reference/operators/keep-equal-parts/): Replaces the parts of each value that are deeply equal to the held value's with the held value's own, so that a part that did not change keeps its reference.
 - [`withInitialValue`](/mono/synstate-next/reference/operators/with-initial-value/): Holds `initialValue` until the source emits, then follows the source.
+- [`dropInitialValue`](/mono/synstate-next/reference/operators/drop-initial-value/): Holds no value when created, whatever the source holds, and passes on every value the source emits after that.
 - [`withCurrentValueFrom`](/mono/synstate-next/reference/operators/with-current-value-from/): Pairs each value of the source with the value `other` holds, up to date for the same update.
 - [`withBufferedFrom`](/mono/synstate-next/reference/operators/with-buffered-from/): Gives each value of the source the values `other` emitted since the previous one, in order: those emitted in the same update included, those it held before this node was created not.
 - [`debounce`](/mono/synstate-next/reference/operators/debounce/): Emits the latest value once `milliseconds` have passed without another, in an update of its own.

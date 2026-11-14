@@ -2,6 +2,7 @@ export * from './audit.mjs';
 export * from './create-derived.mjs';
 export * from './debounce.mjs';
 export * from './derive.mjs';
+export * from './drop-initial-value.mjs';
 export * from './filter.mjs';
 export * from './keep-equal-parts.mjs';
 export * from './map.mjs';

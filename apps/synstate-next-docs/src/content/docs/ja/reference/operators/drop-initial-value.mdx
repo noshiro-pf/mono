@@ -1,0 +1,48 @@
+---
+title: dropInitialValue
+description: '作られた時点ではソースが何を持っていても値を持たず、その後にソースが流す値をすべて流します。'
+---
+
+{/* translated-from:2bfd23b8c734 */}
+
+作られた時点ではソースが何を持っていても値を持たず、その後にソースが流す値をすべて流します。値を持たないソースでは最初の発火を捨てる `skip(1)` と異なり、捨てるのは開始時に持っている値だけです。
+
+{/* reference:operator-kind */}
+
+ソースが値を持っていても、結果は値を持たないことがあります。`pipe` の結果は `Observable` です（[`DropInitialValueOperator`](/mono/synstate-next/ja/guides/deriving-values/#pipe)）。
+
+{/* /reference */}
+
+## 例
+
+```tsx
+import { dropInitialValue, state } from 'synstate-next';
+import { Optional } from 'ts-std-forge';
+
+const eventId = state('event-1');
+
+// Reacts to a change of the id, not to the id held at the start.
+const eventIdChanged = eventId.pipe(dropInitialValue());
+
+const mut_fetched: string[] = [];
+
+eventIdChanged.subscribe((id) => {
+    mut_fetched.push(id);
+});
+
+assert.isTrue(Optional.isNone(eventIdChanged.getSnapshot()));
+
+assert.deepStrictEqual(mut_fetched, []);
+
+eventId.set('event-2');
+
+assert.deepStrictEqual(mut_fetched, ['event-2']);
+```
+
+## 関連項目
+
+- [`withInitialValue`](/mono/synstate-next/ja/reference/operators/with-initial-value/)
+- [値を派生させる](/mono/synstate-next/ja/guides/deriving-values/)
+- [すべての API](/mono/synstate-next/ja/reference/)
+
+[GitHub のソース](https://github.com/noshiro-pf/mono/blob/main/libs/synstate-next/src/operators/drop-initial-value.mts)

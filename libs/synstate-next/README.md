@@ -32,10 +32,10 @@ synstate や synstate-dom に入れたバグ修正・セキュリティ修正・
 - The sources `timer`, `counter`, `fromPromise`, `fromAbortablePromise`,
   `fromSubscribable`, `just` and `empty`.
 - `pipe` with the operators `map`, `filter`, `scan`, `withInitialValue`,
-  `skipIfNoChange`, `keepEqualParts`, `pairwise`, `take`, `skip`, `takeWhile`,
-  `skipWhile`, `takeUntil`, `skipUntil`, `withCurrentValueFrom`,
-  `withBufferedFrom`, `debounce`, `throttle`, `audit`, `switchMap` and
-  `mergeMap`, and `derive`, `merge` and `zip`.
+  `dropInitialValue`, `skipIfNoChange`, `keepEqualParts`, `pairwise`, `take`,
+  `skip`, `takeWhile`, `skipWhile`, `takeUntil`, `skipUntil`,
+  `withCurrentValueFrom`, `withBufferedFrom`, `debounce`, `throttle`, `audit`,
+  `switchMap` and `mergeMap`, and `derive`, `merge` and `zip`.
 - The helpers `createState`, `createReducer`, `createBooleanState`,
   `createEventEmitter` and `createValueEmitter`.
 - `createDerived` and `createSource`, for writing an operator or a source

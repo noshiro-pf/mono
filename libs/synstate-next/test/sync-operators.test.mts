@@ -1,5 +1,6 @@
 import {
   batch,
+  dropInitialValue,
   keepEqualParts,
   map,
   merge,
@@ -134,6 +135,72 @@ describe(skip, () => {
     const a = state(0);
 
     assert.deepStrictEqual(collect(a.pipe(skip(0))), [0]);
+  });
+});
+
+describe(dropInitialValue, () => {
+  test('holds nothing at the start, though the source holds a value', () => {
+    const a = state(0);
+
+    const dropped = a.pipe(dropInitialValue());
+
+    const seen = collect(dropped);
+
+    assert.isTrue(Optional.isNone(dropped.getSnapshot()));
+
+    assert.deepStrictEqual(seen, []);
+
+    a.set(1);
+
+    a.set(2);
+
+    assert.deepStrictEqual(seen, [1, 2]);
+
+    assert.deepStrictEqual(dropped.getSnapshot(), Optional.some(2));
+  });
+
+  test('passes the first emission of a source that holds no value', () => {
+    const e = source<number>();
+
+    const seen = collect(e.pipe(dropInitialValue()));
+
+    e.emit(1);
+
+    e.emit(2);
+
+    assert.deepStrictEqual(seen, [1, 2]);
+  });
+
+  test('drops a value written in the batch it is created in, before it', () => {
+    const a = state(0);
+
+    const dropped = batch(() => {
+      a.set(1);
+
+      return a.pipe(dropInitialValue());
+    });
+
+    const seen = collect(dropped);
+
+    assert.isTrue(Optional.isNone(dropped.getSnapshot()));
+
+    a.set(2);
+
+    assert.deepStrictEqual(seen, [2]);
+  });
+
+  test('passes a value written in the batch it is created in, after it', () => {
+    const a = state(0);
+
+    const dropped = batch(() => {
+      const created = a.pipe(dropInitialValue());
+
+      a.set(1);
+
+      return created;
+    });
+
+    assert.deepStrictEqual(dropped.getSnapshot(), Optional.some(1));
   });
 });
 

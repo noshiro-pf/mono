@@ -7,11 +7,11 @@ description: pipe と 3 種類のオペレーター、derive、merge と zip、�
 
 `observable.pipe(op)` は 1 つのオペレーターを適用します。さらに適用するときは、`a.pipe(map(f)).pipe(filter(p))` のように `pipe` をつなぎます。各オペレーターは、最初に持っている値をどう扱うかを、受け取る型と返す型で表しています。
 
-| オペレーターの型              | 意味                                     | オペレーター                                                                                                                                      |
-| :---------------------------- | :--------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `KeepInitialValueOperator`    | ソースが値を持てば値を持つ               | `map`・`debounce`・`throttle`・`audit`・`take`・`takeUntil`・`skipIfNoChange`・`keepEqualParts`・`withBufferedFrom`                               |
-| `DropInitialValueOperator`    | ソースにかかわらず値を持たないことがある | `filter`・`skip`・`takeWhile`（`inclusive` 付きは `Keep`）・`skipWhile`・`skipUntil`・`pairwise`・`switchMap`・`mergeMap`・`withCurrentValueFrom` |
-| `ProvideInitialValueOperator` | 常に値を持つ                             | `scan`・`withInitialValue`                                                                                                                        |
+| オペレーターの型              | 意味                                     | オペレーター                                                                                                                                                          |
+| :---------------------------- | :--------------------------------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `KeepInitialValueOperator`    | ソースが値を持てば値を持つ               | `map`・`debounce`・`throttle`・`audit`・`take`・`takeUntil`・`skipIfNoChange`・`keepEqualParts`・`withBufferedFrom`                                                   |
+| `DropInitialValueOperator`    | ソースにかかわらず値を持たないことがある | `filter`・`skip`・`takeWhile`（`inclusive` 付きは `Keep`）・`skipWhile`・`skipUntil`・`pairwise`・`switchMap`・`mergeMap`・`withCurrentValueFrom`・`dropInitialValue` |
+| `ProvideInitialValueOperator` | 常に値を持つ                             | `scan`・`withInitialValue`                                                                                                                                            |
 
 `pipe` は、オペレーターの型を結果の型に反映します。`.value` を持つ `InitializedObservable<A>` か、値を `getSnapshot()` が `Optional` で返す `Observable<A>` です。例は[概要](/mono/synstate-next/ja/getting-started/introduction/#pipe-で値を派生させる)にあります。
 
