@@ -1445,8 +1445,10 @@ a:focus-visible {
  * view, and a map of the whole queue above it. Each box is a size container,
  * and the number in it is sized to the box. The running one is filled with
  * the accent; one whose turn has not come is a dashed box in the DAG's waiting
- * amber, and one with a check failed the same in red. What is not the worker's
- * to move is outside the row in the attention orange, as a set-aside badge is.
+ * amber, and one with a check failed the same in red. What a box waits for
+ * ahead of it in the row is an arc over the row in that amber, from that box to
+ * it. What is not the worker's to move is outside the row in the attention
+ * orange, as a set-aside badge is.
  */
 .queue-section {
   --queue-frame: light-dark(#a9a8a1, #5a5955);
@@ -1457,6 +1459,29 @@ a:focus-visible {
   --queue-map-height: 0.75rem;
   --queue-map-gap: 0.375rem;
   --queue-fade: 2.5rem;
+  /* Above the boxes: the priority pills across their top edge, and the arcs. */
+  --queue-room: 0.5rem;
+}
+
+/* As high as the highest arc over the row (`.queue-arc`), and a little. */
+.queue-row:has(> .queue-track > .queue[data-arc-level='1']) {
+  --queue-room: 0.75rem;
+}
+
+.queue-row:has(> .queue-track > .queue[data-arc-level='2']) {
+  --queue-room: 1.125rem;
+}
+
+.queue-row:has(> .queue-track > .queue[data-arc-level='3']) {
+  --queue-room: 1.5rem;
+}
+
+.queue-row:has(> .queue-track > .queue[data-arc-level='4']) {
+  --queue-room: 1.875rem;
+}
+
+.queue-row:has(> .queue-track > .queue[data-arc-level='5']) {
+  --queue-room: 2.25rem;
 }
 
 /* Wraps as a whole after the title's links rather than inside a count. */
@@ -1481,12 +1506,14 @@ a:focus-visible {
   font-size: 0.75rem;
   /* Level with the middle of the boxes, which start below the pills. */
   line-height: 3.75rem;
-  margin-top: 0.5rem;
+  margin-top: var(--queue-room);
 }
 
 /* And below the map, when there is one. */
 .queue-row:has(> .queue-track[data-overflows='true']) > .queue-base {
-  margin-top: calc(0.5rem + var(--queue-map-height) + var(--queue-map-gap));
+  margin-top: calc(
+    var(--queue-room) + var(--queue-map-height) + var(--queue-map-gap)
+  );
 }
 
 .queue-track {
@@ -1501,15 +1528,18 @@ a:focus-visible {
   margin: 0;
   overflow-x: auto;
   overscroll-behavior-x: contain;
-  /* Room for the priority pills across the top edge. */
-  padding: 0.5rem 0 0;
+  /*
+   * Room for the priority pills across the top edge, and the arcs over them:
+   * an overflow that scrolls clips what is drawn outside it.
+   */
+  padding: var(--queue-room) 0 0;
   /* A box reached by Tab is not left under a faded edge. */
   scroll-padding-inline: var(--queue-fade);
-}
-
-.queue-track[data-overflows='true'] > .queue {
-  /* Off the scroll bar. */
-  padding-bottom: 0.375rem;
+  /*
+   * The map above the row is its scroll bar (`queue-map.tsx`); a wheel, a
+   * swipe and the keyboard still scroll it.
+   */
+  scrollbar-width: none;
 }
 
 /* A box reached by Tab is not left under the running one, which stays put. */
@@ -1549,6 +1579,66 @@ a:focus-visible {
   flex: 1 0 var(--queue-slot-min);
   flex-direction: column;
   min-width: 0;
+  /* What its arcs are placed against. */
+  position: relative;
+}
+
+/*
+ * An arc from the middle of a box ahead to the middle of this one, as many
+ * boxes long as it spans (every box is the same width), standing on their top
+ * edge: the top half of an ellipse, a step higher each time the span doubles
+ * (`levelOf` in `queue-section.tsx`).
+ * The pills are drawn over its ends. It always runs forward, from what is
+ * waited for to what waits, so it needs no head.
+ */
+.queue-arc {
+  border: 1.25px solid var(--queue-waiting);
+  border-bottom: none;
+  border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+  bottom: 100%;
+  height: 0.625rem;
+  opacity: 0.6;
+  pointer-events: none;
+  position: absolute;
+}
+
+.queue-arc[data-level='2'] {
+  height: 1rem;
+}
+
+.queue-arc[data-level='3'] {
+  height: 1.375rem;
+}
+
+.queue-arc[data-level='4'] {
+  height: 1.75rem;
+}
+
+.queue-arc[data-level='5'] {
+  height: 2.125rem;
+}
+
+/*
+ * The running box held at the start covers the room above it too once the row
+ * has scrolled under it, as it covers the boxes: an arc drawn from where it
+ * stood before the row scrolled would otherwise start above nothing, and an arc
+ * from it now comes out from behind it.
+ */
+.queue-track[data-more-before='true']
+  .queue-slot[data-kind='running']:first-child::before {
+  background: var(--surface);
+  bottom: 100%;
+  content: '';
+  height: var(--queue-room);
+  left: 0;
+  position: absolute;
+  right: 0;
+}
+
+/* The arcs into the box pointed at or focused. */
+.queue-slot:has(> .queue-link:is(:hover, :focus-visible)) > .queue-arc {
+  border-width: 2px;
+  opacity: 1;
 }
 
 /* The first running box; a second one, should there be one, scrolls by. */
@@ -1727,6 +1817,12 @@ a:focus-visible {
 
 .queue-slot[data-kind='failing'] .queue-note {
   color: var(--status-critical);
+}
+
+/* What is not an open pull request, queued or not, and so not waited for. */
+.queue-slot .queue-note[data-settled='true'] {
+  color: var(--ink-muted);
+  text-decoration: line-through;
 }
 
 /*
@@ -1956,6 +2052,24 @@ a:focus-visible {
 .queue-swatch[data-kind='waiting'] {
   background: color-mix(in srgb, var(--queue-waiting) 8%, var(--surface));
   border: 1px dashed var(--queue-waiting);
+}
+
+.queue-swatch[data-kind='arc'] {
+  border: 1.25px solid var(--queue-waiting);
+  border-bottom: none;
+  border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+  height: 0.5rem;
+}
+
+/* A note as a box draws it: what it waits for, and what it no longer does. */
+.queue-legend-after {
+  color: var(--queue-waiting);
+  font-family: var(--font-mono);
+}
+
+.queue-legend-settled {
+  color: var(--ink-muted);
+  font-family: var(--font-mono);
 }
 
 .queue-swatch[data-kind='outside'] {

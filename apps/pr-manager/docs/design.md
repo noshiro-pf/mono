@@ -51,17 +51,28 @@ the order it stacked them (its `queue/pr-*` branches, read with the pull
 requests, and `stackedAhead` in `pr-report-core`, which the worker releases by),
 each saying where the checks on its layer stand; then the ones whose turn has
 not come, in a dashed box saying what they wait for (`after #N`, `review`,
-`native stack`). Every box is the same width and carries the priority on a pill
-as the DAG's nodes do; hovering one shows its title. A box is never narrower
-than its number needs: when more are queued than fit, the row scrolls across
-with the running one held at its start, and a map of the whole queue, a mark per
-box, is drawn above it with a frame round the part in view; the frame is dragged
-like a scroll bar's thumb, and a click elsewhere on the map scrolls there. What
-is set aside, claimed, a draft or otherwise not the worker's to move is drawn
-outside the row, with why in a word and whose it is. It is decided by the code
-the worker decides with (`queue-order.mts` in `pr-report-core`), from what the
-page reads; what one run of the worker has seen green without merging, and so
-put last, lives in that run's memory and is not shown.
+`native stack`). What a box waits for that is ahead of it in the row is not
+written in it but drawn as an arc over the row, from that box to it, higher the
+farther it reaches, so a stack reads as a chain of arcs; `after #N` is left for
+what is behind it or not in the row at all. Any open pull request blocks, queued
+or not, a draft included, as the worker reads it; a `Merge-After:` number that
+is not an open pull request — one merged or closed, mostly — is one the worker
+does not wait for, and a box with nothing else to say shows it struck out, so
+that its author can see the order is met. Every box is the same width and
+carries the priority on a pill as the DAG's nodes do; hovering one shows its
+title and thickens the arcs into it. A box is never narrower than its number
+needs: when more are queued than fit, the row scrolls across with the running
+one held at its start, and a map of the whole queue, a mark per box, is drawn
+above it with a frame round the part in view, in place of the row's own scroll
+bar, which is hidden; a mouse wheel turned over either scrolls the row across
+without Shift, and leaves the page to scroll on once the row is at its end; the
+frame is dragged like a scroll bar's thumb, and a click elsewhere on the map
+scrolls there. What is set aside, claimed, a draft or otherwise not the worker's
+to move is drawn outside the row, with why in a word and whose it is.
+It is decided by the code the worker decides with (`queue-order.mts` in
+`pr-report-core`), from what the page reads; what one run of the worker has seen
+green without merging, and so put last, lives in that run's memory and is not
+shown.
 
 A layer's checks are what the worker is running while the pull request waits
 with `skip-ci` on, so its box says what the worker does with the layer, as the

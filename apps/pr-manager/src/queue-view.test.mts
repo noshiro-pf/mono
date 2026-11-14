@@ -388,9 +388,193 @@ describe(queueViewOf, () => {
 
     assert.deepStrictEqual(shape(view).slots, [
       [1, 'next', undefined],
-      [2, 'waiting', 'after #1'],
-      [3, 'waiting', 'after #1'],
+      [2, 'waiting', undefined],
+      [3, 'waiting', undefined],
     ]);
+  });
+
+  test('draws a wait on a box ahead in the row as an arc, and says only what is not ahead', () => {
+    const view = queueViewOf(
+      input([
+        pull(1, { labels: [MERGE_QUEUED_LABEL, SKIP_CI_LABEL] }),
+        pull(2, {
+          labels: [MERGE_QUEUED_LABEL, SKIP_CI_LABEL],
+          body: 'Merge-After: #1, #5',
+        }),
+        pull(3, {
+          labels: [MERGE_QUEUED_LABEL, SKIP_CI_LABEL],
+          baseRef: 'branch-1',
+        }),
+        pull(4, {
+          labels: [MERGE_QUEUED_LABEL, SKIP_CI_LABEL],
+          body: 'Merge-After: #6',
+        }),
+        // Open, and not queued.
+        pull(5, { labels: [] }),
+        // Queued, and after #4 in the row, which waits for it.
+        pull(6, {
+          labels: [MERGE_QUEUED_LABEL, SKIP_CI_LABEL],
+          body: 'Merge-After: #5',
+        }),
+      ]),
+    );
+
+    assert.deepStrictEqual(
+      view.slots.map(({ number, note, arcs }) => [number, note, arcs]),
+      [
+        [1, undefined, []],
+        // Its turn comes once #1 merges.
+        [3, undefined, [{ number: 1, span: 1 }]],
+        [2, 'after #5', [{ number: 1, span: 2 }]],
+        [4, 'after #6', []],
+        [6, 'after #5', []],
+      ],
+    );
+  });
+
+  test('strikes out what a pull request declared it merges after once that is no longer open', () => {
+    const view = queueViewOf(
+      input([
+        pull(1, { labels: [MERGE_QUEUED_LABEL, SKIP_CI_LABEL] }),
+        // #8 and #9 are merged or closed.
+        pull(2, {
+          labels: [MERGE_QUEUED_LABEL, SKIP_CI_LABEL],
+          body: 'Merge-After: #9',
+        }),
+        pull(3, {
+          labels: [MERGE_QUEUED_LABEL, SKIP_CI_LABEL],
+          body: 'Merge-After: #1, #8, #9',
+        }),
+        pull(4, {
+          labels: [MERGE_QUEUED_LABEL, SKIP_CI_LABEL],
+          body: 'Merge-After: #9',
+          mergeable: 'CONFLICTING',
+        }),
+      ]),
+    );
+
+    assert.deepStrictEqual(
+      view.slots.map(({ number, kind, note, noteSettled, detail }) => [
+        number,
+        kind,
+        note,
+        noteSettled,
+        detail,
+      ]),
+      [
+        [1, 'next', undefined, false, undefined],
+        [
+          2,
+          'next',
+          'after #9',
+          true,
+          'Merge-After: #9 is merged, closed or not a pull request: not a blocker',
+        ],
+        // What it still waits for, ahead of it, is kept in the detail, which is
+        // what a screen reader reads for the arc.
+        [
+          3,
+          'waiting',
+          'after #8 +1',
+          true,
+          'Merge-After: #1; #8, #9 are merged, closed or not a pull request: not a blocker',
+        ],
+        [4, 'next', 'conflicts', false, undefined],
+      ],
+    );
+  });
+
+  // What blocks is any open pull request, as the worker reads it: one that is
+  // not queued, or a draft, is waited for like a queued one.
+  test('strikes out nothing that is open, queued or not', () => {
+    const view = queueViewOf(
+      input([
+        pull(5, { labels: [] }),
+        pull(6, { labels: [], isDraft: true }),
+        pull(7, {
+          labels: [MERGE_QUEUED_LABEL, SKIP_CI_LABEL],
+          body: 'Merge-After: #5, #6',
+        }),
+      ]),
+    );
+
+    assert.deepStrictEqual(
+      view.slots.map(({ number, kind, note, noteSettled }) => [
+        number,
+        kind,
+        note,
+        noteSettled,
+      ]),
+      [[7, 'waiting', 'after #5 +1', false]],
+    );
+  });
+
+  test('says where the checks on its layer stand of a stacked layer whose wait is an arc', () => {
+    const queued = [MERGE_QUEUED_LABEL, SKIP_CI_LABEL] as const;
+
+    const layer = (
+      number: number,
+      below: Readonly<{ tip: string; tree: string }>,
+      checks: LayerChecks,
+    ): CheckedQueueLayer =>
+      ({
+        number,
+        head: sha(number),
+        tip: `tip-${number}`,
+        tree: `tree-${number}`,
+        parent: below.tip,
+        parentTree: below.tree,
+        builtAt: NOW_MS,
+        checks,
+      }) as const;
+
+    const view = queueViewOf({
+      ...input([
+        pull(5, { labels: queued }),
+        pull(6, { labels: queued, baseRef: 'branch-5' }),
+      ]),
+      layers: {
+        baseTree: 'main-tree',
+        built: [
+          layer(5, { tip: BASE_TIP, tree: 'main-tree' }, GREEN_LAYER),
+          layer(6, { tip: 'tip-5', tree: 'tree-5' }, RUNNING_LAYER),
+        ],
+      },
+    });
+
+    assert.deepStrictEqual(
+      view.slots.map(({ number, note, arcs }) => [number, note, arcs]),
+      [
+        [5, 'passed', []],
+        [6, '2/6 runs', [{ number: 5, span: 1 }]],
+      ],
+    );
+
+    // Its layer's checks not read, it says it is checked ahead, and why.
+    const unread = queueViewOf({
+      ...input([
+        pull(5, { labels: queued }),
+        pull(6, { labels: queued, baseRef: 'branch-5' }),
+      ]),
+      layers: {
+        baseTree: 'main-tree',
+        built: [
+          layer(5, { tip: BASE_TIP, tree: 'main-tree' }, GREEN_LAYER),
+          {
+            ...layer(6, { tip: 'tip-5', tree: 'tree-5' }, GREEN_LAYER),
+            checks: undefined,
+          },
+        ],
+      },
+    });
+
+    assert.deepStrictEqual(
+      unread.slots.map(({ number, note, detail }) => [number, note, detail]),
+      [
+        [5, 'checked ahead', KEPT_AHEAD_DETAIL],
+        [6, 'checked ahead', `stacked on #5; ${KEPT_AHEAD_DETAIL}`],
+      ],
+    );
   });
 
   test('puts one whose wait ends when the ones ahead of it merge where it would then be picked', () => {
@@ -420,12 +604,12 @@ describe(queueViewOf, () => {
 
     assert.deepStrictEqual(shape(view).slots, [
       [1, 'next', undefined],
-      [3, 'waiting', 'after #1'],
-      [7, 'waiting', 'after #3'],
+      [3, 'waiting', undefined],
+      [7, 'waiting', undefined],
       [2, 'next', undefined],
-      [4, 'waiting', 'after #1'],
+      [4, 'waiting', undefined],
       [5, 'failing', 'failing'],
-      [6, 'waiting', 'after #5'],
+      [6, 'waiting', undefined],
     ]);
   });
 
@@ -447,9 +631,9 @@ describe(queueViewOf, () => {
 
     assert.deepStrictEqual(shape(view).slots, [
       [1, 'running', undefined],
-      [3, 'waiting', 'after #1'],
+      [3, 'waiting', undefined],
       [2, 'next', undefined],
-      [4, 'next', undefined],
+      [4, 'next', 'after #9'],
     ]);
   });
 
@@ -469,9 +653,18 @@ describe(queueViewOf, () => {
 
     assert.deepStrictEqual(shape(view).slots, [
       [2, 'next', undefined],
-      [1, 'waiting', 'after #2'],
+      [1, 'waiting', 'release'],
       [3, 'failing', 'failing'],
     ]);
+
+    assert.deepStrictEqual(
+      view.slots.map(({ arcs, detail }) => [arcs, detail]),
+      [
+        [[], undefined],
+        [[{ number: 2, span: 1 }], 'held by blocks-release on #2'],
+        [[], 'a required check failed'],
+      ],
+    );
   });
 
   test('moves each layer of a stack onto the default branch as the one below it would merge', () => {
@@ -492,8 +685,8 @@ describe(queueViewOf, () => {
 
     assert.deepStrictEqual(shape(view).slots, [
       [1, 'next', undefined],
-      [3, 'waiting', 'after #1'],
-      [4, 'waiting', 'after #3'],
+      [3, 'waiting', undefined],
+      [4, 'waiting', undefined],
       [2, 'next', undefined],
     ]);
   });
@@ -528,8 +721,8 @@ describe(queueViewOf, () => {
     assert.deepStrictEqual(shape(view).slots, [
       [3, 'next', undefined],
       [1, 'next', undefined],
-      [2, 'waiting', 'after #1'],
-      [4, 'waiting', 'after #3'],
+      [2, 'waiting', undefined],
+      [4, 'waiting', undefined],
     ]);
   });
 
@@ -554,7 +747,7 @@ describe(queueViewOf, () => {
     assert.deepStrictEqual(shape(view).slots, [
       [1, 'next', undefined],
       [3, 'next', undefined],
-      [2, 'waiting', 'after #1'],
+      [2, 'waiting', undefined],
     ]);
   });
 
@@ -631,7 +824,7 @@ describe(queueViewOf, () => {
 
     assert.deepStrictEqual(shape(view).slots, [
       [1, 'next', undefined],
-      [2, 'waiting', 'after #1'],
+      [2, 'waiting', undefined],
       [3, 'next', undefined],
     ]);
   });
@@ -998,6 +1191,9 @@ const shape = (
   }) as const;
 
 const BASE_TIP = 'b'.repeat(40);
+
+const KEPT_AHEAD_DETAIL =
+  'its queue layer is built, so the worker releases it before what the queue’s own order would put first';
 
 const OLDER_BASE = 'a'.repeat(40);
 

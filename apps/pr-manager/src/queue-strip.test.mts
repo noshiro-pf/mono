@@ -6,6 +6,7 @@ import {
   overflows,
   scrollLeftAt,
   tipSideOf,
+  wheeledLeft,
   windowOf,
 } from './queue-strip.mjs';
 
@@ -14,6 +15,10 @@ const strip = (left: number, held = 0) =>
   ({ left, width: 800, scrollWidth: 4000, held }) as const;
 
 const fits = { left: 0, width: 800, scrollWidth: 800, held: 0 } as const;
+
+// A vertical wheel, in pixels unless `deltaMode` says lines (1) or pages (2).
+const down = (deltaY: number, deltaMode = 0) =>
+  ({ deltaX: 0, deltaY, deltaMode, ctrlKey: false }) as const;
 
 describe(overflows, () => {
   test('is false before the strip is measured', () => {
@@ -174,5 +179,56 @@ describe(tipSideOf, () => {
     expect(tipSideOf(NO_STRIP, 2, 10)).toBe('start');
 
     expect(tipSideOf(NO_STRIP, 7, 10)).toBe('end');
+  });
+});
+
+describe(wheeledLeft, () => {
+  test('scrolls the strip across by what a vertical wheel turns', () => {
+    assert.strictEqual(wheeledLeft(strip(1000), down(100)), 1100);
+
+    assert.strictEqual(wheeledLeft(strip(1000), down(-100)), 900);
+  });
+
+  test('reads a wheel counted in lines or pages', () => {
+    assert.strictEqual(wheeledLeft(strip(1000), down(3, 1)), 1060);
+
+    // A page is what is in view.
+    assert.strictEqual(wheeledLeft(strip(1000), down(1, 2)), 1800);
+  });
+
+  test('stops at either end', () => {
+    assert.strictEqual(wheeledLeft(strip(3100), down(200)), 3200);
+
+    assert.strictEqual(wheeledLeft(strip(50), down(-200)), 0);
+  });
+
+  test('leaves the wheel to the page where the strip cannot move that way', () => {
+    // At the end, or a fraction of a pixel short of it.
+    assert.isUndefined(wheeledLeft(strip(3200), down(100)));
+
+    assert.isUndefined(wheeledLeft(strip(3199.5), down(100)));
+
+    assert.isUndefined(wheeledLeft(strip(0), down(-100)));
+
+    assert.isUndefined(wheeledLeft(fits, down(100)));
+
+    assert.isUndefined(wheeledLeft(NO_STRIP, down(100)));
+  });
+
+  test('leaves alone a sideways gesture, a pinch and a wheel that turns nothing', () => {
+    assert.isUndefined(
+      wheeledLeft(strip(1000), {
+        deltaX: 40,
+        deltaY: 10,
+        deltaMode: 0,
+        ctrlKey: false,
+      }),
+    );
+
+    assert.isUndefined(
+      wheeledLeft(strip(1000), { ...down(100), ctrlKey: true }),
+    );
+
+    assert.isUndefined(wheeledLeft(strip(1000), down(0)));
   });
 });

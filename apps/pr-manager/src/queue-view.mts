@@ -46,6 +46,7 @@ import {
   type NativeStackEntry,
   type QueueContext,
   type QueueFacts,
+  type QueueGraph,
   type QueueOwner,
   type QueueStanding,
   type ReportEntry,
@@ -134,10 +135,24 @@ export type QueueSlot = Readonly<{
    * `failing` is up to date with a required check failed.
    */
   kind: 'running' | 'next' | 'waiting' | 'failing';
-  /** A word or two under the number: why it waits, or what it is. */
+  /**
+   * A word or two under the number: why it waits, or what it is. What it waits
+   * for that is ahead of it in the row is an arc instead (`arcs`).
+   */
   note: string | undefined;
+  /**
+   * Whether the note names only what it declared it merges after and is not an
+   * open pull request, queued or not — merged or closed, mostly — which it does
+   * not wait for: drawn struck out.
+   */
+  noteSettled: boolean;
   /** The tooltip's second line, when the note leaves something out. */
   detail: string | undefined;
+  /**
+   * What it waits for that is ahead of it in the row, each drawn as an arc from
+   * that box to this one: its number, and how many places back it is.
+   */
+  arcs: readonly SlotArc[];
   priority: Priority;
   /**
    * Where the checks on its queue layer stand, for one the worker has checked
@@ -145,6 +160,9 @@ export type QueueSlot = Readonly<{
    */
   layer: SlotLayer | undefined;
 }>;
+
+/** One box ahead in the row that a box waits for (`QueueSlot`'s `arcs`). */
+export type SlotArc = Readonly<{ number: number; span: number }>;
 
 /**
  * A layer as the box draws it: what the worker does with it (`layerStandings`
@@ -297,13 +315,23 @@ export const queueViewOf = ({
     layers,
   );
 
+  const row = [...running, ...picked, ...rest] as const;
+
+  // Where each number stands in the row.
+  const places: ReadonlyMap<number, number> = new Map(
+    row.map(({ facts }, index) => [facts.number, index] as const),
+  );
+
   return {
     base: defaultBranch,
-    slots: [...running, ...picked, ...rest].map(({ pull, facts, standing }) =>
+    slots: row.map(({ pull, facts, standing }, index) =>
       slotOf(pull, facts, standing, {
         defaultBranch,
         keptAhead: kept.has(facts.number),
         layer: slotLayers.get(facts.number),
+        place: index,
+        places,
+        settled: settledOf(graph, facts.number),
       }),
     ),
     outside: Arr.generate(function* () {
@@ -338,6 +366,10 @@ export const queueViewOf = ({
 
 /** A base tip no set-aside was recorded against: the base has moved. */
 const MOVED_BASE_TIP = '';
+
+/** What `checked ahead` under the number means. */
+const KEPT_AHEAD_DETAIL =
+  'its queue layer is built, so the worker releases it before what the queue’s own order would put first';
 
 const labelNamesOf = (entry: ReportEntry): readonly string[] =>
   entry.labels.map((label) => label.name);
@@ -715,25 +747,72 @@ const afterWord = (numbers: readonly number[]): string =>
       : (`after #${numbers[0]} +${numbers.length - 1}` as const)
     : 'waiting';
 
-/** The word under the number of one that waits, and what it leaves out. */
+/** `#1, #2`. */
+const numbersWord = (numbers: readonly number[]): string =>
+  numbers.map((n) => `#${n}`).join(', ');
+
+/**
+ * Why `Merge-After:` numbers that are not open pull requests are struck out:
+ * the worker waits for every open pull request, queued or not, a draft
+ * included, and for nothing else (`waitingOn` in `pr-report-core`). Merged or
+ * closed, mostly; an issue named by mistake is one too, and the page reads the
+ * state of neither, so the words name all three.
+ */
+const notBlocking = (numbers: readonly number[]): string =>
+  `${numbersWord(numbers)} ${Arr.isFixedLengthArray(1, numbers) ? 'is' : 'are'} merged, closed or not a pull request: not a blocker` as const;
+
+/**
+ * What a pull request declared it merges after — its `Merge-After:`, not what
+ * it inherits from the issues it closes, which may name an issue — that is not
+ * an open pull request. The worker does not wait for it (`waitingOn` in
+ * `pr-report-core`).
+ */
+const settledOf = (graph: QueueGraph, number: number): readonly number[] => {
+  const inherited = graph.inherited.get(number) ?? [];
+
+  return (graph.dependencies.get(number) ?? []).filter(
+    (n) => !graph.openNumbers.has(n) && !inherited.includes(n),
+  );
+};
+
+/**
+ * The word under the number of one that waits, and what it leaves out. What it
+ * waits for that is `ahead` of it in the row is drawn as an arc and left out of
+ * the word; the word is `undefined` when that is all of it.
+ */
 const sayStanding = (
   standing: QueueStanding,
-): Readonly<{ note: string; detail: string | undefined }> | undefined => {
+  ahead: ReadonlySet<number>,
+):
+  | Readonly<{ note: string | undefined; detail: string | undefined }>
+  | undefined => {
+  const waitWord = (on: readonly number[]): string | undefined => {
+    const notAhead = on.filter((n) => !ahead.has(n));
+
+    return Arr.isNonEmpty(notAhead) ? afterWord(notAhead) : undefined;
+  };
+
   switch (standing.kind) {
     case 'stacked':
-      return { note: `after #${standing.on}`, detail: 'stacked on it' };
+      return {
+        note: waitWord([standing.on]),
+        detail: `stacked on #${standing.on}`,
+      };
 
     case 'waiting':
       return {
-        note: afterWord(standing.on),
-        detail: `Merge-After: ${standing.on.map((n) => `#${n}`).join(', ')}`,
+        note: waitWord(standing.on),
+        detail: `Merge-After: ${numbersWord(standing.on)}`,
       };
 
-    case 'release-blocked':
+    case 'release-blocked': {
+      const by = standing.by.map(({ number }) => number);
+
       return {
-        note: afterWord(standing.by.map(({ number }) => number)),
-        detail: 'held by blocks-release',
+        note: waitWord(by),
+        detail: `held by blocks-release on ${numbersWord(by)}`,
       };
+    }
 
     case 'release-stale':
       return {
@@ -867,6 +946,37 @@ const sayLayer = (
   }
 };
 
+/** What one waits for other pull requests merging to end its wait. */
+const waitedOn = (standing: QueueStanding): readonly number[] => {
+  switch (standing.kind) {
+    case 'stacked':
+      return [standing.on];
+
+    case 'waiting':
+      return standing.on;
+
+    case 'release-blocked':
+      return standing.by.map(({ number }) => number);
+
+    case 'ignore':
+    case 'unactionable':
+    case 'owned':
+    case 'native-stack':
+    case 'release-stale':
+    case 'merge-state':
+    case 'candidate':
+    case 'in-flight':
+    case 'failing':
+    case 'held':
+    case 'needs':
+      return [];
+  }
+};
+
+/** Two tooltip lines' worth, as one. */
+const detailOf = (first: string | undefined, second: string): string =>
+  first === undefined ? second : (`${first}; ${second}` as const);
+
 const slotOf = (
   pull: QueuePull,
   facts: QueueFacts,
@@ -875,19 +985,77 @@ const slotOf = (
     defaultBranch,
     keptAhead,
     layer,
+    place,
+    places,
+    settled,
   }: Readonly<{
     defaultBranch: string;
     keptAhead: boolean;
     layer: SlotLayer | undefined;
+    /** Where this one stands in the row. */
+    place: number;
+    /** Where each number stands in the row. */
+    places: ReadonlyMap<number, number>;
+    /** What it declared it merges after that is not an open pull request. */
+    settled: readonly number[];
   }>,
 ): QueueSlot => {
   const { entry } = pull;
 
   const release = isVersionBranch(entry.headRef, defaultBranch);
 
+  const arcs = Arr.generate(function* () {
+    for (const number of waitedOn(standing)) {
+      const from = places.get(number);
+
+      if (from !== undefined && from < place) {
+        yield { number, span: place - from } as const;
+      }
+    }
+  });
+
+  const waited = sayStanding(
+    standing,
+    new Set(arcs.map(({ number }) => number)),
+  );
+
+  const layerSaid =
+    layer === undefined ? undefined : sayLayer(entry.number, layer);
+
+  // A wait drawn wholly as arcs leaves the word to the layer, and its detail,
+  // which a screen reader reads for the arcs, to the tooltip.
   const said =
-    sayStanding(standing) ??
-    (layer === undefined ? undefined : sayLayer(entry.number, layer));
+    waited === undefined
+      ? layerSaid
+      : layerSaid === undefined || waited.note !== undefined
+        ? waited
+        : ({
+            note: layerSaid.note,
+            detail: detailOf(waited.detail, layerSaid.detail),
+          } as const);
+
+  const note =
+    said?.note ??
+    (keptAhead
+      ? 'checked ahead'
+      : release
+        ? 'release'
+        : facts.mergeState === 'DIRTY'
+          ? 'conflicts'
+          : undefined);
+
+  // Said only when there is nothing else to say: what it is still waiting for,
+  // or how it stands, comes first.
+  const settledNote =
+    note === undefined && Arr.isNonEmpty(settled)
+      ? ({
+          note: afterWord(settled),
+          detail:
+            said?.detail === undefined
+              ? (`Merge-After: ${notBlocking(settled)}` as const)
+              : (`${said.detail}; ${notBlocking(settled)}` as const),
+        } as const)
+      : undefined;
 
   return {
     number: entry.number,
@@ -901,22 +1069,18 @@ const slotOf = (
           : standing.kind === 'failing'
             ? 'failing'
             : 'waiting',
-    note:
-      said?.note ??
-      (keptAhead
-        ? 'checked ahead'
-        : release
-          ? 'release'
-          : facts.mergeState === 'DIRTY'
-            ? 'conflicts'
-            : undefined),
+    note: settledNote?.note ?? note,
+    noteSettled: settledNote !== undefined,
     detail:
-      said?.detail ??
-      (keptAhead
-        ? 'its queue layer is built, so the worker releases it before what the queue’s own order would put first'
-        : undefined),
+      settledNote?.detail ??
+      // The note says it is checked ahead when nothing before it says more, and
+      // the detail says what that means after what it waits for.
+      (keptAhead && said?.note === undefined
+        ? detailOf(said?.detail, KEPT_AHEAD_DETAIL)
+        : said?.detail),
     priority: priorityOf(entry.labels),
     layer,
+    arcs,
   };
 };
 

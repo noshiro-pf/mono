@@ -42,10 +42,12 @@ import { RunStateIcon } from './run-state-icon.js';
  *
  * The boxes share the row, but none is narrower than its number needs: when
  * there are more than fit, the row scrolls across, the running one stays at its
- * start, and a map of the whole queue is drawn above it (`queue-map.tsx`). The
- * title is in the tooltip, and the rest of what is known about a pull request
- * is in its card in the merge order, so a box says only its number, its
- * priority and a word on why it waits.
+ * start, and a map of the whole queue is drawn above it (`queue-map.tsx`), which
+ * is its scroll bar; a wheel turned over either scrolls it across. The title is
+ * in the tooltip, and the rest of what is known about a pull request is in its
+ * card in the merge order, so a box says only its number, its priority and a
+ * word on why it waits. What it waits for that is ahead of it in the row is an
+ * arc over the row from that box to it instead, which scrolls with the boxes.
  */
 export const QueueSection = (): JSX.Element => {
   // `undefined` while what it is decided from is still being read.
@@ -111,6 +113,9 @@ const QUEUED_TITLE =
 
 const PICKED_TITLE =
   `The queued pull requests without ${SKIP_CI_LABEL}: the one unblock-prs is running and those it picked before, but also any whose ${SKIP_CI_LABEL} came off another way. GitHub cannot tell them apart; the boxes below can.` as const;
+
+/** The highest an arc over the row is drawn (`levelOf`). */
+const MAX_ARC_LEVEL = 5;
 
 const queuedOf = (entries: readonly Entry[]): readonly Entry[] =>
   entries
@@ -180,6 +185,21 @@ const QueueUnordered = (): JSX.Element => {
   );
 };
 
+/**
+ * How high an arc spanning `span` places is drawn, 1 to {@link MAX_ARC_LEVEL}:
+ * one step higher each time the span doubles, so that a long arc clears the
+ * shorter ones under it, up to a ceiling the row leaves room for.
+ */
+const levelOf = (span: number): number =>
+  Math.min(1 + Math.ceil(Math.log2(Math.max(span, 1))), MAX_ARC_LEVEL);
+
+/** The highest arc over the row, which the row leaves room for; 0 with none. */
+const arcLevelOf = (slots: readonly QueueSlot[]): string =>
+  Math.max(
+    0,
+    ...slots.flatMap(({ arcs }) => arcs.map(({ span }) => levelOf(span))),
+  ).toString();
+
 const QueueLegend = (): JSX.Element => (
   <ul class={constant('queue-legend')}>
     <li>
@@ -189,6 +209,18 @@ const QueueLegend = (): JSX.Element => (
     <li>
       <span class={constant('queue-swatch')} data-kind={constant('waiting')} />
       {constant('waits for another PR')}
+    </li>
+    <li>
+      <span class={constant('queue-swatch')} data-kind={constant('arc')} />
+      {constant('waits for the PR the arc starts at')}
+    </li>
+    <li>
+      <span class={constant('queue-legend-after')}>{constant('after #N')}</span>
+      {constant('#N is open, queued or not: a blocker')}
+    </li>
+    <li>
+      <s class={constant('queue-legend-settled')}>{constant('after #N')}</s>
+      {constant('#N merged, closed or not a PR: not a blocker')}
     </li>
     <li>
       <span class={constant('queue-swatch')} data-kind={constant('outside')} />
@@ -304,6 +336,10 @@ const QueueBody = ({
                   data-more-after={strip.strip$.pipe(
                     map((s) => edgesOf(s).after.toString()),
                   )}
+                  // Not passive, as a listener on an element other than the
+                  // document is not, so that a wheel it turns into a scroll
+                  // across does not scroll the page as well.
+                  onWheel={strip.wheel}
                 >
                   <If
                     cond={strip.strip$.pipe(map(overflows))}
@@ -321,6 +357,7 @@ const QueueBody = ({
                   <ol
                     ref={strip.ref}
                     class={constant('queue')}
+                    data-arc-level={slots$.pipe(map(arcLevelOf))}
                     onScroll={strip.onScroll}
                   >
                     <For items={slots$} key={(slot) => slot.number}>
@@ -335,6 +372,33 @@ const QueueBody = ({
                             map((slot) => slot.priority),
                           )}
                         >
+                          <For
+                            items={slot$.pipe(map((slot) => slot.arcs))}
+                            key={(arc) => arc.number}
+                          >
+                            {(arc$) => (
+                              <span
+                                aria-hidden={constant('true')}
+                                class={constant('queue-arc')}
+                                data-level={arc$.pipe(
+                                  map(({ span }) => levelOf(span).toString()),
+                                )}
+                                style={{
+                                  left: arc$.pipe(
+                                    map(
+                                      ({ span }) =>
+                                        `calc(50% - ${span * 100}%)` as const,
+                                    ),
+                                  ),
+                                  width: arc$.pipe(
+                                    map(
+                                      ({ span }) => `${span * 100}%` as const,
+                                    ),
+                                  ),
+                                }}
+                              />
+                            )}
+                          </For>
                           <QueueSlotBox
                             slot$={slot$}
                             onHide={hide}
