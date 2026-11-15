@@ -179,12 +179,13 @@ diff that reaches the converter or its output — `strict-lib/scripts-common/`,
 `strict-lib/scripts/`, oxfmt's configuration there, or a harness
 `strict-lib/v<X.Y>/` — also runs the generators as `strict-lib-gen.yml` does,
 `strict-lib:gen:with-codemod-fixed` and then `strict-lib:gen:version-diff`
-(about two and a half minutes), and fails when they change the tree. It does not
-run a package's `gen` that reads what they write (the synstate-dom packages'
-reflected keys, from the strict `lib.dom`) unless the diff touches that package
-or changes the code of one it declares; CI's `ws:gen` finds that one stale. The
-harnesses' own type checks (`ws:check:types:strict-lib`, each TypeScript minor
-over its generated lib) are `strict-lib-gen.yml`'s.
+(about two and a half minutes), and fails when they change the tree. Then it
+runs the `gen` of each package that reads what they write (`STRICT_LIB_READERS`:
+the synstate-dom packages' reflected keys, from the strict `lib.dom`), after
+building what that package is built against, which its generator reads from
+`dist/`, and fails when it changes the tree too.
+The harnesses' own type checks (`ws:check:types:strict-lib`, each TypeScript
+minor over its generated lib) are `strict-lib-gen.yml`'s.
 Browser tests, end-to-end tests, the Firestore rules tests (`check:test:rules`,
 which need Java; a diff touching a package's `firestore.rules`, `test/` or rules
 config prints a note naming the command, `rules-tests.mts`) and `ws:check:dist`

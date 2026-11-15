@@ -735,6 +735,106 @@ describe('buildPlan', () => {
     );
   });
 
+  describe('the generators that read the strict lib', () => {
+    // A workspace of its own, so that the readers declare nothing the shared
+    // fixture's other cases count.
+    const readers = [
+      pkg('strict-lib/v7.0', ['gen:lib', 'check:types']),
+      pkg('libs/ts-type-forge', ['build', 'check:types'], {
+        exportsBuild: true,
+      }),
+      pkg('libs/synstate', ['gen', 'build', 'check:types'], {
+        workspaceDependencies: ['ts-type-forge'],
+        buildDependencies: ['ts-type-forge'],
+        exportsBuild: true,
+      }),
+      pkg('libs/synstate-dom', ['gen', 'build', 'check:types'], {
+        workspaceDependencies: ['synstate', 'ts-type-forge'],
+        buildDependencies: ['synstate', 'ts-type-forge'],
+        exportsBuild: true,
+      }),
+      pkg('libs/synstate-dom-next', ['gen', 'build', 'check:types'], {
+        workspaceDependencies: ['ts-type-forge'],
+        buildDependencies: ['ts-type-forge'],
+        exportsBuild: true,
+      }),
+    ] as const;
+
+    test('a converter change runs their gen after the strict-lib generators, with what they import built', () => {
+      const commands = planCommands(readers, [
+        'strict-lib/scripts-common/src/convert.mts',
+      ]);
+
+      const versionDiff = at(commands, 'run strict-lib:gen:version-diff');
+
+      const typeForge = at(commands, 'libs/ts-type-forge: run build');
+
+      const synstate = at(commands, 'libs/synstate: run build');
+
+      const dom = at(commands, 'libs/synstate-dom: run gen');
+
+      const domNext = at(commands, 'libs/synstate-dom-next: run gen');
+
+      assert.isAbove(typeForge, versionDiff);
+
+      assert.isAbove(synstate, typeForge);
+
+      assert.isAbove(dom, synstate);
+
+      assert.isAbove(domNext, synstate);
+
+      // Their generators read their own sources.
+      assert.notInclude(commands, 'libs/synstate-dom: run build');
+
+      assert.notInclude(commands, 'libs/synstate-dom-next: run build');
+    });
+
+    test('their gen is a generator, so a change it makes to the tree fails the run', () => {
+      const steps = buildPlan({
+        classification: classifyChanges({
+          files: ['strict-lib/v7.0/temp/copied/lib.dom.d.ts'],
+          packages: readers,
+          proseGate,
+          generatorReaders: noReaders,
+        }),
+        base: 'abc123',
+        rootScripts,
+        coverage: true,
+        spellChecked: [],
+      });
+
+      assert.deepStrictEqual(
+        steps
+          .filter(
+            ({ cwd, args }) =>
+              cwd.startsWith('libs/synstate-dom') && args[1] === 'gen',
+          )
+          .map(({ kind }) => kind),
+        ['generate', 'generate'],
+      );
+    });
+
+    test('a strict-lib change the generators do not read runs neither', () => {
+      const commands = planCommands(readers, ['strict-lib/README.md']);
+
+      assert.notInclude(commands, 'libs/synstate-dom: run gen');
+
+      assert.notInclude(commands, 'libs/ts-type-forge: run build');
+    });
+
+    test('a touched reader runs its gen once', () => {
+      const commands = planCommands(readers, [
+        'strict-lib/scripts-common/src/convert.mts',
+        'libs/synstate-dom/src/x.mts',
+      ]);
+
+      assert.lengthOf(
+        commands.filter((command) => command === 'libs/synstate-dom: run gen'),
+        1,
+      );
+    });
+  });
+
   test('the strict-lib generators run before every other generator', () => {
     const steps = plan([
       'strict-lib/scripts-common/src/convert.mts',
