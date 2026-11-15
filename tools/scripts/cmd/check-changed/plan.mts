@@ -281,6 +281,30 @@ export const buildPlan = ({
     members,
   );
 
+  const strictLibReaders: readonly PackageInfo[] = areas.has(
+    'strict-lib-output',
+  )
+    ? members.filter(
+        ({ dir, scripts }) =>
+          STRICT_LIB_READERS.includes(dir) && scripts.has('gen'),
+      )
+    : ([] as const);
+
+  const isStrictLibReader = (pkg: PackageInfo): boolean =>
+    strictLibReaders.some(({ dir }) => dir === pkg.dir);
+
+  // Every member a reader is built against is built, not the changed ones
+  // alone: its generator's probe program reads them from `dist/` (the script
+  // itself runs from sources under `tools/configs/tsconfig.tsx.json`), a diff
+  // confined to `strict-lib/` changes none of them, and a missing or stale
+  // `dist/` would fail the generator or pass it silently. The readers
+  // themselves are not built; their generators read their own sources.
+  const builtForStrictLibReaders = changedBuildsFor(
+    strictLibReaders,
+    members.filter((member) => !isStrictLibReader(member)),
+    members,
+  );
+
   return [
     formatStep('format the diff (before)', base),
 
@@ -293,12 +317,10 @@ export const buildPlan = ({
     //
     // Before every other generator, so that one that reads what they write
     // reads it current when the plan runs it: `gen:verify-npm-packages` copies
-    // the bundles' manifests, and the synstate-dom packages' `gen` reads the
-    // strict `lib.dom` and each harness's `temp/copied/`. The synstate-dom
-    // packages' `gen` runs only when the diff touches its package or changes
-    // the code of one it declares, since check-changed knows a package
-    // generator's inputs only as those; a diff confined to `strict-lib/` leaves
-    // it to CI's `ws:gen`. The converter imports some packages' sources, but a
+    // the bundles' manifests, and the `gen` of each member in
+    // `STRICT_LIB_READERS` reads the strict `lib.dom` and each harness's
+    // `temp/copied/`, which runs right after them, with what it is built
+    // against built. The converter imports some packages' sources, but a
     // package generator that rewrites one fails the run itself, whichever runs
     // first.
     ...(areas.has('strict-lib-output')
@@ -308,7 +330,24 @@ export const buildPlan = ({
         ]
       : []),
 
-    ...packages.flatMap(({ pkg }) => packageStep(pkg, 'generate', 'gen')),
+    ...builtForStrictLibReaders.flatMap((pkg) =>
+      packageStep(pkg, 'build', 'build'),
+    ),
+
+    ...strictLibReaders.map(
+      (pkg) =>
+        ({
+          title: `${pkg.name}: gen (reads the strict lib)`,
+          kind: 'generate',
+          cwd: pkg.dir,
+          args: ['run', 'gen'],
+        }) as const,
+    ),
+
+    // A touched reader's `gen` ran just above.
+    ...packages
+      .filter(({ pkg }) => !isStrictLibReader(pkg))
+      .flatMap(({ pkg }) => packageStep(pkg, 'generate', 'gen')),
 
     // A generator can read a package it declares: the docs measure its bundle
     // and embed its JSDoc, the hooks packages re-export what it exports. Those
@@ -768,6 +807,20 @@ export const ROOT_GENERATORS = {
   string,
   Readonly<{ entry: string; inputs: readonly string[] }>
 >;
+
+/**
+ * The members whose `gen` reads what the strict-lib generators write: the
+ * synstate-dom packages' `gen:reflected-keys` reads each harness's
+ * `temp/copied/lib.dom.d.ts` and the strict `lib.dom` through the root
+ * `@typescript/lib-*` link. Their `gen` runs after the strict-lib generators,
+ * on `strict-lib-output`, whether or not the diff touches them.
+ * `strict-lib-readers.test.mts` holds the list to the members whose generators
+ * name the strict lib.
+ */
+export const STRICT_LIB_READERS: readonly string[] = [
+  'libs/synstate-dom',
+  'libs/synstate-dom-next',
+] as const;
 
 /** Whether `file` is one of `inputs`, or under one ending in `/`. */
 export const readsGeneratorInput = (
