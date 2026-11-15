@@ -5,8 +5,11 @@ import {
   isListed,
   issuesCodec,
   issueTileCounts,
+  labelPicksOf,
   passesTiers,
   sortIssues,
+  toggleAuthorOnlyHidden,
+  toggleAuthorOnlyOnly,
   toggleTierHidden,
   toggleTierOnly,
 } from './issues-view.mjs';
@@ -25,6 +28,32 @@ describe('issuesCodec', () => {
       labels: ['bug'],
       sort: 'start',
     });
+  });
+
+  test('drops author-only as a label, which has a switch of its own', () => {
+    const params = new URLSearchParams(
+      'issues.label=Author-Only&issues.label=bug&issues.onlyAuthorOnly=1',
+    );
+
+    assert.deepStrictEqual(issuesCodec.read(params), {
+      ...DEFAULT_ISSUES,
+      onlyAuthorOnly: true,
+      labels: ['bug'],
+    });
+
+    issuesCodec.write(issuesCodec.read(params), params);
+
+    assert.strictEqual(
+      searchOf(params),
+      '?issues.onlyAuthorOnly=1&issues.label=bug',
+    );
+
+    // Switched off and picked is switched off.
+    assert.isFalse(
+      issuesCodec.read(
+        new URLSearchParams('issues.onlyAuthorOnly=1&issues.hideAuthorOnly=1'),
+      ).onlyAuthorOnly,
+    );
   });
 
   test('writes only what differs, and drops the older keys', () => {
@@ -53,6 +82,69 @@ describe(passesTiers, () => {
         ...s,
         onlyInProgress: true,
       }),
+    );
+  });
+});
+
+describe('author only', () => {
+  const authorOnly = [
+    { name: 'author-only', color: '', description: '' },
+  ] as const;
+
+  test('picked, shows only what carries the label, read with the tiers', () => {
+    const s = toggleAuthorOnlyOnly({ ...DEFAULT_ISSUES, onlyPriority: ['A'] });
+
+    assert.isTrue(passesTiers(row(1, { tier: 'A', labels: authorOnly }), s));
+
+    assert.isFalse(passesTiers(row(2, { tier: 'A' }), s));
+
+    assert.isFalse(passesTiers(row(3, { tier: 'B', labels: authorOnly }), s));
+  });
+
+  test('switched off, hides it, and its tile counts what showing it would add', () => {
+    const s = toggleAuthorOnlyHidden(DEFAULT_ISSUES);
+
+    const rows = [
+      row(1, { tier: 'A', labels: authorOnly }),
+      row(2, { tier: 'A' }),
+      row(3, { tier: 'C', labels: authorOnly }),
+    ] as const;
+
+    assert.deepStrictEqual(
+      rows.filter((r) => passesTiers(r, s)).map(({ number }) => number),
+      [2],
+    );
+
+    const counts = issueTileCounts(rows, s, passesTiers);
+
+    assert.deepStrictEqual(counts.authorOnly, { count: 2, hidden: true });
+
+    assert.deepStrictEqual(counts.open, { shown: 1, total: 3 });
+  });
+
+  test('picking it switches it back on, and switching it off unpicks it', () => {
+    const picked = toggleAuthorOnlyOnly(toggleAuthorOnlyHidden(DEFAULT_ISSUES));
+
+    assert.isFalse(picked.hideAuthorOnly);
+
+    assert.isTrue(picked.onlyAuthorOnly);
+
+    const hidden = toggleAuthorOnlyHidden(picked);
+
+    assert.isTrue(hidden.hideAuthorOnly);
+
+    assert.isFalse(hidden.onlyAuthorOnly);
+  });
+});
+
+describe(labelPicksOf, () => {
+  test('lists every label but the tiers and author-only, in name order', () => {
+    assert.deepStrictEqual(
+      labelPicksOf([
+        row(1, { labels: labelled('priority:A', 'bug', 'Author-Only') }),
+        row(2, { labels: labelled('docs', 'bug', 'priority:hold') }),
+      ]),
+      ['bug', 'docs'],
     );
   });
 });
@@ -144,6 +236,9 @@ describe(toggleTierOnly, () => {
     );
   });
 });
+
+const labelled = (...names: readonly string[]): IssueRow['labels'] =>
+  names.map((name) => ({ name, color: '', description: '' }));
 
 const row = (number: number, fields: Partial<IssueRow> = {}): IssueRow =>
   ({
