@@ -1,5 +1,5 @@
 import { RuleTester, type Rule } from 'eslint';
-import { pluginRule, suggestionOnly } from './suggestion-only.mjs';
+import { pluginRule, pluginRules, suggestionOnly } from '../src/index.mjs';
 
 // ESLint's own tester, whose suggestion outputs take a `desc` as ESLint does.
 const tester = new RuleTester();
@@ -84,5 +84,35 @@ describe(pluginRule, () => {
     assert.isUndefined(pluginRule({ rules: { a: { create: 1 } } }, 'a'));
 
     assert.isUndefined(pluginRule(undefined, 'a'));
+  });
+
+  test('finds a rule the plugin defines as a non-enumerable property', () => {
+    const rules: unknown = Object.create(Object.prototype, {
+      hidden: { value: renameX },
+    });
+
+    assert.strictEqual(pluginRule({ rules }, 'hidden'), renameX);
+  });
+});
+
+describe(pluginRules, () => {
+  test('lists every rule of a plugin module, in its order', () => {
+    assert.deepStrictEqual(
+      pluginRules({ rules: { a: renameX, b: { create: 1 }, c: reportZ } }),
+      [
+        ['a', renameX],
+        ['c', reportZ],
+      ],
+    );
+  });
+
+  test('is empty for a value that is not a plugin', () => {
+    assert.deepStrictEqual(pluginRules(undefined), []);
+
+    assert.deepStrictEqual(pluginRules({ rules: null }), []);
+
+    assert.deepStrictEqual(pluginRules({}), []);
+
+    assert.deepStrictEqual(pluginRules({ rules: [renameX] }), []);
   });
 });

@@ -13,6 +13,7 @@ import {
   getImportDeclarations,
   importedNameOf,
   isShadowedCallee,
+  pluginRules,
   skipTypeWrappers,
 } from 'eslint-rule-forge';
 import { Arr, castDeepMutable, hasKey, isRecord, Obj } from 'ts-data-forge';
@@ -76,7 +77,7 @@ export const withSynstateDomConstants = (
     // own plugins, which carry no `meta` at all.
     ...metaOf(plugin),
     rules: Object.fromEntries(
-      rulesOf(plugin).map(
+      pluginRules(plugin).map(
         ([name, rule]) =>
           [
             name,
@@ -169,36 +170,6 @@ const metaOf = (plugin: unknown): Readonly<{ meta?: PluginMeta }> => {
         : {}),
     },
   };
-};
-
-/** The rules of `plugin`, each one that has a `create` function. */
-const rulesOf = (
-  plugin: unknown,
-): readonly (readonly [string, Rule.RuleModule])[] => {
-  if (
-    !isRecord(plugin) ||
-    !hasKey(plugin, 'rules') ||
-    !isRecord(plugin.rules)
-  ) {
-    return [];
-  }
-
-  const { rules } = plugin;
-
-  // Not `pluginRule` of ts-restrictions' `suggestion-only.mts`, which takes one
-  // rule by name and is internal to that plugin.
-  return Arr.generate(function* () {
-    for (const [name, rule] of Object.entries(rules)) {
-      if (
-        isRecord(rule) &&
-        hasKey(rule, 'create') &&
-        typeof rule.create === 'function'
-      ) {
-        // eslint-disable-next-line total-functions/no-unsafe-type-assertion -- a plugin's rule, which ESLint validates as it runs it
-        yield [name, rule as unknown as Rule.RuleModule] as const;
-      }
-    }
-  });
 };
 
 /**

@@ -1,6 +1,6 @@
 // @ts-expect-error no type definition
 import eslintPluginPromise from 'eslint-plugin-promise';
-import { pluginRule, suggestionOnly } from './suggestion-only.mjs';
+import { pluginRule, suggestionOnly } from 'eslint-rule-forge';
 
 /**
  * `promise/prefer-catch`, its fix only suggested. The fix rewrites
