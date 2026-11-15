@@ -1,6 +1,7 @@
 /** Which issue a round hands a session, read without the model. */
 
 import {
+  AUTHOR_ONLY_LABEL,
   hasLabel,
   issuePriorityLabel,
   issueStartRank,
@@ -148,8 +149,9 @@ export const ISSUES_READ = {
 
 /**
  * Labels that say an issue is not to be started as it stands: a question to
- * answer first, one that will not be done, or one the author is holding back,
- * or one placed under the tier for either (`docs/issue-priority.md`).
+ * answer first, one that will not be done, one the author is holding back, one
+ * only the author can do (`author-only`, whatever its tier), or one placed
+ * under the tier for either of the first three (`docs/issue-priority.md`).
  * `pending` is a pull request's label, and `pr-report` asks for an issue
  * carrying it to be moved to `priority:hold`; until it is, it still holds the
  * issue back, so that an issue its author paused is never started by mistake.
@@ -160,6 +162,7 @@ export const HELD_LABELS = [
   'question',
   'wontfix',
   PENDING_LABEL,
+  AUTHOR_ONLY_LABEL,
   issuePriorityLabel('hold'),
   issuePriorityLabel('close'),
 ] as const;

@@ -36,7 +36,8 @@ Issue labels:
 | `in-progress`                                                           | someone started it (`start-issue`)                 |
 | `planned`                                                               | someone means to start it next                     |
 | `priority:S`, `:A`, `:B`, `:C`, `:D`, `priority:hold`, `priority:close` | its tier, one per issue (`docs/issue-priority.md`) |
-| `duplicate`, `invalid`, `question`, `wontfix`, `pending`                | not handed to `run-issue-resolver`                 |
+| `author-only`                                                           | only the author can do it; keeps its tier          |
+| `duplicate`, `invalid`, `question`, `wontfix`, `pending`, `author-only` | not handed to `run-issue-resolver`                 |
 
 `issue-closed-labels.yml` takes `in-progress` and `planned` off a closing issue
 and releases its claim.

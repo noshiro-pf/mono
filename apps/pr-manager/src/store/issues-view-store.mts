@@ -4,11 +4,11 @@
  *
  * The DAG leaves out what is done (`omitDone`), so that what is left to do is
  * all it lays out — what is done is closed or merged, and is read only for how
- * an issue that names it stands; and the issues the tiers and `in progress`
- * leave out (`omitFilteredIssues`), `priority:hold` among them when it is
- * switched off, which both views read (`issues-list-store.mts`), with how many
- * issues each of them has drawn of how many are open. The view starts as
- * `initial`, which the page reads off the query string as it opens
+ * an issue that names it stands; and the issues the tiers, `in progress` and
+ * `author only` leave out (`omitFilteredIssues`), `priority:hold` among them
+ * when it is switched off, which both views read (`issues-list-store.mts`),
+ * with how many issues each of them has drawn of how many are open. The view
+ * starts as `initial`, which the page reads off the query string as it opens
  * (`issues-view-settings.mts`), and every change is handed to `save` from
  * `start` on.
  *
@@ -91,7 +91,8 @@ export type IssuesViewDeps = Readonly<{
   /** The whole graph, what is done included ({@link createIssueGraph}). */
   graph: InitializedObservable<IssueGraph>;
   /**
-   * The tiers and `in progress` the list shows, which the DAG draws too.
+   * The tiers, `in progress` and `author only` the list shows, which the DAG
+   * draws too.
    */
   filter: InitializedObservable<IssueFilter>;
   /** The view as the page opens. */
@@ -273,4 +274,5 @@ export const createIssueGraph = ({
 const NODE_FACTS: IssueFacts<IssueGraphNode> = {
   priority: (node) => node.priority,
   inProgress: (node) => node.state === 'in-progress',
+  authorOnly: (node) => node.authorOnly,
 } as const;

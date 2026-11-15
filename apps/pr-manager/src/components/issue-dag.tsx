@@ -44,7 +44,7 @@ export const IssueDag = (): JSX.Element => (
               ? 'No open issues.'
               : hideInProgress && inProgress.total === open.total
                 ? 'Every open issue is in progress.'
-                : 'No open issue has the priorities and in progress shown.',
+                : 'No open issue has the priorities, in progress and author only shown.',
         )}
       </p>
     }

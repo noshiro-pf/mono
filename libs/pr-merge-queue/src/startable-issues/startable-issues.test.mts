@@ -160,7 +160,7 @@ describe(renderStartable, () => {
         'No issue to start.',
         '#5: an earlier run-issue-resolver session left them as they stand; waiting for someone to change them.',
         '#6, #7: startable, but not written by owner or friend; left to a person.',
-        '#8: startable, but labelled duplicate, invalid, question, wontfix, pending, priority:hold, priority:close or the like; left as they are.',
+        '#8: startable, but labelled duplicate, invalid, question, wontfix, pending, author-only, priority:hold, priority:close or the like; left as they are.',
       ].join('\n'),
     );
   });

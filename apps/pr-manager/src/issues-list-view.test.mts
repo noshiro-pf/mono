@@ -7,6 +7,8 @@ import {
   issuesListViewFromSearch,
   matchesIssueSearch,
   searchWithIssuesListView,
+  toggleIssueAuthorOnly,
+  toggleIssueAuthorOnlyOnly,
   toggleIssueInProgress,
   toggleIssueInProgressOnly,
   toggleIssuePriority,
@@ -214,6 +216,8 @@ describe(arrangeIssues, () => {
       onlyLabels: ['bug'],
       hideInProgress: false,
       onlyInProgress: false,
+      hideAuthorOnly: false,
+      onlyAuthorOnly: false,
       sort: 'priority',
     } as const;
 
@@ -526,6 +530,76 @@ describe('the start states', () => {
   });
 });
 
+describe('author only', () => {
+  const items = [
+    issue(1, ['author-only', 'priority:A']),
+    issue(2, ['priority:A']),
+    issue(3, ['author-only', 'priority:C']),
+    issue(4, ['bug']),
+  ] as const;
+
+  test('picked, shows only the issues labelled author-only, read with the tiers', () => {
+    const view = toggleIssueAuthorOnlyOnly(DEFAULT_ISSUES_LIST_VIEW);
+
+    assert.deepStrictEqual(numbersOf(arrangeIssues(items, view)), [1, 3]);
+
+    assert.deepStrictEqual(
+      numbersOf(arrangeIssues(items, { ...view, onlyPriorities: ['A'] })),
+      [1],
+    );
+  });
+
+  test('switched off, hides them, and counts what showing them would show', () => {
+    const view = toggleIssueAuthorOnly(DEFAULT_ISSUES_LIST_VIEW);
+
+    assert.deepStrictEqual(numbersOf(arrangeIssues(items, view)), [2, 4]);
+
+    const counts = countIssues(items, view);
+
+    assert.deepStrictEqual(counts.authorOnly, { shown: 2, total: 2 });
+
+    assert.deepStrictEqual(counts.open, { shown: 2, total: 4 });
+
+    // A tier counts what showing it would show, author only as it is.
+    assert.deepStrictEqual(counts.priorities.A, { shown: 1, total: 2 });
+  });
+
+  test('counts what the tiers leave of it', () => {
+    assert.deepStrictEqual(
+      countIssues(items, {
+        ...DEFAULT_ISSUES_LIST_VIEW,
+        hiddenPriorities: ['C'],
+      }).authorOnly,
+      { shown: 1, total: 2 },
+    );
+  });
+
+  test('is not one of the label picks, which it has a switch apart from', () => {
+    assert.deepStrictEqual(
+      countIssues(items, DEFAULT_ISSUES_LIST_VIEW).labels.map(
+        ({ name }) => name,
+      ),
+      ['bug'],
+    );
+  });
+
+  test('switching it off unpicks it, and picking it switches it back on', () => {
+    const hidden = toggleIssueAuthorOnly(
+      toggleIssueAuthorOnlyOnly(DEFAULT_ISSUES_LIST_VIEW),
+    );
+
+    assert.isTrue(hidden.hideAuthorOnly);
+
+    assert.isFalse(hidden.onlyAuthorOnly);
+
+    const pickedAgain = toggleIssueAuthorOnlyOnly(hidden);
+
+    assert.isFalse(pickedAgain.hideAuthorOnly);
+
+    assert.isTrue(pickedAgain.onlyAuthorOnly);
+  });
+});
+
 describe(toggleLabel, () => {
   test('picks and unpicks, keeping the labels in name order', () => {
     const picked = toggleLabel(
@@ -550,6 +624,8 @@ describe(issuesListViewFromSearch, () => {
       onlyLabels: ['bug', 'good first issue', 'v1.2'],
       hideInProgress: false,
       onlyInProgress: true,
+      hideAuthorOnly: true,
+      onlyAuthorOnly: false,
       sort: 'start',
     } as const;
 
@@ -557,7 +633,7 @@ describe(issuesListViewFromSearch, () => {
 
     assert.strictEqual(
       search,
-      '?issues.hidePriority=D.none&issues.onlyPriority=S&issues.hideStart=blocked&issues.label=bug&issues.label=good+first+issue&issues.label=v1.2&issues.onlyInProgress=1&issues.sort=start',
+      '?issues.hidePriority=D.none&issues.onlyPriority=S&issues.hideStart=blocked&issues.label=bug&issues.label=good+first+issue&issues.label=v1.2&issues.onlyInProgress=1&issues.hideAuthorOnly=1&issues.sort=start',
     );
 
     assert.deepStrictEqual(issuesListViewFromSearch(search), view);
@@ -635,6 +711,23 @@ describe(issuesListViewFromSearch, () => {
     assert.deepStrictEqual(view.onlyLabels, ['bug']);
   });
 
+  test('author-only is not a label to pick, having a switch of its own', () => {
+    const view = issuesListViewFromSearch(
+      '?issues.label=author-only&issues.label=bug&issues.onlyAuthorOnly=1',
+    );
+
+    assert.isTrue(view.onlyAuthorOnly);
+
+    assert.deepStrictEqual(view.onlyLabels, ['bug']);
+
+    // Switched off and picked is switched off.
+    assert.isFalse(
+      issuesListViewFromSearch(
+        '?issues.onlyAuthorOnly=1&issues.hideAuthorOnly=1',
+      ).onlyAuthorOnly,
+    );
+  });
+
   test('anything it cannot make sense of is the default, and what it does not know is dropped', () => {
     assert.deepStrictEqual(
       issuesListViewFromSearch(''),
@@ -654,6 +747,8 @@ describe(issuesListViewFromSearch, () => {
         onlyLabels: ['bug', 'pending'],
         hideInProgress: false,
         onlyInProgress: false,
+        hideAuthorOnly: false,
+        onlyAuthorOnly: false,
         sort: 'updated',
       },
     );

@@ -127,7 +127,7 @@ describe(surveyIssues, () => {
     );
   });
 
-  test('holds what is placed under hold or close, a question, a pending one and one that will not be done', () => {
+  test('holds what is placed under hold or close, a question, a pending one, one that will not be done and one only the author can do', () => {
     const result = survey([
       decided(1, { labels: labelled('priority:hold') }),
       decided(2, { labels: labelled('priority:close') }),
@@ -135,9 +135,10 @@ describe(surveyIssues, () => {
       decided(4, { labels: labelled('pending') }),
       decided(5, { labels: labelled('wontfix') }),
       decided(6),
+      decided(7, { labels: labelled('priority:A', 'author-only') }),
     ]);
 
-    assert.deepStrictEqual(result.held, [1, 2, 3, 4, 5]);
+    assert.deepStrictEqual(result.held, [1, 2, 3, 4, 5, 7]);
 
     assert.deepStrictEqual(
       result.fresh.map(({ number }) => number),

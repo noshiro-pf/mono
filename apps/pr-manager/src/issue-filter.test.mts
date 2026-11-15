@@ -8,14 +8,14 @@ describe(isIssueFilterShown, () => {
   test('by default, every tier is shown, held or not', () => {
     assert.isTrue(
       isIssueFilterShown(
-        { priority: 'hold', inProgress: false },
+        { priority: 'hold', inProgress: false, authorOnly: false },
         DEFAULT_ISSUE_FILTER,
       ),
     );
 
     assert.isTrue(
       isIssueFilterShown(
-        { priority: 'none', inProgress: false },
+        { priority: 'none', inProgress: false, authorOnly: false },
         DEFAULT_ISSUE_FILTER,
       ),
     );
@@ -24,14 +24,14 @@ describe(isIssueFilterShown, () => {
   test('what the tiers hide is hidden, hold included', () => {
     assert.isFalse(
       isIssueFilterShown(
-        { priority: 'hold', inProgress: false },
+        { priority: 'hold', inProgress: false, authorOnly: false },
         { ...DEFAULT_ISSUE_FILTER, hiddenPriorities: ['hold'] },
       ),
     );
 
     assert.isTrue(
       isIssueFilterShown(
-        { priority: 'S', inProgress: false },
+        { priority: 'S', inProgress: false, authorOnly: false },
         { ...DEFAULT_ISSUE_FILTER, hiddenPriorities: ['hold'] },
       ),
     );
@@ -45,29 +45,88 @@ describe(isIssueFilterShown, () => {
     } as const;
 
     assert.isTrue(
-      isIssueFilterShown({ priority: 'S', inProgress: true }, filter),
+      isIssueFilterShown(
+        { priority: 'S', inProgress: true, authorOnly: false },
+        filter,
+      ),
     );
 
     // Neither side brings in what the other leaves out.
     assert.isFalse(
-      isIssueFilterShown({ priority: 'S', inProgress: false }, filter),
-    );
-
-    assert.isFalse(
-      isIssueFilterShown({ priority: 'B', inProgress: true }, filter),
+      isIssueFilterShown(
+        { priority: 'S', inProgress: false, authorOnly: false },
+        filter,
+      ),
     );
 
     assert.isFalse(
       isIssueFilterShown(
-        { priority: 'S', inProgress: true },
+        { priority: 'B', inProgress: true, authorOnly: false },
+        filter,
+      ),
+    );
+
+    assert.isFalse(
+      isIssueFilterShown(
+        { priority: 'S', inProgress: true, authorOnly: false },
         { ...DEFAULT_ISSUE_FILTER, hideInProgress: true },
       ),
     );
 
     assert.isTrue(
       isIssueFilterShown(
-        { priority: 'S', inProgress: false },
+        { priority: 'S', inProgress: false, authorOnly: false },
         { ...DEFAULT_ISSUE_FILTER, hideInProgress: true },
+      ),
+    );
+  });
+
+  test('author only is a side of its own, read with the tiers and in progress', () => {
+    const filter: IssueFilter = {
+      ...DEFAULT_ISSUE_FILTER,
+      onlyPriorities: ['A'],
+      onlyAuthorOnly: true,
+    } as const;
+
+    assert.isTrue(
+      isIssueFilterShown(
+        { priority: 'A', inProgress: false, authorOnly: true },
+        filter,
+      ),
+    );
+
+    assert.isFalse(
+      isIssueFilterShown(
+        { priority: 'A', inProgress: false, authorOnly: false },
+        filter,
+      ),
+    );
+
+    assert.isFalse(
+      isIssueFilterShown(
+        { priority: 'B', inProgress: false, authorOnly: true },
+        filter,
+      ),
+    );
+
+    assert.isFalse(
+      isIssueFilterShown(
+        { priority: 'A', inProgress: true, authorOnly: true },
+        { ...filter, hideInProgress: true },
+      ),
+    );
+
+    assert.isFalse(
+      isIssueFilterShown(
+        { priority: 'A', inProgress: false, authorOnly: true },
+        { ...DEFAULT_ISSUE_FILTER, hideAuthorOnly: true },
+      ),
+    );
+
+    assert.isTrue(
+      isIssueFilterShown(
+        { priority: 'A', inProgress: false, authorOnly: false },
+        { ...DEFAULT_ISSUE_FILTER, hideAuthorOnly: true },
       ),
     );
   });

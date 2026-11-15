@@ -395,6 +395,7 @@ const graph = (
       state: 'free',
       priority: 'none',
       pending: false,
+      authorOnly: false,
       marked: 'none',
     })),
     edges,

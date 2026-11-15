@@ -8,11 +8,13 @@
  * the merge order's statuses (`merge-order-view.mts`), for the tiers of issues.
  * A tier is never both, so picking one switches it back on, and switching one
  * off unpicks it. An issue held back is `priority:hold`, so leaving out what is
- * held back, or looking at it alone, is that tier's switch. They and
- * `in progress` are the part of the view the DAG reads too (`issue-graph.mts`'s
- * `omitFilteredIssues`), so that the two views draw the same issues.
+ * held back, or looking at it alone, is that tier's switch. They, `in progress`
+ * and `author only` are the part of the view the DAG reads too
+ * (`issue-graph.mts`'s `omitFilteredIssues`), so that the two views draw the
+ * same issues.
  *
- * **The labels** are every other label an open issue carries, each one a pick:
+ * **The labels** are every other label an open issue carries but `author-only`,
+ * which is the switch below, each one a pick:
  * once any is picked, an issue is shown only when it carries one picked, and
  * still not when its priority is switched off. A pick rather than a switch for
  * hiding, because a label is a kind of work, and the question a reader brings
@@ -28,6 +30,12 @@
  * `in-progress`. It is a switch with a pick of its own, and a second side read
  * with the tiers (`issue-filter.mts`), since what a reader wants of it is the
  * work under way alone, in the DAG as much as in the list.
+ *
+ * **Author only** is the `author-only` label (`author-only.mts`): what only the
+ * author can do, whatever its tier. It is a switch with a pick of its own and a
+ * third side, as `in progress` is, since the author looks for their own work
+ * alone and a reader choosing what a session could take leaves it out, in
+ * either view.
  *
  * **The start states** are how each issue stands for being started
  * (`docs/issue-start-after.md`, `pr-report-core`'s `IssueStartState`), read off
@@ -54,6 +62,7 @@
  * DEFAULT_ISSUES_LIST_VIEW} written: `issues.hidePriority=hold.close`,
  * `issues.onlyPriority=S.A`, `issues.hideStart=blocked.cycle`,
  * `issues.hideInProgress=1` or `issues.onlyInProgress=1`,
+ * `issues.hideAuthorOnly=1` or `issues.onlyAuthorOnly=1`,
  * `issues.sort=priority`, and a label picked as `issues.label=bug`, once for
  * each, since a label's name can hold the `.` the others are joined with.
  */
@@ -61,6 +70,11 @@
 import { issuePriorityLabel, type IssueStartState } from 'pr-report-core';
 import { Arr } from 'ts-data-forge';
 import type { ReadonlyRecord, StrictExclude, StrictPick } from 'ts-type-forge';
+import {
+  isAuthorOnly,
+  isAuthorOnlyLabel,
+  isAuthorOnlyShown,
+} from './author-only.mjs';
 import { isInProgressShown } from './in-progress.mjs';
 import {
   DEFAULT_ISSUE_FILTER,
@@ -147,25 +161,29 @@ export type IssuesListCounts = Readonly<{
   open: Count;
   priorities: ReadonlyRecord<IssueTier, Count>;
   inProgress: Count;
+  authorOnly: Count;
   starts: ReadonlyRecord<IssueStartSwitch, Count>;
-  /** In name order; not the tiers. */
+  /** In name order; not the tiers, nor `author-only`. */
   labels: readonly LabelCount[];
 }>;
 
 /**
- * The `open` count, the tiers' and `in progress`'s, for either view.
+ * The `open` count, the tiers', `in progress`'s and `author only`'s, for either
+ * view.
  */
 export type IssueFilterCounts = StrictPick<
   IssuesListCounts,
-  'open' | 'priorities' | 'inProgress'
+  'open' | 'priorities' | 'inProgress' | 'authorOnly'
 >;
 
 /**
- * How {@link countIssueFilter} reads an item's tier and `in progress`.
+ * How {@link countIssueFilter} reads an item's tier, `in progress` and
+ * `author only`.
  */
 export type IssueFacts<T> = Readonly<{
   priority: (item: T) => IssueTier;
   inProgress: (item: T) => boolean;
+  authorOnly: (item: T) => boolean;
 }>;
 
 /** Each issue's start state, by number; one not in it is `free`. */
@@ -184,6 +202,7 @@ export const isIssueShown = (
       {
         priority: issueTierOf(issue.labels),
         inProgress: start === 'in-progress',
+        authorOnly: isAuthorOnly(issue.labels),
       },
       view,
     ) &&
@@ -195,20 +214,29 @@ export const isIssueShown = (
 };
 
 /**
- * The `open` count, each tier's and `in progress`'s, of `items` that `passes`
- * lets through whatever their tier and whether or not they are in progress, as
- * {@link countIssues} counts them: `open` as the filter leaves it, and each
- * tier and `in progress` as if it were shown, the other side of the filter as
- * it is.
+ * The `open` count, each tier's, `in progress`'s and `author only`'s, of
+ * `items` that `passes` lets through whatever their tier and whether or not
+ * they are in progress or only the author's, as {@link countIssues} counts
+ * them: `open` as the filter leaves it, and each tier, `in progress` and
+ * `author only` as if it were shown, the other sides of the filter as they are.
  * The DAG counts its issues with this (`issues-view-store.mts`), with every one
  * it reads passing.
  */
 export const countIssueFilter = <T,>(
   items: readonly T[],
-  { priority, inProgress }: IssueFacts<T>,
+  { priority, inProgress, authorOnly }: IssueFacts<T>,
   passes: (item: T) => boolean,
   filter: IssueFilter,
 ): IssueFilterCounts => {
+  const isPriorityPassed = (item: T): boolean =>
+    isPriorityShown(priority(item), filter);
+
+  const isInProgressPassed = (item: T): boolean =>
+    isInProgressShown(inProgress(item), filter);
+
+  const isAuthorOnlyPassed = (item: T): boolean =>
+    isAuthorOnlyShown(authorOnly(item), filter);
+
   // Each priority reads how many of it the view would show were it shown,
   // whether that is switching it back on or picking it too: an issue has one
   // priority, so under a pick one not picked would otherwise read none.
@@ -217,13 +245,16 @@ export const countIssueFilter = <T,>(
 
     return {
       shown: all.filter(
-        (item) => passes(item) && isInProgressShown(inProgress(item), filter),
+        (item) =>
+          passes(item) && isInProgressPassed(item) && isAuthorOnlyPassed(item),
       ).length,
       total: all.length,
     } as const;
   };
 
   const allInProgress = items.filter(inProgress);
+
+  const allAuthorOnly = items.filter(authorOnly);
 
   return {
     open: {
@@ -234,6 +265,7 @@ export const countIssueFilter = <T,>(
             {
               priority: priority(item),
               inProgress: inProgress(item),
+              authorOnly: authorOnly(item),
             },
             filter,
           ),
@@ -252,9 +284,17 @@ export const countIssueFilter = <T,>(
     },
     inProgress: {
       shown: allInProgress.filter(
-        (item) => passes(item) && isPriorityShown(priority(item), filter),
+        (item) =>
+          passes(item) && isPriorityPassed(item) && isAuthorOnlyPassed(item),
       ).length,
       total: allInProgress.length,
+    },
+    authorOnly: {
+      shown: allAuthorOnly.filter(
+        (item) =>
+          passes(item) && isPriorityPassed(item) && isInProgressPassed(item),
+      ).length,
+      total: allAuthorOnly.length,
     },
   } as const;
 };
@@ -317,12 +357,12 @@ export const arrangeIssues = (
  *
  * As the merge order counts (`countView`), each switch is counted with itself
  * on and every other as it is: a tier switched off reads how many showing it
- * would show (switching it back on, or picking it too while another is
- * picked), `in progress` likewise, and a label how many picking it would add —
- * which, picked or not, is every issue carrying it that the tiers and `in
- * progress` show. The search narrows what each
- * shows, never its whole: the whole is what is open, so that the counts say how
- * much the search leaves out.
+ * would show (switching it back on, or picking it too while another is picked),
+ * `in progress` and `author only` likewise, and a label how many picking it
+ * would add — which, picked or not, is every issue carrying it that the tiers,
+ * `in progress` and `author only` show. The search narrows what each shows,
+ * never its whole: the whole is what is open, so that the counts say how much
+ * the search leaves out.
  */
 export const countIssues = (
   items: readonly IssueItem[],
@@ -345,7 +385,7 @@ export const countIssues = (
   const colors = new Map(
     items
       .flatMap(({ labels }) => labels)
-      .filter((label) => !isPriorityLabel(label.name))
+      .filter((label) => isLabelPick(label.name))
       .map((label) => [label.name, label.color]),
   );
 
@@ -364,6 +404,7 @@ export const countIssues = (
       {
         priority: (issue) => issueTierOf(issue.labels),
         inProgress: (issue) => startOf(starts, issue) === 'in-progress',
+        authorOnly: (issue) => isAuthorOnly(issue.labels),
       },
       (issue) => isIssueShown(issue, unfiltered, query, starts),
       view,
@@ -468,6 +509,27 @@ export const toggleIssueInProgressOnly = (
     onlyInProgress: !view.onlyInProgress,
   }) as const;
 
+/**
+ * Hides what only the author can do when it is shown, unpicking it, and shows
+ * it again.
+ */
+export const toggleIssueAuthorOnly = (view: IssuesListView): IssuesListView =>
+  ({
+    ...view,
+    hideAuthorOnly: !view.hideAuthorOnly,
+    onlyAuthorOnly: false,
+  }) as const;
+
+/** Picks what only the author can do, switching it back on, or unpicks it. */
+export const toggleIssueAuthorOnlyOnly = (
+  view: IssuesListView,
+): IssuesListView =>
+  ({
+    ...view,
+    hideAuthorOnly: false,
+    onlyAuthorOnly: !view.onlyAuthorOnly,
+  }) as const;
+
 export const withIssueSort = (
   view: IssuesListView,
   sort: IssueSort,
@@ -512,6 +574,8 @@ export const issuesListViewFromSearch = (search: string): IssuesListView => {
         namesParam(['in-progress'], params.getAll(PARAM.hideStart)),
       ));
 
+  const hideAuthorOnly = flagParam(params, PARAM.hideAuthorOnly);
+
   return {
     hiddenPriorities,
     // A tier picked as a label is what a page wrote before the tiers had
@@ -529,14 +593,17 @@ export const issuesListViewFromSearch = (search: string): IssuesListView => {
       ISSUE_START_SWITCHES,
       params.getAll(PARAM.hideStart),
     ),
-    // The tiers are not labels to pick here: they have parameters of their own.
+    // The tiers and `author-only` are not labels to pick here: they have
+    // parameters of their own.
     onlyLabels: Arr.uniq(
       params
         .getAll(PARAM.label)
-        .filter((labelName) => labelName !== '' && !isPriorityLabel(labelName)),
+        .filter((labelName) => labelName !== '' && isLabelPick(labelName)),
     ).toSorted((a, b) => a.localeCompare(b)),
     hideInProgress,
     onlyInProgress: !hideInProgress && onlyInProgress,
+    hideAuthorOnly,
+    onlyAuthorOnly: !hideAuthorOnly && flagParam(params, PARAM.onlyAuthorOnly),
     sort: sort === 'priority' || sort === 'start' ? sort : 'updated',
   };
 };
@@ -572,6 +639,10 @@ export const searchWithIssuesListView = (
   setFlagParam(params, PARAM.hideInProgress, view.hideInProgress);
 
   setFlagParam(params, PARAM.onlyInProgress, view.onlyInProgress);
+
+  setFlagParam(params, PARAM.hideAuthorOnly, view.hideAuthorOnly);
+
+  setFlagParam(params, PARAM.onlyAuthorOnly, view.onlyAuthorOnly);
 
   if (view.sort === 'updated') {
     params.delete(PARAM.sort);
@@ -614,8 +685,17 @@ const PARAM = {
   label: 'issues.label',
   hideInProgress: 'issues.hideInProgress',
   onlyInProgress: 'issues.onlyInProgress',
+  hideAuthorOnly: 'issues.hideAuthorOnly',
+  onlyAuthorOnly: 'issues.onlyAuthorOnly',
   sort: 'issues.sort',
 } as const;
+
+/**
+ * Whether a label is one of the picks: not a tier nor `author-only`, which have
+ * switches of their own.
+ */
+const isLabelPick = (labelName: string): boolean =>
+  !isPriorityLabel(labelName) && !isAuthorOnlyLabel(labelName);
 
 /**
  * What an older page wrote for what is pending, read as the `hold` tier's

@@ -40,9 +40,10 @@ import { Timestamp } from './timestamp.js';
  * and numbers (`issues-list-filters.tsx`), which its "on GitHub" link carries
  * as far as GitHub's search can (`issues-search.mts`). Each row says how the
  * issue stands for being started and what it waits for (`issue-start-row.tsx`).
- * The DAG is narrowed by the tiers and `in progress` alone, which lead either
- * view with how many issues are shown of how many are open: what an issue drawn
- * waits on is drawn, whatever its priority (`omitFilteredIssues`).
+ * The DAG is narrowed by the tiers, `in progress` and `author only` alone,
+ * which lead either view with how many issues are shown of how many are open:
+ * what an issue drawn waits on is drawn, whatever its priority
+ * (`omitFilteredIssues`).
  *
  * Last, because it is the one section that is not about the queue: a reader
  * asks "what is in flight" first and "what is waiting to be started" second.
