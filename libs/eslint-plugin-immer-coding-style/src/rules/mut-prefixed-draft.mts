@@ -6,7 +6,7 @@ import {
 import { isTypeWrapper, skipTypeWrappers } from 'eslint-rule-forge';
 import { Arr } from 'ts-data-forge';
 import type { DeepReadonly } from 'ts-type-forge';
-import { mutablePrefix } from '../../../constants/index.mjs';
+import { mutablePrefix } from '../mutable-prefix.mjs';
 import {
   buildImmerProduceResolver,
   type ImmerProduce,

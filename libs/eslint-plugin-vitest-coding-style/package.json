@@ -1,0 +1,90 @@
+{
+  "name": "eslint-plugin-vitest-coding-style",
+  "version": "1.0.0",
+  "private": false,
+  "description": "ESLint rules that steer Vitest assertions toward `assert`'s narrowing forms.",
+  "keywords": [
+    "eslint",
+    "eslintplugin",
+    "eslint-plugin",
+    "typescript",
+    "vitest",
+    "testing"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/noshiro-pf/mono.git",
+    "directory": "libs/eslint-plugin-vitest-coding-style"
+  },
+  "license": "Apache-2.0",
+  "author": "noshiro-pf <noshiro.pf@gmail.com>",
+  "sideEffects": false,
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.mts",
+      "import": "./dist/index.mjs"
+    }
+  },
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.mts",
+  "files": [
+    "src",
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/cmd/build.mts",
+    "check:ext": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/cmd/check-ext.mts",
+    "check:lint": "node ../../tools/scripts/cmd/assert-deps-built.mts && oxlint . && eslint .",
+    "check:test": "node ../../tools/scripts/cmd/assert-deps-built.mts && pnpm run z:vitest run",
+    "check:test:cov": "node ../../tools/scripts/cmd/assert-deps-built.mts && pnpm run z:vitest run --coverage",
+    "check:types": "node ../../tools/scripts/cmd/assert-deps-built.mts && node ../../node_modules/typescript-native/bin/tsc --noEmit",
+    "doc": "pnpm run gen:readme",
+    "fix:fmt": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/format-uncommitted.mts --cwd .",
+    "fix:fmt:diff": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/format-diff-from.mts origin/main --cwd .",
+    "fix:fmt:full": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../tools/scripts/cmd/format-package.mts",
+    "fix:lint": "node ../../tools/scripts/cmd/assert-deps-built.mts && oxlint . --fix && eslint . --fix",
+    "fmt": "pnpm run fix:fmt",
+    "gen": "run-s gen:rule-types gen:readme",
+    "gen:readme": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/cmd/embed-examples.mts",
+    "gen:rule-types": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/cmd/gen-rule-types.mts",
+    "test": "pnpm run check:test",
+    "watch:test": "pnpm run z:vitest",
+    "watch:types": "node ../../node_modules/typescript-native/bin/tsc --noEmit --watch -p ./tsconfig.json",
+    "z:vitest": "vitest --config ./configs/vitest.config.mts"
+  },
+  "dependencies": {
+    "@typescript-eslint/utils": "^8.72.0",
+    "eslint-rule-forge": "workspace:^",
+    "ts-data-forge": "workspace:^",
+    "ts-type-forge": "workspace:^",
+    "tsutils": "^3.21.0"
+  },
+  "devDependencies": {
+    "@typescript-eslint/parser": "catalog:",
+    "@typescript-eslint/rule-tester": "catalog:",
+    "dedent": "catalog:",
+    "eslint": "catalog:",
+    "eslint-config-typed": "workspace:*",
+    "eslint-plugin-ts-data-forge": "workspace:*",
+    "eslint-plugin-ts-type-forge": "workspace:*",
+    "prettier": "catalog:",
+    "prettier-plugin-organize-imports": "catalog:",
+    "prettier-plugin-packagejson": "catalog:",
+    "ts-repo-utils": "workspace:*"
+  },
+  "peerDependencies": {
+    "eslint": ">=9.0.0",
+    "typescript": ">=5.0.0 <7.0.0"
+  },
+  "engines": {
+    "node": ">=22.23.4",
+    "pnpm": ">=9.0.0"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  }
+}

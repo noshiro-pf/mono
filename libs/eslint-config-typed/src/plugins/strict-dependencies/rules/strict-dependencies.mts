@@ -35,6 +35,10 @@ export const strictDependenciesRule: TSESLint.RuleModule<
 > = {
   meta: {
     type: 'suggestion',
+    docs: {
+      description:
+        'Allow a module to be imported only from the files the config lists for it',
+    },
     messages: {
       'forbidden-import-specifier':
         "import specifier '{{specifiers}}' is not allowed from {{from}}.",
