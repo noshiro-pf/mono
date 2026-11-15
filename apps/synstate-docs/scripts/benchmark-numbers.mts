@@ -1522,14 +1522,20 @@ const cutOffLastLabel = (label: string): string =>
 /**
  * The trend from `start` to `end` that `words` has wording for: flat within
  * {@link FLAT_WITHIN}× either way, and a change within {@link EDGE_BAND} of
- * that edge read on either side of it, as in {@link compared}.
+ * that edge read on either side of it, as in {@link compared}. Each end under
+ * `floorMs` is read as `floorMs`, which the error then says.
  */
 const trendBetween = (
   sentence: string,
-  start: number,
-  end: number,
+  measuredStart: number,
+  measuredEnd: number,
   words: Partial<ReadonlyRecord<Trend, Localized>>,
+  floorMs = 0,
 ): Readonly<{ trend: Trend; wording: Localized }> => {
+  const start = Math.max(measuredStart, floorMs);
+
+  const end = Math.max(measuredEnd, floorMs);
+
   const change = divide(end, start);
 
   const trendOf = (value: number): Trend =>
@@ -1548,7 +1554,7 @@ const trendBetween = (
 
   if (found === undefined) {
     throw new Error(
-      `❌ ${sentence}: it now ${trendOf(change)} (${factor(end, start)}× from start to end), which the sentence does not explain — rewrite it against the tables`,
+      `❌ ${sentence}: it now ${trendOf(change)} (${factor(end, start)}× from start to end${measuredStart < floorMs || measuredEnd < floorMs ? `, an end under the ${ms(floorMs)} noise floor read at it` : ''}), which the sentence does not explain — rewrite it against the tables`,
     );
   }
 
@@ -2172,7 +2178,10 @@ const endMedians = (
  * "SynState's row stays flat" / "Jotai's row grows": the median of the last
  * three points of a sweep against the median of the first three, so that one
  * point — under a millisecond, where a shared runner has measured a point at
- * several times its neighbors — decides nothing. Flat is within
+ * several times its neighbors — decides nothing. Each median is read at
+ * {@link NOISE_FLOOR_MS}, as {@link floored} reads a pair, so two medians
+ * under it are flat (0.3 ms → 0.6 ms) and a row growing past it is judged from
+ * the floor (0.5 ms → 4 ms grows). Flat is within
  * {@link FLAT_WITHIN}× either way, for the same reason, and a change within
  * {@link EDGE_BAND} of that edge may be read on either side of it, as in
  * {@link compared}. Each sentence has words for the trends its reasoning
@@ -2188,18 +2197,24 @@ const rowTrend = (
   label: string,
   words: Partial<ReadonlyRecord<Trend, Localized>>,
 ): Localized => {
-  // Not read at `NOISE_FLOOR_MS` yet, unlike `typicalFactor`: a row whose
-  // three-point medians are both under that floor can still read as growing or
-  // falling on noise alone. Flooring it also means changing the check below on
-  // the quoted medians, which would then show a flat row as two figures further
-  // apart than flat allows.
   const [start, end] = endMedians(data, label);
 
-  const { trend, wording } = trendBetween(sentence, start, end, words);
+  const { trend, wording } = trendBetween(
+    sentence,
+    start,
+    end,
+    words,
+    NOISE_FLOOR_MS,
+  );
 
-  // The two medians, as `ms` prints them: a flat row must not show them further
-  // apart than a flat row may be, nor a growing one show the later one lower.
-  const [from, to] = [shownMs(start), shownMs(end)] as const;
+  // The two medians, as `ms` prints them and read at the floor as the trend is:
+  // a flat row must not show them further apart than a flat row may be, nor a
+  // growing one show the later one lower. Two printed medians under the floor
+  // (0.3 ms and 0.7 ms) are level, as their row is.
+  const [from, to] = [
+    Math.max(shownMs(start), NOISE_FLOOR_MS),
+    Math.max(shownMs(end), NOISE_FLOOR_MS),
+  ] as const;
 
   const shownFlat =
     from === to ||
