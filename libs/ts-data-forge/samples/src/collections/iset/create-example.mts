@@ -1,4 +1,4 @@
-// Example: src/collections/iset.mts (ISet.create)
+// Example: src/collections/iset-impl.mts (ISet.create)
 import { ISet } from 'ts-data-forge';
 
 if (import.meta.vitest !== undefined) {

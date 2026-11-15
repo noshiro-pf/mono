@@ -1,4 +1,4 @@
-// Example: src/collections/iset.mts (iterator)
+// Example: src/collections/iset-impl.mts (iterator)
 import { ISet } from 'ts-data-forge';
 
 if (import.meta.vitest !== undefined) {

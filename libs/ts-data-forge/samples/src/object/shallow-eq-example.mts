@@ -1,5 +1,5 @@
 /* eslint-disable unicorn/consistent-function-scoping */
-// Example: src/object/object.mts (shallowEq)
+// Example: src/object/object-impl.mts (shallowEq)
 import { Obj } from 'ts-data-forge';
 
 if (import.meta.vitest !== undefined) {

@@ -1,4 +1,4 @@
-// Example: src/string/str.mts (Str.isMaxLengthString)
+// Example: src/string/str-impl.mts (Str.isMaxLengthString)
 import { Str } from 'ts-data-forge';
 import type { MaxLengthString } from 'ts-type-forge';
 

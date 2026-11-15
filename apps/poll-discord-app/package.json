@@ -24,7 +24,7 @@
     "fmt": "pnpm run fix:fmt",
     "gen": "run-s gen:index",
     "gen:index": "run-s gen:index:src fix:fmt",
-    "gen:index:src": "pnpm run z:gen-index-ts ./src --index-ext .mts --export-ext .mjs --target-ext .mts --exclude assets --preserve index.mts",
+    "gen:index:src": "pnpm run z:gen-index-ts ./src --index-ext .mts --export-ext .mjs --target-ext .mts --exclude assets --preserve index.mts --exclude '**/*-impl.mts'",
     "start": "node ./build/index.mjs",
     "test": "pnpm run check:test",
     "watch:test": "vitest --config ./configs/vitest.config.mts watch",

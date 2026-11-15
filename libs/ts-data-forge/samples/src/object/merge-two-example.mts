@@ -1,6 +1,6 @@
 /* transformer-ignore convert-to-readonly */
 /* eslint-disable vitest/expect-expect */
-// Example: src/object/object.mts (MergeTwo)
+// Example: src/object/object-impl.mts (MergeTwo)
 import { expectType } from 'ts-data-forge';
 import type { RelaxedExclude, StrictPick, UnknownRecord } from 'ts-type-forge';
 

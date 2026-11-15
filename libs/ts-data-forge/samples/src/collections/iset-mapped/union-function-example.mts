@@ -1,4 +1,4 @@
-// Example: src/collections/iset-mapped.mts (ISetMapped.union)
+// Example: src/collections/iset-mapped-impl.mts (ISetMapped.union)
 import { ISetMapped } from 'ts-data-forge';
 
 if (import.meta.vitest !== undefined) {

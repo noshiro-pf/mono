@@ -1,4 +1,4 @@
-// Example: src/object/object.mts (deepOmit)
+// Example: src/object/object-impl.mts (deepOmit)
 import { Obj, pipe } from 'ts-data-forge';
 
 if (import.meta.vitest !== undefined) {

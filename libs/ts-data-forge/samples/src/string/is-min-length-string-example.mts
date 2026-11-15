@@ -1,4 +1,4 @@
-// Example: src/string/str.mts (Str.isMinLengthString)
+// Example: src/string/str-impl.mts (Str.isMinLengthString)
 import { Str } from 'ts-data-forge';
 import type { NonEmptyString } from 'ts-type-forge';
 

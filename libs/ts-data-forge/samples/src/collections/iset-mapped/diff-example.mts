@@ -1,4 +1,4 @@
-// Example: src/collections/iset-mapped.mts (ISetMapped.diff)
+// Example: src/collections/iset-mapped-impl.mts (ISetMapped.diff)
 import { ISetMapped } from 'ts-data-forge';
 
 if (import.meta.vitest !== undefined) {

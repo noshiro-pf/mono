@@ -1,4 +1,4 @@
-// Example: src/collections/iset.mts (ISet.union)
+// Example: src/collections/iset-impl.mts (ISet.union)
 import { ISet } from 'ts-data-forge';
 
 if (import.meta.vitest !== undefined) {

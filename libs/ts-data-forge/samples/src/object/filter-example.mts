@@ -1,4 +1,4 @@
-// Example: src/object/object.mts (filter)
+// Example: src/object/object-impl.mts (filter)
 import { Obj, isString } from 'ts-data-forge';
 import type { UnknownRecord } from 'ts-type-forge';
 

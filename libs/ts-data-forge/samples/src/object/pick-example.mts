@@ -1,4 +1,4 @@
-// Example: src/object/object.mts (pick)
+// Example: src/object/object-impl.mts (pick)
 import { Obj, pipe } from 'ts-data-forge';
 
 if (import.meta.vitest !== undefined) {

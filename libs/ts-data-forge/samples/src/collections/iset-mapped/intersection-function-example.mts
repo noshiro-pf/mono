@@ -1,4 +1,4 @@
-// Example: src/collections/iset-mapped.mts (ISetMapped.intersection)
+// Example: src/collections/iset-mapped-impl.mts (ISetMapped.intersection)
 import { ISetMapped } from 'ts-data-forge';
 
 if (import.meta.vitest !== undefined) {

@@ -1,4 +1,4 @@
-// Example: src/collections/iset-mapped.mts (ISetMapped.equal)
+// Example: src/collections/iset-mapped-impl.mts (ISetMapped.equal)
 import { ISetMapped } from 'ts-data-forge';
 
 if (import.meta.vitest !== undefined) {

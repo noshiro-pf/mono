@@ -1,4 +1,4 @@
-// Example: src/object/object.mts (deepPick)
+// Example: src/object/object-impl.mts (deepPick)
 import { Obj, pipe } from 'ts-data-forge';
 
 if (import.meta.vitest !== undefined) {

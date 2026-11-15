@@ -1,4 +1,4 @@
-// Example: src/collections/imap-mapped.mts (create)
+// Example: src/collections/imap-mapped-impl.mts (create)
 import { IMapMapped, Optional } from 'ts-data-forge';
 
 if (import.meta.vitest !== undefined) {

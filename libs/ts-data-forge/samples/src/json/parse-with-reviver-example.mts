@@ -1,4 +1,4 @@
-// Example: src/json/json.mts (parseWithReviver)
+// Example: src/json/json-impl.mts (parseWithReviver)
 import { isRecord, Json, Result } from 'ts-data-forge';
 
 if (import.meta.vitest !== undefined) {

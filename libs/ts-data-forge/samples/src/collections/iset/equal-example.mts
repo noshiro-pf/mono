@@ -1,4 +1,4 @@
-// Example: src/collections/iset.mts (ISet.equal)
+// Example: src/collections/iset-impl.mts (ISet.equal)
 import { ISet } from 'ts-data-forge';
 
 if (import.meta.vitest !== undefined) {
