@@ -1365,6 +1365,7 @@ const generateSpace = async (
  */
 const notYetPublished: ReadonlySet<string> = new Set<string>([
   'synstate-router-preact',
+  'ts-fsm-forge',
 ]);
 
 const typesOnlyPackages: ReadonlySet<string> = new Set<string>([
