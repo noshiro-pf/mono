@@ -45,6 +45,7 @@
     "synstate-dom": "workspace:*",
     "ts-data-forge": "workspace:*",
     "ts-fortress": "workspace:*",
+    "ts-fsm-forge": "workspace:*",
     "ts-utils-additional": "workspace:*"
   },
   "devDependencies": {

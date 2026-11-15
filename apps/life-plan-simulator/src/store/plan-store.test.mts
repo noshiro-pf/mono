@@ -87,7 +87,7 @@ describe(createPlanStore, () => {
   test('has no plan while signed out, and loads the plans on sign-in', () => {
     const { store, setSession } = setUp(createMemoryRepository([plan('a', 1)]));
 
-    setSession({ type: 'signed-out', error: undefined, signingIn: false });
+    setSession({ type: 'signed-out', error: undefined });
 
     assert.deepStrictEqual(Optional.unwrap(store.plans.getSnapshot()), {
       type: 'loading',

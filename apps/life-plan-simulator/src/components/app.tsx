@@ -16,15 +16,15 @@ export const App = (): JSX.Element => {
       then={<StartingScreen />}
       else={
         <If
-          cond={session.pipe(map((s) => s.type === 'signed-out'))}
+          cond={session.pipe(
+            map((s) => s.type === 'signed-out' || s.type === 'signing-in'),
+          )}
           then={
             <SignInScreen
               error={session.pipe(
                 map((s) => (s.type === 'signed-out' ? s.error : undefined)),
               )}
-              signingIn={session.pipe(
-                map((s) => s.type === 'signed-out' && s.signingIn),
-              )}
+              signingIn={session.pipe(map((s) => s.type === 'signing-in'))}
             />
           }
           else={

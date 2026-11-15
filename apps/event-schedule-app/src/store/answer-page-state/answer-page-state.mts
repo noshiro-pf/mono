@@ -2,6 +2,7 @@ import { Answer, UserId, UserName } from 'event-schedule-app-shared';
 import {
   createBooleanState,
   createEventEmitter,
+  createReducer,
   createState,
   createState as createStateBase,
   derive,
@@ -25,6 +26,7 @@ import {
   pipe,
 } from 'ts-data-forge';
 import { DateUtils } from 'ts-fortress-types';
+import { defineMachine } from 'ts-fsm-forge';
 import type { DeepReadonly, ReadonlyRecord, StrictPick } from 'ts-type-forge';
 import type { Api } from '../../api/index.mjs';
 import {
@@ -71,19 +73,20 @@ export const createAnswerPageStore = (deps: AnswerPageDeps): AnswerPage => {
     Answer | undefined
   >(undefined);
 
-  const [submitButtonIsLoading$, { setState: setSubmitButtonIsLoading }] =
-    createBooleanState(false);
-
   const [
     alertOnAnswerClickIsOpen$,
     { setTrue: openAlertOnAnswerClick, setFalse: closeAlertOnAnswerClick },
   ] = createBooleanState(false);
 
-  const [
-    answerBeingEditedSectionState$,
-    setAnswerBeingEditedSectionState_,
-    { getSnapshot: getAnswerBeingEditedSectionStateSnapshot },
-  ] = createState<'creating' | 'editing' | 'hidden'>('hidden');
+  const [section$, dispatchSection, { getSnapshot: getSection }] =
+    createReducer(sectionMachine.reducer, hidden);
+
+  const answerBeingEditedSectionState$: InitializedObservable<SectionShown> =
+    section$.pipe(map((sec) => (sec.type === 'saving' ? sec.shown : sec.type)));
+
+  const submitButtonIsLoading$: InitializedObservable<boolean> = section$.pipe(
+    map((sec) => sec.type === 'saving'),
+  );
 
   const emptyAnswerSelection$: InitializedObservable<Answer> =
     deps.eventSchedule$
@@ -129,16 +132,8 @@ export const createAnswerPageStore = (deps: AnswerPageDeps): AnswerPage => {
     updateAnswerBeingEdited(() => answer);
   };
 
-  const setAnswerBeingEditedSectionState = (
-    nextState: 'creating' | 'editing' | 'hidden',
-  ): void => {
-    setAnswerBeingEditedSectionState_(nextState);
-
-    // 回答追加開始時にデフォルトで「回答を保護する」を有効にする
-    if (nextState !== 'creating') {
-      return;
-    }
-
+  // 回答追加開始時にデフォルトで「回答を保護する」を有効にする
+  const protectNewAnswer = (): void => {
     const user = deps.auth.getFireAuthUserSnapshot();
 
     updateAnswerBeingEdited((ans) => ({
@@ -264,9 +259,54 @@ export const createAnswerPageStore = (deps: AnswerPageDeps): AnswerPage => {
   };
 
   const onCancelEditingAnswer = (): void => {
+    if (!sectionMachine.can(getSection(), 'cancel')) {
+      return;
+    }
+
     clearAnswerBeingEditedFields();
 
-    setAnswerBeingEditedSectionState('hidden');
+    dispatchSection({ type: 'cancel' });
+  };
+
+  /**
+   * Saves through `write`, keeping the section as it is drawn with its button
+   * spinning, then hides it whatever the result. Nothing else is started on the
+   * section meanwhile: the graph has only `saved` from `saving`.
+   */
+  const save = async (
+    action: SectionAction &
+      Readonly<{ type: 'delete' | 'submit' | 'submitEmpty' }>,
+    write: () => Promise<Result<unknown, unknown>>,
+    successMessage: string | undefined,
+  ): Promise<void> => {
+    if (!sectionMachine.can(getSection(), action.type)) {
+      return;
+    }
+
+    dispatchSection(action);
+
+    // `deps.api` returns every failure as an `Err` (`Result.fromPromise`), so
+    // this settles, and `saved` follows.
+    const res = await write();
+
+    if (Result.isErr(res)) {
+      // TODO: use toast
+      console.error(res.value);
+    }
+
+    dispatchSection({ type: 'saved' });
+
+    deps.answers.refetchAnswersAfterWrite();
+
+    clearAnswerBeingEditedFields();
+
+    if (successMessage !== undefined) {
+      showToast({
+        toast: deps.toast,
+        message: successMessage,
+        intent: 'success',
+      });
+    }
   };
 
   const onUserNameChange = (userName: UserName): void => {
@@ -305,8 +345,8 @@ export const createAnswerPageStore = (deps: AnswerPageDeps): AnswerPage => {
     // ログインユーザーの回答は本人のみ編集可能にする
     if (answer.user.id !== null && answer.user.id !== user?.uid) {
       openAlertOnAnswerClick();
-    } else {
-      setAnswerBeingEditedSectionState('editing');
+    } else if (sectionMachine.can(getSection(), 'edit')) {
+      dispatchSection({ type: 'edit' });
 
       setAnswerBeingEdited(answer);
 
@@ -316,9 +356,15 @@ export const createAnswerPageStore = (deps: AnswerPageDeps): AnswerPage => {
 
   /* @internal */
   const onAddAnswerButtonClickImpl = (user: SignedInUser | undefined): void => {
+    if (!sectionMachine.can(getSection(), 'add')) {
+      return;
+    }
+
     clearAnswerBeingEditedFields();
 
-    setAnswerBeingEditedSectionState('creating');
+    dispatchSection({ type: 'add' });
+
+    protectNewAnswer();
 
     // automatically set username with user.displayName
     updateAnswerBeingEdited((prev) =>
@@ -330,71 +376,45 @@ export const createAnswerPageStore = (deps: AnswerPageDeps): AnswerPage => {
   const onSubmitAnswerImpl = async (
     eventId: string | undefined,
     answerBeingEdited: Answer,
-    answerBeingEditedSection: 'creating' | 'editing' | 'hidden',
   ): Promise<void> => {
     if (eventId === undefined) {
       return;
     }
 
-    setSubmitButtonIsLoading(true);
+    const section = getSection();
 
-    switch (answerBeingEditedSection) {
+    switch (section.type) {
       case 'creating':
-        await deps.api.answers
-          .add(eventId, { ...answerBeingEdited, createdAt: DateUtils.now() })
-          .then((res) => {
-            if (Result.isErr(res)) {
-              // TODO: use toast
-              console.error(res.value);
-            }
-
-            setSubmitButtonIsLoading(false);
-
-            setAnswerBeingEditedSectionState('hidden');
-
-            deps.answers.refetchAnswersAfterWrite();
-
-            clearAnswerBeingEditedFields();
-
-            showToast({
-              toast: deps.toast,
-              message:
-                dict.answerPage.answerBeingEdited.submitButton
-                  .createAnswerResultMessage,
-              intent: 'success',
-            });
-          });
+        await save(
+          { type: 'submit' },
+          () =>
+            deps.api.answers.add(eventId, {
+              ...answerBeingEdited,
+              createdAt: DateUtils.now(),
+            }),
+          dict.answerPage.answerBeingEdited.submitButton
+            .createAnswerResultMessage,
+        );
 
         break;
 
       case 'editing':
-        await deps.api.answers
-          .update(eventId, answerBeingEdited.id, answerBeingEdited)
-          .then((res) => {
-            if (Result.isErr(res)) {
-              // TODO: use toast
-              console.error(res.value);
-            }
-
-            setSubmitButtonIsLoading(false);
-
-            setAnswerBeingEditedSectionState('hidden');
-
-            deps.answers.refetchAnswersAfterWrite();
-
-            clearAnswerBeingEditedFields();
-
-            showToast({
-              toast: deps.toast,
-              message:
-                dict.answerPage.answerBeingEdited.submitButton
-                  .updateAnswerResultMessage,
-              intent: 'success',
-            });
-          });
+        await save(
+          { type: 'submit' },
+          () =>
+            deps.api.answers.update(
+              eventId,
+              answerBeingEdited.id,
+              answerBeingEdited,
+            ),
+          dict.answerPage.answerBeingEdited.submitButton
+            .updateAnswerResultMessage,
+        );
 
         break;
+
       case 'hidden':
+      case 'saving':
         break;
     }
   };
@@ -412,41 +432,23 @@ export const createAnswerPageStore = (deps: AnswerPageDeps): AnswerPage => {
       return;
     }
 
-    setSubmitButtonIsLoading(true);
-
-    await deps.api.answers
-      .add(
-        eventId,
-        pipe(Answer.defaultValue)
-          .map((a) => ({ ...a, createdAt: DateUtils.now() }))
-          .map((a) => ({
-            ...a,
-            user: {
-              id: UserId.cast(fireAuthUser.uid),
-              name: UserName.cast(fireAuthUser.displayName ?? ''),
-            },
-          })).value,
-      )
-      .then((res) => {
-        if (Result.isErr(res)) {
-          // TODO: use toast
-          console.error(res.value);
-        }
-
-        setSubmitButtonIsLoading(false);
-
-        setAnswerBeingEditedSectionState('hidden');
-
-        deps.answers.refetchAnswersAfterWrite();
-
-        clearAnswerBeingEditedFields();
-
-        showToast({
-          toast: deps.toast,
-          message: dict.answerPage.answerLater.result.success,
-          intent: 'success',
-        });
-      });
+    await save(
+      { type: 'submitEmpty' },
+      () =>
+        deps.api.answers.add(
+          eventId,
+          pipe(Answer.defaultValue)
+            .map((a) => ({ ...a, createdAt: DateUtils.now() }))
+            .map((a) => ({
+              ...a,
+              user: {
+                id: UserId.cast(fireAuthUser.uid),
+                name: UserName.cast(fireAuthUser.displayName ?? ''),
+              },
+            })).value,
+        ),
+      dict.answerPage.answerLater.result.success,
+    );
   };
 
   /* @internal */
@@ -458,22 +460,11 @@ export const createAnswerPageStore = (deps: AnswerPageDeps): AnswerPage => {
       return;
     }
 
-    setSubmitButtonIsLoading(true);
-
-    await deps.api.answers.delete(eventId, answerBeingEdited.id).then((res) => {
-      if (Result.isErr(res)) {
-        // TODO: use toast
-        console.error(res.value);
-      }
-
-      setSubmitButtonIsLoading(false);
-
-      setAnswerBeingEditedSectionState('hidden');
-
-      deps.answers.refetchAnswersAfterWrite();
-
-      clearAnswerBeingEditedFields();
-    });
+    await save(
+      { type: 'delete' },
+      () => deps.api.answers.delete(eventId, answerBeingEdited.id),
+      undefined,
+    );
   };
 
   /* @internal */
@@ -533,15 +524,10 @@ export const createAnswerPageStore = (deps: AnswerPageDeps): AnswerPage => {
     onSubmitAnswerImpl(
       Optional.unwrap(deps.router.eventId$.getSnapshot()),
       getAnswerBeingEditedSnapshot(),
-      getAnswerBeingEditedSectionStateSnapshot(),
     );
 
   const onSubmitAnswerClick = (): void => {
-    onSubmitAnswerImpl(
-      Optional.unwrap(deps.router.eventId$.getSnapshot()),
-      getAnswerBeingEditedSnapshot(),
-      getAnswerBeingEditedSectionStateSnapshot(),
-    ).catch(() => {});
+    onSubmitAnswerClickPromise().catch(() => {});
   };
 
   const onSubmitEmptyAnswerClick = (): Promise<void> =>
@@ -792,9 +778,7 @@ export type AnswerPage = Readonly<{
     ISetMapped<DatetimeRange, DatetimeRangeMapKey>
   >;
   batchInputFieldIsOpen$: InitializedObservable<boolean>;
-  answerBeingEditedSectionState$: InitializedObservable<
-    'creating' | 'editing' | 'hidden'
-  >;
+  answerBeingEditedSectionState$: InitializedObservable<SectionShown>;
   answerBeingEditedList$: InitializedObservable<
     DeepReadonly<
       {
@@ -853,6 +837,80 @@ export type AnswerPage = Readonly<{
   toggleBatchInputField: () => void;
   onCheckAll: (checked: boolean) => void;
 }>;
+
+/** How the section with the answer being written is drawn. */
+export type SectionShown = 'creating' | 'editing' | 'hidden';
+
+/**
+ * The section with the answer being written: hidden, adding an answer, editing
+ * one, or saving — a submit, an empty answer for later, or a delete — with the
+ * section drawn as it was and its button spinning. While saving, nothing else
+ * is started: a click on another answer would be wiped when the save clears the
+ * fields, and a second save would write twice.
+ */
+type Section = Readonly<
+  | { type: 'creating' }
+  | { type: 'editing' }
+  | { type: 'hidden' }
+  | { type: 'saving'; shown: SectionShown }
+>;
+
+type SectionAction = Readonly<
+  | { type: 'add' }
+  | { type: 'cancel' }
+  | { type: 'delete' }
+  | { type: 'edit' }
+  | { type: 'saved' }
+  | { type: 'submit' }
+  | { type: 'submitEmpty' }
+>;
+
+const hidden: Section = { type: 'hidden' } as const;
+
+const sectionMachine = defineMachine<Section, SectionAction>()(
+  {
+    hidden: { add: 'creating', edit: 'editing', submitEmpty: 'saving' },
+    creating: {
+      add: 'creating',
+      edit: 'editing',
+      cancel: 'hidden',
+      submit: 'saving',
+      submitEmpty: 'saving',
+    },
+    editing: {
+      add: 'creating',
+      edit: 'editing',
+      cancel: 'hidden',
+      submit: 'saving',
+      submitEmpty: 'saving',
+      delete: 'saving',
+    },
+    saving: { saved: 'hidden' },
+  },
+  {
+    hidden: {
+      add: () => ({ type: 'creating' }),
+      edit: () => ({ type: 'editing' }),
+      submitEmpty: () => ({ type: 'saving', shown: 'hidden' }),
+    },
+    creating: {
+      add: () => ({ type: 'creating' }),
+      edit: () => ({ type: 'editing' }),
+      cancel: () => hidden,
+      submit: () => ({ type: 'saving', shown: 'creating' }),
+      submitEmpty: () => ({ type: 'saving', shown: 'creating' }),
+    },
+    editing: {
+      add: () => ({ type: 'creating' }),
+      edit: () => ({ type: 'editing' }),
+      cancel: () => hidden,
+      submit: () => ({ type: 'saving', shown: 'editing' }),
+      submitEmpty: () => ({ type: 'saving', shown: 'editing' }),
+      delete: () => ({ type: 'saving', shown: 'editing' }),
+    },
+    saving: { saved: () => hidden },
+  },
+);
 
 /** What the page reads of the signed-in user. */
 export type SignedInUser = Readonly<{

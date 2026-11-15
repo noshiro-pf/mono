@@ -40,7 +40,8 @@
     "synstate": "workspace:*",
     "synstate-dom": "workspace:*",
     "ts-data-forge": "workspace:*",
-    "ts-fortress": "workspace:*"
+    "ts-fortress": "workspace:*",
+    "ts-fsm-forge": "workspace:*"
   },
   "devDependencies": {
     "@vitest/coverage-istanbul": "catalog:",

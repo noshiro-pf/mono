@@ -3,7 +3,7 @@
 # ts-fsm-forge
 
 A reducer restricted to a declared transition graph, for state and action unions
-discriminated by `type`.
+discriminated by `type` (or another property you name).
 
 A plain reducer `(state, action) => state` accepts every pair of state and
 action: for a finite set of state types, its transition graph is complete. Here
@@ -167,6 +167,32 @@ for it — a second click before the next render, an action from another client 
 the state may move on. That is why `reducer` checks again and ignores what no
 longer applies, and why a store's `dispatch` takes the whole `Action` union.
 
+## Another discriminating property
+
+Both unions are read by `type` unless a third type argument and the call name
+another property, the same one for states and actions:
+
+```ts
+type Door = Readonly<{ kind: 'closed' } | { kind: 'open'; by: string }>;
+
+type DoorAction = Readonly<{ kind: 'close' } | { kind: 'open'; by: string }>;
+
+// The property is named twice: as a type for the compiler, and as a string
+// for the machine to read. Naming one without the other does not compile.
+const door = defineMachine<Door, DoorAction, 'kind'>('kind')(
+    { closed: { open: 'open' }, open: { close: 'closed' } },
+    {
+        closed: { open: (_s, a) => ({ kind: 'open', by: a.by }) },
+        open: { close: () => ({ kind: 'closed' }) },
+    },
+);
+
+assert.deepStrictEqual(
+    door.reducer({ kind: 'closed' }, { kind: 'open', by: 'me' }),
+    { kind: 'open', by: 'me' },
+);
+```
+
 ## Drawing the graph
 
 ```ts
@@ -193,14 +219,14 @@ assert.strictEqual(
 
 ## API
 
-| Export                                                                                                                     | What it is                                                                          |
-| :------------------------------------------------------------------------------------------------------------------------- | :---------------------------------------------------------------------------------- |
-| `defineMachine<S, A>()(graph, handlers, options?)`                                                                         | Returns a `Machine`: `graph`, `reducer`, `transition`, `can`, `allowedActionTypes`. |
-| `toMermaid(graph, options?)`                                                                                               | A Mermaid `stateDiagram-v2` of a graph.                                             |
-| `TransitionGraph<S, A>`                                                                                                    | The shape of a graph: every state type to its action types to their target(s).      |
-| `EdgeHandlers<S, A, G>`                                                                                                    | The shape of the handlers for graph `G`.                                            |
-| `Machine<S, A, G>`                                                                                                         | What `defineMachine` returns.                                                       |
-| `AllowedActionType<G, K>`, `EdgeActionType<G, K>`, `NextStateType<G, K, T>`, `SourceStateType<G, T>`, `TargetStateType<V>` | The graph read as types.                                                            |
+| Export                                                                                                                      | What it is                                                                          |
+| :-------------------------------------------------------------------------------------------------------------------------- | :---------------------------------------------------------------------------------- |
+| `defineMachine<S, A>()(graph, handlers, options?)`; `defineMachine<S, A, D>(d)(…)` for a discriminant `d` other than `type` | Returns a `Machine`: `graph`, `reducer`, `transition`, `can`, `allowedActionTypes`. |
+| `toMermaid(graph, options?)`                                                                                                | A Mermaid `stateDiagram-v2` of a graph.                                             |
+| `TransitionGraph<S, A, D?>`                                                                                                 | The shape of a graph: every state type to its action types to their target(s).      |
+| `EdgeHandlers<S, A, G, D?>`                                                                                                 | The shape of the handlers for graph `G`.                                            |
+| `Machine<S, A, G, D?>`                                                                                                      | What `defineMachine` returns.                                                       |
+| `AllowedActionType<G, K>`, `EdgeActionType<G, K>`, `NextStateType<G, K, T>`, `SourceStateType<G, T>`, `TargetStateType<V>`  | The graph read as types.                                                            |
 
 ## Compared with
 

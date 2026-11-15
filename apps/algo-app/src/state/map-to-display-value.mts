@@ -1,5 +1,5 @@
 import { Arr, match } from 'ts-data-forge';
-import type { FixedLengthTuple, StrictPick } from 'ts-type-forge';
+import type { FixedLengthTuple } from 'ts-type-forge';
 import {
   dictionary,
   directions,
@@ -21,6 +21,8 @@ import type {
   PlayerIndex,
   VisibilityFromMe,
 } from '../types/index.mjs';
+import { chosenCards } from './chosen-cards.mjs';
+import { gameStateMachine } from './game-state-machine.mjs';
 
 export const mapToDisplayValue = ({
   gameState,
@@ -66,11 +68,7 @@ export const mapToDisplayValue = ({
       }),
     },
 
-    gameMessage: match(gameState.phase, {
-      ph010_selectMyCardToToss: dictionary.gameMessage.selectYourCardToToss,
-      ph020_firstAnswer: dictionary.gameMessage.selectYourCardAndAttack,
-      ph030_continuousAnswer: dictionary.gameMessage.selectYourCardToAttack,
-    }),
+    gameMessage: gameMessage(gameState),
     // Every branch of the original `match` was the same expression with the
     // matched value substituted, so it collapses to one call. `match` also
     // requires string cases now, and `currentPlayerIndex` is numeric.
@@ -79,8 +77,7 @@ export const mapToDisplayValue = ({
         decrementPlayerIndex(gameState.currentPlayerIndex, myPlayerIndex)
       ],
 
-    endTurnButtonDisabled:
-      gameState.phase !== 'ph030_continuousAnswer' || gameState.readonly,
+    endTurnButtonDisabled: !gameStateMachine.can(gameState, 'goToNextTurn'),
   }) as const;
 
 const mapPlayers6CardsToDisplayValue = ({
@@ -92,28 +89,23 @@ const mapPlayers6CardsToDisplayValue = ({
 }: Readonly<{
   direction: NWES;
   player6Cards: FixedLengthTuple<6, CardWithVisibility>;
-  gameState: StrictPick<
-    GameState,
-    | 'cardChosenToAttack'
-    | 'cardChosenToBeAttacked'
-    | 'cardChosenToToss'
-    | 'currentPlayerIndex'
-    | 'phase'
-    | 'readonly'
-  >;
+  gameState: GameState;
   myPlayerIndex: PlayerIndex;
   onCardClick: (card: Card, playerDirectionFromMe: NWES) => void;
-}>): FixedLengthTuple<6, CardWithDisplayValue> =>
+}>): FixedLengthTuple<6, CardWithDisplayValue> => {
+  const { cardChosenToToss, cardChosenToAttack, cardChosenToBeAttacked } =
+    chosenCards(gameState);
+
   // Written as `Arr.map(sortCards(…), …)` rather than `pipe().map(Arr.map(…))`:
   // `fix:lint` rewrites the latter into `Arr.map`'s curried overload, which
   // cannot infer the element type from the callback alone and leaves every
   // parameter `unknown`.
-  Arr.map(sortCards(player6Cards), (c) => {
-    const isAns = cardEq(gameState.cardChosenToBeAttacked, c);
+  return Arr.map(sortCards(player6Cards), (c) => {
+    const isAns = cardEq(cardChosenToBeAttacked, c);
 
-    const isAtk = cardEq(gameState.cardChosenToAttack, c);
+    const isAtk = cardEq(cardChosenToAttack, c);
 
-    const isToss = cardEq(gameState.cardChosenToToss, c);
+    const isToss = cardEq(cardChosenToToss, c);
 
     const visibilityFromMe: VisibilityFromMe = match(c.visibleTo, {
       self: 'faceDown',
@@ -126,33 +118,16 @@ const mapPlayers6CardsToDisplayValue = ({
       everyone: 'faceUp',
     } as const);
 
+    // What a click sends is decided by the side of the table the card is on;
+    // the graph says whether the turn takes it now.
     const isClickable: boolean =
-      !gameState.readonly &&
       myPlayerIndex === gameState.currentPlayerIndex &&
+      visibilityFromMe !== 'faceUp' &&
       match(direction, {
-        // me
-        S:
-          visibilityFromMe !== 'faceUp' &&
-          match(gameState.phase, {
-            ph010_selectMyCardToToss: true,
-            ph020_firstAnswer: true,
-            ph030_continuousAnswer: false,
-          }),
-        W:
-          visibilityFromMe !== 'faceUp' &&
-          match(gameState.phase, {
-            ph010_selectMyCardToToss: false,
-            ph020_firstAnswer: true,
-            ph030_continuousAnswer: true,
-          }),
+        S: gameStateMachine.can(gameState, 'selectMyCard'),
+        W: gameStateMachine.can(gameState, 'selectOpponentCard'),
         N: false,
-        E:
-          visibilityFromMe !== 'faceUp' &&
-          match(gameState.phase, {
-            ph010_selectMyCardToToss: false,
-            ph020_firstAnswer: true,
-            ph030_continuousAnswer: true,
-          }),
+        E: gameStateMachine.can(gameState, 'selectOpponentCard'),
       } as const);
 
     return {
@@ -175,3 +150,26 @@ const mapPlayers6CardsToDisplayValue = ({
           },
     } as const;
   });
+};
+
+const gameMessage = (gameState: GameState): string => {
+  switch (gameState.type) {
+    case 'toss.selecting':
+    case 'toss.confirming':
+      return dictionary.gameMessage.selectYourCardToToss;
+
+    case 'first.selecting':
+    case 'first.answering':
+      return dictionary.gameMessage.selectYourCardAndAttack;
+
+    case 'cont.selecting':
+    case 'cont.answering':
+      return dictionary.gameMessage.selectYourCardToAttack;
+
+    case 'judging.pending':
+    case 'judging.shown':
+      return gameState.round === 'first'
+        ? dictionary.gameMessage.selectYourCardAndAttack
+        : dictionary.gameMessage.selectYourCardToAttack;
+  }
+};

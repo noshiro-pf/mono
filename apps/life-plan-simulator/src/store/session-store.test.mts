@@ -76,7 +76,6 @@ describe(createSessionStore, () => {
     assert.deepStrictEqual(Optional.unwrap(store.session.getSnapshot()), {
       type: 'signed-out',
       error: undefined,
-      signingIn: false,
     });
   });
 
@@ -85,7 +84,13 @@ describe(createSessionStore, () => {
 
     const failed = Promise.reject(new Error('boom'));
 
-    const { backend, emit } = fakeBackend(() => failed);
+    let mut_signIns = 0;
+
+    const { backend, emit } = fakeBackend(() => {
+      mut_signIns += 1;
+
+      return failed;
+    });
 
     store.attach(backend);
 
@@ -94,10 +99,13 @@ describe(createSessionStore, () => {
     store.signIn();
 
     assert.deepStrictEqual(Optional.unwrap(store.session.getSnapshot()), {
-      type: 'signed-out',
-      error: undefined,
-      signingIn: true,
+      type: 'signing-in',
     });
+
+    // A second click before the page redraws opens no second popup.
+    store.signIn();
+
+    assert.strictEqual(mut_signIns, 1);
 
     await failed.catch(() => {});
 
@@ -106,8 +114,57 @@ describe(createSessionStore, () => {
     assert.deepStrictEqual(Optional.unwrap(store.session.getSnapshot()), {
       type: 'signed-out',
       error: 'サインインできませんでした（boom）。',
-      signingIn: false,
     });
+  });
+
+  test('a failure that comes back after the backend reported is shown only while nobody is signed in', async () => {
+    const store = createSessionStore();
+
+    const mut_signIns: PromiseWithResolvers<undefined>[] = [];
+
+    const { backend, emit } = fakeBackend(() => {
+      const signIn = Promise.withResolvers<undefined>();
+
+      mut_signIns.push(signIn);
+
+      return signIn.promise;
+    });
+
+    store.attach(backend);
+
+    emit({ type: 'signed-out' });
+
+    store.signIn();
+
+    // The backend says again that nobody is signed in while the popup is open.
+    emit({ type: 'signed-out' });
+
+    assert.deepStrictEqual(Optional.unwrap(store.session.getSnapshot()), {
+      type: 'signed-out',
+      error: undefined,
+    });
+
+    mut_signIns[0]?.reject(new Error('closed'));
+
+    await flush();
+
+    assert.deepStrictEqual(Optional.unwrap(store.session.getSnapshot()), {
+      type: 'signed-out',
+      error: 'サインインできませんでした（closed）。',
+    });
+
+    store.signIn();
+
+    emit({ type: 'signed-in', userName: 'me', repository });
+
+    mut_signIns[1]?.reject(new Error('late'));
+
+    await flush();
+
+    assert.strictEqual(
+      Optional.unwrap(store.session.getSnapshot()).type,
+      'signed-in',
+    );
   });
 
   test('signs out through the backend, keeping writes not yet sent', async () => {

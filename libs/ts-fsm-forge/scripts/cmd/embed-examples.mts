@@ -13,7 +13,8 @@ const documents = [
       '00-fetch-machine.mts',
       '01-reducer.mts',
       '02-transition.mts',
-      '03-to-mermaid.mts',
+      '03-discriminant.mts',
+      '04-to-mermaid.mts',
     ],
   },
 ] as const;

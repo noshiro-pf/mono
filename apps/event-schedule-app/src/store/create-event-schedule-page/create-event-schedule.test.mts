@@ -111,6 +111,40 @@ describe(createCreateEventScheduleStore, () => {
     consoleError.mockRestore();
 
     assert.strictEqual(toasts.count, 1);
+
+    // The dialog closes again rather than spinning with its buttons disabled.
+    assert.isFalse(Optional.unwrap(store.isLoading$.getSnapshot()));
+
+    assert.isFalse(
+      Optional.unwrap(store.createResultDialogIsOpen$.getSnapshot()),
+    );
+  });
+
+  test('starts no second create while one is in progress', async () => {
+    const { store, calls } = setup();
+
+    fillValidEvent(store);
+
+    store.onCreateEventClick();
+
+    store.onCreateEventClick();
+
+    await settle(10);
+
+    assert.deepStrictEqual(calls, [
+      'add event alice u1',
+      'storage.save (reset)',
+    ]);
+
+    assert.isTrue(
+      Optional.unwrap(store.createResultDialogIsOpen$.getSnapshot()),
+    );
+
+    store.closeCreateResultDialog();
+
+    assert.isFalse(
+      Optional.unwrap(store.createResultDialogIsOpen$.getSnapshot()),
+    );
   });
 
   test('keeps the settings in storage once they stay still, from the second change after start', async () => {
