@@ -55,10 +55,21 @@ export const initiatorRuleId = 1;
 export const ensureInitiatorRule = async (): Promise<boolean> => {
   const existing = await chrome.declarativeNetRequest.getDynamicRules();
 
-  if (existing.some((rule) => rule.id === initiatorRuleId)) {
-    return true;
-  }
+  return (
+    existing.some((rule) => rule.id === initiatorRuleId) ||
+    installInitiatorRule()
+  );
+};
 
+/**
+ * Writes the rule {@link ensureInitiatorRule} describes, replacing any rule 1
+ * already there, whatever it says; `updateDynamicRules` removes and adds in one
+ * atomic call. Dynamic rules survive a browser restart and an extension update,
+ * so the service worker calls this on every install and update: a rule an older
+ * build left behind would otherwise stay as it was, a header added to the
+ * source never reaching it.
+ */
+export const installInitiatorRule = async (): Promise<boolean> => {
   await chrome.declarativeNetRequest.updateDynamicRules({
     removeRuleIds: [initiatorRuleId],
     addRules: [
