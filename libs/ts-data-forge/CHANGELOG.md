@@ -1,5 +1,20 @@
 # ts-data-forge
 
+## 15.0.1
+
+### Patch Changes
+
+- e68e601: `IMap`, `ISet`, `IMapMapped` and `ISetMapped` write with the key `-0` as they read with it. `has(-0)` and `get(-0)` already found the entry under `0`, but `delete(-0)`, `set(-0, v)` and `update(-0, f)` returned the collection unchanged. They now go through `withMutations`, which compares keys as the native `Map` and `Set` do.
+- 6f38584: The direct form of `Arr.countBy` types each count of a tuple as `0 … N` rather than as an index (`0 … N - 1`), so a count equal to the tuple's length is in its type: `Arr.countBy(['a', 'a', 'a'] as const, (x) => x)` is `IMap<'a', 0 | 1 | 2 | 3>` (was `IMap<'a', 0 | 1 | 2>`). A plain array's count is still `SizeType.Arr`.
+- 38a2075: `fastDeepEqual` compares an `ArrayBuffer`, a `SharedArrayBuffer` and a `DataView` by their bytes. Having no enumerable keys, any two of them were equal, whatever their length or contents, and `replaceEqualDeep` kept an old buffer when one with other bytes arrived.
+- d92c572: The curried form of `Arr.flat` is typed by its depth, as the direct form is: `Arr.flat(2)(nested)` has the type of `Arr.flat(nested, 2)` (it was typed as if flattened once, and `Arr.flat(0)(xs)` as flattened once too). The curried form now takes the depth as a `SafeUint` or a small literal, as the direct form does; a plain `number` is converted with `asSafeUint`.
+- 6790e63: The integer branded types' `pow` floors a fractional result, as its documentation says and as `div` does: `SafeInt.pow(2, -1)` is `0` (was `1`, rounded from `0.5`) and `Int16.pow(-2, -1)` is `-1` (was `-0`). `Int8` and `Uint8` do the same.
+- e6a4dac: `FiniteNumber.random()`, `NonZeroFiniteNumber.random()`, `Int.random()` and `NonZeroInt.random()` return values spread over their range. Their default bounds are `±Number.MAX_VALUE`, whose span overflows to `Infinity`, so every call returned the same bound; so did any call whose range is wider than `Number.MAX_VALUE`.
+- 745a60e: `Num.roundToInt` rounds as `Math.round` does, so a negative number rounds to the nearest integer: `Num.roundToInt(-2.3)` is `-2` (was `-1`) and `Num.roundToInt(-2.6)` is `-3` (was `-2`). `Num.round(digit)`, built on it, now agrees with `Num.roundAt` for a negative number, and `Num.roundToInt(0.49999999999999994)` is `0` (was `1`).
+- 8f59370: A branded number type with two bounds saturates `+Infinity` to its `MAX_VALUE`, as its `fromNumber` documents, rather than to its `MIN_VALUE`. `FiniteNumber.mul(1e200, 1e200)` is `Number.MAX_VALUE` (was `-Number.MAX_VALUE`), `SafeInt.pow(10, 400)` is `Number.MAX_SAFE_INTEGER`, `Uint32.pow(2, 2000)` is `4294967295` and `Int16.fromNumber(Infinity)` is `32767`. `NaN` still becomes `MIN_VALUE`, which the `fromNumber` documentation now says.
+- e45e274: `Obj.shallowEq` no longer reports two records with different keys as equal when the differing key of the first holds `undefined` (`Obj.shallowEq({ a: undefined }, { b: 1 })` was `true`), nor counts an inherited property of the second as one of its keys. Each key of the first must be an own key of the second.
+- 7f9658b: `Arr.toFilled` returns `[]` for an empty array, in both forms, instead of throwing `TypeError: Expected a positive integer in [1, 2^32), got: 0`.
+
 ## 15.0.0
 
 ### Major Changes

@@ -1,5 +1,27 @@
 # synstate-dom
 
+## 0.12.0
+
+### Minor Changes
+
+- af4fd4a: Control the bound `value` of a `<select>`, as `checked` is controlled: after a `change`, the select is drawn as its bound value again before the next frame is painted, so a choice the owner does not take in `onChange` undoes itself. A choice taken asynchronously is drawn as the bound value in between; bind `value` to what should be shown meanwhile. The `value` of an `<input>` or a `<textarea>` stays bound one way.
+
+### Patch Changes
+
+- ea6958f: Bind `value` after every other prop of an element, whatever the order the props are written in. A range or number input fits its value to the `type`, `min`, `max` and `step` it has when the value is written, so `<input type="range" value="150" max="200">` written in that order showed 100; it now shows 150.
+- Updated dependencies [e68e601]
+- Updated dependencies [6f38584]
+- Updated dependencies [38a2075]
+- Updated dependencies [d92c572]
+- Updated dependencies [6790e63]
+- Updated dependencies [e6a4dac]
+- Updated dependencies [745a60e]
+- Updated dependencies [8f59370]
+- Updated dependencies [e45e274]
+- Updated dependencies [7f9658b]
+    - ts-data-forge@15.0.1
+    - synstate@9.0.0
+
 ## 0.11.0
 
 ### Minor Changes

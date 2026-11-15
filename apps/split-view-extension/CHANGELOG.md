@@ -1,5 +1,27 @@
 # split-view-extension
 
+## 0.10.2
+
+### Patch Changes
+
+- af4fd4a: The split view picker keeps showing the chosen split view while it switches by binding the choice, rather than writing the select's value by hand.
+- Updated dependencies [af4fd4a]
+- Updated dependencies [ea6958f]
+- Updated dependencies [e68e601]
+- Updated dependencies [6f38584]
+- Updated dependencies [38a2075]
+- Updated dependencies [d92c572]
+- Updated dependencies [6790e63]
+- Updated dependencies [e6a4dac]
+- Updated dependencies [745a60e]
+- Updated dependencies [8f59370]
+- Updated dependencies [e45e274]
+- Updated dependencies [7f9658b]
+    - synstate-dom@0.12.0
+    - ts-data-forge@15.0.1
+    - split-view-link@0.0.4
+    - synstate@9.0.0
+
 ## 0.10.1
 
 ### Patch Changes

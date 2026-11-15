@@ -5,7 +5,7 @@
   "type": "module",
   "dependencies": {
     "synstate": ">=9.0.0",
-    "synstate-dom": ">=0.11.0",
+    "synstate-dom": ">=0.12.0",
     "synstate-router": ">=0.4.0",
     "synstate-router-dom": "file:../../../.tarballs/synstate-router-dom.tgz"
   }

@@ -1,5 +1,11 @@
 # better-preact-use-state
 
+## 1.0.5
+
+### Patch Changes
+
+- 1e77f1c: `resetState` resets to the value the state was created with — the first render's `initialState`, as `useState` reads it — rather than the latest render's argument, and keeps its identity across renders. It changed identity whenever the argument did, so `useState({ name: '' })` gave a new `resetState` on every render, and an effect depending on it re-ran after every render.
+
 ## 1.0.4
 
 ### Patch Changes

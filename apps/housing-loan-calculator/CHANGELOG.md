@@ -1,5 +1,29 @@
 # housing-loan-calculator
 
+## 0.0.39
+
+### Patch Changes
+
+- Updated dependencies [af4fd4a]
+- Updated dependencies [ea6958f]
+- Updated dependencies [e68e601]
+- Updated dependencies [6f38584]
+- Updated dependencies [38a2075]
+- Updated dependencies [d92c572]
+- Updated dependencies [6790e63]
+- Updated dependencies [e6a4dac]
+- Updated dependencies [745a60e]
+- Updated dependencies [8f59370]
+- Updated dependencies [e45e274]
+- Updated dependencies [7f9658b]
+    - synstate-dom@0.12.0
+    - ts-data-forge@15.0.1
+    - ts-utils-additional@0.0.16
+    - blueprint-synstate@0.12.1
+    - synstate@9.0.0
+    - synstate-router@0.4.0
+    - ts-fortress@13.0.1
+
 ## 0.0.38
 
 ### Patch Changes

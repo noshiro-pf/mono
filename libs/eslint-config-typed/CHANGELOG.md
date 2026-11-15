@@ -1,5 +1,43 @@
 ## [5.8.4](https://github.com/noshiro-pf/eslint-config-typed/compare/v5.8.3...v5.8.4) (2026-08-09)
 
+## 7.14.0
+
+### Minor Changes
+
+- d5ff4f6: The `vitest-coding-style/*`, `react-coding-style/*` and `immer-coding-style/*`
+  rules are now also published on their own, for projects that want them without
+  the third-party ESLint plugins this package depends on:
+  `eslint-plugin-vitest-coding-style`, `eslint-plugin-react-coding-style` and
+  `eslint-plugin-immer-coding-style`. This package depends on them and exports the
+  same plugin objects under the same names, registered under the same ids, so a
+  config needs no change. Each now also carries a `recommended` preset
+  (`configs.recommended`), which this package's own configs do not use.
+
+    The forked plugins (`total-functions`, `tree-shakable`, `strict-dependencies`)
+    stay in this package only. `strict-dependencies/strict-dependencies` gains a
+    `meta.docs.description`, and `tree-shakable/import-star`'s description reads
+    "Forbid" for "Forbits".
+
+### Patch Changes
+
+- Updated dependencies [e68e601]
+- Updated dependencies [6f38584]
+- Updated dependencies [38a2075]
+- Updated dependencies [d92c572]
+- Updated dependencies [6790e63]
+- Updated dependencies [e6a4dac]
+- Updated dependencies [745a60e]
+- Updated dependencies [8f59370]
+- Updated dependencies [e45e274]
+- Updated dependencies [7f9658b]
+- Updated dependencies [b494544]
+    - ts-data-forge@15.0.1
+    - eslint-plugin-immer-coding-style@1.0.1
+    - eslint-plugin-react-coding-style@1.0.1
+    - eslint-plugin-ts-restrictions@1.0.3
+    - eslint-plugin-ts-ui-restrictions@1.0.2
+    - eslint-plugin-vitest-coding-style@1.0.1
+
 ## 7.13.0
 
 ### Minor Changes
