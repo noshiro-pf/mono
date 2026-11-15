@@ -22,6 +22,7 @@ import {
 } from 'pr-report-core';
 import { Arr } from 'ts-data-forge';
 import type { StrictPick } from 'ts-type-forge';
+import { isAuthorOnly } from './author-only.mjs';
 import { isIssueFilterShown, type IssueFilter } from './issue-filter.mjs';
 import type { Entry, IssueItem, ReferencedItem } from './load-report.mjs';
 import { isPending } from './pending.mjs';
@@ -59,6 +60,12 @@ export type IssueGraphNode = Readonly<{
    * included, since an issue held back is `priority:hold`.
    */
   pending: boolean;
+  /**
+   * Whether it is a listed issue labelled `author-only`, which only the author
+   * can do (`author-only.mts`); `false` for everything else, since only a listed
+   * issue has its labels read for a filter.
+   */
+  authorOnly: boolean;
   /**
    * What its `in-progress` or `planned` label says (`pr-report-core`'s
    * `progressOf`, with no pull request), read on a listed issue and an open
@@ -140,6 +147,7 @@ export const buildIssueGraph = ({
       ),
       priority: issueTierOf(issue.labels),
       pending: false,
+      authorOnly: isAuthorOnly(issue.labels),
       marked,
     };
   });
@@ -162,6 +170,7 @@ export const buildIssueGraph = ({
         state: 'open',
         priority: 'none',
         pending: isPending(pull.labels),
+        authorOnly: false,
         marked: 'none',
       };
     }
@@ -177,6 +186,7 @@ export const buildIssueGraph = ({
           state: 'unknown',
           priority: 'none',
           pending: false,
+          authorOnly: false,
           marked: 'none',
         }
       : {
@@ -187,6 +197,7 @@ export const buildIssueGraph = ({
           state: item.status === 'waiting' ? 'open' : item.status,
           priority: 'none',
           pending: false,
+          authorOnly: false,
           marked: 'none',
         };
   });
@@ -279,10 +290,11 @@ export const omitDone = (graph: IssueGraph): IssueGraph =>
   omitNodes(graph, ({ state }) => state === 'done');
 
 /**
- * The graph without the listed issues `filter` leaves out by their tier or by
- * whether they are in progress (`issue-filter.mts`, which the list reads the
- * same one from), save those an issue left in waits on, and without what is
- * left with no edge for them (see {@link omitNodes}).
+ * The graph without the listed issues `filter` leaves out by their tier, by
+ * whether they are in progress or by whether only the author can do them
+ * (`issue-filter.mts`, which the list reads the same one from), save those an
+ * issue left in waits on, and without what is left with no edge for them (see
+ * {@link omitNodes}).
  *
  * An issue left out that one left in waits on is kept, as what that one waits
  * on is kept when it is not a listed issue: it is why that issue waits. It is
@@ -306,6 +318,7 @@ export const omitFilteredIssues = (
             {
               priority: node.priority,
               inProgress: node.state === 'in-progress',
+              authorOnly: node.authorOnly,
             },
             filter,
           ),

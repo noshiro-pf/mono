@@ -111,7 +111,7 @@ describe(startableIssues, () => {
       '#3  [priority:B]  {synstate}  feat(synstate): c  https://github.com/o/n/issues/3',
       '#5: startable, but another session is on its theme (tooling: #4); left to that session, unless named with --theme.',
       '#7: startable, but not written by me; left to a person.',
-      '#6: startable, but labelled duplicate, invalid, question, wontfix, pending, priority:hold, priority:close; left as they are.',
+      '#6: startable, but labelled duplicate, invalid, question, wontfix, pending, author-only, priority:hold, priority:close; left as they are.',
     ]);
   });
 

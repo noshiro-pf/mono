@@ -51,7 +51,7 @@ decided by the code `run-issue-resolver` uses:
   when the person asked for them): whatever the issue says is acted on, and
   anyone can open one.
 - **Not held** — not labelled `question`, `wontfix`, `duplicate`, `invalid`,
-  `pending`, `priority:hold` or `priority:close`, and not one a
+  `pending`, `author-only`, `priority:hold` or `priority:close`, and not one a
   `run-issue-resolver` session left as it stands.
   That record is a file on the machine the resolver ran on, so elsewhere such an
   issue is listed; step 2 passes over it by its comment.

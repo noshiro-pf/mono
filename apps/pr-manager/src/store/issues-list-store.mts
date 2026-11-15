@@ -10,7 +10,7 @@
  * The search is held beside the view, not in it, and so is never saved: it
  * starts empty on every visit.
  *
- * The tiers and `in progress` in the view are the DAG's too
+ * The tiers, `in progress` and `author only` in the view are the DAG's too
  * (`issues-view-store.mts`): switched off or picked here, they are for either
  * view.
  */
@@ -32,6 +32,8 @@ import {
 import {
   arrangeIssues,
   countIssues,
+  toggleIssueAuthorOnly,
+  toggleIssueAuthorOnlyOnly,
   toggleIssueInProgress,
   toggleIssueInProgressOnly,
   toggleIssuePriority,
@@ -61,7 +63,7 @@ export type IssuesListDeps = Readonly<{
 export type IssuesListStore = Readonly<{
   view: InitializedObservable<IssuesListView>;
   /**
-   * The tiers and `in progress` of the view alone, which the
+   * The tiers, `in progress` and `author only` of the view alone, which the
    * DAG reads (`issues-view-store.mts`); passed on only when they changed, so
    * that a change to the rest of the view derives nothing there.
    */
@@ -86,6 +88,8 @@ export type IssuesListStore = Readonly<{
   toggleLabel: (labelName: string) => void;
   toggleInProgress: () => void;
   toggleInProgressOnly: () => void;
+  toggleAuthorOnly: () => void;
+  toggleAuthorOnlyOnly: () => void;
   setSort: (sort: IssueSort) => void;
   setQuery: (query: string) => void;
   /** Saves every change from now on; returns what stops it. */
@@ -130,11 +134,15 @@ export const createIssuesListStore = (
             onlyPriorities,
             hideInProgress,
             onlyInProgress,
+            hideAuthorOnly,
+            onlyAuthorOnly,
           }): IssueFilter => ({
             hiddenPriorities,
             onlyPriorities,
             hideInProgress,
             onlyInProgress,
+            hideAuthorOnly,
+            onlyAuthorOnly,
           }),
         ),
       )
@@ -170,6 +178,12 @@ export const createIssuesListStore = (
     },
     toggleInProgressOnly: () => {
       updateView(toggleIssueInProgressOnly);
+    },
+    toggleAuthorOnly: () => {
+      updateView(toggleIssueAuthorOnly);
+    },
+    toggleAuthorOnlyOnly: () => {
+      updateView(toggleIssueAuthorOnlyOnly);
     },
     setSort: (sort) => {
       updateView((current) => withIssueSort(current, sort));

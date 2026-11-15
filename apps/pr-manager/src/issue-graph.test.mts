@@ -106,6 +106,7 @@ describe(buildIssueGraph, () => {
         state: 'attention',
         priority: 'none',
         pending: false,
+        authorOnly: false,
         marked: 'none',
       },
       {
@@ -116,6 +117,7 @@ describe(buildIssueGraph, () => {
         state: 'unknown',
         priority: 'none',
         pending: false,
+        authorOnly: false,
         marked: 'none',
       },
     ]);
@@ -263,6 +265,26 @@ describe(buildIssueGraph, () => {
         // What a declaration names past the list: its labels are not read.
         [4, false],
         [7, true],
+      ],
+    );
+  });
+
+  test('marks a listed issue labelled author-only, and nothing past the list', () => {
+    const graph = build({
+      issues: [issue(1, [], ['author-only']), issue(2, [3]), issue(4, [])],
+      referenced: [referencedItem(3, 'issue', 'waiting')],
+      pulls: [pull(7, [4], ['author-only'])],
+    });
+
+    assert.deepStrictEqual(
+      graph.nodes.map(({ number, authorOnly }) => [number, authorOnly]),
+      [
+        [1, true],
+        [2, false],
+        // What a declaration names past the list: its labels are not read.
+        [3, false],
+        [4, false],
+        [7, false],
       ],
     );
   });

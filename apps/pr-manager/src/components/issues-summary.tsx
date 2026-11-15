@@ -14,7 +14,7 @@ import { StatTile, StatToggle } from './stat-tile.js';
 
 /**
  * What the open issues lead with, in either view: how many are shown of how
- * many are open, `in progress` and the tiers, each a switch for the issues it
+ * many are open, `in progress`, `author only` and the tiers, each a switch for the issues it
  * counts with an `only` switch in its corner — the merge order's counts
  * (`merge-order-filters.tsx`), for issues. What a switch does is
  * `issues-list-view.mts`, which keeps the choice in the URL; the list and the
@@ -25,9 +25,10 @@ import { StatTile, StatToggle } from './stat-tile.js';
  * The tiers are one control, since they are one question asked of every issue,
  * which has exactly one of them: picking two shows either. `in progress` stands
  * apart, as another question: picked with a tier, it shows what is both
- * (`issue-filter.mts`). Once a tier is picked, the tiers neither picked nor
- * hidden fade, and `in progress` does not, since it is not it that decides
- * them.
+ * (`issue-filter.mts`); so does `author only`, the issues labelled
+ * `author-only` (`author-only.mts`). Once a tier is picked, the tiers neither
+ * picked nor hidden fade, and `in progress` and `author only` do not, since it
+ * is not they that decide them.
  *
  * The tiers are drawn as two groups of joined tiles (`issue-tier-group.tsx`):
  * `S` to `D` and `none` on a row of their own, and `hold` and `close` beside
@@ -42,7 +43,8 @@ import { StatTile, StatToggle } from './stat-tile.js';
  * are in all when that is more. A tier is pressed while its issues are shown:
  * one neither hidden nor picked while another is picked is not, and pressing it
  * picks it too. `in progress` is there while an open issue is under way, or
- * while it is switched off or picked, so that it can be undone.
+ * while it is switched off or picked, so that it can be undone; `author only`
+ * likewise, while an open issue is labelled `author-only`.
  */
 export const IssuesSummary = (): JSX.Element => {
   const counts$ = shownCounts();
@@ -53,7 +55,9 @@ export const IssuesSummary = (): JSX.Element => {
     <div class={constant('issues-summary-box')}>
       {/* eslint-disable-next-line synstate-dom-a11y/prefer-tag-over-role -- recorded, not fixed, when jsx-a11y came to synstate-dom (#3764) */}
       <div
-        aria-label={constant('Open issues by priority and in progress')}
+        aria-label={constant(
+          'Open issues by priority, in progress and author only',
+        )}
         class={constant('summary-row issues-summary')}
         role={constant('group')}
       >
@@ -84,6 +88,28 @@ export const IssuesSummary = (): JSX.Element => {
             />
           }
         />
+        <If
+          cond={deriveBindable(
+            [counts$, view$],
+            ({ authorOnly }, { hideAuthorOnly, onlyAuthorOnly }) =>
+              authorOnly.total > 0 || hideAuthorOnly || onlyAuthorOnly,
+          )}
+          then={
+            <StatToggle
+              label={'author only'}
+              only={view$.pipe(map(({ onlyAuthorOnly }) => onlyAuthorOnly))}
+              pickWith={'both'}
+              pressed={view$.pipe(map(({ hideAuthorOnly }) => !hideAuthorOnly))}
+              subject={
+                'the issues only the author can do: those labelled author-only, which no session is handed'
+              }
+              total={mapBindable(counts$, ({ authorOnly }) => authorOnly.total)}
+              value={mapBindable(counts$, ({ authorOnly }) => authorOnly.shown)}
+              onOnly={toggleAuthorOnlyOnly}
+              onToggle={toggleAuthorOnly}
+            />
+          }
+        />
         <IssueTierGroup counts$={counts$} row={'aside'} />
         <IssueTierGroup counts$={counts$} row={'ranked'} />
       </div>
@@ -104,4 +130,12 @@ const toggleInProgress = (): void => {
 
 const toggleInProgressOnly = (): void => {
   issuesListStore.toggleInProgressOnly();
+};
+
+const toggleAuthorOnly = (): void => {
+  issuesListStore.toggleAuthorOnly();
+};
+
+const toggleAuthorOnlyOnly = (): void => {
+  issuesListStore.toggleAuthorOnlyOnly();
 };

@@ -302,7 +302,7 @@ it is sorted into one of four:
   case-insensitively); a session acts on what the issue says with no person in
   between;
 - **held**: labelled `duplicate`, `invalid`, `question`, `wontfix`, `pending`,
-  `priority:hold` or `priority:close`;
+  `author-only`, `priority:hold` or `priority:close`;
 - **left**: a `run-issue-resolver` session ended on it with no pull request, and
   its `updatedAt` is still what the record says (a record with no instant holds
   it until removed);

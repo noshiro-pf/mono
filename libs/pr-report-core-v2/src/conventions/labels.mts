@@ -49,6 +49,11 @@ export const IssueLabel = {
   inProgress: 'in-progress',
   /** Someone means to start it next (`start-issue --plan`). */
   planned: 'planned',
+  /**
+   * Only the author can do it (their accounts, consoles or machine); it keeps
+   * its tier, and no session is handed it whatever that tier is.
+   */
+  authorOnly: 'author-only',
 } as const;
 
 /**
@@ -60,6 +65,7 @@ export const NOT_FOR_RESOLVER_LABELS = [
   'question',
   'wontfix',
   'pending',
+  IssueLabel.authorOnly,
 ] as const;
 
 /**

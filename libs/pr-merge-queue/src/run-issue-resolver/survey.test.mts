@@ -98,12 +98,13 @@ describe(surveyIssues, () => {
     );
   });
 
-  test('holds what is placed under hold or close', () => {
+  test('holds what is placed under hold or close, and what only the author can do', () => {
     const survey = surveyIssues(
       [
         issue(1, { labels: ['priority:hold'] }),
         issue(2, { labels: ['priority:close'] }),
         issue(3),
+        issue(4, { labels: ['priority:A', 'Author-Only'] }),
       ],
       OWNER,
       NONE,
@@ -114,7 +115,7 @@ describe(surveyIssues, () => {
       [3],
     );
 
-    assert.deepStrictEqual(survey.held, [1, 2]);
+    assert.deepStrictEqual(survey.held, [1, 2, 4]);
   });
 
   test('leaves what someone outside the authors wrote, whatever the case of a login', () => {
@@ -194,7 +195,7 @@ describe(passedOverNotes, () => {
         '#3: an earlier run-issue-resolver session left them as they stand; waiting for someone to change them.',
         '#4: a session stopped at its cap; a later run, capping one higher, tries again.',
         '#5: startable, but not written by owner; left to a person.',
-        '#6: startable, but labelled duplicate, invalid, question, wontfix, pending, priority:hold, priority:close or the like; left as they are.',
+        '#6: startable, but labelled duplicate, invalid, question, wontfix, pending, author-only, priority:hold, priority:close or the like; left as they are.',
       ],
     );
   });

@@ -201,6 +201,7 @@ describe(createIssuesViewStore, () => {
         none: { shown: 1, total: 1 },
       },
       inProgress: { shown: 0, total: 0 },
+      authorOnly: { shown: 0, total: 0 },
     });
 
     setFilter(DEFAULT_ISSUE_FILTER);
@@ -241,6 +242,7 @@ describe(createIssuesViewStore, () => {
         none: { shown: 1, total: 1 },
       },
       inProgress: { shown: 0, total: 0 },
+      authorOnly: { shown: 0, total: 0 },
     });
 
     setFilter({ ...DEFAULT_ISSUE_FILTER, onlyPriorities: ['D'] });
@@ -278,6 +280,7 @@ describe(createIssuesViewStore, () => {
         none: { shown: 1, total: 1 },
       },
       inProgress: { shown: 0, total: 0 },
+      authorOnly: { shown: 0, total: 0 },
     });
   });
 

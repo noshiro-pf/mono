@@ -21,6 +21,17 @@ describe(githubIssuesSearchOf, () => {
     );
   });
 
+  test('author only switched off is its label negated, and picked is its label', () => {
+    assert.deepStrictEqual(searchFor({ hideAuthorOnly: true }).qualifiers, [
+      '-label:"author-only"',
+    ]);
+
+    assert.deepStrictEqual(
+      searchFor({ onlyAuthorOnly: true, onlyPriorities: ['A'] }).qualifiers,
+      ['label:"priority:A"', 'label:"author-only"'],
+    );
+  });
+
   test('"none" switched off asks for one of the tier labels', () => {
     assert.deepStrictEqual(
       searchFor({ hiddenPriorities: ['none'] }).qualifiers,

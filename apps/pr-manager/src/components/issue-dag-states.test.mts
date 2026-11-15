@@ -53,6 +53,7 @@ const node = (
     url: 'https://github.com/o/r/issues/1',
     priority: 'none',
     pending: false,
+    authorOnly: false,
     ...overrides,
   }) as const;
 

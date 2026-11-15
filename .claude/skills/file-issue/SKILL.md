@@ -66,6 +66,14 @@ pnpm run pr-description -- check --file <path> --issue
 pnpm run pr-description -- create --title '<title>' --file <path> --priority <S|A|B|C|D|hold> [--not-duplicate <N>]...
 ```
 
+When what it asks takes the author's own accounts, consoles or machine, or a
+post in their name (`docs/issue-priority.md`, "作者にしかできない issue"), add
+`--label author-only` and still give the tier the rules decide, not `hold`.
+When only part of it is the author's, file that part as its own `author-only`
+issue and the rest without the label, linked to each other (and ordered by
+`Start-After:` where one waits on the other), so that a session can take the
+rest.
+
 `create` refuses while an open issue has a close title; name each one you read
 in step 2 and found to be another problem with `--not-duplicate`. Never pass a
 `priority:` label as `--label`, and never add or change one later by another

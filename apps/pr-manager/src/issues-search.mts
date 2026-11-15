@@ -9,19 +9,22 @@
  * them; picked alone, it negates them all; picked with a tier, it is "this tier
  * or none of them", which is no search GitHub has. An issue carrying several
  * tiers, which the page counts as `none`, is where the two can still differ.
- * The labels picked are one `label:` too.
+ * The labels picked are one `label:` too. `author only` is the `author-only`
+ * label: switched off it is `-label:`, picked it is a `label:` of its own,
+ * which GitHub reads with the others as both.
  *
  * `in progress` and the start states are read off the issue graph and the open
  * pull requests (`issue-start.mts`), which GitHub's search knows nothing of,
  * and the search matches any part of a title, or a number, where GitHub's
  * matches whole words, so they are left out and said to be, as where GitHub
- * lists more. The DAG reads the tiers and `in progress` alone, as it does on
- * the page, and also draws what a drawn issue waits on, whatever its tier and
- * even closed unfinished, which the search can leave out. GitHub has no order
- * by tier or by start state.
+ * lists more. The DAG reads the tiers, `in progress` and `author only` alone,
+ * as it does on the page, and also draws what a drawn issue waits on, whatever
+ * its tier and even closed unfinished, which the search can leave out. GitHub
+ * has no order by tier or by start state.
  */
 
 import {
+  AUTHOR_ONLY_LABEL,
   ISSUE_PRIORITIES,
   issuePriorityLabel,
   type IssuePriority,
@@ -63,6 +66,8 @@ export const githubIssuesSearchOf = (
   return {
     qualifiers: [
       ...tiers,
+      ...(view.hideAuthorOnly ? [notLabelQualifier(AUTHOR_ONLY_LABEL)] : []),
+      ...(view.onlyAuthorOnly ? [anyLabelQualifier([AUTHOR_ONLY_LABEL])] : []),
       ...(isList && Arr.isNonEmpty(view.onlyLabels)
         ? [anyLabelQualifier(view.onlyLabels)]
         : []),

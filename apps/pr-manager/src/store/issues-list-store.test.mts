@@ -36,7 +36,7 @@ describe(createIssuesListStore, () => {
     assert.strictEqual(saved.length, 2);
   });
 
-  test('passes on the tiers and in progress alone, and only when they changed', () => {
+  test('passes on the tiers, in progress and author only alone, and only when they changed', () => {
     const { store } = setup();
 
     const mut_filters: unknown[] = [];
@@ -57,10 +57,23 @@ describe(createIssuesListStore, () => {
 
     store.toggleInProgressOnly();
 
+    store.toggleAuthorOnlyOnly();
+
+    store.toggleAuthorOnly();
+
+    const picked = {
+      ...DEFAULT_ISSUE_FILTER,
+      onlyPriorities: ['S'],
+      onlyInProgress: true,
+    } as const;
+
     assert.deepStrictEqual(mut_filters, [
       DEFAULT_ISSUE_FILTER,
       { ...DEFAULT_ISSUE_FILTER, onlyPriorities: ['S'] },
-      { ...DEFAULT_ISSUE_FILTER, onlyPriorities: ['S'], onlyInProgress: true },
+      picked,
+      { ...picked, onlyAuthorOnly: true },
+      // Switching it off unpicks it.
+      { ...picked, hideAuthorOnly: true },
     ]);
   });
 
@@ -135,6 +148,8 @@ const STORED: IssuesListView = {
   onlyLabels: ['bug'],
   hideInProgress: false,
   onlyInProgress: false,
+  hideAuthorOnly: false,
+  onlyAuthorOnly: false,
   sort: 'priority',
 } as const;
 

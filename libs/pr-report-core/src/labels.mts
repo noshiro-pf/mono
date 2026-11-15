@@ -100,3 +100,15 @@ export const IN_PROGRESS_LABEL = 'in-progress';
  * `issue-closed-labels.yml` takes it off a closing issue too, with its claim.
  */
 export const PLANNED_LABEL = 'planned';
+
+/**
+ * The label that says only the author can do an issue: what it asks for takes
+ * the author's own accounts, consoles, machine or voice (a service account
+ * registered in a store's console, a report posted upstream, a setting applied
+ * by hand), so no session can finish it. It is not a tier: the issue keeps the
+ * `priority:<tier>` it would have anyway (`docs/issue-priority.md`), so that the
+ * author's own work is ordered like everyone else's, and `run-issue-resolver`
+ * and `startable-issues` never hand it to a session whatever that tier is. The
+ * Pull Requests Manager page counts it and can show it alone or leave it out.
+ */
+export const AUTHOR_ONLY_LABEL = 'author-only';

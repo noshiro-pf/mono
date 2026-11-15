@@ -293,8 +293,9 @@ Lists the issues to start next, writing nothing (**New in v2**: `--repo`, as
 every other command takes it). Startable: start state `ready` or `free`, not
 `in-progress` or `planned` (by label or **live claim**, v2), no open pull
 request closes it, written by `--author` (default the token's account), none of
-`duplicate`, `invalid`, `question`, `wontfix`, `pending`, `priority:hold`,
-`priority:close`, and not left by a `run-issue-resolver` session (its record).
+`duplicate`, `invalid`, `question`, `wontfix`, `pending`, `author-only`,
+`priority:hold`, `priority:close`, and not left by a `run-issue-resolver`
+session (its record).
 
 Themes: the scope a title starts with (`feat(synstate): …`), with the package
 that scope lives in, and the packages its body names by path. Order without

@@ -12,7 +12,8 @@ open な issue はどれも、**優先度の段を表す `priority:<段>` ラベ
   `pnpm run pr-report` の issue の節に `no priority tier` /
   `several priority tiers` と出る。見つけたら段を付ける。
 - `run-issue-resolver` は着手できる issue を段の順（`S`、`A`、`B`、`C`、段なし、
-  `D`）に取り、`hold` と `close` は取らない。ただし `S` より下の issue は、主な
+  `D`）に取り、`hold` と `close` は取らない。段によらず `author-only` の付いた
+  issue も取らない（下の「作者にしかできない issue」）。ただし `S` より下の issue は、主な
   テーマ（タイトルの scope と、それが属するパッケージ）がすでに着手された issue
   か、同時に始めるほかのセッションの issue と同じなら、空くまで待たせる（#3598）。
   `/resolve-issues` はテーマごとにまとめて取る（`startable-issues`）。
@@ -83,6 +84,27 @@ open な issue はどれも、**優先度の段を表す `priority:<段>` ラベ
   `react-blueprintjs-utils`、`numeric-input-utils`。`event-schedule-app` の
   移行（#2649）が済んだら、残っている issue を閉じるか見直す。
 
+## 作者にしかできない issue — `author-only`
+
+作者（noshiro-pf）のアカウント・コンソール・手元のマシンが要る、または作者の名前で
+外へ発信する作業を含む issue には、段とは別に **`author-only` ラベル**を付ける。
+セッションには終えられないので、`run-issue-resolver` と `startable-issues` は段に
+よらずこれを取らない。Pull Requests Manager では `author only` のタイルで、それだけを
+表示したり外したりできる。
+
+- 例：ストアの開発者コンソールでのサービスアカウント登録、Discord Developer Portal
+  での bot 作成、upstream への報告の投稿、`repo-settings:apply` やブランチの削除、
+  作者のマシンでしか動かないワーカーの比較・再起動。
+- **段は `hold` にせず、この文書の決め方どおりに付ける。** 「誰がするか」は
+  `author-only` が、「いつ・どれから」は段が表す。`hold` にすると作者自身の作業の
+  順が見えなくなる。今は着手しない理由がほかにあるときだけ `hold` にする。
+- **作者の作業とセッションにできる作業が混ざっているなら、分割する。** 作者の
+  作業だけを別の issue に切り出してそれにだけ `author-only` を付け、元の issue
+  からリンクする。セッションにできる部分は `author-only` を付けずに残し、ほかの
+  作業者が取れるようにする。作者の作業を待つ部分は `Start-After:` で切り出した
+  issue を名指し、作者の作業のほうが待つなら逆に名指す。
+- 作るときは `pr-description create` に `--label author-only` を渡す。
+
 ## `Start-After:` との関係
 
 **段の高い issue が、段の低いものを待ってはいけない。** 待つ理由はあるはずなので、
@@ -103,7 +125,8 @@ open な issue はどれも、**優先度の段を表す `priority:<段>` ラベ
 
 ## issue に `pending` は付けない
 
-issue を止めるのは `priority:hold` だけにする。`pending` ラベルは pull request
+issue を段で止めるのは `priority:hold` だけにする（作者にしかできないものは
+`author-only`）。`pending` ラベルは pull request
 の「作者が今は止めている」印で、マージ順（Pull Requests Manager）がそれを数える。
 issue に付いていると、`pnpm run pr-report` が `pending is for pull requests` と
 出すので、`priority:hold` に付け替える。作者が一時的に止めたい issue も `hold` に
