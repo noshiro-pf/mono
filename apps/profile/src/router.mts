@@ -5,8 +5,10 @@ import { routes, tabKeys } from './constants/index.mjs';
 export const selectTab = (tabIndex: number): void => {
   const key = tabKeys[tabIndex];
 
+  // A cross-fade where the browser has View Transitions, and the same change as
+  // before where it does not; `index.css` turns it off for reduced motion.
   if (key !== undefined) {
-    router.push(routes[key].href());
+    router.push(routes[key].href(), { viewTransition: true });
   }
 };
 
