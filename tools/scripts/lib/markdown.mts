@@ -39,12 +39,22 @@ export const markdownLines = (fileText: string): readonly MarkdownLine[] =>
     }
   });
 
-/** The inline code spans of one line, as written between the backticks. */
+/**
+ * The inline code spans of one line, as CommonMark shows them: what is between
+ * the backticks, less one space at each end when both ends have one and the
+ * span is not spaces alone. Read by {@link codeSpanRanges}, as every guard
+ * reads them.
+ */
 export const codeSpans = (lineText: string): readonly string[] =>
-  Array.from(
-    lineText.matchAll(CODE_SPAN),
-    (span) => span.groups?.['code'] ?? '',
-  );
+  codeSpanRanges(lineText).map(({ start, end }) => {
+    const ticks = /^`+/u.exec(lineText.slice(start))?.[0].length ?? 0;
+
+    const code = lineText.slice(start + ticks, end - ticks);
+
+    return code.startsWith(' ') && code.endsWith(' ') && code.trim() !== ''
+      ? code.slice(1, -1)
+      : code;
+  });
 
 /**
  * Where each inline code span of one line is, its backticks included: `start`
@@ -103,9 +113,13 @@ export const codeSpanRanges = (
     }
   });
 
-/** One line with its inline code spans taken out. */
+/** One line with its inline code spans ({@link codeSpanRanges}) taken out. */
 export const withoutCodeSpans = (lineText: string): string =>
-  lineText.replaceAll(CODE_SPAN, '');
+  // From the last span back, so that each range still indexes the text.
+  codeSpanRanges(lineText).reduceRight(
+    (text, { start, end }) => `${text.slice(0, start)}${text.slice(end)}`,
+    lineText,
+  );
 
 /** Text on one line: every run of whitespace one space, none at the ends. */
 export const oneLine = (text: string): string =>
@@ -142,13 +156,6 @@ type Fence = Readonly<{ char: string; length: number }>;
  * the start of a line, not a fence.
  */
 const FENCE = /^[\s>]*(?<fence>`{3,}|~{3,})(?<info>.*)$/u;
-
-/**
- * An inline code span: a run of backticks, the code, and a run of the same
- * length. A span that wraps onto the next line is not read; what such a
- * mismatch pairs has spaces in it, which no path has.
- */
-const CODE_SPAN = /(?<!`)(?<ticks>`+)(?!`)(?<code>[^`]+)\k<ticks>(?!`)/gu;
 
 const nextFence = (
   open: Fence | undefined,
