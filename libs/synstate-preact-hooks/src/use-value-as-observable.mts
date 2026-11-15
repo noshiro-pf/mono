@@ -2,12 +2,14 @@ import * as Preact from 'preact/hooks';
 import {
   source,
   withInitialValue,
-  type Observable,
+  type InitializedObservable,
   type SourceObservable,
 } from 'synstate';
 import { Optional } from 'ts-data-forge';
 
-export const useValueAsObservable = <A,>(input: A): Observable<A> => {
+export const useValueAsObservable = <A,>(
+  input: A,
+): InitializedObservable<A> => {
   const sourceObservable = Preact.useMemo<SourceObservable<A>>(source, []);
 
   const state = Preact.useMemo(

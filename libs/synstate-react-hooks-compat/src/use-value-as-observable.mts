@@ -3,7 +3,6 @@ import {
   source,
   withInitialValue,
   type InitializedObservable,
-  type Observable,
   type SourceObservable,
 } from 'synstate';
 import { Optional } from 'ts-data-forge';
@@ -22,7 +21,9 @@ import { Optional } from 'ts-data-forge';
  * again. So read the observable from each render rather than keeping the first
  * one.
  */
-export const useValueAsObservable = <A,>(input: A): Observable<A> => {
+export const useValueAsObservable = <A,>(
+  input: A,
+): InitializedObservable<A> => {
   const [observables, setObservables] = React.useState(() =>
     createObservables(input),
   );
