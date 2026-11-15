@@ -73,6 +73,12 @@ describe('aria-role', () => {
         `,
       },
       {
+        name: 'a file read for its autofocus, with no constant imported, unwraps no call',
+        code: dedent`
+          const a = <input autofocus role={constant('bogus')} />;
+        `,
+      },
+      {
         name: "another module's constant is not unwrapped, and its call reads as no literal",
         code: dedent`
           import { constant } from 'elsewhere';
@@ -578,6 +584,108 @@ describe('a rule that visits spread attributes alone', () => {
           ${importConstant}
           const a = <div {...{ role: constant('button') }} />;
         `,
+        errors: 1,
+      },
+    ],
+  });
+});
+
+describe("no-autofocus, reading synstate-dom's spelling as React's", () => {
+  tester.run('no-autofocus', ruleOf('no-autofocus'), {
+    valid: [
+      {
+        name: 'an input with no autofocus',
+        code: 'const a = <input type="text" />;',
+      },
+      {
+        name: 'another name that differs from React\'s in case alone is not "autofocus"',
+        code: 'const a = <input autocomplete="off" />;',
+      },
+    ],
+    invalid: [
+      {
+        name: 'a bare autofocus, in a file that imports nothing from synstate-dom',
+        code: 'const a = <input autofocus />;',
+        errors: 1,
+      },
+      {
+        name: 'autofocus bound to a literal',
+        code: 'const a = <input autofocus={true} />;',
+        errors: 1,
+      },
+      {
+        name: 'autofocus bound to constant',
+        code: dedent`
+          ${importConstant}
+          const a = <input autofocus={constant(true)} />;
+        `,
+        errors: 1,
+      },
+      {
+        name: "autofocus in a file that imports synstate-dom's For alone",
+        code: dedent`
+          import { For } from 'synstate-dom';
+          const a = <input autofocus />;
+        `,
+        errors: 1,
+      },
+      {
+        name: "React's spelling is still reported",
+        code: 'const a = <input autoFocus />;',
+        errors: 1,
+      },
+    ],
+  });
+});
+
+describe('prefer-tag-over-role', () => {
+  tester.run('prefer-tag-over-role', ruleOf('prefer-tag-over-role'), {
+    valid: [
+      {
+        name: 'an SVG group given a role',
+        code: dedent`
+          ${importConstant}
+          const a = <g role={constant('button')} tabindex={constant(0)} />;
+        `,
+      },
+      {
+        name: 'an svg given the img role',
+        code: dedent`
+          ${importConstant}
+          const a = <svg role={constant('img')} aria-label={constant('chart')} />;
+        `,
+      },
+      {
+        name: 'an SVG element in a file that imports nothing from synstate-dom',
+        code: 'const a = <rect role="button" />;',
+      },
+    ],
+    invalid: [
+      {
+        name: 'an HTML element given a role is still reported',
+        code: dedent`
+          ${importConstant}
+          const a = <div role={constant('button')} />;
+        `,
+        errors: 1,
+      },
+      {
+        name: 'an HTML element inside an svg is still reported',
+        code: dedent`
+          ${importConstant}
+          const a = (
+            <svg>
+              <foreignObject>
+                <div role={constant('button')} />
+              </foreignObject>
+            </svg>
+          );
+        `,
+        errors: 1,
+      },
+      {
+        name: 'a component named like an SVG tag is not one',
+        code: 'const a = <G role="button" />;',
         errors: 1,
       },
     ],

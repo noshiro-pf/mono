@@ -30,7 +30,6 @@ export const DagEdgeDelete = ({
   const label = button.pipe(map((state) => state.label));
 
   return (
-    // eslint-disable-next-line synstate-dom-a11y/prefer-tag-over-role -- An SVG has no <button>: the group takes its role, focus and keys.
     <g
       ref={(element) => {
         const afterUpdate = createAfterUpdate();

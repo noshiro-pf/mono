@@ -7,6 +7,8 @@ import { defineKnownRules, type FlatConfig } from '../types/index.mjs';
  *
  * The rules are jsx-a11y's under `synstate-dom-a11y/`, a second registration
  * that reads an attribute bound to synstate-dom's `constant(x)` as bound to `x`
+ * and synstate-dom's `autofocus` as React's `autoFocus`, and does not ask an
+ * SVG element for an HTML tag in `prefer-tag-over-role`
  * (`withSynstateDomConstants`), so every rule of `eslintConfigForReact`'s set
  * applies as it does there; disable one by that name. The React rules and the
  * hooks rules do not: a synstate-dom component is called once and has no hooks.

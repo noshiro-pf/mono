@@ -29,7 +29,6 @@ export const DagMilestoneNode = ({ record }: Props): JSX.Element => {
   );
 
   return (
-    // eslint-disable-next-line synstate-dom-a11y/prefer-tag-over-role -- An SVG has no <button>: the group takes its role, focus and keys.
     <g
       aria-label={record.pipe(map((r) => r.view.ariaLabel))}
       class={record.pipe(
