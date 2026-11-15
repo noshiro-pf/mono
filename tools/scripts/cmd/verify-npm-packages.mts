@@ -1378,6 +1378,7 @@ const generateSpace = async (
  * the breakage. Wait for the release that fixes it.
  */
 const notYetPublished: ReadonlySet<string> = new Set<string>([
+  'eslint-plugin-synstate-dom-a11y',
   'synstate-router-preact',
   'ts-fsm-forge',
 ]);

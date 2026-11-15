@@ -593,8 +593,10 @@ projects' plugins, changed for flat config, and live in this package only.
 
 #### Wrapped plugins
 
+- **`eslintPluginSynstateDomA11y`**
+    - The plugin of [`eslint-plugin-synstate-dom-a11y`](https://www.npmjs.com/package/eslint-plugin-synstate-dom-a11y), registered as it is under `synstate-dom-a11y`: the rules of `eslint-plugin-jsx-a11y`, each reading an attribute bound to synstate-dom's `constant(x)` as bound to `x`, in a file that imports `constant`, or the namespace, from `'synstate-dom'` itself (a re-export through another module is not followed)
 - **`withSynstateDomConstants(plugin)`**
-    - The `meta` and `rules` of `eslint-plugin-jsx-a11y`, each rule reading an attribute bound to synstate-dom's `constant(x)` as bound to `x`, in a file that imports `constant`, or the namespace, from `'synstate-dom'` itself (a re-export through another module is not followed); registered as `synstate-dom-a11y`
+    - The same reading applied to a jsx-a11y plugin module given, re-exported from `eslint-plugin-synstate-dom-a11y`
 
 #### ts-restrictions
 

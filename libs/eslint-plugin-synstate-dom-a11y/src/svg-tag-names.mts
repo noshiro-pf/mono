@@ -4,9 +4,9 @@
  * The tags synstate-dom creates in the SVG namespace: those of
  * `SVGElementTagNameMap` that HTML does not also have. A copy of synstate-dom's
  * `svgTagNames` (`libs/synstate-dom/src/internal/dom-tables.mts`), which this
- * package cannot import, since synstate-dom lints with it;
- * `tools/configs/synstate-dom-svg-tag-names.test.mts` fails when the two
- * differ.
+ * package cannot import: synstate-dom lints with eslint-config-typed, which
+ * depends on this package. `tools/configs/synstate-dom-svg-tag-names.test.mts`
+ * fails when the two differ.
  */
 export const svgTagNames: ReadonlySet<string> = new Set<string>([
   'animate',
