@@ -14,7 +14,6 @@ import { issuesListStore, issuesViewStore, reader } from '../store/index.mjs';
 import { dagBox } from './dag-box.mjs';
 import { IssueDagLegend } from './issue-dag-legend.js';
 import { IssueDagNode, type PlacedNode } from './issue-dag-node.js';
-import { SvgTitle } from './svg-elements.js';
 
 /**
  * The open issues as a graph of what each waits for, read left to right:
@@ -99,7 +98,7 @@ const Dag = (): JSX.Element => {
             Math.floor(layout.width * scale),
           )}
         >
-          <SvgTitle>{constant('Open issues and what each waits for')}</SvgTitle>
+          <title>{constant('Open issues and what each waits for')}</title>
 
           <defs>
             <marker

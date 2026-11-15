@@ -50,7 +50,6 @@ export * from './sort-editor.js';
 export * from './sort-key-row.js';
 export * from './starting-screen.js';
 export * from './status-badge.js';
-export * from './svg-title.js';
 export * from './task-card-list.js';
 export * from './task-card.js';
 export * from './task-form.js';

@@ -1,6 +1,13 @@
 import { hasKey, isRecord } from 'ts-data-forge';
 import { bindProps } from '../bind/index.mjs';
-import { appendTo, mountThenInsert, svgTagNames } from '../internal/index.mjs';
+import {
+  appendTo,
+  isMountingInSvg,
+  mountThenInsert,
+  mountUnder,
+  svgTagNames,
+  svgTwinTagNames,
+} from '../internal/index.mjs';
 import { isChild, mountChild, type Child } from './child.mjs';
 import { mountable, type Mountable } from './mountable.mjs';
 
@@ -36,7 +43,12 @@ const isRefCallback = (value: unknown): value is (element: Element) => void =>
   typeof value === 'function';
 
 const mountElement = (tag: string, props: unknown): Element => {
-  const element = svgTagNameSet.has(tag)
+  // An element knows its own namespace, so its children are told it without
+  // reading the DOM.
+  const isSvg =
+    svgTagNameSet.has(tag) || (isMountingInSvg() && svgTwinTagNameSet.has(tag));
+
+  const element = isSvg
     ? document.createElementNS(svgNamespace, tag)
     : document.createElement(tag);
 
@@ -50,7 +62,11 @@ const mountElement = (tag: string, props: unknown): Element => {
 
   // Children first, so that a `<select>`'s `value` finds its `<option>`s.
   if (hasKey(props, 'children') && isChild(props.children)) {
-    mountThenInsert(mountChild, props.children, appendTo, element);
+    const { children } = props;
+
+    mountUnder(isSvg && tag !== 'foreignObject', () =>
+      mountThenInsert(mountChild, children, appendTo, element),
+    );
   }
 
   bindProps(element, props);
@@ -61,3 +77,5 @@ const mountElement = (tag: string, props: unknown): Element => {
 const svgNamespace = 'http://www.w3.org/2000/svg';
 
 const svgTagNameSet: ReadonlySet<string> = new Set(svgTagNames);
+
+const svgTwinTagNameSet: ReadonlySet<string> = new Set(svgTwinTagNames);

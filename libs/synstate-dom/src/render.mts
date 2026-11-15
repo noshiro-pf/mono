@@ -1,5 +1,10 @@
 import { createScope } from 'synstate';
-import { appendTo, mountThenInsert } from './internal/index.mjs';
+import {
+  appendTo,
+  holdsSvgContent,
+  mountThenInsert,
+  mountUnder,
+} from './internal/index.mjs';
 import { type JSX, toNodes } from './jsx/index.mjs';
 
 /**
@@ -32,15 +37,17 @@ export const render = (
 
   try {
     root.run(() =>
-      mountThenInsert(
-        mountApp,
-        app,
-        (into: Element, nodes: readonly ChildNode[]) => {
-          mut_inserted.nodes = nodes;
+      mountUnder(holdsSvgContent(container), () =>
+        mountThenInsert(
+          mountApp,
+          app,
+          (into: Element, nodes: readonly ChildNode[]) => {
+            mut_inserted.nodes = nodes;
 
-          appendTo(into, nodes);
-        },
-        container,
+            appendTo(into, nodes);
+          },
+          container,
+        ),
       ),
     );
   } catch (error) {

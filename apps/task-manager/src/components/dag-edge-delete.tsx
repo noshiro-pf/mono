@@ -7,7 +7,6 @@ import {
 } from 'synstate-dom';
 import { Num } from 'ts-data-forge';
 import type { EdgeDeleteState } from './dag-canvas-scene.mjs';
-import { SvgTitle } from './svg-title.js';
 
 type Props = Readonly<{
   button: InitializedObservable<EdgeDeleteState>;
@@ -88,7 +87,7 @@ export const DagEdgeDelete = ({
         onDismiss();
       }}
     >
-      <SvgTitle>{label}</SvgTitle>
+      <title>{label}</title>
       <circle
         class={constant('dag-edge-delete-circle')}
         r={button.pipe(map(radius))}

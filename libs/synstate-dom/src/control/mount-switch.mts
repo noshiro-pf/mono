@@ -10,8 +10,10 @@ import type { Bindable } from '../constant/index.mjs';
 import {
   applyWhenAttached,
   bindValue,
+  holdsSvgContent,
   insertBefore,
   mountThenInsert,
+  mountUnder,
 } from '../internal/index.mjs';
 import { toNodes, type Mountable, type MountedNodes } from '../jsx/index.mjs';
 
@@ -88,7 +90,10 @@ export const mountSwitch = <V, K>(
       mut_state.current.scope.dispose();
     }
 
-    mountThenInsert((k: K) => mountBranch(k, v), key, insertBefore, anchor);
+    // An update runs outside the parent's mount, so it reads where it goes.
+    mountUnder(holdsSvgContent(anchor.parentNode), () =>
+      mountThenInsert((k: K) => mountBranch(k, v), key, insertBefore, anchor),
+    );
   };
 
   const switchWhenAttached = applyWhenAttached(anchor, switchTo);
