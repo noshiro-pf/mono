@@ -14,7 +14,6 @@ import type {
   TakeUntilOperatorObservable,
   UpdateToken,
 } from '../types/index.mjs';
-import { maxDepth } from '../utils/index.mjs';
 
 /**
  * Emits values from the source until the notifier observable emits.
@@ -90,12 +89,10 @@ class TakeUntilObservableClass<A>
       parents: [parentObservable],
       // Deeper than the notifier too, so that a notifier emitting in the same
       // update as the source has been heard before this observable is visited,
-      // however deep it is. Raised to the scope's floor by the constructor.
-      // Computed here, as `withCurrentValueFrom` does, because the config names
-      // no observable to follow besides the parents. A deep notifier makes this
-      // observable, and what derives from it, as deep, which costs an update an
-      // empty bucket for each extra level.
-      depth: 1 + maxDepth([parentObservable, notifier]),
+      // however deep it is. A deep notifier makes this observable, and what
+      // derives from it, as deep, which costs an update an empty bucket for
+      // each extra level.
+      alsoAfter: [notifier],
       initialValue: parentObservable.getSnapshot(),
     });
 

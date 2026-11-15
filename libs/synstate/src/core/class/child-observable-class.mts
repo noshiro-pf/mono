@@ -3,6 +3,7 @@
 // @sumi-expect-error-file functions/prefer-arrow-function
 // @sumi-expect-error-file mutation/no-mutation-without-mut-prefix
 import { Optional, type Some } from 'ts-data-forge';
+import * as Arr from 'ts-data-forge/array';
 import { panic } from 'ts-std-forge';
 import type { MutableSet } from 'ts-type-forge';
 import type {
@@ -25,6 +26,7 @@ import {
   childDepth,
   isDevelopmentBuild,
   issueUnqueuedToken,
+  maxDepth,
   runUndoingOnThrow,
 } from '../utils/index.mjs';
 import { ManagerObservableClass } from './manager-observable-class.mjs';
@@ -36,9 +38,11 @@ type ChildObservableConfig<A, P extends NonEmptyUnknownList> = Readonly<{
   parents: Wrap<P>;
 
   /**
-   * As `depth` of `createSyncChildObservable`'s config
-   * (`ChildObservableConfigBase` in `create-child-observable.mts`) says.
+   * As `alsoAfter` and `depth` of `createSyncChildObservable`'s config
+   * (`ChildObservableConfigBase` in `create-child-observable.mts`) say.
    */
+  alsoAfter?: readonly Observable<unknown>[];
+
   depth?: number;
 
   initialValue: Optional<A>;
@@ -59,16 +63,15 @@ export class SyncChildObservableClass<A, const P extends NonEmptyUnknownList>
   #mut_isAttached: boolean;
   readonly parents: Wrap<P>;
 
-  constructor({ parents, depth, initialValue }: ChildObservableConfig<A, P>) {
+  constructor({
+    parents,
+    alsoAfter,
+    depth,
+    initialValue,
+  }: ChildObservableConfig<A, P>) {
     super({
       kind: 'sync child',
-      // A passed depth is not checked against the parents'. As deep as a
-      // parent, this observable is dropped by an update that parent emits in;
-      // shallower, it is left in a bucket that update has visited, and a later
-      // update visits it out of order, perhaps twice; as shallow as the node
-      // that started the update, or shallower, queueing it throws a TypeError
-      // that names neither this observable nor its depth.
-      depth: depth === undefined ? childDepth(parents) : atScopeFloor(depth),
+      depth: depthOfChild(parents, alsoAfter, depth),
       initialValue,
     });
 
@@ -145,11 +148,15 @@ export class AsyncChildObservableClass<A, const P extends NonEmptyUnknownList>
   #mut_isAttached: boolean;
   readonly parents: Wrap<P>;
 
-  constructor({ parents, depth, initialValue }: ChildObservableConfig<A, P>) {
+  constructor({
+    parents,
+    alsoAfter,
+    depth,
+    initialValue,
+  }: ChildObservableConfig<A, P>) {
     super({
       kind: 'async child',
-      // Unchecked, as in `SyncChildObservableClass`'s constructor.
-      depth: depth === undefined ? childDepth(parents) : atScopeFloor(depth),
+      depth: depthOfChild(parents, alsoAfter, depth),
       initialValue,
     });
 
@@ -367,6 +374,44 @@ const detectCircularDependency = (child: ChildNode): void => {
       );
     }
   }
+};
+
+/**
+ * The depth of a child of `parents` that also follows `alsoAfter`: `depth` when
+ * passed, which has to be greater than every one of them, or one more than the
+ * deepest; raised to the scope's floor either way.
+ *
+ * A passed depth at or below one of them is a programming error. As deep as a
+ * parent, the child would be dropped by an update that parent emits in;
+ * shallower, it would be left in a bucket that update has visited, and a later
+ * update would visit it out of order, perhaps twice; as shallow as the node that
+ * started the update, queueing it would throw a `TypeError` naming nothing.
+ */
+const depthOfChild = (
+  parents: readonly Observable<unknown>[],
+  alsoAfter: readonly Observable<unknown>[] = [],
+  depth?: number,
+): number => {
+  // Most children follow their parents alone; they are read as they are.
+  const followed = Arr.isEmpty(alsoAfter)
+    ? parents
+    : ([...parents, ...alsoAfter] as const);
+
+  if (depth === undefined) {
+    return childDepth(followed);
+  }
+
+  const deepest = maxDepth(followed);
+
+  if (depth <= deepest) {
+    // A programming error, marked by `panic` as the circular dependency above
+    // is, so that a `Result` boundary rethrows it.
+    panic(
+      `A child observable's depth (${depth}) has to be greater than that of every observable it follows: the deepest is at depth ${deepest}.`,
+    );
+  }
+
+  return atScopeFloor(depth);
 };
 
 /** Registers a child to its parents. */

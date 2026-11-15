@@ -13,7 +13,6 @@ import type {
   UpdateToken,
   WithCurrentValueFromOperatorObservable,
 } from '../types/index.mjs';
-import { maxDepth } from '../utils/index.mjs';
 
 /**
  * Samples the current value from another observable each time the source emits.
@@ -93,8 +92,7 @@ class WithCurrentValueFromObservableClass<A, B>
   constructor(parentObservable: Observable<A>, observable: Observable<B>) {
     super({
       parents: [parentObservable],
-      // Raised to the scope's floor by the constructor.
-      depth: 1 + maxDepth([parentObservable, observable]),
+      alsoAfter: [observable],
       initialValue: pipe({
         par: parentObservable.getSnapshot(),
         me: observable.getSnapshot(),
