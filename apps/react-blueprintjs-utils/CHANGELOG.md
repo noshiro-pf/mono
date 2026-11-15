@@ -1,5 +1,16 @@
 # react-blueprintjs-utils
 
+## 0.0.42
+
+### Patch Changes
+
+- Updated dependencies [cdab38f]
+- Updated dependencies [fd436eb]
+    - better-react-use-state@1.0.4
+    - synstate-react-hooks@9.0.2
+    - react-utils@0.0.35
+    - synstate@9.0.0
+
 ## 0.0.41
 
 ### Patch Changes

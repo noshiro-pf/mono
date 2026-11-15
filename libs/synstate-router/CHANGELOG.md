@@ -1,5 +1,15 @@
 # synstate-router
 
+## 0.5.0
+
+### Minor Changes
+
+- 3f3b37f: `handleLinkClick` and `NavigateOptions` take a `state`, which a routed click passes to `push` / `replace` as the destination page's history state; a click the browser handles writes none.
+
+### Patch Changes
+
+- synstate@9.0.0
+
 ## 0.4.0
 
 ### Minor Changes

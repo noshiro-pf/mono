@@ -1,5 +1,14 @@
 # react-utils-styled
 
+## 0.0.35
+
+### Patch Changes
+
+- Updated dependencies [cdab38f]
+    - better-react-use-state@1.0.4
+    - react-utils@0.0.35
+    - resize-observer-react-hooks@0.0.20
+
 ## 0.0.34
 
 ### Patch Changes

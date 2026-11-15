@@ -1,5 +1,17 @@
 # synstate-router-react
 
+## 0.3.0
+
+### Minor Changes
+
+- 3f3b37f: `Link` takes a `state` prop: the destination page's history state, written with the navigation as `router.push(href, { state })` writes it, and restored by back and forward. A click the browser handles (a modifier key, `target`, `download`, an `ExternalHref`) writes none.
+
+### Patch Changes
+
+- Updated dependencies [3f3b37f]
+    - synstate-router@0.5.0
+    - synstate@9.0.0
+
 ## 0.2.0
 
 ### Minor Changes
