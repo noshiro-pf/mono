@@ -64,13 +64,15 @@ export default [
     files: ['test/**'],
     rules: defineKnownRules({
       // `samples.test.tsx` runs the README samples, which are modules of
-      // their own rather than part of the package.
+      // their own rather than part of the package; `vitest/browser` is where
+      // Vitest exports `cdp`, which the IME composition tests drive.
       'import-x/no-internal-modules': [
         'error',
         {
           allow: [
             ...eslintImportsRules['import-x/no-internal-modules'][1].allow,
             '**/samples/readme/*',
+            'vitest/browser',
           ],
         },
       ],

@@ -1,6 +1,7 @@
 import { createState, just, map } from 'synstate';
 import { constant, render, type JSX } from 'synstate-dom';
 import { Obj, Optional } from 'ts-data-forge';
+import { cdp } from 'vitest/browser';
 
 const mountInto = (
   app: () => JSX.Element,
@@ -505,6 +506,256 @@ describe('controlled checked', () => {
     assert.isFalse(first.checked);
 
     assert.isTrue(second.checked);
+
+    unmount();
+  });
+});
+
+/** Picks `value` on `select` as a user would: the value, then `change`. */
+const choose = (mut_select: HTMLSelectElement, value: string): void => {
+  mut_select.value = value;
+
+  mut_select.dispatchEvent(new Event('change', { bubbles: true }));
+};
+
+const selectOptions = (): JSX.Element => (
+  <>
+    <option value={constant('a')}>{constant('A')}</option>
+    <option value={constant('b')}>{constant('B')}</option>
+  </>
+);
+
+const mountSelect = (
+  app: () => JSX.Element,
+): Readonly<{ select: HTMLSelectElement; unmount: () => void }> => {
+  const container = document.createElement('div');
+
+  document.body.append(container);
+
+  const unmountApp = render(app, container);
+
+  const select = container.querySelector('select');
+
+  assert.isNotNull(select);
+
+  return {
+    select,
+    unmount: () => {
+      unmountApp();
+
+      container.remove();
+    },
+  };
+};
+
+describe('controlled select value (#3411)', () => {
+  test('a refused choice is drawn as the bound value again', async () => {
+    const mut_seen: string[] = [];
+
+    const { select, unmount } = mountSelect(() => (
+      <select
+        value={constant('a')}
+        onChange={(event) => {
+          mut_seen.push(event.currentTarget.value);
+        }}
+      >
+        {selectOptions()}
+      </select>
+    ));
+
+    choose(select, 'b');
+
+    // The handler sees the user's choice, which is undone only after it.
+    assert.deepStrictEqual(mut_seen, ['b']);
+
+    await nextFrame();
+
+    assert.strictEqual(select.value, 'a');
+
+    unmount();
+  });
+
+  test('a taken choice stays', async () => {
+    const [value$, setValue] = createState('a');
+
+    const { select, unmount } = mountSelect(() => (
+      <select
+        value={value$}
+        onChange={(event) => {
+          setValue(event.currentTarget.value);
+        }}
+      >
+        {selectOptions()}
+      </select>
+    ));
+
+    choose(select, 'b');
+
+    await nextFrame();
+
+    assert.strictEqual(select.value, 'b');
+
+    unmount();
+  });
+
+  test('a handler that stops the event does not keep the refused choice', async () => {
+    const { select, unmount } = mountSelect(() => (
+      <select
+        value={constant('a')}
+        onChange={(event) => {
+          event.stopImmediatePropagation();
+        }}
+      >
+        {selectOptions()}
+      </select>
+    ));
+
+    choose(select, 'b');
+
+    await nextFrame();
+
+    assert.strictEqual(select.value, 'a');
+
+    unmount();
+  });
+
+  test('a text input and a textarea stay one way', async () => {
+    const container = document.createElement('div');
+
+    document.body.append(container);
+
+    const unmount = render(
+      () => (
+        <>
+          <input value={constant('bound')} />
+          <textarea value={constant('bound')} />
+        </>
+      ),
+      container,
+    );
+
+    const mut_input = container.querySelector('input');
+
+    const mut_textarea = container.querySelector('textarea');
+
+    assert.isNotNull(mut_input);
+
+    assert.isNotNull(mut_textarea);
+
+    mut_input.value = 'typed';
+
+    mut_input.dispatchEvent(new Event('change', { bubbles: true }));
+
+    mut_textarea.value = 'typed';
+
+    mut_textarea.dispatchEvent(new Event('change', { bubbles: true }));
+
+    await nextFrame();
+
+    assert.strictEqual(mut_input.value, 'typed');
+
+    assert.strictEqual(mut_textarea.value, 'typed');
+
+    unmount();
+
+    container.remove();
+  });
+});
+
+/** Composes `か`, `かん` and `漢` through CDP, then commits `漢`. */
+const composeKan = async (between: () => void): Promise<void> => {
+  for (const text of ['か', 'かん', '漢']) {
+    // eslint-disable-next-line no-await-in-loop
+    await cdp().send('Input.imeSetComposition', {
+      text,
+      selectionStart: text.length,
+      selectionEnd: text.length,
+    });
+
+    between();
+  }
+
+  await cdp().send('Input.insertText', { text: '漢' });
+};
+
+/** The number of compositions started on `input` so far. */
+const countCompositions = (input: HTMLInputElement): (() => number) => {
+  const mut_count = { current: 0 };
+
+  input.addEventListener('compositionstart', () => {
+    mut_count.current += 1;
+  });
+
+  return () => mut_count.current;
+};
+
+describe('a one-way value during an IME composition (SPEC.md 7.3)', () => {
+  test('a draft written back on every input keeps the composition', async () => {
+    const [draft$, setDraft] = createState('');
+
+    const { inputs, unmount } = mountInDocument(() => (
+      <input
+        value={draft$}
+        onInput={(event) => {
+          setDraft(event.currentTarget.value);
+        }}
+      />
+    ));
+
+    const input = inputs[0];
+
+    assert.isDefined(input);
+
+    const compositions = countCompositions(input);
+
+    input.focus();
+
+    await composeKan(() => {});
+
+    assert.strictEqual(compositions(), 1);
+
+    assert.strictEqual(input.value, '漢');
+
+    assert.strictEqual(Optional.unwrap(draft$.getSnapshot()), '漢');
+
+    unmount();
+  });
+
+  test('a different value written mid-composition restarts it', async () => {
+    const [draft$, setDraft] = createState('');
+
+    const { inputs, unmount } = mountInDocument(() => (
+      <input
+        value={draft$}
+        onInput={(event) => {
+          setDraft(event.currentTarget.value);
+        }}
+      />
+    ));
+
+    const input = inputs[0];
+
+    assert.isDefined(input);
+
+    const compositions = countCompositions(input);
+
+    input.focus();
+
+    const mut_written = { current: false };
+
+    await composeKan(() => {
+      if (mut_written.current) {
+        return;
+      }
+
+      mut_written.current = true;
+
+      setDraft('x');
+    });
+
+    assert.strictEqual(compositions(), 2);
+
+    assert.notStrictEqual(input.value, '漢');
 
     unmount();
   });
