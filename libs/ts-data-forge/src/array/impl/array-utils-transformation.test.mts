@@ -7,7 +7,7 @@ import type {
 } from 'ts-type-forge';
 import { IMap } from '../../collections/index.mjs';
 import { expectType } from '../../expect-type.mjs';
-import { Optional } from '../../functional/index.mjs';
+import { Optional, pipe } from '../../functional/index.mjs';
 import { SafeUint } from '../../number/index.mjs';
 import { asMinLengthArray } from './array-utils-length-bounded-array-cast.mjs';
 import {
@@ -534,6 +534,41 @@ describe('Arr transformations', () => {
   });
 
   describe(flat, () => {
+    test('the curried form and the direct form have the same type (#3966)', () => {
+      const nested = [[1, [2, [3]]]] as const;
+
+      const direct = flat(nested, 2);
+
+      const curried = flat(2)(nested);
+
+      expectType<typeof curried, typeof direct>('=');
+
+      expectType<typeof curried, readonly (1 | 2 | readonly [3])[]>('=');
+
+      assert.deepStrictEqual(curried, direct);
+
+      const d1 = flat()(nested);
+
+      expectType<typeof d1, readonly (1 | readonly [2, readonly [3]])[]>('=');
+
+      assert.deepStrictEqual(d1, [1, [2, [3]]]);
+
+      const d0 = flat(0)(nested);
+
+      expectType<
+        typeof d0,
+        readonly (readonly [1, readonly [2, readonly [3]]])[]
+      >('=');
+
+      assert.deepStrictEqual(d0, nested);
+
+      const viaPipe = pipe(nested).map(flat(2)).value;
+
+      expectType<typeof viaPipe, readonly (1 | 2 | readonly [3])[]>('=');
+
+      assert.deepStrictEqual(viaPipe, [1, 2, [3]]);
+    });
+
     test('should flatten nested arrays with default depth 1', () => {
       const nested = [
         [1, 2],
