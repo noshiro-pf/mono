@@ -1364,13 +1364,7 @@ const generateSpace = async (
  * the breakage. Wait for the release that fixes it.
  */
 const notYetPublished: ReadonlySet<string> = new Set<string>([
-  'eslint-plugin-immer-coding-style',
-  'eslint-plugin-react-coding-style',
-  'eslint-plugin-ts-restrictions',
-  'eslint-plugin-ts-ui-restrictions',
-  'eslint-plugin-vitest-coding-style',
   'synstate-router-preact',
-  'ts-std-forge-keys',
 ]);
 
 const typesOnlyPackages: ReadonlySet<string> = new Set<string>([
