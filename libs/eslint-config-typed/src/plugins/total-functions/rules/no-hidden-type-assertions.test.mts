@@ -311,8 +311,8 @@ ruleTester.run('no-hidden-type-assertions', noHiddenTypeAssertions, {
       `,
     },
     // A type parameter that only constrains, or defaults, one of the returned
-    // function's own is not looked for, as before: here the returned function
-    // hands back what its caller passes
+    // function's own is not a hidden one when a value parameter of the returned
+    // function uses that one: it hands back what its caller passes
     {
       filename: 'file.ts',
       code: dedent`
@@ -320,6 +320,21 @@ ruleTester.run('no-hidden-type-assertions', noHiddenTypeAssertions, {
         export const r1 = f<string>();
         declare function g<T>(): <U = T>(u: U) => U;
         export const r2 = g<string>();
+      `,
+    },
+    // A callback's own type parameter constrained by it is a use on the value
+    // parameter side: the argument ties it down (#3220)
+    {
+      filename: 'file.ts',
+      code: dedent`
+        declare function f<T>(cb: <U extends T>(u: U) => void): T;
+        export const r1 = f<string>(<U extends string>(u: U) => {
+          console.log(u);
+        });
+        declare function g<T>(cb: <U = T>(u: U) => void): T;
+        export const r2 = g<string>(<U = string>(u: U) => {
+          console.log(u);
+        });
       `,
     },
     // A type parameter an argument supplies is not judged, whatever the
@@ -371,6 +386,31 @@ ruleTester.run('no-hidden-type-assertions', noHiddenTypeAssertions, {
     },
   ],
   invalid: [
+    // A returned function whose own type parameter no value parameter uses
+    // falls back to its constraint or default: the call that sets them makes a
+    // type from nothing, whether or not the returned function is called here
+    // (#3220)
+    {
+      filename: 'file.ts',
+      code: dedent`
+        type Foo = Readonly<{ foo: string }>;
+        declare function f<T>(): <U extends T>() => U;
+        export const r1 = f<Foo>();
+        declare function g<T>(): <U = T>() => U;
+        export const r2 = g<Foo>();
+      `,
+      errors: Arr.create(2, { messageId: 'errorStringGeneric' } as const),
+    },
+    // An \`infer\` type's constraint is a use of what it names (#3220)
+    {
+      filename: 'file.ts',
+      code: dedent`
+        type Foo = Readonly<{ foo: string }>;
+        declare function f<T>(): Foo extends infer U extends T ? U : never;
+        export const r1 = f<Foo>();
+      `,
+      errors: [{ messageId: 'errorStringGeneric' }],
+    },
     // A type parameter only an omitted optional parameter mentions is inferred
     // from the context alone
     {
