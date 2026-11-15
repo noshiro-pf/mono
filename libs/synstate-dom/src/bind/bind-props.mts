@@ -1,5 +1,5 @@
 import { isObservable, onScopeDispose } from 'synstate';
-import { isBoolean, isRecord, unknownToString } from 'ts-data-forge';
+import { hasKey, isBoolean, isRecord, unknownToString } from 'ts-data-forge';
 import type { ReadonlyRecord } from 'ts-type-forge';
 import type { Bindable } from '../constant/index.mjs';
 import {
@@ -12,15 +12,24 @@ import { listenInScope } from '../scope/index.mjs';
 /**
  * Binds every prop of an intrinsic element except `ref` and `children` (SPEC.md
  * 7): `class`, `style`, event handlers, the DOM properties of `propertyNames`,
- * and attributes for the rest. Subscriptions and listeners are released when
- * the current scope is disposed.
+ * and attributes for the rest, `value` last. Subscriptions and listeners are
+ * released when the current scope is disposed.
  */
 export const bindProps = (
   element: Element,
   props: ReadonlyRecord<string, unknown>,
 ): void => {
   for (const [key, value] of Object.entries(props)) {
-    bindProp(element, key, value);
+    if (key !== 'value') {
+      bindProp(element, key, value);
+    }
+  }
+
+  // Last, whatever the order the props were written in: a range or number input
+  // fits its value to the `type`, `min`, `max` and `step` it has when the value
+  // is written, and does not take it back when they come after.
+  if (hasKey(props, 'value')) {
+    bindProp(element, 'value', props.value);
   }
 };
 

@@ -1,10 +1,10 @@
 | Library                               |      W=1 |      W=2 |      W=5 |     W=10 |      W=20 |      W=50 |     W=100 |     W=200 |     W=500 |    W=1000 |
 | ------------------------------------- | -------: | -------: | -------: | -------: | --------: | --------: | --------: | --------: | --------: | --------: |
-| **SynState**                          |   9.1 ms |   9.5 ms |   9.2 ms |   8.7 ms |    8.8 ms |    9.2 ms |    9.4 ms |   11.4 ms |   12.4 ms |   16.3 ms |
-| RxJS                                  |   7.4 ms |   7.5 ms |   7.1 ms |   7.3 ms |    7.2 ms |    7.4 ms |    7.7 ms |    8.6 ms |   10.8 ms |   15.6 ms |
-| RxJS (naive, no distinctUntilChanged) |  17.6 ms |  20.0 ms |  30.1 ms |  48.3 ms |   92.3 ms |  185.2 ms |  341.4 ms |  688.0 ms | 1848.1 ms | 3896.0 ms |
-| Jotai                                 | 447.4 ms | 492.6 ms | 562.1 ms | 703.0 ms |  993.5 ms | 1963.5 ms | 3710.2 ms | > 5000 ms | > 5000 ms | > 5000 ms |
-| MobX                                  |  66.3 ms |  78.9 ms | 114.5 ms | 173.8 ms |  287.4 ms |  638.5 ms | 1154.6 ms | 2243.6 ms | > 5000 ms | > 5000 ms |
-| Redux                                 | 282.3 ms | 358.6 ms | 574.5 ms | 920.6 ms | 1777.9 ms | 4093.0 ms | > 5000 ms | > 5000 ms | > 5000 ms | > 5000 ms |
-| Solid                                 |  46.0 ms |  50.6 ms |  66.8 ms |  94.4 ms |  157.5 ms |  340.2 ms |  654.2 ms | 1295.0 ms | 3469.1 ms | > 5000 ms |
-| Preact Signals                        |   7.6 ms |  10.2 ms |  17.9 ms |  31.1 ms |   58.0 ms |  139.3 ms |  282.0 ms |  584.8 ms | 1585.9 ms | 3345.8 ms |
+| **SynState**                          |   8.3 ms |  10.9 ms |   8.4 ms |   7.6 ms |    7.7 ms |    7.8 ms |    7.8 ms |    8.5 ms |   10.3 ms |   13.6 ms |
+| RxJS                                  |   5.9 ms |   5.8 ms |   5.7 ms |   5.7 ms |    5.6 ms |    6.0 ms |    6.2 ms |    6.8 ms |    8.6 ms |   11.8 ms |
+| RxJS (naive, no distinctUntilChanged) |  12.8 ms |  15.6 ms |  23.5 ms |  37.6 ms |   86.1 ms |  200.0 ms |  308.4 ms |  617.6 ms | 1482.7 ms | 3246.2 ms |
+| Jotai                                 | 361.7 ms | 399.0 ms | 456.2 ms | 559.2 ms |  797.1 ms | 1560.8 ms | 2906.8 ms | > 5000 ms | > 5000 ms | > 5000 ms |
+| MobX                                  |  51.6 ms |  58.0 ms |  83.2 ms | 129.3 ms |  238.5 ms |  535.7 ms | 1023.6 ms | 2018.8 ms | > 5000 ms | > 5000 ms |
+| Redux                                 | 235.3 ms | 300.6 ms | 464.6 ms | 815.9 ms | 1480.2 ms | 3563.5 ms | > 5000 ms | > 5000 ms | > 5000 ms | > 5000 ms |
+| Solid                                 |  29.1 ms |  32.1 ms |  45.1 ms |  67.6 ms |  116.5 ms |  275.8 ms |  534.7 ms | 1096.2 ms | 2908.6 ms | > 5000 ms |
+| Preact Signals                        |   6.2 ms |   8.0 ms |  14.3 ms |  24.7 ms |   45.3 ms |  113.3 ms |  233.3 ms |  481.3 ms | 1184.4 ms | 2425.6 ms |
