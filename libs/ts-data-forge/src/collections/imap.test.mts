@@ -1094,3 +1094,34 @@ describe('IMap.toRawMap', () => {
     expect(rawMap.get('c')).toBe(3);
   });
 });
+
+describe('IMap writes with the key -0 (#3963)', () => {
+  // A native `Map` compares keys with SameValueZero, so `-0` and `0` are one
+  // key for reading; writing has to agree.
+  const map = IMap.create<number, string>([[0, 'a']]);
+
+  test('delete(-0) deletes the entry stored under 0', () => {
+    assert.deepStrictEqual(Array.from(map.delete(-0)), []);
+  });
+
+  test('set(-0, v) replaces the value stored under 0', () => {
+    assert.deepStrictEqual(Array.from(map.set(-0, 'b')), [[0, 'b']]);
+  });
+
+  test('update(-0, f) updates the value stored under 0', () => {
+    assert.deepStrictEqual(Array.from(map.update(-0, () => 'c')), [[0, 'c']]);
+  });
+
+  test('set keeps the position of an existing key and appends a new one', () => {
+    const three = IMap.create<number, string>([
+      [1, 'a'],
+      [2, 'b'],
+    ]);
+
+    assert.deepStrictEqual(Array.from(three.set(1, 'x').set(3, 'c')), [
+      [1, 'x'],
+      [2, 'b'],
+      [3, 'c'],
+    ]);
+  });
+});
