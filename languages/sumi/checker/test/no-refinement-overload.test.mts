@@ -50,6 +50,44 @@ describe(noRefinementOverload.ruleId, () => {
         `,
       },
       {
+        name: 'a branded number is not an object (#2835)',
+        code: dedent`
+          type Brand = number & Readonly<{ brand: 'brand' }>;
+
+          export function brandedOrObject(value: Brand): Brand;
+          export function brandedOrObject(value: Readonly<{ n: number }>): number;
+          export function brandedOrObject(
+            value: Brand | Readonly<{ n: number }>,
+          ): number {
+            return typeof value === 'number' ? value : value.n;
+          }
+        `,
+      },
+      {
+        name: 'an intersection of objects alone is still an object, not a function',
+        code: dedent`
+          type Both = Readonly<{ a: number }> & Readonly<{ b: number }>;
+
+          export function objectOrFunction(value: Both): number;
+          export function objectOrFunction(value: () => number): string;
+          export function objectOrFunction(
+            value: Both | (() => number),
+          ): number | string {
+            return typeof value === 'function' ? String(value()) : value.a;
+          }
+        `,
+      },
+      {
+        name: 'a brand on a type parameter rules out undefined (#2835)',
+        code: dedent`
+          export function h<T>(x: T & Readonly<{ brand: 'h' }>): T;
+          export function h(x: undefined): undefined;
+          export function h(x: unknown): unknown {
+            return x;
+          }
+        `,
+      },
+      {
         name: 'a type parameter is judged by its constraint',
         code: dedent`
           export function constrained<S extends string>(value: S): S;
@@ -132,6 +170,30 @@ describe(noRefinementOverload.ruleId, () => {
       },
     ],
     invalid: [
+      {
+        name: 'a branded number and a number are both numbers (#2835)',
+        code: dedent`
+          type Int = number & Readonly<{ brand: 'Int' }>;
+
+          export function f(x: Int): Int;
+          export function f(x: number): number;
+          export function f(x: number): number {
+            return x;
+          }
+        `,
+        errors: [{ messageId: 'indistinguishable', line: 4 }],
+      },
+      {
+        name: 'a brand on a type parameter may brand any primitive (#2835)',
+        code: dedent`
+          export function g<T>(x: T & Readonly<{ brand: 'g' }>): T;
+          export function g(x: string): string;
+          export function g(x: unknown): unknown {
+            return x;
+          }
+        `,
+        errors: [{ messageId: 'indistinguishable', line: 2 }],
+      },
       {
         name: 'subtypes of each other: one runtime body',
         code: dedent`
