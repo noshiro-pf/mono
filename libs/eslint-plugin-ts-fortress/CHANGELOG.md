@@ -1,5 +1,22 @@
 # eslint-plugin-ts-fortress
 
+## 1.3.20
+
+### Patch Changes
+
+- dc35fe8: `no-type-only-codec` counts a `require('./a.cjs')` in a TypeScript file (`.ts`, `.cts`, `.mts`) as a use of every export of the module, as it already did in a JavaScript file. TypeScript resolves the argument of `require()` only in a JavaScript file, so the rule had dropped the edge and reported a codec read at run time as type-only.
+- Updated dependencies [e68e601]
+- Updated dependencies [6f38584]
+- Updated dependencies [38a2075]
+- Updated dependencies [d92c572]
+- Updated dependencies [6790e63]
+- Updated dependencies [e6a4dac]
+- Updated dependencies [745a60e]
+- Updated dependencies [8f59370]
+- Updated dependencies [e45e274]
+- Updated dependencies [7f9658b]
+    - ts-data-forge@15.0.1
+
 ## 1.3.19
 
 ### Patch Changes

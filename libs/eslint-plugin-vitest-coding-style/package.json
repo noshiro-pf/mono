@@ -1,6 +1,6 @@
 {
   "name": "eslint-plugin-vitest-coding-style",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "private": false,
   "description": "ESLint rules that steer Vitest assertions toward `assert`'s narrowing forms.",
   "keywords": [
