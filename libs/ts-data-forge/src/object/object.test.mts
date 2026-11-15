@@ -10,6 +10,21 @@ import { isString } from '../guard/index.mjs';
 import { Obj } from './object.mjs';
 
 describe('shallowEq', () => {
+  test('a key holding undefined is not equal to a missing key (#3964)', () => {
+    assert.isFalse(Obj.shallowEq({ a: undefined }, { b: 1 }));
+
+    assert.isFalse(Obj.shallowEq({ a: 1, b: undefined }, { a: 1, c: 3 }));
+
+    assert.isTrue(Obj.shallowEq({ a: undefined }, { a: undefined }));
+  });
+
+  test('an inherited property of the other record is not a key', () => {
+    // The very function `{ x: 1 }` inherits as `toString`.
+    const inherited: unknown = Reflect.get(Object.prototype, 'toString');
+
+    assert.isFalse(Obj.shallowEq({ toString: inherited }, { x: 1 }));
+  });
+
   test('truthy case 1', () => {
     assert.isTrue(Obj.shallowEq({ x: 0 }, { x: 0 }));
   });
