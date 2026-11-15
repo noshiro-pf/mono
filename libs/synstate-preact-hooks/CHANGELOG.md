@@ -1,5 +1,13 @@
 # synstate-preact-hooks
 
+## 9.0.2
+
+### Patch Changes
+
+- 8b37bb9: Under preact 11, `useObservableEffect` no longer delivers values to a component that has unmounted, and the observable `useValueAsObservable` returns is completed as the component unmounts. preact 11 defers an effect's cleanup to after the next frame; both hooks now release what they hold from a layout effect's cleanup, which runs at once on preact 10 and 11. The `preact` peer range starts at `10.9.0`, the first version with the `useSyncExternalStore` that `useObservableValue` calls.
+- fd436eb: `useValueAsObservable` is typed as returning `InitializedObservable<A>`, which the observable it returns always was: it starts from the first render's `input`. What is derived from it keeps the initial value in its type, so `useObservableValue(useValueAsObservable(n).pipe(map(f)))` is no longer `B | undefined`.
+- synstate@9.0.0
+
 ## 9.0.0
 
 ### Major Changes

@@ -1,5 +1,12 @@
 # resize-observer-react-hooks
 
+## 0.0.20
+
+### Patch Changes
+
+- Updated dependencies [cdab38f]
+    - better-react-use-state@1.0.4
+
 ## 0.0.19
 
 ### Patch Changes

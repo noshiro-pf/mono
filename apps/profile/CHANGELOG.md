@@ -1,5 +1,13 @@
 # profile
 
+## 0.0.36
+
+### Patch Changes
+
+- Updated dependencies [3f3b37f]
+    - synstate-router@0.5.0
+    - synstate@9.0.0
+
 ## 0.0.35
 
 ### Patch Changes

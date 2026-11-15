@@ -1,5 +1,12 @@
 # synstate-react-hooks-compat
 
+## 9.0.2
+
+### Patch Changes
+
+- fd436eb: `useValueAsObservable` is typed as returning `InitializedObservable<A>`, which the observable it returns always was: it starts from the first render's `input`. What is derived from it keeps the initial value in its type, so `useObservableValue(useValueAsObservable(n).pipe(map(f)))` is no longer `B | undefined`.
+- synstate@9.0.0
+
 ## 9.0.0
 
 ### Major Changes

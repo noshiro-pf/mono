@@ -1,5 +1,14 @@
 # react-mui-utils
 
+## 0.0.32
+
+### Patch Changes
+
+- Updated dependencies [cdab38f]
+    - better-react-use-state@1.0.4
+    - react-utils@0.0.35
+    - react-utils-styled@0.0.35
+
 ## 0.0.31
 
 ### Patch Changes
