@@ -71,7 +71,8 @@ open な issue はどれも、**優先度の段を表す `priority:<段>` ラベ
 
 - **実ユーザーがいる**: `event-schedule-app`（`-functions`・`-shared` を含む）、
   `poll-discord-app`、`task-manager`、`life-plan-simulator`、
-  `split-view-extension`、`profile`。開発ツールとして毎日使う `pr-manager`。
+  `split-view-extension`（それを置き換える作り直し版 `split-view-extension-v2`
+  を含む）、`profile`。開発ツールとして毎日使う `pr-manager`。
   `libs/` と `strict-lib/` の公開パッケージ。
 - **おもちゃ**: `algo-app`、`housing-loan-calculator`、`mahjong-calculator-app`、
   `mahjong-scoring-tool`、`lambda-calculus-interpreter-*`、`color-demo`、
