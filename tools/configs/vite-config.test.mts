@@ -11,6 +11,7 @@ import {
   hasTestFiles,
   nodeProjectExclude,
   usesModuleMocks,
+  withDefaultExclude,
 } from './vite-config.mjs';
 
 /** A package root holding `files`, removed once `fn` returns. */
@@ -178,7 +179,7 @@ describe(defineViteConfig, () => {
   });
 
   test('gives each project an exclude array of its own when the package passes one', () => {
-    const exclude = ['skipped/**'] as const;
+    const exclude = Arr.toPushed(defaultExclude, 'skipped/**');
 
     const excludes = projectExcludes(
       defineViteConfig({
@@ -189,8 +190,8 @@ describe(defineViteConfig, () => {
     );
 
     assert.deepStrictEqual(excludes, [
-      ['skipped/**', 'test/browser/**'],
-      ['skipped/**'],
+      [...defaultExclude, 'skipped/**', 'test/browser/**'],
+      Arr.toPushed(defaultExclude, 'skipped/**'),
     ]);
 
     assert.isTrue(excludes.every((e) => e !== exclude));
@@ -200,5 +201,25 @@ describe(defineViteConfig, () => {
 describe('defaultExclude', () => {
   test('is frozen, so that a project handed it uncopied fails when Vitest adds to it', () => {
     assert.isTrue(Object.isFrozen(defaultExclude));
+  });
+});
+
+describe(withDefaultExclude, () => {
+  test('gives the default when the package passes no exclude', () => {
+    assert.deepStrictEqual(withDefaultExclude(undefined), defaultExclude);
+  });
+
+  test('takes an exclude that spreads the default and adds to it', () => {
+    assert.deepStrictEqual(
+      withDefaultExclude(Arr.toPushed(defaultExclude, 'x.mts')),
+      Arr.toPushed(defaultExclude, 'x.mts'),
+    );
+  });
+
+  test('throws for one that restates the default and leaves an entry out', () => {
+    assert.throws(
+      () => withDefaultExclude(['**/*.d.mts', '**/index.mts', 'x.mts']),
+      'leaves out `src/entry-point.mts` of `defaultExclude`',
+    );
   });
 });

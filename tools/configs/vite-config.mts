@@ -14,8 +14,11 @@ type ProjectOverrides = DeepReadonly<{
   includeSource?: string[];
   include?: string[];
   /**
-   * Replaces the default. The Node.js project excludes `test/browser/**` after
-   * it all the same (`nodeProjectExclude`).
+   * Replaces the default, and has to keep every entry of it: spread
+   * {@link defaultExclude} into it, then add. One that leaves an entry out
+   * throws, so that a change to the default reaches every package. The Node.js
+   * project excludes `test/browser/**` after it all the same
+   * (`nodeProjectExclude`).
    */
   exclude?: string[];
   testTimeout?: number;
@@ -220,7 +223,7 @@ export const defineBrowserProject = ({
 
 /**
  * A project's `exclude` when the package passes none; one that passes its own
- * and means to keep these spreads them into it.
+ * has to keep these, spreading them into it ({@link withDefaultExclude}).
  */
 export const defaultExclude = Object.freeze([
   '**/*.d.mts',
@@ -279,6 +282,28 @@ export const nodeProjectExclude = (
   exclude: readonly string[],
 ): readonly string[] => Arr.toPushed(exclude, 'test/browser/**');
 
+/**
+ * `exclude`, or the default when there is none; throws when `exclude` leaves
+ * out an entry of {@link defaultExclude}, which it was meant to spread.
+ */
+export const withDefaultExclude = (
+  exclude: readonly string[] | undefined,
+): readonly string[] => {
+  if (exclude === undefined) {
+    return defaultExclude;
+  }
+
+  const missing = defaultExclude.filter((entry) => !exclude.includes(entry));
+
+  if (Arr.isNonEmpty(missing)) {
+    throw new Error(
+      `A Vitest project's \`exclude\` leaves out ${missing.map((entry) => `\`${entry}\``).join(', ')} of \`defaultExclude\`: spread \`defaultExclude\` (tools/configs/vite-config.mts) into it, then add its own entries.`,
+    );
+  }
+
+  return exclude;
+};
+
 const projectConfig = (packageRoot: string, overrides?: ProjectOverrides) =>
   ({
     dir: packageRoot,
@@ -302,7 +327,7 @@ const projectConfig = (packageRoot: string, overrides?: ProjectOverrides) =>
     // A copy, so that Vitest, which adds the command line's `--exclude` to the
     // array it is given, cannot change `defaultExclude` for the projects after
     // it.
-    exclude: Array.from(overrides?.exclude ?? defaultExclude),
+    exclude: Array.from(withDefaultExclude(overrides?.exclude)),
     testTimeout: overrides?.testTimeout,
     setupFiles: castMutable(overrides?.setupFiles),
     globalSetup: castMutable(overrides?.globalSetup),

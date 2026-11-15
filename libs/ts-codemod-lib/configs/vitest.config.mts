@@ -1,8 +1,12 @@
 import { playwright } from '@vitest/browser-playwright';
 import * as path from 'node:path';
 import { projectRootPath } from '../scripts/project-root-path.mjs';
-// eslint-disable-next-line import-x/no-relative-packages
-import { defineViteConfig } from '../../../tools/configs/vite-config.mjs';
+/* eslint-disable import-x/no-relative-packages */
+import {
+  defaultExclude,
+  defineViteConfig,
+} from '../../../tools/configs/vite-config.mjs';
+/* eslint-enable import-x/no-relative-packages */
 
 export default defineViteConfig({
   packageRoot: projectRootPath,
@@ -22,8 +26,7 @@ export default defineViteConfig({
     includeSource: ['src/functions/**/*.mts', 'samples/**/*.mts'],
     include: ['src/functions/**/*.test.mts', 'samples/**/*.mts'],
     exclude: [
-      '**/*.d.mts',
-      '**/index.mts',
+      ...defaultExclude,
       'samples/readme/apply-transformers-to-src-directory.mts',
       'samples/readme/apply-transformers-in-project.mts',
     ],
@@ -39,8 +42,7 @@ export default defineViteConfig({
     includeSource: ['src/functions/**/*.mts', 'samples/**/*.mts'],
     include: ['src/functions/**/*.test.mts', 'samples/**/*.mts'],
     exclude: [
-      '**/*.d.mts',
-      '**/index.mts',
+      ...defaultExclude,
       'samples/readme/apply-transformers-to-src-directory.mts',
       'samples/readme/apply-transformers-in-project.mts',
       'samples/**/*',

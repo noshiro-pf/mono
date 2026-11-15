@@ -1,8 +1,12 @@
 import { playwright } from '@vitest/browser-playwright';
 import * as path from 'node:path';
+/* eslint-disable import-x/no-relative-packages */
+import {
+  defaultExclude,
+  defineViteConfig,
+} from '../../../tools/configs/vite-config.mjs';
+/* eslint-enable import-x/no-relative-packages */
 import { workspaceRootPath } from '../scripts/workspace-root-path.mjs';
-// eslint-disable-next-line import-x/no-relative-packages
-import { defineViteConfig } from '../../../tools/configs/vite-config.mjs';
 
 export default defineViteConfig({
   packageRoot: workspaceRootPath,
@@ -29,9 +33,7 @@ export default defineViteConfig({
     provider: playwright(),
     includeSource: ['src/**/*.mts', 'samples/**/*.mts'],
     exclude: [
-      '**/*.d.mts',
-      '**/index.mts',
-      'src/entry-point.mts',
+      ...defaultExclude,
       'samples/**/*',
       // Runs ESLint, which needs Node.js.
       'test/eslint-config.test.mts',

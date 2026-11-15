@@ -24,7 +24,6 @@ export default defineViteConfig({
   node: {
     includeSource: ['src/**/*.mts'],
     include: ['src/**/*.test.mts', 'test/**/*.test.mts'],
-    exclude: ['**/*.d.mts', '**/index.mts'],
   },
   browser: {
     provider: playwright(),
