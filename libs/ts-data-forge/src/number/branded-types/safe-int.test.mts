@@ -249,3 +249,13 @@ describe('SafeInt saturation (#3960)', () => {
     );
   });
 });
+
+describe('SafeInt.pow floors a fractional result (#3968)', () => {
+  test('as div does', () => {
+    expect(SafeInt.pow(asSafeInt(2), asSafeInt(-1))).toBe(0);
+
+    expect(SafeInt.pow(asSafeInt(3), asSafeInt(-1))).toBe(0);
+
+    expect(SafeInt.pow(asSafeInt(3), asSafeInt(2))).toBe(9);
+  });
+});

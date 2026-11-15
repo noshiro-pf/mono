@@ -210,3 +210,11 @@ describe('Int.random over a span wider than Number.MAX_VALUE (#3961)', () => {
     }
   });
 });
+
+describe('Int.pow floors a fractional result (#3968)', () => {
+  test('as div does', () => {
+    expect(Int.pow(asInt(2), asInt(-1))).toBe(0);
+
+    expect(Int.pow(asInt(3), asInt(2))).toBe(9);
+  });
+});

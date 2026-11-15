@@ -481,7 +481,7 @@ const renderEnumWrappers = (
     ...(enumSpec.hasAbs ? [absConst] : []),
     `const min_ = (...values: readonly ${t}[]): ${t} =>\n  ${castType}(Math.min(...values));`,
     `const max_ = (...values: readonly ${t}[]): ${t} =>\n  ${castType}(Math.max(...values));`,
-    `const pow = (x: ${t}, y: ${t}): ${t} => fromNumber(x ** y);`,
+    `const pow = (x: ${t}, y: ${t}): ${t} => fromNumber(Math.floor(x ** y));`,
     `const add = (x: ${t}, y: ${t}): ${t} => fromNumber(x + y);`,
     `const sub = (x: ${t}, y: ${t}): ${t} => fromNumber(x - y);`,
     `const mul = (x: ${t}, y: ${t}): ${t} => fromNumber(x * y);`,
