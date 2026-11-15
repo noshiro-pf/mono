@@ -5,11 +5,11 @@ import {
 } from 'event-schedule-app-shared';
 import {
   type InitializedObservable,
-  createBooleanState,
-  createState,
+  createReducer,
   debounce,
   derive,
   filter,
+  map,
   skip,
 } from 'synstate';
 import {
@@ -22,6 +22,7 @@ import {
   pipe,
 } from 'ts-data-forge';
 import { compareYearMonthDate } from 'ts-fortress-types';
+import { defineMachine } from 'ts-fsm-forge';
 import type { StrictPick } from 'ts-type-forge';
 import type { Api } from '../../api/index.mjs';
 import { dict, routes } from '../../constants/index.mjs';
@@ -178,18 +179,20 @@ export const createCreateEventScheduleStore = (
     }
   };
 
-  const [
-    isLoading$,
-    { setTrue: setIsLoadingTrue, setFalse: setIsLoadingFalse },
-  ] = createBooleanState(false);
+  const [creation$, dispatchCreation, { getSnapshot: getCreation }] =
+    createReducer(creationMachine.reducer, idle);
 
-  const [
-    createResultDialogIsOpen$,
-    { setTrue: openCreateResultDialog, setFalse: closeCreateResultDialog },
-  ] = createBooleanState(false);
+  const isLoading$ = creation$.pipe(map((c) => c.type === 'creating'));
 
-  const [url$, setUrl, { getSnapshot: getUrlSnapshot }] =
-    createState<string>('');
+  const createResultDialogIsOpen$ = creation$.pipe(
+    map((c) => c.type !== 'idle'),
+  );
+
+  const url$ = creation$.pipe(map((c) => (c.type === 'created' ? c.url : '')));
+
+  const closeCreateResultDialog = (): void => {
+    dispatchCreation({ type: 'close' });
+  };
 
   const createEvent = async (): Promise<Result<undefined, string>> => {
     const commonState = Optional.unwrap(commonState$.getSnapshot());
@@ -202,16 +205,19 @@ export const createCreateEventScheduleStore = (
       notificationSettingsWithEmail,
     } = commonState;
 
-    if (!eventScheduleValidationOk) {
+    if (
+      !eventScheduleValidationOk ||
+      !creationMachine.can(getCreation(), 'create')
+    ) {
       return Result.ok(undefined);
     }
 
     const email = notificationSettingsWithEmail?.email ?? '';
 
-    setIsLoadingTrue();
+    dispatchCreation({ type: 'create' });
 
-    openCreateResultDialog();
-
+    // `deps.api` returns every failure as an `Err` (`Result.fromPromise`), so
+    // each call settles, and `failed` or `succeeded` follows.
     const res = await deps.api.event.add({
       ...eventScheduleNormalized,
       author: {
@@ -221,6 +227,8 @@ export const createCreateEventScheduleStore = (
     });
 
     if (Result.isErr(res)) {
+      dispatchCreation({ type: 'failed' });
+
       return Result.err(res.value);
     }
 
@@ -230,13 +238,16 @@ export const createCreateEventScheduleStore = (
       const res2 = await deps.api.event.setAuthorsEmail(eventId, email);
 
       if (Result.isErr(res2)) {
+        dispatchCreation({ type: 'failed' });
+
         return Result.err(res2.value);
       }
     }
 
-    setIsLoadingFalse();
-
-    setUrl(deps.router.absoluteUrlOf(routes.event.answer.href({ eventId })));
+    dispatchCreation({
+      type: 'succeeded',
+      url: deps.router.absoluteUrlOf(routes.event.answer.href({ eventId })),
+    });
 
     // reset local storage
     const baseline = Optional.unwrap(baseline$.getSnapshot());
@@ -277,10 +288,14 @@ export const createCreateEventScheduleStore = (
   };
 
   const onClipboardButtonClick = (): void => {
-    const url = getUrlSnapshot();
+    const creation = getCreation();
+
+    if (creation.type !== 'created') {
+      return;
+    }
 
     // TODO: use toast
-    deps.writeToClipboard(url).catch(console.error);
+    deps.writeToClipboard(creation.url).catch(console.error);
   };
 
   /** Starts saving the settings as they change; returns what stops it. */
@@ -318,6 +333,41 @@ export const createCreateEventScheduleStore = (
     restoreFromLocalStorage,
   } as const;
 };
+
+/**
+ * Creating the event, as the result dialog shows it: closed, a spinner while
+ * the event is saved, then its link. A failure closes the dialog again (a toast
+ * says why), so that the page is never left behind a spinner with the dialog's
+ * buttons disabled; a second create is not started while one is in progress.
+ */
+type Creation = Readonly<
+  { type: 'created'; url: string } | { type: 'creating' } | { type: 'idle' }
+>;
+
+type CreationAction = Readonly<
+  | { type: 'close' }
+  | { type: 'create' }
+  | { type: 'failed' }
+  | { type: 'succeeded'; url: string }
+>;
+
+const idle: Creation = { type: 'idle' } as const;
+
+const creationMachine = defineMachine<Creation, CreationAction>()(
+  {
+    idle: { create: 'creating' },
+    creating: { succeeded: 'created', failed: 'idle' },
+    created: { close: 'idle' },
+  },
+  {
+    idle: { create: () => ({ type: 'creating' }) },
+    creating: {
+      succeeded: (_s, a) => ({ type: 'created', url: a.url }),
+      failed: () => idle,
+    },
+    created: { close: () => idle },
+  },
+);
 
 export type CreateEventSchedule = Readonly<{
   /** Starts saving the settings as they change; returns what stops it. */

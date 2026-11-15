@@ -52,7 +52,8 @@
     "synstate-router-dom": "workspace:*",
     "ts-data-forge": "workspace:*",
     "ts-fortress": "workspace:*",
-    "ts-fortress-types": "workspace:*"
+    "ts-fortress-types": "workspace:*",
+    "ts-fsm-forge": "workspace:*"
   },
   "devDependencies": {
     "@firebase/rules-unit-testing": "^5.0.2",

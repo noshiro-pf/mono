@@ -508,6 +508,9 @@ importers:
       ts-fortress:
         specifier: workspace:*
         version: link:../../libs/ts-fortress
+      ts-fsm-forge:
+        specifier: workspace:*
+        version: link:../../libs/ts-fsm-forge
       ts-utils-additional:
         specifier: workspace:*
         version: link:../ts-utils-additional
@@ -843,6 +846,9 @@ importers:
       ts-fortress-types:
         specifier: workspace:*
         version: link:../ts-fortress-types
+      ts-fsm-forge:
+        specifier: workspace:*
+        version: link:../../libs/ts-fsm-forge
     devDependencies:
       '@firebase/rules-unit-testing':
         specifier: ^5.0.2
@@ -1359,6 +1365,9 @@ importers:
       ts-fortress:
         specifier: workspace:*
         version: link:../../libs/ts-fortress
+      ts-fsm-forge:
+        specifier: workspace:*
+        version: link:../../libs/ts-fsm-forge
       ts-utils-additional:
         specifier: workspace:*
         version: link:../ts-utils-additional
@@ -1759,6 +1768,9 @@ importers:
       ts-fortress:
         specifier: workspace:*
         version: link:../../libs/ts-fortress
+      ts-fsm-forge:
+        specifier: workspace:*
+        version: link:../../libs/ts-fsm-forge
     devDependencies:
       '@vitest/coverage-istanbul':
         specifier: 'catalog:'

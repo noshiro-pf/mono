@@ -547,4 +547,107 @@ describe(defineMachine, () => {
       });
     });
   });
+
+  describe('another discriminating property', () => {
+    type Door = Readonly<{ kind: 'closed' } | { kind: 'open'; by: string }>;
+
+    type DoorAction = Readonly<
+      { kind: 'close' } | { kind: 'open'; by: string }
+    >;
+
+    const door = defineMachine<Door, DoorAction, 'kind'>('kind')(
+      {
+        closed: { open: 'open' },
+        open: { close: 'closed' },
+      },
+      {
+        closed: { open: (_, a) => ({ kind: 'open', by: a.by }) },
+        open: { close: () => ({ kind: 'closed' }) },
+      },
+    );
+
+    const closed: Door = { kind: 'closed' } as const;
+
+    test('reads the states and actions by it', () => {
+      assert.deepStrictEqual(door.reducer(closed, { kind: 'open', by: 'me' }), {
+        kind: 'open',
+        by: 'me',
+      });
+
+      assert.strictEqual(door.reducer(closed, { kind: 'close' }), closed);
+
+      assert.deepStrictEqual(door.allowedActionTypes(closed), ['open']);
+    });
+
+    test('narrows by it', () => {
+      const s: Door = door.reducer(closed, { kind: 'open', by: 'me' });
+
+      if (door.can(s, 'close')) {
+        expectType<typeof s, Readonly<{ kind: 'open'; by: string }>>('=');
+
+        expectType<
+          ReturnType<
+            typeof door.transition<typeof s, Readonly<{ kind: 'close' }>>
+          >,
+          Readonly<{ kind: 'closed' }>
+        >('=');
+      }
+
+      assert.isTrue(door.can(s, 'close'));
+    });
+
+    test('checks what a handler returns by it', () => {
+      const stillClosed: Door = { kind: 'closed' } as const;
+
+      // A handler that lies about where it goes, as only an assertion can.
+      // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+      const lying = stillClosed as unknown as Readonly<{
+        kind: 'open';
+        by: string;
+      }>;
+
+      const broken = defineMachine<Door, DoorAction, 'kind'>('kind')(
+        { closed: { open: 'open' }, open: {} },
+        { closed: { open: () => lying } },
+      );
+
+      assert.throws(
+        () => broken.reducer(closed, { kind: 'open', by: 'me' }),
+        /closed is not an edge of the graph/u,
+      );
+    });
+
+    test('ignores a state or an action without it', () => {
+      // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+      const untagged = { type: 'closed' } as unknown as Door;
+
+      assert.strictEqual(door.reducer(untagged, { kind: 'close' }), untagged);
+
+      assert.isFalse(door.can(untagged, 'open'));
+
+      assert.deepStrictEqual(door.allowedActionTypes(untagged), []);
+
+      assert.strictEqual(
+        // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+        door.reducer(closed, {
+          type: 'open',
+          by: 'me',
+        } as unknown as DoorAction),
+        closed,
+      );
+    });
+
+    test('is named in the type arguments and the call alike', () => {
+      // The checks are the compiler's; both calls still run.
+      // @ts-expect-error With no argument, the unions are read by `type`.
+      const unnamed = defineMachine<Door, DoorAction, 'kind'>();
+
+      // @ts-expect-error The argument must be the property the type argument names.
+      const misnamed = defineMachine<Door, DoorAction, 'kind'>('name');
+
+      assert.isFunction(unnamed);
+
+      assert.isFunction(misnamed);
+    });
+  });
 });

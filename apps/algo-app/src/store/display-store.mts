@@ -7,7 +7,7 @@ import { type InitializedObservable, derive } from 'synstate';
 import type { StrictPick } from 'ts-type-forge';
 import type { Rect } from 'ts-utils-additional';
 import { getCardDirection } from '../functions/index.mjs';
-import { mapToDisplayValue } from '../state/index.mjs';
+import { answerToSubmit, mapToDisplayValue } from '../state/index.mjs';
 import type {
   CardNumber,
   ConfirmTossBalloonProps,
@@ -101,7 +101,7 @@ export const createDisplayStore = (deps: DisplayDeps): DisplayStore => {
         return undefined;
       }
 
-      if (!gameState.confirmTossBalloonIsOpen) {
+      if (gameState.type !== 'toss.confirming') {
         return undefined;
       }
 
@@ -110,10 +110,6 @@ export const createDisplayStore = (deps: DisplayDeps): DisplayStore => {
       }
 
       const anchorCard = gameState.cardChosenToToss;
-
-      if (anchorCard === undefined) {
-        return undefined;
-      }
 
       return {
         anchorCardRect: cardPositions[anchorCard.color][anchorCard.number],
@@ -137,7 +133,10 @@ export const createDisplayStore = (deps: DisplayDeps): DisplayStore => {
         return undefined;
       }
 
-      if (!gameState.selectAnswerBalloonIsOpen) {
+      if (
+        gameState.type !== 'first.answering' &&
+        gameState.type !== 'cont.answering'
+      ) {
         return undefined;
       }
 
@@ -146,10 +145,6 @@ export const createDisplayStore = (deps: DisplayDeps): DisplayStore => {
       }
 
       const anchorCard = gameState.cardChosenToBeAttacked;
-
-      if (anchorCard === undefined) {
-        return undefined;
-      }
 
       const cardColor = anchorCard.color;
 
@@ -163,9 +158,7 @@ export const createDisplayStore = (deps: DisplayDeps): DisplayStore => {
         onSelectedNumberChange: (selectedNumber: CardNumber) => {
           deps.onSelectAnswer({ color: cardColor, number: selectedNumber });
         },
-        submitButtonIsDisabled:
-          gameState.cardChosenToAttack === undefined ||
-          gameState.cardChosenToBeAttacked === undefined,
+        submitButtonIsDisabled: answerToSubmit(gameState) === undefined,
       };
     },
   );
@@ -179,25 +172,23 @@ export const createDisplayStore = (deps: DisplayDeps): DisplayStore => {
         return undefined;
       }
 
-      if (!gameState.decidedAnswerBalloonIsOpen) {
-        return undefined;
-      }
-
-      if (gameState.answerSelected === undefined) {
+      if (
+        gameState.type !== 'judging.pending' &&
+        gameState.type !== 'judging.shown'
+      ) {
         return undefined;
       }
 
       const anchorCard = gameState.cardChosenToBeAttacked;
 
-      if (anchorCard === undefined) {
-        return undefined;
-      }
-
       return {
         anchorCardRect: cardPositions[anchorCard.color][anchorCard.number],
         arrowDirection: getCardDirection(values.playerCards, anchorCard),
         card: gameState.answerSelected,
-        showSymbol: gameState.judgeResult,
+        showSymbol:
+          gameState.type === 'judging.shown'
+            ? gameState.judgeResult
+            : undefined,
       };
     },
   );

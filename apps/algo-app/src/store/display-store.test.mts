@@ -55,8 +55,8 @@ describe(createDisplayStore, () => {
 
     setGameState({
       ...initialGameState,
+      type: 'toss.confirming',
       currentPlayerIndex: 1,
-      confirmTossBalloonIsOpen: true,
       cardChosenToToss: black6,
     });
 
@@ -90,8 +90,8 @@ describe(createDisplayStore, () => {
 
     setGameState({
       ...initialGameState,
+      type: 'toss.confirming',
       currentPlayerIndex: 0,
-      confirmTossBalloonIsOpen: true,
       cardChosenToToss: black6,
     });
 

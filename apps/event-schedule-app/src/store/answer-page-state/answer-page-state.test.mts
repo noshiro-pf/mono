@@ -113,6 +113,49 @@ describe(createAnswerPageStore, () => {
     assert.deepStrictEqual(calls, ['add abc alice', 'refetch']);
   });
 
+  test('while an answer is being saved, the section stays as drawn and takes nothing else', async () => {
+    const { store, calls } = setup(undefined);
+
+    store.onAnswerClick(answerOf(null, 'carol'));
+
+    const saving = store.onSubmitAnswerClickPromise();
+
+    assert.isTrue(Optional.unwrap(store.submitButtonIsLoading$.getSnapshot()));
+
+    assert.strictEqual(
+      Optional.unwrap(store.answerBeingEditedSectionState$.getSnapshot()),
+      'editing',
+    );
+
+    // Opened now, this answer would be cleared when the save ends.
+    store.onAnswerClick(answerOf(null, 'erin'));
+
+    store.onCancelEditingAnswer();
+
+    await store.onSubmitAnswerClickPromise();
+
+    await saving;
+
+    assert.deepStrictEqual(calls, ['update abc a-carol ', 'refetch']);
+
+    assert.isFalse(Optional.unwrap(store.submitButtonIsLoading$.getSnapshot()));
+
+    assert.strictEqual(
+      Optional.unwrap(store.answerBeingEditedSectionState$.getSnapshot()),
+      'hidden',
+    );
+  });
+
+  test('a submit with the section hidden saves nothing and leaves no spinner', async () => {
+    const { store, calls } = setup(undefined);
+
+    await store.onSubmitAnswerClickPromise();
+
+    assert.deepStrictEqual(calls, []);
+
+    assert.isFalse(Optional.unwrap(store.submitButtonIsLoading$.getSnapshot()));
+  });
+
   test('answering later does nothing while nobody is signed in', async () => {
     const { store, calls } = setup(undefined);
 

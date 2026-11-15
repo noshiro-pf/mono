@@ -25,7 +25,8 @@ import { edgeTargets } from './internal/index.mjs';
  *
  * The state type and the action type are given first and the graph is
  * inferred, so the call is curried: `defineMachine<State, Action>()(graph,
- * handlers)`. Both are discriminated by a `type` property.
+ * handlers)`. Both are discriminated by a `type` property, or by the one named
+ * below.
  *
  * The definition is checked when it is made: an edge with no target, with a
  * target that is not a string or an array of them, or with a target that names
@@ -33,20 +34,44 @@ import { edgeTargets } from './internal/index.mjs';
  * throw. The machine keeps a frozen copy of the graph, so changing the object
  * passed in afterwards changes neither.
  *
- * @template S The state union, discriminated by `type`.
- * @template A The action union, discriminated by `type`.
+ * Both unions are discriminated by `type`, unless another property is named:
+ * `defineMachine<S, A, 'kind'>('kind')` reads `kind` of both. The name is given
+ * twice, as a type for the compiler and as a string for the machine to read,
+ * and the overloads make the two agree.
+ *
+ * @template S The state union, discriminated by `type` (or `D`).
+ * @template A The action union, discriminated by the same property.
+ * @template D The discriminating property, when it is not `type`.
  */
-export const defineMachine =
-  <S extends Tagged, A extends Tagged>() =>
-  <const G extends TransitionGraph<S, A>>(
-    graph: G,
-    handlers: EdgeHandlers<S, A, G>,
-    options?: MachineOptions<S, A>,
-  ): Machine<S, A, G> => {
+export const defineMachine: DefineMachine = (discriminant = 'type') =>
+  // The signatures `DefineMachine` declares are generic over the discriminant,
+  // which this implementation, written over `Tagged<string>`, cannot state.
+  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+  ((
+    graph: UntypedGraph,
+    handlers: UntypedHandlers,
+    options?: MachineOptions<UntypedState, UntypedState>,
+  ) => {
+    type S = UntypedState;
+
+    type A = UntypedState;
+
     const rows = compileRows<S, A>(graph, handlers);
 
-    const findEdge = (state: S, action: A): Edge<S, A> | undefined =>
-      rows.get(state.type)?.edges.get(action.type);
+    // A state or an action without the property finds no row and no edge.
+    const rowOf = (state: S): Row<S, A> | undefined => {
+      const from = state[discriminant];
+
+      return from === undefined ? undefined : rows.get(from);
+    };
+
+    const findEdge = (state: S, action: A): Edge<S, A> | undefined => {
+      const actionType = action[discriminant];
+
+      return actionType === undefined
+        ? undefined
+        : rowOf(state)?.edges.get(actionType);
+    };
 
     const reducer = (state: S, action: A): S => {
       const edge = findEdge(state, action);
@@ -57,7 +82,7 @@ export const defineMachine =
         return state;
       }
 
-      return follow(edge, state, action);
+      return follow(edge, state, action, discriminant);
     };
 
     const transition = (state: S, action: A): S => {
@@ -65,39 +90,64 @@ export const defineMachine =
 
       if (edge === undefined) {
         throw new Error(
-          `ts-fsm-forge: no edge ${state.type} --${action.type}--> in the graph. \`transition\` takes only the pairs the graph declares; \`reducer\` ignores the others.`,
+          `ts-fsm-forge: no edge ${state[discriminant]} --${action[discriminant]}--> in the graph. \`transition\` takes only the pairs the graph declares; \`reducer\` ignores the others.`,
         );
       }
 
-      return follow(edge, state, action);
+      return follow(edge, state, action, discriminant);
     };
 
-    const can = (state: S, actionType: A['type']): boolean =>
-      rows.get(state.type)?.edges.has(actionType) ?? false;
+    const can = (state: S, actionType: string): boolean =>
+      rowOf(state)?.edges.has(actionType) ?? false;
 
-    const allowedActionTypes = (state: S): readonly A['type'][] =>
-      rows.get(state.type)?.actionTypes ?? noActionTypes;
+    const allowedActionTypes = (state: S): readonly string[] =>
+      rowOf(state)?.actionTypes ?? noActionTypes;
 
-    // The signatures `Machine` declares are generic over the state passed in,
-    // which these implementations, written over `S` and `A`, cannot state.
-    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
     return {
       graph: graphOf(rows),
       reducer,
       transition,
       can,
       allowedActionTypes,
-    } as unknown as Machine<S, A, G>;
-  };
+    };
+  }) as never;
 
-/** A state or an action: an object discriminated by its `type`. */
-export type Tagged = Readonly<{ type: string }>;
+/**
+ * {@link defineMachine}'s signatures: with no argument the unions are
+ * discriminated by `type`; with one, by the property it names, which the third
+ * type argument names too.
+ */
+export type DefineMachine = {
+  <S extends Tagged, A extends Tagged>(): MachineFactory<S, A, 'type'>;
+
+  <S extends Tagged<D>, A extends Tagged<D>, D extends string>(
+    discriminant: D,
+  ): MachineFactory<S, A, D>;
+};
+
+/** What {@link defineMachine} returns: it takes the graph and its handlers. */
+export type MachineFactory<
+  S extends Tagged<D>,
+  A extends Tagged<D>,
+  D extends string,
+> = <const G extends TransitionGraph<S, A, D>>(
+  graph: G,
+  handlers: EdgeHandlers<S, A, G, D>,
+  options?: MachineOptions<S, A>,
+) => Machine<S, A, G, D>;
+
+/**
+ * A state or an action: an object discriminated by its `type`, or by the
+ * property `D` names.
+ */
+export type Tagged<D extends string = 'type'> = ReadonlyRecord<D, string>;
 
 /**
  * Where an edge leads: one state type, or several when which one depends on the
  * payload (the handler decides, and must return one of them).
  */
-export type EdgeTarget<S extends Tagged> = S['type'] | NonEmptyTuple<S['type']>;
+export type EdgeTarget<S extends Tagged<D>, D extends string = 'type'> =
+  NonEmptyTuple<S[D]> | S[D];
 
 /**
  * The transition graph: every state type, each with the action types it has an
@@ -105,26 +155,29 @@ export type EdgeTarget<S extends Tagged> = S['type'] | NonEmptyTuple<S['type']>;
  * listed with `{}`, so that adding a state to the union asks where it goes.
  */
 export type TransitionGraph<
-  S extends Tagged,
-  A extends Tagged,
-> = ReadonlyRecord<
-  S['type'],
-  Partial<ReadonlyRecord<A['type'], EdgeTarget<S>>>
->;
+  S extends Tagged<D>,
+  A extends Tagged<D>,
+  D extends string = 'type',
+> = ReadonlyRecord<S[D], Partial<ReadonlyRecord<A[D], EdgeTarget<S, D>>>>;
 
 /**
  * One handler per edge of `G`, keyed like the graph. A handler takes the source
- * state and the action, both narrowed by `type`, and returns a state whose
- * `type` is one of the edge's targets. A state with no outgoing edge takes no
- * entry.
+ * state and the action, both narrowed by their discriminant (`type`, or `D`),
+ * and returns a state whose discriminant is one of the edge's targets. A state
+ * with no outgoing edge takes no entry.
  */
-export type EdgeHandlers<S extends Tagged, A extends Tagged, G> = Readonly<
+export type EdgeHandlers<
+  S extends Tagged<D>,
+  A extends Tagged<D>,
+  G,
+  D extends string = 'type',
+> = Readonly<
   Readonly<{
     [K in keyof G as [keyof G[K]] extends [never] ? never : K]: Readonly<{
       [T in keyof G[K]]: (
-        state: RelaxedExtract<S, Readonly<{ type: K }>>,
-        action: RelaxedExtract<A, Readonly<{ type: T }>>,
-      ) => RelaxedExtract<S, Readonly<{ type: TargetStateType<G[K][T]> }>>;
+        state: RelaxedExtract<S, ReadonlyRecord<D, K>>,
+        action: RelaxedExtract<A, ReadonlyRecord<D, T>>,
+      ) => RelaxedExtract<S, ReadonlyRecord<D, TargetStateType<G[K][T]>>>;
     }>;
   }> &
     Readonly<{
@@ -133,7 +186,7 @@ export type EdgeHandlers<S extends Tagged, A extends Tagged, G> = Readonly<
 >;
 
 /** Options of {@link defineMachine}. */
-export type MachineOptions<S extends Tagged, A extends Tagged> = Readonly<{
+export type MachineOptions<S, A> = Readonly<{
   /**
    * Called by {@link Machine.reducer} with each pair it ignores because the
    * graph has no edge for it, e.g. to log it in development.
@@ -143,9 +196,10 @@ export type MachineOptions<S extends Tagged, A extends Tagged> = Readonly<{
 
 /** What {@link defineMachine} returns. */
 export type Machine<
-  S extends Tagged,
-  A extends Tagged,
-  G extends TransitionGraph<S, A>,
+  S extends Tagged<D>,
+  A extends Tagged<D>,
+  G extends TransitionGraph<S, A, D>,
+  D extends string = 'type',
 > = Readonly<{
   /**
    * A frozen copy of the graph the machine was defined with, target arrays
@@ -165,22 +219,19 @@ export type Machine<
    * The handler's result for an edge of the graph, typed by the edge's
    * target(s). The compiler accepts only the actions every member of the
    * state's type has an edge for, so the state is narrowed first — with a
-   * `switch` on `type`, or with {@link Machine.can}. Throws for a pair the
-   * graph leaves out, which only an assertion can pass the compiler.
+   * `switch` on the discriminant, or with {@link Machine.can}. Throws for a
+   * pair the graph leaves out, which only an assertion can pass the compiler.
    */
   transition: <
     Cur extends S,
     Act extends RelaxedExtract<
       A,
-      Readonly<{ type: AllowedActionType<G, Cur['type']> }>
+      ReadonlyRecord<D, AllowedActionType<G, Cur[D]>>
     >,
   >(
     state: Cur,
     action: Act,
-  ) => RelaxedExtract<
-    S,
-    Readonly<{ type: NextStateType<G, Cur['type'], Act['type']> }>
-  >;
+  ) => RelaxedExtract<S, ReadonlyRecord<D, NextStateType<G, Cur[D], Act[D]>>>;
 
   /**
    * Whether `state` has an edge for `actionType`, narrowing it to the state
@@ -190,12 +241,12 @@ export type Machine<
   can: {
     // For a type parameter `T`, the narrowed type stays generic in `T`, so
     // `false` excludes nothing: `T` may be instantiated with a union.
-    <T extends A['type']>(
+    <T extends A[D]>(
       state: S,
       actionType: IsUnion<T> extends true ? never : T,
-    ): state is RelaxedExtract<S, Readonly<{ type: SourceStateType<G, T> }>>;
+    ): state is RelaxedExtract<S, ReadonlyRecord<D, SourceStateType<G, T>>>;
 
-    (state: S, actionType: A['type']): boolean;
+    (state: S, actionType: A[D]): boolean;
   };
 
   /**
@@ -205,7 +256,7 @@ export type Machine<
    */
   allowedActionTypes: <Cur extends S>(
     state: Cur,
-  ) => readonly EdgeActionType<G, Cur['type']>[];
+  ) => readonly EdgeActionType<G, Cur[D]>[];
 }>;
 
 /**
@@ -247,7 +298,7 @@ export type TargetStateType<V> = V extends readonly (infer U)[] ? U : V;
 // more list to keep in step. `toMermaid` reads the graph, not an `Edge`, and
 // drops repeats itself. The list being frozen is what keeps a change to
 // `machine.graph` from widening what `follow` accepts.
-type Edge<S extends Tagged, A extends Tagged> = Readonly<{
+type Edge<S, A> = Readonly<{
   from: string;
   actionType: string;
   /**
@@ -264,12 +315,15 @@ type Edge<S extends Tagged, A extends Tagged> = Readonly<{
 }>;
 
 /** A state type's outgoing edges, and their action types in graph order. */
-type Row<S extends Tagged, A extends Tagged> = Readonly<{
+type Row<S, A> = Readonly<{
   edges: ReadonlyMap<string, Edge<S, A>>;
   actionTypes: readonly string[];
 }>;
 
 type UntypedGraph = TransitionGraph<Tagged, Tagged>;
+
+/** A state or an action, whatever property discriminates it. */
+type UntypedState = ReadonlyRecord<string, string>;
 
 type UntypedHandlers = ReadonlyRecord<
   string,
@@ -279,7 +333,7 @@ type UntypedHandlers = ReadonlyRecord<
 const noActionTypes: readonly string[] = Object.freeze([]);
 
 /** The graph as nested maps, checked against itself and the handlers. */
-const compileRows = <S extends Tagged, A extends Tagged>(
+const compileRows = <S, A>(
   graph: UntypedGraph,
   handlers: UntypedHandlers,
 ): ReadonlyMap<string, Row<S, A>> => {
@@ -355,7 +409,7 @@ const compileRows = <S extends Tagged, A extends Tagged>(
  * The checked graph, frozen, as {@link Machine.graph} exposes it: built from
  * the rows rather than read again from the graph passed in.
  */
-const graphOf = <S extends Tagged, A extends Tagged>(
+const graphOf = <S, A>(
   rows: ReadonlyMap<string, Row<S, A>>,
 ): ReadonlyRecord<string, ReadonlyRecord<string, unknown>> =>
   Object.freeze(
@@ -376,19 +430,22 @@ const graphOf = <S extends Tagged, A extends Tagged>(
 
 /**
  * Applies an edge's handler, checking that it went where the edge leads. The
- * check is for a handler whose result's `type` a type assertion got past the
- * compiler; a result that is not a state at all is left to the types.
+ * check is for a handler whose result's discriminant a type assertion got past
+ * the compiler; a result that is not a state at all is left to the types.
  */
-const follow = <S extends Tagged, A extends Tagged>(
+const follow = <S extends UntypedState, A extends UntypedState>(
   edge: Edge<S, A>,
   state: S,
   action: A,
+  discriminant: string,
 ): S => {
   const next = edge.handler(state, action);
 
-  if (!edge.targets.includes(next.type)) {
+  const to = next[discriminant];
+
+  if (to === undefined || !edge.targets.includes(to)) {
     throw new Error(
-      `ts-fsm-forge: ${edge.from} --${edge.actionType}--> ${next.type} is not an edge of the graph: the handler returned a \`${next.type}\` state, and the edge leads only to ${Arr.uniq(edge.targets).join(' | ')}.`,
+      `ts-fsm-forge: ${edge.from} --${edge.actionType}--> ${to} is not an edge of the graph: the handler returned a \`${to}\` state, and the edge leads only to ${Arr.uniq(edge.targets).join(' | ')}.`,
     );
   }
 

@@ -19,23 +19,13 @@ describe(createGameStateStore, () => {
 
     store.onCardClick(black6, 'S');
 
-    assert.deepStrictEqual(
-      Optional.unwrap(store.gameState.getSnapshot()).cardChosenToToss,
-      black6,
-    );
-
-    assert.isTrue(
-      Optional.unwrap(store.gameState.getSnapshot()).confirmTossBalloonIsOpen,
-    );
+    assert.deepStrictEqual(cardChosenToToss(store), black6);
 
     store.onTossCancel();
 
-    assert.isUndefined(
-      Optional.unwrap(store.gameState.getSnapshot()).cardChosenToToss,
-    );
-
-    assert.isFalse(
-      Optional.unwrap(store.gameState.getSnapshot()).confirmTossBalloonIsOpen,
+    assert.strictEqual(
+      Optional.unwrap(store.gameState.getSnapshot()).type,
+      'toss.selecting',
     );
   });
 
@@ -56,17 +46,11 @@ describe(createGameStateStore, () => {
     // `selectMyCard` of the same card would unselect it.
     actionsFromDb.next([selectMyCard(black6)]);
 
-    assert.deepStrictEqual(
-      Optional.unwrap(store.gameState.getSnapshot()).cardChosenToToss,
-      black6,
-    );
+    assert.deepStrictEqual(cardChosenToToss(store), black6);
 
     actionsFromDb.next([selectMyCard(black6), selectMyCard(white7)]);
 
-    assert.deepStrictEqual(
-      Optional.unwrap(store.gameState.getSnapshot()).cardChosenToToss,
-      white7,
-    );
+    assert.deepStrictEqual(cardChosenToToss(store), white7);
   });
 
   test('writes each action played before the room is known, in order, once it is', () => {
@@ -261,6 +245,13 @@ const setup = (): Setup => {
       ticks.next(n);
     },
   } as const;
+};
+
+/** The card chosen to toss, while the toss is being confirmed. */
+const cardChosenToToss = (store: GameStateStore): Card | undefined => {
+  const state = Optional.unwrap(store.gameState.getSnapshot());
+
+  return state.type === 'toss.confirming' ? state.cardChosenToToss : undefined;
 };
 
 const black6: Card = { color: 'black', number: 6 } as const;

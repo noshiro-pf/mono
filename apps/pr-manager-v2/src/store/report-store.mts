@@ -8,8 +8,14 @@ import {
   type ReadError,
   type Snapshot,
 } from 'pr-report-core-v2';
-import { createState, type InitializedObservable } from 'synstate';
+import {
+  createReducer,
+  createState,
+  type InitializedObservable,
+} from 'synstate';
 import { Arr, hasKey, isRecord, Result } from 'ts-data-forge';
+import { defineMachine } from 'ts-fsm-forge';
+import type { RelaxedExtract } from 'ts-type-forge';
 import {
   delayOnShow,
   failuresOf,
@@ -144,8 +150,10 @@ export const createReportStore = (deps: ReportDeps): ReportStore => {
     RunsReport | undefined
   >(undefined);
 
-  const [status, setStatus, { getSnapshot: getStatus }] =
-    createState<ReportStatus>({ kind: 'no-token' });
+  const [status, dispatchStatus, { getSnapshot: getStatus }] = createReducer(
+    statusMachine.reducer,
+    noToken,
+  );
 
   const [tokenRefused, setTokenRefused] = createState(false);
 
@@ -157,8 +165,6 @@ export const createReportStore = (deps: ReportDeps): ReportStore => {
 
   /** Rises with every token, so that a read asked with an older one is dropped. */
   let mut_generation = 0;
-
-  let mut_reading = false;
 
   let mut_again = false;
 
@@ -190,8 +196,6 @@ export const createReportStore = (deps: ReportDeps): ReportStore => {
     startedAtMs: number,
     budgets: ReadonlyMap<string, RateLimit>,
   ): void => {
-    mut_reading = false;
-
     const nowMs = deps.timers.now();
 
     mut_lastReadAtMs = nowMs;
@@ -203,19 +207,13 @@ export const createReportStore = (deps: ReportDeps): ReportStore => {
       const failure =
         `Could not draw what was read: ${threw(error).message}` as const;
 
-      // What is on screen is the last report drawn, and as old as it was.
-      const drawn = getReport();
-
-      setStatus(
-        drawn === undefined
-          ? { kind: 'failed', failure, reading: false }
-          : {
-              kind: 'ready',
-              readAtMs: drawn.readAtMs,
-              reading: false,
-              failure,
-            },
-      );
+      // What is on screen is the last report drawn, and as old as it was:
+      // the report may have been kept before its drawing threw.
+      dispatchStatus({
+        kind: 'drawFailed',
+        failure,
+        drawnAtMs: getReport()?.readAtMs,
+      });
     }
 
     pace(budgets);
@@ -242,19 +240,11 @@ export const createReportStore = (deps: ReportDeps): ReportStore => {
     });
 
     if (Result.isErr(read.snapshot)) {
-      const failure = describeReadError(read.snapshot.value);
-
       // What stays on screen is the last report, as old as it was.
-      setStatus(
-        previous === undefined
-          ? { kind: 'failed', failure, reading: false }
-          : {
-              kind: 'ready',
-              readAtMs: previous.readAtMs,
-              reading: false,
-              failure,
-            },
-      );
+      dispatchStatus({
+        kind: 'readFailed',
+        failure: describeReadError(read.snapshot.value),
+      });
     } else {
       const snapshot = keptSnapshot(previous?.snapshot, read.snapshot.value);
 
@@ -289,12 +279,7 @@ export const createReportStore = (deps: ReportDeps): ReportStore => {
         readAtMs: startedAtMs,
       });
 
-      setStatus({
-        kind: 'ready',
-        readAtMs: startedAtMs,
-        reading: false,
-        failure: undefined,
-      });
+      dispatchStatus({ kind: 'readSucceeded', readAtMs: startedAtMs });
     }
   };
 
@@ -333,34 +318,9 @@ export const createReportStore = (deps: ReportDeps): ReportStore => {
 
     cancelTimer();
 
-    mut_reading = true;
-
     const generation = mut_generation;
 
-    const current = getStatus();
-
-    switch (current.kind) {
-      case 'ready':
-        setStatus({ ...current, reading: true });
-
-        break;
-
-      case 'failed':
-        setStatus({ ...current, reading: true });
-
-        break;
-
-      case 'waiting':
-        setStatus({ kind: 'first-read' });
-
-        break;
-
-      case 'no-token':
-        break;
-
-      case 'first-read':
-        break;
-    }
+    dispatchStatus({ kind: 'readStarted' });
 
     const startedAtMs = deps.timers.now();
 
@@ -401,8 +361,6 @@ export const createReportStore = (deps: ReportDeps): ReportStore => {
 
     mut_token = token?.value;
 
-    mut_reading = false;
-
     mut_again = false;
 
     mut_lastReadAtMs = undefined;
@@ -417,7 +375,7 @@ export const createReportStore = (deps: ReportDeps): ReportStore => {
 
     setBudget({ rateLimit: undefined, intervalMs: POLL.minMs });
 
-    setStatus(token === undefined ? { kind: 'no-token' } : { kind: 'waiting' });
+    dispatchStatus({ kind: 'tokenSet', present: token !== undefined });
 
     // A tab opened in the background reads once it is shown (onVisibility).
     if (deps.isVisible()) {
@@ -431,7 +389,7 @@ export const createReportStore = (deps: ReportDeps): ReportStore => {
       mut_samples = new Map<string, BudgetSample>();
     }
 
-    if (mut_reading) {
+    if (isReading(getStatus())) {
       return;
     }
 
@@ -455,7 +413,7 @@ export const createReportStore = (deps: ReportDeps): ReportStore => {
     tokenRefused,
     budget,
     refresh: () => {
-      if (mut_reading) {
+      if (isReading(getStatus())) {
         mut_again = true;
       } else {
         readNow();
@@ -474,9 +432,9 @@ export const createReportStore = (deps: ReportDeps): ReportStore => {
         mut_again = false;
 
         // A read still out when the store stops is dropped, as for a new token.
+        // The status may go on saying it is out; `start` sets it again from the
+        // token, and nothing reads or draws it before then.
         mut_generation += 1;
-
-        mut_reading = false;
 
         subscription.unsubscribe();
 
@@ -522,6 +480,110 @@ export const isReading = (status: ReportStatus): boolean =>
 /** A failure as one line: what was being read, and why it was not. */
 export const describeReadError = (error: ReadError): string =>
   `Could not read ${error.what}: ${error.message}` as const;
+
+type StatusAction = Readonly<
+  | { kind: 'drawFailed'; failure: string; drawnAtMs: number | undefined }
+  | { kind: 'readFailed'; failure: string }
+  | { kind: 'readStarted' }
+  | { kind: 'readSucceeded'; readAtMs: number }
+  | { kind: 'tokenSet'; present: boolean }
+>;
+
+const noToken: ReportStatus = { kind: 'no-token' } as const;
+
+/** A token set or cleared starts the status over, from whatever state. */
+const onToken = (
+  _s: ReportStatus,
+  { present }: RelaxedExtract<StatusAction, Readonly<{ kind: 'tokenSet' }>>,
+): RelaxedExtract<ReportStatus, Readonly<{ kind: 'no-token' | 'waiting' }>> =>
+  present ? ({ kind: 'waiting' } as const) : noToken;
+
+const failedWith = (
+  failure: string,
+): RelaxedExtract<ReportStatus, Readonly<{ kind: 'failed' }>> =>
+  ({ kind: 'failed', failure, reading: false }) as const;
+
+const readyAt = (
+  readAtMs: number,
+): RelaxedExtract<ReportStatus, Readonly<{ kind: 'ready' }>> =>
+  ({ kind: 'ready', readAtMs, reading: false, failure: undefined }) as const;
+
+const drawFailed = ({
+  failure,
+  drawnAtMs,
+}: RelaxedExtract<
+  StatusAction,
+  Readonly<{ kind: 'drawFailed' }>
+>): RelaxedExtract<ReportStatus, Readonly<{ kind: 'failed' | 'ready' }>> =>
+  drawnAtMs === undefined
+    ? failedWith(failure)
+    : ({
+        kind: 'ready',
+        readAtMs: drawnAtMs,
+        reading: false,
+        failure,
+      } as const);
+
+/**
+ * How the status moves (spec §4). A token, set or cleared, starts it over from
+ * any state. A read starts from `waiting` as the first one, or again from
+ * `ready` or `failed`, which keep what they show while it is out; it ends in
+ * `ready` once one has brought anything, `failed` until then. `no-token` and
+ * `first-read` take no other read, so a second one is not marked as started.
+ */
+const statusMachine = defineMachine<ReportStatus, StatusAction, 'kind'>('kind')(
+  {
+    'no-token': { tokenSet: ['no-token', 'waiting'] },
+    waiting: { tokenSet: ['no-token', 'waiting'], readStarted: 'first-read' },
+    'first-read': {
+      tokenSet: ['no-token', 'waiting'],
+      readSucceeded: 'ready',
+      readFailed: 'failed',
+      drawFailed: ['failed', 'ready'],
+    },
+    failed: {
+      tokenSet: ['no-token', 'waiting'],
+      readStarted: 'failed',
+      readSucceeded: 'ready',
+      readFailed: 'failed',
+      drawFailed: ['failed', 'ready'],
+    },
+    ready: {
+      tokenSet: ['no-token', 'waiting'],
+      readStarted: 'ready',
+      readSucceeded: 'ready',
+      readFailed: 'ready',
+      drawFailed: ['failed', 'ready'],
+    },
+  },
+  {
+    'no-token': { tokenSet: onToken },
+    waiting: {
+      tokenSet: onToken,
+      readStarted: () => ({ kind: 'first-read' }),
+    },
+    'first-read': {
+      tokenSet: onToken,
+      readSucceeded: (_s, a) => readyAt(a.readAtMs),
+      readFailed: (_s, a) => failedWith(a.failure),
+      drawFailed: (_s, a) => drawFailed(a),
+    },
+    failed: {
+      tokenSet: onToken,
+      readStarted: (s) => ({ ...s, reading: true }),
+      readSucceeded: (_s, a) => readyAt(a.readAtMs),
+      readFailed: (_s, a) => failedWith(a.failure),
+      drawFailed: (_s, a) => drawFailed(a),
+    },
+    ready: {
+      tokenSet: onToken,
+      readStarted: (s) => ({ ...s, reading: true }),
+      readSucceeded: (_s, a) => readyAt(a.readAtMs),
+      readFailed: (s, a) => ({ ...s, reading: false, failure: a.failure }),
+      drawFailed: (_s, a) => drawFailed(a),
+    },
+  },
+);
 
 /** As many open issues as a read takes; more is said to be cut short. */
 const ISSUES_LIMIT = 1000;
