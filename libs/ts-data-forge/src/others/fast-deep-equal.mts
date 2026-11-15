@@ -1,4 +1,11 @@
-import { isMap, isRegExp, isSet, isTypedArray } from '../built-in-tag.mjs';
+import {
+  isArrayBuffer,
+  isDataView,
+  isMap,
+  isRegExp,
+  isSet,
+  isTypedArray,
+} from '../built-in-tag.mjs';
 import { hasKey, isRecord } from '../guard/index.mjs';
 
 /**
@@ -60,6 +67,26 @@ export const fastDeepEqual = <T,>(a: T, b: T): boolean => {
         isTypedArray(b) &&
         a.length === b.length &&
         a.every((value, index) => value === b[index])
+      );
+    }
+
+    // Neither has an enumerable own key, so without these every two buffers (or
+    // views) would fall through to the key comparison and be equal. An
+    // `ArrayBuffer` and a `SharedArrayBuffer` were told apart by their
+    // constructors above.
+    if (isArrayBuffer(a)) {
+      return (
+        isArrayBuffer(b) && fastDeepEqual(new Uint8Array(a), new Uint8Array(b))
+      );
+    }
+
+    if (isDataView(a)) {
+      return (
+        isDataView(b) &&
+        fastDeepEqual(
+          new Uint8Array(a.buffer, a.byteOffset, a.byteLength),
+          new Uint8Array(b.buffer, b.byteOffset, b.byteLength),
+        )
       );
     }
 
