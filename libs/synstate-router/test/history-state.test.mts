@@ -4,6 +4,7 @@ import {
   createMemoryBrowser,
   createRouter,
   defineRoutes,
+  handleLinkClick,
   historyState,
   matchRoutes,
   pageValues,
@@ -321,5 +322,85 @@ describe('historyState.schema', () => {
     assert.deepStrictEqual(codec.decode('3'), Optional.none);
 
     assert.strictEqual(codec.encode(3), 3);
+  });
+});
+
+/** A plain primary-button click on an anchor to `href`, with `init` over it. */
+const linkClick = (
+  href: string,
+  init: Readonly<{ ctrlKey?: boolean }> = {},
+): Parameters<typeof handleLinkClick>[1] =>
+  ({
+    defaultPrevented: false,
+    button: 0,
+    metaKey: false,
+    ctrlKey: init.ctrlKey ?? false,
+    shiftKey: false,
+    altKey: false,
+    currentTarget: { href, target: '', hasAttribute: () => false },
+    preventDefault: () => {},
+  }) as const;
+
+test('a routed click writes the state, and back and forward restore it', async () => {
+  const { router } = setup();
+
+  assert.isTrue(
+    handleLinkClick(router, linkClick('https://example.com/checkout/'), {
+      state: { step: 3 },
+    }),
+  );
+
+  const m = current(router);
+
+  assert.isTrue(m.route === 'checkout');
+
+  assert.deepStrictEqual(m.state, { step: 3 });
+
+  router.push(routes.home.href());
+
+  router.back();
+
+  await nextTask();
+
+  const back = current(router);
+
+  assert.isTrue(back.route === 'checkout');
+
+  assert.deepStrictEqual(back.state, { step: 3 });
+});
+
+describe('handleLinkClick with a history state (#3859)', () => {
+  test('with replace, the state goes on the replaced entry', () => {
+    const { router, browser } = setup();
+
+    handleLinkClick(router, linkClick('https://example.com/checkout/'), {
+      replace: true,
+      state: { step: 4 },
+    });
+
+    const m = current(router);
+
+    assert.isTrue(m.route === 'checkout');
+
+    assert.deepStrictEqual(m.state, { step: 4 });
+
+    assert.deepStrictEqual(browser.history.state, {
+      synstateRouterIndex: 0,
+      state: { step: 4 },
+    });
+  });
+
+  test('a click the browser handles writes nothing', () => {
+    const { router } = setup();
+
+    assert.isFalse(
+      handleLinkClick(
+        router,
+        linkClick('https://example.com/checkout/', { ctrlKey: true }),
+        { state: { step: 5 } },
+      ),
+    );
+
+    assert.strictEqual(current(router).route, 'home');
   });
 });

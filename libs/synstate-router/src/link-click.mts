@@ -134,10 +134,12 @@ export const handleLinkClick = (
 
   event.preventDefault();
 
-  const pushOptions =
-    options?.viewTransition === true
+  const pushOptions = {
+    ...(options?.viewTransition === true
       ? ({ viewTransition: true } as const)
-      : undefined;
+      : {}),
+    ...(options?.state === undefined ? {} : { state: options.state }),
+  } as const;
 
   if (options?.replace === true) {
     router.replace(Optional.unwrap(href), pushOptions);

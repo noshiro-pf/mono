@@ -17,6 +17,7 @@ export const createLink = <R extends AnyRoutes>(
     to,
     replace,
     viewTransition,
+    state,
     onClick,
     children,
     ...anchorProps
@@ -26,10 +27,14 @@ export const createLink = <R extends AnyRoutes>(
         onClick?.(clickEvent);
 
         if (isHref(to)) {
-          handleLinkClick(router, clickEvent, { replace, viewTransition });
+          handleLinkClick(router, clickEvent, {
+            replace,
+            viewTransition,
+            state,
+          });
         }
       },
-      [onClick, to, replace, viewTransition],
+      [onClick, to, replace, viewTransition, state],
     );
 
     return (

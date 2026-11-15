@@ -16,7 +16,7 @@ export const createLink =
   <R extends AnyRoutes>(
     router: Router<R>,
   ): ((props: LinkProps) => JSX.Element) =>
-  ({ to, replace, viewTransition, onClick, ...anchorProps }) => {
+  ({ to, replace, viewTransition, state, onClick, ...anchorProps }) => {
     // A plain `Href` is a destination that does not change: a constant, as
     // synstate-dom takes one.
     const destination: Bindable<Href | ExternalHref> =
@@ -36,7 +36,11 @@ export const createLink =
 
           // An `ExternalHref` is the browser's, even to this origin.
           if (isHref(current())) {
-            handleLinkClick(router, clickEvent, { replace, viewTransition });
+            handleLinkClick(router, clickEvent, {
+              replace,
+              viewTransition,
+              state,
+            });
           }
         }}
       />

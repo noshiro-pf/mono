@@ -127,6 +127,8 @@ export type StateOptions = Readonly<{
 export type NavigateOptions = Readonly<{
   /** Replace the current history entry instead of adding one. */
   replace?: boolean;
+  /** The history state to write; see {@link StateOptions}. */
+  state?: unknown;
   /** Make the navigation inside a View Transition; see {@link StateOptions}. */
   viewTransition?: boolean;
 }>;
