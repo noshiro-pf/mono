@@ -1,4 +1,4 @@
-import { issueTierOf, type ReadError, type Snapshot } from 'pr-report-core-v2';
+import type { ReadError, Snapshot } from 'pr-report-core-v2';
 import {
   combine,
   createState,
@@ -6,13 +6,14 @@ import {
   skipIfNoChange,
   type InitializedObservable,
 } from 'synstate';
-import { Arr, fastDeepEqual, Result } from 'ts-data-forge';
+import { fastDeepEqual, Result } from 'ts-data-forge';
 import {
   isListed,
   issueGraphOf,
   issueRowOf,
   issueTileCounts,
   issueTitlesOf,
+  labelPicksOf,
   passesTiers,
   sortIssues,
   tierSettingsOf,
@@ -33,7 +34,10 @@ export type IssuesBlockView = Readonly<
       rows: ReadonlyMap<number, IssueRow>;
       /** The list as filtered, searched and sorted. */
       listed: readonly IssueRow[];
-      /** The issues the DAG draws: only the tiers and in progress filter it. */
+      /**
+       * The issues the DAG draws: only the tiers, in progress and author only
+       * filter it.
+       */
       drawn: readonly IssueRow[];
       /** The DAG of `drawn`, with what they wait on and what closes them. */
       graph: IssueGraph;
@@ -151,13 +155,7 @@ export const createIssuesStore = (
         graph: drawnGraph.graph,
         listCounts: issueTileCounts(list, settings, listedOf),
         dagCounts: issueTileCounts(list, settings, passesTiers),
-        labelNames: Arr.uniq(
-          list.flatMap(({ labels }) =>
-            labels
-              .map(({ name }) => name)
-              .filter((name) => issueTierOf([name]) === 'none'),
-          ),
-        ).toSorted((a, b) => a.localeCompare(b)),
+        labelNames: labelPicksOf(list),
         incomplete:
           Result.isOk(report.snapshot.openIssues) &&
           !report.snapshot.openIssues.value.complete,

@@ -1,4 +1,9 @@
-import type { IssueStartState } from 'pr-report-core-v2';
+import {
+  hasLabel,
+  IssueLabel,
+  issueTierOf,
+  type IssueStartState,
+} from 'pr-report-core-v2';
 import { Arr } from 'ts-data-forge';
 import type { ReadonlyRecord, StrictExclude, StrictPick } from 'ts-type-forge';
 import type { TileCount } from '../merge-order/index.mjs';
@@ -22,9 +27,18 @@ export type IssuesSettings = Readonly<{
   /** In progress picked with a tier shows both. */
   hideInProgress: boolean;
   onlyInProgress: boolean;
+  /**
+   * The issues labelled `author-only`, which only the author can do; picked
+   * with a tier or in progress, shows both.
+   */
+  hideAuthorOnly: boolean;
+  onlyAuthorOnly: boolean;
   /** List only: the start states switched off. */
   hideStart: readonly StartSwitch[];
-  /** List only: the labels picked; one picked shows issues with any picked. */
+  /**
+   * List only: the labels picked, never `author-only`, which has a switch of
+   * its own; one picked shows issues with any picked.
+   */
   labels: readonly string[];
   sort: IssuesSort;
 }>;
@@ -88,6 +102,8 @@ export const DEFAULT_ISSUES: IssuesSettings = {
   onlyPriority: [],
   hideInProgress: false,
   onlyInProgress: false,
+  hideAuthorOnly: false,
+  onlyAuthorOnly: false,
   hideStart: [],
   labels: [],
   sort: 'updated',
@@ -96,10 +112,13 @@ export const DEFAULT_ISSUES: IssuesSettings = {
 /**
  * `issues=dag`, `issues.hidePriority=D.close`, `issues.onlyPriority=S.A`,
  * `issues.hideStart=blocked.cycle`, `issues.hideInProgress=1` or
- * `issues.onlyInProgress=1`, `issues.sort=priority`, `issues.label=<name>`
+ * `issues.onlyInProgress=1`, `issues.hideAuthorOnly=1` or
+ * `issues.onlyAuthorOnly=1`, `issues.sort=priority`, `issues.label=<name>`
  * repeated: v1's spelling. The older `issues.hidePending=1`,
  * `issues.onlyPending=1` and `dag.hidePending=1` read as `hold`, and go once
- * written. A tier both hidden and picked reads as picked.
+ * written. A tier both hidden and picked reads as picked; `in progress` and
+ * `author only` read as switched off. An `issues.label=author-only` is dropped,
+ * the label having a switch of its own.
  */
 export const issuesCodec: ParamCodec<IssuesSettings> = {
   read: (params) => {
@@ -109,6 +128,8 @@ export const issuesCodec: ParamCodec<IssuesSettings> = {
     ]);
 
     const hideInProgress = readFlag(params, KEY.hideInProgress);
+
+    const hideAuthorOnly = readFlag(params, KEY.hideAuthorOnly);
 
     return {
       view: readChoice(params, KEY.view, VIEWS, 'list'),
@@ -121,9 +142,15 @@ export const issuesCodec: ParamCodec<IssuesSettings> = {
       onlyPriority,
       hideInProgress,
       onlyInProgress: !hideInProgress && readFlag(params, KEY.onlyInProgress),
+      hideAuthorOnly,
+      onlyAuthorOnly: !hideAuthorOnly && readFlag(params, KEY.onlyAuthorOnly),
       hideStart: readNames(params, KEY.hideStart, START_SWITCHES),
       labels: Arr.uniq(
-        params.getAll(KEY.label).filter((name) => name !== ''),
+        params
+          .getAll(KEY.label)
+          .filter(
+            (name) => name !== '' && !hasLabel([name], IssueLabel.authorOnly),
+          ),
       ).toSorted((a, b) => a.localeCompare(b)),
       sort: readChoice(params, KEY.sort, SORTS, 'updated'),
     };
@@ -138,6 +165,10 @@ export const issuesCodec: ParamCodec<IssuesSettings> = {
     writeFlag(params, KEY.hideInProgress, settings.hideInProgress);
 
     writeFlag(params, KEY.onlyInProgress, settings.onlyInProgress);
+
+    writeFlag(params, KEY.hideAuthorOnly, settings.hideAuthorOnly);
+
+    writeFlag(params, KEY.onlyAuthorOnly, settings.onlyAuthorOnly);
 
     writeNames(params, KEY.hideStart, settings.hideStart);
 
@@ -157,21 +188,42 @@ export const issuesCodec: ParamCodec<IssuesSettings> = {
   },
 } as const;
 
-/** Whether the tier and in-progress filters show `row`: both views read it. */
+/**
+ * Whether the tier, in-progress and author-only filters show `row`: both views
+ * read it.
+ */
 export const passesTiers = (row: IssueRow, s: TierSettings): boolean => {
   const inProgress = row.start === 'in-progress';
+
+  const authorOnly = isAuthorOnly(row);
 
   return (
     !s.hidePriority.includes(row.tier) &&
     (!Arr.isNonEmpty(s.onlyPriority) || s.onlyPriority.includes(row.tier)) &&
-    (inProgress ? !s.hideInProgress : !s.onlyInProgress)
+    (inProgress ? !s.hideInProgress : !s.onlyInProgress) &&
+    (authorOnly ? !s.hideAuthorOnly : !s.onlyAuthorOnly)
   );
 };
 
-/** The settings the DAG reads: the tiers and in progress, nothing of the list. */
+/** Whether only the author can do the issue: it is labelled `author-only`. */
+export const isAuthorOnly = (row: IssueRow): boolean =>
+  hasLabel(
+    row.labels.map(({ name }) => name),
+    IssueLabel.authorOnly,
+  );
+
+/**
+ * The settings the DAG reads: the tiers, in progress and author only, nothing
+ * of the list.
+ */
 export type TierSettings = StrictPick<
   IssuesSettings,
-  'hideInProgress' | 'hidePriority' | 'onlyInProgress' | 'onlyPriority'
+  | 'hideAuthorOnly'
+  | 'hideInProgress'
+  | 'hidePriority'
+  | 'onlyAuthorOnly'
+  | 'onlyInProgress'
+  | 'onlyPriority'
 >;
 
 export const tierSettingsOf = (s: IssuesSettings): TierSettings =>
@@ -180,7 +232,26 @@ export const tierSettingsOf = (s: IssuesSettings): TierSettings =>
     onlyPriority: s.onlyPriority,
     hideInProgress: s.hideInProgress,
     onlyInProgress: s.onlyInProgress,
+    hideAuthorOnly: s.hideAuthorOnly,
+    onlyAuthorOnly: s.onlyAuthorOnly,
   }) as const;
+
+/**
+ * The list's label picks: every label an open issue carries but the tiers and
+ * `author-only`, which have tiles of their own, in name order.
+ */
+export const labelPicksOf = (rows: readonly IssueRow[]): readonly string[] =>
+  Arr.uniq(
+    rows.flatMap(({ labels }) =>
+      labels
+        .map(({ name }) => name)
+        .filter(
+          (name) =>
+            issueTierOf([name]) === 'none' &&
+            !hasLabel([name], IssueLabel.authorOnly),
+        ),
+    ),
+  ).toSorted((a, b) => a.localeCompare(b));
 
 /** Whether the list shows `row`: the tiers, the starts, the labels, the search. */
 export const isListed = (
@@ -225,6 +296,7 @@ export const issueTileCounts = (
   open: Readonly<{ shown: number; total: number }>;
   tiers: ReadonlyRecord<Tier, TileCount>;
   inProgress: TileCount;
+  authorOnly: TileCount;
 }> => {
   const tier = (t: Tier): TileCount => {
     const hidden =
@@ -267,6 +339,14 @@ export const issueTileCounts = (
           shows(row, { ...s, hideInProgress: false, onlyInProgress: false }),
       ).length,
       hidden: inProgressHidden,
+    },
+    authorOnly: {
+      count: rows.filter(
+        (row) =>
+          isAuthorOnly(row) &&
+          shows(row, { ...s, hideAuthorOnly: false, onlyAuthorOnly: false }),
+      ).length,
+      hidden: s.hideAuthorOnly,
     },
   };
 };
@@ -327,12 +407,28 @@ export const toggleInProgressOnly = (s: IssuesSettings): IssuesSettings =>
     hideInProgress: false,
   }) as const;
 
+export const toggleAuthorOnlyHidden = (s: IssuesSettings): IssuesSettings =>
+  ({
+    ...s,
+    hideAuthorOnly: !s.hideAuthorOnly,
+    onlyAuthorOnly: false,
+  }) as const;
+
+export const toggleAuthorOnlyOnly = (s: IssuesSettings): IssuesSettings =>
+  ({
+    ...s,
+    onlyAuthorOnly: !s.onlyAuthorOnly,
+    hideAuthorOnly: false,
+  }) as const;
+
 const KEY = {
   view: 'issues',
   hidePriority: 'issues.hidePriority',
   onlyPriority: 'issues.onlyPriority',
   hideInProgress: 'issues.hideInProgress',
   onlyInProgress: 'issues.onlyInProgress',
+  hideAuthorOnly: 'issues.hideAuthorOnly',
+  onlyAuthorOnly: 'issues.onlyAuthorOnly',
   hideStart: 'issues.hideStart',
   label: 'issues.label',
   sort: 'issues.sort',

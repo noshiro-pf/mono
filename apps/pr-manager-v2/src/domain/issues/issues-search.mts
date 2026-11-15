@@ -5,7 +5,8 @@ import type { IssuesSettings } from './issues-view.mjs';
 
 /**
  * The closest GitHub search for the issues the block shows, and the tooltip
- * saying where it lists more (spec §11.1). Tiers and picked labels are labels;
+ * saying where it lists more (spec §11.1). Tiers, `author only` and picked
+ * labels are labels;
  * `in progress` is read from the label alone, though the page also counts an
  * open pull request closing the issue and a `started` claim; the start states
  * and the search box are the page's own.
@@ -37,6 +38,12 @@ export const issuesSearchOf = (
       : []),
     ...(settings.onlyInProgress
       ? [anyLabelQualifier([IssueLabel.inProgress])]
+      : []),
+    ...(settings.hideAuthorOnly
+      ? [notLabelQualifier(IssueLabel.authorOnly)]
+      : []),
+    ...(settings.onlyAuthorOnly
+      ? [anyLabelQualifier([IssueLabel.authorOnly])]
       : []),
     ...(Arr.isNonEmpty(settings.labels)
       ? [anyLabelQualifier(settings.labels)]

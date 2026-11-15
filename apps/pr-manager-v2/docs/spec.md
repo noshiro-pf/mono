@@ -277,9 +277,11 @@ is:stale`.
 - Title "Open issues (N)", **on GitHub** (closest search), **New issue**.
 - View switch **List | DAG** (`issues=dag`).
 - Count tiles in both views: **open** (shown of total), tiers `S A B C D none`
-  as one joined group, `hold` and `close` beside open, **in progress**; each a
-  switch with **only**. Two tiers picked show either; in progress with a tier
-  shows both.
+  as one joined group, `hold` and `close` beside open, **in progress**, and
+  **(new)** **author only** (issues labelled `author-only`, which only the
+  author can do and no session is handed; `docs/issue-priority.md`); each a
+  switch with **only**. Two tiers picked show either; in progress or author only
+  with a tier shows both.
 - Tiers come from `priority:S|A|B|C|D|hold|close` labels (none = zero or
   several). Tooltips say what each tier means.
 - **(changed)** Read with the snapshot, up to 1,000 open issues, rather than 30
@@ -295,8 +297,8 @@ is:stale`.
 
 - Search box: title substring (case-insensitive) or number (`123`/`#123`); not
   kept in the URL.
-- Label picks: every other label on an open issue; once any is picked, only
-  issues carrying one picked.
+- Label picks: every other label on an open issue but `author-only`; once any is
+  picked, only issues carrying one picked.
 - Start-state switches (DAG's words and colours): `Can start, wait over`,
   `Can start`, `Planned`, `In progress`, `Needs a look`, `Waiting`, `Cycle`.
 - Sort: **updated** | **priority** (S, A, B, C, none, D, hold, close; updated
@@ -306,7 +308,8 @@ is:stale`.
   state, title on hover), a warning when the body has `Merge-After:` (which
   issues don't read), updated age, author, comment count, labels.
 - URL: `issues.hidePriority`, `issues.onlyPriority`, `issues.hideStart`,
-  `issues.hideInProgress=1`/`issues.onlyInProgress=1`, `issues.sort`,
+  `issues.hideInProgress=1`/`issues.onlyInProgress=1`,
+  `issues.hideAuthorOnly=1`/`issues.onlyAuthorOnly=1`, `issues.sort`,
   `issues.label=<name>` (repeated). Legacy `issues.hidePending=1`,
   `issues.onlyPending=1`, `dag.hidePending=1` read as `hold`.
 
@@ -321,8 +324,8 @@ is:stale`.
   dotted), whose own state is unknown; priority pill (`high` filled, `mid`
   outlined, `low` faint); `pending` PRs faint. Done issues and merged PRs are
   not drawn, nor the waits on them.
-- Only tiers and in progress filter the DAG; an issue left out that a drawn one
-  waits on stays (not counted).
+- Only tiers, in progress and author only filter the DAG; an issue left out that
+  a drawn one waits on stays (not counted).
 - Each node: `#N` pill, title fitted to two lines (CJK counted double) with `…`,
   links to GitHub.
 - Layered layout, left to right: components stacked largest first; nodes with no

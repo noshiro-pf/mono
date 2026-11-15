@@ -22,6 +22,18 @@ describe(issuesSearchOf, () => {
     );
   });
 
+  test('says author only switched off or picked as its label', () => {
+    assert.strictEqual(
+      issuesSearchOf({ ...DEFAULT_ISSUES, hideAuthorOnly: true }).query,
+      'is:issue is:open -label:"author-only" sort:updated-desc',
+    );
+
+    assert.strictEqual(
+      issuesSearchOf({ ...DEFAULT_ISSUES, onlyAuthorOnly: true }).query,
+      'is:issue is:open label:"author-only" sort:updated-desc',
+    );
+  });
+
   test('picks none as no tier label', () => {
     assert.include(
       issuesSearchOf({ ...DEFAULT_ISSUES, onlyPriority: ['none'] }).query,

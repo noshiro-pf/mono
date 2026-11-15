@@ -1,6 +1,8 @@
 import { map, type InitializedObservable } from 'synstate';
 import { constant, type JSX } from 'synstate-dom';
 import {
+  toggleAuthorOnlyHidden,
+  toggleAuthorOnlyOnly,
   toggleInProgressHidden,
   toggleInProgressOnly,
   type IssuesSettings,
@@ -20,8 +22,9 @@ type Props = Readonly<{
 
 /**
  * The counts both views lead with (spec §11.1): `open`, the tiers as one joined
- * group, `hold` and `close` beside them, and `in progress`, each a switch with
- * an `only`.
+ * group, `hold` and `close` beside them, `in progress` and `author only` (the
+ * issues labelled `author-only`, which no session is handed), each a switch
+ * with an `only`.
  */
 export const IssueTiles = ({
   counts,
@@ -58,6 +61,18 @@ export const IssueTiles = ({
       }}
       onToggle={() => {
         update(toggleInProgressHidden);
+      }}
+    />
+    <TileSwitch
+      count={counts.pipe(map(({ authorOnly }) => authorOnly))}
+      label={'author only'}
+      only={settings.pipe(map(({ onlyAuthorOnly }) => onlyAuthorOnly))}
+      subject={'the issues only the author can do'}
+      onOnly={() => {
+        update(toggleAuthorOnlyOnly);
+      }}
+      onToggle={() => {
+        update(toggleAuthorOnlyHidden);
       }}
     />
   </div>

@@ -195,7 +195,7 @@ export const IssueDag = ({ view, store, now }: Props): JSX.Element => {
               map(({ rows }) =>
                 rows.size === 0
                   ? 'No open issues.'
-                  : 'No open issue has the tiers and in progress shown.',
+                  : 'No open issue has the tiers, in progress and author only shown.',
               ),
             )}
           </p>
