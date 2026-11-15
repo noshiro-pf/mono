@@ -172,6 +172,24 @@ describe(publishablePackagesOf, () => {
 
     assert.include(result.value, 'No publishable package');
   });
+
+  test('refuses a scoped package, naming what does not support one (#4035)', () => {
+    const result = publishablePackagesOf([
+      workspacePackage('a', {}),
+      workspacePackage('@scope/b', {}),
+      workspacePackage('@scope/hidden', { private: true }),
+    ]);
+
+    assert.isTrue(Result.isErr(result));
+
+    assert.include(result.value, '@scope/b');
+
+    assert.notInclude(result.value, '@scope/hidden');
+
+    for (const place of ['packAll', 'smokeFileName', 'pnpm-update.yml']) {
+      assert.include(result.value, place);
+    }
+  });
 });
 
 describe(writeCheckCopy, () => {

@@ -389,9 +389,10 @@ export const removeStaleProjects = async (
 
 /**
  * The workspace packages not marked `private`, sorted by name, or an error when
- * there are none: that says the workspace was misread, and it is refused here,
- * before anything is packed, written or removed, so that no later step needs a
- * guard of its own.
+ * there are none: that says the workspace was misread. A scoped one
+ * (`@scope/name`) is an error too, until the three places below learn a name
+ * with a `/` in it (#4035). Both are refused here, before anything is packed,
+ * written or removed, so that no later step needs a guard of its own.
  */
 export const publishablePackagesOf = (
   workspacePackages: readonly Package[],
@@ -411,6 +412,19 @@ export const publishablePackagesOf = (
     // without this the `overrides` block of the generated `pnpm-workspace.yaml`
     // is shuffled on every run and the repository never looks clean twice.
     .toSorted((a, b) => a.name.localeCompare(b.name));
+
+  const scoped = packages.filter(({ name }) => name.startsWith('@'));
+
+  if (Arr.isNonEmpty(scoped)) {
+    return Result.err(
+      [
+        `A scoped package cannot be verified yet: ${scoped.map(({ name }) => name).join(', ')}. Nothing was packed, written or removed.`,
+        'Three places assume a name with no `/` (#4035): `packAll` writes `.tarballs/<name>.tgz`,',
+        '`smokeFileName` names the check `<name>.mjs`, and the `commit` job of',
+        '`.github/workflows/pnpm-update.yml` allows a check only one directory deep.',
+      ].join('\n'),
+    );
+  }
 
   return Arr.isNonEmpty(packages)
     ? Result.ok(packages)
