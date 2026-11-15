@@ -1,4 +1,4 @@
-import starlight from '@astrojs/starlight';
+import StarlightIntegration from '@astrojs/starlight';
 import { defineConfig } from 'astro/config';
 // A moved file or a renamed export still fails when this config loads.
 // @ts-expect-error TS5097, the `.mts` extension, which Node.js needs here
@@ -11,7 +11,7 @@ export default defineConfig({
   // directory (`check:root:astro-site-base`).
   base: '/mono/synstate-next/',
   integrations: [
-    starlight({
+    StarlightIntegration({
       title: 'synstate-next',
       description:
         'A glitch-free state management library for TypeScript, with built-in async operators, such as debounce and switchMap, that stay glitch-free.',
@@ -107,6 +107,9 @@ export default defineConfig({
         {
           label: 'Reference',
           translations: { ja: 'リファレンス' },
+          // Starlight's `items` takes a mutable array, which `Arr.toUnshifted`
+          // does not return.
+          // eslint-disable-next-line ts-data-forge/prefer-canonical-array-slicing
           items: [
             { slug: 'reference' },
             ...Object.entries(groupTitles.en).map(([group, label]) => ({

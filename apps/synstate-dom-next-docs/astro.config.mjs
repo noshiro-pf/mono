@@ -1,4 +1,4 @@
-import starlight from '@astrojs/starlight';
+import StarlightIntegration from '@astrojs/starlight';
 import { defineConfig } from 'astro/config';
 
 export default defineConfig({
@@ -8,7 +8,7 @@ export default defineConfig({
   // directory (`check:root:astro-site-base`).
   base: '/mono/synstate-dom-next/',
   integrations: [
-    starlight({
+    StarlightIntegration({
       title: 'synstate-dom-next',
       description:
         'The UI library for synstate-next: a compiler-free, fine-grained UI library that binds observables directly to the DOM.',
