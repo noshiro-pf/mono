@@ -4,10 +4,18 @@
     "../../tools/configs/tsconfig/tsconfig.vite.json"
   ],
   "compilerOptions": {
+    // Opted into the strict standard library. Both TypeScript 6 and 7 default
+    // `libReplacement` to false, so the `@typescript/lib-*` links the root
+    // `prepare` script writes do nothing without it. Stated here, with a probe:
+    // `check:root:tsconfig-lib-replacement` requires both. See
+    // docs/strict-typescript-lib-integration.md.
     "libReplacement": true,
-    "allowArbitraryExtensions": true,
-    "jsx": "react-jsx",
-    "jsxImportSource": "synstate-dom"
+
+    "jsxImportSource": "synstate-dom",
+
+    // CSS Modules: `allowArbitraryExtensions` lets an import of `x.module.css`
+    // resolve to the `x.module.d.css.ts` that `gen:css-module-types` writes.
+    "allowArbitraryExtensions": true
   },
-  "include": ["./src", "./e2e", "./test", "./scripts", "./configs"]
+  "include": ["./src", "./test", "./e2e", "./scripts", "./configs"]
 }

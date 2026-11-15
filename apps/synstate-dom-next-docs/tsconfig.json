@@ -4,14 +4,19 @@
     "../../tools/configs/tsconfig/tsconfig.vite.json"
   ],
   "compilerOptions": {
+    // Opted into the strict standard library. Both TypeScript 6 and 7 default
+    // `libReplacement` to false, so the `@typescript/lib-*` links the root
+    // `prepare` script writes do nothing without it. Stated here, with a probe:
+    // `check:root:tsconfig-lib-replacement` requires both. See
+    // docs/strict-typescript-lib-integration.md.
     "libReplacement": true,
 
-    // Every code block on the site is a file in `samples/`, checked as a
-    // consumer would write it: against synstate-dom-next's types.
-    "jsx": "react-jsx",
     "jsxImportSource": "synstate-dom-next"
   },
-  "include": ["./astro.config.mjs", "./samples", "./scripts", "./test"],
+  // Every code block on the site is a file in `samples/`, checked as a
+  // consumer would write it: against synstate-dom-next's types. The pages
+  // under `src/` are Astro's, which `astro check` reads.
+  "include": ["./test", "./samples", "./scripts", "./astro.config.mjs"],
   // It imports `astro:content`, a module only Astro's own type generation
   // declares, so `tsc` cannot resolve it.
   "exclude": ["./src/content.config.ts"]

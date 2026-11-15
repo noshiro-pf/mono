@@ -557,6 +557,7 @@ describe('buildPlan', () => {
       'run z:format-diff-from abc123',
       'libs/ts-data-forge: run gen',
       'run gen:verify-npm-packages',
+      'run gen:tsconfig',
       'run fix:codemod:affected',
       'run z:format-diff-from abc123',
       'libs/ts-data-forge: run fix:lint',
@@ -1054,6 +1055,7 @@ describe('buildPlan', () => {
         'gen:deps-graph',
         'gen:license-files',
         'gen:verify-npm-packages',
+        'gen:tsconfig',
       ],
     );
   });
@@ -1115,6 +1117,7 @@ describe('buildPlan', () => {
         'synstate-docs: gen (declares synstate)',
         'synstate-react-hooks: gen (declares synstate)',
         'gen:verify-npm-packages',
+        'gen:tsconfig',
       ],
     );
   });
@@ -1341,6 +1344,20 @@ describe('buildPlan', () => {
     assert.notInclude(
       commandsOf(['verify-npm-packages/README.md']),
       'run gen:verify-npm-packages',
+    );
+  });
+
+  test('a change that is not prose alone regenerates the members tsconfig.json files', () => {
+    assert.include(commandsOf(['libs/lonely/src/x.mts']), 'run gen:tsconfig');
+
+    assert.include(
+      commandsOf(['tools/configs/member-tsconfig.mts']),
+      'run gen:tsconfig',
+    );
+
+    assert.notInclude(
+      commandsOf(['libs/lonely/README.md']),
+      'run gen:tsconfig',
     );
   });
 });

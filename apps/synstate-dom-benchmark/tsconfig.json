@@ -4,11 +4,18 @@
     "../../tools/configs/tsconfig/tsconfig.vite.json"
   ],
   "compilerOptions": {
+    // Opted into the strict standard library. Both TypeScript 6 and 7 default
+    // `libReplacement` to false, so the `@typescript/lib-*` links the root
+    // `prepare` script writes do nothing without it. Stated here, with a probe:
+    // `check:root:tsconfig-lib-replacement` requires both. See
+    // docs/strict-typescript-lib-integration.md.
     "libReplacement": true,
+
     // The default for the files with no pragma. `frameworks/solid.tsx` and
     // `frameworks/preact-signals.tsx` name their own with `@jsxImportSource`.
-    "jsx": "react-jsx",
     "jsxImportSource": "synstate-dom"
   },
+  // `./test` holds only `strict-lib-active.mts`, the probe that fails when
+  // the replacement above stops happening.
   "include": ["./src", "./test", "./scripts", "./configs"]
 }

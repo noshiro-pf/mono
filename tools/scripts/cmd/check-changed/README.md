@@ -37,8 +37,10 @@ by case. In order:
    generator, and `gen:verify-npm-packages` for any change that is not prose
    alone, since its committed `local/` copies are written from `smoke/`, the
    manifests and the generator's own code (it also removes a gone package's
-   project from `published/`). **A generator that changes the tree fails the
-   run**, naming itself and the files; that is the dirty tree CI's
+   project from `published/`), and `gen:tsconfig` likewise, since a member's
+   `tsconfig.json` follows its directories as well as its manifest and
+   `tools/configs/member-tsconfig.mts`. **A generator that changes the tree
+   fails the run**, naming itself and the files; that is the dirty tree CI's
    `assert-repo-is-clean` reports with no hint which generator wrote it. Only
    the run in which it writes fails: a later run cannot tell its output, left
    uncommitted, from a hand edit, so commit it before moving on.

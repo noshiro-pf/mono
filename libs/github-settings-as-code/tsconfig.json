@@ -12,13 +12,8 @@
     // docs/strict-typescript-lib-integration.md.
     "libReplacement": true
   },
-  "include": [
-    "./src",
-    "./test",
-    "./samples",
-    "./scripts",
-    "./configs",
-    "./release.config.js",
-    "./.markdownlint-cli2.mjs"
-  ]
+  // `./test` holds only `strict-lib-active.mts`, the probe that fails when
+  // the replacement above stops happening. It is not published — `files`
+  // lists `src` and `dist` and `README.md` and `LICENSE`.
+  "include": ["./src", "./test", "./scripts", "./configs"]
 }

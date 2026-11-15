@@ -11,16 +11,16 @@
     // docs/strict-typescript-lib-integration.md.
     "libReplacement": true,
 
-    // `samples/` imports this package by its own name, the way a consumer
-    // does, and is embedded into the README verbatim. Mapped to the source so
-    // that a sample is checked against the code being edited rather than
-    // against the last build. See docs/workspace-package-linking.md.
+    // `samples/` imports this package by its own name, the way a consumer does.
+    // Mapped to the source so that a sample is checked against the code being
+    // edited rather than against the last build. See
+    // docs/workspace-package-linking.md.
     "paths": {
       "eslint-plugin-ts-std-forge": ["./src/index.mts"]
     }
   },
-  // `./test` holds only `strict-lib-active.mts`, the probe that fails when the
-  // replacement above stops happening. It is not published — `files` lists
-  // `src` and `dist`.
-  "include": ["./samples", "./src", "./test", "./scripts", "./configs"]
+  // `./test` holds only `strict-lib-active.mts`, the probe that fails when
+  // the replacement above stops happening. It is not published — `files`
+  // lists `src` and `dist` and `README.md` and `LICENSE`.
+  "include": ["./src", "./test", "./samples", "./scripts", "./configs"]
 }

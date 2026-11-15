@@ -408,6 +408,13 @@ export const buildPlan = ({
       ? [rootStep('generate', 'gen:verify-npm-packages')]
       : []),
 
+    // Every member's `tsconfig.json` is written from the member's directories,
+    // its manifest and `tools/configs/member-tsconfig.mts`. A directory a
+    // member gains is no file a list here could name, so it runs, as the one
+    // above does, for any change that is not prose alone; it takes a few
+    // seconds.
+    ...(areas.has('root-guards') ? [rootStep('generate', 'gen:tsconfig')] : []),
+
     // The codemod before the lint, so that what it rewrites is linted too, and
     // as CI runs it: `fix:codemod:affected` runs it over the diff from
     // `CODEMOD_DIFF_BASE` (which `main.mts` sets to the base), the untracked
