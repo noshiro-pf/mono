@@ -1,12 +1,19 @@
 import { unified } from '@astrojs/markdown-remark';
 import preact from '@astrojs/preact';
 import react from '@astrojs/react';
-import starlight from '@astrojs/starlight';
+import StarlightIntegration from '@astrojs/starlight';
 import { defineConfig } from 'astro/config';
+// `rehype-katex` and `remark-math` re-export their plugins with
+// `export { default } from './lib/index.js'`, so the name
+// `import-x/no-rename-default` reads, and asks for, is `default`, which no
+// binding can take; the functions behind it are named as imported here.
+// eslint-disable-next-line import-x/no-rename-default
 import rehypeKatex from 'rehype-katex';
+// eslint-disable-next-line import-x/no-rename-default
 import remarkMath from 'remark-math';
 // A moved file or a renamed export still fails when this config loads.
 // @ts-expect-error TS5097, the `.mts` extension, which Node.js needs here
+// eslint-disable-next-line import-x/no-relative-packages
 import { appDevPort } from '../../tools/configs/app-dev-ports.mts';
 import {
   preactComponentDirs,
@@ -21,8 +28,8 @@ export default defineConfig({
   // `astro dev` and `astro preview`; the e2e suite
   // (`configs/playwright.config.mts`) waits on it.
   server: { port: appDevPort(import.meta.dirname) },
-  // A taken port fails instead of moving to the next one, which the e2e
-  // server would never find.
+  // A taken port fails instead of moving to the next one, which the e2e server
+  // would never find.
   vite: { server: { strictPort: true }, preview: { strictPort: true } },
   markdown: {
     processor: unified({
@@ -50,7 +57,7 @@ export default defineConfig({
         (dir) => `**/components/${dir}/**/*.{jsx,tsx}`,
       ),
     }),
-    starlight({
+    StarlightIntegration({
       title: 'SynState',
       description:
         'A lightweight, type-safe state management library for TypeScript/JavaScript built on an Observable pattern.',
@@ -94,8 +101,8 @@ export default defineConfig({
           },
         },
         // Icons are rasterized from public/synstate-logo.png by
-        // `pnpm run gen:icons`; favicon.ico (16/32/48) is Starlight's
-        // `favicon` above.
+        // `pnpm run gen:icons`; favicon.ico (16/32/48) is Starlight's `favicon`
+        // above.
         {
           tag: 'link',
           attrs: {

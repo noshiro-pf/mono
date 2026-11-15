@@ -21,12 +21,13 @@ export default [
   eslintPluginTsFortress.configs.recommended,
 
   {
-    ignores: ['.astro/**', 'src/content.config.ts', 'astro.config.mjs'],
+    ignores: ['.astro/**', 'src/content.config.ts'],
   },
 
-  eslintConfigForNodeJs(['scripts/**']),
+  // `astro.config.mjs` is loaded by Astro under Node.js, as `scripts/` are.
+  eslintConfigForNodeJs(['scripts/**', 'astro.config.mjs']),
   {
-    files: ['scripts/**'],
+    files: ['scripts/**', 'astro.config.mjs'],
     rules: defineKnownRules({
       '@typescript-eslint/explicit-function-return-type': 'off',
       'no-await-in-loop': 'off',
