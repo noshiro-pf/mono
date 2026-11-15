@@ -52,6 +52,39 @@ describe(eslintConfigForSynstateDom, () => {
     );
   });
 
+  test("reports synstate-dom's autofocus, the DOM property's spelling", () => {
+    const messages = verify(
+      dedent`
+        const a = <input autofocus />;
+      `,
+    );
+
+    assert.deepStrictEqual(
+      messages.map((m) => m.ruleId),
+      ['synstate-dom-a11y/no-autofocus'],
+    );
+  });
+
+  test('does not report an SVG element given a role in prefer-tag-over-role', () => {
+    const messages = verify(
+      dedent`
+        import { constant } from 'synstate-dom';
+        const a = (
+          <svg aria-label={constant('chart')} role={constant('img')}>
+            <g role={constant('button')} tabindex={constant(0)} />
+          </svg>
+        );
+      `,
+    );
+
+    assert.deepStrictEqual(
+      messages
+        .map((m) => m.ruleId)
+        .filter((id) => id === 'synstate-dom-a11y/prefer-tag-over-role'),
+      [],
+    );
+  });
+
   test("leaves a file that imports nothing from synstate-dom to jsx-a11y's reading", () => {
     const messages = verify(
       dedent`

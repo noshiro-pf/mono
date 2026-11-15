@@ -1,7 +1,10 @@
+// cspell:ignore axobject
+
 import {
   type TSESLint,
   type TSESTree,
   AST_NODE_TYPES,
+  AST_TOKEN_TYPES,
 } from '@typescript-eslint/utils';
 import type { Rule } from 'eslint';
 import {
@@ -14,6 +17,7 @@ import {
 } from 'eslint-rule-forge';
 import { Arr, castDeepMutable, hasKey, isRecord, Obj } from 'ts-data-forge';
 import type { DeepReadonly, ReadonlyRecord } from 'ts-type-forge';
+import { svgTagNames } from '../../constants/index.mjs';
 
 /**
  * The `meta` and `rules` of `plugin`, a plugin module that ships no types, each
@@ -31,9 +35,18 @@ import type { DeepReadonly, ReadonlyRecord } from 'ts-type-forge';
  * the copy's parents and children are copies too, so a rule that reads an
  * element's other attributes or its children's reads them unwrapped, those in
  * an object literal spread (`{...{ role: constant('button') }}`) included. It
- * reports on the copy, which has the original's location. A file that imports
- * neither `constant` nor a namespace from synstate-dom gets the rules
- * unchanged, so React's JSX reads as before.
+ * reports on the copy, which has the original's location.
+ *
+ * The copy also names an attribute by React's spelling where synstate-dom's,
+ * the DOM property's, differs and a rule compares the name with React's exactly
+ * ({@link reactSpellingOf}): `<input autofocus />` reads as
+ * `<input autoFocus />`, which `no-autofocus` reports. A file that imports
+ * neither `constant` nor a namespace from synstate-dom, and writes no such
+ * name, gets the rules unchanged, so React's JSX reads as before.
+ *
+ * `prefer-tag-over-role` skips an SVG element ({@link svgTagNames}): the HTML
+ * tag it asks for (`<button>`, `<img>`) cannot stand inside an `<svg>`, so a
+ * role is the only way to give one.
  *
  * A call is unwrapped when its callee is synstate-dom's `constant`, by any
  * local name or through a namespace import (`dom.constant`, not a computed
@@ -64,7 +77,15 @@ export const withSynstateDomConstants = (
     ...metaOf(plugin),
     rules: Object.fromEntries(
       rulesOf(plugin).map(
-        ([name, rule]) => [name, unwrappingConstants(rule)] as const,
+        ([name, rule]) =>
+          [
+            name,
+            unwrappingConstants(
+              name === 'prefer-tag-over-role'
+                ? skippingSvgElements(rule)
+                : rule,
+            ),
+          ] as const,
       ),
     ),
   }) as const;
@@ -73,6 +94,22 @@ export const withSynstateDomConstants = (
 // replaces synstate-dom under this name at its next major, so a module list
 // would only keep a name nothing will publish.
 const synstateDom = 'synstate-dom';
+
+/**
+ * React's spelling of each attribute name synstate-dom spells otherwise and a
+ * jsx-a11y rule compares with React's exactly, `propName(attribute) === …`.
+ * jsx-a11y 6.10's rules otherwise compare a name in one case (`toUpperCase`),
+ * read it through jsx-ast-utils' `getProp` or `hasProp`, which ignore case
+ * (`tabindex`, `accesskey`, `autocomplete`), or compare one spelled the same in
+ * both (`role`, `aria-*`, the attributes of aria-query's and axobject-query's
+ * element tables): `no-autofocus` alone matches `autoFocus` and not
+ * synstate-dom's `autofocus`, the DOM property's name. A name a rule takes from
+ * its options (`labelAttributes`, a per-element handler list) is compared as
+ * the configuration writes it, so it is left to the configuration.
+ */
+const reactSpellingOf: ReadonlyMap<string, string> = new Map<string, string>([
+  ['autofocus', 'autoFocus'],
+]);
 
 /** Nodes whose children jsx-ast-utils' `getPropValue` does not evaluate. */
 const opaque: ReadonlySet<string> = new Set<string>([
@@ -103,7 +140,8 @@ type Read = (node: DeepReadonly<TSESTree.Node>) => DeepReadonly<TSESTree.Node>;
 /**
  * Per file, keyed by its `Program`, how the wrapped rules read its nodes, built
  * once for every rule; `read` is `undefined` for a file that imports neither
- * `constant` nor a namespace from synstate-dom.
+ * `constant` nor a namespace from synstate-dom and writes no name of
+ * {@link reactSpellingOf}.
  */
 const mut_readers = new WeakMap<
   DeepReadonly<TSESTree.Program>,
@@ -261,51 +299,15 @@ const constantImports = (
   return Arr.isEmpty(specifiers) ? [] : [{ ...declaration, specifiers }];
 };
 
-const buildRead = (
+/**
+ * How the wrapped rules read the nodes of `sourceCode`, whose calls to
+ * `constant` are those `isConstant` names.
+ */
+const readerFor = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types -- ESLint's source code object, whose type has mutable members
   sourceCode: TSESLint.SourceCode,
-): Read | undefined => {
-  // A language other than JavaScript (`@eslint/json`, `@eslint/markdown`) hands
-  // its own root node, and a config may name such a file for these rules; it
-  // has no JSX to read.
-  const ast: unknown = sourceCode.ast;
-
-  if (
-    !isRecord(ast) ||
-    ast['type'] !== AST_NODE_TYPES.Program ||
-    !hasKey(ast, 'body') ||
-    !Arr.isArray(ast.body)
-  ) {
-    return undefined;
-  }
-
-  // Only an import from 'synstate-dom' itself counts: a `constant` re-exported
-  // by another module is not followed, since that would need the other file,
-  // and a rule reads one.
-  const declarations = getImportDeclarations(
-    sourceCode.ast,
-    synstateDom,
-  ).flatMap(constantImports);
-
-  if (Arr.isEmpty(declarations)) {
-    return undefined;
-  }
-
-  const resolve = buildCalleeResolver(declarations);
-
-  const isConstant: IsConstant = (callee) => {
-    // `(dom?.constant)(x)`: the resolver reads through type wrappers, not chains.
-    const resolved = resolve(
-      // eslint-disable-next-line total-functions/no-unsafe-type-assertion -- a callee, an expression, with its wrappers skipped is one too
-      castDeepMutable(unwrap(callee)) as TSESTree.Expression,
-    );
-
-    return (
-      resolved?.canonicalName === 'constant' &&
-      !isShadowedCallee(sourceCode, resolved, synstateDom)
-    );
-  };
-
+  isConstant: IsConstant,
+): Read => {
   /**
    * `node` with each `constant(x)` in it read as `x`, or `undefined` when it
    * holds none: the children ESLint's visitor keys name, down to a function or
@@ -376,6 +378,20 @@ const buildRead = (
     const mut_copy = { ...asNode<TSESTree.JSXAttribute>(node), parent };
 
     mut_copies.set(node, mut_copy);
+
+    const { name } = node;
+
+    if (name.type === AST_NODE_TYPES.JSXIdentifier) {
+      const reactName = reactSpellingOf.get(name.name);
+
+      if (reactName !== undefined) {
+        mut_copy.name = {
+          ...asNode<TSESTree.JSXIdentifier>(name),
+          name: reactName,
+          parent: mut_copy,
+        };
+      }
+    }
 
     if (
       node.value?.type === AST_NODE_TYPES.JSXExpressionContainer &&
@@ -509,6 +525,60 @@ const buildRead = (
   };
 };
 
+const buildRead = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types -- ESLint's source code object, whose type has mutable members
+  sourceCode: TSESLint.SourceCode,
+): Read | undefined => {
+  // A language other than JavaScript (`@eslint/json`, `@eslint/markdown`) hands
+  // its own root node, and a config may name such a file for these rules; it
+  // has no JSX to read.
+  const ast: unknown = sourceCode.ast;
+
+  if (
+    !isRecord(ast) ||
+    ast['type'] !== AST_NODE_TYPES.Program ||
+    !hasKey(ast, 'body') ||
+    !Arr.isArray(ast.body)
+  ) {
+    return undefined;
+  }
+
+  // Only an import from 'synstate-dom' itself counts: a `constant` re-exported
+  // by another module is not followed, since that would need the other file,
+  // and a rule reads one.
+  const declarations = getImportDeclarations(
+    sourceCode.ast,
+    synstateDom,
+  ).flatMap(constantImports);
+
+  if (Arr.isEmpty(declarations)) {
+    // A token is enough to tell: a tag named `autofocus` would make the file
+    // copied for nothing, and no rule reads it differently for that.
+    return sourceCode.ast.tokens.some(
+      (token) =>
+        token.type === AST_TOKEN_TYPES.JSXIdentifier &&
+        reactSpellingOf.has(token.value),
+    )
+      ? readerFor(sourceCode, () => false)
+      : undefined;
+  }
+
+  const resolve = buildCalleeResolver(declarations);
+
+  return readerFor(sourceCode, (callee) => {
+    // `(dom?.constant)(x)`: the resolver reads through type wrappers, not chains.
+    const resolved = resolve(
+      // eslint-disable-next-line total-functions/no-unsafe-type-assertion -- a callee, an expression, with its wrappers skipped is one too
+      castDeepMutable(unwrap(callee)) as TSESTree.Expression,
+    );
+
+    return (
+      resolved?.canonicalName === 'constant' &&
+      !isShadowedCallee(sourceCode, resolved, synstateDom)
+    );
+  });
+};
+
 const readerOf = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types -- ESLint's source code object, whose type has mutable members
   sourceCode: TSESLint.SourceCode,
@@ -568,6 +638,48 @@ const withoutFixes = (
       },
     },
   }) as Rule.RuleContext;
+
+/** Whether `node` is an element whose tag is an SVG tag. */
+const isSvgElement = (node: unknown): boolean =>
+  isRecord(node) &&
+  hasKey(node, 'name') &&
+  isRecord(node.name) &&
+  node.name['type'] === AST_NODE_TYPES.JSXIdentifier &&
+  typeof node.name['name'] === 'string' &&
+  svgTagNames.has(node.name['name']);
+
+/**
+ * `rule`, its `JSXOpeningElement` visitor not called for an SVG element: a tag
+ * synstate-dom creates in the SVG namespace, written as a lower-case
+ * identifier, as a tag is.
+ */
+const skippingSvgElements = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types -- ESLint's rule type, which has mutable members
+  rule: Rule.RuleModule,
+): Rule.RuleModule =>
+  ({
+    ...rule,
+    create: (context) => {
+      const visitors = rule.create(context);
+
+      const visit = visitors['JSXOpeningElement'];
+
+      return typeof visit === 'function'
+        ? {
+            ...visitors,
+            JSXOpeningElement: (
+              node: unknown,
+              ...rest: readonly unknown[]
+            ): unknown =>
+              isSvgElement(node)
+                ? undefined
+                : // As in `unwrappingConstants`: a call to the union of the
+                  // listener types would take only `never`.
+                  Reflect.apply(visit, undefined, Arr.toUnshifted(node)(rest)),
+          }
+        : visitors;
+    },
+  }) as const;
 
 /**
  * `rule`, its visitors handed nodes with `constant(x)` read as `x`. A visitor's

@@ -119,8 +119,9 @@ export const plugins: ReadonlyRecord<
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   'jsx-a11y': eslintPluginJsxA11y,
   // jsx-a11y again, reading synstate-dom's `constant(x)` attribute values as
-  // `x`. Under a name of its own, so that a configuration that registers
-  // jsx-a11y itself still loads: ESLint refuses two objects under one name.
+  // `x` and its attribute names as React's. Under a name of its own, so that a
+  // configuration that registers jsx-a11y itself still loads: ESLint refuses
+  // two objects under one name.
   'synstate-dom-a11y': withSynstateDomConstants(eslintPluginJsxA11y),
   math: eslintPluginMath,
   'prefer-arrow-functions': eslintPluginPreferArrowFunctions,

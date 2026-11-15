@@ -17,7 +17,6 @@ export const DagArcEdge = ({ record }: Props): JSX.Element => {
   const name = record.pipe(map(({ arc }) => arc.ariaLabel));
 
   return (
-    // eslint-disable-next-line synstate-dom-a11y/prefer-tag-over-role -- An SVG has no <img>: the group is one, named by its label.
     <g
       aria-label={name}
       class={constant('dag-edge dag-arc')}
