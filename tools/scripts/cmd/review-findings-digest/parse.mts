@@ -1,6 +1,7 @@
 // cspell:ignore xhigh
 import {
   deferralReasonOf,
+  reviewOpeningAdditions,
   reviewOpeningOf,
   reviewOpeningRounds,
   type DeferralReason,
@@ -218,12 +219,20 @@ export const findingsIn = (section: ReviewSection): readonly Finding[] => {
 
 /**
  * The total of rounds the section's opening states, in the form
- * `pr-description` asks for (`reviewOpeningOf`, `reviewOpeningRounds`), or
- * `undefined` when it opens any other way. The sentences after it divide that
- * total, so they are not added to it.
+ * `pr-description` asks for (`reviewOpeningOf`, `reviewOpeningRounds`), with
+ * the rounds its first sentence adds after it (`, and 4 more on the restack`:
+ * `reviewOpeningAdditions`), or `undefined` when it opens any other way. Other
+ * sentences divide that total, so they are not added to it.
  */
-const openingRounds = (lines: readonly string[]): number | undefined =>
-  reviewOpeningRounds(reviewOpeningOf(lines.join('\n')));
+const openingRounds = (lines: readonly string[]): number | undefined => {
+  const opening = reviewOpeningOf(lines.join('\n'));
+
+  const total = reviewOpeningRounds(opening);
+
+  return total === undefined
+    ? undefined
+    : total + reviewOpeningAdditions(opening);
+};
 
 export type Disposition = 'deferred' | 'dismissed' | 'fixed' | 'unknown';
 

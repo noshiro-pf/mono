@@ -137,6 +137,29 @@ describe('parseReview', () => {
     assert.strictEqual(review?.rounds, 6);
   });
 
+  test.each([
+    ['`/code-review high`, 3 rounds; then 2 rounds on the amend.', 5],
+    [
+      '`/code-review high`, 11 rounds, and 4 more on resolving the restack.',
+      15,
+    ],
+    ['`/code-review high`, 3 rounds: 2 before opening and 1 on the amend.', 3],
+    [
+      '`/code-review high`, 76 rounds: per-command loops, then 22 rounds over the whole diff.',
+      76,
+    ],
+    ['`/code-review high`, 4 rounds. Round 1 raised 2 more questions.', 4],
+  ] as const)(
+    'adds the rounds the opening sentence adds after its total: %j (#3329)',
+    (opening, expected) => {
+      const review = parseReview(
+        ['## Review', '', opening, '', '- Fixed: a.'].join('\n'),
+      );
+
+      assert.strictEqual(review?.rounds, expected);
+    },
+  );
+
   test('takes the total and the level from a self-review opening', () => {
     const review = parseReview(dedent`
       ## Review
