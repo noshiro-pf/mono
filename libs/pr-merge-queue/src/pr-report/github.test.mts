@@ -10,7 +10,7 @@ import {
   type FakeRoutes,
 } from '../../test/index.mjs';
 import { parseJson } from '../lib/index.mjs';
-import { createClient } from './github.mjs';
+import { createClient, type HandLinks } from './github.mjs';
 
 describe(createClient, () => {
   describe('the open pull requests', () => {
@@ -26,7 +26,7 @@ describe(createClient, () => {
       assert.isTrue(Result.isOk(facts));
 
       assert.deepStrictEqual(
-        facts.value.map(({ number }) => number),
+        facts.value.pulls.map(({ number }) => number),
         Array.from(Arr.range(asUint32(1), asUint32(104))),
       );
     });
@@ -71,7 +71,7 @@ describe(createClient, () => {
       assert.isTrue(Result.isOk(facts));
 
       assert.deepStrictEqual(
-        facts.value.map(({ number }) => number),
+        facts.value.pulls.map(({ number }) => number),
         Array.from(Arr.range(asUint32(1), asUint32(102))),
       );
     });
@@ -87,7 +87,7 @@ describe(createClient, () => {
 
       assert.isTrue(Result.isOk(facts));
 
-      assert.lengthOf(facts.value, 100);
+      assert.lengthOf(facts.value.pulls, 100);
 
       assert.deepStrictEqual(
         github.requested
@@ -148,7 +148,9 @@ describe(createClient, () => {
 
       assert.isTrue(Result.isOk(facts));
 
-      assert.deepStrictEqual(facts.value[0]?.linkedIssues, [byGraphQl(12)]);
+      assert.deepStrictEqual(facts.value.pulls[0]?.linkedIssues, [
+        byGraphQl(12),
+      ]);
     });
 
     test('reads the links GraphQL holds for one past its first hundred, by the cursor it gave', async () => {
@@ -177,9 +179,404 @@ describe(createClient, () => {
       assert.isTrue(Result.isOk(facts));
 
       assert.deepStrictEqual(
-        facts.value.find(({ number }) => number === 101)?.linkedIssues,
+        facts.value.pulls.find(({ number }) => number === 101)?.linkedIssues,
         [byGraphQl(12)],
       );
+    });
+  });
+
+  describe('how far the links GitHub holds were read', () => {
+    test('says every list was read when GraphQL answered each whole', async () => {
+      const read = await handLinksFrom(
+        answering({ html: undefined, linked: [12] }),
+        'token',
+      );
+
+      assert.deepStrictEqual(read, { unread: undefined, truncated: [] });
+    });
+
+    test('names every pull request as unread without a token', async () => {
+      const read = await handLinksFrom(
+        answering({ html: undefined, linked: [] }),
+        undefined,
+      );
+
+      assert.deepStrictEqual(read.unread?.pulls, [1]);
+
+      assert.include(read.unread?.because, 'without a token');
+    });
+
+    test('names every pull request as unread, and why, when GraphQL refuses', async () => {
+      const read = await handLinksFrom(
+        answering({ html: undefined, linked: 'refused' }),
+        'token',
+      );
+
+      assert.deepStrictEqual(read.unread?.pulls, [1]);
+
+      assert.include(read.unread?.because, '/graphql answered 403 Forbidden');
+    });
+
+    test('names as unread only the pull requests past the GraphQL page that failed', async () => {
+      const read = await handLinksFrom((request) => {
+        if (request.url === '/graphql') {
+          return cursorOf(request.body) === undefined
+            ? {
+                body: closingIssuesPage({
+                  numbers: [1],
+                  linkedTo: [],
+                  endCursor: 'c1',
+                }),
+              }
+            : { status: 502, body: { message: 'Bad Gateway' } };
+        }
+
+        return openPages([3])(request);
+      }, 'token');
+
+      assert.deepStrictEqual(read.unread?.pulls, [2, 3]);
+
+      assert.include(read.unread?.because, '502 Bad Gateway');
+    });
+
+    test('names every pull request as unread, with the messages GraphQL gave, when it answers errors for data', async () => {
+      const read = await handLinksFrom(
+        (request) =>
+          request.url === '/graphql'
+            ? {
+                body: {
+                  data: null,
+                  errors: [
+                    {
+                      type: 'RATE_LIMITED',
+                      message: 'API rate limit exceeded',
+                    },
+                  ],
+                },
+              }
+            : undefined,
+        'token',
+      );
+
+      assert.deepStrictEqual(read.unread, {
+        pulls: [1],
+        because: '/graphql answered errors: API rate limit exceeded',
+      });
+    });
+
+    test('gives both the errors and the shape when GraphQL answers errors beside data it does not know', async () => {
+      const read = await handLinksFrom(
+        (request) =>
+          request.url === '/graphql'
+            ? {
+                body: {
+                  data: { repository: null },
+                  errors: [{ message: 'Resource not accessible' }],
+                },
+              }
+            : undefined,
+        'token',
+      );
+
+      assert.include(
+        read.unread?.because,
+        '/graphql answered errors: Resource not accessible; /graphql has an unexpected shape: ',
+      );
+
+      assert.include(read.unread?.because, 'repository');
+    });
+
+    test('names every pull request as unread when GraphQL answers a shape it does not know', async () => {
+      const read = await handLinksFrom(
+        (request) =>
+          request.url === '/graphql' ? { body: { data: null } } : undefined,
+        'token',
+      );
+
+      assert.deepStrictEqual(read.unread?.pulls, [1]);
+
+      assert.include(read.unread?.because, '/graphql');
+    });
+
+    test('names as unread the pull requests the GraphQL pages had not reached when their bound ran out', async () => {
+      // Every page says there is another, and lists a pull request the open
+      // list does not have.
+      const read = await handLinksFrom((request) => {
+        if (request.url === '/graphql') {
+          return {
+            body: closingIssuesPage({
+              numbers: [999],
+              linkedTo: [],
+              endCursor: 'again',
+            }),
+          };
+        }
+
+        return openPages([2])(request);
+      }, 'token');
+
+      assert.deepStrictEqual(read.unread?.pulls, [1, 2]);
+
+      assert.include(read.unread?.because, 'did not end within 2 pages');
+    });
+
+    test('names as unread the pull requests past a GraphQL page that says another follows without a cursor', async () => {
+      const read = await handLinksFrom((request) => {
+        if (request.url === '/graphql') {
+          return {
+            body: {
+              data: {
+                repository: {
+                  pullRequests: {
+                    pageInfo: { hasNextPage: true, endCursor: null },
+                    nodes: [
+                      {
+                        number: 1,
+                        closingIssuesReferences: { totalCount: 0, nodes: [] },
+                      },
+                    ],
+                  },
+                },
+              },
+            },
+          };
+        }
+
+        return openPages([2])(request);
+      }, 'token');
+
+      assert.deepStrictEqual(read.unread?.pulls, [2]);
+
+      assert.include(read.unread?.because, 'gave no cursor');
+    });
+
+    test('gives the reason as one line, its runs of space folded', async () => {
+      const read = await handLinksFrom(
+        (request) =>
+          request.url === '/graphql'
+            ? {
+                status: 502,
+                body: {
+                  message: 'a \r\n\r\n  b\rc\u{2028}d\u{85}e\vf\tg  h\u{2029}',
+                },
+              }
+            : undefined,
+        'token',
+      );
+
+      assert.isTrue(
+        (read.unread?.because ?? '').endsWith(': a; b; c; d; e; f g h'),
+      );
+    });
+
+    test('cuts a long reason short by character, the ellipsis within the bound', async () => {
+      const read = await handLinksFrom(
+        (request) =>
+          request.url === '/graphql'
+            ? { status: 502, body: { message: '😀'.repeat(400) } }
+            : undefined,
+        'token',
+      );
+
+      const because = read.unread?.because ?? '';
+
+      assert.isTrue(because.endsWith('😀…'));
+
+      assert.lengthOf(Array.from(because), 300);
+    });
+
+    test('cuts before a space without leaving it before the ellipsis', async () => {
+      const read = await handLinksFrom(
+        (request) =>
+          request.url === '/graphql'
+            ? { status: 502, body: { message: 'x '.repeat(400) } }
+            : undefined,
+        'token',
+      );
+
+      assert.isTrue((read.unread?.because ?? '').endsWith('x…'));
+    });
+
+    test('cuts after a separator without leaving it before the ellipsis', async () => {
+      const read = await handLinksFrom(
+        (request) =>
+          request.url === '/graphql'
+            ? { status: 502, body: { message: 'x\n'.repeat(400) } }
+            : undefined,
+        'token',
+      );
+
+      assert.isTrue((read.unread?.because ?? '').endsWith('x…'));
+    });
+
+    test('keeps a joined emoji sequence whole, and folds a long run of spaces', async () => {
+      const read = await handLinksFrom(
+        (request) =>
+          request.url === '/graphql'
+            ? {
+                status: 502,
+                body: {
+                  message: `👨\u{200D}👩\u{200D}👧${' '.repeat(200_000)}end`,
+                },
+              }
+            : undefined,
+        'token',
+      );
+
+      assert.isTrue(
+        (read.unread?.because ?? '').endsWith('👨\u{200D}👩\u{200D}👧 end'),
+      );
+    });
+
+    test('cuts a reason of many lines short', async () => {
+      const read = await handLinksFrom(
+        (request) =>
+          request.url === '/graphql'
+            ? { status: 502, body: { message: 'field\n'.repeat(200_000) } }
+            : undefined,
+        'token',
+      );
+
+      assert.isTrue((read.unread?.because ?? '').endsWith('field…'));
+    });
+
+    test('keeps a reason of exactly the bound whole, and cuts one past it', async () => {
+      const opening = REFUSAL_OPENING;
+
+      const whole = await reasonOf(300 - opening.length);
+
+      assert.strictEqual(
+        whole,
+        `${opening}${'😀'.repeat(300 - opening.length)}`,
+      );
+
+      const cut = await reasonOf(301 - opening.length);
+
+      assert.isTrue(cut.endsWith('😀…'));
+
+      assert.lengthOf(Array.from(cut), 300);
+    });
+
+    test('keeps whole a reason of fewer characters than the bound, though more UTF-16 units', async () => {
+      const read = await handLinksFrom(
+        (request) =>
+          request.url === '/graphql'
+            ? { status: 502, body: { message: '😀'.repeat(200) } }
+            : undefined,
+        'token',
+      );
+
+      assert.isTrue((read.unread?.because ?? '').endsWith('😀'.repeat(200)));
+    });
+
+    test('names a pull request whose list GraphQL cut short', async () => {
+      const read = await handLinksFrom(
+        (request) =>
+          request.url === '/graphql'
+            ? {
+                body: closingIssuesPage({
+                  numbers: [1],
+                  linkedTo: Array.from(Arr.range(asUint32(1), asUint32(101))),
+                  endCursor: undefined,
+                  totalCount: 101,
+                }),
+              }
+            : undefined,
+        'token',
+      );
+
+      assert.deepStrictEqual(read, { unread: undefined, truncated: [1] });
+    });
+
+    test('leaves out a pull request cut short that the open list does not have', async () => {
+      const read = await handLinksFrom(
+        (request) =>
+          request.url === '/graphql'
+            ? {
+                body: closingIssuesPage({
+                  numbers: [1, 2],
+                  linkedTo: [],
+                  endCursor: undefined,
+                  totalCount: 101,
+                }),
+              }
+            : undefined,
+        'token',
+      );
+
+      assert.deepStrictEqual(read.truncated, [1]);
+    });
+
+    test('names the pull requests as unread, without a token hint, when the GraphQL rate limit is spent', async () => {
+      const github = await fakeGitHub((request) =>
+        request.url === '/graphql'
+          ? {
+              status: 403,
+              headers: { 'x-ratelimit-remaining': '0' },
+              body: { message: 'API rate limit exceeded' },
+            }
+          : undefined,
+      );
+
+      // With the checks, whose REST reads all succeed: the report stands.
+      const facts = await createClient('token', github.baseUrl).facts(repo, {
+        checks: true,
+      });
+
+      await github.close();
+
+      assert.isTrue(Result.isOk(facts));
+
+      assert.deepStrictEqual(facts.value.handLinks.unread?.pulls, [1]);
+
+      assert.include(
+        facts.value.handLinks.unread?.because,
+        'The GraphQL rate limit',
+      );
+
+      assert.notInclude(facts.value.handLinks.unread?.because, 'GH_TOKEN');
+    });
+
+    test('names the pull requests as unread, and why, when a secondary rate limit refuses GraphQL', async () => {
+      const read = await handLinksFrom(
+        (request) =>
+          request.url === '/graphql'
+            ? {
+                status: 403,
+                headers: { 'retry-after': '60' },
+                body: {
+                  message: 'You have exceeded a secondary rate limit.',
+                },
+              }
+            : undefined,
+        'token',
+      );
+
+      assert.deepStrictEqual(read.unread?.pulls, [1]);
+
+      assert.include(read.unread?.because, 'secondary rate limit');
+    });
+
+    test('still fails the report when the REST rate limit is spent', async () => {
+      const github = await fakeGitHub((request) =>
+        request.url.includes('/check-runs')
+          ? {
+              status: 403,
+              headers: { 'x-ratelimit-remaining': '0' },
+              body: { message: 'API rate limit exceeded' },
+            }
+          : undefined,
+      );
+
+      const facts = await createClient(undefined, github.baseUrl).facts(repo, {
+        checks: true,
+      });
+
+      await github.close();
+
+      assert.isTrue(Result.isErr(facts));
+
+      assert.include(facts.value, 'rate limit was spent');
     });
   });
 
@@ -210,7 +607,7 @@ describe(createClient, () => {
 
       assert.isTrue(Result.isOk(facts));
 
-      const read = await client.queueComments(repo, 'main', facts.value);
+      const read = await client.queueComments(repo, 'main', facts.value.pulls);
 
       await github.close();
 
@@ -347,6 +744,7 @@ const answering =
                       {
                         number: 1,
                         closingIssuesReferences: {
+                          totalCount: answers.linked.length,
                           nodes: answers.linked.map((number) => ({
                             ...byGraphQl(number),
                             state: 'OPEN',
@@ -409,9 +807,46 @@ const readThrough = async (
   assert.isTrue(Result.isOk(facts));
 
   return {
-    linkedIssues: facts.value.flatMap(({ linkedIssues }) => linkedIssues),
+    linkedIssues: facts.value.pulls.flatMap(({ linkedIssues }) => linkedIssues),
     requested: github.requested,
   };
+};
+
+/**
+ * What `facts` says of the links GitHub holds, read with `{ checks: false }`
+ * from a fake GitHub that answers `routes`.
+ */
+const handLinksFrom = async (
+  routes: FakeRoutes,
+  token: string | undefined,
+): Promise<HandLinks> => {
+  const github = await fakeGitHub(routes);
+
+  const facts = await createClient(token, github.baseUrl).facts(repo, {
+    checks: false,
+  });
+
+  await github.close();
+
+  assert.isTrue(Result.isOk(facts));
+
+  return facts.value.handLinks;
+};
+
+/** What a 502 from GraphQL opens its reason with, before the message. */
+const REFUSAL_OPENING = '/graphql answered 502 Bad Gateway: ';
+
+/** The reason `facts` gives when GraphQL answers 502 with `count` emoji. */
+const reasonOf = async (count: number): Promise<string> => {
+  const read = await handLinksFrom(
+    (request) =>
+      request.url === '/graphql'
+        ? { status: 502, body: { message: '😀'.repeat(count) } }
+        : undefined,
+    'token',
+  );
+
+  return read.unread?.because ?? '';
 };
 
 /** {@link readThrough}'s `linkedIssues` alone. */
@@ -499,10 +934,13 @@ const closingIssuesPage = ({
   numbers,
   linkedTo,
   endCursor,
+  totalCount = linkedTo.length,
 }: Readonly<{
   numbers: readonly number[];
   linkedTo: readonly number[];
   endCursor: string | undefined;
+  /** How many each links in all, more than `linkedTo` for a list cut short. */
+  totalCount?: number;
 }>): unknown =>
   ({
     data: {
@@ -515,6 +953,7 @@ const closingIssuesPage = ({
           nodes: numbers.map((number) => ({
             number,
             closingIssuesReferences: {
+              totalCount,
               nodes: linkedTo.map((linked) => ({
                 ...byGraphQl(linked),
                 state: 'OPEN',

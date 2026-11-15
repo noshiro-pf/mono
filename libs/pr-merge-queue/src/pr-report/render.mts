@@ -15,6 +15,8 @@ import {
 } from 'pr-report-core';
 import { Arr } from 'ts-data-forge';
 import type { ReadonlyRecord } from 'ts-type-forge';
+import type { HandLinks } from './github.mjs';
+import { describeHandLinks } from './hand-links.mjs';
 
 const EMPTY = 'No open pull requests.';
 
@@ -37,7 +39,10 @@ const GLYPH = {
  * the information — a table would have to spell the tree back out in a column,
  * and a reader would have to rebuild it.
  */
-export const renderMarkdown = (report: PrReport): string => {
+export const renderMarkdown = (
+  report: PrReport,
+  handLinks: HandLinks,
+): string => {
   if (!Arr.isNonEmpty(report.entries)) {
     return [
       heading(report),
@@ -80,13 +85,16 @@ export const renderMarkdown = (report: PrReport): string => {
     ...cyclesSection(report),
     ...mergedSection(report, 'markdown'),
     ...issuesSection(report, 'markdown'),
-    ...footnote(report),
+    ...footnote(report, handLinks),
     '',
   ].join('\n');
 };
 
 /** The same report drawn with box characters, for a terminal. */
-export const renderTerminal = (report: PrReport): string => {
+export const renderTerminal = (
+  report: PrReport,
+  handLinks: HandLinks,
+): string => {
   if (!Arr.isNonEmpty(report.entries)) {
     return [
       title(report),
@@ -139,7 +147,7 @@ export const renderTerminal = (report: PrReport): string => {
     ...cyclesSection(report).map(withoutHeadingMark),
     ...mergedSection(report, 'terminal').map(withoutHeadingMark),
     ...issuesSection(report, 'terminal').map(withoutHeadingMark),
-    ...footnote(report).map((l) => l.replace(/^> /u, '')),
+    ...footnote(report, handLinks).map((l) => l.replace(/^> /u, '')),
     '',
   ].join('\n');
 };
@@ -447,10 +455,16 @@ const STATUS_WORDS = {
   unknown: 'unknown',
 } as const satisfies ReadonlyRecord<ReferenceStatus, string>;
 
-/** Said once, at the bottom, rather than beside every pull request. */
-const footnote = (report: PrReport): readonly string[] =>
+/**
+ * Said once, at the bottom, rather than beside every pull request: that the
+ * issue links are the keywords alone, without a token, and with one, which pull
+ * requests' links GitHub's list could not complete (`describeHandLinks`). The
+ * reason given there is GitHub's or a proxy's text, put in unescaped as every
+ * refusal the report prints is: Markdown in it is drawn as Markdown.
+ */
+const footnote = (report: PrReport, handLinks: HandLinks): readonly string[] =>
   report.authenticated
-    ? ([] as const)
+    ? describeHandLinks(handLinks).flatMap((line) => ['', `> ${line}`])
     : ([
         '',
         '> Read without a token: the linked issues are the ones the bodies',

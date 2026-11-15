@@ -7,7 +7,7 @@ import {
   tokenFromEnv,
   viewerLogin,
 } from '../lib/index.mjs';
-import { readReport } from '../pr-report/index.mjs';
+import { describeHandLinks, readReport } from '../pr-report/index.mjs';
 import {
   attemptedFile,
   issueNumbers,
@@ -162,6 +162,9 @@ export const startableIssues = async (
             ]
           : []),
         ...others.notes,
+        // An issue linked by hand alone to a pull request whose links were not
+        // all read is listed as startable here, though one closes it.
+        ...describeHandLinks(read.value.handLinks),
       ],
     }),
   );

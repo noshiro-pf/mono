@@ -53,6 +53,15 @@ const MAX_CHECK_RUN_PAGES = 10;
  */
 const MAX_ISSUE_PAGES = 20;
 
+/**
+ * How many of one pull request's linked issues the GraphQL query lists: the
+ * most one page holds, which costs nothing more against GraphQL's rate limit
+ * than one, as a hundred pull requests a page cost one request each either way.
+ * A pull request with more is named in {@link HandLinks.truncated}, so that the
+ * ones past it are known to be unread rather than taken for none.
+ */
+const LINKS_PER_PULL = 100;
+
 const PullRequestSchema = t.record({
   number: t.number(),
   title: t.string(),
@@ -190,6 +199,16 @@ const CommentListSchema = t.array(
   }),
 );
 
+/**
+ * What GraphQL answers in place of `data` when it refuses a query it accepted
+ * over HTTP — its rate limit spent among them, as `type: RATE_LIMITED`.
+ */
+const GraphQlErrorsSchema = t.record({
+  errors: t.array(t.record({ message: t.string() })),
+  // Whether there is any, which decides whether the shape error is news.
+  data: t.optional(t.unknown()),
+});
+
 const ClosingIssuesSchema = t.record({
   data: t.record({
     repository: t.record({
@@ -205,6 +224,9 @@ const ClosingIssuesSchema = t.record({
             // `closingIssuesIn` skips: one unreadable issue used to fail this
             // whole answer and drop every pull request's list with it.
             closingIssuesReferences: t.record({
+              // Compared with the length of `nodes`, which this query caps at
+              // `LINKS_PER_PULL`, to say which lists it cut short.
+              totalCount: t.number(),
               nodes: t.array(
                 t.union([
                   t.record({
@@ -240,15 +262,16 @@ export type Client = Readonly<{
     branch: string,
   ) => Promise<Result<readonly string[], string>>;
   /**
-   * The open pull requests. With `{ checks: false }`, one page of the list,
-   * and one page of a GraphQL query with a token, per hundred pull requests,
-   * rather than about four requests per pull request: no comparison and no
-   * check is read, for a caller that reads neither.
+   * The open pull requests, and how far the links GitHub holds for them were
+   * read. With `{ checks: false }`, one page of the list, and one page of a
+   * GraphQL query with a token, per hundred pull requests, rather than about
+   * four requests per pull request: no comparison and no check is read, for a
+   * caller that reads neither.
    */
   facts: (
     repo: RepoRef,
     options?: Readonly<{ checks: boolean }>,
-  ) => Promise<Result<readonly PullRequestFacts[], string>>;
+  ) => Promise<Result<OpenPullFacts, string>>;
   /**
    * The pull requests that landed in the last `withinDays` days, newest first.
    * One request: the closed list, sorted by when it last changed.
@@ -295,6 +318,35 @@ export type Client = Readonly<{
   ) => Promise<ReadonlyMap<number, ReferenceStatus>>;
 }>;
 
+/** What {@link Client.facts} reads. */
+export type OpenPullFacts = Readonly<{
+  pulls: readonly PullRequestFacts[];
+  handLinks: HandLinks;
+}>;
+
+/**
+ * Which open pull requests' `linkedIssues` lack some of the links GitHub holds
+ * (the sidebar list, where a link made by hand is), because the GraphQL query
+ * that reads them was not made, failed or cut a list short. Their links are
+ * then the closing keywords alone, or the first {@link LINKS_PER_PULL} of
+ * GitHub's list and the keywords: an issue linked by hand alone may be missing
+ * from them, which is what tells "no link" from "not read". A pull request
+ * named in neither had its whole list read.
+ */
+export type HandLinks = Readonly<{
+  /**
+   * The ones whose list was not read, lowest first, and why: no token, or what
+   * GraphQL answered, as one line of at most a few hundred characters.
+   * `undefined` when every list was read.
+   */
+  unread: Readonly<{ pulls: readonly number[]; because: string }> | undefined;
+  /**
+   * The ones with more linked issues than {@link LINKS_PER_PULL}, of which only
+   * that many were listed, lowest first.
+   */
+  truncated: readonly number[];
+}>;
+
 /** What {@link Client.issueBodies} reads of one issue. */
 export type IssueBody = Readonly<{
   open: boolean;
@@ -329,6 +381,10 @@ export const createClient = (
    * One call. A body makes it a POST, which is only ever the GraphQL query —
    * everything else this reads is a GET, so the media type is all there is to
    * configure.
+   *
+   * GraphQL's rate limit is a budget of its own, spent only with a token, so a
+   * refusal of the query neither sets {@link mut_state} — the REST reads it
+   * would have failed may well have succeeded — nor advises a token.
    */
   const request = async (
     route: string,
@@ -346,16 +402,20 @@ export const createClient = (
       return response;
     }
 
-    if (response.value.rateLimited) {
+    const graphql = body !== undefined;
+
+    if (!graphql && response.value.rateLimited) {
       mut_state.rateLimited = true;
     }
 
     const refused = `${route} answered ${response.value.message}` as const;
 
     return Result.err(
-      response.value.rateLimited
-        ? `${refused}\nThe rate limit is spent. Set GH_TOKEN or GITHUB_TOKEN to raise it from 60 requests an hour to 5000.`
-        : refused,
+      !response.value.rateLimited
+        ? refused
+        : graphql
+          ? `${refused}\nThe GraphQL rate limit, a budget of its own beside the REST one, is spent.`
+          : `${refused}\nThe rate limit is spent. Set GH_TOKEN or GITHUB_TOKEN to raise it from 60 requests an hour to 5000.`,
     );
   };
 
@@ -600,11 +660,14 @@ export const createClient = (
    * into the default branch, so a stacked one answers an empty list. That is
    * why `linkedIssuesOf` joins this with the keywords rather than taking it as
    * the answer.
+   *
+   * What it could not read is said rather than dropped: the first refusal, or
+   * answer of a shape this does not know, and the lists cut short.
    */
   const closingIssues = async (
     repo: RepoRef,
     openCount: number,
-  ): Promise<ReadonlyMap<number, readonly LinkedIssue[]>> => {
+  ): Promise<ClosingIssuesRead> => {
     const query = [
       'query($owner: String!, $name: String!, $after: String) {',
       '  repository(owner: $owner, name: $name) {',
@@ -612,7 +675,8 @@ export const createClient = (
       '      pageInfo { hasNextPage endCursor }',
       '      nodes {',
       '        number',
-      '        closingIssuesReferences(first: 10) {',
+      `        closingIssuesReferences(first: ${LINKS_PER_PULL}) {`,
+      '          totalCount',
       '          nodes { number title url state repository { nameWithOwner } }',
       '        }',
       '      }',
@@ -623,6 +687,8 @@ export const createClient = (
 
     const mut_linked = new Map<number, readonly LinkedIssue[]>();
 
+    const mut_truncated: number[] = [];
+
     // A page that fails keeps the pages before it: the pull requests it would
     // have covered fall back to their keywords, as every one does when GraphQL
     // refuses outright.
@@ -631,6 +697,11 @@ export const createClient = (
     // A bound rather than a `while (true)`, as for {@link MAX_CHECK_RUN_PAGES}:
     // the pages the REST list just took, and one for any opened since.
     const maxPages = asUint32(Math.floor(openCount / PAGE_SIZE) + 2);
+
+    // Why the pages stopped before the last, if they did.
+    let mut_refusal: string | undefined = undefined;
+
+    let mut_ended = false;
 
     for (const _page of Arr.seq(maxPages)) {
       const answered = await request('/graphql', {
@@ -641,32 +712,56 @@ export const createClient = (
       });
 
       if (Result.isErr(answered)) {
+        mut_refusal = answered.value;
+
         break;
       }
 
       const parsed = parseJson(answered.value, ClosingIssuesSchema, '/graphql');
 
       if (Result.isErr(parsed)) {
+        mut_refusal = refusalOf(answered.value, parsed.value);
+
         break;
       }
 
       const { nodes, pageInfo } = parsed.value.data.repository.pullRequests;
 
       for (const node of nodes) {
-        mut_linked.set(
-          node.number,
-          closingIssuesIn(repo, node.closingIssuesReferences.nodes),
-        );
+        const references = node.closingIssuesReferences;
+
+        mut_linked.set(node.number, closingIssuesIn(repo, references.nodes));
+
+        if (references.totalCount > references.nodes.length) {
+          mut_truncated.push(node.number);
+        }
       }
 
-      if (!pageInfo.hasNextPage || pageInfo.endCursor === null) {
+      if (!pageInfo.hasNextPage) {
+        mut_ended = true;
+
+        break;
+      }
+
+      if (pageInfo.endCursor === null) {
+        mut_refusal =
+          '/graphql said another page of pull requests follows, and gave no cursor to read it by';
+
         break;
       }
 
       mut_after = pageInfo.endCursor;
     }
 
-    return mut_linked;
+    return {
+      linked: mut_linked,
+      truncated: mut_truncated,
+      refusal:
+        mut_refusal ??
+        (mut_ended
+          ? undefined
+          : `the pages of /graphql did not end within ${maxPages} pages`),
+    };
   };
 
   return {
@@ -935,10 +1030,17 @@ export const createClient = (
         return listed;
       }
 
-      const linked =
+      const links =
         token === undefined
-          ? new Map<number, readonly LinkedIssue[]>()
+          ? ({
+              linked: new Map<number, readonly LinkedIssue[]>(),
+              truncated: [],
+              refusal:
+                'read without a token, and GraphQL refuses an anonymous caller',
+            } as const)
           : await closingIssues(repo, listed.value.length);
+
+      const { linked } = links;
 
       const mut_facts: PullRequestFacts[] = [];
 
@@ -1000,7 +1102,10 @@ export const createClient = (
       const unreadable = describeUnreadableChecks(mut_unreadable);
 
       return unreadable === undefined
-        ? Result.ok(mut_facts)
+        ? Result.ok({
+            pulls: mut_facts,
+            handLinks: handLinksOf(listed.value, links),
+          })
         : Result.err(unreadable);
     },
   };
@@ -1025,6 +1130,24 @@ type RequestOptions = Readonly<{
   accept?: MediaType | undefined;
   body?: string | undefined;
 }>;
+
+/** What `closingIssues` read, and what it could not. */
+type ClosingIssuesRead = Readonly<{
+  linked: ReadonlyMap<number, readonly LinkedIssue[]>;
+  /** The pull requests whose list was cut short. */
+  truncated: readonly number[];
+  /** Why the pages stopped before the last, if they did. */
+  refusal: string | undefined;
+}>;
+
+/** How many characters of a refusal {@link HandLinks.unread} carries. */
+const MAX_REASON_LENGTH = 300;
+
+/** One line break, of any kind a terminal or a log breaks a line at. */
+const LINE_BREAK = /[\n\v\f\r\u{85}\u{2028}\u{2029}]/u;
+
+/** A run of whitespace within a line, read as one space. */
+const SPACE_RUNS = /\s+/gu;
 
 /**
  * The issues an open pull request closes: the ones GitHub links
@@ -1067,6 +1190,109 @@ const linkedIssuesOf = (
         state: 'unknown' as const,
       })),
   ];
+};
+
+/**
+ * A refusal as one line of at most {@link MAX_REASON_LENGTH} characters, the
+ * ellipsis of one cut short included: it is printed inside a sentence, in a
+ * terminal and a log too, and an answer of an unexpected shape names every
+ * field that did not match, which can run to thousands of lines. Cut in the
+ * JSON too, which carries the same reason. Its lines are joined by `; `, or by
+ * a space after a line that ends in a colon, as a heading does.
+ */
+// Only the line breaks and the runs of space are its own: the characters are
+// GitHub's or a proxy's, a control or an invisible one included, as in every
+// other refusal the report prints; making those safe to print is not done yet
+// for any refusal, and is one change for all of them. The whole reason is split
+// and joined, once a read, in time linear in its length.
+const cutShort = (reason: string): string => {
+  const lines = reason
+    .split(LINE_BREAK)
+    .map((line) => line.replaceAll(SPACE_RUNS, ' ').trim())
+    .filter((line) => line !== '');
+
+  // A line that ends in a colon heads what follows, as a shape error's first
+  // line does; one that ends so by chance, a refusal whose message is empty,
+  // runs into the next sentence, which still reads.
+  const joined = lines
+    .map((line, index) =>
+      index === 0
+        ? line
+        : `${(lines[index - 1] ?? '').endsWith(':') ? ' ' : '; '}${line}`,
+    )
+    .join('');
+
+  // By code point, which keeps a surrogate pair whole; a grapheme of several,
+  // such as an emoji sequence, may still be cut, which costs a glyph before the
+  // ellipsis of a reason already cut. One past the bound says it is over.
+  const mut_head: string[] = [];
+
+  for (const character of joined) {
+    if (mut_head.length > MAX_REASON_LENGTH) {
+      break;
+    }
+
+    mut_head.push(character);
+  }
+
+  if (Arr.isMaxLengthArray(MAX_REASON_LENGTH, mut_head)) {
+    return joined;
+  }
+
+  // The separator a cut may end on goes, and a semicolon of the reason's own
+  // with it, which costs a character of a reason already cut. The refusals
+  // given here all open with the route or the words that refused, which stay.
+  return `${mut_head
+    .slice(0, MAX_REASON_LENGTH - 1)
+    .join('')
+    .replace(/[\s;]+$/u, '')}…`;
+};
+
+/**
+ * {@link HandLinks} of the open pull requests: those GraphQL's pages did not
+ * reach when they stopped early are unread. One the pages did not list without
+ * stopping — closed between the two reads — has nothing left to read, and one
+ * they listed that the open list does not — opened between them — is not
+ * reported.
+ */
+const handLinksOf = (
+  open: readonly Readonly<{ number: number }>[],
+  { linked, truncated, refusal }: ClosingIssuesRead,
+): HandLinks => {
+  const numbers = open.map(({ number }) => number).toSorted((a, b) => a - b);
+
+  const unread = numbers.filter((number) => !linked.has(number));
+
+  const cut = new Set(truncated);
+
+  return {
+    unread:
+      refusal === undefined || !Arr.isNonEmpty(unread)
+        ? undefined
+        : { pulls: unread, because: cutShort(refusal) },
+    truncated: numbers.filter((number) => cut.has(number)),
+  };
+};
+
+/**
+ * Why a GraphQL answer of an unexpected shape gave no list: the messages of its
+ * `errors`, when it carries any, and the shape error `unexpected` beside them
+ * unless the answer has no data at all, for which the errors are the whole
+ * story.
+ */
+const refusalOf = (answer: string, unexpected: string): string => {
+  const parsed = parseJson(answer, GraphQlErrorsSchema, '/graphql');
+
+  if (Result.isErr(parsed) || !Arr.isNonEmpty(parsed.value.errors)) {
+    return unexpected;
+  }
+
+  const errors =
+    `/graphql answered errors: ${parsed.value.errors.map(({ message }) => message).join('; ')}` as const;
+
+  return parsed.value.data === undefined || parsed.value.data === null
+    ? errors
+    : `${errors}\n${unexpected}`;
 };
 
 /**
