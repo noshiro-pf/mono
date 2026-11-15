@@ -17,17 +17,25 @@ const projectsRoot = fs.mkdtempSync(
   path.join(os.tmpdir(), 'no-type-only-codec-'),
 );
 
+const COMPILER_OPTIONS = {
+  module: 'nodenext',
+  moduleResolution: 'nodenext',
+  target: 'es2022',
+  strict: true,
+  noEmit: true,
+  skipLibCheck: true,
+  types: [],
+} as const;
+
 const TSCONFIG = JSON.stringify({
-  compilerOptions: {
-    module: 'nodenext',
-    moduleResolution: 'nodenext',
-    target: 'es2022',
-    strict: true,
-    noEmit: true,
-    skipLibCheck: true,
-    types: [],
-  },
+  compilerOptions: COMPILER_OPTIONS,
   include: ['**/*.mts'],
+});
+
+/** {@link TSCONFIG} for a project of CommonJS TypeScript files. */
+const CTS_TSCONFIG = JSON.stringify({
+  compilerOptions: COMPILER_OPTIONS,
+  include: ['**/*.cts'],
 });
 
 const USER_CODEC = dedent`
@@ -193,6 +201,43 @@ describe('no-type-only-codec', () => {
           `,
         }),
       },
+      ...(
+        [
+          [
+            'a require() in a CommonJS TypeScript file (#2832)',
+            'require-cts',
+            dedent`
+              const codecs = require('./codec.cjs');
+
+              export const isUser = (u: unknown): boolean => codecs.User.is(u);
+            `,
+          ],
+          [
+            'an import-equals require of a CommonJS TypeScript file',
+            'import-equals-cts',
+            dedent`
+              import codecs = require('./codec.cjs');
+
+              export const isUser = (u: unknown): boolean => codecs.User.is(u);
+            `,
+          ],
+          [
+            'a require() that reads no member',
+            'require-cts-whole',
+            dedent`
+              require('./codec.cjs');
+            `,
+          ],
+        ] as const
+      ).map(([name, projectName, main]) => ({
+        name,
+        ...project(
+          projectName,
+          { 'tsconfig.json': CTS_TSCONFIG, 'main.cts': main },
+          USER_CODEC,
+          'codec.cts',
+        ),
+      })),
       {
         name: 'a value import through a barrel',
         ...project('barrel-named', {
