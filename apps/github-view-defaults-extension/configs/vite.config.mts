@@ -1,41 +1,24 @@
-import * as path from 'node:path';
 import { defineConfig } from 'vite';
 import { workspaceRootPath } from '../scripts/workspace-root-path.mjs';
 // eslint-disable-next-line import-x/no-relative-packages
 import { writeManifestVersion } from '../../../tools/configs/chrome-extension-manifest.mjs';
+import { outDir, scriptConfig } from './script.config.mjs';
 
 /**
- * The whole build: one content script, and the manifest and icons beside it.
- *
- * A content script is evaluated as a classic script, not as a module, so it
- * cannot carry `import` statements. Library mode with the `iife` format emits
- * one self-contained file, which is what the manifest names.
+ * The first build: the content script that sets the defaults, and the manifest
+ * and icons beside it. The other scripts the manifest names are built after it
+ * by the configs beside this one (`script.config.mts`).
  *
  * `public/` is copied by Vite's `publicDir` handling, the manifest given the
  * `package.json` version on the way, so `dist/` is what `chrome://extensions`
- * loads as-is.
+ * loads as-is once `pnpm run build` has run every build.
  */
-const outDir = path.resolve(workspaceRootPath, 'dist');
-
 export default defineConfig({
-  root: workspaceRootPath,
+  ...scriptConfig({
+    entry: 'src/content.mts',
+    globalName: 'githubDiffDefaults',
+    first: true,
+  }),
 
   plugins: [writeManifestVersion({ packageRoot: workspaceRootPath, outDir })],
-
-  build: {
-    outDir,
-    emptyOutDir: true,
-    sourcemap: true,
-
-    // Only ever loaded by the Chrome the manifest's `minimum_chrome_version`
-    // names, so there is no reason to down-level anything.
-    target: 'chrome116',
-
-    lib: {
-      entry: path.resolve(workspaceRootPath, 'src/content.mts'),
-      formats: ['iife'],
-      name: 'githubDiffDefaults',
-      fileName: (): string => 'content.js',
-    },
-  },
 });

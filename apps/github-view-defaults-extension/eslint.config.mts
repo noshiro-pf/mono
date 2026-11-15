@@ -1,5 +1,6 @@
 import {
   eslintConfigForBrowser,
+  eslintConfigForPlaywright,
   eslintConfigForTypeScript,
   type FlatConfig,
 } from 'eslint-config-typed';
@@ -28,6 +29,8 @@ export default [
   // this deliberately: the globals the browser rules guard against — `name`,
   // `top`, `close`, `status` — are ordinary identifiers there.
   eslintConfigForBrowser(['src/**/*.mts']),
+
+  eslintConfigForPlaywright(['e2e/**']),
 
   // Last, so that nothing above turns these back on.
   eslintConfigOffForOxlint,

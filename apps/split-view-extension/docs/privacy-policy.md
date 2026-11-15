@@ -1,6 +1,6 @@
 # Split View — privacy policy
 
-Last updated: 2026-11-12
+Last updated: 2026-11-16
 
 **Split View collects nothing, sends nothing, and has no server.** There is no
 account, no analytics, no telemetry and no third party of any kind.
@@ -16,8 +16,8 @@ Everything it stores is in the browser's own extension storage
 - **Per-site settings** — the origins whose service workers a pane removes on
   sight, which the user turns on per site.
 
-That is all of it. It never leaves the device, and it is sent nowhere. The one
-network request the extension makes of its own is to GitHub, described below.
+That is all of it. It never leaves the device, and it is sent nowhere. The
+extension makes no network request of its own.
 Removing the extension removes the lot.
 
 ## What the extension reads
@@ -27,33 +27,9 @@ Removing the extension removes the lot.
   its tooltip can show where it is, and so that a reload can come back to it.
   The address is saved as described above; the title is not saved. Neither is
   transmitted anywhere.
-- **A GitHub pull request's title, the issue it closes and the Claude Code
-  session it names**, when you ask for
-  that pull request to be opened in a split view — with the **⧉ Split view**
-  button on its page, or from the context menu. A script on github.com loads the
-  pull request's conversation page from github.com, as your browser would if you
-  opened it, and reads three things from it: the title, which names the new tab,
-  the address of the first issue the pull request closes, and the address of the
-  first Claude Code session (`https://claude.ai/code/session_…`) its description
-  names on a `Claude-Session:` line. The issue and the session are each opened
-  in a pane. All three become part of that split view and are saved as
-  described above.
-  Nothing is read until you ask, and nothing is sent anywhere else.
-- **The labels of a GitHub pull request in `noshiro-pf/mono`**, when you press
-  the **＋ merge-queued** button, which is shown on that repository's pull
-  requests and nowhere else. The script reads the label names in GitHub's own
-  label picker, and which are selected, and the labels listed in the pull
-  request's sidebar.
 - **Nothing else about the page.** The scripts do not read page content, form
   fields, cookies or storage beyond the above, and on a page that is not inside
-  a split view or a GitHub pull request they stop immediately.
-
-## What the extension changes on GitHub
-
-Only when you press **＋ merge-queued**: it adds the `merge-queued` label to
-that pull request by using GitHub's label picker on the page, as you would by
-hand. GitHub makes the change, as the signed-in user and with that user's
-permissions; the extension sends nothing itself.
+  a split view they stop immediately.
 
 ## What the panes themselves do
 

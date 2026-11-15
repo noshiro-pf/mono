@@ -74,7 +74,7 @@ a tab of its own.
 | reload one pane                      | its reload button, or `Ctrl+R` / `F5` with the focus in it                       |
 | add a split view (in a new tab)      | `＋` at the top left                                                             |
 | open one from a link                 | `split.html?layout=r70pp&url=…&url=…` — see [Open from a URL](#open-from-a-url)  |
-| open a GitHub pull request in one    | **⧉ Split view** on its page — see [GitHub pull requests](#github-pull-requests) |
+| open a GitHub pull request in one    | **⧉ Split view** on its page, with [GitHub View Defaults](#github-pull-requests) |
 | open a link beside this page         | **Open in a split …** in its context menu — see [below](#from-the-context-menu)  |
 | switch split views in this tab       | the select at the top left, or `Alt+1` … `Alt+9`                                 |
 | rename, reorder, delete, back up     | **Edit** — with **Export** / **Import** for the whole list as one JSON file      |
@@ -194,74 +194,21 @@ list.
 
 ### GitHub pull requests
 
-Every pull request page on github.com, in any repository, has a **⧉ Split view**
-button at the bottom left. It opens the pull request in a new tab the way the
-[PR
-Manager](../pr-manager/docs/design.md#opening-a-pull-request-in-a-split-view)'s
-links do: the diff, without whitespace changes or the files already marked
-viewed, at 737px and 67% — which keeps GitHub's file tree beside it — and the
-conversation in the rest of the page. When the pull request closes an issue, or
-names the Claude Code session it was written in, the diff is held at 737px,
-still at 67%, the conversation at 577px — the widest its description gets with
-the reviewers and the labels below it rather than beside it — and the rest goes
-to the issue or the session, to the right of the conversation; with both, the
-issue is stacked over the session. The conversation and the issue are at 75% so
-that more of each fits; the session is at 100%. The pull request's own tab is
-closed once the split view has opened, so the split view takes its place;
-`Ctrl`+click or a middle click opens it behind the current tab instead, and
-keeps that tab.
+The **⧉ Split view** button on a pull request's page on github.com, and **Open
+pull request in Split View** in the context menu of a link to one, are [GitHub
+View Defaults](../github-view-defaults-extension/README.md#pull-requests)'s:
+install it beside this one to have them. They were this extension's once, and
+moved because they follow GitHub's markup and change with it: an update of this
+extension closes every split view open, and an update of that one closes
+nothing. What they open is a URL like any other here ([Open from a
+URL](#open-from-a-url)), in one saved split view, **GitHub pull request**, which
+they reuse instead of adding one to the list each time; the
+PR Manager's links use another, so the two do not replace each other's.
 
-A link to a pull request — on GitHub, in a mail, in a chat — has **Open pull
-request in Split View** in its context menu, under **Split View** with the items
-above, and so does a pull request's own page.
-
-The title, the issue and the session are read from the pull request's
-conversation page, as you see it, so a private repository works when you are
-signed in. The issue is the first one GitHub lists under "Successfully merging
-this pull request may close these issues"; the session is the first
-`https://claude.ai/code/session_…` link on a `Claude-Session:` line of the
-description, outside code, as the PR Manager reads it. A link from outside
-GitHub opens without the issue or the session, since nothing there can read
-them, and so does a pull request whose page could not be read.
-
-Every pull request opened this way reuses one saved split view, **GitHub pull
-request**, instead of adding one to the list each time; the PR Manager's links
-use another, so the two do not replace each other's.
-
-#### ＋ merge-queued, on this repository's pull requests
-
-On the pull requests of `noshiro-pf/mono`, and nowhere else, a second button
-sits beside **⧉ Split view**: **＋ merge-queued**. It puts the `merge-queued`
-label on the pull request, which is what queues it for `unblock-prs`
-(`libs/pr-report-core/src/labels.mts`). It is shown only there because the label
-is this repository's convention, not GitHub's: on any other repository it could
-only report that there is no such label, and anyone else who installs the
-extension never sees it. The list is `hasMergeQueue` in
-`src/github/pull-request.mts`.
-
-It works GitHub's own label picker in the sidebar, as a person would: open it,
-filter for the label, select it, close it, and then read the sidebar back. So
-the label is added as you, with your permissions, and the extension holds no
-token and makes no request for it. The picker is on the conversation tab only;
-pressed on another tab, the button follows GitHub's own link there first. It
-then says what happened for a few seconds: `✓ merge-queued`,
-`✓ already merge-queued`, or what stopped it — no label picker (no permission to
-label, or GitHub's markup changed), no such label, not saved, or that you left
-the pull request while it waited, in which case it does nothing to the page you
-went to.
-
-It is in the panes of a split view too, where the conversation usually sits
-beside the diff: a pane showing the conversation of one of this repository's
-pull requests has the button at its own bottom left, and works its own picker.
-A pane never gets **⧉ Split view**, since it is in one already, and in a pane
-the button is shown on the conversation tab alone rather than moving the pane
-there, which would take the conversation's place beside the diff.
-
-What it reads of GitHub's page is the `Manage labels` button, the
-`Filter labels` input, and the `role="option"` items with their
-`aria-labelledby` and `aria-selected` — accessibility attributes, which GitHub
-keeps stable longest. When they change the button says it found no label picker,
-and `src/github/label-picker.mts` is what to update.
+So that GitHub View Defaults can tell whether this extension is installed — it
+shows the button only then — one file, `icons/16.png`, is listed for every other
+extension to fetch (`splitViewPresencePath` in `split-view-link`). A web page
+cannot fetch it, and it says nothing but that the extension is there.
 
 ## Good to know
 
@@ -291,7 +238,7 @@ The reasons behind each of these are in
 | `host_permissions: <all_urls>`        | those rules only act on sites the extension has access to |
 | `storage`                             | to save your split views                                  |
 | `favicon`                             | to show each site's icon in its pane's toolbar            |
-| `contextMenus`                        | for **Open pull request in Split View** on a link         |
+| `contextMenus`                        | for **Open in a split to the right** / **below**          |
 
 ## For developers
 

@@ -16,35 +16,49 @@ import {
 } from './github/index.mjs';
 
 /**
- * The content script on github.com: a "⧉ Split view" button on every pull
- * request, which opens it as the PR Manager's links do — the diff beside the
- * conversation, and beside those the issue it closes and the Claude Code
- * session it was written in, when it names them.
+ * The content script that puts two buttons at the bottom left of a pull request
+ * on github.com.
+ *
+ * - **"⧉ Split view"**, on every pull request, when Split View
+ *   (`apps/split-view-extension`) is installed: opens it as the PR Manager's
+ *   links do — the diff beside the conversation, and beside those the issue it
+ *   closes and the Claude Code session it was written in, when it names them.
+ * - **"＋ merge-queued"**, on this repository's pull requests only
+ *   (`hasMergeQueue`): puts the label that queues a pull request for
+ *   `unblock-prs` on the one on screen, through GitHub's own label picker
+ *   (`github/label-picker.mts`).
+ *
+ * They are this extension's rather than Split View's because they follow
+ * GitHub's markup and change with it, and an update of Split View closes every
+ * split view open (Chrome closes an extension's pages when it reloads it); an
+ * update of this one closes nothing.
  *
  * It runs in every frame of github.com. In a pane of a split view — the only
- * place github.com is framed, since GitHub refuses to be framed anywhere the
- * extension has not taken that refusal away — there is no "⧉ Split view"
- * button, the pull request being in one already, and the merge-queued button
- * below is shown on the conversation tab alone (`inPane`).
+ * place github.com is framed, since GitHub refuses to be framed anywhere Split
+ * View has not taken that refusal away — there is no "⧉ Split view" button, the
+ * pull request being in one already, and the merge-queued button is shown on
+ * the conversation tab alone (`inPane`).
  *
- * The button is a `<button>` rather than a link to `split.html`: a web page may
- * not navigate to an extension page it is not listed for, and listing github.com
- * would let every page there open a split view and tell that the extension is
- * installed. The click is passed to the service worker instead, which opens the
- * tab with the extension's own id, whatever that id is.
- *
- * Beside it, on this repository's pull requests only (`hasMergeQueue`), a
- * "＋ merge-queued" button puts the label that queues a pull request for
- * `unblock-prs` on the one on screen, through GitHub's own label picker
- * (`github/label-picker.mts`).
+ * The Split view button is a `<button>` rather than a link to `split.html`: a
+ * web page may not navigate to an extension page it is not listed for. The
+ * click is passed to this extension's service worker instead, which opens the
+ * tab.
  *
  * They sit at the bottom left of the window, in a shadow root on `<html>`
  * rather than anywhere in `<body>`: GitHub replaces the body on every
  * navigation within the site and rearranges its pull request header often, and
  * a button wedged into either would come and go with them.
+ *
+ * This runs in the isolated world, unlike `content.mts`: it talks to the
+ * service worker, which a script in the page's world cannot.
  */
 const main = (): void => {
-  const inPane = globalThis.self !== window.top;
+  // Read as `unknown`: `globalThis` (what `prefer-global-this` makes of
+  // `window.self`) is `typeof globalThis` to the type checker, which it will
+  // not compare with a `Window`, though at run time they are the one object.
+  const topWindow: unknown = window.top;
+
+  const inPane = topWindow !== globalThis;
 
   const mut_host = document.createElement('div');
 
@@ -89,8 +103,39 @@ const main = (): void => {
 
   mut_shadow.append(mut_button, mut_queueButton);
 
+  // Hidden until the worker says Split View is there to open.
+  let mut_splitViewInstalled = false;
+
+  // The worker is asked once per document, and only once a pull request is on
+  // screen in the top frame: most of github.com never shows the button, and a
+  // pane never does.
+  let mut_askedAboutSplitView = false;
+
+  const askAboutSplitView = (): void => {
+    mut_askedAboutSplitView = true;
+
+    isSplitViewInstalled()
+      .catch((error: unknown) => {
+        console.error(error);
+
+        return false;
+      })
+      .then((installed) => {
+        mut_splitViewInstalled = installed;
+
+        mut_host.dataset['splitView'] = installed ? 'installed' : 'absent';
+
+        showOnPullRequests();
+      })
+      .catch(console.error);
+  };
+
   const showOnPullRequests = (): void => {
     const pullRequest = pullRequestOf(document.location.href);
+
+    if (pullRequest !== undefined && !inPane && !mut_askedAboutSplitView) {
+      askAboutSplitView();
+    }
 
     // In a pane the button never moves the pane to another tab, which would
     // take the conversation's place beside the diff, so it is shown only where
@@ -100,12 +145,19 @@ const main = (): void => {
       hasMergeQueue(pullRequest) &&
       (!inPane || isConversationOf(document.location.href, pullRequest));
 
-    mut_button.hidden = inPane;
+    const splitViewShown = !inPane && mut_splitViewInstalled;
+
+    mut_button.hidden = !splitViewShown;
 
     mut_queueButton.hidden = !queueShown;
 
-    mut_host.hidden = pullRequest === undefined || (inPane && !queueShown);
+    mut_host.hidden =
+      pullRequest === undefined || (!splitViewShown && !queueShown);
   };
+
+  // `data-e2e` says what the worker answered, which is otherwise seen only as a
+  // button that stays hidden; the e2e tests wait on it.
+  mut_host.dataset['e2e'] = 'pull-request-buttons';
 
   showOnPullRequests();
 
@@ -186,22 +238,45 @@ const main = (): void => {
     return;
   }
 
-  chrome.runtime.onMessage.addListener((value: unknown) => {
-    const message = asGitHubMessage(value);
+  chrome.runtime.onMessage.addListener(
+    (value: unknown, _sender, sendResponse) => {
+      const message = asGitHubMessage(value);
 
-    if (message?.kind !== 'look-up') {
-      return;
-    }
+      if (message?.kind !== 'look-up') {
+        return;
+      }
 
-    const pullRequest = pullRequestOf(message.url);
+      const pullRequest = pullRequestOf(message.url);
 
-    if (pullRequest !== undefined) {
-      openPullRequest(pullRequest, {
-        active: true,
-        closeOpener: false,
-      }).catch(console.error);
-    }
-  });
+      // Answered at once: the worker opens the pull request itself unless this
+      // says it has been taken, and an unanswered message reads there as no
+      // content script at all.
+      sendResponse(pullRequest !== undefined);
+
+      if (pullRequest !== undefined) {
+        openPullRequest(pullRequest, {
+          active: true,
+          closeOpener: false,
+        }).catch(console.error);
+      }
+    },
+  );
+};
+
+/**
+ * Whether Split View is installed, as the service worker finds it. Asked once
+ * per document: installing it while a pull request is open shows the button on
+ * the next page loaded.
+ */
+const isSplitViewInstalled = async (): Promise<boolean> => {
+  const query: GitHubMessage = {
+    tag: githubMessageTag,
+    kind: 'split-view-installed',
+  } as const;
+
+  const answer: unknown = await chrome.runtime.sendMessage(query);
+
+  return answer === true;
 };
 
 /**

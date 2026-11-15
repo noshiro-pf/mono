@@ -1,25 +1,33 @@
 import { hasKey, isRecord } from 'ts-data-forge';
 
 /**
- * Tags every `chrome.runtime` message between the GitHub content script and the
- * service worker.
+ * Tags every `chrome.runtime` message between the pull request content script
+ * and the service worker.
  */
-export const githubMessageTag = 'split-view/github/v1';
+export const githubMessageTag = 'github-view-defaults/pull-request/v1';
 
 /**
- * The two messages between `github-button.mts` and the service worker.
+ * The messages between `pull-request-buttons.mts` and the service worker.
  *
+ * - `split-view-installed`, content script to worker: is Split View installed?
+ *   The worker answers `true` or `false`; the "⧉ Split view" button is shown
+ *   only on `true`. A content script cannot ask itself, since its fetches are
+ *   the page's (see `splitViewPresencePath` in `split-view-link`).
  * - `open`, content script to worker: open this pull request in a split view,
  *   with what the content script read off GitHub — its title, the issue it
- *   closes and the Claude Code session it was written in. The worker opens
- *   the tab, because an extension page is not something a web page can
- *   navigate to.
+ *   closes and the Claude Code session it was written in. The worker opens the
+ *   tab, because an extension page is not something a web page can navigate
+ *   to.
  * - `look-up`, worker to content script: the context menu was used on this
  *   pull request; read its title, issue and session as the button does, and
  *   answer with an `open`. The worker cannot read them itself — a service
  *   worker has no `DOMParser` and does not carry the user's GitHub session.
  */
 export type GitHubMessage = Readonly<
+  | {
+      tag: typeof githubMessageTag;
+      kind: 'split-view-installed';
+    }
   | {
       tag: typeof githubMessageTag;
       kind: 'open';
@@ -54,10 +62,16 @@ export const asGitHubMessage = (value: unknown): GitHubMessage | undefined => {
     !isRecord(value) ||
     !hasKey(value, 'tag') ||
     value.tag !== githubMessageTag ||
-    !hasKey(value, 'url') ||
-    typeof value.url !== 'string' ||
     !hasKey(value, 'kind')
   ) {
+    return undefined;
+  }
+
+  if (value.kind === 'split-view-installed') {
+    return { tag: githubMessageTag, kind: 'split-view-installed' };
+  }
+
+  if (!hasKey(value, 'url') || typeof value.url !== 'string') {
     return undefined;
   }
 

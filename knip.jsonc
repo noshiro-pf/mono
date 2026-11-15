@@ -650,15 +650,14 @@
     },
 
     // Not an Astro site like the entry above assumes: a Chrome extension, which
-    // has four entry points rather than one — the page the browser loads, the
-    // service worker the manifest names, the content script injected into
-    // every pane, and the one that puts a button on GitHub's pull requests.
+    // has three entry points rather than one — the page the browser loads, the
+    // service worker the manifest names, and the content script injected into
+    // every pane.
     "apps/split-view-extension": {
       "entry": [
         "src/main.tsx",
         "src/background.mts",
         "src/frame-agent.mts",
-        "src/github-button.mts",
         "configs/*.mts",
         "scripts/**/*.mts",
         "test/**/*.test.mts",
@@ -668,7 +667,8 @@
     },
 
     // The rebuild of the entry above (apps/split-view-extension-v2/docs/spec.md),
-    // with the same four entry points, each a `main` in its own directory.
+    // with four entry points, each a `main` in its own directory: the three
+    // above and a content script that puts a button on GitHub's pull requests.
     "apps/split-view-extension-v2": {
       "entry": [
         "src/page/main.tsx",
@@ -683,14 +683,18 @@
     },
 
     // Not an Astro site like the entry above assumes either: a Chrome extension
-    // with one entry point, the content script the manifest names. `src/index.mts`
-    // is reached from the tests rather than being an entry of its own.
+    // with three entry points, the two content scripts and the service worker
+    // the manifest names. `src/index.mts` is reached from the tests rather than
+    // being an entry of its own.
     "apps/github-view-defaults-extension": {
       "entry": [
         "src/content.mts",
+        "src/pull-request-buttons.mts",
+        "src/background.mts",
         "configs/*.mts",
         "scripts/**/*.mts",
         "test/**/*.test.mts",
+        "e2e/**/*.spec.mts",
       ],
       "project": ["**/*.mts"],
     },

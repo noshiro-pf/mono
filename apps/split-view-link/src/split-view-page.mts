@@ -25,6 +25,18 @@ export const splitViewPagePath = 'split.html';
  */
 export const splitViewExtensionId = 'nifmgpafbfpgpcijgmfpcoonjbalbkhf';
 
+/**
+ * A file of the extension that every other extension may fetch, so that one can
+ * tell whether Split View is installed before it offers to open a split view:
+ * `chrome-extension://<splitViewExtensionId>/<this>` answers when it is, and the
+ * fetch fails when it is not. Opening `split.html` itself needs no such listing
+ * — `chrome.tabs.create` opens another extension's page — but cannot be asked
+ * whether the page is there. The manifest lists it under
+ * `web_accessible_resources` with `extension_ids: ["*"]`, which the extension's
+ * tests compare with this.
+ */
+export const splitViewPresencePath = 'icons/16.png';
+
 /** Which saved split view a tab shows. */
 export const workspaceQueryParam = 'ws';
 

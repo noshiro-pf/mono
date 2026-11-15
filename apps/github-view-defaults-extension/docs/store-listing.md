@@ -56,6 +56,9 @@ the ordinary GitHub page, opened the way you would have set it up by hand.
 • Two kinds of page, and no others. Pull request diffs and the branch overview
   have their address changed; pull requests and issues have their tab title
   numbered. Commit pages, comparisons and the rest of GitHub are untouched.
+• Pull requests, side by side. With the Split View extension installed, a
+  button on a pull request opens its diff beside its conversation, and beside
+  those the issue it closes and the Claude Code session it names.
 • Nothing is collected, stored or sent. No account, no analytics, no server, no
   storage permission. It runs on github.com and nowhere else.
 
@@ -80,24 +83,43 @@ with their number first so they can be told apart.
 
 ## Permission justifications
 
-The extension declares **no** `permissions` and **no** `host_permissions`. The
-one thing to justify is the content script.
+The extension declares one permission, `contextMenus`, and **no**
+`host_permissions`. That and the content scripts are what to justify.
 
-**Content script on `https://github.com/*`**
+**`contextMenus`**
 
 ```text
-The extension's only job is to send two kinds of GitHub URL to the view they
+Adds "Open pull request in Split View" to the context menu of a link to a pull
+request on github.com and of a pull request's own page, which opens that pull
+request in the Split View extension. The items are shown for those addresses
+only, and only while Split View is installed.
+```
+
+**Content scripts on `https://github.com/*`**
+
+```text
+The extension's main job is to send two kinds of GitHub URL to the view they
 would otherwise have to be clicked into. Deciding whether the current page is
 such a URL, and rewriting the links on the page that point at one, has to
 happen in the page, and so does putting a pull request's or an issue's number
-at the front of its tab title. The script reads the page's address, the href of
-its links and the page title, and nothing else — no other page content, no form
-fields, no cookies, no storage. It is declared for github.com alone and runs
-nowhere else.
+at the front of its tab title; that script reads the page's address, the href
+of its links and the page title, and nothing else. A second script puts a
+button on pull request pages that opens the pull request in the Split View
+extension, shown only when that extension is installed: when pressed, it loads
+that pull request's page from github.com and reads its title, the address of
+the issue it closes and the address of a Claude Code session named on a
+"Claude-Session:" line of its description, and passes them to the extension's
+service worker, which opens the tab. On the pull requests of the developer's
+own repository only, a second button adds the "merge-queued" label used by that
+repository's merge queue, by using GitHub's own label picker on the page; it
+reads the label names there when pressed, and the change is made by GitHub as
+the signed-in user. Neither script reads form fields, cookies or storage, or
+sends anything anywhere but to the extension's own service worker. They are
+declared for github.com alone and run nowhere else.
 ```
 
-**Remote code**: No. The one script in the package is in the package; nothing
-is fetched, evaluated or injected from anywhere else.
+**Remote code**: No. Every script in the package is in the package; nothing is
+fetched, evaluated or injected from anywhere else.
 
 ## Data usage
 
@@ -132,7 +154,7 @@ and the same tab with the extension installed.
 
 ## What to expect from review
 
-An extension with no permissions, no remote code and one content script on one
+An extension with one menu permission, no remote code and content scripts on one
 origin is the easy case. The two things that draw questions are the content
 script's scope — answered above, and visibly narrow in the manifest — and the
 privacy policy, which has to exist even though the answer to every question on
