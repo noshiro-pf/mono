@@ -413,13 +413,28 @@ describe('Num test', () => {
 
       expect(Num.roundToInt(2.5)).toBe(3);
 
-      expect(Num.roundToInt(-2.3)).toBe(-1); // bitwise behavior: -2.3 + 0.5 = -1.8, then floor with bitwise OR
+      expect(Num.roundToInt(-2.3)).toBe(-2);
 
-      expect(Num.roundToInt(-2.7)).toBe(-2); // bitwise behavior: -2.7 + 0.5 = -2.2, then floor with bitwise OR
+      expect(Num.roundToInt(-2.7)).toBe(-3);
+    });
+
+    test.each([
+      [-2.3, -2],
+      [-2.7, -3],
+      [-2.5, -2],
+      [-0.6, -1],
+      [2.5, 3],
+      [0.499_999_999_999_999_94, 0],
+    ] as const)('roundToInt(%d) is %d', (x, expected) => {
+      expect(Num.roundToInt(x)).toBe(expected);
     });
   });
 
   describe('round', () => {
+    test('round(digit) agrees with roundAt for a negative number', () => {
+      expect(Num.round(2)(-1.236)).toBe(Num.roundAt(-1.236, 2));
+    });
+
     test('creates rounding function with specified precision', () => {
       const round2 = Num.round(2);
 
