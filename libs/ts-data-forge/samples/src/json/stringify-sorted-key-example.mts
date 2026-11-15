@@ -1,4 +1,4 @@
-// Example: src/json/json.mts (stringifySortedKey)
+// Example: src/json/json-impl.mts (stringifySortedKey)
 import { isString, Json, Result } from 'ts-data-forge';
 
 if (import.meta.vitest !== undefined) {

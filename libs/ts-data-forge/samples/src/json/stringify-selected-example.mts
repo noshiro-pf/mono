@@ -1,4 +1,4 @@
-// Example: src/json/json.mts (stringifySelected)
+// Example: src/json/json-impl.mts (stringifySelected)
 import { isString, Json, Result } from 'ts-data-forge';
 
 if (import.meta.vitest !== undefined) {

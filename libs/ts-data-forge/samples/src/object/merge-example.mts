@@ -1,4 +1,4 @@
-// Example: src/object/object.mts (merge)
+// Example: src/object/object-impl.mts (merge)
 import { Obj } from 'ts-data-forge';
 
 if (import.meta.vitest !== undefined) {

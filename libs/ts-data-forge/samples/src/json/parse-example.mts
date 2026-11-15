@@ -1,4 +1,4 @@
-// Example: src/json/json.mts (parse)
+// Example: src/json/json-impl.mts (parse)
 import { Json, Result } from 'ts-data-forge';
 
 if (import.meta.vitest !== undefined) {

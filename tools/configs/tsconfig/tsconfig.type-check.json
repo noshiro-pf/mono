@@ -46,7 +46,7 @@
     "isolatedModules": true,
     "allowImportingTsExtensions": false,
 
-    "erasableSyntaxOnly": false,
+    "erasableSyntaxOnly": true,
     "verbatimModuleSyntax": true,
 
     // Don't include @types/* by default

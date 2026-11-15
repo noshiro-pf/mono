@@ -1,4 +1,4 @@
-// Example: src/collections/iset.mts (ISet.diff)
+// Example: src/collections/iset-impl.mts (ISet.diff)
 import { ISet } from 'ts-data-forge';
 
 if (import.meta.vitest !== undefined) {

@@ -1,4 +1,4 @@
-// Example: src/collections/imap-mapped.mts (equal)
+// Example: src/collections/imap-mapped-impl.mts (equal)
 import { IMapMapped } from 'ts-data-forge';
 
 if (import.meta.vitest !== undefined) {

@@ -1,4 +1,4 @@
-// Example: src/object/object.mts (fromEntries)
+// Example: src/object/object-impl.mts (fromEntries)
 import { Obj } from 'ts-data-forge';
 
 if (import.meta.vitest !== undefined) {

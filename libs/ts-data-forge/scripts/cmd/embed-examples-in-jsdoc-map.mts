@@ -199,6 +199,11 @@ export const sourceFileMappings: readonly SourceFileMapping[] = [
       'samples/src/collections/imap-mapped/to-entries-array-example.mts',
       'samples/src/collections/imap-mapped/to-array-example.mts',
       'samples/src/collections/imap-mapped/to-raw-map-example.mts',
+    ],
+  },
+  {
+    sourcePath: 'src/collections/imap-mapped-impl.mts',
+    sampleFiles: [
       'samples/src/collections/imap-mapped/create-example.mts',
       'samples/src/collections/imap-mapped/equal-example.mts',
       'samples/src/collections/imap-mapped/iterator-example.mts',
@@ -228,6 +233,11 @@ export const sourceFileMappings: readonly SourceFileMapping[] = [
       'samples/src/collections/imap/to-entries-array-example.mts',
       'samples/src/collections/imap/to-array-example.mts',
       'samples/src/collections/imap/to-raw-map-example.mts',
+    ],
+  },
+  {
+    sourcePath: 'src/collections/imap-impl.mts',
+    sampleFiles: [
       'samples/src/collections/imap/create-example.mts',
       'samples/src/collections/imap/equal-example.mts',
       'samples/src/collections/imap/iterator-example.mts',
@@ -258,6 +268,11 @@ export const sourceFileMappings: readonly SourceFileMapping[] = [
       'samples/src/collections/iset-mapped/entries-example.mts',
       'samples/src/collections/iset-mapped/to-array-example.mts',
       'samples/src/collections/iset-mapped/to-raw-set-example.mts',
+    ],
+  },
+  {
+    sourcePath: 'src/collections/iset-mapped-impl.mts',
+    sampleFiles: [
       'samples/src/collections/iset-mapped/create-example.mts',
       'samples/src/collections/iset-mapped/equal-example.mts',
       'samples/src/collections/iset-mapped/diff-example.mts',
@@ -291,6 +306,11 @@ export const sourceFileMappings: readonly SourceFileMapping[] = [
       'samples/src/collections/iset/entries-example.mts',
       'samples/src/collections/iset/to-array-example.mts',
       'samples/src/collections/iset/to-raw-set-example.mts',
+    ],
+  },
+  {
+    sourcePath: 'src/collections/iset-impl.mts',
+    sampleFiles: [
       'samples/src/collections/iset/create-example.mts',
       'samples/src/collections/iset/equal-example.mts',
       'samples/src/collections/iset/diff-example.mts',
@@ -457,14 +477,14 @@ export const sourceFileMappings: readonly SourceFileMapping[] = [
     ],
   },
   {
-    sourcePath: 'src/number/refined-number-utils.mts',
+    sourcePath: 'src/number/refined-number-utils-impl.mts',
     sampleFiles: [
       'samples/src/number/refined-number-utils/operators-for-integer-example.mts',
       'samples/src/number/refined-number-utils/operators-for-float-example.mts',
     ],
   },
   {
-    sourcePath: 'src/json/json.mts',
+    sourcePath: 'src/json/json-impl.mts',
     sampleFiles: [
       'samples/src/json/parse-example.mts',
       'samples/src/json/parse-with-reviver-example.mts',
@@ -474,7 +494,7 @@ export const sourceFileMappings: readonly SourceFileMapping[] = [
     ],
   },
   {
-    sourcePath: 'src/object/object.mts',
+    sourcePath: 'src/object/object-impl.mts',
     sampleFiles: [
       'samples/src/object/shallow-eq-example.mts',
       'samples/src/object/pick-example.mts',
@@ -502,7 +522,7 @@ export const sourceFileMappings: readonly SourceFileMapping[] = [
     sampleFiles: ['samples/src/others/tp-example.mts'],
   },
   {
-    sourcePath: 'src/string/str.mts',
+    sourcePath: 'src/string/str-impl.mts',
     sampleFiles: [
       'samples/src/string/is-min-length-string-example.mts',
       'samples/src/string/is-max-length-string-example.mts',

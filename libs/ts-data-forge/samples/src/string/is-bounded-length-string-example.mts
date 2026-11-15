@@ -1,4 +1,4 @@
-// Example: src/string/str.mts (Str.isBoundedLengthString)
+// Example: src/string/str-impl.mts (Str.isBoundedLengthString)
 import { Str } from 'ts-data-forge';
 import type { BoundedLengthString } from 'ts-type-forge';
 

@@ -1,4 +1,4 @@
-// Example: src/collections/iset.mts (ISet.intersection)
+// Example: src/collections/iset-impl.mts (ISet.intersection)
 import { ISet } from 'ts-data-forge';
 
 if (import.meta.vitest !== undefined) {

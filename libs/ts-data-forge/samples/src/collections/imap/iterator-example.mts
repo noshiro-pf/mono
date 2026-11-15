@@ -1,4 +1,4 @@
-// Example: src/collections/imap.mts (iterator)
+// Example: src/collections/imap-impl.mts (iterator)
 import { IMap } from 'ts-data-forge';
 
 if (import.meta.vitest !== undefined) {

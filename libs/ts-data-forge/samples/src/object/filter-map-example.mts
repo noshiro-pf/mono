@@ -1,4 +1,4 @@
-// Example: src/object/object.mts (filterMap)
+// Example: src/object/object-impl.mts (filterMap)
 import { Obj, Optional } from 'ts-data-forge';
 
 if (import.meta.vitest !== undefined) {

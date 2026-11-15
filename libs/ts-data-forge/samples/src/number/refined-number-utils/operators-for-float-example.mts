@@ -1,4 +1,4 @@
-// Example: src/number/refined-number-utils.mts (operatorsForFloat)
+// Example: src/number/refined-number-utils-impl.mts (operatorsForFloat)
 import { TsDataForgeInternals } from 'ts-data-forge';
 import type { PositiveFiniteNumber } from 'ts-type-forge';
 
