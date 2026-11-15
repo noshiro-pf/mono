@@ -9,7 +9,7 @@ import {
   unknownToString,
 } from 'ts-data-forge';
 import type { NonEmptyTuple, ReadonlyRecord } from 'ts-type-forge';
-import { projectRootPath } from '../project-root-path.mjs';
+import { projectRootPath, toPosixPath } from '../project-root-path.mjs';
 import { type Embedded, embedInto, markerKeys } from './embed-markers.mjs';
 
 /**
@@ -110,9 +110,7 @@ export const embedPlacement = (
  * translation under a directory named after its locale.
  */
 export const pageLocale = (page: string): Locale =>
-  page.split(path.sep).join('/').includes('/src/content/docs/ja/')
-    ? 'ja'
-    : 'en';
+  toPosixPath(page).includes('/src/content/docs/ja/') ? 'ja' : 'en';
 
 export const parseResults = (markdown: string): Result<Results, string> => {
   const environment =

@@ -13,11 +13,15 @@ import {
   isDirectlyExecuted,
 } from 'ts-repo-utils';
 import type { ReadonlyRecord } from 'ts-type-forge';
-import { runFile, runInherited } from '../lib/child-process.mjs';
+import {
+  describeFailure,
+  runFile,
+  runInherited,
+} from '../lib/child-process.mjs';
 import { resolveDiffBase } from '../lib/diff-base.mjs';
 import { readScripts } from '../lib/manifest-scripts.mjs';
 import { readRepositoryFile } from '../lib/repo-files.mjs';
-import { projectRootPath } from '../project-root-path.mjs';
+import { pathFromRoot, projectRootPath } from '../project-root-path.mjs';
 
 /**
  * `fix:codemod:affected`: the root codemod over what the change could have left
@@ -92,7 +96,7 @@ export const decideCodemodScope = ({
  * repository paths.
  */
 export const toRepositoryPath = (root: string, file: string): string =>
-  path.relative(root, path.resolve(root, file)).split(path.sep).join('/');
+  pathFromRoot(path.resolve(root, file), root);
 
 export type CodemodScope = Readonly<
   { full: false } | { full: true; reasons: readonly string[] }
@@ -133,7 +137,7 @@ const run = async (
   return result.status === 0
     ? Result.ok(result.stdout)
     : Result.err(
-        `\`${Arr.toUnshifted(command)(args).join(' ')}\` failed: ${result.stderr.trim()}`,
+        `\`${Arr.toUnshifted(command)(args).join(' ')}\` failed: ${describeFailure(result)}`,
       );
 };
 

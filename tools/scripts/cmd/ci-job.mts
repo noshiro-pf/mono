@@ -2,7 +2,7 @@ import * as fs from 'node:fs/promises';
 import * as util from 'node:util';
 import { Arr, asPositiveUint32, Result, unknownToString } from 'ts-data-forge';
 import { isDirectlyExecuted } from 'ts-repo-utils';
-import { runInherited } from '../lib/child-process.mjs';
+import { describeFailure, runInherited } from '../lib/child-process.mjs';
 import { plural } from '../lib/plural.mjs';
 import {
   diffSnapshots,
@@ -383,7 +383,7 @@ const runDiffs = async (
 
     if (outcome === 'failed') {
       console.error(
-        `git diff invocation ${index + 1} of ${invocations.length} (${plural(pathsOf(args).length, 'path')}) failed: ${unknownToString(result.error ?? result.signal ?? result.status)}`,
+        `git diff invocation ${index + 1} of ${invocations.length} (${plural(pathsOf(args).length, 'path')}) failed: ${describeFailure(result)}`,
       );
     }
   }

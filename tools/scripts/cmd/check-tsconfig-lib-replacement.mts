@@ -4,7 +4,7 @@ import { Arr, hasKey, isRecord, Result, unknownToString } from 'ts-data-forge';
 import { getWorkspacePackages, isDirectlyExecuted } from 'ts-repo-utils';
 import type { ReadonlyRecord } from 'ts-type-forge';
 import * as ts from 'typescript';
-import { projectRootPath } from '../project-root-path.mjs';
+import { projectRootPath, toPosixPath } from '../project-root-path.mjs';
 
 /**
  * Fails when a workspace member's `tsconfig.json`, or the root one, does not
@@ -142,10 +142,7 @@ export const findLibReplacementViolations = (
 export const probePathOf = (relativePath: string): string =>
   relativePath === 'tsconfig.json'
     ? 'tools/scripts/strict-lib-active.mts'
-    : path.posix.join(
-        path.posix.dirname(relativePath.split(path.sep).join('/')),
-        PROBE,
-      );
+    : path.posix.join(path.posix.dirname(toPosixPath(relativePath)), PROBE);
 
 /**
  * Whether `probePath` is among the files the program `tsconfig` describes

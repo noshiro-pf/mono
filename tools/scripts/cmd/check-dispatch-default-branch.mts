@@ -1,5 +1,4 @@
 import * as fs from 'node:fs/promises';
-import * as path from 'node:path';
 import { Arr, Result } from 'ts-data-forge';
 import { isDirectlyExecuted } from 'ts-repo-utils';
 import { plural } from '../lib/plural.mjs';
@@ -10,7 +9,7 @@ import {
   readWorkflowTriggers,
   type WorkflowJob,
 } from '../lib/workflow-jobs.mjs';
-import { projectRootPath } from '../project-root-path.mjs';
+import { pathFromRoot } from '../project-root-path.mjs';
 
 /**
  * Holds every job that opens a pull request (`gh pr create`) in a workflow that
@@ -37,10 +36,7 @@ export const checkDispatchDefaultBranch = (): Promise<Result<number, string>> =>
     const mut_messages: string[] = [];
 
     for (const workflowPath of paths) {
-      const relativePath = path
-        .relative(projectRootPath, workflowPath)
-        .split(path.sep)
-        .join('/');
+      const relativePath = pathFromRoot(workflowPath);
 
       // eslint-disable-next-line security/detect-non-literal-fs-filename -- a workflow file listWorkflowFiles found.
       const text = await fs.readFile(workflowPath, 'utf8');

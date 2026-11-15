@@ -15,7 +15,7 @@ import {
   oxlintConfig,
   toOxlintRuleName,
 } from '../../configs/oxlint-rules.mjs';
-import { runFile } from '../lib/child-process.mjs';
+import { describeFailure, runFile } from '../lib/child-process.mjs';
 import {
   forEachLintedFile,
   importPackageEslintConfigs,
@@ -304,7 +304,7 @@ const gitGrep = async (args: readonly string[]): Promise<readonly string[]> => {
   });
 
   if (result.status !== 0 && result.status !== 1) {
-    throw new Error(`git grep failed: ${result.stderr}`);
+    throw new Error(`git grep failed: ${describeFailure(result)}`);
   }
 
   return result.stdout.split('\0').filter((entry) => entry !== '');
