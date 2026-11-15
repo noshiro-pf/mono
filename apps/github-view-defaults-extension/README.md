@@ -1,11 +1,13 @@
 # GitHub View Defaults
 
-A Chrome extension that opens a few GitHub pages the way you would have set
-them up by hand: a pull request diff with whitespace-only changes hidden and
-the files you have already marked as viewed collapsed, and a repository's
-branches page as the full list of branches rather than the overview. It also
-puts a pull request's or an issue's number at the front of its tab title, where
-a narrow tab still shows it.
+A Chrome extension that opens a few GitHub pages the way you would have set them
+up by hand: a pull request diff with whitespace-only changes hidden and the
+files you have already marked as viewed collapsed, and a repository's branches
+page as the full list of branches rather than the overview. It also puts a pull
+request's or an issue's number at the front of its tab title, where a narrow tab
+still shows it, and puts two buttons on a pull request — one that opens it in
+[Split View](../split-view-extension/README.md), and on this repository's, one
+that queues it for merging (see [Pull requests](#pull-requests)).
 
 | page                                  | opened as                                              |
 | :------------------------------------ | :----------------------------------------------------- |
@@ -32,6 +34,96 @@ The tab title is changed on these pages and no others:
 | :------------------------------------------------- | :------------------------------------ |
 | `/{owner}/{repo}/pull/{n}`, and every tab below it | `#{n}` in front of GitHub's own title |
 | `/{owner}/{repo}/issues/{n}`                       | the same                              |
+
+## Pull requests
+
+Two buttons sit at the bottom left of a pull request's page. They were Split
+View's once, and are this extension's because they follow GitHub's markup and
+change with it: an update of Split View closes every split view open, and an
+update of this one closes nothing.
+
+### ⧉ Split view
+
+With [Split View](../split-view-extension/README.md) installed, every pull
+request page on github.com, in any repository, has a **⧉ Split view** button.
+It opens the pull request in Split View the way the [PR
+Manager](../pr-manager/docs/design.md#opening-a-pull-request-in-a-split-view)'s
+links do: the diff, without whitespace changes or the files already marked
+viewed, at 737px and 67% — which keeps GitHub's file tree beside it — and the
+conversation in the rest of the page. When the pull request closes an issue, or
+names the Claude Code session it was written in, the conversation is held at
+577px — the widest its description gets with the reviewers and the labels below
+it rather than beside it — and the rest goes to the issue or the session, to the
+right of the conversation; with both, the issue is stacked over the session. The
+layout is `pullRequestSplitViewSearch` in `split-view-link`. The pull request's
+own tab is closed once the split view has opened, so the split view takes its
+place; `Ctrl`+click or a middle click opens it behind the current tab instead,
+and keeps that tab.
+
+A link to a pull request — on GitHub, in a mail, in a chat — has **Open pull
+request in Split View** in its context menu, and so does a pull request's own
+page.
+
+The title, the issue and the session are read from the pull request's
+conversation page, as you see it, so a private repository works when you are
+signed in. The issue is the first one GitHub lists under "Successfully merging
+this pull request may close these issues"; the session is the first
+`https://claude.ai/code/session_…` link on a `Claude-Session:` line of the
+description, outside code, as the PR Manager reads it. A link from outside
+GitHub opens without the issue or the session, since nothing there can read
+them, and so does a pull request whose page could not be read.
+
+Every pull request opened this way reuses one saved split view, **GitHub pull
+request**, instead of adding one to Split View's list each time.
+
+Split View is found by the id its manifest's `key` gives a build from source
+(`splitViewExtensionId` in `split-view-link`): the service worker fetches the
+one file Split View lists for every extension to fetch, and the button and the
+menu items are there only when it answers. A Split View installed from the
+Chrome Web Store has an id of its own, and is not found.
+
+### ＋ merge-queued, on this repository's pull requests
+
+On the pull requests of `noshiro-pf/mono`, and nowhere else, a second button
+sits beside **⧉ Split view** — alone, without Split View: **＋ merge-queued**.
+It puts the `merge-queued` label on the pull request, which is what queues it
+for `unblock-prs` (`libs/pr-report-core/src/labels.mts`). It is shown only there
+because the label is this repository's convention, not GitHub's: on any other
+repository it could only report that there is no such label, and anyone else who
+installs the extension never sees it. The list is `hasMergeQueue` in
+`src/github/pull-request.mts`.
+
+It works GitHub's own label picker in the sidebar, as a person would: open it,
+select the label, close it, and then read the sidebar back. So the label is
+added as you, with your permissions, and the extension holds no token and makes
+no request for it. The picker is on the conversation tab only; pressed on
+another tab, the button follows GitHub's own link there first. It then says what
+happened for a few seconds: `✓ merge-queued`, `✓ already merge-queued`, or what
+stopped it — no label picker (no permission to label, or GitHub's markup
+changed), no such label, not saved, or that you left the pull request while it
+waited, in which case it does nothing to the page you went to.
+
+It is in the panes of a split view too, where the conversation usually sits
+beside the diff: a pane showing the conversation of one of this repository's
+pull requests has the button at its own bottom left, and works its own picker.
+A pane never gets **⧉ Split view**, since it is in one already, and in a pane
+the button is shown on the conversation tab alone rather than moving the pane
+there, which would take the conversation's place beside the diff.
+
+GitHub has drawn the sidebar two ways, and has gone from one to the other and
+back, so the button works either:
+
+- **the server-rendered sidebar** (what github.com serves as of November 2026):
+  a `<details>` holding the `Filter labels` input, opened by its `<summary>`,
+  with `role="menuitemcheckbox"` items that say whether they are on by
+  `aria-checked` and name their label by `data-label-name`;
+- **the React sidebar**: the `Manage labels` button, the `Filter labels` input,
+  and `role="option"` items with their `aria-labelledby` and `aria-selected`.
+
+These are accessibility attributes as far as they go, which GitHub keeps stable
+longest. When they change the button says it found no label picker (or no such
+label), and `src/github/label-picker.mts` is what to update; the stand-ins
+`e2e/pull-request-buttons.spec.mts` checks it against are modelled on each.
 
 ## What it does, exactly
 
@@ -83,14 +175,15 @@ The tab title is changed on these pages and no others:
   rewrites the title on its own navigations. A title that already starts with
   the number is left as it is. The pull request and issue lists, a new issue
   and discussions are not numbered.
-- **Nothing else.** No options, no storage, no network, no permissions beyond
-  running on `github.com`. Both address rules are a table in
+- **Nothing else.** No options and no storage. Both address rules are a table in
   `src/page-url.mts`, and the title rule is `src/page-title.mts`; changing them
   is an edit and a rebuild.
 
 Only `https://github.com` is matched. A GitHub Enterprise installation on
-another host is not covered — add its origin to `content_scripts.matches` in
-`public/manifest.json` and rebuild.
+another host is not covered. For the addresses and the title, add its origin to
+the `matches` of the first entry of `content_scripts` in `public/manifest.json`
+and rebuild; the pull request buttons read `github.com` in the code
+(`src/github/pull-request.mts`) and would need that changed too.
 
 ## Install
 
@@ -116,7 +209,7 @@ extension's card.
 
 ## How it works
 
-Three mechanisms, in the order they matter:
+For the addresses and the title, three mechanisms, in the order they matter:
 
 - **The links are rewritten.** A `MutationObserver` watches the document and
   gives every new anchor pointing at one of those pages the address the rules
@@ -163,6 +256,16 @@ count and what the extension wants of them — and `src/page-title.mts` holds th
 title rule the same way; `src/content.mts` is the glue that applies them.
 `test/page-url.test.mts` and `test/page-title.test.mts` cover the first two.
 
+The pull request buttons are another content script,
+`src/pull-request-buttons.mts`, in the isolated world rather than the page's,
+because it talks to the service worker, `src/background.mts`, which opens Split
+View — a web page may not navigate to another extension's page, and
+`chrome.tabs.create` may — and holds the context menu. `src/github/` is what
+they decide with: a pull request's address and title, their messages, and the
+label picker. `test/pull-request.test.mts` covers the first two, and
+`e2e/pull-request-buttons.spec.mts` the buttons, in a real Chromium against
+stand-ins for GitHub's pages and for Split View.
+
 ## Commands
 
 | command                | what it does                                          |
@@ -170,6 +273,7 @@ title rule the same way; `src/content.mts` is the glue that applies them.
 | `pnpm run build`       | builds `dist/`, which is what Chrome loads            |
 | `pnpm run test`        | runs the unit tests                                   |
 | `pnpm run smoke`       | runs the built extension in a real Chromium           |
+| `pnpm run check:e2e`   | builds, and runs the pull request buttons' e2e tests  |
 | `pnpm run check:types` | type-checks the package                               |
 | `pnpm run check:lint`  | lints it                                              |
 | `pnpm run gen:icons`   | redraws `public/icons/` — see `scripts/gen-icons.mts` |

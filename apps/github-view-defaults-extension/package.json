@@ -11,7 +11,11 @@
   "author": "noshiro-pf <noshiro.pf@gmail.com>",
   "type": "module",
   "scripts": {
-    "build": "vite build --config ./configs/vite.config.mts",
+    "build": "run-s build:content build:pull-request-buttons build:background",
+    "build:background": "vite build --config ./configs/vite.background.config.mts",
+    "build:content": "vite build --config ./configs/vite.config.mts",
+    "build:pull-request-buttons": "vite build --config ./configs/vite.pull-request-buttons.config.mts",
+    "check:e2e": "playwright test --config ./configs/playwright.config.mts",
     "check:lint": "node ../../tools/scripts/cmd/assert-deps-built.mts && oxlint . && eslint .",
     "check:test": "node ../../tools/scripts/cmd/assert-deps-built.mts && vitest --config ./configs/vitest.config.mts run",
     "check:types": "node ../../tools/scripts/cmd/assert-deps-built.mts && node ../../node_modules/typescript-native/bin/tsc --noEmit",
@@ -29,6 +33,7 @@
     "smoke": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/smoke.mts",
     "test": "pnpm run check:test",
     "watch:test": "vitest --config ./configs/vitest.config.mts watch",
+    "z:e2e-pages": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/e2e-page-server.mts",
     "z:format-diff-from": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/format-diff-from.mts",
     "z:format-uncommitted": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/format-uncommitted.mts",
     "z:gen-index-ts": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/gen-index-ts.mts",
@@ -36,16 +41,19 @@
     "z:pack-crx": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/pack-crx.mts"
   },
   "dependencies": {
+    "split-view-link": "workspace:*",
     "ts-data-forge": "workspace:*"
   },
   "devDependencies": {
     "@playwright/test": "catalog:",
+    "@types/chrome": "^0.3.6",
     "eslint": "catalog:",
     "eslint-config-typed": "workspace:*",
     "eslint-plugin-ts-data-forge": "workspace:*",
     "npm-run-all2": "catalog:",
     "prettier-plugin-organize-imports": "catalog:",
     "prettier-plugin-packagejson": "catalog:",
+    "ts-type-forge": "workspace:*",
     "tsx": "catalog:",
     "vite": "catalog:"
   }

@@ -19,6 +19,9 @@ export const appDevPorts = {
   'catan-dice': 5186,
   'color-demo': 5187,
   'event-schedule-app': 5188,
+  // Not a dev server: the page its e2e frames GitHub's pull requests in
+  // (`z:e2e-pages`).
+  'github-view-defaults-extension': 5204,
   'housing-loan-calculator': 5189,
   'lambda-calculus-interpreter-preact': 5190,
   'lambda-calculus-interpreter-react': 5191,

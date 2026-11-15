@@ -80,10 +80,6 @@ Worth knowing before you install:
   sign-in redirect, a payment flow — is stopped by the pane's sandbox, which
   you can turn off for that one pane. Every pane can open its address in an
   ordinary tab, which is the way out of any of this.
-• A GitHub pull request can be opened in a split view from a button on its
-  page or from the context menu of a link to it: its diff beside its
-  conversation, and beside those the issue it closes and the Claude Code
-  session it names.
 • Nothing leaves your computer. There is no account, no analytics and no
   server: the layouts and addresses live in the browser's own extension
   storage.
@@ -117,11 +113,8 @@ a reload or the tab being closed. Local only; nothing is sent anywhere.
 **`contextMenus`**
 
 ```text
-Adds "Open pull request in Split View" to the context menu of a link to a pull
-request on github.com and of a pull request's own page, which opens that pull
-request in a split view and is shown for those addresses only; and "Open in a
-split to the right" and "Open in a split below" to the context menu of web
-pages and their links, which put the link, or an empty pane, beside the page in
+Adds "Open in a split to the right" and "Open in a split below" to the context
+menu of web pages and their links, which put the link, or an empty pane, beside the page in
 a split view: by splitting the pane in a split view, and in a new one in place
 of the tab anywhere else.
 ```
@@ -166,11 +159,10 @@ has granted host access.
 
 ```text
 A pane shows whatever address the user types into it, so the extension cannot
-know in advance which sites it needs. The permission is used for three things
+know in advance which sites it needs. The permission is used for two things
 only: the header rules above, which act only on this extension's own frames and
-its own tab; a content script that reports a pane's title and current URL back
-to the extension's page; and, on github.com, the pull request button described
-below. None of them transmits page content anywhere.
+its own tab; and a content script that reports a pane's title and current URL
+back to the extension's page. Neither transmits page content anywhere.
 ```
 
 **Content script on all sites**
@@ -182,23 +174,6 @@ three things and report them to the extension's own page over postMessage. On
 an ordinary page it checks whether it is inside a split view — one property read
 — and returns immediately. It sends nothing until the extension's page has told
 it which pane it belongs to.
-```
-
-**Content script on github.com**
-
-```text
-Puts a "Split view" button on GitHub pull request pages, which opens the pull
-request in a split view: its diff beside its conversation, and beside those
-the issue it closes and the Claude Code session it names. When the button or
-the context menu item is used, the script loads that pull request's page from
-github.com and reads its title, the address of the issue it closes and the
-address of a Claude Code session named on a "Claude-Session:" line of its
-description. It reads nothing until then, and sends
-nothing anywhere but to the extension's own service worker, which opens the
-tab. On the pull requests of the developer's own repository only, a second
-button adds the "merge-queued" label used by that repository's merge queue, by
-using GitHub's own label picker on the page; it reads the label names there
-when pressed, and the change is made by GitHub as the signed-in user.
 ```
 
 **Remote code**: No. Every script in the package is in the package. The panes

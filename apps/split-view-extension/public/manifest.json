@@ -28,6 +28,10 @@
     {
       "resources": ["split.html"],
       "matches": ["https://noshiro-pf.github.io/*"]
+    },
+    {
+      "resources": ["icons/16.png"],
+      "extension_ids": ["*"]
     }
   ],
   "content_scripts": [
@@ -37,12 +41,6 @@
       "match_origin_as_fallback": true,
       "run_at": "document_start",
       "js": ["frame-agent.js"]
-    },
-    {
-      "matches": ["https://github.com/*"],
-      "all_frames": true,
-      "run_at": "document_idle",
-      "js": ["github-button.js"]
     }
   ]
 }

@@ -1,20 +1,15 @@
 import { pullRequestSplitViewSearch } from 'split-view-link';
-import type { StrictOmit } from 'ts-type-forge';
 import {
   asGitHubMessage,
   claudeSessionUrlOfBody,
-  computeGeometry,
   conversationPathOf,
   githubMessageTag,
   hasMergeQueue,
   isConversationOf,
   issueUrlOf,
-  parseLayoutSpec,
   pullRequestOf,
   pullRequestTitleOf,
   pullRequestWorkspace,
-  removePaneAt,
-  type LayoutNode,
 } from '../src/index.mjs';
 
 describe('pullRequestOf', () => {
@@ -191,12 +186,15 @@ describe('pullRequestSplitViewSearch, from GitHub', () => {
   test('opens the saved split view of pull requests opened from GitHub', () => {
     // The layout, the panes and the zoom are `split-view-link`'s, and tested
     // there.
-    const params = paramsFor({
-      pullRequest,
-      title: 'Fix the thing',
-      issueUrl: undefined,
-      sessionUrl: undefined,
-    });
+    const params = new URLSearchParams(
+      pullRequestSplitViewSearch({
+        workspace: pullRequestWorkspace,
+        pullRequest,
+        title: 'Fix the thing',
+        issueUrl: undefined,
+        sessionUrl: undefined,
+      }),
+    );
 
     assert.deepStrictEqual(
       {
@@ -210,37 +208,6 @@ describe('pullRequestSplitViewSearch, from GitHub', () => {
         title: '#2085 Fix the thing',
       },
     );
-  });
-
-  test('holds the diff and the conversation at their widths on a wide window', () => {
-    const root = threeColumnRoot();
-
-    for (const width of [1440, 1920, 2560, 3840]) {
-      const [diffWidth, conversationWidth, issueWidth] = widthsOf(root, width);
-
-      assert.deepStrictEqual(
-        [diffWidth, conversationWidth, issueWidth],
-        [737, 577, width - 737 - 577 - 2 * gutter],
-      );
-    }
-  });
-
-  test('gives the right column the width of the conversation when it is closed', () => {
-    const root = threeColumnRoot();
-
-    const withoutConversation = removePaneAt(root, 1);
-
-    assert.isDefined(withoutConversation);
-
-    const [diffWidth = 0, conversationWidth = 0, issueWidth = 0] = widthsOf(
-      root,
-      1920,
-    );
-
-    assert.deepStrictEqual(widthsOf(withoutConversation, 1920), [
-      diffWidth,
-      conversationWidth + gutter + issueWidth,
-    ]);
   });
 });
 
@@ -290,6 +257,13 @@ describe('asGitHubMessage', () => {
         active: true,
         closeOpener: true,
       },
+    );
+  });
+
+  test('accepts the question whether Split View is installed', () => {
+    assert.deepStrictEqual(
+      asGitHubMessage({ tag: githubMessageTag, kind: 'split-view-installed' }),
+      { tag: githubMessageTag, kind: 'split-view-installed' },
     );
   });
 
@@ -351,46 +325,6 @@ describe('asGitHubMessage', () => {
     }
   });
 });
-
-const gutter = 6;
-
-/** The query the extension's own button opens a pull request with. */
-const paramsFor = (
-  args: StrictOmit<
-    Parameters<typeof pullRequestSplitViewSearch>[0],
-    'workspace'
-  >,
-): URLSearchParams =>
-  new URLSearchParams(
-    pullRequestSplitViewSearch({ workspace: pullRequestWorkspace, ...args }),
-  );
-
-/** The tree of the split view a pull request that closes an issue opens. */
-const threeColumnRoot = (): LayoutNode => {
-  const params = paramsFor({
-    pullRequest: {
-      number: 2085,
-      url: 'https://github.com/noshiro-pf/mono/pull/2085',
-    },
-    title: undefined,
-    issueUrl: 'https://github.com/noshiro-pf/mono/issues/2084',
-    sessionUrl: undefined,
-  });
-
-  const root = parseLayoutSpec(params.get('layout') ?? '');
-
-  assert.isDefined(root);
-
-  return root;
-};
-
-/** Each pane's width, in pane order, on a page `width` pixels wide. */
-const widthsOf = (root: LayoutNode, width: number): readonly number[] =>
-  computeGeometry(
-    root,
-    { left: 0, top: 0, width, height: 800 },
-    gutter,
-  ).panes.map(({ rect }) => rect.width);
 
 describe('conversationPathOf', () => {
   test('is the path of the conversation tab', () => {

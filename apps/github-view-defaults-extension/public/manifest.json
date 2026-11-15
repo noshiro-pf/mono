@@ -9,6 +9,10 @@
     "48": "icons/48.png",
     "128": "icons/128.png"
   },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "permissions": ["contextMenus"],
   "content_scripts": [
     {
       "matches": ["https://github.com/*"],
@@ -16,6 +20,12 @@
       "all_frames": true,
       "world": "MAIN",
       "js": ["content.js"]
+    },
+    {
+      "matches": ["https://github.com/*"],
+      "run_at": "document_idle",
+      "all_frames": true,
+      "js": ["pull-request-buttons.js"]
     }
   ]
 }

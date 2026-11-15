@@ -1,18 +1,6 @@
-import {
-  claudeSessionUrlOf,
-  pullRequestSplitViewSearch,
-  splitViewPagePath,
-} from 'split-view-link';
+import { splitViewPagePath } from 'split-view-link';
 import { Arr } from 'ts-data-forge';
 import type { ReadonlyRecord } from 'ts-type-forge';
-import {
-  asGitHubMessage,
-  githubMessageTag,
-  issueUrlOf,
-  pullRequestOf,
-  pullRequestWorkspace,
-  type GitHubMessage,
-} from './github/index.mjs';
 import {
   ensureInitiatorRule,
   eventLogSessionKey,
@@ -44,10 +32,13 @@ import {
  * The split view manages its own header-stripping rule from the page, because
  * the page is what knows which tab it is in; the worker is here for the events
  * a page cannot see — the toolbar button being clicked, its own tab being
- * closed, a pull request on GitHub asked to be opened in one, from the content
- * script's button or from the context menu, and a page or a link asked to be
- * opened in a split from the context menu — which, in a split view, is passed
- * on to the page.
+ * closed, and a page or a link asked to be opened in a split from the context
+ * menu — which, in a split view, is passed on to the page.
+ *
+ * A pull request on GitHub is opened in a split view by
+ * `github-view-defaults-extension`, which opens `split.html` itself; nothing
+ * here knows GitHub, so that following GitHub's markup never needs an update of
+ * this extension, which would close every split view open.
  *
  * Listeners are registered at the top level: a service worker is woken by the
  * event, so a listener added later than the first turn of the event loop is a
@@ -77,34 +68,11 @@ chrome.runtime.onStartup.addListener(() => {
   createContextMenus().catch(console.error);
 });
 
-chrome.runtime.onMessage.addListener((value: unknown, sender) => {
-  const message = asGitHubMessage(value);
-
-  if (message?.kind === 'open') {
-    openPullRequest(message, sender.tab).catch(console.error);
-  }
-});
-
 chrome.contextMenus.onClicked.addListener((info, tab) => {
   const direction = splitDirectionOfMenuItem(info.menuItemId);
 
   if (direction !== undefined) {
     openInSplit(direction, info, tab).catch(console.error);
-
-    return;
-  }
-
-  if (
-    info.menuItemId !== linkMenuItemId &&
-    info.menuItemId !== pageMenuItemId
-  ) {
-    return;
-  }
-
-  const url = info.menuItemId === linkMenuItemId ? info.linkUrl : info.pageUrl;
-
-  if (url !== undefined) {
-    openPullRequestFromMenu(url, tab).catch(console.error);
   }
 });
 
@@ -127,7 +95,7 @@ if (SPLIT_VIEW_DIAGNOSTICS) {
   // A debugging API the browser does not offer throws here. Uncaught, that
   // would stop the worker's module halfway through its first run: the listeners
   // above would stay registered, but every function they call is declared
-  // further down and would never be assigned, so the GitHub button
+  // further down and would never be assigned, so the toolbar button
   // would fail with "<name> is not a function". The diagnostics are an extra;
   // losing them must not take the worker with them.
   try {
@@ -293,108 +261,6 @@ const openSplitView = async (): Promise<void> => {
 };
 
 /**
- * Opens a pull request in a split view, in a new tab beside the one it was
- * asked from, and closes that one when the message asks for it.
- *
- * The tab is closed only after the split view's tab has been created, so a
- * failure to open leaves the user where they were; the closed tab is in
- * Chrome's recently closed list like any other.
- *
- * The addresses were read off a web page, so they are checked again here:
- * nothing but a pull request on github.com is opened, and nothing but an issue
- * there and a Claude Code session is put beside it.
- */
-const openPullRequest = async (
-  message: Extract<GitHubMessage, Readonly<{ kind: 'open' }>>,
-  openerTab: OpenerTab | undefined,
-): Promise<void> => {
-  const pullRequest = pullRequestOf(message.url);
-
-  if (pullRequest === undefined) {
-    return;
-  }
-
-  const search = pullRequestSplitViewSearch({
-    workspace: pullRequestWorkspace,
-    pullRequest,
-    title: message.title,
-    issueUrl:
-      message.issueUrl === undefined ? undefined : issueUrlOf(message.issueUrl),
-    sessionUrl:
-      message.sessionUrl === undefined
-        ? undefined
-        : claudeSessionUrlOf(message.sessionUrl),
-  });
-
-  await chrome.tabs.create({
-    url: `${chrome.runtime.getURL(splitViewPagePath)}${search}`,
-    active: message.active,
-    ...(openerTab?.id === undefined
-      ? {}
-      : {
-          openerTabId: openerTab.id,
-          windowId: openerTab.windowId,
-          index: openerTab.index + 1,
-        }),
-  });
-
-  if (message.closeOpener && openerTab?.id !== undefined) {
-    await chrome.tabs.remove(openerTab.id);
-  }
-};
-
-/** What of the tab a pull request was asked from the new tab is put beside. */
-type OpenerTab = Readonly<Pick<chrome.tabs.Tab, 'id' | 'index' | 'windowId'>>;
-
-/**
- * The context menu's item was chosen on a pull request.
- *
- * The title, the issue and the session are read by the GitHub content script,
- * which is asked to do so and answers with an `open`, so the split view is the
- * button's, and the PR Manager's. A tab it is not in — a link to a pull request
- * on another site, or a GitHub tab loaded before the extension was — refuses
- * the message, and the pull request is opened with what the address alone says.
- */
-const openPullRequestFromMenu = async (
-  url: string,
-  tab: (OpenerTab & Readonly<{ url?: string }>) | undefined,
-): Promise<void> => {
-  if (pullRequestOf(url) === undefined) {
-    return;
-  }
-
-  const lookUp: GitHubMessage = {
-    tag: githubMessageTag,
-    kind: 'look-up',
-    url,
-  } as const;
-
-  if (tab?.id !== undefined && tab.url?.startsWith(gitHubOrigin) === true) {
-    try {
-      await chrome.tabs.sendMessage(tab.id, lookUp, { frameId: 0 });
-
-      return;
-    } catch {
-      // No content script in that tab; open it with what is known.
-    }
-  }
-
-  await openPullRequest(
-    {
-      tag: githubMessageTag,
-      kind: 'open',
-      url,
-      title: undefined,
-      issueUrl: undefined,
-      sessionUrl: undefined,
-      active: true,
-      closeOpener: false,
-    },
-    tab,
-  );
-};
-
-/**
  * Asks the frame the menu was opened in which pane it is, and the split view in
  * that tab to split it.
  *
@@ -442,8 +308,8 @@ const splitPaneInSplitView = async (
  * In a split view, the pane the menu was opened in is split as its `||` and `=`
  * buttons split it, and the link opens in the new pane. Anywhere else, a new
  * split view opens in a tab where this one was — the page beside the link — and
- * this tab is closed, so that the split view takes its place, as the
- * GitHub button's does; it is in Chrome's recently closed list like any other.
+ * this tab is closed, so that the split view takes its place; it is in
+ * Chrome's recently closed list like any other.
  *
  * Nothing is opened from an incognito tab. The extension runs in spanning mode,
  * so its page would open in a normal window, and the incognito page's address
@@ -455,8 +321,12 @@ const openInSplit = async (
     Pick<chrome.contextMenus.OnClickData, 'frameId' | 'linkUrl' | 'pageUrl'>
   >,
   tab:
-    | (OpenerTab &
-        Readonly<{ title?: string; incognito: boolean; pinned: boolean }>)
+    | Readonly<
+        Pick<
+          chrome.tabs.Tab,
+          'id' | 'index' | 'windowId' | 'title' | 'incognito' | 'pinned'
+        >
+      >
     | undefined,
 ): Promise<void> => {
   // A tab Chrome does not name cannot be told to be a normal one either.
@@ -505,20 +375,6 @@ const splitDirectionOfMenuItem = (
 const replaceContextMenus = async (): Promise<void> => {
   await chrome.contextMenus.removeAll();
 
-  chrome.contextMenus.create({
-    id: linkMenuItemId,
-    title: 'Open pull request in Split View',
-    contexts: ['link'],
-    targetUrlPatterns: [pullRequestUrlPattern],
-  });
-
-  chrome.contextMenus.create({
-    id: pageMenuItemId,
-    title: 'Open this pull request in Split View',
-    contexts: ['page'],
-    documentUrlPatterns: [pullRequestUrlPattern],
-  });
-
   const uiLanguage = chrome.i18n.getUILanguage();
 
   for (const item of splitMenuItems) {
@@ -544,9 +400,8 @@ const replaceContextMenus = async (): Promise<void> => {
 };
 
 /**
- * The context menu's items: one on a link to a pull request, wherever the link
- * is, one on a pull request's own page, and "open to the right" and "open
- * below" on any web page and any link on one.
+ * The context menu's items: "open to the right" and "open below" on any web
+ * page and any link on one.
  *
  * Created on install and on update, which is when Chrome forgets them, and on
  * startup, so that the titles follow a change of Chrome's language; they are
@@ -570,18 +425,6 @@ const splitMenuItems = [
 ] as const;
 
 const webPageUrlPatterns = ['http://*/*', 'https://*/*'] as const;
-
-const linkMenuItemId = 'open-pull-request-link';
-
-const pageMenuItemId = 'open-pull-request-page';
-
-/**
- * What Chrome shows the items for. Wider than a pull request — a match pattern
- * cannot say "digits" — and narrowed by `pullRequestOf` on the click.
- */
-const pullRequestUrlPattern = 'https://github.com/*/*/pull/*';
-
-const gitHubOrigin = 'https://github.com/';
 
 /**
  * The tails of the log-write chain and of the context menu's re-creation. An

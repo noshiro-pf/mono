@@ -41,8 +41,8 @@ export const issueUrlOf = (address: string): string | undefined =>
  * `<title> by <author> · Pull Request #<number> · <owner>/<repo> · GitHub`.
  *
  * The author is the last ` by ` before the `·`, so a title with a ` by ` of its
- * own keeps it. A `#<number> ` in front, which `github-view-defaults-extension`
- * puts there, is taken off. Any other shape is `undefined`, and the tab is then
+ * own keeps it. A `#<number> ` in front, which this extension puts there
+ * (`page-title.mts`), is taken off. Any other shape is `undefined`, and the tab is then
  * titled with the number alone.
  */
 export const pullRequestTitleOf = (
@@ -135,10 +135,12 @@ export const hasMergeQueue = (pullRequest: PullRequest): boolean => {
 };
 
 /**
- * The saved split view a pull request opened from GitHub reuses, rather than
- * adding one to the list each time. It is not the PR Manager's `pr-manager`, so
- * the two do not overwrite each other. What it is opened with is
- * `pullRequestSplitViewSearch`'s.
+ * The saved split view of Split View that a pull request opened from GitHub
+ * reuses, rather than adding one to its list each time. It is not the PR
+ * Manager's `pr-manager`, so the two do not overwrite each other. What it is
+ * opened with is `pullRequestSplitViewSearch`'s. The id is kept from when the
+ * button was Split View's own, so the entry made then goes on being the one
+ * reused.
  */
 export const pullRequestWorkspace = {
   id: 'github-pull-request',
@@ -196,5 +198,5 @@ const titleSeparator = ' · ';
 
 const pullRequestLabelPattern = /^Pull Request #\d+$/u;
 
-/** What `github-view-defaults-extension` puts in front of the title. */
+/** What `numberedTitleOf` puts in front of the title. */
 const numberPrefixPattern = /^#\d+ /u;

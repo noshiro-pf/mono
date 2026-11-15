@@ -14,3 +14,6 @@ words:
   # document, and those client-side navigations are what the observer watches
   # for.
   - navigations
+  # The ARIA attribute `aria-labelledby`, which names each option of GitHub's
+  # React label picker; the merge-queued button and its e2e stand-in read it.
+  - labelledby
