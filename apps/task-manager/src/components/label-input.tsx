@@ -98,7 +98,7 @@ export const LabelInput = ({
   // browser.
   let mut_pointerType = '';
 
-  let mut_list: HTMLUListElement | undefined = undefined;
+  let mut_list: HTMLDivElement | undefined = undefined;
 
   /** What is being typed: `text`, in the box. */
   const retype = (text: string): void => {
@@ -316,7 +316,7 @@ export const LabelInput = ({
       <label class={constant('bp6-label field-label')} htmlFor={constant(id)}>
         {constant(caption)}
       </label>
-      {/* eslint-disable-next-line synstate-dom-a11y/no-static-element-interactions -- recorded, not fixed, when jsx-a11y came to synstate-dom (#3764) */}
+      {/* eslint-disable-next-line synstate-dom-a11y/no-static-element-interactions -- a pointer convenience that forwards a press to the input; nothing here is reachable only by pointer, the keyboard reaches the input directly */}
       <div
         class={constant('bp6-input label-input-box')}
         onPointerDown={(pressed) => {
@@ -433,8 +433,8 @@ export const LabelInput = ({
       <If
         cond={shown$}
         then={
-          // eslint-disable-next-line synstate-dom-a11y/prefer-tag-over-role -- recorded, not fixed, when jsx-a11y came to synstate-dom (#3764)
-          <ul
+          // eslint-disable-next-line synstate-dom-a11y/prefer-tag-over-role, synstate-dom-a11y/interactive-supports-focus -- combobox popup: the input owns the keyboard and the focus (`aria-activedescendant`), Enter takes the active option; `select`/`option` cannot be a popup of a text input
+          <div
             aria-label={constant(m.labels.suggestions(caption))}
             class={constant('label-suggestions')}
             id={constant(listId)}
@@ -451,13 +451,12 @@ export const LabelInput = ({
                 list.scrollIntoView({ block: 'nearest' });
               });
             }}
-            // eslint-disable-next-line synstate-dom-a11y/no-noninteractive-element-to-interactive-role -- recorded, not fixed, when jsx-a11y came to synstate-dom (#3764)
             role={constant('listbox')}
           >
             <For items={options$} key={(option) => option.label}>
               {(option$) => (
-                // eslint-disable-next-line synstate-dom-a11y/click-events-have-key-events, synstate-dom-a11y/prefer-tag-over-role -- recorded, not fixed, when jsx-a11y came to synstate-dom (#3764)
-                <li
+                // eslint-disable-next-line synstate-dom-a11y/click-events-have-key-events, synstate-dom-a11y/prefer-tag-over-role -- combobox popup: the input owns the keyboard, Enter takes the active option; `select`/`option` cannot be a popup of a text input
+                <div
                   aria-selected={option$.pipe(map(({ active }) => active))}
                   class={option$.pipe(
                     map(({ active }) =>
@@ -466,7 +465,6 @@ export const LabelInput = ({
                   )}
                   data-e2e={constant('label-suggestion')}
                   id={option$.pipe(map((option) => option.id))}
-                  // eslint-disable-next-line synstate-dom-a11y/no-noninteractive-element-to-interactive-role -- recorded, not fixed, when jsx-a11y came to synstate-dom (#3764)
                   role={constant('option')}
                   // Focusable, so that the focus a tap may take from the box
                   // stays in the list (`onBlur`).
@@ -479,10 +477,10 @@ export const LabelInput = ({
                   }}
                 >
                   {option$.pipe(map(({ label }) => label))}
-                </li>
+                </div>
               )}
             </For>
-          </ul>
+          </div>
         }
       />
     </div>
