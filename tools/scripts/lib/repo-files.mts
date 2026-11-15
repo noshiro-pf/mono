@@ -4,10 +4,18 @@
 
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
-import { Arr, Json, Result, unknownToString } from 'ts-data-forge';
-import { $, glob } from 'ts-repo-utils';
+import {
+  Arr,
+  hasKey,
+  isRecord,
+  Json,
+  Result,
+  unknownToString,
+} from 'ts-data-forge';
+import { glob } from 'ts-repo-utils';
 import type { ReadonlyRecord } from 'ts-type-forge';
 import { projectRootPath } from '../project-root-path.mjs';
+import { runFile } from './child-process.mjs';
 import { readScripts } from './manifest-scripts.mjs';
 
 /** Where the workflows are, relative to the repository root. */
@@ -47,25 +55,84 @@ export const listLibraryDirs = async (): Promise<
 export const listTrackedFiles = async (): Promise<
   Result<readonly string[], string>
 > => {
-  const result = await $('git ls-files -z', {
-    cwd: projectRootPath,
-    silent: true,
-    // The repository tracks well over ten thousand files, which is more than
-    // the 1 MiB `exec` defaults to.
-    maxBuffer: 64 * 1024 * 1024,
-  });
+  const tracked = await gitLsFiles(projectRootPath, [], 'the tracked files');
 
-  if (Result.isErr(result)) {
-    return Result.err(
-      `Failed to list the tracked files: ${unknownToString(result.value)}`,
-    );
+  return Result.map(tracked, (files) => files.toSorted());
+};
+
+/**
+ * Every file of the checkout that git does not ignore and that is a file on
+ * disk — tracked, force-added past `.gitignore` included, or untracked and not
+ * ignored — relative to the checkout's root, once each and sorted. What is not
+ * a file now is not listed: a tracked file deleted or left out of a sparse
+ * checkout, one replaced by a directory, a link to a directory or to nothing.
+ * Directories whose name starts with `.` are listed like any other.
+ *
+ * Asked of git rather than of a glob, for a guard that reads the working tree
+ * as it stands: a glob from the root walks every directory under it, the ones
+ * `.gitignore` ignores included, and a checkout where sessions keep git
+ * worktrees under `.claude/worktrees/` holds a whole copy of the repository in
+ * each.
+ */
+export const listCheckoutFiles = async ({
+  select = () => true,
+  root = projectRootPath,
+}: Readonly<{
+  /**
+   * Which paths to list, asked of every path git lists before anything else is
+   * read: every one unless given.
+   */
+  select?: (relativePath: string) => boolean;
+  /** The checkout to list: the repository's own unless given. */
+  root?: string;
+}> = {}): Promise<Result<readonly string[], string>> => {
+  const listed = await gitLsFiles(
+    root,
+    ['--cached', '--others', '--exclude-standard'],
+    'the files of the checkout',
+  );
+
+  if (Result.isErr(listed)) {
+    return listed;
   }
 
-  return Result.ok(
-    result.value.stdout
-      .split('\0')
-      .filter((file) => file !== '')
-      .toSorted(),
+  // `--cached` lists an unmerged path once per stage.
+  const files = Arr.uniq(listed.value.filter(select));
+
+  // One `stat` per file selected, about half a second over the whole
+  // repository: git has no listing that tells a file on disk from the rest
+  // (`--deleted` misses skip-worktree entries, and `-t` tags one that is on
+  // disk as absent).
+  const checked = await Promise.all(
+    files.map(async (file): Promise<Result<readonly string[], string>> => {
+      const stat = await Result.fromPromise(
+        // eslint-disable-next-line security/detect-non-literal-fs-filename -- a path git listed.
+        fs.stat(path.join(root, file)),
+      );
+
+      if (Result.isOk(stat)) {
+        return Result.ok(stat.value.isFile() ? [file] : []);
+      }
+
+      const code = errorCode(stat.value);
+
+      // Any other failure, a directory that cannot be searched among them,
+      // fails the listing rather than leaving the file out unread.
+      return ABSENT_CODES.has(code)
+        ? Result.ok([])
+        : Result.err(
+            `Failed to list the files of the checkout: ${unknownToString(stat.value)}`,
+          );
+    }),
+  );
+
+  return (
+    checked.find(Result.isErr) ??
+    Result.ok(
+      checked
+        .flatMap((result) => (Result.isOk(result) ? result.value : []))
+        .toSorted(),
+    )
   );
 };
 
@@ -217,6 +284,16 @@ export const TEXT_EXTENSIONS: ReadonlySet<string> = new Set<string>([
   '.yml',
 ]);
 
+/**
+ * What `stat` fails with for a path that is no file to read: not there, under a
+ * file rather than a directory, or a link that leads round in a loop.
+ */
+const ABSENT_CODES: ReadonlySet<unknown> = new Set<unknown>([
+  'ENOENT',
+  'ENOTDIR',
+  'ELOOP',
+]);
+
 const PROSE_EXTENSIONS: ReadonlySet<string> = new Set<string>(['.md', '.mdx']);
 
 /** A directory whose documents are records. */
@@ -253,6 +330,39 @@ const EXCLUDED_PREFIXES: readonly string[] = [
   // The dated record of the move into this monorepo.
   'docs/monorepo-consolidation.md',
 ] as const;
+
+/** The `code` of a Node.js system error, if it has one. */
+const errorCode = (error: unknown): unknown =>
+  isRecord(error) && hasKey(error, 'code') ? error.code : undefined;
+
+/** The paths `git ls-files -z` prints with `args`, relative to `root`. */
+const gitLsFiles = async (
+  root: string,
+  args: readonly string[],
+  what: string,
+): Promise<Result<readonly string[], string>> => {
+  const result = await runFile('git', ['ls-files', '-z', ...args], {
+    cwd: root,
+    // The repository tracks well over ten thousand files, which is more than
+    // the 1 MiB `execFile` defaults to.
+    maxBuffer: 64 * 1024 * 1024,
+  });
+
+  const stderr = result.stderr.trim();
+
+  // `runFile` leaves `error` unset only when there is an exit code or a signal.
+  return result.status === 0
+    ? Result.ok(result.stdout.split('\0').filter((file) => file !== ''))
+    : Result.err(
+        `Failed to list ${what}: ${
+          result.error !== undefined
+            ? unknownToString(result.error)
+            : stderr !== ''
+              ? stderr
+              : `git ended with ${result.status ?? result.signal}`
+        }`,
+      );
+};
 
 const listSorted = async (
   pattern: string,

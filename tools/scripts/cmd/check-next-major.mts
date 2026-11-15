@@ -9,7 +9,7 @@ import {
   Result,
   unknownToString,
 } from 'ts-data-forge';
-import { glob, isDirectlyExecuted } from 'ts-repo-utils';
+import { isDirectlyExecuted } from 'ts-repo-utils';
 import {
   isBreaking,
   isBreakingRelease,
@@ -20,6 +20,7 @@ import {
 import { runFile } from '../lib/child-process.mjs';
 import { resolveDiffBase } from '../lib/diff-base.mjs';
 import { markdownLines } from '../lib/markdown.mjs';
+import { isUnderExperimental, listCheckoutFiles } from '../lib/repo-files.mjs';
 import { projectRootPath } from '../project-root-path.mjs';
 
 /**
@@ -261,20 +262,23 @@ const HEADING = /^\s{0,3}#{1,6}\s+(.*?)\s*#*\s*$/u;
 /** A list item at column 0, capturing its text. */
 const TOP_LEVEL_LIST_ITEM = /^(?:[-*+]|\d+[.)])\s+(.*)$/u;
 
+/**
+ * Whether a path from the repository root is a package's stock of breaking
+ * changes: a `NEXT_MAJOR.md`, the root's included, outside `experimental/`.
+ */
+export const isStockFile = (relativePath: string): boolean =>
+  path.posix.basename(relativePath) === STOCK_FILE_NAME &&
+  !isUnderExperimental(relativePath);
+
 export const readStocks = async (): Promise<readonly StockFile[]> => {
-  const files = await glob(`**/${STOCK_FILE_NAME}`, {
-    cwd: projectRootPath,
-    ignore: ['**/node_modules/**', '**/dist/**', 'experimental/**'],
-  });
+  const files = await listCheckoutFiles({ select: isStockFile });
 
   if (Result.isErr(files)) {
-    throw new Error(
-      `Failed to list ${STOCK_FILE_NAME} files: ${unknownToString(files.value)}`,
-    );
+    throw new Error(files.value);
   }
 
   return Promise.all(
-    files.value.toSorted().map(async (file) => ({
+    files.value.map(async (file) => ({
       file,
       // eslint-disable-next-line security/detect-non-literal-fs-filename
       content: await fs.readFile(path.resolve(projectRootPath, file), 'utf8'),

@@ -1,8 +1,7 @@
 import { Arr, isRecord, Result, unknownToString } from 'ts-data-forge';
 import { isDirectlyExecuted } from 'ts-repo-utils';
 import type { ReadonlyRecord } from 'ts-type-forge';
-import { readRepositoryFile } from '../lib/repo-files.mjs';
-import { git, isRegularFile, splitZ } from '../lib/step-runner.mjs';
+import { listCheckoutFiles, readRepositoryFile } from '../lib/repo-files.mjs';
 
 /**
  * Fails when the synstate hooks packages drift apart in the files they share.
@@ -140,14 +139,9 @@ export const filesOf = (
 ): readonly string[] => {
   const prefix = `${dir}/` as const;
 
-  // `git ls-files --cached` lists an unmerged path once per stage.
-  return Array.from(
-    new Set<string>(
-      listed
-        .filter((file) => file.startsWith(prefix))
-        .map((file) => file.slice(prefix.length)),
-    ),
-  );
+  return listed
+    .filter((file) => file.startsWith(prefix))
+    .map((file) => file.slice(prefix.length));
 };
 
 /**
@@ -393,22 +387,21 @@ const departureOf = (
         : 'differs';
 
 /**
- * The files of every package that git would commit, repository-relative:
- * tracked, or untracked and not ignored, and present in the working tree.
- * {@link readSharedFiles} keeps the shared ones.
+ * The files of every package that git would commit, repository-relative, as
+ * {@link listCheckoutFiles} lists them. {@link readSharedFiles} keeps the
+ * shared ones.
  */
-const listSharedFiles = async (): Promise<readonly string[]> =>
-  splitZ(
-    await git([
-      'ls-files',
-      '-z',
-      '--cached',
-      '--others',
-      '--exclude-standard',
-      '--',
-      ...Arr.toUnshifted(REFERENCE)(COPIES.map((copy) => copy.dir)),
-    ]),
-  ).filter(isRegularFile);
+const listSharedFiles = async (): Promise<readonly string[]> => {
+  const prefixes = Arr.toUnshifted(REFERENCE)(
+    COPIES.map((copy) => copy.dir),
+  ).map((dir) => `${dir}/`);
+
+  return Result.unwrapThrow(
+    await listCheckoutFiles({
+      select: (file) => prefixes.some((prefix) => file.startsWith(prefix)),
+    }),
+  );
+};
 
 /**
  * The shared files of a package, keyed by their path inside it, and its scripts

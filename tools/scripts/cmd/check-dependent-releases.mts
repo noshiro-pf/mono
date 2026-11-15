@@ -927,6 +927,8 @@ const readReExports = async (
     packages
       .filter(({ released }) => released)
       .map(async ({ name, directory }) => {
+        // A package's `src/`: nothing in it is ignored.
+        // eslint-disable-next-line ts-restrictions/no-restricted-syntax
         const files = await glob(`${directory}/src/**/*.{ts,mts,cts,tsx}`, {
           cwd: projectRootPath,
           ignore: ['**/*.test.*', '**/node_modules/**'],

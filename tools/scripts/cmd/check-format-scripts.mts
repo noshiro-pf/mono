@@ -174,6 +174,9 @@ export const findPrettierInSource = (
 const findPrettierInMember = async (
   memberPath: string,
 ): Promise<readonly string[]> => {
+  // A member's `scripts/`: nothing in it is ignored but `node_modules`, which
+  // `ignore` leaves out.
+  // eslint-disable-next-line ts-restrictions/no-restricted-syntax
   const files = await glob('scripts/**/*.{mts,ts,mjs,js}', {
     cwd: memberPath,
     absolute: true,

@@ -103,6 +103,8 @@ export const checkPackageExampleCoverage = async (
     string
   >
 > => {
+  // A package's `src/`: nothing in it is ignored.
+  // eslint-disable-next-line ts-restrictions/no-restricted-syntax
   const filesResult = await glob('src/**/*.{mts,tsx}', {
     cwd: packageDir,
     absolute: true,
