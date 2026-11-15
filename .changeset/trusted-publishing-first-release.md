@@ -4,7 +4,6 @@
 'eslint-plugin-ts-restrictions': patch
 'eslint-plugin-ts-ui-restrictions': patch
 'eslint-plugin-vitest-coding-style': patch
-'ts-std-forge-keys': patch
 ---
 
 Publish through npm trusted publishing for the first time. Nothing in the packages changes.

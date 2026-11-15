@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "dependencies": {
-    "synstate": ">=8.0.0",
-    "synstate-router": "0.2.1"
+    "synstate": ">=9.0.0",
+    "synstate-router": "0.4.0"
   }
 }

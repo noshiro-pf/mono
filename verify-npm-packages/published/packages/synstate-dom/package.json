@@ -4,8 +4,8 @@
   "private": true,
   "type": "module",
   "dependencies": {
-    "synstate": ">=8.0.0",
-    "synstate-dom": "0.9.0",
-    "ts-data-forge": ">=14.13.0"
+    "synstate": ">=9.0.0",
+    "synstate-dom": "0.11.0",
+    "ts-data-forge": ">=15.0.0"
   }
 }
