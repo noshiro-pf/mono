@@ -1,6 +1,6 @@
 {
   "name": "synstate-router-preact",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Preact bindings for synstate-router: exhaustive Routes, a Link that takes no plain string, and hooks",
   "repository": {
     "type": "git",

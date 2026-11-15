@@ -1,5 +1,21 @@
 ## [5.8.4](https://github.com/noshiro-pf/eslint-config-typed/compare/v5.8.3...v5.8.4) (2026-08-09)
 
+## 7.14.1
+
+### Patch Changes
+
+- 0208c99: `total-functions/no-hidden-type-assertions` looks into the constraint and default of a type parameter that an inner signature or `infer` type declares. On the return type side it reports `f<Foo>()` for `declare function f<T>(): <U extends T>() => U` (and `<U = T>() => U`, and `Foo extends infer U extends T ? U : never`), whose inner type parameter has no value parameter to infer it from and so falls back to `T`. A returned function that hands back what its caller passes, `<U extends T>(u: U) => U`, still passes. On the value parameter side, `f<string>(<U extends string>(u: U) => {})` for `declare function f<T>(cb: <U extends T>(u: U) => void): T` is no longer reported, since the argument ties `T` down.
+- 537d770: `synstate-dom-a11y/no-autofocus` reports synstate-dom's `autofocus`, the DOM
+  property's spelling, as `jsx-a11y/no-autofocus` reports React's `autoFocus`:
+  `<input autofocus />` was never reported. No other jsx-a11y rule compares a name
+  it has built in with React's spelling exactly.
+
+    `synstate-dom-a11y/prefer-tag-over-role` no longer reports an SVG element given
+    a role, such as `<g role={constant('button')}>` or
+    `<svg role={constant('img')}>`:
+    the HTML tag it asked for cannot stand inside an `<svg>`. An HTML element given
+    a role is reported as before.
+
 ## 7.14.0
 
 ### Minor Changes

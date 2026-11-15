@@ -1,5 +1,17 @@
 # synstate-router-dom-sample-app
 
+## 0.0.14
+
+### Patch Changes
+
+- Updated dependencies [c53d7d8]
+    - synstate-dom@0.13.0
+    - synstate@9.0.0
+    - synstate-router@0.5.0
+    - synstate-router-dom@0.4.0
+    - ts-data-forge@15.0.1
+    - ts-std-forge@0.6.0
+
 ## 0.0.13
 
 ### Patch Changes

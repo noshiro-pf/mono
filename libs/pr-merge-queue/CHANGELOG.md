@@ -1,5 +1,17 @@
 # pr-merge-queue
 
+## 0.15.0
+
+### Minor Changes
+
+- 31d1d1b: Add the `author-only` issue label (`AUTHOR_ONLY_LABEL`), for an issue only the repository's author can do. `run-issue-resolver` and `startable-issues` hold an issue carrying it back whatever its `priority:<tier>`, so that it keeps the tier it would have and no session is handed it.
+- fd07677: Add `reviewOpeningAdditions`, the rounds a `## Review` opening adds after its total in the same sentence: `` `/code-review high`, 11 rounds, and 4 more on the restack. `` adds 4, and `; then 2 rounds on the amend` adds 2. A colon after the total divides it, so nothing after one adds, and a later sentence adds nothing. `reviewOpeningRounds` still reads the total alone.
+
+### Patch Changes
+
+- Updated dependencies [31d1d1b]
+    - pr-report-core@0.9.0
+
 ## 0.14.0
 
 ### Minor Changes
