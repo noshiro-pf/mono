@@ -87,6 +87,28 @@ type Violation = Readonly<{
  */
 const excludedDirs = ['experimental', 'verify-npm-packages'] as const;
 
+/**
+ * A violation for a tsconfig that sets `baseUrl`. TypeScript 6 deprecates it,
+ * and TypeScript 7 ignores it and resolves `paths` from the configuration
+ * file's own directory: a `paths` written against a `baseUrl` then points at
+ * nothing, and TypeScript falls back to `dist/` without an error. Every
+ * tsconfig is read, a package's or not.
+ */
+export const baseUrlViolations = (
+  relativeFile: string,
+  compilerOptions: ReadonlyRecord<string, unknown>,
+): readonly Violation[] =>
+  hasKey(compilerOptions, 'baseUrl')
+    ? ([
+        {
+          file: relativeFile,
+          key: 'baseUrl',
+          detail: 'is set, and TypeScript 7 ignores it.',
+          hint: 'Remove `baseUrl` and write `paths` relative to the configuration file.',
+        },
+      ] as const)
+    : ([] as const);
+
 const collectTsconfigFiles = async (): Promise<
   Result<readonly string[], string>
 > => {
@@ -206,7 +228,10 @@ const checkEntry = async ({
   return perTarget.flat();
 };
 
-const readPaths = async (file: string): Promise<PathsBlock | undefined> => {
+/** The `compilerOptions` of one tsconfig, as tsc reads the file. */
+const readCompilerOptions = async (
+  file: string,
+): Promise<ReadonlyRecord<string, unknown> | undefined> => {
   // eslint-disable-next-line security/detect-non-literal-fs-filename
   const text = await Result.fromPromise(fs.readFile(file, 'utf8'));
 
@@ -225,26 +250,23 @@ const readPaths = async (file: string): Promise<PathsBlock | undefined> => {
 
   const compilerOptions: unknown = parsed.compilerOptions;
 
-  if (!isRecord(compilerOptions) || !hasKey(compilerOptions, 'paths')) {
-    return undefined;
-  }
+  return isRecord(compilerOptions) ? compilerOptions : undefined;
+};
 
-  const entries: unknown = compilerOptions.paths;
+/**
+ * The `paths` block of `compilerOptions`, resolved from the configuration
+ * file's own directory, as TypeScript 7 resolves it (`baseUrl` is refused by
+ * {@link baseUrlViolations}).
+ */
+const readPaths = (
+  file: string,
+  compilerOptions: ReadonlyRecord<string, unknown>,
+): PathsBlock | undefined => {
+  const entries: unknown = compilerOptions['paths'];
 
-  if (!isRecord(entries)) {
-    return undefined;
-  }
-
-  const baseUrl: unknown = hasKey(compilerOptions, 'baseUrl')
-    ? compilerOptions.baseUrl
+  return isRecord(entries)
+    ? { entries, basePath: path.dirname(file) }
     : undefined;
-
-  const dir = path.dirname(file);
-
-  return {
-    entries,
-    basePath: isString(baseUrl) ? path.resolve(dir, baseUrl) : dir,
-  };
 };
 
 /**
@@ -297,7 +319,22 @@ const readPackageName = async (
 };
 
 const checkFile = async (file: string): Promise<readonly Violation[]> => {
-  const paths = await readPaths(file);
+  const compilerOptions = await readCompilerOptions(file);
+
+  if (compilerOptions === undefined) {
+    return [];
+  }
+
+  const baseUrl = baseUrlViolations(
+    path.relative(projectRootPath, file),
+    compilerOptions,
+  );
+
+  if (Arr.isNonEmpty(baseUrl)) {
+    return baseUrl;
+  }
+
+  const paths = readPaths(file, compilerOptions);
 
   if (paths === undefined) {
     return [];
@@ -350,8 +387,8 @@ const checkFile = async (file: string): Promise<readonly Violation[]> => {
  *
  * Only this file's own block is read: `paths` is not merged through `extends` —
  * a child that declares one replaces its parent's wholesale — so a config
- * without a block of its own has nothing to answer for. `baseUrl` is read the
- * same way, which is exact as long as no shared base sets one; none does.
+ * without a block of its own has nothing to answer for. Its entries resolve
+ * from the file's own directory; a `baseUrl` is refused rather than read.
  */
 type PathsBlock = Readonly<{
   entries: ReadonlyRecord<string, unknown>;
