@@ -140,7 +140,7 @@ export const NegativeFiniteNumber = {
    *
    * Unlike `asNegativeFiniteNumber`, this is total: out-of-range inputs are
    * clamped to the nearest representable `NegativeFiniteNumber` instead of
-   * throwing.
+   * throwing, `NaN` included, which becomes `MIN_VALUE`.
    *
    * @param value - The value to convert
    * @returns The value as a `NegativeFiniteNumber`

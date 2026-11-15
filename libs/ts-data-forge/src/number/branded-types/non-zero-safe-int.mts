@@ -112,7 +112,8 @@ export const NonZeroSafeInt = {
    * MAX_VALUE]`.
    *
    * Unlike `asNonZeroSafeInt`, this is total: out-of-range inputs are clamped
-   * to the nearest representable `NonZeroSafeInt` instead of throwing.
+   * to the nearest representable `NonZeroSafeInt` instead of throwing, `NaN`
+   * included, which becomes `MIN_VALUE`.
    *
    * @param value - The value to convert
    * @returns The value as a `NonZeroSafeInt`

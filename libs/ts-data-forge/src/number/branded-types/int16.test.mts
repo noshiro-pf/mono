@@ -233,3 +233,11 @@ describe('Int16 test', () => {
     });
   });
 });
+
+describe('Int16 saturation (#3960)', () => {
+  test('fromNumber saturates +Infinity to MAX_VALUE and -Infinity to MIN_VALUE', () => {
+    expect(Int16.fromNumber(Number.POSITIVE_INFINITY)).toBe(32_767);
+
+    expect(Int16.fromNumber(Number.NEGATIVE_INFINITY)).toBe(-32_768);
+  });
+});

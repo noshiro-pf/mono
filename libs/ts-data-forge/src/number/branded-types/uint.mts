@@ -144,7 +144,8 @@ export const Uint = {
    * integer and saturating the result into the range `[MIN_VALUE, MAX_VALUE]`.
    *
    * Unlike `asUint`, this is total: out-of-range inputs are clamped to the
-   * nearest representable `Uint` instead of throwing.
+   * nearest representable `Uint` instead of throwing, `NaN` included, which
+   * becomes `MIN_VALUE`.
    *
    * @example
    *

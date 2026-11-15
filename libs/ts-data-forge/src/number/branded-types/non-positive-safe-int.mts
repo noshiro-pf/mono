@@ -100,7 +100,7 @@ export const NonPositiveSafeInt = {
    *
    * Unlike `asNonPositiveSafeInt`, this is total: out-of-range inputs are
    * clamped to the nearest representable `NonPositiveSafeInt` instead of
-   * throwing.
+   * throwing, `NaN` included, which becomes `MIN_VALUE`.
    *
    * @param value - The value to convert
    * @returns The value as a `NonPositiveSafeInt`

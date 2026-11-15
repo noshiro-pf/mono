@@ -118,7 +118,8 @@ export const NonZeroInt32 = {
    * MAX_VALUE]`.
    *
    * Unlike `asNonZeroInt32`, this is total: out-of-range inputs are clamped to
-   * the nearest representable `NonZeroInt32` instead of throwing.
+   * the nearest representable `NonZeroInt32` instead of throwing, `NaN`
+   * included, which becomes `MIN_VALUE`.
    *
    * @param value - The value to convert
    * @returns The value as a `NonZeroInt32`
