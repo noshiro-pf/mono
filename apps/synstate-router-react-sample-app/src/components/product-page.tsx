@@ -19,8 +19,7 @@ type Props = Readonly<{
 export const ProductPage = React.memo<Props>((props) => {
   const { productId } = props;
 
-  // The fallback is never drawn: `productDetail$` holds a value from the start.
-  const data = useObservableValue(productDetail$, AsyncData.pending());
+  const data = useObservableValue(productDetail$);
 
   const view = React.useMemo(() => viewOf(data, productId), [data, productId]);
 

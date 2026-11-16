@@ -20,8 +20,7 @@ export const ProductListPage = React.memo<Props>((props) => {
 
   const { q, sort, page } = list.search;
 
-  // The fallback is never drawn: `productList$` holds a value from the start.
-  const data = useObservableValue(productList$, AsyncData.pending());
+  const data = useObservableValue(productList$);
 
   const links = React.useMemo(
     () => ({

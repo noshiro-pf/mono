@@ -17,10 +17,9 @@ export const latestRequest = <Q, A>(
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types -- a DOM class, handed over by `fromAbortablePromise`
   request: (query: Q, signal: AbortSignal) => Promise<A>,
 ): InitializedObservable<AsyncData<A, unknown>> =>
-  query$
-    .pipe(switchMap((query) => fromRequest((signal) => request(query, signal))))
-    // `switchMap` already holds that pending value; its type does not say so.
-    .pipe(withInitialValue<AsyncData<A, unknown>>(AsyncData.pending()));
+  query$.pipe(
+    switchMap((query) => fromRequest((signal) => request(query, signal))),
+  );
 
 /**
  * One request as `AsyncData`: pending at once, then its result. Unsubscribing

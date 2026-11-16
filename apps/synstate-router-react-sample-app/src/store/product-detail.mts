@@ -3,7 +3,7 @@ import {
   map,
   skipIfNoChange,
   switchMap,
-  type Observable as SynstateObservable,
+  type InitializedObservable,
 } from 'synstate';
 import { AsyncData, Optional } from 'ts-std-forge';
 import type { SafeInt } from 'ts-type-forge';
@@ -17,10 +17,9 @@ import { fromRequest } from './from-request.mjs';
  * before.
  *
  * It holds a value from the start, since `switchMap` projects the location the
- * router already has; its type does not say so, which is why the page reads it
- * with a fallback.
+ * router already has.
  */
-export const productDetail$: SynstateObservable<
+export const productDetail$: InitializedObservable<
   AsyncData<Optional<ProductDetail>, unknown>
 > = router
   .at(routes.products.item)
@@ -33,7 +32,9 @@ export const productDetail$: SynstateObservable<
   .pipe(skipIfNoChange())
   .pipe(
     switchMap(
-      (id): SynstateObservable<AsyncData<Optional<ProductDetail>, unknown>> =>
+      (
+        id,
+      ): InitializedObservable<AsyncData<Optional<ProductDetail>, unknown>> =>
         id === undefined
           ? just(AsyncData.idle)
           : fromRequest((signal) => fetchProduct(id, signal)),
