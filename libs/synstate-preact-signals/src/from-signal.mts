@@ -1,5 +1,10 @@
 import { effect, type ReadonlySignal, type Signal } from '@preact/signals';
-import { source, type InitializedSourceObservable } from 'synstate';
+import {
+  getCurrentScope,
+  onScopeDispose,
+  source,
+  type InitializedSourceObservable,
+} from 'synstate';
 
 /**
  * Converts a Preact `Signal` (or `ReadonlySignal`) into a synstate
@@ -17,8 +22,9 @@ import { source, type InitializedSourceObservable } from 'synstate';
  *
  * @returns A tuple of `[observable, dispose]`.
  *   - `observable` — an `InitializedSourceObservable` that mirrors the signal.
- *   - `dispose` — a function to stop tracking the signal. Call this when the
- *     bridge is no longer needed to avoid memory leaks.
+ *   - `dispose` — a function to stop tracking the signal. Called inside a
+ *     synstate scope, the bridge stops when that scope is disposed; otherwise
+ *     call this when the bridge is no longer needed to avoid memory leaks.
  *
  * @example
  * ```ts
@@ -65,15 +71,18 @@ export const fromSignal = <A,>(
   // Either calls back once before returning, with the signal's current value;
   // nothing can have subscribed to the source yet, so no one sees what it held
   // before.
-  // The bridge is not tied to the synstate scope `fromSignal` runs in: a scope
-  // that disposes the source leaves the subscription to the signal live until
-  // `dispose` is called.
   const dispose =
     typeof sig.subscribe === 'function'
       ? sig.subscribe(pass)
       : effect(() => {
           pass(sig.value);
         });
+
+  // The scope that disposes the source ends the subscription too. Preact's
+  // dispose does nothing the second time, so the caller may still call it.
+  if (getCurrentScope() !== undefined) {
+    onScopeDispose(dispose);
+  }
 
   return [src, dispose] as const;
 };
