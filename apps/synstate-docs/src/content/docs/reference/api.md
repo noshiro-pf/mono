@@ -75,8 +75,8 @@ For complex scenarios, SynState provides observable-based APIs:
 - [`take(n)`](../take/): Take first n emissions then complete.
 - [`skipWhile(predicate)`](../skip-while/): Skip values while predicate is true.
 - [`takeWhile(predicate)`](../take-while/): Emit values while predicate is true, then complete.
-- [`skipUntil(notifier)`](../skip-until/): Skip values until notifier emits.
-- [`takeUntil(notifier)`](../take-until/): Complete on notifier emission.
+- [`skipUntil(notifier)`](../skip-until/): Skip values until notifier emits or completes.
+- [`takeUntil(notifier)`](../take-until/): Complete when notifier emits or completes.
 
 #### Time series processing
 

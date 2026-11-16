@@ -16,8 +16,9 @@ import type {
 } from '../types/index.mjs';
 
 /**
- * Emits values from the source until the notifier observable emits.
- * When the notifier emits, this observable completes.
+ * Emits values from the source until the notifier observable emits or completes.
+ * When the notifier emits, or completes without emitting, this observable
+ * completes. (In RxJS a notifier that only completes is ignored.)
  * In an update that reaches both the source and the notifier (both derive from one
  * observable), this observable hears the notifier first: if the notifier emits in
  * that update, or has completed by then, the source's value in that update is not
@@ -25,7 +26,7 @@ import type {
  *
  * @template A - The type of values from the source
  * @param notifier - An observable that signals when to complete
- * @returns An operator that takes values until notifier emits
+ * @returns An operator that takes values until the notifier emits or completes
  *
  * @example
  * ```ts
@@ -36,7 +37,7 @@ import type {
  * //  limited$      1         2         |------- (completed)
  * //
  * //  Explanation:
- * //  - takeUntil completes the observable when the notifier emits
+ * //  - takeUntil completes the observable when the notifier emits or completes
  * //  - After stop() is called, no further values are emitted
  * //  - Useful for cleanup and cancellation patterns
  *
@@ -101,9 +102,7 @@ class TakeUntilObservableClass<A>
     };
 
     // A notifier that already holds a value completes this observable inside
-    // `subscribe`, before the subscription is stored. A notifier that completes
-    // without emitting completes it too, which the description above, the
-    // README and the reference pages do not say yet.
+    // `subscribe`, before the subscription is stored.
     this.#subscription = notifier.subscribe(complete, complete);
 
     if (this.isCompleted) {

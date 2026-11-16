@@ -11,7 +11,7 @@ if (import.meta.vitest !== undefined) {
     //  limited$      1         2         |------- (completed)
     //
     //  Explanation:
-    //  - takeUntil completes the observable when the notifier emits
+    //  - takeUntil completes the observable when the notifier emits or completes
     //  - After stop() is called, no further values are emitted
     //  - Useful for cleanup and cancellation patterns
 
