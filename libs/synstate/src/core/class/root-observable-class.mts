@@ -78,7 +78,7 @@ export class RootObservableClass<A>
  * anything was refused.
  */
 export const writeDuringPropagationWarning =
-  'synstate: an observable was written to (next / setState / dispatch) while an update was propagating, so subscribers can see intermediate states. Derive the value with map / combine instead of writing from a subscriber or a projection.';
+  'synstate: an observable was written to (next / setState / dispatch) while an update was propagating, so subscribers can see intermediate states. Derive the value with map / derive instead of writing from a subscriber or a projection.';
 
 if (import.meta.vitest !== undefined) {
   test('isRootObservable', () => {
