@@ -33,7 +33,7 @@ export const extractJsdoc = (
 ): Result<string, string> => {
   const declarations = exportedDeclarations(source, name);
 
-  if (Arr.isEmpty(declarations)) {
+  if (!Arr.isNonEmpty(declarations)) {
     return Result.err(
       'has no exported declaration in its file: check the name and file in reference-pages.mts, or write `export` on the declaration (an `export { name }` list is not read)',
     );
@@ -60,14 +60,7 @@ export const extractJsdoc = (
 
   const body = bodies[0];
 
-  const paragraphs = (body ?? '')
-    .split('\n')
-    .map((line) => line.replace(/^\s*\*\s?/u, ''))
-    .join('\n')
-    .replaceAll(/```[\s\S]*?```\n?/gu, '')
-    .trim()
-    .split(/\n{2,}/u)
-    .filter((paragraph) => paragraph !== '');
+  const paragraphs = paragraphsOf(body ?? '');
 
   if (Arr.isEmpty(paragraphs)) {
     return Result.err('has no JSDoc to embed');
@@ -76,21 +69,41 @@ export const extractJsdoc = (
   const mut_lines: string[] = [];
 
   for (const paragraph of paragraphs) {
-    const line = paragraph.replaceAll(/\s*\n\s*/gu, ' ');
+    const line = proseLine(paragraph);
 
-    // As written and as embedded: a construct that interrupts a paragraph shows
-    // in the first, and putting it on one line must not make one.
-    const refused =
-      refusedConstruct(paragraph) ??
-      (line === paragraph ? undefined : refusedConstruct(line));
+    if (Result.isErr(line)) {
+      return line;
+    }
+
+    mut_lines.push(line.value);
+  }
+
+  // A type's members, one item each: the list is built here, so only each
+  // member's text has to be prose.
+  const mut_items: string[] = [];
+
+  for (const member of documentedMembers(source, declarations[0].node)) {
+    const lines = paragraphsOf(member.jsdoc).map(proseLine);
+
+    const refused = lines.find(Result.isErr);
 
     if (refused !== undefined) {
       return Result.err(
-        `has a JSDoc paragraph the page cannot show as prose (${refused}): write it as plain sentences, with code in backticks (${JSON.stringify(line)})`,
+        `has, on \`${member.name}\`, ${refused.value.slice('has '.length)}`,
       );
     }
 
-    mut_lines.push(line);
+    const text = lines
+      .map((line) => (Result.isOk(line) ? line.value : ''))
+      .join(' ');
+
+    mut_items.push(
+      `- \`${member.name}\`${member.optional ? ' (optional)' : ''}: ${text}`,
+    );
+  }
+
+  if (Arr.isNonEmpty(mut_items)) {
+    mut_lines.push(mut_items.join('\n'));
   }
 
   return Result.ok(mut_lines.join('\n\n'));
@@ -424,6 +437,20 @@ const parseYaml = (
   }
 };
 
+/** The text between `/**` and `*\/` of the last JSDoc before `node`. */
+const jsdocBodyOf = (
+  source: string,
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  file: ts.SourceFile,
+  node: ts.Node,
+): string | undefined => {
+  const jsdoc = ts.getJSDocCommentsAndTags(node).filter(ts.isJSDoc).at(-1);
+
+  return jsdoc === undefined
+    ? undefined
+    : source.slice(jsdoc.getStart(file) + 3, jsdoc.end - 2);
+};
+
 /**
  * The declarations of `name` that `source` exports, in the order written, each
  * with its JSDoc as TypeScript attaches it: a function's every signature, a
@@ -435,7 +462,7 @@ const exportedDeclarations = (
   source: string,
   name: string,
 ): readonly Readonly<{
-  node: ts.ClassDeclaration | ts.FunctionDeclaration | ts.VariableDeclaration;
+  node: Declaration;
   jsdoc: string | undefined;
 }>[] => {
   const file = ts.createSourceFile(
@@ -446,49 +473,135 @@ const exportedDeclarations = (
     true,
   );
 
-  const nodes = file.statements.flatMap(
-    (
-      statement,
-    ): readonly (
-      ts.ClassDeclaration | ts.FunctionDeclaration | ts.VariableDeclaration
-    )[] => {
-      const exported =
-        ts.canHaveModifiers(statement) &&
-        (ts.getModifiers(statement) ?? []).some(
-          ({ kind }) => kind === ts.SyntaxKind.ExportKeyword,
-        );
+  const nodes = file.statements.flatMap((statement): readonly Declaration[] => {
+    const exported =
+      ts.canHaveModifiers(statement) &&
+      (ts.getModifiers(statement) ?? []).some(
+        ({ kind }) => kind === ts.SyntaxKind.ExportKeyword,
+      );
 
-      return !exported
-        ? []
-        : ts.isFunctionDeclaration(statement) ||
-            ts.isClassDeclaration(statement)
-          ? statement.name?.text === name
-            ? [statement]
-            : []
-          : ts.isVariableStatement(statement)
-            ? statement.declarationList.declarations.filter(
-                (declaration) =>
-                  ts.isIdentifier(declaration.name) &&
-                  declaration.name.text === name,
-              )
-            : [];
-    },
-  );
-
-  return nodes.map((node) => {
-    // The last JSDoc before it, even with a `//` comment between; of a `const`
-    // that declares several, the first one's only. Its text between `/**` and
-    // `*/`.
-    const jsdoc = ts.getJSDocCommentsAndTags(node).filter(ts.isJSDoc).at(-1);
-
-    return {
-      node,
-      jsdoc:
-        jsdoc === undefined
-          ? undefined
-          : source.slice(jsdoc.getStart(file) + 3, jsdoc.end - 2),
-    };
+    return !exported
+      ? []
+      : ts.isFunctionDeclaration(statement) ||
+          ts.isClassDeclaration(statement) ||
+          ts.isTypeAliasDeclaration(statement)
+        ? statement.name?.text === name
+          ? [statement]
+          : []
+        : ts.isVariableStatement(statement)
+          ? statement.declarationList.declarations.filter(
+              (declaration) =>
+                ts.isIdentifier(declaration.name) &&
+                declaration.name.text === name,
+            )
+          : [];
   });
+
+  return nodes.map((node) => ({
+    node,
+    // The last JSDoc before it, even with a `//` comment between; of a `const`
+    // that declares several, the first one's only.
+    jsdoc: jsdocBodyOf(source, file, node),
+  }));
+};
+
+type Declaration =
+  | ts.ClassDeclaration
+  | ts.FunctionDeclaration
+  | ts.TypeAliasDeclaration
+  | ts.VariableDeclaration;
+
+/**
+ * The documented members of a type alias declared as an object type, alone or
+ * in `Readonly<…>`, each with the text of its JSDoc; none for anything else.
+ */
+const documentedMembers = (
+  source: string,
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  node: Declaration,
+): readonly Readonly<{ name: string; optional: boolean; jsdoc: string }>[] => {
+  if (!ts.isTypeAliasDeclaration(node)) {
+    return [];
+  }
+
+  const literal = ts.isTypeLiteralNode(node.type)
+    ? node.type
+    : ts.isTypeReferenceNode(node.type) &&
+        node.type.typeName.getText() === 'Readonly' &&
+        node.type.typeArguments?.length === 1 &&
+        node.type.typeArguments[0] !== undefined &&
+        ts.isTypeLiteralNode(node.type.typeArguments[0])
+      ? node.type.typeArguments[0]
+      : undefined;
+
+  if (literal === undefined) {
+    return [];
+  }
+
+  const file = node.getSourceFile();
+
+  return literal.members.flatMap((member) => {
+    const jsdoc = jsdocBodyOf(source, file, member);
+
+    return jsdoc !== undefined &&
+      ts.isPropertySignature(member) &&
+      ts.isIdentifier(member.name)
+      ? [
+          {
+            name: member.name.text,
+            optional: member.questionToken !== undefined,
+            jsdoc,
+          },
+        ]
+      : [];
+  });
+};
+
+/**
+ * The paragraphs of a JSDoc text, each on one line, with a code fence left out
+ * and `{@link X}` (or `{@link X text}`, `{@link X | text}`) written as inline
+ * code: MDX would read the braces as an expression.
+ */
+const paragraphsOf = (jsdoc: string): readonly string[] =>
+  jsdoc
+    .split('\n')
+    .map((line) => line.replace(/^\s*\*\s?/u, ''))
+    .join('\n')
+    .replaceAll(/```[\s\S]*?```\n?/gu, '')
+    .trim()
+    .split(/\n{2,}/u)
+    .filter((paragraph) => paragraph !== '')
+    .map((paragraph) =>
+      paragraph.replaceAll(
+        /\{@link\s+([^\s|}]+)([^}]*)\}/gu,
+        (_, target: string | undefined, rest: string | undefined) => {
+          const text = (rest ?? '')
+            .replace(/^\s*\|/u, '')
+            .replaceAll(/\s+/gu, ' ')
+            .trim();
+
+          return `\`${text === '' ? (target ?? '') : text}\``;
+        },
+      ),
+    );
+
+/**
+ * `paragraph` on one line, or why the page cannot show it as prose: checked as
+ * written and as embedded, since a construct that interrupts a paragraph shows
+ * in the first, and putting it on one line must not make one.
+ */
+const proseLine = (paragraph: string): Result<string, string> => {
+  const line = paragraph.replaceAll(/\s*\n\s*/gu, ' ');
+
+  const refused =
+    refusedConstruct(paragraph) ??
+    (line === paragraph ? undefined : refusedConstruct(line));
+
+  return refused === undefined
+    ? Result.ok(line)
+    : Result.err(
+        `has a JSDoc paragraph the page cannot show as prose (${refused}): write it as plain sentences, with code in backticks (${JSON.stringify(line)})`,
+      );
 };
 
 /** The kinds of operator a return type names: itself, or each union member. */

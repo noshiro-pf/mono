@@ -29,7 +29,7 @@ Each page gives the API's description, taken from its JSDoc, and an example that
 - [`fromSubscribable`](/mono/synstate-next/reference/sources/from-subscribable/): Follows `subscribable`, emitting each of its values as `Result.ok(value)` and an error as `Result.err(error)`.
 - [`timer`](/mono/synstate-next/reference/sources/timer/): Emits `0` once, `milliseconds` after it is created, and settles.
 - [`counter`](/mono/synstate-next/reference/sources/counter/): Emits `0` in the task after it is created (or, with `emitInitial: false`, `1` one interval later), then the next integer every `milliseconds`.
-- [`createSource`](/mono/synstate-next/reference/sources/create-source/): Creates a source that emits by itself, from another library or an event: a creator written outside the package.
+- [`createSource`, `SourceContext`](/mono/synstate-next/reference/sources/create-source/): Creates a source that emits by itself, from another library or an event: a creator written outside the package.
 
 ## Combining
 
@@ -60,7 +60,7 @@ Each page gives the API's description, taken from its JSDoc, and an example that
 - [`audit`](/mono/synstate-next/reference/operators/audit/): On a value, waits `milliseconds` and then emits the latest value, in an update of its own; the values in between start no wait of their own.
 - [`switchMap`](/mono/synstate-next/reference/operators/switch-map/): Follows the observable that `project` returns for the latest value.
 - [`mergeMap`](/mono/synstate-next/reference/operators/merge-map/): Follows every observable that `project` returns, emitting whatever any of them emits.
-- [`createDerived`](/mono/synstate-next/reference/operators/create-derived/): Creates an observable that follows `parents`: an operator written outside the package.
+- [`createDerived`, `DerivedContext`, `DerivedBehavior`](/mono/synstate-next/reference/operators/create-derived/): Creates an observable that follows `parents`: an operator written outside the package.
 
 ## Updates and lifetime
 
