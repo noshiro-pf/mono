@@ -326,7 +326,7 @@ gates:
         contents: read
         pull-requests: read
     with:
-        diff-scope: code # or runtime, style, strict-lib, none
+        diff-scope: code # or runtime, benchmark, style, strict-lib, none
         result-job: code-check-result / result
 
 the-work:
@@ -423,23 +423,24 @@ comment of their own, so what they mean is here:
   (`!apps/*/src/`). A page there is what an app builds, and its e2e checks (that
   a Japanese table fits as its English one does, say) run in `code-check.yml`
   alone, so a diff touching only that page is the one they judge.
-- **`runtime`** (`node-version-compatibility.yml`, `synstate-benchmark.yml`)
-  ignores what `code` does, with exceptions of its own. Those workflows run the
-  packages' code on each Node.js and measure it. An app's page goes through that
-  app's build, which `ws:build` runs there too, but nothing in it depends on the
-  Node.js version and `code-check.yml` builds it, so `runtime` does not take
-  `apps/*/src/` back. Of the apps it takes back `apps/synstate-docs/src/data/`
-  alone: the benchmark judges the tables there against its baseline, so a diff
-  of the tables alone is one it has to see. The ignore entries are written out
-  in both lists, and `workflow-steps.test.mts` fails when they differ, so an
-  entry added to one goes in the other.
-- **Both take back each Markdown document a unit test reads**, as `!` entries
-  naming the document: unit tests run in `code-check.yml` and
+- **`runtime`** (`node-version-compatibility.yml`) and **`benchmark`**
+  (`synstate-benchmark.yml`) ignore what `code` does, with exceptions of their
+  own. Those workflows run the packages' code on each Node.js and measure it.
+  An app's page goes through that app's build, which `ws:build` runs there too,
+  but nothing in it depends on the Node.js version and `code-check.yml` builds
+  it, so neither takes `apps/*/src/` back. `benchmark` takes back
+  `apps/synstate-docs/src/data/` alone: the benchmark judges the tables there
+  against its baseline, so a diff of the tables alone is one it has to see. The
+  ignore entries are written out in each list, and `workflow-steps.test.mts`
+  fails when they differ from `code`'s, so an entry added to one goes in the
+  others.
+- **`code` and `runtime` take back each Markdown document a unit test reads**,
+  as `!` entries naming the document: unit tests run in `code-check.yml` and
   `node-version-compatibility.yml` alone, so a diff of the document alone is the
   one the test judges, and skipped, the test would fail on the next pull request
-  that touched code. The benchmark, gated on `runtime` too, then runs for such a
-  diff as well. `check:root:test-documents` finds each test whose `readFile`
-  call names a `.md` path, and holds those tests to the table in
+  that touched code. `benchmark` does not, since the benchmark reads none of
+  them. `check:root:test-documents` finds each test whose `readFile` call names
+  a `.md` path, and holds those tests to the table in
   `tools/scripts/cmd/check-test-documents.mts` and each document of the table to
   an exception naming it in both lists. Each `.md` exception of the lists has to
   name a document of the table.
