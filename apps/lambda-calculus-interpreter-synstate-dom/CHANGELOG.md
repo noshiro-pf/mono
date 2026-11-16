@@ -1,5 +1,15 @@
 # lambda-calculus-interpreter-synstate-dom
 
+## 0.0.11
+
+### Patch Changes
+
+- Updated dependencies [0f38111]
+    - ts-data-forge@15.1.0
+    - lambda-calculus-interpreter-core@0.0.20
+    - synstate-dom@0.13.0
+    - synstate@9.0.0
+
 ## 0.0.10
 
 ### Patch Changes

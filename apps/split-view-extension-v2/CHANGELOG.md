@@ -1,5 +1,15 @@
 # split-view-extension-v2
 
+## 0.9.9
+
+### Patch Changes
+
+- Updated dependencies [0f38111]
+    - ts-data-forge@15.1.0
+    - split-view-link@0.0.5
+    - synstate-dom@0.13.0
+    - synstate@9.0.0
+
 ## 0.9.8
 
 ### Patch Changes

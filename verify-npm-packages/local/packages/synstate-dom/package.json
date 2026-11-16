@@ -6,6 +6,6 @@
   "dependencies": {
     "synstate": ">=9.0.0",
     "synstate-dom": "file:../../../.tarballs/synstate-dom.tgz",
-    "ts-data-forge": ">=15.0.1"
+    "ts-data-forge": ">=15.1.0"
   }
 }

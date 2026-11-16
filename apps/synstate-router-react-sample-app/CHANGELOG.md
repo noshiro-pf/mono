@@ -1,5 +1,16 @@
 # synstate-router-react-sample-app
 
+## 0.0.14
+
+### Patch Changes
+
+- Updated dependencies [0f38111]
+    - ts-data-forge@15.1.0
+    - synstate@9.0.0
+    - synstate-react-hooks@9.0.2
+    - synstate-router@0.5.0
+    - synstate-router-react@0.3.0
+
 ## 0.0.13
 
 ### Patch Changes

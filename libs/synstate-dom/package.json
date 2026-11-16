@@ -91,7 +91,7 @@
   },
   "peerDependencies": {
     "synstate": ">=9.0.0",
-    "ts-data-forge": ">=15.0.1"
+    "ts-data-forge": ">=15.1.0"
   },
   "engines": {
     "node": ">=22.23.4",
