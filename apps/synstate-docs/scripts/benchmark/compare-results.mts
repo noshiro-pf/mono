@@ -1,6 +1,14 @@
-import * as fs from 'node:fs/promises';
-import * as path from 'node:path';
 import { Arr, Num, Result } from 'ts-data-forge';
+import {
+  labelsOf,
+  pointsOf,
+  readScenario,
+  resultsFilesIn,
+  scenarioFiles,
+  titleOf,
+  valueAt,
+  type Results,
+} from './results-tables.mjs';
 
 /**
  * Compares two directories of results and prints what moved, as Markdown.
@@ -12,6 +20,10 @@ import { Arr, Num, Result } from 'ts-data-forge';
  * current library versions as the baseline, measures the branch, and prints
  * this — so a pull request that slows propagation down says so in its own run
  * instead of being found months later by someone re-reading a table.
+ *
+ * Every `results*.json` on either side is compared, as `check-drift.mts` judges
+ * them, and a table that is on one side only, or cannot be read, or a directory
+ * that cannot be listed, is reported as a row.
  *
  * Only SynState's rows are reported as the answer. Every other library's row is
  * there to calibrate: the two measurements come from different runner
@@ -32,15 +44,46 @@ const main = async (): Promise<void> => {
     process.exit(1);
   }
 
-  const compared = await Promise.all(
-    scenarios.map(async (scenario) =>
-      compareScenario(
-        scenario,
-        await readScenario(baselineDir, scenario.file),
-        await readScenario(currentDir, scenario.file),
-      ),
-    ),
-  );
+  const [baselineListed, currentListed] = await Promise.all([
+    resultsFilesIn(baselineDir),
+    resultsFilesIn(currentDir),
+  ]);
+
+  const unlisted: readonly Compared[] = [
+    ...(Result.isErr(baselineListed)
+      ? [`the baseline (${baselineListed.value})`]
+      : []),
+    ...(Result.isErr(currentListed)
+      ? [`the current run (${currentListed.value})`]
+      : []),
+  ].map((side) => ({
+    synstate: [`| — | — | — | — | cannot list ${side} |`],
+    calibration: [],
+  }));
+
+  const inBaseline = Result.isOk(baselineListed)
+    ? baselineListed.value
+    : new Set<string>();
+
+  const inCurrent = Result.isOk(currentListed)
+    ? currentListed.value
+    : new Set<string>();
+
+  const compared: readonly Compared[] = Arr.isNonEmpty(unlisted)
+    ? unlisted
+    : await Promise.all(
+        scenarioFiles(inBaseline, inCurrent).map(async (file) =>
+          compareScenario(
+            titleOf(file),
+            inBaseline.has(file)
+              ? await readScenario(baselineDir, file)
+              : undefined,
+            inCurrent.has(file)
+              ? await readScenario(currentDir, file)
+              : undefined,
+          ),
+        ),
+      );
 
   console.log(
     [
@@ -65,57 +108,10 @@ const main = async (): Promise<void> => {
   );
 };
 
-const scenarios = [
-  { title: 'single state', file: 'results-single-state.json' },
-  { title: 'derived chain', file: 'results.json' },
-  { title: 'diamond', file: 'results-diamond.json' },
-  { title: 'deep chain', file: 'results-deep-chain.json' },
-  { title: 'cascaded diamond', file: 'results-cascaded-diamond.json' },
-  { title: 'conditional fan-out', file: 'results-conditional-fan-out.json' },
-  { title: 'equality cut-off', file: 'results-equality-cut-off.json' },
-] as const;
-
-type Scenario = Readonly<{ title: string; file: string }>;
-
-type Results = Readonly<
-  | {
-      kind: 'series';
-      xLabels: readonly string[];
-      series: readonly Readonly<{
-        label: string;
-        values: readonly (number | null)[];
-      }>[];
-    }
-  | {
-      kind: 'stats';
-      rows: readonly Readonly<{ label: string; median: number }>[];
-    }
->;
-
 type Compared = Readonly<{
   synstate: readonly string[];
   calibration: readonly string[];
 }>;
-
-const valueAt = (
-  results: Results,
-  label: string,
-  point: string,
-): number | undefined => {
-  if (results.kind === 'stats') {
-    return results.rows.find((r) => r.label === label)?.median;
-  }
-
-  const index = results.xLabels.indexOf(point);
-
-  if (index === -1) {
-    return undefined;
-  }
-
-  return (
-    results.series.find((s) => s.label === label)?.values[index] ?? undefined
-  );
-};
 
 /** A list rather than an optional, so that the callers stay `flatMap`s. */
 const comparePoint = (
@@ -150,28 +146,46 @@ const isSynState = (label: string): boolean =>
 /** ` (switchMap)` for `SynState (switchMap)`, `''` for `SynState`. */
 const formOf = (label: string): string => label.slice('SynState'.length);
 
-const labelsOf = (results: Results): readonly string[] =>
-  results.kind === 'stats'
-    ? results.rows.map((r) => r.label)
-    : results.series.map((s) => s.label);
-
-/** `''` for a single-point scenario, the sweep's labels for a swept one. */
-const pointsOf = (results: Results): readonly string[] =>
-  results.kind === 'stats' ? ([''] as const) : results.xLabels;
-
+/**
+ * The rows of one scenario: `undefined` for a side without its table, an error
+ * for a side whose table cannot be read.
+ */
 const compareScenario = (
-  scenario: Scenario,
-  baseline: Results | undefined,
-  current: Results | undefined,
+  title: string,
+  baselineRead: Result<Results, string> | undefined,
+  currentRead: Result<Results, string> | undefined,
 ): Compared => {
-  if (baseline === undefined || current === undefined) {
+  const unreadable = [
+    ...(baselineRead !== undefined && Result.isErr(baselineRead)
+      ? ([`the baseline's ${baselineRead.value}`] as const)
+      : ([] as const)),
+    ...(currentRead !== undefined && Result.isErr(currentRead)
+      ? ([`the current run's ${currentRead.value}`] as const)
+      : ([] as const)),
+  ] as const;
+
+  if (Arr.isNonEmpty(unreadable)) {
     return {
-      synstate: [
-        `| ${scenario.title} | — | — | — | not measured on both sides |`,
-      ],
+      synstate: [`| ${title} | — | — | — | ${unreadable.join('; ')} |`],
       calibration: [],
     };
   }
+
+  if (
+    baselineRead === undefined ||
+    currentRead === undefined ||
+    Result.isErr(baselineRead) ||
+    Result.isErr(currentRead)
+  ) {
+    return {
+      synstate: [`| ${title} | — | — | — | not measured on both sides |`],
+      calibration: [],
+    };
+  }
+
+  const baseline = baselineRead.value;
+
+  const current = currentRead.value;
 
   // The current run's rows, read from the file rather than named here, so that
   // a library or a form both runs measured is compared without a list to keep.
@@ -187,11 +201,11 @@ const compareScenario = (
       .filter((m) => isSynState(m.label))
       .map(
         (m) =>
-          `| ${scenario.title}${formOf(m.label)} | ${m.point} | ${m.baseline} ms | ${m.current} ms | ${m.ratio}x |`,
+          `| ${title}${formOf(m.label)} | ${m.point} | ${m.baseline} ms | ${m.current} ms | ${m.ratio}x |`,
       ),
     calibration: measured
       .filter((m) => !isSynState(m.label))
-      .map((m) => `${m.label} ${scenario.title} ${m.point}: ${m.ratio}x`),
+      .map((m) => `${m.label} ${title} ${m.point}: ${m.ratio}x`),
   };
 };
 
@@ -202,20 +216,5 @@ type Point = Readonly<{
   current: string;
   ratio: string;
 }>;
-
-const readScenario = async (
-  dir: string,
-  file: string,
-): Promise<Results | undefined> => {
-  const read = await Result.fromPromise(
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
-    fs.readFile(path.resolve(dir, file), 'utf8'),
-  );
-
-  return Result.isErr(read)
-    ? undefined
-    : // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-      (JSON.parse(read.value) as unknown as Results);
-};
 
 await main();
