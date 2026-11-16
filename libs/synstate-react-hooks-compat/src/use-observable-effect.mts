@@ -13,6 +13,12 @@ import { useBeforeEffects } from './react-version-hooks.mjs';
  * component, or memoized): one built during render is subscribed again, and an
  * initialized one calls `subscriptionFn` again, on every render.
  *
+ * On React 16.8 and 17, which have no `useInsertionEffect`, the callback is
+ * kept current in a layout effect, so a value emitted in the same commit by a
+ * layout effect React runs before it, such as one declared before this hook in
+ * the same component or one in a child component, reaches the previous render's
+ * `subscriptionFn`.
+ *
  * @param observable$ The Observable to subscribe to.
  * @param subscriptionFn Called with each value `observable$` emits.
  */
