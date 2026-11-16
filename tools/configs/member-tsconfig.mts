@@ -142,7 +142,6 @@ export const memberTsconfigs: ReadonlyRecord<string, MemberTsconfig> = {
   'apps/pr-manager-v2': { jsx: 'synstate-dom' },
   'apps/preact-utils': { jsx: 'preact' },
   'apps/profile': { jsx: 'synstate-dom', ...cssModules },
-  'apps/resize-observer-preact-hooks': { jsx: 'preact' },
   'apps/slack-archive-tools': { nodeOnly: true },
   'apps/split-view-extension': { jsx: 'synstate-dom', ...chromeTypes },
   'apps/split-view-extension-v2': { jsx: 'synstate-dom', ...chromeTypes },

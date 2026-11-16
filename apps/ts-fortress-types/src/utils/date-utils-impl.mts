@@ -76,25 +76,6 @@ export const toLocaleHM = (date: Date, separator = ':'): string =>
     getLocaleMinutes(date).toString().padStart(2, '0'),
   ].join(separator);
 
-/**
- * A copy with the month replaced, taking 1-12. The day of the month is clamped
- * to the last day of that month, so 31 January set to February is the end of
- * February rather than early March.
- */
-export const setLocaleMonth =
-  (month: MonthEnum) =>
-  (date: Date): Date =>
-    withLocaleYearMonth(date, date.getFullYear(), monthToIndex[month]);
-
-/**
- * A copy with the year replaced by `updater`'s result. The day of the month is
- * clamped, so 29 February in a year without one is 28 February.
- */
-export const updateLocaleYear =
-  (updater: (year: SafeUint) => SafeUint) =>
-  (date: Date): Date =>
-    withLocaleYearMonth(date, updater(getLocaleYear(date)), date.getMonth());
-
 /** The day of the week, 0-6, Sunday first. */
 export const getLocaleDayOfWeek = (date: Date): DayOfWeekIndex => {
   const day = date.getDay();
@@ -143,45 +124,6 @@ const monthToIndex = {
   11: 10,
   12: 11,
 } as const satisfies ReadonlyRecord<MonthEnum, Index<12>>;
-
-/**
- * The last day of the month `monthIndex` (0-based, carried into the next or
- * previous year as `setFullYear` does) of `year`. Counted in UTC, where no
- * daylight-saving change can move the day.
- */
-const lastDayOfMonth = (year: number, monthIndex: number): number => {
-  // Day 0 of the following month is the last day of this one.
-  const mut_lastDay = new Date(0);
-
-  mut_lastDay.setUTCFullYear(year, monthIndex + 1, 0);
-
-  return mut_lastDay.getUTCDate();
-};
-
-/**
- * A copy of `date` in the local `year` and month `monthIndex` (0-based, carried
- * into the next or previous year as `setFullYear` does), with the day of the
- * month clamped to that month's last day and the time of day kept. Every setter
- * that moves the year or month goes through here.
- */
-const withLocaleYearMonth = (
-  date: Date,
-  year: number,
-  monthIndex: number,
-): Date => {
-  const mut_next = new Date(date);
-
-  // One call sets the year, month and day together, so a day the target month
-  // does not have cannot roll over into the month after, and the date never
-  // passes through the 1st, which may fall in a daylight-saving gap.
-  mut_next.setFullYear(
-    year,
-    monthIndex,
-    Math.min(date.getDate(), lastDayOfMonth(year, monthIndex)),
-  );
-
-  return mut_next;
-};
 
 const isMonth: (n: number) => n is MonthEnum = Num.isUintInRangeInclusive(
   1,

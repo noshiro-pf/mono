@@ -1,7 +1,7 @@
 <!-- cspell:ignore ENOENT iset -->
 
 <!-- Paths in the upstream repository and inside a bundle, and one that moved since. -->
-<!-- doc-paths-ignore: docs/first-release.md libs/es2022/package.json libs/synstate/scripts/cmd/embed-examples-utils.mts -->
+<!-- doc-paths-ignore: docs/first-release.md libs/es2022/package.json libs/synstate/scripts/cmd/embed-examples-utils.mts apps/numeric-input-utils -->
 
 # `strict-typescript-lib` を mono に統合するか
 

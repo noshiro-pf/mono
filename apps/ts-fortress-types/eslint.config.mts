@@ -57,7 +57,7 @@ export default [
     // `setMonth(m)` keeps the day of the month, so 31 January set to February
     // rolls into March, and `setFullYear(y)` / `setFullYear(y, m)` do the same
     // to 29 February or the 31st (#3075). Set the year, month and day in one
-    // call, clamping the day, as `withLocaleYearMonth` in `date-utils.mts` does.
+    // call, clamping the day to the target month.
     // The selectors check the call's shape only — that the day is passed, not
     // that it is clamped — and see through `d.setMonth!(…)`, `(d.setMonth as F)(…)`
     // and `d['setMonth'](…)`; `Date.prototype.setMonth.call` is not matched.
@@ -68,12 +68,12 @@ export default [
         {
           selector: restrictedDateSetterCall('Month', 2),
           message:
-            'Pass the day too, clamped to the target month, or the day rolls into the next month; `DateUtils.setLocaleMonth` does.',
+            'Pass the day too, clamped to the target month, or the day rolls into the next month.',
         },
         {
           selector: restrictedDateSetterCall('FullYear', 3),
           message:
-            'Pass the month and day too, the day clamped to the target month, or 29 February rolls into March; `DateUtils.updateLocaleYear` does.',
+            'Pass the month and day too, the day clamped to the target month, or 29 February rolls into March.',
         },
       ],
     }),
