@@ -102,7 +102,7 @@ test('plans keep their own inputs', { tag: '@smoke' }, async ({ page }) => {
 test(
   'a plan exported to a file reads back as a new plan',
   { tag: '@smoke' },
-  async ({ page }) => {
+  async ({ page }, testInfo) => {
     await page.goto(demo);
 
     const initialCash = page.getByTestId('initial-cash');
@@ -135,13 +135,25 @@ test(
 
     await page.getByTestId('tab-data').click();
 
-    await page
-      .getByTestId('plan-import-new')
-      .setInputFiles(await download.path());
+    // `download.path()` is named by a GUID; saved as the exported name, the
+    // message names the file as a person's would.
+    const saved = testInfo.outputPath('home.json');
+
+    await download.saveAs(saved);
+
+    await page.getByTestId('plan-import-new').setInputFiles(saved);
 
     await expect
       .soft(page.getByTestId('plan-select').getByRole('option'))
       .toHaveText(['home', 'home']);
+
+    const fileStatus = page.getByTestId('plan-file-status');
+
+    await expect.soft(fileStatus).toHaveRole('status');
+
+    await expect
+      .soft(fileStatus.getByRole('paragraph'))
+      .toHaveText('home.json を読み込みました。');
 
     await expect.soft(page.getByTestId('plan-import-warnings')).toBeEmpty();
 

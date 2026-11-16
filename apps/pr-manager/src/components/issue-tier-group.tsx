@@ -23,14 +23,12 @@ export const IssueTierGroup = ({ row, counts$ }: Props): JSX.Element => {
   const view$ = issuesListStore.view;
 
   return (
-    // eslint-disable-next-line synstate-dom-a11y/prefer-tag-over-role -- recorded, not fixed, when jsx-a11y came to synstate-dom (#3764)
-    <div
+    <fieldset
       aria-label={constant(GROUP_NAMES[row])}
       class={constant(`stat-group tiers-${row}`)}
       data-picking={view$.pipe(
         map(({ onlyPriorities }) => Arr.isNonEmpty(onlyPriorities).toString()),
       )}
-      role={constant('group')}
     >
       {ISSUE_TIERS.filter((priority) => TIER_ROWS[priority] === row).map(
         (priority) => (
@@ -61,7 +59,7 @@ export const IssueTierGroup = ({ row, counts$ }: Props): JSX.Element => {
           />
         ),
       )}
-    </div>
+    </fieldset>
   );
 };
 

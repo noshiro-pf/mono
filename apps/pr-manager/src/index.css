@@ -2680,6 +2680,18 @@ a:focus-visible {
   flex: 1 1 100%;
 }
 
+/*
+ * A `<fieldset>` for the group role, with its own border, padding and side
+ * margins taken off. At no specificity, so that any rule for these classes
+ * applies over it.
+ */
+:where(fieldset.summary-row, fieldset.stat-group) {
+  border: none;
+  margin-inline: 0;
+  min-inline-size: 0;
+  padding: 0;
+}
+
 .stat-group {
   display: flex;
   min-width: 0;
