@@ -74,7 +74,7 @@
     "gen": "run-s gen:index gen:config-schema gen:plugin-version gen:readme",
     "gen:config-schema": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/cmd/gen-config-schema.mts",
     "gen:index": "run-s gen:index:src fix:fmt",
-    "gen:index:src": "pnpm run z:gen-index-ts ./src/lib,./src/open-pr,./src/unblock-prs,./src/pr-report,./src/claim-pr,./src/pr-description,./src/push-fixed-pr,./src/report-unowned-prs,./src/rework-pr,./src/run-issue-resolver,./src/run-unblock-prs-skill,./src/start-issue,./src/startable-issues --index-ext .mts --export-ext .mjs --target-ext .mts",
+    "gen:index:src": "pnpm run z:gen-index-ts ./src/lib,./src/markdown,./src/open-pr,./src/unblock-prs,./src/pr-report,./src/claim-pr,./src/pr-description,./src/push-fixed-pr,./src/report-unowned-prs,./src/rework-pr,./src/run-issue-resolver,./src/run-unblock-prs-skill,./src/start-issue,./src/startable-issues --index-ext .mts --export-ext .mjs --target-ext .mts",
     "gen:plugin-version": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/cmd/gen-plugin-version.mts",
     "gen:readme": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/cmd/embed-examples.mts",
     "test": "pnpm run check:test",
@@ -87,7 +87,13 @@
     "z:vitest:node": "pnpm run z:vitest --project='Node.js'"
   },
   "dependencies": {
+    "@types/mdast": "^4.0.4",
+    "decode-named-character-reference": "^1.3.0",
     "dedent": "^1.7.2",
+    "mdast-util-from-markdown": "^2.1.0",
+    "mdast-util-gfm": "^3.1.0",
+    "micromark-extension-gfm": "^3.0.0",
+    "micromark-util-decode-numeric-character-reference": "^2.0.2",
     "pr-report-core": "workspace:^",
     "ts-data-forge": "workspace:^",
     "ts-fortress": "workspace:^",

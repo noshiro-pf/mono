@@ -1,9 +1,10 @@
 // cspell:ignore xhigh
 import dedent from 'dedent';
-import { Result } from 'ts-data-forge';
+import { Arr, Result } from 'ts-data-forge';
 import {
   changedParts,
   checkDescription,
+  declarationProblems,
   descriptionKindOf,
   readableDescription,
   reviewOpeningAdditions,
@@ -381,12 +382,35 @@ describe(checkDescription, () => {
     );
   });
 
+  test('quotes every line a closing keyword is written over', () => {
+    assert.deepStrictEqual(
+      checkDescription(
+        split(dedent`
+          A.
+
+          **Fixes:**
+          #2 was the bug.
+
+          ## 日本語
+
+          あ。
+        `),
+        'pull-request',
+      ),
+      [closingKeywordProblem('original', '**Fixes:** #2 was the bug.')],
+    );
+  });
+
   test.each([
     'Closes #2',
     'Closes noshiro-pf/mono#2',
     'Fixes https://github.com/noshiro-pf/mono/issues/2',
     'Fixes:#2',
     'Closes : #2',
+    // Not confirmed against GitHub; read, on the side of reading.
+    'Fixes#2',
+    // Emphasis leaves its text.
+    '**Fixes:** #2',
   ])(
     'reads %s as a closing keyword, and says what each reading asks',
     (line) => {
@@ -412,6 +436,230 @@ describe(checkDescription, () => {
       );
     },
   );
+
+  test.each([
+    'Fixes #2',
+    '**Fixes:** #2',
+    'Fix<em>es</em> #2',
+    "**Closes** #2, see 'www.example.com'.",
+  ])('does not ask the translation for the number %s closes', (line) => {
+    assert.deepStrictEqual(
+      checkDescription(
+        split(dedent`
+          A.
+
+          ${line}
+
+          ## 日本語
+
+          あ。
+        `),
+        'pull-request',
+      ),
+      [closingKeywordProblem('original', line)],
+    );
+  });
+
+  test.each(['<!-- Fixes #12 -->', '    Fixes #12'])(
+    'does not ask the translation for the number %s closes unseen',
+    (line) => {
+      assert.deepStrictEqual(
+        checkDescription(
+          split(dedent`
+            A.
+
+            ${line}
+
+            ## 日本語
+
+            あ。
+          `),
+          'pull-request',
+        ),
+        [],
+      );
+    },
+  );
+
+  test('reads a lone carriage return in a line as a space', () => {
+    assert.deepStrictEqual(
+      checkDescription(
+        {
+          ...split(dedent`
+            A.
+
+            ## 日本語
+
+            あ。
+          `),
+          original: 'A.\rB\nFixes #2',
+        },
+        'pull-request',
+      ),
+      [closingKeywordProblem('original', 'Fixes #2')],
+    );
+  });
+
+  test("quotes the line a task list item's keyword is on", () => {
+    assert.deepStrictEqual(
+      checkDescription(
+        split(dedent`
+          A.
+
+          - [x]
+            Closes #7
+
+          ## 日本語
+
+          あ。
+        `),
+        'pull-request',
+      ),
+      [closingKeywordProblem('original', 'Closes #7')],
+    );
+  });
+
+  test('names the line a keyword is on after a line break written as a reference', () => {
+    assert.deepStrictEqual(
+      checkDescription(
+        split(dedent`
+          A &#10; B.
+          Fixes #1
+          C.
+
+          ## 日本語
+
+          あ。
+        `),
+        'pull-request',
+      ),
+      [closingKeywordProblem('original', 'Fixes #1')],
+    );
+  });
+
+  test('quotes a closing keyword alone, not the trailer after it', () => {
+    assert.deepStrictEqual(
+      checkDescription(
+        split(dedent`
+          A.
+
+          Fixes #2
+          Fixes #3
+
+          ## 日本語
+
+          あ。
+        `),
+        'pull-request',
+      ),
+      [closingKeywordProblem('original', 'Fixes #2')],
+    );
+  });
+
+  test('counts a reference a code span keeps from a keyword', () => {
+    assert.deepStrictEqual(
+      checkDescription(
+        split(dedent`
+          A. Fixes \`x\` #12 here.
+
+          ## 日本語
+
+          あ。
+        `),
+        'pull-request',
+      ),
+      ['the original names #12 and the translation does not'],
+    );
+  });
+
+  test('reads no keyword before an escaped number sign', () => {
+    assert.deepStrictEqual(
+      checkDescription(
+        split(dedent`
+          A.
+
+          Write Fixes ${'\\'}#25 to close an issue.
+
+          ## 日本語
+
+          あ。
+
+          Fixes ${'\\'}#25 と書く。
+        `),
+        'pull-request',
+      ),
+      [],
+    );
+  });
+
+  test('reads no keyword across table cells', () => {
+    assert.deepStrictEqual(
+      checkDescription(
+        split(dedent`
+          A.
+
+          | Kind | Issue |
+          | --- | --- |
+          | Bug fix | #12 |
+
+          ## 日本語
+
+          あ。
+        `),
+        'pull-request',
+      ),
+      [],
+    );
+  });
+
+  test.each([
+    // U+017F LATIN SMALL LETTER LONG S, which Unicode folds to `s`.
+    'Clo\u{17F}es #2',
+    // No issue is numbered 0.
+    'Fixes #0',
+    // GitHub shows no comment or code, and acts on no keyword in one.
+    '<!-- Closes #2 -->',
+    'Write `Closes #2` to close one.',
+    // A repository's name, not a keyword.
+    'See someone/fix#2.',
+  ])('reads %s as prose, as GitHub does', (line) => {
+    assert.deepStrictEqual(
+      checkDescription(
+        split(dedent`
+          A.
+
+          ${line}
+
+          ## 日本語
+
+          あ。
+
+          ${line}
+        `),
+        'pull-request',
+      ),
+      [],
+    );
+  });
+
+  test('names the line of a paragraph that holds the keyword', () => {
+    assert.deepStrictEqual(
+      checkDescription(
+        split(dedent`
+          Write \`Closes #2\` to close one.
+          Fixes #2
+
+          ## 日本語
+
+          あ。
+
+          #2
+        `),
+        'pull-request',
+      ),
+      [closingKeywordProblem('original', 'Fixes #2')],
+    );
+  });
 
   test('never sends a pull request toward --issue, nor an issue draft toward rewording', () => {
     const problems = checkDescription(
@@ -446,6 +694,16 @@ describe(checkDescription, () => {
         'issue',
       ),
       [],
+    );
+  });
+
+  test('counts a number a closing keyword names where prose names it too', () => {
+    assert.include(
+      checkDescription(
+        split('See #5.\n\nFixes #5\n\n## 日本語\n\nあ。'),
+        'pull-request',
+      ),
+      'the original names #5 and the translation does not',
     );
   });
 
@@ -1224,6 +1482,60 @@ describe(changedParts, () => {
     );
   });
 
+  test('does not count a keyword over two lines moved out of a half as a change', () => {
+    assert.deepStrictEqual(
+      changedParts(
+        split(dedent`
+          A.
+
+          Closes
+          #11
+
+          ## 日本語
+
+          あ。
+        `),
+        split(dedent`
+          A.
+
+          ## 日本語
+
+          あ。
+
+          ---
+
+          Closes
+          #11
+        `),
+        'pull-request',
+      ),
+      { original: false, translation: false },
+    );
+  });
+
+  test.each(['A.', 'We use `foo`.', '**A.**'])(
+    'does not count a keyword moved out of the line %s as a change',
+    (prose) => {
+      assert.deepStrictEqual(
+        changedParts(
+          split(`${prose} Closes #11\n\n## 日本語\n\nあ。`),
+          split(`${prose}\n\n## 日本語\n\nあ。\n\n---\n\nCloses #11`),
+          'pull-request',
+        ),
+        { original: false, translation: false },
+      );
+    },
+  );
+
+  test('counts an edit beside a keyword over two lines', () => {
+    const body = 'We do X. Closes\n#2 and more.\n\n## 日本語\n\nあ。';
+
+    assert.deepStrictEqual(
+      changedParts(split(body), split(body.replace('X', 'Y')), 'pull-request'),
+      { original: true, translation: false },
+    );
+  });
+
   test('counts an edit to a line of an issue that has a closing keyword', () => {
     const issue =
       'The fix resolves #10 partly.\n\n## 日本語\n\nこの修正は #10 を一部解決する。';
@@ -1311,3 +1623,13 @@ const OPENING_RULE =
 
 const CODE_RULE =
   'each code block appears in both halves, the same and in the same order, so that either half reads on its own';
+
+describe(declarationProblems, () => {
+  test('reads a lone carriage return as a line break, as `splitDescription` does', () => {
+    const problems = declarationProblems('A.\nMerge-After: 5');
+
+    assert.isTrue(Arr.isNonEmpty(problems));
+
+    assert.deepStrictEqual(declarationProblems('A.\rMerge-After: 5'), problems);
+  });
+});

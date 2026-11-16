@@ -982,26 +982,31 @@ export const createClient = (
 
       const cutoff = currentEpochMs() - withinDays * 24 * 60 * 60 * 1000;
 
-      const within = listed.value.filter((pr) => {
+      const within = listed.value.flatMap((pr) => {
         if (pr.merged_at === null) {
-          return false;
+          return [];
         }
 
         const at = epochMsOf(pr.merged_at);
 
-        return at !== undefined && at >= cutoff;
+        return at !== undefined && at >= cutoff
+          ? [{ pr, mergedAt: pr.merged_at }]
+          : [];
       });
 
       return Result.ok(
         within
-          .map((pr) => ({
+          .toSorted((a, b) => b.mergedAt.localeCompare(a.mergedAt))
+          // Before the bodies are parsed, which costs a Markdown parse each.
+          .slice(0, limit)
+          .map(({ pr, mergedAt }) => ({
             number: pr.number,
             title: pr.title,
             author: pr.user?.login ?? 'unknown',
             url: pr.html_url,
             headRef: pr.head.ref,
             baseRef: pr.base.ref,
-            mergedAt: pr.merged_at ?? '',
+            mergedAt,
             labels: labelsOf(pr.labels),
             // The text, not the rendering: this list is only displayed, so a
             // keyword read differently from GitHub costs a line of display,
@@ -1014,9 +1019,7 @@ export const createClient = (
                 state: 'unknown' as const,
               }),
             ),
-          }))
-          .toSorted((a, b) => b.mergedAt.localeCompare(a.mergedAt))
-          .slice(0, limit),
+          })),
       );
     },
 

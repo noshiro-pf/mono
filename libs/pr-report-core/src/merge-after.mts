@@ -65,9 +65,10 @@ export const parseStartAfter = (body: string): readonly number[] =>
  * it. A fence is how every document here already says "this is a sample, not
  * the thing itself", so it is the line to draw.
  *
- * Exported because `pr-report` reads the closing keywords (`Closes #12`) out of
- * the same bodies and has to draw the line in the same place — a document
- * showing what a declaration looks like must not become one.
+ * Exported for the tools that read declarations out of the same bodies. The
+ * closing keywords (`Closes #12`) are read with a Markdown parser instead, which
+ * also skips indented code, code spans and HTML comments: a declaration there
+ * is still read.
  */
 export const outsideCodeFences = (body: string): string => {
   const lines = body.split('\n');

@@ -101,7 +101,14 @@ A body is refused by `push`, `create`, `check` and `open-pr --body-file` when:
 - the translation holds a table, an image, or a `Merge-After:` line;
 - either half holds a trailer (`Start-After:`, `Claude-Session:`, a pull
   request's closing keyword): trailers go after the `---` rule. In an issue a
-  closing keyword is prose (`push` asks GitHub which the number is);
+  closing keyword is prose (`push` asks GitHub which the number is). A closing
+  keyword is read as `pr-report` reads one without the rendered body (#4064):
+  in the text the Markdown shows, so not in code, a code span or an HTML
+  comment, but through emphasis (`**Fixes:** #2`) and a soft line break, and not
+  across a table cell or an HTML block element; `#0` and an escaped `\#` are
+  none. The cases are in
+  `libs/pr-merge-queue/src/markdown/prose-blocks.test.mts` and
+  `libs/pr-report-core/src/closing-keywords.test.mts`;
 - the original has more than one `## Review` (suffixed ones included), or the
   translation has one (its section is `### レビュー`);
 - the original's `## Review` does not open with the review line, the level and
