@@ -2,6 +2,10 @@
 
 import { Result } from 'ts-data-forge';
 import { parseCommandArgs, positiveInteger } from '../lib/index.mjs';
+import {
+  ANONYMOUS_REQUESTS_PER_HOUR,
+  REQUESTS_PER_PULL_WITH_CHECKS,
+} from './rate-limit.mjs';
 
 export const FORMATS = ['json', 'markdown', 'terminal'] as const;
 
@@ -57,7 +61,8 @@ export const HELP = [
   '  -h, --help                       show this help',
   '',
   'Reads GH_TOKEN or GITHUB_TOKEN when one is set. Without it the public API',
-  'allows 60 requests an hour, which is about twenty pull requests, and the',
+  `allows ${ANONYMOUS_REQUESTS_PER_HOUR} requests an hour, and a report asks at least ${REQUESTS_PER_PULL_WITH_CHECKS} for each open`,
+  `pull request, so it fits fewer than ${Math.ceil(ANONYMOUS_REQUESTS_PER_HOUR / REQUESTS_PER_PULL_WITH_CHECKS)} of them. Without a token, too, the`,
   'issue links are the ones the bodies declare rather than GitHub’s own list.',
 ].join('\n');
 
