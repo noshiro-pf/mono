@@ -1,9 +1,22 @@
-import type { ReadonlyRecord } from 'ts-type-forge';
+import type { ReadonlyRecord, StrictExclude } from 'ts-type-forge';
 import { synstateRules } from './rules/index.mjs';
 import type { ESLintFlatConfig, ESLintPlugin } from './types.mjs';
 
 /**
- * Every rule this plugin ships, at `error`.
+ * The rules for synstate-dom code alone, which `recommended` leaves out: they
+ * read JSX as synstate-dom binds it, and would misjudge React's
+ * (`no-unfocusable-focus-handler`: React's `onFocus` bubbles).
+ */
+const synstateDomRules = {
+  'synstate/no-unfocusable-focus-handler': 'error',
+} as const satisfies Partial<
+  ReadonlyRecord<`synstate/${keyof typeof synstateRules}`, 'error'>
+>;
+
+type SynstateDomRuleName = keyof typeof synstateDomRules;
+
+/**
+ * Every rule this plugin ships, at `error`, but the synstate-dom ones.
  *
  * The `satisfies` clause below is keyed off {@link synstateRules}, so leaving a
  * rule out, naming one that does not exist, or setting one to anything but
@@ -19,7 +32,7 @@ const recommendedRules = {
   'synstate/prefer-derive': 'error',
   'synstate/prefer-map-to': 'error',
 } as const satisfies ReadonlyRecord<
-  `synstate/${keyof typeof synstateRules}`,
+  StrictExclude<`synstate/${keyof typeof synstateRules}`, SynstateDomRuleName>,
   'error'
 >;
 
@@ -39,13 +52,29 @@ const recommendedConfig = {
   rules: recommendedRules,
 } as const satisfies ESLintFlatConfig;
 
+const synstateDomConfig = {
+  name: 'synstate/synstate-dom',
+  plugins: {
+    // Resolved lazily, as in `recommendedConfig`.
+    get synstate(): ESLintPlugin {
+      return eslintPluginSynstate;
+    },
+  },
+  rules: synstateDomRules,
+} as const satisfies ESLintFlatConfig;
+
 export const eslintPluginSynstate = {
   meta: {
     name: 'eslint-plugin-synstate',
   },
   rules: synstateRules,
   configs: {
-    /** Enables every rule of this plugin at `error`. */
+    /** Enables every rule of this plugin at `error`, but the synstate-dom ones. */
     recommended: recommendedConfig,
+    /**
+     * Enables the rules for synstate-dom code at `error`; add it beside
+     * `recommended` for the files synstate-dom renders.
+     */
+    'synstate-dom': synstateDomConfig,
   },
 } as const satisfies ESLintPlugin;

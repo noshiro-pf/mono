@@ -19,7 +19,10 @@ const verify = (code: string): readonly Linter.LintMessage[] =>
       [
         {
           languageOptions: { parser },
-          plugins: { 'synstate-dom-a11y': plugin },
+          plugins: {
+            'synstate-dom-a11y': plugin,
+            synstate: plugins.synstate,
+          },
         },
         config,
       ] as unknown as readonly Linter.Config[],
@@ -28,14 +31,33 @@ const verify = (code: string): readonly Linter.LintMessage[] =>
   );
 
 describe(eslintConfigForSynstateDom, () => {
-  test('turns on only rules the registered plugin has', () => {
-    const missing = Object.keys(config.rules ?? {}).filter(
-      (name) =>
-        !name.startsWith('synstate-dom-a11y/') ||
-        plugin.rules?.[name.slice('synstate-dom-a11y/'.length)] === undefined,
-    );
+  test('turns on only rules the registered plugins have', () => {
+    const registered = new Map(Object.entries(plugins));
+
+    const missing = Object.keys(config.rules ?? {}).filter((name) => {
+      const slash = name.lastIndexOf('/');
+
+      const prefix = name.slice(0, slash);
+
+      const rule = name.slice(slash + 1);
+
+      return registered.get(prefix)?.rules?.[rule] === undefined;
+    });
 
     assert.deepStrictEqual(missing, []);
+  });
+
+  test('reports onFocus on an element that cannot take the focus', () => {
+    const messages = verify(
+      dedent`
+        const a = <div onFocus={() => {}}><input /></div>;
+      `,
+    );
+
+    assert.include(
+      messages.map((m) => m.ruleId),
+      'synstate/no-unfocusable-focus-handler',
+    );
   });
 
   test('reports through the registered plugin, reading constant(x) as x', () => {

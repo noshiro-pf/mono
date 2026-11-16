@@ -23,6 +23,7 @@ import type {
   EslintSecurityRules,
   EslintStrictDependenciesRules,
   EslintStylisticRules,
+  EslintSynstateRules,
   EslintTestingLibraryRules,
   EslintTotalFunctionsRules,
   EslintTreeShakableRules,
@@ -74,6 +75,7 @@ export type KnownRules = DeepReadonly<
     EslintVitestRules &
     EslintVitestCodingStyleRules &
     EslintImmerCodingStyleRules &
+    EslintSynstateRules &
     EslintTsDataForgeRules &
     EslintReactCodingStyleRules &
     TypeScriptEslintRules

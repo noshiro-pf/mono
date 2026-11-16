@@ -181,6 +181,12 @@ export const eslintPlugins = {
     rulePrefix: 'immer-coding-style/',
     outputFileName: 'eslint-immer-coding-style-rules.mts',
   },
+  EslintSynstateRules: {
+    typeName: 'EslintSynstateRules',
+    pluginName: 'eslint-plugin-synstate',
+    rulePrefix: 'synstate/',
+    outputFileName: 'eslint-synstate-rules.mts',
+  },
   EslintTsDataForgeRules: {
     typeName: 'EslintTsDataForgeRules',
     pluginName: 'eslint-plugin-ts-data-forge',

@@ -72,6 +72,10 @@ words:
   - tses
   - tsgolint
   - sumi
+  # Of an element that cannot take the focus: the rule
+  # `synstate/no-unfocusable-focus-handler` (eslint-plugin-synstate, used by
+  # eslint-config-typed's synstate-dom preset).
+  - unfocusable
   - unshifted
   - unsub
   - valtio

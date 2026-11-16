@@ -10,11 +10,13 @@ import { defineKnownRules, type FlatConfig } from '../types/index.mjs';
  * and synstate-dom's `autofocus` as React's `autoFocus`, and does not ask an
  * SVG element for an HTML tag in `prefer-tag-over-role`
  * (`eslint-plugin-synstate-dom-a11y`), so every rule of `eslintConfigForReact`'s set
- * applies as it does there; disable one by that name. The React rules and the
- * hooks rules do not: a synstate-dom component is called once and has no hooks.
- * Browser globals are left to `eslintConfigForBrowser`, which a package adds
- * where it wants them. Name files `eslintConfigForReact` or
- * `eslintConfigForPreact` does not: on a file both cover, `jsx-a11y/` reads
+ * applies as it does there; disable one by that name. Beside them,
+ * `synstate/no-unfocusable-focus-handler` reports `onFocus` / `onBlur`, which
+ * do not bubble in synstate-dom, on an element that cannot take the focus. The
+ * React rules and the hooks rules do not: a synstate-dom component is called
+ * once and has no hooks. Browser globals are left to `eslintConfigForBrowser`,
+ * which a package adds where it wants them. Name files `eslintConfigForReact`
+ * or `eslintConfigForPreact` does not: on a file both cover, `jsx-a11y/` reads
  * `constant(x)` as no value beside these rules, and reports every other finding
  * a second time.
  */
@@ -32,5 +34,10 @@ export const eslintConfigForSynstateDom = (
     },
     // The plugin is registered by `eslintConfigForTypeScript`, as are those of
     // every other preset here.
-    rules: defineKnownRules(eslintSynstateDomA11yRules),
+    rules: defineKnownRules({
+      ...eslintSynstateDomA11yRules,
+      // `onFocus` / `onBlur` do not bubble in synstate-dom, as they do in
+      // React, so on an element that cannot take the focus they never run.
+      'synstate/no-unfocusable-focus-handler': 'error',
+    }),
   }) as const;

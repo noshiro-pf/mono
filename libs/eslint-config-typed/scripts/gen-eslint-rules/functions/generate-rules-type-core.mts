@@ -1,6 +1,7 @@
 import type { DeprecatedInfo } from '@eslint/core';
 import { immerCodingStyleRules } from 'eslint-plugin-immer-coding-style';
 import { reactCodingStyleRules } from 'eslint-plugin-react-coding-style';
+import { synstateRules } from 'eslint-plugin-synstate';
 import { tsDataForgeRules } from 'eslint-plugin-ts-data-forge';
 import { tsUiRestrictionsRules } from 'eslint-plugin-ts-ui-restrictions';
 import { vitestCodingStyleRules } from 'eslint-plugin-vitest-coding-style';
@@ -493,6 +494,10 @@ const getRules = async (
     case eslintPlugins.EslintImmerCodingStyleRules.pluginName:
       // eslint-disable-next-line total-functions/no-unsafe-type-assertion
       return Object.entries(immerCodingStyleRules as unknown as Rules);
+
+    case eslintPlugins.EslintSynstateRules.pluginName:
+      // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+      return Object.entries(synstateRules as unknown as Rules);
 
     // A workspace plugin with no default export: its rules object is named.
     case eslintPlugins.EslintTsDataForgeRules.pluginName:
