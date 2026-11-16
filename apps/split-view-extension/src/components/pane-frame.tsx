@@ -851,9 +851,7 @@ export const PaneFrame = ({
               class={constant('pane__menu')}
             >
               <button
-                aria-expanded={load$.pipe(
-                  map((load) => (load.menuOpen ? 'true' : 'false')),
-                )}
+                aria-expanded={load$.pipe(map((load) => load.menuOpen))}
                 aria-label={constant('More for this pane')}
                 class={constant('pane__button')}
                 title={constant('More for this pane')}

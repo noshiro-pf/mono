@@ -12,7 +12,7 @@ export const PaneMenuItem = ({
   onChosen: (choice: PaneMenuChoice) => void;
 }>): JSX.Element => (
   <button
-    aria-pressed={item$.pipe(map((item) => item.pressed?.toString()))}
+    aria-pressed={item$.pipe(map((item) => item.pressed))}
     class={item$.pipe(
       map((item) =>
         item.tone === 'warn'

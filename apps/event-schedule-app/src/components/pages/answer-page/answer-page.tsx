@@ -392,9 +392,7 @@ const AnswerPageOk = ({
               </div>
 
               <button
-                aria-expanded={AnswerTableStore.detailedFilterIsOpen$.pipe(
-                  map((open) => (open ? 'true' : 'false')),
-                )}
+                aria-expanded={AnswerTableStore.detailedFilterIsOpen$}
                 class={constant(styles.toggleDetailedFilterSettingsLabel)}
                 data-e2e={constant('toggle-detailed-filter')}
                 type={constant('button')}

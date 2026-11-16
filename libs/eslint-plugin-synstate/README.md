@@ -13,11 +13,12 @@ Requires ESLint 9+ (flat config). The rules read the syntax and need no TypeScri
 ## Usage (flat config)
 
 The plugin ships a `recommended` config preset that registers the plugin and
-turns on every rule at `error` but the one for synstate-dom code
-(`no-unfocusable-focus-handler`), which the `synstate-dom` preset
-(`eslintPluginSynstate.configs['synstate-dom']`) turns on: add it after
-`recommended`, for the files synstate-dom renders. React's `onFocus` bubbles, so
-the rule would misjudge a React component.
+turns on every rule at `error` but the ones for synstate-dom code
+(`no-aria-string-conversion`, `no-unfocusable-focus-handler`), which the
+`synstate-dom` preset (`eslintPluginSynstate.configs['synstate-dom']`) turns on:
+add it after `recommended`, for the files synstate-dom renders. They read JSX as
+synstate-dom binds it: React's `onFocus` bubbles, so the second would misjudge a
+React component.
 
 The `recommended` preset:
 
@@ -72,6 +73,7 @@ export default [
 
 | Rule                             | Description                                                                                                                                                                                                                |
 | :------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `no-aria-string-conversion`      | Disallow converting an `aria-*` value to a string (`String(x)`, `.toString()`, `map(String)`, `x ? 'true' : 'false'`), which synstate-dom does itself. In the `synstate-dom` preset only.                                  |
 | `no-identity-map`                | Require `skipIfNoChange()` instead of `map((x) => x)`, which changes no value and only stops a repeated one. Fixable.                                                                                                      |
 | `no-observable-in-handler`       | Disallow deriving or subscribing to an observable in an event handler or listener, or after an `await` in a component. Both run outside every scope, so the observable is never disposed and the subscription never ended. |
 | `no-redundant-skip-if-no-change` | Disallow `skipIfNoChange()` directly after `map`, an operator built on it, or another `skipIfNoChange()`, which already stop a value equal (`Object.is`) to the one before. Fixable.                                       |
@@ -277,6 +279,23 @@ It recognizes `counter` imported from `synstate` by name, under an alias or
 through a namespace import, and reads through `as`, `satisfies`, `!` and
 parentheses. Options it cannot see into — a variable, a spread, a computed
 key — are assumed to carry `times`, and are not reported.
+
+### `no-aria-string-conversion`
+
+synstate-dom writes a boolean on an `aria-*` attribute as `"true"` or `"false"`,
+and a number through `String`, so `aria-pressed={closed$.pipe(map(String))}`
+writes what `aria-pressed={closed$}` does. The rule reports an `aria-*` value
+whose last step is only such a conversion: `String(x)`, `x.toString()`,
+`map(String)` or `x ? 'true' : 'false'` (either way round), as the value itself,
+in a branch of a conditional, or as what a function passed to a call returns
+(`map((c) => (c.selected ? 'true' : 'false'))`).
+
+`String(x)` and `.toString()` are reported only on the attributes whose value is
+a boolean, a tristate or a number (`aria-pressed`, `aria-expanded`,
+`aria-valuenow`, …); a string-valued one (`aria-label`, `aria-controls`) may
+convert something that is neither. A conversion that is not the last step
+(`toNumber(String(x))`) is not reported. It reads through `as`, `satisfies`, `!`
+and parentheses.
 
 ### `no-unfocusable-focus-handler`
 

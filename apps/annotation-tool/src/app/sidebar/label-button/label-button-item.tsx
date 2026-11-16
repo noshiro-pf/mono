@@ -48,9 +48,7 @@ export const LabelButtonItem = ({
       }}
     >
       <button
-        aria-pressed={mapBindable(isSelected, (selected) =>
-          selected ? 'true' : 'false',
-        )}
+        aria-pressed={isSelected}
         class={constant(styles.button)}
         data-e2e={constant('label-button')}
         type={constant('button')}
@@ -70,9 +68,7 @@ export const LabelButtonItem = ({
       </button>
       <button
         aria-label={constant(`Show ${label.name}`)}
-        aria-pressed={mapBindable(isVisible, (visible) =>
-          visible ? 'true' : 'false',
-        )}
+        aria-pressed={isVisible}
         class={constant(styles.visibilityToggle)}
         data-e2e={constant('visibility-toggle')}
         type={constant('button')}

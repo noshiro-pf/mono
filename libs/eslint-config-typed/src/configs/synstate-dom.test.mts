@@ -60,6 +60,19 @@ describe(eslintConfigForSynstateDom, () => {
     );
   });
 
+  test('reports an aria-* value converted to a string', () => {
+    const messages = verify(
+      dedent`
+        const a = <button aria-pressed={pressed.toString()} />;
+      `,
+    );
+
+    assert.include(
+      messages.map((m) => m.ruleId),
+      'synstate/no-aria-string-conversion',
+    );
+  });
+
   test('reports through the registered plugin, reading constant(x) as x', () => {
     const messages = verify(
       dedent`

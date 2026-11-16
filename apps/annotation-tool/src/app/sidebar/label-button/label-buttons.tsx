@@ -23,9 +23,7 @@ export const LabelButtons = (props: Props): JSX.Element => (
       {constant('Labels')}
       <Button
         aria-controls={constant(labelListId)}
-        aria-expanded={mapBindable(props.hidden, (hidden) =>
-          hidden ? 'false' : 'true',
-        )}
+        aria-expanded={mapBindable(props.hidden, (hidden) => !hidden)}
         aria-label={constant('Labels')}
         icon={mapBindable(props.hidden, (hidden) =>
           hidden ? 'double-chevron-down' : 'double-chevron-up',
