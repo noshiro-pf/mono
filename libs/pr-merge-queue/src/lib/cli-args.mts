@@ -2,6 +2,7 @@
 
 import * as util from 'node:util';
 import { Num, Result, unknownToString } from 'ts-data-forge';
+import type { ReadonlyRecord } from 'ts-type-forge';
 
 /**
  * `util.parseArgs` over `args`, answering `'help'` when `-h` / `--help` was
@@ -9,16 +10,10 @@ import { Num, Result, unknownToString } from 'ts-data-forge';
  * `help`; this does. Nothing throws: an unknown flag or a missing value is the
  * error.
  */
-export const parseCommandArgs = <const O extends util.ParseArgsOptionsConfig>(
+export const parseCommandArgs = <const O extends CommandOptions>(
   args: readonly string[],
   options: O,
-): Result<
-  | ReturnType<
-      typeof util.parseArgs<Readonly<{ args: readonly string[]; options: O }>>
-    >['values']
-  | 'help',
-  string
-> => {
+): Result<CommandValues<O> | 'help', string> => {
   // `pnpm run <command> -- --flag` forwards the `--` as well, and `parseArgs`
   // would read everything after it as positionals.
   const [first, ...rest] = args;
@@ -40,13 +35,18 @@ export const parseCommandArgs = <const O extends util.ParseArgsOptionsConfig>(
     return Result.ok('help');
   }
 
-  const parsed = Result.fromThrowable(() =>
-    util.parseArgs({ args: argv, options }),
+  const config: util.ParseArgsConfig = { args: argv, options } as const;
+
+  const parsed = Result.fromThrowable(
+    (): CommandValues<O> =>
+      // `CommandValues` restates, read-only, the type Node gives these values
+      // for `options`, which TypeScript cannot see through a type parameter.
+      // The test checks that Node's type is assignable to it.
+      // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+      util.parseArgs(config).values as CommandValues<O>,
   );
 
-  return Result.isErr(parsed)
-    ? Result.err(unknownToString(parsed.value))
-    : Result.ok(parsed.value.values);
+  return Result.mapErr(parsed, unknownToString);
 };
 
 /**
@@ -84,3 +84,67 @@ export const pullRequestNumber = (raw: string): number | undefined =>
   /^#?[1-9]\d*$/u.test(raw)
     ? Result.unwrapOkOr(Num.safeParseInt(raw.replace(/^#/u, '')), undefined)
     : undefined;
+
+/**
+ * A flag {@link parseCommandArgs} reads, as `util.parseArgs` takes it. Written
+ * here rather than taken from `node:util`, so that the published declarations
+ * need no `@types/node`. A flag's `default` has the flag's type, and a flag
+ * that is `multiple` takes none, since `util.parseArgs` wants one as a mutable
+ * array.
+ */
+export type CommandOption = Readonly<
+  | { type: 'string'; short?: string; multiple?: false; default?: string }
+  | { type: 'boolean'; short?: string; multiple?: false; default?: boolean }
+  | {
+      type: 'string' | 'boolean';
+      short?: string;
+      multiple: true;
+      default?: never;
+    }
+>;
+
+/** The flags a command reads, by their long names. */
+export type CommandOptions = ReadonlyRecord<string, CommandOption>;
+
+/**
+ * What {@link parseCommandArgs} reads for `O`: as `util.parseArgs` types its
+ * `values`, read-only. A flag with a `default` is always there; the others may
+ * be missing.
+ */
+export type CommandValues<O extends CommandOptions> = Flatten<
+  Readonly<{ [K in keyof O]?: FlagValue<O[K]> }> &
+    Readonly<{
+      [
+        K in keyof O as O[K] extends Readonly<{ default: string | boolean }>
+          ? K
+          : never
+      ]: FlagValue<O[K]>;
+    }>
+>;
+
+/**
+ * The value one flag declared as `D` reads. Distributes over `D`, so that a
+ * flag typed as any `CommandOption` may be either.
+ *
+ * @internal Reached through {@link CommandValues}, by indexing it with a flag's
+ * name; a consumer has no need to spell it.
+ */
+type FlagValue<D extends CommandOption> =
+  D extends Readonly<{ multiple: true }>
+    ? readonly TypeValue<D['type']>[]
+    : TypeValue<D['type']>;
+
+type TypeValue<T extends CommandOption['type']> = [T] extends ['string']
+  ? string
+  : [T] extends ['boolean']
+    ? boolean
+    : string | boolean;
+
+/**
+ * `T` with an intersection of object types merged into one, so that an editor
+ * shows {@link CommandValues} as one object.
+ *
+ * @internal Only shapes how {@link CommandValues} is shown; a consumer has no
+ * need to spell it.
+ */
+type Flatten<T> = Readonly<{ [K in keyof T]: T[K] }>;

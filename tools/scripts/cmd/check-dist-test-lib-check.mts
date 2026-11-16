@@ -1,5 +1,12 @@
 import * as path from 'node:path';
-import { Arr, hasKey, isRecord, Result, unknownToString } from 'ts-data-forge';
+import {
+  Arr,
+  hasKey,
+  isNotUndefined,
+  isRecord,
+  Result,
+  unknownToString,
+} from 'ts-data-forge';
 import { isDirectlyExecuted } from 'ts-repo-utils';
 import * as ts from 'typescript';
 import { listTrackedFiles } from '../lib/repo-files.mjs';
@@ -7,7 +14,8 @@ import { projectRootPath } from '../project-root-path.mjs';
 
 /**
  * Fails when a `tsconfig*.json` under a package's `test/dist_/` turns
- * `skipLibCheck` on, itself or through a config it extends.
+ * `skipLibCheck` on, itself or through a config it extends, or loads types the
+ * package's consumers may not have.
  *
  * `check:dist` type-checks what a build emitted, reached the way a consumer
  * reaches it. What a build emits for types is `.d.mts`, and `skipLibCheck` is
@@ -15,6 +23,10 @@ import { projectRootPath } from '../project-root-path.mjs';
  * check only proves that the test file can import the package, and passes on
  * declarations that do not type-check. Nothing fails, and a consumer compiling
  * with `skipLibCheck: false` gets the errors from inside `node_modules`.
+ *
+ * `types` does the same more quietly: an entry for anything but the package
+ * itself, such as `node` from the repository's own `@types/node`, resolves
+ * names in the declarations that a consumer may not have.
  */
 export const checkDistTestLibCheck = async (): Promise<
   Result<number, string>
@@ -37,28 +49,16 @@ export const checkDistTestLibCheck = async (): Promise<
 
   const violations = findSkipLibCheckConfigs(projectRootPath, configs);
 
-  if (Arr.isNonEmpty(violations)) {
-    return Result.err(
-      [
-        `❌ ${violations.length} \`test/dist_\` tsconfig file(s) do not type-check the declarations they are there to check:`,
-        '',
-        ...violations.map(
-          ({ relativePath, problem, detail }) =>
-            `  ${relativePath}: ${problemText(problem, detail)}`,
-        ),
-        '',
-        'The files under test are declaration files (`dist/**/*.d.mts`), and',
-        '`skipLibCheck` is the option that skips checking those: with it on,',
-        '`check:dist` passes on a `.d.mts` that does not type-check. Remove it',
-        '(or state `"skipLibCheck": false` over a config that is extended), and',
-        'fix what the check then reports in the package’s own declarations. If',
-        'they name types of another package (`node:` modules), list that',
-        'package in `types`.',
-      ].join('\n'),
-    );
-  }
+  const undeclared = findUndeclaredTypes(projectRootPath, configs);
 
-  return Result.ok(configs.length);
+  const reports = [
+    skipLibCheckReport(violations),
+    undeclaredTypesReport(undeclared),
+  ].filter(isNotUndefined);
+
+  return Arr.isNonEmpty(reports)
+    ? Result.err(reports.join('\n\n'))
+    : Result.ok(configs.length);
 };
 
 /**
@@ -89,6 +89,59 @@ export const findSkipLibCheckConfigs = (
       }
     }
   });
+
+/**
+ * The files among `relativePaths` (relative to `rootDir`, each under
+ * `libs/<package>/`) whose `types`, as tsc resolves it through `extends`, names
+ * anything but the package itself, by its name as `libs/<package>/package.json`
+ * gives it or a subpath of it (`pkg/global`).
+ * A consumer's compiler loads only what the declarations reference and what the
+ * consumer names, so an entry for anything else, such as `node`, resolves names
+ * in the declarations that a consumer may not have. A file whose options cannot
+ * be read is left to {@link findSkipLibCheckConfigs}, which reports it.
+ */
+export const findUndeclaredTypes = (
+  rootDir: string,
+  relativePaths: readonly string[],
+): readonly TypesViolation[] =>
+  Arr.generate(function* () {
+    for (const relativePath of relativePaths) {
+      const read = readOptions(path.join(rootDir, relativePath));
+
+      if (Result.isErr(read)) {
+        continue;
+      }
+
+      const packageDir = Arr.take(relativePath.split('/'), 2).join('/');
+
+      const own = packageNameAt(path.join(rootDir, packageDir));
+
+      // Unstated, `types` is empty from TypeScript 6 on.
+      const undeclared = (read.value.options.types ?? []).filter(
+        (entry) => own === undefined || !namesPackage(entry, own),
+      );
+
+      if (Arr.isNonEmpty(undeclared)) {
+        yield own === undefined
+          ? {
+              relativePath,
+              undeclared,
+              namelessManifest: `${packageDir}/package.json`,
+            }
+          : { relativePath, undeclared };
+      }
+    }
+  });
+
+type TypesViolation = Readonly<{
+  relativePath: string;
+  undeclared: readonly string[];
+  /**
+   * The package's `package.json`, when no `name` could be read from it, so that
+   * no entry could be told to be the package's own.
+   */
+  namelessManifest?: string;
+}>;
 
 type Problem = 'inherited' | 'set' | 'unreadable';
 
@@ -159,7 +212,7 @@ const isAboutReading = (code: number, message: string): boolean =>
   !NOT_ABOUT_READING.has(code) ||
   // By the message: a TS5024 names its option there alone. One about a config
   // further down the chain carries a position in that file, but the root
-  // config's carries none, because `problemOf` parses the object
+  // config's carries none, because `readOptions` parses the object
   // `readConfigFile` returns. Reading the root as a source file instead would
   // give it a position, which would still have to be mapped back to the
   // `extends` node at every level. This reads with the repository's own
@@ -167,17 +220,25 @@ const isAboutReading = (code: number, message: string): boolean =>
   // the tests of a mistyped `extends` fail.
   (code === 5024 && message.includes("'extends'"));
 
-const problemOf = (tsconfig: string): Finding | undefined => {
+/**
+ * The file as written and its compiler options as tsc resolves them, or what
+ * keeps them from being read.
+ */
+const readOptions = (
+  tsconfig: string,
+): Result<
+  Readonly<{ config: unknown; options: ts.CompilerOptions }>,
+  string
+> => {
   // These files are JSONC, and `extends` is resolved as tsc resolves it:
   // both are tsc's own reading, so a commented-out entry is not taken for one
   // and an option set three configs away is.
   const read = ts.readConfigFile(tsconfig, (file) => ts.sys.readFile(file));
 
   if (read.error !== undefined) {
-    return {
-      problem: 'unreadable',
-      detail: ts.flattenDiagnosticMessageText(read.error.messageText, '\n'),
-    };
+    return Result.err(
+      ts.flattenDiagnosticMessageText(read.error.messageText, '\n'),
+    );
   }
 
   const config: unknown = read.config;
@@ -191,26 +252,64 @@ const problemOf = (tsconfig: string): Finding | undefined => {
   );
 
   // An `extends` that does not resolve leaves the options without what they
-  // inherit, and the option would read as off when the config is broken.
+  // inherit, and an option would read as unset when the config is broken.
   const errors = parsed.errors.filter(({ code, messageText }) =>
     isAboutReading(code, ts.flattenDiagnosticMessageText(messageText, '\n')),
   );
 
   return Arr.isNonEmpty(errors)
-    ? {
-        problem: 'unreadable',
-        detail: errors
+    ? Result.err(
+        errors
           .map(({ messageText }) =>
             ts.flattenDiagnosticMessageText(messageText, '\n'),
           )
           .join('; '),
-      }
-    : parsed.options.skipLibCheck !== true
+      )
+    : Result.ok({ config, options: parsed.options });
+};
+
+const problemOf = (tsconfig: string): Finding | undefined => {
+  const read = readOptions(tsconfig);
+
+  return Result.isErr(read)
+    ? { problem: 'unreadable', detail: read.value }
+    : read.value.options.skipLibCheck !== true
       ? undefined
-      : setsItself(config)
+      : setsItself(read.value.config)
         ? { problem: 'set' }
         : { problem: 'inherited' };
 };
+
+/** The `name` in the `package.json` at `packageDir`, if it can be read. */
+const packageNameAt = (packageDir: string): string | undefined => {
+  const text = ts.sys.readFile(path.join(packageDir, 'package.json'));
+
+  const manifest: unknown = Result.unwrapOkOr(
+    Result.fromThrowable((): unknown => JSON.parse(text ?? '')),
+    undefined,
+  );
+
+  return isRecord(manifest) &&
+    hasKey(manifest, 'name') &&
+    typeof manifest.name === 'string'
+    ? manifest.name
+    : undefined;
+};
+
+/**
+ * Whether a `types` entry is the package `name` or a subpath of it. A subpath
+ * may not leave the package: none of its segments, split as tsc splits them on
+ * either slash, is empty, `.` or `..`.
+ */
+const namesPackage = (entry: string, name: string): boolean =>
+  entry === name ||
+  (entry.startsWith(`${name}/`) &&
+    entry
+      .slice(name.length + 1)
+      .split(/[/\\]/u)
+      .every(
+        (segment) => segment !== '' && segment !== '.' && segment !== '..',
+      ));
 
 const problemText = (problem: Problem, detail: string | undefined): string => {
   switch (problem) {
@@ -225,6 +324,50 @@ const problemText = (problem: Problem, detail: string | undefined): string => {
   }
 };
 
+const skipLibCheckReport = (
+  violations: readonly Violation[],
+): string | undefined =>
+  Arr.isNonEmpty(violations)
+    ? [
+        `❌ ${violations.length} \`test/dist_\` tsconfig file(s) do not type-check the declarations they are there to check:`,
+        '',
+        ...violations.map(
+          ({ relativePath, problem, detail }) =>
+            `  ${relativePath}: ${problemText(problem, detail)}`,
+        ),
+        '',
+        'The files under test are declaration files (`dist/**/*.d.mts`), and',
+        '`skipLibCheck` is the option that skips checking those: with it on,',
+        '`check:dist` passes on a `.d.mts` that does not type-check. Remove it',
+        '(or state `"skipLibCheck": false` over a config that is extended), and',
+        'fix what the check then reports in the package’s own declarations.',
+      ].join('\n')
+    : undefined;
+
+const undeclaredTypesReport = (
+  undeclared: readonly TypesViolation[],
+): string | undefined =>
+  Arr.isNonEmpty(undeclared)
+    ? [
+        `❌ ${undeclared.length} \`test/dist_\` tsconfig file(s) load types beside the package under test:`,
+        '',
+        ...undeclared.map(
+          ({ relativePath, undeclared: names, namelessManifest }) =>
+            `  ${relativePath}: ${names.map((name) => `\`${name}\``).join(', ')}${namelessManifest === undefined ? '' : ` (\`${namelessManifest}\` gives no \`name\`, so none of them can be the package itself: fix that first)`}`,
+        ),
+        '',
+        'A consumer’s compiler loads only what the declarations reference and',
+        'what the consumer names in its own `types`, so a declaration that',
+        'resolves only through another entry here fails for them. Name nothing',
+        'but the package itself (a file it publishes by its subpath, such as',
+        '`pkg/global`), or state `"types": []`, and fix what `check:dist` then',
+        'reports in the package’s declarations: write the types they need',
+        'without the other package. A file only the test has gives them what',
+        'consumers lack whichever option loads it, so remove it rather than',
+        'moving it to `include`.',
+      ].join('\n')
+    : undefined;
+
 if (isDirectlyExecuted(import.meta.url)) {
   const result = await checkDistTestLibCheck().catch((error: unknown) =>
     Result.err(unknownToString(error)),
@@ -237,6 +380,6 @@ if (isDirectlyExecuted(import.meta.url)) {
   }
 
   console.info(
-    `${result.value} \`test/dist_\` tsconfig file(s) checked; none turns \`skipLibCheck\` on.`,
+    `${result.value} \`test/dist_\` tsconfig file(s) checked; none turns \`skipLibCheck\` on or loads types beside the package under test.`,
   );
 }
