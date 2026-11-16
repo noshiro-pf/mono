@@ -144,6 +144,40 @@ describe(fromSubscribable, () => {
     assert.deepStrictEqual(mut_combineEvents, [Result.ok(9), 'complete']);
   });
 
+  test('a complete() a subscriber calls on a value delivered from inside unsubscribe unsubscribes once', () => {
+    let mut_onNext: ((value: number) => void) | undefined = undefined;
+
+    let mut_unsubscribes = 0;
+
+    const observable$ = fromSubscribable<number>({
+      subscribe: (onNext) => {
+        mut_onNext = onNext;
+
+        return {
+          unsubscribe: () => {
+            mut_unsubscribes += 1;
+
+            if (mut_unsubscribes === 1) {
+              mut_onNext?.(9);
+            }
+          },
+        };
+      },
+    });
+
+    observable$.subscribe((result) => {
+      if (Result.isOk(result) && result.value === 9) {
+        observable$.complete();
+      }
+    });
+
+    observable$.complete();
+
+    assert.strictEqual(mut_unsubscribes, 1);
+
+    assert.isTrue(observable$.isCompleted);
+  });
+
   test('dispose() unsubscribes from the subscribable', () => {
     const { subscribable, unsubscribe } = createManualSubscribable();
 

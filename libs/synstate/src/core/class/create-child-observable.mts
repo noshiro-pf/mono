@@ -3,7 +3,6 @@
 // @sumi-expect-error-file functions/prefer-arrow-function
 // @sumi-expect-error-file mutation/no-mutation-without-mut-prefix
 import type { Optional, Some } from 'ts-data-forge';
-import * as Arr from 'ts-data-forge/array';
 import { unreachable } from 'ts-std-forge';
 import type {
   AsyncChildObservable,
@@ -14,6 +13,7 @@ import type {
   UpdateToken,
   Wrap,
 } from '../types/index.mjs';
+import { createTeardownList, type TeardownList } from '../utils/index.mjs';
 import {
   AsyncChildObservableClass,
   SyncChildObservableClass,
@@ -268,7 +268,7 @@ class CustomSyncChildObservableClass<
   A,
   const P extends NonEmptyUnknownList,
 > extends SyncChildObservableClass<A, P> {
-  #mut_teardowns: readonly (() => void)[] | undefined;
+  readonly #teardowns: TeardownList;
   readonly #hooks: SyncChildObservableHooks;
 
   constructor(
@@ -279,7 +279,7 @@ class CustomSyncChildObservableClass<
   ) {
     super(config);
 
-    this.#mut_teardowns = undefined;
+    this.#teardowns = createTeardownList();
 
     this.#hooks = toHooks(
       init({
@@ -297,10 +297,7 @@ class CustomSyncChildObservableClass<
           if (this.isCompleted) {
             teardown();
           } else {
-            this.#mut_teardowns = Arr.toPushed(
-              this.#mut_teardowns ?? [],
-              teardown,
-            );
+            this.#teardowns.add(teardown);
           }
         },
       }),
@@ -318,9 +315,7 @@ class CustomSyncChildObservableClass<
   }
 
   protected override teardown(): void {
-    for (const teardown of this.#mut_teardowns ?? []) {
-      teardown();
-    }
+    this.#teardowns.runAll();
   }
 }
 
@@ -328,7 +323,7 @@ class CustomAsyncChildObservableClass<
   A,
   const P extends NonEmptyUnknownList,
 > extends AsyncChildObservableClass<A, P> {
-  #mut_teardowns: readonly (() => void)[] | undefined;
+  readonly #teardowns: TeardownList;
   // Undefined until `init` returns, which may complete the observable first;
   // `complete` then calls `flush` before there is a hook to call.
   readonly #hooks: AsyncChildObservableHooks | undefined;
@@ -341,7 +336,7 @@ class CustomAsyncChildObservableClass<
   ) {
     super(config);
 
-    this.#mut_teardowns = undefined;
+    this.#teardowns = createTeardownList();
 
     this.#hooks = toHooks(
       init({
@@ -362,10 +357,7 @@ class CustomAsyncChildObservableClass<
           if (this.isCompleted) {
             teardown();
           } else {
-            this.#mut_teardowns = Arr.toPushed(
-              this.#mut_teardowns ?? [],
-              teardown,
-            );
+            this.#teardowns.add(teardown);
           }
         },
       }),
@@ -387,9 +379,7 @@ class CustomAsyncChildObservableClass<
   }
 
   protected override teardown(): void {
-    for (const teardown of this.#mut_teardowns ?? []) {
-      teardown();
-    }
+    this.#teardowns.runAll();
   }
 }
 

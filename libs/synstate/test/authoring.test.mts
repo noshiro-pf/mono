@@ -509,6 +509,141 @@ describe('custom operators and creators', () => {
     assert.deepStrictEqual(mut_events, [0, 1, 'complete']);
   });
 
+  test('a complete() a subscriber calls on a value a teardown emits runs no teardown again', () => {
+    let mut_teardowns = 0;
+
+    const obs$ = createRootObservable<number>(
+      { initialValue: Optional.some(0) },
+      ({ startUpdate, onComplete }) => {
+        onComplete(() => {
+          mut_teardowns += 1;
+
+          // Without a guard this would go on until the counter stops it.
+          if (mut_teardowns < 5) {
+            startUpdate(1);
+          }
+        });
+
+        return {};
+      },
+    );
+
+    obs$.subscribe((value) => {
+      if (value === 1) {
+        obs$.complete();
+      }
+    });
+
+    obs$.complete();
+
+    assert.strictEqual(mut_teardowns, 1);
+
+    assert.isTrue(obs$.isCompleted);
+  });
+
+  test('a teardown registered while the teardowns run runs too, once', () => {
+    let mut_onComplete: ((teardown: () => void) => void) | undefined =
+      undefined;
+
+    const mut_run: string[] = [];
+
+    const obs$ = createRootObservable<number>(
+      { initialValue: Optional.some(0) },
+      ({ onComplete }) => {
+        mut_onComplete = onComplete;
+
+        onComplete(() => {
+          mut_run.push('first');
+
+          mut_onComplete?.(() => {
+            mut_run.push('late');
+          });
+        });
+
+        return {};
+      },
+    );
+
+    obs$.complete();
+
+    assert.deepStrictEqual(mut_run, ['first', 'late']);
+  });
+
+  test('after a teardown throws, a later complete() runs only the teardowns that have not run', () => {
+    const mut_run: string[] = [];
+
+    let mut_fails = true;
+
+    const obs$ = createRootObservable<number>(
+      { initialValue: Optional.some(0) },
+      ({ onComplete }) => {
+        onComplete(() => {
+          mut_run.push('a');
+        });
+
+        onComplete(() => {
+          mut_run.push('b');
+
+          if (!mut_fails) {
+            return;
+          }
+
+          mut_fails = false;
+
+          throw new Error('teardown failed');
+        });
+
+        onComplete(() => {
+          mut_run.push('c');
+        });
+
+        return {};
+      },
+    );
+
+    assert.throws(() => {
+      obs$.complete();
+    }, 'teardown failed');
+
+    assert.isFalse(obs$.isCompleted);
+
+    obs$.complete();
+
+    assert.isTrue(obs$.isCompleted);
+
+    assert.deepStrictEqual(mut_run, ['a', 'b', 'c']);
+  });
+
+  test('a complete() a subscriber calls on a value flush emits flushes nothing again', () => {
+    let mut_flushes = 0;
+
+    const parent$ = source(0);
+
+    const child$ = createAsyncChildObservable<number, readonly [number]>(
+      { parents: [parent$], initialValue: Optional.some(0) },
+      ({ startUpdate }) => ({
+        tryUpdate: () => {},
+        flush: () => {
+          mut_flushes += 1;
+
+          startUpdate(1);
+        },
+      }),
+    );
+
+    child$.subscribe((value) => {
+      if (value === 1) {
+        child$.complete();
+      }
+    });
+
+    child$.complete();
+
+    assert.strictEqual(mut_flushes, 1);
+
+    assert.isTrue(child$.isCompleted);
+  });
+
   test('what a teardown registered after completion emits is ignored', () => {
     let mut_tools:
       | Readonly<{
