@@ -14,6 +14,7 @@ export * from './queue-comments.mjs';
 export * from './queue-layers.mjs';
 export * from './queue-order.mjs';
 export * from './queue-owner.mjs';
+export * from './repo-name.mjs';
 export * from './report.mjs';
 export * from './review-hold.mjs';
 export * from './ruleset.mjs';

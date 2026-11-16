@@ -1,6 +1,7 @@
 /** The issues GitHub says a pull request closes, as a report lists them. */
 
-import { Arr, Num, Result } from 'ts-data-forge';
+import { Arr } from 'ts-data-forge';
+import { isRepoNamed, readIssueNumber } from './repo-name.mjs';
 import type { LinkedIssue, RepoRef } from './types.mjs';
 
 /**
@@ -31,12 +32,10 @@ export type ClosingIssueNode = Readonly<{
 export const closingIssuesIn = (
   repo: RepoRef,
   nodes: readonly ClosingIssueNode[],
-): readonly LinkedIssue[] => {
-  const own = `${repo.owner}/${repo.name}`.toLowerCase();
-
-  return Arr.generate(function* () {
+): readonly LinkedIssue[] =>
+  Arr.generate(function* () {
     for (const node of nodes) {
-      if (node?.repository.nameWithOwner.toLowerCase() === own) {
+      if (node !== null && isRepoNamed(repo, node.repository.nameWithOwner)) {
         yield {
           number: node.number,
           title: node.title,
@@ -51,7 +50,6 @@ export const closingIssuesIn = (
       }
     }
   });
-};
 
 /**
  * The issues of `repo` a pull request body closes by keyword, as GitHub itself
@@ -73,10 +71,8 @@ export const closingIssuesIn = (
 export const closingKeywordIssuesIn = (
   repo: RepoRef,
   bodyHtml: string,
-): readonly number[] => {
-  const own = `${repo.owner}/${repo.name}`.toLowerCase();
-
-  return Arr.uniq(
+): readonly number[] =>
+  Arr.uniq(
     bodyHtml
       .matchAll(KEYWORD_THEN_LINK)
       .flatMap((match) => {
@@ -85,13 +81,12 @@ export const closingKeywordIssuesIn = (
         const target = ISSUE_URL.exec(attributes.get('data-url') ?? '')?.groups;
 
         return attributes.get('data-hovercard-type') === 'issue' &&
-          target?.['repo']?.toLowerCase() === own
-          ? readNumber(target['number'] ?? '')
+          isRepoNamed(repo, target?.['repo'])
+          ? readIssueNumber(target?.['number'] ?? '')
           : [];
       })
       .toArray(),
   );
-};
 
 /**
  * A keyword GitHub marked, then the link that follows it with only text in
@@ -118,9 +113,3 @@ const attributesOf = (attributes: string): ReadonlyMap<string, string> =>
   );
 
 const ATTRIBUTE = /(?<name>[\w-]+)="(?<value>[^"]*)"/gu;
-
-const readNumber = (raw: string): readonly number[] => {
-  const parsed = Num.safeParseInt(raw);
-
-  return Result.isOk(parsed) ? [parsed.value] : [];
-};

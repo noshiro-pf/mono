@@ -5,6 +5,7 @@ import {
   BLOCKS_RELEASE_LABEL,
   closingKeywordIssuesIn,
   inheritStartAfter,
+  isRepoApiUrl,
   isSafeRefName,
   isVersionBranch,
   parseMergeAfter,
@@ -471,12 +472,9 @@ const blockedByOf = async (
     t.array(t.record({ number: t.number(), repository_url: t.string() })),
   );
 
-  const own =
-    `https://api.github.com/repos/${api.repo.owner}/${api.repo.name}`.toLowerCase();
-
   return Result.map(listed, (blocking) =>
     blocking
-      .filter(({ repository_url: url }) => url.toLowerCase() === own)
+      .filter(({ repository_url: url }) => isRepoApiUrl(api.repo, url))
       .map(({ number }) => number),
   );
 };

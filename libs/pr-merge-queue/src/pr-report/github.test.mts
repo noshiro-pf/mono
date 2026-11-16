@@ -13,6 +13,119 @@ import { parseJson } from '../lib/index.mjs';
 import { createClient, type HandLinks } from './github.mjs';
 
 describe(createClient, () => {
+  describe('whether a pull request is from a fork', () => {
+    test("is not, for a head in this repository named in another case than GitHub's", async () => {
+      const github = await fakeGitHub();
+
+      const facts = await createClient(undefined, github.baseUrl).facts(
+        {
+          owner: FAKE_REPO.owner.toUpperCase(),
+          name: FAKE_REPO.name.toUpperCase(),
+        },
+        { checks: false },
+      );
+
+      await github.close();
+
+      assert.isTrue(Result.isOk(facts));
+
+      assert.deepStrictEqual(
+        facts.value.pulls.map(({ fromFork }) => fromFork),
+        [false],
+      );
+    });
+
+    test("is, for a head in another repository's", async () => {
+      const github = await fakeGitHub(({ url }) =>
+        url.includes('/pulls?state=open')
+          ? {
+              body: [
+                fakePullRequest({
+                  head: {
+                    ref: 'b',
+                    sha: FAKE_HEAD_SHA,
+                    repo: { full_name: 'someone/r' },
+                  },
+                }),
+              ],
+            }
+          : undefined,
+      );
+
+      const facts = await createClient(undefined, github.baseUrl).facts(repo, {
+        checks: false,
+      });
+
+      await github.close();
+
+      assert.isTrue(Result.isOk(facts));
+
+      assert.deepStrictEqual(
+        facts.value.pulls.map(({ fromFork }) => fromFork),
+        [true],
+      );
+    });
+  });
+
+  describe('the issues blocking an open issue', () => {
+    test("keeps this repository's, named in another case than the run's", async () => {
+      const github = await fakeGitHub(({ url }) => {
+        if (url.includes('/issues?state=open')) {
+          return {
+            body: [
+              {
+                number: 5,
+                title: 'An issue',
+                body: null,
+                issue_dependencies_summary: { total_blocked_by: 2 },
+                html_url: `https://github.com/${FAKE_REPO.owner}/${FAKE_REPO.name}/issues/5`,
+                created_at: '2026-01-01T00:00:00Z',
+                updated_at: '2026-01-01T00:00:00Z',
+                comments: 0,
+                user: { login: 'someone' },
+                labels: [],
+              },
+            ],
+          };
+        }
+
+        if (url.includes('/issues/5/dependencies/blocked_by')) {
+          return {
+            body: [
+              {
+                number: 3,
+                repository_url: `${github.baseUrl}/repos/${FAKE_REPO.owner}/${FAKE_REPO.name}`,
+              },
+              {
+                number: 4,
+                repository_url: `${github.baseUrl}/repos/${FAKE_REPO.owner}/other`,
+              },
+            ],
+          };
+        }
+
+        return undefined;
+      });
+
+      const issues = await createClient(undefined, github.baseUrl).issues(
+        {
+          owner: FAKE_REPO.owner.toUpperCase(),
+          name: FAKE_REPO.name.toUpperCase(),
+        },
+        10,
+      );
+
+      await github.close();
+
+      assert.isTrue(Result.isOk(issues));
+
+      assert.deepStrictEqual(
+        issues.value.map(({ startAfter }) => startAfter),
+        [[3]],
+      );
+    });
+  });
+
   describe('the open pull requests', () => {
     test('reads every page of them, past the first hundred', async () => {
       const github = await fakeGitHub(openPages([100, 3]));

@@ -24,6 +24,7 @@ import {
   codeOwnerReview,
   codeOwnersEnforcedBy,
   epochMsOf,
+  isRepoNamed,
   layerRunsVerdict,
   namesEveryChangedPath,
   numberOfQueueLayerBranch,
@@ -1389,32 +1390,24 @@ const applyFiles = (
 const ownBlockedBy = (
   repo: RepoRef,
   blockedBy: BlockedByNodes,
-): readonly number[] => {
-  const own = `${repo.owner}/${repo.name}`.toLowerCase();
-
-  return blockedBy.nodes
-    .filter(({ repository }) => repository.nameWithOwner.toLowerCase() === own)
+): readonly number[] =>
+  blockedBy.nodes
+    .filter(({ repository }) => isRepoNamed(repo, repository.nameWithOwner))
     .map(({ number }) => number);
-};
 
 /** Each of `repo`'s issues among `nodes`, by what its body declares. */
 const startAfterOfNodes = (
   repo: RepoRef,
   nodes: readonly t.TypeOf<typeof IssueWithBodySchema>[],
-): ReadonlyMap<number, readonly number[]> => {
-  const own = `${repo.owner}/${repo.name}`.toLowerCase();
-
-  return new Map(
+): ReadonlyMap<number, readonly number[]> =>
+  new Map(
     nodes
-      .filter(
-        ({ repository }) => repository.nameWithOwner.toLowerCase() === own,
-      )
+      .filter(({ repository }) => isRepoNamed(repo, repository.nameWithOwner))
       .map(({ number, body, blockedBy }) => [
         number,
         waitsFor(body, ownBlockedBy(repo, blockedBy)),
       ]),
   );
-};
 
 /**
  * What GitHub calls the issues in `numbers`, keyed by number, as a linked one
