@@ -4,7 +4,12 @@ import type { StrictOmit } from 'ts-type-forge';
 import type { RoomApi } from '../api/index.mjs';
 import { roomPage } from '../constants/index.mjs';
 import { newRoom } from '../functions/index.mjs';
-import type { GameStateActionFromDb, Player, Room } from '../types/index.mjs';
+import type {
+  ActionRecord,
+  GameStateActionFromDb,
+  Player,
+  Room,
+} from '../types/index.mjs';
 import {
   createRoomStore,
   type CreatedRoom,
@@ -27,7 +32,7 @@ describe(createRoomStore, () => {
 
     assert.strictEqual(Optional.unwrap(store.room.getSnapshot()), roomA);
 
-    const mut_received: (readonly GameStateActionFromDb[])[] = [];
+    const mut_received: (readonly ActionRecord<GameStateActionFromDb>[])[] = [];
 
     store.actionsFromDb.subscribe((actions) => {
       mut_received.push(actions);
@@ -416,7 +421,7 @@ type FakeApi = Readonly<{
   emitRoom: (roomId: string, room: Room | undefined) => void;
   emitActions: (
     roomId: string,
-    actions: readonly GameStateActionFromDb[],
+    actions: readonly ActionRecord<GameStateActionFromDb>[],
   ) => void;
   addedRooms: readonly Readonly<{
     room: StrictOmit<Room, 'id'>;
@@ -436,7 +441,7 @@ const fakeApi = (): FakeApi => {
 
   const mut_actionWatchers = new Map<
     string,
-    (actions: readonly GameStateActionFromDb[]) => void
+    (actions: readonly ActionRecord<GameStateActionFromDb>[]) => void
   >();
 
   const mut_addedRooms: FakeApi['addedRooms'][number][] = [];
