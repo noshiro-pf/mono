@@ -25,7 +25,7 @@ export const runBenchmark = (k: number, branchCount: number): number => {
 
   const initialState: State = {
     selector: 0,
-    branches: Arr.zeros(asUint32(branchCount)),
+    branches: Arr.create(asUint32(branchCount), -1),
   } as const;
 
   // A plain reducer rather than `createSlice`: an Immer draft of the `branches`
@@ -79,7 +79,7 @@ if (import.meta.vitest !== undefined) {
   test('conditional-fan-out benchmark (Redux)', () => {
     const result = runBenchmark(10, 5);
 
-    // selector=0, active branch=branch[0] which stays at 0
-    assert.strictEqual(result, 0);
+    // selector=0, active branch=branch[0], which stays at its initial -1
+    assert.strictEqual(result, -1);
   });
 }

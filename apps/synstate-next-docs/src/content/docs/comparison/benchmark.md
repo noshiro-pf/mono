@@ -1032,7 +1032,7 @@ export const runBenchmark = (k: number, branchCount: number): number => {
             set: (v: number) => void;
         }[]
     > = Arr.zeros(asUint32(branchCount)).map(() => {
-        const [source, setSource] = createState(0);
+        const [source, setSource] = createState(-1);
 
         return { source, set: setSource };
     });
@@ -1077,7 +1077,7 @@ export const runBenchmark = (k: number, branchCount: number): number => {
             set: (v: number) => void;
         }[]
     > = Arr.zeros(asUint32(branchCount)).map(() => {
-        const [source, setSource] = createState(0);
+        const [source, setSource] = createState(-1);
 
         return { source, set: setSource };
     });
@@ -1121,7 +1121,7 @@ export const runBenchmark = (k: number, branchCount: number): number => {
 
     const branches: readonly BehaviorSubject<number>[] = Arr.zeros(
         asUint32(branchCount),
-    ).map(() => new BehaviorSubject(0));
+    ).map(() => new BehaviorSubject(-1));
 
     // Dynamic dependency: only follows the branch selected by selector
     const result = selector.pipe(switchMap((sel) => branches[sel] ?? of(0)));
@@ -1157,7 +1157,7 @@ export const runBenchmark = (k: number, branchCount: number): number => {
 
     const branches: readonly BehaviorSubject<number>[] = Arr.zeros(
         asUint32(branchCount),
-    ).map(() => new BehaviorSubject(0));
+    ).map(() => new BehaviorSubject(-1));
 
     // `combineLatest` only infers the element types from an array literal.
     // eslint-disable-next-line ts-data-forge/prefer-canonical-array-slicing
@@ -1199,7 +1199,7 @@ export const runBenchmark = (k: number, branchCount: number): number => {
     const selector = observable.box(0);
 
     const branches: readonly ReturnType<typeof observable.box<number>>[] =
-        Arr.zeros(asUint32(branchCount)).map(() => observable.box(0));
+        Arr.zeros(asUint32(branchCount)).map(() => observable.box(-1));
 
     // Dynamic dependency: only tracks the branch selected by selector
     const result = computed(() => {
@@ -1247,7 +1247,7 @@ export const runBenchmark = (k: number, branchCount: number): number => {
         number,
         Mutable<readonly [number]>,
         void
-    >[] = Arr.zeros(asUint32(branchCount)).map(() => atom(0));
+    >[] = Arr.zeros(asUint32(branchCount)).map(() => atom(-1));
 
     // Dynamic dependency: only reads the branch selected by selectorAtom
     const resultAtom = atom((get) => {
@@ -1301,7 +1301,7 @@ export const runBenchmark = (k: number, branchCount: number): number => {
 
     const initialState: State = {
         selector: 0,
-        branches: Arr.zeros(asUint32(branchCount)),
+        branches: Arr.create(asUint32(branchCount), -1),
     } as const;
 
     // A plain reducer rather than `createSlice`: an Immer draft of the `branches`
@@ -1362,7 +1362,7 @@ export const runBenchmark = (k: number, branchCount: number): number => {
 
         const branchSignals: readonly Signal<number>[] = Arr.zeros(
             asUint32(branchCount),
-        ).map(() => createSignal(0));
+        ).map(() => createSignal(-1));
 
         // Dynamic dependency: only tracks the branch selected by selector
         const result = createMemo(() => {
@@ -1405,7 +1405,7 @@ export const runBenchmark = (k: number, branchCount: number): number => {
 
     const branches: readonly Signal<number>[] = Arr.zeros(
         asUint32(branchCount),
-    ).map(() => signal(0));
+    ).map(() => signal(-1));
 
     // Dynamic dependency: only tracks the branch selected by selector
     const result = computed(() => {

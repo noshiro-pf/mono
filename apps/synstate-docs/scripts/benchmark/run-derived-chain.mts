@@ -108,33 +108,40 @@ const measureEntry = async ({
   // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   const mod = (await import(filePath)) as BenchmarkModule;
 
-  // Verify correctness
-  const check = mod.runBenchmark(1000);
+  /** Fails the run when a result of `n` updates is not the scenario's. */
+  const assertResult = (n: number, result: number): void => {
+    const expected = (scenario.expectedValue / N) * n;
 
-  const expectedCheck = (scenario.expectedValue / N) * 1000;
+    if (result === expected) {
+      return;
+    }
 
-  if (check !== expectedCheck) {
     console.error(
-      `❌ ${entry.name}: expected ${expectedCheck.toString()} but got ${check.toString()}`,
+      `❌ ${entry.name}, ${n.toString()} updates: expected ${expected.toString()} but got ${result.toString()}`,
     );
 
     process.exit(1);
-  }
+  };
+
+  // Verify correctness
+  assertResult(1000, mod.runBenchmark(1000));
 
   // Warmup
   for (const _ of range(0, WARMUP_ROUNDS)) {
-    mod.runBenchmark(N);
+    assertResult(N, mod.runBenchmark(N));
   }
 
-  // Measure
+  // Measure: each round's result is checked once its clock has stopped.
   const mut_times: number[] = [];
 
   for (const _ of range(0, MEASURE_ROUNDS)) {
     const start = performance.now();
 
-    mod.runBenchmark(N);
+    const result = mod.runBenchmark(N);
 
     const end = performance.now();
+
+    assertResult(N, result);
 
     mut_times.push(end - start);
   }

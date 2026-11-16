@@ -7,7 +7,7 @@ export const runBenchmark = (k: number, branchCount: number): number => {
 
   const branches: readonly BehaviorSubject<number>[] = Arr.zeros(
     asUint32(branchCount),
-  ).map(() => new BehaviorSubject(0));
+  ).map(() => new BehaviorSubject(-1));
 
   // `combineLatest` only infers the element types from an array literal.
   // eslint-disable-next-line ts-data-forge/prefer-canonical-array-slicing
@@ -46,7 +46,7 @@ if (import.meta.vitest !== undefined) {
   test('conditional-fan-out benchmark (RxJS)', () => {
     const result = runBenchmark(10, 5);
 
-    // selector=0, active branch=branch[0] which stays at 0
-    assert.strictEqual(result, 0);
+    // selector=0, active branch=branch[0], which stays at its initial -1
+    assert.strictEqual(result, -1);
   });
 }
