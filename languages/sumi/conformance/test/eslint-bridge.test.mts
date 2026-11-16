@@ -121,10 +121,6 @@ const knownDivergences: ReadonlyMap<string, string> = new Map<string, string>([
     'eslint-config-typed configures @typescript-eslint/triple-slash-reference with `types: "always"`, so `/// <reference types>` is allowed.',
   ],
   [
-    'modules/require-extension/invalid/missing-extension.mts',
-    'eslint-config-typed configures import-x/extensions as `never` (`mjs` / `json` always), which does not require an extension on a relative import.',
-  ],
-  [
     'modules/require-import-type/invalid/namespace-used-as-type.mts',
     'Reported, but as @typescript-eslint/consistent-type-imports, which stays unmapped (see eslint-rules-by-rule-id.mts in @sumi-lang/cli); the mapped no-import-type-side-effects judges only inline `type` specifiers.',
   ],

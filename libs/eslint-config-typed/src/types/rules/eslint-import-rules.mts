@@ -14,7 +14,7 @@ type SpreadOptionsIfIsArray<
 
 /**
  * @description Ensure imports point to a file/module that can be resolved.
- * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.17.1/docs/rules/no-unresolved.md
+ * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.18.0/docs/rules/no-unresolved.md
  *
  *  ```md
  *  | key        | value   |
@@ -46,6 +46,12 @@ namespace NoUnresolved {
    *       "ignore": {
    *         "type": "array",
    *         "minItems": 1,
+   *         "items": {
+   *           "type": [
+   *             "string",
+   *             "object"
+   *           ]
+   *         },
    *         "uniqueItems": true
    *       },
    *       "caseSensitive": {
@@ -68,7 +74,7 @@ namespace NoUnresolved {
     /**
      * @minItems 1
      */
-    ignore?: NonEmptyTuple<unknown>;
+    ignore?: NonEmptyTuple<string | UnknownRecord>;
     /**
      * @default true
      */
@@ -82,7 +88,7 @@ namespace NoUnresolved {
 
 /**
  * @description Ensure named imports correspond to a named export in the remote file.
- * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.17.1/docs/rules/named.md
+ * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.18.0/docs/rules/named.md
  *
  *  ```md
  *  | key        | value   |
@@ -121,7 +127,7 @@ namespace Named {
 
 /**
  * @description Ensure a default export is present, given a default import.
- * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.17.1/docs/rules/default.md
+ * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.18.0/docs/rules/default.md
  *
  *  ```md
  *  | key        | value   |
@@ -138,7 +144,7 @@ namespace Default {
 
 /**
  * @description Ensure imported namespaces contain dereferenced properties as they are dereferenced.
- * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.17.1/docs/rules/namespace.md
+ * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.18.0/docs/rules/namespace.md
  *
  *  ```md
  *  | key        | value   |
@@ -184,7 +190,7 @@ namespace Namespace {
 
 /**
  * @description Forbid namespace (a.k.a. "wildcard" `*`) imports.
- * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.17.1/docs/rules/no-namespace.md
+ * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.18.0/docs/rules/no-namespace.md
  *
  *  ```md
  *  | key        | value      |
@@ -212,14 +218,14 @@ namespace NoNamespace {
    *         },
    *         "uniqueItems": true
    *       }
-   *     }
+   *     },
+   *     "additionalProperties": false
    *   }
    * ]
    * ```
    */
   export type Options = Readonly<{
     ignore?: readonly string[];
-    [k: string]: unknown;
   }>;
 
   export type RuleEntry =
@@ -228,7 +234,7 @@ namespace NoNamespace {
 
 /**
  * @description Forbid any invalid exports, i.e. re-export of the same name.
- * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.17.1/docs/rules/export.md
+ * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.18.0/docs/rules/export.md
  *
  *  ```md
  *  | key        | value   |
@@ -245,7 +251,7 @@ namespace Export {
 
 /**
  * @description Forbid the use of mutable exports with `var` or `let`.
- * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.17.1/docs/rules/no-mutable-exports.md
+ * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.18.0/docs/rules/no-mutable-exports.md
  *
  *  ```md
  *  | key        | value      |
@@ -262,7 +268,7 @@ namespace NoMutableExports {
 
 /**
  * @description Ensure consistent use of file extension within the import path.
- * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.17.1/docs/rules/extensions.md
+ * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.18.0/docs/rules/extensions.md
  *
  *  ```md
  *  | key            | value      |
@@ -330,6 +336,9 @@ namespace Extensions {
    *               "checkTypeImports": {
    *                 "type": "boolean"
    *               },
+   *               "checkSelfReference": {
+   *                 "type": "boolean"
+   *               },
    *               "pathGroupOverrides": {
    *                 "type": "array",
    *                 "items": {
@@ -359,7 +368,8 @@ namespace Extensions {
    *               "fix": {
    *                 "type": "boolean"
    *               }
-   *             }
+   *             },
+   *             "additionalProperties": false
    *           }
    *         ],
    *         "additionalItems": false
@@ -389,6 +399,9 @@ namespace Extensions {
    *               "checkTypeImports": {
    *                 "type": "boolean"
    *               },
+   *               "checkSelfReference": {
+   *                 "type": "boolean"
+   *               },
    *               "pathGroupOverrides": {
    *                 "type": "array",
    *                 "items": {
@@ -418,7 +431,8 @@ namespace Extensions {
    *               "fix": {
    *                 "type": "boolean"
    *               }
-   *             }
+   *             },
+   *             "additionalProperties": false
    *           }
    *         ],
    *         "additionalItems": false
@@ -486,13 +500,13 @@ namespace Extensions {
           >;
           ignorePackages?: boolean;
           checkTypeImports?: boolean;
+          checkSelfReference?: boolean;
           pathGroupOverrides?: readonly Readonly<{
             pattern: string;
             patternOptions?: UnknownRecord;
             action: 'enforce' | 'ignore';
           }>[];
           fix?: boolean;
-          [k: string]: unknown;
         }>,
       ]
     | readonly [
@@ -503,13 +517,13 @@ namespace Extensions {
           >;
           ignorePackages?: boolean;
           checkTypeImports?: boolean;
+          checkSelfReference?: boolean;
           pathGroupOverrides?: readonly Readonly<{
             pattern: string;
             patternOptions?: UnknownRecord;
             action: 'enforce' | 'ignore';
           }>[];
           fix?: boolean;
-          [k: string]: unknown;
         }>,
       ]
     | readonly [
@@ -526,7 +540,7 @@ namespace Extensions {
 
 /**
  * @description Enforce which files can be imported in a given folder.
- * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.17.1/docs/rules/no-restricted-paths.md
+ * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.18.0/docs/rules/no-restricted-paths.md
  *
  *  ```md
  *  | key        | value   |
@@ -626,7 +640,7 @@ namespace NoRestrictedPaths {
 
 /**
  * @description Forbid importing the submodules of other modules.
- * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.17.1/docs/rules/no-internal-modules.md
+ * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.18.0/docs/rules/no-internal-modules.md
  *
  *  ```md
  *  | key        | value      |
@@ -689,7 +703,7 @@ namespace NoInternalModules {
 
 /**
  * @description Prefer named exports to be grouped together in a single export declaration.
- * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.17.1/docs/rules/group-exports.md
+ * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.18.0/docs/rules/group-exports.md
  *
  *  ```md
  *  | key        | value      |
@@ -706,7 +720,7 @@ namespace GroupExports {
 
 /**
  * @description Forbid importing packages through relative paths.
- * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.17.1/docs/rules/no-relative-packages.md
+ * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.18.0/docs/rules/no-relative-packages.md
  *
  *  ```md
  *  | key        | value      |
@@ -739,6 +753,12 @@ namespace NoRelativePackages {
    *       "ignore": {
    *         "type": "array",
    *         "minItems": 1,
+   *         "items": {
+   *           "type": [
+   *             "string",
+   *             "object"
+   *           ]
+   *         },
    *         "uniqueItems": true
    *       }
    *     },
@@ -754,7 +774,7 @@ namespace NoRelativePackages {
     /**
      * @minItems 1
      */
-    ignore?: NonEmptyTuple<unknown>;
+    ignore?: NonEmptyTuple<string | UnknownRecord>;
   }>;
 
   export type RuleEntry =
@@ -763,7 +783,7 @@ namespace NoRelativePackages {
 
 /**
  * @description Forbid importing modules from parent directories.
- * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.17.1/docs/rules/no-relative-parent-imports.md
+ * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.18.0/docs/rules/no-relative-parent-imports.md
  *
  *  ```md
  *  | key        | value      |
@@ -795,6 +815,12 @@ namespace NoRelativeParentImports {
    *       "ignore": {
    *         "type": "array",
    *         "minItems": 1,
+   *         "items": {
+   *           "type": [
+   *             "string",
+   *             "object"
+   *           ]
+   *         },
    *         "uniqueItems": true
    *       }
    *     },
@@ -810,7 +836,7 @@ namespace NoRelativeParentImports {
     /**
      * @minItems 1
      */
-    ignore?: NonEmptyTuple<unknown>;
+    ignore?: NonEmptyTuple<string | UnknownRecord>;
   }>;
 
   export type RuleEntry =
@@ -819,7 +845,7 @@ namespace NoRelativeParentImports {
 
 /**
  * @description Enforce or ban the use of inline type-only markers for named imports.
- * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.17.1/docs/rules/consistent-type-specifier-style.md
+ * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.18.0/docs/rules/consistent-type-specifier-style.md
  *
  *  ```md
  *  | key        | value      |
@@ -856,7 +882,7 @@ namespace ConsistentTypeSpecifierStyle {
 
 /**
  * @description Forbid a module from importing itself.
- * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.17.1/docs/rules/no-self-import.md
+ * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.18.0/docs/rules/no-self-import.md
  *
  *  ```md
  *  | key         | value   |
@@ -874,7 +900,7 @@ namespace NoSelfImport {
 
 /**
  * @description Forbid a module from importing a module with a dependency path back to itself.
- * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.17.1/docs/rules/no-cycle.md
+ * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.18.0/docs/rules/no-cycle.md
  *
  *  ```md
  *  | key        | value      |
@@ -906,6 +932,12 @@ namespace NoCycle {
    *       "ignore": {
    *         "type": "array",
    *         "minItems": 1,
+   *         "items": {
+   *           "type": [
+   *             "string",
+   *             "object"
+   *           ]
+   *         },
    *         "uniqueItems": true
    *       },
    *       "maxDepth": {
@@ -946,7 +978,7 @@ namespace NoCycle {
     /**
      * @minItems 1
      */
-    ignore?: NonEmptyTuple<unknown>;
+    ignore?: NonEmptyTuple<string | UnknownRecord>;
     maxDepth?: number | '∞';
     /**
      * ignore external modules
@@ -968,7 +1000,7 @@ namespace NoCycle {
 
 /**
  * @description Forbid named default exports.
- * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.17.1/docs/rules/no-named-default.md
+ * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.18.0/docs/rules/no-named-default.md
  *
  *  ```md
  *  | key        | value      |
@@ -985,7 +1017,7 @@ namespace NoNamedDefault {
 
 /**
  * @description Forbid use of exported name as identifier of default export.
- * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.17.1/docs/rules/no-named-as-default.md
+ * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.18.0/docs/rules/no-named-as-default.md
  *
  *  ```md
  *  | key        | value   |
@@ -1002,7 +1034,7 @@ namespace NoNamedAsDefault {
 
 /**
  * @description Forbid use of exported name as property of default export.
- * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.17.1/docs/rules/no-named-as-default-member.md
+ * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.18.0/docs/rules/no-named-as-default-member.md
  *
  *  ```md
  *  | key        | value      |
@@ -1019,7 +1051,7 @@ namespace NoNamedAsDefaultMember {
 
 /**
  * @description Forbid anonymous values as default exports.
- * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.17.1/docs/rules/no-anonymous-default-export.md
+ * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.18.0/docs/rules/no-anonymous-default-export.md
  *
  *  ```md
  *  | key        | value      |
@@ -1118,7 +1150,7 @@ namespace NoAnonymousDefaultExport {
 
 /**
  * @description Forbid importing a default export by a different name.
- * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.17.1/docs/rules/no-rename-default.md
+ * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.18.0/docs/rules/no-rename-default.md
  *
  *  ```md
  *  | key        | value      |
@@ -1145,6 +1177,13 @@ namespace NoRenameDefault {
    *       "preventRenamingBindings": {
    *         "default": true,
    *         "type": "boolean"
+   *       },
+   *       "whitelist": {
+   *         "type": "array",
+   *         "uniqueItems": true,
+   *         "items": {
+   *           "type": "string"
+   *         }
    *       }
    *     },
    *     "additionalProperties": false
@@ -1161,6 +1200,7 @@ namespace NoRenameDefault {
      * @default true
      */
     preventRenamingBindings?: boolean;
+    whitelist?: readonly string[];
   }>;
 
   export type RuleEntry =
@@ -1169,7 +1209,7 @@ namespace NoRenameDefault {
 
 /**
  * @description Forbid modules without exports, or exports without matching import in another module.
- * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.17.1/docs/rules/no-unused-modules.md
+ * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.18.0/docs/rules/no-unused-modules.md
  *
  *  ```md
  *  | key        | value      |
@@ -1187,75 +1227,93 @@ namespace NoUnusedModules {
    * ```json
    * [
    *   {
-   *     "type": "object",
-   *     "properties": {
-   *       "src": {
-   *         "description": "files/paths to be analyzed (only for unused exports)",
-   *         "type": "array",
-   *         "uniqueItems": true,
-   *         "items": {
-   *           "type": "string",
-   *           "minLength": 1
-   *         }
-   *       },
-   *       "ignoreExports": {
-   *         "description": "files/paths for which unused exports will not be reported (e.g module entry points)",
-   *         "type": "array",
-   *         "uniqueItems": true,
-   *         "items": {
-   *           "type": "string",
-   *           "minLength": 1
-   *         }
-   *       },
-   *       "missingExports": {
-   *         "description": "report modules without any exports",
-   *         "type": "boolean"
-   *       },
-   *       "unusedExports": {
-   *         "description": "report exports without any usage",
-   *         "type": "boolean"
-   *       },
-   *       "ignoreUnusedTypeExports": {
-   *         "description": "ignore type exports without any usage",
-   *         "type": "boolean"
-   *       },
-   *       "suppressMissingFileEnumeratorAPIWarning": {
-   *         "description": "ESLint 10 and later versions remove the FileEnumerator API, which is required by the \"no-unused-modules\" rule. Therefore a warning message will be logged before an alternative is implemented. You can suppress the warning with this option",
-   *         "type": "boolean"
-   *       }
-   *     },
    *     "anyOf": [
    *       {
    *         "type": "object",
    *         "properties": {
-   *           "unusedExports": {
-   *             "type": "boolean",
-   *             "enum": [
-   *               true
-   *             ]
-   *           },
    *           "src": {
+   *             "description": "files/paths to be analyzed (only for unused exports)",
    *             "type": "array",
+   *             "uniqueItems": true,
+   *             "items": {
+   *               "type": "string",
+   *               "minLength": 1
+   *             },
    *             "minItems": 1
+   *           },
+   *           "ignoreExports": {
+   *             "description": "files/paths for which unused exports will not be reported (e.g module entry points)",
+   *             "type": "array",
+   *             "uniqueItems": true,
+   *             "items": {
+   *               "type": "string",
+   *               "minLength": 1
+   *             }
+   *           },
+   *           "missingExports": {
+   *             "description": "report modules without any exports",
+   *             "type": "boolean"
+   *           },
+   *           "unusedExports": {
+   *             "description": "report exports without any usage",
+   *             "type": "boolean"
+   *           },
+   *           "ignoreUnusedTypeExports": {
+   *             "description": "ignore type exports without any usage",
+   *             "type": "boolean"
+   *           },
+   *           "suppressMissingFileEnumeratorAPIWarning": {
+   *             "description": "ESLint 10 and later versions remove the FileEnumerator API, which is required by the \"no-unused-modules\" rule. Therefore a warning message will be logged before an alternative is implemented. You can suppress the warning with this option",
+   *             "type": "boolean"
    *           }
    *         },
    *         "required": [
    *           "unusedExports"
-   *         ]
+   *         ],
+   *         "additionalProperties": false
    *       },
    *       {
    *         "type": "object",
    *         "properties": {
+   *           "src": {
+   *             "description": "files/paths to be analyzed (only for unused exports)",
+   *             "type": "array",
+   *             "uniqueItems": true,
+   *             "items": {
+   *               "type": "string",
+   *               "minLength": 1
+   *             }
+   *           },
+   *           "ignoreExports": {
+   *             "description": "files/paths for which unused exports will not be reported (e.g module entry points)",
+   *             "type": "array",
+   *             "uniqueItems": true,
+   *             "items": {
+   *               "type": "string",
+   *               "minLength": 1
+   *             }
+   *           },
    *           "missingExports": {
-   *             "type": "boolean",
-   *             "enum": [
-   *               true
-   *             ]
+   *             "description": "report modules without any exports",
+   *             "type": "boolean"
+   *           },
+   *           "unusedExports": {
+   *             "description": "report exports without any usage",
+   *             "type": "boolean"
+   *           },
+   *           "ignoreUnusedTypeExports": {
+   *             "description": "ignore type exports without any usage",
+   *             "type": "boolean"
+   *           },
+   *           "suppressMissingFileEnumeratorAPIWarning": {
+   *             "description": "ESLint 10 and later versions remove the FileEnumerator API, which is required by the \"no-unused-modules\" rule. Therefore a warning message will be logged before an alternative is implemented. You can suppress the warning with this option",
+   *             "type": "boolean"
    *           }
    *         },
    *         "required": [
    *           "missingExports"
-   *         ]
+   *         ],
+   *         "additionalProperties": false
    *       }
    *     ]
    *   }
@@ -1263,46 +1321,60 @@ namespace NoUnusedModules {
    * ```
    */
   export type Options = Readonly<
-    (
-      | {
-          unusedExports: true;
-          /**
-           * @minItems 1
-           */
-          src?: NonEmptyTuple<unknown>;
-          [k: string]: unknown;
-        }
-      | {
-          missingExports: true;
-          [k: string]: unknown;
-        }
-    ) & {
-      /**
-       * files/paths to be analyzed (only for unused exports)
-       */
-      src?: readonly string[];
-      /**
-       * files/paths for which unused exports will not be reported (e.g module entry points)
-       */
-      ignoreExports?: readonly string[];
-      /**
-       * report modules without any exports
-       */
-      missingExports?: boolean;
-      /**
-       * report exports without any usage
-       */
-      unusedExports?: boolean;
-      /**
-       * ignore type exports without any usage
-       */
-      ignoreUnusedTypeExports?: boolean;
-      /**
-       * ESLint 10 and later versions remove the FileEnumerator API, which is required by the "no-unused-modules" rule. Therefore a warning message will be logged before an alternative is implemented. You can suppress the warning with this option
-       */
-      suppressMissingFileEnumeratorAPIWarning?: boolean;
-      [k: string]: unknown;
-    }
+    | {
+        /**
+         * files/paths to be analyzed (only for unused exports)
+         *
+         * @minItems 1
+         */
+        src?: NonEmptyTuple<string>;
+        /**
+         * files/paths for which unused exports will not be reported (e.g module entry points)
+         */
+        ignoreExports?: readonly string[];
+        /**
+         * report modules without any exports
+         */
+        missingExports?: boolean;
+        /**
+         * report exports without any usage
+         */
+        unusedExports: boolean;
+        /**
+         * ignore type exports without any usage
+         */
+        ignoreUnusedTypeExports?: boolean;
+        /**
+         * ESLint 10 and later versions remove the FileEnumerator API, which is required by the "no-unused-modules" rule. Therefore a warning message will be logged before an alternative is implemented. You can suppress the warning with this option
+         */
+        suppressMissingFileEnumeratorAPIWarning?: boolean;
+      }
+    | {
+        /**
+         * files/paths to be analyzed (only for unused exports)
+         */
+        src?: readonly string[];
+        /**
+         * files/paths for which unused exports will not be reported (e.g module entry points)
+         */
+        ignoreExports?: readonly string[];
+        /**
+         * report modules without any exports
+         */
+        missingExports: boolean;
+        /**
+         * report exports without any usage
+         */
+        unusedExports?: boolean;
+        /**
+         * ignore type exports without any usage
+         */
+        ignoreUnusedTypeExports?: boolean;
+        /**
+         * ESLint 10 and later versions remove the FileEnumerator API, which is required by the "no-unused-modules" rule. Therefore a warning message will be logged before an alternative is implemented. You can suppress the warning with this option
+         */
+        suppressMissingFileEnumeratorAPIWarning?: boolean;
+      }
   >;
 
   export type RuleEntry =
@@ -1311,7 +1383,7 @@ namespace NoUnusedModules {
 
 /**
  * @description Forbid CommonJS `require` calls and `module.exports` or `exports.*`.
- * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.17.1/docs/rules/no-commonjs.md
+ * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.18.0/docs/rules/no-commonjs.md
  *
  *  ```md
  *  | key        | value      |
@@ -1387,7 +1459,7 @@ namespace NoCommonjs {
 
 /**
  * @description Forbid AMD `require` and `define` calls.
- * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.17.1/docs/rules/no-amd.md
+ * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.18.0/docs/rules/no-amd.md
  *
  *  ```md
  *  | key        | value      |
@@ -1404,7 +1476,7 @@ namespace NoAmd {
 
 /**
  * @description Forbid repeated import of the same module in multiple places.
- * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.17.1/docs/rules/no-duplicates.md
+ * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.18.0/docs/rules/no-duplicates.md
  *
  *  ```md
  *  | key        | value   |
@@ -1430,6 +1502,16 @@ namespace NoDuplicates {
    *       },
    *       "prefer-inline": {
    *         "type": "boolean"
+   *       },
+   *       "whitelist": {
+   *         "type": "array",
+   *         "items": {
+   *           "type": "array",
+   *           "uniqueItems": true,
+   *           "items": {
+   *             "type": "string"
+   *           }
+   *         }
    *       }
    *     },
    *     "additionalProperties": false
@@ -1440,6 +1522,7 @@ namespace NoDuplicates {
   export type Options = Readonly<{
     considerQueryString?: boolean;
     'prefer-inline'?: boolean;
+    whitelist?: readonly (readonly string[])[];
   }>;
 
   export type RuleEntry =
@@ -1448,7 +1531,7 @@ namespace NoDuplicates {
 
 /**
  * @description Ensure all imports appear before other statements.
- * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.17.1/docs/rules/first.md
+ * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.18.0/docs/rules/first.md
  *
  *  ```md
  *  | key        | value      |
@@ -1484,7 +1567,7 @@ namespace First {
 
 /**
  * @description Enforce the maximum number of dependencies a module can have.
- * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.17.1/docs/rules/max-dependencies.md
+ * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.18.0/docs/rules/max-dependencies.md
  *
  *  ```md
  *  | key        | value      |
@@ -1527,7 +1610,7 @@ namespace MaxDependencies {
 
 /**
  * @description Forbid the use of extraneous packages.
- * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.17.1/docs/rules/no-extraneous-dependencies.md
+ * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.18.0/docs/rules/no-extraneous-dependencies.md
  *
  *  ```md
  *  | key        | value   |
@@ -1615,7 +1698,7 @@ namespace NoExtraneousDependencies {
 
 /**
  * @description Forbid import of modules using absolute paths.
- * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.17.1/docs/rules/no-absolute-path.md
+ * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.18.0/docs/rules/no-absolute-path.md
  *
  *  ```md
  *  | key        | value      |
@@ -1648,6 +1731,12 @@ namespace NoAbsolutePath {
    *       "ignore": {
    *         "type": "array",
    *         "minItems": 1,
+   *         "items": {
+   *           "type": [
+   *             "string",
+   *             "object"
+   *           ]
+   *         },
    *         "uniqueItems": true
    *       }
    *     },
@@ -1663,7 +1752,7 @@ namespace NoAbsolutePath {
     /**
      * @minItems 1
      */
-    ignore?: NonEmptyTuple<unknown>;
+    ignore?: NonEmptyTuple<string | UnknownRecord>;
   }>;
 
   export type RuleEntry =
@@ -1672,7 +1761,7 @@ namespace NoAbsolutePath {
 
 /**
  * @description Forbid Node.js builtin modules.
- * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.17.1/docs/rules/no-nodejs-modules.md
+ * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.18.0/docs/rules/no-nodejs-modules.md
  *
  *  ```md
  *  | key        | value      |
@@ -1715,7 +1804,7 @@ namespace NoNodejsModules {
 
 /**
  * @description Forbid webpack loader syntax in imports.
- * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.17.1/docs/rules/no-webpack-loader-syntax.md
+ * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.18.0/docs/rules/no-webpack-loader-syntax.md
  *
  *  ```md
  *  | key        | value   |
@@ -1732,7 +1821,7 @@ namespace NoWebpackLoaderSyntax {
 
 /**
  * @description Enforce a convention in module import order.
- * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.17.1/docs/rules/order.md
+ * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.18.0/docs/rules/order.md
  *
  *  ```md
  *  | key        | value      |
@@ -1898,7 +1987,17 @@ namespace Order {
    *         "additionalProperties": false
    *       },
    *       "warnOnUnassignedImports": {
-   *         "type": "boolean",
+   *         "oneOf": [
+   *           {
+   *             "type": "boolean"
+   *           },
+   *           {
+   *             "type": "string",
+   *             "enum": [
+   *               "top"
+   *             ]
+   *           }
+   *         ],
    *         "default": false
    *       }
    *     },
@@ -2007,7 +2106,7 @@ namespace Order {
     /**
      * @default false
      */
-    warnOnUnassignedImports?: boolean;
+    warnOnUnassignedImports?: boolean | 'top';
   }>;
 
   export type RuleEntry =
@@ -2016,7 +2115,7 @@ namespace Order {
 
 /**
  * @description Enforce a newline after import statements.
- * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.17.1/docs/rules/newline-after-import.md
+ * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.18.0/docs/rules/newline-after-import.md
  *
  *  ```md
  *  | key        | value      |
@@ -2065,7 +2164,7 @@ namespace NewlineAfterImport {
 
 /**
  * @description Prefer a default export if module exports a single name or multiple names.
- * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.17.1/docs/rules/prefer-default-export.md
+ * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.18.0/docs/rules/prefer-default-export.md
  *
  *  ```md
  *  | key        | value      |
@@ -2112,7 +2211,7 @@ namespace PreferDefaultExport {
 
 /**
  * @description Enforce using namespace imports for specific modules, like `react`/`react-dom`, etc.
- * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.17.1/docs/rules/prefer-namespace-import.md
+ * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.18.0/docs/rules/prefer-namespace-import.md
  *
  *  ```md
  *  | key        | value   |
@@ -2156,7 +2255,7 @@ namespace PreferNamespaceImport {
 
 /**
  * @description Forbid default exports.
- * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.17.1/docs/rules/no-default-export.md
+ * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.18.0/docs/rules/no-default-export.md
  *
  *  ```md
  *  | key        | value      |
@@ -2173,7 +2272,7 @@ namespace NoDefaultExport {
 
 /**
  * @description Forbid named exports.
- * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.17.1/docs/rules/no-named-export.md
+ * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.18.0/docs/rules/no-named-export.md
  *
  *  ```md
  *  | key        | value      |
@@ -2190,7 +2289,7 @@ namespace NoNamedExport {
 
 /**
  * @description Forbid `require()` calls with expressions.
- * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.17.1/docs/rules/no-dynamic-require.md
+ * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.18.0/docs/rules/no-dynamic-require.md
  *
  *  ```md
  *  | key        | value      |
@@ -2229,7 +2328,7 @@ namespace NoDynamicRequire {
 
 /**
  * @description Forbid potentially ambiguous parse goal (`script` vs. `module`).
- * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.17.1/docs/rules/unambiguous.md
+ * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.18.0/docs/rules/unambiguous.md
  *
  *  ```md
  *  | key        | value      |
@@ -2246,7 +2345,7 @@ namespace Unambiguous {
 
 /**
  * @description Forbid unassigned imports.
- * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.17.1/docs/rules/no-unassigned-import.md
+ * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.18.0/docs/rules/no-unassigned-import.md
  *
  *  ```md
  *  | key        | value      |
@@ -2309,7 +2408,7 @@ namespace NoUnassignedImport {
 
 /**
  * @description Forbid unnecessary path segments in import and require statements.
- * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.17.1/docs/rules/no-useless-path-segments.md
+ * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.18.0/docs/rules/no-useless-path-segments.md
  *
  *  ```md
  *  | key        | value      |
@@ -2353,7 +2452,7 @@ namespace NoUselessPathSegments {
 
 /**
  * @description Enforce a leading comment with the webpackChunkName for dynamic imports.
- * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.17.1/docs/rules/dynamic-import-chunkname.md
+ * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.18.0/docs/rules/dynamic-import-chunkname.md
  *
  *  ```md
  *  | key            | value      |
@@ -2387,7 +2486,8 @@ namespace DynamicImportChunkname {
    *       "webpackChunknameFormat": {
    *         "type": "string"
    *       }
-   *     }
+   *     },
+   *     "additionalProperties": false
    *   }
    * ]
    * ```
@@ -2396,7 +2496,6 @@ namespace DynamicImportChunkname {
     importFunctions?: readonly string[];
     allowEmpty?: boolean;
     webpackChunknameFormat?: string;
-    [k: string]: unknown;
   }>;
 
   export type RuleEntry =
@@ -2405,7 +2504,7 @@ namespace DynamicImportChunkname {
 
 /**
  * @description Forbid import statements with CommonJS module.exports.
- * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.17.1/docs/rules/no-import-module-exports.md
+ * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.18.0/docs/rules/no-import-module-exports.md
  *
  *  ```md
  *  | key         | value   |
@@ -2446,7 +2545,7 @@ namespace NoImportModuleExports {
 
 /**
  * @description Forbid empty named import blocks.
- * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.17.1/docs/rules/no-empty-named-blocks.md
+ * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.18.0/docs/rules/no-empty-named-blocks.md
  *
  *  ```md
  *  | key            | value      |
@@ -2465,7 +2564,7 @@ namespace NoEmptyNamedBlocks {
 
 /**
  * @description Ensure all exports appear after other statements.
- * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.17.1/docs/rules/exports-last.md
+ * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.18.0/docs/rules/exports-last.md
  *
  *  ```md
  *  | key        | value      |
@@ -2482,7 +2581,7 @@ namespace ExportsLast {
 
 /**
  * @description Forbid imported names marked with `@deprecated` documentation tag.
- * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.17.1/docs/rules/no-deprecated.md
+ * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.18.0/docs/rules/no-deprecated.md
  *
  *  ```md
  *  | key        | value      |
@@ -2498,8 +2597,197 @@ namespace NoDeprecated {
 }
 
 /**
+ * @description Forbid authoring of barrel files.
+ * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.18.0/docs/rules/avoid-barrel-files.md
+ *
+ *  ```md
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | recommended | true       |
+ *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
+ */
+namespace AvoidBarrelFiles {
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "type": "object",
+   *     "properties": {
+   *       "amountOfExportsToConsiderModuleAsBarrel": {
+   *         "type": "number",
+   *         "description": "Minimum amount of exports to consider module as barrelfile",
+   *         "default": 3
+   *       }
+   *     },
+   *     "additionalProperties": false
+   *   }
+   * ]
+   * ```
+   */
+  export type Options = Readonly<{
+    /**
+     * Minimum amount of exports to consider module as barrelfile
+     *
+     * @default 3
+     */
+    amountOfExportsToConsiderModuleAsBarrel?: number;
+  }>;
+
+  export type RuleEntry =
+    'off' | Linter.Severity | readonly [Linter.StringSeverity, Options];
+}
+
+/**
+ * @description Forbid importing barrel files.
+ * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.18.0/docs/rules/avoid-importing-barrel-files.md
+ *
+ *  ```md
+ *  | key         | value   |
+ *  | :---------- | :------ |
+ *  | type        | problem |
+ *  | deprecated  | false   |
+ *  | recommended | true    |
+ *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
+ */
+namespace AvoidImportingBarrelFiles {
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "type": "object",
+   *     "properties": {
+   *       "allowList": {
+   *         "type": "array",
+   *         "description": "List of modules from which to allow barrel files",
+   *         "default": [],
+   *         "uniqueItems": true,
+   *         "items": {
+   *           "type": "string"
+   *         }
+   *       },
+   *       "maxModuleGraphSizeAllowed": {
+   *         "type": "number",
+   *         "description": "Maximum allowed module graph size",
+   *         "default": 20
+   *       },
+   *       "amountOfExportsToConsiderModuleAsBarrel": {
+   *         "type": "number",
+   *         "description": "Amount of exports to consider a module as barrel file",
+   *         "default": 3
+   *       }
+   *     },
+   *     "additionalProperties": false
+   *   }
+   * ]
+   * ```
+   */
+  export type Options = Readonly<{
+    /**
+     * List of modules from which to allow barrel files
+     *
+     * @default []
+     */
+    allowList?: readonly string[];
+    /**
+     * Maximum allowed module graph size
+     *
+     * @default 20
+     */
+    maxModuleGraphSizeAllowed?: number;
+    /**
+     * Amount of exports to consider a module as barrel file
+     *
+     * @default 3
+     */
+    amountOfExportsToConsiderModuleAsBarrel?: number;
+  }>;
+
+  export type RuleEntry =
+    'off' | Linter.Severity | readonly [Linter.StringSeverity, Options];
+}
+
+/**
+ * @description Forbid namespace imports.
+ * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.18.0/docs/rules/avoid-namespace-import.md
+ *
+ *  ```md
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | recommended | true       |
+ *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
+ */
+namespace AvoidNamespaceImport {
+  /**
+   * ### schema
+   *
+   * ```json
+   * [
+   *   {
+   *     "type": "object",
+   *     "properties": {
+   *       "allowList": {
+   *         "type": "array",
+   *         "description": "List of namespace imports to allow",
+   *         "default": [],
+   *         "uniqueItems": true,
+   *         "items": {
+   *           "type": "string"
+   *         }
+   *       }
+   *     },
+   *     "additionalProperties": false
+   *   }
+   * ]
+   * ```
+   */
+  export type Options = Readonly<{
+    /**
+     * List of namespace imports to allow
+     *
+     * @default []
+     */
+    allowList?: readonly string[];
+  }>;
+
+  export type RuleEntry =
+    'off' | Linter.Severity | readonly [Linter.StringSeverity, Options];
+}
+
+/**
+ * @description Forbid re-exporting * from a module.
+ * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.18.0/docs/rules/avoid-re-export-all.md
+ *
+ *  ```md
+ *  | key         | value      |
+ *  | :---------- | :--------- |
+ *  | type        | suggestion |
+ *  | deprecated  | false      |
+ *  | recommended | true       |
+ *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
+ */
+namespace AvoidReExportAll {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
  * @description Replaced by `import-x/first`.
- * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.17.1/docs/rules/imports-first.md
+ * @link https://github.com/un-ts/eslint-plugin-import-x/blob/v4.18.0/docs/rules/imports-first.md
  *
  *  ```md
  *  | key        | value      |
@@ -2577,6 +2865,10 @@ export type EslintImportsRules = Readonly<{
   'import-x/no-empty-named-blocks': NoEmptyNamedBlocks.RuleEntry;
   'import-x/exports-last': ExportsLast.RuleEntry;
   'import-x/no-deprecated': NoDeprecated.RuleEntry;
+  'import-x/avoid-barrel-files': AvoidBarrelFiles.RuleEntry;
+  'import-x/avoid-importing-barrel-files': AvoidImportingBarrelFiles.RuleEntry;
+  'import-x/avoid-namespace-import': AvoidNamespaceImport.RuleEntry;
+  'import-x/avoid-re-export-all': AvoidReExportAll.RuleEntry;
 
   // deprecated
   'import-x/imports-first': ImportsFirst.RuleEntry;
@@ -2613,4 +2905,7 @@ export type EslintImportsRulesOption = Readonly<{
   'import-x/no-useless-path-segments': NoUselessPathSegments.Options;
   'import-x/dynamic-import-chunkname': DynamicImportChunkname.Options;
   'import-x/no-import-module-exports': NoImportModuleExports.Options;
+  'import-x/avoid-barrel-files': AvoidBarrelFiles.Options;
+  'import-x/avoid-importing-barrel-files': AvoidImportingBarrelFiles.Options;
+  'import-x/avoid-namespace-import': AvoidNamespaceImport.Options;
 }>;
