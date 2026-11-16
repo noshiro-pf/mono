@@ -1,6 +1,7 @@
 import { NumericInput, NumericInputView } from 'blueprint-synstate';
 import { createState } from 'synstate';
 import { constant, type Bindable } from 'synstate-dom';
+import { cdp } from 'vitest/browser';
 import { all, mountInto, one, press, settle, type } from './helpers.mjs';
 
 describe(NumericInputView, () => {
@@ -133,6 +134,63 @@ describe(NumericInput, () => {
     const { input, setValue, unmount } = setUp(3);
 
     setValue(42);
+
+    await settle();
+
+    assert.strictEqual(input.value, '42');
+
+    unmount();
+  });
+
+  // Writing another value mid-composition commits what is composed and starts
+  // the rest as a new composition, losing the text (synstate-dom SPEC.md 7.3).
+  test('holds a value changed from outside during an IME composition until it ends', async () => {
+    const { input, setValue, unmount } = setUp(3);
+
+    const mut_compositions = { count: 0 };
+
+    input.addEventListener('compositionstart', () => {
+      mut_compositions.count += 1;
+    });
+
+    const mut_committed = { text: '' };
+
+    // In the capture phase, before NumericInput's own listener writes the text.
+    input.addEventListener(
+      'compositionend',
+      () => {
+        mut_committed.text = input.value;
+      },
+      { capture: true },
+    );
+
+    input.focus();
+
+    input.setSelectionRange(1, 1);
+
+    for (const text of ['か', 'かん', '漢']) {
+      // eslint-disable-next-line no-await-in-loop
+      await cdp().send('Input.imeSetComposition', {
+        text,
+        selectionStart: text.length,
+        selectionEnd: text.length,
+      });
+
+      if (text !== 'か') {
+        continue;
+      }
+
+      setValue(42);
+
+      // eslint-disable-next-line no-await-in-loop
+      await settle();
+    }
+
+    await cdp().send('Input.insertText', { text: '漢' });
+
+    assert.strictEqual(mut_compositions.count, 1);
+
+    assert.strictEqual(mut_committed.text, '3漢');
 
     await settle();
 
