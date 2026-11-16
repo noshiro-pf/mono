@@ -1,6 +1,6 @@
 {
   "name": "ts-fsm-forge",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "private": false,
   "description": "A reducer restricted to a declared transition graph: per-edge handlers typed by their source and target states, a total reducer that ignores the pairs the graph leaves out, and a transition the compiler refuses for them.",
   "keywords": [

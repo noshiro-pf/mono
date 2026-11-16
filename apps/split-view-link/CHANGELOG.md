@@ -1,5 +1,12 @@
 # split-view-link
 
+## 0.0.5
+
+### Patch Changes
+
+- Updated dependencies [0f38111]
+    - ts-data-forge@15.1.0
+
 ## 0.0.4
 
 ### Patch Changes

@@ -1,5 +1,19 @@
 # life-plan-simulator
 
+## 0.0.25
+
+### Patch Changes
+
+- Updated dependencies [0f38111]
+- Updated dependencies [ff39874]
+    - ts-data-forge@15.1.0
+    - ts-fsm-forge@1.0.1
+    - ts-utils-additional@0.0.17
+    - blueprint-synstate@0.12.1
+    - synstate-dom@0.13.0
+    - ts-fortress@13.0.2
+    - synstate@9.0.0
+
 ## 0.0.24
 
 ### Patch Changes

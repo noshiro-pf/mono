@@ -1,5 +1,16 @@
 # profile
 
+## 0.0.38
+
+### Patch Changes
+
+- Updated dependencies [0f38111]
+    - ts-data-forge@15.1.0
+    - mui-look@0.0.4
+    - synstate-dom@0.13.0
+    - synstate@9.0.0
+    - synstate-router@0.5.0
+
 ## 0.0.37
 
 ### Patch Changes
