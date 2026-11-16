@@ -45,6 +45,7 @@ const rootScripts = [
   'check:md',
   'gen:deps-graph',
   'gen:license-files',
+  'gen:tsconfig',
   'check:knip',
   'check:published-deps',
   'check:cspell',

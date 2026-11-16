@@ -1,5 +1,8 @@
 {
-  "extends": ["../../tools/configs/tsconfig/tsconfig.type-check.json"],
+  "extends": [
+    "../../tools/configs/tsconfig/tsconfig.type-check.json",
+    "../../tools/configs/tsconfig/tsconfig.vite.json"
+  ],
   "compilerOptions": {
     // Opted into the strict standard library. Both TypeScript 6 and 7 default
     // `libReplacement` to false, so the `@typescript/lib-*` links the root
@@ -8,5 +11,8 @@
     // docs/strict-typescript-lib-integration.md.
     "libReplacement": true
   },
-  "include": ["./src", "./test", "./scripts"]
+  // `./test` holds only `strict-lib-active.mts`, the probe that fails when
+  // the replacement above stops happening. It is not published — `files`
+  // lists `dist` and `README.md` and `LICENSE`.
+  "include": ["./src", "./test", "./scripts", "./configs"]
 }

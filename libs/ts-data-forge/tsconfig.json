@@ -4,8 +4,6 @@
     "../../tools/configs/tsconfig/tsconfig.vite.json"
   ],
   "compilerOptions": {
-    "jsx": "react-jsx",
-
     // Opted into the strict standard library. Both TypeScript 6 and 7 default
     // `libReplacement` to false, so the `@typescript/lib-*` links the root
     // `prepare` script writes do nothing without it. Stated here, with a probe:
@@ -13,10 +11,10 @@
     // docs/strict-typescript-lib-integration.md.
     "libReplacement": true,
 
-    // `samples/` imports this package by its own name, the way a consumer
-    // does, and is embedded into the README verbatim. Mapped to the source so
-    // that a sample is checked against the code being edited rather than
-    // against the last build. See docs/workspace-package-linking.md.
+    // `samples/` imports this package by its own name, the way a consumer does.
+    // Mapped to the source so that a sample is checked against the code being
+    // edited rather than against the last build. See
+    // docs/workspace-package-linking.md.
     "paths": {
       "ts-data-forge": ["./src/entry-point.mts"],
       "ts-data-forge/array": ["./src/array/impl/index.mts"],

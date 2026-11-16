@@ -11,10 +11,10 @@
     // docs/strict-typescript-lib-integration.md.
     "libReplacement": true,
 
-    // `samples/` imports this package by its own name, the way a consumer
-    // does, and is embedded into the README verbatim. Mapped to the source so
-    // that a sample is checked against the code being edited rather than
-    // against the last build. See docs/workspace-package-linking.md.
+    // `samples/` imports this package by its own name, the way a consumer does.
+    // Mapped to the source so that a sample is checked against the code being
+    // edited rather than against the last build. See
+    // docs/workspace-package-linking.md.
     "paths": {
       "eslint-plugin-synstate": ["./src/index.mts"]
     }
@@ -24,5 +24,5 @@
   // rule test lints against: they have to be in this project for the project
   // service to find them. Neither is published — `files` lists `src` and
   // `dist`.
-  "include": ["./samples", "./src", "./test", "./scripts", "./configs"]
+  "include": ["./src", "./test", "./samples", "./scripts", "./configs"]
 }

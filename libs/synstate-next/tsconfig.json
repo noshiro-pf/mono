@@ -4,9 +4,15 @@
     "../../tools/configs/tsconfig/tsconfig.vite.json"
   ],
   "compilerOptions": {
+    // Opted into the strict standard library. Both TypeScript 6 and 7 default
+    // `libReplacement` to false, so the `@typescript/lib-*` links the root
+    // `prepare` script writes do nothing without it. Stated here, with a probe:
+    // `check:root:tsconfig-lib-replacement` requires both. See
+    // docs/strict-typescript-lib-integration.md.
     "libReplacement": true,
-    // The tests and samples import this package by its own name, the way a consumer does.
-    // Mapped to the source so that they are checked against the code being
+
+    // `samples/` imports this package by its own name, the way a consumer does.
+    // Mapped to the source so that a sample is checked against the code being
     // edited rather than against the last build. See
     // docs/workspace-package-linking.md.
     "paths": {
@@ -14,5 +20,5 @@
       "synstate-next/internal": ["./src/internal.mts"]
     }
   },
-  "include": ["./samples", "./src", "./test", "./scripts", "./configs"]
+  "include": ["./src", "./test", "./samples", "./scripts", "./configs"]
 }

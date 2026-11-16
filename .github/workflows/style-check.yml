@@ -115,6 +115,10 @@ jobs:
         #   rather than propagated. Its `--verify-upstream` is deliberately
         #   not here: it fetches apache.org, and a check that fetches is a
         #   check that fails when the fetch does.
+        # - `gen:tsconfig`: every member's `tsconfig.json` is written from what
+        #   it can read off the member and from its entry in
+        #   `tools/configs/member-tsconfig.mts`, so a hand edit to one, or a
+        #   member whose directories changed, fails here naming the file.
         # - `ws:gen`, every committed generated source: the `index.mts`
         #   barrels, the ESLint rule types, ts-data-forge's branded numbers,
         #   ts-type-forge's `global.mts` / `entry-point.mts`, the synstate
