@@ -273,6 +273,8 @@ const readPngSize = (bytes: Readonly<Buffer>): PublicFile['png'] =>
 const readPublicFiles = async (
   publicDir: string,
 ): Promise<ReadonlyMap<string, PublicFile>> => {
+  // An app's `public/`: nothing in it is ignored.
+  // eslint-disable-next-line ts-restrictions/no-restricted-syntax
   const listed = await glob('**/*', { cwd: publicDir, dot: false });
 
   if (Result.isErr(listed)) {

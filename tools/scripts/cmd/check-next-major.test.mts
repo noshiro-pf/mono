@@ -2,9 +2,32 @@ import dedent from 'dedent';
 import { Result } from 'ts-data-forge';
 import {
   checkNextMajor,
+  isStockFile,
   listStockItems,
   type StockFile,
 } from './check-next-major.mjs';
+
+describe(isStockFile, () => {
+  test("reads every package's NEXT_MAJOR.md, the root's and an experimental-named sibling's included", () => {
+    for (const file of [
+      'NEXT_MAJOR.md',
+      'libs/a/NEXT_MAJOR.md',
+      'experimental-a/NEXT_MAJOR.md',
+    ]) {
+      assert.isTrue(isStockFile(file));
+    }
+  });
+
+  test('leaves out other files and experimental/', () => {
+    for (const file of [
+      'libs/a/next_major.md',
+      'libs/a/NEXT_MAJOR.md.bak',
+      'experimental/a/NEXT_MAJOR.md',
+    ]) {
+      assert.isFalse(isStockFile(file));
+    }
+  });
+});
 
 describe('listStockItems', () => {
   test('lists top-level items only, by their first line', () => {

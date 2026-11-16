@@ -8,9 +8,10 @@ import {
   Result,
   unknownToString,
 } from 'ts-data-forge';
-import { glob, isDirectlyExecuted } from 'ts-repo-utils';
+import { isDirectlyExecuted } from 'ts-repo-utils';
 import type { ReadonlyRecord } from 'ts-type-forge';
 import * as ts from 'typescript';
+import { listCheckoutFiles } from '../lib/repo-files.mjs';
 import { projectRootPath } from '../project-root-path.mjs';
 
 /**
@@ -109,26 +110,27 @@ export const baseUrlViolations = (
       ] as const)
     : ([] as const);
 
+/**
+ * Whether a path from the repository root is a tsconfig this guard reads: any
+ * `tsconfig*.json`, the root's included, outside {@link excludedDirs}.
+ */
+export const isCheckedTsconfig = (relativePath: string): boolean =>
+  TSCONFIG_FILE_NAME.test(path.posix.basename(relativePath)) &&
+  excludedDirs.every((dir) => !relativePath.startsWith(`${dir}/`));
+
+/** A tsconfig's file name: `tsconfig.json`, `tsconfig.build.json` and the like. */
+const TSCONFIG_FILE_NAME = /^tsconfig.*\.json$/u;
+
 const collectTsconfigFiles = async (): Promise<
   Result<readonly string[], string>
 > => {
-  const result = await glob('**/tsconfig*.json', {
-    cwd: projectRootPath,
-    ignore: [
-      '**/node_modules/**',
-      '**/dist/**',
-      ...excludedDirs.map((dir) => `${dir}/**`),
-    ],
-    absolute: true,
-  });
+  const listed = await listCheckoutFiles({ select: isCheckedTsconfig });
 
-  if (Result.isErr(result)) {
-    return Result.err(
-      `❌ Failed to list tsconfig files: ${unknownToString(result.value)}`,
-    );
-  }
-
-  return Result.ok(result.value.toSorted());
+  return Result.isErr(listed)
+    ? Result.err(`❌ ${listed.value}`)
+    : Result.ok(
+        listed.value.map((file) => path.resolve(projectRootPath, file)),
+      );
 };
 
 const checkTarget = async ({

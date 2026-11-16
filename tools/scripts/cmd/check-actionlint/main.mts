@@ -631,6 +631,8 @@ const copyGithubDirAsLocalForm = async (): Promise<Result<string, string>> => {
       // eslint-disable-next-line security/detect-non-literal-fs-filename -- inside the temporary directory just made.
       await fs.mkdir(path.join(root, '.git'));
 
+      // `.github/`, copied into the temporary directory: nothing in it is ignored.
+      // eslint-disable-next-line ts-restrictions/no-restricted-syntax
       const files = await glob('.github/**/*.{yml,yaml}', {
         cwd: root,
         absolute: true,

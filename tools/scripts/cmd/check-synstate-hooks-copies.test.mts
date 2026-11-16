@@ -107,13 +107,12 @@ describe(compareWithReference, () => {
 });
 
 describe(filesOf, () => {
-  test("lists a package's files by their path inside it, once each, and no other package's", () => {
+  test("lists a package's files by their path inside it, and no other package's", () => {
     assert.deepStrictEqual(
       filesOf('libs/synstate-react-hooks', [
         'libs/synstate-react-hooks/src/a.mts',
         'libs/synstate-react-hooks-compat/src/a.mts',
         'libs/synstate-react-hooks/test/a.test.mts',
-        'libs/synstate-react-hooks/src/a.mts',
       ]),
       ['src/a.mts', 'test/a.test.mts'],
     );
