@@ -24,6 +24,8 @@ import type {
 
 export type RoomDeps = Readonly<{
   api: RoomApi;
+  /** Runs `run` after `delayMs`; returns what cancels it. */
+  setTimer: (delayMs: number, run: () => void) => () => void;
 }>;
 
 export type RoomStore = Readonly<{
@@ -127,7 +129,11 @@ export const createRoomStore = (deps: RoomDeps): RoomStore => {
 
     /**
      * The room saved, or why it could not be: a throw is an `Err` as a
-     * rejection is, and the waiting ends on every way out.
+     * rejection is, and the waiting ends on every way out. Offline, Firestore
+     * queues the write and its promise stays pending until the server answers,
+     * so the waiting also ends at {@link createRoomDeadlineMs}. A write that
+     * lands after that is a room no one is shown: the player was told it
+     * failed, and trying again makes another.
      */
     const save = async (
       payload: Readonly<{
@@ -135,20 +141,37 @@ export const createRoomStore = (deps: RoomDeps): RoomStore => {
         password: string | undefined;
       }>,
     ): Promise<Result<Room, unknown>> => {
-      try {
-        return await Result.fromPromise(
-          (async (): Promise<Room> => {
-            const created = newRoom(payload.password, {
-              name: payload.username,
-              online: true,
-            });
+      const deadline = Promise.withResolvers<Result<Room, unknown>>();
 
-            const id = await deps.api.addRoom(created);
-
-            return { ...created, id };
-          })(),
+      const cancelDeadline = deps.setTimer(createRoomDeadlineMs, () => {
+        deadline.resolve(
+          Result.err(
+            new Error(
+              `The room could not be saved within ${createRoomDeadlineMs} ms.`,
+            ),
+          ),
         );
+      });
+
+      try {
+        return await Promise.race([
+          Result.fromPromise(
+            (async (): Promise<Room> => {
+              const created = newRoom(payload.password, {
+                name: payload.username,
+                online: true,
+              });
+
+              const id = await deps.api.addRoom(created);
+
+              return { ...created, id };
+            })(),
+          ),
+          deadline.promise,
+        ]);
       } finally {
+        cancelDeadline();
+
         setIsWaitingResponse(false);
       }
     };
@@ -250,6 +273,9 @@ export const createRoomStore = (deps: RoomDeps): RoomStore => {
     start,
   };
 };
+
+/** How long creating a room waits for the database before it fails. */
+export const createRoomDeadlineMs = 10_000;
 
 /**
  * A room just created, and the name its creator is already a player of it by,

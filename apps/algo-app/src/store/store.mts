@@ -14,20 +14,22 @@ import { createRoomStore } from './room-store.mjs';
 
 const roomApi = createFirestoreRoomApi(firebaseConfig);
 
-export const roomStore = createRoomStore({ api: roomApi });
+const setTimer = (delayMs: number, run: () => void): (() => void) => {
+  const timer = setTimeout(run, delayMs);
+
+  return () => {
+    clearTimeout(timer);
+  };
+};
+
+export const roomStore = createRoomStore({ api: roomApi, setTimer });
 
 export const gameStateStore = createGameStateStore({
   room: roomStore.room,
   actionsFromDb: roomStore.actionsFromDb,
   addAction: roomApi.addAction,
   newActionId: () => crypto.randomUUID(),
-  setTimer: (delayMs, run) => {
-    const timer = setTimeout(run, delayMs);
-
-    return () => {
-      clearTimeout(timer);
-    };
-  },
+  setTimer,
   counter: (ms) => counter(ms),
 });
 
