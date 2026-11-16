@@ -8,6 +8,7 @@ import {
   toggleHidden,
   toggleOnly,
   togglePriority,
+  type MergeOrderSort,
   type MergeOrderStatus,
   type Priority,
   type Tone,
@@ -86,40 +87,39 @@ export const MergeOrderFilters = ({ view, update }: Props): JSX.Element => (
         />
       </fieldset>
 
-      <fieldset class={constant('control-group')}>
-        <legend>{constant('sort')}</legend>
-        <button
-          aria-pressed={view.pipe(
-            map(({ applied }) => applied.sort === 'order'),
-          )}
-          class={constant('chip')}
-          title={constant('In the order the trailers and the stacks declare.')}
-          type={constant('button')}
-          onClick={() => {
-            update((prev) => ({ ...prev, sort: 'order' }));
-          }}
-        >
-          {constant('merge order')}
-        </button>
-        <button
-          aria-pressed={view.pipe(
-            map(({ applied }) => applied.sort === 'priority'),
-          )}
-          class={constant('chip')}
-          title={constant(
-            'Each level of the tree by the best priority in it and below it; no priority sits between mid and low.',
-          )}
-          type={constant('button')}
-          onClick={() => {
-            update((prev) => ({ ...prev, sort: 'priority' }));
-          }}
-        >
-          {constant('priority')}
-        </button>
-      </fieldset>
+      <div
+        aria-label={constant('Sort')}
+        class={constant('segmented')}
+        role={constant('group')}
+      >
+        {SORTS.map(([sort, name, title]) => (
+          <button
+            aria-pressed={view.pipe(
+              map(({ applied }) => applied.sort === sort),
+            )}
+            class={constant('segment')}
+            title={constant(title)}
+            type={constant('button')}
+            onClick={() => {
+              update((prev) => ({ ...prev, sort }));
+            }}
+          >
+            {constant(name)}
+          </button>
+        ))}
+      </div>
     </div>
   </div>
 );
+
+const SORTS = [
+  ['order', 'merge order', 'In the order the trailers and the stacks declare.'],
+  [
+    'priority',
+    'priority',
+    'Each level of the tree by the best priority in it and below it; no priority sits between mid and low.',
+  ],
+] as const satisfies readonly (readonly [MergeOrderSort, string, string])[];
 
 const STATUS_TONES = {
   queued: undefined,

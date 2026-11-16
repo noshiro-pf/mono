@@ -9,10 +9,12 @@ import {
 import { fastDeepEqual, Result } from 'ts-data-forge';
 import {
   isListed,
+  issueChipCounts,
   issueGraphOf,
   issueRowOf,
   issueTileCounts,
   issueTitlesOf,
+  labelColorsOf,
   labelPicksOf,
   passesTiers,
   sortIssues,
@@ -45,6 +47,10 @@ export type IssuesBlockView = Readonly<
       dagCounts: ReturnType<typeof issueTileCounts>;
       /** Every label on an open issue but the tiers, for the label picks. */
       labelNames: readonly string[];
+      /** Each of those labels' colour, for its pick's swatch. */
+      labelColors: ReadonlyMap<string, string>;
+      /** The list's start switches' and label picks' numbers. */
+      chipCounts: ReturnType<typeof issueChipCounts>;
       /** Whether the list stopped short of every open issue. */
       incomplete: boolean;
       failures: readonly ReadError[];
@@ -156,6 +162,8 @@ export const createIssuesStore = (
         listCounts: issueTileCounts(list, settings, listedOf),
         dagCounts: issueTileCounts(list, settings, passesTiers),
         labelNames: labelPicksOf(list),
+        labelColors: labelColorsOf(list),
+        chipCounts: issueChipCounts(list, settings, q),
         incomplete:
           Result.isOk(report.snapshot.openIssues) &&
           !report.snapshot.openIssues.value.complete,

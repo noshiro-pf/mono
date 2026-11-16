@@ -98,7 +98,20 @@ export const Header = ({
           type={constant('button')}
           onClick={app.header.toggle}
         >
-          {folded.pipe(map((f) => (f ? '⌄' : '⌃')))}
+          <svg
+            aria-hidden={constant('true')}
+            fill={constant('none')}
+            stroke={constant('currentColor')}
+            stroke-linecap={constant('round')}
+            stroke-linejoin={constant('round')}
+            stroke-width={constant(1.6)}
+            viewBox={constant('0 0 16 16')}
+          >
+            {/* Points where the header goes: down to unfold, up to fold. */}
+            <path
+              d={folded.pipe(map((f) => (f ? CHEVRON_DOWN : CHEVRON_UP)))}
+            />
+          </svg>
         </button>
       </div>
 
@@ -106,6 +119,10 @@ export const Header = ({
     </header>
   );
 };
+
+const CHEVRON_UP = 'M3.5 10.5L8 6l4.5 4.5';
+
+const CHEVRON_DOWN = 'M3.5 5.5L8 10l4.5-4.5';
 
 /** Hands the header's height on whenever it changes, until it goes. */
 const observeHeight =

@@ -76,7 +76,9 @@
     font-weight: 600;
   }
 
+  /* At the heading's right end, clear of the title. */
   .split-view {
+    margin-left: auto;
     font-size: 0.8rem;
     white-space: nowrap;
   }
@@ -104,6 +106,7 @@
   }
 
   .branch {
+    color: var(--ink-2);
     font-family: var(--font-mono);
     font-size: 0.8rem;
     overflow-wrap: anywhere;
@@ -115,34 +118,56 @@
 
   .divergence {
     display: inline-flex;
-    gap: 4px;
+    gap: 6px;
     align-items: center;
-    font-family: var(--font-mono);
-    font-size: 0.75rem;
+    max-width: 100%;
   }
 
+  .divergence-count {
+    color: var(--ink-2);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+
+  /*
+   * Two halves meeting at a centre line, each filled from the middle outwards,
+   * so that the eye reads distance from zero; the same length on every card,
+   * shorter only in a card too narrow for it.
+   */
   .divergence-bars {
     display: inline-flex;
-    width: 96px;
-    height: 8px;
-    border-left: 0;
+    flex-shrink: 1;
+    width: 9rem;
+    min-width: 2.5rem;
   }
 
   .divergence-side {
     display: flex;
-    flex: 1;
+    flex: 1 1 50%;
+    height: 8px;
+    background: var(--hairline);
   }
 
   .divergence-behind {
     justify-content: flex-end;
-    border-right: 1px solid var(--ink-3);
+    margin-right: 1px;
+    border-radius: 4px 0 0 4px;
+  }
+
+  .divergence-ahead {
+    margin-left: 1px;
+    border-radius: 0 4px 4px 0;
   }
 
   .divergence-behind > span {
+    border-radius: 4px 0 0 4px;
     background: var(--behind);
   }
 
   .divergence-ahead > span {
+    border-radius: 0 4px 4px 0;
     background: var(--ahead);
   }
 

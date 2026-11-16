@@ -81,7 +81,7 @@ const detailsNode = (
     reviewThreads: { totalCount: 0, nodes: [] },
     comments: { totalCount: 0, nodes: [] },
     stackEntry: null,
-    timelineItems: { totalCount: 0, nodes: [] },
+    timelineItems: { filteredCount: 0, nodes: [] },
     ...extra,
   }) as const;
 
@@ -248,7 +248,7 @@ describe(readPullRequestsGraphql, () => {
       pullNode(7),
       detailsNode(7, {
         timelineItems: {
-          totalCount: 1,
+          filteredCount: 1,
           nodes: [
             {
               previousRefName: 'parent',
@@ -320,6 +320,32 @@ describe(readPullRequestsGraphql, () => {
         containsHead: true,
       }),
     );
+  });
+
+  test('only the base changes are counted, not every timeline item', async () => {
+    // GitHub's `totalCount` counts the whole timeline whatever `itemTypes` asks
+    // for; `filteredCount` counts what the filter keeps.
+    const pr = await readOne(
+      pullNode(7),
+      detailsNode(7, {
+        timelineItems: { totalCount: 312, filteredCount: 0, nodes: [] },
+      }),
+    );
+
+    assert.isTrue(Result.isOk(pr.mergedParent));
+
+    assert.isUndefined(Result.unwrapThrow(pr.mergedParent));
+  });
+
+  test('more base changes than listed: the merged parent is unread', async () => {
+    const pr = await readOne(
+      pullNode(7),
+      detailsNode(7, {
+        timelineItems: { totalCount: 400, filteredCount: 101, nodes: [] },
+      }),
+    );
+
+    assert.isTrue(Result.isErr(pr.mergedParent));
   });
 
   test('more comments than listed are read over REST; a head not last is read by sha', async () => {
@@ -407,7 +433,7 @@ describe(readPullRequestsGraphql, () => {
       pullNode(7),
       detailsNode(7, {
         timelineItems: {
-          totalCount: 1,
+          filteredCount: 1,
           nodes: [
             {
               previousRefName: 'renovate',

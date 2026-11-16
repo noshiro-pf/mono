@@ -29,7 +29,7 @@ export const queueBlock = (
   );
 
   return {
-    title: constant('queue'),
+    title: constant('Queue'),
     extras: (
       <>
         <ExternalLink
@@ -108,7 +108,20 @@ const QueueBody = ({
       }
     />
 
-    <QueueRow view={view} />
+    <If
+      cond={view.pipe(
+        map(
+          ({ running, next, waiting }) =>
+            Arr.isEmpty(running) && Arr.isEmpty(next) && Arr.isEmpty(waiting),
+        ),
+      )}
+      then={
+        <p class={constant('muted')}>
+          {constant('Nothing runs or waits its turn.')}
+        </p>
+      }
+      else={<QueueRow view={view} />}
+    />
 
     <If
       cond={view.pipe(map(({ outside }) => Arr.isNonEmpty(outside)))}

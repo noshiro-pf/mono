@@ -3,8 +3,10 @@ import type { IssueRow } from './issue-row.mjs';
 import {
   DEFAULT_ISSUES,
   isListed,
+  issueChipCounts,
   issuesCodec,
   issueTileCounts,
+  labelColorsOf,
   labelPicksOf,
   passesTiers,
   sortIssues,
@@ -149,6 +151,19 @@ describe(labelPicksOf, () => {
   });
 });
 
+describe(labelColorsOf, () => {
+  test('gives each label the colour of the first issue carrying it', () => {
+    const colors = labelColorsOf([
+      row(1, { labels: [{ name: 'bug', color: 'd73a4a', description: '' }] }),
+      row(2, { labels: [{ name: 'bug', color: '000000', description: '' }] }),
+    ]);
+
+    assert.strictEqual(colors.get('bug'), 'd73a4a');
+
+    assert.isUndefined(colors.get('docs'));
+  });
+});
+
 describe(isListed, () => {
   test('keeps an issue in progress whatever start states are off', () => {
     const s = { ...DEFAULT_ISSUES, hideStart: ['free'] } as const;
@@ -202,6 +217,55 @@ describe(issueTileCounts, () => {
     assert.deepStrictEqual(counts.tiers.B, { count: 2, hidden: true });
 
     assert.deepStrictEqual(counts.tiers.S, { count: 1, hidden: false });
+  });
+});
+
+describe(issueChipCounts, () => {
+  test('counts each start state as switching it on would show it', () => {
+    const rows = [
+      row(1, { start: 'free' }),
+      row(2, { start: 'free' }),
+      row(3, { start: 'blocked' }),
+      row(4, { start: 'blocked', tier: 'D' }),
+    ] as const;
+
+    const counts = issueChipCounts(
+      rows,
+      { ...DEFAULT_ISSUES, hideStart: ['blocked'], hidePriority: ['D'] },
+      '',
+    );
+
+    assert.deepStrictEqual(counts.starts.free, { count: 2, hidden: false });
+
+    // Off, it counts what switching it on would add; the tier filter holds.
+    assert.deepStrictEqual(counts.starts.blocked, { count: 1, hidden: true });
+
+    assert.deepStrictEqual(counts.starts.cycle, { count: 0, hidden: false });
+  });
+
+  test('counts each label as picking it would show it', () => {
+    const rows = [
+      row(1, { labels: labelled('bug') }),
+      row(2, { labels: labelled('bug', 'docs') }),
+      row(3, { labels: labelled('docs'), title: 'other' }),
+    ] as const;
+
+    const counts = issueChipCounts(
+      rows,
+      { ...DEFAULT_ISSUES, labels: ['bug'] },
+      '#',
+    );
+
+    assert.deepStrictEqual(counts.labels.get('bug'), {
+      count: 2,
+      hidden: false,
+    });
+
+    // Not picked while another is: what picking it would add, the search held.
+    assert.deepStrictEqual(counts.labels.get('docs'), {
+      count: 1,
+      hidden: true,
+    });
   });
 });
 

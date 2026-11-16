@@ -141,8 +141,26 @@
   }
 
   /* Fill the window: the page does not scroll, each block does. */
+  /*
+   * The page is the window's height and the columns take what the header,
+   * the token panel and any notice leave; a window too short for any room
+   * makes the page taller than it, and that alone scrolls.
+   */
+  .page:has(> .columns[data-mode='fill']) {
+    display: flex;
+    flex-direction: column;
+    height: 100dvh;
+    min-height: 30rem;
+    padding-bottom: 16px;
+  }
+
+  .page:has(> .columns[data-mode='fill']) > * {
+    flex-shrink: 0;
+  }
+
   .columns[data-mode='fill'] {
-    height: calc(100dvh - var(--header-height) - 16px);
+    flex: 1 1 0;
+    min-height: 0;
     align-items: stretch;
   }
 

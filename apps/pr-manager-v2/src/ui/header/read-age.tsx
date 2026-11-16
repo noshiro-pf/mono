@@ -4,7 +4,10 @@ import type { ReportStatus } from '../../store/index.mjs';
 import { Age } from '../common/index.mjs';
 import { Updating } from './updating.js';
 
-/** The read's age alone, for the folded toolbar; nothing before a read. */
+/**
+ * `Read 2 minutes ago`, the exact time on hover, for the folded toolbar;
+ * nothing before a read.
+ */
 export const ReadAge = ({
   status,
   now,
@@ -19,6 +22,7 @@ export const ReadAge = ({
         <Age
           at={status.pipe(map((s) => (s.kind === 'ready' ? s.readAtMs : 0)))}
           now={now}
+          prefix={'Read '}
         />
 
         <Updating status={status} />

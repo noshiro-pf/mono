@@ -190,9 +190,25 @@
 }
 
 @layer components {
+  /*
+   * One column reads as a column, not a line from edge to edge; the page
+   * widens with the columns it is given.
+   */
   .page {
-    max-width: 120rem;
+    max-width: 68rem;
     margin: 0 auto;
-    padding: 0 16px 24px;
+    padding: 16px 16px 48px;
+  }
+
+  .page:has(.columns[data-count='2']) {
+    max-width: 120rem;
+  }
+
+  .page:has(.columns[data-count='3']) {
+    max-width: 180rem;
+  }
+
+  .page:has(.header[data-folded='true']) {
+    padding-top: 8px;
   }
 }
