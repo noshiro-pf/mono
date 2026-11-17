@@ -1,7 +1,11 @@
 import dedent from 'dedent';
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
-import { transformSourceCode, type TsMorphTransformer } from 'ts-codemod-lib';
+import {
+  createProjectTransformer,
+  transformSourceCode,
+  type TsMorphTransformer,
+} from 'ts-codemod-lib';
 import { Arr, expectType, Result, unknownToString } from 'ts-data-forge';
 import {
   getDiffFrom,
@@ -19,7 +23,14 @@ type GetFilesOptions = Readonly<{
   silent: boolean;
 }>;
 
-type TransformerCLIOptions = GetFilesOptions;
+type TransformerCLIOptions = GetFilesOptions &
+  Readonly<{
+    /** A tsconfig.json whose project every file is checked in. */
+    project: string | undefined;
+  }>;
+
+/** Takes a file's path and text, and returns the text transformed. */
+type TransformCode = (filePath: string, code: string) => string;
 
 export const runTransformerCLI = async (
   options: TransformerCLIOptions,
@@ -58,9 +69,15 @@ export const runTransformerCLI = async (
     return Result.ok(undefined);
   }
 
+  const transformCode: TransformCode =
+    options.project === undefined
+      ? (filePath, code) =>
+          transformSourceCode(code, isTsxPath(filePath), transformers)
+      : createProjectTransformer(path.resolve(options.project), transformers);
+
   const { errorFiles, transformedCount, unchangedCount } = await transformFiles(
     files,
-    transformers,
+    transformCode,
     options.silent,
   );
 
@@ -215,9 +232,12 @@ const getFilesForTransformation = async (
   return Result.ok(mut_files);
 };
 
+const isTsxPath = (filePath: string): boolean =>
+  filePath.endsWith('.tsx') || filePath.endsWith('.jsx');
+
 const transformOneFile = async (
   filePath: string,
-  transformers: readonly TsMorphTransformer[],
+  transformCode: TransformCode,
   silent: boolean,
 ): Promise<Result<'unchanged' | 'transformed', string>> => {
   const echoIfNotSilent = silent ? () => {} : console.log;
@@ -226,17 +246,11 @@ const transformOneFile = async (
 
   const fileName = path.basename(filePath);
 
-  const isTsx = fileName.endsWith('.tsx') || fileName.endsWith('.jsx');
-
   try {
     // eslint-disable-next-line security/detect-non-literal-fs-filename
     const originalCode = await fs.readFile(filePath, 'utf8');
 
-    const transformedCode = transformSourceCode(
-      originalCode,
-      isTsx,
-      transformers,
-    );
+    const transformedCode = transformCode(filePath, originalCode);
 
     if (transformedCode === originalCode) {
       echoIfNotSilent(`⏭️ ${fileName} - no changes needed`);
@@ -261,7 +275,7 @@ const transformOneFile = async (
 
 const transformFiles = async (
   filePaths: readonly string[],
-  transformers: readonly TsMorphTransformer[],
+  transformCode: TransformCode,
   silent: boolean,
 ): Promise<
   Readonly<{
@@ -277,7 +291,7 @@ const transformFiles = async (
   const mut_errorFiles: string[] = [];
 
   for (const filePath of filePaths) {
-    const result = await transformOneFile(filePath, transformers, silent);
+    const result = await transformOneFile(filePath, transformCode, silent);
 
     if (Result.isOk(result)) {
       expectType<typeof result.value, 'unchanged' | 'transformed'>('=');

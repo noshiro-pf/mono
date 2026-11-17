@@ -2,7 +2,7 @@ import { Arr } from 'ts-data-forge';
 import * as tsm from 'ts-morph';
 import type { DeepReadonly } from 'ts-type-forge';
 import { hasDisableNextLineComment } from '../functions/index.mjs';
-import { isTypeAssertingWrapper } from '../utils/index.mjs';
+import { insertTexts, isTypeAssertingWrapper } from '../utils/index.mjs';
 import type { TsMorphTransformer } from './types.mjs';
 
 const TRANSFORMER_NAME = 'enable-no-unchecked-indexed-access';
@@ -97,7 +97,10 @@ export const enableNoUncheckedIndexedAccessTransformer = (
       // assertion.
       sourceAst.replaceText(
         [0, sourceAst.getEnd()],
-        insertNonNullAssertions(sourceAst.getFullText(), positions),
+        insertTexts(
+          sourceAst.getFullText(),
+          positions.map((position) => ({ position, text: '!' })),
+        ),
       );
     },
   };
@@ -450,25 +453,6 @@ const collectAssertionPositions = (
       noUncheckedIndexedAccess: originalOptions.noUncheckedIndexedAccess,
     });
   }
-};
-
-const insertNonNullAssertions = (
-  fullText: string,
-  positions: readonly number[],
-): string => {
-  const mut_parts: string[] = [];
-
-  let mut_restStart: number = 0;
-
-  for (const position of positions.toSorted((a, b) => a - b)) {
-    mut_parts.push(fullText.slice(mut_restStart, position), '!');
-
-    mut_restStart = position;
-  }
-
-  mut_parts.push(fullText.slice(mut_restStart));
-
-  return mut_parts.join('');
 };
 
 const equalityOperatorKinds: readonly tsm.SyntaxKind[] = [

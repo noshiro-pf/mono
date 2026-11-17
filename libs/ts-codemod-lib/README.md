@@ -292,6 +292,82 @@ const entry2: number = rec['a']!;
 const second2: string = pair[1];
 ```
 
+### 7. `enableExplicitFunctionReturnTypeTransformer`
+
+Writes the return type the compiler infers onto every function that
+[`@typescript-eslint/explicit-function-return-type`](https://typescript-eslint.io/rules/explicit-function-return-type/)
+reports, so that the rule can be turned on in an existing codebase.
+
+Which functions are annotated is decided by the rule's own logic, ported to the
+TypeScript AST, and the options are the rule's, with its defaults. Pass the
+options the rule is configured with, and the functions annotated are the ones it
+reports.
+
+Options: those of the rule — `allowExpressions`, `allowTypedFunctionExpressions`,
+`allowHigherOrderFunctions`, `allowDirectConstAssertionInArrowFunctions`,
+`allowConciseArrowFunctionExpressionsStartingWithVoid`,
+`allowFunctionsWithoutTypeParameters`, `allowedNames` and `allowIIFEs` — with
+the rule's defaults. `parseEnableExplicitFunctionReturnTypeTransformerOptions`
+reads them from a value of unknown shape, such as the JSON of an ESLint
+configuration.
+
+The type written is the one the checker infers, printed as a declaration file
+would print it, except that:
+
+- **A type from another module is imported** with `import type` (added to the
+  file's existing type import from that module, or as an inline `type` specifier
+  when the file imports that way) rather than written as `import("…").Name`.
+- **A type alias the checker does not remember is restored.**
+  `type Point = Readonly<{ x: number }>` names an instantiation of `Readonly`,
+  which the checker prints as `Readonly<{ x: number }>`; the alias declared for
+  it is printed instead. Only a non-generic alias declared outside
+  `node_modules` is restored, and only when no other alias names the same type:
+  in every file when its module exports it and is not a test, story or mock, and
+  otherwise in its own file alone.
+- **An inferred type predicate stays one** (`x is T`, not `boolean`), and an
+  optional parameter of a printed function type loses its redundant
+  `| undefined`.
+
+A function is left as it is, for a human to annotate, when its type cannot be
+written down faithfully:
+
+- the type contains `any`, written or inferred;
+- it names a type that is neither in scope nor exported from its module;
+- importing a name it needs would change what a name already in scope means — a
+  local, an import, a global the file mentions, or a global the annotation
+  itself uses (React's `MouseEvent<HTMLElement, MouseEvent>` holds the DOM's
+  `MouseEvent`, which an import of React's would replace). A global the file
+  never mentions may be shadowed: `@types/react` 18 still declares a global
+  `JSX`, and `import type { JSX } from 'react'` is what a component gets.
+
+The rule then still reports exactly those functions, so nothing is lost
+silently.
+
+**Run it with the whole project.** A type from another module resolves only when
+the file is checked as part of its project: use `createProjectTransformer` (see
+"Programmatic Usage") or the CLI's `--project`. `transformSourceCode` checks
+each file on its own, where such a type is unresolved and its function is left
+alone. In a project, each edited file invalidates the program, so a run over a
+few hundred files takes minutes.
+
+What it writes is a declaration file's spelling, not a formatter's or a linter's:
+run Prettier afterwards, and `eslint --fix` for style rules such as
+`@typescript-eslint/consistent-indexed-object-style`.
+
+Example:
+
+```ts
+// Before (`@typescript-eslint/explicit-function-return-type` reports both)
+export const double = (x: number) => x * 2;
+
+export const isString = (x: unknown) => typeof x === 'string';
+
+// After (an inferred type predicate is kept a type predicate)
+export const double2 = (x: number): number => x * 2;
+
+export const isString2 = (x: unknown): x is string => typeof x === 'string';
+```
+
 ### Disabling Transformers
 
 - Nodes on the line immediately following a `// transformer-ignore-next-line` comment will be skipped.
@@ -485,6 +561,35 @@ Run:
 
 ```sh
 node codemod.mjs
+```
+
+### Checking Files as Part of Their Project
+
+`transformSourceCode` checks each file on its own, so a type imported from
+another module does not resolve there. `createProjectTransformer` loads the
+project a `tsconfig.json` describes once, and transforms each file as part of
+it. Nothing is written to disk.
+
+```tsx
+import * as fs from 'node:fs/promises';
+import {
+    createProjectTransformer,
+    enableExplicitFunctionReturnTypeTransformer,
+} from 'ts-codemod-lib';
+
+const transform = createProjectTransformer('path/to/tsconfig.json', [
+    enableExplicitFunctionReturnTypeTransformer({ allowExpressions: true }),
+]);
+
+for await (const filePath of fs.glob('path/to/src/**/*.{mts,tsx}')) {
+    const originalCode = await fs.readFile(filePath, 'utf8');
+
+    const transformedCode = transform(filePath, originalCode);
+
+    if (transformedCode !== originalCode) {
+        await fs.writeFile(filePath, transformedCode, 'utf8');
+    }
+}
 ```
 
 ## Notes

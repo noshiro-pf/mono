@@ -15,6 +15,13 @@ type SourceFileMapping = Readonly<{
 export const sourceFileMappings: readonly SourceFileMapping[] = [
   {
     sourcePath:
+      'src/functions/ast-transformers/enable-explicit-function-return-type.mts',
+    sampleFiles: [
+      'samples/src/enable-explicit-function-return-type-jsdoc-example.mts',
+    ],
+  },
+  {
+    sourcePath:
       'src/functions/ast-transformers/enable-no-unchecked-indexed-access.mts',
     sampleFiles: [
       'samples/src/enable-no-unchecked-indexed-access-jsdoc-example.mts',
