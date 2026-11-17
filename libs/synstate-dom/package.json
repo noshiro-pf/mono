@@ -90,7 +90,7 @@
     "vitest": "catalog:"
   },
   "peerDependencies": {
-    "synstate": ">=9.0.0",
+    "synstate": ">=9.1.0",
     "ts-data-forge": ">=15.1.0"
   },
   "engines": {

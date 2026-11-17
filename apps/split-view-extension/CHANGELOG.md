@@ -1,5 +1,19 @@
 # split-view-extension
 
+## 0.12.0
+
+### Minor Changes
+
+- 084ab0e: The merge-queued button is back in the panes of a split view. Chrome lets no extension reach a page inside another extension's page, so since the button moved to GitHub View Defaults it could not appear in Split View's panes. Split View now draws another extension's buttons in a pane and, once one is pressed and until it is answered, runs that extension's steps on the pane's page (the pane bridge in `split-view-link`), for GitHub View Defaults alone; the label picker stays GitHub View Defaults' code. GitHub View Defaults' manifest now has a `key`, pinning the id Split View answers: remove a build loaded before it and load `dist` again, once.
+
+### Patch Changes
+
+- Updated dependencies [c2096a2]
+    - synstate@9.1.0
+    - split-view-link@0.0.5
+    - synstate-dom@0.13.0
+    - ts-data-forge@15.1.0
+
 ## 0.11.2
 
 ### Patch Changes

@@ -1,6 +1,6 @@
 {
   "name": "eslint-plugin-react-coding-style",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "private": false,
   "description": "ESLint rules for one way of writing React components: `React.memo`, typed props, namespace imports, a single JSX return.",
   "keywords": [

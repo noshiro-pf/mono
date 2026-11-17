@@ -1,5 +1,12 @@
 # synstate-preact-hooks
 
+## 9.1.0
+
+### Patch Changes
+
+- Updated dependencies [c2096a2]
+    - synstate@9.1.0
+
 ## 9.0.2
 
 ### Patch Changes
