@@ -3,7 +3,8 @@
  * ask and make of the answers. Every route the readers ask is answered with the
  * smallest answer of the right shape — one open pull request, #1, onto `main`,
  * and nothing else open, merged, reported or commented — unless the test
- * answers it itself.
+ * answers it itself. As on GitHub, a default answer is found whatever the case of
+ * the repository in the path; a test's own routes are given the path as sent.
  */
 
 import { createServer } from 'node:http';
@@ -225,7 +226,16 @@ const DEFAULT_ROUTES: readonly (readonly [RegExp, FakeAnswer])[] = [
  * do not.
  */
 const defaultAnswer = (url: string): FakeAnswer => {
-  const { pathname, searchParams } = new URL(url, 'http://localhost');
+  const { pathname: asked, searchParams } = new URL(url, 'http://localhost');
+
+  // GitHub ignores the case of the owner and the repository in a path. The
+  // fake's are lower case, so the folded path finds the route.
+  const folded = asked.toLowerCase();
+
+  const pathname =
+    folded === REPO_PREFIX || folded.startsWith(`${REPO_PREFIX}/`)
+      ? (`${REPO_PREFIX}${asked.slice(REPO_PREFIX.length)}` as const)
+      : asked;
 
   // The open list and the closed one, told apart by the query alone.
   if (pathname === `${REPO_PREFIX}/pulls`) {

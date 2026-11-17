@@ -2,7 +2,12 @@
 
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
-import { MAIN_RULESET_PATH, parseRuleset, type RepoRef } from 'pr-report-core';
+import {
+  isSameRepo,
+  MAIN_RULESET_PATH,
+  parseRuleset,
+  type RepoRef,
+} from 'pr-report-core';
 import { Result } from 'ts-data-forge';
 import { repoRoot, resolveRepo } from '../lib/index.mjs';
 import type { Client } from './github.mjs';
@@ -41,8 +46,3 @@ export const readRequiredContexts = async (
     ({ requiredContexts }) => requiredContexts,
   );
 };
-
-/** Whether `a` and `b` name one repository: GitHub ignores the case of both names. */
-export const isSameRepo = (a: RepoRef, b: RepoRef): boolean =>
-  a.owner.toLowerCase() === b.owner.toLowerCase() &&
-  a.name.toLowerCase() === b.name.toLowerCase();

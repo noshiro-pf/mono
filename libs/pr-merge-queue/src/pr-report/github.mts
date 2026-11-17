@@ -5,6 +5,8 @@ import {
   closingIssuesIn,
   closingKeywordIssuesIn,
   epochMsOf,
+  isRepoApiUrl,
+  isRepoNamed,
   parseMergeAfter,
   readBranchRequirements,
   readQueueComments,
@@ -609,13 +611,10 @@ export const createClient = (
       PAGE_SIZE,
     );
 
-    const own =
-      `https://api.github.com/repos/${repo.owner}/${repo.name}`.toLowerCase();
-
     return Result.isErr(listed)
       ? []
       : listed.value
-          .filter(({ repository_url: url }) => url.toLowerCase() === own)
+          .filter(({ repository_url: url }) => isRepoApiUrl(repo, url))
           .map(({ number }) => number);
   };
 
@@ -1082,7 +1081,7 @@ export const createClient = (
           headRef: pr.head.ref,
           headSha: pr.head.sha,
           baseRef: pr.base.ref,
-          fromFork: pr.head.repo?.full_name !== `${repo.owner}/${repo.name}`,
+          fromFork: !isRepoNamed(repo, pr.head.repo?.full_name),
           url: pr.html_url,
           updatedAt: pr.updated_at,
           headCommittedAt: compared.headCommittedAt,

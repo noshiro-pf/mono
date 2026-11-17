@@ -7,6 +7,7 @@
  */
 
 import {
+  isRepoNamed,
   isSafeRefName,
   namesEveryChangedPath,
   parseClaimComment,
@@ -18,6 +19,7 @@ import {
   type CheckRunReport,
   type Claim,
   type NativeStackEntry,
+  type RepoRef,
   type RulesetRequirements,
 } from 'pr-report-core';
 import { Arr, asUint32, isRecord, Result } from 'ts-data-forge';
@@ -443,8 +445,6 @@ export const readIssueOrder = async (
 
   const { repo, fields } = pulls.value;
 
-  const own = `${repo.owner}/${repo.name}`.toLowerCase();
-
   const read = Arr.generate(function* () {
     for (const n of numbers) {
       const node = ClosingIssuesNodeSchema.validate(fields(`pr_${n}`));
@@ -454,10 +454,10 @@ export const readIssueOrder = async (
           number: n,
           bodyHtml: node.value.bodyHTML,
           linked: node.value.closingIssuesReferences.nodes
-            .filter(
-              (issue) => issue.repository.nameWithOwner.toLowerCase() === own,
+            .filter((issue) =>
+              isRepoNamed(repo, issue.repository.nameWithOwner),
             )
-            .map((issue) => closingIssueAnswer(own, issue)),
+            .map((issue) => closingIssueAnswer(repo, issue)),
         };
       }
     }
@@ -493,7 +493,7 @@ export const readIssueOrder = async (
         );
 
         if (Result.isOk(node)) {
-          yield [n, closingIssueAnswer(own, node.value)] as const;
+          yield [n, closingIssueAnswer(repo, node.value)] as const;
         }
       }
     }),
@@ -965,9 +965,9 @@ export const removeWorktree = async (worktreeDir: string): Promise<void> => {
   await git('git worktree prune');
 };
 
-/** An issue as read, with only `own`'s issues among what blocks it. */
+/** An issue as read, with only `repo`'s issues among what blocks it. */
 const closingIssueAnswer = (
-  own: string,
+  repo: RepoRef,
   { number, state, body, blockedBy }: t.TypeOf<typeof ClosingIssueSchema>,
 ): ClosingIssueAnswer =>
   ({
@@ -975,9 +975,7 @@ const closingIssueAnswer = (
     state,
     body,
     blockedBy: blockedBy.nodes
-      .filter(
-        ({ repository }) => repository.nameWithOwner.toLowerCase() === own,
-      )
+      .filter(({ repository }) => isRepoNamed(repo, repository.nameWithOwner))
       .map((node) => node.number),
   }) as const;
 
@@ -1029,7 +1027,7 @@ const askRepository = async (
 ): Promise<
   Result<
     Readonly<{
-      repo: Readonly<{ owner: string; name: string }>;
+      repo: RepoRef;
       fields: (alias: string) => unknown;
     }>,
     string
