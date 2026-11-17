@@ -1,7 +1,9 @@
 import { Arr } from 'ts-data-forge';
+import { createPaneButtons } from './pane-bridge/index.mjs';
 import {
   asNestedFrameMessage,
   asPageToFrameMessage,
+  asPaneDomRequest,
   asPaneOfFrameQuery,
   paneFrameNamePrefix,
   paneIdOfFrameName,
@@ -70,10 +72,16 @@ const main = (): void => {
   // happening.
   let mut_lastSignature: string | undefined = undefined;
 
+  // Other extensions' buttons, drawn in a pane once it has been assigned: a
+  // frame nested in a pane's page gets none.
+  const paneButtons = createPaneButtons();
+
   const report = (): void => {
     if (mut_paneId === undefined || mut_replyOrigin === undefined) {
       return;
     }
+
+    paneButtons.show(document.location.href);
 
     const message: FrameToPageMessage = {
       tag: splitViewMessageTag,
@@ -165,11 +173,25 @@ const main = (): void => {
   // while a new document has not been assigned yet. Answered with `null` in a
   // frame nested in a pane's page, which cannot know.
   chrome.runtime.onMessage.addListener(
-    (value: unknown, sender, sendResponse: (answer: number | null) => void) => {
-      if (
-        sender.id !== chrome.runtime.id ||
-        asPaneOfFrameQuery(value) === undefined
-      ) {
+    (value: unknown, sender, sendResponse: (answer: unknown) => void) => {
+      if (sender.id !== chrome.runtime.id) {
+        return false;
+      }
+
+      // A step of the partner whose button was pressed in this pane. The worker
+      // passes one on only while that press is in flight, and only to the pane
+      // it was pressed in; a frame never assigned a pane takes none.
+      const domRequest = asPaneDomRequest(value);
+
+      if (domRequest !== undefined) {
+        sendResponse(
+          mut_paneId === undefined ? null : paneButtons.run(domRequest.op),
+        );
+
+        return false;
+      }
+
+      if (asPaneOfFrameQuery(value) === undefined) {
         return false;
       }
 

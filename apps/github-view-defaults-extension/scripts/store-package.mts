@@ -5,19 +5,19 @@ import { workspaceRootPath } from './workspace-root-path.mjs';
 
 /**
  * Only the source maps come off `dist/` on the way to the store, and `key` in
- * the manifest if there is one, which the store refuses.
+ * the manifest, which the store refuses, since it assigns the id from the key
+ * it holds.
  *
- * Unlike `split-view-extension`, a `key` here is optional rather than required.
- * That extension pins the id of its unpacked build so that a checkout loaded
- * from another path keeps the layouts it saved in `chrome.storage`; this one
- * stores nothing at all, so there is nothing for a changing id to lose. Add a
- * `key` to `public/manifest.json` if the unpacked build and the published one
- * should be the same extension anyway — the packaging handles both.
+ * The `key` stays in `public/manifest.json` all the same, and is required there:
+ * it pins the id of the _unpacked_ build, which is the one Split View acts for
+ * in its panes (`paneBridgePartnerIds` in `split-view-link`, and
+ * `test/extension-id.test.mts`). A build from the store has an id of its own,
+ * and Split View draws no button for it.
  */
 export const storePackageOptions = {
   packageRoot: workspaceRootPath,
   packageName: 'github-view-defaults-extension',
-  requireManifestKey: false,
+  requireManifestKey: true,
   stripManifestKeys: [],
   signingKeyPassEnv: 'GITHUB_DIFF_DEFAULTS_SIGNING_KEY_PASS',
   defaultPassEntry: 'github-view-defaults-extension',

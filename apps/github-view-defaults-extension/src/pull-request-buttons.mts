@@ -1,4 +1,4 @@
-import type { ReadonlyRecord } from 'ts-type-forge';
+import { createDomExecutor } from 'split-view-link';
 import {
   addLabelThroughPicker,
   asGitHubMessage,
@@ -8,11 +8,16 @@ import {
   hasMergeQueue,
   isConversationOf,
   issueUrlOf,
+  mergeQueuedLabel,
+  pageDomOver,
   pullRequestOf,
   pullRequestTitleOf,
-  type AddLabelResult,
+  queueBusyText,
+  queueIdleText,
+  queueResultText,
   type GitHubMessage,
   type PullRequest,
+  type QueueResult,
 } from './github/index.mjs';
 
 /**
@@ -33,11 +38,12 @@ import {
  * split view open (Chrome closes an extension's pages when it reloads it); an
  * update of this one closes nothing.
  *
- * It runs in every frame of github.com. In a pane of a split view — the only
- * place github.com is framed, since GitHub refuses to be framed anywhere Split
- * View has not taken that refusal away — there is no "⧉ Split view" button, the
- * pull request being in one already, and the merge-queued button is shown on
- * the conversation tab alone (`inPane`).
+ * It runs in every frame of github.com that Chrome lets it into, which is not a
+ * pane of Split View: Chrome lets no extension reach a page inside another
+ * extension's page. There the merge-queued button is Split View's, worked for
+ * this extension through the pane bridge (`background.mts`). In a frame of a web
+ * page (`inPane`) there is no "⧉ Split view" button, and the merge-queued
+ * button is shown on the conversation tab alone, never moving the frame.
  *
  * The Split view button is a `<button>` rather than a link to `split.html`: a
  * web page may not navigate to an extension page it is not listed for. The
@@ -443,8 +449,13 @@ const queueThisPullRequest = async (inPane: boolean): Promise<QueueResult> => {
     conversationLink.click();
   }
 
-  return addLabelThroughPicker(mergeQueuedLabel, () =>
-    isConversationOf(document.location.href, pullRequest),
+  // A fresh executor for each press: its handles are this press's alone.
+  const executor = createDomExecutor();
+
+  return addLabelThroughPicker(
+    pageDomOver(executor.run),
+    mergeQueuedLabel,
+    () => isConversationOf(document.location.href, pullRequest),
   );
 };
 
@@ -459,33 +470,6 @@ const fetchTimeoutMs = 5000;
 
 /** `MouseEvent.button` of the wheel. */
 const middleButton = 1;
-
-/**
- * What the merge-queued button shows afterwards: what adding the label came to,
- * or that the conversation tab is being loaded as a new document.
- */
-type QueueResult = AddLabelResult | 'reloading';
-
-/**
- * The string is the one in `libs/pr-report-core/src/labels.mts` and the
- * workflows; it is written out rather than imported because this is a content
- * script, built into one file, and that package is the queue's Node tooling.
- */
-const mergeQueuedLabel = 'merge-queued';
-
-const queueIdleText = `＋ ${mergeQueuedLabel}` as const;
-
-const queueBusyText = `… ${mergeQueuedLabel}` as const;
-
-const queueResultText = {
-  labelled: `✓ ${mergeQueuedLabel}`,
-  'already-labelled': `✓ already ${mergeQueuedLabel}`,
-  'no-picker': '✕ no label picker here',
-  'no-such-label': `✕ no "${mergeQueuedLabel}" label`,
-  'not-saved': '✕ not saved',
-  'left-page': '✕ left the pull request',
-  reloading: '→ conversation; press again there',
-} as const satisfies ReadonlyRecord<QueueResult, string>;
 
 /** How long the outcome stays on the button before it is ready again. */
 const queueResultShownMs = 3000;

@@ -1,6 +1,6 @@
 # GitHub View Defaults — privacy policy
 
-Last updated: 2026-11-16
+Last updated: 2026-11-17
 
 **GitHub View Defaults collects nothing, stores nothing, and sends nothing.**
 There is no account, no analytics, no telemetry, no server and no third party
@@ -50,7 +50,11 @@ The second puts two buttons on a pull request, and reads:
 - **The labels of a pull request in `noshiro-pf/mono`**, when you press the
   **＋ merge-queued** button, which is shown on that repository's pull requests
   and nowhere else: the label names in GitHub's own label picker, which of them
-  are selected, and the labels listed in the pull request's sidebar.
+  are selected, and the labels listed in the pull request's sidebar. In a pane
+  of Split View, which no script of this extension can reach, Split View reads
+  these for it after you press the button there, and hands them to this
+  extension's service worker; this extension tells Split View, for each pane's
+  address, whether the pane gets the button.
 
 That is all of it. Neither script reads any other page content — diffs,
 comments, form fields — nor cookies or storage, and they read nothing at all on

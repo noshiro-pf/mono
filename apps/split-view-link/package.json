@@ -46,6 +46,7 @@
     "npm-run-all2": "catalog:",
     "prettier-plugin-organize-imports": "catalog:",
     "prettier-plugin-packagejson": "catalog:",
+    "ts-type-forge": "workspace:*",
     "tsx": "catalog:",
     "vite": "catalog:",
     "vitest": "catalog:"

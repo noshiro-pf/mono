@@ -2,6 +2,7 @@
   "manifest_version": 3,
   "name": "GitHub View Defaults",
   "description": "Opens GitHub PR diffs with whitespace hidden and viewed files collapsed, branches as the full list, and numbers PR and issue tabs.",
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAlnq6JTDntVAez77iyBS8OyMAIJ1XNz1Y+bNbELPfp70Y1dIAOB7SYg/uGR1QQTXNwt6xTZ2AlLl41ZIIRVhj/IG2x8nEBJKdo08jQeKsdK9VmF/O8He3RGo8iSqw6xUT42qb83Mze2dhYoWwQC0LW9gyR97W6bVHGcTBG9X7ufdyfdOfJX44UhXgS8OU2OIl+ImWo0+pwuNjlEaj/Ayi1aKS8Mnz2Z/X2l4gwjfDDWwFtTxwSfXGUcJlysBnDRikhpvJGTtb5iyCPkmZWXFbIgMN+Hq7vJ7NwFoXRyl1YifkT9Dv5ABjQKWW5rPVuX7Rob2gS9S4PiB5zvluE2nYpwIDAQAB",
   "minimum_chrome_version": "116",
   "icons": {
     "16": "icons/16.png",

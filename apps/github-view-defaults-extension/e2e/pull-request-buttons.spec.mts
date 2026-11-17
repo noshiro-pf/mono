@@ -1,11 +1,13 @@
 import {
   expect,
   type BrowserContext,
+  type Frame,
   type FrameLocator,
   type Locator,
   type Page,
 } from '@playwright/test';
 import { splitViewExtensionId } from 'split-view-link';
+import { Arr } from 'ts-data-forge';
 import type { DeepReadonly } from 'ts-type-forge';
 import { githubMessageTag, type GitHubMessage } from '../src/index.mjs';
 import { test } from './fixtures.mjs';
@@ -224,7 +226,7 @@ test.describe('with Split View', () => {
         splitViewButton(page).click(),
       ]);
 
-      await expect.soft(splitView).toHaveTitle('Split View stand-in');
+      await expect.soft(splitView).toHaveURL(/\/split\.html\?/u);
 
       const opened = new URL(splitView.url());
 
@@ -266,7 +268,11 @@ test.describe('with Split View', () => {
 
       const worker = context
         .serviceWorkers()
-        .find((candidate) => candidate.url().endsWith('/background.js'));
+        .find(
+          (candidate) =>
+            candidate.url().endsWith('/background.js') &&
+            !candidate.url().includes(splitViewExtensionId),
+        );
 
       expect.soft(worker).toBeDefined();
 
@@ -304,7 +310,7 @@ test.describe('with Split View', () => {
 
       expect.soft(answer).toBe(true);
 
-      await expect.soft(splitView).toHaveTitle('Split View stand-in');
+      await expect.soft(splitView).toHaveURL(/\/split\.html\?/u);
 
       const opened = new URL(splitView.url());
 
@@ -327,7 +333,7 @@ test.describe('with Split View', () => {
         splitViewButton(page).click({ modifiers: ['Control'] }),
       ]);
 
-      await expect.soft(splitView).toHaveTitle('Split View stand-in');
+      await expect.soft(splitView).toHaveURL(/\/split\.html\?/u);
 
       // The worker answers once it is done with the tab, closing it or not, and
       // the button is ready again only then.
@@ -338,7 +344,7 @@ test.describe('with Split View', () => {
   );
 
   test(
-    'in a frame, only the merge-queued button, and only on the conversation',
+    "in a web page's frame, only the merge-queued button, and only on the conversation",
     { tag: '@smoke' },
     async ({ context, page }) => {
       await serveGitHub(context);
@@ -369,7 +375,7 @@ test.describe('with Split View', () => {
   );
 
   test(
-    'in a frame, adds the label in the conversation, as in a tab',
+    "in a web page's frame, adds the label in the conversation, as in a tab",
     { tag: '@smoke' },
     async ({ context, page }) => {
       await serveGitHub(context);
@@ -389,6 +395,108 @@ test.describe('with Split View', () => {
       await expect
         .soft(conversation.getByTestId('labels-list').getByRole('link'))
         .toHaveText(['auto-rebase', 'merge-queued']);
+    },
+  );
+
+  // No script of this extension runs in a pane of Split View — Chrome lets no
+  // extension reach a frame inside another's page — so there the button is
+  // Split View's, drawn and worked for this extension through the pane bridge.
+  for (const markup of markups) {
+    test(
+      `in a pane of Split View, adds the label in the conversation, ${markup} sidebar`,
+      { tag: '@smoke' },
+      async ({ context, page }) => {
+        await serveGitHub(context, { markup });
+
+        await openSplitView(page, [
+          `${githubOrigin}${labelled}/files`,
+          `${githubOrigin}${labelled}`,
+        ]);
+
+        const conversation = paneOf(page, `${githubOrigin}${labelled}`);
+
+        const button = conversation.getByRole('button', {
+          name: queueButtonName,
+        });
+
+        await button.click();
+
+        await expect.soft(button).toHaveText('✓ merge-queued', outcome);
+
+        await expect
+          .soft(conversation.getByTestId('labels-list').getByRole('link'))
+          .toHaveText(['auto-rebase', 'merge-queued']);
+
+        await expect.soft(button).toHaveText('＋ merge-queued', outcome);
+
+        await button.click();
+
+        await expect.soft(button).toHaveText('✓ already merge-queued', outcome);
+      },
+    );
+  }
+
+  test(
+    'in a pane of Split View, the button is on the conversation alone',
+    { tag: '@smoke' },
+    async ({ context, page }) => {
+      await serveGitHub(context);
+
+      await openSplitView(page, [
+        `${githubOrigin}${labelled}/files`,
+        `${githubOrigin}${labelled}`,
+        `${githubOrigin}/someone/else/pull/7`,
+      ]);
+
+      await expect
+        .soft(
+          paneOf(page, `${githubOrigin}${labelled}`).getByRole('button', {
+            name: queueButtonName,
+          }),
+        )
+        .toBeVisible();
+
+      // Asked about, and answered with nothing: the diff, and another
+      // repository's conversation.
+      await expect
+        .soft(
+          paneOf(page, `${githubOrigin}${labelled}/files`).getByRole('button'),
+        )
+        .toHaveCount(0);
+
+      await expect
+        .soft(
+          paneOf(page, `${githubOrigin}/someone/else/pull/7`).getByRole(
+            'button',
+          ),
+        )
+        .toHaveCount(0);
+    },
+  );
+
+  test(
+    'in a pane of Split View, stops when the pane leaves the conversation',
+    { tag: '@smoke' },
+    async ({ context, page }) => {
+      // A menu slow enough that the pane is left well before its items load.
+      await serveGitHub(context, { menuDelayMs: slowRouterDelayMs });
+
+      await openSplitView(page, [`${githubOrigin}${labelled}`]);
+
+      const conversation = paneOf(page, `${githubOrigin}${labelled}`);
+
+      const button = conversation.getByRole('button', {
+        name: queueButtonName,
+      });
+
+      await button.click();
+
+      // While the menu is still loading its items, the pane moves on.
+      await conversation.evaluate(() => {
+        history.pushState(null, '', '/noshiro-pf/mono/pull/8');
+      });
+
+      await expect.soft(button).toHaveText('✕ left the pull request', outcome);
     },
   );
 });
@@ -425,6 +533,36 @@ const queueButton = (page: DeepReadonly<Page>): Locator =>
 
 const splitViewButton = (page: DeepReadonly<Page>): Locator =>
   page.getByRole('button', { name: '⧉ Split view' });
+
+/**
+ * Opens `split.html` of Split View with these addresses side by side, and waits
+ * for the last pane's page.
+ */
+const openSplitView = async (
+  page: DeepReadonly<Page>,
+  urls: readonly string[],
+): Promise<void> => {
+  const query = new URLSearchParams(
+    Arr.toUnshifted(['ws', 'e2e'])(urls.map((url) => ['url', url] as const)),
+  );
+
+  await page.goto(
+    `chrome-extension://${splitViewExtensionId}/split.html?${query.toString()}`,
+  );
+
+  await expect.poll(() => page.frames().length).toBeGreaterThan(urls.length);
+};
+
+/** The pane of `page` showing `url`. */
+const paneOf = (page: DeepReadonly<Page>, url: string): Frame => {
+  const frame = page.frame({ url });
+
+  if (frame === null) {
+    throw new Error(`No pane shows ${url}`);
+  }
+
+  return frame;
+};
 
 const frameOf = (
   page: DeepReadonly<Page>,
@@ -476,7 +614,10 @@ const labelLinksScript = [
 ].join('\n');
 
 /** The server-rendered sidebar, and its `<details>` menu. */
-const classicPickerScript = (labels: readonly string[]): string =>
+const classicPickerScript = (
+  labels: readonly string[],
+  menuDelayMs: number,
+): string =>
   [
     `const all = ${JSON.stringify(labels)};`,
     "const on = new Set(['auto-rebase']);",
@@ -511,7 +652,7 @@ const classicPickerScript = (labels: readonly string[]): string =>
     '          });',
     '          return item;',
     '        }));',
-    '      }, 300);',
+    `      }, ${menuDelayMs.toString()});`,
     '      return;',
     '    }',
     '    menu.replaceChildren();',
@@ -582,10 +723,12 @@ const pullRequestPage = ({
   markup,
   labels,
   routerDelayMs,
+  menuDelayMs,
 }: Readonly<{
   markup: Markup;
   labels: readonly string[];
   routerDelayMs: number;
+  menuDelayMs: number;
 }>): string =>
   [
     '<!doctype html>',
@@ -593,11 +736,17 @@ const pullRequestPage = ({
     '<title>Fix the thing by someone · Pull Request #7 · noshiro-pf/mono · GitHub</title>',
     `<a id="conversation-tab" href="${labelled}">Conversation</a>`,
     '<div id="sidebar"></div>',
-    `<script>${markup === 'classic' ? classicPickerScript(labels) : reactPickerScript(labels)}\n${routerScript(routerDelayMs)}</script>`,
+    `<script>${markup === 'classic' ? classicPickerScript(labels, menuDelayMs) : reactPickerScript(labels)}\n${routerScript(routerDelayMs)}</script>`,
   ].join('\n');
 
 /** How long the stand-in router takes to draw the conversation. */
 const defaultRouterDelayMs = 500;
+
+/**
+ * How long the server-rendered menu takes to load its items once opened, as
+ * GitHub's loads them when the menu opens.
+ */
+const defaultMenuDelayMs = 300;
 
 /** Longer than the button ever waits for the picker, so it never appears. */
 const slowRouterDelayMs = 30_000;
@@ -609,17 +758,19 @@ const serveGitHub = async (
     markup = 'classic',
     labels = withLabel,
     routerDelayMs = defaultRouterDelayMs,
+    menuDelayMs = defaultMenuDelayMs,
   }: Readonly<{
     markup?: Markup;
     labels?: readonly string[];
     routerDelayMs?: number;
+    menuDelayMs?: number;
   }> = {},
 ): Promise<void> => {
   await context.route(`${githubOrigin}/**`, async (route) => {
     await route.fulfill({
       status: 200,
       contentType: 'text/html; charset=utf-8',
-      body: pullRequestPage({ markup, labels, routerDelayMs }),
+      body: pullRequestPage({ markup, labels, routerDelayMs, menuDelayMs }),
     });
   });
 };

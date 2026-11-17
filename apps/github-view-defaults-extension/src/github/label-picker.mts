@@ -1,27 +1,31 @@
 import { Arr } from 'ts-data-forge';
+import { cssStringOf, type PageDom } from './page-dom.mjs';
 
 /**
- * Puts a label on the pull request on screen by working GitHub's own label
+ * Puts a label on the pull request on `dom` by working GitHub's own label
  * picker — the gear beside "Labels" in the conversation tab's sidebar — the way
  * a person would: open it, select the label, close it, and read the sidebar
  * back.
  *
  * It is done through the page rather than through the REST API because the page
  * is signed in already: the label is added as the user, with the permissions
- * they have, and the extension holds no token and sends nothing for it — this
- * needs nothing beyond the content script already on `github.com`.
+ * they have, and the extension holds no token and sends nothing for it.
+ *
+ * `dom` is the page in a tab, or a page in a pane of Split View, which only
+ * Split View can act on (`page-dom.mts`); every step is a `PageDom` call, so
+ * the two cannot drift apart.
  *
  * GitHub has drawn the sidebar two ways, and has gone from the one to the other
  * and back, so both are worked; which one a page has is read off the page each
  * time. What is read of either is accessibility attributes as far as they go,
  * which are what GitHub keeps stable longest:
  *
- * - **The server-rendered sidebar** (`classicPicker`): a `<details>` holding
- *   the `Filter labels` input, opened and closed by its `<summary>`; its
- *   `role="menuitemcheckbox"` items, loaded when it opens, say whether they are
- *   on by `aria-checked` and name their label by the `data-label-name` of the
- *   checkbox inside. Closing it is what submits the change.
- * - **The React sidebar** (`reactPicker`): the button labelled
+ * - **The server-rendered sidebar** (`addThroughClassicPicker`): a `<details>`
+ *   holding the `Filter labels` input, opened and closed by its `<summary>`;
+ *   its `role="menuitemcheckbox"` items, loaded when it opens, say whether they
+ *   are on by `aria-checked` and name their label by the `data-label-name` of
+ *   the checkbox inside. Closing it is what submits the change.
+ * - **The React sidebar** (`addThroughReactPicker`): the button labelled
  *   `Manage labels`, which opens a dialog holding the `Filter labels` input and
  *   `role="option"` items, each named by `aria-labelledby` and saying whether
  *   it is on by `aria-selected`. Closing it with Escape is what saves.
@@ -31,24 +35,25 @@ import { Arr } from 'ts-data-forge';
  * page left while this waits is not the one labelled.
  */
 export const addLabelThroughPicker = async (
+  dom: PageDom,
   labelName: string,
-  isStillOnPage: () => boolean,
+  isStillOnPage: () => boolean | Promise<boolean>,
 ): Promise<AddLabelResult> => {
   // The conversation may still be rendering after a client-side navigation to
   // it, so the page is waited on until one picker or the other is there.
   const picker = await waitFor(
-    findPicker,
+    async () => findPicker(dom),
     pickerButtonTimeoutMs,
     isStillOnPage,
   );
 
-  return !isStillOnPage()
+  return !(await isStillOnPage())
     ? 'left-page'
     : picker === undefined
       ? 'no-picker'
       : picker === 'classic'
-        ? addThroughClassicPicker(labelName, isStillOnPage)
-        : addThroughReactPicker(labelName, isStillOnPage);
+        ? addThroughClassicPicker(dom, labelName, isStillOnPage)
+        : addThroughReactPicker(dom, labelName, isStillOnPage);
 };
 
 /**
@@ -95,18 +100,20 @@ const classicItemSelector = '[role="menuitemcheckbox"]';
  * than at the deadline, and answers nothing found on the other page.
  */
 const waitFor = async <T,>(
-  lookUp: () => T | undefined,
+  lookUp: () => Promise<T | undefined>,
   timeoutMs: number,
-  isStillOnPage: () => boolean,
+  isStillOnPage: () => boolean | Promise<boolean>,
 ): Promise<T | undefined> => {
   const deadline = performance.now() + timeoutMs;
 
   for (;;) {
-    if (!isStillOnPage()) {
+    // eslint-disable-next-line no-await-in-loop
+    if (!(await isStillOnPage())) {
       return undefined;
     }
 
-    const found = lookUp();
+    // eslint-disable-next-line no-await-in-loop
+    const found = await lookUp();
 
     if (found !== undefined || performance.now() >= deadline) {
       return found;
@@ -119,15 +126,19 @@ const waitFor = async <T,>(
   }
 };
 
-const findFilter = (): HTMLInputElement | undefined => {
-  const element = document.querySelector(filterSelector);
+const findFilter = async (dom: PageDom): Promise<number | undefined> =>
+  dom.query(filterSelector);
 
-  return element instanceof HTMLInputElement ? element : undefined;
+/** Whether any of `links` reads exactly `labelName`. */
+const listsLabel = async (
+  dom: PageDom,
+  links: readonly number[],
+  labelName: string,
+): Promise<boolean> => {
+  const texts = await Promise.all(links.map(async (link) => dom.text(link)));
+
+  return texts.includes(labelName);
 };
-
-/** Whether the sidebar's labels list, below the picker, names `labelName`. */
-const listsLabel = (links: Iterable<Element>, labelName: string): boolean =>
-  Array.from(links).some((anchor) => anchor.textContent.trim() === labelName);
 
 // The server-rendered sidebar
 
@@ -135,146 +146,150 @@ const listsLabel = (links: Iterable<Element>, labelName: string): boolean =>
  * The `<details>` the filter input is in. Found afresh every time: GitHub
  * replaces the whole sidebar section when the labels change.
  */
-const findClassicPicker = (): HTMLDetailsElement | undefined => {
-  const details = findFilter()?.closest('details');
+const findClassicPicker = async (dom: PageDom): Promise<number | undefined> => {
+  const filter = await findFilter(dom);
 
-  return details instanceof HTMLDetailsElement ? details : undefined;
+  return filter === undefined ? undefined : dom.closest(filter, 'details');
 };
 
-const labelNameOfCheckbox = (checkbox: Element | null): string | undefined =>
-  checkbox instanceof HTMLElement ? checkbox.dataset['labelName'] : undefined;
-
 /**
- * The item for exactly `labelName`, by the `data-label-name` of the checkbox
- * inside it. Its text runs the name into the label's description, so
- * `merge-queued` and a label called `merge-queued-later` could not be told
- * apart by that.
+ * The item for exactly `labelName`: the one around the checkbox whose
+ * `data-label-name` is the label's. Its text runs the name into the label's
+ * description, so `merge-queued` and a label called `merge-queued-later` could
+ * not be told apart by that.
  */
-const findClassicItem = (
-  picker: Element,
+const findClassicItem = async (
+  dom: PageDom,
+  picker: number,
   labelName: string,
-): HTMLElement | undefined =>
-  Array.from(picker.querySelectorAll(classicItemSelector)).find(
-    (element): element is HTMLElement =>
-      element instanceof HTMLElement &&
-      labelNameOfCheckbox(element.querySelector('input[data-label-name]')) ===
-        labelName,
+): Promise<number | undefined> => {
+  const checkbox = await dom.query(
+    `input[data-label-name=${cssStringOf(labelName)}]`,
+    picker,
   );
 
-const isChecked = (item: Element): boolean =>
-  item.getAttribute('aria-checked') === 'true';
+  return checkbox === undefined
+    ? undefined
+    : dom.closest(checkbox, classicItemSelector);
+};
+
+const isChecked = async (dom: PageDom, item: number): Promise<boolean> =>
+  (await dom.attribute(item, 'aria-checked')) === 'true';
 
 /**
- * Whether the labels listed under the menu, in the same sidebar section, name
+ * Whether the labels listed beside the menu, in the same sidebar section, name
  * `labelName`. Only that section: the timeline names labels too ("added
  * merge-queued"), and a match there would say nothing about whether the label
  * is on now. The links inside the menu are its own, not the list.
  */
-const classicSidebarShows = (labelName: string): boolean => {
-  const picker = findClassicPicker();
+const classicSidebarShows = async (
+  dom: PageDom,
+  labelName: string,
+): Promise<boolean> => {
+  const picker = await findClassicPicker(dom);
 
-  const section = picker?.parentElement;
+  const section = picker === undefined ? undefined : await dom.parent(picker);
 
-  if (picker === undefined || section === null || section === undefined) {
-    return false;
-  }
-
-  return listsLabel(
-    Array.from(section.querySelectorAll('a')).filter(
-      (anchor) => !picker.contains(anchor),
-    ),
-    labelName,
+  return (
+    section !== undefined &&
+    listsLabel(
+      dom,
+      await dom.queryAll(':scope > :not(details) a', section),
+      labelName,
+    )
   );
 };
 
 const addThroughClassicPicker = async (
+  dom: PageDom,
   labelName: string,
-  isStillOnPage: () => boolean,
+  isStillOnPage: () => boolean | Promise<boolean>,
 ): Promise<AddLabelResult> => {
-  const picker = findClassicPicker();
+  const picker = await findClassicPicker(dom);
 
-  const summary = picker?.querySelector(':scope > summary');
+  const summary =
+    picker === undefined
+      ? undefined
+      : await dom.query(':scope > summary', picker);
 
-  if (picker === undefined || !(summary instanceof HTMLElement)) {
+  if (picker === undefined || summary === undefined) {
     return 'no-picker';
   }
 
   // A menu the user already opened is used as it is: the summary toggles it, so
   // a click would close it.
-  if (!picker.open) {
-    summary.click();
+  if (!(await dom.isOpen(picker))) {
+    await dom.click(summary);
   }
+
+  const closeMenu = async (): Promise<void> => {
+    if (await dom.isOpen(picker)) {
+      await dom.click(summary);
+    }
+  };
 
   // The items are loaded once the menu opens. All of them are, so the filter is
   // left alone: the item is there whether or not the list is filtered to it.
   const item = await waitFor(
-    () => findClassicItem(picker, labelName),
+    async () => findClassicItem(dom, picker, labelName),
     stepTimeoutMs,
     isStillOnPage,
   );
 
-  const closeMenu = (): void => {
-    if (picker.open) {
-      summary.click();
-    }
-  };
-
-  if (!isStillOnPage()) {
-    closeMenu();
+  if (!(await isStillOnPage())) {
+    await closeMenu();
 
     return 'left-page';
   }
 
   if (item === undefined) {
-    closeMenu();
+    const anyItem = await dom.query(classicItemSelector, picker);
 
-    return picker.querySelector(classicItemSelector) === null
-      ? 'no-picker'
-      : 'no-such-label';
+    await closeMenu();
+
+    return anyItem === undefined ? 'no-picker' : 'no-such-label';
   }
 
-  if (isChecked(item)) {
-    closeMenu();
+  if (await isChecked(dom, item)) {
+    await closeMenu();
 
     return 'already-labelled';
   }
 
-  item.click();
+  await dom.click(item);
 
   const checked = await waitFor(
-    () => (isChecked(item) ? item : undefined),
+    async () => ((await isChecked(dom, item)) ? item : undefined),
     stepTimeoutMs,
     isStillOnPage,
   );
 
   // Closing is what submits the change, so it is closed whatever happened, and
   // whether it was saved is read off the sidebar GitHub draws again afterwards.
-  closeMenu();
+  await closeMenu();
 
   if (checked === undefined) {
-    return isStillOnPage() ? 'not-saved' : 'left-page';
+    return (await isStillOnPage()) ? 'not-saved' : 'left-page';
   }
 
   const shown = await waitFor(
-    () => classicSidebarShows(labelName) || undefined,
+    async () => (await classicSidebarShows(dom, labelName)) || undefined,
     stepTimeoutMs,
     isStillOnPage,
   );
 
   return shown !== undefined
     ? 'labelled'
-    : isStillOnPage()
+    : (await isStillOnPage())
       ? 'not-saved'
       : 'left-page';
 };
 
 // The React sidebar
 
-const findReactPickerButton = (): HTMLButtonElement | undefined => {
-  const element = document.querySelector(reactPickerButtonSelector);
-
-  return element instanceof HTMLButtonElement ? element : undefined;
-};
+const findReactPickerButton = async (
+  dom: PageDom,
+): Promise<number | undefined> => dom.query(reactPickerButtonSelector);
 
 /**
  * Clicks `Manage labels` and returns the filter of the picker it opens. Called
@@ -282,32 +297,40 @@ const findReactPickerButton = (): HTMLButtonElement | undefined => {
  * open one would close it.
  */
 const openReactPicker = async (
-  isStillOnPage: () => boolean,
-): Promise<HTMLInputElement | undefined> => {
-  const pickerButton = findReactPickerButton();
+  dom: PageDom,
+  isStillOnPage: () => boolean | Promise<boolean>,
+): Promise<number | undefined> => {
+  const pickerButton = await findReactPickerButton(dom);
 
-  if (pickerButton === undefined || !isStillOnPage()) {
+  if (pickerButton === undefined || !(await isStillOnPage())) {
     return undefined;
   }
 
-  pickerButton.click();
+  await dom.click(pickerButton);
 
-  return waitFor(findFilter, stepTimeoutMs, isStillOnPage);
+  return waitFor(async () => findFilter(dom), stepTimeoutMs, isStillOnPage);
 };
 
-const accessibleNameOf = (element: Element): string => {
-  const ids = element.getAttribute('aria-labelledby');
+/** The text of the elements `aria-labelledby` names, or the element's own. */
+const accessibleNameOf = async (
+  dom: PageDom,
+  element: number,
+): Promise<string> => {
+  const ids = await dom.attribute(element, 'aria-labelledby');
 
-  return ids === null
-    ? element.textContent.trim()
-    : ids
-        .split(/\s+/u)
-        .map(
-          (id) =>
-            document.querySelector(`#${CSS.escape(id)}`)?.textContent ?? '',
-        )
-        .join(' ')
-        .trim();
+  if (ids === undefined) {
+    return dom.text(element);
+  }
+
+  const texts = await Promise.all(
+    ids.split(/\s+/u).map(async (id) => {
+      const named = await dom.query(`[id=${cssStringOf(id)}]`);
+
+      return named === undefined ? '' : dom.text(named);
+    }),
+  );
+
+  return texts.join(' ').trim();
 };
 
 /**
@@ -316,26 +339,25 @@ const accessibleNameOf = (element: Element): string => {
  * into the label's description, so `merge-queued` and a label called
  * `merge-queued-later` cannot be told apart by it.
  */
-const findReactOption = (labelName: string): HTMLElement | undefined =>
-  Array.from(document.querySelectorAll('[role="option"]')).find(
-    (element): element is HTMLElement =>
-      element instanceof HTMLElement && accessibleNameOf(element) === labelName,
+const findReactOption = async (
+  dom: PageDom,
+  labelName: string,
+): Promise<number | undefined> => {
+  const options = await dom.queryAll('[role="option"]');
+
+  const names = await Promise.all(
+    options.map(async (option) => accessibleNameOf(dom, option)),
   );
 
-const isSelected = (option: Element): boolean =>
-  option.getAttribute('aria-selected') === 'true';
+  return options[names.indexOf(labelName)];
+};
+
+const isSelected = async (dom: PageDom, option: number): Promise<boolean> =>
+  (await dom.attribute(option, 'aria-selected')) === 'true';
 
 /** Escape on the filter, which is how the picker closes from the keyboard. */
-const closeReactPicker = (filter: HTMLInputElement): void => {
-  filter.dispatchEvent(
-    new KeyboardEvent('keydown', {
-      key: 'Escape',
-      code: 'Escape',
-      bubbles: true,
-      cancelable: true,
-    }),
-  );
-};
+const closeReactPicker = async (dom: PageDom, filter: number): Promise<void> =>
+  dom.key(filter, 'Escape');
 
 /**
  * Whether the sidebar's "Labels" section lists `labelName`.
@@ -345,31 +367,35 @@ const closeReactPicker = (filter: HTMLInputElement): void => {
  * links, and the search stops at the first ancestor holding a second heading,
  * which is past the section — every sidebar section has one.
  */
-const reactSidebarShows = (labelName: string): boolean => {
-  const pickerButton = findReactPickerButton();
-
-  if (pickerButton === undefined) {
-    return false;
-  }
+const reactSidebarShows = async (
+  dom: PageDom,
+  labelName: string,
+): Promise<boolean> => {
+  const pickerButton = await findReactPickerButton(dom);
 
   for (
-    let mut_ancestor = pickerButton.parentElement;
-    mut_ancestor !== null && mut_ancestor !== document.body;
-    mut_ancestor = mut_ancestor.parentElement
+    let mut_ancestor =
+      pickerButton === undefined ? undefined : await dom.parent(pickerButton);
+    mut_ancestor !== undefined;
+    // eslint-disable-next-line no-await-in-loop
+    mut_ancestor = await dom.parent(mut_ancestor)
   ) {
-    if (
-      mut_ancestor.querySelector('[role="option"]') !== null ||
-      mut_ancestor.querySelectorAll(headingSelector).length > 1
-    ) {
+    // eslint-disable-next-line no-await-in-loop
+    const [tagName, option, headings, labels] = await Promise.all([
+      dom.tagName(mut_ancestor),
+      dom.query('[role="option"]', mut_ancestor),
+      dom.queryAll(headingSelector, mut_ancestor),
+      dom.queryAll('a', mut_ancestor),
+    ]);
+
+    if (tagName === 'BODY' || option !== undefined || headings.length > 1) {
       // The open picker, whose options are not the sidebar, or past the
       // Labels section.
       return false;
     }
 
-    const labels = Array.from(mut_ancestor.querySelectorAll('a'));
-
     if (Arr.isNonEmpty(labels)) {
-      return listsLabel(labels, labelName);
+      return listsLabel(dom, labels, labelName);
     }
   }
 
@@ -377,66 +403,65 @@ const reactSidebarShows = (labelName: string): boolean => {
 };
 
 const addThroughReactPicker = async (
+  dom: PageDom,
   labelName: string,
-  isStillOnPage: () => boolean,
+  isStillOnPage: () => boolean | Promise<boolean>,
 ): Promise<AddLabelResult> => {
   // Each wait gives up as soon as the page is another one: the user may follow
   // a link while this waits, and the next pull request's picker must not be the
   // one worked.
-  const mut_openFilter = findFilter() ?? (await openReactPicker(isStillOnPage));
+  const filter =
+    (await findFilter(dom)) ?? (await openReactPicker(dom, isStillOnPage));
 
-  if (!isStillOnPage()) {
-    if (mut_openFilter !== undefined) {
-      closeReactPicker(mut_openFilter);
+  if (!(await isStillOnPage())) {
+    if (filter !== undefined) {
+      await closeReactPicker(dom, filter);
     }
 
     return 'left-page';
   }
 
-  if (mut_openFilter === undefined) {
+  if (filter === undefined) {
     return 'no-picker';
   }
 
-  // The isolated world's `value` setter is the DOM's own, beneath the one
-  // React installs on the element in the page's world, so the `input` event
-  // that follows is seen by React as a change.
-  mut_openFilter.value = labelName;
-
-  mut_openFilter.dispatchEvent(new Event('input', { bubbles: true }));
+  await dom.input(filter, labelName);
 
   const option = await waitFor(
-    () => findReactOption(labelName),
+    async () => findReactOption(dom, labelName),
     stepTimeoutMs,
     isStillOnPage,
   );
 
-  if (!isStillOnPage()) {
-    closeReactPicker(mut_openFilter);
+  if (!(await isStillOnPage())) {
+    await closeReactPicker(dom, filter);
 
     return 'left-page';
   }
 
   if (option === undefined) {
-    closeReactPicker(mut_openFilter);
+    await closeReactPicker(dom, filter);
 
     return 'no-such-label';
   }
 
-  if (isSelected(option)) {
-    closeReactPicker(mut_openFilter);
+  if (await isSelected(dom, option)) {
+    await closeReactPicker(dom, filter);
 
     return 'already-labelled';
   }
 
-  option.click();
+  await dom.click(option);
 
   // Found again on every poll rather than held: a picker that re-renders its
   // list replaces the element that was clicked.
   const selected = await waitFor(
-    () => {
-      const current = findReactOption(labelName);
+    async () => {
+      const current = await findReactOption(dom, labelName);
 
-      return current !== undefined && isSelected(current) ? current : undefined;
+      return current !== undefined && (await isSelected(dom, current))
+        ? current
+        : undefined;
     },
     stepTimeoutMs,
     isStillOnPage,
@@ -446,21 +471,21 @@ const addThroughReactPicker = async (
   // Whether it does save is read off the sidebar below rather than assumed: a
   // picker that took Escape as "cancel" would leave the label off, and that is
   // reported as `not-saved`, not as success.
-  closeReactPicker(mut_openFilter);
+  await closeReactPicker(dom, filter);
 
   if (selected === undefined) {
-    return isStillOnPage() ? 'not-saved' : 'left-page';
+    return (await isStillOnPage()) ? 'not-saved' : 'left-page';
   }
 
   const shown = await waitFor(
-    () => reactSidebarShows(labelName) || undefined,
+    async () => (await reactSidebarShows(dom, labelName)) || undefined,
     stepTimeoutMs,
     isStillOnPage,
   );
 
   return shown !== undefined
     ? 'labelled'
-    : isStillOnPage()
+    : (await isStillOnPage())
       ? 'not-saved'
       : 'left-page';
 };
@@ -470,9 +495,12 @@ const addThroughReactPicker = async (
  * is in the page whether the menu is open or not, so the React picker's way of
  * telling an open picker — the filter being there — would read it as open.
  */
-const findPicker = (): 'classic' | 'react' | undefined =>
-  findClassicPicker() !== undefined
+const findPicker = async (
+  dom: PageDom,
+): Promise<'classic' | 'react' | undefined> =>
+  (await findClassicPicker(dom)) !== undefined
     ? 'classic'
-    : findReactPickerButton() !== undefined || findFilter() !== undefined
+    : (await findReactPickerButton(dom)) !== undefined ||
+        (await findFilter(dom)) !== undefined
       ? 'react'
       : undefined;

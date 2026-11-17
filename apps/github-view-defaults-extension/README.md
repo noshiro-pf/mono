@@ -110,6 +110,18 @@ A pane never gets **⧉ Split view**, since it is in one already, and in a pane
 the button is shown on the conversation tab alone rather than moving the pane
 there, which would take the conversation's place beside the diff.
 
+No script of this extension can run in a pane of Split View — Chrome lets no
+extension touch a page inside another extension's page — so there the button is
+Split View's, drawn and worked for this extension through the pane bridge
+(`pane-bridge.mts` in `split-view-link`): Split View asks this extension's
+service worker which buttons a pane's address gets, and when one is pressed,
+runs the label picker's steps (`src/github/page-dom.mts`) on the pane's page as
+the worker asks. The picker is the same code in a tab and in a pane, so it is
+this extension, not Split View, that follows GitHub's markup. Split View acts
+only for the id the `key` in this extension's manifest gives a build from source
+(`githubViewDefaultsExtensionId` in `split-view-link`); a build from the Chrome
+Web Store has an id of its own and gets no button in a pane.
+
 GitHub has drawn the sidebar two ways, and has gone from one to the other and
 back, so the button works either:
 
@@ -148,9 +160,12 @@ label), and `src/github/label-picker.mts` is what to update; the stand-ins
   page with `w=0` or `show-viewed-files=true` on it; forcing the defaults back
   would leave no way to look at what the extension hides. A link somebody
   shared with `w=0` on it keeps it, too.
-- **Inside a frame too.** A diff in a pane of a split view
-  ([`split-view-extension`](../split-view-extension/README.md)) is treated as it
-  would be in a tab of its own.
+- **Inside a frame too** — of a web page, but not in a pane of [Split
+  View](../split-view-extension/README.md): Chrome lets no extension touch a
+  page inside another extension's page, so nothing of this extension runs there.
+  A pull request opened in Split View has its diff at
+  `?w=1&show-viewed-files=false` all the same, because that is the address
+  Split View is given.
 - **The branches "Overview" tab still works.** It points at the very URL the
   branch rule redirects, so redirecting it whatever the address said would make
   the overview unreachable. The way out is in the address: the extension gives
@@ -205,7 +220,8 @@ It is installed from source, as an unpacked extension. You need
    `apps/github-view-defaults-extension/dist`.
 
 To update it later, pull, build again, and press the reload button on the
-extension's card.
+extension's card. A build from before its manifest had a `key` has another id:
+remove that one and load `dist` again, once.
 
 ## How it works
 
@@ -260,11 +276,13 @@ The pull request buttons are another content script,
 `src/pull-request-buttons.mts`, in the isolated world rather than the page's,
 because it talks to the service worker, `src/background.mts`, which opens Split
 View — a web page may not navigate to another extension's page, and
-`chrome.tabs.create` may — and holds the context menu. `src/github/` is what
-they decide with: a pull request's address and title, their messages, and the
-label picker. `test/pull-request.test.mts` covers the first two, and
+`chrome.tabs.create` may — holds the context menu, and answers Split View about
+its panes. `src/github/` is what they decide with: a pull request's address and
+title, their messages, and the label picker, written against `PageDom`
+(`page-dom.mts`) so that it runs on a page in a tab and, through Split View, in
+a pane. `test/pull-request.test.mts` covers the first two, and
 `e2e/pull-request-buttons.spec.mts` the buttons, in a real Chromium against
-stand-ins for GitHub's pages and for Split View.
+stand-ins for GitHub's pages, with Split View's own build for the panes.
 
 ## Commands
 
@@ -273,7 +291,7 @@ stand-ins for GitHub's pages and for Split View.
 | `pnpm run build`       | builds `dist/`, which is what Chrome loads            |
 | `pnpm run test`        | runs the unit tests                                   |
 | `pnpm run smoke`       | runs the built extension in a real Chromium           |
-| `pnpm run check:e2e`   | builds, and runs the pull request buttons' e2e tests  |
+| `pnpm run check:e2e`   | builds it and Split View, and runs the e2e tests      |
 | `pnpm run check:types` | type-checks the package                               |
 | `pnpm run check:lint`  | lints it                                              |
 | `pnpm run gen:icons`   | redraws `public/icons/` — see `scripts/gen-icons.mts` |
