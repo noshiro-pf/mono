@@ -1,5 +1,5 @@
 import type { Rule } from 'eslint';
-import { hasKey, isRecord } from 'ts-data-forge';
+import type { UnknownRecord } from 'ts-type-forge';
 
 /**
  * `upstream` run unchanged, with the fix of each report it makes offered as a
@@ -9,10 +9,10 @@ import { hasKey, isRecord } from 'ts-data-forge';
  *
  * This is the answer for a rule whose `--fix` turns out to change what code
  * does, instead of turning the rule off: its reports stay, and the rewrite is
- * left to whoever reads it. Register the result as a rule of its own
- * (`ts-restrictions/<name>`) and turn the upstream rule off beside it. A rule
- * whose rewrite there is nothing to suggest for yet (an API not every supported
- * platform has) stays off instead.
+ * left to whoever reads it. Register the result as a rule of your own plugin
+ * and turn the upstream rule off beside it. A rule whose rewrite there is
+ * nothing to suggest for yet (an API not every supported platform has) stays
+ * off instead.
  *
  * `name` is the upstream rule's id, which its description and the error thrown
  * when the plugin no longer has it name.
@@ -58,31 +58,58 @@ export const suggestionOnly = (
 };
 
 /**
- * The rule `name` of `plugin`, a plugin module that ships no types, or
+ * The rule `name` of `plugin`, a plugin module that may ship no types, or
  * `undefined` when it has no such rule.
  */
 export const pluginRule = (
   plugin: unknown,
   name: string,
-): Rule.RuleModule | undefined => {
-  if (
-    !isRecord(plugin) ||
-    !hasKey(plugin, 'rules') ||
-    !isRecord(plugin.rules) ||
-    !hasKey(plugin.rules, name)
-  ) {
-    return undefined;
-  }
+): Rule.RuleModule | undefined =>
+  asRuleModule(propertyOf(rulesOf(plugin), name));
 
-  const rule = plugin.rules[name];
+/**
+ * Every rule of `plugin`, a plugin module that may ship no types, as
+ * `[name, rule]` in the order the plugin lists them: each enumerable property
+ * of its `rules` whose value has a `create` function. `[]` for a value that is
+ * not a plugin.
+ */
+export const pluginRules = (
+  plugin: unknown,
+): readonly (readonly [string, Rule.RuleModule])[] => {
+  const rules = rulesOf(plugin);
 
-  return isRecord(rule) &&
-    hasKey(rule, 'create') &&
-    typeof rule.create === 'function'
-    ? // eslint-disable-next-line total-functions/no-unsafe-type-assertion -- a plugin's rule, which ESLint validates as it runs it
-      (rule as unknown as Rule.RuleModule)
-    : undefined;
+  return rules === undefined
+    ? []
+    : Object.entries(rules).flatMap(([name, rule]) => {
+        const module = asRuleModule(rule);
+
+        return module === undefined ? [] : [[name, module] as const];
+      });
 };
+
+/** Whether `value` is an object, not an array, whose properties are read. */
+const isRecordLike = (value: unknown): value is UnknownRecord =>
+  typeof value === 'object' && value !== null && !Array.isArray(value);
+
+/** The own property `key` of `value`, or `undefined` when it has none. */
+const propertyOf = (value: unknown, key: string): unknown =>
+  isRecordLike(value) && Object.hasOwn(value, key)
+    ? Reflect.get(value, key)
+    : undefined;
+
+/** The `rules` of `plugin`, or `undefined` when it has none. */
+const rulesOf = (plugin: unknown): UnknownRecord | undefined => {
+  const rules = propertyOf(plugin, 'rules');
+
+  return isRecordLike(rules) ? rules : undefined;
+};
+
+/** `value` as a rule module when it has a `create` function. */
+const asRuleModule = (value: unknown): Rule.RuleModule | undefined =>
+  typeof propertyOf(value, 'create') === 'function'
+    ? // eslint-disable-next-line total-functions/no-unsafe-type-assertion -- a plugin's rule, which ESLint validates as it runs it
+      (value as Rule.RuleModule)
+    : undefined;
 
 /**
  * The string `descriptor` holds under `key`: its message and its message id are

@@ -8,7 +8,11 @@ const documents = [
   {
     mdPath: path.resolve(workspaceRootPath, 'README.md'),
     samplesDir: path.resolve(workspaceRootPath, 'samples/readme'),
-    sampleCodeFiles: ['01-type-wrappers.mts', '02-imports.mts'],
+    sampleCodeFiles: [
+      '01-type-wrappers.mts',
+      '02-imports.mts',
+      '03-suggestion-only.mts',
+    ],
   },
 ] as const;
 

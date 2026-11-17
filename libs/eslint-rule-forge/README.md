@@ -286,6 +286,39 @@ so that a fix to the rule reaches every plugin that builds it.
 | `createPreferSafeParseFloat`    | `parseFloat(x)`, `Number.parseFloat(x)`, `Number(x)` → the same, for a `string` `x`, also a suggestion only                                                                                                  |
 | `createNoSideEffectImport`      | removes `import '<module>';`, with the reason the caller gives                                                                                                                                               |
 
+## Wrapping another plugin's rule
+
+A rule of another plugin that is right in what it reports but wrong in what its
+`--fix` writes can be kept rather than turned off: run it unchanged, and offer
+each fix as a suggestion instead.
+
+| Helper           | What it gives                                                                                                                         |
+| :--------------- | :------------------------------------------------------------------------------------------------------------------------------------ |
+| `suggestionOnly` | the rule run unchanged, each fix it reports moved to a suggestion; it throws when run if the rule given is `undefined`, naming the id |
+| `pluginRule`     | the rule of a given name of a plugin module that ships no types, or `undefined`                                                       |
+| `pluginRules`    | every rule of such a module, as `[name, rule]`, or `[]` for a value that is not a plugin                                              |
+
+```ts
+import type { Rule } from 'eslint';
+import { pluginRule, suggestionOnly } from 'eslint-rule-forge';
+import type { ReadonlyRecord } from 'ts-type-forge';
+
+// `eslint-plugin-promise` ships no types, so its default import is read as
+// `unknown`. Its `prefer-catch` reports rightly, but its fix rewrites
+// `p.then(a, b)` into `p.catch(b).then(a)`, which calls `a` after a rejection
+// too. Kept with the fix offered as a suggestion, under your plugin's own name,
+// with `promise/prefer-catch` turned off beside it.
+export const rulesOfYourPlugin = (
+    eslintPluginPromise: unknown,
+): ReadonlyRecord<string, Rule.RuleModule> =>
+    ({
+        'prefer-catch': suggestionOnly(
+            pluginRule(eslintPluginPromise, 'prefer-catch'),
+            'promise/prefer-catch',
+        ),
+    }) as const;
+```
+
 ## License
 
 [Apache-2.0](https://github.com/noshiro-pf/mono/blob/main/libs/eslint-rule-forge/LICENSE)
