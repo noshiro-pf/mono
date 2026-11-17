@@ -210,6 +210,31 @@ shows the button only then — one file, `icons/16.png`, is listed for every oth
 extension to fetch (`splitViewPresencePath` in `split-view-link`). A web page
 cannot fetch it, and it says nothing but that the extension is there.
 
+#### Another extension's buttons in a pane
+
+Chrome lets no extension touch a page inside another extension's page, so
+nothing of GitHub View Defaults runs in a pane here — not its content scripts,
+not `chrome.scripting`. Its **＋ merge-queued** button is in the panes all the
+same, because this extension draws it there and works it for GitHub View
+Defaults, through what `split-view-link` calls the pane bridge
+(`apps/split-view-link/src/pane-bridge.mts`):
+
+- When a pane shows a page, this extension asks GitHub View Defaults which
+  buttons that address gets — the merge-queued one on the conversation of a
+  `noshiro-pf/mono` pull request, none anywhere else — and draws them at the
+  pane's bottom left.
+- When one is pressed, it tells GitHub View Defaults which pane, and shows what
+  it answers on the button. Until that answer, and in that pane only,
+  GitHub View Defaults may ask this extension to find, read, click and type into
+  elements of the pane's page, from a fixed list of steps; that is how it works
+  GitHub's label picker there.
+
+This extension knows nothing of what the button does, so a change to GitHub's
+label picker is GitHub View Defaults' to follow and never needs an update here.
+It acts for one extension only, GitHub View Defaults by the id the `key` in its
+manifest gives a build from source (`paneBridgePartnerIds`), and for no other
+that asks.
+
 ## Good to know
 
 - **Most sites ask not to be shown inside another page.** For its own panes, and

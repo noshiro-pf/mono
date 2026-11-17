@@ -1,14 +1,27 @@
 import {
+  asToPartnerMessage,
   claudeSessionUrlOf,
+  paneBridgeTag,
   pullRequestSplitViewSearch,
   splitViewExtensionId,
   splitViewPagePath,
   splitViewPresencePath,
+  type PaneButton,
+  type PaneButtonOutcome,
+  type PaneRef,
+  type ToSplitViewMessage,
 } from 'split-view-link';
 import {
+  addLabelThroughPicker,
   asGitHubMessage,
   githubMessageTag,
+  hasMergeQueue,
+  isConversationOf,
   issueUrlOf,
+  mergeQueuedLabel,
+  mergeQueuedPaneButton,
+  pageDomOver,
+  paneOutcomeOf,
   pullRequestOf,
   pullRequestWorkspace,
   type GitHubMessage,
@@ -70,6 +83,41 @@ chrome.runtime.onMessage.addListener((value: unknown, sender, sendResponse) => {
   return true;
 });
 
+/**
+ * Split View's questions about its panes (`pane-bridge.mts` in
+ * `split-view-link`): no script of this extension can reach a page in a pane of
+ * Split View, so Split View draws the merge-queued button there and runs the
+ * label picker's steps for this worker.
+ */
+chrome.runtime.onMessageExternal.addListener(
+  (value: unknown, sender, sendResponse) => {
+    const message =
+      sender.id === splitViewExtensionId
+        ? asToPartnerMessage(value)
+        : undefined;
+
+    if (message === undefined) {
+      return false;
+    }
+
+    if (message.kind === 'buttons') {
+      sendResponse(paneButtonsFor(message.url));
+
+      return false;
+    }
+
+    pressInPane(message.url, message.buttonId, message.pane)
+      .then(sendResponse)
+      .catch((error: unknown) => {
+        console.error(error);
+
+        sendResponse(paneOutcomeOf('not-saved'));
+      });
+
+    return true;
+  },
+);
+
 chrome.contextMenus.onClicked.addListener((info, tab) => {
   if (
     info.menuItemId !== linkMenuItemId &&
@@ -84,6 +132,61 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
     openPullRequestFromMenu(url, info.pageUrl, tab).catch(console.error);
   }
 });
+
+/**
+ * The buttons a pane showing `url` gets: the merge-queued one on the
+ * conversation of one of this repository's pull requests, as in a tab, and
+ * nothing anywhere else. Never "⧉ Split view": a pane is in one already.
+ */
+const paneButtonsFor = (url: string): readonly PaneButton[] => {
+  const pullRequest = pullRequestOf(url);
+
+  return pullRequest !== undefined &&
+    hasMergeQueue(pullRequest) &&
+    isConversationOf(url, pullRequest)
+    ? [mergeQueuedPaneButton]
+    : [];
+};
+
+/**
+ * Adds the label in the pane the button was pressed in, through Split View,
+ * which runs each step there. In a pane the button never moves the pane to
+ * another tab, which would take the conversation's place beside the diff, so
+ * only a conversation already on screen is worked; every step is taken only
+ * while the pane still shows it.
+ */
+const pressInPane = async (
+  url: string,
+  buttonId: string,
+  pane: PaneRef,
+): Promise<PaneButtonOutcome> => {
+  const pullRequest = pullRequestOf(url);
+
+  if (
+    pullRequest === undefined ||
+    buttonId !== mergeQueuedPaneButton.id ||
+    !hasMergeQueue(pullRequest)
+  ) {
+    return paneOutcomeOf('no-picker');
+  }
+
+  const dom = pageDomOver(async (op): Promise<unknown> => {
+    const message: ToSplitViewMessage = {
+      tag: paneBridgeTag,
+      kind: 'dom',
+      pane,
+      op,
+    } as const;
+
+    return chrome.runtime.sendMessage(splitViewExtensionId, message);
+  });
+
+  const result = await addLabelThroughPicker(dom, mergeQueuedLabel, async () =>
+    isConversationOf(await dom.location(), pullRequest),
+  );
+
+  return paneOutcomeOf(result);
+};
 
 /**
  * Whether Split View is installed: whether the file it lists for every

@@ -173,7 +173,10 @@ cannot call history.back() on it. A small script runs in each frame to do those
 three things and report them to the extension's own page over postMessage. On
 an ordinary page it checks whether it is inside a split view — one property read
 — and returns immediately. It sends nothing until the extension's page has told
-it which pane it belongs to.
+it which pane it belongs to. In a pane it can also show a button of the
+developer's other extension, GitHub View Defaults, and, once the user presses
+it and until that extension answers, act on that pane's page for it; no other
+extension is answered.
 ```
 
 **Remote code**: No. Every script in the package is in the package. The panes

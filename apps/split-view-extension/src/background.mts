@@ -1,7 +1,19 @@
-import { splitViewPagePath } from 'split-view-link';
+import {
+  asPaneButtonOutcome,
+  asPaneButtons,
+  asToSplitViewMessage,
+  paneBridgePartnerIds,
+  paneBridgeTag,
+  splitViewPagePath,
+  type PaneButtonOutcome,
+  type PaneRef,
+  type ToPartnerMessage,
+} from 'split-view-link';
 import { Arr } from 'ts-data-forge';
 import type { ReadonlyRecord } from 'ts-type-forge';
 import {
+  asPaneButtonPress,
+  asPaneButtonsQuery,
   ensureInitiatorRule,
   eventLogSessionKey,
   forgetOpenSplitViewTab,
@@ -14,7 +26,10 @@ import {
   removeHeaderRule,
   splitViewTabIdSessionKey,
   workerMessageTag,
+  type PaneButtonPress,
+  type PaneDomRequest,
   type PaneOfFrameQuery,
+  type PartnerButton,
 } from './shared/index.mjs';
 import {
   isAnyWorkspaceOpen,
@@ -80,6 +95,84 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
 chrome.tabs.onRemoved.addListener((tabId) => {
   forgetTab(tabId).catch(console.error);
 });
+
+/**
+ * The pane bridge (`pane-bridge.mts` in `split-view-link`), between a pane's
+ * content script and the partner extensions: which buttons a pane gets, and
+ * what came of a press.
+ */
+chrome.runtime.onMessage.addListener((value: unknown, sender, sendResponse) => {
+  if (sender.id !== chrome.runtime.id) {
+    return false;
+  }
+
+  const query = asPaneButtonsQuery(value);
+
+  if (query !== undefined) {
+    partnerButtonsFor(query.url)
+      .then(sendResponse)
+      .catch(() => {
+        sendResponse([]);
+      });
+
+    return true;
+  }
+
+  const press = asPaneButtonPress(value);
+
+  // The pane is the frame that sent the press, so a pane can press only its own
+  // buttons, and the partner acts only where the user pressed one.
+  if (
+    press === undefined ||
+    sender.tab?.id === undefined ||
+    sender.frameId === undefined
+  ) {
+    return false;
+  }
+
+  relayPress(press, { tabId: sender.tab.id, frameId: sender.frameId })
+    .then(sendResponse)
+    .catch(() => {
+      sendResponse(undefined);
+    });
+
+  return true;
+});
+
+/**
+ * A partner's step on a pane's page, run only for the partner whose button was
+ * pressed in that very pane, and only until its press is answered: that is the
+ * whole of what a partner may do in a split view.
+ */
+chrome.runtime.onMessageExternal.addListener(
+  (value: unknown, sender, sendResponse) => {
+    const message = asToSplitViewMessage(value);
+
+    if (
+      message === undefined ||
+      sender.id === undefined ||
+      mut_workerState.presses.get(paneKeyOf(message.pane)) !== sender.id
+    ) {
+      return false;
+    }
+
+    const request: PaneDomRequest = {
+      tag: workerMessageTag,
+      kind: 'pane-dom',
+      op: message.op,
+    } as const;
+
+    chrome.tabs
+      .sendMessage(message.pane.tabId, request, {
+        frameId: message.pane.frameId,
+      })
+      .catch(() => null)
+      .then(sendResponse)
+      .catch(console.error);
+
+    return true;
+  },
+);
 
 /**
  * A tab's id is not permanent: Chrome's memory saver discards an idle tab and
@@ -428,16 +521,89 @@ const splitMenuItems = [
 const webPageUrlPatterns = ['http://*/*', 'https://*/*'] as const;
 
 /**
- * The tails of the log-write chain and of the context menu's re-creation. An
- * object, because the lint rules allow a `mut_`-prefixed property to be
- * assigned but not a top-level binding.
+ * Every partner's buttons for a page at `url`. A partner that is not installed,
+ * or does not answer, has none. Only web pages are asked about.
+ *
+ * Every web page is asked about, though a partner may care for few: this
+ * extension knows nothing of what a partner's buttons are for, and keeps no
+ * list of addresses per partner, so that what a partner wants never needs an
+ * update here. The question goes between two workers inside the browser.
+ */
+const partnerButtonsFor = async (
+  url: string,
+): Promise<readonly PartnerButton[]> => {
+  if (!url.startsWith('https://') && !url.startsWith('http://')) {
+    return [];
+  }
+
+  const question: ToPartnerMessage = {
+    tag: paneBridgeTag,
+    kind: 'buttons',
+    url,
+  } as const;
+
+  const answers = await Promise.all(
+    paneBridgePartnerIds.map(async (partnerId) => {
+      const answer: unknown = await chrome.runtime
+        .sendMessage(partnerId, question)
+        .catch(() => undefined);
+
+      return asPaneButtons(answer).map((button) => ({ ...button, partnerId }));
+    }),
+  );
+
+  return answers.flat();
+};
+
+const paneKeyOf = (pane: PaneRef): string =>
+  `${pane.tabId.toString()}:${pane.frameId.toString()}` as const;
+
+/**
+ * Tells the partner which pane its button was pressed in, lets it act there
+ * until it answers, and returns what it answered.
+ */
+const relayPress = async (
+  press: PaneButtonPress,
+  pane: PaneRef,
+): Promise<PaneButtonOutcome | undefined> => {
+  const key = paneKeyOf(pane);
+
+  mut_workerState.presses.set(key, press.partnerId);
+
+  const message: ToPartnerMessage = {
+    tag: paneBridgeTag,
+    kind: 'press',
+    url: press.url,
+    buttonId: press.buttonId,
+    pane,
+  } as const;
+
+  try {
+    const answer: unknown = await chrome.runtime.sendMessage(
+      press.partnerId,
+      message,
+    );
+
+    return asPaneButtonOutcome(answer);
+  } finally {
+    mut_workerState.presses.delete(key);
+  }
+};
+
+/**
+ * The tails of the log-write chain and of the context menu's re-creation, and
+ * the panes a partner's press is in flight in, by `paneKeyOf`, with the
+ * partner's id. An object, because the lint rules allow a `mut_`-prefixed
+ * property to be assigned but not a top-level binding.
  */
 const mut_workerState: {
   appendQueue: Promise<void>;
   menuQueue: Promise<void>;
+  presses: Map<string, string>;
 } = {
   appendQueue: Promise.resolve(),
   menuQueue: Promise.resolve(),
+  presses: new Map<string, string>(),
 };
 
 const writeEvent = async (

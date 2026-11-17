@@ -491,22 +491,48 @@ a key event does not cross a frame boundary, so without the frame forwarding it
 the shortcut would work only while the toolbar had the focus. It carries
 `KeyboardEvent.code`, never `key` — on macOS `Alt+1` _types_ `¡`.
 
+## The pane bridge
+
+Another extension may put a button in a pane (`pane-bridge.mts` in
+`split-view-link`, which has the protocol, and the README's "Another extension's
+buttons in a pane"). Nothing of it is stored: it is messages over
+`chrome.runtime`, between a pane's content script and the worker, and between
+the worker and the other extension's worker, whose id must be one of
+`paneBridgePartnerIds`.
+
+| direction        | kind                | carries                        | for                                                    |
+| :--------------- | :------------------ | :----------------------------- | :----------------------------------------------------- |
+| pane → worker    | `pane-buttons`      | `url`                          | the buttons a page at that address gets                |
+| worker → partner | `buttons`           | `url`                          | the same question, answered with the partner's buttons |
+| pane → worker    | `pane-button-press` | `partnerId`, `buttonId`, `url` | a button was pressed; answered with what it came to    |
+| worker → partner | `press`             | `url`, `buttonId`, `pane`      | the same, with the pane as Chrome names its frame      |
+| partner → worker | `dom`               | `pane`, `op`                   | one step on that pane's page, while its press is open  |
+| worker → pane    | `pane-dom`          | `op`                           | the step, run by the pane's content script             |
+
+The pane of a press is the frame the press came from, read off the message's
+sender rather than its contents, and a `dom` step is passed on only for the
+partner whose press is in flight in that very pane, until the partner answers
+it. So another extension can act in a pane only after the user pressed its
+button there, and only there.
+
 ## Where each piece lives
 
-| file                          | what it owns                                                                |
-| :---------------------------- | :-------------------------------------------------------------------------- |
-| `src/layout/types.mts`        | `LayoutNode`, `PaneState`, `WorkspaceState` — the shapes stored             |
-| `src/layout/tree.mts`         | the pure tree operations: split, remove, set ratio                          |
-| `src/layout/geometry.mts`     | the tree flattened into rectangles, and the hit-test behind a drop          |
-| `src/layout/presets.mts`      | the preset layouts, and the rule that a grid is a row of columns            |
-| `src/layout/zoom.mts`         | the zoom ladder, its clamp and its formatting                               |
-| `src/layout/spec.mts`         | the layout as a string, for the URL: `rcppcpp`                              |
-| `src/state/reducer.mts`       | `workspaceReducer`, and reconciliation                                      |
-| `src/state/storage.mts`       | `workspace:<id>`: read, write, list, delete, prune                          |
-| `src/state/registry.mts`      | `workspaceRegistry`: the list, its edits, its migration, its cross-tab sync |
-| `src/state/backup.mts`        | the JSON export and import                                                  |
-| `src/state/workspace-url.mts` | the URL: reading a view out of it, writing the view into it                 |
-| `src/state/tab-identity.mts`  | the tab's title, and the numbered favicon drawn on a canvas                 |
-| `src/state/sw-origins.mts`    | `serviceWorkerResetOrigins`                                                 |
-| `src/shared/protocol.mts`     | the `postMessage` messages, and their validators                            |
-| `src/shared/shortcuts.mts`    | what counts as `Alt+1..9`                                                   |
+| file                                  | what it owns                                                                |
+| :------------------------------------ | :-------------------------------------------------------------------------- |
+| `src/layout/types.mts`                | `LayoutNode`, `PaneState`, `WorkspaceState` — the shapes stored             |
+| `src/layout/tree.mts`                 | the pure tree operations: split, remove, set ratio                          |
+| `src/layout/geometry.mts`             | the tree flattened into rectangles, and the hit-test behind a drop          |
+| `src/layout/presets.mts`              | the preset layouts, and the rule that a grid is a row of columns            |
+| `src/layout/zoom.mts`                 | the zoom ladder, its clamp and its formatting                               |
+| `src/layout/spec.mts`                 | the layout as a string, for the URL: `rcppcpp`                              |
+| `src/state/reducer.mts`               | `workspaceReducer`, and reconciliation                                      |
+| `src/state/storage.mts`               | `workspace:<id>`: read, write, list, delete, prune                          |
+| `src/state/registry.mts`              | `workspaceRegistry`: the list, its edits, its migration, its cross-tab sync |
+| `src/state/backup.mts`                | the JSON export and import                                                  |
+| `src/state/workspace-url.mts`         | the URL: reading a view out of it, writing the view into it                 |
+| `src/state/tab-identity.mts`          | the tab's title, and the numbered favicon drawn on a canvas                 |
+| `src/state/sw-origins.mts`            | `serviceWorkerResetOrigins`                                                 |
+| `src/shared/protocol.mts`             | the `postMessage` messages, and their validators                            |
+| `src/shared/pane-bridge-messages.mts` | the pane bridge's messages between a pane and the worker                    |
+| `src/pane-bridge/pane-buttons.mts`    | the buttons drawn in a pane, and the steps run there on a press             |
+| `src/shared/shortcuts.mts`            | what counts as `Alt+1..9`                                                   |

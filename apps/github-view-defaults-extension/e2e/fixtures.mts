@@ -1,23 +1,22 @@
-import { test as base, chromium } from '@playwright/test';
+import { test as base, chromium, expect } from '@playwright/test';
 import * as fs from 'node:fs';
-import * as os from 'node:os';
 import * as path from 'node:path';
-import { splitViewPagePath, splitViewPresencePath } from 'split-view-link';
-import { hasKey, isRecord, isString } from 'ts-data-forge';
+import { splitViewExtensionId } from 'split-view-link';
 
 /**
  * Playwright's `test`, with a browser that has the built extension loaded —
- * and, with `splitViewInstalled`, a stand-in for Split View beside it.
+ * and, with `splitViewInstalled`, Split View's own build beside it.
+ *
+ * Split View is the real one, from `apps/split-view-extension/dist`, because
+ * what these tests check of it is its half of the pane bridge: no script of
+ * this extension can reach a page in a pane of Split View, so the merge-queued
+ * button there is drawn and worked by Split View on this extension's behalf.
+ * `pnpm run check:e2e` builds it first (`configs/playwright.config.mts`); in CI
+ * the job's `ws:build` has. Installing it opens a split view in a tab, which is
+ * closed before a test starts.
  *
  * An extension needs a persistent context of its own, and Chromium itself
  * rather than the headless shell, which loads none: `channel: 'chromium'`.
- *
- * The stand-in is what this extension needs of Split View and no more: the id
- * an unpacked build of it has, which comes of the `key` in its manifest; the
- * file it lists for every extension to fetch, which is how this one tells it is
- * installed; and a `split.html`, which is what the "Split view" button opens.
- * Split View itself would open a split view of its own on install and keep
- * state between tests, and would have to be built first.
  *
  * Of the context options, the launch takes `headless` and `viewport`, the only
  * ones the shared config sets; any other set there would have to be passed on
@@ -33,8 +32,17 @@ export const test = base.extend<Readonly<{ splitViewInstalled: boolean }>>({
     { headless, viewport: viewportSize, splitViewInstalled },
     provide,
   ) => {
+    if (
+      splitViewInstalled &&
+      !fs.existsSync(path.resolve(splitViewDistPath, 'manifest.json'))
+    ) {
+      throw new Error(
+        `${splitViewDistPath} is missing: build Split View first (pnpm --dir ../split-view-extension run build).`,
+      );
+    }
+
     const extensions = splitViewInstalled
-      ? [distPath, makeSplitViewStandIn()]
+      ? [distPath, splitViewDistPath]
       : [distPath];
 
     const context = await chromium.launchPersistentContext('', {
@@ -53,6 +61,22 @@ export const test = base.extend<Readonly<{ splitViewInstalled: boolean }>>({
       await context.waitForEvent('serviceworker', { predicate: isOwnWorker });
     }
 
+    if (splitViewInstalled) {
+      // The split view Split View opens on install, settled and then closed.
+      await expect.poll(() => context.pages().some(isSplitView)).toBe(true);
+
+      await Promise.all(
+        context
+          .pages()
+          .filter(isSplitView)
+          .map(async (tab) => {
+            await tab.getByTestId('pane').first().waitFor();
+
+            await tab.close();
+          }),
+      );
+    }
+
     await provide(context);
 
     await context.close();
@@ -61,71 +85,15 @@ export const test = base.extend<Readonly<{ splitViewInstalled: boolean }>>({
 
 const distPath = path.resolve(import.meta.dirname, '../dist');
 
+const splitViewDistPath = path.resolve(
+  import.meta.dirname,
+  '../../split-view-extension/dist',
+);
+
+/** This extension's worker: Split View's is a `background.js` too. */
 const isOwnWorker = (worker: Readonly<{ url: () => string }>): boolean =>
-  worker.url().endsWith('/background.js');
+  worker.url().endsWith('/background.js') &&
+  !worker.url().includes(splitViewExtensionId);
 
-/**
- * Writes the stand-in for Split View into a new temporary directory and returns
- * it. The `key` is read from Split View's own manifest, so that the
- * stand-in has the id the real one has.
- */
-const makeSplitViewStandIn = (): string => {
-  const directory = fs.mkdtempSync(
-    path.join(os.tmpdir(), 'github-view-defaults-e2e-split-view-'),
-  );
-
-  const splitViewManifest: unknown = JSON.parse(
-    fs.readFileSync(
-      path.resolve(
-        import.meta.dirname,
-        '../../split-view-extension/public/manifest.json',
-      ),
-      'utf8',
-    ),
-  );
-
-  if (
-    !isRecord(splitViewManifest) ||
-    !hasKey(splitViewManifest, 'key') ||
-    !isString(splitViewManifest.key)
-  ) {
-    throw new Error("Split View's manifest has no key");
-  }
-
-  const manifest = {
-    manifest_version: 3,
-    name: 'Split View (stand-in)',
-    version: '0.0.0',
-    key: splitViewManifest.key,
-    web_accessible_resources: [
-      { resources: [splitViewPresencePath], extension_ids: ['*'] },
-    ],
-  } as const;
-
-  const files = [
-    ['manifest.json', JSON.stringify(manifest)],
-    [
-      splitViewPresencePath,
-      fs.readFileSync(
-        path.resolve(import.meta.dirname, '../public/icons/16.png'),
-      ),
-    ],
-    [
-      splitViewPagePath,
-      '<!doctype html><title>Split View stand-in</title><p>split view</p>',
-    ],
-  ] as const;
-
-  for (const [relativePath, content] of files) {
-    const filePath = path.join(directory, relativePath);
-
-    // The paths are this file's own, under the directory made just above.
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
-    fs.mkdirSync(path.dirname(filePath), { recursive: true });
-
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
-    fs.writeFileSync(filePath, content);
-  }
-
-  return directory;
-};
+const isSplitView = (tab: Readonly<{ url: () => string }>): boolean =>
+  tab.url().includes('/split.html');

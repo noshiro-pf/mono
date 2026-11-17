@@ -1,6 +1,6 @@
 # Split View — privacy policy
 
-Last updated: 2026-11-16
+Last updated: 2026-11-17
 
 **Split View collects nothing, sends nothing, and has no server.** There is no
 account, no analytics, no telemetry and no third party of any kind.
@@ -27,6 +27,17 @@ Removing the extension removes the lot.
   its tooltip can show where it is, and so that a reload can come back to it.
   The address is saved as described above; the title is not saved. Neither is
   transmitted anywhere.
+- **A pane's address, for GitHub View Defaults.** When a pane shows a page, its
+  address is passed to the developer's other extension, GitHub View Defaults, if
+  it is installed, to ask which of its buttons the pane gets (the merge-queued
+  button on a `noshiro-pf/mono` pull request). The address goes from one
+  extension to the other inside the browser, and nowhere else.
+- **What GitHub View Defaults asks for, after you press its button in a pane.**
+  From the press until it answers, and in that pane only, Split View finds,
+  reads, clicks and types into elements of the pane's page as that extension
+  asks — which is how it works GitHub's label picker there — and hands it what
+  it reads. Nothing is read before you press, and no other extension is
+  answered.
 - **Nothing else about the page.** The scripts do not read page content, form
   fields, cookies or storage beyond the above, and on a page that is not inside
   a split view they stop immediately.
