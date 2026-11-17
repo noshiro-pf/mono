@@ -4,7 +4,8 @@ import { isReading, type ReportStatus } from '../../store/index.mjs';
 
 /**
  * The "Updating…" ring while a read is out: hidden rather than removed when
- * none is, so the line it is in does not jump (spec §4.2).
+ * none is, so the line it is in does not jump (spec §4.2). The folded toolbar
+ * keeps the ring alone.
  */
 export const Updating = ({
   status,
@@ -16,6 +17,6 @@ export const Updating = ({
   >
     <span class={constant('spinner')} />
 
-    {constant(' Updating…')}
+    <span class={constant('updating-word')}>{constant(' Updating…')}</span>
   </span>
 );

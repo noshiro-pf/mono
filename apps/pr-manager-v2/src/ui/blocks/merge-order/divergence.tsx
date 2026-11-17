@@ -13,7 +13,8 @@ type Props = Readonly<{
 /**
  * How far the branch is from its base, as GitHub's branches view draws it: a
  * bar each side of a centre line, behind in red on the left and ahead in blue
- * on the right, with both numbers written out so nobody measures a bar.
+ * on the right, on a track that shows the scale, with both numbers written out
+ * so nobody measures a bar.
  */
 export const Divergence = ({ comparison, scaleMax }: Props): JSX.Element => {
   const widths = combine([comparison, scaleMax]).pipe(
@@ -37,23 +38,21 @@ export const Divergence = ({ comparison, scaleMax }: Props): JSX.Element => {
           )}
         >
           <span class={constant('divergence-count')}>
-            {comparison.pipe(map((c) => `-${c?.behindBy ?? 0}`))}
+            {comparison.pipe(map((c) => `${c?.behindBy ?? 0} behind`))}
           </span>
           <span
             aria-hidden={constant('true')}
             class={constant('divergence-bars')}
           >
             <span class={constant('divergence-side divergence-behind')}>
-              <span
-                style={{ width: widths.pipe(map((w) => `${w.behind}%`)) }}
-              />
+              <span style={{ width: widths.pipe(map((w) => w.behind)) }} />
             </span>
             <span class={constant('divergence-side divergence-ahead')}>
-              <span style={{ width: widths.pipe(map((w) => `${w.ahead}%`)) }} />
+              <span style={{ width: widths.pipe(map((w) => w.ahead)) }} />
             </span>
           </span>
           <span class={constant('divergence-count')}>
-            {comparison.pipe(map((c) => `+${c?.aheadBy ?? 0}`))}
+            {comparison.pipe(map((c) => `${c?.aheadBy ?? 0} ahead`))}
           </span>
         </span>
       }
@@ -69,5 +68,15 @@ export const Divergence = ({ comparison, scaleMax }: Props): JSX.Element => {
   );
 };
 
-const percentOf = (count: number, max: number): number =>
-  Num.isNonZero(max) ? Num.div(count * 100, max) : 0;
+/** Small enough to read as "barely any", large enough to see. */
+const MIN_VISIBLE_PERCENT = 4;
+
+/**
+ * A zero draws nothing rather than a sliver, since "nothing on this side" is
+ * the answer read most often; anything else at least a few percent, so a count
+ * of one beside a count of hundreds still shows.
+ */
+const percentOf = (count: number, max: number): string =>
+  count === 0 || !Num.isNonZero(max)
+    ? '0'
+    : (`${Math.max(Num.div(count * 100, max), MIN_VISIBLE_PERCENT)}%` as const);

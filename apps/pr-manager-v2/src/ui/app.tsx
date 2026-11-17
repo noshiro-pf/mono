@@ -51,7 +51,10 @@ export const App = ({ app, go }: Props): JSX.Element => {
       style={{
         '--header-height': headerHeight.pipe(map((h) => `${h}px`)),
         '--sticky-top': app.header.folded.pipe(
-          map((folded) => (folded ? 'var(--header-height)' : '0px')),
+          map((folded) =>
+            // Under the toolbar, which floats 8px below the window's top.
+            folded ? 'calc(var(--header-height) + 8px)' : '0px',
+          ),
         ),
       }}
     >

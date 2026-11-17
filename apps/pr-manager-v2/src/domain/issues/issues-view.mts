@@ -253,6 +253,23 @@ export const labelPicksOf = (rows: readonly IssueRow[]): readonly string[] =>
     ),
   ).toSorted((a, b) => a.localeCompare(b));
 
+/** Each label's colour, from the first issue carrying it, for its pick's swatch. */
+export const labelColorsOf = (
+  rows: readonly IssueRow[],
+): ReadonlyMap<string, string> => {
+  const mut_colors = new Map<string, string>();
+
+  for (const { labels } of rows) {
+    for (const { name, color } of labels) {
+      if (!mut_colors.has(name)) {
+        mut_colors.set(name, color);
+      }
+    }
+  }
+
+  return mut_colors;
+};
+
 /** Whether the list shows `row`: the tiers, the starts, the labels, the search. */
 export const isListed = (
   row: IssueRow,
@@ -348,6 +365,59 @@ export const issueTileCounts = (
       ).length,
       hidden: s.hideAuthorOnly,
     },
+  };
+};
+
+/**
+ * The list's start switches' and label picks' numbers, read as the tiles are: a
+ * switch that is on counts what the list shows of it; one off, or a label not
+ * picked while others are, counts what switching it on or picking it would add.
+ */
+export const issueChipCounts = (
+  rows: readonly IssueRow[],
+  s: IssuesSettings,
+  query: string,
+): Readonly<{
+  starts: ReadonlyRecord<StartSwitch, TileCount>;
+  labels: ReadonlyMap<string, TileCount>;
+}> => {
+  const start = (t: StartSwitch): TileCount => {
+    const as: IssuesSettings = {
+      ...s,
+      hideStart: s.hideStart.filter((x) => x !== t),
+    } as const;
+
+    return {
+      count: rows.filter((row) => row.start === t && isListed(row, as, query))
+        .length,
+      hidden: s.hideStart.includes(t),
+    };
+  };
+
+  const unpicked: IssuesSettings = { ...s, labels: [] } as const;
+
+  return {
+    starts: {
+      ready: start('ready'),
+      free: start('free'),
+      planned: start('planned'),
+      attention: start('attention'),
+      blocked: start('blocked'),
+      cycle: start('cycle'),
+    },
+    labels: new Map(
+      labelPicksOf(rows).map((name) => [
+        name,
+        {
+          count: rows.filter(
+            (row) =>
+              row.labels.some((label) => label.name === name) &&
+              isListed(row, unpicked, query),
+          ).length,
+          hidden: Arr.isNonEmpty(s.labels) && !s.labels.includes(name),
+        },
+      ]),
+    ),
   };
 };
 

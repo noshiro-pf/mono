@@ -203,7 +203,9 @@ export const PullRequestCard = ({
           >
             {(session$) => (
               <li class={constant('session')}>
-                <span aria-hidden={constant('true')}>{constant('✻ ')}</span>
+                <span class={constant('muted')}>
+                  {constant('Claude Code ')}
+                </span>
                 <ExternalLink
                   href={session$.pipe(map(({ url }) => url))}
                   title={session$.pipe(map(({ url }) => url))}

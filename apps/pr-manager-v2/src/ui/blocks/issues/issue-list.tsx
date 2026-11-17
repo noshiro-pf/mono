@@ -1,13 +1,15 @@
-import { map, type InitializedObservable } from 'synstate';
+import { combine, map, type InitializedObservable } from 'synstate';
 import { constant, For, If, type JSX } from 'synstate-dom';
 import { Arr, Optional } from 'ts-data-forge';
 import {
+  labelBackground,
   START_NAMES,
   START_SWITCHES,
   type IssuesSettings,
   type IssuesSort,
 } from '../../../domain/index.mjs';
 import type { IssuesBlockView, IssuesStore } from '../../../store/index.mjs';
+import { TileValue } from '../../common/index.mjs';
 import { IssueListRow } from './issue-list-row.js';
 
 type Ready = IssuesBlockView & Readonly<{ kind: 'ready' }>;
@@ -36,6 +38,26 @@ export const IssueList = ({ view, store, now }: Props): JSX.Element => (
         }}
       />
 
+      <div
+        aria-label={constant('Sort')}
+        class={constant('segmented')}
+        role={constant('group')}
+      >
+        {SORTS.map(([sort, name, title]) => (
+          <button
+            aria-pressed={store.settings.pipe(map((s) => s.sort === sort))}
+            class={constant('segment')}
+            title={constant(title)}
+            type={constant('button')}
+            onClick={() => {
+              store.update((prev) => ({ ...prev, sort }));
+            }}
+          >
+            {constant(name)}
+          </button>
+        ))}
+      </div>
+
       <fieldset class={constant('control-group')}>
         <legend>{constant('start')}</legend>
         {START_SWITCHES.map((start) => (
@@ -56,22 +78,11 @@ export const IssueList = ({ view, store, now }: Props): JSX.Element => (
             }}
           >
             {constant(START_NAMES[start])}
-          </button>
-        ))}
-      </fieldset>
-
-      <fieldset class={constant('control-group')}>
-        <legend>{constant('sort')}</legend>
-        {SORTS.map(([sort, name]) => (
-          <button
-            aria-pressed={store.settings.pipe(map((s) => s.sort === sort))}
-            class={constant('chip')}
-            type={constant('button')}
-            onClick={() => {
-              store.update((prev) => ({ ...prev, sort }));
-            }}
-          >
-            {constant(name)}
+            <TileValue
+              count={view.pipe(
+                map(({ chipCounts }) => chipCounts.starts[start]),
+              )}
+            />
           </button>
         ))}
       </fieldset>
@@ -89,7 +100,7 @@ export const IssueList = ({ view, store, now }: Props): JSX.Element => (
             {(name$) => (
               <button
                 aria-pressed={isPicked(store.settings, name$)}
-                class={constant('chip')}
+                class={constant('chip pick')}
                 title={constant(
                   'Once any label is picked, only the issues carrying one picked are listed.',
                 )}
@@ -106,7 +117,30 @@ export const IssueList = ({ view, store, now }: Props): JSX.Element => (
                   }));
                 }}
               >
+                <span
+                  aria-hidden={constant('true')}
+                  class={constant('chip-swatch')}
+                  style={{
+                    background: combine([view, name$]).pipe(
+                      map(([{ labelColors }, name]) => {
+                        const color = labelColors.get(name);
+
+                        return color === undefined
+                          ? 'transparent'
+                          : labelBackground(color);
+                      }),
+                    ),
+                  }}
+                />
                 {name$}
+                <TileValue
+                  count={combine([view, name$]).pipe(
+                    map(
+                      ([{ chipCounts }, name]) =>
+                        chipCounts.labels.get(name) ?? NO_COUNT,
+                    ),
+                  )}
+                />
               </button>
             )}
           </For>
@@ -134,6 +168,22 @@ export const IssueList = ({ view, store, now }: Props): JSX.Element => (
   </div>
 );
 
+const NO_COUNT = { count: 0, hidden: false } as const;
+
+const SORTS = [
+  ['updated', 'updated', 'Most recently updated first.'],
+  [
+    'priority',
+    'priority',
+    'By tier: S, A, B, C, none, D, hold, close; updated within.',
+  ],
+  [
+    'start',
+    'start',
+    'By start state: can start with the wait over first, then can start, planned, in progress, needs a look, waiting, cycle; updated within.',
+  ],
+] as const satisfies readonly (readonly [IssuesSort, string, string])[];
+
 const isPicked = (
   settings: InitializedObservable<IssuesSettings>,
   name$: InitializedObservable<string>,
@@ -141,9 +191,3 @@ const isPicked = (
   settings.pipe(
     map(({ labels }) => labels.includes(Optional.unwrap(name$.getSnapshot()))),
   );
-
-const SORTS = [
-  ['updated', 'updated'],
-  ['priority', 'priority'],
-  ['start', 'start'],
-] as const satisfies readonly (readonly [IssuesSort, string])[];

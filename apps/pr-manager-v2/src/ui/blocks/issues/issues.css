@@ -5,36 +5,10 @@
     gap: 10px;
   }
 
-  /* Joined, and wrapping rather than widening the page at phone width. */
-  .tile-group {
+  .issue-tiles {
     display: flex;
-    flex-wrap: wrap;
-    gap: 2px;
-    max-width: 100%;
-  }
-
-  .tile-group .tile {
-    min-width: 4.6rem;
-  }
-
-  .segmented {
-    display: inline-flex;
-    border: 1px solid var(--baseline);
-    border-radius: 6px;
-    overflow: hidden;
-  }
-
-  .segment {
-    border: 0;
-    background: transparent;
-    padding: 0 10px;
-    font-size: 0.85rem;
-    cursor: pointer;
-  }
-
-  .segment[aria-pressed='true'] {
-    background: var(--hairline);
-    font-weight: 600;
+    flex-direction: column;
+    gap: 8px;
   }
 
   .issue-list {

@@ -1,6 +1,6 @@
 import { map, type InitializedObservable } from 'synstate';
 import { constant, If, MatchOptional, type JSX } from 'synstate-dom';
-import { Arr, Optional } from 'ts-data-forge';
+import { Optional } from 'ts-data-forge';
 import {
   githubSearchUrl,
   issuesSearchOf,
@@ -9,7 +9,7 @@ import {
   type Repo,
 } from '../../../domain/index.mjs';
 import type { IssuesBlockView, IssuesStore } from '../../../store/index.mjs';
-import { ExternalLink, Notice } from '../../common/index.mjs';
+import { ExternalLink, FailuresNotice, Notice } from '../../common/index.mjs';
 import type { BlockView } from '../../layout/index.mjs';
 import { IssueDag } from './issue-dag.js';
 import { IssueList } from './issue-list.js';
@@ -113,32 +113,16 @@ const IssuesBody = ({
   return (
     <div class={constant('issues')}>
       <If
-        cond={view.pipe(
-          map(
-            ({ failures, incomplete }) =>
-              incomplete || Arr.isNonEmpty(failures),
-          ),
-        )}
+        cond={view.pipe(map(({ incomplete }) => incomplete))}
         then={
           <Notice>
-            {view.pipe(
-              map(({ failures, incomplete }) =>
-                [
-                  ...(incomplete
-                    ? [
-                        'More issues are open than one read takes: the oldest are left out.',
-                      ]
-                    : []),
-                  ...failures.map(
-                    ({ what, message }) =>
-                      `Could not read ${what} (${message}); its last answer is drawn.`,
-                  ),
-                ].join(' '),
-              ),
+            {constant(
+              'More issues are open than one read takes: the oldest are left out.',
             )}
           </Notice>
         }
       />
+      <FailuresNotice failures={view.pipe(map(({ failures }) => failures))} />
       <IssueTiles
         counts={view.pipe(
           map((v) =>

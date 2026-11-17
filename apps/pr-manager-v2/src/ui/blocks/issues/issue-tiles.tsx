@@ -21,19 +21,57 @@ type Props = Readonly<{
 }>;
 
 /**
- * The counts both views lead with (spec §11.1): `open`, the tiers as one joined
- * group, `hold` and `close` beside them, `in progress` and `author only` (the
- * issues labelled `author-only`, which no session is handed), each a switch
- * with an `only`.
+ * The counts both views lead with (spec §11.1), in two rows: `open` with
+ * `in progress`, `author only` (the issues labelled `author-only`, which no
+ * session is handed), `hold` and `close`; then the tiers as one joined group.
+ * Each but `open` is a switch with an `only`.
  */
 export const IssueTiles = ({
   counts,
   settings,
   update,
 }: Props): JSX.Element => (
-  <div class={constant('tiles')}>
-    <OpenTile open={counts.pipe(map(({ open }) => open))} />
-    <div class={constant('tile-group')}>
+  <div class={constant('issue-tiles')}>
+    <div class={constant('tiles')}>
+      <OpenTile open={counts.pipe(map(({ open }) => open))} />
+      <TileSwitch
+        count={counts.pipe(map(({ inProgress }) => inProgress))}
+        label={'in progress'}
+        only={settings.pipe(map(({ onlyInProgress }) => onlyInProgress))}
+        subject={'the issues in progress'}
+        onOnly={() => {
+          update(toggleInProgressOnly);
+        }}
+        onToggle={() => {
+          update(toggleInProgressHidden);
+        }}
+      />
+      <TileSwitch
+        count={counts.pipe(map(({ authorOnly }) => authorOnly))}
+        label={'author only'}
+        only={settings.pipe(map(({ onlyAuthorOnly }) => onlyAuthorOnly))}
+        subject={'the issues only the author can do'}
+        onOnly={() => {
+          update(toggleAuthorOnlyOnly);
+        }}
+        onToggle={() => {
+          update(toggleAuthorOnlyHidden);
+        }}
+      />
+      {APART.map((tier) => (
+        <TierTile
+          counts={counts}
+          settings={settings}
+          tier={tier}
+          update={update}
+        />
+      ))}
+    </div>
+    <div
+      aria-label={constant('Tiers')}
+      class={constant('tile-group')}
+      role={constant('group')}
+    >
       {GROUPED.map((tier) => (
         <TierTile
           counts={counts}
@@ -43,38 +81,6 @@ export const IssueTiles = ({
         />
       ))}
     </div>
-    {APART.map((tier) => (
-      <TierTile
-        counts={counts}
-        settings={settings}
-        tier={tier}
-        update={update}
-      />
-    ))}
-    <TileSwitch
-      count={counts.pipe(map(({ inProgress }) => inProgress))}
-      label={'in progress'}
-      only={settings.pipe(map(({ onlyInProgress }) => onlyInProgress))}
-      subject={'the issues in progress'}
-      onOnly={() => {
-        update(toggleInProgressOnly);
-      }}
-      onToggle={() => {
-        update(toggleInProgressHidden);
-      }}
-    />
-    <TileSwitch
-      count={counts.pipe(map(({ authorOnly }) => authorOnly))}
-      label={'author only'}
-      only={settings.pipe(map(({ onlyAuthorOnly }) => onlyAuthorOnly))}
-      subject={'the issues only the author can do'}
-      onOnly={() => {
-        update(toggleAuthorOnlyOnly);
-      }}
-      onToggle={() => {
-        update(toggleAuthorOnlyHidden);
-      }}
-    />
   </div>
 );
 

@@ -135,7 +135,7 @@ export const DETAILS_QUERY = [
   '        reviewThreads(first: 100) { totalCount nodes { isResolved } }',
   '        comments(last: 100) { totalCount nodes { databaseId body createdAt viewerDidAuthor } }',
   '        stackEntry { position stack { number size } }',
-  '        timelineItems(itemTypes: [BASE_REF_CHANGED_EVENT], first: 100) { totalCount nodes { ... on BaseRefChangedEvent { previousRefName currentRefName createdAt } } }',
+  '        timelineItems(itemTypes: [BASE_REF_CHANGED_EVENT], first: 100) { filteredCount nodes { ... on BaseRefChangedEvent { previousRefName currentRefName createdAt } } }',
   '      }',
   '    }',
   '  }',
@@ -248,7 +248,9 @@ const DetailsSchema = t.record({
     t.nullType,
   ]),
   timelineItems: t.record({
-    totalCount: t.number(),
+    // Not `totalCount`, which counts the whole timeline whatever `itemTypes`
+    // keeps: a pull request with a long timeline would read as unread.
+    filteredCount: t.number(),
     nodes: t.array(
       t.record({
         previousRefName: t.optional(t.string()),
@@ -498,11 +500,11 @@ const baseChangesOf = (
 ): Read<readonly BaseChange[]> => {
   const timeline = details.timelineItems;
 
-  if (timeline.totalCount > timeline.nodes.length) {
+  if (timeline.filteredCount > timeline.nodes.length) {
     return Result.err(
       malformed(
         `the base changes of #${number}`,
-        `${timeline.totalCount} changes, ${timeline.nodes.length} read`,
+        `${timeline.filteredCount} changes, ${timeline.nodes.length} read`,
       ),
     );
   }

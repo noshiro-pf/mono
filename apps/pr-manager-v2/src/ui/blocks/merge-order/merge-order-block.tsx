@@ -30,7 +30,7 @@ export const mergeOrderBlock = (
   );
 
   return {
-    title: constant('merge order'),
+    title: constant('Merge order'),
     extras: (
       <MatchOptional
         value={ready}

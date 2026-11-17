@@ -15,7 +15,7 @@ export const ThemeSwitch = ({ theme }: Props): JSX.Element => {
       aria-pressed={theme.scheme.pipe(
         map((shown) => (shown === look).toString()),
       )}
-      class={constant('button')}
+      class={constant('segment')}
       type={constant('button')}
       onClick={() => {
         theme.pick(look);

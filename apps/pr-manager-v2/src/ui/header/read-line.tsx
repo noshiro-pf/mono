@@ -1,5 +1,6 @@
 import { map, type InitializedObservable } from 'synstate';
 import { constant, If, type JSX } from 'synstate-dom';
+import { formatLocalTime } from '../../domain/index.mjs';
 import type { ReportStatus } from '../../store/index.mjs';
 import { Age } from '../common/index.mjs';
 import { Updating } from './updating.js';
@@ -10,8 +11,8 @@ type Props = Readonly<{
 }>;
 
 /**
- * "Read from GitHub 2 minutes ago", the exact time on hover, the "Updating…"
- * ring, and "last refresh failed" with the reason on hover (spec §4.1, §4.2).
+ * "Read from GitHub 2 minutes ago · <exact time>", the "Updating…" ring, and
+ * "last refresh failed" with the reason on hover (spec §4.1, §4.2).
  * Before anything is read it says so instead of giving an age.
  */
 export const ReadLine = ({ status, now }: Props): JSX.Element => (
@@ -40,6 +41,12 @@ export const ReadLine = ({ status, now }: Props): JSX.Element => (
             at={status.pipe(map((s) => (s.kind === 'ready' ? s.readAtMs : 0)))}
             now={now}
           />
+
+          {status.pipe(
+            map((s) =>
+              s.kind === 'ready' ? ` · ${formatLocalTime(s.readAtMs)}` : '',
+            ),
+          )}
 
           <If
             cond={status.pipe(

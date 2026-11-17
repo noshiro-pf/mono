@@ -267,7 +267,7 @@ const graphqlRoutes: Routes = {
                 ],
               },
               stackEntry: null,
-              timelineItems: { totalCount: 0, nodes: [] },
+              timelineItems: { filteredCount: 0, nodes: [] },
             },
           ],
         },
