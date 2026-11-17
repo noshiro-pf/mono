@@ -98,10 +98,18 @@ open な PR が閉じる issue は、トークンの有無によらず**2つの�
 に載らないからです。キーワードは GitHub がレンダリングした `body_html` の印から
 読み（`start-issue`・`open-pr`・`unblock-prs` と同じ読み方）、`body_html` の無い
 応答だけテキストから読みます。GraphQL からリストを得られないとき（無認証のとき、
-またはトークンがあっても問い合わせからリストを得られなかったとき）はキーワードだ
-けなので、手動リンクは見えません。レポートの末尾にその旨を書くのは無認証のときだ
-けです。唯一の例外は `x-ratelimit-remaining` ヘッダーが 0 の拒否で、そのときはレ
-ポートの代わりにエラーになります。
+またはトークンがあっても問い合わせが拒否されたか、知らない形の応答だったとき）は
+キーワードだけなので、手動リンクは見えません。レポートはその旨を末尾に書きます。
+無認証ならそう書き、トークンがあれば、どの PR のリストを読めなかったかと GraphQL
+の答え（GraphQL 自身のレート制限や二次レート制限を含む）を書きます。PR 1本あたり
+100件を超えるリンクは先頭100件しか読まないので、超えた PR も末尾に名前を出します。
+`--format json` では同じことを `handLinks`（`unread` と `truncated`。すべて
+読めたときの `unread` は `null`、理由は長くても数百文字の1行）に載せ、
+`startable-issues` は一覧の後に、`run-issue-resolver` は issue を探すたびにログ
+に同じ注記を出します。手動リンクだけで閉じられる issue が、読めなかった PR の分
+だけ着手可能に見えるからです。GraphQL の拒否はレポートを止めません。レポートの
+代わりにエラーになるのは、REST の応答で `x-ratelimit-remaining` ヘッダーが 0 の
+ときだけです。
 
 ### 判定の決まりごと
 
@@ -238,10 +246,18 @@ public API allows 60 requests an hour — about twenty pull requests at roughly
 three requests each, which one report a day fits inside — and the issue links
 are the ones the bodies declare with a closing keyword, without GitHub's own
 list, which only GraphQL serves. The report says so at the bottom when it ran
-that way. With a token whose GraphQL query yields no list, the links are the
-keywords alone too, and the report does not say so. The one exception is a
-refusal whose `x-ratelimit-remaining` header reads 0, which replaces the report
-with an error.
+that way. With a token whose GraphQL query is refused or answers a shape this
+does not know, the links are the keywords alone too, and the report names at the
+bottom the pull requests whose list it could not read and what GraphQL answered,
+GraphQL's own rate limit and a secondary rate limit included. GraphQL lists the
+first hundred links of a pull request; one with more is named there too.
+`--format json` carries the same as `handLinks` (`unread`, `null` when every
+list was read, and `truncated`; the reason is one line of a few hundred
+characters at most), and `startable-issues` prints the same notes after its list
+and `run-issue-resolver` logs them on each look for an issue, since an issue
+closed by a hand-made link alone looks startable while that link is unread. No
+GraphQL refusal stops the report: only a REST refusal whose
+`x-ratelimit-remaining` header reads 0 replaces it with an error.
 
 The issues an open pull request closes are read from both sources and joined,
 with a token or without: the ones GitHub's list holds, with their titles and

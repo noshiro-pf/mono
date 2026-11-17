@@ -16,7 +16,7 @@ import {
   resolveRepo,
   tokenFromEnv,
 } from '../lib/index.mjs';
-import { createClient, type Client } from './github.mjs';
+import { createClient, type Client, type HandLinks } from './github.mjs';
 import { readOpenPulls } from './open-pulls.mjs';
 import type { Format, Options } from './options.mjs';
 import { ownersOf } from './queue.mjs';
@@ -69,7 +69,7 @@ export const prReport = async (
     return read;
   }
 
-  const { client, repo, defaultBranch, pulls, report } = read.value;
+  const { client, repo, defaultBranch, pulls, handLinks, report } = read.value;
 
   // Only the JSON carries these: they are what a session working the queue
   // reads (`claude-plugin/skills/unblock-prs/SKILL.md`), not what a person does.
@@ -80,7 +80,7 @@ export const prReport = async (
 
   const owners = ownersOf(report, queue, defaultBranch, currentEpochMs());
 
-  return Result.ok(print(report, queue, owners, options.format));
+  return Result.ok(print(report, handLinks, queue, owners, options.format));
 };
 
 /**
@@ -112,7 +112,7 @@ export const readReportWith = async (
     return open;
   }
 
-  const { defaultBranch, required, pulls } = open.value;
+  const { defaultBranch, required, pulls, handLinks } = open.value;
 
   // One more request, and the one section that is not about what is open:
   // what landed. A report that only lists the queue cannot answer "did the
@@ -173,6 +173,7 @@ export const readReportWith = async (
     repo,
     defaultBranch,
     pulls,
+    handLinks,
     report,
   });
 };
@@ -198,6 +199,8 @@ export type ReadReport = Readonly<{
    * comparison and no check state.
    */
   pulls: readonly PullRequestFacts[];
+  /** Which of `pulls` may lack an issue linked by hand (`Client.facts`). */
+  handLinks: HandLinks;
   /**
    * Built with `checks: false`, it requires nothing, and its entries' check
    * verdicts and the summary's failing and behind are made from nothing read
@@ -266,18 +269,23 @@ const namedBeyond = (
 
 /**
  * The report with its maps turned into objects, because `JSON.stringify` writes
- * a `Map` as `{}` and would quietly drop every check verdict, and with what the
- * queue's comments say on each entry (absent when there is none) and who moves
- * it next (absent outside the queue, or when its comments could not be read;
- * `queue.mts`).
+ * a `Map` as `{}` and would quietly drop every check verdict, with which pull
+ * requests' issue links may lack one linked by hand (`handLinks`), and with
+ * what the queue's comments say on each entry (absent when there is none) and
+ * who moves it next (absent outside the queue, or when its comments could not
+ * be read; `queue.mts`).
  */
 const serializable = (
   report: PrReport,
+  handLinks: HandLinks,
   queue: ReadonlyMap<number, QueueComments>,
   owners: ReadonlyMap<number, QueueOwner>,
 ): unknown =>
   ({
     ...report,
+    // `null` rather than a key `JSON.stringify` leaves out, so that a reader
+    // finds every list read stated rather than the field missing.
+    handLinks: { ...handLinks, unread: handLinks.unread ?? null },
     entries: report.entries.map((entry) => ({
       ...entry,
       reported: Object.fromEntries(entry.reported),
@@ -288,18 +296,23 @@ const serializable = (
 
 const print = (
   report: PrReport,
+  handLinks: HandLinks,
   queue: ReadonlyMap<number, QueueComments>,
   owners: ReadonlyMap<number, QueueOwner>,
   format: Format,
 ): string => {
   switch (format) {
     case 'json':
-      return JSON.stringify(serializable(report, queue, owners), undefined, 2);
+      return JSON.stringify(
+        serializable(report, handLinks, queue, owners),
+        undefined,
+        2,
+      );
 
     case 'markdown':
-      return renderMarkdown(report);
+      return renderMarkdown(report, handLinks);
 
     case 'terminal':
-      return renderTerminal(report);
+      return renderTerminal(report, handLinks);
   }
 };

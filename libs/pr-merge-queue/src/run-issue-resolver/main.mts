@@ -17,7 +17,7 @@ import {
   viewerLogin,
   type ApiContext,
 } from '../lib/index.mjs';
-import { readReport } from '../pr-report/index.mjs';
+import { describeHandLinks, readReport } from '../pr-report/index.mjs';
 import {
   describeOutcome,
   mayHaveSpent,
@@ -547,6 +547,18 @@ const survey = async (
   const stoppedAtCap = found.left.filter(
     (number) => cutOff.has(number) && !mut_attempted.has(number),
   );
+
+  // An issue linked by hand alone to a pull request whose links were not all
+  // read is taken as startable here, though one closes it. Said on each look,
+  // rather than among `notes`, which are printed only when nothing starts, so
+  // that it is next to the issue a look starts. That costs one line on every
+  // look while GraphQL refuses.
+  // Only said, not held back on: GraphQL refused or cut short is rare, an issue
+  // closed by a hand-made link alone rarer, and a resolver that started nothing
+  // while GraphQL refuses would stop on every outage of it.
+  for (const line of describeHandLinks(read.value.handLinks)) {
+    log(line);
+  }
 
   const notes = [
     ...themed.notes,

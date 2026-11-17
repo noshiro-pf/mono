@@ -1,6 +1,6 @@
 import type { PullRequestFacts, RepoRef } from 'pr-report-core';
 import { Result } from 'ts-data-forge';
-import type { Client } from './github.mjs';
+import type { Client, HandLinks } from './github.mjs';
 import { readRequiredContexts } from './repo-settings.mjs';
 
 /**
@@ -32,16 +32,17 @@ export const readOpenPulls = async (
     return required;
   }
 
-  const pulls = await client.facts(repo, { checks });
+  const facts = await client.facts(repo, { checks });
 
-  if (Result.isErr(pulls)) {
-    return pulls;
+  if (Result.isErr(facts)) {
+    return facts;
   }
 
   return Result.ok({
     defaultBranch: defaultBranch.value,
     required: required.value,
-    pulls: pulls.value,
+    pulls: facts.value.pulls,
+    handLinks: facts.value.handLinks,
   });
 };
 
@@ -49,6 +50,8 @@ export type OpenPulls = Readonly<{
   defaultBranch: string;
   required: readonly string[];
   pulls: readonly PullRequestFacts[];
+  /** Which of `pulls` may lack an issue linked by hand (`Client.facts`). */
+  handLinks: HandLinks;
 }>;
 
 const NOTHING_REQUIRED: readonly string[] = [] as const;

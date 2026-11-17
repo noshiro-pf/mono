@@ -1,5 +1,6 @@
 export * from './checks-unreadable.mjs';
 export * from './github.mjs';
+export * from './hand-links.mjs';
 export * from './linked-issues.mjs';
 export * from './main.mjs';
 export * from './open-pulls.mjs';

@@ -9,6 +9,7 @@ import {
   type PullRequestFacts,
   type ReferenceStatus,
 } from 'pr-report-core';
+import type { HandLinks } from './github.mjs';
 import { renderMarkdown, renderTerminal } from './render.mjs';
 
 /** Labels by name alone, for the tests that do not care what colour they are. */
@@ -39,9 +40,13 @@ const facts = (
     ...overrides,
   }) as const;
 
+/** Every pull request's issue links read whole. */
+const ALL_READ: HandLinks = { unread: undefined, truncated: [] } as const;
+
 const report = (
   pulls: readonly PullRequestFacts[],
   issues: readonly OpenIssue[] = [],
+  authenticated = false,
 ): PrReport =>
   buildReport({
     repo: { owner: 'noshiro-pf', name: 'mono' },
@@ -52,7 +57,7 @@ const report = (
     mergedWithinDays: 7,
     issues,
     issuesLimit: 3,
-    authenticated: false,
+    authenticated,
     pulls,
   });
 
@@ -72,7 +77,7 @@ const issue = (number: number): OpenIssue =>
 
 describe(renderMarkdown, () => {
   test('says so plainly when there is nothing open', () => {
-    const rendered = renderMarkdown(report([]));
+    const rendered = renderMarkdown(report([]), ALL_READ);
 
     assert.isTrue(rendered.includes('No open pull requests.'));
   });
@@ -83,6 +88,7 @@ describe(renderMarkdown, () => {
         facts({ number: 1901 }),
         facts({ number: 1903, body: 'Merge-After: #1901' }),
       ]),
+      ALL_READ,
     );
 
     const lines = rendered.split('\n');
@@ -105,6 +111,7 @@ describe(renderMarkdown, () => {
         facts({ number: 1901 }),
         facts({ number: 1903, baseRef: 'branch-1901' }),
       ]),
+      ALL_READ,
     );
 
     const lines = rendered.split('\n');
@@ -149,6 +156,7 @@ describe(renderMarkdown, () => {
           open: new Set<number>([1700]),
         },
       }),
+      ALL_READ,
     );
 
     const lines = rendered.split('\n');
@@ -178,6 +186,7 @@ describe(renderMarkdown, () => {
           ],
         }),
       ]),
+      ALL_READ,
     );
 
     assert.isTrue(
@@ -202,6 +211,7 @@ describe(renderMarkdown, () => {
           comparison: { aheadBy: 3, behindBy: 12 },
         }),
       ]),
+      ALL_READ,
     );
 
     assert.isTrue(rendered.includes('+3'));
@@ -222,6 +232,7 @@ describe(renderMarkdown, () => {
           autoMerge: true,
         }),
       ]),
+      ALL_READ,
     );
 
     assert.isTrue(rendered.includes('auto-merge'));
@@ -240,6 +251,7 @@ describe(renderMarkdown, () => {
           autoMerge: false,
         }),
       ]),
+      ALL_READ,
     );
 
     assert.isFalse(rendered.includes('auto-merge'));
@@ -248,6 +260,7 @@ describe(renderMarkdown, () => {
   test('says nothing about auto-merge on a pull request that is not queued', () => {
     const rendered = renderMarkdown(
       report([facts({ number: 1901, autoMerge: false })]),
+      ALL_READ,
     );
 
     assert.isFalse(rendered.includes('auto-merge'));
@@ -259,6 +272,7 @@ describe(renderMarkdown, () => {
         facts({ number: 1, body: 'Merge-After: #2' }),
         facts({ number: 2, body: 'Merge-After: #1' }),
       ]),
+      ALL_READ,
     );
 
     assert.isTrue(rendered.includes('Merge-After cycle'));
@@ -273,6 +287,7 @@ describe('the open issues section', () => {
   test('lists every open issue with a link, its labels and its comments', () => {
     const rendered = renderMarkdown(
       report([facts({ number: 1901 })], [issue(2036)]),
+      ALL_READ,
     );
 
     assert.isTrue(rendered.includes('## Open issues (1)'));
@@ -301,6 +316,7 @@ describe('the open issues section', () => {
           },
         ],
       ),
+      ALL_READ,
     );
 
     const line = (number: number): string =>
@@ -322,6 +338,7 @@ describe('the open issues section', () => {
           { ...issue(2041), labels: labelled('priority:hold') },
         ],
       ),
+      ALL_READ,
     );
 
     const line = (number: number): string =>
@@ -355,6 +372,7 @@ describe('the open issues section', () => {
         pulls: [facts({ number: 1901 })],
         references: new Map<number, ReferenceStatus>([[1700, 'done']]),
       }),
+      ALL_READ,
     );
 
     const line = (number: number): string =>
@@ -376,19 +394,23 @@ describe('the open issues section', () => {
   test('says when the list is full, so that it may not be all of them', () => {
     const rendered = renderMarkdown(
       report([facts({ number: 1901 })], [issue(1), issue(2), issue(3)]),
+      ALL_READ,
     );
 
     assert.isTrue(rendered.includes('## Open issues (3+)'));
   });
 
   test('is left out when no issue is open', () => {
-    const rendered = renderMarkdown(report([facts({ number: 1901 })]));
+    const rendered = renderMarkdown(
+      report([facts({ number: 1901 })]),
+      ALL_READ,
+    );
 
     assert.isFalse(rendered.includes('Open issues'));
   });
 
   test('is there even when no pull request is open', () => {
-    const rendered = renderMarkdown(report([], [issue(2036)]));
+    const rendered = renderMarkdown(report([], [issue(2036)]), ALL_READ);
 
     assert.isTrue(rendered.includes('No open pull requests.'));
 
@@ -398,6 +420,7 @@ describe('the open issues section', () => {
   test('drops the Markdown in a terminal', () => {
     const rendered = renderTerminal(
       report([facts({ number: 1901 })], [issue(2036)]),
+      ALL_READ,
     );
 
     assert.isTrue(rendered.includes('Open issues (1)'));
@@ -417,6 +440,7 @@ describe(renderTerminal, () => {
         facts({ number: 1901 }),
         facts({ number: 1903, body: 'Merge-After: #1901' }),
       ]),
+      ALL_READ,
     );
 
     assert.isFalse(rendered.includes(']('));
@@ -426,5 +450,63 @@ describe(renderTerminal, () => {
     assert.isTrue(rendered.includes('#1903'));
 
     assert.isTrue(/[└├]/u.test(rendered));
+  });
+});
+
+describe('the footnote on the issue links', () => {
+  test('says without a token that the links are the keywords alone', () => {
+    const rendered = renderMarkdown(report([facts({ number: 1 })]), {
+      unread: { pulls: [1], because: 'read without a token' },
+      truncated: [],
+    });
+
+    assert.isTrue(rendered.includes('> Read without a token'));
+
+    assert.isFalse(rendered.includes('linked by hand'));
+  });
+
+  test('says nothing with a token when every list was read', () => {
+    const rendered = renderMarkdown(
+      report([facts({ number: 1 })], [], true),
+      ALL_READ,
+    );
+
+    assert.isFalse(rendered.includes('Read without a token'));
+
+    assert.isFalse(rendered.includes('linked by hand'));
+  });
+
+  test('names the pull requests whose links could not be read, and why', () => {
+    const rendered = renderMarkdown(
+      report([facts({ number: 1 }), facts({ number: 2 })], [], true),
+      {
+        unread: {
+          pulls: [1, 2],
+          because: '/graphql answered 502 Bad Gateway: down; more advice',
+        },
+        truncated: [],
+      },
+    );
+
+    assert.isTrue(
+      rendered.includes(
+        '> The issues linked by hand to #1, #2 could not be read (/graphql answered 502 Bad Gateway: down; more advice)',
+      ),
+    );
+  });
+
+  test('names the pull requests whose lists were cut short', () => {
+    const rendered = renderTerminal(
+      report([facts({ number: 1 }), facts({ number: 2 })], [], true),
+      { unread: undefined, truncated: [2] },
+    );
+
+    assert.isTrue(
+      rendered.includes(
+        'The issues linked to #2 were more than were read: an issue linked by hand past those may be missing.',
+      ),
+    );
+
+    assert.isFalse(rendered.includes('> The issues linked to'));
   });
 });

@@ -113,6 +113,7 @@ export const fakeGitHub = async (
         }) ?? defaultAnswer(url);
 
       response.writeHead(answer.status ?? 200, {
+        ...answer.headers,
         'content-type': 'application/json',
       });
 
@@ -150,8 +151,15 @@ export type FakeGitHub = Readonly<{
   close: () => Promise<void>;
 }>;
 
-/** An answer: JSON for `body`, sent with `status`, 200 when not given. */
-export type FakeAnswer = Readonly<{ status?: number; body: unknown }>;
+/**
+ * An answer: JSON for `body`, sent with `status`, 200 when not given, and with
+ * `headers` beside the content type, such as `x-ratelimit-remaining`.
+ */
+export type FakeAnswer = Readonly<{
+  status?: number;
+  headers?: ReadonlyRecord<string, string>;
+  body: unknown;
+}>;
 
 /**
  * What a test is told of a request: its path and query, its media type, and the
