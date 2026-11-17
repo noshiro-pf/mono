@@ -29,25 +29,61 @@ export const transformSourceCode = (
     code,
   );
 
-  const ignoredTransformers = findFileIgnoreTransformers(code);
-
-  for (const transformer of transformers) {
-    const transformerName = transformer.name;
-
-    if (shouldSkipFile(ignoredTransformers, transformerName)) {
-      if (debug) {
-        console.debug(
-          `skipped by ignore-file comment for transformer: ${transformerName}`,
-        );
-      }
-
-      continue;
-    }
-
-    transformer.transform(sourceAst);
-  }
+  applyTransformers(sourceAst, transformers, debug);
 
   return sourceAst.getFullText();
+};
+
+/**
+ * Returns a function that transforms files of the project `tsConfigFilePath`
+ * describes, each checked as part of that project rather than on its own as
+ * {@link transformSourceCode} checks it: a type imported from another module
+ * resolves, under the project's own compiler options.
+ *
+ * The returned function takes a file's path and current text and returns the
+ * transformed text. Nothing is written to disk. The project keeps each file as
+ * transformed, so that a file transformed later is checked against what the
+ * earlier ones have become. A path outside the project is added to it.
+ *
+ * One project is loaded per call to this function, when the first file is
+ * transformed, and each edit invalidates its program, so transforming a file
+ * costs a fresh type check of what that file depends on.
+ */
+export const createProjectTransformer = (
+  tsConfigFilePath: string,
+  transformers: readonly TsMorphTransformer[],
+  debug: boolean = false,
+): ((filePath: string, code: string) => string) => {
+  // Loaded with the first file, so that a run with nothing to transform does
+  // not pay for it.
+  let mut_project: tsm.Project | undefined = undefined;
+
+  return (filePath, code) => {
+    mut_project ??= new tsm.Project({ tsConfigFilePath });
+
+    const project = mut_project;
+
+    const existing = project.getSourceFile(filePath);
+
+    const sourceAst =
+      existing ?? project.createSourceFile(filePath, code, { overwrite: true });
+
+    if (sourceAst.getFullText() !== code) {
+      sourceAst.replaceWithText(code);
+    }
+
+    try {
+      applyTransformers(sourceAst, transformers, debug);
+    } catch (error) {
+      // The caller keeps the file as it was, and so does the project: a later
+      // file is checked against what is on disk, not a half-made edit.
+      sourceAst.replaceWithText(code);
+
+      throw error;
+    }
+
+    return sourceAst.getFullText();
+  };
 };
 
 /**
@@ -215,3 +251,30 @@ const shouldSkipFile = (
   // list
   (Arr.isEmpty(ignoredTransformers) ||
     ignoredTransformers.includes(transformerName));
+
+const applyTransformers = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  sourceAst: tsm.SourceFile,
+  transformers: readonly TsMorphTransformer[],
+  debug: boolean,
+): void => {
+  const ignoredTransformers = findFileIgnoreTransformers(
+    sourceAst.getFullText(),
+  );
+
+  for (const transformer of transformers) {
+    const transformerName = transformer.name;
+
+    if (shouldSkipFile(ignoredTransformers, transformerName)) {
+      if (debug) {
+        console.debug(
+          `skipped by ignore-file comment for transformer: ${transformerName}`,
+        );
+      }
+
+      continue;
+    }
+
+    transformer.transform(sourceAst);
+  }
+};

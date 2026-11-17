@@ -5,6 +5,7 @@ import {
   appendAsConstTransformer,
   convertInterfaceToTypeTransformer,
   convertToReadonlyTransformer,
+  enableExplicitFunctionReturnTypeTransformer,
   enableNoUncheckedIndexedAccessTransformer,
   replaceAnyWithUnknownTransformer,
   replaceRecordWithUnknownRecordTransformer,
@@ -12,17 +13,28 @@ import {
 import { Arr, Result } from 'ts-data-forge';
 import { cliVersion } from './cli-version.mjs';
 import { runTransformerCLI } from './run-transformer-cli.mjs';
+import {
+  parseTransformerOptions,
+  type TransformerOptions,
+} from './transformer-options.mjs';
 
-/** Every transformer this CLI can apply, keyed by the name `--transformer` takes. */
+/**
+ * Every transformer this CLI can apply, keyed by the name `--transformer`
+ * takes, built with the options `--transformer-options` gives it, if any.
+ */
 const transformerFactories = {
-  'append-as-const': appendAsConstTransformer,
-  'convert-interface-to-type': convertInterfaceToTypeTransformer,
-  'convert-to-readonly': convertToReadonlyTransformer,
-  'enable-no-unchecked-indexed-access':
-    enableNoUncheckedIndexedAccessTransformer,
-  'replace-any-with-unknown': replaceAnyWithUnknownTransformer,
-  'replace-record-with-unknown-record':
-    replaceRecordWithUnknownRecordTransformer,
+  'append-as-const': () => appendAsConstTransformer(),
+  'convert-interface-to-type': () => convertInterfaceToTypeTransformer(),
+  'convert-to-readonly': () => convertToReadonlyTransformer(),
+  'enable-explicit-function-return-type': (options: TransformerOptions) =>
+    enableExplicitFunctionReturnTypeTransformer(
+      options['enable-explicit-function-return-type'],
+    ),
+  'enable-no-unchecked-indexed-access': () =>
+    enableNoUncheckedIndexedAccessTransformer(),
+  'replace-any-with-unknown': () => replaceAnyWithUnknownTransformer(),
+  'replace-record-with-unknown-record': () =>
+    replaceRecordWithUnknownRecordTransformer(),
 } as const;
 
 /**
@@ -35,6 +47,7 @@ const transformerNames = [
   'append-as-const',
   'convert-interface-to-type',
   'convert-to-readonly',
+  'enable-explicit-function-return-type',
   'enable-no-unchecked-indexed-access',
   'replace-any-with-unknown',
   'replace-record-with-unknown-record',
@@ -77,6 +90,26 @@ const cmdDef = cmd.command({
       description:
         'If provided, transforms only files that differ from the given base branch or commit hash',
     }),
+    transformerOptions: cmd.option({
+      long: 'transformer-options',
+      type: cmd.optional(cmd.string),
+      description: [
+        'A JSON object from transformer name to its options, e.g.',
+        '\'{"enable-explicit-function-return-type":{"allowExpressions":true}}\'.',
+        'Only enable-explicit-function-return-type takes options here: those',
+        'of the ESLint rule it applies',
+      ].join(' '),
+    }),
+    project: cmd.option({
+      long: 'project',
+      short: 'p',
+      type: cmd.optional(cmd.string),
+      description: [
+        'Path to a tsconfig.json. If provided, every file is checked as part of',
+        'the project it describes, so that types imported from other modules',
+        'resolve; otherwise each file is checked on its own',
+      ].join(' '),
+    }),
     silent: cmd.flag({
       long: 'silent',
       type: cmd.optional(cmd.boolean),
@@ -95,15 +128,29 @@ const cmdDef = cmd.command({
         process.exit(1);
       }
 
+      const transformerOptions = parseTransformerOptions(
+        args.transformerOptions,
+        selected,
+      );
+
+      if (Result.isErr(transformerOptions)) {
+        console.error(transformerOptions.value);
+
+        process.exit(1);
+      }
+
       const result = await runTransformerCLI(
         {
           baseDir: args.baseDir,
           exclude: args.exclude ?? [],
           uncommitted: args.uncommitted ?? false,
           diffFrom: args.diffFrom,
+          project: args.project,
           silent: args.silent ?? false,
         },
-        selected.map((name) => transformerFactories[name]()),
+        selected.map((name) =>
+          transformerFactories[name](transformerOptions.value),
+        ),
       );
 
       if (Result.isErr(result)) {

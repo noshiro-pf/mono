@@ -283,6 +283,8 @@ export const CODEMOD_HELPER_MODULE =
 export const EXEMPT_MODULES: ReadonlyRecord<string, string> = {
   'libs/ts-codemod-lib/src/functions/ast-transformers/append-as-const.mts':
     'Decides where `as const` goes: an `as` or `<T>` is left alone, `satisfies` is looked into unless its type is mutable, and parentheses are passed through, so each wrapper is its own case.',
+  'libs/ts-codemod-lib/src/functions/ast-transformers/enable-explicit-function-return-type.mts':
+    'Ports @typescript-eslint/explicit-function-return-type, whose ESTree has no parentheses, counts `as` and `<T>` as typing a function but `satisfies` and `!` not, and looks through `satisfies` only for `as const`: each wrapper is a case of the rule.',
 } as const;
 
 /** ts-morph's `Node.is…` names that differ from the compiler API's. */

@@ -25,6 +25,7 @@ export default defineViteConfig({
       '**/*.d.mts',
       '**/index.mts',
       'samples/readme/apply-transformers-to-src-directory.mts',
+      'samples/readme/apply-transformers-in-project.mts',
     ],
   },
   browser: {
@@ -41,7 +42,12 @@ export default defineViteConfig({
       '**/*.d.mts',
       '**/index.mts',
       'samples/readme/apply-transformers-to-src-directory.mts',
+      'samples/readme/apply-transformers-in-project.mts',
       'samples/**/*',
+      // Node-only: it writes a project to a temporary directory through
+      // `node:fs` and runs ESLint's `Linter` with typescript-eslint, neither of
+      // which a browser can load. The node project runs it.
+      'src/functions/ast-transformers/enable-explicit-function-return-type.test.mts',
     ],
     optimizeDepsInclude: [
       'dedent',
