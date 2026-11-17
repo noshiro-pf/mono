@@ -15,7 +15,6 @@ import type {
   UpdateToken,
   WithBufferedFromOperatorObservable,
 } from '../types/index.mjs';
-import { maxDepth } from '../utils/index.mjs';
 
 /**
  * Buffers values from the source observable and emits them along with the parent value
@@ -98,8 +97,7 @@ class WithBufferedFromObservableClass<A, B>
 
     super({
       parents: [parentObservable],
-      // Raised to the scope's floor by the constructor.
-      depth: 1 + maxDepth([parentObservable, observable]),
+      alsoAfter: [observable],
       initialValue: pipe({
         par: parentSnapshot,
         me: observable.getSnapshot(),

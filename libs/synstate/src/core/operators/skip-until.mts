@@ -14,7 +14,6 @@ import type {
   Subscription,
   UpdateToken,
 } from '../types/index.mjs';
-import { maxDepth } from '../utils/index.mjs';
 
 /**
  * Skips all values from the source observable until the notifier observable emits.
@@ -86,7 +85,7 @@ class SkipUntilObservableClass<A>
     super({
       parents: [parentObservable],
       // Deeper than the notifier too, as in `TakeUntilObservableClass`.
-      depth: 1 + maxDepth([parentObservable, notifier]),
+      alsoAfter: [notifier],
       initialValue: Optional.none,
     });
 

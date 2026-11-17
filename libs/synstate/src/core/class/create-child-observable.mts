@@ -9,6 +9,7 @@ import type {
   AsyncChildObservable,
   InitializedSyncChildObservable,
   NonEmptyUnknownList,
+  Observable,
   SyncChildObservable,
   UpdateToken,
   Wrap,
@@ -106,19 +107,25 @@ type ChildObservableConfigBase<P extends NonEmptyUnknownList> = Readonly<{
   parents: Wrap<P>;
 
   /**
-   * Defaults to one more than the deepest parent. A depth passed has to be
-   * greater than every parent's; nothing checks it. Defaulted or passed, it is
-   * raised to one more than the deepest `after` (`createScope`) of the scope
-   * this observable is created in and the scopes that scope is nested in.
+   * Observables this one depends on without being derived from them: one
+   * `tryUpdate` reads with `getSnapshot`, or hears through `subscribe`, in the
+   * same update (as `withCurrentValueFrom` and `takeUntil` do). This observable
+   * is made deeper than each, as it is than each parent.
    *
    * An update visits observables in ascending depth, and those of equal depth
-   * in the order it queued them. An observable `tryUpdate` depends on without
-   * being a parent, reading it with `getSnapshot` or hearing it through
-   * `subscribe` in the same update (as `withCurrentValueFrom` and `takeUntil`
-   * do), has to be shallower too, or the update may visit this one before that
-   * observable has emitted: pass one more than the deepest of it and the
-   * parents then. An async child that starts an update of its own on hearing an
-   * observable (`switchMap` with its inner one) does not depend on it so.
+   * in the order it queued them, so one left out here may be visited before an
+   * observable it reads has emitted in that update. An async child that starts
+   * an update of its own on hearing an observable (`switchMap` with its inner
+   * one) does not depend on it so.
+   */
+  alsoAfter?: readonly Observable<unknown>[];
+
+  /**
+   * Defaults to one more than the deepest parent or observable in `alsoAfter`.
+   * A depth passed has to be greater than every one of them, or the constructor
+   * throws. Defaulted or passed, it is raised to one more than the deepest
+   * `after` (`createScope`) of the scope this observable is created in and the
+   * scopes that scope is nested in.
    */
   depth?: number;
 }>;
