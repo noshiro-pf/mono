@@ -1,5 +1,17 @@
 # pr-merge-queue
 
+## 0.16.0
+
+### Minor Changes
+
+- cd96461: `pr-report` says when the issues linked to an open pull request by hand could not be read, or were cut short at a hundred, instead of reporting the closing keywords alone as the whole list: the report names those pull requests at the bottom with what GraphQL answered, `--format json` carries them as `handLinks`, `startable-issues` adds the same notes after its list, and `run-issue-resolver` logs them on each look for an issue. A GraphQL refusal for its own rate limit no longer stops the report with advice to set a token. `Client.facts` now resolves to `{ pulls, handLinks }`.
+
+### Patch Changes
+
+- aa9100a: Add `isRepoNamed`, `isRepoApiUrl`, `isSameRepo` and `readIssueNumber`: whether a name or API URL GitHub gave back is a repository, compared without case as GitHub compares it, and the issue number a reference spells. `pr-report` no longer reports every pull request as from a fork when the repository is named in another case than GitHub's.
+- Updated dependencies [aa9100a]
+    - pr-report-core@0.10.0
+
 ## 0.15.0
 
 ### Minor Changes

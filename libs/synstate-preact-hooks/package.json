@@ -1,6 +1,6 @@
 {
   "name": "synstate-preact-hooks",
-  "version": "9.0.2",
+  "version": "9.1.0",
   "description": "Type-safe State Management Library for TypeScript/JavaScript",
   "repository": {
     "type": "git",

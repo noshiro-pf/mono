@@ -1,5 +1,23 @@
 ## [5.8.4](https://github.com/noshiro-pf/eslint-config-typed/compare/v5.8.3...v5.8.4) (2026-08-09)
 
+## 7.15.0
+
+### Minor Changes
+
+- b5b0d08: The `synstate-dom-a11y/` rules, jsx-a11y's rules reading an attribute bound to synstate-dom's `constant(x)` as bound to `x`, move into a plugin of their own, `eslint-plugin-synstate-dom-a11y`, which this package depends on and registers under `synstate-dom-a11y` as before; the rule ids and `eslintConfigForSynstateDom` are unchanged. The plugin is exported as `eslintPluginSynstateDomA11y`, and `withSynstateDomConstants` is re-exported from it.
+
+### Patch Changes
+
+- bb5158d: Update `eslint-plugin-import-x` to 4.18.0 and turn off its new rules (`avoid-barrel-files`, `avoid-importing-barrel-files`, `avoid-namespace-import`, `avoid-re-export-all`). `import-x/extensions` no longer checks an import written with `.js` or `.jsx`, which 4.18.0 would otherwise report even where it names a `.ts` / `.tsx` module; such an import of a real JavaScript file or a package subpath, which 4.17 reported, is accepted too
+- Updated dependencies [f785bd5]
+    - eslint-rule-forge@0.12.0
+    - eslint-plugin-immer-coding-style@1.0.2
+    - eslint-plugin-react-coding-style@1.0.2
+    - eslint-plugin-synstate-dom-a11y@1.0.1
+    - eslint-plugin-ts-restrictions@1.0.4
+    - eslint-plugin-ts-ui-restrictions@1.0.3
+    - eslint-plugin-vitest-coding-style@1.0.2
+
 ## 7.14.1
 
 ### Patch Changes

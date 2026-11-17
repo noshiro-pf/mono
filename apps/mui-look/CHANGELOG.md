@@ -1,5 +1,14 @@
 # mui-look
 
+## 0.0.5
+
+### Patch Changes
+
+- Updated dependencies [c2096a2]
+    - synstate@9.1.0
+    - synstate-dom@0.13.0
+    - ts-data-forge@15.1.0
+
 ## 0.0.4
 
 ### Patch Changes

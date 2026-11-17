@@ -1,5 +1,16 @@
 # synstate-dom-benchmark
 
+## 0.0.19
+
+### Patch Changes
+
+- Updated dependencies [c2096a2]
+    - synstate@9.1.0
+    - synstate-dom@0.13.0
+    - synstate-dom-next@0.0.1
+    - synstate-next@0.0.1
+    - ts-data-forge@15.1.0
+
 ## 0.0.18
 
 ### Patch Changes
