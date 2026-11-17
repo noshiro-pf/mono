@@ -72,6 +72,8 @@ component_management:
       paths: ['libs/eslint-plugin-immer-coding-style/**']
     - component_id: eslint-plugin-react-coding-style
       paths: ['libs/eslint-plugin-react-coding-style/**']
+    - component_id: eslint-plugin-synstate-dom-a11y
+      paths: ['libs/eslint-plugin-synstate-dom-a11y/**']
     - component_id: eslint-plugin-ts-data-forge
       paths: ['libs/eslint-plugin-ts-data-forge/**']
     - component_id: eslint-plugin-ts-fortress

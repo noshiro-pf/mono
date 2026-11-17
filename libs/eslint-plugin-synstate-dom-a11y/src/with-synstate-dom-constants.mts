@@ -18,7 +18,7 @@ import {
 } from 'eslint-rule-forge';
 import { Arr, castDeepMutable, hasKey, isRecord, Obj } from 'ts-data-forge';
 import type { DeepReadonly, ReadonlyRecord } from 'ts-type-forge';
-import { svgTagNames } from '../../constants/index.mjs';
+import { svgTagNames } from './svg-tag-names.mjs';
 
 /**
  * The `meta` and `rules` of `plugin`, a plugin module that ships no types, each
@@ -72,9 +72,9 @@ export const withSynstateDomConstants = (
   ({
     // ESLint names a plugin by its `meta` in a cache key and in the config
     // inspector: the wrapper takes jsx-a11y's version, so that upgrading
-    // jsx-a11y invalidates a cache, and a name of its own. A change to the
-    // wrapper alone is no more visible to a cache than one to this package's
-    // own plugins, which carry no `meta` at all.
+    // jsx-a11y invalidates a cache, and a name of its own. The wrapper's own
+    // changes are not in it: `eslintPluginSynstateDomA11y` replaces this `meta`
+    // with one that names this package's version too.
     ...metaOf(plugin),
     rules: Object.fromEntries(
       pluginRules(plugin).map(
