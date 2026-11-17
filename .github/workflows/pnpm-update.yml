@@ -34,6 +34,13 @@ name: pnpm update
 # `update.ignoreDeps` currently holds back `typescript`, which also covers the
 # `typescript-native` alias since pnpm matches the resolved package.
 #
+# `update-packages:hold-prereleases` follows `update-packages`, because
+# `minimumReleaseAge` alone does not keep `--latest` on stable releases: when
+# the `latest` version is younger than the hold, pnpm falls back to the newest
+# version the hold accepts, prereleases included. The script puts every range
+# moved from a stable release to a prerelease back on the newest mature stable
+# one.
+#
 # This is a Changesets monorepo, so the workflow also adds a patch changeset
 # for each publishable (non-private) workspace package whose runtime
 # (dependencies / peerDependencies / optionalDependencies) changed, mirroring
@@ -196,6 +203,7 @@ jobs:
       - name: Update dependencies
         run: |
           pnpm run update-packages
+          pnpm run update-packages:hold-prereleases
           pnpm install --no-frozen-lockfile
 
       # The published half of `verify-npm-packages` pins exact versions, and

@@ -169,9 +169,9 @@ export const selfUpdatePnpm = async (
 
   const cutoff = now - hold.milliseconds;
 
-  const metadata = await readPnpmRegistryMetadata();
+  const metadata = await readRegistryMetadata('pnpm');
 
-  const selection = selectMaturePnpmVersion(metadata, cutoff);
+  const selection = selectMatureVersion(metadata, cutoff);
 
   if (selection === undefined) {
     console.error(
@@ -193,12 +193,12 @@ export const selfUpdatePnpm = async (
 };
 
 /**
- * The newest stable pnpm published at or before `cutoff` (epoch ms), and the
+ * The newest stable version published at or before `cutoff` (epoch ms), and the
  * stable versions newer than it that the hold keeps back. `undefined` when no
  * stable version is old enough. A version whose publish time is missing or
  * unreadable is skipped — age unknown is not age proven.
  */
-export const selectMaturePnpmVersion = (
+export const selectMatureVersion = (
   metadata: RegistryMetadata,
   cutoff: number,
 ): Readonly<{ target: string; heldBack: readonly string[] }> | undefined => {
@@ -230,7 +230,7 @@ export const selectMaturePnpmVersion = (
   };
 };
 
-/** What `pnpm view pnpm versions time --json` answers. */
+/** What `pnpm view <name> versions time --json` answers. */
 export type RegistryMetadata = Readonly<{
   versions: readonly string[];
   time: ReadonlyRecord<string, unknown>;
@@ -667,6 +667,44 @@ export const parseStableVersion = (
     : { major, minor, patch };
 };
 
+/** `pnpm view`, so the registry is the one the next install reads. */
+export const readRegistryMetadata = async (
+  packageName: string,
+): Promise<RegistryMetadata> => {
+  const raw: unknown = JSON.parse(
+    await pnpmStdout(['view', packageName, 'versions', 'time', '--json']),
+  );
+
+  const metadata = parseRegistryMetadata(raw);
+
+  if (metadata === undefined) {
+    throw new Error(
+      `\`pnpm view ${packageName} versions time --json\` did not return { versions: string[], time: object }.`,
+    );
+  }
+
+  return metadata;
+};
+
+/** `minimumReleaseAge` is minutes; anything unparsable counts as no hold. */
+export const readMinimumReleaseAge = async (): Promise<Hold> => {
+  const minutes = await pnpmStdout(['config', 'get', 'minimumReleaseAge']);
+
+  try {
+    return {
+      minutes,
+      milliseconds: Temporal.Duration.from(`PT${minutes}M`).total(
+        'milliseconds',
+      ),
+    };
+  } catch {
+    return { minutes, milliseconds: 0 };
+  }
+};
+
+export const describeHold = (hold: Hold, cutoff: number): string =>
+  `minimumReleaseAge: ${hold.minutes} min (cutoff ${Temporal.Instant.fromEpochMilliseconds(cutoff).toString()})` as const;
+
 const toEpochMilliseconds = (value: unknown): number | undefined => {
   if (typeof value !== 'string') {
     return undefined;
@@ -699,6 +737,9 @@ export type StableVersion = Readonly<{
   minor: string;
   patch: string;
 }>;
+
+/** `minimumReleaseAge`, as pnpm reports it and in milliseconds. */
+export type Hold = Readonly<{ minutes: string; milliseconds: number }>;
 
 // ---------------------------------------------------------------------------
 // helpers
@@ -750,22 +791,6 @@ const pnpmStdout = async (args: readonly string[]): Promise<string> => {
   process.stderr.write(stderr);
 
   return stdout.trim();
-};
-
-const readPnpmRegistryMetadata = async (): Promise<RegistryMetadata> => {
-  const raw: unknown = JSON.parse(
-    await pnpmStdout(['view', 'pnpm', 'versions', 'time', '--json']),
-  );
-
-  const metadata = parseRegistryMetadata(raw);
-
-  if (metadata === undefined) {
-    throw new Error(
-      '`pnpm view pnpm versions time --json` did not return { versions: string[], time: object }.',
-    );
-  }
-
-  return metadata;
 };
 
 const isRepositorySegment = (segment: string): boolean =>
@@ -1457,27 +1482,6 @@ const parseReleaseBinaryPins = (
 
 const compareDigits = (a: string, b: string): number =>
   a.length !== b.length ? a.length - b.length : a < b ? -1 : a > b ? 1 : 0;
-
-type Hold = Readonly<{ minutes: string; milliseconds: number }>;
-
-/** `minimumReleaseAge` is minutes; anything unparsable counts as no hold. */
-const readMinimumReleaseAge = async (): Promise<Hold> => {
-  const minutes = await pnpmStdout(['config', 'get', 'minimumReleaseAge']);
-
-  try {
-    return {
-      minutes,
-      milliseconds: Temporal.Duration.from(`PT${minutes}M`).total(
-        'milliseconds',
-      ),
-    };
-  } catch {
-    return { minutes, milliseconds: 0 };
-  }
-};
-
-const describeHold = (hold: Hold, cutoff: number): string =>
-  `minimumReleaseAge: ${hold.minutes} min (cutoff ${Temporal.Instant.fromEpochMilliseconds(cutoff).toString()})` as const;
 
 /**
  * `isDirectlyExecuted` from `ts-repo-utils`, inlined: that package is not

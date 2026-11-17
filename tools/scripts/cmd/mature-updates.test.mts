@@ -22,8 +22,8 @@ import {
   parseStableVersion,
   releaseLine,
   renderActionPin,
-  selectMaturePnpmVersion,
   selectMatureRelease,
+  selectMatureVersion,
   type RegistryMetadata,
   type Release,
   type StableVersion,
@@ -135,9 +135,9 @@ describe('pnpm', () => {
     },
   } as const;
 
-  describe('selectMaturePnpmVersion', () => {
+  describe('selectMatureVersion', () => {
     test('picks the newest stable version older than the hold', () => {
-      const selection = selectMaturePnpmVersion(metadata, cutoffDaysAgo(7));
+      const selection = selectMatureVersion(metadata, cutoffDaysAgo(7));
 
       assert.deepStrictEqual(selection, {
         target: '12.3.4',
@@ -146,7 +146,7 @@ describe('pnpm', () => {
     });
 
     test('takes latest when everything is old enough', () => {
-      const selection = selectMaturePnpmVersion(metadata, cutoffDaysAgo(0));
+      const selection = selectMatureVersion(metadata, cutoffDaysAgo(0));
 
       assert.deepStrictEqual(selection, {
         target: '12.4.1',
@@ -155,7 +155,7 @@ describe('pnpm', () => {
     });
 
     test('ignores prereleases even when they are old', () => {
-      const selection = selectMaturePnpmVersion(
+      const selection = selectMatureVersion(
         { versions: ['13.0.0-alpha.0'], time: metadata.time },
         cutoffDaysAgo(0),
       );
@@ -164,7 +164,7 @@ describe('pnpm', () => {
     });
 
     test('skips a version whose publish time is missing or unreadable', () => {
-      const selection = selectMaturePnpmVersion(
+      const selection = selectMatureVersion(
         {
           versions: ['12.5.0', '12.6.0', '12.3.4'],
           time: { ...metadata.time, '12.6.0': 'not a date' },
@@ -179,13 +179,13 @@ describe('pnpm', () => {
     });
 
     test('returns undefined when nothing is old enough', () => {
-      const selection = selectMaturePnpmVersion(metadata, cutoffDaysAgo(100));
+      const selection = selectMatureVersion(metadata, cutoffDaysAgo(100));
 
       assert.deepStrictEqual(selection, undefined);
     });
 
     test('orders numerically, not lexically', () => {
-      const selection = selectMaturePnpmVersion(
+      const selection = selectMatureVersion(
         {
           versions: ['9.15.9', '10.2.0', '10.10.0'],
           time: {
