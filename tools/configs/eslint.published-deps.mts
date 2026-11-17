@@ -1,10 +1,9 @@
 import typescriptEslintParser from '@typescript-eslint/parser';
 import type { FlatConfig } from 'eslint-config-typed';
-import { hasKey, isRecord } from 'ts-data-forge';
-/* eslint-disable-next-line import-x/no-rename-default */
 import eslintPluginImportX from 'eslint-plugin-import-x';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
+import { hasKey, isRecord } from 'ts-data-forge';
 import { projectRootPath } from '../scripts/project-root-path.mjs';
 
 /**

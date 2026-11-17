@@ -3,13 +3,7 @@ import preact from '@astrojs/preact';
 import react from '@astrojs/react';
 import StarlightIntegration from '@astrojs/starlight';
 import { defineConfig } from 'astro/config';
-// `rehype-katex` and `remark-math` re-export their plugins with
-// `export { default } from './lib/index.js'`, so the name
-// `import-x/no-rename-default` reads, and asks for, is `default`, which no
-// binding can take; the functions behind it are named as imported here.
-// eslint-disable-next-line import-x/no-rename-default
 import rehypeKatex from 'rehype-katex';
-// eslint-disable-next-line import-x/no-rename-default
 import remarkMath from 'remark-math';
 // A moved file or a renamed export still fails when this config loads.
 // @ts-expect-error TS5097, the `.mts` extension, which Node.js needs here

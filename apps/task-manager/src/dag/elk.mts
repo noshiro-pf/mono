@@ -9,7 +9,7 @@
 
 import { castDeepMutable } from 'ts-data-forge';
 import type { DeepReadonly } from 'ts-type-forge';
-// eslint-disable-next-line import-x/no-internal-modules, import-x/extensions -- elkjs has no `exports` map, and its browser build is reachable only by this path (`main` is the Node build).
+// eslint-disable-next-line import-x/no-internal-modules -- elkjs has no `exports` map, and its browser build is reachable only by this path (`main` is the Node build).
 import type * as ElkApi from 'elkjs/lib/elk.bundled.js';
 
 export type ElkNode = ElkApi.ElkNode;
@@ -34,7 +34,7 @@ type ElkInstance = Readonly<{
 }>;
 
 const loadElk = async (): Promise<ElkInstance> => {
-  // eslint-disable-next-line import-x/no-internal-modules, import-x/extensions -- See the import above.
+  // eslint-disable-next-line import-x/no-internal-modules -- See the import above.
   const module = await import('elkjs/lib/elk.bundled.js');
 
   // The file is CommonJS whose declaration says `export default`, so the

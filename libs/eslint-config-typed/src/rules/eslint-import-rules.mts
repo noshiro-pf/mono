@@ -95,6 +95,23 @@ export const eslintImportsRules = {
     'never',
     {
       pattern: { json: 'always', mjs: 'always' },
+      // `./a.js` is how a `.ts` / `.tsx` module is imported under Node16 /
+      // NodeNext resolution, and `./a.jsx` how a `.tsx` one is under
+      // `jsx: preserve`. Since v4.18 the rule reads such an extension as
+      // written rather than as resolved, so `never` would forbid it, while
+      // `js: 'always'` would also demand `.js` of every extensionless import of
+      // a `.ts` file (inferred through the resolver's alias). So an import
+      // written with either extension is not checked at all, and an
+      // extensionless one still is. That also accepts what v4.17 reported: a
+      // `.js` on a real JavaScript file reachable without it, and on a package
+      // subpath. `matchBase` matches the file name, at any depth of `../`.
+      pathGroupOverrides: [
+        {
+          pattern: '*.{js,jsx}',
+          patternOptions: { matchBase: true },
+          action: 'ignore',
+        },
+      ],
     },
   ],
 
@@ -151,6 +168,27 @@ export const eslintImportsRules = {
   // Covered by react-coding-style/import-style
   'import-x/prefer-namespace-import': 'off',
   // 'import-x/prefer-namespace-import': ['error', { patterns: ['react'] }],
+
+  // Added in v4.18.
+
+  /**
+   * Barrel files are the convention here — `pnpm run gen:index` generates an
+   * `index.mts` for every directory, and other directories import through it
+   * (`import-x/no-internal-modules`). The same reason keeps
+   * `unicorn/no-barrel-files` off.
+   */
+  'import-x/avoid-barrel-files': 'off',
+  'import-x/avoid-importing-barrel-files': 'off',
+
+  /** The generated barrels are `export * from …` throughout. */
+  'import-x/avoid-re-export-all': 'off',
+
+  /**
+   * Covered more precisely by `tree-shakable/import-star`, which reports only a
+   * namespace object used in a way that defeats tree-shaking; `import * as fs
+   * from 'node:fs'` with member access is not one.
+   */
+  'import-x/avoid-namespace-import': 'off',
 
   // deprecated rules
   'import-x/imports-first': 0,

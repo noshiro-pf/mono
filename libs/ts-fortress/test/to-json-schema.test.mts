@@ -1,6 +1,6 @@
 // ajv publishes its draft 2020-12 validator only at this path, and has no
 // `exports` map to name it otherwise.
-// eslint-disable-next-line import-x/no-internal-modules, import-x/extensions
+// eslint-disable-next-line import-x/no-internal-modules
 import { Ajv2020 } from 'ajv/dist/2020.js';
 import { hasKey, Result } from 'ts-data-forge';
 import * as t from '../src/index.mjs';
