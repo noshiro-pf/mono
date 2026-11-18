@@ -1,8 +1,12 @@
 import { playwright } from '@vitest/browser-playwright';
 import * as path from 'node:path';
+/* eslint-disable import-x/no-relative-packages */
+import {
+  defaultExclude,
+  defineViteConfig,
+} from '../../../tools/configs/vite-config.mjs';
+/* eslint-enable import-x/no-relative-packages */
 import { workspaceRootPath } from '../scripts/workspace-root-path.mjs';
-// eslint-disable-next-line import-x/no-relative-packages
-import { defineViteConfig } from '../../../tools/configs/vite-config.mjs';
 
 export default defineViteConfig({
   packageRoot: workspaceRootPath,
@@ -15,9 +19,7 @@ export default defineViteConfig({
   },
   node: {
     exclude: [
-      '**/*.d.mts',
-      '**/index.mts',
-      'src/entry-point.mts',
+      ...defaultExclude,
       // Helpers the samples import, with no test of their own: matched by the
       // default `samples/**/*.mts`, each would fail as an empty test file.
       'samples/docs-site/**/solid-js-client.mts',
@@ -30,9 +32,7 @@ export default defineViteConfig({
     includeSource: ['src/**/*.mts'],
     include: ['src/**/*.test.mts', 'test/**/*.test.mts'],
     exclude: [
-      '**/*.d.mts',
-      '**/index.mts',
-      'src/entry-point.mts',
+      ...defaultExclude,
       // `vi.resetModules` does not give a page a second copy of a module, so
       // the two copies this file needs exist only in Node.js.
       'test/duplicate-copies.test.mts',

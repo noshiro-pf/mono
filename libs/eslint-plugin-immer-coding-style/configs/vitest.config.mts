@@ -10,7 +10,6 @@ export default defineViteConfig({
   node: {
     includeSource: [],
     include: ['src/**/*.test.mts'],
-    exclude: ['**/*.d.mts', '**/index.mts'],
     testTimeout: 30_000,
   },
   browser: false,

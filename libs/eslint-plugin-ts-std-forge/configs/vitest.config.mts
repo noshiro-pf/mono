@@ -17,7 +17,6 @@ export default defineViteConfig({
   node: {
     includeSource: [],
     include: ['src/**/*.test.mts'],
-    exclude: ['**/*.d.mts', '**/index.mts'],
     testTimeout: 30_000,
     setupFiles: ['configs/module-parity.setup.mts'],
     globalSetup: ['configs/shared-exports.global-setup.mts'],

@@ -21,7 +21,6 @@ export default defineViteConfig({
     // each a test in the file it is embedded from.
     includeSource: ['src/**/*.mts', 'samples/**/*.mts'],
     include: ['src/**/*.test.mts', 'test/**/*.test.mts'],
-    exclude: ['**/*.d.mts', '**/index.mts'],
   },
   browser: {
     provider: playwright(),
