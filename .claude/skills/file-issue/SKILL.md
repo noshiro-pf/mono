@@ -13,8 +13,8 @@ issues are about one problem. Filing through this procedure keeps both true;
 
 A finding that reads as a way to break in — bypassing authentication or a
 permission, exposing personal data, steps an attacker could follow — goes to the
-private `noshiro-pf/mono-security`, never here (`CLAUDE.md`, "Security
-findings"). Stop here for one of those. Hardening with no way in (a missing
+private `noshiro-pf/mono-security`, never here (`CLAUDE.md`, "Private
+information"). Stop here for one of those. Hardening with no way in (a missing
 CSP, a rule narrower than it needs to be) may be filed here.
 
 ## 2. Look for the issue it repeats

@@ -133,7 +133,8 @@ round dismissed, costs as much as the first.
       generation. A comment in a file the change does not touch, of any kind,
       would pull that file into the diff.
     - **A dismissed security finding is in neither.** It goes to `mono-security`
-      alone, as "Security findings" in `CLAUDE.md` and the end of this file say:
+      alone, as "Private information" in `CLAUDE.md` and the end of this file
+      say:
       a comment or a ledger entry stating why a weakness stays would publish it.
 - **Fix it here unless it is out of scope.** A finding is fixed in this pull
   request, whatever round raised it and however many lines the fix takes, when
@@ -277,6 +278,6 @@ The Japanese half of the description (`CLAUDE.md`, "Japanese text")
 carries the section under `### レビュー`, never a second `## Review`: the
 digest reads the first `## Review` alone, and only the English one parses.
 
-A security finding is the exception, as "Security findings" in `CLAUDE.md`
-says: one dismissed or deferred goes to `mono-security` and is not listed
-here, and one fixed is described no further than that section allows.
+A security finding is the exception, as "Private information" in `CLAUDE.md`
+says: one dismissed or deferred goes to `mono-security` and is not listed here,
+and one fixed is described no further than that section allows.

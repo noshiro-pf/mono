@@ -195,9 +195,8 @@ auto-merged with no human in between.
 
 This stays the deny-all form in each workflow rather than a repository-wide
 setting: a setting is one switch for every workflow at once, and
-`repo-settings/actions-settings/` does not model it, so a change there would
-not be noticed by the settings drift check, which runs from the private
-`noshiro-pf/mono-security` (see "Security findings" in `CLAUDE.md`).
+`repo-settings/actions-settings/` does not model it, so a change there would not
+be noticed by the settings drift check, which does not run in this repository.
 
 Grants that recur:
 

@@ -16,6 +16,7 @@ export const scriptsRunBeforeInstall = [
   'tools/scripts/cmd/assert-deps-built.mts',
   'tools/scripts/cmd/claude-code-claude-md-sync.mts',
   'tools/scripts/cmd/claude-code-post-edit.mts',
+  'tools/scripts/cmd/claude-code-public-write-gate.mts',
   'tools/scripts/cmd/firebase-deploy-plan.mts',
   'tools/scripts/cmd/mature-updates.mts',
   'tools/scripts/cmd/submit-chrome-extension.mts',
