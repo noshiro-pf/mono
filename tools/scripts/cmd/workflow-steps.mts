@@ -309,6 +309,7 @@ export const parseGateLists = (
     value: {
       code: listOf('code'),
       runtime: listOf('runtime'),
+      benchmark: listOf('benchmark'),
       style: listOf('style'),
       'strict-lib': listOf('strict-lib'),
     },
@@ -470,7 +471,13 @@ export const parseShouldRunArgs = (
 /** Where the ignore lists are, relative to the repository root. */
 export const GATE_LISTS_FILE = 'tools/configs/gate-ignore-lists.json';
 
-export const GATE_SCOPES = ['code', 'runtime', 'style', 'strict-lib'] as const;
+export const GATE_SCOPES = [
+  'code',
+  'runtime',
+  'benchmark',
+  'style',
+  'strict-lib',
+] as const;
 
 export type GateScope = (typeof GATE_SCOPES)[number];
 

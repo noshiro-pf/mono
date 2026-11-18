@@ -204,8 +204,18 @@ describe('codeTouched', () => {
       Array.from(
         codeTouched({
           packages: [
-            { pkg: pkg('libs/code'), code: true, emitted: true },
-            { pkg: pkg('libs/readme'), code: false, emitted: false },
+            {
+              pkg: pkg('libs/code'),
+              code: true,
+              emitted: true,
+              testsRead: false,
+            },
+            {
+              pkg: pkg('libs/readme'),
+              code: false,
+              emitted: false,
+              testsRead: false,
+            },
           ],
           dependents: [],
           generatorReaders: [],

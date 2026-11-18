@@ -1,6 +1,7 @@
 import { Arr, isRecord, isString } from 'ts-data-forge';
 import type { ReadonlyRecord, StrictPick } from 'ts-type-forge';
 import { entryPointTargets } from '../assert-deps-built.mjs';
+import { TEST_DOCUMENTS } from '../check-test-documents.mjs';
 // The gate's own matcher, so that what check-changed calls prose is what CI
 // skips. It lives in the gate's script rather than tools/scripts/lib/ because
 // that script runs under plain `node`, which resolves an import by the name
@@ -45,7 +46,7 @@ export const classifyChanges = ({
 }>): Classification => {
   const mut_touched = new Map<
     string,
-    { pkg: PackageInfo; code: boolean; emitted: boolean }
+    { pkg: PackageInfo; code: boolean; emitted: boolean; testsRead: boolean }
   >();
 
   const mut_areas = new Set<Area>();
@@ -63,7 +64,16 @@ export const classifyChanges = ({
       continue;
     }
 
-    const prose = isProse(file);
+    // A document a unit test reads (`check:root:test-documents`) is code to the
+    // gate, so that a diff of it alone runs the test; nothing else reads it, so
+    // it is planned as prose, with its package's `check:test` alone
+    // (`testsRead`). One in no member is left code, which runs the root
+    // program's tests.
+    const testDocument =
+      TEST_DOCUMENT_FILES.has(file) &&
+      byDepth.some(({ dir }) => file.startsWith(`${dir}/`));
+
+    const prose = isProse(file) || testDocument;
 
     // CI runs `check:root` on every diff its code gate lets through, and the
     // guards in it read package files too (`check:root:example-coverage` reads
@@ -132,12 +142,8 @@ export const classifyChanges = ({
       continue;
     }
 
-    // A page an app builds (`!apps/*/src/`), or a document a unit test reads
-    // (`check:root:test-documents`), is code to the gate, and still Markdown,
-    // which `check:md` reads unless its `ignores` leave it out. Code, a
-    // document a test reads is planned as a change to its package's code (lint,
-    // type check, the codemod, its dependents' generators) where its tests are
-    // all it needs: that would take a kind of change of its own.
+    // A page an app builds (`!apps/*/src/`) is code to the gate, and still
+    // Markdown, which `check:md` reads unless its `ignores` leave it out.
     if (prose || file.endsWith('.md')) {
       mut_areas.add('prose');
     }
@@ -168,12 +174,14 @@ export const classifyChanges = ({
       pkg,
       code: false,
       emitted: false,
+      testsRead: false,
     };
 
     mut_touched.set(pkg.dir, {
       pkg,
       code: entry.code || !prose,
       emitted: entry.emitted || (!prose && isBuildInput(pkg.dir, file)),
+      testsRead: entry.testsRead || testDocument,
     });
   }
 
@@ -456,6 +464,12 @@ export const buildPlan = ({
       ...testStep(pkg, coverage),
       ...packageStep(pkg, 'check', 'check:sumi'),
     ]),
+
+    // A document a unit test reads, with no code of its package changed, asks
+    // for that package's tests alone.
+    ...packages
+      .filter(({ code: isCode, testsRead }) => !isCode && testsRead)
+      .flatMap(({ pkg }) => testStep(pkg, coverage)),
 
     // `check:forgotten-exports` reads the built declarations, so each changed
     // package it reads is built here, with the changed packages it is built
@@ -886,6 +900,12 @@ export type Classification = Readonly<{
      * build depends on.
      */
     emitted: boolean;
+    /**
+     * Whether the diff changes a document one of its unit tests reads
+     * (`TEST_DOCUMENTS`), which asks for its `check:test` even when no code of
+     * it changed.
+     */
+    testsRead: boolean;
   }>[];
   /**
    * The members that declare a package whose code changed, touched by the diff
@@ -1176,6 +1196,11 @@ const RUN_FIELDS = [
  */
 const PUBLISHED_DEPS_INPUT =
   /^(?:libs|apps)\/[^/]+\/src\/.+\.(?:mts|ts|tsx)$|(?:^|\/)eslint\.config\.mts$/u;
+
+/** The documents a unit test reads, repository-relative. */
+const TEST_DOCUMENT_FILES: ReadonlySet<string> = new Set<string>(
+  Object.values(TEST_DOCUMENTS),
+);
 
 /**
  * What under `strict-lib/` the strict-lib generators read or write, by

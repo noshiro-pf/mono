@@ -458,7 +458,9 @@ describe('classifyChanges', () => {
       ['prose', 'root-guards'],
     ],
     // A document a unit test reads (`check:root:test-documents`): code to the
-    // gate too, so that its package's tests run.
+    // gate. None of their packages is a member of this fixture, so each is code
+    // here, as one in no member is; how one in its member is planned is in 'the
+    // documents a unit test reads, planned'.
     ...Object.values(TEST_DOCUMENTS).map(
       (document) => [document, ['prose', 'root-guards']] as const,
     ),
@@ -547,6 +549,56 @@ describe('the documents a unit test reads', () => {
         runs,
         `check-changed would not run ${testFile} for a diff of ${document} alone: keep the document in the test's workspace package, or the test in the document's (for a test of the root program, the test under tools/scripts/ or tools/configs/ and the document under tools/).`,
       ).toBe(true);
+    },
+  );
+});
+
+describe('the documents a unit test reads, planned', () => {
+  // A document only its test reads asks for that test: none of the package's
+  // lint, type check or build, nor its dependents' generators.
+  test.each(Object.values(TEST_DOCUMENTS))(
+    'a diff of %s alone plans its tests and check:md, and no code step',
+    async (document) => {
+      const members = await readPackages();
+
+      const commands = buildPlan({
+        classification: classifyChanges({
+          files: [document],
+          packages: members,
+          proseGate,
+          generatorReaders: noReaders,
+        }),
+        base: 'abc123',
+        rootScripts: ['check:md', 'check:root:test', 'check:root:a'],
+        coverage: false,
+        spellChecked: [],
+      }).map(describeStep);
+
+      assert.include(commands, 'run check:md');
+
+      assert.isTrue(
+        commands.some((command) => command.endsWith('run check:test')),
+      );
+
+      assert.deepStrictEqual(
+        commands.filter((command) =>
+          /run (?:build|fix:lint|check:types|fix:codemod:affected|gen:verify-npm-packages)$/u.test(
+            command,
+          ),
+        ),
+        [],
+      );
+
+      // The package's own `gen` runs, as it does for any file of the package (a
+      // generator may read the document); its dependents' do not.
+      assert.isAtMost(
+        commands.filter((command) => command.endsWith('run gen')).length,
+        1,
+      );
+
+      assert.isFalse(
+        commands.some((command) => command.includes('check:root:')),
+      );
     },
   );
 });
