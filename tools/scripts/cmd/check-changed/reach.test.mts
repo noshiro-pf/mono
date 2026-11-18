@@ -52,6 +52,19 @@ describe('stepCommands', () => {
       ]),
       ['.:check:root:a', '.:check:root:b'],
     ],
+    [
+      step('.', [
+        'exec',
+        'run-p',
+        '--continue-on-error',
+        '--print-label',
+        '--max-parallel',
+        '2',
+        'check:root:a',
+        'check:root:b',
+      ]),
+      ['.:check:root:a', '.:check:root:b'],
+    ],
     [step('.', ['exec', 'cspell', '--no-progress', './a.md']), []],
   ] as const)('%j runs %j', (given, expected) => {
     assert.deepStrictEqual(stepCommands(given, defined), Result.ok(expected));

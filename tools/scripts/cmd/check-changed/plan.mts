@@ -1,4 +1,4 @@
-import { Arr, isRecord, isString } from 'ts-data-forge';
+import { Arr, isRecord, isString, Num, Result } from 'ts-data-forge';
 import type { ReadonlyRecord, StrictPick } from 'ts-type-forge';
 import { entryPointTargets } from '../assert-deps-built.mjs';
 import { TEST_DOCUMENTS } from '../check-test-documents.mjs';
@@ -246,6 +246,7 @@ export const buildPlan = ({
   classification,
   base,
   rootScripts,
+  maxParallel,
   coverage,
   spellChecked,
 }: Readonly<{
@@ -253,6 +254,11 @@ export const buildPlan = ({
   /** The commit the diff is taken from (a merge base). */
   base: string;
   rootScripts: readonly string[];
+  /**
+   * How many `check:root:*` scripts may run at once (`rootParallelism`); no
+   * limit when omitted.
+   */
+  maxParallel?: number;
   coverage: boolean;
   /** The changed files that still exist and are not ignored, for cspell. */
   spellChecked: readonly string[];
@@ -524,6 +530,7 @@ export const buildPlan = ({
         ? new Set<Area>([...areas, 'root'])
         : areas,
       rootScripts,
+      maxParallel,
       coverage,
     }),
 
@@ -853,6 +860,26 @@ export const readsGeneratorInput = (
   );
 
 /**
+ * The default `--max-parallel` of the `check:root:*` step: what `pnpm run
+ * '/regex/'` holds `check:root` to, pnpm's default `workspaceConcurrency` of
+ * one script per CPU and at most {@link ROOT_PARALLELISM_CEILING}. `check:root`
+ * runs on a 16 GB machine at that; all of them at once do not. At least 1.
+ */
+export const rootParallelism = (cpus: number): number =>
+  Math.max(1, Math.min(cpus, ROOT_PARALLELISM_CEILING));
+
+/**
+ * The value of `--max-parallel`: a positive integer written in at most 15
+ * decimal digits, which are always a safe integer, or `undefined`.
+ */
+export const parseMaxParallel = (text: string): number | undefined =>
+  /^[1-9]\d{0,14}$/u.test(text)
+    ? Result.unwrapOkOr(Num.safeParseInt(text), undefined)
+    : undefined;
+
+const ROOT_PARALLELISM_CEILING = 4;
+
+/**
  * What a change touches beyond its package. `root` asks for every
  * `check:root:*` (tools/ and the root configuration); `root-guards` for the
  * guards alone, without the root program's own type check, lint and tests.
@@ -967,15 +994,19 @@ const rootStep = (kind: StepKind, script: string): Step =>
  * the root program's own for `root-guards`. They run in parallel, as
  * `check:root` runs them, but through `run-p --continue-on-error`: `pnpm run
  * '/regex/'` kills the rest when one fails, which leaves the others' verdicts
- * unknown. `check:root:test` runs on its own so that its coverage can be read.
+ * unknown. At most `maxParallel`, when given, run at once, as all of them at
+ * once run a machine with 16 GB out of memory. `check:root:test` runs on its
+ * own so that its coverage can be read.
  */
 const rootSteps = ({
   areas,
   rootScripts,
+  maxParallel,
   coverage,
 }: Readonly<{
   areas: ReadonlySet<Area>;
   rootScripts: readonly string[];
+  maxParallel: number | undefined;
   coverage: boolean;
 }>): readonly Step[] => {
   if (!areas.has('root') && !areas.has('root-guards')) {
@@ -992,11 +1023,17 @@ const rootSteps = ({
 
   const parallel = scripts.filter((script) => script !== 'check:root:test');
 
+  // A cap of at least as many scripts as there are holds back none.
+  const limit =
+    maxParallel !== undefined && maxParallel < parallel.length
+      ? maxParallel
+      : undefined;
+
   return [
     ...(Arr.isNonEmpty(parallel)
       ? [
           {
-            title: `check:root (${parallel.length} scripts in parallel)`,
+            title: `check:root (${parallel.length} scripts in parallel${limit === undefined ? '' : `, ${limit} at a time`})`,
             kind: 'check',
             cwd: '.',
             args: [
@@ -1004,6 +1041,9 @@ const rootSteps = ({
               'run-p',
               '--continue-on-error',
               '--print-label',
+              ...(limit === undefined
+                ? []
+                : ['--max-parallel', limit.toString()]),
               ...parallel,
             ],
           } as const,
