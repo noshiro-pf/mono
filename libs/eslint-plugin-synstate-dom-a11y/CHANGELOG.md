@@ -1,5 +1,11 @@
 # eslint-plugin-synstate-dom-a11y
 
+## 1.0.2
+
+### Patch Changes
+
+- 3071712: Publish through npm trusted publishing for the first time. Nothing in the package changes.
+
 ## 1.0.1
 
 ### Patch Changes
