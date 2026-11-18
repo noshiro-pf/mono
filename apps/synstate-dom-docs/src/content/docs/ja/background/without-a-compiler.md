@@ -16,7 +16,7 @@ Solid では、signal を読む呼び出し `count()` が依存の目印です�
 | **`<Show>` などの children を遅延させて**、選ばれた分岐だけを評価します。                                                                                                          | `jsx()` は DOM ではなく記述を返すので、`If` に両方の分岐を書いても、マウントされるのは選ばれた側だけです（[制御構文](/mono/synstate-dom/ja/guides/control-flow/)）。                                                |
 | **静的な部分を最適化する。** 静的な HTML を `<template>` に抜き出して複製し、属性・プロパティ・イベントの区別もコンパイル時に決めます。                                            | 静的かどうかは実行時に決めます。`Constant` と完了済みの Observable は 1 回書くだけで購読しません。属性とプロパティの区別は表で持っています。                                                                        |
 
-Solid 側の説明は、Solid の JSX を変換する [babel-plugin-jsx-dom-expressions](https://github.com/ryansolid/dom-expressions/blob/main/packages/babel-plugin-jsx-dom-expressions/README.md) と、[`solid-js/h`](https://github.com/solidjs/solid/blob/main/packages/solid/h/README.md)・[`solid-js/html`](https://github.com/solidjs/solid/blob/main/packages/solid/html/README.md) の README で確認しました。
+Solid 側の説明は、Solid の JSX を変換する [babel-plugin-jsx-dom-expressions](https://github.com/ryansolid/dom-expressions/blob/main/packages/babel-plugin-jsx-dom-expressions/README.md) と、[`solid-js/h`](https://github.com/solidjs/solid/blob/v1.9.16/packages/solid/h/README.md)・[`solid-js/html`](https://github.com/solidjs/solid/blob/v1.9.16/packages/solid/html/README.md) の README で確認しました。
 
 ## 代わりに払っているもの
 

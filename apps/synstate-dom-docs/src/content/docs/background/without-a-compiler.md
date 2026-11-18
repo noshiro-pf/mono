@@ -16,7 +16,7 @@ In Solid, a dependency is a call that reads a signal, such as `count()`. For tha
 | **Makes the children of `<Show>` lazy**, so that only the chosen branch is evaluated.                                                                                                            | `jsx()` returns a description, not DOM, so you can write both branches of `If` and only the chosen one mounts ([Control flow](/mono/synstate-dom/guides/control-flow/)).                       |
 | **Optimizes the static parts.** Static HTML is extracted into a `<template>` and cloned; attributes, properties and events are told apart at compile time.                                       | What is static is decided at run time: a `Constant` or a completed observable is written once and never subscribed to. A table tells attributes and properties apart.                          |
 
-The Solid column is based on the README of [babel-plugin-jsx-dom-expressions](https://github.com/ryansolid/dom-expressions/blob/main/packages/babel-plugin-jsx-dom-expressions/README.md), the transform behind Solid's JSX, and those of [`solid-js/h`](https://github.com/solidjs/solid/blob/main/packages/solid/h/README.md) and [`solid-js/html`](https://github.com/solidjs/solid/blob/main/packages/solid/html/README.md).
+The Solid column is based on the README of [babel-plugin-jsx-dom-expressions](https://github.com/ryansolid/dom-expressions/blob/main/packages/babel-plugin-jsx-dom-expressions/README.md), the transform behind Solid's JSX, and those of [`solid-js/h`](https://github.com/solidjs/solid/blob/v1.9.16/packages/solid/h/README.md) and [`solid-js/html`](https://github.com/solidjs/solid/blob/v1.9.16/packages/solid/html/README.md).
 
 ## What it costs
 
