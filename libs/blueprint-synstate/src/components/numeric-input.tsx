@@ -32,6 +32,10 @@ type ViewProps = Readonly<{
   /** Called when the input loses focus: where the text is committed. */
   onBlur?: () => void;
   onKeyDown?: (event: KeyboardEvent) => void;
+  /** Called when an input method starts composing in the input. */
+  onCompositionStart?: () => void;
+  /** Called when an input method's composition in the input ends. */
+  onCompositionEnd?: () => void;
   /** Called when the up button is pressed, before it is released. */
   onIncrementMouseDown?: (event: MouseEvent) => void;
   /** Called when the down button is pressed, before it is released. */
@@ -101,6 +105,8 @@ export const NumericInputView = ({
   onValueChange,
   onBlur,
   onKeyDown,
+  onCompositionStart,
+  onCompositionEnd,
   onIncrementMouseDown,
   onDecrementMouseDown,
   onIncrementClick,
@@ -163,6 +169,12 @@ export const NumericInputView = ({
           value={value}
           onBlur={() => {
             onBlur?.();
+          }}
+          onCompositionEnd={() => {
+            onCompositionEnd?.();
+          }}
+          onCompositionStart={() => {
+            onCompositionStart?.();
           }}
           onFocus={(event) => {
             if (selectAllOnFocus) {
@@ -267,6 +279,8 @@ type Props<N extends number> = Readonly<
     | 'max'
     | 'min'
     | 'onBlur'
+    | 'onCompositionEnd'
+    | 'onCompositionStart'
     | 'onDecrementClick'
     | 'onDecrementMouseDown'
     | 'decrementDisabled'
@@ -338,12 +352,22 @@ export const NumericInput = <N extends number>({
   // was made from.
   let mut_following = false;
 
+  // Whether an input method is composing in the input, and whether a value from
+  // outside waits for it to end: writing another text mid-composition commits
+  // what is composed and starts the rest as a new composition (synstate-dom
+  // SPEC.md 7.3).
+  const mut_composition = { active: false, held: false };
+
   // A state is not written while another is still propagating, so the text
   // follows the value once the update that brought it has finished.
   value$.subscribe((current) => {
     if (mut_following) {
       afterUpdate(() => {
-        setText(encode(current));
+        if (mut_composition.active) {
+          mut_composition.held = true;
+        } else {
+          setText(encode(current));
+        }
       });
     }
   });
@@ -557,6 +581,20 @@ export const NumericInput = <N extends number>({
         },
       )}
       value={text$}
+      onCompositionEnd={() => {
+        mut_composition.active = false;
+
+        if (!mut_composition.held) {
+          return;
+        }
+
+        mut_composition.held = false;
+
+        setText(encode(Optional.unwrap(value$.getSnapshot())));
+      }}
+      onCompositionStart={() => {
+        mut_composition.active = true;
+      }}
       onBlur={() => {
         // A held arrow key needs the focus; a held button has just taken it.
         repeat.stopKey();
