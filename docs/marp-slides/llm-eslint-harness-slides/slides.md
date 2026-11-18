@@ -252,7 +252,7 @@ export const myRule: Rule.RuleModule = {
 
 ## リポジトリ専用ローカル plugin
 
-[`<private-repo>/configs/eslint/plugins/`](https://github.com/tier4/<private-repo>/tree/trunk/configs/eslint/plugins)
+[`<private-repo>/configs/eslint/plugins/`](https://github.com/<private-repo>/tree/trunk/configs/eslint/plugins)
 
 ---
 
