@@ -37,6 +37,7 @@ import {
 } from '../lib/index.mjs';
 import { describeUnreadableChecks } from './checks-unreadable.mjs';
 import { parseClosingIssueRefs } from './linked-issues.mjs';
+import { restRateLimitSpent } from './rate-limit.mjs';
 
 /** The most GitHub answers in one page of a paged list. */
 const PAGE_SIZE = 100;
@@ -359,10 +360,11 @@ export type IssueBody = Readonly<{
  * A client for the public REST API, using a token when one is in the
  * environment and going without when there is not.
  *
- * Unauthenticated works because the repository is public, and one report a day
- * fits inside the 60 requests an hour an anonymous caller gets — roughly three
- * per pull request, for the comparison and the two kinds of check.
- * A token raises that to 5000 and, through a GraphQL query read a hundred pull
+ * Unauthenticated works because the repository is public, within what an
+ * anonymous caller gets an hour (`ANONYMOUS_REQUESTS_PER_HOUR`): a report that
+ * reads checks costs at least `REQUESTS_PER_PULL_WITH_CHECKS` per open pull
+ * request, beside a few for the lists (both in `rate-limit.mts`). A token
+ * raises the allowance and, through a GraphQL query read a hundred pull
  * requests a page, adds the issue links GitHub itself holds to the ones read
  * out of the bodies.
  */
@@ -417,7 +419,7 @@ export const createClient = (
         ? refused
         : graphql
           ? `${refused}\nThe GraphQL rate limit, a budget of its own beside the REST one, is spent.`
-          : `${refused}\nThe rate limit is spent. Set GH_TOKEN or GITHUB_TOKEN to raise it from 60 requests an hour to 5000.`,
+          : `${refused}\n${restRateLimitSpent(token)}`,
     );
   };
 
@@ -1094,7 +1096,7 @@ export const createClient = (
 
       if (mut_state.rateLimited) {
         return Result.err(
-          'The GitHub rate limit was spent part way through, so this report would have been missing commit counts and check verdicts without saying which.\nSet GH_TOKEN or GITHUB_TOKEN to raise it from 60 requests an hour to 5000.',
+          `${restRateLimitSpent(token)}\nIt ran out part way through, so this report would have been missing commit counts and check verdicts without saying which.`,
         );
       }
 

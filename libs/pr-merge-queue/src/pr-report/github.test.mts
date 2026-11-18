@@ -11,6 +11,7 @@ import {
 } from '../../test/index.mjs';
 import { parseJson } from '../lib/index.mjs';
 import { createClient, type HandLinks } from './github.mjs';
+import { REQUESTS_PER_PULL_WITH_CHECKS } from './rate-limit.mjs';
 
 describe(createClient, () => {
   describe('whether a pull request is from a fork', () => {
@@ -621,15 +622,7 @@ describe(createClient, () => {
     });
 
     test('names the pull requests as unread, without a token hint, when the GraphQL rate limit is spent', async () => {
-      const github = await fakeGitHub((request) =>
-        request.url === '/graphql'
-          ? {
-              status: 403,
-              headers: { 'x-ratelimit-remaining': '0' },
-              body: { message: 'API rate limit exceeded' },
-            }
-          : undefined,
-      );
+      const github = await fakeGitHub(rateLimitedAt('/graphql'));
 
       // With the checks, whose REST reads all succeed: the report stands.
       const facts = await createClient('token', github.baseUrl).facts(repo, {
@@ -670,27 +663,73 @@ describe(createClient, () => {
       assert.include(read.unread?.because, 'secondary rate limit');
     });
 
-    test('still fails the report when the REST rate limit is spent', async () => {
-      const github = await fakeGitHub((request) =>
-        request.url.includes('/check-runs')
-          ? {
-              status: 403,
-              headers: { 'x-ratelimit-remaining': '0' },
-              body: { message: 'API rate limit exceeded' },
-            }
-          : undefined,
-      );
+    test('asks as many requests for each open pull request as the help counts', async () => {
+      const one = await requestsWithOpen([1]);
 
-      const facts = await createClient(undefined, github.baseUrl).facts(repo, {
-        checks: true,
-      });
+      const two = await requestsWithOpen([1, 2]);
 
-      await github.close();
-
-      assert.isTrue(Result.isErr(facts));
-
-      assert.include(facts.value, 'rate limit was spent');
+      assert.strictEqual(two - one, REQUESTS_PER_PULL_WITH_CHECKS);
     });
+
+    test.each([
+      { token: undefined, advice: 'set GH_TOKEN or GITHUB_TOKEN' },
+      { token: 'a-token', advice: 'resets within the hour' },
+    ] as const)(
+      'fails the report, advising $advice, when a check read spends the REST limit',
+      async ({ token, advice }) => {
+        const github = await fakeGitHub(rateLimitedAt('/check-runs'));
+
+        const facts = await createClient(token, github.baseUrl).facts(repo, {
+          checks: true,
+        });
+
+        await github.close();
+
+        assert.isTrue(Result.isErr(facts));
+
+        assert.include(facts.value, 'commit counts and check verdicts');
+
+        assert.include(facts.value, 'The rate limit is spent');
+
+        assert.include(facts.value, advice);
+
+        assert.notInclude(
+          facts.value,
+          token === undefined ? 'resets within the hour' : 'GH_TOKEN',
+        );
+      },
+    );
+
+    test.each([
+      { token: undefined, advice: 'set GH_TOKEN or GITHUB_TOKEN' },
+      { token: 'a-token', advice: 'resets within the hour' },
+    ] as const)(
+      'names the open list, advising $advice, when it spends the limit with checks off',
+      async ({ token, advice }) => {
+        const github = await fakeGitHub(rateLimitedAt('/pulls?state=open'));
+
+        const facts = await createClient(token, github.baseUrl).facts(repo, {
+          checks: false,
+        });
+
+        await github.close();
+
+        assert.isTrue(Result.isErr(facts));
+
+        assert.include(facts.value, '/pulls?state=open');
+
+        assert.include(facts.value, 'The rate limit is spent');
+
+        assert.include(facts.value, advice);
+
+        assert.notInclude(facts.value, 'check verdicts');
+
+        assert.notInclude(
+          facts.value,
+          token === undefined ? 'resets within the hour' : 'GH_TOKEN',
+        );
+      },
+    );
   });
 
   describe('the queue comments', () => {
@@ -1078,3 +1117,52 @@ const closingIssuesPage = ({
       },
     },
   }) as const;
+
+/** Routes that refuse every request whose path holds `route`, as rate-limited. */
+const rateLimitedAt =
+  (route: string): FakeRoutes =>
+  ({ url }) =>
+    url.includes(route)
+      ? ({
+          status: 403,
+          headers: { 'x-ratelimit-remaining': '0' },
+          body: { message: 'API rate limit exceeded' },
+        } as const)
+      : undefined;
+
+/**
+ * How many requests `facts`, reading checks, asks with the open pull requests
+ * `numbers`, each on a head of its own; the read must succeed.
+ */
+const requestsWithOpen = async (
+  numbers: readonly (1 | 2)[],
+): Promise<number> => {
+  const github = await fakeGitHub(({ url }) =>
+    url.includes('/pulls?state=open')
+      ? {
+          body: numbers.map((number) =>
+            fakePullRequest({
+              number,
+              head: {
+                ref: `b${number}`,
+                sha: (number === 1 ? 'a' : 'b').repeat(40),
+                repo: { full_name: `${FAKE_REPO.owner}/${FAKE_REPO.name}` },
+              },
+            }),
+          ),
+        }
+      : undefined,
+  );
+
+  try {
+    const facts = await createClient(undefined, github.baseUrl).facts(repo, {
+      checks: true,
+    });
+
+    assert.isTrue(Result.isOk(facts));
+
+    return github.requested.length;
+  } finally {
+    await github.close();
+  }
+};

@@ -6,5 +6,6 @@ export * from './main.mjs';
 export * from './open-pulls.mjs';
 export * from './options.mjs';
 export * from './queue.mjs';
+export * from './rate-limit.mjs';
 export * from './render.mjs';
 export * from './repo-settings.mjs';

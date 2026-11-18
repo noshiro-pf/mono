@@ -83,12 +83,13 @@ undici の実験的機能の警告を消しているだけです）。`NODE_USE_
 ### トークン
 
 `GH_TOKEN` か `GITHUB_TOKEN` があれば（この順に）使い、無ければ無認証で読みます。public
-なリポジトリなら無認証でも動き、1回のレポートは匿名の 60 requests/hour に収まりま
-す（PR 1本あたり約3リクエスト = 20本程度まで。issue 一覧は全体で1リクエスト）。
+なリポジトリなら無認証でも動きます。匿名の上限は 60 requests/hour で、1回のレポートは
+open な PR 1本あたり少なくとも4リクエスト（比較、workflow run、check run、コミット
+ステータス。複数ページになればさらに多く）を使うので、収まるのは15本未満です。
 
-トークンがあると変わるのは2点だけです。レート制限が 5000/hour になることと、
-閉じる issue に GraphQL の `closingIssuesReferences`（サイドバーで手動リンクした
-ものを含む、GitHub 自身のリスト）が加わること。
+トークンがあると変わるのは2点だけです。レート制限が上がること（個人のトークン
+なら 5000/hour）と、閉じる issue に GraphQL の `closingIssuesReferences`（サイド
+バーで手動リンクしたものを含む、GitHub 自身のリスト）が加わること。
 
 open な PR が閉じる issue は、トークンの有無によらず**2つの出どころを合わせて**
 読みます。GitHub のリストにある issue（タイトルと状態つき）を先に、続けて body の
@@ -242,22 +243,25 @@ about reading rather than about fitting: past twenty the section stops being
 a list and starts being an archive.
 
 `GH_TOKEN` or `GITHUB_TOKEN`, in that order, is used when set. Without one the
-public API allows 60 requests an hour — about twenty pull requests at roughly
-three requests each, which one report a day fits inside — and the issue links
-are the ones the bodies declare with a closing keyword, without GitHub's own
-list, which only GraphQL serves. The report says so at the bottom when it ran
-that way. With a token whose GraphQL query is refused or answers a shape this
-does not know, the links are the keywords alone too, and the report names at the
-bottom the pull requests whose list it could not read and what GraphQL answered,
-GraphQL's own rate limit and a secondary rate limit included. GraphQL lists the
-first hundred links of a pull request; one with more is named there too.
-`--format json` carries the same as `handLinks` (`unread`, `null` when every
-list was read, and `truncated`; the reason is one line of a few hundred
-characters at most), and `startable-issues` prints the same notes after its list
-and `run-issue-resolver` logs them on each look for an issue, since an issue
-closed by a hand-made link alone looks startable while that link is unread. No
-GraphQL refusal stops the report: only a REST refusal whose
-`x-ratelimit-remaining` header reads 0 replaces it with an error.
+public API allows 60 requests an hour. A report asks at least four for each open
+pull request (the comparison, the workflow runs, the check runs and the commit
+statuses, and more where those take more than one page), so it fits fewer than
+fifteen of them. A token raises the allowance (5000 an hour for a personal one).
+Without a token, too, the issue links are the ones the bodies declare with a
+closing keyword, without GitHub's own list, which only GraphQL serves. The
+report says so at the bottom when it ran that way. With a token whose GraphQL
+query is refused or answers a shape this does not know, the links are the
+keywords alone too, and the report names at the bottom the pull requests whose
+list it could not read and what GraphQL answered, GraphQL's own rate limit and a
+secondary rate limit included. GraphQL lists the first hundred links of a pull
+request; one with more is named there too. `--format json` carries the same as
+`handLinks` (`unread`, `null` when every list was read, and `truncated`; the
+reason is one line of a few hundred characters at most), and `startable-issues`
+prints the same notes after its list and `run-issue-resolver` logs them on each
+look for an issue, since an issue closed by a hand-made link alone looks
+startable while that link is unread. No GraphQL refusal stops the report: only a
+REST refusal whose `x-ratelimit-remaining` header reads 0 replaces it with an
+error.
 
 The issues an open pull request closes are read from both sources and joined,
 with a token or without: the ones GitHub's list holds, with their titles and
