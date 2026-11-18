@@ -94,6 +94,24 @@ namespace NoUnboundedCounterPipe {
 }
 
 /**
+ * @description Disallow `onFocus` / `onBlur`, which do not bubble in synstate-dom, on an element that cannot take the focus itself.
+ *
+ *  ```md
+ *  | key            | value   |
+ *  | :------------- | :------ |
+ *  | type           | problem |
+ *  | deprecated     | false   |
+ *  | fixable        | false   |
+ *  | hasSuggestions | true    |
+ *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
+ */
+namespace NoUnfocusableFocusHandler {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
  * @description Disallow writing to a synstate state or source from a subscriber or a projection, while the update that called it is propagating.
  *
  *  ```md
@@ -150,6 +168,7 @@ export type EslintSynstateRules = Readonly<{
   'synstate/no-redundant-skip-if-no-change': NoRedundantSkipIfNoChange.RuleEntry;
   'synstate/no-throw-in-operator': NoThrowInOperator.RuleEntry;
   'synstate/no-unbounded-counter-pipe': NoUnboundedCounterPipe.RuleEntry;
+  'synstate/no-unfocusable-focus-handler': NoUnfocusableFocusHandler.RuleEntry;
   'synstate/no-write-during-propagation': NoWriteDuringPropagation.RuleEntry;
   'synstate/prefer-derive': PreferDerive.RuleEntry;
   'synstate/prefer-map-to': PreferMapTo.RuleEntry;

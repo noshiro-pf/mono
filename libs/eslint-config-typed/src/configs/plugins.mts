@@ -49,6 +49,10 @@ import eslintPluginJsxA11y from 'eslint-plugin-jsx-a11y';
 
 import eslintPluginMath from 'eslint-plugin-math';
 
+// Imported, not re-exported from `../plugins/`: the public entry passes on
+// nothing of eslint-plugin-synstate.
+import { eslintPluginSynstate } from 'eslint-plugin-synstate';
+
 import eslintPluginEslintPlugin from 'eslint-plugin-eslint-plugin';
 
 import type { ReadonlyRecord, StrictOmit } from 'ts-type-forge';
@@ -101,6 +105,7 @@ export const plugins: ReadonlyRecord<
   | 'ts-ui-restrictions'
   | 'react-coding-style'
   | 'immer-coding-style'
+  | 'synstate'
   | 'vitest-coding-style',
   StrictOmit<ESLintPlugin, 'configs'>
 > = {
@@ -146,5 +151,8 @@ export const plugins: ReadonlyRecord<
   'ts-ui-restrictions': eslintPluginTsUiRestrictions,
   'react-coding-style': eslintPluginReactCodingStyle,
   'immer-coding-style': eslintPluginImmerCodingStyle,
+  // synstate's rules; the presets turn on only those for synstate-dom
+  // (`eslintConfigForSynstateDom`).
+  synstate: eslintPluginSynstate,
   'vitest-coding-style': eslintPluginVitestCodingStyle,
 } as const satisfies FlatConfig['plugins'];

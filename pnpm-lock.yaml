@@ -3672,6 +3672,9 @@ importers:
       eslint-plugin-sort-destructure-keys:
         specifier: ^3.0.0
         version: 3.0.0(eslint@10.13.0(jiti@2.7.0)(supports-color@7.2.0))
+      eslint-plugin-synstate:
+        specifier: workspace:^
+        version: link:../eslint-plugin-synstate
       eslint-plugin-synstate-dom-a11y:
         specifier: workspace:^
         version: link:../eslint-plugin-synstate-dom-a11y

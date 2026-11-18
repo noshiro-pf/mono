@@ -107,6 +107,7 @@
     "eslint-plugin-react-refresh": "^0.5.7",
     "eslint-plugin-security": "^4.2.0",
     "eslint-plugin-sort-destructure-keys": "^3.0.0",
+    "eslint-plugin-synstate": "workspace:^",
     "eslint-plugin-synstate-dom-a11y": "workspace:^",
     "eslint-plugin-testing-library": "^7.16.2",
     "eslint-plugin-ts-restrictions": "workspace:^",

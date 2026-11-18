@@ -13,7 +13,13 @@ Requires ESLint 9+ (flat config). The rules read the syntax and need no TypeScri
 ## Usage (flat config)
 
 The plugin ships a `recommended` config preset that registers the plugin and
-turns on **every** rule at `error`:
+turns on every rule at `error` but the one for synstate-dom code
+(`no-unfocusable-focus-handler`), which the `synstate-dom` preset
+(`eslintPluginSynstate.configs['synstate-dom']`) turns on: add it after
+`recommended`, for the files synstate-dom renders. React's `onFocus` bubbles, so
+the rule would misjudge a React component.
+
+The `recommended` preset:
 
 ```ts
 // eslint.config.mts
@@ -71,6 +77,7 @@ export default [
 | `no-redundant-skip-if-no-change` | Disallow `skipIfNoChange()` directly after `map`, an operator built on it, or another `skipIfNoChange()`, which already stop a value equal (`Object.is`) to the one before. Fixable.                                       |
 | `no-throw-in-operator`           | Disallow `throw` in a function passed to a synstate operator. The exception stops the update midway, leaving part of the graph updated; return a `Result` instead.                                                         |
 | `no-unbounded-counter-pipe`      | Disallow calling `.pipe` directly on `counter(...)` when it has no `times` option. Nothing holds the counter, so nothing can complete it, and it never ends.                                                               |
+| `no-unfocusable-focus-handler`   | Disallow `onFocus` / `onBlur`, which do not bubble in synstate-dom, on an element that cannot take the focus itself. In the `synstate-dom` preset only. Suggests `onFocusIn` / `onFocusOut`.                               |
 | `no-write-during-propagation`    | Disallow writing to a synstate state or source from a subscriber or a projection. The write starts an update inside the one that called it, outside the graph synstate orders.                                             |
 | `prefer-derive`                  | Require `derive(parents, fn)` instead of `combine(parents).pipe(map(fn))`, which is two observables and builds a tuple on every update. Fixable.                                                                           |
 | `prefer-map-to`                  | Require `mapTo(c)` instead of `map(() => c)`. `map` stops a result equal to the one it holds, so a `map` to a constant emits once and never again. Fixable.                                                                |
@@ -270,6 +277,22 @@ It recognizes `counter` imported from `synstate` by name, under an alias or
 through a namespace import, and reads through `as`, `satisfies`, `!` and
 parentheses. Options it cannot see into — a variable, a spread, a computed
 key — are assumed to carry `times`, and are not reported.
+
+### `no-unfocusable-focus-handler`
+
+synstate-dom binds `onFocus` and `onBlur` to the DOM's `focus` and `blur`
+events, which do not bubble, where React's `onFocus` and `onBlur` do. Code
+ported from React that puts them on a wrapper, expecting to hear the focus of
+what it holds, compiles and never runs. The rule reports `onFocus` or `onBlur`
+on an intrinsic element that cannot take the focus itself, and suggests the
+bubbling `onFocusIn` / `onFocusOut`.
+
+An element takes the focus when it is a natively focusable control (`button`,
+`input`, `select`, `textarea`, `iframe`, `summary`, `embed`, `object`), an `a`
+or `area` with `href`, an `audio` or `video` with `controls`, or any element
+with `tabIndex` or `contentEditable`. An element with a spread attribute is not
+judged, since the spread may carry any of those, nor is a component, whose props
+are its own.
 
 ### `no-write-during-propagation`
 
