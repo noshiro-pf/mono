@@ -9,10 +9,13 @@
   // Deliberately self-contained (no `extends`, no test-library dependencies).
   // `skipLibCheck` stays off: what is under test is the package's `.d.mts`,
   // which is what that option skips (`check:root:dist-test-lib-check`).
-  // `types` names `node` and nothing else: the package's own declarations
-  // import Node's (`dist/lib/cli-args.d.mts` reads `node:util`), and they are
-  // type-checked here, so Node's types have to resolve; everything else under
-  // node_modules/@types stays out.
+  // `types` is empty: the package does not depend on `@types/node`, so a
+  // consumer may not have it, and a declaration reachable from the entry point
+  // that names Node's types (`node:util`, `NodeJS.*`, `Buffer`) fails here as
+  // it would for them. A `/// <reference types="node" />` that tsc writes into
+  // a declaration still loads them, which this does not catch. `DOM` stays in
+  // `lib` for the `AbortSignal` that `pause` names, which no ES lib declares;
+  // a consumer has it from that lib, TypeScript's default, or from Node's.
   "compilerOptions": {
     "strict": true,
     "noEmit": true,
@@ -20,7 +23,7 @@
     "moduleResolution": "NodeNext",
     "target": "ESNext",
     "lib": ["ESNext", "DOM"],
-    "types": ["node"],
+    "types": [],
     "noUncheckedIndexedAccess": true,
     "noUnusedLocals": false
   },

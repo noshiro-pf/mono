@@ -1,8 +1,13 @@
-import { Result } from 'ts-data-forge';
+import type * as util from 'node:util';
+import { expectType, Result } from 'ts-data-forge';
+import type { ReadonlyRecord } from 'ts-type-forge';
 import {
   parseCommandArgs,
   positiveInteger,
   pullRequestNumber,
+  type CommandOption,
+  type CommandOptions,
+  type CommandValues,
 } from './cli-args.mjs';
 
 describe(parseCommandArgs, () => {
@@ -48,6 +53,93 @@ describe(parseCommandArgs, () => {
     assert.isTrue(Result.isErr(parsed));
 
     assert.include(parsed.value, '--nope');
+  });
+});
+
+describe('CommandValues', () => {
+  test('types the values as `util.parseArgs` does, read-only', () => {
+    const flags = {
+      title: { type: 'string' },
+      once: { type: 'boolean', short: 'o' },
+      'dry-run': { type: 'boolean', default: false },
+      repo: { type: 'string', default: 'o/r' },
+      author: { type: 'string', multiple: true },
+    } as const;
+
+    type NodeValues = ReturnType<
+      typeof util.parseArgs<
+        Readonly<{ args: readonly string[]; options: typeof flags }>
+      >
+    >['values'];
+
+    expectType<
+      CommandValues<typeof flags>,
+      Readonly<{
+        title?: string;
+        once?: boolean;
+        'dry-run': boolean;
+        repo: string;
+        author?: readonly string[];
+      }>
+    >('=');
+
+    expectType<NodeValues, CommandValues<typeof flags>>('<=');
+
+    // Options not inferred as literals: a flag may be any of them.
+    expectType<
+      ReturnType<
+        typeof util.parseArgs<
+          Readonly<{ args: readonly string[]; options: CommandOptions }>
+        >
+      >['values'],
+      CommandValues<CommandOptions>
+    >('<=');
+
+    expectType<
+      CommandValues<CommandOptions>,
+      Readonly<
+        Partial<
+          ReadonlyRecord<
+            string,
+            string | boolean | readonly (string | boolean)[]
+          >
+        >
+      >
+    >('=');
+
+    assert.deepStrictEqual(
+      parseCommandArgs(['--author', 'a', '--author', 'b'], flags),
+      Result.ok({ 'dry-run': false, repo: 'o/r', author: ['a', 'b'] }),
+    );
+  });
+});
+
+describe('CommandOption', () => {
+  test('refuses a default of another type, and one for a `multiple` flag', () => {
+    expectType<Readonly<{ type: 'boolean'; default: false }>, CommandOption>(
+      '<=',
+    );
+
+    expectType<Readonly<{ type: 'boolean'; default: 'no' }>, CommandOption>(
+      '!<=',
+    );
+
+    expectType<
+      Readonly<{ type: 'string'; multiple: true; default: 'x' }>,
+      CommandOption
+    >('!<=');
+
+    expectType<
+      Readonly<{ type: 'string'; multiple: true; default: readonly ['x'] }>,
+      CommandOption
+    >('!<=');
+
+    assert.deepStrictEqual(
+      parseCommandArgs(['--tag', 'x'], {
+        tag: { type: 'string', multiple: true },
+      }),
+      Result.ok({ tag: ['x'] }),
+    );
   });
 });
 

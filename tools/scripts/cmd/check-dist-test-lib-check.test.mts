@@ -6,6 +6,7 @@ import type { ReadonlyRecord } from 'ts-type-forge';
 import {
   findDistTestConfigs,
   findSkipLibCheckConfigs,
+  findUndeclaredTypes,
 } from './check-dist-test-lib-check.mjs';
 
 describe(findDistTestConfigs, () => {
@@ -188,6 +189,104 @@ describe(findSkipLibCheckConfigs, () => {
     );
   });
 });
+
+describe(findUndeclaredTypes, () => {
+  test('reports every entry but the package itself or a subpath of it', async () => {
+    await withFixture(
+      {
+        'libs/node/package.json': manifest(
+          ', "dependencies": { "@types/node": "*" }',
+        ),
+        [at('node')]: config(', "types": ["node"]'),
+        'libs/own/package.json': manifest(''),
+        [at('own')]: config(', "types": ["pkg", "pkg/global", "pkg/a/b"]'),
+        'libs/empty/package.json': manifest(''),
+        [at('empty')]: config(', "types": []'),
+        'libs/unstated/package.json': manifest(''),
+        [at('unstated')]: config(''),
+        'libs/other/package.json': manifest(''),
+        [at('other')]: config(
+          ', "types": ["*", "./ambient", "pkg-other", "@pkg/x", "pkg/"]',
+        ),
+        'libs/escape/package.json': manifest(''),
+        [at('escape')]: config(
+          String.raw`, "types": ["pkg/../x", "pkg/./x", "pkg/a\\..\\..\\x"]`,
+        ),
+      },
+      (root) => {
+        assert.deepStrictEqual(
+          findUndeclaredTypes(root, [
+            at('node'),
+            at('own'),
+            at('empty'),
+            at('unstated'),
+            at('other'),
+            at('escape'),
+          ]),
+          [
+            { relativePath: at('node'), undeclared: ['node'] },
+            {
+              relativePath: at('other'),
+              undeclared: ['*', './ambient', 'pkg-other', '@pkg/x', 'pkg/'],
+            },
+            {
+              relativePath: at('escape'),
+              undeclared: ['pkg/../x', 'pkg/./x', String.raw`pkg/a\..\..\x`],
+            },
+          ],
+        );
+      },
+    );
+  });
+
+  test('reads `types` through `extends`', async () => {
+    await withFixture(
+      {
+        'configs/base.json': dedent`
+          { "compilerOptions": { "types": ["node"] } }
+        `,
+        'libs/inherited/package.json': manifest(''),
+        [at('inherited')]: dedent`
+          { "extends": "../../../../../configs/base.json", "compilerOptions": {} }
+        `,
+      },
+      (root) => {
+        assert.deepStrictEqual(findUndeclaredTypes(root, [at('inherited')]), [
+          { relativePath: at('inherited'), undeclared: ['node'] },
+        ]);
+      },
+    );
+  });
+
+  test('reports every entry when the package has no readable name', async () => {
+    await withFixture(
+      {
+        'libs/nameless/package.json': '{}',
+        [at('nameless')]: config(', "types": ["pkg/global"]'),
+      },
+      (root) => {
+        assert.deepStrictEqual(findUndeclaredTypes(root, [at('nameless')]), [
+          {
+            relativePath: at('nameless'),
+            undeclared: ['pkg/global'],
+            namelessManifest: 'libs/nameless/package.json',
+          },
+        ]);
+      },
+    );
+  });
+});
+
+const config = (types: string): string => dedent`
+  { "compilerOptions": { "noEmit": true${types} }, "include": ["./*.mts"] }
+`;
+
+const manifest = (fields: string): string => dedent`
+  { "name": "pkg"${fields} }
+`;
+
+const at = (name: string): string =>
+  `libs/${name}/test/dist_/named/tsconfig.json` as const;
 
 const withFixture = async (
   files: ReadonlyRecord<string, string>,
