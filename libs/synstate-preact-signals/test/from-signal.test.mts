@@ -1,5 +1,5 @@
 import { computed, effect, signal } from '@preact/signals';
-import { map } from 'synstate';
+import { createScope, map } from 'synstate';
 import { fromSignal } from '../src/index.mjs';
 
 describe(fromSignal, () => {
@@ -187,5 +187,61 @@ describe(fromSignal, () => {
     mut_input.value = 3;
 
     assert.deepStrictEqual(mut_seen, [1, 2]);
+  });
+
+  // A computed runs again on a write only while something subscribes to it.
+  test('stops following the signal when the scope it was called in is disposed', () => {
+    const mut_input = signal(0);
+
+    const mut_runs = { count: 0 };
+
+    const derived = computed(() => {
+      mut_runs.count += 1;
+
+      return mut_input.value;
+    });
+
+    const scope = createScope();
+
+    scope.run(() => fromSignal(derived));
+
+    assert.strictEqual(mut_runs.count, 1);
+
+    mut_input.value = 1;
+
+    assert.strictEqual(mut_runs.count, 2);
+
+    scope.dispose();
+
+    mut_input.value = 2;
+
+    assert.strictEqual(mut_runs.count, 2);
+  });
+
+  test('takes a dispose called before the scope is disposed, and one outside every scope', () => {
+    const warn = vi.fn();
+
+    vi.stubGlobal('console', { ...console, warn });
+
+    try {
+      const scope = createScope();
+
+      const [, disposeInScope] = scope.run(() => fromSignal(signal(0)));
+
+      disposeInScope();
+
+      scope.dispose();
+
+      const [, disposeOutside] = fromSignal(signal(0));
+
+      disposeOutside();
+
+      disposeOutside();
+
+      expect(warn).not.toHaveBeenCalled();
+    } finally {
+      // cspell:disable-next-line
+      vi.unstubAllGlobals();
+    }
   });
 });
