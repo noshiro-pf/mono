@@ -20,18 +20,93 @@ export const bindProps = (
   element: Element,
   props: ReadonlyRecord<string, unknown>,
 ): void => {
+  const refitter =
+    element instanceof HTMLInputElement &&
+    hasKey(props, 'value') &&
+    isBindable(props.value)
+      ? createValueRefitter(element)
+      : undefined;
+
   for (const [key, value] of Object.entries(props)) {
     if (key !== 'value') {
-      bindProp(element, key, value);
+      bindProp(
+        element,
+        key,
+        value,
+        refitter !== undefined && fittingKeys.has(key)
+          ? refitter.refit
+          : undefined,
+      );
     }
   }
 
   // Last, whatever the order the props were written in: a range or number input
   // fits its value to the `type`, `min`, `max` and `step` it has when the value
   // is written, and does not take it back when they come after.
-  if (hasKey(props, 'value')) {
-    bindProp(element, 'value', props.value);
+  if (!hasKey(props, 'value')) {
+    return;
   }
+
+  const boundValue = props.value;
+
+  if (refitter !== undefined && isBindable(boundValue)) {
+    bindValue(boundValue, refitter.write);
+  } else {
+    bindProp(element, 'value', boundValue);
+  }
+};
+
+/**
+ * The props of an `<input>` whose write fits its value again: a range or number
+ * input fits it to the `type`, `min`, `max` and `step` it has when the value is
+ * written.
+ */
+const fittingKeys: ReadonlySet<string> = new Set<string>([
+  'max',
+  'min',
+  'step',
+  'type',
+]);
+
+/**
+ * `value` of an `<input>`, bound one way (SPEC.md 7.3), and written again when
+ * a later write of `min`, `max`, `step` or `type` lets it be what was bound: an
+ * update that raises `max` and `value` together may write the value first,
+ * fitted to the old `max`. It is written again only while the input shows what
+ * the last write left in it and that differs from the bound value, so a value
+ * the user has changed since, a draft or an IME composition, is kept.
+ */
+const createValueRefitter = (
+  element: HTMLInputElement,
+): Readonly<{ write: (value: unknown) => void; refit: () => void }> => {
+  const mut_last: {
+    current:
+      Readonly<{ bound: unknown; shown: string; fitted: boolean }> | undefined;
+  } = { current: undefined };
+
+  const write = (value: unknown): void => {
+    Reflect.set(element, 'value', value);
+
+    mut_last.current = {
+      bound: value,
+      shown: element.value,
+      fitted:
+        value !== undefined &&
+        value !== null &&
+        element.value !== unknownToString(value),
+    };
+  };
+
+  return {
+    write,
+    refit: () => {
+      const last = mut_last.current;
+
+      if (last?.fitted === true && element.value === last.shown) {
+        write(last.bound);
+      }
+    },
+  };
 };
 
 /**
@@ -282,7 +357,12 @@ const isEventKey = (key: string): boolean => /^on[A-Z]/u.test(key);
 const isEventHandler = (value: unknown): value is EventListener =>
   typeof value === 'function';
 
-const bindProp = (element: Element, key: string, value: unknown): void => {
+const bindProp = (
+  element: Element,
+  key: string,
+  value: unknown,
+  afterWrite?: () => void,
+): void => {
   if (key === 'children' || key === 'ref' || !isBindable(value)) {
     return;
   }
@@ -321,6 +401,8 @@ const bindProp = (element: Element, key: string, value: unknown): void => {
   if (propertyNameSet.has(key)) {
     bindValue(value, (v) => {
       Reflect.set(element, key, v);
+
+      afterWrite?.();
     });
 
     return;
@@ -342,6 +424,8 @@ const bindProp = (element: Element, key: string, value: unknown): void => {
 
   bindValue(value, (v) => {
     write(element, attributeName, v);
+
+    afterWrite?.();
   });
 };
 

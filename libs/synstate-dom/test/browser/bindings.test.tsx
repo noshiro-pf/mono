@@ -282,6 +282,83 @@ describe('value is bound after the other props (#3940)', () => {
   });
 });
 
+describe('value fitted to the min, max, step or type of the time (#4123)', () => {
+  test('raising max and value in one update draws the new value', () => {
+    const [state, setState] = createState({ max: '200', value: '150' });
+
+    // `value` is derived first, so the update writes it before `max`.
+    const value = state.pipe(map((s) => s.value));
+
+    const max = state.pipe(map((s) => s.max));
+
+    const { container } = mountInto(() => (
+      <input max={max} type={constant('range')} value={value} />
+    ));
+
+    const input = container.querySelector('input');
+
+    assert.strictEqual(input?.value, '150');
+
+    setState({ max: '400', value: '350' });
+
+    assert.strictEqual(input?.value, '350');
+  });
+
+  test('lowering min and value in one update draws the new value', () => {
+    const [state, setState] = createState({ min: '0', value: '10' });
+
+    const value = state.pipe(map((s) => s.value));
+
+    const min = state.pipe(map((s) => s.min));
+
+    const { container } = mountInto(() => (
+      <input min={min} type={constant('range')} value={value} />
+    ));
+
+    const input = container.querySelector('input');
+
+    setState({ min: '-100', value: '-50' });
+
+    assert.strictEqual(input?.value, '-50');
+  });
+
+  test('a range the user moved keeps the user’s value when max changes', () => {
+    const [max, setMax] = createState('200');
+
+    const { container } = mountInto(() => (
+      <input max={max} type={constant('range')} value={constant('150')} />
+    ));
+
+    const mut_input = container.querySelector('input');
+
+    assert.isNotNull(mut_input);
+
+    mut_input.value = '180';
+
+    setMax('400');
+
+    assert.strictEqual(mut_input.value, '180');
+  });
+
+  test('a text input keeps the draft typed into it when its type changes', () => {
+    const [type, setType] = createState('text');
+
+    const { container } = mountInto(() => (
+      <input type={type} value={constant('bound')} />
+    ));
+
+    const mut_input = container.querySelector('input');
+
+    assert.isNotNull(mut_input);
+
+    mut_input.value = 'draft';
+
+    setType('search');
+
+    assert.strictEqual(mut_input.value, 'draft');
+  });
+});
+
 describe('controlled checked', () => {
   test('a checkbox whose change is refused is drawn as its bound value again', async () => {
     const mut_seen: boolean[] = [];
