@@ -62,6 +62,7 @@ export class ObservableBaseClass<
 > implements ObservableBase<A> {
   #mut_snapshot: Optional<A>;
   #mut_isCompleted: boolean;
+  #mut_isFlushing: boolean;
   #mut_updateToken: UpdateToken;
   #mut_children: MutableSet<ChildNode> | undefined;
   #mut_subscribers: MutableSet<OrderedSubscriber<A>> | undefined;
@@ -87,6 +88,8 @@ export class ObservableBaseClass<
     this.#mut_snapshot = initialValue;
 
     this.#mut_isCompleted = false;
+
+    this.#mut_isFlushing = false;
 
     this.#mut_updateToken = notUpdatedYet;
 
@@ -307,9 +310,31 @@ export class ObservableBaseClass<
       return;
     }
 
+    // A `complete()` a subscriber or a child calls on hearing a value `flush`
+    // emits goes straight to `dispose`: flushing again would emit again,
+    // without end if `flush` emits each time. What the rest of the running
+    // `flush` then emits is ignored, as anything sent to a completed observable
+    // is.
+    if (this.#mut_isFlushing) {
+      this.dispose();
+
+      return;
+    }
+
     // `flush` emits through `startUpdate` and `dispose` notifies, and each
     // leaves the current scope itself.
-    this.flush();
+    this.#mut_isFlushing = true;
+
+    runUndoingOnThrow(
+      () => {
+        this.flush();
+      },
+      () => {
+        this.#mut_isFlushing = false;
+      },
+    );
+
+    this.#mut_isFlushing = false;
 
     this.dispose();
   }
@@ -339,14 +364,19 @@ export class ObservableBaseClass<
     // `isCompleted` turns true after the teardown, so a teardown that throws
     // leaves the observable as it was, and a value the teardown makes it emit
     // (the last value of a custom root, which has no `flush`, or one a
-    // subscribable delivers from inside `unsubscribe`) still propagates.
-    // Re-entry is not guarded yet: a `complete()` a subscriber calls on hearing
-    // that value runs every teardown again, without end if one emits every
-    // time. It takes a teardown that emits and a subscriber that completes this
-    // observable on that value. A guard has to settle too what a retry after a
-    // teardown that throws runs again, and when a teardown registered during
-    // the teardown runs.
+    // subscribable delivers from inside `unsubscribe`) still propagates. A
+    // subscriber or a child that completes this observable on hearing that
+    // value enters here again, and that inner call completes it: a teardown
+    // that ran is not run again (`createRootObservable` and the custom children
+    // drop each before running it, and `fromSubscribable` guards its
+    // `unsubscribe`), and this call stops after the teardown.
     this.teardown();
+
+    // Through the getter: the check above narrows the field to `false`, which a
+    // re-entrant call during the teardown may have changed.
+    if (this.isCompleted) {
+      return;
+    }
 
     this.#mut_isCompleted = true;
 

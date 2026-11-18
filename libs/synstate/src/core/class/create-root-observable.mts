@@ -3,9 +3,9 @@
 // @sumi-expect-error-file functions/prefer-arrow-function
 // @sumi-expect-error-file mutation/no-mutation-without-mut-prefix
 import type { Optional } from 'ts-data-forge';
-import * as Arr from 'ts-data-forge/array';
 import type { ReadonlyRecord } from 'ts-type-forge';
 import type { RootObservable } from '../types/index.mjs';
+import { createTeardownList, type TeardownList } from '../utils/index.mjs';
 import { RootObservableClass } from './root-observable-class.mjs';
 
 /**
@@ -71,7 +71,7 @@ export const createRootObservable = <
 /* implementation */
 
 class CustomRootObservableClass<A> extends RootObservableClass<A> {
-  #mut_teardowns: readonly (() => void)[] | undefined;
+  readonly #teardowns: TeardownList;
 
   constructor(
     initialValue: Optional<A>,
@@ -79,7 +79,7 @@ class CustomRootObservableClass<A> extends RootObservableClass<A> {
   ) {
     super({ initialValue });
 
-    this.#mut_teardowns = undefined;
+    this.#teardowns = createTeardownList();
 
     const extension = init({
       startUpdate: (nextValue) => {
@@ -94,10 +94,7 @@ class CustomRootObservableClass<A> extends RootObservableClass<A> {
         if (this.isCompleted) {
           teardown();
         } else {
-          this.#mut_teardowns = Arr.toPushed(
-            this.#mut_teardowns ?? [],
-            teardown,
-          );
+          this.#teardowns.add(teardown);
         }
       },
     });
@@ -106,8 +103,6 @@ class CustomRootObservableClass<A> extends RootObservableClass<A> {
   }
 
   protected override teardown(): void {
-    for (const teardown of this.#mut_teardowns ?? []) {
-      teardown();
-    }
+    this.#teardowns.runAll();
   }
 }
