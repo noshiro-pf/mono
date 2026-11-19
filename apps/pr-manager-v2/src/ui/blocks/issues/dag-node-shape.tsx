@@ -1,10 +1,11 @@
 import { combine, map, type InitializedObservable } from 'synstate';
 import { constant, If, type JSX } from 'synstate-dom';
-import { Optional } from 'ts-data-forge';
+import { asNonZeroFiniteNumber, Num, Optional } from 'ts-data-forge';
 import {
   fitTitle,
   NODE_HEIGHT,
   NODE_WIDTH,
+  PILL_HEIGHT,
   type DagNode,
 } from '../../../domain/index.mjs';
 import { SvgLink } from './svg-link.js';
@@ -22,13 +23,19 @@ export const DagNodeShape = ({
 
   const first = Optional.unwrap(node.getSnapshot());
 
-  const title = node.pipe(map((n) => fitTitle(n.title, TITLE_UNITS)));
+  const issue = first.kind === 'issue';
+
+  const lines = node.pipe(map((n) => fitTitle(n.title, TITLE_UNITS)));
+
+  const numberWidth = pillWidthOf(`#${first.number}`);
 
   return (
     <g
       class={constant('dag-node')}
       data-extra={node.pipe(map(({ extra }) => (extra ? 'true' : 'false')))}
-      data-faint={node.pipe(map(({ faint }) => (faint ? 'true' : 'false')))}
+      data-faint={node.pipe(
+        map(({ faint, pill }) => (faint || isFaded(pill) ? 'true' : 'false')),
+      )}
       data-kind={constant(first.kind)}
       data-state={node.pipe(map(({ state }) => state))}
       transform={placed.pipe(map(({ x, y }) => `translate(${x},${y})`))}
@@ -39,95 +46,159 @@ export const DagNodeShape = ({
           map(([n, nowMs]) => tooltipOf(n, nowMs)),
         )}
       >
+        <If
+          cond={node.pipe(map(({ pill }) => isRinged(pill)))}
+          then={
+            <path
+              class={constant('dag-ring')}
+              d={constant(issue ? ISSUE_RING : ROUNDED_RING)}
+            />
+          }
+        />
         <path
           class={constant('dag-shape')}
-          d={constant(first.kind === 'issue' ? HEXAGON : ROUNDED)}
+          d={constant(issue ? HEXAGON : ROUNDED)}
         />
-        <rect
-          class={constant('dag-number-pill')}
-          height={constant('16')}
-          rx={constant('8')}
-          width={constant('52')}
-          x={constant('12')}
-          y={constant('6')}
-        />
-        <text
-          class={constant('dag-number')}
-          x={constant('38')}
-          y={constant('18')}
-        >
-          {node.pipe(map(({ number }) => `#${number}`))}
+        <text class={constant('dag-title')}>
+          <tspan
+            x={constant(NODE_WIDTH / 2)}
+            y={lines.pipe(map((l) => lineY(0, l.length).toString()))}
+          >
+            {lines.pipe(map(([line]) => line))}
+          </tspan>
+          <tspan
+            x={constant(NODE_WIDTH / 2)}
+            y={lines.pipe(map((l) => lineY(1, l.length).toString()))}
+          >
+            {lines.pipe(map((l) => l[1] ?? ''))}
+          </tspan>
         </text>
+        <g
+          class={constant('dag-number')}
+          transform={constant(`translate(${PILL_X},${-PILL_HEIGHT / 2})`)}
+        >
+          <rect
+            height={constant(PILL_HEIGHT)}
+            rx={constant(PILL_HEIGHT / 2)}
+            width={constant(numberWidth)}
+          />
+          <text x={constant(numberWidth / 2)} y={constant(PILL_HEIGHT / 2)}>
+            {constant(`#${first.number}`)}
+          </text>
+        </g>
         <If
-          cond={node.pipe(map(({ pill }) => pill !== undefined))}
+          cond={node.pipe(map(({ claim }) => claim !== undefined))}
           then={
-            <g>
+            <g
+              class={constant('dag-claim')}
+              data-stale={node.pipe(
+                map(({ claim }) => (claim?.stale === true ? 'true' : 'false')),
+              )}
+              transform={constant(
+                `translate(${PILL_X + numberWidth + 4},${-PILL_HEIGHT / 2})`,
+              )}
+            >
               <rect
-                class={constant('dag-pill')}
-                data-pill={node.pipe(map(({ pill }) => pill ?? ''))}
-                height={constant('16')}
-                rx={constant('8')}
-                width={constant('40')}
-                x={constant((NODE_WIDTH - 52).toString())}
-                y={constant('6')}
+                height={constant(PILL_HEIGHT)}
+                rx={constant(PILL_HEIGHT / 2)}
+                width={constant(CLAIM_WIDTH)}
               />
-              <text
-                class={constant('dag-pill-text')}
-                data-pill={node.pipe(map(({ pill }) => pill ?? ''))}
-                x={constant((NODE_WIDTH - 32).toString())}
-                y={constant('18')}
-              >
-                {node.pipe(map(({ pill }) => pill ?? ''))}
+              <text x={constant(CLAIM_WIDTH / 2)} y={constant(PILL_HEIGHT / 2)}>
+                {node.pipe(
+                  map(({ claim }) =>
+                    claim?.stale === true ? '⚠ claimed' : '✋ claimed',
+                  ),
+                )}
               </text>
             </g>
           }
         />
         <If
-          cond={node.pipe(map(({ claim }) => claim !== undefined))}
+          cond={node.pipe(map(({ pill }) => pill !== undefined))}
           then={
-            <text
-              class={constant('dag-claim')}
-              data-stale={node.pipe(
-                map(({ claim }) => (claim?.stale === true ? 'true' : 'false')),
+            <g
+              class={constant('dag-pill')}
+              data-pill={node.pipe(map(({ pill }) => pill ?? ''))}
+              transform={constant(
+                `translate(${NODE_WIDTH - PILL_X - TIER_WIDTH},${-PILL_HEIGHT / 2})`,
               )}
-              x={constant('72')}
-              y={constant('18')}
             >
-              {node.pipe(
-                map(({ claim }) =>
-                  claim?.stale === true ? '⚠ claimed' : '✋ claimed',
-                ),
-              )}
-            </text>
+              <rect
+                height={constant(PILL_HEIGHT)}
+                rx={constant(PILL_HEIGHT / 2)}
+                width={constant(TIER_WIDTH)}
+              />
+              <text x={constant(TIER_WIDTH / 2)} y={constant(PILL_HEIGHT / 2)}>
+                {node.pipe(map(({ pill }) => pill ?? ''))}
+              </text>
+            </g>
           }
         />
-        <text
-          class={constant('dag-title')}
-          x={constant('12')}
-          y={constant('38')}
-        >
-          {title.pipe(map(([line]) => line))}
-        </text>
-        <text
-          class={constant('dag-title')}
-          x={constant('12')}
-          y={constant('53')}
-        >
-          {title.pipe(map((lines) => lines[1] ?? ''))}
-        </text>
       </SvgLink>
     </g>
   );
 };
 
+/** Where the straight part of the top edge starts, for either shape. */
+const PILL_X = NODE_HEIGHT / 2;
+
+/** Wide enough for `close` in 10px bold. */
+const TIER_WIDTH = 36;
+
+const CLAIM_WIDTH = 60;
+
+const INSET = 12;
+
+/** How far the ring of an S or A node stands off its edge. */
+const RING_GAP = 4;
+
+const LINE_HEIGHT = 15;
+
+/** Title characters per line inside the pointed ends: wide ones count two. */
+const TITLE_UNITS = 26;
+
 const HEXAGON =
-  `M10,0 H${NODE_WIDTH - 10} L${NODE_WIDTH},${NODE_HEIGHT / 2} L${NODE_WIDTH - 10},${NODE_HEIGHT} H10 L0,${NODE_HEIGHT / 2} Z` as const;
+  `M${INSET},0 H${NODE_WIDTH - INSET} L${NODE_WIDTH},${NODE_HEIGHT / 2} L${NODE_WIDTH - INSET},${NODE_HEIGHT} H${INSET} L0,${NODE_HEIGHT / 2} Z` as const;
+
+// The hexagon grown by the gap all round: each corner moves out along its
+// bisector, the top and bottom ones sideways by g·h/(L + inset) and the points
+// by g·L/h, where h is half the height and L a slanted edge's length.
+const ISSUE_RING = (() => {
+  const g = RING_GAP;
+
+  const h = NODE_HEIGHT / 2;
+
+  const slant = Math.hypot(INSET, h);
+
+  const side = Num.div(g * h, asNonZeroFiniteNumber(slant + INSET));
+
+  const tip = Num.div(g * slant, asNonZeroFiniteNumber(h));
+
+  return `M${INSET - side},${-g} H${NODE_WIDTH - INSET + side} L${NODE_WIDTH + tip},${h} L${NODE_WIDTH - INSET + side},${NODE_HEIGHT + g} H${INSET - side} L${-tip},${h} Z`;
+})();
+
+const R = NODE_HEIGHT / 2;
 
 const ROUNDED =
-  `M8,0 H${NODE_WIDTH - 8} Q${NODE_WIDTH},0 ${NODE_WIDTH},8 V${NODE_HEIGHT - 8} Q${NODE_WIDTH},${NODE_HEIGHT} ${NODE_WIDTH - 8},${NODE_HEIGHT} H8 Q0,${NODE_HEIGHT} 0,${NODE_HEIGHT - 8} V8 Q0,0 8,0 Z` as const;
+  `M${R},0 H${NODE_WIDTH - R} A${R},${R} 0 0 1 ${NODE_WIDTH - R},${NODE_HEIGHT} H${R} A${R},${R} 0 0 1 ${R},0 Z` as const;
 
-/** Title characters per line: wide ones count two. */
-const TITLE_UNITS = 28;
+const ROUNDED_RING =
+  `M${R},${-RING_GAP} H${NODE_WIDTH - R} A${R + RING_GAP},${R + RING_GAP} 0 0 1 ${NODE_WIDTH - R},${NODE_HEIGHT + RING_GAP} H${R} A${R + RING_GAP},${R + RING_GAP} 0 0 1 ${R},${-RING_GAP} Z` as const;
+
+/** The baseline of line `index` of `count`, the lines centred in the node. */
+const lineY = (index: number, count: number): number =>
+  NODE_HEIGHT / 2 + (index - (count - 1) / 2) * LINE_HEIGHT;
+
+/** A pill wide enough for its text in 10px bold figures. */
+const pillWidthOf = (text: string): number => 8 + 6.2 * text.length;
+
+/** The tiers and priority drawn with a second outline: start these first. */
+const isRinged = (pill: DagNode['pill']): boolean =>
+  pill === 'S' || pill === 'A' || pill === 'high';
+
+/** The tiers drawn faint: the ones to start last, if at all. */
+const isFaded = (pill: DagNode['pill']): boolean =>
+  pill === 'D' || pill === 'hold' || pill === 'close';
 
 const tooltipOf = (node: DagNode, nowMs: number): string =>
   [

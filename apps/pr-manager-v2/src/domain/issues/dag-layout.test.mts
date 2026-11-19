@@ -25,7 +25,7 @@ describe(layoutDag, () => {
 
     assert.deepStrictEqual(
       [x(1), x(2), x(3)],
-      [0, NODE_WIDTH + 72, 2 * (NODE_WIDTH + 72)],
+      [0, NODE_WIDTH + 64, 2 * (NODE_WIDTH + 64)],
     );
 
     const free = layout.nodes.find(({ node }) => node.number === 9);

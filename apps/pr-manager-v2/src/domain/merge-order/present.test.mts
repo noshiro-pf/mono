@@ -1,4 +1,5 @@
 import {
+  autoMergeBadgeText,
   checksBadgeText,
   codeOwnerBadgeText,
   setAsideBadgeText,
@@ -19,7 +20,8 @@ describe(checksBadgeText, () => {
       {
         tone: 'critical',
         glyph: '✗',
-        word: 'failing',
+        icon: 'M4.6 4.6L11.4 11.4M11.4 4.6L4.6 11.4',
+        word: 'checks failing',
         counts: '1✗ 1– 2✓',
         title: [
           'Over the 4 contexts the branch rules require:',
@@ -42,7 +44,7 @@ describe(checksBadgeText, () => {
       noneRequired: true,
     });
 
-    assert.strictEqual(text.word, 'running');
+    assert.strictEqual(text.word, 'checks running');
 
     assert.strictEqual(
       text.title,
@@ -86,15 +88,31 @@ describe(codeOwnerBadgeText, () => {
 });
 
 describe(setAsideBadgeText, () => {
-  test('greys a record that no longer applies', () => {
-    assert.strictEqual(
-      setAsideBadgeText({ reason: 'checks failed', applies: false }).tone,
-      'neutral',
-    );
+  test('names the reason, and greys a record that no longer applies', () => {
+    const was = setAsideBadgeText({ reason: 'checks-failed', applies: false });
 
-    assert.strictEqual(
-      setAsideBadgeText({ reason: 'checks failed', applies: true }).tone,
-      'serious',
+    assert.strictEqual(was.tone, 'neutral');
+
+    assert.strictEqual(was.word, 'was set aside: checks failed');
+
+    const is = setAsideBadgeText({ reason: 'checks-failed', applies: true });
+
+    assert.strictEqual(is.tone, 'critical');
+
+    assert.strictEqual(is.word, 'set aside: checks failed');
+  });
+});
+
+describe(autoMergeBadgeText, () => {
+  test('says both states, neither in a status colour', () => {
+    assert.deepStrictEqual(
+      [autoMergeBadgeText(true), autoMergeBadgeText(false)].map(
+        ({ tone, glyph, word }) => [tone, glyph, word],
+      ),
+      [
+        ['plain', '⇥', 'auto-merge on'],
+        ['quiet', '⊘', 'auto-merge off'],
+      ],
     );
   });
 });

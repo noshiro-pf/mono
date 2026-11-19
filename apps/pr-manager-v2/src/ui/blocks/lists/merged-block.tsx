@@ -130,65 +130,62 @@ const MergedRow = ({
   now: InitializedObservable<number>;
 }>): JSX.Element => (
   <li class={constant('row')}>
-    <span class={constant('merged-mark')} title={constant('merged')}>
-      {constant('⮑')}
-    </span>
-    <span class={constant('row-main')}>
-      <span>
-        <span class={constant('card-number')}>
-          {pr.pipe(map(({ number }) => `#${number} `))}
-        </span>
-        <ExternalLink
-          class={constant('row-title')}
-          href={pr.pipe(map(({ url }) => url))}
-        >
-          {pr.pipe(map(({ title }) => title))}
-        </ExternalLink>
+    <div class={constant('row-heading')}>
+      <span class={constant('card-number')}>
+        {pr.pipe(map(({ number }) => `#${number}`))}
       </span>
-      <span class={constant('row-meta')}>
-        {pr.pipe(
-          map(
-            ({ author, headRef, baseRef }) =>
-              `${author} · ${headRef} → ${baseRef} · `,
-          ),
-        )}
+      <ExternalLink
+        class={constant('row-title')}
+        href={pr.pipe(map(({ url }) => url))}
+      >
+        {pr.pipe(map(({ title }) => title))}
+      </ExternalLink>
+    </div>
+    <div class={constant('row-meta')}>
+      <span>
         <Age
           at={pr.pipe(map(({ mergedAt }) => instantMsOf(mergedAt)))}
           now={now}
           prefix={'merged '}
         />
+        {pr.pipe(map(({ author }) => ` by ${author}`))}
+      </span>
+      <span class={constant('branch')}>
+        <span aria-hidden={constant('true')}>{constant('⎇ ')}</span>
+        {pr.pipe(map(({ headRef }) => headRef))}
       </span>
       <If
         cond={pr.pipe(
-          map(
-            ({ labels, closingIssues }) =>
-              Arr.isNonEmpty(labels) || Arr.isNonEmpty(closingIssues),
-          ),
+          map(({ closingIssues }) => Arr.isNonEmpty(closingIssues)),
         )}
         then={
-          <span class={constant('row-meta')}>
+          <span class={constant('linked-issues')}>
+            {constant('closes ')}
             <For
               items={pr.pipe(map(({ closingIssues }) => closingIssues))}
               key={(n) => n}
             >
-              {(n$) => (
-                <ExternalLink
-                  href={n$.pipe(map((n) => `${repoUrl(repo)}/issues/${n}`))}
-                >
-                  {n$.pipe(map((n) => `closed #${n}`))}
-                </ExternalLink>
+              {(n$, index$) => (
+                <>
+                  {index$.pipe(map((index) => (index === 0 ? '' : ', ')))}
+                  <ExternalLink
+                    href={n$.pipe(map((n) => `${repoUrl(repo)}/issues/${n}`))}
+                  >
+                    {n$.pipe(map((n) => `#${n}`))}
+                  </ExternalLink>
+                </>
               )}
-            </For>
-            <For
-              items={pr.pipe(map(({ labels }) => labels))}
-              key={({ name }) => name}
-            >
-              {(label$) => <LabelChip label={label$} />}
             </For>
           </span>
         }
       />
-    </span>
+      <For
+        items={pr.pipe(map(({ labels }) => labels))}
+        key={({ name }) => name}
+      >
+        {(label$) => <LabelChip label={label$} />}
+      </For>
+    </div>
   </li>
 );
 

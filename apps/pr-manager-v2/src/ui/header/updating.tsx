@@ -17,6 +17,6 @@ export const Updating = ({
   >
     <span class={constant('spinner')} />
 
-    <span class={constant('updating-word')}>{constant(' Updating…')}</span>
+    <span class={constant('updating-word')}>{constant('Updating…')}</span>
   </span>
 );

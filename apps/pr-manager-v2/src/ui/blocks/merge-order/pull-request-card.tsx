@@ -162,60 +162,55 @@ export const PullRequestCard = ({
         map(({ closingIssues }) => Arr.isNonEmpty(closingIssues)),
       )}
       then={
-        <ul class={constant('card-list')}>
+        <div class={constant('card-row linked-issues')}>
+          {constant('closes ')}
           <For
             items={card.pipe(map(({ closingIssues }) => closingIssues))}
             key={({ number }) => number}
           >
-            {(issue$) => (
-              <li>
-                <span
-                  class={constant('issue-state')}
-                  data-state={issue$.pipe(map(({ state }) => state))}
+            {(issue$, index$) => (
+              <>
+                {index$.pipe(map(separator))}
+                <ExternalLink
+                  state={issue$.pipe(map(({ state }) => state))}
+                  href={issue$.pipe(map(({ url }) => url))}
                   title={issue$.pipe(map(({ state }) => `issue ${state}`))}
                 >
-                  {issue$.pipe(
-                    map(({ state }) =>
-                      state === 'open' ? '◯' : state === 'closed' ? '✓' : '?',
-                    ),
-                  )}
-                </span>
-                {constant(' closes ')}
-                <ExternalLink href={issue$.pipe(map(({ url }) => url))}>
-                  {issue$.pipe(
-                    map(({ number, title }) => `#${number} ${title}`),
-                  )}
+                  {issue$.pipe(map(({ number }) => `#${number}`))}
                 </ExternalLink>
-              </li>
+                {issue$.pipe(
+                  map(({ title }) => (title === '' ? '' : ` ${title}`)),
+                )}
+              </>
             )}
           </For>
-        </ul>
+        </div>
       }
     />
 
     <If
       cond={card.pipe(map(({ sessions }) => Arr.isNonEmpty(sessions)))}
       then={
-        <ul class={constant('card-list')}>
+        <div class={constant('card-row sessions')}>
+          {constant('Claude Code ')}
           <For
             items={card.pipe(map(({ sessions }) => sessions))}
             key={({ url }) => url}
           >
-            {(session$) => (
-              <li class={constant('session')}>
-                <span class={constant('muted')}>
-                  {constant('Claude Code ')}
-                </span>
+            {(session$, index$) => (
+              <>
+                {index$.pipe(map(separator))}
                 <ExternalLink
+                  class={constant('session')}
                   href={session$.pipe(map(({ url }) => url))}
                   title={session$.pipe(map(({ url }) => url))}
                 >
                   {session$.pipe(map(({ title, url }) => title ?? url))}
                 </ExternalLink>
-              </li>
+              </>
             )}
           </For>
-        </ul>
+        </div>
       }
     />
 
@@ -224,13 +219,20 @@ export const PullRequestCard = ({
         class={constant('branch')}
         title={constant('head branch → base branch')}
       >
-        {card.pipe(map(({ headRef, baseRef }) => `${headRef} → ${baseRef}`))}
+        <span aria-hidden={constant('true')}>{constant('⎇ ')}</span>
+        {card.pipe(map(({ headRef }) => headRef))}
+        <span aria-hidden={constant('true')} class={constant('branch-base')}>
+          {constant(' → ')}
+        </span>
+        <span class={constant('branch-base')}>
+          {card.pipe(map(({ baseRef }) => baseRef))}
+        </span>
       </span>
       <If
         cond={card.pipe(map(({ stackedOn }) => stackedOn !== undefined))}
         then={
           <span
-            class={constant('note')}
+            class={constant('stacked-on')}
             title={card.pipe(
               map(
                 ({ stackedOn }) =>
@@ -242,29 +244,26 @@ export const PullRequestCard = ({
           </span>
         }
       />
-      <Divergence
-        comparison={card.pipe(map(({ comparison }) => comparison))}
-        scaleMax={scaleMax}
-      />
-    </div>
-
-    <If
-      cond={card.pipe(map((c) => waitsText(c) !== ''))}
-      then={
-        <div class={constant('card-row')}>
+      <If
+        cond={card.pipe(map((c) => waitsText(c) !== ''))}
+        then={
           <span
-            class={constant('note')}
+            class={constant('stacked-on')}
             title={constant(
               'Merge-After: lines in its description, and the Start-After: of the issues it closes, which it inherits as a merge order. An open issue no pull request closes is not done yet.',
             )}
           >
             {card.pipe(map(waitsText))}
           </span>
-        </div>
-      }
-    />
+        }
+      />
+      <Divergence
+        comparison={card.pipe(map(({ comparison }) => comparison))}
+        scaleMax={scaleMax}
+      />
+    </div>
 
-    <div class={constant('card-row muted')}>
+    <div class={constant('card-row')}>
       <If
         cond={card.pipe(map(({ pushedAtMs }) => pushedAtMs !== undefined))}
         then={
@@ -283,7 +282,12 @@ export const PullRequestCard = ({
     </div>
 
     <If
-      cond={card.pipe(map(({ labels }) => Arr.isNonEmpty(labels)))}
+      cond={card.pipe(
+        map(
+          ({ labels, checks }) =>
+            Arr.isNonEmpty(labels) || failedNamesText(checks) !== '',
+        ),
+      )}
       then={
         <div class={constant('card-row')}>
           <For
@@ -292,11 +296,34 @@ export const PullRequestCard = ({
           >
             {(label$) => <LabelChip label={label$} />}
           </For>
+          <span
+            class={card.pipe(
+              map(({ checks }) =>
+                checks.kind === 'counts' && checks.verdict === 'paused'
+                  ? 'stale-checks'
+                  : 'failed-checks',
+              ),
+            )}
+          >
+            {card.pipe(map(({ checks }) => failedNamesText(checks)))}
+          </span>
         </div>
       }
     />
   </article>
 );
+
+/** Between two items of a list written as a sentence. */
+const separator = (index: number): string => (index === 0 ? '' : ', ');
+
+/**
+ * The red checks by name: `failed: lint, e2e`, or, while the checks wait for
+ * the queue, `stale red: …` for an earlier round's; empty when none is red.
+ */
+const failedNamesText = (checks: MergeOrderCard['checks']): string =>
+  checks.kind !== 'counts' || Arr.isEmpty(checks.failed)
+    ? ''
+    : (`${checks.verdict === 'paused' ? 'stale red' : 'failed'}: ${checks.failed.join(', ')}` as const);
 
 /**
  * `after #3801, #3802 (Start-After) · #3790 (issue) not done`: what it waits

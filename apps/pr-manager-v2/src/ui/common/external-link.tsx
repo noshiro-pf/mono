@@ -5,12 +5,15 @@ type Props = Readonly<{
   children: Child;
   class?: Bindable<string>;
   title?: Bindable<string>;
+  /** A state the link is drawn by: an issue's `open` or `closed`. */
+  state?: Bindable<string>;
 }>;
 
 /** A link to GitHub, opened in a new tab. */
 export const ExternalLink = (props: Props): JSX.Element => (
   <a
     class={props.class}
+    data-state={props.state}
     href={props.href}
     rel={constant('noreferrer')}
     target={constant('_blank')}

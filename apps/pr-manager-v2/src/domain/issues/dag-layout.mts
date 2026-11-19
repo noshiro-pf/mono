@@ -12,9 +12,15 @@ export type DagLayout = Readonly<{
   freeCaptionY: number | undefined;
 }>;
 
-export const NODE_WIDTH = 200;
+export const NODE_WIDTH = 208;
 
-export const NODE_HEIGHT = 60;
+export const NODE_HEIGHT = 44;
+
+/**
+ * The number and tier pills sit centred on a node's top edge, half of them
+ * above it, in the gap the layout keeps between rows.
+ */
+export const PILL_HEIGHT = 14;
 
 /**
  * A layered layout read left to right: each connected part apart, the largest
@@ -164,15 +170,16 @@ export const bestFreeColumns = (
   }).columns;
 };
 
-const GAP_X = 72;
+const GAP_X = 64;
 
 const CELL_WIDTH = NODE_WIDTH + GAP_X;
 
-const GAP_Y = 20;
+const GAP_Y = 14;
 
-const PART_GAP = 40;
+const PART_GAP = 32;
 
-const CAPTION_HEIGHT = 28;
+/** The caption over the free nodes, clear of the pills over their tops. */
+const CAPTION_HEIGHT = 24 + PILL_HEIGHT / 2;
 
 const SWEEPS = 4;
 

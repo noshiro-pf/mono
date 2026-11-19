@@ -29,6 +29,10 @@ type Props = Readonly<{
   view: InitializedObservable<Ready>;
   store: IssuesStore;
   now: InitializedObservable<number>;
+  /** The List | DAG switch, drawn at the head beside the zoom. */
+  viewSwitch: () => JSX.Element;
+  /** The counts both views lead with. */
+  tiles: () => JSX.Element;
 }>;
 
 /**
@@ -36,7 +40,13 @@ type Props = Readonly<{
  * §11.3), in a box that scrolls over it at the zoom chosen above it. The
  * `viewBox` stays the layout's; what is scaled is the size the SVG takes.
  */
-export const IssueDag = ({ view, store, now }: Props): JSX.Element => {
+export const IssueDag = ({
+  view,
+  store,
+  now,
+  viewSwitch,
+  tiles,
+}: Props): JSX.Element => {
   const [box, setBox] = createState({ width: 0, height: 0 });
 
   const mut_scroller: { element: HTMLElement | undefined } = {
@@ -129,63 +139,84 @@ export const IssueDag = ({ view, store, now }: Props): JSX.Element => {
 
   return (
     <div class={constant('dag')}>
-      <div
-        class={constant('dag-zoom')}
-        role={constant('group')}
-        aria-label={constant('Zoom')}
-      >
-        <button
-          aria-label={constant('Zoom out')}
-          class={constant('button')}
-          type={constant('button')}
-          onClick={() => {
-            zoomTo({
-              kind: 'scale',
-              scale: zoomOutFrom(Optional.unwrap(drawn.getSnapshot()).scale),
-            });
-          }}
-        >
-          {constant('−')}
-        </button>
-        <span class={constant('dag-scale')}>
-          {drawn.pipe(map(({ scale }) => `${Math.round(scale * 100)}%`))}
-        </span>
-        <button
-          aria-label={constant('Zoom in')}
-          class={constant('button')}
-          type={constant('button')}
-          onClick={() => {
-            zoomTo({
-              kind: 'scale',
-              scale: zoomInFrom(Optional.unwrap(drawn.getSnapshot()).scale),
-            });
-          }}
-        >
-          {constant('+')}
-        </button>
-        <button
-          aria-pressed={store.zoom.pipe(map((z) => z.kind === 'fit'))}
-          class={constant('button')}
-          title={constant(
-            'Draw it all in the box, never above 100%, following the box as it resizes; the nodes with no edge are laid out to draw the graph largest.',
-          )}
-          type={constant('button')}
-          onClick={() => {
-            zoomTo({ kind: 'fit' });
-          }}
-        >
-          {constant('Fit')}
-        </button>
-        <button
-          class={constant('button')}
-          type={constant('button')}
-          onClick={() => {
-            zoomTo(NATURAL_ZOOM);
-          }}
-        >
-          {constant('100%')}
-        </button>
+      <div class={constant('issues-toolbar')}>
+        {viewSwitch()}
+
+        <div class={constant('dag-zoom')}>
+          <div
+            aria-label={constant('Zoom')}
+            class={constant('segmented')}
+            role={constant('group')}
+          >
+            <button
+              aria-label={constant('Zoom out')}
+              class={constant('segment')}
+              type={constant('button')}
+              onClick={() => {
+                zoomTo({
+                  kind: 'scale',
+                  scale: zoomOutFrom(
+                    Optional.unwrap(drawn.getSnapshot()).scale,
+                  ),
+                });
+              }}
+            >
+              {constant('−')}
+            </button>
+            <span class={constant('dag-scale')}>
+              {drawn.pipe(map(({ scale }) => `${Math.round(scale * 100)}%`))}
+            </span>
+            <button
+              aria-label={constant('Zoom in')}
+              class={constant('segment')}
+              type={constant('button')}
+              onClick={() => {
+                zoomTo({
+                  kind: 'scale',
+                  scale: zoomInFrom(Optional.unwrap(drawn.getSnapshot()).scale),
+                });
+              }}
+            >
+              {constant('+')}
+            </button>
+          </div>
+          <div
+            aria-label={constant('Size')}
+            class={constant('segmented')}
+            role={constant('group')}
+          >
+            <button
+              aria-pressed={store.zoom.pipe(map((z) => z.kind === 'fit'))}
+              class={constant('segment')}
+              title={constant(
+                'Draw it all in the box, never above 100%, following the box as it resizes; the nodes with no edge are laid out to draw the graph largest.',
+              )}
+              type={constant('button')}
+              onClick={() => {
+                zoomTo({ kind: 'fit' });
+              }}
+            >
+              {constant('Fit')}
+            </button>
+            <button
+              aria-pressed={store.zoom.pipe(
+                map((z) => z.kind === 'scale' && z.scale === 1),
+              )}
+              class={constant('segment')}
+              type={constant('button')}
+              onClick={() => {
+                zoomTo(NATURAL_ZOOM);
+              }}
+            >
+              {constant('100%')}
+            </button>
+          </div>
+        </div>
       </div>
+
+      {tiles()}
+
+      <DagLegend />
 
       <If
         cond={graph.pipe(map(({ nodes }) => Arr.isEmpty(nodes)))}
@@ -267,8 +298,6 @@ export const IssueDag = ({ view, store, now }: Props): JSX.Element => {
           </For>
         </svg>
       </div>
-
-      <DagLegend />
     </div>
   );
 };

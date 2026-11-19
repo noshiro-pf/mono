@@ -54,29 +54,11 @@ export const issuesBlock = (
           {constant('on GitHub')}
         </ExternalLink>
         <ExternalLink
-          class={constant('on-github')}
+          class={constant('title-action')}
           href={constant(`${repoUrl(repo)}/issues/new`)}
         >
           {constant('New issue')}
         </ExternalLink>
-        <div
-          aria-label={constant('View')}
-          class={constant('segmented')}
-          role={constant('group')}
-        >
-          {VIEWS.map(([view, name]) => (
-            <button
-              aria-pressed={store.settings.pipe(map((s) => s.view === view))}
-              class={constant('segment')}
-              type={constant('button')}
-              onClick={() => {
-                store.update((prev) => ({ ...prev, view }));
-              }}
-            >
-              {constant(name)}
-            </button>
-          ))}
-        </div>
       </>
     ),
     body: () => (
@@ -110,6 +92,61 @@ const IssuesBody = ({
 }>): JSX.Element => {
   const isDag = store.settings.pipe(map((s) => s.view === 'dag'));
 
+  // The view a press of the switch has just drawn: its own switch, made anew,
+  // takes the focus the pressed button had, which went with the other view.
+  const mut_pressed: { view: IssuesView | undefined } = { view: undefined };
+
+  // Each view draws these at its head, the DAG with its zoom beside the switch.
+  const viewSwitch = (): JSX.Element => (
+    <div
+      aria-label={constant('View')}
+      class={constant('segmented')}
+      role={constant('group')}
+    >
+      {VIEWS.map(([shown, name]) => (
+        <button
+          ref={(button) => {
+            if (mut_pressed.view !== shown) {
+              return;
+            }
+
+            mut_pressed.view = undefined;
+
+            queueMicrotask(() => {
+              button.focus();
+            });
+          }}
+          aria-pressed={store.settings.pipe(map((s) => s.view === shown))}
+          class={constant('segment')}
+          type={constant('button')}
+          onClick={() => {
+            if (Optional.unwrap(store.settings.getSnapshot()).view !== shown) {
+              mut_pressed.view = shown;
+            }
+
+            store.update((prev) => ({ ...prev, view: shown }));
+          }}
+        >
+          {constant(name)}
+        </button>
+      ))}
+    </div>
+  );
+
+  const tiles = (): JSX.Element => (
+    <IssueTiles
+      counts={view.pipe(
+        map((v) =>
+          Optional.unwrap(store.settings.getSnapshot()).view === 'dag'
+            ? v.dagCounts
+            : v.listCounts,
+        ),
+      )}
+      settings={store.settings}
+      update={store.update}
+    />
+  );
+
   return (
     <div class={constant('issues')}>
       <If
@@ -123,21 +160,26 @@ const IssuesBody = ({
         }
       />
       <FailuresNotice failures={view.pipe(map(({ failures }) => failures))} />
-      <IssueTiles
-        counts={view.pipe(
-          map((v) =>
-            Optional.unwrap(store.settings.getSnapshot()).view === 'dag'
-              ? v.dagCounts
-              : v.listCounts,
-          ),
-        )}
-        settings={store.settings}
-        update={store.update}
-      />
       <If
         cond={isDag}
-        then={<IssueDag now={now} store={store} view={view} />}
-        else={<IssueList now={now} store={store} view={view} />}
+        then={
+          <IssueDag
+            now={now}
+            store={store}
+            tiles={tiles}
+            view={view}
+            viewSwitch={viewSwitch}
+          />
+        }
+        else={
+          <IssueList
+            now={now}
+            store={store}
+            tiles={tiles}
+            view={view}
+            viewSwitch={viewSwitch}
+          />
+        }
       />
     </div>
   );
