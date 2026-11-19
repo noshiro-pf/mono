@@ -231,6 +231,11 @@ const COPIES = [
         reason:
           'React 16 and 17 have no useInsertionEffect; compat falls back to useLayoutEffect.',
       },
+      'src/use-observable-effect.mts': {
+        kind: 'differs',
+        reason:
+          'Its JSDoc says what React 16.8 and 17 do with a value an earlier layout effect of the same commit emits, which src/react-version-hooks.mts brings about.',
+      },
       'src/use-observable-value.mts': {
         kind: 'differs',
         reason:
