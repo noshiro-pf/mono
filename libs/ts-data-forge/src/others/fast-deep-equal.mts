@@ -12,7 +12,8 @@ import { hasKey, isRecord } from '../guard/index.mjs';
  * The fastest deep equal with ES6 Map, Set and Typed arrays support.
  * Checks equality of Date and RegExp objects by value.
  *
- * Forked from https://github.com/epoberezkin/fast-deep-equal/blob/v3.1.3/src/index.jst
+ * Forked from https://github.com/epoberezkin/fast-deep-equal/blob/v3.1.3/src/index.jst;
+ * its license ships as third-party/fast-deep-equal/LICENSE.txt
  */
 export const fastDeepEqual = <T,>(a: T, b: T): boolean => {
   if (a === b) {
