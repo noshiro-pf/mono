@@ -1,5 +1,22 @@
 # cant-stop-probability
 
+## 0.0.44
+
+### Patch Changes
+
+- Updated dependencies [44f8c67]
+- Updated dependencies [c533c1d]
+- Updated dependencies [72930f9]
+- Updated dependencies [95978fa]
+- Updated dependencies [82da4b7]
+- Updated dependencies [4ee8f8a]
+- Updated dependencies [eb9be0c]
+    - blueprint-synstate@0.13.0
+    - synstate-dom@0.13.1
+    - synstate@9.2.0
+    - ts-data-forge@15.1.1
+    - ts-fortress@13.0.2
+
 ## 0.0.43
 
 ### Patch Changes

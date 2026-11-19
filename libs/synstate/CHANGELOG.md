@@ -1,5 +1,39 @@
 # synstate
 
+## 9.2.0
+
+### Minor Changes
+
+- 72930f9: `switchMap` and `mergeMap` (and its alias `flatMap`), on an initialized source
+  with a projection that returns an initialized observable, give an
+  `InitializedObservable`: they project the value the source holds as soon as they
+  are created, so the result holds a value from the start. They gave a plain
+  `Observable`, so a consumer passed a fallback that was never used, or restated
+  the value with `withInitialValue`. A source that has already completed, such as
+  `just(x)`, is still not projected, so there the result completes holding no
+  value although its type says it holds one.
+
+### Patch Changes
+
+- 95978fa: The warning a write during an update prints, and the error thrown past 100
+  nested updates, now recommend deriving the value with `map` / `derive` rather
+  than `map` / `combine`, as the README and the documentation do.
+- 82da4b7: A `complete()` that a subscriber or a child calls on hearing a value an
+  observable's teardown emits no longer runs the teardowns again. With a custom
+  root or child whose teardown emitted each time, it ran them without end. The
+  teardowns registered with `onComplete` now each run once: one that throws stops
+  the rest, which a later `complete()` runs without repeating those that ran, and
+  one registered while they run runs too. Likewise a `complete()` called on
+  hearing a value `flush` emits no longer flushes again.
+- 4ee8f8a: Say in the documentation of `takeUntil` and `skipUntil` that a notifier which
+  completes without emitting ends them as an emission does: it completes
+  `takeUntil`, and ends `skipUntil`'s skipping, at once when it has completed
+  already. In RxJS such a notifier is ignored. The behavior is unchanged, and now
+  tested.
+- Updated dependencies [eb9be0c]
+    - ts-std-forge@0.6.1
+    - ts-data-forge@15.1.1
+
 ## 9.1.0
 
 ### Minor Changes

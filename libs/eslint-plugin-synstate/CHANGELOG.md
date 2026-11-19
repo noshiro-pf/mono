@@ -1,5 +1,33 @@
 # eslint-plugin-synstate
 
+## 0.8.0
+
+### Minor Changes
+
+- 839a0d8: eslint-plugin-synstate gains `no-aria-string-conversion`, which reports an
+  `aria-*` value whose last step is only a conversion to a string (`String(x)`,
+  `x.toString()`, `map(String)`, `x ? 'true' : 'false'`): synstate-dom writes a
+  boolean on an `aria-*` attribute as `"true"` or `"false"` and a number through
+  `String` itself. It is in the `synstate-dom` preset, and eslint-config-typed's
+  `eslintConfigForSynstateDom` turns it on.
+- 1bfcc20: eslint-plugin-synstate gains `no-unfocusable-focus-handler`, which reports
+  `onFocus` / `onBlur` on an intrinsic element that cannot take the focus itself
+  and suggests the bubbling `onFocusIn` / `onFocusOut`: synstate-dom binds the
+  DOM's `focus` and `blur` events, which do not bubble, so on a wrapper they never
+  run. It is for synstate-dom code alone, so it is not in `recommended` but in a
+  new `synstate-dom` preset (`eslintPluginSynstate.configs['synstate-dom']`).
+
+    eslint-config-typed's `eslintConfigForSynstateDom` turns it on, and
+    eslint-config-typed now depends on eslint-plugin-synstate, registered as
+    `synstate`.
+
+### Patch Changes
+
+- Updated dependencies [8c46d7d]
+- Updated dependencies [eb9be0c]
+    - eslint-rule-forge@0.13.0
+    - ts-std-forge@0.6.1
+
 ## 0.7.3
 
 ### Patch Changes

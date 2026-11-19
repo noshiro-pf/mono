@@ -1,5 +1,20 @@
 # synstate-react-hooks-compat
 
+## 9.2.0
+
+### Patch Changes
+
+- a5fbc07: Say in `useObservableEffect`'s JSDoc what the README says already: on React 16.8
+  and 17, a value emitted in the same commit by a layout effect React runs before
+  the hook's reaches the previous render's callback.
+- Updated dependencies [72930f9]
+- Updated dependencies [95978fa]
+- Updated dependencies [82da4b7]
+- Updated dependencies [4ee8f8a]
+- Updated dependencies [eb9be0c]
+    - synstate@9.2.0
+    - ts-data-forge@15.1.1
+
 ## 9.1.0
 
 ### Patch Changes

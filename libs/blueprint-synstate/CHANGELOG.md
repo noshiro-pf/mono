@@ -1,5 +1,29 @@
 # blueprint-synstate
 
+## 0.13.0
+
+### Minor Changes
+
+- 44f8c67: `NumericInput` keeps an input method's composition whole when its `value`
+  changes from outside meanwhile (by a linked control, or a reset from elsewhere):
+  the text follows the new value once the composition ends. It wrote the text at
+  once, which committed what was composed and started the rest as a new
+  composition, losing the text typed so far. `NumericInputView` takes
+  `onCompositionStart` and `onCompositionEnd`, called for the composition in its
+  input.
+
+### Patch Changes
+
+- Updated dependencies [c533c1d]
+- Updated dependencies [72930f9]
+- Updated dependencies [95978fa]
+- Updated dependencies [82da4b7]
+- Updated dependencies [4ee8f8a]
+- Updated dependencies [eb9be0c]
+    - synstate-dom@0.13.1
+    - synstate@9.2.0
+    - ts-data-forge@15.1.1
+
 ## 0.12.1
 
 ### Patch Changes

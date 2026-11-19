@@ -1,5 +1,13 @@
 # github-view-defaults-extension
 
+## 0.5.3
+
+### Patch Changes
+
+- Updated dependencies [eb9be0c]
+    - ts-data-forge@15.1.1
+    - split-view-link@0.0.6
+
 ## 0.5.2
 
 ### Patch Changes

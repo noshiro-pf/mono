@@ -1,5 +1,24 @@
 # synstate-dom
 
+## 0.13.1
+
+### Patch Changes
+
+- c533c1d: A range or number `<input>` whose `max` and `value` rise in one update draws the
+  new value: `{max: 200, value: 150}` then `{max: 400, value: 350}` drew 200 when
+  the observable bound to `value` was computed first. After a binding writes
+  `min`, `max`, `step` or `type` of an `<input>`, the bound `value` is written
+  again while the input still shows what the last write left and that differs from
+  the bound value; a value the user has changed since, a draft or an IME
+  composition, is kept.
+- Updated dependencies [72930f9]
+- Updated dependencies [95978fa]
+- Updated dependencies [82da4b7]
+- Updated dependencies [4ee8f8a]
+- Updated dependencies [eb9be0c]
+    - synstate@9.2.0
+    - ts-data-forge@15.1.1
+
 ## 0.13.0
 
 ### Minor Changes

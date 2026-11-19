@@ -1,5 +1,21 @@
 # eslint-plugin-ts-data-forge
 
+## 0.13.4
+
+### Patch Changes
+
+- 754fd0d: `prefer-canonical-array-slicing` no longer fixes a rewrite that would not
+  compile or would drop a comment. A literal count above 39 (`xs.slice(0, 100)` →
+  `Arr.take(xs, 100)`), which `Arr.skip`, `Arr.take`, `Arr.skipLast` and
+  `Arr.takeLast` do not take without `asUint32`, is reported without a fix; a call
+  holding a comment the rewrite has no place for (`xs.slice(/* header */ 2)`) is
+  reported with a suggestion instead. An array literal under a const assertion
+  (`[...xs, 1] as const`) is left alone: `as const` on the call does not compile.
+- Updated dependencies [8c46d7d]
+- Updated dependencies [eb9be0c]
+    - eslint-rule-forge@0.13.0
+    - ts-data-forge@15.1.1
+
 ## 0.13.3
 
 ### Patch Changes

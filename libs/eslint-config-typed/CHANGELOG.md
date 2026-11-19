@@ -1,5 +1,70 @@
 ## [5.8.4](https://github.com/noshiro-pf/eslint-config-typed/compare/v5.8.3...v5.8.4) (2026-08-09)
 
+## 7.16.0
+
+### Minor Changes
+
+- 839a0d8: eslint-plugin-synstate gains `no-aria-string-conversion`, which reports an
+  `aria-*` value whose last step is only a conversion to a string (`String(x)`,
+  `x.toString()`, `map(String)`, `x ? 'true' : 'false'`): synstate-dom writes a
+  boolean on an `aria-*` attribute as `"true"` or `"false"` and a number through
+  `String` itself. It is in the `synstate-dom` preset, and eslint-config-typed's
+  `eslintConfigForSynstateDom` turns it on.
+- 1bfcc20: eslint-plugin-synstate gains `no-unfocusable-focus-handler`, which reports
+  `onFocus` / `onBlur` on an intrinsic element that cannot take the focus itself
+  and suggests the bubbling `onFocusIn` / `onFocusOut`: synstate-dom binds the
+  DOM's `focus` and `blur` events, which do not bubble, so on a wrapper they never
+  run. It is for synstate-dom code alone, so it is not in `recommended` but in a
+  new `synstate-dom` preset (`eslintPluginSynstate.configs['synstate-dom']`).
+
+    eslint-config-typed's `eslintConfigForSynstateDom` turns it on, and
+    eslint-config-typed now depends on eslint-plugin-synstate, registered as
+    `synstate`.
+
+### Patch Changes
+
+- d0cb7aa: `prefer-assert-is-true-over-assert` and
+  `prefer-assert-is-false-over-assert-not-ok` fix `assert(X)`, `assert.isOk(X)`,
+  `assert.ok(X)`, `assert.isNotOk(X)` and `assert.notOk(X)` only when `X` is a
+  boolean at every layer of its type wrappers; any other operand is reported under
+  a message that asks for the assertion meant (`assert.isDefined(X)`,
+  `assert.isUndefined(X)`, …), since `assert.ok(X)` passes for any truthy `X` and
+  `assert.isTrue(X)` for `true` alone:
+  the rewrite of `assert(el)` with `el: T | undefined` made a passing test fail,
+  or one that did not compile.
+  `prefer-assert-is-false-over-negated-assert-is-true` and
+  `prefer-assert-is-true-over-negated-assert-is-false` report `assert.isTrue(!X)`
+  / `assert.isFalse(!X)` only when `X` is a boolean:
+  on any other, `!X` is already a strict boolean. The four rules read type
+  information now; without it (another parser, or no project) the first two write
+  no fix and report under the message that asks for the assertion meant, and the
+  negation rules report nothing, rather than throw. A call with no operand
+  (`assert.ok()`), which the type checker reports, is left alone.
+- 5052026: `no-expect-to-strict-equal` leaves `expect(x).toStrictEqual(y)` alone when
+  either side refers to Vitest's `expect`, or reads a member named `expect`, other
+  than to call it, as an asymmetric matcher does (`expect.any(Date)`,
+  `v.expect.arrayContaining([1])`, `ctx.expect.any(Date)`, a helper handed
+  `expect`): only `toStrictEqual` understands the matcher, and the rewrite to
+  `assert.deepStrictEqual` type-checked and failed. A call `expect(…)`, a property
+  key spelled `expect` and a binding that shadows it are still fixed.
+- Updated dependencies [d0cb7aa]
+- Updated dependencies [8c46d7d]
+- Updated dependencies [5052026]
+- Updated dependencies [290de0c]
+- Updated dependencies [7ead3ad]
+- Updated dependencies [839a0d8]
+- Updated dependencies [1bfcc20]
+- Updated dependencies [eb9be0c]
+    - eslint-plugin-vitest-coding-style@1.0.3
+    - eslint-rule-forge@0.13.0
+    - eslint-plugin-ts-restrictions@1.0.5
+    - eslint-plugin-synstate@0.8.0
+    - ts-data-forge@15.1.1
+    - eslint-plugin-immer-coding-style@1.0.3
+    - eslint-plugin-react-coding-style@1.0.3
+    - eslint-plugin-synstate-dom-a11y@1.0.3
+    - eslint-plugin-ts-ui-restrictions@1.0.4
+
 ## 7.15.0
 
 ### Minor Changes
