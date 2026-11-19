@@ -13,6 +13,8 @@ import {
 import type { QueueBlockView } from '../../../store/index.mjs';
 import { ExternalLink, FailuresNotice } from '../../common/index.mjs';
 import type { BlockView } from '../../layout/index.mjs';
+import { QueueLegend } from './queue-legend.js';
+import { QueueOutsideBox } from './queue-outside-box.js';
 import { QueueRow } from './queue-row.js';
 import './queue.css';
 
@@ -94,7 +96,7 @@ const QueueBody = ({
   view: InitializedObservable<QueueView>;
   failures: InitializedObservable<readonly ReadError[]>;
 }>): JSX.Element => (
-  <div class={constant('queue')}>
+  <div class={constant('queue-block')}>
     <FailuresNotice failures={failures} />
 
     <If
@@ -123,70 +125,28 @@ const QueueBody = ({
       else={<QueueRow view={view} />}
     />
 
-    <If
-      cond={view.pipe(map(({ outside }) => Arr.isNonEmpty(outside)))}
-      then={
-        <section class={constant('queue-outside')}>
-          <h3>{constant('Outside the queue')}</h3>
-          <ul>
-            <For
-              items={view.pipe(map(({ outside }) => outside))}
-              key={({ number }) => number}
-            >
-              {(item$) => (
-                <li title={item$.pipe(map(({ detail }) => detail))}>
-                  <ExternalLink href={item$.pipe(map(({ url }) => url))}>
-                    {item$.pipe(map(({ number }) => `#${number}`))}
-                  </ExternalLink>
-                  <span class={constant('queue-why')}>
-                    {item$.pipe(map(({ why }) => why))}
-                  </span>
-                  <span class={constant('muted')}>
-                    {item$.pipe(map(({ whose }) => `— ${whose}`))}
-                  </span>
-                  <span class={constant('queue-outside-title')}>
-                    {item$.pipe(map(({ title }) => title))}
-                  </span>
-                </li>
-              )}
-            </For>
-          </ul>
-        </section>
-      }
-    />
+    <div class={constant('queue-foot')}>
+      <If
+        cond={view.pipe(map(({ outside }) => Arr.isNonEmpty(outside)))}
+        then={
+          <div class={constant('queue-outside')}>
+            <span class={constant('queue-outside-label')}>
+              {constant('set aside')}
+            </span>
+            <ul class={constant('queue-outside-list')}>
+              <For
+                items={view.pipe(map(({ outside }) => outside))}
+                key={({ number }) => number}
+              >
+                {(item$) => <QueueOutsideBox item={item$} />}
+              </For>
+            </ul>
+          </div>
+        }
+      />
 
-    <ul aria-label={constant('Legend')} class={constant('queue-legend')}>
-      <li>
-        <span class={constant('spinner')} />
-        {constant(' running')}
-      </li>
-      <li>
-        <span class={constant('legend-box legend-waiting')} />
-        {constant(' waits for another pull request')}
-      </li>
-      <li>
-        <span class={constant('legend-box legend-ahead')} />
-        {constant(' checked ahead')}
-      </li>
-      <li>
-        <span aria-hidden={constant('true')}>{constant('⚑')}</span>
-        {constant(' only a ruleset bypass merges it')}
-      </li>
-      <li>
-        <span
-          class={constant('priority-pill')}
-          data-priority={constant('high')}
-        >
-          {constant('high')}
-        </span>
-        <span class={constant('priority-pill')} data-priority={constant('mid')}>
-          {constant('mid')}
-        </span>
-        <span class={constant('priority-pill')} data-priority={constant('low')}>
-          {constant('low')}
-        </span>
-      </li>
-    </ul>
+      <QueueLegend />
+    </div>
   </div>
 );
 
