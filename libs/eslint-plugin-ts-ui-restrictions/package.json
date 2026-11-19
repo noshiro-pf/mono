@@ -1,6 +1,6 @@
 {
   "name": "eslint-plugin-ts-ui-restrictions",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "private": false,
   "description": "ESLint rules for TypeScript UI code (DOM events, JSX) that eslint-config-typed enables, published on their own with few dependencies.",
   "keywords": [

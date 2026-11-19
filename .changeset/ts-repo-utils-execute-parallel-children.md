@@ -1,5 +1,0 @@
----
-'ts-repo-utils': patch
----
-
-`executeParallel` (and `executeStages`, `runCmdInParallelAcrossWorkspaces` and `runCmdInStagesAcrossWorkspaces`, built on it) fails fast as documented: on the first failure it stops the scripts still running and waits for them to exit before it rejects, instead of leaving them running after the command has reported the failure. A script killed by a signal now counts as failed rather than as exit code 0. A caller that catches the rejection is no longer ended by an unhandled rejection. Output is decoded as UTF-8 per stream, so a character split across two chunks is no longer printed as two U+FFFD, and Node's DEP0190 warning is no longer printed. A script is stopped with `SIGTERM` to it and every process it started, as `ps` lists them, and `SIGKILL` to what is left after 5 seconds, or up to about 9 when `ps` fails or does not answer (`taskkill /T /F` on Windows). When `ps` fails or does not answer within 2 seconds, or `taskkill` fails or does not answer within 30 seconds, what the scripts started may be left running, and a warning says so.

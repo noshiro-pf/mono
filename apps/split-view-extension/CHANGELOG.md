@@ -1,5 +1,22 @@
 # split-view-extension
 
+## 0.12.1
+
+### Patch Changes
+
+- 839a0d8: Pass booleans to `aria-expanded` and `aria-pressed` as they are, rather than
+  converted to `"true"` / `"false"` first; what the extension draws is the same.
+- Updated dependencies [c533c1d]
+- Updated dependencies [72930f9]
+- Updated dependencies [95978fa]
+- Updated dependencies [82da4b7]
+- Updated dependencies [4ee8f8a]
+- Updated dependencies [eb9be0c]
+    - synstate-dom@0.13.1
+    - synstate@9.2.0
+    - ts-data-forge@15.1.1
+    - split-view-link@0.0.6
+
 ## 0.12.0
 
 ### Minor Changes

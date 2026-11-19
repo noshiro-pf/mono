@@ -1,5 +1,23 @@
 # pr-merge-queue
 
+## 0.17.0
+
+### Minor Changes
+
+- 88db9bb: Exports `descriptionProblems`, which says why a description may not be posted
+  (what `pr-description check` refuses), with its `DescriptionKind`, and
+  `readConfig`, which reads `.github/unblock-prs.json`, so that a repository's own
+  checks can hold a pull request template to the shape `pr-description` accepts.
+- 7375a4e: The published declarations no longer import `node:util`, so a consumer without `@types/node` can compile against them with `skipLibCheck` off, given the `DOM` lib (TypeScript's default) for the `AbortSignal` that `pause` names. `parseCommandArgs` types its options and values with the package's own `CommandOption`, `CommandOptions` and `CommandValues`, which follow `util.parseArgs`, with three differences: the values are read-only, a flag's `default` must have the flag's type, with none for a `multiple` flag, and only a `multiple` flag may be typed as either `'string'` or `'boolean'`.
+
+### Patch Changes
+
+- 5de4465: `pr-report` no longer tells a run that has a token to set one when the REST rate limit is spent, and its help and documentation count at least four requests per open pull request, so an anonymous report fits fewer than fifteen.
+- Updated dependencies [b35e7e2]
+- Updated dependencies [eb9be0c]
+    - ts-repo-utils@11.0.2
+    - ts-data-forge@15.1.1
+
 ## 0.16.0
 
 ### Minor Changes

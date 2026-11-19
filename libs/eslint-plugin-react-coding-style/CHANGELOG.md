@@ -1,5 +1,14 @@
 # eslint-plugin-react-coding-style
 
+## 1.0.3
+
+### Patch Changes
+
+- Updated dependencies [8c46d7d]
+- Updated dependencies [eb9be0c]
+    - eslint-rule-forge@0.13.0
+    - ts-data-forge@15.1.1
+
 ## 1.0.2
 
 ### Patch Changes
