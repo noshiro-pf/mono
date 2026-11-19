@@ -1,10 +1,15 @@
 # lychee's configuration for `.github/workflows/link-check.yml`, which checks
-# the external URLs in the SynState docs. Links to this repository's own
-# files are `check:prose:mono-links`'s, which reads the tracked tree and needs
-# no network.
+# the external URLs in the docs sites and the SynState packages' Markdown.
+# Links to this repository's own files are `check:prose:mono-links`'s, which
+# reads the tracked tree and needs no network.
 
-# Only web URLs. The docs site's pages link to each other by route
-# (`/mono/synstate/…`, `../map/`), which are paths of the built site rather
+# Which files are read is the workflow's list alone, which
+# `check:prose:link-check-scope` holds to the scope, so nothing here narrows it
+# (no `exclude_path`): that would leave files unread with no check failing. A
+# URL is excluded below instead.
+
+# Only web URLs. The docs sites' pages link to each other by route
+# (`/mono/<site>/…`, `../map/`), which are paths of the built site rather
 # than of the tree; `root_dir` turns the root-relative ones into file paths,
 # and this drops every file path.
 scheme = ["https", "http"]
@@ -18,6 +23,13 @@ timeout = 30
 # 429 is a host asking for fewer requests, not saying the page is gone.
 accept = ["200..=299", "429"]
 
+# This repository's own Pages site (`https://noshiro-pf.github.io/mono/`) is
+# checked like any other host, since a docs site's page can move under a link
+# another site holds. A docs site's README links to its own deployed URL, which
+# answers 404 on the pull request that adds the site, until `deploy-pages.yml`
+# publishes it from `main` (it does so for the sites `pagesAstroSites` in
+# `tools/configs/pages-apps.mts` lists); the workflow holds no merge, so that
+# report is expected there and holds nothing.
 exclude = [
     # `check:prose:mono-links` resolves these against the tree. An issue or
     # pull request link here does not break.

@@ -49,7 +49,8 @@ import {
  * GitHub's slugs are its own and change with the heading.
  *
  * External URLs are not this check's business; `link-check.yml` runs lychee
- * over the same files on a schedule, where a site that is down for an hour
+ * over the Markdown and MDX of {@link SCOPE_PATTERN} (not the rest of the
+ * repository's Markdown) on a schedule, where a site that is down for an hour
  * fails nothing anyone has to merge.
  */
 export const checkMonoLinks = async (): Promise<
@@ -179,6 +180,25 @@ export const brokenReason = async (
     : undefined;
 };
 
+/**
+ * Whether the links of the tracked file at `relativePath` are read: the
+ * repository's own Markdown, and the files {@link isInScope} with a scanned
+ * extension.
+ */
+export const isScanned = (relativePath: string): boolean =>
+  isRepositoryProse(relativePath) ||
+  (isInScope(relativePath) &&
+    SCANNED_EXTENSIONS.has(path.extname(relativePath)));
+
+/**
+ * Whether `relativePath` is in {@link SCOPE_PATTERN}, changelogs aside: the
+ * files whose links are read besides the repository's own Markdown, and whose
+ * external ones `link-check.yml` checks.
+ */
+export const isInScope = (relativePath: string): boolean =>
+  SCOPE_PATTERN.test(relativePath) &&
+  path.basename(relativePath) !== 'CHANGELOG.md';
+
 export type MonoLink = Readonly<{
   /** 1-based. */
   line: number;
@@ -202,11 +222,13 @@ type CheckSummary = Readonly<{
 
 /**
  * The files whose absolute URLs are read besides the repository's own
- * Markdown: the SynState docs site and the SynState packages, whose code builds
- * links to source files.
+ * Markdown: the docs sites and the SynState packages, whose code builds links
+ * to source files. A docs site is matched by its directory's `-docs` suffix, so
+ * that a new one is read with no edit here. `link-check.yml` checks the external
+ * links of the same scope, held to it by `check:prose:link-check-scope`.
  */
-const SCOPE_PATTERN =
-  /^(?:apps\/synstate-docs|libs\/synstate[^/]*|libs\/eslint-plugin-synstate)\//u;
+export const SCOPE_PATTERN =
+  /^(?:apps\/[^/]+-docs|libs\/synstate[^/]*|libs\/eslint-plugin-synstate)\//u;
 
 /** The extensions worth reading. Everything else is binary. */
 const SCANNED_EXTENSIONS: ReadonlySet<string> = new Set<string>([
@@ -267,12 +289,6 @@ const DIGITS = /^\d+$/u;
 
 /** Prose punctuation that follows a bare URL rather than belonging to it. */
 const TRAILING_PUNCTUATION = /[.,;:!]+$/u;
-
-const isScanned = (relativePath: string): boolean =>
-  isRepositoryProse(relativePath) ||
-  (SCOPE_PATTERN.test(relativePath) &&
-    SCANNED_EXTENSIONS.has(path.extname(relativePath)) &&
-    path.basename(relativePath) !== 'CHANGELOG.md');
 
 const isTemplate = (target: string): boolean =>
   target.includes('{') || target.includes('$');
