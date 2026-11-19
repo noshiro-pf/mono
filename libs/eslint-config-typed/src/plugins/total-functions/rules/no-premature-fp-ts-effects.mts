@@ -1,5 +1,5 @@
 import { ESLintUtils } from '@typescript-eslint/utils';
-import { typeWrapperLayers } from 'eslint-rule-forge';
+import { typeHoldsAtSomeLayer } from 'eslint-rule-forge';
 import { Arr } from 'ts-data-forge';
 import { createRule } from './common.mjs';
 import { fpTsEffectType } from './fp-ts.mjs';
@@ -26,9 +26,8 @@ export const noPrematureFpTsEffects = createRule({
     defaultOptions: [],
   },
   create: (context) => {
-    const parserServices = ESLintUtils.getParserServices(context);
-
-    const checker = parserServices.program.getTypeChecker();
+    // Throws without type information, which the rule needs.
+    ESLintUtils.getParserServices(context);
 
     return {
       CallExpression: (node) => {
@@ -38,13 +37,10 @@ export const noPrematureFpTsEffects = createRule({
 
         // `(effect as () => void)()` still runs the effect, so the callee is an
         // effect if the type at any wrapper layer says so.
-        const isEffect = typeWrapperLayers(node.callee).some(
-          (layer) =>
-            fpTsEffectType(
-              checker.getTypeAtLocation(
-                parserServices.esTreeNodeToTSNodeMap.get(layer),
-              ),
-            ) !== undefined,
+        const isEffect = typeHoldsAtSomeLayer(
+          context.sourceCode,
+          node.callee,
+          (type) => fpTsEffectType(type) !== undefined,
         );
 
         if (!isEffect) {

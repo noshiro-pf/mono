@@ -101,6 +101,32 @@ export const typeHoldsAtEveryLayer = (
   node: TSESTree.Node,
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   holds: (type: ts.Type, typeChecker: ts.TypeChecker) => boolean,
+): boolean => typeHoldsAtLayers(sourceCode, node, holds, 'every');
+
+/**
+ * Whether `holds` is true of the type of some layer of type wrappers around
+ * `node` (see {@link typeWrapperLayers}); `false` without type information. A
+ * cast changes the type and not the value, so this is how to ask what the value
+ * may be: `b as unknown as number` is still a bigint, and `n!` may still be
+ * `undefined`. The counterpart of {@link typeHoldsAtEveryLayer}.
+ */
+export const typeHoldsAtSomeLayer = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  sourceCode: TSESLint.SourceCode,
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  node: TSESTree.Node,
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  holds: (type: ts.Type, typeChecker: ts.TypeChecker) => boolean,
+): boolean => typeHoldsAtLayers(sourceCode, node, holds, 'some');
+
+const typeHoldsAtLayers = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  sourceCode: TSESLint.SourceCode,
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  node: TSESTree.Node,
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  holds: (type: ts.Type, typeChecker: ts.TypeChecker) => boolean,
+  quantifier: 'every' | 'some',
 ): boolean => {
   const services = sourceCode.parserServices;
 
@@ -110,13 +136,20 @@ export const typeHoldsAtEveryLayer = (
     return false;
   }
 
-  return typeWrapperLayers(node).every((layer) => {
+  const holdsAt = (
+    // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+    layer: TSESTree.Node,
+  ): boolean => {
     const tsNode = services?.esTreeNodeToTSNodeMap?.get(layer);
 
     return (
       tsNode !== undefined && holds(checker.getTypeAtLocation(tsNode), checker)
     );
-  });
+  };
+
+  const layers = typeWrapperLayers(node);
+
+  return quantifier === 'every' ? layers.every(holdsAt) : layers.some(holdsAt);
 };
 
 const TYPE_WRAPPERS: ReadonlySet<AST_NODE_TYPES> = new Set<AST_NODE_TYPES>([

@@ -11,7 +11,7 @@ import {
   parenthesesDepth,
   skipTypeWrappers,
   typeHoldsAtEveryLayer,
-  typeWrapperLayers,
+  typeHoldsAtSomeLayer,
 } from 'eslint-rule-forge';
 import { Arr } from 'ts-data-forge';
 import * as ts from 'typescript';
@@ -781,38 +781,6 @@ const isNeverPositive = (
   }
 
   return type.isNumberLiteral() && type.value <= 0;
-};
-
-/**
- * Whether `holds` is true of the type of `node` at some layer of its type
- * wrappers: a cast changes the type, not the value (`b as unknown as number` is
- * still a bigint). Without type information it holds of nothing.
- *
- * It is eslint-rule-forge's `typeHoldsAtEveryLayer` with `some` for `every`,
- * written here because eslint-rule-forge has no such counterpart yet.
- */
-const typeHoldsAtSomeLayer = (
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  sourceCode: TSESLint.SourceCode,
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  node: TSESTree.Node,
-  holds: TypePredicate,
-): boolean => {
-  const services = sourceCode.parserServices;
-
-  const checker = services?.program?.getTypeChecker();
-
-  return (
-    checker !== undefined &&
-    typeWrapperLayers(node).some((layer) => {
-      const tsNode = services?.esTreeNodeToTSNodeMap?.get(layer);
-
-      return (
-        tsNode !== undefined &&
-        holds(checker.getTypeAtLocation(tsNode), checker)
-      );
-    })
-  );
 };
 
 const isWithin = (
