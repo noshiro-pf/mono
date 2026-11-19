@@ -12,21 +12,42 @@ export const verifyEmail = ({ fbFunctions }: FirebaseHandles) => {
   ): Promise<
     Result<
       'ng' | 'ok',
-      Readonly<{ type: 'not-found' | 'others' | 'type-error'; message: string }>
+      Readonly<{
+        type: VerifyEmailErrorType;
+        message: string;
+      }>
     >
   > =>
     Result.fromPromise(fbVerifyEmail({ eventId, email })).then((result) => {
       if (Result.isErr(result)) {
         const err = result.value;
 
-        if (
-          isRecord(err) &&
-          hasKeyValue(err, 'code', isString) &&
-          err.code === 'functions/not-found'
-        ) {
+        const code =
+          isRecord(err) && hasKeyValue(err, 'code', isString)
+            ? err.code
+            : undefined;
+
+        if (code === 'functions/not-found') {
           return Result.err({
             type: 'not-found' as const,
             message: `event of id "${eventId}" not-found`,
+          });
+        }
+
+        // Refused by the function: an event made signed in is checked only for
+        // its author, signed in, and one made signed out only so many times an
+        // hour.
+        if (code === 'functions/permission-denied') {
+          return Result.err({
+            type: 'permission-denied' as const,
+            message: unknownToString(err),
+          });
+        }
+
+        if (code === 'functions/resource-exhausted') {
+          return Result.err({
+            type: 'resource-exhausted' as const,
+            message: unknownToString(err),
           });
         }
 
@@ -48,3 +69,10 @@ export const verifyEmail = ({ fbFunctions }: FirebaseHandles) => {
       });
     });
 };
+
+export type VerifyEmailErrorType =
+  | 'not-found'
+  | 'others'
+  | 'permission-denied'
+  | 'resource-exhausted'
+  | 'type-error';

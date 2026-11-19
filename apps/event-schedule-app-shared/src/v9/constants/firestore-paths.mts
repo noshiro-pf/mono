@@ -11,6 +11,11 @@
  *   |     +-- deadlineMillis
  *   |     +-- claimId
  *   |
+ *   +-- internal/emailChecks
+ *   |     |
+ *   |     +-- windowStartMillis
+ *   |     +-- count
+ *   |
  *   +-- answers
  *         |
  *         +-- answer1
@@ -28,4 +33,7 @@ export const firestorePaths = {
   closingMail: 'closingMail',
   deadlineMillis: 'deadlineMillis',
   claimId: 'claimId',
+  emailChecks: 'emailChecks',
+  windowStartMillis: 'windowStartMillis',
+  count: 'count',
 } as const;

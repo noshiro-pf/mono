@@ -26,6 +26,8 @@
 //   "answers closed" mail was sent for. No rule matches it, so no client reads
 //   or writes it; do not move it into `internal/values`, which the author's
 //   write replaces whole.
+// - `internal/emailChecks` is the functions' count of `verifyEmail` checks of
+//   an event made signed out. No rule matches it either.
 
 rules_version = '2';
 

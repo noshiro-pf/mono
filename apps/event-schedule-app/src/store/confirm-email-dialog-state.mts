@@ -7,7 +7,7 @@ import {
 } from 'synstate';
 import { Optional, Result } from 'ts-data-forge';
 import type { StrictPick } from 'ts-type-forge';
-import type { Api } from '../api/index.mjs';
+import type { Api, VerifyEmailErrorType } from '../api/index.mjs';
 import { dict } from '../constants/index.mjs';
 import {
   confirmEmailDialogFormInitialState,
@@ -93,7 +93,12 @@ export const createConfirmEmailDialogStore = (
 
     const verifyEmailResult = await deps.api.event.verifyEmail(eventId, email);
 
-    if (Result.isErr(verifyEmailResult)) {
+    // A refusal is an answer the dialog explains, not a failure.
+    if (
+      Result.isErr(verifyEmailResult) &&
+      verifyEmailResult.value.type !== 'permission-denied' &&
+      verifyEmailResult.value.type !== 'resource-exhausted'
+    ) {
       console.error(verifyEmailResult.value);
     }
 
@@ -113,7 +118,11 @@ export const createConfirmEmailDialogStore = (
         payload: verifyEmailResult.value.message,
       });
 
-      showToast({ toast: deps.toast, message: dc.error, intent: 'danger' });
+      showToast({
+        toast: deps.toast,
+        message: verifyEmailErrorMessage(verifyEmailResult.value.type),
+        intent: 'danger',
+      });
 
       return;
     }
@@ -182,6 +191,24 @@ export const createConfirmEmailDialogStore = (
     resetInput,
     cancelClickHandler,
   } as const;
+};
+
+/** The toast for a check that did not answer whether the email matches. */
+export const verifyEmailErrorMessage = (type: VerifyEmailErrorType): string => {
+  const dc = dict.answerPage.eventInfo.verifyEmailDialog;
+
+  switch (type) {
+    case 'permission-denied':
+      return dc.notAuthor;
+
+    case 'resource-exhausted':
+      return dc.tooManyAttempts;
+
+    case 'not-found':
+    case 'others':
+    case 'type-error':
+      return dc.error;
+  }
 };
 
 export type ConfirmEmailDialog = Readonly<{
