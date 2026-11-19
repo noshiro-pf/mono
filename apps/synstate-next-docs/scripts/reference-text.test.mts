@@ -73,6 +73,83 @@ describe(extractJsdoc, () => {
   test('refuses a declaration with no JSDoc', () => {
     assert.isTrue(Result.isErr(extractJsdoc('export const f = 1;', 'f')));
   });
+
+  test.each([
+    [
+      '{@link X}',
+      'Returns a {@link Derived} at once.',
+      'Returns a `Derived` at once.',
+    ],
+    [
+      '{@link X text}',
+      'See {@link DerivedBehavior the behavior} first.',
+      'See `the behavior` first.',
+    ],
+    [
+      '{@link X | text}',
+      'See {@link DerivedBehavior | the behavior} first.',
+      'See `the behavior` first.',
+    ],
+    [
+      'a link that wraps',
+      'See {@link DerivedBehavior the\nbehavior} first.',
+      'See `the behavior` first.',
+    ],
+  ] as const)('writes %s as inline code', (_, line, embedded) => {
+    const result = extractJsdoc(jsdocOf(line.split('\n')), 'f');
+
+    assert.isTrue(Result.isOk(result));
+
+    assert.strictEqual(result.value, embedded);
+  });
+
+  test('reads a type, with its members and their JSDoc as a list', () => {
+    const result = extractJsdoc(
+      dedent`
+        /** What \`f\` gives. */
+        export type Context<A> = Readonly<{
+          /**
+           * Passes \`value\` on,
+           * once.
+           */
+          set: (value: A) => void;
+          /** Whether it ended; see {@link Context}. */
+          ended?: () => boolean;
+          undocumented: number;
+        }>;
+      `,
+      'Context',
+    );
+
+    assert.isTrue(Result.isOk(result));
+
+    assert.strictEqual(
+      result.value,
+      dedent`
+        What \`f\` gives.
+
+        - \`set\`: Passes \`value\` on, once.
+        - \`ended\` (optional): Whether it ended; see \`Context\`.
+      `,
+    );
+  });
+
+  test('refuses a member whose JSDoc the page cannot show as prose', () => {
+    assert.isTrue(
+      Result.isErr(
+        extractJsdoc(
+          dedent`
+            /** What \`f\` gives. */
+            export type Context = Readonly<{
+              /** Returns {x}. */
+              get: () => number;
+            }>;
+          `,
+          'Context',
+        ),
+      ),
+    );
+  });
 });
 
 describe(readDescription, () => {

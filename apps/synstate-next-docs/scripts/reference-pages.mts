@@ -6,7 +6,10 @@ import type { OperatorKindConditions } from './reference-text.mjs';
  * `src/content/docs/reference/<group>/<slug>.mdx` (and the same under `ja/`).
  * `gen:reference` fills each English page from the JSDoc of the exports it
  * lists (see `embed-reference.mts` for what is by hand), and fails on a public
- * export no page lists, so a new API cannot go without a page. Each page's code block is
+ * export no page lists, so a new API cannot go without a page. A page may also
+ * list an exported type, which it documents with its members: one that a
+ * function's argument or result is typed with and that its own page leaves to
+ * the type (`DerivedContext` on `createDerived`'s). Each page's code block is
  * `libs/synstate-next/samples/docs-site/reference/<slug>.mts`.
  */
 export const referencePages: readonly ReferencePage[] = [
@@ -42,10 +45,12 @@ export const referencePages: readonly ReferencePage[] = [
   ]),
   page('sources', 'timer', ['timer', 'sources/timer.mts']),
   page('sources', 'counter', ['counter', 'sources/timer.mts']),
-  page('sources', 'create-source', [
-    'createSource',
-    'sources/create-source.mts',
-  ]),
+  page(
+    'sources',
+    'create-source',
+    ['createSource', 'sources/create-source.mts'],
+    ['SourceContext', 'sources/create-source.mts'],
+  ),
   page('combining', 'derive', ['derive', 'operators/derive.mts']),
   page('combining', 'merge', ['merge', 'operators/derive.mts']),
   page('combining', 'zip', ['zip', 'operators/zip.mts']),
@@ -102,10 +107,13 @@ export const referencePages: readonly ReferencePage[] = [
   page('operators', 'audit', ['audit', 'operators/audit.mts']),
   page('operators', 'switch-map', ['switchMap', 'operators/switch-map.mts']),
   page('operators', 'merge-map', ['mergeMap', 'operators/merge-map.mts']),
-  page('operators', 'create-derived', [
-    'createDerived',
-    'operators/create-derived.mts',
-  ]),
+  page(
+    'operators',
+    'create-derived',
+    ['createDerived', 'operators/create-derived.mts'],
+    ['DerivedContext', 'operators/create-derived.mts'],
+    ['DerivedBehavior', 'operators/create-derived.mts'],
+  ),
   page('lifetime', 'batch', ['batch', 'core/scheduler.mts']),
   page(
     'lifetime',

@@ -5,7 +5,17 @@ description: 'Creates a source that emits by itself, from another library or an 
 
 {/* reference:jsdoc */}
 
+### `createSource`
+
 Creates a source that emits by itself, from another library or an event: a creator written outside the package. `setup` runs once, at creation. The source holds `initialValue` if given, and nothing until it first emits otherwise. It belongs to the current owner as every observable does. `setup` runs with the source as the current owner, so what it creates and the cleanups it registers (`ctx.onCleanup`, or `onCleanup`) belong to the source. Disposing it runs the cleanups, newest first, and then disposes what `setup` created, as an owner does. A cleanup is registered, not returned.
+
+### `SourceContext`
+
+What `createSource` gives the source it builds.
+
+- `emit`: Passes `value` on in an update of its own, after the one under way if any. Every value given is passed on, in order; nothing once it is disposed or has ended.
+- `end`: Says it will emit no more: it settles once its last value is passed on.
+- `onCleanup`: Registers `cleanup` to run when the source is disposed; at once if it is disposed already.
 
 {/* /reference */}
 

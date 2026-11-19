@@ -37,6 +37,8 @@ export const embedReference = async (): Promise<Result<undefined, string>> => {
 
   const exported = await publicExports();
 
+  const exportedTypes = await publicTypeExports();
+
   const listed = new Set(
     referencePages.flatMap((p) => p.exports.map(([name]) => name)),
   );
@@ -50,7 +52,7 @@ export const embedReference = async (): Promise<Result<undefined, string>> => {
   }
 
   for (const name of listed) {
-    if (!exported.has(name)) {
+    if (!exported.has(name) && !exportedTypes.has(name)) {
       mut_errors.push(
         `${name} is listed in scripts/reference-pages.mts but synstate-next does not export it.`,
       );
@@ -350,10 +352,14 @@ const fillIndex = async (
 };
 
 /**
- * The names `src/index.mts` exports as values: those it lists from
- * `./core/index.mjs` and those declared in the directories it re-exports.
+ * The names of `./core/index.mjs`'s list in `src/index.mts` that `fromCoreList`
+ * keeps, and those that `declared` matches in the files of the directories it
+ * re-exports.
  */
-const publicExports = async (): Promise<ReadonlySet<string>> => {
+const declaredInIndex = async (
+  fromCoreList: (name: string) => readonly string[],
+  declared: RegExp,
+): Promise<readonly string[]> => {
   // eslint-disable-next-line security/detect-non-literal-fs-filename
   const index = await fs.readFile(path.resolve(srcDir, 'index.mts'), 'utf8');
 
@@ -364,9 +370,10 @@ const publicExports = async (): Promise<ReadonlySet<string>> => {
   const coreNames = (coreList ?? '')
     .split(',')
     .map((s) => s.trim())
-    .filter((s) => s !== '' && !s.startsWith('type '));
+    .filter((s) => s !== '')
+    .flatMap(fromCoreList);
 
-  const mut_names = new Set(coreNames);
+  const mut_names: string[] = Array.from(coreNames);
 
   for (const match of index.matchAll(
     /export \* from '\.\/(\w+)\/index\.mjs';/gu,
@@ -385,16 +392,39 @@ const publicExports = async (): Promise<ReadonlySet<string>> => {
       // eslint-disable-next-line security/detect-non-literal-fs-filename
       const source = await fs.readFile(path.resolve(dir, file), 'utf8');
 
-      for (const declared of source.matchAll(
-        /^export (?:const|function|class) (\w+)/gmu,
-      )) {
-        mut_names.add(declared[1] ?? '');
+      for (const found of source.matchAll(declared)) {
+        mut_names.push(found[1] ?? '');
       }
     }
   }
 
   return mut_names;
 };
+
+/**
+ * The names `src/index.mts` exports as types: those it lists from
+ * `./core/index.mjs` with `type`, and those declared with `export type` in the
+ * directories it re-exports. A page may list one; none needs a page.
+ */
+const publicTypeExports = async (): Promise<ReadonlySet<string>> =>
+  new Set(
+    await declaredInIndex(
+      (name) => (name.startsWith('type ') ? [name.slice('type '.length)] : []),
+      /^export type (\w+)/gmu,
+    ),
+  );
+
+/**
+ * The names `src/index.mts` exports as values: those it lists from
+ * `./core/index.mjs` and those declared in the directories it re-exports.
+ */
+const publicExports = async (): Promise<ReadonlySet<string>> =>
+  new Set(
+    await declaredInIndex(
+      (name) => (name.startsWith('type ') ? [] : [name]),
+      /^export (?:const|function|class) (\w+)/gmu,
+    ),
+  );
 
 if (isDirectlyExecuted(import.meta.url)) {
   const result = await embedReference();

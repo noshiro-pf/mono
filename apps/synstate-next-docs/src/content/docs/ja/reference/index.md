@@ -29,7 +29,7 @@ description: synstate-next の公開 API を用途ごとに並べ、それぞれ
 - [`fromSubscribable`](/mono/synstate-next/ja/reference/sources/from-subscribable/): `subscribable` を追いかけ、値をそれぞれ `Result.ok(value)`、エラーを `Result.err(error)` として流します。
 - [`timer`](/mono/synstate-next/ja/reference/sources/timer/): 作られてから `milliseconds` 後に `0` を 1 回流し、決着します。
 - [`counter`](/mono/synstate-next/ja/reference/sources/counter/): 作られた次のタスクで `0` を流し（`emitInitial: false` なら 1 間隔後に `1`）、その後 `milliseconds` ごとに次の整数を流します。
-- [`createSource`](/mono/synstate-next/ja/reference/sources/create-source/): 他のライブラリやイベントから自分で値を流すソースを作ります。
+- [`createSource`, `SourceContext`](/mono/synstate-next/ja/reference/sources/create-source/): 他のライブラリやイベントから自分で値を流すソースを作ります。
 
 ## 組み合わせ
 
@@ -60,7 +60,7 @@ description: synstate-next の公開 API を用途ごとに並べ、それぞれ
 - [`audit`](/mono/synstate-next/ja/reference/operators/audit/): 値が来ると `milliseconds` 待ち、その時点の最新の値を独立した更新で流します。
 - [`switchMap`](/mono/synstate-next/ja/reference/operators/switch-map/): 最新の値に対して `project` が返す Observable を追いかけます。
 - [`mergeMap`](/mono/synstate-next/ja/reference/operators/merge-map/): `project` が返すすべての Observable を追いかけ、どれかが流した値を流します。
-- [`createDerived`](/mono/synstate-next/ja/reference/operators/create-derived/): `parents` を追いかける Observable を作ります。
+- [`createDerived`, `DerivedContext`, `DerivedBehavior`](/mono/synstate-next/ja/reference/operators/create-derived/): `parents` を追いかける Observable を作ります。
 
 ## 更新と寿命
 
