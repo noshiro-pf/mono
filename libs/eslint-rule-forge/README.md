@@ -27,6 +27,8 @@ dependencies.
 | :---------------------- | :-------------------------------------------------------------------------------------------------------------------- |
 | `isTypeWrapper`         | whether a node is one of the four                                                                                     |
 | `skipTypeWrappers`      | the expression inside every wrapper around a node: judge syntax on this                                               |
+| `outermostTypeWrapper`  | the node with every wrapper around it: where its value ends up (a call's argument, a member's object)                 |
+| `isCallee`              | whether a node is what a call calls, through the wrappers and an optional chain around it                             |
 | `typeWrapperLayers`     | the node and every expression inside its wrappers, outermost first: ask types of each                                 |
 | `TypeWrapper`           | the four node types                                                                                                   |
 | `isIdentifierNamed`     | whether a node, read through its wrappers, is the identifier of a given name                                          |
@@ -35,7 +37,9 @@ dependencies.
 
 All of them but `typeHoldsAtEveryLayer` and `typeHoldsAtSomeLayer` take a
 readonly (`DeepReadonly<TSESTree.Node>`) or a mutable node, and those that
-return a node give back the same kind.
+return a node give back the same kind, save `outermostTypeWrapper`, which
+returns a readonly one: a node's parent is typed apart from the node. Where a
+mutable one is needed, find it among `sourceCode.getAncestors(node)`.
 
 Judge syntax on what `skipTypeWrappers` returns, and write the fix from the
 original node, so that the wrapper is kept:

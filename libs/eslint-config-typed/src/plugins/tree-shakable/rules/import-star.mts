@@ -1,5 +1,5 @@
 import { type TSESLint, TSESTree } from '@typescript-eslint/utils';
-import { isTypeWrapper, type TypeWrapper } from 'eslint-rule-forge';
+import { outermostTypeWrapper } from 'eslint-rule-forge';
 import type { DeepReadonly } from 'ts-type-forge';
 
 type MessageIds = 'non-tree-shakable-access';
@@ -33,23 +33,16 @@ export const importStarRule: TSESLint.RuleModule<MessageIds> = {
 const getModuleSpecifier = (node: TSESTree.ImportNamespaceSpecifier): string =>
   node.parent.source.value;
 
-/** `node`, or the outermost of the type wrappers directly around it. */
-const outermostTypeWrapper = (
-  node: DeepReadonly<
-    TSESTree.Identifier | TSESTree.JSXIdentifier | TypeWrapper
-  >,
-): DeepReadonly<TSESTree.Identifier | TSESTree.JSXIdentifier | TypeWrapper> =>
-  isTypeWrapper(node.parent) ? outermostTypeWrapper(node.parent) : node;
-
 const isTreeShakingSafeReference = (
   identifier: DeepReadonly<TSESTree.Identifier | TSESTree.JSXIdentifier>,
 ): boolean => {
   // Only allow `id.foo` or `id["foo"]` references. A type wrapper is erased
   // before bundling, so `(id as T).foo` and `id!.foo` are `id.foo`.
   const { parent } = outermostTypeWrapper(identifier);
-  // if (parent === undefined) {
-  //   return false;
-  // }
+
+  if (parent === undefined) {
+    return false;
+  }
 
   switch (parent.type) {
     case TSESTree.AST_NODE_TYPES.MemberExpression: {

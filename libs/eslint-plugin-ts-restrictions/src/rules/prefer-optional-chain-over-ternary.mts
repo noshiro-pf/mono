@@ -10,6 +10,7 @@ import {
   createGetLayerTypes,
   isSameReference,
   isTypeWrapper,
+  outermostTypeWrapper,
   skipTypeWrappers,
 } from 'eslint-rule-forge';
 import { Arr } from 'ts-data-forge';
@@ -353,19 +354,6 @@ const firstLinkFrom = (
     ? firstLinkFrom(branch.expression, value)
     : firstLinkBelow(branch, value);
 
-/** `node`, or the outermost `!` / `as` / `satisfies` wrapped around it. */
-const outermostWrapperOf = (
-  node: DeepReadonly<TSESTree.Node>,
-): DeepReadonly<TSESTree.Node> => {
-  const { parent } = node;
-
-  return parent !== undefined &&
-    isTypeWrapper(parent) &&
-    parent.expression === node
-    ? outermostWrapperOf(parent)
-    : node;
-};
-
 /**
  * Whether the ternary sits where an optional chain means something else: as a
  * callee or a tag (the chain passes `this`), or under `delete`.
@@ -373,7 +361,7 @@ const outermostWrapperOf = (
 const changesMeaningAsChain = (
   node: DeepReadonly<TSESTree.ConditionalExpression>,
 ): boolean => {
-  const outer = outermostWrapperOf(node);
+  const outer = outermostTypeWrapper(node);
 
   const { parent } = outer;
 
