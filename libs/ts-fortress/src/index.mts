@@ -2,6 +2,7 @@ export * from './array/index.mjs';
 export * from './brand/index.mjs';
 export * from './compose/index.mjs';
 export * from './constraints/index.mjs';
+export * from './deep-merge.mjs';
 export * from './enum/index.mjs';
 export * from './json-schema/index.mjs';
 export * from './other-types/index.mjs';
