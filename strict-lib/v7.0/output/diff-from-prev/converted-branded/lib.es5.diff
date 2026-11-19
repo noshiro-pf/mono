@@ -1,8 +1,8 @@
 diff --git a/v6.0/output/lib-files-branded/lib.es5.d.ts b/v7.0/output/lib-files-branded/lib.es5.d.ts
-index 17277347c4d47d2fe00cbf273d0f85534dfc9725..80033922d90702f95fb6dbc76136c015c1ff18b3 100644
+index 65bf2917bba8bb0f8fe0fe9d6692f612609b878a..9b196df7c101cca8a179bf6ae11e04bc2322354c 100644
 --- a/v6.0/output/lib-files-branded/lib.es5.d.ts
 +++ b/v7.0/output/lib-files-branded/lib.es5.d.ts
-@@ -506,8 +506,8 @@ interface String {
+@@ -508,8 +508,8 @@ interface String {
    charAt(pos: NumberType.StringSizeArg): string;
  
    /**
@@ -13,7 +13,7 @@ index 17277347c4d47d2fe00cbf273d0f85534dfc9725..80033922d90702f95fb6dbc76136c015
     */
    charCodeAt(index: NumberType.StringSizeArg): number;
  
-@@ -682,7 +682,7 @@ interface Number {
+@@ -684,7 +684,7 @@ interface Number {
  
    /**
     * Returns a string representing a number in fixed-point notation.
@@ -22,7 +22,7 @@ index 17277347c4d47d2fe00cbf273d0f85534dfc9725..80033922d90702f95fb6dbc76136c015
     */
    toFixed(
      fractionDigits?: import('ts-type-forge').UintRangeInclusive<0, 100>,
-@@ -690,7 +690,7 @@ interface Number {
+@@ -692,7 +692,7 @@ interface Number {
  
    /**
     * Returns a string containing a number represented in exponential notation.
@@ -31,7 +31,7 @@ index 17277347c4d47d2fe00cbf273d0f85534dfc9725..80033922d90702f95fb6dbc76136c015
     */
    toExponential(
      fractionDigits?: import('ts-type-forge').UintRangeInclusive<0, 100>,
-@@ -698,7 +698,7 @@ interface Number {
+@@ -700,7 +700,7 @@ interface Number {
  
    /**
     * Returns a string containing a number represented either in exponential or fixed-point notation with a specified number of digits.

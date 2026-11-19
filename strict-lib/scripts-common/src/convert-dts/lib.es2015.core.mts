@@ -179,7 +179,9 @@ export const convertLibEs2015Core =
         replaceWithinInterface({
           name: 'ObjectConstructor',
           mapFn: composeMonoTypeFns(
-            // use the refined type definition in lib-files/lib.es5.d.ts
+            // Use the signature in lib.es5.d.ts, which takes any object. A
+            // parameter of type `{}` would also accept a primitive, as in
+            // `Object.keys(1)`.
             replaceWithNoMatchCheck(
               'keys(o: {}): readonly string[]',
               '// keys(o: {}): readonly string[]',

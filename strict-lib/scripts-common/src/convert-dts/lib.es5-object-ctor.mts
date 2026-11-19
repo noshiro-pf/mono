@@ -32,6 +32,21 @@ export const convertLibEs5_ObjectConstructor =
                 `,
               ),
             ),
+            // One signature for every object: a type `UnknownRecord` accepts,
+            // such as an object literal's, gets its keys, and any other object
+            // (an interface or a class that declares no string index signature,
+            // an array, a function, `object`) gets `string`. One signature
+            // rather than a fallback overload, so that a reference that does
+            // not call it, as in `records.map(Object.keys)`, still gets the
+            // keys: TypeScript reads an overload set there as its last
+            // signature. The condition is not distributive, so that an argument
+            // typed `any`, or by an unresolved import, gets the keys of a
+            // record as before rather than a union with `string`, and a union
+            // of records gets the keys of the union, as before. Known limit: in
+            // a generic function the condition stays unresolved, so
+            // `Object.keys(t)` with `t: T extends UnknownRecord` is an array of
+            // that condition rather than `ToObjectKeys<T>[]`; its elements are
+            // still strings, which is all a caller there can rely on.
             replaceWithNoMatchCheck(
               dedent`
                  */
@@ -43,7 +58,7 @@ export const convertLibEs5_ObjectConstructor =
                  * const ks = Object.keys({ x: 1, y: 2, z: '3', 3: 4 }); // ('3' | 'x' | 'y' | 'z' | (string & {}))[]
                  *
                  */
-                keys<const R extends UnknownRecord>(object: R): ${readonlyModifier}StrictLibInternals.ToObjectKeys<R>[];
+                keys<const R extends object>(object: R): ${readonlyModifier}([R] extends [UnknownRecord] ? StrictLibInternals.ToObjectKeys<R> : string)[];
               `,
             ),
           ),

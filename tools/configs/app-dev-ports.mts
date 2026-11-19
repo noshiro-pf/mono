@@ -1,5 +1,5 @@
 import * as path from 'node:path';
-import { hasKey, isRecord } from 'ts-data-forge';
+import { keyIsIn } from 'ts-data-forge';
 
 /**
  * The dev-server port for each app under `apps/`, in one place.
@@ -51,11 +51,11 @@ export const appDevPorts = {
 export const appDevPort = (packageRoot: string): number => {
   const name = path.basename(packageRoot);
 
-  if (!(isRecord(appDevPorts) && hasKey(appDevPorts, name))) {
+  if (!keyIsIn(name, appDevPorts)) {
     throw new Error(
       `appDevPort: no port for "${name}". Add it to tools/configs/app-dev-ports.mts.`,
     );
   }
 
-  return appDevPorts[name as keyof typeof appDevPorts];
+  return appDevPorts[name];
 };

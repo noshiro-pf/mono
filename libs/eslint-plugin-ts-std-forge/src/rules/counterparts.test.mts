@@ -2,7 +2,7 @@ import { tsDataForgeRules } from 'eslint-plugin-ts-data-forge';
 import { ruleFactoriesOf } from 'eslint-rule-forge';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import { hasKey } from 'ts-std-forge';
+import { keyIsIn } from 'ts-std-forge';
 import { tsStdForgeRules } from './rules.mjs';
 
 /**
@@ -69,11 +69,11 @@ const pairs = counterparts.flatMap(([own, counterpart]) =>
 test.each(pairs)(
   '%s is built by a factory its counterpart %s is built by too',
   (own, counterpart) => {
-    const ownRule = hasKey(tsStdForgeRules, own)
+    const ownRule = keyIsIn(own, tsStdForgeRules)
       ? tsStdForgeRules[own]
       : undefined;
 
-    const counterpartRule = hasKey(tsDataForgeRules, counterpart)
+    const counterpartRule = keyIsIn(counterpart, tsDataForgeRules)
       ? tsDataForgeRules[counterpart]
       : undefined;
 

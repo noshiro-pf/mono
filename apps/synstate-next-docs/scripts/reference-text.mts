@@ -1,4 +1,4 @@
-import type { Nodes, Root } from 'mdast';
+import type { Nodes, Parents, Root } from 'mdast';
 import { directiveFromMarkdown } from 'mdast-util-directive';
 import { fromMarkdown } from 'mdast-util-from-markdown';
 import { mdxFromMarkdown } from 'mdast-util-mdx';
@@ -338,6 +338,10 @@ const allowedInline: ReadonlySet<Nodes['type']> = new Set<Nodes['type']>([
   'textDirective',
 ]);
 
+/** Whether `node` is one of mdast's parents, the nodes that hold `children`. */
+const isParent = (node: DeepReadonly<Nodes>): node is DeepReadonly<Parents> =>
+  isRecord(node) && hasKey(node, 'children');
+
 const firstRefusedInline = (
   nodes: readonly DeepReadonly<Nodes>[],
 ): string | undefined => {
@@ -346,7 +350,7 @@ const firstRefusedInline = (
       return node.type;
     }
 
-    if (!isRecord(node) || !hasKey(node, 'children')) {
+    if (!isParent(node)) {
       continue;
     }
 
