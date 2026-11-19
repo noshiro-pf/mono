@@ -95,14 +95,108 @@ describe(createAnswerPageStore, () => {
     assert.deepStrictEqual(calls, ['update abc a-carol see you', 'refetch']);
   });
 
-  test('deleting removes the answer being edited', async () => {
-    const { store, calls } = setup(undefined);
+  test('deleting removes the answer being edited, and says so', async () => {
+    const { store, calls, toasts } = setup(undefined);
 
     store.onAnswerClick(answerOf(null, 'carol'));
 
     await store.onDeleteAnswerClick();
 
     assert.deepStrictEqual(calls, ['delete abc a-carol', 'refetch']);
+
+    await settle();
+
+    assert.deepStrictEqual(toasts.intents, ['success']);
+  });
+
+  describe('a write the database refuses', () => {
+    test('an add keeps the section and what was typed, and says it failed', async () => {
+      const { store, calls, toasts } = setup(undefined, true);
+
+      store.onAddAnswerButtonClick();
+
+      store.onUserNameChange(Answer.fill({ user: { name: 'dave' } }).user.name);
+
+      store.onCommentChange('a long comment the user typed');
+
+      await store.onSubmitAnswerClickPromise();
+
+      assert.strictEqual(
+        Optional.unwrap(store.answerBeingEditedSectionState$.getSnapshot()),
+        'creating',
+      );
+
+      const kept = Optional.unwrap(store.answerBeingEdited$.getSnapshot());
+
+      assert.strictEqual(kept.user.name, 'dave');
+
+      assert.strictEqual(kept.comment, 'a long comment the user typed');
+
+      assert.isFalse(
+        Optional.unwrap(store.submitButtonIsLoading$.getSnapshot()),
+      );
+
+      // The event is read again, so that a deadline passed meanwhile shows.
+      assert.deepStrictEqual(calls, ['add abc dave', 'refetch event']);
+
+      await settle();
+
+      assert.deepStrictEqual(toasts.intents, ['danger']);
+    });
+
+    test('an update keeps the answer being edited', async () => {
+      const { store, toasts } = setup(undefined, true);
+
+      store.onAnswerClick(answerOf(null, 'carol'));
+
+      store.onCommentChange('see you');
+
+      await store.onSubmitAnswerClickPromise();
+
+      assert.strictEqual(
+        Optional.unwrap(store.answerBeingEditedSectionState$.getSnapshot()),
+        'editing',
+      );
+
+      assert.strictEqual(
+        Optional.unwrap(store.answerBeingEdited$.getSnapshot()).comment,
+        'see you',
+      );
+
+      await settle();
+
+      assert.deepStrictEqual(toasts.intents, ['danger']);
+    });
+
+    test('answering later says it failed', async () => {
+      const { store, toasts } = setup(
+        { uid: 'u1', displayName: 'alice' },
+        true,
+      );
+
+      await store.onSubmitEmptyAnswerClick();
+
+      await settle();
+
+      assert.deepStrictEqual(toasts.intents, ['danger']);
+    });
+
+    test('a delete keeps the section and says it failed', async () => {
+      const { store, toasts } = setup(undefined, true);
+
+      store.onAnswerClick(answerOf(null, 'carol'));
+
+      await store.onDeleteAnswerClick();
+
+      assert.strictEqual(
+        Optional.unwrap(store.answerBeingEditedSectionState$.getSnapshot()),
+        'editing',
+      );
+
+      await settle();
+
+      assert.deepStrictEqual(toasts.intents, ['danger']);
+    });
   });
 
   test('answering later adds an empty answer in the signed-in user’s name', async () => {
@@ -196,25 +290,35 @@ type Setup = Readonly<{
   store: AnswerPage;
   browser: ReturnType<typeof createMemoryBrowser>;
   calls: readonly string[];
-  toasts: Readonly<{ count: number }>;
+  toasts: Readonly<{ count: number; intents: readonly string[] }>;
 }>;
 
-/** A toaster that only counts what it is asked to show. */
-const fakeToaster = (onShow: () => number): Toaster =>
+/** A toaster that only records the intent of what it is asked to show. */
+const fakeToaster = (onShow: (intent: string) => number): Toaster =>
   ({
-    show: () => `toast-${onShow()}`,
+    show: (props) => `toast-${onShow(props.intent ?? 'none')}`,
     dismiss: () => undefined,
     clear: () => undefined,
     getToasts: () => [],
     remove: () => undefined,
   }) as const;
 
-const setup = (user: SignedInUser | undefined): Setup => {
+const setup = (
+  user: SignedInUser | undefined,
+  /** Whether the database refuses every write, as its rules do past the deadline. */
+  refuse = false,
+): Setup => {
   const browser = createMemoryBrowser('https://example.com/event/abc/');
 
   const mut_calls: string[] = [];
 
-  const mut_toasts = { count: 0 };
+  const mut_toasts: { count: number; intents: string[] } = {
+    count: 0,
+    intents: [],
+  };
+
+  const answered = <A,>(ok: A): Promise<Result<A, string>> =>
+    Promise.resolve(refuse ? Result.err('denied') : Result.ok(ok));
 
   const [answers$] = createState<readonly Answer[] | undefined>([]);
 
@@ -228,17 +332,17 @@ const setup = (user: SignedInUser | undefined): Setup => {
         add: (eventId, answer) => {
           mut_calls.push(`add ${eventId} ${answer.user.name}`);
 
-          return Promise.resolve(Result.ok('new-id'));
+          return answered('new-id');
         },
         update: (eventId, answerId, answer) => {
           mut_calls.push(`update ${eventId} ${answerId} ${answer.comment}`);
 
-          return Promise.resolve(Result.ok(undefined));
+          return answered(undefined);
         },
         delete: (eventId, answerId) => {
           mut_calls.push(`delete ${eventId} ${answerId}`);
 
-          return Promise.resolve(Result.ok(undefined));
+          return answered(undefined);
         },
       },
     },
@@ -251,9 +355,16 @@ const setup = (user: SignedInUser | undefined): Setup => {
     auth: { getFireAuthUserSnapshot: () => user },
     router: createAppRouter(browser),
     eventSchedule$,
+    eventSchedule: {
+      refetchEventScheduleAfterWrite: () => {
+        mut_calls.push('refetch event');
+      },
+    },
     toast: Promise.resolve(
-      fakeToaster(() => {
+      fakeToaster((intent) => {
         mut_toasts.count += 1;
+
+        mut_toasts.intents.push(intent);
 
         return mut_toasts.count;
       }),
