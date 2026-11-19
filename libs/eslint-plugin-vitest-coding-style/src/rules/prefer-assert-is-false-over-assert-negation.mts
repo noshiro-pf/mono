@@ -1,6 +1,7 @@
 import { AST_NODE_TYPES, type TSESLint } from '@typescript-eslint/utils';
 import { getArgumentText, skipTypeWrappers } from 'eslint-rule-forge';
 import { Arr } from 'ts-data-forge';
+import { isBooleanOperand } from './boolean-operand.mjs';
 import { getVitestReceiver } from './vitest-binding.mjs';
 
 type MessageIds = 'preferAssertIsFalseOverAssertNegation';
@@ -11,7 +12,9 @@ type Options = readonly [];
  * `assert.isTrue(!X)` becomes `assert.isFalse(X)`. The callee, the receiver and
  * the argument are read through `as`, `satisfies`, `!` and `<T>`: a wrapper on
  * the receiver stays, and one around the negation goes with it
- * (`assert.isTrue(!x as boolean)` becomes `assert.isFalse(x)`).
+ * (`assert.isTrue(!x as boolean)` becomes `assert.isFalse(x)`). Only an `X`
+ * that is a boolean at every layer of its type wrappers (`isBooleanOperand`) is
+ * reported: on any other, `!X` is already a strict boolean.
  */
 export const preferAssertIsFalseOverNegatedAssertIsTrueRule: TSESLint.RuleModule<
   MessageIds,
@@ -20,7 +23,8 @@ export const preferAssertIsFalseOverNegatedAssertIsTrueRule: TSESLint.RuleModule
   meta: {
     type: 'suggestion',
     docs: {
-      description: 'Prefer assert.isFalse(X) over assert.isTrue(!X).',
+      description:
+        'Prefer assert.isFalse(X) over assert.isTrue(!X) (only when X is boolean; type-aware).',
     },
     fixable: 'code',
     schema: [],
@@ -51,9 +55,12 @@ export const preferAssertIsFalseOverNegatedAssertIsTrueRule: TSESLint.RuleModule
             ? arg
             : skipTypeWrappers(arg);
 
+        // On any other operand the negation is already a strict boolean, and
+        // the rewrite would fail where it passes.
         if (
           negation.type === AST_NODE_TYPES.UnaryExpression &&
-          negation.operator === '!'
+          negation.operator === '!' &&
+          isBooleanOperand(context.sourceCode, negation.argument)
         ) {
           const targetText = getArgumentText(
             context.sourceCode,
