@@ -53,13 +53,11 @@ export const IssuesSummary = (): JSX.Element => {
 
   return (
     <div class={constant('issues-summary-box')}>
-      {/* eslint-disable-next-line synstate-dom-a11y/prefer-tag-over-role -- recorded, not fixed, when jsx-a11y came to synstate-dom (#3764) */}
-      <div
+      <fieldset
         aria-label={constant(
           'Open issues by priority, in progress and author only',
         )}
         class={constant('summary-row issues-summary')}
-        role={constant('group')}
       >
         <StatTile
           label={'open'}
@@ -112,7 +110,7 @@ export const IssuesSummary = (): JSX.Element => {
         />
         <IssueTierGroup counts$={counts$} row={'aside'} />
         <IssueTierGroup counts$={counts$} row={'ranked'} />
-      </div>
+      </fieldset>
     </div>
   );
 };

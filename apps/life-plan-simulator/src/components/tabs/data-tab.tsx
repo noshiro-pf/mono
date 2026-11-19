@@ -117,8 +117,8 @@ export const DataTab = (): JSX.Element => {
             importIntoCurrentPlan,
           )}
         </div>
-        {/* eslint-disable-next-line synstate-dom-a11y/prefer-tag-over-role -- recorded, not fixed, when jsx-a11y came to synstate-dom (#3764) */}
-        <div role={constant('status')}>
+        {/* eslint-disable-next-line synstate-dom-a11y/prefer-tag-over-role -- the status is a paragraph and a list, and an `output` holds phrasing content only; around the message alone, it would leave the warnings unannounced */}
+        <div data-e2e={constant('plan-file-status')} role={constant('status')}>
           <p>{message$}</p>
           <WarningList warnings$={warnings$} />
         </div>
