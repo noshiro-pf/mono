@@ -6,6 +6,7 @@ import {
 } from '@typescript-eslint/utils';
 import {
   isTypeWrapper,
+  outermostTypeWrapper,
   skipTypeWrappers,
   typeWrapperLayers,
 } from 'eslint-rule-forge';
@@ -203,7 +204,11 @@ export const isPartOfBoundedLengthCheck = (
 ): boolean => {
   const operand = outermostTypeWrapper(node);
 
-  const { parent } = operand;
+  // The same node as `operand.parent`, as the mutable one the comparison is
+  // parsed from.
+  const parent = sourceCode
+    .getAncestors(node)
+    .find((ancestor) => ancestor === operand.parent);
 
   if (
     parent?.type !== AST_NODE_TYPES.LogicalExpression ||
@@ -242,15 +247,6 @@ type LengthComparison = Readonly<{
   bound: TSESTree.Expression;
   kind: 'max' | 'min';
 }>;
-
-/** The outermost of the type wrappers around `node`, or `node` itself. */
-const outermostTypeWrapper = (
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  node: TSESTree.Node,
-): TSESTree.Node =>
-  node.parent !== undefined && isTypeWrapper(node.parent)
-    ? outermostTypeWrapper(node.parent)
-    : node;
 
 type VariableDefinition = Readonly<{
   type: string;
