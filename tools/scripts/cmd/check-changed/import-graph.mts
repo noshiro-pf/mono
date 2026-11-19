@@ -99,11 +99,21 @@ export const importGraph = (
   {
     root = projectRootPath,
     libraries = new Map<string, WorkspaceLibrary>(),
+    onUnresolved = () => undefined,
   }: Readonly<{
     /** What the graph's paths are relative to; a test gives another. */
     root?: string;
     /** The workspace members by package name. */
     libraries?: ReadonlyMap<string, WorkspaceLibrary>;
+    /**
+     * Told of each import the graph cannot follow, with the file importing it
+     * (absolute) and the specifier, a name imported by name in parentheses
+     * after it: a module that is not there, a package not installed, a name a
+     * library does not export. The graph goes on as it says above; a reader
+     * that holds a list to the graph (`generator-inputs.test.mts`) fails on
+     * one, since what it would have led to is missing.
+     */
+    onUnresolved?: (from: string, specifier: string) => void;
   }> = {},
 ): readonly string[] => {
   const options = program.getCompilerOptions();
@@ -234,6 +244,10 @@ export const importGraph = (
       ) {
         const target = resolve();
 
+        if (target === undefined) {
+          onUnresolved(fileName, specifier);
+        }
+
         if (target !== undefined) {
           visit(target, false);
         } else if (!specifier.startsWith('#')) {
@@ -291,6 +305,12 @@ export const importGraph = (
         continue;
       }
 
+      if (resolved === undefined && library === undefined) {
+        onUnresolved(fileName, specifier);
+
+        continue;
+      }
+
       if (names === undefined || Arr.isEmpty(names)) {
         if (resolved !== undefined) {
           visit(resolved, true);
@@ -317,7 +337,16 @@ export const importGraph = (
             ? checker.getAliasedSymbol(symbol)
             : symbol;
 
-        for (const declaration of target?.declarations ?? []) {
+        const declarations = target?.declarations ?? [];
+
+        if (!Arr.isNonEmpty(declarations)) {
+          onUnresolved(
+            fileName,
+            `${specifier} (${(ts.isIdentifier(element) ? element : element.name).text})`,
+          );
+        }
+
+        for (const declaration of declarations) {
           visit(declaration.getSourceFile().fileName, true);
         }
       }

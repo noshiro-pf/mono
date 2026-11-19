@@ -15,22 +15,17 @@ import {
 import { readPackages } from './packages.mjs';
 
 /**
- * A directory of modules, written fresh for each case, and the graph of
- * `entry.mts` read relative to it.
+ * As {@link graphOf}, with the imports the graph could not follow, each as
+ * `<file relative to the root>: <specifier>`.
  */
-const graphOf = (
+const graphAndUnresolvedOf = (
   files: ReadonlyRecord<string, string>,
-  /**
-   * Inside the repository (its ignored `out/`), so that a workspace library
-   * imported by name is in the graph, which is then read from the repository's
-   * root; else a directory of its own.
-   */
   inRepository = false,
   libraries: ReadonlyMap<string, WorkspaceLibrary> = new Map<
     string,
     WorkspaceLibrary
   >(),
-): readonly string[] => {
+): Readonly<{ graph: readonly string[]; unresolved: readonly string[] }> => {
   const parent = inRepository ? path.join(projectRootPath, 'out') : os.tmpdir();
 
   // eslint-disable-next-line security/detect-non-literal-fs-filename -- the repository's ignored `out/`, or the system's temporary directory.
@@ -55,14 +50,44 @@ const graphOf = (
       throw new Error(program.value);
     }
 
-    return importGraph(program.value, entry, {
-      root: inRepository ? projectRootPath : root,
+    const mut_unresolved: string[] = [];
+
+    const graphRoot = inRepository ? projectRootPath : root;
+
+    const graph = importGraph(program.value, entry, {
+      root: graphRoot,
       libraries,
+      onUnresolved: (from, specifier) => {
+        mut_unresolved.push(
+          `${path.relative(root, from).split(path.sep).join('/')}: ${specifier.split(root).join('ABSOLUTE')}`,
+        );
+      },
     });
+
+    return { graph, unresolved: mut_unresolved };
   } finally {
     fs.rmSync(root, { recursive: true, force: true });
   }
 };
+
+/**
+ * A directory of modules, written fresh for each case, and the graph of
+ * `entry.mts` read relative to it.
+ */
+const graphOf = (
+  files: ReadonlyRecord<string, string>,
+  /**
+   * Inside the repository (its ignored `out/`), so that a workspace library
+   * imported by name is in the graph, which is then read from the repository's
+   * root; else a directory of its own.
+   */
+  inRepository = false,
+  libraries: ReadonlyMap<string, WorkspaceLibrary> = new Map<
+    string,
+    WorkspaceLibrary
+  >(),
+): readonly string[] =>
+  graphAndUnresolvedOf(files, inRepository, libraries).graph;
 
 describe('importGraph', () => {
   test('follows a relative import, a bare import and a barrel’s re-exports', () => {
@@ -113,6 +138,31 @@ describe('importGraph', () => {
     );
   });
 
+  test('names each import it cannot follow, and the file importing it', () => {
+    assert.deepStrictEqual(
+      graphAndUnresolvedOf({
+        'entry.mts': dedent`
+          import { gone } from './gone.mjs';
+          import 'ABSOLUTE/missing.mjs';
+          import './a.mjs';
+          console.log(gone);
+        `,
+        'a.mts': 'export const a = 1;\n',
+      }).unresolved,
+      ['entry.mts: ./gone.mjs', 'entry.mts: ABSOLUTE/missing.mjs'],
+    );
+  });
+
+  test('names nothing when every import resolves', () => {
+    assert.deepStrictEqual(
+      graphAndUnresolvedOf({
+        'entry.mts': "import { a } from './a.mjs';\nconsole.log(a);\n",
+        'a.mts': 'export const a = 1;\n',
+      }).unresolved,
+      [],
+    );
+  });
+
   test('follows an absolute import as a relative one', () => {
     const graph = graphOf({
       'entry.mts': "import 'ABSOLUTE/a.mjs';\n",
@@ -158,6 +208,25 @@ describe('importGraph', () => {
         'libs/ts-repo-utils/src/functions/assert-path-exists.mts',
         'libs/ts-repo-utils/src/functions/glob.mts',
       ]);
+    });
+
+    test('names a name a library does not export, and a package that is not there', () => {
+      assert.deepStrictEqual(
+        graphAndUnresolvedOf(
+          {
+            'entry.mts': dedent`
+              import { assertPathExists, noSuchName } from 'ts-repo-utils';
+              import 'no-such-package-anywhere';
+              await assertPathExists(String(noSuchName));
+            `,
+          },
+          true,
+        ).unresolved,
+        [
+          'entry.mts: ts-repo-utils (noSuchName)',
+          'entry.mts: no-such-package-anywhere',
+        ],
+      );
     });
 
     test.each([

@@ -74,20 +74,66 @@ describe('ROOT_GENERATORS', () => {
     mut_shared.program = undefined;
   });
 
+  /** The graph of `entry`, and the imports it could not follow. */
+  const graphOf = (
+    entry: string,
+  ): Readonly<{ graph: readonly string[]; unresolved: readonly string[] }> => {
+    const { program } = mut_shared;
+
+    assert.isDefined(program);
+
+    const mut_unresolved: string[] = [];
+
+    const graph = importGraph(program, entry, {
+      libraries: mut_shared.libraries,
+      onUnresolved: (from, specifier) => {
+        mut_unresolved.push(
+          `${path.relative(projectRootPath, from)}: ${specifier}`,
+        );
+      },
+    });
+
+    return { graph, unresolved: mut_unresolved };
+  };
+
   test.each(Object.entries(ROOT_GENERATORS))(
     '%s declares every file it imports',
     (_, { entry, inputs }) => {
-      const { program } = mut_shared;
+      const { graph, unresolved } = graphOf(entry);
 
-      assert.isDefined(program);
+      // What an import that does not resolve would have led to is missing from
+      // the graph, which would then pass short: each is named here.
+      assert.deepStrictEqual(unresolved, []);
 
-      const uncovered = importGraph(program, entry, {
-        libraries: mut_shared.libraries,
-      }).filter((file) => !readsGeneratorInput(file, inputs));
+      assert.deepStrictEqual(
+        graph.filter((file) => !readsGeneratorInput(file, inputs)),
+        [],
+      );
+    },
+  );
 
-      assert.deepStrictEqual(uncovered, []);
+  // The other direction, for the modules: an input no file of the graph is left
+  // behind when the generator stops importing it, and reruns the generator for
+  // nothing. An input that is not a module — a document the generator reads or
+  // writes, such as `docs/package-dependencies.md` — is read by the file
+  // system, which no import graph sees: those are left to review.
+  test.each(Object.entries(ROOT_GENERATORS))(
+    '%s declares no module it does not import',
+    (_, { entry, inputs }) => {
+      const { graph } = graphOf(entry);
+
+      assert.deepStrictEqual(
+        inputs.filter(
+          (input) =>
+            (input.endsWith('/') || MODULE.test(input)) &&
+            graph.every((file) => !readsGeneratorInput(file, [input])),
+        ),
+        [],
+      );
     },
   );
 });
 
 const PROGRAM_BUILD_TIMEOUT_MS = 60_000;
+
+const MODULE = /\.[cm]?[jt]sx?$/u;
