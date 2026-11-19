@@ -6,7 +6,7 @@ import {
 import {
   getArgumentText,
   skipTypeWrappers,
-  typeWrapperLayers,
+  typeHoldsAtSomeLayer,
 } from 'eslint-rule-forge';
 import { Arr } from 'ts-data-forge';
 import type { FixedLengthTuple } from 'ts-type-forge';
@@ -178,38 +178,32 @@ export const preferArrScan: TSESLint.RuleModule<MessageIds, Options> = {
   create: (context) => {
     const sourceCode = context.sourceCode;
 
-    const services = sourceCode.parserServices;
-
-    const checker = services?.program?.getTypeChecker();
+    const hasTypeInformation =
+      sourceCode.parserServices?.program?.getTypeChecker() !== undefined;
 
     /**
-     * Whether the value at `node` can be `null` or `undefined`. Answers `true`
-     * without type information, which is the conservative direction: it only
-     * ever keeps a `?? fallback` that could have been removed.
+     * Whether the value at `node` can be `null` or `undefined`, as the type at
+     * some layer of its type wrappers says. Answers `true` without type
+     * information, which is the conservative direction: it only ever keeps a
+     * `?? fallback` that could have been removed.
      */
-    const isNullish = (
+    const mayBeNullish = (
       // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
       node: TSESTree.Node,
-    ): boolean => {
-      const tsNode = services?.esTreeNodeToTSNodeMap?.get(node);
-
-      if (checker === undefined || tsNode === undefined) {
-        return true;
-      }
-
-      const type = checker.getTypeAtLocation(tsNode);
-
-      return (type.isUnion() ? type.types : [type]).some(
-        (constituent) =>
-          (constituent.flags &
-            (ts.TypeFlags.Null |
-              ts.TypeFlags.Undefined |
-              ts.TypeFlags.Void |
-              ts.TypeFlags.Any |
-              ts.TypeFlags.Unknown)) !==
-          0,
+    ): boolean =>
+      !hasTypeInformation ||
+      typeHoldsAtSomeLayer(sourceCode, node, (type) =>
+        (type.isUnion() ? type.types : [type]).some(
+          (constituent) =>
+            (constituent.flags &
+              (ts.TypeFlags.Null |
+                ts.TypeFlags.Undefined |
+                ts.TypeFlags.Void |
+                ts.TypeFlags.Any |
+                ts.TypeFlags.Unknown)) !==
+            0,
+        ),
       );
-    };
 
     const mut_candidates: PrefixCandidate[] = [];
 
@@ -282,13 +276,11 @@ export const preferArrScan: TSESLint.RuleModule<MessageIds, Options> = {
       // is known not to be nullish, a `?? fallback` guarding the read is dead
       // and the fix takes it with the read — leaving it would hand the author
       // an unnecessary condition that no rule can fix for them. Every layer of
-      // type wrappers is asked (see typeWrapperLayers): the value under an `as`
-      // / `!` is what `scan` carries at run time (`[init!]` may still hold
+      // type wrappers is asked (see `typeHoldsAtSomeLayer`): the value under an
+      // `as` / `!` is what `scan` carries at run time (`[init!]` may still hold
       // `undefined`), and a wider type a wrapper states is the author saying it
       // may be nullish.
-      const carriesNullish = [seed, element].some((node) =>
-        typeWrapperLayers(node).some(isNullish),
-      );
+      const carriesNullish = [seed, element].some(mayBeNullish);
 
       const mut_lastReads: Splice[] = [];
 
