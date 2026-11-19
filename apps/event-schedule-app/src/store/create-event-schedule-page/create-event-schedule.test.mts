@@ -120,6 +120,47 @@ describe(createCreateEventScheduleStore, () => {
     );
   });
 
+  test('gives the link of an event added whose notification email was refused, and warns', async () => {
+    const consoleError = vi
+      .spyOn(console, 'error')
+      .mockImplementation(() => undefined);
+
+    onTestFinished(() => {
+      consoleError.mockRestore();
+    });
+
+    const { store, calls, toasts } = setup({ setAuthorsEmailFails: true });
+
+    fillValidEvent(store);
+
+    store.commonStateHandlers.toggleNotificationSection();
+
+    store.onCreateEventClick();
+
+    await settle(10);
+
+    // The event exists: its link is shown and the draft cleared, so that it is
+    // not created twice.
+    assert.deepStrictEqual(calls, [
+      'add event alice u1',
+      'setAuthorsEmail new-id alice@example.com',
+      'storage.save (reset)',
+    ]);
+
+    assert.isTrue(
+      Optional.unwrap(store.createResultDialogIsOpen$.getSnapshot()),
+    );
+
+    assert.strictEqual(
+      Optional.unwrap(store.url$.getSnapshot()),
+      'https://example.com/event/new-id/',
+    );
+
+    assert.isFalse(Optional.unwrap(store.isLoading$.getSnapshot()));
+
+    assert.strictEqual(toasts.count, 1);
+  });
+
   test('starts no second create while one is in progress', async () => {
     const { store, calls } = setup();
 
@@ -299,6 +340,7 @@ const fakeToaster = (onShow: () => number): Toaster =>
 const setup = (
   options?: Readonly<{
     addFails?: boolean;
+    setAuthorsEmailFails?: boolean;
     stored?: EventSchedule;
     restoreFails?: boolean;
     saveFails?: boolean;
@@ -327,7 +369,11 @@ const setup = (
         setAuthorsEmail: (eventId, email) => {
           mut_calls.push(`setAuthorsEmail ${eventId} ${email}`);
 
-          return Promise.resolve(Result.ok(undefined));
+          return Promise.resolve(
+            options?.setAuthorsEmailFails === true
+              ? Result.err('denied')
+              : Result.ok(undefined),
+          );
         },
       },
     },

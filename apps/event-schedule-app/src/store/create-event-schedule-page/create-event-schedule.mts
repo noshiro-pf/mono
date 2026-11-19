@@ -237,10 +237,18 @@ export const createCreateEventScheduleStore = (
     if (email !== '') {
       const res2 = await deps.api.event.setAuthorsEmail(eventId, email);
 
+      // The event exists all the same: its link is given and the draft cleared,
+      // or it would be created again, and a warning says the notifications are
+      // not set up.
       if (Result.isErr(res2)) {
-        dispatchCreation({ type: 'failed' });
+        console.error(res2.value);
 
-        return Result.err(res2.value);
+        showToast({
+          toast: deps.toast,
+          message:
+            dict.eventSettingsPage.createEventResultMessage.notificationError,
+          intent: 'warning',
+        });
       }
     }
 
