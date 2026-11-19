@@ -77,6 +77,11 @@ import {
  * A key only a workflow's step takes (`timeout-minutes:`) is not reported
  * either, nor the `with:` of a local action (`uses: ./…`), which actionlint
  * resolves only from a file.
+ *
+ * **A run that hangs is stopped and named.** Each actionlint run is given
+ * {@link actionlintTimeoutMs}; one that runs past it fails with
+ * {@link hangExplanation}, the one way it is known to hang, instead of holding
+ * `check:root` until someone kills it.
  */
 export const checkActionlint = async ({
   pins,
@@ -151,10 +156,14 @@ export const checkActionlint = async ({
   const versions =
     `actionlint ${actionlintPin.version}, shellcheck ${shellcheckPin.version}` as const;
 
-  const workflows = judgeActionlint(
-    await runActionlint(actionlint.value, shellcheck.value),
-    versions,
-  );
+  const workflowsRun = await runActionlint(actionlint.value, shellcheck.value);
+
+  const workflows = judgeActionlint(workflowsRun, versions);
+
+  // The composite actions would meet the same pipes, and each wait as long.
+  if (workflowsRun.timedOut) {
+    return Result.err([workflows ?? '', '', ...hangExplanation].join('\n'));
+  }
 
   const actions = await Promise.all(
     compositeActions.map(async (action) => {
@@ -165,21 +174,23 @@ export const checkActionlint = async ({
       const wrapped =
         steps === undefined ? undefined : wrapInWorkflow(steps, { inputs });
 
-      const verdict =
+      const run =
         wrapped === undefined
+          ? undefined
+          : await lintWorkflowText(actionlint.value, shellcheck.value, {
+              ...wrapped,
+              text: asLocalActionForm(wrapped.text),
+            });
+
+      const verdict =
+        run === undefined
           ? ({ findings: [], failure: undefined } as const)
-          : judgeComposite(
-              await lintWorkflowText(actionlint.value, shellcheck.value, {
-                ...wrapped,
-                text: asLocalActionForm(wrapped.text),
-              }),
-              action.path,
-              scripts,
-            );
+          : judgeComposite(run, action.path, scripts);
 
       return {
         checked: steps !== undefined,
         unread: problems.map((problem) => `${action.path}:${problem}`),
+        timedOut: run?.timedOut === true,
         ...verdict,
       };
     }),
@@ -234,6 +245,10 @@ export const checkActionlint = async ({
           '`shell:` and a literal `run: |`; `./run-scripts.mts` says what it reads.',
         ],
       ),
+      // Once, however many runs it stopped.
+      ...(actions.some(({ timedOut }) => timedOut)
+        ? Arr.toUnshifted('')(hangExplanation)
+        : []),
     ].join('\n'),
   );
 };
@@ -336,6 +351,8 @@ export type RunActionlint = (
     signal: string | null;
     /** Why it could not be started at all, if it could not. */
     error: string | undefined;
+    /** Whether it was stopped for running past {@link actionlintTimeoutMs}. */
+    timedOut: boolean;
   }>
 >;
 
@@ -353,14 +370,108 @@ export type LintWorkflowText = (
     stderr: string;
     /** Why it could not be started at all, if it could not. */
     error: string | undefined;
+    /** Whether it was stopped for running past {@link actionlintTimeoutMs}. */
+    timedOut: boolean;
   }>
 >;
 
+/**
+ * How long one actionlint run may take before it is stopped. Over every
+ * workflow it takes well under a second, so this is not a budget but a bound on
+ * a hang ({@link hangExplanation}), which otherwise lasts until someone kills
+ * it.
+ */
+export const actionlintTimeoutMs = 60_000;
+
+/**
+ * Why actionlint hangs rather than fails, for a run stopped at
+ * {@link actionlintTimeoutMs}. actionlint 1.7.12 (`cmdExecution.run` in
+ * `process.go`) writes a script into the stdin pipe of the shellcheck it is
+ * about to run before starting it, so the write ends only if the script fits in
+ * the pipe's buffer; Linux gives a new pipe one or two pages (by kernel
+ * version) instead of sixteen once the pipes of one user hold more than
+ * `fs.pipe-user-pages-soft` pages, and several `run:` scripts here are larger
+ * than that.
+ */
+const hangExplanation = [
+  'The pinned actionlint writes each `run:` script into the stdin pipe of a',
+  'shellcheck it has not started yet, so a script larger than the pipe buffer',
+  "blocks it for good, silent and idle. Linux shrinks a new pipe's buffer from",
+  '64 KiB to a page or two once the pipes of one user hold more pages than',
+  '/proc/sys/fs/pipe-user-pages-soft allows, as many processes running at once',
+  '(other sessions, other checks) can make them. Run it again with fewer of',
+  'them running, or lift the limit on this machine',
+  '(`sudo sysctl fs.pipe-user-pages-soft=0`); nothing in the workflows needs',
+  'changing.',
+] as const;
+
+/**
+ * actionlint over the workflows of the project at `root`: the copy
+ * {@link copyGithubDirAsLocalForm} made, whose paths it reports as the
+ * repository's (`.github/workflows/<file>`), since it runs from that copy's
+ * root. Stopped after `timeoutMs`.
+ */
+export const runActionlintIn =
+  (root: string, timeoutMs: number = actionlintTimeoutMs): RunActionlint =>
+  async (actionlint, shellcheck) => {
+    const { status, signal, error } = await runInherited(
+      actionlint,
+      [`-shellcheck=${shellcheck}`, '-pyflakes='],
+      {
+        cwd: root,
+        env: toolEnv,
+        signal: AbortSignal.timeout(timeoutMs),
+        killSignal: 'SIGKILL',
+      },
+    );
+
+    return { status, signal, ...stoppedAtTimeout(error) };
+  };
+
+/** actionlint over a workflow given on stdin, stopped after `timeoutMs`. */
+export const lintWorkflowTextWithin =
+  (timeoutMs: number = actionlintTimeoutMs): LintWorkflowText =>
+  async (actionlint, shellcheck, workflow) => {
+    const { status, stdout, stderr, error } = await runFile(
+      actionlint,
+      [
+        `-shellcheck=${shellcheck}`,
+        '-pyflakes=',
+        '-format',
+        '{{json .}}',
+        '-stdin-filename',
+        'composite-action.yml',
+        '-',
+      ],
+      {
+        cwd: projectRootPath,
+        env: toolEnv,
+        input: workflow.text,
+        signal: AbortSignal.timeout(timeoutMs),
+        // execFile settles only once the process has exited, so a signal it may
+        // not die of would leave the hang in place.
+        killSignal: 'SIGKILL',
+      },
+    );
+
+    return {
+      workflow,
+      stdout,
+      stderr,
+      status,
+      ...stoppedAtTimeout(error),
+    };
+  };
+
 /** The failure for the workflows, or `undefined` when actionlint passed. */
 const judgeActionlint = (
-  { status, signal, error }: Awaited<ReturnType<RunActionlint>>,
+  { status, signal, error, timedOut }: Awaited<ReturnType<RunActionlint>>,
   versions: string,
 ): string | undefined => {
+  if (timedOut) {
+    return `❌ actionlint did not finish over .github/workflows/ within ${actionlintTimeoutMs / 1000} s and was stopped (${versions}).`;
+  }
+
   if (error !== undefined) {
     return `❌ Could not run actionlint: ${error}`;
   }
@@ -417,10 +528,18 @@ const judgeComposite = (
     stdout,
     stderr,
     error,
+    timedOut,
   }: Awaited<ReturnType<LintWorkflowText>>,
   file: string,
   scripts: readonly RunScript[],
 ): Readonly<{ findings: readonly string[]; failure: string | undefined }> => {
+  if (timedOut) {
+    return {
+      findings: [],
+      failure: `${file}: actionlint did not finish within ${actionlintTimeoutMs / 1000} s and was stopped`,
+    };
+  }
+
   if (error !== undefined) {
     return {
       findings: [],
@@ -591,22 +710,15 @@ const tryRunningBinary = async (
 };
 
 /**
- * actionlint over the workflows of the project at `root`: the copy
- * {@link copyGithubDirAsLocalForm} made, whose paths it reports as the
- * repository's (`.github/workflows/<file>`), since it runs from that copy's
- * root.
+ * The `error` of a run given `AbortSignal.timeout`, with the `AbortError` that
+ * stopping it raises read as a timeout rather than as a failure to start.
  */
-const runActionlintIn =
-  (root: string): RunActionlint =>
-  async (actionlint, shellcheck) => {
-    const { status, signal, error } = await runInherited(
-      actionlint,
-      [`-shellcheck=${shellcheck}`, '-pyflakes='],
-      { cwd: root, env: toolEnv },
-    );
-
-    return { status, signal, error: error?.message };
-  };
+const stoppedAtTimeout = (
+  error: Readonly<{ name: string; message: string }> | undefined,
+): Readonly<{ error: string | undefined; timedOut: boolean }> =>
+  error?.name === 'AbortError'
+    ? ({ error: undefined, timedOut: true } as const)
+    : ({ error: error?.message, timedOut: false } as const);
 
 /**
  * A temporary project holding a copy of `.github/` with every YAML file passed
@@ -663,32 +775,6 @@ const copyGithubDirAsLocalForm = async (): Promise<Result<string, string>> => {
     : Result.ok(copied.value);
 };
 
-const lintWorkflowTextBinary: LintWorkflowText = async (
-  actionlint,
-  shellcheck,
-  workflow,
-) => {
-  const { status, stdout, stderr, error } = await runFile(
-    actionlint,
-    [
-      `-shellcheck=${shellcheck}`,
-      '-pyflakes=',
-      '-format',
-      '{{json .}}',
-      '-stdin-filename',
-      'composite-action.yml',
-      '-',
-    ],
-    {
-      cwd: projectRootPath,
-      env: toolEnv,
-      input: workflow.text,
-    },
-  );
-
-  return { workflow, status, stdout, stderr, error: error?.message };
-};
-
 const readCompositeActions = async (): Promise<
   Result<readonly Readonly<{ path: string; text: string }>[], string>
 > => {
@@ -736,7 +822,7 @@ if (isDirectlyExecuted(import.meta.url)) {
                 tryRunning: tryRunningBinary,
                 runActionlint: runActionlintIn(copy.value),
                 compositeActions: compositeActions.value,
-                lintWorkflowText: lintWorkflowTextBinary,
+                lintWorkflowText: lintWorkflowTextWithin(),
               });
     } finally {
       // Whatever happened above, thrown or returned.

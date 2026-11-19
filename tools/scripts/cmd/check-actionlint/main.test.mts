@@ -1,9 +1,14 @@
 import dedent from 'dedent';
+import * as fs from 'node:fs';
+import * as os from 'node:os';
+import * as path from 'node:path';
 import { Arr, Result } from 'ts-data-forge';
 import type { ReleaseBinaryPin } from '../../lib/release-binaries.mjs';
 import {
   asLocalActionForm,
   checkActionlint,
+  lintWorkflowTextWithin,
+  runActionlintIn,
   wrapInWorkflow,
   type Install,
   type LintWorkflowText,
@@ -33,7 +38,31 @@ const runsFine = (): Promise<undefined> => Promise.resolve(undefined);
 const actionlintExits =
   (status: number | null, signal: string | null = null): RunActionlint =>
   () =>
-    Promise.resolve({ status, signal, error: undefined } as const);
+    Promise.resolve({
+      status,
+      signal,
+      error: undefined,
+      timedOut: false,
+    } as const);
+
+/** actionlint stopped at its timeout, over the workflows or a wrapper. */
+const actionlintHangs: RunActionlint = () =>
+  Promise.resolve({
+    status: null,
+    signal: null,
+    error: undefined,
+    timedOut: true,
+  } as const);
+
+const compositeHangs: LintWorkflowText = (_actionlint, _shellcheck, workflow) =>
+  Promise.resolve({
+    workflow,
+    status: null,
+    stdout: '',
+    stderr: '',
+    error: undefined,
+    timedOut: true,
+  } as const);
 
 /** actionlint over the wrapped composite scripts, answering `reports`. */
 const compositeReports =
@@ -45,6 +74,7 @@ const compositeReports =
       stdout: JSON.stringify(reports),
       stderr: '',
       error: undefined,
+      timedOut: false,
     } as const);
 
 const setupAction = {
@@ -584,6 +614,7 @@ describe('checkActionlint', () => {
           stdout: '',
           stderr: 'could not read config',
           error: undefined,
+          timedOut: false,
         } as const),
     });
 
@@ -784,5 +815,195 @@ describe('checkActionlint, binaries that do not run', () => {
         '❌ tools/configs/release-binaries.json pins no actionlint and no shellcheck.',
       ),
     );
+  });
+});
+
+describe('checkActionlint, a run that hangs', () => {
+  test('names the hang and its cause when the run over the workflows is stopped', async () => {
+    const result = await checkActionlint({
+      pins,
+      install: installed,
+      tryRunning: runsFine,
+      runActionlint: actionlintHangs,
+      compositeActions: [],
+      lintWorkflowText: compositeReports([]),
+    });
+
+    assert.isTrue(Result.isErr(result));
+
+    assert.include(
+      result.value,
+      '❌ actionlint did not finish over .github/workflows/ within 60 s and was stopped (actionlint 1.7.12, shellcheck 0.11.0).',
+    );
+
+    assert.include(result.value, 'stdin pipe');
+
+    assert.include(result.value, '/proc/sys/fs/pipe-user-pages-soft');
+
+    // Not findings, so not the advice for findings.
+    assert.notInclude(result.value, 'shellcheck disable');
+  });
+
+  test('runs no composite action once the run over the workflows is stopped', async () => {
+    const lintWorkflowText = vi.fn(compositeReports([]));
+
+    const result = await checkActionlint({
+      pins,
+      install: installed,
+      tryRunning: runsFine,
+      runActionlint: actionlintHangs,
+      compositeActions: [setupAction],
+      lintWorkflowText,
+    });
+
+    assert.isTrue(Result.isErr(result));
+
+    assert.include(result.value, '/proc/sys/fs/pipe-user-pages-soft');
+
+    expect(lintWorkflowText).not.toHaveBeenCalled();
+  });
+
+  test('names the composite action whose run is stopped, and the cause once', async () => {
+    const result = await checkActionlint({
+      pins,
+      install: installed,
+      tryRunning: runsFine,
+      runActionlint: actionlintExits(0),
+      compositeActions: [
+        setupAction,
+        { ...setupAction, path: '.github/actions/other/action.yml' },
+      ],
+      lintWorkflowText: compositeHangs,
+    });
+
+    assert.isTrue(Result.isErr(result));
+
+    assert.include(
+      result.value,
+      '.github/actions/setup/action.yml: actionlint did not finish within 60 s and was stopped',
+    );
+
+    assert.strictEqual(
+      result.value.split('/proc/sys/fs/pipe-user-pages-soft').length,
+      2,
+    );
+  });
+
+  test('says nothing of a hang when every run finished', async () => {
+    const result = await checkActionlint({
+      pins,
+      install: installed,
+      tryRunning: runsFine,
+      runActionlint: actionlintExits(1),
+      compositeActions: [setupAction],
+      lintWorkflowText: compositeReports([]),
+    });
+
+    assert.isTrue(Result.isErr(result));
+
+    assert.notInclude(result.value, 'pipe-user-pages-soft');
+  });
+});
+
+describe('the actionlint runs, stopped at their timeout', () => {
+  const mut_tempDirs: string[] = [];
+
+  afterAll(() => {
+    for (const dir of mut_tempDirs) {
+      fs.rmSync(dir, { recursive: true, force: true });
+    }
+  });
+
+  /** An executable that runs `script`, whatever arguments it is given. */
+  const fakeActionlint = (script: string): string => {
+    const dir = fs.mkdtempSync(
+      path.join(os.tmpdir(), 'check-actionlint-test-'),
+    );
+
+    mut_tempDirs.push(dir);
+
+    const file = path.join(dir, 'actionlint');
+
+    // eslint-disable-next-line security/detect-non-literal-fs-filename -- inside the temporary directory just made.
+    fs.writeFileSync(file, `#!/bin/sh\n${script}\n`, { mode: 0o755 });
+
+    return file;
+  };
+
+  const wrapped = wrapInWorkflow(
+    { line: 1, dashIndent: 4, lines: ['    - run: echo hi'] },
+    { inputs: [] },
+  );
+
+  test('stops the run over the workflows and says it timed out', async () => {
+    const hangs = fakeActionlint('exec sleep 60');
+
+    const started = performance.now();
+
+    const result = await runActionlintIn(os.tmpdir(), 200)(
+      hangs,
+      '/no/shellcheck',
+    );
+
+    assert.deepStrictEqual(result, {
+      status: null,
+      signal: null,
+      error: undefined,
+      timedOut: true,
+    });
+
+    assert.isBelow(performance.now() - started, 10_000);
+  });
+
+  test('stops the run over a composite action and says it timed out', async () => {
+    const hangs = fakeActionlint('exec sleep 60');
+
+    const result = await lintWorkflowTextWithin(200)(
+      hangs,
+      '/no/shellcheck',
+      wrapped,
+    );
+
+    assert.isTrue(result.timedOut);
+
+    assert.isUndefined(result.error);
+  });
+
+  test('reads a run that finishes in time as it ended', async () => {
+    const finishes = fakeActionlint("echo '[]'; exit 0");
+
+    assert.deepStrictEqual(
+      await runActionlintIn(os.tmpdir(), 10_000)(finishes, '/no/shellcheck'),
+      { status: 0, signal: null, error: undefined, timedOut: false },
+    );
+
+    const composite = await lintWorkflowTextWithin(10_000)(
+      finishes,
+      '/no/shellcheck',
+      wrapped,
+    );
+
+    assert.deepStrictEqual(
+      { ...composite, workflow: undefined },
+      {
+        workflow: undefined,
+        status: 0,
+        stdout: '[]\n',
+        stderr: '',
+        error: undefined,
+        timedOut: false,
+      },
+    );
+  });
+
+  test('still reports a binary that cannot start as an error, not a timeout', async () => {
+    const result = await runActionlintIn(os.tmpdir(), 10_000)(
+      path.join(os.tmpdir(), 'no-such-actionlint'),
+      '/no/shellcheck',
+    );
+
+    assert.isFalse(result.timedOut);
+
+    assert.include(result.error, 'ENOENT');
   });
 });
