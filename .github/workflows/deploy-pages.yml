@@ -38,6 +38,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v7.0.1
+        with:
+          persist-credentials: false
 
       - name: Set up pnpm, Node.js and the dependencies
         uses: $/.github/actions/setup

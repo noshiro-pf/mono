@@ -10,7 +10,7 @@ name: Lint Pull Request
 # holds the three is above the jobs below.
 
 on:
-  pull_request_target:
+  pull_request_target: # zizmor: ignore[dangerous-triggers] nothing from the pull request is checked out or run; README.md, "`pull_request_target`"
     branches:
       - 'main'
       # `archive/**` holds frozen snapshots of retired work. They are never

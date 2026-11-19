@@ -217,6 +217,7 @@ Grants that recur:
 - uses: actions/checkout@…
   with:
       ref: ${{ case(github.event_name == 'pull_request', github.event.pull_request.head.sha, github.sha) }}
+      persist-credentials: false
 ```
 
 The branch tip, not the merge commit GitHub synthesises for a `pull_request`
@@ -225,11 +226,20 @@ not even exist while the pull request has a conflict, and the gate's diff has
 to be the diff the checks then run against. On a `push` or
 `workflow_dispatch` run this falls back to the event's own commit.
 
+`persist-credentials: false` on every checkout: otherwise the job's token stays
+in `.git/config` for every later step, the dependency tree included, to read.
+The repository is public, so a later `git fetch` needs no token. A job that
+pushes takes its token in the step that pushes instead: `pnpm-update.yml` and
+`node-support-update.yml` put it in the push's remote URL, and `release.yml`
+hands it to `changesets/action` (see "Jobs that hold a key").
+
 ### Setup
 
 ```yaml
 - name: Checkout
   uses: actions/checkout@…
+  with:
+      persist-credentials: false
 
 - name: Set up pnpm, Node.js and the dependencies
   uses: $/.github/actions/setup

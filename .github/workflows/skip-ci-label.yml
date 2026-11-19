@@ -16,7 +16,7 @@ name: Skip CI Label
 # reported", which blocks forever.
 
 on:
-  pull_request_target:
+  pull_request_target: # zizmor: ignore[dangerous-triggers] nothing from the pull request is checked out or run; README.md, "`pull_request_target`"
     types:
       - opened
       - synchronize
