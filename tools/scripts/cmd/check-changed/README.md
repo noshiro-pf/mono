@@ -73,8 +73,9 @@ by case. In order:
    repository it imports too (as TypeScript resolves them), and what those run
    with. So when what a package emits changes (its `src/` less tests,
    `configs/tsconfig.build.json`, `scripts/cmd/build.mts` or manifest), what a
-   config imports that runs with it is built first, as far as the diff changed
-   it, and `fix:lint` then runs in every changed package and every member whose
+   config imports (a member's, or the root's or `strict-lib/`'s, which are no
+   member's) that runs with it is built first, as far as the diff changed it,
+   and `fix:lint` then runs in every changed package and every member whose
    config imports one, and the root program's checks and strict-lib's lint run
    too.
    What runs with a changed package is followed through any member from an

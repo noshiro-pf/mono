@@ -1,6 +1,10 @@
 import { Arr, Result, unknownToString } from 'ts-data-forge';
 import { isDirectlyExecuted } from 'ts-repo-utils';
-import { readPackages, readProseGate } from './check-changed/packages.mjs';
+import {
+  readOutsideLintImports,
+  readPackages,
+  readProseGate,
+} from './check-changed/packages.mjs';
 import {
   AREAS,
   buildPlan,
@@ -48,11 +52,13 @@ import {
  */
 export const checkChangedReach = (): Promise<Result<Summary, string>> =>
   Result.safeTry(async function* () {
-    const [manifestsRead, workflowsRead, packages] = await Promise.all([
-      readManifests(),
-      readCheckWorkflows(),
-      readPackages(),
-    ]);
+    const [manifestsRead, workflowsRead, packages, outsideLintImports] =
+      await Promise.all([
+        readManifests(),
+        readCheckWorkflows(),
+        readPackages(),
+        readOutsideLintImports(),
+      ]);
 
     const manifests = yield* Result.safeUnwrap(manifestsRead);
 
@@ -73,6 +79,7 @@ export const checkChangedReach = (): Promise<Result<Summary, string>> =>
         packages,
         proseGate,
         rootScripts: Object.keys(rootScripts),
+        outsideLintImports,
       }),
     );
 
@@ -149,10 +156,13 @@ export const planReach = ({
   packages,
   proseGate,
   rootScripts,
+  outsideLintImports,
 }: Readonly<{
   packages: readonly PackageInfo[];
   proseGate: readonly string[];
   rootScripts: readonly string[];
+  /** What the root's and `strict-lib/`'s ESLint configs import by name. */
+  outsideLintImports: ReadonlySet<string>;
 }>): Result<
   Readonly<{ commands: readonly CommandId[]; areas: ReadonlySet<Area> }>,
   string
@@ -192,6 +202,7 @@ export const planReach = ({
       rootScripts,
       coverage: true,
       spellChecked: [file],
+      outsideLintImports,
     });
 
     for (const step of plan) {

@@ -2,7 +2,12 @@ import dedent from 'dedent';
 import * as fs from 'node:fs/promises';
 import * as os from 'node:os';
 import * as path from 'node:path';
-import { moduleReader, readLintImports, resolveModule } from './packages.mjs';
+import {
+  moduleReader,
+  readLintImports,
+  readOutsideLintImports,
+  resolveModule,
+} from './packages.mjs';
 
 describe('readLintImports', () => {
   const modules = new Map<string, readonly string[]>([
@@ -258,3 +263,13 @@ const toFixturePath = (file: string): string =>
     .split(path.sep)
     .join('/')
     .replace(/^[a-z]:/iu, '');
+
+describe(readOutsideLintImports, () => {
+  test('reads what the root’s and strict-lib’s configs import', async () => {
+    const names = await readOutsideLintImports();
+
+    // strict-lib/eslint.config.mts imports the preset, and the root's config
+    // the preset and its own plugins.
+    assert.isTrue(names.has('eslint-config-typed'));
+  });
+});

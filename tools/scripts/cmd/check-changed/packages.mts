@@ -53,6 +53,36 @@ export const readPackages = async (): Promise<readonly PackageInfo[]> => {
 };
 
 /**
+ * The packages the ESLint configs outside the members import by name: the
+ * root's and `strict-lib/`'s, which load the same toolchain and are linted on
+ * every CI run (`buildPlan`'s `outsideLintImports`).
+ */
+export const readOutsideLintImports = async (): Promise<
+  ReadonlySet<string>
+> => {
+  // eslint-disable-next-line security/detect-non-literal-fs-filename -- a config at the root or in strict-lib/, or a module it imports
+  const readModule = moduleReader((file) => fs.readFile(file, 'utf8'));
+
+  const read = await Promise.all(
+    OUTSIDE_LINT_CONFIG_DIRS.map(async (dir) => {
+      const absolute = path.join(projectRootPath, dir);
+
+      return readLintImports(
+        absolute,
+        // eslint-disable-next-line security/detect-non-literal-fs-filename -- the root, or strict-lib/
+        await fs.readdir(absolute),
+        { readModule, resolve: resolveModule },
+      );
+    }),
+  );
+
+  return new Set<string>(read.flatMap((names) => Array.from(names)));
+};
+
+/** Where the ESLint configs that are no member's live. */
+const OUTSIDE_LINT_CONFIG_DIRS = ['.', 'strict-lib'] as const;
+
+/**
  * A `readModule` for {@link readLintImports}, shared across members so that a
  * module many configs import is read once: a module's runtime specifiers, or
  * `undefined` for a file gone since it was listed or resolved. Any other read

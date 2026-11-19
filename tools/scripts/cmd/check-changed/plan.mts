@@ -258,6 +258,7 @@ export const buildPlan = ({
   maxParallel,
   coverage,
   spellChecked,
+  outsideLintImports,
 }: Readonly<{
   classification: Classification;
   /** The commit the diff is taken from (a merge base). */
@@ -271,6 +272,12 @@ export const buildPlan = ({
   coverage: boolean;
   /** The changed files that still exist and are not ignored, for cspell. */
   spellChecked: readonly string[];
+  /**
+   * The packages the root's and `strict-lib/`'s ESLint configs import by name
+   * (`readOutsideLintImports` in `packages.mts`): those configs are no
+   * member's, and what they import counts as imported by a config all the same.
+   */
+  outsideLintImports: ReadonlySet<string>;
 }>): readonly Step[] => {
   const { packages, dependents, areas, members } = classification;
 
@@ -296,7 +303,7 @@ export const buildPlan = ({
     ({ forgottenExportsRead: read }) => read,
   );
 
-  const linted = lintedPackages(code, members);
+  const linted = lintedPackages(code, members, outsideLintImports);
 
   const builtForForgottenExports = changedBuildsFor(
     forgottenExportsRead,
@@ -544,9 +551,7 @@ export const buildPlan = ({
     }),
 
     // strict-lib's config loads the same toolchain, and CI lints it on every
-    // run. For any such change, as for the root's checks above. Its config's
-    // imports are not read, as it is not a member: a package it alone imports
-    // would not count as one a config imports.
+    // run. For any such change, as for the root's checks above.
     ...(linted.lintInputChanged && !areas.has('strict-lib')
       ? [rootStep('check', 'strict-lib:check:lint')]
       : []),
@@ -1328,8 +1333,8 @@ const loadersOf = (
 
 /**
  * What `fix:lint` runs in, and what is built for it. A lint loads from `dist/`
- * the packages a member's config imports (`lintImports`) and what those run
- * with. With no change to that, the packages whose code changed. With one, the
+ * the packages a member's config imports (`lintImports`), or the root's or
+ * `strict-lib/`'s (`outsideLintImports`), and what those run with. With no change to that, the packages whose code changed. With one, the
  * `packages` linted are every changed one and every member whose config imports
  * a package that loads a changed one, and the `builds` are the changed packages
  * those imported packages are built against, in build order.
@@ -1346,6 +1351,7 @@ const loadersOf = (
 const lintedPackages = (
   code: Classification['packages'],
   members: readonly PackageInfo[],
+  outsideLintImports: ReadonlySet<string>,
 ): Readonly<{
   /** Whether a package a config imports changed what a lint loads of it. */
   lintInputChanged: boolean;
@@ -1374,7 +1380,8 @@ const lintedPackages = (
   const imported = members.filter(
     ({ name }) =>
       loaded.has(name) &&
-      members.some(({ lintImports }) => lintImports.has(name)),
+      (outsideLintImports.has(name) ||
+        members.some(({ lintImports }) => lintImports.has(name))),
   );
 
   if (Arr.isEmpty(imported)) {
