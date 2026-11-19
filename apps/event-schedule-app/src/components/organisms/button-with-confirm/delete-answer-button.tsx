@@ -23,11 +23,6 @@ const dialogConfig = {
   confirmButtonText: dict.common.buttonText.delete,
 } as const;
 
-const toastConfig = {
-  message: dc.deleteAnswerResultMessage,
-  intent: 'success',
-} as const;
-
 export const DeleteAnswerButton = ({
   onConfirmDeleteAnswer,
   loading,
@@ -36,7 +31,7 @@ export const DeleteAnswerButton = ({
     buttonConfig={buttonConfig}
     dialogConfig={dialogConfig}
     loading={loading}
-    toastConfig={toastConfig}
+    // The store says whether the delete went through, which this cannot see.
     onConfirmClick={onConfirmDeleteAnswer}
   />
 );

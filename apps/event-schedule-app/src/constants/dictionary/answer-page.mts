@@ -50,7 +50,10 @@ export const answerPageDictionary = {
       'また、仮登録によりこの日程調整とアカウントが紐づくことで、日程調整一覧に表示されるようになります。',
       '各日程の回答は空欄で登録されるので、後で回答を埋めるのを忘れないようにしてください。',
     ].join(''),
-    result: { success: '仮登録しました。' },
+    result: {
+      success: '仮登録しました。',
+      error: '仮登録に失敗しました。回答期限を過ぎていないか確認してください。',
+    },
   },
 
   eventInfo: {
@@ -246,11 +249,17 @@ export const answerPageDictionary = {
         '未回答の日程がありますが、このまま提出してもよろしいですか？（後からの回答追加は可能です）',
       createAnswerResultMessage: '追加しました。',
       updateAnswerResultMessage: '更新しました。',
+      createAnswerErrorMessage:
+        '回答の追加に失敗しました。回答期限を過ぎていないか確認してください。',
+      updateAnswerErrorMessage:
+        '回答の更新に失敗しました。回答期限を過ぎていないか確認してください。',
     },
     deleteButton: {
       deleteAnswerConfirmation:
         '回答を削除しますか？（この操作は取り消すことができません）',
       deleteAnswerResultMessage: '削除しました。',
+      deleteAnswerErrorMessage:
+        '回答の削除に失敗しました。回答期限を過ぎていないか確認してください。',
     },
   },
 } as const;
