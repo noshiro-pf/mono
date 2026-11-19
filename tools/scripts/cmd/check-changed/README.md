@@ -102,10 +102,13 @@ by case. In order:
    one script per CPU and at most 4 at once, as `pnpm run` runs `check:root`
    (`--max-parallel` sets another); the `strict-lib:`
    checks for `strict-lib/`, and its members' `check:test` for a path there the
-   code gate lets through; `check:knip` for any change the code gate lets
-   through, as CI runs it, and `check:published-deps` for a manifest or for what
-   it lints (a published package's `src/`, an `eslint.config.mts`); `check:md`
-   for prose; `check:prose` always; cspell over the changed files, and
+   code gate lets through, and after its generators a harness's `check:types`
+   (the lib-check entries over its generated output) for a file of its own,
+   every harness's for an entry, a shared config or the converter, a few minutes
+   for all twelve; `check:knip` for any change the code gate lets through, as CI
+   runs it, and `check:published-deps` for a manifest or for what it lints (a
+   published package's `src/`, an `eslint.config.mts`); `check:md` for prose;
+   `check:prose` always; cspell over the changed files, and
    `check:cspell:changeset` for a changeset (the whole `check:cspell` instead
    when a `cspell.config.yaml` changed).
 5. **Format** again, for what the fixers wrote (`fix:fmt:full` instead when
