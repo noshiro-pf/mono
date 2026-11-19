@@ -56,20 +56,25 @@ describe(queueViewOf, () => {
     );
 
     assert.deepStrictEqual(
-      view.next.map(({ number, checkedAhead }) => [number, checkedAhead]),
+      view.next.map(({ number, checkedAhead, why }) => [
+        number,
+        checkedAhead,
+        why,
+      ]),
       [
-        [2, true],
-        [3, false],
+        [2, true, 'checked ahead'],
+        [3, false, undefined],
       ],
     );
 
     assert.isTrue(view.orderKnown);
   });
 
-  test('says why a queued pull request waits, and leaves out one not queued', () => {
+  test('draws a wait on a box ahead as an arc, not as words, and leaves out one not queued', () => {
+    // #2 is the second box of the row, #4 the fourth: two places back.
     assert.deepStrictEqual(
-      view.waiting.map(({ number, why }) => [number, why]),
-      [[4, 'after #2']],
+      view.waiting.map(({ number, why, arcs }) => [number, why, arcs]),
+      [[4, undefined, [{ number: 2, span: 2 }]]],
     );
 
     assert.deepStrictEqual(
@@ -77,10 +82,94 @@ describe(queueViewOf, () => {
       [[5, 'draft']],
     );
 
+    // Queued counts the boxes the worker may take, the running one aside.
     assert.strictEqual(
       queueSummary(view),
-      '5 queued · 1 running · 0 set aside',
+      '3 queued · 1 running · 1 set aside',
     );
+  });
+});
+
+describe('the boxes that wait', () => {
+  const queued = [label('merge-queued')] as const;
+
+  test('come after what they wait for among them, by number otherwise', () => {
+    const from = snapshot([
+      pull(7, {
+        labels: queued,
+        mergeState: 'BEHIND',
+        body: 'Merge-After: #9',
+      }),
+      pull(8, {
+        labels: queued,
+        mergeState: 'BEHIND',
+        body: 'Merge-After: #10',
+      }),
+      pull(9, {
+        labels: queued,
+        mergeState: 'BEHIND',
+        body: 'Merge-After: #10',
+      }),
+      pull(10, { labels: queued, isDraft: true }),
+    ]);
+
+    const view = queueViewOf(decided(from), from);
+
+    assert.deepStrictEqual(
+      view.waiting.map(({ number }) => number),
+      [8, 9, 7],
+    );
+
+    // #9 is ahead of #7: an arc; #10 is not in the row: words.
+    assert.deepStrictEqual(
+      view.waiting.map(({ number, why, arcs }) => [number, why, arcs]),
+      [
+        [8, 'after #10', []],
+        [9, 'after #10', []],
+        [7, undefined, [{ number: 9, span: 1 }]],
+      ],
+    );
+  });
+
+  test('strike out a Merge-After that names no open pull request, with nothing else to say', () => {
+    const from = snapshot([
+      pull(7, {
+        labels: queued,
+        mergeState: 'BEHIND',
+        body: 'Merge-After: #99',
+      }),
+    ]);
+
+    const [box] = queueViewOf(decided(from), from).next;
+
+    assert.deepStrictEqual([box?.why, box?.settled], ['after #99', true]);
+  });
+
+  test('say conflicts, which goes before a met Merge-After', () => {
+    const from = snapshot([
+      pull(7, {
+        labels: queued,
+        mergeState: 'DIRTY',
+        body: 'Merge-After: #99',
+      }),
+    ]);
+
+    const [box] = queueViewOf(decided(from), from).next;
+
+    assert.deepStrictEqual([box?.why, box?.settled], ['conflicts', false]);
+  });
+
+  test('keep one in a merge state nothing expects in the row', () => {
+    const from = snapshot([pull(7, { labels: queued, mergeState: 'UNKNOWN' })]);
+
+    const view = queueViewOf(decided(from), from);
+
+    assert.deepStrictEqual(
+      view.waiting.map(({ number, why }) => [number, why]),
+      [[7, 'merge state']],
+    );
+
+    assert.isEmpty(view.outside);
   });
 });
 

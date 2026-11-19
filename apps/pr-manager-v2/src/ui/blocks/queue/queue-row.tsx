@@ -6,18 +6,20 @@ import {
 } from 'synstate';
 import { constant, For, If, type JSX } from 'synstate-dom';
 import { Num, Optional } from 'ts-data-forge';
-import type { QueueView } from '../../../domain/index.mjs';
+import type { QueueBox, QueueView } from '../../../domain/index.mjs';
 import { dragFrom } from '../../layout/index.mjs';
-import { QueueLayerBox } from './queue-layer-box.js';
+import { arcLevelOf, QueueLayerBox } from './queue-layer-box.js';
 
 type Props = Readonly<{ view: InitializedObservable<QueueView> }>;
 
 /**
- * The queue in one row of equal boxes: the base and what is running, held at
- * the start, then what the worker picks next in order, then dashed boxes for
- * those whose turn has not come. When the row overflows, a map above it shows
- * one mark per box and a frame around the part in view; the frame drags like a
- * scroll bar's thumb, and a click elsewhere on the map jumps there.
+ * The queue in one row of joined boxes after the base it merges into: what is
+ * running, held at the start, then what the worker picks next in order, then
+ * dashed boxes for those whose turn has not come. When the row overflows it
+ * scrolls across, its edges fading where there is more, and a map above it, one
+ * mark per box, shows a window around the part in view in place of a scroll
+ * bar: the window drags like a thumb, a press elsewhere jumps there, and a
+ * mouse wheel over either scrolls the row across until it is at its end.
  */
 export const QueueRow = ({ view }: Props): JSX.Element => {
   const [metrics, setMetrics] = createState<Metrics>({
@@ -32,12 +34,18 @@ export const QueueRow = ({ view }: Props): JSX.Element => {
 
   const boxes = view.pipe(
     map(({ running, next, waiting }) => [
-      ...running.map((box) => ({ box, place: 'running' as const })),
-      ...next.map((box, index) => ({
+      ...running.map((box) => ({
         box,
-        place: index === 0 ? ('next' as const) : (index + 1).toString(),
+        kind: 'running' as const,
+        place: 'running',
       })),
-      ...waiting.map((box) => ({ box, place: 'waiting' as const })),
+      ...[
+        ...next.map((box) => ({ box, kind: 'next' as const })),
+        ...waiting.map((box) => ({ box, kind: 'waiting' as const })),
+      ].map((item, index) => ({
+        ...item,
+        place: index === 0 ? 'next' : (index + 1).toString(),
+      })),
     ]),
   );
 
@@ -56,13 +64,50 @@ export const QueueRow = ({ view }: Props): JSX.Element => {
     ),
   );
 
-  /** Scrolls so that the frame's left edge sits at `fraction` of the map. */
+  /** Scrolls so that the window's left edge sits at `fraction` of the map. */
   const scrollTo = (fraction: number): void => {
     const element = mut_scroller.element;
 
     if (element !== undefined) {
       element.scrollTo({ left: fraction * element.scrollWidth });
     }
+  };
+
+  // A vertical wheel turned over the row scrolls it across, and leaves the page
+  // to scroll on once the row is at its end: a mouse wheel cannot be told from
+  // a trackpad's vertical swipe, and turning one over the row is what this is
+  // for.
+  const onWheel = (event: WheelEvent): void => {
+    const element = mut_scroller.element;
+
+    if (
+      element === undefined ||
+      event.ctrlKey ||
+      Math.abs(event.deltaX) >= Math.abs(event.deltaY) ||
+      element.scrollWidth <= element.clientWidth + 1
+    ) {
+      return;
+    }
+
+    const delta =
+      event.deltaY *
+      (event.deltaMode === WheelEvent.DOM_DELTA_LINE
+        ? LINE_PIXELS
+        : event.deltaMode === WheelEvent.DOM_DELTA_PAGE
+          ? element.clientWidth
+          : 1);
+
+    const max = element.scrollWidth - element.clientWidth;
+
+    const left = Math.min(Math.max(element.scrollLeft + delta, 0), max);
+
+    if (Math.abs(left - element.scrollLeft) < 1) {
+      return;
+    }
+
+    event.preventDefault();
+
+    element.scrollTo({ left });
   };
 
   const observe = (element: HTMLElement): void => {
@@ -80,7 +125,7 @@ export const QueueRow = ({ view }: Props): JSX.Element => {
 
     observer.observe(element);
 
-    // The map's frame follows the scroll position itself, which no observer
+    // The map's window follows the scroll position itself, which no observer
     // reports: an IntersectionObserver says what is in view, not by how much.
     // eslint-disable-next-line unicorn/prefer-observer-apis
     element.addEventListener('scroll', measure, { passive: true });
@@ -99,82 +144,96 @@ export const QueueRow = ({ view }: Props): JSX.Element => {
   };
 
   return (
-    <div class={constant('queue-rows')}>
-      <If
-        cond={overflows}
-        then={
-          <div
-            aria-hidden={constant('true')}
-            class={constant('queue-map')}
-            onPointerDown={(event) => {
-              const box = event.currentTarget.getBoundingClientRect();
+    <div class={constant('queue-row')}>
+      <span class={constant('queue-base')}>
+        {view.pipe(map(({ base }) => base))}
+        <span aria-hidden={constant('true')}>{constant(' ←')}</span>
+      </span>
 
-              const mapWidth = box.width;
+      <div
+        class={constant('queue-track')}
+        data-arc-level={view.pipe(map(arcRoomOf))}
+        data-more-after={metrics.pipe(
+          map(({ left, width, client }) =>
+            (left + client < width - 1).toString(),
+          ),
+        )}
+        data-more-before={metrics.pipe(
+          map(({ left }) => (left > 1).toString()),
+        )}
+        data-overflows={overflows.pipe(map((o) => o.toString()))}
+        onWheel={onWheel}
+      >
+        <If
+          cond={overflows}
+          then={
+            <div
+              aria-hidden={constant('true')}
+              class={constant('queue-map')}
+              onPointerDown={(event) => {
+                const box = event.currentTarget.getBoundingClientRect();
 
-              const { width, client, left } = Optional.unwrap(
-                metrics.getSnapshot(),
-              );
+                const mapWidth = box.width;
 
-              if (!Num.isNonZero(mapWidth) || !Num.isNonZero(width)) {
-                return;
-              }
+                const { width, client, left } = Optional.unwrap(
+                  metrics.getSnapshot(),
+                );
 
-              const visible = Num.div(client, width);
+                if (!Num.isNonZero(mapWidth) || !Num.isNonZero(width)) {
+                  return;
+                }
 
-              const frameStart = Num.div(left, width);
+                const visible = Num.div(client, width);
 
-              const at = Num.div(event.clientX - box.left, mapWidth);
+                const frameStart = Num.div(left, width);
 
-              // On the frame: drag it from where it was taken. Elsewhere: jump
-              // so the frame is centred there, then drag from its middle.
-              const grip =
-                frameStart <= at && at <= frameStart + visible
-                  ? at - frameStart
-                  : visible / 2;
+                const at = Num.div(event.clientX - box.left, mapWidth);
 
-              scrollTo(at - grip);
+                // On the window: drag it from where it was taken. Elsewhere:
+                // jump so the window is centred there, then drag from its
+                // middle.
+                const grip =
+                  frameStart <= at && at <= frameStart + visible
+                    ? at - frameStart
+                    : visible / 2;
 
-              dragFrom(event, (x) => {
-                scrollTo(Num.div(x - box.left, mapWidth) - grip);
-              });
-            }}
-          >
-            <For items={boxes} key={({ box }) => box.number}>
-              {(item$) => (
-                <span
-                  class={constant('queue-map-mark')}
-                  data-place={item$.pipe(
-                    map(({ place }) =>
-                      place === 'running' || place === 'waiting'
-                        ? place
-                        : 'next',
-                    ),
-                  )}
-                />
-              )}
-            </For>
-            <span
-              class={constant('queue-map-frame')}
-              style={{
-                left: frame.pipe(map((f) => f.left)),
-                width: frame.pipe(map((f) => f.width)),
+                scrollTo(at - grip);
+
+                dragFrom(event, (x) => {
+                  scrollTo(Num.div(x - box.left, mapWidth) - grip);
+                });
               }}
-            />
-          </div>
-        }
-      />
+            >
+              <For items={boxes} key={({ box }) => box.number}>
+                {(item$) => (
+                  <span
+                    class={constant('queue-map-mark')}
+                    data-kind={item$.pipe(
+                      map(({ box, kind }) =>
+                        kind === 'waiting' && box.failing ? 'failing' : kind,
+                      ),
+                    )}
+                    data-priority={item$.pipe(map(({ box }) => box.priority))}
+                  />
+                )}
+              </For>
+              <span
+                class={constant('queue-map-window')}
+                style={{
+                  left: frame.pipe(map((f) => f.left)),
+                  width: frame.pipe(map((f) => f.width)),
+                }}
+              />
+            </div>
+          }
+        />
 
-      <div class={constant('queue-scroll')} ref={observe}>
-        <ol class={constant('queue-row')}>
-          <li class={constant('queue-base')}>
-            <span class={constant('queue-base-name')}>
-              {view.pipe(map(({ base }) => `${base} ←`))}
-            </span>
-          </li>
+        <ol class={constant('queue')} ref={observe}>
           <For items={boxes} key={({ box }) => box.number}>
             {(item$) => (
               <QueueLayerBox
                 box={item$.pipe(map(({ box }) => box))}
+                kind={item$.pipe(map(({ kind }) => kind))}
                 place={item$.pipe(map(({ place }) => place))}
               />
             )}
@@ -186,3 +245,15 @@ export const QueueRow = ({ view }: Props): JSX.Element => {
 };
 
 type Metrics = Readonly<{ left: number; width: number; client: number }>;
+
+/** A wheel's line, in pixels, about what a browser scrolls a page by. */
+const LINE_PIXELS = 20;
+
+/** The highest arc in the row, which the room above the boxes is made for. */
+const arcRoomOf = ({ running, next, waiting }: QueueView): string =>
+  Math.max(
+    0,
+    ...[...running, ...next, ...waiting].flatMap(({ arcs }: QueueBox) =>
+      arcs.map(({ span }) => arcLevelOf(span)),
+    ),
+  ).toString();

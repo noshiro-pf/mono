@@ -1,11 +1,14 @@
 import {
+  isVersionBranch,
   numberOfQueueLayerBranch,
+  parseMergeAfter,
   type PullRequestDecision,
   type QueueDecision,
   type QueueStanding,
   type Snapshot,
 } from 'pr-report-core-v2';
 import { Arr, Result } from 'ts-data-forge';
+import type { ReadonlyRecord } from 'ts-type-forge';
 import { priorityOf, type Priority } from '../merge-order/index.mjs';
 
 /** What the queue block draws (spec §8). */
@@ -39,11 +42,31 @@ export type QueueBox = Readonly<{
    * is picked late, and lands nothing until someone with the bypass merges.
    */
   bypass: string | undefined;
-  /** For a waiting box: `after #N`, `review`, `native stack`, … */
+  /**
+   * A word or two under the number: why it waits (`after #N`, `review`,
+   * `native stack`, …), or a `Merge-After:` it does not wait for. What it waits
+   * for ahead of it in the row is an arc instead (`arcs`).
+   */
   why: string | undefined;
   /** What `why` stands for, in full. */
   detail: string | undefined;
+  /**
+   * Whether `why` names only what it declared it merges after that is not an
+   * open pull request, merged or closed mostly, which it does not wait for:
+   * drawn struck out, so its author sees the order is met.
+   */
+  settled: boolean;
+  /** Whether its checks failed: drawn in the status red. */
+  failing: boolean;
+  /**
+   * What it waits for ahead of it in the row, each an arc from that box to this
+   * one: its number, and how many places back it is.
+   */
+  arcs: readonly QueueArc[];
 }>;
+
+/** One box ahead in the row that a box waits for. */
+export type QueueArc = Readonly<{ number: number; span: number }>;
 
 export type OutsideItem = Readonly<{
   number: number;
@@ -53,6 +76,8 @@ export type OutsideItem = Readonly<{
   why: string;
   /** Whose move it is: `the skill`, `a person`, … */
   whose: string;
+  /** The same in a word, for a box: `skill`, `person`, … */
+  whoseWord: string;
   detail: string;
 }>;
 
@@ -85,34 +110,10 @@ export const queueViewOf = (
     }),
   );
 
-  const box = (d: PullRequestDecision): QueueBox => {
-    const waits = waitOf(d.standing);
-
-    return {
-      number: d.facts.number,
-      title: d.facts.title,
-      url: d.facts.url,
-      priority: priorityOf(d.facts.labels.map(({ name }) => name)),
-      checkedAhead: layered.has(d.facts.number),
-      bypass:
-        d.review !== undefined &&
-        Result.isOk(d.review) &&
-        d.review.value?.kind === 'bypass'
-          ? d.review.value.reason
-          : undefined,
-      why: waits?.why,
-      detail: waits?.detail,
-    };
-  };
-
   const orderKnown = queued.every(({ standing }) => standing.kind !== 'unread');
 
   const running = queued.filter(
     ({ standing }) => standing.kind === 'in-flight',
-  );
-
-  const waiting = queued.filter(
-    ({ standing }) => waitOf(standing) !== undefined,
   );
 
   const outside = Arr.generate(function* () {
@@ -124,6 +125,11 @@ export const queueViewOf = (
       }
     }
   });
+
+  // Those whose turn has not come, each after what it waits for among them.
+  const waiting = afterWhatEachWaitsOn(
+    queued.filter(({ standing }) => waitOf(standing) !== undefined),
+  );
 
   const placed = new Set<number>([
     ...running.map(({ facts }) => facts.number),
@@ -145,42 +151,152 @@ export const queueViewOf = (
         .filter(({ facts }) => !placed.has(facts.number))
         .toSorted((a, b) => a.facts.number - b.facts.number);
 
+  // Checked ahead first, as the worker merges them first.
+  const picked = [
+    ...next.filter(({ facts }) => layered.has(facts.number)),
+    ...next.filter(({ facts }) => !layered.has(facts.number)),
+  ] as const;
+
+  const row = [...running, ...picked, ...waiting] as const;
+
+  // Where each number stands in the row.
+  const places = new Map<number, number>(
+    row.map(({ facts }, index) => [facts.number, index]),
+  );
+
+  const open = new Set<number>(
+    Result.isOk(snapshot.pullRequests)
+      ? snapshot.pullRequests.value.map(({ number }) => number)
+      : [],
+  );
+
+  const box = (d: PullRequestDecision): QueueBox => {
+    const place = places.get(d.facts.number) ?? 0;
+
+    const arcs = Arr.generate(function* () {
+      for (const number of waitedOn(d.standing)) {
+        const from = places.get(number);
+
+        if (from !== undefined && from < place) {
+          yield { number, span: place - from } as const;
+        }
+      }
+    });
+
+    const waits = waitOf(d.standing, new Set(arcs.map(({ number }) => number)));
+
+    // With nothing it waits for to say: what it is.
+    const what = layered.has(d.facts.number)
+      ? ({ why: 'checked ahead', detail: CHECKED_AHEAD } as const)
+      : isVersionBranch(d.facts.headRef, snapshot.repository.defaultBranch)
+        ? ({ why: 'release', detail: 'The version pull request.' } as const)
+        : d.facts.mergeState === 'DIRTY'
+          ? ({
+              why: 'conflicts',
+              detail:
+                'GitHub says it conflicts with its base: the worker rebases it when its turn comes.',
+            } as const)
+          : undefined;
+
+    const said =
+      what !== undefined && waits?.why === undefined
+        ? ({
+            why: what.why,
+            detail:
+              waits === undefined
+                ? what.detail
+                : (`${waits.detail} ${what.detail}` as const),
+          } as const)
+        : waits;
+
+    const settled = parseMergeAfter(d.facts.body).filter(
+      (n) => n !== d.facts.number && !open.has(n),
+    );
+
+    const settledNote =
+      said?.why === undefined && Arr.isNonEmpty(settled)
+        ? ({
+            why: afterWord(settled),
+            detail: `Merge-After: ${afterWord(settled).slice('after '.length)} ${settled.length === 1 ? 'is' : 'are'} merged, closed or not a pull request: not a blocker.`,
+          } as const)
+        : undefined;
+
+    return {
+      number: d.facts.number,
+      title: d.facts.title,
+      url: d.facts.url,
+      priority: priorityOf(d.facts.labels.map(({ name }) => name)),
+      checkedAhead: layered.has(d.facts.number),
+      bypass:
+        d.review !== undefined &&
+        Result.isOk(d.review) &&
+        d.review.value?.kind === 'bypass'
+          ? d.review.value.reason
+          : undefined,
+      why: settledNote?.why ?? said?.why,
+      detail: settledNote?.detail ?? said?.detail,
+      settled: settledNote !== undefined,
+      failing: d.standing.kind === 'failing',
+      arcs,
+    };
+  };
+
   return {
     base: snapshot.repository.defaultBranch,
     running: running.map(box),
-    // Checked ahead first, as the worker merges them first.
-    next: [
-      ...next.filter(({ facts }) => layered.has(facts.number)),
-      ...next.filter(({ facts }) => !layered.has(facts.number)),
-    ].map(box),
+    next: picked.map(box),
     waiting: waiting.map(box),
     outside,
     orderKnown,
   };
 };
 
-/** Every count the summary line gives. */
+/**
+ * Every count the summary line gives, as v1 counts them: the boxes the worker
+ * may take, the running one aside; the one running; those outside the row.
+ */
 export const queueSummary = (view: QueueView): string =>
   [
-    `${countQueued(view)} queued`,
+    `${view.next.length + view.waiting.length} queued`,
     `${view.running.length} running`,
-    `${view.outside.filter(({ why }) => why === 'set aside').length} set aside`,
+    `${view.outside.length} set aside`,
   ].join(' · ');
 
+/** `#1, #2`. */
+const numbersWord = (numbers: readonly number[]): string =>
+  numbers.map((n) => `#${n}`).join(', ');
+
+/** `after #1, #2`. */
+const afterWord = (numbers: readonly number[]): string =>
+  `after ${numbersWord(numbers)}` as const;
+
+/**
+ * Why one whose turn has not come waits, in a word and in full, or `undefined`
+ * for one that does not wait. What it waits for that is `ahead` of it in the
+ * row is drawn as an arc and left out of the word, which is `undefined` when
+ * that is all of it.
+ */
 const waitOf = (
   standing: QueueStanding,
-): Readonly<{ why: string; detail: string }> | undefined => {
+  ahead: ReadonlySet<number> = new Set<number>(),
+): Readonly<{ why: string | undefined; detail: string }> | undefined => {
+  const after = (on: readonly number[]): string | undefined => {
+    const notAhead = on.filter((n) => !ahead.has(n));
+
+    return Arr.isNonEmpty(notAhead) ? afterWord(notAhead) : undefined;
+  };
+
   switch (standing.kind) {
     case 'stacked':
       return {
-        why: `after #${standing.on}`,
+        why: after([standing.on]),
         detail: `Stacked on #${standing.on}: it moves once that one merges.`,
       };
 
     case 'waiting':
       return {
-        why: `after ${standing.on.map((n) => `#${n}`).join(', ')}`,
-        detail: `Merges after ${standing.on.map((n) => `#${n}`).join(', ')}${standing.cyclic ? ', which wait on it in turn: a cycle' : ''}.`,
+        why: after(standing.on),
+        detail: `Merges after ${numbersWord(standing.on)}${standing.cyclic ? ', which wait on it in turn: a cycle' : ''}.`,
       };
 
     case 'native-stack':
@@ -195,7 +311,7 @@ const waitOf = (
 
     case 'release-blocked':
       return {
-        why: `after ${standing.by.map(({ number }) => `#${number}`).join(', ')}`,
+        why: after(standing.by.map(({ number }) => number)),
         detail: `The release waits for ${standing.by.map(({ number, isDraft }) => `#${number}${isDraft ? ' (draft)' : ''}`).join(', ')}, labelled blocks-release.`,
       };
 
@@ -206,17 +322,88 @@ const waitOf = (
           'The version pull request is behind the tip; the release workflow rebuilds it.',
       };
 
+    case 'failing':
+      return {
+        why: 'failing',
+        detail:
+          'Up to date with a required check failed: the worker sets it aside.',
+      };
+
+    case 'merge-state':
+      return {
+        why: 'merge state',
+        detail: `GitHub calls it ${standing.state}, which nothing here expects.`,
+      };
+
     case 'ignore':
     case 'unactionable':
     case 'owned':
-    case 'merge-state':
     case 'candidate':
     case 'in-flight':
-    case 'failing':
     case 'unread':
       return undefined;
   }
 };
+
+/** What one waits for other pull requests merging to end its wait. */
+const waitedOn = (standing: QueueStanding): readonly number[] => {
+  switch (standing.kind) {
+    case 'stacked':
+      return [standing.on];
+
+    case 'waiting':
+      return standing.on;
+
+    case 'release-blocked':
+      return standing.by.map(({ number }) => number);
+
+    case 'ignore':
+    case 'unactionable':
+    case 'owned':
+    case 'native-stack':
+    case 'release-stale':
+    case 'merge-state':
+    case 'candidate':
+    case 'in-flight':
+    case 'failing':
+    case 'held':
+    case 'unread':
+      return [];
+  }
+};
+
+/**
+ * The waits in the order they can end: each after what it waits for among them,
+ * by number otherwise (a cycle keeps number order where it closes).
+ */
+const afterWhatEachWaitsOn = (
+  pending: readonly PullRequestDecision[],
+): readonly PullRequestDecision[] => {
+  const byNumber = pending.toSorted((a, b) => a.facts.number - b.facts.number);
+
+  const mut_ordered: PullRequestDecision[] = [];
+
+  let mut_left: readonly PullRequestDecision[] = byNumber;
+
+  while (Arr.isNonEmpty(mut_left)) {
+    const left = new Set<number>(mut_left.map(({ facts }) => facts.number));
+
+    const next =
+      mut_left.find(({ standing }) =>
+        waitedOn(standing).every((n) => !left.has(n)),
+      ) ?? mut_left[0];
+
+    mut_ordered.push(next);
+
+    mut_left = mut_left.filter((each) => each !== next);
+  }
+
+  return mut_ordered;
+};
+
+/** What `checked ahead` under the number means. */
+const CHECKED_AHEAD =
+  'Its queue layer is built, so the worker releases it before what the queue’s own order would put first.';
 
 /** Set aside or claimed, by what the comments say; otherwise its owner's. */
 const ownedWord = (d: PullRequestDecision): string => {
@@ -250,6 +437,7 @@ const outsideOf = (d: PullRequestDecision): OutsideItem | undefined => {
         ...base,
         why: facts.isDraft ? 'draft' : 'out of scope',
         whose: 'its author',
+        whoseWord: 'author',
         detail: standing.reason,
       };
 
@@ -258,23 +446,8 @@ const outsideOf = (d: PullRequestDecision): OutsideItem | undefined => {
         ...base,
         why: ownedWord(d),
         whose: WHOSE[standing.owner.owner],
+        whoseWord: WHOSE_WORD[standing.owner.owner],
         detail: standing.owner.reason,
-      };
-
-    case 'failing':
-      return {
-        ...base,
-        why: 'failing',
-        whose: 'the worker',
-        detail: 'Up to date with a required check failed.',
-      };
-
-    case 'merge-state':
-      return {
-        ...base,
-        why: 'merge state',
-        whose: 'a person',
-        detail: `GitHub calls it ${standing.state}, which nothing here expects.`,
       };
 
     case 'unread':
@@ -282,6 +455,7 @@ const outsideOf = (d: PullRequestDecision): OutsideItem | undefined => {
         ...base,
         why: 'unread',
         whose: 'unknown',
+        whoseWord: '?',
         detail: `${standing.error.what}: ${standing.error.message}`,
       };
 
@@ -294,6 +468,8 @@ const outsideOf = (d: PullRequestDecision): OutsideItem | undefined => {
     case 'candidate':
     case 'in-flight':
     case 'held':
+    case 'failing':
+    case 'merge-state':
       return undefined;
   }
 };
@@ -305,8 +481,9 @@ const WHOSE = {
   none: 'nobody (a bug)',
 } as const;
 
-const countQueued = (view: QueueView): number =>
-  view.running.length +
-  view.next.length +
-  view.waiting.length +
-  view.outside.length;
+const WHOSE_WORD = {
+  worker: 'worker',
+  skill: 'skill',
+  human: 'person',
+  none: 'nobody',
+} as const satisfies ReadonlyRecord<keyof typeof WHOSE, string>;
