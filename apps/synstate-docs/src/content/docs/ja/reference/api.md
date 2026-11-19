@@ -75,8 +75,8 @@ SynStateはアプリケーションの状態を管理するためのシンプル
 - [`take(n)`](../take/): 最初のn回の発行を取得して完了。
 - [`skipWhile(predicate)`](../skip-while/): 述語がtrueの間、値をスキップ。
 - [`takeWhile(predicate)`](../take-while/): 述語がtrueの間、値を発行し、その後完了。
-- [`skipUntil(notifier)`](../skip-until/): notifierが発行するまで値をスキップ。
-- [`takeUntil(notifier)`](../take-until/): notifierの発行で完了。
+- [`skipUntil(notifier)`](../skip-until/): notifierが発行するか完了するまで値をスキップ。
+- [`takeUntil(notifier)`](../take-until/): notifierの発行か完了で完了。
 
 #### 時系列処理
 

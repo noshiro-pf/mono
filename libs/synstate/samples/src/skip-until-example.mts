@@ -12,9 +12,9 @@ if (import.meta.vitest !== undefined) {
     //                |------ skipped -------|
     //
     //  Explanation:
-    //  - skipUntil ignores all values until the notifier emits
-    //  - After the notifier emits, all subsequent values are passed through
-    //  - Opposite of takeUntil (which completes when notifier emits)
+    //  - skipUntil ignores all values until the notifier emits or completes
+    //  - After that, all subsequent values are passed through
+    //  - Opposite of takeUntil (which completes when the notifier emits or completes)
 
     const num$ = source<number>();
 

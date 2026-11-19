@@ -2,15 +2,15 @@
 prev: false
 next: false
 title: takeUntil
-description: '通知用 Observable が発行するまで、ソースからの値を発行します。'
+description: '通知用 Observable が発行するか完了するまで、ソースからの値を発行します。'
 ---
 
 import { MarbleDiagram } from '../../../../components/marble-diagram/marble-diagram';
 import { colors } from '../../../../components/constants.mjs';
 
 {/* jsdoc-description */}
-通知用 Observable が発行するまで、ソースからの値を発行します。
-通知用 Observable が発行すると、この Observable は完了します。
+通知用 Observable が発行するか完了するまで、ソースからの値を発行します。
+通知用 Observable が発行するか、発行せずに完了すると、この Observable は完了します（RxJS では、完了するだけの通知用 Observable は無視されます）。
 ソースと通知用 Observable の両方に届く更新（両者が同じ Observable から派生している場合）では、この Observable は通知用 Observable を先に聞きます。その更新で通知用 Observable が発行するか、それまでに完了していれば、その更新でのソースの値は発行されません。
 {/* /jsdoc-description */}
 
@@ -49,7 +49,7 @@ import { colors } from '../../../../components/constants.mjs';
 //  limited$      1         2         |------- (completed)
 //
 //  Explanation:
-//  - takeUntil completes the observable when the notifier emits
+//  - takeUntil completes the observable when the notifier emits or completes
 //  - After stop() is called, no further values are emitted
 //  - Useful for cleanup and cancellation patterns
 

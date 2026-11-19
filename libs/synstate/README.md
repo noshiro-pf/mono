@@ -752,8 +752,8 @@ For complex scenarios, SynState provides observable-based APIs:
     - `take(n)`: Take first n emissions then complete
     - `skipWhile(predicate)`: Skip values while predicate is true
     - `takeWhile(predicate)`: Emit values while predicate is true, then complete
-    - `skipUntil(notifier)`: Skip values until notifier emits
-    - `takeUntil(notifier)`: Complete on notifier emission
+    - `skipUntil(notifier)`: Skip values until notifier emits or completes
+    - `takeUntil(notifier)`: Complete when notifier emits or completes
 - Time series processing
     - `audit(ms)`: Emit the last value after specified time window (Almost equivalent to RxJS `auditTime`)
     - `debounce(ms)`: Debounce emissions (Almost equivalent to RxJS `debounceTime`)

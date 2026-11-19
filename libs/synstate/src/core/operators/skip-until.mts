@@ -16,7 +16,10 @@ import type {
 } from '../types/index.mjs';
 
 /**
- * Skips all values from the source observable until the notifier observable emits.
+ * Skips all values from the source observable until the notifier observable emits
+ * or completes: a notifier that completes without emitting, or has completed
+ * already, ends the skipping too. (In RxJS a notifier that only completes is
+ * ignored.)
  * In an update that reaches both the source and the notifier (both derive from one
  * observable), this observable hears the notifier first: if the notifier emits in
  * that update, or has completed by then, the source's value in that update is
@@ -24,7 +27,7 @@ import type {
  *
  * @template A - The type of values from the source
  * @param notifier - An observable that signals when to start emitting
- * @returns An operator that skips values until the notifier emits
+ * @returns An operator that skips values until the notifier emits or completes
  *
  * @example
  * ```ts
@@ -36,9 +39,9 @@ import type {
  * //                |------ skipped -------|
  * //
  * //  Explanation:
- * //  - skipUntil ignores all values until the notifier emits
- * //  - After the notifier emits, all subsequent values are passed through
- * //  - Opposite of takeUntil (which completes when notifier emits)
+ * //  - skipUntil ignores all values until the notifier emits or completes
+ * //  - After that, all subsequent values are passed through
+ * //  - Opposite of takeUntil (which completes when the notifier emits or completes)
  *
  * const num$ = source<number>();
  *
@@ -105,9 +108,6 @@ class SkipUntilObservableClass<A>
         this.#mut_subscription = undefined;
       };
 
-      // A notifier that completes without emitting stops the skipping too,
-      // which the description above, the README and the reference pages do not
-      // say yet.
       this.#mut_subscription = notifier.subscribe(stopSkipping, stopSkipping);
     }
 

@@ -2,14 +2,14 @@
 prev: false
 next: false
 title: skipUntil
-description: '通知用 Observable が発行するまで、ソース Observable からのすべての値をスキップします。'
+description: '通知用 Observable が発行するか完了するまで、ソース Observable からのすべての値をスキップします。'
 ---
 
 import { MarbleDiagram } from '../../../../components/marble-diagram/marble-diagram';
 import { colors } from '../../../../components/constants.mjs';
 
 {/* jsdoc-description */}
-通知用 Observable が発行するまで、ソース Observable からのすべての値をスキップします。
+通知用 Observable が発行するか完了するまで、ソース Observable からのすべての値をスキップします。発行せずに完了した、またはすでに完了している通知用 Observable も、スキップを終わらせます（RxJS では、完了するだけの通知用 Observable は無視されます）。
 ソースと通知用 Observable の両方に届く更新（両者が同じ Observable から派生している場合）では、この Observable は通知用 Observable を先に聞きます。その更新で通知用 Observable が発行するか、それまでに完了していれば、その更新でのソースの値は発行されます。
 {/* /jsdoc-description */}
 
@@ -49,9 +49,9 @@ import { colors } from '../../../../components/constants.mjs';
 //                |------ skipped -------|
 //
 //  Explanation:
-//  - skipUntil ignores all values until the notifier emits
-//  - After the notifier emits, all subsequent values are passed through
-//  - Opposite of takeUntil (which completes when notifier emits)
+//  - skipUntil ignores all values until the notifier emits or completes
+//  - After that, all subsequent values are passed through
+//  - Opposite of takeUntil (which completes when the notifier emits or completes)
 
 const num$ = source<number>();
 
