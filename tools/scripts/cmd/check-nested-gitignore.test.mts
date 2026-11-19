@@ -1,4 +1,8 @@
-import { findNestedGitignores } from './check-nested-gitignore.mjs';
+import {
+  ALLOWED_PRETTIERIGNORES,
+  findNestedGitignores,
+  findNestedPrettierignores,
+} from './check-nested-gitignore.mjs';
 
 describe(findNestedGitignores, () => {
   test('reports a nested .gitignore', () => {
@@ -33,6 +37,49 @@ describe(findNestedGitignores, () => {
         'libs/a/.gitignore.sample',
       ]),
       [],
+    );
+  });
+});
+
+describe(findNestedPrettierignores, () => {
+  const allowed = new Map<string, string>([
+    ['languages/x/fixtures/.prettierignore', 'its fmt runs from there'],
+  ]);
+
+  test('reports a package-level .prettierignore not on the allow-list', () => {
+    assert.deepStrictEqual(
+      findNestedPrettierignores(
+        [
+          '.prettierignore',
+          'languages/x/fixtures/.prettierignore',
+          'libs/a/.prettierignore',
+          'libs/b/.PrettierIgnore',
+          'experimental/old/.prettierignore',
+          'libs/a/x.prettierignore',
+        ],
+        allowed,
+      ),
+      {
+        notAllowed: ['libs/a/.prettierignore', 'libs/b/.PrettierIgnore'],
+        stale: [],
+      },
+    );
+  });
+
+  test('reports an allow-list entry that names no tracked file', () => {
+    assert.deepStrictEqual(
+      findNestedPrettierignores(['.prettierignore'], allowed),
+      { notAllowed: [], stale: ['languages/x/fixtures/.prettierignore'] },
+    );
+  });
+
+  test('allows the repository’s own list as it stands', () => {
+    assert.deepStrictEqual(
+      findNestedPrettierignores([
+        '.prettierignore',
+        ...ALLOWED_PRETTIERIGNORES.keys(),
+      ]),
+      { notAllowed: [], stale: [] },
     );
   });
 });
