@@ -3,7 +3,7 @@ import {
   map,
   skipIfNoChange,
   switchMap,
-  type Observable as SynstateObservable,
+  type InitializedObservable,
 } from 'synstate';
 import { AsyncData } from 'ts-std-forge';
 import {
@@ -19,10 +19,9 @@ import { fromRequest } from './from-request.mjs';
  * The page of summaries the product list shows. `switchMap` projects the query
  * the location already has, so opening the app on `/products/?page=2` asks for
  * page 2 at once, and a new query aborts the request for the one before. Like
- * `productDetail$`, it holds a value from the start, which its type does not
- * say.
+ * `productDetail$`, it holds a value from the start.
  */
-export const productList$: SynstateObservable<
+export const productList$: InitializedObservable<
   AsyncData<ProductSummaryPage, unknown>
 > = router.match
   // The list's own query, and only while the list is the page. The router keeps
@@ -36,7 +35,7 @@ export const productList$: SynstateObservable<
   .pipe(skipIfNoChange())
   .pipe(
     switchMap(
-      (query): SynstateObservable<AsyncData<ProductSummaryPage, unknown>> =>
+      (query): InitializedObservable<AsyncData<ProductSummaryPage, unknown>> =>
         query === undefined
           ? just(AsyncData.idle)
           : fromRequest((signal) => fetchProductSummaries(query, signal)),

@@ -5,11 +5,14 @@
 // @sumi-expect-error-file banned-syntax/no-this
 // @sumi-expect-error-file functions/prefer-arrow-function
 // @sumi-expect-error-file mutation/no-mutation-without-mut-prefix
-import { Optional } from 'ts-data-forge';
+import { Optional, expectType } from 'ts-data-forge';
 import { AsyncChildObservableClass } from '../class/index.mjs';
+import { just, source } from '../create/index.mjs';
 import { createScope, getCurrentScope } from '../scope/index.mjs';
 import type {
   DropInitialValueOperator,
+  InitializedObservable,
+  KeepInitialValueOperator,
   Observable,
   Scope,
   Subscription,
@@ -24,7 +27,10 @@ import { runUndoingOnThrow } from '../utils/index.mjs';
  *
  * A value the source already holds when `switchMap` is created (a state, an
  * observable with an initial value) is projected at once, as `map` and `filter`
- * start from it. A completed source is not projected.
+ * start from it. So an initialized source, with a projection that returns an
+ * initialized observable, gives an `InitializedObservable`. A completed source is
+ * not projected: on one, such as `just(x)`, the result completes holding no value
+ * although its type says it holds one.
  *
  * The projection runs in a scope of its own (see `createScope`): what it
  * creates is disposed when the next value switches away from it and when
@@ -126,12 +132,24 @@ import { runUndoingOnThrow } from '../utils/index.mjs';
  * ]);
  * ```
  */
-export const switchMap =
-  <A, B>(
-    mapToObservable: (curr: A) => Observable<B>,
-  ): DropInitialValueOperator<A, B> =>
-  (parentObservable) =>
+export function switchMap<A, B>(
+  mapToObservable: (curr: A) => InitializedObservable<B>,
+): KeepInitialValueOperator<A, B>;
+
+// The clauses differ in the return type alone: one body serves both. A
+// conditional return type, which Sumi asks for instead, would replace the
+// `<A, B>` a caller may pass explicitly.
+// @sumi-expect-error functions/no-refinement-overload
+export function switchMap<A, B>(
+  mapToObservable: (curr: A) => Observable<B>,
+): DropInitialValueOperator<A, B>;
+
+export function switchMap<A, B>(
+  mapToObservable: (curr: A) => Observable<B>,
+): DropInitialValueOperator<A, B> | KeepInitialValueOperator<A, B> {
+  return (parentObservable: Observable<A>) =>
     new SwitchMapObservableClass(parentObservable, mapToObservable);
+}
 
 class SwitchMapObservableClass<A, B>
   extends AsyncChildObservableClass<B, readonly [A]>
@@ -242,5 +260,42 @@ class SwitchMapObservableClass<A, B>
 
   protected override teardown(): void {
     this.#releaseInner();
+  }
+}
+
+if (import.meta.vitest !== undefined) {
+  test('type test', () => {
+    expect(1).toBe(1); // dummy
+  });
+
+  // An initialized source and a projection to an initialized observable.
+  {
+    const s = source<number>(0);
+
+    const _d = s.pipe(switchMap((x) => just(x + 1)));
+
+    expectType<typeof _d, InitializedObservable<number>>('=');
+  }
+
+  // A projection that may return an observable with no value.
+  {
+    const s = source<number>(0);
+
+    const _d = s.pipe(
+      switchMap((x): Observable<number> =>
+        x > 0 ? just(x) : source<number>(),
+      ),
+    );
+
+    expectType<typeof _d, Observable<number>>('=');
+  }
+
+  // A source with no value.
+  {
+    const s: Observable<number> = source<number>();
+
+    const _d = s.pipe(switchMap((x) => just(x + 1)));
+
+    expectType<typeof _d, Observable<number>>('=');
   }
 }
