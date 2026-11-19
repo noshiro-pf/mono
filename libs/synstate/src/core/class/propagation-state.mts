@@ -130,7 +130,7 @@ export const openUpdate = (depth: number): UpdateToken => {
 export const maxUpdateNesting = 100;
 
 export const updateLoopMessage =
-  `synstate: more than ${maxUpdateNesting.toString()} updates were nested, one started inside another: a subscriber or projection keeps writing to an observable whose update reaches it again. Make the write stop (a condition, or a value equal to the current one), or derive the value with map / combine.` as const;
+  `synstate: more than ${maxUpdateNesting.toString()} updates were nested, one started inside another: a subscriber or projection keeps writing to an observable whose update reaches it again. Make the write stop (a condition, or a value equal to the current one), or derive the value with map / derive.` as const;
 
 /** Visits every node the update has queued, shallowest first. */
 export const drainUpdate = (updateToken: UpdateToken): void => {
