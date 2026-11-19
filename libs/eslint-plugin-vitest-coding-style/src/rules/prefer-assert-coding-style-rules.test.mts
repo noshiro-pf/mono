@@ -1,6 +1,7 @@
 import parser from '@typescript-eslint/parser';
 import { RuleTester } from '@typescript-eslint/rule-tester';
 import dedent from 'dedent';
+import { Arr } from 'ts-data-forge';
 import { preferAssertDeepStrictEqualOverDeepEqualRule } from './prefer-assert-deep-strict-equal-over-deep-equal.mjs';
 import { preferAssertIsFalseOverNegatedAssertIsTrueRule } from './prefer-assert-is-false-over-assert-negation.mjs';
 import { preferAssertIsFalseOverAssertNotOkRule } from './prefer-assert-is-false-over-assert-not-ok.mjs';
@@ -257,22 +258,36 @@ ruleTester.run(
     ],
     invalid: [
       {
-        code: 'assert.isTrue(!foo);',
-        output: 'assert.isFalse(foo);',
+        code: dedent`
+          declare const foo: boolean;
+          assert.isTrue(!foo);
+        `,
+        output: dedent`
+          declare const foo: boolean;
+          assert.isFalse(foo);
+        `,
         errors: [{ messageId: 'preferAssertIsFalseOverAssertNegation' }],
       },
       {
-        code: 'assert.isTrue(!condition());',
-        output: 'assert.isFalse(condition());',
+        code: dedent`
+          declare const condition: () => boolean;
+          assert.isTrue(!condition());
+        `,
+        output: dedent`
+          declare const condition: () => boolean;
+          assert.isFalse(condition());
+        `,
         errors: [{ messageId: 'preferAssertIsFalseOverAssertNegation' }],
       },
       {
         code: dedent`
           import { assert as a } from 'vitest';
+          declare const foo: boolean;
           a.isTrue(!foo);
         `,
         output: dedent`
           import { assert as a } from 'vitest';
+          declare const foo: boolean;
           a.isFalse(foo);
         `,
         errors: [{ messageId: 'preferAssertIsFalseOverAssertNegation' }],
@@ -350,11 +365,13 @@ describe('prefer-assert-is-false-over-assert-is-not-ok through type wrappers', (
         {
           name: 'a wrapped receiver or method keeps its wrapper',
           code: dedent`
+            declare const x: boolean;
             (assert as typeof assert).notOk(x);
             assert!.isNotOk(x);
             assert.notOk!(x);
           `,
           output: dedent`
+            declare const x: boolean;
             (assert as typeof assert).isFalse(x);
             assert!.isFalse(x);
             assert.isFalse!(x);
@@ -389,10 +406,12 @@ describe('prefer-assert-is-true-over-assert through type wrappers', () => {
         {
           name: 'a wrapped receiver keeps its wrapper',
           code: dedent`
+            declare const x: boolean;
             (assert as typeof assert).ok(x);
             assert!.isOk(x);
           `,
           output: dedent`
+            declare const x: boolean;
             (assert as typeof assert).isTrue(x);
             assert!.isTrue(x);
           `,
@@ -404,6 +423,7 @@ describe('prefer-assert-is-true-over-assert through type wrappers', () => {
         {
           name: 'a wrapped bare callee is reported without a fix',
           code: dedent`
+            declare const x: boolean;
             (assert as typeof assert)(x);
             assert!(x);
           `,
@@ -456,10 +476,12 @@ describe('prefer-assert-is-false-over-negated-assert-is-true through type wrappe
         {
           name: 'a wrapped receiver keeps its wrapper',
           code: dedent`
+            declare const foo: boolean;
             (assert as typeof assert).isTrue(!foo);
             assert!.isTrue(!foo);
           `,
           output: dedent`
+            declare const foo: boolean;
             (assert as typeof assert).isFalse(foo);
             assert!.isFalse(foo);
           `,
@@ -482,8 +504,14 @@ describe('prefer-assert-is-false-over-negated-assert-is-true with parenthesized 
       invalid: [
         {
           name: 'a sequence expression stays one argument',
-          code: 'assert.isTrue(!(setup(), flag));',
-          output: 'assert.isFalse((setup(), flag));',
+          code: dedent`
+            declare const setup: () => void; declare const flag: boolean;
+            assert.isTrue(!(setup(), flag));
+          `,
+          output: dedent`
+            declare const setup: () => void; declare const flag: boolean;
+            assert.isFalse((setup(), flag));
+          `,
           errors: [{ messageId: 'preferAssertIsFalseOverAssertNegation' }],
         },
       ],
@@ -508,17 +536,25 @@ describe('prefer-assert-is-true-over-negated-assert-is-false', () => {
       ],
       invalid: [
         {
-          code: 'assert.isFalse(!foo);',
-          output: 'assert.isTrue(foo);',
+          code: dedent`
+            declare const foo: boolean;
+            assert.isFalse(!foo);
+          `,
+          output: dedent`
+            declare const foo: boolean;
+            assert.isTrue(foo);
+          `,
           errors: [{ messageId: 'preferAssertIsTrueOverNegatedAssertIsFalse' }],
         },
         {
           code: dedent`
             import { assert as a } from 'vitest';
+            declare const foo: boolean;
             a.isFalse(!foo);
           `,
           output: dedent`
             import { assert as a } from 'vitest';
+            declare const foo: boolean;
             a.isTrue(foo);
           `,
           errors: [{ messageId: 'preferAssertIsTrueOverNegatedAssertIsFalse' }],
@@ -554,8 +590,14 @@ describe('prefer-assert-is-true-over-negated-assert-is-false through type wrappe
         },
         {
           name: 'a wrapped receiver keeps its wrapper',
-          code: '(assert as typeof assert).isFalse(!foo);',
-          output: '(assert as typeof assert).isTrue(foo);',
+          code: dedent`
+            declare const foo: boolean;
+            (assert as typeof assert).isFalse(!foo);
+          `,
+          output: dedent`
+            declare const foo: boolean;
+            (assert as typeof assert).isTrue(foo);
+          `,
           errors: [{ messageId: 'preferAssertIsTrueOverNegatedAssertIsFalse' }],
         },
       ],
@@ -572,8 +614,14 @@ describe('prefer-assert-is-true-over-negated-assert-is-false with parenthesized 
       invalid: [
         {
           name: 'a sequence expression stays one argument',
-          code: 'assert.isFalse(!(setup(), flag));',
-          output: 'assert.isTrue((setup(), flag));',
+          code: dedent`
+            declare const setup: () => void; declare const flag: boolean;
+            assert.isFalse(!(setup(), flag));
+          `,
+          output: dedent`
+            declare const setup: () => void; declare const flag: boolean;
+            assert.isTrue((setup(), flag));
+          `,
           errors: [{ messageId: 'preferAssertIsTrueOverNegatedAssertIsFalse' }],
         },
       ],
@@ -1111,6 +1159,280 @@ describe('expect-to-assert fixes resolve the assert they write', () => {
             va.isTrue(flag);
           `,
           errors: [{ messageId: 'preferAssertIsTrueOverExpectTrue' }],
+        },
+      ],
+    },
+  );
+});
+
+// `assert.ok(X)` passes for any truthy `X` and `assert.isTrue(X)` for `true`
+// alone, so the rename is written only when `X` is a boolean at every layer of
+// its type wrappers; any other operand is reported and left as written.
+describe('the assert-renaming rules fix a boolean operand only', () => {
+  const NON_BOOLEAN_DECLARATIONS = dedent`
+    declare const el: { id: string } | undefined;
+    declare const label: string;
+    declare const count: number;
+    declare const u: unknown;
+    declare const maybe: boolean | undefined;
+    declare const flag: boolean;
+  `;
+
+  const NON_BOOLEAN_OPERANDS = [
+    'el',
+    'label',
+    'count',
+    'u',
+    'maybe',
+    'u as boolean',
+    'flag as unknown as boolean',
+    'flag as boolean | undefined',
+    'maybe!',
+  ] as const;
+
+  ruleTester.run(
+    'prefer-assert-is-true-over-assert',
+    preferAssertIsTrueOverAssertRule,
+    {
+      valid: [],
+      invalid: Arr.toUnshifted({
+        name: 'a boolean, a comparison, and a boolean under satisfies',
+        code: dedent`
+          declare const flag: boolean;
+          declare const a: number;
+          assert(flag);
+          assert.isOk(a === 1);
+          assert.ok(flag satisfies boolean);
+        `,
+        output: dedent`
+          declare const flag: boolean;
+          declare const a: number;
+          assert.isTrue(flag);
+          assert.isTrue(a === 1);
+          assert.isTrue(flag satisfies boolean);
+        `,
+        errors: [
+          { messageId: 'preferAssertIsTrueOverAssert' },
+          { messageId: 'preferAssertIsTrueOverAssert' },
+          { messageId: 'preferAssertIsTrueOverAssert' },
+        ],
+      })(
+        NON_BOOLEAN_OPERANDS.flatMap((operand) =>
+          ['assert', 'assert.isOk', 'assert.ok'].map((call) => ({
+            name: `${call}(${operand}) is reported without a fix`,
+            code: `${NON_BOOLEAN_DECLARATIONS}\n${call}(${operand});`,
+            output: null,
+            errors: [{ messageId: 'assertWhatIsMeant' as const }],
+          })),
+        ),
+      ),
+    },
+  );
+
+  ruleTester.run(
+    'prefer-assert-is-false-over-assert-is-not-ok',
+    preferAssertIsFalseOverAssertNotOkRule,
+    {
+      valid: [],
+      invalid: Arr.toUnshifted({
+        name: 'a boolean and a comparison',
+        code: dedent`
+          declare const flag: boolean;
+          assert.notOk(flag);
+          assert.isNotOk(1 > 2);
+        `,
+        output: dedent`
+          declare const flag: boolean;
+          assert.isFalse(flag);
+          assert.isFalse(1 > 2);
+        `,
+        errors: [
+          { messageId: 'preferAssertIsFalseOverAssertNotOk' },
+          { messageId: 'preferAssertIsFalseOverAssertNotOk' },
+        ],
+      })(
+        NON_BOOLEAN_OPERANDS.flatMap((operand) =>
+          ['assert.isNotOk', 'assert.notOk'].map((call) => ({
+            name: `${call}(${operand}) is reported without a fix`,
+            code: `${NON_BOOLEAN_DECLARATIONS}\n${call}(${operand});`,
+            output: null,
+            errors: [{ messageId: 'assertWhatIsMeant' as const }],
+          })),
+        ),
+      ),
+    },
+  );
+
+  ruleTester.run(
+    'prefer-assert-is-false-over-negated-assert-is-true',
+    preferAssertIsFalseOverNegatedAssertIsTrueRule,
+    {
+      valid: NON_BOOLEAN_OPERANDS.map((operand) => ({
+        name: `assert.isTrue(!(${operand})) is already a strict boolean`,
+        code: `${NON_BOOLEAN_DECLARATIONS}\nassert.isTrue(!(${operand}));`,
+      })),
+      invalid: [
+        {
+          name: 'a negated boolean',
+          code: dedent`
+            declare const flag: boolean;
+            assert.isTrue(!flag);
+          `,
+          output: dedent`
+            declare const flag: boolean;
+            assert.isFalse(flag);
+          `,
+          errors: [{ messageId: 'preferAssertIsFalseOverAssertNegation' }],
+        },
+      ],
+    },
+  );
+
+  ruleTester.run(
+    'prefer-assert-is-true-over-negated-assert-is-false',
+    preferAssertIsTrueOverNegatedAssertIsFalseRule,
+    {
+      valid: NON_BOOLEAN_OPERANDS.map((operand) => ({
+        name: `assert.isFalse(!(${operand})) is already a strict boolean`,
+        code: `${NON_BOOLEAN_DECLARATIONS}\nassert.isFalse(!(${operand}));`,
+      })),
+      invalid: [
+        {
+          name: 'a negated comparison',
+          code: dedent`
+            declare const a: number;
+            assert.isFalse(!(a === 1));
+          `,
+          output: dedent`
+            declare const a: number;
+            assert.isTrue(a === 1);
+          `,
+          errors: [{ messageId: 'preferAssertIsTrueOverNegatedAssertIsFalse' }],
+        },
+      ],
+    },
+  );
+});
+
+describe('the assert-renaming rules name the call they report', () => {
+  ruleTester.run(
+    'prefer-assert-is-true-over-assert',
+    preferAssertIsTrueOverAssertRule,
+    {
+      valid: [{ name: 'no operand', code: 'assert.ok();' }],
+      invalid: [
+        {
+          name: 'a wrapped bare callee and an aliased receiver, on a non-boolean',
+          code: dedent`
+            import { assert as check } from 'vitest';
+            declare const el: { id: string } | undefined;
+            (check as typeof check)(el);
+            check.ok(el);
+          `,
+          output: null,
+          errors: [
+            {
+              messageId: 'assertWhatIsMeant',
+              data: { method: 'check', receiver: 'check' },
+            },
+            {
+              messageId: 'assertWhatIsMeant',
+              data: { method: 'check.ok', receiver: 'check' },
+            },
+          ],
+        },
+      ],
+    },
+  );
+
+  ruleTester.run(
+    'prefer-assert-is-false-over-assert-is-not-ok',
+    preferAssertIsFalseOverAssertNotOkRule,
+    {
+      valid: [{ name: 'no operand', code: 'assert.notOk();' }],
+      invalid: [
+        {
+          name: 'an aliased receiver, on a non-boolean',
+          code: dedent`
+            import { assert as check } from 'vitest';
+            declare const el: { id: string } | undefined;
+            check.isNotOk(el);
+          `,
+          output: null,
+          errors: [
+            {
+              messageId: 'assertWhatIsMeant',
+              data: { method: 'check.isNotOk', receiver: 'check' },
+            },
+          ],
+        },
+      ],
+    },
+  );
+});
+
+describe('the assert-renaming rules without type information', () => {
+  const untypedTester = new RuleTester({
+    languageOptions: { parser, parserOptions: { sourceType: 'module' } },
+  });
+
+  untypedTester.run(
+    'prefer-assert-is-true-over-assert',
+    preferAssertIsTrueOverAssertRule,
+    {
+      valid: [],
+      invalid: [
+        {
+          name: 'reported without a fix, rather than throwing',
+          code: 'assert(flag);',
+          output: null,
+          errors: [{ messageId: 'assertWhatIsMeant' }],
+        },
+      ],
+    },
+  );
+
+  untypedTester.run(
+    'prefer-assert-is-false-over-negated-assert-is-true',
+    preferAssertIsFalseOverNegatedAssertIsTrueRule,
+    {
+      valid: [
+        {
+          name: 'left alone, rather than throwing',
+          code: 'assert.isTrue(!flag);',
+        },
+      ],
+      invalid: [],
+    },
+  );
+});
+
+describe('the assert-renaming rules under another parser', () => {
+  // A parser that gives the rules an AST and no services at all.
+  const servicelessTester = new RuleTester({
+    languageOptions: {
+      parser: {
+        parse: (
+          code: string,
+          // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types -- the parser's own options type
+          options: Parameters<typeof parser.parse>[1],
+        ) => parser.parse(code, options),
+      },
+      parserOptions: { sourceType: 'module' },
+    },
+  });
+
+  servicelessTester.run(
+    'prefer-assert-is-false-over-assert-is-not-ok',
+    preferAssertIsFalseOverAssertNotOkRule,
+    {
+      valid: [],
+      invalid: [
+        {
+          name: 'reported without a fix, rather than throwing',
+          code: 'assert.notOk(flag);',
+          output: null,
+          errors: [{ messageId: 'assertWhatIsMeant' }],
         },
       ],
     },

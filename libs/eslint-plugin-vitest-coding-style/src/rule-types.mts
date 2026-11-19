@@ -61,7 +61,7 @@ namespace PreferAssertStrictEqualForPrimitives {
 }
 
 /**
- * @description Prefer assert.isTrue(X) over assert(X), assert.isOk(X), assert.ok(X).
+ * @description Prefer assert.isTrue(X) over assert(X), assert.isOk(X), assert.ok(X) (fixed only when X is boolean; type-aware).
  *
  *  ```md
  *  | key        | value      |
@@ -78,7 +78,7 @@ namespace PreferAssertIsTrueOverAssert {
 }
 
 /**
- * @description Prefer assert.isFalse(X) over assert.isNotOk(X), assert.notOk(X).
+ * @description Prefer assert.isFalse(X) over assert.isNotOk(X), assert.notOk(X) (fixed only when X is boolean; type-aware).
  *
  *  ```md
  *  | key        | value      |
@@ -129,7 +129,7 @@ namespace PreferAssertIsFalseOverExpectFalse {
 }
 
 /**
- * @description Prefer assert.isFalse(X) over assert.isTrue(!X).
+ * @description Prefer assert.isFalse(X) over assert.isTrue(!X) (only when X is boolean; type-aware).
  *
  *  ```md
  *  | key        | value      |
@@ -146,7 +146,7 @@ namespace PreferAssertIsFalseOverNegatedAssertIsTrue {
 }
 
 /**
- * @description Prefer assert.isTrue(X) over assert.isFalse(!X).
+ * @description Prefer assert.isTrue(X) over assert.isFalse(!X) (only when X is boolean; type-aware).
  *
  *  ```md
  *  | key        | value      |
