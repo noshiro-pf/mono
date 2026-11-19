@@ -1,3 +1,4 @@
+import { isPanicError } from '../../../panic/index.mjs';
 import type { TernaryOk, TernaryResult } from '../ternary-result.mjs';
 import { err } from './ternary-result-err.mjs';
 import { ok } from './ternary-result-ok.mjs';
@@ -7,7 +8,9 @@ type UnwrapPromise<P extends Promise<unknown>> =
   P extends Promise<infer V> ? V : never;
 
 /**
- * Converts a Promise into a Promise that resolves to a `TernaryResult`.
+ * Converts a Promise into a Promise that resolves to a `TernaryResult`. A
+ * rejection with a panic (see `isPanicError`) is passed on rather than wrapped,
+ * as `Result.fromPromise` does.
  *
  * @example
  *
@@ -26,5 +29,13 @@ type UnwrapPromise<P extends Promise<unknown>> =
 export const fromPromise = <P extends Promise<unknown>>(
   promise: P,
 ): Promise<TernaryResult<UnwrapPromise<P>, unknown, never>> =>
-  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-  promise.then((value) => ok(value) as TernaryOk<UnwrapPromise<P>>).catch(err);
+  promise
+    // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+    .then((value) => ok(value) as TernaryOk<UnwrapPromise<P>>)
+    .catch((error: unknown) => {
+      if (isPanicError(error)) {
+        throw error;
+      }
+
+      return err(error);
+    });

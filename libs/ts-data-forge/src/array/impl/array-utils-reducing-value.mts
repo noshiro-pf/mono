@@ -1,11 +1,9 @@
 import type { Int, NonEmptyTuple, Uint } from 'ts-type-forge';
-import { isError } from '../../built-in-tag.mjs';
 import { IMap } from '../../collections/index.mjs';
 import { Optional, Result } from '../../functional/index.mjs';
 import { isString, isUndefined } from '../../guard/index.mjs';
 import { asUint32, type Uint32 } from '../../number/index.mjs';
 import * as Num from '../../number/num/impl/index.mjs';
-import { unknownToString } from '../../others/index.mjs';
 import type {
   ArrayIndex,
   MapSetKeyType,
@@ -624,17 +622,7 @@ const foldrImpl = <E, P>(
 const joinImpl = (
   array: readonly unknown[],
   separator: string | undefined,
-): Result<string, Error> => {
-  try {
-    const result = array.join(separator);
-
-    return Result.ok(result);
-  } catch (error) {
-    return Result.err(
-      isError(error) ? error : new Error(unknownToString(error)),
-    );
-  }
-};
+): Result<string, Error> => Result.fromThrowable(() => array.join(separator));
 
 /**
  * Alias for `foldl`.
