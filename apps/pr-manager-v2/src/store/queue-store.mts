@@ -40,7 +40,7 @@ export const queueBlockViewOf = (
           ? { kind: 'unread', reason: r.decision.value.message }
           : {
               kind: 'ready',
-              view: queueViewOf(r.decision.value, r.snapshot),
+              view: queueViewOf(r.decision.value, r.snapshot, r.layerWorkflows),
               // All of the report's: the decision reads each of them (set-aside
               // records are comments, Start-After comes through the closing
               // issues, merge state from the comparison).

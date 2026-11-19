@@ -18,14 +18,22 @@ export const QueueLayerBox = ({
     data-place={place.pipe(
       map((p) => (p === 'running' || p === 'waiting' ? p : 'next')),
     )}
+    // A waiting box says why it waits; its layer is in the tooltip alone.
+    data-layer={combine([box, place]).pipe(
+      map(([b, p]) =>
+        p === 'waiting' ? 'none' : (b.layer?.standing ?? 'none'),
+      ),
+    )}
     title={combine([box, place]).pipe(
       map(([b]) =>
         [
           `#${b.number} ${b.title}`,
           ...(b.detail === undefined ? [] : [b.detail]),
-          ...(b.checkedAhead
-            ? ['The worker is checking it ahead on a queue/pr- layer.']
-            : []),
+          ...(b.layer !== undefined
+            ? [b.layer.detail]
+            : b.checkedAhead
+              ? ['The worker is checking it ahead on a queue/pr- layer.']
+              : []),
           ...(b.bypass === undefined
             ? []
             : [`Only a ruleset bypass merges it: ${b.bypass}.`]),
@@ -58,7 +66,13 @@ export const QueueLayerBox = ({
     </span>
     <span class={constant('queue-box-place')}>
       <If
-        cond={place.pipe(map((p) => p === 'running'))}
+        cond={combine([box, place]).pipe(
+          map(
+            ([b, p]) =>
+              p === 'running' ||
+              (p !== 'waiting' && b.layer?.standing === 'running'),
+          ),
+        )}
         then={<span class={constant('spinner')} />}
       />
       {combine([box, place]).pipe(
@@ -67,9 +81,11 @@ export const QueueLayerBox = ({
             ? ' running'
             : p === 'waiting'
               ? (b.why ?? 'waiting')
-              : b.checkedAhead
-                ? `${p} · checked ahead`
-                : p,
+              : b.layer !== undefined
+                ? `${b.layer.standing === 'running' ? ' ' : ''}${p} · ${b.layer.note}`
+                : b.checkedAhead
+                  ? `${p} · checked ahead`
+                  : p,
         ),
       )}
     </span>

@@ -236,10 +236,20 @@ Per PR:
   summary `7 queued · 1 running · 0 set aside`.
 - One row of equal-width boxes: the running one first (turning ring, `running`
   under it) next to the base it merges into (`main ←`), then the ones it would
-  pick next in order (`next`, `2`, `3`, …), first those checked ahead
-  (`queue/pr-*` layers, `checked ahead`; the layers' own runs, which v1 gains
-  in #3809, come with #3810), then dashed boxes for those whose turn has not
-  come with why (`after #N`, `review`, `native stack`).
+  pick next in order (`next`, `2`, `3`, …), first those checked ahead, in the
+  order they were stacked (the `queue/pr-*` layers the worker keeps:
+  `stackedAhead` over them, heads followed by `withMovedHeads`), then dashed
+  boxes for those whose turn has not come with why (`after #N`, `review`,
+  `native stack`).
+- Each box checked ahead says where the checks on its layer stand, as the worker
+  decides it over the whole stack (`layerRunsVerdict` on the runs it dispatched,
+  then `layerStandings`): `2/6 runs` with the turning ring, `passed`, `failed`,
+  `on red` (dropped above a failed layer), `to check` or `not checked` (a
+  workflow cancelled too often), with what the worker does with it on hover; the
+  summary adds `N checking ahead`. The workflows are the `speculate.workflows`
+  of `.github/unblock-prs.json` on the default branch, read over REST. Without
+  that file, or while the runs on a layer kept ahead are unread, each box says
+  only `checked ahead`.
 - Each box carries its priority pill, title on hover (tooltip anchored to the
   nearer end).
 - When the row overflows: it scrolls with the running box held at the start, and

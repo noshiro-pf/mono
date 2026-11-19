@@ -128,6 +128,20 @@
     font-size: 0.75rem;
   }
 
+  /*
+   * Where the checks on the layer of one checked ahead stand: a verdict in its
+   * colour; one still going has the ring before its place.
+   */
+  .queue-box[data-layer='green'] .queue-box-place {
+    color: var(--good);
+  }
+
+  .queue-box[data-layer='set-aside'] .queue-box-place,
+  .queue-box[data-layer='red'] .queue-box-place,
+  .queue-box[data-layer='dropped'] .queue-box-place {
+    color: var(--critical);
+  }
+
   .queue-bypass {
     border: 1px solid var(--serious);
     border-radius: 999px;

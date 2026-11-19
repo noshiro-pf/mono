@@ -29,6 +29,7 @@ import {
 } from '../domain/index.mjs';
 import {
   browserTransport,
+  readLayerWorkflows,
   readRunningWorkflows,
   type RunningWorkflows,
   type StoredToken,
@@ -48,6 +49,12 @@ export type PageReport = Readonly<{
   issueDecision: Read<QueueDecision>;
   /** What failed in the latest read, kept answers notwithstanding. */
   failures: SnapshotFailures;
+  /**
+   * The workflows the worker dispatches on each queue layer (spec §8): the last
+   * read of them, none until one is read. With none, a box checked ahead says
+   * only that it is.
+   */
+  layerWorkflows: readonly string[];
   /** When the read this report is from began. */
   readAtMs: number;
 }>;
@@ -107,10 +114,14 @@ export type ReportStore = Readonly<{
   start: () => () => void;
 }>;
 
-/** One read: the snapshot and the running workflows, each as read. */
+/**
+ * One read: the snapshot, the running workflows and the workflows dispatched on
+ * the queue layers, each as read.
+ */
 export type ReportRead = Readonly<{
   snapshot: Read<Snapshot>;
   runs: Read<RunningWorkflows>;
+  layerWorkflows: Read<readonly string[]>;
 }>;
 
 export type ReadReport = (
@@ -276,6 +287,9 @@ export const createReportStore = (deps: ReportDeps): ReportStore => {
                 ...failures,
                 issues: Arr.toUnshifted(pullsUnread)(failures.issues),
               },
+        layerWorkflows: Result.isOk(read.layerWorkflows)
+          ? read.layerWorkflows.value
+          : (previous?.layerWorkflows ?? []),
         readAtMs: startedAtMs,
       });
 
@@ -345,6 +359,7 @@ export const createReportStore = (deps: ReportDeps): ReportStore => {
       .catch((error: unknown): ReportRead => ({
         snapshot: Result.err(threw(error)),
         runs: Result.err(threw(error)),
+        layerWorkflows: Result.err(threw(error)),
       }))
       .then((read) => {
         if (generation === mut_generation) {
@@ -457,7 +472,7 @@ export const browserReadReport =
       token,
     });
 
-    const [snapshot, runs] = await Promise.all([
+    const [snapshot, runs, layerWorkflows] = await Promise.all([
       readSnapshotGraphql(context, {
         nowEpochMs: nowMs,
         issuesLimit: ISSUES_LIMIT,
@@ -467,9 +482,10 @@ export const browserReadReport =
         readBranchTips: branchTipsNotRead,
       }),
       readRunningWorkflows(context),
+      readLayerWorkflows(context),
     ]);
 
-    return { snapshot, runs };
+    return { snapshot, runs, layerWorkflows };
   };
 
 /** Whether a read is out, as the header's ring and Refresh show it. */
