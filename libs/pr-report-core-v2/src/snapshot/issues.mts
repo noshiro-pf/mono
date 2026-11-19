@@ -1,6 +1,6 @@
 /** The issues and the merged pull requests a snapshot reads. */
 
-import type { OwnComment } from './pull-request.mjs';
+import type { ClosingIssue, OwnComment } from './pull-request.mjs';
 import type { Read } from './read-result.mjs';
 import type { Label } from './repository.mjs';
 
@@ -58,8 +58,9 @@ export type MergedPullRequestFacts = Readonly<{
   labels: readonly Label[];
   /**
    * This repository's issues it closed, as `conventions.md` "Closing issues"
-   * defines them for an open one: `closingIssuesReferences` where GraphQL is
-   * read, and the closing keywords of the body.
+   * defines them for an open one, each with its title and state: the closing
+   * keywords of the body, in its order, then the ones GitHub links
+   * (`closingIssuesReferences`) where GraphQL is read.
    */
-  closingIssues: readonly number[];
+  closingIssues: readonly ClosingIssue[];
 }>;

@@ -278,7 +278,10 @@ is:stale`.
 ## 10. Merged in the last 7 days
 
 - Title with **on GitHub**; per PR: number, title, author, `head → base`, merged
-  age, labels, closing issues.
+  age, labels, and each issue it closed as a card's are, one a line:
+  `✓ closes #N <title>` with the issue's state (#4327). They are the closing
+  keywords of its body, each read for its title, then the issues GitHub links to
+  it, read over GraphQL.
 
 ## 11. Open issues
 

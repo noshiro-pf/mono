@@ -101,7 +101,11 @@ const mergedPull = (
   number: number,
   title: string,
   mergedAt: string,
-  closingIssues: readonly number[],
+  closingIssues: readonly Readonly<{
+    number: number;
+    title: string;
+    state?: 'open';
+  }>[],
 ): MergedPullRequestFacts =>
   ({
     number,
@@ -114,7 +118,12 @@ const mergedPull = (
     headSha: shaOf(number),
     mergeCommitSha: shaOf(number + 1),
     labels: [],
-    closingIssues,
+    closingIssues: closingIssues.map((closing) => ({
+      number: closing.number,
+      title: closing.title,
+      url: `https://github.com/noshiro-pf/mono/issues/${closing.number}`,
+      state: closing.state ?? 'closed',
+    })),
   }) as const;
 
 const demoSnapshot = (nowMs: number): Snapshot => {
@@ -442,7 +451,12 @@ const demoSnapshot = (nowMs: number): Snapshot => {
       3780,
       'feat(pr-report-core-v2): add the GraphQL reader',
       ago(60 * 20),
-      [3770],
+      [
+        {
+          number: 3770,
+          title: 'pr-report-core-v2: read the snapshot over GraphQL',
+        },
+      ],
     ),
     mergedPull(
       3778,
@@ -454,7 +468,18 @@ const demoSnapshot = (nowMs: number): Snapshot => {
       3771,
       'fix(unblock-prs): keep the claim through a rebase',
       ago(60 * 50),
-      [],
+      [
+        {
+          number: 3765,
+          title: 'unblock-prs: a rebase drops the claim comment',
+        },
+        // Still open: the body says it closes it, and the merge did not.
+        {
+          number: 3766,
+          title: 'unblock-prs: say who holds a claim in the set-aside comment',
+          state: 'open',
+        },
+      ],
     ),
   ] as const;
 

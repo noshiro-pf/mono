@@ -78,8 +78,6 @@ export const buildReport = (
     mut_entries.push(entry.value);
   }
 
-  const { owner, name } = repository.repo;
-
   return Result.ok({
     repo: repository.repo,
     defaultBranch: repository.defaultBranch,
@@ -98,13 +96,7 @@ export const buildReport = (
       baseRef: pr.baseRef,
       mergedAt: pr.mergedAt,
       labels: pr.labels,
-      // Merged, its issues are read from the body: no title, no state.
-      linkedIssues: pr.closingIssues.map((number) => ({
-        number,
-        title: '',
-        url: `https://github.com/${owner}/${name}/issues/${number}`,
-        state: 'unknown' as const,
-      })),
+      linkedIssues: pr.closingIssues,
     })),
     mergedWithinDays: options.mergedWithinDays,
     issues: issues.value.map(issueOf),

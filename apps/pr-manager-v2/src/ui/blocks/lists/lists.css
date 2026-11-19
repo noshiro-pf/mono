@@ -28,6 +28,26 @@
     font-weight: 600;
   }
 
+  /*
+   * The issues a merged pull request closed, one a line as a card's are: what
+   * each was, the state before it, merged's colour for closed.
+   */
+  .merged-issues {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    color: var(--ink-2);
+    font-size: 0.8rem;
+  }
+
+  .merged-issue-state[data-state='open'] {
+    color: var(--good);
+  }
+
+  .merged-issue-state[data-state='closed'] {
+    color: var(--merged);
+  }
+
   .row-meta {
     display: flex;
     flex-wrap: wrap;
