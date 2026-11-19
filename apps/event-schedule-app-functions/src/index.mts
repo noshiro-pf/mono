@@ -20,7 +20,7 @@ import {
   isVerifyEmailPayload,
   toStringWithCheck,
 } from './types/index.mjs';
-import { verifyEmailImpl } from './verify-email.mjs';
+import { firestoreVerifyEmailDeps, verifyEmailImpl } from './verify-email.mjs';
 
 initializeApp();
 
@@ -176,7 +176,7 @@ export const fetchEventListOfUser = regionSelected
   });
 
 export const verifyEmail = regionSelected.https.onCall(
-  (payload: unknown, _context) => {
+  (payload: unknown, context) => {
     if (!isVerifyEmailPayload(payload)) {
       throw new https.HttpsError(
         'invalid-argument',
@@ -184,7 +184,11 @@ export const verifyEmail = regionSelected.https.onCall(
       );
     }
 
-    return verifyEmailImpl(db, payload);
+    return verifyEmailImpl(
+      payload,
+      context.auth?.uid,
+      firestoreVerifyEmailDeps(db),
+    );
   },
 );
 
