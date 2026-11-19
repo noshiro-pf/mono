@@ -1,3 +1,22 @@
+/* The page fills the height the footer leaves, as the sign-in page does. */
+.page {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/*
+ * The message in the middle of the room below the navbar, as the sign-in form
+ * is; the padding keeps it clear of the navbar where the window is short.
+ */
+.body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 40px 20px;
+}
+
 /* A link drawn as a default Blueprint button. */
 .anchor {
   cursor: pointer;
