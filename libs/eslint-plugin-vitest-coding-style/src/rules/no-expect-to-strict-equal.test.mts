@@ -374,3 +374,171 @@ describe('no-expect-to-strict-equal resolves expect and assert', () => {
     ],
   });
 });
+
+describe('no-expect-to-strict-equal against an asymmetric matcher', () => {
+  tester.run('no-expect-to-strict-equal', noExpectToStrictEqualRule, {
+    valid: [
+      {
+        name: 'a matcher inside the expected object',
+        code: dedent`
+          import { expect } from 'vitest';
+          expect({ id: 1, at: new Date() }).toStrictEqual({ id: 1, at: expect.any(Date) });
+        `,
+      },
+      {
+        name: 'a matcher as the expected value',
+        code: dedent`
+          import { expect } from 'vitest';
+          expect([1, 2]).toStrictEqual(expect.arrayContaining([1]));
+        `,
+      },
+      {
+        name: 'an aliased expect',
+        code: dedent`
+          import { expect as e } from 'vitest';
+          e({ a: 1 }).toStrictEqual({ a: e.anything() });
+        `,
+      },
+      {
+        name: 'a matcher inside a type wrapper',
+        code: dedent`
+          import { expect } from 'vitest';
+          expect(x).toStrictEqual(expect.anything() satisfies unknown);
+        `,
+      },
+      {
+        name: 'the global expect, with no import',
+        code: 'expect(x).toStrictEqual({ a: expect.stringMatching(/a/u) });',
+      },
+      {
+        name: 'a matcher behind a type wrapper on expect',
+        code: dedent`
+          import { expect } from 'vitest';
+          expect(x).toStrictEqual({ a: expect!.any(Date) });
+          expect(x).toStrictEqual({ a: (expect as any).custom() });
+        `,
+      },
+      {
+        name: 'expect handed to a helper that builds matchers',
+        code: dedent`
+          import { expect } from 'vitest';
+          expect(x).toStrictEqual(withTimestamps(expect));
+        `,
+      },
+      {
+        name: 'a matcher in the decorator of a class expression',
+        code: dedent`
+          import { expect } from 'vitest';
+          expect(x).toStrictEqual(@dec(expect.any(Date)) class {});
+        `,
+      },
+      {
+        name: 'a matcher reached through a namespace, a test context or the in-source handle',
+        code: dedent`
+          import { expect, test } from 'vitest';
+          import * as v from 'vitest';
+          expect(x).toStrictEqual({ at: v.expect.any(Date) });
+          test('t', (ctx) => {
+            expect(x).toStrictEqual({ at: ctx.expect.any(Date) });
+          });
+          expect(x).toStrictEqual({ at: import.meta.vitest.expect.any(Date) });
+        `,
+      },
+      {
+        name: 'an expect member through a type wrapper, a computed key, or handed to a helper',
+        code: dedent`
+          import { expect } from 'vitest';
+          import * as v from 'vitest';
+          expect(x).toStrictEqual({ at: v.expect!.any(Date) });
+          expect(x).toStrictEqual({ at: (v.expect as typeof v.expect).any(Date) });
+          expect(x).toStrictEqual({ at: v['expect'].any(Date) });
+          expect(x).toStrictEqual({ at: v[\`expect\`].any(Date) });
+          expect(x).toStrictEqual({ at: (v.expect satisfies unknown) });
+          expect(x).toStrictEqual({ at: v['expect' as const].any(Date) });
+          expect(x).toStrictEqual(withTimestamps(v.expect));
+        `,
+      },
+      {
+        name: 'a fixture field named expect is read as one, by spelling',
+        code: 'expect(o.expect).toStrictEqual(c.expect.output);',
+      },
+      {
+        name: 'a matcher on the actual side',
+        code: 'expect(expect.any(Number)).toStrictEqual(1);',
+      },
+      {
+        name: 'a matcher from the expect of a test context',
+        code: dedent`
+          import { test } from 'vitest';
+          test('t', ({ expect }) => {
+            expect(a).toStrictEqual({ at: expect.any(Date) });
+          });
+        `,
+      },
+    ],
+    invalid: [
+      {
+        name: 'a property key spelled expect is no reference to it',
+        code: 'expect(o).toStrictEqual({ expect: 1 });',
+        output: 'assert.deepStrictEqual(o, { expect: 1 });',
+        errors: [{ messageId: 'useAssert' }],
+      },
+      {
+        name: 'a call through a member named expect is no matcher',
+        code: dedent`
+          expect(o).toStrictEqual(ctx.expect(1));
+          expect(o).toStrictEqual(ctx.expect?.(1));
+          expect(o).toStrictEqual((ctx.expect)(1));
+          expect(o).toStrictEqual((ctx.expect satisfies unknown)(1));
+          expect(o).toStrictEqual((ctx?.expect)(1));
+        `,
+        output: dedent`
+          assert.deepStrictEqual(o, ctx.expect(1));
+          assert.deepStrictEqual(o, ctx.expect?.(1));
+          assert.deepStrictEqual(o, (ctx.expect)(1));
+          assert.deepStrictEqual(o, (ctx.expect satisfies unknown)(1));
+          assert.deepStrictEqual(o, (ctx?.expect)(1));
+        `,
+        errors: [
+          { messageId: 'useAssert' },
+          { messageId: 'useAssert' },
+          { messageId: 'useAssert' },
+          { messageId: 'useAssert' },
+          { messageId: 'useAssert' },
+        ],
+      },
+      {
+        name: "a binding that shadows expect is not Vitest's",
+        code: 'expect(o).toStrictEqual([1].map((expect) => expect.valueOf()));',
+        output:
+          'assert.deepStrictEqual(o, [1].map((expect) => expect.valueOf()));',
+        errors: [{ messageId: 'useAssert' }],
+      },
+      {
+        name: 'a mention of expect in a type is no matcher',
+        code: 'expect(x).toStrictEqual(y as ReturnType<typeof expect>);',
+        output: 'assert.deepStrictEqual(x, y as ReturnType<typeof expect>);',
+        errors: [{ messageId: 'useAssert' }],
+      },
+      {
+        name: 'a type named under expect is no matcher',
+        code: 'expect(x).toStrictEqual(y as expect.Foo);',
+        output: 'assert.deepStrictEqual(x, y as expect.Foo);',
+        errors: [{ messageId: 'useAssert' }],
+      },
+      {
+        name: 'a call to expect through a type wrapper is no matcher',
+        code: 'expect(o).toStrictEqual([() => (expect as any)(1), () => expect!(2)]);',
+        output:
+          'assert.deepStrictEqual(o, [() => (expect as any)(1), () => expect!(2)]);',
+        errors: [{ messageId: 'useAssert' }],
+      },
+      {
+        name: 'a call to expect is no matcher',
+        code: 'expect(o).toStrictEqual([() => expect(1)]);',
+        output: 'assert.deepStrictEqual(o, [() => expect(1)]);',
+        errors: [{ messageId: 'useAssert' }],
+      },
+    ],
+  });
+});
