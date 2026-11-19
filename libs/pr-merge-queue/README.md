@@ -137,9 +137,15 @@ changes what the description says:
 
 Drafts and auto-merge are GraphQL only, so where GraphQL is refused `start`
 holds it by the labels alone and says so, unless it was armed, when it fails:
-disarming it is then the author's. A draft that fails in any other way, such as
-a 502, fails `start` too, with the pull request held; running it again finishes
-it.
+disarming it is then the author's. Saying so names another way to make the draft
+— the GitHub MCP server's `update_pull_request` with `draft: true`, whose server
+makes the call outside a Claude Code session's proxy, or the pull request's page
+— and the draft is still to be made. `done` refused marking it ready, after the
+push, stops before the steps after it — putting `merge-queued` back, with
+`--requeue`, since the worker sets aside a queued draft — and names the same
+ways with `draft: false`; running `done` again once it is ready finishes it. A
+draft that fails in any other way, such as a 502, fails `start` too, with the
+pull request held; running it again finishes it.
 
 ### Running the worker
 

@@ -238,7 +238,9 @@ the answer is classified, `refused`, not by matching its message; a 408 and a
   event under the clone's git directory (**Changed in v2**: the event must be
   newer than every one listed before the label came off, so that an older
   unlabel shown early is not taken for it); auto-merge disarmed; draft. Without
-  GraphQL: held by the labels alone, and said; armed and not disarmable fails.
+  GraphQL: held by the labels alone, and said, naming another way to make the
+  draft (the GitHub MCP tool `update_pull_request` with `draft: true`, or the
+  pull request's page); armed and not disarmable fails.
   The queue is read before any of it, as v1 does, though with the checks
   (**Changed in v2**), which makes the read, and the window before the hold,
   longer.
@@ -250,7 +252,9 @@ the answer is classified, `refused`, not by matching its message; a 408 and a
   (**Changed in v2**: v1 pushed `--force-with-lease --force-if-includes` against
   the remote-tracking branch, and could not tell a push whose answer was lost
   from one that failed); carries the stacked layers along (skipping one a claim
-  holds on, or whose comments cannot be read); marks it ready; then
+  holds on, or whose comments cannot be read); marks it ready (without GraphQL:
+  stops before the steps after it, naming the same ways with `draft: false`, and
+  running it again finishes it); then
     - `--requeue`: puts `merge-queued` back last, only if `start` took it off
       and that unlabel is still the label's last event;
     - `--review`: leaves `merge-queued` off for the author to queue again.
