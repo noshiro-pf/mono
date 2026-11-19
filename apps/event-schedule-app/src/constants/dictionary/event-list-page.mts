@@ -17,6 +17,16 @@ export const eventListPageDictionary = {
   refresh: '更新',
   search: '検索',
   itemCount: (n: SafeUint) => `${n}件`,
+  empty: {
+    title: '表示する日程調整がありません。',
+    whatIsListed: 'ここには自分が回答した日程調整が表示されます。',
+    archive: 'アーカイブした日程調整のみ表示しています。',
+    createdOnly: '自分が作成した日程調整のみ表示しています。',
+    filterText: (text: string): string =>
+      `タイトルに「${text}」を含む日程調整のみ表示しています。`,
+    pastHidden: '候補日程がすべて過去の日程調整は表示していません。',
+    showPast: '過去の日程調整も表示する',
+  },
   archive: 'アーカイブする',
   unarchive: 'アーカイブ解除する',
   confirmationMessage: {

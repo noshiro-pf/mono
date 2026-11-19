@@ -30,6 +30,7 @@ import {
 } from '../../../store/index.mjs';
 import { Header } from '../../organisms/index.mjs';
 import { pageWidthClass } from '../../styled/index.mjs';
+import { EventListEmpty } from './event-list-empty.js';
 import { EventListItemComponent } from './event-list-item.js';
 import * as styles from './event-list-page.module.css';
 
@@ -168,54 +169,70 @@ export const EventListPage = (): JSX.Element => {
               />
             </div>
 
-            <div class={constant(styles.list)}>
-              <For items={mapBindable(listDrawing$, (d) => [d])} key={(d) => d}>
-                {(drawing$) => {
-                  const { eventList, fireAuthUser, archiveOrUnArchive } =
-                    Optional.unwrap(drawing$.getSnapshot());
+            <If
+              cond={mapBindable(sortedEventList$, (list) =>
+                Arr.isEmpty(list ?? []),
+              )}
+              else={
+                <div class={constant(styles.list)}>
+                  <For
+                    items={mapBindable(listDrawing$, (d) => [d])}
+                    key={(d) => d}
+                  >
+                    {(drawing$) => {
+                      const { eventList, fireAuthUser, archiveOrUnArchive } =
+                        Optional.unwrap(drawing$.getSnapshot());
 
-                  const user = (): User | undefined =>
-                    fireAuthUser === undefined
-                      ? undefined
-                      : ({
-                          id: UserId.cast(fireAuthUser.uid),
-                          name: UserName.cast(fireAuthUser.displayName ?? ''),
-                        } as const);
+                      const user = (): User | undefined =>
+                        fireAuthUser === undefined
+                          ? undefined
+                          : ({
+                              id: UserId.cast(fireAuthUser.uid),
+                              name: UserName.cast(
+                                fireAuthUser.displayName ?? '',
+                              ),
+                            } as const);
 
-                  return (
-                    <>
-                      {eventList.map((eventListItem) => {
-                        const eventId = eventListItem.eventScheduleMetadata.id;
+                      return (
+                        <>
+                          {eventList.map((eventListItem) => {
+                            const eventId =
+                              eventListItem.eventScheduleMetadata.id;
 
-                        const run =
-                          (handler: (id: string, u: User) => Promise<void>) =>
-                          (): void => {
-                            const u = user();
+                            const run =
+                              (
+                                handler: (id: string, u: User) => Promise<void>,
+                              ) =>
+                              (): void => {
+                                const u = user();
 
-                            if (u !== undefined) {
-                              handler(eventId, u).catch(() => {});
-                            }
-                          };
+                                if (u !== undefined) {
+                                  handler(eventId, u).catch(() => {});
+                                }
+                              };
 
-                        return (
-                          <EventListItemComponent
-                            archiveOrUnArchive={archiveOrUnArchive}
-                            eventListItem={eventListItem}
-                            fireAuthUser={fireAuthUser}
-                            onConfirmArchiving={run(
-                              archiveEventScheduleHandler,
-                            )}
-                            onConfirmUnArchiving={run(
-                              unarchiveEventScheduleHandler,
-                            )}
-                          />
-                        );
-                      })}
-                    </>
-                  );
-                }}
-              </For>
-            </div>
+                            return (
+                              <EventListItemComponent
+                                archiveOrUnArchive={archiveOrUnArchive}
+                                eventListItem={eventListItem}
+                                fireAuthUser={fireAuthUser}
+                                onConfirmArchiving={run(
+                                  archiveEventScheduleHandler,
+                                )}
+                                onConfirmUnArchiving={run(
+                                  unarchiveEventScheduleHandler,
+                                )}
+                              />
+                            );
+                          })}
+                        </>
+                      );
+                    }}
+                  </For>
+                </div>
+              }
+              then={<EventListEmpty disabled={formElementsAreDisabled} />}
+            />
           </div>
         }
         then={<Spinner />}

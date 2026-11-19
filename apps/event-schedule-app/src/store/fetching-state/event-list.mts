@@ -38,6 +38,9 @@ export type EventListDeps = Readonly<{
   throttleMs: number;
 }>;
 
+/** The filters a read of the list is made with. */
+export type EventListRequest = Parameters<EventListDeps['fetchEventList']>[0];
+
 export type EventListResult =
   | Result<
       readonly EventListItem[] | undefined,
@@ -46,13 +49,41 @@ export type EventListResult =
   | undefined;
 
 export type EventListFetcher = Readonly<{
+  /**
+   * The list as last read: `undefined` until the first list comes back, and
+   * again once the user signs out. Not handled yet: a read that fails sets it
+   * to `undefined` too, which the page shows as its spinner, until the page has
+   * a failed state to show.
+   */
   eventList$: InitializedObservable<readonly EventListItem[] | undefined>;
+  /**
+   * The filters the last list that came back was read with, which the filters
+   * on the page are not while a read for a change is out; `undefined` until the
+   * first list comes back, and again once the user signs out. A read that fails
+   * leaves it as it was.
+   */
+  listedWith$: InitializedObservable<EventListRequest | undefined>;
   /** Reads the list again, unless a read was requested within `throttleMs`. */
   fetchEventList: () => void;
-  /** Whether a read the refresh button asked for has yet to come back. */
+  /**
+   * Whether a read has yet to come back: any read, the refresh button's or a
+   * filter's; none once the user signs out.
+   *
+   * Not handled yet: an answer that is never taken leaves it on, and the page's
+   * filters and refresh button disabled with it until a reload: where a
+   * subscriber throws while one is taken, or the store stops with a read out.
+   * Turning it off in the `catch` instead would show the old list under the new
+   * filters as if it answered them; this waits for the page to have a failed
+   * state to show.
+   */
   refreshButtonIsLoading$: InitializedObservable<boolean>;
   /** Disabled for `throttleMs` after each read the button can ask for. */
   refreshButtonIsDisabled$: InitializedObservable<boolean>;
+  /**
+   * `fetchEventList`, for the refresh button: the read it starts is what shows
+   * it loading, and none goes out while nobody is signed in, or within
+   * `throttleMs` of the last.
+   */
   refreshEventList: () => void;
   /** Starts reading, with the first read; returns what stops it. */
   start: () => () => void;
@@ -101,27 +132,30 @@ export const createEventListStore = (deps: EventListDeps): EventListFetcher => {
     withInitialValue(undefined),
   );
 
-  const [refreshButtonIsLoading$, setRefreshButtonIsLoading] =
-    createReducerWithActions(
-      (_: boolean, isLoading: boolean) => isLoading,
-      false,
-      [
-        fetchEventListStarted$.pipe(mapTo(true)),
-        fetchedEventListResult$.pipe(mapTo(false)),
-      ],
-    );
+  const [listedWith$, setListedWith] = createReducerWithActions(
+    (_: EventListRequest | undefined, next: EventListRequest | undefined) =>
+      next,
+    undefined,
+    // Signing out leaves no list.
+    [signedOutResult$.pipe(mapTo(undefined))],
+  );
+
+  const [refreshButtonIsLoading$] = createReducerWithActions(
+    (_: boolean, isLoading: boolean) => isLoading,
+    false,
+    [
+      fetchEventListStarted$.pipe(mapTo(true)),
+      fetchedEventListResult$.pipe(mapTo(false)),
+      // Signing out drops the answer to a read still out.
+      signedOutResult$.pipe(mapTo(false)),
+    ],
+  );
 
   /** Disabled for `throttleMs` after each read the button can ask for. */
   const refreshButtonIsDisabled$ = merge([
     fetchEventListThrottled$.pipe(mapTo(true)),
     fetchEventListThrottled$.pipe(debounce(deps.throttleMs)).pipe(mapTo(false)),
   ]).pipe(withInitialValue(false));
-
-  const refreshEventList = (): void => {
-    fetchEventList();
-
-    setRefreshButtonIsLoading(true);
-  };
 
   const eventList$: InitializedObservable<
     readonly EventListItem[] | undefined
@@ -131,7 +165,14 @@ export const createEventListStore = (deps: EventListDeps): EventListFetcher => {
     .pipe(withInitialValue(undefined));
 
   const start = (): (() => void) => {
-    const mut_run = { stopped: false };
+    const mut_run: {
+      stopped: boolean;
+      /**
+       * The read sent last, the only one whose answer is taken; none once the
+       * user signs out.
+       */
+      latest: EventListRequest | undefined;
+    } = { stopped: false, latest: undefined };
 
     const subscriptions: readonly Subscription[] = [
       fetchEventListStarted$.subscribe(
@@ -143,24 +184,40 @@ export const createEventListStore = (deps: EventListDeps): EventListFetcher => {
           showAllPastDaysEvent,
           showOnlyEventSchedulesICreated,
         ]) => {
-          deps
-            .fetchEventList({
-              filterText,
-              filterOptionState,
-              showAllPastDaysEvent,
-              showOnlyEventSchedulesICreated,
-            })
-            .then((result) => {
-              // A read still out when the store stops is dropped.
-              if (mut_run.stopped) {
-                return;
-              }
+          const request: EventListRequest = {
+            filterText,
+            filterOptionState,
+            showAllPastDaysEvent,
+            showOnlyEventSchedulesICreated,
+          };
 
-              setFetchedEventListResult(result);
-            })
+          mut_run.latest = request;
+
+          const answer = (result: NonNullable<EventListResult>): void => {
+            // A read still out when the store stops is dropped, and so is one a
+            // later read has overtaken, which would put back the list of
+            // filters no longer set.
+            if (mut_run.stopped || mut_run.latest !== request) {
+              return;
+            }
+
+            if (Result.isOk(result)) {
+              setListedWith(request);
+            }
+
+            setFetchedEventListResult(result);
+          };
+
+          deps
+            .fetchEventList(request)
+            .then(answer)
             .catch(() => {});
         },
       ),
+      // Signing out drops the answer to a read still out.
+      signedOutResult$.subscribe(() => {
+        mut_run.latest = undefined;
+      }),
       result$.subscribe((e) => {
         if (e !== undefined && Result.isErr(e)) {
           // TODO: use toast
@@ -184,10 +241,11 @@ export const createEventListStore = (deps: EventListDeps): EventListFetcher => {
 
   return {
     eventList$,
+    listedWith$,
     fetchEventList,
     refreshButtonIsLoading$,
     refreshButtonIsDisabled$,
-    refreshEventList,
+    refreshEventList: fetchEventList,
     start,
   };
 };

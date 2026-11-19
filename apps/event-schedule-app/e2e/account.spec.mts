@@ -1,5 +1,6 @@
 import { expect, type Locator, type Page, test } from '@playwright/test';
 import type { DeepReadonly, ReadonlyRecord } from 'ts-type-forge';
+import { password, register, uniqueEmail, username } from './account-steps.mjs';
 import {
   answerPageLoadTimeout,
   authCallTimeout,
@@ -14,10 +15,6 @@ import {
 // new password, and the account settings in the user menu. Every step goes to
 // Auth, Firestore or a function, so this runs against the emulators
 // (`check:e2e:emulators`), Auth's included.
-
-const password = 'e2e-password';
-
-const username = 'e2e-user';
 
 test(
   'an account is registered, signed in to, and lists its events',
@@ -370,43 +367,6 @@ const openEmailChangeLink = async (
   const applied = await page.request.get(oobLink);
 
   expect.soft(applied.ok()).toBe(true);
-};
-
-/**
- * Unique per call, so that a retry, or a second run against the same emulators,
- * can register again.
- */
-const uniqueEmail = (): string =>
-  `e2e-${crypto.randomUUID().slice(0, 8)}-${Date.now().toString()}@example.com`;
-
-/** Registers `email` with the name and password above, from the navbar. */
-const register = async (
-  page: DeepReadonly<Page>,
-  email: string,
-): Promise<void> => {
-  await page.goto('/');
-
-  await page.getByTestId('nav-register').click();
-
-  const registerPage = page.getByTestId('register-page');
-
-  await registerPage.getByTestId('username').fill(username);
-
-  await registerPage.getByTestId('email').fill(email);
-
-  await registerPage.getByTestId('password').fill(password);
-
-  await registerPage.getByTestId('verify-password').fill(password);
-
-  await registerPage.getByTestId('register-button').click();
-
-  await expect
-    .soft(toastWith(page, 'アカウントを作成しました。'))
-    .toBeVisible({ timeout: authCallTimeout });
-
-  await expect.soft(page.getByTestId('create-page')).toBeVisible();
-
-  await expect.soft(page.getByTestId('nav-user-menu')).toHaveText(username);
 };
 
 /** Opens the dialog `item` names, from the user menu's account settings. */
