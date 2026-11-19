@@ -29,14 +29,23 @@ type MessageIds = 'preferNonMutatingMethod';
  *
  * - `Array.from(xs).reverse()` → `xs.toReversed()`
  * - `Array.from(xs).sort(cmp?)` → `xs.toSorted(cmp?)`
- * - `Array.from(xs).splice(...args)` → `xs.toSpliced(...args)`
  * - `Array.from(xs).fill(v)` → `xs.map(() => v)`
+ * - `Array.from(xs).splice(s)` → `xs.slice(s)`, and
+ *   `Array.from(xs).splice(s, c)` → `xs.slice(s, s + c)` for non-negative
+ *   integer literals `s` and `c`
  *
- * Note on `splice`: `splice` returns the *removed* elements while `toSpliced`
- * returns the spliced copy, so the rewrite is not value-preserving when the
- * expression result is used as the removed elements. Code of the shape
- * `Array.from(xs).splice(...)` is treated as intending the copy semantics
- * (otherwise the defensive copy is dead), which is exactly `toSpliced`.
+ * `splice` returns the elements it *removed*, while `toSpliced` returns the
+ * array *without* them, so `toSpliced` is never its rewrite. The two shapes
+ * above are those whose `slice` form returns the same elements for every array
+ * length: with inserted items no `slice` does, and with a negative start and a
+ * count the right `slice` depends on the length (`splice(-3, 1)` is
+ * `slice(-3, -2)` on three or more elements only); a count that is not a
+ * literal may be negative. A start-only `splice` has `slice`'s value whatever
+ * the start, but a start that may have an effect would run after the copy and
+ * before `slice` reads the array, so it has to be safe to evaluate
+ * (`isSafeToReEvaluate`). As with `fill`, the rewrite reads the array itself,
+ * so a hole stays a hole where the copy held `undefined`, and an `Array`
+ * subclass typed as `T[]` gets its own class back from `slice`.
  *
  * The `Array.from()` call is found through type wrappers, which the fix keeps
  * (`(Array.from(xs) as T[]).sort()` → `(xs as T[]).toSorted()`), and the
@@ -51,6 +60,24 @@ const MUTATING_METHOD_NAMES: ReadonlySet<string> = new Set<string>([
   'sort',
   'splice',
 ]);
+
+/** `node`'s value when it is a non-negative integer literal, through wrappers. */
+const nonNegativeIntegerLiteral = (
+  node: DeepReadonly<TSESTree.CallExpressionArgument>,
+): number | undefined => {
+  if (node.type === AST_NODE_TYPES.SpreadElement) {
+    return undefined;
+  }
+
+  const unwrapped = skipTypeWrappers(node);
+
+  return unwrapped.type === AST_NODE_TYPES.Literal &&
+    typeof unwrapped.value === 'number' &&
+    Number.isSafeInteger(unwrapped.value) &&
+    unwrapped.value >= 0
+    ? unwrapped.value
+    : undefined;
+};
 
 /**
  * Expressions that are safe to re-evaluate once per element inside a `map`
@@ -88,6 +115,39 @@ const isSafeToReEvaluate = (
   }
 
   return false;
+};
+
+/**
+ * The `slice(…)` that returns what `splice(…)` with `args` (written `argsText`)
+ * removes from a copy, or `undefined` for a shape whose value `slice` does not
+ * have (see {@link MUTATING_METHOD_NAMES}).
+ */
+const toSliceCall = (
+  args: DeepReadonly<TSESTree.CallExpressionArgument[]>,
+  argsText: string,
+): string | undefined => {
+  if (Arr.isFixedLengthArray(1, args)) {
+    const [onlyStart] = args;
+
+    return onlyStart.type !== AST_NODE_TYPES.SpreadElement &&
+      isSafeToReEvaluate(onlyStart)
+      ? `slice(${argsText})`
+      : undefined;
+  }
+
+  if (!Arr.isFixedLengthArray(2, args)) {
+    return undefined;
+  }
+
+  const [start, count] = args;
+
+  const s = nonNegativeIntegerLiteral(start);
+
+  const c = nonNegativeIntegerLiteral(count);
+
+  return s === undefined || c === undefined
+    ? undefined
+    : `slice(${s}, ${s + c})`;
 };
 
 export const preferNonMutatingArrayMethod: TSESLint.RuleModule<
@@ -157,15 +217,18 @@ export const preferNonMutatingArrayMethod: TSESLint.RuleModule<
 
             break;
 
-          case 'splice':
-            if (Arr.isEmpty(node.arguments)) {
+          case 'fill':
+            if (!Arr.isFixedLengthArray(1, node.arguments)) {
               return;
             }
 
             break;
 
-          case 'fill':
-            if (!Arr.isFixedLengthArray(1, node.arguments)) {
+          case 'splice':
+            if (
+              !Arr.isFixedLengthArray(1, node.arguments) &&
+              !Arr.isFixedLengthArray(2, node.arguments)
+            ) {
               return;
             }
 
@@ -175,14 +238,12 @@ export const preferNonMutatingArrayMethod: TSESLint.RuleModule<
             return;
         }
 
+        // The rewrites inspect or count the arguments.
         if (
-          methodName !== 'splice' &&
           node.arguments.some(
             (argument) => argument.type === AST_NODE_TYPES.SpreadElement,
           )
         ) {
-          // `toSpliced(...args)` keeps spread arguments as-is; the other
-          // rewrites need to inspect / count the arguments.
           return;
         }
 
@@ -235,9 +296,6 @@ export const preferNonMutatingArrayMethod: TSESLint.RuleModule<
             case 'sort':
               return `toSorted(${argsText})`;
 
-            case 'splice':
-              return `toSpliced(${argsText})`;
-
             case 'fill': {
               const fillValue = node.arguments[0];
 
@@ -254,12 +312,29 @@ export const preferNonMutatingArrayMethod: TSESLint.RuleModule<
 
               return `map(() => ${argsText})`;
             }
+
+            case 'splice':
+              return toSliceCall(node.arguments, argsText);
           }
         })();
 
         if (replacement === undefined) {
           return;
         }
+
+        // The two-argument `slice` is written from the numbers, not the source,
+        // so a comment among the arguments would be dropped: then the call is
+        // reported without a fix.
+        const dropsComment =
+          methodName === 'splice' &&
+          Arr.isFixedLengthArray(2, node.arguments) &&
+          sourceCode
+            .getCommentsInside(node)
+            .some(
+              (comment) =>
+                comment.range[0] > callee.property.range[1] &&
+                comment.range[1] <= node.range[1],
+            );
 
         context.report({
           node,
@@ -268,20 +343,22 @@ export const preferNonMutatingArrayMethod: TSESLint.RuleModule<
           // The `Array.from(...)` call and the `<method>(...)` part are
           // replaced separately, so that wrappers around the call and the `?.`
           // between them are kept.
-          fix: (fixer) => {
-            const objectText = toMemberObjectText(
-              sourceCode.getText(arg),
-              arg.type,
-            );
+          fix: dropsComment
+            ? null
+            : (fixer) => {
+                const objectText = toMemberObjectText(
+                  sourceCode.getText(arg),
+                  arg.type,
+                );
 
-            return [
-              fixer.replaceText(inner, objectText),
-              fixer.replaceTextRange(
-                [callee.property.range[0], node.range[1]],
-                replacement,
-              ),
-            ];
-          },
+                return [
+                  fixer.replaceText(inner, objectText),
+                  fixer.replaceTextRange(
+                    [callee.property.range[0], node.range[1]],
+                    replacement,
+                  ),
+                ];
+              },
         });
       },
     };
