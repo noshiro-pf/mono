@@ -24,7 +24,7 @@ That leaves one question, which is what this document is about: **which member i
 Selection runs in two steps.
 
 1. **Filter by runtime type category.** Keep the members whose default value has the same runtime type as the value (`string`, `number`, `array`, `Map`, `object`, …). No member accepted the value, so this can never discard a member that would have matched; it only decides who is worth reporting. If nothing survives, the union reports the categories it accepts instead of a member.
-2. **Score the survivors.** Each candidate is validated and scored as _failed checks − passed checks_ — lower is closer. Ties go to the member that passed more checks, and members equal on both are all named, with the first in declaration order reporting its errors (the same order `prune` and `fill` use).
+2. **Score the survivors.** Each candidate is validated and scored as _failed checks − passed checks_ — lower is closer. Ties go to the member that passed more checks, and members equal on both are all named, with the first in declaration order reporting its errors (the same order `prune` uses).
 
 ```ts
 const satisfiedCheckCount = Math.max(
@@ -174,6 +174,26 @@ Error at type: expected one of { fs, ss } but "xx" was passed.
 ```
 
 Otherwise the listing stays. A union of literals or other primitives always keeps it, since each member makes one check and a value it rejects passes none; so does a value that passes nothing of any member (such as `{}` here), or one that two members explain equally well, where naming one of them would mislead and naming both is what the listing already does. A union with another union directly among its members keeps it too, since the listing names that union as written and the closest member would be one of its members.
+
+### Repairs
+
+Without a `defaultType`, `fill` repairs a value no member accepts with the record or tuple member closest to it, where no other member of the value's category is as close. A union given a `defaultType` repairs with it instead, as it always did: the option is how a caller says what a value the union rejects becomes. A record missing a key is then repaired by the record member, wherever a `null` member is declared:
+
+```ts
+union([nullType, record({ x: number(), y: number() })]).fill({ x: 1 }); // { x: 1, y: 0 }
+
+union([nullType, record({ x: number(), y: number() })]).fill('x'); // null
+
+union([circle, square, rectangle]).fill({ kind: 'circle', radius: '5' }); // { kind: 'circle', radius: 0 }
+```
+
+Closeness for a repair is counted over the keys the value has, not over the member's errors: the value's keys a member does not keep (rejects by its own `is` of what is under them, or does not declare, so that a repair by it drops them) minus those it keeps. A key the value leaves out speaks for no member, since the repair fills it in, so a variant with many optional or missing keys does not win or lose by them; a key wrong in several places counts once, so a variant whose discriminant matches does not lose to one that fails only its discriminant. The report can count errors, since it decides nothing, but a repair would turn the value into the wrong variant. Counting with `is` also reads no errors.
+
+A member is a repair only if it keeps at least one of the value's keys: one that keeps none has nothing of the value to keep. Nor is a tuple of another length than the value. A member of the value's category that checks the value as a whole (an `array`, a `keyValueRecord`, a `recursion` that is not a record, a `refine` or a `brand` of a record, which may reject what its base accepts, or any other member whose default is of the value's category) cannot be weighed key by key, so a record keeping one key of many would win against a `keyValueRecord` keeping them all: with one among the members, the value is repaired by the first member. A key holding `undefined` speaks for no member, as a key left out. The only member of the value's category is taken whatever keys the value has when it is a record, since a record that has none of its keys is still a record; among several, the value has to say which. Any other value is repaired by the first member, as before: one of no member's category (`'x'` above becomes `null`), one no member is a repair of (scenario 5's `{}`, which has no key to keep), and one that two members are equally close to (`{ kind: 'circle', radius: '5', color: 1, size: 3 }` for a `circle` of `kind`, `radius` and `color` and a `square` of `kind` and `size`, each of which keeps one of its keys). A member of a union nested directly in this one, and not also a member of this one, is repaired by that union (the first that holds it), which applies its own `defaultType`, or its own closest member.
+
+A repair goes down into the value where cutting it to the first member did not: a `recursion` such as `union([nullType, Node])` repairs an invalid node as a node, level by level, and each level's union first tests its part of the value with `is`. A `recursion`'s `is` validates, and a union's failing `validate` validates its members again to report the closest one, so testing a value invalid deep down already costs time exponential in its depth; repairing level by level pays that at each level it goes down.
+
+Only a plain object is repaired by a record and only an array by a tuple, so a `Date` or another class instance is repaired by the first member as before, and a value of any other kind reads no member's default. A default is read only to find a member of the value's category that checks it as a whole, and a record's or a tuple's is not read for a value of the other kind. A member whose default does not terminate, such as two `recursion`s that default to each other, still cannot repair a value, whether the first or the closest: that is a fault of the schema, which `validate` already meets, since it reads every member's default to report the categories. A member that a nested union repeats counts once.
 
 ### Why this scoring
 
