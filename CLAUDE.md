@@ -115,7 +115,7 @@ harnesses, never a bundle, which `strict-lib:gen:packages` stamps back
 
 The pre-2026 monorepo plus standalone repositories imported before deletion;
 inventory in `docs/experimental-inventory.md`. Nothing here is installed, built
-or checked, and a diff touching only it skips the check workflows.
+or checked bar private pointers, and a diff touching only it skips the checks.
 
 - Do not add it to the workspace, and do not fix code here in unrelated work.
 - Importing into it and reviving from it follow `experimental/README.md`.
@@ -268,14 +268,16 @@ not mirror each other and an edit to one half alone
   enough to know what it costs, and give each a confidence** (Pick and Works
   percentages, with what they rest on): `docs/presenting-choices.md`.
 
-## Security findings
+## Private information
 
-This repository is public, so a finding about it is a reproduction. Findings
-go to the private **`noshiro-pf/mono-security`**, never to issues or pull
-requests here; a fix here may say what it closes, not read as steps that
-work. A public issue cannot be taken back (edit history is readable, archives
-ingest the feed). Outside reports come through private vulnerability reporting
-(`.github/SECURITY.md`).
+This repository is public, as is all around it (commits, pull requests, issues,
+comments, `mono-screenshots`): **nothing only a private source holds goes in
+them** — a private repository's names, numbers or contents, an employer's
+internals. `claude-code-public-write-gate.mts` holds each publishing call once
+for that review. A security finding, a reproduction, goes to the private
+**`noshiro-pf/mono-security`**, never here; a fix here says what it fixes, not
+the private issue it closes or steps that work. Nothing public can be undone
+(edit history stays readable). Outside reports: `.github/SECURITY.md`.
 
 ## Commits and pull requests
 

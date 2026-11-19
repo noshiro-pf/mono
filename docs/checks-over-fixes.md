@@ -71,10 +71,10 @@ none.
 A check added this way is part of the fix, not unrelated work: it is what
 keeps the fix fixed.
 
-**A security finding is the exception.** As "Security findings" in CLAUDE.md
+**A security finding is the exception.** As "Private information" in CLAUDE.md
 says, it is never described here: the deferred check, or the reason there is
-none, goes to `mono-security` with the finding, and a check added here must
-not read as steps that work any more than the fix may.
+none, goes to `mono-security` with the finding, and a check added here must not
+read as steps that work any more than the fix may.
 
 ## In the description
 

@@ -36,6 +36,18 @@
         ]
       }
     ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash|mcp__.*[Gg][Ii][Tt][Hh][Uu][Bb].*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "f=\"$CLAUDE_PROJECT_DIR/tools/scripts/cmd/claude-code-public-write-gate.mts\"; [ ! -f \"$f\" ] || node \"$f\"",
+            "timeout": 30
+          }
+        ]
+      }
+    ],
     "PostToolUse": [
       {
         "matcher": "Edit|Write|MultiEdit",
