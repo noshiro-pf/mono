@@ -20,6 +20,7 @@ import {
   stepCommands,
   type Uncovered,
 } from './check-changed/reach.mjs';
+import { readRootProgramReads } from './check-changed/root-program.mjs';
 import {
   buildCoverageGraph,
   reachableFrom,
@@ -372,11 +373,18 @@ const main = async (): Promise<Result<string, string>> => {
     return generatorReaders;
   }
 
+  const rootProgramReads = readRootProgramReads(files);
+
+  if (Result.isErr(rootProgramReads)) {
+    return rootProgramReads;
+  }
+
   const classification = classifyChanges({
     files,
     packages,
     proseGate: proseGate.value,
     generatorReaders: generatorReaders.value,
+    rootProgramReads: rootProgramReads.value,
   });
 
   const plan = buildPlan({

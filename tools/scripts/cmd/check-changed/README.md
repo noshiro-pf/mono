@@ -95,10 +95,11 @@ by case. In order:
    guards in parallel for any change the code gate lets through, as CI runs
    them, and the root program's `check:root:types`, `lint` and `test` only for
    what the root `tsconfig.json` reads (`tools/`, the root configuration, any
-   `configs/`, `eslint.config*.mts` or `vite.config.mts`), all of them but
-   `check:root:test` in one parallel run of one script per CPU and at most 4 at
-   once, as `pnpm run` runs `check:root` (`--max-parallel` sets another); the
-   `strict-lib:`
+   `configs/`, `eslint.config*.mts` or `vite.config.mts`, and what those import
+   from a member by a relative path, read from the program itself:
+   `root-program.mts`), all of them but `check:root:test` in one parallel run of
+   one script per CPU and at most 4 at once, as `pnpm run` runs `check:root`
+   (`--max-parallel` sets another); the `strict-lib:`
    checks for `strict-lib/`, and its members' `check:test` for a path there the
    code gate lets through; `check:knip` for any change the code gate lets
    through, as CI runs it, and `check:published-deps` for a manifest or for what

@@ -33,6 +33,7 @@ export const classifyChanges = ({
   packages,
   proseGate,
   generatorReaders,
+  rootProgramReads,
 }: Readonly<{
   /** Repository-relative, `/`-separated. */
   files: readonly string[];
@@ -43,6 +44,12 @@ export const classifyChanges = ({
    * import (`generatorReadersOf` in `generator-entries.mts`).
    */
   generatorReaders: ReadonlyMap<string, readonly string[]>;
+  /**
+   * The changed files the root program reads (`readRootProgramReads` in
+   * `root-program.mts`): a member file it imports by a relative path among
+   * them, which no pattern of `isRootProgramFile` names.
+   */
+  rootProgramReads: ReadonlySet<string>;
 }>): Classification => {
   const mut_touched = new Map<
     string,
@@ -85,10 +92,12 @@ export const classifyChanges = ({
     }
 
     // `.markdownlint-cli2.mjs` is the one file the gate counts as prose that
-    // the root program also type-checks.
+    // the root program also type-checks. The patterns name what the root
+    // `tsconfig.json` includes, a file the diff deletes among them; what that
+    // imports from a member is read from the program itself.
     if (
-      isRootProgramFile(file) &&
-      (!prose || file === '.markdownlint-cli2.mjs')
+      rootProgramReads.has(file) ||
+      (isRootProgramFile(file) && (!prose || file === '.markdownlint-cli2.mjs'))
     ) {
       mut_areas.add('root');
     }
