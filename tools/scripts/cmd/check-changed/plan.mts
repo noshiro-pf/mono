@@ -60,6 +60,11 @@ export const classifyChanges = ({
 
   const mut_ignored: string[] = [];
 
+  // The harnesses whose `check:types` the diff asks for, or all of them.
+  const mut_libChecked = new Set<string>();
+
+  let mut_libCheckedAll = false;
+
   const byDepth = packages.toSorted((a, b) => b.dir.length - a.dir.length);
 
   const isProse = ignoredBy(proseGate);
@@ -146,6 +151,20 @@ export const classifyChanges = ({
     if (file.startsWith('strict-lib/')) {
       mut_areas.add('strict-lib');
 
+      // A harness's `check:types` type-checks the lib-check entries over its
+      // generated output (`strict-lib-gen.yml` runs every one): for any file of
+      // its own but a document, and every harness for an entry, a shared
+      // config, or the converter, which writes every harness's output.
+      const harness = STRICT_LIB_HARNESS.exec(file)?.[0];
+
+      if (harness !== undefined) {
+        if (!file.endsWith('.md')) {
+          mut_libChecked.add(harness);
+        }
+      } else if (LIB_CHECKED_BY_EVERY_HARNESS.test(file)) {
+        mut_libCheckedAll = true;
+      }
+
       if (STRICT_LIB_GENERATOR_INPUT.test(file)) {
         mut_areas.add('strict-lib-output');
       }
@@ -223,6 +242,13 @@ export const classifyChanges = ({
     members: packages,
     areas: mut_areas,
     ignored: mut_ignored,
+    libChecked: packages
+      .filter(
+        ({ dir }) =>
+          STRICT_LIB_HARNESS.test(dir) &&
+          (mut_libCheckedAll || mut_libChecked.has(dir)),
+      )
+      .toSorted((a, b) => a.dir.localeCompare(b.dir)),
   };
 };
 
@@ -564,10 +590,18 @@ export const buildPlan = ({
         ]
       : []),
 
+    // The harnesses' type checks of the lib-check entries, after the generators
+    // above wrote what they read. A converter or entry change runs all of them,
+    // a few minutes on twelve TypeScript versions (the oldest through the
+    // JavaScript compiler): what `strict-lib-gen.yml` runs on the same change,
+    // found here rather than once the queue takes `skip-ci` off.
+    ...classification.libChecked.flatMap((pkg) =>
+      packageStep(pkg, 'check', 'check:types'),
+    ),
+
     // The members' own tests (the generator's), for a path under `strict-lib/`
     // that the code gate lets through, as a package's tests run for its own
     // code; CI runs them with everyone's over any diff its gate lets through.
-    // The harnesses' `check:types` is `strict-lib-gen.yml`'s.
     ...(areas.has('strict-lib-code')
       ? members
           .filter(({ dir }) => dir.startsWith('strict-lib/'))
@@ -969,6 +1003,13 @@ export type Classification = Readonly<{
   members: readonly PackageInfo[];
   areas: ReadonlySet<Area>;
   ignored: readonly string[];
+  /**
+   * The strict-lib harnesses whose `check:types` the diff asks for, which
+   * type-checks the lib-check entries over the harness's generated output:
+   * the harness of a changed file of its own, or every one for a changed entry,
+   * shared config or converter.
+   */
+  libChecked: readonly PackageInfo[];
 }>;
 
 export type StepKind = 'format' | 'generate' | 'build' | 'fix' | 'check';
@@ -1255,6 +1296,17 @@ const PUBLISHED_DEPS_INPUT =
 const TEST_DOCUMENT_FILES: ReadonlySet<string> = new Set<string>(
   Object.values(TEST_DOCUMENTS),
 );
+
+/** A strict-lib harness's directory, `strict-lib/v<major>.<minor>`. */
+const STRICT_LIB_HARNESS = /^strict-lib\/v\d+\.\d+(?=\/|$)/u;
+
+/**
+ * What every harness's `check:types` reads or what writes every harness's
+ * output: the lib-check entries and their shared configs, and the converter and
+ * its scripts. A document there changes neither.
+ */
+const LIB_CHECKED_BY_EVERY_HARNESS =
+  /^strict-lib\/(?:configs|scripts-common|scripts)\/(?!.*\.md$)/u;
 
 /**
  * What under `strict-lib/` the strict-lib generators read or write, by

@@ -222,6 +222,7 @@ describe('codeTouched', () => {
           members: [],
           areas: new Set<Area>(),
           ignored: [],
+          libChecked: [],
         }),
       ),
       ['libs/code'],
