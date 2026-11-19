@@ -1,3 +1,5 @@
+// Copied from https://www.npmjs.com/package/@blueprintjs/icons (Apache-2.0);
+// its license ships as third-party/@blueprintjs/icons/LICENSE.txt
 /**
  * The 16px paths of Blueprint's icons, as `@blueprintjs/icons` has them in
  * `lib/esm/generated/16px/paths/`. Copied rather than imported: the package
