@@ -1,115 +1,132 @@
+/* The order named first wins: see layer-order.test.mts. */
+@layer tokens, base, components, utilities;
+
 @layer components {
+  /* A link in a block's title, to the same list on GitHub. */
   .on-github {
-    font-size: 0.85rem;
+    font-size: 0.8125rem;
+    font-weight: 400;
   }
 
-  /* The counts and filters: a row of their own under the title. */
+  /*
+   * Under the title the counts, then the priorities, the drafts and the sort,
+   * kept in view with it.
+   */
   .filters {
-    display: flex;
-    flex-basis: 100%;
-    flex-wrap: wrap;
-    gap: 8px 16px;
-    align-items: center;
+    margin-bottom: 0.5rem;
   }
 
-  /* The tree: each level indented with a guide line. */
+  .filters > .tiles {
+    margin-bottom: 0.75rem;
+  }
+
+  .filters > .controls {
+    padding-bottom: 0.75rem;
+  }
+
+  /*
+   * The tree: each level indented with a guide line, the step narrowing with
+   * the depth so a deep stack still fits a narrow column.
+   */
   .tree {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 0.6rem;
     margin: 0;
     padding: 0;
     list-style: none;
+  }
+
+  /* The outermost list is what the step is measured against. */
+  .tree:not(.tree-children) {
+    container-type: inline-size;
   }
 
   .tree > li {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 0.6rem;
   }
 
   .tree-children {
-    margin-left: 10px;
+    --tree-step: clamp(0.6rem, (100cqi - 20rem) / 4, 2.1rem);
+
+    margin-left: calc(var(--tree-step) / 2);
     border-left: 2px solid var(--hairline);
-    padding-left: 12px;
+    padding-left: calc(var(--tree-step) / 2);
   }
 
   .repeated {
+    padding: 0.35rem 0.9rem;
     color: var(--ink-2);
-    font-size: 0.85rem;
+    font-size: 0.875rem;
   }
 
   .card {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    border: 1px solid var(--hairline);
+    min-width: 0;
+    border: 1px solid var(--ring);
     border-radius: var(--radius);
     background: var(--surface);
-    padding: 8px 12px;
-    min-width: 0;
+    padding: 0.7rem 0.9rem;
+  }
+
+  /* The badges first, then the heading, then a row each. */
+  .card > .card-row:first-child {
+    gap: 0.35rem;
+    margin: 0 0 0.45rem;
   }
 
   .card-row {
     display: flex;
     flex-wrap: wrap;
-    gap: 4px 8px;
-    align-items: baseline;
-    font-size: 0.85rem;
+    gap: 0.35rem 0.75rem;
+    align-items: center;
+    margin-top: 0.4rem;
+    color: var(--ink-2);
+    font-size: 0.8125rem;
+  }
+
+  /* A sentence, not a row of parts: `closes #12 its title, #13 …`. */
+  .card-row:is(.linked-issues, .sessions) {
+    display: block;
+    min-width: 0;
   }
 
   .card-heading {
     display: flex;
     flex-wrap: wrap;
-    gap: 2px 8px;
+    gap: 0.5rem;
     align-items: baseline;
     overflow-wrap: anywhere;
   }
 
-  .card-number {
-    color: var(--ink-3);
-    font-variant-numeric: tabular-nums;
-  }
-
   .card-title {
-    color: var(--ink-1);
+    flex: 1 1 20rem;
     font-weight: 600;
   }
 
-  /* At the heading's right end, clear of the title. */
   .split-view {
-    margin-left: auto;
-    font-size: 0.8rem;
+    font-size: 0.875rem;
     white-space: nowrap;
-  }
-
-  .card-list {
-    margin: 0;
-    padding: 0;
-    list-style: none;
-    font-size: 0.85rem;
   }
 
   /* A session's title, or its URL, cut with an ellipsis. */
   .session {
+    display: inline-block;
+    max-width: 100%;
     overflow: hidden;
     text-overflow: ellipsis;
+    vertical-align: bottom;
     white-space: nowrap;
   }
 
-  .issue-state[data-state='open'] {
-    color: var(--good);
-  }
-
-  .issue-state[data-state='closed'] {
-    color: var(--merged);
-  }
-
-  .branch {
+  .stacked-on {
     color: var(--ink-2);
-    font-family: var(--font-mono);
-    font-size: 0.8rem;
-    overflow-wrap: anywhere;
+    font-size: 0.75rem;
+  }
+
+  .stale-checks {
+    color: var(--ink-3);
   }
 
   .note {

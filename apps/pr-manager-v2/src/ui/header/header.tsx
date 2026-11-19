@@ -16,8 +16,6 @@ type Props = Readonly<{
   activity?: JSX.Element;
   /** The Refresh button, after the theme. */
   refresh?: JSX.Element;
-  /** The line under the header saying when the report was read. */
-  readLine?: JSX.Element;
   /** The age alone, for the folded toolbar. */
   readAge?: JSX.Element;
   /** Measured height, for what stays in view under a folded header. */
@@ -33,7 +31,6 @@ export const Header = ({
   go,
   activity,
   refresh,
-  readLine,
   readAge,
   onHeight,
 }: Props): JSX.Element => {
@@ -114,8 +111,6 @@ export const Header = ({
           </svg>
         </button>
       </div>
-
-      <If cond={folded} then={<></>} else={readLine ?? <></>} />
     </header>
   );
 };

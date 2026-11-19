@@ -6,8 +6,10 @@ import type { BlockId } from '../../domain/index.mjs';
 export type BlockView = Readonly<{
   /** The title, a heading's content. */
   title: Child;
-  /** Links and counts after the title, in the same sticky line. */
+  /** Links after the title, on its line. */
   extras?: Child;
+  /** Counts and filters under the title's line, kept in view with it. */
+  controls?: Child;
   /** The block itself, made once and kept while the block is in the page. */
   body: () => JSX.Element;
 }>;

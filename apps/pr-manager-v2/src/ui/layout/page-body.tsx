@@ -53,7 +53,7 @@ export const PageBody = ({ layout, views }: Props): JSX.Element => {
     map((l) =>
       columnWidths(l)
         .map((width) => `minmax(0, ${width}fr)`)
-        .join(' 8px '),
+        .join(' 1.25rem '),
     ),
   );
 

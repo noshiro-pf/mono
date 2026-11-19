@@ -187,16 +187,17 @@ enforced-by:`), and an outline of the merge queue setup linking to
 
 Per PR:
 
-- Badges: **open/draft** (categorical blue, not a status colour), **checks
-  verdict** with parts `1✗ 1… 1– 6✓` (failed, pending, skipped, passed; names on
-  hover; "running" while anything on the head still runs; `checks unread` when
-  rules could not be read; over every reported context when the branch requires
-  none, and the hover says so), **auto-merge** on/off, **code owner review**
-  (shown only when waiting or unknown; "needs a ruleset bypass" when the author
-  is the only owner; team owners can't be resolved without `read:org`, said so),
-  **set aside** by the worker with its reason (only from the signed-in account's
-  comments; grey once the base moved), **claimed** (who, when), `paused` while
-  `skip-ci` is on (only on a queue repository).
+- Badges: **open/draft** (open in the categorical blue, draft grey; neither a
+  status colour), **checks verdict** with parts `1✗ 1… 1– 6✓` (failed, pending,
+  skipped, passed; names on hover; "running" while anything on the head still
+  runs; `checks unread` when rules could not be read; over every reported
+  context when the branch requires none, and the hover says so), **auto-merge**
+  on/off, **code owner review** (shown only when waiting or unknown; "needs a
+  ruleset bypass" when the author is the only owner; team owners can't be
+  resolved without `read:org`, said so), **set aside** by the worker with its
+  reason (only from the signed-in account's comments; grey once the base moved),
+  **claimed** (who, when), `paused` while `skip-ci` is on (only on a queue
+  repository).
 - `#N` and the title linking to the PR; **⧉ split view** link (§12).
 - Claude Code sessions from `Claude-Session:` lines, by title (URL when no
   title, truncated with an ellipsis).
@@ -322,13 +323,14 @@ is:stale`.
 - States and colours: can start (green; thick border when the wait is over),
   waiting (brown, dashed), planned (purple), in progress / open PR (blue),
   closed unfinished (grey); **(new)** open but past what the list read (grey,
-  dotted), whose own state is unknown; priority pill (`high` filled, `mid`
-  outlined, `low` faint); `pending` PRs faint. Done issues and merged PRs are
-  not drawn, nor the waits on them.
+  dotted), whose own state is unknown; the tier pill (`S`, `A` filled, `B`,
+  `C` outlined, the rest faint), and `S` and `A` drawn with a second outline,
+  `D`, `hold` and `close` faint, as are `pending` PRs. Done issues and merged
+  PRs are not drawn, nor the waits on them.
 - Only tiers, in progress and author only filter the DAG; an issue left out that
   a drawn one waits on stays (not counted).
-- Each node: `#N` pill, title fitted to two lines (CJK counted double) with `…`,
-  links to GitHub.
+- Each node: `#N` and tier pills on its top edge, title fitted to two centred
+  lines (CJK counted double) with `…`, links to GitHub.
 - Layered layout, left to right: components stacked largest first; nodes with no
   edge in a grid under "No dependencies drawn either way"; crossings reduced by
   barycenter sweeps; nodes levelled with neighbors; curved edges.
@@ -356,7 +358,7 @@ dropped; everything carries over when switching repository.
 ## 14. Accessibility and style
 
 - Status colours never carry meaning alone (glyph + word).
-- Diverging blue/red for ahead/behind; categorical blue for open/draft.
+- Diverging blue/red for ahead/behind; categorical blue for open, grey for draft.
 - Light and dark from one set of tokens via `light-dark()`.
 - Dialogs are native modal `<dialog>`s; drags are pointer-only with keyboard
   equivalents in the Layout dialog; tabs follow WAI-ARIA.
