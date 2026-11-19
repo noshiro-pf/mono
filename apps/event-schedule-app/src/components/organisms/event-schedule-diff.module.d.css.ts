@@ -2,6 +2,8 @@
 
 export declare const box: string;
 
+export declare const noChanges: string;
+
 export declare const root: string;
 
 export declare const title: string;

@@ -110,6 +110,7 @@ export const eventSettingsPageDictionary = {
   },
   diff: {
     title: '変更差分',
+    noChanges: '変更はありません。',
     values: { none: 'なし' },
     items: {
       title: 'イベント名：',

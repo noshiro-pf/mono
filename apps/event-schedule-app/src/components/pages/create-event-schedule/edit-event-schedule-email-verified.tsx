@@ -87,7 +87,10 @@ export const EditEventScheduleEmailVerified = (): JSX.Element => {
           />
         </div>
       </ButtonsWrapperForEventSettingsPage>
-      <EventScheduleDiff diff={EditEventScheduleStore.diff$} />
+      <EventScheduleDiff
+        diff={EditEventScheduleStore.diff$}
+        hasNoChanges={EditEventScheduleStore.hasNoChanges$}
+      />
     </>
   );
 };

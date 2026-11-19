@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
 import {
+  answerPageLoadTimeout,
   createAnswer,
   emulatorTestTimeout,
   firestoreWriteTimeout,
@@ -89,8 +90,12 @@ test('create event', { tag: '@emulators' }, async ({ page, context }) => {
     await answerPage.getByTestId('edit-event-settings').click();
 
     await expect
-      .soft(answerPage.getByTestId('diff-ul').getByRole('listitem'))
-      .toHaveCount(0);
+      .soft(
+        answerPage
+          .getByTestId('event-schedule-diff')
+          .getByText('変更はありません。'),
+      )
+      .toBeVisible({ timeout: answerPageLoadTimeout });
   }
 
   const editEventSchedulePage = answerPage.getByTestId(
