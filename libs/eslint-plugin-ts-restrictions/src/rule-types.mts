@@ -458,14 +458,15 @@ namespace NoStringSpread {
 }
 
 /**
- * @description Disallow wrapping an array in `Array.from()` before a non-mutating array method (e.g. `Array.from(x).toSorted()`), since the method already returns a new array
+ * @description Disallow wrapping an array in `Array.from()` before an array method that does not change it (e.g. `Array.from(x).toSorted()`); only suggested where code can change the array before or while the method reads it (a callback, an iterator, the `toString` of an element, an argument with an effect)
  *
  *  ```md
- *  | key        | value      |
- *  | :--------- | :--------- |
- *  | type       | suggestion |
- *  | deprecated | false      |
- *  | fixable    | code       |
+ *  | key            | value      |
+ *  | :------------- | :--------- |
+ *  | type           | suggestion |
+ *  | deprecated     | false      |
+ *  | fixable        | code       |
+ *  | hasSuggestions | true       |
  *  ```
  *
  * @internal Reached by indexing the rules record by the rule's name.
