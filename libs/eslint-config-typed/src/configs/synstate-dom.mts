@@ -12,7 +12,9 @@ import { defineKnownRules, type FlatConfig } from '../types/index.mjs';
  * (`eslint-plugin-synstate-dom-a11y`), so every rule of `eslintConfigForReact`'s set
  * applies as it does there; disable one by that name. Beside them,
  * `synstate/no-unfocusable-focus-handler` reports `onFocus` / `onBlur`, which
- * do not bubble in synstate-dom, on an element that cannot take the focus. The
+ * do not bubble in synstate-dom, on an element that cannot take the focus, and
+ * `synstate/no-aria-string-conversion` a conversion of an `aria-*` value to a
+ * string, which synstate-dom does itself. The
  * React rules and the hooks rules do not: a synstate-dom component is called
  * once and has no hooks. Browser globals are left to `eslintConfigForBrowser`,
  * which a package adds where it wants them. Name files `eslintConfigForReact`
@@ -39,5 +41,7 @@ export const eslintConfigForSynstateDom = (
       // `onFocus` / `onBlur` do not bubble in synstate-dom, as they do in
       // React, so on an element that cannot take the focus they never run.
       'synstate/no-unfocusable-focus-handler': 'error',
+      // synstate-dom writes a boolean or a number on `aria-*` itself.
+      'synstate/no-aria-string-conversion': 'error',
     }),
   }) as const;

@@ -24,7 +24,7 @@ export const DeadColumn = (): JSX.Element => (
         return (
           <Button
             active={closed$}
-            aria-pressed={closed$.pipe(map(String))}
+            aria-pressed={closed$}
             class={styles.toggle}
             onClick={() => {
               toggleColumn(index);

@@ -2,6 +2,22 @@
 import type { Linter } from 'eslint';
 
 /**
+ * @description Disallow converting an `aria-*` value to a string, which synstate-dom does itself.
+ *
+ *  ```md
+ *  | key        | value      |
+ *  | :--------- | :--------- |
+ *  | type       | suggestion |
+ *  | deprecated | false      |
+ *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
+ */
+namespace NoAriaStringConversion {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
  * @description Require `skipIfNoChange()` instead of `map((x) => x)`, which changes no value and only stops a repeated one.
  *
  *  ```md
@@ -151,6 +167,7 @@ namespace PreferMapTo {
 }
 
 export type EslintSynstateRules = Readonly<{
+  'synstate/no-aria-string-conversion': NoAriaStringConversion.RuleEntry;
   'synstate/no-identity-map': NoIdentityMap.RuleEntry;
   'synstate/no-observable-in-handler': NoObservableInHandler.RuleEntry;
   'synstate/no-redundant-skip-if-no-change': NoRedundantSkipIfNoChange.RuleEntry;

@@ -8,6 +8,7 @@ import type { ESLintFlatConfig, ESLintPlugin } from './types.mjs';
  * (`no-unfocusable-focus-handler`: React's `onFocus` bubbles).
  */
 const synstateDomRules = {
+  'synstate/no-aria-string-conversion': 'error',
   'synstate/no-unfocusable-focus-handler': 'error',
 } as const satisfies Partial<
   ReadonlyRecord<`synstate/${keyof typeof synstateRules}`, 'error'>

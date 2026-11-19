@@ -108,9 +108,7 @@ export const TopBar = ({
             ]
           : []}
         <button
-          aria-expanded={mapBindable(helpShown$, (shown) =>
-            shown ? 'true' : 'false',
-          )}
+          aria-expanded={helpShown$}
           class={constant('top-bar__button')}
           title={constant('How it works, and what it cannot do')}
           type={constant('button')}

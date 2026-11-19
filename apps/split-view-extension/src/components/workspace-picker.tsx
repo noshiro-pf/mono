@@ -192,9 +192,7 @@ export const WorkspacePicker = ({
       </button>
 
       <button
-        aria-expanded={editing$.pipe(
-          map((shown) => (shown ? 'true' : 'false')),
-        )}
+        aria-expanded={editing$}
         class={constant('top-bar__button')}
         title={constant(
           'Rename, reorder or delete this split view, open one or all of them in tabs, export and import',

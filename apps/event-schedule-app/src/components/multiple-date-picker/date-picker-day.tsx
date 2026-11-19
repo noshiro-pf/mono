@@ -19,13 +19,13 @@ export const DatePickerDate = ({
 }: Props): JSX.Element => (
   // eslint-disable-next-line synstate-dom-a11y/click-events-have-key-events, synstate-dom-a11y/prefer-tag-over-role -- recorded, not fixed, when jsx-a11y came to synstate-dom (#3764)
   <div
-    aria-disabled={cell.pipe(map((c) => (c.outside ? 'true' : 'false')))}
+    aria-disabled={cell.pipe(map((c) => c.outside))}
     aria-label={cell.pipe(
       map(({ ymd }) =>
         DateUtils.create(ymd.year, ymd.month, ymd.date).toString(),
       ),
     )}
-    aria-selected={cell.pipe(map((c) => (c.selected ? 'true' : 'false')))}
+    aria-selected={cell.pipe(map((c) => c.selected))}
     class={cell.pipe(
       map((c) => dayClass(c, onClick !== undefined, useOutlinedSelectedStyle)),
     )}
