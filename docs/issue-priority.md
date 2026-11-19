@@ -80,8 +80,7 @@ open な issue はどれも、**優先度の段を表す `priority:<段>` ラベ
   `annotation-tool`、`synstate-dom-benchmark`、`cant-stop-probability`、
   `catan-dice`。
 - **置き換わる予定（`hold`）**: synstate-dom への移行で消える React 向けの
-  `apps/` 内ユーティリティ — `react-utils`、`preact-utils`、`react-utils-styled`、
-  `react-blueprintjs-utils`、`numeric-input-utils`。`event-schedule-app` の
+  `apps/` 内ユーティリティ — `react-utils`、`preact-utils`。`event-schedule-app` の
   移行（#2649）が済んだら、残っている issue を閉じるか見直す。
 
 ## 作者にしかできない issue — `author-only`

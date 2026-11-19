@@ -128,8 +128,8 @@ update:
     - '@firebase/rules-unit-testing'
 
     # preact 11 changes the type `useRef` returns and when effects clean up
-    # on unmount, which breaks `apps/resize-observer-preact-hooks`'s types and
-    # `libs/synstate-preact-hooks`'s browser tests (#2154). The port, and what
+    # on unmount, which breaks `libs/synstate-preact-hooks`'s browser tests
+    # (#2154). The port, and what
     # the published hooks' `preact: ">=10.0.0"` peer range should say, is
     # #2218.
     - preact

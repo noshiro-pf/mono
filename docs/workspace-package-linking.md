@@ -1,5 +1,8 @@
 # workspace パッケージの解決 — `paths` をどこまで削れるか
 
+<!-- A path removed since, by #3529. -->
+<!-- doc-paths-ignore: apps/react-blueprintjs-utils/tsconfig.json -->
+
 `apps/*` と `libs/*` の `tsconfig.json` に散っていた `compilerOptions.paths` を
 **58 エントリ / 25 ファイルから 18 エントリ / 12 ファイル**へ整理した記録と、
 残した 12 エントリが何のために残っているかの根拠。

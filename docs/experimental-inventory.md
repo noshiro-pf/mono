@@ -1,7 +1,7 @@
 <!-- cspell:ignore catan dezero firebaserc idfn Ymdhm -->
 
 <!-- Paths under experimental/packages/, and paths that were renamed or removed since. -->
-<!-- doc-paths-ignore: tools/eslint-custom-rules apps/io-ts-types apps/better-preact-use-state apps/event-schedule-app/configs/playwright.config.ts apps/tiny-router-react-hooks -->
+<!-- doc-paths-ignore: tools/eslint-custom-rules apps/io-ts-types apps/better-preact-use-state apps/event-schedule-app/configs/playwright.config.ts apps/tiny-router-react-hooks apps/resize-observer-react-hooks apps/react-blueprintjs-utils apps/react-blueprintjs-utils/src -->
 
 # `experimental/` の棚卸し
 
@@ -108,6 +108,12 @@ app に連れられて来るもの。単体で復元する理由は薄い。
 
 （2026-11-05 追記）`tiny-router-*` の 3 つは復元したあと、`libs/synstate-router`
 に置き換えて削除した（#3362）。
+
+（2026-11-16 追記）`react-blueprintjs-utils`・`numeric-input-utils`・`react-mui-utils`・
+`react-utils-styled`・`resize-observer-react-hooks`・`resize-observer-preact-hooks`
+の 6 つは復元したあと、使う app が synstate-dom と blueprint-synstate に移って
+依存がなくなったので削除した（#3529）。戻すものではない。下の各節の注記は、
+復元した時点の記録である。
 
 ### others / slides（6 個）
 

@@ -431,34 +431,10 @@
       "project": ["**/*.{mts,tsx}"],
     },
 
-    // Not an Astro site like the entry below assumes: a single entry point.
-    "apps/numeric-input-utils": {
-      "entry": ["src/index.mts"],
-      "project": ["**/*.mts"],
-    },
-
-    // Not an Astro site like the entry below assumes: a single entry point.
-    "apps/resize-observer-react-hooks": {
-      "entry": ["src/index.mts"],
-      "project": ["**/*.mts"],
-    },
-
-    // Not an Astro site like the entry below assumes: a single entry point.
-    "apps/react-blueprintjs-utils": {
-      "entry": ["src/index.mts"],
-      "project": ["**/*.{mts,ts,tsx}"],
-    },
-
     // Not an Astro site like the entry above assumes: a single entry point.
     "apps/preact-utils": {
       "entry": ["src/index.mts"],
       "project": ["**/*.{mts,tsx}"],
-    },
-
-    // Not an Astro site like the entry above assumes: a single entry point.
-    "apps/resize-observer-preact-hooks": {
-      "entry": ["src/index.mts"],
-      "project": ["**/*.mts"],
     },
 
     // Not an Astro site like the entry above assumes: a Vite synstate-dom app
@@ -513,12 +489,6 @@
       "ignoreDependencies": ["@fontsource/roboto"],
     },
 
-    // Not an Astro site like the entry below assumes: a single entry point.
-    "apps/react-mui-utils": {
-      "entry": ["src/index.mts"],
-      "project": ["**/*.{mts,tsx}"],
-    },
-
     // Not an Astro site like the entry below assumes: a Vite synstate-dom app
     // whose entry is the module `index.html` loads.
     "apps/annotation-tool": {
@@ -551,12 +521,6 @@
     "apps/ts-utils-additional": {
       "entry": ["src/index.mts"],
       "project": ["**/*.mts"],
-    },
-
-    // Not an Astro site like the entry below assumes: a single entry point.
-    "apps/react-utils-styled": {
-      "entry": ["src/index.mts"],
-      "project": ["**/*.{mts,tsx}"],
     },
 
     // Not an Astro site like the entry below assumes: a single entry point.
