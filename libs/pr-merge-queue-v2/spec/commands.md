@@ -114,9 +114,11 @@ A body is refused by `push`, `create`, `check` and `open-pr --body-file` when:
 - the original's `## Review` does not open with the review line, the level and
   the total of rounds in digits (see "Review line" below), going on only after
   `.`, `,`, `;` or `:`;
+- the first line of the translation's section in the place of `## Review` does
+  not state the original's total of rounds in digits, in any wording;
 - an item under a `**Deferred**` line of `## Review` does not open with
-  `(predates)`, `(another change)` or `(too large)`, or the line has neither
-  items nor `none`;
+  `(predates)`, `(another change)` or `(too large)`, the line has neither items
+  nor `none`, or the line carries a finding itself;
 - a `Merge-After:` or `Start-After:` line outside code fences, the trailers
   included, names no `#N` (a URL, `owner/repo#N` or a bare number is not read),
   or a line meant as one is no declaration line: its key behind a list marker

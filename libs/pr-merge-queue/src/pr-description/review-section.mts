@@ -25,8 +25,8 @@ export const deferralReasonOf = (text: string): DeferralReason | undefined => {
 /**
  * What keeps the lists under the `**Deferred**` lines of a `## Review` section
  * (its lines, fenced code blanked) from the rule, one sentence each: an item
- * that opens with no reason, and a `**Deferred**` line with no list and no
- * "none".
+ * that opens with no reason, a `**Deferred**` line with no list and no "none",
+ * and one that carries a finding itself.
  *
  * A list runs from the first item after the line to the first paragraph that is
  * neither an item nor indented under one; a line right after an item, with no
@@ -46,8 +46,16 @@ export const deferralProblemsIn = (
         ? DEFERRED_HEADER.exec(line.trim())?.groups?.['rest']
         : undefined;
 
-    if (rest !== '') {
+    if (rest === undefined || NONE.test(rest)) {
       return [];
+    }
+
+    // A finding on the line itself is no item of a list under it, which is
+    // where the digest reads a deferral's reason from.
+    if (rest !== '') {
+      return [
+        `the "**Deferred**" line carries the finding "${shortened(rest)}"; list it as an item under the line ${NONE_HINT}; ${DEFERRAL_RULE}`,
+      ];
     }
 
     const after = section.slice(index + 1);
@@ -68,7 +76,7 @@ export const deferralProblemsIn = (
               `the deferred finding "${shortened(item)}" opens with no reason; ${DEFERRAL_RULE}`,
           )
       : [
-          `the "**Deferred**" line lists nothing (with nothing deferred, write "**Deferred**: none." or leave the line out); ${DEFERRAL_RULE}`,
+          `the "**Deferred**" line lists nothing ${NONE_HINT}; ${DEFERRAL_RULE}`,
         ];
   });
 
@@ -99,7 +107,11 @@ const DEFERRAL_RULE =
 const DEFERRED_HEADER =
   /^(?:\*\*Deferred\*\*:?|\*\*Deferred:\*\*|Deferred:)[ \t]*(?<rest>.*)$/u;
 
-const NONE = /^none\.?$/iu;
+/** "none", alone or with a remark after it: `none (all fixed).` */
+const NONE = /^none\b/iu;
+
+const NONE_HINT =
+  '(with nothing deferred, write "**Deferred**: none." or leave the line out)';
 
 /** At most three spaces: four or more make an indented code block. */
 const HEADER_INDENT = /^ {0,3}\S/u;

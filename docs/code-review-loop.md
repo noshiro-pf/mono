@@ -75,7 +75,12 @@ round dismissed, costs as much as the first.
       review reads. If the pushed branch has moved (`auto-rebase`), bring the
       local branch onto it first — `git fetch`, then
       `git rebase --onto origin/<branch> <the head you knew>` — or the review
-      reads the whole commit again.
+      reads the whole commit again. Push the amend with no rebase onto `main` of
+      your own in the same push: the "Compare" link on the pull request's
+      "force-pushed" entry then shows a reader the amend alone. When the two
+      were mixed, give the reader
+      `git range-diff <old base>..<old head> <new base>..<new head>`, which
+      leaves `main`'s changes out.
 - **After each round's fixes, run `check-changed` again** — the fixes are
   code, and with `skip-ci` on the local checks are the only ones the branch
   gets.
@@ -277,6 +282,10 @@ later mines the descriptions for recurring findings, can parse.
 The Japanese half of the description (`CLAUDE.md`, "Japanese text")
 carries the section under `### レビュー`, never a second `## Review`: the
 digest reads the first `## Review` alone, and only the English one parses.
+Its first line states the same level and total, in digits and in any wording
+(`` `/code-review high`、3 ラウンド。 ``): an amend that adds rounds updates
+both, and `pr-description` refuses a translation whose first line lacks the
+total.
 
 A security finding is the exception, as "Private information" in `CLAUDE.md`
 says: one dismissed or deferred goes to `mono-security` and is not listed here,
