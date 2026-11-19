@@ -10,6 +10,7 @@ import { Optional, Result } from 'ts-data-forge';
 import { dict } from '../../../constants/index.mjs';
 import { EventScheduleStore, Router } from '../../../store/index.mjs';
 import { Header } from '../../organisms/index.mjs';
+import { pageWidthClass } from '../../styled/index.mjs';
 import { NotFoundPage } from '../not-found-page.js';
 import { EditEventScheduleOk } from './edit-event-schedule-ok.js';
 import { FetchEventScheduleError } from './error.js';
@@ -37,13 +38,15 @@ export const EditEventSchedule = (): JSX.Element => {
         ) : (
           <div data-e2e={constant('edit-event-schedule-page')}>
             <Header title={dc.title} />
-            {status === 'others' ? (
-              <FetchEventScheduleError errorType={'others'} />
-            ) : status === 'loading' ? (
-              <Spinner />
-            ) : (
-              <EditEventScheduleOk />
-            )}
+            <div class={constant(pageWidthClass)}>
+              {status === 'others' ? (
+                <FetchEventScheduleError errorType={'others'} />
+              ) : status === 'loading' ? (
+                <Spinner />
+              ) : (
+                <EditEventScheduleOk />
+              )}
+            </div>
           </div>
         );
       }}

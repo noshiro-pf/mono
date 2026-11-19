@@ -115,19 +115,15 @@
 
 /*
  * A container, so that the full-width toggle can tell whether the page has
- * any room to widen into.
+ * any room to widen into. Each of its children is at the page's width
+ * (`pageWidthClass`), but the answers section leaves it when the table is shown
+ * full width, for reading many answers side by side. The class is given to each
+ * child by hand rather than by a rule here, so that the page width stays in one
+ * place: a new child has to be given it as well. `answer-page-width.spec.mts`
+ * checks the children drawn in the state it opens the page in.
  */
 .page {
   container-type: inline-size;
-}
-
-/*
- * The page's width: each card 1200px at most, centred (the cards' own 10px
- * margins included). The answers section leaves it when the table is shown
- * full width, for reading many answers side by side.
- */
-.page > :not(.fullWidth) {
-  padding-inline: max(0px, calc((100% - 1220px) / 2));
 }
 
 /*
@@ -139,10 +135,10 @@
 }
 
 /*
- * Hidden where the page already spans the screen: at the 1220px of the padding
- * above, which it has to follow. Just above that a press widens the table by
- * little, but the toggle stays: hidden there, a full width kept from a wider
- * screen could not be turned off.
+ * Hidden where the page already spans the screen: at the 1220px of
+ * `styled/page-width.module.css`, which it has to follow. Just above that a
+ * press widens the table by little, but the toggle stays: hidden there, a full
+ * width kept from a wider screen could not be turned off.
  */
 @container (max-width: 1220px) {
   .fullWidthToggle {

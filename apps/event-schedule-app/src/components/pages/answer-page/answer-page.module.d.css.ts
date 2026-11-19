@@ -12,8 +12,6 @@ export declare const filterButtonsWrapper: string;
 
 export declare const flex: string;
 
-export declare const fullWidth: string;
-
 export declare const fullWidthToggle: string;
 
 export declare const iconDescriptionWrapper: string;

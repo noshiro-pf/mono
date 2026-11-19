@@ -13,7 +13,10 @@ import {
   Header,
   ResetButton,
 } from '../../organisms/index.mjs';
-import { ButtonsWrapperForEventSettingsPage } from '../../styled/index.mjs';
+import {
+  ButtonsWrapperForEventSettingsPage,
+  pageWidthClass,
+} from '../../styled/index.mjs';
 import { EventScheduleSettingCommon } from './event-schedule-setting-common.js';
 
 const dc = dict.eventSettingsPage;
@@ -27,32 +30,36 @@ export const CreateEventSchedule = (): JSX.Element => {
   return (
     <div data-e2e={constant('create-page')}>
       <Header title={dc.title} />
-      <EventScheduleSettingCommon
-        handlers={CreateEventScheduleStore.commonStateHandlers}
-        state$={commonState$}
-      />
-      <ButtonsWrapperForEventSettingsPage>
-        <ResetButton
-          disabled={deriveBindable(
-            [isLoading$, hasNoChanges$],
-            (loading, noChanges) => loading || noChanges,
-          )}
-          onConfirmClick={CreateEventScheduleStore.resetAllState}
+      <div class={constant(pageWidthClass)}>
+        <EventScheduleSettingCommon
+          handlers={CreateEventScheduleStore.commonStateHandlers}
+          state$={commonState$}
         />
-        <Button
-          data-e2e={constant('create-button')}
-          disabled={commonState$.pipe(map((s) => !s.eventScheduleValidationOk))}
-          intent={'primary'}
-          loading={isLoading$}
-          text={constant(dc.createEventButton)}
-          onClick={CreateEventScheduleStore.onCreateEventClick}
-        />
-        <CreateEventResultDialog
-          isLoading={isLoading$}
-          isOpen={CreateEventScheduleStore.createResultDialogIsOpen$}
-          url={CreateEventScheduleStore.url$}
-        />
-      </ButtonsWrapperForEventSettingsPage>
+        <ButtonsWrapperForEventSettingsPage>
+          <ResetButton
+            disabled={deriveBindable(
+              [isLoading$, hasNoChanges$],
+              (loading, noChanges) => loading || noChanges,
+            )}
+            onConfirmClick={CreateEventScheduleStore.resetAllState}
+          />
+          <Button
+            data-e2e={constant('create-button')}
+            disabled={commonState$.pipe(
+              map((s) => !s.eventScheduleValidationOk),
+            )}
+            intent={'primary'}
+            loading={isLoading$}
+            text={constant(dc.createEventButton)}
+            onClick={CreateEventScheduleStore.onCreateEventClick}
+          />
+          <CreateEventResultDialog
+            isLoading={isLoading$}
+            isOpen={CreateEventScheduleStore.createResultDialogIsOpen$}
+            url={CreateEventScheduleStore.url$}
+          />
+        </ButtonsWrapperForEventSettingsPage>
+      </div>
     </div>
   );
 };
