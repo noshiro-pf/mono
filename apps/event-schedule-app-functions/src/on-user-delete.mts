@@ -3,16 +3,23 @@ import { GrpcStatus, type Firestore } from 'firebase-admin/firestore';
 import { logger, type auth } from 'firebase-functions/v1';
 import { Arr, isNotUndefined, isRecord } from 'ts-data-forge';
 import type { DeepReadonly } from 'ts-type-forge';
-import { isCurrentEventAnswerPath } from './functions/index.mjs';
+import {
+  deletedUserId,
+  deletedUserWrites,
+  isCurrentEventAnswerPath,
+} from './functions/index.mjs';
 
 /**
- * Takes the deleted user's id off what still names it: `author.id` of the
- * events they made and `user.id` of the answers they gave.
+ * Takes the deleted user's account off what still names it: `author.id` of the
+ * events they made and `user.id` of the answers they gave become
+ * `deletedUserId`, so that no one may edit them any more, and those events'
+ * notification email is deleted (`deletedUserWrites`).
  *
- * Only the documents that name the user are read, and only that field is
- * written (`update`), so an edit made meanwhile to any other field stays. The
- * answers are found by a collection-group query, which needs the `answers` /
- * `user.id` index in `apps/event-schedule-app/firestore.indexes.json`.
+ * Only the documents that name the user are read, and of each only that field
+ * is written (`update`), so an edit made meanwhile to any other field stays;
+ * the events' `internal/values` is deleted whole. The answers are found by a
+ * collection-group query, which needs the `answers` / `user.id` index in
+ * `apps/event-schedule-app/firestore.indexes.json`.
  *
  * The writes go through a `BulkWriter`, which commits them in batches within
  * Firestore's limits and retries what fails transiently. A document deleted
@@ -38,16 +45,24 @@ export const onUserDelete = async (
     isCurrentEventAnswerPath(doc.ref.path),
   );
 
+  const writes = deletedUserWrites({
+    eventIds: events.docs.map((doc) => doc.id),
+    answerPaths: currentAnswers.map((doc) => doc.ref.path),
+  });
+
   const writer = db.bulkWriter();
 
-  const results = [
-    ...events.docs.map((doc) => writer.update(doc.ref, 'author.id', null)),
-    ...currentAnswers.map((doc) => writer.update(doc.ref, 'user.id', null)),
-  ].map(async (write) =>
-    write
-      .then(() => undefined)
-      .catch((error: unknown) => (isNotFound(error) ? undefined : error)),
-  );
+  const results = writes
+    .map((write) =>
+      write.type === 'delete'
+        ? writer.delete(db.doc(write.path))
+        : writer.update(db.doc(write.path), write.field, deletedUserId),
+    )
+    .map(async (write) =>
+      write
+        .then(() => undefined)
+        .catch((error: unknown) => (isNotFound(error) ? undefined : error)),
+    );
 
   await writer.close();
 
