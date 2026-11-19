@@ -68,7 +68,7 @@ const routesOf = (overrides: Routes = {}): Routes =>
     '/repos/o/n/pulls/7/files?per_page=100': ok([
       { filename: 'b.md', status: 'renamed', previous_filename: 'a.md' },
     ]),
-    '/repos/o/n/activity?ref=refs%2Fheads%2Ffeature&activity_type=push&direction=asc&per_page=100':
+    '/repos/o/n/activity?ref=refs%2Fheads%2Ffeature&direction=asc&per_page=100':
       ok([
         {
           activity_type: 'branch_creation',
