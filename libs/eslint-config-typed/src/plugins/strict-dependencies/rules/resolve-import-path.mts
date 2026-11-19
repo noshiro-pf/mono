@@ -9,7 +9,8 @@ import {
 import type { MutableRecord, ReadonlyRecord } from 'ts-type-forge';
 import * as ts from 'typescript';
 
-// Forked from https://github.com/knowledge-work/eslint-plugin-strict-dependencies/blob/v1.3.27/strict-dependencies/resolveImportPath.js
+// Forked from https://github.com/knowledge-work/eslint-plugin-strict-dependencies/blob/v1.3.27/strict-dependencies/resolveImportPath.js;
+// its license ships as third-party/eslint-plugin-strict-dependencies/LICENSE.txt
 
 /**
  * import文のrootからのパスを求める
