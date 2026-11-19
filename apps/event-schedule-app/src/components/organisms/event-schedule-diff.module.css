@@ -12,3 +12,9 @@
 .title {
   margin: 5px;
 }
+
+/* In place of the list, where its items would be, so that nothing moves. */
+.noChanges {
+  margin: 1em 0;
+  padding-left: 40px;
+}

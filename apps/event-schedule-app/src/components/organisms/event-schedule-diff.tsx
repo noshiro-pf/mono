@@ -1,6 +1,7 @@
 import {
   constant,
   For,
+  If,
   mapBindable,
   type Bindable,
   type JSX,
@@ -10,7 +11,14 @@ import { dict } from '../../constants/index.mjs';
 import type { EventSettingsPageDiffResult } from '../../functions/index.mjs';
 import * as styles from './event-schedule-diff.module.css';
 
-type Props = Readonly<{ diff: Bindable<EventSettingsPageDiffResult> }>;
+type Props = Readonly<{
+  diff: Bindable<EventSettingsPageDiffResult>;
+  /**
+   * The store's own word on it, which the page's buttons follow too, so that
+   * the box never says nothing changed while they offer to save a change.
+   */
+  hasNoChanges: Bindable<boolean>;
+}>;
 
 const list1 = [
   'title',
@@ -26,16 +34,41 @@ const list2 = [
 
 const dc = dict.eventSettingsPage.diff;
 
-/** What the edit changes, drawn again whenever it changes. */
-export const EventScheduleDiff = ({ diff }: Props): JSX.Element => (
-  <div class={constant(styles.root)}>
+/**
+ * What the edit changes, drawn again whenever it changes; with nothing changed,
+ * a line that says so in place of an empty list.
+ */
+export const EventScheduleDiff = ({
+  diff,
+  hasNoChanges,
+}: Props): JSX.Element => (
+  <div class={constant(styles.root)} data-e2e={constant('event-schedule-diff')}>
     <div class={constant(styles.box)}>
       <div class={constant(styles.title)}>{constant(dc.title)}</div>
-      <ul data-e2e={constant('diff-ul')}>
-        <For items={mapBindable(diff, (d) => [d])} key={(d) => d}>
-          {(diff$) => <DiffItems diff={Optional.unwrap(diff$.getSnapshot())} />}
-        </For>
-      </ul>
+      {/*
+       * The list can still stand empty where the store sees a change it does
+       * not show: an event stored with its dates unsorted or doubled, which the
+       * store's normalization sorts and de-duplicates and the diff, comparing
+       * sets, does not list. Saying nothing changed there would contradict the
+       * buttons, which offer to save.
+       */}
+      <If
+        cond={hasNoChanges}
+        else={
+          <ul data-e2e={constant('diff-ul')}>
+            <For items={mapBindable(diff, (d) => [d])} key={(d) => d}>
+              {(diff$) => (
+                <DiffItems diff={Optional.unwrap(diff$.getSnapshot())} />
+              )}
+            </For>
+          </ul>
+        }
+        then={
+          <p class={constant(`${styles.noChanges} bp6-text-muted`)}>
+            {constant(dc.noChanges)}
+          </p>
+        }
+      />
     </div>
   </div>
 );

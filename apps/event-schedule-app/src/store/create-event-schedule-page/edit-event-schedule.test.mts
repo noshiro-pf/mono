@@ -26,6 +26,50 @@ describe(createEditEventScheduleStore, () => {
     assert.isDefined(Optional.unwrap(store.diff$.getSnapshot()).title);
   });
 
+  // The edit page's diff box says nothing changed by `hasNoChanges$`, so a
+  // change it would miss would be hidden there too.
+  test('an answer icon’s point, or the email alone, is a change, and listed', () => {
+    const { store } = setup();
+
+    store.setEventSchedule(fromDatabase, undefined);
+
+    store.commonStateHandlers.setAnswerIcons({
+      ...fromDatabase.answerIcons,
+      fair: { ...fromDatabase.answerIcons.fair, point: 7 },
+    });
+
+    assert.isFalse(Optional.unwrap(store.hasNoChanges$.getSnapshot()));
+
+    assert.isDefined(
+      Optional.unwrap(store.diff$.getSnapshot()).answerIcons.fair.point,
+    );
+
+    const { store: withEmail } = setup();
+
+    withEmail.setEmailVerified('abc', 'bob@example.com');
+
+    withEmail.setEventSchedule(withNotifications, 'bob@example.com');
+
+    assert.isTrue(Optional.unwrap(withEmail.hasNoChanges$.getSnapshot()));
+
+    const { notificationSettingsWithEmail } = Optional.unwrap(
+      withEmail.commonState$.getSnapshot(),
+    );
+
+    assert.isDefined(notificationSettingsWithEmail);
+
+    withEmail.commonStateHandlers.setNotificationSettingsWithEmail({
+      ...notificationSettingsWithEmail,
+      email: 'carol@example.com',
+    });
+
+    assert.isFalse(Optional.unwrap(withEmail.hasNoChanges$.getSnapshot()));
+
+    assert.isDefined(
+      Optional.unwrap(withEmail.diff$.getSnapshot()).notificationSettings,
+    );
+  });
+
   // #3416: the form outlived the visit, and another event's edit page showed it
   // until its own event was read.
   test('leaving the edit page forgets the form and the event it was loaded from', () => {

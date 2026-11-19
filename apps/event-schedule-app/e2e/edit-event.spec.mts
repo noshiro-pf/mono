@@ -44,12 +44,25 @@ test(
       .getByTestId('submit-button')
       .getByTestId('update-event-settings');
 
-    // Nothing changed yet, so there is nothing to submit.
+    // Nothing changed yet, so there is nothing to submit, and the diff box says
+    // so rather than standing empty.
     await expect.soft(submitButton).toBeDisabled();
+
+    const diffBox = editPage.getByTestId('event-schedule-diff');
+
+    const noChanges = diffBox.getByText('変更はありません。');
+
+    await expect.soft(noChanges).toBeVisible();
 
     await editPage.getByTestId('title').fill('編集後のイベント');
 
     await expect.soft(submitButton).toBeEnabled();
+
+    await expect.soft(noChanges).toBeHidden();
+
+    await expect
+      .soft(diffBox.getByTestId('diff-ul').getByText('イベント名：'))
+      .toBeVisible();
 
     /* deleting a date asks for confirmation before the update */
 
