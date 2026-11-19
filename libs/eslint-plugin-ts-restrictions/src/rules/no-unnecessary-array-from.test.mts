@@ -323,27 +323,46 @@ describe('no-unnecessary-array-from through type wrappers', () => {
         name: 'an argument that is an array at every layer',
         code: dedent`
           declare const xs: number[];
-          const y = Array.from(xs as readonly number[]).map((x) => x * 2);
+          const y = Array.from(xs as readonly number[]).toSorted();
         `,
         output: dedent`
           declare const xs: number[];
-          const y = (xs as readonly number[]).map((x) => x * 2);
+          const y = (xs as readonly number[]).toSorted();
         `,
         errors: [{ messageId: 'unnecessaryArrayFrom' }],
+      },
+      {
+        name: 'an argument that is an array at every layer, before a callback method',
+        code: dedent`
+          declare const xs: number[];
+          const y = Array.from(xs as readonly number[]).map((x) => x * 2);
+        `,
+        errors: [
+          {
+            messageId: 'unnecessaryArrayFromUnlessMutated',
+            suggestions: [
+              {
+                messageId: 'removeArrayFrom',
+                output: dedent`
+                  declare const xs: number[];
+                  const y = (xs as readonly number[]).map((x) => x * 2);
+                `,
+              },
+            ],
+          },
+        ],
       },
       {
         name: 'the `Array.from()` call is wrapped in `satisfies` or `!`',
         code: dedent`
           declare const xs: readonly number[];
-          declare const f: (x: number) => number;
           const y = (Array.from(xs) satisfies readonly number[]).toSorted();
-          const z = Array.from(xs)!.map(f);
+          const z = Array.from(xs)!.at(0);
         `,
         output: dedent`
           declare const xs: readonly number[];
-          declare const f: (x: number) => number;
           const y = (xs satisfies readonly number[]).toSorted();
-          const z = xs!.map(f);
+          const z = xs!.at(0);
         `,
         errors: [
           { messageId: 'unnecessaryArrayFrom' },
@@ -361,6 +380,158 @@ describe('no-unnecessary-array-from through type wrappers', () => {
           const y = (xs satisfies readonly number[]).toSorted();
         `,
         errors: [{ messageId: 'unnecessaryArrayFrom' }],
+      },
+    ],
+  });
+});
+
+describe('no-unnecessary-array-from before a method that runs code while it reads', () => {
+  tester.run('no-unnecessary-array-from', noUnnecessaryArrayFrom, {
+    valid: [],
+    invalid: [
+      {
+        name: 'a callback method only suggests: the copy may be a snapshot the callback changes',
+        code: dedent`
+          const listeners: (() => void)[] = [];
+          Array.from(listeners).forEach((l) => {
+            l();
+            listeners.pop();
+          });
+        `,
+        errors: [
+          {
+            messageId: 'unnecessaryArrayFromUnlessMutated',
+            data: { methodName: 'forEach' },
+            suggestions: [
+              {
+                messageId: 'removeArrayFrom',
+                output: dedent`
+                  const listeners: (() => void)[] = [];
+                  listeners.forEach((l) => {
+                    l();
+                    listeners.pop();
+                  });
+                `,
+              },
+            ],
+          },
+        ],
+      },
+      {
+        name: 'an iterator method only suggests: the iterator reads the array later',
+        code: dedent`
+          const xs: number[] = [1, 2, 3];
+          const it = Array.from(xs).values();
+          xs.push(4);
+        `,
+        errors: [
+          {
+            messageId: 'unnecessaryArrayFromUnlessMutated',
+            data: { methodName: 'values' },
+            suggestions: [
+              {
+                messageId: 'removeArrayFrom',
+                output: dedent`
+                  const xs: number[] = [1, 2, 3];
+                  const it = xs.values();
+                  xs.push(4);
+                `,
+              },
+            ],
+          },
+        ],
+      },
+      ...[
+        'entries()',
+        'every((x) => x > 0)',
+        'filter((x) => x > 0)',
+        'find((x) => x > 0)',
+        'findIndex((x) => x > 0)',
+        'findLast((x) => x > 0)',
+        'findLastIndex((x) => x > 0)',
+        'flatMap((x) => [x])',
+        'join(",")',
+        'keys()',
+        'map((x) => x)',
+        'reduce((a, x) => a + x, 0)',
+        'reduceRight((a, x) => a + x, 0)',
+        'some((x) => x > 0)',
+        'toLocaleString()',
+        'toString()',
+      ].map((call) => ({
+        name: `${call.split('(', 1)[0]} only suggests`,
+        code: dedent`
+          declare const xs: readonly number[];
+          const y = Array.from(xs).${call};
+        `,
+        errors: [
+          {
+            messageId: 'unnecessaryArrayFromUnlessMutated' as const,
+            suggestions: [
+              {
+                messageId: 'removeArrayFrom' as const,
+                output: dedent`
+                  declare const xs: readonly number[];
+                  const y = xs.${call};
+                `,
+              },
+            ],
+          },
+        ],
+      })),
+      ...[
+        'at(0)',
+        'concat([1])',
+        'flat()',
+        'includes(1)',
+        'indexOf(1)',
+        'lastIndexOf(1)',
+        'slice(1)',
+        'toReversed()',
+        'toSorted((a, b) => a - b)',
+        'toSpliced(0, 1)',
+        'with(0, 1)',
+      ].map((call) => ({
+        name: `${call.split('(', 1)[0]} reads the array before any code of the author runs, and is fixed`,
+        code: dedent`
+          declare const xs: readonly number[];
+          const y = Array.from(xs).${call};
+        `,
+        output: dedent`
+          declare const xs: readonly number[];
+          const y = xs.${call};
+        `,
+        errors: [{ messageId: 'unnecessaryArrayFrom' as const }],
+      })),
+    ],
+  });
+});
+
+describe('no-unnecessary-array-from before an argument that may change the array', () => {
+  tester.run('no-unnecessary-array-from', noUnnecessaryArrayFrom, {
+    valid: [],
+    invalid: [
+      {
+        name: 'an argument with an effect only suggests: it runs after the copy, before the array is read',
+        code: dedent`
+          const xs: number[] = [1, 2, 3];
+          const y = Array.from(xs).concat(xs.splice(0));
+        `,
+        errors: [
+          {
+            messageId: 'unnecessaryArrayFromUnlessMutated',
+            data: { methodName: 'concat' },
+            suggestions: [
+              {
+                messageId: 'removeArrayFrom',
+                output: dedent`
+                  const xs: number[] = [1, 2, 3];
+                  const y = xs.concat(xs.splice(0));
+                `,
+              },
+            ],
+          },
+        ],
       },
     ],
   });
