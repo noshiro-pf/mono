@@ -536,7 +536,7 @@ const splitViewButton = (page: DeepReadonly<Page>): Locator =>
 
 /**
  * Opens `split.html` of Split View with these addresses side by side, and waits
- * for the last pane's page.
+ * until a pane shows each of them, so that `paneOf` finds every one.
  */
 const openSplitView = async (
   page: DeepReadonly<Page>,
@@ -550,7 +550,12 @@ const openSplitView = async (
     `chrome-extension://${splitViewExtensionId}/split.html?${query.toString()}`,
   );
 
-  await expect.poll(() => page.frames().length).toBeGreaterThan(urls.length);
+  // Each pane's frame exists before it has navigated, its address still empty,
+  // so it is the addresses that are waited for, not the frames: the panes that
+  // do not show theirs yet, until there are none.
+  await expect
+    .poll(() => urls.filter((url) => page.frame({ url }) === null))
+    .toStrictEqual([]);
 };
 
 /** The pane of `page` showing `url`. */
