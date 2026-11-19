@@ -21,6 +21,24 @@ describe('prefer-non-mutating-array-method', () => {
   tester.run('prefer-non-mutating-array-method', preferNonMutatingArrayMethod, {
     valid: [
       {
+        // `splice` returns the removed elements and `toSpliced` the array
+        // without them, so `toSpliced` is never the rewrite; `slice` has the
+        // same value only for the shapes the rule fixes.
+        name: 'splice on a copy whose value slice does not have is left alone',
+        code: dedent`
+          declare const x: readonly number[];
+          declare const args: readonly [number, number];
+          declare const n: number;
+          declare const f: () => number;
+          const a = Array.from(x).splice(1, 0, 10, 20);
+          Array.from(x).splice(...args);
+          const b = Array.from(x).splice(-3, 1);
+          const c = Array.from(x).splice(1, n);
+          const d = Array.from(x).splice(f());
+          const e = Array.from(x).splice();
+        `,
+      },
+      {
         name: 'Array.from on a Set is a genuine conversion, not a copy',
         code: dedent`
           declare const x: Set<number>;
@@ -126,30 +144,6 @@ describe('prefer-non-mutating-array-method', () => {
         output: dedent`
           declare const x: readonly number[];
           const y = x.toSorted((a, b) => a - b);
-        `,
-        errors: [{ messageId: 'preferNonMutatingMethod' }],
-      },
-      {
-        name: 'Array.from(array).splice(args) → array.toSpliced(args)',
-        code: dedent`
-          declare const x: readonly number[];
-          const y = Array.from(x).splice(0, 1);
-        `,
-        output: dedent`
-          declare const x: readonly number[];
-          const y = x.toSpliced(0, 1);
-        `,
-        errors: [{ messageId: 'preferNonMutatingMethod' }],
-      },
-      {
-        name: 'Array.from(array).splice with insertion arguments',
-        code: dedent`
-          declare const x: readonly number[];
-          const y = Array.from(x).splice(1, 0, 10, 20);
-        `,
-        output: dedent`
-          declare const x: readonly number[];
-          const y = x.toSpliced(1, 0, 10, 20);
         `,
         errors: [{ messageId: 'preferNonMutatingMethod' }],
       },
@@ -325,19 +319,62 @@ describe('prefer-non-mutating-array-method with parenthesized operands', () => {
           declare function log(): void;
           declare const cmp: (a: number, b: number) => number;
           const y = Array.from(xs).sort((log(), cmp));
-          const z = Array.from(xs).splice(0, (log(), 1));
         `,
         output: dedent`
           declare const xs: readonly number[];
           declare function log(): void;
           declare const cmp: (a: number, b: number) => number;
           const y = xs.toSorted((log(), cmp));
-          const z = xs.toSpliced(0, (log(), 1));
         `,
-        errors: [
-          { messageId: 'preferNonMutatingMethod' },
-          { messageId: 'preferNonMutatingMethod' },
-        ],
+        errors: [{ messageId: 'preferNonMutatingMethod' }],
+      },
+    ],
+  });
+});
+
+describe('prefer-non-mutating-array-method and splice', () => {
+  tester.run('prefer-non-mutating-array-method', preferNonMutatingArrayMethod, {
+    valid: [],
+    invalid: (
+      [
+        ['splice(1)', 'slice(1)'],
+        ['splice(-2)', 'slice(-2)'],
+        ['splice(0, 2)', 'slice(0, 2)'],
+        ['splice(2, 3)', 'slice(2, 5)'],
+        ['splice(1, 0)', 'slice(1, 1)'],
+        ['splice(1 as number, 2)', 'slice(1, 3)'],
+        ['splice(+1)', 'slice(+1)'],
+        ['splice(s)', 'slice(s)'],
+      ] as const
+    ).map(([call, replacement]) => ({
+      name: `the removed elements of ${call} are ${replacement} of the original`,
+      code: dedent`
+        declare const x: readonly number[];
+        declare const s: number;
+        const y = Array.from(x).${call};
+      `,
+      output: dedent`
+        declare const x: readonly number[];
+        declare const s: number;
+        const y = x.${replacement};
+      `,
+      errors: [{ messageId: 'preferNonMutatingMethod' as const }],
+    })),
+  });
+});
+
+describe('prefer-non-mutating-array-method and a comment in a splice', () => {
+  tester.run('prefer-non-mutating-array-method', preferNonMutatingArrayMethod, {
+    valid: [],
+    invalid: [
+      {
+        name: 'a comment among two literal arguments is reported without a fix',
+        code: dedent`
+          declare const x: readonly number[];
+          const y = Array.from(x).splice(/* the header row */ 1, 2);
+        `,
+        output: null,
+        errors: [{ messageId: 'preferNonMutatingMethod' }],
       },
     ],
   });
