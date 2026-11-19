@@ -18,14 +18,28 @@ type Props = Readonly<{
   view: InitializedObservable<Ready>;
   store: IssuesStore;
   now: InitializedObservable<number>;
+  /** The List | DAG switch, drawn at the head. */
+  viewSwitch: () => JSX.Element;
+  /** The counts both views lead with. */
+  tiles: () => JSX.Element;
 }>;
 
 /**
  * The issues as a list (spec §11.2): a search box, the labels to pick, the
  * start states to switch, the sort, then a row per issue.
  */
-export const IssueList = ({ view, store, now }: Props): JSX.Element => (
-  <div class={constant('issue-list')}>
+export const IssueList = ({
+  view,
+  store,
+  now,
+  viewSwitch,
+  tiles,
+}: Props): JSX.Element => (
+  <div class={constant('issue-list filter-bar')}>
+    <div class={constant('issues-toolbar')}>{viewSwitch()}</div>
+
+    {tiles()}
+
     <div class={constant('controls')}>
       <input
         aria-label={constant('Search the titles, or a number')}
@@ -92,7 +106,7 @@ export const IssueList = ({ view, store, now }: Props): JSX.Element => (
       cond={view.pipe(map(({ labelNames }) => Arr.isNonEmpty(labelNames)))}
       then={
         <fieldset class={constant('control-group label-picks')}>
-          <legend>{constant('labels')}</legend>
+          <legend>{constant('label')}</legend>
           <For
             items={view.pipe(map(({ labelNames }) => labelNames))}
             key={(n) => n}
@@ -162,7 +176,13 @@ export const IssueList = ({ view, store, now }: Props): JSX.Element => (
         items={view.pipe(map(({ listed }) => listed))}
         key={({ number }) => number}
       >
-        {(row$) => <IssueListRow now={now} row={row$} />}
+        {(row$) => (
+          <IssueListRow
+            now={now}
+            row={row$}
+            rows={view.pipe(map(({ rows }) => rows))}
+          />
+        )}
       </For>
     </ul>
   </div>

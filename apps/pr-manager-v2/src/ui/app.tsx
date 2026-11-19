@@ -52,8 +52,9 @@ export const App = ({ app, go }: Props): JSX.Element => {
         '--header-height': headerHeight.pipe(map((h) => `${h}px`)),
         '--sticky-top': app.header.folded.pipe(
           map((folded) =>
-            // Under the toolbar, which floats 8px below the window's top.
-            folded ? 'calc(var(--header-height) + 8px)' : '0px',
+            // A little below the window's top, or under the toolbar, which
+            // floats 0.5rem below it.
+            folded ? 'calc(var(--header-height) + 1rem)' : '0.5rem',
           ),
         ),
       }}
@@ -64,7 +65,6 @@ export const App = ({ app, go }: Props): JSX.Element => {
         app={app}
         go={go}
         readAge={<ReadAge now={now} status={status} />}
-        readLine={<ReadLine now={now} status={status} />}
         onHeight={setHeaderHeight}
       />
 
@@ -89,6 +89,12 @@ export const App = ({ app, go }: Props): JSX.Element => {
             }
           />
         }
+      />
+
+      <If
+        cond={app.header.folded}
+        then={<></>}
+        else={<ReadLine now={now} status={status} />}
       />
 
       <If

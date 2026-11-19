@@ -18,12 +18,16 @@ type Props = Readonly<{
 
 /**
  * `3 minutes ago`, kept current by the page's one clock, with the exact time on
- * hover. Only this text node changes on a tick.
+ * hover, after its prefix (`pushed `) in a fainter ink. Only the age's text node
+ * changes on a tick.
  */
 export const Age = ({ at, now, prefix = '' }: Props): JSX.Element => (
-  <time class={constant('age')} title={mapBindable(at, formatLocalTime)}>
-    {combine([toObservable(at), now]).pipe(
-      map(([atMs, nowMs]) => `${prefix}${describeAge(atMs, nowMs)}`),
-    )}
-  </time>
+  <span class={constant('timestamp')}>
+    {constant(prefix)}
+    <time class={constant('age')} title={mapBindable(at, formatLocalTime)}>
+      {combine([toObservable(at), now]).pipe(
+        map(([atMs, nowMs]) => describeAge(atMs, nowMs)),
+      )}
+    </time>
+  </span>
 );

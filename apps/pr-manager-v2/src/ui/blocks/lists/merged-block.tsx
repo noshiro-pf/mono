@@ -130,92 +130,79 @@ const MergedRow = ({
   now: InitializedObservable<number>;
 }>): JSX.Element => (
   <li class={constant('row')}>
-    <span class={constant('merged-mark')} title={constant('merged')}>
-      {constant('⮑')}
-    </span>
-    <span class={constant('row-main')}>
-      <span>
-        <span class={constant('card-number')}>
-          {pr.pipe(map(({ number }) => `#${number} `))}
-        </span>
-        <ExternalLink
-          class={constant('row-title')}
-          href={pr.pipe(map(({ url }) => url))}
-        >
-          {pr.pipe(map(({ title }) => title))}
-        </ExternalLink>
+    <div class={constant('row-heading')}>
+      <span class={constant('card-number')}>
+        {pr.pipe(map(({ number }) => `#${number}`))}
       </span>
-      <span class={constant('row-meta')}>
-        {pr.pipe(
-          map(
-            ({ author, headRef, baseRef }) =>
-              `${author} · ${headRef} → ${baseRef} · `,
-          ),
-        )}
+      <ExternalLink
+        class={constant('row-title')}
+        href={pr.pipe(map(({ url }) => url))}
+      >
+        {pr.pipe(map(({ title }) => title))}
+      </ExternalLink>
+    </div>
+    <div class={constant('row-meta')}>
+      <span>
         <Age
           at={pr.pipe(map(({ mergedAt }) => instantMsOf(mergedAt)))}
           now={now}
           prefix={'merged '}
         />
+        {pr.pipe(map(({ author }) => ` by ${author}`))}
       </span>
-      <If
-        cond={pr.pipe(map(({ labels }) => Arr.isNonEmpty(labels)))}
-        then={
-          <span class={constant('row-meta')}>
-            <For
-              items={pr.pipe(map(({ labels }) => labels))}
-              key={({ name }) => name}
-            >
-              {(label$) => <LabelChip label={label$} />}
-            </For>
-          </span>
-        }
-      />
-      <If
-        cond={pr.pipe(
-          map(({ closingIssues }) => Arr.isNonEmpty(closingIssues)),
-        )}
-        then={
-          <ul class={constant('merged-issues')}>
-            <For
-              items={pr.pipe(map(({ closingIssues }) => closingIssues))}
-              key={({ number }) => number}
-            >
-              {(issue$) => (
-                <li>
-                  <span
-                    class={constant('merged-issue-state')}
-                    data-state={issue$.pipe(map(({ state }) => state))}
-                    title={issue$.pipe(map(({ state }) => `issue ${state}`))}
-                  >
-                    {issue$.pipe(
-                      map(({ state }) =>
-                        state === 'open' ? '◯' : state === 'closed' ? '✓' : '?',
-                      ),
-                    )}
-                  </span>
-                  {constant(' closes ')}
-                  <ExternalLink
-                    href={issue$.pipe(
-                      // An issue whose read failed has no URL of its own.
-                      map(({ number, url }) =>
-                        url === '' ? `${repoUrl(repo)}/issues/${number}` : url,
-                      ),
-                    )}
-                  >
-                    {issue$.pipe(
-                      map(({ number, title }) =>
-                        title === '' ? `#${number}` : `#${number} ${title}`,
-                      ),
-                    )}
-                  </ExternalLink>
-                </li>
-              )}
-            </For>
-          </ul>
-        }
-      />
-    </span>
+      <span class={constant('branch')}>
+        <span aria-hidden={constant('true')}>{constant('⎇ ')}</span>
+        {pr.pipe(map(({ headRef }) => headRef))}
+      </span>
+      <For
+        items={pr.pipe(map(({ labels }) => labels))}
+        key={({ name }) => name}
+      >
+        {(label$) => <LabelChip label={label$} />}
+      </For>
+    </div>
+    <If
+      cond={pr.pipe(map(({ closingIssues }) => Arr.isNonEmpty(closingIssues)))}
+      then={
+        <ul class={constant('merged-issues')}>
+          <For
+            items={pr.pipe(map(({ closingIssues }) => closingIssues))}
+            key={({ number }) => number}
+          >
+            {(issue$) => (
+              <li>
+                <span
+                  class={constant('merged-issue-state')}
+                  data-state={issue$.pipe(map(({ state }) => state))}
+                  title={issue$.pipe(map(({ state }) => `issue ${state}`))}
+                >
+                  {issue$.pipe(
+                    map(({ state }) =>
+                      state === 'open' ? '◯' : state === 'closed' ? '✓' : '?',
+                    ),
+                  )}
+                </span>
+                {constant(' closes ')}
+                <ExternalLink
+                  href={issue$.pipe(
+                    // An issue whose read failed has no URL of its own.
+                    map(({ number, url }) =>
+                      url === '' ? `${repoUrl(repo)}/issues/${number}` : url,
+                    ),
+                  )}
+                >
+                  {issue$.pipe(
+                    map(({ number, title }) =>
+                      title === '' ? `#${number}` : `#${number} ${title}`,
+                    ),
+                  )}
+                </ExternalLink>
+              </li>
+            )}
+          </For>
+        </ul>
+      }
+    />
   </li>
 );
 

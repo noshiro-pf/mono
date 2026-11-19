@@ -1,3 +1,6 @@
+/* The order named first wins: see layer-order.test.mts. */
+@layer tokens, base, components, utilities;
+
 @layer components {
   .queue-summary {
     font-size: 0.85rem;

@@ -1,3 +1,6 @@
+/* The order named first wins: see layer-order.test.mts. */
+@layer tokens, base, components, utilities;
+
 @layer components {
   .columns {
     display: grid;
@@ -44,8 +47,8 @@
   }
 
   .column-line:hover::after {
-    background: var(--accent);
     width: 2px;
+    background: var(--accent);
   }
 
   @media (width >= 60rem) {
@@ -86,7 +89,7 @@
   }
 
   /* A tab names the block already; its title row keeps only the extras. */
-  .block[data-tabbed='true'] .block-title h2 {
+  .block[data-tabbed='true'] .block-title-row h2 {
     position: absolute;
     width: 1px;
     height: 1px;
@@ -95,31 +98,60 @@
     white-space: nowrap;
   }
 
-  .block[data-tabbed='true'] .block-title:not(:has(> :not(h2))) {
+  .block[data-tabbed='true'] .block-title-row:not(:has(> :not(h2))) {
     display: none;
   }
 
+  /*
+   * The title's line and what is kept in view with it, a little below the top
+   * of the window, or under the folded toolbar; the page's colour behind it and
+   * in the gap above it, so that nothing scrolls by over it.
+   */
   .block-title {
     position: sticky;
     top: var(--sticky-top, 0px);
-    z-index: 2;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 4px 12px;
-    align-items: baseline;
-    padding: 8px 0 4px;
-    border-bottom: 1px solid var(--hairline);
+    z-index: 5;
     background: var(--plane);
+    box-shadow: 0 -0.5rem 0 var(--plane);
   }
 
-  .block-title h2 {
+  .block-title-row {
+    display: flex;
+    flex-wrap: wrap;
+    column-gap: 0.35rem;
+    align-items: baseline;
+    margin: 0 0 0.9rem;
+    border-bottom: 1px solid var(--hairline);
+    padding-bottom: 0.4rem;
+  }
+
+  .block-title-row h2 {
     margin: 0;
-    font-size: 1.05rem;
+    font-size: 1rem;
+    font-weight: 600;
+  }
+
+  /* A link that does something on GitHub, a button at the title's end. */
+  .title-action {
+    margin-left: auto;
+    border: 1px solid var(--baseline);
+    border-radius: var(--radius);
+    background: var(--surface);
+    padding: 0.15rem 0.65rem;
+    color: var(--ink-1);
+    font-size: 0.8125rem;
+    font-weight: 400;
+  }
+
+  .title-action:is(:hover, :focus-visible) {
+    border-color: var(--accent);
+    color: var(--accent);
+    text-decoration: none;
   }
 
   .block-body {
     min-height: 0;
-    padding: 8px 0 16px;
+    padding-bottom: 2rem;
   }
 
   /* Its height is the block's rest, whatever it holds (the DAG's fit reads it). */
@@ -129,8 +161,12 @@
     overflow: auto;
   }
 
+  /* A hairline across the middle, which the pointer takes to drag. */
   .boundary-line {
-    height: 8px;
+    flex-shrink: 0;
+    height: 1.25rem;
+    background: linear-gradient(var(--hairline), var(--hairline)) center / 100%
+      1px no-repeat;
     cursor: row-resize;
     touch-action: none;
   }
@@ -151,7 +187,7 @@
     flex-direction: column;
     height: 100dvh;
     min-height: 30rem;
-    padding-bottom: 16px;
+    padding-bottom: 1rem;
   }
 
   .page:has(> .columns[data-mode='fill']) > * {
@@ -176,6 +212,12 @@
 
   .columns[data-mode='fill'] .block-title {
     position: static;
+  }
+
+  /* A block that scrolls on its own ends where its content does. */
+  .group[data-fixed='true'] .block-body,
+  .columns[data-mode='fill'] .block-body {
+    padding-bottom: 0;
   }
 
   .columns[data-mode='fill'] .boundary-line[data-last='true'] {

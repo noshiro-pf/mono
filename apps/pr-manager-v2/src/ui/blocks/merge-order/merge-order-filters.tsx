@@ -30,7 +30,7 @@ type Props = Readonly<{
  * showing it would add, struck through.
  */
 export const MergeOrderFilters = ({ view, update }: Props): JSX.Element => (
-  <div class={constant('filters')}>
+  <div class={constant('filters filter-bar')}>
     <div class={constant('tiles')}>
       <OpenTile open={view.pipe(map(({ counts }) => counts.open))} />
 
@@ -104,7 +104,18 @@ export const MergeOrderFilters = ({ view, update }: Props): JSX.Element => (
               update((prev) => ({ ...prev, sort }));
             }}
           >
-            {constant(name)}
+            {sort === 'order' ? (
+              // Under the block's title `Merge order`, a narrow bar needs no
+              // `merge`.
+              <>
+                <span class={constant('narrow-hidden')}>
+                  {constant('merge ')}
+                </span>
+                {constant('order')}
+              </>
+            ) : (
+              constant(name)
+            )}
           </button>
         ))}
       </div>
@@ -124,7 +135,7 @@ const SORTS = [
 const STATUS_TONES = {
   queued: undefined,
   failing: 'critical',
-  setAside: 'serious',
+  setAside: 'critical',
   codeOwner: 'warning',
   pending: undefined,
 } as const satisfies ReadonlyRecord<MergeOrderStatus, Tone | undefined>;

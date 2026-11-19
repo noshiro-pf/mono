@@ -1,30 +1,33 @@
+/* The order named first wins: see layer-order.test.mts. */
+@layer tokens, base, components, utilities;
+
 @layer components {
   .rows {
-    display: flex;
-    flex-direction: column;
     margin: 0;
     padding: 0;
     list-style: none;
   }
 
+  /* A merged pull request, a run, an issue: its title, then a row or two. */
   .row {
-    display: flex;
-    gap: 10px;
-    align-items: baseline;
     border-bottom: 1px solid var(--hairline);
-    padding: 6px 0;
+    padding: 0.6rem 0;
   }
 
-  .row-main {
+  .row:last-child {
+    border-bottom: 0;
+  }
+
+  .row-heading {
     display: flex;
-    flex-direction: column;
-    gap: 2px;
-    min-width: 0;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    align-items: baseline;
     overflow-wrap: anywhere;
   }
 
   .row-title {
-    color: var(--ink-1);
+    flex: 1 1 20rem;
     font-weight: 600;
   }
 
@@ -51,15 +54,25 @@
   .row-meta {
     display: flex;
     flex-wrap: wrap;
-    gap: 0 6px;
-    align-items: baseline;
+    gap: 0.35rem 0.75rem;
+    align-items: center;
+    margin-top: 0.4rem;
     color: var(--ink-2);
-    font-size: 0.8rem;
+    font-size: 0.8125rem;
   }
 
   .run-state {
+    display: inline-flex;
     flex: none;
-    min-width: 1.2em;
+    align-self: center;
+  }
+
+  /* A run going: a turning ring in the status amber, whatever the motion. */
+  .run-state .spinner {
+    width: 1em;
+    height: 1em;
+    border-color: color-mix(in srgb, var(--warning) 30%, transparent);
+    border-top-color: var(--warning);
   }
 
   .dot {
@@ -68,10 +81,5 @@
     height: 0.6em;
     border-radius: 50%;
     background: var(--warning);
-  }
-
-  .merged-mark {
-    flex: none;
-    color: var(--merged);
   }
 }

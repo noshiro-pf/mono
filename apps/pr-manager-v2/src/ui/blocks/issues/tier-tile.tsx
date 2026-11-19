@@ -30,7 +30,6 @@ export const TierTile = ({
     label={tier}
     only={settings.pipe(map(({ onlyPriority }) => onlyPriority.includes(tier)))}
     subject={tier === 'none' ? 'the issues with no tier' : `the ${tier} issues`}
-    tone={tier === 'S' ? 'critical' : undefined}
     onOnly={() => {
       update((prev) => toggleTierOnly(prev, tier));
     }}
