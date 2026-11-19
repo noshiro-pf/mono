@@ -1,8 +1,8 @@
 diff --git a/v5.4/output/lib-files/lib.es5.d.ts b/v5.5/output/lib-files/lib.es5.d.ts
-index 53881fb570fe010977691bcbd0cb4f342366ece7..14472dc358fd313791f916c1e53779615b41fdf5 100644
+index cbff715873500947f66bb16c06fd3ccf271178ae..eb0c77c67a46e08d78b8718e90cc370702f4616d 100644
 --- a/v5.4/output/lib-files/lib.es5.d.ts
 +++ b/v5.5/output/lib-files/lib.es5.d.ts
-@@ -926,7 +926,7 @@ interface Date {
+@@ -928,7 +928,7 @@ interface Date {
    getMilliseconds(): import('ts-type-forge').MillisecondsEnum;
    /** Gets the milliseconds of a Date object using Universal Coordinated Time (UTC). */
    getUTCMilliseconds(): import('ts-type-forge').MillisecondsEnum;
@@ -11,7 +11,7 @@ index 53881fb570fe010977691bcbd0cb4f342366ece7..14472dc358fd313791f916c1e5377961
    getTimezoneOffset(): number;
    /**
     * Sets the date and time value in the Date object.
-@@ -5573,12 +5573,44 @@ declare namespace Intl {
+@@ -5575,12 +5575,44 @@ declare namespace Intl {
  
    const Collator: CollatorConstructor;
  
@@ -60,7 +60,7 @@ index 53881fb570fe010977691bcbd0cb4f342366ece7..14472dc358fd313791f916c1e5377961
      readonly minimumIntegerDigits?:
        | import('ts-type-forge').UintRangeInclusive<1, 21>
        | undefined;
-@@ -5599,17 +5631,18 @@ declare namespace Intl {
+@@ -5601,17 +5633,18 @@ declare namespace Intl {
    interface ResolvedNumberFormatOptions {
      readonly locale: string;
      readonly numberingSystem: string;
@@ -82,7 +82,7 @@ index 53881fb570fe010977691bcbd0cb4f342366ece7..14472dc358fd313791f916c1e5377961
        0,
        100
      >;
-@@ -5621,7 +5654,7 @@ declare namespace Intl {
+@@ -5623,7 +5656,7 @@ declare namespace Intl {
        1,
        21
      >;

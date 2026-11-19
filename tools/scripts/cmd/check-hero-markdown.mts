@@ -1,5 +1,5 @@
 // cspell:ignore FEFF
-import type { Nodes } from 'mdast';
+import type { Nodes, Parents } from 'mdast';
 import { fromMarkdown } from 'mdast-util-from-markdown';
 import { gfmStrikethroughFromMarkdown } from 'mdast-util-gfm-strikethrough';
 import { gfmStrikethrough } from 'micromark-extension-gfm-strikethrough';
@@ -162,6 +162,10 @@ const kindLabel: Readonly<Partial<ReadonlyRecord<string, string>>> = {
   thematicBreak: 'a thematic break',
 } as const;
 
+/** Whether `node` is one of mdast's parents, the nodes that hold `children`. */
+const isParent = (node: DeepReadonly<Nodes>): node is DeepReadonly<Parents> =>
+  isRecord(node) && hasKey(node, 'children');
+
 /**
  * What `text` would be as Markdown, each kind once, in the order first met.
  * Text is not Markdown, and HTML and character references are not when `html`
@@ -228,7 +232,7 @@ const markdownIn = (
       mut_found.add(kindLabel[node.type] ?? node.type);
     }
 
-    if (isRecord(node) && hasKey(node, 'children')) {
+    if (isParent(node)) {
       for (const child of node.children) {
         visit(child);
       }

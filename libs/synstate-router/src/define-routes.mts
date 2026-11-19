@@ -253,8 +253,11 @@ const assertValidKey = (key: string, what: string): void => {
   }
 };
 
+// A rest codec's type is `Readonly<{ rest: true; … }>`, which a `rest` reached
+// through the prototype chain satisfies too, so `rest` is read as that type
+// reads it, by `Reflect.get` rather than as an own property.
 const isRestCodec = (codec: AnyParamCodec): codec is AnyRestParamCodec =>
-  hasKey(codec, 'rest') && codec.rest;
+  Reflect.get(codec, 'rest') === true;
 
 const compileSegment = (
   id: string,

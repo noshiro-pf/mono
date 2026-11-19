@@ -435,8 +435,14 @@ import, not adding `ts-type-forge/global` to a tsconfig.
 ### ts-data-forge
 
 - `Arr.isArray`, not `Array.isArray` (`ts-data-forge/prefer-arr-is-array`).
-- `isRecord` and `hasKey` to narrow, not `Object.hasOwn` or the `in` operator
-  (`ts-data-forge/prefer-is-record-and-has-key`).
+- `isRecord` and `hasKey` to check for an own property, not `Object.hasOwn` or
+  the `in` operator (`ts-data-forge/prefer-is-record-and-has-key`). `hasKey`,
+  like `Object.hasOwn`, narrows only where it returns `true`, and only for one
+  literal key that no member of the object's type declares as required; tell a
+  union of shapes apart by a discriminant property. Failing one, a type guard
+  written for the union, such as `(r: A | B): r is B => hasKey(r, 'b')`, is its
+  author's claim that no `A` holds an own `b`, and `hasKey` there needs record
+  types; the rule reports `in` too.
 - `Arr.seq` and similar take an `Int`; cast with `asUint32`.
 - `memoizeFunction` to memoize a function, `fastDeepEqual` for deep equality.
 - In tests, `assert.isTrue(Result.isErr(result))` rather than

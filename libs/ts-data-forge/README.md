@@ -530,7 +530,7 @@ const processData = (data: unknown): string | undefined => {
     if (
         isRecord(data) && // data is now UnknownRecord (= Readonly<Record<string, unknown>>)
         hasKey(data, 'name') &&
-        // data is now ReadonlyRecord<"name", unknown> & UnknownRecord
+        // data is now UnknownRecord & Readonly<{ name: unknown }>
         typeof data.name === 'string'
     ) {
         return `Hello, ${data.name}!`;
@@ -547,8 +547,7 @@ if (isNonNullObject(value)) {
     assert.isTrue(value !== null);
 }
 
-// `object` is not enough to read keys from: an index signature is what says
-// the keys are strings. `isRecord` is the guard that gives one.
+// `isRecord` also rules out an array, which `isNonNullObject` lets through.
 if (isRecord(value)) {
     assert.deepStrictEqual(Object.keys(value), ['key']);
 }

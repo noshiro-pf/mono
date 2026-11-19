@@ -1055,3 +1055,408 @@ describe('prefer-is-record-and-has-key on Reflect.has', () => {
     ],
   });
 });
+
+describe('prefer-is-record-and-has-key where `in` may narrow', () => {
+  tester.run('prefer-is-record-and-has-key', preferIsRecordAndHasKey, {
+    valid: [],
+    invalid: [
+      {
+        name: "'a' in m",
+        code: dedent`
+          declare const m: Readonly<{ kind: 'a'; a: number; [k: string]: unknown }> | Readonly<{ kind: 'b'; [k: string]: unknown }>;
+          const ok = 'a' in m;
+        `,
+        output: null,
+        errors: [
+          {
+            messageId: 'inMayNarrow',
+            suggestions: [
+              {
+                messageId: 'suggestCheckKeepingMembers',
+                output: dedent`
+                  import { hasKey } from 'ts-std-forge';
+                  declare const m: Readonly<{ kind: 'a'; a: number; [k: string]: unknown }> | Readonly<{ kind: 'b'; [k: string]: unknown }>;
+                  const ok = hasKey(m, 'a');
+                `,
+              },
+            ],
+          },
+        ],
+      },
+      {
+        name: "'a' in m, optional in one member: conservative without exactOptionalPropertyTypes",
+        code: dedent`
+          declare const m: Readonly<{ kind: 'x'; a?: number; [k: string]: unknown }> | Readonly<{ kind: 'y'; [k: string]: unknown }>;
+          const ok = 'a' in m;
+        `,
+        output: null,
+        errors: [
+          {
+            messageId: 'inMayNarrow',
+            suggestions: [
+              {
+                messageId: 'suggestCheckKeepingMembers',
+                output: dedent`
+                  import { hasKey } from 'ts-std-forge';
+                  declare const m: Readonly<{ kind: 'x'; a?: number; [k: string]: unknown }> | Readonly<{ kind: 'y'; [k: string]: unknown }>;
+                  const ok = hasKey(m, 'a');
+                `,
+              },
+            ],
+          },
+        ],
+      },
+      {
+        name: "'a' in r",
+        code: dedent`
+          declare const r: Readonly<{ a: number; [k: string]: unknown }>;
+          const ok = 'a' in r;
+        `,
+        output: null,
+        errors: [
+          {
+            messageId: 'inMayNarrow',
+            suggestions: [
+              {
+                messageId: 'suggestCheckKeepingMembers',
+                output: dedent`
+                  import { hasKey } from 'ts-std-forge';
+                  declare const r: Readonly<{ a: number; [k: string]: unknown }>;
+                  const ok = hasKey(r, 'a');
+                `,
+              },
+            ],
+          },
+        ],
+      },
+      {
+        name: '0 in t',
+        code: dedent`
+          declare const t: Readonly<{ 0: string; [k: string]: unknown }>;
+          const ok = 0 in t;
+        `,
+        output: null,
+        errors: [
+          {
+            messageId: 'inMayNarrow',
+            suggestions: [
+              {
+                messageId: 'suggestCheckKeepingMembers',
+                output: dedent`
+                  import { hasKey } from 'ts-std-forge';
+                  declare const t: Readonly<{ 0: string; [k: string]: unknown }>;
+                  const ok = hasKey(t, 0);
+                `,
+              },
+            ],
+          },
+        ],
+      },
+      {
+        name: 'sym in s',
+        code: dedent`
+          declare const sym: unique symbol; declare const s: Readonly<{ [sym]: number; [k: string]: unknown }>;
+          const ok = sym in s;
+        `,
+        output: null,
+        errors: [
+          {
+            messageId: 'inMayNarrow',
+            suggestions: [
+              {
+                messageId: 'suggestCheckKeepingMembers',
+                output: dedent`
+                  import { hasKey } from 'ts-std-forge';
+                  declare const sym: unique symbol; declare const s: Readonly<{ [sym]: number; [k: string]: unknown }>;
+                  const ok = hasKey(s, sym);
+                `,
+              },
+            ],
+          },
+        ],
+      },
+      {
+        name: 'sym in s, through Record',
+        code: dedent`
+          declare const sym: unique symbol; declare const s: Readonly<Record<typeof sym, number> & { [k: string]: unknown }>;
+          const ok = sym in s;
+        `,
+        output: null,
+        errors: [
+          {
+            messageId: 'inMayNarrow',
+            suggestions: [
+              {
+                messageId: 'suggestCheckKeepingMembers',
+                output: dedent`
+                  import { hasKey } from 'ts-std-forge';
+                  declare const sym: unique symbol; declare const s: Readonly<Record<typeof sym, number> & { [k: string]: unknown }>;
+                  const ok = hasKey(s, sym);
+                `,
+              },
+            ],
+          },
+        ],
+      },
+      {
+        name: "('a' satisfies string) in r",
+        code: dedent`
+          declare const r: Readonly<{ a: number; [k: string]: unknown }>;
+          const ok = ('a' satisfies string) in r;
+        `,
+        output: null,
+        errors: [
+          {
+            messageId: 'inMayNarrow',
+            suggestions: [
+              {
+                messageId: 'suggestCheckKeepingMembers',
+                output: dedent`
+                  import { hasKey } from 'ts-std-forge';
+                  declare const r: Readonly<{ a: number; [k: string]: unknown }>;
+                  const ok = hasKey(r, 'a' satisfies string);
+                `,
+              },
+            ],
+          },
+        ],
+      },
+      {
+        name: "(k as 'a') in r",
+        code: dedent`
+          declare const k: string; declare const r: Readonly<{ a: number; [k: string]: unknown }>;
+          const ok = (k as 'a') in r;
+        `,
+        output: null,
+        errors: [
+          {
+            messageId: 'inMayNarrow',
+            suggestions: [
+              {
+                messageId: 'suggestCheckKeepingMembers',
+                output: dedent`
+                  import { hasKey } from 'ts-std-forge';
+                  declare const k: string; declare const r: Readonly<{ a: number; [k: string]: unknown }>;
+                  const ok = hasKey(r, k as 'a');
+                `,
+              },
+            ],
+          },
+        ],
+      },
+      {
+        name: "'a' in r!",
+        code: dedent`
+          declare const r: Readonly<{ a: number; [k: string]: unknown }>;
+          const ok = 'a' in r!;
+        `,
+        output: null,
+        errors: [
+          {
+            messageId: 'inMayNarrow',
+            suggestions: [
+              {
+                messageId: 'suggestCheckKeepingMembers',
+                output: dedent`
+                  import { hasKey } from 'ts-std-forge';
+                  declare const r: Readonly<{ a: number; [k: string]: unknown }>;
+                  const ok = hasKey(r!, 'a');
+                `,
+              },
+            ],
+          },
+        ],
+      },
+      {
+        name: "'a' in (r as Readonly<Record<string, unknown>>): the check is conservative",
+        code: dedent`
+          declare const r: Readonly<{ a: number; [k: string]: unknown }>;
+          const ok = 'a' in (r as Readonly<Record<string, unknown>>);
+        `,
+        output: null,
+        errors: [
+          {
+            messageId: 'inMayNarrow',
+            suggestions: [
+              {
+                messageId: 'suggestCheckKeepingMembers',
+                output: dedent`
+                  import { hasKey } from 'ts-std-forge';
+                  declare const r: Readonly<{ a: number; [k: string]: unknown }>;
+                  const ok = hasKey(r as Readonly<Record<string, unknown>>, 'a');
+                `,
+              },
+            ],
+          },
+        ],
+      },
+      {
+        name: "'a' in o['m']",
+        code: dedent`
+          declare const o: { m: Readonly<{ a: number; [k: string]: unknown }> };
+          const ok = 'a' in o['m'];
+        `,
+        output: null,
+        errors: [
+          {
+            messageId: 'inMayNarrow',
+            suggestions: [
+              {
+                messageId: 'suggestCheckKeepingMembers',
+                output: dedent`
+                  import { hasKey } from 'ts-std-forge';
+                  declare const o: { m: Readonly<{ a: number; [k: string]: unknown }> };
+                  const ok = hasKey(o['m'], 'a');
+                `,
+              },
+            ],
+          },
+        ],
+      },
+      {
+        name: 'suggests on a call too, which `in` narrows nothing of: the check is conservative',
+        code: dedent`
+          declare const getR: () => Readonly<{ a: number; [k: string]: unknown }>;
+          const ok = 'a' in getR();
+        `,
+        output: null,
+        errors: [
+          {
+            messageId: 'inMayNarrow',
+            suggestions: [
+              {
+                messageId: 'suggestCheckKeepingMembers',
+                output: dedent`
+                  import { hasKey } from 'ts-std-forge';
+                  declare const getR: () => Readonly<{ a: number; [k: string]: unknown }>;
+                  const ok = hasKey(getR(), 'a');
+                `,
+              },
+            ],
+          },
+        ],
+      },
+      {
+        name: 'suggests with a `unique symbol` key no member declares: the check is conservative',
+        code: dedent`
+          declare const sym: unique symbol; declare const r: Readonly<Record<string, unknown>>;
+          const ok = sym in r;
+        `,
+        output: null,
+        errors: [
+          {
+            messageId: 'inMayNarrow',
+            suggestions: [
+              {
+                messageId: 'suggestCheckKeepingMembers',
+                output: dedent`
+                  import { hasKey } from 'ts-std-forge';
+                  declare const sym: unique symbol; declare const r: Readonly<Record<string, unknown>>;
+                  const ok = hasKey(r, sym);
+                `,
+              },
+            ],
+          },
+        ],
+      },
+      {
+        name: 'suggests on a union where no member declares the key: the check is conservative',
+        code: dedent`
+          declare const m: Readonly<{ b: string; [k: string]: unknown }> | Readonly<{ c: string; [k: string]: unknown }>;
+          const ok = 'a' in m;
+        `,
+        output: null,
+        errors: [
+          {
+            messageId: 'inMayNarrow',
+            suggestions: [
+              {
+                messageId: 'suggestCheckKeepingMembers',
+                output: dedent`
+                  import { hasKey } from 'ts-std-forge';
+                  declare const m: Readonly<{ b: string; [k: string]: unknown }> | Readonly<{ c: string; [k: string]: unknown }>;
+                  const ok = hasKey(m, 'a');
+                `,
+              },
+            ],
+          },
+        ],
+      },
+      {
+        name: 'suggests where `as` widens a record to a union: the check is conservative',
+        code: dedent`
+          declare const r: Readonly<Record<string, unknown>>;
+          const ok = 'a' in (r as Readonly<{ a?: number; [k: string]: unknown }> | Readonly<{ [k: string]: unknown }>);
+        `,
+        output: null,
+        errors: [
+          {
+            messageId: 'inMayNarrow',
+            suggestions: [
+              {
+                messageId: 'suggestCheckKeepingMembers',
+                output: dedent`
+                  import { hasKey } from 'ts-std-forge';
+                  declare const r: Readonly<Record<string, unknown>>;
+                  const ok = hasKey(r as Readonly<{ a?: number; [k: string]: unknown }> | Readonly<{ [k: string]: unknown }>, 'a');
+                `,
+              },
+            ],
+          },
+        ],
+      },
+      {
+        name: 'fixes `in` on a key one record declares as optional: safe only without exactOptionalPropertyTypes (known limit)',
+        code: dedent`
+          declare const r: Readonly<{ a?: number; [k: string]: unknown }>;
+          const ok = 'a' in r;
+        `,
+        output: dedent`
+          import { hasKey } from 'ts-std-forge';
+          declare const r: Readonly<{ a?: number; [k: string]: unknown }>;
+          const ok = hasKey(r, 'a');
+        `,
+        errors: [{ messageId: 'useHasKey' }],
+      },
+      {
+        name: 'fixes `in` on a key one record does not declare',
+        code: dedent`
+          declare const r: Readonly<Record<string, unknown>>;
+          const ok = 'c' in r;
+        `,
+        output: dedent`
+          import { hasKey } from 'ts-std-forge';
+          declare const r: Readonly<Record<string, unknown>>;
+          const ok = hasKey(r, 'c');
+        `,
+        errors: [{ messageId: 'useHasKey' }],
+      },
+      {
+        name: 'fixes `in` with a union of keys, by which it narrows nothing',
+        code: dedent`
+          declare const k: 'a' | 'b'; declare const m: Readonly<{ kind: 'a'; a: number; [k: string]: unknown }> | Readonly<{ kind: 'b'; [k: string]: unknown }>;
+          const ok = k in m;
+        `,
+        output: dedent`
+          import { hasKey } from 'ts-std-forge';
+          declare const k: 'a' | 'b'; declare const m: Readonly<{ kind: 'a'; a: number; [k: string]: unknown }> | Readonly<{ kind: 'b'; [k: string]: unknown }>;
+          const ok = hasKey(m, k);
+        `,
+        errors: [{ messageId: 'useHasKey' }],
+      },
+      {
+        name: 'fixes `Reflect.has` on a key the record requires, which it does not narrow by',
+        code: dedent`
+          declare const r: Readonly<{ a: number; [k: string]: unknown }>;
+          const ok = Reflect.has(r, 'a');
+        `,
+        output: dedent`
+          import { hasKey } from 'ts-std-forge';
+          declare const r: Readonly<{ a: number; [k: string]: unknown }>;
+          const ok = hasKey(r, 'a');
+        `,
+        errors: [{ messageId: 'useHasKey' }],
+      },
+    ],
+  });
+});

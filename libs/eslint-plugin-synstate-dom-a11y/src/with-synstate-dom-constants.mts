@@ -16,7 +16,14 @@ import {
   pluginRules,
   skipTypeWrappers,
 } from 'eslint-rule-forge';
-import { Arr, castDeepMutable, hasKey, isRecord, Obj } from 'ts-data-forge';
+import {
+  Arr,
+  castDeepMutable,
+  hasKey,
+  isRecord,
+  keyIsIn,
+  Obj,
+} from 'ts-data-forge';
 import type { DeepReadonly, ReadonlyRecord } from 'ts-type-forge';
 import { svgTagNames } from './svg-tag-names.mjs';
 
@@ -301,7 +308,7 @@ const readerFor = (
     const changed = (sourceCode.visitorKeys[node.type] ?? [])
       .filter((key) => !typeKeys.has(key))
       .flatMap((key): readonly (readonly [string, unknown])[] => {
-        const value: unknown = hasKey(node, key) ? node[key] : undefined;
+        const value: unknown = keyIsIn(key, node) ? node[key] : undefined;
 
         if (isNode(value)) {
           const replaced = unwrapped(value);
