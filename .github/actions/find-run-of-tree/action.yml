@@ -65,8 +65,12 @@ runs:
             ;;
         esac
 
-        if ! TREE_SHA="$(git rev-parse 'HEAD^{tree}' 2>&1)"; then
-          produce_it_here "Could not read the checked-out tree: ${TREE_SHA}"
+        # The calls' stderr, apart from the stdout they parse ("Adding or
+        # changing a workflow" in .github/workflows/README.md).
+        errors="$(mktemp -p "${RUNNER_TEMP}")" || produce_it_here 'Could not create a temporary file.'
+
+        if ! TREE_SHA="$(git rev-parse 'HEAD^{tree}' 2>"${errors}")"; then
+          produce_it_here "Could not read the checked-out tree: $(<"${errors}")"
         fi
         export TREE_SHA
 
@@ -87,8 +91,8 @@ runs:
               | select(.id != (env.GITHUB_RUN_ID | tonumber))
               | select(.head_commit.tree_id == env.TREE_SHA)
               | select(.head_repository.full_name == env.GITHUB_REPOSITORY)
-              | "run \(.id)"' 2>&1)"; then
-            produce_it_here "Could not list the runs of ${WORKFLOW}: ${page}"
+              | "run \(.id)"' 2>"${errors}")"; then
+            produce_it_here "Could not list the runs of ${WORKFLOW}: $(<"${errors}")"
           fi
           pages="${pages}${page}"$'\n'
         done
@@ -105,15 +109,15 @@ runs:
           # recorded it as one about the tree. A pull request onto another
           # branch runs its head merged into that base's workflow files.
           if ! about_tree="$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${run_id}/jobs?filter=latest&per_page=100" \
-            --jq 'any(.jobs[].steps[]?; .name == "Verdict reusable by tree: true")' 2>&1)"; then
-            produce_it_here "Could not list the jobs of run ${run_id}: ${about_tree}"
+            --jq 'any(.jobs[].steps[]?; .name == "Verdict reusable by tree: true")' 2>"${errors}")"; then
+            produce_it_here "Could not list the jobs of run ${run_id}: $(<"${errors}")"
           fi
           if [ "${about_tree}" != 'true' ]; then
             continue
           fi
           if ! count="$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${run_id}/artifacts?per_page=100" \
-            --jq '[.artifacts[] | select(.expired | not) | select(.name | test(env.ARTIFACT_PATTERN))] | length' 2>&1)"; then
-            produce_it_here "Could not list the artifacts of run ${run_id}: ${count}"
+            --jq '[.artifacts[] | select(.expired | not) | select(.name | test(env.ARTIFACT_PATTERN))] | length' 2>"${errors}")"; then
+            produce_it_here "Could not list the artifacts of run ${run_id}: $(<"${errors}")"
           fi
           if [ "${count}" -gt 0 ]; then
             echo "Run ${run_id} of ${WORKFLOW} is on tree ${TREE_SHA} and holds ${count} artifact(s) matching ${ARTIFACT_PATTERN}."

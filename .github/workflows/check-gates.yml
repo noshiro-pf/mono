@@ -122,6 +122,10 @@ jobs:
             exit 0
           }
 
+          # The calls' stderr, apart from the stdout they parse ("Adding or
+          # changing a workflow" in .github/workflows/README.md).
+          errors="$(mktemp -p "${RUNNER_TEMP}")" || run_the_checks 'Could not create a temporary file, so the checks run.'
+
           # `push` and `workflow_dispatch` are exempt, exactly as they are
           # from the `skip-ci` gate: there is no pull request to be behind
           # anything, and asking for the checks by hand from the Actions tab
@@ -141,8 +145,8 @@ jobs:
           if [ "${BASE_REF}" != "${DEFAULT_BRANCH}" ]; then
             # `-X GET` with `-f` sends the fields as the query string, encoded,
             # since a branch name is the pull request author's to choose.
-            if ! stacked_on="$(gh api -X GET "repos/${GITHUB_REPOSITORY}/pulls" -f state=open -f per_page=1 -f "head=${GITHUB_REPOSITORY_OWNER}:${BASE_REF}" --jq '.[0].number // ""' 2>&1)"; then
-              run_the_checks "Could not ask whether ${BASE_REF} is an open pull request's branch, so the checks run: ${stacked_on}"
+            if ! stacked_on="$(gh api -X GET "repos/${GITHUB_REPOSITORY}/pulls" -f state=open -f per_page=1 -f "head=${GITHUB_REPOSITORY_OWNER}:${BASE_REF}" --jq '.[0].number // ""' 2>"${errors}")"; then
+              run_the_checks "Could not ask whether ${BASE_REF} is an open pull request's branch, so the checks run: $(<"${errors}")"
             fi
 
             if [ -z "${stacked_on}" ]; then
@@ -160,8 +164,8 @@ jobs:
           # against the head by SHA, so a fork needs no special case — a pull
           # request's head commit is readable from the base repository, its
           # branch is not.
-          if ! behind_by="$(gh api "repos/${GITHUB_REPOSITORY}/compare/${BASE_REF}...${HEAD_SHA}" --jq '.behind_by' 2>&1)"; then
-            run_the_checks "Could not compare ${BASE_REF} with ${HEAD_SHA}, so the checks run: ${behind_by}"
+          if ! behind_by="$(gh api "repos/${GITHUB_REPOSITORY}/compare/${BASE_REF}...${HEAD_SHA}" --jq '.behind_by' 2>"${errors}")"; then
+            run_the_checks "Could not compare ${BASE_REF} with ${HEAD_SHA}, so the checks run: $(<"${errors}")"
           fi
 
           case "${behind_by}" in
@@ -203,6 +207,10 @@ jobs:
             exit 0
           }
 
+          # The calls' stderr, apart from the stdout they parse ("Adding or
+          # changing a workflow" in .github/workflows/README.md).
+          errors="$(mktemp -p "${RUNNER_TEMP}")" || run_the_checks 'Could not create a temporary file, so the checks run.'
+
           case "${GITHUB_EVENT_NAME}" in
             pull_request)
               if [ "${BASE_REF}" != "${DEFAULT_BRANCH}" ]; then
@@ -223,8 +231,8 @@ jobs:
             run_the_checks "This is attempt ${GITHUB_RUN_ATTEMPT} of the run, i.e. a re-run asked for by hand: the checks run for real."
           fi
 
-          if ! TREE_SHA="$(gh api "repos/${GITHUB_REPOSITORY}/git/commits/${HEAD_SHA}" --jq '.tree.sha' 2>&1)"; then
-            run_the_checks "Could not read the tree of ${HEAD_SHA}, so the checks run: ${TREE_SHA}"
+          if ! TREE_SHA="$(gh api "repos/${GITHUB_REPOSITORY}/git/commits/${HEAD_SHA}" --jq '.tree.sha' 2>"${errors}")"; then
+            run_the_checks "Could not read the tree of ${HEAD_SHA}, so the checks run: $(<"${errors}")"
           fi
 
           case "${TREE_SHA}" in
@@ -249,11 +257,8 @@ jobs:
           # progress have no verdict, and a cancelled run's red aggregate is
           # not one; a run can conclude `success` with its aggregate skipped (a
           # branch behind main), which the job filter below takes care of.
-          # Captured with `2>&1`, as every gh call in this step is, for the
-          # error message; only whole lines of the form the `--jq` filter prints
-          # are read from it below. The step's other gh captures are read as
-          # they come, relying on gh writing nothing beside its output when it
-          # succeeds.
+          # Only whole lines of the form the `--jq` filter prints are read
+          # from `listed` below.
           listed=''
           for listed_as in success failure; do
             # LISTED is read by the `--jq` filter, which takes no `--arg`. A
@@ -267,8 +272,8 @@ jobs:
                 (.workflow_runs[]
                   | select(.head_commit.tree_id == env.TREE_SHA)
                   | select(.head_repository.full_name == env.GITHUB_REPOSITORY)
-                  | "run \(env.LISTED) \(.id) \(.updated_at)")' 2>&1)"; then
-              run_the_checks "Could not list earlier runs of ${workflow_file}, so the checks run: ${page}"
+                  | "run \(env.LISTED) \(.id) \(.updated_at)")' 2>"${errors}")"; then
+              run_the_checks "Could not list earlier runs of ${workflow_file}, so the checks run: $(<"${errors}")"
             fi
             listed="${listed}${page}"$'\n'
           done
@@ -341,8 +346,8 @@ jobs:
               --jq 'select(any(.jobs[].steps[]?; .name == "Verdict reusable by tree: true"))
                 | .jobs[]
                 | select(.name == env.RESULT_JOB and (.conclusion == "success" or .conclusion == "failure"))
-                | "\(.completed_at)\t\(.conclusion)\t\(.html_url)"' 2>&1)"; then
-              run_the_checks "Could not list the jobs of run ${run_id}, so the checks run: ${jobs}"
+                | "\(.completed_at)\t\(.conclusion)\t\(.html_url)"' 2>"${errors}")"; then
+              run_the_checks "Could not list the jobs of run ${run_id}, so the checks run: $(<"${errors}")"
             fi
 
             if [ -n "${jobs}" ]; then

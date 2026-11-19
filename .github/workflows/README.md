@@ -1073,3 +1073,12 @@ Nothing checks this; a review does.
   are the one thing a bot writes there.
 - **A changed `uses:` is followed by `gh actions-lock`** (see "Action pins and
   the lockfile").
+- **A `run:` script that parses what a command prints captures its stdout
+  alone**:
+  `if ! x="$(gh api … 2>"${errors}")"; then fail "…: $(<"${errors}")"; fi`, with
+  `errors` a file under `RUNNER_TEMP`, whose text (gh's names the server's
+  message and status) goes into the error message. A capture with `2>&1` turns a
+  warning a command writes on success into a value, which in `check-gates.yml`
+  would be the newest verdict on the tree. No check reports such a capture yet:
+  it needs the redirections that `readShellCommands` in
+  `tools/scripts/lib/shell-commands.mts` reads past without keeping.
