@@ -3,9 +3,8 @@ import {
   type TSESLint,
   type TSESTree,
 } from '@typescript-eslint/utils';
-import { isTypeWrapper } from 'eslint-rule-forge';
+import { isCallee, isTypeWrapper } from 'eslint-rule-forge';
 import { isBooleanOperand } from './boolean-operand.mjs';
-import { isCalleeOfCall } from './type-wrappers.mjs';
 import { getVitestReceiver } from './vitest-binding.mjs';
 
 type MessageIds = 'preferAssertIsFalseOverAssertNotOk' | 'assertWhatIsMeant';
@@ -52,7 +51,7 @@ export const preferAssertIsFalseOverAssertNotOkRule: TSESLint.RuleModule<
         receiver !== undefined &&
         node.property.type === AST_NODE_TYPES.Identifier &&
         (node.property.name === 'isNotOk' || node.property.name === 'notOk') &&
-        isCalleeOfCall(node)
+        isCallee(node)
       ) {
         const { property } = node;
 
@@ -82,7 +81,10 @@ export const preferAssertIsFalseOverAssertNotOkRule: TSESLint.RuleModule<
   }),
 } as const;
 
-/** The call whose callee `node` is, through the type wrappers around it. */
+/**
+ * The call whose callee `node` is, through the type wrappers and an optional
+ * chain around it, as `isCallee` reads it.
+ */
 const callOfCallee = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types -- the call it returns, read from the mutable parent, has its argument passed to isBooleanOperand, which takes a mutable node
   node: TSESTree.Node,
@@ -91,7 +93,7 @@ const callOfCallee = (
 
   return parent === undefined
     ? undefined
-    : isTypeWrapper(parent)
+    : isTypeWrapper(parent) || parent.type === AST_NODE_TYPES.ChainExpression
       ? callOfCallee(parent)
       : parent.type === AST_NODE_TYPES.CallExpression && parent.callee === node
         ? parent
