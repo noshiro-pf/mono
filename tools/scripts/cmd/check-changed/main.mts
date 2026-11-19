@@ -33,6 +33,8 @@ import { readPackages, readProseGate, scriptsOf } from './packages.mjs';
 import {
   buildPlan,
   classifyChanges,
+  parseMaxParallel,
+  rootParallelism,
   stepEnvironment,
   type PackageInfo,
   type Step,
@@ -113,6 +115,7 @@ const main = async (): Promise<number> => {
     classification,
     base,
     rootScripts: Array.from(rootScripts.keys()),
+    maxParallel: options.maxParallel,
     coverage: options.coverage,
     spellChecked: existing.filter(
       (file) => !classification.ignored.includes(file),
@@ -187,6 +190,7 @@ type Options = Readonly<{
   baseRef: string;
   dryRun: boolean;
   coverage: boolean;
+  maxParallel: number;
 }>;
 
 const parseOptions = (): Options | 'help' | undefined => {
@@ -197,6 +201,7 @@ const parseOptions = (): Options | 'help' | undefined => {
           base: { type: 'string' },
           'dry-run': { type: 'boolean', default: false },
           'no-coverage': { type: 'boolean', default: false },
+          'max-parallel': { type: 'string' },
           help: { type: 'boolean', default: false },
         },
         strict: true,
@@ -224,20 +229,38 @@ const parseOptions = (): Options | 'help' | undefined => {
     return undefined;
   }
 
+  const maxParallel =
+    parsed['max-parallel'] === undefined
+      ? rootParallelism(os.availableParallelism())
+      : parseMaxParallel(parsed['max-parallel']);
+
+  if (maxParallel === undefined) {
+    console.error(
+      `--max-parallel must be a positive integer: ${parsed['max-parallel']}`,
+    );
+
+    return undefined;
+  }
+
   return {
     baseRef,
     dryRun: parsed['dry-run'],
     coverage: !parsed['no-coverage'],
+    maxParallel,
   };
 };
 
 const USAGE = [
   'Usage: pnpm run check-changed [--base <ref>] [--dry-run] [--no-coverage]',
+  '                              [--max-parallel <n>]',
   '',
   '  --base <ref>    diff from the merge base with <ref> (default: origin/main);',
   '                  a stacked pull request passes the branch it is based on',
   '  --dry-run       print the plan and the commit and changeset findings only',
   '  --no-coverage   run the tests without listing the changed lines they miss',
+  '  --max-parallel <n>',
+  '                  run at most <n> check:root:* scripts at once (default: one',
+  '                  per CPU, at most 4, as pnpm runs check:root)',
 ].join('\n');
 
 const reportCoverage = async ({
@@ -754,7 +777,8 @@ const printSummary = ({
 
 const LINT_PULL_REQUEST = '.github/workflows/lint-pull-request.yml';
 
-const DESCRIBED_ARGS = 8;
+// Enough for a capped `exec run-p` (six words) and four of its scripts.
+const DESCRIBED_ARGS = 10;
 
 /** Ranges of uncovered lines listed per file before the rest is counted. */
 const REPORTED_RANGES = 12;

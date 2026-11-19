@@ -11,7 +11,9 @@ import {
   classifyChanges,
   isLintToolchain,
   isSpellCheckedByCi,
+  parseMaxParallel,
   readManifestDependencies,
+  rootParallelism,
   stepEnvironment,
   type PackageInfo,
   type Step,
@@ -603,6 +605,46 @@ describe('the documents a unit test reads, planned', () => {
   );
 });
 
+describe('rootParallelism', () => {
+  test.each([
+    [1, 1],
+    [2, 2],
+    [4, 4],
+    [32, 4],
+    [0, 1],
+  ] as const)('%i CPUs give %i', (cpus, expected) => {
+    assert.strictEqual(rootParallelism(cpus), expected);
+  });
+});
+
+describe('parseMaxParallel', () => {
+  test('reads a positive integer', () => {
+    assert.strictEqual(parseMaxParallel('1'), 1);
+
+    assert.strictEqual(parseMaxParallel('12'), 12);
+
+    assert.strictEqual(
+      parseMaxParallel('999999999999999'),
+      999_999_999_999_999,
+    );
+  });
+
+  test.each([
+    '0',
+    '-1',
+    '2.5',
+    '1e3',
+    '0x4',
+    ' 4',
+    '04',
+    'abc',
+    '',
+    '1000000000000000',
+  ])('refuses %j', (text) => {
+    assert.isUndefined(parseMaxParallel(text));
+  });
+});
+
 describe('buildPlan', () => {
   test('a package source change: format, generate, fix, check, spell, format', () => {
     assert.deepStrictEqual(commandsOf(['libs/ts-data-forge/src/array.mts']), [
@@ -681,6 +723,60 @@ describe('buildPlan', () => {
     );
 
     assert.include(commands, 'run check:root:test');
+  });
+
+  test('the root checks run at most maxParallel at once', () => {
+    const step = buildPlan({
+      classification: classify(['tools/scripts/cmd/x.mts']),
+      base: 'abc123',
+      rootScripts,
+      maxParallel: 2,
+      coverage: true,
+      spellChecked: [],
+    }).find(({ title }) => title.startsWith('check:root ('));
+
+    assert.strictEqual(
+      step?.title,
+      'check:root (4 scripts in parallel, 2 at a time)',
+    );
+
+    assert.strictEqual(
+      step === undefined ? undefined : describeStep(step),
+      'exec run-p --continue-on-error --print-label --max-parallel 2 check:root:actionlint check:root:ci-commands check:root:lint check:root:types',
+    );
+  });
+
+  test.each([4, 8])(
+    'a cap of %i, no smaller than the 4 scripts, is left out',
+    (maxParallel) => {
+      const step = buildPlan({
+        classification: classify(['tools/scripts/cmd/x.mts']),
+        base: 'abc123',
+        rootScripts,
+        maxParallel,
+        coverage: true,
+        spellChecked: [],
+      }).find(({ title }) => title.startsWith('check:root ('));
+
+      assert.strictEqual(step?.title, 'check:root (4 scripts in parallel)');
+
+      assert.notInclude(step?.args ?? [], '--max-parallel');
+    },
+  );
+
+  test('the root checks run without a limit when maxParallel is omitted', () => {
+    const commands = buildPlan({
+      classification: classify(['tools/scripts/cmd/x.mts']),
+      base: 'abc123',
+      rootScripts,
+      coverage: true,
+      spellChecked: [],
+    }).map(describeStep);
+
+    assert.include(
+      commands,
+      'exec run-p --continue-on-error --print-label check:root:actionlint check:root:ci-commands check:root:lint check:root:types',
+    );
   });
 
   test('a workflow runs the root guards without the root program checks', () => {
