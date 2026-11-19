@@ -39,6 +39,7 @@ import {
   type PackageInfo,
   type Step,
 } from './plan.mjs';
+import { readRootProgramReads } from './root-program.mjs';
 import { findRulesTestNotes } from './rules-tests.mjs';
 
 /**
@@ -102,11 +103,22 @@ const main = async (): Promise<number> => {
     return 2;
   }
 
+  const rootProgramReads = readRootProgramReads(changedFiles);
+
+  if (Result.isErr(rootProgramReads)) {
+    console.error(
+      `Could not read which changed files the root program reads: ${rootProgramReads.value}`,
+    );
+
+    return 2;
+  }
+
   const classification = classifyChanges({
     files: changedFiles,
     packages,
     proseGate: proseGate.value,
     generatorReaders: generatorReaders.value,
+    rootProgramReads: rootProgramReads.value,
   });
 
   const existing = await filterExisting(changedFiles);

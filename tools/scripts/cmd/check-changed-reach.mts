@@ -177,6 +177,9 @@ export const planReach = ({
       // sample path in that member already plans: no script is reached only
       // this way.
       generatorReaders: new Map<string, readonly string[]>(),
+      // A member file the root program reads plans `root`, which a sample path
+      // under `tools/` already plans.
+      rootProgramReads: new Set<string>(),
     });
 
     for (const area of classification.areas) {

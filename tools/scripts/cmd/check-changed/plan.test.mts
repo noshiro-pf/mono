@@ -196,12 +196,15 @@ const proseGate = proseGateResult.ok ? proseGateResult.value : ([] as const);
 
 const noReaders = new Map<string, readonly string[]>();
 
+const noRootReads: ReadonlySet<string> = new Set<string>();
+
 const classify = (files: readonly string[]) =>
   classifyChanges({
     files,
     packages,
     proseGate,
     generatorReaders: noReaders,
+    rootProgramReads: noRootReads,
   });
 
 const sortedAreas = (
@@ -252,6 +255,7 @@ const planCommands = (
       packages: members,
       proseGate,
       generatorReaders: noReaders,
+      rootProgramReads: noRootReads,
     }),
     base: 'abc123',
     rootScripts,
@@ -425,6 +429,24 @@ describe('classifyChanges', () => {
     },
   );
 
+  test('a member file the root program reads asks for its checks', () => {
+    const file =
+      'libs/eslint-config-typed/src/rules/node-version-gated-apis.mts';
+
+    const readsIt = classifyChanges({
+      files: [file],
+      packages,
+      proseGate,
+      generatorReaders: noReaders,
+      rootProgramReads: new Set<string>([file]),
+    });
+
+    assert.isTrue(readsIt.areas.has('root'));
+
+    // The same file, which the root program does not read.
+    assert.isFalse(classify([file]).areas.has('root'));
+  });
+
   test('experimental/ is ignored', () => {
     const result = classify(['experimental/old/a.ts']);
 
@@ -525,6 +547,7 @@ describe('the documents a unit test reads', () => {
           packages: members,
           proseGate,
           generatorReaders: noReaders,
+          rootProgramReads: noRootReads,
         }),
         base: 'abc123',
         rootScripts: ['check:root:test'],
@@ -569,6 +592,7 @@ describe('the documents a unit test reads, planned', () => {
           packages: members,
           proseGate,
           generatorReaders: noReaders,
+          rootProgramReads: noRootReads,
         }),
         base: 'abc123',
         rootScripts: ['check:md', 'check:root:test', 'check:root:a'],
@@ -945,6 +969,7 @@ describe('buildPlan', () => {
           packages: readers,
           proseGate,
           generatorReaders: noReaders,
+          rootProgramReads: noRootReads,
         }),
         base: 'abc123',
         rootScripts,
@@ -1018,6 +1043,7 @@ describe('buildPlan', () => {
         files: ['tools/configs/gen-shared.mts', 'libs/synstate/src/x.mts'],
         packages,
         proseGate,
+        rootProgramReads: noRootReads,
         generatorReaders: new Map<string, readonly string[]>([
           ['libs/ts-data-forge', ['tools/configs/gen-shared.mts']],
           // Touched by the diff, so its own `gen` runs already.
@@ -1130,6 +1156,7 @@ describe('buildPlan', () => {
         packages: [pkg('libs/ext', ['check:ext', 'check:types'])],
         proseGate,
         generatorReaders: noReaders,
+        rootProgramReads: noRootReads,
       }),
       base: 'abc123',
       rootScripts,
