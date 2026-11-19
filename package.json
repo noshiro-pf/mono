@@ -103,6 +103,7 @@
     "check:root:restricted-imports": "node ./tools/scripts/cmd/assert-deps-built.mts --workspace && tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-restricted-imports.mts",
     "check:root:scheduled-failure-report": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-scheduled-failure-report.mts",
     "check:root:shellcheck": "NODE_USE_ENV_PROXY=1 NODE_OPTIONS='--disable-warning=UNDICI-EHPA' tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-shellcheck.mts",
+    "check:root:stderr-captures": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-stderr-captures.mts",
     "check:root:strict-lib-dev-dependencies": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-strict-lib-dev-dependencies.mts",
     "check:root:strict-lib-links": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-strict-lib-links.mts",
     "check:root:synstate-benchmark-imports": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-synstate-benchmark-imports.mts",
