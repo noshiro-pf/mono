@@ -221,7 +221,7 @@ describe(reworkPr, () => {
         }),
         '/repos/o/n/pulls/8/reviews?per_page=100': ok([]),
         '/repos/o/n/pulls/8/files?per_page=100': ok([]),
-        '/repos/o/n/activity?ref=refs%2Fheads%2Ffeature-8&activity_type=push&direction=asc&per_page=100':
+        '/repos/o/n/activity?ref=refs%2Fheads%2Ffeature-8&direction=asc&per_page=100':
           ok([]),
         '/repos/o/n/issues/8/comments?per_page=100': ok([]),
         [EVENTS]: ok([

@@ -148,7 +148,7 @@ describe(reportUnownedPrs, () => {
           html_url: 'https://github.com/o/n/pull/8',
           head: { ...PULL_7.head, ref: 'feature-8' },
         }),
-        '/repos/o/n/activity?ref=refs%2Fheads%2Ffeature-8&activity_type=push&direction=asc&per_page=100':
+        '/repos/o/n/activity?ref=refs%2Fheads%2Ffeature-8&direction=asc&per_page=100':
           ok([]),
         '/repos/o/n/pulls/8/reviews?per_page=100': ok([]),
         '/repos/o/n/pulls/8/files?per_page=100': ok([]),

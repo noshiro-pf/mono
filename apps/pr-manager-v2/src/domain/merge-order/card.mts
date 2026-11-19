@@ -213,6 +213,17 @@ export const claudeSessionsOf = (body: string): readonly ClaudeSession[] =>
   }));
 
 /**
+ * Whether anything enforces code owner review on the default branch: the
+ * ruleset's own rule, or a required check `CODEOWNERS` names. The `awaiting
+ * code owner` tile is offered where it is, as the cards' badge is judged; the
+ * ruleset's rule holds even where `CODEOWNERS` could not be read.
+ */
+export const codeOwnerReviewEnforced = (snapshot: Snapshot): boolean =>
+  (Result.isOk(snapshot.requirements) &&
+    snapshot.requirements.value.requireCodeOwnerReview) ||
+  reviewRulesOf(snapshot)?.codeOwnerGate !== undefined;
+
+/**
  * The review rules a card's code owner badge is judged by, worked out once per
  * snapshot: every card of a read asks, and parsing `CODEOWNERS` is not free.
  */

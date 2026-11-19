@@ -213,8 +213,9 @@ Per PR:
 
 - Count tiles: **open** (`2 of 8`), **queued**, **failing**, **set aside**,
   **awaiting code owner**, **pending** (`pending` label). Queue-related tiles
-  only on a queue repository; code-owner tile only when a ruleset asks for code
-  owner review.
+  only on a queue repository; code-owner tile only where code owner review is
+  enforced: by a ruleset, or by a required check `CODEOWNERS` names
+  (`# enforced-by:`), as the cards' badge is judged.
 - Each tile but open is a switch (hide what it counts) with an **only** pick in
   its corner; a status is never both hidden and picked.
 - **priority**: `high`, `mid`, `low`, `none` switches (labels

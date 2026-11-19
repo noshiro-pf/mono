@@ -61,7 +61,7 @@ const shared: Routes = {
   '/repos/o/n/branches/main': ok({}),
   ...emptyChecksOf(TIP),
   ...emptyChecksOf(HEAD),
-  '/repos/o/n/activity?ref=refs%2Fheads%2Ffeature&activity_type=push&direction=asc&per_page=100':
+  '/repos/o/n/activity?ref=refs%2Fheads%2Ffeature&direction=asc&per_page=100':
     ok([
       {
         activity_type: 'branch_creation',
