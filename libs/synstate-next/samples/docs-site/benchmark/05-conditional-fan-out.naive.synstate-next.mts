@@ -12,7 +12,7 @@ export const runBenchmark = (k: number, branchCount: number): number => {
       set: (v: number) => void;
     }[]
   > = Arr.zeros(asUint32(branchCount)).map(() => {
-    const [source, setSource] = createState(0);
+    const [source, setSource] = createState(-1);
 
     return { source, set: setSource };
   });
@@ -52,7 +52,7 @@ if (import.meta.vitest !== undefined) {
   test('conditional-fan-out benchmark (synstate-next, naive derive)', () => {
     const result = runBenchmark(10, 5);
 
-    // The selector picks branch 0, which stays at 0.
-    assert.strictEqual(result, 0);
+    // The selector picks branch 0, which stays at its initial -1.
+    assert.strictEqual(result, -1);
   });
 }

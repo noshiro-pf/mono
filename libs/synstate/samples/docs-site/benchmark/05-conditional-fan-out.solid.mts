@@ -16,7 +16,7 @@ export const runBenchmark = (k: number, branchCount: number): number => {
 
     const branchSignals: readonly Signal<number>[] = Arr.zeros(
       asUint32(branchCount),
-    ).map(() => createSignal(0));
+    ).map(() => createSignal(-1));
 
     // Dynamic dependency: only tracks the branch selected by selector
     const result = createMemo(() => {
@@ -55,7 +55,7 @@ if (import.meta.vitest !== undefined) {
   test('conditional-fan-out benchmark (Solid)', () => {
     const result = runBenchmark(10, 5);
 
-    // selector=0, active branch=branch[0] which stays at 0
-    assert.strictEqual(result, 0);
+    // selector=0, active branch=branch[0], which stays at its initial -1
+    assert.strictEqual(result, -1);
   });
 }

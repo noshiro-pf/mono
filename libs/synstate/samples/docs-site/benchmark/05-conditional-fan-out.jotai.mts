@@ -10,7 +10,7 @@ export const runBenchmark = (k: number, branchCount: number): number => {
     number,
     Mutable<readonly [number]>,
     void
-  >[] = Arr.zeros(asUint32(branchCount)).map(() => atom(0));
+  >[] = Arr.zeros(asUint32(branchCount)).map(() => atom(-1));
 
   // Dynamic dependency: only reads the branch selected by selectorAtom
   const resultAtom = atom((get) => {
@@ -50,7 +50,7 @@ if (import.meta.vitest !== undefined) {
   test('conditional-fan-out benchmark (Jotai)', () => {
     const result = runBenchmark(10, 5);
 
-    // selector=0, active branch=branch[0] which stays at 0
-    assert.strictEqual(result, 0);
+    // selector=0, active branch=branch[0], which stays at its initial -1
+    assert.strictEqual(result, -1);
   });
 }

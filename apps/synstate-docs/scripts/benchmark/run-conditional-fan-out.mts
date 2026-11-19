@@ -76,9 +76,11 @@ await runSeriesSweep({
   prepare: scenarioModule(K, {
     updates: 3,
     // The selector stays 0 and only branch[1] is written, so the result is
-    // branch[0]'s initial 0 whatever k and B are. That catches a library that
-    // lets the inactive branch through, not one that computes nothing.
-    expected: () => 0,
+    // branch[0]'s initial -1 whatever k and B are. That catches a library that
+    // lets the inactive branch through, and one that computes nothing: each
+    // scenario's last value starts at 0, which it returns if its subscriber or
+    // effect never runs.
+    expected: () => -1,
   }),
   resultsFile: 'results-conditional-fan-out.md',
 });
