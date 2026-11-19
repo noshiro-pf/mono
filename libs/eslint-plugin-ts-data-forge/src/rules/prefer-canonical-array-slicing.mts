@@ -8,6 +8,7 @@ import {
   getImportDeclarations,
   getImportedLocalName,
   hasForeignBinding,
+  isTypeWrapper,
   skipTypeWrappers,
   typeWrapperLayers,
 } from 'eslint-rule-forge';
@@ -23,7 +24,9 @@ type Options = readonly [];
 type MessageIds =
   | 'preferCanonicalArraySlicing'
   | 'preferCanonicalArraySlicingUnfixed'
-  | 'suggestCanonicalArraySlicing';
+  | 'suggestCanonicalArraySlicing'
+  | 'preferCanonicalArraySlicingNotFixed'
+  | 'suggestCanonicalArraySlicingAsWritten';
 
 /**
  * A canonical ts-data-forge `Arr` operation a detected pattern is rewritten to:
@@ -188,7 +191,7 @@ export const preferCanonicalArraySlicing: TSESLint.RuleModule<
     type: 'suggestion',
     docs: {
       description:
-        'Unify non-mutating array element addition/removal patterns (`slice` / `toSpliced` / `filter` / `concat` / spread) into the corresponding ts-data-forge functions: `Arr.tail`, `Arr.skip`, `Arr.take`, `Arr.butLast`, `Arr.skipLast`, `Arr.takeLast`, `Arr.toUnshifted`, `Arr.toPushed`. A rewrite to `Arr.tail` or `Arr.butLast` is a suggestion, not a fix: the call can fail to compile with TS2590 (https://github.com/noshiro-pf/mono/issues/2994).',
+        'Unify non-mutating array element addition/removal patterns (`slice` / `toSpliced` / `filter` / `concat` / spread) into the corresponding ts-data-forge functions: `Arr.tail`, `Arr.skip`, `Arr.take`, `Arr.butLast`, `Arr.skipLast`, `Arr.takeLast`, `Arr.toUnshifted`, `Arr.toPushed`. A rewrite to `Arr.tail` or `Arr.butLast` is a suggestion, not a fix: the call can fail to compile with TS2590 (https://github.com/noshiro-pf/mono/issues/2994). So is one that would drop a comment. One with a literal count above 39, which does not type-check, is reported with neither a fix nor a suggestion, and an array literal under `as const` is left alone.',
     },
     fixable: 'code',
     hasSuggestions: true,
@@ -200,6 +203,9 @@ export const preferCanonicalArraySlicing: TSESLint.RuleModule<
         'Replace with `{{replacement}}` from ts-data-forge. Not fixed automatically: the call can fail to compile (TS2590) where it has a contextual type, such as an annotation or an argument. Bind its result to an unannotated `const` first there.',
       suggestCanonicalArraySlicing:
         'Replace with `{{replacement}}` (can fail to compile where the call has a contextual type).',
+      preferCanonicalArraySlicingNotFixed:
+        'Replace with `{{replacement}}` from ts-data-forge. Not fixed automatically: {{reason}}.',
+      suggestCanonicalArraySlicingAsWritten: 'Replace with `{{replacement}}`.',
     },
     defaultOptions: [],
   },
@@ -837,6 +843,13 @@ export const preferCanonicalArraySlicing: TSESLint.RuleModule<
           return;
         }
 
+        // Under a const assertion the literal's type is a readonly tuple, and
+        // `as const` on the call does not compile (TS1355); the call's type
+        // would not be the literal's either, so the literal is left alone.
+        if (isUnderConstAssertion(node)) {
+          return;
+        }
+
         // Spreading a non-array iterable (`[v, ...someSet]`) is a genuine
         // conversion, not an element addition to an array.
         if (!holdsThroughWrappers(spread.argument, isArrayOrTupleType)) {
@@ -876,7 +889,13 @@ export const preferCanonicalArraySlicing: TSESLint.RuleModule<
                   fixer.replaceText(nodeInfo.node, replacement),
                 ];
 
-          if (isSuggestionOnly(nodeInfo.op)) {
+          const suggestionOnly = isSuggestionOnly(nodeInfo.op);
+
+          const notFixed = suggestionOnly
+            ? undefined
+            : whyNotFixed(sourceCode, nodeInfo.node, nodeInfo.op, replacement);
+
+          if (suggestionOnly) {
             context.report({
               node: nodeInfo.node,
               messageId: 'preferCanonicalArraySlicingUnfixed',
@@ -887,6 +906,22 @@ export const preferCanonicalArraySlicing: TSESLint.RuleModule<
                   : [
                       {
                         messageId: 'suggestCanonicalArraySlicing',
+                        data: { replacement },
+                        fix,
+                      },
+                    ],
+            });
+          } else if (notFixed !== undefined) {
+            context.report({
+              node: nodeInfo.node,
+              messageId: 'preferCanonicalArraySlicingNotFixed',
+              data: { replacement, reason: notFixed.reason },
+              suggest:
+                fix === null || !notFixed.suggest
+                  ? []
+                  : [
+                      {
+                        messageId: 'suggestCanonicalArraySlicingAsWritten',
                         data: { replacement },
                         fix,
                       },
@@ -905,6 +940,14 @@ export const preferCanonicalArraySlicing: TSESLint.RuleModule<
     };
   },
 } as const;
+
+/**
+ * The largest literal count `Arr.skip`, `Arr.take`, `Arr.skipLast` and
+ * `Arr.takeLast` take: a larger one does not type-check, and needs
+ * `asUint32(N)`. `test/largest-literal-count.mts` fails to compile if that
+ * bound moves.
+ */
+const LARGEST_LITERAL_COUNT = 39;
 
 // `--fix` never rewrites to `Arr.tail` or `Arr.butLast` until
 // https://github.com/noshiro-pf/mono/issues/2994 fixes the types. The call
@@ -926,6 +969,78 @@ export const preferCanonicalArraySlicing: TSESLint.RuleModule<
 // that compiles, an unannotated `const` holding the result.
 const isSuggestionOnly = (op: CopyOp): boolean =>
   op.fn === 'tail' || op.fn === 'butLast';
+
+/**
+ * Why the rewrite of `node` to `replacement` is not fixed, and whether it is
+ * still suggested, or `undefined` when it may be fixed: a count the call does
+ * not take as a literal, or a comment inside `node` that `replacement` does not
+ * carry. The replacement copies the array's and the item's text whole, so a
+ * comment inside them is carried and one anywhere else (between the arguments,
+ * inside a `filter` callback) is not; each comment is counted against the
+ * copies of its text in the replacement.
+ */
+const whyNotFixed = (
+  sourceCode: TSESLint.SourceCode,
+  node: TSESTree.Node,
+  op: CopyOp,
+  replacement: string,
+): Readonly<{ reason: string; suggest: boolean }> | undefined => {
+  if (
+    (op.fn === 'skip' ||
+      op.fn === 'take' ||
+      op.fn === 'skipLast' ||
+      op.fn === 'takeLast') &&
+    op.count > LARGEST_LITERAL_COUNT
+  ) {
+    // The suggestion would write the same literal, so none is offered.
+    return {
+      reason: `a literal count above ${LARGEST_LITERAL_COUNT} does not type-check; write it as \`asUint32(${op.count})\``,
+      suggest: false,
+    };
+  }
+
+  const commentTexts = sourceCode
+    .getCommentsInside(node)
+    .map((comment) => sourceCode.getText(comment));
+
+  const dropsComment = commentTexts.some(
+    (text) =>
+      commentTexts.filter((other) => other === text).length >
+      replacement.split(text).length - 1,
+  );
+
+  return dropsComment
+    ? {
+        reason:
+          'it would drop a comment inside the expression; move the comment out first',
+        suggest: true,
+      }
+    : undefined;
+};
+
+/**
+ * Whether `node`, through the type wrappers around it, is the operand of a
+ * const assertion (`as const`, `<const>`).
+ */
+const isUnderConstAssertion = (node: TSESTree.Node): boolean => {
+  const { parent } = node;
+
+  if (parent === undefined) {
+    return false;
+  }
+
+  if (
+    (parent.type === AST_NODE_TYPES.TSAsExpression ||
+      parent.type === AST_NODE_TYPES.TSTypeAssertion) &&
+    parent.typeAnnotation.type === AST_NODE_TYPES.TSTypeReference &&
+    parent.typeAnnotation.typeName.type === AST_NODE_TYPES.Identifier &&
+    parent.typeAnnotation.typeName.name === 'const'
+  ) {
+    return true;
+  }
+
+  return isTypeWrapper(parent) && isUnderConstAssertion(parent);
+};
 
 /** The call `op` is rewritten to, writing `Arr` as `arrRef`. */
 const toReplacementText = (

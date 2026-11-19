@@ -57,13 +57,15 @@ export default [
 
   {
     files: ['test/**/*.mts', '**/*.test.mts'],
-    /* Four files sit under `test/` but are not tests: each holds
+    /* Five files sit under `test/` but are not tests: each holds
        `@ts-expect-error` lines that `check:types` reads —
        `strict-lib-active.mts` stops compiling if the strict standard library
        stops being applied, `arr-tail-ts2590.mts` as its header says,
        `range-for-loop-fix-output.mts` if `range` stops agreeing with what
        `prefer-range-for-loop` fixes, and `as-int-fix-output.mts` if the cast
-       functions stop agreeing with what `prefer-as-int` fixes — and the
+       functions stop agreeing with what `prefer-as-int` fixes, and
+       `largest-literal-count.mts` if the largest literal count `Arr.take`
+       takes moves from what `prefer-canonical-array-slicing` fixes — and the
        `export` is what keeps their declarations from being unused locals,
        whose error would satisfy the directive instead. The no-export rule
        below is about test files, so it — and the loosened rules beside it —
@@ -73,6 +75,7 @@ export default [
       'test/arr-tail-ts2590.mts',
       'test/range-for-loop-fix-output.mts',
       'test/as-int-fix-output.mts',
+      'test/largest-literal-count.mts',
     ],
     rules: defineKnownRules({
       '@typescript-eslint/no-empty-object-type': 'off',

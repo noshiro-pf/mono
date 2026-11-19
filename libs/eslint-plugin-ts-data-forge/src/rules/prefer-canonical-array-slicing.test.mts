@@ -1294,3 +1294,174 @@ describe('prefer-canonical-array-slicing and the import it adds', () => {
     ],
   });
 });
+
+describe('prefer-canonical-array-slicing withholds a fix that would not compile or would drop a comment', () => {
+  tester.run('prefer-canonical-array-slicing', preferCanonicalArraySlicing, {
+    valid: [
+      {
+        name: 'an array literal under a const assertion is left alone: the call would not take it',
+        code: dedent`
+          declare const xs: readonly number[];
+          declare const v: number;
+          const a = [...xs, 1] as const;
+          const b = [v, ...xs] as const;
+          const c = ([...xs, 1]) as const;
+          const d = <const>[...xs, 1];
+        `,
+      },
+    ],
+    invalid: [
+      ...[
+        'xs.slice(0, 40)',
+        'xs.slice(-40)',
+        'xs.slice(0, -40)',
+        'xs.slice(40)',
+        'xs.filter((_, i) => i < 40)',
+      ].map((call) => ({
+        name: `a count of 40 or more is reported without a fix: ${call}`,
+        code: dedent`
+          declare const xs: readonly number[];
+          const ys = ${call};
+        `,
+        output: null,
+        errors: [
+          {
+            messageId: 'preferCanonicalArraySlicingNotFixed' as const,
+            suggestions: [],
+          },
+        ],
+      })),
+      {
+        name: 'a count of 39 is fixed',
+        code: dedent`
+          declare const xs: readonly number[];
+          const ys = xs.slice(0, 39);
+        `,
+        output: dedent`
+          import { Arr } from 'ts-data-forge';
+          declare const xs: readonly number[];
+          const ys = Arr.take(xs, 39);
+        `,
+        errors: [{ messageId: 'preferCanonicalArraySlicing' }],
+      },
+      {
+        name: 'an array literal under a widening as is still fixed',
+        code: dedent`
+          declare const xs: readonly number[];
+          const a = [...xs, 1] as readonly number[];
+        `,
+        output: dedent`
+          import { Arr } from 'ts-data-forge';
+          declare const xs: readonly number[];
+          const a = Arr.toPushed(xs, 1) as readonly number[];
+        `,
+        errors: [{ messageId: 'preferCanonicalArraySlicing' }],
+      },
+      {
+        name: 'a comment the rewrite has no place for is only suggested',
+        code: dedent`
+          declare const xs: readonly number[];
+          declare const v: number;
+          const a = xs.slice(/* skip the header */ 2);
+          const b = [...xs, /* last */ v];
+        `,
+        output: null,
+        errors: [
+          {
+            messageId: 'preferCanonicalArraySlicingNotFixed',
+            suggestions: [
+              {
+                messageId: 'suggestCanonicalArraySlicingAsWritten',
+                output: dedent`
+                  import { Arr } from 'ts-data-forge';
+                  declare const xs: readonly number[];
+                  declare const v: number;
+                  const a = Arr.skip(xs, 2);
+                  const b = [...xs, /* last */ v];
+                `,
+              },
+            ],
+          },
+          {
+            messageId: 'preferCanonicalArraySlicingNotFixed',
+            suggestions: [
+              {
+                messageId: 'suggestCanonicalArraySlicingAsWritten',
+                output: dedent`
+                  import { Arr } from 'ts-data-forge';
+                  declare const xs: readonly number[];
+                  declare const v: number;
+                  const a = xs.slice(/* skip the header */ 2);
+                  const b = Arr.toPushed(xs, v);
+                `,
+              },
+            ],
+          },
+        ],
+      },
+      {
+        name: 'a comment inside the array is copied, and fixed',
+        code: dedent`
+          declare const f: (x: readonly number[]) => readonly number[];
+          declare const xs: readonly number[];
+          const a = f(/* c */ xs).slice(2);
+        `,
+        output: dedent`
+          import { Arr } from 'ts-data-forge';
+          declare const f: (x: readonly number[]) => readonly number[];
+          declare const xs: readonly number[];
+          const a = Arr.skip(f(/* c */ xs), 2);
+        `,
+        errors: [{ messageId: 'preferCanonicalArraySlicing' }],
+      },
+      {
+        name: 'a comment inside the item is copied, and fixed',
+        code: dedent`
+          declare const g: (x: number) => number;
+          declare const xs: readonly number[];
+          declare const v: number;
+          const b = [...xs, g(/* d */ v)];
+        `,
+        output: dedent`
+          import { Arr } from 'ts-data-forge';
+          declare const g: (x: number) => number;
+          declare const xs: readonly number[];
+          declare const v: number;
+          const b = Arr.toPushed(xs, g(/* d */ v));
+        `,
+        errors: [{ messageId: 'preferCanonicalArraySlicing' }],
+      },
+    ],
+  });
+});
+
+describe('prefer-canonical-array-slicing and a comment inside a filter callback', () => {
+  tester.run('prefer-canonical-array-slicing', preferCanonicalArraySlicing, {
+    valid: [],
+    invalid: [
+      {
+        name: 'is only suggested',
+        code: dedent`
+          declare const xs: readonly number[];
+          const ys = xs.filter((_, i) => /* past the header */ i >= 2);
+        `,
+        output: null,
+        errors: [
+          {
+            messageId: 'preferCanonicalArraySlicingNotFixed',
+            suggestions: [
+              {
+                messageId: 'suggestCanonicalArraySlicingAsWritten',
+                output: dedent`
+                  import { Arr } from 'ts-data-forge';
+                  declare const xs: readonly number[];
+                  const ys = Arr.skip(xs, 2);
+                `,
+              },
+            ],
+          },
+        ],
+      },
+    ],
+  });
+});
