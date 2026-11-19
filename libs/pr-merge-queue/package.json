@@ -103,7 +103,7 @@
     "eslint-plugin-ts-data-forge": "workspace:*",
     "eslint-plugin-ts-fortress": "workspace:*",
     "eslint-plugin-ts-type-forge": "workspace:*",
-    "graphql": "17.0.2",
+    "graphql": "17.1.0",
     "jiti": "catalog:",
     "npm-run-all2": "catalog:",
     "prettier": "catalog:",
