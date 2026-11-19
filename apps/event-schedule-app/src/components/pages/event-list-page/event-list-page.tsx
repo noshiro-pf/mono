@@ -29,6 +29,7 @@ import {
   toaster,
 } from '../../../store/index.mjs';
 import { Header } from '../../organisms/index.mjs';
+import { pageWidthClass } from '../../styled/index.mjs';
 import { EventListItemComponent } from './event-list-item.js';
 import * as styles from './event-list-page.module.css';
 
@@ -85,7 +86,7 @@ export const EventListPage = (): JSX.Element => {
       <If
         cond={mapBindable(sortedEventList$, (list) => list === undefined)}
         else={
-          <div class={constant(styles.content)}>
+          <div class={constant(`${styles.content} ${pageWidthClass}`)}>
             <div class={constant(styles.filterByArea)}>
               <HtmlSelect
                 disabled={formElementsAreDisabled}

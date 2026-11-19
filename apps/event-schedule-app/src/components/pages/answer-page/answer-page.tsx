@@ -53,6 +53,7 @@ import {
   ButtonsWrapperAlignEnd,
   ButtonsWrapperNowrap,
   maxWidthModalClass,
+  pageWidthClass,
 } from '../../styled/index.mjs';
 import { NotFoundPage } from '../not-found-page.js';
 import * as styles from './answer-page.module.css';
@@ -96,18 +97,20 @@ export const AnswerPage = (): JSX.Element => {
             <Header title={dc.title} />
             {match(status, {
               error: (
-                <For
-                  items={mapBindable(errorType$, (e) =>
-                    e === undefined ? [] : [e],
-                  )}
-                  key={(e) => e}
-                >
-                  {(errorType$_) => (
-                    <AnswerPageError
-                      errorType={Optional.unwrap(errorType$_.getSnapshot())}
-                    />
-                  )}
-                </For>
+                <div class={constant(pageWidthClass)}>
+                  <For
+                    items={mapBindable(errorType$, (e) =>
+                      e === undefined ? [] : [e],
+                    )}
+                    key={(e) => e}
+                  >
+                    {(errorType$_) => (
+                      <AnswerPageError
+                        errorType={Optional.unwrap(errorType$_.getSnapshot())}
+                      />
+                    )}
+                  </For>
+                </div>
               ),
               loading: <Spinner />,
               ok: <AnswerPageOkOnceRead />,
@@ -245,7 +248,7 @@ const AnswerPageOk = ({
 
   return (
     <div class={constant(styles.page)}>
-      <div class={constant(styles.answerLaterWrapper)}>
+      <div class={constant(`${styles.answerLaterWrapper} ${pageWidthClass}`)}>
         <If
           cond={showAnswerLaterButton$}
           then={
@@ -256,7 +259,10 @@ const AnswerPageOk = ({
           }
         />
       </div>
-      <Section sectionTitle={dc.eventInfo.title}>
+      <Section
+        class={constant(pageWidthClass)}
+        sectionTitle={dc.eventInfo.title}
+      >
         <AnswerPageEventInfo eventSchedule={eventScheduleDefined$} />
         <ButtonsWrapperAlignEnd>
           <Button
@@ -272,7 +278,7 @@ const AnswerPageOk = ({
         // Derived here, as the page's other bindings are: the scope the page is
         // mounted in disposes what its render derives when it is left.
         class={AnswerTableStore.tableIsFullWidth$.pipe(
-          map((full) => (full ? styles.fullWidth : '')),
+          map((full) => (full ? '' : pageWidthClass)),
         )}
         sectionTitle={dc.answers.title}
       >
@@ -544,6 +550,7 @@ const AnswerPageOk = ({
         ref={(el) => {
           mut_elements.answerSection = el;
         }}
+        class={constant(pageWidthClass)}
         data-e2e={constant('answer-being-edited-section')}
       >
         <For

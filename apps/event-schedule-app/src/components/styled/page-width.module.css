@@ -1,0 +1,13 @@
+/*
+ * A page's width: 1220px at most, centred. What the element holds keeps its own
+ * margins inside that, as on a narrow screen: a card's 10px leaves it 1200px.
+ * The padding's percentage is of the containing block, so each element given
+ * this class reads the same screen-wide width.
+ *
+ * The answer page's full-width toggle hides itself at the same 1220px, in a
+ * container query, which cannot read a custom property: change both together,
+ * and the e2e specs that measure against it (`answer-page-width`, `page-width`).
+ */
+.pageWidth {
+  padding-inline: max(0px, calc((100% - 1220px) / 2));
+}

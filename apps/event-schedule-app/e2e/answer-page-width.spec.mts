@@ -1,10 +1,10 @@
-import { expect, test, type Locator } from '@playwright/test';
-import type { DeepReadonly } from 'ts-type-forge';
+import { expect, test } from '@playwright/test';
 import {
   answerPageLoadTimeout,
   createEventAndOpenAnswerPage,
   emulatorTestTimeout,
 } from './answer-page-steps.mjs';
+import { leftOf, rightOf } from './boxes.mjs';
 
 // On a wide screen the answer page keeps its cards to the page's width, so that
 // a form's buttons stay near its inputs, and the table's toggle widens the
@@ -55,6 +55,21 @@ test(
     expect.soft(await eventInfoRight()).toBeLessThan(2000);
 
     expect.soft(await answersRight()).toBeCloseTo(await eventInfoRight(), 0);
+
+    // The page's title moves with the cards, in the column of the button above
+    // them, as on a narrow screen.
+    expect
+      .soft(await leftOf(answerPage.getByTestId('page-title')))
+      .toBeCloseTo(
+        await leftOf(answerPage.getByRole('button', { name: '後で回答する' })),
+        0,
+      );
+
+    // Every child of the answer page's container is at the page's width, not
+    // only the cards checked above.
+    expect
+      .soft(await toggle.evaluate(partsOutsidePageWidthOf))
+      .toStrictEqual([]);
 
     await toggle.click();
 
@@ -147,9 +162,32 @@ const toggleAndPaddingOf = (
   throw new Error('The toggle is in no inline-size container.');
 };
 
-/** The x of the right edge of what `locator` finds. */
-const rightOf = async (locator: DeepReadonly<Locator>): Promise<number> => {
-  const box = await locator.boundingBox();
+/**
+ * The children of the page, the inline-size container round `toggle`, whose
+ * side padding is not the one that keeps them to the page's 1220px, each by its
+ * tag and classes. Throws where there is no container. Run in the page.
+ */
+const partsOutsidePageWidthOf = (toggle: Element): readonly string[] => {
+  for (
+    let mut_el: Element | null = toggle.parentElement;
+    mut_el !== null;
+    mut_el = mut_el.parentElement
+  ) {
+    if (getComputedStyle(mut_el).containerType === 'inline-size') {
+      const padding = Math.max(0, (mut_el.clientWidth - 1220) / 2);
 
-  return box === null ? Number.NaN : box.x + box.width;
+      return Array.from(mut_el.children)
+        .filter((child) => {
+          const style = getComputedStyle(child);
+
+          // A padding that does not read as a number counts as outside.
+          return [style.paddingLeft, style.paddingRight]
+            .map((p) => Number.parseFloat(p))
+            .some((p) => Number.isNaN(p) || Math.abs(p - padding) > 1);
+        })
+        .map((child) => `${child.tagName} ${child.className}`);
+    }
+  }
+
+  throw new Error('The toggle is in no inline-size container.');
 };
