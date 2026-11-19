@@ -5,10 +5,12 @@ export { readQueueState, type QueueState } from './pr-report/index.mjs';
 export {
   DEFERRAL_REASONS,
   deferralReasonOf,
+  descriptionProblems,
   reviewOpeningAdditions,
   reviewOpeningOf,
   reviewOpeningRounds,
   type DeferralReason,
+  type DescriptionKind,
 } from './pr-description/index.mjs';
 
 export {
@@ -17,6 +19,7 @@ export {
   failedContexts,
   firstFixerOf,
   planAutoFix,
+  readConfig,
   type AutoFixConfig,
   type AutoFixPlan,
   type GeneratedBranch,
