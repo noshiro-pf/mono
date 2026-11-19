@@ -58,7 +58,12 @@ const rootScripts = [
   'strict-lib:gen:version-diff',
 ] as const;
 
-const reach = planReach({ packages, proseGate, rootScripts });
+const reach = planReach({
+  packages,
+  proseGate,
+  rootScripts,
+  outsideLintImports: new Set<string>(),
+});
 
 describe('samplePaths', () => {
   test('a source file, a document and a manifest in every package', () => {

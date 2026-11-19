@@ -4,7 +4,11 @@ import { isDirectlyExecuted } from 'ts-repo-utils';
 import { plural } from '../lib/plural.mjs';
 import { git, splitZ } from '../lib/step-runner.mjs';
 import { readGeneratorReaders } from './check-changed/generator-entries.mjs';
-import { readPackages, readProseGate } from './check-changed/packages.mjs';
+import {
+  readOutsideLintImports,
+  readPackages,
+  readProseGate,
+} from './check-changed/packages.mjs';
 import {
   buildPlan,
   classifyChanges,
@@ -346,9 +350,10 @@ const main = async (): Promise<Result<string, string>> => {
     return remaining;
   }
 
-  const [manifestsRead, packages] = await Promise.all([
+  const [manifestsRead, packages, outsideLintImports] = await Promise.all([
     readManifests(),
     readPackages(),
+    readOutsideLintImports(),
   ]);
 
   if (Result.isErr(manifestsRead)) {
@@ -398,6 +403,7 @@ const main = async (): Promise<Result<string, string>> => {
     spellChecked: remaining.value.filter(
       (file) => !classification.ignored.includes(file),
     ),
+    outsideLintImports,
   });
 
   return describeGap({

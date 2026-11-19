@@ -29,7 +29,12 @@ import {
 import { parseLcov, uncoveredChangedLines } from './coverage.mjs';
 import { findPatchExportChanges } from './exports.mjs';
 import { readGeneratorReaders } from './generator-entries.mjs';
-import { readPackages, readProseGate, scriptsOf } from './packages.mjs';
+import {
+  readOutsideLintImports,
+  readPackages,
+  readProseGate,
+  scriptsOf,
+} from './packages.mjs';
 import {
   buildPlan,
   classifyChanges,
@@ -91,7 +96,10 @@ const main = async (): Promise<number> => {
     return 2;
   }
 
-  const packages = await readPackages();
+  const [packages, outsideLintImports] = await Promise.all([
+    readPackages(),
+    readOutsideLintImports(),
+  ]);
 
   const generatorReaders = await readGeneratorReaders(changedFiles, packages);
 
@@ -132,6 +140,7 @@ const main = async (): Promise<number> => {
     spellChecked: existing.filter(
       (file) => !classification.ignored.includes(file),
     ),
+    outsideLintImports,
   });
 
   // What is read rather than run comes first: it is quick and needs no tree.
