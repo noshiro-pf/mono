@@ -9,7 +9,7 @@ import type { ReadonlyRecord } from 'ts-type-forge';
 import type { vitestCodingStyleRules } from './rules/index.mjs';
 
 /**
- * @description Disallow `expect(X).toStrictEqual(Y)` (and `expect(X, message)`) in favor of `assert.deepStrictEqual(X, Y)` (`assert.deepStrictEqual(X, Y, message)`), which constrains X and Y to a single type at compile time (`toStrictEqual` type-checks neither); note that it compares structure only, so pin a prototype with `assert.instanceOf`.
+ * @description Disallow `expect(X).toStrictEqual(Y)` (and `expect(X, message)`) in favor of `assert.deepStrictEqual(X, Y)` (`assert.deepStrictEqual(X, Y, message)`), which constrains X and Y to a single type at compile time (`toStrictEqual` type-checks neither); note that it compares structure only, so pin a prototype with `assert.instanceOf`. A comparison against an asymmetric matcher (`expect.any(…)`) stays on `toStrictEqual`.
  *
  *  ```md
  *  | key        | value      |

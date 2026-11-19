@@ -711,6 +711,12 @@ second name (the same function object), not Node.js's `node:assert` function of
 that name; a test that has to pin a class rather than a shape needs
 `assert.instanceOf` alongside it. Both halves are pinned as executable tests in
 [`assert-vs-expect-strict-equality.test.mts`](../eslint-plugin-vitest-coding-style/src/rules/assert-vs-expect-strict-equality.test.mts).
+A comparison against an asymmetric matcher (`expect.any(Date)`,
+`expect.objectContaining(…)`) stays on `toStrictEqual`: only it understands the
+matcher, which `assert.deepStrictEqual` compares as a plain object, so
+`no-expect-to-strict-equal` leaves a comparison that refers to `expect`, or
+reads a member named `expect` (such as a fixture's `c.expect`), on either side
+other than by calling it, alone.
 
 All of these rules resolve the binding behind `assert` / `expect` rather than
 matching the identifier's spelling. `includeSource` puts in-source tests in

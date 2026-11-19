@@ -1,10 +1,12 @@
 import {
   AST_NODE_TYPES,
+  AST_TOKEN_TYPES,
   type TSESLint,
   type TSESTree,
 } from '@typescript-eslint/utils';
 import {
   getArgumentText,
+  isTypeWrapper,
   mayHaveEffect,
   skipTypeWrappers,
 } from 'eslint-rule-forge';
@@ -45,6 +47,15 @@ type CallExpressionWithLegacyTypeParameters = TSESTree.CallExpression &
  * is Vitest's only (`getVitestReceiver`), and the fix names Vitest's `assert`
  * only (`createVitestAssertFixer`).
  *
+ * A comparison that refers to Vitest's `expect`, or reads a member named
+ * `expect` (such as a fixture's `c.expect`), on either side other than by
+ * calling it is left alone: that is how an asymmetric matcher
+ * (`expect.any(Date)`, `expect.objectContaining(…)`) gets into a value, and only
+ * `toStrictEqual` understands one, so the comparison has no `assert` form. A
+ * matcher held in a variable declared outside the comparison is not seen. The
+ * check errs toward leaving a comparison alone: a missed rewrite costs nothing
+ * a failing test does.
+ *
  * `expect(X, message)` is reported too, and its message becomes the third
  * argument, `assert.deepStrictEqual(X, Y, message)`. That moves its evaluation
  * from before `Y` to after it, so the fix is written only when the order cannot
@@ -57,7 +68,7 @@ export const noExpectToStrictEqualRule: TSESLint.RuleModule<MessageIds> = {
     type: 'suggestion',
     docs: {
       description:
-        'Disallow `expect(X).toStrictEqual(Y)` (and `expect(X, message)`) in favor of `assert.deepStrictEqual(X, Y)` (`assert.deepStrictEqual(X, Y, message)`), which constrains X and Y to a single type at compile time (`toStrictEqual` type-checks neither); note that it compares structure only, so pin a prototype with `assert.instanceOf`.',
+        'Disallow `expect(X).toStrictEqual(Y)` (and `expect(X, message)`) in favor of `assert.deepStrictEqual(X, Y)` (`assert.deepStrictEqual(X, Y, message)`), which constrains X and Y to a single type at compile time (`toStrictEqual` type-checks neither); note that it compares structure only, so pin a prototype with `assert.instanceOf`. A comparison against an asymmetric matcher (`expect.any(…)`) stays on `toStrictEqual`.',
     },
     fixable: 'code',
     schema: [],
@@ -112,6 +123,17 @@ export const noExpectToStrictEqualRule: TSESLint.RuleModule<MessageIds> = {
 
         const expectedArgument = node.arguments[0];
 
+        // An asymmetric matcher (`expect.any(Date)`, `expect.arrayContaining`,
+        // …), on either side, is understood by `toStrictEqual` alone: Vitest's
+        // `assert.deepStrictEqual` compares it as the plain object it is, and
+        // it is typed `any`, so the rewrite would type-check and fail.
+        if (
+          holdsVitestMatcher(sourceCode, expectedArgument) ||
+          holdsVitestMatcher(sourceCode, actualArgument)
+        ) {
+          return;
+        }
+
         const actualText = getArgumentText(sourceCode, actualArgument);
 
         const expectedText = getArgumentText(sourceCode, expectedArgument);
@@ -157,6 +179,130 @@ export const noExpectToStrictEqualRule: TSESLint.RuleModule<MessageIds> = {
     };
   },
 } as const;
+
+/** `scope` and every scope nested in it. */
+const scopesWithin = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  scope: TSESLint.Scope.Scope,
+): readonly TSESLint.Scope.Scope[] =>
+  Arr.toUnshifted(scope)(scope.childScopes.flatMap(scopesWithin));
+
+/** `node` with the type wrappers around it. */
+const outermostWrapper = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  node: TSESTree.Node,
+): TSESTree.Node =>
+  node.parent !== undefined && isTypeWrapper(node.parent)
+    ? outermostWrapper(node.parent)
+    : node;
+
+/**
+ * Whether `node`, with the type wrappers and an optional chain around it, is
+ * what a call calls.
+ */
+const isCallee = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  node: TSESTree.Node,
+): boolean => {
+  const { parent } = node;
+
+  return (
+    parent !== undefined &&
+    (isTypeWrapper(parent) || parent.type === AST_NODE_TYPES.ChainExpression
+      ? isCallee(parent)
+      : parent.type === AST_NODE_TYPES.CallExpression && parent.callee === node)
+  );
+};
+
+/**
+ * Whether `node` reads a member named `expect` other than to call it
+ * (`v.expect.any(Date)`, `ctx.expect!.any(Date)`, `v['expect']`, `` v[`expect`] ``,
+ * `withTimestamps(ctx.expect)`): a matcher reached through a namespace import,
+ * a test context that is not destructured or `import.meta.vitest`, whose
+ * binding (`v`, `ctx`, `import.meta`) no reference resolves to Vitest's
+ * `expect`. Read by spelling, so a fixture's `c.expect.output` is counted too:
+ * a comparison left on `toStrictEqual` costs a missed rewrite, a matcher
+ * rewritten to `assert.deepStrictEqual` costs a failing test.
+ */
+const holdsExpectMember = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  sourceCode: TSESLint.SourceCode,
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  node: TSESTree.Node,
+): boolean =>
+  sourceCode
+    .getTokens(node)
+    .filter(
+      (token) =>
+        (token.type === AST_TOKEN_TYPES.Identifier &&
+          token.value === 'expect') ||
+        ((token.type === AST_TOKEN_TYPES.String ||
+          token.type === AST_TOKEN_TYPES.Template) &&
+          token.value.slice(1, -1) === 'expect'),
+    )
+    .some((token) => {
+      const atToken = sourceCode.getNodeByRangeIndex(token.range[0]);
+
+      // A template key's token is that of its one element.
+      const key =
+        atToken?.type === AST_NODE_TYPES.TemplateElement
+          ? atToken.parent
+          : atToken;
+
+      // A computed key may be wrapped: `v['expect' as const]`.
+      const wrappedKey = key === null ? undefined : outermostWrapper(key);
+
+      const member = wrappedKey?.parent;
+
+      return (
+        member?.type === AST_NODE_TYPES.MemberExpression &&
+        member.property === wrappedKey &&
+        !isCallee(member)
+      );
+    });
+
+/** Whether `node` is inside a `typeof` in a type: it reads no value. */
+const isInTypeQuery = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  node: TSESTree.Node,
+): boolean =>
+  node.type !== AST_NODE_TYPES.Program &&
+  (node.parent.type === AST_NODE_TYPES.TSTypeQuery ||
+    isInTypeQuery(node.parent));
+
+/**
+ * Whether `node` refers to Vitest's `expect` other than by calling it: a member
+ * of it (`expect.any(Date)`, `expect!.not.objectContaining(…)`, through type
+ * wrappers) or `expect` handed on as a value (`withTimestamps(expect)`), which
+ * is how an asymmetric matcher gets into a value, or a member named `expect`
+ * read other than to call it ({@link holdsExpectMember}). A call `expect(…)`, a
+ * property key spelled `expect`, a binding that shadows it and a mention in a
+ * type (`typeof expect`) are not counted. A member that is no matcher
+ * (`expect.getState()`) is counted too, which leaves such a comparison on
+ * `toStrictEqual` rather than telling the APIs apart.
+ */
+const holdsVitestMatcher = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  sourceCode: TSESLint.SourceCode,
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  node: TSESTree.Node,
+): boolean =>
+  // From the scope around `node`: one `node` itself opens (a class expression)
+  // records its decorators' references in the scope outside it.
+  holdsExpectMember(sourceCode, node) ||
+  scopesWithin(sourceCode.getScope(node.parent ?? node)).some((scope) =>
+    scope.references.some(
+      (reference) =>
+        reference.isValueReference &&
+        reference.identifier.type === AST_NODE_TYPES.Identifier &&
+        !isInTypeQuery(reference.identifier) &&
+        node.range[0] <= reference.identifier.range[0] &&
+        reference.identifier.range[1] <= node.range[1] &&
+        !isCallee(reference.identifier) &&
+        getVitestReceiver(sourceCode, reference.identifier, 'expect') !==
+          undefined,
+    ),
+  );
 
 /**
  * Whether `node`, through type wrappers, is a literal or a template literal
