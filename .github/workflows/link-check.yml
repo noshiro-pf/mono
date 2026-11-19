@@ -1,8 +1,13 @@
 name: Link Check
 
-# The external URLs in the SynState docs, checked with lychee. Links to this
-# repository's own files are not checked here: `check:prose:mono-links`
-# resolves them against the tree in `style-check.yml`, which is required.
+# The external URLs in the docs sites and the SynState packages' Markdown,
+# checked with lychee. Links to this repository's own files are not checked
+# here: `check:prose:mono-links` resolves them against the tree in
+# `style-check.yml`, which is required.
+#
+# A docs site is matched by its directory's `-docs` suffix (`apps/*-docs`)
+# rather than by name, here and in the file list below, so that a new one is
+# checked from its first page with no edit to this file.
 #
 # This workflow reports no required status check, because its verdict is a
 # function of other people's servers as well as of the tree: a site that is
@@ -23,8 +28,8 @@ on:
       - synchronize
       - reopened
     paths:
-      - 'apps/synstate-docs/**.md'
-      - 'apps/synstate-docs/**.mdx'
+      - 'apps/*-docs/**.md'
+      - 'apps/*-docs/**.mdx'
       - 'libs/synstate*/**.md'
       - 'libs/eslint-plugin-synstate/**.md'
       - 'tools/configs/lychee.toml'
@@ -60,17 +65,25 @@ jobs:
           ref: ${{ case(github.event_name == 'pull_request', github.event.pull_request.head.sha, github.sha) }}
           persist-credentials: false
 
-      # The tracked files only, as `check:prose:mono-links` reads them, and the
-      # same scope. The changelogs are left out: they link to commits and pull
+      # The tracked Markdown and MDX of `SCOPE_PATTERN` in
+      # `tools/scripts/cmd/check-mono-links.mts`, which also reads the code
+      # there; `check:prose:link-check-scope` runs this step and holds its list
+      # and the `paths` filter to it. The docs sites' patterns are `:(glob)`
+      # pathspecs, in which `*` stops at a slash as it does in the `paths`
+      # filter above; without it, `*` would match a `-docs/` directory at any
+      # depth. The changelogs are left out: they link to commits and pull
       # requests here, which `lychee.toml` excludes anyway.
       - name: List the files to check
         run: |
-          git ls-files -- \
-            'apps/synstate-docs/*.md' 'apps/synstate-docs/*.mdx' \
+          git -c core.quotePath=false ls-files -- \
+            ':(glob)apps/*-docs/**/*.md' ':(glob)apps/*-docs/**/*.mdx' \
             'libs/synstate*/*.md' 'libs/eslint-plugin-synstate/*.md' |
             grep -v '/CHANGELOG\.md$' > "${RUNNER_TEMP}/link-check-files.txt"
           wc -l < "${RUNNER_TEMP}/link-check-files.txt"
 
+      # Given the list above alone, and narrowing it nowhere (`lychee.toml`
+      # sets no `exclude_path`): `check:prose:link-check-scope` holds the list
+      # to the scope, and reads nothing of this step or of that file.
       - name: Check the links
         uses: lycheeverse/lychee-action@v2.9.0
         with:

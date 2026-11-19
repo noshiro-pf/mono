@@ -3,6 +3,8 @@ import { toTree } from '../lib/repo-files.mjs';
 import {
   brokenReason,
   findMonoLinks,
+  isInScope,
+  isScanned,
   type MonoLink,
 } from './check-mono-links.mjs';
 
@@ -288,6 +290,46 @@ describe('findMonoLinks', () => {
       ).map((link) => link.line),
       [3],
     );
+  });
+});
+
+describe('isScanned', () => {
+  test('reads the code of every docs site, matched by its -docs suffix', () => {
+    assert.isTrue(isScanned('apps/synstate-docs/astro.config.mjs'));
+
+    assert.isTrue(isScanned('apps/synstate-dom-docs/astro.config.mjs'));
+
+    assert.isTrue(isScanned('apps/foo-docs/src/content/docs/index.mdx'));
+  });
+
+  test('leaves the code of other apps and a nested -docs directory alone', () => {
+    assert.isFalse(isScanned('apps/foo/src/index.mts'));
+
+    assert.isFalse(isScanned('apps/foo/api-docs/index.mts'));
+  });
+
+  test("leaves a docs site's changelog alone", () => {
+    assert.isFalse(isScanned('apps/foo-docs/CHANGELOG.md'));
+  });
+});
+
+describe('isInScope', () => {
+  test('takes in the docs sites and the SynState packages', () => {
+    assert.isTrue(isInScope('apps/x-docs/sub/page.md'));
+
+    assert.isTrue(isInScope('libs/synstate-dom/README.md'));
+  });
+
+  test('leaves out a changelog at any depth', () => {
+    assert.isFalse(isInScope('libs/synstate/CHANGELOG.md'));
+
+    assert.isFalse(isInScope('apps/x-docs/sub/CHANGELOG.md'));
+  });
+
+  test('leaves out other apps and a nested -docs directory', () => {
+    assert.isFalse(isInScope('apps/x/README.md'));
+
+    assert.isFalse(isInScope('apps/x/y-docs/page.md'));
   });
 });
 

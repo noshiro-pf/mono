@@ -44,6 +44,7 @@
     "check:prose:hero-markdown": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-hero-markdown.mts",
     "check:prose:japanese-parentheses": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-japanese-parentheses.mts",
     "check:prose:japanese-terms": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-japanese-terms.mts",
+    "check:prose:link-check-scope": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-link-check-scope.mts",
     "check:prose:linked-releases": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-linked-releases.mts",
     "check:prose:majors-only-releases": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-majors-only-releases.mts",
     "check:prose:markdown-wrap": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-markdown-wrap/main.mts",
