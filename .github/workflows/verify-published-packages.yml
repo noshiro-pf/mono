@@ -84,6 +84,7 @@ jobs:
         uses: actions/checkout@v7.0.1
         with:
           ref: ${{ case(github.event_name == 'pull_request', github.event.pull_request.head.sha, github.sha) }}
+          persist-credentials: false
           # The gate below resolves a merge base, which does not exist in the
           # default shallow clone. It also brings every branch in as
           # `refs/remotes/origin/*`, which is why nothing below fetches `main`

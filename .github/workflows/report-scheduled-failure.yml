@@ -10,7 +10,7 @@ name: Report scheduled failure
 # branch has it.
 
 on:
-  workflow_run:
+  workflow_run: # zizmor: ignore[dangerous-triggers] no checkout, and only scheduled runs of named workflows reach the job
     # The `name:` of each workflow with a `schedule:` trigger, which
     # `check:root:scheduled-failure-report` holds to the workflows: a name
     # that matches no workflow would drop out without a word.

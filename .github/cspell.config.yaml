@@ -11,3 +11,5 @@ words:
   - knip
   - temurin
   - vite
+  # The Actions linter whose `# zizmor: ignore[...]` comments sit in the workflows.
+  - zizmor

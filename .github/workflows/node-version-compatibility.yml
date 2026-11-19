@@ -105,6 +105,7 @@ jobs:
         uses: actions/checkout@v7.0.1
         with:
           ref: ${{ case(github.event_name == 'pull_request', github.event.pull_request.head.sha, github.sha) }}
+          persist-credentials: false
 
       # Resolved from the checkout rather than written into the matrix above,
       # so that the versions this job runs and the versions

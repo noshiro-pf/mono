@@ -98,6 +98,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v7.0.1
+        with:
+          persist-credentials: false
 
       # `setup-node` takes `<major>-nightly` and resolves it to the newest
       # nightly of that line; the major comes from the pinned `current` rather
