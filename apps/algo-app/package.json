@@ -36,7 +36,7 @@
   },
   "dependencies": {
     "firebase": "^12.19.0",
-    "immer": "^11.2.7",
+    "immer": "^11.2.10",
     "synstate": "workspace:*",
     "synstate-dom": "workspace:*",
     "synstate-router": "workspace:*",

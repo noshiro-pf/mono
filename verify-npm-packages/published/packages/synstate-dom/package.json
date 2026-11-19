@@ -5,7 +5,7 @@
   "type": "module",
   "dependencies": {
     "synstate": ">=9.0.0",
-    "synstate-dom": "0.11.0",
-    "ts-data-forge": ">=15.0.0"
+    "synstate-dom": "0.13.0",
+    "ts-data-forge": ">=15.0.1"
   }
 }

@@ -34,8 +34,8 @@
     "z:gen-index-ts": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/gen-index-ts.mts"
   },
   "dependencies": {
-    "discord.js": "^14.27.0",
-    "dotenv": "^18.0.8",
+    "discord.js": "^14.28.1",
+    "dotenv": "^18.0.10",
     "firebase": "^12.19.0",
     "ts-data-forge": "workspace:*",
     "ts-fortress": "workspace:*"
