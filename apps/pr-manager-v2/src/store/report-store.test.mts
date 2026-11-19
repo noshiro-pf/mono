@@ -79,6 +79,7 @@ describe(createReportStore, () => {
                 snapshot([pull(1)], [], { merged: failed('the merged') }),
               ),
               runs: failed('the runs'),
+              layerWorkflows: ok.layerWorkflows,
             }
           : ok,
       ),
@@ -122,6 +123,7 @@ describe(createReportStore, () => {
           snapshot([], [], { pullRequests: failed('the pull requests') }),
         ),
         runs: ok.runs,
+        layerWorkflows: ok.layerWorkflows,
       }),
     );
 
@@ -154,6 +156,7 @@ describe(createReportStore, () => {
                 message: '401: Bad credentials',
               }),
               runs: ok.runs,
+              layerWorkflows: ok.layerWorkflows,
             }
           : ok,
       ),
@@ -254,9 +257,38 @@ describe(createReportStore, () => {
     assert.isUndefined(Optional.unwrap(store.report.getSnapshot()));
   });
 
+  test('keeps the layer workflows last read when a read of them fails', async () => {
+    const { store, setToken, reads } = setup((n) =>
+      answer(
+        n === 1
+          ? ok
+          : { ...ok, layerWorkflows: failed('.github/unblock-prs.json') },
+      ),
+    );
+
+    setToken(TOKEN);
+
+    await flush();
+
+    store.refresh();
+
+    await flush();
+
+    assert.strictEqual(reads(), 2);
+
+    assert.deepStrictEqual(
+      Optional.unwrap(store.report.getSnapshot())?.layerWorkflows,
+      ['code-check.yml'],
+    );
+  });
+
   test('shows the runs read even when the snapshot failed', async () => {
     const { store, setToken } = setup(() =>
-      answer({ snapshot: failed('the repository'), runs: ok.runs }),
+      answer({
+        snapshot: failed('the repository'),
+        runs: ok.runs,
+        layerWorkflows: ok.layerWorkflows,
+      }),
     );
 
     setToken(TOKEN);
@@ -477,11 +509,13 @@ const TOKEN: StoredToken = { value: 't', place: 'session' } as const;
 const ok: ReportRead = {
   snapshot: Result.ok(snapshot([pull(1)])),
   runs: Result.ok({ runs: [], complete: true }),
+  layerWorkflows: Result.ok(['code-check.yml']),
 } as const;
 
 const nothing: ReportRead = {
   snapshot: failed('the repository'),
   runs: failed('the runs'),
+  layerWorkflows: failed('.github/unblock-prs.json'),
 } as const;
 
 const answer = (read: ReportRead): Promise<ReportRead> => Promise.resolve(read);

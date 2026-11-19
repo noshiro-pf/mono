@@ -10,6 +10,7 @@ import {
   type MergedPullRequestFacts,
   type MovedHead,
   type PullRequestFacts,
+  type QueueLayerFacts,
   type Snapshot,
 } from 'pr-report-core-v2';
 import { Result } from 'ts-data-forge';
@@ -49,7 +50,22 @@ export const demoRead = (nowMs: number): ReportRead =>
   ({
     snapshot: Result.ok(demoSnapshot(nowMs)),
     runs: Result.ok({ runs: demoRuns(nowMs), complete: true }),
+    layerWorkflows: Result.ok(LAYER_WORKFLOWS),
   }) as const;
+
+/** A demo layer's commit, by its pull request. */
+const shaOfLayer = (number: number): string =>
+  number.toString(16).padStart(40, 'a');
+
+/** A demo layer's tree, by its pull request. */
+const treeOfLayer = (number: number): string =>
+  number.toString(16).padStart(40, 'b');
+
+/** The tree of the default branch's tip, which the first layer stands on. */
+const BASE_TREE = 'd'.repeat(40);
+
+/** What the demo's worker dispatches on each queue layer. */
+const LAYER_WORKFLOWS = ['code-check.yml', 'style-check.yml'] as const;
 
 const REQUIRED = 'code-check-result / result';
 
@@ -164,6 +180,51 @@ const demoSnapshot = (nowMs: number): Snapshot => {
           url: `https://github.com/noshiro-pf/mono/actions/runs/${number * 1000}`,
         },
       ],
+    };
+  };
+
+  /**
+   * The layer `queue/pr-<number>` on the layer of `on`, or on the tip, with a run the worker
+   * dispatched for each workflow concluded as `conclusions` say (going while
+   * `undefined`), in the order of {@link LAYER_WORKFLOWS}.
+   */
+  const layer = (
+    number: number,
+    on: number | undefined,
+    conclusions: readonly (string | undefined)[],
+  ): QueueLayerFacts => {
+    const sha = shaOfLayer(number);
+
+    const branch = `queue/pr-${number}` as const;
+
+    return {
+      branch,
+      origin: { number, builtFromHead: shaOf(number) },
+      sha,
+      tree: treeOfLayer(number),
+      parent: on === undefined ? TIP : shaOfLayer(on),
+      parentTree: on === undefined ? BASE_TREE : treeOfLayer(on),
+      committedAt: ago(12),
+      checks: Result.ok({
+        sha,
+        runs: [],
+        statuses: [],
+        rounds: conclusions.map((conclusion, index) => ({
+          checkSuiteId: number * 10 + index,
+          runId: number * 1000 + index,
+          workflowId: index + 1,
+          completed: conclusion !== undefined,
+          attemptStartedAt: ago(10),
+          headBranch: branch,
+          path: `.github/workflows/${LAYER_WORKFLOWS[index] ?? ''}`,
+          event: 'workflow_dispatch',
+          status: conclusion === undefined ? 'in_progress' : 'completed',
+          conclusion,
+          createdAt: ago(11),
+          updatedAt: ago(conclusion === undefined ? 1 : 3),
+          url: `https://github.com/noshiro-pf/mono/actions/runs/${number * 1000 + index}`,
+        })),
+      }),
     };
   };
 
@@ -416,19 +477,14 @@ const demoSnapshot = (nowMs: number): Snapshot => {
     }),
     merged: Result.ok(merged),
     queueLayers: Result.ok({
-      baseTree: 'd'.repeat(40),
+      baseTree: BASE_TREE,
       movedHeads: new Map<number, MovedHead>(),
+      // A stack of three: the first passed, the second's runs going, the
+      // third's to dispatch once the second has started every job.
       layers: [
-        {
-          branch: 'queue/pr-3832',
-          origin: { number: 3832, builtFromHead: shaOf(3832) },
-          sha: 'a'.repeat(40),
-          tree: 'b'.repeat(40),
-          parent: 'e'.repeat(40),
-          parentTree: 'c'.repeat(40),
-          committedAt: ago(4),
-          checks: Result.ok(checks(3832, 'running')),
-        },
+        layer(3832, undefined, ['success', 'success']),
+        layer(3801, 3832, ['success', undefined]),
+        layer(3834, 3801, []),
       ],
     }),
   });
