@@ -357,6 +357,10 @@ describe(readShellScript, () => {
           { name: 'f', value: './tools/a.mts', before: 0 },
           { name: 'f', value: './b.mts', before: 1 },
         ],
+        details: [
+          { redirections: [], inSubstitution: false },
+          { redirections: [], inSubstitution: false },
+        ],
       },
     );
   });
@@ -377,6 +381,49 @@ describe(readShellScript, () => {
       readShellScript('FOO=./tools/a.mts node ./x.mjs; y="$(g=1; node "$g")"')
         .assignments,
       [{ name: 'y', value: '$(…)', before: 2 }],
+    );
+  });
+});
+
+/** Each command of `script`, its words joined, with its details. */
+const detailsOf = (script: string) =>
+  readShellScript(script).commands.map((words, index) => [
+    words.join(' '),
+    readShellScript(script).details[index],
+  ]);
+
+describe('readShellScript details', () => {
+  test('keeps each command’s redirections in order, the descriptor, operator and target', () => {
+    assert.deepStrictEqual(
+      detailsOf(
+        'a 2>&1 >/dev/null; b &> "log file"; c 2> "$errors" >&2; d <<< "$x"; e |& f',
+      ),
+      [
+        ['a', { redirections: ['2>&1', '>/dev/null'], inSubstitution: false }],
+        ['b', { redirections: ['&>log file'], inSubstitution: false }],
+        ['c', { redirections: ['2>$errors', '>&2'], inSubstitution: false }],
+        ['d', { redirections: ['<<<$x'], inSubstitution: false }],
+        ['e', { redirections: ['|&'], inSubstitution: false }],
+        ['f', { redirections: [], inSubstitution: false }],
+      ],
+    );
+  });
+
+  test('says which commands run inside a command substitution, nested ones and backticks too', () => {
+    assert.deepStrictEqual(
+      detailsOf(
+        'x="$(gh api a 2>&1)"; y=`b 2>&1`; z=$( (c; d) | e ); f <(g); h',
+      ),
+      [
+        ['gh api a', { redirections: ['2>&1'], inSubstitution: true }],
+        ['b', { redirections: ['2>&1'], inSubstitution: true }],
+        ['c', { redirections: [], inSubstitution: true }],
+        ['d', { redirections: [], inSubstitution: true }],
+        ['e', { redirections: [], inSubstitution: true }],
+        ['g', { redirections: [], inSubstitution: false }],
+        ['f $(…)', { redirections: [], inSubstitution: false }],
+        ['h', { redirections: [], inSubstitution: false }],
+      ].map(([words, detail]) => [words, detail] as const),
     );
   });
 });
