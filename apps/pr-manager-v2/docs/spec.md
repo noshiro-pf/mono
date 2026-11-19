@@ -235,27 +235,38 @@ Per PR:
 ## 8. Queue (only when the repository has a `merge-queued` label)
 
 - Title links: **on GitHub** (all `merge-queued`), **picked on GitHub**; a
-  summary `7 queued · 1 running · 0 set aside`.
-- One row of equal-width boxes: the running one first (turning ring, `running`
-  under it) next to the base it merges into (`main ←`), then the ones it would
-  pick next in order (`next`, `2`, `3`, …), first those checked ahead
-  (`queue/pr-*` layers, `checked ahead`; the layers' own runs, which v1 gains
-  in #3809, come with #3810), then dashed boxes for those whose turn has not
-  come with why (`after #N`, `review`, `native stack`).
-- Each box carries its priority pill, title on hover (tooltip anchored to the
-  nearer end).
-- When the row overflows: it scrolls with the running box held at the start, and
-  a **map** above (one mark per box) shows a frame around the part in view; drag
-  the frame like a scrollbar thumb, click elsewhere to jump.
-- Outside the row: set aside, claimed, drafts and the like, each with why in a
-  word and whose it is.
+  summary `7 queued · 1 running · 0 set aside` (queued: the boxes in the row but
+  the running one; set aside: those outside it).
+- One row of joined boxes: the running one first (turning ring, `running` under
+  it) next to the base it merges into (`main ←`), then the ones it would pick
+  next in order, first those checked ahead (`queue/pr-*` layers, `checked
+ahead`; the layers' own runs, which v1 gains in #3809, come with #3810), then
+  dashed boxes for those whose turn has not come, each after what it waits for
+  among them (#4255 in v1), with why (`after #N`, `review`, `native stack`,
+  `failing` in red, `merge state`). Every box after the running one is numbered
+  under it (`next`, `2`, `3`, …).
+- What a box waits for that is ahead of it in the row is an **arc** from that
+  box to it, a step higher each time the span doubles, instead of `after #N`,
+  which is left for what is behind it or not in the row (#4250 in v1). A box
+  with nothing else to say shows `checked ahead`, `release` or `conflicts`, and
+  otherwise a `Merge-After:` naming no open pull request, struck out: the worker
+  does not wait for it.
+- Each box carries its priority pill on its top edge, title on hover.
+- When the row overflows: it scrolls with the running box held at the start, its
+  edges fading where there is more, and a **map** above (one mark per box) shows
+  a window around the part in view in place of a scroll bar; drag the window
+  like a thumb, click elsewhere to jump; a mouse wheel over the row scrolls it
+  across until it is at its end.
+- Outside the row: set aside, claimed, drafts and the like, as dashed boxes with
+  why in a word and whose it is.
 - **(new, #2757)** A candidate that only a ruleset bypass can merge is marked
   `bypass` with the review hold's reason (text from `pr-report-core`), so its
   later place does not look like a bug.
 - Order decided by `pr-report-core`'s queue code from what the page read (merge
   state made from `mergeable` + comparison). Until every part it needs is read,
   it lists the `merge-queued` PRs by number, order unknown.
-- A legend: running, waits for another PR, set aside, high/mid/low.
+- A legend: running, waits for another PR, the arc, `after #N` and its struck
+  form, set aside, the bypass mark, high/mid/low.
 
 ## 9. Running workflows
 
