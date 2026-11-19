@@ -68,6 +68,12 @@ pnpm run pr-description -- create --title 'fix: x' --file ./d.md --priority B  #
    いないこと。
 4. 実行したチェックと `## Review`。
 
+この並びを骨組みにしたものが `.github/pull_request_template.md` です。GitHub の
+Web UI で pull request を作るとこれが入ります。`check:prose:pr-template` は、
+このテンプレートがここで拒否されない形であること、`Review` か `レビュー` で
+始まる `#` の見出しを（大文字小文字を問わず、どの階層でも、コメントやコードブロック
+の中でも）持たないことを確かめます。
+
 訳文は原文と同じことを、同じ節と同じ参照で言います。原文を一語ずつ置き換える
 のではなく、その言語として自然な文で書きます。コードブロックは訳文にも同じものを
 置くので、訳文だけで読めます。表と画像は原文だけに置きます。対応のチェックが比べるのは見出しと
@@ -204,6 +210,12 @@ the issue nor the code and has to judge the change from it, in this order:
 3. **Notes**, if any: what the change deliberately leaves, related pull
    requests, what was not verified.
 4. The checks run, then `## Review`.
+
+`.github/pull_request_template.md` lays this out as a skeleton, which GitHub's
+web UI fills a new pull request with. `check:prose:pr-template` holds it to a
+shape these checks accept, and to having no `#` heading that opens with
+`Review` or `レビュー`, ignoring letter case, at any level, in a comment or a
+code fence too.
 
 The translation says what the original says, with the same sections and
 references, in sentences natural to its language rather than word for word: the
