@@ -3,9 +3,7 @@ import { restrictedSyntax } from './eslint-rules.mjs';
 
 const linter = new Linter();
 
-const entry: Linter.RuleEntry =
-  // eslint-disable-next-line ts-data-forge/prefer-canonical-array-slicing -- the type `Arr.toUnshifted` returns is not assignable to `Linter.RuleEntry`
-  ['error', ...restrictedSyntax] as const;
+const entry: Linter.RuleEntry = ['error', ...restrictedSyntax] as const;
 
 /** Lints `code` with `no-restricted-syntax` set to `restrictedSyntax`. */
 const lintRestrictedSyntax = (code: string): readonly string[] =>

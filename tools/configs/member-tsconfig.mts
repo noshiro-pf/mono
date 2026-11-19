@@ -208,7 +208,7 @@ export const memberTsconfigs: ReadonlyRecord<string, MemberTsconfig> = {
   'libs/eslint-plugin-ts-data-forge': {
     notes: {
       include:
-        '`./test` holds no test, only files this type check is the test of: `strict-lib-active.mts`, the probe that fails when the replacement above stops happening, `arr-tail-ts2590.mts`, whose header says what it watches, `range-for-loop-fix-output.mts`, the fixes of `prefer-range-for-loop` compiled against `range`, and `as-int-fix-output.mts`, the fixes of `prefer-as-int` compiled against the cast functions. It is not published — `files` lists `src` and `dist`.',
+        '`./test` holds no test, only files this type check is the test of: `strict-lib-active.mts`, the probe that fails when the replacement above stops happening, `arr-tail-ts2590.mts`, whose header says what it watches, `range-for-loop-fix-output.mts`, the fixes of `prefer-range-for-loop` compiled against `range`, `as-int-fix-output.mts`, the fixes of `prefer-as-int` compiled against the cast functions, and `largest-literal-count.mts`, the largest literal count `prefer-canonical-array-slicing` fixes. It is not published — `files` lists `src` and `dist`.',
     },
   },
   'libs/eslint-plugin-ts-type-forge': {
