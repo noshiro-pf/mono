@@ -1,5 +1,6 @@
 import { Result } from 'ts-data-forge';
 import type { UnknownRecord } from 'ts-type-forge';
+import type { ClosingIssue } from '../snapshot/index.mjs';
 import { ok, recordedTransport, status } from './recorded-transport.mjs';
 import {
   readFollowed,
@@ -401,7 +402,97 @@ describe(readMerged, () => {
       [1, 5],
     );
 
-    assert.deepStrictEqual(read.value[0]?.closingIssues, [3]);
+    assert.deepStrictEqual(
+      read.value[0]?.closingIssues.map(({ number }) => number),
+      [3],
+    );
+  });
+
+  test('gives each issue a body closes its title and state, and adds the issues GitHub links', async () => {
+    const { transport, sent } = recordedTransport({
+      '/repos/o/n/pulls?state=closed&sort=updated&direction=desc&per_page=100':
+        ok([
+          closedPull(1, '2026-11-09T00:00:00Z'),
+          closedPull(2, '2026-11-08T00:00:00Z'),
+        ]),
+      '/repos/o/n/issues/3': ok({
+        title: 'the third',
+        html_url: 'https://github.com/o/n/issues/3',
+        state: 'closed',
+      }),
+    });
+
+    const read = await readMerged(
+      { transport, owner: 'o', name: 'n', token: 'token' },
+      { limit: 10, days: 3, nowEpochMs: Date.parse('2026-11-10T00:00:00Z') },
+      (numbers) =>
+        Promise.resolve(
+          Result.ok(
+            new Map<number, readonly ClosingIssue[]>(
+              numbers
+                .filter((number) => number === 2)
+                .map((number) => [
+                  number,
+                  [
+                    {
+                      number: 7,
+                      title: 'linked',
+                      url: 'https://github.com/o/n/issues/7',
+                      state: 'closed',
+                    },
+                  ],
+                ]),
+            ),
+          ),
+        ),
+    );
+
+    assert.deepStrictEqual(
+      Result.unwrapThrow(read).map(({ number, closingIssues }) => [
+        number,
+        closingIssues.map(({ number: issue, title, state }) => [
+          issue,
+          title,
+          state,
+        ]),
+      ]),
+      [
+        [1, [[3, 'the third', 'closed']]],
+        [
+          2,
+          [
+            [3, 'the third', 'closed'],
+            [7, 'linked', 'closed'],
+          ],
+        ],
+      ],
+    );
+
+    // An issue two of them close is read once.
+    assert.strictEqual(
+      sent.filter(({ url }) => url.endsWith('/issues/3')).length,
+      1,
+    );
+  });
+
+  test('fails with the links GitHub keeps unread', async () => {
+    const read = await readMerged(
+      contextOf({
+        '/repos/o/n/pulls?state=closed&sort=updated&direction=desc&per_page=100':
+          ok([closedPull(1, '2026-11-09T00:00:00Z')]),
+      }),
+      { limit: 10, days: 3, nowEpochMs: Date.parse('2026-11-10T00:00:00Z') },
+      () =>
+        Promise.resolve(
+          Result.err({
+            kind: 'unavailable',
+            what: 'the issues the merged pull requests close',
+            message: '502',
+          }),
+        ),
+    );
+
+    assert.isTrue(Result.isErr(read));
   });
 
   test('reads on while every pull request on a page is in the window', async () => {

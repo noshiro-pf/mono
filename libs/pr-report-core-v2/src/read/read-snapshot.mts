@@ -12,6 +12,7 @@ import {
   parseStartAfter,
 } from '../conventions/index.mjs';
 import type {
+  ClosingIssue,
   IssueFacts,
   OpenIssues,
   PullRequestFacts,
@@ -21,6 +22,7 @@ import type {
   Snapshot,
 } from '../snapshot/index.mjs';
 import { skipped } from './classify.mjs';
+import { readLinkedClosingIssuesGraphql } from './graphql-merged.mjs';
 import { readPullRequestsGraphql } from './graphql-pull-requests.mjs';
 import { readRepositoryFactsGraphql } from './graphql-repository.mjs';
 import { readHeadChecks } from './rest-checks.mjs';
@@ -68,6 +70,7 @@ export const readSnapshotRest = async (
   readSnapshotWith(context, options, {
     repositoryFacts: readRepositoryFacts,
     pullRequests: readPullRequests,
+    linkedClosingIssues: undefined,
   });
 
 /** The snapshot with the repository and the pull requests over GraphQL. */
@@ -78,6 +81,7 @@ export const readSnapshotGraphql = async (
   readSnapshotWith(context, options, {
     repositoryFacts: readRepositoryFactsGraphql,
     pullRequests: readPullRequestsGraphql,
+    linkedClosingIssues: readLinkedClosingIssuesGraphql,
   });
 
 /** The parts the two readers read each their own way. */
@@ -87,6 +91,16 @@ type ReaderParts = Readonly<{
     context: ReadContext,
     options: Readonly<{ viewer: Read<string>; defaultBranch: string }>,
   ) => Promise<Read<readonly PullRequestFacts[]>>;
+  /**
+   * The issues GitHub links to the merged pull requests; `undefined` where they
+   * cannot be read (REST serves none).
+   */
+  linkedClosingIssues:
+    | ((
+        context: ReadContext,
+        numbers: readonly number[],
+      ) => Promise<Read<ReadonlyMap<number, readonly ClosingIssue[]>>>)
+    | undefined;
 }>;
 
 /** Numbers named, read as issues or as references. */
@@ -206,6 +220,8 @@ const readSnapshotWith = async (
 ): Promise<Read<Snapshot>> => {
   const repository = await parts.repositoryFacts(context);
 
+  const { linkedClosingIssues } = parts;
+
   if (Result.isErr(repository)) {
     return repository;
   }
@@ -247,11 +263,17 @@ const readSnapshotWith = async (
       async ([pulls, issues]) =>
         [pulls, issues, await namedOf(current, viewer, pulls, issues)] as const,
     ),
-    readMerged(current, {
-      limit: options.mergedLimit,
-      days: options.mergedDays,
-      nowEpochMs: options.nowEpochMs,
-    }),
+    readMerged(
+      current,
+      {
+        limit: options.mergedLimit,
+        days: options.mergedDays,
+        nowEpochMs: options.nowEpochMs,
+      },
+      linkedClosingIssues === undefined
+        ? undefined
+        : async (numbers) => linkedClosingIssues(current, numbers),
+    ),
     // Once the pull requests are read too, the heads moved off their layers.
     Promise.all([
       readQueueLayers(current, defaultBranchTip),

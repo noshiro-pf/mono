@@ -7,6 +7,7 @@ import { Arr, Result } from 'ts-data-forge';
 import * as t from 'ts-fortress';
 import { closingKeywordIssuesInHtml } from '../conventions/index.mjs';
 import type {
+  ClosingIssue,
   FollowedPullRequest,
   IssueFacts,
   MergedPullRequestFacts,
@@ -16,7 +17,11 @@ import type {
 } from '../snapshot/index.mjs';
 import { allRead } from './all-read.mjs';
 import { isGone, isNotFound } from './classify.mjs';
-import { labelsOf, readOwnComments } from './rest-pull-requests.mjs';
+import {
+  labelsOf,
+  readClosingIssue,
+  readOwnComments,
+} from './rest-pull-requests.mjs';
 import {
   answersAsContext,
   RenderedBodySchema,
@@ -102,11 +107,18 @@ export const readNumbers = async (
 
 /**
  * The pull requests merged most recently, up to `limit` and within `days` of
- * `nowEpochMs`, each with what its body closes.
+ * `nowEpochMs`, each with the issues it closed, as an open one's are read: the
+ * closing keywords of its body, each read for its title and state unless
+ * `readLinked` gives it, then what `readLinked` gives (the issues GitHub links,
+ * where GraphQL is read; none over REST, which does not serve them). An issue
+ * several of them close is read once.
  */
 export const readMerged = async (
   context: ReadContext,
   options: Readonly<{ limit: number; days: number; nowEpochMs: number }>,
+  readLinked: (
+    numbers: readonly number[],
+  ) => Promise<Read<ReadonlyMap<number, readonly ClosingIssue[]>>> = noneLinked,
 ): Promise<Read<readonly MergedPullRequestFacts[]>> => {
   const since = options.nowEpochMs - options.days * 24 * 60 * 60 * 1000;
 
@@ -138,28 +150,74 @@ export const readMerged = async (
     return listed;
   }
 
-  return Result.ok(
-    Arr.generate(function* () {
-      for (const pr of listed.value) {
-        if (pr.merged_at !== null && Date.parse(pr.merged_at) >= since) {
-          yield {
-            number: pr.number,
-            title: pr.title,
-            author: pr.user?.login ?? '',
-            url: pr.html_url,
-            headRef: pr.head.ref,
-            baseRef: pr.base.ref,
-            mergedAt: pr.merged_at,
-            headSha: pr.head.sha,
-            mergeCommitSha: pr.merge_commit_sha ?? '',
-            labels: labelsOf(pr.labels),
-            closingIssues: closingKeywordIssuesInHtml(context, pr.body_html),
-          };
-        }
+  const merged = Arr.generate(function* () {
+    for (const pr of listed.value) {
+      if (pr.merged_at !== null && Date.parse(pr.merged_at) >= since) {
+        yield { pr, mergedAt: pr.merged_at } as const;
       }
-    })
-      .toSorted((a, b) => Date.parse(b.mergedAt) - Date.parse(a.mergedAt))
-      .slice(0, options.limit),
+    }
+  })
+    .toSorted((a, b) => Date.parse(b.mergedAt) - Date.parse(a.mergedAt))
+    .slice(0, options.limit);
+
+  const linked = await readLinked(merged.map(({ pr }) => pr.number));
+
+  if (Result.isErr(linked)) {
+    return linked;
+  }
+
+  const named = merged.map(({ pr }) => ({
+    number: pr.number,
+    named: closingKeywordIssuesInHtml(context, pr.body_html),
+    linked: linked.value.get(pr.number) ?? [],
+  }));
+
+  // Each issue a body names that no link gives, read once.
+  const toRead = Arr.uniq(
+    named.flatMap(({ named: numbers, linked: links }) =>
+      numbers.filter((number) => links.every((link) => link.number !== number)),
+    ),
+  );
+
+  const issues = new Map<number, ClosingIssue>([
+    ...named.flatMap(({ linked: links }) =>
+      links.map((issue) => [issue.number, issue] as const),
+    ),
+    ...(await Promise.all(
+      toRead.map(
+        async (number) =>
+          [number, await readClosingIssue(context, number)] as const,
+      ),
+    )),
+  ]);
+
+  return Result.ok(
+    Arr.zip(merged, named).map(
+      ([{ pr, mergedAt }, { named: numbers, linked: links }]) => ({
+        number: pr.number,
+        title: pr.title,
+        author: pr.user?.login ?? '',
+        url: pr.html_url,
+        headRef: pr.head.ref,
+        baseRef: pr.base.ref,
+        mergedAt,
+        headSha: pr.head.sha,
+        mergeCommitSha: pr.merge_commit_sha ?? '',
+        labels: labelsOf(pr.labels),
+        closingIssues: [
+          ...Arr.generate(function* () {
+            for (const number of numbers) {
+              const issue = issues.get(number);
+
+              if (issue !== undefined) {
+                yield issue;
+              }
+            }
+          }),
+          ...links.filter(({ number }) => !numbers.includes(number)),
+        ],
+      }),
+    ),
   );
 };
 
@@ -237,6 +295,11 @@ export const readBlockedBy = async (
             .filter(({ repository_url: url }) => answersAsContext(url, context))
             .map(({ number: blocking }) => blocking),
       );
+
+/** Over REST, which does not serve the issues GitHub links: none. */
+const noneLinked = (): Promise<
+  Read<ReadonlyMap<number, readonly ClosingIssue[]>>
+> => Promise.resolve(Result.ok(new Map<number, readonly ClosingIssue[]>()));
 
 const readAsPullRequest = async (
   context: ReadContext,

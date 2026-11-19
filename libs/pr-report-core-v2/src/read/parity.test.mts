@@ -3,7 +3,8 @@
  * The two readers, given recorded answers of one repository state, build the
  * same snapshot (`libs/pr-merge-queue-v2/spec/README.md`, §3), save for what
  * one of them cannot read: the parts only GraphQL serves, the open
- * conversations REST cannot tell, and a rename's old path GraphQL withholds.
+ * conversations REST cannot tell, a rename's old path GraphQL withholds, and
+ * the issues GitHub links to a merged pull request, which REST does not serve.
  */
 
 import { Result } from 'ts-data-forge';

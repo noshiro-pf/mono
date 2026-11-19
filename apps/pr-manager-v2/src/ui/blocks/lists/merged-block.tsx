@@ -159,26 +159,9 @@ const MergedRow = ({
         />
       </span>
       <If
-        cond={pr.pipe(
-          map(
-            ({ labels, closingIssues }) =>
-              Arr.isNonEmpty(labels) || Arr.isNonEmpty(closingIssues),
-          ),
-        )}
+        cond={pr.pipe(map(({ labels }) => Arr.isNonEmpty(labels)))}
         then={
           <span class={constant('row-meta')}>
-            <For
-              items={pr.pipe(map(({ closingIssues }) => closingIssues))}
-              key={(n) => n}
-            >
-              {(n$) => (
-                <ExternalLink
-                  href={n$.pipe(map((n) => `${repoUrl(repo)}/issues/${n}`))}
-                >
-                  {n$.pipe(map((n) => `closed #${n}`))}
-                </ExternalLink>
-              )}
-            </For>
             <For
               items={pr.pipe(map(({ labels }) => labels))}
               key={({ name }) => name}
@@ -186,6 +169,50 @@ const MergedRow = ({
               {(label$) => <LabelChip label={label$} />}
             </For>
           </span>
+        }
+      />
+      <If
+        cond={pr.pipe(
+          map(({ closingIssues }) => Arr.isNonEmpty(closingIssues)),
+        )}
+        then={
+          <ul class={constant('merged-issues')}>
+            <For
+              items={pr.pipe(map(({ closingIssues }) => closingIssues))}
+              key={({ number }) => number}
+            >
+              {(issue$) => (
+                <li>
+                  <span
+                    class={constant('merged-issue-state')}
+                    data-state={issue$.pipe(map(({ state }) => state))}
+                    title={issue$.pipe(map(({ state }) => `issue ${state}`))}
+                  >
+                    {issue$.pipe(
+                      map(({ state }) =>
+                        state === 'open' ? '◯' : state === 'closed' ? '✓' : '?',
+                      ),
+                    )}
+                  </span>
+                  {constant(' closes ')}
+                  <ExternalLink
+                    href={issue$.pipe(
+                      // An issue whose read failed has no URL of its own.
+                      map(({ number, url }) =>
+                        url === '' ? `${repoUrl(repo)}/issues/${number}` : url,
+                      ),
+                    )}
+                  >
+                    {issue$.pipe(
+                      map(({ number, title }) =>
+                        title === '' ? `#${number}` : `#${number} ${title}`,
+                      ),
+                    )}
+                  </ExternalLink>
+                </li>
+              )}
+            </For>
+          </ul>
         }
       />
     </span>

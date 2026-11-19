@@ -1,5 +1,6 @@
 export * from './all-read.mjs';
 export * from './classify.mjs';
+export * from './graphql-merged.mjs';
 export * from './graphql-pull-requests.mjs';
 export * from './graphql-repository.mjs';
 export * from './graphql.mjs';
