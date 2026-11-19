@@ -70,9 +70,9 @@ see "Japanese text".
 Workspace globs are in `pnpm-workspace.yaml`; a directory is a member only
 with a `package.json`; `tools/configs/` and `tools/scripts/` have none by design.
 
-**One `.gitignore`, at the root** (`check:prose:nested-gitignore`), and one
-deliberate package-level `.prettierignore` (`languages/sumi/conformance/`),
-whose header says why; another has to answer it first.
+**One `.gitignore` and one `.prettierignore`, at the root**
+(`check:prose:nested-gitignore`, whose allow-list keeps the package-level
+`.prettierignore` that the root file cannot serve, each with its reason).
 
 Inside a package: `src/` (`entry-point.mts` or `index.mts` is the public
 entry; `src/cmd/` for CLIs), `test/` (`test/browser/` for DOM tests),
