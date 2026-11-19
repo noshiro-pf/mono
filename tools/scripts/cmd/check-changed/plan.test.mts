@@ -422,10 +422,10 @@ describe('classifyChanges', () => {
   );
 
   test.each([
-    ['strict-lib/README.md', ['strict-lib']],
+    ['strict-lib/README.md', ['prose', 'strict-lib']],
     [
       'strict-lib/v5.1/output/diff-from-prev/summary.txt',
-      ['strict-lib', 'strict-lib-output'],
+      ['prose', 'strict-lib', 'strict-lib-output'],
     ],
   ] as const)(
     '%s, which the code gate ignores, is no strict-lib code',
@@ -996,6 +996,20 @@ describe('buildPlan', () => {
           )
           .map(({ kind }) => kind),
         ['generate', 'generate'],
+      );
+    });
+
+    test('a strict-lib document plans check:md, as CI lints it', () => {
+      for (const file of [
+        'strict-lib/README.md',
+        'strict-lib/v7.0/output/lib/README.md',
+      ]) {
+        assert.include(planCommands(readers, [file]), 'run check:md');
+      }
+
+      assert.notInclude(
+        planCommands(readers, ['strict-lib/scripts-common/src/convert.mts']),
+        'run check:md',
       );
     });
 
