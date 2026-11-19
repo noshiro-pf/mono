@@ -632,8 +632,8 @@ const scratchGitEnv = (): NodeJS.ProcessEnv =>
 /**
  * The lines of the `commit` job's script that decide which paths a patch may
  * carry: from the pattern naming a published check to the end of the loop that
- * holds each published `tsconfig` to the local space's. Read from the workflow
- * so that what is tested is what runs.
+ * holds each published `tsconfig` to the local space's, after the helpers they
+ * refuse through. Read from the workflow so that what is tested is what runs.
  */
 const readPathCheck = async (): Promise<string> => {
   // eslint-disable-next-line security/detect-non-literal-fs-filename
@@ -674,7 +674,25 @@ const readPathCheck = async (): Promise<string> => {
 
   assert.isAbove(end, start);
 
-  return lines.slice(start, end + 1).join('\n');
+  // The block refuses through `refuse`, and its trap calls `unpause`, both
+  // defined at the top of the step with the pause they lift: from `resume=` to
+  // the blank line after `refuse`.
+  const preambleStart = lines.findIndex((line) => line.startsWith('resume='));
+
+  const preambleEnd = lines.findIndex(
+    (line, index) => index > preambleStart && line.trim() === '',
+  );
+
+  assert.isAtLeast(preambleStart, 0);
+
+  assert.isAbove(preambleEnd, preambleStart);
+
+  assert.isBelow(preambleEnd, start);
+
+  return [
+    ...lines.slice(preambleStart, preambleEnd),
+    ...lines.slice(start, end + 1),
+  ].join('\n');
 };
 
 const write = async (

@@ -320,6 +320,27 @@ jobs:
           # else; the job's own `contents: read` is all it needs.
           RELEASES_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          # The patch's names reach this log (a refusal lists them, `git`
+          # prints them), and the runner reads `::` at the start of a line,
+          # leading spaces aside, and `##[` anywhere in one as a workflow
+          # command. So nothing is read as one until the step ends, and a
+          # refusal takes the pause off before its `::error::`. The token is
+          # drawn here, after the patch was made.
+          resume="$(openssl rand -hex 16)"
+          echo "::stop-commands::${resume}"
+          unpause() {
+            if [ -n "$resume" ]; then
+              echo "::${resume}::"
+              resume=''
+            fi
+          }
+          trap unpause EXIT
+          refuse() {
+            unpause
+            printf '::error::%s\n' "$1"
+            exit 1
+          }
+
           # Applied, not executed. `git apply` refuses paths outside the work
           # tree unless asked otherwise, and a diff has no way to express a
           # `.git/` entry, so what a patch can carry is content — which is
@@ -425,9 +446,8 @@ jobs:
             | grep -Ev "$tsconfig_copy" || true)"
 
           if [ -n "$unexpected" ]; then
-            echo '::error::The patch carries paths a dependency update does not write, so it is not one; refusing to commit it.'
             printf '%s\n' "$unexpected"
-            exit 1
+            refuse 'The patch carries paths a dependency update does not write, so it is not one; refusing to commit it.'
           fi
 
           # A published project's check is a program the pull request runs, and
@@ -449,8 +469,7 @@ jobs:
             # the refusal to the message below.
             blob="$(git rev-parse --verify --quiet ":${copy}" || true)"
             if [ -z "$blob" ] || [ "$blob" != "$(git rev-parse --verify --quiet "HEAD:verify-npm-packages/smoke/${source}")" ]; then
-              echo "::error::${copy} is not a copy of verify-npm-packages/smoke/${source} as HEAD has it; refusing to commit it."
-              exit 1
+              refuse "${copy} is not a copy of verify-npm-packages/smoke/${source} as HEAD has it; refusing to commit it."
             fi
           done < <(printf '%s\n' "$changed" | grep -E "$smoke_copy" || true)
 
@@ -475,10 +494,9 @@ jobs:
           # Each staged copy is written here, as its bytes, for both parsers:
           # a shell variable would drop a NUL.
           blob_file="$(mktemp "${RUNNER_TEMP}/tsconfig.XXXXXX")"
-          trap 'rm -f "$blob_file"' EXIT
+          trap 'rm -f "$blob_file"; unpause' EXIT
           not_local() {
-            echo "::error::${copy} is not ${local_copy} as HEAD has it; refusing to commit it."
-            exit 1
+            refuse "${copy} is not ${local_copy} as HEAD has it; refusing to commit it."
           }
           while IFS= read -r copy; do
             [ -n "$copy" ] || continue
@@ -486,8 +504,7 @@ jobs:
             # Not in a pipeline, so that git failing is told apart from a copy
             # with no mode.
             if ! entry="$(git ls-files --stage -- ":(literal)${copy}")"; then
-              echo "::error::git could not list ${copy}; refusing to commit it."
-              exit 1
+              refuse "git could not list ${copy}; refusing to commit it."
             fi
             # The one entry, for the copy itself, of a regular file: a copy
             # the patch deletes has none, a link or an executable has another
@@ -500,20 +517,17 @@ jobs:
             # A blob that cannot be read is git's failure, not a verdict on
             # the file.
             if ! git show ":${copy}" >"$blob_file"; then
-              echo "::error::git could not read ${copy}; refusing to commit it."
-              exit 1
+              refuse "git could not read ${copy}; refusing to commit it."
             fi
             status=0
             node -e "$strict_json" "$blob_file" || status=$?
             case "$status" in
               0) ;;
               3)
-                echo "::error::${copy} is not JSON; refusing to commit it."
-                exit 1
+                refuse "${copy} is not JSON; refusing to commit it."
                 ;;
               *)
-                echo "::error::node could not check ${copy} (exit ${status}); refusing to commit it."
-                exit 1
+                refuse "node could not check ${copy} (exit ${status}); refusing to commit it."
                 ;;
             esac
             # The staged text's parse errors go nowhere, as node's do for a
@@ -544,8 +558,7 @@ jobs:
             well_formed='[.[] | (.version | type == "string" and test("\\A[0-9]+\\.[0-9]+\\.[0-9]+\\z")), (.assets[] | .sha256 | type == "string" and test("\\A[0-9a-f]{64}\\z"))] | all'
             if [ "$(jq -S "$strip" "$before")" != "$(jq -S "$strip" "$pins")" ] ||
               [ "$(jq "$well_formed" "$pins")" != 'true' ]; then
-              echo "::error::The patch changes ${pins} beyond well-formed versions and digests; refusing to commit it."
-              exit 1
+              refuse "The patch changes ${pins} beyond well-formed versions and digests; refusing to commit it."
             fi
 
             # Well-formed is not yet what `update-release-binaries` writes.
@@ -563,8 +576,7 @@ jobs:
             hold_minutes="$(git show HEAD:pnpm-workspace.yaml |
               sed -nE 's/^minimumReleaseAge: *([0-9]+)( +#.*)?$/\1/p' | head -n 1)"
             if [ -z "$hold_minutes" ]; then
-              echo "::error::pnpm-workspace.yaml has no top-level minimumReleaseAge whose value is a bare number of minutes to hold the release-binary pins to; refusing to commit them."
-              exit 1
+              refuse "pnpm-workspace.yaml has no top-level minimumReleaseAge whose value is a bare number of minutes to hold the release-binary pins to; refusing to commit them."
             fi
             cutoff="$(($(date +%s) - 10#${hold_minutes} * 60))"
             # shellcheck disable=SC2016 # a jq program; its $ are jq variables
@@ -591,29 +603,24 @@ jobs:
                 ] | all)'
             while IFS= read -r name; do
               if ! compared="$(jq -r --arg name "$name" --slurpfile before "$before" "$direction" "$pins")"; then
-                echo "::error::${pins}: ${name}: could not be compared with HEAD (above); refusing to commit it."
-                exit 1
+                refuse "${pins}: ${name}: could not be compared with HEAD (above); refusing to commit it."
               fi
               IFS=$'\t' read -r verdict repository version <<<"$compared"
               if [ "$verdict" = 'same' ]; then
                 continue
               fi
               if [ "$verdict" != 'moved' ]; then
-                echo "::error::${pins}: ${name}: ${verdict}; refusing to commit it."
-                exit 1
+                refuse "${pins}: ${name}: ${verdict}; refusing to commit it."
               fi
               if ! release="$(GH_TOKEN="$RELEASES_TOKEN" gh api "repos/${repository}/releases/tags/v${version}")"; then
-                echo "::error::${pins}: ${name}: could not read the release v${version} of ${repository} from the Releases API (above); refusing to commit unverified digests."
-                exit 1
+                refuse "${pins}: ${name}: could not read the release v${version} of ${repository} from the Releases API (above); refusing to commit unverified digests."
               fi
               if ! verified="$(jq --arg name "$name" --slurpfile pins "$pins" --argjson cutoff "$cutoff" \
                 "$matches" <<<"$release")"; then
-                echo "::error::${pins}: ${name}: could not read the Releases API's answer for v${version} of ${repository} (above); refusing to commit unverified digests."
-                exit 1
+                refuse "${pins}: ${name}: could not read the Releases API's answer for v${version} of ${repository} (above); refusing to commit unverified digests."
               fi
               if [ "$verified" != 'true' ]; then
-                echo "::error::${pins}: ${name}: v${version} of ${repository} is not a published, non-prerelease release older than minimumReleaseAge whose assets have these digests; refusing to commit it."
-                exit 1
+                refuse "${pins}: ${name}: v${version} of ${repository} is not a published, non-prerelease release older than minimumReleaseAge whose assets have these digests; refusing to commit it."
               fi
             done < <(jq -r 'keys[]' "$before")
           fi
