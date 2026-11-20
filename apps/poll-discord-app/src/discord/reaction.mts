@@ -6,7 +6,7 @@ import { firestoreApi } from '../firebase/index.mjs';
 import {
   createUserIdToDisplayNameMap,
   getUserIdsFromAnswers,
-  rpCreateSummaryMessage,
+  rpCreateSummaryMessages,
 } from '../functions/index.mjs';
 import {
   toDateOptionId,
@@ -180,7 +180,7 @@ const onMessageReactCommon = async (
   const result = await Result.fromPromise(
     channel.messages
       .edit(pollId, {
-        embeds: [rpCreateSummaryMessage(resultPoll, userIdToDisplayName)],
+        embeds: rpCreateSummaryMessages(resultPoll, userIdToDisplayName),
       })
       .then(() => undefined),
   );
