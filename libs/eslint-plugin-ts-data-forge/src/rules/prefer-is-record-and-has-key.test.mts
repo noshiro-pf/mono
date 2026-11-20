@@ -1045,17 +1045,40 @@ describe('prefer-is-record-and-has-key on Reflect.has', () => {
     ],
     invalid: [
       {
-        name: 'a plain record is fixed to hasKey',
+        name: 'a key typed string is suggested: hasKey narrows the record to never where it answers false',
         code: dedent`
           declare const rec: Readonly<Record<string, number>>;
           declare const key: string;
           const ok = Reflect.has(rec, key);
         `,
+        output: null,
+        errors: [
+          {
+            messageId: 'wideKeyNarrowsToNever',
+            suggestions: [
+              {
+                messageId: 'suggestHasKeyForWideKey',
+                output: dedent`
+                  import { hasKey } from 'ts-data-forge';
+                  declare const rec: Readonly<Record<string, number>>;
+                  declare const key: string;
+                  const ok = hasKey(rec, key);
+                `,
+              },
+            ],
+          },
+        ],
+      },
+      {
+        name: 'a plain record with a literal key is fixed to hasKey',
+        code: dedent`
+          declare const rec: Readonly<Record<string, number>>;
+          const ok = Reflect.has(rec, 'a');
+        `,
         output: dedent`
           import { hasKey } from 'ts-data-forge';
           declare const rec: Readonly<Record<string, number>>;
-          declare const key: string;
-          const ok = hasKey(rec, key);
+          const ok = hasKey(rec, 'a');
         `,
         errors: [{ messageId: 'useHasKey' }],
       },
@@ -1169,6 +1192,220 @@ describe('prefer-is-record-and-has-key on Reflect.has', () => {
             ],
           },
         ],
+      },
+    ],
+  });
+});
+
+// What the fix would break, offered as a suggestion instead: a key wider than a
+// union of literals, which `hasKey` narrows the record to `never` for where it
+// answers `false`; a key typed as an `Object.prototype` member; and a type
+// alias with a method signature, which a class may implement.
+describe('prefer-is-record-and-has-key where the fix would break the code', () => {
+  tester.run('prefer-is-record-and-has-key', preferIsRecordAndHasKey, {
+    valid: [
+      {
+        name: 'Reflect.has on a type alias with a method signature is left alone, as off any record that is not plain',
+        code: dedent`
+          type Store = {
+            [key: string]: unknown;
+            getItem(key: string): unknown;
+          };
+          declare const s: Store;
+          const ok = Reflect.has(s, 'getItem');
+        `,
+      },
+    ],
+    invalid: [
+      {
+        name: '`key in rec` with a key typed string is suggested',
+        code: dedent`
+          declare const rec: Readonly<Record<string, number>>;
+          declare const key: string;
+          const ok = key in rec;
+        `,
+        output: null,
+        errors: [
+          {
+            messageId: 'wideKeyNarrowsToNever',
+            suggestions: [
+              {
+                messageId: 'suggestHasKeyForWideKey',
+                output: dedent`
+                  import { hasKey } from 'ts-data-forge';
+                  declare const rec: Readonly<Record<string, number>>;
+                  declare const key: string;
+                  const ok = hasKey(rec, key);
+                `,
+              },
+            ],
+          },
+        ],
+      },
+      {
+        name: '`Object.hasOwn(rec, key)` with a key typed string is suggested',
+        code: dedent`
+          declare const rec: Readonly<Record<string, number>>;
+          declare const key: string;
+          const ok = Object.hasOwn(rec, key);
+        `,
+        output: null,
+        errors: [
+          {
+            messageId: 'wideKeyNarrowsToNever',
+            suggestions: [
+              {
+                messageId: 'suggestHasKeyForWideKey',
+                output: dedent`
+                  import { hasKey } from 'ts-data-forge';
+                  declare const rec: Readonly<Record<string, number>>;
+                  declare const key: string;
+                  const ok = hasKey(rec, key);
+                `,
+              },
+            ],
+          },
+        ],
+      },
+      {
+        name: 'a key typed as an Object.prototype member, though not written as one, is suggested',
+        code: dedent`
+          declare const rec: Readonly<Record<string, unknown>>;
+          const k = 'toString';
+          const ok = Reflect.has(rec, k);
+        `,
+        output: null,
+        errors: [
+          {
+            messageId: 'inReadsPrototypeChain',
+            suggestions: [
+              {
+                messageId: 'suggestOwnPropertyCheck',
+                output: dedent`
+                  import { hasKey } from 'ts-data-forge';
+                  declare const rec: Readonly<Record<string, unknown>>;
+                  const k = 'toString';
+                  const ok = hasKey(rec, k);
+                `,
+              },
+            ],
+          },
+        ],
+      },
+      {
+        name: '`k in rec` with a key typed as an Object.prototype member is suggested',
+        code: dedent`
+          declare const rec: Readonly<Record<string, unknown>>;
+          const k = 'toString';
+          const ok = k in rec;
+        `,
+        output: null,
+        errors: [
+          {
+            messageId: 'inReadsPrototypeChain',
+            suggestions: [
+              {
+                messageId: 'suggestOwnPropertyCheck',
+                output: dedent`
+                  import { hasKey } from 'ts-data-forge';
+                  declare const rec: Readonly<Record<string, unknown>>;
+                  const k = 'toString';
+                  const ok = hasKey(rec, k);
+                `,
+              },
+            ],
+          },
+        ],
+      },
+      {
+        name: 'a template literal naming an Object.prototype member is suggested',
+        code: dedent`
+          declare const rec: Readonly<Record<string, unknown>>;
+          const ok = Reflect.has(rec, \`constructor\`);
+        `,
+        output: null,
+        errors: [
+          {
+            messageId: 'inReadsPrototypeChain',
+            suggestions: [
+              {
+                messageId: 'suggestOwnPropertyCheck',
+                output: dedent`
+                  import { hasKey } from 'ts-data-forge';
+                  declare const rec: Readonly<Record<string, unknown>>;
+                  const ok = hasKey(rec, \`constructor\`);
+                `,
+              },
+            ],
+          },
+        ],
+      },
+      {
+        name: 'a type alias with a method signature, which a class may implement, is suggested',
+        code: dedent`
+          type Store = {
+            [key: string]: unknown;
+            getItem(key: string): unknown;
+          };
+          declare const s: Store;
+          const ok = 'getItem' in s;
+        `,
+        output: null,
+        errors: [
+          {
+            messageId: 'inReadsPrototypeChain',
+            suggestions: [
+              {
+                messageId: 'suggestOwnPropertyCheck',
+                output: dedent`
+                  import { hasKey } from 'ts-data-forge';
+                  type Store = {
+                    [key: string]: unknown;
+                    getItem(key: string): unknown;
+                  };
+                  declare const s: Store;
+                  const ok = hasKey(s, 'getItem');
+                `,
+              },
+            ],
+          },
+        ],
+      },
+      {
+        name: 'a key typed as a union of string literals is still fixed',
+        code: dedent`
+          declare const rec: Readonly<Record<string, number>>;
+          declare const key: 'a' | 'b';
+          const ok = key in rec;
+        `,
+        output: dedent`
+          import { hasKey } from 'ts-data-forge';
+          declare const rec: Readonly<Record<string, number>>;
+          declare const key: 'a' | 'b';
+          const ok = hasKey(rec, key);
+        `,
+        errors: [{ messageId: 'useHasKey' }],
+      },
+      {
+        name: 'an object type literal with only property signatures is still fixed',
+        code: dedent`
+          type Bag = {
+            [key: string]: unknown;
+            a: number;
+          };
+          declare const bag: Bag;
+          const ok = 'a' in bag;
+        `,
+        output: dedent`
+          import { hasKey } from 'ts-data-forge';
+          type Bag = {
+            [key: string]: unknown;
+            a: number;
+          };
+          declare const bag: Bag;
+          const ok = hasKey(bag, 'a');
+        `,
+        errors: [{ messageId: 'useHasKey' }],
       },
     ],
   });
