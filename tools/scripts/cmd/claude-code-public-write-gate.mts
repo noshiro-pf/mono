@@ -71,8 +71,9 @@ import type { UnknownRecord } from 'ts-type-forge';
  * The review the hold asks for covers the diffs, and
  * `check:prose:private-pointers`, which runs this file's
  * {@link findPrivatePointers} over every file of the checkout, fails in
- * `check-changed` before the push and in CI on any diff that runs the checks
- * (not one touching `experimental/` alone).
+ * `check-changed` before the push and in CI on any diff that runs the checks;
+ * {@link scanTracked} reads `experimental/` in `verify-lockfile.yml`, on a diff
+ * touching it alone, which runs none.
  *
  * **Silent when it cannot read the call** (no JSON, no tool name): exit 0 with
  * nothing printed, so a broken hook never stops a session's work.
@@ -195,6 +196,81 @@ export const findPrivatePointers = (
       pointer,
     }));
   });
+};
+
+/**
+ * `<file>: <pointer>` for its path, and `<file>:<line>: <pointer>` for its
+ * text. A binary file's bytes are read too, at the cost of a pointer its bytes
+ * might happen to spell.
+ */
+export const findPointers = (
+  file: string,
+  content: string,
+): readonly string[] =>
+  [
+    ...findPrivatePointers(file).map(({ pointer }) => `${file}: ${pointer}`),
+    ...findPrivatePointers(content).map(
+      ({ line, pointer }) => `${file}:${line}: ${pointer}`,
+    ),
+  ] as const;
+
+/**
+ * `node claude-code-public-write-gate.mts --scan <path>…`: prints
+ * {@link findPointers} for every file git tracks under the paths, in the current
+ * directory, and returns 1 when it found any, or when git or a file cannot be
+ * read; 0 otherwise. `check:prose:private-pointers` reads the whole checkout,
+ * untracked files included, but needs the dependencies installed; this needs
+ * `node` alone, for `verify-lockfile.yml`, which installs nothing.
+ */
+export const scanTracked = async (
+  paths: readonly string[],
+): Promise<number> => {
+  if (paths.length === 0) {
+    console.error('--scan names no path to read.');
+
+    return 1;
+  }
+
+  const listed = await readGit(process.cwd(), [
+    'ls-files',
+    '-z',
+    '--',
+    ...paths,
+  ]);
+
+  if (listed === undefined) {
+    console.error(`git ls-files failed for ${paths.join(' ')}.`);
+
+    return 1;
+  }
+
+  const files = listed.split('\0').filter((file) => file !== '');
+
+  const found = files.flatMap((file) => {
+    const content = readText(file);
+
+    return content === undefined
+      ? [`${file}: cannot be read, so it is not checked`]
+      : findPointers(file, content);
+  });
+
+  if (found.length > 0) {
+    console.error(
+      [
+        `${found.length} pointer(s) into the private repository, or file(s) unread:`,
+        ...found.map((line) => `  ${line}`),
+        'This repository is public: name the change by what it does here (CLAUDE.md, "Private information").',
+      ].join('\n'),
+    );
+
+    return 1;
+  }
+
+  console.info(
+    `${files.length} file(s) under ${paths.join(' ')} read; none points into the private repository.`,
+  );
+
+  return 0;
 };
 
 type Call = Readonly<{
@@ -749,7 +825,7 @@ const parseJson = (text: string): unknown => {
 
 const readText = (file: string): string | undefined => {
   try {
-    // eslint-disable-next-line security/detect-non-literal-fs-filename -- a file the published command names, or the ledger.
+    // eslint-disable-next-line security/detect-non-literal-fs-filename -- a file the published command names, the ledger, or a file `--scan` lists.
     return fs.readFileSync(file, 'utf8');
   } catch {
     return undefined;
@@ -1393,5 +1469,9 @@ const isDirectlyExecuted = (fileUrl: string): boolean =>
   fs.realpathSync(fileURLToPath(fileUrl)) === fs.realpathSync(process.argv[1]);
 
 if (isDirectlyExecuted(import.meta.url)) {
-  process.exit(await main(fs.readFileSync(0, 'utf8')));
+  process.exit(
+    process.argv[2] === '--scan'
+      ? await scanTracked(process.argv.slice(3))
+      : await main(fs.readFileSync(0, 'utf8')),
+  );
 }

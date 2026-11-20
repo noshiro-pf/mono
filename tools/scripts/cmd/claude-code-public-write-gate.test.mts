@@ -1182,3 +1182,88 @@ describe('the hook', () => {
     });
   });
 });
+
+/** Runs the hook's `--scan` with `node` in `cwd`, as `verify-lockfile.yml` does. */
+const scan = async (
+  cwd: string,
+  paths: readonly string[],
+): Promise<Readonly<{ status: number | null; output: string }>> => {
+  const result = await runFile(
+    process.execPath,
+    [scriptPath, '--scan', ...paths],
+    { cwd },
+  );
+
+  return {
+    status: result.status,
+    output: `${result.stdout}${result.stderr}`,
+  };
+};
+
+// `verify-lockfile.yml` runs it with `node` alone, on `experimental/`.
+describe('--scan', () => {
+  test('passes the tracked files under the paths that point nowhere', async () => {
+    await withTemporaryDirectory(async (tmp) => {
+      await git(tmp, ['init', '-q']);
+
+      write(
+        path.join(tmp, 'experimental/a.md'),
+        `Findings go to \`${PRIVATE_REPO}\`.\n`,
+      );
+
+      // Outside the paths, and untracked: neither is read.
+      write(path.join(tmp, 'docs/b.md'), `Closes ${PRIVATE_REPO}#13.\n`);
+
+      write(path.join(tmp, 'experimental/c.md'), `See ${PRIVATE_REPO}#13.\n`);
+
+      await git(tmp, ['add', 'experimental/a.md', 'docs/b.md']);
+
+      const result = await scan(tmp, ['experimental/']);
+
+      expect(result.status).toBe(0);
+
+      expect(result.output).toContain('1 file(s) under experimental/ read');
+    });
+  });
+
+  test('fails naming each pointer, by path and by line', async () => {
+    await withTemporaryDirectory(async (tmp) => {
+      await git(tmp, ['init', '-q']);
+
+      const named =
+        `experimental/${['mono-security', 'issues', '4.md'].join('/')}` as const;
+
+      write(
+        path.join(tmp, 'experimental/a.md'),
+        `x\nSee ${PRIVATE_REPO}#13.\n`,
+      );
+
+      write(path.join(tmp, named), 'clean\n');
+
+      await git(tmp, ['add', '.']);
+
+      const result = await scan(tmp, ['experimental/']);
+
+      expect(result.status).toBe(1);
+
+      expect(result.output).toContain(
+        `experimental/a.md:2: ${PRIVATE_REPO}#13.`,
+      );
+
+      expect(result.output).toContain(`${named}: ${named}`);
+    });
+  });
+
+  test('fails when it names no path, or git cannot list them', async () => {
+    await withTemporaryDirectory(async (tmp) => {
+      const unnamed = await scan(tmp, []);
+
+      expect(unnamed.status).toBe(1);
+
+      // Not a repository.
+      const unlisted = await scan(tmp, ['experimental/']);
+
+      expect(unlisted.status).toBe(1);
+    });
+  });
+});
