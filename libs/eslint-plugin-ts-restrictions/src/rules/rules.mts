@@ -22,6 +22,7 @@ import { preferNullishCoalescingWhenSafe } from './prefer-nullish-coalescing-whe
 import { preferOptionalChainOverTernary } from './prefer-optional-chain-over-ternary.mjs';
 import { preferRangeInNumberLineOrder } from './prefer-range-in-number-line-order.mjs';
 import { preferTernary } from './prefer-ternary.mjs';
+import { requireDateSetterDay } from './require-date-setter-day.mjs';
 
 export const tsRestrictionsRules = {
   'check-destructuring-completeness': checkDestructuringCompleteness,
@@ -47,4 +48,5 @@ export const tsRestrictionsRules = {
   'prefer-optional-chain-over-ternary': preferOptionalChainOverTernary,
   'prefer-range-in-number-line-order': preferRangeInNumberLineOrder,
   'prefer-ternary': preferTernary,
+  'require-date-setter-day': requireDateSetterDay,
 } as const satisfies ESLintPlugin['rules'];
