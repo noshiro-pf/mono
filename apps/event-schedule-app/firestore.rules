@@ -21,7 +21,10 @@
 //   owned by that account; one with `user.id == null` is editable by anyone.
 //   Nothing is written to answers after the event's deadline.
 // - `internal/values` holds the author's notification email. It is written
-//   by whoever may edit the event and read by the functions alone.
+//   by the event's signed-in author alone, and only as the verified email of
+//   their account, so that no one can have mail sent to an address that is not
+//   theirs; an event made signed out has none. It is read by the functions
+//   alone, which mail it only while it is still the author's verified email.
 // - `internal/closingMail` is the functions' record of the deadline the
 //   "answers closed" mail was sent for. No rule matches it, so no client reads
 //   or writes it; do not move it into `internal/values`, which the author's
@@ -324,7 +327,10 @@ service cloud.firestore {
 
       match /internal/values {
         allow read: if false;
-        allow create, update: if owns(event().author)
+        allow create, update: if isSignedIn()
+          && event().author.id == uid()
+          && request.auth.token.email_verified == true
+          && request.resource.data.email == request.auth.token.email
           && request.resource.data.keys().hasOnly(['email'])
           && request.resource.data.keys().hasAll(['email'])
           && request.resource.data.email is string

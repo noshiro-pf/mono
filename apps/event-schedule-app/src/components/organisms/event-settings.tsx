@@ -1,11 +1,11 @@
-import { createEventEmitter, map, type InitializedObservable } from 'synstate';
+import { map, type InitializedObservable } from 'synstate';
 import {
   constant,
-  createAfterUpdate,
+  deriveBindable,
   type Bindable,
   type JSX,
 } from 'synstate-dom';
-import { Optional } from 'ts-data-forge';
+import { Arr } from 'ts-data-forge';
 import {
   dict,
   notificationSettingsWithEmailDefaultValue,
@@ -34,6 +34,8 @@ type Props = Readonly<{
   onNotificationSettingsWithEmailChange: (
     value: NotificationSettingsWithEmail,
   ) => void;
+  /** The signed-in account's verified email; notifications need one. */
+  notificationEmail: InitializedObservable<string | undefined>;
 }>;
 
 export const EventSettings = ({
@@ -47,10 +49,25 @@ export const EventSettings = ({
   onToggleUseNotification,
   notificationSettingsWithEmail,
   onNotificationSettingsWithEmailChange,
+  notificationEmail,
 }: Props): JSX.Element => {
-  const [focusEmailInput$, focusEmailInput] = createEventEmitter();
+  const notificationDescription = notificationEmail.pipe(
+    map((email) =>
+      email === undefined
+        ? Arr.toPushed(
+            dc.notification.description,
+            dc.notification.requiresVerifiedAccount,
+          )
+        : dc.notification.description,
+    ),
+  );
 
-  const afterUpdate = createAfterUpdate();
+  // Off and with no verified email, notifications cannot be turned on. On, as
+  // an event saved before may be, they can always be turned off.
+  const notificationToggleDisabled = deriveBindable(
+    [notificationEmail, useNotification],
+    (email, use) => email === undefined && !use,
+  );
 
   return (
     <div class={constant(styles.settings)}>
@@ -69,12 +86,12 @@ export const EventSettings = ({
       />
       <hr />
       <ParagraphWithSwitch
-        description={dc.notification.description}
+        description={notificationDescription}
         elementToToggle={
           <NotificationSettingsComponent
             answerDeadline={answerDeadline}
             disabled={useNotification.pipe(map((use) => !use))}
-            focusEmailInput$={focusEmailInput$}
+            notificationEmail={notificationEmail}
             notificationSettingsWithEmail={notificationSettingsWithEmail.pipe(
               map(
                 (settings) =>
@@ -88,17 +105,9 @@ export const EventSettings = ({
           />
         }
         title={dc.notification.useNotification}
+        toggleDisabled={notificationToggleDisabled}
         toggleState={useNotification}
-        onToggle={() => {
-          onToggleUseNotification();
-
-          // The email input is wanted next once notifications are turned on.
-          afterUpdate(() => {
-            if (Optional.unwrap(useNotification.getSnapshot())) {
-              focusEmailInput();
-            }
-          });
-        }}
+        onToggle={onToggleUseNotification}
       />
       <hr />
       <AnswerIconSettingsComponent

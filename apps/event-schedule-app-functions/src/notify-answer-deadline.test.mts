@@ -11,6 +11,7 @@ import type { DeepReadonly, ReadonlyRecord } from 'ts-type-forge';
 import { getFirebaseConfig } from './env.mjs';
 import { notifyAfterAnswerDeadline } from './notify-answer-deadline.mjs';
 import { sendEmail } from './setup-mailer.mjs';
+import { verifiedEmailOf } from './verified-email-of.mjs';
 
 vi.mock(import('firebase-functions/v1'), async (importOriginal) => {
   const original = await importOriginal();
@@ -25,6 +26,10 @@ vi.mock(import('firebase-functions/v1'), async (importOriginal) => {
     },
   };
 });
+
+vi.mock(import('./verified-email-of.mjs'), () => ({
+  verifiedEmailOf: vi.fn(),
+}));
 
 vi.mock(import('./env.mjs'), async (importOriginal) => ({
   ...(await importOriginal()),
@@ -240,6 +245,7 @@ const eventClosingAt = (
 ): EventSchedule =>
   EventSchedule.fill({
     title: 'Party',
+    author: { id: 'author', name: 'Author' },
     answerDeadline,
     timezoneOffsetMinutes: 0,
     notificationSettings: NotificationSettings.fill({
@@ -269,6 +275,13 @@ describe(notifyAfterAnswerDeadline, () => {
 
     vi.mocked(logger.warn).mockClear();
 
+    // The accounts the events' authors have, each with its email verified.
+    vi.mocked(verifiedEmailOf).mockImplementation((uid) =>
+      Promise.resolve(
+        uid === 'author' || uid === 'other' ? `${uid}@example.com` : undefined,
+      ),
+    );
+
     vi.mocked(getFirebaseConfig).mockReturnValue({
       gmail: {
         email: 'from@example.com',
@@ -277,6 +290,33 @@ describe(notifyAfterAnswerDeadline, () => {
         'email-address-for-error-log': 'log@example.com',
       },
     });
+  });
+
+  test('mails no one for an event made signed out', async () => {
+    const { db, mut_docs } = createFakeFirestore({
+      [eventPath('e1')]: EventSchedule.fill({
+        ...eventClosingAt(deadlineAt(23, 5)),
+        author: { id: null, name: '' },
+      }),
+      [emailPath('e1')]: { email: 'author@example.com' },
+    });
+
+    await notifyAfterAnswerDeadline(db, at('01T23:10'));
+
+    assert.deepStrictEqual(sentTo(), []);
+
+    assert.isFalse(mut_docs.has(markPath('e1')));
+  });
+
+  test('mails no one when the stored email is not the author’s verified one', async () => {
+    const { db } = createFakeFirestore({
+      [eventPath('e1')]: eventClosingAt(deadlineAt(23, 5)),
+      [emailPath('e1')]: { email: 'someone-else@example.com' },
+    });
+
+    await notifyAfterAnswerDeadline(db, at('01T23:10'));
+
+    assert.deepStrictEqual(sentTo(), []);
   });
 
   test('mails the author once the deadline has passed, and not before', async () => {
@@ -588,7 +628,10 @@ describe(notifyAfterAnswerDeadline, () => {
 
     const { db, mut_docs, reads } = createFakeFirestore({
       ...oneEvent(),
-      [eventPath('e2')]: eventClosingAt(deadlineAt(23, 0)),
+      [eventPath('e2')]: EventSchedule.fill({
+        ...eventClosingAt(deadlineAt(23, 0)),
+        author: { id: 'other', name: 'Other' },
+      }),
       [emailPath('e2')]: { email: 'other@example.com' },
     });
 
@@ -699,7 +742,10 @@ describe(notifyAfterAnswerDeadline, () => {
   test('one failed send does not keep the other events from their mail', async () => {
     const { db, mut_docs } = createFakeFirestore({
       ...oneEvent(),
-      [eventPath('e2')]: eventClosingAt(deadlineAt(23, 0)),
+      [eventPath('e2')]: EventSchedule.fill({
+        ...eventClosingAt(deadlineAt(23, 0)),
+        author: { id: 'other', name: 'Other' },
+      }),
       [emailPath('e2')]: { email: 'other@example.com' },
     });
 

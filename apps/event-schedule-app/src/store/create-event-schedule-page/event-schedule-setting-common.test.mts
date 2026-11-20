@@ -69,6 +69,7 @@ const alice: EventScheduleSettingUser = {
   uid: 'u1',
   displayName: 'alice',
   email: 'alice@example.com',
+  emailVerified: true,
 } as const;
 
 const setup = (

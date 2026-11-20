@@ -12,6 +12,7 @@ import {
 } from '../../constants/index.mjs';
 import {
   normalizeEventSchedule,
+  notificationEmailOf,
   validateEventSchedule,
   validateEventScheduleAll,
 } from '../../functions/index.mjs';
@@ -100,11 +101,15 @@ export const createEventScheduleSettingStore = (
     setAnswerIcons(getBaseline().answerIcons);
   };
 
+  // Where notifications go: the signed-in account's verified email, the only
+  // one the Firestore rules take. With none, notifications cannot be turned on.
+  const notificationEmail$ = deps.fireAuthUser$.pipe(map(notificationEmailOf));
+
   const initialNotificationSettingsWithEmailFilled$ = derive(
-    [deps.fireAuthUser$, answerDeadline$],
-    (user, answerDeadline) => ({
+    [notificationEmail$, answerDeadline$],
+    (notificationEmail, answerDeadline) => ({
       ...notificationSettingsInitialValue,
-      email: user?.email ?? '',
+      email: notificationEmail ?? '',
       notifyAfterAnswerDeadline: answerDeadline !== undefined,
       notify00daysBeforeAnswerDeadline: answerDeadline !== undefined,
     }),
@@ -234,14 +239,30 @@ export const createEventScheduleSettingStore = (
         datetimeRangeList$,
         answerIcons$,
         notificationSettingsWithEmail$,
+        notificationEmail$,
       ],
-      (title, datetimeRangeList, answerIcons, notificationSettingsWithEmail) =>
+      (
+        title,
+        datetimeRangeList,
+        answerIcons,
+        notificationSettingsWithEmail,
+        notificationEmail,
+      ) =>
         validateEventSchedule({
           title,
           datetimeRangeList,
           answerIcons,
+          // Checked as the email that would be saved, the account's verified
+          // one, not the one the form took when notifications were turned on:
+          // the account may have signed out since, or the settings come from
+          // local storage.
           notificationSettingsWithEmail:
-            notificationSettingsWithEmail ?? 'none',
+            notificationSettingsWithEmail === undefined
+              ? 'none'
+              : {
+                  ...notificationSettingsWithEmail,
+                  email: notificationEmail ?? '',
+                },
         }),
     );
 
@@ -261,6 +282,7 @@ export const createEventScheduleSettingStore = (
         answerIcons$,
         useNotification$,
         notificationSettingsWithEmail$,
+        notificationEmail$,
         eventScheduleValidation$,
         eventScheduleNormalized$,
         eventScheduleValidationOk$,
@@ -275,6 +297,7 @@ export const createEventScheduleSettingStore = (
         answerIcons,
         useNotification,
         notificationSettingsWithEmail,
+        notificationEmail,
         eventScheduleValidation,
         eventScheduleNormalized,
         eventScheduleValidationOk,
@@ -288,6 +311,7 @@ export const createEventScheduleSettingStore = (
         answerIcons,
         useNotification,
         notificationSettingsWithEmail,
+        notificationEmail,
         eventScheduleValidation,
         eventScheduleNormalized,
         eventScheduleValidationOk,
@@ -350,4 +374,5 @@ export type EventScheduleSettingUser = Readonly<{
   uid: string;
   displayName: string | null;
   email: string | null;
+  emailVerified: boolean;
 }>;
