@@ -3,6 +3,7 @@ import {
   constant,
   deriveBindable,
   For,
+  If,
   mapBindable,
   type JSX,
 } from 'synstate-dom';
@@ -16,7 +17,7 @@ import {
   type StatusFilter,
 } from '../merge-order-view.mjs';
 import { PRIORITIES, PRIORITY_NAMES } from '../priority.mjs';
-import { mergeOrderStore, reader } from '../store/index.mjs';
+import { mergeOrderStore, reader, stackFoldStore } from '../store/index.mjs';
 import type { StatusRole } from '../verdict.mjs';
 import { OfTotal, StatTile, StatToggle } from './stat-tile.js';
 
@@ -197,6 +198,38 @@ export const MergeOrderFilters = (): JSX.Element => {
             {constant('priority')}
           </button>
         </fieldset>
+
+        <If
+          cond={stackFoldStore.foldable.pipe(map(Arr.isNonEmpty))}
+          then={
+            <fieldset
+              aria-label={constant('Stacks')}
+              class={constant('filter-group')}
+            >
+              <span class={constant('filter-group-name')}>
+                {constant('stacks')}
+              </span>
+              <button
+                class={constant('filter-chip')}
+                title={constant(
+                  'Fold each stack under its first pull request, so that unfolding it shows the whole stack.',
+                )}
+                type={constant('button')}
+                onClick={stackFoldStore.foldAll}
+              >
+                {constant('fold all')}
+              </button>
+              <button
+                class={constant('filter-chip')}
+                title={constant('Show every layer of every stack.')}
+                type={constant('button')}
+                onClick={stackFoldStore.unfoldAll}
+              >
+                {constant('unfold all')}
+              </button>
+            </fieldset>
+          }
+        />
       </div>
     </div>
   );

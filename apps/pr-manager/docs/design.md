@@ -294,6 +294,21 @@ under more than one predecessor is expanded wherever it now comes first.
 
 Everything is shown, in merge order, until the reader changes it.
 
+**A stack can be folded**, since one thirty layers deep pushes everything after
+it off the screen. A card with pull requests below it in the tree ends its
+badges with a toggle saying how many (`⌄ 25 below`); pressed, what is below it
+is drawn as one dashed row where its first layer would be, on the tree's line —
+how many pull requests, their checks counted as a verdict badge counts them,
+failing first, how many are drafts, and the numbers at either end
+(`#4392 … #4426`) — and the toggle reads `› +26 folded`. The row and the toggle
+both unfold it. **fold all** and **unfold all**, under **stacks** beside the
+sort, do every stack at once; fold all folds the first pull request of each
+branch with anything below it, so unfolding that shows the whole stack rather
+than one more layer. A fold is kept by number, so it outlives a poll that
+rebuilt the tree, and for the tab only: a reload shows everything again. A pull
+request under more than one predecessor counts where it is expanded, not where
+it is only named.
+
 **What the page shows is kept in the URL**, as the layout and the theme are,
 so a bookmark or a pasted link opens on the same pull requests and issues,
 and two tabs can show two different ones. Only what differs from the default

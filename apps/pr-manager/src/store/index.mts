@@ -5,6 +5,7 @@ export * from './issues-view-store.mjs';
 export * from './layout-store.mjs';
 export * from './merge-order-store.mjs';
 export * from './reader.mjs';
+export * from './stack-fold-store.mjs';
 export * from './store.mjs';
 export * from './theme-store.mjs';
 export * from './token-store.mjs';

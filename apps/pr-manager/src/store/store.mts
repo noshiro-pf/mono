@@ -54,6 +54,7 @@ import {
 import { createLayoutStore } from './layout-store.mjs';
 import { createMergeOrderStore } from './merge-order-store.mjs';
 import { createReader } from './reader.mjs';
+import { createStackFoldStore } from './stack-fold-store.mjs';
 import { createThemeStore } from './theme-store.mjs';
 import { createTokenStore } from './token-store.mjs';
 
@@ -106,6 +107,11 @@ export const mergeOrderStore = createMergeOrderStore({
   features: reader.features,
   initial: mergeOrderViewFromLocation(),
   save: saveMergeOrderView,
+});
+
+export const stackFoldStore = createStackFoldStore({
+  roots: mergeOrderStore.roots,
+  byNumber: reader.byNumber,
 });
 
 const HEADER_FOLDED_KEY = 'header-folded';

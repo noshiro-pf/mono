@@ -1416,16 +1416,22 @@ a:focus-visible {
  * still reads as a level and the one a shallow tree has always had.
  */
 .merge-order {
-  container-type: inline-size;
-}
-
-.merge-order-children {
+  /*
+   * Declared on the list rather than each level, so that a folded stack's row
+   * (`.folded-summary`) is indented by the same step as the level it stands
+   * for. The value is substituted where it is used, so `100cqi` is still the
+   * list's width.
+   */
   --merge-order-step: clamp(
     0.6rem,
     (100cqi - 20rem) / max(var(--merge-order-depth, 1), 1),
     2.1rem
   );
 
+  container-type: inline-size;
+}
+
+.merge-order-children {
   border-left: 2px solid var(--hairline);
   margin-left: calc(var(--merge-order-step) / 2);
   padding-left: calc(var(--merge-order-step) / 2);
@@ -1434,6 +1440,135 @@ a:focus-visible {
 .merge-order > li + li,
 .merge-order-children > li {
   margin-top: 0.6rem;
+}
+
+/*
+ * Folding a stack (`stack-fold.mts`). The toggle ends the card's badges, in
+ * the same place folded or not; what is folded is one row where its first
+ * layer would be, on the tree's line.
+ */
+.stack-fold-toggle {
+  align-items: center;
+  background: transparent;
+  border: 1px solid var(--baseline);
+  border-radius: 999px;
+  color: var(--ink-secondary);
+  cursor: pointer;
+  display: inline-flex;
+  font: inherit;
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+  gap: 0.25rem;
+  line-height: 1.6;
+  margin-left: auto;
+  padding: 0 0.55rem 0 0.4rem;
+  white-space: nowrap;
+}
+
+.stack-fold-toggle:hover {
+  border-color: var(--accent);
+  color: var(--ink-primary);
+}
+
+.stack-fold-toggle[data-folded='true'] {
+  background: color-mix(in srgb, var(--accent) 12%, var(--surface));
+  border-color: var(--accent);
+  color: var(--ink-primary);
+}
+
+.stack-fold-toggle:focus-visible,
+.folded-summary:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* The whole of the row is a button that unfolds it. */
+.folded-summary {
+  align-items: center;
+  background: var(--plane);
+  border: 1px dashed var(--baseline);
+  border-radius: var(--radius);
+  box-sizing: border-box;
+  color: var(--ink-secondary);
+  cursor: pointer;
+  display: flex;
+  flex-wrap: wrap;
+  font: inherit;
+  font-size: 0.8125rem;
+  gap: 0.35rem 0.9rem;
+  margin: 0.6rem 0 0 calc(var(--merge-order-step) + 2px);
+  padding: 0.3rem 0.9rem;
+  position: relative;
+  text-align: left;
+  width: calc(100% - var(--merge-order-step) - 2px);
+}
+
+/* The tree's line, from the card down to the row, as a child's would be. */
+.folded-summary::before {
+  border-bottom: 2px solid var(--hairline);
+  border-left: 2px solid var(--hairline);
+  border-bottom-left-radius: 6px;
+  content: '';
+  height: calc(50% + 0.6rem + 1px);
+  left: calc(-1 * (var(--merge-order-step) / 2 + 3px));
+  pointer-events: none;
+  position: absolute;
+  bottom: 50%;
+  width: calc(var(--merge-order-step) / 2);
+}
+
+.folded-summary:hover {
+  border-color: var(--accent);
+  color: var(--ink-primary);
+}
+
+.folded-summary-count {
+  align-items: center;
+  color: var(--ink-primary);
+  display: inline-flex;
+  font-weight: 600;
+  gap: 0.3rem;
+}
+
+.folded-summary-tally {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.folded-summary-part {
+  align-items: center;
+  display: inline-flex;
+  font-variant-numeric: tabular-nums;
+  gap: 0.15rem;
+}
+
+.folded-summary-part[data-status='good'] .badge-icon {
+  color: var(--status-good);
+}
+
+.folded-summary-part[data-status='critical'] .badge-icon {
+  color: var(--status-critical);
+}
+
+/*
+ * An icon with no border round it, so not the badge's yellow, which is below
+ * 3:1 on the surface: the waiting amber the DAG (`--dag-waiting`) and the queue
+ * (`--queue-waiting`) each declare for their own section.
+ */
+.folded-summary-part[data-status='warning'] .badge-icon {
+  color: light-dark(#935610, #f0b35a);
+}
+
+.folded-summary-drafts {
+  color: var(--ink-muted);
+}
+
+.folded-summary-range {
+  color: var(--ink-muted);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  margin-left: auto;
 }
 
 /* --- the queue ---------------------------------------------------------- */
