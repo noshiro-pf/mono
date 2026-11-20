@@ -1,5 +1,12 @@
 # pr-manager
 
+## 0.0.37
+
+### Patch Changes
+
+- Updated dependencies [cc769bb]
+    - pr-report-core@0.11.0
+
 ## 0.0.36
 
 ### Patch Changes
