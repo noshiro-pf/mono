@@ -438,11 +438,21 @@ describe('prefer-as-int and where the type name comes from', () => {
           import { type Int } from 'ts-data-forge';
           export const a = 1 as Int;
         `,
-        output: dedent`
-          import { type Int, asInt } from 'ts-data-forge';
-          export const a = asInt(1);
-        `,
-        errors: [{ messageId: 'useBrandedNumberCastFunction' }],
+        output: null,
+        errors: [
+          {
+            messageId: 'useBrandedNumberCastFunction',
+            suggestions: [
+              {
+                messageId: 'suggestBrandedNumberCastFunction',
+                output: dedent`
+                  import { type Int, asInt } from 'ts-data-forge';
+                  export const a = asInt(1);
+                `,
+              },
+            ],
+          },
+        ],
       },
       {
         name: 'reports Int imported from ts-type-forge',
@@ -450,14 +460,25 @@ describe('prefer-as-int and where the type name comes from', () => {
           import type { Int } from 'ts-type-forge';
           export const a = <Int>1;
         `,
-        output: dedent`
-          import { asInt } from 'ts-data-forge';
-          import type { Int } from 'ts-type-forge';
-          export const a = asInt(1);
-        `,
-        errors: [{ messageId: 'useBrandedNumberCastFunction' }],
+        output: null,
+        errors: [
+          {
+            messageId: 'useBrandedNumberCastFunction',
+            suggestions: [
+              {
+                messageId: 'suggestBrandedNumberCastFunction',
+                output: dedent`
+                  import { asInt } from 'ts-data-forge';
+                  import type { Int } from 'ts-type-forge';
+                  export const a = asInt(1);
+                `,
+              },
+            ],
+          },
+        ],
       },
       {
+        // \`0 as Int\` is suggested: \`asInt(0)\` is typed \`Int & 0\`.
         name: 'reports Int where a value of the same name is in scope',
         code: dedent`
           import { type Int } from 'ts-data-forge';
@@ -466,25 +487,30 @@ describe('prefer-as-int and where the type name comes from', () => {
             return Int > 0 ? (n as Int) : (0 as Int);
           };
         `,
-        output: [
-          dedent`
-            import { type Int, asInt } from 'ts-data-forge';
-            export const f = (n: number): Int => {
-              const Int = 5;
-              return Int > 0 ? (asInt(n)) : (0 as Int);
-            };
-          `,
-          dedent`
-            import { type Int, asInt } from 'ts-data-forge';
-            export const f = (n: number): Int => {
-              const Int = 5;
-              return Int > 0 ? (asInt(n)) : (asInt(0));
-            };
-          `,
-        ],
+        output: dedent`
+          import { type Int, asInt } from 'ts-data-forge';
+          export const f = (n: number): Int => {
+            const Int = 5;
+            return Int > 0 ? (asInt(n)) : (0 as Int);
+          };
+        `,
         errors: [
           { messageId: 'useBrandedNumberCastFunction' },
-          { messageId: 'useBrandedNumberCastFunction' },
+          {
+            messageId: 'useBrandedNumberCastFunction',
+            suggestions: [
+              {
+                messageId: 'suggestBrandedNumberCastFunction',
+                output: dedent`
+                  import { type Int, asInt } from 'ts-data-forge';
+                  export const f = (n: number): Int => {
+                    const Int = 5;
+                    return Int > 0 ? (n as Int) : (asInt(0));
+                  };
+                `,
+              },
+            ],
+          },
         ],
       },
       {
@@ -665,11 +691,25 @@ describe('prefer-as-int fixes only a number operand', () => {
         ],
       },
       {
-        // The output does not compile (`test/as-int-fix-output.mts`): the known
-        // limit stated at the fix in `prefer-as-int.mts`. When the limit is
-        // lifted, change this test and the `reassigned` entry in that file
-        // together, dropping the entry if the fix is withheld.
-        name: 'fixes a cast that initializes a let, although the call is typed Int & 0 (a known limit)',
+        // \`asInt8\` takes a \`number\` and returns an \`Int8\`, whatever the
+        // operand: its call is never narrower than the cast.
+        name: 'fixes a literal cast to Int8, whose cast function is not generic',
+        code: dedent`
+          import type { Int8 } from 'ts-type-forge';
+          export const a = 1 as Int8;
+        `,
+        output: dedent`
+          import { asInt8 } from 'ts-data-forge';
+          import type { Int8 } from 'ts-type-forge';
+          export const a = asInt8(1);
+        `,
+        errors: [{ messageId: 'useBrandedNumberCastFunction' }],
+      },
+      {
+        // \`asInt(0)\` is typed \`Int & 0\`, which \`mut_i\` would keep, and
+        // \`asInt(mut_i + 1)\` is an \`Int\` it would not take; the operand of the
+        // second cast is a \`number\`, so that one is fixed.
+        name: 'suggests rather than fixes a cast whose call is typed narrower, which a let reassigned later would not take',
         code: dedent`
           import type { Int } from 'ts-type-forge';
           export const reassigned = (): Int => {
@@ -678,28 +718,33 @@ describe('prefer-as-int fixes only a number operand', () => {
             return mut_i;
           };
         `,
-        output: [
-          dedent`
-            import { asInt } from 'ts-data-forge';
-            import type { Int } from 'ts-type-forge';
-            export const reassigned = (): Int => {
-              let mut_i = asInt(0);
-              mut_i = (mut_i + 1) as Int;
-              return mut_i;
-            };
-          `,
-          dedent`
-            import { asInt } from 'ts-data-forge';
-            import type { Int } from 'ts-type-forge';
-            export const reassigned = (): Int => {
-              let mut_i = asInt(0);
-              mut_i = asInt(mut_i + 1);
-              return mut_i;
-            };
-          `,
-        ],
+        output: dedent`
+          import { asInt } from 'ts-data-forge';
+          import type { Int } from 'ts-type-forge';
+          export const reassigned = (): Int => {
+            let mut_i = 0 as Int;
+            mut_i = asInt(mut_i + 1);
+            return mut_i;
+          };
+        `,
         errors: [
-          { messageId: 'useBrandedNumberCastFunction' },
+          {
+            messageId: 'useBrandedNumberCastFunction',
+            suggestions: [
+              {
+                messageId: 'suggestBrandedNumberCastFunction',
+                output: dedent`
+                  import { asInt } from 'ts-data-forge';
+                  import type { Int } from 'ts-type-forge';
+                  export const reassigned = (): Int => {
+                    let mut_i = asInt(0);
+                    mut_i = (mut_i + 1) as Int;
+                    return mut_i;
+                  };
+                `,
+              },
+            ],
+          },
           { messageId: 'useBrandedNumberCastFunction' },
         ],
       },
@@ -858,53 +903,81 @@ describe('prefer-as-int without type information', () => {
     ],
     invalid: [
       {
-        name: 'fixes a number literal, whose type the syntax alone tells',
+        // Suggested, not fixed: a literal's call is typed narrower than the
+        // cast (\`asInt(1)\` is \`Int & 1\`).
+        name: 'suggests a number literal, whose type the syntax alone tells',
         code: dedent`
           import type { Int } from 'ts-type-forge';
           export const a = 1 as Int;
           export const b = <Int>-1;
         `,
-        output: [
-          dedent`
-            import { asInt } from 'ts-data-forge';
-            import type { Int } from 'ts-type-forge';
-            export const a = asInt(1);
-            export const b = <Int>-1;
-          `,
-          dedent`
-            import { asInt } from 'ts-data-forge';
-            import type { Int } from 'ts-type-forge';
-            export const a = asInt(1);
-            export const b = asInt(-1);
-          `,
-        ],
+        output: null,
         errors: [
-          { messageId: 'useBrandedNumberCastFunction' },
-          { messageId: 'useBrandedNumberCastFunction' },
+          {
+            messageId: 'useBrandedNumberCastFunction',
+            suggestions: [
+              {
+                messageId: 'suggestBrandedNumberCastFunction',
+                output: dedent`
+                  import { asInt } from 'ts-data-forge';
+                  import type { Int } from 'ts-type-forge';
+                  export const a = asInt(1);
+                  export const b = <Int>-1;
+                `,
+              },
+            ],
+          },
+          {
+            messageId: 'useBrandedNumberCastFunction',
+            suggestions: [
+              {
+                messageId: 'suggestBrandedNumberCastFunction',
+                output: dedent`
+                  import { asInt } from 'ts-data-forge';
+                  import type { Int } from 'ts-type-forge';
+                  export const a = 1 as Int;
+                  export const b = asInt(-1);
+                `,
+              },
+            ],
+          },
         ],
       },
       {
-        name: 'fixes a number literal inside type wrappers that keep it a number',
+        name: 'suggests a number literal inside type wrappers that keep it a number',
         code: dedent`
           import { type Int } from 'ts-data-forge';
           export const a = (1 satisfies number) as Int;
           export const b = (-1 as number) as Int;
         `,
-        output: [
-          dedent`
-            import { type Int, asInt } from 'ts-data-forge';
-            export const a = asInt(1 satisfies number);
-            export const b = (-1 as number) as Int;
-          `,
-          dedent`
-            import { type Int, asInt } from 'ts-data-forge';
-            export const a = asInt(1 satisfies number);
-            export const b = asInt(-1 as number);
-          `,
-        ],
+        output: null,
         errors: [
-          { messageId: 'useBrandedNumberCastFunction' },
-          { messageId: 'useBrandedNumberCastFunction' },
+          {
+            messageId: 'useBrandedNumberCastFunction',
+            suggestions: [
+              {
+                messageId: 'suggestBrandedNumberCastFunction',
+                output: dedent`
+                  import { type Int, asInt } from 'ts-data-forge';
+                  export const a = asInt(1 satisfies number);
+                  export const b = (-1 as number) as Int;
+                `,
+              },
+            ],
+          },
+          {
+            messageId: 'useBrandedNumberCastFunction',
+            suggestions: [
+              {
+                messageId: 'suggestBrandedNumberCastFunction',
+                output: dedent`
+                  import { type Int, asInt } from 'ts-data-forge';
+                  export const a = (1 satisfies number) as Int;
+                  export const b = asInt(-1 as number);
+                `,
+              },
+            ],
+          },
         ],
       },
       {
