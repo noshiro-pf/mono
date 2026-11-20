@@ -8,6 +8,7 @@ import {
   getArgumentText,
   hasCommentWithin,
   isIdentifierNamed,
+  outermostTypeWrapper,
   parenthesesDepth,
   skipTypeWrappers,
   typeHoldsAtEveryLayer,
@@ -21,7 +22,10 @@ import { tsDataForgeValueAt } from './import-binding.mjs';
 type Options = readonly [];
 
 type MessageIds =
-  'useRangeForLoop' | 'suggestRangeForLoop' | 'noCastFitsRangeForLoop';
+  | 'useRangeForLoop'
+  | 'suggestRangeForLoop'
+  | 'suggestRangeForLoopNarrows'
+  | 'noCastFitsRangeForLoop';
 
 /**
  * Reports `for (let i = begin; i < end; ++i)` and rewrites it to
@@ -47,6 +51,8 @@ export const preferRangeForLoop: TSESLint.RuleModule<MessageIds, Options> = {
         'Replace with `for (const {{varName}} of range({{args}}))` from ts-data-forge.',
       suggestRangeForLoop:
         'Replace with `for (const {{varName}} of range({{args}}))` from ts-data-forge, then cast what `range` does not accept: it takes a `SafeInt` or an integer literal from {{smallIntMin}} to {{smallIntMax}} (`asSafeInt` throws on anything else).{{stepNote}}',
+      suggestRangeForLoopNarrows:
+        'Replace with `for (const {{varName}} of range({{args}}))` from ts-data-forge, then check the body: `{{varName}}` becomes what `range` yields, a `SafeInt`, where it was a `number`, and {{narrowing}}.',
       noCastFitsRangeForLoop:
         '`for (const {{varName}} of range({{args}}))` from ts-data-forge cannot replace this loop: {{reasons}}.',
     },
@@ -123,6 +129,12 @@ export const preferRangeForLoop: TSESLint.RuleModule<MessageIds, Options> = {
        * needed, which each kind of wrapper made harder to get right.
        */
       hasTypedStep: boolean;
+
+      /**
+       * Why the body may not take the loop variable's new type, if it may not
+       * (`narrowingOf`): the fix becomes a suggestion that says so.
+       */
+      narrowing: string | undefined;
     }[] = [];
 
     return {
@@ -373,6 +385,7 @@ export const preferRangeForLoop: TSESLint.RuleModule<MessageIds, Options> = {
           step: mut_step,
           rewrite,
           hasTypedStep: mut_stepOperand !== undefined,
+          narrowing: narrowingOf(sourceCode, declaration, node.body),
         });
       },
       'Program:exit': () => {
@@ -411,11 +424,10 @@ export const preferRangeForLoop: TSESLint.RuleModule<MessageIds, Options> = {
           }
 
           // The fix declares the loop variable as what `range` yields, a
-          // `SafeUint` or a `SafeInt`, where the loop declared a `number` (and
-          // drops a `let i: number` annotation): a body that widens it, such as
-          // `let acc = i; acc += 0.5`, stops compiling. Only the `range` call is
-          // checked, since telling would mean type-checking the body again
-          // against the new type.
+          // `SafeUint` or a `SafeInt`, where the loop declared a `number`. Where
+          // the body may widen it (`narrowingOf`) it is a suggestion; a use
+          // that only the type checker can tell, such as passing it to a
+          // parameter typed by a `let`, is not looked for.
           const fix: TSESLint.ReportFixFunction = (fixer) => {
             const bodyText = sourceCode.getText(node.body);
 
@@ -427,7 +439,20 @@ export const preferRangeForLoop: TSESLint.RuleModule<MessageIds, Options> = {
             ];
           };
 
-          if (rewrite === 'fix') {
+          if (rewrite === 'fix' && entry.narrowing !== undefined) {
+            context.report({
+              node: node.init ?? node,
+              messageId: 'useRangeForLoop',
+              data,
+              suggest: [
+                {
+                  messageId: 'suggestRangeForLoopNarrows',
+                  data: { ...data, narrowing: entry.narrowing },
+                  fix,
+                },
+              ],
+            });
+          } else if (rewrite === 'fix') {
             context.report({
               node: node.init ?? node,
               messageId: 'useRangeForLoop',
@@ -446,9 +471,17 @@ export const preferRangeForLoop: TSESLint.RuleModule<MessageIds, Options> = {
                     ...data,
                     smallIntMin: -SMALL_INT_END,
                     smallIntMax: SMALL_INT_END - 1,
-                    stepNote: entry.hasTypedStep
-                      ? ' Its step has to be a positive one (`asPositiveSafeInt` throws on anything else): `range` takes no zero step, and with a negative one it runs while the value is above the end, where the loop runs while it is below.'
-                      : '',
+                    // The note on the body rides on `stepNote`, which is empty
+                    // where neither applies.
+                    stepNote: `${
+                      entry.hasTypedStep
+                        ? ' Its step has to be a positive one (`asPositiveSafeInt` throws on anything else): `range` takes no zero step, and with a negative one it runs while the value is above the end, where the loop runs while it is below.'
+                        : ''
+                    }${
+                      entry.narrowing === undefined
+                        ? ''
+                        : ` Check the body too: \`${varName}\` becomes a \`SafeInt\` where it was a \`number\`, and ${entry.narrowing}.`
+                    }`,
                   },
                   fix,
                 },
@@ -791,16 +824,29 @@ const isWithin = (
 ): boolean =>
   container.range[0] <= node.range[0] && node.range[1] <= container.range[1];
 
+/** Whether `identifier`, under any type wrapper, is what an update or an assignment writes. */
+const isWriteTarget = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  identifier: TSESTree.Node,
+): boolean => {
+  const target = outermostTypeWrapper(identifier);
+
+  const { parent } = target;
+
+  return (
+    (parent?.type === AST_NODE_TYPES.UpdateExpression &&
+      parent.argument === target) ||
+    (parent?.type === AST_NODE_TYPES.AssignmentExpression &&
+      parent.left === target)
+  );
+};
+
 /**
  * Whether the loop variable declared by `declaration` is written anywhere but
- * its initializer and the loop's `update`.
- *
- * It reads the scope manager's write references, which see through one `as`,
- * `<T>` or `!` on an assignment target and no `satisfies`: a body that writes
- * `(i satisfies number)++` is not seen, and the fix to `const i` then throws on
- * that write at run time, which TypeScript does not report. Such a write is
- * rare, and reading every reference's parents through type wrappers is not done
- * yet.
+ * its initializer and the loop's `update`: by the scope manager's write
+ * references, and by a reference under any wrapper (`satisfies`, stacked `as`,
+ * `!`) that is the target of an update or an assignment, which the scope
+ * manager does not count as a write and `const i` would throw on.
  */
 const isAssignedOutsideUpdate = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
@@ -815,7 +861,54 @@ const isAssignedOutsideUpdate = (
     .flatMap((variable) => variable.references)
     .some(
       (reference) =>
-        reference.isWrite() &&
         reference.init !== true &&
-        !isWithin(reference.identifier, update),
+        !isWithin(reference.identifier, update) &&
+        (reference.isWrite() || isWriteTarget(reference.identifier)),
     );
+
+/**
+ * Why the body of a loop may not take its variable's new type, `SafeInt` or
+ * `SafeUint` where it was a `number`, if a use read off the syntax says so:
+ * the loop declared it `let i: number`, whose annotation the rewrite drops, or
+ * the body binds it, under any type wrapper, to a `let` with no annotation,
+ * which takes the new type and may be widened later (`acc += 0.5`).
+ */
+const narrowingOf = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  sourceCode: TSESLint.SourceCode,
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  declaration: TSESTree.VariableDeclarator,
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  body: TSESTree.Statement,
+): string | undefined => {
+  if (
+    declaration.id.type === AST_NODE_TYPES.Identifier &&
+    declaration.id.typeAnnotation !== undefined
+  ) {
+    return 'its type annotation is dropped';
+  }
+
+  for (const reference of sourceCode
+    .getDeclaredVariables(declaration)
+    .flatMap((variable) => variable.references)) {
+    if (!isWithin(reference.identifier, body)) {
+      continue;
+    }
+
+    const value = outermostTypeWrapper(reference.identifier);
+
+    const { parent } = value;
+
+    if (
+      parent?.type === AST_NODE_TYPES.VariableDeclarator &&
+      parent.init === value &&
+      parent.parent.kind === 'let' &&
+      parent.id.type === AST_NODE_TYPES.Identifier &&
+      parent.id.typeAnnotation === undefined
+    ) {
+      return `\`let ${parent.id.name}\` takes the new type and may be widened later`;
+    }
+  }
+
+  return undefined;
+};
