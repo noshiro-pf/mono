@@ -1,6 +1,6 @@
 import {
   AST_NODE_TYPES,
-  type TSESLint,
+  TSESLint,
   type TSESTree,
 } from '@typescript-eslint/utils';
 import { Arr, hasKey, isNonNullObject, isRecord } from 'ts-data-forge';
@@ -171,221 +171,300 @@ const bindingNames = (pattern: TSESTree.Node): readonly string[] => {
 };
 
 /**
- * The key a class is found by from inside it (`this`, and its own name in a
- * class expression): its name, or for an anonymous class one made from its
- * position, which no code can spell but `this` reaches.
+ * Whether `node` is a declaration the reference graph has a node for: `type
+ * X`, `interface X`, a class, a function, `enum X`, `import X = …`, a
+ * specifier of `import … from 'm'`, a variable declarator, a `namespace` and a
+ * `declare module` (or `declare global`).
  */
-const classKey = (
-  node: TSESTree.ClassDeclaration | TSESTree.ClassExpression,
-): string => node.id?.name ?? `<class at ${node.range[0]}>`;
+const isDeclaration = (node: TSESTree.Node): boolean =>
+  node.type === AST_NODE_TYPES.TSTypeAliasDeclaration ||
+  node.type === AST_NODE_TYPES.TSInterfaceDeclaration ||
+  node.type === AST_NODE_TYPES.TSImportEqualsDeclaration ||
+  node.type === AST_NODE_TYPES.TSEnumDeclaration ||
+  node.type === AST_NODE_TYPES.TSModuleDeclaration ||
+  node.type === AST_NODE_TYPES.ClassDeclaration ||
+  node.type === AST_NODE_TYPES.ClassExpression ||
+  node.type === AST_NODE_TYPES.FunctionDeclaration ||
+  node.type === AST_NODE_TYPES.TSDeclareFunction ||
+  node.type === AST_NODE_TYPES.VariableDeclarator ||
+  ((node.type === AST_NODE_TYPES.ImportSpecifier ||
+    node.type === AST_NODE_TYPES.ImportDefaultSpecifier ||
+    node.type === AST_NODE_TYPES.ImportNamespaceSpecifier) &&
+    // Always so at run time; the parser's types also allow an
+    // `ExportNamedDeclaration`, whose `source` may be null.
+    node.parent.type === AST_NODE_TYPES.ImportDeclaration);
+
+/** The declarations `node` sits in (itself included), from the innermost out. */
+const enclosingDeclarations = (
+  node: TSESTree.Node,
+): readonly TSESTree.Node[] =>
+  node.type === AST_NODE_TYPES.Program
+    ? []
+    : isDeclaration(node)
+      ? Arr.toUnshifted(node)(enclosingDeclarations(node.parent))
+      : enclosingDeclarations(node.parent);
+
+/** The class `node` sits in, if any. */
+const enclosingClass = (node: TSESTree.Node): TSESTree.Node | undefined => {
+  if (node.type === AST_NODE_TYPES.Program) {
+    return undefined;
+  }
+
+  const { parent } = node;
+
+  return parent.type === AST_NODE_TYPES.ClassDeclaration ||
+    parent.type === AST_NODE_TYPES.ClassExpression
+    ? parent
+    : enclosingClass(parent);
+};
+
+/** `['A', 'B', 'C']` of `A.B.C`. */
+const qualifiedParts = (name: TSESTree.EntityName): readonly string[] =>
+  name.type === AST_NODE_TYPES.Identifier
+    ? [name.name]
+    : name.type === AST_NODE_TYPES.TSQualifiedName
+      ? Arr.toPushed(qualifiedParts(name.left), name.right.name)
+      : [];
 
 /**
- * The names `node` declares, if it is a declaration the reference graph has a
- * node for: `type X`, `interface X`, a class (`classKey`), `function X`,
- * `enum X`, `import X = …`, the local name of an import specifier and the
- * bindings of a variable declarator. A `namespace` and a `declare module` have
- * nodes too, but are handled apart (`namespacePath`, `declarationKeys`).
+ * The name a declaration other than a variable declares, as code reads it: a
+ * dotted `namespace A.B` by its first part, `A`.
  */
-const declaredNames = (node: TSESTree.Node): readonly string[] => {
+const declaredName = (node: TSESTree.Node): string | undefined => {
   if (
     node.type === AST_NODE_TYPES.TSTypeAliasDeclaration ||
     node.type === AST_NODE_TYPES.TSInterfaceDeclaration ||
-    node.type === AST_NODE_TYPES.TSImportEqualsDeclaration ||
-    node.type === AST_NODE_TYPES.TSEnumDeclaration
+    node.type === AST_NODE_TYPES.TSEnumDeclaration ||
+    node.type === AST_NODE_TYPES.TSImportEqualsDeclaration
   ) {
-    return [node.id.name];
+    return node.id.name;
   }
 
   if (
     node.type === AST_NODE_TYPES.ClassDeclaration ||
-    node.type === AST_NODE_TYPES.ClassExpression
-  ) {
-    return [classKey(node)];
-  }
-
-  if (
     node.type === AST_NODE_TYPES.FunctionDeclaration ||
     node.type === AST_NODE_TYPES.TSDeclareFunction
   ) {
-    return node.id === null ? [] : [node.id.name];
+    return node.id?.name;
   }
 
-  // `import { x as y } from 'm'` declares `y`, which leads to the module.
-  if (
-    (node.type === AST_NODE_TYPES.ImportSpecifier ||
-      node.type === AST_NODE_TYPES.ImportDefaultSpecifier ||
-      node.type === AST_NODE_TYPES.ImportNamespaceSpecifier) &&
-    // Always so at run time; the parser's types also allow an
-    // `ExportNamedDeclaration`, whose `source` may be null.
-    node.parent.type === AST_NODE_TYPES.ImportDeclaration
-  ) {
-    return [node.local.name];
-  }
-
-  return node.type === AST_NODE_TYPES.VariableDeclarator
-    ? bindingNames(node.id)
-    : [];
-};
-
-/**
- * The `namespace` whose member `node` is — declared directly in its body, or
- * through `export` / a variable declaration — if any. A declaration inside a
- * function or class in the namespace is not a member.
- */
-const namespaceOf = (
-  node: TSESTree.Node,
-): TSESTree.TSModuleDeclaration | undefined => {
-  const { parent } = node;
-
-  if (parent === undefined) {
-    return undefined;
-  }
-
-  if (parent.type === AST_NODE_TYPES.TSModuleBlock) {
-    return parent.parent;
-  }
-
-  return parent.type === AST_NODE_TYPES.ExportNamedDeclaration ||
-    parent.type === AST_NODE_TYPES.ExportDefaultDeclaration ||
-    parent.type === AST_NODE_TYPES.VariableDeclaration
-    ? namespaceOf(parent)
+  return node.type === AST_NODE_TYPES.TSModuleDeclaration &&
+    node.id.type !== AST_NODE_TYPES.Literal
+    ? qualifiedParts(node.id)[0]
     : undefined;
 };
 
 /**
- * The key of the class `node` sits in (`classKey`).
+ * The declarations directly in the body of a `namespace` (or `declare global`)
+ * that declare `name`, exported or not; a nested `namespace` by its first part.
  */
-const enclosingClassKey = (node: TSESTree.Node): string | undefined => {
+const membersNamed = (
+  namespace: TSESTree.TSModuleDeclaration,
+  name: string,
+): readonly TSESTree.Node[] =>
+  (namespace.body?.body ?? []).flatMap(
+    (statement): readonly TSESTree.Node[] => {
+      const declaration =
+        statement.type === AST_NODE_TYPES.ExportNamedDeclaration ||
+        statement.type === AST_NODE_TYPES.ExportDefaultDeclaration
+          ? statement.declaration
+          : statement;
+
+      if (declaration === null) {
+        return [];
+      }
+
+      if (declaration.type === AST_NODE_TYPES.VariableDeclaration) {
+        return declaration.declarations.filter((declarator) =>
+          bindingNames(declarator.id).includes(name),
+        );
+      }
+
+      return declaredName(declaration) === name ? [declaration] : [];
+    },
+  );
+
+/**
+ * The names read off `identifier` after it, in `N.X.Y` (a type name, or a
+ * member chain as far as it is not computed): `['X', 'Y']`.
+ */
+const memberNamesAfter = (identifier: TSESTree.Node): readonly string[] => {
+  const { parent } = identifier;
+
+  if (
+    parent?.type === AST_NODE_TYPES.TSQualifiedName &&
+    parent.left === identifier
+  ) {
+    return Arr.toUnshifted(parent.right.name)(memberNamesAfter(parent));
+  }
+
+  return parent?.type === AST_NODE_TYPES.MemberExpression &&
+    parent.object === identifier &&
+    !parent.computed &&
+    parent.property.type === AST_NODE_TYPES.Identifier
+    ? Arr.toUnshifted(parent.property.name)(memberNamesAfter(parent))
+    : [];
+};
+
+/**
+ * `declarations` followed into their members along `names`: `N.X` leads to the
+ * member `X` of a `namespace N`, rather than to all of `N`, as far as a
+ * namespace declares the next name; where none does (`v.x` of a variable), the
+ * declarations reached so far.
+ */
+const followMembers = (
+  declarations: readonly TSESTree.Node[],
+  names: readonly string[],
+): readonly TSESTree.Node[] => {
+  if (Arr.isEmpty(names)) {
+    return declarations;
+  }
+
+  const reached = lookupMembers(declarations, names);
+
+  return Arr.isNonEmpty(reached) ? reached : declarations;
+};
+
+/**
+ * One step of `names` into `declaration`, if it is a namespace: past its own
+ * parts (`namespace A.B { … }` is reached as `A`, so `B` comes first), then
+ * into the member of its body the next name names.
+ */
+const stepInto = (
+  declaration: TSESTree.Node,
+  names: readonly string[],
+): readonly Readonly<{
+  declaration: TSESTree.Node;
+  rest: readonly string[];
+}>[] => {
+  if (
+    declaration.type !== AST_NODE_TYPES.TSModuleDeclaration ||
+    declaration.id.type === AST_NODE_TYPES.Literal
+  ) {
+    return [];
+  }
+
+  const ownParts = Arr.tail(qualifiedParts(declaration.id));
+
+  const mismatch = ownParts.findIndex((part, index) => names[index] !== part);
+
+  if (mismatch !== -1) {
+    // `A.B` of `namespace A.B.C`: the declaration as a whole.
+    return mismatch < names.length ? [] : [{ declaration, rest: [] }];
+  }
+
+  const rest = names.slice(ownParts.length);
+
+  const [next] = rest;
+
+  const after = Arr.tail(rest);
+
+  return next === undefined
+    ? [{ declaration, rest }]
+    : membersNamed(declaration, next).map((member) => ({
+        declaration: member,
+        rest: after,
+      }));
+};
+
+/**
+ * What `names` reach from `declarations` ({@link followMembers}), or nothing
+ * where no namespace among them declares the first name.
+ */
+const lookupMembers = (
+  declarations: readonly TSESTree.Node[],
+  names: readonly string[],
+): readonly TSESTree.Node[] =>
+  declarations
+    .flatMap((declaration) => stepInto(declaration, names))
+    .flatMap(({ declaration, rest }) => followMembers([declaration], rest));
+
+/**
+ * Every block of the namespace `declaration` is one of, in the same statement
+ * list: `namespace A { … }` and `namespace A.B { … }` beside it are both `A`,
+ * though the scope manager binds `A` to the first alone.
+ */
+const namespaceBlocks = (
+  declaration: TSESTree.Node,
+): readonly TSESTree.Node[] => {
+  if (
+    declaration.type !== AST_NODE_TYPES.TSModuleDeclaration ||
+    declaration.id.type === AST_NODE_TYPES.Literal
+  ) {
+    return [declaration];
+  }
+
+  const holder =
+    declaration.parent.type === AST_NODE_TYPES.ExportNamedDeclaration
+      ? declaration.parent.parent
+      : declaration.parent;
+
+  const statements =
+    holder.type === AST_NODE_TYPES.Program ||
+    holder.type === AST_NODE_TYPES.TSModuleBlock
+      ? holder.body
+      : [];
+
+  const name = declaredName(declaration);
+
+  const blocks = Arr.generate(function* () {
+    for (const statement of statements) {
+      const candidate =
+        statement.type === AST_NODE_TYPES.ExportNamedDeclaration
+          ? statement.declaration
+          : statement;
+
+      if (
+        candidate?.type === AST_NODE_TYPES.TSModuleDeclaration &&
+        declaredName(candidate) === name
+      ) {
+        yield candidate;
+      }
+    }
+  });
+
+  return Arr.isNonEmpty(blocks) ? blocks : [declaration];
+};
+
+/** The namespaces `node` sits in, from the innermost out. */
+const enclosingNamespaces = (
+  node: TSESTree.Node,
+): readonly TSESTree.TSModuleDeclaration[] => {
+  if (node.type === AST_NODE_TYPES.Program) {
+    return [];
+  }
+
   const { parent } = node;
 
-  if (parent === undefined) {
+  return parent.type === AST_NODE_TYPES.TSModuleDeclaration &&
+    parent.id.type !== AST_NODE_TYPES.Literal &&
+    parent.kind !== 'global'
+    ? Arr.toUnshifted(parent)(enclosingNamespaces(parent))
+    : enclosingNamespaces(parent);
+};
+
+/**
+ * The declaration a definition of the scope manager stands for: the node it
+ * names when that is one the graph keys (`isDeclaration`), else the nearest one
+ * around it (an enum member's enum). A parameter, a type parameter and an
+ * implicit global lead nowhere: they hold no declaration of their own.
+ */
+const declarationOf = (
+  definition: TSESLint.Scope.Definition,
+): TSESTree.Node | undefined => {
+  const { type, node } = definition;
+
+  if (
+    type === TSESLint.Scope.DefinitionType.Parameter ||
+    type === TSESLint.Scope.DefinitionType.ImplicitGlobalVariable ||
+    type === TSESLint.Scope.DefinitionType.CatchClause ||
+    node.type === AST_NODE_TYPES.TSTypeParameter
+  ) {
     return undefined;
   }
 
-  return parent.type === AST_NODE_TYPES.ClassDeclaration ||
-    parent.type === AST_NODE_TYPES.ClassExpression
-    ? classKey(parent)
-    : enclosingClassKey(parent);
+  return isDeclaration(node) ? node : enclosingDeclarations(node)[0];
 };
-
-/**
- * `N.X.Y` written out, for a name (as a type name or as an expression) made of
- * identifiers, `this` standing for the enclosing class's name (`typeof this.x`
- * leads to the class as `C.x` does); `undefined` for anything else (`a[b]`).
- */
-const dottedName = (node: TSESTree.Node): string | undefined => {
-  if (node.type === AST_NODE_TYPES.Identifier) {
-    return node.name;
-  }
-
-  if (node.type === AST_NODE_TYPES.ThisExpression) {
-    return enclosingClassKey(node);
-  }
-
-  if (node.type === AST_NODE_TYPES.TSQualifiedName) {
-    const left = dottedName(node.left);
-
-    return left === undefined ? undefined : `${left}.${node.right.name}`;
-  }
-
-  if (
-    node.type === AST_NODE_TYPES.MemberExpression &&
-    !node.computed &&
-    node.property.type === AST_NODE_TYPES.Identifier
-  ) {
-    const object = dottedName(node.object);
-
-    return object === undefined ? undefined : `${object}.${node.property.name}`;
-  }
-
-  return undefined;
-};
-
-/**
- * The full path of a namespace: `['A', 'B']` for `namespace A.B`, and for
- * `namespace B` declared in `namespace A`. Empty for `declare module 'm'` and
- * `declare global`, whose members are found by their bare names.
- */
-const namespacePath = (
-  namespace: TSESTree.TSModuleDeclaration,
-): readonly string[] => {
-  // `declare global { … }` declares global names, found bare.
-  if (
-    namespace.id.type === AST_NODE_TYPES.Literal ||
-    namespace.kind === 'global'
-  ) {
-    return [];
-  }
-
-  const outer = namespaceOf(namespace);
-
-  return [
-    ...(outer === undefined ? [] : namespacePath(outer)),
-    ...(dottedName(namespace.id)?.split('.') ?? []),
-  ];
-};
-
-/** `C`, `B.C`, `A.B.C` of `['A', 'B', 'C']`. */
-const tailsOf = (parts: readonly string[]): readonly string[] => {
-  const mut_tails: string[] = [];
-
-  let mut_tail: string | undefined = undefined;
-
-  for (const part of parts.toReversed()) {
-    mut_tail = mut_tail === undefined ? part : `${part}.${mut_tail}`;
-
-    mut_tails.push(mut_tail);
-  }
-
-  return mut_tails;
-};
-
-/**
- * The keys a name declared under `path` is found by: bare, as code inside the
- * namespace writes it, and qualified by each tail of the path (`B.X` and
- * `A.B.X` under `['A', 'B']`), as code outside it does.
- */
-const keysUnder = (path: readonly string[], name: string): readonly string[] =>
-  tailsOf(Arr.toPushed(path, name));
-
-/** The key of `declare module 'm'`, which no name in code can collide with. */
-const moduleKey = (name: string): string => `import('${name}')`;
-
-/** The graph keys of the declaration `node`, if it is one (`declaredNames`). */
-const declarationKeys = (node: TSESTree.Node): readonly string[] => {
-  // `declare module 'm' { … }` is one node, holding everything its body refers
-  // to: code outside reaches its members by their exported names (`default`,
-  // `export { x as y }`), which this graph does not pair with the local ones,
-  // so `import('m')` in any form leads to all of it.
-  if (
-    node.type === AST_NODE_TYPES.TSModuleDeclaration &&
-    node.id.type === AST_NODE_TYPES.Literal
-  ) {
-    return [moduleKey(node.id.value)];
-  }
-
-  const names = declaredNames(node);
-
-  if (Arr.isEmpty(names)) {
-    return [];
-  }
-
-  const namespace = namespaceOf(node);
-
-  const path = namespace === undefined ? [] : namespacePath(namespace);
-
-  return names.flatMap((name) => keysUnder(path, name));
-};
-
-/**
- * The keys of the declarations `node` sits in, from the innermost out. A tuple
- * in a member of `interface X` closes a cycle by leading back to `X` just as
- * one in `type X = …` does.
- */
-const enclosingDeclarationKeys = (node: TSESTree.Node): readonly string[] =>
-  node.type === AST_NODE_TYPES.Program
-    ? []
-    : [...declarationKeys(node), ...enclosingDeclarationKeys(node.parent)];
 
 const isNode = (value: unknown): value is TSESTree.Node =>
   isNonNullObject(value) &&
@@ -424,75 +503,78 @@ const childrenOf = (
 };
 
 /**
- * The names of the file's `declare module 'm'`: exact ones, and `*` patterns
- * longest prefix first. Read once per file.
+ * The file's `declare module 'm'` by name, exact ones and `*` patterns (longest
+ * prefix first), and its `declare global` blocks. Read once per file.
  */
-const declaredModules = (program: TSESTree.Program): DeclaredModules => {
-  const cached = declaredModulesCache.get(program);
+const moduleDeclarations = (program: TSESTree.Program): ModuleDeclarations => {
+  const mut_byName = new Map<string, readonly TSESTree.TSModuleDeclaration[]>();
 
-  if (cached !== undefined) {
-    return cached;
+  const mut_globals: TSESTree.TSModuleDeclaration[] = [];
+
+  for (const statement of program.body) {
+    const declaration =
+      statement.type === AST_NODE_TYPES.ExportNamedDeclaration
+        ? statement.declaration
+        : statement;
+
+    if (declaration?.type !== AST_NODE_TYPES.TSModuleDeclaration) {
+      continue;
+    }
+
+    if (declaration.kind === 'global') {
+      mut_globals.push(declaration);
+    } else if (declaration.id.type === AST_NODE_TYPES.Literal) {
+      const name = declaration.id.value;
+
+      mut_byName.set(
+        name,
+        Arr.toPushed(mut_byName.get(name) ?? [], declaration),
+      );
+    }
   }
 
-  const names = Arr.generate(function* () {
-    for (const statement of program.body) {
-      const declaration =
-        statement.type === AST_NODE_TYPES.ExportNamedDeclaration
-          ? statement.declaration
-          : statement;
+  const names = Array.from(mut_byName.keys());
 
-      if (
-        declaration?.type === AST_NODE_TYPES.TSModuleDeclaration &&
-        declaration.id.type === AST_NODE_TYPES.Literal
-      ) {
-        yield declaration.id.value;
-      }
-    }
-  });
-
-  const modules: DeclaredModules = {
-    exact: new Set<string>(names.filter((name) => !name.includes('*'))),
+  return {
+    byName: mut_byName,
     patterns: names
       .filter((name) => name.includes('*'))
       .toSorted((a, b) => b.indexOf('*') - a.indexOf('*')),
+    globals: mut_globals,
   };
-
-  declaredModulesCache.set(program, modules);
-
-  return modules;
 };
+
+type ModuleDeclarations = Readonly<{
+  byName: ReadonlyMap<string, readonly TSESTree.TSModuleDeclaration[]>;
+  patterns: readonly string[];
+  globals: readonly TSESTree.TSModuleDeclaration[];
+}>;
 
 /**
  * The `declare module 'm' { … }` of the file that `specifier` resolves to, by
- * its exact name or a `*` pattern (`'*.css'`), if any: its key.
+ * its exact name or a `*` pattern (`'*.css'`), if any.
  */
-const declaredModuleKey = (
-  program: TSESTree.Program,
+const declaredModulesFor = (
+  modules: ModuleDeclarations,
   specifier: string,
-): string | undefined => {
-  const { exact, patterns } = declaredModules(program);
-
+): readonly TSESTree.Node[] => {
   // An exact name wins over a pattern, and of patterns the longest prefix
   // (`patterns` is sorted so), as TypeScript resolves them.
-  const name = exact.has(specifier)
-    ? specifier
-    : patterns.find((pattern) => {
-        const star = pattern.indexOf('*');
+  const name =
+    !specifier.includes('*') && modules.byName.has(specifier)
+      ? specifier
+      : modules.patterns.find((pattern) => {
+          const star = pattern.indexOf('*');
 
-        return (
-          specifier.length >= pattern.length - 1 &&
-          specifier.startsWith(pattern.slice(0, star)) &&
-          specifier.endsWith(pattern.slice(star + 1))
-        );
-      });
+          return (
+            specifier.length >= pattern.length - 1 &&
+            specifier.startsWith(pattern.slice(0, star)) &&
+            specifier.endsWith(pattern.slice(star + 1))
+          );
+        });
 
-  return name === undefined ? undefined : moduleKey(name);
+  return name === undefined ? [] : (modules.byName.get(name) ?? []);
 };
-
-type DeclaredModules = Readonly<{
-  exact: ReadonlySet<string>;
-  patterns: readonly string[];
-}>;
 
 /** `'m'` of `import('m')`. */
 const importTypeSpecifier = (
@@ -520,76 +602,34 @@ const importTypeSpecifier = (
     : undefined;
 };
 
-const programOf = (node: TSESTree.Node): TSESTree.Program =>
-  node.type === AST_NODE_TYPES.Program ? node : programOf(node.parent);
-
-/** The key of the `declare module` of this file `specifier` names, if any. */
-const moduleReferenceOf = (
-  node: TSESTree.Node,
-  specifier: string,
-): string | undefined => declaredModuleKey(programOf(node), specifier);
-
 /**
- * The name `node` itself refers to, not counting its descendants: `X` / `N.X`
- * of a type reference, of `typeof`, of an interface's `extends` and of `import
- * Y = N.X`; and the key of a `declare module 'm'` of this file that
- * `import('m')` (a type or an expression), `import x = require('m')`, an
- * import specifier from `'m'` or an `export … from 'm'` leads to. (A name an
- * identifier reads in a value position counts too: `valueReferenceOf`.)
- *
- * A class's `implements I` is left out on purpose: the class's instance type
- * does not take its members from `I`, so `I` closes no cycle through it.
+ * The module a node names as a whole, if it is one that does: `import('m')`
+ * (a type or an expression, its name written as a string or a template literal
+ * with no substitution), `import x = require('m')`, a specifier of `import …
+ * from 'm'` and `export … from 'm'`. A `declare module 'm'` of this file is
+ * one node of the graph, which every one of them leads to.
  */
-const referenceOf = (node: TSESTree.Node): string | undefined => {
-  if (node.type === AST_NODE_TYPES.TSTypeReference) {
-    return dottedName(node.typeName);
-  }
-
-  if (node.type === AST_NODE_TYPES.TSTypeQuery) {
-    return node.exprName.type === AST_NODE_TYPES.TSImportType
-      ? undefined
-      : dottedName(node.exprName);
-  }
-
-  if (node.type === AST_NODE_TYPES.TSInterfaceHeritage) {
-    return dottedName(node.expression);
-  }
-
+const moduleSpecifierOf = (node: TSESTree.Node): string | undefined => {
   if (node.type === AST_NODE_TYPES.TSImportType) {
-    // `import('m')`, `import('m').X`: the whole of a `declare module 'm'` of
-    // this file (`declarationKeys`); of any other module, nothing here.
-    const specifier = importTypeSpecifier(node);
-
-    return specifier === undefined
-      ? undefined
-      : moduleReferenceOf(node, specifier);
+    return importTypeSpecifier(node);
   }
 
   if (node.type === AST_NODE_TYPES.TSImportEqualsDeclaration) {
     return node.moduleReference.type ===
       AST_NODE_TYPES.TSExternalModuleReference
-      ? moduleReferenceOf(node, node.moduleReference.expression.value)
-      : dottedName(node.moduleReference);
+      ? node.moduleReference.expression.value
+      : undefined;
   }
 
-  // A specifier of `import … from 'm'` (a declaration of its own, so that its
-  // local name leads on), and an `export … from 'm'`: the whole of a
-  // `declare module 'm'` of this file, as for `import('m')`. A specifier inside
-  // a `declare module` is keyed bare like the module's other members, and so
-  // shares its node with any declaration of the same spelling.
   if (
     (node.type === AST_NODE_TYPES.ImportSpecifier ||
       node.type === AST_NODE_TYPES.ImportDefaultSpecifier ||
       node.type === AST_NODE_TYPES.ImportNamespaceSpecifier) &&
-    // Always so at run time; the parser's types also allow an
-    // `ExportNamedDeclaration`, whose `source` may be null.
     node.parent.type === AST_NODE_TYPES.ImportDeclaration
   ) {
-    return moduleReferenceOf(node, node.parent.source.value);
+    return node.parent.source.value;
   }
 
-  // `import('m')` as an expression, whose value is the module, the module's
-  // name written as a string or a template literal with no substitution.
   if (node.type === AST_NODE_TYPES.ImportExpression) {
     const { source } = node;
 
@@ -601,281 +641,71 @@ const referenceOf = (node: TSESTree.Node): string | undefined => {
           ? source.quasis[0]?.value.cooked
           : undefined;
 
-    return specifier === undefined || specifier === null
-      ? undefined
-      : moduleReferenceOf(node, specifier);
+    return specifier ?? undefined;
   }
 
   return (node.type === AST_NODE_TYPES.ExportAllDeclaration ||
     node.type === AST_NODE_TYPES.ExportNamedDeclaration) &&
     node.source !== null
-    ? moduleReferenceOf(node, node.source.value)
+    ? node.source.value
     : undefined;
 };
 
-/** `a.b.c` of the `a` it starts with, as far as the chain is not computed. */
-const memberChainTop = (node: TSESTree.Node): TSESTree.Node => {
-  const { parent } = node;
-
-  return parent?.type === AST_NODE_TYPES.MemberExpression &&
-    parent.object === node &&
-    !parent.computed
-    ? memberChainTop(parent)
-    : node;
-};
-
-const isPropertyName = (
-  node: TSESTree.Identifier,
-  parent: TSESTree.Node,
-): boolean =>
-  (parent.type === AST_NODE_TYPES.MemberExpression &&
-    parent.property === node &&
-    !parent.computed) ||
-  ((parent.type === AST_NODE_TYPES.Property ||
-    parent.type === AST_NODE_TYPES.PropertyDefinition ||
-    parent.type === AST_NODE_TYPES.AccessorProperty ||
-    parent.type === AST_NODE_TYPES.MethodDefinition ||
-    parent.type === AST_NODE_TYPES.TSAbstractPropertyDefinition ||
-    parent.type === AST_NODE_TYPES.TSAbstractMethodDefinition ||
-    parent.type === AST_NODE_TYPES.TSAbstractAccessorProperty ||
-    parent.type === AST_NODE_TYPES.TSPropertySignature ||
-    parent.type === AST_NODE_TYPES.TSMethodSignature) &&
-    parent.key === node &&
-    !parent.computed &&
-    // `{ a }` reads `a` as well as naming the property.
-    !(parent.type === AST_NODE_TYPES.Property && parent.shorthand)) ||
-  (parent.type === AST_NODE_TYPES.TSEnumMember && parent.id === node) ||
-  parent.type === AST_NODE_TYPES.TSNamedTupleMember ||
-  parent.type === AST_NODE_TYPES.LabeledStatement ||
-  parent.type === AST_NODE_TYPES.BreakStatement ||
-  parent.type === AST_NODE_TYPES.ContinueStatement ||
-  parent.type === AST_NODE_TYPES.MetaProperty;
-
-/**
- * Whether `node` is part of a name `referenceOf` reads whole — a type name, a
- * `typeof` operand, a heritage clause, an `import Y = N.X` — or the qualifier
- * of an `import('m')` type, which names a module's member, not a local name.
- */
-const isTypeNamePart = (node: TSESTree.Node): boolean => {
-  const { parent } = node;
-
-  if (parent === undefined) {
+/** Whether `node` sits in a class's `implements` clause. */
+const isInImplements = (node: TSESTree.Node): boolean => {
+  if (node.type === AST_NODE_TYPES.Program) {
     return false;
   }
 
-  if (
-    parent.type === AST_NODE_TYPES.TSQualifiedName ||
-    (parent.type === AST_NODE_TYPES.MemberExpression && parent.object === node)
-  ) {
-    return isTypeNamePart(parent);
-  }
+  const { parent } = node;
 
   return (
-    (parent.type === AST_NODE_TYPES.TSTypeReference &&
-      parent.typeName === node) ||
-    (parent.type === AST_NODE_TYPES.TSTypeQuery && parent.exprName === node) ||
-    ((parent.type === AST_NODE_TYPES.TSInterfaceHeritage ||
-      parent.type === AST_NODE_TYPES.TSClassImplements) &&
-      parent.expression === node) ||
-    (parent.type === AST_NODE_TYPES.TSImportEqualsDeclaration &&
-      parent.moduleReference === node) ||
-    // `import('m').X` names a member of a module, not the local `X`; the
-    // import type leads to the module itself (`referenceOf`).
-    parent.type === AST_NODE_TYPES.TSImportType
+    parent.type === AST_NODE_TYPES.TSClassImplements ||
+    ((parent.type === AST_NODE_TYPES.TSQualifiedName ||
+      parent.type === AST_NODE_TYPES.MemberExpression ||
+      parent.type === AST_NODE_TYPES.TSTypeReference) &&
+      isInImplements(parent))
   );
 };
 
-/** Whether `node` is a name being declared, which reads nothing. */
-const isBindingName = (
-  node: TSESTree.Identifier,
-  parent: TSESTree.Node,
-): boolean =>
-  ((parent.type === AST_NODE_TYPES.VariableDeclarator ||
-    parent.type === AST_NODE_TYPES.TSTypeAliasDeclaration ||
-    parent.type === AST_NODE_TYPES.TSInterfaceDeclaration ||
-    parent.type === AST_NODE_TYPES.ClassDeclaration ||
-    parent.type === AST_NODE_TYPES.ClassExpression ||
-    parent.type === AST_NODE_TYPES.FunctionDeclaration ||
-    parent.type === AST_NODE_TYPES.FunctionExpression ||
-    parent.type === AST_NODE_TYPES.TSDeclareFunction ||
-    parent.type === AST_NODE_TYPES.TSModuleDeclaration ||
-    parent.type === AST_NODE_TYPES.TSImportEqualsDeclaration ||
-    parent.type === AST_NODE_TYPES.TSEnumDeclaration) &&
-    parent.id === node) ||
-  (parent.type === AST_NODE_TYPES.TSTypeParameter && parent.name === node) ||
-  (parent.type === AST_NODE_TYPES.TSMappedType && parent.key === node) ||
-  // `x is T` names the parameter `x`.
-  (parent.type === AST_NODE_TYPES.TSTypePredicate &&
-    parent.parameterName === node) ||
-  (parent.type === AST_NODE_TYPES.TSIndexSignature &&
-    parent.parameters.includes(node)) ||
-  (parent.type === AST_NODE_TYPES.CatchClause && parent.param === node) ||
-  (parent.type === AST_NODE_TYPES.AssignmentPattern && parent.left === node) ||
-  parent.type === AST_NODE_TYPES.ArrayPattern ||
-  parent.type === AST_NODE_TYPES.RestElement ||
-  // `{ a }` and `{ x: a }` in a pattern: the key of a shorthand is a node of
-  // its own, beside the value it binds.
-  (parent.type === AST_NODE_TYPES.Property &&
-    parent.parent.type === AST_NODE_TYPES.ObjectPattern &&
-    (parent.value === node || (parent.shorthand && parent.key === node))) ||
-  parent.type === AST_NODE_TYPES.ImportSpecifier ||
-  parent.type === AST_NODE_TYPES.ImportDefaultSpecifier ||
-  parent.type === AST_NODE_TYPES.ImportNamespaceSpecifier ||
-  parent.type === AST_NODE_TYPES.ExportSpecifier ||
-  ((parent.type === AST_NODE_TYPES.FunctionDeclaration ||
-    parent.type === AST_NODE_TYPES.FunctionExpression ||
-    parent.type === AST_NODE_TYPES.ArrowFunctionExpression ||
-    parent.type === AST_NODE_TYPES.TSDeclareFunction ||
-    parent.type === AST_NODE_TYPES.TSEmptyBodyFunctionExpression ||
-    parent.type === AST_NODE_TYPES.TSFunctionType ||
-    parent.type === AST_NODE_TYPES.TSMethodSignature ||
-    parent.type === AST_NODE_TYPES.TSCallSignatureDeclaration ||
-    parent.type === AST_NODE_TYPES.TSConstructSignatureDeclaration ||
-    parent.type === AST_NODE_TYPES.TSConstructorType) &&
-    parent.params.includes(node)) ||
-  (parent.type === AST_NODE_TYPES.TSParameterProperty &&
-    parent.parameter === node);
+const thisHead = (node: TSESTree.Node): TSESTree.Node | undefined =>
+  node.type === AST_NODE_TYPES.ThisExpression
+    ? node
+    : node.type === AST_NODE_TYPES.TSQualifiedName
+      ? thisHead(node.left)
+      : node.type === AST_NODE_TYPES.MemberExpression
+        ? thisHead(node.object)
+        : undefined;
+
+/** The head of `this.x.y` in a `typeof`, whose `this` leads to the class. */
+const isTypeofThis = (node: TSESTree.Node): boolean =>
+  node.type === AST_NODE_TYPES.TSTypeQuery &&
+  thisHead(node.exprName) !== undefined;
 
 /**
- * The name an identifier in a value position reads: `a` of `const b = a`, `f`
- * of `f()`, `p` of a class field `x = p`, `Base` of `extends mix(Base)`, `v` of
- * `v.x` — a value's type can be inferred from any of them, so `typeof b` leads
- * on through `a`.
+ * Which declarations each declaration of the file leads to, and what each
+ * reference in the file leads to (`targets`, keyed by the node that refers).
  *
- * Not one: a property name (`v.x`, `{ x: 1 }`, `x: T`), a name `referenceOf`
- * already reads as part of a type name or heritage clause, and a name being
- * declared (a declaration's id, a parameter, a binding pattern), which refers
- * to nothing. An identifier this keeps that names no declaration of the file
- * adds nothing; one that collides with an unrelated declaration only adds an
- * edge.
- */
-const valueReferenceOf = (node: TSESTree.Node): string | undefined => {
-  if (node.type !== AST_NODE_TYPES.Identifier) {
-    return undefined;
-  }
-
-  const { parent } = node;
-
-  if (
-    isPropertyName(node, parent) ||
-    isTypeNamePart(node) ||
-    isBindingName(node, parent)
-  ) {
-    return undefined;
-  }
-
-  // `N.make()` reads `N.make`, `v.x` reads `v.x`, `globalThis.make()` the
-  // global `make`: the whole member chain, which `keyCandidates` takes apart.
-  return dottedName(memberChainTop(node)) ?? node.name;
-};
-
-/**
- * Calls `onReference` for every name referred to in `node`'s subtree, with the
- * keys of the declarations within the subtree that the reference sits in.
- */
-const forEachReference = (
-  node: TSESTree.Node,
-  sourceCode: TSESLint.SourceCode,
-  onReference: (referenced: string, declarations: readonly string[]) => void,
-  enclosing: readonly string[] = [],
-): void => {
-  const declared = declarationKeys(node);
-
-  const inside = Arr.isEmpty(declared)
-    ? enclosing
-    : [...enclosing, ...declared];
-
-  const name = referenceOf(node) ?? valueReferenceOf(node);
-
-  if (name !== undefined) {
-    onReference(name, inside);
-  }
-
-  for (const child of childrenOf(node, sourceCode)) {
-    forEachReference(child, sourceCode, onReference, inside);
-  }
-};
-
-/**
- * The edges that make a namespace reachable as a whole, for `typeof N`: from
- * each key of the namespace (`B` and `A.B` for `A.B`, and `A` for its outer
- * part) to the fully qualified key of each of its members, nested namespaces
- * included.
- */
-const forEachNamespaceEdge = (
-  node: TSESTree.Node,
-  sourceCode: TSESLint.SourceCode,
-  onEdge: (from: string, to: string) => void,
-): void => {
-  const names = declaredNames(node);
-
-  const namespace = Arr.isEmpty(names) ? undefined : namespaceOf(node);
-
-  // A `declare module 'm'` holds its members' references itself
-  // (`declarationKeys`), so only a namespace's members are linked here.
-  if (namespace !== undefined && namespace.id.type !== AST_NODE_TYPES.Literal) {
-    const path = namespacePath(namespace);
-
-    for (const name of names) {
-      const member = Arr.toPushed(path, name).join('.');
-
-      for (const key of tailsOf(path)) {
-        onEdge(key, member);
-      }
-    }
-  }
-
-  if (node.type === AST_NODE_TYPES.TSModuleDeclaration) {
-    const path = namespacePath(node);
-
-    // `namespace A.B` and `namespace B` in `namespace A` are members of `A`.
-    for (const [index, part] of path.entries()) {
-      if (index === 0) {
-        continue;
-      }
-
-      const outer = path.slice(0, index);
-
-      for (const key of tailsOf(outer)) {
-        onEdge(key, Arr.toPushed(outer, part).join('.'));
-      }
-    }
-  }
-
-  for (const child of childrenOf(node, sourceCode)) {
-    forEachNamespaceEdge(child, sourceCode, onEdge);
-  }
-};
-
-/** Whether a top-level statement is or exports a `namespace`. */
-const containsNamespace = (statement: TSESTree.ProgramStatement): boolean =>
-  statement.type === AST_NODE_TYPES.TSModuleDeclaration ||
-  (statement.type === AST_NODE_TYPES.ExportNamedDeclaration &&
-    statement.declaration?.type === AST_NODE_TYPES.TSModuleDeclaration);
-
-/**
- * Which names each declaration in the file refers to, keyed by the names it is
- * found by (`declarationKeys`). A declaration counts as a whole — an alias's
- * type parameters, an interface's or class's members and heritage clauses, a
- * function's signature, a variable's annotation and initializer (where `typeof`
- * of it reads its type from). Bodies count too, although only signatures
- * matter: telling the two apart would need a second notion of which subtrees
- * hold edges, and a body only adds edges, which can only suppress more
- * rewrites.
+ * A reference is resolved through `sourceCode.scopeManager`, so a name leads to
+ * the declaration it binds to and no other of the same spelling: a local `pair`
+ * in one function and a namespace member `Pair` are nodes apart from a
+ * top-level `Pair`. A name resolved to a `namespace` is followed into the member
+ * a qualified name reads (`followMembers`); one the scope manager leaves
+ * unresolved is looked up among the file's `declare global` members, as is
+ * `globalThis.X`, and is otherwise followed no further (another module, a
+ * global of the environment). A reference in a class's `implements` clause is
+ * left out: the instance type does not take its members from it.
  *
- * Keyed by name, not by binding, so declarations of one name in different
- * scopes share a node and their sets are merged: a name reused in a function
- * must not hide the edges of the outer declaration. Types and values share it
- * too, so `typeof X` reaches a `type X` as well as a `const X`. Both only add
- * edges, so their cost is a rewrite withheld where two unrelated declarations
- * share a name (a local `result` and a top-level one). Telling them apart means
- * resolving each name to its binding through `sourceCode.scopeManager`
- * instead of by spelling, which would replace this graph's keys altogether;
- * until then a shared spelling costs a rewrite, never a broken one.
+ * Besides names, `typeof this.x` leads to the class it sits in, and the module
+ * forms of `moduleSpecifierOf` lead to the file's `declare module` of that name.
+ *
+ * A declaration counts as a whole — an alias's type parameters, an interface's
+ * or class's members and heritage clauses, a function's signature and body, a
+ * variable's annotation and initializer — so a reference anywhere inside it is
+ * an edge from it, and from every declaration around it.
  *
  * Built once per file and cached on the `Program` node: the search below runs
- * per candidate tuple, and rebuilding this for each of them made the rule cost
- * `O(tuples × file size)` — a full second on the largest generated files here.
+ * per candidate tuple.
  */
 const declarationReferenceGraph = (
   program: TSESTree.Program,
@@ -887,84 +717,154 @@ const declarationReferenceGraph = (
     return cached;
   }
 
-  const mut_graph = new Map<string, Set<string>>();
+  const mut_edges = new Map<TSESTree.Node, Set<TSESTree.Node>>();
 
-  const addEdge = (from: string, to: string): void => {
-    const mut_names = mut_graph.get(from);
+  const mut_targets = new Map<TSESTree.Node, TSESTree.Node[]>();
 
-    if (mut_names === undefined) {
-      mut_graph.set(from, new Set<string>([to]));
-    } else {
-      mut_names.add(to);
+  const modules = moduleDeclarations(program);
+
+  const globalMembers = (name: string): readonly TSESTree.Node[] =>
+    modules.globals.flatMap((block) => membersNamed(block, name));
+
+  // A name the scope manager does not resolve: a member of a block of a
+  // namespace around it that it does not bind (`B` in `namespace A { … }`, of
+  // `namespace A.B { … }` beside it), else a `declare global` member.
+  const unresolvedTargets = (
+    identifier: TSESTree.Node,
+    name: string,
+    names: readonly string[],
+  ): readonly TSESTree.Node[] => {
+    for (const namespace of enclosingNamespaces(identifier)) {
+      const found = lookupMembers(
+        namespaceBlocks(namespace),
+        Arr.toUnshifted(name)(names),
+      );
+
+      if (Arr.isNonEmpty(found)) {
+        return found;
+      }
     }
-  };
 
-  forEachReference(program, sourceCode, (name, enclosing) => {
-    for (const declaration of enclosing) {
-      addEdge(declaration, name);
-    }
-  });
+    // `A` of `namespace A.B { … }` alone, which binds no `A`.
+    const topLevel = Arr.generate(function* () {
+      for (const statement of program.body) {
+        const candidate =
+          statement.type === AST_NODE_TYPES.ExportNamedDeclaration
+            ? statement.declaration
+            : statement;
 
-  const declarationKeysWithEdges = new Set<string>(mut_graph.keys());
-
-  const mut_namespaceKeys = new Set<string>();
-
-  // A second walk, but only for a file that declares a namespace: the keys it
-  // adds exist only there, and most files, the large generated ones included,
-  // declare none. (A `declare module` counts, as it may hold one.)
-  if (program.body.some(containsNamespace)) {
-    forEachNamespaceEdge(program, sourceCode, (from, to) => {
-      addEdge(from, to);
-
-      mut_namespaceKeys.add(from);
-
-      // A member is found by its qualified key even when it refers to nothing,
-      // so that `N.X` stops there rather than falling back to `N`.
-      if (!mut_graph.has(to)) {
-        mut_graph.set(to, new Set<string>());
+        if (
+          candidate?.type === AST_NODE_TYPES.TSModuleDeclaration &&
+          declaredName(candidate) === name
+        ) {
+          yield candidate;
+        }
       }
     });
+
+    return followMembers(
+      Arr.isNonEmpty(topLevel) ? topLevel : globalMembers(name),
+      names,
+    );
+  };
+
+  const addReference = (
+    from: TSESTree.Node,
+    to: readonly TSESTree.Node[],
+  ): void => {
+    if (Arr.isEmpty(to)) {
+      return;
+    }
+
+    mut_targets.set(from, [...(mut_targets.get(from) ?? []), ...to]);
+
+    for (const declaration of enclosingDeclarations(from)) {
+      const mut_set = mut_edges.get(declaration) ?? new Set<TSESTree.Node>();
+
+      for (const target of to) {
+        mut_set.add(target);
+      }
+
+      mut_edges.set(declaration, mut_set);
+    }
+  };
+
+  for (const scope of sourceCode.scopeManager?.scopes ?? []) {
+    for (const reference of scope.references) {
+      const { identifier } = reference;
+
+      if (isInImplements(identifier)) {
+        continue;
+      }
+
+      const names = memberNamesAfter(identifier);
+
+      // A global of the environment (`globalThis`, `Array`) resolves to a
+      // variable with no definition: as good as unresolved.
+      const definitions = reference.resolved?.defs ?? [];
+
+      const name =
+        identifier.type === AST_NODE_TYPES.Identifier
+          ? identifier.name
+          : undefined;
+
+      const [first, ...rest] = names;
+
+      addReference(
+        identifier,
+        Arr.isNonEmpty(definitions)
+          ? followMembers(
+              definitions.flatMap((definition) => {
+                const declaration = declarationOf(definition);
+
+                return declaration === undefined
+                  ? []
+                  : namespaceBlocks(declaration);
+              }),
+              names,
+            )
+          : name === 'globalThis'
+            ? first === undefined
+              ? []
+              : followMembers(globalMembers(first), rest)
+            : name === undefined
+              ? []
+              : unresolvedTargets(identifier, name, names),
+      );
+    }
   }
 
-  const graph: ReferenceGraph = {
-    edges: mut_graph,
-    namespaceOnlyKeys: mut_namespaceKeys.difference(declarationKeysWithEdges),
+  const visit = (node: TSESTree.Node): void => {
+    const specifier = moduleSpecifierOf(node);
+
+    if (specifier !== undefined) {
+      addReference(node, declaredModulesFor(modules, specifier));
+    }
+
+    if (isTypeofThis(node)) {
+      const owner = enclosingClass(node);
+
+      if (owner !== undefined) {
+        addReference(node, [owner]);
+      }
+    }
+
+    for (const child of childrenOf(node, sourceCode)) {
+      visit(child);
+    }
   };
+
+  visit(program);
+
+  const graph: ReferenceGraph = { edges: mut_edges, targets: mut_targets };
 
   declarationReferenceGraphCache.set(program, graph);
 
   return graph;
 };
 
-/**
- * `N.X.Y`, `N.X`, `N`, longest first. (A loop, as `tailsOf` is: each form
- * extends the one before it.)
- */
-const prefixesOf = (name: string): readonly string[] => {
-  const mut_candidates: string[] = [];
-
-  let mut_prefix: string | undefined = undefined;
-
-  for (const part of name.split('.')) {
-    mut_prefix = mut_prefix === undefined ? part : `${mut_prefix}.${part}`;
-
-    mut_candidates.push(mut_prefix);
-  }
-
-  return mut_candidates.toReversed();
-};
-
-/**
- * `N.X.Y`, then `N.X`, then `N`: the keys a qualified name may be found by,
- * longest first. `globalThis.X` is found as `X` as well, as a global
- * declaration is keyed bare.
- */
-const keyCandidates = (name: string): readonly string[] =>
-  name.startsWith(globalThisPrefix)
-    ? [...prefixesOf(name), ...prefixesOf(name.slice(globalThisPrefix.length))]
-    : prefixesOf(name);
-
-const globalThisPrefix = 'globalThis.';
+const programOf = (node: TSESTree.Node): TSESTree.Program =>
+  node.type === AST_NODE_TYPES.Program ? node : programOf(node.parent);
 
 /**
  * Whether the tuple sits in a declaration that its own element type leads back
@@ -980,8 +880,8 @@ const globalThisPrefix = 'globalThis.';
  * The cycle is often indirect. `LambdaApplication = readonly [LambdaTerm,
  * LambdaTerm]` looks fine on its own, and only recurses because `LambdaTerm` is
  * a union that includes `LambdaApplication`. So this follows references through
- * the other declarations in the file rather than looking for the enclosing name
- * in the element text.
+ * the other declarations in the file (`declarationReferenceGraph`) rather than
+ * looking for the enclosing name in the element text.
  *
  * **Any cycle counts, which leaves some rewritable tuples alone.** Not every
  * cycle actually breaks: TypeScript resolves an object type, an array, a tuple
@@ -1009,46 +909,47 @@ const globalThisPrefix = 'globalThis.';
  * `readonly [Vec, Vec]` are left alone too, although their rewrites compile:
  * a member's type is deferred just as an object type's is, and the same
  * reasoning above keeps this from telling the safe cycles from the others.
- *
- * A name declared in a `namespace` is found both bare and qualified (`N.X`, and
- * `B.X` and `A.B.X` in `namespace A.B`), and `typeof N` leads to every member
- * of `N`; a qualified name that matches no declaration of the file is followed
- * by its longest part that does (`typeof v.x` by `v`), or not at all
- * (`vscode.Range`).
- *
- * A `declare module 'm'` of this file is one node, which `import('m')`,
- * `import … from 'm'`, `export … from 'm'` and `import x = require('m')` all
- * lead to as a whole. A cycle closed through a module this file does not
- * declare is not followed, unless a name it reaches happens to match a
- * declaration of this file.
  */
 const closesDeclarationCycle = (
   tuple: TSESTree.TSTupleType,
   sourceCode: TSESLint.SourceCode,
 ): boolean => {
-  const enclosingKeys = new Set<string>(enclosingDeclarationKeys(tuple));
+  const enclosing = new Set<TSESTree.Node>(enclosingDeclarations(tuple));
 
-  if (enclosingKeys.size === 0) {
+  if (enclosing.size === 0) {
     return false;
   }
 
-  const references = declarationReferenceGraph(programOf(tuple), sourceCode);
+  // With no scope manager the graph would have no edges, and every cycle would
+  // go unseen: a rewrite withheld is the safe side.
+  if (sourceCode.scopeManager === null) {
+    return true;
+  }
+
+  const { edges, targets } = declarationReferenceGraph(
+    programOf(tuple),
+    sourceCode,
+  );
 
   // A search per tuple, over what its elements reach — at worst the whole
-  // graph, so a file with many uniform tuples in declarations pays O(tuples ×
-  // graph) here, as it once did to build the graph. The search stops at the
-  // first cycle and most reach only a few declarations; strongly connected
-  // components computed once per file would bound it, if a file turns out to
-  // need it.
-  const mut_seen = new Set<string>();
+  // graph. It stops at the first cycle, and most reach only a few declarations;
+  // strongly connected components computed once per file would bound it, if a
+  // file turns out to need it.
+  const mut_queue: TSESTree.Node[] = [];
 
-  const mut_queue: string[] = [];
+  const collect = (node: TSESTree.Node): void => {
+    mut_queue.push(...(targets.get(node) ?? []));
+
+    for (const child of childrenOf(node, sourceCode)) {
+      collect(child);
+    }
+  };
 
   for (const element of tuple.elementTypes) {
-    forEachReference(element, sourceCode, (name) => {
-      mut_queue.push(name);
-    });
+    collect(element);
   }
+
+  const mut_seen = new Set<TSESTree.Node>();
 
   while (true) {
     const next = mut_queue.pop();
@@ -1057,40 +958,19 @@ const closesDeclarationCycle = (
       return false;
     }
 
+    if (enclosing.has(next)) {
+      return true;
+    }
+
     if (mut_seen.has(next)) {
       continue;
     }
 
     mut_seen.add(next);
 
-    // Every form of the name that the file declares, longest first (`v.x` of a
-    // variable `v`, `B.X` of `namespace A.B` and of a variable `B` alike) —
-    // save a namespace's own key once a member of it matched, which would lead
-    // to every other member of the namespace too.
-    let mut_matched = false;
-
-    for (const candidate of keyCandidates(next)) {
-      if (enclosingKeys.has(candidate)) {
-        return true;
-      }
-
-      const edges = references.edges.get(candidate);
-
-      if (
-        edges === undefined ||
-        (mut_matched && references.namespaceOnlyKeys.has(candidate))
-      ) {
-        continue;
-      }
-
-      mut_queue.push(...edges);
-
-      mut_matched = true;
-    }
+    mut_queue.push(...(edges.get(next) ?? []));
   }
 };
-
-const declaredModulesCache = new WeakMap<TSESTree.Program, DeclaredModules>();
 
 const declarationReferenceGraphCache = new WeakMap<
   TSESTree.Program,
@@ -1098,13 +978,10 @@ const declarationReferenceGraphCache = new WeakMap<
 >();
 
 type ReferenceGraph = Readonly<{
-  /** What each key leads to (`declarationReferenceGraph`). */
-  edges: ReadonlyMap<string, ReadonlySet<string>>;
-  /**
-   * The keys only a namespace is found by, which lead to every member of it:
-   * `N` of `N.X`, followed only when no longer form of the name is a key.
-   */
-  namespaceOnlyKeys: ReadonlySet<string>;
+  /** The declarations each declaration leads to (`declarationReferenceGraph`). */
+  edges: ReadonlyMap<TSESTree.Node, ReadonlySet<TSESTree.Node>>;
+  /** The declarations each node that refers leads to. */
+  targets: ReadonlyMap<TSESTree.Node, readonly TSESTree.Node[]>;
 }>;
 
 /** Unwraps `V[]` and `readonly V[]` to `V`. */
