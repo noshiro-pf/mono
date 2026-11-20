@@ -999,3 +999,99 @@ ruleTester.run(
     ],
   },
 );
+
+// `A` of `m` is also the namespace `m/a` is as a whole.
+const namespaceSubpaths = [{ exportName: 'A', moduleName: 'm/a' }] as const;
+
+const probeSubpathBindingAt = (
+  names: readonly string[],
+): ReturnType<typeof probeRule> =>
+  probeRule(
+    (context, argument) =>
+      bindValueImportsAt(
+        context.sourceCode,
+        'm',
+        names,
+        [],
+        namespaceSubpaths,
+      )(argument)?.localNames.join(', ') ?? '(none)',
+    (context, fixer, argument) =>
+      bindValueImportsAt(
+        context.sourceCode,
+        'm',
+        names,
+        [],
+        namespaceSubpaths,
+      )(argument)?.edits(fixer) ?? [],
+  );
+
+ruleTester.run(
+  'bindValueImportsAt with namespace subpaths',
+  probeSubpathBindingAt(['A']),
+  {
+    valid: [],
+    invalid: [
+      {
+        name: "the subpath's namespace import is the export, with no edit",
+        code: dedent`
+          import * as A from 'm/a';
+          probe(0);
+        `,
+        output: null,
+        errors: [{ messageId: 'result', data: { result: 'A' } }],
+      },
+      {
+        name: "an alias of the subpath's namespace is written by its local name",
+        code: dedent`
+          import * as Ar from 'm/a';
+          probe(0);
+        `,
+        output: null,
+        errors: [{ messageId: 'result', data: { result: 'Ar' } }],
+      },
+      {
+        name: 'refused where a local binding shadows the namespace',
+        code: dedent`
+          import * as A from 'm/a';
+          const run = (A: number) => probe(A);
+        `,
+        output: null,
+        errors: [{ messageId: 'result', data: { result: '(none)' } }],
+      },
+      {
+        name: '`import type * as` of the subpath binds no value, and takes the name',
+        code: dedent`
+          import type * as A from 'm/a';
+          probe(0);
+        `,
+        output: null,
+        errors: [{ messageId: 'result', data: { result: '(none)' } }],
+      },
+      {
+        name: 'added as a namespace import where the file imports another subpath',
+        code: dedent`
+          import * as B from 'm/b';
+          probe(B);
+        `,
+        output: dedent`
+          import * as B from 'm/b';
+          import * as A from 'm/a';
+          probe(B);
+        `,
+        errors: [{ messageId: 'result', data: { result: 'A' } }],
+      },
+      {
+        name: 'added by name from the module where the file imports no subpath',
+        code: dedent`
+          import { f } from 'm';
+          probe(f);
+        `,
+        output: dedent`
+          import { f, A } from 'm';
+          probe(f);
+        `,
+        errors: [{ messageId: 'result', data: { result: 'A' } }],
+      },
+    ],
+  },
+);
