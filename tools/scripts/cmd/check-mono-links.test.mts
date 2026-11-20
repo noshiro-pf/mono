@@ -19,7 +19,23 @@ const targetsOf = (
 const linkTo = (
   target: string,
   lines?: Readonly<{ first: number; last: number }>,
-): MonoLink => ({ line: 1, written: target, target, lines }) as const;
+): MonoLink =>
+  ({ line: 1, written: target, target, lines, ref: undefined }) as const;
+
+/** The reasons `findMonoLinks` and `brokenReason` give the links of `text`. */
+const reasonsOf = async (
+  text: string,
+  relativePath: string,
+  tracked: readonly string[] = ['README.md'],
+): Promise<readonly (string | undefined)[]> => {
+  const tree = toTree(tracked);
+
+  return Promise.all(
+    findMonoLinks(text, relativePath).map(async (link) =>
+      brokenReason(link, tree, new Map<string, number>()),
+    ),
+  );
+};
 
 describe('findMonoLinks', () => {
   test('reads blob, tree, raw and edit URLs on main', () => {
@@ -49,15 +65,60 @@ describe('findMonoLinks', () => {
     );
   });
 
-  test('leaves URLs pinned to a commit or another branch alone', () => {
+  test('leaves a URL pinned to a full commit SHA alone', () => {
     assert.deepStrictEqual(
       targetsOf(dedent`
         ${BASE}/blob/282de895074789a85912c618d6ae69ac49c2730d/gone.mts
-        ${BASE}/blob/develop/gone.mts
         ${BASE}/pull/2052
       `),
       [],
     );
+  });
+
+  test('fails a URL on another branch or a short SHA, naming the ref', async () => {
+    assert.deepStrictEqual(
+      await reasonsOf(
+        dedent`
+          ${BASE}/blob/develop/README.md
+          ${BASE}/tree/abc1234/README.md
+        `,
+        'libs/synstate/README.md',
+      ),
+      [
+        'names the ref `develop`, neither main nor a full commit SHA: a branch can be renamed or deleted',
+        'names the ref `abc1234`, neither main nor a full commit SHA: a branch can be renamed or deleted',
+      ],
+    );
+  });
+
+  test('fails a URL on another branch into experimental/ too', () => {
+    assert.deepStrictEqual(
+      findMonoLinks(
+        `${BASE}/blob/develop/experimental/a.mts`,
+        'libs/synstate/README.md',
+      ).map(({ ref }) => ref),
+      ['develop'],
+    );
+  });
+
+  test('reads the absolute URLs of articles/ and books/, not their relative links', async () => {
+    const text = dedent`
+      ${BASE}/blob/develop/README.md
+      ${BASE}/blob/main/gone.md
+      ${BASE}/blob/main/README.md?raw=true
+      ${BASE}/blob/282de895074789a85912c618d6ae69ac49c2730d/gone.png
+      ![x](./missing.png)
+    `;
+
+    for (const file of ['articles/a.md', 'books/b/c.md']) {
+      assert.isTrue(isScanned(file));
+
+      assert.deepStrictEqual(await reasonsOf(text, file), [
+        'names the ref `develop`, neither main nor a full commit SHA: a branch can be renamed or deleted',
+        'no such path on main',
+        undefined,
+      ]);
+    }
   });
 
   test('leaves templates alone', () => {
@@ -294,6 +355,16 @@ describe('findMonoLinks', () => {
 });
 
 describe('isScanned', () => {
+  test('reads the Markdown of articles/ and books/, nothing else there', () => {
+    assert.isTrue(isScanned('articles/a.md'));
+
+    assert.isTrue(isScanned('books/b/c.md'));
+
+    assert.isFalse(isScanned('articles/a/1.png'));
+
+    assert.isFalse(isScanned('books/b/config.yaml'));
+  });
+
   test('reads the code of every docs site, matched by its -docs suffix', () => {
     assert.isTrue(isScanned('apps/synstate-docs/astro.config.mjs'));
 
