@@ -198,6 +198,8 @@ const noReaders = new Map<string, readonly string[]>();
 
 const noRootReads: ReadonlySet<string> = new Set<string>();
 
+const noOutsideImports: ReadonlySet<string> = new Set<string>();
+
 const classify = (files: readonly string[]) =>
   classifyChanges({
     files,
@@ -219,6 +221,7 @@ const plan = (files: readonly string[], coverage = true) =>
     rootScripts,
     coverage,
     spellChecked: files,
+    outsideLintImports: noOutsideImports,
   });
 
 const describeStep = ({ cwd, args }: Step): string =>
@@ -261,6 +264,7 @@ const planCommands = (
     rootScripts,
     coverage: true,
     spellChecked: [],
+    outsideLintImports: noOutsideImports,
   }).map(describeStep);
 
 /** Whether the root's own lint runs for a change to `file`. */
@@ -334,6 +338,7 @@ describe('isSpellCheckedByCi', () => {
       rootScripts,
       coverage: false,
       spellChecked: ['.claude/settings.json', 'CLAUDE.md'],
+      outsideLintImports: noOutsideImports,
     }).find(({ args }) => args.includes('cspell'));
 
     assert.deepStrictEqual(step?.args.slice(-1), ['./CLAUDE.md']);
@@ -553,6 +558,7 @@ describe('the documents a unit test reads', () => {
         rootScripts: ['check:root:test'],
         coverage: false,
         spellChecked: [],
+        outsideLintImports: noOutsideImports,
       });
 
       // A test in a member runs by its `check:test`; one in no member is the
@@ -598,6 +604,7 @@ describe('the documents a unit test reads, planned', () => {
         rootScripts: ['check:md', 'check:root:test', 'check:root:a'],
         coverage: false,
         spellChecked: [],
+        outsideLintImports: noOutsideImports,
       }).map(describeStep);
 
       assert.include(commands, 'run check:md');
@@ -757,6 +764,7 @@ describe('buildPlan', () => {
       maxParallel: 2,
       coverage: true,
       spellChecked: [],
+      outsideLintImports: noOutsideImports,
     }).find(({ title }) => title.startsWith('check:root ('));
 
     assert.strictEqual(
@@ -780,6 +788,7 @@ describe('buildPlan', () => {
         maxParallel,
         coverage: true,
         spellChecked: [],
+        outsideLintImports: noOutsideImports,
       }).find(({ title }) => title.startsWith('check:root ('));
 
       assert.strictEqual(step?.title, 'check:root (4 scripts in parallel)');
@@ -795,6 +804,7 @@ describe('buildPlan', () => {
       rootScripts,
       coverage: true,
       spellChecked: [],
+      outsideLintImports: noOutsideImports,
     }).map(describeStep);
 
     assert.include(
@@ -975,6 +985,7 @@ describe('buildPlan', () => {
         rootScripts,
         coverage: true,
         spellChecked: [],
+        outsideLintImports: noOutsideImports,
       });
 
       assert.deepStrictEqual(
@@ -1056,6 +1067,7 @@ describe('buildPlan', () => {
       rootScripts,
       coverage: false,
       spellChecked: [],
+      outsideLintImports: noOutsideImports,
     });
 
     const generators = steps
@@ -1162,6 +1174,7 @@ describe('buildPlan', () => {
       rootScripts,
       coverage: false,
       spellChecked: [],
+      outsideLintImports: noOutsideImports,
     }).map(({ title }) => title);
 
     assert.include(steps, 'ext: check:ext');
@@ -1670,6 +1683,51 @@ describe('the ESLint toolchain', () => {
 
     assert.notInclude(
       commandsOf(['libs/lint-helper/src/index.mts']),
+      'run strict-lib:check:lint',
+    );
+  });
+
+  test('a package the root or strict-lib config alone imports asks for their lint', () => {
+    const members = [
+      pkg('libs/eslint-plugin-outside', ['build', 'fix:lint'], {
+        exportsBuild: true,
+      }),
+      pkg('apps/user', ['fix:lint']),
+    ] as const;
+
+    const commandsWith = (outside: ReadonlySet<string>): readonly string[] =>
+      buildPlan({
+        classification: classifyChanges({
+          files: ['libs/eslint-plugin-outside/src/index.mts'],
+          packages: members,
+          proseGate,
+          generatorReaders: noReaders,
+          rootProgramReads: noRootReads,
+        }),
+        base: 'abc123',
+        rootScripts,
+        coverage: true,
+        spellChecked: [],
+        outsideLintImports: outside,
+      }).map(describeStep);
+
+    const imported = commandsWith(new Set<string>(['eslint-plugin-outside']));
+
+    assert.include(imported, 'run strict-lib:check:lint');
+
+    assert.isTrue(
+      imported.some(
+        (command) =>
+          command.startsWith('exec run-p') &&
+          command.includes('check:root:lint'),
+      ),
+    );
+
+    assert.include(imported, 'libs/eslint-plugin-outside: run build');
+
+    // Imported by no config: no lint of what loads it.
+    assert.notInclude(
+      commandsWith(noOutsideImports),
       'run strict-lib:check:lint',
     );
   });
