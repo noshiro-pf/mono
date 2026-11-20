@@ -1,6 +1,12 @@
 import parser from '@typescript-eslint/parser';
 import { RuleTester } from '@typescript-eslint/rule-tester';
 import dedent from 'dedent';
+import { Arr } from 'ts-data-forge';
+import {
+  type RecordedOutputs,
+  recordingRun,
+  typeErrorsOf,
+} from '../../test/index.mjs';
 import { preferRangeForLoop } from './prefer-range-for-loop.mjs';
 
 const tester = new RuleTester({
@@ -17,8 +23,14 @@ const tester = new RuleTester({
   },
 });
 
+// Every output the cases below fix to, and the suggestions they declare
+// (\`typeCheck\`), compiled against \`range\` by the last \`describe\`.
+const mut_outputs: RecordedOutputs[] = [];
+
+const run = recordingRun(tester, mut_outputs);
+
 describe('prefer-range-for-loop', () => {
-  tester.run('prefer-range-for-loop', preferRangeForLoop, {
+  run('prefer-range-for-loop', preferRangeForLoop, {
     valid: [
       {
         name: 'ignores for loop with const',
@@ -61,6 +73,7 @@ describe('prefer-range-for-loop', () => {
         // The variable becomes what `range` yields, a `SafeUint` here, which
         // `acc += 0.5` does not take.
         name: 'suggests rather than fixes a loop whose body widens the variable through a let',
+        typeCheck: { suggestions: 'fail' },
         code: dedent`
           import type { SafeInt } from 'ts-type-forge';
           declare const n: SafeInt;
@@ -92,6 +105,7 @@ describe('prefer-range-for-loop', () => {
       },
       {
         name: 'suggests rather than fixes a loop that declared its variable a number',
+        typeCheck: { suggestions: 'compile' },
         code: dedent`
           for (let i: number = 0; i < 10; ++i) {
             console.log(i);
@@ -233,7 +247,7 @@ describe('prefer-range-for-loop', () => {
 }, 20000);
 
 describe('prefer-range-for-loop through type wrappers', () => {
-  tester.run('prefer-range-for-loop', preferRangeForLoop, {
+  run('prefer-range-for-loop', preferRangeForLoop, {
     valid: [
       {
         name: 'a wrapped non-positive step',
@@ -280,7 +294,7 @@ describe('prefer-range-for-loop through type wrappers', () => {
 }, 20000);
 
 describe('prefer-range-for-loop with parenthesized operands', () => {
-  tester.run('prefer-range-for-loop', preferRangeForLoop, {
+  run('prefer-range-for-loop', preferRangeForLoop, {
     valid: [],
     invalid: [
       {
@@ -335,7 +349,7 @@ const STEP_NOTE =
   ' Its step has to be a positive one (`asPositiveSafeInt` throws on anything else): `range` takes no zero step, and with a negative one it runs while the value is above the end, where the loop runs while it is below.';
 
 describe('prefer-range-for-loop where the rewrite would change behavior', () => {
-  tester.run('prefer-range-for-loop', preferRangeForLoop, {
+  run('prefer-range-for-loop', preferRangeForLoop, {
     valid: [
       {
         // `const i` could not be assigned.
@@ -812,10 +826,10 @@ const unionStepCode = dedent`
 `;
 
 // `range` takes a `SafeInt` or an integer literal from -512 to 511. Every
-// `output` here is also in `test/range-for-loop-fix-output.mts`, which
-// `check:types` compiles.
+// `output` here is compiled against it by the last `describe`, and the
+// suggestions a case declares (`typeCheck`).
 describe('prefer-range-for-loop fixes only what `range` accepts', () => {
-  tester.run('prefer-range-for-loop', preferRangeForLoop, {
+  run('prefer-range-for-loop', preferRangeForLoop, {
     valid: [],
     invalid: [
       {
@@ -1014,6 +1028,7 @@ describe('prefer-range-for-loop fixes only what `range` accepts', () => {
       },
       {
         name: 'an end typed number is suggested, not fixed',
+        typeCheck: { suggestions: 'fail' },
         code: dedent`
           const f = (xs: readonly string[], n: number): void => {
             const len = xs.length;
@@ -1065,6 +1080,7 @@ describe('prefer-range-for-loop fixes only what `range` accepts', () => {
       },
       {
         name: 'a literal outside the small-integer range is suggested, not fixed',
+        typeCheck: { suggestions: 'fail' },
         code: dedent`
           import { range } from 'ts-data-forge';
           for (let i = 0; i < 512; ++i) {
@@ -1144,6 +1160,7 @@ describe('prefer-range-for-loop fixes only what `range` accepts', () => {
       {
         // TypeScript types `-5` as `-5`, but `-(5)` as a `number`.
         name: 'a negated literal in parentheses is suggested, not fixed',
+        typeCheck: { suggestions: 'fail' },
         code: dedent`
           import { range } from 'ts-data-forge';
           for (let i = -(5); i < 0; ++i) {
@@ -1170,6 +1187,7 @@ describe('prefer-range-for-loop fixes only what `range` accepts', () => {
       },
       {
         name: 'a begin or an end typed Int, FiniteNumber or number is suggested, not fixed',
+        typeCheck: { suggestions: 'fail' },
         code: dedent`
           import { range } from 'ts-data-forge';
           import type { FiniteNumber, Int } from 'ts-type-forge';
@@ -1261,6 +1279,7 @@ describe('prefer-range-for-loop fixes only what `range` accepts', () => {
       {
         // `range`'s step is a `NonZeroSafeInt`: a `SafeInt` may be zero.
         name: 'a step typed number or SafeInt is suggested, not fixed',
+        typeCheck: { suggestions: 'fail' },
         code: dedent`
           import { range } from 'ts-data-forge';
           import type { SafeInt } from 'ts-type-forge';
@@ -1326,6 +1345,7 @@ describe('prefer-range-for-loop fixes only what `range` accepts', () => {
         // intersection of those) gets neither a fix nor a suggestion, and a
         // message saying why.
         name: 'a step typed NonZeroSafeInt is suggested, one never positive by its type gets a message saying why',
+        typeCheck: { suggestions: 'compile' },
         code: dedent`
           import type {
             NegativeSafeInt,
@@ -1478,6 +1498,7 @@ describe('prefer-range-for-loop fixes only what `range` accepts', () => {
         // The value of a literal step is known to be positive, whatever a cast
         // on it claims.
         name: 'a large literal step cast to a negative type is still suggested',
+        typeCheck: { suggestions: 'compile' },
         code: dedent`
           import type { SafeInt } from 'ts-type-forge';
           const f = (n: SafeInt): void => {
@@ -1511,6 +1532,7 @@ describe('prefer-range-for-loop fixes only what `range` accepts', () => {
         // The literal 600 is no parameter type of `range`, so the step is not
         // fixed, but the suggestion keeps the cast the author wrote.
         name: 'a wrapped literal step too large to fit keeps its wrapper',
+        typeCheck: { suggestions: 'compile' },
         code: dedent`
           import type { PositiveSafeInt, SafeInt } from 'ts-type-forge';
           const f = (n: SafeInt): void => {
@@ -1552,7 +1574,7 @@ describe('prefer-range-for-loop fixes only what `range` accepts', () => {
 }, 20000);
 
 describe('prefer-range-for-loop asks every layer of a wrapped bound for its type', () => {
-  tester.run('prefer-range-for-loop', preferRangeForLoop, {
+  run('prefer-range-for-loop', preferRangeForLoop, {
     valid: [],
     invalid: [
       {
@@ -1683,6 +1705,7 @@ describe('prefer-range-for-loop asks every layer of a wrapped bound for its type
         // The brand keys alone do not make a type ts-type-forge's `SafeInt`:
         // `range` does not take this one.
         name: 'a look-alike of the SafeInt brand is suggested, not fixed',
+        typeCheck: { suggestions: 'fail' },
         code: dedent`
           type MyInt = number & {
             readonly NaNValue: false;
@@ -1725,7 +1748,7 @@ describe('prefer-range-for-loop asks every layer of a wrapped bound for its type
 }, 20000);
 
 describe('prefer-range-for-loop keeps the comments of the loop head', () => {
-  tester.run('prefer-range-for-loop', preferRangeForLoop, {
+  run('prefer-range-for-loop', preferRangeForLoop, {
     valid: [],
     invalid: [
       {
@@ -1887,3 +1910,44 @@ describe('prefer-range-for-loop without type information', () => {
     ],
   });
 }, 20000);
+
+describe('what prefer-range-for-loop writes compiles', () => {
+  test('every fixed output compiles', () => {
+    const fixed = mut_outputs.flatMap(({ name, fixed: outputs }) =>
+      outputs.map((output) => ({ name, output })),
+    );
+
+    const errors = typeErrorsOf(fixed.map(({ output }) => output));
+
+    assert.deepStrictEqual(
+      fixed.flatMap(({ name }, index) =>
+        Arr.isNonEmpty(errors[index] ?? [])
+          ? [{ name, errors: errors[index] }]
+          : [],
+      ),
+      [],
+    );
+  });
+
+  test('a suggestion compiles or fails as its case declares', () => {
+    const declared = mut_outputs.flatMap(
+      ({ name, suggestions, suggestionsShould }) =>
+        suggestionsShould === undefined
+          ? []
+          : suggestions.map((output) => ({ name, output, suggestionsShould })),
+    );
+
+    assert.isNotEmpty(declared);
+
+    const errors = typeErrorsOf(declared.map(({ output }) => output));
+
+    assert.deepStrictEqual(
+      declared.flatMap(({ name, output, suggestionsShould }, index) =>
+        Arr.isNonEmpty(errors[index] ?? []) === (suggestionsShould === 'fail')
+          ? []
+          : [{ name, output, suggestionsShould, errors: errors[index] }],
+      ),
+      [],
+    );
+  });
+}, 120_000);
