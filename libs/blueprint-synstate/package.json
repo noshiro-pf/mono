@@ -30,7 +30,8 @@
     "src",
     "dist",
     "README.md",
-    "LICENSE"
+    "LICENSE",
+    "third-party"
   ],
   "scripts": {
     "build": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/cmd/build.mts",

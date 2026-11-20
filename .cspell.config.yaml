@@ -30,6 +30,9 @@ ignorePaths:
   # GitHub's GraphQL schema, vendored verbatim; the README beside it is
   # checked.
   - tools/configs/github-graphql/schema.docs.graphql
+  # The license texts of code a package took from elsewhere, copied verbatim
+  # with their holders' names (check:root:third-party-notices).
+  - '**/third-party/**/LICENSE.txt'
   - '**/prior-art-research.md'
   - '**/prior-art-and-design-rationale.mdx'
   # --- mono-specific ---

@@ -36,6 +36,7 @@
     "dist",
     "README.md",
     "LICENSE",
+    "third-party",
     "vitest-globals.d.ts"
   ],
   "scripts": {
