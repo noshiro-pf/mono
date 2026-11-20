@@ -999,6 +999,63 @@ describe('buildPlan', () => {
       );
     });
 
+    test('a harness runs its type check of the lib-check entries for its own change, and every harness for a shared one', () => {
+      const harnesses = [
+        pkg('strict-lib/v5.0', ['gen:lib', 'check:types']),
+        pkg('strict-lib/v7.0', ['gen:lib', 'check:types']),
+        pkg('strict-lib/scripts-common', ['check:test', 'check:types']),
+      ] as const;
+
+      const checked = (file: string): readonly string[] =>
+        planCommands(harnesses, [file]).filter((command) =>
+          /^strict-lib\/v\d+\.\d+: run check:types$/u.test(command),
+        );
+
+      const both = [
+        'strict-lib/v5.0: run check:types',
+        'strict-lib/v7.0: run check:types',
+      ] as const;
+
+      assert.deepStrictEqual(
+        checked(
+          'strict-lib/configs/tsconfig/lib-check-entry.branded.since-5.8.ts',
+        ),
+        both,
+      );
+
+      assert.deepStrictEqual(
+        checked('strict-lib/scripts-common/src/convert.mts'),
+        both,
+      );
+
+      assert.deepStrictEqual(
+        checked('strict-lib/v7.0/output/lib/lib.es5.d.ts'),
+        ['strict-lib/v7.0: run check:types'],
+      );
+
+      assert.deepStrictEqual(
+        checked('strict-lib/v5.0/tsconfig.lib-files-check.branded.json'),
+        ['strict-lib/v5.0: run check:types'],
+      );
+
+      for (const file of [
+        'strict-lib/README.md',
+        'strict-lib/v7.0/CHANGELOG.md',
+      ]) {
+        assert.deepStrictEqual(checked(file), []);
+      }
+
+      // After the generators, which write what it reads.
+      const commands = planCommands(harnesses, [
+        'strict-lib/v7.0/output/lib/lib.es5.d.ts',
+      ]);
+
+      assert.isAbove(
+        commands.indexOf('strict-lib/v7.0: run check:types'),
+        commands.indexOf('run strict-lib:gen:with-codemod-fixed'),
+      );
+    });
+
     test('a strict-lib document plans check:md, as CI lints it', () => {
       for (const file of [
         'strict-lib/README.md',
