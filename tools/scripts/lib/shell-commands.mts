@@ -76,6 +76,9 @@ export type ShellAssignment = Readonly<{
 
 type ListReading = ShellScriptReading & Readonly<{ end: number }>;
 
+/** A `$` expansion read: its text and the index after it, or a problem. */
+type DollarReading = Readonly<{ text: string; end: number }> | ListReading;
+
 type Heredoc = Readonly<{
   delimiter: string;
   /** `<<-`: leading tabs are taken off the body and the delimiter line. */
@@ -83,6 +86,10 @@ type Heredoc = Readonly<{
   /** A quoted delimiter leaves the body unexpanded. */
   quoted: boolean;
 }>;
+
+/** Whether a {@link DollarReading} is a problem rather than text. */
+const isProblem = (reading: DollarReading): reading is ListReading =>
+  hasKey(reading, 'commands');
 
 /** The index past a wrapper's options from `from`, each value taken along. */
 const pastOptions = (
@@ -517,9 +524,7 @@ const readList = (
    * A `$` expansion at `at`: its text and the index after it, or a problem.
    * Only a command substitution runs anything.
    */
-  const readDollar = (
-    at: number,
-  ): Readonly<{ text: string; end: number }> | ListReading => {
+  const readDollar = (at: number): DollarReading => {
     const next = chars[at + 1];
 
     if (next === '(' && chars[at + 2] === '(') {
@@ -625,7 +630,7 @@ const readList = (
       if (character === '$') {
         const expansion = readDollar(mut_cursor.at);
 
-        if (hasKey(expansion, 'commands')) {
+        if (isProblem(expansion)) {
           return expansion;
         }
 
@@ -891,7 +896,7 @@ const readList = (
     if (character === '$') {
       const expansion = readDollar(at);
 
-      if (hasKey(expansion, 'commands')) {
+      if (isProblem(expansion)) {
         return expansion;
       }
 

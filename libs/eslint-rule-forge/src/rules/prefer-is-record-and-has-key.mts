@@ -24,11 +24,14 @@ import { builtBy } from './rule-factory.mjs';
  * string index signature; anywhere else the rewrite is a suggestion, because
  * `hasKey` checks own properties where `in` walks the prototype chain
  * (`'then' in promise`, `'size' in map`, a class method) and `isRecord` rejects
- * the functions `in` accepts.
+ * the functions `in` accepts. Even on a plain record it is a suggestion where
+ * `in` may narrow the object in a way `hasKey` does not: by one literal key on
+ * a union or on a type that requires the key, or by a `unique symbol` key.
  *
  * `Reflect.has(obj, key)`, which answers as `key in obj` does, is reported only
- * on a plain record, and fixed or suggested there as `key in obj` is; anywhere
- * else reading the prototype chain is what it is for.
+ * on a plain record, and fixed or suggested there as `key in obj` is, save that
+ * where `in` may narrow it is still fixed, since `Reflect.has` narrows nothing;
+ * anywhere else reading the prototype chain is what it is for.
  */
 export const createPreferIsRecordAndHasKey = ({
   moduleName,
@@ -46,6 +49,8 @@ export const createPreferIsRecordAndHasKey = ({
   | 'useHasKey'
   | 'inReadsPrototypeChain'
   | 'suggestOwnPropertyCheck'
+  | 'inMayNarrow'
+  | 'suggestCheckKeepingMembers'
   | 'hasOwnAcceptsFunctions'
   | 'suggestRecordCheck',
   readonly []
@@ -64,6 +69,11 @@ export const createPreferIsRecordAndHasKey = ({
         useHasKey: `Replace \`{{original}}\` with \`{{replacement}}\` from ${moduleName}.`,
         inReadsPrototypeChain: `\`{{original}}\` also finds keys on the prototype chain (a Promise's \`then\`, a Map's \`size\`, a class method) and on functions; \`{{replacement}}\` from ${moduleName} checks own properties of a non-function object only. Replace it where that is what is meant.`,
         suggestOwnPropertyCheck: `Replace with \`{{replacement}}\` from ${moduleName}, which checks own properties only.`,
+        inMayNarrow: `\`{{original}}\` may narrow the object's type by its key (keeping the members of a union that may have it, or ruling out a type that requires it), where \`{{replacement}}\` from ${moduleName} does not, so code that relies on that stops compiling. Replace it where nothing does.`,
+        // What `hasKey` does, which holds wherever `inMayNarrow` reports,
+        // including a `unique symbol` key it suggests on without looking the
+        // property up; the report's "may" covers that case.
+        suggestCheckKeepingMembers: `Replace with \`{{replacement}}\` from ${moduleName}, which keeps every member of a union and does not rule out a type that requires the key.`,
         hasOwnAcceptsFunctions: `\`{{original}}\` answers for a function's own properties too (its \`name\`, a class's static members), and nothing here says the object is not one; \`{{replacement}}\` from ${moduleName} answers \`false\` for every function. Replace it where that is what is meant.`,
         suggestRecordCheck: `Replace with \`{{replacement}}\` from ${moduleName}, which answers \`false\` for a function.`,
       },
@@ -103,6 +113,65 @@ export const createPreferIsRecordAndHasKey = ({
         expression: TSESTree.Expression,
       ): boolean =>
         typeHoldsAtEveryLayer(sourceCode, expression, isPlainObjectType);
+
+      /**
+       * Whether `key in obj` may narrow `obj` in a way `hasKey` does not: by
+       * one literal key, where some layer of type wrappers types `obj` as a
+       * union (`in` keeps only the members that may have the key, `hasKey`
+       * keeps them all) or as a type that declares the key as required (`in`
+       * narrows it to `never` where it answers `false`), and by a
+       * `unique symbol` key, whose property is not looked up here. A key of any
+       * other type narrows nothing. This does not tell exactly where
+       * TypeScript narrows (only a reference, and not through `as`): where it
+       * may, the rewrite is left to the author, which costs a fix where it
+       * would have been safe. Without type information nothing is known, and
+       * the object is not a plain record either, so the rewrite is suggested
+       * anyway.
+       *
+       * Known limit: under `exactOptionalPropertyTypes`, `key in obj` also
+       * narrows `obj[key]` (for `'a' in r`, `r.a`) when a single type declares
+       * the key as optional: it loses its `undefined` where `in` answers `true`
+       * and is `undefined` where `in` answers `false`. `hasKey` does neither,
+       * and this does not look for it.
+       */
+      const inMayNarrow = (
+        // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+        objExpression: TSESTree.Expression,
+        // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+        keyExpression: TSESTree.Expression,
+      ): boolean => {
+        const services = sourceCode.parserServices;
+
+        const checker = services?.program?.getTypeChecker();
+
+        const keyNode = services?.esTreeNodeToTSNodeMap?.get(keyExpression);
+
+        if (checker === undefined || keyNode === undefined) {
+          return true;
+        }
+
+        const keyType = checker.getTypeAtLocation(keyNode);
+
+        const name = keyType.isStringLiteral()
+          ? keyType.value
+          : keyType.isNumberLiteral()
+            ? keyType.value.toString()
+            : undefined;
+
+        if (name === undefined) {
+          return (keyType.flags & ts.TypeFlags.UniqueESSymbol) !== 0;
+        }
+
+        return !typeHoldsAtEveryLayer(sourceCode, objExpression, (type) => {
+          const property = type.getProperty(name);
+
+          return (
+            !type.isUnion() &&
+            (property === undefined ||
+              (property.flags & ts.SymbolFlags.Optional) !== 0)
+          );
+        });
+      };
 
       /**
        * Whether type information shows the object is not callable at any layer
@@ -292,10 +361,12 @@ export const createPreferIsRecordAndHasKey = ({
 
             const keyText = getArgumentText(sourceCode, keyExpression);
 
-            // Known limit: with a key typed `string`, `hasKey` narrows a record
-            // to `never` where it answers `false`, which `in`, `Object.hasOwn`
-            // and `Reflect.has` do not, so code there that reads or writes the
-            // record stops type-checking after the fix.
+            // `hasKey` narrows only where it answers `true`, as `Object.hasOwn`
+            // does, never removes a member of a union, and does not narrow at
+            // all by a key that a member declares as required. The rewrite of
+            // `key in obj` is therefore only suggested off a plain record and
+            // where `in` may narrow otherwise (`inMayNarrow`, below): code that
+            // relies on `in`'s narrowing stops compiling once it is taken.
             const fixable =
               binding !== undefined &&
               hasKeyName !== undefined &&
@@ -336,23 +407,36 @@ export const createPreferIsRecordAndHasKey = ({
                 !isPlainObject(objExpression) ||
                 namesObjectPrototypeMember(keyExpression));
 
+            // `in` may narrow where `hasKey` does not; `Reflect.has` narrows
+            // nothing, so it is fixed as before.
+            // Off a plain record the prototype chain is the larger difference
+            // (`'then' in promise`), and its message already leaves the rewrite
+            // to the author, so it is not replaced by this one there.
+            const narrowingSuggestOnly =
+              !prototypeSuggestOnly &&
+              node.type === AST_NODE_TYPES.BinaryExpression &&
+              inMayNarrow(objExpression, keyExpression);
+
             // `Object.hasOwn` accepts a function, and `isRecord` does not.
             const hasOwnSuggestOnly =
               !readsPrototypeChain &&
               needsIsRecord &&
               !cannotBeCallable(objExpression);
 
-            const suggestOnly = prototypeSuggestOnly || hasOwnSuggestOnly;
+            const suggestOnly =
+              prototypeSuggestOnly || narrowingSuggestOnly || hasOwnSuggestOnly;
 
             context.report({
               node,
               messageId: prototypeSuggestOnly
                 ? 'inReadsPrototypeChain'
-                : hasOwnSuggestOnly
-                  ? 'hasOwnAcceptsFunctions'
-                  : needsIsRecord
-                    ? 'useIsRecordAndHasKey'
-                    : 'useHasKey',
+                : narrowingSuggestOnly
+                  ? 'inMayNarrow'
+                  : hasOwnSuggestOnly
+                    ? 'hasOwnAcceptsFunctions'
+                    : needsIsRecord
+                      ? 'useIsRecordAndHasKey'
+                      : 'useHasKey',
               data,
               fix: suggestOnly ? null : fix,
               suggest:
@@ -361,7 +445,9 @@ export const createPreferIsRecordAndHasKey = ({
                       {
                         messageId: prototypeSuggestOnly
                           ? 'suggestOwnPropertyCheck'
-                          : 'suggestRecordCheck',
+                          : narrowingSuggestOnly
+                            ? 'suggestCheckKeepingMembers'
+                            : 'suggestRecordCheck',
                         data,
                         fix,
                       },

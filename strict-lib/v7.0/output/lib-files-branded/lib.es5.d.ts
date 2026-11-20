@@ -300,9 +300,11 @@ interface ObjectConstructor {
    * const ks = Object.keys({ x: 1, y: 2, z: '3', 3: 4 }); // ('3' | 'x' | 'y' | 'z' | (string & {}))[]
    *
    */
-  keys<const R extends import('ts-type-forge').UnknownRecord>(
+  keys<const R extends object>(
     object: R,
-  ): readonly StrictLibInternals.ToObjectKeys<R>[];
+  ): readonly ([R] extends [import('ts-type-forge').UnknownRecord]
+    ? StrictLibInternals.ToObjectKeys<R>
+    : string)[];
 }
 
 /**

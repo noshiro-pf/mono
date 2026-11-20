@@ -3,9 +3,9 @@ import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import {
   Arr,
-  hasKey,
   ISet,
   isString,
+  keyIsIn,
   pipe,
   Result,
   unknownToString,
@@ -436,7 +436,7 @@ const specifierExtension = (
   sourceExtension: string,
   fallback: `.${string}`,
 ): `.${string}` =>
-  hasKey(emittedExtensions, sourceExtension)
+  keyIsIn(sourceExtension, emittedExtensions)
     ? emittedExtensions[sourceExtension]
     : fallback;
 

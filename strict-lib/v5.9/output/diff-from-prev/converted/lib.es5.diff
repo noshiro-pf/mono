@@ -1,8 +1,8 @@
 diff --git a/v5.8/output/lib-files/lib.es5.d.ts b/v5.9/output/lib-files/lib.es5.d.ts
-index 37d91641f6f5e20652e9ad67f3498d512ef81f79..c8d2e4ed2114e8558419437c8eb70a3192fe0389 100644
+index d3e707602eed5c601db8945df872a4f0c13c04e3..6ec72d58f1431634b0b5cb79602ca7b5b6f07b98 100644
 --- a/v5.8/output/lib-files/lib.es5.d.ts
 +++ b/v5.9/output/lib-files/lib.es5.d.ts
-@@ -1276,6 +1276,7 @@ interface JSON {
+@@ -1278,6 +1278,7 @@ interface JSON {
     * @param text A valid JSON string.
     * @param reviver A function that transforms the results. This function is called for each member of the object.
     * If a member contains nested objects, the nested objects are transformed before the parent object is.
@@ -10,7 +10,7 @@ index 37d91641f6f5e20652e9ad67f3498d512ef81f79..c8d2e4ed2114e8558419437c8eb70a31
     */
    parse(
      text: string,
-@@ -1286,6 +1287,7 @@ interface JSON {
+@@ -1288,6 +1289,7 @@ interface JSON {
     * @param value A JavaScript value, usually an object or array, to be converted.
     * @param replacer A function that transforms the results.
     * @param space Adds indentation, white space, and line break characters to the return-value JSON text to make it easier to read.
@@ -18,7 +18,7 @@ index 37d91641f6f5e20652e9ad67f3498d512ef81f79..c8d2e4ed2114e8558419437c8eb70a31
     */
    stringify(
      value: unknown,
-@@ -1297,6 +1299,7 @@ interface JSON {
+@@ -1299,6 +1301,7 @@ interface JSON {
     * @param value A JavaScript value, usually an object or array, to be converted.
     * @param replacer An array of strings and numbers that acts as an approved list for selecting the object properties that will be stringified.
     * @param space Adds indentation, white space, and line break characters to the return-value JSON text to make it easier to read.
@@ -26,7 +26,7 @@ index 37d91641f6f5e20652e9ad67f3498d512ef81f79..c8d2e4ed2114e8558419437c8eb70a31
     */
    stringify(
      value: unknown,
-@@ -1589,14 +1592,18 @@ interface Array<T> {
+@@ -1591,14 +1594,18 @@ interface Array<T> {
    /**
     * Removes elements from an array and, if necessary, inserts new elements in their place, returning the deleted elements.
     * @param start The zero-based location in the array from which to start removing elements.

@@ -1,111 +1,144 @@
-import type { ReadonlyRecord } from 'ts-type-forge';
+import type { ReadonlyRecord, UnknownRecord } from 'ts-type-forge';
 import { expectType } from '../expect-type.mjs';
 import { hasKey, type HasKeyReturnType } from './has-key.mjs';
 
-test('hasKey type inferences', () => {
-  {
-    expectType<
-      HasKeyReturnType<Readonly<{ a: 0 } | { b: 1 }>, 'a'>,
-      Readonly<{ a: 0 }>
-    >('=');
+type WithX = Readonly<{ x: number }>;
 
-    expectType<
-      HasKeyReturnType<Readonly<{ a: 0 } | { b: 1 }>, 'b'>,
-      Readonly<{ b: 1 }>
-    >('=');
+type WithOptionalA = Readonly<{ a?: number }>;
 
-    expectType<HasKeyReturnType<Readonly<{ a: 0 } | { b: 1 }>, 'd'>, never>(
-      '=',
-    );
+type WithA = Readonly<{ a: 0 }>;
 
-    expectType<
-      HasKeyReturnType<
-        Readonly<{ a: 0 } | { a: 1; b: 1 } | { b: 2 } | { c: 3 }>,
-        'a'
-      >,
-      Readonly<{ a: 0 } | { a: 1; b: 1 }>
-    >('=');
+type WithB = Readonly<{ b: 1 }>;
 
-    expectType<
-      HasKeyReturnType<
-        Readonly<{ a: 0 } | { a: 1; b: 1 } | { b: 2 } | { c: 3 }>,
-        'b'
-      >,
-      Readonly<{ a: 1; b: 1 } | { b: 2 }>
-    >('=');
+test('HasKeyReturnType adds the key to each member', () => {
+  expectType<HasKeyReturnType<WithX, 'y'>, WithX & Readonly<{ y: unknown }>>(
+    '=',
+  );
 
-    expectType<
-      HasKeyReturnType<
-        | ReadonlyRecord<string, number>
-        | Readonly<{ a: 0 } | { a: 1; b: 1 } | { b: 2 }>,
-        'a'
-      >,
-      | Readonly<{ a: 0 } | { a: 1; b: 1 }>
-      | (ReadonlyRecord<'a', number> & ReadonlyRecord<string, number>)
-    >('=');
+  expectType<
+    HasKeyReturnType<WithOptionalA, 'a'>,
+    WithOptionalA & Readonly<{ a: number | undefined }>
+  >('=');
 
-    expectType<
-      HasKeyReturnType<ReadonlyRecord<string, unknown>, 'a'>,
-      ReadonlyRecord<'a', unknown> & ReadonlyRecord<string, unknown>
-    >('=');
+  expectType<
+    HasKeyReturnType<ReadonlyRecord<string, number>, 'a'>,
+    ReadonlyRecord<string, number> & Readonly<{ a: number }>
+  >('=');
+
+  expectType<
+    HasKeyReturnType<WithA | WithB, 'c'>,
+    (WithA & Readonly<{ c: unknown }>) | (WithB & Readonly<{ c: unknown }>)
+  >('=');
+
+  assert.isTrue(true);
+});
+
+test('hasKey narrows where it returns true', () => {
+  const xy = { x: 1, y: 2 } as const;
+
+  // A value may have properties its type does not name.
+  const withX: WithX = xy;
+
+  if (hasKey(withX, 'y')) {
+    expectType<typeof withX, WithX & Readonly<{ y: unknown }>>('=');
+
+    assert.isTrue(withX.y === 2);
+  } else {
+    expectType<typeof withX, WithX>('=');
+
+    assert.fail();
   }
 
-  {
-    type R = Readonly<{ a: 0 } | { b: 1 }>;
+  const dict: ReadonlyRecord<string, number> = { a: 1 } as const;
 
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
-    const obj: R = { a: 0 } as R;
+  if (hasKey(dict, 'a')) {
+    expectType<typeof dict.a, number>('=');
 
-    if (hasKey(obj, 'a')) {
-      expectType<typeof obj.a, 0>('=');
+    assert.isTrue(dict.a === 1);
+  } else {
+    assert.fail();
+  }
 
-      expectType<typeof obj, Readonly<{ a: 0 }>>('=');
+  const record: UnknownRecord = { a: 'a', b: 'b' } as const;
+
+  if (hasKey(record, 'a') && hasKey(record, 'b')) {
+    expectType<typeof record.a, unknown>('=');
+
+    expectType<typeof record.b, unknown>('=');
+
+    assert.isTrue(record.a === 'a' && record.b === 'b');
+  } else {
+    assert.fail();
+  }
+});
+
+test('hasKey removes nothing where it returns false', () => {
+  // `{}` is a `WithOptionalA` with no own `a`.
+  const withOptionalA: WithOptionalA = {} as const;
+
+  if (hasKey(withOptionalA, 'a')) {
+    expectType<typeof withOptionalA.a, number | undefined>('=');
+
+    assert.fail();
+  } else {
+    expectType<typeof withOptionalA, WithOptionalA>('=');
+
+    assert.isTrue(withOptionalA.a === undefined);
+  }
+});
+
+test('hasKey narrows nothing for a key some member requires', () => {
+  const xy = { x: 1, y: 2 } as const;
+
+  const withX: WithX = xy;
+
+  if (hasKey(withX, 'x')) {
+    expectType<typeof withX, WithX>('=');
+  } else {
+    expectType<typeof withX, WithX>('=');
+
+    assert.fail();
+  }
+
+  // Tell such a union apart by a discriminant property, or with a type guard
+  // written for the union.
+  const withAOrBs: readonly (WithA | WithB)[] = [{ b: 1 }] as const;
+
+  for (const withAOrB of withAOrBs) {
+    if (hasKey(withAOrB, 'a')) {
+      expectType<typeof withAOrB, WithA | WithB>('=');
+
+      assert.fail();
+    } else {
+      expectType<typeof withAOrB, WithA | WithB>('=');
     }
+  }
+});
 
-    if (hasKey(obj, 'c')) {
-      expectType<typeof obj, never>('=');
+test('hasKey narrows nothing for a key that is not one literal', () => {
+  const xy = { x: 1, y: 2 } as const;
+
+  const withX: WithX = xy;
+
+  const keys: readonly string[] = ['y'] as const;
+
+  for (const key of keys) {
+    if (hasKey(withX, key)) {
+      expectType<typeof withX, WithX>('=');
+    } else {
+      expectType<typeof withX, WithX>('=');
+
+      assert.fail();
     }
   }
 
-  {
-    type R = Readonly<{ a: 0 } | { a: 1; b: 1 } | { b: 2 } | { c: 3 }>;
+  const xOrY = keys.includes('y') ? 'y' : 'x';
 
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
-    const obj: R = { a: 0 } as R;
+  if (hasKey(withX, xOrY)) {
+    expectType<typeof withX, WithX>('=');
+  } else {
+    expectType<typeof withX, WithX>('=');
 
-    if (hasKey(obj, 'a') && hasKey(obj, 'b')) {
-      expectType<typeof obj.a, 1>('=');
-
-      expectType<typeof obj.b, 1>('=');
-
-      expectType<typeof obj, Readonly<{ a: 1; b: 1 }>>('=');
-    }
+    assert.fail();
   }
-
-  {
-    type R =
-      | ReadonlyRecord<string, number>
-      | Readonly<{ a: 0 } | { a: 1; b: 1 } | { b: 2 }>;
-
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
-    const obj: R = { a: 0 } as R;
-
-    expectType<
-      R,
-      | ReadonlyRecord<string, number>
-      | Readonly<{ a: 0 } | { a: 1; b: 1 } | { b: 2 }>
-    >('=');
-
-    if (hasKey(obj, 'a')) {
-      expectType<typeof obj.a, number>('=');
-
-      expectType<
-        typeof obj,
-        | Readonly<{ a: 0 } | { a: 1; b: 1 }>
-        | (ReadonlyRecord<'a', number> & ReadonlyRecord<string, number>)
-      >('=');
-    }
-  }
-
-  assert.strictEqual(true, true);
 });

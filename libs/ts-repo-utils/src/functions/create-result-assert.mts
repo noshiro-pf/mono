@@ -18,27 +18,16 @@ export type CreateResultAssertOptions<Config, Ok, Err> = Readonly<{
  * commands that should stop execution on failure but remain composable when a
  * Result is preferred.
  */
-export const createResultAssert = <Config, Ok, Err>({
-  run,
-  onSuccess,
-  onError,
-  exitCode = 1,
-}: CreateResultAssertOptions<Config, Ok, Err>): ((
-  config: Config,
-) => Promise<Ok>) => {
-  const defaultOnError = (error: Err): void => {
-    if (
-      isRecord(error) &&
-      hasKey(error, 'message') &&
-      isString(error.message)
-    ) {
-      console.info(error.message);
-    } else {
-      console.error(error);
-    }
-  };
-
-  return async (config: Config): Promise<Ok> => {
+export const createResultAssert =
+  <Config, Ok, Err>({
+    run,
+    onSuccess,
+    onError,
+    exitCode = 1,
+  }: CreateResultAssertOptions<Config, Ok, Err>): ((
+    config: Config,
+  ) => Promise<Ok>) =>
+  async (config: Config): Promise<Ok> => {
     const result = await run(config);
 
     if (Result.isErr(result)) {
@@ -57,4 +46,12 @@ export const createResultAssert = <Config, Ok, Err>({
 
     return result.value;
   };
+
+/** Prints an error's `message` when it has one, and the error otherwise. */
+const defaultOnError = (error: unknown): void => {
+  if (isRecord(error) && hasKey(error, 'message') && isString(error.message)) {
+    console.info(error.message);
+  } else {
+    console.error(error);
+  }
 };

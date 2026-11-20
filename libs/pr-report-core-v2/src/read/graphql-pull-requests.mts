@@ -10,7 +10,7 @@
  * commit time where the head is not the last commit listed.
  */
 
-import { Arr, hasKey, Result } from 'ts-data-forge';
+import { Arr, keyIsIn, Result } from 'ts-data-forge';
 import * as t from 'ts-fortress';
 import type { ReadonlyRecord } from 'ts-type-forge';
 import { closingKeywordIssuesInHtml } from '../conventions/index.mjs';
@@ -340,7 +340,7 @@ const byNumber = (
   );
 
 const changeOf = (changeType: string): ChangedFile['change'] =>
-  hasKey(CHANGE_OF, changeType) ? CHANGE_OF[changeType] : 'changed';
+  keyIsIn(changeType, CHANGE_OF) ? CHANGE_OF[changeType] : 'changed';
 
 /** One pull request's details, or why they are missing from the list. */
 const detailsFor = (

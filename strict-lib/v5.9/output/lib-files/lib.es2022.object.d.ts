@@ -23,28 +23,45 @@ and limitations under the License.
 /// <reference no-default-lib="true"/>
 /// <reference lib="es5" />
 
-/**
- * @internal
- * R が union 型（要素数1の場合も含む）のとき、 union の要素の中に K をキーとして含むものが一つでもあれば、
- * union 型を K をキーとして含むもののみに絞った型を返す。
- * union の要素の中に K をキーとして含むものが一つも無ければ、`MutableRecord<K, unknown>` を返す。
- * 結果には Readonly を付ける。
- */
 declare namespace StrictLibInternals {
-  export type HasOwnReturnType<
-    R extends import('ts-type-forge').UnknownRecord,
+  /**
+   * @internal
+   * The key with which `Object.hasOwn(obj, key)` narrows an `obj` of type `R`
+   * where it returns `true`, or `never` where it narrows nothing.
+   *
+   * A type predicate narrows both ways, but `Object.hasOwn` returning `false`
+   * says only that `obj` has no *own* property `key`: a type does not tell an
+   * own property from an inherited one (a class's getter), and a value may
+   * have properties its type does not name. So no member of `R` may be
+   * removed where it returns `false`, which holds when no member of `R` is
+   * assignable to the narrowed type: `K` must be one literal key (not a union,
+   * not `string`, `number`, `symbol` or a template literal pattern) that no
+   * member of `R` declares as required.
+   */
+  export type HasOwnNarrowableKey<
+    R,
     K extends PropertyKey,
-  > = R extends R // union distribution
-    ? K extends keyof R
-      ? string extends keyof R
-        ? import('ts-type-forge').MutableRecord<K, R[keyof R]> & R
-        : number extends keyof R
-          ? import('ts-type-forge').MutableRecord<K, R[keyof R]> & R
-          : symbol extends keyof R
-            ? import('ts-type-forge').MutableRecord<K, R[keyof R]> & R
-            : R
-      : never // omit union member that does not have key K
-    : never; // dummy case for union distribution
+  > = import('ts-type-forge').IsUnion<K> extends true
+    ? never
+    : // A property is optional in the first and required in the second only
+      // where `K` is a literal. Where `K` is `string`, `number`, `symbol`, a
+      // template literal pattern or `never`, both are the same index signature,
+      // or no property at all.
+      Partial<{ [P in K]: unknown }> extends { [P in K]: unknown }
+      ? never
+      : true extends (R extends { readonly [P in K]: unknown } ? true : false)
+        ? never
+        : K;
+
+  /**
+   * @internal
+   * What `Object.hasOwn(obj, key)` narrows an `obj` of type `R` to where it
+   * returns `true`: each member of `R` with the property `K`, typed as that
+   * member declares it, or `unknown`.
+   */
+  export type HasOwnReturnType<R, K extends PropertyKey> = R extends unknown // union distribution
+    ? R & { [P in K]: P extends keyof R ? R[P] : unknown }
+    : never;
 }
 
 interface ObjectConstructor {
@@ -53,11 +70,15 @@ interface ObjectConstructor {
    * @param obj An object.
    * @param key A property name.
    */
-  hasOwn<
-    R extends import('ts-type-forge').UnknownRecord,
-    K extends PropertyKey,
-  >(
+  hasOwn<R extends object, K extends PropertyKey>(
     obj: R,
-    key: K,
+    key: K & StrictLibInternals.HasOwnNarrowableKey<R, K>,
   ): obj is StrictLibInternals.HasOwnReturnType<R, K>;
+
+  /**
+   * Determines whether an object has a property with the specified name.
+   * @param obj An object.
+   * @param key A property name.
+   */
+  hasOwn(obj: object, key: PropertyKey): boolean;
 }
