@@ -75,6 +75,13 @@ its fix reuses the import the file already has rather than adding a second one.
 A name only `ts-data-forge` exports (`Arr`, `Num`, `isString`, …) is read from
 `ts-data-forge` alone.
 
+`Arr` and `Num` are also the subpath modules `ts-data-forge/array` and
+`ts-data-forge/number` as a whole, which a file imports so that a bundler keeps
+only the functions it calls: `import * as Arr from 'ts-data-forge/array'` binds
+what `import { Arr } from 'ts-data-forge'` does, for every rule, and a fix
+writes through it. A fix in a file that imports any subpath of `ts-data-forge`
+adds `Arr` or `Num` the same way; any other file gets the named import.
+
 Use this plugin or [`eslint-plugin-ts-std-forge`](https://www.npmjs.com/package/eslint-plugin-ts-std-forge)
 on a file, not both: their overlapping rules would report the same code twice.
 This one is for code that depends on `ts-data-forge`.

@@ -1,6 +1,10 @@
 import { createPreferEmptinessGuard } from 'eslint-rule-forge';
 import { isPartOfBoundedLengthCheck } from './ast-utils.mjs';
-import { EQUIVALENT_MODULES, TS_DATA_FORGE_MODULE } from './constants.mjs';
+import {
+  EQUIVALENT_MODULES,
+  NAMESPACE_SUBPATHS,
+  TS_DATA_FORGE_MODULE,
+} from './constants.mjs';
 
 /**
  * The emptiness half of `prefer-canonical-length-guard`: `xs.length > 0`,
@@ -14,5 +18,6 @@ export const preferArrEmptinessGuard = createPreferEmptinessGuard({
   moduleName: TS_DATA_FORGE_MODULE,
   namespace: 'Arr',
   equivalentModules: EQUIVALENT_MODULES,
+  namespaceSubpaths: NAMESPACE_SUBPATHS,
   isHandledElsewhere: isPartOfBoundedLengthCheck,
 });

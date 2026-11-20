@@ -76,3 +76,15 @@ export const primitiveTypeFlags =
 export const EQUIVALENT_MODULES = [
   { moduleName: TS_STD_FORGE_MODULE, exportNames: SHARED_EXPORTS },
 ] as const;
+
+/**
+ * ts-data-forge's exports that are also the namespace of a subpath module of
+ * their own (`NamespaceSubpath` of eslint-rule-forge): a file may import
+ * `import * as Arr from 'ts-data-forge/array'` so that a bundler keeps only the
+ * functions it calls, and a fix in a file that imports a subpath adds that
+ * form. `package.json`'s `exports` of ts-data-forge lists them.
+ */
+export const NAMESPACE_SUBPATHS = [
+  { exportName: 'Arr', moduleName: `${TS_DATA_FORGE_MODULE}/array` },
+  { exportName: 'Num', moduleName: `${TS_DATA_FORGE_MODULE}/number` },
+] as const;
