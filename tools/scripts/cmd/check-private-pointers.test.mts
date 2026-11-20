@@ -1,4 +1,4 @@
-import { findPointers } from './check-private-pointers.mjs';
+import { findPointers } from './claude-code-public-write-gate.mjs';
 
 // Built from parts, so that this file is no pointer itself.
 const PRIVATE_REPO = ['noshiro-pf', 'mono-security'].join('/');

@@ -460,6 +460,12 @@ describe('classifyChanges', () => {
     assert.deepStrictEqual(sortedAreas(result), []);
   });
 
+  // `check:prose:private-pointers` reads `experimental/` too, and a diff of it
+  // alone is the one that can add a pointer there.
+  test('a diff of experimental/ alone runs the check:prose guards', () => {
+    assert.include(commandsOf(['experimental/old/a.ts']), 'run check:prose');
+  });
+
   test.each([
     ['tools/scripts/cmd/x.mts', ['root', 'root-guards']],
     ['tools/configs/vite-config.mts', ['root', 'root-guards', 'shared-config']],
