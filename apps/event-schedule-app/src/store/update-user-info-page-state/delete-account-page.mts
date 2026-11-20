@@ -4,10 +4,10 @@ import type { StrictPick } from 'ts-type-forge';
 import { dict } from '../../constants/index.mjs';
 import {
   type DeleteAccountPageState,
-  credentialErrorOf,
   deleteAccountPageHasError,
   deleteAccountPageInitialState,
   deleteAccountPageStateReducer,
+  reauthErrorOf,
   showToast,
 } from '../../functions/index.mjs';
 import {
@@ -141,7 +141,7 @@ export const createDeleteAccountPageStore = <
     );
 
     if (Result.isErr(res1)) {
-      switch (credentialErrorOf(authErrorCodeOf(res1.value))) {
+      switch (reauthErrorOf(authErrorCodeOf(res1.value))) {
         case 'wrongPassword':
           if (isCurrent()) {
             dispatch({
@@ -163,9 +163,18 @@ export const createDeleteAccountPageStore = <
 
           break;
 
-        // Signing in again reports an email of no account as
-        // `auth/user-mismatch`, not `auth/user-not-found`.
-        case 'userNotFound':
+        // With email enumeration protection off, an email of no account, typed
+        // here, is `auth/user-mismatch` when signing in again.
+        case 'wrongEmail':
+          if (isCurrent()) {
+            dispatch({
+              type: 'setEmailError',
+              payload: dc.reauthenticate.message.wrongEmail,
+            });
+          }
+
+          break;
+
         case undefined:
           console.error(
             'error occurred on reauthenticateWithCredential:',
