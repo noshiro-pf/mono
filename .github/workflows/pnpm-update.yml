@@ -12,7 +12,7 @@ name: pnpm update
 # `minimumReleaseAge` — live in pnpm-workspace.yaml), the action pins in
 # `.github/workflows/` and `.github/actions/` come from `update-actions`, and
 # the release binaries in `tools/configs/release-binaries.json` (actionlint,
-# shellcheck) from `update-release-binaries`. There is no
+# shellcheck, gitleaks) from `update-release-binaries`. There is no
 # .github/dependabot.yml.
 #
 # `update-packages` also carries two skips that cannot live in
@@ -191,8 +191,9 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: node ./tools/scripts/cmd/mature-updates.mts actions
 
-      # The same, for the binaries `check:root:actionlint` downloads
-      # (actionlint, shellcheck): a version and one SHA-256 per platform in
+      # The same, for the binaries `check:root:actionlint` and
+      # `check:prose:gitleaks` download (actionlint, shellcheck, gitleaks): a
+      # version and one SHA-256 per platform in
       # `tools/configs/release-binaries.json`, the digests read from the
       # Releases API. How far it moves on its own is in the script's header.
       - name: Update the release-binary pins
@@ -646,7 +647,7 @@ jobs:
               --head "$branch" \
               --label merge-queued \
               --title "chore: update dependencies" \
-              --body "Automated dependency update via \`pnpm run update-packages\` + \`pnpm run update-actions\` + \`pnpm run update-release-binaries\` + \`pnpm self-update\`. The latter three go through \`tools/scripts/cmd/mature-updates.mts\`, which holds pnpm itself, the action pins and the release-binary pins (actionlint, shellcheck) to \`minimumReleaseAge\` the way pnpm holds npm dependencies. Action pins move within their major only, and release-binary pins within their major or, for a \`0.x\` version, their minor, so the next one waits for a human. A patch changeset is added for publishable packages whose runtime dependencies changed. Rebuilt from main on every run, so force-pushes to this branch are expected. Auto-merges once CI passes."
+              --body "Automated dependency update via \`pnpm run update-packages\` + \`pnpm run update-actions\` + \`pnpm run update-release-binaries\` + \`pnpm self-update\`. The latter three go through \`tools/scripts/cmd/mature-updates.mts\`, which holds pnpm itself, the action pins and the release-binary pins (actionlint, shellcheck, gitleaks) to \`minimumReleaseAge\` the way pnpm holds npm dependencies. Action pins move within their major only, and release-binary pins within their major or, for a \`0.x\` version, their minor, so the next one waits for a human. A patch changeset is added for publishable packages whose runtime dependencies changed. Rebuilt from main on every run, so force-pushes to this branch are expected. Auto-merges once CI passes."
           fi
           gh pr merge --auto --squash "$branch"
 
