@@ -84,18 +84,20 @@ the answer this procedure exists to rule out.
 
 ## Examples
 
-- **A string the tools cannot read.** A query `unblock-prs` sends to GitHub
-  left a selection open and reached `main`: to `tsc` and ESLint a GraphQL
-  query is a string, and once GitHub rejected it — answering with an error
-  and no data — the command reported "could not read …" and went on. #2561 fixed
-  the brace and added a test counting that query's braces — a check for the
-  instance. #2563 closed the class by validating every query the PR tools
-  send against GitHub's schema (`github-graphql.test.mts` in
-  `libs/pr-merge-queue`, where a function that sends a new query joins
-  `sendEveryQuery`, and in `apps/pr-manager`, where a new query joins
-  `QUERIES`). That registration was itself a step someone had to remember,
-  until the fix for #2642 added a second test to each, which fails on a query
-  written in the source that none of the validated ones contains. SQL, HTML or a shell
+- **A string the tools cannot read.** A query `unblock-prs` sends to GitHub left
+  a selection open and reached `main`: to `tsc` and ESLint a GraphQL query is a
+  string, and once GitHub rejected it — answering with an error and no data —
+  the command reported "could not read …" and went on. #2561 fixed the brace and
+  added a test counting that query's braces — a check for the instance. #2563
+  closed the class by validating every query the PR tools send against GitHub's
+  schema (`github-graphql.test.mts` in `libs/pr-merge-queue`, where a function
+  that sends a new query joins `sendEveryQuery`, and in `apps/pr-manager`, where
+  a new query joins `QUERIES`). That registration was itself a step someone had
+  to remember, until the fix for #2642 added a second test to each, which fails
+  on a query written in the source that none of the validated ones contains.
+  Having the test at all was the next such step: the `-v2` rebuilds sent GraphQL
+  from three packages without one, until `check:root:github-graphql-tests` held
+  every package whose `src/` writes GraphQL to its own. SQL, HTML or a shell
   command in a string ask the same question.
 - **A discipline that did not hold.** `CLAUDE.md` states its own admission
   test, and the file still had to be cut back from four digits. What was

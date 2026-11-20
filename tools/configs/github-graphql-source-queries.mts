@@ -46,7 +46,7 @@ export const queriesNotSent = (
   );
 };
 
-type SourceQuery = Readonly<{
+export type SourceQuery = Readonly<{
   /** Where its first line is, counted from 1. */
   line: number;
   /** As written, a substitution shown as `…`. */
@@ -72,8 +72,72 @@ const OPERATION = /^\s*(?:query|mutation|subscription)\b\s*\w*\s*[({]/u;
 /** `query ` before the substitution that names it. */
 const OPERATION_BEFORE_NAME = /^\s*(?:query|mutation|subscription)\s+$/u;
 
-/** `(number: $` and `, after: $`, before a variable's name. */
-const VARIABLE_ARGUMENT = /[(,]\s*\w+\s*:\s*\$/u;
+/**
+ * `(number: $` and `, after: $`, before a variable's name or the substitution
+ * that writes it. A name starts with a letter or `_`, so `array: $1`, a
+ * replacement's group, is not one.
+ */
+const VARIABLE_ARGUMENT = /[(,]\s*\w+\s*:\s*\$(?![^A-Z_a-z])/u;
+
+/**
+ * Whether `sourceText` may hold GraphQL {@link queriesIn} would find, read as
+ * plain text: an operation keyword, or an argument bound to a variable. A file
+ * for which it is `false` holds none written as plain text, so a reader of many
+ * files parses only the rest; GraphQL that spells a keyword or `$` with a
+ * Unicode or hex escape sequence is the one kind it misses. It sits beside the
+ * patterns above so that it widens with them.
+ */
+export const mayWriteGraphql = (sourceText: string): boolean =>
+  /\b(?:query|mutation|subscription)\b|[(,]\s*\w+\s*:\s*\$/u.test(sourceText);
+
+/**
+ * The GraphQL in one file, once for each array or literal it is written in.
+ * `check:root:github-graphql-tests` reads every package's `src/` with it.
+ */
+export const queriesIn = (
+  fileName: string,
+  sourceText: string,
+): readonly SourceQuery[] => {
+  const sourceFile = ts.createSourceFile(
+    fileName,
+    sourceText,
+    ts.ScriptTarget.Latest,
+    true,
+  );
+
+  return Arr.uniqBy(
+    literalPiecesIn(sourceFile)
+      .filter(marksQuery)
+      .map((piece) => ({
+        owner: ownerOf(piece),
+        construct: constructOf(piece),
+      })),
+    ({ construct }) => `${construct.pos}-${construct.end}`,
+  ).map(({ owner, construct }) => {
+    const lines = render(owner).split('\n');
+
+    const index = Math.max(
+      0,
+      lines.findIndex((line) => line.trim() !== ''),
+    );
+
+    return {
+      line:
+        sourceFile.getLineAndCharacterOfPosition(owner.getStart(sourceFile))
+          .line +
+        index +
+        1,
+      firstLine: (lines[index] ?? '').trim(),
+      pieces: fragmentsOf(construct)
+        .map((fragment) =>
+          fragment === undefined ? '\0' : withoutWhitespace(fragment),
+        )
+        .join('')
+        .split('\0')
+        .filter((text) => text !== ''),
+    };
+  });
+};
 
 const withoutWhitespace = (text: string): string =>
   text.replaceAll(/\s+/gu, '');
@@ -172,52 +236,6 @@ const render = (node: ts.Node): string =>
   fragmentsOf(node)
     .map((fragment) => fragment ?? '…')
     .join('');
-
-/** The GraphQL in one file, once for each array or literal it is written in. */
-const queriesIn = (
-  fileName: string,
-  sourceText: string,
-): readonly SourceQuery[] => {
-  const sourceFile = ts.createSourceFile(
-    fileName,
-    sourceText,
-    ts.ScriptTarget.Latest,
-    true,
-  );
-
-  return Arr.uniqBy(
-    literalPiecesIn(sourceFile)
-      .filter(marksQuery)
-      .map((piece) => ({
-        owner: ownerOf(piece),
-        construct: constructOf(piece),
-      })),
-    ({ construct }) => `${construct.pos}-${construct.end}`,
-  ).map(({ owner, construct }) => {
-    const lines = render(owner).split('\n');
-
-    const index = Math.max(
-      0,
-      lines.findIndex((line) => line.trim() !== ''),
-    );
-
-    return {
-      line:
-        sourceFile.getLineAndCharacterOfPosition(owner.getStart(sourceFile))
-          .line +
-        index +
-        1,
-      firstLine: (lines[index] ?? '').trim(),
-      pieces: fragmentsOf(construct)
-        .map((fragment) =>
-          fragment === undefined ? '\0' : withoutWhitespace(fragment),
-        )
-        .join('')
-        .split('\0')
-        .filter((text) => text !== ''),
-    };
-  });
-};
 
 /** The source files under `srcDir`, as `/`-separated relative paths. */
 const sourceFilesIn = (srcDir: string): readonly string[] => {

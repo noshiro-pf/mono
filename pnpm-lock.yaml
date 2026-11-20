@@ -397,6 +397,9 @@ importers:
       github-slugger:
         specifier: 2.0.0
         version: 2.0.0
+      graphql:
+        specifier: 17.0.2
+        version: 17.0.2
       jiti:
         specifier: 'catalog:'
         version: 2.7.0
@@ -909,7 +912,7 @@ importers:
         version: 14.5.0(@firebase/app-compat@0.5.18)(@firebase/app@0.16.2)(supports-color@7.2.0)
       firebase-functions:
         specifier: ^7.4.0
-        version: 7.4.0(firebase-admin@14.5.0(@firebase/app-compat@0.5.18)(@firebase/app@0.16.2)(supports-color@7.2.0))(supports-color@7.2.0)
+        version: 7.4.0(firebase-admin@14.5.0(@firebase/app-compat@0.5.18)(@firebase/app@0.16.2)(supports-color@7.2.0))(graphql@17.0.2)(supports-color@7.2.0)
       nodemailer:
         specifier: ^10.2.0
         version: 10.2.0
@@ -1689,9 +1692,6 @@ importers:
       eslint-plugin-ts-type-forge:
         specifier: workspace:*
         version: link:../../libs/eslint-plugin-ts-type-forge
-      graphql:
-        specifier: 17.0.2
-        version: 17.0.2
       npm-run-all2:
         specifier: 'catalog:'
         version: 9.0.4
@@ -4381,9 +4381,6 @@ importers:
       eslint-plugin-ts-type-forge:
         specifier: workspace:*
         version: link:../eslint-plugin-ts-type-forge
-      graphql:
-        specifier: 17.0.2
-        version: 17.0.2
       jiti:
         specifier: 'catalog:'
         version: 2.7.0
@@ -23619,7 +23616,7 @@ snapshots:
       - '@firebase/app-compat'
       - supports-color
 
-  firebase-functions@7.4.0(firebase-admin@14.5.0(@firebase/app-compat@0.5.18)(@firebase/app@0.16.2)(supports-color@7.2.0))(supports-color@7.2.0):
+  firebase-functions@7.4.0(firebase-admin@14.5.0(@firebase/app-compat@0.5.18)(@firebase/app@0.16.2)(supports-color@7.2.0))(graphql@17.0.2)(supports-color@7.2.0):
     dependencies:
       '@types/cors': 2.8.19
       '@types/express': 5.0.6
@@ -23627,6 +23624,8 @@ snapshots:
       express: 5.3.0(supports-color@7.2.0)
       firebase-admin: 14.5.0(@firebase/app-compat@0.5.18)(@firebase/app@0.16.2)(supports-color@7.2.0)
       protobufjs: 7.6.6
+    optionalDependencies:
+      graphql: 17.0.2
     transitivePeerDependencies:
       - supports-color
 

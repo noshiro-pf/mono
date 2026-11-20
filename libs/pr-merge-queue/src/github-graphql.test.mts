@@ -19,12 +19,11 @@
  * refresh it).
  */
 
-import { buildSchema, parse, validate, type GraphQLSchema } from 'graphql';
-import * as fs from 'node:fs';
-import * as path from 'node:path';
-import { Result, unknownToString } from 'ts-data-forge';
+import { Result } from 'ts-data-forge';
 import * as t from 'ts-fortress';
 // `tools/` is not a package and has no barrel; it is reached by relative path.
+// eslint-disable-next-line import-x/no-relative-packages, import-x/no-internal-modules
+import { githubGraphqlErrors } from '../../../tools/configs/github-graphql-schema.mjs';
 // eslint-disable-next-line import-x/no-relative-packages, import-x/no-internal-modules
 import { queriesNotSent } from '../../../tools/configs/github-graphql-source-queries.mjs';
 import { parseJson, type ApiContext } from './lib/index.mjs';
@@ -56,7 +55,7 @@ describe('the GraphQL requests', () => {
 
     for (const { operation, query } of sent) {
       assert.deepStrictEqual(
-        { operation, errors: errorsOf(query) },
+        { operation, errors: githubGraphqlErrors(query) },
         { operation, errors: [] },
       );
     }
@@ -186,37 +185,3 @@ const CLOSING_ISSUES_ANSWER = {
     },
   },
 } as const;
-
-/** What GitHub would say is wrong with `query`, empty when nothing is. */
-const errorsOf = (query: string): readonly string[] => {
-  try {
-    return validate(githubSchema(), parse(query)).map(({ message }) => message);
-  } catch (error: unknown) {
-    return [unknownToString(error)];
-  }
-};
-
-/**
- * GitHub's schema as GitHub publishes it, built once. Built without its own
- * validation: GitHub's SDL does not pass every rule `graphql` checks a schema
- * against (an interface field that is not deprecated where an implementation's
- * is), and what is checked here is the queries.
- */
-const githubSchema = (() => {
-  let mut_schema: GraphQLSchema | undefined = undefined;
-
-  return (): GraphQLSchema => {
-    mut_schema ??= buildSchema(
-      fs.readFileSync(
-        path.resolve(
-          import.meta.dirname,
-          '../../../tools/configs/github-graphql/schema.docs.graphql',
-        ),
-        'utf8',
-      ),
-      { assumeValid: true, assumeValidSDL: true },
-    );
-
-    return mut_schema;
-  };
-})();
