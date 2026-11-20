@@ -54,18 +54,21 @@ export const reportStdTypeReference = <MessageIds extends string>(
     return;
   }
 
-  const program = context.sourceCode.ast;
-
   context.report({
     node: typeName,
     messageId: messageIds.report,
     data: { name: stdName, alternatives: formatAlternatives(candidates) },
     suggest: Arr.generate(function* () {
       for (const candidate of candidates) {
-        const target = resolveTypeName(program, candidate, importStyle);
+        const target = resolveTypeName(
+          context.sourceCode,
+          typeName,
+          candidate,
+          importStyle,
+        );
 
-        // The replacement name is already bound to something else in this file,
-        // so rewriting to it would resolve to the wrong declaration.
+        // The replacement name is bound to something else where it would be
+        // written, so rewriting to it would resolve to the wrong declaration.
         if (target !== undefined) {
           yield {
             messageId: messageIds.suggestion,
