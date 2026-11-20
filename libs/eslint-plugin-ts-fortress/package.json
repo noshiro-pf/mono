@@ -76,7 +76,13 @@
   },
   "peerDependencies": {
     "eslint": ">=9.0.0",
+    "ts-fortress": "workspace:^13.0.0",
     "typescript": ">=5.0.0"
+  },
+  "peerDependenciesMeta": {
+    "ts-fortress": {
+      "optional": true
+    }
   },
   "engines": {
     "node": ">=22.23.4",

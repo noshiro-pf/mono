@@ -3685,6 +3685,9 @@ importers:
       eslint-rule-forge:
         specifier: workspace:^
         version: link:../eslint-rule-forge
+      synstate-dom:
+        specifier: workspace:^0.13.0
+        version: link:../synstate-dom
       ts-data-forge:
         specifier: workspace:^
         version: link:../ts-data-forge
