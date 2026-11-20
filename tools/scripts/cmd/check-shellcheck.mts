@@ -29,8 +29,9 @@ import {
 
 /**
  * Runs the pinned shellcheck over every tracked `*.sh` and `*.bash`, every
- * script of every tracked `package.json`, and the commands of
- * `.github/unblock-prs.json`, all outside `experimental/` and `docs/`.
+ * script of every tracked `package.json`, the commands of
+ * `.github/unblock-prs.json` and the hook commands of `.claude/settings.json`,
+ * all outside `experimental/` and `docs/`.
  *
  * The binary is the one `tools/configs/release-binaries.json` pins, never
  * whatever `PATH` has, and it runs without `SHELLCHECK_OPTS` and without a
@@ -70,13 +71,14 @@ export const checkRepository = async (): Promise<Result<string, string>> => {
           '',
           'A finding that is wrong for its line is disabled in a shell file by',
           '`# shellcheck disable=SC<number> # why` above the command, and for a',
-          'script of a package.json by an entry with its reason in',
-          'SCRIPT_EXCEPTIONS (tools/scripts/cmd/check-shellcheck.mts). A command',
-          'of .github/unblock-prs.json is rewritten instead.',
+          'script of a package.json or a hook command of .claude/settings.json',
+          'by an entry with its reason in SCRIPT_EXCEPTIONS',
+          '(tools/scripts/cmd/check-shellcheck.mts). A command of',
+          '.github/unblock-prs.json is rewritten instead.',
         ].join('\n'),
       )
     : Result.ok(
-        `Nothing to report in ${plural(sources.value.shellFiles.length, 'shell file')}, the scripts of ${plural(sources.value.manifests.length, 'manifest')} and ${UNBLOCK_PRS_CONFIG} (${plural(commandCount, 'distinct command')}; shellcheck ${installed.value.version}).`,
+        `Nothing to report in ${plural(sources.value.shellFiles.length, 'shell file')}, the scripts of ${plural(sources.value.manifests.length, 'manifest')}, ${UNBLOCK_PRS_CONFIG} and the hooks of ${CLAUDE_SETTINGS} (${plural(commandCount, 'distinct command')}; shellcheck ${installed.value.version}).`,
       );
 };
 
@@ -85,9 +87,10 @@ export const checkRepository = async (): Promise<Result<string, string>> => {
  * `exceptions` that matches none of it.
  *
  * A shell file is checked in the dialect its shebang names. A script of a
- * manifest and a command of the queue's configuration are checked as `sh`, each
- * distinct text once, and reported under every place that has it; their
- * findings carry no position, which would be that of a temporary file.
+ * manifest, a command of the queue's configuration and a Claude Code hook
+ * command are checked as `sh`, each distinct text once, and reported under
+ * every place that has it; their findings carry no position, which would be
+ * that of a temporary file.
  */
 export const findShellFindings = async ({
   shellcheck,
@@ -190,7 +193,7 @@ export const findShellFindings = async ({
           .filter((exception) => !commandFindings.some(isExcepted(exception)))
           .map(
             ({ manifest, script, code }) =>
-              `The exception for SC${code} in script "${script}" of ${manifest} matches no finding: delete it from SCRIPT_EXCEPTIONS in tools/scripts/cmd/check-shellcheck.mts.`,
+              `The exception for SC${code} at ${manifest}: ${script} matches no finding: delete it from SCRIPT_EXCEPTIONS in tools/scripts/cmd/check-shellcheck.mts.`,
           ),
       ],
     });
@@ -262,6 +265,59 @@ export const unblockPrsCommands = (
     : Result.ok(mut_commands);
 };
 
+/**
+ * The commands of the Claude Code hooks in `.claude/settings.json`, each with
+ * its path: `hooks.<event>[i].hooks[j].command` of every hook whose `type` is
+ * `command`, which Claude Code hands `sh -c`. A command hook whose `command` is
+ * not a string is an error rather than a command left unchecked.
+ */
+export const claudeHookCommands = (
+  settings: unknown,
+): Result<readonly Readonly<{ field: string; text: string }>[], string> => {
+  const events =
+    isRecord(settings) && isRecord(settings['hooks'])
+      ? settings['hooks']
+      : ({} as const);
+
+  const hooks = Object.entries(events).flatMap(([event, matchers]) =>
+    (Arr.isArray(matchers) ? matchers : []).flatMap((matcher, index) =>
+      isRecord(matcher) && Arr.isArray(matcher['hooks'])
+        ? matcher['hooks'].map((hook, hookIndex) => ({
+            field: `hooks.${event}[${index}].hooks[${hookIndex}].command`,
+            hook,
+          }))
+        : [],
+    ),
+  );
+
+  const commandHooks = hooks.filter(
+    ({ hook }) => isRecord(hook) && hook['type'] === 'command',
+  );
+
+  const malformed = commandHooks.filter(
+    ({ hook }) => !isRecord(hook) || !isString(hook['command']),
+  );
+
+  return Arr.isNonEmpty(malformed)
+    ? Result.err(
+        malformed
+          .map(
+            ({ field }) =>
+              `${CLAUDE_SETTINGS}: ${field} is not a string, so it cannot be checked.`,
+          )
+          .join('\n'),
+      )
+    : Result.ok(
+        Arr.generate(function* () {
+          for (const { field, hook } of commandHooks) {
+            if (isRecord(hook) && isString(hook['command'])) {
+              yield { field, text: hook['command'] };
+            }
+          }
+        }),
+      );
+};
+
 /** The pinned shellcheck, installed, and its version. */
 export const installPinnedShellcheck = async (): Promise<
   Result<Readonly<{ binary: string; version: string }>, string>
@@ -304,11 +360,14 @@ export type ShellSources = Readonly<{
   manifests: readonly TextFile[];
   /** `.github/unblock-prs.json`, when the repository has one. */
   unblockPrsConfig: TextFile | undefined;
+  /** `.claude/settings.json`, when the repository has one. */
+  claudeSettings: TextFile | undefined;
 }>;
 
 export type ScriptException = Readonly<{
-  /** The manifest's path from the repository root. */
+  /** The manifest's, or `.claude/settings.json`'s, path from the repository root. */
   manifest: string;
+  /** The script's name, or the hook command's path (`hooks.<event>[i].hooks[j].command`). */
   script: string;
   /** The number of the `SC` code. */
   code: number;
@@ -319,7 +378,7 @@ type Command = Readonly<{
   /** Where the command is, as a finding names it. */
   label: string;
   text: string;
-  /** Set for a manifest's script, which alone an exception can name. */
+  /** Set for a manifest's script and a hook command, which alone an exception can name. */
   manifest?: string;
   script?: string;
 }>;
@@ -339,15 +398,26 @@ type ShellcheckComment = Readonly<{
 }>;
 
 /**
- * A finding of a `package.json` script that is wrong for it. JSON takes no
- * `# shellcheck disable=` comment, so the reason is kept here; an entry that no
- * longer matches a finding fails the guard. A command of
+ * A finding of a `package.json` script or a `.claude/settings.json` hook
+ * command that is wrong for it. JSON takes no `# shellcheck disable=` comment,
+ * so the reason is kept here; an entry that no longer matches a finding fails
+ * the guard, as one does whose hook moved to another index. A command of
  * `.github/unblock-prs.json` cannot be named here: the queue's few commands are
  * the repository's own, and one with a wrong finding is rewritten.
  */
-const SCRIPT_EXCEPTIONS: readonly ScriptException[] = [] as const;
+const SCRIPT_EXCEPTIONS: readonly ScriptException[] = [
+  {
+    manifest: '.claude/settings.json',
+    script: 'hooks.SessionStart[1].hooks[0].command',
+    code: 1090,
+    reason:
+      'Sources the Node.js environment of the cloud image, a file only that image has and nothing here can name for shellcheck to follow; the hook skips it when the file is not there.',
+  },
+] as const;
 
 const UNBLOCK_PRS_CONFIG = '.github/unblock-prs.json';
+
+const CLAUDE_SETTINGS = '.claude/settings.json';
 
 /** The fields of the queue's configuration that hold commands, an array index written `[]`. */
 const COMMAND_FIELDS: ReadonlySet<string> = new Set<string>([
@@ -378,6 +448,7 @@ const parseJson = (file: TextFile): Result<unknown, string> =>
 const commandsOf = ({
   manifests,
   unblockPrsConfig,
+  claudeSettings,
 }: ShellSources): Result<readonly Command[], string> => {
   const mut_commands: Command[] = [];
 
@@ -423,6 +494,29 @@ const commandsOf = ({
         )
           ? text.replaceAll(/\$[1-9]/gu, "'x'")
           : text,
+      });
+    }
+  }
+
+  if (claudeSettings !== undefined) {
+    const parsed = parseJson(claudeSettings);
+
+    if (Result.isErr(parsed)) {
+      return parsed;
+    }
+
+    const commands = claudeHookCommands(parsed.value);
+
+    if (Result.isErr(commands)) {
+      return commands;
+    }
+
+    for (const { field, text } of commands.value) {
+      mut_commands.push({
+        label: `${claudeSettings.path}: ${field}`,
+        text,
+        manifest: claudeSettings.path,
+        script: field,
       });
     }
   }
@@ -531,10 +625,11 @@ const readSources = async (): Promise<Result<ShellSources, string>> => {
     return failed ?? Result.ok(texts.filter(Result.isOk).map((r) => r.value));
   };
 
-  const [shellFiles, manifests, configs] = await Promise.all([
+  const [shellFiles, manifests, configs, settings] = await Promise.all([
     read(files.filter((file) => /\.(?:sh|bash)$/u.test(file))),
     read(files.filter((file) => path.posix.basename(file) === 'package.json')),
     read(files.filter((file) => file === UNBLOCK_PRS_CONFIG)),
+    read(files.filter((file) => file === CLAUDE_SETTINGS)),
   ]);
 
   if (Result.isErr(shellFiles)) {
@@ -549,10 +644,15 @@ const readSources = async (): Promise<Result<ShellSources, string>> => {
     return configs;
   }
 
+  if (Result.isErr(settings)) {
+    return settings;
+  }
+
   return Result.ok({
     shellFiles: shellFiles.value,
     manifests: manifests.value,
     unblockPrsConfig: configs.value[0],
+    claudeSettings: settings.value[0],
   });
 };
 
