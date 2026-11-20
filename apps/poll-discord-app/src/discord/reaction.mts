@@ -78,6 +78,7 @@ const onRefreshClick = async (
   const fixAnswerAndUpdateMessageResult = await fixAnswerAndUpdateMessage(
     messages,
     poll,
+    { resetRefreshReaction: true },
   );
 
   return Result.isErr(fixAnswerAndUpdateMessageResult)

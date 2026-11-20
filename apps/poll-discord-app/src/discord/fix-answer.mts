@@ -15,20 +15,26 @@ import {
   type Poll,
   type UserId,
 } from '../types/index.mjs';
+import { fetchAllReactionUsers } from './fetch-reaction-users.mjs';
 
-/** Reactions を取得して poll.answers を修復（データベースが壊れたときの保険） */
+/**
+ * Reactions を取得して poll.answers を修復（データベースが壊れたときの保険）し、
+ * `poll` を保存してサマリーを一度だけ描き直す。
+ *
+ * `resetRefreshReaction` のとき（🔄 による修復）は、修復が保存と描画まで済んだ後
+ * にだけサマリーのリアクションを外して 🔄 を付け直す。途中で失敗したときは押された
+ * 🔄 が残るので、もう一度修復を試せる。
+ */
 export const fixAnswerAndUpdateMessage = async (
   mut_messages: Discord.Collection<string, Discord.Message>,
   poll: Poll,
+  { resetRefreshReaction }: Readonly<{ resetRefreshReaction: boolean }>,
 ): Promise<Result<undefined, string>> => {
   const pollMessage = mut_messages.find((m) => m.id === poll.id);
 
   if (pollMessage === undefined) {
     return Result.err(`message with id ${poll.id} not found`);
   }
-
-  // remove reaction stamp button
-  await pollMessage.reactions.removeAll();
 
   const dateOptionMessages: readonly (readonly [
     DateOptionId,
@@ -61,24 +67,9 @@ export const fixAnswerAndUpdateMessage = async (
   > = await Promise.all(
     dateOptionMessagesFilled.map(([dateId, msg]) =>
       Promise.all([
-        msg.reactions
-          .resolve(emojis.good.unicode)
-          ?.users.fetch()
-          .then((good) =>
-            good.filter((u) => !u.bot).map((u) => toUserId(u.id)),
-          ),
-        msg.reactions
-          .resolve(emojis.fair.unicode)
-          ?.users.fetch()
-          .then((fair) =>
-            fair.filter((u) => !u.bot).map((u) => toUserId(u.id)),
-          ),
-        msg.reactions
-          .resolve(emojis.poor.unicode)
-          ?.users.fetch()
-          .then((poor) =>
-            poor.filter((u) => !u.bot).map((u) => toUserId(u.id)),
-          ),
+        reactingUserIds(msg, emojis.good.unicode),
+        reactingUserIds(msg, emojis.fair.unicode),
+        reactingUserIds(msg, emojis.poor.unicode),
       ]).then(([good, fair, poor]) =>
         tp(dateId, {
           good,
@@ -165,7 +156,23 @@ export const fixAnswerAndUpdateMessage = async (
     );
   }
 
-  // restore reaction stamp button
+  if (!resetRefreshReaction) {
+    return Result.ok(undefined);
+  }
+
+  // Clear the 🔄 that was pressed, and put the bot's back.
+  const removeAllResult = await Result.fromPromise(
+    pollMessage.reactions.removeAll(),
+  );
+
+  if (Result.isErr(removeAllResult)) {
+    return Result.err(
+      `removeAll in fixAnswerAndUpdateMessage failed: ${unknownToString(
+        removeAllResult.value,
+      )}`,
+    );
+  }
+
   const addEmojiResult = await Result.fromPromise(
     pollMessage.react(emojis.refresh.unicode),
   );
@@ -179,4 +186,25 @@ export const fixAnswerAndUpdateMessage = async (
   }
 
   return Result.ok(undefined);
+};
+
+/**
+ * The ids of the users other than bots who reacted to `message` with `emoji`,
+ * every page of them, or `undefined` for a reaction nobody added.
+ */
+const reactingUserIds = async (
+  message: Discord.Message,
+  emoji: string,
+): Promise<readonly UserId[] | undefined> => {
+  const reaction = message.reactions.resolve(emoji);
+
+  if (reaction === null) {
+    return undefined;
+  }
+
+  const users = await fetchAllReactionUsers((options) =>
+    reaction.users.fetch(options),
+  );
+
+  return users.filter((u) => !u.bot).map((u) => toUserId(u.id));
 };
