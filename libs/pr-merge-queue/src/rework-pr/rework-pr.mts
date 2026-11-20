@@ -51,11 +51,12 @@ export const REWORK_PR_HELP = [
   'more work goes into it, and gives it back once that is pushed.',
   '',
   `  start  put ${SKIP_CI_LABEL} on, take ${MERGE_QUEUED_LABEL} off, disarm auto-merge,`,
-  '         and make it a draft; a draft refused is said, and is not a',
-  '         failure, since the labels hold it without one',
+  '         and make it a draft; a draft refused is said, with how else to',
+  '         make one, and is not a failure, since the labels hold it without one',
   '  done   refuse uncommitted changes and untracked files, push the branch',
   '         with --force-with-lease --force-if-includes, carry along the pull',
-  '         requests stacked on it, then mark it ready for review, and then:',
+  '         requests stacked on it, then mark it ready for review (where',
+  '         GraphQL is refused, it stops there and says how else to), and then:',
   '           --requeue  the work changes nothing the description says: put',
   `                      ${MERGE_QUEUED_LABEL} back, if start took it off, and the queue`,
   '                      takes it from there',
@@ -158,8 +159,9 @@ export const reworkPr = async (
  * that one the worker armed, or took `skip-ci` off, after the first read is
  * disarmed too. That narrows the race with the worker rather than closing it;
  * what closes it is `done` refusing a pull request still armed. A draft refused
- * ({@link isGraphqlRefusal}) is said and is not a failure: the pull request is
- * held without it. A draft that failed for any other reason may pass when tried
+ * ({@link isGraphqlRefusal}) is said, with how else to make one
+ * ({@link setDraftElsewhere}), and is not a failure: the pull request is held
+ * without it. A draft that failed for any other reason may pass when tried
  * again, so `start` fails, and running it again finishes it.
  *
  * `done` refuses a pull request that is not held — `skip-ci` on, `merge-queued`
@@ -170,7 +172,9 @@ export const reworkPr = async (
  * meanwhile is refused even after a fetch, carries along the pull requests
  * stacked on the branch, with `unblock-prs`'s `restack`, as `push-fixed-pr` does
  * (one that cannot be moved is said and left where it is), and marks a draft
- * ready for review.
+ * ready for review. That refused stops it, saying how else to mark it: the
+ * worker sets aside a draft it is given, so `requeue` waits for a run of `done`
+ * once it is ready.
  * Last, with `--requeue` — the work changes nothing the description says, so
  * nothing the author queued needs reviewing again — it puts `merge-queued`
  * back, but only where `start` took it off and nobody has put it on or taken it
@@ -272,8 +276,11 @@ export const applyRework = async (
     );
   }
 
+  // Asked for although `done` then stops at `ready` and is run again: the
+  // worker passes over a draft, where it rebases a pull request that is not one
+  // and asked for `auto-rebase` (`autoRebaseTargets`), under the work going on.
   io.log(
-    `${failed}. It is held all the same, so the work can go on; it is just not marked as a draft.`,
+    `${failed}. It is held all the same, so the work can go on, but make it a draft another way now (${setDraftElsewhere(true)}); rework-pr done says how to mark it ready again.`,
   );
 
   return Result.ok({ number, steps: ran });
@@ -379,6 +386,14 @@ export const isGraphqlRefusal = (message: string): boolean =>
     /resource not accessible|permission|forbidden|not authorized/iu.test(
       message,
     ));
+
+/**
+ * Where GraphQL is refused, how else a pull request is made a draft (`draft`
+ * true) or marked ready for review: the GitHub MCP server makes the call from
+ * its own side, out of reach of a Claude Code session's proxy.
+ */
+export const setDraftElsewhere = (draft: boolean): string =>
+  `the GitHub MCP tool update_pull_request with draft: ${draft}, or "${draft ? 'Convert to draft' : 'Ready for review'}" on the pull request's page` as const;
 
 /**
  * Whether the `merge-queued` event `recorded` — `start` taking the label off —
@@ -811,8 +826,18 @@ const runSteps = async (
     const done = await io.run(state, step, standing);
 
     if (Result.isErr(done)) {
+      const failed =
+        `#${state.number}: cannot ${STEP_DESCRIPTIONS[step]}: ${done.value}` as const;
+
+      // Stopped before `requeue`, since the worker sets aside a draft it is
+      // given, and only after the push: a pull request marked ready before the
+      // amend is pushed is one the worker may rebase under it, and one left
+      // ready by a `done` that refused before pushing is open to that while the
+      // work goes on. The second run pushes the same commit again.
       return Result.err(
-        `#${state.number}: cannot ${STEP_DESCRIPTIONS[step]}: ${done.value}`,
+        step === 'ready' && isGraphqlRefusal(done.value)
+          ? `${failed}. Mark it ready another way (${setDraftElsewhere(false)}), then right away run rework-pr done again with the same flag: it pushes the same commit again, which changes nothing, leaves the layers above as this run said it left them, and finishes the steps after this one.`
+          : failed,
       );
     }
 

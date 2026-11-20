@@ -345,7 +345,7 @@ the private issue it closes or steps that work. Nothing public can be undone
   branch's one commit between **`pnpm run rework-pr -- start`**, before the
   first edit, and **`-- done --requeue`**, which puts back the `merge-queued`
   `start` took off, or **`--review`** when the description must change; without
-  GraphQL, go on after its labels unless disarming failed: then it is the
+  GraphQL, go on as its output says unless disarming failed: then it is the
   author's. Anything larger is a question. Claim one `unblock-prs` set aside
   instead (`pnpm run claim-pr -- <n> --by <session URL>`); refused, leave it.
   `main` moving under the branch is `auto-rebase`'s: ask before rebasing. A

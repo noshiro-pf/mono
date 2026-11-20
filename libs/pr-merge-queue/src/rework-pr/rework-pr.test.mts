@@ -550,6 +550,8 @@ describe(applyRework, () => {
       logged.at(-1),
       '#3456: cannot make it a draft: 403 Forbidden: refused. It is held all the same',
     );
+
+    assert.include(logged.at(-1), 'update_pull_request with draft: true');
   });
 
   test('start: a draft that failed for any other reason fails, held', async () => {
@@ -769,6 +771,79 @@ describe(applyRework, () => {
     assert.isTrue(Result.isErr(await applyRework(done('requeue'), io)));
 
     assert.deepStrictEqual(ran, []);
+  });
+
+  test('done --requeue: a ready refused queues nothing, and says how to finish', async () => {
+    const { io, ran } = fakeIo(
+      [state({ labels: [SKIP_CI_LABEL], isDraft: true })],
+      'ready',
+      'untouched',
+    );
+
+    const applied = await applyRework(done('requeue'), io);
+
+    assert.isTrue(Result.isErr(applied));
+
+    assert.include(
+      applied.value,
+      '#3456: cannot mark it ready for review: 403 Forbidden: refused',
+    );
+
+    assert.include(applied.value, 'update_pull_request with draft: false');
+
+    assert.include(
+      applied.value,
+      'right away run rework-pr done again with the same flag: it pushes the same commit again',
+    );
+
+    assert.include(
+      applied.value,
+      'leaves the layers above as this run said it left them',
+    );
+
+    assert.deepStrictEqual(ran, ['push', 'ready']);
+  });
+
+  test('done --requeue: on one marked ready, pushes and queues it again', async () => {
+    const { io, ran } = fakeIo(
+      [state({ labels: [SKIP_CI_LABEL] })],
+      undefined,
+      'untouched',
+      {
+        standing: Result.ok({
+          pr: branch(entry(3456)),
+          layers: [branch(entry(2))],
+          claimedLayers: [],
+        }),
+      },
+    );
+
+    assert.deepStrictEqual(
+      await applyRework(done('requeue'), io),
+      Result.ok({
+        number: 3456,
+        steps: ['push', 'restack', 'requeue', 'forget'],
+      }),
+    );
+
+    assert.deepStrictEqual(ran, ['push', 'restack', 'requeue', 'forget']);
+  });
+
+  test('done: a ready that failed for any other reason names no other way', async () => {
+    const { io, ran } = fakeIo(
+      [state({ labels: [SKIP_CI_LABEL], isDraft: true })],
+      'ready',
+      'none',
+      { failure: '502 Bad Gateway: try again' },
+    );
+
+    const applied = await applyRework(done('review'), io);
+
+    assert.isTrue(Result.isErr(applied));
+
+    assert.notInclude(applied.value, 'update_pull_request');
+
+    assert.deepStrictEqual(ran, ['push', 'ready']);
   });
 
   test('done --requeue: a push refused queues nothing', async () => {
