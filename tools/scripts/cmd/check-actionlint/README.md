@@ -54,5 +54,5 @@ keeps); nothing in the workflows is wrong.
 
 `check:root:shellcheck` (`../check-shellcheck.mts`) runs the same pinned
 shellcheck over the tracked `*.sh` and `*.bash` files, the scripts of every
-`package.json` and the commands of `.github/unblock-prs.json`, outside
-`experimental/` and `docs/`.
+`package.json`, the commands of `.github/unblock-prs.json` and the hook commands
+of `.claude/settings.json`, outside `experimental/` and `docs/`.
