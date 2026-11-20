@@ -181,8 +181,10 @@ describe(createDeleteAccountPageStore, () => {
 
     await settle();
 
+    // A failure the dialog does not mark on a field: logged, and nothing more
+    // from a session already closed.
     reauthAnswers[0].resolve(
-      Result.err({ code: 'auth/user-mismatch', message: 'mismatch' }),
+      Result.err({ code: 'auth/too-many-requests', message: 'too many' }),
     );
 
     await settle();

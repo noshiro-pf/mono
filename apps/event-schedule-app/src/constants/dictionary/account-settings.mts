@@ -7,6 +7,7 @@ export const accountSettingsDictionary = {
     message: {
       wrongPassword: 'パスワードが間違っています。',
       wrongEmailOrPassword: 'メールアドレスまたはパスワードが間違っています。',
+      wrongEmail: 'このメールアドレスのアカウントではありません。',
       error: '再認証でエラーが発生しました。',
     },
   },

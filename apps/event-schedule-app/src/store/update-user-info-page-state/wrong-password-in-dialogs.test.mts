@@ -60,6 +60,41 @@ describe(createDeleteAccountPageStore, () => {
     },
   );
 
+  // With email enumeration protection off, signing in again reports an email of
+  // no account as `auth/user-mismatch`.
+  test('marks the email on auth/user-mismatch, deletes nothing and stays open', async () => {
+    const { deps, calls, dialog, toasts } = setup('auth/user-mismatch');
+
+    const store = createDeleteAccountPageStore(deps);
+
+    dialog.deleteAccount();
+
+    store.inputEmailHandler('alice@example.co');
+
+    store.inputPasswordHandler('password123');
+
+    store.enterClickHandler();
+
+    await settle();
+
+    assert.deepStrictEqual(calls, ['reauthenticate']);
+
+    const { formState } = Optional.unwrap(store.state.getSnapshot());
+
+    assert.strictEqual(formState.email.error, dc.wrongEmail);
+
+    assert.isUndefined(formState.password.error);
+
+    assert.isFalse(formState.isWaitingResponse);
+
+    assert.deepStrictEqual(toasts, []);
+
+    assert.strictEqual(
+      Optional.unwrap(dialog.openingDialogType$.getSnapshot()),
+      'deleteAccount',
+    );
+  });
+
   test('after auth/invalid-credential, fixing the email clears the password error', async () => {
     const { deps } = setup('auth/invalid-credential');
 
