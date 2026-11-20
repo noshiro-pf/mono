@@ -132,11 +132,17 @@ export const classifyChanges = ({
       mut_areas.add('published-source');
     }
 
+    // A page an app builds (`!apps/*/src/`) is code to the gate, and still
+    // Markdown, which `check:md` reads unless its `ignores` leave it out; so is
+    // the Markdown under `strict-lib/` that CI lints, which the `continue`
+    // below would skip.
+    if (prose || file.endsWith('.md')) {
+      mut_areas.add('prose');
+    }
+
     // Its tooling's checks for any file under it, and its members' tests for
     // one the code gate lets through; its generators, as `strict-lib-gen.yml`
-    // runs them, for what they read or write. Markdown here does not reach
-    // `prose` below, so `check:md` is not planned for the Markdown here that CI
-    // lints (what the `ignores` of `.markdownlint-cli2.mjs` leave in).
+    // runs them, for what they read or write.
     if (file.startsWith('strict-lib/')) {
       mut_areas.add('strict-lib');
 
@@ -149,12 +155,6 @@ export const classifyChanges = ({
       }
 
       continue;
-    }
-
-    // A page an app builds (`!apps/*/src/`) is code to the gate, and still
-    // Markdown, which `check:md` reads unless its `ignores` leave it out.
-    if (prose || file.endsWith('.md')) {
-      mut_areas.add('prose');
     }
 
     if (file.startsWith('tools/configs/')) {
