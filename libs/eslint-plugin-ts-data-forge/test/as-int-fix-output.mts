@@ -10,9 +10,9 @@
  * tests about the operand's type (`src/rules/prefer-as-int.test.mts`), so
  * `check:types` fails when a cast function stops accepting something the rule
  * fixes, and the `@ts-expect-error` lines show why the rest get no fix, failing
- * when a cast function starts accepting one of them. `reassigned` holds a fixed
- * output whose later reassignment is a type error, pinned by `@ts-expect-error`:
- * the known limit its documentation states.
+ * when a cast function starts accepting one of them. `reassigned` holds the
+ * fixed output of a cast whose call would be typed narrower, which the rule
+ * suggests rather than fixes.
  *
  * The calls are copied here by hand: nothing checks that a new `output` of the
  * rule's tests is among them, until a harness compiles every fixed output of
@@ -71,14 +71,17 @@ export const notFixed = <T, S extends `${number}`>(
   ] as const;
 
 /**
- * The known limit stated at the fix in `prefer-as-int.mts`: `asInt(0)` is typed
- * `Int & 0`, so a `let` it initializes takes no other `Int` later. This is the
- * `output` of the rule's test of a cast that initializes a `let`.
+ * `asInt(0)` would be typed `Int & 0`, and a `let` it initialized would take no
+ * other `Int` later, so the rule suggests that rewrite rather than fixing it
+ * (`isNarrowerThanCast`) and fixes only the reassignment, whose operand is a
+ * `number`. This is the `output` of the rule's test of a cast that initializes
+ * a `let`, and it compiles.
  */
 export const reassigned = (): Int => {
-  let mut_i = asInt(0);
+  // The cast the rule leaves as it is, reproduced.
+  // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+  let mut_i = 0 as Int;
 
-  // @ts-expect-error `mut_i` is typed `Int & 0`, not `Int`
   mut_i = asInt(mut_i + 1);
 
   return mut_i;
