@@ -11,10 +11,14 @@ import type {
 } from '../types/index.mjs';
 import { userIdToMention } from './user-id-to-mention.mjs';
 
+/**
+ * The summary field of one option. `userIdToDisplayName` names the voters;
+ * `undefined` gives their counts alone, for a summary whose names do not fit.
+ */
 export const rpCreateSummaryField = (
   dateOption: DateOption,
   poll: Poll,
-  userIdToDisplayName: IMap<UserId, string>,
+  userIdToDisplayName: IMap<UserId, string> | undefined,
 ): Discord.EmbedField => {
   const answerOfDate = Optional.toNullable(poll.answers.get(dateOption.id));
 
@@ -44,7 +48,7 @@ export const rpCreateSummaryField = (
 
 export const rpCreateSummaryValue = (
   value: AnswerOfDate,
-  userIdToDisplayName: IMap<UserId, string>,
+  userIdToDisplayName: IMap<UserId, string> | undefined,
 ): string =>
   [
     value.good.size === 0
@@ -63,7 +67,7 @@ export const rpCreateSummaryValue = (
 export const rpCreateSummaryValueElement = (
   reactions: ISet<UserId>,
   answerType: AnswerType,
-  userIdToDisplayName: IMap<UserId, string>,
+  userIdToDisplayName: IMap<UserId, string> | undefined,
 ): string =>
   `${emojis[answerType].name} :${rpToUserListString(
     reactions,
@@ -86,7 +90,7 @@ const rpFormatEmbedField = (
 const rpCreateSummaryFieldSub = (
   pollName: string,
   answerOfDate: AnswerOfDate,
-  userIdToDisplayName: IMap<UserId, string>,
+  userIdToDisplayName: IMap<UserId, string> | undefined,
 ): Discord.EmbedField =>
   rpFormatEmbedField(
     pollName,
@@ -95,16 +99,19 @@ const rpCreateSummaryFieldSub = (
 
 const rpToUserListString = (
   reactions: ISet<UserId>,
-  userIdToDisplayName: IMap<UserId, string>,
+  userIdToDisplayName: IMap<UserId, string> | undefined,
 ): string =>
-  `\t(${reactions.size})\t${reactions
-    .toArray()
-    .toSorted((a, b) => a.localeCompare(b))
-    .map(
-      (id) =>
-        Optional.toNullable(userIdToDisplayName.get(id)) ?? userIdToMention(id),
-    )
-    .join(', ')}`.trimEnd();
+  userIdToDisplayName === undefined
+    ? (`\t(${reactions.size})` as const)
+    : `\t(${reactions.size})\t${reactions
+        .toArray()
+        .toSorted((a, b) => a.localeCompare(b))
+        .map(
+          (id) =>
+            Optional.toNullable(userIdToDisplayName.get(id)) ??
+            userIdToMention(id),
+        )
+        .join(', ')}`.trimEnd();
 
 const gpFormatEmbedFieldData = (
   groupName: string,
