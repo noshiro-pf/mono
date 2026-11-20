@@ -2,9 +2,10 @@ import { EventSchedule, NotificationSettings } from 'event-schedule-app-shared';
 import { createState } from 'synstate';
 import { createMemoryBrowser } from 'synstate-router';
 import { Optional, Result } from 'ts-data-forge';
-import { routes } from '../constants/index.mjs';
+import { dict, routes } from '../constants/index.mjs';
 import {
   createConfirmEmailDialogStore,
+  verifyEmailErrorMessage,
   type ConfirmEmailDialog,
 } from './confirm-email-dialog-state.mjs';
 import { createEditEventScheduleStore } from './create-event-schedule-page/index.mjs';
@@ -177,6 +178,20 @@ const fakeToaster = (onShow: () => number): Toaster =>
     getToasts: () => [],
     remove: () => undefined,
   }) as const;
+
+describe(verifyEmailErrorMessage, () => {
+  const dc = dict.answerPage.eventInfo.verifyEmailDialog;
+
+  test.each([
+    { type: 'permission-denied', expected: dc.notAuthor },
+    { type: 'resource-exhausted', expected: dc.tooManyAttempts },
+    { type: 'not-found', expected: dc.error },
+    { type: 'others', expected: dc.error },
+    { type: 'type-error', expected: dc.error },
+  ] as const)('says $type', ({ type, expected }) => {
+    assert.strictEqual(verifyEmailErrorMessage(type), expected);
+  });
+});
 
 const setup = (
   answer: 'fails' | 'ng' | 'ok',
