@@ -6,7 +6,7 @@ import { firestoreApi } from '../firebase/index.mjs';
 import {
   createUserIdToDisplayNameMap,
   getUserIdsFromAnswers,
-  rpCreateSummaryMessage,
+  rpCreateSummaryMessages,
 } from '../functions/index.mjs';
 import {
   toDateOptionId,
@@ -143,7 +143,7 @@ export const fixAnswerAndUpdateMessage = async (
   const editSummaryMessageResult = await Result.fromPromise(
     pollMessage
       .edit({
-        embeds: [rpCreateSummaryMessage(newPollFilled, userIdToDisplayName)],
+        embeds: rpCreateSummaryMessages(newPollFilled, userIdToDisplayName),
       })
       .then(() => undefined),
   );

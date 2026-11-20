@@ -46,6 +46,17 @@ with today's date (`11/2（月）`):
 /rp30d 21 23
 ```
 
+#### Limits
+
+The summary of a poll is one message of up to ten embeds of 25 options each, so
+a poll has at most 250 options, a title of at most 232 characters and options of
+at most 252. Discord also allows a message 6000 characters of text in all, and
+the bot checks the summary against that with each option's counts alone (its
+label and about 60 characters): a few dozen short options fit, and
+`/rp30 "x" 0 30`, 60 options, does. A command past a limit is answered with the
+reason, and nothing else is posted. When the voters' names do not fit in the
+summary, it shows each option's counts instead.
+
 ### Grouping
 
 ```txt
