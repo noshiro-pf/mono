@@ -24,7 +24,8 @@ describe('storeManifestOf', () => {
     manifest_version: 3,
     name: 'Split View',
     version: '0.3.0',
-    key: 'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA',
+    // The start of a public key, as a manifest's `key` is: nothing secret.
+    key: 'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA', // gitleaks:allow
     permissions: ['storage'],
     web_accessible_resources: [
       {

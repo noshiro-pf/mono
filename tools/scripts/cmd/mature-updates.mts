@@ -58,12 +58,12 @@ import type { ReleaseBinaryPin } from '../lib/release-binaries.mjs';
  *
  * **`release-binaries`** moves each tool in
  * `tools/configs/release-binaries.json` (actionlint and shellcheck, which
- * `check:root:actionlint` downloads) to the newest release older than the hold,
- * within its line: the range a caret draws, so the major, or for a `0.x`
- * version the minor (a `0.0.x` one never moves on its own). So actionlint 1.x
- * moves on its own and 2.0 waits for a human; shellcheck 0.11.x moves on its
- * own and 0.12 waits. The tag is `v<version>`, and each platform's new SHA-256
- * is the `digest` the Releases
+ * `check:root:actionlint` downloads, and gitleaks, which `check:prose:gitleaks`
+ * does) to the newest release older than the hold, within its line: the range a
+ * caret draws, so the major, or for a `0.x` version the minor (a `0.0.x` one
+ * never moves on its own). So actionlint 1.x moves on its own and 2.0 waits for
+ * a human; shellcheck 0.11.x moves on its own and 0.12 waits. The tag is
+ * `v<version>`, and each platform's new SHA-256 is the `digest` the Releases
  * API reports for that asset. The hold applies to each asset's upload too,
  * since a file can be replaced long after its release was published. A release
  * that cannot be taken — an asset missing or without a digest (a warning), or
