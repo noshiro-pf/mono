@@ -8,6 +8,7 @@ import {
   asNode,
   createGetLayerTypes,
   isTypeWrapper,
+  mayHaveEffect,
   skipTypeWrappers,
 } from 'eslint-rule-forge';
 import { Arr } from 'ts-data-forge';
@@ -21,7 +22,10 @@ import {
 
 type Options = readonly [];
 
-type MessageIds = 'preferNonMutatingMethod';
+type MessageIds =
+  | 'preferNonMutatingMethod'
+  | 'preferNonMutatingMethodUnlessArgumentChangesArray'
+  | 'useNonMutatingMethod';
 
 /**
  * Mutating array methods that have a non-mutating counterpart usable when the
@@ -46,6 +50,11 @@ type MessageIds = 'preferNonMutatingMethod';
  * (`isSafeToReEvaluate`). As with `fill`, the rewrite reads the array itself,
  * so a hole stays a hole where the copy held `undefined`, and an `Array`
  * subclass typed as `T[]` gets its own class back from `slice`.
+ *
+ * `Array.from(xs)` copies `xs` before the method's arguments are evaluated, and
+ * the rewrite reads `xs` after them, so a call whose argument may have an
+ * effect (`mayHaveEffect`: `sort(cmpAfterPush())`) is reported with the rewrite
+ * as a suggestion only.
  *
  * The `Array.from()` call is found through type wrappers, which the fix keeps
  * (`(Array.from(xs) as T[]).sort()` → `(xs as T[]).toSorted()`), and the
@@ -161,10 +170,14 @@ export const preferNonMutatingArrayMethod: TSESLint.RuleModule<
         'Disallow calling a mutating array method on a defensive `Array.from()` copy of an array (e.g. `Array.from(x).sort()`); use the non-mutating counterpart on the original array instead (e.g. `x.toSorted()`)',
     },
     fixable: 'code',
+    hasSuggestions: true,
     schema: [],
     messages: {
       preferNonMutatingMethod:
         'Mutating a throw-away `Array.from()` copy with `{{mutatingMethod}}` is roundabout. Use `{{replacement}}` on the original array instead.',
+      preferNonMutatingMethodUnlessArgumentChangesArray:
+        'Mutating a throw-away `Array.from()` copy with `{{mutatingMethod}}` is roundabout, unless the copy is there because an argument changes the array: `Array.from()` copies it before the arguments run, `{{replacement}}` reads it after them. Use `{{replacement}}` on the original array if no argument changes it.',
+      useNonMutatingMethod: 'Use `{{replacement}}` on the original array.',
     },
     defaultOptions: [],
   },
@@ -336,29 +349,47 @@ export const preferNonMutatingArrayMethod: TSESLint.RuleModule<
                 comment.range[1] <= node.range[1],
             );
 
+        // The `Array.from(...)` call and the `<method>(...)` part are replaced
+        // separately, so that wrappers around the call and the `?.` between
+        // them are kept.
+        const fix = (
+          fixer: TSESLint.RuleFixer,
+        ): readonly TSESLint.RuleFix[] => [
+          fixer.replaceText(
+            inner,
+            toMemberObjectText(sourceCode.getText(arg), arg.type),
+          ),
+          fixer.replaceTextRange(
+            [callee.property.range[0], node.range[1]],
+            replacement,
+          ),
+        ];
+
+        const data = { mutatingMethod: methodName, replacement } as const;
+
+        // `Array.from(xs)` copies `xs` before the arguments are evaluated, and
+        // the replacement reads `xs` after them: an argument that may change
+        // `xs` (`sort(cmpAfterPush())`) changes what the replacement reads.
+        if (
+          node.arguments.some((argument) => mayHaveEffect(argument, sourceCode))
+        ) {
+          context.report({
+            node,
+            messageId: 'preferNonMutatingMethodUnlessArgumentChangesArray',
+            data,
+            suggest: dropsComment
+              ? []
+              : [{ messageId: 'useNonMutatingMethod', data, fix }],
+          });
+
+          return;
+        }
+
         context.report({
           node,
           messageId: 'preferNonMutatingMethod',
-          data: { mutatingMethod: methodName, replacement },
-          // The `Array.from(...)` call and the `<method>(...)` part are
-          // replaced separately, so that wrappers around the call and the `?.`
-          // between them are kept.
-          fix: dropsComment
-            ? null
-            : (fixer) => {
-                const objectText = toMemberObjectText(
-                  sourceCode.getText(arg),
-                  arg.type,
-                );
-
-                return [
-                  fixer.replaceText(inner, objectText),
-                  fixer.replaceTextRange(
-                    [callee.property.range[0], node.range[1]],
-                    replacement,
-                  ),
-                ];
-              },
+          data,
+          fix: dropsComment ? null : fix,
         });
       },
     };
