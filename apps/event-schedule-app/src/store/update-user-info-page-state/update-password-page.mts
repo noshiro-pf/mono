@@ -3,7 +3,7 @@ import { Optional, Result } from 'ts-data-forge';
 import type { StrictPick } from 'ts-type-forge';
 import { dict } from '../../constants/index.mjs';
 import {
-  credentialErrorOf,
+  reauthErrorOf,
   showToast,
   updatePasswordPageHasError,
   updatePasswordPageInitialState,
@@ -154,7 +154,7 @@ export const createUpdatePasswordPageStore = <
     );
 
     if (Result.isErr(res1)) {
-      switch (credentialErrorOf(authErrorCodeOf(res1.value))) {
+      switch (reauthErrorOf(authErrorCodeOf(res1.value))) {
         // The email signed in with is the user's own, so only the password can
         // be wrong.
         case 'wrongPassword':
@@ -168,9 +168,9 @@ export const createUpdatePasswordPageStore = <
 
           break;
 
-        // Signing in again reports an email of no account as
-        // `auth/user-mismatch`, not `auth/user-not-found`.
-        case 'userNotFound':
+        // The email is the user's own, not typed: an account it does not match
+        // is no typo the form could mark.
+        case 'wrongEmail':
         case undefined:
           console.error(
             'error occurred on reauthenticateWithCredential:',

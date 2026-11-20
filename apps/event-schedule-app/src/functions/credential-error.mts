@@ -1,3 +1,5 @@
+import type { StrictExclude } from 'ts-type-forge';
+
 /**
  * What a failed email-and-password sign-in, or signing in again before an
  * account change, says is wrong with what was typed, or `undefined` for a
@@ -37,3 +39,27 @@ export const credentialErrorOf = (
  */
 export type CredentialError =
   'wrongPassword' | 'userNotFound' | 'wrongEmailOrPassword';
+
+/**
+ * {@link credentialErrorOf} for signing in again before an account change
+ * (`reauthenticateWithCredential`), which reports what was typed differently:
+ * with email enumeration protection off, an email of no account is
+ * `auth/user-mismatch` (`@firebase/auth`'s `_reauthenticate` turns
+ * `auth/user-not-found` into it), so `userNotFound` is no outcome here and
+ * `wrongEmail` is. A dialog where the email is the user's own, not typed, reads
+ * `wrongEmail` as an account the sign-in does not match.
+ */
+export const reauthErrorOf = (
+  code: string | undefined,
+): ReauthError | undefined => {
+  if (code === 'auth/user-mismatch') {
+    return 'wrongEmail';
+  }
+
+  const error = credentialErrorOf(code);
+
+  return error === 'userNotFound' ? undefined : error;
+};
+
+export type ReauthError =
+  StrictExclude<CredentialError, 'userNotFound'> | 'wrongEmail';
