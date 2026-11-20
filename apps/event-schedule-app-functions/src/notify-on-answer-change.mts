@@ -1,6 +1,7 @@
 import { isAfterAnswerDeadline, type Answer } from 'event-schedule-app-shared';
 import type { Firestore } from 'firebase-admin/firestore';
 import { logger } from 'firebase-functions/v1';
+import { notificationRecipient } from './author-email.mjs';
 import {
   createMailBodyForAnswerDelete,
   createMailBodyForNewAnswer,
@@ -65,8 +66,12 @@ export const notifyOnAnswerChangeBody = async (
     return;
   }
 
-  if (email === '') {
-    logger.log('skipped because email is empty.');
+  const to = await notificationRecipient(email, eventItem.author.id);
+
+  if (to === '') {
+    logger.log(
+      "skipped because there is no email, or it is not the author's verified one.",
+    );
 
     return;
   }
@@ -89,7 +94,7 @@ export const notifyOnAnswerChangeBody = async (
 
       await sendEmail(
         createMailOptions({
-          to: email,
+          to,
           subject: `イベント「${eventItem.title}」の日程調整に回答が追加されました。`,
           text: createMailBodyForNewAnswer({
             eventId,
@@ -108,7 +113,7 @@ export const notifyOnAnswerChangeBody = async (
 
       await sendEmail(
         createMailOptions({
-          to: email,
+          to,
           subject: `イベント「${eventItem.title}」の日程調整の回答が削除されました。`,
           text: createMailBodyForAnswerDelete({
             eventId,
@@ -129,7 +134,7 @@ export const notifyOnAnswerChangeBody = async (
 
       await sendEmail(
         createMailOptions({
-          to: email,
+          to,
           subject: `イベント「${eventItem.title}」の日程調整の回答が更新されました。`,
           text: createMailBodyForUpdatedAnswer({
             eventId,

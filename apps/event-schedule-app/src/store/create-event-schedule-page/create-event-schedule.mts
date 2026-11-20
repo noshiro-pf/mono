@@ -29,6 +29,7 @@ import { dict, routes } from '../../constants/index.mjs';
 import {
   type EventScheduleAppLocalStorage,
   normalizeEventSchedule,
+  notificationEmailToSave,
   showToast,
 } from '../../functions/index.mjs';
 import type {
@@ -199,11 +200,7 @@ export const createCreateEventScheduleStore = (
 
     const fireAuthUser = deps.auth.getFireAuthUserSnapshot();
 
-    const {
-      eventScheduleNormalized,
-      eventScheduleValidationOk,
-      notificationSettingsWithEmail,
-    } = commonState;
+    const { eventScheduleNormalized, eventScheduleValidationOk } = commonState;
 
     if (
       !eventScheduleValidationOk ||
@@ -212,7 +209,7 @@ export const createCreateEventScheduleStore = (
       return Result.ok(undefined);
     }
 
-    const email = notificationSettingsWithEmail?.email ?? '';
+    const email = notificationEmailToSave(commonState) ?? '';
 
     dispatchCreation({ type: 'create' });
 

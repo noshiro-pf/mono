@@ -43,11 +43,49 @@ describe(createCreateEventScheduleStore, () => {
     await settle(10);
 
     assert.deepStrictEqual(calls, [
-      'add event alice u1',
+      'add event alice u1 with notifications',
       'setAuthorsEmail new-id alice@example.com',
       'storage.save (reset)',
     ]);
   });
+
+  test.each([
+    { name: 'signed out', signOutAfterTurningOn: false, user: 'signed out' },
+    {
+      name: 'with an email not verified',
+      signOutAfterTurningOn: false,
+      user: { ...alice, emailVerified: false },
+    },
+    {
+      name: 'signed out after turning them on',
+      signOutAfterTurningOn: true,
+      user: alice,
+    },
+  ] as const)(
+    'creates nothing with notifications on and no verified email, $name',
+    async ({ user, signOutAfterTurningOn }) => {
+      const { store, calls, setUser } = setup({ user });
+
+      fillValidEvent(store);
+
+      store.commonStateHandlers.toggleNotificationSection();
+
+      if (signOutAfterTurningOn) {
+        setUser(undefined);
+      }
+
+      assert.isFalse(
+        Optional.unwrap(store.commonState$.getSnapshot())
+          .eventScheduleValidationOk,
+      );
+
+      store.onCreateEventClick();
+
+      await settle(10);
+
+      assert.deepStrictEqual(calls, []);
+    },
+  );
 
   // #3416: the form was the day the tab loaded, however long it stayed open.
   test('a store entered on a later day starts on that day and counts as unchanged', () => {
@@ -278,12 +316,14 @@ const alice: EventScheduleSettingUser = {
   uid: 'u1',
   displayName: 'alice',
   email: 'alice@example.com',
+  emailVerified: true,
 } as const;
 
 type Setup = Readonly<{
   store: CreateEventSchedule;
   calls: readonly string[];
   toasts: Readonly<{ count: number }>;
+  setUser: (user: EventScheduleSettingUser | undefined) => void;
 }>;
 
 /** A toaster that only counts what it is asked to show. */
@@ -302,11 +342,16 @@ const setup = (
     stored?: EventSchedule;
     restoreFails?: boolean;
     saveFails?: boolean;
+    /** The signed-in user, `alice` when omitted. */
+    user?: EventScheduleSettingUser | 'signed out';
   }>,
 ): Setup => {
-  const [fireAuthUser$] = createState<EventScheduleSettingUser | undefined>(
-    alice,
-  );
+  const user =
+    options?.user === 'signed out' ? undefined : (options?.user ?? alice);
+
+  const [fireAuthUser$, setUser] = createState<
+    EventScheduleSettingUser | undefined
+  >(user);
 
   const mut_calls: string[] = [];
 
@@ -316,7 +361,9 @@ const setup = (
     api: {
       event: {
         add: (ev) => {
-          mut_calls.push(`add ${ev.title} ${ev.author.name} ${ev.author.id}`);
+          mut_calls.push(
+            `add ${ev.title} ${ev.author.name} ${ev.author.id}${ev.notificationSettings === 'none' ? '' : ' with notifications'}`,
+          );
 
           return Promise.resolve(
             options?.addFails === true
@@ -331,7 +378,11 @@ const setup = (
         },
       },
     },
-    auth: { fireAuthUser$, getFireAuthUserSnapshot: () => alice },
+    auth: {
+      fireAuthUser$,
+      getFireAuthUserSnapshot: () =>
+        Optional.unwrap(fireAuthUser$.getSnapshot()),
+    },
     storage: {
       restore: () =>
         options?.restoreFails === true
@@ -372,7 +423,7 @@ const setup = (
     ),
   });
 
-  return { store, calls: mut_calls, toasts: mut_toasts } as const;
+  return { store, calls: mut_calls, toasts: mut_toasts, setUser } as const;
 };
 
 /** A date of October 2026 as stored, before the codec reads it. */

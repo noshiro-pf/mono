@@ -7,7 +7,7 @@
  * `archivedBy` holds entries Alice and Bob left under old names and one of
  * Carol's; `duplicated`, whose `archivedBy` holds one of Alice's twice; an
  * anonymous event `anonymous`; `deleted`, the event of an account since
- * deleted; and Bob's events `open` and `closed`, whose answer deadlines are
+ * deleted; Carol's event `carols` (Carol's email is the one not verified); and Bob's events `open` and `closed`, whose answer deadlines are
  * ahead and past. Each has an answer of Alice's, and `owned` an anonymous answer
  * and one of the deleted account too.
  */
@@ -473,7 +473,25 @@ const cases = (): readonly Case[] =>
         setDoc(doc(db, 'events_v7/anonymous/internal/values'), {
           email: 'someone@example.com',
         }),
-      expected: 'allowed',
+      expected: 'denied',
+    },
+    {
+      name: 'the author writes their own email before verifying it',
+      actor: 'carol',
+      operation: (db) =>
+        setDoc(doc(db, 'events_v7/carols/internal/values'), {
+          email: 'carol@example.com',
+        }),
+      expected: 'denied',
+    },
+    {
+      name: 'the author writes an address other than their verified one',
+      actor: 'bob',
+      operation: (db) =>
+        setDoc(doc(db, 'events_v7/owned/internal/values'), {
+          email: 'victim@example.com',
+        }),
+      expected: 'denied',
     },
     {
       name: 'internal/values is written with a field besides the email',
@@ -655,6 +673,8 @@ const seed = async (): Promise<void> => {
 
     batch.set(db.doc('events_v7/owned/answers/anonymous'), answer(anonymous));
 
+    batch.set(db.doc('events_v7/carols'), eventSchedule({ author: carol }));
+
     batch.set(
       db.doc('events_v7/deleted'),
       eventSchedule({ author: deletedAccount }),
@@ -682,7 +702,10 @@ const seed = async (): Promise<void> => {
 const firestoreFor = (actor: Actor): Firestore =>
   (actor === 'signed out'
     ? env.unauthenticatedContext()
-    : env.authenticatedContext(actor)
+    : env.authenticatedContext(actor, {
+        email: `${actor}@example.com`,
+        email_verified: actor !== 'carol',
+      })
   ).firestore();
 
 /**

@@ -61,6 +61,7 @@ export const EventScheduleSettingCommon = ({
         <EventSettings
           answerDeadline={field('answerDeadline')}
           answerIcons={field('answerIcons')}
+          notificationEmail={field('notificationEmail')}
           notificationSettingsWithEmail={field('notificationSettingsWithEmail')}
           useAnswerDeadline={field('useAnswerDeadline')}
           useNotification={field('useNotification')}

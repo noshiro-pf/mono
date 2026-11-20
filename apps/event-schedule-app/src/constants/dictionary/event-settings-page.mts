@@ -49,7 +49,11 @@ export const eventSettingsPageDictionary = {
         '回答期限に関する通知設定を有効にするには、一つ前のセクションで回答期限を設定する必要があります。',
       ],
       useNotification: '幹事用通知設定',
+      requiresVerifiedAccount:
+        'メール通知は、メールアドレスを確認済みのアカウントでログインしているときに設定できます。',
       emailAddress: '通知先メールアドレス',
+      emailAddressIsAccounts:
+        'ログイン中のアカウントのメールアドレスに送ります。',
       notifyOnAnswerChange: '回答に更新があったときにメール通知',
       notifyAfterAnswerDeadline: '回答期限を過ぎたらメール通知',
       notify00daysBeforeAnswerDeadline: '回答期限当日にメール通知',

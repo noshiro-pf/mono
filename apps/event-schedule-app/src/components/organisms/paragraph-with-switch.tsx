@@ -16,6 +16,8 @@ type Props = Readonly<{
   /** Lines under the title; an observable of them for lines that change. */
   description?: InitializedObservable<readonly string[]> | readonly string[];
   toggleState: Bindable<boolean>;
+  /** Whether the switch is unavailable; it is available when omitted. */
+  toggleDisabled?: Bindable<boolean>;
   onToggle: () => void;
   elementToToggle: Child;
 }>;
@@ -26,6 +28,7 @@ export const ParagraphWithSwitch = ({
   onToggle,
   title,
   toggleState,
+  toggleDisabled,
   description,
 }: Props): JSX.Element => (
   <div>
@@ -35,6 +38,7 @@ export const ParagraphWithSwitch = ({
         aria-label={constant(title)}
         checked={toggleState}
         class={styles.switchControl}
+        disabled={toggleDisabled}
         inline
         onChange={onToggle}
       />
