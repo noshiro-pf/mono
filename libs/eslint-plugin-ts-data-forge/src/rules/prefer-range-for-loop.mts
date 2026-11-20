@@ -499,15 +499,16 @@ export const preferRangeForLoop: TSESLint.RuleModule<MessageIds, Options> = {
  * not read from its declaration with `isTypeAssignableTo`: the fix usually adds
  * the import, so the file has no `range` symbol to resolve, and reaching
  * ts-data-forge's declaration would take module resolution inside the rule.
- * `test/range-for-loop-fix-output.mts` compiles the fixes against the real
- * `range`, so the restatement cannot drift from it unnoticed.
+ * The rule's tests compile every fix they expect against the real `range`
+ * (`test/type-check-outputs.mts`), so the restatement cannot drift from it
+ * unnoticed.
  */
 
 /**
  * `range` takes the integer literals from `-SMALL_INT_END` up to, and not
  * including, `SMALL_INT_END` beside a `SafeInt`: the `MaxInt` its parameters
- * hand to ts-type-forge's `WithSmallInt`. `test/range-for-loop-fix-output.mts`
- * stops compiling when that width changes.
+ * hand to ts-type-forge's `WithSmallInt`. The rule's tests, which compile their
+ * outputs, fail when that width changes.
  */
 const SMALL_INT_END = 512;
 
