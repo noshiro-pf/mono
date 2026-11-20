@@ -684,6 +684,22 @@ namespace PreferTernary {
 }
 
 /**
+ * @description Require the day in `Date`'s `setMonth` and the month and day in `setFullYear`, without which a day the target month lacks rolls into the next month
+ *
+ *  ```md
+ *  | key        | value   |
+ *  | :--------- | :------ |
+ *  | type       | problem |
+ *  | deprecated | false   |
+ *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
+ */
+namespace RequireDateSetterDay {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
  * @description `promise/prefer-catch`, its fix offered only as a suggestion: Prefer `catch` to `then(a, b)`/`then(null, b)` for handling errors.
  * @link https://github.com/eslint-community/eslint-plugin-promise/blob/main/docs/rules/prefer-catch.md
  *
@@ -808,6 +824,7 @@ export type EslintTsRestrictionsRules = Readonly<{
   'ts-restrictions/prefer-optional-chain-over-ternary': PreferOptionalChainOverTernary.RuleEntry;
   'ts-restrictions/prefer-range-in-number-line-order': PreferRangeInNumberLineOrder.RuleEntry;
   'ts-restrictions/prefer-ternary': PreferTernary.RuleEntry;
+  'ts-restrictions/require-date-setter-day': RequireDateSetterDay.RuleEntry;
   'ts-restrictions/prefer-catch': PreferCatch.RuleEntry;
   'ts-restrictions/prefer-global-this': PreferGlobalThis.RuleEntry;
 

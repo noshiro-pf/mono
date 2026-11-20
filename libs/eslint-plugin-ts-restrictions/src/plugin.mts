@@ -32,6 +32,7 @@ const recommendedRules = {
   'ts-restrictions/prefer-optional-chain-over-ternary': 'error',
   'ts-restrictions/prefer-range-in-number-line-order': 'error',
   'ts-restrictions/prefer-ternary': ['error', 'only-single-line'],
+  'ts-restrictions/require-date-setter-day': 'error',
 } as const satisfies Partial<
   ReadonlyRecord<`ts-restrictions/${keyof typeof tsRestrictionsRules}`, unknown>
 >;
