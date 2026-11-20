@@ -31,17 +31,16 @@ export const reportTypeRewrites = <MessageIds extends string>(
 ): void => {
   const sourceCode = context.sourceCode;
 
-  const program = sourceCode.ast;
-
   const resolved = Arr.generate(function* () {
     for (const rewrite of rewrites) {
       const target = resolveTypeName(
-        program,
+        sourceCode,
+        rewrite.node,
         rewrite.canonicalName,
         importStyle,
       );
 
-      // The name is already bound to something else in this file, so the rewrite
+      // The name is bound to something else where the rewrite writes it, so it
       // would resolve to the wrong declaration.
       if (target !== undefined) {
         yield { rewrite, target };

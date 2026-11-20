@@ -58,6 +58,35 @@ describe('prefer-canonical-mutable-record', () => {
         `,
       },
       {
+        name: 'stays silent under a type parameter named `MutableRecord`',
+        code: 'function f<MutableRecord>(x: Mutable<Record<string, number>>) {}',
+      },
+      {
+        name: 'stays silent beside a local type alias named `MutableRecord`',
+        code: dedent`
+          function f() {
+            type MutableRecord = string;
+            type A = Mutable<Record<string, number>>;
+          }
+        `,
+      },
+      {
+        name: 'stays silent beside a local interface named `MutableRecord`',
+        code: dedent`
+          function f() {
+            interface MutableRecord {}
+            type A = Mutable<Record<string, number>>;
+          }
+        `,
+      },
+      {
+        name: 'stays silent where a type parameter shadows the imported `MutableRecord`',
+        code: dedent`
+          import { type MutableRecord } from 'ts-type-forge';
+          function f<MutableRecord>(x: Mutable<Record<string, number>>) {}
+        `,
+      },
+      {
         name: 'stays silent when `MutableRecord` is bound to another module',
         code: dedent`
           import { type MutableRecord } from './my-types.mjs';
