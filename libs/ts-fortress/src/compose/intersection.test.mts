@@ -2,8 +2,8 @@ import { expectType, Result } from 'ts-data-forge';
 import type { UnknownRecord } from 'ts-type-forge';
 import { array } from '../array/index.mjs';
 import { uintRange } from '../enum/index.mjs';
-import { literal, recursion } from '../other-types/index.mjs';
-import { number } from '../primitives/index.mjs';
+import { literal, MapType, recursion } from '../other-types/index.mjs';
+import { number, string } from '../primitives/index.mjs';
 import { record } from '../record/index.mjs';
 import type { TypeOf } from '../type.mjs';
 import {
@@ -194,6 +194,20 @@ describe(intersection, () => {
           targetType.prune({ x: 0, y: 1, z: 2, w: 3, excess: 9 }),
           { x: 0, y: 1, z: 2, w: 3 },
         );
+      });
+
+      test('keeps a Map that two members share as it is', () => {
+        const WithMap = intersection(
+          [
+            record({ m: MapType(string(), number()) }),
+            record({ m: MapType(string(), number()) }),
+          ],
+          record({ m: MapType(string(), number()) }),
+        );
+
+        const m = new Map<string, number>([['a', 1]]);
+
+        assert.deepStrictEqual(WithMap.prune({ m }), { m });
       });
 
       test('keeps represented values as-is (never fills defaults)', () => {

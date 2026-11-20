@@ -6,8 +6,10 @@ import {
   memoizeFunction,
   Optional,
   Result,
+  tp,
 } from 'ts-data-forge';
 import type { ArrayElement, NonEmptyTuple, StrictPick } from 'ts-type-forge';
+import { isPlainObject } from '../deep-merge.mjs';
 import {
   asType,
   flattenShapeStructure,
@@ -41,11 +43,19 @@ import {
  *   extra key — the result therefore depends on the order: `union([point2d,
  *   point3d]).prune({ x, y, z })` drops `z`, and `union([point3d, point2d])`
  *   keeps it. Put the more specific member first.
- * - `fill` returns a value that is already a member as it is, and otherwise
- *   repairs it with `defaultType`, or the first member when none is given. A
- *   member's own repair rules, such as `array`'s `onInvalidElement: 'drop'`,
- *   therefore apply to a non-member value only through that default source,
- *   and inside an element type they apply as usual.
+ * - `fill` returns a value that is already a member as it is. A union given a
+ *   `defaultType` repairs any other value with it. Otherwise it repairs it
+ *   with the only member of the value's runtime category where that is a
+ *   record, whatever keys the value has; among several record or tuple members
+ *   (and no member of the category that checks the value as a whole, such as
+ *   an `array` or a `keyValueRecord`), with the one that keeps the most of the
+ *   value's keys against those it does not keep, where it keeps one at least
+ *   and no other is as close:
+ *   `union([nullType, record({ x, y })]).fill({ x: 1 })` is `{ x: 1, y: 0 }`;
+ *   and else with the first member. A member's own repair rules, such as
+ *   `array`'s `onInvalidElement: 'drop'`, therefore apply to a non-member
+ *   value only through the member that repairs it, and inside an element type
+ *   they apply as usual.
  */
 export const union = <const Types extends NonEmptyTuple<UnknownType>>(
   types: Types,
@@ -59,8 +69,9 @@ export const union = <const Types extends NonEmptyTuple<UnknownType>>(
   type T = UnionTypeValue<Types>;
 
   /**
-   * Where `fill` and `defaultValue` come from when the value is not a member of
-   * the union: the explicit `defaultType`, else the first member.
+   * Where `defaultValue` comes from, and `fill` for a value that is not a member
+   * of the union and that no closest member repairs (see `closestRepairOf`):
+   * the explicit `defaultType`, else the first member.
    *
    * Deferred like every other default-value source in the package, and
    * deliberately so although nothing here needs it: both operands exist by the
@@ -197,8 +208,8 @@ export const union = <const Types extends NonEmptyTuple<UnknownType>>(
     // The closest member is the one with the lowest similarity score (see
     // `evaluateMember`); its errors explain the mismatch far better than the
     // full member listing would. Members that tie with it are named alongside
-    // it, and the first of them (in declaration order, as in `prune` and
-    // `fill`) is the one whose errors are reported.
+    // it, and the first of them (in declaration order, as in `prune`) is the one
+    // whose errors are reported.
     const closest = Optional.unwrap(
       Arr.minBy(candidates, (candidate) => candidate, compareByCloseness),
     );
@@ -231,7 +242,136 @@ export const union = <const Types extends NonEmptyTuple<UnknownType>>(
     );
   };
 
-  const fill: Type<T>['fill'] = (a) => (is(a) ? a : getDefaultSource().fill(a));
+  // A value no member accepts is repaired by the record or tuple member closest
+  // to it (see `repairDistanceOf`) where no other member of the value's
+  // category is as close, and by the only member of its category where that is
+  // a record: a record that is missing a key is then repaired by the record
+  // member rather than by a `null` declared first. A union given a
+  // `defaultType` repairs with it, as it did before members were compared; so
+  // does one where no member is a repair of the value, or two are as close.
+  //
+  // The members are sorted for each value rather than once for the union: a
+  // `recursion` is resolved only when a value first needs it, and the sorting
+  // costs about as much as the `is` checks that follow it.
+  //
+  // A member whose default does not terminate (two `recursion`s that default to
+  // each other, of records or of tuples) cannot repair a value it is chosen
+  // for, and its default is read here to sort it unless it is a record or a
+  // tuple (a `recursion` of a tuple is not seen as one, and is read); this
+  // union's `validate` already reads every member's default for the same value,
+  // so such a schema fails there as it does here. The first member used to
+  // repair it only by being declared first.
+  const closestRepairOf = (a: unknown): UnknownType | undefined => {
+    if (options?.defaultType !== undefined) {
+      return undefined;
+    }
+
+    const isRecord_ = (t: UnknownType): boolean =>
+      recordViewOf(t) !== undefined;
+
+    const isTuple = (t: UnknownType): boolean =>
+      tupleElementTypesOf(t) !== undefined;
+
+    // Only a plain object can be repaired by a record, and only an array by a
+    // tuple: a `Date` or another class instance is not a record of defaults.
+    // A default is read only to find a member of the value's category that
+    // checks it as a whole: none for a value of any other kind, nor a record's
+    // or a tuple's, since a default may not terminate (two `recursion`s that
+    // default to each other; a member with such a default fails `validate`,
+    // which reads every member's default, and cannot repair a value either).
+    const kinds = isPlainObject(a)
+      ? tp(isRecord_, isTuple)
+      : Arr.isArray(a)
+        ? tp(isTuple, isRecord_)
+        : undefined;
+
+    if (kinds === undefined) {
+      return undefined;
+    }
+
+    const [checksKeys, isOfTheOtherKind] = kinds;
+
+    const actualCategory = runtimeTypeNameOf(a);
+
+    // Once each: a member a nested union repeats is one member.
+    const sameCategory = memberTypes.filter(
+      (t, i) =>
+        memberTypes.indexOf(t) === i &&
+        (checksKeys(t) ||
+          (!isOfTheOtherKind(t) &&
+            runtimeTypeNameOf(t.defaultValue) === actualCategory)),
+    );
+
+    // The only member of the value's category, if a record, repairs it whatever
+    // keys it has: a record that has none of its keys is still a record. Among
+    // several, the value has to say which.
+    if (
+      Arr.isFixedLengthTuple(1, sameCategory) &&
+      recordViewOf(sameCategory[0]) !== undefined
+    ) {
+      return sameCategory[0];
+    }
+
+    // A member that checks the value as a whole (a `keyValueRecord`, an
+    // `array`, a `recursion` that is not a record, a `refine` or a `brand`,
+    // which may reject what its base accepts) is not weighed key by key, so a
+    // record that keeps one key cannot be told closer than it: the repair is
+    // left to the default.
+    if (sameCategory.some((t) => checkedKeysOf(t) === undefined)) {
+      return undefined;
+    }
+
+    const candidates = Arr.generate(function* () {
+      for (const t of sameCategory) {
+        const d = repairDistanceOf(t, a);
+
+        if (d !== undefined) {
+          yield tp(t, d);
+        }
+      }
+    });
+
+    const closest = Arr.minBy(candidates, ([, d]) => d);
+
+    if (Optional.isNone(closest)) {
+      return undefined;
+    }
+
+    const [memberType, distance] = Optional.unwrap(closest);
+
+    return candidates.every(([t, d]) => t === memberType || d !== distance)
+      ? memberType
+      : undefined;
+  };
+
+  // `is` of a value invalid deep in a `recursion` costs time exponential in its
+  // depth (a `recursion`'s `is` validates, and a failing union's `validate`
+  // validates its members again to name the closest), and repairing level by
+  // level pays it at each level; cutting it to the first member paid it once.
+  // Acceptable until `recursion`'s `is` stops going through `validate`.
+  const fill: Type<T>['fill'] = (a) => {
+    if (is(a)) {
+      return a;
+    }
+
+    const closest = closestRepairOf(a);
+
+    // A member of a union nested directly in this one is repaired by that union
+    // (the first that holds it), which applies its own `defaultType`, or its
+    // own closest member.
+    const repairing =
+      closest === undefined
+        ? undefined
+        : types.includes(closest)
+          ? closest
+          : (types.find((t) => unionMembersOf(t).includes(closest)) ?? closest);
+
+    return repairing === undefined
+      ? getDefaultSource().fill(a)
+      : // A member of the union repairs to a member of the union.
+        // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
+        (repairing.fill(a) as T);
+  };
 
   // Prunes with the first member type that matches the value.
   const prune = (a: T): T => {
@@ -378,6 +518,80 @@ const compareByCloseness = (x: MemberCloseness, y: MemberCloseness): number =>
   x.score !== y.score
     ? x.score - y.score
     : y.satisfiedCheckCount - x.satisfiedCheckCount;
+
+/**
+ * For each key `a` has, whether `memberType` keeps it: whether it accepts what
+ * is under it, and `false` for a key it does not declare, which a repair by it
+ * drops or rejects, and none for a key holding `undefined`; `undefined` for a
+ * member that checks `a` as a whole, or a tuple of another length.
+ */
+const keyVerdictsOf = (
+  memberType: UnknownType,
+  a: unknown,
+): readonly boolean[] | undefined => {
+  const view = recordViewOf(memberType);
+
+  if (view !== undefined) {
+    const shape = flattenShapeStructure(view.shapeStructure);
+
+    if (shape === undefined || !isRecord(a)) {
+      return undefined;
+    }
+
+    return Arr.generate(function* () {
+      for (const [key, value] of Object.entries(a)) {
+        // Own keys only: the value's keys may name an `Object.prototype` member
+        // (`toString`, a parsed `__proto__`).
+        // A key holding `undefined` speaks for no member, as a key left out.
+        if (value === undefined) {
+          continue;
+        }
+
+        const keyType = hasKey(shape, key) ? shape[key] : undefined;
+
+        yield keyType?.is(value) ?? false;
+      }
+    });
+  }
+
+  const elementTypes = tupleElementTypesOf(memberType);
+
+  return elementTypes === undefined ||
+    !Arr.isArray(a) ||
+    a.length !== elementTypes.length
+    ? undefined
+    : elementTypes.map((t, i) => t.is(a[i]));
+};
+
+/**
+ * How far a member is from repairing a value it rejected, or `undefined` when
+ * it is not a repair of it: the keys of the value the member does not keep
+ * (rejects, or does not declare) minus those it keeps. Only the keys the value
+ * has count, each by the member's own `is` of what is under it, so a key the
+ * value leaves out (to be filled in, or an optional one) speaks for no member,
+ * and a key wrong in several places counts once. A member that keeps none of
+ * the value's keys has nothing of it to keep, and is not a repair; nor is a
+ * tuple of another length.
+ *
+ * `validate` reports the closest member by its errors instead (see
+ * `evaluateMember`), which tells the reader more and decides nothing; this
+ * reads no errors, which would validate each member's part of the value again
+ * on the way.
+ */
+const repairDistanceOf = (
+  memberType: UnknownType,
+  a: unknown,
+): number | undefined => {
+  const counts = keyVerdictsOf(memberType, a);
+
+  if (counts === undefined) {
+    return undefined;
+  }
+
+  const accepted = counts.filter((c) => c).length;
+
+  return accepted === 0 ? undefined : counts.length - 2 * accepted;
+};
 
 /**
  * @internal The `Type` `union` returns, computed from the arguments; a consumer

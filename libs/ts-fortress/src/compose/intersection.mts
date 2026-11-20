@@ -1,13 +1,6 @@
-import {
-  Arr,
-  expectType,
-  hasKey,
-  isRecord,
-  memoizeFunction,
-  Obj,
-  Result,
-} from 'ts-data-forge';
+import { Arr, expectType, memoizeFunction, Result } from 'ts-data-forge';
 import type { Intersection, NonEmptyTuple } from 'ts-type-forge';
+import { deepMerge } from '../deep-merge.mjs';
 import {
   asType,
   recordViewOf,
@@ -84,10 +77,12 @@ export const intersection = <const Types extends NonEmptyTuple<UnknownType>>(
     isRecordIntersection()
       ? // A value path is represented by a record intersection if it is
         // represented by any member, so the pruned members are merged (deeply;
-        // see `mergePruned`). Every member is a record type here, so each
-        // pruned result is a record.
+        // see `deepMerge`). Every member is a record type here, so each pruned
+        // result is a record.
         // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
-        (types.map((t) => asType(t).prune(a)).reduce(mergePruned, {}) as T)
+        (types
+          .map((t) => asType(t).prune(a))
+          .reduce((acc, r) => deepMerge(a, acc, r), {}) as T)
       : // Non-record intersections (e.g. branded primitives) have no excess
         // paths to remove.
         a;
@@ -109,33 +104,6 @@ export const intersection = <const Types extends NonEmptyTuple<UnknownType>>(
   } as const;
 
   return baseType;
-};
-
-/**
- * Deep-merges the pruned results of intersection members. Each pruned result
- * contains only the value paths represented by its own member type, so the
- * results have to be merged recursively to keep the union of all represented
- * paths — a shallow spread would drop nested paths kept by an earlier member
- * whenever a later member shares the same key (e.g. two members both having a
- * `pos` sub-record with different fields).
- */
-const mergePruned = (x: unknown, y: unknown): unknown => {
-  if (isRecord(x) && isRecord(y)) {
-    const xMergedWithY = Obj.map(x, (xv, k) =>
-      hasKey(y, k) ? mergePruned(xv, y[k]) : xv,
-    );
-
-    const yOnly = Obj.filter(y, (_yv, k) => !hasKey(x, k));
-
-    return { ...xMergedWithY, ...yOnly };
-  }
-
-  // Both members pruned the same input array, so the lengths always match;
-  // merge element-wise to keep every represented element path. Otherwise not
-  // structurally mergeable — the later member wins.
-  return Arr.isArray(x) && Arr.isArray(y) && x.length === y.length
-    ? x.map((xi, i) => mergePruned(xi, y[i]))
-    : y;
 };
 
 /**

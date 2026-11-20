@@ -15,6 +15,7 @@ import type {
   UnknownRecord,
 } from 'ts-type-forge';
 import { intersection, union } from '../compose/index.mjs';
+import { deepMerge } from '../deep-merge.mjs';
 import { enumType } from '../enum/index.mjs';
 import { literal } from '../other-types/index.mjs';
 import {
@@ -580,15 +581,21 @@ const mergeKey = (
 /**
  * The intersection of `members`. Once a `recursion` among them can be resolved
  * (on first use), members that all are records validate, fill and prune as the
- * records merged. The default, and otherwise `fill`, look for a value every
- * member accepts: among the members' own defaults and repairs (from the last),
- * their union branches', then their record branches merged, one branch of each
- * member. When none does, the default is the records merged's where the members
- * are records; else an optional key defaults to `undefined` and any other to
- * the last member's default, as before shared keys were checked against every
- * member: the members may contradict each other in a way only a value tells (a
- * `number` and a `string`, two ranges that do not overlap), which no check when
- * the merge is built finds, or agree on a value the search does not find (two
+ * records merged. Otherwise `prune` merges what each member keeps of the value
+ * (see `deepMerge`), and `fill` first tries the members' repairs merged the
+ * same way, which repairs records that members wrap in an array element by
+ * element, and those in a union by each union's own repair (see `union`'s
+ * `fill`), as a union of the records merged would.
+ * The default, and then `fill`, look for a value every member accepts: among
+ * the members' own defaults and repairs (from the last), their union branches',
+ * then their record branches merged, one branch of each member.
+ * When none does, the default is the records merged's where the members are
+ * records, else the members' defaults merged if every member accepts them;
+ * else an optional key defaults to `undefined` and any other to the last
+ * member's default, as before shared keys were checked against every member:
+ * the members may contradict each other in a way only a value tells (a `number`
+ * and a `string`, two ranges that do not overlap), which no check when the
+ * merge is built finds, or agree on a value the search does not find (two
  * ranges whose defaults both lie outside their overlap).
  */
 const intersectMembers = (
@@ -599,10 +606,9 @@ const intersectMembers = (
 
   // `intersection` reads its default type only for `defaultValue` and `fill`,
   // both replaced below. Members that wrap records in a union or an array
-  // validate, prune and are described as `intersection` does any parts: each
-  // record checks excess keys against its own shape, so a `strictRecord`
-  // rejects the keys the others add, and nothing under the key is pruned
-  // (#4384).
+  // validate and are described as `intersection` does any parts: each record
+  // checks excess keys against its own shape, so a `strictRecord` rejects the
+  // keys the others add.
   // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
   const both: UnknownType = intersection(members, members[0] as Type<never>);
 
@@ -645,9 +651,7 @@ const intersectMembers = (
   // `MERGE_RECORDS_MAX_VARIANTS` throws when the search reaches it, as the
   // merge would when built: the bound is a panic, which `Result.fromThrowable`
   // does not catch, and telling it from a contradiction would take a third kind
-  // of result through every nested merge. A `fill` takes the first repair every
-  // member accepts, so a nullable record may be repaired to a branch's `null`
-  // before the record branches merged are tried (#4384).
+  // of result through every nested merge.
   const stages: readonly (() => readonly (() => UnknownType | undefined)[])[] =
     [
       memoizeFunction(() => reversed.map((m) => () => m)),
@@ -696,6 +700,21 @@ const intersectMembers = (
     return otherwise();
   };
 
+  // A value of the key is a value of every member, which prunes it to the paths
+  // it declares, so the results merged keep the paths some member declares.
+  // Repairs and defaults are merged the same way, and the result checked, since
+  // members may give different shapes (one `null`, another a record). A member
+  // that accepts a value keeps it whole, so where it keeps a key that another
+  // member repairs, the merged repair fails and the search follows.
+  const mergedResultOf = (
+    a: unknown,
+    run: (member: UnknownType) => unknown,
+  ): unknown =>
+    Arr.tail(members).reduce(
+      (acc: unknown, m) => deepMerge(a, acc, run(m)),
+      run(members[0]),
+    );
+
   // The members' defaults come before the records merged: a `recursion` may
   // have a default of its own to end its self-reference, which the merged
   // records' default, built from their shapes, would not read.
@@ -705,20 +724,50 @@ const intersectMembers = (
       // The last member's default is not a panic, though for a required key it
       // fails `is`: `fill` falls back to it, and a `fill` that throws cannot
       // repair the stored data it is for.
-      () =>
-        getMergedAsRecords()?.defaultValue ??
-        (isOptionalKey ? undefined : reversed[0].defaultValue),
+      () => {
+        const merged = getMergedAsRecords();
+
+        if (merged !== undefined) {
+          return merged.defaultValue;
+        }
+
+        // Read only here, after each member's own default: reading them all
+        // first could resolve a `recursion` whose default is not needed.
+        const defaults = mergedResultOf(undefined, (m) => m.defaultValue);
+
+        return is(defaults)
+          ? defaults
+          : isOptionalKey
+            ? undefined
+            : reversed[0].defaultValue;
+      },
     ),
   );
 
   const fill = (a: unknown): unknown => {
     const merged = getMergedAsRecords();
 
+    if (merged !== undefined) {
+      return merged.fill(a);
+    }
+
+    if (is(a)) {
+      return a;
+    }
+
+    const repaired = mergedResultOf(a, (m) => m.fill(a));
+
+    return is(repaired)
+      ? repaired
+      : firstAccepted((type) => type.fill(a), getDefaultValue);
+  };
+
+  const prune = (a: unknown): unknown => {
+    const merged = getMergedAsRecords();
+
     return merged !== undefined
-      ? merged.fill(a)
-      : is(a)
-        ? a
-        : firstAccepted((type) => type.fill(a), getDefaultValue);
+      ? asType(merged).prune(a)
+      : mergedResultOf(a, (m) => asType(m).prune(a));
   };
 
   const validate: UnknownType['validate'] = (a) => effective().validate(a);
@@ -728,10 +777,7 @@ const intersectMembers = (
     ...Object.getOwnPropertyDescriptors(both),
     defaultValue: { get: getDefaultValue, enumerable: true },
     fill: { value: fill, enumerable: true },
-    prune: {
-      value: (a: unknown): unknown => asType(effective()).prune(a),
-      enumerable: true,
-    },
+    prune: { value: prune, enumerable: true },
     validate: { value: validate, enumerable: true },
     is: { value: createIsFn(validate), enumerable: true },
     assertIs: { value: createAssertFn(validate), enumerable: true },
