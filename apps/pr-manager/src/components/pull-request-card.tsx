@@ -27,6 +27,8 @@ type Props = Readonly<{
   entry: Bindable<Entry>;
   /** The scale every divergence bar in the report is drawn against. */
   scaleMax: Bindable<number>;
+  /** Drawn at the end of the badges: the merge order's fold, when it has one. */
+  badgesEnd?: JSX.Element;
 }>;
 
 /**
@@ -44,7 +46,11 @@ type Props = Readonly<{
  * (`entry.reading`). A poll that changes a pull request rewrites the parts of
  * its card bound to what changed, and leaves the rest of it alone.
  */
-export const PullRequestCard = ({ entry, scaleMax }: Props): JSX.Element => (
+export const PullRequestCard = ({
+  entry,
+  scaleMax,
+  badgesEnd,
+}: Props): JSX.Element => (
   <article class={constant('pull-request')}>
     <div class={constant('pull-request-badges')}>
       <StateBadge isDraft={mapBindable(entry, ({ isDraft }) => isDraft)} />
@@ -69,6 +75,7 @@ export const PullRequestCard = ({ entry, scaleMax }: Props): JSX.Element => (
           />
         }
       />
+      {badgesEnd ?? constant('')}
     </div>
 
     <div class={constant('pull-request-heading')}>

@@ -1,19 +1,21 @@
 import type { TreeNode } from 'pr-report-core';
-import { map } from 'synstate';
+import { derive, map, skipIfNoChange } from 'synstate';
 import {
   constant,
   deriveBindable,
   For,
   If,
-  mapBindable,
   type Bindable,
   type JSX,
 } from 'synstate-dom';
-import { Arr } from 'ts-data-forge';
+import { Arr, fastDeepEqual } from 'ts-data-forge';
 import type { Entry } from '../load-report.mjs';
-import { reader } from '../store/index.mjs';
+import { layersBelow } from '../stack-fold.mjs';
+import { reader, stackFoldStore } from '../store/index.mjs';
 import { ExternalLink } from './external-link.js';
+import { FoldedStack } from './folded-stack.js';
 import { PullRequestCard } from './pull-request-card.js';
+import { StackFoldToggle } from './stack-fold-toggle.js';
 
 type Props = Readonly<{
   nodes: Bindable<readonly TreeNode[]>;
@@ -42,47 +44,99 @@ export const MergeOrder = ({ nodes, depth }: Props): JSX.Element => {
       style={
         depth === 0
           ? {
-              '--merge-order-depth': mapBindable(nodes, (top) =>
-                depthOf(top).toString(),
+              '--merge-order-depth': deriveBindable(
+                [nodes, stackFoldStore.folded, reader.byNumber],
+                (top, folded, byNumber) =>
+                  depthOf(
+                    top,
+                    (node) =>
+                      folded.includes(node.number) &&
+                      Arr.isNonEmpty(
+                        layersBelow(node, (each) => byNumber.has(each)),
+                      ),
+                  ).toString(),
               ),
             }
           : undefined
       }
     >
       <For items={rows} key={rowKey}>
-        {(row$) => (
-          <li>
-            <If
-              cond={row$.pipe(map(({ node }) => node.repeated))}
-              // Declared after more than one predecessor, so it is drawn under
-              // each and expanded under the first only.
-              then={
-                <div class={constant('pull-request-repeated')}>
-                  <ExternalLink href={row$.pipe(map(({ entry }) => entry.url))}>
-                    {row$.pipe(map(({ node }) => `#${node.number}`))}
-                  </ExternalLink>
-                  {constant(' — shown above')}
-                </div>
-              }
-              else={
-                <PullRequestCard
-                  entry={row$.pipe(map(({ entry }) => entry))}
-                  scaleMax={reader.scaleMax}
-                />
-              }
-            />
+        {(row$) => {
+          const number = row$.pipe(map(({ node }) => node.number));
 
-            <If
-              cond={row$.pipe(map(({ node }) => Arr.isNonEmpty(node.children)))}
-              then={
-                <MergeOrder
-                  depth={depth + 1}
-                  nodes={row$.pipe(map(({ node }) => node.children))}
-                />
-              }
-            />
-          </li>
-        )}
+          const layers = derive([row$, reader.byNumber], ({ node }, byNumber) =>
+            layersBelow(node, (each) => byNumber.has(each)),
+          ).pipe(skipIfNoChange(fastDeepEqual));
+
+          const layerCount = layers.pipe(map((list) => list.length));
+
+          const folded = derive(
+            [number, stackFoldStore.folded],
+            (n, foldedNumbers) => foldedNumbers.includes(n),
+          );
+
+          // Folded only while there is something below to fold.
+          const showFolded = derive(
+            [layerCount, folded],
+            (count, isFolded) => count > 0 && isFolded,
+          );
+
+          return (
+            <li>
+              <If
+                cond={row$.pipe(map(({ node }) => node.repeated))}
+                // Declared after more than one predecessor, so it is drawn under
+                // each and expanded under the first only.
+                then={
+                  <div class={constant('pull-request-repeated')}>
+                    <ExternalLink
+                      href={row$.pipe(map(({ entry }) => entry.url))}
+                    >
+                      {row$.pipe(map(({ node }) => `#${node.number}`))}
+                    </ExternalLink>
+                    {constant(' — shown above')}
+                  </div>
+                }
+                else={
+                  <PullRequestCard
+                    badgesEnd={
+                      <If
+                        cond={layerCount.pipe(map((count) => count > 0))}
+                        then={
+                          <StackFoldToggle
+                            folded={showFolded}
+                            layers={layerCount}
+                            number={number}
+                          />
+                        }
+                      />
+                    }
+                    entry={row$.pipe(map(({ entry }) => entry))}
+                    scaleMax={reader.scaleMax}
+                  />
+                }
+              />
+
+              <If
+                cond={showFolded}
+                then={<FoldedStack layers={layers} number={number} />}
+                else={
+                  <If
+                    cond={row$.pipe(
+                      map(({ node }) => Arr.isNonEmpty(node.children)),
+                    )}
+                    then={
+                      <MergeOrder
+                        depth={depth + 1}
+                        nodes={row$.pipe(map(({ node }) => node.children))}
+                      />
+                    }
+                  />
+                }
+              />
+            </li>
+          );
+        }}
       </For>
     </ul>
   );
@@ -130,12 +184,19 @@ const rowsOf = (): ((
 
 const rowKey = ({ node }: Row): number => node.number;
 
-/** How many levels the tree has below its top one. */
-const depthOf = (nodes: readonly TreeNode[]): number =>
+/**
+ * How many levels the tree has below its top one, as drawn: below a pull
+ * request folded as the row folds it — with something below it to fold — there
+ * is no level.
+ */
+const depthOf = (
+  nodes: readonly TreeNode[],
+  isFolded: (node: TreeNode) => boolean,
+): number =>
   nodes.reduce(
     (max, node) =>
-      Arr.isNonEmpty(node.children)
-        ? Math.max(max, 1 + depthOf(node.children))
+      Arr.isNonEmpty(node.children) && !isFolded(node)
+        ? Math.max(max, 1 + depthOf(node.children, isFolded))
         : max,
     0,
   );
