@@ -35,6 +35,8 @@ dependencies. Requires ESLint 9+ (flat config). The rules read no type
 information; a TypeScript file needs a parser that reads TypeScript, such as
 `@typescript-eslint/parser`.
 
+`synstate-dom` is an optional peer dependency whose range is the major of `synstate-dom` the rules are written for. On another major, the package manager reports the mismatch at install (pnpm warns; npm can refuse without `--legacy-peer-deps`); use the version of this plugin released for that major.
+
 ## Usage (flat config)
 
 `configs.recommended` and `configs.strict` are jsx-a11y's presets of the same

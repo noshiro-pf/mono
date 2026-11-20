@@ -78,7 +78,13 @@
   },
   "peerDependencies": {
     "eslint": ">=9.0.0",
+    "synstate-dom": "workspace:^0.13.0",
     "typescript": ">=5.0.0 <7.0.0"
+  },
+  "peerDependenciesMeta": {
+    "synstate-dom": {
+      "optional": true
+    }
   },
   "engines": {
     "node": ">=22.23.4",
