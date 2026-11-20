@@ -88,7 +88,7 @@ const layerRoutes = (
     [`/repos/o/n/compare/main...${headSha}`]: ok({ ahead_by: 2, behind_by: 2 }),
     [`/repos/o/n/pulls/${number}/reviews?per_page=100`]: ok([]),
     [`/repos/o/n/pulls/${number}/files?per_page=100`]: ok([]),
-    [`/repos/o/n/activity?ref=refs%2Fheads%2Ffeature-${number}&activity_type=push&direction=asc&per_page=100`]:
+    [`/repos/o/n/activity?ref=refs%2Fheads%2Ffeature-${number}&direction=asc&per_page=100`]:
       ok([]),
     [`/repos/o/n/issues/${number}/comments?per_page=100`]: ok(
       by === undefined ? [] : [claimOf(number * 10, by, headSha)],

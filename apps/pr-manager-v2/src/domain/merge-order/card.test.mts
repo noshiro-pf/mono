@@ -1,7 +1,12 @@
 import { decideQueue, type QueueDecision } from 'pr-report-core-v2';
 import { Result } from 'ts-data-forge';
 import { label, pull, snapshot } from '../../../test/index.mjs';
-import { cardOf, claudeSessionsOf, priorityOf } from './card.mjs';
+import {
+  cardOf,
+  claudeSessionsOf,
+  codeOwnerReviewEnforced,
+  priorityOf,
+} from './card.mjs';
 
 describe(priorityOf, () => {
   test.each([
@@ -111,3 +116,62 @@ const decided = (from: ReturnType<typeof snapshot>): QueueDecision =>
   Result.unwrapThrow(
     decideQueue(from, { nowEpochMs: 0, demoted: new Set<number>() }),
   );
+
+describe(codeOwnerReviewEnforced, () => {
+  test('a ruleset asking for code owner review enforces it', () => {
+    assert.isTrue(codeOwnerReviewEnforced(withRules(true, undefined)));
+  });
+
+  test('so does a required check CODEOWNERS names, with the ruleset rule off', () => {
+    assert.isTrue(
+      codeOwnerReviewEnforced(
+        withRules(false, '# enforced-by: Validate code owners\n* @o\n'),
+      ),
+    );
+  });
+
+  test('the ruleset rule holds when CODEOWNERS could not be read', () => {
+    const base = withRules(true, undefined);
+
+    assert.isTrue(
+      codeOwnerReviewEnforced({
+        ...base,
+        repository: {
+          ...base.repository,
+          codeOwners: Result.err({
+            kind: 'unavailable',
+            what: 'CODEOWNERS',
+            message: '502',
+          }),
+        },
+      }),
+    );
+  });
+
+  test('a check that is not required, or none, enforces nothing', () => {
+    assert.isFalse(
+      codeOwnerReviewEnforced(
+        withRules(false, '# enforced-by: Some other check\n* @o\n'),
+      ),
+    );
+
+    assert.isFalse(codeOwnerReviewEnforced(withRules(false, undefined)));
+  });
+});
+
+/** A snapshot whose rules and CODEOWNERS are these, `Validate code owners` required. */
+const withRules = (
+  requireCodeOwnerReview: boolean,
+  codeOwners: string | undefined,
+): ReturnType<typeof snapshot> => {
+  const base = snapshot([]);
+
+  return snapshot([], [], {
+    repository: { ...base.repository, codeOwners: Result.ok(codeOwners) },
+    requirements: Result.ok({
+      requiredContexts: ['code-check-result / result', 'Validate code owners'],
+      requireCodeOwnerReview,
+      requireConversationResolution: false,
+    }),
+  });
+};

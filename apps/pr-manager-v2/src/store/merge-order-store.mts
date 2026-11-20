@@ -4,6 +4,7 @@ import { Arr, Result } from 'ts-data-forge';
 import {
   availableStatuses,
   cardOf,
+  codeOwnerReviewEnforced,
   isShown,
   shownTree,
   tileCounts,
@@ -92,8 +93,7 @@ export const createMergeOrderStore = (
       const available = availableStatuses(
         Result.isOk(snapshot.repository.hasQueueLabel) &&
           snapshot.repository.hasQueueLabel.value,
-        Result.isOk(snapshot.requirements) &&
-          snapshot.requirements.value.requireCodeOwnerReview,
+        codeOwnerReviewEnforced(snapshot),
       );
 
       const applied = withAvailable(settings, available);

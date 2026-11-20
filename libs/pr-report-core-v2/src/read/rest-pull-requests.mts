@@ -404,10 +404,12 @@ const permissionReader = (
   };
 };
 
+// Every type, not `activity_type=push`: that filter leaves out the creation the
+// chain starts from and every force-push, so a branch created by one push and
+// then amended reads as a gap, and its pushers as unknown (`pushersOf`).
 const activityQueryOf = (branch: string): string => {
   const query = new URLSearchParams({
     ref: `refs/heads/${branch}`,
-    activity_type: 'push',
     direction: 'asc',
   });
 

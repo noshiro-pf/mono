@@ -33,7 +33,7 @@ const checksOf = (sha: string): Routes =>
 
 const restOf = (number: number, branch: string): Routes =>
   ({
-    [`/repos/o/n/activity?ref=refs%2Fheads%2F${branch}&activity_type=push&direction=asc&per_page=100`]:
+    [`/repos/o/n/activity?ref=refs%2Fheads%2F${branch}&direction=asc&per_page=100`]:
       ok([]),
     [`/repos/o/n/compare/main...${HEAD}`]: ok({
       ahead_by: number,

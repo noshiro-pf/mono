@@ -19,7 +19,7 @@ import {
 
 /**
  * The tiles a repository offers: `queued` and `set aside` only where the queue
- * runs, `awaiting code owner` only where a rule asks for code owner review.
+ * runs, `awaiting code owner` only where something enforces code owner review.
  */
 export const availableStatuses = (
   queueRepository: boolean,
