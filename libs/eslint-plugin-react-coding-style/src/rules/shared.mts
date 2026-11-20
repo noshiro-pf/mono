@@ -3,7 +3,7 @@ import {
   type TSESLint,
   type TSESTree,
 } from '@typescript-eslint/utils';
-import { isTypeWrapper, skipTypeWrappers } from 'eslint-rule-forge';
+import { outermostTypeWrapper, skipTypeWrappers } from 'eslint-rule-forge';
 import { Arr, hasKey, isRecord } from 'ts-data-forge';
 import type { DeepReadonly } from 'ts-type-forge';
 
@@ -75,25 +75,6 @@ export const getReactMemoArrowFunction = (
     : argument;
 };
 
-/**
- * The outermost type wrapper whose value is `node`'s, or `node` itself when its
- * parent is not one: from the arrow function in
- * `((props) => <div />) satisfies React.FC as React.FC`, the `as` expression.
- * A rule that asks where a value ends up (a variable's initializer, a call's
- * argument) asks it of the node this returns.
- */
-export const climbTypeWrappers = (
-  node: DeepReadonly<TSESTree.Node>,
-): DeepReadonly<TSESTree.Node> => {
-  const { parent } = node;
-
-  return parent !== undefined &&
-    isTypeWrapper(parent) &&
-    parent.expression === node
-    ? climbTypeWrappers(parent)
-    : node;
-};
-
 export type FunctionNode =
   | TSESTree.ArrowFunctionExpression
   | TSESTree.FunctionDeclaration
@@ -146,7 +127,7 @@ export const getBoundIdentifier = (
     return node.id ?? undefined;
   }
 
-  const wrapped = climbTypeWrappers(node);
+  const wrapped = outermostTypeWrapper(node);
 
   const parent =
     wrapped.type === AST_NODE_TYPES.Program ? undefined : wrapped.parent;
@@ -190,7 +171,7 @@ export const isComponentFunction = (
     return isComponentName(boundName) && options.containsJsx;
   }
 
-  const wrapped = climbTypeWrappers(fn);
+  const wrapped = outermostTypeWrapper(fn);
 
   const parent =
     wrapped.type === AST_NODE_TYPES.Program ? undefined : wrapped.parent;

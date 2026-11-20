@@ -3,10 +3,10 @@ import {
   type TSESLint,
   type TSESTree,
 } from '@typescript-eslint/utils';
+import { outermostTypeWrapper } from 'eslint-rule-forge';
 import type { DeepReadonly } from 'ts-type-forge';
 import {
   castNode,
-  climbTypeWrappers,
   getBoundIdentifier,
   isComponentName,
   isFunctionNode,
@@ -153,7 +153,7 @@ const getDefinitionIfNotMemoized = (
   context: DeepReadonly<TSESLint.RuleContext<MessageIds, Options>>,
   node: DeepReadonly<TSESTree.Node>,
 ): DeepReadonly<TSESTree.Node> | undefined => {
-  const wrapped = climbTypeWrappers(node);
+  const wrapped = outermostTypeWrapper(node);
 
   const parent =
     wrapped.type === AST_NODE_TYPES.Program ? undefined : wrapped.parent;

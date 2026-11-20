@@ -50,6 +50,46 @@ export const skipTypeWrappers = <N extends DeepReadonly<TSESTree.Node>>(
   isTypeWrapper(node) ? skipTypeWrappers(node.expression) : node;
 
 /**
+ * `node` with every `as`, `satisfies`, `!` and `<T>` that wraps it: the
+ * expression whose value is `node`'s, where it ends up — a call's argument, a
+ * member's object, a variable's initializer. The counterpart of
+ * {@link skipTypeWrappers}, which goes the other way. A type annotation is no
+ * wrapper's value: a node that is one comes back as it is.
+ */
+export const outermostTypeWrapper = (
+  node: DeepReadonly<TSESTree.Node>,
+): DeepReadonly<TSESTree.Node> => {
+  const { parent } = node;
+
+  return parent !== undefined &&
+    isTypeWrapper(parent) &&
+    parent.expression === node
+    ? outermostTypeWrapper(parent)
+    : node;
+};
+
+/**
+ * Whether `node` is what a call calls, through the type wrappers and an
+ * optional chain around it: `f!()`, `(f as F)()`, `(o?.f)()` and `o?.f()` all
+ * call `f` or `o?.f`. A `new` or a tag is no call.
+ */
+export const isCallee = (node: DeepReadonly<TSESTree.Node>): boolean => {
+  const { parent } = node;
+
+  if (parent === undefined) {
+    return false;
+  }
+
+  if (isTypeWrapper(parent) || parent.type === AST_NODE_TYPES.ChainExpression) {
+    return parent.expression === node && isCallee(parent);
+  }
+
+  return (
+    parent.type === AST_NODE_TYPES.CallExpression && parent.callee === node
+  );
+};
+
+/**
  * `node` and every expression inside the type wrappers around it, outermost
  * first: `x as A as B` gives `x as A as B`, `x as A` and `x`, the last of which
  * is `skipTypeWrappers(node)`.

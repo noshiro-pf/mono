@@ -58,6 +58,12 @@ ruleTester.run(
         output: 'assert.deepStrictEqual(a, b);',
         errors: [{ messageId: 'preferAssertDeepStrictEqual' }],
       },
+      // Through an optional chain it is still the method called.
+      {
+        code: '(assert?.deepEqual)(a, b);',
+        output: '(assert?.deepStrictEqual)(a, b);',
+        errors: [{ messageId: 'preferAssertDeepStrictEqual' }],
+      },
       // Imported explicitly from Vitest: the same value as the global.
       {
         code: dedent`
@@ -381,6 +387,18 @@ describe('prefer-assert-is-false-over-assert-is-not-ok through type wrappers', (
             { messageId: 'preferAssertIsFalseOverAssertNotOk' },
             { messageId: 'preferAssertIsFalseOverAssertNotOk' },
           ],
+        },
+        {
+          name: 'a method read through an optional chain is still the callee',
+          code: dedent`
+            declare const x: boolean;
+            (assert?.notOk)(x);
+          `,
+          output: dedent`
+            declare const x: boolean;
+            (assert?.isFalse)(x);
+          `,
+          errors: [{ messageId: 'preferAssertIsFalseOverAssertNotOk' }],
         },
       ],
     },
