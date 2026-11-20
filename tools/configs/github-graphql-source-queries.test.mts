@@ -4,7 +4,11 @@ import * as fs from 'node:fs';
 import * as os from 'node:os';
 import * as path from 'node:path';
 import type { ReadonlyRecord } from 'ts-type-forge';
-import { queriesNotSent } from './github-graphql-source-queries.mjs';
+import {
+  mayWriteGraphql,
+  queriesIn,
+  queriesNotSent,
+} from './github-graphql-source-queries.mjs';
 
 describe(queriesNotSent, () => {
   test('a query sent with other whitespace and its substitutions filled in is sent', () => {
@@ -125,6 +129,8 @@ describe(queriesNotSent, () => {
             "const message = 'query the API again';",
             "const kind = 'query';",
             'const price = `costs: $${amount}`;',
+            // A replacement's group, which no GraphQL variable's name can be.
+            "const signature = text.replace(pattern, '(value: T, array: $1)');",
           ],
           'github.test.mts': [
             "const query = 'query Unsent { viewer { login } }';",
@@ -133,6 +139,29 @@ describe(queriesNotSent, () => {
         [],
       ),
       [],
+    );
+  });
+});
+
+describe(mayWriteGraphql, () => {
+  test.each([
+    ["const q = 'query Read($owner: String!) { viewer { login } }';"],
+    ["const m = 'mutation ($id: ID!) { x(input: { id: $id }) { y } }';"],
+    ['const q = `query ${name}(${declarations}) { viewer { login } }`;'],
+    [
+      'const f = (alias: string) => `${alias}: pullRequest(number: $${alias}) { title }`;',
+    ],
+  ])('is true of source queriesIn finds GraphQL in: %s', (source) => {
+    assert.isNotEmpty(queriesIn('a.mts', source));
+
+    assert.isTrue(mayWriteGraphql(source));
+  });
+
+  test('is false of source with neither a keyword nor a variable argument', () => {
+    assert.isFalse(
+      mayWriteGraphql(
+        "const price = `costs: ${amount}`;\nconst found = querySelector('#a');",
+      ),
     );
   });
 });

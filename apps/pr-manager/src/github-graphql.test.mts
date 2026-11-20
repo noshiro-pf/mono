@@ -12,12 +12,10 @@
  * refresh it). `libs/pr-merge-queue` checks its own requests the same way.
  */
 
-import { buildSchema, parse, validate, type GraphQLSchema } from 'graphql';
-import * as fs from 'node:fs';
-import * as path from 'node:path';
-import { unknownToString } from 'ts-data-forge';
 import type { FixedLengthTuple } from 'ts-type-forge';
 // `tools/` is not a package and has no barrel; it is reached by relative path.
+// eslint-disable-next-line import-x/no-relative-packages, import-x/no-internal-modules
+import { githubGraphqlErrors } from '../../../tools/configs/github-graphql-schema.mjs';
 // eslint-disable-next-line import-x/no-relative-packages, import-x/no-internal-modules
 import { queriesNotSent } from '../../../tools/configs/github-graphql-source-queries.mjs';
 import type { ReportSource } from './constants.mjs';
@@ -44,7 +42,7 @@ describe('the GraphQL queries', () => {
   test.each(QUERIES)(
     '%s is valid against the schema GitHub publishes',
     (_name, query) => {
-      assert.deepStrictEqual(errorsOf(query), []);
+      assert.deepStrictEqual(githubGraphqlErrors(query), []);
     },
   );
 
@@ -107,37 +105,3 @@ const QUERIES: readonly FixedLengthTuple<2, string>[] = [
     ).query,
   ],
 ] as const;
-
-/** What GitHub would say is wrong with `query`, empty when nothing is. */
-const errorsOf = (query: string): readonly string[] => {
-  try {
-    return validate(githubSchema(), parse(query)).map(({ message }) => message);
-  } catch (error: unknown) {
-    return [unknownToString(error)];
-  }
-};
-
-/**
- * GitHub's schema as GitHub publishes it, built once. Built without its own
- * validation: GitHub's SDL does not pass every rule `graphql` checks a schema
- * against (an interface field that is not deprecated where an implementation's
- * is), and what is checked here is the queries.
- */
-const githubSchema = (() => {
-  let mut_schema: GraphQLSchema | undefined = undefined;
-
-  return (): GraphQLSchema => {
-    mut_schema ??= buildSchema(
-      fs.readFileSync(
-        path.resolve(
-          import.meta.dirname,
-          '../../../tools/configs/github-graphql/schema.docs.graphql',
-        ),
-        'utf8',
-      ),
-      { assumeValid: true, assumeValidSDL: true },
-    );
-
-    return mut_schema;
-  };
-})();
