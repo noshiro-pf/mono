@@ -41,6 +41,17 @@ files needs the asset `name` templates in the pin file edited first.
 A finding that is wrong for its line is disabled on the command it names:
 `# shellcheck disable=SC<number> # why`.
 
+Each actionlint run is stopped after a minute and reported as a hang. The pinned
+actionlint writes each script into the stdin pipe of a shellcheck it has not
+started yet, so a script larger than the pipe buffer blocks it for good, idle
+and silent. On Linux a new pipe's buffer drops from 64 KiB to a page or two once
+one user's pipes hold more pages than `/proc/sys/fs/pipe-user-pages-soft`
+allows, which many processes running at once (several sessions, each running
+`check:root` in parallel) can reach. The cure is to run it again with fewer of
+them, or to lift the limit on the machine
+(`sudo sysctl fs.pipe-user-pages-soft=0`, which a file under `/etc/sysctl.d/`
+keeps); nothing in the workflows is wrong.
+
 `check:root:shellcheck` (`../check-shellcheck.mts`) runs the same pinned
 shellcheck over the tracked `*.sh` and `*.bash` files, the scripts of every
 `package.json` and the commands of `.github/unblock-prs.json`, outside
