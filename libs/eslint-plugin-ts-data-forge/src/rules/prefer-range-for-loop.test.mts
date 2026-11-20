@@ -36,8 +36,85 @@ describe('prefer-range-for-loop', () => {
           }
         `,
       },
+      {
+        // `const i` would throw on these writes, and TypeScript reports none
+        // through `satisfies`.
+        name: 'leaves alone a loop whose variable is written through satisfies or stacked wrappers',
+        code: dedent`
+          for (let i = 0; i < 10; ++i) {
+            (i satisfies number)++;
+          }
+          for (let j = 0; j < 10; ++j) {
+            (j satisfies number) += 1;
+          }
+          for (let k = 0; k < 10; ++k) {
+            ((k as number) as number)++;
+          }
+          for (let m = 0; m < 10; ++m) {
+            m!!++;
+          }
+        `,
+      },
     ],
     invalid: [
+      {
+        // The variable becomes what `range` yields, a `SafeUint` here, which
+        // `acc += 0.5` does not take.
+        name: 'suggests rather than fixes a loop whose body widens the variable through a let',
+        code: dedent`
+          import type { SafeInt } from 'ts-type-forge';
+          declare const n: SafeInt;
+          for (let i = 0; i < n; ++i) {
+            let acc = i;
+            acc += 0.5;
+          }
+        `,
+        output: null,
+        errors: [
+          {
+            messageId: 'useRangeForLoop',
+            suggestions: [
+              {
+                messageId: 'suggestRangeForLoopNarrows',
+                output: dedent`
+                  import { range } from 'ts-data-forge';
+                  import type { SafeInt } from 'ts-type-forge';
+                  declare const n: SafeInt;
+                  for (const i of range(0, n)) {
+                    let acc = i;
+                    acc += 0.5;
+                  }
+                `,
+              },
+            ],
+          },
+        ],
+      },
+      {
+        name: 'suggests rather than fixes a loop that declared its variable a number',
+        code: dedent`
+          for (let i: number = 0; i < 10; ++i) {
+            console.log(i);
+          }
+        `,
+        output: null,
+        errors: [
+          {
+            messageId: 'useRangeForLoop',
+            suggestions: [
+              {
+                messageId: 'suggestRangeForLoopNarrows',
+                output: dedent`
+                  import { range } from 'ts-data-forge';
+                  for (const i of range(0, 10)) {
+                    console.log(i);
+                  }
+                `,
+              },
+            ],
+          },
+        ],
+      },
       {
         name: 'replaces for loop with ++i',
         code: dedent`
