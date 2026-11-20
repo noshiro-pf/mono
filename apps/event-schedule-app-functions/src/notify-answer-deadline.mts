@@ -8,6 +8,7 @@ import { logger } from 'firebase-functions/v1';
 import { randomUUID } from 'node:crypto';
 import { Arr } from 'ts-data-forge';
 import type { DeepReadonly, ReadonlyRecord } from 'ts-type-forge';
+import { notificationRecipient } from './author-email.mjs';
 import {
   createMailBodyForAnswerDeadline,
   createMailBodyForAnswerResult,
@@ -75,7 +76,9 @@ export const notifyAnswerDeadline = async (
   });
 
   const emails = await Promise.all(
-    due.map(({ eventId }) => getEmail(db, eventId)),
+    due.map(async ({ eventId, ev }) =>
+      notificationRecipient(await getEmail(db, eventId), ev.author.id),
+    ),
   );
 
   await Promise.all(
@@ -397,7 +400,10 @@ const sendClosingMailOnce = async (
       const deadlineMillis =
         ev === undefined ? undefined : closingMailDeadlineOf(ev, nowMillis);
 
-      const to = emailOf(values?.data());
+      const to =
+        ev === undefined
+          ? ''
+          : await notificationRecipient(emailOf(values?.data()), ev.author.id);
 
       // The SDK runs this function again when a commit is reported as failed,
       // which one that went through can be: the mark is then this attempt's

@@ -1,8 +1,7 @@
 import { Checkbox, FormGroup, InputGroup } from 'blueprint-synstate';
-import type { InitializedObservable, Observable } from 'synstate';
+import type { InitializedObservable } from 'synstate';
 import {
   constant,
-  createAfterUpdate,
   deriveBindable,
   mapBindable,
   type Bindable,
@@ -11,7 +10,6 @@ import {
 import { Optional } from 'ts-data-forge';
 import { dict } from '../../constants/index.mjs';
 import type { NotificationSettingsWithEmail } from '../../types/index.mjs';
-import { isEmailString } from '../../utils-ported/index.mjs';
 import { now, ymdhmDateDiff } from '../../utils/index.mjs';
 import { WidthRestrictedInputWrapper } from '../styled/index.mjs';
 import * as styles from './notification-settings.module.css';
@@ -26,8 +24,11 @@ type Props = Readonly<{
   disabled: Bindable<boolean>;
   useAnswerDeadline: Bindable<boolean>;
   answerDeadline: Bindable<Ymdhm | undefined>;
-  /** Each emission focuses the email input. */
-  focusEmailInput$: Observable<unknown>;
+  /**
+   * The signed-in account's verified email, which notifications go to. Shown,
+   * not typed: the Firestore rules take no other.
+   */
+  notificationEmail: Bindable<string | undefined>;
 }>;
 
 type Item =
@@ -46,10 +47,8 @@ export const NotificationSettingsComponent = ({
   disabled,
   useAnswerDeadline,
   answerDeadline,
-  focusEmailInput$,
+  notificationEmail,
 }: Props): JSX.Element => {
-  const afterUpdate = createAfterUpdate();
-
   const settings$ = notificationSettingsWithEmail;
 
   const update = (patch: Partial<NotificationSettingsWithEmail>): void => {
@@ -69,11 +68,6 @@ export const NotificationSettingsComponent = ({
         deadline === undefined ||
         ymdhmDateDiff(deadline, now()) <= days,
     );
-
-  const invalidEmail$ = deriveBindable(
-    [disabled, settings$],
-    (d, s) => !d && !isEmailString(s.email),
-  );
 
   const checkbox = (
     item: Item,
@@ -96,34 +90,16 @@ export const NotificationSettingsComponent = ({
     <div>
       <WidthRestrictedInputWrapper>
         <FormGroup
-          helperText={mapBindable(invalidEmail$, (invalid) =>
-            invalid ? dict.common.error.invalidEmail : '',
-          )}
-          intent={mapBindable(invalidEmail$, (invalid) =>
-            invalid ? 'danger' : 'primary',
-          )}
+          helperText={constant(dc.notification.emailAddressIsAccounts)}
           label={constant(dc.notification.emailAddress)}
+          labelFor={notificationEmailInputId}
         >
           <InputGroup
-            // eslint-disable-next-line synstate-dom-a11y/no-autofocus -- recorded, not fixed, when jsx-a11y came to synstate-dom (#3764)
-            autoFocus
             disabled={disabled}
-            inputRef={(input) => {
-              focusEmailInput$.subscribe(() => {
-                afterUpdate(() => {
-                  input.focus();
-                });
-              });
-            }}
-            intent={mapBindable(invalidEmail$, (invalid) =>
-              invalid ? 'danger' : 'primary',
-            )}
-            placeholder={constant('sample@gmail.com')}
+            id={notificationEmailInputId}
+            readOnly={constant(true)}
             type={'email'}
-            value={mapBindable(settings$, (s) => s.email)}
-            onInput={({ currentTarget }) => {
-              update({ email: currentTarget.value });
-            }}
+            value={mapBindable(notificationEmail, (email) => email ?? '')}
           />
         </FormGroup>
       </WidthRestrictedInputWrapper>
@@ -172,3 +148,5 @@ export const NotificationSettingsComponent = ({
     </div>
   );
 };
+
+const notificationEmailInputId = 'notification-email';

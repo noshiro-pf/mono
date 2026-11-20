@@ -9,6 +9,7 @@ export * from './local-storage.mjs';
 export * from './map-key/index.mjs';
 export * from './multiple-date-picker/index.mjs';
 export * from './normalize-event-schedule.mjs';
+export * from './notification-email-of.mjs';
 export * from './reducers/index.mjs';
 export * from './select-datetimes-component/index.mjs';
 export * from './the-name-is-already-used.mjs';

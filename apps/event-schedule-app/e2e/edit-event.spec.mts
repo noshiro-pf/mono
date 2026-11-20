@@ -1,6 +1,15 @@
 import { expect, test } from '@playwright/test';
 import {
+  openEmailVerificationLink,
+  register,
+  signIn,
+  signOut,
+  uniqueEmail,
+  username,
+} from './account-steps.mjs';
+import {
   answerPageLoadTimeout,
+  authCallTimeout,
   createEventAndOpenAnswerPage,
   emulatorTestTimeout,
   firestoreWriteTimeout,
@@ -10,8 +19,9 @@ import {
 } from './answer-page-steps.mjs';
 
 // The edit page, reached from the answer page. It reads and writes the event,
-// and checks the author's email through a function, so this runs against the
-// emulators (`check:e2e:emulators`).
+// checks the author's email through a function, and an event with notifications
+// needs a signed-in account whose email is verified, so this runs against the
+// emulators (`check:e2e:emulators`), Auth's included.
 
 test(
   'an event without notifications is edited from its answer page',
@@ -132,12 +142,32 @@ test(
 );
 
 test(
-  'an event with notifications asks for its email before it is edited',
+  'an event with notifications is edited by its signed-in author alone',
   { tag: '@emulators' },
   async ({ page, context }) => {
     test.setTimeout(emulatorTestTimeout);
 
-    const authorsEmail = 'author@example.com';
+    const authorsEmail = uniqueEmail();
+
+    /* signed out, notifications cannot be turned on */
+
+    await page.goto('/');
+
+    const notificationSwitch = page
+      .getByTestId('create-page')
+      .getByRole('checkbox', { name: '幹事用通知設定' });
+
+    await expect.soft(notificationSwitch).toBeDisabled();
+
+    /* signed in with a verified email, they go to that email */
+
+    await register(page, authorsEmail);
+
+    await openEmailVerificationLink(page, authorsEmail);
+
+    await signOut(page);
+
+    await signIn(page, authorsEmail);
 
     await page.goto('/');
 
@@ -148,15 +178,22 @@ test(
 
       // Blueprint draws the switch's indicator over the input; both are in one
       // `<label>`, so the click the indicator takes still toggles the input.
-      await createPage
-        .getByRole('checkbox', { name: '幹事用通知設定' })
+      await notificationSwitch
         // eslint-disable-next-line playwright/no-force-option -- the indicator is what takes the click, as a person's would
         .check({ force: true });
 
-      await createPage.getByPlaceholder('sample@gmail.com').fill(authorsEmail);
+      await expect
+        .soft(createPage.getByRole('textbox', { name: '通知先メールアドレス' }))
+        .toHaveValue(authorsEmail);
     }
 
     const answerPage = await submitAndOpenAnswerPage(page, context);
+
+    // The new tab signs in again from the kept session a moment after it loads;
+    // the email dialog fills in the account's email only from then.
+    await expect
+      .soft(answerPage.getByTestId('nav-user-menu'))
+      .toHaveText(username, { timeout: authCallTimeout });
 
     const editButton = answerPage.getByTestId('edit-event-settings');
 
@@ -164,47 +201,13 @@ test(
       .soft(editButton)
       .toBeVisible({ timeout: answerPageLoadTimeout });
 
-    await editButton.click();
-
-    const dialog = answerPage.getByRole('dialog');
-
-    await expect
-      .soft(
-        dialog.getByText('通知用に設定したメールアドレスを入力してください。'),
-      )
-      .toBeVisible({ timeout: answerPageLoadTimeout });
-
-    /* going back leaves the edit page */
-
-    await dialog.getByRole('button', { name: '前のページに戻る' }).click();
-
-    await expect.soft(editButton).toBeVisible();
+    /* the signed-in author's own email is filled in and confirmed */
 
     await editButton.click();
-
-    /* a wrong address is refused, the registered one lets the form open */
-
-    const emailInput = dialog.getByRole('textbox');
-
-    const decideButton = dialog.getByRole('button', { name: '決定' });
-
-    await emailInput.fill('someone-else@example.com');
-
-    await decideButton.click();
-
-    await expect
-      .soft(dialog.getByText('登録されているメールアドレスと一致しません。'))
-      .toBeVisible({ timeout: functionCallTimeout });
-
-    await emailInput.fill(authorsEmail);
-
-    await decideButton.click();
 
     await expect
       .soft(toastWith(answerPage, 'メールアドレスが確認できました。'))
       .toBeVisible({ timeout: functionCallTimeout });
-
-    await expect.soft(dialog).toBeHidden();
 
     await expect
       .soft(
@@ -221,5 +224,32 @@ test(
       .click();
 
     await expect.soft(editButton).toBeVisible();
+
+    /* signed out, even the author's email does not open the form */
+
+    const answerUrl = answerPage.url();
+
+    await signOut(answerPage);
+
+    await answerPage.goto(answerUrl);
+
+    await answerPage.getByTestId('edit-event-settings').click();
+
+    const dialog = answerPage.getByRole('dialog');
+
+    await dialog.getByRole('textbox').fill(authorsEmail);
+
+    await dialog.getByRole('button', { name: '決定' }).click();
+
+    await expect
+      .soft(
+        toastWith(
+          answerPage,
+          'このイベントは、作成したアカウントでログインしているときだけ編集できます。',
+        ),
+      )
+      .toBeVisible({ timeout: functionCallTimeout });
+
+    await expect.soft(dialog).toBeVisible();
   },
 );
