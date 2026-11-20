@@ -5,7 +5,11 @@ import {
 } from '@typescript-eslint/utils';
 import * as ts from 'typescript';
 import { isRuntimeBound } from '../bindings.mjs';
-import { bindValueImportsAt, type EquivalentModule } from '../imports.mjs';
+import {
+  bindValueImportsAt,
+  type EquivalentModule,
+  type NamespaceSubpath,
+} from '../imports.mjs';
 import { getArgumentText } from '../parentheses.mjs';
 import {
   isIdentifierNamed,
@@ -33,6 +37,7 @@ import { builtBy } from './rule-factory.mjs';
 export const createPreferIsRecordAndHasKey = ({
   moduleName,
   equivalentModules = [],
+  namespaceSubpaths = [],
 }: Readonly<{
   /** The module that exports `isRecord` and `hasKey`. */
   moduleName: string;
@@ -41,6 +46,12 @@ export const createPreferIsRecordAndHasKey = ({
    * import of one of them from there is reused rather than refused.
    */
   equivalentModules?: readonly EquivalentModule[];
+  /**
+   * Exports of the module that are also the namespace of a module of their own
+   * (`import * as Arr from 'ts-data-forge/array'`), which bind what the
+   * module's own import does.
+   */
+  namespaceSubpaths?: readonly NamespaceSubpath[];
 }>): TSESLint.RuleModule<
   | 'useIsRecordAndHasKey'
   | 'useHasKey'
@@ -259,6 +270,7 @@ export const createPreferIsRecordAndHasKey = ({
             moduleName,
             ['isRecord', 'hasKey'],
             equivalentModules,
+            namespaceSubpaths,
           );
 
           const hasKeyOnlyAt = bindValueImportsAt(
@@ -266,6 +278,7 @@ export const createPreferIsRecordAndHasKey = ({
             moduleName,
             ['hasKey'],
             equivalentModules,
+            namespaceSubpaths,
           );
 
           for (const {

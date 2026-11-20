@@ -4,7 +4,11 @@ import {
   type TSESTree,
 } from '@typescript-eslint/utils';
 import type { ReadonlyRecord } from 'ts-type-forge';
-import { bindValueImportsAt, type EquivalentModule } from '../imports.mjs';
+import {
+  bindValueImportsAt,
+  type EquivalentModule,
+  type NamespaceSubpath,
+} from '../imports.mjs';
 import { getArgumentText } from '../parentheses.mjs';
 import { skipTypeWrappers, typeHoldsAtEveryLayer } from '../type-wrappers.mjs';
 import { builtBy } from './rule-factory.mjs';
@@ -35,6 +39,13 @@ export const createPreferEmptinessGuard = (
     equivalentModules?: readonly EquivalentModule[];
 
     /**
+     * Exports of the module that are also the namespace of a module of their own
+     * (`import * as Arr from 'ts-data-forge/array'`), which bind what the
+     * module's own import does.
+     */
+    namespaceSubpaths?: readonly NamespaceSubpath[];
+
+    /**
      * A comparison another rule of the plugin rewrites as part of something
      * larger, such as `xs.length >= 1 && xs.length <= 3` read as one range, and
      * this one leaves alone.
@@ -51,6 +62,7 @@ export const createPreferEmptinessGuard = (
     moduleName,
     namespace,
     equivalentModules = [],
+    namespaceSubpaths = [],
     isHandledElsewhere,
   } = config;
 
@@ -99,6 +111,7 @@ export const createPreferEmptinessGuard = (
             moduleName,
             [namespace],
             equivalentModules,
+            namespaceSubpaths,
           );
 
           // Every fix brings the namespace into scope itself, so that one

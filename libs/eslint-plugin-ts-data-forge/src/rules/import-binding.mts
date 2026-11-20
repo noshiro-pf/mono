@@ -1,7 +1,11 @@
 import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
 import { bindValueImportsAt, type ValueImportBinding } from 'eslint-rule-forge';
 import { memoizeFunction } from 'ts-data-forge';
-import { EQUIVALENT_MODULES, TS_DATA_FORGE_MODULE } from './constants.mjs';
+import {
+  EQUIVALENT_MODULES,
+  NAMESPACE_SUBPATHS,
+  TS_DATA_FORGE_MODULE,
+} from './constants.mjs';
 
 /**
  * Binds ts-data-forge's `exportName` as a value once per file (see
@@ -63,6 +67,7 @@ export const tsDataForgeValuesAt = (
     TS_DATA_FORGE_MODULE,
     exportNames,
     EQUIVALENT_MODULES,
+    NAMESPACE_SUBPATHS,
   );
 
 /** What {@link tsDataForgeValueAt} gives for one node. */

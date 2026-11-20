@@ -3,7 +3,7 @@ import {
   type TSESLint,
   type TSESTree,
 } from '@typescript-eslint/utils';
-import { bindValueImportsAt } from '../imports.mjs';
+import { bindValueImportsAt, type NamespaceSubpath } from '../imports.mjs';
 import { getRangeWithParens } from '../parentheses.mjs';
 import { isIdentifierNamed, skipTypeWrappers } from '../type-wrappers.mjs';
 import { builtBy } from './rule-factory.mjs';
@@ -16,12 +16,20 @@ import { builtBy } from './rule-factory.mjs';
 export const createPreferArrayIsArray = ({
   moduleName,
   namespace,
+  namespaceSubpaths = [],
 }: Readonly<{
   /** The module that exports `namespace`. */
   moduleName: string;
 
   /** The exported namespace whose `isArray` replaces `Array.isArray`. */
   namespace: string;
+
+  /**
+   * Exports of the module that are also the namespace of a module of their own
+   * (`import * as Arr from 'ts-data-forge/array'`), which bind what the
+   * module's own import does.
+   */
+  namespaceSubpaths?: readonly NamespaceSubpath[];
 }>): TSESLint.RuleModule<'useIsArray', readonly []> =>
   builtBy(createPreferArrayIsArray, {
     meta: {
@@ -55,9 +63,13 @@ export const createPreferArrayIsArray = ({
             return;
           }
 
-          const bindingAt = bindValueImportsAt(sourceCode, moduleName, [
-            namespace,
-          ]);
+          const bindingAt = bindValueImportsAt(
+            sourceCode,
+            moduleName,
+            [namespace],
+            [],
+            namespaceSubpaths,
+          );
 
           // Every fix brings the namespace into scope itself, so that one
           // applied alone (an editor's quick fix) is complete.

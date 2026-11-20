@@ -4,7 +4,11 @@ import {
   type TSESTree,
 } from '@typescript-eslint/utils';
 import { isRuntimeBound } from '../bindings.mjs';
-import { bindValueImportsAt, type EquivalentModule } from '../imports.mjs';
+import {
+  bindValueImportsAt,
+  type EquivalentModule,
+  type NamespaceSubpath,
+} from '../imports.mjs';
 import { getRangeWithParens, parenthesesDepth } from '../parentheses.mjs';
 import { skipTypeWrappers } from '../type-wrappers.mjs';
 import { builtBy } from './rule-factory.mjs';
@@ -25,6 +29,7 @@ import { builtBy } from './rule-factory.mjs';
 export const createPreferIsNonNullObject = ({
   moduleName,
   equivalentModules = [],
+  namespaceSubpaths = [],
 }: Readonly<{
   /** The module that exports `isNonNullObject`. */
   moduleName: string;
@@ -33,6 +38,12 @@ export const createPreferIsNonNullObject = ({
    * import of one of them from there is reused rather than refused.
    */
   equivalentModules?: readonly EquivalentModule[];
+  /**
+   * Exports of the module that are also the namespace of a module of their own
+   * (`import * as Arr from 'ts-data-forge/array'`), which bind what the
+   * module's own import does.
+   */
+  namespaceSubpaths?: readonly NamespaceSubpath[];
 }>): TSESLint.RuleModule<'useIsNonNullObject', readonly []> =>
   builtBy(createPreferIsNonNullObject, {
     meta: {
@@ -84,6 +95,7 @@ export const createPreferIsNonNullObject = ({
             moduleName,
             ['isNonNullObject'],
             equivalentModules,
+            namespaceSubpaths,
           );
 
           // Every fix brings `isNonNullObject` into scope itself, so that one
