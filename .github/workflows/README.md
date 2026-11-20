@@ -455,13 +455,14 @@ comment of their own, so what they mean is here:
   name a document of the table.
   `tools/scripts/cmd/check-changed/plan.test.mts` holds that check-changed runs
   each test for a diff of its document alone.
-- **`style`** (`style-check.yml`) drops `experimental/` and nothing else: its
-  matrix checks markdown, `ws:doc` regenerates the package READMEs, and
-  `ws:check:ext` globs every file under the directories it is given, so `code`
-  would skip that workflow exactly when it should fail. This is why a guard
-  whose input is a document is a `check:prose:*` script run there, and a
-  `check:root:*` script, run in `code-check.yml`, is skipped by the very diff it
-  judges (see "Commands" in `CLAUDE.md`).
+- **`style`** (`style-check.yml`) drops `experimental/` and nothing else (what
+  `check:prose:private-pointers` would find there, `verify-lockfile.yml` refuses
+  on every diff): its matrix checks markdown, `ws:doc` regenerates the package
+  READMEs, and `ws:check:ext` globs every file under the directories it is
+  given, so `code` would skip that workflow exactly when it should fail. This is
+  why a guard whose input is a document is a `check:prose:*` script run there,
+  and a `check:root:*` script, run in `code-check.yml`, is skipped by the very
+  diff it judges (see "Commands" in `CLAUDE.md`).
 - **`strict-lib`** (`strict-lib-gen.yml`) is a list of its own; the workflow
   explains each entry.
 - **`none`** (`verify-published-packages.yml`) skips the diff question
@@ -879,7 +880,9 @@ merge as well. `verify-lockfile.yml`'s one job is the same kind of context for
 the same reasons, and does not run on label events at all, so taking `skip-ci`
 off would not bring back a run it had skipped. Running on every pull request
 with a checkout, it is also where a `package.json` or lockfile under
-`experimental/` is refused: every gate skips the diff that adds one.
+`experimental/` is refused, and a pointer into the private repository there (the
+pattern of `check:prose:private-pointers`, by the hook's `--scan` under `node`
+with nothing installed): every gate skips the diff that adds one.
 
 ## `pull_request_target`
 

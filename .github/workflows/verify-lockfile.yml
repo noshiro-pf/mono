@@ -21,12 +21,16 @@ name: Verify Lockfile
 # land a tree no pull request run verified.
 #
 # The job also refuses a `package.json` or lockfile under `experimental/`
-# (`experimental/README.md` says why none stays there). That has nothing to do
-# with the action pins; it is here because the check workflows skip a diff that
-# touches `experimental/` alone, which is exactly the diff that adds one, and
-# this is the one job with a checkout that runs on every pull request. A step
-# costs no job and no required context of its own, at the price of a failure
-# reported under `verify-lockfile`, so the step's message says what it found.
+# (`experimental/README.md` says why none stays there), and a pointer into the
+# private repository there (`check:prose:private-pointers`, which `experimental/`
+# alone does not run). Neither has anything to do with the action pins; they
+# are here because the check workflows skip a diff that touches `experimental/`
+# alone, which is exactly the diff that adds one, and this is the one job with
+# a checkout that runs on every pull request. A step costs no job and no
+# required context of its own, at the price of a failure reported under
+# `verify-lockfile`, so each step's message says what it found. The pointer
+# step is the one place this job runs repository code: one file, under `node`
+# with nothing installed, which keeps it to seconds.
 
 on:
   push:
@@ -112,3 +116,21 @@ jobs:
           done < "${list}"
 
           exit "${found}"
+
+      # Node.js alone, as check-gates.yml sets it up: no pnpm, no store, no
+      # install.
+      - name: Set up Node.js
+        if: ${{ !cancelled() }}
+        uses: $/.github/actions/setup
+        with:
+          pnpm: 'false'
+          install: 'false'
+
+      # The hook's `--scan`: the pattern `check:prose:private-pointers` reads
+      # every file with, over the files git tracks under `experimental/`, with
+      # nothing installed (`claude-code-public-write-gate.mts` imports only
+      # `node:*`). Every diff, not one of `experimental/` alone: the step takes
+      # seconds, and a gate of its own would be more code than the check.
+      - name: Refuse a pointer into the private repository under experimental/
+        if: ${{ !cancelled() }}
+        run: node ./tools/scripts/cmd/claude-code-public-write-gate.mts --scan experimental/
