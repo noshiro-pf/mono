@@ -32,8 +32,9 @@ export const buildTypeImportFix = (
  * to the wrong declaration. (ts-type-forge's own sources, which declare
  * `NonEmptyArray` themselves, are the motivating example.)
  *
- * Not `hasForeignBinding` from eslint-rule-forge: `resolveTypeName` decides
- * once per file, with no node to read a scope at.
+ * The top level alone: `resolveTypeName` reads the scopes around the node it
+ * rewrites with `hasForeignBinding`, which counts an import of any
+ * ts-type-forge export as the module's own and so cannot tell this case.
  */
 export const hasConflictingDeclaration = (
   program: TSESTree.Program,

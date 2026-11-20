@@ -1,5 +1,9 @@
 import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
-import { getImportDeclarations, getImportedLocalName } from 'eslint-rule-forge';
+import {
+  getImportDeclarations,
+  getImportedLocalName,
+  hasForeignBinding,
+} from 'eslint-rule-forge';
 import { TS_TYPE_FORGE_MODULE } from './constants.mjs';
 import { hasConflictingDeclaration } from './import-utils.mjs';
 
@@ -29,28 +33,46 @@ export const IMPORT_STYLE_SCHEMA_PROPERTY: JsonSchema = {
 };
 
 /**
- * Resolves how a ts-type-forge type name should be written in this file, and
+ * Resolves how a ts-type-forge type name should be written at `node`, and
  * whether the fix has to add an import for it.
  *
- * Returns `undefined` when the name is already bound to something else (a local
- * alias, an import from another module, or another ts-type-forge export
- * imported under the name) — rewriting to it would then silently resolve to the
- * wrong declaration, which is exactly what happens inside
- * ts-type-forge's own sources.
+ * Returns `undefined` when the name the fix would write is bound to something
+ * else where it is written: at the top of the file (a local alias, an import
+ * from another module, or another ts-type-forge export imported under the
+ * name), or by a type parameter, type alias or interface around `node` —
+ * rewriting to it would then silently resolve to the wrong declaration, which
+ * is exactly what happens inside ts-type-forge's own sources.
  */
 export const resolveTypeName = (
-  program: TSESTree.Program,
+  sourceCode: TSESLint.SourceCode,
+  node: TSESTree.Node,
   canonicalName: string,
   importStyle: ImportStyle,
 ): Readonly<{ localName: string; needsImport: boolean }> | undefined => {
   const importedLocalName = getImportedLocalName(
-    getImportDeclarations(program, TS_TYPE_FORGE_MODULE),
+    getImportDeclarations(sourceCode.ast, TS_TYPE_FORGE_MODULE),
     canonicalName,
   );
 
-  return importedLocalName !== undefined
-    ? { localName: importedLocalName, needsImport: false }
-    : hasConflictingDeclaration(program, canonicalName)
-      ? undefined
-      : { localName: canonicalName, needsImport: importStyle === 'named' };
+  const localName = importedLocalName ?? canonicalName;
+
+  // An import of another ts-type-forge export under the name is not foreign to
+  // `hasForeignBinding`, so the top level is read on its own.
+  const isBoundElsewhere =
+    (importedLocalName === undefined &&
+      hasConflictingDeclaration(sourceCode.ast, canonicalName)) ||
+    hasForeignBinding(
+      sourceCode,
+      node,
+      localName,
+      TS_TYPE_FORGE_MODULE,
+      'type',
+    );
+
+  return isBoundElsewhere
+    ? undefined
+    : {
+        localName,
+        needsImport: importedLocalName === undefined && importStyle === 'named',
+      };
 };
