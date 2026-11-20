@@ -1080,6 +1080,56 @@ describe('prefer-canonical-length-constrained-tuple', () => {
           errors: [{ messageId: 'useCanonicalTuple' }],
         },
         {
+          name: 'still rewrites a tuple whose route reaches a local that shares its spelling with one that would close a cycle',
+          code: dedent`
+            function f() {
+              const pair = make();
+              return pair;
+            }
+            type T = readonly [U, U];
+            type U = typeof g;
+            function g() {
+              const pair = 1;
+              return pair;
+            }
+            declare function make(): T;
+          `,
+          output: dedent`
+            import { type FixedLengthTuple } from 'ts-type-forge';
+            function f() {
+              const pair = make();
+              return pair;
+            }
+            type T = FixedLengthTuple<2, U>;
+            type U = typeof g;
+            function g() {
+              const pair = 1;
+              return pair;
+            }
+            declare function make(): T;
+          `,
+          errors: [{ messageId: 'useCanonicalTuple' }],
+        },
+        {
+          name: 'still rewrites a tuple whose element shares its name with a namespace member that names the alias',
+          code: dedent`
+            type T = readonly [Foo, Foo];
+            type Foo = string;
+            namespace N {
+              export type Foo = T;
+            }
+          `,
+          output: dedent`
+            import { type FixedLengthTuple } from 'ts-type-forge';
+            type T = FixedLengthTuple<2, Foo>;
+            type Foo = string;
+            namespace N {
+              export type Foo = T;
+            }
+          `,
+          errors: [{ messageId: 'useCanonicalTuple' }],
+        },
+        {
           name: 'still rewrites a tuple in a namespace that closes no cycle',
           code: dedent`
             namespace N {
