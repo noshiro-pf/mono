@@ -124,7 +124,8 @@ does every page under a `docs/` directory). A document a unit test reads (the
 `!` entries `check:root:test-documents` holds) is code to the gate too, but it
 runs only what it needs: `check:md` and its package's `check:test`, besides the
 package's own generators, not the package's lint, type check or build, nor its
-dependents' generators. `experimental/` is outside everything.
+dependents' generators. `experimental/` is outside everything but `check:prose`,
+which every plan runs and whose `private-pointers` reads it.
 
 Every step runs whatever failed before it, and every step is watched for what
 it writes. What is still changed at the end is listed under the step that
