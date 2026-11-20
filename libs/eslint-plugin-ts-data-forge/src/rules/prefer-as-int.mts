@@ -21,7 +21,10 @@ import { tsDataForgeValueAtByName } from './import-binding.mjs';
 
 type Options = readonly [];
 
-type MessageIds = 'useBrandedNumberCastFunction' | 'castNonNumberOperand';
+type MessageIds =
+  | 'useBrandedNumberCastFunction'
+  | 'suggestBrandedNumberCastFunction'
+  | 'castNonNumberOperand';
 
 export const preferAsInt: TSESLint.RuleModule<MessageIds, Options> = {
   meta: {
@@ -31,10 +34,13 @@ export const preferAsInt: TSESLint.RuleModule<MessageIds, Options> = {
         'Replace branded number type assertions (e.g., `as Int`) with corresponding functions (e.g., `asInt()`) from ts-data-forge.',
     },
     fixable: 'code',
+    hasSuggestions: true,
     schema: [],
     messages: {
       useBrandedNumberCastFunction:
         'Replace the assertion to `{{typeName}}` with `{{functionName}}()` from ts-data-forge.',
+      suggestBrandedNumberCastFunction:
+        'Replace the assertion to `{{typeName}}` with `{{functionName}}()` from ts-data-forge, where its narrower type does: `{{functionName}}()` is typed by its operand as well (`asInt(0)` is `Int & 0`), so a `let` or a type argument inferred from it may not take another `{{typeName}}` later.',
       castNonNumberOperand:
         'Replace the assertion to `{{typeName}}` with `{{functionName}}()` from ts-data-forge once the operand is a number: `{{functionName}}()` takes a `number`, and the operand is not typed as one at every layer of its type wrappers.',
     },
@@ -107,6 +113,19 @@ export const preferAsInt: TSESLint.RuleModule<MessageIds, Options> = {
             ? typeHoldsAtEveryLayer(sourceCode, node.expression, isNumberType)
             : !isGlobal && isNumberWithoutTypes(node.expression);
 
+          const writeCall = (
+            fixer: TSESLint.RuleFixer,
+          ): readonly TSESLint.RuleFix[] =>
+            cast === undefined
+              ? []
+              : [
+                  ...cast.edits(fixer),
+                  fixer.replaceText(
+                    node,
+                    `${cast.localName}(${getArgumentText(sourceCode, node.expression)})`,
+                  ),
+                ];
+
           context.report({
             node,
             messageId:
@@ -118,29 +137,82 @@ export const preferAsInt: TSESLint.RuleModule<MessageIds, Options> = {
               // The name the fix writes: an aliased import's local name.
               functionName: cast?.localName ?? functionName,
             },
-            // Not handled yet: the call can be typed narrower than the `Int`
-            // the cast gave (`asInt(0)` is `Int & 0`), and where that type is
-            // inferred into something that later takes another `Int` (a `let`
-            // reassigned later), the fixed code does not compile. Whether the
-            // call is narrower depends on the cast function's signature and the
-            // operand, and whether that breaks anything depends on the cast's
-            // use.
-            fix:
-              cast === undefined || !isNumber
-                ? null
-                : (fixer) => [
-                    ...cast.edits(fixer),
-                    fixer.replaceText(
-                      node,
-                      `${cast.localName}(${getArgumentText(sourceCode, node.expression)})`,
-                    ),
-                  ],
+            // A call typed narrower than the cast (`asInt(0)` is `Int & 0`) is
+            // offered as a suggestion instead (`isNarrowerThanCast`): where its
+            // type is inferred into something that later takes another `Int` (a
+            // `let` reassigned later), the fixed code would not compile.
+            ...(cast === undefined || !isNumber
+              ? {}
+              : isNarrowerThanCast(sourceCode, node, functionName, hasTypes)
+                ? {
+                    suggest: [
+                      {
+                        messageId: 'suggestBrandedNumberCastFunction' as const,
+                        data: {
+                          typeName,
+                          functionName: cast.localName,
+                        },
+                        fix: (fixer: TSESLint.RuleFixer) => writeCall(fixer),
+                      },
+                    ],
+                  }
+                : { fix: (fixer: TSESLint.RuleFixer) => writeCall(fixer) }),
           });
         }
       },
     };
   },
 } as const;
+
+/**
+ * Whether the call the fix writes may be typed narrower than the cast it
+ * replaces. The cast functions are generic (`asInt` is `<N extends number>(value:
+ * N) => Int & N`), so the call is the cast's type and the operand's at once:
+ * no narrower when the cast's type is assignable to the operand's (an operand
+ * typed `number`), narrower otherwise (`asInt(0)` is `Int & 0`). `asInt8` and
+ * `asUint8` are not generic, and never narrower. Without type information a
+ * literal operand, the only one fixed there, is always narrower.
+ */
+const isNarrowerThanCast = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  sourceCode: TSESLint.SourceCode,
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  node: TSESTree.TSAsExpression | TSESTree.TSTypeAssertion,
+  functionName: string,
+  hasTypes: boolean,
+): boolean => {
+  if (NON_GENERIC_CASTS.has(functionName)) {
+    return false;
+  }
+
+  const services = sourceCode.parserServices;
+
+  const checker = services?.program?.getTypeChecker();
+
+  const castNode = services?.esTreeNodeToTSNodeMap?.get(node);
+
+  const operandNode = services?.esTreeNodeToTSNodeMap?.get(node.expression);
+
+  if (
+    !hasTypes ||
+    checker === undefined ||
+    castNode === undefined ||
+    operandNode === undefined
+  ) {
+    return true;
+  }
+
+  return !checker.isTypeAssignableTo(
+    checker.getTypeAtLocation(castNode),
+    checker.getTypeAtLocation(operandNode),
+  );
+};
+
+/** The cast functions that take a `number` and are typed by their brand alone. */
+const NON_GENERIC_CASTS: ReadonlySet<string> = new Set<string>([
+  'asInt8',
+  'asUint8',
+]);
 
 const FORGE_MODULES: ReadonlySet<unknown> = new Set<string>([
   TS_DATA_FORGE_MODULE,
