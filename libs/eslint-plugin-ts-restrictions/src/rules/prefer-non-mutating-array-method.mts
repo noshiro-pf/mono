@@ -23,6 +23,7 @@ import {
 type Options = readonly [];
 
 type MessageIds =
+  | 'preferArrayFromMapFunction'
   | 'preferNonMutatingMethod'
   | 'preferNonMutatingMethodUnlessArgumentChangesArray'
   | 'useNonMutatingMethod';
@@ -33,7 +34,7 @@ type MessageIds =
  *
  * - `Array.from(xs).reverse()` → `xs.toReversed()`
  * - `Array.from(xs).sort(cmp?)` → `xs.toSorted(cmp?)`
- * - `Array.from(xs).fill(v)` → `xs.map(() => v)`
+ * - `Array.from(xs).fill(v)` → `Array.from(xs, () => v)`
  * - `Array.from(xs).splice(s)` → `xs.slice(s)`, and
  *   `Array.from(xs).splice(s, c)` → `xs.slice(s, s + c)` for non-negative
  *   integer literals `s` and `c`
@@ -47,9 +48,11 @@ type MessageIds =
  * literal may be negative. A start-only `splice` has `slice`'s value whatever
  * the start, but a start that may have an effect would run after the copy and
  * before `slice` reads the array, so it has to be safe to evaluate
- * (`isSafeToReEvaluate`). As with `fill`, the rewrite reads the array itself,
- * so a hole stays a hole where the copy held `undefined`, and an `Array`
- * subclass typed as `T[]` gets its own class back from `slice`.
+ * (`isSafeToReEvaluate`). The rewrite reads the array itself, so a hole stays a
+ * hole where the copy held `undefined`, and an `Array` subclass typed as `T[]`
+ * gets its own class back from `slice`. `fill` is rewritten to the mapping
+ * function of `Array.from` instead, which fills the holes as the copy does
+ * (`reportFill`).
  *
  * `Array.from(xs)` copies `xs` before the method's arguments are evaluated, and
  * the rewrite reads `xs` after them, so a call whose argument may have an
@@ -89,12 +92,12 @@ const nonNegativeIntegerLiteral = (
 };
 
 /**
- * Expressions that are safe to re-evaluate once per element inside a `map`
- * callback: re-reading them cannot trigger side effects and always yields the
- * same value, so `Array.from(xs).fill(v)` → `xs.map(() => v)` is behavior
- * preserving. Anything that may allocate (`{}`, `new Foo()`), call code, or hit
- * a getter is excluded — for those, `fill` shares one value across all slots
- * while `map` would create one per slot.
+ * Expressions that are safe to re-evaluate once per element inside a mapping
+ * function: re-reading them cannot trigger side effects and always yields the
+ * same value, so `Array.from(xs).fill(v)` → `Array.from(xs, () => v)` is
+ * behavior preserving. Anything that may allocate (`{}`, `new Foo()`), call
+ * code, or hit a getter is excluded — for those, `fill` shares one value across
+ * all slots while the mapping function would create one per slot.
  */
 const isSafeToReEvaluate = (
   node: DeepReadonly<TSESTree.Expression>,
@@ -159,6 +162,62 @@ const toSliceCall = (
     : `slice(${s}, ${s + c})`;
 };
 
+/**
+ * Reports `Array.from(xs).fill(v)` and fixes it to `Array.from(xs, () => v)`.
+ * `Array.from(xs)` turns a hole of a sparse array into `undefined`, which `fill`
+ * then overwrites, while `xs.map(() => v)` skips a hole and keeps it
+ * (`Array.from(Array(3)).fill(0)` is `[0, 0, 0]`, `Array(3).map(() => 0)` three
+ * holes); the mapping function of `Array.from` is called for every index, holes
+ * included, so it fills what `fill` does. The fix adds the function to the
+ * `Array.from(…)` call, wrappers around it kept, and drops `.fill(v)`.
+ */
+// The token and fixer APIs of `SourceCode` take the AST's own mutable types.
+// eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+const reportFill = ({
+  context,
+  node,
+  inner,
+  arg,
+  mapFunction,
+}: Readonly<{
+  context: Readonly<TSESLint.RuleContext<MessageIds, Options>>;
+  node: TSESTree.CallExpression;
+  inner: TSESTree.Node;
+  arg: TSESTree.Expression;
+  mapFunction: string;
+}>): void => {
+  const sourceCode = context.sourceCode;
+
+  const closingParen = sourceCode.getLastToken(inner);
+
+  const callee = node.callee;
+
+  const accessToken =
+    callee.type === AST_NODE_TYPES.MemberExpression
+      ? sourceCode.getTokenBefore(callee.property)
+      : null;
+
+  if (closingParen === null || accessToken === null) {
+    return;
+  }
+
+  // A trailing comma (`Array.from(xs,)`) already separates the new argument.
+  const separator =
+    sourceCode.getTokenBefore(closingParen)?.value === ',' ? ' ' : ', ';
+
+  context.report({
+    node,
+    messageId: 'preferArrayFromMapFunction',
+    data: {
+      replacement: `Array.from(${sourceCode.getText(arg)}, ${mapFunction})`,
+    },
+    fix: (fixer) => [
+      fixer.insertTextBefore(closingParen, `${separator}${mapFunction}`),
+      fixer.removeRange([accessToken.range[0], node.range[1]]),
+    ],
+  });
+};
+
 export const preferNonMutatingArrayMethod: TSESLint.RuleModule<
   MessageIds,
   Options
@@ -173,6 +232,8 @@ export const preferNonMutatingArrayMethod: TSESLint.RuleModule<
     hasSuggestions: true,
     schema: [],
     messages: {
+      preferArrayFromMapFunction:
+        'Filling a throw-away `Array.from()` copy with `fill` is roundabout. Give `Array.from` the value as a mapping function instead: `{{replacement}}`.',
       preferNonMutatingMethod:
         'Mutating a throw-away `Array.from()` copy with `{{mutatingMethod}}` is roundabout. Use `{{replacement}}` on the original array instead.',
       preferNonMutatingMethodUnlessArgumentChangesArray:
@@ -312,9 +373,9 @@ export const preferNonMutatingArrayMethod: TSESLint.RuleModule<
             case 'fill': {
               const fillValue = node.arguments[0];
 
-              // `fill(v)` evaluates `v` once while `map(() => v)` re-evaluates
-              // it per element, so the rewrite is only offered for expressions
-              // that are safe to re-evaluate.
+              // `fill(v)` evaluates `v` once while `() => v` re-evaluates it per
+              // element, so the rewrite is only offered for expressions that
+              // are safe to re-evaluate.
               if (
                 fillValue === undefined ||
                 fillValue.type === AST_NODE_TYPES.SpreadElement ||
@@ -323,7 +384,7 @@ export const preferNonMutatingArrayMethod: TSESLint.RuleModule<
                 return undefined;
               }
 
-              return `map(() => ${argsText})`;
+              return `() => ${argsText}`;
             }
 
             case 'splice':
@@ -332,6 +393,12 @@ export const preferNonMutatingArrayMethod: TSESLint.RuleModule<
         })();
 
         if (replacement === undefined) {
+          return;
+        }
+
+        if (methodName === 'fill') {
+          reportFill({ context, node, inner, arg, mapFunction: replacement });
+
           return;
         }
 
