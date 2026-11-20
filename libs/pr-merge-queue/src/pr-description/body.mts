@@ -1,4 +1,4 @@
-// cspell:ignore xhigh
+// cspell:ignore xhigh FFFC
 /**
  * A description written twice — the original, then its translation under one
  * `## <heading>` — and what keeps the two saying the same thing. Nothing here
@@ -13,7 +13,10 @@
  */
 
 import {
+  asciiLowerCase,
   CLAUDE_SESSION_LINE,
+  CLOSING_ISSUE_NUMBER,
+  closingKeywordBefore,
   codeFenceBlocks,
   isDeclarationLine,
   outsideCodeFences,
@@ -22,6 +25,7 @@ import {
   REVIEW_SECTION_HEADING,
 } from 'pr-report-core';
 import { Arr, Num, Result } from 'ts-data-forge';
+import { shownMatches, shownOutsideMatches } from '../markdown/index.mjs';
 import { deferralProblemsIn } from './review-section.mjs';
 
 /** A description cut where its translation begins and where it ends. */
@@ -61,7 +65,8 @@ export const splitDescription = (
   body: string,
   heading: string,
 ): Result<DescriptionParts, string> => {
-  const lines = body.replaceAll('\r\n', '\n').split('\n');
+  // A lone `\r` ends a line too, as CommonMark and `proseBlocks` read one.
+  const lines = body.replaceAll(/\r\n?/gu, '\n').split('\n');
 
   // Blanked fences keep the line count, so an index found here is one in
   // `lines` too.
@@ -233,8 +238,8 @@ export const checkDescription = (
     translation.some((line) => MERGE_AFTER.test(line))
       ? 'the translation has a Merge-After: line; it is read wherever it is, so it appears once, in the original'
       : undefined,
-    trailerProblem('original', original, kind),
-    trailerProblem('translation', translation, kind),
+    trailerProblem('original', parts.original.split('\n'), kind),
+    trailerProblem('translation', parts.translation.split('\n'), kind),
     reviews > 1
       ? `the original has a "## Review" section ${reviews} times; the tools read the first, so the findings go under one`
       : undefined,
@@ -268,7 +273,7 @@ export const checkDescription = (
  * the same line.
  */
 export const reviewOpeningOf = (section: string): string => {
-  const opening = outsideCodeFences(section.replaceAll('\r\n', '\n'))
+  const opening = outsideCodeFences(section.replaceAll(/\r\n?/gu, '\n'))
     .split('\n')
     .find((line) => line.trim() !== '');
 
@@ -376,7 +381,7 @@ export const readableDescription = (
  * The one rule `descriptionProblems` applies with no translation configured.
  */
 export const declarationProblems = (text: string): readonly string[] =>
-  lineDeclarationProblems(visibleLines(text.replaceAll('\r\n', '\n')));
+  lineDeclarationProblems(visibleLines(text.replaceAll(/\r\n?/gu, '\n')));
 
 type Heading = Readonly<{ level: number; text: string }>;
 
@@ -448,25 +453,75 @@ const HTML_COMMENT = /<!--[\s\S]*?-->/gu;
 
 /**
  * A closing keyword before any reference GitHub closes by: `#N`,
- * `owner/repo#N`, or an issue or pull request URL.
+ * `owner/repo#N`, or an issue or pull request URL, in text folded by
+ * `asciiLowerCase`. Wider than `pr-report` reads, which wants this repository's
+ * issues alone: here any keyword GitHub acts on is a trailer.
  */
-const CLOSING_KEYWORD =
-  /\b(?:close[sd]?|fix(?:e[sd])?|resolve[sd]?)(?:[^\S\n]*:[^\S\n]*|[^\S\n]+)(?:[\w.-]+\/[\w.-]+#\d|#\d|https:\/\/github\.com\/[\w.-]+\/[\w.-]+\/(?:issues|pull)\/\d)/iu;
+const CLOSING_KEYWORD = closingKeywordBefore(
+  String.raw`(?:(?:[\w.-]+\/[\w.-]+)?#|https?:\/\/github\.com\/[\w.-]+\/[\w.-]+\/(?:issues|pull)\/)${CLOSING_ISSUE_NUMBER}`,
+);
 
-/** {@link CLOSING_KEYWORD} before a `#N` alone, read once and replaced all. */
-const CLOSING_KEYWORDS =
-  /\b(?:close[sd]?|fix(?:e[sd])?|resolve[sd]?)(?:[^\S\n]*:[^\S\n]*|[^\S\n]+)#\d+/giu;
+/** {@link CLOSING_KEYWORD} before a `#N` alone, with its number. */
+// `#0` included, which names no issue for the other half to name.
+const CLOSING_KEYWORDS = closingKeywordBefore(String.raw`#(?<number>\d+)\b`);
 
 /** As `pr-report-core` reads one: not after anything that ends a repository name. */
 const REFERENCE = /(?<![\w./&-])#(?<number>\d+)\b/gu;
 
-const stripInlineCode = (line: string): string =>
-  line.replaceAll(/(`+)[^`]*?\1/gu, '');
+/**
+ * `lines` as one text whose lines are theirs: a `\r` left in one, which
+ * `proseBlocks` would take for a line break, is a space.
+ */
+const asSource = (lines: readonly string[]): string =>
+  lines.join('\n').replaceAll('\r', ' ');
 
-/** A closing keyword is a trailer in a pull request's description only. */
-const isTrailer = (line: string, kind: DescriptionKind): boolean =>
-  isTrailerLine(line) ||
-  (kind === 'pull-request' && CLOSING_KEYWORD.test(stripInlineCode(line)));
+/**
+ * `line` with each code span U+FFFC, as `proseBlocks` shows one: no keyword is
+ * read across it, so a reference after one stays a reference.
+ */
+const stripInlineCode = (line: string): string =>
+  line.replaceAll(/(`+)[^`]*?\1/gu, '\u{FFFC}');
+
+/** The lines each closing keyword is written over, in a pull request's description. */
+const keywordSpans = (
+  lines: readonly string[],
+  kind: DescriptionKind,
+): readonly Readonly<{ firstLine: number; lastLine: number }>[] =>
+  kind === 'pull-request'
+    ? shownMatches(asSource(lines), CLOSING_KEYWORD)
+    : ([] as const);
+
+/**
+ * Which of `lines` are trailers: a `Start-After:` or `Claude-Session:` line
+ * outside a code fence, as `pr-report-core` reads one, and, in a pull request's
+ * description only, a closing keyword in the text a block shows
+ * (`shownMatches`), as `pr-report` reads one. A keyword in code, a code span or
+ * an HTML comment is no trailer, since GitHub shows none.
+ *
+ * A keyword is pinned to every line it is written over: `Closes` and `#2` on
+ * two lines are both trailers.
+ */
+const trailerLines = (
+  lines: readonly string[],
+  kind: DescriptionKind,
+  spans: ReturnType<typeof keywordSpans> = keywordSpans(lines, kind),
+): readonly boolean[] => {
+  const keywordLines = new Set(
+    spans.flatMap(({ firstLine, lastLine }) =>
+      Array.from(
+        { length: lastLine - firstLine + 1 },
+        (_, offset) => firstLine + offset,
+      ),
+    ),
+  );
+
+  // A declaration in fenced code is an example, as `pr-report-core` reads it.
+  const visible = outsideCodeFences(lines.join('\n')).split('\n');
+
+  return lines.map(
+    (_, i) => isTrailerLine(visible[i] ?? '') || keywordLines.has(i),
+  );
+};
 
 /** The first trailer `half` holds, as a problem; `undefined` when none. */
 const trailerProblem = (
@@ -474,15 +529,35 @@ const trailerProblem = (
   lines: readonly string[],
   kind: DescriptionKind,
 ): string | undefined => {
-  const trailer = lines.find((line) => isTrailer(line, kind));
+  const spans = keywordSpans(lines, kind);
 
-  return trailer === undefined
-    ? undefined
-    : isTrailerLine(trailer)
-      ? `the ${half} has the trailer "${trailer.trim()}"; Start-After: and Claude-Session: lines are read wherever they are, so each appears once, after the "---" rule that ends the translation`
-      : // Both readings and no flag: a file does not say which it is, and
-        // `--issue` passes a pull request's that GitHub would still act on.
-        `the ${half} has the closing keyword "${trailer.trim()}"; read as a pull request's description, as this is, GitHub acts on one wherever it is, so it appears once, after the "---" rule that ends the translation. In an issue's description one is prose and stays where it is`;
+  const isTrailer = trailerLines(lines, kind, spans);
+
+  const first = isTrailer.indexOf(true);
+
+  const trailer = lines[first];
+
+  if (trailer === undefined) {
+    return undefined;
+  }
+
+  if (isTrailerLine(trailer)) {
+    return `the ${half} has the trailer "${trailer.trim()}"; Start-After: and Claude-Session: lines are read wherever they are, so each appears once, after the "---" rule that ends the translation`;
+  }
+
+  // A keyword written over several lines is quoted over all of them, so that
+  // the quote holds its number. The first line flagged begins one.
+  const last =
+    spans.find(({ firstLine }) => firstLine === first)?.lastLine ?? first;
+
+  const keyword = lines
+    .slice(first, last + 1)
+    .map((line) => line.trim())
+    .join(' ');
+
+  // Both readings and no flag: a file does not say which it is, and `--issue`
+  // passes a pull request's that GitHub would still act on.
+  return `the ${half} has the closing keyword "${keyword}"; read as a pull request's description, as this is, GitHub acts on one wherever it is, so it appears once, after the "---" rule that ends the translation. In an issue's description one is prose and stays where it is`;
 };
 
 const headingOf = (line: string): readonly Heading[] => {
@@ -702,6 +777,18 @@ const reviewSectionIn = (
 };
 
 /**
+ * In a pull request's description, what each line a closing keyword spans shows
+ * besides its keywords (`shownOutsideMatches`).
+ */
+const shownBesideKeywords = (
+  lines: readonly string[],
+  kind: DescriptionKind,
+): ReadonlyMap<number, string> =>
+  kind === 'pull-request'
+    ? shownOutsideMatches(asSource(lines), CLOSING_KEYWORD)
+    : new Map<number, string>();
+
+/**
  * The `#N` a half names, outside code, table rows, declarations and, in a pull
  * request, closing keywords: a table, like code, appears in the original only,
  * and the rest are read by tools, not translated. In an issue a closing keyword
@@ -710,18 +797,30 @@ const reviewSectionIn = (
 const referencesIn = (
   lines: readonly string[],
   kind: DescriptionKind,
-): ReadonlySet<number> =>
-  new Set(
+): ReadonlySet<number> => {
+  // In a pull request, a line a closing keyword spans, read as `trailerLines`
+  // reads one however the keyword is marked up, is what it shows besides.
+  const besideKeywords = shownBesideKeywords(lines, kind);
+
+  return new Set(
     lines
-      .filter(
-        (line) =>
-          !TABLE_ROW.test(line) &&
-          !isDeclaration(line) &&
-          !MERGE_BEFORE_NOTE.test(line),
-      )
-      .map(stripInlineCode)
-      .map((line) =>
-        kind === 'pull-request' ? line.replaceAll(CLOSING_KEYWORDS, '') : line,
+      .flatMap((line, i) =>
+        TABLE_ROW.test(line) ||
+        isDeclaration(line) ||
+        MERGE_BEFORE_NOTE.test(line)
+          ? []
+          : [
+              besideKeywords.get(i) ??
+                // A keyword GitHub does not show, in a comment or indented
+                // code, is still the author's keyword. Folding changes no
+                // digit.
+                (kind === 'pull-request'
+                  ? asciiLowerCase(stripInlineCode(line)).replaceAll(
+                      CLOSING_KEYWORDS,
+                      '',
+                    )
+                  : stripInlineCode(line)),
+            ],
       )
       .flatMap((line) =>
         Array.from(line.matchAll(REFERENCE), (match) =>
@@ -729,12 +828,60 @@ const referencesIn = (
         ),
       ),
   );
+};
 
-const normalized = (text: string, kind: DescriptionKind): string =>
-  text
-    .split('\n')
-    .map((line) => line.trimEnd())
-    .filter((line) => !MERGE_AFTER.test(line) && !isTrailer(line, kind))
+/** `line` with each closing keyword it holds cut out, its case kept. */
+const withoutKeywordsAsWritten = (line: string): string => {
+  const mut_parts: string[] = [];
+
+  let mut_at = 0;
+
+  // Folding changes no position, so a match in the folded line is one in it.
+  for (const match of asciiLowerCase(line).matchAll(CLOSING_KEYWORD)) {
+    mut_parts.push(line.slice(mut_at, match.index));
+
+    mut_at = match.index + match[0].length;
+  }
+
+  mut_parts.push(line.slice(mut_at));
+
+  return mut_parts.join('');
+};
+
+/**
+ * `text` as `changedParts` compares it: without its `Merge-After:` and other
+ * trailer lines, and a line a closing keyword spans without the keyword, or
+ * nothing when that is all it holds.
+ */
+const normalized = (text: string, kind: DescriptionKind): string => {
+  const lines = text.split('\n').map((line) => line.trimEnd());
+
+  const isDeclared = trailerLines(lines, kind, []);
+
+  const besideKeywords = shownBesideKeywords(lines, kind);
+
+  return lines
+    .flatMap((line, i) => {
+      if (MERGE_AFTER.test(line) || isDeclared[i] === true) {
+        return [];
+      }
+
+      const beside = besideKeywords.get(i);
+
+      if (beside === undefined) {
+        return [line];
+      }
+
+      // A keyword on one line is cut out of the line as written, so that the
+      // line compares with itself once the keyword moves; one the line alone
+      // does not hold, over two lines or within markup, leaves what it shows.
+      const cut = withoutKeywordsAsWritten(line);
+
+      const rest = (cut === line ? beside : cut).trim();
+
+      return rest === '' ? [] : [rest];
+    })
     .join('\n')
     .replaceAll(/\n{3,}/gu, '\n\n')
     .trim();
+};

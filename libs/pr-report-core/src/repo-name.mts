@@ -72,7 +72,12 @@ export const readIssueNumber = (digits: string): readonly number[] => {
     : [];
 };
 
-const DIGITS = /^\d+$/u;
-
-const asciiLowerCase = (text: string): string =>
+/**
+ * `text` with `A` to `Z` lowered and nothing else changed. `toLowerCase` would
+ * also fold U+212A KELVIN SIGN to `k`, so a keyword or a repository name GitHub
+ * never reads could match.
+ */
+export const asciiLowerCase = (text: string): string =>
   text.replaceAll(/[A-Z]/gu, (letter) => letter.toLowerCase());
+
+const DIGITS = /^\d+$/u;

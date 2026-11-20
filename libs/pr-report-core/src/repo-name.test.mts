@@ -1,4 +1,5 @@
 import {
+  asciiLowerCase,
   isRepoApiUrl,
   isRepoNamed,
   isSameRepo,
@@ -146,5 +147,11 @@ describe(readIssueNumber, () => {
 
   test('reads nothing from digits past the safe integers', () => {
     assert.deepStrictEqual(readIssueNumber('9'.repeat(20)), []);
+  });
+});
+
+describe(asciiLowerCase, () => {
+  test('lowers A to Z alone', () => {
+    assert.strictEqual(asciiLowerCase('Fixes \u{212A} É'), 'fixes \u{212A} É');
   });
 });

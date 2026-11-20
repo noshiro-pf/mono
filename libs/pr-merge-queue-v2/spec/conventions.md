@@ -90,9 +90,9 @@ The issues a pull request closes are:
   written HTML.
 - Over REST as over GraphQL: every REST read of a pull request's body asks for
   its rendering too, with `application/vnd.github.full+json` (**Changed in v2**:
-  v1's `pr-report` read the text, outside fenced code, without GraphQL). An
-  answer without the `body_html` key fails to decode; a null one is GitHub's for
-  a null body and closes nothing.
+  without GraphQL, v1's `pr-report` read the text a Markdown parser shows,
+  `libs/pr-merge-queue/src/markdown/`). An answer without the `body_html` key
+  fails to decode; a null one is GitHub's for a null body and closes nothing.
 
 Only this repository's issues count, in first-appearance order, each once. The
 owner and name in an issue URL are compared case-insensitively.

@@ -60,8 +60,9 @@ jobs:
           # - The worker imports `unblock-prs/` and `lib/`, and reads
           #   `.github/unblock-prs.json` (`readConfig`) before the first survey.
           # - `run-unblock-prs-skill` imports `run-unblock-prs-skill/`,
-          #   `claim-pr/`, `pr-report/`, `report-unowned-prs/`, `unblock-prs/`
-          #   and `lib/`. The sessions it starts read the skill afresh.
+          #   `claim-pr/`, `pr-report/` (with `markdown/`), `report-unowned-prs/`,
+          #   `unblock-prs/` and `lib/`. The sessions it starts read the skill
+          #   afresh.
           # The other workspace libraries they import (`ts-data-forge`, …)
           # are left out: they change often and the queue's behavior rarely
           # waits on them, so a TODO for each would be noise; the guard's
@@ -69,7 +70,7 @@ jobs:
           src='libs/pr-merge-queue/src'
           core='libs/pr-report-core/src/'
           worker_re="^(${src}/(unblock-prs/|lib/|cmd/unblock-prs\.mts$)|${core})"
-          runner_re="^(${src}/(run-unblock-prs-skill/|claim-pr/|pr-report/|report-unowned-prs/|unblock-prs/|lib/|cmd/run-unblock-prs-skill\.mts$)|${core})"
+          runner_re="^(${src}/(run-unblock-prs-skill/|claim-pr/|pr-report/|markdown/|report-unowned-prs/|unblock-prs/|lib/|cmd/run-unblock-prs-skill\.mts$)|${core})"
 
           # Blobless: the name diff reads trees only, and the one blob diff
           # below (`package.json`) is fetched on demand.

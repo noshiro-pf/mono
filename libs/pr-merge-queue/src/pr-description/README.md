@@ -102,8 +102,9 @@ description も、次の `push` で訳文に同じものを置きます。
 - 訳文に表か画像がある。どちらも原文に1度だけ置き、訳文はそれを参照します。
 - 訳文に `Merge-After:` の行がある。ツールは本文のどこにあっても読むので、
   食い違った写しも効いてしまいます。原文に1度だけ置きます。
-- トレーラ（`Start-After:`・`Claude-Session:` の行、pull request なら closing
-  keyword）が原文か訳文の中にある。ツールと GitHub はどこにあっても読むので、
+- トレーラ（`Start-After:`・`Claude-Session:` の行、pull request なら GitHub
+  が表示する closing keyword。コード、コードスパン、HTML コメントの中は除く）が
+  原文か訳文の中にある。ツールと GitHub はどこにあっても読むので、
   訳文の後の `---` 行より後に1度だけ置きます。GitHub は issue の本文の closing
   keyword では何もしないので、issue（`create`、issue への `push`、
   `check --issue`）ではただの文として扱い、`#N` も数えます。`push` は番号が
@@ -247,10 +248,11 @@ blocks are in the original alone gets them in the translation too.
   so a copy that drifted would be obeyed too, and it appears once, in the
   original;
 - either half holds a trailer — a `Start-After:` or `Claude-Session:` line, or
-  in a pull request a closing keyword — which the tools and GitHub read wherever
-  it is, so it appears once, after the `---` rule. GitHub acts on no closing
-  keyword in an issue, so there (`create`, `push` to an issue, `check --issue`)
-  one is prose and its `#N` counts; `push` asks GitHub which the number is;
+  in a pull request a closing keyword GitHub shows, outside code, a code span
+  and an HTML comment — which the tools and GitHub read wherever it is, so it
+  appears once, after the `---` rule. GitHub acts on no closing keyword in an
+  issue, so there (`create`, `push` to an issue, `check --issue`) one is prose
+  and its `#N` counts; `push` asks GitHub which the number is;
 - a `Merge-After:` or `Start-After:` line outside code fences, the trailers
   included, names no `#N`, or a line meant as one is no declaration line: its
   key behind a list marker (`-`, `+`, `*`, a number, a task box) or emphasis

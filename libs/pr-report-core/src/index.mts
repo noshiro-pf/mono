@@ -2,6 +2,7 @@ export * from './branch-rules.mjs';
 export * from './checks.mjs';
 export * from './claim.mjs';
 export * from './closing-issues.mjs';
+export * from './closing-keywords.mjs';
 export * from './code-owners.mjs';
 export * from './description-lines.mjs';
 export * from './issue-claim.mjs';
