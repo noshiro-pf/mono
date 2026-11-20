@@ -1,6 +1,7 @@
 export * from './answer-diff.mjs';
 export * from './create-mail-body.mjs';
 export * from './deadline-passed.mjs';
+export * from './deleted-user-writes.mjs';
 export * from './is-current-event-answer-path.mjs';
 export * from './is-only-user-id-cleared.mjs';
 export * from './is-reminder-hour.mjs';

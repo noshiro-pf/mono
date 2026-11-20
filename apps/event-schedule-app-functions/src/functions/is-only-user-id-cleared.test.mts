@@ -1,4 +1,5 @@
 import { Answer } from 'event-schedule-app-shared';
+import { deletedUserId } from './deleted-user-writes.mjs';
 import { isOnlyUserIdCleared } from './is-only-user-id-cleared.mjs';
 
 describe(isOnlyUserIdCleared, () => {
@@ -8,7 +9,16 @@ describe(isOnlyUserIdCleared, () => {
     comment: 'hello',
   });
 
-  test('is true when only user.id became null, as onUserDelete writes it', () => {
+  test('is true when only user.id became the deleted account id, as onUserDelete writes it', () => {
+    assert.isTrue(
+      isOnlyUserIdCleared(
+        before,
+        Answer.fill({ ...before, user: { ...before.user, id: deletedUserId } }),
+      ),
+    );
+  });
+
+  test('is true when only user.id became null, as onUserDelete wrote it before', () => {
     assert.isTrue(
       isOnlyUserIdCleared(
         before,

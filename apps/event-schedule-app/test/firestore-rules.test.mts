@@ -6,9 +6,10 @@
  * Each case starts from the same data (`seed`): Bob's event `owned`, whose
  * `archivedBy` holds entries Alice and Bob left under old names and one of
  * Carol's; `duplicated`, whose `archivedBy` holds one of Alice's twice; an
- * anonymous event `anonymous`; and Bob's events `open` and `closed`, whose
- * answer deadlines are ahead and past. Each has an answer of Alice's, and `owned` an
- * anonymous answer too.
+ * anonymous event `anonymous`; `deleted`, the event of an account since
+ * deleted; and Bob's events `open` and `closed`, whose answer deadlines are
+ * ahead and past. Each has an answer of Alice's, and `owned` an anonymous answer
+ * and one of the deleted account too.
  */
 import {
   initializeTestEnvironment,
@@ -491,6 +492,51 @@ const cases = (): readonly Case[] =>
       expected: 'denied',
     },
 
+    // What a deleted account made: `onUserDelete` leaves `''` as its id.
+    {
+      name: 'a signed-out user edits the event of a deleted account',
+      actor: 'signed out',
+      operation: (db) =>
+        updateDoc(doc(db, 'events_v7/deleted'), { title: 'Renamed' }),
+      expected: 'denied',
+    },
+    {
+      name: 'a signed-in user edits the event of a deleted account',
+      actor: 'alice',
+      operation: (db) =>
+        updateDoc(doc(db, 'events_v7/deleted'), { title: 'Renamed' }),
+      expected: 'denied',
+    },
+    {
+      name: 'anyone writes internal/values of the event of a deleted account',
+      actor: 'signed out',
+      operation: (db) =>
+        setDoc(doc(db, 'events_v7/deleted/internal/values'), {
+          email: 'someone@example.com',
+        }),
+      expected: 'denied',
+    },
+    {
+      name: 'anyone answers the event of a deleted account',
+      actor: 'signed out',
+      operation: (db) =>
+        setDoc(doc(db, 'events_v7/deleted/answers/new'), answer(anonymous)),
+      expected: 'allowed',
+    },
+    {
+      name: 'a signed-out user edits the answer of a deleted account',
+      actor: 'signed out',
+      operation: (db) =>
+        setDoc(doc(db, 'events_v7/owned/answers/deleted'), answer(anonymous)),
+      expected: 'denied',
+    },
+    {
+      name: 'a signed-out user deletes the answer of a deleted account',
+      actor: 'signed out',
+      operation: (db) => deleteDoc(doc(db, 'events_v7/owned/answers/deleted')),
+      expected: 'denied',
+    },
+
     // `internal/closingMail`: the functions' record of the "answers closed"
     // mail, which no rule matches.
     {
@@ -534,6 +580,9 @@ const bob = { id: 'bob', name: 'Bob' } as const;
 const carol = { id: 'carol', name: 'Carol' } as const;
 
 const anonymous = { id: null, name: 'Someone' } as const;
+
+/** What `onUserDelete` leaves of an account. */
+const deletedAccount = { id: '', name: 'Dave' } as const;
 
 /** Entries left under names their users no longer have. */
 const aliceOld1 = { id: 'alice', name: 'Alice (1)' } as const;
@@ -585,6 +634,16 @@ const seed = async (): Promise<void> => {
     batch.set(db.doc('events_v7/owned/answers/alice'), answer(alice));
 
     batch.set(db.doc('events_v7/owned/answers/anonymous'), answer(anonymous));
+
+    batch.set(
+      db.doc('events_v7/deleted'),
+      eventSchedule({ author: deletedAccount }),
+    );
+
+    batch.set(
+      db.doc('events_v7/owned/answers/deleted'),
+      answer(deletedAccount),
+    );
 
     batch.set(db.doc('events_v7/closed/answers/alice'), answer(alice));
 

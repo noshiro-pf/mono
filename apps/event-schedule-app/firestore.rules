@@ -11,6 +11,10 @@
 //   `author.id` and is edited by that account only; one created anonymously
 //   has `author.id == null` and stays editable by anyone who has the URL, as
 //   the app has always let it be. Nothing deletes an event.
+// - An account's deletion leaves `''` where its uid was, in `author.id` and
+//   `user.id` (`deletedUserId` of event-schedule-app-functions), never
+//   `null`: no uid is empty, so `owns` matches no one and what it made is
+//   edited by no one. Answers to its events are still taken.
 // - `archivedBy` is per user: a signed-in user adds or removes their own entry
 //   and touches nothing else. An author's edit leaves it as it is.
 // - Answers are public and anyone may post one. An answer with `user.id` is
