@@ -47,7 +47,10 @@ import {
 import type { AnswerSelectionValue } from '../../types/index.mjs';
 import { Obj } from '../../utils-ported/index.mjs';
 import { createReducerWithActions } from '../../utils/index.mjs';
-import type { AnswersFetcher } from '../fetching-state/index.mjs';
+import type {
+  AnswersFetcher,
+  EventScheduleFetcher,
+} from '../fetching-state/index.mjs';
 import type { AppRouter } from '../router-store.mjs';
 
 export type AnswerPageDeps = Readonly<{
@@ -58,7 +61,15 @@ export type AnswerPageDeps = Readonly<{
   auth: Readonly<{ getFireAuthUserSnapshot: () => SignedInUser | undefined }>;
   router: StrictPick<AppRouter, 'eventId$' | 'push'>;
   eventSchedule$: InitializedObservable<EventSchedule | undefined>;
-  /** Where the page says that an answer was saved. */
+  /**
+   * Read again after a write the database refused, so that the page shows the
+   * deadline when it was the reason.
+   */
+  eventSchedule: StrictPick<
+    EventScheduleFetcher,
+    'refetchEventScheduleAfterWrite'
+  >;
+  /** Where the page says that an answer was saved, or was not. */
   toast: Promise<Toaster>;
 }>;
 
@@ -270,14 +281,18 @@ export const createAnswerPageStore = (deps: AnswerPageDeps): AnswerPage => {
 
   /**
    * Saves through `write`, keeping the section as it is drawn with its button
-   * spinning, then hides it whatever the result. Nothing else is started on the
-   * section meanwhile: the graph has only `saved` from `saving`.
+   * spinning. A write that went through hides the section, clears what was
+   * typed and says so. One the database refused (past the deadline, a name or
+   * comment too long, an answer whose owner changed) brings the section back as
+   * it was, with what was typed, says so, and reads the event again, so that a
+   * deadline passed meanwhile shows. Nothing else is started on the section
+   * meanwhile: the graph has only `saved` and `failed` from `saving`.
    */
   const save = async (
     action: SectionAction &
       Readonly<{ type: 'delete' | 'submit' | 'submitEmpty' }>,
     write: () => Promise<Result<unknown, unknown>>,
-    successMessage: string | undefined,
+    messages: Readonly<{ success: string; error: string }>,
   ): Promise<void> => {
     if (!sectionMachine.can(getSection(), action.type)) {
       return;
@@ -286,12 +301,23 @@ export const createAnswerPageStore = (deps: AnswerPageDeps): AnswerPage => {
     dispatchSection(action);
 
     // `deps.api` returns every failure as an `Err` (`Result.fromPromise`), so
-    // this settles, and `saved` follows.
+    // this settles, and `saved` or `failed` follows.
     const res = await write();
 
     if (Result.isErr(res)) {
-      // TODO: use toast
       console.error(res.value);
+
+      dispatchSection({ type: 'failed' });
+
+      deps.eventSchedule.refetchEventScheduleAfterWrite();
+
+      showToast({
+        toast: deps.toast,
+        message: messages.error,
+        intent: 'danger',
+      });
+
+      return;
     }
 
     dispatchSection({ type: 'saved' });
@@ -300,13 +326,11 @@ export const createAnswerPageStore = (deps: AnswerPageDeps): AnswerPage => {
 
     clearAnswerBeingEditedFields();
 
-    if (successMessage !== undefined) {
-      showToast({
-        toast: deps.toast,
-        message: successMessage,
-        intent: 'success',
-      });
-    }
+    showToast({
+      toast: deps.toast,
+      message: messages.success,
+      intent: 'success',
+    });
   };
 
   const onUserNameChange = (userName: UserName): void => {
@@ -392,8 +416,14 @@ export const createAnswerPageStore = (deps: AnswerPageDeps): AnswerPage => {
               ...answerBeingEdited,
               createdAt: DateUtils.now(),
             }),
-          dict.answerPage.answerBeingEdited.submitButton
-            .createAnswerResultMessage,
+          {
+            success:
+              dict.answerPage.answerBeingEdited.submitButton
+                .createAnswerResultMessage,
+            error:
+              dict.answerPage.answerBeingEdited.submitButton
+                .createAnswerErrorMessage,
+          },
         );
 
         break;
@@ -407,8 +437,14 @@ export const createAnswerPageStore = (deps: AnswerPageDeps): AnswerPage => {
               answerBeingEdited.id,
               answerBeingEdited,
             ),
-          dict.answerPage.answerBeingEdited.submitButton
-            .updateAnswerResultMessage,
+          {
+            success:
+              dict.answerPage.answerBeingEdited.submitButton
+                .updateAnswerResultMessage,
+            error:
+              dict.answerPage.answerBeingEdited.submitButton
+                .updateAnswerErrorMessage,
+          },
         );
 
         break;
@@ -447,7 +483,7 @@ export const createAnswerPageStore = (deps: AnswerPageDeps): AnswerPage => {
               },
             })).value,
         ),
-      dict.answerPage.answerLater.result.success,
+      dict.answerPage.answerLater.result,
     );
   };
 
@@ -463,7 +499,14 @@ export const createAnswerPageStore = (deps: AnswerPageDeps): AnswerPage => {
     await save(
       { type: 'delete' },
       () => deps.api.answers.delete(eventId, answerBeingEdited.id),
-      undefined,
+      {
+        success:
+          dict.answerPage.answerBeingEdited.deleteButton
+            .deleteAnswerResultMessage,
+        error:
+          dict.answerPage.answerBeingEdited.deleteButton
+            .deleteAnswerErrorMessage,
+      },
     );
   };
 
@@ -860,6 +903,7 @@ type SectionAction = Readonly<
   | { type: 'cancel' }
   | { type: 'delete' }
   | { type: 'edit' }
+  | { type: 'failed' }
   | { type: 'saved' }
   | { type: 'submit' }
   | { type: 'submitEmpty' }
@@ -885,7 +929,7 @@ const sectionMachine = defineMachine<Section, SectionAction>()(
       submitEmpty: 'saving',
       delete: 'saving',
     },
-    saving: { saved: 'hidden' },
+    saving: { saved: 'hidden', failed: ['creating', 'editing', 'hidden'] },
   },
   {
     hidden: {
@@ -908,7 +952,12 @@ const sectionMachine = defineMachine<Section, SectionAction>()(
       submitEmpty: () => ({ type: 'saving', shown: 'editing' }),
       delete: () => ({ type: 'saving', shown: 'editing' }),
     },
-    saving: { saved: () => hidden },
+    saving: {
+      saved: () => hidden,
+      // Back to the section as it was drawn, what was typed kept.
+      failed: (state) =>
+        state.shown === 'hidden' ? hidden : { type: state.shown },
+    },
   },
 );
 

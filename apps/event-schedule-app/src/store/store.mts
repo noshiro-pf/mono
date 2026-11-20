@@ -138,6 +138,7 @@ export const AnswerPageStore = createAnswerPageStore({
   auth: Auth,
   router: Router,
   eventSchedule$,
+  eventSchedule: EventScheduleStore,
   toast: toaster,
 });
 
