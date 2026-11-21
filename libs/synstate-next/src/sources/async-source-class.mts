@@ -30,13 +30,14 @@ export class AsyncSourceClass<A> extends ObservableClass<A> {
   }
 
   /**
-   * Emits `value` unless disposed, as an event (see `publishEvent`); `last`
-   * settles it. A value given while the graph drains (another library's
-   * callback run by a `map`) waits until the round's effects have run, as a
-   * write does.
+   * Emits `value` unless disposed or done, as an event (see `publishEvent`);
+   * `last` settles it. A value given after the last one is dropped, as a
+   * subscribable that breaks its contract may give one. A value given while the
+   * graph drains (another library's callback run by a `map`) waits until the
+   * round's effects have run, as a write does.
    */
   protected deliver(value: A, last: boolean): void {
-    if (this.disposed) {
+    if (this.disposed || this.#mut_done) {
       return;
     }
 

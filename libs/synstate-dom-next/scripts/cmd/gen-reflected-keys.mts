@@ -4,6 +4,7 @@ import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import { Arr } from 'ts-data-forge';
 import { formatFiles, Result } from 'ts-repo-utils';
+import type { ReadonlyRecord } from 'ts-type-forge';
 import * as ts from 'typescript';
 import { propertyNames } from '../../src/bind/dom-tables.mjs';
 import { workspaceRootPath } from '../workspace-root-path.mjs';
@@ -55,11 +56,15 @@ const probeSource = dedent`
 
 /**
  * Writes, for each tag of `HTMLElementTagNameMap`, the keys its props type
- * admits as attributes: what `ReflectedProps` lets through, less the keys
- * written as properties (`propertyNames`). The browser test
- * `ported/reflected-keys.test.tsx` binds each one and reads the property back.
- * A TypeScript update that changes the keys leaves the tree dirty after
+ * admits: what `ReflectedProps` lets through, as two lists, the keys written as
+ * attributes and those written as properties (`propertyNames`). The browser
+ * test `ported/reflected-keys.test.tsx` binds each one and reads the property
+ * back. A TypeScript update that changes the keys leaves the tree dirty after
  * `ws:gen`, and the generated file's first line names this command.
+ *
+ * It fails on an entry of `propertyNames` that no tag admits under any of those
+ * libraries: one a `lib.dom.d.ts` drops or renames is still admitted while an
+ * older one a consumer may compile against has it, and is dead once none does.
  *
  * The props are mapped types over `HTMLElementTagNameMap`, so a consumer's
  * compiler evaluates them against the consumer's own `lib.dom.d.ts` (#3449).
@@ -88,20 +93,22 @@ const genReflectedKeys = async (): Promise<void> => {
     ),
   );
 
-  const [first, ...rest] = keysByTag.map(([, keys]) => keys);
-
-  const common = (first ?? []).filter((key) =>
-    rest.every((keys) => keys.includes(key)),
+  const notAdmitted = Arr.setDifference(
+    propertyNames,
+    keysByTag.flatMap(([, keys]) => keys),
   );
 
-  const commonSet = new Set(common);
+  if (Arr.isNonEmpty(notAdmitted)) {
+    throw new Error(
+      `no tag's props admit ${notAdmitted.join(', ')} of propertyNames (src/bind/dom-tables.mts): remove the entry if no lib.dom.d.ts has the property any more, or fix the props types (src/jsx/element-props.mts) if they dropped a key they should admit`,
+    );
+  }
 
-  const byTag = Object.fromEntries(
-    keysByTag.map(([tag, keys]) => [
-      tag,
-      keys.filter((key) => !commonSet.has(key)),
-    ]),
-  );
+  const properties = new Set<string>(propertyNames);
+
+  const attributes = splitCommon(keysByTag, (key) => !properties.has(key));
+
+  const written = splitCommon(keysByTag, (key) => properties.has(key));
 
   const source = dedent`
     // Written by \`pnpm run gen:reflected-keys\` from the props types; do not edit.
@@ -113,13 +120,25 @@ const genReflectedKeys = async (): Promise<void> => {
     // for.
 
     /** The keys the props of every HTML element admit as attributes. */
-    export const commonReflectedKeys = ${JSON.stringify(common)} as const;
+    export const commonReflectedKeys = ${JSON.stringify(attributes.common)} as const;
 
     /**
      * The keys the props of each HTML element admit as attributes beyond
      * \`commonReflectedKeys\`.
      */
-    export const reflectedKeysByTag = ${JSON.stringify(byTag)} as const;
+    export const reflectedKeysByTag = ${JSON.stringify(attributes.byTag)} as const;
+
+    /**
+     * The keys the props of every HTML element admit that are written as properties
+     * (\`propertyNames\`).
+     */
+    export const commonPropertyKeys = ${JSON.stringify(written.common)} as const;
+
+    /**
+     * The keys the props of each HTML element admit that are written as properties,
+     * beyond \`commonPropertyKeys\`.
+     */
+    export const propertyKeysByTag = ${JSON.stringify(written.byTag)} as const;
   `;
 
   // eslint-disable-next-line security/detect-non-literal-fs-filename -- a fixed path in this package
@@ -192,7 +211,7 @@ const checkedDiagnostics = (program: ts.Program): readonly ts.Diagnostic[] => {
 };
 
 /**
- * The keys each tag's props admit as attributes, under the package's config.
+ * The keys each tag's props admit, under the package's config.
  *
  * With `libDir` undefined, that is the repository's own program, the strict
  * library included; any diagnostic fails it.
@@ -297,13 +316,10 @@ const keysUnder = (libDir: string | undefined): KeysByTag => {
 
   const probeType = checker.getDeclaredTypeOfSymbol(exported);
 
-  const properties = new Set<string>(propertyNames);
-
   return checker.getPropertiesOfType(probeType).map((tag) => {
     const keys = checker
       .getPropertiesOfType(checker.getTypeOfSymbol(tag))
       .map((p) => p.name)
-      .filter((key) => !properties.has(key))
       .toSorted();
 
     return [tag.name, keys] as const;
@@ -347,6 +363,40 @@ const unionOfKeys = (lists: readonly KeysByTag[]): KeysByTag => {
     mut_keys,
     ([tag, keys]) => [tag, Array.from(keys).toSorted()] as const,
   );
+};
+
+/**
+ * Of the keys `isIncluded` keeps, those every tag has, and for each tag those it
+ * has beyond them.
+ */
+const splitCommon = (
+  keysByTag: KeysByTag,
+  isIncluded: (key: string) => boolean,
+): Readonly<{
+  common: readonly string[];
+  byTag: ReadonlyRecord<string, readonly string[]>;
+}> => {
+  const included = keysByTag.map(
+    ([tag, keys]) => [tag, keys.filter(isIncluded)] as const,
+  );
+
+  const [first, ...rest] = included.map(([, keys]) => keys);
+
+  const common = (first ?? []).filter((key) =>
+    rest.every((keys) => keys.includes(key)),
+  );
+
+  const commonSet = new Set(common);
+
+  return {
+    common,
+    byTag: Object.fromEntries(
+      included.map(([tag, keys]) => [
+        tag,
+        keys.filter((key) => !commonSet.has(key)),
+      ]),
+    ),
+  };
 };
 
 await genReflectedKeys();

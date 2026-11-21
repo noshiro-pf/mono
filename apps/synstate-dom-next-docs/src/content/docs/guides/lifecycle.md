@@ -5,7 +5,7 @@ description: Where owners are created, what they dispose, and the two habits tha
 
 ## Owners
 
-synstate-dom-next has no lifetime of its own: it uses synstate-next's owners, which are the only lifetime there is. Everything created while an owner's `run` executes belongs to that owner: the observables, the bindings, the subscriptions, the cleanups registered with `onCleanup`, and the owners created inside it. Disposing an owner disposes its child owners, then runs its cleanups, then disposes its nodes, each newest first. Nothing is reference-counted, and nothing travels down the graph to say that a source has ended: what depends on something goes when its owner goes.
+synstate-dom-next has no lifetime of its own: it uses synstate-next's owners, which are the only lifetime there is. Everything created while an owner's `run` executes belongs to that owner: the observables, the bindings, the subscriptions, the cleanups registered with `onCleanup`, and the owners created inside it. Disposing an owner first stops every binding and subscription in it, its child owners' included, so that none writes what a cleanup sets (save what a projection or a setup made before disposing an owner of its own observable); then it disposes its child owners, runs its cleanups and disposes its nodes, each newest first. Nothing is reference-counted, and nothing travels down the graph to say that a source has ended: what depends on something goes when its owner goes.
 
 An owner is created only where something can be disposed on its own:
 

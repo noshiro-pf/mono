@@ -19,8 +19,9 @@ export type Subscribable<A> = Readonly<{
 /**
  * Follows `subscribable`, emitting each of its values as `Result.ok(value)` and
  * an error as `Result.err(error)`. It settles on the error or on completion,
- * and unsubscribes when disposed, unless the subscribable ended first. A value
- * given while it subscribes is held from the start rather than emitted.
+ * and drops what the subscribable gives after either; it unsubscribes when
+ * disposed, unless the subscribable ended first. A value given while it
+ * subscribes is held from the start rather than emitted.
  */
 export const fromSubscribable = <A, E = unknown>(
   subscribable: Subscribable<A>,
@@ -69,7 +70,7 @@ class FromSubscribableClass<A, E> extends AsyncSourceClass<Result<A, E>> {
   }
 
   #receive(value: Result<A, E>, last: boolean): void {
-    if (!this.#subscribing) {
+    if (!this.#subscribing || this.done) {
       this.deliver(value, last);
 
       return;

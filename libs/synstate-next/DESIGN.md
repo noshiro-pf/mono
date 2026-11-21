@@ -152,10 +152,18 @@ the function again from inside itself.
 ## Ownership
 
 An owner is the only lifetime. Everything created while an owner's `run`
-executes belongs to it; disposing it disposes the child owners, then runs the
-cleanups, then disposes the nodes, each newest first. There is no reference
-counting and no completion travelling down the graph: a source that ends is
-disposed, and what depends on it is disposed with its owner.
+executes belongs to it; disposing it first takes everything in it out of the
+updates, its child owners' and its nodes' own owners included, then disposes the
+child owners, then runs the cleanups, then disposes the nodes, each newest
+first. Taking the subtree out first (as a switch retires a branch) means that no
+subscription or binding in it runs for what a cleanup writes or the disposal
+sets off, as in synstate since #3609, and that a cleanup reads the derived
+values the nodes held when the disposal began, even after it writes a state they
+follow. A projection or a setup that disposes an owner of its own node is the
+exception: what it made there before may still hear the cleanups (see
+`Owner#retireJoined`).
+There is no reference counting and no completion travelling down the graph: a
+source that ends is disposed, and what depends on it is disposed with its owner.
 
 A disposed child (an owner, a node in a parent's `children`) is not looked up
 and spliced out: it is skipped, and the list is compacted once half of it is
