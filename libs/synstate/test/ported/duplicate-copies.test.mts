@@ -3,7 +3,7 @@
  * copies of the package build one graph; synstate refuses it (DESIGN.md), and
  * this is where the refusal is checked.
  */
-import type * as SynstateNext from 'synstate';
+import type * as SynstateModule from 'synstate';
 
 describe('two copies of synstate in one program', () => {
   test('each load is a distinct copy', async () => {
@@ -47,7 +47,7 @@ describe('two copies of synstate in one program', () => {
 
 // Each call loads a new module graph, standing for one more copy of the package
 // in the same program, as a bundle that resolves two installations has.
-const loadCopy = async (): Promise<typeof SynstateNext> => {
+const loadCopy = async (): Promise<typeof SynstateModule> => {
   vi.resetModules();
 
   return import('synstate');

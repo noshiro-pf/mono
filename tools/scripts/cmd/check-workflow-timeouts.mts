@@ -172,11 +172,6 @@ const LONGER_TIMEOUTS: ReadonlyRecord<string, LongerTimeout> = {
   'synstate-benchmark.yml#measure': {
     minutes: 120,
     reason:
-      'the same measurement as synstate-next-benchmark.yml, of the site that replaced it; dispatched by hand, it holds no merge',
-  },
-  'synstate-next-benchmark.yml#measure': {
-    minutes: 120,
-    reason:
       'it measures every library in every scenario several times, each in a process of its own: a run with seven processes each took 68 minutes on the runner; dispatched by hand, it holds no merge',
   },
   'code-check.yml#coverage-main': {

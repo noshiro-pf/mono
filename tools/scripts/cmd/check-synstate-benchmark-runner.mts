@@ -13,10 +13,8 @@ import { listTrackedFiles, readRepositoryFile } from '../lib/repo-files.mjs';
 /**
  * Fails when a committed synstate benchmark table was not measured by the
  * benchmark workflow: `environment.runner` is `'local'`, or there is no
- * `environment` at all. The tables are each documentation site's
- * `benchmark-results.json`: synstate's, measured by `synstate-benchmark.yml`,
- * and synstate-next's, measured by `synstate-next-benchmark.yml` until that
- * site is removed.
+ * `environment` at all. The table is the documentation site's
+ * `benchmark-results.json`, measured by `synstate-benchmark.yml`.
  *
  * The benchmark page says its numbers come from CI on a pinned runner, and
  * another machine's CPU moves the ratios between libraries. A local run
@@ -84,10 +82,7 @@ const PINNED_RUNNER = 'github-actions';
 export const DOCS_RESULTS =
   'apps/synstate-docs/src/data/benchmark-results.json';
 
-export const NEXT_RESULTS =
-  'apps/synstate-next-docs/src/data/benchmark-results.json';
-
-const RESULTS_FILES: readonly string[] = [DOCS_RESULTS, NEXT_RESULTS] as const;
+const RESULTS_FILES: readonly string[] = [DOCS_RESULTS] as const;
 
 /** Whether a tracked path, from the repository root, is a benchmark table. */
 export const isResultsTable = (file: string): boolean =>
@@ -159,10 +154,9 @@ const formatViolations = (violations: readonly string[]): string =>
     '',
     'Measuring locally is for trying a change, not for committing. If the',
     'change is not meant to move the numbers, restore the file from main. If',
-    'it is, dispatch the benchmark workflow of its site on the branch',
-    `(\`synstate-benchmark.yml\` for ${DOCS_RESULTS},`,
-    `\`synstate-next-benchmark.yml\` for ${NEXT_RESULTS}), put the file of the`,
-    'artifact it uploads in its place, and run `gen:benchmark` in that site.',
+    'it is, dispatch `synstate-benchmark.yml` on the branch, put the file of',
+    `the artifact it uploads in place of ${DOCS_RESULTS}, and run`,
+    '`gen:benchmark` in that site.',
   ].join('\n');
 
 if (isDirectlyExecuted(import.meta.url)) {

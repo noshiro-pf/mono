@@ -2,7 +2,6 @@ import {
   collectRunnerViolations,
   DOCS_RESULTS,
   isResultsTable,
-  NEXT_RESULTS,
 } from './check-synstate-benchmark-runner.mjs';
 
 const table = (recorded: unknown): unknown =>
@@ -24,7 +23,6 @@ describe('collectRunnerViolations', () => {
     assert.deepStrictEqual(
       collectRunnerViolations([
         { file: DOCS_RESULTS, content: table(environmentOf('github-actions')) },
-        { file: NEXT_RESULTS, content: table(environmentOf('github-actions')) },
       ]),
       [],
     );
@@ -33,7 +31,6 @@ describe('collectRunnerViolations', () => {
   test('names a table measured locally', () => {
     const violations = collectRunnerViolations([
       { file: DOCS_RESULTS, content: table(environmentOf('local')) },
-      { file: NEXT_RESULTS, content: table(environmentOf('github-actions')) },
     ]);
 
     assert.strictEqual(violations.length, 1);
@@ -43,20 +40,19 @@ describe('collectRunnerViolations', () => {
     assert.include(violations[0], '"local"');
   });
 
-  test('names a table that records no environment', () => {
+  test.each([
+    ['an undefined environment', table(undefined)],
+    ['no environment key', { scenarios: {} }],
+  ] as const)('names a table that records %s', (_, content) => {
     const violations = collectRunnerViolations([
-      { file: DOCS_RESULTS, content: table(undefined) },
-      { file: NEXT_RESULTS, content: { scenarios: {} } },
+      { file: DOCS_RESULTS, content },
     ]);
 
-    assert.deepStrictEqual(
-      violations.map((v) => v.split(': ', 1)[0]),
-      [DOCS_RESULTS, NEXT_RESULTS],
-    );
+    assert.strictEqual(violations.length, 1);
 
-    for (const v of violations) {
-      assert.include(v, 'no environment');
-    }
+    assert.include(violations[0], DOCS_RESULTS);
+
+    assert.include(violations[0], 'no environment');
   });
 
   test('does not look for the environment anywhere but the top', () => {
@@ -96,10 +92,8 @@ describe('collectRunnerViolations', () => {
 });
 
 describe('isResultsTable', () => {
-  test("takes each site's results file", () => {
+  test("takes the site's results file", () => {
     assert.isTrue(isResultsTable(DOCS_RESULTS));
-
-    assert.isTrue(isResultsTable(NEXT_RESULTS));
   });
 
   test('leaves out every other file beside them', () => {
@@ -110,7 +104,7 @@ describe('isResultsTable', () => {
     );
 
     assert.isFalse(
-      isResultsTable('apps/synstate-next-docs/src/data/results.json'),
+      isResultsTable('apps/synstate-dom-docs/src/data/benchmark-results.json'),
     );
 
     assert.isFalse(isResultsTable('baseline/benchmark-results.json'));

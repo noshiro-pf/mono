@@ -156,12 +156,7 @@ const EXEMPTIONS: readonly Exemption[] = [
     pattern: 'verify-npm-packages/published/**',
     reason: 'Generated from `smoke/` by `gen:verify-npm-packages`.',
   },
-  ...[
-    'synstate-docs',
-    'synstate-dom-docs',
-    'synstate-dom-next-docs',
-    'synstate-next-docs',
-  ].map((app) => ({
+  ...['synstate-docs', 'synstate-dom-docs'].map((app) => ({
     pattern: `apps/${app}/src/content.config.ts`,
     reason:
       "Imports `astro:content`, a module only Astro's own type generation declares; the app's `tsconfig.json` excludes it.",

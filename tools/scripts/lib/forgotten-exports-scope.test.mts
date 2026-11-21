@@ -82,16 +82,6 @@ describe(readsForgottenExports, () => {
       ),
     );
   });
-
-  test('the listed private packages, by default', () => {
-    assert.isTrue(
-      readsForgottenExports({
-        name: 'synstate-next',
-        dir: 'libs/synstate-next',
-        manifest: { ...withTypes, private: true },
-      }),
-    );
-  });
 });
 
 describe(forgottenExportsEntryPoints, () => {
