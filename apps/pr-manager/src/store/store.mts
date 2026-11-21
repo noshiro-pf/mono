@@ -10,6 +10,8 @@
 import {
   counter,
   createEventEmitter,
+  map,
+  skipIfNoChange,
   type Observable as SynstateObservable,
 } from 'synstate';
 import {
@@ -32,7 +34,13 @@ import {
   mergeOrderViewFromLocation,
   saveMergeOrderView,
 } from '../merge-order-view.mjs';
-import { readSetting, writeSetting } from '../settings-db.mjs';
+import {
+  readSetting,
+  stackFoldsKey,
+  updateSetting,
+  writeSetting,
+} from '../settings-db.mjs';
+import { foldChoicesFrom } from '../stack-fold.mjs';
 import {
   applyTheme,
   saveTheme,
@@ -112,6 +120,15 @@ export const mergeOrderStore = createMergeOrderStore({
 export const stackFoldStore = createStackFoldStore({
   roots: mergeOrderStore.roots,
   byNumber: reader.byNumber,
+  foldByDefault: layoutStore.layout
+    .pipe(map(({ foldStacks }) => foldStacks))
+    .pipe(skipIfNoChange()),
+  load: () => readSetting(stackFoldsKey(reportSource)),
+  update: (change) => {
+    updateSetting(stackFoldsKey(reportSource), (saved) =>
+      change(foldChoicesFrom(saved)),
+    ).catch(() => undefined);
+  },
 });
 
 const HEADER_FOLDED_KEY = 'header-folded';
@@ -179,6 +196,8 @@ export const startStore = (): (() => void) => {
 
   const stopHeader = headerStore.start();
 
+  const stopStackFold = stackFoldStore.start();
+
   const stopIssuesView = issuesViewStore.start();
 
   const stopIssuesList = issuesListStore.start();
@@ -197,6 +216,8 @@ export const startStore = (): (() => void) => {
     stopMergeOrder();
 
     stopHeader();
+
+    stopStackFold();
 
     stopIssuesView();
 

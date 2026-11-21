@@ -1,15 +1,16 @@
 /**
  * The page's own settings, kept in IndexedDB.
  *
- * The header's fold is kept here (`header-store.mts`). What the page shows is
- * kept in the URL (`url.mts`), so that a link opens it the same way; whether
- * the header is folded is how much room this screen has to spare, not a way of
- * looking at the page worth sharing in a link. A database of the page's own
- * name rather than a `localStorage` key, since that one store is shared by
- * every app on the origin. Like `localStorage` it is per browser, and gone when
- * the site's data is cleared.
+ * The header's fold is kept here (`header-store.mts`), and the stacks of each
+ * repository the reader folded or unfolded (`stack-fold-store.mts`), under
+ * {@link stackFoldsKey}. What the page shows is kept in the URL (`url.mts`), so
+ * that a link opens it the same way; whether the header is folded is how much
+ * room this screen has to spare, not a way of looking at the page worth sharing
+ * in a link. A database of the page's own name rather than a `localStorage`
+ * key, since that one store is shared by every app on the origin. Like
+ * `localStorage` it is per browser, and gone when the site's data is cleared.
  *
- * Both functions reject when the browser has no IndexedDB or refuses it (a
+ * The functions reject when the browser has no IndexedDB or refuses it (a
  * private window can); the store treats that as nothing saved.
  */
 
@@ -42,6 +43,60 @@ export const writeSetting = async (
     database.close();
   }
 };
+
+/**
+ * Replaces what `key` holds with what `update` makes of it, in one transaction:
+ * the read and the write see no write from another tab between them, so a tab
+ * that saves what it changed this way never undoes what another saved.
+ */
+export const updateSetting = async (
+  key: string,
+  update: (stored: unknown) => unknown,
+): Promise<void> => {
+  const database = await openDatabase();
+
+  try {
+    await new Promise<void>((resolve, reject) => {
+      const transaction = database.transaction(STORE, 'readwrite');
+
+      const store = transaction.objectStore(STORE);
+
+      const read = store.get(key);
+
+      // `put` from the `get`'s own listener, while the transaction is sure to
+      // be active; after an `await` it is only in browsers that keep it so
+      // through microtasks.
+      read.addEventListener('success', () => {
+        store.put(update(read.result), key);
+      });
+
+      transaction.addEventListener('complete', () => {
+        resolve();
+      });
+
+      transaction.addEventListener('error', () => {
+        reject(transaction.error ?? new Error('IndexedDB request failed'));
+      });
+
+      transaction.addEventListener('abort', () => {
+        reject(transaction.error ?? new Error('IndexedDB transaction aborted'));
+      });
+    });
+  } finally {
+    database.close();
+  }
+};
+
+/**
+ * Where the stacks folded or unfolded in a repository's merge order are kept:
+ * one key each, since pull request numbers mean nothing outside their
+ * repository. GitHub matches owner and name without regard to case, so they are
+ * kept lower-cased, and `?repo=Owner/Name` finds what `owner/name` kept.
+ */
+export const stackFoldsKey = (
+  source: Readonly<{ owner: string; repo: string }>,
+): string =>
+  `stack-folds:${source.owner.toLowerCase()}/${source.repo.toLowerCase()}` as const;
 
 const DATABASE = 'pr-manager-app';
 
