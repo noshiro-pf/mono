@@ -1,11 +1,8 @@
 import { fork } from 'node:child_process';
 import * as fs from 'node:fs/promises';
-import { findPackageJSON } from 'node:module';
 import * as os from 'node:os';
 import * as path from 'node:path';
-import { pathToFileURL } from 'node:url';
-import { Arr, isRecord, isString, Result } from 'ts-data-forge';
-import type { ReadonlyRecord } from 'ts-type-forge';
+import { Arr } from 'ts-data-forge';
 // A measuring child, which runs this file too, loads it as well: it costs the
 // child little, since Prettier runs in a process of its own and only when
 // `formatPackage` is called.
@@ -18,14 +15,7 @@ import {
   EntryResultSchema,
   type ScenarioResult,
 } from './results.mjs';
-import {
-  isSubject,
-  libraryOf,
-  packageOf,
-  resultsPath,
-  type Scenario,
-  scenarios,
-} from './scenarios.mjs';
+import { resultsPath, type Scenario, scenarios } from './scenarios.mjs';
 import { medianOverRounds, ROUNDS, timeEntry } from './time-entry.mjs';
 
 /**
@@ -69,6 +59,11 @@ const main = async (): Promise<void> => {
     );
   }
 
+  // Imported here rather than at the top: a measuring child runs this file too,
+  // and esbuild, which the digest loads, would sit in its heap while it
+  // measures.
+  const { readMeasuredInputs } = await import('./measured-inputs.mjs');
+
   const today = new Date();
 
   const environment = {
@@ -80,7 +75,7 @@ const main = async (): Promise<void> => {
     node: process.version,
     os: `${os.type()} ${os.release()} (${process.arch})`,
     cpu: os.cpus()[0]?.model ?? 'unknown',
-    libraries: await readLibraryVersions(),
+    ...(await readMeasuredInputs()),
     measuredOn: today.toISOString().slice(0, 10),
   } as const;
 
@@ -290,65 +285,6 @@ const measureScenario = async (scenario: Scenario): Promise<ScenarioResult> => {
       values: medianOverRounds(results.map(({ values }) => values)),
     })),
   };
-};
-
-/**
- * The installed versions of the libraries the scenarios measure, each resolved
- * from the file that imports it, as Node.js resolves that import. The scenario
- * files resolve theirs from `libs/synstate` and the deep chain's adapters from
- * `apps/synstate-docs`, so a library installed at two versions there fails the
- * run rather than leave the page naming one of them.
- */
-const readLibraryVersions = async (): Promise<
-  ReadonlyRecord<string, string>
-> => {
-  const mut_versions = new Map<string, string>();
-
-  // About fifty lookups, once per run of over an hour: not worth a cache.
-  for (const { entries } of scenarios) {
-    for (const { label, file } of entries) {
-      if (isSubject(label)) {
-        continue;
-      }
-
-      const name = packageOf[libraryOf(label)];
-
-      if (name === undefined) {
-        throw new Error(`no package for ${libraryOf(label)} in \`packageOf\``);
-      }
-
-      const manifestPath = Result.fromThrowable(() =>
-        findPackageJSON(name, pathToFileURL(file)),
-      );
-
-      if (Result.isErr(manifestPath) || manifestPath.value === undefined) {
-        throw new Error(
-          `${name} does not resolve from ${file}; install it where that file can import it`,
-        );
-      }
-
-      const manifest: unknown = JSON.parse(
-        // eslint-disable-next-line security/detect-non-literal-fs-filename
-        await fs.readFile(manifestPath.value, 'utf8'),
-      );
-
-      if (!isRecord(manifest) || !isString(manifest['version'])) {
-        throw new Error(`no version in ${manifestPath.value}`);
-      }
-
-      const known = mut_versions.get(name);
-
-      if (known !== undefined && known !== manifest['version']) {
-        throw new Error(
-          `${name} is installed at ${known} for one scenario and at ${manifest['version']} for ${file}; align them`,
-        );
-      }
-
-      mut_versions.set(name, manifest['version']);
-    }
-  }
-
-  return Object.fromEntries(mut_versions);
 };
 
 await main();

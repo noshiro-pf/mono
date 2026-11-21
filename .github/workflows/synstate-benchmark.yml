@@ -4,10 +4,25 @@ name: synstate Benchmark
 # on a GitHub-hosted runner, when dispatched by hand, and uploads what it
 # measured, laid out as it is committed, as the
 # `synstate-benchmark-<commit>-<run id>` artifact, named after the commit it
-# measured. Whoever dispatched it commits that file, on that commit's branch,
-# as apps/synstate-docs/src/data/benchmark-results.json, and runs
-# `pnpm --filter @synstate/docs run gen:benchmark`, which embeds it into the
-# page and stops on a sentence the new figures no longer bear out.
+# measured. Whoever dispatched it commits that file, in a pull request based
+# on that commit, as apps/synstate-docs/src/data/benchmark-results.json, and
+# runs `pnpm --filter @synstate/docs run gen:benchmark`, which embeds it into
+# the page and stops on a sentence the new figures no longer bear out.
+#
+# The runner records what it measured (a digest of the code the scenarios
+# run, the other libraries' versions and those of what they run on), and
+# `check:prose:synstate-benchmark-fresh` holds the version pull request that
+# releases synstate until that record matches the tree: before a release,
+# dispatch it on `main` once the other `blocks-release` pull requests have
+# merged (taking `merge-queued` off any queued one that changes what the
+# record holds, through the code, a manifest, the lockfile or the Node.js
+# version, until the release lands), label the pull request that commits its
+# file `blocks-release` and `priority:high`, and, once that merges, label the
+# version pull request `priority:high` too, so that no queued pull request
+# merges ahead of either and changes the record again. pnpm-update.yml is
+# not held by the queue: it arms auto-merge on its pull request on every run,
+# so disable that workflow, and disarm its open pull request and take
+# `merge-queued` off it, until the release lands.
 #
 # The page says its figures come from one kind of machine, and a cloud
 # container's CPU moved every ratio between libraries; hence the runner image
@@ -18,9 +33,10 @@ name: synstate Benchmark
 #
 # Not a check workflow: it reports no required context, and calls neither
 # `check-gates.yml` nor `check-result.yml`. A measurement is a decision to
-# republish the page, not a property of a tree, and it is long. Dispatch it
-# on the branch whose code is to be measured: the run measures the
-# dispatched ref.
+# republish the page, not a property of a tree, and it is long. The run
+# measures the ref it is dispatched on: for a release, `main`, as above; any
+# other branch only to try a change, since the table it records matches no
+# version pull request.
 
 on:
   workflow_dispatch:

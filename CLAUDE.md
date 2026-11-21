@@ -136,13 +136,13 @@ terminates. `build` and `doc` write untracked output. Consequences:
 - `test` and `fmt` are aliases for `check:test` and `fix:fmt`. Keep them, add
   no more.
 - Root guards live in two globbed namespaces, **chosen by what the guard
-  reads**: `check:prose:*` for documents and document-tool configuration
-  (runs in `style-check.yml`, whose gate ignores only `experimental/`), and
-  `check:root:*` for everything else (runs in `code-check.yml`, whose gate
-  drops `**.md`, `docs/` and style-tool configuration — a document guard
-  there is skipped by the very diff it judges). A new `check:root:*` or
-  `check:prose:*` script is in CI with no other wiring. `check:prose` must
-  stay buildless.
+  reads**: `check:prose:*` for documents, document-tool configuration and the
+  diff base (runs in `style-check.yml`, the one workflow to set
+  `PROSE_DIFF_BASE`; its gate ignores only `experimental/`), and `check:root:*`
+  for everything else (runs in `code-check.yml`, whose gate drops `**.md`,
+  `docs/` and style-tool configuration — a document guard there is skipped by
+  the very diff it judges). A new `check:root:*` or `check:prose:*` script is in
+  CI with no other wiring. `check:prose` must stay buildless.
 
 Main entry points: `ws:build[:deps]`, `ws:gen`, `ws:check:types`, `ws:fix:lint`,
 `ws:check:test[:cov|:browser]`, `ws:check:e2e`, `ws:check:dist`,

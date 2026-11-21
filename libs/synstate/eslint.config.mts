@@ -115,7 +115,6 @@ export default [
             'zustand/vanilla',
             'jotai/vanilla',
             'jotai/vanilla/utils',
-            'jotai/utils',
             'valtio/vanilla',
             'rxjs/fetch',
           ],

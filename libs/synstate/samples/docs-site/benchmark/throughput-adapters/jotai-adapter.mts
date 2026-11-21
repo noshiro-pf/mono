@@ -1,5 +1,5 @@
-import { atom, createStore } from 'jotai';
-import { selectAtom } from 'jotai/utils';
+import { atom, createStore } from 'jotai/vanilla';
+import { selectAtom } from 'jotai/vanilla/utils';
 import { Arr, range } from 'ts-data-forge';
 import {
   type Point,
