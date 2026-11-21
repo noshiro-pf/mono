@@ -5,7 +5,7 @@ description: createOwner, createRootOwner, run, dispose, onCleanup, getOwner and
 
 ## Everything belongs to an owner
 
-An owner is a lifetime. Everything created while its `run` executes belongs to it: derived observables, subscriptions, timers, requests, the cleanups registered with `onCleanup`, and the owners created inside it. `dispose()` disposes them, newest first: the child owners, then the cleanups, then the observables.
+An owner is a lifetime. Everything created while its `run` executes belongs to it: derived observables, subscriptions, timers, requests, the cleanups registered with `onCleanup`, and the owners created inside it. `dispose()` first stops every subscription in the owner, its child owners' included, then disposes the rest, newest first: the child owners, then the cleanups, then the observables. So no subscription is called for what a cleanup writes, and a cleanup reads the values the owner's derived observables held when the disposal began, even after it writes a state they follow. The exception is a projection or a setup that disposes an owner of its own observable: what it made there before may still hear the cleanups.
 
 ```tsx
 import { createRootOwner, createState, map, onCleanup } from 'synstate-next';

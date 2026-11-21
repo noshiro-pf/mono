@@ -1,5 +1,7 @@
-import { constant, render, type JSX } from 'synstate-dom-next';
-import { createState, just, map } from 'synstate-next';
+import { constant, render, type Bindable, type JSX } from 'synstate-dom-next';
+import { createState, just, map, source } from 'synstate-next';
+import { Obj } from 'ts-data-forge';
+import { cdp } from 'vitest/browser';
 
 const mountInto = (
   app: () => JSX.Element,
@@ -237,6 +239,283 @@ describe('properties', () => {
   });
 });
 
+describe('value is bound after the other props (#3940)', () => {
+  // The props are written out of order on purpose: a range or number input fits
+  // its value to the `type`, `min`, `max` and `step` it has when the value is
+  // written, so `value` has to come last whatever the order.
+  test.each([
+    ['max', { value: '150', type: 'range', max: '200' }, '150'],
+    ['min', { value: '-5', type: 'range', min: '-10' }, '-5'],
+    ['step', { value: '0.5', type: 'range', step: '0.5' }, '0.5'],
+    ['type', { value: '150', max: '200', type: 'range' }, '150'],
+  ] as const)(
+    'a range input with value written before %s reads back the bound value',
+    (_, props, expected) => {
+      const { container } = mountInto(() => (
+        <input {...Obj.map(props, constant)} />
+      ));
+
+      assert.strictEqual(container.querySelector('input')?.value, expected);
+    },
+  );
+
+  test('a number input and a select still read back theirs', () => {
+    const { container } = mountInto(() => (
+      <>
+        <input
+          {...{
+            value: constant('7'),
+            type: constant('number'),
+            max: constant('9'),
+          }}
+        />
+        <select value={constant('b')}>
+          <option value={constant('a')}>{constant('a')}</option>
+          <option value={constant('b')}>{constant('b')}</option>
+        </select>
+      </>
+    ));
+
+    assert.strictEqual(container.querySelector('input')?.value, '7');
+
+    assert.strictEqual(container.querySelector('select')?.value, 'b');
+  });
+});
+
+describe('value fitted to the min, max, step or type of the time (#4123)', () => {
+  test('raising max and value in one update draws the new value', () => {
+    const [state, setState] = createState({ max: '200', value: '150' });
+
+    // `value` is derived first, so the update writes it before `max`.
+    const value = state.pipe(map((s) => s.value));
+
+    const max = state.pipe(map((s) => s.max));
+
+    const { container } = mountInto(() => (
+      <input max={max} type={constant('range')} value={value} />
+    ));
+
+    const input = container.querySelector('input');
+
+    assert.strictEqual(input?.value, '150');
+
+    setState({ max: '400', value: '350' });
+
+    assert.strictEqual(input?.value, '350');
+  });
+
+  test('lowering min and value in one update draws the new value', () => {
+    const [state, setState] = createState({ min: '0', value: '10' });
+
+    const value = state.pipe(map((s) => s.value));
+
+    const min = state.pipe(map((s) => s.min));
+
+    const { container } = mountInto(() => (
+      <input min={min} type={constant('range')} value={value} />
+    ));
+
+    const input = container.querySelector('input');
+
+    setState({ min: '-100', value: '-50' });
+
+    assert.strictEqual(input?.value, '-50');
+  });
+
+  test('raising min and max past the value in one update draws the new value', () => {
+    const [state, setState] = createState({
+      min: '0',
+      max: '100',
+      value: '50',
+    });
+
+    // `value` is derived first, so the update writes it before `min` and `max`,
+    // and the browser fits the value again when each of them is written.
+    const value = state.pipe(map((s) => s.value));
+
+    const min = state.pipe(map((s) => s.min));
+
+    const max = state.pipe(map((s) => s.max));
+
+    const { container } = mountInto(() => (
+      <input max={max} min={min} type={constant('range')} value={value} />
+    ));
+
+    const input = container.querySelector('input');
+
+    setState({ min: '200', max: '300', value: '250' });
+
+    assert.strictEqual(input?.value, '250');
+  });
+
+  test('a max lowered below the value and raised again draws the bound value again', () => {
+    const [max, setMax] = createState('200');
+
+    const { container } = mountInto(() => (
+      <input max={max} type={constant('range')} value={constant('150')} />
+    ));
+
+    const input = container.querySelector('input');
+
+    setMax('100');
+
+    assert.strictEqual(input?.value, '100');
+
+    setMax('200');
+
+    assert.strictEqual(input?.value, '150');
+  });
+
+  test('a range the user moved keeps the user’s value when max changes', () => {
+    const [max, setMax] = createState('200');
+
+    const { container } = mountInto(() => (
+      <input max={max} type={constant('range')} value={constant('150')} />
+    ));
+
+    const mut_input = container.querySelector('input');
+
+    assert.isNotNull(mut_input);
+
+    mut_input.value = '180';
+
+    setMax('400');
+
+    assert.strictEqual(mut_input.value, '180');
+  });
+
+  test('a text input whose type becomes file is left empty, and drawn again when it changes back', () => {
+    const [type, setType] = createState('text');
+
+    const [value, setValue] = createState('bound');
+
+    const { container } = mountInto(() => <input type={type} value={value} />);
+
+    const input = container.querySelector('input');
+
+    setType('file');
+
+    assert.strictEqual(input?.value, '');
+
+    setValue('changed');
+
+    assert.strictEqual(input?.value, '');
+
+    setType('text');
+
+    assert.strictEqual(input?.value, 'changed');
+  });
+
+  test('a value bound to an observable that holds none is not written when the type goes through file', () => {
+    const [type, setType] = createState('text');
+
+    // The types admit only an observable that holds a value; a JavaScript
+    // caller can still bind one that does not.
+    // eslint-disable-next-line total-functions/no-unsafe-type-assertion -- the test binds what the types refuse
+    const value = source<string>() as unknown as Bindable<string>;
+
+    const { container } = mountInto(() => (
+      <input defaultValue={constant('x')} type={type} value={value} />
+    ));
+
+    const input = container.querySelector('input');
+
+    setType('file');
+
+    setType('text');
+
+    assert.strictEqual(input?.value, 'x');
+  });
+
+  test('a file input mounted with a value is left empty', () => {
+    const { container } = mountInto(() => (
+      <input type={constant('file')} value={constant('bound')} />
+    ));
+
+    assert.strictEqual(container.querySelector('input')?.value, '');
+  });
+
+  test('a bound empty value clears the file chosen in a file input', () => {
+    const [value, setValue] = createState('bound');
+
+    const { container } = mountInto(() => (
+      <input type={constant('file')} value={value} />
+    ));
+
+    const mut_input = container.querySelector('input');
+
+    assert.isNotNull(mut_input);
+
+    const transfer = new DataTransfer();
+
+    transfer.items.add(new File(['x'], 'chosen.txt'));
+
+    mut_input.files = transfer.files;
+
+    assert.strictEqual(mut_input.files.length, 1);
+
+    setValue('');
+
+    assert.strictEqual(mut_input.files.length, 0);
+  });
+
+  test('a draft typed before the type becomes file and back gives way to the bound value', () => {
+    const [type, setType] = createState('text');
+
+    const { container } = mountInto(() => (
+      <input type={type} value={constant('bound')} />
+    ));
+
+    const mut_input = container.querySelector('input');
+
+    assert.isNotNull(mut_input);
+
+    mut_input.value = 'draft';
+
+    setType('file');
+
+    setType('text');
+
+    assert.strictEqual(mut_input.value, 'bound');
+  });
+
+  test('a draft the new type drops gives way to the bound value', () => {
+    const [type, setType] = createState('text');
+
+    const { container } = mountInto(() => (
+      <input type={type} value={constant('5')} />
+    ));
+
+    const mut_input = container.querySelector('input');
+
+    assert.isNotNull(mut_input);
+
+    mut_input.value = 'abc';
+
+    setType('number');
+
+    assert.strictEqual(mut_input.value, '5');
+  });
+
+  test('a text input keeps the draft typed into it when its type changes', () => {
+    const [type, setType] = createState('text');
+
+    const { container } = mountInto(() => (
+      <input type={type} value={constant('bound')} />
+    ));
+
+    const mut_input = container.querySelector('input');
+
+    assert.isNotNull(mut_input);
+
+    mut_input.value = 'draft';
+
+    setType('search');
+
+    assert.strictEqual(mut_input.value, 'draft');
+  });
+});
+
 describe('controlled checked', () => {
   test('a checkbox whose change is refused is drawn as its bound value again', async () => {
     const mut_seen: boolean[] = [];
@@ -461,6 +740,285 @@ describe('controlled checked', () => {
     assert.isFalse(first.checked);
 
     assert.isTrue(second.checked);
+
+    unmount();
+  });
+});
+
+/** Picks `value` on `select` as a user would: the value, then `change`. */
+const choose = (mut_select: HTMLSelectElement, value: string): void => {
+  mut_select.value = value;
+
+  mut_select.dispatchEvent(new Event('change', { bubbles: true }));
+};
+
+const selectOptions = (): JSX.Element => (
+  <>
+    <option value={constant('a')}>{constant('A')}</option>
+    <option value={constant('b')}>{constant('B')}</option>
+  </>
+);
+
+const mountSelect = (
+  app: () => JSX.Element,
+): Readonly<{ select: HTMLSelectElement; unmount: () => void }> => {
+  const container = document.createElement('div');
+
+  document.body.append(container);
+
+  const unmountApp = render(app, container);
+
+  const select = container.querySelector('select');
+
+  assert.isNotNull(select);
+
+  return {
+    select,
+    unmount: () => {
+      unmountApp();
+
+      container.remove();
+    },
+  };
+};
+
+describe('controlled select value (#3411)', () => {
+  test('a refused choice is drawn as the bound value again', async () => {
+    const mut_seen: string[] = [];
+
+    const { select, unmount } = mountSelect(() => (
+      <select
+        value={constant('a')}
+        onChange={(event) => {
+          mut_seen.push(event.currentTarget.value);
+        }}
+      >
+        {selectOptions()}
+      </select>
+    ));
+
+    choose(select, 'b');
+
+    // The handler sees the user's choice, which is undone only after it.
+    assert.deepStrictEqual(mut_seen, ['b']);
+
+    await nextFrame();
+
+    assert.strictEqual(select.value, 'a');
+
+    unmount();
+  });
+
+  test('a taken choice stays', async () => {
+    const [value$, setValue] = createState('a');
+
+    const { select, unmount } = mountSelect(() => (
+      <select
+        value={value$}
+        onChange={(event) => {
+          setValue(event.currentTarget.value);
+        }}
+      >
+        {selectOptions()}
+      </select>
+    ));
+
+    choose(select, 'b');
+
+    await nextFrame();
+
+    assert.strictEqual(select.value, 'b');
+
+    unmount();
+  });
+
+  test('a handler that stops the event does not keep the refused choice', async () => {
+    const { select, unmount } = mountSelect(() => (
+      <select
+        value={constant('a')}
+        onChange={(event) => {
+          event.stopImmediatePropagation();
+        }}
+      >
+        {selectOptions()}
+      </select>
+    ));
+
+    choose(select, 'b');
+
+    await nextFrame();
+
+    assert.strictEqual(select.value, 'a');
+
+    unmount();
+  });
+
+  test('a multiple select stays one way, keeping the choices the user made', async () => {
+    const { select, unmount } = mountSelect(() => (
+      <select multiple={constant(true)} value={constant('a')}>
+        {selectOptions()}
+      </select>
+    ));
+
+    const [mut_a, mut_b] = Array.from(select.options);
+
+    assert.isDefined(mut_a);
+
+    assert.isDefined(mut_b);
+
+    // The user moves the choice from a to b, which changes `value`.
+    mut_a.selected = false;
+
+    mut_b.selected = true;
+
+    select.dispatchEvent(new Event('change', { bubbles: true }));
+
+    await nextFrame();
+
+    assert.isFalse(mut_a.selected);
+
+    assert.isTrue(mut_b.selected);
+
+    unmount();
+  });
+
+  test('a text input and a textarea stay one way', async () => {
+    const container = document.createElement('div');
+
+    document.body.append(container);
+
+    const unmount = render(
+      () => (
+        <>
+          <input value={constant('bound')} />
+          <textarea value={constant('bound')} />
+        </>
+      ),
+      container,
+    );
+
+    const mut_input = container.querySelector('input');
+
+    const mut_textarea = container.querySelector('textarea');
+
+    assert.isNotNull(mut_input);
+
+    assert.isNotNull(mut_textarea);
+
+    mut_input.value = 'typed';
+
+    mut_input.dispatchEvent(new Event('change', { bubbles: true }));
+
+    mut_textarea.value = 'typed';
+
+    mut_textarea.dispatchEvent(new Event('change', { bubbles: true }));
+
+    await nextFrame();
+
+    assert.strictEqual(mut_input.value, 'typed');
+
+    assert.strictEqual(mut_textarea.value, 'typed');
+
+    unmount();
+
+    container.remove();
+  });
+});
+
+/** Composes `か`, `かん` and `漢` through CDP, then commits `漢`. */
+const composeKan = async (between: () => void): Promise<void> => {
+  for (const text of ['か', 'かん', '漢']) {
+    // eslint-disable-next-line no-await-in-loop -- each composition step reaches the input before the next
+    await cdp().send('Input.imeSetComposition', {
+      text,
+      selectionStart: text.length,
+      selectionEnd: text.length,
+    });
+
+    between();
+  }
+
+  await cdp().send('Input.insertText', { text: '漢' });
+};
+
+/** The number of compositions started on `input` so far. */
+const countCompositions = (input: HTMLInputElement): (() => number) => {
+  const mut_count = { current: 0 };
+
+  input.addEventListener('compositionstart', () => {
+    mut_count.current += 1;
+  });
+
+  return () => mut_count.current;
+};
+
+describe('a one-way value during an IME composition (SPEC.md 7.3)', () => {
+  test('a draft written back on every input keeps the composition', async () => {
+    const [draft$, setDraft] = createState('');
+
+    const { inputs, unmount } = mountInDocument(() => (
+      <input
+        value={draft$}
+        onInput={(event) => {
+          setDraft(event.currentTarget.value);
+        }}
+      />
+    ));
+
+    const input = inputs[0];
+
+    assert.isDefined(input);
+
+    const compositions = countCompositions(input);
+
+    input.focus();
+
+    await composeKan(() => {});
+
+    assert.strictEqual(compositions(), 1);
+
+    assert.strictEqual(input.value, '漢');
+
+    assert.strictEqual(draft$.value, '漢');
+
+    unmount();
+  });
+
+  test('a different value written mid-composition restarts it', async () => {
+    const [draft$, setDraft] = createState('');
+
+    const { inputs, unmount } = mountInDocument(() => (
+      <input
+        value={draft$}
+        onInput={(event) => {
+          setDraft(event.currentTarget.value);
+        }}
+      />
+    ));
+
+    const input = inputs[0];
+
+    assert.isDefined(input);
+
+    const compositions = countCompositions(input);
+
+    input.focus();
+
+    const mut_written = { current: false };
+
+    await composeKan(() => {
+      if (mut_written.current) {
+        return;
+      }
+
+      mut_written.current = true;
+
+      setDraft('x');
+    });
+
+    assert.strictEqual(compositions(), 2);
+
+    assert.notStrictEqual(input.value, '漢');
 
     unmount();
   });

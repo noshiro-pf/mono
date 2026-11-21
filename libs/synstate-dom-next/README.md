@@ -68,7 +68,8 @@ parent?)` returns a child's nodes, appended to `parent` in its namespace when
   `synstate-dom-next/jsx-runtime`) and the types `Mountable` and `MountedNodes`
   (a description is a `JSX.Element`) are gone. `Switch` is public, so a router
   need not copy the branch component it mounts its pages with.
-- A controlled `checked` or `indeterminate` is restored in the next animation
+- A controlled `checked`, `indeterminate` or `<select>` `value` (not a
+  `<select multiple>`'s, which stays one way) is restored in the next animation
   frame or a task after the `change`, whichever comes first, so it is restored
   in a hidden page too.
 
