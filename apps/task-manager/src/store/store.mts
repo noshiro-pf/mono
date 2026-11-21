@@ -301,7 +301,7 @@ export const startStore = (): (() => void) => {
   });
 
   return () => {
-    darkSubscription.unsubscribe();
+    darkSubscription();
 
     for (const stopOne of stops) {
       stopOne();

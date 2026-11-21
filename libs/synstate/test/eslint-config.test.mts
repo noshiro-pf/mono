@@ -1,47 +1,111 @@
+import { ESLint } from 'eslint';
 import * as path from 'node:path';
-// eslint-disable-next-line import-x/no-relative-packages, import-x/no-internal-modules
-import { defineImportProbe } from '../../../tools/configs/eslint-import-probe.mjs';
+import { getSnapshotBan } from '../configs/eslint/rules/get-snapshot-ban.mjs';
 
-// The import allow-list in eslint.config.mts is what keeps `Arr`, `SafeUint`
-// and the like from the ts-data-forge root out of src/, and a block after it
-// that sets `no-restricted-imports` again (the Sumi block did) turns it off with
-// nothing failing. So this lints probe text the way `check:lint` lints a source
-// file.
-describe('eslint.config.mts', () => {
-  const restrictedImportLines = defineImportProbe({
-    packageRoot: path.resolve(import.meta.dirname, '..'),
-    sourcePath: 'src/core/combine/__probe__.mts',
+const packageRootPath = path.resolve(import.meta.dirname, '..');
+
+// The ban on `getSnapshot` in src/ (configs/eslint/rules/get-snapshot-ban.mts)
+// is a set of selectors, which nothing else checks; this lints probe text the
+// way `check:lint` lints a source file, as test/ported/eslint-config.test.mts
+// does for the imports. A report is the ban's when it carries the ban's
+// message.
+describe('eslint.config.mts: getSnapshot in src/', () => {
+  // As in test/ported/eslint-config.test.mts: the probe text is linted under
+  // the path of a real file. With `CI` set, typescript-estree assumes no file
+  // changes during the run and parses that file from disk instead of the text
+  // given, so that inference is turned off. Only the rule under test runs: rules
+  // that read the TypeScript program can still see the file's contents.
+  const eslint = new ESLint({
+    cwd: packageRootPath,
+    overrideConfig: {
+      languageOptions: {
+        parserOptions: { disallowAutomaticSingleRunInference: true },
+      },
+    },
+    ruleFilter: ({ ruleId }) => ruleId === 'no-restricted-syntax',
   });
 
-  test('refuses objects from the ts-data-forge root in src/', async () => {
-    const lines = await restrictedImportLines(
+  const filePath = path.resolve(packageRootPath, 'src/operators/zip.mts');
+
+  const getSnapshotLines = async (code: string): Promise<readonly number[]> => {
+    const results = await eslint.lintText(code, { filePath });
+
+    const messages = results.flatMap((r) => r.messages);
+
+    // A probe that does not parse, or a path ESLint ignores, yields no report,
+    // which an empty expectation would accept: both come as a message of no
+    // rule.
+    assert.deepStrictEqual(
+      messages.filter((m) => m.ruleId === null),
+      [],
+    );
+
+    return messages
+      .filter(
+        (m) =>
+          m.ruleId === 'no-restricted-syntax' &&
+          m.message === getSnapshotBan.message,
+      )
+      .map((m) => m.line);
+  };
+
+  test('refuses each read by that name once, with up to three type wrappers on the key', async () => {
+    const lines = await getSnapshotLines(
       [
-        "import { Arr as A } from 'ts-data-forge';",
-        "import { SafeUint as B } from 'ts-data-forge';",
-        "import { Num as C } from 'ts-data-forge';",
-        "import { Arr as D } from 'ts-std-forge';",
-        '',
-        'export const used = [A, B, C, D];',
+        'declare const o: Readonly<{ getSnapshot: () => number }>;',
+        'export const a = o.getSnapshot();',
+        "export const b = o['getSnapshot']();",
+        'export const c = o[`getSnapshot`]();',
+        'export const d = o.getSnapshot.call(o);',
+        'export const e = (o as typeof o).getSnapshot();',
+        "export const f = o['getSnapshot' as const]();",
+        "export const g = o['getSnapshot' satisfies string]();",
+        "export const h = o[<'getSnapshot'>'getSnapshot']();",
+        "export const i = o['getSnapshot'!]();",
+        'export const j = o?.getSnapshot();',
+        "export const k = o['getSnapshot' as 'getSnapshot']();",
+        "export const l = o['getSnapshot' as const as 'getSnapshot']();",
+        "export const m = o[('getSnapshot' as const)! satisfies string]();",
+        'export const n = ({ getSnapshot: 1 }).getSnapshot;',
+        "export const p = o?.['getSnapshot']();",
+        "export const q = o[('getSnapshot')]();",
         '',
       ].join('\n'),
     );
 
-    assert.deepStrictEqual(lines, [1, 2, 3, 4]);
+    assert.deepStrictEqual(
+      lines,
+      [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17],
+    );
   }, 60_000);
 
-  test('allows the subpath, standalone functions and type imports', async () => {
-    const lines = await restrictedImportLines(
+  // The limit of `getSnapshotKeys` (configs/eslint/rules/get-snapshot-ban.mts),
+  // recorded so that a change to it is seen: a fourth wrapper is not looked
+  // through.
+  test('does not see a key under four type wrappers', async () => {
+    const lines = await getSnapshotLines(
       [
-        "import * as A from 'ts-data-forge/array';",
-        "import { asSafeUint as B, type SafeUint } from 'ts-data-forge';",
-        "import { Optional as C } from 'ts-std-forge';",
+        'declare const o: Readonly<{ getSnapshot: () => number }>;',
+        "export const a = o[('getSnapshot' as const satisfies string as 'getSnapshot')!]();",
         '',
-        'export const used: readonly [unknown, unknown, unknown, SafeUint] = [',
-        '  A,',
-        '  B,',
-        '  C,',
-        '  B(0),',
-        '];',
+      ].join('\n'),
+    );
+
+    assert.deepStrictEqual(lines, []);
+  }, 60_000);
+
+  test('leaves a key that is not the literal, Reflect.get and destructuring', async () => {
+    const lines = await getSnapshotLines(
+      [
+        'declare const o: Readonly<Record<string, () => number>>;',
+        "declare const k: 'getSnapshot';",
+        'declare const names: readonly string[];',
+        'declare const xs: readonly (() => number)[];',
+        'export const a = o[k]();',
+        "export const b = o[k as 'getSnapshot']();",
+        "export const c = xs[names.indexOf('getSnapshot')];",
+        "export const d = Reflect.get(o, 'getSnapshot');",
+        'export const { getSnapshot } = o;',
         '',
       ].join('\n'),
     );

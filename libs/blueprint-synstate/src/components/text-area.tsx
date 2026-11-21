@@ -1,4 +1,4 @@
-import { onScopeDispose } from 'synstate';
+import { onCleanup } from 'synstate';
 import {
   constant,
   createAfterUpdate,
@@ -128,13 +128,13 @@ const fitToText = (
     fit(textarea);
   });
 
-  onScopeDispose(() => {
+  onCleanup(() => {
     cancelAnimationFrame(frame);
   });
 
   const value$ = toObservable(value);
 
-  if (value$.isCompleted) {
+  if (value$.settled) {
     return;
   }
 

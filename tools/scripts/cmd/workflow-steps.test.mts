@@ -296,7 +296,7 @@ describe('check-diff', () => {
       {
         ok: false,
         message:
-          'Input diff-scope is "none"; expected one of code, runtime, benchmark, style, strict-lib.',
+          'Input diff-scope is "none"; expected one of code, runtime, style, strict-lib.',
       },
     );
   });
@@ -305,13 +305,12 @@ describe('check-diff', () => {
 const lists = (value: unknown): string => JSON.stringify(value);
 
 describe('the ignore lists', () => {
-  test('reads the five lists', () => {
+  test('reads the four lists', () => {
     assert.deepStrictEqual(
       parseGateLists(
         lists({
           code: ['docs/', '**.md'],
           runtime: ['docs/'],
-          benchmark: ['docs/'],
           style: [],
           'strict-lib': ['apps/'],
         }),
@@ -321,7 +320,6 @@ describe('the ignore lists', () => {
         value: {
           code: ['docs/', '**.md'],
           runtime: ['docs/'],
-          benchmark: ['docs/'],
           style: [],
           'strict-lib': ['apps/'],
         },
@@ -337,7 +335,7 @@ describe('the ignore lists', () => {
     });
   });
 
-  test('refuses a file that is not exactly the five lists of strings', () => {
+  test('refuses a file that is not exactly the four lists of strings', () => {
     for (const text of [
       'not json',
       lists(['docs/']),
@@ -346,7 +344,6 @@ describe('the ignore lists', () => {
       lists({
         code: [],
         runtime: [],
-        benchmark: [],
         style: [],
         'strict-lib': [],
         extra: [],
@@ -354,14 +351,12 @@ describe('the ignore lists', () => {
       lists({
         code: 'docs/',
         runtime: [],
-        benchmark: [],
         style: [],
         'strict-lib': [],
       }),
       lists({
         code: [1],
         runtime: [],
-        benchmark: [],
         style: [],
         'strict-lib': [],
       }),
@@ -376,7 +371,6 @@ describe('the ignore lists', () => {
         lists({
           code: ['src/*/x.ts'],
           runtime: [],
-          benchmark: [],
           style: [],
           'strict-lib': [],
         }),
@@ -437,7 +431,6 @@ describe('the ignore lists', () => {
         lists({
           code: [pattern],
           runtime: [],
-          benchmark: [],
           style: [],
           'strict-lib': [],
         }),
@@ -509,12 +502,11 @@ describe('the ignore lists', () => {
     );
   });
 
-  // `runtime` is what node-version-compatibility.yml gates on and `benchmark`
-  // what synstate-benchmark.yml does: what `code` ignores, each with exceptions
-  // of its own rather than `code`'s (#3332). Kept as lists of their own, which
-  // a list file can state and a reader can see, and held to that here so that
-  // an entry added to one and not the others fails.
-  test.each(['runtime', 'benchmark'] as const)(
+  // `runtime` is what node-version-compatibility.yml gates on: what `code`
+  // ignores, with exceptions of its own rather than `code`'s (#3332). Kept as a
+  // list of its own, which a list file can state and a reader can see, and held
+  // to that here so that an entry added to one and not the other fails.
+  test.each(['runtime'] as const)(
     "the repository's %s list ignores what its code list does",
     (scope) => {
       const code = readGateList('code', projectRoot);
@@ -534,7 +526,7 @@ describe('the ignore lists', () => {
     },
   );
 
-  test("an app's page runs code-check.yml and neither the Node.js matrix nor the benchmark", () => {
+  test("an app's page runs code-check.yml and not the Node.js matrix", () => {
     const page =
       'apps/synstate-docs/src/content/docs/ja/getting-started/installation.md';
 
@@ -542,31 +534,11 @@ describe('the ignore lists', () => {
 
     const runtime = readGateList('runtime', projectRoot);
 
-    const benchmark = readGateList('benchmark', projectRoot);
-
-    assert.isTrue(code.ok && runtime.ok && benchmark.ok);
+    assert.isTrue(code.ok && runtime.ok);
 
     assert.isFalse(ignoredBy(code.value)(page));
 
     assert.isTrue(ignoredBy(runtime.value)(page));
-
-    assert.isTrue(ignoredBy(benchmark.value)(page));
-  });
-
-  // The benchmark judges the committed tables against its baseline, so a diff
-  // of the tables alone is one it has to see.
-  test('a benchmark table runs the benchmark, and not the Node.js checks', () => {
-    const runtime = readGateList('runtime', projectRoot);
-
-    const benchmark = readGateList('benchmark', projectRoot);
-
-    assert.isTrue(runtime.ok && benchmark.ok);
-
-    const table = 'apps/synstate-docs/src/data/results-diamond.md';
-
-    assert.isFalse(ignoredBy(benchmark.value)(table));
-
-    assert.isTrue(ignoredBy(runtime.value)(table));
   });
 
   // A unit test reads each of these, and unit tests run in code-check.yml and
@@ -584,17 +556,6 @@ describe('the ignore lists', () => {
       assert.isFalse(ignoredBy(code.value)(document));
 
       assert.isFalse(ignoredBy(runtime.value)(document));
-    }
-  });
-
-  // The benchmark reads none of them.
-  test('a document a unit test reads does not run the benchmark', () => {
-    const benchmark = readGateList('benchmark', projectRoot);
-
-    assert.isTrue(benchmark.ok);
-
-    for (const document of Object.values(TEST_DOCUMENTS)) {
-      assert.isTrue(ignoredBy(benchmark.value)(document));
     }
   });
 
@@ -724,7 +685,6 @@ const makeBinDir = (): string => {
     JSON.stringify({
       code: ['docs/', '**.md'],
       runtime: ['docs/', '**.md'],
-      benchmark: ['docs/', '**.md'],
       style: [],
       'strict-lib': [],
     }),
@@ -1096,7 +1056,7 @@ describe('the script, run the way the workflows run it', () => {
       code: 1,
       stdout: [
         'fake git: fetch --depth=1 origin +refs/heads/main:refs/remotes/origin/main',
-        '::error::tools/configs/gate-ignore-lists.json holds the lists code, runtime, benchmark, style and strict-lib and nothing else, each an array of strings.',
+        '::error::tools/configs/gate-ignore-lists.json holds the lists code, runtime, style and strict-lib and nothing else, each an array of strings.',
         '',
       ].join('\n'),
     });

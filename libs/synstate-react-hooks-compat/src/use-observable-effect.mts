@@ -37,12 +37,10 @@ export const useObservableEffect = <A,>(
   });
 
   React.useEffect(() => {
-    const s = observable$.subscribe((v) => {
+    const unsubscribe = observable$.subscribe((v) => {
       mut_subscriptionFnRef.current(v);
     });
 
-    return () => {
-      s.unsubscribe();
-    };
+    return unsubscribe;
   }, [observable$]);
 };

@@ -1,16 +1,16 @@
 ---
 title: Bindable values
-description: constant, pipe(map), and what a slot that takes data accepts.
+description: constant, pipe(map), and what the props and attributes that take data accept.
 ---
 
 Every place in JSX that takes data (an attribute, a DOM property, a text child, or a prop of a component the library provides) accepts a `Bindable<T>`:
 
-| `Bindable<T>` is one of    | what happens when it is bound                                      |
-| :------------------------- | :----------------------------------------------------------------- |
-| `InitializedObservable<T>` | written once with its current value, then again on every new value |
-| `Constant<T>`              | written once; nothing is subscribed                                |
+| `Bindable<T>` is one of    | what happens when it is bound                                             |
+| :------------------------- | :------------------------------------------------------------------------ |
+| `InitializedObservable<T>` | written once with its value, then again after each update that changes it |
+| `Constant<T>`              | written once; nothing is made for it, neither a node nor a binding        |
 
-An observable that has already completed, such as `just(...)`, is treated like a constant: written once and never subscribed to.
+An `Observable<T>` that may hold no value yet (an event source, a `filter`) is not a `Bindable`: there would be nothing to write when it is bound. Give it one with `withInitialValue(x)` first.
 
 ## `constant`
 
@@ -19,7 +19,6 @@ A plain value is not a `Bindable`. When a value never changes, you wrap it in `c
 ```tsx
 import { createState } from 'synstate';
 import { constant, type JSX } from 'synstate-dom';
-import { Optional } from 'ts-data-forge';
 
 const [count$] = createState(0);
 
@@ -33,19 +32,15 @@ export const Counter = (): JSX.Element => (
 // @ts-expect-error A plain string is not a Bindable: write constant('Hi').
 export const Plain = (): JSX.Element => <p>{'Hi'}</p>;
 
-export const Stale = (): JSX.Element => {
-    const count = Optional.unwrap(count$.getSnapshot());
-
-    // @ts-expect-error A snapshot would be written once and never updated.
-    return <p>{count}</p>;
-};
+// @ts-expect-error A snapshot would be written once and never updated.
+export const Stale = (): JSX.Element => <p>{count$.value}</p>;
 ```
 
 `constant` just returns its argument. `Constant<T>` exists only in the types, so it costs nothing at run time. `constant('button')` keeps the literal type `Constant<'button'>`.
 
-The rule is there for the second error above. `count`, read once with `Optional.unwrap(count$.getSnapshot())`, writes a number that never updates. If plain values were accepted, it would compile and show the right number, right up until the first update. Here it does not compile at all.
+The rule is there for the second error above. `{count$.value}` reads the state once and writes a number that never updates. If plain values were accepted, it would compile and show the right number, right up until the first update. Here it does not compile at all.
 
-Things that are not data take plain values: event handlers, `ref`, the `key` function of `For`, and functions that return children.
+Things that are not data take plain values: event handlers, `ref`, the `key` function of `For` and `Switch`, and functions that return children.
 
 - `constant` rejects `null` and `undefined`. To leave an attribute out, omit the prop; for a value that is only sometimes absent, use an `InitializedObservable<T | undefined>`.
 - `constant(obs$)` is a type error too.
@@ -53,7 +48,7 @@ Things that are not data take plain values: event handlers, `ref`, the `key` fun
 
 ## Transforming an observable: `pipe(map)`
 
-To show an observable transformed, write `source$.pipe(map(fn))`. There is no separate form for bindings: a slot takes the `map` node like any other observable. Created inside a component, or inside a row of `For`, the node belongs to that scope and is disposed with it:
+To show an observable transformed, write `source$.pipe(map(fn))`. There is no separate form for bindings: a prop or attribute takes the `map` node like any other observable. Created inside a component, or inside a row of `For`, the node belongs to that owner and is disposed with it:
 
 ```tsx
 import { createState, map } from 'synstate';
@@ -96,7 +91,7 @@ export const PriceList = (): JSX.Element => (
 );
 ```
 
-A `map` node computes `fn` once per update and passes on a result only when it is not `Object.is` the last one, so a binding writes to the DOM only when what it shows changed. The result is an observable like any other: several bindings, `getSnapshot()` and further operators can all read it.
+A `map` node computes `fn` once per update, and passes on a result only when it is not `Object.is` the last one: an equal result stops the update there, and nothing below it is visited. So a binding writes to the DOM only when what it shows changed. The result is an observable like any other: several bindings, `.value` and further operators can all read it. `pipe` takes one operator, and calls chain, `source$.pipe(filter(f)).pipe(map(g)).pipe(withInitialValue(x))`; each works out from its operator whether the result always holds a value.
 
 ## Receiving a `Bindable`: `mapBindable`, `deriveBindable`, `toObservable`
 
@@ -155,4 +150,4 @@ export const SearchSummary = ({
 };
 ```
 
-Use `toObservable` only where you really need an observable, such as to apply an operator. Turning a constant into an observable adds it to the graph, which `mapBindable` and `deriveBindable` avoid.
+Use `toObservable` only where you really need an observable, such as to apply an operator. A constant turned into an observable is a node of the graph, which `mapBindable` and `deriveBindable` avoid. `just(x)` holds `x` and never emits again: bound, it is written once.

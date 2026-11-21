@@ -9,9 +9,10 @@ import {
   isShadowedCallee,
   skipTypeWrappers,
 } from 'eslint-rule-forge';
-import { SYNSTATE_MODULE } from './constants.mjs';
+import { SYNSTATE_AND_WRAPPER_MODULES } from './constants.mjs';
 import {
   enclosingFunctionOf,
+  functionValuesOf,
   isPipeArgument,
   localFunctionOf,
   type FunctionNode,
@@ -30,13 +31,16 @@ type MessageIds = 'throwInOperator' | 'throwThroughCall';
  * value, which the graph carries on like any other.
  *
  * Reported: a `throw` directly in a function passed to a synstate operator
- * called in `.pipe(…)` — as an argument, or as a property of an options object
- * (`map(f, { equals })`) — unless a `try` with a `catch` in the same
- * function encloses it. A function passed by name counts when this file
- * defines it, and so does a function of this file the callback calls, at any
- * depth, reported at the call. A throw in a function the callback only defines,
- * or in an `async` function, does not run in the update and is not reported. A
- * call that throws without a `throw` of this file is not seen.
+ * called in `.pipe(…)` or to `derive`, whose projection runs as an operator's
+ * does — as an argument, or as a property of an options object written in the
+ * call (`map(f, { equals })`) — unless a `try` with a `catch` in the same
+ * function encloses it. A getter in the options is not followed, nor the
+ * function it returns (see `functionValuesOf`). A function passed by name
+ * counts when this file defines it, and so does a function of this file the
+ * callback calls, at any depth, reported at the call. A throw in a function the
+ * callback only defines, or in an `async` function, does not run in the update
+ * and is not reported. A call that throws without a `throw` of this file is not
+ * seen.
  *
  * The cost is one look at each call and each `throw`; nothing is followed
  * unless the file has a `throw`.
@@ -51,9 +55,9 @@ export const noThrowInOperator: TSESLint.RuleModule<MessageIds, Options> = {
     schema: [],
     messages: {
       throwInOperator:
-        'This throws in a function a synstate operator calls while an update propagates. The exception stops the update midway: the nodes it already reached hold the new value, the rest keep the old one, and the error reaches whoever wrote to the source. Make the function pure and return a `Result` (`Result.err(...)`) instead, and handle the error downstream (`mapResultOk`, `unwrapResultOk`, `filter(Result.isOk)`).',
+        'This throws in a function a synstate operator calls while an update propagates. The exception stops the update midway: the nodes it already reached hold the new value, the rest keep the old one, and the error reaches whoever wrote to the source. Make the function pure and return a `Result` (`Result.err(...)`) instead, and handle the error downstream (`map(Result.map(...))`, `filter(Result.isOk)`).',
       throwThroughCall:
-        'This calls `{{name}}`, which throws, in a function a synstate operator calls while an update propagates. The exception stops the update midway: the nodes it already reached hold the new value, the rest keep the old one, and the error reaches whoever wrote to the source. Make `{{name}}` return a `Result` (`Result.err(...)`) instead, and handle the error downstream (`mapResultOk`, `unwrapResultOk`, `filter(Result.isOk)`).',
+        'This calls `{{name}}`, which throws, in a function a synstate operator calls while an update propagates. The exception stops the update midway: the nodes it already reached hold the new value, the rest keep the old one, and the error reaches whoever wrote to the source. Make `{{name}}` return a `Result` (`Result.err(...)`) instead, and handle the error downstream (`map(Result.map(...))`, `filter(Result.isOk)`).',
     },
     defaultOptions: [],
   },
@@ -61,7 +65,9 @@ export const noThrowInOperator: TSESLint.RuleModule<MessageIds, Options> = {
   create: (context) => {
     const sourceCode = context.sourceCode;
 
-    const imports = getImportDeclarations(sourceCode.ast, SYNSTATE_MODULE);
+    const imports = SYNSTATE_AND_WRAPPER_MODULES.flatMap((moduleName) =>
+      getImportDeclarations(sourceCode.ast, moduleName),
+    );
 
     if (imports.length === 0) {
       return {};
@@ -78,6 +84,9 @@ export const noThrowInOperator: TSESLint.RuleModule<MessageIds, Options> = {
 
     const mut_operatorCalls: TSESTree.CallExpression[] = [];
 
+    /** Calls of `derive`, whose projection runs as an operator's does. */
+    const mut_deriveCalls: TSESTree.CallExpression[] = [];
+
     return {
       ThrowStatement: (node) => {
         mut_throwStatements.push(node);
@@ -92,9 +101,13 @@ export const noThrowInOperator: TSESLint.RuleModule<MessageIds, Options> = {
 
         if (
           resolved !== undefined &&
-          !isShadowedCallee(sourceCode, resolved, SYNSTATE_MODULE)
+          !isShadowedCallee(sourceCode, resolved, SYNSTATE_AND_WRAPPER_MODULES)
         ) {
-          mut_operatorCalls.push(node);
+          if (resolved.canonicalName === 'derive') {
+            mut_deriveCalls.push(node);
+          } else {
+            mut_operatorCalls.push(node);
+          }
         }
       },
 
@@ -144,8 +157,7 @@ export const noThrowInOperator: TSESLint.RuleModule<MessageIds, Options> = {
 
         /** The functions synstate operators call while an update propagates. */
         const callbacks = new Set(
-          mut_operatorCalls
-            .filter(isPipeArgument)
+          [...mut_operatorCalls.filter(isPipeArgument), ...mut_deriveCalls]
             .flatMap((call) => call.arguments.flatMap(functionValuesOf))
             .flatMap((expression) => {
               const callback = localFunctionOf(sourceCode, expression);
@@ -228,23 +240,6 @@ const escapingFunctionOf = (
   }
 
   return fn;
-};
-
-/**
- * The expressions in an argument of an operator that may be functions it calls:
- * the argument, or each property of an options object (`map(f, { equals })`).
- */
-const functionValuesOf = (
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  argument: TSESTree.CallExpressionArgument,
-): readonly TSESTree.Node[] => {
-  const unwrapped = skipTypeWrappers(argument);
-
-  return unwrapped.type === AST_NODE_TYPES.ObjectExpression
-    ? unwrapped.properties.flatMap((property) =>
-        property.type === AST_NODE_TYPES.Property ? [property.value] : [],
-      )
-    : [argument];
 };
 
 /** `nodes` by {@link escapingFunctionOf}, leaving out those it has none for. */

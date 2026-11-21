@@ -1,5 +1,5 @@
 import { Button, type IconName, type IconName20 } from 'blueprint-synstate';
-import { createState, onScopeDispose } from 'synstate';
+import { createState, onCleanup } from 'synstate';
 import { constant, type Bindable, type JSX } from 'synstate-dom';
 import { isPromiseLike, showToast } from '../../../functions/index.mjs';
 import { toaster } from '../../../store/index.mjs';
@@ -44,7 +44,7 @@ export const ButtonWithConfirm = ({
 
   let mut_alive = true;
 
-  onScopeDispose(() => {
+  onCleanup(() => {
     mut_alive = false;
   });
 

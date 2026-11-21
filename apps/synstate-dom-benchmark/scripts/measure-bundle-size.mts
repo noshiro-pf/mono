@@ -1,12 +1,9 @@
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
-import * as util from 'node:util';
 import { Arr } from 'ts-data-forge';
-import type { ReadonlyRecord } from 'ts-type-forge';
 import { version as viteVersion } from 'vite';
 // eslint-disable-next-line import-x/no-relative-packages -- shared with synstate-docs' measurement (#3066)
 import * as bundleSize from '../../../tools/scripts/lib/bundle-size.mjs';
-import { benchmarkSets, type BenchmarkSet } from './benchmark-sets.mjs';
 import { createProductionConfig } from './production-config.mjs';
 import { workspaceRootPath } from './workspace-root-path.mjs';
 
@@ -27,28 +24,8 @@ import { workspaceRootPath } from './workspace-root-path.mjs';
  * Unlike the timings, the sizes depend on nothing but the sources and the
  * installed versions, so one run is enough. Needs `pnpm run ws:build` first,
  * like `pnpm run benchmark`.
- *
- * ```sh
- * pnpm run bundle-size -- --next
- * ```
- *
- * With `--next`, the bundles are those of synstate-dom, synstate-dom-next and
- * Solid, the libraries `pnpm run benchmark:next` times, and the sizes go to
- * BUNDLE-SIZE-NEXT.md, which synstate-dom-next-docs embeds.
  */
 const main = async (): Promise<void> => {
-  // `pnpm run bundle-size -- --next` passes the `--` on.
-  const args = Arr.skip(process.argv, 2);
-
-  const [first, ...rest] = args;
-
-  const { values } = util.parseArgs({
-    args: first === '--' ? rest : args,
-    options: { next: { type: 'boolean', default: false } },
-  });
-
-  const set = sets[values.next ? 'next' : 'all'];
-
   const { libraries } = set;
 
   const sizes = await bundleSize.mapInSequence(
@@ -123,20 +100,6 @@ const synstateDom: Library = {
     loan: 'synstateDomLoan',
     schedule: 'synstateDomSchedule',
     zoom: 'synstateDomZoom',
-  },
-} as const;
-
-const synstateDomNext: Library = {
-  name: 'synstate-dom-next',
-  packages: ['synstate-dom-next', 'synstate-next'],
-  entryPoints: ['synstate-dom-next', 'synstate-next'],
-  fileName: 'synstate-dom-next.tsx',
-  exportName: {
-    counter: 'synstateDomNextCounter',
-    table: 'synstateDomNext',
-    loan: 'synstateDomNextLoan',
-    schedule: 'synstateDomNextSchedule',
-    zoom: 'synstateDomNextZoom',
   },
 } as const;
 
@@ -217,21 +180,13 @@ type BundleSet = Readonly<{
   timedBy: string;
 }>;
 
-/** One per benchmark set, with that set's libraries. */
-const sets = {
-  all: {
-    libraries: [synstateDom, solid, ...otherLibraries],
-    fileName: 'BUNDLE-SIZE.md',
-    command: 'pnpm run bundle-size',
-    timedBy: `pnpm run ${benchmarkSets.all.script}`,
-  },
-  next: {
-    libraries: [synstateDom, synstateDomNext, solid],
-    fileName: 'BUNDLE-SIZE-NEXT.md',
-    command: 'pnpm run bundle-size -- --next',
-    timedBy: `pnpm run ${benchmarkSets.next.script}`,
-  },
-} as const satisfies ReadonlyRecord<BenchmarkSet, BundleSet>;
+/** The libraries `pnpm run benchmark` times. */
+const set: BundleSet = {
+  libraries: [synstateDom, solid, ...otherLibraries],
+  fileName: 'BUNDLE-SIZE.md',
+  command: 'pnpm run bundle-size',
+  timedBy: 'pnpm run benchmark',
+} as const;
 
 const applications: readonly Application[] = [
   { name: 'everything exported', source: undefined },

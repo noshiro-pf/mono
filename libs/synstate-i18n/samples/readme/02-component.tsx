@@ -1,5 +1,5 @@
-import { constant, For, type JSX } from 'synstate-dom-next';
-import { map, type InitializedObservable } from 'synstate-next';
+import { map, type InitializedObservable } from 'synstate';
+import { constant, For, type JSX } from 'synstate-dom';
 import { i18n } from './i18n.mjs';
 
 const localeNames = { en: 'English', ja: '日本語' } as const;

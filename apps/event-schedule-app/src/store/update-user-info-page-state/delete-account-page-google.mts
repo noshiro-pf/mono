@@ -1,19 +1,13 @@
-import {
-  derive,
-  filter,
-  type InitializedObservable,
-  map,
-  mapTo,
-} from 'synstate';
+import { derive, filter, map, type InitializedObservable } from 'synstate';
 import { Optional, Result } from 'ts-data-forge';
 import type { StrictPick } from 'ts-type-forge';
 import { dict } from '../../constants/index.mjs';
 import {
   emailInputHasError,
   emailInputInitialState,
-  type EmailInputState,
   emailInputStateReducer,
   showToast,
+  type EmailInputState,
 } from '../../functions/index.mjs';
 import { createReducerWithActions } from '../../utils/index.mjs';
 import type {
@@ -79,7 +73,7 @@ export const createDeleteAccountCreatedWithGoogleStore = <
     createReducerWithActions(
       (_: boolean, isWaitingResponse: boolean) => isWaitingResponse,
       false,
-      [dialogClosed$.pipe(mapTo(false))],
+      [dialogClosed$.pipe(map(() => false, { equals: () => false }))],
     );
 
   const setTrueIsWaitingResponse = (): void => {

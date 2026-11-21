@@ -1,77 +1,75 @@
 ---
-title: Why SynState?
-description: Why choose SynState over other state management libraries — glitch-free, lightweight, type-safe, and React Compiler compatible.
-sidebar:
-    order: 1
+title: Why synstate
+description: What synstate gives an application — glitch-free updates at linear cost, subscribers that run once every value is up to date, updates that stop at unchanged values, cleanup in one place — and where it fits.
 ---
 
-## Simple to Start, Powerful When You Need It
+## Simple to start, powerful when you need it
 
-SynState is a state management library for web frontends. For most use cases, `createState`, `createReducer`, and simple combinators like `derive` and `map` are all you need — clean, minimal APIs that feel as intuitive as React's `useState` / `useReducer`, but for global state. For example, a [simple counter](/mono/synstate/examples/react/#global-counter) can be implemented in just a few lines:
+A counter is a `createState` and a `subscribe`. The same model scales to an application: the values the screen shows are derived from a handful of states with `map`, `derive` and the asynchronous operators, and the graph they form decides the order in which everything is recomputed. Nothing else has to be learned to go from one to the other.
+
+## Why observables
+
+An observable is a value that changes over time and can be followed. That fits what a front end deals with: an input is a state, a click is an event, a request is a value that arrives later, a timer is a value that ticks. With one abstraction for all of them, a debounce, a cancellation or "the latest answer only" is an operator in a pipeline instead of a timer and a flag kept by hand. [Declarative state](/mono/synstate/guides/declarative-state/) shows the difference on a search box and a data table.
+
+## Glitch-free, at linear cost
+
+A glitch is a moment in which a value derived from two others has seen one of them change and not the other. In the diamond below, a library that pushes each change to its children at once computes `sum` from the new `tens` and the old `hundreds`, shows 120 for an instant, and then 220.
+
+synstate queues the nodes an update reaches in a queue per depth and visits them shallowest first, so `sum` is computed once, after both of its parents:
 
 ```tsx
-import { createState } from 'synstate-react-hooks';
+import { createState, derive, map } from 'synstate';
 
-const [useCount, , { updateState }] = createState(0);
+const [a, setA] = createState(1);
 
-const Counter = () => {
-    const count = useCount();
-    return <button onClick={() => updateState((n) => n + 1)}>{count}</button>;
-};
+const tens = a.pipe(map((x) => x * 10));
+
+const hundreds = a.pipe(map((x) => x * 100));
+
+let mut_computed = 0;
+
+const sum = derive([tens, hundreds], (t, h) => {
+    mut_computed += 1;
+
+    return t + h;
+});
+
+const mut_seen: number[] = [];
+
+sum.subscribe((value) => {
+    mut_seen.push(value);
+});
+
+setA(2);
+
+// Never 120 or 210: `sum` is computed once per update, after both of its
+// parents, and its subscriber runs once every value is up to date.
+assert.deepStrictEqual(mut_seen, [110, 220]);
+
+assert.strictEqual(mut_computed, 2);
 ```
 
-When your requirements grow more complex, SynState scales with you. You can describe everything from a simple [Dark Mode toggle](/mono/synstate/examples/react/#boolean-state-dark-mode) to a [debounced search pipeline with auto-cancellation](/mono/synstate/examples/advanced/#search-with-debounce) in a single, unified API.
+Each node is visited at most once per update, so an update costs what it reaches, not more. How the queue works is in [How an update propagates](/mono/synstate/internals/how-an-update-propagates/).
 
-## Why Observable-Based?
+## Subscribers run after the update
 
-Real-world state management involves more than simple get/set. Filter inputs need debouncing, API calls need cancellation, and derived values must stay consistent when multiple sources change at once. These requirements demand a system that can express **asynchronous data flow** and **automatic dependency propagation** declaratively.
+Many observable libraries call a subscriber as soon as its observable changes, in the middle of the update. synstate queues the subscriber instead, and runs it once every node the update reaches has been recomputed. A subscriber therefore finds every other value of the graph up to date, unless a subscriber called before it for the same update has written a state: it then reads that state's new value, and what derives from it still old. A write a subscriber makes is the next update rather than an update nested inside this one. The UI layer, synstate-dom, relies on this: its bindings run the same way, so mounting and unmounting a branch never happen in the middle of a propagation.
 
-SynState is built on the Observable pattern — a model where state is represented as streams of values that can be composed, transformed, and combined. This gives you access to a rich set of operators (`debounce`, `throttle`, `switchMap`, `mergeMap`, etc.) without requiring a separate library like RxJS.
+## Stops where a value does not change
 
-To see how this works in practice — and how it compares to imperative code — see [Declarative State Management](/mono/synstate/guides/declarative-state-management/).
+Every node that computes a value (a `map`, a `derive`, a state's write) compares it with what it holds (`Object.is`, or the `equals` you give it), and passes nothing on when the two are equal. A filter that matches the same rows, a page count that stays the same, a boolean that stays `false`: the part of the graph below it is not visited at all. [Deriving values](/mono/synstate/guides/deriving-values/) shows when to turn it off.
 
-## Glitch-Free, at Linear Cost
+## Cleanup in one place
 
-The Observable pattern is not new — RxJS has popularized it for years. However, RxJS has a fundamental correctness issue known as the **glitch problem**: when multiple derived values share a common source, `combineLatest` can emit inconsistent intermediate states where some inputs have updated but others have not. This problem worsens as the dependency graph grows more complex. For example, in "diamond" dependencies — where a single source fans out to multiple derived values that are then recombined — the redundant computations scale as $O(n^2)$ with the number of recombinations, and when such diamonds are chained in series, the cost grows exponentially — $O(D^n)$ where $D$ is the number of branches per stage.
+An observable ends by being disposed, and disposal follows ownership: everything made while an owner runs belongs to that owner. A dialog that makes its own derived values, subscriptions and requests inside an owner closes all of them with one `dispose()`. Nothing travels down the graph to announce the end, so no operator can forget to pass it on. [Owners and lifetime](/mono/synstate/guides/owners-and-lifetime/) has the API, and [Why there is no completion](/mono/synstate/internals/why-no-completion/) the reasons.
 
-SynState solves this with a **depth-ordered propagation** algorithm that guarantees every derived value is updated only after all of its ancestors have been updated — in a single $O(n)$ pass. No glitches, no redundant computations, and no heap: the queue is a bucket per depth (a bucket queue), with none of a binary heap's $O(\log n)$ per node.
+## Use cases
 
-| Feature                     | RxJS                                                                             | SynState                                                                                 |
-| :-------------------------- | :------------------------------------------------------------------------------- | :--------------------------------------------------------------------------------------- |
-| **Glitch-free**             | No — `combineLatest` emits intermediate states                                   | Yes — depth-ordered propagation guarantees consistency                                   |
-| **Propagation cost**        | $O(n)$ for trees, up to $O(D^n)$ for chained diamonds ($D$ = branches per stage) | $O(n)$ in all cases                                                                      |
-| **`InitializedObservable`** | Not available — values may be absent until first emission                        | Built-in — always holds a value, ideal for representing state                            |
-| **Design focus**            | General-purpose asynchronous event processing                                    | State management first, with full async operator support (`debounce`, `switchMap`, etc.) |
+- An application whose state is shared across screens and components, where the same derived values are read in many places.
+- Asynchronous flows that need cancelling, debouncing or ordering: search boxes, autosave, polling, uploads.
+- UI built with [synstate-dom](/mono/synstate-dom/), where the graph ends in the DOM itself.
 
-For a detailed explanation, see [How SynState Solved the Glitch](/mono/synstate/internals/how-synstate-solved-the-glitch/).
+## Next steps
 
-RxJS is not the only library to compare against. Preact Signals and Solid are glitch-free and $O(n)$ as well; SynState stands apart from them on two counts. On speed, the [benchmark summary](/mono/synstate/guides/library-comparison/benchmark/#how-to-read-this-page) puts SynState within <!-- bench:summary/synstate-worst-over-fastest -->4.7<!-- /bench -->× of the fastest library in every scenario, <!-- bench:summary/synstate-alone-in-single-digits -->the only library measured in all of them whose worst case stays in single digits<!-- /bench -->. On features, SynState has the operator set of the previous section on the same glitch-free graph: with Preact Signals, a debounce, a cancellation or a switch to the latest request is code written by hand inside an effect, and an effect that writes a signal is outside what its glitch-freedom covers ([Operators on Signals](/mono/synstate/guides/library-comparison/operators-on-signals/)). See [Running Outside React](/mono/synstate/guides/library-comparison/library-comparison/#running-outside-react) for what each library takes when used on its own.
-
-## Fully Compatible with React Compiler
-
-All of SynState's reactive computation (`derive`, `map`, `filter`, etc.) happens **outside** React's rendering cycle. Components read values through `useSyncExternalStore` (a first-class React API) and have no implicit side effects during rendering — no proxy-based tracking, no hidden subscriptions triggered by property access. This means React Compiler can safely analyze and memoize these components, fully aligned with [React Compiler](https://react.dev/learn/react-compiler)'s automatic memoization.
-
-MobX's `observer()` HOC tracks observable access during rendering, which conflicts with React Compiler's memoization and requires opting out via the `"use no memo"` directive. SynState requires no such workarounds.
-
-## Use Cases
-
-**Use SynState when you need:**
-
-- ✅ A small piece of global state shared across components (e.g., dark mode toggle, user session).
-- ✅ Complex asynchronous state management with operators like `debounce`, `throttle`, `switchMap`.
-- ✅ Redux-like state with reducers (`createReducer`).
-- ✅ A project where the scale of state management is uncertain — SynState's unified API covers everything from a single shared counter to a full debounced search pipeline, so you never have to switch libraries as requirements grow.
-- ✅ Type-safe event emitters (`createEventEmitter`).
-
-**Consider other solutions when:**
-
-- You need per-instance state for dynamically created components — for example, form input values, accordion open/close state, or modal visibility, where multiple instances of the same component exist on screen and each requires its own independent state. Managing these with global state would require tracking instance creation and destruction in arrays, adding unnecessary complexity. React hooks (`useState` / `useReducer`) are the natural fit for component-local state like this.
-
-## Next Steps
-
-- [Declarative State Management](/mono/synstate/guides/declarative-state-management/) — understand the reactive programming model with concrete examples.
-- [React Integration](/mono/synstate/guides/react-integration/) — use SynState with React.
-- [Library Comparison](/mono/synstate/guides/library-comparison/library-comparison/) — how SynState compares to RxJS, Jotai, MobX, and others.
-- [Async Logic Compared](/mono/synstate/guides/library-comparison/async-comparison/) — one production-grade search box written with seven libraries.
-- [Performance Benchmark](/mono/synstate/guides/library-comparison/benchmark/) — quantitative throughput comparisons.
-- [Interactive Demos](/mono/synstate/guides/library-comparison/interactive-demo/) — see the differences in action.
+- [State and writes](/mono/synstate/guides/state-and-writes/): `createState` and the rules for writes.
+- [Deriving values](/mono/synstate/guides/deriving-values/): `pipe`, `derive`, `merge` and `zip`.

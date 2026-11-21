@@ -5,7 +5,7 @@
  */
 export {
   Fragment,
-  createMountable as jsx,
-  createMountable as jsxs,
+  createDescription as jsx,
+  createDescription as jsxs,
   type JSX,
 } from './jsx/index.mjs';

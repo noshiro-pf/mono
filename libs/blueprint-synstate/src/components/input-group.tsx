@@ -1,4 +1,4 @@
-import { onScopeDispose } from 'synstate';
+import { onCleanup } from 'synstate';
 import {
   constant,
   createAfterUpdate,
@@ -171,7 +171,7 @@ const padForAction = (
 
   observer.observe(action);
 
-  onScopeDispose(() => {
+  onCleanup(() => {
     observer.disconnect();
   });
 };

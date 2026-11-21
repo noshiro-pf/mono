@@ -1,4 +1,4 @@
-import { combine, map, type InitializedObservable } from 'synstate';
+import { derive, map, type InitializedObservable } from 'synstate';
 import { constant, For, If, type JSX } from 'synstate-dom';
 import { Arr, Optional } from 'ts-data-forge';
 import {
@@ -31,25 +31,23 @@ export const FoldedStack = ({
   cards,
   fold,
 }: Props): JSX.Element => {
-  const tally = combine([layers, cards]).pipe(
-    map(([numbers, byNumber]) =>
-      tallyLayers(
-        Arr.generate(function* () {
-          for (const each of numbers) {
-            const card = byNumber.get(each);
+  const tally = derive([layers, cards], (numbers, byNumber) =>
+    tallyLayers(
+      Arr.generate(function* () {
+        for (const each of numbers) {
+          const card = byNumber.get(each);
 
-            if (card !== undefined) {
-              yield {
-                checks:
-                  card.checks.kind === 'unread'
-                    ? ('unread' as const)
-                    : card.checks.verdict,
-                isDraft: card.isDraft,
-              };
-            }
+          if (card !== undefined) {
+            yield {
+              checks:
+                card.checks.kind === 'unread'
+                  ? ('unread' as const)
+                  : card.checks.verdict,
+              isDraft: card.isDraft,
+            };
           }
-        }),
-      ),
+        }
+      }),
     ),
   );
 

@@ -34,7 +34,7 @@ export const createDiagramSortStore = (
       const subscription = sort.subscribe(deps.save);
 
       return () => {
-        subscription.unsubscribe();
+        subscription();
       };
     },
   };

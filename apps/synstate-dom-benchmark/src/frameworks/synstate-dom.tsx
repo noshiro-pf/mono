@@ -1,6 +1,6 @@
-import { createState, map } from 'synstate';
-import { constant, For, render, type JSX } from 'synstate-dom';
-import { Optional } from 'ts-data-forge';
+/** @jsxImportSource synstate-dom */
+import { map, state } from 'synstate';
+import { constant, For, render, selector, type JSX } from 'synstate-dom';
 import type { BenchApp, Framework } from '../bench-app.mjs';
 import {
   createRowFactory,
@@ -9,66 +9,69 @@ import {
 } from '../data.mjs';
 
 /**
- * The table as SPEC.md has an application write it: the rows are one immutable
- * array in a state, and `For` derives each row's value from it.
+ * The table as synstate-dom's README has an application write it: the rows are
+ * one immutable array in a state, `For` keeps a state per row, and `selector`
+ * writes only the rows whose selection changed.
  */
 export const synstateDom: Framework = {
   name: 'synstate-dom',
   mount: (container) => {
     const factory = createRowFactory();
 
-    const [rows$, setRows, { getSnapshot: getRows }] = createState<
-      readonly RowData[]
-    >([]);
+    const rows = state<readonly RowData[]>([]);
 
-    const [selected$, setSelected] = createState<number | undefined>(undefined);
+    const selected = state<number | undefined>(undefined);
 
-    const App = (): JSX.Element => (
-      <table>
-        <tbody>
-          <For items={rows$} key={(row) => row.id}>
-            {(row$) => {
-              const { id } = Optional.unwrap(row$.getSnapshot());
+    const App = (): JSX.Element => {
+      const isSelected = selector(selected);
 
-              return (
-                <tr class={{ danger: selected$.pipe(map((s) => s === id)) }}>
-                  <td>{constant(id)}</td>
-                  <td>{row$.pipe(map((row) => row.label))}</td>
-                </tr>
-              );
-            }}
-          </For>
-        </tbody>
-      </table>
-    );
+      return (
+        <table>
+          <tbody>
+            <For items={rows} key={(row) => row.id}>
+              {(row) => {
+                const { id } = row.value;
+
+                return (
+                  <tr class={{ danger: isSelected.is(id) }}>
+                    <td>{constant(id)}</td>
+                    <td>{row.pipe(map((r) => r.label))}</td>
+                  </tr>
+                );
+              }}
+            </For>
+          </tbody>
+        </table>
+      );
+    };
 
     const unmount = render(App, container);
 
     return {
       run: (count) => {
-        setRows(factory.build(count));
+        rows.set(factory.build(count));
       },
       add: (count) => {
-        setRows([...getRows(), ...factory.build(count)]);
+        rows.set([...rows.value, ...factory.build(count)]);
       },
       update: () => {
-        setRows(
-          getRows().map((row, i) =>
+        rows.set(
+          rows.value.map((row, i) =>
             i % 10 === 0 ? { ...row, label: `${row.label} !!!` } : row,
           ),
         );
       },
       select: (index) => {
-        setSelected(getRows()[index]?.id);
+        selected.set(rows.value[index]?.id);
       },
       swapRows: () => {
-        setRows(swapSecondAndSecondToLast(getRows()));
+        rows.set(swapSecondAndSecondToLast(rows.value));
       },
       remove: (index) => {
-        setRows(getRows().toSpliced(index, 1));
+        rows.set(rows.value.toSpliced(index, 1));
       },
       clear: () => {
-        setRows([]);
+        rows.set([]);
       },
       dispose: unmount,
     } satisfies BenchApp;

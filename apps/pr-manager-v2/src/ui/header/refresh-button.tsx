@@ -1,4 +1,4 @@
-import { combine, map, type InitializedObservable } from 'synstate';
+import { derive, map, type InitializedObservable } from 'synstate';
 import { constant, type JSX } from 'synstate-dom';
 import { isReading, type ReportStatus } from '../../store/index.mjs';
 
@@ -15,9 +15,7 @@ export const RefreshButton = ({
   return (
     <button
       class={constant('button')}
-      disabled={combine([reading, status]).pipe(
-        map(([r, s]) => r || s.kind === 'no-token'),
-      )}
+      disabled={derive([reading, status], (r, s) => r || s.kind === 'no-token')}
       type={constant('button')}
       onClick={refresh}
     >

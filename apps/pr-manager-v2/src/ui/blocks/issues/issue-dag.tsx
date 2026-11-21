@@ -1,8 +1,8 @@
 import {
-  combine,
   createState,
+  derive,
   map,
-  onScopeDispose,
+  onCleanup,
   skipIfNoChange,
   type InitializedObservable,
 } from 'synstate';
@@ -62,26 +62,25 @@ export const IssueDag = ({
     .pipe(map((v) => v.graph))
     .pipe(skipIfNoChange(fastDeepEqual));
 
-  const fitBox = combine([store.zoom, box])
-    .pipe(map(([zoom, size]) => (zoom.kind === 'fit' ? size : undefined)))
-    .pipe(skipIfNoChange(sameBox));
+  const fitBox = derive([store.zoom, box], (zoom, size) =>
+    zoom.kind === 'fit' ? size : undefined,
+  ).pipe(skipIfNoChange(sameBox));
 
-  const laidOutGraph = combine([graph, fitBox]).pipe(
-    map(([g, size]) =>
-      layoutDag(
-        g,
-        size === undefined
-          ? undefined
-          : bestFreeColumns(g, size.width, size.height),
-      ),
+  const laidOutGraph = derive([graph, fitBox], (g, size) =>
+    layoutDag(
+      g,
+      size === undefined
+        ? undefined
+        : bestFreeColumns(g, size.width, size.height),
     ),
   );
 
-  const drawn = combine([laidOutGraph, store.zoom, box]).pipe(
-    map(([laidOut, zoom, size]) => ({
+  const drawn = derive(
+    [laidOutGraph, store.zoom, box],
+    (laidOut, zoom, size) => ({
       layout: laidOut,
       scale: zoom.kind === 'fit' ? fitScale(padded(laidOut), size) : zoom.scale,
-    })),
+    }),
   );
 
   /** Moves to `next`, keeping the point at the middle of the box there. */
@@ -130,7 +129,7 @@ export const IssueDag = ({
 
     globalThis.addEventListener('resize', measure);
 
-    onScopeDispose(() => {
+    onCleanup(() => {
       observer.disconnect();
 
       globalThis.removeEventListener('resize', measure);

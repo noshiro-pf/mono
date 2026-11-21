@@ -1,7 +1,7 @@
 import {
   createState,
   map,
-  onScopeDispose,
+  onCleanup,
   type InitializedObservable,
 } from 'synstate';
 import { constant, For, If, type JSX } from 'synstate-dom';
@@ -134,12 +134,12 @@ export const QueueRow = ({ view }: Props): JSX.Element => {
       queueMicrotask(measure);
     });
 
-    onScopeDispose(() => {
+    onCleanup(() => {
       observer.disconnect();
 
       element.removeEventListener('scroll', measure);
 
-      subscription.unsubscribe();
+      subscription();
     });
   };
 

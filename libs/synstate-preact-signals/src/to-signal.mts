@@ -9,23 +9,22 @@ import { Optional } from 'ts-data-forge';
  * observable has an initial value, the returned signal is guaranteed to hold a
  * value of type `A`.
  *
- * The subscription lives for the lifetime of the observable (until it
- * completes), or, when made while a synstate scope runs, until that scope is
- * disposed.
+ * The subscription lasts until the observable is disposed, or, when made while
+ * a synstate owner runs, until that owner is disposed.
  *
  * @example
  * ```ts
- * const count$ = source<number>(0);
+ * const count$ = state<number>(0);
  *
  * const countSignal = toSignal(count$);
  *
  * assert.strictEqual(countSignal.value, 0);
  *
- * count$.next(1);
+ * count$.set(1);
  *
  * assert.strictEqual(countSignal.value, 1);
  *
- * count$.next(42);
+ * count$.set(42);
  *
  * assert.strictEqual(countSignal.value, 42);
  * ```

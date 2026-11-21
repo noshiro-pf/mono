@@ -1,6 +1,6 @@
 import { createState, map } from 'synstate';
 import { constant, MatchResult, type JSX } from 'synstate-dom';
-import { Result } from 'ts-data-forge';
+import { Result } from 'ts-std-forge';
 
 const [parsed$] = createState<Result<number, string>>(Result.ok(0));
 

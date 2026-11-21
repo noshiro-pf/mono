@@ -1,0 +1,63 @@
+---
+title: mergeMap
+description: 'Follows every observable that `project` returns, emitting whatever any of them emits.'
+---
+
+import MarbleDiagram from '../../../../components/MarbleDiagram.astro';
+
+{/* reference:jsdoc */}
+
+Follows every observable that `project` returns, emitting whatever any of them emits. What a projection creates belongs to an owner of its own, disposed once its observable is settled (a `timer` that fired, a settled promise) or when this node is disposed.
+
+The inner observable's value at the time of the projection joins the update that caused it, unless this node already emitted in that update. A later emission arrives in an update of its own. Every value is delivered, as an event source's are: values that meet in one update are delivered one update after another, in the order they arrived.
+
+On an initialized source, with a projection that returns an initialized observable, it projects the value the source holds when it is created, so it holds a value from the start and is typed `InitializedObservable`, unless the projection disposes an owner of it.
+
+{/* /reference */}
+
+{/* reference:operator-kind */}
+
+- When `project` returns an `InitializedObservable`, its result holds a value whenever the source does: on an `InitializedObservable`, `pipe` gives one ([`KeepInitialValueOperator`](/mono/synstate/guides/deriving-values/#pipe)).
+- Otherwise, its result may hold no value even when the source holds one: `pipe` gives an `Observable` ([`DropInitialValueOperator`](/mono/synstate/guides/deriving-values/#pipe)).
+
+{/* /reference */}
+
+## Marble diagram
+
+<MarbleDiagram slug="merge-map" />
+
+## Example
+
+```tsx
+import { createValueEmitter, map, mergeMap, timer } from 'synstate';
+
+const [uploaded, upload] = createValueEmitter<string>();
+
+// Every upload runs to the end, the slow one included.
+const done = uploaded.pipe(
+    mergeMap((name) =>
+        timer(name === 'big' ? 300 : 100).pipe(map(() => `${name} done`)),
+    ),
+);
+
+const mut_seen: string[] = [];
+
+done.subscribe((message) => {
+    mut_seen.push(message);
+});
+
+upload('big');
+
+upload('small');
+
+await vi.advanceTimersByTimeAsync(300);
+
+assert.deepStrictEqual(mut_seen, ['small done', 'big done']);
+```
+
+## See also
+
+- [Async operators](/mono/synstate/guides/async-operators/)
+- [All APIs](/mono/synstate/reference/)
+
+[Source on GitHub](https://github.com/noshiro-pf/mono/blob/main/libs/synstate/src/operators/merge-map.mts)

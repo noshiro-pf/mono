@@ -1,4 +1,4 @@
-import { combine, map, type InitializedObservable } from 'synstate';
+import { derive, map, type InitializedObservable } from 'synstate';
 import { constant, type JSX } from 'synstate-dom';
 import { Optional } from 'ts-data-forge';
 import {
@@ -37,8 +37,8 @@ export const BoundaryLine = ({
     <div
       aria-hidden={constant('true')}
       class={constant('boundary-line')}
-      data-last={combine([index, siblings]).pipe(
-        map(([i, all]) => (i === all.length - 1).toString()),
+      data-last={derive([index, siblings], (i, all) =>
+        (i === all.length - 1).toString(),
       )}
       title={layout.layout.pipe(
         map((l) =>

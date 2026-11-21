@@ -13,15 +13,15 @@
 
     "jsxImportSource": "synstate-dom",
 
-    // `samples/` imports this package by its own name, the way a consumer does.
-    // Mapped to the source so that a sample is checked against the code being
-    // edited rather than against the last build. See
-    // docs/workspace-package-linking.md.
+    // `jsxImportSource` names this package itself, and the tests import it by
+    // name the way a consumer does. Mapped to the source so that they are
+    // checked against the code being edited rather than against the last build.
+    // See docs/workspace-package-linking.md.
     "paths": {
       "synstate-dom": ["./src/index.mts"],
       "synstate-dom/jsx-runtime": ["./src/jsx-runtime.mts"],
       "synstate-dom/jsx-dev-runtime": ["./src/jsx-dev-runtime.mts"]
     }
   },
-  "include": ["./src", "./test", "./samples", "./scripts", "./configs"]
+  "include": ["./src", "./test", "./scripts", "./configs"]
 }

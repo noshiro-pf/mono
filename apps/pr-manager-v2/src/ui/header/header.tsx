@@ -1,4 +1,4 @@
-import { map, onScopeDispose } from 'synstate';
+import { map, onCleanup } from 'synstate';
 import { constant, If, type JSX } from 'synstate-dom';
 import { repoSlug, repoUrl, type Repo } from '../../domain/index.mjs';
 import type { AppStore } from '../../store/index.mjs';
@@ -133,7 +133,7 @@ const observeHeight =
 
     observer.observe(header);
 
-    onScopeDispose(() => {
+    onCleanup(() => {
       observer.disconnect();
     });
   };

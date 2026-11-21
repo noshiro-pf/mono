@@ -74,15 +74,50 @@ export default [
 | Rule                             | Description                                                                                                                                                                                                                |
 | :------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `no-aria-string-conversion`      | Disallow converting an `aria-*` value to a string (`String(x)`, `.toString()`, `map(String)`, `x ? 'true' : 'false'`), which synstate-dom does itself. In the `synstate-dom` preset only.                                  |
+| `no-constant-map`                | Require `{ equals: () => false }` on `map(() => c)`. `map` stops a result equal to the one it holds, so a `map` to a constant emits once and never again. Fixable.                                                         |
 | `no-identity-map`                | Require `skipIfNoChange()` instead of `map((x) => x)`, which changes no value and only stops a repeated one. Fixable.                                                                                                      |
-| `no-observable-in-handler`       | Disallow deriving or subscribing to an observable in an event handler or listener, or after an `await` in a component. Both run outside every scope, so the observable is never disposed and the subscription never ended. |
-| `no-redundant-skip-if-no-change` | Disallow `skipIfNoChange()` directly after `map`, an operator built on it, or another `skipIfNoChange()`, which already stop a value equal (`Object.is`) to the one before. Fixable.                                       |
+| `no-observable-in-handler`       | Disallow deriving or subscribing to an observable in an event handler or listener, or after an `await` in a component. Both run outside every owner, so the observable is never disposed and the subscription never ended. |
+| `no-redundant-skip-if-no-change` | Disallow `skipIfNoChange()` directly after `map` or another `skipIfNoChange()`, which already stop a value equal (`Object.is`) to the one before. Fixable.                                                                 |
 | `no-throw-in-operator`           | Disallow `throw` in a function passed to a synstate operator. The exception stops the update midway, leaving part of the graph updated; return a `Result` instead.                                                         |
-| `no-unbounded-counter-pipe`      | Disallow calling `.pipe` directly on `counter(...)` when it has no `times` option. Nothing holds the counter, so nothing can complete it, and it never ends.                                                               |
+| `no-unbounded-counter-pipe`      | Disallow calling `.pipe` directly on `counter(...)` when it has no `times` option. Nothing holds the counter, so nothing but its owner can dispose it, and outside every owner it never ends.                              |
 | `no-unfocusable-focus-handler`   | Disallow `onFocus` / `onBlur`, which do not bubble in synstate-dom, on an element that cannot take the focus itself. In the `synstate-dom` preset only. Suggests `onFocusIn` / `onFocusOut`.                               |
-| `no-write-during-propagation`    | Disallow writing to a synstate state or source from a subscriber or a projection. The write starts an update inside the one that called it, outside the graph synstate orders.                                             |
-| `prefer-derive`                  | Require `derive(parents, fn)` instead of `combine(parents).pipe(map(fn))`, which is two observables and builds a tuple on every update. Fixable.                                                                           |
-| `prefer-map-to`                  | Require `mapTo(c)` instead of `map(() => c)`. `map` stops a result equal to the one it holds, so a `map` to a constant emits once and never again. Fixable.                                                                |
+| `no-write-during-propagation`    | Disallow writing to a synstate state or source from a subscriber or a projection. The write is not an edge of the graph, so synstate cannot order it with the update that called it.                                       |
+
+### `no-constant-map`
+
+`map` passes on a result only when it is not `Object.is` the one it holds, so
+that a derived value that did not change wakes nothing below it. A `map` that
+turns events into a constant — `click$.pipe(map(() => true))`,
+`reset$.pipe(map(() => 'reset' as const))` — therefore emits on the first event
+and on none after it. `map(() => true, { equals: () => false })` emits on every
+one, and the rule adds the options.
+
+Only a body that is the same value every time it runs is reported: a literal
+other than a regular expression, a template literal with no expression,
+`undefined`, a `const` or an import, `!` or `void` of one of those, or `-` or
+`+` of a literal or a template literal with no expression (signed or not), of
+`undefined`, of a `const` named alone (not destructured) and initialized with
+such a literal, or of a `!`, `void`, `-` or `+` reported itself (any other name
+may hold an object whose `valueOf` answers differently each time), save `+` of a
+bigint, which throws. An import is taken to be constant, so a module that
+reassigns an exported `let` is outside what the rule can tell.
+The body may be an expression, a block whose one statement returns, or a block
+that returns `undefined` (`map(() => {})`), in an arrow function or a function
+expression that is neither async nor a generator, whatever its parameters: a
+default or a destructuring runs code, but nothing it runs changes the constant
+returned. A member of a constant object (`Status.idle`) is not read as constant,
+since a property may be reassigned. A body that calls something or builds an
+object or array is left alone; a new object each time is never equal, so such a
+`map` emits on every event already.
+A `map` given options is left alone too, since its author has said how results
+compare. When the event maps to a value that can repeat but is not constant — a
+request mapped to the id it is for — give the `map` `{ equals: () => false }`
+yourself; the rule cannot tell such a `map` from a derived state and does not
+report it.
+
+`map` is recognized imported from `synstate` by name, under an alias or through
+a namespace import, and the body is read through `as`, `satisfies`, `!` and
+parentheses.
 
 ### `no-identity-map`
 
@@ -107,9 +142,9 @@ under that name by `import type` is reported without a fix.
 
 ### `no-observable-in-handler`
 
-A handler runs outside every scope: by the time it is called, no `run` is
+A handler runs outside every owner: by the time it is called, no `run` is
 executing. An observable it derives, such as `a$.pipe(map(f))` in an `onClick`,
-belongs to no scope, so nothing disposes it when the row or branch it was made
+belongs to no owner, so nothing disposes it when the row or branch it was made
 for goes away, and its parents keep computing it for as long as they live.
 synstate-dom does not check this at run time: wrapping every handler would cost
 each event, and synstate's development check reads `process`, which a browser
@@ -117,9 +152,9 @@ bundle does not have.
 
 The rule reports a call that creates an observable that keeps working while it
 lives — `.pipe(…)` with a synstate operator (written there or bound to a `const`
-of the file), `combine`, `derive`, `merge`, `zip`, `fromSubscribable`, a
-`counter` without a `times` option, and synstate-dom's `deriveBindable`,
-`mapBindable` and `toObservable` — inside:
+of the file), `derive`, `merge`, `zip`, `fromSubscribable`, `createSource`,
+`createDerived`, a `counter` without a `times` option, and synstate-dom's
+`deriveBindable`, `mapBindable` and `toObservable` — inside:
 
 - a JSX prop whose name starts with `on` and a capital letter, including either
   side of a condition (`enabled ? handler : undefined`);
@@ -127,48 +162,48 @@ of the file), `combine`, `derive`, `merge`, `zip`, `fromSubscribable`, a
   `addEventListener` (not a binding of the file's own: an import, a declaration
   or a parameter), or to any object's `addEventListener`;
 
-whether the function is written in place or named by a function declaration or
-a `const` of the same file. It reads the code written inside the handler,
-nested functions included (a callback it subscribes, schedules or iterates
-with runs outside every scope too), and the functions of the same file that the
-handler calls by name. A function of the file that the handler only passes by
-name to another call, other than one of the listener calls above, is not
-followed, since it may be a component mounted later in its own scope
-(`setPage(Settings)`); so `setTimeout(rebuild)` and `createScope().run(build)`
-with a named function are not reported either. The same body written inline,
-as in `setPage(() => <div>{derive(…)}</div>)`, is code written inside the
-handler and is reported.
+whether the function is written in place or named by a function declaration or a
+`const` of the same file. It reads the code written inside the handler, nested
+functions included (a callback it subscribes, schedules or iterates with runs
+outside every owner too), and the functions of the same file that the handler
+calls by name. A function of the file that the handler only passes by name to
+another call, other than one of the listener calls above, is not followed, since
+it may be a component mounted later in its own owner (`setPage(Settings)`); so
+`setTimeout(rebuild)` and `createOwner().run(build)` with a named function are
+not reported either. The same body written inline, as in
+`setPage(() => <div>{derive(…)}</div>)`, is code written inside the handler and
+is reported.
 
-A chain of `.pipe` calls, or a creation in the arguments of another, is
-reported once, at the outer call, which also stands for what a function of the
-file called there creates. A root state, `just(…)`, a `timer` and a counter
-with `times` are not reported: they compute nothing more, or complete by
-themselves. synstate-dom's factories are reported whatever their arguments,
-although given only constants they create nothing.
+A chain of `.pipe` calls, or a creation in the arguments of another, is reported
+once, at the outer call, which also stands for what a function of the file
+called there creates. A root state, `just(…)`, a `timer` and a counter with
+`times` are not reported: they compute nothing more, or settle by themselves.
+synstate-dom's factories are reported whatever their arguments, although given
+only constants they create nothing.
 
 A `.subscribe(…)` in the same places is reported too. A subscription made while
-a scope runs is ended by that scope, as an observable created there is disposed;
-one made in a handler belongs to none, and nothing ends it. The receiver has to
-be known to be a synstate observable: a call of a synstate export or a creation
-above, a `const` bound to one, the first element destructured from such a call
-(`const [count$] = createState(0)`), or, with type information, any expression
-typed as an observable. One that completes by itself, such as `timer(300)`,
-`just(x)`, a `counter` with `times`, a `.pipe` of one of those, or a `.pipe`
-with `take`, ends its subscriptions and is not reported. `takeUntil` and
-`takeWhile` do not count: they end it only if their notifier emits or their
-predicate fails.
+an owner runs is ended by that owner, as an observable created there is
+disposed; one made in a handler belongs to none, and nothing ends it. The
+receiver has to be known to be a synstate observable: a call of a synstate
+export or a creation above, a `const` bound to one, the first element
+destructured from such a call (`const [count$] = createState(0)`), or, with type
+information, any expression typed as an observable. One that settles by itself,
+such as `timer(300)`, `just(x)`, a `counter` with `times`, a `.pipe` of one of
+those, or a `.pipe` with `take`, leaves nothing to keep its subscriptions alive
+and is not reported. `takeUntil` and `takeWhile` do not count: they settle only
+if their notifier emits or their predicate fails.
 
 Two ways out are accepted:
 
 - have the handler write to a state, and derive from that state at mount time;
-- take the scope with `getCurrentScope()` at mount time and create the
-  observable, or subscribe, inside its `run(…)` callback, which also covers work
-  after an `await`.
+- take the owner with `getOwner()` at mount time and create the observable, or
+  subscribe, inside its `run(…)` callback, which also covers work after an
+  `await`.
 
-Code after an `await` in a component runs outside every scope too. A component
-runs in its scope only until it returns, and an `async` function it starts, such
+Code after an `await` in a component runs outside every owner too. A component
+runs in its owner only until it returns, and an `async` function it starts, such
 as `void (async () => { await ready; count$.subscribe(log); })()`, is resumed
-later with no scope current. So the same creations and subscriptions are
+later with no owner current. So the same creations and subscriptions are
 reported, with their own message, in an `async` function that contains JSX or is
 written inside a function that does (JSX passed to a `render` call, such as
 synstate-dom's `render(() => <App />, root)` or React's `root.render(<App />)`,
@@ -181,74 +216,71 @@ name is read as it is for a handler; a function is otherwise judged by where it
 is written, a function declaration too, so write one that runs before the
 `await` above it.
 
-Code before the first `await` still runs in the scope and is not reported.
-Neither is work in the `run` of a scope taken with `getCurrentScope()` before
-the `await`, nor under `untracked(…)`. An `async` callback of `run` is no
-exception: its scope is current only until the callback's first `await`, so what
-follows it is reported. An `async` function outside a component is not read, nor
-is a callback scheduled with `.then`, `setTimeout` or the like.
+Code before the first `await` still runs in the owner and is not reported.
+Neither is work in the `run` of an owner taken with `getOwner()` before the
+`await`, nor under `untracked(…)`. An `async` callback of `run` is no exception:
+its owner is current only until the callback's first `await`, so what follows it
+is reported. An `async` function outside a component is not read, nor is a
+callback scheduled with `.then`, `setTimeout` or the like.
 
-Any `run` is trusted to choose a scope that something disposes, except one on a
-scope made on the spot with no parent: `createScope()`,
-`createScope(undefined)`, `createScope(null)`, `createScope(void 0)` or
-`createScope(getCurrentScope())`. `untracked(…)` is accepted, for an observable
-or a subscription meant to belong to no scope, and so is the app passed to
-synstate-dom's `render`, whose root scope the function it returns disposes.
+Any `run` is trusted to choose an owner that something disposes, except one on
+an owner made on the spot, which in a handler has no parent: `createOwner()` or
+`createRootOwner()`. `untracked(…)` is accepted, for an observable or a
+subscription meant to belong to no owner, and so is the app passed to
+synstate-dom's `render`, whose root owner the function it returns disposes.
 
 It recognizes the factories imported from `synstate`, its wrapper packages and
 `synstate-dom` by name, under an alias or through a namespace import, and reads
 through `as`, `satisfies`, `!` and parentheses. A `.pipe` whose operators are
-not synstate's, such as RxJS's, is not reported. Neither is a scope bound to a
+not synstate's, such as RxJS's, is not reported. Neither is an owner bound to a
 name in the handler and then run, a function of another file, nor a listener
 given as a `handleEvent` object.
 
 ### `no-redundant-skip-if-no-change`
 
 `map` passes on a result only when it is not `Object.is` the one it holds, so
-`layout$.pipe(map((l) => l.mode)).pipe(skipIfNoChange())` compares every
-result twice and keeps one more observable for nothing. The rule removes the
-`.pipe(skipIfNoChange())`. The same holds after the operators synstate builds
-on `map` — `pluck` (`getKey`), `mapOptional`, `mapResultOk`, `mapResultErr`,
-`unwrapOptional`, `unwrapResultOk`, `unwrapResultErr` — and after a
-`skipIfNoChange()` that compares with `Object.is` itself: of the values these
-pass on, none is `Object.is` the one before.
+`layout$.pipe(map((l) => l.mode)).pipe(skipIfNoChange())` compares every result
+twice and keeps one more observable for nothing. The rule removes the
+`.pipe(skipIfNoChange())`. The same holds after a `skipIfNoChange()` that
+compares with `Object.is` itself: of the values it passes on, none is
+`Object.is` the one before.
 
-Only `skipIfNoChange` (or `distinctUntilChanged`) given no comparison or
-`Object.is` is reported, piped directly onto `x.pipe(op)` where `op` is one of
-those: a `map` given no `equals`, an operator built on `map`, or
-`skipIfNoChange` comparing with `Object.is`. A comparison of its own may stop
-more than `Object.is`, a `map` with `equals` may pass equal results on, `mapTo`
-emits on every source value, and an operator in between (`withInitialValue`)
-may emit a value the one before it never compared. An observable reached
-through a name is not followed. The operators are recognized imported from
-`synstate` by name, under an alias or through a namespace import, and read
-through `as`, `satisfies`, `!` and parentheses, which the fix keeps around the
-observable before. A comment inside the removed text leaves the report without
-a fix.
+Only `skipIfNoChange` given no comparison or `Object.is` is reported, piped
+directly onto `x.pipe(op)` where `op` is one of those: a `map` given no options,
+or `skipIfNoChange` comparing with `Object.is`. A comparison of its own may stop
+more than `Object.is`, a `map` with `equals` may pass equal results on, and an
+operator in between (`withInitialValue`) may emit a value the one before it
+never compared. An observable reached through a name is not followed. The
+operators are recognized imported from `synstate` by name, under an alias or
+through a namespace import, and read through `as`, `satisfies`, `!` and
+parentheses, which the fix keeps around the observable before. A comment inside
+the removed text leaves the report without a fix.
 
 ### `no-throw-in-operator`
 
-synstate calls the functions given to its operators while an update
-propagates, and catches nothing they throw. A `throw` in
+synstate calls the functions given to its operators while an update propagates,
+and catches nothing they throw. A `throw` in
 `text$.pipe(map((text) => { if (text === '') throw new Error('empty'); ... }))`
-stops the update where it is and reaches whoever wrote to the source: the
-nodes the update already reached hold the new value, those it had not reached
-keep the old one, and a subscriber that reads both sees them disagree until
-the next update. Make the function pure and return the failure as a value,
-which the graph carries like any other —
+stops the update where it is and reaches whoever wrote to the source: the nodes
+the update already reached hold the new value, those it had not reached keep the
+old one, and a subscriber that reads both sees them disagree until the next
+update. Make the function pure and return the failure as a value, which the
+graph carries like any other —
 `map((text) => (text === '' ? Result.err('empty') : Result.ok(text)))` — and
-handle it downstream with `mapResultOk`, `unwrapResultOk` or
-`filter(Result.isOk)`.
+handle it downstream with `map(Result.map(...))` or `filter(Result.isOk)`.
 
-Reported is a `throw` directly in a function given to a synstate operator
-called in `.pipe(...)` — as an argument, or as a property of an options object
+Reported is a `throw` directly in a function given to a synstate operator called
+in `.pipe(...)`, or to `derive`, whose projection runs the same way — as an
+argument, or as a property of an options object written in the call
 (`map(f, { equals })`) — unless a `try` with a `catch` in the same function
-encloses it. A function passed by name counts when the file defines it (a
-function declaration, or a `const` bound to a function), and so does a
-function of the file that the callback calls, at any depth: the rule reports
-the call in the callback, naming the function that throws. The operators are
-recognized imported from `synstate` by name, under an alias or through a
-namespace import, and read through `as`, `satisfies`, `!` and parentheses.
+encloses it. A getter in the options is rare enough not to be followed, nor the
+function it returns. A function passed by name counts when the file defines it
+(a function declaration, or a `const` bound to a function), and so does a
+function of the file that the callback calls, at any depth: the rule reports the
+call in the callback, naming the function that throws. The operators are
+recognized imported from `synstate` or from the packages that re-export it
+(`synstate-react-hooks`, …), by name, under an alias or through a namespace
+import, and read through `as`, `satisfies`, `!` and parentheses.
 
 Not reported: a `throw` in a function the callback only defines (a `.then`
 callback, which runs after the update), in an `async` function (whose `throw`
@@ -259,21 +291,21 @@ costs it one look at each call.
 
 ### `no-unbounded-counter-pipe`
 
-`counter(1000).pipe(take(3))` reads like three ticks, but `take(3)` completes
-the observable it returns, not the counter underneath. Since synstate 4.0.0 a
-child completing does not complete its parents, so the counter keeps running
-until it is completed through a name or stops by itself. A counter piped
-straight from its call has no name, so without a `times` option it keeps its
-timer running for as long as the program lives.
+`counter(1000).pipe(take(3))` reads like three ticks, but `take(3)` settles the
+observable it returns, not the counter underneath, so the counter keeps running
+until it is disposed or stops by itself. A counter piped straight from its call
+has no name, so without a `times` option only its owner can dispose it: it keeps
+its timer running until the owner goes, and for as long as the program lives
+when made outside every owner.
 
 The type cannot forbid this `.pipe`, because the same call is fine once the
-counter has a name: `const counter$ = counter(1000)` can be completed through
+counter has a name: `const counter$ = counter(1000)` can be disposed through
 `counter$` when it is no longer needed. The rule therefore reports a `.pipe`
 whose receiver is the `counter(...)` call itself, and accepts either fix:
 
-- pass `{ times: N }`, so that the counter completes by itself after `N`
-  emissions: `counter(1000, { times: 3 }).pipe(...)`;
-- bind the counter to a name and complete it yourself.
+- pass `{ times: N }`, so that the counter stops by itself after `N` emissions:
+  `counter(1000, { times: 3 }).pipe(...)`;
+- bind the counter to a name and dispose it yourself.
 
 It recognizes `counter` imported from `synstate` by name, under an alias or
 through a namespace import, and reads through `as`, `satisfies`, `!` and
@@ -325,9 +357,9 @@ recurses until synstate stops it. synstate warns at run time, once per state;
 this rule reports the write where it is written. Derive the value instead, so
 that the graph has the edge: `const b$ = a$.pipe(map((a) => a * 2))`.
 
-It reports a call, made directly in a function passed to `.subscribe(...)`,
-to an operator inside `.pipe(...)` or to `useObservableEffect`, to what a
-synstate factory returned:
+It reports a call, made directly in a function passed to `.subscribe(...)`, to
+an operator inside `.pipe(...)`, to `derive` or to `useObservableEffect`, to
+what a synstate factory returned:
 
 - the setter of `createState`, and its `updateState` and `resetState`;
 - the `dispatch` of `createReducer`;
@@ -336,10 +368,13 @@ synstate factory returned:
 - the emitter of `createEventEmitter` and `createValueEmitter`;
 - `next` of a `source()`.
 
-A subscriber or projection passed by name counts when the file defines it
-(a function declaration, or a `const` bound to a function). So does a function
-of the file that the callback calls, at any depth: the rule reports the call
-in the callback, naming the function that writes.
+A projection of synstate's may be an argument or a property of an options object
+written in the call (`map(f, { equals })`), not a getter, which is rare enough
+not to be followed, nor the function it returns. A subscriber or projection
+passed by name counts when the file defines it (a function declaration, or a
+`const` bound to a function). So does a function of the file that the callback
+calls, at any depth: the rule reports the call in the callback, naming the
+function that writes.
 
 The factories and `useObservableEffect` are recognized imported from
 `synstate` or from the packages that re-export it (`synstate-react-hooks`,
@@ -360,57 +395,6 @@ covers a write in a function the callback merely defines (a `setTimeout`
 callback, which runs after the update, so it is correct), a setter passed as an
 argument or kept in an object, and a function imported from another file and
 called from the callback.
-
-### `prefer-derive`
-
-`combine(parents)` emits a tuple of its parents' latest values, so deriving one
-value from several — `combine([a$, b$]).pipe(map(([a, b]) => a + b))` — takes
-two observables, and every update builds a tuple only for `map` to take apart.
-`derive([a$, b$], (a, b) => a + b)` is one observable that calls the function
-with the values as arguments. It stops a result `Object.is` the one it holds,
-as `map` does, and takes `map`'s `equals` as its own, so the rewrite changes
-nothing that is emitted.
-
-Every `.pipe` whose one operator is `map`, called on `combine(...)` or its alias
-`combineLatest(...)`, is reported, unless the `map` is one `prefer-map-to` or
-`no-identity-map` reports (`map(() => c)`, `map((xs) => xs)`). The fix
-turns an array pattern into the parameters (`([a, b]) =>` to `(a, b) =>`) and
-a name into a rest parameter (`(xs) =>` to `(...xs) =>`), adding `derive` to
-the file's synstate import when it is missing. It is not offered for a mapping function that is not an arrow function
-written in place, a parameter with a type annotation, a default, a `?` or a
-hole, a `combine(...)` or its `.pipe` in a type wrapper or parentheses, a
-`combine` or `map` callee in a type wrapper, a parameter followed by a comma,
-type arguments on any of the three calls, or a comment between the calls or
-in the parentheses around the `combine` callee, which the rewrite would drop,
-or a file where `derive` names something else or is imported under that name by
-`import type`.
-
-### `prefer-map-to`
-
-`map` passes on a result only when it is not `Object.is` the one it holds, so
-that a derived value that did not change wakes nothing below it. A `map` that
-turns events into a constant — `click$.pipe(map(() => true))`,
-`reset$.pipe(map(() => 'reset' as const))` — therefore emits on the first event
-and on none after it. `mapTo(true)` emits on every one, and the rule rewrites
-the call to it, adding the name to the file's synstate import when it is
-missing.
-
-Only a body that is the same value every time it runs is reported, because
-`mapTo` evaluates its value once: a literal other than a regular expression, a
-template literal with no expression, `undefined`, a `const` or an import, or
-`-`, `+`, `!` or `void` of one of those. A body that calls something or builds
-an object or array is left alone; a new object each time is never equal, so
-such a `map` emits on every event already. A `map` given `equals` is left alone
-too, since its author has said how results compare. When the event maps to a
-value that can repeat but is not constant — a request mapped to the id it is
-for — give the `map` `{ equals: () => false }`; the rule cannot tell such a
-`map` from a derived state and does not report it.
-
-`map` is recognized imported from `synstate` by name, under an alias or
-through a namespace import, and the body is read through `as`, `satisfies`,
-`!` and parentheses, which the fix keeps. A callee in a type wrapper, a comment
-outside the body that the rewrite would drop, or a file where `mapTo` names
-something else or is imported under that name by `import type`, is reported without a fix.
 
 ## License
 

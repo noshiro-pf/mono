@@ -75,7 +75,7 @@ export const HtmlSelect = ({
 
         const value$ = toObservable(value);
 
-        if (value$.isCompleted) {
+        if (value$.settled) {
           return;
         }
 

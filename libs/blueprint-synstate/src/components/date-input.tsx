@@ -1,4 +1,4 @@
-import { createState, derive, map, onScopeDispose } from 'synstate';
+import { createState, derive, map, onCleanup } from 'synstate';
 import {
   constant,
   If,
@@ -295,7 +295,7 @@ export const DateInput = ({
         ref={(content) => {
           mut_elements.content = content;
 
-          onScopeDispose(() => {
+          onCleanup(() => {
             mut_elements.content = undefined;
           });
         }}

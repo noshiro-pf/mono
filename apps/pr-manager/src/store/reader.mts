@@ -13,7 +13,6 @@ import {
   empty,
   filter,
   map,
-  mapTo,
   merge,
   scan,
   skipIfNoChange,
@@ -274,7 +273,7 @@ export const createReader = (deps: ReaderDeps): Reader => {
     update: updateLoadStatus,
     getSnapshot: getLoadStatus,
   } = createResettableState<LoadStatus>(LOADING, fastDeepEqual, [
-    tokenForgotten.pipe(mapTo(LOADING)),
+    tokenForgotten.pipe(map(() => LOADING, { equals: () => false })),
   ]);
 
   const [rateLimit, , { updateState: updateRateLimit }] = createState<
@@ -338,7 +337,7 @@ export const createReader = (deps: ReaderDeps): Reader => {
     update: updateReport,
     getSnapshot: getReport,
   } = createResettableState<ReportParts>(EMPTY_PARTS, Object.is, [
-    tokenForgotten.pipe(mapTo(EMPTY_PARTS)),
+    tokenForgotten.pipe(map(() => EMPTY_PARTS, { equals: () => false })),
   ]);
 
   const partOf = <K extends keyof ReportParts>(
@@ -371,7 +370,7 @@ export const createReader = (deps: ReaderDeps): Reader => {
   const { state: runs, update: updateRuns } = createResettableState<RunsStatus>(
     RUNS_READING,
     fastDeepEqual,
-    [tokenForgotten.pipe(mapTo(RUNS_READING))],
+    [tokenForgotten.pipe(map(() => RUNS_READING, { equals: () => false }))],
   );
 
   // When the read of the runs on screen started; `0` while none is.
@@ -382,7 +381,7 @@ export const createReader = (deps: ReaderDeps): Reader => {
     set: setMoreIssues,
     getSnapshot: getMoreIssues,
   } = createResettableState<MoreIssuesStatus>(MORE_ISSUES_IDLE, fastDeepEqual, [
-    tokenChanged.pipe(mapTo(MORE_ISSUES_IDLE)),
+    tokenChanged.pipe(map(() => MORE_ISSUES_IDLE, { equals: () => false })),
   ]);
 
   // What the page holds of each part, and which failed on the read that last
@@ -934,15 +933,15 @@ export const createReader = (deps: ReaderDeps): Reader => {
     setStarted(true);
 
     return () => {
-      tokenSubscription.unsubscribe();
+      tokenSubscription();
 
-      visibilitySubscription.unsubscribe();
+      visibilitySubscription();
 
-      intervalSubscription.unsubscribe();
+      intervalSubscription();
 
       stopPolling();
 
-      // Switching away disposes the clock, and completing a counter is what
+      // Switching away disposes the clock, and disposing a counter is what
       // clears its interval.
       setStarted(false);
     };
@@ -1102,10 +1101,10 @@ const pollEvery = (
 
   return {
     stop: () => {
-      subscription.unsubscribe();
+      subscription();
 
-      // Completing a counter is what clears its interval.
-      poll.complete();
+      // Disposing a counter is what clears its interval.
+      poll.dispose();
     },
   };
 };

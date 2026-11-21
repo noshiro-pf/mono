@@ -6,13 +6,15 @@ import {
   NonIdealState,
   TextArea,
 } from 'blueprint-synstate';
+import { createBooleanState, createOwner, createState } from 'synstate';
 import {
-  createBooleanState,
-  createScope,
-  createState,
-  getCurrentScope,
-} from 'synstate';
-import { constant, If, mapBindable, mountable, type JSX } from 'synstate-dom';
+  constant,
+  If,
+  mapBindable,
+  mountable,
+  mountChild,
+  type JSX,
+} from 'synstate-dom';
 import { Json, Optional, Result, unknownToString } from 'ts-data-forge';
 import {
   ButtonsWrapperAlignEnd,
@@ -51,21 +53,21 @@ type Props = Readonly<{ children: JSX.Element }>;
  * @link https://www.asobou.co.jp/blog/web/error-boundary
  */
 export const ErrorBoundary = ({ children }: Props): JSX.Element =>
-  // A component runs as it is mounted, so that is what is guarded. In a scope
+  // A component runs as it is mounted, so that is what is guarded. In an owner
   // of its own, so that what the part drawn before the throw set up (its
   // subscriptions, its requests) is stopped with it, not left behind the error
   // screen.
   mountable(() => {
-    const scope = createScope(getCurrentScope());
+    const owner = createOwner();
 
     try {
-      return scope.run(() => children.mount());
+      return owner.run(() => mountChild(children));
     } catch (error) {
-      scope.dispose();
+      owner.dispose();
 
       console.error(error);
 
-      return (<ErrorScreen error={error} />).mount();
+      return mountChild(<ErrorScreen error={error} />);
     }
   });
 

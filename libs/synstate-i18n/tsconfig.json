@@ -11,7 +11,7 @@
     // docs/strict-typescript-lib-integration.md.
     "libReplacement": true,
 
-    "jsxImportSource": "synstate-dom-next",
+    "jsxImportSource": "synstate-dom",
 
     // `samples/` imports this package by its own name, the way a consumer does.
     // Mapped to the source so that a sample is checked against the code being

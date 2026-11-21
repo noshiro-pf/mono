@@ -1,6 +1,9 @@
 /**
  * The module `"jsxImportSource": "synstate-dom"` makes TypeScript import for
- * `"jsx": "react-jsxdev"`. The extra arguments (`key`, source location) are not
- * used.
+ * `"jsx": "react-jsxdev"`. The source location is not used.
  */
-export { Fragment, createMountable as jsxDEV, type JSX } from './jsx/index.mjs';
+export {
+  Fragment,
+  createDescription as jsxDEV,
+  type JSX,
+} from './jsx/index.mjs';

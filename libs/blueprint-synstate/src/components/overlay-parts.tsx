@@ -6,7 +6,7 @@
 import {
   createState,
   map,
-  onScopeDispose,
+  onCleanup,
   type InitializedObservable,
 } from 'synstate';
 import {
@@ -106,7 +106,7 @@ export const Overlay = ({
     timer: ReturnType<typeof setTimeout> | undefined;
   } = { generation: 0, timer: undefined };
 
-  onScopeDispose(() => {
+  onCleanup(() => {
     clearTimeout(mut_transition.timer);
   });
 
@@ -135,7 +135,7 @@ export const Overlay = ({
     autoFocuses: autoFocus,
   } as const;
 
-  onScopeDispose(() => {
+  onCleanup(() => {
     leaveStack(self);
   });
 
@@ -500,7 +500,7 @@ const OverlayBody = ({
     }
   });
 
-  onScopeDispose(() => {
+  onCleanup(() => {
     cancelAnimationFrame(mut_frame.id);
 
     cancelAnimationFrame(mut_backdropFrame.id);

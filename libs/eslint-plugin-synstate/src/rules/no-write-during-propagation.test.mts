@@ -71,11 +71,20 @@ ruleTester.run('no-write-during-propagation', noWriteDuringPropagation, {
       `,
     },
     {
-      name: '`next` on something that is not a synstate source',
+      name: '`getSnapshot` of a state, which only reads',
+      code: dedent`
+        import { createState, state } from 'synstate';
+        const [a$] = createState(0);
+        const b$ = state(0);
+        a$.subscribe(() => { b$.getSnapshot(); });
+      `,
+    },
+    {
+      name: '`emit` on something that is not a synstate source',
       code: dedent`
         import { createState } from 'synstate';
         const [a$] = createState(0);
-        a$.subscribe(() => { iterator.next(); });
+        a$.subscribe(() => { emitter.emit(); });
       `,
     },
     {
@@ -144,6 +153,35 @@ ruleTester.run('no-write-during-propagation', noWriteDuringPropagation, {
       `,
     },
     {
+      name: 'an object given to `.subscribe` or to another library’s operator, and a getter in options',
+      code: dedent`
+        import { createState, map } from 'synstate';
+        import { tap } from 'rxjs';
+        const [count$, setCount] = createState(0);
+        rx$.subscribe({ next: (v) => { setCount(v); } });
+        rx$.pipe(tap({ next: (v) => { setCount(v); } }));
+        const twice$ = a$.pipe(
+          map((a) => a * 2, {
+            get equals() {
+              setCount(1);
+              return Object.is;
+            },
+          }),
+        );
+        // Neither is the function a getter returns followed.
+        const thrice$ = a$.pipe(
+          map((a) => a * 3, {
+            get equals() {
+              return (x: number, y: number) => {
+                setCount(x);
+                return x === y;
+              };
+            },
+          }),
+        );
+      `,
+    },
+    {
       name: 'a `useObservableEffect` that is not synstate’s',
       code: dedent`
         import { createState } from 'synstate';
@@ -167,6 +205,51 @@ ruleTester.run('no-write-during-propagation', noWriteDuringPropagation, {
   ],
   invalid: [
     {
+      name: 'a write in a `derive` projection, directly and by name',
+      code: dedent`
+        import { createState, derive } from 'synstate';
+        const [count$, setCount] = createState(0);
+        const total = (a: number, b: number): number => {
+          setCount(a);
+          return a + b;
+        };
+        const sum$ = derive([a$, b$], total);
+        const product$ = derive([a$, b$], (a, b) => {
+          setCount(b);
+          return a * b;
+        });
+      `,
+      errors: [
+        { messageId: 'writeDuringPropagation', line: 4 },
+        { messageId: 'writeDuringPropagation', line: 9 },
+      ],
+    },
+    {
+      name: 'a write in an `equals` given in an options object',
+      code: dedent`
+        import { createState, derive, map } from 'synstate';
+        const [count$, setCount] = createState(0);
+        const sum$ = derive([a$, b$], (a, b) => a + b, {
+          equals: (x, y) => {
+            setCount(x);
+            return x === y;
+          },
+        });
+        const twice$ = a$.pipe(
+          map((a) => a * 2, {
+            equals: (x, y) => {
+              setCount(y);
+              return x === y;
+            },
+          }),
+        );
+      `,
+      errors: [
+        { messageId: 'writeDuringPropagation', line: 5 },
+        { messageId: 'writeDuringPropagation', line: 12 },
+      ],
+    },
+    {
       name: 'a setter from each wrapper package',
       code: dedent`
         import { createState } from 'synstate-react-hooks';
@@ -181,7 +264,7 @@ ruleTester.run('no-write-during-propagation', noWriteDuringPropagation, {
           setA(a + 1);
           dispatch(a);
           toggle();
-          b$.next(a);
+          b$.emit(a);
         });
       `,
       errors: [
@@ -302,12 +385,28 @@ ruleTester.run('no-write-during-propagation', noWriteDuringPropagation, {
       errors: [{ messageId: 'writeDuringPropagation' }],
     },
     {
-      name: '`next` of a source',
+      name: '`set` and `update` of a state',
+      code: dedent`
+        import { createState, state } from 'synstate';
+        const [a$] = createState(0);
+        const b$ = state(0);
+        a$.subscribe((a) => {
+          b$.set(a);
+          b$.update((b) => b + a);
+        });
+      `,
+      errors: [
+        { messageId: 'writeDuringPropagation', line: 5 },
+        { messageId: 'writeDuringPropagation', line: 6 },
+      ],
+    },
+    {
+      name: '`emit` of a source',
       code: dedent`
         import { createState, source } from 'synstate';
         const [a$, setA] = createState(0);
         const b$ = source<number>();
-        a$.subscribe((a) => { b$.next(a); });
+        a$.subscribe((a) => { b$.emit(a); });
       `,
       errors: [{ messageId: 'writeDuringPropagation' }],
     },
@@ -490,7 +589,7 @@ describe('no-write-during-propagation through type wrappers', () => {
           import { createState, source } from 'synstate';
           const [a$, setA] = createState(0);
           const b$ = source<number>();
-          a$.subscribe((a) => { (b$ as typeof b$).next(a); });
+          a$.subscribe((a) => { (b$ as typeof b$).emit(a); });
         `,
         errors: [{ messageId: 'writeDuringPropagation' }],
       },

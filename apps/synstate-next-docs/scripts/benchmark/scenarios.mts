@@ -95,10 +95,16 @@ const synstateBenchmarkDir = path.resolve(
   '../../libs/synstate/samples/docs-site/benchmark',
 );
 
-const throughputAdapters = path.resolve(
-  workspaceRootPath,
-  '../synstate-docs/src/components/throughput-demo/adapters/index.mts',
-);
+/**
+ * Where the deep chain's adapter of `label` lives, now that synstate's
+ * documentation keeps them beside its own samples.
+ */
+const throughputAdapter = (label: string): string =>
+  label === predecessorLabel()
+    ? synstateSample('03-deep-chain.synstate')
+    : synstateSample(
+        `throughput-adapters/${label.toLowerCase().replaceAll(' ', '-')}-adapter`,
+      );
 
 /** Where `run-benchmark.mts` writes what it measured. */
 export const resultsPath = path.resolve(
@@ -191,7 +197,7 @@ export const scenarios = [
   },
   {
     id: 'deep-chain',
-    // The page links to synstate's throughput demo, whose adapters these are.
+    // The page links to synstate's adapters rather than show six more listings.
     listsOthers: false,
     kind: 'deep-chain',
     entries: Arr.toUnshifted({
@@ -211,7 +217,7 @@ export const scenarios = [
         ] as const
       ).map(([label, factory]) => ({
         label,
-        file: throughputAdapters,
+        file: throughputAdapter(label),
         factory,
       })),
     ),

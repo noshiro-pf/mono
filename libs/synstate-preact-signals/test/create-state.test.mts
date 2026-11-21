@@ -29,17 +29,21 @@ describe(createState, () => {
     assert.strictEqual(getSnapshot(), 0);
   });
 
-  test('returns the value that was set', () => {
-    const [, setCount, { updateState, resetState }] = createState(1);
+  test('writes what the setters are given', () => {
+    const [, setCount, { updateState, resetState, getSnapshot }] =
+      createState(1);
 
-    assert.strictEqual(setCount(2), 2);
+    setCount(2);
 
-    assert.strictEqual(
-      updateState((prev) => prev * 10),
-      20,
-    );
+    assert.strictEqual(getSnapshot(), 2);
 
-    assert.strictEqual(resetState(), 1);
+    updateState((prev) => prev * 10);
+
+    assert.strictEqual(getSnapshot(), 20);
+
+    resetState();
+
+    assert.strictEqual(getSnapshot(), 1);
   });
 
   test('feeds the underlying observable', () => {

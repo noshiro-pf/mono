@@ -18,7 +18,7 @@
 import {
   createState,
   type InitializedObservable,
-  type Subscription,
+  type Unsubscribe,
 } from 'synstate';
 import { Optional, Result, unknownToString } from 'ts-data-forge';
 import type { Answered } from '../graphql.mjs';
@@ -155,7 +155,7 @@ export const createActivityStore = (deps: ActivityDeps): ActivityStore => {
     // The token's first value is the one the page started with, not a change.
     const mut_token = { first: true };
 
-    const tokenSubscription: Subscription = deps.token.subscribe(() => {
+    const tokenSubscription: Unsubscribe = deps.token.subscribe(() => {
       if (mut_token.first) {
         mut_token.first = false;
 
@@ -168,7 +168,7 @@ export const createActivityStore = (deps: ActivityDeps): ActivityStore => {
     return () => {
       mut_run.cancel();
 
-      tokenSubscription.unsubscribe();
+      tokenSubscription();
     };
   };
 

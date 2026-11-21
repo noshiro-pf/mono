@@ -1,0 +1,41 @@
+---
+title: just
+description: 'Holds `value` and is settled: it never emits.'
+---
+
+{/* reference:jsdoc */}
+
+Holds `value` and is settled: it never emits. For a branch of a `switchMap` or `mergeMap` that needs no asynchronous work.
+
+{/* /reference */}
+
+## Example
+
+```tsx
+import { createState, just, map, switchMap, timer } from 'synstate';
+import { Optional } from 'ts-std-forge';
+
+const [delayed, setDelayed] = createState(false);
+
+const label = delayed.pipe(
+    switchMap((d) =>
+        // A branch with nothing to wait for.
+        d ? timer(500).pipe(map(() => 'later')) : just('now'),
+    ),
+);
+
+assert.deepStrictEqual(label.getSnapshot(), Optional.some('now'));
+
+setDelayed(true);
+
+await vi.advanceTimersByTimeAsync(500);
+
+assert.deepStrictEqual(label.getSnapshot(), Optional.some('later'));
+```
+
+## See also
+
+- [Async operators](/mono/synstate/guides/async-operators/)
+- [All APIs](/mono/synstate/reference/)
+
+[Source on GitHub](https://github.com/noshiro-pf/mono/blob/main/libs/synstate/src/sources/just.mts)

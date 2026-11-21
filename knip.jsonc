@@ -557,10 +557,15 @@
         "e2e/**/*.spec.mts",
       ],
       "project": ["**/*.{mts,ts,tsx,mjs,astro,mdx}"],
-      // `scripts/embed-examples.mts` reads their `samples/` as files, and
+      // `scripts/embed-samples.mts` reads their samples as files (synstate's
+      // `samples/docs-site/` and the READMEs' samples of the bindings), and
       // declares them so that `check-changed` regenerates the pages when a
       // sample changes; nothing imports them.
       "ignoreDependencies": [
+        "synstate",
+        "synstate-preact-hooks",
+        "synstate-preact-signals",
+        "synstate-react-hooks",
         "synstate-router",
         "synstate-router-dom",
         "synstate-router-react",
@@ -571,6 +576,17 @@
     // linted modules that `scripts/embed-samples.mts` embeds into the pages as
     // text: they are entries, so that what only a sample imports counts as
     // used. The other globs are `apps/*`'s, kept in step with it.
+    "apps/synstate-dom-docs": {
+      "entry": [
+        "src/pages/**/*.{astro,mts,ts,tsx}",
+        "scripts/**/*.mts",
+        "configs/*.mts",
+        "e2e/**/*.spec.mts",
+        "samples/**/*.tsx",
+      ],
+      "project": ["**/*.{mts,ts,tsx,mjs,astro,mdx}"],
+    },
+
     "apps/synstate-dom-next-docs": {
       "entry": [
         "src/pages/**/*.{astro,mts,ts,tsx}",

@@ -1,20 +1,20 @@
 import { effect } from '@preact/signals';
-import { map, source } from 'synstate';
+import { map, source, state } from 'synstate';
 import { toSignal } from '../src/index.mjs';
 
 describe(toSignal, () => {
   test('starts at the observable value and follows every emission', () => {
-    const count$ = source<number>(0);
+    const count$ = state<number>(0);
 
     const countSignal = toSignal(count$);
 
     assert.strictEqual(countSignal.value, 0);
 
-    count$.next(1);
+    count$.set(1);
 
     assert.strictEqual(countSignal.value, 1);
 
-    count$.next(42);
+    count$.set(42);
 
     assert.strictEqual(countSignal.value, 42);
   });
@@ -26,13 +26,13 @@ describe(toSignal, () => {
 
     assert.strictEqual(countSignal.value, -1);
 
-    count$.next(7);
+    count$.emit(7);
 
     assert.strictEqual(countSignal.value, 7);
   });
 
   test('starts at a held undefined rather than the fallback', () => {
-    const value$ = source<number | undefined>(undefined);
+    const value$ = state<number | undefined>(undefined);
 
     const valueSignal = toSignal(value$, -1);
 
@@ -46,13 +46,13 @@ describe(toSignal, () => {
 
     assert.strictEqual(countSignal.value, undefined);
 
-    count$.next(7);
+    count$.emit(7);
 
     assert.strictEqual(countSignal.value, 7);
   });
 
   test('notifies the signal subscribers of the observable emissions', () => {
-    const count$ = source<number>(0);
+    const count$ = state<number>(0);
 
     const doubledSignal = toSignal(count$.pipe(map((n) => n * 2)));
 
@@ -62,13 +62,13 @@ describe(toSignal, () => {
       mut_seen.push(doubledSignal.value);
     });
 
-    count$.next(1);
+    count$.set(1);
 
-    count$.next(2);
+    count$.set(2);
 
     dispose();
 
-    count$.next(3);
+    count$.set(3);
 
     assert.deepStrictEqual(mut_seen, [0, 2, 4]);
   });

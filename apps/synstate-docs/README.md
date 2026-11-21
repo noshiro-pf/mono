@@ -1,26 +1,32 @@
-# @synstate/docs
+# synstate-docs
 
 The documentation site for [synstate](../../libs/synstate), built with
-[Astro Starlight](https://starlight.astro.build/).
-
-Published at **<https://noshiro-pf.github.io/mono/synstate>** (English and
-Japanese).
+[Astro Starlight](https://starlight.astro.build/), in English and Japanese.
+Published at <https://noshiro-pf.github.io/mono/synstate/> by
+`.github/workflows/deploy-pages.yml`.
 
 ## Development
 
 ```sh
 pnpm run dev      # start the dev server
-pnpm run build    # regenerate embedded docs, then build the site into dist/
-pnpm run preview  # serve the built site
+pnpm run build    # build the site into dist/
+pnpm run gen      # re-embed the samples
 ```
 
-Pages live in `src/content/docs/` (Japanese under `src/content/docs/ja/`). API
-reference, examples and benchmark results are embedded by the `gen:*` scripts
-in `scripts/`; run `pnpm run gen` after changing them.
+Pages live in `src/content/docs/` (Japanese under `src/content/docs/ja/`).
 
-## Links
+**Code blocks are not edited here.** Each one is a file under
+`libs/synstate/samples/docs-site/`, where synstate's own `tsc`,
+ESLint and Vitest check it, embedded by `gen:samples`
+(`scripts/embed-samples.mts` maps each page to its files, in order). Edit the
+sample and run `pnpm run gen`; an edit made to a page is overwritten by the next
+`gen`.
 
-- [Published site](https://noshiro-pf.github.io/mono/synstate)
-- [synstate package](../../libs/synstate)
-- <https://starlight.astro.build/ja/components/code/>
-- [Source of the slide diagrams in the docs (Google slides, private)](https://docs.google.com/presentation/d/1_DQanZBI3vG9eQ3Lolw7ko8TZcaYgZnBzBnou20nXnE/edit?slide=id.g3c56a79e56b_0_7#slide=id.g3c56a79e56b_0_7)
+**The reference pages** (`src/content/docs/reference/`) are listed in
+`scripts/reference-pages.mts`, one per public API, and `gen:reference` fails on
+an export no page lists. It writes each English page's JSDoc block from
+synstate's sources, and its description on a page of one export (a page of
+several is described by hand). The Japanese text is translated by hand, and its
+`{/* translated-from:<version> */}` marker names the version of the English text
+it translates: when that changes, `gen:reference` names each Japanese page to
+bring up to date and the version to set.

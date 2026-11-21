@@ -1,4 +1,4 @@
-import { combine, map, type InitializedObservable } from 'synstate';
+import { derive, type InitializedObservable } from 'synstate';
 import {
   constant,
   mapBindable,
@@ -25,8 +25,8 @@ export const Age = ({ at, now, prefix = '' }: Props): JSX.Element => (
   <span class={constant('timestamp')}>
     {constant(prefix)}
     <time class={constant('age')} title={mapBindable(at, formatLocalTime)}>
-      {combine([toObservable(at), now]).pipe(
-        map(([atMs, nowMs]) => describeAge(atMs, nowMs)),
+      {derive([toObservable(at), now], (atMs, nowMs) =>
+        describeAge(atMs, nowMs),
       )}
     </time>
   </span>

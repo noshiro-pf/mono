@@ -1,11 +1,11 @@
 import { act, renderHook } from '@testing-library/preact';
-import { source, type Observable } from 'synstate';
+import { source, state, type Observable } from 'synstate';
 import { expectType } from 'ts-data-forge';
 import { useObservableValue } from '../../src/index.mjs';
 
 describe(useObservableValue, () => {
   test('starts at the current value and re-renders on every emission that changes it', async () => {
-    const count$ = source<number>(0);
+    const count$ = state<number>(0);
 
     const { result } = renderHook(() => useObservableValue(count$));
 
@@ -14,20 +14,21 @@ describe(useObservableValue, () => {
     assert.strictEqual(result.current, 0);
 
     await act(() => {
-      count$.next(1);
+      count$.set(1);
     });
 
     assert.strictEqual(result.current, 1);
 
     await act(() => {
-      count$.next(42);
+      count$.set(42);
     });
 
     assert.strictEqual(result.current, 42);
   });
 
   test('renders nothing for an emission equal to the current value', async () => {
-    const count$ = source<number>(1);
+    // A state that passes on every write, so that the hook is what drops it.
+    const count$ = state<number>(1, { equals: () => false });
 
     const mut_renders = { count: 0 };
 
@@ -40,7 +41,7 @@ describe(useObservableValue, () => {
     const rendersAtMount = mut_renders.count;
 
     await act(() => {
-      count$.next(1);
+      count$.set(1);
     });
 
     assert.strictEqual(mut_renders.count, rendersAtMount);
@@ -56,7 +57,7 @@ describe(useObservableValue, () => {
     assert.strictEqual(result.current, -1);
 
     await act(() => {
-      count$.next(7);
+      count$.emit(7);
     });
 
     assert.strictEqual(result.current, 7);
@@ -72,28 +73,28 @@ describe(useObservableValue, () => {
     assert.strictEqual(result.current, undefined);
 
     await act(() => {
-      count$.next(7);
+      count$.emit(7);
     });
 
     assert.strictEqual(result.current, 7);
   });
 
   test('stops re-rendering once unmounted', async () => {
-    const count$ = source<number>(0);
+    const count$ = state<number>(0);
 
     const { result, unmount } = renderHook(() => useObservableValue(count$));
 
     unmount();
 
     await act(() => {
-      count$.next(1);
+      count$.set(1);
     });
 
     assert.strictEqual(result.current, 0);
   });
 
   test('stays subscribed across renders with the same observable (#3144)', async () => {
-    const count$ = source<number>(0);
+    const count$ = state<number>(0);
 
     const mut_subscriptions = { current: 0 };
 
@@ -124,7 +125,7 @@ describe(useObservableValue, () => {
     assert.strictEqual(mut_subscriptions.current, 1);
 
     await act(() => {
-      count$.next(1);
+      count$.set(1);
     });
 
     assert.strictEqual(result.current, 1);
@@ -133,9 +134,9 @@ describe(useObservableValue, () => {
   });
 
   test('moves to a different observable passed on a later render', async () => {
-    const a$ = source<number>(1);
+    const a$ = state<number>(1);
 
-    const b$ = source<number>(2);
+    const b$ = state<number>(2);
 
     const { result, rerender } = renderHook(
       ({ observable$ }) => useObservableValue(observable$),
@@ -149,20 +150,20 @@ describe(useObservableValue, () => {
     assert.strictEqual(result.current, 2);
 
     await act(() => {
-      b$.next(3);
+      b$.set(3);
     });
 
     assert.strictEqual(result.current, 3);
 
     await act(() => {
-      a$.next(4);
+      a$.set(4);
     });
 
     assert.strictEqual(result.current, 3);
   });
 
   test('moves to an observable that holds no value yet', async () => {
-    const a$: Observable<number> = source<number>(1);
+    const a$: Observable<number> = state<number>(1);
 
     const b$ = source<number>();
 
@@ -178,14 +179,14 @@ describe(useObservableValue, () => {
     assert.strictEqual(result.current, undefined);
 
     await act(() => {
-      b$.next(2);
+      b$.emit(2);
     });
 
     assert.strictEqual(result.current, 2);
   });
 
   test('reads an observable again when it is passed back', () => {
-    const a$ = source<number>(1);
+    const a$ = state<number>(1);
 
     const b$ = source<number>();
 
@@ -200,7 +201,7 @@ describe(useObservableValue, () => {
 
     rerender({ observable$: b$ });
 
-    a$.next(5);
+    a$.set(5);
 
     rerender({ observable$: a$ });
 
@@ -208,7 +209,7 @@ describe(useObservableValue, () => {
   });
 
   test('follows a later emission equal to the previous observable value', async () => {
-    const a$ = source<number>(1);
+    const a$ = state<number>(1);
 
     const b$ = source<number>();
 
@@ -226,7 +227,7 @@ describe(useObservableValue, () => {
     assert.strictEqual(result.current, -1);
 
     await act(() => {
-      b$.next(1);
+      b$.emit(1);
     });
 
     assert.strictEqual(result.current, 1);
@@ -255,7 +256,7 @@ describe(useObservableValue, () => {
     const { result } = renderHook(() => useObservableValue(handler$));
 
     await act(() => {
-      handler$.next(fn);
+      handler$.emit(fn);
     });
 
     assert.strictEqual(result.current, fn);

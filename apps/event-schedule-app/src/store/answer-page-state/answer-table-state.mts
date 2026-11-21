@@ -439,11 +439,15 @@ export const createAnswerTableStore = (deps: AnswerTableDeps): AnswerTable => {
   // Read once, when the app starts, not on each visit: a tab keeps the width it
   // shows, and a toggle in it saves what that tab then shows, which is the
   // reader's latest choice even when another tab saved a different one.
-  const [tableIsFullWidth$, { toggle: toggleTableIsFullWidthState }] =
-    createBooleanState(restoreTableIsFullWidth(deps.storage));
+  const [
+    tableIsFullWidth$,
+    { toggle: toggleTableIsFullWidthState, getSnapshot: tableIsFullWidth },
+  ] = createBooleanState(restoreTableIsFullWidth(deps.storage));
 
   const toggleTableIsFullWidth = (): boolean => {
-    const next = toggleTableIsFullWidthState();
+    toggleTableIsFullWidthState();
+
+    const next = tableIsFullWidth();
 
     const saveResult = deps.storage.saveTableIsFullWidth(next);
 
@@ -494,10 +498,10 @@ export type AnswerTable = Readonly<{
    * side, and would otherwise widen it on every visit.
    */
   tableIsFullWidth$: InitializedObservable<boolean>;
-  toggleDetailedFilter: () => boolean;
-  toggleDateStringIsMinimized: () => boolean;
-  toggleAnswerIconIsHidden: () => boolean;
-  toggleTableIsMinimized: () => boolean;
+  toggleDetailedFilter: () => void;
+  toggleDateStringIsMinimized: () => void;
+  toggleAnswerIconIsHidden: () => void;
+  toggleTableIsMinimized: () => void;
   /** Flips the width, saves it, and returns the new value. */
   toggleTableIsFullWidth: () => boolean;
 }>;

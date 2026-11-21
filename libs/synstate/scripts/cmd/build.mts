@@ -8,17 +8,16 @@ import { stripDistDevOnlyCode } from '../../../../tools/configs/strip-dev-only-c
 
 const distDir = path.resolve(workspaceRootPath, './dist');
 
+/**
+ * The monorepo root, where the hoisted `node_modules` lives.
+ */
 const monorepoRootPath = path.resolve(workspaceRootPath, '../..');
 
 /**
- * The native TypeScript compiler (TypeScript >= 7). It is installed under the
- * alias "typescript-native" because the "typescript" package must stay on 6.x
- * for tools that require the JS compiler API (typescript-eslint, typedoc,
- * prettier-plugin-organize-imports, ...), which TypeScript 7 no longer
- * provides. It is hoisted to the monorepo root's node_modules (not this
- * package's own node_modules), and invoked via an explicit path because both
- * packages declare a `tsc` bin and the winner of the `node_modules/.bin/tsc`
- * conflict is not guaranteed.
+ * The native TypeScript compiler (TypeScript >= 7), installed under the alias
+ * "typescript-native" and hoisted to the monorepo root's `node_modules`. It
+ * emits everything this package ships: the JavaScript, the declarations and
+ * both source maps.
  */
 const nativeTsc = path.resolve(
   monorepoRootPath,
@@ -26,7 +25,7 @@ const nativeTsc = path.resolve(
 );
 
 /**
- * Builds the entire project.
+ * Builds the package.
  */
 const build = async (): Promise<void> => {
   console.info('Starting build process...\n');
@@ -35,12 +34,7 @@ const build = async (): Promise<void> => {
     startMessage: 'Cleaning dist directory',
     action: () =>
       runStep(
-        Result.fromPromise(
-          fs.rm(distDir, {
-            recursive: true,
-            force: true,
-          }),
-        ),
+        Result.fromPromise(fs.rm(distDir, { recursive: true, force: true })),
         'Failed to clean dist directory',
       ),
     successMessage: 'Cleaned dist directory',
@@ -68,38 +62,6 @@ const build = async (): Promise<void> => {
         'Stripping development-only code failed',
       ),
     successMessage: 'Development-only code stripped',
-  });
-
-  await logStep({
-    startMessage: 'Generating dist/types.d.mts',
-    action: async () => {
-      const content = "export * from './entry-point.mjs';\n";
-
-      const typesFile = path.resolve(distDir, 'types.d.mts');
-
-      await runStep(
-        // eslint-disable-next-line security/detect-non-literal-fs-filename
-        Result.fromPromise(fs.writeFile(typesFile, content)),
-        'Failed to generate dist/types.d.mts',
-      );
-    },
-    successMessage: 'Generated dist/types.d.mts',
-  });
-
-  await logStep({
-    startMessage: 'Generating dist TypeScript config',
-    action: async () => {
-      const configContent = JSON.stringify({ include: ['.'] });
-
-      const configFile = path.resolve(distDir, 'tsconfig.json');
-
-      await runStep(
-        // eslint-disable-next-line security/detect-non-literal-fs-filename
-        Result.fromPromise(fs.writeFile(configFile, configContent)),
-        'Failed to generate tsconfig',
-      );
-    },
-    successMessage: 'Generated dist/tsconfig.json',
   });
 
   console.info('✅ Build completed successfully!\n');

@@ -13,11 +13,10 @@ export const useObservableValue = <A,>(
   observable: InitializedObservable<A>,
 ): A => {
   const subscribe = React.useCallback(
-    (onStoreChange: () => void) => {
-      const { unsubscribe } = observable.subscribe(onStoreChange);
-
-      return unsubscribe;
-    },
+    (onStoreChange: () => void) =>
+      observable.subscribe(() => {
+        onStoreChange();
+      }),
     [observable],
   );
 

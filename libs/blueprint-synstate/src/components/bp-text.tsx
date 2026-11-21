@@ -1,4 +1,4 @@
-import { createState, onScopeDispose } from 'synstate';
+import { createState, onCleanup } from 'synstate';
 import {
   createAfterUpdate,
   type Bindable,
@@ -78,14 +78,14 @@ export const BpText = ({
       sizeChanges.observe(mut_element.element);
     });
 
-    onScopeDispose(() => {
+    onCleanup(() => {
       textChanges.disconnect();
 
       sizeChanges.disconnect();
     });
   }
 
-  onScopeDispose(() => {
+  onCleanup(() => {
     mut_element.element = undefined;
   });
 

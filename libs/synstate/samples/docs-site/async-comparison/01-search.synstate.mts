@@ -1,5 +1,5 @@
 import {
-  createScope,
+  createRootOwner,
   createState,
   debounce,
   fromAbortablePromise,
@@ -7,9 +7,10 @@ import {
   map,
   switchMap,
   withInitialValue,
+  type InitializedObservable,
   type Observable,
 } from 'synstate';
-import { Optional, Result } from 'ts-data-forge';
+import { Result } from 'ts-std-forge';
 import {
   debounceMs,
   fetchItems,
@@ -20,19 +21,20 @@ import {
 import { testSearch } from './search-test-suite.mjs';
 
 // embed-sample-code-ignore-above
-export const createSearch = () => {
-  // Everything created inside `run` is torn down by `scope.dispose()`.
-  // A search box that lives as long as the page can skip the scope.
-  const scope = createScope();
+export const createSearch = (): Search => {
+  // Everything created inside `run` belongs to the owner, and `owner.dispose()`
+  // tears it down. A search box that lives as long as the page can skip the
+  // owner.
+  const owner = createRootOwner();
 
-  return scope.run(() => {
+  return owner.run(() => {
     const [query, setQuery] = createState('');
 
     const searchState = query
       .pipe(debounce(debounceMs)) // wait for typing to pause
       .pipe(map((q) => q.trim())) // map passes on only a changed query
       .pipe(
-        // A newer query completes the previous inner observable, and completing
+        // A newer query disposes the previous inner observable, and disposing
         // it aborts its request.
         switchMap((q): Observable<SearchState> =>
           q === ''
@@ -51,7 +53,7 @@ export const createSearch = () => {
                   ),
                 )
                 .pipe(
-                  // emitted as soon as the request starts
+                  // held as soon as the request starts
                   withInitialValue<SearchState>({
                     status: 'loading',
                     query: q,
@@ -65,20 +67,26 @@ export const createSearch = () => {
       setQuery,
       searchState,
       dispose: () => {
-        scope.dispose();
+        owner.dispose();
       },
     };
   });
 };
+
+type Search = Readonly<{
+  setQuery: (query: string) => void;
+  searchState: InitializedObservable<SearchState>;
+  dispose: () => void;
+}>;
 // embed-sample-code-ignore-below
 
 if (import.meta.vitest !== undefined) {
-  testSearch('SynState', () => {
+  testSearch('synstate', () => {
     const { setQuery, searchState, dispose } = createSearch();
 
     return {
       setQuery,
-      getState: () => Optional.unwrap(searchState.getSnapshot()),
+      getState: () => searchState.value,
       dispose,
     };
   });

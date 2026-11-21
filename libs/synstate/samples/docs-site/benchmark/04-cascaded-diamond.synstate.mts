@@ -19,7 +19,7 @@ export const runBenchmark = (k: number, depth: number): number => {
 
   let mut_lastValue = 0;
 
-  const subscription = mut_current.subscribe((v) => {
+  const unsubscribe = mut_current.subscribe((v) => {
     mut_lastValue = v;
   });
 
@@ -27,7 +27,7 @@ export const runBenchmark = (k: number, depth: number): number => {
     setSource(mut_i);
   }
 
-  subscription.unsubscribe();
+  unsubscribe();
 
   return mut_lastValue;
 };
@@ -35,9 +35,7 @@ export const runBenchmark = (k: number, depth: number): number => {
 
 if (import.meta.vitest !== undefined) {
   test('cascaded-diamond benchmark (synstate)', () => {
-    const result = runBenchmark(10, 4);
-
-    // Each level maps x to (x + 1) + (x + 2): 10 → 23 → 49 → 101 → 205.
-    assert.strictEqual(result, 205);
+    // Each level doubles the value and adds 3: 10, 23, 49, 101, 205.
+    assert.strictEqual(runBenchmark(10, 4), 205);
   });
 }

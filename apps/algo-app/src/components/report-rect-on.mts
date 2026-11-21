@@ -1,4 +1,4 @@
-import { onScopeDispose, type InitializedObservable } from 'synstate';
+import { onCleanup, type InitializedObservable } from 'synstate';
 import type { Rect } from 'ts-utils-additional';
 
 /**
@@ -22,7 +22,7 @@ export const reportRectOn = (
     scheduled: boolean;
   } = { element: undefined, last: undefined, alive: true, scheduled: false };
 
-  onScopeDispose(() => {
+  onCleanup(() => {
     mut_state.alive = false;
   });
 

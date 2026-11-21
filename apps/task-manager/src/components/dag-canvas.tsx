@@ -2,7 +2,7 @@ import {
   createState,
   derive,
   map,
-  onScopeDispose,
+  onCleanup,
   type InitializedObservable,
 } from 'synstate';
 import {
@@ -504,7 +504,7 @@ export const DagCanvas = ({ layout, toolbar }: Props): JSX.Element => {
     observer.observe(element);
   });
 
-  onScopeDispose(() => {
+  onCleanup(() => {
     observer.disconnect();
   });
 

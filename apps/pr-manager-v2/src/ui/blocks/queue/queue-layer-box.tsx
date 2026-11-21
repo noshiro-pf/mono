@@ -1,4 +1,4 @@
-import { combine, map, type InitializedObservable } from 'synstate';
+import { derive, map, type InitializedObservable } from 'synstate';
 import { constant, For, If, type JSX } from 'synstate-dom';
 import type { QueueBox } from '../../../domain/index.mjs';
 import { ExternalLink } from '../../common/index.mjs';
@@ -23,8 +23,8 @@ type Props = Readonly<{
 export const QueueLayerBox = ({ box, kind, place }: Props): JSX.Element => (
   <li
     class={constant('queue-slot')}
-    data-kind={combine([box, kind]).pipe(
-      map(([b, k]) => (k === 'waiting' && b.failing ? 'failing' : k)),
+    data-kind={derive([box, kind], (b, k) =>
+      k === 'waiting' && b.failing ? 'failing' : k,
     )}
     data-layer={box.pipe(map(({ layer }) => layer?.standing ?? 'none'))}
     data-priority={box.pipe(map(({ priority }) => priority))}
@@ -60,8 +60,9 @@ export const QueueLayerBox = ({ box, kind, place }: Props): JSX.Element => (
       />
       <span class={constant('queue-number')}>
         <If
-          cond={combine([box, kind]).pipe(
-            map(([b, k]) => k === 'running' || b.layer?.standing === 'running'),
+          cond={derive(
+            [box, kind],
+            (b, k) => k === 'running' || b.layer?.standing === 'running',
           )}
           then={<span class={constant('spinner')} />}
         />

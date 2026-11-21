@@ -17,9 +17,9 @@ describe(useObservableEffect, () => {
     });
 
     await act(() => {
-      count$.next(1);
+      count$.emit(1);
 
-      count$.next(2);
+      count$.emit(2);
     });
 
     // Not in `act`: `renderHook`'s `unmount` is a bare `render(null, …)`, as an
@@ -28,7 +28,7 @@ describe(useObservableEffect, () => {
     unmount();
 
     await act(() => {
-      count$.next(3);
+      count$.emit(3);
     });
 
     assert.deepStrictEqual(mut_seen, [1, 2]);
@@ -53,11 +53,11 @@ describe(useObservableEffect, () => {
       render(h(Subscriber, {}), container);
     });
 
-    count$.next(1);
+    count$.emit(1);
 
     render(null, container);
 
-    count$.next(2);
+    count$.emit(2);
 
     assert.deepStrictEqual(mut_seen, [1]);
   });
@@ -78,7 +78,7 @@ describe(useObservableEffect, () => {
     rerender();
 
     await act(() => {
-      count$.next(1);
+      count$.emit(1);
     });
 
     assert.deepStrictEqual(mut_seen, [1]);
@@ -99,13 +99,13 @@ describe(useObservableEffect, () => {
     );
 
     await act(() => {
-      count$.next(1);
+      count$.emit(1);
     });
 
     rerender({ label: 'b' });
 
     await act(() => {
-      count$.next(2);
+      count$.emit(2);
     });
 
     assert.deepStrictEqual(mut_seen, ['a:1', 'b:2']);
@@ -130,9 +130,9 @@ describe(useObservableEffect, () => {
     rerender({ count$: second$ });
 
     await act(() => {
-      first$.next(1);
+      first$.emit(1);
 
-      second$.next(2);
+      second$.emit(2);
     });
 
     assert.deepStrictEqual(mut_seen, [2]);
@@ -147,7 +147,7 @@ describe(useObservableEffect, () => {
       ({ label }: Readonly<{ label: string }>) => {
         // Declared first, so it runs before any layout effect of the hook
         Preact.useLayoutEffect(() => {
-          count$.next(label.length);
+          count$.emit(label.length);
         }, [label]);
 
         useObservableEffect(count$, (value) => {

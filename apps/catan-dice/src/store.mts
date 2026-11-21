@@ -1,14 +1,13 @@
 import {
   counter,
   createEventEmitter,
-  type InitializedObservable,
   map,
-  mapTo,
   merge,
   scan,
   switchMap,
   take,
   withInitialValue,
+  type InitializedObservable,
 } from 'synstate';
 import { Arr, asSafeUint, type SafeUint } from 'ts-data-forge';
 import type { FixedLengthTuple } from 'ts-type-forge';
@@ -27,9 +26,9 @@ const [undo$, undo] = createEventEmitter();
 const [redo$, redo] = createEventEmitter();
 
 const history$ = merge([
-  rollDices$.pipe(mapTo('roll-dices')),
-  undo$.pipe(mapTo('undo')),
-  redo$.pipe(mapTo('redo')),
+  rollDices$.pipe(map(() => 'roll-dices' as const, { equals: () => false })),
+  undo$.pipe(map(() => 'undo' as const, { equals: () => false })),
+  redo$.pipe(map(() => 'redo' as const, { equals: () => false })),
 ] as const).pipe(scan(historyReducer, defaultHistoryState));
 
 const undoable$: InitializedObservable<boolean> = history$

@@ -1,4 +1,4 @@
-import { combine, createState, map } from 'synstate';
+import { createState, derive, map } from 'synstate';
 import { constant, If, type JSX } from 'synstate-dom';
 import type { Repo } from '../domain/index.mjs';
 import type { AppStore } from '../store/index.mjs';
@@ -41,8 +41,9 @@ export const App = ({ app, go }: Props): JSX.Element => {
   const noToken = app.token.token.pipe(map((t) => t === undefined));
 
   // A folded header still shows the panel when the token is what needs work.
-  const tokenNeeded = combine([noToken, app.report.tokenRefused]).pipe(
-    map(([none, refused]) => none || refused),
+  const tokenNeeded = derive(
+    [noToken, app.report.tokenRefused],
+    (none, refused) => none || refused,
   );
 
   return (

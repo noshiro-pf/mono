@@ -1,11 +1,13 @@
 import { expectType } from 'ts-data-forge';
-import type { Bindable } from '../constant/index.mjs';
+import type { Bindable } from '../constant.mjs';
 import type {
   CommonElementProps,
   GeneratedIntrinsicElements,
   HtmlElementProps,
 } from './element-props.mjs';
 import type { EventPropNames } from './event-prop-names.mjs';
+
+// synstate-dom 0.13's `src/jsx/element-props.test.mts`.
 
 describe('EventPropNames', () => {
   test('names every event of HTML and SVG elements', () => {

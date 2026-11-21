@@ -106,6 +106,29 @@ export const callTakingAsArgument = (
     : undefined;
 };
 
+/**
+ * The expressions in an argument of an operator that may be functions it calls:
+ * the argument, or each property of an options object written in the call
+ * (`map(f, { equals })`). An accessor is left out: a setter gives the operator
+ * nothing to call, and a getter, which may run when the options are read, at
+ * creation or (`keepEqualParts`) in each update, is rare enough not to be
+ * followed, nor the function it returns; the README says so.
+ */
+export const functionValuesOf = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  argument: TSESTree.CallExpressionArgument,
+): readonly TSESTree.Node[] => {
+  const unwrapped = skipTypeWrappers(argument);
+
+  return unwrapped.type === AST_NODE_TYPES.ObjectExpression
+    ? unwrapped.properties.flatMap((property) =>
+        property.type === AST_NODE_TYPES.Property && property.kind === 'init'
+          ? [property.value]
+          : [],
+      )
+    : [argument];
+};
+
 /** Whether `call` is an argument of `.pipe(…)`, through type wrappers. */
 export const isPipeArgument = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types

@@ -1,6 +1,6 @@
 import {
-  combine,
   createState,
+  derive,
   map,
   skipIfNoChange,
   type InitializedObservable,
@@ -87,13 +87,11 @@ export const createStackFoldStore = (deps: StackFoldDeps): StackFoldStore => {
     .pipe(map(foldableNumbersOf))
     .pipe(skipIfNoChange(fastDeepEqual));
 
-  const folded = combine([choices, foldable, deps.foldByDefault])
-    .pipe(
-      map(([current, foldableNumbers, foldByDefault]) =>
-        foldedNumbersOf(current, { foldable: foldableNumbers, foldByDefault }),
-      ),
-    )
-    .pipe(skipIfNoChange(fastDeepEqual));
+  const folded = derive(
+    [choices, foldable, deps.foldByDefault],
+    (current, foldableNumbers, foldByDefault) =>
+      foldedNumbersOf(current, { foldable: foldableNumbers, foldByDefault }),
+  ).pipe(skipIfNoChange(fastDeepEqual));
 
   const rootsNow = (): readonly FoldNode[] =>
     Optional.unwrap(deps.roots.getSnapshot());

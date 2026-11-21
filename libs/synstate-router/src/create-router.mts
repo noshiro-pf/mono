@@ -1,7 +1,7 @@
 import {
-  combine,
-  createScope,
+  createRootOwner,
   createState,
+  derive,
   keepEqualParts,
   map,
   untracked,
@@ -254,9 +254,9 @@ export type Router<R extends AnyRoutes> = Readonly<{
    * (in a microtask): the way to navigate from an observable, such as a
    * debounced search box. The value an initialized observable already holds
    * when following starts is a state, not a move, and is skipped. Returns the
-   * function that stops it; following also ends when `href$` completes (a move
-   * it queued just before still happens) or the router is disposed, and after
-   * `dispose` it follows nothing.
+   * function that stops it; following also ends when `href$` is disposed (a
+   * move it queued just before still happens) or the router is disposed, and
+   * after `dispose` it follows nothing.
    */
   follow: (href$: Observable<Href>, options?: NavigateOptions) => () => void;
 
@@ -589,8 +589,8 @@ export const createRouter = <R extends AnyRoutes>(
 
   const initialSettled = initial.settled;
 
-  // Every observable of the router is made outside every scope: the router
-  // outlives a component, a test or a `scope.run` that happened to create it,
+  // Every observable of the router is made outside every owner: the router
+  // outlives a component, a test or an `owner.run` that happened to create it,
   // and so does what `at` and `isActive` cache.
   const [snapshot$, setSnapshot, { getSnapshot }] = untracked(() =>
     createState(
@@ -733,35 +733,37 @@ export const createRouter = <R extends AnyRoutes>(
   const declaresTitle = definesTitle(routes[routeTreeKey].definition);
 
   const stopTitle = untracked(() =>
-    combine([ready$, match]).subscribe(([ready, m]) => {
-      const { documentTitle } = browser;
+    derive([ready$, match], (ready, m) => [ready, m] as const).subscribe(
+      ([ready, m]) => {
+        const { documentTitle } = browser;
 
-      // Not ready: the page may redirect, and its title is not shown either.
-      if (documentTitle === undefined || !declaresTitle || !ready) {
-        return;
-      }
-
-      const title = titleOf(matchedBranch(routes, m), m);
-
-      if (title === undefined) {
-        // A router that never set a title leaves the app's own alone.
-        if (mut_title.set !== undefined) {
-          documentTitle.set(mut_title.original ?? '');
-
-          mut_title.set = undefined;
+        // Not ready: the page may redirect, and its title is not shown either.
+        if (documentTitle === undefined || !declaresTitle || !ready) {
+          return;
         }
 
-        return;
-      }
+        const title = titleOf(matchedBranch(routes, m), m);
 
-      if (mut_title.set === undefined) {
-        mut_title.original = documentTitle.get();
-      }
+        if (title === undefined) {
+          // A router that never set a title leaves the app's own alone.
+          if (mut_title.set !== undefined) {
+            documentTitle.set(mut_title.original ?? '');
 
-      mut_title.set = title;
+            mut_title.set = undefined;
+          }
 
-      documentTitle.set(title);
-    }),
+          return;
+        }
+
+        if (mut_title.set === undefined) {
+          mut_title.original = documentTitle.get();
+        }
+
+        mut_title.set = title;
+
+        documentTitle.set(title);
+      },
+    ),
   );
 
   // Scrolling
@@ -1340,9 +1342,9 @@ export const createRouter = <R extends AnyRoutes>(
         );
   };
 
-  // Owns the `follow` subscriptions, so that `dispose` ends them and one whose
-  // observable completed is forgotten.
-  const follows = createScope();
+  // Owns the `follow` subscriptions, so that `dispose` ends them. A root owner:
+  // the router outlives whichever owner happens to be running.
+  const follows = createRootOwner();
 
   const mut_router = { disposed: false };
 
@@ -1358,8 +1360,8 @@ export const createRouter = <R extends AnyRoutes>(
 
     const mut_follow = { active: true, subscribing: true };
 
-    // In the router's own scope, not whichever one happens to be running.
-    const subscription = follows.run(() =>
+    // In the router's own owner, not whichever one happens to be running.
+    const unsubscribe = follows.run(() =>
       href$.subscribe((href) => {
         // An initialized observable delivers the value it holds during
         // `subscribe`: a state, not a move.
@@ -1384,7 +1386,7 @@ export const createRouter = <R extends AnyRoutes>(
     const stop = (): void => {
       mut_follow.active = false;
 
-      subscription.unsubscribe();
+      unsubscribe();
     };
 
     return stop;
@@ -1403,7 +1405,7 @@ export const createRouter = <R extends AnyRoutes>(
   ): InitializedObservable<Optional<RouteNodeValues<N>>> => {
     assertOwnNode(node, 'at');
 
-    // Outside every scope, as above: the first caller may be a component.
+    // Outside every owner, as above: the first caller may be a component.
     const cached =
       mut_atCache.get(node.id) ??
       untracked(() =>
@@ -1430,7 +1432,7 @@ export const createRouter = <R extends AnyRoutes>(
 
     const key = `${exact ? 'exact' : 'prefix'}:${node.id}` as const;
 
-    // Outside every scope, as above.
+    // Outside every owner, as above.
     const cached =
       mut_isActiveCache.get(key) ??
       untracked(() =>
@@ -1508,9 +1510,9 @@ export const createRouter = <R extends AnyRoutes>(
 
       forgetMissed();
 
-      stopMissed.unsubscribe();
+      stopMissed();
 
-      stopTitle.unsubscribe();
+      stopTitle();
     },
   };
 };

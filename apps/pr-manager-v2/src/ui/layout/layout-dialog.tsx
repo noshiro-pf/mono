@@ -1,4 +1,4 @@
-import { combine, map } from 'synstate';
+import { derive, map } from 'synstate';
 import { constant, For, If, type JSX } from 'synstate-dom';
 import { Arr, Optional } from 'ts-data-forge';
 import {
@@ -24,7 +24,10 @@ type Props = Readonly<{ layout: LayoutStore; fold: StackFoldStore }>;
  * mode, hiding — and whether stacks in the merge order start folded (§7.4).
  */
 export const LayoutDialog = ({ layout, fold }: Props): JSX.Element => {
-  const state = combine([layout.layout, layout.absent]);
+  const state = derive(
+    [layout.layout, layout.absent],
+    (l, absent) => [l, absent] as const,
+  );
 
   const change = (fn: (l: Layout) => Layout): void => {
     layout.change(fn);

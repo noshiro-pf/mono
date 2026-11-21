@@ -67,12 +67,12 @@
     "prettier": "catalog:",
     "prettier-plugin-organize-imports": "catalog:",
     "prettier-plugin-packagejson": "catalog:",
-    "synstate-dom-next": "workspace:*",
-    "synstate-next": "workspace:*",
+    "synstate": "workspace:*",
+    "synstate-dom": "workspace:*",
     "ts-repo-utils": "workspace:*"
   },
   "peerDependencies": {
-    "synstate-next": "workspace:^"
+    "synstate": "workspace:^"
   },
   "engines": {
     "node": ">=22.23.4",

@@ -16,7 +16,6 @@
   "include": [
     "./src",
     "./test",
-    "./e2e",
     "./scripts",
     "./configs",
     "./astro.config.mjs"

@@ -1,4 +1,4 @@
-import { combine, map, type InitializedObservable } from 'synstate';
+import { derive, map, type InitializedObservable } from 'synstate';
 import { constant, type JSX } from 'synstate-dom';
 import { Optional } from 'ts-data-forge';
 import { pullRequestsText } from '../../../domain/index.mjs';
@@ -31,12 +31,10 @@ export const StackFoldToggle = ({
     aria-expanded={folded.pipe(map((isFolded) => !isFolded))}
     class={constant('stack-fold-toggle')}
     data-folded={folded.pipe(map((isFolded) => (isFolded ? 'true' : 'false')))}
-    title={combine([number, layers, folded]).pipe(
-      map(([n, count, isFolded]) =>
-        isFolded
-          ? `Show the ${pullRequestsText(count)} below #${n}`
-          : `Fold the ${pullRequestsText(count)} below #${n} into one line`,
-      ),
+    title={derive([number, layers, folded], (n, count, isFolded) =>
+      isFolded
+        ? `Show the ${pullRequestsText(count)} below #${n}`
+        : `Fold the ${pullRequestsText(count)} below #${n} into one line`,
     )}
     type={constant('button')}
     onClick={() => {
@@ -48,10 +46,8 @@ export const StackFoldToggle = ({
         map((isFolded) => (isFolded ? CHEVRON_RIGHT : CHEVRON_DOWN)),
       )}
     />
-    {combine([layers, folded]).pipe(
-      map(([count, isFolded]) =>
-        isFolded ? `+${count} folded` : `${count} below`,
-      ),
+    {derive([layers, folded], (count, isFolded) =>
+      isFolded ? `+${count} folded` : `${count} below`,
     )}
   </button>
 );

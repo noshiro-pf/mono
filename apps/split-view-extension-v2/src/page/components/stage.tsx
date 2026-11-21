@@ -2,7 +2,7 @@ import {
   createState,
   derive,
   map,
-  onScopeDispose,
+  onCleanup,
   type InitializedObservable,
 } from 'synstate';
 import {
@@ -236,7 +236,7 @@ export const Stage = ({
 
         observer.observe(element);
 
-        onScopeDispose(() => {
+        onCleanup(() => {
           observer.disconnect();
         });
       }}

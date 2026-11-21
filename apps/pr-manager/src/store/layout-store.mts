@@ -10,6 +10,7 @@
  */
 
 import {
+  createOwner,
   createState,
   debounce,
   map,
@@ -141,12 +142,16 @@ export const createLayoutStore = (deps: LayoutDeps): LayoutStore => {
   };
 
   const start = (): (() => void) => {
-    const subscription = layout
-      .pipe(debounce(deps.saveDelayMs))
-      .subscribe(deps.save);
+    // The debounce belongs to the owner too, so that stopping disposes it, its
+    // timer included, and not only the subscription.
+    const owner = createOwner();
+
+    owner.run(() => {
+      layout.pipe(debounce(deps.saveDelayMs)).subscribe(deps.save);
+    });
 
     return () => {
-      subscription.unsubscribe();
+      owner.dispose();
     };
   };
 

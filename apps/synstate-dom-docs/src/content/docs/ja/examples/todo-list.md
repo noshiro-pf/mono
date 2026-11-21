@@ -3,12 +3,12 @@ title: Todo リスト
 description: If、For、class のオブジェクト形式、ビュー専用の派生を使った Todo リストです。
 ---
 
-README に載せている大きい方のサンプルです。入力欄と、項目ができると現れるリスト、残りの件数を表示します。
+入力欄と、項目ができると現れるリスト、残りの件数を表示します。
 
 ```tsx
 import { createState, map } from 'synstate';
 import { constant, For, If, render, type JSX } from 'synstate-dom';
-import { Arr, Optional } from 'ts-data-forge';
+import { Arr } from 'ts-data-forge';
 
 type Todo = Readonly<{ id: number; title: string; done: boolean }>;
 
@@ -80,11 +80,7 @@ const TodoApp = (): JSX.Element => {
                                                 map((todo) => todo.done),
                                             )}
                                             onChange={() => {
-                                                toggle(
-                                                    Optional.unwrap(
-                                                        todo$.getSnapshot(),
-                                                    ).id,
-                                                );
+                                                toggle(todo$.value.id);
                                             }}
                                         />
                                         {index$.pipe(map((i) => `${i + 1}. `))}
@@ -107,7 +103,7 @@ render(TodoApp, document.body);
 
 ポイント：
 
-- **`For` は `todo.id` ごとに 1 行を保ちます。** Todo を切り替えると新しい配列が `todos$` に書き込まれますが、行の関数がもう一度呼ばれることはありません。変わるのは、その行の `checked` プロパティ、`done` クラス、テキストだけです。
-- **`remaining$` は `TodoApp` の中で作っています。** このビューしか読まないからです。ルートスコープに属するので、アンマウント時に破棄されます。[ライフサイクルとスコープ](/mono/synstate-dom/ja/guides/lifecycle/#2-つの書き方)も見てください。
-- **リストと「Nothing to do.」の段落は、どちらも `If` に渡した記述です。** 一度にマウントされるのは片方だけで、切り替えるともう片方のスコープが `For` や行ごと破棄されます。
+- **`For` は `todo.id` ごとに 1 行を保ちます。** Todo を切り替えると新しい配列が `todos$` に書き込まれますが、行の関数がもう一度呼ばれることはありません。`For` が新しい Todo をその行の状態に書き込み、変わるのはその行の `checked` プロパティ、`done` クラス、テキストだけです。Todo が前と同じオブジェクトのほかの行は、訪れもしません。
+- **`remaining$` は `TodoApp` の中で作っています。** このビューしか読まないからです。ルートの owner に属するので、アンマウント時に破棄されます。[ライフサイクルと owner](/mono/synstate-dom/ja/guides/lifecycle/#2-つの書き方)も見てください。
+- **リストと「Nothing to do.」の段落は、どちらも `If` に渡した記述です。** 一度にマウントされるのは片方だけで、切り替えるともう片方の owner が `For` や行ごと破棄されます。
 - **イベントハンドラは状態に書き込むだけ**（`setDraft`、`updateTodos`）で、Observable は作りません。

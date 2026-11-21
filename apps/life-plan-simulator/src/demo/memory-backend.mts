@@ -32,11 +32,9 @@ export const createMemoryBackend = (now: number): Backend => {
 
   return {
     watchSession: (listener) => {
-      const subscription = session.subscribe(listener);
+      const unsubscribe = session.subscribe(listener);
 
-      return () => {
-        subscription.unsubscribe();
-      };
+      return unsubscribe;
     },
     signIn: () => {
       setSession(signedIn);

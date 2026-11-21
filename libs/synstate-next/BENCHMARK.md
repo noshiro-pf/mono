@@ -1,6 +1,8 @@
 # Benchmark: synstate-next and synstate
 
-<!-- Written by `pnpm run benchmark`; edits here are overwritten. -->
+<!-- Written by `pnpm run benchmark`, which was removed with the synstate it compared against; this is its last run. -->
+
+<!-- doc-paths-ignore: scripts/cmd/benchmark.mts -->
 
 Measured with Node.js v26.13.0 on Intel(R) Xeon(R) Processor @ 2.30GHz. Each figure is the median time of one operation, in nanoseconds, of 6 processes per library, each the median of 21 samples after 10 warm-up samples; see `scripts/cmd/benchmark.mts` for the scenarios. The last column is synstate-next's time divided by synstate's: below 1 is faster than synstate, above 1 slower.
 

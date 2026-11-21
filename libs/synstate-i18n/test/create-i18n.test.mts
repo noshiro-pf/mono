@@ -1,10 +1,6 @@
 // cspell:ignore Planification réponses Répondre avant titel
 import { runInNewContext } from 'node:vm';
-import {
-  createRootOwner,
-  state,
-  type InitializedObservable,
-} from 'synstate-next';
+import { createRootOwner, state, type InitializedObservable } from 'synstate';
 import { expectType } from 'ts-data-forge';
 import type { ReadonlyRecord } from 'ts-type-forge';
 import {

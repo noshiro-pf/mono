@@ -15,6 +15,7 @@ import * as ts from 'typescript';
 import { SYNSTATE_AND_WRAPPER_MODULES } from './constants.mjs';
 import {
   enclosingFunctionOf,
+  functionValuesOf,
   isPipeArgument,
   isPropertyNamed,
   localFunctionOf,
@@ -26,20 +27,25 @@ type Options = readonly [];
 type MessageIds = 'writeDuringPropagation' | 'writeThroughCall';
 
 /**
- * A subscriber or a projection that writes to a root starts an update while the
- * one that called it is still propagating. The write is not an edge of the
- * graph, so synstate cannot order it: subscribers see intermediate states, a
- * node can emit twice for one write, and a write back into the
- * update that called it loops. synstate warns at run time, once per root;
- * this rule says so where the write is written.
+ * A subscriber or a projection that writes to a root makes a write the graph
+ * cannot order, since it is not an edge of the graph. A projection's write
+ * waits until the update's subscribers have run and then starts another update;
+ * a subscriber's is applied at once, so a subscriber after it reads the new
+ * state while what derives from it is still old. Either way a node can emit
+ * twice for one write, and a write back into what the callback reads loops
+ * until synstate's round limit stops it. This rule says so where the write is
+ * written.
  *
  * A write is a call to what a synstate factory returned (`createState`'s
- * setter, `createReducer`'s `dispatch`, `source()`'s `next`, …), made directly
- * in a function passed to `.subscribe(…)` or to an operator in `.pipe(…)`. A
- * function passed by name counts when this file defines it, and so does a write
- * in a function of this file the callback calls, at any depth, reported at the
- * call. A write in a function the callback only defines (a `setTimeout`
- * callback) runs later and is not reported.
+ * setter, `createReducer`'s `dispatch`, `source()`'s `emit`, `state()`'s `set`
+ * and `update`, …), made directly in a function passed to `.subscribe(…)`, to
+ * an operator in `.pipe(…)` or to `derive`, as an argument; for synstate's own
+ * `derive` and operators, also as a property of an options object written in
+ * the call (`map(f, { equals })`), not a getter. A function passed by name
+ * counts when this file defines it, and so does a write in a function of this
+ * file the callback calls, at any depth, reported at the call. A write in a
+ * function the callback only defines (a `setTimeout` callback) runs later and
+ * is not reported.
  *
  * `useObservableEffect`'s callback is a subscriber too. synstate is recognized
  * under its own name and under those of the packages that wrap it
@@ -65,9 +71,9 @@ export const noWriteDuringPropagation: TSESLint.RuleModule<
     schema: [],
     messages: {
       writeDuringPropagation:
-        'This writes to a synstate state from a subscriber or a projection, while the update that called it is still propagating. The write is not part of the graph, so subscribers can see intermediate states, and a write back into the same update loops. Derive the value with `pipe` (`map`, `combine`, …) instead.',
+        'This writes to a synstate state from a subscriber or a projection, while the update that called it is still propagating. The write is not part of the graph, so subscribers can see intermediate states, and a write back into the same update loops. Derive the value instead, with `.pipe(map(…))` or `derive([…], …)`.',
       writeThroughCall:
-        'This calls `{{name}}`, which writes to a synstate state, from a subscriber or a projection, while the update that called it is still propagating. The write is not part of the graph, so subscribers can see intermediate states, and a write back into the same update loops. Derive the value with `pipe` (`map`, `combine`, …) instead.',
+        'This calls `{{name}}`, which writes to a synstate state, from a subscriber or a projection, while the update that called it is still propagating. The write is not part of the graph, so subscribers can see intermediate states, and a write back into the same update loops. Derive the value instead, with `.pipe(map(…))` or `derive([…], …)`.',
     },
     defaultOptions: [],
   },
@@ -180,10 +186,7 @@ export const noWriteDuringPropagation: TSESLint.RuleModule<
         );
       }
 
-      if (
-        callee.type !== AST_NODE_TYPES.MemberExpression ||
-        !isPropertyNamed(callee, 'next')
-      ) {
+      if (callee.type !== AST_NODE_TYPES.MemberExpression) {
         return false;
       }
 
@@ -195,7 +198,13 @@ export const noWriteDuringPropagation: TSESLint.RuleModule<
 
       const binding = factoryBindingOf(object);
 
-      return binding?.factory === 'source' && binding.path.length === 0;
+      if (binding === undefined || binding.path.length > 0) {
+        return false;
+      }
+
+      return methodWritersOf(binding.factory).some((method) =>
+        isPropertyNamed(callee, method),
+      );
     };
 
     /** The calls made directly in each function, outside nested ones. */
@@ -247,12 +256,24 @@ export const noWriteDuringPropagation: TSESLint.RuleModule<
           }
         }
 
+        const synstateName = isSynstateCall(node);
+
         if (
-          callsBackDuringPropagation(node) ||
-          isSynstateCall(node) === 'useObservableEffect'
+          synstateName === 'useObservableEffect' ||
+          synstateName === 'derive' ||
+          callsBackDuringPropagation(node)
         ) {
-          for (const argument of node.arguments) {
-            const callback = localFunctionOf(sourceCode, argument);
+          // Only synstate's own `derive` and operators take an options object
+          // of functions; `.subscribe` and another library's operator are read
+          // by their arguments alone.
+          const values =
+            synstateName === 'derive' ||
+            (synstateName !== undefined && isPipeArgument(node))
+              ? node.arguments.flatMap(functionValuesOf)
+              : node.arguments;
+
+          for (const value of values) {
+            const callback = localFunctionOf(sourceCode, value);
 
             if (callback !== undefined) {
               mut_callbacks.add(callback);
@@ -295,7 +316,8 @@ type PathStep = number | string;
 /**
  * What each synstate factory returns that writes, by its place in the result:
  * `createState`'s `[state$, setState, { updateState, resetState }]` and so on.
- * `source()` writes through its `next` method instead.
+ * `source()` and `state()` write through their methods instead
+ * ({@link methodWritersOf}).
  */
 const writersOf = (factory: string): readonly (readonly PathStep[])[] => {
   switch (factory) {
@@ -316,6 +338,20 @@ const writersOf = (factory: string): readonly (readonly PathStep[])[] => {
         [1, 'updateState'],
         [1, 'resetState'],
       ];
+
+    default:
+      return [];
+  }
+};
+
+/** The methods that write, of what a synstate factory returns itself. */
+const methodWritersOf = (factory: string): readonly string[] => {
+  switch (factory) {
+    case 'source':
+      return ['emit'];
+
+    case 'state':
+      return ['set', 'update'];
 
     default:
       return [];

@@ -6,7 +6,7 @@ import {
   map,
   state,
   type InitializedObservable,
-} from 'synstate-next';
+} from 'synstate';
 import { hasKey } from 'ts-data-forge';
 import * as Arr from 'ts-data-forge/array';
 import type { ReadonlyRecord, RelaxedExtract } from 'ts-type-forge';
@@ -915,7 +915,7 @@ const lookUp = (
 // A message that throws is a bug in its catalog: the error surfaces where the
 // text is computed, as the rejection of the `setLocale` that switched to it,
 // rather than being hidden behind the base text. How far the switch got by then
-// is how far synstate-next's update of the texts got.
+// is how far synstate's update of the texts got.
 const render = (
   message: MessageFn | string,
   params: ReadonlyRecord<string, unknown> | undefined,

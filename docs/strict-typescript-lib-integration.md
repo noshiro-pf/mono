@@ -2797,6 +2797,10 @@ overload の形だけ書き写してある。
 
 ### 戻したもの
 
+<!-- doc-paths-ignore: libs/synstate/src/core/types/timer.mts -->
+
+`libs/synstate/src/core/types/timer.mts` は synstate 9 のファイルで、synstate の置き換えでなくなった。
+
 | 箇所                                                                              | 戻した先                                                         |
 | :-------------------------------------------------------------------------------- | :--------------------------------------------------------------- |
 | `libs/synstate/src/core/types/timer.mts`                                          | `TimerId = ReturnType<typeof setTimeout>`                        |

@@ -1,14 +1,9 @@
 import { effect, type ReadonlySignal, type Signal } from '@preact/signals';
-import {
-  getCurrentScope,
-  onScopeDispose,
-  source,
-  type InitializedSourceObservable,
-} from 'synstate';
+import { createSource, type InitializedObservable } from 'synstate';
 
 /**
  * Converts a Preact `Signal` (or `ReadonlySignal`) into a synstate
- * `InitializedSourceObservable`.
+ * `InitializedObservable`.
  *
  * This allows applying synstate's rich operator chain (e.g. `map`, `filter`,
  * `debounce`, `switchMap`) to values originating from Preact Signals.
@@ -20,11 +15,15 @@ import {
  * later, which every `@preact/signals` from 1.1.0 depends on; with an older
  * core such a read still makes the observable emit again.
  *
+ * The observable belongs to the current owner, as every observable does, and
+ * stops following the signal when it is disposed, by its owner or by itself.
+ *
  * @returns A tuple of `[observable, dispose]`.
- *   - `observable` — an `InitializedSourceObservable` that mirrors the signal.
- *   - `dispose` — a function to stop tracking the signal. Called inside a
- *     synstate scope, the bridge stops when that scope is disposed; otherwise
- *     call this when the bridge is no longer needed to avoid memory leaks.
+ *   - `observable` — an `InitializedObservable` that mirrors the signal.
+ *   - `dispose` — disposes the observable, which stops tracking the signal.
+ *     Made inside a synstate owner, the bridge stops when that owner is
+ *     disposed; otherwise call this when the bridge is no longer needed to
+ *     avoid memory leaks.
  *
  * @example
  * ```ts
@@ -50,39 +49,46 @@ import {
 export const fromSignal = <A,>(
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   sig: ReadonlySignal<A> | Signal<A>,
-): readonly [
-  observable: InitializedSourceObservable<A>,
-  dispose: () => void,
-] => {
-  // `peek`, so that a `fromSignal` called inside an effect or a computed does
-  // not make the enclosing effect or computed depend on the signal.
-  const src = source<A>(sig.peek());
+): readonly [observable: InitializedObservable<A>, dispose: () => void] => {
+  const observable = createSource<A>(
+    (ctx) => {
+      /** False during the call back the signal makes before returning. */
+      let mut_following = false;
 
-  const pass = (value: A): void => {
-    src.next(value);
-  };
+      const pass = (value: A): void => {
+        if (mut_following) {
+          ctx.emit(value);
+        }
+      };
 
-  // From `@preact/signals-core` 1.2.0, `subscribe` does not track what its
-  // callback reads, so a signal that a subscriber or a projection of the
-  // observable reads while `next` runs is not taken for a dependency of the
-  // bridge; core 1.1 tracks it, as an effect does. Core 1.0, which the peer
-  // range admits, has no `subscribe` although the installed types declare one,
-  // so the bridge follows the signal with an effect there rather than throw.
-  // Either calls back once before returning, with the signal's current value;
-  // nothing can have subscribed to the source yet, so no one sees what it held
-  // before.
-  const dispose =
-    typeof sig.subscribe === 'function'
-      ? sig.subscribe(pass)
-      : effect(() => {
-          pass(sig.value);
-        });
+      // From `@preact/signals-core` 1.2.0, `subscribe` does not track what its
+      // callback reads, so a signal that a subscriber or a projection of the
+      // observable reads while `emit` runs is not taken for a dependency of the
+      // bridge; core 1.1 tracks it, as an effect does. Core 1.0, which the peer
+      // range admits, has no `subscribe` although the installed types declare
+      // one, so the bridge follows the signal with an effect there rather than
+      // throw. Either calls back once before returning, with the value the
+      // source already holds, which is not passed on again.
+      const stop =
+        typeof sig.subscribe === 'function'
+          ? sig.subscribe(pass)
+          : effect(() => {
+              pass(sig.value);
+            });
 
-  // The scope that disposes the source ends the subscription too. Preact's
-  // dispose does nothing the second time, so the caller may still call it.
-  if (getCurrentScope() !== undefined) {
-    onScopeDispose(dispose);
-  }
+      mut_following = true;
 
-  return [src, dispose] as const;
+      ctx.onCleanup(stop);
+    },
+    // `peek`, so that a `fromSignal` called inside an effect or a computed does
+    // not make the enclosing effect or computed depend on the signal.
+    { initialValue: sig.peek() },
+  );
+
+  return [
+    observable,
+    () => {
+      observable.dispose();
+    },
+  ] as const;
 };

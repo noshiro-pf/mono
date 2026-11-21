@@ -90,6 +90,33 @@ ruleTester.run('no-throw-in-operator', noThrowInOperator, {
       `,
     },
     {
+      name: 'a throw in a getter of the options, or in what it returns, which are not followed',
+      code: dedent`
+        import { derive, map } from 'synstate';
+        const a2$ = a$.pipe(
+          map((a) => a, {
+            get equals() {
+              throw new Error('no');
+            },
+          }),
+        );
+        const b2$ = derive([b$], (b) => b, {
+          get equals() {
+            throw new Error('no');
+          },
+        });
+        const c2$ = c$.pipe(
+          map((c) => c, {
+            get equals() {
+              return () => {
+                throw new Error('no');
+              };
+            },
+          }),
+        );
+      `,
+    },
+    {
       name: 'an operator that is not synstate’s',
       code: dedent`
         import { map } from 'rxjs';
@@ -145,6 +172,59 @@ ruleTester.run('no-throw-in-operator', noThrowInOperator, {
   ],
 
   invalid: [
+    {
+      name: 'a throw in a `derive` projection and in its `equals`',
+      code: dedent`
+        import { derive } from 'synstate';
+        const ratio$ = derive(
+          [a$, b$],
+          (a, b) => {
+            if (b === 0) throw new RangeError('zero');
+            return a / b;
+          },
+          {
+            equals: (x, y) => {
+              throw new Error(String(x === y));
+            },
+          },
+        );
+      `,
+      errors: [
+        { messageId: 'throwInOperator', line: 5 },
+        { messageId: 'throwInOperator', line: 10 },
+      ],
+    },
+    {
+      name: 'a throw in a `derive` imported from a package that re-exports synstate',
+      code: dedent`
+        import { derive } from 'synstate-react-hooks';
+        const checked$ = derive([a$], (a) => {
+          throw new Error(String(a));
+        });
+      `,
+      errors: [{ messageId: 'throwInOperator', line: 3 }],
+    },
+    {
+      name: 'a throw in an operator imported by name and through a namespace from such a package',
+      code: dedent`
+        import { map } from 'synstate-preact-hooks';
+        import * as S from 'synstate-react-hooks';
+        const a2$ = a$.pipe(
+          map((a) => {
+            throw new Error(String(a));
+          }),
+        );
+        const b2$ = b$.pipe(
+          S.filter((b) => {
+            throw new Error(String(b));
+          }),
+        );
+      `,
+      errors: [
+        { messageId: 'throwInOperator', line: 5 },
+        { messageId: 'throwInOperator', line: 10 },
+      ],
+    },
     {
       name: 'a throw in a map projection',
       code: dedent`
@@ -332,12 +412,12 @@ ruleTester.run('no-throw-in-operator', noThrowInOperator, {
       ],
     },
     {
-      name: 'the predefined operators built on map',
+      name: 'the other operators that take a function',
       code: dedent`
-        import { mapOptional, mapResultErr, mapResultOk } from 'synstate';
-        const a$ = x$.pipe(mapOptional(() => { throw new Error('a'); }));
-        const b$ = x$.pipe(mapResultOk(() => { throw new Error('b'); }));
-        const c$ = x$.pipe(mapResultErr(() => { throw new Error('c'); }));
+        import { scan, skipWhile, switchMap } from 'synstate';
+        const a$ = x$.pipe(scan(() => { throw new Error('a'); }, 0));
+        const b$ = x$.pipe(skipWhile(() => { throw new Error('b'); }));
+        const c$ = x$.pipe(switchMap(() => { throw new Error('c'); }));
       `,
       errors: [
         { messageId: 'throwInOperator', line: 2 },

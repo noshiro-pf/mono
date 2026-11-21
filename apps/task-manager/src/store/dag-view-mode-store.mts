@@ -32,7 +32,7 @@ export const createDagViewModeStore = (
       const subscription = mode.subscribe(deps.save);
 
       return () => {
-        subscription.unsubscribe();
+        subscription();
       };
     },
   };

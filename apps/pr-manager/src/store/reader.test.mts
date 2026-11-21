@@ -1,4 +1,4 @@
-import { createState, source, type SourceObservable } from 'synstate';
+import { createState, source, type Source } from 'synstate';
 import { Optional, Result } from 'ts-data-forge';
 import { CLOCK_TICK_MS, POLL_INTERVAL_MS } from '../constants.mjs';
 import type { Answered } from '../graphql.mjs';
@@ -1409,10 +1409,10 @@ const setup = (initialToken: StoredToken | undefined): Setup => {
   /** One `counter` stand-in per timer the reader asks for, oldest first. */
   const mut_counters: Readonly<{
     ms: number;
-    counter: SourceObservable<number>;
+    counter: Source<number>;
   }>[] = [];
 
-  const countersOf = (ms: number): readonly SourceObservable<number>[] =>
+  const countersOf = (ms: number): readonly Source<number>[] =>
     mut_counters.filter((c) => c.ms === ms).map((c) => c.counter);
 
   const visibilityChange = source<undefined>();
@@ -1425,12 +1425,12 @@ const setup = (initialToken: StoredToken | undefined): Setup => {
     hide: () => {
       mut_visibility.visible = false;
 
-      visibilityChange.next(undefined);
+      visibilityChange.emit(undefined);
     },
     show: () => {
       mut_visibility.visible = true;
 
-      visibilityChange.next(undefined);
+      visibilityChange.emit(undefined);
     },
   };
 
@@ -1479,11 +1479,11 @@ const setup = (initialToken: StoredToken | undefined): Setup => {
     setToken,
     timers: {
       fire: (ms: number) => {
-        countersOf(ms).at(-1)?.next(1);
+        countersOf(ms).at(-1)?.emit(1);
       },
       started: (ms: number) => countersOf(ms).length,
       running: (ms: number) =>
-        countersOf(ms).filter((counter) => !counter.isCompleted).length,
+        countersOf(ms).filter((counter) => !counter.settled).length,
     },
   } as const;
 };

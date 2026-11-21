@@ -1,6 +1,6 @@
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
-import { Result, unknownToString } from 'ts-data-forge';
+import { Obj, Result, unknownToString } from 'ts-data-forge';
 import { isDirectlyExecuted } from 'ts-repo-utils';
 import type { FixedLengthTuple, ReadonlyRecord } from 'ts-type-forge';
 // eslint-disable-next-line import-x/no-relative-packages -- tools/ is not a package; this is how apps reach its shared scripts
@@ -24,10 +24,10 @@ import { workspaceRootPath } from './workspace-root-path.mjs';
  * the operations in Japanese. An operation this script has no name for is an
  * error, not a row left in English.
  *
- * The introduction and the landing page quote synstate-dom's place among the
- * libraries too, beside SynState's own benchmark; the SynState site's
- * `gen:benchmark-doc` fills both kinds of figure there, so that each page has
- * one writer, and `check:prose:synstate-dom-placement` checks them.
+ * The introduction and the landing page quote some of the same figures, which
+ * are filled here too, so that each page has one writer;
+ * `check:prose:synstate-dom-placement` checks the placement figures of every
+ * page.
  */
 export const embedBenchmark = async (): Promise<Result<undefined, string>> => {
   try {
@@ -49,14 +49,22 @@ export const embedBenchmark = async (): Promise<Result<undefined, string>> => {
     // them unformatted, which the next run or `fix:fmt` repairs.
     const mut_embedded: FixedLengthTuple<2, string>[] = [];
 
-    for (const [locale, pagePath] of pages) {
+    for (const [locale, pagePath, quotesSome] of pages) {
       // eslint-disable-next-line security/detect-non-literal-fs-filename
       const page = await fs.readFile(pagePath, 'utf8');
+
+      const rendered = render(results.value, locale);
+
+      // A page that quotes some figures gets only those; the benchmark pages
+      // carry every one, so a marker missing from them still fails.
+      const used = markers.markerKeys(page, 'benchmark');
 
       const embedded = markers.embedInto(
         page,
         'benchmark',
-        render(results.value, locale),
+        quotesSome
+          ? Obj.filter(rendered, (_value, key) => used.has(key))
+          : rendered,
       );
 
       if (Result.isErr(embedded)) {
@@ -92,10 +100,13 @@ export const embedBenchmark = async (): Promise<Result<undefined, string>> => {
   }
 };
 
-const pages: readonly (readonly [domResults.Locale, string])[] =
-  domResults.benchmarkPages.map(
-    (page) => [domResults.pageLocale(page), page] as const,
-  );
+const pages: readonly (readonly [domResults.Locale, string, boolean])[] = [
+  ...domResults.benchmarkPages.map((page) => [page, false] as const),
+  ...domResults.placementPages.map((page) => [page, true] as const),
+].map(
+  ([page, quotesSome]) =>
+    [domResults.pageLocale(page), page, quotesSome] as const,
+);
 
 const operationNamesJa: ReadonlyRecord<string, string> = {
   'create 1,000 rows': '1,000 行を作る',
