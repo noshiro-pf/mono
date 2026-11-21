@@ -1,6 +1,7 @@
 /**
  * Ownership. Everything created while an owner's `run` executes belongs to it,
- * and `dispose()` disposes it: the child owners first, then the cleanups, then
+ * and `dispose()` disposes it: it takes the whole subtree out of the updates
+ * first, then disposes the child owners, then runs the cleanups, then disposes
  * the nodes, each newest first. A cleanup or a disposal that throws does not
  * stop the rest: the first exception is thrown once everything is disposed.
  * This is the only lifetime a node has; there is no reference counting and no
@@ -10,7 +11,7 @@
 /**
  * What an owner disposes. `retire`, where a node has it, takes the node out of
  * the updates to come without running any code of the application; see
- * `retireOwner`.
+ * `retireOwner`. It does not throw, and does nothing when called again.
  */
 export type OwnedNode = Readonly<{
   dispose: () => void;
@@ -29,8 +30,14 @@ const mut_internals: {
 
 /**
  * Everything created while its `run` executes belongs to it, and `dispose()`
- * disposes it: the child owners first, then the cleanups, then the nodes, each
- * newest first. Made by `createOwner` or `createRootOwner`.
+ * disposes it: it takes everything in it, its child owners' included, out of
+ * the updates first, then disposes the child owners, then runs the cleanups,
+ * then disposes the nodes, each newest first. So no subscription or binding in
+ * it hears what a cleanup writes or anything the disposal sets off, and a
+ * cleanup reads the derived values its nodes held when the disposal began. The
+ * exception is a projection or a setup that disposes an owner of its own
+ * observable: what it made there before may still hear the cleanups. Made by
+ * `createOwner` or `createRootOwner`.
  */
 export class Owner {
   static {
@@ -43,7 +50,9 @@ export class Owner {
     };
 
     mut_internals.retire = (owner) => {
-      owner.#retire();
+      // Reported, not thrown: it is called in the drain, and from a node's
+      // `retire`, which does not throw.
+      reportFailure(owner.#retire(undefined, false));
     };
   }
 
@@ -75,15 +84,29 @@ export class Owner {
    */
   #mut_depthFloor: number;
 
-  /** Whether `retireOwner` was called; it is disposed soon. */
+  /**
+   * Whether `retireOwner` or `dispose` took it out of the updates. It stays
+   * out: a child owner made in it before it is disposed starts retired, and a
+   * node made in it is retired once the `run` that made it returns (see
+   * `#retireJoined`). What is made after it is disposed during its own `run`
+   * goes to `#takeLate`.
+   */
   #mut_retired: boolean;
+
+  /** What was made in this owner during its `run` after it was retired. */
+  #mut_joined: OwnedNode[] | undefined;
 
   constructor(parent: Owner | undefined) {
     this.#parent = parent;
 
     this.#mut_depthFloor = parent === undefined ? 0 : parent.#mut_depthFloor;
 
-    this.#mut_retired = false;
+    // A child made in a retired parent starts retired; one made after the
+    // parent was disposed during its `run` lives until that `run` ends.
+    this.#mut_retired =
+      parent !== undefined && !parent.#mut_disposed && parent.#mut_retired;
+
+    this.#mut_joined = undefined;
 
     this.#mut_children = undefined;
 
@@ -120,6 +143,14 @@ export class Owner {
     }
   }
 
+  #takeJoined(node: OwnedNode): void {
+    if (this.#mut_joined === undefined) {
+      this.#mut_joined = [node];
+    } else {
+      this.#mut_joined.push(node);
+    }
+  }
+
   #takeLate(node: OwnedNode): void {
     if (this.#mut_late === undefined) {
       this.#mut_late = [node];
@@ -131,7 +162,9 @@ export class Owner {
   /**
    * Disposes what was made after this owner was disposed, newest first. After
    * an exception from `fn`, an exception from a disposal is reported rather
-   * than thrown, so that it does not replace the first.
+   * than thrown, so that it does not replace the first. Not covered yet: these
+   * are not taken out of the updates first, so an older one hears what a newer
+   * one's teardown writes.
    */
   #disposeLate(fnThrew: boolean): void {
     const late = this.#mut_late;
@@ -175,21 +208,111 @@ export class Owner {
     this.#mut_deadChildren = 0;
   }
 
-  /** See `retireOwner`. */
-  #retire(): void {
-    if (this.#mut_disposed || this.#mut_retired) {
+  /**
+   * Retires the subtree (see `retireOwner`). Each node is retired once: in an
+   * owner retired before, only what joined it since and waits for its `run` to
+   * return (see `#retireJoined`), which `dispose` retires now, walking the whole
+   * tree, and `retireOwner` leaves to the `run`. A node whose `retire` throws,
+   * against its contract, does not stop the rest; in an owner a node made for
+   * itself, which that node retires through `retireOwner`, it is reported.
+   */
+  #retire(failure: Failure, joinedToo: boolean): Failure {
+    if (this.#mut_disposed) {
+      return failure;
+    }
+
+    let mut_failure = failure;
+
+    if (this.#mut_retired) {
+      if (!joinedToo) {
+        return mut_failure;
+      }
+
+      const joined = this.#mut_joined;
+
+      this.#mut_joined = undefined;
+
+      mut_failure = retireEach(joined, mut_failure);
+    } else {
+      this.#mut_retired = true;
+
+      mut_failure = retireEach(this.#mut_nodes, mut_failure);
+    }
+
+    for (const child of this.#mut_children ?? []) {
+      mut_failure = child.#retire(mut_failure, joinedToo);
+    }
+
+    return mut_failure;
+  }
+
+  /**
+   * Retires what joined this owner, retired, during the `run` that is
+   * returning: not as it joined, since a node joins its owner before its
+   * constructor ends. Until then it is in the updates, and hears what that
+   * `run` writes; a disposal in it retires it at once (see `#retire`).
+   * Reported, not thrown, as `retireOwner` reports.
+   *
+   * Not covered: a projection or a setup that retires or disposes an owner of
+   * its own node while it runs. The node is retired or torn down before the
+   * owner the projection runs in is among those it holds, so what the
+   * projection makes may still hear that owner's cleanups. Code of the
+   * application that ends its own enclosing lifetime from inside a projection
+   * is rare, so it waits for a change of its own.
+   */
+  #retireJoined(): void {
+    const joined = this.#mut_joined;
+
+    if (joined === undefined) {
       return;
     }
 
-    this.#mut_retired = true;
+    this.#mut_joined = undefined;
 
-    for (const child of this.#mut_children ?? []) {
-      child.#retire();
+    reportFailure(retireEach(joined, undefined));
+  }
+
+  /**
+   * Disposes this owner once its subtree is retired: its child owners are
+   * disposed the same way, so that the tree is walked once, not once per level.
+   */
+  #disposeRetired(failure: Failure): Failure {
+    this.#mut_disposed = true;
+
+    const children = this.#mut_children;
+
+    const cleanups = this.#mut_cleanups;
+
+    const nodes = this.#mut_nodes;
+
+    this.#mut_children = undefined;
+
+    this.#mut_cleanups = undefined;
+
+    this.#mut_nodes = undefined;
+
+    if (this.#parent !== undefined) {
+      this.#parent.#childGone();
     }
 
-    for (const node of this.#mut_nodes ?? []) {
-      node.retire?.();
+    // Newest first, by index: the lists are this owner's no longer, and a
+    // reversed copy would allocate one per row of a list. Everything is
+    // disposed even when something throws; see `disposeAll`.
+    let mut_failure = failure;
+
+    for (let mut_i = (children?.length ?? 0) - 1; mut_i >= 0; mut_i -= 1) {
+      const child = children?.[mut_i];
+
+      if (child === undefined || child.#mut_disposed) {
+        continue;
+      }
+
+      mut_failure = child.#disposeRetired(mut_failure);
     }
+
+    mut_failure = runNewestFirst(cleanups, mut_failure);
+
+    return disposeNewestFirst(nodes, mut_failure);
   }
 
   get parent(): Owner | undefined {
@@ -234,6 +357,8 @@ export class Owner {
       this.#mut_running -= 1;
 
       if (this.#mut_running === 0) {
+        this.#retireJoined();
+
         this.#disposeLate(mut_threw);
       }
     }
@@ -274,6 +399,16 @@ export class Owner {
       return;
     }
 
+    if (this.#mut_retired) {
+      if (this.#mut_running > 0) {
+        this.#takeJoined(node);
+      } else {
+        // A node adopts itself only into the current owner, during a `run`:
+        // one adopted outside a `run` was handed over constructed.
+        reportFailure(retireEach([node], undefined));
+      }
+    }
+
     const nodes = this.#mut_nodes;
 
     if (nodes === undefined) {
@@ -300,34 +435,13 @@ export class Owner {
       return;
     }
 
-    this.#mut_disposed = true;
-
-    const children = this.#mut_children;
-
-    const cleanups = this.#mut_cleanups;
-
-    const nodes = this.#mut_nodes;
-
-    this.#mut_children = undefined;
-
-    this.#mut_cleanups = undefined;
-
-    this.#mut_nodes = undefined;
-
-    if (this.#parent !== undefined) {
-      this.#parent.#childGone();
-    }
-
-    // Newest first, by index: the lists are this owner's no longer, and a
-    // reversed copy would allocate one per row of a list. Everything is
-    // disposed even when something throws; see `disposeAll`.
-    let mut_failure = disposeNewestFirst(children, undefined);
-
-    mut_failure = runNewestFirst(cleanups, mut_failure);
-
-    mut_failure = disposeNewestFirst(nodes, mut_failure);
-
-    throwFailure(mut_failure);
+    // First out of the updates, the whole subtree at once (the child owners,
+    // and the owners its nodes made for themselves): no effect anywhere in it,
+    // a sibling's or a setup's included, runs for what a cleanup writes or for
+    // anything the disposal sets off. Its nodes keep the values they hold for
+    // the cleanups to read, and no longer follow their parents: a cleanup that
+    // writes a state reads the owner's derived values from before the write.
+    throwFailure(this.#disposeRetired(this.#retire(undefined, true)));
   }
 }
 
@@ -399,7 +513,8 @@ export const currentDepthFloor = (): number => mut_current.depthFloor;
  * Creates an owner, a child of `parent`, whose nodes are all at depth
  * `depthFloor` or deeper: the nodes it creates, and those of its child owners.
  * A switch places its branch below the node that decides it this way, so that
- * the drain decides before it visits the branch; see `retireOwner`.
+ * the drain decides before it visits the branch; see `retireOwner`. An owner a
+ * node makes for itself has no parent: the node retires it from its `retire`.
  */
 export const ownerBelow = (
   parent: Owner | undefined,
@@ -419,7 +534,9 @@ export const ownerBelow = (
  * before the drain reaches the branch's nodes (see `ownerBelow`), so that none
  * of them computes from a value the switch rules out. The owner is to be
  * disposed once the update has settled; until then its nodes keep their values
- * and emit nothing.
+ * and emit nothing. The owner stays retired: a child owner made in it starts
+ * retired, and a node made in it is retired when the `run` that made it
+ * returns. A node's `retire` that throws is reported, not thrown.
  */
 export const retireOwner = (owner: Owner): void => {
   mut_internals.retire(owner);
@@ -495,6 +612,13 @@ export const throwFailure = (failure: Failure): void => {
   }
 };
 
+/** Reports the exception `failure` holds, if any, with `console.error`. */
+const reportFailure = (failure: Failure): void => {
+  if (failure !== undefined) {
+    console.error(failure.error);
+  }
+};
+
 const disposeNewestFirst = (
   items: readonly (Readonly<{ dispose: () => void }> | undefined)[] | undefined,
   failure: Failure,
@@ -533,6 +657,24 @@ const runNewestFirst = (
 
     try {
       fn?.();
+    } catch (error) {
+      mut_failure = keepFirst(mut_failure, error);
+    }
+  }
+
+  return mut_failure;
+};
+
+/** Retires each node, keeping the first exception; see `keepFirst`. */
+const retireEach = (
+  nodes: readonly OwnedNode[] | undefined,
+  failure: Failure,
+): Failure => {
+  let mut_failure = failure;
+
+  for (const node of nodes ?? []) {
+    try {
+      node.retire?.();
     } catch (error) {
       mut_failure = keepFirst(mut_failure, error);
     }

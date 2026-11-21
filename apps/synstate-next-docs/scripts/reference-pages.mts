@@ -61,8 +61,8 @@ export const referencePages: readonly ReferencePage[] = [
   page('operators', 'take', ['take', 'operators/take.mts']),
   page('operators', 'skip', ['skip', 'operators/take.mts']),
   // Spread rather than a parameter of `page`, whose rest parameters are the
-  // exports: one page has conditions, and a second shape of `page` for it would
-  // cost more than this entry's.
+  // exports: few pages have conditions, and a second shape of `page` for them
+  // would cost more than these entries'.
   {
     ...page('operators', 'take-while', [
       'takeWhile',
@@ -105,8 +105,27 @@ export const referencePages: readonly ReferencePage[] = [
   page('operators', 'debounce', ['debounce', 'operators/debounce.mts']),
   page('operators', 'throttle', ['throttle', 'operators/throttle.mts']),
   page('operators', 'audit', ['audit', 'operators/audit.mts']),
-  page('operators', 'switch-map', ['switchMap', 'operators/switch-map.mts']),
-  page('operators', 'merge-map', ['mergeMap', 'operators/merge-map.mts']),
+  {
+    ...page('operators', 'switch-map', [
+      'switchMap',
+      'operators/switch-map.mts',
+    ]),
+    operatorKindConditions: {
+      Keep: {
+        en: 'When `project` returns an `InitializedObservable`',
+        ja: '`project` が `InitializedObservable` を返すとき',
+      },
+    },
+  },
+  {
+    ...page('operators', 'merge-map', ['mergeMap', 'operators/merge-map.mts']),
+    operatorKindConditions: {
+      Keep: {
+        en: 'When `project` returns an `InitializedObservable`',
+        ja: '`project` が `InitializedObservable` を返すとき',
+      },
+    },
+  },
   page(
     'operators',
     'create-derived',

@@ -48,7 +48,8 @@ export const SignUp = (): JSX.Element => (
 ```
 
 - ほとんどの props は `setAttribute` で書き込みます。`value`、`checked`、`selected`、`indeterminate` など一部の props は、ユーザーの操作につれて属性と実際の値がずれていくので、代わりに DOM プロパティとして書き込みます（`element.value = v`）。
-- `<input>` に束縛した `checked` と `indeterminate` は制御されます。`change` の後、次のアニメーションフレームかタスクの早い方で、束縛した値に戻します。そのため `onChange` が受け入れなかった変更は、描画される前に元に戻ります。上のチェックボックスで `toggleAgreed` を呼ばなかった場合がそうです。フレームが描かれない非表示のページでも戻ります。ユーザーが自由に切り替えられるチェックボックスにするなら、代わりに `defaultChecked` を渡してください。ラジオボタンのグループでは、すべてのボタンを束縛してください。
+- `value` は、書かれた順序にかかわらず、ほかのすべての props の後に束縛します。input は値を書き込んだ時点の `type` に合わせて値を直し、range の input はさらに `min`、`max`、`step` にも合わせて丸めるためです。1 つの更新で `max` と `value` が一緒に上がったときは、`max` を書き込んだ後に値をもう一度書き込みます（その間にユーザーが値を変えていなければ）。
+- `<input>` に束縛した `checked` と `indeterminate`、`<select>`（`<select multiple>` を除く）に束縛した `value` は制御されます。`change` の後、次のアニメーションフレームかタスクの早い方で、束縛した値に戻します。そのため `onChange` が受け入れなかった変更は、描画される前に元に戻ります。上のチェックボックスで `toggleAgreed` を呼ばなかった場合がそうです。フレームが描かれない非表示のページでも戻ります。ユーザーが自由に切り替えられるチェックボックスにするなら、代わりに `defaultChecked` を渡してください。`<select>` で自由に選ばせるなら、`value` を束縛せず、option に `defaultSelected` を渡してください。ラジオボタンのグループでは、すべてのボタンを束縛してください。`<input>` と `<textarea>` の `value` は一方向のままです。入力中の下書きや IME の変換を保つためです。
 - `disabled` のような真偽値の属性は `Bindable<boolean>` を受け取り、値が `false` の間は取り除かれます。
 
 ## `class` と `style`

@@ -27,7 +27,7 @@ Calls `fn` with no current owner: what it creates outlives the caller.
 
 ### `Owner`
 
-Everything created while its `run` executes belongs to it, and `dispose()` disposes it: the child owners first, then the cleanups, then the nodes, each newest first. Made by `createOwner` or `createRootOwner`.
+Everything created while its `run` executes belongs to it, and `dispose()` disposes it: it takes everything in it, its child owners' included, out of the updates first, then disposes the child owners, then runs the cleanups, then disposes the nodes, each newest first. So no subscription or binding in it hears what a cleanup writes or anything the disposal sets off, and a cleanup reads the derived values its nodes held when the disposal began. The exception is a projection or a setup that disposes an owner of its own observable: what it made there before may still hear the cleanups. Made by `createOwner` or `createRootOwner`.
 
 {/* /reference */}
 

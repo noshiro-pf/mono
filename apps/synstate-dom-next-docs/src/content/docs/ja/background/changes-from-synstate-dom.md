@@ -15,7 +15,7 @@ synstate-dom-next は synstate-dom のモデルと API のほとんどを引き�
 - **Observable を束縛した分岐のコンポーネントは、両端のコメントで示します。** synstate-dom は後ろに 1 つ置きます。constant を渡した分岐のコンポーネントは、コメントなしで分岐をマウントします。
 - **イベントハンドラは、要素が持っていれば `on…` プロパティ**、持っていなければリスナーです。要素は owner と一緒に消えるので、どちらも取り外しません。
 - **失敗はその場にとどまります。** `For` の行や分岐の後始末が例外を投げても、更新もほかの破棄も止まりません。例外は行と分岐が置かれた後に投げられます。マウント中に例外を投げた行は、その更新で作った行を取り除き、ほかの行は残します。例外を投げた分岐は、次の値まで分岐のコンポーネントを空にします。例外を投げた束縛は、同じ更新のほかの束縛を止めません。
-- **制御された `checked` と `indeterminate`** は、`change` の後、次のアニメーションフレームかタスクの早い方で戻します。そのため非表示のページでも戻ります。
+- **制御された `checked`、`indeterminate`、`<select>` の `value`**（`<select multiple>` は一方向のまま）は、`change` の後、次のアニメーションフレームかタスクの早い方で戻します。そのため非表示のページでも戻ります。
 - **`subscribeInScope` はなくなりました。** owner の実行中に行った `subscribe` は、もともとその owner に属します。
 - **`inlineMap` は作り直していません。** synstate-dom でも削除済みです。
 - **低レベル API は小さくなりました。** `mountable(mount)` はノードを返す関数を受け取り、`mountChild(child, parent?)` は子を専用の owner の中でマウントしてノードを返し、`parent` を渡せばその名前空間でそこに追加します。`isChild` は残っています。`toNodes`、`createMountable`、型 `Mountable` と `MountedNodes` はなくなりました（[低レベル API](/mono/synstate-dom-next/ja/guides/low-level/)）。

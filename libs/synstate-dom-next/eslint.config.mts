@@ -101,13 +101,15 @@ export default [
     files: ['test/**'],
     rules: defineKnownRules({
       // A published entry point, which a test that makes an element of a tag
-      // known only at run time calls.
+      // known only at run time calls, and `vitest/browser`, where Vitest
+      // exports `cdp`, which the IME composition tests drive.
       'import-x/no-internal-modules': [
         'error',
         {
           allow: [
             ...eslintImportsRules['import-x/no-internal-modules'][1].allow,
             'synstate-dom-next/jsx-runtime',
+            'vitest/browser',
           ],
         },
       ],

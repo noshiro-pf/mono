@@ -9,6 +9,7 @@ import {
   keepEqualParts,
   map,
   merge,
+  mergeMap,
   onCleanup,
   pairwise,
   scan,
@@ -18,6 +19,7 @@ import {
   skipWhile,
   source,
   state,
+  switchMap,
   take,
   takeUntil,
   takeWhile,
@@ -259,6 +261,30 @@ describe('types', () => {
     );
 
     expectType<typeof _explicit, InitializedObservable<number>>('=');
+
+    const _switched = s.pipe(switchMap((x) => state(x + 1)));
+
+    expectType<typeof _switched, InitializedObservable<number>>('=');
+
+    const _merged = s.pipe(mergeMap((x) => state(x + 1)));
+
+    expectType<typeof _merged, InitializedObservable<number>>('=');
+
+    const _switchedToNone = s.pipe(
+      switchMap((x): Observable<number> => (x > 0 ? state(x) : source())),
+    );
+
+    expectType<typeof _switchedToNone, Observable<number>>('=');
+
+    const _mergedFromEvent = e.pipe(mergeMap((x) => state(x.length)));
+
+    expectType<typeof _mergedFromEvent, Observable<number>>('=');
+
+    const _switchedExplicit = s.pipe(
+      switchMap<number, number>((x) => state(x)),
+    );
+
+    expectType<typeof _switchedExplicit, InitializedObservable<number>>('=');
 
     expectType<Observable<number>['settled'], boolean>('=');
 

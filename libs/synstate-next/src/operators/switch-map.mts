@@ -9,6 +9,8 @@ import {
   toNode,
   view,
   type DropInitialValueOperator,
+  type InitializedObservable,
+  type KeepInitialValueOperator,
   type Observable,
   type ObservableClass,
   type Owner,
@@ -24,13 +26,45 @@ import {
  * its own. Like every node, it holds the last value it emitted: switching to an
  * inner observable that holds none emits nothing, and keeps the value held.
  * For the same reason the result may hold no value even when the source does.
+ *
+ * On an initialized source, with a projection that returns an initialized
+ * observable, it projects the value the source holds when it is created, so it
+ * holds a value from the start and is typed `InitializedObservable`, unless the
+ * projection disposes an owner of it.
  */
-export const switchMap =
-  <A, B>(
-    project: (value: A) => Observable<B>,
-  ): DropInitialValueOperator<A, B> =>
-  (source) =>
+export function switchMap<A, B>(
+  project: (value: A) => InitializedObservable<B>,
+): KeepInitialValueOperator<A, B>;
+
+/**
+ * Follows the observable that `project` returns for the latest value. What the
+ * projection creates belongs to an owner of its own, disposed when the next
+ * value replaces it.
+ *
+ * The inner observable's value at the time of the switch joins the update that
+ * caused it; a later emission of the inner observable arrives in an update of
+ * its own. Like every node, it holds the last value it emitted: switching to an
+ * inner observable that holds none emits nothing, and keeps the value held.
+ * For the same reason the result may hold no value even when the source does.
+ *
+ * On an initialized source, with a projection that returns an initialized
+ * observable, it projects the value the source holds when it is created, so it
+ * holds a value from the start and is typed `InitializedObservable`, unless the
+ * projection disposes an owner of it.
+ */
+export function switchMap<A, B>(
+  project: (value: A) => Observable<B>,
+): DropInitialValueOperator<A, B>;
+
+// Overloads that differ in the return type alone, as `takeWhile`'s: a
+// conditional return type would fix the `<A, B>` a caller may pass. Both carry
+// the JSDoc, since an editor shows the one a call resolves to.
+export function switchMap<A, B>(
+  project: (value: A) => Observable<B>,
+): KeepInitialValueOperator<A, B> | DropInitialValueOperator<A, B> {
+  return (source: Observable<A>): Observable<B> =>
     view(new SwitchMapClass(toNode(source), project));
+}
 
 class SwitchMapClass<A, B> extends DerivedClass<B> {
   readonly #parent: ObservableClass<A>;

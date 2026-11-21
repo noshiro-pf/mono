@@ -13,6 +13,8 @@ import {
   toNode,
   view,
   type DropInitialValueOperator,
+  type InitializedObservable,
+  type KeepInitialValueOperator,
   type Observable,
   type ObservableClass,
   type Owner,
@@ -29,13 +31,46 @@ import {
  * emission arrives in an update of its own. Every value is delivered, as an
  * event source's are: values that meet in one update are delivered one update
  * after another, in the order they arrived.
+ *
+ * On an initialized source, with a projection that returns an initialized
+ * observable, it projects the value the source holds when it is created, so it
+ * holds a value from the start and is typed `InitializedObservable`, unless the
+ * projection disposes an owner of it.
  */
-export const mergeMap =
-  <A, B>(
-    project: (value: A) => Observable<B>,
-  ): DropInitialValueOperator<A, B> =>
-  (source) =>
+export function mergeMap<A, B>(
+  project: (value: A) => InitializedObservable<B>,
+): KeepInitialValueOperator<A, B>;
+
+/**
+ * Follows every observable that `project` returns, emitting whatever any of
+ * them emits. What a projection creates belongs to an owner of its own,
+ * disposed once its observable is settled (a `timer` that fired, a settled
+ * promise) or when this node is disposed.
+ *
+ * The inner observable's value at the time of the projection joins the update
+ * that caused it, unless this node already emitted in that update. A later
+ * emission arrives in an update of its own. Every value is delivered, as an
+ * event source's are: values that meet in one update are delivered one update
+ * after another, in the order they arrived.
+ *
+ * On an initialized source, with a projection that returns an initialized
+ * observable, it projects the value the source holds when it is created, so it
+ * holds a value from the start and is typed `InitializedObservable`, unless the
+ * projection disposes an owner of it.
+ */
+export function mergeMap<A, B>(
+  project: (value: A) => Observable<B>,
+): DropInitialValueOperator<A, B>;
+
+// Overloads that differ in the return type alone, as `takeWhile`'s: a
+// conditional return type would fix the `<A, B>` a caller may pass. Both carry
+// the JSDoc, since an editor shows the one a call resolves to.
+export function mergeMap<A, B>(
+  project: (value: A) => Observable<B>,
+): KeepInitialValueOperator<A, B> | DropInitialValueOperator<A, B> {
+  return (source: Observable<A>): Observable<B> =>
     view(new MergeMapClass(toNode(source), project));
+}
 
 /**
  * Whether `inner` can give its `mergeMap` nothing more: settled, and not waiting
@@ -119,6 +154,12 @@ class MergeMapClass<A, B> extends DerivedClass<B> {
 
     this.#inners.set(owner, inner);
 
+    // Not covered yet: on a mergeMap made outside an update, a first projection
+    // that writes the source projects the new value in a nested update before
+    // this one returns, and this older value is then kept, so the newer one is
+    // never delivered. In an update the write waits for the next one, which
+    // delivers it. Like a projection that disposes an owner of this node, this
+    // is not covered (see `Owner`).
     const v = inner.current;
 
     // A settled inner made by this projection emitted nothing its follower saw.
