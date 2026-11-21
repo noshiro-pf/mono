@@ -1,9 +1,4 @@
-import {
-  combine,
-  createState,
-  map,
-  type InitializedObservable,
-} from 'synstate';
+import { createState, derive, type InitializedObservable } from 'synstate';
 import { Optional } from 'ts-data-forge';
 import {
   drawnColumns,
@@ -39,8 +34,8 @@ export const createLayoutStore = (
   return {
     layout: deps.field.value,
     absent: deps.absent,
-    drawn: combine([deps.field.value, deps.absent]).pipe(
-      map(([layout, absent]) => drawnColumns(layout, absent)),
+    drawn: derive([deps.field.value, deps.absent], (layout, absent) =>
+      drawnColumns(layout, absent),
     ),
     change: (fn) => {
       deps.field.update(fn);

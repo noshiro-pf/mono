@@ -1,4 +1,4 @@
-import { createState, onScopeDispose } from 'synstate';
+import { createState, onCleanup } from 'synstate';
 import {
   constant,
   createAfterUpdate,
@@ -131,7 +131,7 @@ export const RangeSlider = ({
 
   const mut_drag: { stop: () => void } = { stop: () => {} };
 
-  onScopeDispose(() => {
+  onCleanup(() => {
     mut_drag.stop();
 
     handleSizes.disconnect();

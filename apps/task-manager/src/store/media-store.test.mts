@@ -14,7 +14,7 @@ describe(createMediaStore, () => {
 
     mut_matches = true;
 
-    change.next(undefined);
+    change.emit(undefined);
 
     assert.isTrue(Optional.unwrap(store.matches.getSnapshot()));
 
@@ -22,7 +22,7 @@ describe(createMediaStore, () => {
 
     mut_matches = false;
 
-    change.next(undefined);
+    change.emit(undefined);
 
     assert.isTrue(Optional.unwrap(store.matches.getSnapshot()));
   });

@@ -17,9 +17,17 @@ export const useObservableValue = <A,>(
   const value = Optional.unwrap(observable.getSnapshot());
 
   useLayoutEffect(() => {
-    const { unsubscribe } = observable.subscribe(() => {
-      rerender(undefined);
+    // `subscribe` calls back at once with the value just rendered, which needs
+    // no render.
+    let mut_subscribed = false;
+
+    const unsubscribe = observable.subscribe(() => {
+      if (mut_subscribed) {
+        rerender(undefined);
+      }
     });
+
+    mut_subscribed = true;
 
     // An emission between the render and this effect.
     if (!Object.is(Optional.unwrap(observable.getSnapshot()), value)) {

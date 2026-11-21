@@ -13,7 +13,7 @@
 import {
   createState,
   type InitializedObservable,
-  type Subscription,
+  type Unsubscribe,
 } from 'synstate';
 
 export type HeaderDeps = Readonly<{
@@ -42,7 +42,7 @@ export const createHeaderStore = (deps: HeaderDeps): HeaderStore => {
   };
 
   const start = (): (() => void) => {
-    const mut_run: { stopped: boolean; saving: Subscription | undefined } = {
+    const mut_run: { stopped: boolean; saving: Unsubscribe | undefined } = {
       stopped: false,
       saving: undefined,
     };
@@ -68,7 +68,7 @@ export const createHeaderStore = (deps: HeaderDeps): HeaderStore => {
     return () => {
       mut_run.stopped = true;
 
-      mut_run.saving?.unsubscribe();
+      mut_run.saving?.();
     };
   };
 

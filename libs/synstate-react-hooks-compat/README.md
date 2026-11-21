@@ -13,17 +13,17 @@ One thing differs on React 16.8 and 17, which have no `useInsertionEffect`: `use
 ## Installation
 
 ```bash
-npm add synstate-react-hooks-compat
+npm add synstate-react-hooks-compat synstate
 ```
 
 Or with other package managers:
 
 ```bash
 # Yarn
-yarn add synstate-react-hooks-compat
+yarn add synstate-react-hooks-compat synstate
 
 # pnpm
-pnpm add synstate-react-hooks-compat
+pnpm add synstate-react-hooks-compat synstate
 ```
 
 ## Quick Start

@@ -1,65 +1,63 @@
-import { isObservable, onScopeDispose } from 'synstate';
-import { hasKey, isBoolean, isRecord, unknownToString } from 'ts-data-forge';
+import { isObservable, map } from 'synstate';
+import { toNode } from 'synstate/internal';
+import { isNonNullObject } from 'ts-data-forge';
+import * as Arr from 'ts-data-forge/array';
 import type { ReadonlyRecord } from 'ts-type-forge';
-import type { Bindable } from '../constant/index.mjs';
+import {
+  AttributeBinding,
+  ClassToggleBinding,
+  InputValueBinding,
+  InputValueWriter,
+  PropertyBinding,
+  StyleBinding,
+  writeAttribute,
+  writeStyle,
+} from './bindings.mjs';
+import { controlProperty, controlledKeyOn } from './controlled.mjs';
 import {
   attributeNameOf,
-  bindValue,
+  isSvgOnlyTag,
   propertyNames,
-  svgTwinTagNames,
-} from '../internal/index.mjs';
-import { listenInScope } from '../scope/index.mjs';
+  svgNamespace,
+} from './dom-tables.mjs';
 
 /**
- * Binds every prop of an intrinsic element except `ref` and `children` (SPEC.md
- * 7): `class`, `style`, event handlers, the DOM properties of `propertyNames`,
- * and attributes for the rest, `value` last. Subscriptions and listeners are
- * released when the current scope is disposed.
+ * Binds every prop of an element except `ref` and `children`: `class`, `style`,
+ * the event handlers, the DOM properties of `propertyNames`, and attributes for
+ * the rest, `value` last. A constant is written once; an observable gets a
+ * binding, owned by the current owner.
  */
 export const bindProps = (
   element: Element,
   props: ReadonlyRecord<string, unknown>,
 ): void => {
-  const refitter =
-    element instanceof HTMLInputElement &&
-    hasKey(props, 'value') &&
-    isBindable(props.value)
-      ? createValueRefitter(element)
+  const htmlTypedSvg =
+    element.namespaceURI === svgNamespace && !isSvgOnlyTag(element.localName);
+
+  const { value } = props;
+
+  const valueWriter =
+    value !== undefined && element instanceof HTMLInputElement
+      ? new InputValueWriter(element)
       : undefined;
 
-  for (const [key, value] of Object.entries(props)) {
+  for (const [key, v] of Object.entries(props)) {
     if (key !== 'value') {
-      bindProp(
-        element,
-        key,
-        value,
-        refitter !== undefined && fittingKeys.has(key)
-          ? refitter.refit
-          : undefined,
-      );
+      bindProp(element, key, v, htmlTypedSvg, valueWriter);
     }
   }
 
-  // Last, whatever the order the props were written in: a range or number input
-  // fits its value to the `type`, `min`, `max` and `step` it has when the value
-  // is written, and does not take it back when they come after.
-  if (!hasKey(props, 'value')) {
-    return;
-  }
-
-  const boundValue = props.value;
-
-  if (refitter !== undefined && isBindable(boundValue)) {
-    bindValue(boundValue, refitter.write);
-  } else {
-    bindProp(element, 'value', boundValue);
-  }
+  // Last, whatever the order the props were written in: an input fits its value
+  // to the `type` it has when the value is written, and a range input to its
+  // `min`, `max` and `step` too, and does not take it back when they come after.
+  bindProp(element, 'value', value, htmlTypedSvg, valueWriter);
 };
 
 /**
- * The props of an `<input>` whose write fits its value again: a range or number
- * input fits it to the `type`, `min`, `max` and `step` it has when the value is
- * written.
+ * The attributes of an `<input>` whose write fits its value again: an input
+ * fits it to its `type`, and a range input to its `min`, `max` and `step` too.
+ * Others that change how a value is sanitized, `multiple` on an email input,
+ * are not watched: the value they leave differs only in white space.
  */
 const fittingKeys: ReadonlySet<string> = new Set<string>([
   'max',
@@ -68,108 +66,131 @@ const fittingKeys: ReadonlySet<string> = new Set<string>([
   'type',
 ]);
 
+/** `onClick`, `onPointerDown`: `on` and an upper-case letter. */
+const isEventKey = (key: string): boolean => /^on[A-Z]/u.test(key);
+
 /**
- * `value` of an `<input>`, bound one way (SPEC.md 7.3), and written again when
- * a later write of `min`, `max`, `step` or `type` lets it be what was bound: an
- * update that raises `max` and `value` together may write the value first,
- * fitted to the old `max`. It is written again only while the input shows what
- * the last write left in it and that differs from the bound value, so a value
- * the user has changed since, a draft or an IME composition, is kept.
+ * Assigns the handler to the element's `on…` property where it has one, which
+ * costs less than a listener and goes with the element; an event with no such
+ * property (`focusin`, `compositionstart`) gets a listener. Neither is removed:
+ * the element is dropped when its owner is disposed.
  */
-const createValueRefitter = (
-  element: HTMLInputElement,
-): Readonly<{ write: (value: unknown) => void; refit: () => void }> => {
-  const mut_last: {
-    current:
-      Readonly<{ bound: unknown; shown: string; fitted: boolean }> | undefined;
-  } = { current: undefined };
+const listen = (element: Element, key: string, handler: unknown): void => {
+  if (typeof handler !== 'function') {
+    return;
+  }
 
-  const write = (value: unknown): void => {
-    Reflect.set(element, 'value', value);
+  const property = key.toLowerCase();
 
-    mut_last.current = {
-      bound: value,
-      shown: element.value,
-      fitted:
-        value !== undefined &&
-        value !== null &&
-        element.value !== unknownToString(value),
-    };
-  };
-
-  return {
-    write,
-    refit: () => {
-      const last = mut_last.current;
-
-      if (last?.fitted === true && element.value === last.shown) {
-        write(last.bound);
-      }
-    },
-  };
+  // The handler properties are inherited from the prototype chain, which is
+  // what `in` looks at.
+  // eslint-disable-next-line no-restricted-syntax, unicorn/no-computed-property-existence-check, ts-data-forge/prefer-is-record-and-has-key
+  if (property in element) {
+    Reflect.set(element, property, handler);
+  } else {
+    element.addEventListener(property.slice(2), (event) => {
+      Reflect.apply(handler, element, [event]);
+    });
+  }
 };
 
-/**
- * `true` writes an empty attribute, and `false`, `undefined` and `null` remove
- * it.
- */
-const writeAttribute = (
+const bindProperty = (element: Element, key: string, value: unknown): void => {
+  if (isObservable(value)) {
+    // Registers itself with the source and the current owner.
+    // oxlint-disable-next-line eslint/no-new
+    new PropertyBinding(toNode(value), element, key);
+  } else {
+    Reflect.set(element, key, value);
+  }
+};
+
+const bindAttribute = (
   element: Element,
   name: string,
   value: unknown,
+  fitted?: InputValueWriter,
 ): void => {
-  if (isBoolean(value)) {
-    element.toggleAttribute(name, value);
-
-    return;
+  if (isObservable(value)) {
+    // oxlint-disable-next-line eslint/no-new
+    new AttributeBinding(toNode(value), element, name, fitted);
+  } else {
+    writeAttribute(element, name, value);
   }
+};
 
-  if (value === undefined || value === null) {
-    element.removeAttribute(name);
+const booleanAsText = (value: unknown): unknown =>
+  typeof value === 'boolean' ? value.toString() : value;
 
-    return;
+/**
+ * `value`, a constant or an observable, with a boolean as text: `false` is a
+ * value of an enumerated attribute, where `writeAttribute` would remove it.
+ */
+const asText = (value: unknown): unknown =>
+  isObservable(value) ? value.pipe(map(booleanAsText)) : booleanAsText(value);
+
+/** `value` of an `<input>`, written again when its bounds let it be. */
+const bindInputValue = (writer: InputValueWriter, value: unknown): void => {
+  if (isObservable(value)) {
+    // oxlint-disable-next-line eslint/no-new
+    new InputValueBinding(toNode(value), writer);
+  } else {
+    writer.write(value);
   }
-
-  element.setAttribute(name, unknownToString(value));
 };
 
 /**
- * An `aria-*` attribute reads `""` as its default, so a boolean is written as
- * `"true"` or `"false"`, as React does (#3165); anything else as
- * {@link writeAttribute} writes it.
+ * An event handler, a DOM property, or an attribute. `htmlTypedSvg` is an
+ * element with a tag HTML has (`<a>`, `<title>`) mounted inside an `<svg>`: an
+ * SVG element, typed with HTML's props. It has none of HTML's DOM properties,
+ * and `setAttribute` lower-cases a name on an HTML element only, so every prop
+ * is an attribute, lower-cased here (`tabIndex` becomes `tabindex`), and the
+ * enumerated ones are written as text (`draggable="false"`).
  */
-const writeAriaAttribute = (
+const bindOther = (
   element: Element,
-  name: string,
+  key: string,
   value: unknown,
+  htmlTypedSvg: boolean,
+  valueWriter: InputValueWriter | undefined,
 ): void => {
-  if (isBoolean(value)) {
-    element.setAttribute(name, value ? 'true' : 'false');
+  if (isEventKey(key)) {
+    listen(element, key, value);
+  } else if (htmlTypedSvg) {
+    bindAttribute(
+      element,
+      (attributeNameOf[key] ?? key).toLowerCase(),
+      enumeratedNameSet.has(key) ? asText(value) : value,
+    );
+  } else if (key === 'value' && valueWriter !== undefined) {
+    bindInputValue(valueWriter, value);
+  } else if (propertyNameSet.has(key)) {
+    bindProperty(element, key, value);
 
-    return;
+    const controlled = controlledKeyOn(element, key);
+
+    if (controlled !== undefined) {
+      controlProperty(controlled.element, controlled.key, value);
+    }
+  } else {
+    bindAttribute(
+      element,
+      attributeNameOf[key] ?? key,
+      value,
+      fittingKeys.has(key) ? valueWriter : undefined,
+    );
   }
-
-  writeAttribute(element, name, value);
 };
 
-/**
- * Every value is a `Bindable` at run time: what is not an observable is a
- * constant. An omitted prop is `undefined`, which is not.
- */
-const isBindable = (value: unknown): value is Bindable<unknown> =>
-  value !== undefined && value !== null;
-
-/** `class` and `style` in their object form, not an observable. */
+/** `class` and `style` in their object form. */
 const isPlainObject = (
   value: unknown,
 ): value is ReadonlyRecord<string, unknown> =>
-  isRecord(value) && !isObservable(value);
+  isNonNullObject(value) && !Arr.isArray(value) && !isObservable(value);
 
-const bindClass = (element: Element, value: Bindable<unknown>): void => {
+/** `class` as a string, or as one boolean per class name. */
+const bindClass = (element: Element, value: unknown): void => {
   if (!isPlainObject(value)) {
-    bindValue(value, (v) => {
-      writeAttribute(element, 'class', v);
-    });
+    bindAttribute(element, 'class', value);
 
     return;
   }
@@ -179,254 +200,78 @@ const bindClass = (element: Element, value: Bindable<unknown>): void => {
       console.error(
         `synstate-dom: the class name ${JSON.stringify(name)} contains whitespace; give each class its own key.`,
       );
-
-      continue;
-    }
-
-    if (isBindable(on)) {
-      bindValue(on, (v) => {
-        element.classList.toggle(name, v === true);
-      });
+    } else if (isObservable(on)) {
+      // oxlint-disable-next-line eslint/no-new
+      new ClassToggleBinding(toNode(on), element, name);
+    } else if (on === true) {
+      element.classList.add(name);
     }
   }
 };
 
-const bindStyle = (element: Element, value: Bindable<unknown>): void => {
+/** `style` as a `cssText` string, or as one value per CSS property. */
+const bindStyle = (element: Element, value: unknown): void => {
+  if (!isPlainObject(value)) {
+    bindAttribute(element, 'style', value);
+
+    return;
+  }
+
   if (!(element instanceof HTMLElement || element instanceof SVGElement)) {
     return;
   }
 
   const { style } = element;
 
-  if (!isPlainObject(value)) {
-    bindValue(value, (v) => {
-      writeAttribute(element, 'style', v);
-    });
-
-    return;
-  }
-
   for (const [name, v] of Object.entries(value)) {
-    if (isBindable(v)) {
-      bindValue(v, (current) => {
-        if (current === undefined || current === null) {
-          style.removeProperty(name);
-        } else {
-          style.setProperty(name, unknownToString(current));
-        }
-      });
+    if (isObservable(v)) {
+      // oxlint-disable-next-line eslint/no-new
+      new StyleBinding(toNode(v), style, name);
+    } else {
+      writeStyle(style, name, v);
     }
   }
 };
-
-/**
- * The radio buttons of `input`'s group: those of the same `name` and form in
- * the same document or shadow root. Any other input is a group of its own.
- */
-const radioGroupOf = (input: HTMLInputElement): readonly HTMLInputElement[] => {
-  const root = input.getRootNode();
-
-  if (
-    input.type !== 'radio' ||
-    input.name === '' ||
-    !(root instanceof Document || root instanceof ShadowRoot)
-  ) {
-    return [input];
-  }
-
-  return Array.from(
-    root.querySelectorAll<HTMLInputElement>(
-      `input[type="radio"][name="${CSS.escape(input.name)}"]`,
-    ),
-  ).filter((radio) => radio.form === input.form);
-};
-
-/**
- * The controlled properties of an element, created with the `change` listener
- * that sets them back. The listener is a capturing one, which runs before the
- * element's own handlers, so no handler on the element can stop it.
- */
-const controlledOf = (element: ControlledElement): Controlled => {
-  const existing = controlled.get(element);
-
-  if (existing !== undefined) {
-    return existing;
-  }
-
-  const mut_restorers = new Map<ControlledKey, () => void>();
-
-  const created: Controlled = {
-    add: (key, restore) => {
-      mut_restorers.set(key, restore);
-    },
-    restore: () => {
-      for (const restore of mut_restorers.values()) {
-        restore();
-      }
-    },
-  } as const;
-
-  const onChange = (): void => {
-    requestAnimationFrame(() => {
-      for (const target of element instanceof HTMLInputElement
-        ? radioGroupOf(element)
-        : [element]) {
-        controlled.get(target)?.restore();
-      }
-    });
-  };
-
-  controlled.set(element, created);
-
-  listenInScope(element, 'change', onChange, { capture: true });
-
-  onScopeDispose(() => {
-    controlled.delete(element);
-  });
-
-  return created;
-};
-
-/**
- * `checked` and `indeterminate` of an `<input>` and `value` of a `<select>` are
- * controlled (SPEC.md 7.2): after a `change`, the element is drawn as the bound
- * values again, so a change its owner did not take undoes itself. This waits
- * for the next frame, after every handler of the event, the ancestors'
- * included, has seen the user's change, and before it is painted. Checking a
- * radio button unchecks the others of its group with no event on them, so a
- * change on one sets back every bound button of the group.
- */
-const bindControlled = (
-  element: ControlledElement,
-  key: ControlledKey,
-  value: Bindable<unknown>,
-): void => {
-  const mut_bound: { current: unknown } = { current: undefined };
-
-  bindValue(value, (v) => {
-    mut_bound.current = v;
-
-    Reflect.set(element, key, v);
-  });
-
-  controlledOf(element).add(key, () => {
-    if (Reflect.get(element, key) !== mut_bound.current) {
-      Reflect.set(element, key, mut_bound.current);
-    }
-  });
-};
-
-type ControlledKey = 'checked' | 'indeterminate' | 'value';
-
-type ControlledElement = HTMLInputElement | HTMLSelectElement;
-
-type Controlled = Readonly<{
-  add: (key: ControlledKey, restore: () => void) => void;
-  /** Writes every bound property back to the element. */
-  restore: () => void;
-}>;
-
-/**
- * `key` when it is controlled on `element`: `checked` and `indeterminate` on an
- * `<input>`, and `value` on a `<select>` alone. A `<select>` has no draft and no
- * composition, so every `change` is a finished choice, as a checkbox's is; an
- * `<input>` or `<textarea>` bound one way keeps what is being typed, which a
- * draft committed on `change` or blur, or an IME composition, needs.
- */
-const controlledKeyOn = (
-  element: ControlledElement,
-  key: string,
-): ControlledKey | undefined =>
-  key === 'value'
-    ? element instanceof HTMLSelectElement
-      ? key
-      : undefined
-    : (key === 'checked' || key === 'indeterminate') &&
-        element instanceof HTMLInputElement
-      ? key
-      : undefined;
-
-/** The elements bound by {@link bindControlled}. */
-const controlled = new WeakMap<ControlledElement, Controlled>();
-
-const svgTwinTagNameSet: ReadonlySet<string> = new Set<string>(svgTwinTagNames);
-
-/** `onClick`, `onPointerDown`: `on` and an upper-case letter. */
-const isEventKey = (key: string): boolean => /^on[A-Z]/u.test(key);
-
-const isEventHandler = (value: unknown): value is EventListener =>
-  typeof value === 'function';
 
 const bindProp = (
   element: Element,
   key: string,
   value: unknown,
-  afterWrite?: () => void,
+  htmlTypedSvg: boolean,
+  valueWriter: InputValueWriter | undefined,
 ): void => {
-  if (key === 'children' || key === 'ref' || !isBindable(value)) {
-    return;
-  }
-
-  if (key === 'class') {
-    bindClass(element, value);
-
-    return;
-  }
-
-  if (key === 'style') {
-    bindStyle(element, value);
-
-    return;
-  }
-
-  if (isEventKey(key) && isEventHandler(value)) {
-    listenInScope(element, key.slice(2).toLowerCase(), value);
-
-    return;
-  }
-
+  // `key` belongs to `For`; on an element, it can only have come in a spread.
   if (
-    element instanceof HTMLInputElement ||
-    element instanceof HTMLSelectElement
+    key === 'children' ||
+    key === 'ref' ||
+    key === 'key' ||
+    value === undefined
   ) {
-    const controlledKey = controlledKeyOn(element, key);
+    return;
+  }
 
-    if (controlledKey !== undefined) {
-      bindControlled(element, controlledKey, value);
+  switch (key) {
+    case 'class':
+      bindClass(element, value);
 
       return;
-    }
+
+    case 'style':
+      bindStyle(element, value);
+
+      return;
+
+    default:
+      bindOther(element, key, value, htmlTypedSvg, valueWriter);
   }
-
-  if (propertyNameSet.has(key)) {
-    bindValue(value, (v) => {
-      Reflect.set(element, key, v);
-
-      afterWrite?.();
-    });
-
-    return;
-  }
-
-  const name = attributeNameOf[key] ?? key;
-
-  // `setAttribute` lower-cases a name only on an HTML element. The props of the
-  // four tags HTML and SVG share are typed from the HTML elements (`tabIndex`),
-  // and their SVG attributes are all lower-case.
-  const attributeName =
-    element instanceof SVGElement && svgTwinTagNameSet.has(element.localName)
-      ? name.toLowerCase()
-      : name;
-
-  const write = attributeName.startsWith('aria-')
-    ? writeAriaAttribute
-    : writeAttribute;
-
-  bindValue(value, (v) => {
-    write(element, attributeName, v);
-
-    afterWrite?.();
-  });
 };
 
-const propertyNameSet: ReadonlySet<string> = new Set(propertyNames);
+const propertyNameSet: ReadonlySet<string> = new Set<string>(propertyNames);
+
+/** The props of `propertyNames` whose `false` is a value, not an absence. */
+const enumeratedNameSet: ReadonlySet<string> = new Set<string>([
+  'autocorrect',
+  'draggable',
+  'spellcheck',
+  'translate',
+]);

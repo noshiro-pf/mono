@@ -67,7 +67,7 @@ export const createThemeStore = (deps: ThemeDeps): ThemeStore => {
     setStarted(true);
 
     return () => {
-      themeSubscription.unsubscribe();
+      themeSubscription();
 
       setStarted(false);
     };

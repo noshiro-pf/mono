@@ -7,17 +7,6 @@ import { workspaceRootPath } from './workspace-root-path.mjs';
 
 const samplesDir = path.resolve(workspaceRootPath, 'samples');
 
-/** The README's samples, shown as they are rather than copied. */
-const readmeSample = (file: string): string =>
-  path.relative(
-    samplesDir,
-    path.resolve(
-      workspaceRootPath,
-      '../../libs/synstate-dom/samples/readme',
-      file,
-    ),
-  );
-
 /**
  * Each page and the samples that fill its code fences, in order. The English
  * page and its Japanese translation show the same code, so both are listed from
@@ -27,7 +16,7 @@ const pageSamples: readonly (readonly [
   page: string,
   sampleFiles: readonly string[],
 ])[] = [
-  ['getting-started/installation.md', [readmeSample('01-counter.tsx')]],
+  ['getting-started/installation.md', ['getting-started/01-counter.tsx']],
   [
     'guides/bindable.md',
     [
@@ -51,14 +40,16 @@ const pageSamples: readonly (readonly [
       'control-flow/01-if.tsx',
       'control-flow/02-match-optional.tsx',
       'control-flow/03-match-result.tsx',
-      'control-flow/04-for.tsx',
-      'control-flow/05-portal.tsx',
+      'control-flow/04-switch.tsx',
+      'control-flow/05-for.tsx',
+      'control-flow/06-selector.tsx',
+      'control-flow/07-portal.tsx',
     ],
   ],
   [
     'guides/components.md',
     [
-      readmeSample('03-bindable-props.tsx'),
+      'components/01-bindable-props.tsx',
       'components/02-plain-javascript.tsx',
       'components/03-read-once.tsx',
       'components/04-children.tsx',
@@ -69,10 +60,19 @@ const pageSamples: readonly (readonly [
     [
       'lifecycle/01-local-derivation.tsx',
       'lifecycle/02-branch-local.tsx',
-      'lifecycle/03-scope-effects.tsx',
+      'lifecycle/03-after-await.tsx',
+      'lifecycle/04-owner-effects.tsx',
     ],
   ],
-  ['examples/todo-list.md', [readmeSample('02-todo-list.tsx')]],
+  [
+    'guides/low-level.md',
+    [
+      'low-level/01-mountable.tsx',
+      'low-level/02-error-boundary.tsx',
+      'low-level/03-router.tsx',
+    ],
+  ],
+  ['examples/todo-list.md', ['examples/todo-list.tsx']],
 ] as const;
 
 const docsDir = path.resolve(workspaceRootPath, 'src/content/docs');

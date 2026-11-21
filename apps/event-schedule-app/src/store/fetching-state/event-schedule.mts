@@ -1,14 +1,15 @@
 import {
   createEventEmitter,
   createState,
+  dropInitialValue,
   filter,
+  map,
   merge,
   throttle,
-  unwrapResultOk,
   withCurrentValueFrom,
   withInitialValue,
   type InitializedObservable,
-  type Subscription,
+  type Unsubscribe,
 } from 'synstate';
 import { Result, isNotUndefined } from 'ts-data-forge';
 import type { Api } from '../../api/index.mjs';
@@ -65,19 +66,20 @@ export const createEventScheduleStore = (
   const eventSchedule$: InitializedObservable<EventSchedule | undefined> =
     result$
       .pipe(filter(isNotUndefined))
-      .pipe(unwrapResultOk())
+      .pipe(map((result) => Result.unwrapOk(result)))
       .pipe(withInitialValue(undefined));
 
   const start = (): (() => void) => {
     const mut_run = { stopped: false };
 
-    const subscriptions: readonly Subscription[] = [
+    const subscriptions: readonly Unsubscribe[] = [
       // Read on request (the first is made below), and again whenever the page
       // moves to another event.
       merge([
         fetchEventScheduleThrottled$,
         refetchEventScheduleAfterWrite$,
-        deps.eventId$,
+        // The event it shows when this starts is read by the first request.
+        deps.eventId$.pipe(dropInitialValue()),
       ])
         .pipe(withCurrentValueFrom(deps.eventId$))
         .subscribe(([_, eventId]) => {
@@ -112,8 +114,8 @@ export const createEventScheduleStore = (
     return () => {
       mut_run.stopped = true;
 
-      for (const subscription of subscriptions) {
-        subscription.unsubscribe();
+      for (const unsubscribe of subscriptions) {
+        unsubscribe();
       }
     };
   };

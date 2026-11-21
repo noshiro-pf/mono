@@ -1,0 +1,43 @@
+---
+title: merge
+description: 'この更新で値を流した親の値を流します（複数あれば最初のもの）。'
+---
+
+import MarbleDiagram from '../../../../../components/MarbleDiagram.astro';
+
+{/* translated-from:0d27d7b96946 */}
+
+この更新で値を流した親の値を流します（複数あれば最初のもの）。同じ規則で、値が最後に与えられた親の値から始めます。1 回の更新で与えられた値どうしでは、最初の親のものです。どの親も値を持たない間は値を持ちません。
+
+## マーブル図
+
+<MarbleDiagram slug="merge" lang="ja" />
+
+## 例
+
+```tsx
+import { createValueEmitter, merge } from 'synstate';
+
+const [mouse, fromMouse] = createValueEmitter<string>();
+
+const [keyboard, fromKeyboard] = createValueEmitter<string>();
+
+const mut_inputs: string[] = [];
+
+merge([mouse, keyboard]).subscribe((input) => {
+    mut_inputs.push(input);
+});
+
+fromMouse('click');
+
+fromKeyboard('enter');
+
+assert.deepStrictEqual(mut_inputs, ['click', 'enter']);
+```
+
+## 関連項目
+
+- [値を派生させる](/mono/synstate/ja/guides/deriving-values/)
+- [すべての API](/mono/synstate/ja/reference/)
+
+[GitHub のソース](https://github.com/noshiro-pf/mono/blob/main/libs/synstate/src/operators/derive.mts)

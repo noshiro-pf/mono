@@ -31,29 +31,29 @@ type MessageIds =
   | 'subscriptionInHandler';
 
 /**
- * An event handler runs outside every scope: by the time it is called, no `run`
- * is executing. An observable it derives belongs to no scope, so it is not
+ * An event handler runs outside every owner: by the time it is called, no `run`
+ * is executing. An observable it derives belongs to no owner, so it is not
  * disposed with the row or branch it was made for, and its parents keep
  * computing it. synstate-dom's documentation once promised a development-build
  * warning for this; a lint rule catches the same synchronous case with no
  * runtime cost.
  *
  * Only observables that keep working while they live are reported: a root
- * state, `just(…)` or a `timer` computes nothing more, or completes by itself,
+ * state, `just(…)` or a `timer` computes nothing more, or settles by itself,
  * and is collected once nothing refers to it.
  *
  * A `subscribe` there is reported for the same reason: a subscription made
- * while a scope runs ends with the scope, and one made in a handler has none,
+ * while an owner runs ends with the owner, and one made in a handler has none,
  * so nothing ends it. The receiver has to be known to be a synstate observable:
  * written as one (a call of a synstate export, a `.pipe` with a synstate
  * operator, a `const` bound to either, or the first element destructured from
  * such a call, as `createState` returns), or typed as one when type information
- * is available. One that completes by itself (`timer(…)`, `just(…)`, a
- * `counter` with `times`, a `.pipe` of one of those or with `take`) ends its
+ * is available. One that settles by itself (`timer(…)`, `just(…)`, a `counter`
+ * with `times`, a `.pipe` of one of those or with `take`) ends its
  * subscriptions, and is not reported.
  *
- * Code after an `await` in a component runs outside every scope too: a
- * component runs in its scope only until it returns, and an `async` function it
+ * Code after an `await` in a component runs outside every owner too: a
+ * component runs in its owner only until it returns, and an `async` function it
  * starts is resumed later by the microtask queue. So the same calls are
  * reported after an `await` (or in the body of a `for await`) in an `async`
  * function that contains JSX or is written inside a function that does, and in
@@ -64,18 +64,18 @@ export const noObservableInHandler: TSESLint.RuleModule<MessageIds, Options> = {
     type: 'problem',
     docs: {
       description:
-        'Disallow deriving or subscribing to a synstate observable in an event handler or after an `await` in a component, where it belongs to no scope and is never disposed or unsubscribed.',
+        'Disallow deriving or subscribing to a synstate observable in an event handler or after an `await` in a component, where it belongs to no owner and is never disposed or unsubscribed.',
     },
     schema: [],
     messages: {
       observableAfterAwait:
-        "This observable is created after an `await` in a component, when the component's scope is no longer current, so it belongs to none and keeps being computed after the row or branch it was made for is gone. Derive it at mount time from a state the async work writes to, or take the scope with `getCurrentScope()` before the `await` and create the observable inside its `run`.",
+        "This observable is created after an `await` in a component, when the component's owner is no longer current, so it belongs to none and keeps being computed after the row or branch it was made for is gone. Derive it at mount time from a state the async work writes to, or take the owner with `getOwner()` before the `await` and create the observable inside its `run`.",
       subscriptionAfterAwait:
-        "This subscription is made after an `await` in a component, when the component's scope is no longer current, so no scope ends it and it lasts after the row or branch it was made for is gone. Subscribe at mount time, take the scope with `getCurrentScope()` before the `await` and subscribe inside its `run`, or keep the subscription on purpose inside `untracked`.",
+        "This subscription is made after an `await` in a component, when the component's owner is no longer current, so no owner ends it and it lasts after the row or branch it was made for is gone. Subscribe at mount time, take the owner with `getOwner()` before the `await` and subscribe inside its `run`, or keep the subscription on purpose inside `untracked`.",
       observableInHandler:
-        'This observable is created in an event handler, which runs outside every scope, so it belongs to none and keeps being computed after the row or branch it was made for is gone. Have the handler write to a state and derive from that state at mount time, or take the scope with `getCurrentScope()` at mount time and create the observable inside its `run`.',
+        'This observable is created in an event handler, which runs outside every owner, so it belongs to none and keeps being computed after the row or branch it was made for is gone. Have the handler write to a state and derive from that state at mount time, or take the owner with `getOwner()` at mount time and create the observable inside its `run`.',
       subscriptionInHandler:
-        'This subscription is made in an event handler, which runs outside every scope, so no scope ends it and it lasts after the row or branch it was made for is gone. Subscribe at mount time, take the scope with `getCurrentScope()` at mount time and subscribe inside its `run`, or keep the subscription on purpose inside `untracked`.',
+        'This subscription is made in an event handler, which runs outside every owner, so no owner ends it and it lasts after the row or branch it was made for is gone. Subscribe at mount time, take the owner with `getOwner()` at mount time and subscribe inside its `run`, or keep the subscription on purpose inside `untracked`.',
     },
     defaultOptions: [],
   },
@@ -183,39 +183,13 @@ export const noObservableInHandler: TSESLint.RuleModule<MessageIds, Options> = {
     };
 
     /**
-     * Whether the parent passed to `createScope` is none: nothing, `undefined`,
-     * `null`, `void …`, or `getCurrentScope()`, which is `undefined` in a
-     * handler.
+     * Whether `call` runs its argument `fn` in an owner chosen for it: the
+     * callback of `owner.run(…)` (any but the `run` of an owner made on the
+     * spot, which has no parent and which nothing disposes), or the app that
+     * synstate-dom's `render(…)` mounts in a root owner. The body of synstate's `untracked(…)`,
+     * which puts it in no owner on purpose, is accepted by `placeOf` itself.
      */
-    const isNoParent = (
-      // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-      arg: TSESTree.CallExpressionArgument | undefined,
-    ): boolean => {
-      if (arg === undefined) {
-        return true;
-      }
-
-      const parent = skipTypeWrappers(arg);
-
-      return (
-        (parent.type === AST_NODE_TYPES.Identifier &&
-          parent.name === 'undefined') ||
-        (parent.type === AST_NODE_TYPES.Literal && parent.raw === 'null') ||
-        (parent.type === AST_NODE_TYPES.UnaryExpression &&
-          parent.operator === 'void') ||
-        (parent.type === AST_NODE_TYPES.CallExpression &&
-          synstateExportOf(parent.callee) === 'getCurrentScope')
-      );
-    };
-
-    /**
-     * Whether `call` runs its argument `fn` in a scope chosen for it: the
-     * callback of `scope.run(…)` (any but the `run` of a scope made on the spot
-     * with no parent, which nothing disposes), or the app that synstate-dom's
-     * `render(…)` mounts in a root scope. The body of synstate's `untracked(…)`,
-     * which puts it in no scope on purpose, is accepted by `placeOf` itself.
-     */
-    const runsInChosenScope = (
+    const runsInChosenOwner = (
       // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
       call: TSESTree.CallExpression,
       // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
@@ -239,11 +213,14 @@ export const noObservableInHandler: TSESLint.RuleModule<MessageIds, Options> = {
 
       const receiver = skipTypeWrappers(callee.object);
 
-      return !(
+      // An owner made on the spot in a handler has no parent: `createOwner`
+      // takes the current one, which is none there.
+      const madeOnTheSpot =
         receiver.type === AST_NODE_TYPES.CallExpression &&
-        synstateExportOf(receiver.callee) === 'createScope' &&
-        isNoParent(receiver.arguments[0])
-      );
+        (synstateExportOf(receiver.callee) === 'createOwner' ||
+          synstateExportOf(receiver.callee) === 'createRootOwner');
+
+      return !madeOnTheSpot;
     };
 
     /**
@@ -295,7 +272,7 @@ export const noObservableInHandler: TSESLint.RuleModule<MessageIds, Options> = {
 
     /**
      * Where `node` runs: `'handler'` in a handler, `'afterAwait'` after an
-     * `await` in a component, either outside any scope chosen between them,
+     * `await` in a component, either outside any owner chosen between them,
      * `'nested'` in the arguments of a creation that is itself reported, so
      * that the outer one alone is, and `'outside'` otherwise. `origin` is the
      * node whose place is asked, which an `await` has to precede. A function is
@@ -336,7 +313,7 @@ export const noObservableInHandler: TSESLint.RuleModule<MessageIds, Options> = {
           return 'outside';
         }
 
-        // Checked before `run`: an `async` callback of `run` is in the scope
+        // Checked before `run`: an `async` callback of `run` is in the owner
         // only until its first `await`.
         if (
           (parent.async &&
@@ -347,7 +324,7 @@ export const noObservableInHandler: TSESLint.RuleModule<MessageIds, Options> = {
           return 'afterAwait';
         }
 
-        if (call !== undefined && runsInChosenScope(call, parent)) {
+        if (call !== undefined && runsInChosenOwner(call, parent)) {
           return 'outside';
         }
       }
@@ -474,16 +451,16 @@ export const noObservableInHandler: TSESLint.RuleModule<MessageIds, Options> = {
 
     /**
      * What `expression` is written as: `'lasting'`, a call of a synstate export
-     * or a creation whose observable keeps working; `'self-completing'`, one
-     * that completes by itself (`timer`, `just`, a `counter` with `times`, …)
-     * and so ends its subscriptions; `'unknown'` otherwise, which only its type
-     * can tell.
+     * or a creation whose observable keeps working; `'self-settling'`, one that
+     * settles by itself (`timer`, `just`, a `counter` with `times`, …) and so
+     * ends its subscriptions; `'unknown'` otherwise, which only its type can
+     * tell.
      */
     const observableCallKindOf = (
       // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
       expression: TSESTree.Expression,
       pipeDepth: number,
-    ): 'lasting' | 'self-completing' | 'unknown' => {
+    ): 'lasting' | 'self-settling' | 'unknown' => {
       const call = skipTypeWrappers(expression);
 
       if (call.type !== AST_NODE_TYPES.CallExpression) {
@@ -499,7 +476,7 @@ export const noObservableInHandler: TSESLint.RuleModule<MessageIds, Options> = {
 
         const callee = skipTypeWrappers(call.callee);
 
-        // A `.pipe` completes once its source does, or once `take` ends it.
+        // A `.pipe` settles once its source does, or once `take` ends it.
         // The depth bounds a chain of `const`s that pipes back into itself,
         // which half-written code can have.
         if (
@@ -519,20 +496,20 @@ export const noObservableInHandler: TSESLint.RuleModule<MessageIds, Options> = {
 
           return ends ||
             (source !== undefined &&
-              observableCallKindOf(source, pipeDepth + 1) === 'self-completing')
-            ? 'self-completing'
+              observableCallKindOf(source, pipeDepth + 1) === 'self-settling')
+            ? 'self-settling'
             : 'lasting';
         }
 
         return 'lasting';
       }
 
-      const completesByItself =
+      const settlesByItself =
         name === 'counter'
           ? mayStopByItself(call.arguments)
-          : SYNSTATE_SELF_COMPLETING_FACTORIES.has(name);
+          : SYNSTATE_SELF_SETTLING_FACTORIES.has(name);
 
-      return completesByItself ? 'self-completing' : 'lasting';
+      return settlesByItself ? 'self-settling' : 'lasting';
     };
 
     /**
@@ -583,7 +560,7 @@ export const noObservableInHandler: TSESLint.RuleModule<MessageIds, Options> = {
 
     /**
      * Whether the receiver of a `.subscribe` is a synstate observable that does
-     * not complete by itself (see the rule's description). What is written
+     * not settle by itself (see the rule's description). What is written
      * decides when it can; the type is read only when it cannot.
      */
     const isLastingSynstateObservable = (
@@ -602,7 +579,7 @@ export const noObservableInHandler: TSESLint.RuleModule<MessageIds, Options> = {
 
     /**
      * Adds to the handlers every function of this file that a handler calls by
-     * name, outside a chosen scope, and to the late functions every one that
+     * name, outside a chosen owner, and to the late functions every one that
      * code after an `await` calls so, until no more are added. A call in the
      * arguments of a creation is left to that creation's report.
      */
@@ -788,12 +765,17 @@ export const noObservableInHandler: TSESLint.RuleModule<MessageIds, Options> = {
 const SYNSTATE_DOM_MODULE = 'synstate-dom';
 
 /**
- * synstate's factories whose observable completes by itself, which ends the
- * subscriptions to it: subscribing to one in a handler leaves nothing behind.
+ * synstate's factories whose observable settles by itself, after which nothing
+ * refers to the subscriptions to it: subscribing to one in a handler leaves
+ * nothing behind.
  */
-const SYNSTATE_SELF_COMPLETING_FACTORIES: ReadonlySet<string> = new Set<string>(
-  ['empty', 'fromAbortablePromise', 'fromPromise', 'just', 'timer'],
-);
+const SYNSTATE_SELF_SETTLING_FACTORIES: ReadonlySet<string> = new Set<string>([
+  'empty',
+  'fromAbortablePromise',
+  'fromPromise',
+  'just',
+  'timer',
+]);
 
 /**
  * synstate operators that end the observable they make after a bounded number
@@ -810,11 +792,11 @@ const MAX_PIPE_DEPTH = 16;
 
 /** Members that only a synstate observable carries together. */
 const OBSERVABLE_MEMBERS: readonly string[] = [
+  'dispose',
   'getSnapshot',
-  'isCompleted',
   'pipe',
+  'settled',
   'subscribe',
-  'updateToken',
 ] as const;
 
 /** `onClick`, `onInput`: a prop whose value JSX treats as an event handler. */
@@ -826,7 +808,6 @@ const HANDLER_PROP = /^on[A-Z]/u;
  * by its options, since one with `times` stops by itself.
  */
 const SYNSTATE_LASTING_FACTORIES: ReadonlySet<string> = new Set<string>([
-  'combine',
   'derive',
   'fromSubscribable',
   'merge',

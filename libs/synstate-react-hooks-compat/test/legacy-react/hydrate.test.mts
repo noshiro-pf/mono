@@ -1,7 +1,7 @@
 import { act, render } from '@testing-library/react-12';
 import * as React from 'react';
 import { renderToString } from 'react-dom/server';
-import { source } from 'synstate';
+import { state } from 'synstate';
 import { useObservableValue } from '../../src/index.mjs';
 
 // `test/browser/hydrate.test.mts` on React 16.8 and 17, which hydrate through
@@ -10,7 +10,7 @@ import { useObservableValue } from '../../src/index.mjs';
 // alone (`configs/vitest.config.mts`).
 describe('hydrating server-rendered markup before React 18', () => {
   test('takes over the markup without a mismatch and follows later emissions', () => {
-    const count$ = source<number>(3);
+    const count$ = state<number>(3);
 
     const Count = (): React.ReactNode => {
       const count = useObservableValue(count$);
@@ -49,7 +49,7 @@ describe('hydrating server-rendered markup before React 18', () => {
     assert.strictEqual(container.getHTML(), '<span data-reactroot="">3</span>');
 
     act(() => {
-      count$.next(4);
+      count$.set(4);
     });
 
     assert.strictEqual(container.getHTML(), '<span data-reactroot="">4</span>');

@@ -1,148 +1,95 @@
 ---
 title: Introduction
-description: Learn what SynState is — a lightweight, type-safe state management library for TypeScript/JavaScript built on an Observable pattern.
-sidebar:
-    order: 1
+description: What synstate is, and a first look at states, derived values and subscribers.
 ---
 
-<p align="center">
-  <img src="/mono/synstate/synstate-logo.png" alt="SynState Logo" width="400" />
-</p>
+synstate is a state management library for TypeScript built on observables. You keep your application's state in states, declare the values derived from them with operators, and subscribe to what you show. When a state changes, synstate brings every derived value up to date in one glitch-free update, and then calls the subscribers.
 
-**SynState** is a lightweight, glitch-free state management library for TypeScript/JavaScript. Simple global state that scales to complex async pipelines — with built-in `debounce`, `switchMap`, and more. Fully compatible with React Compiler.
-
-"SynState" is named after "Synchronized + State." Derived values are always kept in sync through glitch-free propagation — no inconsistent intermediate states. (Details: [How SynState Solved the Glitch](/mono/synstate/internals/how-synstate-solved-the-glitch/))
+:::note
+If you are moving a program from synstate 9, [Changes from synstate 9](/mono/synstate/background/changes-from-synstate/) lists what is different.
+:::
 
 ## Features
 
-- 🎯 **Simple State Management**: Easy-to-use `createState` and `createReducer` similar to React `useState`/`useReducer`, but for global state.
-- 🔧 **Built-in Async Operators**: `debounce`, `throttle`, `switchMap`, and more — handle complex async flows in a unified, declarative API without external libraries.
-- ⚡ **Glitch-Free Through Every Operator**: Every update is one depth-ordered pass over what it reaches, the ones `debounce` or `switchMap` start later included, so no subscriber sees a half-updated graph, and an update costs in proportion to the nodes it reaches rather than the paths between them. [Operators on Signals](/mono/synstate/guides/library-comparison/operators-on-signals/) shows what an operator written as an effect loses.
-- 🏎️ **Very Fast**: In the benchmark summary, SynState stays within <!-- bench:summary/synstate-worst-over-fastest -->4.7<!-- /bench -->× of the fastest library in every scenario: <!-- bench:summary/synstate-alone-in-single-digits -->the only library measured in all of them whose worst case stays in single digits<!-- /bench -->. [See each library's worst case](/mono/synstate/guides/library-comparison/benchmark/#how-to-read-this-page).
-- 🚀 **Lightweight**: <!-- bundle-size:synstate -->~8.1 kB min+gzip<!-- /bundle-size:synstate --> with two external runtime dependencies ([ts-data-forge](https://www.npmjs.com/package/ts-data-forge) and [ts-std-forge](https://www.npmjs.com/package/ts-std-forge), and the first depends on the second). [Compare it with other libraries](/mono/synstate/guides/library-comparison/bundle-size/).
-- ⚛️ **React-Optimized**: Fully compatible with [React Compiler](https://react.dev/learn/react-compiler). `synstate-react-hooks` lets you add global state to any component in just a few lines.
-- 🌐 **Framework Agnostic**: Core library works as-is with vanilla JavaScript, Vue, Svelte, or any framework. For React and Preact, hooks wrappers (`synstate-react-hooks` / `synstate-preact-hooks`) are available. For Preact, a [Preact Signals integration](/mono/synstate/preact-signals/demo/) (`synstate-preact-signals`) is also provided for fine-grained DOM updates without component re-renders. Without any framework, [synstate-dom](/mono/synstate/synstate-dom/introduction/) binds Observables directly to the DOM.
+- **Simple state, shared anywhere.** `createState` gives a state and its setter, and `createReducer` a state and its dispatch, as React's `useState` and `useReducer` do, for state the whole application shares, and a pipeline that reads them runs the same in a component, a test or a script.
+- **Async operators built in.** `debounce`, `throttle`, `switchMap` and `fromAbortablePromise` turn a timer, a cancellation or "the latest answer only" into one line of a pipeline.
+- **Glitch-free, at linear cost.** An update visits the values it reaches in order of depth, each once, after all of its parents. A value derived from two others never sees one of them updated and the other not. The same holds through `debounce` and `switchMap`, which signal libraries write as effects; what that costs them is in [Operators on signals](/mono/synstate/comparison/operators-on-signals/).
+- **Subscribers run after the update.** A subscriber is called once the update has reached every value it changes, so whatever else it reads is up to date. The one exception: when a subscriber called earlier for the same update writes a state, the values derived from that state catch up only in the next update. A write it makes starts the next update instead of interrupting this one.
+- **Unchanged values stop the update.** A derived value that comes out the same as before passes nothing on, and what depends on it is not visited.
+- **Cancellation is built in.** With `fromAbortablePromise` inside `switchMap`, a newer query aborts the request it replaces, and work started inside an owner (the requests, timers and subscriptions of a dialog, say) stops with one `dispose()` of that owner.
+- **Types that say whether there is a value.** `InitializedObservable<A>` always holds one and has `.value`; `Observable<A>` may hold none yet. `pipe` computes which one an operator chain gives.
 
-## Quick Example
+## Quick example
 
-With a single call to `createState`, you can add global state to your application:
+:::note
+Every example on this site is a file run by the test suite. `assert` and `vi` are Vitest's, there to show what the code does; a helper such as `fetchUser` stands for your own code, and a comment says what it does.
+:::
+
+`createState` returns the state, its setter, and the rest of what you can do with it:
 
 ```tsx
 import { createState } from 'synstate';
 
-// Create a reactive state
-const [state, setState] = createState(0);
+const [count, setCount, { updateState }] = createState(0);
 
-// Subscribe to changes
-state.subscribe((count) => {
-    console.log(count); // 0, 1
-});
+const mut_seen: number[] = [];
 
-// Update state
-setState(1);
-```
-
-`createState` creates a reactive state (InitializedObservable) and a setter function. Subscribers are called immediately with the initial value, and again whenever the state is updated.
-
-`createState` also returns a third element with additional utilities:
-
-```ts
-const [
-    state,
-    setState,
-    { updateState, resetState, getSnapshot, initialState },
-] = createState(0);
-
-updateState((prev) => prev + 2); // update using a function of the previous value
-getSnapshot(); // read current value synchronously (2)
-initialState; // the initial value passed to createState (0)
-
-resetState(); // reset to initial value (0)
-getSnapshot(); // read current value synchronously (0)
-```
-
-## Deriving Values with `pipe`
-
-SynState's power comes from composing Observables. Use `pipe` to derive new values and `derive` to compute one value from several sources:
-
-```tsx
-import { createState, derive, type InitializedObservable, map } from 'synstate';
-import { Optional } from 'ts-data-forge';
-
-const [count, setCount] = createState<number>(0);
-
-// Read the current value
-console.log(Optional.unwrap(count.getSnapshot())); // 0
-
-// Derive new Observables using pipe
-const doubled: InitializedObservable<number> = count.pipe(map((n) => n * 2));
-
-// Derive one value from several Observables
-const combined: InitializedObservable<string> = derive(
-    [count, doubled],
-    (c, d) => `(${c}, ${d})`,
-);
-
-// Subscribe to changes
+// Called at once with the value held, then after every update.
 count.subscribe((value) => {
-    console.log('count:', value); // 0, 1, 2, 3
+    mut_seen.push(value);
 });
 
-doubled.subscribe((value) => {
-    console.log('doubled:', value); // 0, 2, 4, 6
-});
-
-combined.subscribe((value) => {
-    console.log(value); // "(0, 0)", "(1, 2)", "(2, 4)", "(3, 6)"
-});
-
-// Update state
 setCount(1);
-setCount(2);
-setCount(3);
+
+updateState((n) => n + 1);
+
+assert.deepStrictEqual(mut_seen, [0, 1, 2]);
+
+assert.strictEqual(count.value, 2);
 ```
 
-For a deeper understanding of how this declarative model works — and why it is better than managing state imperatively — see [Declarative State Management](/mono/synstate/guides/declarative-state-management/).
+`subscribe` calls its function with the value held, then after every update that changes it. An update is over by the time `setCount` returns: synstate is synchronous, and the asynchronous part of an application comes only from the asynchronous operators and sources (`debounce`, `fromPromise`, `timer`, …).
 
-## Using with React
+## Deriving values with `pipe`
 
-`createState` must be called at **module scope** (outside of components). SynState provides `synstate-react-hooks`, a companion package that bridges Observables and React:
+`pipe` applies one operator, and a chain of `pipe` calls applies several. Each operator says in its type whether the result keeps the value held at the start (`map`), may drop it (`filter`), or always provides one (`scan`, `withInitialValue`), so the type of the result tells you whether you can read `.value` or have to read the `Optional` that `getSnapshot()` returns:
 
 ```tsx
-import type * as React from 'react';
-import { createState } from 'synstate-react-hooks';
+import {
+    createState,
+    filter,
+    map,
+    type InitializedObservable,
+    type Observable,
+} from 'synstate';
+import { expectType } from 'ts-data-forge';
+import { Optional } from 'ts-std-forge';
 
-const [useUserState, setUserState] = createState({
-    name: '',
-    email: '',
-});
+const [count, setCount] = createState(1);
 
-const UserProfile = (): React.JSX.Element => {
-    const user = useUserState();
+// `map` keeps the value held at the start: the result always holds one.
+const doubled = count.pipe(map((n) => n * 2));
 
-    return (
-        <div>
-            <p>{`Name: ${user.name}`}</p>
-            <button
-                onClick={() => {
-                    setUserState({
-                        name: 'Alice',
-                        email: 'alice@example.com',
-                    });
-                }}
-            >
-                {'Set User'}
-            </button>
-        </div>
-    );
-};
+expectType<typeof doubled, InitializedObservable<number>>('=');
+
+// `filter` may drop it: the result may hold none.
+const even = count.pipe(filter((n) => n % 2 === 0));
+
+expectType<typeof even, Observable<number>>('=');
+
+assert.strictEqual(doubled.value, 2);
+
+assert.isTrue(Optional.isNone(even.getSnapshot()));
+
+setCount(4);
+
+assert.strictEqual(doubled.value, 8);
+
+assert.deepStrictEqual(even.getSnapshot(), Optional.some(4));
 ```
 
-For more details, see [React Integration](/mono/synstate/guides/react-integration/).
+## Next steps
 
-## Next Steps
-
-- [Installation](/mono/synstate/getting-started/installation/) — Install SynState and optional companion packages.
-- [Why SynState?](/mono/synstate/guides/why-synstate/) — Design philosophy, glitch-free guarantees, and use cases.
-- [Declarative State Management](/mono/synstate/guides/declarative-state-management/) — Understand the reactive programming model with concrete examples.
-- [React Integration](/mono/synstate/guides/react-integration/) — Use SynState with React.
+- [Installation](/mono/synstate/getting-started/installation/) adds synstate to a package of the repository.
+- [Why synstate](/mono/synstate/guides/why-synstate/) says what the design buys you, and [Declarative state](/mono/synstate/guides/declarative-state/) shows it on a data table with filters.
+- [How an update propagates](/mono/synstate/internals/how-an-update-propagates/) follows an update from a write to the subscribers.

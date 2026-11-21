@@ -1,173 +1,50 @@
-import type { InitializedObservable } from '../core/index.mjs';
-import type { StateOptions } from './create-reducer.mjs';
-import { createStateSource } from './state-source.mjs';
+import {
+  state as createStateNode,
+  type InitializedObservable,
+  type StateOptions,
+} from '../core/index.mjs';
 
 /**
- * Creates a reactive state container with getter and setter methods.
- * Provides a simple state management solution with observable state.
- *
- * @template S - The type of the state
- * @param initialState - The initial value of the state
- * @param options - {@link StateOptions}: `equals` (default `Object.is`),
- *   to pass on only the updates that change the state, and `keepEqualParts`,
- *   to keep the parts of the state an update did not change
- * @returns A 3-element tuple: `[state, setState, { updateState, resetState, getSnapshot, initialState }]`
- *
- * @example
- * ```ts
- * const [state, setState, { updateState, resetState }] = createState(0);
- *
- * const stateHistory: number[] = [];
- *
- * state.subscribe((value: number) => {
- *   stateHistory.push(value);
- * });
- *
- * assert.deepStrictEqual(stateHistory, [0]);
- *
- * setState(10); // logs: 10
- *
- * assert.deepStrictEqual(stateHistory, [0, 10]);
- *
- * updateState((prev: number) => prev + 1); // logs: 11
- *
- * assert.deepStrictEqual(stateHistory, [0, 10, 11]);
- *
- * resetState(); // logs: 0
- *
- * assert.deepStrictEqual(stateHistory, [0, 10, 11, 0]);
- * ```
- *
- * @example
- * ```ts
- * const [filters, setFilters] = createState(
- *   { label: 'bug', page: 1 },
- *   { equals: fastDeepEqual },
- * );
- *
- * const before = Optional.unwrap(filters.getSnapshot());
- *
- * // Derived state is recomputed only when the state really changes.
- * const query = filters.pipe(
- *   map(({ label, page }) => `label:${label} page:${page}`),
- * );
- *
- * const queryHistory: string[] = [];
- *
- * query.subscribe((value: string) => {
- *   queryHistory.push(value);
- * });
- *
- * setFilters({ label: 'bug', page: 1 }); // equal: nothing is passed on
- *
- * assert.strictEqual(Optional.unwrap(filters.getSnapshot()), before);
- *
- * setFilters({ label: 'bug', page: 2 });
- *
- * assert.deepStrictEqual(queryHistory, [
- *   'label:bug page:1',
- *   'label:bug page:2',
- * ]);
- * ```
- *
- * @example
- * ```ts
- * type PullReport = DeepReadonly<{
- *   summary: { open: number };
- *   pulls: { number: number; title: string }[];
- * }>;
- *
- * const [report, setReport] = createState<PullReport>(
- *   { summary: { open: 0 }, pulls: [] },
- *   { keepEqualParts: true },
- * );
- *
- * const summary = report.pipe(map((r) => r.summary));
- *
- * const summaryHistory: unknown[] = [];
- *
- * summary.subscribe((value) => {
- *   summaryHistory.push(value);
- * });
- *
- * // A server answers each poll with the whole report, a new object every
- * // time. What did not change keeps the object already held.
- * setReport({
- *   summary: { open: 1 },
- *   pulls: [{ number: 1, title: 'one' }],
- * });
- *
- * const held = Optional.unwrap(report.getSnapshot());
- *
- * // An answer that changes nothing is not passed on at all.
- * setReport({
- *   summary: { open: 1 },
- *   pulls: [{ number: 1, title: 'one' }],
- * });
- *
- * assert.strictEqual(Optional.unwrap(report.getSnapshot()), held);
- *
- * // An edited title: a new report and a new array, while the summary is the
- * // one held, so `summary` is not told of it.
- * setReport({
- *   summary: { open: 1 },
- *   pulls: [{ number: 1, title: 'one (edited)' }],
- * });
- *
- * assert.notStrictEqual(Optional.unwrap(report.getSnapshot()), held);
- *
- * assert.strictEqual(
- *   Optional.unwrap(report.getSnapshot()).summary,
- *   held.summary,
- * );
- *
- * assert.deepStrictEqual(summaryHistory, [{ open: 0 }, { open: 1 }]);
- * ```
- *
- * @note Do not call `setState`, `updateState` or `resetState` from a subscriber or a projection while another
- * update is propagating: the write propagates immediately, so subscribers can
- * see an intermediate state, and it logs a `console.warn` (once per
- * observable). Derive the value from its source instead —
- * `const b$ = a$.pipe(map((a) => a * 2))` rather than
- * `a$.subscribe((a) => { setB(a * 2); })`.
+ * A state as a tuple of the observable, its setter and the rest, for code that
+ * passes them to different places. The setters return nothing: a write made
+ * inside an operator such as `map` or `derive`, while an update is recomputing
+ * values, is applied once the subscribers and bindings of the update under way
+ * have run, so what it would return is not known yet. Read the state with
+ * `getSnapshot`.
  */
 export const createState = <S,>(
   initialState: S,
   options?: StateOptions<NoInfer<S>>,
 ): readonly [
   state: InitializedObservable<S>,
-  setState: (v: S) => S,
+  setState: (next: S) => void,
   utils: Readonly<{
-    updateState: (updateFn: (prev: S) => S) => S;
-    resetState: () => S;
+    /**
+     * Writes `updateFn(current)`. Called inside an operator such as `map` or
+     * `derive`, while an update is recomputing values, `updateFn` itself waits
+     * with the write, so that it reads the state the writes before it left.
+     */
+    updateState: (updateFn: (current: S) => S) => void;
+    resetState: () => void;
     getSnapshot: () => S;
     initialState: S;
   }>,
 ] => {
-  const { state, getSnapshot, commit } = createStateSource(
-    initialState,
-    options,
-  );
-
-  // Each compares with the state the write started from, as `dispatch` does,
-  // and builds nothing on the way.
-  const updateState = (updateFn: (prev: S) => S): S => {
-    const currentState = getSnapshot();
-
-    return commit(currentState, updateFn(currentState));
-  };
-
-  const setState = (nextState: S): S => commit(getSnapshot(), nextState);
-
-  const resetState = (): S => commit(getSnapshot(), initialState);
+  const node = createStateNode(initialState, options);
 
   return [
-    state,
-    setState,
+    node,
+    (next) => {
+      node.set(next);
+    },
     {
-      updateState,
-      resetState,
-      getSnapshot,
+      updateState: (updateFn) => {
+        node.update(updateFn);
+      },
+      resetState: () => {
+        node.set(initialState);
+      },
+      getSnapshot: () => node.value,
       initialState,
     },
   ] as const;

@@ -17,12 +17,11 @@ import { projectRootPath } from '../project-root-path.mjs';
  * js-framework-benchmark does not carry the figures its one writer would write
  * there now, or when RESULTS.md no longer bears out the placement.
  *
- * The SynState site's generator writes most of those pages, and a
+ * synstate-dom-docs' `gen:benchmark` writes those pages, but a
  * re-measurement, a change to `placement` in
  * `tools/scripts/lib/synstate-dom-benchmark-results.mts` or an edit inside one of
  * their `benchmark:` markers runs no generator that would notice. A guard reads
- * the committed tree, so it neither races `pnpm run --recursive gen` nor
- * depends on which site's `gen` runs first.
+ * the committed tree, so it does not race `pnpm run --recursive gen`.
  */
 export const checkSynstateDomPlacement = async (): Promise<
   Result<number, string>
@@ -42,16 +41,12 @@ export const checkSynstateDomPlacement = async (): Promise<
   }
 
   const pages = [
-    ...placementPages.map(
-      (pagePath) => [pagePath, 'reject', placementPagesWriter] as const,
-    ),
+    ...placementPages.map((pagePath) => [pagePath, 'reject'] as const),
     // The benchmark pages' tables are their own generator's to check.
-    ...benchmarkPages.map(
-      (pagePath) => [pagePath, 'keep', benchmarkPagesWriter] as const,
-    ),
+    ...benchmarkPages.map((pagePath) => [pagePath, 'keep'] as const),
   ] as const;
 
-  for (const [pagePath, otherMarkers, writer] of pages) {
+  for (const [pagePath, otherMarkers] of pages) {
     const name = path.relative(projectRootPath, pagePath);
 
     // eslint-disable-next-line security/detect-non-literal-fs-filename
@@ -78,12 +73,8 @@ export const checkSynstateDomPlacement = async (): Promise<
   return Result.ok(pages.length);
 };
 
-/** The command that writes each kind of page, for the error to name. */
-const placementPagesWriter =
-  '`pnpm --filter @synstate/docs run gen:benchmark-doc`';
-
-const benchmarkPagesWriter =
-  '`pnpm --filter synstate-dom-docs run gen:benchmark`';
+/** The command that writes every page, for the error to name. */
+const writer = '`pnpm --filter synstate-dom-docs run gen:benchmark`';
 
 if (isDirectlyExecuted(import.meta.url)) {
   const result = await checkSynstateDomPlacement().catch((error: unknown) =>

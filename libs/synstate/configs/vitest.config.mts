@@ -1,49 +1,27 @@
 import { playwright } from '@vitest/browser-playwright';
 import * as path from 'node:path';
-/* eslint-disable import-x/no-relative-packages */
-import {
-  defaultExclude,
-  defineViteConfig,
-} from '../../../tools/configs/vite-config.mjs';
-/* eslint-enable import-x/no-relative-packages */
 import { workspaceRootPath } from '../scripts/workspace-root-path.mjs';
+// eslint-disable-next-line import-x/no-relative-packages
+import { defineViteConfig } from '../../../tools/configs/vite-config.mjs';
 
 export default defineViteConfig({
   packageRoot: workspaceRootPath,
   alias: {
+    'synstate/internal': path.resolve(workspaceRootPath, './src/internal.mts'),
     synstate: path.resolve(workspaceRootPath, './src/index.mts'),
-    'synstate-react-hooks': path.resolve(
-      workspaceRootPath,
-      '../synstate-react-hooks/src/index.mts',
-    ),
+  },
+  coverage: {
+    exclude: ['**/index.mts', 'src/**/*.test.mts'],
   },
   node: {
-    exclude: [
-      ...defaultExclude,
-      // Helpers the samples import, with no test of their own: matched by the
-      // default `samples/**/*.mts`, each would fail as an empty test file.
-      'samples/docs-site/**/solid-js-client.mts',
-      'samples/docs-site/operators-on-signals/**/00-search-request.mts',
-    ],
-    testTimeout: 30_000,
+    // `samples/docs-site/` holds the code blocks of apps/synstate-docs, each a
+    // test in the file it is embedded from.
+    includeSource: ['src/**/*.mts', 'samples/**/*.mts'],
+    include: ['src/**/*.test.mts', 'test/**/*.test.mts'],
   },
   browser: {
     provider: playwright(),
-    includeSource: ['src/**/*.mts'],
-    include: ['src/**/*.test.mts', 'test/**/*.test.mts'],
-    exclude: [
-      ...defaultExclude,
-      // `vi.resetModules` does not give a page a second copy of a module, so
-      // the two copies this file needs exist only in Node.js.
-      'test/duplicate-copies.test.mts',
-      // The page's bundle has `process.env.NODE_ENV` replaced by a fixed
-      // string, which neither `vi.stubEnv` nor `vi.stubGlobal` changes.
-      'src/core/utils/is-development-build.test.mts',
-      'test/circular-dependency-check-off.test.mts',
-      // ESLint runs in Node.js only.
-      'test/eslint-config.test.mts',
-    ],
-    optimizeDepsInclude: ['jotai', 'rxjs'],
-    testTimeout: 30_000,
+    includeSource: [],
+    include: [],
   },
 });

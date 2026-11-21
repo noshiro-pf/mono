@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
-import { source } from 'synstate';
+import { source, state } from 'synstate';
 import {
   createReducer,
   createState,
@@ -12,7 +12,7 @@ import {
 // these tests on React 16.8 and 17 too. Both read the server snapshot alike.
 describe('server rendering', () => {
   test('useObservableValue renders the current value', () => {
-    const count$ = source<number>(3);
+    const count$ = state<number>(3);
 
     const Count = (): React.ReactNode => {
       const count = useObservableValue(count$);
@@ -58,7 +58,7 @@ describe('server rendering', () => {
 
   test("createReducer's useCurrentValue renders the current value", () => {
     const [useCurrentValue] = createReducer(
-      (state: number, action: number) => state + action,
+      (total: number, action: number) => total + action,
       10,
     );
 

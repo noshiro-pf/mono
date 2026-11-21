@@ -1,20 +1,17 @@
-import { onScopeDispose } from 'synstate';
+import { onCleanup } from 'synstate';
 import {
-  appendTo,
-  holdsSvgContent,
-  mountThenInsert,
-  mountUnder,
-} from '../internal/index.mjs';
-import { mountChild, mountable, type Child, type JSX } from '../jsx/index.mjs';
+  appendChildTo,
+  ControlDescription,
+  type Child,
+  type Description,
+} from '../jsx/index.mjs';
+import { removeMounted } from './branch.mjs';
 
 /**
- * Mounts `children` into `target` (`document.body` when omitted) rather than
- * where it is written (SPEC.md 8.6): for a modal, a tooltip or a toast that has
- * to escape an ancestor's `overflow: hidden` or `z-index`.
- *
- * The children belong to the scope where `Portal` is written, so closing the
- * enclosing `If` branch removes them too. Nothing is left in the place it is
- * written.
+ * Mounts `children` into `target` (`document.body` by default) instead of where
+ * the `Portal` stands, in the current owner and in the namespace of `target`,
+ * and removes them when it is disposed. The `Portal` itself mounts no node in
+ * place.
  */
 export const Portal = ({
   target,
@@ -22,20 +19,11 @@ export const Portal = ({
 }: Readonly<{
   target?: Element;
   children: Child;
-}>): JSX.Element =>
-  mountable(() => {
-    const into = target ?? document.body;
+}>): Description =>
+  new ControlDescription(() => {
+    const out = appendChildTo(children, target ?? document.body);
 
-    // Where the children go, not where `Portal` is written.
-    const nodes = mountUnder(holdsSvgContent(into), () =>
-      mountThenInsert(mountChild, children, appendTo, into),
-    );
-
-    onScopeDispose(() => {
-      for (const node of nodes) {
-        node.remove();
-      }
+    onCleanup(() => {
+      removeMounted(out);
     });
-
-    return [];
   });

@@ -241,6 +241,12 @@ describe(createLoanStore, () => {
     );
   });
 
+  test('is not calculating before the inputs first change', () => {
+    const { store } = setup('https://example.com/mono/loan/');
+
+    assert.isFalse(Optional.unwrap(store.isCalculating.getSnapshot()));
+  });
+
   test('calculates once the inputs stay still, and is calculating until then', async () => {
     const { store } = setup('https://example.com/mono/loan/');
 

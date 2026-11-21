@@ -332,12 +332,12 @@ ruleTester.run('no-throw-in-operator', noThrowInOperator, {
       ],
     },
     {
-      name: 'the predefined operators built on map',
+      name: 'the other operators that take a function',
       code: dedent`
-        import { mapOptional, mapResultErr, mapResultOk } from 'synstate';
-        const a$ = x$.pipe(mapOptional(() => { throw new Error('a'); }));
-        const b$ = x$.pipe(mapResultOk(() => { throw new Error('b'); }));
-        const c$ = x$.pipe(mapResultErr(() => { throw new Error('c'); }));
+        import { scan, skipWhile, switchMap } from 'synstate';
+        const a$ = x$.pipe(scan(() => { throw new Error('a'); }, 0));
+        const b$ = x$.pipe(skipWhile(() => { throw new Error('b'); }));
+        const c$ = x$.pipe(switchMap(() => { throw new Error('c'); }));
       `,
       errors: [
         { messageId: 'throwInOperator', line: 2 },

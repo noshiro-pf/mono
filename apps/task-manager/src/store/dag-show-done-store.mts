@@ -33,7 +33,7 @@ export const createDagShowDoneStore = (
       const subscription = showDone.subscribe(deps.save);
 
       return () => {
-        subscription.unsubscribe();
+        subscription();
       };
     },
   };

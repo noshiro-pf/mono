@@ -51,7 +51,7 @@ describe(createClockStore, () => {
 
     clock.jump(40_000);
 
-    wake.next(undefined);
+    wake.emit(undefined);
 
     assert.strictEqual(Optional.unwrap(store.now.getSnapshot()), 40_000);
   });

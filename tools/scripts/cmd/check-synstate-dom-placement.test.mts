@@ -5,6 +5,6 @@ describe(checkSynstateDomPlacement, () => {
   test('finds every page of the committed tree current', async () => {
     const result = await checkSynstateDomPlacement();
 
-    assert.deepStrictEqual(result, Result.ok(8));
+    assert.deepStrictEqual(result, Result.ok(6));
   });
 });

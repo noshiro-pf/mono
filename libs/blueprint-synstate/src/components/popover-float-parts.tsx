@@ -17,7 +17,7 @@ import {
 import {
   createState,
   map,
-  onScopeDispose,
+  onCleanup,
   type InitializedObservable,
 } from 'synstate';
 import {
@@ -199,7 +199,7 @@ export const PopoverFloat = ({
       }
     });
 
-    onScopeDispose(() => {
+    onCleanup(() => {
       mut_autoUpdate.stop?.();
 
       mut_elements.container = undefined;
@@ -411,7 +411,7 @@ const PopoverArrow = ({
     ref={(element) => {
       setElement(element);
 
-      onScopeDispose(() => {
+      onCleanup(() => {
         setElement(undefined);
       });
     }}

@@ -3,5 +3,4 @@ export * from './measure-scenario.mjs';
 export * from './scenario.mjs';
 export * from './schedule/index.mjs';
 export * from './synstate-graph.mjs';
-export * from './synstate-next-graph.mjs';
 export * from './zoom/index.mjs';

@@ -931,7 +931,7 @@ const stepTowards = (current: Point, target: Point, factor: number): Point =>
     }) as const;
 ```
 
-The other libraries' code is that of [synstate's throughput demo](https://github.com/noshiro-pf/mono/tree/main/apps/synstate-docs/src/components/throughput-demo/adapters).
+The other libraries' code is that of [synstate's throughput demo](https://github.com/noshiro-pf/mono/tree/f5709ff10f29075c808142cf59dc0c6288d3ffee/apps/synstate-docs/src/components/throughput-demo/adapters).
 
 ## Cascaded diamond
 

@@ -2,7 +2,7 @@ import {
   createState,
   derive,
   map,
-  onScopeDispose,
+  onCleanup,
   type InitializedObservable,
 } from 'synstate';
 import {
@@ -468,7 +468,7 @@ const ToastView = ({
     dismiss: ReturnType<typeof setTimeout> | undefined;
   } = { transition: undefined, dismiss: undefined };
 
-  onScopeDispose(() => {
+  onCleanup(() => {
     clearTimeout(mut_timers.transition);
 
     clearTimeout(mut_timers.dismiss);
@@ -658,7 +658,7 @@ const ToastContainer = ({
     }
   });
 
-  onScopeDispose(() => {
+  onCleanup(() => {
     leaveStack(self);
   });
 

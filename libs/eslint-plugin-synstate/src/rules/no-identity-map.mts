@@ -117,14 +117,31 @@ export const noIdentityMap: TSESLint.RuleModule<MessageIds, Options> = {
   },
 } as const;
 
+/** The expression `body` returns, when that is all it does. */
+const returnedExpressionOf = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  body: TSESTree.BlockStatement | TSESTree.Expression,
+): TSESTree.Expression | undefined => {
+  if (body.type !== AST_NODE_TYPES.BlockStatement) {
+    return body;
+  }
+
+  const [statement, ...rest] = body.body;
+
+  return statement?.type === AST_NODE_TYPES.ReturnStatement &&
+    rest.length === 0 &&
+    statement.argument !== null
+    ? statement.argument
+    : undefined;
+};
+
 /**
  * Whether `argument`, read through its type wrappers, is a function that
  * returns its one parameter, and whether type syntax is written anywhere on the
  * way: around the function or the result, or on the parameter or the
- * return type. `undefined` when it is not such a function. `prefer-derive`
- * reads it too, to leave such a `map` to this rule.
+ * return type. `undefined` when it is not such a function.
  */
-export const identityOf = (
+const identityOf = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   argument: TSESTree.CallExpressionArgument,
 ): Readonly<{ hasTypeSyntax: boolean }> | undefined => {
@@ -167,23 +184,5 @@ export const identityOf = (
           param.typeAnnotation !== undefined ||
           fn.returnType !== undefined,
       }
-    : undefined;
-};
-
-/** The expression `body` returns, when that is all it does. */
-const returnedExpressionOf = (
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  body: TSESTree.BlockStatement | TSESTree.Expression,
-): TSESTree.Expression | undefined => {
-  if (body.type !== AST_NODE_TYPES.BlockStatement) {
-    return body;
-  }
-
-  const [statement, ...rest] = body.body;
-
-  return statement?.type === AST_NODE_TYPES.ReturnStatement &&
-    rest.length === 0 &&
-    statement.argument !== null
-    ? statement.argument
     : undefined;
 };

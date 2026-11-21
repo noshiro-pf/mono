@@ -1,4 +1,4 @@
-// cspell:ignore elkjs istextorbinary noto Odysseas resvg
+// cspell:ignore elkjs istextorbinary Odysseas
 
 /**
  * Which licenses a dependency may carry, read by `check:root:licenses`
@@ -107,16 +107,9 @@ export const licensePolicy = {
   exceptions: [
     {
       license: 'MPL-2.0',
-      packages: [
-        'axe-core',
-        'lightningcss',
-        'lightningcss-*',
-        'satori',
-        '@resvg/resvg-js',
-        '@resvg/resvg-js-*',
-      ],
+      packages: ['axe-core', 'lightningcss', 'lightningcss-*'],
       reason:
-        'File-level copyleft: a modified MPL file that is distributed stays MPL with its source available; the work around it may be under any license. All are used unmodified — `axe-core` is a dependency of `eslint-plugin-jsx-a11y`, the rest build `apps/synstate-docs` (CSS and Open Graph images) and do not reach its output. What to watch: a `pnpm patch` of one of these that ends up in something distributed has to be published.',
+        'File-level copyleft: a modified MPL file that is distributed stays MPL with its source available; the work around it may be under any license. All are used unmodified — `axe-core` is a dependency of `eslint-plugin-jsx-a11y`, and `lightningcss` builds CSS and does not reach the output. What to watch: a `pnpm patch` of one of these that ends up in something distributed has to be published.',
     },
     {
       license: 'EPL-2.0 OR GPL-3.0-or-later',
@@ -132,7 +125,7 @@ export const licensePolicy = {
     },
     {
       license: 'OFL-1.1',
-      packages: ['@fontsource/noto-sans-jp', '@fontsource/roboto'],
+      packages: ['@fontsource/roboto'],
       reason:
         'The one exception that is redistributed: the apps serve these font files. The OFL allows bundling with anything, on condition that the copyright notice and license travel with the font — which it accepts as metadata inside the font file, and the files are served as published. What to watch: subsetting or converting the fonts ourselves makes a Modified Version, which may not keep the Reserved Font Name and must not drop that metadata; and the fonts may not be sold on their own.',
     },

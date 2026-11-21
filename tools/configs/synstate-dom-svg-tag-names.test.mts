@@ -3,7 +3,7 @@
 // eslint-disable-next-line import-x/no-relative-packages
 import { svgTagNames as eslintPluginSvgTagNames } from '../../libs/eslint-plugin-synstate-dom-a11y/src/svg-tag-names.mjs';
 // eslint-disable-next-line import-x/no-relative-packages
-import { svgTagNames } from '../../libs/synstate-dom/src/internal/dom-tables.mjs';
+import { svgTagNames } from '../../libs/synstate-dom/src/bind/dom-tables.mjs';
 
 const sorted = (names: Iterable<string>): readonly string[] =>
   Array.from(names).toSorted((a, b) => a.localeCompare(b));

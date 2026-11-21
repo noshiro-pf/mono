@@ -26,16 +26,19 @@ describe('createBooleanState utils', () => {
     const [, { setState, updateState, resetState, getSnapshot }] =
       createBooleanState(true);
 
-    assert.strictEqual(setState(false), false);
+    setState(false);
 
-    assert.strictEqual(
-      updateState((prev) => !prev),
-      true,
-    );
+    assert.isFalse(getSnapshot());
 
-    assert.strictEqual(getSnapshot(), true);
+    updateState((prev) => !prev);
 
-    assert.strictEqual(resetState(), true);
+    assert.isTrue(getSnapshot());
+
+    setState(false);
+
+    resetState();
+
+    assert.isTrue(getSnapshot());
   });
 });
 

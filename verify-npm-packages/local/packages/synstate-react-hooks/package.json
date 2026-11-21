@@ -5,6 +5,7 @@
   "type": "module",
   "dependencies": {
     "react": ">=18.0.0",
+    "synstate": "^9.2.0",
     "synstate-react-hooks": "file:../../../.tarballs/synstate-react-hooks.tgz"
   }
 }

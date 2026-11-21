@@ -100,11 +100,11 @@ ruleTester.run(
         ],
       },
       {
-        name: '`next` of an imported source',
+        name: '`emit` of an imported source',
         filename,
         code: dedent`
           import { count$, tick$ } from './store.mjs';
-          count$.subscribe((count) => { tick$.next(count); });
+          count$.subscribe((count) => { tick$.emit(count); });
         `,
         errors: [{ messageId: 'writeDuringPropagation' }],
       },

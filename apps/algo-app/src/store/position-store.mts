@@ -41,11 +41,11 @@ export const createPositionStore = (): PositionStore => {
   return {
     cardPositions,
     cardPositionsDispatcher: (action) => {
-      cardPositionsAction.next(action);
+      cardPositionsAction.emit(action);
     },
     playerNamePositions,
     playerNamePositionsDispatcher: (action) => {
-      playerNamePositionsAction.next(action);
+      playerNamePositionsAction.emit(action);
     },
   };
 };

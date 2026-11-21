@@ -5,6 +5,7 @@
   "type": "module",
   "dependencies": {
     "preact": ">=10.9.0",
+    "synstate": "^9.2.0",
     "synstate-preact-hooks": "file:../../../.tarballs/synstate-preact-hooks.tgz"
   }
 }

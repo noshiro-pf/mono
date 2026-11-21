@@ -16,12 +16,9 @@ import { type Embedded, embedInto, markerKeys } from './embed-markers.mjs';
  * Reading `apps/synstate-dom-benchmark/RESULTS.md`, and the figures that place
  * synstate-dom among the libraries it measures.
  *
- * Two generators quote these figures: synstate-dom-docs' `gen:benchmark`, on
- * its benchmark pages, and the SynState site's `gen:benchmark-doc`, on the
- * pages that pitch synstate-dom on both sites, which also quote SynState's own
- * benchmark. Each page has one of them as its only writer, so neither
- * overwrites what the other filled in; this module is what both read, and what
- * `check:prose:synstate-dom-placement` checks the pages against.
+ * synstate-dom-docs' `gen:benchmark` quotes these figures, on its benchmark
+ * pages and on the pages that pitch synstate-dom; this module is what it reads,
+ * and what `check:prose:synstate-dom-placement` checks the pages against.
  */
 
 /** RESULTS.md, read and parsed. */
@@ -276,10 +273,9 @@ const resultsPath = path.resolve(
 );
 
 /**
- * The pages that place synstate-dom among the libraries of
- * js-framework-benchmark beside SynState's own benchmark: synstate-dom-docs'
- * introduction and landing page, and the SynState site's synstate-dom
- * introduction. The SynState site's `gen:benchmark-doc` is their one writer;
+ * The pages that quote synstate-dom's figures beside the benchmark pages:
+ * synstate-dom-docs' introduction and landing page. Its `gen:benchmark` is
+ * their one writer, as it is the benchmark pages';
  * `check:prose:synstate-dom-placement` checks that they are current.
  */
 export const placementPages: readonly string[] = [
@@ -287,8 +283,6 @@ export const placementPages: readonly string[] = [
   'apps/synstate-dom-docs/src/content/docs/ja/getting-started/introduction.md',
   'apps/synstate-dom-docs/src/content/docs/index.mdx',
   'apps/synstate-dom-docs/src/content/docs/ja/index.mdx',
-  'apps/synstate-docs/src/content/docs/synstate-dom/introduction.mdx',
-  'apps/synstate-docs/src/content/docs/ja/synstate-dom/introduction.mdx',
 ].map((page) => path.resolve(projectRootPath, page));
 
 /**

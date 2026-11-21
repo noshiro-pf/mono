@@ -40,10 +40,10 @@ export const createBooleanState = (
     state: InitializedObservable<boolean>;
     setTrue: () => void;
     setFalse: () => void;
-    setState: (next: boolean) => boolean;
-    toggle: () => boolean;
-    updateState: (updateFn: (prev: boolean) => boolean) => boolean;
-    resetState: () => boolean;
+    setState: (next: boolean) => void;
+    toggle: () => void;
+    updateState: (updateFn: (prev: boolean) => boolean) => void;
+    resetState: () => void;
     getSnapshot: () => boolean;
     initialState: boolean;
   }>,

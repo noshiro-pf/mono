@@ -1,4 +1,4 @@
-import { createState, onScopeDispose } from 'synstate';
+import { createState, onCleanup } from 'synstate';
 import { constant, createAfterUpdate, type JSX } from 'synstate-dom';
 import { Arr } from 'ts-data-forge';
 import type { Rect } from 'ts-utils-additional';
@@ -28,7 +28,7 @@ export const Root = (): JSX.Element => {
     setWindowSize({ width, height, top, left });
   });
 
-  onScopeDispose(() => {
+  onCleanup(() => {
     resizeObserver.disconnect();
   });
 

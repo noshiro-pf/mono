@@ -3,7 +3,6 @@ import {
   createState as createStateBase,
   derive,
   map,
-  mapTo,
   type InitializedObservable,
 } from 'synstate';
 import { Arr, fastDeepEqual, Obj, Optional, Result } from 'ts-data-forge';
@@ -76,7 +75,11 @@ export const createEditEventScheduleStore = (
   const [verified$, setVerified] = createReducerWithActions(
     (_: VerifiedEmail | undefined, next: VerifiedEmail | undefined) => next,
     undefined,
-    [deps.router.editPageLeaves$.pipe(mapTo(undefined))],
+    [
+      deps.router.editPageLeaves$.pipe(
+        map(() => undefined, { equals: () => false }),
+      ),
+    ],
   );
 
   const emailVerified$: InitializedObservable<string | undefined> = derive(

@@ -13,32 +13,32 @@ GitHub shows a `.github/README.md` in place of the root one.
 
 ## Inventory
 
-| Workflow                         | Runs on                                    | Reports a required context                        |
-| :------------------------------- | :----------------------------------------- | :------------------------------------------------ |
-| `code-check.yml`                 | pull requests; `push` to `main`            | `code-check-result / result`                      |
-| `style-check.yml`                | pull requests; `push` to `main`            | `style-check-result / result`                     |
-| `strict-lib-gen.yml`             | pull requests; `push` to `main`            | `strict-lib-gen-result / result`                  |
-| `node-version-compatibility.yml` | pull requests; `push` to `main`            | `test-node-versions-result / result`              |
-| `verify-published-packages.yml`  | pull requests; `push` to `main`            | `verify-published-result / result`                |
-| `synstate-benchmark.yml`         | pull requests; `push` to `main`            | `synstate-benchmark-result / result`              |
-| `check-gates.yml`                | `workflow_call`, from the six above        | none; it is the gate the six share                |
-| `check-result.yml`               | `workflow_call`, from the six and the lint | the six above and the lint; it is their aggregate |
-| `skip-ci-label.yml`              | `pull_request_target`                      | the `no-skip-ci-label` commit status              |
-| `lint-pull-request.yml`          | `pull_request_target`                      | `lint-pull-request-result / result`               |
-| `code-owners.yml`                | `pull_request_target`                      | `Validate code owners`, its one job               |
-| `verify-lockfile.yml`            | pull requests; `push` to `main`            | `verify-lockfile`, its one job                    |
-| `release.yml`                    | `push` to `main`                           | none                                              |
-| `pnpm-update.yml`                | schedule                                   | none; opens/closes `chore/pnpm-update`            |
-| `node-support-update.yml`        | schedule                                   | none; opens/closes `chore/node-support-update`    |
-| `deploy-pages.yml`               | `push` to `main`                           | none                                              |
-| `deploy-firestore.yml`           | `push` to `main`; `workflow_dispatch`      | none                                              |
-| `deploy-event-schedule-app.yml`  | `push` to `main`; `workflow_dispatch`      | none                                              |
-| `restart-unblock-prs.yml`        | `push` to `main`                           | none; files the author's restart TODO             |
-| `issue-closed-labels.yml`        | `issues` closed                            | none; releases the closed issue's start           |
-| `link-check.yml`                 | pull requests, path-filtered; schedule     | none; other people's servers decide it            |
-| `e2e-production.yml`             | schedule; `workflow_dispatch`              | none; the live sites decide it                    |
-| `synstate-next-benchmark.yml`    | `workflow_dispatch`                        | none; uploads a measurement to commit             |
-| `report-scheduled-failure.yml`   | `workflow_run` of the scheduled ones       | none; files a failed scheduled run as an issue    |
+| Workflow                         | Runs on                                     | Reports a required context                         |
+| :------------------------------- | :------------------------------------------ | :------------------------------------------------- |
+| `code-check.yml`                 | pull requests; `push` to `main`             | `code-check-result / result`                       |
+| `style-check.yml`                | pull requests; `push` to `main`             | `style-check-result / result`                      |
+| `strict-lib-gen.yml`             | pull requests; `push` to `main`             | `strict-lib-gen-result / result`                   |
+| `node-version-compatibility.yml` | pull requests; `push` to `main`             | `test-node-versions-result / result`               |
+| `verify-published-packages.yml`  | pull requests; `push` to `main`             | `verify-published-result / result`                 |
+| `check-gates.yml`                | `workflow_call`, from the five above        | none; it is the gate the five share                |
+| `check-result.yml`               | `workflow_call`, from the five and the lint | the five above and the lint; it is their aggregate |
+| `skip-ci-label.yml`              | `pull_request_target`                       | the `no-skip-ci-label` commit status               |
+| `lint-pull-request.yml`          | `pull_request_target`                       | `lint-pull-request-result / result`                |
+| `code-owners.yml`                | `pull_request_target`                       | `Validate code owners`, its one job                |
+| `verify-lockfile.yml`            | pull requests; `push` to `main`             | `verify-lockfile`, its one job                     |
+| `release.yml`                    | `push` to `main`                            | none                                               |
+| `pnpm-update.yml`                | schedule                                    | none; opens/closes `chore/pnpm-update`             |
+| `node-support-update.yml`        | schedule                                    | none; opens/closes `chore/node-support-update`     |
+| `deploy-pages.yml`               | `push` to `main`                            | none                                               |
+| `deploy-firestore.yml`           | `push` to `main`; `workflow_dispatch`       | none                                               |
+| `deploy-event-schedule-app.yml`  | `push` to `main`; `workflow_dispatch`       | none                                               |
+| `restart-unblock-prs.yml`        | `push` to `main`                            | none; files the author's restart TODO              |
+| `issue-closed-labels.yml`        | `issues` closed                             | none; releases the closed issue's start            |
+| `link-check.yml`                 | pull requests, path-filtered; schedule      | none; other people's servers decide it             |
+| `e2e-production.yml`             | schedule; `workflow_dispatch`               | none; the live sites decide it                     |
+| `synstate-benchmark.yml`         | `workflow_dispatch`                         | none; uploads a measurement to commit              |
+| `synstate-next-benchmark.yml`    | `workflow_dispatch`                         | none; uploads a measurement to commit              |
+| `report-scheduled-failure.yml`   | `workflow_run` of the scheduled ones        | none; files a failed scheduled run as an issue     |
 
 The required contexts are listed in `repo-settings/rulesets/main.json`. Every
 one of them is either an aggregate job (see "The aggregate job") or a job that
@@ -46,10 +46,9 @@ runs no repository code; none is a job that does the work.
 
 ## The check workflows
 
-Six workflows check a pull request: `code-check.yml`, `style-check.yml`,
-`strict-lib-gen.yml`, `node-version-compatibility.yml`,
-`verify-published-packages.yml` and `synstate-benchmark.yml`. They have one
-shape:
+Five workflows check a pull request: `code-check.yml`, `style-check.yml`,
+`strict-lib-gen.yml`, `node-version-compatibility.yml` and
+`verify-published-packages.yml`. They have one shape:
 
 ```text
 gates  (check-gates.yml, reusable)
@@ -96,12 +95,10 @@ on:
   has to remember to run anything by hand. `code-check.yml`'s `coverage-main`
   job runs on `main` whatever the verdict, because Codecov compares a pull
   request's coverage against the base commit's report and the base commit is on
-  `main`; so does `synstate-benchmark.yml`'s `benchmark`, which stores the
-  baseline the next pull request is compared with. Both take what the pull
-  request's run already made of the tree (see "Reusing what a pull request
-  produced"). On `main` the aggregate holds no merge; it is what a later run on
-  the same tree reuses, and a red one is the signal that a bypass merge landed
-  something broken.
+  `main`. It takes what the pull request's run already made of the tree (see
+  "Reusing what a pull request produced"). On `main` the aggregate holds no
+  merge; it is what a later run on the same tree reuses, and a red one is the
+  signal that a bypass merge landed something broken.
 - **`workflow_dispatch`** is how the checks are asked for from the Actions tab.
   Such a run is exempt from every gate: there is no pull request to be behind
   anything, and no verdict is reused. A queue that checks pull requests ahead of
@@ -335,7 +332,7 @@ gates:
         contents: read
         pull-requests: read
     with:
-        diff-scope: code # or runtime, benchmark, style, strict-lib, none
+        diff-scope: code # or runtime, style, strict-lib, none
         result-job: code-check-result / result
 
 the-work:
@@ -432,24 +429,19 @@ comment of their own, so what they mean is here:
   (`!apps/*/src/`). A page there is what an app builds, and its e2e checks (that
   a Japanese table fits as its English one does, say) run in `code-check.yml`
   alone, so a diff touching only that page is the one they judge.
-- **`runtime`** (`node-version-compatibility.yml`) and **`benchmark`**
-  (`synstate-benchmark.yml`) ignore what `code` does, with exceptions of their
-  own. Those workflows run the packages' code on each Node.js and measure it.
-  An app's page goes through that app's build, which `ws:build` runs there too,
-  but nothing in it depends on the Node.js version and `code-check.yml` builds
-  it, so neither takes `apps/*/src/` back. `benchmark` takes back
-  `apps/synstate-docs/src/data/` alone: the benchmark judges the tables there
-  against its baseline, so a diff of the tables alone is one it has to see. The
-  ignore entries are written out in each list, and `workflow-steps.test.mts`
-  fails when they differ from `code`'s, so an entry added to one goes in the
-  others.
+- **`runtime`** (`node-version-compatibility.yml`) ignores what `code` does,
+  with exceptions of its own. That workflow runs the packages' code on each
+  Node.js. An app's page goes through that app's build, which `ws:build` runs
+  there too, but nothing in it depends on the Node.js version and
+  `code-check.yml` builds it, so it does not take `apps/*/src/` back. The ignore
+  entries are written out in each list, and `workflow-steps.test.mts` fails when
+  they differ from `code`'s, so an entry added to one goes in the other.
 - **`code` and `runtime` take back each Markdown document a unit test reads**,
   as `!` entries naming the document: unit tests run in `code-check.yml` and
   `node-version-compatibility.yml` alone, so a diff of the document alone is the
   one the test judges, and skipped, the test would fail on the next pull request
-  that touched code. `benchmark` does not, since the benchmark reads none of
-  them. `check:root:test-documents` finds each test whose `readFile` call names
-  a `.md` path, and holds those tests to the table in
+  that touched code. `check:root:test-documents` finds each test whose
+  `readFile` call names a `.md` path, and holds those tests to the table in
   `tools/scripts/cmd/check-test-documents.mts` and each document of the table to
   an exception naming it in both lists. Each `.md` exception of the lists has to
   name a document of the table.
@@ -568,15 +560,13 @@ on each time.
 
 #### Reusing what a pull request produced
 
-Two jobs run on a push to `main` even when the verdict is reused, because what
-they produce is not a verdict: `coverage-main` uploads the base commit's
-coverage report to Codecov, and `benchmark` stores the baseline the next pull
-request's measurement is compared with. Both are a function of the tree, so the
-pull request's run of the same tree already made them, and producing them again
-cost a merge about eleven runner-minutes and one runner for ten minutes, while
-the next pull request in the queue was starting its checks. So the pull
-request's run keeps them as artifacts (`coverage-<index>`,
-`synstate-benchmark-<run id>`), and the push takes them instead.
+One job runs on a push to `main` even when the verdict is reused, because what
+it produces is not a verdict: `coverage-main` uploads the base commit's coverage
+report to Codecov. The report is a function of the tree, so the pull request's
+run of the same tree already made it, and producing it again cost every merge
+runner time while the next pull request in the queue was starting its checks. So
+the pull request's run keeps the reports as artifacts (`coverage-<index>`), and
+the push takes them instead.
 
 The lookup is `.github/actions/find-run-of-tree`: the newest run, among the
 latest 100 of each conclusion it takes, of the same workflow on the checked-out
@@ -585,9 +575,7 @@ verdict as one about the tree, and that still holds a matching artifact. By the
 tree, as a verdict is, and not by `reused_from`, because the run whose verdict
 was reused may itself have reused one and then holds nothing. A fork's run is
 never taken: its artifacts come from workflow files the fork wrote.
-`coverage-main` takes only a successful run, since a failed one kept no reports;
-`benchmark` takes a failed one too, because what fails there is the committed
-tables, not the measurement.
+`coverage-main` takes only a successful run, since a failed one kept no reports.
 
 Where no run of the tree holds the artifact — it expired, or the merge bypassed
 the checks — the job produces it as it used to, so the lookup can only save
@@ -733,9 +721,9 @@ each caller passes it as `result-job: <name>-result / result`.
   a job split in two costs that once more and buys nothing but a shorter wait
   for a pull request checked alone, which happens only when the queue is empty.
   So the check workflows run twelve jobs a pull request (code-check's seven,
-  style-check's two, node-version-compatibility's two, strict-lib-gen's one; the
-  benchmark's job, about a minute when its baseline hits, is one more): a short
-  check rides along with a longer one rather than taking a runner of its own,
+  style-check's two, node-version-compatibility's two, strict-lib-gen's one): a
+  short check rides along with a longer one rather than taking a runner of its
+  own,
   and a job is split only when its p90 comes near the timeout. The longest,
   `ws:fix:lint`, is estimated at about ten minutes, twelve at p90, from the two
   halves it used to be. A new check joins an existing entry; the matrix comment
@@ -800,7 +788,7 @@ Node version is the check itself.
 
 ## `skip-ci` and `no-skip-ci-label`
 
-`skip-ci` on a pull request skips the six check workflows; every gated job
+`skip-ci` on a pull request skips the five check workflows; every gated job
 carries the label condition and boots no runner. `lint-pull-request.yml` skips
 its title and commit checks on every event but `opened`, a title edit and the
 `unlabeled` that takes the label off; `code-owners.yml` runs regardless, and

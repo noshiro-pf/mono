@@ -9,6 +9,13 @@ or the reason it was not ported. A case that asked about completion asks about
 
 Each list is one directory of synstate, named by the files' base names.
 
+<!-- doc-paths-ignore: libs/synstate/test/cases -->
+<!-- doc-paths-ignore: libs/synstate/src/core/class -->
+<!-- doc-paths-ignore: libs/synstate/src/core/combine -->
+<!-- doc-paths-ignore: libs/synstate/src/core/create -->
+<!-- doc-paths-ignore: libs/synstate/src/core/operators -->
+<!-- doc-paths-ignore: libs/synstate/src/core/scope -->
+
 `libs/synstate/test/cases/`: every file but `map-to` and `pluck` is in
 `cases.test.mts`, `with-index` as a `scan`.
 

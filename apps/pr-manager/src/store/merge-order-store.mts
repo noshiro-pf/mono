@@ -77,7 +77,7 @@ export const createMergeOrderStore = (
     const saving = view.subscribe(deps.save);
 
     return () => {
-      saving.unsubscribe();
+      saving();
     };
   };
 

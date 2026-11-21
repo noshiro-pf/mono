@@ -1,4 +1,4 @@
-import { combine, map, type InitializedObservable } from 'synstate';
+import { derive, map, type InitializedObservable } from 'synstate';
 import { constant, If, type JSX } from 'synstate-dom';
 import type { QueueBox } from '../../../domain/index.mjs';
 import { ExternalLink } from '../../common/index.mjs';
@@ -19,26 +19,22 @@ export const QueueLayerBox = ({
       map((p) => (p === 'running' || p === 'waiting' ? p : 'next')),
     )}
     // A waiting box says why it waits; its layer is in the tooltip alone.
-    data-layer={combine([box, place]).pipe(
-      map(([b, p]) =>
-        p === 'waiting' ? 'none' : (b.layer?.standing ?? 'none'),
-      ),
+    data-layer={derive([box, place], (b, p) =>
+      p === 'waiting' ? 'none' : (b.layer?.standing ?? 'none'),
     )}
-    title={combine([box, place]).pipe(
-      map(([b]) =>
-        [
-          `#${b.number} ${b.title}`,
-          ...(b.detail === undefined ? [] : [b.detail]),
-          ...(b.layer !== undefined
-            ? [b.layer.detail]
-            : b.checkedAhead
-              ? ['The worker is checking it ahead on a queue/pr- layer.']
-              : []),
-          ...(b.bypass === undefined
-            ? []
-            : [`Only a ruleset bypass merges it: ${b.bypass}.`]),
-        ].join('\n'),
-      ),
+    title={derive([box, place], (b) =>
+      [
+        `#${b.number} ${b.title}`,
+        ...(b.detail === undefined ? [] : [b.detail]),
+        ...(b.layer !== undefined
+          ? [b.layer.detail]
+          : b.checkedAhead
+            ? ['The worker is checking it ahead on a queue/pr- layer.']
+            : []),
+        ...(b.bypass === undefined
+          ? []
+          : [`Only a ruleset bypass merges it: ${b.bypass}.`]),
+      ].join('\n'),
     )}
   >
     <ExternalLink
@@ -66,27 +62,24 @@ export const QueueLayerBox = ({
     </span>
     <span class={constant('queue-box-place')}>
       <If
-        cond={combine([box, place]).pipe(
-          map(
-            ([b, p]) =>
-              p === 'running' ||
-              (p !== 'waiting' && b.layer?.standing === 'running'),
-          ),
+        cond={derive(
+          [box, place],
+          (b, p) =>
+            p === 'running' ||
+            (p !== 'waiting' && b.layer?.standing === 'running'),
         )}
         then={<span class={constant('spinner')} />}
       />
-      {combine([box, place]).pipe(
-        map(([b, p]) =>
-          p === 'running'
-            ? ' running'
-            : p === 'waiting'
-              ? (b.why ?? 'waiting')
-              : b.layer !== undefined
-                ? `${b.layer.standing === 'running' ? ' ' : ''}${p} · ${b.layer.note}`
-                : b.checkedAhead
-                  ? `${p} · checked ahead`
-                  : p,
-        ),
+      {derive([box, place], (b, p) =>
+        p === 'running'
+          ? ' running'
+          : p === 'waiting'
+            ? (b.why ?? 'waiting')
+            : b.layer !== undefined
+              ? `${b.layer.standing === 'running' ? ' ' : ''}${p} · ${b.layer.note}`
+              : b.checkedAhead
+                ? `${p} · checked ahead`
+                : p,
       )}
     </span>
   </li>

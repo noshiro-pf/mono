@@ -1,7 +1,7 @@
 import {
   createState,
   map,
-  onScopeDispose,
+  onCleanup,
   type InitializedObservable,
 } from 'synstate';
 import { constant, For, type JSX } from 'synstate-dom';
@@ -64,7 +64,7 @@ export const QueueMap = ({
   };
 
   // Made to fit while it is dragged, the map goes, and its pointer with it.
-  onScopeDispose(() => {
+  onCleanup(() => {
     if (mut_press.pointer !== undefined) {
       release('lost');
     }

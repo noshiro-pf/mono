@@ -72,7 +72,7 @@ const setup = (initial: Theme, initialSystem: ColorScheme): Setup => {
     set: (next: ColorScheme) => {
       mut_system.value = next;
 
-      change.next(undefined);
+      change.emit(undefined);
     },
   };
 

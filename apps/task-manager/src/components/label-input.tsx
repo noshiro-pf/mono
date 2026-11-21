@@ -2,7 +2,7 @@ import {
   createState,
   derive,
   map,
-  onScopeDispose,
+  onCleanup,
   type InitializedObservable,
 } from 'synstate';
 import {
@@ -193,7 +193,7 @@ export const LabelInput = ({
     mut_form?.addEventListener('submit', onSubmit, { capture: true });
   });
 
-  onScopeDispose(() => {
+  onCleanup(() => {
     mut_form?.removeEventListener('submit', onSubmit, { capture: true });
   });
 

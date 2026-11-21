@@ -1,15 +1,60 @@
 # synstate-dom
 
-A compiler-free, fine-grained UI library that binds [synstate](https://github.com/noshiro-pf/mono/tree/main/libs/synstate) observables directly to the DOM.
+A compiler-free, fine-grained UI library that binds
+[synstate](https://github.com/noshiro-pf/mono/tree/main/libs/synstate)
+observables directly to the DOM.
 
-It is the UI library for SynState: the graph you build with SynState's operators ends in the DOM node bound to it, with nothing converted on the way and no component re-run to read a value. Its API keeps one way to write each thing (a transformed value is `source.pipe(map(fn))` wherever it is bound) rather than adding forms that only win a row of a benchmark. How it compares with Solid, Preact, React and VanJS is on the [benchmark page](https://noshiro-pf.github.io/mono/synstate-dom/background/benchmark/).
+It is the UI library for SynState: the graph you build with SynState's operators
+ends in the DOM node bound to it, with nothing converted on the way and no
+component re-run to read a value. A component is called once; what changes
+afterwards is only the DOM bound to the observables it was given.
 
-> [!NOTE]
-> Version 0.x: the API may still change in a minor release. The design is in [`SPEC.md`](./SPEC.md) (Japanese).
+## Features
 
-## Usage
+- **A binding is one effect.** Each text, attribute, property, class or style
+  binding holds its target in its own fields, and runs once every value of the
+  update is up to date.
+- **Mounting is a batch.** A write made while mounting propagates once the nodes
+  are in the document, so nothing waits for an element to be attached.
+- **Owners for lifetimes.** A component runs in an owner of its own; a
+  subscription, a listener or a timer made while it mounts is disposed with it.
+- **`If`, `MatchOptional`, `MatchResult` and `Switch`** mount one branch at a
+  time, kept while its key stays. **`For`** keeps one row per key, visits only
+  the rows whose element changed, and moves as few rows as it can.
+  **`selector(source).is(key)`** writes only the rows of the old and the new
+  key.
+- **Typed props.** Attributes and DOM properties are typed from `lib.dom.d.ts`;
+  every prop that takes data takes a `Bindable` (an `InitializedObservable` or a
+  `constant(…)`), never a plain value, so a snapshot cannot be passed where a
+  live value is meant.
+- **Controlled inputs.** A bound `checked`, `indeterminate` or `<select>`
+  `value` is drawn as its bound value again after a `change` the application
+  does not take.
 
-Set the JSX transform to this package in `tsconfig.json`:
+## Documentation
+
+- <https://noshiro-pf.github.io/mono/synstate-dom/>
+
+What changed from synstate-dom 0.13, and how to move an application over, is on
+the docs site's changes page.
+
+## Installation
+
+```bash
+npm add synstate synstate-dom
+```
+
+Or with other package managers:
+
+```bash
+# Yarn
+yarn add synstate synstate-dom
+
+# pnpm
+pnpm add synstate synstate-dom
+```
+
+Then set the JSX transform to this package in `tsconfig.json`:
 
 ```jsonc
 {
@@ -20,208 +65,25 @@ Set the JSX transform to this package in `tsconfig.json`:
 }
 ```
 
-A component is called once. What changes afterwards is only the DOM bound to the observables it was given:
+## What is here
 
-```tsx
-import { createState, map } from 'synstate';
-import { constant, render, type JSX } from 'synstate-dom';
+- `render(App, container)`, which mounts `App` and returns the function that
+  unmounts it.
+- `constant`, the `Bindable` and `Constant` types, and the helpers
+  `mapBindable`, `deriveBindable` and `toObservable` for a component that
+  receives a `Bindable`.
+- The components `If`, `MatchOptional`, `MatchResult`, `Switch`, `For` and
+  `Portal`, and `selector`.
+- `listenInScope` and `createAfterUpdate`, what a component, called once, does
+  in place of an effect; `isImeKeyDown`, whether a key down belongs to an input
+  method.
+- The low-level API `mountable`, `mountChild` and `isChild`, for a component
+  that makes its own nodes.
 
-const [count$, _setCount, { updateState: updateCount }] = createState(0);
+## License
 
-// Called once. Only the text node bound to `count$` changes afterwards.
-const Counter = (): JSX.Element => (
-    <div>
-        <p>{count$.pipe(map((n) => `Count: ${n}`))}</p>
-        <button
-            type={constant('button')}
-            onClick={() => {
-                updateCount((n) => n + 1);
-            }}
-        >
-            {constant('+1')}
-        </button>
-    </div>
-);
+This project is licensed under the [Apache License 2.0](https://github.com/noshiro-pf/mono/blob/main/libs/synstate-dom/LICENSE).
 
-const unmount = render(Counter, document.body);
+## Repository
 
-// Later: disposes every subscription the app made and removes its nodes.
-unmount();
-```
-
-Text in JSX is a `Bindable` too: write `constant('Add')`, not `Add`, so that a value which never changes says so and a value which does change cannot be passed by mistake as a snapshot. `If`, `MatchOptional`, `MatchResult` and `For` mount what they choose in a scope of its own and dispose it when they choose something else:
-
-```tsx
-import { createState, map } from 'synstate';
-import { constant, For, If, render, type JSX } from 'synstate-dom';
-import { Arr, Optional } from 'ts-data-forge';
-
-type Todo = Readonly<{ id: number; title: string; done: boolean }>;
-
-const [todos$, _setTodos, { updateState: updateTodos }] = createState<
-    readonly Todo[]
->([]);
-
-const [draft$, setDraft, { getSnapshot: getDraft }] = createState('');
-
-const toggle = (id: number): void => {
-    updateTodos((todos) =>
-        todos.map((t) => (t.id === id ? { ...t, done: !t.done } : t)),
-    );
-};
-
-const add = (): void => {
-    const title = getDraft().trim();
-
-    if (title === '') {
-        return;
-    }
-
-    // Todos are only ever appended, so the length is a unique key. `Date.now()`
-    // is not: two todos added within the same millisecond would share it.
-    updateTodos((todos) =>
-        Arr.toPushed(todos, { id: todos.length, title, done: false }),
-    );
-
-    setDraft('');
-};
-
-// `For` keeps one row per key: a row's function runs once, and reordering
-// `todos$` moves the row's nodes rather than recreating them.
-const TodoApp = (): JSX.Element => {
-    // A derivation only this view reads is created here, inside the component, so
-    // it exists only while the view is mounted.
-    const remaining$ = todos$.pipe(
-        map((todos) => todos.filter((t) => !t.done).length),
-    );
-
-    return (
-        <section>
-            <input
-                value={draft$}
-                onInput={(e) => {
-                    setDraft(e.currentTarget.value);
-                }}
-            />
-            <button type={constant('button')} onClick={add}>
-                {constant('Add')}
-            </button>
-            <If
-                cond={todos$.pipe(map(Arr.isNonEmpty))}
-                then={
-                    <ul>
-                        <For items={todos$} key={(todo) => todo.id}>
-                            {(todo$, index$) => (
-                                <li
-                                    class={{
-                                        done: todo$.pipe(
-                                            map((todo) => todo.done),
-                                        ),
-                                    }}
-                                >
-                                    <label>
-                                        <input
-                                            type={constant('checkbox')}
-                                            checked={todo$.pipe(
-                                                map((todo) => todo.done),
-                                            )}
-                                            onChange={() => {
-                                                toggle(
-                                                    Optional.unwrap(
-                                                        todo$.getSnapshot(),
-                                                    ).id,
-                                                );
-                                            }}
-                                        />
-                                        {index$.pipe(map((i) => `${i + 1}. `))}
-                                        {todo$.pipe(map((todo) => todo.title))}
-                                    </label>
-                                </li>
-                            )}
-                        </For>
-                    </ul>
-                }
-                else={<p>{constant('Nothing to do.')}</p>}
-            />
-            <p>{remaining$.pipe(map((n) => `${n} remaining`))}</p>
-        </section>
-    );
-};
-
-render(TodoApp, document.body);
-```
-
-A component that takes data takes `Bindable<T>`, so that its caller can pass an observable or a constant alike. Props are bindables rather than values, so destructuring them loses nothing:
-
-```tsx
-import { createState } from 'synstate';
-import {
-    constant,
-    mapBindable,
-    render,
-    type Bindable,
-    type JSX,
-} from 'synstate-dom';
-
-type BadgeProps = Readonly<{
-    label: Bindable<string>;
-    count: Bindable<number>;
-}>;
-
-// Props are plain values holding bindables, so destructuring them is safe:
-// the component is called once and binds what it was given.
-const Badge = ({ label, count }: BadgeProps): JSX.Element => (
-    <span>
-        {label}
-        {mapBindable(count, (n) => (n > 99 ? ' (99+)' : ` (${n})`))}
-    </span>
-);
-
-const [unread$, setUnread] = createState(3);
-
-const Inbox = (): JSX.Element => (
-    <nav>
-        {/* A constant stays a constant: nothing is subscribed for it. */}
-        <Badge label={constant('Inbox')} count={unread$} />
-        <Badge label={constant('Archive')} count={constant(120)} />
-        <button
-            type={constant('button')}
-            onClick={() => {
-                setUnread(0);
-            }}
-        >
-            {constant('Mark all read')}
-        </button>
-    </nav>
-);
-
-render(Inbox, document.body);
-```
-
-### Guidelines
-
-synstate derivations are not lazy: a derivation is computed whenever its parent changes, read or not. Two habits keep a derivation from being computed for a view that is not shown:
-
-1. **Create a derivation only a view reads inside the component**, not next to the store. It then exists only while something is bound to it.
-2. **Create what a branch shows inside the branch** (a component the `then` of `If` mounts, the function of `MatchOptional`), not before choosing between two of them. JSX written straight into `then` is evaluated before `If` chooses, so a `pipe(map(...))` in it belongs to the enclosing component and keeps computing while the branch is hidden; a branch with many bindings goes in a component of its own.
-
-## What is implemented
-
-- `Constant<T>` and `constant(value)`: a value written once and never updated.
-- `Bindable<T>`: what a slot that takes data accepts, `InitializedObservable<T> | Constant<T>`. A plain value is a type error. To show an observable transformed, bind `source.pipe(map(fn))`.
-- `mapBindable`, `deriveBindable` and `toObservable`: helpers for a component that receives a `Bindable`. Constants stay constants and never enter the graph.
-- The JSX runtime (`"jsx": "react-jsx"`, `"jsxImportSource": "synstate-dom"`): a JSX expression is a lazy `Mountable` description, and a component is called once, when it is mounted.
-- `render(App, container)`: mounts `App` in a root scope and returns the function that unmounts it.
-- Element props: attributes and DOM properties typed from `lib.dom.d.ts` (`Bindable<T>` of each writable primitive property), `aria-*` (also a number, and a boolean written as `"true"` / `"false"`) and `data-*`, `class` as a string or a `{ name: Bindable<boolean> }` object, `style` as a string or a per-property object, and `onClick`-style event handlers. SVG elements are created in the SVG namespace and take a fixed list of attributes.
-- A bound `checked` or `indeterminate` of an `<input>` is controlled: after a `change`, the input is drawn as its bound value again before the next frame is painted, so a change the owner does not take in `onChange` undoes itself. For a checkbox the user toggles freely, use `defaultChecked`. A radio group is set back as a whole when every button of it is bound.
-- A bound `value` of a `<select>` is controlled the same way: a choice the owner does not take in `onChange` is drawn as the bound value again. A choice taken asynchronously is drawn as the bound value in between, so bind `value` to what should be shown meanwhile, such as the pending choice. The `value` of an `<input>` or a `<textarea>` is bound one way: a draft committed on `change` or blur, and an IME composition, keep what is being typed.
-- `If`, `MatchOptional` and `MatchResult`: mount one branch at a time in a scope of its own, rebuilt only when the condition or the tag changes.
-- `mountSwitch(value, keyOf, branch)`: what those three are built on, for a switch keyed by any function of the value. It mounts the branch for the current key in a scope of its own and rebuilds it only when `keyOf` gives a different key, with the same handling of updates before the anchor is attached; synstate-router-dom's `Routes` switches on the route with it.
-- `For`: one row per key, each in a scope of its own; `item$` and `index$` are derived from `items`, and rows are moved as little as the longest increasing subsequence allows.
-- `Portal`: mounts its children into another element, in the scope where it is written.
-- `listenInScope` and `createAfterUpdate`: what a component, called once, does in place of an effect, with synstate's `subscribe`. A subscription made while a component mounts, like an event listener added by `listenInScope`, lasts until the current scope is disposed; work given to `createAfterUpdate` runs in a microtask once the update under way has finished, dropped if the scope has been disposed by then.
-- `isImeKeyDown(event)`: whether a key down belongs to an input method, so that a handler for Enter or Escape leaves it alone. That is a key sent while a composition is going on, or the Enter or Escape that confirmed or cancelled one, which Safari sends after `compositionend` with key code 229.
-
-## Naming
-
-The library's own props and parameters carry no `$` suffix (`cond`, `items`, `value`): they take a `Bindable`, which may be a constant as well as an observable, and the type already says which. The samples name variables that hold an observable with a `$` suffix (`count$`, `item$`), as the synstate documentation does, to tell them from plain values at a glance. Nothing enforces it; whether a component's own props carry the suffix is up to its author.
+<https://github.com/noshiro-pf/mono/tree/main/libs/synstate-dom>

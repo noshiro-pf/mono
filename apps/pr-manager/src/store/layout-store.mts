@@ -143,7 +143,7 @@ export const createLayoutStore = (deps: LayoutDeps): LayoutStore => {
       .subscribe(deps.save);
 
     return () => {
-      subscription.unsubscribe();
+      subscription();
     };
   };
 

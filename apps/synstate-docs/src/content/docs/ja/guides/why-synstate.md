@@ -1,77 +1,75 @@
 ---
-title: SynState の強み
-description: SynState を選ぶ理由 — グリッチフリー、軽量、型安全、React Compiler 互換の状態管理ライブラリ。
-sidebar:
-    order: 1
+title: synstate を使う理由
+description: synstate がアプリケーションにもたらすもの。線形コストでグリッチのない更新、すべての値が新しくなった後に動く購読者、変わらない値で止まる更新、1 か所でまとめて片付けられること。どこで役に立つか。
 ---
 
-## シンプルに始められ、必要に応じてパワフルに
+## 始めるのは簡単、必要なときには強力
 
-SynState は Web フロントエンド向けの状態管理ライブラリです。ほとんどのユースケースでは、`createState`、`createReducer`、そして `derive` や `map` のようなシンプルなコンビネーターだけで十分です — React の `useState` / `useReducer` と同じくらい直感的でありながら、グローバル状態を管理できるクリーンで最小限の API です。例えば、[シンプルなカウンター](/mono/synstate/ja/examples/react/#グローバルカウンター)はわずか数行で実装できます：
+カウンターなら `createState` と `subscribe` だけです。同じモデルがそのままアプリケーションの規模まで広がります。画面に出す値は、少数の状態から `map`・`derive`・非同期オペレーターで派生させ、それらがなすグラフが、何をどの順に計算し直すかを決めます。小さなものから大きなものに移るときに、新しく覚えることはありません。
+
+## なぜ Observable なのか
+
+Observable は、時間とともに変わり、追いかけられる値です。これはフロントエンドが扱うものにそのまま合います。入力は状態、クリックはイベント、リクエストは後から届く値、タイマーは刻む値です。これらを 1 つの抽象で扱えるので、デバウンスやキャンセル、「最新の応答だけ」は、手で持つタイマーやフラグではなく、パイプラインの中のオペレーターになります。検索ボックスとデータテーブルでの違いは[宣言的な状態管理](/mono/synstate/ja/guides/declarative-state/)で見られます。
+
+## グリッチがなく、コストは線形
+
+グリッチとは、2 つの値から派生した値が、片方の変化だけを見てもう片方を見ていない瞬間のことです。下のダイヤモンドで、変化を子へすぐに押し出すライブラリは、新しい `tens` と古い `hundreds` から `sum` を計算して一瞬 120 を見せ、それから 220 にします。
+
+synstate は、更新が届いたノードを深さごとのキューに入れ、浅いものから辿ります。そのため `sum` は、親が 2 つとも済んだ後に 1 回だけ計算されます。
 
 ```tsx
-import { createState } from 'synstate-react-hooks';
+import { createState, derive, map } from 'synstate';
 
-const [useCount, , { updateState }] = createState(0);
+const [a, setA] = createState(1);
 
-const Counter = () => {
-    const count = useCount();
-    return <button onClick={() => updateState((n) => n + 1)}>{count}</button>;
-};
+const tens = a.pipe(map((x) => x * 10));
+
+const hundreds = a.pipe(map((x) => x * 100));
+
+let mut_computed = 0;
+
+const sum = derive([tens, hundreds], (t, h) => {
+    mut_computed += 1;
+
+    return t + h;
+});
+
+const mut_seen: number[] = [];
+
+sum.subscribe((value) => {
+    mut_seen.push(value);
+});
+
+setA(2);
+
+// Never 120 or 210: `sum` is computed once per update, after both of its
+// parents, and its subscriber runs once every value is up to date.
+assert.deepStrictEqual(mut_seen, [110, 220]);
+
+assert.strictEqual(mut_computed, 2);
 ```
 
-要件がより複雑になっても、SynState は対応できます。シンプルな[ダークモード切替](/mono/synstate/ja/examples/react/#boolean-状態ダークモード)から[自動キャンセル付きデバウンス検索パイプライン](/mono/synstate/ja/examples/advanced/#debounce-付き検索)まで、すべてを統一された API で記述できます。
+各ノードは 1 回の更新で多くても 1 回しか辿られないので、更新のコストは届いた範囲の大きさだけで決まります。キューの仕組みは[更新の伝わり方](/mono/synstate/ja/internals/how-an-update-propagates/)にあります。
 
-## なぜ Observable ベースなのか？
+## 購読者は更新の後に実行される
 
-実際の状態管理は単純な get/set にとどまりません。フィルター入力にはデバウンスが、API 呼び出しにはキャンセルが必要で、複数のソースが同時に変化したときに派生値は一貫性を保たなければなりません。これらの要件には、**非同期データフロー**と**依存関係の自動伝搬**を宣言的に表現できるシステムが求められます。
+Observable のライブラリの多くは、購読者を Observable が変わった時点で、更新の途中に呼びます。synstate は購読者をキューに入れ、更新が届くノードをすべて計算し直してから実行します。購読者がグラフの他の値を読めば、それは最新です。ただし、同じ更新のために先に呼ばれた購読者が状態に書き込んだ場合は、その状態の新しい値と、そこから派生したまだ古い値を読みます。購読者が行った書き込みは、この更新の中に入れ子になった更新ではなく、次の更新になります。UI 層の synstate-dom はこれを前提にしています。束縛も同じように実行されるので、分岐のマウントやアンマウントが伝搬の途中で起きることはありません。
 
-SynState は Observable パターンの上に構築されています。状態を、合成・変換・結合できる値のストリームとしてモデル化するパターンです。これにより、RxJS のような別のライブラリを必要とせず、豊富なオペレーター（`debounce`、`throttle`、`switchMap`、`mergeMap` 等）を利用できます。
+## 値が変わらなければそこで止まる
 
-実際にどのように機能するか、命令的なコードとの比較については[宣言的な状態管理](/mono/synstate/ja/guides/declarative-state-management/)を参照してください。
+値を計算するノード（`map`・`derive`・状態への書き込み）は、計算した値をすでに持っている値と比べ（`Object.is`、または渡した `equals`）、等しければ何も伝えません。同じ行にマッチするフィルター、変わらないページ数、`false` のままの真偽値。その下のグラフはまったく辿られません。この止まり方を外すべき場面は[値を派生させる](/mono/synstate/ja/guides/deriving-values/)で説明しています。
 
-## グリッチフリーで、コストは線形
+## 片付けは 1 か所で
 
-Observable パターン自体は新しいものではありません。RxJS が何年もかけて普及させてきました。しかし RxJS には**グリッチ問題**という根本的な正確性の課題があります。複数の派生値が共通のソースを持つとき、`combineLatest` は一部の入力が更新されたが他はまだ古いままの不整合な中間状態を emit してしまいます。この問題は依存グラフが複雑になるほど深刻化します。例えば、1つのソースから複数の派生値を作り再び結合する「ダイヤモンド型」の依存関係では、結合の数に応じて冗長な計算が $O(n^2)$ にスケールし、さらにこのダイヤモンドが直列に連なると $O(D^n)$（$D$ = 1段あたりの分岐数）と指数関数的に増大します。
+Observable は破棄されることで終わり、破棄は所有関係に従います。owner の実行中に作ったものはすべてその owner に属します。自分の派生値・購読・リクエストを owner の中で作るダイアログは、`dispose()` 1 回でそれらをすべて閉じます。終わりを知らせる何かがグラフを下っていくことはないので、それを伝え忘れるオペレーターもありません。API は [owner と寿命](/mono/synstate/ja/guides/owners-and-lifetime/)に、理由は[完了がない理由](/mono/synstate/ja/internals/why-no-completion/)にあります。
 
-SynState はこれを**深さ順伝搬**アルゴリズムで解決しています。すべての派生値がその祖先すべてが更新された後にのみ更新されることを保証し、$O(n)$ の単一パスで処理します。グリッチなし、冗長な計算なし、ヒープも不要です。キューは深さごとのバケット（バケットキュー）で、二分ヒープのようにノードごとに $O(\log n)$ かかることはありません。
+## 向いている用途
 
-| 特徴                        | RxJS                                                                                    | SynState                                                                       |
-| :-------------------------- | :-------------------------------------------------------------------------------------- | :----------------------------------------------------------------------------- |
-| **グリッチフリー**          | No — `combineLatest` が中間状態を emit する                                             | Yes — depth 順の伝搬により一貫性を保証                                         |
-| **伝搬コスト**              | ツリーでは $O(n)$、ダイヤモンドが直列に連なると最大 $O(D^n)$（$D$ = 1段あたりの分岐数） | すべてのケースで $O(n)$                                                        |
-| **`InitializedObservable`** | なし — 最初の emission まで値がない場合がある                                           | 組み込み — 常に値を保持し、状態の表現に最適                                    |
-| **設計の焦点**              | 汎用的な非同期イベント処理                                                              | 状態管理が第一、非同期オペレーター（`debounce`、`switchMap` 等）も完全サポート |
+- 画面やコンポーネントをまたいで共有され、同じ派生値をあちこちで読む状態を持つアプリケーション。
+- キャンセル・デバウンス・順序付けが必要な非同期の流れ。検索ボックス、自動保存、ポーリング、アップロードなど。
+- [synstate-dom](/mono/synstate-dom/ja/) で作る UI。グラフがそのまま DOM で終わります。
 
-詳細な説明は [SynState はグリッチをどう解決したか](/mono/synstate/ja/internals/how-synstate-solved-the-glitch/)を参照してください。
+## 次に読むもの
 
-比較の相手は RxJS だけではありません。Preact Signals と Solid もグリッチフリーで $O(n)$ ですが、SynState には両者と違う点が 2 つあります。速度では、[ベンチマークの概要](/mono/synstate/ja/guides/library-comparison/benchmark/#このページの読み方)で SynState はどのシナリオでも最速のライブラリの <!-- bench:summary/synstate-worst-over-fastest -->4.7<!-- /bench --> 倍以内に収まります。<!-- bench:summary/synstate-alone-in-single-digits -->すべてのシナリオで計測したライブラリのうち、最悪のケースでも1桁倍に収まるのは SynState だけです<!-- /bench -->。機能では、前の節のオペレーター群を同じグリッチフリーなグラフの上で使えます。Preact Signals では、debounce やキャンセル、最新のリクエストへの切り替えは effect の中に手で書くコードになり、signal に書き込む effect はそのグリッチフリーの保証の外にあります（[Signals の上の operator](/mono/synstate/ja/guides/library-comparison/operators-on-signals/)）。単独で使うときに各ライブラリで何が必要かは [React の外での動作](/mono/synstate/ja/guides/library-comparison/library-comparison/#react-の外での動作)を参照してください。
-
-## React Compiler と完全互換
-
-SynState のすべてのリアクティブ計算（`derive`、`map`、`filter` など）は React のレンダリングサイクルの**外側**で完了します。コンポーネントは `useSyncExternalStore`（React のファーストクラス API）を通じて値を読み取るだけであり、レンダリング中に暗黙的な副作用を持ちません — Proxy ベースの追跡も、プロパティアクセスによる隠れたサブスクリプションもありません。そのため、React Compiler はこれらのコンポーネントを安全に解析・メモ化でき、[React Compiler](https://react.dev/learn/react-compiler) の自動メモ化と完全に整合します。
-
-MobX の `observer()` HOC はレンダリング中に observable へのアクセスを追跡するため、React Compiler のメモ化と衝突し、`"use no memo"` ディレクティブによる opt-out が必要です。SynState ではこのような回避策は不要です。
-
-## ユースケース
-
-**SynState が適しているケース：**
-
-- ✅ コンポーネント間で共有するグローバル状態（ダークモード切替、ユーザーセッションなど）。
-- ✅ `debounce`、`throttle`、`switchMap` などのオペレーターを使った複雑な非同期状態管理。
-- ✅ Redux ライクな reducer による状態管理（`createReducer`）。
-- ✅ 状態管理の規模が未定のプロジェクト。SynState の統一された API は、単一の共有カウンターから完全なデバウンス検索パイプラインまですべてをカバーするため、要件が増えてもライブラリを切り替える必要がありません。
-- ✅ 型安全なイベントエミッター（`createEventEmitter`）。
-
-**他のソリューションを検討すべきケース：**
-
-- コンポーネントインスタンスごとに独立した状態が必要な場合 — 例えば、フォームの各入力フィールドの値、アコーディオンの開閉状態、モーダルの表示/非表示など、同じコンポーネントが画面上に複数インスタンス存在し、それぞれが独立した状態を持つケースです。これらはグローバルステートで管理するとインスタンスの生成・破棄に合わせた配列管理が必要になりコードが複雑化するため、React hooks の `useState` / `useReducer` でコンポーネントローカルに管理するのが自然です。
-
-## 次のステップ
-
-- [宣言的な状態管理](/mono/synstate/ja/guides/declarative-state-management/) — 具体的な例でリアクティブプログラミングモデルを理解する。
-- [React 連携](/mono/synstate/ja/guides/react-integration/) — SynState を React で使う。
-- [ライブラリ比較](/mono/synstate/ja/guides/library-comparison/library-comparison/) — SynState と RxJS、Jotai、MobX 等の比較。
-- [非同期処理の比較](/mono/synstate/ja/guides/library-comparison/async-comparison/) — 本番品質の検索ボックスを7つのライブラリで書き比べる。
-- [パフォーマンスベンチマーク](/mono/synstate/ja/guides/library-comparison/benchmark/) — スループットの定量比較。
-- [インタラクティブデモ](/mono/synstate/ja/guides/library-comparison/interactive-demo/) — 違いを体感する。
+- [状態と書き込み](/mono/synstate/ja/guides/state-and-writes/): `createState` と書き込みの規則。
+- [値を派生させる](/mono/synstate/ja/guides/deriving-values/): `pipe`・`derive`・`merge`・`zip`。

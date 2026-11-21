@@ -17,37 +17,38 @@ import {
 export const createSearchView = (): SearchView => {
   const [query, setQuery] = createState('a');
 
-  // A newer query completes the previous inner observable, which cancels its
+  // A newer query disposes the previous inner observable, which cancels its
   // request.
   const searchState = query.pipe(
     switchMap((q) =>
       timer(answerMs)
         .pipe(map((): SearchState => ({ status: 'success', query: q })))
-        // emitted in the same update as the query
+        // held in the same update as the query
         .pipe(withInitialValue<SearchState>({ status: 'loading', query: q })),
     ),
   );
 
   // What the page shows: the query in the box, and what the list is for.
-  const view = derive([query, searchState], showView);
+  const view = derive([query, searchState], (q, state) => showView(q, state));
 
-  // transformer-ignore-next-line convert-to-readonly, append-as-const
-  const viewLog: string[] = [];
+  const mut_viewLog: string[] = [];
 
   view.subscribe((v) => {
-    viewLog.push(v);
+    mut_viewLog.push(v);
   });
 
-  return { setQuery, viewLog };
+  return { setQuery, viewLog: mut_viewLog };
 };
 // embed-sample-code-ignore-below
 
 if (import.meta.vitest !== undefined) {
-  test('an async step written as switchMap (SynState): one consistent run per query', async () => {
+  test('an async step written as switchMap (synstate): one consistent run per query', async () => {
     vi.useFakeTimers();
 
     try {
       const { setQuery, viewLog } = createSearchView();
+
+      assert.deepStrictEqual(viewLog, ['a / loading for a']);
 
       await vi.runAllTimersAsync();
 

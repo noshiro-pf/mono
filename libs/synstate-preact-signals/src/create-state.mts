@@ -46,11 +46,11 @@ export const createState = <S,>(
   options?: StateOptions<NoInfer<S>>,
 ): readonly [
   signal: ReadonlySignal<S>,
-  setState: (v: S) => S,
+  setState: (v: S) => void,
   utils: Readonly<{
     state: InitializedObservable<S>;
-    updateState: (updateFn: (prev: S) => S) => S;
-    resetState: () => S;
+    updateState: (updateFn: (prev: S) => S) => void;
+    resetState: () => void;
     getSnapshot: () => S;
     initialState: S;
   }>,

@@ -1,13 +1,12 @@
-import { eslintConfigOffForSumiCheck } from '@sumi-lang/cli';
 import {
   defineKnownRules,
   eslintConfigForNodeJs,
-  eslintConfigForReact,
   eslintConfigForTypeScript,
   eslintConfigForVitest,
   eslintImportsRules,
   mergeRestrictedImportsOptions,
   restrictedImportsOptions,
+  restrictedSyntax,
   typescriptEslintRules,
   type FlatConfig,
 } from 'eslint-config-typed';
@@ -15,6 +14,7 @@ import { eslintPluginTsDataForge } from 'eslint-plugin-ts-data-forge';
 import { eslintPluginTsFortress } from 'eslint-plugin-ts-fortress';
 import { eslintPluginTsTypeForge } from 'eslint-plugin-ts-type-forge';
 import { eslintConfigOffForOxlint } from '../../tools/configs/oxlint-rules.mjs';
+import { getSnapshotBan } from './configs/eslint/rules/get-snapshot-ban.mjs';
 
 export default [
   ...eslintConfigForTypeScript({
@@ -30,14 +30,83 @@ export default [
   eslintConfigForVitest(),
 
   {
+    files: ['test/**'],
     rules: defineKnownRules({
-      '@typescript-eslint/no-shadow': [
+      // A test reads a node's state that the public types leave out.
+      'import-x/no-internal-modules': [
         'error',
         {
-          ...typescriptEslintRules['@typescript-eslint/no-shadow'][1],
-          allow: ['Observable'],
+          allow: [
+            ...eslintImportsRules['import-x/no-internal-modules'][1].allow,
+            'synstate/internal',
+            // test/eslint-config.test.mts reads the ban it tests.
+            '**/configs/eslint/rules/get-snapshot-ban.mjs',
+          ],
         },
       ],
+    }),
+  },
+
+  {
+    files: ['src/**'],
+    rules: defineKnownRules({
+      // See configs/eslint/rules/get-snapshot-ban.mts.
+      'no-restricted-syntax': ['error', ...restrictedSyntax, getSnapshotBan],
+      // The observables are classes: a node per derived value has to be
+      // cheap, so the methods live on a prototype and each operator is a
+      // subclass that overrides `recompute`. See DESIGN.md.
+      'functional/no-class-inheritance': 'off',
+      // The graph's nodes are mutable by nature: a parent records its
+      // children, a child is queued and recomputed in place.
+      '@typescript-eslint/prefer-readonly-parameter-types': [
+        'error',
+        {
+          ...typescriptEslintRules[
+            '@typescript-eslint/prefer-readonly-parameter-types'
+          ][1],
+          allow: [
+            ...typescriptEslintRules[
+              '@typescript-eslint/prefer-readonly-parameter-types'
+            ][1].allow,
+            {
+              from: 'file',
+              name: [
+                'DerivedClass',
+                'DerivedNode',
+                'EffectClass',
+                'EffectNode',
+                'FirstEmission',
+                'ObservableClass',
+                'OwnedNode',
+                'Owner',
+                'QueuedNode',
+              ],
+            },
+            // What `fromAbortablePromise` hands its factory: the factory
+            // listens on it, which a readonly type would not let it do.
+            { from: 'lib', name: ['AbortSignal'] },
+          ],
+        },
+      ],
+    }),
+  },
+
+  // The other libraries' code that the documentation's benchmark and async
+  // comparison set beside synstate's, each written the way its own
+  // documentation writes it (the operators-on-signals pages show Preact
+  // Signals the same way): their stores are mutated in place, and some are
+  // imported from the entry point each library documents for use outside a
+  // framework. synstate's own samples there keep every rule.
+  {
+    files: [
+      'samples/docs-site/benchmark/**',
+      'samples/docs-site/async-comparison/**',
+      'samples/docs-site/operators-on-signals/**',
+    ],
+    ignores: ['**/*.synstate.mts'],
+    rules: defineKnownRules({
+      'functional/immutable-data': 'off',
+      'functional/no-let': 'off',
       'import-x/no-internal-modules': [
         'error',
         {
@@ -46,75 +115,10 @@ export default [
             'zustand/vanilla',
             'jotai/vanilla',
             'jotai/vanilla/utils',
+            'jotai/utils',
             'valtio/vanilla',
             'rxjs/fetch',
           ],
-        },
-      ],
-    }),
-  },
-  {
-    files: ['test/**/*.mts', '**/*.test.mts'],
-    rules: defineKnownRules({
-      '@typescript-eslint/no-empty-object-type': 'off',
-      '@typescript-eslint/no-duplicate-type-constituents': 'off',
-      '@typescript-eslint/no-explicit-any': 'off',
-      '@typescript-eslint/consistent-indexed-object-style': 'off',
-      '@typescript-eslint/no-restricted-types': 'off',
-      '@typescript-eslint/no-redundant-type-constituents': 'off',
-      // Tests often assert conditionally and may omit explicit expectations in helper-driven flows
-      'vitest/no-conditional-expect': 'off',
-      'vitest/expect-expect': 'off',
-      'unicorn/consistent-function-scoping': 'off',
-    }),
-  },
-
-  eslintConfigForNodeJs(['scripts/**', 'configs/**']),
-  {
-    files: ['scripts/**', 'configs/**'],
-    rules: defineKnownRules({
-      '@typescript-eslint/explicit-function-return-type': 'off',
-      'no-await-in-loop': 'off',
-      'import-x/no-unassigned-import': 'off',
-      'import-x/no-internal-modules': 'off',
-      'import-x/no-default-export': 'off',
-    }),
-  },
-
-  {
-    files: ['src/**'],
-    rules: defineKnownRules({
-      'functional/no-class-inheritance': 'off',
-    }),
-  },
-
-  {
-    files: ['src/entry-point.mts'],
-    rules: defineKnownRules({
-      'no-restricted-imports': 'off',
-      'import-x/export': 'off',
-    }),
-  },
-
-  ...eslintConfigForReact(['samples/**']),
-  {
-    files: ['samples/**'],
-    rules: defineKnownRules({
-      'react-refresh/only-export-components': 'off',
-      'react/button-has-type': 'off',
-      'react/jsx-no-bind': 'off',
-      'react-perf/jsx-no-new-function-as-prop': 'off',
-      'react/no-array-index-key': 'off',
-      // The samples show how synstate is used, in the plain React the reader
-      // knows; memoizing every one of them would bury that under this
-      // repository's component style.
-      'react-coding-style/require-react-memo': 'off',
-      'functional/immutable-data': 'off',
-      'functional/no-let': 'off',
-      'import-x/no-extraneous-dependencies': [
-        'error',
-        {
-          whitelist: ['synstate-react-hooks', 'synstate-react-hooks-compat'],
         },
       ],
     }),
@@ -160,14 +164,16 @@ export default [
     }),
   },
 
-  // src/ is what `pnpm run check:sumi` checks (tsconfig.sumi.json), so the
-  // ESLint rules Sumi covers are turned off there and a diagnostic is
-  // answered by its `@sumi-expect-error` marker alone (D-46). It leaves
-  // `no-restricted-imports` on, so the import allow-list below holds wherever
-  // it stands (test/eslint-config.test.mts checks that it is in effect).
+  eslintConfigForNodeJs(['scripts/**', 'configs/**']),
   {
-    ...eslintConfigOffForSumiCheck,
-    files: ['src/**'],
+    files: ['scripts/**', 'configs/**'],
+    rules: defineKnownRules({
+      '@typescript-eslint/explicit-function-return-type': 'off',
+      'no-await-in-loop': 'off',
+      'import-x/no-unassigned-import': 'off',
+      'import-x/no-internal-modules': 'off',
+      'import-x/no-default-export': 'off',
+    }),
   },
 
   // What src/ imports from ts-data-forge and ts-std-forge at run time is in
@@ -175,16 +181,12 @@ export default [
   // `Num` or `SafeUint` whole once a module uses any member of it, when the
   // object comes from the package root. So src/ imports `Arr` as
   // `import * as Arr from 'ts-data-forge/array'`, which esbuild tree-shakes,
-  // and from the root only the names below. Each of them brings only itself
-  // and the few functions it is built on, mostly `Optional`, which the API
-  // is built on anyway (this relies on ts-data-forge's branded-number `is*` /
-  // `as*` being standalone, #3092). Add a standalone function to the list,
-  // never an object. Tests are bundled by nobody; the entry point is not
-  // exempt, since a re-export from it would reach every bundle. The paths are
-  // merged with eslint-config-typed's index-file pattern, which a block that
-  // sets the rule would otherwise drop. The ts-data-forge rules' fixes still
-  // import from the package root (#3093), so a fix that adds `Arr` or an
-  // object is reported here; move that import to the subpath by hand.
+  // and from the roots only the names below. Add a standalone function to a
+  // list, never an object. `Optional` and `Result` are the exception: objects,
+  // but what src/ is built on, so every bundle that uses it has them anyway.
+  // Tests are bundled by nobody. The ts-data-forge rules' fixes still import
+  // from the package root, so a fix that adds `Arr` or an object is reported
+  // here; move that import to the subpath by hand.
   {
     files: ['src/**'],
     ignores: ['src/**/*.test.mts'],
@@ -195,36 +197,17 @@ export default [
           paths: [
             {
               name: 'ts-data-forge',
-              allowImportNames: [
-                'Optional',
-                'Result',
-                'asSafeUint',
-                'createQueue',
-                'expectType',
-                'hasKey',
-                'isNotUndefined',
-                'isPositiveSafeInt',
-                'isRecord',
-                'isString',
-                'pipe',
-                'replaceEqualDeep',
-              ],
+              allowImportNames: ['replaceEqualDeep'],
               allowTypeImports: true,
               message:
                 "synstate src/ imports only standalone functions from the ts-data-forge root, and `Arr` from 'ts-data-forge/array'; see the comment in eslint.config.mts.",
             },
             {
               name: 'ts-std-forge',
-              allowImportNames: [
-                'Optional',
-                'Result',
-                'panic',
-                'pipe',
-                'unreachable',
-              ],
+              allowImportNames: ['Optional', 'Result'],
               allowTypeImports: true,
               message:
-                'synstate src/ imports only standalone functions from ts-std-forge, which tree-shake; see the comment in eslint.config.mts.',
+                'synstate src/ imports only `Optional`, `Result` and standalone functions from ts-std-forge; see the comment in eslint.config.mts.',
             },
           ],
         }),

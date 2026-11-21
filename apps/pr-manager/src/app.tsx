@@ -1,4 +1,4 @@
-import { createState, map, onScopeDispose } from 'synstate';
+import { createState, map, onCleanup } from 'synstate';
 import {
   constant,
   deriveBindable,
@@ -212,7 +212,7 @@ const observeHeight =
 
     observer.observe(header);
 
-    onScopeDispose(() => {
+    onCleanup(() => {
       observer.disconnect();
     });
   };

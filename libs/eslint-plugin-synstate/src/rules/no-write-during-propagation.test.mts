@@ -71,11 +71,20 @@ ruleTester.run('no-write-during-propagation', noWriteDuringPropagation, {
       `,
     },
     {
-      name: '`next` on something that is not a synstate source',
+      name: '`getSnapshot` of a state, which only reads',
+      code: dedent`
+        import { createState, state } from 'synstate';
+        const [a$] = createState(0);
+        const b$ = state(0);
+        a$.subscribe(() => { b$.getSnapshot(); });
+      `,
+    },
+    {
+      name: '`emit` on something that is not a synstate source',
       code: dedent`
         import { createState } from 'synstate';
         const [a$] = createState(0);
-        a$.subscribe(() => { iterator.next(); });
+        a$.subscribe(() => { emitter.emit(); });
       `,
     },
     {
@@ -181,7 +190,7 @@ ruleTester.run('no-write-during-propagation', noWriteDuringPropagation, {
           setA(a + 1);
           dispatch(a);
           toggle();
-          b$.next(a);
+          b$.emit(a);
         });
       `,
       errors: [
@@ -302,12 +311,28 @@ ruleTester.run('no-write-during-propagation', noWriteDuringPropagation, {
       errors: [{ messageId: 'writeDuringPropagation' }],
     },
     {
-      name: '`next` of a source',
+      name: '`set` and `update` of a state',
+      code: dedent`
+        import { createState, state } from 'synstate';
+        const [a$] = createState(0);
+        const b$ = state(0);
+        a$.subscribe((a) => {
+          b$.set(a);
+          b$.update((b) => b + a);
+        });
+      `,
+      errors: [
+        { messageId: 'writeDuringPropagation', line: 5 },
+        { messageId: 'writeDuringPropagation', line: 6 },
+      ],
+    },
+    {
+      name: '`emit` of a source',
       code: dedent`
         import { createState, source } from 'synstate';
         const [a$, setA] = createState(0);
         const b$ = source<number>();
-        a$.subscribe((a) => { b$.next(a); });
+        a$.subscribe((a) => { b$.emit(a); });
       `,
       errors: [{ messageId: 'writeDuringPropagation' }],
     },
@@ -490,7 +515,7 @@ describe('no-write-during-propagation through type wrappers', () => {
           import { createState, source } from 'synstate';
           const [a$, setA] = createState(0);
           const b$ = source<number>();
-          a$.subscribe((a) => { (b$ as typeof b$).next(a); });
+          a$.subscribe((a) => { (b$ as typeof b$).emit(a); });
         `,
         errors: [{ messageId: 'writeDuringPropagation' }],
       },

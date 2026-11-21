@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { source, type SourceObservable } from 'synstate';
+import { source, type Source } from 'synstate';
 
 /**
  * A `synstate` source that lives as long as the component that made it.
@@ -9,5 +9,5 @@ import { source, type SourceObservable } from 'synstate';
  * `synstate-react-hooks`. Creating the source is the only one of the three with
  * no counterpart there.
  */
-export const useObservable = <T,>(): SourceObservable<T> =>
-  React.useMemo<SourceObservable<T>>(source, []);
+export const useObservable = <T,>(): Source<T> =>
+  React.useMemo<Source<T>>(source, []);

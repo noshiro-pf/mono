@@ -166,11 +166,11 @@ export const createIssuesViewStore = (
     });
 
     return () => {
-      saving.unsubscribe();
+      saving();
 
-      zoomSaving.unsubscribe();
+      zoomSaving();
 
-      reading.unsubscribe();
+      reading();
     };
   };
 

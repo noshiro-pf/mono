@@ -7,28 +7,13 @@ import {
   react,
   solid,
   synstateDom,
-  synstateDomNext,
   vanjs,
 } from './frameworks/index.mjs';
 import {
   loanScenario,
   measureScenario,
   scheduleScenario,
-  solidLoan,
-  solidSchedule,
-  solidZoom,
-  synstateDomDeriveLoan,
-  synstateDomDeriveSchedule,
-  synstateDomDeriveZoom,
-  synstateDomLoan,
-  synstateDomNextLoan,
-  synstateDomNextSchedule,
-  synstateDomNextZoom,
-  synstateDomSchedule,
-  synstateDomZoom,
   zoomScenario,
-  type Scenario,
-  type ScenarioAppBase,
   type ScenarioResult,
 } from './scenarios/index.mjs';
 import { mapInSequence, median, rotated, settle, warmups } from './timing.mjs';
@@ -136,53 +121,22 @@ const cases: readonly Case[] = [
   },
 ] as const;
 
-/**
- * `next` (`pnpm run benchmark:next`) compares synstate-dom with
- * synstate-dom-next, the rebuild that is to replace it, and Solid; otherwise
- * every library but synstate-dom-next is measured. The config names the file
- * the results go to, its title and the script, from
- * `scripts/benchmark-sets.mts`.
- */
-const isNextSet = process.env['BENCHMARK_SET'] === 'next';
-
 const output = {
-  results: process.env['BENCHMARK_RESULTS'] ?? 'RESULTS.md',
-  title: process.env['BENCHMARK_TITLE'] ?? '# Results',
-  script: process.env['BENCHMARK_SCRIPT'] ?? 'benchmark',
+  results: 'RESULTS.md',
+  title: '# Results',
+  script: 'benchmark',
 } as const;
 
-const frameworks: readonly Framework[] = isNextSet
-  ? ([synstateDom, synstateDomNext, solid] as const)
-  : ([synstateDom, solid, preactSignals, preact, react, vanjs] as const);
+const frameworks: readonly Framework[] = [
+  synstateDom,
+  solid,
+  preactSignals,
+  preact,
+  react,
+  vanjs,
+] as const;
 
-/** `scenario` measured with `frameworks` only. */
-const withFrameworks = <App extends ScenarioAppBase>(
-  scenario: Scenario<App>,
-  scenarioFrameworks: Scenario<App>['frameworks'],
-): Scenario<App> => ({ ...scenario, frameworks: scenarioFrameworks }) as const;
-
-const scenarios = isNextSet
-  ? ([
-      withFrameworks(loanScenario, [
-        synstateDomLoan,
-        synstateDomDeriveLoan,
-        synstateDomNextLoan,
-        solidLoan,
-      ]),
-      withFrameworks(scheduleScenario, [
-        synstateDomSchedule,
-        synstateDomDeriveSchedule,
-        synstateDomNextSchedule,
-        solidSchedule,
-      ]),
-      withFrameworks(zoomScenario, [
-        synstateDomZoom,
-        synstateDomDeriveZoom,
-        synstateDomNextZoom,
-        solidZoom,
-      ]),
-    ] as const)
-  : ([loanScenario, scheduleScenario, zoomScenario] as const);
+const scenarios = [loanScenario, scheduleScenario, zoomScenario] as const;
 
 type Result = Readonly<{ caseName: string; framework: string; ms: number }>;
 

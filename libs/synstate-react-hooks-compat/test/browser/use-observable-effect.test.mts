@@ -16,15 +16,15 @@ describe(useObservableEffect, () => {
     });
 
     act(() => {
-      count$.next(1);
+      count$.emit(1);
 
-      count$.next(2);
+      count$.emit(2);
     });
 
     unmount();
 
     act(() => {
-      count$.next(3);
+      count$.emit(3);
     });
 
     assert.deepStrictEqual(mut_seen, [1, 2]);
@@ -46,7 +46,7 @@ describe(useObservableEffect, () => {
     rerender();
 
     act(() => {
-      count$.next(1);
+      count$.emit(1);
     });
 
     assert.deepStrictEqual(mut_seen, [1]);
@@ -67,13 +67,13 @@ describe(useObservableEffect, () => {
     );
 
     act(() => {
-      count$.next(1);
+      count$.emit(1);
     });
 
     rerender({ label: 'b' });
 
     act(() => {
-      count$.next(2);
+      count$.emit(2);
     });
 
     assert.deepStrictEqual(mut_seen, ['a:1', 'b:2']);
@@ -98,9 +98,9 @@ describe(useObservableEffect, () => {
     rerender({ count$: second$ });
 
     act(() => {
-      first$.next(1);
+      first$.emit(1);
 
-      second$.next(2);
+      second$.emit(2);
     });
 
     assert.deepStrictEqual(mut_seen, [2]);
@@ -115,7 +115,7 @@ describe(useObservableEffect, () => {
       ({ label }: Readonly<{ label: string }>) => {
         // Declared first, so it runs before any layout effect of the hook
         React.useLayoutEffect(() => {
-          count$.next(label.length);
+          count$.emit(label.length);
         }, [label]);
 
         useObservableEffect(count$, (value) => {

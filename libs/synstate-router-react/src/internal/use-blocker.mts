@@ -16,7 +16,7 @@ export const createUseBlocker = <R extends AnyRoutes>(
   shouldBlock: (attempt: NavigationAttempt<R>) => boolean,
 ) => BlockerState<R>) => {
   // What a component reads before its blocker is registered, and after; made
-  // outside every scope, as the router's own observables are.
+  // outside every owner, as the router's own observables are.
   const [idle$] = untracked(() =>
     createState<BlockerState<R>>({ status: 'idle' }),
   );

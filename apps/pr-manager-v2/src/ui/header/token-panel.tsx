@@ -1,4 +1,4 @@
-import { combine, map, type InitializedObservable } from 'synstate';
+import { derive, map, type InitializedObservable } from 'synstate';
 import { constant, If, MatchOptional, type JSX } from 'synstate-dom';
 import { Optional } from 'ts-data-forge';
 import { describeInterval, type RateLimit } from '../../domain/index.mjs';
@@ -24,19 +24,18 @@ type Props = Readonly<{
 export const TokenPanel = ({ token, budget, refused }: Props): JSX.Element => (
   <details
     class={constant('token-panel')}
-    open={combine([token.token, refused]).pipe(
-      map(([held, no]) => held === undefined || no),
+    open={derive(
+      [token.token, refused],
+      (held, no) => held === undefined || no,
     )}
   >
     <summary>
-      {combine([token.token, refused]).pipe(
-        map(([held, no]) =>
-          held === undefined
-            ? 'A token is needed'
-            : no
-              ? 'GitHub refused this token'
-              : 'Reading with a token',
-        ),
+      {derive([token.token, refused], (held, no) =>
+        held === undefined
+          ? 'A token is needed'
+          : no
+            ? 'GitHub refused this token'
+            : 'Reading with a token',
       )}
     </summary>
 
@@ -52,9 +51,7 @@ export const TokenPanel = ({ token, budget, refused }: Props): JSX.Element => (
     />
 
     <p class={constant('token-state')}>
-      {combine([token.token, budget]).pipe(
-        map(([held, b]) => stateWords(held, b)),
-      )}
+      {derive([token.token, budget], (held, b) => stateWords(held, b))}
     </p>
 
     <form

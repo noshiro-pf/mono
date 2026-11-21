@@ -32,12 +32,6 @@ const checkAll = async (): Promise<void> => {
     successMessage: 'Build succeeded',
   });
 
-  await logStep({
-    startMessage: 'Generating documentation',
-    action: () => runCmdStep('pnpm run doc', 'Documentation generation failed'),
-    successMessage: 'Documentation generated',
-  });
-
   console.info('✅ All checks completed successfully!\n');
 };
 

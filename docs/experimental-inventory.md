@@ -981,7 +981,7 @@ MUI 待ちにしていた 4 つを数え直したときの表（#1777）で
 ### synstate に `interval` は無い — `counter` がそれ
 
 `syncflow` の `interval(50)` は `synstate` では `counter(50)`
-（`libs/synstate/src/core/create/counter.mts`）。
+（`libs/synstate/src/sources/timer.mts`）。
 一定間隔で増える整数を流すので、`interval(50).chain(take(11))` は
 `counter(50).pipe(take(11))` にそのまま置き換わる。
 

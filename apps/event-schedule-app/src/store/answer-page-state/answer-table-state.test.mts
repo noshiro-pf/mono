@@ -32,14 +32,20 @@ describe(createAnswerTableStore, () => {
     );
   });
 
-  test('each toggle flips and reports its new value', () => {
+  test('each toggle flips its value', () => {
     const { store } = setup();
 
-    assert.isTrue(store.toggleTableIsMinimized());
+    store.toggleTableIsMinimized();
 
-    assert.isFalse(store.toggleTableIsMinimized());
+    assert.isTrue(Optional.unwrap(store.tableIsMinimized$.getSnapshot()));
 
-    assert.isTrue(store.toggleDetailedFilter());
+    store.toggleTableIsMinimized();
+
+    assert.isFalse(Optional.unwrap(store.tableIsMinimized$.getSnapshot()));
+
+    store.toggleDetailedFilter();
+
+    assert.isTrue(Optional.unwrap(store.detailedFilterIsOpen$.getSnapshot()));
   });
 
   test('the table starts at the width storage kept and saves each change', () => {

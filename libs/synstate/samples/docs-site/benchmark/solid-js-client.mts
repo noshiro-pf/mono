@@ -8,9 +8,9 @@
  * client build, the one a bundler picks for the browser, by its path. A browser
  * application imports the same functions from `solid-js`.
  *
- * `apps/synstate-docs/src/components/throughput-demo/adapters/solid-js-client.mts` is the same
- * module for the other half of the benchmark, and the two must import the same
- * build. `../async-comparison/solid-js-client.mts` re-exports this one.
+ * The deep chain's Solid adapter (`throughput-adapters/solid-adapter.mts`)
+ * imports it too, and `../async-comparison/solid-js-client.mts` re-exports it,
+ * so that every Solid sample runs the same build.
  */
 // eslint-disable-next-line import-x/no-internal-modules, no-restricted-imports -- the client build has no export condition Node picks; see above.
 export * from 'solid-js/dist/solid.js';

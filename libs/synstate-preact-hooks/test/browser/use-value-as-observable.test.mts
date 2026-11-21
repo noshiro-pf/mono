@@ -36,20 +36,20 @@ describe(useValueAsObservable, () => {
     assert.deepStrictEqual(mut_seen, [1, 2, 3]);
   });
 
-  test('completes the observable when the component unmounts', () => {
+  test('disposes the observable when the component unmounts', () => {
     const { result, unmount } = renderHook(() => useValueAsObservable(0));
 
     const observable$ = result.current;
 
-    assert.isFalse(observable$.isCompleted);
+    assert.isFalse(observable$.settled);
 
     // Not in `act`: see `use-observable-effect.test.mts` (#3917).
     unmount();
 
-    assert.isTrue(observable$.isCompleted);
+    assert.isTrue(observable$.settled);
   });
 
-  test('is completed right after a bare unmount (#3917)', () => {
+  test('is disposed right after a bare unmount (#3917)', () => {
     const mut_captured: { observable: Observable<number> | undefined } = {
       observable: undefined,
     };
@@ -64,11 +64,11 @@ describe(useValueAsObservable, () => {
 
     preactRender(h(Owner, {}), container);
 
-    assert.isFalse(mut_captured.observable?.isCompleted ?? true);
+    assert.isFalse(mut_captured.observable?.settled ?? true);
 
     preactRender(null, container);
 
-    assert.isTrue(mut_captured.observable?.isCompleted ?? false);
+    assert.isTrue(mut_captured.observable?.settled ?? false);
   });
 
   test('emits the initial value once', () => {
@@ -80,7 +80,7 @@ describe(useValueAsObservable, () => {
       value$,
     }: Readonly<{ value$: Observable<number> }>): null => {
       Preact.useEffect(() => {
-        const { unsubscribe } = value$.subscribe((v) => {
+        const unsubscribe = value$.subscribe((v) => {
           mut_seen.push(v);
         });
 

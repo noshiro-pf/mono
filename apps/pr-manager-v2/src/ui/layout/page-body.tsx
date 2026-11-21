@@ -1,5 +1,12 @@
 import { map } from 'synstate';
-import { constant, For, If, mountable, type JSX } from 'synstate-dom';
+import {
+  constant,
+  For,
+  If,
+  mountable,
+  mountChild,
+  type JSX,
+} from 'synstate-dom';
 import { Obj } from 'ts-data-forge';
 import { columnWidths } from '../../domain/index.mjs';
 import type { LayoutStore } from '../../store/index.mjs';
@@ -25,7 +32,7 @@ type Props = Readonly<{
  * what its body holds (its subscriptions, a typed filter) survives the move.
  */
 export const PageBody = ({ layout, views }: Props): JSX.Element => {
-  // Mounted here, in the page's scope, rather than by the group that shows the
+  // Mounted here, in the page's owner, rather than by the group that shows the
   // block: a row of a list is unmounted when its key goes, and a block whose
   // group changes would otherwise be made again.
   const blocks = Obj.map(views, (view, id) => {
@@ -33,14 +40,14 @@ export const PageBody = ({ layout, views }: Props): JSX.Element => {
       map((drawn) => drawn.flat().find((g) => g.tabs.includes(id))),
     );
 
-    const nodes = (
+    const nodes = mountChild(
       <LayoutBlock
         id={id}
         shown={group.pipe(map((g) => g?.shown === id))}
         tabbed={group.pipe(map((g) => (g?.tabs.length ?? 0) > 1))}
         view={view}
-      />
-    ).mount();
+      />,
+    );
 
     return mountable(() => nodes);
   });

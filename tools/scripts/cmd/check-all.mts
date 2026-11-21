@@ -32,8 +32,7 @@ import { ignoredBy, readGateList } from './workflow-steps.mjs';
  *   may load an extension) and a Java 21 are in place.
  * - The other check workflows: `strict-lib-gen.yml` (its generators rewrite
  *   thousands of files), `node-version-compatibility.yml` (other Node
- *   versions), `verify-published-packages.yml` (what the registry serves) and
- *   `synstate-benchmark.yml`.
+ *   versions) and `verify-published-packages.yml` (what the registry serves).
  * - A build an earlier entry already ran (`ws:build` covers `ws:build:deps`)
  *   is not run again while the tree stays as it left it, and one that failed
  *   is not run again either, nor one that covers it (`ws:build` after a failed

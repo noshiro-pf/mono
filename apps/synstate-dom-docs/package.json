@@ -43,6 +43,7 @@
     "synstate-dom": "workspace:*",
     "ts-data-forge": "workspace:*",
     "ts-repo-utils": "workspace:*",
+    "ts-std-forge": "workspace:*",
     "ts-type-forge": "workspace:*"
   }
 }

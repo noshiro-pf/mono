@@ -294,7 +294,7 @@ const fromFeed = <A,>(
   subscribe: (next: (value: A) => void) => () => void,
 ): Observable<A> =>
   fromSubscribable<A, never>({
-    subscribe: (next) => {
+    subscribe: ({ next }) => {
       next(first);
 
       return { unsubscribe: subscribe(next) };

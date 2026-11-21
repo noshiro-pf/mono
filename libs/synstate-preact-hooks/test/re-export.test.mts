@@ -5,7 +5,7 @@ import {
   withInitialValue,
   type InitializedObservable,
   type Observable,
-  type Subscription,
+  type Unsubscribe,
 } from '../src/index.mjs';
 
 describe('re-exports of synstate', () => {
@@ -14,16 +14,16 @@ describe('re-exports of synstate', () => {
 
     const doubled = derive([count], (n) => n * 2);
 
-    const subscription = doubled.subscribe(() => {});
+    const unsubscribe = doubled.subscribe(() => {});
 
     expectType<typeof doubled, InitializedObservable<number>>('<=');
 
     expectType<typeof doubled, Observable<number>>('<=');
 
-    expectType<typeof subscription, Subscription>('=');
+    expectType<typeof unsubscribe, Unsubscribe>('=');
 
     assert.strictEqual(Optional.unwrap(doubled.getSnapshot()), 2);
 
-    subscription.unsubscribe();
+    unsubscribe();
   });
 });

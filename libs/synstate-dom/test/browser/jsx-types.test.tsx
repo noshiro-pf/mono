@@ -1,179 +1,197 @@
-import { createState, map } from 'synstate';
-import { constant, type JSX } from 'synstate-dom';
-import { expectType, Optional } from 'ts-data-forge';
+import { createOwner, source, state } from 'synstate';
+import {
+  constant,
+  createAfterUpdate,
+  listenInScope,
+  render,
+  type JSX,
+} from 'synstate-dom';
+import { expectType } from 'ts-data-forge';
 
 describe('JSX types', () => {
-  test('text children must be Bindable', () => {
-    const [count$] = createState(0);
+  test('data slots take a Bindable, not a plain value', () => {
+    const name = state('a');
 
-    // @ts-expect-error JSX text is a plain string: write `{constant('big')}`
-    const text = <p>big</p>;
-
-    // @ts-expect-error a plain string is written once and never updated
-    const plain = <p>{'big'}</p>;
-
-    // @ts-expect-error the snapshot is read once
-    const snapshot = <p>{Optional.unwrap(count$.getSnapshot())}</p>;
-
-    const ok = (
-      <p>
-        {constant('big')}
-        {count$}
-      </p>
+    const App = (): JSX.Element => (
+      <div>
+        {/* @ts-expect-error a plain string is not a Bindable */}
+        <p title="plain" />
+        <p title={constant('ok')} />
+        <p title={name} />
+        {/* @ts-expect-error text must be a Bindable */}
+        <p>plain text</p>
+        {/* @ts-expect-error a number is not a string attribute */}
+        <p title={constant(1)} />
+        {/* @ts-expect-error a handler is a function, not an observable */}
+        <button onClick={name} />
+        <input
+          onInput={(event) => {
+            // `currentTarget` is the element.
+            expectType<typeof event.currentTarget, HTMLInputElement>('<=');
+          }}
+        />
+      </div>
     );
 
-    expectType<typeof ok, JSX.Element>('=');
+    const container = document.createElement('div');
 
-    assert.isDefined([text, plain, snapshot, ok]);
+    onTestFinished(render(App, container));
+
+    assert.strictEqual(container.querySelectorAll('p').length, 5);
   });
 
-  test('ref receives the element type of its tag', () => {
-    const input = (
-      <input
-        ref={(element) => {
-          expectType<typeof element, HTMLInputElement>('=');
-        }}
-      />
+  test('a handler and a ref take no method of an observable', () => {
+    const clicks = source<MouseEvent>();
+
+    const pressed = state<HTMLButtonElement | undefined>(undefined);
+
+    const mut_buttons: HTMLButtonElement[] = [];
+
+    // Typed only: mounted, the ref would throw at once.
+    const _passedOnTheirOwn = (): JSX.Element => (
+      <div>
+        {/* @ts-expect-error emit needs the source as its this */}
+        <button onClick={clicks.emit} />
+        {/* @ts-expect-error set needs the state as its this */}
+        <button ref={pressed.set} />
+      </div>
     );
 
-    assert.isDefined(input);
-  });
+    expectType<typeof _passedOnTheirOwn, () => JSX.Element>('=');
 
-  test('unknown tags are rejected', () => {
-    // @ts-expect-error not an HTML element
-    const unknown = <foo />;
-
-    assert.isDefined(unknown);
-  });
-});
-
-describe('element props types', () => {
-  test('attributes take a Bindable of the property type', () => {
-    const [count$] = createState(0);
-
-    // @ts-expect-error a plain value would be written once and never updated
-    const plain = <div id="x" />;
-
-    // @ts-expect-error `disabled` is a boolean
-    const wrongType = <button disabled={constant('yes')} />;
-
-    // @ts-expect-error not a property of a `div`
-    const unknownProp = <div href={constant('/')} />;
-
-    // @ts-expect-error `innerHTML` is not bound
-    const inner = <div innerHTML={constant('<b></b>')} />;
-
-    const ok = (
-      <input
-        value={count$.pipe(map((n) => n.toString()))}
-        disabled={constant(false)}
-        tabIndex={count$}
-      />
+    const App = (): JSX.Element => (
+      <div>
+        <button
+          onClick={(event) => {
+            clicks.emit(event);
+          }}
+          ref={(button) => {
+            mut_buttons.push(button);
+          }}
+        />
+      </div>
     );
 
-    assert.isDefined([plain, wrongType, unknownProp, inner, ok]);
-  });
+    onTestFinished(render(App, document.createElement('div')));
 
-  test('writable properties with no attribute are not props (#2934)', () => {
-    const [n$] = createState(0);
+    const mut_seen: MouseEvent[] = [];
 
-    // @ts-expect-error `selectedIndex` has no attribute; bind `value`
-    const select = <select selectedIndex={n$} />;
-
-    // @ts-expect-error `valueAsNumber` has no attribute
-    const input = <input valueAsNumber={n$} />;
-
-    // @ts-expect-error `currentTime` has no attribute
-    const video = <video currentTime={n$} />;
-
-    // @ts-expect-error `hash` has no attribute; bind `href`
-    const link = <a hash={constant('#x')} />;
-
-    assert.isDefined([select, input, video, link]);
-  });
-
-  test('a key written as a property takes no undefined (#3000)', () => {
-    // @ts-expect-error `autocorrect` is a property: `false` turns it off
-    const input = <input autocorrect={constant(undefined)} />;
-
-    // @ts-expect-error `async` is a property: `false` turns it off
-    const script = <script async={constant(undefined)} />;
-
-    assert.isDefined([input, script]);
-  });
-
-  test('class takes a string or an object, never both', () => {
-    const [on$] = createState(true);
-
-    // @ts-expect-error a class object takes `Bindable<boolean>` values
-    const wrong = <p class={{ a: constant('x') }} />;
-
-    const ok = (
-      <>
-        <p class={constant('a b')} />
-        <p class={{ a: on$, b: constant(false) }} />
-      </>
+    onTestFinished(
+      clicks.subscribe((event) => {
+        mut_seen.push(event);
+      }),
     );
 
-    assert.isDefined([wrong, ok]);
+    mut_buttons[0]?.click();
+
+    assert.strictEqual(mut_seen.length, 1);
   });
 
-  test('event handlers narrow currentTarget and event', () => {
-    const ok = (
-      <input
-        onInput={(event) => {
-          expectType<typeof event.currentTarget, HTMLInputElement>('<=');
-        }}
-        onKeyDown={(event) => {
-          expectType<typeof event.key, string>('<=');
-        }}
-      />
+  test("a handler's this is typed unknown, and is the element when it is called", () => {
+    type Handler = NonNullable<JSX.IntrinsicElements['input']['onInput']>;
+
+    // `unknown`, or none declared; a handler that needs a `this` of its own is
+    // not one, as it would be if none were declared.
+    expectType<ThisParameterType<Handler>, unknown>('=');
+
+    expectType<(this: Readonly<{ own: true }>) => void, Handler>('!<=');
+
+    const mut_thisValues: unknown[] = [];
+
+    // A function expression, since an arrow function has no `this` to record.
+    const record = function record(this: unknown): void {
+      mut_thisValues.push(this);
+    };
+
+    const mut_buttons: HTMLButtonElement[] = [];
+
+    const App = (): JSX.Element => (
+      <div>
+        <button
+          onClick={record}
+          ref={(button) => {
+            mut_buttons.push(button);
+          }}
+        />
+        {/* No `on…` property for this event, so it is listened to. */}
+        <button
+          onFocusIn={record}
+          ref={(button) => {
+            mut_buttons.push(button);
+          }}
+        />
+      </div>
     );
 
-    const [handler$] = createState(() => {});
+    onTestFinished(render(App, document.createElement('div')));
 
-    // @ts-expect-error a handler is a function, not an observable
-    const observable = <button onClick={handler$} />;
+    mut_buttons[0]?.click();
 
-    assert.isDefined([ok, observable]);
+    mut_buttons[1]?.dispatchEvent(new FocusEvent('focusin'));
+
+    assert.strictEqual(mut_thisValues.length, 2);
+
+    assert.strictEqual(mut_thisValues[0], mut_buttons[0]);
+
+    assert.strictEqual(mut_thisValues[1], mut_buttons[1]);
   });
-});
 
-describe('optional attributes', () => {
-  test('an attribute takes an observable of `T | undefined`', () => {
-    const [label$] = createState<string | undefined>(undefined);
+  test('listenInScope and createAfterUpdate take no method of an observable', () => {
+    const clicks = source<Event>();
 
-    const ok = (
-      <>
-        <div aria-label={label$} data-x={label$} title={label$} />
-        <svg>
-          <g
-            role={constant('img')}
-            opacity={label$.pipe(map(() => undefined))}
-          />
-        </svg>
-      </>
+    const count = state(0);
+
+    // Typed only: each would throw when it is called.
+    const _givenOnTheirOwn = (): void => {
+      // @ts-expect-error emit needs the source as its this
+      listenInScope(globalThis, 'click', clicks.emit);
+
+      // @ts-expect-error dispose needs the observable as its this
+      createAfterUpdate()(count.dispose);
+    };
+
+    expectType<typeof _givenOnTheirOwn, () => void>('=');
+
+    // A function of its own passes.
+    const owner = createOwner();
+
+    onTestFinished(() => {
+      owner.dispose();
+    });
+
+    const mut_received: Event[] = [];
+
+    onTestFinished(
+      clicks.subscribe((event) => {
+        mut_received.push(event);
+      }),
     );
 
-    // @ts-expect-error `value` is a DOM property, which has no absent state
-    const property = <input value={label$} />;
+    owner.run(() => {
+      listenInScope(globalThis, 'click', (event) => {
+        clicks.emit(event);
+      });
+    });
 
-    assert.isDefined([ok, property]);
+    globalThis.dispatchEvent(new Event('click'));
+
+    owner.dispose();
+
+    globalThis.dispatchEvent(new Event('click'));
+
+    assert.strictEqual(mut_received.length, 1);
   });
 
-  test('a form takes its props, its named controls notwithstanding', () => {
-    const ok = (
-      <form
-        id={constant('f')}
-        onSubmit={(event) => {
-          event.preventDefault();
-        }}
-      />
-    );
+  test('constant rejects null, undefined and observables', () => {
+    // @ts-expect-error `null` is an omitted prop
+    constant(null);
 
-    // @ts-expect-error a form has no `href`
-    const wrong = <form href={constant('/')} />;
+    // @ts-expect-error `undefined` is an omitted prop
+    constant(undefined);
 
-    assert.isDefined([ok, wrong]);
+    // @ts-expect-error an observable would be read once
+    constant(state(0));
+
+    assert.isTrue(true);
   });
 });

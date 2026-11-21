@@ -1,58 +1,52 @@
-import { createScope } from 'synstate';
+import { batch, createRootOwner } from 'synstate';
+import { removeMounted } from './control/index.mjs';
 import {
-  appendTo,
-  holdsSvgContent,
-  mountThenInsert,
-  mountUnder,
-} from './internal/index.mjs';
-import { type JSX, toNodes } from './jsx/index.mjs';
+  MountedNodes,
+  mountInNamespace,
+  namespaceInside,
+  type Description,
+} from './jsx/index.mjs';
 
 /**
- * Mounts `app` into `container` and returns the function that unmounts it
- * (SPEC.md 6.5).
+ * Mounts `app` into `container` and returns the function that unmounts it.
  *
- * `app` is called once, inside a new root scope; everything created while it
- * and the description it returns are mounted belongs to that scope, and
- * unmounting disposes it and removes the nodes. If mounting throws, what was
- * mounted is disposed and removed before the error is rethrown.
+ * `app` is called once, in a new root owner; everything created while it and
+ * the description it returns are mounted belongs to that owner, and unmounting
+ * disposes it and removes the nodes.
  *
- * `render(App, el)` rather than `render(<App />, el)`: taking the component
- * makes it plain that it is evaluated here.
+ * Mounting is one batch: a write made while mounting propagates once the nodes
+ * are in `container`, so nothing has to wait for an element to be attached. If
+ * mounting throws, what was mounted is disposed and removed before the error is
+ * rethrown.
  */
 export const render = (
-  app: () => JSX.Element,
+  app: () => Description,
   container: Element,
 ): (() => void) => {
-  const root = createScope(undefined);
+  const owner = createRootOwner();
 
-  const mut_inserted: { nodes: readonly ChildNode[] } = { nodes: [] };
+  const out = new MountedNodes();
 
   const unmount = (): void => {
-    root.dispose();
-
-    for (const node of mut_inserted.nodes) {
-      node.remove();
+    try {
+      owner.dispose();
+    } finally {
+      // Removed even when a cleanup throws: the tree is disposed all the same.
+      removeMounted(out);
     }
   };
 
   try {
-    root.run(() =>
-      mountUnder(holdsSvgContent(container), () =>
-        mountThenInsert(
-          mountApp,
-          app,
-          (into: Element, nodes: readonly ChildNode[]) => {
-            mut_inserted.nodes = nodes;
+    batch(() => {
+      mountInNamespace(namespaceInside(container), () => {
+        owner.run(() => {
+          app().mount(out);
+        });
+      });
 
-            appendTo(into, nodes);
-          },
-          container,
-        ),
-      ),
-    );
+      out.appendTo(container);
+    });
   } catch (error) {
-    // An update applied after the app was appended can throw; take back what
-    // was mounted rather than leave it in `container` with no way to unmount.
     unmount();
 
     throw error;
@@ -60,6 +54,3 @@ export const render = (
 
   return unmount;
 };
-
-const mountApp = (app: () => JSX.Element): readonly ChildNode[] =>
-  toNodes(app().mount());

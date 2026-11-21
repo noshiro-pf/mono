@@ -3,7 +3,7 @@ import {
   createState,
   derive,
   map,
-  onScopeDispose,
+  onCleanup,
   type InitializedObservable,
 } from 'synstate';
 import {
@@ -136,7 +136,7 @@ export const PaneFrame = ({
     mut_timers.add(timer);
   };
 
-  onScopeDispose(() => {
+  onCleanup(() => {
     for (const timer of mut_timers) {
       clearTimeout(timer);
     }

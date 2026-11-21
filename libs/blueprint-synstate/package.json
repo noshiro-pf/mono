@@ -88,8 +88,8 @@
     "vitest": "catalog:"
   },
   "peerDependencies": {
-    "synstate": ">=9.2.0",
-    "synstate-dom": ">=0.13.1",
+    "synstate": "workspace:^",
+    "synstate-dom": "workspace:^",
     "ts-data-forge": ">=15.1.1"
   },
   "engines": {

@@ -1,4 +1,3 @@
-import * as path from 'node:path';
 import {
   Arr,
   hasKey,
@@ -12,25 +11,21 @@ import { isDirectlyExecuted } from 'ts-repo-utils';
 import { listTrackedFiles, readRepositoryFile } from '../lib/repo-files.mjs';
 
 /**
- * Fails when a committed SynState benchmark table was not measured by the
- * benchmark workflow: `meta.environment.runner` is `'local'`, or there is no
- * `meta.environment` at all. The same holds for the synstate-next
- * documentation's `benchmark-results.json`, which keeps its environment at the
- * top (`environment.runner`) and is measured by `synstate-next-benchmark.yml`:
- * its page is read beside synstate's, and another machine's CPU moves the
- * ratios between libraries.
+ * Fails when a committed synstate benchmark table was not measured by the
+ * benchmark workflow: `environment.runner` is `'local'`, or there is no
+ * `environment` at all. The tables are each documentation site's
+ * `benchmark-results.json`: synstate's, measured by `synstate-benchmark.yml`,
+ * and synstate-next's, measured by `synstate-next-benchmark.yml` until that
+ * site is removed.
  *
  * The benchmark page says its numbers come from CI on a pinned runner, and
- * `synstate-benchmark.yml` judges drift against that runner alone. A local pass
- * committed by mistake passes everything else as long as all the tables agree
- * with one another: the checks in
- * `apps/synstate-docs/scripts/measurement-checks.mts` fail on a table whose
- * environment is missing, malformed or differs from the others', not on one
- * that records `'local'` in every table.
+ * another machine's CPU moves the ratios between libraries. A local run
+ * committed by mistake passes everything else: `gen:benchmark` embeds whatever
+ * the file holds.
  *
- * A root guard rather than part of `gen:benchmark-doc`, because the local
+ * A root guard rather than part of `gen:benchmark`, because the local
  * `benchmark` command runs that generator on what it has just measured: running
- * the benchmark locally works, and only committing its tables fails.
+ * the benchmark locally works, and only committing its table fails.
  */
 export const checkSynstateBenchmarkRunner = (): Promise<
   Result<number, string>
@@ -38,15 +33,13 @@ export const checkSynstateBenchmarkRunner = (): Promise<
   Result.safeTry(async function* () {
     const tables = yield* Result.safeUnwrap(await readTables());
 
-    if (tables.every(({ file }) => !isInDocsDataDir(file))) {
-      return Result.err(
-        `❌ No results*.json is tracked under ${RESULTS_DIR}; if the tables moved, point this check at them.`,
-      );
-    }
+    const missing = RESULTS_FILES.filter((expected) =>
+      tables.every(({ file }) => file !== expected),
+    );
 
-    if (tables.every(({ file }) => file !== NEXT_RESULTS)) {
+    if (Arr.isNonEmpty(missing)) {
       return Result.err(
-        `❌ ${NEXT_RESULTS} is not tracked; if it moved, point this check at it.`,
+        `❌ ${missing.join(', ')} is not tracked; if it moved, point this check at it.`,
       );
     }
 
@@ -66,12 +59,10 @@ export const collectRunnerViolations = (
 ): readonly string[] =>
   Arr.generate(function* () {
     for (const { file, content } of tables) {
-      const location = environmentLocation(file);
-
-      const recorded = readRunner(content, location);
+      const recorded = readRunner(content);
 
       if (recorded === undefined) {
-        yield `${file}: records no environment (\`${location.join('.')}\`), so nothing says where it was measured.`;
+        yield `${file}: records no environment (\`environment\`), so nothing says where it was measured.`;
       } else if (!isString(recorded.runner)) {
         yield `${file}: records a runner that is not a string, ${JSON.stringify(recorded.runner)}.`;
       } else if (recorded.runner !== PINNED_RUNNER) {
@@ -90,52 +81,30 @@ export type Table = Readonly<{
 /** What `readBenchmarkEnvironment` writes when the workflow measured it. */
 const PINNED_RUNNER = 'github-actions';
 
-const RESULTS_DIR = 'apps/synstate-docs/src/data';
-
-const RESULTS_FILE = /^results.*\.json$/u;
+export const DOCS_RESULTS =
+  'apps/synstate-docs/src/data/benchmark-results.json';
 
 export const NEXT_RESULTS =
   'apps/synstate-next-docs/src/data/benchmark-results.json';
 
+const RESULTS_FILES: readonly string[] = [DOCS_RESULTS, NEXT_RESULTS] as const;
+
 /** Whether a tracked path, from the repository root, is a benchmark table. */
-export const isResultsTable = (file: string): boolean => {
-  const { dir, base } = path.posix.parse(file);
-
-  return (
-    (dir === RESULTS_DIR && RESULTS_FILE.test(base)) || file === NEXT_RESULTS
-  );
-};
-
-const isInDocsDataDir = (file: string): boolean =>
-  path.posix.dirname(file) === RESULTS_DIR;
+export const isResultsTable = (file: string): boolean =>
+  RESULTS_FILES.includes(file);
 
 /**
- * Where a file keeps its environment, decided by its path rather than by what
- * it holds, so that a synstate table missing `meta` is not read as
- * synstate-next's layout: synstate-next's `benchmark-results.json` keeps it at
- * the top, synstate's tables under `meta`.
- */
-const environmentLocation = (
-  file: string,
-): readonly ['environment'] | readonly ['meta', 'environment'] =>
-  file === NEXT_RESULTS
-    ? (['environment'] as const)
-    : (['meta', 'environment'] as const);
-
-/**
- * The runner recorded at `location`, or `undefined` where the file records no
- * environment there. Wrapped, so that a runner of the wrong type is reported as
- * what it is rather than as missing.
+ * The runner the file records, or `undefined` where it records no environment.
+ * Wrapped, so that a runner of the wrong type is reported as what it is rather
+ * than as missing.
  */
 const readRunner = (
   content: unknown,
-  location: ReturnType<typeof environmentLocation>,
 ): Readonly<{ runner: unknown }> | undefined => {
-  const environment = location.reduce<unknown>(
-    (holder, key) =>
-      isRecord(holder) && hasKey(holder, key) ? holder[key] : undefined,
-    content,
-  );
+  const environment =
+    isRecord(content) && hasKey(content, 'environment')
+      ? content.environment
+      : undefined;
 
   return !isRecord(environment) || !hasKey(environment, 'runner')
     ? undefined
@@ -183,28 +152,17 @@ const readTables = async (): Promise<Result<readonly Table[], string>> => {
 
 const formatViolations = (violations: readonly string[]): string =>
   [
-    '❌ A SynState benchmark table was not measured on the pinned runner,',
+    '❌ A synstate benchmark table was not measured on the pinned runner,',
     '   while the page says its numbers were:',
     '',
     ...violations.map((message) => `  ${message}`),
     '',
-    `For ${NEXT_RESULTS}: dispatch the synstate-next Benchmark`,
-    'workflow (`synstate-next-benchmark.yml`) on the branch, put the file of',
-    'the artifact it uploads in its place, and run',
-    '`pnpm --filter synstate-next-docs run gen:benchmark`; or restore it from',
-    'main if the change is not meant to move the numbers.',
-    '',
-    `For the tables in ${RESULTS_DIR}:`,
     'Measuring locally is for trying a change, not for committing. If the',
-    'change is not meant to move the numbers, restore the tables from main',
-    `(\`git checkout origin/main -- '${RESULTS_DIR}/results*'\`, or the`,
-    'branch below on a stacked one). If it is,',
-    'replace them with the files of the `synstate-benchmark-to-commit-<run id>`',
-    'artifact the SynState Benchmark workflow uploads when it reports that the',
-    'tables drifted (or of `synstate-benchmark-<run id>`, its fresh',
-    'measurement). Either way, then run',
-    '`pnpm --filter @synstate/docs run gen:benchmark-doc` and `pnpm run fmt`,',
-    'and commit the result.',
+    'change is not meant to move the numbers, restore the file from main. If',
+    'it is, dispatch the benchmark workflow of its site on the branch',
+    `(\`synstate-benchmark.yml\` for ${DOCS_RESULTS},`,
+    `\`synstate-next-benchmark.yml\` for ${NEXT_RESULTS}), put the file of the`,
+    'artifact it uploads in its place, and run `gen:benchmark` in that site.',
   ].join('\n');
 
 if (isDirectlyExecuted(import.meta.url)) {
@@ -219,6 +177,6 @@ if (isDirectlyExecuted(import.meta.url)) {
   }
 
   console.info(
-    `Every SynState benchmark table was measured on the pinned runner (${result.value} tables).`,
+    `Every synstate benchmark table was measured on the pinned runner (${result.value} tables).`,
   );
 }

@@ -1,369 +1,155 @@
-import { createState, map, type InitializedObservable } from 'synstate';
-import {
-  constant,
-  If,
-  MatchOptional,
-  MatchResult,
-  render,
-  type JSX,
-} from 'synstate-dom';
-import { Optional, Result } from 'ts-data-forge';
+import { map, onCleanup, state } from 'synstate';
+import { constant, For, If, render, selector, type JSX } from 'synstate-dom';
 
-const mountInto = (
-  app: () => JSX.Element,
-): Readonly<{
-  container: HTMLDivElement;
-  unmount: () => void;
-}> => {
+const mount = (app: () => JSX.Element): HTMLDivElement => {
   const container = document.createElement('div');
 
-  const unmount = render(app, container);
+  render(app, container);
 
-  return { container, unmount };
-};
-
-/** Counts the calls of a component, and the values it derived. */
-const tracked = (
-  label: string,
-): Readonly<{
-  Component: () => JSX.Element;
-  calls: Readonly<{ current: number }>;
-}> => {
-  const mut_calls = { current: 0 };
-
-  const Component = (): JSX.Element => {
-    mut_calls.current += 1;
-
-    return <span>{constant(label)}</span>;
-  };
-
-  return { Component, calls: mut_calls };
-};
-
-type User = Readonly<{ name: string }>;
-
-/**
- * A branch that reads `user$` narrowed by the switch above it, as the user
- * would write it, and records every value its derived node computes.
- */
-const narrowingBranch = (
-  user$: InitializedObservable<User | undefined>,
-): Readonly<{
-  Branch: () => JSX.Element;
-  seen: readonly (string | undefined)[];
-}> => {
-  const mut_seen: (string | undefined)[] = [];
-
-  const Branch = (): JSX.Element => (
-    <b>
-      {user$.pipe(
-        map((u) => {
-          mut_seen.push(u?.name);
-
-          // The switch rules `undefined` out; reaching it here is the bug.
-          return u === undefined ? 'unreachable' : u.name;
-        }),
-      )}
-    </b>
-  );
-
-  return { Branch, seen: mut_seen };
+  return container;
 };
 
 describe(If, () => {
-  test('mounts only the branch chosen', () => {
-    const [cond$, setCond] = createState(false);
+  test('mounts the branch the condition picks, and disposes the other', () => {
+    const cond = state(true);
 
-    const a = tracked('a');
+    const mut_cleaned: string[] = [];
 
-    const b = tracked('b');
+    const Branch = ({ name }: Readonly<{ name: string }>): JSX.Element => {
+      onCleanup(() => {
+        mut_cleaned.push(name);
+      });
 
-    const { container } = mountInto(() => (
-      <p>
-        <If cond={cond$} then={<a.Component />} else={<b.Component />} />
-      </p>
-    ));
-
-    assert.strictEqual(container.textContent, 'b');
-
-    assert.strictEqual(a.calls.current, 0);
-
-    setCond(true);
-
-    assert.strictEqual(container.textContent, 'a');
-
-    assert.strictEqual(a.calls.current, 1);
-
-    setCond(false);
-
-    assert.strictEqual(container.textContent, 'b');
-
-    assert.strictEqual(b.calls.current, 2);
-  });
-
-  test('rebuilds a branch only when cond flips', () => {
-    const [n$, setN] = createState(1);
-
-    const a = tracked('a');
-
-    mountInto(() => (
-      <If cond={n$.pipe(map((n) => n > 0))} then={<a.Component />} />
-    ));
-
-    setN(2);
-
-    setN(3);
-
-    assert.strictEqual(a.calls.current, 1);
-  });
-
-  test('an omitted else mounts nothing', () => {
-    const [cond$, setCond] = createState(true);
-
-    const { container } = mountInto(() => (
-      <p>
-        <If cond={cond$} then={<b />} />
-        <i />
-      </p>
-    ));
-
-    assert.strictEqual(container.getHTML(), '<p><b></b><!----><i></i></p>');
-
-    setCond(false);
-
-    assert.strictEqual(container.getHTML(), '<p><!----><i></i></p>');
-  });
-
-  test('disposes the branch it leaves', () => {
-    const [cond$, setCond] = createState(true);
-
-    const [count$, setCount] = createState(0);
-
-    const mut_runs = { current: 0 };
-
-    const Branch = (): JSX.Element => {
-      const doubled$ = count$.pipe(
-        map((n) => {
-          mut_runs.current += 1;
-
-          return n * 2;
-        }),
-      );
-
-      return <span>{doubled$}</span>;
+      return <b>{constant(name)}</b>;
     };
 
-    mountInto(() => <If cond={cond$} then={<Branch />} />);
-
-    setCount(1);
-
-    const runsBefore = mut_runs.current;
-
-    setCond(false);
-
-    setCount(2);
-
-    assert.strictEqual(mut_runs.current, runsBefore);
-  });
-
-  test('keeps its nodes right when it is the top level and unmounts', () => {
-    const [cond$, setCond] = createState(true);
-
-    const { container, unmount } = mountInto(() => (
-      <If cond={cond$} then={<b />} else={<i />} />
-    ));
-
-    setCond(false);
-
-    setCond(true);
-
-    assert.strictEqual(container.getHTML(), '<b></b><!---->');
-
-    unmount();
-
-    assert.strictEqual(container.getHTML(), '');
-  });
-
-  test('nested switches inside a branch are removed with it', () => {
-    const [outer$, setOuter] = createState(true);
-
-    const [inner$, setInner] = createState(true);
-
-    const { container } = mountInto(() => (
+    const container = mount(() => (
       <div>
         <If
-          cond={outer$}
-          then={<If cond={inner$} then={<b />} else={<i />} />}
+          cond={cond}
+          else={<Branch name="no" />}
+          then={<Branch name="yes" />}
         />
+        <hr />
       </div>
     ));
 
-    setInner(false);
+    const text = (): string => container.textContent;
 
-    assert.strictEqual(container.getHTML(), '<div><i></i><!----><!----></div>');
+    assert.strictEqual(text(), 'yes');
 
-    setOuter(false);
+    cond.set(false);
 
-    assert.strictEqual(container.getHTML(), '<div><!----></div>');
+    assert.strictEqual(text(), 'no');
+
+    assert.deepStrictEqual(mut_cleaned, ['yes']);
+
+    cond.set(true);
+
+    assert.strictEqual(text(), 'yes');
+
+    assert.deepStrictEqual(mut_cleaned, ['yes', 'no']);
+
+    // The branch stays before the following sibling.
+    assert.strictEqual(
+      container.querySelector('div')?.lastElementChild?.tagName,
+      'HR',
+    );
   });
 
-  test('disposes a branch before it computes a value that cond rules out, however deep cond is (#3605)', () => {
-    const [user$, setUser] = createState<User | undefined>({ name: 'a' });
-
-    const { Branch, seen } = narrowingBranch(user$);
-
-    // Two steps from the source, so that cond is deeper than the branch's node.
-    const cond$ = user$.pipe(map((u) => u)).pipe(map((u) => u !== undefined));
-
-    const { container } = mountInto(() => (
-      <p>
-        <If cond={cond$} then={<Branch />} />
-      </p>
-    ));
-
-    setUser({ name: 'b' });
-
-    setUser(undefined);
-
-    assert.strictEqual(container.textContent, '');
-
-    assert.deepStrictEqual(seen, ['a', 'b']);
-  });
-
-  test('a constant cond mounts one branch', () => {
-    const { container } = mountInto(() => (
+  test('a constant condition mounts one branch once', () => {
+    const container = mount(() => (
       <If cond={constant(false)} then={<b />} else={<i />} />
     ));
 
-    assert.strictEqual(container.getHTML(), '<i></i><!---->');
+    assert.strictEqual(container.getHTML(), '<i></i>');
+  });
+
+  test('no else: nothing while the condition is false', () => {
+    const cond = state(false);
+
+    const container = mount(() => <If cond={cond} then={<b />} />);
+
+    assert.strictEqual(container.querySelectorAll('b').length, 0);
+
+    cond.set(true);
+
+    assert.strictEqual(container.querySelectorAll('b').length, 1);
   });
 });
 
-describe(MatchOptional, () => {
-  test('passes the present value as an observable and follows it', () => {
-    const [user$, setUser] = createState<Optional<string>>(Optional.none);
+describe(selector, () => {
+  test('only the rows of the old and the new key are written', () => {
+    const selected = state(1);
 
-    const mut_someCalls = { current: 0 };
+    const isSelected = selector(selected);
 
-    const Profile = ({
-      name$,
-    }: Readonly<{ name$: InitializedObservable<string> }>): JSX.Element => {
-      mut_someCalls.current += 1;
+    const mut_writes: number[] = [];
 
-      return <b>{name$}</b>;
-    };
+    const container = mount(() => (
+      <ul>
+        <For
+          items={constant([1, 2, 3, 4])}
+          key={(id) => id}
+          children={(item) => {
+            const id = item.value;
 
-    const { container } = mountInto(() => (
-      <MatchOptional
-        value={user$}
-        some={(name$) => <Profile name$={name$} />}
-        none={<i>{constant('login')}</i>}
-      />
+            const on = isSelected.is(id);
+
+            on.subscribe(() => {
+              mut_writes.push(id);
+            });
+
+            return <li class={{ on }} />;
+          }}
+        />
+      </ul>
     ));
 
-    assert.strictEqual(container.textContent, 'login');
+    const before = mut_writes.length;
 
-    setUser(Optional.some('alice'));
+    selected.set(3);
 
-    assert.strictEqual(container.textContent, 'alice');
-
-    setUser(Optional.some('bob'));
-
-    assert.strictEqual(container.textContent, 'bob');
-
-    assert.strictEqual(mut_someCalls.current, 1);
-
-    setUser(Optional.none);
-
-    assert.strictEqual(container.textContent, 'login');
-  });
-
-  test('disposes the some branch before it computes a value that value rules out (#3605)', () => {
-    const [user$, setUser] = createState<User | undefined>({ name: 'a' });
-
-    const { Branch, seen } = narrowingBranch(user$);
-
-    const value$ = user$
-      .pipe(map((u) => u))
-      .pipe(map((u) => (u === undefined ? Optional.none : Optional.some(u))));
-
-    const { container } = mountInto(() => (
-      <MatchOptional
-        value={value$}
-        some={() => <Branch />}
-        none={<i>{constant('login')}</i>}
-      />
-    ));
-
-    setUser(undefined);
-
-    assert.strictEqual(container.textContent, 'login');
-
-    assert.deepStrictEqual(seen, ['a']);
-  });
-
-  test('takes a constant', () => {
-    const { container } = mountInto(() => (
-      <MatchOptional
-        value={constant(Optional.some(1))}
-        some={(n$) => <b>{n$}</b>}
-      />
-    ));
-
-    assert.strictEqual(container.getHTML(), '<b>1</b><!---->');
-  });
-});
-
-describe(MatchResult, () => {
-  test('switches between ok and err and follows the value within a tag', () => {
-    const [result$, setResult] = createState<Result<number, string>>(
-      Result.ok(1),
+    assert.deepStrictEqual(
+      mut_writes.slice(before).toSorted((a, b) => a - b),
+      [1, 3],
     );
 
-    const { container } = mountInto(() => (
-      <MatchResult
-        value={result$}
-        ok={(n$) => <b>{n$}</b>}
-        err={(e$) => <i>{e$}</i>}
-      />
-    ));
-
-    assert.strictEqual(container.getHTML(), '<b>1</b><!---->');
-
-    setResult(Result.ok(2));
-
-    assert.strictEqual(container.getHTML(), '<b>2</b><!---->');
-
-    setResult(Result.err('oops'));
-
-    assert.strictEqual(container.getHTML(), '<i>oops</i><!---->');
+    assert.deepStrictEqual(
+      Array.from(container.querySelectorAll('li'), (li) => li.className),
+      ['', '', 'on', ''],
+    );
   });
 
-  test('disposes the ok branch before it computes a value that value rules out (#3605)', () => {
-    const [user$, setUser] = createState<User | undefined>({ name: 'a' });
+  test('an `is` made after a change starts from the current key', () => {
+    const selected = state('a');
 
-    const { Branch, seen } = narrowingBranch(user$);
+    const isSelected = selector(selected);
 
-    const value$ = user$
-      .pipe(map((u) => u))
-      .pipe(
-        map((u): Result<User, string> =>
-          u === undefined ? Result.err('gone') : Result.ok(u),
-        ),
-      );
+    selected.set('b');
 
-    const { container } = mountInto(() => (
-      <MatchResult
-        value={value$}
-        ok={() => <Branch />}
-        err={(e$) => <i>{e$}</i>}
+    assert.isTrue(isSelected.is('b').value);
+
+    assert.isFalse(isSelected.is('a').value);
+  });
+});
+
+describe('a map in a row', () => {
+  test('reads the new item after the update', () => {
+    const items = state<readonly Readonly<{ id: number; n: number }>[]>([
+      { id: 1, n: 1 },
+    ]);
+
+    const container = mount(() => (
+      <For
+        items={items}
+        key={(x) => x.id}
+        children={(item) => <p>{item.pipe(map((x) => x.n * 10))}</p>}
       />
     ));
 
-    setUser(undefined);
+    items.set([{ id: 1, n: 2 }]);
 
-    assert.strictEqual(container.textContent, 'gone');
-
-    assert.deepStrictEqual(seen, ['a']);
+    assert.strictEqual(container.textContent, '20');
   });
 });

@@ -1,4 +1,4 @@
-import { createState, map } from 'synstate';
+import { createState, map, onCleanup } from 'synstate';
 import { constant, type JSX } from 'synstate-dom';
 
 const [position$, setPosition] = createState('');
@@ -13,8 +13,12 @@ export const Pad = (): JSX.Element => (
   <div
     ref={(element) => {
       // Called once, right after the element is created and before anything is
-      // bound or its children are mounted.
+      // bound or its children are mounted, in the owner the element mounts in.
       resizeObserver.observe(element);
+
+      onCleanup(() => {
+        resizeObserver.unobserve(element);
+      });
     }}
     onPointerMove={(event) => {
       // `currentTarget` is narrowed to the element: HTMLDivElement here.
