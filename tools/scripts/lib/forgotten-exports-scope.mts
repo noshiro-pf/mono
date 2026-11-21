@@ -50,9 +50,12 @@ export const typesEntryPoints = (exportsField: unknown): readonly string[] =>
     ),
   ).filter((file) => !file.includes('*'));
 
-/** The private packages read, as if published: they replace published ones. */
+/**
+ * The private packages read, as if published: they replace published ones.
+ * Empty: no private package is read today.
+ */
 export const FORGOTTEN_EXPORTS_PRIVATE_READ: ReadonlySet<string> =
-  new Set<string>(['synstate-dom-next', 'synstate-next']);
+  new Set<string>();
 
 const DECLARATION_FILE = /\.d\.[cm]?ts$/u;
 

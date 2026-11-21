@@ -37,7 +37,6 @@ GitHub shows a `.github/README.md` in place of the root one.
 | `link-check.yml`                 | pull requests, path-filtered; schedule      | none; other people's servers decide it             |
 | `e2e-production.yml`             | schedule; `workflow_dispatch`               | none; the live sites decide it                     |
 | `synstate-benchmark.yml`         | `workflow_dispatch`                         | none; uploads a measurement to commit              |
-| `synstate-next-benchmark.yml`    | `workflow_dispatch`                         | none; uploads a measurement to commit              |
 | `report-scheduled-failure.yml`   | `workflow_run` of the scheduled ones        | none; files a failed scheduled run as an issue     |
 
 The required contexts are listed in `repo-settings/rulesets/main.json`. Every

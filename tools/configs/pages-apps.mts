@@ -90,14 +90,4 @@ export const pagesAstroSites = [
     siteDir: 'synstate-dom',
     buildCommand: 'pnpm --filter synstate-dom-docs run build',
   },
-  {
-    packageDir: 'synstate-dom-next-docs',
-    siteDir: 'synstate-dom-next',
-    buildCommand: 'pnpm --filter synstate-dom-next-docs run build',
-  },
-  {
-    packageDir: 'synstate-next-docs',
-    siteDir: 'synstate-next',
-    buildCommand: 'pnpm --filter synstate-next-docs run build',
-  },
 ] as const;

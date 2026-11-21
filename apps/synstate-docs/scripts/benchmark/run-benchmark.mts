@@ -104,9 +104,8 @@ const main = async (): Promise<void> => {
 
   // Laid out as it is committed, so that neither `benchmark` nor the workflow
   // that uploads it formats it after. A failure fails the run with the file
-  // already written in `JSON.stringify`'s layout, which a local run keeps; the
-  // workflow, like `synstate-benchmark.yml` over its own `fix:fmt`, uploads
-  // only what a run completed.
+  // already written in `JSON.stringify`'s layout, which a local run keeps;
+  // `synstate-benchmark.yml` uploads only what a run completed.
   if (
     (await formatPackage({
       cwd: workspaceRootPath,
@@ -124,7 +123,7 @@ const main = async (): Promise<void> => {
  * pid is checked so that a value left in a shell does not turn a runner into a
  * child that writes nothing.
  */
-const childEnv = 'SYNSTATE_NEXT_BENCHMARK_CHILD';
+const childEnv = 'SYNSTATE_BENCHMARK_CHILD';
 
 /**
  * How long one library may take over one scenario, every point of a sweep
@@ -193,9 +192,6 @@ const measureAsChild = async (): Promise<void> => {
  * lines go straight to this process's output; its result comes back as its one
  * message.
  */
-// synstate-docs' runner (`apps/synstate-docs/scripts/benchmark/own-process.mts`)
-// does the same; it is not shared, because this site replaces that one at the
-// next major and that runner goes with it.
 const measureInChild = (
   scenario: Scenario,
   index: number,
