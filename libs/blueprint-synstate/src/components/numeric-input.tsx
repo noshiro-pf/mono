@@ -1,7 +1,7 @@
 import {
   createState,
   map,
-  onScopeDispose,
+  onCleanup,
   type InitializedObservable,
 } from 'synstate';
 import {
@@ -404,7 +404,7 @@ export const NumericInput = <N extends number>({
 
   const repeat = createRepeat(commit);
 
-  onScopeDispose(repeat.stop);
+  onCleanup(repeat.stop);
 
   // The number the text stands for, read once for what reads it.
   const decoded$ = text$.pipe(map(read));
@@ -461,7 +461,7 @@ export const NumericInput = <N extends number>({
     mut_press.stepped = false;
   };
 
-  onScopeDispose(endPress);
+  onCleanup(endPress);
 
   if (viewProps.disabled !== undefined) {
     toObservable(viewProps.disabled).subscribe((disabled) => {

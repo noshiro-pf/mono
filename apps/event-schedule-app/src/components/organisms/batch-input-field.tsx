@@ -132,7 +132,7 @@ export const BatchInputAnswerForm = ({
 // Kept for the page's lifetime, as the batch input was.
 const [comment$, setComment] = createState('');
 
-const [selectedIconId$, , { updateState: updateSelectedIconId }] =
+const [selectedIconId$, setSelectedIconId] =
   createState<AnswerIconIdWithNone>('none');
 
 const [fairPoint$, setFairPoint] = createState<AnswerIconPoint>(0);
@@ -142,9 +142,10 @@ const onIconClick = (
   iconId: AnswerIconId,
   defaultFairPoint: AnswerIconPoint,
 ): void => {
-  const next = updateSelectedIconId((prev) =>
-    prev === iconId ? 'none' : iconId,
-  );
+  const next =
+    Optional.unwrap(selectedIconId$.getSnapshot()) === iconId ? 'none' : iconId;
+
+  setSelectedIconId(next);
 
   if (next === 'fair') {
     setFairPoint(defaultFairPoint);

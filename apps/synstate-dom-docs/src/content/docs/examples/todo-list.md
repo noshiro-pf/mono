@@ -3,12 +3,12 @@ title: Todo list
 description: A todo list with If, For, class objects and a derivation local to the view.
 ---
 
-This is the larger sample from the README: an input, a list that appears once it has items, and a count of what is left.
+An input, a list that appears once it has items, and a count of what is left.
 
 ```tsx
 import { createState, map } from 'synstate';
 import { constant, For, If, render, type JSX } from 'synstate-dom';
-import { Arr, Optional } from 'ts-data-forge';
+import { Arr } from 'ts-data-forge';
 
 type Todo = Readonly<{ id: number; title: string; done: boolean }>;
 
@@ -80,11 +80,7 @@ const TodoApp = (): JSX.Element => {
                                                 map((todo) => todo.done),
                                             )}
                                             onChange={() => {
-                                                toggle(
-                                                    Optional.unwrap(
-                                                        todo$.getSnapshot(),
-                                                    ).id,
-                                                );
+                                                toggle(todo$.value.id);
                                             }}
                                         />
                                         {index$.pipe(map((i) => `${i + 1}. `))}
@@ -107,7 +103,7 @@ render(TodoApp, document.body);
 
 What to look at:
 
-- **`For` keeps one row per `todo.id`.** When you toggle a todo, a new array is written to `todos$`, but the row's function is not called again: only that row's `checked` property, `done` class and text change.
-- **`remaining$` is created inside `TodoApp`**, since only this view reads it. It belongs to the root scope and is disposed on unmount. See [Lifecycle and scopes](/mono/synstate-dom/guides/lifecycle/#two-habits).
-- **The list and the "Nothing to do." paragraph are both descriptions** given to `If`. Only one is mounted at a time, and switching disposes the other's scope, `For` and its rows included.
+- **`For` keeps one row per `todo.id`.** When you toggle a todo, a new array is written to `todos$`, but the row's function is not called again. `For` sets the new todo into that row's state, and only that row's `checked` property, `done` class and text change; the other rows, whose todo is the same object as before, are not visited.
+- **`remaining$` is created inside `TodoApp`**, since only this view reads it. It belongs to the root owner and is disposed on unmount. See [Lifecycle and owners](/mono/synstate-dom/guides/lifecycle/#two-habits).
+- **The list and the "Nothing to do." paragraph are both descriptions** given to `If`. Only one is mounted at a time, and switching disposes the other's owner, `For` and its rows included.
 - **The event handlers only write to states** (`setDraft`, `updateTodos`) and create no observables.

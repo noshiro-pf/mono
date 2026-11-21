@@ -15,8 +15,7 @@ on:
         description: >-
           Which list of tools/configs/gate-ignore-lists.json to gate on: `code` for
           code-check.yml, `runtime` for node-version-compatibility.yml,
-          `benchmark` for synstate-benchmark.yml, `style` for
-          style-check.yml, `strict-lib` for strict-lib-gen.yml. `none` skips
+          `style` for style-check.yml, `strict-lib` for strict-lib-gen.yml. `none` skips
           the diff question altogether, for the one workflow that gates itself
           in shell — the gate then costs a few API calls and no checkout.
         type: string
@@ -33,8 +32,7 @@ on:
         description: >-
           Answer the diff question even when a verdict is reused, for a caller
           with a job that a reused verdict does not skip but an irrelevant
-          diff does — `coverage-main` in code-check.yml, `benchmark` in
-          synstate-benchmark.yml. Otherwise a reused
+          diff does — `coverage-main` in code-check.yml. Otherwise a reused
           verdict leaves `should_run` empty and saves the checkout.
         type: boolean
         default: false

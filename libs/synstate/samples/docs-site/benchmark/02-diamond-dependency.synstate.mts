@@ -12,7 +12,7 @@ export const runBenchmark = (n: number): number => {
 
   let mut_lastValue = 0;
 
-  const subscription = sum.subscribe((v) => {
+  const unsubscribe = sum.subscribe((v) => {
     mut_lastValue = v;
   });
 
@@ -20,7 +20,7 @@ export const runBenchmark = (n: number): number => {
     setCounter(mut_i);
   }
 
-  subscription.unsubscribe();
+  unsubscribe();
 
   return mut_lastValue;
 };
@@ -31,5 +31,28 @@ if (import.meta.vitest !== undefined) {
     const result = runBenchmark(1000);
 
     assert.strictEqual(result, 1000 * 5);
+  });
+
+  test('the subscriber sees no mix of old and new values', () => {
+    const [counter, setCounter] = createState(0);
+
+    const sum = derive(
+      [counter.pipe(map((x) => x * 2)), counter.pipe(map((x) => x * 3))],
+      (d, t) => d + t,
+    );
+
+    const mut_seen: number[] = [];
+
+    const unsubscribe = sum.subscribe((v) => {
+      mut_seen.push(v);
+    });
+
+    setCounter(1);
+
+    setCounter(2);
+
+    unsubscribe();
+
+    assert.deepStrictEqual(mut_seen, [0, 5, 10]);
   });
 }

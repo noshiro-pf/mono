@@ -274,12 +274,6 @@ export const CI_ONLY: readonly CiOnly[] = [
       "Built by the app's `check:e2e:emulators` for the emulators to load; it writes only its untracked output.",
   },
   {
-    directory: 'apps/synstate-docs',
-    scriptName: 'z:benchmark:*',
-    reason:
-      "`synstate-benchmark.yml`'s measurement, its comparison with the base branch's and its check of the committed tables against both; numbers from another machine would mean nothing.",
-  },
-  {
     scriptName: 'check:test:rules',
     reason: 'Needs Java and the Firebase emulators.',
   },

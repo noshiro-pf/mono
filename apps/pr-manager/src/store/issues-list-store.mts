@@ -109,7 +109,7 @@ export const createIssuesListStore = (
     const saving = view.subscribe(deps.save);
 
     return () => {
-      saving.unsubscribe();
+      saving();
     };
   };
 

@@ -6,12 +6,12 @@ import { Arr } from 'ts-data-forge';
 import { formatFiles, Result } from 'ts-repo-utils';
 import type { ReadonlyRecord } from 'ts-type-forge';
 import * as ts from 'typescript';
-import { propertyNames } from '../../src/internal/dom-tables.mjs';
+import { propertyNames } from '../../src/bind/dom-tables.mjs';
 import { workspaceRootPath } from '../workspace-root-path.mjs';
 
 const outputPath = path.resolve(
   workspaceRootPath,
-  'test/browser/reflected-keys.generated.mts',
+  'test/browser/ported/reflected-keys.generated.mts',
 );
 
 /** Where the harness of each TypeScript version keeps its official libraries. */
@@ -21,6 +21,19 @@ const strictLibPath = path.resolve(workspaceRootPath, '../../strict-lib');
 const probePath = path.resolve(
   workspaceRootPath,
   'scripts/reflected-keys-probe.mts',
+);
+
+/**
+ * What a run on an official library checks besides the probe: the props types
+ * (`src/jsx/`) and the files they take types from. The rest of `src/` is
+ * implementation, which, compiled against an older library, reports what a
+ * consumer never compiles (iterating a `Map` before 5.6's iterator types) and
+ * says nothing of the keys.
+ */
+const propsDir = path.resolve(workspaceRootPath, 'src/jsx') + path.sep;
+
+const propsDependencies = ['src/constant.mts', 'src/bind/dom-tables.mts'].map(
+  (file) => path.resolve(workspaceRootPath, file),
 );
 
 // The props each tag admits as attributes or properties: its props type less
@@ -45,14 +58,13 @@ const probeSource = dedent`
  * Writes, for each tag of `HTMLElementTagNameMap`, the keys its props type
  * admits: what `ReflectedProps` lets through, as two lists, the keys written as
  * attributes and those written as properties (`propertyNames`). The browser
- * test `reflected-keys.test.tsx` binds each one and reads the property back. A
- * TypeScript update that changes the keys leaves the tree dirty after `ws:gen`,
- * and the generated file's first line names this command.
+ * test `ported/reflected-keys.test.tsx` binds each one and reads the property
+ * back. A TypeScript update that changes the keys leaves the tree dirty after
+ * `ws:gen`, and the generated file's first line names this command.
  *
  * It fails on an entry of `propertyNames` that no tag admits under any of those
- * libraries (#3448): one a `lib.dom.d.ts` drops or renames is still admitted
- * while an older one a consumer may compile against has it, and is dead once
- * none does.
+ * libraries: one a `lib.dom.d.ts` drops or renames is still admitted while an
+ * older one a consumer may compile against has it, and is dead once none does.
  *
  * The props are mapped types over `HTMLElementTagNameMap`, so a consumer's
  * compiler evaluates them against the consumer's own `lib.dom.d.ts` (#3449).
@@ -88,7 +100,7 @@ const genReflectedKeys = async (): Promise<void> => {
 
   if (Arr.isNonEmpty(notAdmitted)) {
     throw new Error(
-      `no tag's props admit ${notAdmitted.join(', ')} of propertyNames (src/internal/dom-tables.mts): remove the entry if no lib.dom.d.ts has the property any more, or fix the props types (src/jsx/element-props.mts) if they dropped a key they should admit`,
+      `no tag's props admit ${notAdmitted.join(', ')} of propertyNames (src/bind/dom-tables.mts): remove the entry if no lib.dom.d.ts has the property any more, or fix the props types (src/jsx/element-props.mts) if they dropped a key they should admit`,
     );
   }
 
@@ -104,7 +116,8 @@ const genReflectedKeys = async (): Promise<void> => {
     // cspell:disable -- property names as lib.dom.d.ts spells them
 
     // The union of the keys under the repository's strict library and under the
-    // official lib.dom.d.ts of TypeScript ${versions.join(', ')}.
+    // official lib.dom.d.ts of every TypeScript version strict-lib/ has a harness
+    // for.
 
     /** The keys the props of every HTML element admit as attributes. */
     export const commonReflectedKeys = ${JSON.stringify(attributes.common)} as const;
@@ -139,21 +152,8 @@ const genReflectedKeys = async (): Promise<void> => {
 
 type KeysByTag = readonly (readonly [string, readonly string[]])[];
 
-/**
- * The keys each tag's props admit, under the package's config.
- *
- * With `libDir` undefined, that is the repository's own program, the strict
- * library included; any diagnostic fails it.
- *
- * With `libDir`, the official libraries in it are read instead, with the strict
- * library's replacement turned off. The compiler is still the repository's: the
- * mapped types evaluate the same, and an older compiler could not read the
- * newer syntax of the sources. Only the diagnostics of the props types and the
- * probe fail it then: compiled against an older library, the package's
- * implementation files report what a consumer never compiles (iterating a `Map`
- * before 5.6's iterator types), which says nothing of the keys.
- */
-const keysUnder = (libDir: string | undefined): KeysByTag => {
+/** The package's config. */
+const parseConfig = (): ts.ParsedCommandLine => {
   const configPath = path.resolve(workspaceRootPath, 'tsconfig.json');
 
   const parsed = ts.getParsedCommandLineOfConfigFile(configPath, undefined, {
@@ -168,6 +168,64 @@ const keysUnder = (libDir: string | undefined): KeysByTag => {
   if (parsed === undefined) {
     throw new Error(`cannot read ${configPath}`);
   }
+
+  return parsed;
+};
+
+/**
+ * The diagnostics that fail a run on an official library: those of the config
+ * and the options, of the probe and of the props types (`propsDir`,
+ * `propsDependencies`), and the global ones last, which the checker reports as
+ * it meets them. A dependency missing from the program fails it too.
+ */
+const checkedDiagnostics = (program: ts.Program): readonly ts.Diagnostic[] => {
+  const checked = program.getSourceFiles().filter((file) => {
+    const fileName = path.resolve(file.fileName);
+
+    return (
+      fileName === probePath ||
+      fileName.startsWith(propsDir) ||
+      propsDependencies.includes(fileName)
+    );
+  });
+
+  const checkedNames = new Set(
+    checked.map((file) => path.resolve(file.fileName)),
+  );
+
+  const missing = propsDependencies.filter((file) => !checkedNames.has(file));
+
+  if (Arr.isNonEmpty(missing)) {
+    throw new Error(`not in the program: ${missing.join(', ')}`);
+  }
+
+  return [
+    ...program.getConfigFileParsingDiagnostics(),
+    ...program.getOptionsDiagnostics(),
+    ...checked.flatMap((file) => [
+      ...program.getSyntacticDiagnostics(file),
+      ...program.getSemanticDiagnostics(file),
+    ]),
+    ...program.getGlobalDiagnostics(),
+  ];
+};
+
+/**
+ * The keys each tag's props admit, under the package's config.
+ *
+ * With `libDir` undefined, that is the repository's own program, the strict
+ * library included; any diagnostic fails it.
+ *
+ * With `libDir`, the official libraries in it are read instead, with the strict
+ * library's replacement turned off. The compiler is still the repository's: the
+ * mapped types evaluate the same, and an older compiler could not read the
+ * newer syntax of the sources. Only the diagnostics `checkedDiagnostics` lists
+ * fail it then. The libraries are ESNext and DOM, as the package's config names
+ * today, written out so that a library the config adds later, which an older
+ * harness may lack, does not reach these runs.
+ */
+const keysUnder = (libDir: string | undefined): KeysByTag => {
+  const parsed = parseConfig();
 
   const options: ts.CompilerOptions =
     libDir === undefined
@@ -211,18 +269,11 @@ const keysUnder = (libDir: string | undefined): KeysByTag => {
     configFileParsingDiagnostics: parsed.errors,
   });
 
-  const propsDir = path.resolve(workspaceRootPath, 'src/jsx');
-
   // The config's diagnostics among them.
-  const diagnostics = ts
-    .getPreEmitDiagnostics(program)
-    .filter(
-      (diagnostic) =>
-        libDir === undefined ||
-        diagnostic.file === undefined ||
-        path.resolve(diagnostic.file.fileName) === probePath ||
-        path.resolve(diagnostic.file.fileName).startsWith(propsDir),
-    );
+  const diagnostics =
+    libDir === undefined
+      ? ts.getPreEmitDiagnostics(program)
+      : checkedDiagnostics(program);
 
   if (Arr.isNonEmpty(diagnostics)) {
     throw new Error(
@@ -275,11 +326,15 @@ const keysUnder = (libDir: string | undefined): KeysByTag => {
   });
 };
 
-/** The TypeScript versions with a harness in `strict-lib/`, oldest first. */
+/**
+ * The TypeScript versions with a harness in `strict-lib/`, oldest first. A
+ * directory not named `v<major>.<minor>` is not one.
+ */
 const libVersions = (): readonly string[] =>
   fs_
     .globSync('v*/temp/copied/lib.dom.d.ts', { cwd: strictLibPath })
     .map((file) => file.split(path.sep)[0]?.slice(1) ?? '')
+    .filter((version) => /^\d+\.\d+$/u.test(version))
     .toSorted((a, b) => {
       const [aMajor = 0, aMinor = 0] = a.split('.').map(Number);
 

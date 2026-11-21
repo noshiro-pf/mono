@@ -17,6 +17,12 @@
         "types": "./dist/index.d.mts",
         "default": "./dist/index.mjs"
       }
+    },
+    "./internal": {
+      "import": {
+        "types": "./dist/internal.d.mts",
+        "default": "./dist/internal.mjs"
+      }
     }
   },
   "module": "./dist/index.mjs",
@@ -32,32 +38,26 @@
     "build": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/cmd/build.mts",
     "check:ext": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/cmd/check-ext.mts",
     "check:lint": "node ../../tools/scripts/cmd/assert-deps-built.mts && oxlint . && eslint .",
-    "check:sumi": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../languages/sumi/cli/src/cmd/sumi.mts check ./tsconfig.sumi.json",
     "check:test": "node ../../tools/scripts/cmd/assert-deps-built.mts && pnpm run z:vitest:node run",
-    "check:test:browser": "node ../../tools/scripts/cmd/assert-deps-built.mts && pnpm run z:vitest --project='Browser' run",
     "check:test:cov": "node ../../tools/scripts/cmd/assert-deps-built.mts && pnpm run z:vitest:node run --coverage",
     "check:types": "node ../../tools/scripts/cmd/assert-deps-built.mts && node ../../node_modules/typescript-native/bin/tsc --noEmit",
     "check-all": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/cmd/check-all.mts",
-    "doc": "run-s gen:readme gen:jsdoc gen:sample-diffs fix:fmt",
+    "fix:codemod": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-codemod-cli/src/cmd/ts-codemod.mts --transformer convert-to-readonly '{src,test}/**/*.mts'",
     "fix:fmt": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/format-uncommitted.mts --cwd .",
     "fix:fmt:diff": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/format-diff-from.mts origin/main --cwd .",
     "fix:fmt:full": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../tools/scripts/cmd/format-package.mts",
     "fix:lint": "node ../../tools/scripts/cmd/assert-deps-built.mts && oxlint . --fix && eslint . --fix",
     "fmt": "pnpm run fix:fmt",
-    "gen": "run-s gen:index gen:readme gen:jsdoc gen:sample-diffs",
+    "gen": "run-s gen:index",
     "gen:index": "run-s gen:index:src fix:fmt",
-    "gen:index:src": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/gen-index-ts.mts ./src --index-ext .mts --export-ext .mjs --target-ext .mts --target-ext .tsx --exclude entry-point.mts --exclude \"core/class/**\" --exclude \"core/utils/**\" --exclude utils/state-source.mts",
-    "gen:jsdoc": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/cmd/embed-examples-in-jsdoc.mts",
-    "gen:readme": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/cmd/embed-examples.mts",
-    "gen:sample-diffs": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/cmd/generate-sample-diffs.mts",
+    "gen:index:src": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ../../libs/ts-repo-utils/src/cmd/gen-index-ts.mts ./src --index-ext .mts --export-ext .mjs --target-ext .mts --preserve index.mts --exclude internal.mts --exclude sources/async-source-class.mts",
     "test": "pnpm run check:test",
     "test:cov:ui": "vite preview --outDir ./coverage",
     "test:ui": "pnpm run z:vitest:node --ui",
     "watch:test": "pnpm run z:vitest:node watch",
     "watch:types": "node ../../node_modules/typescript-native/bin/tsc --noEmit --watch",
     "z:vitest": "vitest --config ./configs/vitest.config.mts",
-    "z:vitest:node": "pnpm run z:vitest --project='Node.js'",
-    "z:vitest:stream": "vitest --config ./configs/vitest.config.stream.ts"
+    "z:vitest:node": "pnpm run z:vitest --project='Node.js'"
   },
   "dependencies": {
     "ts-data-forge": "workspace:^",
@@ -67,10 +67,7 @@
   "devDependencies": {
     "@preact/signals-core": "catalog:",
     "@reduxjs/toolkit": "catalog:",
-    "@sumi-lang/cli": "workspace:*",
-    "@types/react": "catalog:",
     "@vitest/browser-playwright": "catalog:",
-    "argparse": "catalog:",
     "eslint": "catalog:",
     "eslint-config-typed": "workspace:*",
     "eslint-plugin-ts-data-forge": "workspace:*",
@@ -82,13 +79,11 @@
     "prettier": "catalog:",
     "prettier-plugin-organize-imports": "catalog:",
     "prettier-plugin-packagejson": "catalog:",
-    "react": "catalog:",
     "rxjs": "catalog:",
     "solid-js": "catalog:",
-    "synstate-react-hooks": "workspace:*",
-    "synstate-react-hooks-compat": "workspace:*",
     "ts-repo-utils": "workspace:*",
     "valtio": "catalog:",
+    "vitest": "catalog:",
     "zustand": "catalog:"
   },
   "engines": {

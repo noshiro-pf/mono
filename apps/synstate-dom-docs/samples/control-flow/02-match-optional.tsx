@@ -1,6 +1,6 @@
 import { createState, map, type InitializedObservable } from 'synstate';
 import { constant, MatchOptional, type JSX } from 'synstate-dom';
-import { Optional } from 'ts-data-forge';
+import { Optional } from 'ts-std-forge';
 
 type User = Readonly<{ name: string }>;
 

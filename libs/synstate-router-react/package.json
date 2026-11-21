@@ -82,8 +82,8 @@
   },
   "peerDependencies": {
     "react": ">=19.0.0",
-    "synstate": ">=9.2.0",
-    "synstate-router": ">=0.5.0"
+    "synstate": "workspace:^",
+    "synstate-router": "workspace:^"
   },
   "engines": {
     "node": ">=22.23.4",

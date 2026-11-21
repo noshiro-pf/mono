@@ -1,0 +1,46 @@
+---
+title: fromSubscribable
+description: 'Follows `subscribable`, emitting each of its values as `Result.ok(value)` and an error as `Result.err(error)`.'
+---
+
+{/* reference:jsdoc */}
+
+Follows `subscribable`, emitting each of its values as `Result.ok(value)` and an error as `Result.err(error)`. It settles on the error or on completion, and drops what the subscribable gives after either; it unsubscribes when disposed, unless the subscribable ended first. A value given while it subscribes is held from the start rather than emitted.
+
+{/* /reference */}
+
+## Example
+
+```tsx
+import { fromSubscribable, type Subscribable } from 'synstate';
+import { Optional, Result } from 'ts-std-forge';
+
+const mut_observers: Parameters<Subscribable<number>['subscribe']>[0][] = [];
+
+const external: Subscribable<number> = {
+    subscribe: (observer) => {
+        mut_observers.push(observer);
+
+        return { unsubscribe: () => {} };
+    },
+};
+
+const followed = fromSubscribable(external);
+
+mut_observers[0]?.next(1);
+
+assert.deepStrictEqual(followed.getSnapshot(), Optional.some(Result.ok(1)));
+
+mut_observers[0]?.error(new Error('closed'));
+
+assert.isTrue(
+    Result.isErr(Optional.unwrapOr(followed.getSnapshot(), Result.ok(0))),
+);
+```
+
+## See also
+
+- [Async operators](/mono/synstate/guides/async-operators/)
+- [All APIs](/mono/synstate/reference/)
+
+[Source on GitHub](https://github.com/noshiro-pf/mono/blob/main/libs/synstate/src/sources/from-subscribable.mts)

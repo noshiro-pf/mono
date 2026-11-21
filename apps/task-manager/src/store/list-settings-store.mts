@@ -41,7 +41,7 @@ export const createListSettingsStore = (
       const subscription = settings.subscribe(deps.save);
 
       return () => {
-        subscription.unsubscribe();
+        subscription();
       };
     },
   };

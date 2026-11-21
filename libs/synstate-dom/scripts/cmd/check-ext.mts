@@ -6,7 +6,7 @@ await assertExt({
   directories: [
     {
       path: path.resolve(workspaceRootPath, './src'),
-      extension: '.mts',
+      extension: ['.mts', '.tsx'],
     },
     {
       path: path.resolve(workspaceRootPath, './scripts'),

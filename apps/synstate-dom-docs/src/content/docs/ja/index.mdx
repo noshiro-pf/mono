@@ -1,57 +1,49 @@
 ---
 title: synstate-dom
-description: SynState のための UI ライブラリ。SynState の Observable を DOM に直接束縛する、コンパイラ不要の細粒度 UI ライブラリです。
+description: synstate のための UI ライブラリ。Observable を DOM に直接束縛する、コンパイラ不要の細粒度 UI ライブラリです。
 template: splash
 hero:
-    tagline: SynState のための UI ライブラリ。SynState の Observable を JSX にそのまま渡すだけ。コンポーネントは 1 回しか呼ばれず、その後は Observable に束縛した属性・プロパティ・テキストだけが書き換わります。コンパイラも仮想 DOM も使いません。
+    tagline: synstate のための UI ライブラリです。Observable を JSX にそのまま渡すだけ。コンポーネントは 1 回しか呼ばれず、更新ですべての値が新しくなった後、束縛した属性・プロパティ・テキストを小さな束縛が 1 つずつ書き換えます。コンパイラも仮想 DOM も使いません。
     actions:
         - text: はじめる
           link: /mono/synstate-dom/ja/getting-started/introduction/
           icon: right-arrow
           variant: primary
-        - text: ベンチマーク
-          link: /mono/synstate-dom/ja/background/benchmark/
+        - text: 仕組み
+          link: /mono/synstate-dom/ja/background/how-it-works/
           variant: minimal
 ---
 
-import { Aside, Card, CardGrid } from '@astrojs/starlight/components';
+import { Card, CardGrid } from '@astrojs/starlight/components';
 
-<Aside type="caution">
-    synstate-dom はまだ 0.x なので、マイナーリリースでも API
-    が変わることがあります。
-</Aside>
-
-## 特長
+## 特徴
 
 <CardGrid>
-    <Card title="SynState のために" icon="star">
+    <Card title="synstate のための UI" icon="star">
 
-synstate-dom は SynState のランタイムに最も直接つながる UI ライブラリです。グラフは途中で何も変換されずに DOM で終わります。[SynState のベンチマークの概要](/mono/synstate/ja/guides/library-comparison/benchmark/#このページの読み方)では、SynState はどのシナリオでも最速のライブラリの {/* bench:summary/synstate-worst-over-fastest */}4.7{/* /bench */} 倍以内に収まります。{/* bench:summary/synstate-alone-in-single-digits */}すべてのシナリオで計測したライブラリのうち、最悪のケースでも1桁倍に収まるのは SynState だけです{/* /bench */}。
-
-    </Card>
-    <Card title="シンプルで、遅くなりにくい" icon="pencil">
-
-1 つのことに 1 つの書き方を保ち、ベンチマークの 1 行だけで勝つための書き方は増やしません。js-framework-benchmark の操作では、最も遅い操作でも最速のライブラリの {/* benchmark:worst/synstate-dom */}1.56{/* /benchmark */} 倍で、{/* benchmark:placement/behind */}Solid・Preact・Preact + Signals には及びません{/* /benchmark */}が、React の {/* benchmark:worst/react */}3.79{/* /benchmark */} 倍を大きく下回ります。
+synstate のオペレーターで組んだグラフは、そのまま DOM で終わります。束縛の 1 つ 1 つがグラフの末端で、途中で値を変換することはありません。コンポーネントは、非同期の段も含めて、グラフのどの Observable でも束縛に渡せます。
 
     </Card>
-    <Card title="細粒度、呼ぶのは 1 回だけ" icon="rocket">
-        コンポーネント関数が呼ばれるのはマウント時の 1 回だけです。更新は
-        synstate のグラフを伝わって、束縛された DOM
-        の葉（属性・プロパティ・テキストノード）に直接書き込まれます。
+    <Card title="束縛はすべての値が新しくなった後に動く" icon="approve-check">
+        更新はまずグラフ全体に伝わり、その後で、届いた束縛がそれぞれ 1
+        回だけ実行されます。束縛が更新途中のグラフを見ることはなく、`If` と
+        `For` のマウントとアンマウントも伝播の外で行われます。
+    </Card>
+    <Card title="細粒度、呼び出しは 1 回" icon="rocket">
+
+コンポーネント関数はマウント時に 1 回呼ばれるだけです。その後の更新は、変わったものに束縛した DOM の末端（属性・プロパティ・テキストノード）に直接書き込みます。差分は取らず、js-framework-benchmark の操作では、最も遅い操作でも最速のライブラリの {/* benchmark:worst/synstate-dom */}1.43{/* /benchmark */} 倍で、{/* benchmark:placement/behind */}Solid・Preact・Preact + Signals には及びません{/* /benchmark */}が、React の {/* benchmark:worst/react */}4.07{/* /benchmark */} 倍を大きく下回ります。
+
     </Card>
     <Card title="コンパイラ不要" icon="setting">
-        TypeScript 標準の `"jsx": "react-jsx"` と `jsxImportSource`
-        だけで動きます。Babel や Vite のプラグインを設定する必要はありません。
+        必要なのは TypeScript 標準の `"jsx": "react-jsx"` と `jsxImportSource`
+        だけです。Babel や Vite のプラグインを設定する必要はありません。
     </Card>
-    <Card title="リアクティブかどうかが型でわかる" icon="approve-check">
-        データを受け取るスロットに渡せるのは Observable か `constant(...)`
-        だけで、素の値は渡せません。うっかりスナップショットを読んで渡しても、更新されないビューができあがるのではなく、型エラーになります。props
-        も値を読み出したものではなく Bindable
-        そのものなので、分割代入しても、デフォルト値を付けても壊れません。
+    <Card title="リアクティブかどうかが型でわかる" icon="pencil">
+        JSX がデータを受け取る場所には、Observable か `constant(...)`
+        を渡し、素の値は渡しません。うっかりスナップショットを読んで渡すと、黙って更新が止まる画面ではなく型エラーになります。
     </Card>
-    <Card title="そもそもリークしない作り" icon="random">
-        `If`・`Match`・`For`
-        は、表示するものをそれぞれのスコープでマウントします。分岐を閉じたり行を消したりすると、その中で作った派生と購読はすべて破棄されます。
+    <Card title="構造上リークしない" icon="random">
+        分岐を閉じたり行を消したりすると、それをマウントするときに作った派生・束縛・購読も、そのオペレーターのタイマーやリクエストと一緒に片付きます。手で購読を解除するものはありません。
     </Card>
 
 </CardGrid>

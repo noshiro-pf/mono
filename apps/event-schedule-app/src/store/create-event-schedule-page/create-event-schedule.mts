@@ -8,6 +8,7 @@ import {
   createReducer,
   debounce,
   derive,
+  dropInitialValue,
   filter,
   map,
   skip,
@@ -301,13 +302,15 @@ export const createCreateEventScheduleStore = (
   /** Starts saving the settings as they change; returns what stops it. */
   const start = (): (() => void) => {
     const subscription = commonState$
+      // Only changes from here on: what it holds at the start is not one.
+      .pipe(dropInitialValue())
       .pipe(debounce(deps.saveDelayMs))
       .pipe(skip(1))
       .pipe(filter(isNotUndefined))
       .subscribe(saveToLocalStorage);
 
     return () => {
-      subscription.unsubscribe();
+      subscription();
     };
   };
 

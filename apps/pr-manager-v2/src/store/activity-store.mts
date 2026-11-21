@@ -171,7 +171,7 @@ export const createActivityStore = (deps: ActivityDeps): ActivityStore => {
       return () => {
         mut_timer.cancel();
 
-        subscription.unsubscribe();
+        subscription();
       };
     },
   };

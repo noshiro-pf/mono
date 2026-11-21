@@ -7,7 +7,7 @@ import {
   createState,
   derive,
   map,
-  onScopeDispose,
+  onCleanup,
   type InitializedObservable,
 } from 'synstate';
 import {
@@ -210,7 +210,7 @@ export const Calendar = ({
           ref={(button) => {
             mut_dayButtons.set(key, button);
 
-            onScopeDispose(() => {
+            onCleanup(() => {
               if (mut_dayButtons.get(key) === button) {
                 mut_dayButtons.delete(key);
               }

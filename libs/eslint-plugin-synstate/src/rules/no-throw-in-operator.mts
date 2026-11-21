@@ -51,9 +51,9 @@ export const noThrowInOperator: TSESLint.RuleModule<MessageIds, Options> = {
     schema: [],
     messages: {
       throwInOperator:
-        'This throws in a function a synstate operator calls while an update propagates. The exception stops the update midway: the nodes it already reached hold the new value, the rest keep the old one, and the error reaches whoever wrote to the source. Make the function pure and return a `Result` (`Result.err(...)`) instead, and handle the error downstream (`mapResultOk`, `unwrapResultOk`, `filter(Result.isOk)`).',
+        'This throws in a function a synstate operator calls while an update propagates. The exception stops the update midway: the nodes it already reached hold the new value, the rest keep the old one, and the error reaches whoever wrote to the source. Make the function pure and return a `Result` (`Result.err(...)`) instead, and handle the error downstream (`map(Result.map(...))`, `filter(Result.isOk)`).',
       throwThroughCall:
-        'This calls `{{name}}`, which throws, in a function a synstate operator calls while an update propagates. The exception stops the update midway: the nodes it already reached hold the new value, the rest keep the old one, and the error reaches whoever wrote to the source. Make `{{name}}` return a `Result` (`Result.err(...)`) instead, and handle the error downstream (`mapResultOk`, `unwrapResultOk`, `filter(Result.isOk)`).',
+        'This calls `{{name}}`, which throws, in a function a synstate operator calls while an update propagates. The exception stops the update midway: the nodes it already reached hold the new value, the rest keep the old one, and the error reaches whoever wrote to the source. Make `{{name}}` return a `Result` (`Result.err(...)`) instead, and handle the error downstream (`map(Result.map(...))`, `filter(Result.isOk)`).',
     },
     defaultOptions: [],
   },

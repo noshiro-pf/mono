@@ -6,12 +6,12 @@ export const runBenchmark = (k: number, width: number): number => {
   const [source, setSource] = createState(0);
 
   // Equal to its previous value on 999 updates in 1000. `map` compares its
-  // result with `Object.is` and passes nothing on when it is equal.
+  // result with `Object.is`, and a value that does not change stops there.
   const bucket = source.pipe(map((v) => Math.floor(v / 1000)));
 
   const mut_lastValues = Arr.zeros(asUint32(width)).map(() => 0);
 
-  const subscriptions = Arr.seq(asUint32(width)).map((i) =>
+  const unsubscribes = Arr.seq(asUint32(width)).map((i) =>
     bucket.pipe(map((b) => b + i)).subscribe((v) => {
       mut_lastValues[i] = v;
     }),
@@ -21,8 +21,8 @@ export const runBenchmark = (k: number, width: number): number => {
     setSource(mut_i);
   }
 
-  for (const subscription of subscriptions) {
-    subscription.unsubscribe();
+  for (const unsubscribe of unsubscribes) {
+    unsubscribe();
   }
 
   return Arr.sum(mut_lastValues);

@@ -11,6 +11,7 @@
 import { serverTimestamp } from 'firebase/firestore';
 import {
   derive,
+  dropInitialValue,
   filter,
   map,
   merge,
@@ -94,7 +95,7 @@ export const createGameStateStore = (deps: GameStateDeps): GameStateStore => {
   const localRecordSource = source<ActionRecord<GameStateActionToWrite>>();
 
   const gameStateDispatcher = (action: GameStateActionToWrite): void => {
-    localRecordSource.next({ id: deps.newActionId(), action });
+    localRecordSource.emit({ id: deps.newActionId(), action });
   };
 
   // The game is the room's actions in the server's order, then those played
@@ -246,12 +247,16 @@ export const createGameStateStore = (deps: GameStateDeps): GameStateStore => {
     // before the room is known are written, in order, once it is.
     const knownRoom = deps.room.pipe(filter(isNotUndefined));
 
-    const playedHere = localRecordSource.pipe(
-      scan<
-        ActionRecord<GameStateActionToWrite>,
-        readonly ActionRecord<GameStateActionToWrite>[]
-      >((played, record) => Arr.toPushed(played, record), []),
-    );
+    // The source holds the last action played, which an earlier `start` wrote
+    // already.
+    const playedHere = localRecordSource
+      .pipe(dropInitialValue())
+      .pipe(
+        scan<
+          ActionRecord<GameStateActionToWrite>,
+          readonly ActionRecord<GameStateActionToWrite>[]
+        >((played, record) => Arr.toPushed(played, record), []),
+      );
 
     const writing = derive([knownRoom, playedHere], (...values) => values)
       .pipe(
@@ -315,19 +320,19 @@ export const createGameStateStore = (deps: GameStateDeps): GameStateStore => {
     });
 
     return () => {
-      writing.unsubscribe();
+      writing();
 
       // Unsubscribing leaves the nodes in the graph, where `playedHere` would
-      // keep every later action; completing both completes what they feed.
-      knownRoom.complete();
+      // keep every later action; disposing both settles what they feed.
+      knownRoom.dispose();
 
-      playedHere.complete();
+      playedHere.dispose();
 
-      autoPlaying.unsubscribe();
+      autoPlaying();
 
-      loggingState.unsubscribe();
+      loggingState();
 
-      loggingAction.unsubscribe();
+      loggingAction();
     };
   };
 

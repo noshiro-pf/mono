@@ -18,7 +18,7 @@ Every bundle is built by the same Vite (Rolldown, with Oxc's minifier), with the
 
 <!-- bundle-size:environment -->
 
-Bundled by Vite 8.3.5. Versions: `synstate-dom 0.9.0`, `synstate 8.0.0`, `solid-js 1.9.17`, `preact 10.29.8`, `@preact/signals 2.11.3`, `react 19.3.1`, `react-dom 19.3.1`, `vanjs-core 1.6.1`.
+Bundled by Vite 8.3.5. Versions: `synstate-dom 0.13.1`, `synstate 9.2.0`, `solid-js 1.9.17`, `preact 10.29.8`, `@preact/signals 2.11.3`, `react 19.3.1`, `react-dom 19.3.1`, `vanjs-core 1.6.1`.
 
 <!-- /bundle-size -->
 
@@ -30,12 +30,12 @@ gzip at level 9. One kB is 1,000 bytes; smaller is better.
 
 | application (kB)             | synstate-dom | Solid | Preact + Signals | Preact | React | VanJS |
 | :--------------------------- | -----------: | ----: | ---------------: | -----: | ----: | ----: |
-| everything exported          |         12.8 |  14.7 |              9.3 |    6.2 |  67.7 |   1.2 |
-| counter                      |          6.7 |   4.0 |              7.9 |    5.4 |  67.5 |   1.2 |
-| js-framework-benchmark table |          8.8 |   5.1 |              8.7 |    8.3 |  68.3 |   2.0 |
-| loan scenario                |          7.6 |   4.2 |              8.5 |    6.1 |  68.1 |   1.8 |
-| schedule scenario            |          7.6 |   4.2 |              8.5 |    6.1 |  68.2 |   1.8 |
-| zoom scenario                |          7.3 |   4.0 |              8.3 |    5.9 |  67.9 |   1.5 |
+| everything exported          |         12.7 |  14.7 |              9.3 |    6.2 |  67.7 |   1.2 |
+| counter                      |          7.6 |   4.0 |              7.9 |    5.4 |  67.5 |   1.2 |
+| js-framework-benchmark table |         10.1 |   5.1 |              8.7 |    8.3 |  68.3 |   2.0 |
+| loan scenario                |          8.3 |   4.2 |              8.5 |    6.1 |  68.1 |   1.8 |
+| schedule scenario            |          8.4 |   4.2 |              8.5 |    6.1 |  68.2 |   1.8 |
+| zoom scenario                |          8.1 |   4.0 |              8.3 |    5.9 |  67.9 |   1.5 |
 
 <!-- /bundle-size -->
 
@@ -47,12 +47,12 @@ Brotli at quality 11.
 
 | application (kB)             | synstate-dom | Solid | Preact + Signals | Preact | React | VanJS |
 | :--------------------------- | -----------: | ----: | ---------------: | -----: | ----: | ----: |
-| everything exported          |         11.5 |  13.4 |              8.5 |    5.6 |  58.3 |   1.1 |
-| counter                      |          6.1 |   3.6 |              7.3 |    4.9 |  58.2 |   1.1 |
-| js-framework-benchmark table |          8.0 |   4.7 |              8.0 |    7.6 |  58.9 |   1.8 |
-| loan scenario                |          6.9 |   3.8 |              7.8 |    5.6 |  58.7 |   1.6 |
-| schedule scenario            |          6.9 |   3.8 |              7.8 |    5.6 |  58.7 |   1.6 |
-| zoom scenario                |          6.7 |   3.6 |              7.6 |    5.4 |  58.5 |   1.4 |
+| everything exported          |         11.4 |  13.4 |              8.5 |    5.6 |  58.3 |   1.1 |
+| counter                      |          7.0 |   3.6 |              7.3 |    4.9 |  58.2 |   1.1 |
+| js-framework-benchmark table |          9.2 |   4.7 |              8.0 |    7.6 |  58.9 |   1.8 |
+| loan scenario                |          7.6 |   3.8 |              7.8 |    5.6 |  58.7 |   1.6 |
+| schedule scenario            |          7.6 |   3.8 |              7.8 |    5.6 |  58.7 |   1.6 |
+| zoom scenario                |          7.4 |   3.6 |              7.6 |    5.4 |  58.5 |   1.4 |
 
 <!-- /bundle-size -->
 
@@ -65,7 +65,7 @@ Brotli at quality 11.
 - **VanJS** is one small module with nothing to shake off, so even the counter includes all of it.
 - **Solid** compiles JSX into templates and calls into a small runtime, so a counter uses only a little of `solid-js/web`. Everything it exports is several times that.
 - **Preact** is a small virtual DOM; Signals adds its reactive core and the integration that binds a signal to the DOM. The Preact table is larger than everything exported because its rows use `memo` from `preact/compat`, which the everything-exported row does not count.
-- **synstate-dom** carries synstate's propagation core (the graph, its depth-ordered pass and scopes), its own JSX runtime and binding tables, and the helpers both import from ts-data-forge and ts-std-forge. synstate-dom and Preact + Signals are the largest after React in every row but everything exported. If your application already uses synstate, though, you pay for that core only once, and in the scenarios, whose models use ts-data-forge in every column, synstate-dom shares those helpers with them.
+- **synstate-dom** carries synstate's propagation core (the graph, its depth-ordered pass and owners), its own JSX runtime and binding tables, and the helpers both import from ts-data-forge and ts-std-forge. synstate-dom and Preact + Signals are the largest after React in every row but everything exported. If your application already uses synstate, though, you pay for that core only once, and in the scenarios, whose models use ts-data-forge in every column, synstate-dom shares those helpers with them.
 - **Everything exported**: synstate-dom and Solid are the largest after React in this row. synstate exports a full set of operators, as RxJS does, but an application keeps only the ones it imports.
 
 ## Running it

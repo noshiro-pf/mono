@@ -1,7 +1,7 @@
 import type { ReadError, Snapshot } from 'pr-report-core-v2';
 import {
-  combine,
   createState,
+  derive,
   map,
   skipIfNoChange,
   type InitializedObservable,
@@ -115,27 +115,26 @@ export const createIssuesStore = (
     .pipe(map(tierSettingsOf))
     .pipe(skipIfNoChange(fastDeepEqual));
 
-  const dag = combine([rows, tiers]).pipe(
-    map(([read, settings]) => {
-      if (Result.isErr(read)) {
-        return undefined;
-      }
+  const dag = derive([rows, tiers], (read, settings) => {
+    if (Result.isErr(read)) {
+      return undefined;
+    }
 
-      const { report, rows: byNumber, pullRequests } = read.value;
+    const { report, rows: byNumber, pullRequests } = read.value;
 
-      const drawn = Array.from(byNumber.values()).filter((row) =>
-        passesTiers(row, settings),
-      );
+    const drawn = Array.from(byNumber.values()).filter((row) =>
+      passesTiers(row, settings),
+    );
 
-      return {
-        drawn,
-        graph: issueGraphOf(drawn, byNumber, pullRequests, report.snapshot),
-      };
-    }),
-  );
+    return {
+      drawn,
+      graph: issueGraphOf(drawn, byNumber, pullRequests, report.snapshot),
+    };
+  });
 
-  const view = combine([rows, deps.field.value, query, dag]).pipe(
-    map(([read, settings, q, drawnGraph]): IssuesBlockView => {
+  const view = derive(
+    [rows, deps.field.value, query, dag],
+    (read, settings, q, drawnGraph): IssuesBlockView => {
       if (drawnGraph === undefined || Result.isErr(read)) {
         return {
           kind: 'unread',
@@ -170,7 +169,7 @@ export const createIssuesStore = (
         failures: report.failures.issues,
         snapshot: report.snapshot,
       };
-    }),
+    },
   );
 
   return {

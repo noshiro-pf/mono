@@ -2,16 +2,15 @@ import {
   createEventEmitter,
   createState,
   debounce,
+  dropInitialValue,
   filter,
   map,
-  mapTo,
   merge,
   throttle,
-  unwrapResultOk,
   withCurrentValueFrom,
   withInitialValue,
   type InitializedObservable,
-  type Subscription,
+  type Unsubscribe,
 } from 'synstate';
 import { Result, isNotUndefined } from 'ts-data-forge';
 import type { Api } from '../../api/index.mjs';
@@ -69,7 +68,8 @@ export const createAnswersStore = (deps: AnswersDeps): AnswersFetcher => {
   const fetchAnswersStarted$ = merge([
     fetchAnswersThrottled$,
     refetchAnswersAfterWrite$,
-    deps.eventId$,
+    // The event it shows at the start is read by the first request.
+    deps.eventId$.pipe(dropInitialValue()),
   ])
     .pipe(withCurrentValueFrom(deps.eventId$))
     // Every request is a read, even one for the event already read.
@@ -81,15 +81,17 @@ export const createAnswersStore = (deps: AnswersDeps): AnswersFetcher => {
       (_: boolean, isLoading: boolean) => isLoading,
       false,
       [
-        fetchAnswersStarted$.pipe(mapTo(true)),
-        answersResult$.pipe(mapTo(false)),
+        fetchAnswersStarted$.pipe(map(() => true, { equals: () => false })),
+        answersResult$.pipe(map(() => false, { equals: () => false })),
       ],
     );
 
   /** Disabled for `throttleMs` after each read the button can ask for. */
   const refreshButtonIsDisabled$ = merge([
-    fetchAnswersThrottled$.pipe(mapTo(true)),
-    fetchAnswersThrottled$.pipe(debounce(deps.throttleMs)).pipe(mapTo(false)),
+    fetchAnswersThrottled$.pipe(map(() => true, { equals: () => false })),
+    fetchAnswersThrottled$
+      .pipe(debounce(deps.throttleMs))
+      .pipe(map(() => false, { equals: () => false })),
   ]).pipe(withInitialValue(false));
 
   const refreshAnswers = (): void => {
@@ -102,14 +104,15 @@ export const createAnswersStore = (deps: AnswersDeps): AnswersFetcher => {
 
   const answers$: InitializedObservable<readonly Answer[] | undefined> = result$
     .pipe(filter(isNotUndefined))
-    .pipe(unwrapResultOk())
+    .pipe(map((result) => Result.unwrapOk(result)))
     .pipe(withInitialValue(undefined));
 
   const start = (): (() => void) => {
     const mut_run = { stopped: false };
 
-    const subscriptions: readonly Subscription[] = [
-      fetchAnswersStarted$.subscribe((eventId) => {
+    const subscriptions: readonly Unsubscribe[] = [
+      // A request made before this start was answered then.
+      fetchAnswersStarted$.pipe(dropInitialValue()).subscribe((eventId) => {
         deps
           .fetchAnswers(eventId)
           .then((result) => {
@@ -137,8 +140,8 @@ export const createAnswersStore = (deps: AnswersDeps): AnswersFetcher => {
     return () => {
       mut_run.stopped = true;
 
-      for (const subscription of subscriptions) {
-        subscription.unsubscribe();
+      for (const unsubscribe of subscriptions) {
+        unsubscribe();
       }
     };
   };

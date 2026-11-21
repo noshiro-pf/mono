@@ -33,7 +33,7 @@ export const createAnimationSettingStore = (
       const subscription = setting.subscribe(deps.save);
 
       return () => {
-        subscription.unsubscribe();
+        subscription();
       };
     },
   };

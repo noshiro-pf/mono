@@ -52,7 +52,7 @@ export const createAnswerFilterAndSortStore = (
   const [
     sortKeyAndOrder$,
     setSortOrderAndKey,
-    { resetState: resetSortOrderAndKey_ },
+    { resetState: resetSortOrderAndKey_, getSnapshot: sortKeyAndOrder },
   ] = createState<readonly ['date' | 'score', 'asc' | 'desc']>(['date', 'asc']);
 
   const filterStateWithAnswersReducer = (
@@ -150,7 +150,9 @@ export const createAnswerFilterAndSortStore = (
     filterStateWithAnswersDispatch({ type: 'filter', action }).filterState;
 
   const resetSortOrderAndKey = (): void => {
-    deps.queryParam.saveSortStateToQueryParams(resetSortOrderAndKey_());
+    resetSortOrderAndKey_();
+
+    deps.queryParam.saveSortStateToQueryParams(sortKeyAndOrder());
   };
 
   const resetState = (): void => {
@@ -160,15 +162,19 @@ export const createAnswerFilterAndSortStore = (
   };
 
   const onDatetimeSortOrderChange = (state: 'asc' | 'desc'): void => {
-    deps.queryParam.saveSortStateToQueryParams(
-      setSortOrderAndKey(['date', state]),
-    );
+    const next = ['date', state] as const;
+
+    setSortOrderAndKey(next);
+
+    deps.queryParam.saveSortStateToQueryParams(next);
   };
 
   const onScoreSortOrderChange = (state: 'asc' | 'desc'): void => {
-    deps.queryParam.saveSortStateToQueryParams(
-      setSortOrderAndKey(['score', state]),
-    );
+    const next = ['score', state] as const;
+
+    setSortOrderAndKey(next);
+
+    deps.queryParam.saveSortStateToQueryParams(next);
   };
 
   const disableFilteringByIcon = (iconId: DetailedFilterIcon): void => {
@@ -597,7 +603,7 @@ export const createAnswerFilterAndSortStore = (
   const tags$: InitializedObservable<readonly FilterTag[]> = derive(
     [sortKeyAndOrder$, filterState$],
     (
-      sortKeyAndOrder,
+      keyAndOrder,
       {
         iconState,
         filledDateOnly,
@@ -614,7 +620,7 @@ export const createAnswerFilterAndSortStore = (
 
       return [
         {
-          value: dc.sort(...sortKeyAndOrder),
+          value: dc.sort(...keyAndOrder),
           props: {
             intent: 'success' as const,
             onRemove: resetSortOrderAndKey,

@@ -1,6 +1,6 @@
 import type { MergedPullRequestFacts } from 'pr-report-core-v2';
 import {
-  combine,
+  derive,
   map,
   skipIfNoChange,
   type InitializedObservable,
@@ -63,13 +63,11 @@ export const mergedBlock = (
         // The window of the read the list is from, moving with each read and
         // with the day before one, never with each tick. A merged part that
         // failed keeps an older list, which the block says above it.
-        href={combine([report, today]).pipe(
-          map(([r, day]) =>
-            githubSearchUrl(
-              repo,
-              'pulls',
-              mergedSinceQuery(r?.readAtMs ?? day * DAY_MS, 7),
-            ),
+        href={derive([report, today], (r, day) =>
+          githubSearchUrl(
+            repo,
+            'pulls',
+            mergedSinceQuery(r?.readAtMs ?? day * DAY_MS, 7),
           ),
         )}
         title={constant(

@@ -7,6 +7,7 @@ import {
   findOrphanedSmokeSources,
   generatedFilesGlob,
   publishablePackagesOf,
+  publishedPeerRanges,
   refreshPublishedChecks,
   removeStaleProjects,
   spacesToPrune,
@@ -134,6 +135,48 @@ describe(removeStaleProjects, () => {
     const { spaceDir } = await makeSpace([]);
 
     assert.deepStrictEqual(await removeStaleProjects(spaceDir, ['a']), []);
+  });
+});
+
+describe(publishedPeerRanges, () => {
+  const packages = [
+    { name: 'synstate', manifest: { name: 'synstate', version: '9.2.0' } },
+    {
+      name: 'synstate-dom',
+      manifest: { name: 'synstate-dom', version: '0.13.1' },
+    },
+  ] as const;
+
+  test('writes a workspace peer as `pnpm pack` does, and leaves a plain range', () => {
+    assert.deepStrictEqual(
+      publishedPeerRanges(
+        {
+          synstate: 'workspace:^',
+          'synstate-dom': 'workspace:~',
+          'ts-data-forge': '>=15.1.1',
+        },
+        packages,
+      ),
+      Result.ok({
+        synstate: '^9.2.0',
+        'synstate-dom': '~0.13.1',
+        'ts-data-forge': '>=15.1.1',
+      }),
+    );
+
+    assert.deepStrictEqual(
+      publishedPeerRanges(
+        { synstate: 'workspace:*', 'synstate-dom': 'workspace:>=0.13.0' },
+        packages,
+      ),
+      Result.ok({ synstate: '9.2.0', 'synstate-dom': '>=0.13.0' }),
+    );
+  });
+
+  test('refuses a workspace peer it has no version for', () => {
+    assert.isTrue(
+      Result.isErr(publishedPeerRanges({ other: 'workspace:^' }, packages)),
+    );
   });
 });
 

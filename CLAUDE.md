@@ -186,7 +186,7 @@ aggregates, `skip-ci`, what a job that holds a key may do, and what a new
 workflow has to be wired to. A workflow's own comments say only what is
 particular to it. Here is only what a session has to act on.
 
-- **The required contexts** (`repo-settings/rulesets/main.json`) are the seven
+- **The required contexts** (`repo-settings/rulesets/main.json`) are the six
   `*-result / result` aggregates, the `no-skip-ci-label` status,
   `Validate code owners` and `verify-lockfile`. None does work, because a
   skipped job satisfies a required check. A new matrix entry needs nothing; a

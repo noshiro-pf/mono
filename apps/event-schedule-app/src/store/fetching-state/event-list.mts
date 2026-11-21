@@ -4,16 +4,15 @@ import {
   createState,
   debounce,
   derive,
+  dropInitialValue,
   filter,
   map,
-  mapTo,
   merge,
   throttle,
-  unwrapResultOk,
   withCurrentValueFrom,
   withInitialValue,
   type InitializedObservable,
-  type Subscription,
+  type Unsubscribe,
 } from 'synstate';
 import { Result, isNotUndefined, tp } from 'ts-data-forge';
 import type { StrictPick } from 'ts-type-forge';
@@ -137,31 +136,33 @@ export const createEventListStore = (deps: EventListDeps): EventListFetcher => {
       next,
     undefined,
     // Signing out leaves no list.
-    [signedOutResult$.pipe(mapTo(undefined))],
+    [signedOutResult$.pipe(map(() => undefined, { equals: () => false }))],
   );
 
   const [refreshButtonIsLoading$] = createReducerWithActions(
     (_: boolean, isLoading: boolean) => isLoading,
     false,
     [
-      fetchEventListStarted$.pipe(mapTo(true)),
-      fetchedEventListResult$.pipe(mapTo(false)),
+      fetchEventListStarted$.pipe(map(() => true, { equals: () => false })),
+      fetchedEventListResult$.pipe(map(() => false, { equals: () => false })),
       // Signing out drops the answer to a read still out.
-      signedOutResult$.pipe(mapTo(false)),
+      signedOutResult$.pipe(map(() => false, { equals: () => false })),
     ],
   );
 
   /** Disabled for `throttleMs` after each read the button can ask for. */
   const refreshButtonIsDisabled$ = merge([
-    fetchEventListThrottled$.pipe(mapTo(true)),
-    fetchEventListThrottled$.pipe(debounce(deps.throttleMs)).pipe(mapTo(false)),
+    fetchEventListThrottled$.pipe(map(() => true, { equals: () => false })),
+    fetchEventListThrottled$
+      .pipe(debounce(deps.throttleMs))
+      .pipe(map(() => false, { equals: () => false })),
   ]).pipe(withInitialValue(false));
 
   const eventList$: InitializedObservable<
     readonly EventListItem[] | undefined
   > = result$
     .pipe(filter(isNotUndefined))
-    .pipe(unwrapResultOk())
+    .pipe(map((result) => Result.unwrapOk(result)))
     .pipe(withInitialValue(undefined));
 
   const start = (): (() => void) => {
@@ -174,46 +175,49 @@ export const createEventListStore = (deps: EventListDeps): EventListFetcher => {
       latest: EventListRequest | undefined;
     } = { stopped: false, latest: undefined };
 
-    const subscriptions: readonly Subscription[] = [
-      fetchEventListStarted$.subscribe(
-        ([
-          _,
-          _fireAuthUser,
-          filterText,
-          filterOptionState,
-          showAllPastDaysEvent,
-          showOnlyEventSchedulesICreated,
-        ]) => {
-          const request: EventListRequest = {
+    const subscriptions: readonly Unsubscribe[] = [
+      // A request made before this start was answered then.
+      fetchEventListStarted$
+        .pipe(dropInitialValue())
+        .subscribe(
+          ([
+            _,
+            _fireAuthUser,
             filterText,
             filterOptionState,
             showAllPastDaysEvent,
             showOnlyEventSchedulesICreated,
-          };
+          ]) => {
+            const request: EventListRequest = {
+              filterText,
+              filterOptionState,
+              showAllPastDaysEvent,
+              showOnlyEventSchedulesICreated,
+            };
 
-          mut_run.latest = request;
+            mut_run.latest = request;
 
-          const answer = (result: NonNullable<EventListResult>): void => {
-            // A read still out when the store stops is dropped, and so is one a
-            // later read has overtaken, which would put back the list of
-            // filters no longer set.
-            if (mut_run.stopped || mut_run.latest !== request) {
-              return;
-            }
+            const answer = (result: NonNullable<EventListResult>): void => {
+              // A read still out when the store stops is dropped, and so is one a
+              // later read has overtaken, which would put back the list of
+              // filters no longer set.
+              if (mut_run.stopped || mut_run.latest !== request) {
+                return;
+              }
 
-            if (Result.isOk(result)) {
-              setListedWith(request);
-            }
+              if (Result.isOk(result)) {
+                setListedWith(request);
+              }
 
-            setFetchedEventListResult(result);
-          };
+              setFetchedEventListResult(result);
+            };
 
-          deps
-            .fetchEventList(request)
-            .then(answer)
-            .catch(() => {});
-        },
-      ),
+            deps
+              .fetchEventList(request)
+              .then(answer)
+              .catch(() => {});
+          },
+        ),
       // Signing out drops the answer to a read still out.
       signedOutResult$.subscribe(() => {
         mut_run.latest = undefined;
@@ -233,8 +237,8 @@ export const createEventListStore = (deps: EventListDeps): EventListFetcher => {
     return () => {
       mut_run.stopped = true;
 
-      for (const subscription of subscriptions) {
-        subscription.unsubscribe();
+      for (const unsubscribe of subscriptions) {
+        unsubscribe();
       }
     };
   };

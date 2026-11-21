@@ -1,481 +1,91 @@
-name: SynState Benchmark
+name: synstate Benchmark
 
-# Measures SynState and the libraries it is compared with, and fails when the
-# committed tables in apps/synstate-docs/src/data no longer describe the code
-# they ship with. A change that moves the numbers is declared by committing the
-# tables CI measured for it (the `synstate-benchmark-to-commit-<run id>`
-# artifact); the same change without them is red.
+# Measures the benchmark of the synstate documentation (apps/synstate-docs)
+# on a GitHub-hosted runner, when dispatched by hand, and uploads what it
+# measured, laid out as it is committed, as the
+# `synstate-benchmark-<commit>-<run id>` artifact, named after the commit it
+# measured. Whoever dispatched it commits that file, on that commit's branch,
+# as apps/synstate-docs/src/data/benchmark-results.json, and runs
+# `pnpm --filter @synstate/docs run gen:benchmark`, which embeds it into the
+# page and stops on a sentence the new figures no longer bear out.
 #
-# The check workflow shape — triggers, concurrency, `permissions: {}`, the
-# gate, the aggregate — is in README.md. What is particular to this one:
+# The page says its figures come from one kind of machine, and a cloud
+# container's CPU moved every ratio between libraries; hence the runner image
+# pinned below, and `check:root:synstate-benchmark-runner`, which fails on a
+# table measured anywhere else. The image does not fix the CPU GitHub
+# schedules the job onto, and a workflow has no way to choose one, so nothing
+# here can hold it: the page states the CPU it was measured on.
 #
-# - It gates on the `benchmark` list (`diff-scope: benchmark`), which ignores
-#   what `code` does: the build it runs reads every workspace package SynState
-#   is built from, and a hand-kept list of those would miss the next one,
-#   while a docs page changes no number it measures. The list takes back
-#   apps/synstate-docs/src/data, so that a diff of the committed tables alone
-#   is judged too, and not the documents a unit test reads, which the
-#   benchmark does not read.
-# - On `main` the job runs even when the verdict is reused, because that run
-#   is what stores the baseline the next pull request is compared with. The
-#   aggregate still reports the reused verdict. What it stores is the
-#   measurement the merged pull request's run took of the same tree, when one
-#   did; only a tree no run measured is measured on `main` (see "Reusing what
-#   a pull request produced" in README.md).
-# - Nothing is built or measured when `main` already stored a baseline for
-#   exactly this source and these versions: the committed tables are judged
-#   against that baseline, so a measurement could change nothing but the
-#   summary (see `Build`).
-# - A shared runner is noisy; `check-drift.mts` divides the runner out and
-#   calls drift a library's change relative to the others beyond 2× either
-#   way, a scenario, library or sweep point only one side has, or a library
-#   with no point measured on both sides. The summary it prints gives each
-#   verdict.
+# Not a check workflow: it reports no required context, and calls neither
+# `check-gates.yml` nor `check-result.yml`. A measurement is a decision to
+# republish the page, not a property of a tree, and it is long. Dispatch it
+# on the branch whose code is to be measured: the run measures the
+# dispatched ref.
 
 on:
-  push:
-    branches:
-      - main
-
-  pull_request:
-    types:
-      - opened
-      - synchronize
-      - reopened
-      - labeled
-      - unlabeled
-
-  # No inputs: the queue dispatches each layer it stacks with none (see
-  # "Triggers" in README.md and `check:root:dispatch-inputs`).
   workflow_dispatch:
 
+# One measurement per ref at a time, and a running one never cancelled: a run
+# writes nothing until every scenario is measured, so a cancelled one loses
+# everything it measured. A dispatch made meanwhile waits; GitHub keeps one
+# waiting run per group, so of several such dispatches only the last runs.
 concurrency:
-  group: ${{ github.workflow }}-${{ case(github.event_name == 'pull_request', github.event.pull_request.number, github.event_name == 'push', github.sha, github.ref) }}
-  cancel-in-progress: true
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
 
 permissions: {}
 
 jobs:
-  gates:
-    if: >-
-      github.event_name != 'pull_request' ||
-      !contains(github.event.pull_request.labels.*.name, 'skip-ci')
-    uses: ./.github/workflows/check-gates.yml
-    permissions:
-      actions: read
-      contents: read
-      pull-requests: read
-    with:
-      diff-scope: benchmark
-      # A reused verdict does not skip `benchmark` on `main`, so the diff
-      # question is answered there all the same.
-      diff-when-reused: ${{ github.event_name == 'push' }}
-      result-job: synstate-benchmark-result / result
-
-  benchmark:
-    needs: gates
-    # On `main` a reused verdict does not skip it: that run stores the
-    # baseline the next pull request is compared with.
-    if: >-
-      !cancelled() &&
-      (github.event_name != 'pull_request' || !contains(github.event.pull_request.labels.*.name, 'skip-ci')) &&
-      needs.gates.outputs.branch_up_to_date != 'false' &&
-      needs.gates.outputs.should_run != 'false' &&
-      (needs.gates.outputs.reused_result == '' || github.event_name == 'push')
-    # Pinned, not `ubuntu-latest`. Comparability is the entire point: these
-    # numbers are published, and a table measured on one image beside a table
-    # measured on the next is the confusion this workflow exists to end. When
-    # this moves, every baseline cache key moves with it — the image is part of
-    # the key below — so the tables are re-measured rather than silently mixed.
+  measure:
+    # Pinned, not `ubuntu-latest`, so that a re-measurement differs from the
+    # last only in the code and the versions measured.
     runs-on: ubuntu-24.04
-    # `actions: read` to find and download the measurement a pull request's
-    # run took of this tree.
+    # Every library in every scenario, several times, each in a process of its
+    # own (`run-benchmark.mts`), with the timeouts of the slow libraries in the
+    # sweeps; see `LONGER_TIMEOUTS` in check-workflow-timeouts.mts. It holds
+    # one of the account's concurrent runners all that time, which the checks
+    # of the merge queue share ("The work" in README.md), so dispatch it when
+    # the queue is quiet.
+    timeout-minutes: 120
+
     permissions:
-      actions: read
       contents: read
-    # Five scenarios. The cascaded diamond spends three 5-second timeouts on
-    # RxJS, and the equality cut-off one each on four libraries, after
-    # two warmup rounds at least as long. Measured locally at about 2m30s for
-    # the first four, and 6m for the cut-off on a slower machine, plus install
-    # and build; on the runner a measurement takes 10 to 14 minutes, which is
-    # why this is one of the jobs above the 15-minute ceiling
-    # (`check:root:workflow-timeouts`).
-    timeout-minutes: 20
+
+    env:
+      # Where `run-benchmark.mts` writes (`resultsPath` in its `scenarios.mts`).
+      RESULTS_PATH: apps/synstate-docs/src/data/benchmark-results.json
 
     steps:
       - name: Checkout
         uses: actions/checkout@v7.0.1
         with:
-          ref: ${{ case(github.event_name == 'pull_request', github.event.pull_request.head.sha, github.sha) }}
           persist-credentials: false
 
       - name: Set up pnpm, Node.js and the dependencies
         uses: $/.github/actions/setup
 
-      # The key is the set of versions being compared, because that is what a
-      # benchmark result is a fact about. Re-measuring on every push would put
-      # a diff of noise in the tables on every pull request, which is what
-      # `libraries` in the key prevents; measuring once per version set and
-      # reusing it is what keeps the published tables still.
-      #
-      # The image and the Node version are spelled out rather than folded into
-      # the digest, so that a glance at the cache name says which runner a
-      # baseline came from.
-      #
-      # SynState's own version is not enough for SynState: the workspace
-      # package keeps its version until a release, so a rewrite of its core
-      # measured against a baseline of the old one reads as drift on `main`
-      # until then. The digest of the source of every workspace package the
-      # docs app reaches through `dependencies` (SynState and what it is built
-      # from, read from the workspace graph rather than kept as a list) and of
-      # the benchmark itself — the scenario files, the runners, and the deep
-      # chain's adapters and the spring-demo modules they load, which live
-      # with the interactive demos — therefore joins the key; test files are
-      # left out, since they change nothing measured. `devDependencies` are
-      # left out too: the ESLint packages and the build tooling change no
-      # number, and keying on every package's source made a pull request that
-      # touched any of them measure for ten minutes. That every workspace
-      # package a benchmark source imports is in that closure, every file it
-      # imports by a relative path is in the directories below, and this step
-      # reads both, is `check:root:synstate-benchmark-imports`'s to check. The digest is of
-      # `git ls-files -s`, the blob of each file, and the file list is filtered
-      # by `awk` rather than by an `:(exclude)` pathspec.
-      #
-      # The `vN` is for a change of what is measured that none of that sees,
-      # and bumping it is what makes `main` re-measure; without it the
-      # committed tables keep being judged against the old baseline. v2: the
-      # libraries run their production builds (`production-builds.mts`).
-      - name: Compute the baseline cache key
-        id: key
-        run: |
-          set -euo pipefail
-          libs="$(pnpm --filter @synstate/docs run --silent z:benchmark:version-key)"
-          node_major="$(node -p 'process.versions.node.split(".")[0]')"
-          mapfile -t packages < <(pnpm --filter-prod '@synstate/docs^...' ls --depth -1 --parseable)
-          if [ "${#packages[@]}" -eq 0 ]; then
-            echo '::error::pnpm listed no workspace package that @synstate/docs depends on.'
-            exit 1
-          fi
-          sources=()
-          for package in "${packages[@]}"; do
-            sources+=("$(realpath --relative-to=. "${package}")/src")
-          done
-          echo "Sources: ${sources[*]}"
-          source_digest="$(
-            {
-              git ls-files -s -- "${sources[@]}" \
-                libs/synstate/samples/docs-site/benchmark \
-                apps/synstate-docs/scripts/benchmark \
-                apps/synstate-docs/src/components/throughput-demo/adapters
-              git ls-files -s -- apps/synstate-docs/src/components/spring-demo |
-                awk '$4 ~ /\.mts$/'
-            } |
-              awk '$4 !~ /\.test\.mts$/' |
-              sha256sum
-          )"
-          prefix="synstate-benchmark-v2-ubuntu-24.04-node${node_major}-${libs}-src"
-          key="${prefix}${source_digest:0:12}"
-          echo "prefix=${prefix}" >>"${GITHUB_OUTPUT}"
-          echo "value=${key}" >>"${GITHUB_OUTPUT}"
-          echo "Baseline key: ${key}"
-
-      # Restore only. A cache written on a pull request branch is visible to
-      # that branch alone, so a baseline has to come from `main` to be worth
-      # anything; the save step below is therefore gated on `main`.
-      #
-      # A branch that changes SynState's source has no baseline of its own, so
-      # the newest one `main` stored for the same versions stands in for it
-      # (`cache-hit` false, `cache-matched-key` set): that is the measurement
-      # of the code before the branch, which is what the branch is compared
-      # with. It never stands in for the committed tables, which have to match
-      # the code they ship with.
-      - name: Restore the baseline for these versions
-        id: baseline
-        uses: actions/cache/restore@v5.1.0
-        with:
-          path: baseline
-          key: ${{ steps.key.outputs.value }}
-          restore-keys: ${{ steps.key.outputs.prefix }}
-
-      # `Measure` and `Use that measurement` clear them and write the
-      # measurement in their place, and they are what is judged below.
-      - name: Keep the committed tables
-        run: cp -R apps/synstate-docs/src/data committed
-
-      # On `main` with no baseline for this key, the pull request that brought
-      # this tree usually measured it already: the same source, versions,
-      # image and Node, so the same key. Its measurement becomes the baseline
-      # in place of a second one, a minute or so after the merge rather than
-      # ten, so that the next pull request in the queue, whose benchmark
-      # restores its key about two minutes after the merge, usually finds it;
-      # when it does not, it measures, as every one did before. Where no run
-      # of this tree holds a measurement —
-      # an exact hit there, an expired artifact, a merge that bypassed the
-      # checks — it is measured here as before. A failed run's measurement is
-      # taken too: it failed on the committed tables, not on what it measured.
-      - name: Find a measurement of this tree
-        id: measured
-        if: >-
-          github.event_name == 'push' &&
-          steps.baseline.outputs.cache-hit != 'true'
-        uses: $/.github/actions/find-run-of-tree
-        with:
-          workflow: synstate-benchmark.yml
-          artifact-pattern: '^synstate-benchmark-[0-9]+$'
-          conclusion: any
-
-      # Into a directory of its own, so that a failed or partial download
-      # leaves the committed tables for `Build`, which then runs.
-      - name: Take that measurement
-        id: taken
-        if: steps.measured.outputs.run-id != ''
-        # A download that fails measures here instead.
-        continue-on-error: true
-        uses: actions/download-artifact@v8.0.2
-        with:
-          name: synstate-benchmark-${{ steps.measured.outputs.run-id }}
-          path: taken
-          run-id: ${{ steps.measured.outputs.run-id }}
-          github-token: ${{ github.token }}
-
-      # In place of the committed tables, not over them: a results file that
-      # measurement does not have (a scenario the runners no longer measure)
-      # must not stay behind and pass as measured. See `Measure`. The artifact
-      # was uploaded by a run of this tree after its `Measure`, checks
-      # included, passed, or re-uploaded by one that took it the same way, so
-      # it holds every table the runners wrote; one without both kinds of
-      # table is not used, and this run measures.
-      - name: Use that measurement
-        id: used
-        if: steps.taken.outcome == 'success'
-        run: |
-          set -euo pipefail
-          if [ -z "$(find taken -maxdepth 1 -name 'results*.json' -print -quit)" ] ||
-            [ -z "$(find taken -maxdepth 1 -name 'results*.md' -print -quit)" ]; then
-            echo '::warning title=Measurement not used::The artifact taken lacks its results*.json or results*.md tables, so this run measures instead.'
-            exit 0
-          fi
-          pnpm --filter @synstate/docs run z:benchmark:clear
-          cp taken/results*.json taken/results*.md apps/synstate-docs/src/data/
-          echo 'done=true' >>"${GITHUB_OUTPUT}"
-
-      # Not on an exact hit, and neither is any step that reads the
-      # measurement. The verdict there is the committed tables against the
-      # baseline (`Judge the committed tables`), which a measurement does not
-      # enter, and there is no baseline to store. What remains is the summary
-      # comparing a fresh run with the baseline, and for the same source and
-      # versions that is only the runner's noise. Measuring cost about ten
-      # minutes of a runner on every pull request that changed no library
-      # source, no benchmark file and no compared version. The docs app's
-      # `doc`, which this build also runs, is code-check.yml's to fail on the
-      # same tree (its `ws:build` before `z:ci:code-check:dist-and-verify`). Nor where the measurement was taken from a pull
-      # request's run of this tree, which built it.
+      # Every workspace package that another one links, as every package
+      # script assumes, rather than only those the measurement loads from
+      # `dist/`: a list of those would be one more to keep in step with what
+      # the benchmark imports, and building them all is short beside the
+      # measurement.
       - name: Build
-        if: >-
-          steps.baseline.outputs.cache-hit != 'true' &&
-          steps.used.outputs.done != 'true'
-        run: pnpm run ws:build
+        run: pnpm run ws:build:deps
 
-      # The tables only, without `gen:benchmark-doc`: a near tie in one noisy
-      # re-measurement must not fail the job that judges drift. A sentence the
-      # committed tables no longer support fails `Build` instead (`ws:build`
-      # runs the docs app's `doc`); a page left stale against its tables is
-      # style-check's `ws:gen` to catch. What holds whatever the prose says —
-      # a chart colour for every library, one environment for every table —
-      # is checked here, before the measurement becomes an artifact or a
-      # baseline. Each scenario runs in its own process and stamps the date,
-      # so one date is pinned for the pass, or a run crossing midnight UTC
-      # would record two. `fix:fmt` gives the tables the layout they are
-      # committed in, so the diff below counts changed numbers, not
-      # reformatted lines.
+      # The docs app's `benchmark` without `gen:benchmark`, which stops on a
+      # sentence the figures no longer bear out; rewording one is the
+      # committer's to do. The committed copy is removed first, so that a run
+      # that wrote its results anywhere else fails the upload rather than
+      # uploading that copy as a measurement.
       - name: Measure
-        if: >-
-          steps.baseline.outputs.cache-hit != 'true' &&
-          steps.used.outputs.done != 'true'
         run: |
           set -euo pipefail
-          BENCHMARK_MEASURED_ON="$(date -u +%F)"
-          export BENCHMARK_MEASURED_ON
-          # `z:benchmark:measure` clears the checkout's tables first, after
-          # `Build` has read them (`scripts/benchmark/clear-results.mts`).
+          rm "${RESULTS_PATH}"
           pnpm --filter @synstate/docs run z:benchmark:measure
-          pnpm --filter @synstate/docs run z:benchmark:check-measurement
-          pnpm --filter @synstate/docs run fix:fmt
 
-      # What the measurement would change if it were committed. On `main` with
-      # no baseline yet, this is the diff to commit; on a pull request it is
-      # information, and nothing here commits anything.
-      - name: Show what the measurement changes
-        if: steps.baseline.outputs.cache-hit != 'true'
-        run: |
-          set -euo pipefail
-          # Intent to add, so that a table the measurement adds is listed too.
-          git add --intent-to-add -- apps/synstate-docs/src/data
-          {
-            echo '### The measurement against the committed tables'
-            echo
-            echo '```diff'
-            git --no-pager diff --stat -- apps/synstate-docs/src/data || true
-            echo '```'
-          } >>"${GITHUB_STEP_SUMMARY}"
-
-      - name: Compare with the baseline
-        if: >-
-          steps.baseline.outputs.cache-matched-key != '' &&
-          steps.baseline.outputs.cache-hit != 'true'
-        run: |
-          set -euo pipefail
-          pnpm --filter @synstate/docs run --silent z:benchmark:compare \
-            "$(pwd)/baseline" \
-            "$(pwd)/apps/synstate-docs/src/data" \
-            >>"${GITHUB_STEP_SUMMARY}"
-
-      - name: Say that there was no baseline
-        if: steps.baseline.outputs.cache-matched-key == ''
-        run: |
-          set -euo pipefail
-          # shellcheck disable=SC2016 # literal backticks, not command substitution
-          {
-            echo '### No baseline for these library versions'
-            echo
-            echo 'Nothing has been measured on this runner image for this set of'
-            echo 'versions yet, so there is nothing to compare against. A run on'
-            echo '`main` establishes it.'
-          } >>"${GITHUB_STEP_SUMMARY}"
-
-      - name: Say that the baseline matched exactly
-        if: steps.baseline.outputs.cache-hit == 'true'
-        run: |
-          set -euo pipefail
-          # shellcheck disable=SC2016 # literal backticks, not command substitution
-          {
-            echo '### Nothing measured: `main` measured this exact source'
-            echo
-            echo 'The baseline for these versions was stored from the same'
-            echo 'source as this run, so the committed tables are judged'
-            echo 'against it below and nothing is built or measured.'
-          } >>"${GITHUB_STEP_SUMMARY}"
-
-      # The results are the artifact whether or not they become the baseline:
-      # on a pull request they are what the author can download and commit if
-      # the change is meant to move the published tables. On an exact hit
-      # nothing was measured, and what to commit is the baseline itself (`Upload
-      # the tables to commit`).
       - name: Upload the measurement
-        if: steps.baseline.outputs.cache-hit != 'true'
         uses: actions/upload-artifact@v7.0.2
         with:
-          name: synstate-benchmark-${{ github.run_id }}
-          path: apps/synstate-docs/src/data
+          name: synstate-benchmark-${{ github.sha }}-${{ github.run_id }}
+          path: ${{ env.RESULTS_PATH }}
           if-no-files-found: error
-
-      # Only from `main`, and only when there was no baseline: a cache entry is
-      # immutable, so this writes the first measurement for a version set and
-      # never overwrites it. That immutability is the feature — the baseline a
-      # pull request is compared against does not drift under it.
-      - name: Save this as the baseline
-        if: >-
-          github.ref == 'refs/heads/main' &&
-          github.event_name != 'pull_request' &&
-          steps.baseline.outputs.cache-hit != 'true'
-        run: |
-          set -euo pipefail
-          rm -rf baseline
-          cp -R apps/synstate-docs/src/data baseline
-
-      - name: Store the baseline
-        if: >-
-          github.ref == 'refs/heads/main' &&
-          github.event_name != 'pull_request' &&
-          steps.baseline.outputs.cache-hit != 'true'
-        uses: actions/cache/save@v5.1.0
-        with:
-          path: baseline
-          key: ${{ steps.key.outputs.value }}
-
-      # The published tables are judged against the measurement CI keeps for
-      # this source and these versions: the cached baseline, or where there is
-      # none — a branch that changes SynState or a compared library, or `main`
-      # right after one merged — the one just taken. Not byte for byte, and not
-      # in milliseconds: `check-drift.mts` divides out the runner instance, so
-      # a dependency bump that moves nothing keeps the published tables, and
-      # one that moves a library, or adds or removes one or a point, moves
-      # them. A library's change beyond what unchanged code moves by between
-      # runs is drift, and so are a scenario, library or sweep point only one
-      # side has and a library with no point measured on both sides; the
-      # summary it prints gives each verdict.
-      - name: Judge the committed tables
-        id: committed
-        run: |
-          set -euo pipefail
-          reference="$(pwd)/${{ case(steps.baseline.outputs.cache-hit == 'true', 'baseline', 'apps/synstate-docs/src/data') }}"
-          echo "reference=${reference}" >>"${GITHUB_OUTPUT}"
-          pnpm --filter @synstate/docs run --silent z:benchmark:check-drift \
-            "${reference}" \
-            "$(pwd)/committed" \
-            >>"${GITHUB_STEP_SUMMARY}"
-
-      # Information for a pull request that changes SynState itself: whether
-      # this branch's measurement differs from the baseline, by
-      # `check-drift.mts`'s rules. The baseline is passed as the committed
-      # side and this branch as the reference, so in the table this step adds
-      # to the summary "the committed tables" are the baseline and "the
-      # reference" is this branch. On a queue layer too: a queued pull request
-      # is measured there, and its own run reuses that verdict, whose summary
-      # links the layer's run, without measuring again.
-      - name: Judge this branch's measurement
-        id: branch
-        if: >-
-          (github.event_name == 'pull_request' || startsWith(github.ref, 'refs/heads/queue/')) &&
-          steps.baseline.outputs.cache-matched-key != '' &&
-          steps.baseline.outputs.cache-hit != 'true'
-        run: |
-          set -euo pipefail
-          pnpm --filter @synstate/docs run --silent z:benchmark:check-drift \
-            "$(pwd)/apps/synstate-docs/src/data" \
-            "$(pwd)/baseline" \
-            >>"${GITHUB_STEP_SUMMARY}"
-
-      - name: Warn that this branch's measurement differs from the baseline
-        if: steps.branch.outputs.drifted == 'true'
-        run: echo '::warning title=Benchmark differs from the baseline::The measurement of this branch differs from the baseline beyond run-to-run noise, or the two differ in the scenarios, libraries or sweep points they measure. The last table of the job summary says which; there, the committed tables are the baseline.'
-
-      # What to commit when the tables have drifted: the reference itself, so
-      # that the next run judges the tables equal to it.
-      - name: Upload the tables to commit
-        if: steps.committed.outputs.drifted == 'true'
-        uses: actions/upload-artifact@v7.0.2
-        with:
-          name: synstate-benchmark-to-commit-${{ github.run_id }}
-          path: ${{ steps.committed.outputs.reference }}
-          if-no-files-found: error
-
-      # Red on a pull request too: a change that moves the numbers declares it
-      # by committing the tables measured for it, and one that does not is
-      # the change this check exists to stop. A dependency update that moves a
-      # compared library is no exception — its fix is the same commit.
-      # Re-running `benchmark` locally is not a fix, because a local machine is
-      # not the pinned runner.
-      - name: Fail when the published tables have drifted
-        if: steps.committed.outputs.drifted == 'true'
-        run: |
-          set -euo pipefail
-          echo '::error title=Benchmark tables drifted::The committed tables in apps/synstate-docs/src/data do not describe this code and these library versions. If the change is meant to move the numbers, replace their results*.json and results*.md with those of the synstate-benchmark-to-commit-${{ github.run_id }} artifact, deleting any it does not have (a scenario the summary reports missing from the reference, whose imports in apps/synstate-docs go with it), then run pnpm --filter @synstate/docs run gen:benchmark-doc until it passes, fixing what each error names (a sentence the tables no longer support is rewritten), run pnpm run fmt, and commit the result.'
-          exit 1
-
-  # The one required status check for this workflow, reported as
-  # `synstate-benchmark-result / result` — see "The aggregate job" in
-  # README.md.
-  synstate-benchmark-result:
-    needs:
-      - gates
-      - benchmark
-    # Not on a label event while `skip-ci` is on, so that putting the label on
-    # supersedes no verdict — "A label event under `skip-ci`" in README.md.
-    if: >-
-      always() &&
-      !((github.event.action == 'labeled' || github.event.action == 'unlabeled') &&
-        contains(github.event.pull_request.labels.*.name, 'skip-ci'))
-    uses: ./.github/workflows/check-result.yml
-    with:
-      needs: ${{ toJSON(needs) }}

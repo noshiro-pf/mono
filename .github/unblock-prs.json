@@ -60,8 +60,7 @@
       "style-check.yml",
       "strict-lib-gen.yml",
       "node-version-compatibility.yml",
-      "verify-published-packages.yml",
-      "synstate-benchmark.yml"
+      "verify-published-packages.yml"
     ],
     "depth": 2
   },

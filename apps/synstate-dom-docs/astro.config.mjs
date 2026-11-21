@@ -11,7 +11,7 @@ export default defineConfig({
     StarlightIntegration({
       title: 'synstate-dom',
       description:
-        'A compiler-free, fine-grained UI library that binds synstate observables directly to the DOM.',
+        'The UI library for synstate: a compiler-free, fine-grained UI library that binds observables directly to the DOM.',
       customCss: ['./src/styles/custom.css'],
       // synstate's own icon, until synstate-dom has one.
       favicon: '/favicon.ico',
@@ -66,6 +66,7 @@ export default defineConfig({
             { slug: 'guides/control-flow' },
             { slug: 'guides/components' },
             { slug: 'guides/lifecycle' },
+            { slug: 'guides/low-level' },
           ],
         },
         {
@@ -77,6 +78,8 @@ export default defineConfig({
           label: 'Background',
           translations: { ja: '背景' },
           items: [
+            { slug: 'background/how-it-works' },
+            { slug: 'background/changes-from-synstate-dom' },
             { slug: 'background/without-a-compiler' },
             { slug: 'background/benchmark' },
             { slug: 'background/bundle-size' },

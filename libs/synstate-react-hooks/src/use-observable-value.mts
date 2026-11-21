@@ -40,11 +40,10 @@ export function useObservableValue<A, B = A>(
   // A new `getSnapshot` does not resubscribe; it is memoized alongside only to
   // read the same observable.
   const subscribe = React.useCallback(
-    (onStoreChange: () => void) => {
-      const { unsubscribe } = observable$.subscribe(onStoreChange);
-
-      return unsubscribe;
-    },
+    (onStoreChange: () => void) =>
+      observable$.subscribe(() => {
+        onStoreChange();
+      }),
     [observable$],
   );
 

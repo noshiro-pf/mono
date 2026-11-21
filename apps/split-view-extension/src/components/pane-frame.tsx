@@ -2,7 +2,7 @@ import {
   createState,
   derive,
   map,
-  onScopeDispose,
+  onCleanup,
   type InitializedObservable,
 } from 'synstate';
 import {
@@ -243,7 +243,7 @@ export const PaneFrame = ({
     resetTimer: undefined,
   };
 
-  onScopeDispose(() => {
+  onCleanup(() => {
     clearTimeout(mut_state.greetingTimer);
 
     clearTimeout(mut_state.noAnswerTimer);

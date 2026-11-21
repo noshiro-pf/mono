@@ -1,4 +1,4 @@
-import { combine, map, type InitializedObservable } from 'synstate';
+import { derive, map, type InitializedObservable } from 'synstate';
 import { constant, If, type JSX } from 'synstate-dom';
 import { Num } from 'ts-data-forge';
 
@@ -17,12 +17,10 @@ type Props = Readonly<{
  * so nobody measures a bar.
  */
 export const Divergence = ({ comparison, scaleMax }: Props): JSX.Element => {
-  const widths = combine([comparison, scaleMax]).pipe(
-    map(([c, max]) => ({
-      behind: percentOf(c?.behindBy ?? 0, max),
-      ahead: percentOf(c?.aheadBy ?? 0, max),
-    })),
-  );
+  const widths = derive([comparison, scaleMax], (c, max) => ({
+    behind: percentOf(c?.behindBy ?? 0, max),
+    ahead: percentOf(c?.aheadBy ?? 0, max),
+  }));
 
   return (
     <If

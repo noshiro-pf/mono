@@ -298,14 +298,14 @@ const setup = (): Setup => {
     setRoom,
     actionsFromDb: {
       next: (actions) => {
-        actionsFromDb.next(actions);
+        actionsFromDb.emit(actions);
       },
     },
     written: mut_written,
     played: mut_played,
     timers: mut_timers,
     tick: (n) => {
-      ticks.next(n);
+      ticks.emit(n);
     },
   } as const;
 };

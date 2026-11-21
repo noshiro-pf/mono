@@ -12,7 +12,6 @@ import {
   Result,
   unknownToString,
 } from 'ts-data-forge';
-import { benchmarkSets, type BenchmarkSet } from './benchmark-sets.mjs';
 // eslint-disable-next-line import-x/no-relative-packages -- shared with synstate-docs' measurement (#3066)
 import { mapInSequence } from '../../../tools/scripts/lib/bundle-size.mjs';
 // eslint-disable-next-line import-x/no-relative-packages -- the repository's one way to run a process
@@ -29,13 +28,7 @@ import { workspaceRootPath } from './workspace-root-path.mjs';
  * pnpm run benchmark:repeat                          # 5 runs
  * pnpm run benchmark:repeat -- --runs 8
  * pnpm run benchmark:repeat -- --baseline origin/main
- * pnpm run benchmark:repeat -- --next
  * ```
- *
- * With `--next`, the runs compare synstate-dom with synstate-dom-next, the
- * rebuild that is to replace it, and Solid, and the medians go to
- * RESULTS-NEXT.md (see README.md); RESULTS.md is left as it is. With
- * `--baseline` too, the ref has to define `benchmark:next`.
  *
  * Each run measures the libraries in a different order (`BENCHMARK_ROTATE`), so
  * that no library is always the one measured on a cold browser.
@@ -59,11 +52,8 @@ const main = async (): Promise<void> => {
     options: {
       runs: { type: 'string', default: '5' },
       baseline: { type: 'string' },
-      next: { type: 'boolean', default: false },
     },
   });
-
-  const set: BenchmarkSet = values.next ? 'next' : 'all';
 
   const runs = Result.unwrapOkOr(Num.safeParseInt(values.runs), Number.NaN);
 
@@ -74,7 +64,7 @@ const main = async (): Promise<void> => {
   const baselineRoot =
     values.baseline === undefined
       ? undefined
-      : await prepareBaseline(values.baseline, set);
+      : await prepareBaseline(values.baseline);
 
   try {
     // One run after another, never two at once: they would share the machine
@@ -82,31 +72,29 @@ const main = async (): Promise<void> => {
     const rounds = await mapInSequence(Arr.seq(asUint32(runs)), async (i) => {
       console.info(`\n## Run ${i + 1} of ${runs}\n`);
 
-      const current = await runOnce(workspaceRootPath, i, set);
+      const current = await runOnce(workspaceRootPath, i);
 
       const baseline =
         baselineRoot === undefined
           ? undefined
-          : await runOnce(appIn(baselineRoot), i, set);
+          : await runOnce(appIn(baselineRoot), i);
 
       return { current, baseline } as const;
     });
 
     const medians = medianTables(rounds.map((r) => r.current));
 
-    const measuredIn = userAgentOf(await readResults(workspaceRootPath, set));
+    const measuredIn = userAgentOf(await readResults(workspaceRootPath));
 
     // eslint-disable-next-line security/detect-non-literal-fs-filename
     await fs.writeFile(
-      resultsPath(workspaceRootPath, set),
+      resultsPath(workspaceRootPath),
       [
-        benchmarkSets[set].title,
+        '# Results',
         '',
-        set === 'next'
-          ? '<!-- Written by `pnpm run benchmark:repeat -- --next`; edits here are overwritten. -->'
-          : '<!-- Written by `pnpm run benchmark:repeat`; edits here are overwritten. -->',
+        '<!-- Written by `pnpm run benchmark:repeat`; edits here are overwritten. -->',
         '',
-        `Measured in \`${measuredIn}\`. Each figure is the median of ${runs} runs of \`pnpm run ${benchmarkSets[set].script}\`, each measuring the libraries in a different order and each itself the median of its timed runs; see README.md for what is timed.`,
+        `Measured in \`${measuredIn}\`. Each figure is the median of ${runs} runs of \`pnpm run benchmark\`, each measuring the libraries in a different order and each itself the median of its timed runs; see README.md for what is timed.`,
         '',
         mediansTable(medians.operations),
         '',
@@ -131,7 +119,7 @@ const main = async (): Promise<void> => {
       ].join('\n'),
     );
 
-    console.info(`\nWrote ${resultsPath(workspaceRootPath, set)}`);
+    console.info(`\nWrote ${resultsPath(workspaceRootPath)}`);
 
     if (baselineRoot !== undefined && values.baseline !== undefined) {
       console.info(
@@ -192,15 +180,12 @@ const appPathInRepo = path.relative(repoRoot, workspaceRootPath);
 
 const appIn = (root: string): string => path.join(root, appPathInRepo);
 
-const resultsPath = (appRoot: string, set: BenchmarkSet): string =>
-  path.join(appRoot, benchmarkSets[set].results);
+const resultsPath = (appRoot: string): string =>
+  path.join(appRoot, 'RESULTS.md');
 
-const readResults = async (
-  appRoot: string,
-  set: BenchmarkSet,
-): Promise<string> =>
+const readResults = async (appRoot: string): Promise<string> =>
   // eslint-disable-next-line security/detect-non-literal-fs-filename
-  fs.readFile(resultsPath(appRoot, set), 'utf8');
+  fs.readFile(resultsPath(appRoot), 'utf8');
 
 const run = async (
   command: string,
@@ -281,16 +266,12 @@ const parseResults = (markdown: string): Tables => {
 };
 
 /** Runs the benchmark once in `appRoot` and reads the tables it wrote. */
-const runOnce = async (
-  appRoot: string,
-  rotate: number,
-  set: BenchmarkSet,
-): Promise<Tables> => {
-  await run('pnpm', ['run', benchmarkSets[set].script], appRoot, {
+const runOnce = async (appRoot: string, rotate: number): Promise<Tables> => {
+  await run('pnpm', ['run', 'benchmark'], appRoot, {
     BENCHMARK_ROTATE: rotate.toString(),
   });
 
-  return parseResults(await readResults(appRoot, set));
+  return parseResults(await readResults(appRoot));
 };
 
 /** Whether the package in `appRoot` defines the script `name`. */
@@ -322,10 +303,7 @@ const definesScript = async (
  * Checks `ref` out in a temporary worktree and builds what its benchmark
  * imports, so that it runs the way this tree's does.
  */
-const prepareBaseline = async (
-  ref: string,
-  set: BenchmarkSet,
-): Promise<string> => {
+const prepareBaseline = async (ref: string): Promise<string> => {
   const root = await fs.mkdtemp(
     path.join(os.tmpdir(), 'synstate-dom-benchmark-baseline-'),
   );
@@ -333,7 +311,7 @@ const prepareBaseline = async (
   await run('git', ['worktree', 'add', '--detach', root, ref], repoRoot);
 
   // Before the install and the build, which take minutes.
-  const { script } = benchmarkSets[set];
+  const script = 'benchmark';
 
   if (!(await definesScript(appIn(root), script))) {
     await run('git', ['worktree', 'remove', '--force', root], repoRoot);

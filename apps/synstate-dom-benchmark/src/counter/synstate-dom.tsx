@@ -1,3 +1,4 @@
+/** @jsxImportSource synstate-dom */
 import { createState, map } from 'synstate';
 import { render, type JSX } from 'synstate-dom';
 import type { CounterFramework } from './counter.mjs';

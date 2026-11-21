@@ -35,18 +35,18 @@ describe(useValueAsObservable, () => {
     assert.deepStrictEqual(mut_seen, [1, 2, 3]);
   });
 
-  test('completes the observable in a timer after the component unmounts', async () => {
+  test('disposes the observable in a timer after the component unmounts', async () => {
     const { result, unmount } = renderHook(() => useValueAsObservable(0));
 
     const observable$ = result.current;
 
     unmount();
 
-    assert.isFalse(observable$.isCompleted);
+    assert.isFalse(observable$.settled);
 
     await nextTask();
 
-    assert.isTrue(observable$.isCompleted);
+    assert.isTrue(observable$.settled);
   });
 
   test('keeps one live observable under StrictMode, which runs the effects twice on mount', async () => {
@@ -63,7 +63,7 @@ describe(useValueAsObservable, () => {
 
     const [first, firstValue] = result.current;
 
-    assert.isFalse(first.isCompleted);
+    assert.isFalse(first.settled);
 
     assert.strictEqual(firstValue, 1);
 
@@ -79,7 +79,7 @@ describe(useValueAsObservable, () => {
 
     await nextTask();
 
-    assert.isTrue(first.isCompleted);
+    assert.isTrue(first.settled);
   });
 
   // `React.Activity` came in React 19.2, and synstate-react-hooks-compat runs
@@ -99,7 +99,7 @@ describe(useValueAsObservable, () => {
           const value$ = useValueAsObservable(value);
 
           React.useEffect(() => {
-            const { unsubscribe } = value$.subscribe((v) => {
+            const unsubscribe = value$.subscribe((v) => {
               mut_seen.push(v);
             });
 
@@ -122,7 +122,7 @@ describe(useValueAsObservable, () => {
           children: React.createElement(Reader, { value }),
         });
 
-      /** Updates, then lets a completion scheduled by a cleanup happen. */
+      /** Updates, then lets a disposal scheduled by a cleanup happen. */
       const step = async (update: () => void): Promise<void> => {
         act(update);
 
@@ -185,7 +185,7 @@ describe(useValueAsObservable, () => {
           rerender(activity('visible', Reader, 2));
         });
 
-        // On showing, the reader's effect still holds the completed observable
+        // On showing, the reader's effect still holds the disposed observable
         // from its last render and subscribes to it, which gives its last value;
         // the re-render with the replacement then gives the same value again.
         assert.deepStrictEqual(seen, [1, 1, 1, 2]);
@@ -222,7 +222,7 @@ describe(useValueAsObservable, () => {
       value$,
     }: Readonly<{ value$: Observable<number> }>): null => {
       React.useEffect(() => {
-        const { unsubscribe } = value$.subscribe((v) => {
+        const unsubscribe = value$.subscribe((v) => {
           mut_seen.push(v);
         });
 

@@ -51,7 +51,7 @@ export const createViewQuerySync = (deps: ViewQuerySyncDeps): ViewQuerySync =>
       });
 
       return () => {
-        subscription.unsubscribe();
+        subscription();
       };
     },
   }) as const;

@@ -1,9 +1,9 @@
 import type { GeneratedIntrinsicElements } from './element-props.mjs';
-import type { Mountable } from './mountable.mjs';
+import type { Description } from './mount.mjs';
 
 /** The `JSX` namespace TypeScript reads through `jsxImportSource`. */
 export declare namespace JSX {
-  type Element = Mountable;
+  type Element = Description;
 
   type ElementChildrenAttribute = Readonly<{ children: unknown }>;
 

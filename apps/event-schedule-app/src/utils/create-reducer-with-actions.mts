@@ -1,9 +1,9 @@
 import {
   createValueEmitter,
-  type InitializedObservable,
-  mapTo,
+  map,
   merge,
   scan,
+  type InitializedObservable,
   type Observable as SynstateObservable,
 } from 'synstate';
 import { Arr, match, Optional } from 'ts-data-forge';
@@ -15,7 +15,7 @@ import type { Reducer } from 'ts-type-forge';
  * when a page is left.
  *
  * Dispatching those from a subscriber of their source would be a write while an
- * update propagates, which synstate warns about; here they are part of the
+ * update propagates, which the graph cannot order; here they are part of the
  * graph instead.
  */
 export const createReducerWithActions = <S, A>(
@@ -62,7 +62,9 @@ export const createToggleState = (
     (isOn: boolean, action: 'toggle' | 'reset') =>
       match(action, { toggle: !isOn, reset: false }),
     false,
-    resets.map((reset$) => reset$.pipe(mapTo('reset'))),
+    resets.map((reset$) =>
+      reset$.pipe(map(() => 'reset' as const, { equals: () => false })),
+    ),
   );
 
   return {

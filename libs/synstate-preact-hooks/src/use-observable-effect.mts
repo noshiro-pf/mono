@@ -29,17 +29,13 @@ export const useObservableEffect = <A,>(
   const mut_stopRef = Preact.useRef<(() => void) | undefined>(undefined);
 
   Preact.useEffect(() => {
-    const s = observable$.subscribe((v) => {
+    const unsubscribe = observable$.subscribe((v) => {
       mut_subscriptionFnRef.current(v);
     });
 
-    const stop = (): void => {
-      s.unsubscribe();
-    };
+    mut_stopRef.current = unsubscribe;
 
-    mut_stopRef.current = stop;
-
-    return stop;
+    return unsubscribe;
   }, [observable$]);
 
   // A layout effect's cleanup runs as the component unmounts in preact 10 and

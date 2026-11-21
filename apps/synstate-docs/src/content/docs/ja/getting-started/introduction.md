@@ -1,148 +1,95 @@
 ---
-title: はじめに
-description: SynState の概要 — Observable パターンに基づく、TypeScript/JavaScript 向けの軽量・型安全な状態管理ライブラリ。
-sidebar:
-    order: 1
+title: 概要
+description: synstate とは何か。状態・派生値・購読者を最初にひととおり見ます。
 ---
 
-<p align="center">
-  <img src="/mono/synstate/synstate-logo.png" alt="SynState ロゴ" width="400" />
-</p>
+synstate は、Observable の上に作った TypeScript の状態管理ライブラリです。アプリケーションの状態を state に置き、そこから派生する値をオペレーターで宣言し、表示するものを購読します。状態が変わると、synstate はグリッチのない 1 回の更新ですべての派生値を最新にしてから、購読者を呼びます。
 
-**SynState** は TypeScript/JavaScript 向けの軽量でグリッチフリーな状態管理ライブラリです。シンプルなグローバル状態から、`debounce` や `switchMap` を使った複雑な非同期パイプラインまで統一 API で記述できます。React Compiler と完全互換。
-
-「SynState」は「Synchronized + State」に由来します。グリッチフリーな伝搬により、派生値は常に一貫した状態に保たれます — 不整合な中間状態は発生しません。（詳細： [SynState がグリッチを解決した方法](/mono/synstate/ja/internals/how-synstate-solved-the-glitch/)）
+:::note
+synstate 9 で書いたプログラムを移すなら、違いは [synstate 9 からの変更点](/mono/synstate/ja/background/changes-from-synstate/)にまとめてあります。
+:::
 
 ## 特徴
 
-- 🎯 **シンプルな状態管理**： React の `useState`/`useReducer` に似た使いやすい `createState` と `createReducer`（グローバル状態向け）。
-- 🔧 **非同期オペレーター内蔵**： `debounce`、`throttle`、`switchMap` など — 複雑な非同期処理を外部ライブラリなしに統一的な宣言的 API で記述。
-- ⚡ **operator を通してもグリッチフリー**： 更新はどれも、届く先を深さ順にたどる 1 回のパスです。`debounce` や `switchMap` が後から始める更新も同じです。そのため subscriber が更新途中のグラフを見ることはなく、1 回の更新のコストはノード間の経路の数ではなく、届くノードの数に比例します。effect で書いた operator が何を失うかは [Signals の上の operator](/mono/synstate/ja/guides/library-comparison/operators-on-signals/) を参照。
-- 🏎️ **非常に高速**： ベンチマークの概要では、SynState はどのシナリオでも最速のライブラリの <!-- bench:summary/synstate-worst-over-fastest -->4.7<!-- /bench --> 倍以内に収まります。<!-- bench:summary/synstate-alone-in-single-digits -->すべてのシナリオで計測したライブラリのうち、最悪のケースでも1桁倍に収まるのは SynState だけです<!-- /bench -->。ライブラリごとの最悪のケースは[ベンチマーク](/mono/synstate/ja/guides/library-comparison/benchmark/#このページの読み方)を参照。
-- 🚀 **軽量**： <!-- bundle-size:synstate -->~8.1 kB min+gzip<!-- /bundle-size:synstate -->、外部ランタイム依存は [ts-data-forge](https://www.npmjs.com/package/ts-data-forge) と [ts-std-forge](https://www.npmjs.com/package/ts-std-forge) の 2 つ（前者が後者に依存している）。[ほかのライブラリと比べる](/mono/synstate/ja/guides/library-comparison/bundle-size/)。
-- ⚛️ **React 最適化**： [React Compiler](https://react.dev/learn/react-compiler) と完全互換。`synstate-react-hooks` により数行でコンポーネントにグローバル状態を導入。
-- 🌐 **フレームワーク非依存**： コアはバニラ JavaScript、Vue、Svelte など任意のフレームワークでそのまま動作。React / Preact 向けには hooks ラッパー（`synstate-react-hooks` / `synstate-preact-hooks`）、Preact 向けにはさらに [Preact Signals 連携](/mono/synstate/ja/preact-signals/demo/)（`synstate-preact-signals`）も用意。フレームワークを使わない場合は、[synstate-dom](/mono/synstate/ja/synstate-dom/introduction/) が Observable を DOM に直接束縛します。
+- **シンプルな状態を、どこからでも共有。** `createState` は状態とセッターを、`createReducer` は状態と dispatch を返します。React の `useState`・`useReducer` と同じ形で、アプリケーション全体で共有できます。それを読むパイプラインは、コンポーネントでもテストでもスクリプトでも同じように動きます。
+- **非同期オペレーターを内蔵。** `debounce`・`throttle`・`switchMap`・`fromAbortablePromise` で、タイマー、取り消し、「最新の応答だけ」がパイプラインの 1 行になります。
+- **グリッチがなく、コストは線形。** 更新は、届いた値を深さの順に、親がすべて済んだ後に 1 回ずつ辿ります。2 つの値から派生した値が、片方だけ更新された状態を見ることはありません。`debounce` や `switchMap` を通しても同じで、Signal のライブラリはこれらを effect として書きます。それで何を失うかは [Signals の上のオペレーター](/mono/synstate/ja/comparison/operators-on-signals/) を参照。
+- **購読者は更新の後に呼ばれます。** 購読者が呼ばれるのは、更新が変える値すべてに届いた後なので、ほかに何を読んでも最新です（同じ更新のために先に呼ばれた購読者が状態に書き込んだ場合、その状態から派生した値だけは次の更新で追いつきます）。購読者の書き込みは、この更新を中断せず、次の更新を始めます。
+- **変わらない値で更新が止まります。** 計算し直した派生値が前と同じなら何も伝えず、それに依存するものは訪れません。
+- **取り消しの仕組みが組み込まれています。** `switchMap` の中で `fromAbortablePromise` を使えば新しいクエリは置き換えた前のリクエストを中断し、owner の中で始めた処理（たとえばダイアログのリクエスト・タイマー・購読）は、その owner の `dispose()` 1 回で止まります。
+- **値があるかどうかを型が示します。** `InitializedObservable<A>` は常に値を持ち `.value` があります。`Observable<A>` はまだ値を持たないことがあります。オペレーターをつないだ結果がどちらになるかは `pipe` が計算します。
 
 ## 簡単な例
 
-`createState` を1回呼ぶだけで、アプリケーションにグローバル状態を追加できます：
+:::note
+このサイトの例はどれも、テストで実行しているファイルです。`assert` と `vi` は Vitest のもので、コードが何をするかを示すために置いています。`fetchUser` のような補助関数は読者自身のコードの代わりで、何をするかはコメントに書いてあります。
+:::
+
+`createState` は、状態とそのセッター、それ以外の操作をまとめたものを返します。
 
 ```tsx
 import { createState } from 'synstate';
 
-// リアクティブな状態を作成
-const [state, setState] = createState(0);
+const [count, setCount, { updateState }] = createState(0);
 
-// 変更を購読
-state.subscribe((count) => {
-    console.log(count); // 0, 1
-});
+const mut_seen: number[] = [];
 
-// 状態を更新
-setState(1);
-```
-
-`createState` はリアクティブな状態（InitializedObservable）とセッター関数を作成します。サブスクライバーは初期値で即座に呼び出され、状態が更新されるたびに再び呼び出されます。
-
-`createState` は3番目の要素として追加のユーティリティも返します：
-
-```ts
-const [
-    state,
-    setState,
-    { updateState, resetState, getSnapshot, initialState },
-] = createState(0);
-
-updateState((prev) => prev + 2); // 前の値を使って更新
-getSnapshot(); // 現在の値を同期的に読み取り（2）
-initialState; // createState に渡した初期値（0）
-
-resetState(); // 初期値（0）にリセット
-getSnapshot(); // 現在の値を同期的に読み取り（0）
-```
-
-## `pipe` で値を派生する
-
-SynState の力は Observable の合成にあります。`pipe` で新しい値を派生し、`derive` で複数のソースから 1 つの値を計算します：
-
-```tsx
-import { createState, derive, type InitializedObservable, map } from 'synstate';
-import { Optional } from 'ts-data-forge';
-
-const [count, setCount] = createState<number>(0);
-
-// 現在の値を取得
-console.log(Optional.unwrap(count.getSnapshot())); // 0
-
-// pipe で新しい Observable を派生
-const doubled: InitializedObservable<number> = count.pipe(map((n) => n * 2));
-
-// 複数の Observable から 1 つの値を派生
-const combined: InitializedObservable<string> = derive(
-    [count, doubled],
-    (c, d) => `(${c}, ${d})`,
-);
-
-// 変更を購読
+// Called at once with the value held, then after every update.
 count.subscribe((value) => {
-    console.log('count:', value); // 0, 1, 2, 3
+    mut_seen.push(value);
 });
 
-doubled.subscribe((value) => {
-    console.log('doubled:', value); // 0, 2, 4, 6
-});
-
-combined.subscribe((value) => {
-    console.log(value); // "(0, 0)", "(1, 2)", "(2, 4)", "(3, 6)"
-});
-
-// 状態を更新
 setCount(1);
-setCount(2);
-setCount(3);
+
+updateState((n) => n + 1);
+
+assert.deepStrictEqual(mut_seen, [0, 1, 2]);
+
+assert.strictEqual(count.value, 2);
 ```
 
-この宣言的なモデルがどのように機能するか、なぜ命令的に状態を管理するよりも優れているかについては、[宣言的な状態管理](/mono/synstate/ja/guides/declarative-state-management/)を参照してください。
+`subscribe` は、関数をまず今の値で呼び、その後は値が変わる更新のたびに呼びます。`setCount` が戻った時点で更新は終わっています。synstate は同期的で、アプリケーションの非同期な部分は非同期オペレーターと非同期ソース（`debounce`・`fromPromise`・`timer` など）からだけ生まれます。
 
-## React で使う
+## `pipe` で値を派生させる
 
-`createState` は**モジュールスコープ**（コンポーネントの外）で呼び出す必要があります。SynState は `synstate-react-hooks` というコンパニオンパッケージを提供しており、Observable と React を橋渡しします：
+`pipe` はオペレーターを 1 つ適用し、`pipe` を連ねれば複数を順に適用します。各オペレーターは、最初に持っている値を保つ（`map`）、落とすことがある（`filter`）、必ず値を用意する（`scan`・`withInitialValue`）のどれなのかを型で示すので、結果の型を見れば `.value` を読めるのか、`getSnapshot()` が返す `Optional` を確かめる必要があるのかがわかります。
 
 ```tsx
-import type * as React from 'react';
-import { createState } from 'synstate-react-hooks';
+import {
+    createState,
+    filter,
+    map,
+    type InitializedObservable,
+    type Observable,
+} from 'synstate';
+import { expectType } from 'ts-data-forge';
+import { Optional } from 'ts-std-forge';
 
-const [useUserState, setUserState] = createState({
-    name: '',
-    email: '',
-});
+const [count, setCount] = createState(1);
 
-const UserProfile = (): React.JSX.Element => {
-    const user = useUserState();
+// `map` keeps the value held at the start: the result always holds one.
+const doubled = count.pipe(map((n) => n * 2));
 
-    return (
-        <div>
-            <p>{`Name: ${user.name}`}</p>
-            <button
-                onClick={() => {
-                    setUserState({
-                        name: 'Alice',
-                        email: 'alice@example.com',
-                    });
-                }}
-            >
-                {'Set User'}
-            </button>
-        </div>
-    );
-};
+expectType<typeof doubled, InitializedObservable<number>>('=');
+
+// `filter` may drop it: the result may hold none.
+const even = count.pipe(filter((n) => n % 2 === 0));
+
+expectType<typeof even, Observable<number>>('=');
+
+assert.strictEqual(doubled.value, 2);
+
+assert.isTrue(Optional.isNone(even.getSnapshot()));
+
+setCount(4);
+
+assert.strictEqual(doubled.value, 8);
+
+assert.deepStrictEqual(even.getSnapshot(), Optional.some(4));
 ```
 
-詳細は [React 連携](/mono/synstate/ja/guides/react-integration/)を参照してください。
+## 次に読むもの
 
-## 次のステップ
-
-- [インストール](/mono/synstate/ja/getting-started/installation/) — SynState とオプションのコンパニオンパッケージをインストール。
-- [SynState の強み](/mono/synstate/ja/guides/why-synstate/) — 設計思想、グリッチフリー保証、ユースケース。
-- [宣言的な状態管理](/mono/synstate/ja/guides/declarative-state-management/) — 具体的な例でリアクティブプログラミングモデルを理解する。
-- [React 連携](/mono/synstate/ja/guides/react-integration/) — SynState を React で使う。
+- [インストール](/mono/synstate/ja/getting-started/installation/)では、リポジトリ内のパッケージに synstate を追加します。
+- [synstate を使う理由](/mono/synstate/ja/guides/why-synstate/)では設計から得られるものを説明し、[宣言的な状態管理](/mono/synstate/ja/guides/declarative-state/)ではそれをフィルター付きのデータテーブルで示します。
+- [更新の伝わり方](/mono/synstate/ja/internals/how-an-update-propagates/)では、書き込みから購読者までの更新の流れを追います。

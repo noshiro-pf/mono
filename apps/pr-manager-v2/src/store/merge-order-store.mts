@@ -1,5 +1,5 @@
 import type { ReadError } from 'pr-report-core-v2';
-import { combine, map, type InitializedObservable } from 'synstate';
+import { derive, map, type InitializedObservable } from 'synstate';
 import { Arr, Result } from 'ts-data-forge';
 import {
   availableStatuses,
@@ -78,8 +78,9 @@ export const createMergeOrderStore = (
     }),
   );
 
-  const view = combine([cards, deps.field.value]).pipe(
-    map(([read, settings]): MergeOrderView => {
+  const view = derive(
+    [cards, deps.field.value],
+    (read, settings): MergeOrderView => {
       if (Result.isErr(read)) {
         return { kind: 'unread', reason: read.value };
       }
@@ -128,7 +129,7 @@ export const createMergeOrderStore = (
         ),
         failures: report.failures.report,
       };
-    }),
+    },
   );
 
   return {

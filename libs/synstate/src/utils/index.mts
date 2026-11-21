@@ -1,4 +1,3 @@
-export * from './collect-to-array.mjs';
 export * from './create-boolean-state.mjs';
 export * from './create-event-emitter.mjs';
 export * from './create-reducer.mjs';

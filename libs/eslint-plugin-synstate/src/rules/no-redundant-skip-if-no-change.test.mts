@@ -59,10 +59,10 @@ ruleTester.run('no-redundant-skip-if-no-change', noRedundantSkipIfNoChange, {
       `,
     },
     {
-      name: 'after `mapTo`, which emits on every source value',
+      name: 'after a `map` that passes every result on',
       code: dedent`
-        import { mapTo, skipIfNoChange } from 'synstate';
-        const x$ = click$.pipe(mapTo(1)).pipe(skipIfNoChange());
+        import { map, skipIfNoChange } from 'synstate';
+        const x$ = click$.pipe(map(() => 1, { equals: () => false })).pipe(skipIfNoChange());
       `,
     },
     {
@@ -102,19 +102,14 @@ ruleTester.run('no-redundant-skip-if-no-change', noRedundantSkipIfNoChange, {
       `,
     },
     {
-      name: '`distinctUntilChanged`, and `Object.is` given',
+      name: '`Object.is` given',
       code: dedent`
-        import { distinctUntilChanged, map, skipIfNoChange } from 'synstate';
-        const a = x$.pipe(map(f)).pipe(distinctUntilChanged());
+        import { map, skipIfNoChange } from 'synstate';
         const b = x$.pipe(map(f)).pipe(skipIfNoChange(Object.is));
       `,
-      errors: [
-        { messageId: 'redundantSkipIfNoChange' },
-        { messageId: 'redundantSkipIfNoChange' },
-      ],
+      errors: [{ messageId: 'redundantSkipIfNoChange' }],
       output: dedent`
-        import { distinctUntilChanged, map, skipIfNoChange } from 'synstate';
-        const a = x$.pipe(map(f));
+        import { map, skipIfNoChange } from 'synstate';
         const b = x$.pipe(map(f));
       `,
     },
@@ -138,84 +133,11 @@ ruleTester.run('no-redundant-skip-if-no-change', noRedundantSkipIfNoChange, {
       `,
     },
     {
-      name: 'after the operators built on `map`',
-      code: dedent`
-        import {
-          getKey,
-          mapOptional,
-          mapResultErr,
-          mapResultOk,
-          pluck,
-          skipIfNoChange,
-          unwrapOptional,
-          unwrapResultErr,
-          unwrapResultOk,
-        } from 'synstate';
-        const a = x$.pipe(pluck('mode')).pipe(skipIfNoChange());
-        const b = x$.pipe(getKey('mode')).pipe(skipIfNoChange());
-        const c = x$.pipe(mapOptional(f)).pipe(skipIfNoChange());
-        const d = x$.pipe(mapResultOk(f)).pipe(skipIfNoChange());
-        const e = x$.pipe(mapResultErr(f)).pipe(skipIfNoChange());
-        const g = x$.pipe(unwrapOptional()).pipe(skipIfNoChange());
-        const h = x$.pipe(unwrapResultOk()).pipe(skipIfNoChange());
-        const i = x$.pipe(unwrapResultErr()).pipe(skipIfNoChange());
-      `,
-      errors: [
-        { messageId: 'redundantSkipIfNoChange', data: { operator: 'pluck' } },
-        { messageId: 'redundantSkipIfNoChange', data: { operator: 'getKey' } },
-        {
-          messageId: 'redundantSkipIfNoChange',
-          data: { operator: 'mapOptional' },
-        },
-        {
-          messageId: 'redundantSkipIfNoChange',
-          data: { operator: 'mapResultOk' },
-        },
-        {
-          messageId: 'redundantSkipIfNoChange',
-          data: { operator: 'mapResultErr' },
-        },
-        {
-          messageId: 'redundantSkipIfNoChange',
-          data: { operator: 'unwrapOptional' },
-        },
-        {
-          messageId: 'redundantSkipIfNoChange',
-          data: { operator: 'unwrapResultOk' },
-        },
-        {
-          messageId: 'redundantSkipIfNoChange',
-          data: { operator: 'unwrapResultErr' },
-        },
-      ],
-      output: dedent`
-        import {
-          getKey,
-          mapOptional,
-          mapResultErr,
-          mapResultOk,
-          pluck,
-          skipIfNoChange,
-          unwrapOptional,
-          unwrapResultErr,
-          unwrapResultOk,
-        } from 'synstate';
-        const a = x$.pipe(pluck('mode'));
-        const b = x$.pipe(getKey('mode'));
-        const c = x$.pipe(mapOptional(f));
-        const d = x$.pipe(mapResultOk(f));
-        const e = x$.pipe(mapResultErr(f));
-        const g = x$.pipe(unwrapOptional());
-        const h = x$.pipe(unwrapResultOk());
-        const i = x$.pipe(unwrapResultErr());
-      `,
-    },
-    {
       name: 'after a `skipIfNoChange` that compares with `Object.is`',
       code: dedent`
-        import { distinctUntilChanged, skipIfNoChange } from 'synstate';
+        import { skipIfNoChange } from 'synstate';
         const a = x$.pipe(skipIfNoChange()).pipe(skipIfNoChange());
-        const b = x$.pipe(distinctUntilChanged(Object.is)).pipe(skipIfNoChange());
+        const b = x$.pipe(skipIfNoChange(Object.is)).pipe(skipIfNoChange());
       `,
       errors: [
         {
@@ -224,13 +146,13 @@ ruleTester.run('no-redundant-skip-if-no-change', noRedundantSkipIfNoChange, {
         },
         {
           messageId: 'redundantSkipIfNoChange',
-          data: { operator: 'distinctUntilChanged' },
+          data: { operator: 'skipIfNoChange' },
         },
       ],
       output: dedent`
-        import { distinctUntilChanged, skipIfNoChange } from 'synstate';
+        import { skipIfNoChange } from 'synstate';
         const a = x$.pipe(skipIfNoChange());
-        const b = x$.pipe(distinctUntilChanged(Object.is));
+        const b = x$.pipe(skipIfNoChange(Object.is));
       `,
     },
     {

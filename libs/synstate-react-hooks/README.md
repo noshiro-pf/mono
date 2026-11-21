@@ -9,17 +9,17 @@ Their options, such as `equals` (the second argument of `createState` and `creat
 ## Installation
 
 ```bash
-npm add synstate-react-hooks
+npm add synstate-react-hooks synstate
 ```
 
 Or with other package managers:
 
 ```bash
 # Yarn
-yarn add synstate-react-hooks
+yarn add synstate-react-hooks synstate
 
 # pnpm
-pnpm add synstate-react-hooks
+pnpm add synstate-react-hooks synstate
 ```
 
 ## Quick Start

@@ -1,0 +1,45 @@
+---
+title: state
+description: 'Creates a state holding `initialValue`.'
+---
+
+{/* reference:jsdoc */}
+
+Creates a state holding `initialValue`.
+
+A write made inside an operator such as `map` or `derive`, while an update is recomputing values, is applied once the subscribers and bindings of the update under way have run; a write made by a subscriber or a binding is applied at once. Either propagates in the next update, and neither interrupts the update under way.
+
+`set` and `update` are methods: call them on the state (`count.set(1)`), and wrap one to pass it on its own, `(n) => { count.set(n); }`. TypeScript rejects a call of one taken off the state.
+
+{/* /reference */}
+
+## Example
+
+```tsx
+import { state } from 'synstate';
+
+// The primitive `createState` wraps: one object with `set` and `update`.
+const count = state(0);
+
+const mut_seen: number[] = [];
+
+count.subscribe((n) => {
+    mut_seen.push(n);
+});
+
+count.set(1);
+
+count.update((n) => n + 1);
+
+// An equal value passes nothing on.
+count.set(2);
+
+assert.deepStrictEqual(mut_seen, [0, 1, 2]);
+```
+
+## See also
+
+- [State and writes](/mono/synstate/guides/state-and-writes/)
+- [All APIs](/mono/synstate/reference/)
+
+[Source on GitHub](https://github.com/noshiro-pf/mono/blob/main/libs/synstate/src/core/state.mts)

@@ -1,4 +1,4 @@
-import { createState, derive, map, onScopeDispose } from 'synstate';
+import { createState, derive, map, onCleanup } from 'synstate';
 import {
   constant,
   For,
@@ -137,7 +137,7 @@ export const App = (): JSX.Element => {
    * keeps this tab's own writes — which arrive here too — from updating
    * anything.
    */
-  onScopeDispose(
+  onCleanup(
     watchWorkspaceRegistry((written) => {
       if (!fastDeepEqual(written, Optional.unwrap(registry$.getSnapshot()))) {
         setRegistry(written);
@@ -174,7 +174,7 @@ export const App = (): JSX.Element => {
     }, noticeMs);
   };
 
-  onScopeDispose(() => {
+  onCleanup(() => {
     clearTimeout(mut_timers.notice);
 
     clearTimeout(mut_timers.save);
@@ -305,7 +305,7 @@ export const App = (): JSX.Element => {
 
   // Another tab's toggle has to reach this one's panes too: read once, the list
   // stayed as it was here until this tab was reloaded.
-  onScopeDispose(watchServiceWorkerResetOrigins(setResetOrigins));
+  onCleanup(watchServiceWorkerResetOrigins(setResetOrigins));
 
   const handleToggleResetOrigin = (
     siteOrigin: string,
@@ -792,7 +792,7 @@ export const App = (): JSX.Element => {
 
   chrome.runtime.onMessage.addListener(onWorkerMessage);
 
-  onScopeDispose(() => {
+  onCleanup(() => {
     chrome.runtime.onMessage.removeListener(onWorkerMessage);
   });
 
@@ -859,7 +859,7 @@ export const App = (): JSX.Element => {
 
   const noteTimer = setInterval(note, tabNoteIntervalMs);
 
-  onScopeDispose(() => {
+  onCleanup(() => {
     clearInterval(noteTimer);
   });
 
@@ -1208,7 +1208,7 @@ export const App = (): JSX.Element => {
 
           observer.observe(element);
 
-          onScopeDispose(() => {
+          onCleanup(() => {
             observer.disconnect();
           });
         }}

@@ -1,4 +1,4 @@
-import { onScopeDispose, type Observable } from 'synstate';
+import { onCleanup, type Observable } from 'synstate';
 import { createAfterUpdate } from 'synstate-dom';
 import type { StrictPick } from 'ts-type-forge';
 import { closeOnBackdropClick } from './close-on-backdrop-click.mjs';
@@ -27,7 +27,7 @@ export const followModal = <A,>(
     closed?: () => void;
   }>,
 ): void => {
-  onScopeDispose(closeOnBackdropClick(dialog, close));
+  onCleanup(closeOnBackdropClick(dialog, close));
 
   const afterUpdate = createAfterUpdate();
 

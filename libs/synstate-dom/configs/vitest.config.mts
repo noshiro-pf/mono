@@ -16,6 +16,10 @@ export default defineViteConfig({
       './src/jsx-dev-runtime.mts',
     ),
     'synstate-dom': path.resolve(workspaceRootPath, './src/index.mts'),
+    'synstate/internal': path.resolve(
+      workspaceRootPath,
+      '../synstate/src/internal.mts',
+    ),
     synstate: path.resolve(workspaceRootPath, '../synstate/src/index.mts'),
   },
   coverage: {

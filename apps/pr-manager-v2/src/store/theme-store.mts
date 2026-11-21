@@ -1,9 +1,4 @@
-import {
-  combine,
-  createState,
-  map,
-  type InitializedObservable,
-} from 'synstate';
+import { createState, derive, type InitializedObservable } from 'synstate';
 import {
   colorSchemeOf,
   themeOfPick,
@@ -41,8 +36,8 @@ export const createThemeStore = (deps: ThemeDeps): ThemeStore => {
     deps.system.get(),
   );
 
-  const scheme = combine([deps.field.value, system]).pipe(
-    map(([theme, sys]) => colorSchemeOf(theme, sys)),
+  const scheme = derive([deps.field.value, system], (theme, sys) =>
+    colorSchemeOf(theme, sys),
   );
 
   return {
@@ -61,7 +56,7 @@ export const createThemeStore = (deps: ThemeDeps): ThemeStore => {
       return () => {
         stopWatching();
 
-        subscription.unsubscribe();
+        subscription();
       };
     },
   };

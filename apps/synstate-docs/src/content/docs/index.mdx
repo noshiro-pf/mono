@@ -1,15 +1,15 @@
 ---
-title: SynState
-description: A lightweight, glitch-free state management library for TypeScript with built-in async operators and React Compiler support.
+title: synstate
+description: A glitch-free state management library for TypeScript, with built-in async operators, such as debounce and switchMap, that stay glitch-free.
 template: splash
 hero:
-    tagline: A lightweight, glitch-free state management library for TypeScript/JavaScript. Simple global state that scales to complex async pipelines — with built-in debounce, switchMap, and more. Fully compatible with React Compiler.
+    tagline: State management for TypeScript that scales from one shared value to async workflows. Write a state, derive what you show with operators such as <code>map</code>, <code>debounce</code> and <code>switchMap</code>, and every derived value is computed glitch-free.
     actions:
         - text: Get Started
           link: /mono/synstate/getting-started/introduction/
           icon: right-arrow
           variant: primary
-        - text: Why SynState?
+        - text: Why synstate
           link: /mono/synstate/guides/why-synstate/
           variant: minimal
 ---
@@ -19,46 +19,45 @@ import { Card, CardGrid } from '@astrojs/starlight/components';
 ## Features
 
 <CardGrid>
-    <Card title="Simple State Management" icon="pencil">
-        Easy-to-use `createState` and `createReducer` similar to React
-        `useState` / `useReducer` for global state.
+    <Card title="Simple state" icon="pencil">
+        `createState` gives a state and its setter, and `createReducer` a state
+        and its dispatch, as React's `useState` and `useReducer` do, for state
+        the whole application shares. A counter is a
+        state and a `subscribe`.
     </Card>
-    <Card title="Built-in Async Operators" icon="setting">
-        `debounce`, `throttle`, `switchMap`, and more — handle complex async
-        flows in a unified, declarative API without external libraries.
+    <Card title="Async operators built in" icon="setting">
+        `debounce`, `throttle`, `switchMap`, `fromAbortablePromise` and more. A
+        search box that waits for typing to pause and drops stale answers is
+        one pipeline, not a timer and a flag kept by hand.
     </Card>
-    <Card title="Glitch-Free Through Every Operator" icon="approve-check">
+    <Card title="Glitch-free through every operator" icon="approve-check">
 
-Every update is one depth-ordered pass over what it reaches, the ones `debounce` or `switchMap` start later included, so no subscriber sees a half-updated graph, and an update costs in proportion to the nodes it reaches rather than the paths between them. [Operators on Signals](/mono/synstate/guides/library-comparison/operators-on-signals/) shows what an operator written as an effect loses.
-
-    </Card>
-    <Card title="Very Fast" icon="rocket">
-
-In the benchmark summary, SynState stays within {/* bench:summary/synstate-worst-over-fastest */}4.7{/* /bench */}× of the fastest library in every scenario: {/* bench:summary/synstate-alone-in-single-digits */}the only library measured in all of them whose worst case stays in single digits{/* /bench */}. [See each library's worst case](/mono/synstate/guides/library-comparison/benchmark/#how-to-read-this-page).
+An update computes each derived value once, after all of its parents, and calls subscribers only after that. The result of an async step arrives as an update of its own, under the same rules. No derived value is computed from a mix of old and new inputs. [Operators on signals](/mono/synstate/comparison/operators-on-signals/) shows what an operator written as an effect loses.
 
     </Card>
-    <Card title="Lightweight" icon="seti:favicon">
+    <Card title="Cancellation is built in" icon="random">
 
-{/* bundle-size:synstate */}~8.1 kB min+gzip{/* /bundle-size:synstate */} with two external runtime dependencies, one of which depends on the other. [Compare it with other libraries](/mono/synstate/guides/library-comparison/bundle-size/).
-
-    </Card>
-    <Card title="React-Optimized" icon="seti:react">
-        Fully compatible with React Compiler. `synstate-react-hooks` lets you
-        add global state to any component in just a few lines.
-    </Card>
-    <Card title="Framework Agnostic" icon="random">
-        Core library works as-is with vanilla JavaScript, Vue, Svelte, or any
-        framework. For React and Preact, hooks wrappers are available. For
-        Preact, a Preact Signals integration is also provided.
-    </Card>
-    <Card title="UI on SynState: synstate-dom" icon="window">
-
-[synstate-dom](/mono/synstate/synstate-dom/introduction/) binds Observables straight to the DOM, so the whole UI, async steps included, is one SynState graph. A component runs once, with no virtual DOM and no compiler.
+With `fromAbortablePromise` inside `switchMap`, a newer query aborts the request of the one it replaces. Start a dialog's work inside an owner, and one `dispose()` when it closes stops the requests, timers and subscriptions it started: there is nothing to unsubscribe one by one. See [Owners and lifetime](/mono/synstate/guides/owners-and-lifetime/).
 
     </Card>
-    <Card title="Typed Routes: synstate-router" icon="link">
+    <Card title="Unchanged values stop the update" icon="rocket">
+        A value that comes out the same as before stops the update there, and
+        what depends on it is not visited. An update costs the nodes it reaches,
+        each computed at most once.
+    </Card>
+    <Card title="Types you can rely on" icon="seti:typescript">
+        A state is an `InitializedObservable` with a `.value`; an event, which
+        may hold nothing yet, is an `Observable` without one, and `pipe` works
+        out which of the two an operator chain gives. A failed promise arrives
+        as a `Result` value for the pipeline to handle.
+    </Card>
+    <Card title="Runs anywhere" icon="puzzle">
+        A pipeline is a plain module with no framework behind it. A component, a
+        test or a script that reads it gets the same values.
+    </Card>
+    <Card title="UI on synstate: synstate-dom" icon="window">
 
-[synstate-router](/mono/synstate/synstate-router/introduction/) checks every destination, path parameter and search parameter with the type checker, and keeps its state in SynState Observables. It has bindings for React and synstate-dom, and is not on npm yet.
+[synstate-dom](/mono/synstate-dom/) binds observables straight to the DOM, so the whole UI, async steps included, is one synstate graph. A component runs once, with no virtual DOM and no compiler.
 
     </Card>
 

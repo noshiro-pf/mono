@@ -23,17 +23,15 @@ type MessageIds = 'redundantSkipIfNoChange';
 /**
  * `map` passes on a result only when it is not `Object.is` the one it holds, so
  * a `skipIfNoChange()` piped straight after it compares what `map` has already
- * compared, and costs one more observable for nothing. The same holds after the
- * operators synstate builds on `map` (`pluck`, `unwrapResultOk`, …) and after a
+ * compared, and costs one more observable for nothing. The same holds after a
  * `skipIfNoChange()` that compares with `Object.is` itself: of the values it
  * passes on, none is `Object.is` the one before.
  *
- * Only `skipIfNoChange()` with no comparison or with `Object.is` (or its alias
- * `distinctUntilChanged`) is reported, piped directly onto `x.pipe(op)` where
- * `op` is one of those: a `map` given no `equals`, an operator built on `map`,
- * or `skipIfNoChange` comparing with `Object.is`. A `map` with `equals` may
- * pass equal results on, a comparison of its own may stop more than
- * `Object.is`, and `mapTo` emits on every source value.
+ * Only `skipIfNoChange()` with no comparison or with `Object.is` is reported,
+ * piped directly onto `x.pipe(op)` where `op` is one of those: a `map` given no
+ * options, or `skipIfNoChange` comparing with `Object.is`. A `map` with
+ * `equals` may pass equal results on, and a comparison of its own may stop more
+ * than `Object.is`.
  */
 export const noRedundantSkipIfNoChange: TSESLint.RuleModule<
   MessageIds,
@@ -43,7 +41,7 @@ export const noRedundantSkipIfNoChange: TSESLint.RuleModule<
     type: 'suggestion',
     docs: {
       description:
-        'Disallow `skipIfNoChange()` directly after `map`, an operator built on it, or another `skipIfNoChange()`, which already stop a value equal to the one before.',
+        'Disallow `skipIfNoChange()` directly after `map` or another `skipIfNoChange()`, which already stop a value equal to the one before.',
     },
     fixable: 'code',
     schema: [],
@@ -93,7 +91,7 @@ export const noRedundantSkipIfNoChange: TSESLint.RuleModule<
         const skip = skipTypeWrappers(pipe.operator);
 
         if (
-          !callsSynstate(skip, ['skipIfNoChange', 'distinctUntilChanged']) ||
+          !callsSynstate(skip, ['skipIfNoChange']) ||
           !comparesWithObjectIs(skip.arguments)
         ) {
           return;
@@ -107,14 +105,7 @@ export const noRedundantSkipIfNoChange: TSESLint.RuleModule<
 
         const upstream = skipTypeWrappers(inner.operator);
 
-        if (
-          !callsSynstate(upstream, [
-            'map',
-            ...builtOnMap,
-            'skipIfNoChange',
-            'distinctUntilChanged',
-          ])
-        ) {
+        if (!callsSynstate(upstream, ['map', 'skipIfNoChange'])) {
           return;
         }
 
@@ -123,8 +114,7 @@ export const noRedundantSkipIfNoChange: TSESLint.RuleModule<
         if (
           operator === undefined ||
           (operator === 'map' && upstream.arguments.length > 1) ||
-          ((operator === 'skipIfNoChange' ||
-            operator === 'distinctUntilChanged') &&
+          (operator === 'skipIfNoChange' &&
             !comparesWithObjectIs(upstream.arguments))
         ) {
           return;
@@ -155,21 +145,6 @@ export const noRedundantSkipIfNoChange: TSESLint.RuleModule<
     };
   },
 } as const;
-
-/**
- * The operators synstate builds on `map` with no `equals`, which therefore stop
- * a result `Object.is` the one they hold.
- */
-const builtOnMap = [
-  'pluck',
-  'getKey',
-  'mapOptional',
-  'mapResultOk',
-  'mapResultErr',
-  'unwrapOptional',
-  'unwrapResultOk',
-  'unwrapResultErr',
-] as const;
 
 /** Whether `skipIfNoChange(...)` compares with `Object.is`: given nothing, or `Object.is`. */
 const comparesWithObjectIs = (

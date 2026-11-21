@@ -451,7 +451,7 @@ export const createReportStore = (deps: ReportDeps): ReportStore => {
         // token, and nothing reads or draws it before then.
         mut_generation += 1;
 
-        subscription.unsubscribe();
+        subscription();
 
         stopWatching();
 

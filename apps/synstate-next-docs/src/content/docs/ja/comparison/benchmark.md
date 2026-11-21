@@ -931,7 +931,7 @@ const stepTowards = (current: Point, target: Point, factor: number): Point =>
     }) as const;
 ```
 
-ほかのライブラリのコードは [synstate のスループットのデモ](https://github.com/noshiro-pf/mono/tree/main/apps/synstate-docs/src/components/throughput-demo/adapters)のものです。
+ほかのライブラリのコードは [synstate のスループットのデモ](https://github.com/noshiro-pf/mono/tree/f5709ff10f29075c808142cf59dc0c6288d3ffee/apps/synstate-docs/src/components/throughput-demo/adapters)のものです。
 
 ## 連なったダイヤモンド
 

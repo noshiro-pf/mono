@@ -31,10 +31,12 @@ describe('createReducer utils', () => {
     assert.strictEqual(getSnapshot(), 1);
   });
 
-  test('returns the next state from dispatch', () => {
-    const [, dispatch] = createReducer(countReducer, 10);
+  test('applies the reducer on dispatch', () => {
+    const [, dispatch, { getSnapshot }] = createReducer(countReducer, 10);
 
-    assert.strictEqual(dispatch({ type: 'decrement' }), 9);
+    dispatch({ type: 'decrement' });
+
+    assert.strictEqual(getSnapshot(), 9);
   });
 });
 

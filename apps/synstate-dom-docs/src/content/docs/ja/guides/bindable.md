@@ -1,25 +1,24 @@
 ---
 title: Bindable
-description: constant と pipe(map)、そしてデータを受け取るスロットに何を渡せるか。
+description: constant、pipe(map)、そしてデータを受け取る props と属性が受け付けるもの。
 ---
 
-JSX でデータを受け取る場所（属性、DOM のプロパティ、テキストの子要素、ライブラリが提供するコンポーネントの props）は、どれも `Bindable<T>` を受け付けます。
+JSX の中でデータを受け取る場所（属性、DOM プロパティ、テキストの子、ライブラリが提供するコンポーネントの props）は、どれも `Bindable<T>` を受け付けます。
 
-| `Bindable<T>` の種類       | 束縛したときの動き                                  |
-| :------------------------- | :-------------------------------------------------- |
-| `InitializedObservable<T>` | 現在値を 1 回書き、その後は新しい値が来るたびに書く |
-| `Constant<T>`              | 1 回だけ書いて、購読はしない                        |
+| `Bindable<T>` は次のどちらか | 束縛したときに起きること                                      |
+| :--------------------------- | :------------------------------------------------------------ |
+| `InitializedObservable<T>`   | その値で 1 回書き込み、値を変える更新があるたびに書き込み直す |
+| `Constant<T>`                | 1 回書き込むだけ。ノードも束縛も作らない                      |
 
-完了済みの Observable（`just(...)` など）も、定数と同じく 1 回だけ書いて購読はしません。
+まだ値を持たないことがある `Observable<T>`（イベントのソースや `filter`）は `Bindable` ではありません。束縛したときに書き込むものがないからです。先に `withInitialValue(x)` で値を持たせてください。
 
 ## `constant`
 
-素の値は `Bindable` ではありません。変わらない値は `constant(...)` で包んで、変わらないことをはっきり書きます。
+素の値は `Bindable` ではありません。変わらない値は `constant(...)` で包んで、変わらないことを明示します。
 
 ```tsx
 import { createState } from 'synstate';
 import { constant, type JSX } from 'synstate-dom';
-import { Optional } from 'ts-data-forge';
 
 const [count$] = createState(0);
 
@@ -33,27 +32,23 @@ export const Counter = (): JSX.Element => (
 // @ts-expect-error A plain string is not a Bindable: write constant('Hi').
 export const Plain = (): JSX.Element => <p>{'Hi'}</p>;
 
-export const Stale = (): JSX.Element => {
-    const count = Optional.unwrap(count$.getSnapshot());
-
-    // @ts-expect-error A snapshot would be written once and never updated.
-    return <p>{count}</p>;
-};
+// @ts-expect-error A snapshot would be written once and never updated.
+export const Stale = (): JSX.Element => <p>{count$.value}</p>;
 ```
 
-`constant` は引数をそのまま返すだけです。`Constant<T>` は型の上にしか存在しないので、実行時のコストはかかりません。`constant('button')` と書けば、リテラル型 `Constant<'button'>` もそのまま保たれます。
+`constant` は引数をそのまま返すだけです。`Constant<T>` は型の上にしか存在しないので、実行時のコストはありません。`constant('button')` はリテラル型 `Constant<'button'>` を保ちます。
 
-このルールがあるのは、上の 2 つ目のエラーを防ぐためです。`Optional.unwrap(count$.getSnapshot())` で 1 回だけ読んだ `count` は、二度と更新されない数値を書き込みます。素の値を受け付けてしまうと、これがコンパイルを通り、最初の更新までは正しい数値が表示されるので気づきにくくなります。synstate-dom ではこれがコンパイルエラーになります。
+このルールは、上の 2 つ目のエラーのためにあります。`{count$.value}` は状態を 1 回読んで、二度と更新されない数値を書き込みます。素の値を受け付けていたら、これはコンパイルが通り、最初の更新までは正しい数値を表示してしまいます。ここではそもそもコンパイルが通りません。
 
-データでないものは素の値で渡します。イベントハンドラ、`ref`、`For` の `key` 関数、子要素を返す関数がそうです。
+データではないものは素の値を受け取ります。イベントハンドラ、`ref`、`For` と `Switch` の `key` 関数、子を返す関数です。
 
-- `null` と `undefined` は `constant` に渡せません。属性がないことは props を省略して表し、あったりなかったりする値は `InitializedObservable<T | undefined>` で表します。
-- `constant(obs$)` も型エラーになります。
+- `constant` は `null` と `undefined` を受け付けません。属性を出さないなら prop を省略し、ときどき無くなる値には `InitializedObservable<T | undefined>` を使ってください。
+- `constant(obs$)` も型エラーです。
 - `constant` が長いと感じたら、import するときに名前を変えてください：`import { constant as c } from 'synstate-dom'`。
 
 ## Observable を変換する: `pipe(map)`
 
-Observable を変換して表示するには `source$.pipe(map(fn))` と書きます。束縛のための別の書き方はなく、スロットは `map` のノードをほかの Observable と同じように受け取ります。コンポーネントの中や `For` の行の中で作ったノードはそのスコープに属し、一緒に破棄されます。
+Observable を変換して表示するには `source$.pipe(map(fn))` と書きます。束縛のための別の書き方はありません。props や属性は `map` のノードを他の Observable と同じように受け取ります。コンポーネントや `For` の行の中で作ったノードはその owner に属し、owner と一緒に破棄されます。
 
 ```tsx
 import { createState, map } from 'synstate';
@@ -96,19 +91,19 @@ export const PriceList = (): JSX.Element => (
 );
 ```
 
-`map` のノードは更新 1 回につき `fn` を 1 回だけ計算し、前回と `Object.is` で等しくない結果だけを下流に流すので、束縛が DOM に書くのは表示が変わったときだけです。結果はほかと同じ Observable なので、複数の束縛、`getSnapshot()`、さらに続く operator がすべて読めます。
+`map` のノードは更新ごとに `fn` を 1 回計算し、結果が前回と `Object.is` で等しくないときだけ先へ渡します。等しい結果が出れば更新はそこで止まり、その下は訪れません。そのため束縛は、表示する内容が変わったときにだけ DOM に書き込みます。結果は普通の Observable なので、複数の束縛、`.value`、さらに別のオペレーターから読めます。`pipe` はオペレーターを 1 つ受け取り、`source$.pipe(filter(f)).pipe(map(g)).pipe(withInitialValue(x))` のようにつなげます。それぞれの `pipe` が、結果が常に値を持つかどうかをそのオペレーターから判断します。
 
 ## `Bindable` を受け取る側: `mapBindable`、`deriveBindable`、`toObservable`
 
-`label: Bindable<string>` を受け取ったコンポーネントでは、`label` が定数かもしれないので `label.pipe(...)` とは書けません。そのために次の 3 つの補助関数を用意しています。
+`label: Bindable<string>` を受け取るコンポーネントの中では `label.pipe(...)` を呼べません。`label` が constant かもしれないからです。その場合のためのヘルパーが 3 つあります。
 
-| 関数                        | 定数のとき                                   | Observable のとき             |
-| :-------------------------- | :------------------------------------------- | :---------------------------- |
-| `mapBindable(b, f)`         | `f` を 1 回適用して定数を返す                | `b.pipe(map(f))`              |
-| `deriveBindable([a, b], f)` | すべて定数なら `f` を 1 回適用して定数を返す | 定数を `just` にして `derive` |
-| `toObservable(b)`           | `just(b)`                                    | `b` そのもの                  |
+| ヘルパー                    | constant を渡すと                          | Observable を渡すと                 |
+| :-------------------------- | :----------------------------------------- | :---------------------------------- |
+| `mapBindable(b, f)`         | `f` を 1 回適用して constant を返す        | `b.pipe(map(f))`                    |
+| `deriveBindable([a, b], f)` | すべて constant なら `f` を 1 回、constant | `derive`。constant は `just` として |
+| `toObservable(b)`           | `just(b)`                                  | `b` そのもの                        |
 
-定数から派生したものは定数のままなので、ビューの静的な部分がグラフに入ることはありません。
+constant から派生したものは constant のままなので、画面の静的な部分はグラフに入りません。
 
 ```tsx
 import { debounce, withInitialValue } from 'synstate';
@@ -155,4 +150,4 @@ export const SearchSummary = ({
 };
 ```
 
-`toObservable` を使うのは、operator を適用したいときなど、本当に Observable が必要な場面だけにしてください。定数を Observable にするとグラフに加わってしまいますが、`mapBindable` と `deriveBindable` ならそうなりません。
+`toObservable` は、オペレーターを適用するときのように本当に Observable が要る場所でだけ使ってください。Observable にした constant はグラフのノードになりますが、`mapBindable` と `deriveBindable` はそれを避けます。`just(x)` は `x` を持ち、二度と値を出しません。束縛すると 1 回書き込まれるだけです。

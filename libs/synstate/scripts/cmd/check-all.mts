@@ -8,6 +8,13 @@ const checkAll = async (): Promise<void> => {
   console.info('Starting full project validation and build...\n');
 
   await logStep({
+    startMessage: 'Checking file extensions',
+    action: () =>
+      runCmdStep('pnpm run check:ext', 'Checking file extensions failed'),
+    successMessage: 'File extensions validated',
+  });
+
+  await logStep({
     startMessage: 'Running tests',
     action: () => runCmdStep('pnpm run test', 'Tests failed'),
     successMessage: 'Tests passed',
@@ -23,12 +30,6 @@ const checkAll = async (): Promise<void> => {
     startMessage: 'Building project',
     action: () => runCmdStep('pnpm run build', 'Build failed'),
     successMessage: 'Build succeeded',
-  });
-
-  await logStep({
-    startMessage: 'Generating documentation',
-    action: () => runCmdStep('pnpm run doc', 'Documentation generation failed'),
-    successMessage: 'Documentation generated',
   });
 
   console.info('✅ All checks completed successfully!\n');

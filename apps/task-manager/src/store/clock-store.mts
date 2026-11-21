@@ -91,7 +91,7 @@ export const createClockStore = <H,>(deps: ClockDeps<H>): ClockStore => {
     });
 
     return () => {
-      nowSubscription.unsubscribe();
+      nowSubscription();
 
       setStarted(false);
 

@@ -1,4 +1,4 @@
-import { combine, map, type InitializedObservable } from 'synstate';
+import { derive, map, type InitializedObservable } from 'synstate';
 import { constant, For, If, type JSX } from 'synstate-dom';
 import { Arr, Optional } from 'ts-data-forge';
 import {
@@ -121,24 +121,24 @@ export const IssueList = ({ view, store, now }: Props): JSX.Element => (
                   aria-hidden={constant('true')}
                   class={constant('chip-swatch')}
                   style={{
-                    background: combine([view, name$]).pipe(
-                      map(([{ labelColors }, name]) => {
+                    background: derive(
+                      [view, name$],
+                      ({ labelColors }, name) => {
                         const color = labelColors.get(name);
 
                         return color === undefined
                           ? 'transparent'
                           : labelBackground(color);
-                      }),
+                      },
                     ),
                   }}
                 />
                 {name$}
                 <TileValue
-                  count={combine([view, name$]).pipe(
-                    map(
-                      ([{ chipCounts }, name]) =>
-                        chipCounts.labels.get(name) ?? NO_COUNT,
-                    ),
+                  count={derive(
+                    [view, name$],
+                    ({ chipCounts }, name) =>
+                      chipCounts.labels.get(name) ?? NO_COUNT,
                   )}
                 />
               </button>

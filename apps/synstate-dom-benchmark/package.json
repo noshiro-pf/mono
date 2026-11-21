@@ -11,8 +11,7 @@
   "author": "noshiro-pf <noshiro.pf@gmail.com>",
   "type": "module",
   "scripts": {
-    "benchmark": "BENCHMARK_SET=all vitest --config ./configs/vitest.config.mts run",
-    "benchmark:next": "BENCHMARK_SET=next vitest --config ./configs/vitest.config.mts run",
+    "benchmark": "vitest --config ./configs/vitest.config.mts run",
     "benchmark:repeat": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/repeat-benchmark.mts",
     "bundle-size": "tsx --tsconfig ../../tools/configs/tsconfig.tsx.json ./scripts/measure-bundle-size.mts",
     "check:lint": "node ../../tools/scripts/cmd/assert-deps-built.mts && oxlint . && eslint .",
@@ -38,8 +37,6 @@
     "solid-js": "1.9.17",
     "synstate": "workspace:*",
     "synstate-dom": "workspace:*",
-    "synstate-dom-next": "workspace:*",
-    "synstate-next": "workspace:*",
     "ts-data-forge": "workspace:*",
     "vanjs-core": "1.6.1"
   },

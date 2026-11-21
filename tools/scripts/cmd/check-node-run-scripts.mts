@@ -776,10 +776,7 @@ const THIS_FILE = path
  * before `pnpm install` and the build they need. Every other one runs where
  * there may be none: keep this list to what it must hold.
  */
-export const RUN_AFTER_INSTALL: ReadonlySet<string> = new Set<string>([
-  // `pnpm run benchmark` measures the built packages, imported from `dist/`.
-  'libs/synstate-next/scripts/cmd/benchmark.mts',
-]);
+export const RUN_AFTER_INSTALL: ReadonlySet<string> = new Set<string>();
 
 const TYPESCRIPT_FILE = /\.(?:[cm]?ts)$/u;
 

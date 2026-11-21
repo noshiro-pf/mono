@@ -1,5 +1,5 @@
 import { computed, effect, signal } from '@preact/signals';
-import { createScope, map } from 'synstate';
+import { createOwner, map } from 'synstate';
 import { fromSignal } from '../src/index.mjs';
 
 describe(fromSignal, () => {
@@ -190,7 +190,7 @@ describe(fromSignal, () => {
   });
 
   // A computed runs again on a write only while something subscribes to it.
-  test('stops following the signal when the scope it was called in is disposed', () => {
+  test('stops following the signal when the owner it was called in is disposed', () => {
     const mut_input = signal(0);
 
     const mut_runs = { count: 0 };
@@ -201,9 +201,9 @@ describe(fromSignal, () => {
       return mut_input.value;
     });
 
-    const scope = createScope();
+    const owner = createOwner();
 
-    scope.run(() => fromSignal(derived));
+    owner.run(() => fromSignal(derived));
 
     assert.strictEqual(mut_runs.count, 1);
 
@@ -211,26 +211,26 @@ describe(fromSignal, () => {
 
     assert.strictEqual(mut_runs.count, 2);
 
-    scope.dispose();
+    owner.dispose();
 
     mut_input.value = 2;
 
     assert.strictEqual(mut_runs.count, 2);
   });
 
-  test('takes a dispose called before the scope is disposed, and one outside every scope', () => {
+  test('takes a dispose called before the owner is disposed, and one outside every owner', () => {
     const warn = vi.fn();
 
     vi.stubGlobal('console', { ...console, warn });
 
     try {
-      const scope = createScope();
+      const owner = createOwner();
 
-      const [, disposeInScope] = scope.run(() => fromSignal(signal(0)));
+      const [, disposeInOwner] = owner.run(() => fromSignal(signal(0)));
 
-      disposeInScope();
+      disposeInOwner();
 
-      scope.dispose();
+      owner.dispose();
 
       const [, disposeOutside] = fromSignal(signal(0));
 
