@@ -103,7 +103,7 @@ const packages = [
     isPrivate: true,
   }),
   // Private, and read by check:forgotten-exports all the same.
-  pkg('libs/synstate-next', ['build', 'check:types'], {
+  pkg('libs/private-read-lib', ['build', 'check:types'], {
     exportsBuild: true,
     isPrivate: true,
     forgottenExportsRead: true,
@@ -926,11 +926,6 @@ describe('buildPlan', () => {
         buildDependencies: ['synstate', 'ts-type-forge'],
         exportsBuild: true,
       }),
-      pkg('libs/synstate-dom-next', ['gen', 'build', 'check:types'], {
-        workspaceDependencies: ['ts-type-forge'],
-        buildDependencies: ['ts-type-forge'],
-        exportsBuild: true,
-      }),
     ] as const;
 
     test('a converter change runs their gen after the strict-lib generators, with what they import built', () => {
@@ -946,20 +941,14 @@ describe('buildPlan', () => {
 
       const dom = at(commands, 'libs/synstate-dom: run gen');
 
-      const domNext = at(commands, 'libs/synstate-dom-next: run gen');
-
       assert.isAbove(typeForge, versionDiff);
 
       assert.isAbove(synstate, typeForge);
 
       assert.isAbove(dom, synstate);
 
-      assert.isAbove(domNext, synstate);
-
       // Their generators read their own sources.
       assert.notInclude(commands, 'libs/synstate-dom: run build');
-
-      assert.notInclude(commands, 'libs/synstate-dom-next: run build');
     });
 
     test('their gen is a generator, so a change it makes to the tree fails the run', () => {
@@ -980,11 +969,10 @@ describe('buildPlan', () => {
       assert.deepStrictEqual(
         steps
           .filter(
-            ({ cwd, args }) =>
-              cwd.startsWith('libs/synstate-dom') && args[1] === 'gen',
+            ({ cwd, args }) => cwd === 'libs/synstate-dom' && args[1] === 'gen',
           )
           .map(({ kind }) => kind),
-        ['generate', 'generate'],
+        ['generate'],
       );
     });
 
@@ -1495,8 +1483,8 @@ describe('buildPlan', () => {
 
   test('check:forgotten-exports reads a private package only when the package info says it does', () => {
     assert.include(
-      commandsOf(['libs/synstate-next/src/index.mts']),
-      'run check:forgotten-exports libs/synstate-next',
+      commandsOf(['libs/private-read-lib/src/index.mts']),
+      'run check:forgotten-exports libs/private-read-lib',
     );
 
     assert.notInclude(

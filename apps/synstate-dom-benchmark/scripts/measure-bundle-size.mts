@@ -176,7 +176,7 @@ type BundleSet = Readonly<{
   libraries: readonly Library[];
   fileName: string;
   command: string;
-  /** The script that times these libraries, which BUNDLE-SIZE*.md names. */
+  /** The script that times these libraries, which BUNDLE-SIZE.md names. */
   timedBy: string;
 }>;
 

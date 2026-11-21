@@ -110,7 +110,7 @@ Astro のサイトは別の作り方をする。`apps/synstate-docs` はロゴ P
 - 公開後に `og:image` の URL を直接開いて画像が返ること。X・Slack・Discord は
   カードをキャッシュするので、直したあとはしばらく古いカードが出ることがある。
 
-## 各アプリの状況（2026-10 時点）
+## 各アプリの状況（2026-11 時点）
 
 | アプリ                                                                                                                                                                                              | 公開先                   | favicon                   | iOS                             | OGP                                                   |
 | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :----------------------- | :------------------------ | :------------------------------ | :---------------------------------------------------- |
@@ -118,6 +118,6 @@ Astro のサイトは別の作り方をする。`apps/synstate-docs` はロゴ P
 | `profile`                                                                                                                                                                                           | Pages                    | `favicon.png`（手描き）   | `apple-touch-icon.png` ＋ title | あり                                                  |
 | `event-schedule-app`                                                                                                                                                                                | Firebase                 | `favicon.svg`             | `apple-touch-icon.png` ＋ title | あり                                                  |
 | `synstate-docs`（Astro）                                                                                                                                                                            | Pages                    | `.ico` ＋ PNG             | `apple-touch-icon.png` ＋ title | あり（Starlight の `og:*` ＋ページごとの画像）        |
-| `synstate-dom-docs`, `synstate-dom-next-docs`, `synstate-next-docs`（Astro）                                                                                                                        | Pages                    | `.ico`（synstate のもの） | `apple-touch-icon.png` ＋ title | Starlight の `og:*` と `theme-color` のみ（画像なし） |
+| `synstate-dom-docs`（Astro）                                                                                                                                                                        | Pages                    | `.ico`（synstate のもの） | `apple-touch-icon.png` ＋ title | Starlight の `og:*` と `theme-color` のみ（画像なし） |
 | `mahjong-calculator-app`                                                                                                                                                                            | なし                     | `favicon.svg`             | なし                            | なし                                                  |
 | `synstate-dom-sample-app`, `synstate-router-react-sample-app`, `synstate-router-dom-sample-app`                                                                                                     | なし（開発サーバーのみ） | `.ico`（synstate のもの） | なし                            | なし                                                  |
