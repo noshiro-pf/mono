@@ -2,240 +2,538 @@
 @layer tokens, base, components, utilities;
 
 @layer components {
+  .queue-block {
+    --queue-frame: light-dark(#a9a8a1, #5a5955);
+    --queue-divider: light-dark(#d6d5ce, #3a3a37);
+    --queue-waiting: light-dark(#935610, #f0b35a);
+    --queue-outside: light-dark(#b4501f, #ec835a);
+    --queue-slot-min: 4.75rem;
+    --queue-map-height: 0.75rem;
+    --queue-map-gap: 0.375rem;
+    --queue-fade: 2.5rem;
+    /* Above the boxes: the priority pills across their top edge, and the arcs. */
+    --queue-room: 0.5rem;
+  }
+
   .queue-summary {
-    font-size: 0.85rem;
+    color: var(--ink-2);
+    font-size: 0.8125rem;
+    font-weight: 400;
   }
 
-  .queue {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-  }
-
-  .queue-rows {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-  }
-
-  /* One mark per box, and a frame around the part in view. */
-  .queue-map {
-    position: relative;
-    display: flex;
-    gap: 2px;
-    height: 14px;
-    border-radius: 4px;
-    background: var(--hairline);
-    padding: 3px;
-    cursor: pointer;
-    touch-action: none;
-  }
-
-  .queue-map-mark {
-    flex: 1;
-    border-radius: 2px;
-    background: var(--ink-3);
-  }
-
-  .queue-map-mark[data-place='running'] {
-    background: var(--accent);
-  }
-
-  .queue-map-mark[data-place='waiting'] {
-    background: transparent;
-    outline: 1px dashed var(--ink-3);
-  }
-
-  .queue-map-frame {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    border: 2px solid var(--ink-1);
-    border-radius: 4px;
-    cursor: grab;
-  }
-
-  .queue-scroll {
-    overflow-x: auto;
-    padding: 6px 0;
-  }
-
-  /* As wide as its boxes, so the sticky ones have room to stick in. */
   .queue-row {
-    display: grid;
-    width: max-content;
-    grid-auto-columns: 7.5rem;
-    grid-auto-flow: column;
-    gap: 6px;
-    margin: 0;
-    padding: 0;
-    list-style: none;
+    display: flex;
+    gap: 0.5rem;
+    align-items: flex-start;
   }
 
-  /* The base and what runs stay at the start while the rest scrolls. */
+  .queue-row:has(> .queue-track[data-arc-level='1']) {
+    --queue-room: 0.75rem;
+  }
+
+  .queue-row:has(> .queue-track[data-arc-level='2']) {
+    --queue-room: 1.125rem;
+  }
+
+  .queue-row:has(> .queue-track[data-arc-level='3']) {
+    --queue-room: 1.5rem;
+  }
+
+  .queue-row:has(> .queue-track[data-arc-level='4']) {
+    --queue-room: 1.875rem;
+  }
+
+  .queue-row:has(> .queue-track[data-arc-level='5']) {
+    --queue-room: 2.25rem;
+  }
+
+  /* Level with the middle of the boxes, which start below the pills. */
   .queue-base {
-    position: sticky;
-    left: 0;
-    z-index: 1;
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    background: var(--plane);
-    padding-right: 4px;
+    flex: none;
+    margin-top: var(--queue-room);
+    color: var(--ink-3);
     font-family: var(--font-mono);
-    font-size: 0.8rem;
-  }
-
-  .queue-box {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    border: 1px solid var(--baseline);
-    border-radius: 6px;
-    background: var(--surface);
-    padding: 4px 8px;
-    font-size: 0.8rem;
-  }
-
-  .queue-box[data-place='running'] {
-    position: sticky;
-    left: 7.9rem;
-    z-index: 1;
-    border-color: var(--accent);
-    box-shadow: 0 0 0 1px var(--accent);
-  }
-
-  .queue-box[data-ahead='true'] {
-    border-left: 3px solid var(--accent);
-  }
-
-  .queue-box[data-place='waiting'] {
-    border-style: dashed;
-    background: transparent;
-    color: var(--ink-2);
-  }
-
-  .queue-box-number {
-    font-weight: 600;
-  }
-
-  .queue-box-marks {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 4px;
-    min-height: 1.2rem;
-  }
-
-  .queue-box-place {
-    color: var(--ink-2);
     font-size: 0.75rem;
+    line-height: 3.75rem;
+  }
+
+  .queue-row:has(> .queue-track[data-overflows='true']) > .queue-base {
+    margin-top: calc(
+      var(--queue-room) + var(--queue-map-height) + var(--queue-map-gap)
+    );
+  }
+
+  .queue-track {
+    position: relative;
+    flex: 1;
+    min-width: 0;
   }
 
   /*
-   * Where the checks on the layer of one checked ahead stand: a verdict in its
-   * colour; one still going has the ring before its place.
+   * The row scrolls across under room for the pills and the arcs, which an
+   * overflow that scrolls would otherwise clip; the map above is its scroll
+   * bar, and a wheel, a swipe and the keyboard still scroll it.
    */
-  .queue-box[data-layer='green'] .queue-box-place {
-    color: var(--good);
+  .queue {
+    display: flex;
+    margin: 0;
+    padding: var(--queue-room) 0 0;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    list-style: none;
+    scroll-padding-inline: var(--queue-fade);
+    scrollbar-width: none;
   }
 
-  .queue-box[data-layer='set-aside'] .queue-box-place,
-  .queue-box[data-layer='red'] .queue-box-place,
-  .queue-box[data-layer='dropped'] .queue-box-place {
-    color: var(--critical);
-  }
-
-  .queue-bypass {
-    border: 1px solid var(--serious);
-    border-radius: 999px;
-    padding: 0 6px;
-    color: var(--ink-1);
-    font-size: 0.7rem;
-  }
-
-  .priority-pill {
-    border-radius: 999px;
-    padding: 0 6px;
-    font-size: 0.7rem;
-  }
-
-  .priority-pill:empty {
+  .queue::-webkit-scrollbar {
     display: none;
   }
 
-  .priority-pill[data-priority='high'] {
+  .queue:has(> .queue-slot[data-kind='running']:first-child) {
+    scroll-padding-inline-start: var(--queue-slot-min);
+  }
+
+  /* Faded at an edge with more past it, the running box held at the start aside. */
+  .queue-track[data-more-after='true'] > .queue {
+    mask-image: linear-gradient(
+      to right,
+      #000 calc(100% - var(--queue-fade)),
+      transparent
+    );
+  }
+
+  .queue-track[data-more-before='true'][data-more-after='true']
+    > .queue:not(:has(> .queue-slot[data-kind='running']:first-child)) {
+    mask-image: linear-gradient(
+      to right,
+      transparent,
+      #000 var(--queue-fade),
+      #000 calc(100% - var(--queue-fade)),
+      transparent
+    );
+  }
+
+  .queue-track[data-more-before='true'][data-more-after='false']
+    > .queue:not(:has(> .queue-slot[data-kind='running']:first-child)) {
+    mask-image: linear-gradient(to right, transparent, #000 var(--queue-fade));
+  }
+
+  .queue-slot {
+    position: relative;
+    display: flex;
+    flex: 1 0 var(--queue-slot-min);
+    flex-direction: column;
+    min-width: 0;
+    container-type: inline-size;
+  }
+
+  .queue-slot[data-kind='running']:first-child {
+    position: sticky;
+    left: 0;
+    z-index: 2;
+    background: var(--plane);
+  }
+
+  .queue-arc {
+    position: absolute;
+    bottom: 100%;
+    height: 0.625rem;
+    border: 1.25px solid var(--queue-waiting);
+    border-bottom: none;
+    border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+    opacity: 0.6;
+    pointer-events: none;
+  }
+
+  .queue-arc[data-level='2'] {
+    height: 1rem;
+  }
+
+  .queue-arc[data-level='3'] {
+    height: 1.375rem;
+  }
+
+  .queue-arc[data-level='4'] {
+    height: 1.75rem;
+  }
+
+  .queue-arc[data-level='5'] {
+    height: 2.125rem;
+  }
+
+  .queue-slot:has(> .queue-link:is(:hover, :focus-visible)) > .queue-arc {
+    border-width: 2px;
+    opacity: 1;
+  }
+
+  /* The boxes joined into one strip, a hairline between each two. */
+  .queue-slot > .queue-link {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 3.75rem;
+    border-block: 1.5px solid var(--queue-frame);
+    border-left: 1px solid var(--queue-divider);
+    color: var(--ink-1);
+    text-decoration: none;
+  }
+
+  .queue-slot:first-child > .queue-link {
+    border-left: 1.5px solid var(--queue-frame);
+    border-radius: var(--radius) 0 0 var(--radius);
+  }
+
+  .queue-slot:last-child > .queue-link {
+    border-right: 1.5px solid var(--queue-frame);
+    border-radius: 0 var(--radius) var(--radius) 0;
+  }
+
+  .queue-slot:only-child > .queue-link {
+    border-radius: var(--radius);
+  }
+
+  .queue-slot > .queue-link::before {
+    content: '';
+    position: absolute;
+    inset: 3px;
+    border: 1.2px solid transparent;
+    border-radius: 5px;
+  }
+
+  .queue-slot > .queue-link:is(:hover, :focus-visible)::before {
+    border-color: var(--ink-2);
+    background: color-mix(in srgb, var(--ink-1) 8%, transparent);
+  }
+
+  .queue-slot > .queue-link:focus-visible {
+    outline: none;
+  }
+
+  .queue-slot[data-kind='running'] > .queue-link {
+    background: color-mix(in srgb, var(--accent) 18%, var(--surface));
+    box-shadow: inset 0 0 0 2px var(--accent);
+  }
+
+  .queue-slot[data-kind='waiting'] > .queue-link::before {
+    border: 1.2px dashed var(--queue-waiting);
+    background: color-mix(in srgb, var(--queue-waiting) 8%, transparent);
+  }
+
+  .queue-slot[data-kind='failing'] > .queue-link::before {
+    border: 1.2px dashed var(--critical);
+    background: color-mix(in srgb, var(--critical) 8%, transparent);
+  }
+
+  .queue-slot[data-priority='low'] .queue-number {
+    opacity: 0.5;
+  }
+
+  .queue-number {
+    position: relative;
+    display: inline-flex;
+    gap: 0.35em;
+    align-items: center;
+    max-width: 100%;
+    font-size: clamp(0.5625rem, 19cqi, 0.875rem);
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  .queue-number .spinner {
+    width: 0.9em;
+    height: 0.9em;
+    border-color: color-mix(in srgb, var(--warning) 30%, transparent);
+    border-top-color: var(--warning);
+  }
+
+  .queue-note {
+    position: relative;
+    max-width: calc(100% - 8px);
+    overflow: hidden;
+    color: var(--ink-3);
+    font-size: clamp(0.5rem, 14cqi, 0.65625rem);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .queue-slot[data-kind='waiting'] .queue-note {
+    color: var(--queue-waiting);
+  }
+
+  .queue-slot[data-kind='failing'] .queue-note {
+    color: var(--critical);
+  }
+
+  .queue-slot .queue-note[data-settled='true'] {
+    color: var(--ink-3);
+    text-decoration: line-through;
+  }
+
+  /*
+   * Where the checks on the queue layer of one checked ahead stand: a verdict
+   * in its colour; one still going has the ring beside its number. A kept one
+   * still waiting says what for, and keeps that note's colour.
+   */
+  .queue-slot[data-kind='next'][data-layer='green'] .queue-note {
+    color: var(--good);
+  }
+
+  .queue-slot[data-kind='next'][data-layer='set-aside'] .queue-note,
+  .queue-slot[data-kind='next'][data-layer='red'] .queue-note,
+  .queue-slot[data-kind='next'][data-layer='dropped'] .queue-note {
+    color: var(--critical);
+  }
+
+  .queue-place {
+    margin-top: 0.3rem;
+    overflow: hidden;
+    color: var(--ink-3);
+    font-size: clamp(0.5625rem, 15cqi, 0.6875rem);
+    text-align: center;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .queue-slot[data-kind='running'] .queue-place {
+    color: var(--warning);
+  }
+
+  .queue-slot:nth-child(1 of :not([data-kind='running'])) .queue-place {
+    color: var(--ink-2);
+  }
+
+  .queue-priority {
+    position: absolute;
+    top: -0.45rem;
+    left: 50%;
+    z-index: 1;
+    transform: translateX(-50%);
+    border: 1px solid var(--ink-2);
+    border-radius: 999px;
+    background: var(--surface);
+    padding: 0 0.5em;
+    color: var(--ink-2);
+    font-size: 0.625rem;
+    font-weight: 600;
+    line-height: 0.75rem;
+  }
+
+  .queue-priority[data-priority='high'] {
+    border-color: var(--ink-1);
     background: var(--ink-1);
     color: var(--surface);
   }
 
-  .priority-pill[data-priority='mid'] {
-    border: 1px solid var(--ink-2);
+  .queue-priority[data-priority='mid'] {
+    border-color: var(--ink-1);
+    color: var(--ink-1);
   }
 
-  .priority-pill[data-priority='low'] {
-    border: 1px solid var(--hairline);
-    color: var(--ink-3);
+  .queue-priority[data-priority='low'] {
+    border-color: var(--baseline);
   }
 
-  .queue-outside h3 {
-    margin: 0 0 4px;
-    font-size: 0.95rem;
-  }
-
-  .queue-outside ul {
+  /* One mark per box, and a window around the part in view. */
+  .queue-map {
+    position: relative;
     display: flex;
-    flex-direction: column;
-    gap: 2px;
+    gap: 1px;
+    height: var(--queue-map-height);
+    margin-bottom: var(--queue-map-gap);
+    cursor: pointer;
+    touch-action: pan-y;
+    user-select: none;
+  }
+
+  .queue-map-mark {
+    flex: 1 1 0;
+    min-width: 0;
+    border-radius: 1.5px;
+    background: color-mix(in srgb, var(--ink-3) 28%, transparent);
+  }
+
+  .queue-map-mark[data-priority='high'] {
+    background: var(--ink-1);
+  }
+
+  .queue-map-mark[data-priority='mid'] {
+    background: transparent;
+    box-shadow: inset 0 0 0 1.2px var(--ink-1);
+  }
+
+  .queue-map-mark[data-priority='low'] {
+    opacity: 0.35;
+  }
+
+  /* Never faded for a low priority: these are what the map is looked at for. */
+  .queue-map-mark:is(
+    [data-kind='waiting'],
+    [data-kind='failing'],
+    [data-kind='running']
+  ) {
+    opacity: 1;
+  }
+
+  .queue-map-mark[data-kind='waiting'] {
+    background: color-mix(in srgb, var(--queue-waiting) 22%, transparent);
+    box-shadow: none;
+    outline: 1px dashed var(--queue-waiting);
+    outline-offset: -1px;
+  }
+
+  .queue-map-mark[data-kind='failing'] {
+    background: var(--critical);
+    box-shadow: none;
+  }
+
+  .queue-map-mark[data-kind='running'] {
+    background: var(--accent);
+    box-shadow: none;
+  }
+
+  .queue-map-window {
+    position: absolute;
+    top: -3px;
+    bottom: -3px;
+    border: 1.5px solid var(--accent);
+    border-radius: 4px;
+    background: color-mix(in srgb, var(--accent) 10%, transparent);
+    cursor: grab;
+  }
+
+  .queue-foot {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem 1.5rem;
+    align-items: center;
+    margin-top: 1rem;
+    border-top: 1px dashed var(--hairline);
+    padding-top: 0.75rem;
+  }
+
+  .queue-outside {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    align-items: center;
+  }
+
+  .queue-outside-label {
+    color: var(--queue-outside);
+    font-size: 0.75rem;
+  }
+
+  .queue-outside-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
     margin: 0;
     padding: 0;
     list-style: none;
-    font-size: 0.85rem;
   }
 
-  .queue-outside li {
+  .queue-outside-node > .queue-link {
     display: flex;
-    flex-wrap: wrap;
-    gap: 0 8px;
+    flex-direction: column;
+    align-items: center;
+    min-width: 5.75rem;
+    border: 1.5px dashed var(--queue-outside);
+    border-radius: var(--radius);
+    background: color-mix(in srgb, var(--queue-outside) 12%, var(--surface));
+    padding: 0.25rem 0.625rem;
+    color: var(--ink-1);
+    text-decoration: none;
   }
 
-  .queue-why {
-    font-weight: 600;
+  .queue-outside-node > .queue-link:is(:hover, :focus-visible) {
+    background: color-mix(in srgb, var(--queue-outside) 22%, var(--surface));
   }
 
-  .queue-outside-title {
-    color: var(--ink-2);
+  .queue-outside-node .queue-number {
+    font-size: 0.84375rem;
+  }
+
+  .queue-outside-node .queue-note {
+    max-width: none;
+    color: var(--queue-outside);
+    font-size: 0.65625rem;
   }
 
   .queue-legend {
     display: flex;
     flex-wrap: wrap;
-    gap: 4px 16px;
+    gap: 0.35rem 1rem;
     margin: 0;
     padding: 0;
     list-style: none;
     color: var(--ink-2);
-    font-size: 0.75rem;
+    font-size: 0.71875rem;
   }
 
   .queue-legend li {
-    display: flex;
-    gap: 4px;
+    display: inline-flex;
+    gap: 0.35rem;
     align-items: center;
   }
 
-  .legend-box {
+  .queue-legend-ring {
+    border-color: color-mix(in srgb, var(--warning) 30%, transparent);
+    border-top-color: var(--warning);
+  }
+
+  .queue-swatch {
     display: inline-block;
-    width: 1.2em;
-    height: 0.9em;
-    border: 1px solid var(--baseline);
+    width: 1.125rem;
+    height: 0.75rem;
     border-radius: 3px;
   }
 
-  .legend-waiting {
-    border-style: dashed;
+  .queue-swatch[data-kind='waiting'] {
+    border: 1px dashed var(--queue-waiting);
+    background: color-mix(in srgb, var(--queue-waiting) 8%, var(--surface));
   }
 
-  .legend-ahead {
-    border-left: 3px solid var(--accent);
+  .queue-swatch[data-kind='arc'] {
+    height: 0.5rem;
+    border: 1.25px solid var(--queue-waiting);
+    border-bottom: none;
+    border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+  }
+
+  .queue-legend-after {
+    color: var(--queue-waiting);
+    font-family: var(--font-mono);
+  }
+
+  .queue-legend-settled {
+    color: var(--ink-3);
+    font-family: var(--font-mono);
+    text-decoration: line-through;
+  }
+
+  .queue-swatch[data-kind='outside'] {
+    border: 1px dashed var(--queue-outside);
+    background: color-mix(in srgb, var(--queue-outside) 12%, var(--surface));
+  }
+
+  .queue-swatch[data-kind='priority'] {
+    width: 1.5rem;
+    border: 1px solid var(--ink-2);
+    border-radius: 999px;
+  }
+
+  .queue-swatch[data-priority='high'] {
+    border-color: var(--ink-1);
+    background: var(--ink-1);
+  }
+
+  .queue-swatch[data-priority='mid'] {
+    border-color: var(--ink-1);
+  }
+
+  .queue-swatch[data-priority='low'] {
+    border-color: var(--baseline);
   }
 }

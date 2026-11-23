@@ -235,37 +235,47 @@ Per PR:
 ## 8. Queue (only when the repository has a `merge-queued` label)
 
 - Title links: **on GitHub** (all `merge-queued`), **picked on GitHub**; a
-  summary `7 queued · 1 running · 0 set aside`.
-- One row of equal-width boxes: the running one first (turning ring, `running`
-  under it) next to the base it merges into (`main ←`), then the ones it would
-  pick next in order (`next`, `2`, `3`, …), first those checked ahead, in the
-  order they were stacked (the `queue/pr-*` layers the worker keeps:
-  `stackedAhead` over them, heads followed by `withMovedHeads`), then dashed
-  boxes for those whose turn has not come with why (`after #N`, `review`,
-  `native stack`).
+  summary `7 queued · 1 running · 1 checking ahead · 0 set aside` (queued: the
+  boxes in the row but the running one; set aside: those outside it).
+- One row of joined boxes: the running one first (turning ring, `running` under
+  it) next to the base it merges into (`main ←`), then the ones it would pick
+  next in order, first those checked ahead, in the order they were stacked (the
+  `queue/pr-*` layers the worker keeps: `stackedAhead` over them, heads followed
+  by `withMovedHeads`), then dashed boxes for those whose turn has not come,
+  each after what it waits for among them (#4255 in v1), with why (`after #N`,
+  `review`, `native stack`, `failing` in red, `merge state`). Every box after
+  the running one is numbered under it (`next`, `2`, `3`, …).
 - Each box checked ahead says where the checks on its layer stand, as the worker
   decides it over the whole stack (`layerRunsVerdict` on the runs it dispatched,
   then `layerStandings`): `2/6 runs` with the turning ring, `passed`, `failed`,
   `on red` (dropped above a failed layer), `to check` or `not checked` (a
   workflow cancelled too often), with what the worker does with it on hover; the
-  summary adds `N checking ahead`. The workflows are the `speculate.workflows`
-  of `.github/unblock-prs.json` on the default branch, read over REST. Without
-  that file, or while the runs on a layer kept ahead are unread, each box says
-  only `checked ahead`.
-- Each box carries its priority pill, title on hover (tooltip anchored to the
-  nearer end).
-- When the row overflows: it scrolls with the running box held at the start, and
-  a **map** above (one mark per box) shows a frame around the part in view; drag
-  the frame like a scrollbar thumb, click elsewhere to jump.
-- Outside the row: set aside, claimed, drafts and the like, each with why in a
-  word and whose it is.
+  summary adds `N checking ahead` (#3809 in v1). The workflows are the
+  `speculate.workflows` of `.github/unblock-prs.json` on the default branch,
+  read over REST. Without that file, or while the runs on a layer kept ahead are
+  unread, each box says only `checked ahead`.
+- What a box waits for that is ahead of it in the row is an **arc** from that
+  box to it, a step higher each time the span doubles, instead of `after #N`,
+  which is left for what is behind it or not in the row (#4250 in v1). A box
+  with nothing else to say shows its layer's word, `checked ahead`, `release` or
+  `conflicts`, and otherwise a `Merge-After:` naming no open pull request,
+  struck out: the worker does not wait for it.
+- Each box carries its priority pill on its top edge, title on hover.
+- When the row overflows: it scrolls with the running box held at the start, its
+  edges fading where there is more, and a **map** above (one mark per box) shows
+  a window around the part in view in place of a scroll bar; drag the window
+  like a thumb, click elsewhere to jump; a mouse wheel over the row scrolls it
+  across until it is at its end.
+- Outside the row: set aside, claimed, drafts and the like, as dashed boxes with
+  why in a word and whose it is.
 - **(new, #2757)** A candidate that only a ruleset bypass can merge is marked
   `bypass` with the review hold's reason (text from `pr-report-core`), so its
   later place does not look like a bug.
 - Order decided by `pr-report-core`'s queue code from what the page read (merge
   state made from `mergeable` + comparison). Until every part it needs is read,
   it lists the `merge-queued` PRs by number, order unknown.
-- A legend: running, waits for another PR, set aside, high/mid/low.
+- A legend: running, waits for another PR, the arc, `after #N` and its struck
+  form, set aside, the bypass mark, high/mid/low.
 
 ## 9. Running workflows
 
