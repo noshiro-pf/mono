@@ -51,6 +51,8 @@
  * - `s.open=150`: a block's share, against {@link DEFAULT_SHARE} for the
  *   blocks without one.
  * - `hide=runs.merged`: the blocks hidden, in the usual order.
+ * - `fold=1`: stacks in the merge order start folded
+ *   (`stack-fold-store.mts`). Absent, they start shown in full.
  *
  * Reading forgives: an unknown or repeated block is dropped, a missing one is
  * put back at the end of the left column, and a number out of range is clamped.
@@ -64,7 +66,13 @@ import type {
   ReadonlyRecord,
   StrictPick,
 } from 'ts-type-forge';
-import { currentSearch, rewriteSearch, searchOf } from './url.mjs';
+import {
+  currentSearch,
+  flagParam,
+  rewriteSearch,
+  searchOf,
+  setFlagParam,
+} from './url.mjs';
 
 /** Said here rather than on each member, which `fix:codemod:full` drops (#2042). */
 export type BlockId = 'open' | 'queue' | 'runs' | 'merged' | 'issues';
@@ -168,6 +176,12 @@ export type Layout = Readonly<{
    * the order of {@link BLOCK_IDS}. See {@link selectedTabOf}.
    */
   selected: readonly BlockId[];
+  /**
+   * Whether each stack in the merge order starts folded into one row, until the
+   * reader unfolds it (`stack-fold-store.mts`). Not where a block goes, but how
+   * much room the merge order takes, which is why the Layout dialog has it.
+   */
+  foldStacks: boolean;
 }>;
 
 /**
@@ -201,6 +215,7 @@ export const DEFAULT_LAYOUT: Layout = {
   hidden: [],
   tabbed: [],
   selected: [],
+  foldStacks: false,
 } as const;
 
 export const MIN_HEIGHT = 120;
@@ -286,6 +301,7 @@ export const layoutFromSearch = (search: string): Layout => {
       [PARAM.left, PARAM.middle, PARAM.right].map((param) => params.get(param)),
     ),
     selected: blockList(params.get(PARAM.selected)),
+    foldStacks: flagParam(params, PARAM.foldStacks),
   } as const;
 
   const read = [PARAM.left, PARAM.middle, PARAM.right].some((param) =>
@@ -318,6 +334,7 @@ export const searchWithLayout = (search: string, layout: Layout): string => {
     PARAM.mode,
     PARAM.hidden,
     PARAM.selected,
+    PARAM.foldStacks,
     ...BLOCK_IDS.map(heightParam),
     ...BLOCK_IDS.map(shareParam),
   ]) {
@@ -383,6 +400,8 @@ export const searchWithLayout = (search: string, layout: Layout): string => {
   if (Arr.isNonEmpty(layout.selected)) {
     params.set(PARAM.selected, layout.selected.join(SEPARATOR));
   }
+
+  setFlagParam(params, PARAM.foldStacks, layout.foldStacks);
 
   return searchOf(params);
 };
@@ -754,6 +773,13 @@ export const withHeight = (
   };
 };
 
+/** Whether stacks in the merge order start folded. */
+export const withFoldStacks = (layout: Layout, foldStacks: boolean): Layout =>
+  ({
+    ...layout,
+    foldStacks,
+  }) as const;
+
 export const withMode = (layout: Layout, mode: HeightMode): Layout =>
   ({
     ...layout,
@@ -925,6 +951,7 @@ const PARAM = {
   mode: 'mode',
   hidden: 'hide',
   selected: 'tab',
+  foldStacks: 'fold',
 } as const;
 
 const SEPARATOR = '.';

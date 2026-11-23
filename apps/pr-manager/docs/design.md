@@ -305,9 +305,18 @@ both unfold it. **fold all** and **unfold all**, under **stacks** beside the
 sort, do every stack at once; fold all folds the first pull request of each
 branch with anything below it, so unfolding that shows the whole stack rather
 than one more layer. A fold is kept by number, so it outlives a poll that
-rebuilt the tree, and for the tab only: a reload shows everything again. A pull
-request under more than one predecessor counts where it is expanded, not where
-it is only named.
+rebuilt the tree, and a reload: what the reader folds or unfolds is kept in the
+browser's IndexedDB, per repository, the latest 1,000 choices. A press chooses
+for every layer below too, so a stack stays folded once its first layer merges,
+and unfolding a stack shows all of it, a layer folded on its own inside it
+included; each press is saved as a change to what is stored, so two tabs keep
+each other's. The Layout dialog says whether stacks start folded (`fold=1` in
+the URL, with the rest of the layout): folded, every stack fold all would fold
+is folded until the reader unfolds it, one that appears later included. fold
+all, unfold all and a change of that setting in the dialog replace what was
+kept, so the page looks the way asked for; a link that says otherwise, or
+**Reset the layout**, keeps it. A pull request under more than one predecessor
+counts where it is expanded, not where it is only named.
 
 **What the page shows is kept in the URL**, as the layout and the theme are,
 so a bookmark or a pasted link opens on the same pull requests and issues,
@@ -366,15 +375,16 @@ a keyboard, which is why the drag surfaces themselves are pointer-only. The
 drags are pointer events rather than the HTML drag and drop API, which draws
 its own ghost image and does not work with touch.
 
-**The layout is kept in the URL**, as the theme is, so a bookmark opens the
-same way: `cols=2` or `cols=3`, `left=open.merged`, `middle=runs` (with
-three), `right=issues`, `split=40` (the left column's share of two, in
-percent), `lines=25-70` (where the two lines between three columns are, in
-percent from the left), `h.open=480` (a height, in pixels), `mode=fill` and
-`s.open=150` (a block's share of its column, a weight against 100 for each
-block without one, 50 for the queue) and `hide=runs.merged` (the blocks hidden). Only what differs from one column in the usual order is
-written, a moment after the last
-change so that a drag does not rewrite the address bar on every pointer move.
+**The layout is kept in the URL**, as the theme is, so a bookmark opens the same
+way: `cols=2` or `cols=3`, `left=open.merged`, `middle=runs` (with three),
+`right=issues`, `split=40` (the left column's share of two, in percent),
+`lines=25-70` (where the two lines between three columns are, in percent from
+the left), `h.open=480` (a height, in pixels), `mode=fill` and `s.open=150` (a
+block's share of its column, a weight against 100 for each block without one, 50
+for the queue), `hide=runs.merged` (the blocks hidden) and `fold=1` (the merge
+order's stacks start folded). Only what differs from one column in the usual
+order is written, a moment after the last change so that a drag does not rewrite
+the address bar on every pointer move.
 A URL edited by hand still opens: unknown blocks are dropped, missing ones put
 back, and numbers clamped.
 
@@ -566,18 +576,19 @@ An answer for a token that has since been cleared or replaced is dropped, so
 **Clear** empties the page even while a read is still out.
 
 **The state is in synstate stores** under `src/store/`, not in the components:
-`reader.mts` holds what was read and decides when to read, `token-store.mts`
-the token and its form, `theme-store.mts` light or dark, `layout-store.mts`
-the layout and the drags and dialog that change it, `merge-order-store.mts`
-what the merge order shows and the tree that leaves, `header-store.mts`
-whether the header is folded. Each takes what it
+`reader.mts` holds what was read and decides when to read, `token-store.mts` the
+token and its form, `theme-store.mts` light or dark, `layout-store.mts` the
+layout and the drags and dialog that change it, `merge-order-store.mts` what the
+merge order shows and the tree that leaves, `header-store.mts` whether the
+header is folded, `stack-fold-store.mts` which stacks are. Each takes what it
 touches in the browser as an argument — the timers as synstate `counter`s and
 the DOM events as observables — which is what lets a test drive them with a
 `source`, and `store.mts` hands them the real ones. What is kept outside the
-page follows a store by subscription: storage follows the token, the URL
-and `<html>` follow the theme, the URL follows the layout (through
-`debounce`) and what the merge order and the open issues show (on every
-change, there being no drag), IndexedDB follows the folded header once what it held has been read, and the Layout dialog opens and closes as the store says.
+page follows a store by subscription: storage follows the token, the URL and
+`<html>` follow the theme, the URL follows the layout (through `debounce`) and
+what the merge order and the open issues show (on every change, there being no
+drag), IndexedDB follows the folded header and the folded stacks once what it
+held has been read, and the Layout dialog opens and closes as the store says.
 
 **The view is synstate-dom**, which binds the stores' observables straight
 into the DOM: each component is called once, and a value that changes

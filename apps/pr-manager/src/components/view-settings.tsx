@@ -10,14 +10,14 @@ import {
   type ColumnIndex,
   type Layout,
 } from '../layout.mjs';
-import { layoutStore } from '../store/index.mjs';
+import { layoutStore, stackFoldStore } from '../store/index.mjs';
 import { followOpen } from './follow-open.mjs';
 import { ViewSettingsRow } from './view-settings-row.js';
 
 /**
  * The "Layout" button and the dialog it opens: one column, two or three, how
- * wide each is, whether the page scrolls or fills the window, the order of the
- * blocks, which of them are shown, and their heights or shares, and a way back to the usual layout.
+ * wide each is, whether the page scrolls or fills the window, whether the merge
+ * order's stacks start folded, the order of the blocks, which of them are shown, and their heights or shares, and a way back to the usual layout.
  *
  * Everything the pointer does on the page can be done here with a keyboard,
  * which is what lets the drag surfaces there be pointer-only. A native
@@ -195,6 +195,30 @@ export const ViewSettings = (): JSX.Element => {
           />
         </fieldset>
 
+        <fieldset class={constant('view-settings-group')}>
+          <legend>{constant('Stacks in the merge order')}</legend>
+
+          <Choice
+            checked={layout$.pipe(map(({ foldStacks }) => !foldStacks))}
+            label={'Shown in full to start with'}
+            name={'fold-stacks'}
+            onChoose={startStacksShown}
+          />
+
+          <Choice
+            checked={layout$.pipe(map(({ foldStacks }) => foldStacks))}
+            label={'Folded into one row each to start with'}
+            name={'fold-stacks'}
+            onChoose={startStacksFolded}
+          />
+
+          <p class={constant('section-note')}>
+            {constant(
+              'A stack folded or unfolded on the page stays so after a reload, in this browser. Changing this unfolds or folds every stack again.',
+            )}
+          </p>
+        </fieldset>
+
         <For
           items={layout$.pipe(map(columnIndicesOf))}
           key={(column) => column}
@@ -320,6 +344,18 @@ const naturalMode = (): void => {
 
 const fillMode = (): void => {
   layoutStore.setMode('fill');
+};
+
+const startStacksShown = (): void => {
+  layoutStore.setFoldStacks(false);
+
+  stackFoldStore.forget();
+};
+
+const startStacksFolded = (): void => {
+  layoutStore.setFoldStacks(true);
+
+  stackFoldStore.forget();
 };
 
 const COLUMN_INDICES = [0, 1, 2] as const satisfies readonly ColumnIndex[];

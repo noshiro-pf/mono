@@ -21,6 +21,7 @@ import {
   withColumns,
   withEvenLine,
   withEvenShares,
+  withFoldStacks,
   withHeight,
   withHidden,
   withLineAt,
@@ -58,6 +59,7 @@ describe(layoutFromSearch, () => {
         hidden: [],
         tabbed: [],
         selected: [],
+        foldStacks: false,
       },
     );
   });
@@ -217,6 +219,22 @@ describe(searchWithLayout, () => {
     );
   });
 
+  test('writes stacks folded to start with as fold=1, and nothing when they are not', () => {
+    assert.strictEqual(
+      searchWithLayout('?theme=dark', withFoldStacks(DEFAULT_LAYOUT, true)),
+      '?theme=dark&fold=1',
+    );
+
+    assert.strictEqual(
+      searchWithLayout('?fold=1', withFoldStacks(DEFAULT_LAYOUT, false)),
+      '',
+    );
+
+    assert.isTrue(layoutFromSearch('?fold=1').foldStacks);
+
+    assert.isFalse(layoutFromSearch('?fold=yes').foldStacks);
+  });
+
   test('keeps the other parameters', () => {
     assert.strictEqual(
       searchWithLayout(
@@ -241,6 +259,7 @@ describe(searchWithLayout, () => {
       hidden: ['runs', 'issues'],
       tabbed: ['queue'],
       selected: ['queue'],
+      foldStacks: true,
     } as const;
 
     assert.deepStrictEqual(

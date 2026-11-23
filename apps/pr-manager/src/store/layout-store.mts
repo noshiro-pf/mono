@@ -23,6 +23,7 @@ import {
   withColumns,
   withEvenLine,
   withEvenShares,
+  withFoldStacks,
   withHeight,
   withHidden,
   withLineAt,
@@ -75,6 +76,8 @@ export type LayoutStore = Readonly<{
   evenLine: (line: LineIndex) => void;
   setHeight: (block: BlockId, height: number | undefined) => void;
   setMode: (mode: HeightMode) => void;
+  /** Whether stacks in the merge order start folded; see `Layout.foldStacks`. */
+  setFoldStacks: (foldStacks: boolean) => void;
   setShare: (block: BlockId, share: number | undefined) => void;
   /** Gives the blocks the same height each, out of what they had. */
   evenShares: (blocks: readonly BlockId[]) => void;
@@ -167,6 +170,9 @@ export const createLayoutStore = (deps: LayoutDeps): LayoutStore => {
     setHeight,
     setMode: (mode) => {
       updateLayout((current) => withMode(current, mode));
+    },
+    setFoldStacks: (foldStacks) => {
+      updateLayout((current) => withFoldStacks(current, foldStacks));
     },
     setShare: (block, share) => {
       updateLayout((current) => withShare(current, block, share));

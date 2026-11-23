@@ -9,7 +9,7 @@
  * first predecessor only, and so counts there only.
  */
 import type { ChecksSummary, TreeNode } from 'pr-report-core';
-import { Arr } from 'ts-data-forge';
+import { Arr, isRecord } from 'ts-data-forge';
 
 /**
  * The pull requests below `node` that the merge order would draw, nearest
@@ -76,14 +76,91 @@ export const foldableNumbersOf = (
   return Array.from(mut_found);
 };
 
-/** Folds `number` when it is not, and unfolds it when it is. */
-export const toggleFolded = (
-  folded: readonly number[],
+/**
+ * The pull request `number` and the layers below it ({@link layersBelow}), as
+ * the merge order draws them: below its first place in the tree, not one where
+ * it is only named (`TreeNode.repeated`). Just `number` when the tree has no
+ * such place.
+ */
+export const stackNumbersOf = (
+  roots: readonly TreeNode[],
   number: number,
-): readonly number[] =>
-  folded.includes(number)
-    ? folded.filter((each) => each !== number)
-    : Arr.toPushed(folded, number).toSorted((a, b) => a - b);
+  isDrawn: (each: number) => boolean,
+): readonly number[] => {
+  const find = (nodes: readonly TreeNode[]): TreeNode | undefined => {
+    for (const each of nodes) {
+      if (each.repeated) {
+        continue;
+      }
+
+      if (each.number === number) {
+        return each;
+      }
+
+      const found = find(each.children);
+
+      if (found !== undefined) {
+        return found;
+      }
+    }
+
+    return undefined;
+  };
+
+  const node = find(roots);
+
+  return node === undefined
+    ? [number]
+    : Arr.toUnshifted(number)(layersBelow(node, isDrawn));
+};
+
+/**
+ * The pull requests folded, ascending: those the reader chose to fold, and,
+ * when stacks start folded, every one "fold all" would fold
+ * ({@link foldableNumbersOf}) that the reader has not chosen to unfold.
+ */
+export const foldedNumbersOf = (
+  choices: readonly FoldChoice[],
+  {
+    foldable,
+    foldByDefault,
+  }: Readonly<{ foldable: readonly number[]; foldByDefault: boolean }>,
+): readonly number[] => {
+  const chosen = new Set<number>(choices.map(({ number }) => number));
+
+  const byDefault = foldByDefault
+    ? foldable.filter((number) => !chosen.has(number))
+    : ([] as const);
+
+  return Arr.uniq([
+    ...choices.filter(({ folded }) => folded).map(({ number }) => number),
+    ...byDefault,
+  ]).toSorted((a, b) => a - b);
+};
+
+/**
+ * The choices with each of `numbers` folded or unfolded as the latest of them,
+ * in place of any earlier choice for it, and only the latest
+ * {@link MAX_FOLD_CHOICES} kept. `numbers` are added last first, so that the
+ * first of them is the last to go.
+ */
+export const withFoldChoices = (
+  choices: readonly FoldChoice[],
+  numbers: readonly number[],
+  folded: boolean,
+): readonly FoldChoice[] =>
+  latestOnly([
+    ...choices,
+    ...numbers.toReversed().map((number) => ({ number, folded }) as const),
+  ]);
+
+/**
+ * The choices in what was saved, as it was saved. Anything that is not one is
+ * dropped, and anything but a list is none: a browser's storage can hold what
+ * an older or a newer page wrote.
+ */
+export const foldChoicesFrom = (saved: unknown): readonly FoldChoice[] =>
+  Arr.isArray(saved) ? latestOnly(saved.filter(isFoldChoice)) : ([] as const);
 
 export type LayerState = Readonly<{
   /**
@@ -125,3 +202,42 @@ export const tallyLayers = (states: readonly LayerState[]): LayerTally => {
     drafts: states.filter(({ isDraft }) => isDraft).length,
   };
 };
+
+/**
+ * A pull request folded or unfolded by the reader, by its number. A press
+ * chooses for the pull request pressed and for every layer below it, so that
+ * when the stack's first layer merges, the one now first keeps the choice.
+ * Kept across reloads (`stack-fold-store.mts`).
+ */
+export type FoldChoice = Readonly<{ number: number; folded: boolean }>;
+
+/**
+ * How many choices are kept, the latest. A pull request that merged or closed
+ * is never drawn again, so its choice only takes room; this bounds that room
+ * without having to know which pull requests are gone, which a page still
+ * reading cannot tell. Room for a few dozen stacks of a few dozen layers.
+ */
+export const MAX_FOLD_CHOICES = 1000;
+
+/**
+ * Each number's latest choice, in the order of those, and the latest
+ * {@link MAX_FOLD_CHOICES} of them.
+ */
+const latestOnly = (choices: readonly FoldChoice[]): readonly FoldChoice[] => {
+  const mut_latest = new Map<number, FoldChoice>();
+
+  for (const choice of choices) {
+    mut_latest.delete(choice.number);
+
+    mut_latest.set(choice.number, choice);
+  }
+
+  return Array.from(mut_latest.values()).slice(-MAX_FOLD_CHOICES);
+};
+
+const isFoldChoice = (value: unknown): value is FoldChoice =>
+  isRecord(value) &&
+  typeof value['number'] === 'number' &&
+  Number.isSafeInteger(value['number']) &&
+  value['number'] > 0 &&
+  typeof value['folded'] === 'boolean';
