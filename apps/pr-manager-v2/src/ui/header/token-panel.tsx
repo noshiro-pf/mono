@@ -40,83 +40,85 @@ export const TokenPanel = ({ token, budget, refused }: Props): JSX.Element => (
       )}
     </summary>
 
-    <If
-      cond={refused}
-      then={
-        <p class={constant('token-error')}>
-          {constant(
-            'GitHub answered 401 for it: the token is mistyped, expired or revoked. Paste a new one below.',
-          )}
-        </p>
-      }
-    />
-
-    <p class={constant('token-state')}>
-      {combine([token.token, budget]).pipe(
-        map(([held, b]) => stateWords(held, b)),
-      )}
-    </p>
-
-    <form
-      class={constant('token-form')}
-      onSubmit={(event) => {
-        // A form so that Enter submits; there is nowhere to submit to.
-        event.preventDefault();
-
-        token.submit();
-      }}
-    >
-      <label htmlFor={constant(INPUT_ID)}>
-        {constant('GitHub personal access token')}
-      </label>
-
-      <input
-        autocomplete={constant('off')}
-        id={constant(INPUT_ID)}
-        placeholder={token.token.pipe(
-          map((held) =>
-            held === undefined ? 'ghp_… or github_pat_…' : '••••••••',
-          ),
-        )}
-        type={constant('password')}
-        value={token.typed}
-        onInput={(event) => {
-          token.setTyped(event.currentTarget.value);
-        }}
+    <div class={constant('token-body')}>
+      <If
+        cond={refused}
+        then={
+          <p class={constant('token-error')}>
+            {constant(
+              'GitHub answered 401 for it: the token is mistyped, expired or revoked. Paste a new one below.',
+            )}
+          </p>
+        }
       />
 
-      <label class={constant('token-remember')}>
+      <p class={constant('token-state')}>
+        {combine([token.token, budget]).pipe(
+          map(([held, b]) => stateWords(held, b)),
+        )}
+      </p>
+
+      <form
+        class={constant('token-form')}
+        onSubmit={(event) => {
+          // A form so that Enter submits; there is nowhere to submit to.
+          event.preventDefault();
+
+          token.submit();
+        }}
+      >
+        <label htmlFor={constant(INPUT_ID)}>
+          {constant('GitHub personal access token')}
+        </label>
+
         <input
-          checked={token.remember}
-          type={constant('checkbox')}
-          onChange={(event) => {
-            token.setRemember(event.currentTarget.checked);
+          autocomplete={constant('off')}
+          id={constant(INPUT_ID)}
+          placeholder={token.token.pipe(
+            map((held) =>
+              held === undefined ? 'ghp_… or github_pat_…' : '••••••••',
+            ),
+          )}
+          type={constant('password')}
+          value={token.typed}
+          onInput={(event) => {
+            token.setTyped(event.currentTarget.value);
           }}
         />
-        {constant('Remember on this device')}
-      </label>
 
-      <span class={constant('token-actions')}>
-        <button class={constant('button')} type={constant('submit')}>
-          {constant('Use this token')}
-        </button>
+        <label class={constant('token-remember')}>
+          <input
+            checked={token.remember}
+            type={constant('checkbox')}
+            onChange={(event) => {
+              token.setRemember(event.currentTarget.checked);
+            }}
+          />
+          {constant('Remember on this device')}
+        </label>
 
-        <button
-          class={constant('button')}
-          type={constant('button')}
-          onClick={token.clear}
-        >
-          {constant('Clear')}
-        </button>
-      </span>
-    </form>
+        <span class={constant('token-actions')}>
+          <button class={constant('button')} type={constant('submit')}>
+            {constant('Use this token')}
+          </button>
 
-    <MatchOptional
-      value={token.saveError.pipe(map(Optional.fromNullable))}
-      some={(error) => <p class={constant('token-error')}>{error}</p>}
-    />
+          <button
+            class={constant('button')}
+            type={constant('button')}
+            onClick={token.clear}
+          >
+            {constant('Clear')}
+          </button>
+        </span>
+      </form>
 
-    <TokenHelp />
+      <MatchOptional
+        value={token.saveError.pipe(map(Optional.fromNullable))}
+        some={(error) => <p class={constant('token-error')}>{error}</p>}
+      />
+
+      <TokenHelp />
+    </div>
   </details>
 );
 

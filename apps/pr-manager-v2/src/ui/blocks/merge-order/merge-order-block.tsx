@@ -55,8 +55,15 @@ export const mergeOrderBlock = (
             >
               {constant('on GitHub')}
             </ExternalLink>
-            <MergeOrderFilters update={store.update} view={view$} />
           </>
+        )}
+      />
+    ),
+    controls: (
+      <MatchOptional
+        value={ready}
+        some={(view$) => (
+          <MergeOrderFilters update={store.update} view={view$} />
         )}
       />
     ),

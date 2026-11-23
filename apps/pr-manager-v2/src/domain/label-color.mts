@@ -10,6 +10,13 @@ export const labelInk = (hex: string): '#000' | '#fff' => {
   return (luminance + 0.05) ** 2 >= 1.05 * 0.05 ? '#000' : '#fff';
 };
 
+/**
+ * A chip's edge: a hairline of its ink at low alpha rather than a colour of its
+ * own, so that a chip whose colour is close to the surface still has one.
+ */
+export const labelEdge = (hex: string): string =>
+  labelInk(hex) === '#fff' ? 'rgb(255 255 255 / 25%)' : 'rgb(0 0 0 / 20%)';
+
 /** `#RRGGBB` for CSS, or a neutral grey for a colour GitHub did not give. */
 export const labelBackground = (hex: string): string =>
   HEX.test(hex) ? (`#${hex}` as const) : '#ededed';

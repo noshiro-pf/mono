@@ -135,14 +135,16 @@
 @layer components {
   .button {
     border: 1px solid var(--baseline);
-    border-radius: 6px;
+    border-radius: var(--radius);
     background: var(--surface);
-    padding: 4px 12px;
+    padding: 0.35rem 0.85rem;
+    color: var(--ink-1);
     cursor: pointer;
   }
 
   .button:hover:not(:disabled, [aria-disabled='true']) {
-    border-color: var(--ink-3);
+    border-color: var(--accent);
+    color: var(--accent);
   }
 
   /* aria-disabled: unavailable but still focusable, so focus stays put. */
@@ -197,7 +199,7 @@
   .page {
     max-width: 68rem;
     margin: 0 auto;
-    padding: 16px 16px 48px;
+    padding: 2rem 1rem 4rem;
   }
 
   .page:has(.columns[data-count='2']) {
@@ -209,6 +211,6 @@
   }
 
   .page:has(.header[data-folded='true']) {
-    padding-top: 8px;
+    padding-top: 0.5rem;
   }
 }

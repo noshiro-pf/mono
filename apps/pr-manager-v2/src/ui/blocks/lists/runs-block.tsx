@@ -110,51 +110,55 @@ const RunRow = ({
   now: InitializedObservable<number>;
 }>): JSX.Element => (
   <li class={constant('row')}>
-    <span
-      class={constant('run-state')}
-      data-status={run.pipe(map(({ status }) => status))}
-      title={run.pipe(map(({ status }) => status.replaceAll('_', ' ')))}
-    >
-      <If
-        cond={run.pipe(map(({ status }) => status === 'in_progress'))}
-        then={<span class={constant('spinner')} />}
-        else={
-          <If
-            cond={run.pipe(map(({ status }) => status === 'queued'))}
-            then={
-              <span aria-hidden={constant('true')} class={constant('dot')} />
-            }
-            else={
-              <span class={constant('badge')} data-tone={constant('warning')}>
-                {run.pipe(map(({ status }) => status.replaceAll('_', ' ')))}
-              </span>
-            }
-          />
-        }
-      />
-    </span>
-    <span class={constant('row-main')}>
+    <div class={constant('row-heading')}>
+      <span
+        class={constant('run-state')}
+        data-status={run.pipe(map(({ status }) => status))}
+        title={run.pipe(map(({ status }) => status.replaceAll('_', ' ')))}
+      >
+        <If
+          cond={run.pipe(map(({ status }) => status === 'in_progress'))}
+          then={<span class={constant('spinner')} />}
+          else={
+            <If
+              cond={run.pipe(map(({ status }) => status === 'queued'))}
+              then={
+                <span aria-hidden={constant('true')} class={constant('dot')} />
+              }
+              else={
+                <span class={constant('badge')} data-tone={constant('warning')}>
+                  {run.pipe(map(({ status }) => status.replaceAll('_', ' ')))}
+                </span>
+              }
+            />
+          }
+        />
+      </span>
       <ExternalLink
         class={constant('row-title')}
         href={run.pipe(map(({ url }) => url))}
       >
         {run.pipe(map(({ title }) => title))}
       </ExternalLink>
-      <span class={constant('row-meta')}>
+    </div>
+    <div class={constant('row-meta')}>
+      <span>
         {run.pipe(
-          map(
-            ({ workflow, runNumber, event, branch, actor }) =>
-              `${workflow} #${runNumber} · ${event} · ${branch} · ${actor}`,
-          ),
+          map(({ workflow, runNumber }) => `${workflow} #${runNumber}`),
         )}
-        {constant(' · ')}
-        <Age
-          at={run.pipe(map(({ startedAt }) => instantMsOf(startedAt)))}
-          now={now}
-          prefix={'started '}
-        />
       </span>
-    </span>
+      <span>{run.pipe(map(({ event }) => event))}</span>
+      <span class={constant('branch')}>
+        <span aria-hidden={constant('true')}>{constant('⎇ ')}</span>
+        {run.pipe(map(({ branch }) => branch))}
+      </span>
+      <Age
+        at={run.pipe(map(({ startedAt }) => instantMsOf(startedAt)))}
+        now={now}
+        prefix={'started '}
+      />
+      <span>{run.pipe(map(({ actor }) => `by ${actor}`))}</span>
+    </div>
   </li>
 );
 

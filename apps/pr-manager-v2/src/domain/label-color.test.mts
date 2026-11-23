@@ -1,4 +1,4 @@
-import { labelInk, relativeLuminance } from './label-color.mjs';
+import { labelEdge, labelInk, relativeLuminance } from './label-color.mjs';
 
 describe(labelInk, () => {
   test.each([
@@ -32,5 +32,13 @@ describe(labelInk, () => {
         ? l + 0.05 >= 4.5 * 0.05
         : 1.05 >= 4.5 * (l + 0.05),
     );
+  });
+});
+
+describe(labelEdge, () => {
+  test('is a hairline of the ink, so a chip near the surface keeps an edge', () => {
+    assert.strictEqual(labelEdge('ededed'), 'rgb(0 0 0 / 20%)');
+
+    assert.strictEqual(labelEdge('5319e7'), 'rgb(255 255 255 / 25%)');
   });
 });

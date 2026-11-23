@@ -1,73 +1,136 @@
+/* The order named first wins: see layer-order.test.mts. */
+@layer tokens, base, components, utilities;
+
 @layer components {
   /*
-   * A status badge: the tone tints its border and glyph, never alone; the
-   * word says it.
+   * A status badge: the tone colours its outline and its word, never alone; a
+   * glyph or an icon says it too.
    */
   .badge {
-    --tone: var(--ink-3);
-
     display: inline-flex;
-    gap: 4px;
-    align-items: baseline;
-    border: 1px solid color-mix(in srgb, var(--tone) 55%, transparent);
+    gap: 0.3rem;
+    align-items: center;
+    border: 1px solid var(--ring);
     border-radius: 999px;
-    background: color-mix(in srgb, var(--tone) 10%, var(--surface));
-    padding: 0 8px;
-    font-size: 0.8rem;
+    padding: 0 0.55rem;
+    font-size: 0.75rem;
     line-height: 1.6;
     white-space: nowrap;
   }
 
-  .badge > [aria-hidden='true'] {
-    color: var(--tone);
-    font-weight: 700;
+  .badge-icon {
+    flex: none;
+    width: 0.9em;
+    height: 0.9em;
   }
 
   .badge[data-tone='good'] {
-    --tone: var(--good);
-  }
-
-  .badge[data-tone='warning'] {
-    --tone: var(--warning);
-  }
-
-  .badge[data-tone='serious'] {
-    --tone: var(--serious);
+    border-color: var(--good);
+    color: var(--good);
   }
 
   .badge[data-tone='critical'] {
-    --tone: var(--critical);
+    border-color: var(--critical);
+    color: var(--critical);
+  }
+
+  /* Yellow does not read as text: the outline alone. */
+  .badge[data-tone='warning'] {
+    border-color: var(--warning);
+    color: var(--ink-1);
+  }
+
+  .badge[data-tone='serious'] {
+    border-color: var(--serious);
+    color: var(--ink-1);
+  }
+
+  .badge[data-tone='neutral'] {
+    border-color: var(--baseline);
+    color: var(--ink-2);
+  }
+
+  .badge[data-tone='plain'] {
+    border-color: var(--baseline);
+    color: var(--ink-1);
+  }
+
+  .badge[data-tone='quiet'] {
+    border-color: var(--hairline);
+    color: var(--ink-3);
   }
 
   /* Categorical, not a status: open and draft. */
   .badge[data-tone='info'] {
-    --tone: var(--accent);
+    border-color: var(--accent);
+    color: var(--accent);
   }
 
   .badge-counts {
-    color: var(--ink-2);
+    color: inherit;
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    opacity: 0.85;
+  }
+
+  /* A pull request's or issue's number before its title. */
+  .card-number {
+    color: var(--ink-3);
+    font-family: var(--font-mono);
+    font-size: 0.875rem;
+  }
+
+  .branch {
     font-family: var(--font-mono);
     font-size: 0.75rem;
+    overflow-wrap: anywhere;
+  }
+
+  .branch-base {
+    color: var(--ink-3);
+  }
+
+  .linked-issues a[data-state='closed'] {
+    text-decoration: line-through;
+  }
+
+  .failed-checks {
+    color: var(--critical);
+  }
+
+  /* `pushed 2 hours ago`: the word faint, the age in the line's own ink. */
+  .timestamp {
+    color: var(--ink-3);
+  }
+
+  .timestamp > time {
+    color: var(--ink-2);
   }
 
   .label-chip {
     display: inline-block;
+    border: 1px solid;
     border-radius: 999px;
-    padding: 0 8px;
+    padding: 0 0.6rem;
     font-size: 0.75rem;
-    font-weight: 600;
-    line-height: 1.6;
+    font-weight: 500;
+    line-height: 1.7;
     white-space: nowrap;
   }
 
   /*
    * Count tiles, each a switch with an `only` in its corner: a row of equal
-   * tiles, the number large enough to read across the room.
+   * tiles. A bar of them (`.filter-bar`) is a container, so that in a narrow
+   * column the tiles and chips shrink with it rather than wrap.
    */
+  .filter-bar {
+    container: filter-bar / inline-size;
+  }
+
   .tiles {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(7.5rem, 1fr));
-    gap: 8px;
+    gap: 0.75rem;
     width: 100%;
   }
 
@@ -77,10 +140,8 @@
    * height of the tallest tile, one whose label wraps.
    */
   .tile {
-    --tone: var(--ink-1);
-    --tile-pad-block: 10px;
-    --tile-pad-top: var(--tile-pad-block);
-    --tile-pad-inline: 12px;
+    --tile-pad-block: 0.75rem;
+    --tile-pad-inline: 0.9rem;
 
     display: flex;
     flex: 1;
@@ -88,10 +149,12 @@
     justify-content: flex-start;
     align-items: flex-start;
     min-width: 0;
-    border: 1px solid var(--hairline);
+    border: 1px solid var(--ring);
     border-radius: var(--radius);
     background: var(--surface);
-    padding: var(--tile-pad-top) var(--tile-pad-inline) var(--tile-pad-block);
+    padding: var(--tile-pad-block) var(--tile-pad-inline);
+    color: inherit;
+    font: inherit;
     text-align: left;
   }
 
@@ -110,23 +173,23 @@
     outline-offset: 2px;
   }
 
-  /*
-   * A tone beside the word that says it: a stripe at the tile's left edge, and
-   * for critical the number too (the lighter tones would not read as text on
-   * the light surface). A stripe drawn inside, so the number does not move.
-   */
-  .tile[data-tone='critical'] {
-    --tone: var(--critical);
-
-    box-shadow: inset 3px 0 0 var(--critical);
+  .tile-value {
+    display: block;
+    font-size: 1.75rem;
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+    line-height: 1.1;
   }
 
-  .tile[data-tone='serious'] {
-    box-shadow: inset 3px 0 0 var(--serious);
+  /* A count that should be zero, in the status red beside the word for it. */
+  .tile[data-tone='critical'] .tile-value {
+    color: var(--critical);
   }
 
-  .tile[data-tone='warning'] {
-    box-shadow: inset 3px 0 0 var(--warning);
+  .tile-label {
+    display: block;
+    color: var(--ink-2);
+    font-size: 0.8125rem;
   }
 
   /*
@@ -134,79 +197,58 @@
    * is struck through, so that being off does not rest on a colour.
    */
   .tile-switch[aria-pressed='false'] {
-    border-style: dashed;
-    border-color: var(--baseline);
+    border: 1px dashed var(--baseline);
     background: transparent;
-    color: var(--ink-3);
   }
 
-  .tile-switch[aria-pressed='false'] .tile-label {
+  .tile-switch[aria-pressed='false'] :is(.tile-value, .tile-label) {
     color: var(--ink-3);
     text-decoration: line-through;
   }
 
-  .tile-value {
-    color: var(--tone);
-    font-size: 1.75rem;
-    font-variant-numeric: tabular-nums;
-    font-weight: 600;
-    line-height: 1.1;
-  }
-
-  .tile-switch[aria-pressed='false'] .tile-value {
-    color: var(--ink-3);
-  }
-
-  /* How many showing would add: struck through, since none are drawn. */
-  .tile-value[data-hidden='true'] {
-    text-decoration: line-through;
-  }
-
-  .tile-label {
-    color: var(--ink-2);
-    font-size: 0.8rem;
-  }
-
-  /* Its width, not the window's, decides where the number goes. */
   .tile-cell {
     position: relative;
     display: flex;
     min-width: 0;
-    container-type: inline-size;
-  }
-
-  /* Too narrow for the number beside `only`: the number goes under it. */
-  @container (width < 6.5rem) {
-    .tile {
-      --tile-pad-top: calc(var(--tile-pad-block) + 1.4rem);
-    }
   }
 
   /*
-   * A picked count is filled and outlined in the accent; the outline a pixel
-   * wider and the padding a pixel narrower, so the number does not move.
+   * A picked count is filled and outlined in the accent, the outline a pixel
+   * wider and the padding a pixel narrower so that the number does not move;
+   * once one is picked, the counts neither picked nor hidden fade, without the
+   * strike-through that hiding has.
    */
   .tile-cell:has(> .tile-only[aria-pressed='true']) > .tile {
     border: 2px solid var(--accent);
     background: color-mix(in srgb, var(--accent) 12%, var(--surface));
-    padding: calc(var(--tile-pad-top) - 1px) calc(var(--tile-pad-inline) - 1px)
-      calc(var(--tile-pad-block) - 1px);
+    padding: calc(var(--tile-pad-block) - 1px)
+      calc(var(--tile-pad-inline) - 1px);
+  }
+
+  :is(.tiles, .tile-group):has(.tile-only[aria-pressed='true'])
+    > .tile-cell:not(:has(> .tile-only[aria-pressed='true']))
+    > .tile-switch[aria-pressed='true']
+    :is(.tile-value, .tile-label) {
+    color: var(--ink-3);
   }
 
   /*
-   * Inside the tile's top right corner, clear of the number, and always drawn:
+   * Over the tile's top right corner, clear of the number, and always drawn:
    * the page is used on phones, where nothing hovers.
    */
   .tile-only {
+    --only-offset: 0.45rem;
+
     position: absolute;
-    top: 7px;
-    right: 7px;
+    top: var(--only-offset);
+    right: var(--only-offset);
     border: 1px solid var(--baseline);
     border-radius: 999px;
     background: var(--surface);
-    padding: 1px 8px;
+    padding: 0.15rem 0.5rem;
     color: var(--ink-2);
-    font-size: 0.7rem;
+    font: inherit;
+    font-size: 0.6875rem;
     line-height: 1.2;
     cursor: pointer;
   }
@@ -223,33 +265,31 @@
   }
 
   /*
-   * Tiles joined into one group, as the issue tiers are: one row that never
-   * wraps, each an equal share, so the corners stay at the group's ends. Each
-   * overlaps the one before by the hairline; the one hovered, focused or
-   * picked is drawn over the tiles beside it, so its outline is whole. Hidden, a
-   * tile keeps the solid edge it shares and is told by its strike-through.
+   * Tiles joined into one group, as the issue tiers are: they share their
+   * edges, each overlapping the one before by the hairline, and the one
+   * hovered, focused or picked is drawn over the tiles beside it so that its
+   * outline is whole. Hidden, a tile keeps the solid edge it shares and is told
+   * by its strike-through. Six columns, three or two in a narrow column.
    */
   .tile-group {
-    display: flex;
+    --tier-columns: 6;
+
+    display: grid;
+    grid-template-columns: repeat(var(--tier-columns), minmax(0, 1fr));
     width: 100%;
-    min-width: 0;
   }
 
-  .tile-group > .tile-cell {
-    flex: 1 1 0;
+  .tile-group > .tile-cell + .tile-cell {
+    margin-left: -1px;
   }
 
-  .tile-group > .tile-cell > .tile-switch[aria-pressed='false'] {
-    border-style: solid;
-    border-color: var(--hairline);
+  .tile-group > .tile-cell:is(:hover, :focus-within),
+  .tile-group > .tile-cell:has(> .tile-only[aria-pressed='true']) {
+    z-index: 1;
   }
 
   .tile-group > .tile-cell > .tile {
     border-radius: 0;
-  }
-
-  .tile-group > .tile-cell + .tile-cell > .tile {
-    margin-left: -1px;
   }
 
   .tile-group > .tile-cell:first-child > .tile {
@@ -260,45 +300,50 @@
     border-radius: 0 var(--radius) var(--radius) 0;
   }
 
-  .tile-group > .tile-cell:is(:hover, :focus-within),
-  .tile-group > .tile-cell:has(> .tile-only[aria-pressed='true']) {
-    z-index: 1;
+  .tile-group > .tile-cell > .tile-switch[aria-pressed='false'] {
+    border-style: solid;
+    border-color: var(--ring);
   }
 
   .controls {
     display: flex;
     flex-wrap: wrap;
-    gap: 6px 16px;
+    gap: 0.75rem 1.25rem;
+    align-items: center;
   }
 
+  /* A `<fieldset>` for the group role, with its own margin and padding off. */
   .control-group {
-    display: flex;
+    display: inline-flex;
     flex-wrap: wrap;
-    gap: 4px;
+    gap: 0.4rem;
     align-items: center;
     margin: 0;
     border: 0;
     padding: 0;
+    min-inline-size: 0;
   }
 
   .control-group legend {
     float: left;
-    margin-right: 4px;
-    color: var(--ink-3);
-    font-size: 0.75rem;
+    margin-right: 0.15rem;
+    padding: 0;
+    color: var(--ink-2);
+    font-size: 0.8125rem;
   }
 
   /* A switch with its count: on, a plain pill; off, dashed and struck through. */
   .chip {
     display: inline-flex;
-    gap: 6px;
-    align-items: baseline;
+    gap: 0.35rem;
+    align-items: center;
     border: 1px solid var(--baseline);
     border-radius: 999px;
     background: var(--surface);
-    padding: 1px 10px;
+    padding: 0.15rem 0.65rem;
     color: var(--ink-1);
-    font-size: 0.8rem;
+    font: inherit;
+    font-size: 0.8125rem;
     cursor: pointer;
   }
 
@@ -335,9 +380,11 @@
   }
 
   .chip .tile-value {
+    display: inline;
     color: var(--ink-2);
-    font-size: 0.8rem;
+    font-size: inherit;
     font-weight: 400;
+    line-height: inherit;
   }
 
   .chip[aria-pressed='false'] .tile-value {
@@ -347,30 +394,33 @@
   /* A colour swatch before a label's name. */
   .chip-swatch {
     display: inline-block;
-    border: 1px solid var(--hairline);
     width: 0.6em;
     height: 0.6em;
+    border: 1px solid var(--hairline);
     border-radius: 50%;
-    align-self: center;
   }
 
   /*
    * A segmented control: one outline around the choices, a hairline between
-   * them, the chosen one filled. The list or the DAG, and the sorts.
+   * them, the chosen one filled. The list or the DAG, the sorts, the theme.
    */
   .segmented {
     display: inline-flex;
     border: 1px solid var(--baseline);
-    border-radius: 6px;
+    border-radius: var(--radius);
     overflow: hidden;
   }
 
   .segment {
+    display: inline-flex;
+    gap: 0.35rem;
+    align-items: center;
     border: 0;
     background: var(--surface);
-    padding: 1px 10px;
+    padding: 0.35rem 0.75rem;
     color: var(--ink-2);
-    font-size: 0.85rem;
+    font: inherit;
+    font-size: 0.875rem;
     cursor: pointer;
   }
 
@@ -392,6 +442,151 @@
   .segment:focus-visible {
     outline: 2px solid var(--accent);
     outline-offset: -2px;
+  }
+
+  /* In a narrow column the tiles and chips shrink with it rather than wrap. */
+  @container filter-bar (width < 55rem) {
+    .tiles {
+      grid-template-columns: repeat(auto-fit, minmax(5rem, 1fr));
+      gap: 0.5rem;
+    }
+
+    .tile {
+      --tile-pad-block: 0.45rem;
+      --tile-pad-inline: 0.6rem;
+    }
+
+    .tile-value {
+      font-size: 1.375rem;
+    }
+
+    /* Clear of the `only` over the corner. */
+    .tile-cell .tile-value {
+      padding-right: 2.25rem;
+    }
+
+    .tile-label {
+      font-size: 0.75rem;
+      line-height: 1.25;
+    }
+
+    .tile-only {
+      --only-offset: 0.3rem;
+
+      padding: 0.1rem 0.35rem;
+      font-size: 0.625rem;
+    }
+
+    .controls {
+      gap: 0.5rem 0.6rem;
+    }
+
+    .control-group {
+      gap: 0.25rem;
+    }
+
+    .control-group legend {
+      margin-right: 0.1rem;
+      font-size: 0.75rem;
+    }
+
+    .chip {
+      gap: 0.25rem;
+      padding: 0.1rem 0.45rem;
+      font-size: 0.75rem;
+    }
+
+    .controls .segment {
+      padding: 0.2rem 0.55rem;
+      font-size: 0.75rem;
+    }
+  }
+
+  @container filter-bar (width < 32.5rem) {
+    .tiles:has(> :nth-child(6)) {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  @container filter-bar (width < 27rem) {
+    .tiles:has(> :nth-child(5)) {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .control-group legend,
+    .narrow-hidden {
+      display: none;
+    }
+  }
+
+  @container filter-bar (width < 21.5rem) {
+    .tiles:has(> :nth-child(4):last-child) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  /*
+   * The tiers three to a row, or two, in a narrow column: the corners at the
+   * grid's, and each row overlapping the one above by the hairline.
+   */
+  @container filter-bar (23rem <= width < 46rem) {
+    .tile-group {
+      --tier-columns: 3;
+    }
+
+    .tile-group > .tile-cell + .tile-cell:nth-child(3n + 1) {
+      margin-left: 0;
+    }
+
+    .tile-group > .tile-cell:nth-child(n + 4) {
+      margin-top: -1px;
+    }
+
+    .tile-group > .tile-cell:nth-child(1) > .tile {
+      border-radius: var(--radius) 0 0 0;
+    }
+
+    .tile-group > .tile-cell:nth-child(3) > .tile {
+      border-radius: 0 var(--radius) 0 0;
+    }
+
+    .tile-group > .tile-cell:nth-last-child(3) > .tile {
+      border-radius: 0 0 0 var(--radius);
+    }
+
+    .tile-group > .tile-cell:nth-last-child(1) > .tile {
+      border-radius: 0 0 var(--radius) 0;
+    }
+  }
+
+  @container filter-bar (width < 23rem) {
+    .tile-group {
+      --tier-columns: 2;
+    }
+
+    .tile-group > .tile-cell + .tile-cell:nth-child(odd) {
+      margin-left: 0;
+    }
+
+    .tile-group > .tile-cell:nth-child(n + 3) {
+      margin-top: -1px;
+    }
+
+    .tile-group > .tile-cell:nth-child(1) > .tile {
+      border-radius: var(--radius) 0 0 0;
+    }
+
+    .tile-group > .tile-cell:nth-child(2) > .tile {
+      border-radius: 0 var(--radius) 0 0;
+    }
+
+    .tile-group > .tile-cell:nth-last-child(2) > .tile {
+      border-radius: 0 0 0 var(--radius);
+    }
+
+    .tile-group > .tile-cell:nth-last-child(1) > .tile {
+      border-radius: 0 0 var(--radius) 0;
+    }
   }
 
   .failures-notice {

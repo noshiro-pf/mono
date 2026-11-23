@@ -26,9 +26,13 @@ export const LayoutBlock = ({
     role={tabbed.pipe(map((t) => (t ? 'tabpanel' : 'region')))}
   >
     <div class={constant('block-title')}>
-      <h2 id={constant(`block-title-${id}`)}>{view.title}</h2>
+      <div class={constant('block-title-row')}>
+        <h2 id={constant(`block-title-${id}`)}>{view.title}</h2>
 
-      {view.extras ?? []}
+        {view.extras ?? []}
+      </div>
+
+      {view.controls ?? []}
     </div>
 
     <div class={constant('block-body')}>{view.body()}</div>

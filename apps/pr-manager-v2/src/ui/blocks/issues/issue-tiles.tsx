@@ -31,7 +31,7 @@ export const IssueTiles = ({
   settings,
   update,
 }: Props): JSX.Element => (
-  <div class={constant('issue-tiles')}>
+  <div class={constant('issue-tiles filter-bar')}>
     <div class={constant('tiles')}>
       <OpenTile open={counts.pipe(map(({ open }) => open))} />
       <TileSwitch
