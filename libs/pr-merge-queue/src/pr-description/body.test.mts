@@ -43,6 +43,8 @@ const BODY = dedent`
 
   ### レビュー
 
+  \`/code-review high\`、2 ラウンド。
+
   - 先送り: 残り (#13)。
 
   ---
@@ -58,10 +60,13 @@ const split = (body: string): DescriptionParts =>
 const opened = (original: string): DescriptionParts =>
   split(`${original}\n\n## 日本語\n\n### 背景\n\nあ。`);
 
-/** A Review section of `lines`, its translation naming what they name. */
+/**
+ * A Review section of `lines`, its translation stating the same total and
+ * naming what they name.
+ */
 const review = (lines: string): DescriptionParts =>
   split(
-    `## Review\n\n\`/code-review high\`, 3 rounds.\n\n${lines}\n\n## 日本語\n\n### レビュー\n\nあ ${(lines.match(/#\d+/gu) ?? []).join(' ')}。`,
+    `## Review\n\n\`/code-review high\`, 3 rounds.\n\n${lines}\n\n## 日本語\n\n### レビュー\n\n\`/code-review high\`、3 ラウンド。あ ${(lines.match(/#\d+/gu) ?? []).join(' ')}。`,
   );
 
 describe(splitDescription, () => {
@@ -808,7 +813,7 @@ describe(checkDescription, () => {
 
           ### レビュー
 
-          あ。
+          1 ラウンド。
 
           ### 直していない指摘
 
@@ -833,7 +838,82 @@ describe(checkDescription, () => {
     assert.deepStrictEqual(
       checkDescription(
         split(
-          `## Review\n\n${opening}\n\n- Fixed: a.\n\n## 日本語\n\n### レビュー\n\nあ。`,
+          `## Review\n\n${opening}\n\n- Fixed: a.\n\n## 日本語\n\n### レビュー\n\n${/\d+/u.exec(opening)?.[0] ?? ''} ラウンド。`,
+        ),
+        'pull-request',
+      ),
+      [],
+    );
+  });
+
+  test.each([
+    ['`/code-review high`、2 ラウンド。', '`/code-review high`、2 ラウンド。'],
+    ['`/code-review high` を 13 巡。', '`/code-review high` を 13 巡。'],
+    ['あ。\n\n`/code-review high`、3 ラウンド。', 'あ。'],
+    ['', ''],
+  ] as const)(
+    'refuses a translated review that does not state the total of 3 rounds, %j',
+    (translated, opening) => {
+      assert.deepStrictEqual(
+        checkDescription(
+          split(
+            `## Review\n\n\`/code-review high\`, 3 rounds.\n\n## Checks\n\nA.\n\n## 日本語\n\n### レビュー\n\n${translated}\n\n### チェック\n\nA。`,
+          ),
+          'pull-request',
+        ),
+        [
+          `the translation's review section opens with "${opening}", which does not state the total of rounds, 3; ${TRANSLATED_OPENING_RULE}`,
+        ],
+      );
+    },
+  );
+
+  test.each([
+    '`/code-review high`、3 ラウンド。',
+    '`/code-review high` を 3 ラウンド。5 回目は 2 件。',
+    'セルフレビュー（`high`）を 3 巡。',
+  ])('takes a translated review that states the total, %j', (translated) => {
+    assert.deepStrictEqual(
+      checkDescription(
+        split(
+          `## Review\n\n\`/code-review high\`, 3 rounds.\n\n## 日本語\n\n### レビュー\n\n${translated}`,
+        ),
+        'pull-request',
+      ),
+      [],
+    );
+  });
+
+  test.each([
+    ['`/code-review high`, 3 rounds.', '`/code-review high`、３ ラウンド。'],
+    [
+      '`/code-review high`, 11 rounds, and 4 more on the restack.',
+      '`/code-review high`、計 15 ラウンド。',
+    ],
+    [
+      '`/code-review high`, 11 rounds, and 4 more on the restack.',
+      '`/code-review high`、11 ラウンドと、restack で 4 ラウンド。',
+    ],
+  ])(
+    'takes a translated total in full-width digits or with the rounds added, %j',
+    (opening, translated) => {
+      assert.deepStrictEqual(
+        checkDescription(
+          split(
+            `## Review\n\n${opening}\n\n## 日本語\n\n### レビュー\n\n${translated}`,
+          ),
+          'pull-request',
+        ),
+        [],
+      );
+    },
+  );
+
+  test('reads the translated review where an added lead heading shifts it', () => {
+    assert.deepStrictEqual(
+      checkDescription(
+        split(
+          'A.\n\n## Review\n\n`/code-review high`, 3 rounds.\n\n## 日本語\n\n### 概要\n\n2 件。\n\n### レビュー\n\n3 ラウンド。',
         ),
         'pull-request',
       ),
@@ -931,6 +1011,7 @@ describe(checkDescription, () => {
     '**Deferred:** None',
     'Deferred: none',
     '**Deferred**\n\nNone.',
+    '**Deferred**: none (everything was fixed).',
   ])('takes a Deferred line that says none, as %j', (label) => {
     assert.deepStrictEqual(checkDescription(review(label), 'pull-request'), []);
   });
@@ -982,6 +1063,19 @@ describe(checkDescription, () => {
         checkDescription(review(lines), 'pull-request'),
         [],
       );
+    },
+  );
+
+  test.each([
+    ['**Deferred**: (predates) b (#13).', '(predates) b (#13).'],
+    ['**Deferred:** c, left for later (#14).', 'c, left for later (#14).'],
+    ['Deferred: (too large) d.\n\n- (predates) e.', '(too large) d.'],
+  ] as const)(
+    'refuses a finding written on the Deferred line itself, %j',
+    (lines, finding) => {
+      assert.deepStrictEqual(checkDescription(review(lines), 'pull-request'), [
+        `the "**Deferred**" line carries the finding "${finding}"; list it as an item under the line ${NONE_HINT}; ${DEFERRAL_RULE}`,
+      ]);
     },
   );
 
@@ -1058,7 +1152,7 @@ describe(checkDescription, () => {
 
           ### レビュー
 
-          い。
+          1 ラウンド。
 
           \`\`\`md
           **Deferred**
@@ -1376,6 +1470,9 @@ const NONE_HINT =
 const DEFERRAL_RULE =
   'a deferred finding is an item under a "**Deferred**" line, opening with why it is out of scope: (predates), (another change) or (too large); a finding in scope is fixed in the pull request, whatever round raised it (docs/code-review-loop.md)';
 
+const TRANSLATED_OPENING_RULE =
+  'its first line states the total of rounds in digits, as "`/code-review high`、3 ラウンド。", so that the halves do not drift apart when an amend adds rounds';
+
 const REVIEW_OPENING_RULE =
   'it opens with the level and the total of rounds in digits, as "`/code-review high`, 3 rounds.", "Review at `high`, 2 rounds." or "Self-review at `high`, 1 round."';
 
@@ -1607,7 +1704,7 @@ describe(readableDescription, () => {
 
     assert.include(
       read,
-      '## 日本語\n\n(9 lines left out by `pr-description read`)',
+      '## 日本語\n\n(11 lines left out by `pr-description read`)',
     );
 
     assert.isTrue(

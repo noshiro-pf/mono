@@ -139,6 +139,9 @@ export const splitDescription = (
  * - The original's `## Review` opens with the level and the total of rounds,
  *   in the form {@link reviewOpeningRounds} reads, so that a count is read,
  *   not guessed.
+ * - The translation's section in the place of `## Review` opens with a line
+ *   that states the same total of rounds, in any wording, so that the halves
+ *   do not drift apart when an amend adds rounds.
  * - Each finding the original's `## Review` defers is a bullet under a
  *   `**Deferred**` line, opening with why it is out of scope
  *   ({@link deferralProblemsIn}): a finding in scope is fixed in the pull
@@ -214,6 +217,17 @@ export const checkDescription = (
 
   const deferrals = deferralProblemsIn(reviewSection ?? []);
 
+  const rounds =
+    reviewOpening === undefined
+      ? undefined
+      : reviewOpeningRounds(reviewOpening);
+
+  // Read only where the headings mirror: otherwise that is the problem named.
+  const translatedOpening =
+    mirrored && rounds !== undefined
+      ? translatedReviewOpening(original, translation, titledLead ? 1 : 0)
+      : undefined;
+
   return [
     mirrored
       ? undefined
@@ -252,6 +266,15 @@ export const checkDescription = (
       : reviewOpening === ''
         ? `the "## Review" section is empty; ${REVIEW_OPENING_RULE}`
         : `the "## Review" section opens with "${reviewOpening}"; ${REVIEW_OPENING_RULE}`,
+    translatedOpening === undefined ||
+    rounds === undefined ||
+    statesRounds(
+      translatedOpening,
+      rounds,
+      rounds + reviewOpeningAdditions(reviewOpening ?? ''),
+    )
+      ? undefined
+      : `the translation's review section opens with "${translatedOpening}", which does not state the total of rounds, ${rounds.toString()}; ${TRANSLATED_OPENING_RULE}`,
     ...deferrals,
     kind === 'pull-request' && openingHeading !== undefined
       ? openingProblem(parts.original, original, openingHeading)
@@ -442,6 +465,22 @@ const SENTENCE_END = /\.(?:\s|$)/u;
 
 const REVIEW_OPENING_RULE =
   'it opens with the level and the total of rounds in digits, as "`/code-review high`, 3 rounds.", "Review at `high`, 2 rounds." or "Self-review at `high`, 1 round."';
+
+const TRANSLATED_OPENING_RULE =
+  'its first line states the total of rounds in digits, as "`/code-review high`、3 ラウンド。", so that the halves do not drift apart when an amend adds rounds';
+
+/**
+ * Whether `line` names one of `totals` as a number of its own, full-width
+ * digits read as the ASCII ones an IME's would be: the original's total, or
+ * that total with the rounds its sentence adds, which the digest counts.
+ */
+const statesRounds = (line: string, ...totals: readonly number[]): boolean => {
+  const numbers = new Set(
+    Array.from(line.normalize('NFKC').matchAll(/\d+/gu), ([digits]) => digits),
+  );
+
+  return totals.some((total) => numbers.has(total.toString()));
+};
 
 /** A `#` or `##` heading, which ends a `## Review` section. */
 const SECTION_HEADING = /^ {0,3}#{1,2}(?:[ \t]|$)/u;
@@ -787,6 +826,51 @@ const shownBesideKeywords = (
   kind === 'pull-request'
     ? shownOutsideMatches(asSource(lines), CLOSING_KEYWORD)
     : new Map<number, string>();
+
+/**
+ * The first line of the translation's section under the heading that mirrors
+ * `## Review`, not blank and its trailing spaces dropped; `''` when nothing
+ * comes before the next heading of its level or above, and `undefined` when the
+ * original has no `## Review` or the translation no heading in its place.
+ * `skipped` is the number of headings the translation opens with that the
+ * original has no counterpart of.
+ */
+const translatedReviewOpening = (
+  original: readonly string[],
+  translation: readonly string[],
+  skipped: number,
+): string | undefined => {
+  const at = original.findIndex((line) => REVIEW_SECTION_HEADING.test(line));
+
+  if (at === -1) {
+    return undefined;
+  }
+
+  const start = translation.flatMap((line, i) =>
+    Arr.isNonEmpty(headingOf(line)) ? [i] : [],
+  )[original.slice(0, at).flatMap(headingOf).length + skipped];
+
+  const level =
+    start === undefined
+      ? undefined
+      : headingOf(translation[start] ?? '')[0]?.level;
+
+  if (start === undefined || level === undefined) {
+    return undefined;
+  }
+
+  const rest = translation.slice(start + 1);
+
+  const end = rest.findIndex((line) =>
+    headingOf(line).some((heading) => heading.level <= level),
+  );
+
+  return (
+    (end === -1 ? rest : rest.slice(0, end))
+      .find((line) => line.trim() !== '')
+      ?.trimEnd() ?? ''
+  );
+};
 
 /**
  * The `#N` a half names, outside code, table rows, declarations and, in a pull

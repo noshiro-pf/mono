@@ -53,7 +53,7 @@ describe('templateProblems', () => {
       )
       .replace('---', '### レビュー\n\n---');
 
-    assert.deepStrictEqual(templateProblems(`${template}\n`, settings), [
+    assert.deepStrictEqual(reviewHeadingsIn(template), [
       'it holds the heading "## Review", which opens as a review section does; the template must have none, as the review is written after the checks once it has run (docs/code-review-loop.md)',
       'it holds the heading "### レビュー", which opens as a review section does; the template must have none, as the review is written after the checks once it has run (docs/code-review-loop.md)',
     ]);

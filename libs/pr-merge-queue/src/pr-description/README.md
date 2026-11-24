@@ -139,9 +139,15 @@ description も、次の `push` で訳文に同じものを置きます。
   この形より前に書いた
   description は、両方の最初の行を直すか、原文だけを直して `--wording-only` で
   `push` します。
+- 訳文の `### レビュー`（原文の `## Review` に対応する見出し）の最初の行に、
+  原文の合計ラウンド数が数字で書かれていない（`` `/code-review high`、3 ラウンド。 ``
+  など。言い回しは問いません）。amend でラウンドを足したときに、両方の数が
+  ずれないためです。この形より前に書いた description は、訳文の最初の行を直して
+  `--wording-only` で `push` します。
 - 原文の `## Review` の `**Deferred**` の行の下の項目（箇条書きか番号付き）が、
   範囲外である理由 `(predates)`・`(another change)`・`(too large)` のどれかで
-  始まっていない、またはその行の下に項目も none もない。範囲内の指摘は何回目のラウンドで
+  始まっていない、その行の下に項目も none もない、または `**Deferred**:` の行
+  そのものに指摘を書いている（下の項目にします）。範囲内の指摘は何回目のラウンドで
   出ても元の pull request で直します（`docs/code-review-loop.md`）。
   `review-findings-digest` は理由ごとに数え、ほかの形で書いた先送りは理由なしと
   して数えます。`**Deferred**: none.` はかまいません。この形より前に書いた description も同じように直します。
@@ -282,13 +288,19 @@ blocks are in the original alone gets them in the translation too.
   follows the total (`` `/code-review high`, 11 rounds, and 4 more on the
 restack. `` is 15). A description written before
   this form has its opening fixed in both halves, or in the original alone with
-  `push --wording-only`.
+  `push --wording-only`;
+- the first line of the translation's `### レビュー` (the heading in the place
+  of the original's `## Review`) does not state the original's total of rounds
+  in digits, in any wording (`` `/code-review high`、3 ラウンド。 ``), so that
+  the halves do not drift apart when an amend adds rounds. A description written
+  before this rule has that line fixed and is pushed with `--wording-only`;
 - an item (bulleted or numbered) under a `**Deferred**` line in the original's
   `## Review` does not open with why it is out of scope — `(predates)`,
   `(another change)` or `(too large)` — or the line has neither items nor "none"
-  under it. A finding in scope is fixed in the pull request whatever round
-  raised it (`docs/code-review-loop.md`); `review-findings-digest` counts
-  deferrals by reason, and one written in any other shape as one with none.
+  under it, or carries a finding itself (it goes in an item under the line). A
+  finding in scope is fixed in the pull request whatever round raised it
+  (`docs/code-review-loop.md`); `review-findings-digest` counts deferrals by
+  reason, and one written in any other shape as one with none.
   `**Deferred**: none.` is fine. A description written before this rule is fixed the same way.
 
 `push` also refuses when the description changed on GitHub since the `pull`
