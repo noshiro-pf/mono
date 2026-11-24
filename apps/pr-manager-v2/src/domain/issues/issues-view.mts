@@ -329,6 +329,7 @@ export const issueTileCounts = (
     return {
       count: rows.filter((row) => row.tier === t && shows(row, as)).length,
       hidden,
+      total: rows.filter((row) => row.tier === t).length,
     };
   };
 
@@ -356,6 +357,7 @@ export const issueTileCounts = (
           shows(row, { ...s, hideInProgress: false, onlyInProgress: false }),
       ).length,
       hidden: inProgressHidden,
+      total: rows.filter((row) => row.start === 'in-progress').length,
     },
     authorOnly: {
       count: rows.filter(
@@ -364,6 +366,7 @@ export const issueTileCounts = (
           shows(row, { ...s, hideAuthorOnly: false, onlyAuthorOnly: false }),
       ).length,
       hidden: s.hideAuthorOnly,
+      total: rows.filter(isAuthorOnly).length,
     },
   };
 };
@@ -391,6 +394,7 @@ export const issueChipCounts = (
       count: rows.filter((row) => row.start === t && isListed(row, as, query))
         .length,
       hidden: s.hideStart.includes(t),
+      total: rows.filter((row) => row.start === t).length,
     };
   };
 
@@ -415,6 +419,9 @@ export const issueChipCounts = (
               isListed(row, unpicked, query),
           ).length,
           hidden: Arr.isNonEmpty(s.labels) && !s.labels.includes(name),
+          total: rows.filter((row) =>
+            row.labels.some((label) => label.name === name),
+          ).length,
         },
       ]),
     ),

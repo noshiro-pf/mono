@@ -186,6 +186,28 @@
     color: var(--critical);
   }
 
+  /*
+   * How many there are in all, after a count that leaves some out: small and
+   * quiet, so the count the list agrees with stays the one that is read; faded
+   * or struck through with the count it follows.
+   */
+  .count-total {
+    margin-left: 0.1rem;
+    color: var(--ink-2);
+    font-size: 0.875rem;
+    font-weight: 400;
+  }
+
+  .chip .count-total {
+    margin-left: 0;
+    font-size: inherit;
+  }
+
+  :is(.tile-switch[aria-pressed='false'], .chip[aria-pressed='false'])
+    .count-total {
+    color: inherit;
+  }
+
   .tile-label {
     display: block;
     color: var(--ink-2);
@@ -468,6 +490,10 @@
     .tile-label {
       font-size: 0.75rem;
       line-height: 1.25;
+    }
+
+    .tile .count-total {
+      font-size: 0.75rem;
     }
 
     .tile-only {
