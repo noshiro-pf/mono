@@ -188,7 +188,7 @@ export const IssueList = ({
   </div>
 );
 
-const NO_COUNT = { count: 0, hidden: false } as const;
+const NO_COUNT = { count: 0, hidden: false, total: 0 } as const;
 
 const SORTS = [
   ['updated', 'updated', 'Most recently updated first.'],

@@ -70,8 +70,12 @@ describe(queueViewOf, () => {
     );
 
     assert.deepStrictEqual(
-      view.outside.map(({ number, why }) => [number, why]),
-      [[5, 'draft']],
+      view.outside.map(({ number, why, whoseWord }) => [
+        number,
+        why,
+        whoseWord,
+      ]),
+      [[5, 'draft', 'you']],
     );
 
     // Queued counts the boxes the worker may take, the running one aside.

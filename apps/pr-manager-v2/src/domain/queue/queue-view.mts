@@ -1,5 +1,7 @@
+// cspell:ignore unlabel
 import {
   builtLayersOf,
+  isSetAsideReason,
   isVersionBranch,
   layerRunsVerdict,
   layerStandings,
@@ -15,6 +17,7 @@ import {
   type QueueDecision,
   type QueueLayerFacts,
   type QueueStanding,
+  type SetAsideReason,
   type Snapshot,
 } from 'pr-report-core-v2';
 import { Arr, Result } from 'ts-data-forge';
@@ -104,7 +107,7 @@ export type OutsideItem = Readonly<{
   why: string;
   /** Whose move it is: `the skill`, `a person`, … */
   whose: string;
-  /** The same in a word, for a box: `skill`, `person`, … */
+  /** The same in a word, for a box, as v1 says it: `skill`, `you`, `nobody`. */
   whoseWord: string;
   detail: string;
 }>;
@@ -144,7 +147,7 @@ export const queueViewOf = (
 
   const outside = Arr.generate(function* () {
     for (const d of queued) {
-      const item = outsideOf(d);
+      const item = outsideOf(d, snapshot.repository.defaultBranch);
 
       if (item !== undefined) {
         yield item;
@@ -664,7 +667,11 @@ const afterWhatEachWaitsOn = (
 const CHECKED_AHEAD =
   'Its queue layer is built, so the worker releases it before what the queue’s own order would put first.';
 
-/** Set aside or claimed, by what the comments say; otherwise its owner's. */
+/**
+ * Why one is someone's to move, in a word: claimed, or set aside with the
+ * worker's reason in a word as v1 says it (`checks`, `conflict`, …), by what
+ * the comments say; otherwise a fork's, or set aside.
+ */
 const ownedWord = (d: PullRequestDecision): string => {
   if (Result.isOk(d.comments)) {
     const { claim, setAside } = d.comments.value;
@@ -674,14 +681,35 @@ const ownedWord = (d: PullRequestDecision): string => {
     }
 
     if (setAside?.says.kind === 'standing' && setAside.applies) {
-      return 'set aside';
+      const { reason } = setAside.says.record;
+
+      return isSetAsideReason(reason) ? SET_ASIDE_WORDS[reason] : reason;
     }
   }
 
-  return 'held';
+  return d.facts.fromFork ? 'fork' : 'set aside';
 };
 
-const outsideOf = (d: PullRequestDecision): OutsideItem | undefined => {
+/** Each reason the worker sets aside for, in a word. */
+const SET_ASIDE_WORDS = {
+  'already-in-base': 'in base',
+  'arm-failed': 'arm failed',
+  'awaiting-bypass': 'bypass',
+  'checks-failed': 'checks',
+  'checks-not-started': 'no checks',
+  'head-out-of-sync': 'out of sync',
+  'not-merging': 'not merging',
+  'push-failed': 'push failed',
+  'read-failed': 'unreadable',
+  'rebase-failed': 'conflict',
+  'unlabel-failed': 'skip-ci stuck',
+  'watch-timeout': 'timeout',
+} as const satisfies ReadonlyRecord<SetAsideReason, string>;
+
+const outsideOf = (
+  d: PullRequestDecision,
+  defaultBranch: string,
+): OutsideItem | undefined => {
   const { standing, facts } = d;
 
   const base = {
@@ -694,9 +722,15 @@ const outsideOf = (d: PullRequestDecision): OutsideItem | undefined => {
     case 'unactionable':
       return {
         ...base,
-        why: facts.isDraft ? 'draft' : 'out of scope',
+        // As v1 says it: a draft, a base that is not the default branch, or a
+        // branch the worker does not take.
+        why: facts.isDraft
+          ? 'draft'
+          : facts.baseRef !== defaultBranch
+            ? 'base'
+            : 'branch',
         whose: 'its author',
-        whoseWord: 'author',
+        whoseWord: 'you',
         detail: standing.reason,
       };
 
@@ -741,8 +775,8 @@ const WHOSE = {
 } as const;
 
 const WHOSE_WORD = {
-  worker: 'worker',
+  worker: 'you',
   skill: 'skill',
-  human: 'person',
+  human: 'you',
   none: 'nobody',
 } as const satisfies ReadonlyRecord<keyof typeof WHOSE, string>;

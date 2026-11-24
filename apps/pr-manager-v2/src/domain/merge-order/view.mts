@@ -119,6 +119,7 @@ export const tileCounts = (
         (card) => has(card) && isShown(card, hidden ? unhidden : settings),
       ).length,
       hidden,
+      total: cards.filter(has).length,
     }) as const;
 
   const statusCount = (status: MergeOrderStatus): TileCount =>
@@ -211,8 +212,16 @@ export type ShownNode = Readonly<{
   children: readonly ShownNode[];
 }>;
 
-/** A tile's number: what the list shows, or what showing would add. */
-export type TileCount = Readonly<{ count: number; hidden: boolean }>;
+/**
+ * A tile's or chip's number: what the list shows of it, or, hidden, what
+ * showing it would add; and how many there are whatever else is filtered out,
+ * drawn small after the count where that is more (`3 of 5`).
+ */
+export type TileCount = Readonly<{
+  count: number;
+  hidden: boolean;
+  total: number;
+}>;
 
 export const MERGE_ORDER_STATUSES = [
   'queued',

@@ -108,11 +108,22 @@ describe(tileCounts, () => {
 
     assert.deepStrictEqual(counts.open, { shown: 1, total: 3 });
 
-    // #2 is a draft, still hidden once queued ones show.
-    assert.deepStrictEqual(counts.statuses.queued, { count: 1, hidden: true });
+    // #2 is a draft, still hidden once queued ones show; two are queued.
+    assert.deepStrictEqual(counts.statuses.queued, {
+      count: 1,
+      hidden: true,
+      total: 2,
+    });
 
     // #2 is queued, still hidden once drafts show.
-    assert.deepStrictEqual(counts.drafts, { count: 0, hidden: true });
+    assert.deepStrictEqual(counts.drafts, { count: 0, hidden: true, total: 1 });
+
+    // Shown, the one not queued, of the three with no priority.
+    assert.deepStrictEqual(counts.priorities.none, {
+      count: 1,
+      hidden: false,
+      total: 3,
+    });
   });
 });
 

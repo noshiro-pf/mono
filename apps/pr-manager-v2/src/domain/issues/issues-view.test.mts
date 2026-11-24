@@ -119,7 +119,11 @@ describe('author only', () => {
 
     const counts = issueTileCounts(rows, s, passesTiers);
 
-    assert.deepStrictEqual(counts.authorOnly, { count: 2, hidden: true });
+    assert.deepStrictEqual(counts.authorOnly, {
+      count: 2,
+      hidden: true,
+      total: 2,
+    });
 
     assert.deepStrictEqual(counts.open, { shown: 1, total: 3 });
   });
@@ -214,9 +218,17 @@ describe(issueTileCounts, () => {
 
     assert.deepStrictEqual(counts.open, { shown: 1, total: 3 });
 
-    assert.deepStrictEqual(counts.tiers.B, { count: 2, hidden: true });
+    assert.deepStrictEqual(counts.tiers.B, {
+      count: 2,
+      hidden: true,
+      total: 2,
+    });
 
-    assert.deepStrictEqual(counts.tiers.S, { count: 1, hidden: false });
+    assert.deepStrictEqual(counts.tiers.S, {
+      count: 1,
+      hidden: false,
+      total: 1,
+    });
   });
 });
 
@@ -235,12 +247,24 @@ describe(issueChipCounts, () => {
       '',
     );
 
-    assert.deepStrictEqual(counts.starts.free, { count: 2, hidden: false });
+    assert.deepStrictEqual(counts.starts.free, {
+      count: 2,
+      hidden: false,
+      total: 2,
+    });
 
     // Off, it counts what switching it on would add; the tier filter holds.
-    assert.deepStrictEqual(counts.starts.blocked, { count: 1, hidden: true });
+    assert.deepStrictEqual(counts.starts.blocked, {
+      count: 1,
+      hidden: true,
+      total: 2,
+    });
 
-    assert.deepStrictEqual(counts.starts.cycle, { count: 0, hidden: false });
+    assert.deepStrictEqual(counts.starts.cycle, {
+      count: 0,
+      hidden: false,
+      total: 0,
+    });
   });
 
   test('counts each label as picking it would show it', () => {
@@ -259,12 +283,14 @@ describe(issueChipCounts, () => {
     assert.deepStrictEqual(counts.labels.get('bug'), {
       count: 2,
       hidden: false,
+      total: 2,
     });
 
     // Not picked while another is: what picking it would add, the search held.
     assert.deepStrictEqual(counts.labels.get('docs'), {
       count: 1,
       hidden: true,
+      total: 2,
     });
   });
 });

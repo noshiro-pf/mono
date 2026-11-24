@@ -118,9 +118,15 @@ const QueueBody = ({
         ),
       )}
       then={
-        <p class={constant('muted')}>
-          {constant('Nothing runs or waits its turn.')}
-        </p>
+        // With only what is outside the row, the row is left out, as v1 does.
+        <If
+          cond={view.pipe(map(({ outside }) => Arr.isEmpty(outside)))}
+          then={
+            <p class={constant('muted')}>
+              {constant('No open pull request is labelled merge-queued.')}
+            </p>
+          }
+        />
       }
       else={<QueueRow view={view} />}
     />
