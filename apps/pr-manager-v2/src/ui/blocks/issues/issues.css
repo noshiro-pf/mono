@@ -60,7 +60,7 @@
    */
   .issues {
     --dag-good: light-dark(#1c6e42, #3fb27f);
-    --dag-waiting: light-dark(#935610, #f0b35a);
+    --dag-waiting: var(--warning-ink);
     --dag-attention: light-dark(#b4501f, #ec835a);
     --dag-critical: var(--critical);
     --dag-planned: light-dark(#7a4fc4, #a98ae8);

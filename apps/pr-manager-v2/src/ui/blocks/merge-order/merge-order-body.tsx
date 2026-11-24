@@ -1,7 +1,7 @@
 import { map, type InitializedObservable } from 'synstate';
 import { constant, For, If, type JSX } from 'synstate-dom';
 import { Arr } from 'ts-data-forge';
-import type { MergeOrderView } from '../../../store/index.mjs';
+import type { MergeOrderView, StackFoldStore } from '../../../store/index.mjs';
 import { FailuresNotice } from '../../common/index.mjs';
 import { MergeOrderTree } from './merge-order-tree.js';
 import { PullRequestCard } from './pull-request-card.js';
@@ -9,9 +9,11 @@ import { PullRequestCard } from './pull-request-card.js';
 export const MergeOrderBody = ({
   view,
   now,
+  fold,
 }: Readonly<{
   view: InitializedObservable<Ready>;
   now: InitializedObservable<number>;
+  fold: StackFoldStore;
 }>): JSX.Element => {
   const scaleMax = view.pipe(map(({ scaleMax: max }) => max));
 
@@ -37,7 +39,9 @@ export const MergeOrderBody = ({
       />
 
       <MergeOrderTree
+        cards={view.pipe(map(({ cards }) => cards))}
         depth={0}
+        fold={fold}
         nodes={view.pipe(map(({ tree }) => tree))}
         now={now}
         scaleMax={scaleMax}

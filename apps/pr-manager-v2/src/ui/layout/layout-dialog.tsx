@@ -5,24 +5,25 @@ import {
   DEFAULT_LAYOUT,
   lineRange,
   withColumnCount,
+  withFoldStacks,
   withLineAt,
   withMode,
   type Layout,
 } from '../../domain/index.mjs';
-import type { LayoutStore } from '../../store/index.mjs';
+import type { LayoutStore, StackFoldStore } from '../../store/index.mjs';
 import { followOpen } from '../common/index.mjs';
 import { LayoutBlockRow } from './layout-block-row.js';
 import { LayoutSlider } from './layout-slider.js';
 import './layout.css';
 
-type Props = Readonly<{ layout: LayoutStore }>;
+type Props = Readonly<{ layout: LayoutStore; fold: StackFoldStore }>;
 
 /**
  * The Layout dialog (spec §6): everything a drag on the page does, by keyboard,
  * and what no drag does — the columns, each block's place, tabs, the height
- * mode, hiding.
+ * mode, hiding — and whether stacks in the merge order start folded (§7.4).
  */
-export const LayoutDialog = ({ layout }: Props): JSX.Element => {
+export const LayoutDialog = ({ layout, fold }: Props): JSX.Element => {
   const state = combine([layout.layout, layout.absent]);
 
   const change = (fn: (l: Layout) => Layout): void => {
@@ -135,6 +136,41 @@ export const LayoutDialog = ({ layout }: Props): JSX.Element => {
             {constant(words)}
           </label>
         ))}
+      </fieldset>
+
+      <fieldset>
+        <legend>{constant('Stacks in the merge order')}</legend>
+
+        {(
+          [
+            [false, 'Shown in full to start with'],
+            [true, 'Folded into one row each to start with'],
+          ] as const
+        ).map(([foldStacks, words]) => (
+          <label class={constant('radio')}>
+            <input
+              checked={layout.layout.pipe(
+                map((l) => l.foldStacks === foldStacks),
+              )}
+              name={constant('layout-fold-stacks')}
+              type={constant('radio')}
+              onChange={() => {
+                change((l) => withFoldStacks(l, foldStacks));
+
+                // The page then looks the way that was asked for, rather than
+                // keeping exceptions made under the other default.
+                fold.forget();
+              }}
+            />
+            {constant(words)}
+          </label>
+        ))}
+
+        <p class={constant('muted')}>
+          {constant(
+            'A stack folded or unfolded on the page stays so after a reload, in this browser. Changing this unfolds or folds every stack again.',
+          )}
+        </p>
       </fieldset>
 
       <For items={columnRows} key={(row) => `${row.count}-${row.index}`}>

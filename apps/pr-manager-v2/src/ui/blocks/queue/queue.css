@@ -5,7 +5,7 @@
   .queue-block {
     --queue-frame: light-dark(#a9a8a1, #5a5955);
     --queue-divider: light-dark(#d6d5ce, #3a3a37);
-    --queue-waiting: light-dark(#935610, #f0b35a);
+    --queue-waiting: var(--warning-ink);
     --queue-outside: light-dark(#b4501f, #ec835a);
     --queue-slot-min: 4.75rem;
     --queue-map-height: 0.75rem;

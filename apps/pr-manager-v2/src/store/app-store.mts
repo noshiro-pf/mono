@@ -1,7 +1,9 @@
-import { map, type InitializedObservable } from 'synstate';
+import { map, skipIfNoChange, type InitializedObservable } from 'synstate';
 import { Result } from 'ts-data-forge';
 import {
   dagZoomCodec,
+  foldChoicesFrom,
+  foldTreeOf,
   issuesCodec,
   layoutCodec,
   mergeOrderCodec,
@@ -33,7 +35,15 @@ import {
   type ReadReport,
   type ReportStore,
 } from './report-store.mjs';
-import { browserSettingsDb, type SettingsDb } from './settings-db.mjs';
+import {
+  browserSettingsDb,
+  stackFoldsKey,
+  type SettingsDb,
+} from './settings-db.mjs';
+import {
+  createStackFoldStore,
+  type StackFoldStore,
+} from './stack-fold-store.mjs';
 import { createThemeStore, type ThemeStore } from './theme-store.mjs';
 import { browserTimers, type Timers } from './timers.mjs';
 import { createTokenStore, type TokenStore } from './token-store.mjs';
@@ -59,6 +69,7 @@ export type AppStore = Readonly<{
   layout: LayoutStore;
   report: ReportStore;
   mergeOrder: MergeOrderStore;
+  stackFold: StackFoldStore;
   queue: InitializedObservable<QueueBlockView>;
   issues: IssuesStore;
   activity: ActivityStore;
@@ -122,6 +133,28 @@ export const createAppStore = (deps: AppDeps): AppStore => {
 
   const layout = createLayoutStore({ field: url.field(layoutCodec), absent });
 
+  const mergeOrder = createMergeOrderStore({
+    report: report.report,
+    field: url.field(mergeOrderCodec),
+  });
+
+  const foldsKey = stackFoldsKey(deps.repo);
+
+  const stackFold = createStackFoldStore({
+    roots: mergeOrder.view.pipe(
+      map((view) => (view.kind === 'ready' ? foldTreeOf(view.tree) : [])),
+    ),
+    foldByDefault: layout.layout
+      .pipe(map(({ foldStacks }) => foldStacks))
+      .pipe(skipIfNoChange()),
+    load: () => deps.settings.read(foldsKey),
+    update: (change) => {
+      deps.settings
+        .update(foldsKey, (saved) => change(foldChoicesFrom(saved)))
+        .catch(() => undefined);
+    },
+  });
+
   const activity = createActivityStore({
     token: token.tokenValue,
     timers: deps.timers,
@@ -137,10 +170,8 @@ export const createAppStore = (deps: AppDeps): AppStore => {
     header,
     layout,
     report,
-    mergeOrder: createMergeOrderStore({
-      report: report.report,
-      field: url.field(mergeOrderCodec),
-    }),
+    mergeOrder,
+    stackFold,
     queue: queueBlockViewOf(report.report),
     issues: createIssuesStore({
       report: report.report,
@@ -153,6 +184,7 @@ export const createAppStore = (deps: AppDeps): AppStore => {
         clock.start(),
         theme.start(),
         header.start(),
+        stackFold.start(),
         report.start(),
         activity.start(),
       ] as const;

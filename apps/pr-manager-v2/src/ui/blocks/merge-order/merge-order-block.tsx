@@ -7,7 +7,7 @@ import {
   mergeOrderSearchTitle,
   type Repo,
 } from '../../../domain/index.mjs';
-import type { MergeOrderStore } from '../../../store/index.mjs';
+import type { MergeOrderStore, StackFoldStore } from '../../../store/index.mjs';
 import { ExternalLink } from '../../common/index.mjs';
 import type { BlockView } from '../../layout/index.mjs';
 import { MergeOrderBody } from './merge-order-body.js';
@@ -20,6 +20,7 @@ import './merge-order.css';
  */
 export const mergeOrderBlock = (
   store: MergeOrderStore,
+  fold: StackFoldStore,
   repo: Repo,
   now: InitializedObservable<number>,
 ): BlockView => {
@@ -63,14 +64,14 @@ export const mergeOrderBlock = (
       <MatchOptional
         value={ready}
         some={(view$) => (
-          <MergeOrderFilters update={store.update} view={view$} />
+          <MergeOrderFilters fold={fold} update={store.update} view={view$} />
         )}
       />
     ),
     body: () => (
       <MatchOptional
         value={ready}
-        some={(view$) => <MergeOrderBody now={now} view={view$} />}
+        some={(view$) => <MergeOrderBody fold={fold} now={now} view={view$} />}
         none={
           <p class={constant('muted')}>
             {store.view.pipe(

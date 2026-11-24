@@ -1,15 +1,32 @@
+import type { Repo } from '../domain/index.mjs';
+
 /**
- * The page's own settings in IndexedDB: only the header's fold (spec §5), which
- * is how much room a screen has rather than a view worth a link, so it is kept
- * here rather than in the URL. v1's database, so the swap keeps it.
+ * The page's own settings in IndexedDB: the header's fold (spec §5) and the
+ * stacks folded in the merge order (§7.4), which are how much room a reader
+ * wants rather than a view worth a link, so they are kept here rather than in
+ * the URL. v1's database and keys, so the swap keeps them.
  *
- * Both reject when the browser has no IndexedDB or refuses it (a private window
- * can); callers treat that as nothing saved.
+ * Each rejects when the browser has no IndexedDB or refuses it (a private
+ * window can); callers treat that as nothing saved.
  */
 export type SettingsDb = Readonly<{
   read: (key: string) => Promise<unknown>;
   write: (key: string, value: unknown) => Promise<void>;
+  /**
+   * Replaces what `key` holds with what `change` makes of it, in one
+   * transaction: no other tab's write comes between the read and the write, so
+   * a tab saving its change this way never undoes what another saved.
+   */
+  update: (key: string, change: (stored: unknown) => unknown) => Promise<void>;
 }>;
+
+/**
+ * Where the stacks folded in a repository's merge order are kept: one key each,
+ * since pull request numbers mean nothing outside their repository. GitHub
+ * matches owner and name without regard to case, so they are lower-cased.
+ */
+export const stackFoldsKey = (repo: Repo): string =>
+  `stack-folds:${repo.owner.toLowerCase()}/${repo.name.toLowerCase()}` as const;
 
 export const browserSettingsDb: SettingsDb = {
   read: async (key) => {
@@ -30,6 +47,42 @@ export const browserSettingsDb: SettingsDb = {
       await settled(() =>
         db.transaction(STORE, 'readwrite').objectStore(STORE).put(value, key),
       );
+    } finally {
+      db.close();
+    }
+  },
+  update: async (key, change) => {
+    const db = await open();
+
+    try {
+      await new Promise<void>((resolve, reject) => {
+        const transaction = db.transaction(STORE, 'readwrite');
+
+        const store = transaction.objectStore(STORE);
+
+        const read = store.get(key);
+
+        // `put` from the `get`'s own listener, while the transaction is sure to
+        // be active; after an `await` it is only in browsers that keep it so
+        // through microtasks.
+        read.addEventListener('success', () => {
+          store.put(change(read.result), key);
+        });
+
+        transaction.addEventListener('complete', () => {
+          resolve();
+        });
+
+        transaction.addEventListener('error', () => {
+          reject(transaction.error ?? new Error('IndexedDB request failed'));
+        });
+
+        transaction.addEventListener('abort', () => {
+          reject(
+            transaction.error ?? new Error('IndexedDB transaction aborted'),
+          );
+        });
+      });
     } finally {
       db.close();
     }

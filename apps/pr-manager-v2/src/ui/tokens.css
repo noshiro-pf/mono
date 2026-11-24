@@ -26,6 +26,8 @@
 
     --good: #0ca30c;
     --warning: #fab219;
+    /* The warning tone where it is ink: dark enough to read on light. */
+    --warning-ink: light-dark(#935610, #f0b35a);
     --serious: #ec835a;
     --critical: #d03b3b;
 

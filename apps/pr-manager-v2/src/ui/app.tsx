@@ -120,7 +120,7 @@ export const App = ({ app, go }: Props): JSX.Element => {
       <PageBody
         layout={app.layout}
         views={{
-          open: mergeOrderBlock(app.mergeOrder, app.repo, now),
+          open: mergeOrderBlock(app.mergeOrder, app.stackFold, app.repo, now),
           queue: queueBlock(app.queue, app.repo),
           runs: runsBlock(app.report.runs, app.repo, now),
           merged: mergedBlock(app.report.report, app.repo, now),
@@ -128,7 +128,7 @@ export const App = ({ app, go }: Props): JSX.Element => {
         }}
       />
 
-      <LayoutDialog layout={app.layout} />
+      <LayoutDialog fold={app.stackFold} layout={app.layout} />
     </main>
   );
 };

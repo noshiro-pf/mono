@@ -156,13 +156,16 @@ enforced-by:`), and an outline of the merge queue setup linking to
 - **Hide** a block; it keeps its place, height and share. A column whose blocks
   are all hidden keeps its width. A queue on a repository without the queue
   label is listed as "none here".
+- **Stacks in the merge order** start shown in full or folded into one row each
+  (§7.4), in the dialog; changing it forgets what was folded or unfolded by
+  hand.
 - **Reset the layout** in the dialog.
 - Everything a drag does can be done in the dialog by keyboard.
 - Kept in the URL (debounced): `cols`, `left`/`middle`/`right` (block ids joined
   with `.`, tab groups with `_`), `tab`, `split`, `lines=25-70`, `h.<id>`,
-  `mode=fill`, `s.<id>`, `hide`. Only differences from the default are written;
-  unknown blocks dropped, missing ones appended to the left column, numbers
-  clamped.
+  `mode=fill`, `s.<id>`, `hide`, `fold=1` (stacks start folded). Only
+  differences from the default are written; unknown blocks dropped, missing ones
+  appended to the left column, numbers clamped.
 - Section titles are sticky (under the folded toolbar when folded); the merge
   order's counts and filters stay in view with its title while it scrolls (only
   the title on small screens).
@@ -231,6 +234,27 @@ Per PR:
   tooltip saying what it cannot express.
 - URL: `prs.hide=queued.setAside`, `prs.only=failing`,
   `prs.hidePriority=low.none`, `prs.hideDrafts=1`, `prs.sort=priority`.
+
+### 7.4 Folding a stack
+
+- A card with pull requests below it in the tree ends its badges with a toggle,
+  `N below` or, folded, `+N folded`, in the same place either way. Folded, what
+  is below it is drawn as one row where its first layer would be: how many pull
+  requests, how many in each checks verdict (failing, pending, running, paused,
+  unread, passed, those wrong first), how many are drafts, and the first and
+  last number. The row unfolds it too, and hands focus to the toggle.
+- A press folds or unfolds the pull request and every layer below it, so that
+  when the first layer merges the next keeps the choice. A pull request drawn
+  under several predecessors counts and folds where it is drawn in full.
+- **stacks**: `fold all` folds the first pull request with anything below it in
+  each branch of the tree; `unfold all` shows every layer. Shown only when there
+  is a stack to fold.
+- Only what the filters leave is counted and folded.
+- What was folded or unfolded is kept in IndexedDB per repository (v1's key,
+  `stack-folds:<owner>/<name>`, lower-cased), not in the URL; each change is
+  applied to what is stored, so two tabs keep each other's. With `fold=1` (§6),
+  every stack starts folded unless unfolded by hand, one appearing later
+  included.
 
 ## 8. Queue (only when the repository has a `merge-queued` label)
 

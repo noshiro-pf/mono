@@ -52,6 +52,12 @@ export type Layout = Readonly<{
   hidden: readonly BlockId[];
   /** Of each group, the tab shown when it is not the head. */
   selected: readonly BlockId[];
+  /**
+   * Whether each stack in the merge order starts folded into one row, until the
+   * reader unfolds it (`stack-fold-store.mts`). Not where a block goes but how
+   * much room the merge order takes, which is why the Layout dialog has it.
+   */
+  foldStacks: boolean;
 }>;
 
 export const BLOCK_IDS = [
@@ -79,6 +85,7 @@ export const DEFAULT_LAYOUT: Layout = {
   shares: {},
   hidden: [],
   selected: [],
+  foldStacks: false,
 } as const;
 
 export const LIMITS = {
@@ -717,6 +724,10 @@ export const normalized = (layout: Layout): Layout => {
     selected,
   };
 };
+
+/** Whether stacks in the merge order start folded. */
+export const withFoldStacks = (layout: Layout, foldStacks: boolean): Layout =>
+  ({ ...layout, foldStacks }) as const;
 
 /**
  * Hands the sizes keyed by `from` to `to` when a group's head changes from one
