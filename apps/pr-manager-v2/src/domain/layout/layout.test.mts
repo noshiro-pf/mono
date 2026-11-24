@@ -14,6 +14,7 @@ import {
   withBoundaryMoved,
   withColumnCount,
   withEvenLine,
+  withFoldStacks,
   withHeight,
   withHidden,
   withLineAt,
@@ -74,6 +75,19 @@ describe('layoutCodec', () => {
     assert.strictEqual(layout.mode, 'fill');
 
     assert.deepStrictEqual(layout.hidden, ['runs']);
+  });
+
+  test('reads `fold=1` as stacks folded to start with, and writes it only then', () => {
+    assert.isTrue(read('?fold=1').foldStacks);
+
+    assert.isFalse(read('?fold=true').foldStacks);
+
+    assert.strictEqual(
+      written(withFoldStacks(DEFAULT_LAYOUT, true)),
+      '?fold=1',
+    );
+
+    assert.isFalse(withFoldStacks(read('?fold=1'), false).foldStacks);
   });
 
   test('round-trips', () => {

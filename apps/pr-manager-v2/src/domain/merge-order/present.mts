@@ -6,6 +6,7 @@ import type {
   SetAsideBadge,
   ShownVerdict,
 } from './card.mjs';
+import type { LayerTally } from './stack-fold.mjs';
 
 /**
  * A status colour never carries meaning alone (spec §14): every badge is a
@@ -159,6 +160,72 @@ const VERDICTS = {
   ShownVerdict,
   Readonly<{ tone: Tone; glyph: string; icon: string; word: string }>
 >;
+
+const FOLDED_ORDER = [
+  'failing',
+  'pending',
+  'running',
+  'paused',
+  'unread',
+  'passed',
+] as const satisfies readonly (ShownVerdict | 'unread')[];
+
+const FOLDED_PARTS = {
+  failing: VERDICTS.failing,
+  pending: VERDICTS.pending,
+  running: VERDICTS.running,
+  paused: VERDICTS.paused,
+  unread: {
+    tone: 'neutral',
+    glyph: '?',
+    icon: undefined,
+    word: 'checks unread',
+  },
+  passed: VERDICTS.passed,
+} as const satisfies ReadonlyRecord<
+  ShownVerdict | 'unread',
+  Readonly<{
+    tone: Tone;
+    glyph: string;
+    icon: string | undefined;
+    word: string;
+  }>
+>;
+
+/**
+ * What a folded stack's row says of its layers' checks (spec §7.4), in the
+ * order a checks badge would: what is wrong first, so that a red layer deep in
+ * a folded stack still shows. A verdict no layer has is left out.
+ */
+export const foldedStackParts = (
+  tally: LayerTally,
+): readonly FoldedStackPart[] =>
+  FOLDED_ORDER.map((key) => {
+    const { tone, glyph, icon, word } = FOLDED_PARTS[key];
+
+    return {
+      key,
+      tone,
+      glyph,
+      icon,
+      count: tally[key],
+      title: `${tally[key]} with ${word}`,
+    };
+  }).filter(({ count }) => count > 0);
+
+/** `1 pull request`, `3 pull requests`. */
+export const pullRequestsText = (count: number): string =>
+  count === 1 ? '1 pull request' : (`${count} pull requests` as const);
+
+/** One count of a folded stack's row: how many of its layers stand so. */
+export type FoldedStackPart = Readonly<{
+  key: ShownVerdict | 'unread';
+  tone: Tone;
+  glyph: string;
+  icon: string | undefined;
+  count: number;
+  title: string;
+}>;
 
 /** An eye: what a code owner's review is about. */
 const EYE =

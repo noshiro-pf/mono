@@ -17,6 +17,8 @@ type Props = Readonly<{
   card: InitializedObservable<MergeOrderCard>;
   scaleMax: InitializedObservable<number>;
   now: InitializedObservable<number>;
+  /** Drawn after the badges, at the row's end: the stack's fold. */
+  badgesEnd?: JSX.Element;
 }>;
 
 /**
@@ -29,6 +31,7 @@ export const PullRequestCard = ({
   card,
   scaleMax,
   now,
+  badgesEnd,
 }: Props): JSX.Element => (
   <article class={constant('card')}>
     <div class={constant('card-row')}>
@@ -123,6 +126,7 @@ export const PullRequestCard = ({
           </span>
         }
       />
+      {badgesEnd ?? <></>}
     </div>
 
     <div class={constant('card-heading')}>

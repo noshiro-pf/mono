@@ -8,5 +8,6 @@ export * from './label-chip.js';
 export * from './notice.js';
 export * from './of-total.js';
 export * from './open-tile.js';
+export * from './path-icon.js';
 export * from './tile-switch.js';
 export * from './tile-value.js';

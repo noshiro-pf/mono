@@ -1,6 +1,12 @@
 import { Arr, Num, Obj, Result } from 'ts-data-forge';
 import type { FixedLengthTuple, ReadonlyRecord } from 'ts-type-forge';
-import { readNames, writeNames, type ParamCodec } from '../url/index.mjs';
+import {
+  readFlag,
+  readNames,
+  writeFlag,
+  writeNames,
+  type ParamCodec,
+} from '../url/index.mjs';
 import {
   BLOCK_IDS,
   DEFAULT_LAYOUT,
@@ -26,6 +32,7 @@ import {
  * - `tab=queue`: of each group, the tab shown when it is not the head.
  * - `split=40`; `lines=25-70` (`-`, since `.` would read as a decimal point).
  * - `mode=fill`; `h.<id>=480` heights; `s.<id>=150` shares; `hide=runs.merged`.
+ * - `fold=1`: stacks in the merge order start folded.
  */
 export const layoutCodec: ParamCodec<Layout> = {
   read: (params) => {
@@ -64,6 +71,7 @@ export const layoutCodec: ParamCodec<Layout> = {
       shares: sizesOf(params, 's', LIMITS.share),
       hidden: readNames(params, KEY.hide, BLOCK_IDS),
       selected: readNames(params, KEY.tab, BLOCK_IDS),
+      foldStacks: readFlag(params, KEY.fold),
     });
 
     return withHeadSizesOnly(
@@ -132,6 +140,8 @@ export const layoutCodec: ParamCodec<Layout> = {
     writeNames(params, KEY.hide, layout.hidden);
 
     writeNames(params, KEY.tab, layout.selected);
+
+    writeFlag(params, KEY.fold, layout.foldStacks);
   },
 } as const;
 
@@ -170,6 +180,7 @@ const KEY = {
   mode: 'mode',
   hide: 'hide',
   tab: 'tab',
+  fold: 'fold',
 } as const;
 
 const spell = (column: Column): string =>

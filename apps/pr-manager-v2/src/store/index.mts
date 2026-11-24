@@ -8,6 +8,7 @@ export * from './merge-order-store.mjs';
 export * from './queue-store.mjs';
 export * from './report-store.mjs';
 export * from './settings-db.mjs';
+export * from './stack-fold-store.mjs';
 export * from './theme-store.mjs';
 export * from './timers.mjs';
 export * from './token-store.mjs';

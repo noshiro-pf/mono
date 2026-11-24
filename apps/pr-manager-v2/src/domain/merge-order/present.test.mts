@@ -2,6 +2,8 @@ import {
   autoMergeBadgeText,
   checksBadgeText,
   codeOwnerBadgeText,
+  foldedStackParts,
+  pullRequestsText,
   setAsideBadgeText,
 } from './present.mjs';
 
@@ -115,4 +117,35 @@ describe(autoMergeBadgeText, () => {
       ],
     );
   });
+});
+
+describe(foldedStackParts, () => {
+  test('gives the verdicts a folded stack holds, what is wrong first, leaving out those none has', () => {
+    const parts = foldedStackParts({
+      total: 6,
+      failing: 1,
+      running: 0,
+      pending: 2,
+      paused: 0,
+      unread: 1,
+      passed: 2,
+      drafts: 1,
+    });
+
+    assert.deepStrictEqual(
+      parts.map(({ key, tone, count, title }) => [key, tone, count, title]),
+      [
+        ['failing', 'critical', 1, '1 with checks failing'],
+        ['pending', 'warning', 2, '2 with checks pending'],
+        ['unread', 'neutral', 1, '1 with checks unread'],
+        ['passed', 'good', 2, '2 with checks passed'],
+      ],
+    );
+  });
+});
+
+test(pullRequestsText, () => {
+  assert.strictEqual(pullRequestsText(1), '1 pull request');
+
+  assert.strictEqual(pullRequestsText(3), '3 pull requests');
 });

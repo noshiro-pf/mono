@@ -1,6 +1,6 @@
 import { map, type InitializedObservable } from 'synstate';
-import { constant, For, type JSX } from 'synstate-dom';
-import { Optional } from 'ts-data-forge';
+import { constant, For, If, type JSX } from 'synstate-dom';
+import { Arr, Optional } from 'ts-data-forge';
 import type { ReadonlyRecord } from 'ts-type-forge';
 import {
   PRIORITIES,
@@ -13,7 +13,11 @@ import {
   type Priority,
   type Tone,
 } from '../../../domain/index.mjs';
-import type { MergeOrderStore, MergeOrderView } from '../../../store/index.mjs';
+import type {
+  MergeOrderStore,
+  MergeOrderView,
+  StackFoldStore,
+} from '../../../store/index.mjs';
 import { ChipSwitch, OpenTile, TileSwitch } from '../../common/index.mjs';
 
 type Ready = MergeOrderView & Readonly<{ kind: 'ready' }>;
@@ -21,15 +25,21 @@ type Ready = MergeOrderView & Readonly<{ kind: 'ready' }>;
 type Props = Readonly<{
   view: InitializedObservable<Ready>;
   update: MergeOrderStore['update'];
+  fold: StackFoldStore;
 }>;
 
 /**
  * The counts and filters the merge order leads with (spec §7.3): `open`, then a
  * switch per status with an `only` in its corner, the priorities, the drafts
- * and the sort. Every number is what the list shows; a hidden one is how many
- * showing it would add, struck through.
+ * and the sort, and, with a stack to fold, `fold all` and `unfold all` (§7.4).
+ * Every number is what the list shows; a hidden one is how many showing it
+ * would add, struck through.
  */
-export const MergeOrderFilters = ({ view, update }: Props): JSX.Element => (
+export const MergeOrderFilters = ({
+  view,
+  update,
+  fold,
+}: Props): JSX.Element => (
   <div class={constant('filters filter-bar')}>
     <div class={constant('tiles')}>
       <OpenTile open={view.pipe(map(({ counts }) => counts.open))} />
@@ -119,6 +129,33 @@ export const MergeOrderFilters = ({ view, update }: Props): JSX.Element => (
           </button>
         ))}
       </div>
+
+      <If
+        cond={fold.foldable.pipe(map(Arr.isNonEmpty))}
+        then={
+          <fieldset class={constant('control-group')}>
+            <legend>{constant('stacks')}</legend>
+            <button
+              class={constant('chip')}
+              title={constant(
+                'Fold each stack under its first pull request, so that unfolding it shows the whole stack.',
+              )}
+              type={constant('button')}
+              onClick={fold.foldAll}
+            >
+              {constant('fold all')}
+            </button>
+            <button
+              class={constant('chip')}
+              title={constant('Show every layer of every stack.')}
+              type={constant('button')}
+              onClick={fold.unfoldAll}
+            >
+              {constant('unfold all')}
+            </button>
+          </fieldset>
+        }
+      />
     </div>
   </div>
 );
