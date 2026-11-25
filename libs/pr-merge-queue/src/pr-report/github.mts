@@ -288,7 +288,8 @@ export type Client = Readonly<{
    * What the queue's comments say on each of `pulls` — the set-aside comment
    * `unblock-prs` writes and the claim of whoever is fixing it — by the token's
    * own account, which is what both are trusted by. Empty without a token, or
-   * one whose account cannot be read.
+   * one whose account cannot be read; a page refused by the rate limit is left
+   * out too, which {@link Client.restRateLimitSpent} then says.
    */
   queueComments: (
     repo: RepoRef,
@@ -304,7 +305,8 @@ export type Client = Readonly<{
    * Whether each of `numbers` is an open issue, and what its body declares with
    * `Start-After:`: one request each, for the issues the open pull requests
    * close that the open list did not cover. One that cannot be read is left
-   * out, and declares nothing.
+   * out, and declares nothing; one refused by the rate limit is
+   * {@link Client.restRateLimitSpent}'s to report.
    */
   issueBodies: (
     repo: RepoRef,
@@ -313,12 +315,21 @@ export type Client = Readonly<{
   /**
    * Where each of `numbers` — what the issues' `Start-After:` names beyond the
    * open lists — stands: one request each, an issue or a pull request alike.
-   * One that cannot be read is left out, and is unknown.
+   * One that cannot be read is left out, and is unknown; one refused by the
+   * rate limit is {@link Client.restRateLimitSpent}'s to report.
    */
   references: (
     repo: RepoRef,
     numbers: readonly number[],
   ) => Promise<ReadonlyMap<number, ReferenceStatus>>;
+  /**
+   * The error to fail with when the REST rate limit ran out at any read so far,
+   * or `undefined` while it has not. `facts` fails with it itself; the readers
+   * after it take a refusal as nothing there (no blocked-by list, no body, no
+   * status, no queue comments), so whoever calls them checks this once they are
+   * done rather than report what is missing as absent.
+   */
+  restRateLimitSpent: () => string | undefined;
 }>;
 
 /** What {@link Client.facts} reads. */
@@ -380,6 +391,8 @@ export const createClient = (
    * the whole run into one error naming the cause.
    */
   const mut_state = { rateLimited: false };
+
+  const authenticated = token !== undefined;
 
   /**
    * One call. A body makes it a POST, which is only ever the GraphQL query —
@@ -590,7 +603,8 @@ export const createClient = (
    * The issues of `repo` GitHub records as blocking `issue` — its issue
    * dependencies, read as its `Start-After:` is (`waitsFor`). Asked only when
    * the issue's summary says it has any, so an issue with none costs nothing;
-   * one that cannot be read is taken as having none.
+   * one that cannot be read is taken as having none, and one refused by the
+   * rate limit is {@link Client.restRateLimitSpent}'s to report.
    */
   const blockedByOf = async (
     repo: RepoRef,
@@ -766,7 +780,7 @@ export const createClient = (
   };
 
   return {
-    authenticated: token !== undefined,
+    authenticated,
 
     defaultBranch: async (repo) => {
       const answered = await getJson(
@@ -788,7 +802,13 @@ export const createClient = (
       ),
 
     queueComments: async (repo, defaultBranch, pulls) => {
-      // Without a token this is refused, and nothing is trusted.
+      // Without a token nothing is trusted, and `/user` is refused anyway: not
+      // asking it keeps a quota spent there from failing a read that loses
+      // nothing by it.
+      if (!authenticated) {
+        return new Map<number, QueueComments>();
+      }
+
       const viewer = await getJson('/user', t.record({ login: t.string() }));
 
       const tip = await getJson(
@@ -927,6 +947,11 @@ export const createClient = (
 
       return mut_read;
     },
+
+    restRateLimitSpent: () =>
+      mut_state.rateLimited
+        ? `${restRateLimitSpent(token)}\nIt ran out part way through, so what was read after it would have been missing without saying what.`
+        : undefined,
 
     references: async (repo, numbers) => {
       const mut_read = new Map<number, ReferenceStatus>();

@@ -35,6 +35,32 @@ export const fakePullRequest = (
   }) as const;
 
 /**
+ * An open issue as the issues list and the issue route answer it: #5 when
+ * `overrides` gives no number, blocked by nothing and declaring nothing.
+ */
+export const fakeIssue = (
+  overrides: Readonly<{ number?: number }> &
+    ReadonlyRecord<string, unknown> = {},
+): ReadonlyRecord<string, unknown> => {
+  const { number = 5 } = overrides;
+
+  return {
+    number,
+    title: 'An issue',
+    state: 'open',
+    body: null,
+    issue_dependencies_summary: { total_blocked_by: 0 },
+    html_url: `https://github.com/${FAKE_REPO.owner}/${FAKE_REPO.name}/issues/${number}`,
+    created_at: '2026-01-01T00:00:00Z',
+    updated_at: '2026-01-01T00:00:00Z',
+    comments: 0,
+    user: { login: 'someone' },
+    labels: [],
+    ...overrides,
+  } as const;
+};
+
+/**
  * `main` requiring one context, and the check run of that name failed on every
  * head: the routes that make a pull request's verdict `failing` once its checks
  * are read.

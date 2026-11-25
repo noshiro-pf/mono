@@ -108,6 +108,13 @@ export const readQueueStateWith = async (
 
   const queue = await client.queueComments(repo, defaultBranch, pulls);
 
+  // A page of comments refused leaves a pull request without its owner.
+  const spent = client.restRateLimitSpent();
+
+  if (spent !== undefined) {
+    return Result.err(spent);
+  }
+
   const decided = buildEntries({
     required,
     defaultBranch,

@@ -49,6 +49,32 @@ describe(readQueueStateWith, () => {
       'failing',
     );
   });
+
+  // A page of comments refused would leave the pull request without its queue
+  // comments, and so without an owner.
+  test("fails with the rate-limit error when a pull request's comments are refused by it", async () => {
+    const github = await fakeGitHub(({ url }) =>
+      url.includes('/issues/1/comments')
+        ? {
+            status: 403,
+            headers: { 'x-ratelimit-remaining': '0' },
+            body: { message: 'API rate limit exceeded' },
+          }
+        : undefined,
+    );
+
+    const read = await readQueueStateWith(
+      createClient('token', github.baseUrl),
+      FAKE_REPO,
+      {},
+    );
+
+    await github.close();
+
+    assert.isTrue(Result.isErr(read));
+
+    assert.include(read.value, 'The rate limit is spent');
+  });
 });
 
 /**
