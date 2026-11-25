@@ -12,8 +12,8 @@ import {
 // An event list with nothing to show says so in place of the cards, what it
 // lists, and each filter that narrowed it. While it hides the events whose
 // dates are all past, it offers to show them. A new account lists nothing;
-// answering an event is what puts it on one's list. Auth, Firestore and a
-// function, so this runs against the emulators.
+// creating or answering an event is what puts it on one's list. Auth,
+// Firestore and a function, so this runs against the emulators.
 
 test(
   'an empty event list says why, and shows the past events it hid',
@@ -42,7 +42,11 @@ test(
     await expect.soft(empty).toBeVisible({ timeout: functionCallTimeout });
 
     await expect
-      .soft(empty.getByText('ここには自分が回答した日程調整が表示されます。'))
+      .soft(
+        empty.getByText(
+          'ここには自分が作成または回答した日程調整が表示されます。',
+        ),
+      )
       .toBeVisible();
 
     await expect.soft(pastHidden).toBeVisible();

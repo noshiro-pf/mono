@@ -136,16 +136,8 @@ export const fetchEventListOfUserImpl = async (
     ),
   );
 
-  const eventListItems: readonly EventListItem[] = eventListFiltered
-    .filter(({ eventScheduleMetadata }) => {
-      const ans = Optional.unwrap(
-        answersOfEventMap.get(eventScheduleMetadata.id),
-      );
-
-      // 自分が回答しているかどうか
-      return ans?.answers.some(({ user }) => user.id === uid) ?? false;
-    })
-    .map(({ eventSchedule, eventScheduleMetadata }): EventListItem => {
+  const eventListItems: readonly EventListItem[] = eventListFiltered.map(
+    ({ eventSchedule, eventScheduleMetadata }): EventListItem => {
       const ans = Optional.unwrap(
         answersOfEventMap.get(eventScheduleMetadata.id),
       );
@@ -157,8 +149,10 @@ export const fetchEventListOfUserImpl = async (
         answersMetadata:
           ans?.answersMetadata ?? EventListItem.defaultValue.answersMetadata,
       };
-    });
+    },
+  );
 
+  // 自分が作成したか回答したもの。作成しただけで未回答のものも含む。
   return eventListItems
     .filter(
       ({ eventSchedule, answers }) =>
