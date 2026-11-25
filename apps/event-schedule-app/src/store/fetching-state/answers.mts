@@ -2,12 +2,12 @@ import {
   createEventEmitter,
   createState,
   debounce,
+  derive,
   filter,
   map,
   mapTo,
   merge,
   throttle,
-  unwrapResultOk,
   withCurrentValueFrom,
   withInitialValue,
   type InitializedObservable,
@@ -59,10 +59,21 @@ export const createAnswersStore = (deps: AnswersDeps): AnswersFetcher => {
 
   const fetchAnswersThrottled$ = fetchAnswers$.pipe(throttle(deps.throttleMs));
 
-  const [answersResult$, setAnswersResult] =
-    createState<AnswersResult>(undefined);
+  // The last read, with the event it was for.
+  const [lastRead$, setLastRead] = createState<
+    | Readonly<{ eventId: string; result: NonNullable<AnswersResult> }>
+    | undefined
+  >(undefined);
 
-  const result$ = answersResult$;
+  // Derived, not written on navigation: a read counts only while the page names
+  // the event it was for, so another event's page never shows its answers.
+  const result$: InitializedObservable<AnswersResult> = derive(
+    [lastRead$, deps.eventId$],
+    (lastRead, eventId) =>
+      lastRead !== undefined && lastRead.eventId === eventId
+        ? lastRead.result
+        : undefined,
+  );
 
   // Read on request (the first is made in `start`), and again whenever the page
   // moves to another event.
@@ -80,10 +91,7 @@ export const createAnswersStore = (deps: AnswersDeps): AnswersFetcher => {
     createReducerWithActions(
       (_: boolean, isLoading: boolean) => isLoading,
       false,
-      [
-        fetchAnswersStarted$.pipe(mapTo(true)),
-        answersResult$.pipe(mapTo(false)),
-      ],
+      [fetchAnswersStarted$.pipe(mapTo(true)), lastRead$.pipe(mapTo(false))],
     );
 
   /** Disabled for `throttleMs` after each read the button can ask for. */
@@ -100,25 +108,36 @@ export const createAnswersStore = (deps: AnswersDeps): AnswersFetcher => {
     setRefreshButtonIsLoading(true);
   };
 
-  const answers$: InitializedObservable<readonly Answer[] | undefined> = result$
-    .pipe(filter(isNotUndefined))
-    .pipe(unwrapResultOk())
-    .pipe(withInitialValue(undefined));
+  const answers$: InitializedObservable<readonly Answer[] | undefined> =
+    result$.pipe(
+      map((result) =>
+        result !== undefined && Result.isOk(result) ? result.value : undefined,
+      ),
+    );
 
   const start = (): (() => void) => {
-    const mut_run = { stopped: false };
+    const mut_run = {
+      stopped: false,
+      /** The request made last, the only one whose answer is taken. */
+      latest: 0,
+    };
 
     const subscriptions: readonly Subscription[] = [
       fetchAnswersStarted$.subscribe((eventId) => {
+        mut_run.latest += 1;
+
+        const request = mut_run.latest;
+
         deps
           .fetchAnswers(eventId)
           .then((result) => {
-            // A read still out when the store stops is dropped.
-            if (mut_run.stopped) {
+            // A read still out when the store stops is dropped, and so is one a
+            // later request has replaced.
+            if (mut_run.stopped || request !== mut_run.latest) {
               return;
             }
 
-            setAnswersResult(result);
+            setLastRead({ eventId, result });
           })
           .catch(() => {});
       }),
