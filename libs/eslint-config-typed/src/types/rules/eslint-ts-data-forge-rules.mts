@@ -106,7 +106,7 @@ namespace PreferArrScan {
 }
 
 /**
- * @description Replace `xs.reduce((a, b) => a + b, 0)` with `Arr.sum(xs)` or `Arr.sumBy(xs, fn)` from ts-data-forge.
+ * @description Replace `xs.reduce((a, b) => a + b, 0)` with `Arr.sum(xs)`, and `xs.reduce((acc, x) => acc + x.v, 0)` with `Arr.sumBy(xs, x => x.v)`, from ts-data-forge.
  *
  *  ```md
  *  | key        | value      |

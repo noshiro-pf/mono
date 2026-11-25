@@ -96,7 +96,7 @@ export const checkGhNeedsRepo = (): Promise<Result<CheckSummary, string>> =>
 
     return Result.ok({
       files: read.length,
-      calls: read.reduce((total, report) => total + report.calls, 0),
+      calls: Arr.sumBy(read, (report) => report.calls),
     });
   });
 

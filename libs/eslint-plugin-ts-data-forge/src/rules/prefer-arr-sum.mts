@@ -9,7 +9,7 @@ import {
   typeWrapperLayers,
 } from 'eslint-rule-forge';
 import { Arr, pipe } from 'ts-data-forge';
-import type { TypeReference } from 'typescript';
+import type { Type, TypeReference } from 'typescript';
 import { tsDataForgeValueAt } from './import-binding.mjs';
 
 type Options = readonly [];
@@ -21,7 +21,7 @@ export const preferArrSum: TSESLint.RuleModule<MessageIds, Options> = {
     type: 'suggestion',
     docs: {
       description:
-        'Replace `xs.reduce((a, b) => a + b, 0)` with `Arr.sum(xs)` or `Arr.sumBy(xs, fn)` from ts-data-forge.',
+        'Replace `xs.reduce((a, b) => a + b, 0)` with `Arr.sum(xs)`, and `xs.reduce((acc, x) => acc + x.v, 0)` with `Arr.sumBy(xs, x => x.v)`, from ts-data-forge.',
     },
     fixable: 'code',
     schema: [],
@@ -170,91 +170,72 @@ export const preferArrSum: TSESLint.RuleModule<MessageIds, Options> = {
           return;
         }
 
-        // Case 2: (a, b) => a.prop + b.prop or a['prop'] + b['prop']
+        // Case 2: (acc, x) => acc + x.prop, or x.prop + acc. The first
+        // parameter is the running total, a number, so a property is read of
+        // the second, the element: a path of non-computed or string-literal
+        // keys, which names neither the total nor anything else, and whose text
+        // the mapper keeps, wrappers included.
+        const [accSide, elementSide] =
+          left.type === AST_NODE_TYPES.Identifier && left.name === param1.name
+            ? [left, body.right]
+            : right.type === AST_NODE_TYPES.Identifier &&
+                right.name === param1.name
+              ? [right, body.left]
+              : [undefined, undefined];
+
+        // The type of an expression, as the checker gives it.
+        const typeOf = (
+          // AST nodes hold mutable child arrays, so they are not deeply readonly.
+          // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+          expression: TSESTree.Node,
+        ): Type | undefined =>
+          pipe(services?.esTreeNodeToTSNodeMap?.get(expression)).mapNullable(
+            (tsNode) => checker.getTypeAtLocation(tsNode),
+          ).value;
+
+        // Whether a layer of the receiver is not an array or a tuple.
+        const isNotArrayOrTuple = (
+          // AST nodes hold mutable child arrays, so they are not deeply readonly.
+          // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+          layer: TSESTree.Node,
+        ): boolean => {
+          const type = typeOf(layer);
+
+          return (
+            type === undefined ||
+            (!checker.isArrayType(type) && !checker.isTupleType(type))
+          );
+        };
+
+        // Whether a layer of the element's side is not assignable to number.
+        const isNotNumber = (
+          // AST nodes hold mutable child arrays, so they are not deeply readonly.
+          // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+          layer: TSESTree.Node,
+        ): boolean => {
+          const type = typeOf(layer);
+
+          return (
+            type === undefined ||
+            !checker.isTypeAssignableTo(type, checker.getNumberType())
+          );
+        };
+
         if (
-          left.type === AST_NODE_TYPES.MemberExpression &&
-          right.type === AST_NODE_TYPES.MemberExpression
+          accSide === undefined ||
+          !isMemberPathOf(elementSide, param2.name) ||
+          typeWrapperLayers(arrayExpression).some(isNotArrayOrTuple) ||
+          typeWrapperLayers(elementSide).some(isNotNumber)
         ) {
-          const leftObj = skipTypeWrappers(left.object);
-
-          const rightObj = skipTypeWrappers(right.object);
-
-          if (
-            leftObj.type !== AST_NODE_TYPES.Identifier ||
-            leftObj.name !== param1.name ||
-            rightObj.type !== AST_NODE_TYPES.Identifier ||
-            rightObj.name !== param2.name
-          ) {
-            return;
-          }
-
-          // Check if both access the same property
-          const leftProp = left.property;
-
-          const rightProp = right.property;
-
-          let mut_propName: string | undefined;
-
-          if (
-            leftProp.type === AST_NODE_TYPES.Identifier &&
-            !left.computed &&
-            rightProp.type === AST_NODE_TYPES.Identifier &&
-            !right.computed &&
-            leftProp.name === rightProp.name
-          ) {
-            mut_propName = leftProp.name;
-          } else if (
-            leftProp.type === AST_NODE_TYPES.Literal &&
-            left.computed &&
-            rightProp.type === AST_NODE_TYPES.Literal &&
-            right.computed &&
-            leftProp.value === rightProp.value &&
-            typeof leftProp.value === 'string'
-          ) {
-            mut_propName = leftProp.value;
-          }
-
-          if (mut_propName === undefined) {
-            return;
-          }
-
-          // Check if property type is number
-          if (services?.program !== undefined && services.program !== null) {
-            const tsLeftProp = services.esTreeNodeToTSNodeMap?.get(left);
-
-            const tsRightProp = services.esTreeNodeToTSNodeMap?.get(right);
-
-            if (tsLeftProp !== undefined && tsRightProp !== undefined) {
-              const leftPropType = checker.getTypeAtLocation(tsLeftProp);
-
-              const rightPropType = checker.getTypeAtLocation(tsRightProp);
-
-              const numberType = checker.getNumberType();
-
-              // Check if property type is assignable to number
-              if (
-                !checker.isTypeAssignableTo(leftPropType, numberType) ||
-                !checker.isTypeAssignableTo(rightPropType, numberType)
-              ) {
-                return;
-              }
-            }
-          }
-
-          // Generate mapper function
-          const mapperParam = param1.name;
-
-          const mapper = left.computed
-            ? `${mapperParam} => ${mapperParam}['${mut_propName}']`
-            : `${mapperParam} => ${mapperParam}.${mut_propName}`;
-
-          mut_nodesToFix.push({
-            node,
-            arrayExpression,
-            messageId: 'useArrSumBy',
-            mapper,
-          });
+          return;
         }
+
+        mut_nodesToFix.push({
+          node,
+          arrayExpression,
+          messageId: 'useArrSumBy',
+          mapper: `${param2.name} => ${sourceCode.getText(elementSide)}`,
+        });
       },
       'Program:exit': () => {
         const arrAt = tsDataForgeValueAt(sourceCode, 'Arr');
@@ -294,3 +275,37 @@ export const preferArrSum: TSESLint.RuleModule<MessageIds, Options> = {
     };
   },
 } as const;
+
+/**
+ * Whether `node` is a property path of the identifier `name`: member accesses
+ * with a non-computed key or a string-literal one, read through type wrappers
+ * at any depth (`x.v`, `x['v']`, `x.w.n`, `x!.v`, `(x.v satisfies number)`).
+ */
+const isMemberPathOf = (
+  // AST nodes hold mutable child arrays, so they are not deeply readonly.
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  node: TSESTree.Node,
+  name: string,
+): boolean => {
+  const inner = skipTypeWrappers(node);
+
+  if (inner.type !== AST_NODE_TYPES.MemberExpression) {
+    return false;
+  }
+
+  const keyIsName = inner.computed
+    ? inner.property.type === AST_NODE_TYPES.Literal &&
+      typeof inner.property.value === 'string'
+    : inner.property.type === AST_NODE_TYPES.Identifier;
+
+  if (!keyIsName) {
+    return false;
+  }
+
+  const object = skipTypeWrappers(inner.object);
+
+  return (
+    (object.type === AST_NODE_TYPES.Identifier && object.name === name) ||
+    isMemberPathOf(object, name)
+  );
+};

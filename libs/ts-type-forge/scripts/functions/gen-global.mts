@@ -1,5 +1,6 @@
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
+import { Arr } from 'ts-data-forge';
 import { glob, Result } from 'ts-repo-utils';
 // eslint-disable-next-line import-x/no-relative-packages -- tools/ is not a package; this is how packages reach its shared scripts
 import { formatPackage } from '../../../../tools/configs/format-package.mjs';
@@ -100,7 +101,7 @@ export const genGlobal = async (
 
   const totalAliases =
     typesForGlobal.length +
-    mut_allNamespaces.reduce((sum, ns) => sum + ns.types.length, 0);
+    Arr.sumBy(mut_allNamespaces, (ns) => ns.types.length);
 
   try {
     // eslint-disable-next-line security/detect-non-literal-fs-filename
