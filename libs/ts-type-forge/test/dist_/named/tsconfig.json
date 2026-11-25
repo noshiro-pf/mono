@@ -22,7 +22,7 @@
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
     "target": "ESNext",
-    "lib": ["ESNext", "DOM"],
+    "lib": ["ESNext"],
     "types": [],
     "noUncheckedIndexedAccess": true,
     "noUnusedLocals": false

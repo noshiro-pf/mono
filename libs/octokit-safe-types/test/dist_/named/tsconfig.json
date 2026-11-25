@@ -10,7 +10,10 @@
   // `skipLibCheck` stays off: what is under test is the package's `.d.mts`,
   // which is what that option skips (`check:root:dist-test-lib-check`).
   // `types: []` keeps node_modules/@types out: a consumer has only what the
-  // package declares.
+  // package declares. `DOM` stays in `lib` for the `File`, `Blob` and
+  // `AbortSignal` that the `@octokit` declarations name, which no ES lib
+  // declares (`DOM_LIB_PACKAGES` in `check:root:dist-test-lib-check`, and the
+  // README, say so).
   "compilerOptions": {
     "strict": true,
     "noEmit": true,

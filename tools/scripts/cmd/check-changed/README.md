@@ -87,12 +87,12 @@ by case. In order:
    followed (`resolveModule` in `packages.mts` says why).
 4. **Checks**: per package `check:types`, `check:test` (with coverage turned on
    where the package has a `check:test:cov`) and `check:sumi`;
-   `check:forgotten-exports` over each changed package it reads
-   (`tools/scripts/lib/forgotten-exports-scope.mts`) and those alone, after
-   building them and the changed packages they are built against, in build order
-   and after the fixers, which can rewrite a declaration (CI reads every package
-   after `ws:build`); `check:ext` in every touched package, a document change
-   included; the `check:root:*`
+   `check:forgotten-exports` and `check:dist-type-references` over each changed
+   package they read (`tools/scripts/lib/forgotten-exports-scope.mts`) and those
+   alone, after building them and the changed packages they are built against,
+   in build order and after the fixers, which can rewrite a declaration (CI
+   reads every package after `ws:build`); `check:ext` in every touched package,
+   a document change included; the `check:root:*`
    guards in parallel for any change the code gate lets through, as CI runs
    them, and the root program's `check:root:types`, `lint` and `test` only for
    what the root `tsconfig.json` reads (`tools/`, the root configuration, any
@@ -203,6 +203,6 @@ minor over its generated lib) are `strict-lib-gen.yml`'s.
 Browser tests, end-to-end tests, the Firestore rules tests (`check:test:rules`,
 which need Java; a diff touching a package's `firestore.rules`, `test/` or rules
 config prints a note naming the command, `rules-tests.mts`) and `ws:check:dist`
-are not run, nor is `check:forgotten-exports` over a package whose code the diff
-does not change, nor `check:cspell` over the whole tree, so a `words` entry that
-the diff made dead is not found.
+are not run, nor are `check:forgotten-exports` and `check:dist-type-references`
+over a package whose code the diff does not change, nor `check:cspell` over the
+whole tree, so a `words` entry that the diff made dead is not found.

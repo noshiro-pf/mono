@@ -37,6 +37,19 @@ describe(typesEntryPoints, () => {
     );
   });
 
+  test('keeps an internal subpath when asked, which a consumer can import all the same', () => {
+    assert.deepStrictEqual(
+      typesEntryPoints(
+        {
+          '.': { types: './dist/index.d.mts' },
+          './internal': { types: './dist/internal.d.mts' },
+        },
+        { internal: true },
+      ),
+      ['./dist/index.d.mts', './dist/internal.d.mts'],
+    );
+  });
+
   test('leaves out a pattern and a field that is not an object', () => {
     assert.deepStrictEqual(
       typesEntryPoints({ './*': { types: './dist/*.d.mts' } }),

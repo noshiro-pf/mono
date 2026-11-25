@@ -1490,6 +1490,22 @@ describe('buildPlan', () => {
     );
   });
 
+  test('check:dist-type-references reads the packages check:forgotten-exports reads, right after it', () => {
+    const commands = commandsOf([
+      'libs/y-user/src/index.mts',
+      'libs/z-base/src/index.mts',
+    ]);
+
+    const check = commands.indexOf(
+      'run check:forgotten-exports libs/y-user libs/z-base',
+    );
+
+    assert.strictEqual(
+      commands[check + 1],
+      'run check:dist-type-references libs/y-user libs/z-base',
+    );
+  });
+
   test('a changed package a read one is built against is built first, and not read', () => {
     const commands = commandsOf([
       'libs/x-on-private/src/index.mts',
@@ -1603,6 +1619,11 @@ describe('buildPlan', () => {
     'libs/lonely/README.md',
   ] as const)('%s runs no check:forgotten-exports', (file) => {
     assert.notInclude(commandsOf([file]).join('\n'), 'check:forgotten-exports');
+
+    assert.notInclude(
+      commandsOf([file]).join('\n'),
+      'check:dist-type-references',
+    );
   });
 
   test('prose alone does not regenerate them', () => {
