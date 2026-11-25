@@ -110,7 +110,9 @@ open な PR が閉じる issue は、トークンの有無によらず**2つの�
 に同じ注記を出します。手動リンクだけで閉じられる issue が、読めなかった PR の分
 だけ着手可能に見えるからです。GraphQL の拒否はレポートを止めません。レポートの
 代わりにエラーになるのは、REST の応答で `x-ratelimit-remaining` ヘッダーが 0 の
-ときだけです。
+ときだけで、どの読み取りで起きてもそうなります。PR の後に読む issue、その
+blocked-by の一覧と body、queue のコメントも含みます。これらはエラーにしなければ、
+拒否を「何も無い」と受け取ってしまいます。
 
 ### 判定の決まりごと
 
@@ -261,7 +263,9 @@ prints the same notes after its list and `run-issue-resolver` logs them on each
 look for an issue, since an issue closed by a hand-made link alone looks
 startable while that link is unread. No GraphQL refusal stops the report: only a
 REST refusal whose `x-ratelimit-remaining` header reads 0 replaces it with an
-error.
+error, at whichever read it comes — the issues, their blocked-by lists and
+bodies and the queue comments read after the pull requests included, each of
+which would otherwise take the refusal as nothing there.
 
 The issues an open pull request closes are read from both sources and joined,
 with a token or without: the ones GitHub's list holds, with their titles and

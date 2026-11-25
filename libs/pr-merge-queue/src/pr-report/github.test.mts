@@ -6,11 +6,12 @@ import {
   FAKE_HEAD_SHA,
   FAKE_REPO,
   fakeGitHub,
+  fakeIssue,
   fakePullRequest,
   type FakeRoutes,
 } from '../../test/index.mjs';
 import { parseJson } from '../lib/index.mjs';
-import { createClient, type HandLinks } from './github.mjs';
+import { createClient, type Client, type HandLinks } from './github.mjs';
 import { REQUESTS_PER_PULL_WITH_CHECKS } from './rate-limit.mjs';
 
 describe(createClient, () => {
@@ -732,7 +733,111 @@ describe(createClient, () => {
     );
   });
 
+  describe('a REST rate limit spent after the open pull requests are read', () => {
+    test.each([
+      {
+        reader: 'issues',
+        refused: '/issues/5/dependencies/blocked_by',
+        read: async (client: Client) => {
+          await client.issues(repo, 10);
+        },
+      },
+      {
+        reader: 'issueBodies',
+        refused: '/issues/7/dependencies/blocked_by',
+        read: async (client: Client) => {
+          await client.issueBodies(repo, [7]);
+        },
+      },
+      {
+        reader: 'references',
+        refused: '/issues/9',
+        read: async (client: Client) => {
+          await client.references(repo, [9]);
+        },
+      },
+      {
+        reader: 'queueComments',
+        refused: '/issues/1/comments',
+        read: async (client: Client) => {
+          const facts = await client.facts(repo, { checks: false });
+
+          assert.isTrue(Result.isOk(facts));
+
+          await client.queueComments(repo, 'main', facts.value.pulls);
+        },
+      },
+    ] as const)(
+      'is reported after $reader is refused by it, not taken as nothing there',
+      async ({ refused, read }) => {
+        const github = await fakeGitHub(
+          withBlockedIssues(rateLimitedAt(refused)),
+        );
+
+        const client = createClient('token', github.baseUrl);
+
+        assert.isUndefined(client.restRateLimitSpent());
+
+        await read(client);
+
+        await github.close();
+
+        const spent = client.restRateLimitSpent();
+
+        assert.isDefined(spent);
+
+        assert.include(spent, 'The rate limit is spent');
+
+        assert.include(spent, 'resets within the hour');
+      },
+    );
+
+    // The control for the test above: a refusal that is not the rate limit is
+    // what each reader takes as nothing there.
+    test('is not reported after a refusal that is not the rate limit', async () => {
+      const github = await fakeGitHub(
+        withBlockedIssues(({ url }) =>
+          url.includes('/issues/9')
+            ? { status: 404, body: { message: 'Not Found' } }
+            : undefined,
+        ),
+      );
+
+      const client = createClient('token', github.baseUrl);
+
+      const references = await client.references(repo, [9]);
+
+      await github.close();
+
+      assert.strictEqual(references.size, 0);
+
+      assert.isUndefined(client.restRateLimitSpent());
+    });
+  });
+
   describe('the queue comments', () => {
+    test('are not asked for without a token, so a quota spent on them fails nothing', async () => {
+      const github = await fakeGitHub(rateLimitedAt('/user'));
+
+      const client = createClient(undefined, github.baseUrl);
+
+      const facts = await client.facts(repo, { checks: false });
+
+      assert.isTrue(Result.isOk(facts));
+
+      const asked = github.requested.length;
+
+      const read = await client.queueComments(repo, 'main', facts.value.pulls);
+
+      await github.close();
+
+      assert.strictEqual(read.size, 0);
+
+      assert.strictEqual(github.requested.length, asked);
+
+      assert.isUndefined(client.restRateLimitSpent());
+    });
+
     test('reads one on a later page, past a hundred others', async () => {
       const setAside =
         `<!-- unblock-prs:set-aside reason=checks-failed head=${FAKE_HEAD_SHA} base=${FAKE_BASE_TIP} -->` as const;
@@ -1129,6 +1234,30 @@ const rateLimitedAt =
           body: { message: 'API rate limit exceeded' },
         } as const)
       : undefined;
+
+/**
+ * `routes`, and then #5, the one open issue, and #7, an issue the open list
+ * leaves out, each blocked by one issue that `routes` may refuse.
+ */
+const withBlockedIssues =
+  (routes: FakeRoutes): FakeRoutes =>
+  (request) => {
+    const answered = routes(request);
+
+    if (answered !== undefined) {
+      return answered;
+    }
+
+    const blocked = {
+      issue_dependencies_summary: { total_blocked_by: 1 },
+    } as const;
+
+    return request.url.includes('/issues?state=open')
+      ? { body: [fakeIssue(blocked)] }
+      : request.url.endsWith('/issues/7')
+        ? { body: fakeIssue({ number: 7, ...blocked }) }
+        : undefined;
+  };
 
 /**
  * How many requests `facts`, reading checks, asks with the open pull requests

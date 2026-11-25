@@ -78,6 +78,13 @@ export const prReport = async (
       ? await client.queueComments(repo, defaultBranch, pulls)
       : new Map<number, QueueComments>();
 
+  // A page of comments refused leaves a pull request without its owner.
+  const spent = client.restRateLimitSpent();
+
+  if (spent !== undefined) {
+    return Result.err(spent);
+  }
+
   const owners = ownersOf(report, queue, defaultBranch, currentEpochMs());
 
   return Result.ok(print(report, handLinks, queue, owners, options.format));
@@ -152,6 +159,13 @@ export const readReportWith = async (
     repo,
     namedBeyond(pulls, issues.value),
   );
+
+  // The reads since the open pull requests take a refusal as nothing there.
+  const spent = client.restRateLimitSpent();
+
+  if (spent !== undefined) {
+    return Result.err(spent);
+  }
 
   const report = buildReport({
     repo,
