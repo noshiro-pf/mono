@@ -578,11 +578,12 @@ namespace PreferLogicalOverBooleanTernary {
  * @description Disallow calling a mutating array method on a defensive `Array.from()` copy of an array (e.g. `Array.from(x).sort()`); use the non-mutating counterpart on the original array instead (e.g. `x.toSorted()`)
  *
  *  ```md
- *  | key        | value      |
- *  | :--------- | :--------- |
- *  | type       | suggestion |
- *  | deprecated | false      |
- *  | fixable    | code       |
+ *  | key            | value      |
+ *  | :------------- | :--------- |
+ *  | type           | suggestion |
+ *  | deprecated     | false      |
+ *  | fixable        | code       |
+ *  | hasSuggestions | true       |
  *  ```
  *
  * @internal Reached by indexing the rules record by the rule's name.

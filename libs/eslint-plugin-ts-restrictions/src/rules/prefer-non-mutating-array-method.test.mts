@@ -316,15 +316,13 @@ describe('prefer-non-mutating-array-method with parenthesized operands', () => {
         name: 'a comma expression argument keeps its parentheses',
         code: dedent`
           declare const xs: readonly number[];
-          declare function log(): void;
           declare const cmp: (a: number, b: number) => number;
-          const y = Array.from(xs).sort((log(), cmp));
+          const y = Array.from(xs).sort((0, cmp));
         `,
         output: dedent`
           declare const xs: readonly number[];
-          declare function log(): void;
           declare const cmp: (a: number, b: number) => number;
-          const y = xs.toSorted((log(), cmp));
+          const y = xs.toSorted((0, cmp));
         `,
         errors: [{ messageId: 'preferNonMutatingMethod' }],
       },
@@ -374,6 +372,83 @@ describe('prefer-non-mutating-array-method and a comment in a splice', () => {
           const y = Array.from(x).splice(/* the header row */ 1, 2);
         `,
         output: null,
+        errors: [{ messageId: 'preferNonMutatingMethod' }],
+      },
+    ],
+  });
+});
+
+// `Array.from(xs)` copies `xs` before the arguments are evaluated, and
+// `xs.toSorted(…)` reads `xs` after them, so an argument that may change `xs`
+// makes the rewrite a suggestion.
+describe('prefer-non-mutating-array-method and an argument with an effect', () => {
+  tester.run('prefer-non-mutating-array-method', preferNonMutatingArrayMethod, {
+    valid: [],
+    invalid: [
+      {
+        name: 'a comparator returned by a call is suggested',
+        code: dedent`
+          const xs = [3, 1];
+          const cmpAfterPush = () => {
+            xs.push(2);
+            return (a: number, b: number) => a - b;
+          };
+          const sorted = Array.from(xs).sort(cmpAfterPush());
+        `,
+        output: null,
+        errors: [
+          {
+            messageId: 'preferNonMutatingMethodUnlessArgumentChangesArray',
+            suggestions: [
+              {
+                messageId: 'useNonMutatingMethod',
+                output: dedent`
+                  const xs = [3, 1];
+                  const cmpAfterPush = () => {
+                    xs.push(2);
+                    return (a: number, b: number) => a - b;
+                  };
+                  const sorted = xs.toSorted(cmpAfterPush());
+                `,
+              },
+            ],
+          },
+        ],
+      },
+      {
+        name: 'an assignment in the argument is suggested',
+        code: dedent`
+          let mut_cmp: ((a: number, b: number) => number) | undefined;
+          declare const xs: readonly number[];
+          const sorted = Array.from(xs).sort((mut_cmp = (a, b) => a - b));
+        `,
+        output: null,
+        errors: [
+          {
+            messageId: 'preferNonMutatingMethodUnlessArgumentChangesArray',
+            suggestions: [
+              {
+                messageId: 'useNonMutatingMethod',
+                output: dedent`
+                  let mut_cmp: ((a: number, b: number) => number) | undefined;
+                  declare const xs: readonly number[];
+                  const sorted = xs.toSorted(mut_cmp = (a, b) => a - b);
+                `,
+              },
+            ],
+          },
+        ],
+      },
+      {
+        name: 'a function expression, which runs nothing when evaluated, is still fixed',
+        code: dedent`
+          declare const xs: readonly number[];
+          const sorted = Array.from(xs).sort((a, b) => a - b);
+        `,
+        output: dedent`
+          declare const xs: readonly number[];
+          const sorted = xs.toSorted((a, b) => a - b);
+        `,
         errors: [{ messageId: 'preferNonMutatingMethod' }],
       },
     ],
