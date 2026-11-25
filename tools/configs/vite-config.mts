@@ -163,6 +163,9 @@ export const defineViteConfig = ({
         exclude: castMutable(coverage?.exclude) ?? [
           '**/index.mts',
           'src/entry-point.mts',
+          // A colocated test is not source: an `exclude` given here replaces
+          // Vitest's default, which would leave it out.
+          'src/**/*.test.mts',
         ],
       },
       ...(passWithNoTests === undefined ? {} : { passWithNoTests }),
