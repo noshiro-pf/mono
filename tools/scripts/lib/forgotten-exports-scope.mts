@@ -37,13 +37,16 @@ export const readsForgottenExports = (
  * Every `types` file an `exports` value names, in order, without duplicates: a
  * string ending in `.d.mts`, `.d.cts` or `.d.ts`, and the value of every
  * `types` condition, but under an `internal` subpath (`./internal`,
- * `./dom/internal`). A path with a `*` is a pattern, not a file, and is left
- * out.
+ * `./dom/internal`) unless `internal` is `true`. A path with a `*` is a
+ * pattern, not a file, and is left out.
  */
-export const typesEntryPoints = (exportsField: unknown): readonly string[] =>
+export const typesEntryPoints = (
+  exportsField: unknown,
+  { internal = false }: Readonly<{ internal?: boolean }> = {},
+): readonly string[] =>
   Arr.uniq(
     typesPathsIn(
-      isRecord(exportsField)
+      !internal && isRecord(exportsField)
         ? Obj.filter(exportsField, (_value, key) => !isInternalSubpath(key))
         : exportsField,
       false,

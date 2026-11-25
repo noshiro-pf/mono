@@ -414,7 +414,9 @@ does the worker, and leaves the label on: `start-issue --release`, with the
 ## As a library
 
 What the commands share is exported too, for scripts that talk to the same
-repository the same way.
+repository the same way. `pause` takes an `AbortSignal`, which the `DOM` lib and
+`@types/node` declare: compile with `"DOM"` in `lib` (TypeScript's default), or
+with `@types/node` installed.
 
 ```ts
 import { sh } from 'pr-merge-queue';

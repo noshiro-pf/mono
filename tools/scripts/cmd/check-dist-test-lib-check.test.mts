@@ -5,6 +5,7 @@ import * as path from 'node:path';
 import type { ReadonlyRecord } from 'ts-type-forge';
 import {
   findDistTestConfigs,
+  findDomLibConfigs,
   findSkipLibCheckConfigs,
   findUndeclaredTypes,
 } from './check-dist-test-lib-check.mjs';
@@ -272,6 +273,86 @@ describe(findUndeclaredTypes, () => {
             namelessManifest: 'libs/nameless/package.json',
           },
         ]);
+      },
+    );
+  });
+});
+
+describe(findDomLibConfigs, () => {
+  test('reports a config that loads DOM, by `lib` or by stating none, for a package not listed', async () => {
+    await withFixture(
+      {
+        'libs/esnext/package.json': manifest(''),
+        [at('esnext')]: config(', "lib": ["ESNext"]'),
+        'libs/dom/package.json': manifest(''),
+        [at('dom')]: config(', "lib": ["ESNext", "DOM"]'),
+        'libs/iterable/package.json': manifest(''),
+        [at('iterable')]: config(', "lib": ["ESNext", "DOM.Iterable"]'),
+        'libs/unstated/package.json': manifest(''),
+        [at('unstated')]: config(''),
+      },
+      (root) => {
+        assert.deepStrictEqual(
+          findDomLibConfigs(
+            root,
+            [at('esnext'), at('dom'), at('iterable'), at('unstated')],
+            new Map<string, string>(),
+          ),
+          {
+            unlisted: [
+              { relativePath: at('dom'), packageName: 'pkg' },
+              { relativePath: at('iterable'), packageName: 'pkg' },
+              { relativePath: at('unstated'), packageName: 'pkg' },
+            ],
+            stale: [],
+          },
+        );
+      },
+    );
+  });
+
+  test('passes a package listed, and names one listed that no longer does', async () => {
+    await withFixture(
+      {
+        'libs/dom/package.json': dedent`{ "name": "uses-dom" }`,
+        [at('dom')]: config(', "lib": ["ESNext", "DOM"]'),
+        'libs/esnext/package.json': dedent`{ "name": "was-dom" }`,
+        [at('esnext')]: config(', "lib": ["ESNext"]'),
+      },
+      (root) => {
+        assert.deepStrictEqual(
+          findDomLibConfigs(
+            root,
+            [at('dom'), at('esnext')],
+            new Map<string, string>([
+              ['uses-dom', 'a reason'],
+              ['was-dom', 'a reason'],
+              ['gone', 'a reason'],
+            ]),
+          ),
+          { unlisted: [], stale: ['was-dom', 'gone'] },
+        );
+      },
+    );
+  });
+
+  test('reads `lib` through `extends`', async () => {
+    await withFixture(
+      {
+        'configs/base.json': dedent`
+          { "compilerOptions": { "lib": ["ESNext", "DOM"] } }
+        `,
+        'libs/inherited/package.json': manifest(''),
+        [at('inherited')]: dedent`
+          { "extends": "../../../../../configs/base.json", "compilerOptions": {} }
+        `,
+      },
+      (root) => {
+        assert.deepStrictEqual(
+          findDomLibConfigs(root, [at('inherited')], new Map<string, string>())
+            .unlisted,
+          [{ relativePath: at('inherited'), packageName: 'pkg' }],
+        );
       },
     );
   });

@@ -207,6 +207,7 @@ const rootWorkspaceScripts = [
   'ws:gen',
   'ws:gen:jsdoc',
   'ws:gen:readme',
+  'check:dist-type-references',
   'check:forgotten-exports',
   'check:knip',
   'check:published-deps',

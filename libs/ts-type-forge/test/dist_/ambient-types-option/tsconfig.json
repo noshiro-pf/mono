@@ -27,7 +27,7 @@
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
     "target": "ESNext",
-    "lib": ["ESNext", "DOM"],
+    "lib": ["ESNext"],
     "types": ["ts-type-forge/global"],
     "noUncheckedIndexedAccess": true,
     "noUnusedLocals": false

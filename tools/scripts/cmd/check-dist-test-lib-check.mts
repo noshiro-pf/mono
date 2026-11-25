@@ -26,7 +26,10 @@ import { projectRootPath } from '../project-root-path.mjs';
  *
  * `types` does the same more quietly: an entry for anything but the package
  * itself, such as `node` from the repository's own `@types/node`, resolves
- * names in the declarations that a consumer may not have.
+ * names in the declarations that a consumer may not have. So does `lib`: the
+ * DOM lib declares `Response`, `URL` and `AbortSignal`, which a consumer
+ * compiling a Node-only package with `"lib": ["ESNext"]` lacks, so it is loaded
+ * only for a package `DOM_LIB_PACKAGES` names, with the reason.
  */
 export const checkDistTestLibCheck = async (): Promise<
   Result<number, string>
@@ -51,9 +54,12 @@ export const checkDistTestLibCheck = async (): Promise<
 
   const undeclared = findUndeclaredTypes(projectRootPath, configs);
 
+  const dom = findDomLibConfigs(projectRootPath, configs, DOM_LIB_PACKAGES);
+
   const reports = [
     skipLibCheckReport(violations),
     undeclaredTypesReport(undeclared),
+    domLibReport(dom),
   ].filter(isNotUndefined);
 
   return Arr.isNonEmpty(reports)
@@ -132,6 +138,77 @@ export const findUndeclaredTypes = (
       }
     }
   });
+
+/**
+ * The files among `relativePaths` (relative to `rootDir`, each under
+ * `libs/<package>/`) whose `lib`, as tsc resolves it through `extends`, loads
+ * the DOM — a `DOM` entry of any kind, or no `lib` at all, which loads tsc's
+ * default, DOM included — for a package `listed` does not name; and `stale`, the
+ * packages `listed` names that no such file of theirs loads it for any longer. A
+ * file whose options cannot be read is left to {@link findSkipLibCheckConfigs},
+ * which reports it.
+ */
+export const findDomLibConfigs = (
+  rootDir: string,
+  relativePaths: readonly string[],
+  listed: ReadonlyMap<string, string>,
+): Readonly<{
+  unlisted: readonly Readonly<{ relativePath: string; packageName: string }>[];
+  stale: readonly string[];
+}> => {
+  const loading = Arr.generate(function* () {
+    for (const relativePath of relativePaths) {
+      const read = readOptions(path.join(rootDir, relativePath));
+
+      if (Result.isErr(read)) {
+        continue;
+      }
+
+      const { lib } = read.value.options;
+
+      if (lib !== undefined && !lib.some(isDomLib)) {
+        continue;
+      }
+
+      const packageDir = Arr.take(relativePath.split('/'), 2).join('/');
+
+      yield {
+        relativePath,
+        packageName:
+          packageNameAt(path.join(rootDir, packageDir)) ?? packageDir,
+      } as const;
+    }
+  });
+
+  const loaders = new Set(loading.map(({ packageName }) => packageName));
+
+  return {
+    unlisted: loading.filter(({ packageName }) => !listed.has(packageName)),
+    stale: Array.from(listed.keys()).filter((name) => !loaders.has(name)),
+  };
+};
+
+/**
+ * The packages whose `test/dist_` configs may load the DOM lib, each with why
+ * its declarations need it. Each says so in its README too, since a consumer
+ * compiling without the DOM lib or `@types/node` gets TS2304 for the names it
+ * gives. A package not here is checked against `ESNext` alone, which is what a
+ * consumer of a Node-only package compiles with.
+ */
+const DOM_LIB_PACKAGES: ReadonlyMap<string, string> = new Map<string, string>([
+  [
+    'octokit-safe-types',
+    'the `@octokit/types` and `@octokit/openapi-types` declarations it builds on name `File`, `Blob` and `AbortSignal`',
+  ],
+  ['pr-merge-queue', '`pause` takes an `AbortSignal`'],
+]);
+
+/**
+ * Whether a resolved `lib` entry (`lib.dom.d.ts`, `lib.dom.iterable.d.ts`) is
+ * one of the DOM's.
+ */
+const isDomLib = (lib: string): boolean =>
+  path.basename(lib).toLowerCase().startsWith('lib.dom');
 
 type TypesViolation = Readonly<{
   relativePath: string;
@@ -368,6 +445,37 @@ const undeclaredTypesReport = (
       ].join('\n')
     : undefined;
 
+const domLibReport = ({
+  unlisted,
+  stale,
+}: ReturnType<typeof findDomLibConfigs>): string | undefined =>
+  Arr.isNonEmpty(unlisted) || Arr.isNonEmpty(stale)
+    ? [
+        ...(Arr.isNonEmpty(unlisted)
+          ? [
+              `❌ ${unlisted.length} \`test/dist_\` tsconfig file(s) load the DOM lib for a package \`DOM_LIB_PACKAGES\` does not name:`,
+              '',
+              ...unlisted.map(
+                ({ relativePath, packageName }) =>
+                  `  ${relativePath} (${packageName})`,
+              ),
+              '',
+              'A consumer of a Node-only package may compile with `"lib": ["ESNext"]`',
+              'and no `@types/node`, and gets TS2304 for a DOM name in the',
+              'declarations. State `"lib": ["ESNext"]` and fix what `check:dist` then',
+              'reports; or, when the declarations need the DOM, add the package to',
+              '`DOM_LIB_PACKAGES` with why, and say so in its README.',
+            ]
+          : []),
+        ...(Arr.isNonEmpty(stale)
+          ? Arr.toPushed(
+              Arr.isNonEmpty(unlisted) ? [''] : [],
+              `❌ \`DOM_LIB_PACKAGES\` names ${stale.join(', ')}, whose \`test/dist_\` configs no longer load the DOM lib: remove it, and the README's note.`,
+            )
+          : []),
+      ].join('\n')
+    : undefined;
+
 if (isDirectlyExecuted(import.meta.url)) {
   const result = await checkDistTestLibCheck().catch((error: unknown) =>
     Result.err(unknownToString(error)),
@@ -380,6 +488,6 @@ if (isDirectlyExecuted(import.meta.url)) {
   }
 
   console.info(
-    `${result.value} \`test/dist_\` tsconfig file(s) checked; none turns \`skipLibCheck\` on or loads types beside the package under test.`,
+    `${result.value} \`test/dist_\` tsconfig file(s) checked; none turns \`skipLibCheck\` on, loads types beside the package under test, or loads the DOM lib for a package not listed.`,
   );
 }

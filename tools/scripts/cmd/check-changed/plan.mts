@@ -558,6 +558,26 @@ export const buildPlan = ({
         )
       : []),
 
+    // `check:dist-type-references` reads the same packages' `dist/`, built
+    // above, by the same rule (`readsForgottenExports`).
+    ...(Arr.isNonEmpty(forgottenExportsRead)
+      ? [
+          {
+            title: `check:dist-type-references (${forgottenExportsRead
+              .map(({ name }) => name)
+              .join(', ')})`,
+            kind: 'check',
+            cwd: '.',
+            args: [
+              'run',
+              'check:dist-type-references',
+              ...forgottenExportsRead.map(({ dir }) => dir),
+            ],
+            narrows: 'check:dist-type-references',
+          } as const,
+        ]
+      : []),
+
     // Every file in a package counts, a document included: CI runs it in
     // `style-check.yml`, whose gate drops nothing but `experimental/`.
     ...packages.flatMap(({ pkg }) => packageStep(pkg, 'check', 'check:ext')),

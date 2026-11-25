@@ -8,6 +8,11 @@ A library of readonly versions of Octokit types and their corresponding validato
 npm add octokit-safe-types
 ```
 
+Its declarations name `File`, `Blob` and `AbortSignal`, through the
+`@octokit/types` and `@octokit/openapi-types` declarations it builds on. The
+`DOM` lib declares them, and so does `@types/node`: compile with `"DOM"` in
+`lib` (TypeScript's default), or with `@types/node` installed.
+
 ## Usage
 
 Each GitHub REST API payload is exported as a [ts-fortress](https://www.npmjs.com/package/ts-fortress) schema together with its readonly TypeScript type of the same name, so a response can be validated and typed in one step.

@@ -13,9 +13,11 @@
   // consumer may not have it, and a declaration reachable from the entry point
   // that names Node's types (`node:util`, `NodeJS.*`, `Buffer`) fails here as
   // it would for them. A `/// <reference types="node" />` that tsc writes into
-  // a declaration still loads them, which this does not catch. `DOM` stays in
-  // `lib` for the `AbortSignal` that `pause` names, which no ES lib declares;
-  // a consumer has it from that lib, TypeScript's default, or from Node's.
+  // a declaration still loads them here; `check:dist-type-references` is what
+  // catches that. `DOM` stays in `lib` for the `AbortSignal` that `pause`
+  // names, which no ES lib declares; a consumer has it from that lib,
+  // TypeScript's default, or from Node's (`DOM_LIB_PACKAGES` in
+  // `check:root:dist-test-lib-check`, and the README, say so).
   "compilerOptions": {
     "strict": true,
     "noEmit": true,
