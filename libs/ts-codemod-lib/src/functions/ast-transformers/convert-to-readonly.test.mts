@@ -3395,12 +3395,14 @@ describe(convertToReadonlyTransformer, () => {
             /** Kept until it is forgotten. */
             | 'device';
         `,
-        // Prettier itself moves the second comment to the end of the line
-        // before it; here it stays in front of its member.
+        // Left as written, since nothing in it changes; Prettier then moves the
+        // second comment to the end of the line before it.
         expected: dedent`
           export type ProbeStore =
-            | /** Kept until the browser is closed. */ 'session'
-            | /** Kept until it is forgotten. */ 'device';
+            /** Kept until the browser is closed. */
+            | 'session'
+            /** Kept until it is forgotten. */
+            | 'device';
         `,
       },
       {
@@ -3490,7 +3492,7 @@ describe(convertToReadonlyTransformer, () => {
           type T = (/** a */ 'a' | 'b')[];
         `,
         expected: dedent`
-          type T = /** a */ readonly ('a' | 'b')[];
+          type T = readonly (/** a */ 'a' | 'b')[];
         `,
       },
       {
@@ -3706,7 +3708,7 @@ describe(convertToReadonlyTransformer, () => {
           type T = Array<(A /* x */) | (B)>;
         `,
         expected: dedent`
-          type T = readonly (A | /* x */ B)[];
+          type T = readonly (A /* x */ | B)[];
         `,
       },
       {
@@ -3724,7 +3726,7 @@ describe(convertToReadonlyTransformer, () => {
           type T = (A /* x */) | (B);
         `,
         expected: dedent`
-          type T = A | /* x */ B;
+          type T = A /* x */ | B;
         `,
       },
       {
@@ -6079,10 +6081,10 @@ describe('idempotency', () => {
   });
 
   test('comments on union members survive rounds of the codemod and Prettier', async () => {
-    // `fix:codemod` runs the codemod and then Prettier, which takes off the
-    // parentheses the codemod puts around a union, so every run starts again
-    // from the unparenthesized form. A comment lost in one round or copied in
-    // the next shows up only across several of them.
+    // `fix:codemod` runs the codemod and then Prettier. The codemod leaves a
+    // union it does not change as written, so each round is Prettier's alone.
+    // A comment lost in one round or copied in the next shows up only across
+    // several of them.
     const code = dedent`
       export type ProbeStore =
         /** Kept until the browser is closed. */
@@ -6110,7 +6112,9 @@ describe('idempotency', () => {
       `${dedent`
         export type ProbeStore =
           /** Kept until the browser is closed. */
-          "session" | /** Kept until it is forgotten. */ "device";
+          | "session"
+          /** Kept until it is forgotten. */
+          | "device";
       `}\n`,
     );
 
@@ -6118,4 +6122,77 @@ describe('idempotency', () => {
 
     expect(round3).toBe(round1);
   });
+});
+
+describe('convertToReadonlyTransformer, unformatted', () => {
+  // What the transformer writes before any formatter: a caller that lints first
+  // (oxlint's `no-invalid-void-type` rejects `(Promise<void>) | void`) sees it.
+  const raw = (source: string): string =>
+    transformSourceCode(source, false, [convertToReadonlyTransformer()]);
+
+  test.each([
+    'type F = () => Promise<void> | void;',
+    'function f(): Promise<void> | void {}',
+    'type U = string | number;',
+    'type I = A & B;',
+    'type T = A & (() => void);',
+    'type T = A | (B & C);',
+    'type T = A | (B & C /* d */);',
+    // The groups the transformer sorts members into would put the array last.
+    'type T = string | readonly A[] | number;',
+    dedent`
+      type T =
+        | string
+        | number;
+    `,
+  ] as const)(
+    'leaves a union or intersection it does not change as written: %s',
+    (source) => {
+      assert.strictEqual(raw(source), source);
+    },
+  );
+
+  test.each([
+    {
+      source: 'type T = string[] | number;',
+      expected: 'type T = readonly string[] | number;',
+    },
+    {
+      source: 'type T = readonly (string[] | number)[];',
+      expected: 'type T = readonly (readonly string[] | number)[];',
+    },
+    {
+      source: 'type T = (A & { a: 1 }) | { b: 2 };',
+      expected: 'type T = (A & Readonly<{ a: 1 }>) | Readonly<{ b: 2 }>;',
+    },
+    {
+      source: 'type T = string[] | (/* e */ () => void);',
+      expected: 'type T = readonly string[] | (/* e */ () => void);',
+    },
+    {
+      source: 'type T = (() => void) | string[];',
+      expected: 'type T = (() => void) | readonly string[];',
+    },
+    {
+      source: 'type T = A & (B | string[]);',
+      expected: 'type T = A & (B | readonly string[]);',
+    },
+    {
+      source: 'type T = keyof (A | string[]);',
+      expected: 'type T = keyof (A | readonly string[]);',
+    },
+    {
+      source: 'type T = Readonly<{ a: number }> | Readonly<{ b: string }>;',
+      expected: 'type T = Readonly<{ a: number } | { b: string }>;',
+    },
+    {
+      source: 'type T = DeepReadonly<A> | DeepReadonly<() => void> | number;',
+      expected: 'type T = DeepReadonly<A | (() => void)> | number;',
+    },
+  ] as const)(
+    'rewrites a union it changes with parentheses only where precedence needs them: $source',
+    ({ source, expected }) => {
+      assert.strictEqual(raw(source), expected);
+    },
+  );
 });

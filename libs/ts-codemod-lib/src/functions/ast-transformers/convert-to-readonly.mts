@@ -30,7 +30,6 @@ import {
   isReadonlyTypeReferenceNode,
   removeParentheses,
   shouldAvoidParenthesesForReadonly,
-  unwrapReadonlyTypeArgText,
   wrapWithParentheses,
   type ReadonlyTypeReferenceNode,
 } from '../functions/index.mjs';
@@ -1842,29 +1841,42 @@ const unionToStringImpl = ({
   types,
   op,
   wrapWithReadonly,
+  parenthesize,
 }: Readonly<{
   types: readonly string[];
   op: '&' | '|';
   wrapWithReadonly: boolean | string;
-}>): string =>
-  Arr.isEmpty(types)
+  parenthesize: boolean;
+}>): string => {
+  const parenthesized = (text: string): string =>
+    parenthesize ? wrapWithParentheses(text) : text;
+
+  return Arr.isEmpty(types)
     ? 'never'
     : Arr.isFixedLengthArray(1, types)
       ? wrapWithReadonly === false
-        ? wrapWithParentheses(types[0])
+        ? parenthesized(types[0])
         : (`${isString(wrapWithReadonly) ? wrapWithReadonly : 'Readonly'}<${types[0]}>` as const)
       : wrapWithReadonly === false
-        ? wrapWithParentheses(types.join(` ${op} `))
+        ? parenthesized(types.join(` ${op} `))
         : (`${isString(wrapWithReadonly) ? wrapWithReadonly : 'Readonly'}<${types.join(` ${op} `)}>` as const);
+};
 
+/**
+ * `types` joined with `op`, under `Readonly` (or the type named) when
+ * `wrapWithReadonly` says so, and otherwise in parentheses unless `parenthesize`
+ * is `false` — for a caller that splices the result where it needs none.
+ */
 const unionToString = ({
   types: typesRaw,
   op,
   wrapWithReadonly,
+  parenthesize = true,
 }: Readonly<{
   types: readonly string[];
   op: '&' | '|';
   wrapWithReadonly: boolean | string;
+  parenthesize?: boolean;
 }>): string => {
   // The members are joined with a separator that supplies its own space, so
   // whitespace left at a member's edge would accumulate: every run of the
@@ -1873,8 +1885,27 @@ const unionToString = ({
   // front of a member, which are not whitespace.
   const types = typesRaw.map((s) => s.trim());
 
-  return unionToStringImpl({ types, op, wrapWithReadonly });
+  return unionToStringImpl({ types, op, wrapWithReadonly, parenthesize });
 };
+
+/**
+ * `text`, the text of `node`, as a member of a list joined with `operator`: in
+ * parentheses where the list would read it otherwise — a function, constructor
+ * or conditional type, which would take the members after it in, and a union in
+ * an intersection — and as it is everywhere else.
+ */
+const asMemberOf = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  node: tsm.TypeNode,
+  text: string,
+  operator: '&' | '|',
+): string =>
+  node.isKind(tsm.SyntaxKind.FunctionType) ||
+  node.isKind(tsm.SyntaxKind.ConstructorType) ||
+  node.isKind(tsm.SyntaxKind.ConditionalType) ||
+  (operator === '&' && node.isKind(tsm.SyntaxKind.UnionType))
+    ? wrapWithParentheses(text)
+    : text.trim();
 
 /**
  * - `tr(DeepReadonly<A> | B | DeepReadonly<C>) |-> DeepReadonly<A | C> | B`
@@ -1910,8 +1941,11 @@ const mergeDeepReadonlyUnionMembers = (
   withLeadingComments: (
     // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
     member: tsm.TypeNode,
-    memberText: string,
+    text: string,
   ) => string,
+  /** A member as it goes into the union, with the comments in front of it. */
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  memberText: (member: tsm.TypeNode) => string,
 ): readonly string[] => {
   const typeArgsOfDeepReadonly = nodes.map((n) =>
     getDeepReadonlyTypeArg(n, deepReadonlyTypeName),
@@ -1920,7 +1954,7 @@ const mergeDeepReadonlyUnionMembers = (
   const asIs = (
     // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
     n: tsm.TypeNode,
-  ): string => withLeadingComments(n, wrapWithParentheses(n.getText()));
+  ): string => memberText(n);
 
   if (typeArgsOfDeepReadonly.filter((t) => t !== undefined).length < 2) {
     return nodes.map(asIs);
@@ -1945,14 +1979,7 @@ const mergeDeepReadonlyUnionMembers = (
       // NOTE: DeepReadonly<() => void> | DeepReadonly<B> -> DeepReadonly<(() => void) | B>
       const tText = textWithoutParentheses(t_, t);
 
-      return [
-        withLeadingComments(
-          n,
-          t.isKind(tsm.SyntaxKind.UnionType)
-            ? tText
-            : wrapWithParentheses(tText),
-        ),
-      ];
+      return [withLeadingComments(n, asMemberOf(t, tText, '|'))];
     }),
     op: '|',
     wrapWithReadonly: deepReadonlyTypeName,
@@ -2014,11 +2041,8 @@ const leadingCommentsOfMember = (
 
 /**
  * `Readonly<T>` |-> the text of `T`, to be spliced into a union (`|`) or an
- * intersection (`&`) of the members it is merged with.
- *
- * `T` is wrapped in parentheses for precedence safety (a function type argument
- * needs them), unless it is a union spliced into a union or an intersection
- * spliced into an intersection, which needs none.
+ * intersection (`&`) of the members it is merged with, in parentheses only
+ * where that list needs them (`asMemberOf`).
  */
 const readonlyTypeArgTextSplicedInto = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
@@ -2029,13 +2053,28 @@ const readonlyTypeArgTextSplicedInto = (
 
   const T = removeParentheses(typeArgument);
 
-  return T.isKind(
-    operator === '|'
-      ? tsm.SyntaxKind.UnionType
-      : tsm.SyntaxKind.IntersectionType,
-  )
-    ? textWithoutParentheses(typeArgument, T)
-    : unwrapReadonlyTypeArgText(node);
+  return asMemberOf(T, textWithoutParentheses(typeArgument, T), operator);
+};
+
+/** `texts`, trimmed and sorted, to compare two lists as sets of members. */
+const sortedTexts = (texts: readonly string[]): readonly string[] =>
+  texts.map((t) => t.trim()).toSorted();
+
+/**
+ * The `ParenthesizedType` around `member` that is a member of `list` itself, if
+ * `member` stands in `list` in parentheses at all.
+ */
+const parenthesizedMemberOf = (
+  list: tsm.Node,
+  member: tsm.Node,
+): tsm.ParenthesizedTypeNode | undefined => {
+  const parent = member.getParent();
+
+  return parent?.isKind(tsm.SyntaxKind.ParenthesizedType) === true
+    ? parent.getParent() === list
+      ? parent
+      : parenthesizedMemberOf(list, parent)
+    : undefined;
 };
 
 const transformUnionOrIntersectionTypeNodeImpl = (
@@ -2054,6 +2093,12 @@ const transformUnionOrIntersectionTypeNodeImpl = (
     indexedAccessDepthChange: 'keep',
   });
 
+  // Which members the author put in parentheses, read before the members are
+  // transformed: a member transformed comes back in parentheses of its own.
+  const writtenInParentheses = node
+    .getTypeNodes()
+    .map((n) => n.isKind(tsm.SyntaxKind.ParenthesizedType));
+
   // Recursive processing
   for (const n of node.getTypeNodes() /* = [A, B] */) {
     transformNode(n, nextReadonlyContextValue, options);
@@ -2064,8 +2109,28 @@ const transformUnionOrIntersectionTypeNodeImpl = (
   const withLeadingComments = (
     // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
     member: tsm.TypeNode,
-    memberText: string,
-  ): string => `${leadingCommentsOfMember(node, member)}${memberText}` as const;
+    text: string,
+  ): string => `${leadingCommentsOfMember(node, member)}${text}` as const;
+
+  // A member as it goes into the list, with the comments in front of it: as
+  // written, comments inside included, where the author put it in parentheses,
+  // and otherwise in the parentheses it needs as a member (`asMemberOf`).
+  // `groupUnionIntersectionTypes` hands the members over with their parentheses
+  // taken off.
+  const memberText = (
+    // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+    member: tsm.TypeNode,
+  ): string => {
+    const parenthesized = parenthesizedMemberOf(node, member);
+
+    return parenthesized !== undefined &&
+      writtenInParentheses[newTypes.indexOf(parenthesized)] === true
+      ? withLeadingComments(parenthesized, parenthesized.getText())
+      : withLeadingComments(
+          member,
+          asMemberOf(member, member.getText(), operator),
+        );
+  };
 
   // Whether a type literal member is wrapped at all; under `DeepReadonly` or an
   // indexed access none is.
@@ -2115,20 +2180,22 @@ const transformUnionOrIntersectionTypeNodeImpl = (
       : ([
           unionToString({
             types: nonEmptyTypeLiterals.map((n) =>
-              withLeadingComments(
-                n,
-                isMergeableReadonlyTypeReferenceNode(n, operator)
-                  ? // NOTE: Readonly<A & B> -> (A & B) (spliced into `|`)
-                    // NOTE: Readonly<A | B> -> A | B (spliced into `|`)
-                    readonlyTypeArgTextSplicedInto(n, operator)
-                  : n.isKind(tsm.SyntaxKind.TypeLiteral)
-                    ? n.getText()
-                    : // A member kept under `Readonly`; see `underReadonly`
-                      wrapWithParentheses(n.getText()),
-              ),
+              isMergeableReadonlyTypeReferenceNode(n, operator)
+                ? // NOTE: Readonly<A & B> -> (A & B) (spliced into `|`)
+                  // NOTE: Readonly<A | B> -> A | B (spliced into `|`)
+                  withLeadingComments(
+                    n,
+                    readonlyTypeArgTextSplicedInto(n, operator),
+                  )
+                : // A type literal, or a member kept under `Readonly`; see
+                  // `underReadonly`
+                  memberText(n),
             ),
             op: operator,
+            // Without `Readonly`, the literals are spliced into this list as
+            // they are, with no parentheses of their own.
             wrapWithReadonly: wrapsTypeLiterals,
+            parenthesize: false,
           }),
         ] as const);
 
@@ -2136,19 +2203,11 @@ const transformUnionOrIntersectionTypeNodeImpl = (
   const sorted: readonly string[] = [
     mapNullable(
       primitives,
-      (a) =>
-        [
-          a.nodes.map((n) => withLeadingComments(n, n.getText())),
-          a.firstPosition,
-        ] as const,
+      (a) => [a.nodes.map(memberText), a.firstPosition] as const,
     ),
     mapNullable(
       arraysAndTuples,
-      (a) =>
-        [
-          a.nodes.map((n) => withLeadingComments(n, n.getText())),
-          a.firstPosition,
-        ] as const,
+      (a) => [a.nodes.map(memberText), a.firstPosition] as const,
     ),
     nonEmptyTypeLiterals !== undefined && Arr.isNonEmpty(nonEmptyTypeLiterals)
       ? mapNullable(
@@ -2161,7 +2220,7 @@ const transformUnionOrIntersectionTypeNodeImpl = (
           typeLiterals,
           (a) =>
             [
-              emptyTypeLiterals.map((n) => withLeadingComments(n, n.getText())),
+              emptyTypeLiterals.map(memberText),
               // Use a position after non-empty type literals if they exist
               a.firstPosition +
                 (nonEmptyTypeLiterals !== undefined &&
@@ -2182,10 +2241,9 @@ const transformUnionOrIntersectionTypeNodeImpl = (
                 a.nodes,
                 options.DeepReadonly.typeName,
                 withLeadingComments,
+                memberText,
               )
-            : a.nodes.map((n) =>
-                withLeadingComments(n, wrapWithParentheses(n.getText())),
-              ),
+            : a.nodes.map(memberText),
           a.firstPosition,
         ] as const,
     ),
@@ -2199,23 +2257,39 @@ const transformUnionOrIntersectionTypeNodeImpl = (
 
   // Readonly<number | { x: X } | { y: Y } | readonly E[]>
   // -> number | readonly E[] | Readonly<{ x: X } | { y: Y }>
-  // Readonly<number & { x: X } & { y: Y } & readonly E[]>
-  // -> number & readonly E[] & Readonly<{ x: X } & { y: Y }>
 
-  // Readonly<number | { x: X } | { y: Y } | readonly E[]>
-  // -> number | readonly E[] | Readonly<{ x: X } | { y: Y }>
-  //
-  // NOTE: The result is wrapped in parentheses (via `unionToString`). This is
-  // intentional and required for precedence safety: without it, a member such
-  // as a function type (`() => T`), or a mix of `&` and `|`, or a `readonly`
-  // operator would produce invalid syntax when this node is spliced back in.
-  // Idempotency is guaranteed by `transformParenthesizedTypeNode`, which
-  // collapses the redundant nesting (`((X))` -> `(X)`) this wrapping can create
-  // — see the note there. That prevents the parentheses from growing without
-  // bound when a union/intersection sits inside a `ParenthesizedType`.
+  // A list whose members come out as they went in, in whatever order the groups
+  // above put them, is left as written, its order, layout and line breaks
+  // included: there is nothing to reprint. A list of one member is still
+  // reprinted as that member, without its leading operator: the handler of a
+  // `Readonly` around it reads the member, not the list.
+  const asWritten = sortedTexts(
+    newTypes.map((n) => withLeadingComments(n, n.getText())),
+  );
+
+  const asReprinted = sortedTexts(sorted);
+
+  if (
+    Arr.isMinLengthArray(2, asWritten) &&
+    asReprinted.length === asWritten.length &&
+    asReprinted.every((member, i) => member === asWritten[i])
+  ) {
+    return;
+  }
+
+  // No parentheses around the whole: it takes the place of a list of the same
+  // operator, which stood there without any of its own (a position that needs
+  // them already has a `ParenthesizedType` around this node), and the members
+  // it merges into one are type references. Each member carries the parentheses
+  // it needs as a member (`asMemberOf`).
   options.replaceNode(
     node,
-    unionToString({ types: sorted, op: operator, wrapWithReadonly: false }),
+    unionToString({
+      types: sorted,
+      op: operator,
+      wrapWithReadonly: false,
+      parenthesize: false,
+    }),
   );
 };
 
@@ -2274,13 +2348,9 @@ const transformParenthesizedTypeNode = (
     // collapse redundant nested parentheses if T is itself a ParenthesizedType
     // e.g. `((X)) |-> (X)`
     //
-    // This is what makes the transform terminate on nested parentheses. The
-    // union/intersection handler defensively wraps its result in parentheses
-    // for precedence safety, which turns `(A | B)` into `((A | B))` when the
-    // union already sits inside a `ParenthesizedType`. Collapsing the redundant
-    // outer layer here means each pass removes exactly the layer the wrapping
-    // added, so the parentheses no longer grow without bound (which previously
-    // overflowed the parser stack on inputs like `type T = (('a' | 'b'))`).
+    // A transformed member can come back in parentheses of its own inside the
+    // ones written around it, as `(readonly A[])` does; collapsing the outer
+    // layer keeps them from growing from one run to the next.
     T.isKind(tsm.SyntaxKind.ParenthesizedType);
 
   if (!unwraps) {

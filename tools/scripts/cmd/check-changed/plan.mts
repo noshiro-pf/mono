@@ -481,10 +481,10 @@ export const buildPlan = ({
     ...(areas.has('root-guards')
       ? [
           rootStep('fix', 'fix:codemod:affected'),
-          // The codemod parenthesizes what it reprints and leaves the formatter
-          // to take the parentheses off, and a lint rule can judge them
-          // meanwhile: oxlint's `no-invalid-void-type` rejects
-          // `() => (Promise<void> | void)`, on a line nobody changed (#2998).
+          // The codemod leaves its output to the formatter (it parenthesizes an
+          // array type it makes readonly, `(readonly T[])`), and a lint rule
+          // could judge that layout meanwhile, on a line nobody changed, as
+          // oxlint's `no-invalid-void-type` did a union it reprinted (#2998).
           // CI lints only the formatted tree. `fix:codemod:affected` formats
           // once it is done, but not when the codemod fails; the root checks'
           // `eslint --fix` lints too, so this runs whether or not a package has
