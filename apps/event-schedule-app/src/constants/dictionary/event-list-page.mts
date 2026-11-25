@@ -19,7 +19,7 @@ export const eventListPageDictionary = {
   itemCount: (n: SafeUint) => `${n}件`,
   empty: {
     title: '表示する日程調整がありません。',
-    whatIsListed: 'ここには自分が回答した日程調整が表示されます。',
+    whatIsListed: 'ここには自分が作成または回答した日程調整が表示されます。',
     archive: 'アーカイブした日程調整のみ表示しています。',
     createdOnly: '自分が作成した日程調整のみ表示しています。',
     filterText: (text: string): string =>
