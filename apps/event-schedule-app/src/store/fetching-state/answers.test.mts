@@ -1,6 +1,7 @@
 import { Answer } from 'event-schedule-app-shared';
 import { createState } from 'synstate';
 import { Optional, Result } from 'ts-data-forge';
+import type { Api } from '../../api/index.mjs';
 import { createAnswersStore, type AnswersFetcher } from './answers.mjs';
 
 describe(createAnswersStore, () => {
@@ -87,6 +88,72 @@ describe(createAnswersStore, () => {
     );
   });
 
+  test('an answer that comes back after a later one does not replace it', async () => {
+    const { answer, resolve } = deferredReads();
+
+    const { store, setEventId } = setup('A', answer);
+
+    store.start();
+
+    setEventId('B');
+
+    resolve('B');
+
+    await settle(0);
+
+    assert.deepStrictEqual(idsOf(store), ['B']);
+
+    resolve('A');
+
+    await settle(0);
+
+    assert.deepStrictEqual(idsOf(store), ['B']);
+  });
+
+  test('has no answers from the moment the page moves to another event until its read comes back', async () => {
+    const { answer, resolve } = deferredReads();
+
+    const { store, setEventId } = setup('A', answer);
+
+    store.start();
+
+    resolve('A');
+
+    await settle(0);
+
+    assert.deepStrictEqual(idsOf(store), ['A']);
+
+    setEventId('C');
+
+    assert.isUndefined(Optional.unwrap(store.result$.getSnapshot()));
+
+    assert.isUndefined(idsOf(store));
+
+    resolve('C');
+
+    await settle(0);
+
+    assert.deepStrictEqual(idsOf(store), ['C']);
+  });
+
+  test('has no answers while the page names no event', async () => {
+    const { answer, resolve } = deferredReads();
+
+    const { store, setEventId } = setup('A', answer);
+
+    store.start();
+
+    resolve('A');
+
+    await settle(0);
+
+    setEventId(undefined);
+
+    assert.isUndefined(Optional.unwrap(store.result$.getSnapshot()));
+
+    assert.isUndefined(idsOf(store));
+  });
+
   test('stop ends the reading', () => {
     const { store, reads, setEventId } = setup('abc');
 
@@ -111,7 +178,11 @@ type Setup = Readonly<{
   setEventId: (eventId: string | undefined) => void;
 }>;
 
-const setup = (initialEventId: string | undefined): Setup => {
+const setup = (
+  initialEventId: string | undefined,
+  answer: Api['answers']['fetchList'] = () =>
+    Promise.resolve(Result.ok(answers)),
+): Setup => {
   const [eventId$, setEventId] = createState<string | undefined>(
     initialEventId,
   );
@@ -124,7 +195,7 @@ const setup = (initialEventId: string | undefined): Setup => {
     fetchAnswers: (eventId) => {
       mut_reads.push(eventId);
 
-      return Promise.resolve(Result.ok(answers));
+      return answer(eventId);
     },
     eventId$,
     fetchEventSchedule: () => {
@@ -139,6 +210,34 @@ const setup = (initialEventId: string | undefined): Setup => {
     eventScheduleReads: () => mut_eventSchedule.reads,
     setEventId,
   } as const;
+};
+
+const idsOf = (store: AnswersFetcher): readonly string[] | undefined =>
+  Optional.unwrap(store.answers$.getSnapshot())?.map(({ id }) => id);
+
+/**
+ * Reads the test answers by hand, each with one answer whose id is the event's,
+ * in whatever order the test resolves them.
+ */
+const deferredReads = (): Readonly<{
+  answer: Api['answers']['fetchList'];
+  resolve: (eventId: string) => void;
+}> => {
+  const mut_pending = new Map<string, () => void>();
+
+  return {
+    answer: async (eventId) =>
+      new Promise((resolve) => {
+        mut_pending.set(eventId, () => {
+          resolve(Result.ok([Answer.fill({ id: eventId })]));
+        });
+      }),
+    resolve: (eventId) => {
+      mut_pending.get(eventId)?.();
+
+      mut_pending.delete(eventId);
+    },
+  };
 };
 
 const settle = async (ms: number): Promise<void> => {

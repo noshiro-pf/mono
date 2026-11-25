@@ -111,6 +111,72 @@ describe(createEventScheduleStore, () => {
     assert.isUndefined(Optional.unwrap(store.result$.getSnapshot()));
   });
 
+  test('a read that comes back after a later one does not replace it', async () => {
+    const { answer, resolve } = deferredReads();
+
+    const { store, setEventId } = setup('A', answer);
+
+    store.start();
+
+    setEventId('B');
+
+    resolve('B');
+
+    await settle(0);
+
+    assert.strictEqual(titleOf(store), 'event B');
+
+    resolve('A');
+
+    await settle(0);
+
+    assert.strictEqual(titleOf(store), 'event B');
+  });
+
+  test('has no event from the moment the page moves to another until its read comes back', async () => {
+    const { answer, resolve } = deferredReads();
+
+    const { store, setEventId } = setup('A', answer);
+
+    store.start();
+
+    resolve('A');
+
+    await settle(0);
+
+    assert.strictEqual(titleOf(store), 'event A');
+
+    setEventId('C');
+
+    assert.isUndefined(Optional.unwrap(store.result$.getSnapshot()));
+
+    assert.isUndefined(Optional.unwrap(store.eventSchedule$.getSnapshot()));
+
+    resolve('C');
+
+    await settle(0);
+
+    assert.strictEqual(titleOf(store), 'event C');
+  });
+
+  test('has no event while the page names none', async () => {
+    const { answer, resolve } = deferredReads();
+
+    const { store, setEventId } = setup('A', answer);
+
+    store.start();
+
+    resolve('A');
+
+    await settle(0);
+
+    setEventId(undefined);
+
+    assert.isUndefined(Optional.unwrap(store.result$.getSnapshot()));
+
+    assert.isUndefined(Optional.unwrap(store.eventSchedule$.getSnapshot()));
+  });
+
   test('stop ends the reading', () => {
     const { store, reads, setEventId } = setup('abc');
 
@@ -158,6 +224,34 @@ const setup = (
   });
 
   return { store, reads: mut_reads, setEventId } as const;
+};
+
+const titleOf = (store: EventScheduleFetcher): string | undefined =>
+  Optional.unwrap(store.eventSchedule$.getSnapshot())?.title;
+
+/**
+ * Reads the test answers by hand, each with an event titled after the id it was
+ * for, in whatever order the test resolves them.
+ */
+const deferredReads = (): Readonly<{
+  answer: Api['event']['fetch'];
+  resolve: (eventId: string) => void;
+}> => {
+  const mut_pending = new Map<string, () => void>();
+
+  return {
+    answer: async (eventId) =>
+      new Promise((resolve) => {
+        mut_pending.set(eventId, () => {
+          resolve(Result.ok(EventSchedule.fill({ title: `event ${eventId}` })));
+        });
+      }),
+    resolve: (eventId) => {
+      mut_pending.get(eventId)?.();
+
+      mut_pending.delete(eventId);
+    },
+  };
 };
 
 const settle = async (ms: number): Promise<void> => {

@@ -1,16 +1,15 @@
 import {
   createEventEmitter,
   createState,
-  filter,
+  derive,
+  map,
   merge,
   throttle,
-  unwrapResultOk,
   withCurrentValueFrom,
-  withInitialValue,
   type InitializedObservable,
   type Subscription,
 } from 'synstate';
-import { Result, isNotUndefined } from 'ts-data-forge';
+import { Result } from 'ts-data-forge';
 import type { Api } from '../../api/index.mjs';
 
 export type EventScheduleDeps = Readonly<{
@@ -57,19 +56,35 @@ export const createEventScheduleStore = (
     throttle(deps.throttleMs),
   );
 
-  const [eventScheduleResult$, setEventScheduleResult] =
-    createState<EventScheduleResult>(undefined);
+  // The last read, with the event it was for.
+  const [lastRead$, setLastRead] = createState<
+    | Readonly<{ eventId: string; result: NonNullable<EventScheduleResult> }>
+    | undefined
+  >(undefined);
 
-  const result$ = eventScheduleResult$;
+  // Derived, not written on navigation: a read counts only while the page names
+  // the event it was for, so another event's page never opens on it.
+  const result$: InitializedObservable<EventScheduleResult> = derive(
+    [lastRead$, deps.eventId$],
+    (lastRead, eventId) =>
+      lastRead !== undefined && lastRead.eventId === eventId
+        ? lastRead.result
+        : undefined,
+  );
 
   const eventSchedule$: InitializedObservable<EventSchedule | undefined> =
-    result$
-      .pipe(filter(isNotUndefined))
-      .pipe(unwrapResultOk())
-      .pipe(withInitialValue(undefined));
+    result$.pipe(
+      map((result) =>
+        result !== undefined && Result.isOk(result) ? result.value : undefined,
+      ),
+    );
 
   const start = (): (() => void) => {
-    const mut_run = { stopped: false };
+    const mut_run = {
+      stopped: false,
+      /** The request made last, the only one whose answer is taken. */
+      latest: 0,
+    };
 
     const subscriptions: readonly Subscription[] = [
       // Read on request (the first is made below), and again whenever the page
@@ -81,19 +96,26 @@ export const createEventScheduleStore = (
       ])
         .pipe(withCurrentValueFrom(deps.eventId$))
         .subscribe(([_, eventId]) => {
+          // Counted even when there is nothing to read, so that leaving the
+          // event also retires the reads still out for it.
+          mut_run.latest += 1;
+
           if (eventId === undefined) {
             return;
           }
 
+          const request = mut_run.latest;
+
           deps
             .fetchEventSchedule(eventId)
             .then((result) => {
-              // A read still out when the store stops is dropped.
-              if (mut_run.stopped) {
+              // A read still out when the store stops is dropped, and so is one
+              // a later request has replaced.
+              if (mut_run.stopped || request !== mut_run.latest) {
                 return;
               }
 
-              setEventScheduleResult(result);
+              setLastRead({ eventId, result });
             })
             .catch(() => {});
         }),
