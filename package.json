@@ -95,6 +95,7 @@
     "check:root:open-pull-reads": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-open-pull-reads.mts",
     "check:root:oxlint-rules": "node ./tools/scripts/cmd/assert-deps-built.mts --workspace && tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-oxlint-rules.mts",
     "check:root:package-manager": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-package-manager.mts",
+    "check:root:plugin-library-peers": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-plugin-library-peers.mts",
     "check:root:private-runtime-deps": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-private-runtime-deps.mts",
     "check:root:proxy-scripts": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-proxy-scripts.mts",
     "check:root:queue-layer-conditions": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-queue-layer-conditions.mts",

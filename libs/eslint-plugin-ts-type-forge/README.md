@@ -16,6 +16,8 @@ npm install --save-dev eslint-plugin-ts-type-forge
 Requires ESLint 9+ (flat config) and TypeScript. No rule is type-aware, so a
 configured TypeScript project is not required.
 
+`ts-type-forge` is an optional peer dependency whose range is the major of `ts-type-forge` the rules are written for. On another major, the package manager reports the mismatch at install (pnpm warns; npm can refuse without `--legacy-peer-deps`); use the version of this plugin released for that major.
+
 ## Usage (flat config)
 
 The plugin ships a `recommended` config preset that registers the plugin and

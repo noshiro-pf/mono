@@ -16,6 +16,8 @@ is not required: only `no-type-only-codec` reads type information, and without i
 the rule checks less rather than failing (see
 [Type information](#type-information)).
 
+`ts-fortress` is an optional peer dependency whose range is the major of `ts-fortress` the rules are written for. On another major, the package manager reports the mismatch at install (pnpm warns; npm can refuse without `--legacy-peer-deps`); use the version of this plugin released for that major.
+
 ## Usage (flat config)
 
 The plugin ships a `recommended` config preset that registers the plugin and

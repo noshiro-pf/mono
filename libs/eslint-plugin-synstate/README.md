@@ -10,6 +10,8 @@ npm install --save-dev eslint-plugin-synstate
 
 Requires ESLint 9+ (flat config). The rules read the syntax and need no TypeScript project; `no-write-during-propagation` also follows imported setters when the config provides type information.
 
+`synstate` is an optional peer dependency whose range is the major of `synstate` the rules are written for. On another major, the package manager reports the mismatch at install (pnpm warns; npm can refuse without `--legacy-peer-deps`); use the version of this plugin released for that major.
+
 ## Usage (flat config)
 
 The plugin ships a `recommended` config preset that registers the plugin and
