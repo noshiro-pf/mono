@@ -23,6 +23,9 @@ export type ReadContext = Readonly<{
   token: string | undefined;
 }>;
 
+/** Answers kept across reads, around a transport (`transportCache`). */
+export type TransportCache = (transport: Transport) => Transport;
+
 /**
  * Sends one request. A request that got no answer at all (a dropped connection,
  * a timeout) resolves to a `failed` answer, never rejects.
@@ -55,18 +58,27 @@ export type HttpAnswered = Readonly<{
  * transport, so that every read made through it shares the one limit; a reader
  * does not limit again.
  */
-export const readContextOf = (
-  parts: Readonly<{
-    transport: Transport;
-    owner: string;
-    name: string;
-    token: string | undefined;
-  }>,
-): ReadContext =>
-  ({
+export const readContextOf = ({
+  cache,
+  ...parts
+}: Readonly<{
+  transport: Transport;
+  owner: string;
+  name: string;
+  token: string | undefined;
+  /**
+   * The answers kept across reads (`transportCache`), outside the limit, so
+   * that an answer kept waits for no place.
+   */
+  cache?: TransportCache;
+}>): ReadContext => {
+  const limited = limitConcurrency(parts.transport, CONCURRENT_REQUESTS);
+
+  return {
     ...parts,
-    transport: limitConcurrency(parts.transport, CONCURRENT_REQUESTS),
-  }) as const;
+    transport: cache === undefined ? limited : cache(limited),
+  } as const;
+};
 
 /**
  * How many requests a reader keeps in flight: each open pull request fans out

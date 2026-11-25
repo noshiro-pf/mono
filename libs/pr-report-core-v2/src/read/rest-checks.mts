@@ -137,6 +137,11 @@ const AnnotationsSchema = t.array(
   t.record({ title: t.union([t.string(), t.nullType]) }),
 );
 
+/**
+ * Asked only once the run has completed (`readsAnnotations`): `transportCache`
+ * keeps a run's annotations for good on that ground, so a read of a run still
+ * in progress must not come through here.
+ */
 const titlesOf = async (
   context: ReadContext,
   run: CheckRunJson,
