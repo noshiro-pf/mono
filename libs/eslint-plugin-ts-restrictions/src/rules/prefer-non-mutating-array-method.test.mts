@@ -148,16 +148,16 @@ describe('prefer-non-mutating-array-method', () => {
         errors: [{ messageId: 'preferNonMutatingMethod' }],
       },
       {
-        name: 'Array.from(array).fill(v) → array.map(() => v)',
+        name: 'Array.from(array).fill(v) → Array.from(array, () => v)',
         code: dedent`
           declare const x: readonly number[];
           const y = Array.from(x).fill(0);
         `,
         output: dedent`
           declare const x: readonly number[];
-          const y = x.map(() => 0);
+          const y = Array.from(x, () => 0);
         `,
-        errors: [{ messageId: 'preferNonMutatingMethod' }],
+        errors: [{ messageId: 'preferArrayFromMapFunction' }],
       },
       {
         name: 'fill with an identifier value is safe to re-evaluate',
@@ -169,9 +169,9 @@ describe('prefer-non-mutating-array-method', () => {
         output: dedent`
           declare const x: readonly number[];
           declare const v: string;
-          const y = x.map(() => v);
+          const y = Array.from(x, () => v);
         `,
-        errors: [{ messageId: 'preferNonMutatingMethod' }],
+        errors: [{ messageId: 'preferArrayFromMapFunction' }],
       },
       {
         name: 'mutable array receiver is also targeted',
@@ -300,9 +300,9 @@ describe('prefer-non-mutating-array-method through type wrappers', () => {
         `,
         output: dedent`
           declare const xs: readonly number[];
-          const y = xs.map(() => 0 satisfies number);
+          const y = Array.from(xs, () => 0 satisfies number);
         `,
-        errors: [{ messageId: 'preferNonMutatingMethod' }],
+        errors: [{ messageId: 'preferArrayFromMapFunction' }],
       },
     ],
   });
@@ -450,6 +450,73 @@ describe('prefer-non-mutating-array-method and an argument with an effect', () =
           const sorted = xs.toSorted((a, b) => a - b);
         `,
         errors: [{ messageId: 'preferNonMutatingMethod' }],
+      },
+    ],
+  });
+});
+
+// `Array.from(xs)` turns a hole of a sparse array into `undefined`, which `fill`
+// overwrites, while `xs.map` skips a hole and keeps it; a mapping function
+// given to `Array.from` is called for every index, holes included.
+describe('prefer-non-mutating-array-method and fill on a sparse array', () => {
+  tester.run('prefer-non-mutating-array-method', preferNonMutatingArrayMethod, {
+    valid: [],
+    invalid: [
+      {
+        name: 'Array.from(Array(n)).fill(v) keeps filling every slot',
+        code: dedent`
+          const zeros = Array.from(Array(3)).fill(0);
+        `,
+        output: dedent`
+          const zeros = Array.from(Array(3), () => 0);
+        `,
+        errors: [{ messageId: 'preferArrayFromMapFunction' }],
+      },
+      {
+        name: 'new Array(n) is filled the same way',
+        code: dedent`
+          const zeros = Array.from(new Array(3)).fill(0);
+        `,
+        output: dedent`
+          const zeros = Array.from(new Array(3), () => 0);
+        `,
+        errors: [{ messageId: 'preferArrayFromMapFunction' }],
+      },
+      {
+        name: 'a type wrapper around the call is kept',
+        code: dedent`
+          declare const xs: readonly number[];
+          const y = (Array.from(xs) as number[]).fill(0);
+        `,
+        output: dedent`
+          declare const xs: readonly number[];
+          const y = (Array.from(xs, () => 0) as number[]);
+        `,
+        errors: [{ messageId: 'preferArrayFromMapFunction' }],
+      },
+      {
+        name: 'an optional call is dropped with its ?.',
+        code: dedent`
+          declare const xs: readonly number[];
+          const y = Array.from(xs)?.fill(0);
+        `,
+        output: dedent`
+          declare const xs: readonly number[];
+          const y = Array.from(xs, () => 0);
+        `,
+        errors: [{ messageId: 'preferArrayFromMapFunction' }],
+      },
+      {
+        name: 'a parenthesized argument and a trailing comma',
+        code: dedent`
+          declare const xs: readonly number[];
+          const y = Array.from((xs),).fill(0);
+        `,
+        output: dedent`
+          declare const xs: readonly number[];
+          const y = Array.from((xs), () => 0);
+        `,
+        errors: [{ messageId: 'preferArrayFromMapFunction' }],
       },
     ],
   });
