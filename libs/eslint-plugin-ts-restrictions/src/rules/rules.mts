@@ -14,6 +14,7 @@ import { noRestrictedSyntax } from './no-restricted-syntax.mjs';
 import { noStringSpread } from './no-string-spread.mjs';
 import { noUnnecessaryArrayFrom } from './no-unnecessary-array-from.mjs';
 import { noUnnecessaryCoalesceUndefined } from './no-unnecessary-coalesce-undefined.mjs';
+import { noUnreturnedPromiseInCloudFunction } from './no-unreturned-promise-in-cloud-function.mjs';
 import { preferCurriedCall } from './prefer-curried-call.mjs';
 import { preferDedent } from './prefer-dedent.mjs';
 import { preferLogicalOverBooleanTernary } from './prefer-logical-over-boolean-ternary.mjs';
@@ -40,6 +41,7 @@ export const tsRestrictionsRules = {
   'no-string-spread': noStringSpread,
   'no-unnecessary-array-from': noUnnecessaryArrayFrom,
   'no-unnecessary-coalesce-undefined': noUnnecessaryCoalesceUndefined,
+  'no-unreturned-promise-in-cloud-function': noUnreturnedPromiseInCloudFunction,
   'prefer-curried-call': preferCurriedCall,
   'prefer-dedent': preferDedent,
   'prefer-logical-over-boolean-ternary': preferLogicalOverBooleanTernary,
