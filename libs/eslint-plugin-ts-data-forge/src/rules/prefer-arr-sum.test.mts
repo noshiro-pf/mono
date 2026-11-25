@@ -35,6 +35,48 @@ describe('prefer-arr-sum', () => {
         `,
       },
       {
+        name: 'the shape that reads a property of the running total, which does not compile',
+        code: dedent`
+          const xs: readonly { v: number }[] = [{ v: 1 }, { v: 2 }];
+          // @ts-expect-error the running total is a number
+          const sum = xs.reduce((a, b) => a.v + b.v, 0);
+        `,
+      },
+      {
+        name: 'a property that is not a number',
+        code: dedent`
+          const xs: readonly { v: string }[] = [];
+          const sum = xs.reduce((acc, x) => acc + x.v, 0);
+        `,
+      },
+      {
+        name: 'a receiver that is not an array',
+        code: dedent`
+          declare const o: {
+            reduce(
+              f: (a: number, b: { v: number }) => number,
+              init: number,
+            ): number;
+          };
+          const sum = o.reduce((acc, x) => acc + x.v, 0);
+        `,
+      },
+      {
+        name: 'a property path that reads the accumulator, an index or the array',
+        code: dedent`
+          const xs: readonly { vs: readonly number[]; v: number }[] = [];
+          const a = xs.reduce((acc, x) => acc + (x.vs[acc] ?? 0), 0);
+          const b = xs.reduce((acc, x, i) => acc + x.v + i, 0);
+        `,
+      },
+      {
+        name: 'an accumulator plus a property from another initial value',
+        code: dedent`
+          const xs: readonly { v: number }[] = [];
+          const sum = xs.reduce((acc, x) => acc + x.v, 10);
+        `,
+      },
+      {
         name: 'ignores non-number array',
         code: dedent`
           const xs = [1, "2", "3"];
@@ -106,49 +148,58 @@ describe('prefer-arr-sum', () => {
         },
       ] as const),
 
-      ...([
-        {
-          name: 'replaces xs.reduce with property access with Arr.sumBy',
-          code: dedent`
-            const xs: readonly { v: number }[] = [{ v: 1 }, { v: 2 }];
-            const sum = xs.reduce((a, b) => a.v + b.v, 0);
-          `,
-          output: dedent`
-            import { Arr } from 'ts-data-forge';
-            const xs: readonly { v: number }[] = [{ v: 1 }, { v: 2 }];
-            const sum = Arr.sumBy(xs, a => a.v);
-          `,
-          errors: [{ messageId: 'useArrSumBy' }],
-        },
-        ...([
-          {
-            name: 'replaces xs.reduce with property access with Arr.sumBy',
-            code: dedent`
-              const xs = [{ v: 1 }, { v: 2 }] as const;
-              const sum = xs.reduce((a, b) => a.v + b.v, 0);
-            `,
-            output: dedent`
-              import { Arr } from 'ts-data-forge';
-              const xs = [{ v: 1 }, { v: 2 }] as const;
-              const sum = Arr.sumBy(xs, a => a.v);
-            `,
-            errors: [{ messageId: 'useArrSumBy' }],
-          },
-        ] as const),
-        {
-          name: 'replaces xs.reduce with bracket property access with Arr.sumBy',
-          code: dedent`
-            const xs: readonly { v: number }[] = [{ v: 1 }, { v: 2 }];
-            const sum = xs.reduce((a, b) => a['v'] + b['v'], 0);
-          `,
-          output: dedent`
-            import { Arr } from 'ts-data-forge';
-            const xs: readonly { v: number }[] = [{ v: 1 }, { v: 2 }];
-            const sum = Arr.sumBy(xs, a => a['v']);
-          `,
-          errors: [{ messageId: 'useArrSumBy' }],
-        },
-      ] as const),
+      {
+        name: 'replaces an accumulator plus a property with Arr.sumBy',
+        code: dedent`
+          const xs: readonly { v: number }[] = [{ v: 1 }, { v: 2 }];
+          const sum = xs.reduce((acc, x) => acc + x.v, 0);
+        `,
+        output: dedent`
+          import { Arr } from 'ts-data-forge';
+          const xs: readonly { v: number }[] = [{ v: 1 }, { v: 2 }];
+          const sum = Arr.sumBy(xs, x => x.v);
+        `,
+        errors: [{ messageId: 'useArrSumBy' }],
+      },
+      {
+        name: 'the property before the accumulator, on a tuple',
+        code: dedent`
+          const xs = [{ v: 1 }, { v: 2 }] as const;
+          const sum = xs.reduce((acc, x) => x.v + acc, 0);
+        `,
+        output: dedent`
+          import { Arr } from 'ts-data-forge';
+          const xs = [{ v: 1 }, { v: 2 }] as const;
+          const sum = Arr.sumBy(xs, x => x.v);
+        `,
+        errors: [{ messageId: 'useArrSumBy' }],
+      },
+      {
+        name: 'a bracket key',
+        code: dedent`
+          const xs: readonly { v: number }[] = [];
+          const sum = xs.reduce((acc, x) => acc + x['v'], 0);
+        `,
+        output: dedent`
+          import { Arr } from 'ts-data-forge';
+          const xs: readonly { v: number }[] = [];
+          const sum = Arr.sumBy(xs, x => x['v']);
+        `,
+        errors: [{ messageId: 'useArrSumBy' }],
+      },
+      {
+        name: 'a nested path',
+        code: dedent`
+          const xs: readonly { w: { n: number } }[] = [];
+          const sum = xs.reduce((acc, x) => acc + x.w.n, 0);
+        `,
+        output: dedent`
+          import { Arr } from 'ts-data-forge';
+          const xs: readonly { w: { n: number } }[] = [];
+          const sum = Arr.sumBy(xs, x => x.w.n);
+        `,
+        errors: [{ messageId: 'useArrSumBy' }],
+      },
 
       {
         name: 'keeps existing Arr import',
@@ -188,7 +239,7 @@ describe('prefer-arr-sum through type wrappers', () => {
         code: dedent`
           declare const xs: readonly Readonly<{ n: string }>[];
           const sum = xs.reduce(
-            (a, b) => (a.n as unknown as number) + (b.n as unknown as number),
+            (acc, x) => acc + (x.n as unknown as number),
             0,
           );
         `,
@@ -226,18 +277,20 @@ describe('prefer-arr-sum through type wrappers', () => {
         ],
       },
       {
-        name: 'a property read through wrappers',
+        name: 'a property and the accumulator read through wrappers, which the mapper keeps',
         code: dedent`
           import { Arr } from 'ts-data-forge';
           declare const xs: readonly Readonly<{ n: number }>[];
-          const sum = xs.reduce((a, b) => (a.n satisfies number) + b!.n, 0);
+          const a = xs.reduce((acc, x) => acc + (x.n satisfies number), 0);
+          const b = xs.reduce((acc, x) => (acc as number) + x!.n, 0);
         `,
         output: dedent`
           import { Arr } from 'ts-data-forge';
           declare const xs: readonly Readonly<{ n: number }>[];
-          const sum = Arr.sumBy(xs, a => a.n);
+          const a = Arr.sumBy(xs, x => x.n satisfies number);
+          const b = Arr.sumBy(xs, x => x!.n);
         `,
-        errors: [{ messageId: 'useArrSumBy' }],
+        errors: [{ messageId: 'useArrSumBy' }, { messageId: 'useArrSumBy' }],
       },
     ],
   });

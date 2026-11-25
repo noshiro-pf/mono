@@ -208,18 +208,14 @@ const WeekTable = ({
         <td class={constant('weekly-activity-total')}>
           <span class={constant('weekly-activity-count')}>
             {activity$.pipe(
-              map(({ days: all }) =>
-                all.reduce((sum, day) => sum + day.merged, 0),
-              ),
+              map(({ days: all }) => Arr.sumBy(all, (day) => day.merged)),
             )}
           </span>
         </td>
         <td class={constant('weekly-activity-total')}>
           <span class={constant('weekly-activity-count')}>
             {activity$.pipe(
-              map(({ days: all }) =>
-                all.reduce((sum, day) => sum + day.closed, 0),
-              ),
+              map(({ days: all }) => Arr.sumBy(all, (day) => day.closed)),
             )}
           </span>
         </td>

@@ -147,7 +147,7 @@ const measureBuild = async <App extends ScenarioAppBase>(
     });
 
     return {
-      ms: builds.reduce((total, b) => total + b.ms, 0) / buildsPerSample,
+      ms: Arr.sumBy(builds, (b) => b.ms) / buildsPerSample,
       correct: builds.every((b) => b.correct),
     } as const;
   });
