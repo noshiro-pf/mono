@@ -144,7 +144,8 @@ const writeDeployManifest = async (): Promise<void> => {
  * which is `outDir`, and otherwise tries the production ones with the
  * developer's credentials. So one is always written here: the developer's own
  * `.secret.local` beside `package.json` if there is one, and otherwise a dummy
- * that lets the functions run and fail only when they try to send mail. Deploy
+ * that lets the functions run, and makes them log each mail instead of logging
+ * in to Gmail with its made-up account (`"mail-delivery": "log"`). Deploy
  * leaves it out (`ignore` in `firebase.json`); the real value is the
  * `RUNTIME_CONFIG` secret in Secret Manager.
  */
@@ -172,6 +173,8 @@ const writeLocalSecrets = async (): Promise<void> => {
         'app-password': 'dummy',
         'email-address-for-error-log': 'dummy@example.com',
       },
+      // `sendEmail` logs the mail instead of logging in to Gmail with these.
+      'mail-delivery': 'log',
     }),
   );
 

@@ -2,6 +2,7 @@ import { defineJsonSecret } from 'firebase-functions/params';
 import {
   discordWebhookUrlOf,
   fillFirebaseConfig,
+  mailDeliveryOf,
   type FirebaseConfig,
 } from './types/index.mjs';
 
@@ -21,3 +22,6 @@ export const getFirebaseConfig = (): FirebaseConfig =>
 
 export const getDiscordWebhookUrl = (): string =>
   discordWebhookUrlOf(runtimeConfig.value());
+
+export const getMailDelivery = (): 'log' | 'smtp' =>
+  mailDeliveryOf(runtimeConfig.value());

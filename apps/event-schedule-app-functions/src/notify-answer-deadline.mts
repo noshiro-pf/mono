@@ -15,7 +15,11 @@ import {
   remindersDue,
 } from './functions/index.mjs';
 import { emailOf, eventOf, getEmail } from './get-event-item.mjs';
-import { createMailOptions, sendEmail } from './setup-mailer.mjs';
+import {
+  createMailOptions,
+  sendEmail,
+  withMailSession,
+} from './setup-mailer.mjs';
 import {
   fillEventScheduleWithCheck,
   isClosingMailMark,
@@ -78,26 +82,29 @@ export const notifyAnswerDeadline = async (
     due.map(({ eventId }) => getEmail(db, eventId)),
   );
 
-  await Promise.all(
-    Arr.zip(due, emails).flatMap(([{ eventId, ev, days }, email]) =>
-      email === ''
-        ? []
-        : days.map((diff) => {
-            logger.log(`notify${pad2(diff)}daysBeforeAnswerDeadline`);
+  // One transport for the run's reminders, which share its connections.
+  await withMailSession(async () => {
+    await Promise.all(
+      Arr.zip(due, emails).flatMap(([{ eventId, ev, days }, email]) =>
+        email === ''
+          ? []
+          : days.map((diff) => {
+              logger.log(`notify${pad2(diff)}daysBeforeAnswerDeadline`);
 
-            return sendEmail(
-              createMailOptions({
-                to: email,
-                subject:
-                  diff === 0
-                    ? `イベント「${ev.title}」の回答期限当日になりました。`
-                    : `イベント「${ev.title}」の回答期限${diff}日前になりました。`,
-                text: createMailBodyForAnswerDeadline({ eventId, diff }),
-              }),
-            );
-          }),
-    ),
-  );
+              return sendEmail(
+                createMailOptions({
+                  to: email,
+                  subject:
+                    diff === 0
+                      ? `イベント「${ev.title}」の回答期限当日になりました。`
+                      : `イベント「${ev.title}」の回答期限${diff}日前になりました。`,
+                  text: createMailBodyForAnswerDeadline({ eventId, diff }),
+                }),
+              );
+            }),
+      ),
+    );
+  });
 };
 
 /**
@@ -160,36 +167,41 @@ export const notifyAfterAnswerDeadline = async (
 
   let mut_attempted = 0;
 
-  // One at a time, and none started once the budget is spent. An instance
-  // stopped at its time limit while a mail is marked and not yet sent loses
-  // that mail, so a run has to end by itself, however many mails a run that
-  // makes up for missed ones finds and however slowly they go; what it does not
-  // get to has no mark yet and is the next run's. The price is that the mails
-  // of a long list go out over several runs, in the same order each run.
-  for (const event of unmarked) {
-    // Here as well as in `sendClosingMailOnce`, which stops the loop only when
-    // it gets as far as marking: an event with nothing to send, or a failure,
-    // would otherwise let the loop go on past the budget.
-    if (Date.now() >= startSendBy) {
-      break;
-    }
-
-    try {
-      // eslint-disable-next-line no-await-in-loop -- in sequence on purpose, as said above
-      const outcome = await sendClosingMailOnce(db, event.eventRef, {
-        nowMillis,
-        startSendBy,
-      });
-
-      if (outcome === 'outOfTime') {
+  // One transport for the run's mails, so that each pays no handshake of its
+  // own out of the budget below.
+  await withMailSession(async () => {
+    // One at a time, and none started once the budget is spent. An instance
+    // stopped at its time limit while a mail is marked and not yet sent loses
+    // that mail, so a run has to end by itself, however many mails a run that
+    // makes up for missed ones finds and however slowly they go; what it does
+    // not get to has no mark yet and is the next run's. The price is that the
+    // mails of a long list go out over several runs, in the same order each
+    // run.
+    for (const event of unmarked) {
+      // Here as well as in `sendClosingMailOnce`, which stops the loop only
+      // when it gets as far as marking: an event with nothing to send, or a
+      // failure, would otherwise let the loop go on past the budget.
+      if (Date.now() >= startSendBy) {
         break;
       }
-    } catch (error) {
-      mut_failures.push(error);
-    }
 
-    mut_attempted += 1;
-  }
+      try {
+        // eslint-disable-next-line no-await-in-loop -- in sequence on purpose, as said above
+        const outcome = await sendClosingMailOnce(db, event.eventRef, {
+          nowMillis,
+          startSendBy,
+        });
+
+        if (outcome === 'outOfTime') {
+          break;
+        }
+      } catch (error) {
+        mut_failures.push(error);
+      }
+
+      mut_attempted += 1;
+    }
+  });
 
   const left = unmarked.length - mut_attempted;
 

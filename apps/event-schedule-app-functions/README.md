@@ -77,11 +77,12 @@ pnpm dlx firebase-tools@15 functions:config:export --secret RUNTIME_CONFIG
 Pass `--secret`: without it the command offers `FUNCTIONS_CONFIG_EXPORT`, a
 name the code does not read.
 
-The emulator does not read Secret Manager: `functions-build/.secret.local`
-holds a dummy `RUNTIME_CONFIG`, so mail fails and everything else works. To
+The emulator does not read Secret Manager: `functions-build/.secret.local` holds
+a dummy `RUNTIME_CONFIG`, whose `"mail-delivery": "log"` makes each mail a log
+line (`mail not sent …`) instead of a login to Gmail; everything else works. To
 send real mail locally, put a `.secret.local` beside this README
-(`RUNTIME_CONFIG=<json>` on one line); the build copies it instead. It is
-ignored by git and not deployed.
+(`RUNTIME_CONFIG=<json>` on one line, without that key); the build copies it
+instead. It is ignored by git and not deployed.
 
 ## Deploy
 
