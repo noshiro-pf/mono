@@ -31,6 +31,7 @@ export const eslintTsRestrictionsRules = {
   'ts-restrictions/prefer-optional-chain-over-ternary': 'error',
   'ts-restrictions/prefer-range-in-number-line-order': 'error',
   'ts-restrictions/prefer-ternary': ['error', 'only-single-line'],
+  'ts-restrictions/require-date-setter-day': 'error',
   // Moved to `ts-ui-restrictions/require-ime-guard`; deprecated, and kept
   // loadable until the next major.
   'ts-restrictions/require-ime-guard-on-enter': 0,

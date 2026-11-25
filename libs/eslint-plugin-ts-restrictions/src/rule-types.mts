@@ -651,6 +651,23 @@ namespace PreferTernary {
     'off' | Linter.Severity | readonly [Linter.StringSeverity, Options];
 }
 
+/**
+ * @description Require the day in `Date`'s `setMonth` and the month and day in `setFullYear`, without which a day the target month lacks rolls into the next month
+ *
+ *  ```md
+ *  | key        | value   |
+ *  | :--------- | :------ |
+ *  | type       | problem |
+ *  | deprecated | false   |
+ *  | fixable    | false   |
+ *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
+ */
+namespace RequireDateSetterDay {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
 export type EslintTsRestrictionsRules = Readonly<{
   'ts-restrictions/check-destructuring-completeness': CheckDestructuringCompleteness.RuleEntry;
   'ts-restrictions/explicit-collection-type-arguments': ExplicitCollectionTypeArguments.RuleEntry;
@@ -675,6 +692,7 @@ export type EslintTsRestrictionsRules = Readonly<{
   'ts-restrictions/prefer-optional-chain-over-ternary': PreferOptionalChainOverTernary.RuleEntry;
   'ts-restrictions/prefer-range-in-number-line-order': PreferRangeInNumberLineOrder.RuleEntry;
   'ts-restrictions/prefer-ternary': PreferTernary.RuleEntry;
+  'ts-restrictions/require-date-setter-day': RequireDateSetterDay.RuleEntry;
 }>;
 
 export type EslintTsRestrictionsRulesOption = Readonly<{
