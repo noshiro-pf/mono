@@ -9,5 +9,6 @@ export const eslintArrayFuncRules = {
   // Covered by unicorn/prefer-array-flat-map
   'array-func/prefer-flat-map': 'off',
 
-  'array-func/prefer-flat': 'error',
+  // Covered by unicorn/prefer-array-flat (checks more patterns)
+  'array-func/prefer-flat': 'off',
 } as const satisfies EslintArrayFuncRules;

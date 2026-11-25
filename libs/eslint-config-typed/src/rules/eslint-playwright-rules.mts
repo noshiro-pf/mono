@@ -70,7 +70,9 @@ export const eslintPlaywrightRules = {
   'playwright/no-wait-for-navigation': 'error',
   'playwright/valid-test-tags': withDefaultOption('error'),
   'playwright/no-unused-locators': 'error',
-  'playwright/consistent-spacing-between-blocks': 'error',
+  // Covered by @stylistic/padding-line-between-statements, which requires a
+  // blank line between any two statements.
+  'playwright/consistent-spacing-between-blocks': 'off',
   'playwright/no-restricted-locators': withDefaultOption('error'),
   'playwright/no-duplicate-slow': 'error',
   'playwright/no-restricted-roles': withDefaultOption('error'),

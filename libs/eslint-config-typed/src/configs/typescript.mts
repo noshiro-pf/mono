@@ -120,7 +120,6 @@ export const eslintConfigForTypeScript = ({
       rules: defineKnownRules({
         'no-restricted-imports': 'off',
         'import-x/no-default-export': 'off',
-        'import-x/no-anonymous-default-export': 'off',
         'import-x/no-internal-modules': 'off',
         'import-x/no-named-as-default': 'off',
         'import-x/namespace': 'off',

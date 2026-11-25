@@ -76,11 +76,14 @@ export const eslintUnicornRules = {
   'unicorn/no-negated-condition': 'off',
   'unicorn/no-null': 'off',
   'unicorn/no-object-as-default-parameter': 'error',
-  'unicorn/no-static-only-class': 'error',
+  // Covered by @typescript-eslint/no-extraneous-class (checks more patterns)
+  'unicorn/no-static-only-class': 'off',
   'unicorn/no-thenable': 'error',
-  'unicorn/no-this-assignment': 'error',
+  // Covered by @typescript-eslint/no-this-alias
+  'unicorn/no-this-assignment': 'off',
   'unicorn/no-typeof-undefined': withDefaultOption('error'),
-  'unicorn/no-unnecessary-await': 'error',
+  // Covered by @typescript-eslint/await-thenable (checks more patterns)
+  'unicorn/no-unnecessary-await': 'off',
   'unicorn/no-unreadable-array-destructuring': withDefaultOption('error'),
   'unicorn/no-unused-properties': 'error',
   // Its autofix rewrites `...(cond ? { x } : {})` into `...(cond && { x })`,
@@ -133,7 +136,8 @@ export const eslintUnicornRules = {
   'unicorn/prefer-set-size': 'error',
   'unicorn/prefer-string-replace-all': 'error',
   'unicorn/prefer-string-slice': 'error',
-  'unicorn/prefer-string-starts-ends-with': 'error',
+  // Covered by @typescript-eslint/prefer-string-starts-ends-with (checks more patterns)
+  'unicorn/prefer-string-starts-ends-with': 'off',
   'unicorn/prefer-string-trim-start-end': 'error',
   'unicorn/prefer-switch': [
     'error',
@@ -296,8 +300,10 @@ export const eslintUnicornRules = {
   'unicorn/no-useless-concat': 'error',
   'unicorn/no-useless-else': 'error',
   'unicorn/no-useless-recursion': 'error',
-  'unicorn/no-useless-template-literals': 'error',
-  'unicorn/prefer-array-from-map': 'error',
+  // Covered by @typescript-eslint/no-unnecessary-template-expression
+  'unicorn/no-useless-template-literals': 'off',
+  // Covered by array-func/from-map (checks more patterns)
+  'unicorn/prefer-array-from-map': 'off',
   'unicorn/prefer-array-last-methods': 'error',
 
   // If you're handling Promises within React.useEffect, it's difficult to convert them to async functions, so this rule is disabled.
@@ -341,7 +347,8 @@ export const eslintUnicornRules = {
   'unicorn/prefer-iterator-concat': 'off',
   'unicorn/prefer-iterator-to-array': 'error',
   'unicorn/prefer-iterator-to-array-at-end': 'error',
-  'unicorn/prefer-math-abs': 'error',
+  // Covered by math/abs
+  'unicorn/prefer-math-abs': 'off',
 
   // This rule is disabled because it would require the container to be directly included in the React hooks dependencies.
   'unicorn/prefer-minimal-ternary': 'off',
@@ -454,7 +461,8 @@ export const eslintUnicornRules = {
    * no fix and no option to leave that part out.
    */
   'unicorn/no-unnecessary-array-flat-map': 'off',
-  'unicorn/no-unnecessary-boolean-comparison': 'error',
+  // Covered by @typescript-eslint/no-unnecessary-boolean-literal-compare
+  'unicorn/no-unnecessary-boolean-comparison': 'off',
   'unicorn/no-unnecessary-default-arguments': 'error',
   'unicorn/no-unnecessary-fetch-options': 'error',
   'unicorn/no-unnecessary-string-trim': 'error',
@@ -468,7 +476,9 @@ export const eslintUnicornRules = {
   // literals as simple.
   'unicorn/no-unreadable-for-of-expression': 'off',
   'unicorn/no-unsafe-promise-all-settled-values': 'error',
-  'unicorn/no-useless-coercion': 'error',
+  // Covered by @typescript-eslint/no-unnecessary-type-conversion (checks more
+  // patterns)
+  'unicorn/no-useless-coercion': 'off',
   'unicorn/no-useless-compound-assignment': 'error',
   'unicorn/no-useless-continue': 'error',
   'unicorn/no-useless-delete-check': 'error',
@@ -520,7 +530,8 @@ export const eslintUnicornRules = {
   'unicorn/prefer-set-methods': 'error',
   'unicorn/prefer-simplified-conditions': withDefaultOption('error'),
   'unicorn/prefer-single-replace': 'error',
-  'unicorn/prefer-then-catch': 'error',
+  // Covered by ts-restrictions/prefer-catch (checks more patterns)
+  'unicorn/prefer-then-catch': 'off',
   'unicorn/prefer-toggle-attribute': 'error',
   'unicorn/prefer-unary-minus': 'error',
   'unicorn/prefer-url-can-parse': 'error',

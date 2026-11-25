@@ -1,3 +1,4 @@
+export * from './fix-docs-url.mjs';
 export * from './fix-schema/index.mjs';
 export * from './generate-rules-type-core.mjs';
 export * from './is-deprecated.mjs';

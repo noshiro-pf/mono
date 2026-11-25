@@ -718,7 +718,7 @@ export const view = <V,>(node: ObservableClass<unknown>): V =>
 type EventSink<A> = Readonly<{
   // A method, whose parameter TypeScript checks in both directions: a property
   // would make `ObservableClass` invariant in `A`.
-  // eslint-disable-next-line @typescript-eslint/method-signature-style, functional/prefer-property-signatures
+  // eslint-disable-next-line @typescript-eslint/method-signature-style
   push(value: A): void;
   waiting: boolean;
   drop: () => void;

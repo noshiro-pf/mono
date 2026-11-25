@@ -152,7 +152,6 @@ export default [
     files: ['configs/**/*', '.markdownlint-cli2.mjs'],
     rules: defineKnownRules({
       'import-x/no-default-export': 'off',
-      'import-x/no-anonymous-default-export': 'off',
     }),
   },
 

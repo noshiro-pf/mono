@@ -34,7 +34,8 @@ export const eslintMathRules = {
   // Covered by unicorn/prefer-number-properties (checks more patterns including global isNaN())
   'math/prefer-number-is-nan': 'off',
 
-  'math/prefer-number-is-safe-integer': 'error',
+  // Covered by unicorn/prefer-number-is-safe-integer (checks more patterns)
+  'math/prefer-number-is-safe-integer': 'off',
   'math/prefer-number-max-safe-integer': 'error',
   'math/prefer-number-max-value': 'error',
   'math/prefer-number-min-safe-integer': 'error',

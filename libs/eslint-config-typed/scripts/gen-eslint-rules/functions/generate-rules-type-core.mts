@@ -29,6 +29,7 @@ import {
   toCapitalCase,
   toStr,
 } from '../utils/index.mjs';
+import { fixDocsUrl } from './fix-docs-url.mjs';
 import {
   addDefaultValuesToDescription,
   convertPatternToEnum,
@@ -215,7 +216,17 @@ export const generateRulesTypeCore = async (
       deprecated: meta?.deprecated ?? false,
       // schemaToPrint: falseToUndefined(meta?.schema) ?? [],
       schemaToPrint: fixedSchema,
-      docs: metaToString(meta),
+      docs: metaToString(
+        meta?.docs === undefined
+          ? meta
+          : {
+              ...meta,
+              docs: {
+                ...meta.docs,
+                url: fixDocsUrl(pluginName, ruleName, meta.docs.url),
+              },
+            },
+      ),
     };
   });
 

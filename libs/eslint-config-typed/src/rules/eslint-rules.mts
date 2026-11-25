@@ -309,7 +309,8 @@ export const eslintRules = {
   camelcase: 'off', // disabled
   'capitalized-comments': 'off', // disabled
   complexity: 'off', // disabled
-  'consistent-this': withDefaultOption('error'),
+  // Names the alias @typescript-eslint/no-this-alias forbids
+  'consistent-this': 'off',
   'default-case-last': 'error',
   'default-case': 'off', // disabled
 

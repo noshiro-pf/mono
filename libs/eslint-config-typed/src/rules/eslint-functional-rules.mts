@@ -50,7 +50,8 @@ export const eslintFunctionalRules = {
       ignoreIdentifierPattern: ignoredMutablePattern,
     },
   ],
-  'functional/prefer-property-signatures': withDefaultOption('error'),
+  // Covered by @typescript-eslint/method-signature-style
+  'functional/prefer-property-signatures': 'off',
   // 'functional/prefer-readonly-type': ['warn', preferReadonlyTypeOptions],
 
   // No Object-Orientation Rules

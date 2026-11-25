@@ -32,7 +32,6 @@ export default [
     files: ['src/plugin/index.mts'],
     rules: defineKnownRules({
       'import-x/no-default-export': 'off',
-      'import-x/no-anonymous-default-export': 'off',
     }),
   },
   {

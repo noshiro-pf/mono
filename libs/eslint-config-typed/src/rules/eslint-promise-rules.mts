@@ -2,7 +2,9 @@ import { withDefaultOption, type EslintPromiseRules } from '../types/index.mjs';
 
 export const eslintPromiseRules = {
   'promise/catch-or-return': ['error', { allowFinally: true }],
-  'promise/no-return-wrap': withDefaultOption('error'),
+  // Covered by unicorn/no-useless-promise-resolve-reject (checks async functions
+  // too)
+  'promise/no-return-wrap': 'off',
   'promise/param-names': withDefaultOption('error'),
   'promise/always-return': 'off',
   'promise/no-native': 'off',
@@ -20,7 +22,8 @@ export const eslintPromiseRules = {
   'promise/valid-params': withDefaultOption('error'),
   'promise/prefer-await-to-then': 'off',
   'promise/prefer-await-to-callbacks': 'off',
-  'promise/no-multiple-resolved': 'error',
+  // Covered by unicorn/no-multiple-promise-resolver-calls (checks more patterns)
+  'promise/no-multiple-resolved': 'off',
   'promise/spec-only': withDefaultOption('error'),
 
   // Off for `ts-restrictions/prefer-catch`, the same rule with its fix only
