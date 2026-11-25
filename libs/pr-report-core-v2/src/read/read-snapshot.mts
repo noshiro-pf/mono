@@ -22,15 +22,21 @@ import type {
   Snapshot,
 } from '../snapshot/index.mjs';
 import { skipped } from './classify.mjs';
+import {
+  readIssueExtrasGraphql,
+  readNumbersGraphql,
+} from './graphql-issues.mjs';
 import { readLinkedClosingIssuesGraphql } from './graphql-merged.mjs';
 import { readPullRequestsGraphql } from './graphql-pull-requests.mjs';
 import { readRepositoryFactsGraphql } from './graphql-repository.mjs';
 import { readHeadChecks } from './rest-checks.mjs';
 import {
   readFollowed,
+  readIssueExtrasRest,
   readMerged,
   readNumbers,
   readOpenIssues,
+  type ReadIssueExtras,
 } from './rest-issues.mjs';
 import { readMovedHeads, readQueueLayers } from './rest-layers.mjs';
 import { readPullRequests } from './rest-pull-requests.mjs';
@@ -71,6 +77,8 @@ export const readSnapshotRest = async (
     repositoryFacts: readRepositoryFacts,
     pullRequests: readPullRequests,
     linkedClosingIssues: undefined,
+    numbers: readNumbers,
+    issueExtras: readIssueExtrasRest,
   });
 
 /** The snapshot with the repository and the pull requests over GraphQL. */
@@ -82,6 +90,8 @@ export const readSnapshotGraphql = async (
     repositoryFacts: readRepositoryFactsGraphql,
     pullRequests: readPullRequestsGraphql,
     linkedClosingIssues: readLinkedClosingIssuesGraphql,
+    numbers: readNumbersGraphql,
+    issueExtras: readIssueExtrasGraphql,
   });
 
 /** The parts the two readers read each their own way. */
@@ -101,6 +111,10 @@ type ReaderParts = Readonly<{
         numbers: readonly number[],
       ) => Promise<Read<ReadonlyMap<number, readonly ClosingIssue[]>>>)
     | undefined;
+  /** What the numbers named are, a `Start-After:` level at a time. */
+  numbers: typeof readNumbers;
+  /** The open issues' comments and blockers. */
+  issueExtras: ReadIssueExtras;
 }>;
 
 /** Numbers named, read as issues or as references. */
@@ -119,6 +133,7 @@ const namedByPullRequest = (pr: PullRequestFacts): readonly number[] =>
   ] as const;
 
 const namedFrom = async (
+  readNumbersOf: ReaderParts['numbers'],
   context: ReadContext,
   viewer: Read<string>,
   numbers: readonly number[],
@@ -131,13 +146,14 @@ const namedFrom = async (
     return Result.ok(found);
   }
 
-  const read = await readNumbers(context, fresh, viewer);
+  const read = await readNumbersOf(context, fresh, viewer);
 
   if (Result.isErr(read)) {
     return read;
   }
 
   return namedFrom(
+    readNumbersOf,
     context,
     viewer,
     Array.from(read.value.issues.values()).flatMap(({ body }) =>
@@ -165,6 +181,7 @@ const namedFrom = async (
  * is followed to its end.
  */
 const readNamed = async (
+  readNumbersOf: ReaderParts['numbers'],
   context: ReadContext,
   viewer: Read<string>,
   read: Readonly<{
@@ -173,6 +190,7 @@ const readNamed = async (
   }>,
 ): Promise<Read<Named>> =>
   namedFrom(
+    readNumbersOf,
     context,
     viewer,
     [
@@ -196,6 +214,7 @@ const readNamed = async (
  * (`readSnapshotRest`); the references stand, an issue never being one.
  */
 const namedOf = async (
+  readNumbersOf: ReaderParts['numbers'],
   context: ReadContext,
   viewer: Read<string>,
   pullRequests: Read<readonly PullRequestFacts[]>,
@@ -203,7 +222,7 @@ const namedOf = async (
 ): Promise<Read<Named>> =>
   Result.isErr(pullRequests)
     ? pullRequests
-    : readNamed(context, viewer, {
+    : readNamed(readNumbersOf, context, viewer, {
         pullRequests: pullRequests.value,
         openIssues: Result.isOk(openIssues) ? openIssues.value.issues : [],
       });
@@ -244,6 +263,7 @@ const readSnapshotWith = async (
   const openIssuesRead = readOpenIssues(current, {
     limit: options.issuesLimit,
     viewer,
+    extras: parts.issueExtras,
   });
 
   const [
@@ -261,7 +281,11 @@ const readSnapshotWith = async (
     // beside the rest.
     Promise.all([pullRequestsRead, openIssuesRead]).then(
       async ([pulls, issues]) =>
-        [pulls, issues, await namedOf(current, viewer, pulls, issues)] as const,
+        [
+          pulls,
+          issues,
+          await namedOf(parts.numbers, current, viewer, pulls, issues),
+        ] as const,
     ),
     readMerged(
       current,

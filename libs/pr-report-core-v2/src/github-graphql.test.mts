@@ -9,7 +9,7 @@
  * names any query in the source that none of them contains.
  */
 
-import { Arr, Json, Result } from 'ts-data-forge';
+import { Json, Result } from 'ts-data-forge';
 import * as t from 'ts-fortress';
 // `tools/` is not a package and has no barrel; it is reached by relative path.
 // eslint-disable-next-line import-x/no-relative-packages, import-x/no-internal-modules
@@ -20,7 +20,9 @@ import {
   DETAILS_QUERY,
   MERGED_HEAD_QUERY,
   PULL_REQUESTS_QUERY,
+  readIssueExtrasGraphql,
   readLinkedClosingIssuesGraphql,
+  readNumbersGraphql,
   recordedTransport,
   REPOSITORY_QUERY,
 } from './read/index.mjs';
@@ -40,15 +42,20 @@ describe('the GraphQL queries', () => {
     );
   });
 
+  test('NamedNumbers and IssueExtras, built per chunk of numbers, are valid against the schema GitHub publishes', async () => {
+    assert.deepStrictEqual(githubGraphqlErrors(await namedNumbersQuery()), []);
+
+    assert.deepStrictEqual(githubGraphqlErrors(await issueExtrasQuery()), []);
+  });
+
   test('include every query written in the source (one they do not belongs in `QUERIES`, or is captured beside it)', async () => {
     assert.deepStrictEqual(
-      queriesNotSent(
-        import.meta.dirname,
-        Arr.toPushed(
-          QUERIES.map(([, query]) => query),
-          await mergedClosingIssuesQuery(),
-        ),
-      ),
+      queriesNotSent(import.meta.dirname, [
+        ...QUERIES.map(([, query]) => query),
+        await mergedClosingIssuesQuery(),
+        await namedNumbersQuery(),
+        await issueExtrasQuery(),
+      ]),
       [],
     );
   });
@@ -74,6 +81,49 @@ const mergedClosingIssuesQuery = async (): Promise<string> => {
   await readLinkedClosingIssuesGraphql(
     { transport, owner: 'noshiro-pf', name: 'mono', token: undefined },
     [1, 2],
+  );
+
+  assert.lengthOf(sent, 1);
+
+  return Result.unwrapThrow(
+    BodySchema.validate(Result.unwrapThrow(Json.parse(sent[0]?.body ?? ''))),
+  ).query;
+};
+
+/**
+ * The query `readNumbersGraphql` sends for two numbers, captured from a
+ * transport that answers nothing.
+ */
+const namedNumbersQuery = async (): Promise<string> => {
+  const { transport, sent } = recordedTransport({});
+
+  await readNumbersGraphql(
+    { transport, owner: 'noshiro-pf', name: 'mono', token: undefined },
+    [1, 2],
+    Result.ok('me'),
+  );
+
+  assert.lengthOf(sent, 1);
+
+  return Result.unwrapThrow(
+    BodySchema.validate(Result.unwrapThrow(Json.parse(sent[0]?.body ?? ''))),
+  ).query;
+};
+
+/**
+ * The query `readIssueExtrasGraphql` sends for two issues, captured from a
+ * transport that answers nothing.
+ */
+const issueExtrasQuery = async (): Promise<string> => {
+  const { transport, sent } = recordedTransport({});
+
+  await readIssueExtrasGraphql(
+    { transport, owner: 'noshiro-pf', name: 'mono', token: undefined },
+    [
+      { number: 1, commentCount: 1, dependencies: undefined },
+      { number: 2, commentCount: 1, dependencies: undefined },
+    ],
+    Result.ok('me'),
   );
 
   assert.lengthOf(sent, 1);

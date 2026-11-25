@@ -5,6 +5,7 @@
 
 import { Arr, Result } from 'ts-data-forge';
 import * as t from 'ts-fortress';
+import type { StrictOmit, StrictPick } from 'ts-type-forge';
 import { closingKeywordIssuesInHtml } from '../conventions/index.mjs';
 import type {
   ClosingIssue,
@@ -38,7 +39,12 @@ import type { ReadContext } from './transport.mjs';
  */
 export const readOpenIssues = async (
   context: ReadContext,
-  options: Readonly<{ limit: number; viewer: Read<string> }>,
+  options: Readonly<{
+    limit: number;
+    viewer: Read<string>;
+    /** How the comments and blockers are read: per issue over REST by default. */
+    extras?: ReadIssueExtras;
+  }>,
 ): Promise<Read<OpenIssues>> => {
   const listed = await restLeadingItems(
     context,
@@ -57,13 +63,21 @@ export const readOpenIssues = async (
       : listed;
   }
 
-  const facts = await Promise.all(
-    listed.value.items.map(async (issue) =>
-      issueFactsOf(context, issue, options.viewer),
-    ),
+  const { items } = listed.value;
+
+  const extras = await (options.extras ?? readIssueExtrasRest)(
+    context,
+    items.map(wantedOf),
+    options.viewer,
   );
 
-  return Result.ok({ issues: facts, complete: listed.value.complete });
+  return Result.ok({
+    issues: Arr.zip(items, extras).map(([issue, extra]) => ({
+      ...ownFactsOf(issue),
+      ...extra,
+    })),
+    complete: listed.value.complete,
+  });
 };
 
 /**
@@ -77,21 +91,19 @@ export const readNumbers = async (
   context: ReadContext,
   numbers: readonly number[],
   viewer: Read<string>,
-): Promise<
-  Read<
-    Readonly<{
-      issues: ReadonlyMap<number, IssueFacts>;
-      references: ReadonlyMap<number, ReferenceFacts>;
-    }>
-  >
-> => {
+): Promise<Read<NumbersRead>> => {
   const read = allRead(
     await Promise.all(
       numbers.map(async (number) => readNumber(context, number, viewer)),
     ),
   );
 
-  return Result.map(read, (facts) => ({
+  return Result.map(read, numbersReadOf);
+};
+
+/** The facts of some numbers, issues apart from references. */
+export const numbersReadOf = (facts: readonly NumberFacts[]): NumbersRead =>
+  ({
     issues: new Map<number, IssueFacts>(
       facts
         .filter((each) => each.kind === 'issue')
@@ -102,8 +114,19 @@ export const readNumbers = async (
         .filter((each) => each.kind !== 'issue')
         .map((reference) => [reference.number, reference] as const),
     ),
-  }));
-};
+  }) as const;
+
+/**
+ * Over REST, two requests an issue at most. An issue with no comments has no
+ * claim, and a thousand issues read that way would spend a request each on
+ * nothing; the rest wait their turn in the context's limit of requests in
+ * flight.
+ */
+export const readIssueExtrasRest: ReadIssueExtras = async (
+  context,
+  wanted,
+  viewer,
+) => Promise.all(wanted.map(async (each) => extrasOf(context, each, viewer)));
 
 /**
  * The pull requests merged most recently, up to `limit` and within `days` of
@@ -296,6 +319,36 @@ export const readBlockedBy = async (
             .map(({ number: blocking }) => blocking),
       );
 
+/** What each number is, as {@link readNumbers} gives it. */
+export type NumbersRead = Readonly<{
+  issues: ReadonlyMap<number, IssueFacts>;
+  references: ReadonlyMap<number, ReferenceFacts>;
+}>;
+
+/** What one number is: an issue, or a reference. */
+export type NumberFacts =
+  Readonly<{ kind: 'issue'; facts: IssueFacts }> | ReferenceFacts;
+
+/** What an issue's facts take beyond its own fields: two more reads. */
+export type IssueExtras = StrictPick<IssueFacts, 'blockedBy' | 'comments'>;
+
+/**
+ * What says whether an issue's extras need reading: an issue with no comments
+ * has no claim, and one whose summary counts no blocker has none.
+ */
+export type ExtrasWanted = Readonly<{
+  number: number;
+  commentCount: number;
+  dependencies: DependenciesSummary | undefined;
+}>;
+
+/** The extras of each of `wanted`, in its order. */
+export type ReadIssueExtras = (
+  context: ReadContext,
+  wanted: readonly ExtrasWanted[],
+  viewer: Read<string>,
+) => Promise<readonly IssueExtras[]>;
+
 /** Over REST, which does not serve the issues GitHub links: none. */
 const noneLinked = (): Promise<
   Read<ReadonlyMap<number, readonly ClosingIssue[]>>
@@ -331,22 +384,11 @@ const readAsPullRequest = async (
   });
 };
 
-const issueFactsOf = async (
-  context: ReadContext,
+/** An issue's own fields, as the issue answers them. */
+const ownFactsOf = (
   issue: IssueJson,
-  viewer: Read<string>,
-): Promise<IssueFacts> => {
-  const [blockedBy, comments] = await Promise.all([
-    readBlockedBy(context, issue.number, issue.issue_dependencies_summary),
-    // An issue with no comments has no claim, and a thousand issues read that
-    // way would spend a request each on nothing. The rest wait their turn in
-    // the context's limit of requests in flight.
-    issue.comments === 0
-      ? Promise.resolve(Result.ok([]))
-      : readOwnComments(context, issue.number, viewer),
-  ]);
-
-  return {
+): StrictOmit<IssueFacts, keyof IssueExtras> =>
+  ({
     number: issue.number,
     state: issue.state.toLowerCase(),
     stateReason: issue.state_reason?.toLowerCase(),
@@ -358,10 +400,40 @@ const issueFactsOf = async (
     createdAt: issue.created_at,
     updatedAt: issue.updated_at,
     commentCount: issue.comments,
-    blockedBy,
-    comments,
-  };
+  }) as const;
+
+const wantedOf = (issue: IssueJson): ExtrasWanted =>
+  ({
+    number: issue.number,
+    commentCount: issue.comments,
+    dependencies: issue.issue_dependencies_summary,
+  }) as const;
+
+/** One issue's extras, two requests at most. */
+const extrasOf = async (
+  context: ReadContext,
+  { number, commentCount, dependencies }: ExtrasWanted,
+  viewer: Read<string>,
+): Promise<IssueExtras> => {
+  const [blockedBy, comments] = await Promise.all([
+    readBlockedBy(context, number, dependencies),
+    commentCount === 0
+      ? Promise.resolve(Result.ok([]))
+      : readOwnComments(context, number, viewer),
+  ]);
+
+  return { blockedBy, comments };
 };
+
+const issueFactsOf = async (
+  context: ReadContext,
+  issue: IssueJson,
+  viewer: Read<string>,
+): Promise<IssueFacts> =>
+  ({
+    ...ownFactsOf(issue),
+    ...(await extrasOf(context, wantedOf(issue), viewer)),
+  }) as const;
 
 const readNumber = async (
   context: ReadContext,
@@ -407,9 +479,6 @@ const readNumber = async (
         merged: pullRequest.merged_at !== null,
       });
 };
-
-type NumberFacts =
-  Readonly<{ kind: 'issue'; facts: IssueFacts }> | ReferenceFacts;
 
 /**
  * How many issues block one, which GitHub sends beside an issue where it keeps

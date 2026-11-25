@@ -37,6 +37,28 @@ export const graphqlRead = async <A,>(
   );
 
 /**
+ * {@link graphqlRead} for a query of aliased lookups under `repository`, each of
+ * which may name nothing: GitHub answers such an alias `null`, with a
+ * `NOT_FOUND` error whose path is `repository` and the alias. Those errors are
+ * the answer, not a failure; any other error fails the read as before.
+ */
+export const graphqlReadAllowingMissing = async <A,>(
+  context: ReadContext,
+  what: string,
+  query: string,
+  variables: ReadonlyRecord<string, number | string | null>,
+  schema: t.Type<A>,
+): Promise<Read<A>> =>
+  graphqlSend(
+    context,
+    what,
+    query,
+    { owner: context.owner, name: context.name, ...variables },
+    schema,
+    isMissingAlias,
+  );
+
+/**
  * One mutation, `variables` alone passed: a variable sent that the operation
  * does not declare is an error to GraphQL. The one way a command writes over
  * GraphQL, so that what a read refuses a write refuses too.
@@ -57,9 +79,25 @@ const GRAPHQL_URL = 'https://api.github.com/graphql';
 const EnvelopeSchema = t.record({
   data: t.optional(t.unknown()),
   errors: t.optional(
-    t.array(t.record({ type: t.optional(t.string()), message: t.string() })),
+    t.array(
+      t.record({
+        type: t.optional(t.string()),
+        message: t.string(),
+        path: t.optional(t.array(t.union([t.string(), t.number()]))),
+      }),
+    ),
   ),
 });
+
+type GraphqlError = NonNullable<
+  t.TypeOf<typeof EnvelopeSchema>['errors']
+>[number];
+
+/** A lookup under `repository` that named nothing (`repository.n3`). */
+const isMissingAlias = ({ type, path }: GraphqlError): boolean =>
+  type === 'NOT_FOUND' && path?.length === 2 && path[0] === 'repository';
+
+const noneAllowed = (): boolean => false;
 
 const graphqlSend = async <A,>(
   context: ReadContext,
@@ -67,6 +105,7 @@ const graphqlSend = async <A,>(
   query: string,
   variables: ReadonlyRecord<string, number | string | null>,
   schema: t.Type<A>,
+  isAnswer: (failure: GraphqlError) => boolean = noneAllowed,
 ): Promise<Read<A>> => {
   const answer = await context.transport({
     method: 'POST',
@@ -107,10 +146,12 @@ const graphqlSend = async <A,>(
 
   const graphqlError = classifyGraphqlErrors(
     what,
-    (envelope.value.errors ?? []).map(({ type, message }) => ({
-      type,
-      message,
-    })),
+    (envelope.value.errors ?? [])
+      .filter((each) => !isAnswer(each))
+      .map(({ type, message }) => ({
+        type,
+        message,
+      })),
   );
 
   if (graphqlError !== undefined) {

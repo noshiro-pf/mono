@@ -8,6 +8,7 @@
  */
 
 import { Result } from 'ts-data-forge';
+import type { ReadonlyRecord } from 'ts-type-forge';
 import type { PullRequestFacts, Snapshot } from '../snapshot/index.mjs';
 import {
   branchTipsNotRead,
@@ -72,9 +73,24 @@ const shared: Routes = {
       },
     ]),
   [`/repos/o/n/compare/main...${HEAD}`]: ok({ ahead_by: 1, behind_by: 0 }),
-  '/repos/o/n/issues?state=open&sort=updated&direction=desc&per_page=100': ok(
-    [],
-  ),
+  // An open issue with comments, one of them this account's.
+  '/repos/o/n/issues?state=open&sort=updated&direction=desc&per_page=100': ok([
+    {
+      number: 8,
+      title: 'claimed',
+      body: 'text',
+      state: 'open',
+      state_reason: null,
+      user: { login: 'author' },
+      html_url: 'https://github.com/o/n/issues/8',
+      repository_url: 'https://api.github.com/repos/o/n',
+      labels: [{ name: 'bug', color: 'd73a4a', description: 'broken' }],
+      created_at: '2026-11-01T00:00:00Z',
+      updated_at: '2026-11-03T00:00:00Z',
+      comments: 2,
+      issue_dependencies_summary: { total_blocked_by: 0 },
+    },
+  ]),
   '/repos/o/n/pulls?state=closed&sort=updated&direction=desc&per_page=100': ok(
     [],
   ),
@@ -86,6 +102,10 @@ const shared: Routes = {
     committer: { date: '2026-11-09T00:00:00Z' },
     parents: [],
   }),
+} as const;
+
+const restRoutes: Routes = {
+  ...shared,
   // What the pull request closes, as an issue named: open, not in the list.
   '/repos/o/n/issues/3': ok({
     number: 3,
@@ -103,10 +123,20 @@ const shared: Routes = {
   }),
   '/repos/o/n/issues/3/dependencies/blocked_by?per_page=100': ok([]),
   '/repos/o/n/issues/3/comments?per_page=100': ok([]),
-} as const;
-
-const restRoutes: Routes = {
-  ...shared,
+  '/repos/o/n/issues/8/comments?per_page=100': ok([
+    {
+      id: 81,
+      body: 'claim',
+      user: { login: 'me' },
+      created_at: '2026-11-02T00:00:00Z',
+    },
+    {
+      id: 82,
+      body: 'other',
+      user: { login: 'someone' },
+      created_at: '2026-11-03T00:00:00Z',
+    },
+  ]),
   '/repos/o/n': ok({ full_name: 'o/n', default_branch: 'main' }),
   '/repos/o/n/git/ref/heads/main': ok({ object: { sha: TIP } }),
   '/user': ok({ login: 'me' }),
@@ -163,8 +193,71 @@ const restRoutes: Routes = {
 
 const pageInfo = { hasNextPage: false, endCursor: null } as const;
 
+const issueNode = (
+  number: number,
+  fields: ReadonlyRecord<string, unknown>,
+): ReadonlyRecord<string, unknown> =>
+  ({
+    __typename: 'Issue',
+    number,
+    body: '',
+    state: 'OPEN',
+    stateReason: null,
+    url: `https://github.com/o/n/issues/${number}`,
+    createdAt: '2026-11-01T00:00:00Z',
+    author: { login: 'author' },
+    repository: { nameWithOwner: 'o/n' },
+    labels: { totalCount: 0, nodes: [] },
+    blockedBy: { totalCount: 0, nodes: [] },
+    comments: { totalCount: 0, nodes: [] },
+    ...fields,
+  }) as const;
+
 const graphqlRoutes: Routes = {
   ...shared,
+  // The open issue's comments, and what the pull request names.
+  'graphql:query IssueExtras(': ok({
+    data: {
+      repository: {
+        n0: issueNode(8, {
+          title: 'claimed',
+          body: 'text',
+          updatedAt: '2026-11-03T00:00:00Z',
+          labels: {
+            totalCount: 1,
+            nodes: [{ name: 'bug', color: 'd73a4a', description: 'broken' }],
+          },
+          comments: {
+            totalCount: 2,
+            nodes: [
+              {
+                databaseId: 81,
+                body: 'claim',
+                createdAt: '2026-11-02T00:00:00Z',
+                viewerDidAuthor: true,
+              },
+              {
+                databaseId: 82,
+                body: 'other',
+                createdAt: '2026-11-03T00:00:00Z',
+                viewerDidAuthor: false,
+              },
+            ],
+          },
+        }),
+      },
+    },
+  }),
+  'graphql:query NamedNumbers(': ok({
+    data: {
+      repository: {
+        n0: issueNode(3, {
+          title: 'a thing',
+          updatedAt: '2026-11-02T00:00:00Z',
+        }),
+      },
+    },
+  }),
   'graphql:query Repository(': ok({
     data: {
       viewer: { login: 'me' },
