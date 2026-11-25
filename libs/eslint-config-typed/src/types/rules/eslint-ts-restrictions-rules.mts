@@ -524,6 +524,22 @@ namespace NoUnnecessaryCoalesceUndefined {
 }
 
 /**
+ * @description Require a Cloud Functions handler to return or await every promise it starts, since the instance may be throttled or reclaimed once the handler returns
+ *
+ *  ```md
+ *  | key        | value   |
+ *  | :--------- | :------ |
+ *  | type       | problem |
+ *  | deprecated | false   |
+ *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
+ */
+namespace NoUnreturnedPromiseInCloudFunction {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
  * @description Replace a redundant arrow wrapper with the function itself (`(a) => f(a)` → `f`) or, when the callee has a curried version, its curried form (`(a) => f(a, ...rest)` → `f(...rest)`).
  *
  *  ```md
@@ -816,6 +832,7 @@ export type EslintTsRestrictionsRules = Readonly<{
   'ts-restrictions/no-string-spread': NoStringSpread.RuleEntry;
   'ts-restrictions/no-unnecessary-array-from': NoUnnecessaryArrayFrom.RuleEntry;
   'ts-restrictions/no-unnecessary-coalesce-undefined': NoUnnecessaryCoalesceUndefined.RuleEntry;
+  'ts-restrictions/no-unreturned-promise-in-cloud-function': NoUnreturnedPromiseInCloudFunction.RuleEntry;
   'ts-restrictions/prefer-curried-call': PreferCurriedCall.RuleEntry;
   'ts-restrictions/prefer-dedent': PreferDedent.RuleEntry;
   'ts-restrictions/prefer-logical-over-boolean-ternary': PreferLogicalOverBooleanTernary.RuleEntry;
