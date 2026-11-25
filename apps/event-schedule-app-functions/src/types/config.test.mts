@@ -1,5 +1,9 @@
 import { logger } from 'firebase-functions/v1';
-import { discordWebhookUrlOf, fillFirebaseConfig } from './config.mjs';
+import {
+  discordWebhookUrlOf,
+  fillFirebaseConfig,
+  mailDeliveryOf,
+} from './config.mjs';
 
 vi.mock(import('firebase-functions/v1'), async (importOriginal) => {
   const original = await importOriginal();
@@ -100,5 +104,32 @@ describe(discordWebhookUrlOf, () => {
     );
 
     assert.deepStrictEqual(fillFirebaseConfig(config).gmail, gmail);
+  });
+});
+
+describe(mailDeliveryOf, () => {
+  test('is "log" for `"mail-delivery": "log"`, which the emulator\'s dummy secret says', () => {
+    assert.strictEqual(
+      mailDeliveryOf({ gmail, 'mail-delivery': 'log' }),
+      'log',
+    );
+  });
+
+  test('is "smtp" for a missing key, another value, or a secret that is not an object', () => {
+    assert.strictEqual(mailDeliveryOf({ gmail }), 'smtp');
+
+    assert.strictEqual(
+      mailDeliveryOf({ gmail, 'mail-delivery': 'LOG' }),
+      'smtp',
+    );
+
+    assert.strictEqual(
+      mailDeliveryOf({ gmail, 'mail-delivery': true }),
+      'smtp',
+    );
+
+    assert.strictEqual(mailDeliveryOf('log'), 'smtp');
+
+    assert.strictEqual(mailDeliveryOf(undefined), 'smtp');
   });
 });

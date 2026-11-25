@@ -31,9 +31,26 @@ vi.mock(import('./env.mjs'), async (importOriginal) => ({
   getFirebaseConfig: vi.fn(),
 }));
 
+/**
+ * The mail sessions the runs opened, and how many are open, which a test reads
+ * from inside a send.
+ */
+const sessions = vi.hoisted(() => ({ mut_opened: 0, mut_open: 0 }));
+
 vi.mock(import('./setup-mailer.mjs'), async (importOriginal) => ({
   ...(await importOriginal()),
   sendEmail: vi.fn(() => Promise.resolve()),
+  withMailSession: async <A,>(run: () => Promise<A>): Promise<A> => {
+    sessions.mut_opened += 1;
+
+    sessions.mut_open += 1;
+
+    try {
+      return await run();
+    } finally {
+      sessions.mut_open -= 1;
+    }
+  },
 }));
 
 type FakeSnapshot = Readonly<{ data: () => DocumentData | undefined }>;
@@ -401,6 +418,30 @@ describe(notifyAfterAnswerDeadline, () => {
     ]);
 
     assert.isTrue(mut_docs.has(markPath('e1')));
+  });
+
+  test('sends the closing mails of a run in one mail session', async () => {
+    const { db } = createFakeFirestore({
+      ...oneEvent(),
+      [eventPath('e2')]: eventClosingAt(deadlineAt(23, 5)),
+      [emailPath('e2')]: { email: 'other@example.com' },
+    });
+
+    sessions.mut_opened = 0;
+
+    const mut_inSession: boolean[] = [];
+
+    vi.mocked(sendEmail).mockImplementation(() => {
+      mut_inSession.push(sessions.mut_open > 0);
+
+      return Promise.resolve();
+    });
+
+    await notifyAfterAnswerDeadline(db, at('01T23:10'));
+
+    assert.strictEqual(sessions.mut_opened, 1);
+
+    assert.deepStrictEqual(mut_inSession, [true, true]);
   });
 
   test('a failed send for a moved deadline leaves no mark, not the earlier one', async () => {

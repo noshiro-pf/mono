@@ -71,3 +71,16 @@ export const discordWebhookUrlOf = (config: unknown): string => {
 
   return config.discord['error-report-webhook-url'];
 };
+
+/**
+ * How mail leaves: `'log'` when the secret says `"mail-delivery": "log"`, which
+ * the dummy `.secret.local` the build writes for the emulator does, and
+ * `'smtp'` otherwise. Read apart from {@link fillFirebaseConfig}, like
+ * `discord`, so that the production secret needs no new key.
+ */
+export const mailDeliveryOf = (config: unknown): 'log' | 'smtp' =>
+  isRecord(config) &&
+  hasKey(config, 'mail-delivery') &&
+  config['mail-delivery'] === 'log'
+    ? 'log'
+    : 'smtp';
