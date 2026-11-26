@@ -1,6 +1,6 @@
 import type { IsNotFixedLengthList } from '../condition/index.mjs';
 import type { UnknownRecord } from '../constants/index.mjs';
-import type { ToNumber } from '../others/index.mjs';
+import type { ReadonlyRecord, ToNumber } from '../others/index.mjs';
 import type { IndexOfTuple, Tuple } from '../tuple-and-list/index.mjs';
 
 /**
@@ -142,7 +142,10 @@ export type RecordUpdated<
  * @template Path - The path to the value (from `Paths<R>`).
  * @returns The type of the value at the specified path. Returns `R` if `Path` is `[]`.
  * Includes `undefined` when the path goes through an optional or nullable property,
- * or through a member of a union that does not have the rest of the path.
+ * through a member of a union that does not have the rest of the path, or through
+ * a step that may read nothing: an index into an array that is not a fixed-length
+ * tuple, or a key an index signature admits (a `string` or a template-literal
+ * pattern key). A fixed-length tuple's literal index and a declared key do not.
  * @example
  * ```ts
  * type Data = { a: { b: [string, boolean] } };
@@ -158,11 +161,10 @@ export type RecordValueAtPath<
   ? // A union R is read one member at a time, as RecordPaths lists its paths
     R extends undefined | null
     ? undefined // A nullish parent holds nothing
-    : // A member with an index signature, or an array, has every key it admits,
-      // so it adds its element type, not `undefined`, though the entry may be missing.
-      Head extends keyof R // Does this member have the head key/index?
+    : Head extends keyof R // Does this member have the head key/index?
       ? Rest extends RecordPaths<R[Head]> // Does the nested value have the rest of the path?
-        ? RecordValueAtPath<R[Head], Rest> // Recurse into the nested value
+        ? // Recurse into the nested value; a step that may read nothing adds `undefined`
+          RecordValueAtPath<R[Head], Rest> | UndefinedIfMayBeMissing<R, Head>
         : undefined // Another member of a union has the path; this one holds nothing there
       : undefined // Another member of a union has the key; this one holds nothing there
   : R; // Base case: empty path returns the current record/value R
@@ -173,9 +175,12 @@ export type RecordValueAtPath<
  * @template R - The record or array type.
  * @template Path - The path to the value (from `PathsWithIndex<R>`).
  * @returns The type of the value at the specified path. Returns `R` if `Path` is `[]`.
- * Includes `undefined` when the last path element is the type `number` or `string`,
- * when the path goes through an optional or nullable property, or through a member
- * of a union that does not have the rest of the path.
+ * Includes `undefined` when the path goes through an optional or nullable property,
+ * through a member of a union that does not have the rest of the path, or through
+ * a step that may read nothing, wherever it is in the path: an index (`number` or
+ * a literal) into an array that is not a fixed-length tuple, `number` into a
+ * tuple, or a key an index signature admits (`string` or a template-literal
+ * pattern key). A fixed-length tuple's literal index and a declared key do not.
  * @example
  * ```ts
  * type Data = { a: { b: string[]; c: number } };
@@ -187,7 +192,19 @@ export type RecordValueAtPath<
 export type RecordValueAtPathWithIndex<
   R,
   Path extends RecordPathsWithIndex<R>,
-> = RecordValueAtPathWithIndexImpl<R, Path, never>;
+> = Path extends readonly [infer Head, ...infer Rest] // Deconstruct the path
+  ? // The walk of `RecordValueAtPath`, over `RecordPathsWithIndex`
+    // A union R is read one member at a time, as RecordPathsWithIndex lists its paths
+    R extends undefined | null
+    ? undefined // A nullish parent holds nothing
+    : Head extends keyof R // Does this member have the head key/index?
+      ? Rest extends RecordPathsWithIndex<R[Head]> // Does the nested value have the rest of the path?
+        ? // Recurse into the nested value; a step that may read nothing adds `undefined`
+          | RecordValueAtPathWithIndex<R[Head], Rest>
+          | UndefinedIfMayBeMissing<R, Head>
+        : undefined // Another member of a union has the path; this one holds nothing there
+      : undefined // Another member of a union has the key; this one holds nothing there
+  : R; // Base case: empty path returns the current record/value R
 
 /**
  * @internal Attaches the value type found at a specific `Path` within `R` to the path itself.
@@ -290,10 +307,8 @@ type RecordUpdatedImplRecordCase<
             ? RecordUpdated<R[Head], Rest, ValueAfter> // Recurse to update the nested value
             : R[Key]; // Otherwise, keep the original value type
         }
-      : never // Invalid rest path
-    : // A member of a union R without the head key is dropped here, not kept
-      // unchanged, so the result lacks the members the path does not reach.
-      never
+      : R // A member of a union the rest of the path does not reach is kept unchanged
+    : R // A member of a union without the head key is kept unchanged
   : never; // Path should not be empty here (handled in RecordUpdated)
 
 /**
@@ -317,38 +332,35 @@ type RecordUpdatedImplTupleCase<
   : never; // Path should not be empty here (handled in RecordUpdated)
 
 /**
- * @internal Recursive implementation helper for `RecordValueAtPathWithIndex`.
- * Tracks the last path element to determine if `undefined` should be added for a `number` or `string` index.
- * @template R - The current record/value being traversed.
- * @template Path - The remaining path.
- * @template LastPathElement - The previous path element processed (key or index).
- * @returns The type of the value, potentially including `undefined`.
+ * @internal `undefined` when reading `Key` of `R` may find nothing there, and
+ * `never` otherwise. An array that is not a fixed-length tuple may be shorter
+ * than any index, and `number` may be past the end of a tuple. Of a record, a
+ * key admitted only by an index signature (`string`, `number`, or a pattern such
+ * as `` `k${string}` ``) may be absent, while a declared key is there (an
+ * optional one already has `undefined` in its value type).
  */
-type RecordValueAtPathWithIndexImpl<
-  R,
-  Path extends RecordPathsWithIndex<R>,
-  LastPathElement,
-> = Path extends readonly [infer Head, ...infer Rest] // Deconstruct the path
-  ? // The same walk as `RecordValueAtPath`, over `RecordPathsWithIndex` and with
-    // `LastPathElement`; merging the two is left to the fix of the index limit below.
-    // A union R is read one member at a time, as RecordPathsWithIndex lists its paths
-    R extends undefined | null
-    ? undefined // A nullish parent holds nothing
-    : Head extends keyof R // Does this member have the head key/index?
-      ? Rest extends RecordPathsWithIndex<R[Head]> // Does the nested value have the rest of the path?
-        ? // Recurse, passing the nested value, rest of path, and current head as the new LastPathElement
-          RecordValueAtPathWithIndexImpl<R[Head], Rest, Head>
-        : undefined // Another member of a union has the path; this one holds nothing there
-      : undefined // Another member of a union has the key; this one holds nothing there
-  : // Base case: Path is empty, determine return type based on LastPathElement.
-    // Only a last element of the type `number` or `string` adds `undefined`: a
-    // literal index into an array (`0` for a `string[]`) or an index earlier in the
-    // path (`['a', number, 'x']`) does not, though the element it reads may be missing.
-    number extends LastPathElement // Was the last step accessing an array with `number` index?
-    ? R | undefined // Yes, the value might be undefined at runtime
-    : string extends LastPathElement // Was the last step accessing via `string` index signature?
-      ? R | undefined // Yes, the value might be undefined
-      : R; // No, it was a specific key/index, return the value type R
+type UndefinedIfMayBeMissing<R, Key> = R extends readonly unknown[]
+  ? number extends R['length']
+    ? undefined
+    : number extends Key
+      ? undefined
+      : never
+  : Key extends DeclaredKeys<R>
+    ? never
+    : undefined;
+
+/**
+ * @internal The keys `R` declares, without those its index signatures admit. A
+ * key `K` is an index signature's when an object holding no key satisfies
+ * `ReadonlyRecord<K, unknown>`; the object here is a type literal with one
+ * optional `never` property, which an index signature admits and which lacks
+ * any declared key a record requires.
+ */
+type DeclaredKeys<R> = keyof {
+  [K in keyof R as NoKey extends ReadonlyRecord<K, unknown> ? never : K]: R[K];
+};
+
+type NoKey = Readonly<{ noKey?: never }>;
 
 /**
  * @internal Exported (with the internals prefix, so it is excluded from the

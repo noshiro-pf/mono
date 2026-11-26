@@ -763,4 +763,86 @@ expectType<TSTypeForgeInternals_RecordPathPrefixes<[]>, readonly []>('=');
     | readonly [readonly ['u', 'k'], 1 | 2]
     | readonly [readonly ['u', 'z'], 3 | undefined]
   >('=');
+
+  // An index anywhere in the path, not only the last, reads an element or entry
+  // that may be missing.
+  expectType<
+    RecordValueAtPathWithIndex<
+      Readonly<{ a: readonly Readonly<{ x: 1 }>[] }>,
+      readonly ['a', number, 'x']
+    >,
+    1 | undefined
+  >('=');
+
+  expectType<
+    RecordValueAtPathWithIndex<
+      Readonly<Record<string, Readonly<{ x: 1 }>>>,
+      readonly [string, 'x']
+    >,
+    1 | undefined
+  >('=');
+
+  // A literal index into an array that is not a tuple.
+  expectType<
+    RecordValueAtPathWithIndex<
+      Readonly<{ a: Readonly<{ b: readonly string[] }> }>,
+      readonly ['a', 'b', 0]
+    >,
+    string | undefined
+  >('=');
+
+  // A template-literal index signature.
+  expectType<
+    RecordValueAtPathWithIndex<
+      Readonly<{ r: Readonly<Record<`k${string}`, 1>> }>,
+      readonly ['r', `k${string}`]
+    >,
+    1 | undefined
+  >('=');
+
+  // A fixed-length tuple's literal index reads an element that is there.
+  expectType<
+    RecordValueAtPathWithIndex<
+      Readonly<{ t: readonly [string, boolean] }>,
+      readonly ['t', 0]
+    >,
+    string
+  >('=');
+
+  // A union member with an index signature or an array reads a key it admits but
+  // may not hold.
+  expectType<
+    RecordValueAtPath<
+      Readonly<{ u: Readonly<Record<string, 1>> | Readonly<{ z: 3 }> }>,
+      readonly ['u', 'z']
+    >,
+    1 | 3 | undefined
+  >('=');
+
+  expectType<
+    RecordValueAtPath<
+      Readonly<{ u: readonly number[] | readonly [1] }>,
+      readonly ['u', 0]
+    >,
+    number | undefined
+  >('=');
+
+  // `RecordUpdated` keeps a member of a union the path does not reach.
+  expectType<
+    RecordUpdated<
+      Readonly<{ u: Readonly<{ k: 1 }> | Readonly<{ k: 2; z: 3 }> }>,
+      readonly ['u', 'z'],
+      9
+    >['u'],
+    Readonly<{ k: 1 }> | Readonly<{ k: 2; z: 9 }>
+  >('=');
+
+  expectType<
+    RecordUpdated<
+      Readonly<{ u: Readonly<{ k: 1 }> | Readonly<{ k: Readonly<{ x: 2 }> }> }>,
+      readonly ['u', 'k', 'x'],
+      9
+    >['u'],
+    Readonly<{ k: 1 }> | Readonly<{ k: Readonly<{ x: 9 }> }>
+  >('=');
 }
