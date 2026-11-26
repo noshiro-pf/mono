@@ -44,6 +44,7 @@ import {
   type PackageInfo,
   type Step,
 } from './plan.mjs';
+import { findProfileDateNotes } from './profile-date.mjs';
 import { readRootProgramReads } from './root-program.mjs';
 import { findRulesTestNotes } from './rules-tests.mjs';
 
@@ -170,6 +171,7 @@ const main = async (): Promise<number> => {
         ] as const)
       : ([] as const)),
     ...findRulesTestNotes(changedFiles, packages),
+    ...findProfileDateNotes(changedFiles),
   ] as const;
 
   const env = stepEnvironment(base);
