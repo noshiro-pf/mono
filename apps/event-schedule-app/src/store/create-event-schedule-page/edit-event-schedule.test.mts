@@ -276,6 +276,28 @@ describe(createEditEventScheduleStore, () => {
     );
   });
 
+  test('keeps the time zone offset the database has, whatever zone the editor is in', async () => {
+    const { store, saved } = setup();
+
+    store.setEventSchedule(madeElsewhere, undefined);
+
+    // Nothing was touched yet: the editor's zone alone is not a change.
+    assert.isTrue(Optional.unwrap(store.hasNoChanges$.getSnapshot()));
+
+    assert.isUndefined(
+      Optional.unwrap(store.diff$.getSnapshot()).timezoneOffsetMinutes,
+    );
+
+    store.commonStateHandlers.setTitle('renamed');
+
+    await store.onEditEventClickPromise();
+
+    assert.deepStrictEqual(
+      saved.map((ev) => ev.timezoneOffsetMinutes),
+      [madeElsewhere.timezoneOffsetMinutes],
+    );
+  });
+
   test('the back button goes to the answer page', () => {
     const { store, browser } = setup();
 
@@ -318,6 +340,12 @@ const fromDatabase: EventSchedule = EventSchedule.fill({
   timezoneOffsetMinutes: DateUtils.today().getTimezoneOffset(),
 });
 
+/** The same event, made an hour away from where the test runs. */
+const madeElsewhere: EventSchedule = EventSchedule.fill({
+  ...fromDatabase,
+  timezoneOffsetMinutes: fromDatabase.timezoneOffsetMinutes + 60,
+});
+
 const withNotifications: EventSchedule = EventSchedule.fill({
   ...fromDatabase,
   notificationSettings: NotificationSettings.fill({
@@ -336,6 +364,8 @@ type Setup = Readonly<{
   browser: ReturnType<typeof createMemoryBrowser>;
   router: AppRouter;
   toasts: Readonly<{ count: number }>;
+  /** Each event `update` was given, in order. */
+  saved: readonly EventSchedule[];
 }>;
 
 /** A toaster that only counts what it is asked to show. */
@@ -363,6 +393,8 @@ const setup = (
 
   const mut_toasts = { count: 0 };
 
+  const mut_saved: EventSchedule[] = [];
+
   const router = createAppRouter(browser);
 
   const store = createEditEventScheduleStore({
@@ -370,6 +402,8 @@ const setup = (
       event: {
         update: (eventId, ev) => {
           mut_calls.push(`update ${eventId} ${ev.title} ${ev.author.name}`);
+
+          mut_saved.push(ev);
 
           return Promise.resolve(
             options?.updateFails === true
@@ -415,6 +449,7 @@ const setup = (
     browser,
     router,
     toasts: mut_toasts,
+    saved: mut_saved,
   } as const;
 };
 
