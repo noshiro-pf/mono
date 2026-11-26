@@ -300,19 +300,20 @@ const calculateSalaryMonth = (
 
   const residentTax = residentTaxFrom(grossAfterIdecoAt(salary, month - 12));
 
-  // 賞与には、月給の無い行のものにも健康保険料・厚生年金保険料を掛け、老齢
-  // 厚生年金もその賞与を数える。月給の無い月は被保険者でないが、賞与だけを
-  // 外すと年金の側と食い違うので、両方そろえて直すまでこのままにする。
   const bonus =
     monthOf(month) === 1 && salary.isEmployed(month)
       ? (salary.entryAt(month)?.annualBonus ?? 0)
       : 0;
 
-  const bonusHealthInsurance = bonusHealthInsurancePremium(bonus);
+  // 月給の無い月は被保険者でないので、その月の賞与には保険料をかけない。老齢
+  // 厚生年金も、月給の無い行の賞与を数えない（`remunerationAtAge`）。
+  const insuredBonus = salary.joinedAt(month) === undefined ? 0 : bonus;
 
-  const bonusWelfarePension = bonusWelfarePensionPremium(bonus);
+  const bonusHealthInsurance = bonusHealthInsurancePremium(insuredBonus);
 
-  const bonusEmploymentInsurance = employmentInsurancePremium(bonus);
+  const bonusWelfarePension = bonusWelfarePensionPremium(insuredBonus);
+
+  const bonusEmploymentInsurance = employmentInsurancePremium(insuredBonus);
 
   const previous = socialInsuranceAt(salary, month - 1);
 

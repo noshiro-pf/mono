@@ -148,7 +148,7 @@ export type PensionByStartAge = Readonly<{
 /**
  * 満 `age` 歳の時点で適用されている年収の推移の行から、報酬比例部分に数える
  * 年額（無ければ 0）: 保険料がかかるのと同じく、上限で頭打ちにした月給の
- * 12 か月分と標準賞与額。
+ * 12 か月分と標準賞与額。月給の無い行は被保険者でないので、賞与があっても 0。
  */
 const remunerationAtAge = (
   history: readonly ResolvedSalaryEntry[],
@@ -165,7 +165,7 @@ const remunerationAtAge = (
     mut_entry = entry;
   }
 
-  return mut_entry === undefined
+  return mut_entry === undefined || mut_entry.monthlyGross <= 0
     ? 0
     : Math.min(mut_entry.monthlyGross, welfarePensionMaxStandardRemuneration) *
         12 +

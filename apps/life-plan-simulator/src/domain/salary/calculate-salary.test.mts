@@ -388,6 +388,35 @@ describe(calculateSalary, () => {
   });
 });
 
+describe('月給の無い行の賞与', () => {
+  const [january] = calculateSalary(
+    {
+      history: salaryFrom('2025-01', 0, 600_000),
+      retirementMonth: ym('2030-12'),
+    },
+    [ym('2027-01')],
+  );
+
+  test('賞与は払われること', () => {
+    assert.strictEqual(january?.bonus, 600_000);
+  });
+
+  test('被保険者でないので、賞与に社会保険料・雇用保険料をかけないこと', () => {
+    assert.strictEqual(january?.bonusHealthInsurance, 0);
+
+    assert.strictEqual(january?.bonusWelfarePension, 0);
+
+    assert.strictEqual(january?.bonusEmploymentInsurance, 0);
+  });
+
+  test('手取りは賞与から源泉徴収税額だけを引いたものであること', () => {
+    assert.strictEqual(
+      january?.bonusNet,
+      600_000 - (january?.bonusIncomeTax ?? 0),
+    );
+  });
+});
+
 describe(resolveSalaryHistory, () => {
   test('月収（額面）は年収 / 12 - 企業型 DC の掛金であること', () => {
     const [entry] = resolveSalaryHistory(
