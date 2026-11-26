@@ -9,7 +9,7 @@ import {
   type InitializedObservable,
   type Subscription,
 } from 'synstate';
-import { Result } from 'ts-data-forge';
+import { Result, unknownToString } from 'ts-data-forge';
 import type { Api } from '../../api/index.mjs';
 
 export type EventScheduleDeps = Readonly<{
@@ -117,7 +117,23 @@ export const createEventScheduleStore = (
 
               setLastRead({ eventId, result });
             })
-            .catch(() => {});
+            .catch((error: unknown) => {
+              // The read threw, or a subscriber did while its answer was taken:
+              // logged, and taken as a failed read.
+              console.error('eventScheduleResult', error);
+
+              if (mut_run.stopped || request !== mut_run.latest) {
+                return;
+              }
+
+              setLastRead({
+                eventId,
+                result: Result.err({
+                  type: 'others',
+                  message: unknownToString(error),
+                }),
+              });
+            });
         }),
       result$.subscribe((e) => {
         if (e !== undefined && Result.isErr(e)) {

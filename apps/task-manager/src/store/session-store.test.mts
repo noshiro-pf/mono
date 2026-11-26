@@ -99,7 +99,9 @@ describe(createSessionStore, () => {
       signingIn: true,
     });
 
-    await failed.catch(() => {});
+    // Waited for so that the store has taken the rejection, which the test
+    // reads from the store, not from here.
+    await failed.catch(() => undefined);
 
     await Promise.resolve();
 

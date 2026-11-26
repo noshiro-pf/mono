@@ -224,7 +224,11 @@ export const EventListPage = (): JSX.Element => {
                                     const u = user();
 
                                     if (u !== undefined) {
-                                      handler(eventId, u).catch(() => {});
+                                      handler(eventId, u).catch(
+                                        (error: unknown) => {
+                                          console.error(error);
+                                        },
+                                      );
                                     }
                                   };
 

@@ -15,6 +15,7 @@ export const eslintTsRestrictionsRules = {
   'ts-restrictions/no-date-only-string-to-date': withDefaultOption('error'),
   'ts-restrictions/no-negated-comparison': 'error',
   'ts-restrictions/no-detached-jsdoc': 'error',
+  'ts-restrictions/no-empty-rejection-handler': 'error',
   'ts-restrictions/no-optional-phantom-property': 'error',
   'ts-restrictions/no-export-type-side-effects': 'error',
   'ts-restrictions/no-ragged-comment-wrap': withDefaultOption('error'),

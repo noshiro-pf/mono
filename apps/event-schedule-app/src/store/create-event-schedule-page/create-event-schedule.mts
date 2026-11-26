@@ -292,7 +292,9 @@ export const createCreateEventScheduleStore = (
           intent: 'danger',
         });
       })
-      .catch(() => {});
+      .catch((error: unknown) => {
+        console.error(error);
+      });
   };
 
   const onClipboardButtonClick = (): void => {

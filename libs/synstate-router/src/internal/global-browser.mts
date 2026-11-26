@@ -66,7 +66,11 @@ export const globalBrowser = (): RouterBrowser =>
           Reflect.apply(catchReady, ready, [() => {}]);
         }
       } else {
-        update().catch(() => {});
+        // Logged, as the view transition above reports an update that throws as
+        // an unhandled rejection.
+        update().catch((error: unknown) => {
+          console.error(error);
+        });
       }
     },
     afterRender: (callback) => {
