@@ -1,6 +1,9 @@
 import parser from '@typescript-eslint/parser';
 import { RuleTester } from '@typescript-eslint/rule-tester';
 import dedent from 'dedent';
+// The rules record itself, which the plugin's barrel does not export.
+// eslint-disable-next-line import-x/no-internal-modules
+import { totalFunctionsRules } from '../../total-functions/rules/index.mjs';
 import { tsRestrictionsRules } from './rules.mjs';
 
 const tester = new RuleTester({
@@ -67,6 +70,50 @@ describe('the ids of the rules that moved to ts-ui-restrictions', () => {
           `,
           options: [{ keys: ['Enter'] }],
           errors: [{ messageId: 'missingImeGuard' }],
+        },
+      ],
+    },
+  );
+});
+
+describe('the id of the rule that moved from total-functions', () => {
+  test('total-functions/no-hidden-type-assertions is deprecated in favor of its new id, which the preset leaves off', () => {
+    assert.deepStrictEqual(
+      totalFunctionsRules['no-hidden-type-assertions'].meta.deprecated,
+      {
+        message:
+          'Moved to `eslint-plugin-ts-restrictions` as `ts-restrictions/no-hidden-type-assertions`.',
+        replacedBy: [
+          {
+            plugin: { name: 'eslint-plugin-ts-restrictions' },
+            rule: { name: 'no-hidden-type-assertions' },
+          },
+        ],
+        availableUntil: '8.0.0',
+      },
+    );
+  });
+
+  // A config that still turns the old id on keeps the rule running as it did.
+  tester.run(
+    'no-hidden-type-assertions',
+    totalFunctionsRules['no-hidden-type-assertions'],
+    {
+      valid: [
+        {
+          code: dedent`
+            declare const f: <A = unknown>() => A;
+            export const a = f();
+          `,
+        },
+      ],
+      invalid: [
+        {
+          code: dedent`
+            declare const f: <A>() => A;
+            export const a = f<string>();
+          `,
+          errors: [{ messageId: 'errorStringGeneric' }],
         },
       ],
     },

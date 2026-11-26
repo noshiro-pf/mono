@@ -7,6 +7,7 @@ import { noDateOnlyStringToDate } from './no-date-only-string-to-date.mjs';
 import { noDetachedJsdoc } from './no-detached-jsdoc.mjs';
 import { noEmptyRejectionHandler } from './no-empty-rejection-handler.mjs';
 import { noExportTypeSideEffects } from './no-export-type-side-effects.mjs';
+import { noHiddenTypeAssertions } from './no-hidden-type-assertions.mjs';
 import { noNegatedComparison } from './no-negated-comparison.mjs';
 import { noOptionalPhantomProperty } from './no-optional-phantom-property.mjs';
 import { noRaggedCommentWrap } from './no-ragged-comment-wrap.mjs';
@@ -35,6 +36,7 @@ export const tsRestrictionsRules = {
   'no-detached-jsdoc': noDetachedJsdoc,
   'no-empty-rejection-handler': noEmptyRejectionHandler,
   'no-export-type-side-effects': noExportTypeSideEffects,
+  'no-hidden-type-assertions': noHiddenTypeAssertions,
   'no-negated-comparison': noNegatedComparison,
   'no-optional-phantom-property': noOptionalPhantomProperty,
   'no-ragged-comment-wrap': noRaggedCommentWrap,

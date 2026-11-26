@@ -18,5 +18,7 @@ export const eslintTotalFunctionsRules = {
   'total-functions/no-partial-array-reduce': 'error',
 
   'total-functions/no-nested-fp-ts-effects': 'off',
-  'total-functions/no-hidden-type-assertions': 'off',
+  // Moved to `ts-restrictions/no-hidden-type-assertions`; deprecated, and
+  // removed at the next major (NEXT_MAJOR.md).
+  'total-functions/no-hidden-type-assertions': 0,
 } as const satisfies EslintTotalFunctionsRules;

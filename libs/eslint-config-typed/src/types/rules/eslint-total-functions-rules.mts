@@ -20,19 +20,18 @@ namespace NoEnums {
 
 /**
  * @description Bans hidden type assertions.
- * @link https://github.com/danielnixon/eslint-plugin-total-functions
  *
  *  ```md
  *  | key        | value   |
  *  | :--------- | :------ |
  *  | type       | problem |
- *  | deprecated | false   |
+ *  | deprecated | true    |
  *  ```
  *
  * @internal Reached by indexing the rules record by the rule's name.
  */
 namespace NoHiddenTypeAssertions {
-  export type RuleEntry = Linter.StringSeverity;
+  export type RuleEntry = 0;
 }
 
 /**
@@ -207,7 +206,6 @@ namespace RequireStrictMode {
 
 export type EslintTotalFunctionsRules = Readonly<{
   'total-functions/no-enums': NoEnums.RuleEntry;
-  'total-functions/no-hidden-type-assertions': NoHiddenTypeAssertions.RuleEntry;
   'total-functions/no-nested-fp-ts-effects': NoNestedFpTsEffects.RuleEntry;
   'total-functions/no-partial-array-reduce': NoPartialArrayReduce.RuleEntry;
   'total-functions/no-partial-division': NoPartialDivision.RuleEntry;
@@ -218,4 +216,7 @@ export type EslintTotalFunctionsRules = Readonly<{
   'total-functions/no-unsafe-readonly-mutable-assignment': NoUnsafeReadonlyMutableAssignment.RuleEntry;
   'total-functions/no-unsafe-type-assertion': NoUnsafeTypeAssertion.RuleEntry;
   'total-functions/require-strict-mode': RequireStrictMode.RuleEntry;
+
+  // deprecated
+  'total-functions/no-hidden-type-assertions': NoHiddenTypeAssertions.RuleEntry;
 }>;

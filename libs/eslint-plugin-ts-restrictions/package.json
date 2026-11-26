@@ -56,6 +56,7 @@
   },
   "dependencies": {
     "@types/micromatch": "^4.0.10",
+    "@typescript-eslint/type-utils": "^8.72.0",
     "@typescript-eslint/utils": "^8.72.0",
     "editorconfig-without-wasm": "^0.0.7",
     "eslint-rule-forge": "workspace:^",

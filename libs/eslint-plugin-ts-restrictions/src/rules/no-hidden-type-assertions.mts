@@ -30,21 +30,19 @@ import {
   SyntaxKind,
   TypeFlags,
   type Expression,
-  type Node,
   type Signature,
   type SignatureDeclaration,
+  type Node as TsNode,
   type Symbol as TsSymbol,
   type Type,
   type TypeChecker,
   type TypeNode,
   type TypeParameterDeclaration,
 } from 'typescript';
-import { createRule } from './common.mjs';
 
 /** An ESLint rule to ban hidden type assertions. */
 
-export const noHiddenTypeAssertions = createRule({
-  name: 'no-hidden-type-assertions',
+export const noHiddenTypeAssertions = ESLintUtils.RuleCreator.withoutDocs({
   meta: {
     type: 'problem',
     docs: {
@@ -109,7 +107,7 @@ export const noHiddenTypeAssertions = createRule({
      * recursion is only as deep as it is nested.
      */
     const useOfTypeParameter = (
-      node: Node,
+      node: TsNode,
       typeParameter: TsSymbol,
       side: 'parameter' | 'return',
     ): TypeParameterUse => {
@@ -191,7 +189,7 @@ export const noHiddenTypeAssertions = createRule({
     };
 
     /** Whether `name` is the standard library's `NoInfer`. */
-    const isNoInfer = (name: Node): boolean =>
+    const isNoInfer = (name: TsNode): boolean =>
       isIdentifier(name) &&
       name.text === 'NoInfer' &&
       (checker
@@ -302,7 +300,7 @@ export const noHiddenTypeAssertions = createRule({
     const mentionsType = (
       type: Type,
       target: Type,
-      location: Node,
+      location: TsNode,
       depth: number,
     ): boolean => {
       if (type === target || depth > maxMentionDepth) {
