@@ -801,7 +801,7 @@ JSX に直接コールバック関数を書くのを禁止します。 render �
 
 以下の設定で関数の記述方法をアロー関数に統一し、 `return` 文も自動修正で可能な限り無くすことができます。
 
-- [`func-style`](https://eslint.org/docs/latest/rules/func-style)（★★★）
+- [`func-style`](https://eslint.org/docs/latest/rules/func-style)（★★★ → 現在は off。下の追記参照）
 - [`prefer-arrow-functions`](https://www.npmjs.com/package/eslint-plugin-prefer-arrow-functions)（★★★）
 - [`arrow-body-style`](https://eslint.org/docs/latest/rules/arrow-body-style)（★）
 
@@ -820,7 +820,6 @@ JSX に直接コールバック関数を書くのを禁止します。 render �
 ```json
 {
   "arrow-body-style": ["error", "as-needed"],
-  "func-style": "error",
   "prefer-arrow-functions/prefer-arrow-functions": [
     "error",
     {
@@ -832,6 +831,10 @@ JSX に直接コールバック関数を書くのを禁止します。 render �
   ]
 }
 ```
+
+#### `func-style` を off にした理由（2026/11/26 追記）
+
+`func-style` は現在 off にしています。関数のオーバーロードは、オーバーロードシグネチャを並べた `function` 宣言で書くのが素直ですが、`func-style` にはオーバーロードのときだけ `function` 宣言を許すオプションが無く、オーバーロードを書くたびに誤検知となるためです。関数の書き方のアロー関数への統一は、上の `prefer-arrow-functions` に任せています。こちらはオーバーロードシグネチャを持つ関数を報告しないので、このような誤検知は起きません。
 
 [^javascript_class_in_google]: https://www.yunabe.jp/docs/javascript_class_in_google.html
 
