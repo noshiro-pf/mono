@@ -1,5 +1,5 @@
 import type { UnknownResult } from '../result.mjs';
-import { unwrapOk } from './result-unwrap-ok.mjs';
+import { isOk } from './result-is-ok.mjs';
 import type { UnwrapOk } from './types.mjs';
 
 /**
@@ -63,4 +63,10 @@ export function unwrapOkOr<R extends UnknownResult, D>(
 const unwrapOkOrImpl = <R extends UnknownResult, D>(
   result: R,
   defaultValue: D,
-): D | UnwrapOk<R> => unwrapOk(result) ?? defaultValue;
+): D | UnwrapOk<R> =>
+  // Not `unwrapOk(result) ?? defaultValue`, which would replace an Ok holding
+  // `undefined` or `null` with the default.
+  isOk(result)
+    ? // eslint-disable-next-line total-functions/no-unsafe-type-assertion -- the value of an Ok of `R`
+      (result.value as UnwrapOk<R>)
+    : defaultValue;
