@@ -18,6 +18,7 @@ export const eslintTsRestrictionsRules = {
   'ts-restrictions/no-empty-rejection-handler': 'error',
   'ts-restrictions/no-optional-phantom-property': 'error',
   'ts-restrictions/no-export-type-side-effects': 'error',
+  'ts-restrictions/no-hidden-type-assertions': 'off',
   'ts-restrictions/no-ragged-comment-wrap': withDefaultOption('error'),
   'ts-restrictions/no-string-spread': 'error',
   'ts-restrictions/no-unnecessary-array-from': 'error',

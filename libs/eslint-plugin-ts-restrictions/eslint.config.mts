@@ -54,6 +54,16 @@ export default [
   },
 
   {
+    // Moved from eslint-config-typed's total-functions rules, where this rule
+    // was off for the same reason: it walks the compiler's own objects
+    // (`TypeChecker`, `Type`, `Signature`, nodes), which have no readonly form.
+    files: ['src/rules/no-hidden-type-assertions.mts'],
+    rules: defineKnownRules({
+      '@typescript-eslint/prefer-readonly-parameter-types': 'off',
+    }),
+  },
+
+  {
     files: ['**/*.test.mts'],
     rules: defineKnownRules({
       '@typescript-eslint/no-empty-object-type': 'off',

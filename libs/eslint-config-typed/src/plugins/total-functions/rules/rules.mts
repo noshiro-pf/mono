@@ -1,6 +1,10 @@
+import { tsRestrictionsRules } from 'eslint-plugin-ts-restrictions';
 import type { ESLintPlugin } from '../../../types/index.mjs';
+// Shared with ts-restrictions' moved ids, and kept out of every barrel, which
+// `src/index.mts` publishes.
+// eslint-disable-next-line import-x/no-internal-modules
+import { movedRule } from '../../ts-restrictions/rules/moved-rule.mjs';
 import { noEnums } from './no-enums.mjs';
-import { noHiddenTypeAssertions } from './no-hidden-type-assertions.mjs';
 import { noNestedFpTsEffects } from './no-nested-fp-ts-effects.mjs';
 import { noPartialArrayReduce } from './no-partial-array-reduce.mjs';
 import { noPartialDivision } from './no-partial-division.mjs';
@@ -12,9 +16,21 @@ import { noUnsafeReadonlyMutableAssignment } from './no-unsafe-readonly-mutable-
 import { noUnsafeTypeAssertion } from './no-unsafe-type-assertion.mjs';
 import { requireStrictMode } from './require-strict-mode.mjs';
 
+/**
+ * The rules of `eslint-plugin-total-functions`. `no-hidden-type-assertions`,
+ * which grew far past the original's, moved to `eslint-plugin-ts-restrictions`;
+ * its old id stays here, deprecated, until the next major (`movedRule`).
+ */
 export const totalFunctionsRules = {
   'no-enums': noEnums,
-  'no-hidden-type-assertions': noHiddenTypeAssertions,
+  'no-hidden-type-assertions': movedRule(
+    tsRestrictionsRules['no-hidden-type-assertions'],
+    {
+      packageName: 'eslint-plugin-ts-restrictions',
+      ruleId: 'ts-restrictions/no-hidden-type-assertions',
+      presetTurnsOn: false,
+    },
+  ),
   'no-nested-fp-ts-effects': noNestedFpTsEffects,
   'no-partial-array-reduce': noPartialArrayReduce,
   'no-partial-division': noPartialDivision,

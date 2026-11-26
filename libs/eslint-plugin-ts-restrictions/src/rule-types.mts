@@ -238,6 +238,23 @@ namespace NoExportTypeSideEffects {
 }
 
 /**
+ * @description Bans hidden type assertions.
+ *
+ *  ```md
+ *  | key        | value   |
+ *  | :--------- | :------ |
+ *  | type       | problem |
+ *  | deprecated | false   |
+ *  | fixable    | false   |
+ *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
+ */
+namespace NoHiddenTypeAssertions {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
  * @description Invert the operator of a negated comparison instead of negating it (`!(a === b)` → `a !== b`, `!(a < b)` → `a >= b` when no operand can be NaN).
  *
  *  ```md
@@ -711,6 +728,7 @@ export type EslintTsRestrictionsRules = Readonly<{
   'ts-restrictions/no-detached-jsdoc': NoDetachedJsdoc.RuleEntry;
   'ts-restrictions/no-empty-rejection-handler': NoEmptyRejectionHandler.RuleEntry;
   'ts-restrictions/no-export-type-side-effects': NoExportTypeSideEffects.RuleEntry;
+  'ts-restrictions/no-hidden-type-assertions': NoHiddenTypeAssertions.RuleEntry;
   'ts-restrictions/no-negated-comparison': NoNegatedComparison.RuleEntry;
   'ts-restrictions/no-optional-phantom-property': NoOptionalPhantomProperty.RuleEntry;
   'ts-restrictions/no-ragged-comment-wrap': NoRaggedCommentWrap.RuleEntry;

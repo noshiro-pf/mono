@@ -28,6 +28,11 @@ export const movedRule = <
     packageName: string;
     /** The id the rule has there, prefix included. */
     ruleId: string;
+    /**
+     * Whether `eslint-config-typed` turns the new id on, which the message then
+     * says. `true` unless given.
+     */
+    presetTurnsOn?: boolean;
   }>,
 ): TSESLint.RuleModule<MessageIds, Options> =>
   ({
@@ -35,7 +40,10 @@ export const movedRule = <
     meta: {
       ...rule.meta,
       deprecated: {
-        message: `Moved to \`${movedTo.packageName}\` as \`${movedTo.ruleId}\`, which \`eslint-config-typed\` turns on in its place.`,
+        message:
+          movedTo.presetTurnsOn === false
+            ? (`Moved to \`${movedTo.packageName}\` as \`${movedTo.ruleId}\`.` as const)
+            : (`Moved to \`${movedTo.packageName}\` as \`${movedTo.ruleId}\`, which \`eslint-config-typed\` turns on in its place.` as const),
         replacedBy: [
           {
             plugin: { name: movedTo.packageName },

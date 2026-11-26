@@ -8,11 +8,15 @@ import { noHiddenTypeAssertions } from './no-hidden-type-assertions.mjs';
 
 const ruleTester = new RuleTester({
   languageOptions: {
-    parserOptions: {
-      sourceType: 'module',
-      project: './tsconfig.tests.json',
-    },
     parser,
+    parserOptions: {
+      ecmaVersion: 2022,
+      sourceType: 'module',
+      projectService: {
+        allowDefaultProject: ['*.ts*'],
+      },
+      tsconfigRootDir: `${import.meta.dirname}/../..`,
+    },
   },
 });
 
@@ -824,6 +828,8 @@ ruleTester.run(
  * `getTypeArgumentsForResolvedSignature`, as TypeScript before 5.8 does.
  */
 function withoutResolvedTypeArguments(
+  // A rule module is a record of functions, which no readonly type describes.
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   rule: typeof noHiddenTypeAssertions,
 ): typeof noHiddenTypeAssertions {
   return {
