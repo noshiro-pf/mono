@@ -16,15 +16,19 @@ type Props = Readonly<{
   'data-e2e'?: Bindable<string>;
 }>;
 
-/** A bare checkbox, drawn by its own square, that can be indeterminate. */
+/**
+ * A bare checkbox, drawn by its own square, that can be indeterminate.
+ *
+ * Put it in a `label`, whose text names it and takes a click on the square:
+ * the input under the square takes none itself.
+ */
 export const CheckboxView = ({
   state,
   disabled,
   onCheck,
   'data-e2e': e2e,
 }: Props): JSX.Element => (
-  // eslint-disable-next-line synstate-dom-a11y/label-has-associated-control -- recorded, not fixed, when jsx-a11y came to synstate-dom (#3764)
-  <label class={constant(styles.root)}>
+  <span class={constant(styles.root)}>
     <input
       ref={(mut_input) => {
         toObservable(state).subscribe((s) => {
@@ -40,5 +44,5 @@ export const CheckboxView = ({
       }}
     />
     <span />
-  </label>
+  </span>
 );

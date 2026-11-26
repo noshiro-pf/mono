@@ -17,37 +17,47 @@ export const DatePickerDate = ({
   onClick,
   useOutlinedSelectedStyle,
 }: Props): JSX.Element => (
-  // eslint-disable-next-line synstate-dom-a11y/click-events-have-key-events, synstate-dom-a11y/prefer-tag-over-role -- recorded, not fixed, when jsx-a11y came to synstate-dom (#3764)
-  <div
-    aria-disabled={cell.pipe(map((c) => c.outside))}
-    aria-label={cell.pipe(
-      map(({ ymd }) =>
-        DateUtils.create(ymd.year, ymd.month, ymd.date).toString(),
-      ),
-    )}
-    aria-selected={cell.pipe(map((c) => c.selected))}
-    class={cell.pipe(
-      map((c) => dayClass(c, onClick !== undefined, useOutlinedSelectedStyle)),
-    )}
-    role={constant('gridcell')}
-    tabIndex={constant(-1)}
-    title={cell.pipe(map((c) => c.holidayJpName))}
-    onClick={
-      onClick === undefined
-        ? undefined
-        : () => {
-            const { outside, ymd } = Optional.unwrap(cell.getSnapshot());
+  <td class={constant(styles.cell)}>
+    {/* A read-only picker's days, and those outside the month, are buttons too,
+        so that a day says whether it is selected the same way in both. They
+        are marked `aria-disabled` and left out of the tab order, not
+        `disabled`, under which some browsers show no `title`: the holiday's
+        name. */}
+    <button
+      aria-label={cell.pipe(
+        map(({ ymd }) =>
+          DateUtils.create(ymd.year, ymd.month, ymd.date).toString(),
+        ),
+      )}
+      aria-pressed={cell.pipe(map((c) => c.selected))}
+      class={cell.pipe(
+        map((c) =>
+          dayClass(c, onClick !== undefined, useOutlinedSelectedStyle),
+        ),
+      )}
+      aria-disabled={cell.pipe(map((c) => onClick === undefined || c.outside))}
+      title={cell.pipe(map((c) => c.holidayJpName))}
+      tabIndex={cell.pipe(
+        map((c) => (onClick === undefined || c.outside ? -1 : 0)),
+      )}
+      type={constant('button')}
+      onClick={
+        onClick === undefined
+          ? undefined
+          : () => {
+              const { outside, ymd } = Optional.unwrap(cell.getSnapshot());
 
-            if (!outside) {
-              onClick(ymd);
+              if (!outside) {
+                onClick(ymd);
+              }
             }
-          }
-    }
-  >
-    <div class={constant(styles.dayWrapper)}>
-      {cell.pipe(map((c) => c.ymd.date.toString()))}
-    </div>
-  </div>
+      }
+    >
+      <span class={constant(styles.dayWrapper)}>
+        {cell.pipe(map((c) => c.ymd.date.toString()))}
+      </span>
+    </button>
+  </td>
 );
 
 /**

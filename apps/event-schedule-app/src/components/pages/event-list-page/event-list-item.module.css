@@ -45,10 +45,18 @@
 
 /* As `atoms/section-title`, taking the room the header leaves. */
 .sectionTitle {
+  display: block;
   margin-top: 10px;
   margin-bottom: 10px;
   color: #106ba3;
   font-weight: bold;
+  text-decoration: none;
+
+  /* The link the title is, drawn as the plain title it was. */
+  &:hover {
+    color: #106ba3;
+    text-decoration: none;
+  }
 
   flex: 1;
   overflow: hidden;

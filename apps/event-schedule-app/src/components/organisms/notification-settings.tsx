@@ -105,8 +105,6 @@ export const NotificationSettingsComponent = ({
           label={constant(dc.notification.emailAddress)}
         >
           <InputGroup
-            // eslint-disable-next-line synstate-dom-a11y/no-autofocus -- recorded, not fixed, when jsx-a11y came to synstate-dom (#3764)
-            autoFocus
             disabled={disabled}
             inputRef={(input) => {
               focusEmailInput$.subscribe(() => {

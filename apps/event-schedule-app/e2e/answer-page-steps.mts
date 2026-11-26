@@ -139,11 +139,13 @@ export const createEventAndOpenAnswerPage = async (
   // The page starts with today selected; deselect it, so that the dates are
   // exactly the ones picked below, whichever day the test runs on. `nth` counts
   // the days of this month only, so these are the 11th to the 13th.
-  await createPage.getByRole('gridcell', { selected: true }).click();
+  const picker = createPage.getByTestId('multiple-date-picker');
 
-  const daysOfThisMonth = createPage.getByRole('gridcell', {
-    disabled: false,
-  });
+  await picker.getByRole('button', { pressed: true }).click();
+
+  const daysOfThisMonth = picker
+    .getByRole('cell')
+    .getByRole('button', { disabled: false });
 
   for (const nth of [10, 11, 12].slice(0, numDates)) {
     // eslint-disable-next-line no-await-in-loop -- one day after another

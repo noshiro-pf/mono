@@ -163,6 +163,20 @@ test(
 
     await expect.soft(items).toHaveText(/「一覧に載るイベント」/u);
 
+    /* the event opens from the keyboard, through its title's link */
+
+    const titleLink = items.getByRole('link', {
+      name: '「一覧に載るイベント」',
+    });
+
+    await titleLink.focus();
+
+    await page.keyboard.press('Enter');
+
+    await expect
+      .soft(page.getByTestId('answer-page'))
+      .toBeVisible({ timeout: answerPageLoadTimeout });
+
     /* a new password is asked for, signed out */
 
     await signOut(page);
@@ -390,9 +404,14 @@ const openAccountSetting = async (
   return dialog;
 };
 
-/** Signs out from the user menu, which leads to the sign-in page. */
+/**
+ * Signs out from the user menu, which leads to the sign-in page. The menu is
+ * opened from the keyboard, as a keyboard user opens it.
+ */
 const signOut = async (page: DeepReadonly<Page>): Promise<void> => {
-  await page.getByTestId('nav-user-menu').click();
+  await page.getByTestId('nav-user-menu').focus();
+
+  await page.keyboard.press('Enter');
 
   await page.getByRole('menuitem', { name: 'ログアウト' }).click();
 

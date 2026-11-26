@@ -11,6 +11,7 @@ import {
 import { eventIsAfterDeadline } from '../../../functions/index.mjs';
 import { Router } from '../../../store/index.mjs';
 import { ArchiveEventButton } from '../../organisms/index.mjs';
+import { Link } from '../../router-components.mjs';
 import * as styles from './event-list-item.module.css';
 
 const dc = dict.eventListPage;
@@ -70,19 +71,34 @@ export const EventListItemComponent = ({
 
   const title = dc.listItem.name(eventSchedule.title);
 
+  const answerHref = routes.event.answer.href({ eventId });
+
   return (
-    // eslint-disable-next-line synstate-dom-a11y/click-events-have-key-events, synstate-dom-a11y/no-static-element-interactions -- recorded, not fixed, when jsx-a11y came to synstate-dom (#3764)
+    // eslint-disable-next-line synstate-dom-a11y/click-events-have-key-events, synstate-dom-a11y/no-static-element-interactions -- a pointer's shortcut to the title's link, which is how the keyboard opens the event
     <div
       class={constant(styles.listItem)}
       data-e2e={constant('event-list-item')}
-      onClick={() => {
-        Router.push(routes.event.answer.href({ eventId }));
+      onClick={(event) => {
+        // The title's link goes there itself, in this tab or, with a modifier
+        // key, in another; the buttons in the card keep their clicks.
+        if (
+          event.target instanceof Element &&
+          event.target.closest('a') !== null
+        ) {
+          return;
+        }
+
+        Router.push(answerHref);
       }}
     >
       <div class={constant(styles.header)}>
-        <div class={constant(styles.sectionTitle)} title={constant(title)}>
+        <Link
+          class={constant(styles.sectionTitle)}
+          title={constant(title)}
+          to={answerHref}
+        >
           {constant(title)}
-        </div>
+        </Link>
         <div class={constant(styles.info)}>
           <div class={constant(styles.updatedAtWrapper)}>
             <div class={constant(styles.updatedAt)}>
