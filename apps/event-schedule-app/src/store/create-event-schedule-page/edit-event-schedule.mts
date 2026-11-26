@@ -145,7 +145,9 @@ export const createEditEventScheduleStore = (
   // The settings form knows nothing of who made the event or who archived it,
   // so `eventScheduleNormalized` carries the current user as `author` and an
   // empty `archivedBy`. An edit keeps both as the database has them: the
-  // Firestore rules refuse an update that changes either.
+  // Firestore rules refuse an update that changes either. It also carries the
+  // offset of where the editor is; the event's dates and deadline are read in
+  // the offset it was made with, so that is kept too.
   const keepIdentityOf = (
     fromDatabase: EventSchedule | undefined,
     eventSchedule: EventSchedule,
@@ -156,6 +158,7 @@ export const createEditEventScheduleStore = (
           ...eventSchedule,
           author: fromDatabase.author,
           archivedBy: fromDatabase.archivedBy,
+          timezoneOffsetMinutes: fromDatabase.timezoneOffsetMinutes,
         } as const);
 
   const diff$: InitializedObservable<EventSettingsPageDiffResult> = derive(
