@@ -1,6 +1,6 @@
 import { EventListItem } from 'event-schedule-app-shared';
 import { createState } from 'synstate';
-import { Optional, Result } from 'ts-data-forge';
+import { Optional, Result, unknownToString } from 'ts-data-forge';
 import { createEventListFilterStore } from '../event-list-page-state/index.mjs';
 import {
   createEventListStore,
@@ -141,6 +141,93 @@ describe(createEventListStore, () => {
     assert.strictEqual(
       Optional.unwrap(store.listedWith$.getSnapshot())?.showAllPastDaysEvent,
       false,
+    );
+  });
+
+  test('says a read failed until one is answered, and lets the page read again', async () => {
+    const { store, signIn, answer, reads } = setup({
+      answerByHand: true,
+      throttleMs: 0,
+    });
+
+    store.start();
+
+    signIn('alice');
+
+    assert.isFalse(Optional.unwrap(store.readFailed$.getSnapshot()));
+
+    answer(0, 'failed');
+
+    await settle(0);
+
+    assert.isTrue(Optional.unwrap(store.readFailed$.getSnapshot()));
+
+    store.refreshEventList();
+
+    assert.strictEqual(reads.length, 2);
+
+    answer(1, [eventListItem]);
+
+    await settle(0);
+
+    assert.isFalse(Optional.unwrap(store.readFailed$.getSnapshot()));
+
+    assert.deepStrictEqual(Optional.unwrap(store.eventList$.getSnapshot()), [
+      eventListItem,
+    ]);
+  });
+
+  test('a throw while an answer is taken is logged, and counts as a failed read with none loading', async () => {
+    const consoleError = vi
+      .spyOn(console, 'error')
+      .mockImplementation(() => undefined);
+
+    const { store, signIn, answer } = setup({ answerByHand: true });
+
+    store.start();
+
+    signIn('alice');
+
+    const subscription = store.eventList$.subscribe((list) => {
+      if (list?.length === 1) {
+        throw new Error('A subscriber failed.');
+      }
+    });
+
+    answer(0, [eventListItem]);
+
+    await settle(0);
+
+    subscription.unsubscribe();
+
+    const logged = consoleError.mock.calls
+      .flat()
+      .some((arg) => unknownToString(arg).includes('A subscriber failed.'));
+
+    consoleError.mockRestore();
+
+    assert.isTrue(logged);
+
+    assert.isFalse(
+      Optional.unwrap(store.refreshButtonIsLoading$.getSnapshot()),
+    );
+
+    assert.isTrue(Optional.unwrap(store.readFailed$.getSnapshot()));
+  });
+
+  test('has no read loading once the store stops with a read out', () => {
+    const { store, signIn } = setup({ answerByHand: true });
+
+    const stop = store.start();
+
+    signIn('alice');
+
+    assert.isTrue(Optional.unwrap(store.refreshButtonIsLoading$.getSnapshot()));
+
+    stop();
+
+    assert.isFalse(
+      Optional.unwrap(store.refreshButtonIsLoading$.getSnapshot()),
     );
   });
 

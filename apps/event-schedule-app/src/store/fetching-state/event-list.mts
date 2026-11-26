@@ -15,7 +15,7 @@ import {
   type InitializedObservable,
   type Subscription,
 } from 'synstate';
-import { Result, isNotUndefined, tp } from 'ts-data-forge';
+import { Result, isNotUndefined, tp, unknownToString } from 'ts-data-forge';
 import type { StrictPick } from 'ts-type-forge';
 import type { Api } from '../../api/index.mjs';
 import { createReducerWithActions } from '../../utils/index.mjs';
@@ -50,12 +50,16 @@ export type EventListResult =
 
 export type EventListFetcher = Readonly<{
   /**
-   * The list as last read: `undefined` until the first list comes back, and
-   * again once the user signs out. Not handled yet: a read that fails sets it
-   * to `undefined` too, which the page shows as its spinner, until the page has
-   * a failed state to show.
+   * The list as last read: `undefined` until the first list comes back, again
+   * once the user signs out, and after a read that fails (`readFailed$`).
    */
   eventList$: InitializedObservable<readonly EventListItem[] | undefined>;
+  /**
+   * Whether the last read taken failed: it answered an error, or taking its
+   * answer threw. The page shows that, with a way to read again, until a read
+   * is answered; none once the user signs out.
+   */
+  readFailed$: InitializedObservable<boolean>;
   /**
    * The filters the last list that came back was read with, which the filters
    * on the page are not while a read for a change is out; `undefined` until the
@@ -67,14 +71,7 @@ export type EventListFetcher = Readonly<{
   fetchEventList: () => void;
   /**
    * Whether a read has yet to come back: any read, the refresh button's or a
-   * filter's; none once the user signs out.
-   *
-   * Not handled yet: an answer that is never taken leaves it on, and the page's
-   * filters and refresh button disabled with it until a reload: where a
-   * subscriber throws while one is taken, or the store stops with a read out.
-   * Turning it off in the `catch` instead would show the old list under the new
-   * filters as if it answered them; this waits for the page to have a failed
-   * state to show.
+   * filter's; none once the user signs out, nor once the store stops.
    */
   refreshButtonIsLoading$: InitializedObservable<boolean>;
   /** Disabled for `throttleMs` after each read the button can ask for. */
@@ -140,22 +137,27 @@ export const createEventListStore = (deps: EventListDeps): EventListFetcher => {
     [signedOutResult$.pipe(mapTo(undefined))],
   );
 
-  const [refreshButtonIsLoading$] = createReducerWithActions(
-    (_: boolean, isLoading: boolean) => isLoading,
-    false,
-    [
-      fetchEventListStarted$.pipe(mapTo(true)),
-      fetchedEventListResult$.pipe(mapTo(false)),
-      // Signing out drops the answer to a read still out.
-      signedOutResult$.pipe(mapTo(false)),
-    ],
-  );
+  const [refreshButtonIsLoading$, setRefreshButtonIsLoading] =
+    createReducerWithActions(
+      (_: boolean, isLoading: boolean) => isLoading,
+      false,
+      [
+        fetchEventListStarted$.pipe(mapTo(true)),
+        fetchedEventListResult$.pipe(mapTo(false)),
+        // Signing out drops the answer to a read still out.
+        signedOutResult$.pipe(mapTo(false)),
+      ],
+    );
 
   /** Disabled for `throttleMs` after each read the button can ask for. */
   const refreshButtonIsDisabled$ = merge([
     fetchEventListThrottled$.pipe(mapTo(true)),
     fetchEventListThrottled$.pipe(debounce(deps.throttleMs)).pipe(mapTo(false)),
   ]).pipe(withInitialValue(false));
+
+  const readFailed$: InitializedObservable<boolean> = result$.pipe(
+    map((result) => result !== undefined && Result.isErr(result)),
+  );
 
   const eventList$: InitializedObservable<
     readonly EventListItem[] | undefined
@@ -211,7 +213,20 @@ export const createEventListStore = (deps: EventListDeps): EventListFetcher => {
           deps
             .fetchEventList(request)
             .then(answer)
-            .catch(() => {});
+            .catch((error: unknown) => {
+              // The read threw, or a subscriber did while its answer was taken:
+              // logged, and taken as a failed read, so that the page shows it
+              // with a way to read again rather than loading forever.
+              console.error('eventList', error);
+
+              if (mut_run.stopped || mut_run.latest !== request) {
+                return;
+              }
+
+              setFetchedEventListResult(
+                Result.err({ type: 'others', message: unknownToString(error) }),
+              );
+            });
         },
       ),
       // Signing out drops the answer to a read still out.
@@ -236,11 +251,15 @@ export const createEventListStore = (deps: EventListDeps): EventListFetcher => {
       for (const subscription of subscriptions) {
         subscription.unsubscribe();
       }
+
+      // The answer to a read still out is dropped, so nothing else would.
+      setRefreshButtonIsLoading(false);
     };
   };
 
   return {
     eventList$,
+    readFailed$,
     listedWith$,
     fetchEventList,
     refreshButtonIsLoading$,

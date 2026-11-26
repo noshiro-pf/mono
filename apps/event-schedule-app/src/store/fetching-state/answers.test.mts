@@ -1,6 +1,6 @@
 import { Answer } from 'event-schedule-app-shared';
 import { createState } from 'synstate';
-import { Optional, Result } from 'ts-data-forge';
+import { Optional, Result, unknownToString } from 'ts-data-forge';
 import type { Api } from '../../api/index.mjs';
 import { createAnswersStore, type AnswersFetcher } from './answers.mjs';
 
@@ -152,6 +152,89 @@ describe(createAnswersStore, () => {
     assert.isUndefined(Optional.unwrap(store.result$.getSnapshot()));
 
     assert.isUndefined(idsOf(store));
+  });
+
+  test('the refresh button shows no loading when no read goes out', () => {
+    const { store, reads } = setup(undefined);
+
+    store.start();
+
+    store.refreshAnswers();
+
+    assert.deepStrictEqual(reads, []);
+
+    assert.isFalse(
+      Optional.unwrap(store.refreshButtonIsLoading$.getSnapshot()),
+    );
+  });
+
+  test('the refresh button shows no loading for a press the throttle drops', async () => {
+    const { store, reads } = setup('abc');
+
+    store.start();
+
+    await settle(0);
+
+    assert.isFalse(
+      Optional.unwrap(store.refreshButtonIsLoading$.getSnapshot()),
+    );
+
+    // Within the throttle of the first read.
+    store.refreshAnswers();
+
+    assert.deepStrictEqual(reads, ['abc']);
+
+    assert.isFalse(
+      Optional.unwrap(store.refreshButtonIsLoading$.getSnapshot()),
+    );
+  });
+
+  test('a read that throws is logged, and taken as a failed read with none loading', async () => {
+    const consoleError = vi
+      .spyOn(console, 'error')
+      .mockImplementation(() => undefined);
+
+    const { store } = setup('abc', () =>
+      Promise.reject(new Error('The read threw.')),
+    );
+
+    store.start();
+
+    await settle(0);
+
+    const logged = consoleError.mock.calls
+      .flat()
+      .some((arg) => unknownToString(arg).includes('The read threw.'));
+
+    consoleError.mockRestore();
+
+    assert.isTrue(logged);
+
+    assert.isFalse(
+      Optional.unwrap(store.refreshButtonIsLoading$.getSnapshot()),
+    );
+
+    const result = Optional.unwrap(store.result$.getSnapshot());
+
+    assert.isDefined(result);
+
+    assert.isTrue(Result.isErr(result));
+  });
+
+  test('has no read loading once the store stops with a read out', () => {
+    const { answer } = deferredReads();
+
+    const { store } = setup('abc', answer);
+
+    const stop = store.start();
+
+    assert.isTrue(Optional.unwrap(store.refreshButtonIsLoading$.getSnapshot()));
+
+    stop();
+
+    assert.isFalse(
+      Optional.unwrap(store.refreshButtonIsLoading$.getSnapshot()),
+    );
   });
 
   test('stop ends the reading', () => {

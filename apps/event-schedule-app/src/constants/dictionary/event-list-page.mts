@@ -27,6 +27,11 @@ export const eventListPageDictionary = {
     pastHidden: '候補日程がすべて過去の日程調整は表示していません。',
     showPast: '過去の日程調整も表示する',
   },
+  readFailed: {
+    title: '日程調整一覧を読み込めませんでした。',
+    description: '通信状況を確かめて、もう一度読み込んでください。',
+    retry: '再読み込み',
+  },
   archive: 'アーカイブする',
   unarchive: 'アーカイブ解除する',
   confirmationMessage: {
