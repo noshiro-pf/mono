@@ -6,13 +6,7 @@
   "bypass_actors": [],
   "conditions": {
     "ref_name": {
-      "exclude": [
-        "refs/heads/archive/algo-app",
-        "refs/heads/archive/annotation-tool-dev",
-        "refs/heads/archive/event-schedule-app--create-batchUpdate-page",
-        "refs/heads/archive/migrate/synstate--add-synstate-router",
-        "refs/heads/archive/update-poll-discord-app"
-      ],
+      "exclude": [],
       "include": ["refs/heads/archive/**/*"]
     }
   },
