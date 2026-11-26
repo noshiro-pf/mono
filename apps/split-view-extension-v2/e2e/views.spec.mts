@@ -124,6 +124,72 @@ test(
 );
 
 test(
+  'the picker keeps showing the choice while the switch to it runs',
+  { tag: '@views' },
+  async ({ page, context, extensionId }) => {
+    await openSplitView(page, extensionId);
+
+    const added = await addSplitView(page, context);
+
+    const addedUrl = new URL(added.url());
+
+    const addedId = addedUrl.searchParams.get('ws') ?? '';
+
+    // Reading the chosen split view waits until the test lets it, so the switch
+    // is still running while the picker is drawn.
+    await page.evaluate(() => {
+      const storage = chrome.storage.local;
+
+      const read = storage.get.bind(storage);
+
+      const gate = Promise.withResolvers<undefined>();
+
+      addEventListener(
+        'open-storage-gate',
+        () => {
+          gate.resolve(undefined);
+        },
+        { once: true },
+      );
+
+      // eslint-disable-next-line functional/immutable-data -- Runs in the page, wrapping the extension's own read, which is what holds the switch.
+      Object.assign(storage, {
+        get: async (keys: string) => {
+          await gate.promise;
+
+          return read(keys);
+        },
+      });
+    });
+
+    await picker(page).selectOption({ label: '2: split-view-2' });
+
+    await page.evaluate(
+      async () =>
+        new Promise<void>((resolve) => {
+          requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+              resolve();
+            });
+          });
+        }),
+    );
+
+    await expect.soft(picker(page)).toHaveValue(addedId);
+
+    await expect.soft(page).toHaveTitle('1: split-view-1');
+
+    await page.evaluate(() => {
+      dispatchEvent(new Event('open-storage-gate'));
+    });
+
+    await expect.soft(page).toHaveTitle('2: split-view-2');
+
+    await expect.soft(picker(page)).toHaveValue(addedId);
+  },
+);
+
+test(
   'switching by Alt+N works from inside a pane too',
   { tag: '@views' },
   async ({ page, context, extensionId, pageUrl }) => {
