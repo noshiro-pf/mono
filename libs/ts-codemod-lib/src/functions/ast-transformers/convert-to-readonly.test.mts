@@ -6196,3 +6196,42 @@ describe('convertToReadonlyTransformer, unformatted', () => {
     },
   );
 });
+
+describe('convertToReadonlyTransformer, a property typed `unique symbol`', () => {
+  // TypeScript requires such a property to be `readonly` itself (TS1330), which
+  // `Readonly<...>` around the literal does not make it.
+  const raw = (source: string): string =>
+    transformSourceCode(source, false, [convertToReadonlyTransformer()]);
+
+  test.each([
+    {
+      name: 'a literal holding one is left as written',
+      source: 'type Tag = { readonly tag: unique symbol };',
+      expected: 'type Tag = { readonly tag: unique symbol };',
+    },
+    {
+      name: 'the other members of such a literal are made readonly one by one',
+      source: 'type Tag = { readonly tag: unique symbol; b: number[] };',
+      expected:
+        'type Tag = { readonly tag: unique symbol; readonly b: (readonly number[]) };',
+    },
+    {
+      name: 'a `Readonly` written around such a literal is taken off',
+      source: 'type Tag = Readonly<{ readonly tag: unique symbol }>;',
+      expected: 'type Tag = { readonly tag: unique symbol };',
+    },
+    {
+      name: 'such a literal in a union is not merged into a `Readonly`',
+      source: 'type T = { readonly tag: unique symbol } | string;',
+      expected: 'type T = { readonly tag: unique symbol } | string;',
+    },
+    {
+      name: 'a literal with a method keeps its `Readonly` and the property its modifier',
+      source: 'type T = { readonly tag: unique symbol; f(): void };',
+      expected:
+        'type T = Readonly<{ readonly tag: unique symbol; f(): void }>;',
+    },
+  ] as const)('$name', ({ source, expected }) => {
+    assert.strictEqual(raw(source), expected);
+  });
+});

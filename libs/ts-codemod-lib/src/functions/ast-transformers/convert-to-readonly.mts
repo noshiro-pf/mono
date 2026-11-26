@@ -748,10 +748,39 @@ const checkIfPropertyNameShouldBeIgnored = (
 };
 
 /**
+ * Whether `member` is a property typed `unique symbol`, which TypeScript
+ * requires to be `readonly` itself (TS1330): `Readonly<...>` around its literal
+ * does not do. Its literal is therefore left unwrapped where it can be (see
+ * `isLeftUnwrapped`), and its own `readonly` is never taken off.
+ */
+const isUniqueSymbolProperty = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  member: tsm.TypeElementTypes,
+): boolean => {
+  if (!member.isKind(tsm.SyntaxKind.PropertySignature)) {
+    return false;
+  }
+
+  const type = member.getTypeNode();
+
+  if (type === undefined) {
+    return false;
+  }
+
+  const unwrapped = removeParentheses(type);
+
+  return (
+    unwrapped.isKind(tsm.SyntaxKind.TypeOperator) &&
+    unwrapped.getOperator() === tsm.SyntaxKind.UniqueKeyword
+  );
+};
+
+/**
  * Whether a type literal is left without `Readonly<...>` and marked readonly
  * member by member, because it has a property, a method or an accessor of an
  * ignored prefix (`{ mut_x: X[] }`), which `transformMembers` leaves mutable
- * and `Readonly<T>` would not.
+ * and `Readonly<T>` would not, or a property typed `unique symbol`, which has
+ * to say `readonly` itself (see `isUniqueSymbolProperty`).
  *
  * It keeps its `Readonly<...>` when that would leave another member mutable,
  * since only a property or index signature can be marked `readonly` itself:
@@ -798,7 +827,10 @@ const isLeftUnwrapped = (
         !mb.hasModifier(tsm.SyntaxKind.ReadonlyKeyword) &&
         hasDisableNextLineComment(mb)));
 
-  return members.some(isIgnoredMember) && !members.some(needsReadonlyWrapper);
+  return (
+    (members.some(isIgnoredMember) || members.some(isUniqueSymbolProperty)) &&
+    !members.some(needsReadonlyWrapper)
+  );
 };
 
 /** Whether `node`, or a parenthesized type around it, carries the ignore comment. */
@@ -2446,7 +2478,10 @@ const transformPropertySignature = (
   >,
   options: ReadonlyTransformerOptionsInternal,
 ): void => {
-  if (
+  if (isUniqueSymbolProperty(node)) {
+    // TS1330: it stays `readonly` whatever wraps its literal.
+    node.setIsReadonly(true);
+  } else if (
     readonlyModifier === 'remove' ||
     readonlyContext.type === 'DeepReadonly'
   ) {
