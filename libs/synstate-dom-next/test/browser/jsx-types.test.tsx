@@ -190,8 +190,6 @@ describe('JSX types', () => {
     constant(undefined);
 
     // @ts-expect-error an observable would be read once
-    constant(state(0));
-
-    assert.isTrue(true);
+    assert.throws(() => constant(state(0)), /observable/u);
   });
 });

@@ -11,6 +11,7 @@ import {
 } from 'synstate-dom-next';
 import { createOwner, isObservable, map, state } from 'synstate-next';
 import { expectType } from 'ts-data-forge';
+import { Optional, Result } from 'ts-std-forge';
 
 // synstate-dom's tests of its helpers: `constant/*.test.mts`,
 // `keyboard/is-ime-key-down.test.mts` and `scope/scope-effects.test.mts`.
@@ -187,7 +188,7 @@ describe(constant, () => {
     constant(undefined);
 
     // @ts-expect-error wrapping an observable would bind it once
-    constant(count);
+    assert.throws(() => constant(count), /observable/u);
 
     const maybe = Math.random() > 2 ? 'a' : undefined;
 
@@ -195,6 +196,30 @@ describe(constant, () => {
     constant(maybe);
 
     assert.isTrue(true);
+  });
+
+  test('rejects a Some holding an observable, which is that observable at run time', () => {
+    const count = state(0);
+
+    // The types let it through: `Optional<…>` is not an `Observable`.
+    assert.throws(() => constant(Optional.some(count)), /observable/u);
+
+    // An Ok keeps its value inside it, so it is a constant like any other.
+    assert.doesNotThrow(() => constant(Result.ok(count)));
+  });
+
+  test('a computed constant holding an observable is rejected too', () => {
+    const count = state(0);
+
+    assert.throws(
+      () => mapBindable(constant(1), () => Optional.some(count)),
+      /observable/u,
+    );
+
+    assert.throws(
+      () => deriveBindable([constant(1)], () => Optional.some(count)),
+      /observable/u,
+    );
   });
 
   test('a plain value is not a Bindable', () => {
