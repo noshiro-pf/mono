@@ -3,6 +3,7 @@ import {
   capitalGainsTaxRate,
   housingLoanDeductionResidentTaxCap,
   housingLoanDeductionResidentTaxRate,
+  nisaAnnualLimit,
   nisaLifetimeLimit,
 } from '../../data/index.mjs';
 import {
@@ -284,6 +285,7 @@ export const simulate = (input: SimulationInput): SimulationResult => {
         nisa,
         (r) => r.usedQuota <= nisaLifetimeLimit,
       ),
+      nisaWithinAnnualLimit: firstMonthOverAnnualLimit(nisa, nisaAnnualLimit),
     },
   };
 };
@@ -307,6 +309,7 @@ export type SimulationResult = Readonly<{
     nisaNonNegative: MonthIndex | undefined;
     taxableNonNegative: MonthIndex | undefined;
     nisaWithinLifetimeLimit: MonthIndex | undefined;
+    nisaWithinAnnualLimit: MonthIndex | undefined;
   }>;
 }>;
 
@@ -500,3 +503,32 @@ const firstFailing = <R extends Readonly<{ month: MonthIndex }>>(
   rows: readonly R[],
   ok: (row: R) => boolean,
 ): MonthIndex | undefined => rows.find((row) => !ok(row))?.month;
+
+/**
+ * その暦年の投資額（確定拠出年金の一括受給額を入れたものも含む）の合計が `limit`
+ * を超えた最初の月。
+ */
+const firstMonthOverAnnualLimit = (
+  rows: readonly InvestmentAccountMonth[],
+  limit: number,
+): MonthIndex | undefined => {
+  let mut_year = Number.NaN;
+
+  let mut_bought = 0;
+
+  for (const row of rows) {
+    if (yearOf(row.month) !== mut_year) {
+      mut_year = yearOf(row.month);
+
+      mut_bought = 0;
+    }
+
+    mut_bought += row.contribution;
+
+    if (mut_bought > limit) {
+      return row.month;
+    }
+  }
+
+  return undefined;
+};

@@ -1,6 +1,8 @@
+import { Arr, asUint32 } from 'ts-data-forge';
 import {
   calculateInvestmentAccount,
   toMonthlyRate,
+  type InvestmentAccountMonth,
 } from './calculate-investment-account.mjs';
 
 describe(calculateInvestmentAccount, () => {
@@ -33,7 +35,8 @@ describe(calculateInvestmentAccount, () => {
       profitInWithdrawal: 50,
       principalInWithdrawal: 50,
       received: 90,
-      usedQuota: 450,
+      // 売った元金の枠が戻るのは翌年から。
+      usedQuota: 500,
     });
 
     assert.strictEqual(second?.value, 800);
@@ -71,6 +74,64 @@ describe(calculateInvestmentAccount, () => {
     assert.closeTo(rows[1]?.value ?? 0, (100 * 1.01 + 1100) * 1.01, 1e-9);
 
     assert.strictEqual(rows[3]?.principal, 1205);
+  });
+});
+
+describe('生涯投資枠の利用額', () => {
+  const months = Arr.range(asUint32(2026 * 12), asUint32(2027 * 12 + 2));
+
+  const rows = calculateInvestmentAccount(
+    {
+      input: {
+        initialValue: 17_000_000,
+        initialPrincipal: 17_000_000,
+        initialUsedQuota: 17_000_000,
+        regularContributions: [],
+        oneOffContributions: [
+          { id: 1, name: '', month: '2026-07', amount: 3_000_000 },
+        ],
+        regularWithdrawals: [],
+        oneOffWithdrawals: [
+          { id: 1, name: '', month: '2026-06', amount: 5_000_000 },
+          { id: 2, name: '', month: '2026-12', amount: 1_000_000 },
+        ],
+      },
+      monthlyYieldAt: () => 0.005,
+      extraContributionAt: () => 0,
+      taxRate: 0,
+    },
+    months,
+  );
+
+  const at = (yearMonth: number): InvestmentAccountMonth | undefined =>
+    rows.find((r) => r.month === yearMonth);
+
+  const soldIn2026 =
+    (at(2026 * 12 + 5)?.principalInWithdrawal ?? 0) +
+    (at(2026 * 12 + 11)?.principalInWithdrawal ?? 0);
+
+  test('売った年のうちは売った元金の分を戻さないこと', () => {
+    assert.strictEqual(at(2026 * 12 + 5)?.usedQuota, 17_000_000);
+
+    assert.strictEqual(at(2026 * 12 + 6)?.usedQuota, 20_000_000);
+
+    assert.strictEqual(at(2026 * 12 + 11)?.usedQuota, 20_000_000);
+  });
+
+  test('その年に売った元金の分を翌年の 1 月に戻すこと', () => {
+    assert.isAbove(soldIn2026, 0);
+
+    assert.closeTo(
+      at(2027 * 12)?.usedQuota ?? 0,
+      20_000_000 - soldIn2026,
+      1e-6,
+    );
+
+    assert.closeTo(
+      at(2027 * 12 + 1)?.usedQuota ?? 0,
+      20_000_000 - soldIn2026,
+      1e-6,
+    );
   });
 });
 

@@ -132,6 +132,10 @@ const checkItems = [
     label: '積立 NISA 生涯投資枠 ≤ 1,800 万円',
     pick: (r) => r.checks.nisaWithinLifetimeLimit,
   },
+  {
+    label: '積立 NISA 年間投資額 ≤ 360 万円',
+    pick: (r) => r.checks.nisaWithinAnnualLimit,
+  },
 ] as const satisfies readonly Readonly<{
   label: string;
   pick: (r: SimulationResult) => MonthIndex | undefined;

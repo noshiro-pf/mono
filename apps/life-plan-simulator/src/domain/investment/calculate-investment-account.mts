@@ -7,6 +7,7 @@ import type {
 } from '../input/index.mjs';
 import {
   findLatestStarted,
+  monthOf,
   parseYearMonth,
   parseYearMonthOr,
   sortByStart,
@@ -22,6 +23,8 @@ import {
  * - 取崩額のうち利益の割合（前月末の 1 - 元金 / 評価額）が利益、残りが元金。
  *   課税口座では利益に `taxRate` を掛けた分を引いて受け取る。
  * - 生涯投資枠（NISA）の利用額は 投資額の累計 - 取り崩した元金の累計。
+ *   取り崩した元金（簿価）の分の枠が戻るのは翌年からなので、その年に取り崩した
+ *   元金は翌年の 1 月に引く。
  */
 export const calculateInvestmentAccount = (
   params: InvestmentAccountParams,
@@ -48,6 +51,9 @@ export const calculateInvestmentAccount = (
 
   let mut_usedQuota = input.initialUsedQuota;
 
+  /** その年に取り崩した元金。翌年の 1 月に生涯投資枠へ戻す。 */
+  let mut_soldThisYear = 0;
+
   let mut_profitRatio = profitRatioOf(mut_value, mut_principal);
 
   const mut_rows: InvestmentAccountMonth[] = [];
@@ -71,7 +77,15 @@ export const calculateInvestmentAccount = (
 
     mut_principal = mut_principal + contribution - principalInWithdrawal;
 
-    mut_usedQuota = mut_usedQuota + contribution - principalInWithdrawal;
+    if (monthOf(month) === 1) {
+      mut_usedQuota -= mut_soldThisYear;
+
+      mut_soldThisYear = 0;
+    }
+
+    mut_usedQuota += contribution;
+
+    mut_soldThisYear += principalInWithdrawal;
 
     mut_profitRatio = profitRatioOf(mut_value, mut_principal);
 
