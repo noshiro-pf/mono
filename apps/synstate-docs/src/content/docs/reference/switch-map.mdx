@@ -15,9 +15,9 @@ When a new value arrives from the source, the previous inner observable is unsub
 A value the source already holds when `switchMap` is created (a state, an
 observable with an initial value) is projected at once, as `map` and `filter`
 start from it. So an initialized source, with a projection that returns an
-initialized observable, gives an `InitializedObservable`. A completed source is
-not projected: on one, such as `just(x)`, the result completes holding no value
-although its type says it holds one.
+initialized observable, gives an `InitializedObservable`.
+A completed source, such as `just(x)`, is projected too: the result holds the
+value the projection's observable holds at once, then completes.
 
 The projection runs in a scope of its own (see `createScope`): what it
 creates is disposed when the next value switches away from it and when

@@ -208,11 +208,15 @@ export class AsyncChildObservableClass<A, const P extends NonEmptyUnknownList>
   }
 
   /**
-   * `attach`, then projects the value `parent` holds when `switchMap` /
-   * `mergeMap` is created, as `map` and `filter` start from it; a completed
-   * parent is not projected. Nothing observes the operator yet, so a value the
-   * inner observable emits while it is subscribed is only stored: the token is
-   * one no update is queued with.
+   * `attach`, and projects the value `parent` holds when `switchMap` /
+   * `mergeMap` is created, as `map` and `filter` start from it. Nothing
+   * observes the operator yet, so a value the inner observable emits while it
+   * is subscribed is only stored: the token is one no update is queued with.
+   *
+   * A completed parent is projected before `attach`, which completes the
+   * operator: the operator takes the value the inner observable holds at once,
+   * as `map` holds one on a completed source, and completing then disposes what
+   * the projection made.
    *
    * If the projection throws, the operator is disposed, which disposes what the
    * projection made and takes the operator off its parent, and the exception
@@ -222,22 +226,36 @@ export class AsyncChildObservableClass<A, const P extends NonEmptyUnknownList>
     parent: Observable<V>,
     project: (value: V, updateToken: UpdateToken) => void,
   ): void {
-    this.attach();
-
     const sn = parent.getSnapshot();
 
-    if (this.isCompleted || Optional.isNone(sn)) {
+    const projectHeldValue = (): void => {
+      if (Optional.isNone(sn)) {
+        return;
+      }
+
+      runUndoingOnThrow(
+        () => {
+          project(Optional.unwrap(sn), issueUnqueuedToken());
+        },
+        () => {
+          this.dispose();
+        },
+      );
+    };
+
+    if (parent.isCompleted) {
+      projectHeldValue();
+
+      this.attach();
+
       return;
     }
 
-    runUndoingOnThrow(
-      () => {
-        project(Optional.unwrap(sn), issueUnqueuedToken());
-      },
-      () => {
-        this.dispose();
-      },
-    );
+    this.attach();
+
+    if (!this.isCompleted) {
+      projectHeldValue();
+    }
   }
 
   /**

@@ -136,40 +136,62 @@ describe('the value the source holds when the operator is created is projected',
     assert.deepStrictEqual(s$.getSnapshot(), Optional.some('item 42'));
   });
 
-  test('switchMap: a completed source projects nothing and completes', () => {
+  test('switchMap: a completed source is projected, and the result holds the value and completes', () => {
     const a$ = just(1);
 
     const mut_projected: number[] = [];
+
+    const mut_disposed: number[] = [];
 
     const s$ = a$.pipe(
       switchMap((x) => {
         mut_projected.push(x);
 
-        return just(x);
+        onScopeDispose(() => {
+          mut_disposed.push(x);
+        });
+
+        return just(x * 2);
       }),
     );
 
-    assert.deepStrictEqual(mut_projected, []);
+    assert.deepStrictEqual(mut_projected, [1]);
+
+    assert.deepStrictEqual(s$.getSnapshot(), Optional.some(2));
 
     assert.isTrue(s$.isCompleted);
+
+    // What the projection created is disposed when the operator completes.
+    assert.deepStrictEqual(mut_disposed, [1]);
   });
 
-  test('mergeMap: a completed source projects nothing and completes', () => {
+  test('mergeMap: a completed source is projected, and the result holds the value and completes', () => {
     const a$ = just(1);
 
     const mut_projected: number[] = [];
+
+    const mut_disposed: number[] = [];
 
     const s$ = a$.pipe(
       mergeMap((x) => {
         mut_projected.push(x);
 
-        return just(x);
+        onScopeDispose(() => {
+          mut_disposed.push(x);
+        });
+
+        return just(x * 2);
       }),
     );
 
-    assert.deepStrictEqual(mut_projected, []);
+    assert.deepStrictEqual(mut_projected, [1]);
+
+    assert.deepStrictEqual(s$.getSnapshot(), Optional.some(2));
 
     assert.isTrue(s$.isCompleted);
+
+    // What the projection created is disposed when the operator completes.
+    assert.deepStrictEqual(mut_disposed, [1]);
   });
 
   test('mergeMap: the first inner and the later ones are merged', () => {
