@@ -871,8 +871,9 @@ import しているのでそもそもコンパイルできない。どちらも�
 | `getShuffled`（`@noshiro/ts-utils-additional`） | 後継が無いので同梱（下記）    |
 
 `getShuffled` は `react-blueprintjs-utils` の `utils/ported.mts` と同じ扱いで、
-**後継が無いものはそれを使うパッケージに置く**。ここでは `createPointMap` の
-テスト 1 箇所だけが使う（生の点数の並び順で結果が変わらないことの確認）。
+**後継が無いものはそれを使うパッケージに置く**。ここでは `pointsBySeat`（旧
+`createPointMap`）のテスト 1 箇所だけが使う（席の並びを変えても、各席の結果がその
+席に付いてくることの確認）。
 
 ### `as` を 5 つ消した
 
