@@ -4,7 +4,7 @@ import {
   housingLoanDeductionConditions,
 } from '../housing-loan/index.mjs';
 import { defaultSimulationInput, SimulationInput } from '../input/index.mjs';
-import { formatYearMonth } from '../year-month/index.mjs';
+import { formatYearMonth, yearOf } from '../year-month/index.mjs';
 import { simulate, type SimulationResult } from './simulate.mjs';
 
 const d = defaultSimulationInput;
@@ -163,7 +163,7 @@ describe(simulate, () => {
       const incomeTax = 183_360;
 
       // 住民税の行のもとになる課税所得の概算は
-      // (450,000 × 0.7 - 125,000) × 12 = 2,280,000 円で、その 5% は 114,000 円。
+      // 5,400,000 × 0.7 - 1,500,000 = 2,280,000 円で、その 5% は 114,000 円。
       assert.isTrue(
         incomeTax + 97_500 < (uncappedAt(input, r, '2032-01') ?? 0),
       );
@@ -173,6 +173,52 @@ describe(simulate, () => {
         incomeTax + 97_500,
         1e-6,
       );
+    });
+
+    test('住民税から引ける分は、賞与も数えた年ごとの課税所得の 5% であること', () => {
+      const input: SimulationInput = {
+        ...withSalary(3_600_000, 1_200_000),
+        housingLoan: {
+          ...d.housingLoan,
+          principal: 50_000_000,
+          houseType: 'long-life',
+          childRearing: true,
+        },
+      } as const;
+
+      const r = simulate(input);
+
+      // (3,600,000 + 1,200,000) × 0.7 - 1,500,000 = 1,860,000 円の 5%。
+      const cap = incomeTaxIn(r, 2031) + 93_000;
+
+      assert.isTrue(cap < (uncappedAt(input, r, '2032-01') ?? 0));
+
+      assert.closeTo(deductionAt(r, '2032-01') ?? Number.NaN, cap, 1e-6);
+    });
+
+    test('年の途中で給与が止まった年は、住民税から引ける分も控除を 1 回だけ引いて求めること', () => {
+      // 1990-04 生まれが 41 歳で退職: 2031 年の給与は 4 か月分で、
+      // 450,000 × 4 × 0.7 = 1,260,000 円は 150 万円を下回る。
+      const input: SimulationInput = {
+        ...withSalary(5_400_000),
+        assumptions: { ...d.assumptions, retirementAge: 41 },
+        housingLoan: {
+          ...d.housingLoan,
+          principal: 50_000_000,
+          houseType: 'long-life',
+          childRearing: true,
+        },
+      } as const;
+
+      const r = simulate(input);
+
+      assert.strictEqual(formatYearMonth(r.retirementMonth), '2031-04');
+
+      const cap = incomeTaxIn(r, 2031);
+
+      assert.isTrue(cap < (uncappedAt(input, r, '2032-01') ?? 0));
+
+      assert.closeTo(deductionAt(r, '2032-01') ?? Number.NaN, cap, 1e-6);
     });
 
     test('プランの開始前の年の分は、税額が分からないので頭打ちにしないこと', () => {
@@ -322,8 +368,11 @@ const uncappedAt = (
     housingLoanDeductionConditions(input.housingLoan),
   ).find((x) => formatYearMonth(x.month) === yearMonth)?.amount;
 
-/** 2020-04 から賞与なしで `annualBase` の月給が続くプラン。 */
-const withSalary = (annualBase: number): SimulationInput =>
+/** 2020-04 から `annualBase` の月給と `annualBonus` の賞与（既定はなし）が続くプラン。 */
+const withSalary = (
+  annualBase: number,
+  annualBonus: number = 0,
+): SimulationInput =>
   ({
     ...d,
     salaryHistory: [
@@ -333,7 +382,15 @@ const withSalary = (annualBase: number): SimulationInput =>
         annualBase,
         companyDcMonthly: 0,
         idecoMonthly: 0,
-        annualBonus: 0,
+        annualBonus,
       },
     ],
   }) as const;
+
+/** `year` の給与・賞与の源泉徴収税額の合計。 */
+const incomeTaxIn = (r: SimulationResult, year: number): number =>
+  Arr.sum(
+    r.salary
+      .filter((s) => yearOf(s.month) === year)
+      .map((s) => s.incomeTax + s.bonusIncomeTax),
+  );

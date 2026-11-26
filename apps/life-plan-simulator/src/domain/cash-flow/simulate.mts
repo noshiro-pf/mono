@@ -32,7 +32,7 @@ import {
 } from '../pension/index.mjs';
 import {
   calculateSalary,
-  residentTaxableIncomeFrom,
+  residentTaxableIncomeOfYear,
   resolveSalaryHistory,
   type SalaryMonth,
 } from '../salary/index.mjs';
@@ -68,10 +68,9 @@ export const simulate = (input: SimulationInput): SimulationResult => {
 
   const salaryHistory = resolveSalaryHistory(input.salaryHistory, start);
 
-  const salary = calculateSalary(
-    { history: salaryHistory, retirementMonth },
-    months,
-  );
+  const salaryParams = { history: salaryHistory, retirementMonth } as const;
+
+  const salary = calculateSalary(salaryParams, months);
 
   const pension = calculatePension({
     birth,
@@ -143,7 +142,10 @@ export const simulate = (input: SimulationInput): SimulationResult => {
     months,
   );
 
-  const housingLoan = simulateHousingLoan(input.housingLoan, start, salary);
+  const housingLoan = simulateHousingLoan(input.housingLoan, start, salary, {
+    residentTaxableIncomeOfYear: (year) =>
+      residentTaxableIncomeOfYear(salaryParams, year),
+  });
 
   const oneOffIncomes = resolveOneOffs(input.oneOffIncomes);
 
@@ -369,11 +371,6 @@ type YearlySalaryTaxes = Readonly<{
   months: number;
   /** 給与・賞与の源泉徴収税額の合計 */
   incomeTax: number;
-  /**
-   * その年の月給に対する住民税の課税所得（翌年の住民税のもと）の、月ごとの概算
-   * の合計。賞与を数えない。
-   */
-  residentTaxableIncome: number;
 }>;
 
 const defaultBirth = 1990 * 12 + 3;
@@ -389,8 +386,11 @@ const defaultStart = 2026 * 12;
 const cappedDeduction = (
   deduction: HousingLoanDeduction,
   taxesByYear: ReadonlyMap<number, YearlySalaryTaxes>,
+  residentTaxableIncomeOf: (year: number) => number,
 ): HousingLoanDeduction => {
-  const taxes = taxesByYear.get(yearOf(deduction.month) - 1);
+  const previousYear = yearOf(deduction.month) - 1;
+
+  const taxes = taxesByYear.get(previousYear);
 
   // シミュレーションの範囲に 1 年分が入っていない年（開始前の年、1 月以外から
   // 始まるときの開始の年、12 月以外で終わるときの終わりの年、終わりの後の年）は
@@ -399,14 +399,12 @@ const cappedDeduction = (
     return deduction;
   }
 
-  // 法令の 5% は課税総所得金額等にかかるが、シミュレーターは年ごとの課税所得を
-  // 持たないので、住民税の行と同じ月ごとの概算（`residentTaxableIncomeFrom`）を
-  // 前年の月給について足して代える。概算なので法令の額とは合わない（月ごとに
-  // 0 で打ち切って足すので年で見るより多めになることがあり、賞与を数えないので
-  // 少なめになる、など）。翌年の行は範囲に入るとは限らないので使わない。
+  // 法令の 5% は課税総所得金額等にかかる。住民税の行と同じ、前年の給与と賞与
+  // からの概算（`residentTaxableIncomeOfYear`）で代える。翌年の行は範囲に入る
+  // とは限らないので、住民税の行からは読まない。
   const residentPart = Math.min(
     housingLoanDeductionResidentTaxCap,
-    taxes.residentTaxableIncome * housingLoanDeductionResidentTaxRate,
+    residentTaxableIncomeOf(previousYear) * housingLoanDeductionResidentTaxRate,
   );
 
   // 年金の所得税・住民税は数えない（給与の無い年の控除は 0 になる）。源泉徴収
@@ -427,18 +425,11 @@ const yearlySalaryTaxes = (
   for (const s of salary) {
     const year = yearOf(s.month);
 
-    const prev = mut_result.get(year) ?? {
-      months: 0,
-      incomeTax: 0,
-      residentTaxableIncome: 0,
-    };
+    const prev = mut_result.get(year) ?? { months: 0, incomeTax: 0 };
 
     mut_result.set(year, {
       months: prev.months + 1,
       incomeTax: prev.incomeTax + s.incomeTax + s.bonusIncomeTax,
-      residentTaxableIncome:
-        prev.residentTaxableIncome +
-        residentTaxableIncomeFrom(s.grossAfterIdeco),
     });
   }
 
@@ -449,6 +440,10 @@ const simulateHousingLoan = (
   loan: SimulationInput['housingLoan'],
   fallbackStart: MonthIndex,
   salary: readonly SalaryMonth[],
+  estimates: Readonly<{
+    /** その年の給与と賞与に対する住民税の課税所得の概算（年額） */
+    residentTaxableIncomeOfYear: (year: number) => number;
+  }>,
 ): HousingLoanSimulation => {
   const start = parseYearMonthOr(loan.start, fallbackStart);
 
@@ -476,7 +471,13 @@ const simulateHousingLoan = (
       schedule,
       start,
       housingLoanDeductionConditions(loan),
-    ).map((deduction) => cappedDeduction(deduction, taxesByYear)),
+    ).map((deduction) =>
+      cappedDeduction(
+        deduction,
+        taxesByYear,
+        estimates.residentTaxableIncomeOfYear,
+      ),
+    ),
   };
 };
 
