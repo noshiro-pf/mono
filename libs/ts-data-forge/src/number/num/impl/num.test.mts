@@ -57,12 +57,19 @@ describe('Num test', () => {
 
       expectType<typeof clampTo5_15, (target: number) => number>('=');
 
-      // Invalid (non-finite) values return the lower bound
-      expect(clampTo5_15(Number.POSITIVE_INFINITY)).toBe(5);
+      // An infinity goes to the nearer bound, as any value beyond it does
+      expect(clampTo5_15(Number.POSITIVE_INFINITY)).toBe(15);
 
       expect(clampTo5_15(Number.NEGATIVE_INFINITY)).toBe(5);
 
+      // NaN, which is no value at all, returns the lower bound
       expect(clampTo5_15(Number.NaN)).toBe(5);
+
+      expect(Num.clamp(Number.POSITIVE_INFINITY, 0, 100)).toBe(100);
+
+      expect(Num.clamp(Number.NEGATIVE_INFINITY, 0, 100)).toBe(0);
+
+      expect(Num.clamp(Number.NaN, 0, 100)).toBe(0);
     });
 
     test('should work with negative ranges', () => {

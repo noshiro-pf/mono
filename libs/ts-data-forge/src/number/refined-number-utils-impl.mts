@@ -691,10 +691,9 @@ const clampFnOrUndefined = (
       : (n) => Math.min(max, n)
     : max === undefined
       ? (n) => Math.max(min, n)
-      : // Not `Num.clamp`, which sends every non-finite value to the lower
-        // bound: an overflow to `+Infinity` saturates to `max` here, and only
-        // `NaN` goes to `min`.
-        (n) => (Number.isNaN(n) ? min : Math.max(min, Math.min(max, n)));
+      : // An overflow to `+Infinity` saturates to `max`, and only `NaN` goes
+        // to `min`.
+        Num.clamp(min, max);
 
 export type OperatorsForInteger<
   ElementType extends Int,
