@@ -56,6 +56,10 @@ export const DetailedFilterScoreRange = (): JSX.Element => {
         <RangeSliderWrapper>
           <RangeSlider
             disabled={disabled}
+            handleLabels={{
+              start: constant(dc.filterItems.scoreRangeHandles.start),
+              end: constant(dc.filterItems.scoreRangeHandles.end),
+            }}
             labelPrecision={labelPrecision}
             labelValues={[min, max]}
             max={max}

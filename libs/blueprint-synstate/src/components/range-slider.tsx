@@ -46,6 +46,12 @@ type Props = Readonly<{
   /** The track between the handles takes `intent`; on by default. */
   showTrackFill?: boolean;
   disabled?: Bindable<boolean>;
+  /**
+   * What each handle is called by assistive technology: the lower end and the
+   * upper end of what the slider sets ("Lowest score", "Highest score"). With
+   * none the handles have no name, as Blueprint's.
+   */
+  handleLabels?: Readonly<{ start: Bindable<string>; end: Bindable<string> }>;
   /** Asked to move the range to this, as a handle is dragged or keyed. */
   onChange?: (value: NumberRange) => void;
   /** Where the range was left, as a handle is let go or its key comes up. */
@@ -73,6 +79,7 @@ export const RangeSlider = ({
   intent = 'primary',
   showTrackFill = true,
   disabled = constant(false),
+  handleLabels,
   onChange,
   onRelease,
   class: className,
@@ -321,6 +328,7 @@ export const RangeSlider = ({
           handleSizes.observe(element);
         }}
         aria-disabled={disabled$}
+        aria-label={index === 0 ? handleLabels?.start : handleLabels?.end}
         aria-orientation={constant('horizontal')}
         aria-valuemax={constant(max)}
         aria-valuemin={constant(min)}

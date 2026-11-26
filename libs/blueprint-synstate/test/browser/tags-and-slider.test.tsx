@@ -425,6 +425,47 @@ describe(RangeSlider, () => {
   });
 });
 
+describe(`${RangeSlider.name}, handle names`, () => {
+  test('names each handle by its label, and follows a label that changes', () => {
+    const [end$, setEnd] = createState('Highest score');
+
+    const { container, unmount } = mountInto(() => (
+      <RangeSlider
+        handleLabels={{ start: constant('Lowest score'), end: end$ }}
+        value={constant([2, 8] as const)}
+      />
+    ));
+
+    onTestFinished(unmount);
+
+    const labels = (): readonly (string | null)[] =>
+      Array.from(container.querySelectorAll('.bp6-slider-handle'), (handle) =>
+        handle.getAttribute('aria-label'),
+      );
+
+    assert.deepStrictEqual(labels(), ['Lowest score', 'Highest score']);
+
+    setEnd('Top score');
+
+    assert.deepStrictEqual(labels(), ['Lowest score', 'Top score']);
+  });
+
+  test('gives the handles no name without labels, as Blueprint does', () => {
+    const { container, unmount } = mountInto(() => (
+      <RangeSlider value={constant([2, 8] as const)} />
+    ));
+
+    onTestFinished(unmount);
+
+    assert.deepStrictEqual(
+      Array.from(container.querySelectorAll('.bp6-slider-handle'), (handle) =>
+        handle.hasAttribute('aria-label'),
+      ),
+      [false, false],
+    );
+  });
+});
+
 describe(`${RangeSlider.name}, beyond Blueprint's cases`, () => {
   test('refuses bounds that are not finite, both label options, steps that are not above 0, and more labels than can be drawn', () => {
     assert.throws(() => {

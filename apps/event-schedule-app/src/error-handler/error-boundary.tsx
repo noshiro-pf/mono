@@ -148,7 +148,12 @@ const ErrorScreen = ({ error }: Readonly<{ error: unknown }>): JSX.Element => {
         }
         icon={'error'}
       />
-      <Dialog class={maxWidthModalClass} isOpen={isOpen$} onClose={close}>
+      <Dialog
+        aria-label={constant(dc.sendReport.dialog)}
+        class={maxWidthModalClass}
+        isOpen={isOpen$}
+        onClose={close}
+      >
         <div class={constant('bp6-dialog-body')}>
           <Label text={constant(dc.sendReport.log)}>
             <pre class={constant(`bp6-code-block ${styles.log}`)}>

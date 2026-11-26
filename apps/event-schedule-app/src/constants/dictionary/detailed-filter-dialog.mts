@@ -7,6 +7,8 @@ export const detailedFilterDictionary = {
     answerIcon: '［記号で絞り込み］',
     filledDateOnly: '全員回答済みの候補日のみ表示',
     score: 'スコアで絞り込み',
+    /** The names of the score range slider's two handles. */
+    scoreRangeHandles: { start: '最低スコア', end: '最高スコア' },
     rank: 'スコア上位のみ表示',
     rankPrefix: 'スコア上位',
     rankSuffix: '位まで表示',

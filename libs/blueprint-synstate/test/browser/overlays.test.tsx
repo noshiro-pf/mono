@@ -21,6 +21,16 @@ import { linesOf } from './markup-lines.mjs';
 
 const ignore = (): void => {};
 
+/**
+ * Blueprint's `Alert` has no accessible name: it has no title, and its `Dialog`
+ * is labelled by nothing else. This one is labelled by its message.
+ */
+const alertNamedByItsMessage = (line: string): string =>
+  /^\s*div\.bp6-alert\.bp6-dialog\b/u.test(line) &&
+  !line.includes('[aria-labelledby=')
+    ? line.replace('[aria-modal=', '[aria-labelledby=#found][aria-modal=')
+    : line;
+
 const cases: readonly (readonly [
   name: string,
   theirs: () => ReactElement,
@@ -151,7 +161,10 @@ describe('overlays beside Blueprint React', () => {
       render(ours, container),
     );
 
-    assert.deepStrictEqual(synstate, blueprint.map(disabledButtonTabIndex));
+    assert.deepStrictEqual(
+      synstate,
+      blueprint.map(disabledButtonTabIndex).map(alertNamedByItsMessage),
+    );
   });
 
   test.each(cases)('%s is drawn the same', async (_name, theirs, ours) => {
@@ -967,7 +980,99 @@ describe(Dialog, () => {
   });
 });
 
+describe(`${Dialog.name}, its name`, () => {
+  test('is named by its title', async () => {
+    const { unmount } = mounted(() => (
+      <Dialog isOpen={constant(true)} title={constant('Settings')}>
+        <div class={constant('bp6-dialog-body')}>{constant('Body')}</div>
+      </Dialog>
+    ));
+
+    onTestFinished(unmount);
+
+    await transitioned();
+
+    const labelledBy = theDialog().getAttribute('aria-labelledby');
+
+    assert.isNotNull(labelledBy);
+
+    assert.strictEqual(
+      document.querySelector(`#${CSS.escape(labelledBy)}`)?.textContent,
+      'Settings',
+    );
+  });
+
+  test('is named by the element given in place of its title', async () => {
+    const { unmount } = mounted(() => (
+      <Dialog
+        aria-labelledby={'named-elsewhere'}
+        isOpen={constant(true)}
+        title={constant('Settings')}
+      >
+        <p id={constant('named-elsewhere')}>{constant('Elsewhere')}</p>
+      </Dialog>
+    ));
+
+    onTestFinished(unmount);
+
+    await transitioned();
+
+    assert.strictEqual(
+      theDialog().getAttribute('aria-labelledby'),
+      'named-elsewhere',
+    );
+  });
+
+  test('is named by its label when it has no title, and described by what it is given', async () => {
+    const { unmount } = mounted(() => (
+      <Dialog
+        aria-describedby={'what-went-wrong'}
+        aria-label={constant('Error')}
+        isOpen={constant(true)}
+      >
+        <p id={constant('what-went-wrong')}>{constant('Something broke.')}</p>
+      </Dialog>
+    ));
+
+    onTestFinished(unmount);
+
+    await transitioned();
+
+    assert.strictEqual(theDialog().getAttribute('aria-label'), 'Error');
+
+    assert.isFalse(theDialog().hasAttribute('aria-labelledby'));
+
+    assert.strictEqual(
+      theDialog().getAttribute('aria-describedby'),
+      'what-went-wrong',
+    );
+  });
+});
+
 describe(Alert, () => {
+  test('is named by its message', async () => {
+    const { unmount } = mounted(() => (
+      <Alert cancelButtonText={constant('Cancel')} isOpen={constant(true)}>
+        {constant('Delete this event?')}
+      </Alert>
+    ));
+
+    onTestFinished(unmount);
+
+    await transitioned();
+
+    const labelledBy = one('[role="alertdialog"]').getAttribute(
+      'aria-labelledby',
+    );
+
+    assert.isNotNull(labelledBy);
+
+    assert.strictEqual(
+      document.querySelector(`#${CSS.escape(labelledBy)}`)?.textContent,
+      'Delete this event?',
+    );
+  });
+
   test('confirms and cancels, and tells `onClose` which', async () => {
     const mut_answers: string[] = [];
 
@@ -1051,6 +1156,9 @@ const one = <E extends Element = HTMLElement>(selector: string): E => {
 
   return element;
 };
+
+/** The one dialog in the document. */
+const theDialog = (): HTMLElement => one('.bp6-dialog');
 
 /**
  * Mounts a side, focuses its input, and moves focus to the trap after the

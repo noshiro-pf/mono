@@ -12,6 +12,8 @@ export const errorMessagesDictionary = {
     sendReport: {
       log: 'エラーログ',
       button: 'エラーログと説明を送信する',
+      /** The name of the dialog the button opens, which has no title. */
+      dialog: 'エラー報告の送信',
       success: 'エラー報告を送信しました。ご協力ありがとうございました。',
       error: 'エラー報告の送信に失敗しました。',
       description: {

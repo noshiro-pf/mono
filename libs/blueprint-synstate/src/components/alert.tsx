@@ -6,7 +6,7 @@ import {
   type Child,
   type JSX,
 } from 'synstate-dom';
-import { intentClass } from '../internal/index.mjs';
+import { intentClass, uniqueId } from '../internal/index.mjs';
 import { Button } from './button.js';
 import { Dialog } from './dialog.js';
 import { Icon, type IconName20 } from './icon.js';
@@ -43,7 +43,7 @@ type Props = Readonly<{
 /**
  * Blueprint's `Alert`: a `Dialog` with no header, its role `alertdialog`, an
  * icon and a message, and a footer with the confirm button and an optional
- * cancel button.
+ * cancel button. Having no title, it is named by its message.
  */
 export const Alert = ({
   isOpen,
@@ -61,6 +61,8 @@ export const Alert = ({
   class: className,
   'data-e2e': e2e,
 }: Props): JSX.Element => {
+  const messageId = uniqueId('bp-alert-message');
+
   const answer =
     (confirmed: boolean) =>
     (event: Event): void => {
@@ -71,6 +73,7 @@ export const Alert = ({
 
   return (
     <Dialog
+      aria-labelledby={messageId}
       canEscapeKeyClose={canEscapeKeyCancel}
       canOutsideClickClose={canOutsideClickCancel}
       class={className === undefined ? 'bp6-alert' : `bp6-alert ${className}`}
@@ -85,7 +88,9 @@ export const Alert = ({
         ) : (
           <Icon class={intentClass(intent)} icon={icon} size={40} />
         )}
-        <div class={constant('bp6-alert-contents')}>{children}</div>
+        <div class={constant('bp6-alert-contents')} id={constant(messageId)}>
+          {children}
+        </div>
       </div>
       <div class={constant('bp6-alert-footer')}>
         <Button

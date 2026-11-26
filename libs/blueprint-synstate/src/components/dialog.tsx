@@ -20,6 +20,12 @@ type Props = Readonly<{
   canOutsideClickClose?: boolean;
   /** `alertdialog` for an `Alert`. */
   role?: 'alertdialog' | 'dialog';
+  /** Names the dialog when it has no `title`. */
+  'aria-label'?: Bindable<string>;
+  /** The id of what names the dialog, in place of the title's. */
+  'aria-labelledby'?: string;
+  /** The id of what describes the dialog. */
+  'aria-describedby'?: string;
   /** Usually `div.bp6-dialog-body` and `div.bp6-dialog-footer`. */
   children: Child;
   /** Classes on `div.bp6-dialog`, after Blueprint's own. */
@@ -29,7 +35,8 @@ type Props = Readonly<{
 
 /**
  * Blueprint's `Dialog`: `div.bp6-dialog` with a header, over a backdrop, in a
- * portal at the end of the body. Focus is brought inside as it opens, to an
+ * portal at the end of the body. It is named by its title, or by `aria-label`
+ * or `aria-labelledby` when it has none. Focus is brought inside as it opens, to an
  * element with `autoFocus` if there is one, kept inside while it is open, and
  * given back as it closes.
  */
@@ -42,6 +49,9 @@ export const Dialog = ({
   canEscapeKeyClose = true,
   canOutsideClickClose = true,
   role = 'dialog',
+  'aria-label': ariaLabel,
+  'aria-labelledby': labelledBy,
+  'aria-describedby': describedBy,
   children,
   class: className,
   'data-e2e': e2e,
@@ -59,8 +69,16 @@ export const Dialog = ({
           tabIndex={tabIndex === undefined ? undefined : constant(tabIndex)}
         >
           <div
+            aria-describedby={
+              describedBy === undefined ? undefined : constant(describedBy)
+            }
+            aria-label={ariaLabel}
             aria-labelledby={
-              title === undefined ? undefined : constant(titleId)
+              labelledBy === undefined
+                ? title === undefined
+                  ? undefined
+                  : constant(titleId)
+                : constant(labelledBy)
             }
             aria-modal={constant('true')}
             class={classObject(['bp6-dialog', className])}
