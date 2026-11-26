@@ -1,4 +1,4 @@
-import { createState, derive, map } from 'synstate';
+import { createState, derive, map, type InitializedObservable } from 'synstate';
 import {
   constant,
   createAfterUpdate,
@@ -62,7 +62,6 @@ type Props = DateRangePickerOptions &
     /** The day read from typed text; {@link parseDateText} if omitted. */
     parseDate?: (text: string) => Optional<WallClock>;
     invalidDateMessage?: string;
-    outOfRangeMessage?: string;
     /** Shown in the end field for an end before the start. */
     overlappingDatesMessage?: string;
   }>;
@@ -86,8 +85,14 @@ type Props = DateRangePickerOptions &
  *   closing the calendar; Escape closes it.
  * - With the whole text of a field selected, the arrow keys move its day, by
  *   a day or a week, keeping it from passing the other end.
- * - A field shows the error message for a day not a date or out of range, and
- *   the end field one before the start, drawn as an error.
+ * - A field shows the error message for a day not a date, and the end field
+ *   one before the start, drawn as an error and marked `aria-invalid`.
+ *
+ * Unlike Blueprint's, a day out of range is shown as its date, drawn as an
+ * error, rather than as "Out of range", as {@link DateInput} shows one:
+ * `minDate` and `maxDate` say what can be picked and typed, and a day stored
+ * outside them, as a saved document can give, still reads as itself, focused
+ * too until its text changes. An error drawn is said as `aria-invalid` as well.
  *
  * Unlike Blueprint's, the popover is drawn in place, as {@link DateInput}'s is;
  * Escape in the calendar is kept from the page, and gives the focus back to the
@@ -107,7 +112,6 @@ export const DateRangeInput = ({
   formatDate,
   parseDate,
   invalidDateMessage = 'Invalid date',
-  outOfRangeMessage = 'Out of range',
   overlappingDatesMessage = 'Overlapping dates',
   ...pickerOptions
 }: Props): JSX.Element => {
@@ -180,8 +184,11 @@ export const DateRangeInput = ({
     return Optional.isSome(clock) ? format(Optional.unwrap(clock)) : '';
   };
 
-  /** Blueprint's `formatDateString`. */
-  const shownOf = (day: string, ignoreRange: boolean): string => {
+  /**
+   * Blueprint's `formatDateString`, but a day out of range is shown as its
+   * date, which the field draws as an error ({@link isOutOfRange}).
+   */
+  const shownOf = (day: string): string => {
     if (day === '') {
       return '';
     }
@@ -190,21 +197,19 @@ export const DateRangeInput = ({
 
     return Optional.isNone(clock)
       ? invalidDateMessage
-      : ignoreRange || isDayInRange(Optional.unwrap(clock), min, max)
-        ? format(Optional.unwrap(clock))
-        : outOfRangeMessage;
+      : format(Optional.unwrap(clock));
   };
+
+  /** Whether `day` is a date outside `minDate` to `maxDate`. */
+  const isOutOfRange = (day: string): boolean =>
+    Optional.isSome(parseWallClock(day)) && !isValidInRange(day);
 
   /**
    * Blueprint's `parseDate`: `''` for no text to read, the day read, or
    * {@link INVALID_DAY}.
    */
   const dayOfText = (text: string | undefined): string => {
-    if (
-      text === undefined ||
-      text === outOfRangeMessage ||
-      text === invalidDateMessage
-    ) {
+    if (text === undefined || text === invalidDateMessage) {
       return '';
     }
 
@@ -436,7 +441,6 @@ export const DateRangeInput = ({
           focused: true,
           input: shownOf(
             endOf(boundary, Optional.unwrap(value$.getSnapshot())),
-            true,
           ),
         },
       ),
@@ -455,7 +459,6 @@ export const DateRangeInput = ({
           ? {
               input: shownOf(
                 endOf(boundary, Optional.unwrap(value$.getSnapshot())),
-                false,
               ),
             }
           : {}),
@@ -617,24 +620,27 @@ export const DateRangeInput = ({
             ? ''
             : endOverlaps(selected)
               ? overlappingDatesMessage
-              : shownOf(selected, false));
+              : shownOf(selected));
 
       // Blueprint's `isInputInErrorState`: not while over a day, nor while the
-      // field has had no text.
+      // field has had no text. A stored day out of range is shown as its date
+      // and drawn as an error before the field has had text too, as `DateInput`
+      // draws one.
       const checked = field.focused ? dayOfText(field.input) : selected;
 
       const error =
         field.hover === undefined &&
-        field.input !== undefined &&
-        field.input !== '' &&
-        checked !== '' &&
-        (!isValidInRange(checked) || endOverlaps(checked));
+        ((!field.focused && isOutOfRange(selected)) ||
+          (field.input !== undefined &&
+            field.input !== '' &&
+            checked !== '' &&
+            (!isValidInRange(checked) || endOverlaps(checked))));
 
       return {
         text,
         error,
         placeholder: field.focused
-          ? shownOf(toDateValue(boundary === 'start' ? min : max), false)
+          ? shownOf(toDateValue(boundary === 'start' ? min : max))
           : boundary === 'start'
             ? 'Start date'
             : 'End date',
@@ -675,6 +681,9 @@ export const DateRangeInput = ({
               mut_elements.end = input;
             }
           }}
+          // The error drawn is said here as well. Absent rather than `false`
+          // otherwise, as on Blueprint's input.
+          aria-invalid={shown.error.pipe(map((error) => error || undefined))}
           autocomplete={constant('off')}
           class={constant('bp6-input')}
           disabled={disabled$}
@@ -823,7 +832,7 @@ type Shown = Readonly<{ text: string; error: boolean; placeholder: string }>;
 
 type FieldView = Readonly<{
   text: Bindable<string>;
-  error: Bindable<boolean>;
+  error: InitializedObservable<boolean>;
   placeholder: Bindable<string>;
 }>;
 

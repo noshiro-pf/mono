@@ -255,6 +255,110 @@ describe(DateRangeInput, () => {
   });
 });
 
+describe('DateRangeInput, a day out of range', () => {
+  test('is shown as its date, drawn as an error and marked aria-invalid, focused too until its text changes', async () => {
+    fixNow();
+
+    const host = stage();
+
+    const unmount = render(
+      () => (
+        <DateRangeInput
+          maxDate={'2026-11-15'}
+          minDate={RANGE.minDate}
+          value={constant(['2026-10-10', '2026-12-01'] as const)}
+          onChange={() => {}}
+        />
+      ),
+      host,
+    );
+
+    try {
+      await settle();
+
+      // The start, in range, carries no aria-invalid at all.
+      assert.deepStrictEqual(fieldsOf(host), [
+        '2026/10/10',
+        '2026/12/01!~true',
+      ]);
+
+      const [, end] = all(host, '.bp6-date-range-input input');
+
+      assert.isDefined(end);
+
+      await userEvent.click(end);
+
+      await settle();
+
+      assert.deepStrictEqual(fieldsOf(host), [
+        '2026/10/10',
+        '2026/12/01!~true',
+      ]);
+
+      await userEvent.keyboard('{Control>}a{/Control}2026/11/01');
+
+      await settle();
+
+      assert.deepStrictEqual(fieldsOf(host), ['2026/10/10', '2026/11/01']);
+    } finally {
+      unmount();
+
+      host.remove();
+    }
+  });
+
+  test('marks aria-invalid on text that reads as no date and on an end before the start', async () => {
+    fixNow();
+
+    const host = stage();
+
+    const [range$, setRange] = createState<DayRange>([
+      '2026-10-10',
+      '2026-10-20',
+    ]);
+
+    const unmount = render(
+      () => (
+        <DateRangeInput
+          maxDate={RANGE.maxDate}
+          minDate={RANGE.minDate}
+          value={range$}
+          onChange={setRange}
+        />
+      ),
+      host,
+    );
+
+    try {
+      const [start, end] = all(host, '.bp6-date-range-input input');
+
+      assert.isDefined(start);
+
+      assert.isDefined(end);
+
+      await userEvent.click(start);
+
+      await userEvent.keyboard('{Control>}a{/Control}nonsense');
+
+      await settle();
+
+      assert.strictEqual(fieldsOf(host)[0], 'nonsense!~true');
+
+      await userEvent.click(end);
+
+      await userEvent.keyboard('{Control>}a{/Control}2026/10/01');
+
+      await settle();
+
+      assert.strictEqual(fieldsOf(host)[1], '2026/10/01!~true');
+    } finally {
+      unmount();
+
+      host.remove();
+    }
+  });
+});
+
 describe('DateRangeInput, Escape elsewhere', () => {
   test('closes the calendar and drops what the pointer showed', async () => {
     fixNow();
@@ -405,6 +509,42 @@ describe('DateRangeInput beside Blueprint React', () => {
     assert.deepStrictEqual(synstate, blueprint);
   });
 
+  test('shows a stored day out of range as its date, where Blueprint reads "Out of range"', async () => {
+    fixNow();
+
+    const [blueprint, synstate] = await bothRun(
+      theirInput({
+        initial: ['2026-10-10', '2026-12-01'],
+        maxDate: '2026-11-15',
+      }),
+      ourInput({
+        initial: ['2026-10-10', '2026-12-01'],
+        maxDate: '2026-11-15',
+      }),
+      onInput([
+        ['click', 'end'],
+        ['keys', '{Escape}'],
+      ]),
+    );
+
+    // Focused, both show the date, drawn as an error.
+    const ourFocused = Arr.butLast(synstate);
+
+    const theirFocused = Arr.butLast(blueprint);
+
+    assert.deepStrictEqual(ourFocused, theirFocused);
+
+    // Left, Blueprint's reads "Out of range"; this library's still reads the
+    // day, as its DateInput does, both drawn as an error.
+    assert.deepStrictEqual(Arr.takeLast(blueprint, 1), [
+      'keys {Escape}: 2026/10/10|Start date Out of range|End date! closed',
+    ]);
+
+    assert.deepStrictEqual(Arr.takeLast(synstate, 1), [
+      'keys {Escape}: 2026/10/10|Start date 2026/12/01|End date! closed',
+    ]);
+  });
+
   test('gives the focus back to the field as Escape in the calendar closes it', async () => {
     fixNow();
 
@@ -506,6 +646,13 @@ const inputDrawn = (host: HTMLElement): string => {
     ? `${fields.join(' ')} open ${rangeDrawn(popover())}`
     : `${fields.join(' ')} closed`;
 };
+
+/** Each field's text, `!` for the error drawn, `~` for `aria-invalid`. */
+const fieldsOf = (host: HTMLElement): readonly string[] =>
+  all<HTMLInputElement>(host, '.bp6-date-range-input input').map(
+    (input) =>
+      `${input.value}${input.parentElement?.classList.contains('bp6-intent-danger') === true ? '!' : ''}${input.hasAttribute('aria-invalid') ? `~${input.getAttribute('aria-invalid') ?? ''}` : ''}`,
+  );
 
 /** Does `steps` to the input, logging what it draws after each. */
 const onInput =
