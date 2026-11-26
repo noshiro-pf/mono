@@ -1,9 +1,14 @@
 import { Arr, asUint32, expectType, type Int, Result } from 'ts-data-forge';
-import { array } from '../array/index.mjs';
+import { array, tuple } from '../array/index.mjs';
 import { intersection, union } from '../compose/index.mjs';
 import { enumType } from '../enum/index.mjs';
 import { toJsonSchema } from '../json-schema/index.mjs';
-import { annotate, literal, recursion } from '../other-types/index.mjs';
+import {
+  annotate,
+  literal,
+  MapType,
+  recursion,
+} from '../other-types/index.mjs';
 import { int } from '../predefined/index.mjs';
 import { boolean, nullType, number, string } from '../primitives/index.mjs';
 import type { Type, TypeOf } from '../type.mjs';
@@ -1428,6 +1433,131 @@ describe(mergeRecords, () => {
       assert.deepStrictEqual(Merged.fill({}), { meta: { a: 0, b: 0 } });
     });
 
+    describe('members that wrap records in a union or an array', () => {
+      const nullableX = union([nullType, record({ x: number() })]);
+
+      const nullableY = union([nullType, record({ y: number() })]);
+
+      const NullableFirst = mergeRecords([
+        record({ p: nullableX }),
+        record({ p: nullableY }),
+      ]);
+
+      const NullableLast = mergeRecords([
+        record({ p: union([record({ x: number() }), nullType]) }),
+        record({ p: union([record({ y: number() }), nullType]) }),
+      ]);
+
+      const Arrays = mergeRecords([
+        record({ p: array(record({ x: number() })) }),
+        record({ p: array(record({ y: number() })) }),
+      ]);
+
+      const absent = { p: nullType.defaultValue } as const;
+
+      test('prune removes only the keys no member declares', () => {
+        const withExcess = { p: { x: 1, y: 2, secret: 3 } } as const;
+
+        assert.deepStrictEqual(NullableFirst.prune(withExcess), {
+          p: { x: 1, y: 2 },
+        });
+
+        assert.deepStrictEqual(NullableFirst.prune(absent), absent);
+
+        const elementsWithExcess = {
+          p: [
+            { x: 1, y: 2, secret: 3 },
+            { x: 4, y: 5 },
+          ],
+        } as const;
+
+        // A literal written in place would be checked against the first array's
+        // element type alone, which `y` is not part of.
+        const pruned = {
+          p: [
+            { x: 1, y: 2 },
+            { x: 4, y: 5 },
+          ],
+        } as const;
+
+        assert.deepStrictEqual(Arrays.prune(elementsWithExcess), pruned);
+      });
+
+      test('fill repairs each element of an array as the records merged', () => {
+        const repaired = {
+          p: [
+            { x: 1, y: 0 },
+            { x: 0, y: 2 },
+          ],
+        } as const;
+
+        assert.deepStrictEqual(
+          Arrays.fill({ p: [{ x: 1 }, { y: 2 }] }),
+          repaired,
+        );
+      });
+
+      test('prune keeps a Map that the members share as it is', () => {
+        const WithMap = mergeRecords([
+          record({ p: MapType(string(), number()) }),
+          record({ p: MapType(string(), number()) }),
+        ]);
+
+        const p = new Map<string, number>([['a', 1]]);
+
+        assert.deepStrictEqual(WithMap.prune({ p }), { p });
+      });
+
+      test('fill merges elements by index only where no member dropped one', () => {
+        const Dropping = mergeRecords([
+          record({
+            p: array(record({ x: number() }), { onInvalidElement: 'drop' }),
+          }),
+          record({
+            p: array(record({ y: number() }), { onInvalidElement: 'drop' }),
+          }),
+        ]);
+
+        // Each member drops the other's element, which leaves one element in
+        // each, made from different elements of the value.
+        assert.deepStrictEqual(
+          Dropping.fill({ p: [{ x: 1 }, { y: 2 }] }),
+          Dropping.defaultValue,
+        );
+      });
+
+      test('tuples of records default and repair as the records merged', () => {
+        const Tuples = mergeRecords([
+          record({ p: tuple([record({ x: number() })]) }),
+          record({ p: tuple([record({ y: number() })]) }),
+        ]);
+
+        const merged = { p: [{ x: 0, y: 0 }] } as const;
+
+        assert.deepStrictEqual(Tuples.defaultValue, merged);
+
+        assert.deepStrictEqual(Tuples.fill({ p: 'bad' }), merged);
+
+        assert.deepStrictEqual(Tuples.fill({ p: [] }), merged);
+      });
+
+      test('fill repairs a nullable record as the records merged', () => {
+        // A union repairs a record it rejects by its closest record member,
+        // wherever its `null` is declared.
+        assert.deepStrictEqual(NullableFirst.fill({ p: { x: 1 } }), {
+          p: { x: 1, y: 0 },
+        });
+
+        assert.deepStrictEqual(NullableLast.fill({ p: { x: 1 } }), {
+          p: { x: 1, y: 0 },
+        });
+
+        assert.deepStrictEqual(NullableFirst.fill(absent), absent);
+
+        assert.deepStrictEqual(NullableLast.fill(absent), absent);
+      });
+    });
+
     test('record branches merge in the order of the records', () => {
       const Merged = mergeRecords([
         record({
@@ -2234,10 +2364,29 @@ describe(mergeRecords, () => {
         expect(build).toThrow('exceeding the limit of 10000');
       });
 
-      test('are not merged in the search for a default that comes before them', () => {
+      test("are not merged when the members' repairs, merged, are accepted", () => {
         const Merged = mergeRecords([
           record({ v: union([record({ p: variants('a') }), number()]) }),
           record({ v: union([record({ p: variants('b') }), number()]) }),
+        ]);
+
+        assert.deepStrictEqual(Merged.defaultValue, { v: 0 });
+
+        assert.deepStrictEqual(Merged.fill({ v: 'x' }), {
+          v: { p: { a_first: 0, b_first: 0 } },
+        });
+      });
+
+      test('are not merged in the search for a default that comes before them', () => {
+        // `k` makes the members' repairs of a record, merged, fail the other
+        // member, so that `fill` reaches the search.
+        const Merged = mergeRecords([
+          record({
+            v: union([record({ p: variants('a'), k: literal('a') }), number()]),
+          }),
+          record({
+            v: union([record({ p: variants('b'), k: literal('b') }), number()]),
+          }),
         ]);
 
         assert.deepStrictEqual(Merged.defaultValue, { v: 0 });
