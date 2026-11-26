@@ -60,8 +60,14 @@ export const incomeTaxBrackets: readonly Readonly<{
 /** 上場株式等の譲渡益にかかる税率（所得税・復興特別所得税・住民税）。 */
 export const capitalGainsTaxRate = 0.203_15;
 
-/** NISA の生涯投資枠（円）。 */
+/** NISA の生涯投資枠（非課税保有限度額、円）。 */
 export const nisaLifetimeLimit = 18_000_000;
+
+/**
+ * NISA の年間投資枠（円）。つみたて投資枠 120 万円と成長投資枠 240 万円の合計。
+ * このシミュレーターの NISA 口座は 1 つで、どちらの枠で買うかを区別しない。
+ */
+export const nisaAnnualLimit = 3_600_000;
 
 /** 老齢基礎年金の満額（円 / 年）。 */
 export const basicPensionFullAmount = 816_000;

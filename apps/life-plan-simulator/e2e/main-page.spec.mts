@@ -5,7 +5,7 @@ test('overview shows the checks', { tag: '@smoke' }, async ({ page }) => {
 
   await expect
     .soft(page.getByTestId('checks').getByRole('listitem'))
-    .toHaveCount(5);
+    .toHaveCount(6);
 });
 
 test('housing loan summary', { tag: '@smoke' }, async ({ page }) => {

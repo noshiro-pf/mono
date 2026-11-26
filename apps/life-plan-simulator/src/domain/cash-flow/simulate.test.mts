@@ -236,6 +236,56 @@ describe(simulate, () => {
     });
   });
 
+  describe('NISA の年間投資枠', () => {
+    const rich = { ...d.assumptions, initialCash: 50_000_000 } as const;
+
+    const monthlyNisa = (amount: number): SimulationResult =>
+      simulate({
+        ...d,
+        assumptions: rich,
+        nisa: {
+          ...d.nisa,
+          regularContributions: [
+            { id: 1, start: '2026-01', amount },
+            { id: 2, start: '2027-01', amount: 0 },
+          ],
+        },
+      });
+
+    test('既定のプランは年間投資枠を超えないこと', () => {
+      assert.isUndefined(result.checks.nisaWithinAnnualLimit);
+    });
+
+    test('その年の投資額が 360 万円を超えた月を返すこと', () => {
+      const r = monthlyNisa(1_000_000);
+
+      assert.strictEqual(
+        formatYearMonth(r.checks.nisaWithinAnnualLimit ?? 0),
+        '2026-04',
+      );
+    });
+
+    test('年 360 万円までなら超えないこと', () => {
+      assert.isUndefined(monthlyNisa(300_000).checks.nisaWithinAnnualLimit);
+    });
+
+    test('確定拠出年金の一括受給額を NISA に入れた月も数えること', () => {
+      const r = simulate({
+        ...d,
+        definedContribution: {
+          ...d.definedContribution,
+          initialValue: 30_000_000,
+          lumpSumToNisa: 10_000_000,
+        },
+      });
+
+      assert.strictEqual(
+        r.checks.nisaWithinAnnualLimit,
+        r.definedContribution.lumpSumMonth,
+      );
+    });
+  });
+
   test('欠けた入力値は既定値で補って読み込めること', () => {
     const filled = SimulationInput.fill({ profile: { birth: '1980-01' } });
 
