@@ -124,6 +124,10 @@ const report = (result: CheckResult): number => {
     console.error(result.lint.stderr.trimEnd());
   }
 
+  if (result.lint.failure !== undefined) {
+    console.error(`sumi check: ${result.lint.failure}`);
+  }
+
   for (const diagnostic of result.checker.diagnostics) {
     console.error(
       `${diagnostic.fileName}(${diagnostic.line},${diagnostic.column}): ${diagnostic.ruleId}: ${diagnostic.message}`,
@@ -145,7 +149,7 @@ const report = (result: CheckResult): number => {
   console.error(
     result.ok
       ? `sumi check: ${result.fileCount} files, no problems.`
-      : `sumi check: ${result.fileCount} files, ${result.typeCheck.failure === undefined ? '' : 'type check incomplete, '}${result.typeCheck.diagnostics.length} type errors, ${result.lint.diagnostics.length + result.checker.diagnostics.length} lint problems, ${result.unusedExpectErrors.length} unused @sumi-expect-error, ${result.invalidExpectErrors.length} invalid @sumi-expect-error, ${result.silencingDirectives.length} oxlint-disable directives silencing a Sumi rule.`,
+      : `sumi check: ${result.fileCount} files, ${result.typeCheck.failure === undefined ? '' : 'type check incomplete, '}${result.lint.failure === undefined ? '' : 'lint incomplete, '}${result.typeCheck.diagnostics.length} type errors, ${result.lint.diagnostics.length + result.checker.diagnostics.length} lint problems, ${result.unusedExpectErrors.length} unused @sumi-expect-error, ${result.invalidExpectErrors.length} invalid @sumi-expect-error, ${result.silencingDirectives.length} oxlint-disable directives silencing a Sumi rule.`,
   );
 
   return result.ok ? 0 : 1;

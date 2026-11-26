@@ -45,20 +45,6 @@ describe(typeCheck, () => {
     );
   });
 
-  test('a compiler killed by a signal is a failure', async () => {
-    const result = await typeCheck(
-      tsconfigPath,
-      makeCompiler("process.kill(process.pid, 'SIGKILL');"),
-    );
-
-    assert.deepStrictEqual(result.diagnostics, []);
-
-    assert.strictEqual(
-      result.failure,
-      'the native compiler was killed by SIGKILL',
-    );
-  });
-
   test('a compiler that cannot be found is a failure', async () => {
     const result = await typeCheck(
       tsconfigPath,
@@ -72,15 +58,6 @@ describe(typeCheck, () => {
       result.failure,
       'the native compiler exited with status 1 and reported no diagnostic',
     );
-  });
-
-  test('a compiler output over the buffer limit is a failure', async () => {
-    const result = await typeCheck(
-      tsconfigPath,
-      makeCompiler("process.stdout.write('x'.repeat(65 * 1024 * 1024));"),
-    );
-
-    assert.include(result.failure, 'maxBuffer');
   });
 
   test('a non-zero exit with a diagnostic is a type error, not a failure', async () => {

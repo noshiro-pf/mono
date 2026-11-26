@@ -1,4 +1,4 @@
-import { execFile } from 'node:child_process';
+import { runNodeScript } from '@sumi-lang/oxlint-config';
 import * as path from 'node:path';
 import { nativeTscPath } from './native-tsc.mjs';
 
@@ -38,14 +38,10 @@ export const typeCheck = async (
   /** The compiler script run with this Node.js; replaced only by tests. */
   compilerPath: string = nativeTscPath,
 ): Promise<TypeCheckResult> => {
-  const result = await runCompiler([
-    compilerPath,
-    '-p',
-    tsconfigPath,
-    '--noEmit',
-    '--pretty',
-    'false',
-  ]);
+  const result = await runNodeScript(
+    [compilerPath, '-p', tsconfigPath, '--noEmit', '--pretty', 'false'],
+    'the native compiler',
+  );
 
   const output = `${result.stdout}${result.stderr}` as const;
 
@@ -58,65 +54,10 @@ export const typeCheck = async (
   return {
     diagnostics,
     output,
-    failure: describeFailure(
-      {
-        errorMessage: result.errorMessage,
-        signal: result.signal,
-        status: result.status,
-      },
-      diagnostics.length > 0,
-    ),
+    failure:
+      result.failure ?? statusFailure(result.status, diagnostics.length > 0),
   };
 };
-
-/**
- * Runs `args` with this Node.js and resolves with how it ended, never
- * rejecting. An exit code is a `status`; a process that did not start, or that
- * overran `maxBuffer` (killed for it), has an `errorMessage`; one killed from
- * elsewhere has a `signal`.
- */
-const runCompiler = (
-  args: readonly string[],
-): Promise<
-  Readonly<{
-    status: number | null;
-    signal: string | null;
-    errorMessage: string | undefined;
-    stdout: string;
-    stderr: string;
-  }>
-> =>
-  new Promise((resolve) => {
-    const child = execFile(
-      process.execPath,
-      args,
-      { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 },
-      (error, stdout, stderr) => {
-        const exited = error !== null && typeof error.code === 'number';
-
-        // Typed as optional, but `null` when the process exited by itself.
-        const signal = error?.signal ?? null;
-
-        const signalled = signal !== null && error?.killed !== true;
-
-        resolve({
-          status:
-            error === null
-              ? 0
-              : typeof error.code === 'number'
-                ? error.code
-                : null,
-          signal: signalled ? signal : null,
-          errorMessage:
-            error === null || exited || signalled ? undefined : error.message,
-          stdout,
-          stderr,
-        });
-      },
-    );
-
-    child.stdin?.end();
-  });
 
 /**
  * The compiler exits non-zero when it reports a diagnostic — 1 for most, 2 for
@@ -124,21 +65,13 @@ const runCompiler = (
  * failure only when nothing was parsed. A crash after some diagnostics is not
  * told apart by its status (a Go panic also exits 2).
  */
-const describeFailure = (
-  result: Readonly<{
-    errorMessage: string | undefined;
-    signal: string | null;
-    status: number | null;
-  }>,
+const statusFailure = (
+  status: number | null,
   hasDiagnostics: boolean,
 ): string | undefined =>
-  result.errorMessage !== undefined
-    ? (`the native compiler did not run to completion: ${result.errorMessage}` as const)
-    : result.signal !== null
-      ? (`the native compiler was killed by ${result.signal}` as const)
-      : !hasDiagnostics && result.status !== 0
-        ? (`the native compiler exited with status ${result.status ?? 'null'} and reported no diagnostic` as const)
-        : undefined;
+  !hasDiagnostics && status !== 0
+    ? (`the native compiler exited with status ${status ?? 'null'} and reported no diagnostic` as const)
+    : undefined;
 
 const parseDiagnosticLine = (
   text: string,

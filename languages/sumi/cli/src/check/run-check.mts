@@ -44,6 +44,8 @@ export type CheckResult = Readonly<
         /** After `@sumi-expect-error` suppression. */
         diagnostics: readonly OxlintDiagnostic[];
         stderr: string;
+        /** Why oxlint did not finish or report, when it did not. */
+        failure: string | undefined;
       }>;
       checker: Readonly<{
         /** After `@sumi-expect-error` suppression. */
@@ -85,6 +87,8 @@ export type CheckResult = Readonly<
  */
 export const runCheck = async (
   project: string,
+  /** The compiler script of the type check; replaced only by tests. */
+  compilerPath?: string,
 ): Promise<Result<CheckResult, string>> => {
   const tsconfigPath = resolveTsconfigPath(project);
 
@@ -108,11 +112,11 @@ export const runCheck = async (
     });
   }
 
-  const typeCheckResult = await typeCheck(tsconfigPath.value);
+  const typeCheckResult = await typeCheck(tsconfigPath.value, compilerPath);
 
   const lintResult =
     config.value.files.length === 0
-      ? ({ diagnostics: [], stderr: '' } as const)
+      ? ({ diagnostics: [], stderr: '', failure: undefined } as const)
       : await runOxlint(config.value.files);
 
   // The checker opens the same tsconfig, so it sees the same program the type
@@ -154,6 +158,7 @@ export const runCheck = async (
     ok:
       typeCheckResult.diagnostics.length === 0 &&
       typeCheckResult.failure === undefined &&
+      lintResult.failure === undefined &&
       expectErrors.lint.length === 0 &&
       expectErrors.checker.length === 0 &&
       expectErrors.unused.length === 0 &&
@@ -162,7 +167,11 @@ export const runCheck = async (
       Result.isOk(checkerResult),
     fileCount: config.value.files.length,
     typeCheck: typeCheckResult,
-    lint: { diagnostics: expectErrors.lint, stderr: lintResult.stderr },
+    lint: {
+      diagnostics: expectErrors.lint,
+      stderr: lintResult.stderr,
+      failure: lintResult.failure,
+    },
     checker: {
       diagnostics: expectErrors.checker,
       error: Result.isErr(checkerResult) ? checkerResult.value : undefined,

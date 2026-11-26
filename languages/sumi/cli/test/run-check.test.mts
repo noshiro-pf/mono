@@ -75,6 +75,36 @@ describe(runCheck, () => {
     assert.deepStrictEqual(result.value.lint.diagnostics, []);
   });
 
+  test('a compiler that exits non-zero and prints nothing fails the check', async () => {
+    const dir = makeProject({
+      'a.mts': dedent`
+        export const double = (x: number): number => x * 2;
+      `,
+    });
+
+    const compilerPath = path.join(dir, 'crashing-tsc.mjs');
+
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
+    fs.writeFileSync(compilerPath, 'process.exit(2);\n');
+
+    const result = await runCheck(dir, compilerPath);
+
+    assert.isTrue(Result.isOk(result));
+
+    assert.strictEqual(result.value.kind, 'checked');
+
+    if (result.value.kind !== 'checked') {
+      return;
+    }
+
+    assert.isFalse(result.value.ok);
+
+    assert.strictEqual(
+      result.value.typeCheck.failure,
+      'the native compiler exited with status 2 and reported no diagnostic',
+    );
+  });
+
   test('reports type errors and lint problems together', async () => {
     const dir = makeProject({
       'a.mts': dedent`
