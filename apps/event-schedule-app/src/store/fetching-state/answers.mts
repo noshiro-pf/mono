@@ -13,7 +13,7 @@ import {
   type InitializedObservable,
   type Subscription,
 } from 'synstate';
-import { Result, isNotUndefined } from 'ts-data-forge';
+import { Result, isNotUndefined, unknownToString } from 'ts-data-forge';
 import type { Api } from '../../api/index.mjs';
 import { createReducerWithActions } from '../../utils/index.mjs';
 
@@ -34,7 +34,10 @@ export type AnswersResult =
 export type AnswersFetcher = Readonly<{
   answers$: InitializedObservable<readonly Answer[] | undefined>;
   result$: InitializedObservable<AnswersResult>;
-  /** Whether a read the refresh button asked for has yet to come back. */
+  /**
+   * Whether a read has yet to come back, the refresh button's or another; none
+   * once the store stops.
+   */
   refreshButtonIsLoading$: InitializedObservable<boolean>;
   /** Disabled for `throttleMs` after each read the button can ask for. */
   refreshButtonIsDisabled$: InitializedObservable<boolean>;
@@ -100,12 +103,11 @@ export const createAnswersStore = (deps: AnswersDeps): AnswersFetcher => {
     fetchAnswersThrottled$.pipe(debounce(deps.throttleMs)).pipe(mapTo(false)),
   ]).pipe(withInitialValue(false));
 
+  // The read it starts, if one goes out, is what shows the button loading.
   const refreshAnswers = (): void => {
     deps.fetchEventSchedule();
 
     fetchAnswers();
-
-    setRefreshButtonIsLoading(true);
   };
 
   const answers$: InitializedObservable<readonly Answer[] | undefined> =
@@ -139,7 +141,23 @@ export const createAnswersStore = (deps: AnswersDeps): AnswersFetcher => {
 
             setLastRead({ eventId, result });
           })
-          .catch(() => {});
+          .catch((error: unknown) => {
+            // The read threw, or a subscriber did while its answer was taken:
+            // logged, and taken as a failed read rather than loading forever.
+            console.error('answersResult', error);
+
+            if (mut_run.stopped || request !== mut_run.latest) {
+              return;
+            }
+
+            setLastRead({
+              eventId,
+              result: Result.err({
+                type: 'others',
+                message: unknownToString(error),
+              }),
+            });
+          });
       }),
       result$.subscribe((e) => {
         if (e !== undefined && Result.isErr(e)) {
@@ -159,6 +177,9 @@ export const createAnswersStore = (deps: AnswersDeps): AnswersFetcher => {
       for (const subscription of subscriptions) {
         subscription.unsubscribe();
       }
+
+      // The answer to a read still out is dropped, so nothing else would.
+      setRefreshButtonIsLoading(false);
     };
   };
 
