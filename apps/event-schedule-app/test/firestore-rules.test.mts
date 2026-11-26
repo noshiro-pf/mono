@@ -15,6 +15,7 @@ import {
   initializeTestEnvironment,
   type RulesTestContext,
 } from '@firebase/rules-unit-testing';
+import { EventSchedule } from 'event-schedule-app-shared';
 import {
   arrayRemove,
   arrayUnion,
@@ -28,8 +29,12 @@ import {
 } from 'firebase/firestore';
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
-import { hasKey, isRecord } from 'ts-data-forge';
+import { Arr, Result, hasKey, isRecord } from 'ts-data-forge';
 import type { DeepReadonly, ReadonlyRecord } from 'ts-type-forge';
+// The app has no `src/index` barrel to import through, and this case is about
+// the app's own write, so it reaches the API barrel directly.
+// eslint-disable-next-line import-x/no-internal-modules
+import { updateEventSchedule } from '../src/api/index.mjs';
 
 const env = await initializeTestEnvironment({
   // The same id as `--project` in the `check:test:rules` script. `demo-` makes
@@ -81,6 +86,50 @@ describe('firestore.rules', () => {
       assert.deepStrictEqual(after.get('archivedBy'), remaining);
     },
   );
+
+  // An author's save writes the settings alone (#3937): `archivedBy` is written
+  // by the participants at any time, so the value the author's tab read may be
+  // stale, and the rules refuse an edit that changes it.
+  test('the author edits their event, and the archive entries stay as stored', async () => {
+    await seed();
+
+    const db = firestoreFor('bob');
+
+    await updateDoc(doc(db, 'events_v7/owned'), { title: 'Renamed' });
+
+    const after = await getDoc(doc(db, 'events_v7/owned'));
+
+    assert.strictEqual(after.get('title'), 'Renamed');
+
+    assert.deepStrictEqual(after.get('archivedBy'), archivedBy);
+  });
+
+  test('the author saves an edit read before another user archived the event', async () => {
+    await seed();
+
+    const db = firestoreFor('bob');
+
+    const read = await getDoc(doc(db, 'events_v7/owned'));
+
+    await updateDoc(doc(firestoreFor('alice'), 'events_v7/owned'), {
+      archivedBy: arrayUnion(alice),
+    });
+
+    const saved = await updateEventSchedule({
+      firestoreEvents: collection(db, 'events_v7'),
+    })('owned', { ...EventSchedule.fill(read.data()), title: 'Renamed' });
+
+    assert.isTrue(Result.isOk(saved));
+
+    const after = await getDoc(doc(db, 'events_v7/owned'));
+
+    assert.strictEqual(after.get('title'), 'Renamed');
+
+    assert.deepStrictEqual(
+      after.get('archivedBy'),
+      Arr.toPushed(archivedBy, alice),
+    );
+  });
 });
 
 type Firestore = ReturnType<RulesTestContext['firestore']>;
