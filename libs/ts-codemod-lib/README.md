@@ -182,7 +182,7 @@ type User2 = {
 
 ### 4. `replaceAnyWithUnknownTransformer`
 
-Replaces `any` type annotations with `unknown` for improved type safety. The `unknown` type requires type checking before operations, making your code more robust. For function parameters with rest arguments, `(...args: any) => R` is converted to `(...args: readonly unknown[]) => R`.
+Replaces `any` type annotations with `unknown` for improved type safety. The `unknown` type requires type checking before operations, making your code more robust. For function parameters with rest arguments, `(...args: any) => R` is converted to `(...args: readonly unknown[]) => R`. `keyof any`, any property key, is written `PropertyKey` (the same `string | number | symbol`), since `keyof unknown` would be `never`; a file that declares its own `PropertyKey` keeps `keyof any` as written.
 
 Example (the `as any` casts in the "After" code are not produced by the transformer; they are there only to keep the sample compiling):
 
