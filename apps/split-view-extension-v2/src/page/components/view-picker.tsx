@@ -1,4 +1,4 @@
-import { createBooleanState, derive, map } from 'synstate';
+import { createBooleanState, createState, derive, map } from 'synstate';
 import {
   constant,
   createAfterUpdate,
@@ -35,6 +35,18 @@ export const ViewPicker = ({
   };
 
   const shownId$ = session$.pipe(map(({ id }) => id));
+
+  /**
+   * The last choice made in the select while switches run, which it shows
+   * meanwhile, so a second step from the keyboard starts from it. Once the last
+   * has run, the select shows the split view on screen, which is not the choice
+   * when the switch failed. The select's `value` is controlled (synstate-dom
+   * puts a `<select>` back to its bound value after `change`), so this is what
+   * keeps the choice shown.
+   */
+  const [pendingChoice$, setPendingChoice] = createState<string | undefined>(
+    undefined,
+  );
 
   const entry$ = derive([shownId$, list$], (id, list: SplitViewList) =>
     id === undefined ? undefined : entryOf(list, id),
@@ -82,22 +94,24 @@ export const ViewPicker = ({
         title={constant(
           'The split view shown in this tab. Alt+1..9 switches too.',
         )}
-        value={shownId$.pipe(map((id) => id ?? ''))}
+        value={derive(
+          [pendingChoice$, shownId$],
+          (pending, id) => pending ?? id ?? '',
+        )}
         onChange={(event) => {
-          const mut_select = event.currentTarget;
+          const choice = event.currentTarget.value;
 
-          // The choice stays while switches run; once the last settles, the
-          // select shows what is on screen, which differs if one failed.
           mut_refs.pendingSwitches += 1;
 
+          setPendingChoice(choice);
+
           controller
-            .switchTo(mut_select.value)
+            .switchTo(choice)
             .finally(() => {
               mut_refs.pendingSwitches -= 1;
 
               if (mut_refs.pendingSwitches === 0) {
-                mut_select.value =
-                  Optional.unwrap(shownId$.getSnapshot()) ?? '';
+                setPendingChoice(undefined);
               }
             })
             .catch(console.error);

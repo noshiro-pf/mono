@@ -156,6 +156,8 @@ Two things outside the extension depend on it, so they are fixed:
 - **W1.** The top bar's `select` lists the saved split views as
   `<position>: <name>`; choosing one shows it in this tab (saving the one on
   screen first) and pushes a history entry, so Back walks back through them.
+  The `select` shows the choice until the switch to it settles, then the split
+  view on screen, which is not the choice when the switch failed.
 - **W2.** `Alt+1`..`Alt+9` (by `KeyboardEvent.code`, `Alt` alone) selects by
   position, from the page or from inside any pane; from a pane, only its own
   frame's report is acted on, not one from a frame nested in it.
