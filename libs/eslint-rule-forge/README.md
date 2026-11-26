@@ -195,6 +195,7 @@ The range and the text of a node leave out the parentheses written around it.
 | `isLocallyBound`           | whether a name, at a node, is declared in the file rather than a global or a standard-library type                                                                  |
 | `isRuntimeBound`           | whether a name, at a node, is a value the file creates at runtime, so that reading it cannot throw (not a global, `declare`d, a type-only import or a `const enum`) |
 | `hasCommentWithin`         | whether a comment inside a node lies in ranges a fix would delete (the fix must give up)                                                                            |
+| `hasCommentOutside`        | whether a comment inside a node lies outside every range a fix copies verbatim (the fix must only be suggested)                                                     |
 
 ```ts
 import type { TSESLint } from '@typescript-eslint/utils';

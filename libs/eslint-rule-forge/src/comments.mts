@@ -21,3 +21,23 @@ export const hasCommentWithin = (
         ([start, end]) => start <= comment.range[0] && comment.range[1] <= end,
       ),
     );
+
+/**
+ * Whether a comment inside `node` lies within none of `keptRanges`, the ranges
+ * a fix replacing `node` copies verbatim. Such a comment would be dropped with
+ * the rest of `node`, so the fix is offered as a suggestion instead. Only
+ * comments inside `node` are looked at.
+ */
+export const hasCommentOutside = (
+  sourceCode: TSESLint.SourceCode,
+  node: TSESTree.Node,
+  keptRanges: DeepReadonly<TSESTree.Range[]>,
+): boolean =>
+  sourceCode
+    .getCommentsInside(node)
+    .some((comment) =>
+      keptRanges.every(
+        ([start, end]) =>
+          !(start <= comment.range[0] && comment.range[1] <= end),
+      ),
+    );

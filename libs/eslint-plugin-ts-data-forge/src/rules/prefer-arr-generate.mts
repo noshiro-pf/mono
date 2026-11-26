@@ -8,6 +8,7 @@ import {
 import {
   createGetLayerTypes,
   getArgumentText,
+  hasCommentOutside,
   negationOf,
   prefixedNegationOf,
   skipTypeWrappers,
@@ -247,23 +248,13 @@ export const preferArrGenerate: TSESLint.RuleModule<MessageIds, Options> = {
 
         const binding = arrAt(node);
 
-        const replacement = buildReplacement({
+        const { text: replacement, keptRanges } = buildReplacement({
           sourceCode,
           negationContext,
           node,
           arrName: binding?.localNames[0] ?? 'Arr',
-          typeArgumentsText:
-            typeArguments === undefined
-              ? ''
-              : sourceCode.getText(typeArguments),
-          // The loop variable cannot carry the annotation; the suggestion
-          // leaves it to the receiver's element type.
-          paramText:
-            param.typeAnnotation === undefined
-              ? sourceCode.getText(param)
-              : sourceCode.text
-                  .slice(param.range[0], param.typeAnnotation.range[0])
-                  .trimEnd(),
+          typeArguments,
+          param,
           receiver,
           shape,
         });
@@ -286,16 +277,7 @@ export const preferArrGenerate: TSESLint.RuleModule<MessageIds, Options> = {
               ),
             true,
           ) &&
-          !losesComments(
-            sourceCode,
-            node,
-            [
-              receiver.range,
-              param.range,
-              ...(typeArguments === undefined ? [] : [typeArguments.range]),
-            ],
-            shape,
-          ) &&
+          !hasCommentOutside(sourceCode, node, keptRanges) &&
           !needsMutableResult(sourceCode, checker, getTsNode, node);
 
         mut_matches.push({ node, replacement, autofixable, binding });
@@ -512,14 +494,27 @@ const reindent = (
   ].join('\n');
 };
 
+/**
+ * The text replacing `node`, and the source ranges that text copies verbatim,
+ * so that a comment inside `node` but in none of them is known to be dropped.
+ *
+ * A negated test is kept only when it is written with `!` in front (`!f(x)`,
+ * `!(n < 0)`). One `negationOf` rewrites is not: the rewrite can drop a comment
+ * (one between the operands of `a && b` is gone from `!a || !b`), so any
+ * comment in it keeps the fix a suggestion, even where the negation carries it
+ * over (`x !== 1` from `x === 1`). The parameter is kept up to its type
+ * annotation, which the loop variable cannot carry. A comment between the
+ * receiver and `.flatMap`, after `flatMap(` or after the callback is in none of
+ * the ranges.
+ */
 // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
 const buildReplacement = ({
   sourceCode,
   negationContext,
   node,
   arrName,
-  typeArgumentsText,
-  paramText,
+  typeArguments,
+  param,
   receiver,
   shape,
 }: Readonly<{
@@ -527,11 +522,14 @@ const buildReplacement = ({
   negationContext: NegationContext;
   node: TSESTree.CallExpression;
   arrName: string;
-  typeArgumentsText: string;
-  paramText: string;
+  typeArguments: TSESTree.TSTypeParameterInstantiation | undefined;
+  param: TSESTree.Identifier | TSESTree.ObjectPattern | TSESTree.ArrayPattern;
   receiver: TSESTree.Expression;
   shape: FilterMapShape;
-}>): string => {
+}>): Readonly<{
+  text: string;
+  keptRanges: readonly FixedLengthTuple<2, number>[];
+}> => {
   const indent0 = lineIndentOf(sourceCode, node.range[0]);
 
   const indent1 = `${indent0}  ` as const;
@@ -540,14 +538,20 @@ const buildReplacement = ({
 
   const indent3 = `${indent2}  ` as const;
 
+  const prefixedNegation = prefixedNegationOf(shape.test, sourceCode);
+
+  const conditionText = shape.negated
+    ? (negationOf(shape.test, negationContext, undefined) ?? prefixedNegation)
+    : sourceCode.getText(shape.test);
+
+  // Written as it is, or with `!` in front, the test is copied whole.
+  const testKept = !shape.negated || conditionText === prefixedNegation;
+
   const condition = reindent(
     sourceCode,
     shape.test.range,
     indent2,
-    shape.negated
-      ? (negationOf(shape.test, negationContext, undefined) ??
-          prefixedNegationOf(shape.test, sourceCode))
-      : sourceCode.getText(shape.test),
+    conditionText,
   );
 
   const { preludeRange } = shape;
@@ -581,8 +585,17 @@ const buildReplacement = ({
     getArgumentText(sourceCode, receiver),
   );
 
-  return [
-    `${arrName}.generate${typeArgumentsText}(function* () {`,
+  // The loop variable cannot carry the annotation; the suggestion leaves it to
+  // the receiver's element type.
+  const paramRange: FixedLengthTuple<2, number> = [
+    param.range[0],
+    param.typeAnnotation?.range[0] ?? param.range[1],
+  ] as const;
+
+  const paramText = sourceCode.text.slice(...paramRange).trimEnd();
+
+  const text = [
+    `${arrName}.generate${typeArguments === undefined ? '' : sourceCode.getText(typeArguments)}(function* () {`,
     `${indent1}for (const ${paramText} of ${receiverText}) {`,
     ...preludeLines,
     `${indent2}if (${condition}) {`,
@@ -591,46 +604,19 @@ const buildReplacement = ({
     `${indent1}}`,
     `${indent0}})`,
   ].join('\n');
-};
 
-/**
- * Whether a comment inside `node`, the call the fix replaces, lies outside
- * every range the rewrite copies verbatim, and would therefore be dropped.
- *
- * `copied` lists those ranges besides the shape's: the receiver, the type
- * arguments and the parameter. The test counts only when it is copied as it is:
- * a negated test is rebuilt by `negationOf`, which can drop a comment (one
- * between the operands of `a && b` is gone from `!a || !b`), so any comment in
- * one keeps the fix a suggestion, even where the negation carries it over. A
- * comment between the receiver and `.flatMap`, after `flatMap(` or after the
- * callback is in none of the ranges.
- */
-const losesComments = (
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  sourceCode: TSESLint.SourceCode,
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  node: TSESTree.CallExpression,
-  copied: readonly FixedLengthTuple<2, number>[],
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  shape: FilterMapShape,
-): boolean => {
   const keptRanges: readonly FixedLengthTuple<2, number>[] = [
-    ...copied,
-    ...(shape.negated ? ([] as const) : ([shape.test.range] as const)),
-    ...shape.elements.map((element) => element.range),
-    ...(shape.preludeRange === undefined
+    receiver.range,
+    ...(typeArguments === undefined
       ? ([] as const)
-      : ([shape.preludeRange] as const)),
+      : ([typeArguments.range] as const)),
+    paramRange,
+    ...(preludeRange === undefined ? ([] as const) : ([preludeRange] as const)),
+    ...(testKept ? ([shape.test.range] as const) : ([] as const)),
+    ...shape.elements.map((element) => element.range),
   ] as const;
 
-  return sourceCode
-    .getCommentsInside(node)
-    .some((comment) =>
-      keptRanges.every(
-        ([start, end]) =>
-          !(start <= comment.range[0] && comment.range[1] <= end),
-      ),
-    );
+  return { text, keptRanges };
 };
 
 /** Whether `node`, with its type wrappers taken off, is a `….filter(…)` call. */

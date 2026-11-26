@@ -1069,6 +1069,114 @@ describe('prefer-arr-generate', () => {
         ],
       },
       {
+        name: 'keeps the fix automatic when a negated test is written with `!` in front, carrying its comments',
+        code: dedent`
+          declare const xs: readonly number[];
+          declare const ok: (x: number) => boolean;
+          declare const n: number;
+          const ys = xs.flatMap((x) => (ok(/* the value */ x) ? [] : [x]));
+          const zs = xs.flatMap((x) => (n < /* zero */ 0 ? [] : [x]));
+        `,
+        output: [
+          dedent`
+            import { Arr } from 'ts-data-forge';
+            declare const xs: readonly number[];
+            declare const ok: (x: number) => boolean;
+            declare const n: number;
+            const ys = Arr.generate(function* () {
+              for (const x of xs) {
+                if (!ok(/* the value */ x)) {
+                  yield x;
+                }
+              }
+            });
+            const zs = xs.flatMap((x) => (n < /* zero */ 0 ? [] : [x]));
+          `,
+          dedent`
+            import { Arr } from 'ts-data-forge';
+            declare const xs: readonly number[];
+            declare const ok: (x: number) => boolean;
+            declare const n: number;
+            const ys = Arr.generate(function* () {
+              for (const x of xs) {
+                if (!ok(/* the value */ x)) {
+                  yield x;
+                }
+              }
+            });
+            const zs = Arr.generate(function* () {
+              for (const x of xs) {
+                if (!(n < /* zero */ 0)) {
+                  yield x;
+                }
+              }
+            });
+          `,
+        ],
+        errors: [
+          { messageId: 'useArrGenerate' },
+          { messageId: 'useArrGenerate' },
+        ],
+      },
+      {
+        name: 'only suggests when a negated test the negation rewrites has a comment, even one the rewrite carries over',
+        code: dedent`
+          declare const xs: readonly number[];
+          const ys = xs.flatMap((x) => (x === /* one */ 1 ? [] : [x]));
+        `,
+        output: null,
+        errors: [
+          {
+            messageId: 'useArrGenerate',
+            suggestions: [
+              {
+                messageId: 'suggestArrGenerate',
+                output: dedent`
+                  import { Arr } from 'ts-data-forge';
+                  declare const xs: readonly number[];
+                  const ys = Arr.generate(function* () {
+                    for (const x of xs) {
+                      if (x !== /* one */ 1) {
+                        yield x;
+                      }
+                    }
+                  });
+                `,
+              },
+            ],
+          },
+        ],
+      },
+      {
+        name: 'only suggests when a comment in the parameter type annotation would be lost',
+        code: dedent`
+          declare const xs: readonly number[];
+          const ys = xs.flatMap((x: /* positive */ number) => (x > 0 ? [x] : []));
+        `,
+        output: null,
+        errors: [
+          {
+            messageId: 'useArrGenerate',
+            suggestions: [
+              {
+                messageId: 'suggestArrGenerate',
+                output: dedent`
+                  import { Arr } from 'ts-data-forge';
+                  declare const xs: readonly number[];
+                  const ys = Arr.generate(function* () {
+                    for (const x of xs) {
+                      if (x > 0) {
+                        yield x;
+                      }
+                    }
+                  });
+                `,
+              },
+            ],
+          },
+        ],
+      },
+      {
         name: 'only suggests when a comment before `.flatMap` would be lost, even if a kept comment starts with the same text',
         code: dedent`
           declare const xs: readonly number[];
