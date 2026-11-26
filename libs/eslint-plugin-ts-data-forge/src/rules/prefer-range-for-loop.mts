@@ -1,7 +1,7 @@
 import {
   AST_NODE_TYPES,
   ASTUtils,
-  type TSESLint,
+  TSESLint,
   type TSESTree,
 } from '@typescript-eslint/utils';
 import {
@@ -63,23 +63,46 @@ export const preferRangeForLoop: TSESLint.RuleModule<MessageIds, Options> = {
     const sourceCode = context.sourceCode;
 
     /**
-     * Whether `node` is the same value on every iteration: a literal, or a
-     * variable this file writes nowhere but in its declarations (not only in
-     * the loop, since a function the loop calls could write it). The loop reads
-     * its end and its step on every iteration, and `range` reads them once.
+     * Whether `wrapped`, an end or a step of `loop`, is the same value on every
+     * iteration. The loop reads its end and its step on every iteration, and
+     * `range` reads them once. Stable are:
      *
-     * Anything else is taken for changing, whether it changes or not. The check
-     * can also take a changing value for stable; the known cases are listed in
-     * https://github.com/noshiro-pf/mono/issues/4135.
+     * - a literal;
+     * - for an end (`role`), `-x` or `+x` of a stable `x` typed a number. Not
+     *   for a step: see the comment at the call;
+     * - a variable typed a primitive at every layer of type wrappers (an object,
+     *   an `any` or an `unknown` may be converted anew on every iteration), that
+     *   this file writes nowhere but in a single declaration outside the loop
+     *   (not only in the loop, since a function the loop calls could write it),
+     *   and that nothing outside this file writes: not an imported `let` or
+     *   `var`, an ambient `declare let`, nor a script's global.
+     *
+     * Anything else is taken for changing, whether it changes or not. A write
+     * scope analysis does not see (a sloppy-mode `arguments[0] = …`, `with`,
+     * `eval`) can still make a changing value look stable.
      */
     const isStableBound = (
       // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
       wrapped: TSESTree.Node,
+      // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+      loop: TSESTree.ForStatement,
+      role: 'end' | 'step',
     ): boolean => {
       const node = skipTypeWrappers(wrapped);
 
       if (node.type === AST_NODE_TYPES.Literal) {
         return true;
+      }
+
+      if (
+        node.type === AST_NODE_TYPES.UnaryExpression &&
+        (node.operator === '-' || node.operator === '+')
+      ) {
+        return (
+          role === 'end' &&
+          typeHoldsAtEveryLayer(sourceCode, node.argument, isNumberType) &&
+          isStableBound(node.argument, loop, role)
+        );
       }
 
       if (node.type !== AST_NODE_TYPES.Identifier) {
@@ -91,11 +114,99 @@ export const preferRangeForLoop: TSESLint.RuleModule<MessageIds, Options> = {
         node.name,
       );
 
+      if (variable === null || !Arr.isFixedLengthArray(1, variable.defs)) {
+        return false;
+      }
+
+      const [def] = variable.defs;
+
       return (
-        variable !== null &&
-        variable.defs.length > 0 &&
+        typeHoldsAtEveryLayer(sourceCode, wrapped, isPrimitiveType) &&
         variable.references.every(
           (reference) => !reference.isWrite() || reference.init === true,
+        ) &&
+        !isWrittenElsewhere(def, variable.scope.type, node) &&
+        // A declaration that runs while the loop runs writes the variable anew.
+        !(
+          def.node.range[0] >= loop.range[0] &&
+          def.node.range[1] <= loop.range[1]
+        ) &&
+        !(
+          def.type === TSESLint.Scope.DefinitionType.Variable &&
+          (def.parent.parent.type === AST_NODE_TYPES.ForOfStatement ||
+            def.parent.parent.type === AST_NODE_TYPES.ForInStatement)
+        )
+      );
+    };
+
+    /**
+     * Whether something outside this file may write the variable `def`
+     * declares: an imported `let` or `var` (or an import the checker cannot
+     * follow), an ambient `declare let` or `declare var`, or a global of a
+     * script. `identifier` is a reference to it.
+     */
+    const isWrittenElsewhere = (
+      // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+      def: TSESLint.Scope.Definition,
+      scopeType: string,
+      // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+      identifier: TSESTree.Identifier,
+    ): boolean => {
+      if (def.type === TSESLint.Scope.DefinitionType.ImportBinding) {
+        return importsMutableBinding(identifier);
+      }
+
+      if (def.type !== TSESLint.Scope.DefinitionType.Variable) {
+        return false;
+      }
+
+      return (
+        def.parent.kind !== 'const' &&
+        (def.parent.declare || scopeType === 'global')
+      );
+    };
+
+    /**
+     * Whether the binding `identifier` imports is declared with `let` or `var`,
+     * which the module declaring it may write; also when the checker cannot
+     * tell.
+     */
+    const importsMutableBinding = (
+      // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+      identifier: TSESTree.Identifier,
+    ): boolean => {
+      const services = sourceCode.parserServices;
+
+      if (
+        services?.program === undefined ||
+        services.program === null ||
+        services.esTreeNodeToTSNodeMap === undefined
+      ) {
+        return true;
+      }
+
+      const checker = services.program.getTypeChecker();
+
+      const symbol = checker.getSymbolAtLocation(
+        services.esTreeNodeToTSNodeMap.get(identifier),
+      );
+
+      if (symbol === undefined) {
+        return true;
+      }
+
+      const declarations =
+        ((symbol.flags & ts.SymbolFlags.Alias) === 0
+          ? symbol
+          : checker.getAliasedSymbol(symbol)
+        ).declarations ?? [];
+
+      return (
+        Arr.isEmpty(declarations) ||
+        declarations.some(
+          (declaration) =>
+            ts.isVariableDeclaration(declaration) &&
+            (ts.getCombinedNodeFlags(declaration) & ts.NodeFlags.Const) === 0,
         )
       );
     };
@@ -286,26 +397,17 @@ export const preferRangeForLoop: TSESLint.RuleModule<MessageIds, Options> = {
         const endText = getArgumentText(sourceCode, endExpr);
 
         const rewritable =
-          // An end that is `-` applied to a number literal (`i < -5`) is
-          // stable, as `isStableBound` says any literal is. No other `-x` end,
-          // and no `-x` step (a step `-` on a literal returned above), is taken
-          // for stable.
+          // An end `-x` is stable when `x` is a stable number: `isStableBound`
+          // reads its type, so that `-box` of an object end is not taken.
           //
           // A step `-k` stays refused however stable `k` is: `-k` of a
           // `PositiveSafeInt` is never positive, but its type is `number`, from
           // which `isNeverPositive` cannot tell that, so the loop would be
           // offered a cast that throws on every run.
-          //
-          // An end `-len` is refused too, though it is as stable as `len`, as
-          // before this rule read types: `isStableBound` takes no `-x`, and
-          // `signedLiteral` reads `-` on a literal only. Taking `-len` would
-          // take `-box` as well, as `isStableBound` already takes `box` (an
-          // object end, one of its known cases), so it waits until an end's
-          // stability is read from its type.
           (signedLiteral(sourceCode, endExpr) !== undefined ||
-            isStableBound(endExpr)) &&
+            isStableBound(endExpr, node, 'end')) &&
           (node.update.type !== AST_NODE_TYPES.AssignmentExpression ||
-            isStableBound(node.update.right)) &&
+            isStableBound(node.update.right, node, 'step')) &&
           // The rewrite replaces everything before the body.
           !hasCommentWithin(sourceCode, node, [
             [node.range[0], node.body.range[0]],
@@ -913,3 +1015,64 @@ const narrowingOf = (
 
   return undefined;
 };
+
+/**
+ * Whether `type` is a primitive (a number, a string, …), or a union all of whose
+ * members are, or an intersection one of whose members is (a branded number):
+ * not an object a comparison converts anew each time, nor an `any` or an
+ * `unknown`, which may hold one. A type parameter, an indexed access, a
+ * conditional or a substitution type is read by its constraint.
+ */
+const isPrimitiveType = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  type: ts.Type,
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  checker: ts.TypeChecker,
+): boolean => {
+  if (type.isUnion()) {
+    return type.types.every((member) => isPrimitiveType(member, checker));
+  }
+
+  if (type.isIntersection()) {
+    return type.types.some((member) => isPrimitiveType(member, checker));
+  }
+
+  // A type known only once instantiated is read by its constraint.
+  if (
+    (type.flags &
+      (ts.TypeFlags.TypeParameter |
+        ts.TypeFlags.IndexedAccess |
+        ts.TypeFlags.Conditional |
+        ts.TypeFlags.Substitution)) !==
+    0
+  ) {
+    const constraint = checker.getBaseConstraintOfType(type);
+
+    return constraint !== undefined && isPrimitiveType(constraint, checker);
+  }
+
+  return (
+    (type.flags &
+      (ts.TypeFlags.NumberLike |
+        ts.TypeFlags.BigIntLike |
+        ts.TypeFlags.StringLike |
+        ts.TypeFlags.BooleanLike |
+        ts.TypeFlags.EnumLike |
+        ts.TypeFlags.Null |
+        ts.TypeFlags.Undefined)) !==
+    0
+  );
+};
+
+/** Whether `type` is a number, or a branded one: `-x` of it is a number. */
+const isNumberType = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  type: ts.Type,
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  checker: ts.TypeChecker,
+): boolean =>
+  type.isUnion()
+    ? type.types.every((member) => isNumberType(member, checker))
+    : type.isIntersection()
+      ? type.types.some((member) => isNumberType(member, checker))
+      : (type.flags & ts.TypeFlags.NumberLike) !== 0;

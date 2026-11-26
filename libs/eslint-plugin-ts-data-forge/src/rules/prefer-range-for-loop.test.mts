@@ -16,7 +16,9 @@ const tester = new RuleTester({
       ecmaVersion: 2020,
       sourceType: 'module',
       projectService: {
-        allowDefaultProject: ['*.ts*'],
+        // `test/*` for the cases that import a module of `test/`, as the
+        // outputs compiled there import it.
+        allowDefaultProject: ['*.ts*', 'test/*.ts*'],
       },
       tsconfigRootDir: `${import.meta.dirname}/../..`,
     },
@@ -69,6 +71,130 @@ describe('prefer-range-for-loop', () => {
       },
     ],
     invalid: [
+      {
+        // Another script may write a script's global `var` (#4135).
+        name: 'an end that is a global var of a script gets no rewrite',
+        languageOptions: { parserOptions: { sourceType: 'script' } },
+        code: dedent`
+          var n = 3;
+          for (let i = 0; i < n; ++i) {
+            console.log(i);
+          }
+        `,
+        output: null,
+        errors: [{ messageId: 'useRangeForLoop', suggestions: [] }],
+      },
+      {
+        // An `any` may hold an object, converted to a number anew on every
+        // iteration (#4135).
+        name: 'an end or a step typed any gets no rewrite',
+        code: dedent`
+          import type { SafeInt } from 'ts-type-forge';
+          declare const box: any;
+          declare const n: SafeInt;
+          for (let i = 0; i < box; ++i) {
+            console.log(i);
+          }
+          for (let j = 0; j < n; j += box) {
+            console.log(j);
+          }
+        `,
+        output: null,
+        errors: [
+          { messageId: 'useRangeForLoop', suggestions: [] },
+          { messageId: 'useRangeForLoop', suggestions: [] },
+        ],
+      },
+      {
+        // The `var` in the body writes `n` on every iteration (#4135).
+        name: 'an end a var declaration in the body writes gets no rewrite',
+        code: dedent`
+          import type { SafeInt } from 'ts-type-forge';
+          declare const k: SafeInt;
+          declare const m: SafeInt;
+          var n = k;
+          for (let i = 0; i < n; ++i) {
+            var n = m;
+          }
+        `,
+        output: null,
+        errors: [{ messageId: 'useRangeForLoop', suggestions: [] }],
+      },
+      {
+        // An object cast to a number converts on every iteration, and what its
+        // `valueOf` returns changes (#4135).
+        name: 'an end that is an object cast to a number gets no rewrite',
+        code: dedent`
+          import type { SafeInt } from 'ts-type-forge';
+          let mut_n = 3;
+          const box = { valueOf: () => mut_n };
+          for (let i = 0; i < (box as unknown as SafeInt); ++i) {
+            mut_n -= 1;
+          }
+        `,
+        output: null,
+        errors: [{ messageId: 'useRangeForLoop', suggestions: [] }],
+      },
+      {
+        // The head of the `for...of` writes `n` on every iteration (#4135).
+        name: 'an end a for-of head declares with var gets no rewrite',
+        code: dedent`
+          import type { SafeInt } from 'ts-type-forge';
+          declare const xs: readonly SafeInt[];
+          for (var n of xs) {
+            for (let i = 0; i < n; ++i) {
+              console.log(i);
+            }
+          }
+        `,
+        output: null,
+        errors: [{ messageId: 'useRangeForLoop', suggestions: [] }],
+      },
+      {
+        // Another module writes an exported `let` (#4135).
+        name: 'an end imported from an export let gets no rewrite',
+        filename: 'test/file.ts',
+        code: dedent`
+          import { bump, count } from './prefer-range-for-loop-counter.mjs';
+          for (let i = 0; i < count; ++i) {
+            bump();
+          }
+        `,
+        output: null,
+        errors: [{ messageId: 'useRangeForLoop', suggestions: [] }],
+      },
+      {
+        // Something outside this file may write an ambient `let` (#4135).
+        name: 'an end declared with declare let gets no rewrite',
+        code: dedent`
+          import type { SafeInt } from 'ts-type-forge';
+          declare let count: SafeInt;
+          for (let i = 0; i < count; ++i) {
+            console.log(i);
+          }
+        `,
+        output: null,
+        errors: [{ messageId: 'useRangeForLoop', suggestions: [] }],
+      },
+      {
+        // An imported `const` is written nowhere (#4135).
+        name: 'an end imported from an export const is fixed',
+        filename: 'test/file.ts',
+        code: dedent`
+          import { fixedCount } from './prefer-range-for-loop-counter.mjs';
+          for (let i = 0; i < fixedCount; ++i) {
+            console.log(i);
+          }
+        `,
+        output: dedent`
+          import { range } from 'ts-data-forge';
+          import { fixedCount } from './prefer-range-for-loop-counter.mjs';
+          for (const i of range(0, fixedCount)) {
+            console.log(i);
+          }
+        `,
+        errors: [{ messageId: 'useRangeForLoop' }],
+      },
       {
         // The variable becomes what `range` yields, a `SafeUint` here, which
         // `acc += 0.5` does not take.
@@ -614,15 +740,12 @@ describe('prefer-range-for-loop where the rewrite would change behavior', () => 
         errors: [noCastFits('i', '0, b', defiesCast('the end'))],
       },
       {
-        // Only `-` applied to a number literal is taken for a stable end.
-        name: 'a negated variable or non-number literal end gets no rewrite',
+        // `-x` is a stable end only when `x` is a stable number (#4135): not a
+        // bigint, an `any` or a string.
+        name: 'a negated non-number end gets no rewrite',
         code: dedent`
-          const len = 5;
           declare const big: bigint;
           declare const box: any;
-          for (let i = 0; i < -len; ++i) {
-            console.log(i);
-          }
           for (let j = 0; j < -big; ++j) {
             console.log(j);
           }
@@ -638,23 +761,16 @@ describe('prefer-range-for-loop where the rewrite would change behavior', () => 
           { messageId: 'useRangeForLoop', suggestions: [] },
           { messageId: 'useRangeForLoop', suggestions: [] },
           { messageId: 'useRangeForLoop', suggestions: [] },
-          { messageId: 'useRangeForLoop', suggestions: [] },
         ],
       },
       {
-        // `isStableBound` does not ask the type, so an `any` end or step is
-        // taken for stable (a known case, #4135); `any` does not fit `range`,
-        // so the rewrite is a suggestion, not a fix.
-        name: 'a never-reassigned end or step typed any is suggested',
+        // `-len` is as stable as `len` (#4135).
+        name: 'a negated stable number end is rewritten',
         code: dedent`
           import type { SafeInt } from 'ts-type-forge';
-          declare const box: any;
-          declare const n: SafeInt;
-          for (let i = 0; i < box; ++i) {
+          declare const len: SafeInt;
+          for (let i = 0; i < -len; ++i) {
             console.log(i);
-          }
-          for (let j = 0; j < n; j += box) {
-            console.log(j);
           }
         `,
         output: null,
@@ -667,64 +783,15 @@ describe('prefer-range-for-loop where the rewrite would change behavior', () => 
                 output: dedent`
                   import { range } from 'ts-data-forge';
                   import type { SafeInt } from 'ts-type-forge';
-                  declare const box: any;
-                  declare const n: SafeInt;
-                  for (const i of range(0, box)) {
+                  declare const len: SafeInt;
+                  for (const i of range(0, -len)) {
                     console.log(i);
-                  }
-                  for (let j = 0; j < n; j += box) {
-                    console.log(j);
-                  }
-                `,
-              },
-            ],
-          },
-          {
-            messageId: 'useRangeForLoop',
-            suggestions: [
-              {
-                messageId: 'suggestRangeForLoop',
-                output: dedent`
-                  import { range } from 'ts-data-forge';
-                  import type { SafeInt } from 'ts-type-forge';
-                  declare const box: any;
-                  declare const n: SafeInt;
-                  for (let i = 0; i < box; ++i) {
-                    console.log(i);
-                  }
-                  for (const j of range(0, n, box)) {
-                    console.log(j);
                   }
                 `,
               },
             ],
           },
         ],
-      },
-      {
-        // `isStableBound` counts no write that declares (a known case, #4135),
-        // so the `var` in the body, which writes `n`, does not stop the fix.
-        name: 'an end a var declaration in the body writes is still fixed',
-        code: dedent`
-          import type { SafeInt } from 'ts-type-forge';
-          declare const k: SafeInt;
-          declare const m: SafeInt;
-          var n = k;
-          for (let i = 0; i < n; ++i) {
-            var n = m;
-          }
-        `,
-        output: dedent`
-          import { range } from 'ts-data-forge';
-          import type { SafeInt } from 'ts-type-forge';
-          declare const k: SafeInt;
-          declare const m: SafeInt;
-          var n = k;
-          for (const i of range(0, n)) {
-            var n = m;
-          }
-        `,
-        errors: [{ messageId: 'useRangeForLoop' }],
       },
       {
         // A type parameter constrained to a non-positive number is never
@@ -742,8 +809,9 @@ describe('prefer-range-for-loop where the rewrite would change behavior', () => 
         errors: [noCastFits('i', '0, n, s', NEVER_POSITIVE_STEP)],
       },
       {
-        // An unconstrained type parameter may be a `number` a cast is for.
-        name: 'a bound typed by an unconstrained type parameter is suggested',
+        // An unconstrained type parameter may be an object, converted to a number
+        // on every iteration (#4135).
+        name: 'a bound typed by an unconstrained type parameter gets no rewrite',
         code: dedent`
           const f = <T,>(t: T): void => {
             for (let i = 0; i < t; ++i) {
@@ -752,24 +820,7 @@ describe('prefer-range-for-loop where the rewrite would change behavior', () => 
           };
         `,
         output: null,
-        errors: [
-          {
-            messageId: 'useRangeForLoop',
-            suggestions: [
-              {
-                messageId: 'suggestRangeForLoop',
-                output: dedent`
-                  import { range } from 'ts-data-forge';
-                  const f = <T,>(t: T): void => {
-                    for (const i of range(0, t)) {
-                      console.log(i);
-                    }
-                  };
-                `,
-              },
-            ],
-          },
-        ],
+        errors: [{ messageId: 'useRangeForLoop', suggestions: [] }],
       },
       {
         name: 'a parameter that is never reassigned is a fixed end',
@@ -1825,8 +1876,10 @@ describe('prefer-range-for-loop without type information', () => {
       },
       {
         // Nothing vouches for the type of anything else, so nothing else is
-        // written unasked.
-        name: 'any other bound is a suggestion',
+        // written unasked; and a variable end gets no rewrite at all, since
+        // without types it may be an object converted on every iteration
+        // (#4135).
+        name: 'any other bound is a suggestion, and a variable end gets no rewrite',
         code: dedent`
           import { range } from 'ts-data-forge';
           declare const n: number;
@@ -1842,27 +1895,7 @@ describe('prefer-range-for-loop without type information', () => {
         `,
         output: null,
         errors: [
-          {
-            messageId: 'useRangeForLoop',
-            suggestions: [
-              {
-                messageId: 'suggestRangeForLoop',
-                output: dedent`
-                  import { range } from 'ts-data-forge';
-                  declare const n: number;
-                  for (const i of range(0, n)) {
-                    console.log(i);
-                  }
-                  for (let j = 0; j < 512; ++j) {
-                    console.log(j);
-                  }
-                  for (let k = 0; k < (10 as number); ++k) {
-                    console.log(k);
-                  }
-                `,
-              },
-            ],
-          },
+          { messageId: 'useRangeForLoop', suggestions: [] },
           {
             messageId: 'useRangeForLoop',
             suggestions: [
