@@ -12,7 +12,7 @@ import { colors } from '../../../../components/constants.mjs';
 ソースの各値を Observable に射影し、すべての内部 Observable をマージします。
 `switchMap` とは異なり、以前の内部 Observable をキャンセルしません。
 
-`mergeMap` を作った時点でソースがすでに持っている値は、`switchMap` と同じくすぐに射影します。そのため、初期値を持つソースに、初期値を持つ Observable を返す射影を渡すと、`InitializedObservable` になります。完了したソースは射影しません。`just(x)` のような完了したソースでは、型は値を持つと言いますが、結果は値を持たないまま完了します。
+`mergeMap` を作った時点でソースがすでに持っている値は、`switchMap` と同じくすぐに射影します。そのため、初期値を持つソースに、初期値を持つ Observable を返す射影を渡すと、`InitializedObservable` になります。`just(x)` のような完了したソースも射影します。結果は、射影の Observable がすぐに持つ値を持ち、それから完了します。
 {/* /jsdoc-description */}
 
 ## Marble Diagram
