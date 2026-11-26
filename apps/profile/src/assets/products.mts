@@ -25,7 +25,7 @@ export const products: DeepReadonly<{
       subtitle: 'リアクティブプログラミング用のTypeScriptのライブラリ',
       description:
         'RxJS風の構文のリアクティブプログラミングライブラリ。前作の「rnjs」と同じく「グリッチ」が起きないRxJSを目指し作ったものだが、rnjs で発生したパフォーマンスの問題を解決するために内部実装を全面的に刷新。priority queueを使わず、topological sortによりObservable全体のDAGの依存関係を事前に計算して更新を実行することでglitchを回避するようにし、都度queueを挟む実装より高速に実行できるようにした。',
-      implementation: 'TypeScriptで実装。（最終更新：2024年7月9日）',
+      implementation: 'TypeScriptで実装。',
       imageUrl: '',
     },
     {
@@ -36,7 +36,7 @@ export const products: DeepReadonly<{
         '外界から来た値の型チェックをより便利に行うためのTypeScriptライブラリ',
       description:
         '説明ページ → https://docs.google.com/presentation/d/19YwEkeNl8x3IWglTv8YjcOZPyMVympXn0qyDLf2mXUI/edit#slide=id.p',
-      implementation: 'TypeScriptで実装。（最終更新：2024年7月9日）',
+      implementation: 'TypeScriptで実装。',
       imageUrl: '',
     },
     {
@@ -46,7 +46,7 @@ export const products: DeepReadonly<{
       subtitle: 'TypeScriptの型ユーティリティ集',
       description:
         '`type UintRange<1, 5> = 1 | 2 | 3 | 4` のような型ユーティリティのライブラリ',
-      implementation: 'TypeScriptで実装。（最終更新：2024年7月9日）',
+      implementation: 'TypeScriptで実装。',
       imageUrl: '',
     },
     {
@@ -55,7 +55,7 @@ export const products: DeepReadonly<{
       title: 'ts-data-forge（旧 @noshiro/ts-utils）',
       subtitle: 'TypeScriptのユーティリティ集',
       description: 'Result型や配列・オブジェクト操作ユーティリティなど',
-      implementation: 'TypeScriptで実装。（最終更新：2024年7月9日）',
+      implementation: 'TypeScriptで実装。',
       imageUrl: '',
     },
     {
@@ -64,7 +64,7 @@ export const products: DeepReadonly<{
       title: 'tiny-router-observable',
       subtitle: '簡易的なRouterライブラリ',
       description: 'React Router より簡単なAPIのライブラリが欲しかったので自作',
-      implementation: 'TypeScriptで実装。（最終更新：2024年7月9日）',
+      implementation: 'TypeScriptで実装。',
       imageUrl: '',
     },
     {
@@ -89,7 +89,7 @@ export const products: DeepReadonly<{
       description:
         '説明ページ → https://www.notion.so/noshiro/c40d53907f204a3e9961a4a2b623ca22',
       implementation: [
-        'React・TypeScript・Immutable.js・RxJSで実装。CSSライブラリに Blueprint.js を使用。バックエンドはFirebase FirestoreとFunctions（制作日：2020年1月5日、最終更新：2024年7月9日）',
+        'React・TypeScript・Immutable.js・RxJSで実装。CSSライブラリに Blueprint.js を使用。バックエンドはFirebase FirestoreとFunctions（制作日：2020年1月5日）',
         '→ 2021-03-10にRxJSを自作ライブラリ SyncFlow に差し替えた。Immutable.js も自作ライブラリに差し替えた。',
       ].join('\n'),
       imageUrl: EventScheduleAppImage,
@@ -102,7 +102,7 @@ export const products: DeepReadonly<{
       description:
         'Pixi.jsでぬるぬる動かしてみたくて作ったおもちゃ。もし需要があったら入出力とかできるように整えるかも。',
       implementation:
-        'React・TypeScript・Pixi.jsで実装。CSSライブラリに Blueprint.js を使用。（最終更新：2024年7月9日）',
+        'React・TypeScript・Pixi.jsで実装。CSSライブラリに Blueprint.js を使用。',
       imageUrl: AnnotationToolAppImage,
     },
     {
@@ -113,7 +113,7 @@ export const products: DeepReadonly<{
       description:
         '表計算ソフトで済む内容ではあるが Blueprint.js を試したくなったのもあって React で作成。クエリパラメータで設定を保存可能。',
       implementation:
-        'React・TypeScriptで実装。CSSライブラリに Blueprint.js を使用。（制作日：2019年11月17日、最終更新：2024年7月9日）',
+        'React・TypeScriptで実装。CSSライブラリに Blueprint.js を使用。（制作日：2019年11月17日）',
       imageUrl: HousingLoanCalculatorAppImage,
     },
     {
@@ -134,7 +134,7 @@ export const products: DeepReadonly<{
         '色のコントラストなどについて書いた記事（https://qiita.com/pikohideaki/items/59415524503f833ce41e）のために作ったデモアプリ。',
       description: '',
       implementation:
-        'React・TypeScriptで実装。CSSライブラリに material-UI を使用。（制作日：2019年12月7日、最終更新：2024年7月9日）',
+        'React・TypeScriptで実装。CSSライブラリに material-UI を使用。（制作日：2019年12月7日）',
       imageUrl: ColorDemoAppImage,
     },
     {
@@ -162,7 +162,7 @@ export const products: DeepReadonly<{
         'React・TypeScript・Material UIで実装。',
         '静的ページだが、Markdownでモバイル端末でも簡単に編集できるように、 Dropbox上に置いたMarkdown形式テキストを fetchし"ReactMarkdown"により表示するようにした',
         '（→ 後にmarkdownファイルも直接bundleするように変更）。',
-        'タブ切り替えをreact-routerで行うように変更（2020/08/04）。（最終更新：右上に記載）',
+        'タブ切り替えをreact-routerで行うように変更（2020/08/04）。',
         ' → 2021-09-22 に Preact 化した。ルーティングも自作ライブラリに置き換えた。',
         'GitHub Actions で main branch 更新時に GitHub Pages へ自動でデプロイするよう設定。',
       ].join(' '),
@@ -179,7 +179,6 @@ export const products: DeepReadonly<{
         'Angular・RxJS・TypeScriptで実装。（制作時期：2017年12月）',
         ' → 2019年8月7日にReactで再実装 → 2021/1/27にPreactやSolidにも移植',
         ' → 2021-03-12にRxJSを自作ライブラリ SyncFlow に差し替えた。',
-        '（最終更新：2024年7月9日）',
         ' Preact 版 → https://noshiro-pf.github.io/mono/lambda-calculus-interpreter-preact/',
       ].join(''),
       imageUrl: LambdaInterpreterAppImage,
