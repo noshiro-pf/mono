@@ -3,7 +3,7 @@ import type { Linter } from 'eslint';
 
 /**
  * @description Auto-fix plain Functions into Arrow Functions, in all cases where conversion would result in the same behaviour
- * @link https://github.com/JamieMason/prefer-arrow-functions
+ * @link https://github.com/JamieMason/eslint-plugin-prefer-arrow-functions
  *
  *  ```md
  *  | key        | value      |

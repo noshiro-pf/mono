@@ -125,7 +125,9 @@ export const typescriptEslintRules = {
   /** Off to allow explicit type annotations when desired */
   '@typescript-eslint/no-inferrable-types': 'off', // disabled
 
-  '@typescript-eslint/no-invalid-this': withDefaultOption('error'),
+  // Covered by unicorn/no-this-outside-of-class, which reports `this` in every
+  // function outside a class
+  '@typescript-eslint/no-invalid-this': 'off',
   '@typescript-eslint/no-invalid-void-type': withDefaultOption('error'),
   '@typescript-eslint/no-magic-numbers': 'off', // disabled
   '@typescript-eslint/no-meaningless-void-operator': withDefaultOption('error'),
@@ -213,7 +215,8 @@ export const typescriptEslintRules = {
   '@typescript-eslint/non-nullable-type-assertion-style': 'error',
   '@typescript-eslint/prefer-as-const': 'error',
   '@typescript-eslint/prefer-enum-initializers': 'error',
-  '@typescript-eslint/prefer-for-of': 'error',
+  // Covered by unicorn/no-for-loop (checks more patterns)
+  '@typescript-eslint/prefer-for-of': 'off',
 
   '@typescript-eslint/prefer-includes': 'error',
   '@typescript-eslint/prefer-literal-enum-member': withDefaultOption('error'),

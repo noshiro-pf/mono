@@ -153,7 +153,9 @@ export const eslintImportsRules = {
   'import-x/prefer-default-export': 'off',
 
   'import-x/no-named-export': 'off',
-  'import-x/no-anonymous-default-export': withDefaultOption('error'),
+  // Covered by unicorn/no-anonymous-default-export, and every default export by
+  // import-x/no-default-export
+  'import-x/no-anonymous-default-export': 'off',
   'import-x/group-exports': 'off',
 
   'import-x/dynamic-import-chunkname': 'off',

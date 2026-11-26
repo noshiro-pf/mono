@@ -81,13 +81,6 @@ export default [
     }),
   },
   {
-    files: ['configs/**/*'],
-    rules: defineKnownRules({
-      'import-x/no-anonymous-default-export': 'off',
-    }),
-  },
-
-  {
     files: ['src/**'],
     rules: defineKnownRules({
       'import-x/no-unused-modules': 'off',

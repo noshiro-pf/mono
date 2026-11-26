@@ -8,8 +8,8 @@
 
 | ルール                             | 設定    |
 | ---------------------------------- | ------- |
-| `@typescript-eslint/prefer-for-of` | `error` |
 | `unicorn/no-for-loop`              | `error` |
+| `@typescript-eslint/prefer-for-of` | `off`   |
 | `functional/no-loop-statements`    | `off`   |
 
 ### 根拠
@@ -19,6 +19,8 @@
 - 添字の範囲を自分で書くので、`<=` と `<` の取り違えや、別の配列の `length` を書く誤りが起きる。
 - `noUncheckedIndexedAccess` の下では `xs[i]` が `T | undefined` になり、`!` や余計な判定が要る。`for-of` の要素は `T` のまま得られる。
 - ループ変数 `i` が `let` になる。`functional/no-let` は `allowInForLoopInit: false` なので、`mut_i` のような名前にしない限り報告される。
+
+添字ループは `unicorn/no-for-loop` が報告する。`@typescript-eslint/prefer-for-of` が報告するのは添字を `xs[i]` の読み出しにしか使わないループで、`unicorn/no-for-loop` もすべて報告するので `off` にしている。
 
 ループ文そのものは禁止しない（`functional/no-loop-statements` は `off`）。早期 `return` や `break` を含む処理は、`reduce` や再帰で書くより読みやすいことが多いからである。
 
@@ -30,7 +32,7 @@
 
 ### 性能についての注記
 
-大きな配列を hot path で回す場合、添字ループの方が `for-of` より速いというベンチマーク報告がある。これは反復子プロトコルの分のコストで、どれだけ差が出るかは JavaScript エンジンとそのバージョンで変わる。計測して差が問題になると分かった箇所に限り、理由を書いて外す。添字ループは `unicorn/no-for-loop` に報告され、添字を `xs[i]` の読み出しにしか使わないなら `@typescript-eslint/prefer-for-of` にも報告される。`// eslint-disable-next-line unicorn/no-for-loop -- <計測結果>` のように、実際に報告されたルールだけを書く（使われない disable はプリセットの `reportUnusedDisableDirectives` が報告する）。ループ変数は `functional/no-let` に報告されないよう `mut_i` と名付ける。`xs[mut_i]` は `T | undefined` なので、`!` ではなく（`@typescript-eslint/no-non-null-assertion` に報告される）`undefined` の判定か `??` で既定値を与えて扱う。推測で外さない。
+大きな配列を hot path で回す場合、添字ループの方が `for-of` より速いというベンチマーク報告がある。これは反復子プロトコルの分のコストで、どれだけ差が出るかは JavaScript エンジンとそのバージョンで変わる。計測して差が問題になると分かった箇所に限り、理由を書いて外す。添字ループを報告するのは `unicorn/no-for-loop` だけなので、`// eslint-disable-next-line unicorn/no-for-loop -- <計測結果>` と書く。ループ変数は `functional/no-let` に報告されないよう `mut_i` と名付ける。`xs[mut_i]` は `T | undefined` なので、`!` ではなく（`@typescript-eslint/no-non-null-assertion` に報告される）`undefined` の判定か `??` で既定値を与えて扱う。推測で外さない。
 
 ## `reduce`
 

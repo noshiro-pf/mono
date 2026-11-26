@@ -39,7 +39,8 @@ export const eslintNRules = {
   // Nothing here imports `node:assert`, and the strict entry point is the one
   // worth landing on, so this costs nothing to keep on.
   'n/prefer-import/assert-strict': 'error',
-  'n/prefer-node-protocol': ['error', { version: '>=18.0.0' }],
+  // Covered by unicorn/prefer-node-protocol
+  'n/prefer-node-protocol': 'off',
   // `process.getBuiltinModule()` only earns its keep where a builtin may be
   // absent at runtime; the convention here is a static `node:` import.
   'n/prefer-process-get-builtin-module': 'off',

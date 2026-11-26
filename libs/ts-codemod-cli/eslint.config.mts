@@ -33,12 +33,6 @@ export default [
       'import-x/no-default-export': 'off',
     }),
   },
-  {
-    files: ['configs/**/*'],
-    rules: defineKnownRules({
-      'import-x/no-anonymous-default-export': 'off',
-    }),
-  },
 
   // Last, so that nothing above turns these back on.
   eslintConfigOffForOxlint,

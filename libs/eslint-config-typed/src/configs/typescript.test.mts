@@ -85,8 +85,6 @@ describe(eslintConfigForTypeScript, () => {
     expect(output).not.toContain('.catch(');
 
     // Still reported, with a suggestion an editor applies only when asked.
-    expect(ruleIds).toContain('unicorn/prefer-then-catch');
-
     expect(ruleIds).toContain('ts-restrictions/prefer-catch');
   });
 

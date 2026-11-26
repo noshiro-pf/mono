@@ -108,7 +108,6 @@ export default [
     files: ['samples/**'],
     rules: defineKnownRules({
       'import-x/no-default-export': 'off',
-      'import-x/no-anonymous-default-export': 'off',
     }),
   },
 
@@ -132,7 +131,6 @@ export default [
     files: ['configs/**/*'],
     rules: defineKnownRules({
       'import-x/no-default-export': 'off',
-      'import-x/no-anonymous-default-export': 'off',
     }),
   },
 
