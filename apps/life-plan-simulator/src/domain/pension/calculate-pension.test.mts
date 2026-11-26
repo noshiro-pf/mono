@@ -125,6 +125,41 @@ describe('calculatePension の報酬比例部分の元になる年収', () => {
     // 650,000 × 12、賞与なし
     assert.strictEqual(averageFor(9_600_000, 0), 7_800_000);
   });
+
+  test('月給の無い行の賞与は、保険料がかからないので数えないこと', () => {
+    const pension = calculatePension({
+      birth: parseYearMonthOr('1990-04', 0),
+      salaryHistory: resolveSalaryHistory(
+        [
+          {
+            id: 1,
+            start: '2012-04',
+            annualBase: 4_800_000,
+            companyDcMonthly: 0,
+            idecoMonthly: 0,
+            annualBonus: 0,
+          },
+          {
+            id: 2,
+            start: '2040-04',
+            annualBase: 0,
+            companyDcMonthly: 0,
+            idecoMonthly: 0,
+            annualBonus: 600_000,
+          },
+        ],
+        0,
+      ),
+      retirementAge: 60,
+      basicPensionMonths: 480,
+      yieldRetired: 0,
+    });
+
+    // 22〜49 歳の 28 年だけが加入した年で、その平均は月給 400,000 × 12。
+    assert.strictEqual(pension.enrolledYears, 28);
+
+    assert.strictEqual(pension.averageAnnualIncome, 4_800_000);
+  });
 });
 
 /** The average yearly income the benefit counts, for one salary row from age 22 to 60. */
