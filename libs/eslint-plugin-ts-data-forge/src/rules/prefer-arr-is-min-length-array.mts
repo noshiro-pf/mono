@@ -20,13 +20,13 @@ export const preferArrIsMinLengthArray: TSESLint.RuleModule<
     type: 'suggestion',
     docs: {
       description:
-        'Replace `xs.length >= n` with `Arr.isMinLengthArray(xs, n)` from ts-data-forge.',
+        'Replace `xs.length >= n` with `Arr.isMinLengthArray(n, xs)` from ts-data-forge.',
     },
     fixable: 'code',
     schema: [],
     messages: {
       useIsMinLengthArray:
-        'Replace `{{original}}` with `Arr.isMinLengthArray({{arrayName}}, {{length}})` from ts-data-forge.',
+        'Replace `{{original}}` with `Arr.isMinLengthArray({{length}}, {{arrayName}})` from ts-data-forge.',
     },
     defaultOptions: [],
   },

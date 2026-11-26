@@ -19,13 +19,13 @@ export const preferArrIsFixedLengthArray: TSESLint.RuleModule<
     type: 'suggestion',
     docs: {
       description:
-        'Replace `xs.length === n` with `Arr.isFixedLengthArray(xs, n)` from ts-data-forge.',
+        'Replace `xs.length === n` with `Arr.isFixedLengthArray(n, xs)` from ts-data-forge.',
     },
     fixable: 'code',
     schema: [],
     messages: {
       useIsFixedLengthArray:
-        'Replace `{{original}}` with `Arr.isFixedLengthArray({{arrayName}}, {{length}})` from ts-data-forge.',
+        'Replace `{{original}}` with `Arr.isFixedLengthArray({{length}}, {{arrayName}})` from ts-data-forge.',
     },
     defaultOptions: [],
   },

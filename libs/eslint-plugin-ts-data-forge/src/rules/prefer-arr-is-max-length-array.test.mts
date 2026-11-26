@@ -91,7 +91,7 @@ describe('prefer-arr-is-max-length-array', () => {
           const xs: readonly number[] = [1, 2, 3];
           const ok = Arr.isMaxLengthArray(3, xs);
         `,
-        errors: [{ messageId: 'useIsMaxLengthArray' }],
+        errors: [{ messageId: 'useIsMaxLengthArray', data: messageData }],
       },
       {
         name: 'replaces n >= xs.length with Arr.isMaxLengthArray',
@@ -270,3 +270,21 @@ describe('prefer-arr-is-max-length-array with parenthesized operands', () => {
     ],
   });
 }, 20000);
+
+/** What the rule reports for the first invalid case, as `data`. */
+const messageData = {
+  original: 'xs.length <= 3',
+  arrayName: 'xs',
+  length: '3',
+} as const;
+
+describe('prefer-arr-is-max-length-array, its message', () => {
+  test('writes the call with the arguments in the order the fix writes them', () => {
+    const message = Object.entries(messageData).reduce(
+      (text, [key, value]) => text.replaceAll(`{{${key}}}`, value),
+      preferArrIsMaxLengthArray.meta.messages.useIsMaxLengthArray,
+    );
+
+    assert.include(message, '`Arr.isMaxLengthArray(3, xs)`');
+  });
+});

@@ -87,7 +87,7 @@ describe('prefer-arr-is-bounded-length-array', () => {
             const xs: readonly number[] = [1, 2, 3];
             const ok = Arr.isBoundedLengthArray(1, 5, xs);
           `,
-          errors: [{ messageId: 'useIsBoundedLengthArray' }],
+          errors: [{ messageId: 'useIsBoundedLengthArray', data: messageData }],
         },
         {
           name: 'normalizes max && min ordering to (min, max)',
@@ -239,3 +239,22 @@ describe('prefer-arr-is-bounded-length-array with parenthesized operands', () =>
     },
   );
 }, 20000);
+
+/** What the rule reports for the first invalid case, as `data`. */
+const messageData = {
+  original: 'xs.length >= 1 && xs.length <= 5',
+  arrayName: 'xs',
+  min: '1',
+  max: '5',
+} as const;
+
+describe('prefer-arr-is-bounded-length-array, its message', () => {
+  test('writes the call with the arguments in the order the fix writes them', () => {
+    const message = Object.entries(messageData).reduce(
+      (text, [key, value]) => text.replaceAll(`{{${key}}}`, value),
+      preferArrIsBoundedLengthArray.meta.messages.useIsBoundedLengthArray,
+    );
+
+    assert.include(message, '`Arr.isBoundedLengthArray(1, 5, xs)`');
+  });
+});
