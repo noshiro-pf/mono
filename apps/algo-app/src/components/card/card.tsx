@@ -11,6 +11,7 @@ import { Optional } from 'ts-data-forge';
 import type { Rect, RectSize } from 'ts-utils-additional';
 import {
   darkGray,
+  dictionary,
   eyeIconColorDef,
   lightGray,
   type CardTextColor,
@@ -87,9 +88,10 @@ export const CardComponent = ({
   // The rect is read off the outer element, which floating does not move.
   return (
     <div ref={outerRef}>
-      {/* eslint-disable-next-line synstate-dom-a11y/click-events-have-key-events, synstate-dom-a11y/no-static-element-interactions -- recorded, not fixed, when jsx-a11y came to synstate-dom (#3764) */}
-      <div
+      <button
+        aria-label={card.pipe(map(cardLabel))}
         class={constant(styles.wrapper)}
+        disabled={card.pipe(map((c) => !c.isClickable))}
         style={{
           cursor: card.pipe(
             map((c) => (c.isClickable ? 'pointer' : 'default')),
@@ -106,6 +108,7 @@ export const CardComponent = ({
           height: mapBindable(cardSize, (s) => `${s.height}px`),
           width: mapBindable(cardSize, (s) => `${s.width}px`),
         }}
+        type={constant('button')}
         onClick={() => {
           if (Optional.unwrap(card.getSnapshot()).isClickable) {
             onClick?.();
@@ -149,7 +152,31 @@ export const CardComponent = ({
           textColor={textColor}
           turnedAway={card.pipe(map((c) => c.visibilityFromMe !== 'faceUp'))}
         />
-      </div>
+      </button>
     </div>
   );
+};
+
+/**
+ * The card's name, with its number only where the player sees it: face up, or
+ * their own card face down. Another's face-down card keeps its number hidden.
+ */
+const cardLabel = ({
+  color,
+  number: cardNumber,
+  visibilityFromMe,
+}: CardDisplay): string => {
+  const colorName = dictionary.card.color[color];
+
+  switch (visibilityFromMe) {
+    case 'faceUp':
+      return dictionary.card.faceUp(colorName, cardNumber);
+
+    case 'faceDownButVisibleToMe':
+      return dictionary.card.ownFaceDown(colorName, cardNumber);
+
+    case 'faceDown':
+    case 'faceDownButVisibleToCounter':
+      return dictionary.card.faceDown(colorName);
+  }
 };

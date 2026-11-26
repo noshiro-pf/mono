@@ -17,7 +17,5 @@
     // resolve to the `x.module.d.css.ts` that `gen:css-module-types` writes.
     "allowArbitraryExtensions": true
   },
-  // `./test` holds only `strict-lib-active.mts`, the probe that fails when
-  // the replacement above stops happening.
   "include": ["./src", "./test", "./e2e", "./scripts", "./configs"]
 }
