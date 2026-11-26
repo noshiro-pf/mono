@@ -155,12 +155,18 @@ describe(createPlanStore, () => {
       profile: { ...defaultSimulationInput.profile, birth: '1975-03' },
     } as const;
 
-    store.addPlan('持ち家', input);
+    const id = store.addPlan('持ち家', input);
 
-    assert.strictEqual(
-      Optional.unwrap(store.currentPlan.getSnapshot())?.name,
-      '持ち家',
-    );
+    const opened = Optional.unwrap(store.currentPlan.getSnapshot());
+
+    // It returns the id of the plan it opens.
+    assert.isDefined(id);
+
+    assert.isDefined(opened);
+
+    assert.strictEqual(opened.id, id);
+
+    assert.strictEqual(opened.name, '持ち家');
 
     assert.deepStrictEqual(Optional.unwrap(store.input.getSnapshot()), input);
 

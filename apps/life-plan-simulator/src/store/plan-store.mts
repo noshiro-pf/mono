@@ -63,9 +63,13 @@ export type PlanStore = Readonly<{
   duplicatePlan: () => void;
   /**
    * Creates a plan with these inputs, read from a file, and opens it. Without a
-   * name it gets the one {@link createPlan} would give.
+   * name it gets the one {@link createPlan} would give. Returns the new plan's
+   * id, or `undefined` when there is no list of plans to add it to.
    */
-  addPlan: (name: string | undefined, input: SimulationInput) => void;
+  addPlan: (
+    name: string | undefined,
+    input: SimulationInput,
+  ) => string | undefined;
   renamePlan: (name: string) => void;
   deletePlan: () => void;
   /** Rewrites the open plan's inputs; nothing happens while there is none. */
@@ -178,13 +182,13 @@ export const createPlanStore = ({
   const createFrom = (
     name: (existing: readonly Plan[]) => string,
     planInput: SimulationInput,
-  ): void => {
+  ): string | undefined => {
     const state = Optional.unwrap(plans.getSnapshot());
 
     const repository = currentRepository();
 
     if (repository === undefined || state.type !== 'loaded') {
-      return;
+      return undefined;
     }
 
     const time = now();
@@ -202,6 +206,8 @@ export const createPlanStore = ({
     );
 
     selectPlan(id);
+
+    return id;
   };
 
   const updateCurrent = (fn: (current: Plan) => Plan): void => {
@@ -237,9 +243,8 @@ export const createPlanStore = ({
         createFrom(() => `${plan.name} のコピー`, plan.input);
       }
     },
-    addPlan: (name, planInput) => {
-      createFrom((existing) => name ?? nextPlanName(existing), planInput);
-    },
+    addPlan: (name, planInput) =>
+      createFrom((existing) => name ?? nextPlanName(existing), planInput),
     renamePlan: (name) => {
       const trimmed = name.trim();
 

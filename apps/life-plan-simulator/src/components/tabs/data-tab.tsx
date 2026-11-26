@@ -1,13 +1,16 @@
 import { Button, Card, FileInput } from 'blueprint-synstate';
-import { createState, type InitializedObservable } from 'synstate';
+import { createState, derive, map, type InitializedObservable } from 'synstate';
 import { constant, For, If, type JSX } from 'synstate-dom';
-import { Arr, Result, unknownToString } from 'ts-data-forge';
+import { Arr, Optional, Result, unknownToString } from 'ts-data-forge';
 import { planFileSchemaUrl } from '../../repository/index.mjs';
 import {
+  currentPlanId,
+  currentPlanId$,
   exportCurrentPlan,
   importAsNewPlan,
   importIntoCurrentPlan,
   resetInput,
+  type ImportedFile,
 } from '../../store/index.mjs';
 
 /**
@@ -15,37 +18,76 @@ import {
  * ので、ここはバックアップや、ほかで用意した値を取り込むためのもの。
  */
 export const DataTab = (): JSX.Element => {
-  const [message$, setMessage] = createState('');
+  const [status$, setStatus] = createState<FileStatus | undefined>(undefined);
 
-  const [warnings$, setWarnings] = createState<readonly string[]>([]);
+  // Each status is drawn afresh under a key of its own, so that one repeating
+  // the last message still changes the region and is announced again.
+  const mut_statuses = { count: 0 };
+
+  const report = (
+    planId: string | undefined,
+    message: string,
+    warnings: readonly string[] = [],
+  ): void => {
+    mut_statuses.count += 1;
+
+    setStatus({ key: mut_statuses.count, planId, message, warnings });
+  };
+
+  // The status describes the plan it was about, and is shown only while that
+  // plan is open: an import as a new plan reports before its plan opens.
+  const shown$ = derive([status$, currentPlanId$], (status, planId) =>
+    status !== undefined && status.planId === planId ? [status] : [],
+  );
+
+  // Opening another plan after the status's own clears it, so that coming back
+  // to that plan does not announce it again.
+  const mut_open = { planId: Optional.unwrap(currentPlanId$.getSnapshot()) };
+
+  currentPlanId$.subscribe((planId) => {
+    const status = Optional.unwrap(status$.getSnapshot());
+
+    if (
+      status !== undefined &&
+      status.planId === mut_open.planId &&
+      planId !== status.planId
+    ) {
+      setStatus(undefined);
+    }
+
+    mut_open.planId = planId;
+  });
 
   const [confirmingReset$, setConfirmingReset] = createState(false);
 
   const loadFile = async (
     file: File,
-    load: (json: string) => Result<readonly string[], string>,
+    load: (json: string) => Result<ImportedFile, string>,
   ): Promise<void> => {
     const result = load(await file.text());
 
     if (Result.isOk(result)) {
-      setMessage(
-        Arr.isEmpty(result.value)
+      const { planId, warnings } = result.value;
+
+      report(
+        planId,
+        Arr.isEmpty(warnings)
           ? `${file.name} を読み込みました。`
           : `${file.name} を読み込みました。次の値は無いか読めなかったので既定値にしました:`,
+        warnings,
       );
-
-      setWarnings(result.value);
     } else {
-      setMessage(`${file.name} を読み込めませんでした: ${result.value}`);
-
-      setWarnings([]);
+      report(
+        currentPlanId(),
+        `${file.name} を読み込めませんでした: ${result.value}`,
+      );
     }
   };
 
   const fileInput = (
     label: string,
     e2e: string,
-    load: (json: string) => Result<readonly string[], string>,
+    load: (json: string) => Result<ImportedFile, string>,
   ): JSX.Element => (
     <FileInput
       accept={'application/json,.json'}
@@ -61,7 +103,8 @@ export const DataTab = (): JSX.Element => {
         if (file !== undefined) {
           loadFile(file, load)
             .catch((error: unknown) => {
-              setMessage(
+              report(
+                currentPlanId(),
                 `${file.name} を読み込めませんでした: ${unknownToString(error)}`,
               );
             })
@@ -119,8 +162,18 @@ export const DataTab = (): JSX.Element => {
         </div>
         {/* eslint-disable-next-line synstate-dom-a11y/prefer-tag-over-role -- the status is a paragraph and a list, and an `output` holds phrasing content only; around the message alone, it would leave the warnings unannounced */}
         <div data-e2e={constant('plan-file-status')} role={constant('status')}>
-          <p>{message$}</p>
-          <WarningList warnings$={warnings$} />
+          <For items={shown$} key={(status) => status.key}>
+            {(shownStatus$) => (
+              <>
+                <p>{shownStatus$.pipe(map((status) => status.message))}</p>
+                <WarningList
+                  warnings$={shownStatus$.pipe(
+                    map((status) => status.warnings),
+                  )}
+                />
+              </>
+            )}
+          </For>
         </div>
       </Card>
       <Card>
@@ -139,7 +192,7 @@ export const DataTab = (): JSX.Element => {
 
                     setConfirmingReset(false);
 
-                    setMessage('入力値を既定値に戻しました。');
+                    report(currentPlanId(), '入力値を既定値に戻しました。');
                   }}
                 />
                 <Button
@@ -192,5 +245,20 @@ const downloadJson = (json: string, fileName: string): void => {
 
   a.click();
 
-  URL.revokeObjectURL(url);
+  // The download starts after `click` returns, and reads the blob then, so the
+  // URL is revoked only once it has had time to start.
+  setTimeout(() => {
+    URL.revokeObjectURL(url);
+  }, revokeObjectUrlAfterMs);
 };
+
+/** How long an exported file's object URL is kept for its download to start. */
+const revokeObjectUrlAfterMs = 60_000;
+
+type FileStatus = Readonly<{
+  key: number;
+  /** The plan the status is about. */
+  planId: string | undefined;
+  message: string;
+  warnings: readonly string[];
+}>;
