@@ -1,5 +1,5 @@
 import type { UnknownResult } from '../result.mjs';
-import { unwrapErr } from './result-unwrap-err.mjs';
+import { isErr } from './result-is-err.mjs';
 import type { UnwrapErr } from './types.mjs';
 
 /**
@@ -63,4 +63,10 @@ export function unwrapErrOr<R extends UnknownResult, D>(
 const unwrapErrOrImpl = <R extends UnknownResult, D>(
   result: R,
   defaultValue: D,
-): D | UnwrapErr<R> => unwrapErr(result) ?? defaultValue;
+): D | UnwrapErr<R> =>
+  // Not `unwrapErr(result) ?? defaultValue`, which would replace an Err holding
+  // `undefined` or `null` with the default.
+  isErr(result)
+    ? // eslint-disable-next-line total-functions/no-unsafe-type-assertion -- the value of an Err of `R`
+      (result.value as UnwrapErr<R>)
+    : defaultValue;

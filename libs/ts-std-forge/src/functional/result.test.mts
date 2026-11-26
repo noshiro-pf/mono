@@ -336,6 +336,30 @@ describe('Result test', () => {
   });
 
   describe('unwrapOkOr', () => {
+    test.each([undefined, null] as const)(
+      'returns an Ok holding %s, not the default',
+      (held) => {
+        assert.strictEqual(Result.unwrapOkOr(Result.ok(held), 'default'), held);
+
+        assert.strictEqual(Result.unwrapOkOr('default')(Result.ok(held)), held);
+      },
+    );
+
+    test.each([undefined, null] as const)(
+      'returns the default for an Err holding %s',
+      (held) => {
+        assert.strictEqual(
+          Result.unwrapOkOr(Result.err(held), 'default'),
+          'default',
+        );
+
+        assert.strictEqual(
+          Result.unwrapOkOr('default')(Result.err(held)),
+          'default',
+        );
+      },
+    );
+
     test('unwraps Ok result', () => {
       const result = Result.ok(42);
 
@@ -690,6 +714,36 @@ describe('Result test', () => {
   });
 
   describe('unwrapErrOr', () => {
+    test.each([undefined, null] as const)(
+      'returns an Err holding %s, not the default',
+      (held) => {
+        assert.strictEqual(
+          Result.unwrapErrOr(Result.err(held), 'default'),
+          held,
+        );
+
+        assert.strictEqual(
+          Result.unwrapErrOr('default')(Result.err(held)),
+          held,
+        );
+      },
+    );
+
+    test.each([undefined, null] as const)(
+      'returns the default for an Ok holding %s',
+      (held) => {
+        assert.strictEqual(
+          Result.unwrapErrOr(Result.ok(held), 'default'),
+          'default',
+        );
+
+        assert.strictEqual(
+          Result.unwrapErrOr('default')(Result.ok(held)),
+          'default',
+        );
+      },
+    );
+
     test('should return error value for Err result', () => {
       const result = Result.err('error message');
 
