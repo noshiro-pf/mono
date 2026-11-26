@@ -22,9 +22,20 @@ export type TargetRepo = Readonly<{
  * 4. `package.json` の `name` （ repo のみ ）
  */
 export const resolveTargetRepo = async (): Promise<TargetRepo> => {
+  const cliArgs = fromCliArgs();
+
+  const env = fromEnv();
+
+  // 空の OWNER / REPO_NAME （未定義の CI 変数、 .env の空の行など）は拒否する。
+  // 未指定として git remote origin に進むと、意図と別の repository に書き込み
+  // うるため。 --owner / --repo の空の値は cli-spec.mts が拒否する。
+  refuseEmpty('OWNER', cliArgs.owner, env.owner);
+
+  refuseEmpty('REPO_NAME', cliArgs.repo, env.repo);
+
   const sources: readonly Partial<TargetRepo>[] = [
-    fromCliArgs(),
-    fromEnv(),
+    cliArgs,
+    env,
     await fromGitRemote(),
     await fromPackageJson(),
   ] as const;
@@ -101,10 +112,21 @@ const fromCliArgs = (): Partial<TargetRepo> => {
   };
 };
 
-// NOTE: 空の OWNER / REPO_NAME （未定義の CI 変数など）はまだ拒否せず、空文字列
-// のまま採用される。 --owner / --repo の空の値は cli-spec.mts が拒否するが、
-// 環境変数はそこを通らない。未設定扱いにして git remote origin に進むと別の
-// repository に書き込みうるため、直すなら拒否する。
+/**
+ * 環境変数 `name` が、コマンドライン引数で上書きされないのに空なら投げる。
+ */
+const refuseEmpty = (
+  name: 'OWNER' | 'REPO_NAME',
+  fromCli: string | undefined,
+  fromEnvironment: string | undefined,
+): void => {
+  if (fromCli === undefined && fromEnvironment === '') {
+    throw new Error(
+      `環境変数 ${name} が空です。値を設定するか、変数そのものを外してください。`,
+    );
+  }
+};
+
 const fromEnv = (): Partial<TargetRepo> =>
   ({
     owner: process.env['OWNER'],
