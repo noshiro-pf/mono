@@ -62,6 +62,48 @@ describe(replaceAnyWithUnknownTransformer, () => {
       expected: 'type Foo = [number, ...args: readonly unknown[]];',
     },
     {
+      name: '`keyof any`, any property key, becomes `PropertyKey`',
+      source: 'type Key = keyof any;',
+      expected: 'type Key = PropertyKey;',
+    },
+    {
+      name: '`keyof any` as a type argument',
+      source: 'type R = Record<keyof any, number>;',
+      expected: 'type R = Record<PropertyKey, number>;',
+    },
+    {
+      name: '`keyof (any)`, through parentheses',
+      source: 'type K = keyof (any);',
+      expected: 'type K = PropertyKey;',
+    },
+    {
+      name: '`keyof any[]`, the keys of an array, keeps its operator',
+      source: 'type K = keyof any[];',
+      expected: 'type K = keyof unknown[];',
+    },
+    {
+      name: '`keyof any` is left as written in a file that declares its own `PropertyKey`',
+      source: dedent`
+        type PropertyKey = string;
+        type Key = keyof any;
+      `,
+      expected: dedent`
+        type PropertyKey = string;
+        type Key = keyof any;
+      `,
+    },
+    {
+      name: 'Skip `keyof any` with disable comment',
+      source: dedent`
+        // transformer-ignore-next-line
+        type Key = keyof any;
+      `,
+      expected: dedent`
+        // transformer-ignore-next-line
+        type Key = keyof any;
+      `,
+    },
+    {
       name: 'Skip simple type alias with disable comment',
       source: dedent`
         // transformer-ignore-next-line
