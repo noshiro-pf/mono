@@ -8,6 +8,7 @@ import { eventSettingsPageDictionary } from './event-settings-page.mjs';
 import { forNonLoggedInUserDictionary } from './for-non-logged-in-user-dialog.mjs';
 import { headerDictionary } from './header.mjs';
 import { iconDescriptionDefaultDictionary } from './icon-description-default.mjs';
+import { pageTitleDictionary } from './page-title.mjs';
 import { signInAndRegisterPageDictionary } from './register-page.mjs';
 import { resultPageDictionary } from './result-page.mjs';
 
@@ -28,4 +29,5 @@ export const dict = {
   register: signInAndRegisterPageDictionary,
   accountSettings: accountSettingsDictionary,
   forNonLoggedInUser: forNonLoggedInUserDictionary,
+  pageTitle: pageTitleDictionary,
 } as const;
