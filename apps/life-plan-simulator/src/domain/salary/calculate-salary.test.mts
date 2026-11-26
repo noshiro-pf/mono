@@ -45,10 +45,11 @@ describe(calculateSalary, () => {
     // 300,000 - 14,970 - 27,450 - 1,650 = 255,930 円の行
     assert.strictEqual(september.incomeTax, 6750);
 
-    // (300,000 × 0.7 - 1,500,000 / 12) × 10%
-    assert.closeTo(september.residentTax, 8500, 1e-9);
+    // 2025 年の月給 12 か月分と 1 月の賞与から:
+    // ((300,000 × 12 + 600,000) × 0.7 - 1,500,000) × 10% / 12
+    assert.closeTo(september.residentTax, 12_000, 1e-9);
 
-    assert.closeTo(september.net, 240_680, 1e-9);
+    assert.closeTo(september.net, 237_180, 1e-9);
 
     assert.strictEqual(september.bonus, 0);
   });
@@ -200,7 +201,12 @@ describe(calculateSalary, () => {
 
     assert.strictEqual(lastMonth.welfarePension, 27_450);
 
-    for (const month of [nextMonth, august]) {
+    // 2027-11 は 2026 年（12 か月分と賞与）、2028-08 は 2027 年（10 か月分と
+    // 賞与: ((300,000 × 10 + 600,000) × 0.7 - 1,500,000) × 10% / 12）から。
+    for (const [month, residentTax] of [
+      [nextMonth, 12_000],
+      [august, 8500],
+    ] as const) {
       assert.isDefined(month);
 
       assert.strictEqual(month.gross, 0);
@@ -209,9 +215,9 @@ describe(calculateSalary, () => {
 
       assert.strictEqual(month.welfarePension, 0);
 
-      assert.closeTo(month.residentTax, 8500, 1e-9);
+      assert.closeTo(month.residentTax, residentTax, 1e-9);
 
-      assert.closeTo(month.net, -8500, 1e-9);
+      assert.closeTo(month.net, -residentTax, 1e-9);
     }
   });
 
@@ -385,6 +391,44 @@ describe(calculateSalary, () => {
       firstMonth.welfarePension,
       welfarePensionPremium(500_000),
     );
+  });
+});
+
+describe('住民税の概算', () => {
+  test('年の途中で給与が止まった年は、控除を 1 年に 1 回だけ引くこと', () => {
+    // 2027-03 に退職: 2027 年は 450,000 × 3 × 0.7 = 945,000 円で、150 万円の
+    // 控除を下回るので、2028 年の住民税は 0。
+    const rows = calculateSalary(
+      {
+        history: salaryFrom('2020-01', 5_400_000, 0),
+        retirementMonth: ym('2027-03'),
+      },
+      [ym('2027-06'), ym('2028-01'), ym('2028-03'), ym('2028-12')],
+    );
+
+    const [june, ...in2028] = rows;
+
+    // 2026 年の 12 か月分: (5,400,000 × 0.7 - 1,500,000) × 10% / 12
+    assert.closeTo(june?.residentTax ?? Number.NaN, 19_000, 1e-9);
+
+    for (const row of in2028) {
+      assert.strictEqual(row.residentTax, 0);
+    }
+  });
+
+  test('賞与も課税所得に数えること', () => {
+    const rows = calculateSalary(
+      {
+        history: salaryFrom('2025-01', 3_672_000, 1_000_000),
+        retirementMonth: ym('2040-12'),
+      },
+      [ym('2027-01'), ym('2027-06')],
+    );
+
+    // ((306,000 × 12 + 1,000,000) × 0.7 - 1,500,000) × 10% / 12
+    for (const row of rows) {
+      assert.closeTo(row.residentTax, 1_770_400 / 120, 1e-9);
+    }
   });
 });
 

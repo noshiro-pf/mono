@@ -13,6 +13,7 @@ import {
 } from '../tax/index.mjs';
 import {
   findLatestStarted,
+  integerRange,
   monthOf,
   parseYearMonthOr,
   sortByStart,
@@ -30,7 +31,8 @@ import {
  *   まで使い（定時決定）、在職期間にまだ定時決定が無ければ在職期間の最初の
  *   月の月給を使う（資格取得時決定）。賞与の分は等級を使わず、標準賞与額に
  *   料率を掛ける。
- * - 所得税は月額表、住民税は 12 か月前の月給からの概算。
+ * - 所得税は月額表、住民税は前の年の給与と賞与からの概算
+ *   （`residentTaxableIncomeOfYear`）を 12 か月に分けたもの。
  */
 export const calculateSalary = (
   params: SalaryParams,
@@ -38,8 +40,36 @@ export const calculateSalary = (
 ): readonly SalaryMonth[] => {
   const salary = salaryLookup(params);
 
-  return months.map((month) => calculateSalaryMonth(salary, month));
+  const mut_taxableIncomeByYear = new Map<number, number>();
+
+  const residentTaxAt = (month: MonthIndex): number => {
+    const year = yearOf(month) - 1;
+
+    const cached = mut_taxableIncomeByYear.get(year);
+
+    const taxableIncome = cached ?? taxableIncomeInYear(salary, year);
+
+    if (cached === undefined) {
+      mut_taxableIncomeByYear.set(year, taxableIncome);
+    }
+
+    return (taxableIncome * residentTaxRate) / 12;
+  };
+
+  return months.map((month) =>
+    calculateSalaryMonth(salary, month, residentTaxAt(month)),
+  );
 };
+
+/**
+ * `year` の 1 年分の給与（月給から iDeCo の掛金を除いたもの）と賞与に対する
+ * 住民税の課税所得の概算（年額）。翌年の住民税と、翌年の住宅ローン控除のうち
+ * 住民税から引ける分のもとになる。
+ */
+export const residentTaxableIncomeOfYear = (
+  params: SalaryParams,
+  year: number,
+): number => taxableIncomeInYear(salaryLookup(params), year);
 
 /** 年収の推移の 1 行から導出される値（`年収` シートの F, H 列）。 */
 export const deriveSalaryEntry = (
@@ -70,13 +100,14 @@ export const resolveSalaryHistory = (
   );
 
 /**
- * 1 か月分の月給（iDeCo の掛金を除く）に対する住民税の課税所得（月額）の概算。
- * 給与所得控除を 2〜3 割、基礎控除などを年 150 万円と見る。
+ * 1 年分の給与と賞与（iDeCo の掛金を除く）に対する住民税の課税所得（年額）の
+ * 概算。給与所得控除を 2〜3 割、社会保険料と基礎控除などを年 150 万円と見て、
+ * 1 年に 1 回引く。賞与の社会保険料も、月給の分と同じくこの 150 万円に含める。
  */
-export const residentTaxableIncomeFrom = (grossAfterIdeco: number): number => {
-  const employmentIncomeRatio = grossAfterIdeco > 8_500_000 / 12 ? 0.8 : 0.7;
+const residentTaxableIncomeFrom = (salaryIncome: number): number => {
+  const employmentIncomeRatio = salaryIncome > 8_500_000 ? 0.8 : 0.7;
 
-  return Math.max(0, grossAfterIdeco * employmentIncomeRatio - 1_500_000 / 12);
+  return Math.max(0, salaryIncome * employmentIncomeRatio - 1_500_000);
 };
 
 export type SalaryParams = Readonly<{
@@ -238,11 +269,22 @@ const socialInsuranceAt = (
   };
 };
 
-/**
- * 住民税（月額）の概算。12 か月前の月給（iDeCo の掛金を除く）から求める。
- */
-const residentTaxFrom = (grossAfterIdecoLastYear: number): number =>
-  residentTaxableIncomeFrom(grossAfterIdecoLastYear) * residentTaxRate;
+const bonusAt = (salary: SalaryLookup, month: MonthIndex): number =>
+  monthOf(month) === 1 && salary.isEmployed(month)
+    ? (salary.entryAt(month)?.annualBonus ?? 0)
+    : 0;
+
+const taxableIncomeInYear = (salary: SalaryLookup, year: number): number => {
+  const january = year * 12;
+
+  return residentTaxableIncomeFrom(
+    Arr.sum(
+      integerRange(january, january + 12).map((month) =>
+        grossAfterIdecoAt(salary, month),
+      ),
+    ) + bonusAt(salary, january),
+  );
+};
 
 /**
  * 賞与の源泉徴収税額。ふつうは社会保険料等控除後の賞与に、前月の社会保険料等
@@ -286,6 +328,7 @@ const BONUS_PERIOD_MONTHS = 12;
 const calculateSalaryMonth = (
   salary: SalaryLookup,
   month: MonthIndex,
+  residentTax: number,
 ): SalaryMonth => {
   const gross = grossAt(salary, month);
 
@@ -298,12 +341,7 @@ const calculateSalaryMonth = (
     grossAfterIdeco - healthInsurance - welfarePension - employmentInsurance,
   );
 
-  const residentTax = residentTaxFrom(grossAfterIdecoAt(salary, month - 12));
-
-  const bonus =
-    monthOf(month) === 1 && salary.isEmployed(month)
-      ? (salary.entryAt(month)?.annualBonus ?? 0)
-      : 0;
+  const bonus = bonusAt(salary, month);
 
   // 月給の無い月は被保険者でないので、その月の賞与には保険料をかけない。老齢
   // 厚生年金も、月給の無い行の賞与を数えない（`remunerationAtAge`）。
