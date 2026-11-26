@@ -245,6 +245,82 @@ describe(formatFiles, () => {
     }
   });
 
+  test('with `ignore: false`, should still skip a file with no parser, and format the rest', async () => {
+    vi.clearAllMocks();
+
+    vi.mocked(getGitRoot).mockResolvedValue(Result.ok(testDir));
+
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
+    await fs.mkdir(testDir, { recursive: true });
+
+    try {
+      const unknown = await createTestFile('data.unknownext', 'any  content\n');
+
+      const file = await createTestFile('a.ts', 'const x={a:1}');
+
+      const result = await formatFiles([unknown, file], {
+        silent: true,
+        ignore: false,
+      });
+
+      assert.isTrue(Result.isOk(result));
+
+      assert.strictEqual(await readTestFile(file), 'const x = { a: 1 };\n');
+
+      assert.strictEqual(await readTestFile(unknown), 'any  content\n');
+    } finally {
+      await fs.rm(testDir, { recursive: true, force: true });
+    }
+  });
+
+  test('with `ignore: false` and `ignoreUnknown: false`, should fail on a file with no parser', async () => {
+    vi.clearAllMocks();
+
+    vi.mocked(getGitRoot).mockResolvedValue(Result.ok(testDir));
+
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
+    await fs.mkdir(testDir, { recursive: true });
+
+    try {
+      const unknown = await createTestFile('data.unknownext', 'any content\n');
+
+      const result = await formatFiles([unknown], {
+        silent: true,
+        ignore: false,
+        ignoreUnknown: false,
+      });
+
+      assert.isTrue(Result.isErr(result));
+    } finally {
+      await fs.rm(testDir, { recursive: true, force: true });
+    }
+  });
+
+  test('with `ignore: false`, should format a file the built-in ignore list skips', async () => {
+    vi.clearAllMocks();
+
+    vi.mocked(getGitRoot).mockResolvedValue(Result.ok(testDir));
+
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
+    await fs.mkdir(path.join(testDir, 'dist'), { recursive: true });
+
+    try {
+      const file = await createTestFile('dist/a.ts', 'const x={a:1}');
+
+      assert.isTrue(Result.isOk(await formatFiles([file], { silent: true })));
+
+      assert.strictEqual(await readTestFile(file), 'const x={a:1}');
+
+      const result = await formatFiles([file], { silent: true, ignore: false });
+
+      assert.isTrue(Result.isOk(result));
+
+      assert.strictEqual(await readTestFile(file), 'const x = { a: 1 };\n');
+    } finally {
+      await fs.rm(testDir, { recursive: true, force: true });
+    }
+  });
+
   test('should take the print width from .editorconfig, as the Prettier CLI does', async () => {
     vi.clearAllMocks();
 

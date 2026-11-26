@@ -642,7 +642,7 @@ await formatFilesGlob('src/**/*.ts', {
 
 - `silent?` - Suppress output messages (default: false)
 - `ignoreUnknown?` - Skip files without a Prettier parser instead of erroring (default: true)
-- `ignore?` - Custom function to ignore files (default: built-in ignore list)
+- `ignore?` - Custom function to ignore files (default: built-in ignore list), or `false` to turn off the built-in ignore list and `.prettierignore`, and nothing else: `ignoreUnknown` still applies
 
 #### `formatUncommittedFiles(options?)`
 
@@ -669,7 +669,7 @@ await formatUncommittedFiles({
 - `staged?` - Format staged files (default: true)
 - `silent?` - Suppress output messages (default: false)
 - `ignoreUnknown?` - Skip files without a Prettier parser instead of erroring (default: true)
-- `ignore?` - Custom function to ignore files (default: built-in ignore list)
+- `ignore?` - Custom function to ignore files (default: built-in ignore list), or `false` to turn off the built-in ignore list and `.prettierignore`, and nothing else: `ignoreUnknown` still applies
 
 **Return Type:**
 
@@ -716,7 +716,7 @@ await formatDiffFrom('main', {
 - `includeStaged?` - Include staged files in addition to diff files (default: true)
 - `silent?` - Suppress output messages (default: false)
 - `ignoreUnknown?` - Skip files without a Prettier parser instead of erroring (default: true)
-- `ignore?` - Custom function to ignore files (default: built-in ignore list)
+- `ignore?` - Custom function to ignore files (default: built-in ignore list), or `false` to turn off the built-in ignore list and `.prettierignore`, and nothing else: `ignoreUnknown` still applies
 
 **Return Type:**
 
