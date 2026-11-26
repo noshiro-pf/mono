@@ -83,6 +83,12 @@ every parameter v1 wrote, so bookmarks survive the swap.
   token changed drops whatever a read asked before then brings. This settles
   what the first attempt left open: there is no per-block refresh to overlap the
   poll, and nothing lands late over something newer.
+- **What cannot change is not asked twice.** One `transportCache` for the page's
+  life keeps a commit by its sha, a comparison of two shas and a run's
+  annotations, outside the limit of requests in flight; every other `GET` goes
+  out `no-cache`, so the browser revalidates it and GitHub's 304 costs no
+  budget. A head's checks are asked every read: a re-run adds runs to the same
+  commit.
 - The poll is paced by `domain/poll.mts`'s pure function of the budget drop, and
   a hidden tab reads nothing. Timers and visibility are passed in, so a test
   drives both.

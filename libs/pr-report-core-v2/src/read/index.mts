@@ -20,4 +20,5 @@ export * from './rest-start-issue.mjs';
 export * from './rest-unowned.mjs';
 export * from './rest-worker.mjs';
 export * from './rest.mjs';
+export * from './transport-cache.mjs';
 export * from './transport.mjs';

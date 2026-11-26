@@ -3,6 +3,7 @@ import {
   decideQueue,
   readContextOf,
   readSnapshotGraphql,
+  transportCache,
   type QueueDecision,
   type Read,
   type ReadError,
@@ -461,15 +462,21 @@ export const createReportStore = (deps: ReportDeps): ReportStore => {
   };
 };
 
-/** The browser's reader: `pr-report-core-v2` over `fetch`. */
-export const browserReadReport =
-  (repo: Repo): ReadReport =>
-  async (token, nowMs, onBudget) => {
+/**
+ * The browser's reader: `pr-report-core-v2` over `fetch`. What cannot change (a
+ * commit by its sha, a run's annotations) is kept for the page's life and not
+ * asked again; the browser revalidates the rest itself.
+ */
+export const browserReadReport = (repo: Repo): ReadReport => {
+  const cache = transportCache({ revalidate: false });
+
+  return async (token, nowMs, onBudget) => {
     const context = readContextOf({
       transport: browserTransport(onBudget),
       owner: repo.owner,
       name: repo.name,
       token,
+      cache,
     });
 
     const [snapshot, runs, layerWorkflows] = await Promise.all([
@@ -487,6 +494,7 @@ export const browserReadReport =
 
     return { snapshot, runs, layerWorkflows };
   };
+};
 
 /** Whether a read is out, as the header's ring and Refresh show it. */
 export const isReading = (status: ReportStatus): boolean =>
