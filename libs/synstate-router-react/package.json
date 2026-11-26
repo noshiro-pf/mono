@@ -57,6 +57,7 @@
     "z:vitest:node": "pnpm run z:vitest --project='Node.js'"
   },
   "dependencies": {
+    "synstate-react-hooks": "workspace:^",
     "ts-data-forge": "workspace:^",
     "ts-type-forge": "workspace:^"
   },
