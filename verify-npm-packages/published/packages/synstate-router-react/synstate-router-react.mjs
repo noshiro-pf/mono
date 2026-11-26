@@ -25,6 +25,8 @@ assert.deepEqual(Object.keys(bound).toSorted(), [
   'Link',
   'Routes',
   'useAt',
+  'useBlocker',
+  'useBranch',
   'useIsActive',
   'useRouteMatch',
 ]);

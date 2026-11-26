@@ -55,7 +55,7 @@ runs:
   steps:
     - name: Install pnpm
       if: inputs.pnpm != 'false'
-      uses: pnpm/action-setup@v6.1.0
+      uses: pnpm/action-setup@v6.1.1
       with:
         # Its default, written out: the store is `setup-node`'s to cache, below,
         # where `cache: false` turns it off; a default that changed on an update

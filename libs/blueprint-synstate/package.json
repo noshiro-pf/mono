@@ -65,9 +65,9 @@
     "ts-type-forge": "workspace:^"
   },
   "devDependencies": {
-    "@blueprintjs/core": "^6.21.0",
-    "@blueprintjs/datetime": "^6.3.0",
-    "@blueprintjs/icons": "^6.14.1",
+    "@blueprintjs/core": "^6.23.1",
+    "@blueprintjs/datetime": "^6.3.3",
+    "@blueprintjs/icons": "^6.17.0",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
     "@vitest/browser-playwright": "catalog:",

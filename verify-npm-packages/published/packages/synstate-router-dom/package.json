@@ -4,9 +4,9 @@
   "private": true,
   "type": "module",
   "dependencies": {
-    "synstate": ">=8.0.0",
-    "synstate-dom": ">=0.9.0",
-    "synstate-router": ">=0.2.1",
-    "synstate-router-dom": "0.2.1"
+    "synstate": ">=9.0.0",
+    "synstate-dom": ">=0.13.0",
+    "synstate-router": ">=0.5.0",
+    "synstate-router-dom": "0.4.0"
   }
 }
