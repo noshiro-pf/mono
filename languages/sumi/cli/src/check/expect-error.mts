@@ -58,6 +58,11 @@ export type ExpectErrorResult = Readonly<{
   /** The checker diagnostics left after the matched ones were suppressed. */
   checker: readonly CheckerDiagnostic[];
   unused: readonly UnusedExpectError[];
+  /**
+   * The markers naming a rule that was not evaluated (`unevaluatedRuleIds`):
+   * neither used nor unused, since nothing ran that could answer them.
+   */
+  unevaluated: readonly UnusedExpectError[];
   invalid: readonly InvalidExpectError[];
   silencingDirectives: readonly SilencingDirective[];
 }>;
@@ -104,11 +109,17 @@ type Entry = Readonly<
  * counts as unused, and the diagnostic stands. That is deliberate: the
  * alternative — suppressing whatever happens to be there — is what makes a
  * blanket `disable` comment outlive its reason.
+ *
+ * A marker naming one of `unevaluatedRuleIds` — the rules of an engine that
+ * failed to run — is set apart in `unevaluated` instead: nothing ran that could
+ * answer it, so calling it unused would be a claim about a check never made, and
+ * deleting it would bring the violation back once the engine runs again.
  */
 export const applyExpectErrors = (
   files: readonly string[],
   lintDiagnostics: readonly OxlintDiagnostic[],
   checkerDiagnostics: readonly CheckerDiagnostic[],
+  unevaluatedRuleIds: ReadonlySet<string> = new Set<string>(),
 ): ExpectErrorResult => {
   const entries: readonly Entry[] = [
     ...lintDiagnostics.map((diagnostic): Entry => ({
@@ -146,6 +157,8 @@ export const applyExpectErrors = (
 
   const mut_unused: UnusedExpectError[] = [];
 
+  const mut_unevaluated: UnusedExpectError[] = [];
+
   const mut_invalid: InvalidExpectError[] = [];
 
   const mut_silencingDirectives: SilencingDirective[] = [];
@@ -177,14 +190,20 @@ export const applyExpectErrors = (
       );
 
       if (Arr.isEmpty(matched)) {
-        mut_unused.push({
+        const unanswered: UnusedExpectError = {
           filename: file,
           // The marker's own line, not the code's: the two need not be
           // adjacent, and a file-scoped marker has no code line at all.
           line: marker.markerLine,
           ruleId: marker.ruleId,
           fileScoped: marker.fileScoped,
-        });
+        } as const;
+
+        if (unevaluatedRuleIds.has(marker.ruleId)) {
+          mut_unevaluated.push(unanswered);
+        } else {
+          mut_unused.push(unanswered);
+        }
       } else {
         for (const entry of matched) {
           if (entry.kind === 'lint') {
@@ -205,6 +224,7 @@ export const applyExpectErrors = (
       (diagnostic) => !mut_suppressedChecker.has(diagnostic),
     ),
     unused: mut_unused,
+    unevaluated: mut_unevaluated,
     invalid: mut_invalid,
     silencingDirectives: mut_silencingDirectives,
   };

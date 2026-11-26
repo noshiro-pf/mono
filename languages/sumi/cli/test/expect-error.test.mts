@@ -291,6 +291,42 @@ describe(applyExpectErrors, () => {
     );
   });
 
+  test('a marker for a rule that was not evaluated is neither used nor unused', () => {
+    // When the type-aware checker fails, its rules were never run: a marker
+    // naming one is set apart rather than reported as unused, while a marker
+    // for an oxlint rule nothing answered is still unused.
+    withFile(
+      dedent`
+        // @sumi-expect-error null/no-null-propagation
+        const y = f();
+        // @sumi-expect-error banned-syntax/no-var
+        const z = 1;
+      `,
+      (file) => {
+        const result = applyExpectErrors(
+          [file],
+          [],
+          [],
+          new Set<string>(['null/no-null-propagation']),
+        );
+
+        assert.deepStrictEqual(
+          result.unused.map((u) => u.ruleId),
+          ['banned-syntax/no-var'],
+        );
+
+        assert.deepStrictEqual(result.unevaluated, [
+          {
+            filename: file,
+            line: 1,
+            ruleId: 'null/no-null-propagation',
+            fileScoped: false,
+          },
+        ]);
+      },
+    );
+  });
+
   test('reports an oxlint-disable directive that silences a preset rule', () => {
     // oxlint applies the directive itself, so the diagnostic never reaches this
     // pass; the directive is what is left to report.
