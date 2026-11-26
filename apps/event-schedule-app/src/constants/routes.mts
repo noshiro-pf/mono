@@ -1,4 +1,5 @@
 import { defineRoutes, param, search } from 'synstate-router';
+import { dict } from './dictionary/index.mjs';
 
 /**
  * The answer table's sort and filters in the answer page's query string, so
@@ -25,24 +26,29 @@ const answerTableSearch = {
 
 /**
  * The app's pages. `/` names none of its own: the router sends it to the create
- * page.
+ * page. Each page's `meta.title` is the document's title while it is shown; a
+ * URL that names no page keeps the title of `index.html`.
  */
 export const routes = defineRoutes({
   root: { segment: '' },
-  create: {},
+  create: { meta: { title: dict.pageTitle.create } },
   event: {
     page: false,
     children: {
       answer: {
         params: { eventId: param.string },
         search: answerTableSearch,
-        children: { edit: {} },
+        meta: { title: dict.pageTitle.answer },
+        children: { edit: { meta: { title: dict.pageTitle.edit } } },
       },
     },
   },
-  eventList: { segment: 'event-list' },
-  register: {},
-  signIn: {},
+  eventList: {
+    segment: 'event-list',
+    meta: { title: dict.pageTitle.eventList },
+  },
+  register: { meta: { title: dict.pageTitle.register } },
+  signIn: { meta: { title: dict.pageTitle.signIn } },
 });
 
 /** How the answer table's query values are written. */

@@ -1,9 +1,52 @@
 import { createMemoryBrowser } from 'synstate-router';
 import { Optional } from 'ts-data-forge';
-import { routes } from '../constants/index.mjs';
+import { dict, routes } from '../constants/index.mjs';
 import { createAppRouter } from './router-store.mjs';
 
 describe(createAppRouter, () => {
+  test('shows each page’s title in the tab, and the app’s own on a page with none', async () => {
+    const browser = createMemoryBrowser('https://example.com/no-such-page/', {
+      title: appTitle,
+    });
+
+    const router = createAppRouter(browser);
+
+    assert.strictEqual(browser.title(), appTitle);
+
+    const pages = [
+      [routes.create.href(), dict.pageTitle.create],
+      [routes.event.answer.href({ eventId: 'abc' }), dict.pageTitle.answer],
+      [routes.event.answer.edit.href({ eventId: 'abc' }), dict.pageTitle.edit],
+      [routes.eventList.href(), dict.pageTitle.eventList],
+      [routes.register.href(), dict.pageTitle.register],
+      [routes.signIn.href(), dict.pageTitle.signIn],
+    ] as const;
+
+    for (const [href, title] of pages) {
+      router.push(href);
+
+      assert.strictEqual(browser.title(), title);
+    }
+
+    router.back();
+
+    await settle();
+
+    assert.strictEqual(browser.title(), dict.pageTitle.register);
+
+    for (const _ of pages) {
+      router.back();
+    }
+
+    await settle();
+
+    assert.strictEqual(browser.url().pathname, '/no-such-page/');
+
+    assert.strictEqual(browser.title(), appTitle);
+
+    router.dispose();
+  });
+
   test('sends the root to the create page as it opens', () => {
     const browser = createMemoryBrowser('https://example.com/');
 
@@ -238,3 +281,12 @@ describe(createAppRouter, () => {
     );
   });
 });
+
+/** The title of `index.html`, which a page without one of its own keeps. */
+const appTitle = 'イベント日程調整';
+
+const settle = async (): Promise<void> => {
+  await new Promise<void>((resolve) => {
+    setTimeout(resolve, 0);
+  });
+};

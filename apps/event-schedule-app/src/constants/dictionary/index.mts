@@ -11,5 +11,6 @@ export * from './event-settings-page.mjs';
 export * from './for-non-logged-in-user-dialog.mjs';
 export * from './header.mjs';
 export * from './icon-description-default.mjs';
+export * from './page-title.mjs';
 export * from './register-page.mjs';
 export * from './result-page.mjs';
