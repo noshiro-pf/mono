@@ -195,7 +195,7 @@ describe(reworkPr, () => {
     assert.isTrue(Result.isOk(refused.result));
 
     expect(refused.log.join('\n')).toContain(
-      'It is held all the same, so the work can go on; it is just not marked as a draft.',
+      'It is held all the same, so the work can go on, but make it a draft another way now (the GitHub MCP tool update_pull_request with draft: true, or "Convert to draft" on the pull request\'s page); rework-pr done says how to mark it ready again.',
     );
 
     assert.isTrue(Result.isErr(failed.result));
@@ -250,6 +250,52 @@ describe(reworkPr, () => {
     ]);
 
     assert.strictEqual(record, undefined);
+  });
+
+  test('done stops at a ready refused, naming another way, and a ready that failed otherwise names none', async () => {
+    const routesFor = (answer: ReturnType<typeof status>): Routes =>
+      ({
+        [OPEN]: ok([HELD]),
+        '/repos/o/n/pulls?state=open&sort=created&direction=asc&per_page=100':
+          ok([{ number: 7 }]),
+        [EVENTS]: ok([
+          { id: 2, event: 'unlabeled', label: { name: 'merge-queued' } },
+        ]),
+        'graphql:markPullRequestReadyForReview': answer,
+      }) as const;
+
+    const refused = await run(
+      done('requeue'),
+      routesFor(status(403, 'Forbidden')),
+      {},
+      '2\n',
+    );
+
+    assert.isTrue(Result.isErr(refused.result));
+
+    expect(refused.result.value).toContain(
+      '#7: cannot mark it ready for review',
+    );
+
+    expect(refused.result.value).toContain(
+      'Mark it ready another way (the GitHub MCP tool update_pull_request with draft: false, or "Ready for review" on the pull request\'s page), then right away run rework-pr done again with the same flag',
+    );
+
+    // The steps after it are not taken: merge-queued stays off.
+    assert.deepStrictEqual(refused.sent, [
+      'GraphQL markPullRequestReadyForReview',
+    ]);
+
+    const failed = await run(
+      done('requeue'),
+      routesFor(status(502, 'Bad Gateway')),
+      {},
+      '2\n',
+    );
+
+    assert.isTrue(Result.isErr(failed.result));
+
+    expect(failed.result.value).not.toContain('update_pull_request');
   });
 
   test('done --requeue leaves merge-queued to the author once the label moved since', async () => {
