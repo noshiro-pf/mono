@@ -5,6 +5,10 @@ import { Result } from 'ts-repo-utils';
 import { octokitHeaders, OWNER, REPO } from '../../constants.mjs';
 import { octokit } from '../../octokit.mjs';
 import { EnvironmentSettings } from '../constants.mjs';
+import {
+  listDeploymentBranchPoliciesWith,
+  type DeploymentBranchPolicy,
+} from './list-deployment-branch-policies-with.mjs';
 
 /**
  * Settings > Environments の現在値を、宣言ファイルと同じ形にして返す。
@@ -51,28 +55,30 @@ export const getAllEnvironments = async (): Promise<
   return settings.toSorted((a, b) => a.name.localeCompare(b.name));
 };
 
-/** 「 Selected branches and tags 」に登録されている pattern を列挙する。 */
+/** 「 Selected branches and tags 」に登録されている pattern を、すべてのページから列挙する。 */
 export const getDeploymentBranchPolicies = async (
   environmentName: string,
-): Promise<readonly DeploymentBranchPolicy[]> => {
-  // https://docs.github.com/rest/deployments/branch-policies#list-deployment-branch-policies
-  const response = await octokit.request(
-    'GET /repos/{owner}/{repo}/environments/{environment_name}/deployment-branch-policies' satisfies EndpointKeys,
-    {
-      owner: OWNER,
-      repo: REPO,
-      environment_name: environmentName,
-      headers: octokitHeaders,
-      per_page: 100,
-    },
-  );
+): Promise<readonly DeploymentBranchPolicy[]> =>
+  listDeploymentBranchPoliciesWith(async (page, perPage) => {
+    // https://docs.github.com/rest/deployments/branch-policies#list-deployment-branch-policies
+    const response = await octokit.request(
+      'GET /repos/{owner}/{repo}/environments/{environment_name}/deployment-branch-policies' satisfies EndpointKeys,
+      {
+        owner: OWNER,
+        repo: REPO,
+        environment_name: environmentName,
+        headers: octokitHeaders,
+        per_page: perPage,
+        page,
+      },
+    );
 
-  return response.data.branch_policies.map((policy) => ({
-    id: policy.id ?? 0,
-    name: policy.name ?? '',
-    type: policy.type === 'tag' ? 'tag' : 'branch',
-  }));
-};
+    return response.data.branch_policies.map((policy) => ({
+      id: policy.id ?? 0,
+      name: policy.name ?? '',
+      type: policy.type === 'tag' ? 'tag' : 'branch',
+    }));
+  });
 
 /** 宣言ファイルに載る形。 `id` は GitHub 側の都合なので落とす。 */
 const getDeploymentBranchPolicyNames = async (
@@ -82,12 +88,6 @@ const getDeploymentBranchPolicyNames = async (
 
   return policies.map(({ name, type }) => ({ name, type }));
 };
-
-export type DeploymentBranchPolicy = Readonly<{
-  id: number;
-  name: string;
-  type: 'branch' | 'tag';
-}>;
 
 /**
  * GET が返す `protection_rules` を PUT の body の形に戻す。

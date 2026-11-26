@@ -67,7 +67,10 @@ The target is resolved in the following order. It is normally derived from
 `git remote`, so neither option is usually needed.
 
 1. The command-line options `--owner` / `--repo`
-2. The environment variables `OWNER` / `REPO_NAME`
+2. The environment variables `OWNER` / `REPO_NAME`. One that is set but empty
+   (an undefined CI variable, a blank line in `.env`) is refused with an error
+   naming it, rather than skipped: falling through to `origin` could write to
+   another repository.
 3. `git remote get-url origin`
 4. The `name` field of `package.json` (repository name only)
 

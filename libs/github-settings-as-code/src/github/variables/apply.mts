@@ -7,7 +7,7 @@ import { isDirectlyExecuted, pathExists, Result } from 'ts-repo-utils';
 import { settingsJsonName, variablesDir } from '../constants.mjs';
 import {
   createRepoVariable,
-  listRepoVariables,
+  putVariableWith,
   updateRepoVariable,
 } from './api/index.mjs';
 import {
@@ -35,14 +35,13 @@ export const applyVariables = async (): Promise<void> => {
   // 1 本目を送る前に、全部の名前を見る。
   assertVariableNamesAreValid(variables);
 
-  const existing: ReadonlySet<string> = await listRepoVariables().then(
-    (vs) => new Set(vs.map((v) => v.name)),
-  );
-
+  // 一覧から PATCH / POST を選ばず、 PATCH して 404 なら POST する
+  // （`putVariableWith`）。一覧はページごとに読むので取りこぼしうる。
   for (const [name, value] of Object.entries(variables)) {
-    await (existing.has(name)
-      ? updateRepoVariable({ name, value })
-      : createRepoVariable({ name, value }));
+    await putVariableWith(
+      { update: updateRepoVariable, create: createRepoVariable },
+      { name, value },
+    );
   }
 
   // ここで live を読み直して書き戻すことはしない。 backup は live をそのまま
