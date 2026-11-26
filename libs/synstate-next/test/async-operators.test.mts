@@ -53,6 +53,30 @@ describe(switchMap, () => {
   });
 });
 
+describe('switchMap and mergeMap on an initialized source (#4308)', () => {
+  test('hold the projected value from the start, as their type says', () => {
+    const count = state(1);
+
+    const switched = count.pipe(switchMap((x) => state(x * 2)));
+
+    const merged = count.pipe(mergeMap((x) => state(x * 3)));
+
+    const fromJust = just(1).pipe(switchMap((x) => just(x * 4)));
+
+    assert.strictEqual(switched.value, 2);
+
+    assert.strictEqual(merged.value, 3);
+
+    assert.strictEqual(fromJust.value, 4);
+
+    count.set(5);
+
+    assert.strictEqual(switched.value, 10);
+
+    assert.strictEqual(merged.value, 15);
+  });
+});
+
 describe(debounce, () => {
   test('emits the latest value once the source has been quiet', () => {
     vi.useFakeTimers();

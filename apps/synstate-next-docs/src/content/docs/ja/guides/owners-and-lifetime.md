@@ -5,7 +5,7 @@ description: createOwner・createRootOwner・run・dispose・onCleanup・getOwne
 
 ## すべては owner に属する
 
-owner は寿命です。`run` の実行中に作ったものはすべてその owner に属します。派生 Observable、購読、タイマー、リクエスト、`onCleanup` で登録したクリーンアップ、その中で作った owner です。`dispose()` はそれらを新しいものから順に破棄します。まず子の owner、次にクリーンアップ、最後に Observable です。
+owner は寿命です。`run` の実行中に作ったものはすべてその owner に属します。派生 Observable、購読、タイマー、リクエスト、`onCleanup` で登録したクリーンアップ、その中で作った owner です。`dispose()` はまず、子の owner の分も含めて、owner の中のすべての購読を止めます。そのあと残りを新しいものから順に破棄します。子の owner、次にクリーンアップ、最後に Observable です。そのため、クリーンアップが書き込んだ値で購読が呼ばれることはありません。クリーンアップからは、破棄が始まった時点で owner の派生 Observable が持っていた値を読めます。クリーンアップが元の state に書き込んだ後でも同じです。例外は、射影やセットアップが自分の Observable を持つ owner を破棄する場合で、その前にそこで作ったものはクリーンアップの書き込みを受け取ることがあります。
 
 ```tsx
 import { createRootOwner, createState, map, onCleanup } from 'synstate-next';

@@ -11,11 +11,14 @@ Follows the observable that `project` returns for the latest value. What the pro
 
 The inner observable's value at the time of the switch joins the update that caused it; a later emission of the inner observable arrives in an update of its own. Like every node, it holds the last value it emitted: switching to an inner observable that holds none emits nothing, and keeps the value held. For the same reason the result may hold no value even when the source does.
 
+On an initialized source, with a projection that returns an initialized observable, it projects the value the source holds when it is created, so it holds a value from the start and is typed `InitializedObservable`, unless the projection disposes an owner of it.
+
 {/* /reference */}
 
 {/* reference:operator-kind */}
 
-Its result may hold no value even when the source holds one: `pipe` gives an `Observable` ([`DropInitialValueOperator`](/mono/synstate-next/guides/deriving-values/#pipe)).
+- When `project` returns an `InitializedObservable`, its result holds a value whenever the source does: on an `InitializedObservable`, `pipe` gives one ([`KeepInitialValueOperator`](/mono/synstate-next/guides/deriving-values/#pipe)).
+- Otherwise, its result may hold no value even when the source holds one: `pipe` gives an `Observable` ([`DropInitialValueOperator`](/mono/synstate-next/guides/deriving-values/#pipe)).
 
 {/* /reference */}
 

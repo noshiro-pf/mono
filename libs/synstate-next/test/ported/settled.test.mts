@@ -28,7 +28,7 @@ import {
 } from 'synstate-next';
 import { toNode } from 'synstate-next/internal';
 import { Arr } from 'ts-data-forge';
-import { Optional } from 'ts-std-forge';
+import { Optional, Result } from 'ts-std-forge';
 
 describe(take, () => {
   test('settles, and leaves its parent, in the update of its nth value', () => {
@@ -483,6 +483,62 @@ describe(fromSubscribable, () => {
     assert.isTrue(isSettled(observable));
   });
 
+  test('drops a value the subscribable gives after completing (#4116)', () => {
+    const { subscribable, emit, complete } = manualSubscribable();
+
+    const observable = fromSubscribable(subscribable);
+
+    const seen = collect(observable);
+
+    emit(1);
+
+    complete();
+
+    emit(2);
+
+    assert.deepStrictEqual(seen, [Result.ok(1)]);
+
+    assert.isTrue(isSettled(observable));
+  });
+
+  test('drops a value the subscribable gives after an error (#4116)', () => {
+    const { subscribable, emit, fail } = manualSubscribable();
+
+    const observable = fromSubscribable(subscribable);
+
+    const seen = collect(observable);
+
+    emit(1);
+
+    fail('e');
+
+    emit(2);
+
+    assert.deepStrictEqual(seen, [Result.ok(1), Result.err('e')]);
+
+    assert.isTrue(isSettled(observable));
+  });
+
+  test('drops what the subscribable gives during subscribe after it ended (#4116)', () => {
+    const observable = fromSubscribable<number>({
+      subscribe: (observer) => {
+        observer.next(1);
+
+        observer.complete();
+
+        observer.next(2);
+
+        observer.error('e');
+
+        return { unsubscribe: () => {} };
+      },
+    });
+
+    assert.deepStrictEqual(collect(observable), [Result.ok(1)]);
+
+    assert.isTrue(isSettled(observable));
+  });
+
   test('a finished take below it leaves it subscribed until it is disposed', () => {
     const { subscribable, emit, unsubscribe } = manualSubscribable();
 
@@ -553,12 +609,14 @@ const isSettled = (observable: Observable<unknown>): boolean =>
 const manualSubscribable = (): Readonly<{
   subscribable: Parameters<typeof fromSubscribable<number>>[0];
   emit: (value: number) => void;
+  fail: (error: unknown) => void;
   complete: () => void;
   unsubscribe: () => void;
 }> => {
   const mut_observer: {
     current: Readonly<{
       next?: (value: number) => void;
+      error?: (error: unknown) => void;
       complete?: () => void;
     }>;
   } = { current: {} };
@@ -577,6 +635,9 @@ const manualSubscribable = (): Readonly<{
     },
     emit: (value) => {
       mut_observer.current.next?.(value);
+    },
+    fail: (error) => {
+      mut_observer.current.error?.(error);
     },
     complete: () => {
       mut_observer.current.complete?.();

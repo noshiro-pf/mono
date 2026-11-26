@@ -85,7 +85,8 @@
     "prettier-plugin-packagejson": "catalog:",
     "synstate-next": "workspace:*",
     "ts-repo-utils": "workspace:*",
-    "typescript": "catalog:"
+    "typescript": "catalog:",
+    "vitest": "catalog:"
   },
   "peerDependencies": {
     "synstate-next": "workspace:^"

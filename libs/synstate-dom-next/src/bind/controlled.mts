@@ -1,11 +1,30 @@
 import { isObservable } from 'synstate-next';
 import { noValue, toNode } from 'synstate-next/internal';
 
-/** The DOM properties a user's click changes and the binding sets back. */
-export type ControlledKey = 'checked' | 'indeterminate';
+/** The DOM properties a user's change changes and the binding sets back. */
+export type ControlledKey = 'checked' | 'indeterminate' | 'value';
 
-export const isControlledKey = (key: string): key is ControlledKey =>
-  key === 'checked' || key === 'indeterminate';
+/**
+ * `key` and its element when it is controlled there: `checked` and
+ * `indeterminate` of an `<input>`, and `value` of a `<select>` alone (not of a
+ * `<select multiple>`, which `restore` leaves alone). A `<select>` has no draft
+ * and no composition, so every `change` is a finished choice, as a checkbox's
+ * is; an `<input>` or `<textarea>` bound one way keeps what is being typed,
+ * which a draft committed on `change` or blur, or an IME composition, needs.
+ */
+export const controlledKeyOn = (
+  element: Element,
+  key: string,
+): Readonly<{ element: ControlledElement; key: ControlledKey }> | undefined => {
+  if (key === 'value') {
+    return element instanceof HTMLSelectElement ? { element, key } : undefined;
+  }
+
+  return (key === 'checked' || key === 'indeterminate') &&
+    element instanceof HTMLInputElement
+    ? { element, key }
+    : undefined;
+};
 
 /**
  * Makes `key` of `input` controlled, `value` having been bound to it: after a
@@ -18,7 +37,7 @@ export const isControlledKey = (key: string): key is ControlledKey =>
  * them, so a change on one sets back every bound button of the group.
  */
 export const controlProperty = (
-  input: HTMLInputElement,
+  input: ControlledElement,
   key: ControlledKey,
   value: unknown,
 ): void => {
@@ -40,10 +59,13 @@ export const controlProperty = (
   }
 };
 
+/** The elements whose properties can be controlled. */
+type ControlledElement = HTMLInputElement | HTMLSelectElement;
+
 /** How to read the bound value of each controlled property of an input. */
 // transformer-ignore-next-line convert-to-readonly
 const mut_controlled = new WeakMap<
-  HTMLInputElement,
+  ControlledElement,
   Map<ControlledKey, () => unknown>
 >();
 
@@ -55,7 +77,7 @@ const readNode = (value: Parameters<typeof toNode>[0]): (() => unknown) => {
 };
 
 /** Writes every bound property of `input` back to it. */
-const restore = (input: HTMLInputElement): void => {
+const restore = (input: ControlledElement): void => {
   const reads = mut_controlled.get(input);
 
   if (reads === undefined) {
@@ -63,6 +85,16 @@ const restore = (input: HTMLInputElement): void => {
   }
 
   for (const [key, read] of reads) {
+    // `value` names one option, so a `<select multiple>`, whose user may have
+    // chosen several, is not drawn back to it: it stays one way.
+    if (
+      key === 'value' &&
+      input instanceof HTMLSelectElement &&
+      input.multiple
+    ) {
+      continue;
+    }
+
     const v = read();
 
     if (v !== noValue && Reflect.get(input, key) !== v) {
@@ -77,10 +109,13 @@ const restore = (input: HTMLInputElement): void => {
  * included, is a group of its own: a click on an input in no document fires no
  * `change`, so nothing is restored.
  */
-const radioGroupOf = (input: HTMLInputElement): readonly HTMLInputElement[] => {
+const radioGroupOf = (
+  input: ControlledElement,
+): readonly ControlledElement[] => {
   const root = input.getRootNode();
 
   if (
+    !(input instanceof HTMLInputElement) ||
     input.type !== 'radio' ||
     input.name === '' ||
     !(root instanceof Document || root instanceof ShadowRoot)
@@ -98,7 +133,9 @@ const radioGroupOf = (input: HTMLInputElement): readonly HTMLInputElement[] => {
 const onChange = (event: Event): void => {
   const input = event.currentTarget;
 
-  if (!(input instanceof HTMLInputElement)) {
+  if (!(
+    input instanceof HTMLInputElement || input instanceof HTMLSelectElement
+  )) {
     return;
   }
 

@@ -3,7 +3,7 @@ title: owner
 description: '現在の owner、owner の作成と破棄、後始末の登録。'
 ---
 
-{/* translated-from:6e3bf2b2e332 */}
+{/* translated-from:a1825b0b209a */}
 
 ### `createOwner`
 
@@ -27,7 +27,7 @@ description: '現在の owner、owner の作成と破棄、後始末の登録。
 
 ### `Owner`
 
-`run` の実行中に作ったものはすべてこれに属し、`dispose()` がそれを破棄します。子の owner、後始末、ノードの順に、それぞれ新しいものから破棄します。`createOwner` か `createRootOwner` で作ります。
+`run` の実行中に作ったものはすべてこれに属し、`dispose()` がそれを破棄します。まず子の owner の分も含めて中のすべてを更新から外し、次に子の owner、後始末、ノードの順に、それぞれ新しいものから破棄します。そのため中の購読や束縛は、後始末が書き込んだ値も、破棄が引き起こしたことも受け取りません。後始末からは、破棄が始まった時点で派生ノードが持っていた値を読めます。例外は、射影やセットアップが自分の Observable を持つ owner を破棄する場合で、その前にそこで作ったものは後始末の書き込みを受け取ることがあります。`createOwner` か `createRootOwner` で作ります。
 
 ## 例
 

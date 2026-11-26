@@ -6,12 +6,14 @@ import type { ReadonlyRecord } from 'ts-type-forge';
 import {
   AttributeBinding,
   ClassToggleBinding,
+  InputValueBinding,
+  InputValueWriter,
   PropertyBinding,
   StyleBinding,
   writeAttribute,
   writeStyle,
 } from './bindings.mjs';
-import { controlProperty, isControlledKey } from './controlled.mjs';
+import { controlProperty, controlledKeyOn } from './controlled.mjs';
 import {
   attributeNameOf,
   isSvgOnlyTag,
@@ -22,8 +24,8 @@ import {
 /**
  * Binds every prop of an element except `ref` and `children`: `class`, `style`,
  * the event handlers, the DOM properties of `propertyNames`, and attributes for
- * the rest. A constant is written once; an observable gets a binding, owned by
- * the current owner.
+ * the rest, `value` last. A constant is written once; an observable gets a
+ * binding, owned by the current owner.
  */
 export const bindProps = (
   element: Element,
@@ -32,10 +34,37 @@ export const bindProps = (
   const htmlTypedSvg =
     element.namespaceURI === svgNamespace && !isSvgOnlyTag(element.localName);
 
-  for (const [key, value] of Object.entries(props)) {
-    bindProp(element, key, value, htmlTypedSvg);
+  const { value } = props;
+
+  const valueWriter =
+    value !== undefined && element instanceof HTMLInputElement
+      ? new InputValueWriter(element)
+      : undefined;
+
+  for (const [key, v] of Object.entries(props)) {
+    if (key !== 'value') {
+      bindProp(element, key, v, htmlTypedSvg, valueWriter);
+    }
   }
+
+  // Last, whatever the order the props were written in: an input fits its value
+  // to the `type` it has when the value is written, and a range input to its
+  // `min`, `max` and `step` too, and does not take it back when they come after.
+  bindProp(element, 'value', value, htmlTypedSvg, valueWriter);
 };
+
+/**
+ * The attributes of an `<input>` whose write fits its value again: an input
+ * fits it to its `type`, and a range input to its `min`, `max` and `step` too.
+ * Others that change how a value is sanitized, `multiple` on an email input,
+ * are not watched: the value they leave differs only in white space.
+ */
+const fittingKeys: ReadonlySet<string> = new Set<string>([
+  'max',
+  'min',
+  'step',
+  'type',
+]);
 
 /** `onClick`, `onPointerDown`: `on` and an upper-case letter. */
 const isEventKey = (key: string): boolean => /^on[A-Z]/u.test(key);
@@ -79,10 +108,11 @@ const bindAttribute = (
   element: Element,
   name: string,
   value: unknown,
+  fitted?: InputValueWriter,
 ): void => {
   if (isObservable(value)) {
     // oxlint-disable-next-line eslint/no-new
-    new AttributeBinding(toNode(value), element, name);
+    new AttributeBinding(toNode(value), element, name, fitted);
   } else {
     writeAttribute(element, name, value);
   }
@@ -98,6 +128,16 @@ const booleanAsText = (value: unknown): unknown =>
 const asText = (value: unknown): unknown =>
   isObservable(value) ? value.pipe(map(booleanAsText)) : booleanAsText(value);
 
+/** `value` of an `<input>`, written again when its bounds let it be. */
+const bindInputValue = (writer: InputValueWriter, value: unknown): void => {
+  if (isObservable(value)) {
+    // oxlint-disable-next-line eslint/no-new
+    new InputValueBinding(toNode(value), writer);
+  } else {
+    writer.write(value);
+  }
+};
+
 /**
  * An event handler, a DOM property, or an attribute. `htmlTypedSvg` is an
  * element with a tag HTML has (`<a>`, `<title>`) mounted inside an `<svg>`: an
@@ -111,6 +151,7 @@ const bindOther = (
   key: string,
   value: unknown,
   htmlTypedSvg: boolean,
+  valueWriter: InputValueWriter | undefined,
 ): void => {
   if (isEventKey(key)) {
     listen(element, key, value);
@@ -120,14 +161,23 @@ const bindOther = (
       (attributeNameOf[key] ?? key).toLowerCase(),
       enumeratedNameSet.has(key) ? asText(value) : value,
     );
+  } else if (key === 'value' && valueWriter !== undefined) {
+    bindInputValue(valueWriter, value);
   } else if (propertyNameSet.has(key)) {
     bindProperty(element, key, value);
 
-    if (isControlledKey(key) && element instanceof HTMLInputElement) {
-      controlProperty(element, key, value);
+    const controlled = controlledKeyOn(element, key);
+
+    if (controlled !== undefined) {
+      controlProperty(controlled.element, controlled.key, value);
     }
   } else {
-    bindAttribute(element, attributeNameOf[key] ?? key, value);
+    bindAttribute(
+      element,
+      attributeNameOf[key] ?? key,
+      value,
+      fittingKeys.has(key) ? valueWriter : undefined,
+    );
   }
 };
 
@@ -188,6 +238,7 @@ const bindProp = (
   key: string,
   value: unknown,
   htmlTypedSvg: boolean,
+  valueWriter: InputValueWriter | undefined,
 ): void => {
   // `key` belongs to `For`; on an element, it can only have come in a spread.
   if (
@@ -211,7 +262,7 @@ const bindProp = (
       return;
 
     default:
-      bindOther(element, key, value, htmlTypedSvg);
+      bindOther(element, key, value, htmlTypedSvg, valueWriter);
   }
 };
 

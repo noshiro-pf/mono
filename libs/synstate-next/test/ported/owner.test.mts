@@ -8,15 +8,19 @@
  */
 import {
   createOwner,
+  createSource,
+  createState,
   getOwner,
   map,
+  mergeMap,
   onCleanup,
   Owner,
   source,
+  state,
   untracked,
   type Observable,
 } from 'synstate-next';
-import { toNode } from 'synstate-next/internal';
+import { retireOwner, toNode } from 'synstate-next/internal';
 import { expectType } from 'ts-data-forge';
 
 describe(Owner, () => {
@@ -179,6 +183,630 @@ describe(Owner, () => {
     ]);
 
     assert.isTrue(isDisposed(node));
+  });
+
+  test('a subscription made in the owner ends before its cleanups run, so a value a cleanup writes is not heard (#3609)', () => {
+    const store = source<number>();
+
+    const owner = createOwner();
+
+    const mut_seen: number[] = [];
+
+    owner.run(() => {
+      onCleanup(() => {
+        store.emit(2);
+      });
+
+      store.subscribe((x) => {
+        mut_seen.push(x);
+      });
+    });
+
+    store.emit(1);
+
+    owner.dispose();
+
+    assert.deepStrictEqual(mut_seen, [1]);
+  });
+
+  test("a subscription made in the owner ends before its child owners are disposed, so it hears no child's cleanup (#3609)", () => {
+    const store = source<number>();
+
+    const parent = createOwner();
+
+    const mut_events: string[] = [];
+
+    parent.run(() => {
+      const inner = createOwner().run(() => {
+        onCleanup(() => {
+          store.emit(2);
+        });
+
+        return store.pipe(map((x) => x * 10));
+      });
+
+      store.subscribe((x) => {
+        mut_events.push(`store ${x.toString()}`);
+      });
+
+      inner.subscribe((x) => {
+        mut_events.push(`inner ${x.toString()}`);
+      });
+    });
+
+    store.emit(1);
+
+    parent.dispose();
+
+    assert.deepStrictEqual(mut_events, ['store 1', 'inner 10']);
+  });
+
+  test("a subscription in a child owner hears no sibling's cleanup", () => {
+    const store = source<number>();
+
+    const parent = createOwner();
+
+    const mut_seen: number[] = [];
+
+    parent.run(() => {
+      createOwner().run(() => {
+        store.subscribe((x) => {
+          mut_seen.push(x);
+        });
+      });
+
+      createOwner().run(() => {
+        onCleanup(() => {
+          store.emit(2);
+        });
+      });
+    });
+
+    store.emit(1);
+
+    parent.dispose();
+
+    assert.deepStrictEqual(mut_seen, [1]);
+  });
+
+  test("a subscription made in a source's setup hears no cleanup of the source's owner", () => {
+    const store = source<number>();
+
+    const owner = createOwner();
+
+    const mut_seen: number[] = [];
+
+    owner.run(() => {
+      createSource(() => {
+        store.subscribe((x) => {
+          mut_seen.push(x);
+        });
+      });
+
+      onCleanup(() => {
+        store.emit(2);
+      });
+    });
+
+    store.emit(1);
+
+    owner.dispose();
+
+    assert.deepStrictEqual(mut_seen, [1]);
+  });
+
+  test('a cleanup reads the derived values the nodes of its owner held when the disposal began', () => {
+    const count = state(1);
+
+    const owner = createOwner();
+
+    const mut_read: number[] = [];
+
+    owner.run(() => {
+      const doubled = count.pipe(map((x) => x * 2));
+
+      doubled.subscribe(() => {});
+
+      onCleanup(() => {
+        count.set(5);
+
+        mut_read.push(doubled.value);
+      });
+    });
+
+    owner.dispose();
+
+    assert.deepStrictEqual(mut_read, [2]);
+  });
+
+  test('a subscription made in a retired owner stays out of the updates, the cleanups included', () => {
+    const store = source<number>();
+
+    const owner = createOwner();
+
+    owner.run(() => {
+      onCleanup(() => {
+        store.emit(2);
+      });
+    });
+
+    retireOwner(owner);
+
+    const mut_seen: number[] = [];
+
+    owner.run(() => {
+      store.subscribe((x) => {
+        mut_seen.push(x);
+      });
+    });
+
+    store.emit(1);
+
+    owner.dispose();
+
+    assert.deepStrictEqual(mut_seen, []);
+  });
+
+  test("a subscription made later in a retired source's setup owner stays out of the updates, the cleanups included", () => {
+    const store = source<number>();
+
+    const owner = createOwner();
+
+    const mut_setup: { owner: Owner | undefined } = { owner: undefined };
+
+    owner.run(() => {
+      createSource(() => {
+        mut_setup.owner = getOwner();
+      });
+
+      onCleanup(() => {
+        store.emit(2);
+      });
+    });
+
+    retireOwner(owner);
+
+    const mut_seen: number[] = [];
+
+    assert.isDefined(mut_setup.owner);
+
+    mut_setup.owner.run(() => {
+      store.subscribe((x) => {
+        mut_seen.push(x);
+      });
+    });
+
+    store.emit(1);
+
+    owner.dispose();
+
+    assert.deepStrictEqual(mut_seen, []);
+  });
+
+  test('disposing nested owners retires each node once', () => {
+    const root = createOwner();
+
+    const mut_retired: number[] = [0, 0, 0, 0, 0, 0];
+
+    let mut_owner: Owner = root;
+
+    for (const level of [0, 1, 2, 3, 4, 5]) {
+      mut_owner.adopt({
+        dispose: () => {},
+        disposed: false,
+        retire: () => {
+          mut_retired[level] = (mut_retired[level] ?? 0) + 1;
+        },
+      });
+
+      mut_owner = mut_owner.run(createOwner);
+    }
+
+    root.dispose();
+
+    assert.deepStrictEqual(mut_retired, [1, 1, 1, 1, 1, 1]);
+  });
+
+  test('a subscription a cleanup makes in an older child owner hears no cleanup of that owner', () => {
+    const store = source<number>();
+
+    const parent = createOwner();
+
+    const mut_seen: number[] = [];
+
+    parent.run(() => {
+      const older = createOwner();
+
+      older.run(() => {
+        onCleanup(() => {
+          store.emit(2);
+        });
+      });
+
+      createOwner().run(() => {
+        onCleanup(() => {
+          older.run(() => {
+            store.subscribe((x) => {
+              mut_seen.push(x);
+            });
+          });
+        });
+      });
+    });
+
+    store.emit(1);
+
+    parent.dispose();
+
+    // The first call is the subscription's own, with the value held.
+    assert.deepStrictEqual(mut_seen, [1]);
+  });
+
+  test("a subscription a cleanup makes in a source's setup owner, in an older child owner, hears no cleanup of that owner", () => {
+    const store = source<number>();
+
+    const parent = createOwner();
+
+    const mut_setup: { owner: Owner | undefined } = { owner: undefined };
+
+    const mut_seen: number[] = [];
+
+    parent.run(() => {
+      createOwner().run(() => {
+        createSource(() => {
+          mut_setup.owner = getOwner();
+        });
+
+        onCleanup(() => {
+          store.emit(2);
+        });
+      });
+
+      createOwner().run(() => {
+        onCleanup(() => {
+          mut_setup.owner?.run(() => {
+            store.subscribe((x) => {
+              mut_seen.push(x);
+            });
+          });
+        });
+      });
+    });
+
+    store.emit(1);
+
+    parent.dispose();
+
+    // The first call is the subscription's own, with the value held.
+    assert.deepStrictEqual(mut_seen, [1]);
+  });
+
+  test('an owner retired by retireOwner and then disposed retires each node once', () => {
+    const owner = createOwner();
+
+    const mut_count = { retired: 0 };
+
+    owner.adopt({
+      dispose: () => {},
+      disposed: false,
+      retire: () => {
+        mut_count.retired += 1;
+      },
+    });
+
+    retireOwner(owner);
+
+    owner.dispose();
+
+    assert.strictEqual(mut_count.retired, 1);
+  });
+
+  test("a subscription a cleanup makes in a source's setup owner hears no later cleanup of the source's owner", () => {
+    const store = source<number>();
+
+    const parent = createOwner();
+
+    const mut_setup: { owner: Owner | undefined } = { owner: undefined };
+
+    const mut_seen: number[] = [];
+
+    const subscribeInSetup = (): void => {
+      mut_setup.owner?.run(() => {
+        store.subscribe((x) => {
+          mut_seen.push(x);
+        });
+      });
+    };
+
+    parent.run(() => {
+      createSource(() => {
+        mut_setup.owner = getOwner();
+      });
+
+      onCleanup(() => {
+        store.emit(2);
+      });
+
+      onCleanup(subscribeInSetup);
+
+      createOwner().run(() => {
+        onCleanup(subscribeInSetup);
+      });
+    });
+
+    store.emit(1);
+
+    parent.dispose();
+
+    // The first calls are the subscriptions' own, with the value held.
+    assert.deepStrictEqual(mut_seen, [1, 1]);
+  });
+
+  test("a mergeMap inner whose node's retire throws does not keep the next inner in the updates", () => {
+    const error = vi.fn();
+
+    vi.stubGlobal('console', { ...console, error });
+
+    onTestFinished(() => {
+      vi.unstubAllGlobals();
+    });
+
+    const trigger = source<number>();
+
+    const store = source<number>();
+
+    const owner = createOwner();
+
+    const mut_seen: number[] = [];
+
+    owner.run(() => {
+      trigger
+        .pipe(
+          mergeMap((i) => {
+            if (i === 0) {
+              getOwner()?.adopt({
+                dispose: () => {},
+                disposed: false,
+                retire: () => {
+                  throw new RangeError('retire');
+                },
+              });
+            } else {
+              store.subscribe((x) => {
+                mut_seen.push(x);
+              });
+            }
+
+            return source<number>();
+          }),
+        )
+        .subscribe(() => {});
+
+      onCleanup(() => {
+        store.emit(9);
+      });
+    });
+
+    trigger.emit(0);
+
+    trigger.emit(1);
+
+    store.emit(1);
+
+    retireOwner(owner);
+
+    assert.strictEqual(error.mock.calls.length, 1);
+
+    // Retired once: the disposal does not try the node again.
+    owner.dispose();
+
+    assert.strictEqual(error.mock.calls.length, 1);
+
+    assert.deepStrictEqual(mut_seen, [1]);
+  });
+
+  test('a subscription made after a retire threw, in the owner that threw, stays out of the updates', () => {
+    const error = vi.fn();
+
+    vi.stubGlobal('console', { ...console, error });
+
+    onTestFinished(() => {
+      vi.unstubAllGlobals();
+    });
+
+    const trigger = source<number>();
+
+    const store = source<number>();
+
+    const owner = createOwner();
+
+    const mut_inner: { owner: Owner | undefined } = { owner: undefined };
+
+    const mut_seen: number[] = [];
+
+    owner.run(() => {
+      trigger
+        .pipe(
+          mergeMap(() => {
+            mut_inner.owner = getOwner();
+
+            mut_inner.owner?.adopt({
+              dispose: () => {},
+              disposed: false,
+              retire: () => {
+                throw new RangeError('retire');
+              },
+            });
+
+            return source<number>();
+          }),
+        )
+        .subscribe(() => {});
+
+      onCleanup(() => {
+        store.emit(9);
+      });
+    });
+
+    trigger.emit(0);
+
+    retireOwner(owner);
+
+    mut_inner.owner?.run(() => {
+      store.subscribe((x) => {
+        mut_seen.push(x);
+      });
+    });
+
+    owner.dispose();
+
+    assert.deepStrictEqual(mut_seen, []);
+  });
+
+  test("a subscription a child owner's cleanup makes in a source's setup owner hears no older child's cleanup", () => {
+    const store = source<number>();
+
+    const parent = createOwner();
+
+    const mut_setup: { owner: Owner | undefined } = { owner: undefined };
+
+    const mut_seen: number[] = [];
+
+    parent.run(() => {
+      createSource(() => {
+        mut_setup.owner = getOwner();
+      });
+
+      createOwner().run(() => {
+        onCleanup(() => {
+          store.emit(2);
+        });
+      });
+
+      createOwner().run(() => {
+        onCleanup(() => {
+          mut_setup.owner?.run(() => {
+            store.subscribe((x) => {
+              mut_seen.push(x);
+            });
+          });
+        });
+      });
+    });
+
+    parent.dispose();
+
+    assert.deepStrictEqual(mut_seen, []);
+  });
+
+  test('a node in a child owner whose retire throws is retired once in a disposal, and its exception is thrown, not reported', () => {
+    const error = vi.fn();
+
+    vi.stubGlobal('console', { ...console, error });
+
+    onTestFinished(() => {
+      vi.unstubAllGlobals();
+    });
+
+    const root = createOwner();
+
+    const mut_count = { retired: 0 };
+
+    root.run(createOwner).adopt({
+      dispose: () => {},
+      disposed: false,
+      retire: () => {
+        mut_count.retired += 1;
+
+        throw new RangeError('retire');
+      },
+    });
+
+    assert.throws(() => {
+      root.dispose();
+    }, RangeError);
+
+    assert.strictEqual(mut_count.retired, 1);
+
+    assert.strictEqual(error.mock.calls.length, 0);
+  });
+
+  test('a subscription made in a retired owner is retired by a disposal in the same run', () => {
+    const store = source<number>();
+
+    const owner = createOwner();
+
+    owner.run(() => {
+      onCleanup(() => {
+        store.emit(2);
+      });
+    });
+
+    retireOwner(owner);
+
+    const mut_seen: number[] = [];
+
+    owner.run(() => {
+      store.subscribe((x) => {
+        mut_seen.push(x);
+      });
+
+      owner.dispose();
+    });
+
+    assert.deepStrictEqual(mut_seen, []);
+  });
+
+  test('a child owner made after its parent was disposed during its run hears updates until that run ends', () => {
+    const [count, setCount] = createState(0);
+
+    const parent = createOwner();
+
+    const mut_seen: number[] = [];
+
+    parent.run(() => {
+      parent.dispose();
+
+      createOwner().run(() => {
+        count.subscribe((x) => {
+          mut_seen.push(x);
+        });
+      });
+
+      setCount(1);
+    });
+
+    setCount(2);
+
+    assert.deepStrictEqual(mut_seen, [0, 1]);
+  });
+
+  test('a node whose retire throws does not stop the disposal; the exception is thrown at its end', () => {
+    const owner = createOwner();
+
+    const mut_order: string[] = [];
+
+    owner.adopt({
+      dispose: () => {
+        mut_order.push('node disposed');
+      },
+      disposed: false,
+      retire: () => {
+        throw new RangeError('retire');
+      },
+    });
+
+    owner.onCleanup(() => {
+      mut_order.push('cleanup');
+    });
+
+    assert.throws(() => {
+      owner.dispose();
+    }, RangeError);
+
+    assert.isTrue(owner.disposed);
+
+    assert.deepStrictEqual(mut_order, ['cleanup', 'node disposed']);
   });
 
   test('a throwing cleanup does not stop the disposal; the first exception is thrown at its end', () => {
