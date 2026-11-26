@@ -1,7 +1,8 @@
 import { EventSchedule } from 'event-schedule-app-shared';
-import { DatetimeRange } from 'ts-fortress-types';
+import { DatetimeRange, TimeRange } from 'ts-fortress-types';
 import { answerIconsInitialValue } from '../constants/index.mjs';
 import { collectEventSettingsPageDiff } from './event-settings-page-diff.mjs';
+import { datetimeListReducer } from './select-datetimes-component/index.mjs';
 
 describe(collectEventSettingsPageDiff, () => {
   describe('datetimeRangeList', () => {
@@ -80,6 +81,40 @@ describe(collectEventSettingsPageDiff, () => {
         added: ['2026/11/03 10:00～'],
         deleted: ['2026/11/01 00:00～'],
       });
+    });
+
+    // #3915: a date the calendar takes out and ticks again comes back as the
+    // event has it, the times its specification hides included, so it is listed
+    // neither as added nor as deleted.
+    test('is undefined for a date taken out and ticked again on the calendar', () => {
+      const withHiddenTimes = scheduleWith({
+        datetimeRangeList: [nov1, nov3From10To12],
+      });
+
+      const pick = (
+        state: readonly DatetimeRange[],
+        list: readonly YearMonthDate[],
+      ): readonly DatetimeRange[] =>
+        datetimeListReducer(state, {
+          type: 'fromCalendar',
+          list,
+          mostFrequentTimeRange: TimeRange.defaultValue,
+          stored: withHiddenTimes.datetimeRangeList,
+        });
+
+      const ticked = pick(pick(withHiddenTimes.datetimeRangeList, [nov1.ymd]), [
+        nov1.ymd,
+        nov3From10To12.ymd,
+      ]);
+
+      const diff = collectEventSettingsPageDiff(
+        withHiddenTimes,
+        scheduleWith({ datetimeRangeList: ticked }),
+        undefined,
+        undefined,
+      );
+
+      assert.isUndefined(diff.datetimeRangeList);
     });
 
     test('is undefined when only the specification changes', () => {

@@ -58,6 +58,9 @@ export const EditEventScheduleEmailVerified = (): JSX.Element => {
       <EventScheduleSettingCommon
         handlers={EditEventScheduleStore.commonStateHandlers}
         state$={commonState$}
+        storedDatetimeList={eventSchedule$.pipe(
+          map((e) => e?.datetimeRangeList ?? []),
+        )}
       />
 
       <ButtonsWrapperForEventSettingsPage>

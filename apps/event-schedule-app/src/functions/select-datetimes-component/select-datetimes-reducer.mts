@@ -12,6 +12,11 @@ export type DatetimeListReducerAction = Readonly<
       type: 'fromCalendar';
       list: readonly YearMonthDate[];
       mostFrequentTimeRange: TimeRange;
+      /**
+       * The rows of the event as stored, none on the create page: a date ticked
+       * again gets its stored rows back.
+       */
+      stored: readonly DatetimeRange[];
     }
   | {
       type: 'setTimeAtOneTime';
@@ -35,7 +40,9 @@ export const datetimeListReducer: Reducer<
   switch (action.type) {
     case 'fromCalendar': {
       /* [note]
-      カレンダーから追加された要素は時刻 00:00 でリストに追加する。
+      カレンダーから追加された要素は時刻 00:00 でリストに追加する。ただし保存済みの
+      イベントにその日付の行があれば、その行（時刻指定が隠している時刻も含む）を戻す。
+      外して付け直しただけの日付が、変更差分に追加と削除の両方で現れないようにするため。
       カレンダーから削除された要素はリストからも削除する。 */
       const datetimeSet: ISetMapped<YearMonthDate, YmdKey> = ISetMapped.create(
         state.map((e) => e.ymd),
@@ -55,10 +62,15 @@ export const datetimeListReducer: Reducer<
         .map((list) =>
           Arr.concat(
             list,
-            addedList.map((ymd) => ({
-              ymd,
-              timeRange: TimeRange.defaultValue,
-            })),
+            addedList.flatMap((ymd) => {
+              const storedRows = action.stored.filter(
+                (e) => ymdToKey(e.ymd) === ymdToKey(ymd),
+              );
+
+              return Arr.isNonEmpty(storedRows)
+                ? storedRows
+                : [{ ymd, timeRange: TimeRange.defaultValue }];
+            }),
           ),
         )
         .map((list) => list.toSorted(compareDatetimeRange)).value;
