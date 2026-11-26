@@ -117,6 +117,51 @@ describe('the path check of pnpm-update.yml', () => {
     );
   });
 
+  // A link whose target text is the source's bytes, and an executable copy, have
+  // the source's blob id: only the index mode tells them from the source.
+  test.each(['link', 'executable'] as const)(
+    'refuses a check that is a %s',
+    async (mode) => {
+      const result = await runPathCheck(async (repo) => {
+        const file = path.join(repo, PUBLISHED, 'pkg', 'pkg.mjs');
+
+        await fs.rm(file);
+
+        if (mode === 'link') {
+          // eslint-disable-next-line security/detect-non-literal-fs-filename
+          await fs.symlink('current pkg\n', file);
+        } else {
+          await write(repo, `${PUBLISHED}/pkg/pkg.mjs`, 'current pkg\n');
+
+          // eslint-disable-next-line security/detect-non-literal-fs-filename
+          await fs.chmod(file, 0o755);
+        }
+      });
+
+      expect(result.status).toBe(1);
+
+      expect(result.stdout).toContain(
+        `${PUBLISHED}/pkg/pkg.mjs is not a copy of ${SMOKE}/pkg.mjs as HEAD has it`,
+      );
+    },
+  );
+
+  test('refuses a directory put in place of a check', async () => {
+    const result = await runPathCheck(async (repo) => {
+      await fs.rm(path.join(repo, PUBLISHED, 'pkg', 'pkg.mjs'));
+
+      // A manifest is a path the patch may carry, so the directory reaches the
+      // check's loop rather than the list of unexpected paths.
+      await write(repo, `${PUBLISHED}/pkg/pkg.mjs/package.json`, '{}\n');
+    });
+
+    expect(result.status).toBe(1);
+
+    expect(result.stdout).toContain(
+      `${PUBLISHED}/pkg/pkg.mjs is not a copy of ${SMOKE}/pkg.mjs as HEAD has it`,
+    );
+  });
+
   test('refuses a strict library check that is not the shared one', async () => {
     const result = await runPathCheck(async (repo) => {
       await write(
