@@ -108,6 +108,7 @@
     "check:root:shellcheck": "NODE_USE_ENV_PROXY=1 NODE_OPTIONS='--disable-warning=UNDICI-EHPA' tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-shellcheck.mts",
     "check:root:stderr-captures": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-stderr-captures.mts",
     "check:root:strict-lib-dev-dependencies": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-strict-lib-dev-dependencies.mts",
+    "check:root:strict-lib-english-jsdoc": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-strict-lib-english-jsdoc.mts",
     "check:root:strict-lib-links": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-strict-lib-links.mts",
     "check:root:synstate-benchmark-imports": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-synstate-benchmark-imports.mts",
     "check:root:synstate-benchmark-runner": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-synstate-benchmark-runner.mts",

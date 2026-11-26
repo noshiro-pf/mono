@@ -19,12 +19,14 @@ export const convertLibEs2022Object =
         replaceWithNoMatchCheck(
           'interface ObjectConstructor {',
           dedent`
+            // R（union 型、要素数1の場合も含む）を、K をキーとして含む要素だけに絞った型。
+            // キーが index signature の要素には K のキーを足す。K を含む要素が一つも無ければ never。
             /**
              * @internal
-             * R が union 型（要素数1の場合も含む）のとき、 union の要素の中に K をキーとして含むものが一つでもあれば、
-             * union 型を K をキーとして含むもののみに絞った型を返す。
-             * union の要素の中に K をキーとして含むものが一つも無ければ、\`${returnType === 'mutable' ? 'Mutable' : ''}Record<K, unknown>\` を返す。
-             * 結果には Readonly を付ける。
+             * What \`Object.hasOwn(obj, key)\` narrows \`obj\` to: the members of
+             * \`R\` (a union, or a single type) that have \`K\` as a key, with
+             * \`${returnType === 'mutable' ? 'Mutable' : ''}Record<K, R[keyof R]>\` added to a member whose key is
+             * an index signature's. \`never\` when no member has \`K\`.
              */
             declare namespace StrictLibInternals {
               export type HasOwnReturnType<

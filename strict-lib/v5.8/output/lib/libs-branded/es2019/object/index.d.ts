@@ -69,6 +69,8 @@ declare namespace StrictLibInternals {
             readonly [P in K]: V;
           };
 
+  // 下の2個目の例に対応するためには、無限長の Entries に対しても再帰を回す必要があるが、
+  // 止めるタイミングを決められないので再帰制限を設けている。
   /**
    * - `['x' | 'y' | 'z', number][]]` -> `'x' | 'y' | 'z'`
    * - `[['a' | 'b' | 'c', number], ...['x' | 'y' | 'z', number][]]` -> `'a' | 'b' |
@@ -76,8 +78,9 @@ declare namespace StrictLibInternals {
    *
    * @internal
    *
-   * @note 上の2個目の例に対応するためには、無限長の Entries に対しても再帰を回す必要があるが、
-   * 止めるタイミングを決められないので再帰制限を設けている。
+   * @note The second example needs the recursion to run on past the
+   * fixed elements, through entries of any length, where there is no
+   * point to stop; so the recursion is limited (`RecursionLimit`).
    */
   export type KeysOfEntries<
     Entries extends readonly (readonly [PropertyKey, unknown])[],
@@ -161,14 +164,25 @@ interface ObjectConstructor {
    *
    *   const obj = Object.fromEntries(entries) satisfies { x: 1; y: 3 };
    *
-   * @note `entries` がタプル型の場合には key-value の組み合わせも反映した型にする。
-   * 実行時と同じく後の要素が同じ key の前の要素を上書きし、key が union 型の要素が設定する key は省略可能になる。
-   * そうでない場合、 `K` が union 型の場合、`entries` がそのすべてを網羅しているとは限らないため、
-   * `fromEntries` の返り値型がその union 要素すべてを含む型になってしまわないように `Partial` を付けている。
+   * @note When `entries` is a tuple type, the result keeps each key with
+   * its own value. As at run time, a later element overwrites an earlier
+   * one with the same key, and a key that an element with a union key
+   * sets is optional.
+   * Otherwise, when `K` is a union, `entries` need not cover every
+   * member of it, so the result is `Partial` rather than a type that
+   * holds them all.
    *
-   * index signature の record では `Object.entries` の key が `string` そのものになり
-   * union ではなくなるため、`Partial` は付かない（`WithOpenString` 参照）。
+   * On a record with an index signature, `Object.entries` gives
+   * `string` itself as the key, which is not a union, so the result is
+   * not `Partial` (see `WithOpenString`).
    */
+  // @note `entries` がタプル型の場合には key-value の組み合わせも反映した型にする。
+  // 実行時と同じく後の要素が同じ key の前の要素を上書きし、key が union 型の要素が設定する key は省略可能になる。
+  // そうでない場合、 `K` が union 型の場合、`entries` がそのすべてを網羅しているとは限らないため、
+  // `fromEntries` の返り値型がその union 要素すべてを含む型になってしまわないように `Partial` を付けている。
+  //
+  // index signature の record では `Object.entries` の key が `string` そのものになり
+  // union ではなくなるため、`Partial` は付かない（`WithOpenString` 参照）。
   fromEntries<
     const Entries extends readonly (readonly [PropertyKey, unknown])[],
   >(
