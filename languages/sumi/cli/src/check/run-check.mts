@@ -58,6 +58,11 @@ export type CheckResult = Readonly<
        * own right — the directive is an assertion, not a mute button.
        */
       unusedExpectErrors: readonly UnusedExpectError[];
+      /**
+       * The markers naming a checker rule when the checker failed: not
+       * evaluated, so neither used nor unused.
+       */
+      unevaluatedExpectErrors: readonly UnusedExpectError[];
 
       /** Marker-like comments that are not markers, and so suppress nothing. */
       invalidExpectErrors: readonly InvalidExpectError[];
@@ -131,10 +136,16 @@ export const runCheck = async (
   // corpus merges the two lists for the same reason). Applying the markers to
   // one engine at a time would report every marker the other engine answered as
   // unused.
+  //
+  // When the checker failed, its rules were not evaluated: a marker naming one
+  // is set apart instead of reported as unused.
   const expectErrors = applyExpectErrors(
     config.value.files,
     lintResult.diagnostics,
     checkerDiagnostics,
+    Result.isOk(checkerResult)
+      ? new Set<string>()
+      : new Set<string>(allRules.map((rule) => rule.ruleId)),
   );
 
   return Result.ok({
@@ -157,6 +168,7 @@ export const runCheck = async (
       error: Result.isErr(checkerResult) ? checkerResult.value : undefined,
     },
     unusedExpectErrors: expectErrors.unused,
+    unevaluatedExpectErrors: expectErrors.unevaluated,
     invalidExpectErrors: expectErrors.invalid,
     silencingDirectives: expectErrors.silencingDirectives,
   });

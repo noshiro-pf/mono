@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import * as cmd from 'cmd-ts';
-import { Result } from 'ts-data-forge';
+import { Arr, Result } from 'ts-data-forge';
 import type { ReadonlyRecord } from 'ts-type-forge';
 import { runCheck, type CheckResult } from '../check/index.mjs';
 
@@ -132,6 +132,14 @@ const report = (result: CheckResult): number => {
 
   if (result.checker.error !== undefined) {
     console.error(result.checker.error);
+
+    // Not reported as unused, since nothing checked them: deleting one now
+    // would bring its violation back once the checker runs again.
+    if (Arr.isNonEmpty(result.unevaluatedExpectErrors)) {
+      console.error(
+        `${result.unevaluatedExpectErrors.length.toString()} @sumi-expect-error naming a type-aware checker rule were not evaluated, since the checker did not run.`,
+      );
+    }
   }
 
   console.error(
