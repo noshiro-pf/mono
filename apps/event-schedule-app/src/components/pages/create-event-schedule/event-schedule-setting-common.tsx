@@ -18,10 +18,13 @@ const dc = dict.eventSettingsPage;
 type Props = Readonly<{
   state$: InitializedObservable<EventScheduleSettingCommonState>;
   handlers: EventScheduleSettingCommonStateHandler;
+  /** The dates of the event as stored, on the edit page. */
+  storedDatetimeList?: InitializedObservable<readonly DatetimeRange[]>;
 }>;
 
 export const EventScheduleSettingCommon = ({
   state$,
+  storedDatetimeList,
   handlers: {
     setTitle,
     setNotes,
@@ -55,6 +58,7 @@ export const EventScheduleSettingCommon = ({
           datetimeSpecification={field('datetimeSpecification')}
           onDatetimeListChange={setDatetimeRangeList}
           onDatetimeSpecificationChange={setDatetimeSpecification}
+          {...(storedDatetimeList === undefined ? {} : { storedDatetimeList })}
         />
       </Section>
       <Section sectionTitle={dc.section3.otherSettingsTitle}>

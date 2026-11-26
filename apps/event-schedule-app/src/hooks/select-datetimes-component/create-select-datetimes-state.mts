@@ -33,6 +33,8 @@ type SelectDatetimesState = Readonly<{
 export const createSelectDatetimesState = (
   datetimeList$: InitializedObservable<readonly DatetimeRange[]>,
   onDatetimeListChange: (list: readonly DatetimeRange[]) => void,
+  /** The rows of the event as stored; none on the create page. */
+  storedDatetimeList$: InitializedObservable<readonly DatetimeRange[]>,
 ): SelectDatetimesState => {
   const dispatch = (action: DatetimeListReducerAction): void => {
     onDatetimeListChange(
@@ -58,6 +60,7 @@ export const createSelectDatetimesState = (
         mostFrequentTimeRange: Optional.unwrap(
           mostFrequentTimeRange$.getSnapshot(),
         ),
+        stored: Optional.unwrap(storedDatetimeList$.getSnapshot()),
       });
     },
     onYmdChange: (index, ymd) => {

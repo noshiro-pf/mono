@@ -29,6 +29,11 @@ type Props = Readonly<{
   onDatetimeSpecificationChange: (value: DatetimeSpecificationEnumType) => void;
   datetimeList: Bindable<readonly DatetimeRange[]>;
   onDatetimeListChange: (list: readonly DatetimeRange[]) => void;
+  /**
+   * The rows of the event as stored, which a date ticked again on the calendar
+   * gets back; none on the create page.
+   */
+  storedDatetimeList?: Bindable<readonly DatetimeRange[]>;
 }>;
 
 export const SelectDatetimes = ({
@@ -36,6 +41,7 @@ export const SelectDatetimes = ({
   onDatetimeSpecificationChange,
   datetimeList,
   onDatetimeListChange,
+  storedDatetimeList = constant([]),
 }: Props): JSX.Element => {
   const datetimeList$ = toObservable(datetimeList);
 
@@ -52,7 +58,11 @@ export const SelectDatetimes = ({
     onConfirmDeleteAll,
     onSetTimesPopoverSubmit,
     onSortClick,
-  } = createSelectDatetimesState(datetimeList$, onDatetimeListChange);
+  } = createSelectDatetimesState(
+    datetimeList$,
+    onDatetimeListChange,
+    toObservable(storedDatetimeList),
+  );
 
   return (
     <div class={constant(styles.root)}>
