@@ -14,6 +14,19 @@ export const dictionary = {
     endTurnButton: 'ターン終了',
   },
 
+  /** A card's name, as a screen reader reads its button. */
+  card: {
+    color: { black: '黒', white: '白' },
+    /** One whose number the player sees: `黒の 7`. */
+    faceUp: (color: string, cardNumber: number): string =>
+      `${color}の ${cardNumber.toString()}`,
+    /** The player's own card, face down, whose number they still see. */
+    ownFaceDown: (color: string, cardNumber: number): string =>
+      `${color}の ${cardNumber.toString()}（伏せたカード）`,
+    /** One whose number the player does not see. */
+    faceDown: (color: string): string => `${color}の伏せたカード`,
+  },
+
   notFoundPage: {
     title: 'ページが見つかりません',
     backToMain: 'メインページに戻る',

@@ -1,7 +1,20 @@
+/* The card's button, drawn as the bare card: the browser's own look off. */
 .wrapper {
   display: block;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: none;
+  font: inherit;
+  color: inherit;
   z-index: var(--z-cards);
   position: relative;
   transition-property: transform;
   transition-duration: 0.3s;
+}
+
+.wrapper:focus-visible {
+  outline: rgb(48, 255, 135) solid 3px;
+  outline-offset: 2px;
+  border-radius: 8px;
 }
