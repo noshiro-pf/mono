@@ -14,6 +14,10 @@ if (import.meta.vitest !== undefined) {
 
     assert.isTrue(clampToPercentage(150) === 100);
 
+    assert.isTrue(clampToPercentage(Number.POSITIVE_INFINITY) === 100);
+
+    assert.isTrue(clampToPercentage(Number.NaN) === 0);
+
     // embed-sample-code-ignore-below
   });
 }

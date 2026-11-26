@@ -442,8 +442,9 @@ export const isUintInRangeInclusive =
     Number.isSafeInteger(x) && lowerBound <= x && x <= upperBound;
 
 /**
- * Clamps a value within the given range. If the target value is invalid (not
- * finite), returns the lower bound.
+ * Clamps a value within the given range. An infinity goes to the nearer bound,
+ * as any value beyond it does; `NaN`, which is no value at all, returns the
+ * lower bound.
  *
  * Provides two usage patterns for maximum flexibility:
  *
@@ -463,6 +464,10 @@ export const isUintInRangeInclusive =
  * assert.isTrue(clampToPercentage(75) === 75);
  *
  * assert.isTrue(clampToPercentage(150) === 100);
+ *
+ * assert.isTrue(clampToPercentage(Number.POSITIVE_INFINITY) === 100);
+ *
+ * assert.isTrue(clampToPercentage(Number.NaN) === 0);
  * ```
  */
 export function clamp(
@@ -486,7 +491,7 @@ export function clamp(
     case 3: {
       const [target, lowerBound, upperBound] = args;
 
-      return !Number.isFinite(target)
+      return Number.isNaN(target)
         ? lowerBound
         : Math.max(lowerBound, Math.min(upperBound, target));
     }
