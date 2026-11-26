@@ -1,4 +1,8 @@
-import type { InitializedObservable, Observable } from 'synstate-next';
+import {
+  isObservable,
+  type InitializedObservable,
+  type Observable,
+} from 'synstate-next';
 import type { Brand } from 'ts-type-forge';
 
 /**
@@ -22,10 +26,29 @@ export type Bindable<T> = Constant<T> | InitializedObservable<T>;
  *
  * `null` and `undefined` are rejected: an absent attribute is an omitted prop,
  * and a value that comes and goes is an `InitializedObservable<T | undefined>`.
- * An observable is rejected too, since wrapping one would bind it once.
+ * An observable is rejected too, since wrapping one would bind it once: by the
+ * types, and at run time, where it also catches what the types let through. A
+ * `Some` of an observable is that observable itself at run time, so
+ * `MatchOptional` would read such a constant as an observable of `Optional`s
+ * and follow it. It throws instead (#3898).
  */
 export const constant = <const T,>(
   value: T extends Observable<unknown> | null | undefined ? never : T,
-): Constant<T> =>
+): Constant<T> => {
+  refuseObservable(value);
+
   // eslint-disable-next-line total-functions/no-unsafe-type-assertion -- a brand has no run-time part to check
-  value as Constant<T>;
+  return value as Constant<T>;
+};
+
+/**
+ * Throws when `value`, about to be branded a {@link Constant}, is an observable.
+ * Internal: the package barrel does not export it.
+ */
+export const refuseObservable = (value: unknown): void => {
+  if (isObservable(value)) {
+    throw new TypeError(
+      'A constant was given an observable, which it would bind once. A Some holding an observable is that observable at run time: pass the observable itself, or a constant of the value it holds.',
+    );
+  }
+};

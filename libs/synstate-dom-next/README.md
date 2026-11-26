@@ -50,6 +50,12 @@ The props and attributes that take data keep synstate-dom's rule: they take a
   synstate-dom makes them HTML wherever they are. Their props are still typed as
   HTML's, a `ref` included, since a JSX element's type cannot depend on where it
   stands.
+- `constant` throws when given an observable, where synstate-dom only refuses
+  one in the types and documents the rest as a limit. A `Some` holding an
+  observable is that observable at run time, so a constant `Optional` of one
+  would be read by `MatchOptional` as an observable to follow, and the types
+  cannot see it. The values `mapBindable` and `deriveBindable` compute from
+  constants are refused the same way (#3898).
 - A branch component (`If`, `MatchOptional`, `MatchResult`) bound to an
   observable is marked by a comment at each end, where synstate-dom puts one
   after it. One given a constant mounts its branch with no comment.

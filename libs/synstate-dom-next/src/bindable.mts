@@ -8,7 +8,7 @@ import {
 } from 'synstate-next';
 import * as Arr from 'ts-data-forge/array';
 import type { NonEmptyTuple } from 'ts-type-forge';
-import type { Bindable, Constant } from './constant.mjs';
+import { refuseObservable, type Bindable, type Constant } from './constant.mjs';
 
 /** The value type a {@link Bindable} carries. */
 export type BindableValue<B> =
@@ -72,8 +72,13 @@ const isConstant = (bindable: Bindable<unknown>): boolean =>
 
 /**
  * Brands a value computed from constants. `constant` rejects `null` and
- * `undefined` for a slot written by hand; a computed one may hold them.
+ * `undefined` for a slot written by hand; a computed one may hold them. An
+ * observable is rejected in both.
  */
-const asConstant = <T,>(value: T): Constant<T> =>
+const asConstant = <T,>(value: T): Constant<T> => {
+  // A computed `Some` of an observable is that observable, as for `constant`.
+  refuseObservable(value);
+
   // eslint-disable-next-line total-functions/no-unsafe-type-assertion -- a brand has no run-time part to check
-  value as Constant<T>;
+  return value as Constant<T>;
+};
