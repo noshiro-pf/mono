@@ -109,7 +109,7 @@ export const AnswerBeingEdited = ({
           label={constant(dc.yourName)}
         >
           <InputGroup
-            // eslint-disable-next-line synstate-dom-a11y/no-autofocus -- recorded, not fixed, when jsx-a11y came to synstate-dom (#3764)
+            // eslint-disable-next-line synstate-dom-a11y/no-autofocus -- the first field of the answer form the user has just opened
             autoFocus
             data-e2e={constant('username')}
             intent={intent}

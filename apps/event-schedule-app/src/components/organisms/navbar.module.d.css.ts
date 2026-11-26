@@ -8,6 +8,8 @@ export declare const item: string;
 
 export declare const itemAnchor: string;
 
+export declare const linkButton: string;
+
 export declare const navbar: string;
 
 export declare const row: string;

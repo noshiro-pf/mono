@@ -10,41 +10,47 @@ type Props = Readonly<{
 }>;
 
 export const WeekdaysHeader = ({ onClick }: Props): JSX.Element => (
-  // eslint-disable-next-line synstate-dom-a11y/prefer-tag-over-role -- recorded, not fixed, when jsx-a11y came to synstate-dom (#3764)
-  <div class={constant(styles.weekdays)} role={constant('rowgroup')}>
-    {/* eslint-disable-next-line synstate-dom-a11y/prefer-tag-over-role -- recorded, not fixed, when jsx-a11y came to synstate-dom (#3764) */}
-    <div class={constant(styles.row)} role={constant('row')}>
+  <thead class={constant(styles.weekdays)}>
+    <tr class={constant(styles.row)}>
       <For items={constant(daysOfWeekList.en)} key={(w) => w.name}>
         {(w$, index$) => {
           const { name, abbr } = Optional.unwrap(w$.getSnapshot());
 
+          const label = (
+            <abbr class={constant(styles.abbr)} title={constant(name)}>
+              {constant(abbr)}
+            </abbr>
+          );
+
           return (
-            // eslint-disable-next-line synstate-dom-a11y/click-events-have-key-events, synstate-dom-a11y/interactive-supports-focus, synstate-dom-a11y/prefer-tag-over-role -- recorded, not fixed, when jsx-a11y came to synstate-dom (#3764)
-            <div
+            <th
               class={constant(
                 onClick === undefined
                   ? styles.weekday
                   : `${styles.weekday} ${styles.weekdayClickable}`,
               )}
-              role={constant('columnheader')}
-              onClick={
-                onClick === undefined
-                  ? undefined
-                  : () => {
-                      onClick(
-                        // eslint-disable-next-line total-functions/no-unsafe-type-assertion
-                        Optional.unwrap(index$.getSnapshot()) as DayOfWeekIndex,
-                      );
-                    }
-              }
+              scope={constant('col')}
             >
-              <abbr class={constant(styles.abbr)} title={constant(name)}>
-                {constant(abbr)}
-              </abbr>
-            </div>
+              {onClick === undefined ? (
+                label
+              ) : (
+                <button
+                  class={constant(styles.weekdayButton)}
+                  type={constant('button')}
+                  onClick={() => {
+                    onClick(
+                      // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+                      Optional.unwrap(index$.getSnapshot()) as DayOfWeekIndex,
+                    );
+                  }}
+                >
+                  {label}
+                </button>
+              )}
+            </th>
           );
         }}
       </For>
-    </div>
-  </div>
+    </tr>
+  </thead>
 );

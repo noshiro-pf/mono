@@ -119,7 +119,9 @@ test(
 
     // The page starts with today selected; a day of the same month a year
     // earlier takes its place, past whichever day the test runs on.
-    await createPage.getByRole('gridcell', { selected: true }).click();
+    const picker = createPage.getByTestId('multiple-date-picker');
+
+    await picker.getByRole('button', { pressed: true }).click();
 
     const today = new Date();
 
@@ -132,7 +134,11 @@ test(
       })
       .selectOption(lastYear);
 
-    await createPage.getByRole('gridcell', { disabled: false }).nth(10).click();
+    await picker
+      .getByRole('cell')
+      .getByRole('button', { disabled: false })
+      .nth(10)
+      .click();
 
     await expect
       .soft(createPage.getByTestId('selected-datetime-row'))

@@ -59,8 +59,7 @@ export const MultipleDatePicker = ({
     <div>
       <div class={constant(styles.datePicker)}>
         <div class={constant(styles.dayPicker)} lang={constant('en')}>
-          {/* eslint-disable-next-line synstate-dom-a11y/no-noninteractive-tabindex -- recorded, not fixed, when jsx-a11y came to synstate-dom (#3764) */}
-          <div class={constant(styles.column)} tabIndex={constant(0)}>
+          <div class={constant(styles.column)}>
             <DatepickerNav
               calendarCurrentPage={calendarCurrentPage$}
               onMonthChange={onMonthChange}
@@ -68,14 +67,15 @@ export const MultipleDatePicker = ({
               onPrevMonthClick={onPrevMonthClick}
               onYearChange={onYearChange}
             />
-            <div class={constant(styles.month)} role={constant('grid')}>
+            <table
+              class={constant(styles.month)}
+              data-e2e={constant('multiple-date-picker')}
+            >
               <WeekdaysHeader onClick={onWeekdaysHeaderCellClick} />
-              {/* eslint-disable-next-line synstate-dom-a11y/prefer-tag-over-role -- recorded, not fixed, when jsx-a11y came to synstate-dom (#3764) */}
-              <div class={constant(styles.body)} role={constant('rowgroup')}>
+              <tbody class={constant(styles.body)}>
                 <For items={calendarCells$} key={(_, index) => index}>
                   {(week$) => (
-                    // eslint-disable-next-line synstate-dom-a11y/prefer-tag-over-role -- recorded, not fixed, when jsx-a11y came to synstate-dom (#3764)
-                    <div class={constant(styles.row)} role={constant('row')}>
+                    <tr class={constant(styles.row)}>
                       <For items={week$} key={(_, index) => index}>
                         {(cell$) => (
                           <DatePickerDate
@@ -85,11 +85,11 @@ export const MultipleDatePicker = ({
                           />
                         )}
                       </For>
-                    </div>
+                    </tr>
                   )}
                 </For>
-              </div>
-            </div>
+              </tbody>
+            </table>
           </div>
         </div>
       </div>

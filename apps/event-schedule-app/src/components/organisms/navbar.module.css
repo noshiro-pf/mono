@@ -51,6 +51,14 @@
   }
 }
 
+/* A button drawn as the links beside it: the browser's own button look off. */
+.linkButton {
+  margin: 0;
+  border: none;
+  background: none;
+  font: inherit;
+}
+
 .itemAnchor {
   color: white;
   cursor: pointer;

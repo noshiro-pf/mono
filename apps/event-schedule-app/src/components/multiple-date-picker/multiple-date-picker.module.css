@@ -50,9 +50,29 @@
   vertical-align: middle;
   width: 30px;
   font-weight: 600;
-  padding-top: 5px;
+  padding: 5px 0 0;
   outline: none;
   border-radius: 3px;
+}
+
+/* A clickable weekday's button, drawn as the bare header it sits in. */
+.weekdayButton {
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  border: none;
+  border-radius: 3px;
+  background: none;
+  color: inherit;
+  font: inherit;
+  line-height: inherit;
+  cursor: inherit;
+
+  &:focus-visible {
+    outline: #2d72d2 solid 2px;
+    outline-offset: 0;
+  }
 }
 
 .weekdayClickable {
@@ -67,15 +87,32 @@
   text-decoration: none !important;
 }
 
+/* The table cell a day's button fills. */
+.cell {
+  padding: 0;
+  vertical-align: middle;
+}
+
+/* A day's button, drawn as the bare cell it was. */
 .day {
-  display: table-cell;
+  display: block;
   height: 30px;
+  width: 30px;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background-color: transparent;
+  color: inherit;
+  font: inherit;
   line-height: 1;
   text-align: center;
-  vertical-align: middle;
-  width: 30px;
   border-radius: 3px;
   outline: none;
+
+  &:focus-visible {
+    outline: #2d72d2 solid 2px;
+    outline-offset: -2px;
+  }
 }
 
 .saturday {
@@ -124,6 +161,7 @@
 }
 
 .dayWrapper {
+  display: block;
   border-radius: 3px;
   padding: 7px;
 }

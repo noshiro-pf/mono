@@ -4,6 +4,8 @@ export declare const abbr: string;
 
 export declare const body: string;
 
+export declare const cell: string;
+
 export declare const clickable: string;
 
 export declare const column: string;
@@ -37,6 +39,8 @@ export declare const selectedClickable: string;
 export declare const today: string;
 
 export declare const weekday: string;
+
+export declare const weekdayButton: string;
 
 export declare const weekdayClickable: string;
 
