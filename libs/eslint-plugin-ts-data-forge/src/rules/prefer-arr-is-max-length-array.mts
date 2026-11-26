@@ -20,13 +20,13 @@ export const preferArrIsMaxLengthArray: TSESLint.RuleModule<
     type: 'suggestion',
     docs: {
       description:
-        'Replace `xs.length <= n` with `Arr.isMaxLengthArray(xs, n)` from ts-data-forge.',
+        'Replace `xs.length <= n` with `Arr.isMaxLengthArray(n, xs)` from ts-data-forge.',
     },
     fixable: 'code',
     schema: [],
     messages: {
       useIsMaxLengthArray:
-        'Replace `{{original}}` with `Arr.isMaxLengthArray({{arrayName}}, {{length}})` from ts-data-forge.',
+        'Replace `{{original}}` with `Arr.isMaxLengthArray({{length}}, {{arrayName}})` from ts-data-forge.',
     },
     defaultOptions: [],
   },

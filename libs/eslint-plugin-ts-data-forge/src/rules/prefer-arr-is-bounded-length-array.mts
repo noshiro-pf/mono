@@ -19,13 +19,13 @@ export const preferArrIsBoundedLengthArray: TSESLint.RuleModule<
     type: 'suggestion',
     docs: {
       description:
-        'Replace `xs.length >= min && xs.length <= max` with `Arr.isBoundedLengthArray(xs, min, max)` from ts-data-forge.',
+        'Replace `xs.length >= min && xs.length <= max` with `Arr.isBoundedLengthArray(min, max, xs)` from ts-data-forge.',
     },
     fixable: 'code',
     schema: [],
     messages: {
       useIsBoundedLengthArray:
-        'Replace `{{original}}` with `Arr.isBoundedLengthArray({{arrayName}}, {{min}}, {{max}})` from ts-data-forge.',
+        'Replace `{{original}}` with `Arr.isBoundedLengthArray({{min}}, {{max}}, {{arrayName}})` from ts-data-forge.',
     },
     defaultOptions: [],
   },
