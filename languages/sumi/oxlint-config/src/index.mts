@@ -3,4 +3,5 @@ export * from './oxlint-disable-directives.mjs';
 export * from './oxlint-paths.mjs';
 export * from './plugin/index.mjs';
 export * from './rule-id-mapping.mjs';
+export * from './run-node-script.mjs';
 export * from './run-oxlint.mjs';

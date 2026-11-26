@@ -1,6 +1,6 @@
-import { execFile } from 'node:child_process';
+import { runNodeScript } from '@sumi-lang/oxlint-config';
 import * as path from 'node:path';
-import { hasKey, isRecord, Result } from 'ts-data-forge';
+import { hasKey, isRecord, Json, Result } from 'ts-data-forge';
 import type { ReadonlyRecord } from 'ts-type-forge';
 import { nativeTscPath } from './native-tsc.mjs';
 
@@ -20,28 +20,26 @@ export type EffectiveTsConfig = Readonly<{
 export const showConfig = async (
   tsconfigPath: string,
 ): Promise<Result<EffectiveTsConfig, string>> => {
-  const { failed, stdout, stderr } = await new Promise<
-    Readonly<{ failed: boolean; stdout: string; stderr: string }>
-  >((resolve) => {
-    const child = execFile(
-      process.execPath,
-      [nativeTscPath, '--showConfig', '-p', tsconfigPath],
-      { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 },
-      (error, out, err) => {
-        resolve({ failed: error !== null, stdout: out, stderr: err });
-      },
-    );
+  const { status, failure, stdout, stderr } = await runNodeScript(
+    [nativeTscPath, '--showConfig', '-p', tsconfigPath],
+    'tsc --showConfig',
+  );
 
-    child.stdin?.end();
-  });
-
-  if (failed) {
+  if (failure !== undefined || status !== 0) {
     return Result.err(
-      `tsc --showConfig failed for ${tsconfigPath}:\n${stdout}${stderr}`,
+      `tsc --showConfig failed for ${tsconfigPath}${failure === undefined ? '' : ` (${failure})`}:\n${stdout}${stderr}`,
     );
   }
 
-  const parsed: unknown = JSON.parse(stdout);
+  const json = Json.parse(stdout);
+
+  if (Result.isErr(json)) {
+    return Result.err(
+      `tsc --showConfig printed no JSON for ${tsconfigPath}: ${json.value}`,
+    );
+  }
+
+  const parsed = json.value;
 
   if (!isRecord(parsed)) {
     return Result.err('tsc --showConfig printed no JSON object');

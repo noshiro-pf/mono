@@ -1,11 +1,11 @@
-import { execFile } from 'node:child_process';
-import { hasKey, isRecord } from 'ts-data-forge';
+import { hasKey, isRecord, Json, Result } from 'ts-data-forge';
 import type { UnknownRecord } from 'ts-type-forge';
 import {
   oxlintBinPath,
   oxlintConfigPath,
   packageRootPath,
 } from './oxlint-paths.mjs';
+import { runNodeScript } from './run-node-script.mjs';
 
 /** One diagnostic as `oxlint -f json` reports it (the fields Sumi reads). */
 export type OxlintDiagnostic = Readonly<{
@@ -23,6 +23,13 @@ export type OxlintRunResult = Readonly<{
   diagnostics: readonly OxlintDiagnostic[];
   /** Non-JSON output (stderr), for surfacing loader / tsgolint failures. */
   stderr: string;
+  /**
+   * Set when oxlint did not finish — it could not be started, overran the
+   * buffer or was killed by a signal — or printed no JSON report to read. The
+   * lint run then says nothing about the files, and `diagnostics` being empty
+   * must not read as clean.
+   */
+  failure: string | undefined;
 }>;
 
 /**
@@ -34,47 +41,27 @@ export type OxlintRunResult = Readonly<{
  */
 export const runOxlint = async (
   files: readonly string[],
+  /** The oxlint script run with this Node.js; replaced only by tests. */
+  binPath: string = oxlintBinPath,
 ): Promise<OxlintRunResult> => {
   // oxlint exits non-zero when it reports something, so the exit status is not
-  // read: the diagnostics are on stdout either way, and a failure to run at all
-  // shows on stderr, which is returned.
-  const result = await new Promise<
-    Readonly<{ stdout: string; stderr: string }>
-  >((resolve) => {
-    const child = execFile(
-      process.execPath,
-      [
-        oxlintBinPath,
-        '-c',
-        oxlintConfigPath,
-        '-f',
-        'json',
-        '--type-aware',
-        ...files,
-      ],
-      {
-        cwd: packageRootPath,
-        encoding: 'utf8',
-        maxBuffer: 64 * 1024 * 1024,
-      },
-      (error, stdout, stderr) => {
-        resolve({
-          stdout,
-          stderr:
-            error !== null && typeof error.code !== 'number'
-              ? `${stderr}${error.message}\n`
-              : stderr,
-        });
-      },
-    );
+  // read: the diagnostics are on stdout either way. A run that did not finish
+  // is a failure even if it printed a complete report first.
+  const run = await runNodeScript(
+    [binPath, '-c', oxlintConfigPath, '-f', 'json', '--type-aware', ...files],
+    'oxlint',
+    { cwd: packageRootPath },
+  );
 
-    child.stdin?.end();
-  });
+  if (run.failure !== undefined) {
+    return { diagnostics: [], stderr: run.stderr, failure: run.failure };
+  }
 
-  return {
-    diagnostics: parseDiagnostics(result.stdout, result.stderr),
-    stderr: result.stderr,
-  };
+  const parsed = parseDiagnostics(run.stdout, run.stderr);
+
+  return Result.isOk(parsed)
+    ? { diagnostics: parsed.value, stderr: run.stderr, failure: undefined }
+    : { diagnostics: [], stderr: run.stderr, failure: parsed.value };
 };
 
 const readString = (record: UnknownRecord, key: string): string => {
@@ -109,24 +96,25 @@ const toDiagnostic = (raw: unknown): OxlintDiagnostic => {
 const parseDiagnostics = (
   stdout: string,
   stderr: string,
-): readonly OxlintDiagnostic[] => {
+): Result<readonly OxlintDiagnostic[], string> => {
   const start = stdout.indexOf('{');
 
   if (start === -1) {
-    throw new Error(
+    return Result.err(
       `oxlint produced no JSON output.\nstdout:\n${stdout}\nstderr:\n${stderr}`,
     );
   }
 
-  const parsed: unknown = JSON.parse(stdout.slice(start));
+  const parsed = Json.parse(stdout.slice(start));
 
   if (
-    !isRecord(parsed) ||
-    !hasKey(parsed, 'diagnostics') ||
-    !Array.isArray(parsed.diagnostics)
+    Result.isErr(parsed) ||
+    !isRecord(parsed.value) ||
+    !hasKey(parsed.value, 'diagnostics') ||
+    !Array.isArray(parsed.value.diagnostics)
   ) {
-    throw new Error('oxlint JSON output has no `diagnostics` array');
+    return Result.err('oxlint JSON output has no `diagnostics` array');
   }
 
-  return parsed.diagnostics.map(toDiagnostic);
+  return Result.ok(parsed.value.diagnostics.map(toDiagnostic));
 };
