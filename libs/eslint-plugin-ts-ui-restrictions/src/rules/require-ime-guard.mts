@@ -540,13 +540,11 @@ const rootOf = (
  * What a `const` that names another reference stands for — `event.nativeEvent`
  * for `native` after `const native = event.nativeEvent` — so that the event a
  * key is read from and the one a check is made on compare alike however either
- * was aliased. A `const` bound to anything but an identifier or a member chain
- * on one is left as it is, as its own reference: a chain on a call
- * (`getEvent().nativeEvent`) matches nothing once followed, and one on `this` or
- * `super` is not carried into the matching every `this` already shares, where
- * no variable tells one class's `this` from another's. That costs a report on
- * `const native = this.ev` read beside a guard on `this.ev`, until variableOf
- * gives a `this` root the function or class that binds it.
+ * was aliased. A chain on `this` or `super` is followed too, since
+ * {@link variableOf} tells one function's or class's `this` from another's. A
+ * `const` bound to anything but an identifier or a member chain on one, `this`
+ * or `super` is left as it is, as its own reference: a chain on a call
+ * (`getEvent().nativeEvent`) matches nothing once followed.
  *
  * Only the whole expression is followed, not the root of a member chain
  * (`e.nativeEvent` after `const e = event` stays as it is), and an alias of a
@@ -569,9 +567,13 @@ const referenceThroughConsts = (
 
   const target = withoutChain(init);
 
+  const root = rootOf(target);
+
   return (target.type === AST_NODE_TYPES.Identifier ||
     target.type === AST_NODE_TYPES.MemberExpression) &&
-    rootOf(target).type === AST_NODE_TYPES.Identifier
+    (root.type === AST_NODE_TYPES.Identifier ||
+      root.type === AST_NODE_TYPES.ThisExpression ||
+      root.type === AST_NODE_TYPES.Super)
     ? referenceThroughConsts(sourceCode, target, depth - 1)
     : withoutChain(node);
 };
@@ -672,16 +674,63 @@ const isCheckOf = (
   isSameReference(checked, nativeEventOwner(event) ?? event);
 
 /**
- * The variable `node`'s root names (`event` for `event.nativeEvent`), so that a
- * check of a same-named parameter of another function is told apart;
- * `undefined` for a global or a root that is not an identifier, which only a
- * check by the same name then matches.
+ * The node whose `this` a `this` (or `super`) at `node` is: the nearest
+ * enclosing function that is not an arrow function, the class whose field
+ * initializer or static block it is in, or the program.
+ */
+const thisBinderOf = (
+  node: DeepReadonly<TSESTree.Node>,
+): DeepReadonly<TSESTree.Node> => {
+  let mut_child: DeepReadonly<TSESTree.Node> = node;
+
+  let mut_parent = node.parent;
+
+  while (mut_parent !== undefined) {
+    if (
+      mut_parent.type === AST_NODE_TYPES.FunctionDeclaration ||
+      mut_parent.type === AST_NODE_TYPES.FunctionExpression
+    ) {
+      return mut_parent;
+    }
+
+    if (
+      ((mut_parent.type === AST_NODE_TYPES.PropertyDefinition ||
+        mut_parent.type === AST_NODE_TYPES.AccessorProperty) &&
+        mut_parent.value === mut_child) ||
+      mut_parent.type === AST_NODE_TYPES.StaticBlock
+    ) {
+      // A field or a static block is in a class body, in a class.
+      return mut_parent.parent.parent;
+    }
+
+    mut_child = mut_parent;
+
+    mut_parent = mut_parent.parent;
+  }
+
+  return mut_child;
+};
+
+/**
+ * What `node`'s root stands for, so that a check of a same-named reference
+ * elsewhere is told apart: the variable an identifier names (`event` for
+ * `event.nativeEvent`), and for `this` or `super` what binds it — the nearest
+ * enclosing function that is not an arrow function, or the class for a field's
+ * initializer or a static block. `undefined` for a global or any other root,
+ * which only a check by the same name then matches.
  */
 const variableOf = (
   sourceCode: DeepReadonly<TSESLint.SourceCode>,
   node: DeepReadonly<TSESTree.Node>,
-): TSESLint.Scope.Variable | undefined => {
+): TSESLint.Scope.Variable | DeepReadonly<TSESTree.Node> | undefined => {
   const root = rootOf(node);
+
+  if (
+    root.type === AST_NODE_TYPES.ThisExpression ||
+    root.type === AST_NODE_TYPES.Super
+  ) {
+    return thisBinderOf(root);
+  }
 
   return root.type === AST_NODE_TYPES.Identifier
     ? (ASTUtils.findVariable(sourceCode.getScope(asNode(root)), root.name) ??
