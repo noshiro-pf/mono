@@ -96,8 +96,9 @@ export const formatFiles = async (
             return Result.ok(undefined);
           }
 
+          // Not tied to `ignore: false`, which turns off the ignore rules
+          // alone: a file with no parser cannot be formatted either way.
           if (
-            !noIgnore &&
             (options?.ignoreUnknown ?? true) &&
             fileInfo.inferredParser === null
           ) {
