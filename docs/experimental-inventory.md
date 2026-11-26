@@ -2013,3 +2013,20 @@ pending に載せていた値は常に `undefined` だったので、`AsyncData.
 `ts-utils-additional` の同名との違いは引数（最初の色相と、対数を取るかどうか）
 だけだったので、`ts-utils-additional` 側がその 2 つを省略可能な引数として
 受け取るようにした（#2980）。
+
+## `event-schedule-app` の復元は終わった（2026-11-26）
+
+`experimental/packages/apps/event-schedule-app/` に残っていた 16 ファイルを仕分けた（#3994）。
+
+- **消した 4 つ**: 旧ビルドの暗黙グローバル（`configs/inject-def.ts` ・
+  `scripts/gen-global-dts.mjs` ・ `src/globals.d.ts`）と、旧 `src/` の
+  `configs/tsconfig.test.json`。`apps/event-schedule-app` はすべてを明示的に
+  import し、自前の設定を持つので、代わりは要らない。
+- **残した 12**: Firestore 移行スクリプト（`scripts/migration/history/`、
+  `apps/event-schedule-app-shared` が `v1` 〜 `v9` を持つ理由）、
+  `scripts/export-firestore.ts`（このアプリが持った唯一のバックアップ手段。
+  長期の鍵ファイルが要るので、そのままでは戻さない）、それらの
+  `configs/tsconfig.scripts.json` と `.gitignore`。
+
+残したものとその理由は、そのディレクトリの `README.md` にある。**このディレクトリは
+「復元の途中」ではなく、意図して残した記録である。**
