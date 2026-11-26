@@ -199,6 +199,22 @@ namespace NoDetachedJsdoc {
 }
 
 /**
+ * @description Disallow an empty rejection handler (`p.catch(() => {})`), which drops a rejection without a trace while `no-floating-promises` takes it as handled
+ *
+ *  ```md
+ *  | key        | value   |
+ *  | :--------- | :------ |
+ *  | type       | problem |
+ *  | deprecated | false   |
+ *  ```
+ *
+ * @internal Reached by indexing the rules record by the rule's name.
+ */
+namespace NoEmptyRejectionHandler {
+  export type RuleEntry = Linter.StringSeverity;
+}
+
+/**
  * @description Enforce a top-level `export type` qualifier on a re-export whose specifiers all have inline `type` qualifiers
  *
  *  ```md
@@ -823,6 +839,7 @@ export type EslintTsRestrictionsRules = Readonly<{
   'ts-restrictions/no-clock-read-at-module-load': NoClockReadAtModuleLoad.RuleEntry;
   'ts-restrictions/no-date-only-string-to-date': NoDateOnlyStringToDate.RuleEntry;
   'ts-restrictions/no-detached-jsdoc': NoDetachedJsdoc.RuleEntry;
+  'ts-restrictions/no-empty-rejection-handler': NoEmptyRejectionHandler.RuleEntry;
   'ts-restrictions/no-export-type-side-effects': NoExportTypeSideEffects.RuleEntry;
   'ts-restrictions/no-negated-comparison': NoNegatedComparison.RuleEntry;
   'ts-restrictions/no-optional-phantom-property': NoOptionalPhantomProperty.RuleEntry;

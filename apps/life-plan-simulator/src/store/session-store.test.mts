@@ -107,7 +107,9 @@ describe(createSessionStore, () => {
 
     assert.strictEqual(mut_signIns, 1);
 
-    await failed.catch(() => {});
+    // Waited for so that the store has taken the rejection, which the test
+    // reads from the store, not from here.
+    await failed.catch(() => undefined);
 
     await Promise.resolve();
 

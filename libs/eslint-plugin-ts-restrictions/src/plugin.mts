@@ -17,6 +17,7 @@ const recommendedRules = {
   'ts-restrictions/no-clock-read-at-module-load': 'error',
   'ts-restrictions/no-date-only-string-to-date': 'error',
   'ts-restrictions/no-detached-jsdoc': 'error',
+  'ts-restrictions/no-empty-rejection-handler': 'error',
   'ts-restrictions/no-export-type-side-effects': 'error',
   'ts-restrictions/no-negated-comparison': 'error',
   'ts-restrictions/no-optional-phantom-property': 'error',

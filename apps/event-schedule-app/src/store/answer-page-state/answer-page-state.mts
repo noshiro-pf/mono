@@ -570,7 +570,9 @@ export const createAnswerPageStore = (deps: AnswerPageDeps): AnswerPage => {
     );
 
   const onSubmitAnswerClick = (): void => {
-    onSubmitAnswerClickPromise().catch(() => {});
+    onSubmitAnswerClickPromise().catch((error: unknown) => {
+      console.error(error);
+    });
   };
 
   const onSubmitEmptyAnswerClick = (): Promise<void> =>

@@ -281,7 +281,9 @@ export const createEditEventScheduleStore = (
   const onEditEventClickPromise = saveToDatabase;
 
   const onEditEventClick = (): void => {
-    saveToDatabase().catch(() => {});
+    saveToDatabase().catch((error: unknown) => {
+      console.error(error);
+    });
   };
 
   const [

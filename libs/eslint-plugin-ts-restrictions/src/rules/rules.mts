@@ -5,6 +5,7 @@ import { functionOrder } from './function-order.mjs';
 import { noClockReadAtModuleLoad } from './no-clock-read-at-module-load.mjs';
 import { noDateOnlyStringToDate } from './no-date-only-string-to-date.mjs';
 import { noDetachedJsdoc } from './no-detached-jsdoc.mjs';
+import { noEmptyRejectionHandler } from './no-empty-rejection-handler.mjs';
 import { noExportTypeSideEffects } from './no-export-type-side-effects.mjs';
 import { noNegatedComparison } from './no-negated-comparison.mjs';
 import { noOptionalPhantomProperty } from './no-optional-phantom-property.mjs';
@@ -32,6 +33,7 @@ export const tsRestrictionsRules = {
   'no-clock-read-at-module-load': noClockReadAtModuleLoad,
   'no-date-only-string-to-date': noDateOnlyStringToDate,
   'no-detached-jsdoc': noDetachedJsdoc,
+  'no-empty-rejection-handler': noEmptyRejectionHandler,
   'no-export-type-side-effects': noExportTypeSideEffects,
   'no-negated-comparison': noNegatedComparison,
   'no-optional-phantom-property': noOptionalPhantomProperty,
