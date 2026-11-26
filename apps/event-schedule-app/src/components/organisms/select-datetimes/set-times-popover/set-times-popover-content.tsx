@@ -58,10 +58,12 @@ export const SetTimesPopoverContent = ({
 
   // The time range starts from the list's each time the popover opens, as the
   // content Blueprint mounted on each opening did; the days stay as they were.
+  // The filtered pair is subscribed to as it is: a `map` to the value would pass
+  // nothing on for a value `Object.is` the last, and so hold back the reset of
+  // an opening whose list has not changed since the one before.
   derive([isOpen, initialValue], (...values) => values)
     .pipe(filter(([open]) => open))
-    .pipe(map(([, value]) => value))
-    .subscribe((value) => {
+    .subscribe(([, value]) => {
       afterUpdate(() => {
         setTimeRange(value);
       });
