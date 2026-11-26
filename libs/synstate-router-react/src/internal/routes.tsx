@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { useObservableValue } from 'synstate-react-hooks';
 import {
   matchAt,
   pageValues,
@@ -13,7 +14,6 @@ import type { UnknownRecord } from 'ts-type-forge';
 import type { RoutesProps } from '../routes-props.mjs';
 import { CaseErrorBoundary } from './case-error-boundary.js';
 import { RoutesCase } from './routes-case.js';
-import { useObservableValue } from './use-observable-value.mjs';
 
 /** `Routes` bound to `router` (`ReactRouter['Routes']`). */
 export const createRoutes = <R extends AnyRoutes>(

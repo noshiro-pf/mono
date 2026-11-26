@@ -1,4 +1,5 @@
 import type * as React from 'react';
+import { useObservableValue } from 'synstate-react-hooks';
 import type {
   AnyRouteNode,
   AnyRoutes,
@@ -14,7 +15,6 @@ import {
   createLink,
   createRoutes,
   createUseBlocker,
-  useObservableValue,
 } from './internal/index.mjs';
 import type { LinkProps } from './link-props.mjs';
 import type { RoutesProps } from './routes-props.mjs';

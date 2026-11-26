@@ -1,6 +1,6 @@
 import * as React from 'react';
+import { useObservableValue } from 'synstate-react-hooks';
 import { describeRoutes, type AnyRoutes, type Router } from 'synstate-router';
-import { useObservableValue } from '../internal/index.mjs';
 
 type Props = Readonly<{
   /** The router to show. */

@@ -5274,6 +5274,9 @@ importers:
 
   libs/synstate-router-react:
     dependencies:
+      synstate-react-hooks:
+        specifier: workspace:^
+        version: link:../synstate-react-hooks
       ts-data-forge:
         specifier: workspace:^
         version: link:../ts-data-forge

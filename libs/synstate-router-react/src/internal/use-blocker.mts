@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { createState, untracked, type InitializedObservable } from 'synstate';
+import { useObservableValue } from 'synstate-react-hooks';
 import type {
   AnyRoutes,
   Blocker,
@@ -7,7 +8,6 @@ import type {
   NavigationAttempt,
   Router,
 } from 'synstate-router';
-import { useObservableValue } from './use-observable-value.mjs';
 
 /** `useBlocker` bound to `router` (`ReactRouter['useBlocker']`). */
 export const createUseBlocker = <R extends AnyRoutes>(
