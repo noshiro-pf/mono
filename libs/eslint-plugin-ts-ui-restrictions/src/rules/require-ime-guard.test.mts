@@ -38,6 +38,59 @@ describe('require-ime-guard', () => {
   tester.run('require-ime-guard', requireImeGuard, {
     valid: [
       {
+        name: 'an alias of a chain on this, guarded on the chain in the same method',
+        code: dedent`
+          declare const isImeKeyDown: (event: KeyboardEvent) => boolean;
+          declare const submit: () => void;
+          class A {
+            constructor(readonly ev: KeyboardEvent) {}
+            handle(): void {
+              const native = this.ev;
+
+              if (native.key === 'Enter' && !isImeKeyDown(this.ev)) {
+                submit();
+              }
+            }
+          }
+          ${keyboardEvent}
+        `,
+      },
+      {
+        name: 'a chain on this, guarded in an arrow function of the same method',
+        code: dedent`
+          declare const isImeKeyDown: (event: KeyboardEvent) => boolean;
+          declare const submit: () => void;
+          class A {
+            constructor(readonly ev: KeyboardEvent) {}
+            handle(): void {
+              const composing = (): boolean => isImeKeyDown(this.ev);
+
+              if (this.ev.key === 'Enter' && !composing()) {
+                submit();
+              }
+            }
+          }
+          ${keyboardEvent}
+        `,
+      },
+      {
+        name: 'a chain on this in fields of the same class',
+        code: dedent`
+          declare const isImeKeyDown: (event: KeyboardEvent) => boolean;
+          declare const submit: () => void;
+          class A {
+            constructor(readonly ev: KeyboardEvent) {}
+            composing = (): boolean => isImeKeyDown(this.ev);
+            handle = (): void => {
+              if (this.ev.key === 'Enter' && !this.composing()) {
+                submit();
+              }
+            };
+          }
+          ${keyboardEvent}
+        `,
+      },
+      {
         name: 'an isComposing check in the same condition',
         code: dedent`
           const onKeyDown = (event: KeyboardEvent): void => {
@@ -1013,6 +1066,29 @@ describe('require-ime-guard with imported guards', () => {
         errors: [{ messageId: 'missingImeGuard', line: 4 }],
       },
       {
+        name: 'a chain on this, guarded in another class',
+        code: dedent`
+          declare const isImeKeyDown: (event: KeyboardEvent) => boolean;
+          declare const submit: () => void;
+          class A {
+            constructor(readonly ev: KeyboardEvent) {}
+            handle(): void {
+              if (this.ev.key === 'Enter') {
+                submit();
+              }
+            }
+          }
+          class B {
+            constructor(readonly ev: KeyboardEvent) {}
+            handle(): boolean {
+              return isImeKeyDown(this.ev);
+            }
+          }
+          ${keyboardEvent}
+        `,
+        errors: [{ messageId: 'missingImeGuard', line: 6 }],
+      },
+      {
         name: 'an alias of a chain on this, guarded in another class',
         code: dedent`
           declare const isImeKeyDown: (event: KeyboardEvent) => boolean;
@@ -1036,6 +1112,47 @@ describe('require-ime-guard with imported guards', () => {
           ${keyboardEvent}
         `,
         errors: [{ messageId: 'missingImeGuard', line: 8 }],
+      },
+      {
+        name: 'a chain on this, guarded in another function that binds its own this',
+        code: dedent`
+          declare const isImeKeyDown: (event: KeyboardEvent) => boolean;
+          declare const submit: () => void;
+          class A {
+            constructor(readonly ev: KeyboardEvent) {}
+            handle(): void {
+              if (this.ev.key === 'Enter') {
+                submit();
+              }
+            }
+            guarded(): boolean {
+              return isImeKeyDown(this.ev);
+            }
+          }
+          ${keyboardEvent}
+        `,
+        errors: [{ messageId: 'missingImeGuard', line: 6 }],
+      },
+      {
+        name: 'a chain on this in a field, guarded in a field of another class',
+        code: dedent`
+          declare const isImeKeyDown: (event: KeyboardEvent) => boolean;
+          declare const submit: () => void;
+          class A {
+            constructor(readonly ev: KeyboardEvent) {}
+            handle = (): void => {
+              if (this.ev.key === 'Enter') {
+                submit();
+              }
+            };
+          }
+          class B {
+            constructor(readonly ev: KeyboardEvent) {}
+            guarded = (): boolean => isImeKeyDown(this.ev);
+          }
+          ${keyboardEvent}
+        `,
+        errors: [{ messageId: 'missingImeGuard', line: 6 }],
       },
       {
         name: 'a guard function option naming a local alias',
