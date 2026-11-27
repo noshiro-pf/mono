@@ -1,8 +1,8 @@
 // The digit options of `Intl.NumberFormat` and its kin, for the twelve
 // harnesses to hold. Every harness's `tsconfig.lib-check.json`,
 // `tsconfig.lib-check.webworker.json` and
-// `tsconfig.lib-files-check.branded.json` name this file; nothing checks that
-// every harness does.
+// `tsconfig.lib-files-check.branded.json` name this file, as
+// `check:root:strict-lib-lib-check-entries` holds them to.
 //
 // #2893 — fraction digits were capped at 20, the limit before ECMA-402 2023
 // raised it to 100. Integer and significant digits stay 1–21.
