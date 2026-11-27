@@ -1,4 +1,4 @@
-import { expectType, hasKey, isRecord } from 'ts-data-forge';
+import { expectType, hasKey, isRecord, Result } from 'ts-data-forge';
 import { brand } from '../brand/index.mjs';
 import { recursion, refine } from '../other-types/index.mjs';
 import { int, nonEmptyString, uint } from '../predefined/index.mjs';
@@ -275,5 +275,27 @@ describe(attachConstraints, () => {
     assert.strictEqual(attached.constraints.min, 0);
 
     assert.isTrue(attached.is({ value: 1, child: { value: 2 } }));
+  });
+
+  test('keeps the members a type inherits through its prototype', () => {
+    const base = number(0);
+
+    // A `Type` whose members are all inherited, as one written as a class is.
+    // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
+    const inherited = Object.create(base) as typeof base;
+
+    const attached = attachConstraints(inherited, { min: 0 });
+
+    assert.strictEqual(Object.getPrototypeOf(attached), base);
+
+    assert.isTrue(attached.is(1));
+
+    assert.isFalse(attached.is('a'));
+
+    assert.isTrue(Result.isOk(attached.validate(1)));
+
+    assert.strictEqual(attached.fill('a'), 0);
+
+    assert.strictEqual(attached.constraints.min, 0);
   });
 });

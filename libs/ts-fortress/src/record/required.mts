@@ -100,16 +100,11 @@ const makeRequired = <T extends UnknownType>(t: T): RequiredPropertyType<T> => {
     return t as RequiredPropertyType<T>;
   }
 
-  // Property descriptors rather than an object rest, as in `optional`: a rest
-  // would call the lazy `defaultValue` getter of a record, union or recursion,
-  // and drop the members a `Type` written as a class inherits. Since the
-  // prototype is kept, `optional` is shadowed by a non-enumerable own
+  // Copied by descriptor, not by an object rest: see `copyTypeByDescriptors`.
+  // Since the prototype is kept, `optional` is shadowed by a non-enumerable own
   // `undefined` rather than only removed, in case `t` inherits the flag.
-  const { optional: _, ...descriptors } = Object.getOwnPropertyDescriptors(t);
-
   // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
   return copyTypeByDescriptors(t, {
-    ...descriptors,
     optional: { value: undefined },
   }) as RequiredPropertyType<T>;
 };

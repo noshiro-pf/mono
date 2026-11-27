@@ -205,8 +205,7 @@ export type TypeStructureKind = TypeStructure['kind'];
 
 /**
  * @internal Replaces the {@link TypeStructure} of `type`, keeping every other
- * property as it is — by property descriptor, for the reason given in
- * `attachConstraints`.
+ * property as it is, through {@link copyTypeByDescriptors}.
  */
 export const withStructure = <T extends UnknownType>(
   type: T,
@@ -214,25 +213,32 @@ export const withStructure = <T extends UnknownType>(
 ): T =>
   // The same object with one property replaced.
   // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
-  Object.defineProperties(
-    {},
-    {
-      ...Object.getOwnPropertyDescriptors(type),
-      structure: { value: structure, enumerable: true },
-    },
-  ) as T;
+  copyTypeByDescriptors(type, {
+    structure: { value: structure, enumerable: true },
+  }) as T;
 
 /**
- * @internal A new object with the prototype of `type` and the property
- * `descriptors` given, which are usually `type`'s own with some replaced.
- * Copying by descriptor leaves a lazy `defaultValue` getter unevaluated (see
- * `attachConstraints`), and keeping the prototype keeps the members a `Type`
+ * @internal The one way a `Type` is copied with some properties replaced
+ * (`optional`, `required`, `attachConstraints`, `annotate`, `withStructure`):
+ * a new object with the prototype of `type`, its own property descriptors, and
+ * `overrides` on top of them.
+ *
+ * By descriptor rather than by spread, because `union`, `record`, `recursion`
+ * and the array types expose `defaultValue` as a lazy, memoized getter: a
+ * spread would call it here, which for a recursive type still being defined
+ * never terminates, and freeze what it returned into a plain value. And with
+ * the prototype kept, because a copy onto `{}` drops the members a `Type`
  * written as a class inherits.
  */
 export const copyTypeByDescriptors = (
   type: UnknownType,
-  descriptors: PropertyDescriptorMap,
+  overrides: PropertyDescriptorMap,
 ): unknown => {
+  const descriptors: PropertyDescriptorMap = {
+    ...Object.getOwnPropertyDescriptors(type),
+    ...overrides,
+  } as const;
+
   const proto: unknown = Object.getPrototypeOf(type);
 
   // A prototype is an object, a function or `null`, all of which

@@ -1,6 +1,10 @@
 import { hasKey, isRecord, tp } from 'ts-data-forge';
 import type { ReadonlyRecord, UnknownRecord } from 'ts-type-forge';
-import type { Type, UnknownType } from '../type.mjs';
+import {
+  copyTypeByDescriptors,
+  type Type,
+  type UnknownType,
+} from '../type.mjs';
 
 /**
  * The carrier of the constraint values a {@link Type} was created with.
@@ -101,18 +105,11 @@ export const attachConstraints = <A, C>(
   type: Type<A>,
   constraints: C,
 ): ConstrainedType<A, C> =>
-  // Property descriptors rather than a spread: `union`, `record`, `recursion`
-  // and the array types expose `defaultValue` as a lazy, memoized getter, and a
-  // spread would call it here — which for a recursive type never terminates —
-  // and freeze whatever it returned into a plain value.
+  // Copied by descriptor, keeping the prototype: see `copyTypeByDescriptors`.
   // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
-  Object.defineProperties(
-    {},
-    {
-      ...Object.getOwnPropertyDescriptors(type),
-      constraints: { value: constraints, enumerable: true },
-    },
-  ) as ConstrainedType<A, C>;
+  copyTypeByDescriptors(type, {
+    constraints: { value: constraints, enumerable: true },
+  }) as ConstrainedType<A, C>;
 
 /** Runtime check for a type that carries constraint values. */
 export const hasConstraints = <T extends UnknownType>(

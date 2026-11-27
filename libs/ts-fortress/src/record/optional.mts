@@ -55,13 +55,10 @@ export const optional = <T extends UnknownType>(
 ): OptionalPropertyType<T> =>
   // `OptionalPropertyType<T>` is `T & { optional: true }`, so every property of
   // `t` is carried over — a record's `shape`, a constrained type's
-  // `constraints`, and whatever else a wrapper attached. Property descriptors
-  // rather than a spread: a spread would call the lazy `defaultValue` getter of
-  // a record, union or recursion here, which for a recursive type still being
-  // defined never terminates.
+  // `constraints`, and whatever else a wrapper attached, by descriptor: see
+  // `copyTypeByDescriptors`.
   // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
   copyTypeByDescriptors(t, {
-    ...Object.getOwnPropertyDescriptors(t),
     ...(options?.forceUndefinedDefault === true
       ? // For recursive types: set defaultValue to undefined to avoid infinite loops
         { defaultValue: { value: undefined, enumerable: true } }
