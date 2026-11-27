@@ -1,4 +1,9 @@
-import type { TypeAnnotations, TypeOf, UnknownType } from '../type.mjs';
+import {
+  copyTypeByDescriptors,
+  type TypeAnnotations,
+  type TypeOf,
+  type UnknownType,
+} from '../type.mjs';
 
 /**
  * Returns `type` with `annotations` added to the ones it carries: a title, a
@@ -39,17 +44,11 @@ export const annotate = <T extends UnknownType>(
   type: T,
   annotations: TypeAnnotations<TypeOf<T>>,
 ): T =>
-  // Property descriptors rather than a spread, as in `attachConstraints`: a
-  // spread would call the lazy `defaultValue` getter of a record, union or
-  // recursion here.
+  // Copied by descriptor, keeping the prototype: see `copyTypeByDescriptors`.
   // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
-  Object.defineProperties(
-    {},
-    {
-      ...Object.getOwnPropertyDescriptors(type),
-      annotations: {
-        value: { ...type.annotations, ...annotations },
-        enumerable: true,
-      },
+  copyTypeByDescriptors(type, {
+    annotations: {
+      value: { ...type.annotations, ...annotations },
+      enumerable: true,
     },
-  ) as T;
+  }) as T;

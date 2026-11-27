@@ -1,4 +1,4 @@
-import { Arr, expectType, type Result } from 'ts-data-forge';
+import { Arr, expectType, Result } from 'ts-data-forge';
 import { array, nonEmptyArray, tuple } from './array/index.mjs';
 import { intersection, union } from './compose/index.mjs';
 import { enumType } from './enum/index.mjs';
@@ -15,12 +15,13 @@ import {
   record,
   required,
 } from './record/index.mjs';
-import type {
-  Type,
-  TypeAnnotations,
-  TypeOf,
-  TypeStructure,
-  UnknownType,
+import {
+  withStructure,
+  type Type,
+  type TypeAnnotations,
+  type TypeOf,
+  type TypeStructure,
+  type UnknownType,
 } from './type.mjs';
 import type { ValidationError } from './utils/index.mjs';
 
@@ -204,5 +205,71 @@ describe('TypeStructure', () => {
     const [member] = structure.elementTypes;
 
     assert.deepStrictEqual(member?.prune({ a: 1, b: 2 }), { a: 1 });
+  });
+});
+
+describe(withStructure, () => {
+  test('keeps the members a type inherits through its prototype', () => {
+    const base = number(0);
+
+    // A `Type` whose members are all inherited, as one written as a class is.
+    // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
+    const inherited = Object.create(base) as typeof base;
+
+    const replaced = withStructure(inherited, { kind: 'unknown' });
+
+    assert.strictEqual(Object.getPrototypeOf(replaced), base);
+
+    assert.isTrue(replaced.is(1));
+
+    assert.isFalse(replaced.is('a'));
+
+    assert.isTrue(Result.isOk(replaced.validate(1)));
+
+    assert.strictEqual(replaced.fill('a'), 0);
+
+    assert.deepStrictEqual(replaced.structure, { kind: 'unknown' });
+  });
+
+  test('leaves a lazy default unevaluated until it is read', () => {
+    const computeDefault = vi.fn((): number => 7);
+
+    const base = number(0);
+
+    // `base` with a `defaultValue` getter, as a record, union or recursion has.
+    // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
+    const lazy = Object.create(base, {
+      defaultValue: { get: computeDefault, enumerable: true },
+    }) as typeof base;
+
+    const replaced = withStructure(lazy, { kind: 'unknown' });
+
+    expect(computeDefault).not.toHaveBeenCalled();
+
+    assert.strictEqual(replaced.defaultValue, 7);
+  });
+});
+
+describe(annotate, () => {
+  // The other tests of `annotate` are in `test/annotate.test.mts`; this one sits
+  // beside the prototype tests of the other type copies.
+  test('keeps the members a type inherits through its prototype', () => {
+    const base = number(0);
+
+    // A `Type` whose members are all inherited, as one written as a class is.
+    // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
+    const inherited = Object.create(base) as typeof base;
+
+    const annotated = annotate(optional(inherited), { title: 'x' });
+
+    assert.isTrue(annotated.is(1));
+
+    assert.isFalse(annotated.is('a'));
+
+    assert.isTrue(Result.isOk(annotated.validate(1)));
+
+    assert.strictEqual(annotated.fill('a'), 0);
+
+    assert.strictEqual(annotated.annotations?.title, 'x');
   });
 });
