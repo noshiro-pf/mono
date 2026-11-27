@@ -2,7 +2,7 @@ import { expectType, Result } from 'ts-data-forge';
 import type { NonEmptyString } from 'ts-type-forge';
 import type { TypeOf } from '../../../type.mjs';
 import { validationErrorsToMessages } from '../../../utils/index.mjs';
-import { uuid, uuidV4, uuidV6, uuidV7 } from './uuid.mjs';
+import { uuid, uuidV4, uuidV6, uuidV7, type UuidBaseString } from './uuid.mjs';
 
 const nilUuid = '00000000-0000-0000-0000-000000000000';
 
@@ -125,5 +125,84 @@ describe(uuidV7, () => {
     assert.isFalse(v7Type.is(uuidV4Example));
 
     assert.isFalse(v7Type.is(uuidV6Example));
+  });
+});
+
+describe('uuid with a version and no defaultValue', () => {
+  test.each([1, 2, 3, 4, 5, 6, 7, 8, 'nil', 'max', 'all', 'loose'] as const)(
+    'version %s builds, and its default passes its own is',
+    (version) => {
+      const type = uuid({ version });
+
+      assert.isTrue(type.is(type.defaultValue));
+    },
+  );
+
+  test.each([1, 2, 3, 4, 5, 6, 7, 8] as const)(
+    'version %s defaults to 00000000-0000-V000-8000-000000000000',
+    (version) => {
+      assert.strictEqual(
+        uuid({ version }).defaultValue,
+        `00000000-0000-${version.toString()}000-8000-000000000000`,
+      );
+    },
+  );
+
+  test("'max' defaults to the max UUID", () => {
+    assert.strictEqual(uuid({ version: 'max' }).defaultValue, maxUuid);
+  });
+});
+
+describe('uuid reads hexadecimal digits in any case', () => {
+  const versioned = (version: number): string =>
+    `aaaaaaaa-bbbb-${version.toString()}ccc-8ddd-eeeeeeeeeeee` as const;
+
+  const cases = (lower: string): readonly string[] =>
+    [
+      lower,
+      lower.toUpperCase(),
+      `${lower.slice(0, 4).toUpperCase()}${lower.slice(4)}`,
+    ] as const;
+
+  test.each([1, 2, 3, 4, 5, 6, 7, 8] as const)(
+    'version %s accepts lower, upper and mixed case',
+    (version) => {
+      const type = uuid({ version });
+
+      for (const s of cases(versioned(version))) {
+        assert.isTrue(type.is(s));
+      }
+    },
+  );
+
+  test("'all' and 'loose' accept lower, upper and mixed case", () => {
+    for (const version of ['all', 'loose'] as const) {
+      const type = uuid({ version });
+
+      for (const s of cases(versioned(4))) {
+        assert.isTrue(type.is(s));
+      }
+    }
+  });
+
+  test("'max' and 'all' accept the max UUID in upper and mixed case", () => {
+    for (const version of ['max', 'all'] as const) {
+      const type = uuid({ version });
+
+      for (const s of [
+        'FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF',
+        'FFFFffff-ffff-ffff-ffff-ffffffffffff',
+      ]) {
+        assert.isTrue(type.is(s));
+      }
+    }
+  });
+
+  test('a mixed-case max UUID is a UuidBaseString', () => {
+    expectType<'FFFFffff-ffff-ffff-ffff-ffffffffffff', UuidBaseString>('<=');
+
+    expectType<'00000000-0000-9000-8000-000000000000', UuidBaseString>('!<=');
+
+    assert.isTrue(true);
   });
 });
