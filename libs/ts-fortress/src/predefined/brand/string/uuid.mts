@@ -15,7 +15,9 @@ export type UuidVersion = UintRangeInclusive<1, 8>;
 export type UuidBaseString<V extends UuidVersion = UuidVersion> =
   | `${string}-${string}-${V}${string}-${string}-${string}`
   | '00000000-0000-0000-0000-000000000000'
-  | 'ffffffff-ffff-ffff-ffff-ffffffffffff';
+  // The max UUID in any case, which `is` reads case-insensitively: a literal
+  // would leave its upper- and mixed-case spellings outside the type.
+  | `${string}-${string}-${'f' | 'F'}${string}-${string}-${string}`;
 
 // A UUID always has the dash-separated hexadecimal form, so it is never an
 // empty string; `Uuid` is branded on top of `NonEmptyString` and is assignable
@@ -36,9 +38,9 @@ export const uuid = <V extends UuidVersion | UuidVersionAdditionalOption>(
 ): Type<UuidOf<V>> => {
   type T = Brand<UuidBaseString & NonEmptyString, 'Uuid'>;
 
-  const defaultValue = options?.defaultValue ?? nilUuid;
-
   const version = options?.version ?? 'all';
+
+  const defaultValue = options?.defaultValue ?? defaultOf(version);
 
   // Every value accepted is in the hexadecimal form RFC 9562 defines, so it is
   // also of the JSON Schema `uuid` format.
@@ -70,9 +72,9 @@ export const uuid = <V extends UuidVersion | UuidVersionAdditionalOption>(
 /**
  * The `version` values of {@link uuid} beyond the numbered versions: `'nil'`
  * and `'max'` accept only the all-zero and all-`f` UUIDs, `'all'` those and
- * versions 1–8 in either case, and `'loose'` any lower-case hexadecimal string
- * of the UUID layout, ignoring RFC 9562. A numbered version and the lower-case
- * forms accept no upper-case digit.
+ * versions 1–8, and `'loose'` any hexadecimal string of the UUID layout,
+ * ignoring RFC 9562. Every version reads the hexadecimal digits in any case, as
+ * RFC 9562 says for input.
  */
 export type UuidVersionAdditionalOption = 'nil' | 'max' | 'all' | 'loose';
 
@@ -109,10 +111,10 @@ export const uuidV7 = (defaultValue?: string): Type<Uuid7> =>
   });
 
 /**
- * The options {@link uuid} takes, each optional. `defaultValue` is the nil UUID
- * when left out, which only `'nil'`, `'all'` and `'loose'` accept: another
- * `version` needs a `defaultValue` of its own, or `uuid` panics when it builds
- * the type.
+ * The options {@link uuid} takes, each optional. Left out, `defaultValue` is
+ * one the `version` accepts: `00000000-0000-V000-8000-000000000000` for a
+ * numbered version `V`, the max UUID for `'max'`, and the nil UUID for `'nil'`,
+ * `'all'` and `'loose'`.
  */
 export type UuidValidatorOption<
   V extends UuidVersion | UuidVersionAdditionalOption,
@@ -133,15 +135,16 @@ const nilUuid = '00000000-0000-0000-0000-000000000000' satisfies UuidBaseString;
 const maxUuid = 'ffffffff-ffff-ffff-ffff-ffffffffffff' satisfies UuidBaseString;
 
 const regexDef = {
-  1: /^[\da-f]{8}-[\da-f]{4}-1[\da-f]{3}-[89ab][\da-f]{3}-[\da-f]{12}$/u,
-  2: /^[\da-f]{8}-[\da-f]{4}-2[\da-f]{3}-[89ab][\da-f]{3}-[\da-f]{12}$/u,
-  3: /^[\da-f]{8}-[\da-f]{4}-3[\da-f]{3}-[89ab][\da-f]{3}-[\da-f]{12}$/u,
-  4: /^[\da-f]{8}-[\da-f]{4}-4[\da-f]{3}-[89ab][\da-f]{3}-[\da-f]{12}$/u,
-  5: /^[\da-f]{8}-[\da-f]{4}-5[\da-f]{3}-[89ab][\da-f]{3}-[\da-f]{12}$/u,
-  6: /^[\da-f]{8}-[\da-f]{4}-6[\da-f]{3}-[89ab][\da-f]{3}-[\da-f]{12}$/u,
-  7: /^[\da-f]{8}-[\da-f]{4}-7[\da-f]{3}-[89ab][\da-f]{3}-[\da-f]{12}$/u,
-  8: /^[\da-f]{8}-[\da-f]{4}-8[\da-f]{3}-[89ab][\da-f]{3}-[\da-f]{12}$/u,
-  loose: /^[\da-f]{8}-[\da-f]{4}-[\da-f]{4}-[\da-f]{4}-[\da-f]{12}$/u,
+  1: /^[\da-f]{8}-[\da-f]{4}-1[\da-f]{3}-[89ab][\da-f]{3}-[\da-f]{12}$/iu,
+  2: /^[\da-f]{8}-[\da-f]{4}-2[\da-f]{3}-[89ab][\da-f]{3}-[\da-f]{12}$/iu,
+  3: /^[\da-f]{8}-[\da-f]{4}-3[\da-f]{3}-[89ab][\da-f]{3}-[\da-f]{12}$/iu,
+  4: /^[\da-f]{8}-[\da-f]{4}-4[\da-f]{3}-[89ab][\da-f]{3}-[\da-f]{12}$/iu,
+  5: /^[\da-f]{8}-[\da-f]{4}-5[\da-f]{3}-[89ab][\da-f]{3}-[\da-f]{12}$/iu,
+  6: /^[\da-f]{8}-[\da-f]{4}-6[\da-f]{3}-[89ab][\da-f]{3}-[\da-f]{12}$/iu,
+  7: /^[\da-f]{8}-[\da-f]{4}-7[\da-f]{3}-[89ab][\da-f]{3}-[\da-f]{12}$/iu,
+  8: /^[\da-f]{8}-[\da-f]{4}-8[\da-f]{3}-[89ab][\da-f]{3}-[\da-f]{12}$/iu,
+  max: /^f{8}-f{4}-f{4}-f{4}-f{12}$/iu,
+  loose: /^[\da-f]{8}-[\da-f]{4}-[\da-f]{4}-[\da-f]{4}-[\da-f]{12}$/iu,
   '1-8':
     /^(?:[\da-f]{8}-[\da-f]{4}-[1-8][\da-f]{3}-[89ab][\da-f]{3}-[\da-f]{12})$/iu,
 } as const;
@@ -159,7 +162,21 @@ const uuidDef: ReadonlyRecord<
   7: (s) => regexDef[7].test(s),
   8: (s) => regexDef[8].test(s),
   nil: (s) => s === nilUuid,
-  max: (s) => s === maxUuid,
+  max: (s) => regexDef.max.test(s),
   loose: (s) => regexDef.loose.test(s),
-  all: (s) => s === nilUuid || s === maxUuid || regexDef['1-8'].test(s),
+  all: (s) => s === nilUuid || regexDef.max.test(s) || regexDef['1-8'].test(s),
 } as const;
+
+/**
+ * The default {@link uuid} gives a `version` when the options leave
+ * `defaultValue` out: one that `version` accepts, so that building never
+ * panics.
+ */
+const defaultOf = (
+  version: UuidVersion | UuidVersionAdditionalOption,
+): UuidBaseString =>
+  version === 'max'
+    ? maxUuid
+    : version === 'nil' || version === 'all' || version === 'loose'
+      ? nilUuid
+      : (`00000000-0000-${version}000-8000-000000000000` as const);
