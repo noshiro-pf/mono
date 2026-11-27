@@ -1,5 +1,5 @@
 import { Result, SafeNumber } from 'ts-std-forge';
-import type { Brand, NonEmptyString, StrictOmit } from 'ts-type-forge';
+import type { Brand, NonEmptyString } from 'ts-type-forge';
 import { brand } from '../../../brand/index.mjs';
 import { boolean, string } from '../../../primitives/index.mjs';
 import { record } from '../../../record/index.mjs';
@@ -31,8 +31,9 @@ export const iso8601 = (options?: Iso8601ValidatorOption): Type<Iso8601> => {
  * The options {@link iso8601} takes, all or none: `strict` rejects a calendar
  * date that does not exist (`2009-02-29`), `strictSeparator` a separator
  * between date and time other than `T`, and `defaultValue` is the type's
- * default. Left out, both checks are off and the default is the time the module
- * was loaded.
+ * default. Left out, both checks are off and the default is the Unix epoch,
+ * `1970-01-01T00:00:00.000Z`, so that the type does not depend on when its
+ * module was loaded.
  */
 export type Iso8601ValidatorOption = Readonly<{
   strict: boolean;
@@ -48,7 +49,8 @@ export type Iso8601ValidatorOption = Readonly<{
 // first: `TypeOf<typeof Iso8601ValidatorOption>` would be circular here.
 const Iso8601ValidatorOption: Type<Iso8601ValidatorOption> = record({
   /**
-   *  If strict is true, date strings with invalid dates like 2009-02-29 will be invalid.
+   * If strict is true, date strings with invalid dates like 2009-02-29 will be
+   * invalid, and so will week 53 of a year that has 52 ISO weeks (2010-W53-1).
    */
   strict: boolean(),
 
@@ -58,12 +60,9 @@ const Iso8601ValidatorOption: Type<Iso8601ValidatorOption> = record({
   strictSeparator: boolean(),
 
   /**
-   * @default new Date().toISOString()
+   * @default '1970-01-01T00:00:00.000Z'
    */
-  // The documented default of this published type, the moment the module
-  // loaded; whether it should be something else is ts-fortress's own decision.
-  // eslint-disable-next-line unicorn/no-unreadable-new-expression, ts-restrictions/no-clock-read-at-module-load
-  defaultValue: string(new Date().toISOString()),
+  defaultValue: string('1970-01-01T00:00:00.000Z'),
 });
 
 const parseDigits = (digits: string | undefined): number | undefined => {
@@ -76,6 +75,32 @@ const parseDigits = (digits: string | undefined): number | undefined => {
   return Result.isOk(parsed) ? parsed.value : undefined;
 };
 
+const isLeapYear = (year: number): boolean =>
+  (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0;
+
+const positiveModulo = (n: number, m: 4 | 7 | 100 | 400): number =>
+  ((n % m) + m) % m;
+
+/**
+ * The number of ISO weeks in `year`: 53 when its January 1 is a Thursday, or a
+ * Wednesday in a leap year, and 52 otherwise. The weekday comes from Gauss's
+ * formula (0 is Sunday) rather than `Date`, which reads the years 0–99 as
+ * 1900–1999.
+ */
+const isoWeeksIn = (year: number): 52 | 53 => {
+  const y = year - 1;
+
+  const january1 = positiveModulo(
+    1 +
+      5 * positiveModulo(y, 4) +
+      4 * positiveModulo(y, 100) +
+      6 * positiveModulo(y, 400),
+    7,
+  );
+
+  return january1 === 4 || (january1 === 3 && isLeapYear(year)) ? 53 : 52;
+};
+
 const isValidDate = (str: string): boolean => {
   // str must have passed the ISO8601 check this check is meant to catch invalid
   // dates like 2009-02-31 first check for ordinal dates
@@ -86,14 +111,24 @@ const isValidDate = (str: string): boolean => {
 
     const oDay = parseDigits(ordinalMatch[2]);
 
-    if (oYear === undefined || oDay === undefined) {
-      return false;
-    }
+    return (
+      oYear !== undefined &&
+      oDay !== undefined &&
+      (isLeapYear(oYear) ? oDay <= 366 : oDay <= 365)
+    );
+  }
 
-    // if is leap year
-    return (oYear % 4 === 0 && oYear % 100 !== 0) || oYear % 400 === 0
-      ? oDay <= 366
-      : oDay <= 365;
+  // The sign is part of the year: -2008 has 53 weeks and 2008 has 52.
+  const weekMatch = /^([+-]?\d{4})-?W(\d{2})/u.exec(str) ?? undefined;
+
+  if (weekMatch !== undefined) {
+    const wYear = parseDigits(weekMatch[1]);
+
+    const week = parseDigits(weekMatch[2]);
+
+    return (
+      wYear !== undefined && week !== undefined && week <= isoWeeksIn(wYear)
+    );
   }
 
   const match = /(\d{4})-?(\d{0,2})-?(\d*)/u.exec(str) ?? undefined;
@@ -124,23 +159,21 @@ const isValidDate = (str: string): boolean => {
 };
 
 const isISO8601 =
-  (options?: Partial<StrictOmit<Iso8601ValidatorOption, 'defaultValue'>>) =>
+  ({ strict, strictSeparator }: Iso8601ValidatorOption) =>
   (str: string): str is Iso8601 => {
-    const filledOptions = Iso8601ValidatorOption.fill(options);
-
-    const check = filledOptions.strictSeparator
+    const check = strictSeparator
       ? regexpIso8601StrictSeparator.test(str)
       : regexpIso8601.test(str);
 
-    return check && filledOptions.strict ? isValidDate(str) : check;
+    return check && strict ? isValidDate(str) : check;
   };
 
 // from http://goo.gl/0ejHHW
 const regexpIso8601 =
   // eslint-disable-next-line security/detect-unsafe-regex
-  /^([+-]?\d{4}(?!\d{2}\b))((-?)((0[1-9]|1[0-2])(\3([12]\d|0[1-9]|3[01]))?|W([0-4]\d|5[0-3])(-?[1-7])?|(00[1-9]|0[1-9]\d|[12]\d{2}|3([0-5]\d|6[1-6])))([\sT]((([01]\d|2[0-3])((:?)[0-5]\d)?|24:?00)([,.]\d+(?!:))?)?(\17[0-5]\d([,.]\d+)?)?([Zz]|([+-])([01]\d|2[0-3]):?([0-5]\d)?)?)?)?$/u;
+  /^([+-]?\d{4}(?!\d{2}\b))((-?)((0[1-9]|1[0-2])(\3([12]\d|0[1-9]|3[01]))?|W(0[1-9]|[1-4]\d|5[0-3])(-?[1-7])?|(00[1-9]|0[1-9]\d|[12]\d{2}|3([0-5]\d|6[1-6])))([\sT]((([01]\d|2[0-3])((:?)[0-5]\d)?|24:?00)([,.]\d+(?!:))?)?(\17[0-5]\d([,.]\d+)?)?([Zz]|([+-])([01]\d|2[0-3]):?([0-5]\d)?)?)?)?$/u;
 
 // same as above, except with a strict 'T' separator between date and time
 const regexpIso8601StrictSeparator =
   // eslint-disable-next-line security/detect-unsafe-regex
-  /^([+-]?\d{4}(?!\d{2}\b))((-?)((0[1-9]|1[0-2])(\3([12]\d|0[1-9]|3[01]))?|W([0-4]\d|5[0-3])(-?[1-7])?|(00[1-9]|0[1-9]\d|[12]\d{2}|3([0-5]\d|6[1-6])))(T((([01]\d|2[0-3])((:?)[0-5]\d)?|24:?00)([,.]\d+(?!:))?)?(\17[0-5]\d([,.]\d+)?)?([Zz]|([+-])([01]\d|2[0-3]):?([0-5]\d)?)?)?)?$/u;
+  /^([+-]?\d{4}(?!\d{2}\b))((-?)((0[1-9]|1[0-2])(\3([12]\d|0[1-9]|3[01]))?|W(0[1-9]|[1-4]\d|5[0-3])(-?[1-7])?|(00[1-9]|0[1-9]\d|[12]\d{2}|3([0-5]\d|6[1-6])))(T((([01]\d|2[0-3])((:?)[0-5]\d)?|24:?00)([,.]\d+(?!:))?)?(\17[0-5]\d([,.]\d+)?)?([Zz]|([+-])([01]\d|2[0-3]):?([0-5]\d)?)?)?)?$/u;

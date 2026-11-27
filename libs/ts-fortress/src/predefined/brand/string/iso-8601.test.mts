@@ -144,6 +144,63 @@ describe(iso8601, () => {
     assert.isFalse(strictType.is('2009-13'));
   });
 
+  describe('week dates', () => {
+    const strictType = iso8601({
+      defaultValue: baseDefault,
+      strict: true,
+      strictSeparator: false,
+    });
+
+    test.each([
+      '2009-W53-1',
+      '2020-W53-7',
+      '2010-W52-7',
+      '2009W537',
+      '2015-W53',
+      '2004-W53-1',
+      // The years 0–99 are not read as 1900–1999, as `Date.UTC` would read
+      // them: 1904 has 52 weeks.
+      '0004-W53-1',
+      '-2008-W53-1',
+    ] as const)('strict mode accepts the existing week date $0', (e) => {
+      assert.isTrue(strictType.is(e));
+    });
+
+    test.each([
+      '2010-W53-1',
+      '2021-W53',
+      '2019W537',
+      '2100-W53-1',
+      '1904-W53-1',
+      '-2009-W53-1',
+    ] as const)(
+      'strict mode rejects week 53 of a year that has 52 weeks: $0',
+      (e) => {
+        assert.isFalse(strictType.is(e));
+      },
+    );
+
+    test.each(['2010-W53-1', '2010-W01-1'] as const)(
+      'non-strict mode accepts $0',
+      (e) => {
+        assert.isTrue(baseType.is(e));
+      },
+    );
+
+    test.each(['2010-W00-1', '2010-W00', '2010W001'] as const)(
+      'rejects week 00: $0',
+      (e) => {
+        assert.isFalse(baseType.is(e));
+
+        assert.isFalse(strictType.is(e));
+      },
+    );
+  });
+
+  test('the default is the Unix epoch, not the moment the module loaded', () => {
+    expect(iso8601().defaultValue).toBe('1970-01-01T00:00:00.000Z');
+  });
+
   test('strictSeparator mode enforces the T delimiter', () => {
     const type = iso8601({
       defaultValue: baseDefault,
