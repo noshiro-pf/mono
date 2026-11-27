@@ -5,7 +5,7 @@ import {
   createPrimitiveValidationError,
   type ValidationError,
 } from '../utils/index.mjs';
-import { buildType, validateElements } from './build-type.mjs';
+import { buildType, fillElements, validateElements } from './build-type.mjs';
 
 export type { FixedLengthArray } from 'ts-type-forge';
 
@@ -59,13 +59,16 @@ export function fixedLengthArray<A>(
 ): Type<readonly A[]> {
   type T = readonly A[];
 
+  // Converted once, so that a size that is not a length throws here, at the
+  // call that passed it, rather than from some calls of `fill`.
+  const length = asUint32(size);
+
   const typeName =
     options?.typeName ?? `FixedLengthArray<${size}, ${elementType.typeName}>`;
 
   const getDefaultValue = memoizeFunction(
     (): T =>
-      options?.defaultValue ??
-      Arr.create(asUint32(size), elementType.defaultValue),
+      options?.defaultValue ?? Arr.create(length, elementType.defaultValue),
   );
 
   const validate: Type<T>['validate'] = (a) => {
@@ -80,7 +83,7 @@ export function fixedLengthArray<A>(
       ]);
     }
 
-    if (a.length !== size) {
+    if (a.length !== length) {
       return Result.err([
         {
           path: [],
@@ -89,7 +92,7 @@ export function fixedLengthArray<A>(
           typeName,
           details: {
             kind: 'array-length',
-            expectedLength: size,
+            expectedLength: length,
             actualLength: a.length,
           },
         } satisfies ValidationError,
@@ -101,10 +104,7 @@ export function fixedLengthArray<A>(
 
   const fill: Type<T>['fill'] = (a) =>
     Arr.isArray(a)
-      ? Arr.map(
-          Arr.seq(asUint32(size)),
-          (i) => elementType.fill(a[i]) satisfies A,
-        )
+      ? fillElements(a, elementType, { minLength: length, maxLength: length })
       : getDefaultValue();
 
   return buildType({
@@ -113,7 +113,7 @@ export function fixedLengthArray<A>(
     validate,
     fill,
     elementType,
-    minLength: size,
-    maxLength: size,
+    minLength: length,
+    maxLength: length,
   });
 }

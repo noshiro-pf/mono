@@ -6,7 +6,7 @@ import {
   prependIndexToValidationErrors,
   type ValidationError,
 } from '../utils/index.mjs';
-import { buildType } from './build-type.mjs';
+import { buildType, fillElements } from './build-type.mjs';
 
 export type { NonEmptyArray } from 'ts-type-forge';
 
@@ -74,7 +74,10 @@ export const nonEmptyArray = <A,>(
 
   const fill = (a: unknown): readonly A[] =>
     Arr.isArray(a) && Arr.isNonEmpty(a)
-      ? Arr.map(a, (e) => elementType.fill(e) satisfies A)
+      ? fillElements(a, elementType, {
+          minLength: undefined,
+          maxLength: undefined,
+        })
       : getDefaultValue();
 
   return buildType<A, NonEmptyArray<A>>({

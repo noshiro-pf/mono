@@ -1,4 +1,5 @@
 import { Arr, Result } from 'ts-data-forge';
+import type { Uint32 } from 'ts-type-forge';
 import type { Type } from '../type.mjs';
 import {
   createAssertFn,
@@ -34,6 +35,38 @@ export const validateElements = <A,>(
     : // No errors, so the value is of the validated type.
       // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
       Result.ok(a as readonly A[]);
+};
+
+/**
+ * What `fill` makes of an array input: a dense array of `elementType` cut to at
+ * most `maxLength` elements and padded to at least `minLength`, each one
+ * `elementType.fill` of the input's element at that index. Shared by the array
+ * validators, which used to carry their own copies of it and drifted apart.
+ *
+ * The indices are walked rather than the input mapped, because `map` skips the
+ * holes of a sparse array and would leave them in the result: a hole is not an
+ * `A`, so it is filled like a missing element. The input's own `length` is used
+ * as it is, since only a `Proxy` could report one that is not a length.
+ *
+ * @internal Not part of the public package API.
+ */
+export const fillElements = <A,>(
+  a: readonly unknown[],
+  elementType: Type<A>,
+  {
+    minLength,
+    maxLength,
+  }: Readonly<{
+    minLength: Uint32 | undefined;
+    maxLength: Uint32 | undefined;
+  }>,
+): readonly A[] => {
+  const capped =
+    maxLength === undefined ? a.length : Math.min(a.length, maxLength);
+
+  const length = minLength === undefined ? capped : Math.max(capped, minLength);
+
+  return Array.from({ length }, (_, i) => elementType.fill(a[i]) satisfies A);
 };
 
 /**

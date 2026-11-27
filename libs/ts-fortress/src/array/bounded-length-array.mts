@@ -10,7 +10,7 @@ import {
   createPrimitiveValidationError,
   type ValidationError,
 } from '../utils/index.mjs';
-import { buildType, validateElements } from './build-type.mjs';
+import { buildType, fillElements, validateElements } from './build-type.mjs';
 
 export type { BoundedLengthArray } from 'ts-type-forge';
 
@@ -86,8 +86,8 @@ export function boundedLengthArray<A>(
 ): Type<readonly A[]>;
 
 export function boundedLengthArray<A>(
-  min: number,
-  max: number,
+  minSize: number,
+  maxSize: number,
   elementType: Type<A>,
   options?: Partial<
     Readonly<{
@@ -98,6 +98,12 @@ export function boundedLengthArray<A>(
 ): Type<readonly A[]> {
   type T = readonly A[];
 
+  // Converted once, so that a bound that is not a length throws here, at the
+  // call that passed it, rather than from some calls of `fill`.
+  const min = asUint32(minSize);
+
+  const max = asUint32(maxSize);
+
   const typeName =
     options?.typeName ??
     `BoundedLengthArray<${min}, ${max}, ${elementType.typeName}>`;
@@ -106,7 +112,7 @@ export function boundedLengthArray<A>(
     (): T =>
       options?.defaultValue ??
       // An array of the minimum length is the shortest value within the range.
-      Arr.create(asUint32(min), elementType.defaultValue),
+      Arr.create(min, elementType.defaultValue),
   );
 
   const validate: Type<T>['validate'] = (a) => {
@@ -141,21 +147,10 @@ export function boundedLengthArray<A>(
     return validateElements(a, elementType);
   };
 
-  const fill: Type<T>['fill'] = (a) => {
-    if (!Arr.isArray(a)) {
-      return getDefaultValue();
-    }
-
-    // Trim down to at most `max`, then pad up to at least `min`.
-    const capped = Arr.take(a, asUint32(max));
-
-    return capped.length >= min
-      ? Arr.map(capped, (el) => elementType.fill(el) satisfies A)
-      : Arr.map(
-          Arr.seq(asUint32(min)),
-          (i) => elementType.fill(capped[i]) satisfies A,
-        );
-  };
+  const fill: Type<T>['fill'] = (a) =>
+    Arr.isArray(a)
+      ? fillElements(a, elementType, { minLength: min, maxLength: max })
+      : getDefaultValue();
 
   return buildType({
     typeName,

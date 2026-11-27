@@ -9,6 +9,7 @@ import {
   prependIndexToValidationErrors,
   type ValidationError,
 } from '../utils/index.mjs';
+import { fillElements } from './build-type.mjs';
 
 export type { MaxLengthTuple } from 'ts-type-forge';
 
@@ -51,6 +52,10 @@ export function maxLengthTuple<A>(
 ): Type<readonly A[]> {
   type T = readonly A[];
 
+  // Converted once, so that a size that is not a length throws here, at the
+  // call that passed it, rather than from some calls of `fill`.
+  const maxLength = asUint32(size);
+
   const typeName =
     options?.typeName ?? `MaxLengthTuple<${size}, ${elementType.typeName}>`;
 
@@ -73,7 +78,7 @@ export function maxLengthTuple<A>(
       ]);
     }
 
-    if (a.length > size) {
+    if (a.length > maxLength) {
       return Result.err([
         {
           path: [],
@@ -82,7 +87,7 @@ export function maxLengthTuple<A>(
           typeName,
           details: {
             kind: 'array-max-length',
-            maxLength: size,
+            maxLength,
             actualLength: a.length,
           },
         } satisfies ValidationError,
@@ -108,11 +113,7 @@ export function maxLengthTuple<A>(
 
   const fill: Type<T>['fill'] = (a) =>
     Arr.isArray(a)
-      ? // Keep the input but trim down to at most `size` elements.
-        Arr.map(
-          Arr.take(a, asUint32(size)),
-          (el) => elementType.fill(el) satisfies A,
-        )
+      ? fillElements(a, elementType, { minLength: undefined, maxLength })
       : getDefaultValue();
 
   const prune = (a: T): T => a.map((el) => elementType.prune(el));
@@ -132,7 +133,7 @@ export function maxLengthTuple<A>(
       kind: 'array',
       elementType,
       minLength: undefined,
-      maxLength: size,
+      maxLength,
     },
   };
 }

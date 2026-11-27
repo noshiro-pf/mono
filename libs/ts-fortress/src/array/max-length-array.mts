@@ -5,7 +5,7 @@ import {
   createPrimitiveValidationError,
   type ValidationError,
 } from '../utils/index.mjs';
-import { buildType, validateElements } from './build-type.mjs';
+import { buildType, fillElements, validateElements } from './build-type.mjs';
 
 export type { MaxLengthArray } from 'ts-type-forge';
 
@@ -46,7 +46,7 @@ export function maxLengthArray<A>(
 ): Type<readonly A[]>;
 
 export function maxLengthArray<A>(
-  maxLength: number,
+  size: number,
   elementType: Type<A>,
   options?: Partial<
     Readonly<{
@@ -56,6 +56,10 @@ export function maxLengthArray<A>(
   >,
 ): Type<readonly A[]> {
   type T = readonly A[];
+
+  // Converted once, so that a size that is not a length throws here, at the
+  // call that passed it, rather than from some calls of `fill`.
+  const maxLength = asUint32(size);
 
   const typeName =
     options?.typeName ??
@@ -101,11 +105,7 @@ export function maxLengthArray<A>(
 
   const fill: Type<T>['fill'] = (a) =>
     Arr.isArray(a)
-      ? // Keep the input but trim down to at most `maxLength` elements.
-        Arr.map(
-          Arr.take(a, asUint32(maxLength)),
-          (el) => elementType.fill(el) satisfies A,
-        )
+      ? fillElements(a, elementType, { minLength: undefined, maxLength })
       : getDefaultValue();
 
   return buildType({
