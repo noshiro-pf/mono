@@ -4,6 +4,7 @@ import { Result, hasKey } from 'ts-data-forge';
 import type { ReadonlyRecord } from 'ts-type-forge';
 import {
   findNetworkFiles,
+  findUnproxiedHarnessScripts,
   findUnproxiedScripts as findUnproxiedScriptsWith,
   judgeProxyScripts as judgeProxyScriptsWith,
   scriptFiles,
@@ -493,5 +494,73 @@ describe(findNetworkFiles, () => {
     assert.include(result.value, 'tools/missing.mts');
 
     assert.include(result.value, 'a root script names tools/a.mts');
+  });
+});
+
+describe(findUnproxiedHarnessScripts, () => {
+  const HARNESS_TSX = 'tsx --tsconfig ../../tools/configs/tsconfig.tsx.json';
+
+  const ENV =
+    "NODE_USE_ENV_PROXY=1 NODE_OPTIONS='--disable-warning=UNDICI-EHPA'";
+
+  test('passes a harness whose tsx scripts all set the variables', () => {
+    assert.deepStrictEqual(
+      findUnproxiedHarnessScripts(
+        new Map<string, ReadonlyRecord<string, string>>([
+          [
+            'strict-lib/v7.0/package.json',
+            {
+              'gen:full': `${ENV} ${HARNESS_TSX} ./scripts/gen-full.mts`,
+              'check:types': 'tsc -p tsconfig.lib-check.json',
+            },
+          ],
+        ]),
+      ),
+      Result.ok(1),
+    );
+  });
+
+  test('names each tsx script without the variables, with its manifest', () => {
+    const result = findUnproxiedHarnessScripts(
+      new Map<string, ReadonlyRecord<string, string>>([
+        [
+          'strict-lib/v5.0/package.json',
+          {
+            'gen:full': `${HARNESS_TSX} ./scripts/gen-full.mts`,
+            'gen:lib': `${ENV} ${HARNESS_TSX} ./scripts/gen.mts`,
+          },
+        ],
+        [
+          'strict-lib/v7.0/package.json',
+          {
+            'gen:lib-files': `${OPTIONS} ${HARNESS_TSX} ./scripts/gen-lib-files.mts`,
+            'gen:chained': `${ENV} ${HARNESS_TSX} ./scripts/a.mts && ${HARNESS_TSX} ./scripts/b.mts`,
+          },
+        ],
+      ]),
+    );
+
+    assert.isTrue(Result.isErr(result));
+
+    assert.include(result.value, 'strict-lib/v5.0/package.json: "gen:full"');
+
+    assert.include(
+      result.value,
+      'strict-lib/v7.0/package.json: "gen:lib-files"',
+    );
+
+    assert.include(result.value, 'strict-lib/v7.0/package.json: "gen:chained"');
+
+    assert.notInclude(result.value, '"gen:lib"');
+  });
+
+  test('fails when it finds no harness manifest, as it then checks nothing', () => {
+    const result = findUnproxiedHarnessScripts(
+      new Map<string, ReadonlyRecord<string, string>>(),
+    );
+
+    assert.isTrue(Result.isErr(result));
+
+    assert.include(result.value, 'No strict-lib harness manifest');
   });
 });

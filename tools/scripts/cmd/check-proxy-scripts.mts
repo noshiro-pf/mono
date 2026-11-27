@@ -1,5 +1,11 @@
 import * as path from 'node:path';
-import { Arr, memoizeFunction, Result, unknownToString } from 'ts-data-forge';
+import {
+  Arr,
+  Json,
+  memoizeFunction,
+  Result,
+  unknownToString,
+} from 'ts-data-forge';
 import { isDirectlyExecuted } from 'ts-repo-utils';
 import type { ReadonlyRecord } from 'ts-type-forge';
 import * as ts from 'typescript';
@@ -8,8 +14,13 @@ import {
   readWorkspacePackages,
   walkImports,
 } from '../lib/import-closure.mjs';
+import { readScripts } from '../lib/manifest-scripts.mjs';
 import { packageNameOf } from '../lib/package-name.mjs';
-import { readRootPackageScripts } from '../lib/repo-files.mjs';
+import {
+  listTrackedFiles,
+  readRepositoryFile,
+  readRootPackageScripts,
+} from '../lib/repo-files.mjs';
 import { runtimeImportSpecifiersOf } from '../lib/runtime-specifiers.mjs';
 import { skipExpressionWrappers } from '../lib/ts-expression-wrappers.mjs';
 
@@ -33,6 +44,10 @@ import { skipExpressionWrappers } from '../lib/ts-expression-wrappers.mjs';
  * The shapes are matched whole rather than the shell read, so that no script
  * passes by a shape this does not follow; one that needs another is a change to
  * this check.
+ *
+ * The strict-lib harnesses' own scripts are held too, by a rule of their own
+ * (see {@link findUnproxiedHarnessScripts}): the root starts them through
+ * another process, which the rules above do not follow.
  */
 export const checkProxyScripts = async (): Promise<Result<number, string>> => {
   const scripts = await readRootPackageScripts();
@@ -52,9 +67,28 @@ export const checkProxyScripts = async (): Promise<Result<number, string>> => {
     { ...cachedModuleReader(), workspacePackages: workspacePackages.value },
   );
 
-  return Result.isErr(networkFiles)
-    ? Result.err(`❌ ${networkFiles.value}`)
-    : judgeProxyScripts(scripts.value, networkFiles.value);
+  if (Result.isErr(networkFiles)) {
+    return Result.err(`❌ ${networkFiles.value}`);
+  }
+
+  const root = judgeProxyScripts(scripts.value, networkFiles.value);
+
+  const manifests = await readHarnessManifests();
+
+  if (Result.isErr(manifests)) {
+    return Result.err(`❌ ${manifests.value}`);
+  }
+
+  const harnesses = findUnproxiedHarnessScripts(manifests.value);
+
+  return Result.isErr(root) || Result.isErr(harnesses)
+    ? Result.err(
+        [root, harnesses]
+          .filter(Result.isErr)
+          .map((result) => result.value)
+          .join('\n\n'),
+      )
+    : Result.ok(root.value + harnesses.value);
 };
 
 /**
@@ -197,6 +231,50 @@ export const findNetworkFiles = (
   return Result.ok(mut_found);
 };
 
+/**
+ * Of the strict-lib harnesses' manifests (path → `scripts`), how many scripts
+ * run `tsx`, when each of them sets the two variables; otherwise what to fix.
+ *
+ * Every script of a harness that runs `tsx` is held, whether or not what it
+ * runs fetches: `gen:full`, `gen:lib-files` and `gen:with-codemod-fixed` reach
+ * `fetchLibFiles` in `strict-lib/scripts-common/`, a workspace member outside
+ * `libs/` that `walkImports` does not enter, and the variables cost a script
+ * that never fetches nothing. The shape is the variables, `tsx`, and no shell
+ * operator after them, so that nothing chained runs without them.
+ */
+export const findUnproxiedHarnessScripts = (
+  manifests: ReadonlyMap<string, ReadonlyRecord<string, string>>,
+): Result<number, string> => {
+  if (manifests.size === 0) {
+    return Result.err(
+      '❌ No strict-lib harness manifest (strict-lib/v<major>.<minor>/package.json) was found, so this check holds none of their scripts: point readHarnessManifests in tools/scripts/cmd/check-proxy-scripts.mts at where they moved.',
+    );
+  }
+
+  const held = Array.from(manifests).flatMap(([manifest, scripts]) =>
+    Object.entries(scripts)
+      .filter(([, script]) => RUNS_TSX.test(script))
+      .map(([name, script]) => ({ manifest, name, script })),
+  );
+
+  const offenders = held.filter(
+    ({ script }) =>
+      !script.startsWith(`${ENV}tsx `) || SHELL_OPERATOR.test(script),
+  );
+
+  return Arr.isNonEmpty(offenders)
+    ? Result.err(
+        [
+          `❌ ${offenders.length} strict-lib harness script(s) run tsx without setting NODE_USE_ENV_PROXY=1:`,
+          '',
+          ...offenders.map(({ manifest, name }) => `  ${manifest}: "${name}"`),
+          '',
+          `Write each as \`${ENV}tsx …\`, with nothing chained to it: the generators fetch the TypeScript lib files from GitHub.`,
+        ].join('\n'),
+      )
+    : Result.ok(held.length);
+};
+
 // `NODE_OPTIONS` is replaced rather than appended to, as in the scripts that
 // had this shape first: a script that needs another Node option sets its own
 // (`z:eslint`), so what the command spawns loses nothing a script relies on.
@@ -278,6 +356,8 @@ const isInShape = (script: string): boolean => {
 // entry does not re-export, a module loaded through a wrapped `require`),
 // `node:http(s)`, `fetch` reached by another name, and a file the script runs
 // through another process (`pnpm run`, a spawned command) rather than names.
+// The strict-lib harness scripts that the root runs through `runInHarnesses`
+// are held by `findUnproxiedHarnessScripts` instead.
 const reachesNetwork = (file: string, text: string): boolean => {
   const callsFetch = (node: ts.Node): boolean => {
     if (ts.isCallExpression(node)) {
@@ -322,6 +402,49 @@ const isInNetworkShape = (script: string): boolean => {
   );
 };
 
+/** The strict-lib harnesses' manifests: path → `scripts`. */
+const readHarnessManifests = async (): Promise<
+  Result<ReadonlyMap<string, ReadonlyRecord<string, string>>, string>
+> => {
+  const tracked = await listTrackedFiles();
+
+  if (Result.isErr(tracked)) {
+    return tracked;
+  }
+
+  const mut_manifests = new Map<string, ReadonlyRecord<string, string>>();
+
+  for (const file of tracked.value) {
+    if (!HARNESS_MANIFEST.test(file)) {
+      continue;
+    }
+
+    const contents = await readRepositoryFile(file);
+
+    if (Result.isErr(contents)) {
+      return contents;
+    }
+
+    const parsed = Json.parse(contents.value);
+
+    if (Result.isErr(parsed)) {
+      return Result.err(
+        `Failed to parse ${file}: ${unknownToString(parsed.value)}`,
+      );
+    }
+
+    mut_manifests.set(file, readScripts(parsed.value));
+  }
+
+  return Result.ok(mut_manifests);
+};
+
+const HARNESS_MANIFEST = /^strict-lib\/v\d+\.\d+\/package\.json$/u;
+
+const RUNS_TSX = /(?:^|[\s;&|(])tsx\s/u;
+
+const SHELL_OPERATOR = /[;&|`]|\$\(/u;
+
 if (isDirectlyExecuted(import.meta.url)) {
   const result = await checkProxyScripts().catch((error: unknown) =>
     Result.err(unknownToString(error)),
@@ -334,6 +457,6 @@ if (isDirectlyExecuted(import.meta.url)) {
   }
 
   console.info(
-    `✅ All ${result.value} root script(s) that may reach the network are in a shape that sets NODE_USE_ENV_PROXY=1.`,
+    `✅ All ${result.value} root and strict-lib harness script(s) that may reach the network are in a shape that sets NODE_USE_ENV_PROXY=1.`,
   );
 }
