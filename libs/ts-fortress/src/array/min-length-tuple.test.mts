@@ -298,12 +298,8 @@ describe(minLengthTuple, () => {
       assert.deepStrictEqual(dyn.fill(ys), [1, 2, 3, 4, 5, 0]);
     });
 
-    test('fill rejects a size that is not a length, whatever the input length', () => {
-      const bad = minLengthTuple(2.5, number());
-
-      expect(() => bad.fill([1, 2])).toThrow(TypeError);
-
-      expect(() => bad.fill([1, 2, 3])).toThrow(TypeError);
+    test('rejects a size that is not a length when the type is built', () => {
+      expect(() => minLengthTuple(2.5, number())).toThrow(TypeError);
     });
 
     test('fill still pads an array that is too short', () => {

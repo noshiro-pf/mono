@@ -5,7 +5,7 @@ import {
   createPrimitiveValidationError,
   type ValidationError,
 } from '../utils/index.mjs';
-import { buildType, validateElements } from './build-type.mjs';
+import { buildType, fillElements, validateElements } from './build-type.mjs';
 
 export type { MinLengthArray } from 'ts-type-forge';
 
@@ -46,7 +46,7 @@ export function minLengthArray<A>(
 ): Type<readonly A[]>;
 
 export function minLengthArray<A>(
-  minLength: number,
+  size: number,
   elementType: Type<A>,
   options?: Partial<
     Readonly<{
@@ -57,6 +57,10 @@ export function minLengthArray<A>(
 ): Type<readonly A[]> {
   type T = readonly A[];
 
+  // Converted once, so that a size that is not a length throws here, at the
+  // call that passed it, rather than from some calls of `fill`.
+  const minLength = asUint32(size);
+
   const typeName =
     options?.typeName ??
     `MinLengthArray<${minLength}, ${elementType.typeName}>`;
@@ -65,7 +69,7 @@ export function minLengthArray<A>(
     (): T =>
       options?.defaultValue ??
       // An array of `minLength` elements is the shortest value satisfying the bound.
-      Arr.create(asUint32(minLength), elementType.defaultValue),
+      Arr.create(minLength, elementType.defaultValue),
   );
 
   const validate: Type<T>['validate'] = (a) => {
@@ -99,19 +103,10 @@ export function minLengthArray<A>(
     return validateElements(a, elementType);
   };
 
-  const fill: Type<T>['fill'] = (a) => {
-    if (!Arr.isArray(a)) {
-      return getDefaultValue();
-    }
-
-    // Keep the input if it is long enough; otherwise pad up to `minLength`.
-    return a.length >= minLength
-      ? Arr.map(a, (el) => elementType.fill(el) satisfies A)
-      : Arr.map(
-          Arr.seq(asUint32(minLength)),
-          (i) => elementType.fill(a[i]) satisfies A,
-        );
-  };
+  const fill: Type<T>['fill'] = (a) =>
+    Arr.isArray(a)
+      ? fillElements(a, elementType, { minLength, maxLength: undefined })
+      : getDefaultValue();
 
   return buildType({
     typeName,

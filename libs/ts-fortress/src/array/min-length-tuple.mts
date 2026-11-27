@@ -9,6 +9,7 @@ import {
   prependIndexToValidationErrors,
   type ValidationError,
 } from '../utils/index.mjs';
+import { fillElements } from './build-type.mjs';
 
 export type { MinLengthTuple } from 'ts-type-forge';
 
@@ -51,6 +52,10 @@ export function minLengthTuple<A>(
 ): Type<readonly A[]> {
   type T = readonly A[];
 
+  // Converted once, so that a size that is not a length throws here, at the
+  // call that passed it, rather than from some calls of `fill`.
+  const minLength = asUint32(size);
+
   const typeName =
     options?.typeName ?? `MinLengthTuple<${size}, ${elementType.typeName}>`;
 
@@ -58,7 +63,7 @@ export function minLengthTuple<A>(
     (): T =>
       options?.defaultValue ??
       // An array of `size` elements is the shortest value satisfying the bound.
-      Arr.create(asUint32(size), elementType.defaultValue),
+      Arr.create(minLength, elementType.defaultValue),
   );
 
   const validate: Type<T>['validate'] = (a) => {
@@ -73,7 +78,7 @@ export function minLengthTuple<A>(
       ]);
     }
 
-    if (a.length < size) {
+    if (a.length < minLength) {
       return Result.err([
         {
           path: [],
@@ -82,7 +87,7 @@ export function minLengthTuple<A>(
           typeName,
           details: {
             kind: 'array-min-length',
-            minLength: size,
+            minLength,
             actualLength: a.length,
           },
         } satisfies ValidationError,
@@ -106,27 +111,10 @@ export function minLengthTuple<A>(
         Result.ok(a as unknown as T);
   };
 
-  const fill: Type<T>['fill'] = (a) => {
-    if (!Arr.isArray(a)) {
-      return getDefaultValue();
-    }
-
-    // Every element of the input is kept, and a shorter one is padded up to
-    // `size`. The indices are walked rather than the array mapped, because
-    // `map` skips the holes of a sparse array and would leave them unfilled:
-    // a hole is not an `A`, so the result is dense and as large as the input's
-    // `length` says, however few entries a sparse input holds.
-    // One pass over the indices, where the `Arr.map(Arr.seq(n), …)` of the
-    // sibling validators builds an index array first: the input may be long.
-    // `asUint32(size)` runs before the lengths are compared, so that a `size`
-    // that is not a length throws for an array of any length and never reaches
-    // `Array.from`, which would take a `NaN` `length` as 0 and drop the input.
-    // The input's own `length` is used as it is, since only a `Proxy` could
-    // report one that is not a length.
-    const length = Math.max(a.length, asUint32(size));
-
-    return Array.from({ length }, (_, i) => elementType.fill(a[i]) satisfies A);
-  };
+  const fill: Type<T>['fill'] = (a) =>
+    Arr.isArray(a)
+      ? fillElements(a, elementType, { minLength, maxLength: undefined })
+      : getDefaultValue();
 
   const prune = (a: T): T => a.map((el) => elementType.prune(el));
 
@@ -144,7 +132,7 @@ export function minLengthTuple<A>(
     structure: {
       kind: 'array',
       elementType,
-      minLength: size,
+      minLength,
       maxLength: undefined,
     },
   };

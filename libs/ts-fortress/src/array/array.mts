@@ -8,6 +8,7 @@ import {
   prependIndexToValidationErrors,
   type ValidationError,
 } from '../utils/index.mjs';
+import { fillElements } from './build-type.mjs';
 
 /**
  * Creates a `Type` for a readonly array whose elements are of `elementType`.
@@ -80,7 +81,10 @@ export const array = <A,>(
       ? getDefaultValue()
       : options?.onInvalidElement === 'drop'
         ? a.filter((e) => elementType.is(e)).map((e) => elementType.fill(e))
-        : a.map((e) => elementType.fill(e));
+        : fillElements(a, elementType, {
+            minLength: undefined,
+            maxLength: undefined,
+          });
 
   const prune = (a: T): T => a.map((e) => elementType.prune(e));
 
