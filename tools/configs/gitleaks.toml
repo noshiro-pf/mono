@@ -1,0 +1,18 @@
+# The gitleaks configuration `check:prose:gitleaks`
+# (tools/scripts/cmd/check-gitleaks.mts) runs with: gitleaks's own rules, and
+# the values that look like keys and are public by design. A value that is
+# public on one line only is marked there with a `gitleaks:allow` comment and
+# its reason instead; an entry here covers a kind of file, never one secret.
+
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "A Firebase web app's API key, which identifies the project to the client SDK and is shipped to every browser; Security Rules and App Check are what guard the data."
+targetRules = ["gcp-api-key", "generic-api-key"]
+paths = ['''(^|/)apps/[^/]+/src/(.+/)?(firebase-config|firebase/config|constants/firebase)\.mts$''']
+
+[[allowlists]]
+description = "The `key` of a Chrome extension's manifest: the extension's public key, which fixes its id."
+targetRules = ["generic-api-key"]
+paths = ['''(^|/)apps/[^/]+/public/manifest\.json$''']

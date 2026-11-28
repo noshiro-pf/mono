@@ -99,7 +99,8 @@ export const embedPlacement = (
     'benchmark',
     Obj.filter(
       placementFigures(operations, locale),
-      (_value, key) => key === 'placement/behind' || used.has(key),
+      // A figure's name, which gitleaks reads as a credential.
+      (_value, key) => key === 'placement/behind' || used.has(key), // gitleaks:allow
     ),
     otherMarkers,
   );
