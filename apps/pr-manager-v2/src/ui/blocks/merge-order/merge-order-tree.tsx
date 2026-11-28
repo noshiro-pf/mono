@@ -1,5 +1,5 @@
 import {
-  combine,
+  derive,
   map,
   skipIfNoChange,
   type InitializedObservable,
@@ -54,11 +54,9 @@ export const MergeOrderTree = ({
         const layerCount = layers.pipe(map((list) => list.length));
 
         // Folded only while there is something below to fold.
-        const folded = combine([number, layerCount, fold.folded]).pipe(
-          map(
-            ([n, count, foldedNumbers]) =>
-              count > 0 && foldedNumbers.includes(n),
-          ),
+        const folded = derive(
+          [number, layerCount, fold.folded],
+          (n, count, foldedNumbers) => count > 0 && foldedNumbers.includes(n),
         );
 
         return (

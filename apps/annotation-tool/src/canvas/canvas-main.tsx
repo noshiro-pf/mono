@@ -3,7 +3,7 @@ import {
   InteractionManager,
   settings as mut_settings,
 } from 'pixi.js-legacy';
-import { onScopeDispose } from 'synstate';
+import { onCleanup } from 'synstate';
 import {
   constant,
   createAfterUpdate,
@@ -124,7 +124,7 @@ export const CanvasMain = ({
 
   hue$.subscribe(attachPointerEventListener);
 
-  onScopeDispose(() => {
+  onCleanup(() => {
     mut_state.removePointerEventListener();
 
     // Not one of the application's own plugins, which `destroy` takes down.

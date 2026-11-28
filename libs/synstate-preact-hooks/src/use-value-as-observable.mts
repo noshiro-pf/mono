@@ -3,14 +3,14 @@ import {
   source,
   withInitialValue,
   type InitializedObservable,
-  type SourceObservable,
+  type Source,
 } from 'synstate';
 import { Optional } from 'ts-data-forge';
 
 export const useValueAsObservable = <A,>(
   input: A,
 ): InitializedObservable<A> => {
-  const sourceObservable = Preact.useMemo<SourceObservable<A>>(source, []);
+  const sourceObservable = Preact.useMemo<Source<A>>(source, []);
 
   const state = Preact.useMemo(
     () => sourceObservable.pipe(withInitialValue(input)),
@@ -22,7 +22,9 @@ export const useValueAsObservable = <A,>(
   Preact.useLayoutEffect(
     // eslint-disable-next-line unicorn/consistent-function-scoping
     () => () => {
-      state.complete();
+      state.dispose();
+
+      sourceObservable.dispose();
     },
     [],
   );
@@ -30,7 +32,7 @@ export const useValueAsObservable = <A,>(
   Preact.useEffect(() => {
     // The observable already holds the value it was created with.
     if (!Object.is(Optional.unwrap(state.getSnapshot()), input)) {
-      sourceObservable.next(input);
+      sourceObservable.emit(input);
     }
   }, [input]);
 

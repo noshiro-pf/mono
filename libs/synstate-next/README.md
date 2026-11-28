@@ -45,10 +45,9 @@ synstate や synstate-dom に入れたバグ修正・セキュリティ修正・
 
 ## Benchmark
 
-`pnpm run benchmark` compares synstate-next with synstate on the graphs a state
-library spends its time in and writes [BENCHMARK.md](BENCHMARK.md); both are
-imported from `dist/`, so `pnpm run ws:build` comes first. The script formats
-the file with Prettier as it writes it. The comparison of synstate-dom-next with
-synstate-dom is `apps/synstate-dom-benchmark`'s `pnpm run benchmark:next`,
-written to its
+[BENCHMARK.md](BENCHMARK.md) is the last comparison of synstate-next with the
+synstate it replaced, on the graphs a state library spends its time in; the
+script that wrote it went with that synstate. The comparison of
+synstate-dom-next with synstate-dom is `apps/synstate-dom-benchmark`'s
+`pnpm run benchmark:next`, written to its
 [RESULTS-NEXT.md](../../apps/synstate-dom-benchmark/RESULTS-NEXT.md).

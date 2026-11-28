@@ -1,4 +1,4 @@
-import { createState, map, onScopeDispose } from 'synstate';
+import { createState, map, onCleanup } from 'synstate';
 import {
   constant,
   createAfterUpdate,
@@ -78,7 +78,7 @@ export const Collapse = ({
     mut_state.move += 1;
   };
 
-  onScopeDispose(cancelTimers);
+  onCleanup(cancelTimers);
 
   const measure = (): number => mut_state.body?.clientHeight ?? 0;
 

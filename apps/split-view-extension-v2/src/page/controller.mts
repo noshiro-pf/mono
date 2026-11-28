@@ -2,7 +2,7 @@ import {
   createState,
   derive,
   map,
-  onScopeDispose,
+  onCleanup,
   type InitializedObservable,
 } from 'synstate';
 import { listenInScope } from 'synstate-dom';
@@ -116,7 +116,7 @@ export const createController = (): Controller => {
   /** Switches asked for, so that only the last one asked for lands. */
   const mut_switches = { requested: 0 };
 
-  onScopeDispose(() => {
+  onCleanup(() => {
     clearTimeout(mut_timers.save);
 
     clearTimeout(mut_timers.notice);
@@ -660,7 +660,7 @@ export const createController = (): Controller => {
   };
 
   // The list as the worker stored it, whichever tab asked (spec W9, W10).
-  onScopeDispose(
+  onCleanup(
     watchStorage({
       list: (written) => {
         mut_listWrites.seen += 1;
@@ -740,7 +740,7 @@ export const createController = (): Controller => {
 
   chrome.runtime.onMessage.addListener(onWorkerMessage);
 
-  onScopeDispose(() => {
+  onCleanup(() => {
     chrome.runtime.onMessage.removeListener(onWorkerMessage);
   });
 
@@ -784,7 +784,7 @@ export const createController = (): Controller => {
 
   const noteTimer = setInterval(note, tabNoteIntervalMs);
 
-  onScopeDispose(() => {
+  onCleanup(() => {
     clearInterval(noteTimer);
   });
 

@@ -17,13 +17,14 @@ type Options = readonly [];
 type MessageIds = 'unboundedCounterPipe';
 
 /**
- * `counter(ms).pipe(...)` keeps no reference to the counter, so nothing can
- * complete it, and since synstate 4.0.0 a child completing does not complete
- * its parents, so the derived observable cannot either. Only a counter that
- * stops by itself, after `{ times: N }` emissions, can be piped without a name.
+ * `counter(ms).pipe(...)` keeps no reference to the counter, so only its owner
+ * can dispose it, and a `take` below it settling does not stop it: it ticks
+ * until the owner goes, and for ever when made outside every owner. Only a
+ * counter that stops by itself, after `{ times: N }` emissions, can be piped
+ * without a name.
  *
  * The type cannot forbid this: the same `.pipe` is fine once the counter is
- * bound to a name that can be completed later.
+ * bound to a name that can be disposed later.
  */
 export const noUnboundedCounterPipe: TSESLint.RuleModule<MessageIds, Options> =
   {
@@ -31,12 +32,12 @@ export const noUnboundedCounterPipe: TSESLint.RuleModule<MessageIds, Options> =
       type: 'problem',
       docs: {
         description:
-          'Disallow calling `.pipe` directly on a synstate `counter(...)` that has no `times` option, since nothing can ever stop that counter.',
+          'Disallow calling `.pipe` directly on a synstate `counter(...)` that has no `times` option, since nothing but its owner can stop that counter.',
       },
       schema: [],
       messages: {
         unboundedCounterPipe:
-          'This `counter(...)` is piped without being named and without a `times` option, so nothing can ever stop it. Pass `{ times: N }`, or bind the counter to a name and complete it when it is no longer needed.',
+          'This `counter(...)` is piped without being named and without a `times` option, so nothing but its owner can stop it. Pass `{ times: N }`, or bind the counter to a name and dispose it when it is no longer needed.',
       },
       defaultOptions: [],
     },

@@ -31,7 +31,7 @@ export const createMemoryBackend = (now: number): Backend => {
       const subscription = session.subscribe(listener);
 
       return () => {
-        subscription.unsubscribe();
+        subscription();
       };
     },
     signIn: () => {

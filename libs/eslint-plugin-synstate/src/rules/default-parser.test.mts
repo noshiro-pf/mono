@@ -8,10 +8,7 @@ import { eslintPluginSynstate } from '../plugin.mjs';
 const linter = new Linter();
 
 /** `code` as `eslint --fix` leaves it with `rule` alone on, read by espree. */
-const fixWithDefaultParser = (
-  rule: 'no-identity-map' | 'prefer-derive' | 'prefer-map-to',
-  code: string,
-): string =>
+const fixWithDefaultParser = (rule: 'no-identity-map', code: string): string =>
   linter.verifyAndFix(
     code,
     {
@@ -27,21 +24,6 @@ const fixWithDefaultParser = (
   ).output;
 
 describe('fixes in a file the default parser reads', () => {
-  test('prefer-map-to adds the name to the import', () => {
-    expect(
-      fixWithDefaultParser(
-        'prefer-map-to',
-        dedent`
-          import { map } from 'synstate';
-          const on$ = opened$.pipe(map(() => true));
-        `,
-      ),
-    ).toBe(dedent`
-      import { map, mapTo } from 'synstate';
-      const on$ = opened$.pipe(mapTo(true));
-    `);
-  });
-
   test('no-identity-map uses the name already imported', () => {
     expect(
       fixWithDefaultParser(
@@ -64,20 +46,5 @@ describe('fixes in a file the default parser reads', () => {
     `;
 
     expect(fixWithDefaultParser('no-identity-map', code)).toBe(code);
-  });
-
-  test('prefer-derive adds the name to the import', () => {
-    expect(
-      fixWithDefaultParser(
-        'prefer-derive',
-        dedent`
-          import { combine, map } from 'synstate';
-          const sum$ = combine([a$, b$]).pipe(map(([a, b]) => a + b));
-        `,
-      ),
-    ).toBe(dedent`
-      import { combine, map, derive } from 'synstate';
-      const sum$ = derive([a$, b$], (a, b) => a + b);
-    `);
   });
 });

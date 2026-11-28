@@ -10,7 +10,7 @@ export const runBenchmark = (n: number): number => {
 
   let mut_lastValue = 0;
 
-  const subscription = quadrupled.subscribe((v) => {
+  const unsubscribe = quadrupled.subscribe((v) => {
     mut_lastValue = v;
   });
 
@@ -18,7 +18,7 @@ export const runBenchmark = (n: number): number => {
     setCounter(mut_i);
   }
 
-  subscription.unsubscribe();
+  unsubscribe();
 
   return mut_lastValue;
 };

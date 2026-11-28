@@ -5,20 +5,6 @@ version: '0.2'
 import:
   - '../../.cspell.config.yaml'
 words:
-  - astrojs
-  - jotai
-  - katex
-  - lerp
-  - lerps
-  - maier
-  - mobx
-  - noto
-  - recombinations
-  - recomputations
-  - reduxjs
-  - resvg
-  - scanₘ
-  - seti
-  - sfnt
-  - solidjs
-  - zustand
+  - mdxjs # micromark-extension-mdxjs
+  - solidjs # @solidjs/signals, on the comparison pages
+  - seti # Starlight's seti:* icon names

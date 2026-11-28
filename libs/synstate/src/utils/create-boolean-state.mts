@@ -1,38 +1,7 @@
-import type { InitializedObservable } from '../core/index.mjs';
-import type { StateOptions } from './create-reducer.mjs';
+import type { InitializedObservable, StateOptions } from '../core/index.mjs';
 import { createState } from './create-state.mjs';
 
-/**
- * Creates a reactive boolean state with convenient methods for boolean operations.
- * Extends `createState` with boolean-specific helpers like `toggle`, `setTrue`, and `setFalse`.
- *
- * @param initialState - The initial boolean value
- * @param options - {@link StateOptions}: `equals` (default `Object.is`),
- *   to pass on only the updates that change the state
- * @returns A 2-element tuple: `[state, { setTrue, setFalse, toggle, setState, updateState, resetState, getSnapshot, initialState }]`
- *
- * @example
- * ```ts
- * import type * as React from 'react';
- * import { createBooleanState } from 'synstate';
- * import { useObservableValue } from 'synstate-react-hooks';
- *
- * // Menu drawer open/close state.
- * // setTrue and setFalse can be passed directly as callbacks — no need to
- * // create wrapper functions like `() => setState(true)`.
- * const [menuOpen$, { setTrue: openMenu, setFalse: closeMenu }] =
- *   createBooleanState(false);
- *
- * const SampleComponent = (): React.JSX.Element => (
- *   <MenuDrawer
- *     open={useObservableValue(menuOpen$)}
- *     onClose={closeMenu}
- *     onOpen={openMenu}
- *   />
- * );
- * ```
- */
-
+/** A boolean state with `setTrue`, `setFalse` and `toggle`. */
 export const createBooleanState = (
   initialState: boolean,
   options?: StateOptions<boolean>,
@@ -41,19 +10,19 @@ export const createBooleanState = (
   utils: Readonly<{
     setTrue: () => void;
     setFalse: () => void;
-    setState: (next: boolean) => boolean;
-    toggle: () => boolean;
-    updateState: (updateFn: (prev: boolean) => boolean) => boolean;
-    resetState: () => boolean;
+    toggle: () => void;
+    setState: (next: boolean) => void;
+    updateState: (updateFn: (current: boolean) => boolean) => void;
+    resetState: () => void;
     getSnapshot: () => boolean;
     initialState: boolean;
   }>,
 ] => {
-  const [state, setState, { updateState, resetState, getSnapshot }] =
+  const [node, setState, { updateState, resetState, getSnapshot }] =
     createState(initialState, options);
 
   return [
-    state,
+    node,
     {
       setTrue: () => {
         setState(true);
@@ -61,7 +30,9 @@ export const createBooleanState = (
       setFalse: () => {
         setState(false);
       },
-      toggle: () => updateState((s) => !s),
+      toggle: () => {
+        updateState(negate);
+      },
       setState,
       updateState,
       resetState,
@@ -70,3 +41,5 @@ export const createBooleanState = (
     },
   ] as const;
 };
+
+const negate = (b: boolean): boolean => !b;

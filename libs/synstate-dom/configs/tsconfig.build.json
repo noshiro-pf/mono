@@ -4,6 +4,8 @@
     "../../../tools/configs/tsconfig/tsconfig.vite.json"
   ],
   "compilerOptions": {
+    "jsx": "react-jsx",
+    "jsxImportSource": "synstate-dom",
     "sourceMap": true,
     "declaration": true,
     "declarationMap": true,

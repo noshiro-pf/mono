@@ -122,7 +122,7 @@ export const createRoomStore = (deps: RoomDeps): RoomStore => {
 
       setMyName(username);
 
-      response.next({ room: added.value, myName: username });
+      response.emit({ room: added.value, myName: username });
 
       return added;
     };
@@ -250,12 +250,12 @@ export const createRoomStore = (deps: RoomDeps): RoomStore => {
       });
 
       mut_watching.stopActions = deps.api.watchActions(id, (actions) => {
-        actionsFromDb.next(actions);
+        actionsFromDb.emit(actions);
       });
     });
 
     return () => {
-      subscription.unsubscribe();
+      subscription();
 
       stopWatching();
     };

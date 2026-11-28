@@ -1,4 +1,4 @@
-import { onScopeDispose, type InitializedObservable } from 'synstate';
+import { onCleanup, type InitializedObservable } from 'synstate';
 import { Num, Optional, Result } from 'ts-data-forge';
 import {
   centreAt,
@@ -96,8 +96,8 @@ export const dagBox = (
     });
   });
 
-  onScopeDispose(() => {
-    subscription.unsubscribe();
+  onCleanup(() => {
+    subscription();
 
     observer.disconnect();
 

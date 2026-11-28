@@ -55,7 +55,7 @@ const usage = (s: number, i: number): string =>
       ][i % 4] ?? '');
 
 const fixture = (srcIndex: string): string => dedent`
-  import { state } from 'synstate-next';
+  import { state } from 'synstate';
   import { createI18n, type TranslationOf } from ${JSON.stringify(srcIndex)};
 
   const en = {

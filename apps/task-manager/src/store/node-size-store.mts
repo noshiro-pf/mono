@@ -31,7 +31,7 @@ export const createNodeSizeStore = (deps: NodeSizeDeps): NodeSizeStore => {
       const subscription = size.subscribe(deps.save);
 
       return () => {
-        subscription.unsubscribe();
+        subscription();
       };
     },
   };

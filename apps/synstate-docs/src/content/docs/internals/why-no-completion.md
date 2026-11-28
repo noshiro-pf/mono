@@ -1,0 +1,131 @@
+---
+title: Why there is no completion
+description: What completion did in synstate 9, why each of its jobs is done otherwise in synstate — owners, nodes that leave their parents, settled asked where it is used — and what that saves.
+---
+
+synstate 9, like RxJS, had a second signal beside the values: **completion**, an observable saying "I will emit no more", sent down the graph to everything derived from it. synstate has none. This page says what completion was for, and what does each of its jobs now.
+
+## What completion did
+
+In synstate 9, completion had four jobs:
+
+1. **Telling an operator that an input is over.** `mergeMap` and `switchMap` had to know when an inner observable could emit no more, to let it go; `zip` to stop once a parent ran out; a parent completing completed its children once none of their parents was live.
+2. **Freeing the graph.** A completed observable left its parents, and what nobody depended on any more could be collected. Completion was how a finished `take(1)` or a fired `timer` released what it held.
+3. **Ending something that waits for the end.** `collectToArray` resolved a promise with every value once its source completed, and a subscriber could pass an `onComplete`.
+4. **Telling a pending value to come out.** A `debounce` or an `audit` holding a value when its source completed passed it on (`flush`), so nothing was lost at the end of a stream.
+
+Each job made every operator responsible for passing completion on correctly, in the right order relative to the values, during an update or after it (`completeAfterPropagation`). An operator that forgot left the graph below it alive forever.
+
+## What does each job now
+
+| Job                        | synstate 9                     | synstate                                                                                      |
+| :------------------------- | :----------------------------- | :-------------------------------------------------------------------------------------------- |
+| An input is over           | Completion pushed down         | `settled`, **asked** where the answer is used                                                 |
+| Freeing the graph          | Completed nodes leave          | Owners dispose; a node that is done leaves its parents by itself                              |
+| Waiting for the end        | `collectToArray`, `onComplete` | `settled` read with the last value, or the end sent as a value; an owner's end is `onCleanup` |
+| A pending value at the end | `flush` on completion          | Gone with completion: disposing drops it, as `dispose` already did in synstate 9              |
+
+### Owners are the lifetime
+
+Memory is released by disposal, and disposal follows ownership: everything made while an owner runs belongs to it ([Owners and lifetime](/mono/synstate/guides/owners-and-lifetime/)). A dialog's derived values, timers and requests go when the dialog's owner is disposed, whether any of them finished or not. Nothing needs to travel down the graph for that, and nothing needs counting.
+
+### A node that is done leaves its parents
+
+A `take`, `takeWhile` or `takeUntil` that will pass nothing more takes itself out of its parents' children, keeping its value. Its parents neither visit it nor keep it alive, and its own subscribers simply receive nothing more:
+
+```tsx
+import { createRootOwner, createState, take, timer } from 'synstate';
+import { Optional } from 'ts-std-forge';
+
+const [a, setA] = createState(0);
+
+// The value held at the start counts: 0, 1, 2.
+const firstThree = a.pipe(take(3));
+
+const mut_seen: number[] = [];
+
+firstThree.subscribe((x) => {
+    mut_seen.push(x);
+});
+
+setA(1);
+
+setA(2);
+
+// Done: it has left `a`, keeps its value, and passes nothing more.
+setA(3);
+
+assert.deepStrictEqual(mut_seen, [0, 1, 2]);
+
+assert.strictEqual(firstThree.value, 2);
+
+// A source that is done keeps its value and its subscribers until its
+// owner disposes it.
+const owner = createRootOwner();
+
+const fired = owner.run(() => timer(100));
+
+await vi.advanceTimersByTimeAsync(100);
+
+assert.deepStrictEqual(fired.getSnapshot(), Optional.some(0));
+
+owner.dispose();
+```
+
+### `settled` is asked, not announced
+
+An operator that follows inner observables (`mergeMap`, a `switchMap` that may hold one finished request) still needs to know when one can emit no more. Each node answers `settled` when asked: a source once it is disposed or its timer, promise or subscription is over; a derived node once every parent is settled and it waits on nothing of its own (a `debounce` timer, an inner observable). `mergeMap` asks when an inner observable is projected or emits, and lets it go once it is settled and the effects of its update have read what it emitted. An operator written with `createDerived` gives its own `settled` when it emits later than the update that made it recompute ([Custom operators and sources](/mono/synstate/guides/custom-operators-and-sources/#an-async-operator)).
+
+Asking where the answer is used costs nothing elsewhere: no operator forwards a signal it does not care about, and none can forget to.
+
+### Telling the last value
+
+`settled` is on every observable, so a subscriber can ask it too. Since it is asked, it helps only where the end comes with a value: a `take` is settled by the time its subscriber receives its last value, and so is a `takeWhile` with `inclusive`, which passes the value that ends it. A plain `takeWhile` does not know that a value is its last until the next one fails, unless its source is settled by then, and it passes the failing value to nobody. This holds for a subscriber on the operator itself or below a `map`; below an operator that can drop the last value (`filter`) or emit it later (`debounce`, `switchMap`), the last value and `settled` can come apart. Where the end has no value of its own, the producer sends it as one, as an iterator's `{ done, value }` does and as a `Result` carries an error:
+
+```tsx
+import { createValueEmitter, takeWhile } from 'synstate';
+
+const [progress, report] = createValueEmitter<number>();
+
+// `inclusive` passes the value that ends it, so `settled` is already true
+// when the subscriber receives that value.
+const upload = progress.pipe(takeWhile((p) => p < 100, { inclusive: true }));
+
+const mut_log: string[] = [];
+
+upload.subscribe((p) => {
+    mut_log.push(upload.settled ? `done at ${p}` : `${p}%`);
+});
+
+report(30);
+
+report(100);
+
+report(40);
+
+assert.deepStrictEqual(mut_log, ['30%', 'done at 100']);
+
+// Or the producer sends the end as a value.
+const [transfer, send] =
+    createValueEmitter<
+        Readonly<{ done: false; percent: number } | { done: true }>
+    >();
+
+const mut_transferLog: string[] = [];
+
+transfer.subscribe((t) => {
+    mut_transferLog.push(t.done ? 'done' : `${t.percent}%`);
+});
+
+send({ done: false, percent: 30 });
+
+send({ done: true });
+
+assert.deepStrictEqual(mut_transferLog, ['30%', 'done']);
+```
+
+## What that saves
+
+- **One kind of thing travels the graph.** An update carries values and nothing else, so its order is the order of depth and nothing has to be interleaved with it.
+- **Operators are shorter.** An operator is a `recompute` and, if it emits later, a `settled`. synstate 9's operators each had a completion path beside the value path.
+- **No leak by a forgotten signal.** Lifetime does not depend on every operator between a source and a subscriber passing completion on.

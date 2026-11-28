@@ -33,17 +33,17 @@ ruleTester.run('no-observable-in-handler', noObservableInHandler, {
       `,
     },
     {
-      name: 'work wrapped in the run of a scope taken at mount time',
+      name: 'work wrapped in the run of an owner taken at mount time',
       filename: tsx,
       code: dedent`
-        import { getCurrentScope, map } from 'synstate';
+        import { getOwner, map } from 'synstate';
         const Row = () => {
-          const scope = getCurrentScope();
+          const owner = getOwner();
           return (
             <button
               onClick={async () => {
                 await save();
-                scope?.run(() => {
+                owner?.run(() => {
                   keep(count$.pipe(map((n) => n * 2)));
                 });
               }}
@@ -53,7 +53,7 @@ ruleTester.run('no-observable-in-handler', noObservableInHandler, {
       `,
     },
     {
-      name: 'an observable made under `untracked`, which belongs to no scope on purpose',
+      name: 'an observable made under `untracked`, which belongs to no owner on purpose',
       filename: tsx,
       code: dedent`
         import { derive, untracked } from 'synstate';
@@ -82,9 +82,9 @@ ruleTester.run('no-observable-in-handler', noObservableInHandler, {
       name: 'a local binding that shadows the import',
       filename: tsx,
       code: dedent`
-        import { combine } from 'synstate';
+        import { derive } from 'synstate';
         const Row = () => (
-          <button onClick={() => { const combine = (xs) => xs; keep(combine([1, 2])); }} />
+          <button onClick={() => { const derive = (xs) => xs; keep(derive([1, 2])); }} />
         );
       `,
     },
@@ -106,12 +106,12 @@ ruleTester.run('no-observable-in-handler', noObservableInHandler, {
       `,
     },
     {
-      name: 'an event listener’s scope wrapped in run',
+      name: 'an event listener’s owner wrapped in run',
       code: dedent`
-        import { getCurrentScope, map } from 'synstate';
-        const scope = getCurrentScope();
+        import { getOwner, map } from 'synstate';
+        const owner = getOwner();
         window.addEventListener('resize', () => {
-          scope?.run(() => keep(width$.pipe(map((w) => w / 2))));
+          owner?.run(() => keep(width$.pipe(map((w) => w / 2))));
         });
       `,
     },
@@ -143,34 +143,24 @@ ruleTester.run('no-observable-in-handler', noObservableInHandler, {
       `,
     },
     {
-      name: 'a scope made with a parent, which is disposed with it',
-      filename: tsx,
-      code: dedent`
-        import { createScope, derive } from 'synstate';
-        const Row = () => (
-          <button onClick={() => { createScope(rowScope).run(() => keep(derive([a$], (a) => a))); }} />
-        );
-      `,
-    },
-    {
-      // `scope.run(build)` is fine. `createScope().run(build)` leaks, but is a
+      // `owner.run(build)` is fine. `createOwner().run(build)` leaks, but is a
       // miss the README names: a function passed by name is not followed (see
       // 'a function of the file passed as a value, not called').
-      name: 'a function of the file passed by name to a scope’s run',
+      name: 'a function of the file passed by name to an owner’s run',
       filename: tsx,
       code: dedent`
-        import { createScope, derive } from 'synstate';
+        import { createOwner, derive } from 'synstate';
         const build = () => { keep(derive([a$], (a) => a)); };
         const Row = () => (
           <>
-            <button onClick={() => { scope.run(build); }} />
-            <button onClick={() => { createScope().run(build); }} />
+            <button onClick={() => { owner.run(build); }} />
+            <button onClick={() => { createOwner().run(build); }} />
           </>
         );
       `,
     },
     {
-      name: 'an app that render mounts in a root scope, from a function a handler calls',
+      name: 'an app that render mounts in a root owner, from a function a handler calls',
       filename: tsx,
       code: dedent`
         import { derive } from 'synstate';
@@ -180,21 +170,21 @@ ruleTester.run('no-observable-in-handler', noObservableInHandler, {
       `,
     },
     {
-      // A miss the README names: a scope bound in the handler is trusted like
+      // A miss the README names: an owner bound in the handler is trusted like
       // any other, although nothing disposes it.
-      name: 'a scope bound in the handler, then run',
+      name: 'an owner bound in the handler, then run',
       filename: tsx,
       code: dedent`
-        import { createScope, derive } from 'synstate';
+        import { createOwner, derive } from 'synstate';
         const Row = () => (
-          <button onClick={() => { const scope = createScope(); scope.run(() => keep(derive([a$], (a) => a))); }} />
+          <button onClick={() => { const owner = createOwner(); owner.run(() => keep(derive([a$], (a) => a))); }} />
         );
       `,
     },
     {
       // The rule follows code written in the handler and functions of the file
       // it calls by name, not functions handed around as values: a component
-      // passed on may be mounted later in its own scope, and a callback passed
+      // passed on may be mounted later in its own owner, and a callback passed
       // to a timer by name is a miss the README names.
       name: 'a function of the file passed as a value, not called',
       filename: tsx,
@@ -236,7 +226,7 @@ ruleTester.run('no-observable-in-handler', noObservableInHandler, {
       `,
     },
     {
-      name: 'a subscription made at mount time, which the scope ends',
+      name: 'a subscription made at mount time, which the owner ends',
       filename: tsx,
       code: dedent`
         import { createState } from 'synstate';
@@ -257,7 +247,7 @@ ruleTester.run('no-observable-in-handler', noObservableInHandler, {
       `,
     },
     {
-      name: 'subscribe on a const bound to an observable that completes by itself',
+      name: 'subscribe on a const bound to an observable that settles by itself',
       filename: tsx,
       code: dedent`
         import { just, timer } from 'synstate';
@@ -267,7 +257,7 @@ ruleTester.run('no-observable-in-handler', noObservableInHandler, {
       `,
     },
     {
-      name: 'subscribe on a pipe of an observable that completes by itself, or ended by take',
+      name: 'subscribe on a pipe of an observable that settles by itself, or ended by take',
       filename: tsx,
       code: dedent`
         import { createState, map, take, timer } from 'synstate';
@@ -320,30 +310,40 @@ ruleTester.run('no-observable-in-handler', noObservableInHandler, {
       errors: [{ messageId: 'observableInHandler', line: 2, column: 49 }],
     },
     {
-      name: 'each creating call: combine, derive, merge, zip, fromSubscribable and an endless counter',
+      name: 'each creating call: derive, merge, zip, fromSubscribable, createSource, createDerived and an endless counter',
       filename: tsx,
       code: dedent`
-        import { combine, counter, derive, fromSubscribable, merge, zip } from 'synstate';
+        import {
+          counter,
+          createDerived,
+          createSource,
+          derive,
+          fromSubscribable,
+          merge,
+          zip,
+        } from 'synstate';
         const Row = () => (
           <input
             onInput={() => {
-              keep(combine([a$, b$]));
               keep(derive([a$, b$], (a, b) => a + b));
               keep(merge([a$, b$]));
               keep(zip([a$, b$]));
               keep(fromSubscribable(socket$));
               keep(counter(1000));
+              keep(createSource((ctx) => { window.addEventListener('resize', ctx.emit); }));
+              keep(createDerived([a$], (ctx) => () => { ctx.set(1); }));
             }}
           />
         );
       `,
       errors: [
-        { messageId: 'observableInHandler', line: 5 },
-        { messageId: 'observableInHandler', line: 6 },
-        { messageId: 'observableInHandler', line: 7 },
-        { messageId: 'observableInHandler', line: 8 },
-        { messageId: 'observableInHandler', line: 9 },
-        { messageId: 'observableInHandler', line: 10 },
+        { messageId: 'observableInHandler', line: 13 },
+        { messageId: 'observableInHandler', line: 14 },
+        { messageId: 'observableInHandler', line: 15 },
+        { messageId: 'observableInHandler', line: 16 },
+        { messageId: 'observableInHandler', line: 17 },
+        { messageId: 'observableInHandler', line: 18 },
+        { messageId: 'observableInHandler', line: 19 },
       ],
     },
     {
@@ -385,18 +385,15 @@ ruleTester.run('no-observable-in-handler', noObservableInHandler, {
       ],
     },
     {
-      name: 'a scope made in the handler, which nothing disposes either',
+      name: 'an owner made in the handler, which nothing disposes either',
       filename: tsx,
       code: dedent`
-        import { createScope, derive, getCurrentScope } from 'synstate';
+        import { createOwner, createRootOwner, derive } from 'synstate';
         const Row = () => (
           <button
             onClick={() => {
-              createScope().run(() => keep(derive([a$], (a) => a)));
-              createScope(undefined).run(() => keep(derive([b$], (b) => b)));
-              createScope(getCurrentScope()).run(() => keep(derive([c$], (c) => c)));
-              createScope(null).run(() => keep(derive([d$], (d) => d)));
-              createScope(void 0).run(() => keep(derive([e$], (e) => e)));
+              createOwner().run(() => keep(derive([a$], (a) => a)));
+              createRootOwner().run(() => keep(derive([b$], (b) => b)));
             }}
           />
         );
@@ -404,9 +401,6 @@ ruleTester.run('no-observable-in-handler', noObservableInHandler, {
       errors: [
         { messageId: 'observableInHandler', line: 5 },
         { messageId: 'observableInHandler', line: 6 },
-        { messageId: 'observableInHandler', line: 7 },
-        { messageId: 'observableInHandler', line: 8 },
-        { messageId: 'observableInHandler', line: 9 },
       ],
     },
     {
@@ -572,14 +566,14 @@ ruleTester.run('no-observable-in-handler', noObservableInHandler, {
       name: 'the part after an await, outside the run',
       filename: tsx,
       code: dedent`
-        import { derive, getCurrentScope } from 'synstate';
+        import { derive, getOwner } from 'synstate';
         const Row = () => {
-          const scope = getCurrentScope();
+          const owner = getOwner();
           return (
             <button
               onClick={async () => {
                 await save();
-                scope?.run(() => keep(derive([a$], (a) => a)));
+                owner?.run(() => keep(derive([a$], (a) => a)));
                 keep(derive([b$], (b) => b));
               }}
             />
@@ -709,7 +703,7 @@ describe('no-observable-in-handler through type wrappers', () => {
         code: dedent`
           import { derive } from 'synstate';
           const Row = () => (
-            <button onClick={() => { scope.run((() => keep(derive([a$], (a) => a))) satisfies () => void); }} />
+            <button onClick={() => { owner.run((() => keep(derive([a$], (a) => a))) satisfies () => void); }} />
           );
         `,
       },
@@ -763,7 +757,7 @@ describe('no-observable-in-handler after an await', () => {
   ruleTester.run('no-observable-in-handler', noObservableInHandler, {
     valid: [
       {
-        name: 'code before the first `await`, which still runs in the scope',
+        name: 'code before the first `await`, which still runs in the owner',
         filename: tsx,
         code: dedent`
           import { createState, map } from 'synstate';
@@ -779,16 +773,16 @@ describe('no-observable-in-handler after an await', () => {
         `,
       },
       {
-        name: 'work after the `await` in the run of a scope taken before it',
+        name: 'work after the `await` in the run of an owner taken before it',
         filename: tsx,
         code: dedent`
-          import { createState, getCurrentScope, map } from 'synstate';
+          import { createState, getOwner, map } from 'synstate';
           const [count$] = createState(0);
           const Row = () => {
-            const scope = getCurrentScope();
+            const owner = getOwner();
             void (async () => {
               await ready;
-              scope?.run(() => {
+              owner?.run(() => {
                 keep(count$.pipe(map((n) => n * 2)));
                 count$.subscribe(log);
               });
@@ -798,7 +792,7 @@ describe('no-observable-in-handler after an await', () => {
         `,
       },
       {
-        name: 'work after the `await` under `untracked`, which belongs to no scope on purpose',
+        name: 'work after the `await` under `untracked`, which belongs to no owner on purpose',
         filename: tsx,
         code: dedent`
           import { createState, untracked } from 'synstate';
@@ -964,13 +958,13 @@ describe('no-observable-in-handler after an await', () => {
         errors: [{ messageId: 'subscriptionAfterAwait', line: 6 }],
       },
       {
-        name: 'after an `await` in an async callback of `run`, which is in the scope only until then',
+        name: 'after an `await` in an async callback of `run`, which is in the owner only until then',
         filename: tsx,
         code: dedent`
-          import { getCurrentScope, map } from 'synstate';
+          import { getOwner, map } from 'synstate';
           const Row = () => {
-            const scope = getCurrentScope();
-            void scope?.run(async () => {
+            const owner = getOwner();
+            void owner?.run(async () => {
               await ready;
               keep(count$.pipe(map((n) => n * 2)));
             });
@@ -1050,10 +1044,10 @@ describe('no-observable-in-handler after an await', () => {
         name: 'an async callback of `run` in a type wrapper, after its `await`',
         filename: tsx,
         code: dedent`
-          import { getCurrentScope, map } from 'synstate';
+          import { getOwner, map } from 'synstate';
           const Row = () => {
-            const scope = getCurrentScope();
-            void scope?.run((async () => {
+            const owner = getOwner();
+            void owner?.run((async () => {
               await ready;
               keep(count$.pipe(map((n) => n * 2)));
             }) as () => Promise<void>);

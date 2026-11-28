@@ -2,7 +2,7 @@
 // `MenuItem` use it: the target in `span.bp6-popover-target`, and after it the
 // popover, which `PopoverFloat` draws and places. Not part of the package's
 // API: `gen:index:src` leaves it out of the barrel.
-import { createState, derive, map, onScopeDispose } from 'synstate';
+import { createState, derive, map, onCleanup } from 'synstate';
 import {
   constant,
   createAfterUpdate,
@@ -133,7 +133,7 @@ export const PopoverCore = ({
     leaving: ReturnType<typeof setTimeout> | undefined;
   } = { delayed: undefined, delayedOpens: false, leaving: undefined };
 
-  onScopeDispose(() => {
+  onCleanup(() => {
     clearTimeout(mut_timers.delayed);
 
     clearTimeout(mut_timers.leaving);
@@ -309,7 +309,7 @@ export const PopoverCore = ({
     decorateTarget(Optional.unwrap(open$.getSnapshot()));
   });
 
-  onScopeDispose(() => {
+  onCleanup(() => {
     targetSwaps.disconnect();
   });
 

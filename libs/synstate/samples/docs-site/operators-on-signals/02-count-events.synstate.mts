@@ -1,8 +1,8 @@
-import { createValueEmitter, scan } from 'synstate';
+import { batch, createValueEmitter, scan } from 'synstate';
 
 // embed-sample-code-ignore-below
 if (import.meta.vitest !== undefined) {
-  test('counting events with scan (SynState)', () => {
+  test('counting events with scan (synstate)', () => {
     // embed-sample-code-ignore-above
     // A click on a list item, sent as the item's id.
     const [clicked, click] = createValueEmitter<string>();
@@ -19,9 +19,12 @@ if (import.meta.vitest !== undefined) {
 
     click('A'); // every emission is an event, equal or not
 
-    click('B');
+    batch(() => {
+      // two clicks in one batch: each is delivered in an update of its own
+      click('B');
 
-    click('C');
+      click('C');
+    });
 
     // 4 clicks, counted as 4
     // embed-sample-code-ignore-below

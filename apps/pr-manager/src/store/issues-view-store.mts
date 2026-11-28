@@ -42,6 +42,7 @@
  */
 
 import {
+  createOwner,
   createState,
   derive,
   map,
@@ -150,27 +151,28 @@ export const createIssuesViewStore = (
   const [dagBox, setDagBox] = createState<Size>({ width: 0, height: 0 });
 
   const start = (): (() => void) => {
-    const saving = view.subscribe((current) => {
-      deps.save({ view: current });
-    });
+    // The `derive` below belongs to the owner too, so that stopping disposes
+    // it, and not only the subscriptions.
+    const owner = createOwner();
 
-    const zoomSaving = zoom.subscribe(deps.saveZoom);
+    owner.run(() => {
+      view.subscribe((current) => {
+        deps.save({ view: current });
+      });
 
-    const reading = derive(
-      [deps.issues, deps.moreIssues],
-      (...values) => values,
-    ).subscribe(([issues, more]) => {
-      if (issues.endCursor !== undefined && more.type === 'idle') {
-        deps.loadMoreIssues();
-      }
+      zoom.subscribe(deps.saveZoom);
+
+      derive([deps.issues, deps.moreIssues], (...values) => values).subscribe(
+        ([issues, more]) => {
+          if (issues.endCursor !== undefined && more.type === 'idle') {
+            deps.loadMoreIssues();
+          }
+        },
+      );
     });
 
     return () => {
-      saving.unsubscribe();
-
-      zoomSaving.unsubscribe();
-
-      reading.unsubscribe();
+      owner.dispose();
     };
   };
 

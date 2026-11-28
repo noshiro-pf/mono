@@ -1,14 +1,15 @@
 import {
   createEventEmitter,
+  createOwner,
   createState,
+  dropInitialValue,
   filter,
+  map,
   merge,
   throttle,
-  unwrapResultOk,
   withCurrentValueFrom,
   withInitialValue,
   type InitializedObservable,
-  type Subscription,
 } from 'synstate';
 import { Result, isNotUndefined } from 'ts-data-forge';
 import type { Api } from '../../api/index.mjs';
@@ -65,19 +66,25 @@ export const createEventScheduleStore = (
   const eventSchedule$: InitializedObservable<EventSchedule | undefined> =
     result$
       .pipe(filter(isNotUndefined))
-      .pipe(unwrapResultOk())
+      .pipe(map((result) => Result.unwrapOk(result)))
       .pipe(withInitialValue(undefined));
 
   const start = (): (() => void) => {
     const mut_run = { stopped: false };
 
-    const subscriptions: readonly Subscription[] = [
+    // Every node and subscription `start` makes belongs to one owner, so that
+    // stopping disposes them all, the `merge` and `dropInitialValue` before the
+    // first subscription included.
+    const owner = createOwner();
+
+    owner.run(() => {
       // Read on request (the first is made below), and again whenever the page
       // moves to another event.
       merge([
         fetchEventScheduleThrottled$,
         refetchEventScheduleAfterWrite$,
-        deps.eventId$,
+        // The event it shows when this starts is read by the first request.
+        deps.eventId$.pipe(dropInitialValue()),
       ])
         .pipe(withCurrentValueFrom(deps.eventId$))
         .subscribe(([_, eventId]) => {
@@ -96,14 +103,15 @@ export const createEventScheduleStore = (
               setEventScheduleResult(result);
             })
             .catch(() => {});
-        }),
+        });
+
       result$.subscribe((e) => {
         if (e !== undefined && Result.isErr(e)) {
           // TODO: use toast
           console.error('eventScheduleResult', e);
         }
-      }),
-    ] as const;
+      });
+    });
 
     // The first read, asked for as the page's own requests are, so that the
     // throttle drops the one the page makes as it mounts.
@@ -112,9 +120,7 @@ export const createEventScheduleStore = (
     return () => {
       mut_run.stopped = true;
 
-      for (const subscription of subscriptions) {
-        subscription.unsubscribe();
-      }
+      owner.dispose();
     };
   };
 

@@ -1,0 +1,52 @@
+---
+title: skipIfNoChange
+description: '持っている値と等しい値を捨てます（`equals` を渡さなければ `Object.is` で比べます）。'
+---
+
+import MarbleDiagram from '../../../../../components/MarbleDiagram.astro';
+
+{/* translated-from:2cf37e07f0ee */}
+
+持っている値と等しい値を捨てます（`equals` を渡さなければ `Object.is` で比べます）。派生した値は、変わらなければすでにそこで更新を止めるので、これはイベントソースや、独自の比較のためのものです。
+
+{/* reference:operator-kind */}
+
+ソースが値を持てば、結果も値を持ちます。`pipe` は `InitializedObservable` をそのまま保ちます（[`KeepInitialValueOperator`](/mono/synstate/ja/guides/deriving-values/#pipe)）。
+
+{/* /reference */}
+
+## マーブル図
+
+<MarbleDiagram slug="skip-if-no-change" lang="ja" />
+
+## 例
+
+```tsx
+import { createValueEmitter, skipIfNoChange } from 'synstate';
+
+const [reading, read] = createValueEmitter<number>();
+
+// An event source passes every value; this drops the repeats.
+const changes = reading.pipe(skipIfNoChange());
+
+const mut_seen: number[] = [];
+
+changes.subscribe((r) => {
+    mut_seen.push(r);
+});
+
+read(1);
+
+read(1);
+
+read(2);
+
+assert.deepStrictEqual(mut_seen, [1, 2]);
+```
+
+## 関連項目
+
+- [値を派生させる](/mono/synstate/ja/guides/deriving-values/)
+- [すべての API](/mono/synstate/ja/reference/)
+
+[GitHub のソース](https://github.com/noshiro-pf/mono/blob/main/libs/synstate/src/operators/skip-if-no-change.mts)

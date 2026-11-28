@@ -1,8 +1,8 @@
 /**
- * The prop name of each DOM event, in the PascalCase React uses
- * (`pointerdown` → `onPointerDown`). The event names are single lower-case
- * words, so the word boundaries have to be written down; binding needs no
- * table, since lower-casing the prop name gives the event name back.
+ * The prop name of each DOM event, in the PascalCase React uses (`pointerdown`
+ * → `onPointerDown`). The event names are single lower-case words, so the word
+ * boundaries have to be written down; binding needs no table, since
+ * lower-casing the prop name gives the event name back.
  *
  * Covers every key of `HTMLElementEventMap` and `SVGElementEventMap`, which
  * `element-props.test.mts` asserts.

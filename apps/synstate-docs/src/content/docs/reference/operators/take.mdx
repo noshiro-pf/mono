@@ -1,0 +1,57 @@
+---
+title: take
+description: 'Passes the first `count` values of the source, the one it holds at the start included, and then nothing, keeping the last value passed.'
+---
+
+import MarbleDiagram from '../../../../components/MarbleDiagram.astro';
+
+{/* reference:jsdoc */}
+
+Passes the first `count` values of the source, the one it holds at the start included, and then nothing, keeping the last value passed. `count` is a positive integer.
+
+{/* /reference */}
+
+{/* reference:operator-kind */}
+
+Its result holds a value whenever the source does: on an `InitializedObservable`, `pipe` gives one ([`KeepInitialValueOperator`](/mono/synstate/guides/deriving-values/#pipe)).
+
+{/* /reference */}
+
+## Marble diagram
+
+<MarbleDiagram slug="take" />
+
+## Example
+
+```tsx
+import { createValueEmitter, take } from 'synstate';
+import { Optional } from 'ts-std-forge';
+
+const [clicked, click] = createValueEmitter<number>();
+
+const firstTwo = clicked.pipe(take(2));
+
+const mut_seen: number[] = [];
+
+firstTwo.subscribe((n) => {
+    mut_seen.push(n);
+});
+
+click(1);
+
+click(2);
+
+click(3);
+
+assert.deepStrictEqual(mut_seen, [1, 2]);
+
+// It keeps the last value it passed.
+assert.deepStrictEqual(firstTwo.getSnapshot(), Optional.some(2));
+```
+
+## See also
+
+- [Deriving values](/mono/synstate/guides/deriving-values/)
+- [All APIs](/mono/synstate/reference/)
+
+[Source on GitHub](https://github.com/noshiro-pf/mono/blob/main/libs/synstate/src/operators/take.mts)

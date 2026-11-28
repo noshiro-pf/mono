@@ -25,7 +25,7 @@ const nativeTsc = path.resolve(
 );
 
 /**
- * Builds the ESLint plugin package.
+ * Builds the package.
  */
 const build = async (): Promise<void> => {
   console.info('Starting build process...\n');

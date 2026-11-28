@@ -5,13 +5,13 @@ description: Set up the JSX transform and render a first component.
 
 ## Install
 
-Install synstate-dom together with synstate, which your application imports to create its state. synstate is a peer dependency, so your application and synstate-dom share one instance:
+Install synstate-dom together with synstate, which your application imports to create its state:
 
 ```sh
 npm install synstate-dom synstate
 ```
 
-The other peer dependency, ts-data-forge, comes along as a dependency of synstate. Once your application imports it directly, for example for `Optional` in [Control flow](/mono/synstate-dom/guides/control-flow/), add it yourself.
+synstate is a peer dependency, so your application and synstate-dom share one copy of it. A graph cannot span two copies: an observable from another copy is rejected when it is bound. `Optional` and `Result`, which `MatchOptional` and `MatchResult` take, come from ts-std-forge; add it once your application imports them.
 
 ## Configure the JSX transform
 
@@ -55,6 +55,6 @@ const unmount = render(Counter, document.body);
 unmount();
 ```
 
-`render(App, container)` takes the component itself, not `<App />`, and calls it once inside a root scope. It returns a function that unmounts the app: calling it disposes every subscription and derivation the app made and removes its nodes.
+`render(App, container)` takes the component itself, not `<App />`, and calls it once inside a root owner. Mounting is a batch: a write made while the app mounts propagates once its nodes are in `container`. `render` returns a function that unmounts the app: calling it disposes the root owner, and with it every binding, derivation and subscription the app made, and removes its nodes.
 
 Text in JSX is a `Bindable` too, so you write the label as `constant('+1')` rather than `+1`. [Bindable values](/mono/synstate-dom/guides/bindable/) explains the reason.

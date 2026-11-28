@@ -1,4 +1,4 @@
-import { state } from 'synstate-next';
+import { state } from 'synstate';
 import { i18n } from './i18n.mjs';
 
 if (import.meta.vitest !== undefined) {

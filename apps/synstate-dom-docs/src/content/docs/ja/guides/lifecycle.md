@@ -1,27 +1,30 @@
 ---
-title: ライフサイクルとスコープ
-description: スコープがどこで作られ、何を破棄するのか。そして、表示していないビューのために派生を計算させない 2 つの書き方。
+title: ライフサイクルと owner
+description: owner がどこで作られ、何を破棄するのか。そして、表示していないビューのために派生を計算させない 2 つの書き方。
 ---
 
-## スコープ
+## owner
 
-synstate-dom は独自の所有者ツリーを持たず、synstate 本体のスコープを使います。スコープの実行中に同期的に作られた Observable はそのスコープに属し、束縛が行う購読もすべてそのスコープに属します。スコープを破棄すると、それらがまとめて破棄されます。
+synstate-dom は独自の寿命の仕組みを持たず、synstate の owner を使います。owner は唯一の寿命の仕組みです。owner の `run` の実行中に作られたもの（Observable、束縛、購読、`onCleanup` で登録した後始末、その中で作った owner）は、すべてその owner に属します。owner を破棄すると、まず子の owner の分も含めて、その中のすべての束縛と購読を止めます。そのため、後始末がセットした値を束縛が書き込むことはありません（射影やセットアップが自分の Observable を持つ owner を破棄した場合、その前にそこで作ったものは例外です）。そのあと子の owner を破棄し、後始末を実行し、ノードを破棄します。どれも新しいものから順にです。参照カウントはなく、ソースが終わったことをグラフの下へ伝えることもありません。何かに依存するものは、その owner と一緒に消えます。
 
-スコープを作るのは、単独で破棄できるところだけです。
+owner を作るのは、単独で破棄できるところだけです。
 
-| 作るもの                                        | 親スコープ                   | 破棄されるとき                           |
-| :---------------------------------------------- | :--------------------------- | :--------------------------------------- |
-| `render`                                        | なし                         | `render` が返した関数を呼んだとき        |
-| `If` / `MatchOptional` / `MatchResult` の各分岐 | `If` をマウントしたスコープ  | 分岐が変わったとき、親が破棄されたとき   |
-| `For` の各行                                    | `For` をマウントしたスコープ | 行のキーが消えたとき、親が破棄されたとき |
+| 作るもの                                                   | 親                                       | 破棄されるとき                           |
+| :--------------------------------------------------------- | :--------------------------------------- | :--------------------------------------- |
+| `render`                                                   | なし                                     | `render` が返した関数を呼んだとき        |
+| `If` / `MatchOptional` / `MatchResult` / `Switch` の各分岐 | 分岐のコンポーネントをマウントした owner | 分岐が変わったとき、親が破棄されたとき   |
+| `For` の各行                                               | `For` をマウントした owner               | 行のキーが消えたとき、親が破棄されたとき |
+| `mountChild` の呼び出しごと                                | 呼び出したときの owner                   | 親が破棄されたとき、子が例外を投げたとき |
 
-コンポーネントごとにはスコープを作りません。コンポーネントは 1 回しか呼ばれず、その寿命はマウントされた分岐・行・ルートとちょうど同じだからです。
+コンポーネントごとには owner を作りません。コンポーネントは 1 回しか呼ばれず、その寿命はマウントされた分岐・行・ルートとちょうど同じだからです。
 
-モジュールのトップレベル、つまりすべてのスコープの外で定義した状態はどこにも属さず、ページと同じだけ生き続けます。アプリのストアはそこに置きます。
+モジュールのトップレベル、つまりすべての owner の外で定義した状態はどこにも属さず、ページと同じだけ生き続けます。アプリのストアはそこに置きます。
+
+分岐の owner は、普通の `createOwner()` とは少し違う作り方をします。その中で作られるノードはどれも、分岐を決めるノードよりグラフの深いところに置かれます。そのおかげで分岐のコンポーネントは、分岐のノードを訪れる前に、更新の中で分岐を決められます（[仕組み](/mono/synstate-dom/ja/background/how-it-works/#分岐のコンポーネントは分岐が計算する前に決める)）。
 
 ## 2 つの書き方
 
-synstate の派生は遅延評価ではありません。読まれていてもいなくても、親が変わるたびに計算されます。そこで、表示していないビューのために派生が計算されないよう、次の 2 つの書き方をおすすめします。
+synstate の派生は遅延評価ではありません。読まれていてもいなくても、親が変わるたびに計算されます（前回と等しい結果はそれより先へは伝わりませんが）。そこで、表示していないビューのために派生が計算されないよう、次の 2 つの書き方をおすすめします。
 
 **1 つのビューだけが読む派生は、ストアの横ではなく、そのコンポーネントの中で作りましょう。** そうすれば派生はコンポーネントがマウントされている間だけ存在し、作った時点から束縛という読み手がいることになります。
 
@@ -30,13 +33,13 @@ import { createState, map } from 'synstate';
 import type { JSX } from 'synstate-dom';
 import { Arr } from 'ts-data-forge';
 
-// The store: module level, so it belongs to no scope and lives as long as the
+// The store: module level, so it belongs to no owner and lives as long as the
 // page.
 export const [cart$, setCart] = createState<readonly number[]>([]);
 
 export const CartTotal = (): JSX.Element => {
     // Only this view reads the total, so it is created here. It belongs to the
-    // scope this component is mounted in and is disposed with it.
+    // owner this component is mounted in and is disposed with it.
     const total$ = cart$.pipe(map(Arr.sum));
 
     return <p>{total$.pipe(map((t) => `Total: ${t}`))}</p>;
@@ -70,25 +73,67 @@ const Stats = (): JSX.Element => {
 };
 ```
 
-「分岐の中」とは、上の `Stats` のように分岐がマウントするコンポーネントの中のことです。`then` に直接書いた JSX は書いた場所で `If` が選ぶ前に評価されるので、その中の `pipe(map(...))` は外側のコンポーネントのスコープに作られ、分岐が隠れている間も計算を続けます。軽い束縛が数個ならそれで構いませんが、束縛が多い分岐や頻繁に更新される分岐は、独立したコンポーネントに移しましょう。
+「分岐の中」とは、上の `Stats` のように分岐がマウントするコンポーネントの中のことです。`then` に直接書いた JSX は書いた場所で `If` が選ぶ前に評価されるので、その中の `pipe(map(...))` は外側のコンポーネントの owner に作られ、分岐が隠れている間も計算を続けます。軽い束縛が数個ならそれで構いませんが、束縛が多い分岐や頻繁に更新される分岐は、独立したコンポーネントに移しましょう。
 
-これでも残るのは、グローバルに定義した重い派生をたまにしか読まない場合です。synstate-dom は、読まれていない派生を休眠させることはしません。実際のアプリで問題になったら、そのときに改めて検討します。
+これでも残るのは、グローバルに定義した重い派生をたまにしか読まない場合です。読まれていない派生を休眠させる仕組みはありません。
 
-## イベントハンドラ
+## イベントハンドラと `await`
 
-ハンドラは、どのスコープの外でも実行されます。ハンドラが呼ばれる時点では、どの `run` も動いていません。そのため、ハンドラの中で作った Observable（`a$.pipe(map(...))` など）はどのスコープにも属さず、行や分岐が消えた後も計算され続けてしまいます。そこで行った `subscribe` も解除されません。synstate-dom は実行時には warning を出しません。代わりに [eslint-plugin-synstate](https://www.npmjs.com/package/eslint-plugin-synstate) の `no-observable-in-handler` ルールが、そうした Observable と `subscribe` を報告します。対象は、`onClick` などの props や、`listenInScope`・`addEventListener` に渡したリスナー、その中に書いたコールバック、そこから名前で呼ぶ同じファイルの関数の中で派生させた Observable と、そこで行った `subscribe` です。マウント時に取ったスコープの `run` の中は対象外です。ルールが追う範囲と見逃す場合は、[プラグインの README](https://github.com/noshiro-pf/mono/tree/main/libs/eslint-plugin-synstate#no-observable-in-handler) にあります。
+owner が現在の owner になるのは、その `run` の実行中だけです。イベントハンドラ、タイマーのコールバック、`subscribe` に渡した関数、そしてすべての再計算は、現在の owner が無い状態で実行されます。書き込みの時点でたまたま現在の owner だったものに、作ったものが属してしまわないようにするためです。そのため、ハンドラの中で作った Observable（`a$.pipe(map(...))` など）はどの owner にも属さず、行や分岐が消えた後も計算され続け、そこで行った `subscribe` も解除されません。実行時に警告は出ません。eslint-plugin-synstate の `no-observable-in-handler` が報告します。
 
-ハンドラでは状態に書き込むだけにして、その状態からの派生はマウント時に作っておきましょう。`await` の後など、後から実行する処理でどうしても Observable を作る必要があるなら、コンポーネントのマウント中に `getCurrentScope()` でスコープを取っておき、後の処理をそのスコープの `run` で包んでください。
+ハンドラでは状態に書き込むだけにして、その状態からの派生はマウント時に作っておきましょう。書き込みに owner は要りません。後の処理でどうしても、コンポーネントと一緒に消えるべきものを作る必要があるなら、コンポーネントのマウント中に `getOwner()` で owner を取っておき、その処理を owner の `run` で包んでください。破棄済みの owner でも `run` は owner なしで関数を呼ぶので、先に `disposed` を確かめます。
 
-コンポーネントの中の `await` の後も同じです。コンポーネントがスコープの中で実行されるのは return するまでなので、コンポーネントが始めた `async` 関数の中では、最初の `await` より後は現在のスコープが無い状態で実行されます。`no-observable-in-handler` は、そこで作った Observable と行った `subscribe` も報告します。最初の `await` より前のコードと、その前に取ったスコープの `run` の中の処理は対象外です。
+```tsx
+import { createState, getOwner, map } from 'synstate';
+import type { JSX } from 'synstate-dom';
+
+type Profile = Readonly<{ name: string }>;
+
+declare const fetchProfile: () => Promise<Profile>;
+
+export const Greeting = (): JSX.Element => {
+    const [name$, setName] = createState('');
+
+    // Taken while the component mounts: the owner it is mounted in.
+    const owner = getOwner();
+
+    const load = async (): Promise<void> => {
+        const profile = await fetchProfile();
+
+        // After the `await`, no owner is current. A write needs none; something
+        // made here that should go with the component is made in its owner, unless
+        // the component was unmounted while the fetch was pending.
+        setName(profile.name);
+
+        if (owner === undefined || owner.disposed) {
+            return;
+        }
+
+        owner.run(() => {
+            name$.subscribe((name) => {
+                console.info(`greeting ${name}`);
+            });
+        });
+    };
+
+    load().catch((error: unknown) => {
+        console.error(error);
+    });
+
+    return <p>{name$.pipe(map((name) => `Hello, ${name}`))}</p>;
+};
+```
+
+コンポーネントの中の `await` の後も同じです。コンポーネントが owner の中で実行されるのは return するまでなので、コンポーネントが始めた `async` 関数の中では、最初の `await` より後は owner が無い状態で実行されます。
 
 ## コンポーネントと同じだけ続く副作用
 
-コンポーネントは 1 回しか呼ばれません。ほかのライブラリなら effect で実行する処理は、コンポーネントの本体で始めて、そのスコープが破棄されるときに止めます。
+コンポーネントは 1 回しか呼ばれません。ほかのライブラリなら effect で実行する処理は、コンポーネントの本体で始めて、その owner が破棄されるときに止めます。
 
-- synstate の `source.subscribe(next)` は、`source` の値を今の値から順に `next` に渡します。コンポーネントのマウント中に行った購読はコンポーネントのスコープに属し、そこで作った Observable と同じく、スコープが破棄されると解除されます。スコープより長く続けるときは `untracked` の中で購読します。
-- `listenInScope(target, type, listener, options)` は、`window` や `document` のように、コンポーネントが描く要素ではないものにイベントリスナーを登録し、スコープが破棄されると外します。コンポーネントが描く要素には `onClick` などの props を使ってください。
-- `createAfterUpdate()` は、処理を microtask で実行する関数を返します。実行されるのは、進行中の更新が終わった後です。その時点で、その更新に束縛された DOM は書き込み済みです。伝播も終わっているので、この処理からは状態に書き込めます。synstate が warning を出すのは、別の状態の伝播が終わる前に書き込んだときです。最初のマウントの後に処理を実行するのにも使えます。コンポーネントのノードが document に入るのは、それを含む記述全体がマウントされた後だからです。それまでにスコープが破棄されていた場合、その処理は捨てられます。
+- `source.subscribe(next)` は、すぐに今の値で `next` を呼び、その後は値を変えた更新のすべての値が新しくなるたびに 1 回呼びます。コンポーネントのマウント中に行った購読はコンポーネントの owner に属し、owner が破棄されると解除されます。owner より長く続けるときは `untracked` の中で購読します。`next` が行った書き込みは、今の更新の後に次の更新を始めます。今の更新に割り込むことはありません。
+- `onCleanup(fn)` は、現在の owner が破棄されるときに `fn` を実行します。
+- `listenInScope(target, type, listener, options)` は、`window` や `document` のように、コンポーネントが描く要素ではないものにイベントリスナーを登録し、owner が破棄されると外します。コンポーネントが描く要素には `onClick` などの props を使ってください。
+- `createAfterUpdate()` は、処理を microtask で実行する関数を返します。実行されるのは、進行中の更新とそれによる DOM の変更が終わった後で、それまでに owner が破棄されていれば実行しません。コンポーネントのノードが document に入るのは、それを含む記述全体がマウントされた後なので、ノードが document に入っている必要がある処理（入力欄へのフォーカス、要素の計測）を最初のマウントの後に実行するにはこれを使います。
 
 ```tsx
 import { createState } from 'synstate';
@@ -107,12 +152,13 @@ export const SearchBox = (): JSX.Element => {
     );
 
     // Saves the query whenever it changes. Subscribed while the component mounts,
-    // so the component's scope unsubscribes it: what an effect would do.
+    // so it belongs to the component's owner, which unsubscribes it: what an
+    // effect would do.
     query$.subscribe((query) => {
         sessionStorage.setItem('search', query);
     });
 
-    // Removed with the scope, so a closed branch leaves no listener behind.
+    // Removed with the owner, so a closed branch leaves no listener behind.
     listenInScope(globalThis, 'keydown', (event) => {
         if (
             event instanceof KeyboardEvent &&

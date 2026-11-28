@@ -45,7 +45,6 @@ table to the check workflows):
 | `test-node-versions (<target>, <command>)` | `pnpm run ws:build` then `pnpm run <command>` on that Node                                                                                          |
 | `verify-published`                         | `pnpm run verify:npm-packages:published`                                                                                                            |
 | `strict-lib-gen`                           | Several commands in one job, in an order that matters: see the `strict-lib-gen` bullet below                                                        |
-| `benchmark`                                | Read its failure: drifted tables are replaced by the files of the run's `synstate-benchmark-to-commit-<run id>` artifact, as its message says       |
 | `coverage-main`                            | Runs on `main` alone, never on a pull request                                                                                                       |
 | `coverage-pr (<artifact>)`                 | Uploads reports an earlier run kept, for Codecov alone; it holds no merge, and nothing in the branch fixes it                                       |
 | `Validate PR title`                        | The PR title is not Conventional Commits — `PATCH /pulls/{n}`                                                                                       |

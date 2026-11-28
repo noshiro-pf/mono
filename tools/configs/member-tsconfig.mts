@@ -220,7 +220,14 @@ export const memberTsconfigs: ReadonlyRecord<string, MemberTsconfig> = {
     },
   },
   'libs/github-settings-as-code': { nodeOnly: true },
-  'libs/synstate-dom': { jsx: 'synstate-dom' },
+  'libs/synstate-dom': {
+    jsx: 'synstate-dom',
+    selfPaths: true,
+    notes: {
+      paths:
+        '`jsxImportSource` names this package itself, and the tests import it by name the way a consumer does. Mapped to the source so that they are checked against the code being edited rather than against the last build. See docs/workspace-package-linking.md.',
+    },
+  },
   'libs/synstate-dom-next': {
     jsx: 'synstate-dom-next',
     selfPaths: true,
@@ -229,7 +236,7 @@ export const memberTsconfigs: ReadonlyRecord<string, MemberTsconfig> = {
         '`jsxImportSource` names this package itself, and the tests import it by name the way a consumer does. Mapped to the source so that they are checked against the code being edited rather than against the last build. See docs/workspace-package-linking.md.',
     },
   },
-  'libs/synstate-i18n': { jsx: 'synstate-dom-next' },
+  'libs/synstate-i18n': { jsx: 'synstate-dom' },
   'libs/synstate-preact-hooks': { jsx: 'preact' },
   'libs/synstate-preact-signals': { jsx: 'preact' },
   'libs/synstate-router-dom': { jsx: 'synstate-dom' },

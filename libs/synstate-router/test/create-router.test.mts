@@ -1,4 +1,4 @@
-import { createScope, createState, type InitializedObservable } from 'synstate';
+import { createOwner, createState, type InitializedObservable } from 'synstate';
 import { asSafeInt, expectType, Optional, type SafeInt } from 'ts-data-forge';
 import type { RelaxedExtract } from 'ts-type-forge';
 import {
@@ -682,18 +682,18 @@ describe('match', () => {
 });
 
 describe('at and isActive', () => {
-  test('outlive the scope of their first caller', () => {
+  test('outlive the owner of their first caller', () => {
     const { router } = setup();
 
-    const scope = createScope();
+    const owner = createOwner();
 
-    scope.run(() => {
+    owner.run(() => {
       router.at(routes.settings);
 
       router.isActive(routes.settings);
     });
 
-    scope.dispose();
+    owner.dispose();
 
     router.push(routes.settings.href());
 
@@ -702,14 +702,14 @@ describe('at and isActive', () => {
     assert.isTrue(current(router.isActive(routes.settings)));
   });
 
-  test('the router outlives the scope it was created in', () => {
-    const scope = createScope();
+  test('the router outlives the owner it was created in', () => {
+    const owner = createOwner();
 
-    const { router } = scope.run(() => setup());
+    const { router } = owner.run(() => setup());
 
     const settings = router.at(routes.settings);
 
-    scope.dispose();
+    owner.dispose();
 
     router.push(routes.settings.href());
 
@@ -1460,16 +1460,16 @@ describe('follow', () => {
     assert.strictEqual(browser.url().pathname, '/');
   });
 
-  test('outlives the scope it was started in, until stopped', async () => {
+  test('outlives the owner it was started in, until stopped', async () => {
     const { router } = setup();
 
     const [href$, setHref] = createState<Href>(routes.home.href());
 
-    const scope = createScope();
+    const owner = createOwner();
 
-    const stopFollowing = scope.run(() => router.follow(href$));
+    const stopFollowing = owner.run(() => router.follow(href$));
 
-    scope.dispose();
+    owner.dispose();
 
     setHref(routes.settings.href());
 
@@ -1480,7 +1480,7 @@ describe('follow', () => {
     stopFollowing();
   });
 
-  test('a move queued just before the followed observable completed still happens', async () => {
+  test('a move queued just before the followed observable was disposed still happens', async () => {
     const { router } = setup();
 
     const [href$, setHref] = createState<Href>(routes.home.href());
@@ -1489,14 +1489,14 @@ describe('follow', () => {
 
     setHref(routes.settings.href());
 
-    href$.complete();
+    href$.dispose();
 
     await Promise.resolve();
 
     assert.strictEqual(current(router.match).route, 'settings');
   });
 
-  test('dispose cancels a move queued just before the followed observable completed', async () => {
+  test('dispose cancels a move queued just before the followed observable was disposed', async () => {
     const { router, browser } = setup();
 
     const [href$, setHref] = createState<Href>(routes.home.href());
@@ -1505,7 +1505,7 @@ describe('follow', () => {
 
     setHref(routes.settings.href());
 
-    href$.complete();
+    href$.dispose();
 
     router.dispose();
 
@@ -1514,12 +1514,12 @@ describe('follow', () => {
     assert.strictEqual(browser.url().pathname, '/');
   });
 
-  test('following an observable that has already completed navigates nowhere', async () => {
+  test('following an observable that has already been disposed navigates nowhere', async () => {
     const { router, browser } = setup();
 
     const [href$] = createState<Href>(routes.settings.href());
 
-    href$.complete();
+    href$.dispose();
 
     const stopFollowing = router.follow(href$);
 

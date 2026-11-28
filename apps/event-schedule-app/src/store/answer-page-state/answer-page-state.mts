@@ -8,7 +8,6 @@ import {
   derive,
   filter,
   map,
-  pluck,
   skipIfNoChange,
   withInitialValue,
   type InitializedObservable,
@@ -225,7 +224,7 @@ export const createAnswerPageStore = (deps: AnswerPageDeps): AnswerPage => {
       answerBeingEdited$,
       deps.eventSchedule$
         .pipe(filter(isNotUndefined))
-        .pipe(pluck('datetimeRangeList'))
+        .pipe(map((s) => s.datetimeRangeList))
         .pipe(withInitialValue<readonly DatetimeRange[]>([])),
     ],
     ({ selection }, datetimeRangeList) => {

@@ -1,453 +1,349 @@
-import { createState, map, type InitializedObservable } from 'synstate';
-import { constant, For, If, Portal, render, type JSX } from 'synstate-dom';
-import { Optional } from 'ts-data-forge';
+import { batch, map, state, type InitializedObservable } from 'synstate';
+import { constant, For, If, render, selector, type JSX } from 'synstate-dom';
+import { Arr, Num } from 'ts-data-forge';
 
-type Item = Readonly<{ id: string; name: string }>;
-
-const mountInto = (
-  app: () => JSX.Element,
-): Readonly<{
-  container: HTMLDivElement;
-  unmount: () => void;
-}> => {
-  const container = document.createElement('div');
-
-  const unmount = render(app, container);
-
-  return { container, unmount };
-};
-
-const item = (id: string, name: string = id): Item => ({ id, name }) as const;
+type Item = Readonly<{ id: number; v: number }>;
 
 const setup = (
   initial: readonly Item[],
 ): Readonly<{
-  container: HTMLDivElement;
-  unmount: () => void;
-  setItems: (items: readonly Item[]) => void;
-  calls: ReadonlyMap<string, number>;
+  set: (next: readonly Item[]) => void;
   text: () => string;
+  calls: ReadonlyMap<number, number>;
   lis: () => readonly HTMLLIElement[];
 }> => {
-  const [items$, setItems] = createState<readonly Item[]>(initial);
+  const items = state(initial);
 
-  const mut_calls = new Map<string, number>();
+  const mut_calls = new Map<number, number>();
 
   const Row = ({
-    item$,
-    index$,
+    item,
+    index,
   }: Readonly<{
-    item$: InitializedObservable<Item>;
-    index$: InitializedObservable<number>;
+    item: InitializedObservable<Item>;
+    index: InitializedObservable<number>;
   }>): JSX.Element => {
-    const { id } = Optional.unwrap(item$.getSnapshot());
+    const { id } = item.value;
 
     mut_calls.set(id, (mut_calls.get(id) ?? 0) + 1);
 
     return (
       <li>
-        {index$.pipe(map((i) => `${i}:`))}
-        {item$.pipe(map((i) => i.name))}
+        {index}
+        {constant(':')}
+        {item.pipe(map((x) => `${x.id.toString()}=${x.v.toString()}`))}
       </li>
     );
   };
 
-  const { container, unmount } = mountInto(() => (
-    <ul>
-      <For items={items$} key={(i) => i.id}>
-        {(item$, index$) => <Row item$={item$} index$={index$} />}
-      </For>
-    </ul>
-  ));
+  const container = document.createElement('div');
+
+  render(
+    () => (
+      <ul>
+        <For
+          items={items}
+          key={(x) => x.id}
+          children={(item, index) => <Row index={index} item={item} />}
+        />
+      </ul>
+    ),
+    container,
+  );
 
   return {
-    container,
-    unmount,
-    setItems,
-    calls: mut_calls,
+    set: (next) => {
+      items.set(next);
+    },
     text: () =>
       Array.from(container.querySelectorAll('li'), (li) => li.textContent).join(
         ' ',
       ),
+    calls: mut_calls,
     lis: () => Array.from(container.querySelectorAll('li')),
   };
 };
 
+const it = (id: number, v: number = 0): Item => ({ id, v }) as const;
+
 describe(For, () => {
   test('mounts a row per item', () => {
-    const { text } = setup([item('a'), item('b')]);
+    const { text } = setup([it(1), it(2)]);
 
-    assert.strictEqual(text(), '0:a 1:b');
+    assert.strictEqual(text(), '0:1=0 1:2=0');
   });
 
-  test('adds and removes rows without rebuilding the others', () => {
-    const { setItems, calls, text, lis } = setup([item('a'), item('b')]);
+  test('an item that changes is set in its row, which is not rebuilt', () => {
+    const { set, text, calls, lis } = setup([it(1), it(2)]);
 
-    const [a, b] = lis();
+    const [first] = lis();
 
-    setItems([item('a'), item('c'), item('b')]);
+    set([it(1, 5), it(2)]);
 
-    assert.strictEqual(text(), '0:a 1:c 2:b');
+    assert.strictEqual(text(), '0:1=5 1:2=0');
 
-    setItems([item('c'), item('b')]);
+    assert.strictEqual(calls.get(1), 1);
 
-    assert.strictEqual(text(), '0:c 1:b');
-
-    assert.strictEqual(lis()[1], b);
-
-    assert.strictEqual(a?.isConnected, false);
-
-    assert.deepStrictEqual(Array.from(calls), [
-      ['a', 1],
-      ['b', 1],
-      ['c', 1],
-    ]);
+    assert.strictEqual(lis()[0], first);
   });
 
-  test('reorders the same DOM nodes', () => {
-    const { setItems, calls, text, lis } = setup([
-      item('a'),
-      item('b'),
-      item('c'),
-      item('d'),
-    ]);
+  test('reordering moves the rows, keeping their elements', () => {
+    const { set, text, lis } = setup([it(1), it(2), it(3), it(4)]);
 
-    const before = lis();
+    const before = new Map(lis().map((li, i) => [i + 1, li]));
 
-    setItems([item('d'), item('b'), item('a'), item('c')]);
+    set([it(4), it(2), it(3), it(1)]);
 
-    assert.strictEqual(text(), '0:d 1:b 2:a 3:c');
+    assert.strictEqual(text(), '0:4=0 1:2=0 2:3=0 3:1=0');
 
-    assert.deepStrictEqual<unknown>(lis(), [
-      before[3],
-      before[1],
-      before[0],
-      before[2],
-    ]);
+    const after = lis();
 
-    assert.isTrue(calls.values().every((n) => n === 1));
-  });
-
-  test('moves only the rows outside the longest increasing subsequence', () => {
-    const { container, setItems } = setup([
-      item('a'),
-      item('b'),
-      item('c'),
-      item('d'),
-      item('e'),
-    ]);
-
-    const ul = container.querySelector('ul');
-
-    const mut_moved: Node[] = [];
-
-    const observer = new MutationObserver((records) => {
-      for (const record of records) {
-        mut_moved.push(...record.addedNodes);
-      }
-    });
-
-    if (ul !== null) {
-      observer.observe(ul, { childList: true });
+    for (const [i, id] of [4, 2, 3, 1].entries()) {
+      assert.strictEqual(after[i], before.get(id));
     }
+  });
 
-    setItems([item('e'), item('a'), item('b'), item('c'), item('d')]);
+  test('adding and removing', () => {
+    const { set, text, calls } = setup([it(1), it(2), it(3)]);
 
-    for (const record of observer.takeRecords()) {
-      mut_moved.push(...record.addedNodes);
+    set([it(0), it(2), it(4)]);
+
+    assert.strictEqual(text(), '0:0=0 1:2=0 2:4=0');
+
+    assert.strictEqual(calls.get(2), 1);
+
+    set([]);
+
+    assert.strictEqual(text(), '');
+
+    set([it(2)]);
+
+    assert.strictEqual(text(), '0:2=0');
+
+    assert.strictEqual(calls.get(2), 2);
+  });
+
+  test('a key seen twice is reported', () => {
+    const error = vi
+      // eslint-disable-next-line vitest/no-restricted-vi-methods -- the report is the behavior under test
+      .spyOn(console, 'error')
+      .mockImplementation(() => {});
+
+    try {
+      const { text } = setup([it(1), it(1, 2)]);
+
+      assert.strictEqual(text(), '0:1=0 1:1=2');
+
+      expect(error).toHaveBeenCalledExactlyOnceWith(
+        'synstate-dom: For was given a duplicate key:',
+        1,
+      );
+    } finally {
+      error.mockRestore();
     }
-
-    observer.disconnect();
-
-    // Only `e`: its row start comment and its `li`.
-    assert.strictEqual(
-      mut_moved.filter((node) => node instanceof HTMLLIElement).length,
-      1,
-    );
-  });
-
-  test('updates item$ in place for a key that stays', () => {
-    const { setItems, calls, text } = setup([item('a', 'apple')]);
-
-    setItems([item('a', 'avocado')]);
-
-    assert.strictEqual(text(), '0:avocado');
-
-    assert.strictEqual(calls.get('a'), 1);
-  });
-
-  test('disposes the row of a key that goes', () => {
-    const [items$, setItems] = createState<readonly string[]>(['a', 'b']);
-
-    const [suffix$, setSuffix] = createState('!');
-
-    const mut_runs = { current: 0 };
-
-    mountInto(() => (
-      <For items={items$} key={(s) => s}>
-        {(item$) => (
-          <b>
-            {suffix$.pipe(
-              map((s) => {
-                mut_runs.current += 1;
-
-                return `${Optional.unwrap(item$.getSnapshot())}${s}`;
-              }),
-            )}
-          </b>
-        )}
-      </For>
-    ));
-
-    setItems(['a']);
-
-    const before = mut_runs.current;
-
-    setSuffix('?');
-
-    assert.strictEqual(mut_runs.current, before + 1);
-  });
-
-  test('disposes the row of a key that goes before it computes from the items that drop it (#3605)', () => {
-    const [items$, setItems] = createState<readonly Item[]>([
-      item('a', 'A'),
-      item('b', 'B'),
-    ]);
-
-    const mut_seen: (string | undefined)[] = [];
-
-    // Reads the list by id, as a row may: the row of a removed id would find
-    // nothing.
-    const Row = ({ id }: Readonly<{ id: string }>): JSX.Element => (
-      <b>
-        {items$.pipe(
-          map((xs) => {
-            const name = xs.find((x) => x.id === id)?.name;
-
-            mut_seen.push(name);
-
-            return name ?? 'unreachable';
-          }),
-        )}
-      </b>
-    );
-
-    // Derived, so that `For`'s own view of the list is deeper than the row's.
-    const shown$ = items$.pipe(map((xs) => xs));
-
-    const { container } = mountInto(() => (
-      <For items={shown$} key={(i) => i.id}>
-        {(item$) => <Row id={Optional.unwrap(item$.getSnapshot()).id} />}
-      </For>
-    ));
-
-    setItems([item('a', 'A')]);
-
-    assert.strictEqual(container.textContent, 'A');
-
-    assert.notInclude(mut_seen, undefined);
-  });
-
-  test('keeps rows whose top level switches when they move', () => {
-    const [items$, setItems] = createState<readonly string[]>(['a', 'b']);
-
-    const [open$, setOpen] = createState(false);
-
-    const { container } = mountInto(() => (
-      <div>
-        <For items={items$} key={(s) => s}>
-          {(item$) => (
-            <If cond={open$} then={<b>{item$}</b>} else={<i>{item$}</i>} />
-          )}
-        </For>
-      </div>
-    ));
-
-    setOpen(true);
-
-    setItems(['b', 'a']);
-
-    assert.strictEqual(container.querySelector('div')?.textContent, 'ba');
-
-    assert.strictEqual(container.querySelectorAll('i').length, 0);
-
-    setItems([]);
-
-    assert.strictEqual(container.querySelectorAll('b').length, 0);
-  });
-
-  test('a duplicate key is reported and still rendered', () => {
-    const error = vi.fn();
-
-    vi.stubGlobal('console', { ...console, error });
-
-    const { text } = setup([item('a', 'x'), item('a', 'y')]);
-
-    vi.unstubAllGlobals();
-
-    expect(error).toHaveBeenCalledExactlyOnceWith(
-      'synstate-dom: For found the key',
-      'a',
-      'more than once; keys must be unique.',
-    );
-
-    assert.strictEqual(text(), '0:x 1:y');
-  });
-
-  test('takes a constant', () => {
-    const { container } = mountInto(() => (
-      <For items={constant(['x', 'y'])} key={(s) => s}>
-        {(s$) => <i>{s$}</i>}
-      </For>
-    ));
-
-    assert.strictEqual(
-      container.getHTML().replaceAll('<!---->', ''),
-      '<i>x</i><i>y</i>',
-    );
-  });
-
-  test('writes nothing during propagation', () => {
-    const warn = vi.fn();
-
-    vi.stubGlobal('console', { ...console, warn });
-
-    const { setItems } = setup([item('a'), item('b')]);
-
-    setItems([item('b', 'banana'), item('c')]);
-
-    setItems([item('c'), item('a')]);
-
-    vi.unstubAllGlobals();
-
-    expect(warn).not.toHaveBeenCalled();
-  });
-
-  test('makes index$ only for a children that declares it', () => {
-    const [items$, setItems] = createState<readonly string[]>(['a', 'b']);
-
-    const mut_arguments: number[] = [];
-
-    const { container } = mountInto(() => (
-      <For items={items$} key={(s) => s}>
-        {(...args: readonly [InitializedObservable<string>]) => {
-          mut_arguments.push(args.length);
-
-          return <i>{args[0]}</i>;
-        }}
-      </For>
-    ));
-
-    setItems(['b', 'a', 'c']);
-
-    assert.deepStrictEqual(mut_arguments, [1, 1, 1]);
-
-    assert.strictEqual(container.textContent, 'bac');
-  });
-
-  test('an update that keeps the order moves no node', () => {
-    const { container, setItems, text } = setup([item('a'), item('b')]);
-
-    const observer = new MutationObserver(() => {});
-
-    observer.observe(container, { childList: true, subtree: true });
-
-    setItems([item('a', 'apple'), item('b', 'banana')]);
-
-    assert.deepStrictEqual(observer.takeRecords(), []);
-
-    observer.disconnect();
-
-    assert.strictEqual(text(), '0:apple 1:banana');
-  });
-
-  test('replacing every row keeps the nodes around the list', () => {
-    const [items$, setItems] = createState<readonly string[]>(['a', 'b']);
-
-    const [suffix$, setSuffix] = createState('!');
-
-    const mut_runs = { current: 0 };
-
-    const { container } = mountInto(() => (
-      <ul>
-        <li>{constant('head')}</li>
-        <For items={items$} key={(s) => s}>
-          {(item$) => (
-            <li>
-              {suffix$.pipe(
-                map((s) => {
-                  mut_runs.current += 1;
-
-                  return `${Optional.unwrap(item$.getSnapshot())}${s}`;
-                }),
-              )}
-            </li>
-          )}
-        </For>
-        <li>{constant('tail')}</li>
-      </ul>
-    ));
-
-    const texts = (): readonly string[] =>
-      Array.from(container.querySelectorAll('li'), (li) => li.textContent);
-
-    const [, a] = container.querySelectorAll('li');
-
-    setItems(['c', 'd']);
-
-    assert.deepStrictEqual(texts(), ['head', 'c!', 'd!', 'tail']);
-
-    assert.strictEqual(a?.isConnected, false);
-
-    setItems([]);
-
-    assert.deepStrictEqual(texts(), ['head', 'tail']);
-
-    const before = mut_runs.current;
-
-    setSuffix('?');
-
-    assert.strictEqual(mut_runs.current, before);
-
-    setItems(['e']);
-
-    assert.deepStrictEqual(texts(), ['head', 'e?', 'tail']);
-  });
-
-  test('unmounting removes every row', () => {
-    const { container, unmount } = setup([item('a'), item('b')]);
-
-    unmount();
-
-    assert.strictEqual(container.getHTML(), '');
   });
 });
 
-describe(Portal, () => {
-  test('mounts into the target and leaves with the enclosing branch', () => {
-    const target = document.createElement('section');
+describe('nested For', () => {
+  test('a row that starts with an inner For moves and goes whole', () => {
+    type Group = Readonly<{ id: string; members: readonly string[] }>;
 
-    const [open$, setOpen] = createState(true);
+    const groups = state<readonly Group[]>([
+      { id: 'a', members: ['a1', 'a2'] },
+      { id: 'b', members: ['b1'] },
+    ]);
 
-    const { container } = mountInto(() => (
-      <div>
-        <If
-          cond={open$}
-          then={
-            <Portal target={target}>
-              <b>{constant('modal')}</b>
-            </Portal>
-          }
+    const container = document.createElement('div');
+
+    render(
+      () => (
+        <For
+          items={groups}
+          key={(g) => g.id}
+          children={(group) => (
+            <For
+              items={group.pipe(map((g) => g.members))}
+              key={(m) => m}
+              children={(member) => <i>{member}</i>}
+            />
+          )}
         />
-      </div>
-    ));
+      ),
+      container,
+    );
 
-    assert.strictEqual(target.getHTML(), '<b>modal</b>');
+    const text = (): string =>
+      Array.from(container.querySelectorAll('i'), (i) => i.textContent).join(
+        ' ',
+      );
 
-    assert.strictEqual(container.getHTML(), '<div><!----></div>');
+    // The first node the inner For mounted goes.
+    groups.set([
+      { id: 'a', members: ['a2'] },
+      { id: 'b', members: ['b1'] },
+    ]);
 
-    setOpen(false);
+    assert.strictEqual(text(), 'a2 b1');
 
-    assert.strictEqual(target.getHTML(), '');
+    groups.set([
+      { id: 'b', members: ['b1'] },
+      { id: 'a', members: ['a2'] },
+    ]);
+
+    assert.strictEqual(text(), 'b1 a2');
+
+    groups.set([{ id: 'b', members: ['b1'] }]);
+
+    assert.strictEqual(text(), 'b1');
+
+    groups.set([]);
+
+    assert.strictEqual(text(), '');
+  });
+});
+
+/** xorshift32, so that a failure replays. */
+const random = (seed: number): ((n: number) => number) => {
+  let mut_seed = seed;
+
+  return (n) => {
+    mut_seed ^= mut_seed << 13;
+
+    mut_seed ^= mut_seed >>> 17;
+
+    mut_seed ^= mut_seed << 5;
+
+    return Num.isNonZero(n) ? Num.rem(mut_seed >>> 0, n) : 0;
+  };
+};
+
+describe('For, against random edits', () => {
+  test('the DOM matches the list after every edit', () => {
+    const rnd = random(7);
+
+    const items = state<readonly Item[]>([]);
+
+    const selected = state(-1);
+
+    const isSelected = selector(selected);
+
+    const showTail = state(true);
+
+    const container = document.createElement('div');
+
+    render(
+      () => (
+        <ul>
+          <For
+            items={items}
+            key={(x) => x.id}
+            children={(item, index) => {
+              const { id } = item.value;
+
+              return (
+                <>
+                  <li class={{ on: isSelected.is(id) }}>
+                    {item.pipe(
+                      map((x) => `${x.id.toString()}:${x.v.toString()}`),
+                    )}
+                    {constant('@')}
+                    {index}
+                  </li>
+                  <If
+                    cond={item.pipe(map((x) => x.v % 2 === 0))}
+                    then={<b>{constant('even')}</b>}
+                  />
+                </>
+              );
+            }}
+          />
+          <If
+            cond={showTail}
+            then={<i>{constant('tail')}</i>}
+            else={<s>{constant('none')}</s>}
+          />
+        </ul>
+      ),
+      container,
+    );
+
+    const expected = (): string =>
+      items.value
+        .map(
+          (x, i) =>
+            `<li class="${x.id === selected.value ? 'on' : ''}">${x.id.toString()}:${x.v.toString()}@${i.toString()}</li>${x.v % 2 === 0 ? '<b>even</b>' : ''}`,
+        )
+        .join('') + (showTail.value ? '<i>tail</i>' : '<s>none</s>');
+
+    const actual = (): string =>
+      Array.from(
+        container.querySelector('ul')?.children ?? [],
+        (element) => element.outerHTML,
+      ).join('');
+
+    let mut_nextId = 1;
+
+    const fresh = (): Item => {
+      const item = it(mut_nextId, rnd(10));
+
+      mut_nextId += 1;
+
+      return item;
+    };
+
+    for (const step of Array.from({ length: 2000 }, (_, i) => i)) {
+      const mut_next = Array.from(items.value);
+
+      const op = rnd(8);
+
+      if (op === 0) {
+        for (const _ of Array.from({ length: rnd(5) + 1 })) {
+          mut_next.splice(rnd(mut_next.length + 1), 0, fresh());
+        }
+      } else if (op === 1 && Arr.isNonEmpty(mut_next)) {
+        mut_next.splice(rnd(mut_next.length), 1 + rnd(3));
+      } else if (op === 2) {
+        mut_next.sort(() => rnd(3) - 1);
+      } else if (op === 3 && Arr.isNonEmpty(mut_next)) {
+        const i = rnd(mut_next.length);
+
+        mut_next[i] = it(mut_next[i]?.id ?? 0, rnd(10));
+      } else if (op === 4) {
+        mut_next.reverse();
+      } else if (op === 5 && rnd(10) === 0) {
+        // Everything goes; `length` is read-only under the strict library.
+        while (Arr.isNonEmpty(mut_next)) {
+          mut_next.pop();
+        }
+      } else if (op === 6 && Arr.isNonEmpty(mut_next)) {
+        batch(() => {
+          selected.set(mut_next[rnd(mut_next.length)]?.id ?? -1);
+
+          showTail.update((x) => !x);
+        });
+      } else if (op === 7 && mut_next.length > 1) {
+        const i = rnd(mut_next.length);
+
+        const j = rnd(mut_next.length);
+
+        const a = mut_next[i];
+
+        const b = mut_next[j];
+
+        if (a !== undefined && b !== undefined) {
+          mut_next[i] = b;
+
+          mut_next[j] = a;
+        }
+      }
+
+      items.set(mut_next);
+
+      // The step and the operation, to replay a failure.
+      expect(
+        actual().replaceAll(' class=""', ''),
+        `step ${step.toString()}, op ${op.toString()}`,
+      ).toBe(expected().replaceAll(' class=""', ''));
+    }
   });
 });

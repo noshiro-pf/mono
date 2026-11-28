@@ -1,4 +1,4 @@
-import { combine, map, type InitializedObservable } from 'synstate';
+import { derive, map, type InitializedObservable } from 'synstate';
 import { constant, For, If, type JSX } from 'synstate-dom';
 import { Arr } from 'ts-data-forge';
 import { START_NAMES, type IssueRow } from '../../../domain/index.mjs';
@@ -65,17 +65,13 @@ export const IssueListRow = ({
                 <>
                   {index$.pipe(map((index) => (index === 0 ? '' : ', ')))}
                   <ExternalLink
-                    href={combine([row, wait$]).pipe(
-                      map(([{ url }, { number }]) =>
-                        url.replace(/\/\d+$/u, () => `/${number}`),
-                      ),
+                    href={derive([row, wait$], ({ url }, { number }) =>
+                      url.replace(/\/\d+$/u, () => `/${number}`),
                     )}
-                    state={combine([rows, wait$]).pipe(
-                      map(([all, { number, status }]) =>
-                        status === 'waiting'
-                          ? (all.get(number)?.start ?? 'open')
-                          : status,
-                      ),
+                    state={derive([rows, wait$], (all, { number, status }) =>
+                      status === 'waiting'
+                        ? (all.get(number)?.start ?? 'open')
+                        : status,
                     )}
                     title={wait$.pipe(
                       map(

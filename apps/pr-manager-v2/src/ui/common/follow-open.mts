@@ -1,4 +1,4 @@
-import { onScopeDispose, type InitializedObservable } from 'synstate';
+import { onCleanup, type InitializedObservable } from 'synstate';
 import type { JSX } from 'synstate-dom';
 import { Optional } from 'ts-data-forge';
 
@@ -27,8 +27,8 @@ export const followOpen =
       }
     });
 
-    onScopeDispose(() => {
-      subscription.unsubscribe();
+    onCleanup(() => {
+      subscription();
     });
   };
 

@@ -454,6 +454,52 @@ export const smokeFileName = (packageName: string): string =>
     ? (`${packageName}.mts` as const)
     : (`${packageName}.mjs` as const);
 
+/**
+ * A peer written with the `workspace:` protocol, as `pnpm pack` writes it into
+ * the tarball: `workspace:^` and `workspace:~` become that prefix on the
+ * sibling's version in this checkout, `workspace:*` the version itself, and any
+ * other `workspace:<range>` the range. The project installing the tarball is no
+ * workspace, so the protocol left as it is fails the install; the sibling
+ * itself still comes from this checkout, through `siblingOverrides`.
+ */
+export const publishedPeerRanges = (
+  peers: ReadonlyRecord<string, string>,
+  packages: readonly Readonly<{ name: string; manifest: JsonValue }>[],
+): Result<ReadonlyRecord<string, string>, string> => {
+  const mut_ranges: MutableRecord<string, string> = {};
+
+  for (const [name, range] of Object.entries(peers)) {
+    if (!range.startsWith('workspace:')) {
+      mut_ranges[name] = range;
+
+      continue;
+    }
+
+    const written = range.slice('workspace:'.length);
+
+    const sibling = packages.find((p) => p.name === name)?.manifest;
+
+    const version =
+      isRecord(sibling) && isString(sibling['version'])
+        ? sibling['version']
+        : undefined;
+
+    if (written === '^' || written === '~' || written === '*') {
+      if (version === undefined) {
+        return Result.err(
+          `The peer ${name}@${range} is no package this checks, so nothing says the version \`pnpm pack\` writes for it.`,
+        );
+      }
+
+      mut_ranges[name] = written === '*' ? version : `${written}${version}`;
+    } else {
+      mut_ranges[name] = written;
+    }
+  }
+
+  return Result.ok(mut_ranges);
+};
+
 const spaceDirOf = (target: Target): string => path.resolve(verifyDir, target);
 
 /**
@@ -958,9 +1004,10 @@ const peerSpecs = async (
   pkg: PackageToCheck,
   spec: string,
   updatePins: boolean,
+  packages: readonly PackageToCheck[],
 ): Promise<Result<ReadonlyRecord<string, string>, string>> => {
   if (target === 'local') {
-    return Result.ok(declaredPeers(pkg.manifest));
+    return publishedPeerRanges(declaredPeers(pkg.manifest), packages);
   }
 
   const committed = updatePins ? undefined : await readCommittedPeers(dir, pkg);
@@ -1268,7 +1315,14 @@ const generateSpace = async (
     // eslint-disable-next-line security/detect-non-literal-fs-filename
     await fs.mkdir(dir, { recursive: true });
 
-    const peers = await peerSpecs(target, dir, pkg, spec, options.updatePins);
+    const peers = await peerSpecs(
+      target,
+      dir,
+      pkg,
+      spec,
+      options.updatePins,
+      packages,
+    );
 
     if (Result.isErr(peers)) {
       return peers;

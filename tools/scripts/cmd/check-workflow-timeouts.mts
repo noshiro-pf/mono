@@ -169,9 +169,10 @@ const TIMEOUT_CEILING_MINUTES = 15;
  * goes back under the ceiling fails the check until it is removed.
  */
 const LONGER_TIMEOUTS: ReadonlyRecord<string, LongerTimeout> = {
-  'synstate-benchmark.yml#benchmark': {
-    minutes: 20,
-    reason: 'a measurement takes 10 to 14 minutes on the runner',
+  'synstate-benchmark.yml#measure': {
+    minutes: 120,
+    reason:
+      'it measures every library in every scenario several times, each in a process of its own: the same run from synstate-next-benchmark.yml, with seven processes each, took 68 minutes on the runner; dispatched by hand, it holds no merge',
   },
   'synstate-next-benchmark.yml#measure': {
     minutes: 120,

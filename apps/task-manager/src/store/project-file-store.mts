@@ -255,7 +255,7 @@ export const createProjectFileStore = (
       });
 
       return () => {
-        subscription.unsubscribe();
+        subscription();
       };
     },
   };

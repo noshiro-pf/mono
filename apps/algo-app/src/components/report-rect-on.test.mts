@@ -1,10 +1,10 @@
-import { createScope, createState } from 'synstate';
+import { createRootOwner, createState } from 'synstate';
 import type { Rect } from 'ts-utils-additional';
 import { reportRectOn } from './report-rect-on.mjs';
 
 describe(reportRectOn, () => {
   test('reports the rect once the update has finished, and again only when it changed', async () => {
-    const scope = createScope(undefined);
+    const owner = createRootOwner();
 
     const [measureOn, setMeasureOn] = createState(0);
 
@@ -12,7 +12,7 @@ describe(reportRectOn, () => {
 
     const mut_reported: Rect[] = [];
 
-    const ref = scope.run(() =>
+    const ref = owner.run(() =>
       reportRectOn(measureOn, (rect) => {
         mut_reported.push(rect);
       }),
@@ -42,14 +42,14 @@ describe(reportRectOn, () => {
   });
 
   test('reads every rect before reporting any', async () => {
-    const scope = createScope(undefined);
+    const owner = createRootOwner();
 
     const [measureOn] = createState(0);
 
     const mut_log: string[] = [];
 
     for (const name of ['a', 'b']) {
-      const ref = scope.run(() =>
+      const ref = owner.run(() =>
         reportRectOn(measureOn, () => {
           mut_log.push(`report ${name}`);
         }),
@@ -75,7 +75,7 @@ describe(reportRectOn, () => {
   });
 
   test('a report that throws keeps no other from being sent, and is sent again next time', async () => {
-    const scope = createScope(undefined);
+    const owner = createRootOwner();
 
     const [measureOn, setMeasureOn] = createState(0);
 
@@ -85,7 +85,7 @@ describe(reportRectOn, () => {
 
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
-    const failingRef = scope.run(() =>
+    const failingRef = owner.run(() =>
       reportRectOn(measureOn, () => {
         if (mut_failing.current) {
           throw new Error('failed');
@@ -97,7 +97,7 @@ describe(reportRectOn, () => {
 
     failingRef({ getBoundingClientRect: () => rectA });
 
-    const ref = scope.run(() =>
+    const ref = owner.run(() =>
       reportRectOn(measureOn, () => {
         mut_log.push('report b');
       }),
@@ -123,7 +123,7 @@ describe(reportRectOn, () => {
   });
 
   test('a measurement that throws keeps no other from being taken, and is taken again next time', async () => {
-    const scope = createScope(undefined);
+    const owner = createRootOwner();
 
     const [measureOn, setMeasureOn] = createState(0);
 
@@ -133,7 +133,7 @@ describe(reportRectOn, () => {
 
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
-    const failingRef = scope.run(() =>
+    const failingRef = owner.run(() =>
       reportRectOn(measureOn, () => {
         mut_log.push('report a');
       }),
@@ -149,7 +149,7 @@ describe(reportRectOn, () => {
       },
     });
 
-    const ref = scope.run(() =>
+    const ref = owner.run(() =>
       reportRectOn(measureOn, () => {
         mut_log.push('report b');
       }),
@@ -172,14 +172,14 @@ describe(reportRectOn, () => {
     errorSpy.mockRestore();
   });
 
-  test('measures nothing once its scope is disposed', async () => {
-    const scope = createScope(undefined);
+  test('measures nothing once its owner is disposed', async () => {
+    const owner = createRootOwner();
 
     const [measureOn, setMeasureOn] = createState(0);
 
     const mut_reported: Rect[] = [];
 
-    const ref = scope.run(() =>
+    const ref = owner.run(() =>
       reportRectOn(measureOn, (rect) => {
         mut_reported.push(rect);
       }),
@@ -187,7 +187,7 @@ describe(reportRectOn, () => {
 
     ref({ getBoundingClientRect: () => rectA });
 
-    scope.dispose();
+    owner.dispose();
 
     setMeasureOn(1);
 

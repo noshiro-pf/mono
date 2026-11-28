@@ -1,4 +1,4 @@
-import { combine, map, type InitializedObservable } from 'synstate';
+import { derive, map, type InitializedObservable } from 'synstate';
 import { constant, If, type JSX } from 'synstate-dom';
 import { asNonZeroFiniteNumber, Num, Optional } from 'ts-data-forge';
 import {
@@ -42,9 +42,7 @@ export const DagNodeShape = ({
     >
       <SvgLink
         href={first.url}
-        title={combine([node, now]).pipe(
-          map(([n, nowMs]) => tooltipOf(n, nowMs)),
-        )}
+        title={derive([node, now], (n, nowMs) => tooltipOf(n, nowMs))}
       >
         <If
           cond={node.pipe(map(({ pill }) => isRinged(pill)))}

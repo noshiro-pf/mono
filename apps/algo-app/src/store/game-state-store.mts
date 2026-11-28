@@ -10,7 +10,9 @@
 
 import { serverTimestamp } from 'firebase/firestore';
 import {
+  createOwner,
   derive,
+  dropInitialValue,
   filter,
   map,
   merge,
@@ -94,7 +96,7 @@ export const createGameStateStore = (deps: GameStateDeps): GameStateStore => {
   const localRecordSource = source<ActionRecord<GameStateActionToWrite>>();
 
   const gameStateDispatcher = (action: GameStateActionToWrite): void => {
-    localRecordSource.next({ id: deps.newActionId(), action });
+    localRecordSource.emit({ id: deps.newActionId(), action });
   };
 
   // The game is the room's actions in the server's order, then those played
@@ -240,94 +242,91 @@ export const createGameStateStore = (deps: GameStateDeps): GameStateStore => {
   };
 
   const start = (): (() => void) => {
-    // Each action played here is written once. A new snapshot of the room
-    // (another player joining) re-emits the `derive`, so what to write is the
-    // actions played since the last emission, not the latest one; those played
-    // before the room is known are written, in order, once it is.
-    const knownRoom = deps.room.pipe(filter(isNotUndefined));
+    // Every node and subscription `start` makes belongs to one owner, so that
+    // stopping disposes them all, the operators between a long-lived source and
+    // what this subscribes included.
+    const owner = createOwner();
 
-    const playedHere = localRecordSource.pipe(
-      scan<
-        ActionRecord<GameStateActionToWrite>,
-        readonly ActionRecord<GameStateActionToWrite>[]
-      >((played, record) => Arr.toPushed(played, record), []),
-    );
+    owner.run(() => {
+      // Each action played here is written once. A new snapshot of the room
+      // (another player joining) re-emits the `derive`, so what to write is the
+      // actions played since the last emission, not the latest one; those played
+      // before the room is known are written, in order, once it is.
+      const knownRoom = deps.room.pipe(filter(isNotUndefined));
 
-    const writing = derive([knownRoom, playedHere], (...values) => values)
-      .pipe(
-        scan<
-          readonly [Room, readonly ActionRecord<GameStateActionToWrite>[]],
-          Readonly<{
-            roomId: string | undefined;
-            toWrite: readonly ActionRecord<GameStateActionToWrite>[];
-            numWritten: SizeType.Arr;
-          }>
-        >(
-          ({ numWritten }, [room, played]) => ({
-            roomId: room.id,
-            toWrite: Arr.skip(played, numWritten),
-            numWritten: Arr.length(played),
-          }),
-          { roomId: undefined, toWrite: [], numWritten: asUint32(0) },
-        ),
-      )
-      .subscribe(({ roomId, toWrite }) => {
-        if (roomId === undefined) {
-          return;
-        }
+      // The source holds the last action played, which an earlier `start` wrote
+      // already.
+      const playedHere = localRecordSource
+        .pipe(dropInitialValue())
+        .pipe(
+          scan<
+            ActionRecord<GameStateActionToWrite>,
+            readonly ActionRecord<GameStateActionToWrite>[]
+          >((played, record) => Arr.toPushed(played, record), []),
+        );
 
-        for (const record of toWrite) {
-          Result.fromPromise(deps.addAction(roomId, record))
-            .then(() => {
-              if (returnFalse()) {
-                console.log(roomId, record);
-              }
-            })
-            .catch((error: unknown) => {
-              console.error(error);
-            });
+      derive([knownRoom, playedHere], (...values) => values)
+        .pipe(
+          scan<
+            readonly [Room, readonly ActionRecord<GameStateActionToWrite>[]],
+            Readonly<{
+              roomId: string | undefined;
+              toWrite: readonly ActionRecord<GameStateActionToWrite>[];
+              numWritten: SizeType.Arr;
+            }>
+          >(
+            ({ numWritten }, [room, played]) => ({
+              roomId: room.id,
+              toWrite: Arr.skip(played, numWritten),
+              numWritten: Arr.length(played),
+            }),
+            { roomId: undefined, toWrite: [], numWritten: asUint32(0) },
+          ),
+        )
+        .subscribe(({ roomId, toWrite }) => {
+          if (roomId === undefined) {
+            return;
+          }
+
+          for (const record of toWrite) {
+            Result.fromPromise(deps.addAction(roomId, record))
+              .then(() => {
+                if (returnFalse()) {
+                  console.log(roomId, record);
+                }
+              })
+              .catch((error: unknown) => {
+                console.error(error);
+              });
+          }
+        });
+
+      autoPlay(deps.counter).subscribe((action) => {
+        // turn off auto play
+        if (returnFalse()) {
+          if (action.type === 'submitAnswer') {
+            onAnswerSubmit();
+          } else {
+            gameStateDispatcher(action);
+          }
         }
       });
 
-    const autoPlaying = autoPlay(deps.counter).subscribe((action) => {
-      // turn off auto play
-      if (returnFalse()) {
-        if (action.type === 'submitAnswer') {
-          onAnswerSubmit();
-        } else {
-          gameStateDispatcher(action);
-        }
-      }
-    });
-
-    const loggingState = gameState
-      .pipe(pairwise())
-      .subscribe(([prev, curr]) => {
+      gameState.pipe(pairwise()).subscribe(([prev, curr]) => {
         if (returnFalse()) {
           console.log('gameState.prev', prev, 'gameState.curr', curr);
         }
       });
 
-    const loggingAction = gameStateAction.subscribe((action) => {
-      if (returnFalse()) {
-        console.log('action', action);
-      }
+      gameStateAction.subscribe((action) => {
+        if (returnFalse()) {
+          console.log('action', action);
+        }
+      });
     });
 
     return () => {
-      writing.unsubscribe();
-
-      // Unsubscribing leaves the nodes in the graph, where `playedHere` would
-      // keep every later action; completing both completes what they feed.
-      knownRoom.complete();
-
-      playedHere.complete();
-
-      autoPlaying.unsubscribe();
-
-      loggingState.unsubscribe();
-
-      loggingAction.unsubscribe();
+      owner.dispose();
     };
   };
 

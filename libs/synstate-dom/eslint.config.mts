@@ -1,7 +1,6 @@
 import {
   defineKnownRules,
   eslintConfigForNodeJs,
-  eslintConfigForSynstateDom,
   eslintConfigForTypeScript,
   eslintConfigForVitest,
   eslintImportsRules,
@@ -28,9 +27,6 @@ export default [
 
   eslintConfigForVitest(),
 
-  // Accessibility, reading `constant(x)` as `x`, for the README samples.
-  eslintConfigForSynstateDom(['samples/**/*.tsx']),
-
   {
     rules: defineKnownRules({
       // The `JSX` namespace has to declare an `Element` type of its own.
@@ -41,8 +37,30 @@ export default [
           allow: ['Element'],
         },
       ],
-      // The DOM nodes a mount creates and moves are mutable by nature, as the
-      // elements the shared configuration already allows are.
+    }),
+  },
+
+  {
+    files: ['src/**'],
+    rules: defineKnownRules({
+      // A binding is a subclass of synstate's effect class, and a
+      // description of the abstract `Description`: one object per binding,
+      // its methods on the prototype. See synstate's DESIGN.md.
+      'functional/no-class-inheritance': 'off',
+      // The renderer is built on synstate's classes, which only
+      // `synstate/internal` exports.
+      'import-x/no-internal-modules': [
+        'error',
+        {
+          allow: [
+            ...eslintImportsRules['import-x/no-internal-modules'][1].allow,
+            'synstate/internal',
+          ],
+        },
+      ],
+      // The DOM nodes a mount creates and moves, and the graph's nodes, are
+      // mutable by nature, as the elements the shared configuration already
+      // allows are.
       '@typescript-eslint/prefer-readonly-parameter-types': [
         'error',
         {
@@ -53,7 +71,26 @@ export default [
             ...typescriptEslintRules[
               '@typescript-eslint/prefer-readonly-parameter-types'
             ][1].allow,
-            { from: 'lib', name: ['ChildNode', 'Comment', 'Node', 'Text'] },
+            {
+              from: 'lib',
+              name: [
+                'ChildNode',
+                'Comment',
+                'CSSStyleDeclaration',
+                'Document',
+                'Node',
+                'Text',
+              ],
+            },
+            {
+              from: 'file',
+              name: ['Description', 'MountedNodes', 'Row'],
+            },
+            {
+              from: 'package',
+              package: 'synstate',
+              name: ['ObservableClass', 'Owner', 'State'],
+            },
           ],
         },
       ],
@@ -63,15 +100,15 @@ export default [
   {
     files: ['test/**'],
     rules: defineKnownRules({
-      // `samples.test.tsx` runs the README samples, which are modules of
-      // their own rather than part of the package; `vitest/browser` is where
-      // Vitest exports `cdp`, which the IME composition tests drive.
+      // A published entry point, which a test that makes an element of a tag
+      // known only at run time calls, and `vitest/browser`, where Vitest
+      // exports `cdp`, which the IME composition tests drive.
       'import-x/no-internal-modules': [
         'error',
         {
           allow: [
             ...eslintImportsRules['import-x/no-internal-modules'][1].allow,
-            '**/samples/readme/*',
+            'synstate-dom/jsx-runtime',
             'vitest/browser',
           ],
         },
@@ -91,19 +128,17 @@ export default [
     }),
   },
 
-  // What src/ imports from ts-data-forge at run time is in every bundle that
-  // uses synstate-dom. esbuild keeps an object such as `Arr` whole
-  // once a module uses any member of it, when the object comes from the
-  // package root. So src/ imports `Arr` as
-  // `import * as Arr from 'ts-data-forge/array'`, which tree-shakes, and from
-  // the root only the names below, each standalone or (`Optional`, `Result`)
-  // what synstate's own API is built on. Add a standalone function to the
-  // list, never an object. Tests are bundled by nobody. The paths are merged
-  // with eslint-config-typed's index-file pattern, which a block that sets the
-  // rule would otherwise drop. The ts-data-forge rules' fixes still import
-  // from the package root (#3093), so a fix that adds `Arr` or an object is
-  // reported here; move that import to the subpath by hand.
-  // test/eslint-config.test.mts checks that this is in effect.
+  // What src/ imports from ts-data-forge and ts-std-forge at run time is in
+  // every bundle that uses synstate-dom. esbuild keeps an object such as `Arr`,
+  // `Num` or `SafeUint` whole once a module uses any member of it, when the
+  // object comes from the package root. So src/ imports `Arr` as
+  // `import * as Arr from 'ts-data-forge/array'`, which esbuild tree-shakes,
+  // and from the roots only the names below. Add a standalone function to a
+  // list, never an object. `Optional` and `Result` are the exception: objects,
+  // but what src/ is built on, so every bundle that uses it has them anyway.
+  // Tests are bundled by nobody. The ts-data-forge rules' fixes still import
+  // from the package root, so a fix that adds `Arr` or an object is reported
+  // here; move that import to the subpath by hand.
   {
     files: ['src/**'],
     ignores: ['src/**/*.test.mts'],
@@ -114,20 +149,17 @@ export default [
           paths: [
             {
               name: 'ts-data-forge',
-              allowImportNames: [
-                'Optional',
-                'Result',
-                'expectType',
-                'hasKey',
-                'isBoolean',
-                'isNumber',
-                'isRecord',
-                'isString',
-                'unknownToString',
-              ],
+              allowImportNames: ['isNonNullObject'],
               allowTypeImports: true,
               message:
-                "synstate-dom src/ imports only standalone functions, `Optional` and `Result` from the ts-data-forge root, and `Arr` from 'ts-data-forge/array'; see the comment in eslint.config.mts.",
+                "synstate-dom src/ imports only standalone functions from the ts-data-forge root, and `Arr` from 'ts-data-forge/array'; see the comment in eslint.config.mts.",
+            },
+            {
+              name: 'ts-std-forge',
+              allowImportNames: ['Optional', 'Result'],
+              allowTypeImports: true,
+              message:
+                'synstate-dom src/ imports only `Optional`, `Result` and standalone functions from ts-std-forge; see the comment in eslint.config.mts.',
             },
           ],
         }),

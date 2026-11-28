@@ -7,10 +7,7 @@ export default defineViteConfig({
   packageRoot: workspaceRootPath,
   alias: {
     'synstate-i18n': path.resolve(workspaceRootPath, './src/index.mts'),
-    'synstate-next': path.resolve(
-      workspaceRootPath,
-      '../synstate-next/src/index.mts',
-    ),
+    synstate: path.resolve(workspaceRootPath, '../synstate/src/index.mts'),
   },
   node: {
     // The samples' locale and store modules are imported by the samples, and

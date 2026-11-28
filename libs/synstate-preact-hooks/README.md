@@ -9,17 +9,17 @@ Their options, such as `equals` (the second argument of `createState` and `creat
 ## Installation
 
 ```bash
-npm add synstate-preact-hooks
+npm add synstate-preact-hooks synstate
 ```
 
 Or with other package managers:
 
 ```bash
 # Yarn
-yarn add synstate-preact-hooks
+yarn add synstate-preact-hooks synstate
 
 # pnpm
-pnpm add synstate-preact-hooks
+pnpm add synstate-preact-hooks synstate
 ```
 
 ## Quick Start

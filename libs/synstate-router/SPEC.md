@@ -229,7 +229,7 @@ type M = RouteMatch<typeof routes>;
 | `back()` / `forward()` / `go(n)`        | `() => void`                                                                       | 状態は `popstate` が来たときにだけ変わる                                                                                                                                                                                                                                                                                                                                                                                         |
 | `parseHref(url)`                        | `(url: string) => Optional<Href>`                                                  | 外から来た URL（メールのリンク、サーバーの応答）を照合して `Href` にする                                                                                                                                                                                                                                                                                                                                                         |
 | `toUrl(href)`                           | `(href: Href) => string`                                                           | ベースパスを付けたブラウザ上の URL。`Link` 以外で `<a>` を書くとき、コピー用の URL を作るときに使う                                                                                                                                                                                                                                                                                                                              |
-| `follow(href$, { replace? })`           | `(href$: Observable<Href>, ...) => () => void`                                     | Observable から遷移する認められた手段（入力欄の debounce した検索語など）。値が来るたびに、伝播が終わった後（microtask）で `push` / `replace` する。返り値で止める。購読を始めたときに Observable が持っている値は状態であって移動ではないので飛ばす。Observable が complete したらルーターはそれを忘れる。`dispose` の後は何もしない                                                                                            |
+| `follow(href$, { replace? })`           | `(href$: Observable<Href>, ...) => () => void`                                     | Observable から遷移する認められた手段（入力欄の debounce した検索語など）。値が来るたびに、伝播が終わった後（microtask）で `push` / `replace` する。返り値で止める。購読を始めたときに Observable が持っている値は状態であって移動ではないので飛ばす。Observable が dispose されたらルーターはそれを忘れる。`dispose` の後は何もしない                                                                                           |
 | `dispose()`                             | `() => void`                                                                       | `popstate` の購読を外し、すべての `follow` を止め、まだ行っていないスクロールを捨てる                                                                                                                                                                                                                                                                                                                                            |
 
 ### 4.2 振る舞いの約束
@@ -323,7 +323,7 @@ export const App = (): React.JSX.Element => (
 
 ## 6. synstate-dom との連携（`synstate-router-dom`）
 
-synstate-dom は context を持たないと決めているので（`libs/synstate-dom/SPEC.md`）、ルーターに束縛した部品を factory で作り、props に毎回 `router` を書かずに済むようにする。
+synstate-dom は context を持たないと決めているので（[コンポーネント](https://noshiro-pf.github.io/mono/synstate-dom/ja/guides/components/)）、ルーターに束縛した部品を factory で作り、props に毎回 `router` を書かずに済むようにする。
 
 ```tsx
 export const { Routes, Link } = createRouterComponents(router);
@@ -360,7 +360,7 @@ const App = (): JSX.Element => (
 ### 6.1 `Routes`
 
 - `cases` の必須キーは React 版と同じ。
-- 各 case はそのルートに絞られた `InitializedObservable<{ params; search; withSearch }>` を受け取る（`withSearch` は React 版と同じ）。内部は synstate-dom の `mountSwitch` と同じ方式で、**ルート id が変わったときだけ分岐を作り直す**。`mountSwitch` は synstate-dom の公開 API にないので、同じ処理を公開されている部品（`subscribe`・`toNodes`）で持つ。`/products/1` から `/products/2` では分岐を保ったまま Observable に新しい params が流れ、`MatchOptional` と同じ細粒度の更新になる。
+- 各 case はそのルートに絞られた `InitializedObservable<{ params; search; withSearch }>` を受け取る（`withSearch` は React 版と同じ）。内部は synstate-dom の `Switch` で、**ルート id が変わったときだけ分岐を作り直す**。`/products/1` から `/products/2` では分岐を保ったまま Observable に新しい params が流れ、`MatchOptional` と同じ細粒度の更新になる。
 - レイアウトは `under` と `prefix` で入れ子にする。`<Routes prefix cases={...}>` は直下の子の prefix 一致で分岐し、その中で `<Routes under={routes.products} cases={...}>` が `products` 以下のページを完全一致で分岐する。`under` を付けたときの必須キーはその枝のルート id だけ。
 - キーは常に完全なルート id（`'products.item'`）。枝の中でも略さないので、`grep` で定義と描画を結べる。
 
@@ -474,5 +474,5 @@ stacked pull request で次の順に進める。
 2. `synstate-router` の骨格と `defineRoutes`・codec・`href`・照合。純粋関数だけで Node でテストし、`expectType` で型を固める。
 3. `createRouter`: ブラウザ注入、`setTimeout` で `popstate` を発火する memory browser、`basePath`、`redirect`、末尾スラッシュ、`setSearch`。型検査コストの計測（200 ルート）もここ。
 4. `synstate-router-react`（`Routes`・`Link`・hooks）。社内検討に使うので synstate-dom 版より先にする。
-5. `synstate-router-dom`（`mountSwitch` の上の `Routes` と `Link`）。
+5. `synstate-router-dom`（`Switch` の上の `Routes` と `Link`）。
 6. サンプルアプリと e2e、synstate-docs のページ。その後、tiny-router-observable を使うアプリを 1 つずつ移し、tiny-router を引退させる。

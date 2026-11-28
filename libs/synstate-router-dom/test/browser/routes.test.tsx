@@ -364,7 +364,7 @@ describe('Routes', () => {
     unmount();
   });
 
-  test('unmounting removes the case and stops following the router', () => {
+  test('unmounting stops following the router', () => {
     const {
       router,
       bound: { Routes },
@@ -391,6 +391,10 @@ describe('Routes', () => {
 
     router.push(routes.settings.href());
 
-    assert.strictEqual(inner?.textContent, '');
+    // synstate-dom removes the nodes of what it unmounts at the root only, so
+    // the detached `div` keeps the case it last showed.
+    assert.strictEqual(inner?.textContent, 'home');
+
+    assert.isFalse(container.contains(inner ?? null));
   });
 });

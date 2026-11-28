@@ -1,13 +1,9 @@
-import {
-  combine,
-  createState,
-  map,
-  type InitializedObservable,
-} from 'synstate';
+/** @jsxImportSource synstate-dom */
+import { derive, state, type InitializedObservable } from 'synstate';
 import { constant, render, type JSX } from 'synstate-dom';
 import { Arr } from 'ts-data-forge';
 import type { ScenarioFramework } from '../scenario.mjs';
-import { combineAll } from '../synstate-graph.mjs';
+import { deriveAll } from '../synstate-graph.mjs';
 import {
   countZeros,
   initialDurations,
@@ -22,44 +18,43 @@ import {
 
 /**
  * Each duration is a state, and every figure is a node of its own, made with
- * `combine` and `map` from the figures it is computed from. The cells bind the
- * figures directly; a number is written as its text.
+ * `derive` from the figures it is computed from, which passes on only a value
+ * that changed. The cells bind the figures directly; a number is written as its
+ * text.
  */
 export const synstateDomSchedule: ScenarioFramework<ScheduleApp> = {
   name: 'synstate-dom',
   mount: (container) => {
-    const durations = initialDurations.map((days) => createState(days));
+    const durations = initialDurations.map((days) => state(days));
 
     const mut_earlyStart: (InitializedObservable<number> | undefined)[] = [];
 
     const mut_earlyFinish: InitializedObservable<number>[] = [];
 
     for (const task of tasks) {
-      const duration$ = durations[task.id]?.[0];
+      const duration = durations[task.id];
 
-      if (duration$ === undefined) {
+      if (duration === undefined) {
         throw new Error(`no duration for task ${task.id}`);
       }
 
-      const earlyStart$ = Arr.isEmpty(task.predecessors)
+      const earlyStart = Arr.isEmpty(task.predecessors)
         ? undefined
-        : combineAll(
+        : deriveAll(
             task.predecessors.flatMap((p) => mut_earlyFinish[p] ?? []),
             (finishes) => maxOf(finishes, 0),
           );
 
-      mut_earlyStart.push(earlyStart$);
+      mut_earlyStart.push(earlyStart);
 
       mut_earlyFinish.push(
-        earlyStart$ === undefined
-          ? duration$
-          : combine([earlyStart$, duration$]).pipe(
-              map(([start, days]) => start + days),
-            ),
+        earlyStart === undefined
+          ? duration
+          : derive([earlyStart, duration], (start, days) => start + days),
       );
     }
 
-    const projectEnd$ = combineAll(
+    const projectEnd = deriveAll(
       lastTasks.flatMap((task) => mut_earlyFinish[task] ?? []),
       (finishes) => maxOf(finishes, 0),
     );
@@ -69,38 +64,37 @@ export const synstateDomSchedule: ScenarioFramework<ScheduleApp> = {
     const mut_slack: InitializedObservable<number>[] = [];
 
     for (const task of tasks.toReversed()) {
-      const duration$ = durations[task.id]?.[0];
+      const duration = durations[task.id];
 
-      if (duration$ === undefined) {
+      if (duration === undefined) {
         throw new Error(`no duration for task ${task.id}`);
       }
 
       const next = successors[task.id] ?? [];
 
-      const lateFinish$ = Arr.isEmpty(next)
-        ? projectEnd$
-        : combineAll(
+      const lateFinish = Arr.isEmpty(next)
+        ? projectEnd
+        : deriveAll(
             next.flatMap((s) => mut_lateStart[s] ?? []),
             (starts) => minOf(starts, 0),
           );
 
-      const lateStart$ = combine([lateFinish$, duration$]).pipe(
-        map(([finish, days]) => finish - days),
+      const lateStart = derive(
+        [lateFinish, duration],
+        (finish, days) => finish - days,
       );
 
-      const earlyStart$ = mut_earlyStart[task.id];
+      const earlyStart = mut_earlyStart[task.id];
 
-      mut_lateStart[task.id] = lateStart$;
+      mut_lateStart[task.id] = lateStart;
 
       mut_slack[task.id] =
-        earlyStart$ === undefined
-          ? lateStart$
-          : combine([lateStart$, earlyStart$]).pipe(
-              map(([late, early]) => late - early),
-            );
+        earlyStart === undefined
+          ? lateStart
+          : derive([lateStart, earlyStart], (late, early) => late - early);
     }
 
-    const criticalCount$ = combineAll(mut_slack, countZeros);
+    const criticalCount = deriveAll(mut_slack, countZeros);
 
     const zero = constant(0);
 
@@ -108,8 +102,8 @@ export const synstateDomSchedule: ScenarioFramework<ScheduleApp> = {
       <table>
         <tbody>
           <tr>
-            <td>{projectEnd$}</td>
-            <td>{criticalCount$}</td>
+            <td>{projectEnd}</td>
+            <td>{criticalCount}</td>
           </tr>
           {shownTasks.map((task) => (
             <tr>
@@ -127,7 +121,7 @@ export const synstateDomSchedule: ScenarioFramework<ScheduleApp> = {
 
     return {
       setDuration: (task, days) => {
-        durations[task]?.[1](days);
+        durations[task]?.set(days);
       },
       dispose: unmount,
     } satisfies ScheduleApp;

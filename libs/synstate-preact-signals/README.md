@@ -60,7 +60,7 @@ const [input$, dispose] = fromSignal(input);
 const debouncedInput$ = input$.pipe(debounce(300));
 ```
 
-Called inside a synstate scope (a `switchMap` projection, a synstate-dom row or branch), the bridge stops following the signal when that scope is disposed. Elsewhere, call `dispose` when it is no longer needed.
+Called inside a synstate owner (a `switchMap` projection, a synstate-dom row or branch), the bridge stops following the signal when that owner is disposed. Elsewhere, call `dispose` when it is no longer needed.
 
 ### `createState` / `createBooleanState` / `createReducer`
 

@@ -1,5 +1,5 @@
 import * as Preact from 'preact/hooks';
-import { source, type SourceObservable } from 'synstate';
+import { source, type Source } from 'synstate';
 
 /**
  * A `synstate` source that lives as long as the component that made it.
@@ -10,5 +10,5 @@ import { source, type SourceObservable } from 'synstate';
  * with no counterpart there. This mirrors `apps/react-utils`, which replaced
  * the same `@noshiro/ts-utils` tiny-observable hooks the same way.
  */
-export const useObservable = <T,>(): SourceObservable<T> =>
-  Preact.useMemo<SourceObservable<T>>(source, []);
+export const useObservable = <T,>(): Source<T> =>
+  Preact.useMemo<Source<T>>(source, []);

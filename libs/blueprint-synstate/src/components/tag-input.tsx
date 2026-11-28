@@ -1,4 +1,4 @@
-import { createState, map, onScopeDispose } from 'synstate';
+import { createState, map, onCleanup } from 'synstate';
 import {
   constant,
   deriveBindable,
@@ -100,7 +100,7 @@ export const TagInput = ({
     blurFrame: number;
   } = { input: undefined, blurFrame: 0 };
 
-  onScopeDispose(() => {
+  onCleanup(() => {
     cancelAnimationFrame(mut_state.blurFrame);
   });
 

@@ -12,7 +12,7 @@ export const createReducer = <S, A>(
   options?: StateOptions<NoInfer<S>>,
 ): readonly [
   useCurrentValue: () => S,
-  dispatch: (action: A) => S,
+  dispatch: (action: A) => void,
   utils: Readonly<{
     state: InitializedObservable<S>;
     getSnapshot: () => S;

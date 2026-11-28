@@ -1,27 +1,30 @@
 ---
-title: Lifecycle and scopes
-description: Where scopes are created, what they dispose, and the two habits that keep derivations from running for a view that is not shown.
+title: Lifecycle and owners
+description: Where owners are created, what they dispose, and the two habits that keep derivations from running for a view that is not shown.
 ---
 
-## Scopes
+## Owners
 
-synstate-dom has no owner tree of its own; it uses synstate's own scopes. Any observable created synchronously while a scope runs belongs to that scope, and so does every subscription a binding makes. When the scope is disposed, all of them go with it.
+synstate-dom has no lifetime of its own: it uses synstate's owners, which are the only lifetime there is. Everything created while an owner's `run` executes belongs to that owner: the observables, the bindings, the subscriptions, the cleanups registered with `onCleanup`, and the owners created inside it. Disposing an owner first stops every binding and subscription in it, its child owners' included, so that none writes what a cleanup sets (save what a projection or a setup made before disposing an owner of its own observable); then it disposes its child owners, runs its cleanups and disposes its nodes, each newest first. Nothing is reference-counted, and nothing travels down the graph to say that a source has ended: what depends on something goes when its owner goes.
 
-A scope is created only where something can be disposed on its own:
+An owner is created only where something can be disposed on its own:
 
-| created by                                            | parent                         | disposed when                                    |
-| :---------------------------------------------------- | :----------------------------- | :----------------------------------------------- |
-| `render`                                              | none                           | the function `render` returned is called         |
-| each branch of `If` / `MatchOptional` / `MatchResult` | the scope `If` was mounted in  | the branch changes, or the parent is disposed    |
-| each row of `For`                                     | the scope `For` was mounted in | the row's key is gone, or the parent is disposed |
+| created by                                                       | parent                                        | disposed when                                    |
+| :--------------------------------------------------------------- | :-------------------------------------------- | :----------------------------------------------- |
+| `render`                                                         | none                                          | the function `render` returned is called         |
+| each branch of `If` / `MatchOptional` / `MatchResult` / `Switch` | the owner the branch component was mounted in | the branch changes, or the parent is disposed    |
+| each row of `For`                                                | the owner `For` was mounted in                | the row's key is gone, or the parent is disposed |
+| each call of `mountChild`                                        | the owner current at the call                 | the parent is disposed, or the child throws      |
 
-A component does not get a scope of its own: it is called once and lives exactly as long as the branch, row or root it is mounted in.
+A component does not get an owner of its own: it is called once and lives exactly as long as the branch, row or root it is mounted in.
 
-State you define at module level, outside every scope, belongs to no scope and lives as long as the page. That is where your application's stores go.
+State you define at module level, outside every owner, belongs to none and lives as long as the page. That is where your application's stores go.
+
+A branch's owner is made a little differently from a plain `createOwner()`: every node created in it sits deeper in the graph than the node that decides the branch. That is what lets a branch component decide, in the update, before any node of the branch is visited ([How it works](/mono/synstate-dom/background/how-it-works/#a-branch-component-decides-before-its-branch-computes)).
 
 ## Two habits
 
-synstate derivations are not lazy. A derivation is recomputed whenever its parent changes, whether anything reads it or not. Two habits keep derivations from running for a view that is not on screen.
+synstate's derivations are not lazy. A derivation is recomputed whenever its parent changes, whether anything reads it or not (though a result equal to the last one goes no further). Two habits keep derivations from running for a view that is not on screen.
 
 **If only one view reads a derivation, create it inside that component**, not next to the store. It then exists only while the component is mounted, and from the moment it is created it has a reader: the binding.
 
@@ -30,13 +33,13 @@ import { createState, map } from 'synstate';
 import type { JSX } from 'synstate-dom';
 import { Arr } from 'ts-data-forge';
 
-// The store: module level, so it belongs to no scope and lives as long as the
+// The store: module level, so it belongs to no owner and lives as long as the
 // page.
 export const [cart$, setCart] = createState<readonly number[]>([]);
 
 export const CartTotal = (): JSX.Element => {
     // Only this view reads the total, so it is created here. It belongs to the
-    // scope this component is mounted in and is disposed with it.
+    // owner this component is mounted in and is disposed with it.
     const total$ = cart$.pipe(map(Arr.sum));
 
     return <p>{total$.pipe(map((t) => `Total: ${t}`))}</p>;
@@ -70,25 +73,67 @@ const Stats = (): JSX.Element => {
 };
 ```
 
-"Inside the branch" means inside a component the branch mounts, as `Stats` above. JSX written straight into `then` is evaluated where it is written, before `If` chooses, so a `pipe(map(...))` in it is created in the enclosing component's scope and keeps computing while the branch is hidden. That is fine for a few light bindings; move a branch with many bindings, or ones that update often, into a component of its own.
+"Inside the branch" means inside a component the branch mounts, as `Stats` above. JSX written straight into `then` is evaluated where it is written, before `If` chooses, so a `pipe(map(...))` in it is created in the enclosing component's owner and keeps computing while the branch is hidden. That is fine for a few light bindings; move a branch with many bindings, or ones that update often, into a component of its own.
 
-That leaves one case: a heavy derivation defined globally and read only rarely. synstate-dom does not put such a derivation to sleep while nothing reads it. If that turns out to matter in a real application, it will be revisited.
+That leaves one case: a heavy derivation defined globally and read only rarely. Nothing puts such a derivation to sleep while nothing reads it.
 
-## Event handlers
+## Event handlers and `await`
 
-A handler runs outside every scope: by the time it is called, no `run` is executing. So an observable you create in a handler, such as `a$.pipe(map(...))`, belongs to no scope and keeps being computed even after its row or branch is gone, and a `subscribe` made there is never unsubscribed. synstate-dom gives no warning at run time. The `no-observable-in-handler` rule of [eslint-plugin-synstate](https://www.npmjs.com/package/eslint-plugin-synstate) reports such an observable, and such a `subscribe`, instead: one made in an `onClick`-style prop or a listener passed to `listenInScope` or `addEventListener`, in a callback written inside it, or in a function of the same file it calls by name. Work inside the `run` of a scope taken at mount time is accepted. What the rule follows, and what it misses, is in the [plugin's README](https://github.com/noshiro-pf/mono/tree/main/libs/eslint-plugin-synstate#no-observable-in-handler).
+An owner is current only while its `run` executes. An event handler, a timer callback, the function given to `subscribe`, and every recompute run with no owner current, so that what they create does not belong to whichever owner happened to be current when a write was made. An observable you create in a handler, such as `a$.pipe(map(...))`, therefore belongs to no owner and keeps being computed after its row or branch is gone, and a `subscribe` made there is never unsubscribed. Nothing warns of it at run time. eslint-plugin-synstate's `no-observable-in-handler` reports it.
 
-Instead, have the handler write to a state, and derive from that state at mount time. If later work really has to create an observable, say after an `await`, grab the scope with `getCurrentScope()` while the component is mounting, and wrap the later work in that scope's `run`.
+Instead, have the handler write to a state, and derive from that state at mount time. A write needs no owner. If later work really has to create something that should go with the component, take the owner with `getOwner()` while the component mounts and wrap that work in its `run`. In an owner already disposed, `run` still calls the function, with no owner current, so check `disposed` first:
 
-The same holds after an `await` inside a component: the component runs in its scope only until it returns, so in an `async` function it starts, what comes after the first `await` runs with no scope current. `no-observable-in-handler` reports an observable created, or a `subscribe` made, there too; code before the first `await`, and work in the `run` of a scope taken before it, are accepted.
+```tsx
+import { createState, getOwner, map } from 'synstate';
+import type { JSX } from 'synstate-dom';
+
+type Profile = Readonly<{ name: string }>;
+
+declare const fetchProfile: () => Promise<Profile>;
+
+export const Greeting = (): JSX.Element => {
+    const [name$, setName] = createState('');
+
+    // Taken while the component mounts: the owner it is mounted in.
+    const owner = getOwner();
+
+    const load = async (): Promise<void> => {
+        const profile = await fetchProfile();
+
+        // After the `await`, no owner is current. A write needs none; something
+        // made here that should go with the component is made in its owner, unless
+        // the component was unmounted while the fetch was pending.
+        setName(profile.name);
+
+        if (owner === undefined || owner.disposed) {
+            return;
+        }
+
+        owner.run(() => {
+            name$.subscribe((name) => {
+                console.info(`greeting ${name}`);
+            });
+        });
+    };
+
+    load().catch((error: unknown) => {
+        console.error(error);
+    });
+
+    return <p>{name$.pipe(map((name) => `Hello, ${name}`))}</p>;
+};
+```
+
+The same holds after an `await` inside a component: the component runs in its owner only until it returns, so in an `async` function it starts, what comes after the first `await` runs with no owner.
 
 ## Effects that last as long as the component
 
-A component is called once, so what another library would run in an effect is started in the component's body and stopped when its scope is disposed.
+A component is called once, so what another library would run in an effect is started in the component's body and stopped when its owner is disposed.
 
-- synstate's `source.subscribe(next)` calls `next` with every value of `source`, the current one first. Made while the component mounts, it belongs to the component's scope, which unsubscribes it when disposed, as it disposes the observables created there. To keep a subscription past the scope, make it inside `untracked`.
-- `listenInScope(target, type, listener, options)` adds an event listener to something other than an element the component draws, such as `window` or `document`, and removes it when the scope is disposed. For an element the component draws, use its `onClick`-style props.
-- `createAfterUpdate()` returns a function that runs work in a microtask, after the update under way has finished. By then the DOM bound to that update has been written and the propagation is over, so the work may write to a state: a write made while another state is still propagating is what synstate warns of. It is also how work runs after the first mount, because a component's nodes are attached to the document only once the whole description they are in is mounted. Work for a scope disposed by then is dropped.
+- `source.subscribe(next)` calls `next` at once with the current value, and then once after each update that changed it, once every value of the update is up to date. Made while the component mounts, it belongs to the component's owner, which unsubscribes it when disposed. To keep a subscription past the owner, make it inside `untracked`. A write made by `next` starts the next update, after the current one; it never interrupts it.
+- `onCleanup(fn)` runs `fn` when the current owner is disposed.
+- `listenInScope(target, type, listener, options)` adds an event listener to something other than an element the component draws, such as `window` or `document`, and removes it when the owner is disposed. For an element the component draws, use its `onClick`-style props.
+- `createAfterUpdate()` returns a function that runs work in a microtask, after the update under way and the DOM changes it makes, unless the owner has been disposed by then. A component's nodes are attached to the document only once the whole description they are in is mounted, so this is how work that needs them in the document (focusing an input, measuring an element) runs after the first mount.
 
 ```tsx
 import { createState } from 'synstate';
@@ -107,12 +152,13 @@ export const SearchBox = (): JSX.Element => {
     );
 
     // Saves the query whenever it changes. Subscribed while the component mounts,
-    // so the component's scope unsubscribes it: what an effect would do.
+    // so it belongs to the component's owner, which unsubscribes it: what an
+    // effect would do.
     query$.subscribe((query) => {
         sessionStorage.setItem('search', query);
     });
 
-    // Removed with the scope, so a closed branch leaves no listener behind.
+    // Removed with the owner, so a closed branch leaves no listener behind.
     listenInScope(globalThis, 'keydown', (event) => {
         if (
             event instanceof KeyboardEvent &&

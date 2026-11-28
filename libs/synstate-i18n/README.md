@@ -5,9 +5,8 @@ follows the current locale, so a synstate-dom component puts it straight into
 its markup, and the compiler checks every key, every placeholder and every
 translation.
 
-It is private for now: it is written against
-[synstate-next](../synstate-next/README.md), the rebuild that replaces synstate
-in its next major release, and is published once that release is out.
+It is private for now: it is written against synstate 10, the rebuilt
+[synstate](../synstate/README.md), and is published once that release is out.
 
 - **Typed from the base catalog.** The catalog of the base locale, declared
   `as const`, is the type everything is checked against. `i18n.t.greeting()`
@@ -180,8 +179,8 @@ an unhandled rejection.
 A text goes wherever an observable does: a child, an attribute, a property.
 
 ```tsx
-import { constant, For, type JSX } from 'synstate-dom-next';
-import { map, type InitializedObservable } from 'synstate-next';
+import { map, type InitializedObservable } from 'synstate';
+import { constant, For, type JSX } from 'synstate-dom';
 import { i18n } from './i18n.mjs';
 
 const localeNames = { en: 'English', ja: '日本語' } as const;

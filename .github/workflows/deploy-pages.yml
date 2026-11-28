@@ -52,9 +52,6 @@ jobs:
       - name: Generate the API documentation
         run: pnpm run ws:doc
 
-      - name: Build the documentation site
-        run: pnpm --filter @synstate/docs run build:astro
-
       # Into `docs/marp-slides/<deck>/slides.html`, which the next step copies.
       - name: Render the Marp decks
         run: pnpm run build:marp-slides

@@ -9,8 +9,8 @@
 
 import {
   debounce,
+  dropInitialValue,
   map,
-  mapTo,
   merge,
   withInitialValue,
   type InitializedObservable,
@@ -59,9 +59,15 @@ export const createLoanStore = (deps: LoanDeps): LoanStore => {
     .pipe(debounce(deps.calcDelayMs))
     .pipe(map(calcAll));
 
+  // Only changes: the values the inputs and the figures hold when the store is
+  // created are not a calculation under way.
   const isCalculating: InitializedObservable<boolean> = merge([
-    inputs.pipe(mapTo(true)),
-    calculatedValues.pipe(mapTo(false)),
+    inputs
+      .pipe(dropInitialValue())
+      .pipe(map(() => true, { equals: () => false })),
+    calculatedValues
+      .pipe(dropInitialValue())
+      .pipe(map(() => false, { equals: () => false })),
   ]).pipe(withInitialValue(false));
 
   const setInputs = (patch: Partial<Store>): void => {

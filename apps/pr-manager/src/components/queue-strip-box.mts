@@ -1,8 +1,4 @@
-import {
-  createState,
-  onScopeDispose,
-  type InitializedObservable,
-} from 'synstate';
+import { createState, onCleanup, type InitializedObservable } from 'synstate';
 import { Optional } from 'ts-data-forge';
 import {
   draggedLeft,
@@ -106,7 +102,7 @@ export const queueStripBox = (): Readonly<{
   // A box that starts or stops running where it is changes what is held.
   const kindChanged = new MutationObserver(request);
 
-  onScopeDispose(() => {
+  onCleanup(() => {
     resized.disconnect();
 
     changed.disconnect();

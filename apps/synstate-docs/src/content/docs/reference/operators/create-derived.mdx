@@ -1,0 +1,95 @@
+---
+title: createDerived
+description: 'Creates an observable that follows `parents`: an operator written outside the package.'
+---
+
+{/* reference:jsdoc */}
+
+### `createDerived`
+
+Creates an observable that follows `parents`: an operator written outside the package. `setup` runs once, at creation, and returns its `update` (alone, or with `settled`). The observable holds `initialValue` if given, and nothing until it is first set otherwise. It belongs to the current owner as every observable does. `setup` runs with the observable as the current owner, so what it creates and the cleanups it registers (`ctx.onCleanup`, or `onCleanup`) belong to the observable. Disposing it disposes them as an owner does: the owners `setup` created first, then the cleanups, then the nodes, each newest first.
+
+`update` reads its parents. What `setup` creates is for work on the side (a subscription, a listener): a node made there is visited in the same update as this one, not before it, so `update` would read its value from before.
+
+An operator that emits later than the update that made it recompute (from a timer) gives `settled`, so that it is not taken for done while a value is still due; a `mergeMap` lets go of an inner observable that is settled.
+
+### `DerivedContext`
+
+What `createDerived` gives the operator it builds.
+
+- `emitted`: Whether `parent` emitted in the update under way, after this observable was created. Any of its parents makes it recompute; this tells which of them did.
+- `set`: Passes `value` on in the update under way, once `update` returns; of several, the last. Only for `update`: a value that comes later (from a timer) is `emit`ted.
+- `emit`: Passes `value` on in an update of its own, after the one under way if any. Every value given is passed on, in order; nothing once it is disposed.
+- `onCleanup`: Registers `cleanup` to run when the observable is disposed; at once if it is disposed already.
+
+### `DerivedBehavior`
+
+What the setup of `createDerived` returns in place of a function: an object whose functions are called on it, as methods (a function returned instead is called with no `this`). Each is typed with a `this` of `unknown`, not `void`, which a call on the object would not satisfy, so that a function that needs a particular `this`, as a method of an observable does, does not type-check; a class's methods, which declare none, do.
+
+- `update`: Called in each update a parent emitted in.
+- `settled` (optional): Whether it can emit no more, besides being disposed: every parent settled unless given. A value given to `emit` and not passed on yet keeps it from being settled either way.
+
+{/* /reference */}
+
+## Example
+
+```tsx
+import {
+    createDerived,
+    createState,
+    type DropInitialValueOperator,
+    type Observable,
+} from 'synstate';
+import { Optional } from 'ts-std-forge';
+
+// Passes on every `n`-th value of the source.
+const everyNth =
+    <A,>(n: number): DropInitialValueOperator<A, A> =>
+    (source: Observable<A>): Observable<A> =>
+        createDerived<A>([source], (ctx) => {
+            let mut_count = 0;
+
+            return () => {
+                const value = source.getSnapshot();
+
+                if (Optional.isNone(value) || !ctx.emitted(source)) {
+                    return;
+                }
+
+                mut_count += 1;
+
+                if (mut_count !== n) {
+                    return;
+                }
+
+                mut_count = 0;
+
+                ctx.set(Optional.unwrap(value));
+            };
+        });
+
+const [count, setCount] = createState(0);
+
+const mut_seen: number[] = [];
+
+count.pipe(everyNth(2)).subscribe((c) => {
+    mut_seen.push(c);
+});
+
+setCount(1);
+
+setCount(2);
+
+setCount(3);
+
+setCount(4);
+
+assert.deepStrictEqual(mut_seen, [2, 4]);
+```
+
+## See also
+
+- [Custom operators and sources](/mono/synstate/guides/custom-operators-and-sources/)
+- [All APIs](/mono/synstate/reference/)
+
+[Source on GitHub](https://github.com/noshiro-pf/mono/blob/main/libs/synstate/src/operators/create-derived.mts)
