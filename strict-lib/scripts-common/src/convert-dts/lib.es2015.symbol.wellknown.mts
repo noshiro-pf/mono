@@ -5,11 +5,14 @@ import {
   replaceWithNoMatchCheck,
   replaceWithinInterface,
 } from '../functions/utils/node-utils.mjs';
-import type { ConverterOptions } from './common.mjs';
+import { idFn, type ConverterOptions } from './common.mjs';
 import { convertStringReplacerArgs } from './convert-string-replacer-args.mjs';
 
 export const convertEs2015SymbolWellknown =
-  ({ brandedNumber }: ConverterOptions): MonoTypeFunction<string> =>
+  ({
+    brandedNumber,
+    config: { useBrandedNumber },
+  }: ConverterOptions): MonoTypeFunction<string> =>
   (src) =>
     pipe(src).map(
       composeMonoTypeFns(
@@ -36,11 +39,6 @@ export const convertEs2015SymbolWellknown =
         replaceWithinInterface({
           name: 'RegExp',
           mapFn: composeMonoTypeFns(
-            // `String#search(searcher)`, declared in this lib file, keeps
-            // `number`: a searcher's `[Symbol.search]` may return any number,
-            // and the overload does not take its return type from the searcher.
-            // It is merged ahead of the ES5 `search(regexp)`, so
-            // `'abc'.search(/x/)` is typed `number`, not `StringSearchResult`.
             replaceWithNoMatchCheck(
               '[Symbol.search](string: string): number;',
               `[Symbol.search](string: string): ${brandedNumber.StringSearchResult};`,
@@ -50,6 +48,21 @@ export const convertEs2015SymbolWellknown =
               `limit?: ${brandedNumber.ArraySizeArgNonNegative}`,
             ),
           ),
+        }),
+
+        // `String#search(searcher)` is merged ahead of the ES5
+        // `search(regexp)`, so a `RegExp` argument resolves to it. A searcher's
+        // `[Symbol.search]` may return any number, so the overload returns what
+        // the searcher's does: `StringSearchResult` for a `RegExp`, as
+        // `'abc'.search(/x/)` should be. The plain flavor types both `number`.
+        replaceWithinInterface({
+          name: 'String',
+          mapFn: !useBrandedNumber
+            ? idFn
+            : replaceWithNoMatchCheck(
+                'search(searcher: { [Symbol.search](string: string): number }): number;',
+                'search<R extends number>(searcher: { [Symbol.search](string: string): R }): R;',
+              ),
         }),
 
         // Three occurrences here — `RegExp[Symbol.replace]` and the two in

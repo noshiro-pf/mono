@@ -441,3 +441,21 @@ export const dateTypes = [
 
 // @ts-expect-error `new Date('1960-01-01').getTime()` is `-315619200000`.
 export const timestampBefore1970: SafeUint = new Date('1960-01-01').getTime();
+
+/**
+ * #4175 — `'abc'.search(/x/)` was typed `number`. ES2015's
+ * `search(searcher)`, declared after the ES5 `search(regexp)`, is tried first,
+ * and it returned `number` whatever the searcher's `[Symbol.search]` returns.
+ * It now returns what the searcher's does: a `RegExp`'s is
+ * `StringSearchResult`, and a searcher typed `number` still gives `number`.
+ */
+const searchWithRegExp = 'abc'.search(/x/);
+
+const searchWithSearcher = 'abc'.search({
+  [Symbol.search]: (_: string): number => 0,
+});
+
+export const searchTypes = [
+  true satisfies TypeEq<typeof searchWithRegExp, NumberType.StringSearchResult>,
+  true satisfies TypeEq<typeof searchWithSearcher, number>,
+] as const;
