@@ -1,6 +1,7 @@
 import { Result } from 'ts-data-forge';
 import {
   checkRepository,
+  claudeHookCommands,
   findShellFindings,
   installPinnedShellcheck,
   unblockPrsCommands,
@@ -24,6 +25,7 @@ const findingsOf = async (
       shellFiles: [],
       manifests: [],
       unblockPrsConfig: undefined,
+      claudeSettings: undefined,
       ...sources,
     },
     exceptions,
@@ -135,6 +137,7 @@ describe(findShellFindings, () => {
         shellFiles: [],
         manifests: [{ path: 'libs/a/package.json', text: '{' }],
         unblockPrsConfig: undefined,
+        claudeSettings: undefined,
       },
       exceptions: [],
     });
@@ -204,6 +207,37 @@ describe(findShellFindings, () => {
     assert.isTrue(findings.every((finding) => !finding.includes('fixers[0]')));
   });
 
+  test('reports a Claude Code hook command with its path in the settings', async () => {
+    const findings = await findingsOf({
+      claudeSettings: {
+        path: '.claude/settings.json',
+        text: JSON.stringify({
+          hooks: {
+            SessionStart: [
+              { hooks: [{ type: 'command', command: 'echo ok' }] },
+              {
+                matcher: 'startup',
+                hooks: [{ type: 'command', command: unsafeRemoval }],
+              },
+            ],
+          },
+        }),
+      },
+    });
+
+    assert.isTrue(
+      findings.some((finding) =>
+        finding.startsWith(
+          '.claude/settings.json: hooks.SessionStart[1].hooks[0].command: SC2115 ',
+        ),
+      ),
+    );
+
+    assert.isTrue(
+      findings.every((finding) => !finding.includes('SessionStart[0]')),
+    );
+  });
+
   test('leaves out a finding the table excepts, and only that one', async () => {
     const findings = await findingsOf(
       {
@@ -232,6 +266,60 @@ describe(findShellFindings, () => {
     assert.isTrue(
       findings.some((finding) =>
         finding.startsWith('libs/b/package.json: script "clean": SC2115'),
+      ),
+    );
+  });
+
+  test('leaves out a hook command finding the table excepts by its path', async () => {
+    const settings = (command: string) =>
+      ({
+        path: '.claude/settings.json',
+        text: JSON.stringify({
+          hooks: { Stop: [{ hooks: [{ type: 'command', command }] }] },
+        }),
+      }) as const;
+
+    const exception = {
+      manifest: '.claude/settings.json',
+      script: 'hooks.Stop[0].hooks[0].command',
+      code: 1090,
+      reason: 'a fixture',
+    } as const;
+
+    assert.deepStrictEqual(
+      await findingsOf({ claudeSettings: settings('f=$1; . "$f"') }, [
+        exception,
+      ]),
+      [],
+    );
+
+    // Its hook moved: the entry names nothing, and fails.
+    const moved = await findingsOf(
+      {
+        claudeSettings: {
+          path: '.claude/settings.json',
+          text: JSON.stringify({
+            hooks: {
+              Stop: [
+                { hooks: [{ type: 'command', command: 'true' }] },
+                { hooks: [{ type: 'command', command: 'f=$1; . "$f"' }] },
+              ],
+            },
+          }),
+        },
+      },
+      [exception],
+    );
+
+    assert.isTrue(
+      moved.some((finding) => finding.includes('matches no finding')),
+    );
+
+    assert.isTrue(
+      moved.some((finding) =>
+        finding.startsWith(
+          '.claude/settings.json: hooks.Stop[1].hooks[0].command: SC1090 ',
+        ),
       ),
     );
   });
@@ -296,6 +384,49 @@ describe(unblockPrsCommands, () => {
     assert.include(result.value, 'speculate.before');
 
     assert.include(result.value, 'autoFix.fixers[0].cleanup.run');
+  });
+});
+
+describe(claudeHookCommands, () => {
+  test('lists the command of every command hook, by its path', () => {
+    assert.deepStrictEqual(
+      claudeHookCommands({
+        permissions: { allow: ['Bash(ls)'] },
+        hooks: {
+          SessionStart: [{ hooks: [{ type: 'command', command: 'a' }] }],
+          PostToolUse: [
+            {
+              matcher: 'Edit',
+              hooks: [
+                { type: 'prompt', prompt: 'not shell' },
+                { type: 'command', command: 'b', timeout: 5 },
+              ],
+            },
+          ],
+        },
+      }),
+      Result.ok([
+        { field: 'hooks.SessionStart[0].hooks[0].command', text: 'a' },
+        { field: 'hooks.PostToolUse[0].hooks[1].command', text: 'b' },
+      ]),
+    );
+  });
+
+  test('lists nothing for settings with no hooks', () => {
+    assert.deepStrictEqual(
+      claudeHookCommands({ permissions: {} }),
+      Result.ok([]),
+    );
+  });
+
+  test('fails on a command hook whose command is not a string', () => {
+    const result = claudeHookCommands({
+      hooks: { Stop: [{ hooks: [{ type: 'command', command: ['a'] }] }] },
+    });
+
+    assert.isTrue(Result.isErr(result));
+
+    assert.include(result.value, 'hooks.Stop[0].hooks[0].command');
   });
 });
 
