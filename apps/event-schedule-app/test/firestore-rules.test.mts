@@ -537,6 +537,26 @@ const cases = (): readonly Case[] =>
       expected: 'denied',
     },
 
+    // `internal/emailChecks`: the functions' count of `verifyEmail` checks,
+    // which no rule matches.
+    {
+      name: 'anyone reads internal/emailChecks of an anonymous event',
+      actor: 'signed out',
+      operation: (db) =>
+        getDoc(doc(db, 'events_v7/anonymous/internal/emailChecks')),
+      expected: 'denied',
+    },
+    {
+      name: 'anyone writes internal/emailChecks of an anonymous event',
+      actor: 'signed out',
+      operation: (db) =>
+        setDoc(doc(db, 'events_v7/anonymous/internal/emailChecks'), {
+          windowStartMillis: 0,
+          count: 0,
+        }),
+      expected: 'denied',
+    },
+
     // `internal/closingMail`: the functions' record of the "answers closed"
     // mail, which no rule matches.
     {
