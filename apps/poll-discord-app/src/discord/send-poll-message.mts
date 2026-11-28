@@ -14,7 +14,8 @@ import {
   gpParseGroupingCommandArgument,
   gpParseRandCommandArgument,
   removeCommandPrefix,
-  rpCreateSummaryMessage,
+  rpCheckPollLimits,
+  rpCreateSummaryMessages,
   rpParseCommand,
 } from '../functions/index.mjs';
 import {
@@ -25,7 +26,6 @@ import {
   toTimestamp,
   toTitleMessageId,
   type AnswerOfDate,
-  type CommandMessageId,
   type DateOption,
   type DateOptionId,
   type Group,
@@ -53,12 +53,7 @@ export const sendMessageMain = async (
   if (message.content.startsWith(`${triggerCommand.rp} `)) {
     const [title, ...args] = rpParseCommand(message.content);
 
-    return rpSendPollMessage(
-      message.channel,
-      toCommandMessageId(message.id),
-      title,
-      args,
-    );
+    return rpSendPollMessage(message, title, args);
   }
 
   if (message.content.startsWith(`${triggerCommand.rp30} `)) {
@@ -66,16 +61,9 @@ export const sendMessageMain = async (
       removeCommandPrefix(message.content, triggerCommand.rp30),
     );
 
-    if (Result.isErr(res)) {
-      return res;
-    }
-
-    return rpSendPollMessage(
-      message.channel,
-      toCommandMessageId(message.id),
-      res.value.title,
-      res.value.args,
-    );
+    return Result.isErr(res)
+      ? res
+      : rpSendPollMessage(message, res.value.title, res.value.args);
   }
 
   if (message.content.startsWith(`${triggerCommand.rp60} `)) {
@@ -83,16 +71,9 @@ export const sendMessageMain = async (
       removeCommandPrefix(message.content, triggerCommand.rp60),
     );
 
-    if (Result.isErr(res)) {
-      return res;
-    }
-
-    return rpSendPollMessage(
-      message.channel,
-      toCommandMessageId(message.id),
-      res.value.title,
-      res.value.args,
-    );
+    return Result.isErr(res)
+      ? res
+      : rpSendPollMessage(message, res.value.title, res.value.args);
   }
 
   if (message.content.startsWith(`${triggerCommand.rp30d} `)) {
@@ -100,16 +81,9 @@ export const sendMessageMain = async (
       removeCommandPrefix(message.content, triggerCommand.rp30d),
     );
 
-    if (Result.isErr(res)) {
-      return res;
-    }
-
-    return rpSendPollMessage(
-      message.channel,
-      toCommandMessageId(message.id),
-      res.value.title,
-      res.value.args,
-    );
+    return Result.isErr(res)
+      ? res
+      : rpSendPollMessage(message, res.value.title, res.value.args);
   }
 
   if (message.content.startsWith(`${triggerCommand.rp60d} `)) {
@@ -117,16 +91,9 @@ export const sendMessageMain = async (
       removeCommandPrefix(message.content, triggerCommand.rp60d),
     );
 
-    if (Result.isErr(res)) {
-      return res;
-    }
-
-    return rpSendPollMessage(
-      message.channel,
-      toCommandMessageId(message.id),
-      res.value.title,
-      res.value.args,
-    );
+    return Result.isErr(res)
+      ? res
+      : rpSendPollMessage(message, res.value.title, res.value.args);
   }
 
   return Result.ok(undefined);
@@ -185,7 +152,7 @@ const rpSendPollMessageSub = async (
 
   const dateOptions = mut_dateOptionAndMessageListTemp.map(([a]) => a);
 
-  const summaryMessageEmbed = rpCreateSummaryMessage(
+  const summaryMessageEmbeds = rpCreateSummaryMessages(
     {
       id: toPollId(''),
       updatedAt: toTimestamp(DateUtils.now()),
@@ -200,7 +167,7 @@ const rpSendPollMessageSub = async (
   );
 
   const summaryMessageInitResult = await Result.fromPromise(
-    messageChannel.send({ embeds: [summaryMessageEmbed] }),
+    messageChannel.send({ embeds: summaryMessageEmbeds }),
   );
 
   if (Result.isErr(summaryMessageInitResult)) {
@@ -212,7 +179,7 @@ const rpSendPollMessageSub = async (
   // memo: "（編集済）" という文字列が表示されてずれるのが操作性を若干損ねるので、
   // あえて一度メッセージを送った後再編集している
   const summaryMessageEditResult = await Result.fromPromise(
-    summaryMessageInit.edit({ embeds: [summaryMessageEmbed] }),
+    summaryMessageInit.edit({ embeds: summaryMessageEmbeds }),
   );
 
   if (Result.isErr(summaryMessageEditResult)) {
@@ -238,8 +205,7 @@ const rpSendPollMessageSub = async (
 };
 
 const rpSendPollMessage = async (
-  discordChannel: Discord.Message['channel'],
-  messageId: CommandMessageId,
+  commandMessage: Discord.Message,
   title: string | undefined,
   pollOptions: readonly string[],
 ): Promise<Result<undefined, unknown>> => {
@@ -251,8 +217,20 @@ const rpSendPollMessage = async (
     return Result.ok(undefined);
   }
 
+  // Before anything is posted: a poll whose summary cannot be built would leave
+  // its title and option messages in the channel with nothing behind them.
+  const limitsResult = rpCheckPollLimits(title, pollOptions);
+
+  if (Result.isErr(limitsResult)) {
+    return Result.fromPromise(
+      commandMessage.reply(limitsResult.value).then(() => undefined),
+    );
+  }
+
+  const messageId = toCommandMessageId(commandMessage.id);
+
   const replySubResult = await rpSendPollMessageSub(
-    discordChannel,
+    commandMessage.channel,
     title,
     pollOptions,
   );
