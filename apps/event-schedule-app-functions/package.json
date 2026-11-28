@@ -33,9 +33,9 @@
   },
   "dependencies": {
     "event-schedule-app-shared": "workspace:*",
-    "firebase-admin": "^14.5.0",
+    "firebase-admin": "^14.5.1",
     "firebase-functions": "^7.4.0",
-    "nodemailer": "^10.2.0",
+    "nodemailer": "^10.6.0",
     "ts-data-forge": "workspace:*",
     "ts-fortress": "workspace:*",
     "ts-fortress-types": "workspace:*"

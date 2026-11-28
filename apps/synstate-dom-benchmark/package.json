@@ -35,13 +35,13 @@
     "preact": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
-    "solid-js": "1.9.17",
+    "solid-js": "2.0.1",
     "synstate": "workspace:*",
     "synstate-dom": "workspace:*",
     "synstate-dom-next": "workspace:*",
     "synstate-next": "workspace:*",
     "ts-data-forge": "workspace:*",
-    "vanjs-core": "1.6.1"
+    "vanjs-core": "1.6.2"
   },
   "devDependencies": {
     "@types/react": "catalog:",
@@ -57,7 +57,7 @@
     "prettier-plugin-packagejson": "catalog:",
     "tsx": "catalog:",
     "vite": "catalog:",
-    "vite-plugin-solid": "2.11.14",
+    "vite-plugin-solid": "2.11.17",
     "vitest": "catalog:"
   }
 }

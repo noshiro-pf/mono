@@ -46,7 +46,7 @@
   },
   "devDependencies": {
     "@playwright/test": "catalog:",
-    "@types/chrome": "^0.3.6",
+    "@types/chrome": "^0.3.7",
     "eslint": "catalog:",
     "eslint-config-typed": "workspace:*",
     "eslint-plugin-ts-data-forge": "workspace:*",

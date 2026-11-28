@@ -1,8 +1,27 @@
 import * as assert from 'node:assert/strict';
-import { execFileSync } from 'node:child_process';
+import { spawn } from 'node:child_process';
 import * as fs from 'node:fs';
 import * as os from 'node:os';
 import * as path from 'node:path';
+
+/**
+ * Runs `file`, its output going to this process's (or nowhere, with
+ * `stdio: 'ignore'`), and fails unless it exits 0.
+ */
+const run = (file, args, stdio = 'inherit') =>
+  new Promise((resolve, reject) => {
+    const child = spawn(file, args, { stdio });
+
+    child.once('error', reject);
+
+    child.once('close', (status) => {
+      if (status === 0) {
+        resolve();
+      } else {
+        reject(new Error(`${file} ${args.join(' ')} exited with ${status}`));
+      }
+    });
+  });
 
 // This package is executables only, so the check runs one the way a consumer
 // would — through the bin symlink npm creates.
@@ -21,24 +40,20 @@ fs.writeFileSync(
   'export const xs: string[] = [];\nexport const o = { a: 1 };\n',
 );
 
-execFileSync(
-  bin('ts-codemod'),
-  [
-    '--transformer',
-    'append-as-const',
-    '--transformer',
-    'convert-to-readonly',
-    file,
-  ],
-  { stdio: 'inherit' },
-);
+await run(bin('ts-codemod'), [
+  '--transformer',
+  'append-as-const',
+  '--transformer',
+  'convert-to-readonly',
+  file,
+]);
 
 const transformed = fs.readFileSync(file, 'utf8');
 
 assert.match(transformed, /readonly\s+string\[\]/u);
 assert.match(transformed, /as const/u);
 
-execFileSync(bin('ts-codemod'), ['--help'], { stdio: 'ignore' });
+await run(bin('ts-codemod'), ['--help'], 'ignore');
 
 fs.rmSync(dir, { recursive: true, force: true });
 

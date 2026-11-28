@@ -83,6 +83,22 @@ assert.equal(Result.isOk(SafeNumber.parse('1.5')), true);
 assert.equal(Result.unwrapOkOr(SafeNumber.parse('x'), 0), 0);
 assert.equal(Optional.unwrapOr(Optional.some(1), 0), 1);
 assert.equal(Optional.unwrapOr(Optional.fromNullable(undefined), 0), 0);
+
+// Round trips through the public API alone, so that they hold whatever the
+// runtime representation of an Optional is: falsy values, a nested None, a
+// string, and a structured clone.
+for (const value of [0, '', false, null, undefined, 'text', { id: 1 }]) {
+  const held = Optional.some(value);
+
+  assert.equal(Optional.isSome(held), true);
+  assert.deepStrictEqual(Optional.unwrap(held), value);
+}
+
+const someNone = Optional.some(Optional.none);
+assert.equal(Optional.isSome(someNone), true);
+assert.equal(Optional.isNone(Optional.unwrap(someNone)), true);
+assert.equal(Optional.isNone(structuredClone(Optional.none)), true);
+assert.equal(Optional.unwrap(structuredClone(Optional.some(0))), 0);
 assert.equal(
   pipe(' 2 ')
     .map((s) => s.trim())
