@@ -229,6 +229,81 @@ describe('prefer-strict-or-relaxed-utility-type', () => {
           ],
         },
         {
+          name: 'drops the suggestion whose target name is a type parameter around it',
+          code: dedent`
+            function f<StrictOmit>(x: Omit<{ a: 1; b: 2 }, 'a'>) {}
+          `,
+          errors: [
+            {
+              messageId: 'useStrictOrRelaxed',
+              suggestions: [
+                {
+                  messageId: 'replaceWith',
+                  data: { name: 'Omit', replacement: 'RelaxedOmit' },
+                  output: dedent`
+                    import { type RelaxedOmit } from 'ts-type-forge';
+                    function f<StrictOmit>(x: RelaxedOmit<{ a: 1; b: 2 }, 'a'>) {}
+                  `,
+                },
+              ],
+            },
+          ],
+        },
+        {
+          name: 'drops the suggestion whose target name is a local type alias around it',
+          code: dedent`
+            function f() {
+              type StrictOmit = string;
+              type A = Omit<{ a: 1; b: 2 }, 'a'>;
+            }
+          `,
+          errors: [
+            {
+              messageId: 'useStrictOrRelaxed',
+              suggestions: [
+                {
+                  messageId: 'replaceWith',
+                  data: { name: 'Omit', replacement: 'RelaxedOmit' },
+                  output: dedent`
+                    import { type RelaxedOmit } from 'ts-type-forge';
+                    function f() {
+                      type StrictOmit = string;
+                      type A = RelaxedOmit<{ a: 1; b: 2 }, 'a'>;
+                    }
+                  `,
+                },
+              ],
+            },
+          ],
+        },
+        {
+          name: 'drops the suggestion whose target name is a local interface around it',
+          code: dedent`
+            function f() {
+              interface StrictOmit {}
+              type A = Omit<{ a: 1; b: 2 }, 'a'>;
+            }
+          `,
+          errors: [
+            {
+              messageId: 'useStrictOrRelaxed',
+              suggestions: [
+                {
+                  messageId: 'replaceWith',
+                  data: { name: 'Omit', replacement: 'RelaxedOmit' },
+                  output: dedent`
+                    import { type RelaxedOmit } from 'ts-type-forge';
+                    function f() {
+                      interface StrictOmit {}
+                      type A = RelaxedOmit<{ a: 1; b: 2 }, 'a'>;
+                    }
+                  `,
+                },
+              ],
+            },
+          ],
+        },
+        {
           name: 'reports every occurrence, nesting included',
           code: "type A = Pick<{ a: 1; b: 2 }, Exclude<'a' | 'b', 'b'>>;",
           errors: [
