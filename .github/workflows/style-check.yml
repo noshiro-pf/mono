@@ -63,13 +63,14 @@ jobs:
 
     # The commit the `check:prose` guards that read a change compare the tree
     # with (`tools/scripts/lib/diff-base.mts`): `next-major` reads each
-    # package's version there, as a version pull request is the one tree that
-    # raises a version past its base, and `markdown-wrap` reads only the
-    # paragraphs the change touched. On `main` it is the commit before the
-    # push; a queue layer, on a `queue/*` branch, compares with `origin/main`,
-    # as a pull request does, so that its verdict is a whole one; and any other
-    # manual run compares the tree with itself, so the gate leaves no verdict
-    # of it to reuse (`check-gates.yml`).
+    # package's version there and `synstate-benchmark-fresh` synstate's, as a
+    # version pull request is the one tree that raises a version past its
+    # base, and `markdown-wrap` reads only the paragraphs the change touched.
+    # On `main` it is the commit before the push; a queue layer, on a
+    # `queue/*` branch, compares with `origin/main`, as a pull request does, so
+    # that its verdict is a whole one; and any other manual run compares the
+    # tree with itself, so the gate leaves no verdict of it to reuse
+    # (`check-gates.yml`).
     # The `queue/` prefix is `LAYER_BRANCH_PREFIX` in `libs/pr-merge-queue`, reserved
     # by `repo-settings/rulesets/queue-branches.json`: change them together.
     env:
@@ -93,7 +94,10 @@ jobs:
         # change touched), then the generators, each compared against the
         # tree as committed:
         #
-        # - `check:prose`: the checks whose inputs are documents. They are here
+        # - `check:prose`: the checks whose inputs are documents, and the
+        #   release guards that compare versions with the base
+        #   (`next-major`, `synstate-benchmark-fresh`), which only this
+        #   workflow fetches and sets as `PROSE_DIFF_BASE`. They are here
         #   and not in `check:root` because `check:root` is a
         #   `code-check.yml` entry, whose ignore list drops `**.md` and
         #   `.markdownlint-cli2.mjs` — so a diff touching only those would

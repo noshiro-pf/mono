@@ -41,6 +41,7 @@
     "@types/mdast": "catalog:",
     "@vitest/coverage-istanbul": "catalog:",
     "dedent": "catalog:",
+    "esbuild": "catalog:",
     "eslint-config-typed": "workspace:*",
     "eslint-plugin-ts-data-forge": "workspace:*",
     "eslint-plugin-ts-fortress": "workspace:*",

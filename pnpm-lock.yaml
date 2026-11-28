@@ -2130,6 +2130,9 @@ importers:
       dedent:
         specifier: 'catalog:'
         version: 1.7.2(babel-plugin-macros@3.1.0)
+      esbuild:
+        specifier: 'catalog:'
+        version: 0.28.2
       eslint-config-typed:
         specifier: workspace:*
         version: link:../../libs/eslint-config-typed

@@ -8,6 +8,7 @@ export default defineViteConfig({
     include: [
       'scripts/reference-text.mts',
       'scripts/embed-benchmark.mts',
+      'scripts/benchmark/measured-inputs.mts',
       'scripts/benchmark/scenarios.mts',
       'scripts/benchmark/time-entry.mts',
     ],

@@ -34,6 +34,18 @@ const BenchmarkResultsSchema = t.record({
     cpu: t.string(),
     /** The installed versions of the other libraries. */
     libraries: t.keyValueRecord(t.string(), t.string()),
+    /**
+     * The digest of the code measured (`digestMeasuredCode`). Absent from a
+     * file measured before it was recorded, which
+     * `check:prose:synstate-benchmark-fresh` treats as one to measure again.
+     */
+    measuredCode: t.optional(t.string()),
+    /**
+     * The installed versions of what the other libraries run on in turn
+     * (`readMeasuredInputs`); absent from a file measured before it was
+     * recorded, like `measuredCode`.
+     */
+    libraryDependencies: t.optional(t.keyValueRecord(t.string(), t.string())),
     /** `YYYY-MM-DD`, in UTC. */
     measuredOn: t.string(),
   }),

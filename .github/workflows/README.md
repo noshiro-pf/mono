@@ -508,12 +508,14 @@ the checks simply run, as they do the first time a tree is seen.
 
 A check inside a workflow that runs and reads only the diff —
 `fix:codemod:affected`, and the `check:prose` guards that read a change
-(`markdown-wrap`, `next-major`) — judges the tree only as far as its base lets
-it. A manual run on a branch other than a queue layer's compares the guards'
-tree with itself, so they pass whatever changed, and the gate records its
-verdict as not reusable. A queue layer's runs diff against `origin/main`, as a
-pull request's do, so its verdicts need no such care, and the queue deletes none
-of them (`unblock-prs`, step 3b in
+(`markdown-wrap`, `next-major`, `synstate-benchmark-fresh`) — judges the tree
+only as far as its base lets it. A manual run on a branch other than a queue
+layer's compares the guards' tree with itself, so they pass whatever changed
+(save `synstate-benchmark-fresh` on measured inputs, a table or a manifest it
+cannot read, which it fails on any tree), and the gate records its verdict as
+not reusable. A queue layer's runs diff against `origin/main`, as a pull
+request's do, so its verdicts need no such care, and the queue deletes none of
+them (`unblock-prs`, step 3b in
 `libs/pr-merge-queue/src/unblock-prs/README.md`).
 
 **A verdict has to be a function of the tree.** That is what makes reusing it

@@ -57,6 +57,7 @@
     "check:prose:readme-api-headings": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-readme-api-headings.mts",
     "check:prose:readme-sample-coverage": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-readme-sample-coverage.mts",
     "check:prose:site-fragments": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-site-fragments.mts",
+    "check:prose:synstate-benchmark-fresh": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-synstate-benchmark-fresh.mts",
     "check:prose:synstate-dom-placement": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-synstate-dom-placement.mts",
     "check:prose:unblock-prs-guide": "tsx --tsconfig ./tools/configs/tsconfig.tsx.json ./tools/scripts/cmd/check-unblock-prs-guide.mts",
     "check:published-deps": "node ./tools/scripts/cmd/assert-deps-built.mts --workspace && pnpm run z:eslint --config ./tools/configs/eslint.published-deps.mts --no-config-lookup '{libs,apps}/*/src/**/*.{mts,ts,tsx}' './eslint.config.mts' '{libs,apps}/*/eslint.config.mts' 'languages/*/*/eslint.config.mts' 'strict-lib/eslint.config.mts' --quiet",

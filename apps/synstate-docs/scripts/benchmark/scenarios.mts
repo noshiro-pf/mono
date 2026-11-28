@@ -42,11 +42,12 @@ const signalLibraries = Arr.toUnshifted('RxJS')(librariesButRxjs);
 
 /**
  * The npm package of each library the scenarios measure but synstate, by the
- * name its rows carry; `run-benchmark.mts` reads their versions.
+ * name its rows carry; `readMeasuredInputs` (`measured-inputs.mts`) reads their
+ * versions for the runner and for `check:prose:synstate-benchmark-fresh`.
  */
 // Keyed by `string`: the labels pass through `others()` as strings, so there is
 // no union of them to key on. `scenarios.test.mts` fails, naming the row, when
-// one is missing here, and `run-benchmark.mts` stops before measuring anything,
+// one is missing here, and `readMeasuredInputs` stops before measuring anything,
 // naming the library, for a run that skipped the test.
 export const packageOf: ReadonlyRecord<string, string> = {
   RxJS: 'rxjs',
