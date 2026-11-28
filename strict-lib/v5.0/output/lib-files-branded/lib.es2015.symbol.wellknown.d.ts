@@ -294,7 +294,7 @@ interface String {
    * Finds the first substring match in a regular expression search.
    * @param searcher An object which supports searching within a string.
    */
-  search(searcher: { [Symbol.search](string: string): number }): number;
+  search<R extends number>(searcher: { [Symbol.search](string: string): R }): R;
 
   /**
    * Split a string into substrings using the specified separator and return them as an array.
