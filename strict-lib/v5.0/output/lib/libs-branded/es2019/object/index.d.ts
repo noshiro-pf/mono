@@ -50,27 +50,90 @@ declare namespace StrictLibInternals {
 
   /**
    * One entry set on `R`, replacing an earlier entry with the same
-   * key as at run time. A union key sets one of its members: a member
-   * `R` already has keeps its value or takes `V`, and one it lacks
-   * is optional. A key with no literal (`string`, ``p-${string}``)
-   * is intersected with `R`, which does not widen the keys it may
-   * overwrite.
+   * key as at run time. The key is read as {@link EntryKey} gives it,
+   * and split into the literals a record lists and the index
+   * signatures it does not:
+   *
+   * - literals alone: one replaces an earlier value, and a union sets
+   *   one of its members, so a member `R` already has keeps its value
+   *   or takes `V`, and one it lacks is optional;
+   * - index signatures alone: an index signature of `V`, and a key of
+   *   `R` they match may have been overwritten, so it takes `V` too;
+   * - both: either may be the key, so the literals are optional, as
+   *   for a union, and then the index signatures are set.
    *
    * @internal
    */
-  type EntryStep<R, K extends PropertyKey, V> =
-    HasLiteralKey<K> extends false
-      ? R & { readonly [P in K]: V }
-      : import('ts-type-forge').IsUnion<K> extends true
-        ? { [P in keyof R]: [P & K] extends [never] ? R[P] : R[P] | V } & {
-            readonly [P in Exclude<K, keyof R>]?: V;
-          }
+  type EntryStep<
+    R,
+    K0 extends PropertyKey,
+    V,
+    K extends PropertyKey = EntryKey<K0>,
+  > = [LiteralKeys<K>] extends [never]
+    ? IndexSignatureStep<R, K, V>
+    : [IndexSignatureKeys<K>] extends [never]
+      ? import('ts-type-forge').IsUnion<K> extends true
+        ? UnionStep<R, K, V>
         : { [P in keyof R as P extends K ? never : P]: R[P] } & {
             readonly [P in K]: V;
-          };
+          }
+      : IndexSignatureStep<
+          UnionStep<R, LiteralKeys<K>, V>,
+          IndexSignatureKeys<K>,
+          V
+        >;
 
-  // 下の2個目の例に対応するためには、無限長の Entries に対しても再帰を回す必要があるが、
-  // 止めるタイミングを決められないので再帰制限を設けている。
+  /** @internal */
+  type UnionStep<R, K extends PropertyKey, V> = {
+    [P in keyof R]: [P & K] extends [never] ? R[P] : R[P] | V;
+  } & {
+    readonly [P in Exclude<K, keyof R>]?: V;
+  };
+
+  /** @internal */
+  type IndexSignatureStep<R, K extends PropertyKey, V> = {
+    [P in keyof R]: P extends K ? R[P] | V : R[P];
+  } & {
+    readonly [P in K]: V;
+  };
+
+  /**
+   * A key as `Object.fromEntries` sets it. A number literal sets its
+   * string: `0` sets `'0'`, as the key `'0'` does. A branded literal
+   * (`'a' & { readonly __b: 1 }`), which a mapped type cannot list,
+   * widens to its primitive, an index signature. `string`, a pattern
+   * (``p-${string}``) and an open `string & {}` stay as they are.
+   *
+   * @internal
+   */
+  type EntryKey<K extends PropertyKey> = K extends string
+    ? string extends K
+      ? K
+      : K extends `${infer _}`
+        ? K
+        : string
+    : K extends number
+      ? {} extends { [P in K]: unknown }
+        ? number
+        : `${K}`
+      : K;
+
+  /**
+   * The object set by entries that need not be a tuple: each literal key
+   * is optional, since such entries may be empty or leave a key out,
+   * and an index signature is not, since its values hold no
+   * `undefined`.
+   *
+   * @internal
+   */
+  export type ObjectOfEntryKeys<
+    K0 extends PropertyKey,
+    V,
+    K extends PropertyKey = EntryKey<K0>,
+  > = Readonly<
+    { [P in LiteralKeys<K>]?: V } & { [P in IndexSignatureKeys<K>]: V }
+  >;
+
   /**
    * - `['x' | 'y' | 'z', number][]]` -> `'x' | 'y' | 'z'`
    * - `[['a' | 'b' | 'c', number], ...['x' | 'y' | 'z', number][]]` -> `'a' | 'b' |
@@ -122,33 +185,19 @@ declare namespace StrictLibInternals {
         >;
 
   /**
-   * `Partial<T>` when `K` is a union with a literal key, which the
-   * entries need not all set.
+   * The members of `K` a record keyed by it must hold, rather than
+   * index signatures (`string`, ``p-${string}``).
    *
    * @internal
    */
-  export type PartialIfKeyIsUnion<K, T> =
-    import('ts-type-forge').IsUnion<K> extends true
-      ? HasLiteralKey<K> extends true
-        ? Partial<T>
-        : T
-      : T;
+  type LiteralKeys<K> = K extends unknown
+    ? {} extends { [P in K & PropertyKey]: unknown }
+      ? never
+      : K
+    : never;
 
-  /**
-   * Whether `K` has a key that a record keyed by it must hold, rather
-   * than only index signatures (`string`, ``p-${string}``).
-   *
-   * @internal
-   */
-  type HasLiteralKey<K> = [
-    K extends unknown
-      ? {} extends { [P in K & PropertyKey]: unknown }
-        ? never
-        : K
-      : never,
-  ] extends [never]
-    ? false
-    : true;
+  /** @internal */
+  type IndexSignatureKeys<K> = Exclude<K, LiteralKeys<K>>;
 }
 
 interface ObjectConstructor {
@@ -168,33 +217,30 @@ interface ObjectConstructor {
    * its own value. As at run time, a later element overwrites an earlier
    * one with the same key, and a key that an element with a union key
    * sets is optional.
-   * Otherwise, when `K` is a union, `entries` need not cover every
-   * member of it, so the result is `Partial` rather than a type that
-   * holds them all.
+   * Otherwise `entries` may be empty or leave a key out, so each
+   * literal key of the result is optional, while an index signature is
+   * not: its values hold no `undefined`.
    *
-   * On a record with an index signature, `Object.entries` gives
-   * `string` itself as the key, which is not a union, so the result is
-   * not `Partial` (see `WithOpenString`).
+   * A number key sets its string, and a branded literal key, which a
+   * mapped type cannot list, widens to an index signature of its
+   * primitive.
    */
   // @note `entries` がタプル型の場合には key-value の組み合わせも反映した型にする。
   // 実行時と同じく後の要素が同じ key の前の要素を上書きし、key が union 型の要素が設定する key は省略可能になる。
-  // そうでない場合、 `K` が union 型の場合、`entries` がそのすべてを網羅しているとは限らないため、
-  // `fromEntries` の返り値型がその union 要素すべてを含む型になってしまわないように `Partial` を付けている。
+  // そうでない場合、`entries` は空のことも key を欠くこともあるので、結果のリテラルの key は省略可能にし、
+  // index signature は値に `undefined` を含まないので省略可能にしない。
   //
-  // index signature の record では `Object.entries` の key が `string` そのものになり
-  // union ではなくなるため、`Partial` は付かない（`WithOpenString` 参照）。
+  // 数値の key はその文字列を設定し、mapped type で列挙できない brand 付きのリテラルの key は、
+  // そのプリミティブの index signature に広げる。
   fromEntries<
     const Entries extends readonly (readonly [PropertyKey, unknown])[],
   >(
     entries: Entries,
   ): import('ts-type-forge').IsFixedLengthList<Entries> extends true
     ? StrictLibInternals.EntriesToObject<Entries>
-    : StrictLibInternals.PartialIfKeyIsUnion<
+    : StrictLibInternals.ObjectOfEntryKeys<
         StrictLibInternals.KeysOfEntries<Entries>,
-        Record<
-          StrictLibInternals.KeysOfEntries<Entries>,
-          StrictLibInternals.ValuesOfEntries<Entries>
-        >
+        StrictLibInternals.ValuesOfEntries<Entries>
       >;
 
   /**
@@ -209,12 +255,12 @@ interface ObjectConstructor {
    *     [4, 3],
    *   ]);
    *
-   *   const obj = Object.fromEntries(entries); // Partial<Record<'x' | 'y' | 'z' | 4, 1 | 2 | 3>>
+   *   const obj = Object.fromEntries(entries); // { readonly x?: 1 | 2 | 3; readonly y?: 1 | 2 | 3; readonly z?: 1 | 2 | 3; readonly '4'?: 1 | 2 | 3 }
    *
    */
   fromEntries<K extends PropertyKey, V>(
     entries: Iterable<readonly [K, V]>,
-  ): StrictLibInternals.PartialIfKeyIsUnion<K, Record<K, V>>;
+  ): StrictLibInternals.ObjectOfEntryKeys<K, V>;
 
   /**
    * Returns an object created by key-value entries for properties and methods

@@ -95,3 +95,82 @@ export const mapWithOpenStringKey = (
 
   return true satisfies TypeEq<(typeof obj)['a'], number | undefined>;
 };
+
+/**
+ * #4046 — a key with no literal may overwrite an earlier key, so that key takes
+ * either value; the key itself sets an index signature. The result is read
+ * rather than compared whole: a type literal cannot spell `x: 1 | 2` beside a
+ * `[k: string]: 2` that does not cover it.
+ */
+export const indexSignatureKeyAfterLiteral = (s: string): readonly true[] => {
+  const obj = Object.fromEntries([
+    ['x', 1],
+    [s, 2],
+  ]);
+
+  return [
+    true satisfies TypeEq<(typeof obj)['x'], 1 | 2>,
+    true satisfies TypeEq<(typeof obj)['y'], 2>,
+  ];
+};
+
+/** #4046 — a number key sets its string, the key a string spells the same. */
+export const numberAndStringKey = (): true => {
+  const obj = Object.fromEntries([
+    ['0', 'a'],
+    [0, 'b'],
+  ]);
+
+  return true satisfies TypeEq<typeof obj, { '0': 'b' }>;
+};
+
+/**
+ * #4046 — a key mixing a literal with an index signature sets one of them: the
+ * literal is optional, and the index signature's values are not `undefined`.
+ */
+export const mixedKey = (k: 'x' | `a-${string}`): true => {
+  const obj = Object.fromEntries([[k, 1]]);
+
+  return true satisfies TypeEq<typeof obj, { x?: 1; [k: `a-${string}`]: 1 }>;
+};
+
+/** #4046 — the same for an iterable that is not an array. */
+export const mapWithMixedKey = (
+  map: ReadonlyMap<'x' | `a-${string}`, number>,
+): true => {
+  const obj = Object.fromEntries(map);
+
+  return true satisfies TypeEq<
+    typeof obj,
+    { x?: number; [k: `a-${string}`]: number }
+  >;
+};
+
+/**
+ * #4046 — a branded literal key, which a mapped type cannot list, widens to an
+ * index signature of its primitive.
+ */
+export const brandedKey = (k: 'a' & { readonly __b: 1 }): true => {
+  const obj = Object.fromEntries([[k, 1]]);
+
+  return true satisfies TypeEq<typeof obj, { [k: string]: 1 }>;
+};
+
+/**
+ * #4046 — entries that are not a tuple may be empty, so even one literal key is
+ * optional.
+ */
+export const mapWithOneLiteralKey = (map: ReadonlyMap<'a', number>): true => {
+  const obj = Object.fromEntries(map);
+
+  return true satisfies TypeEq<typeof obj, { a?: number }>;
+};
+
+/** #4046 — the same for an array that is not a tuple. */
+export const arrayWithOneLiteralKey = (
+  entries: readonly (readonly ['a', number])[],
+): true => {
+  const obj = Object.fromEntries(entries);
+
+  return true satisfies TypeEq<typeof obj, { a?: number }>;
+};

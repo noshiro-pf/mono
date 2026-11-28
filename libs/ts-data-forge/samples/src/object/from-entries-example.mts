@@ -19,7 +19,7 @@ if (import.meta.vitest !== undefined) {
       active: true,
     });
 
-    // Dynamic length array - Partial type applied
+    // Dynamic length array - each key optional
     const dynamicEntries: readonly (readonly ['x' | 'y', number])[] = [
       ['x', 10],
       ['y', 20],
