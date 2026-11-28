@@ -15,6 +15,7 @@ import {
   isIdentifierNamed,
   skipTypeWrappers,
   typeHoldsAtEveryLayer,
+  typeHoldsAtSomeLayer,
 } from '../type-wrappers.mjs';
 import { builtBy } from './rule-factory.mjs';
 
@@ -58,7 +59,9 @@ export const createPreferIsRecordAndHasKey = ({
   | 'inReadsPrototypeChain'
   | 'suggestOwnPropertyCheck'
   | 'hasOwnAcceptsFunctions'
-  | 'suggestRecordCheck',
+  | 'suggestRecordCheck'
+  | 'wideKeyNarrowsToNever'
+  | 'suggestHasKeyForWideKey',
   readonly []
 > =>
   builtBy(createPreferIsRecordAndHasKey, {
@@ -77,6 +80,8 @@ export const createPreferIsRecordAndHasKey = ({
         suggestOwnPropertyCheck: `Replace with \`{{replacement}}\` from ${moduleName}, which checks own properties only.`,
         hasOwnAcceptsFunctions: `\`{{original}}\` answers for a function's own properties too (its \`name\`, a class's static members), and nothing here says the object is not one; \`{{replacement}}\` from ${moduleName} answers \`false\` for every function. Replace it where that is what is meant.`,
         suggestRecordCheck: `Replace with \`{{replacement}}\` from ${moduleName}, which answers \`false\` for a function.`,
+        wideKeyNarrowsToNever: `\`{{original}}\` narrows nothing; \`{{replacement}}\` from ${moduleName} narrows the record to \`never\` where it answers \`false\`, since the key is not one literal or a union of them, so code there that reads or writes the record may stop compiling. Replace it where that is what is meant.`,
+        suggestHasKeyForWideKey: `Replace with \`{{replacement}}\` from ${moduleName}, which narrows the record to \`never\` where it answers \`false\`.`,
       },
       defaultOptions: [],
     },
@@ -114,6 +119,28 @@ export const createPreferIsRecordAndHasKey = ({
         expression: TSESTree.Expression,
       ): boolean =>
         typeHoldsAtEveryLayer(sourceCode, expression, isPlainObjectType);
+
+      /**
+       * Whether the key is a literal or a union of literals — strings, numbers
+       * or unique symbols — by its type at every layer of type wrappers, or,
+       * without type information, written as a string or a template literal
+       * with no substitution. `hasKey` checks each literal on its own, while a
+       * key typed `string` or `number` covers the record's index signature.
+       */
+      const isLiteralKey = (
+        // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+        expression: TSESTree.Expression,
+      ): boolean =>
+        sourceCode.parserServices?.program == null
+          ? stringLiteralValueOf(skipTypeWrappers(expression)) !== undefined
+          : typeHoldsAtEveryLayer(sourceCode, expression, (type) =>
+              (type.isUnion() ? type.types : [type]).every(
+                (member) =>
+                  member.isStringLiteral() ||
+                  member.isNumberLiteral() ||
+                  (member.flags & ts.TypeFlags.UniqueESSymbol) !== 0,
+              ),
+            );
 
       /**
        * Whether type information shows the object is not callable at any layer
@@ -305,10 +332,6 @@ export const createPreferIsRecordAndHasKey = ({
 
             const keyText = getArgumentText(sourceCode, keyExpression);
 
-            // Known limit: with a key typed `string`, `hasKey` narrows a record
-            // to `never` where it answers `false`, which `in`, `Object.hasOwn`
-            // and `Reflect.has` do not, so code there that reads or writes the
-            // record stops type-checking after the fix.
             const fixable =
               binding !== undefined &&
               hasKeyName !== undefined &&
@@ -347,7 +370,7 @@ export const createPreferIsRecordAndHasKey = ({
               readsPrototypeChain &&
               (needsIsRecord ||
                 !isPlainObject(objExpression) ||
-                namesObjectPrototypeMember(keyExpression));
+                namesObjectPrototypeMember(sourceCode, keyExpression));
 
             // `Object.hasOwn` accepts a function, and `isRecord` does not.
             const hasOwnSuggestOnly =
@@ -355,7 +378,15 @@ export const createPreferIsRecordAndHasKey = ({
               needsIsRecord &&
               !cannotBeCallable(objExpression);
 
-            const suggestOnly = prototypeSuggestOnly || hasOwnSuggestOnly;
+            // `hasKey` alone narrows the record to `never` where it answers
+            // `false` for a key wider than a union of literals, which `in`,
+            // `Object.hasOwn` and `Reflect.has` do not: code there that reads
+            // or writes the record would stop compiling.
+            const wideKeySuggestOnly =
+              !needsIsRecord && !isLiteralKey(keyExpression);
+
+            const suggestOnly =
+              prototypeSuggestOnly || hasOwnSuggestOnly || wideKeySuggestOnly;
 
             context.report({
               node,
@@ -363,9 +394,11 @@ export const createPreferIsRecordAndHasKey = ({
                 ? 'inReadsPrototypeChain'
                 : hasOwnSuggestOnly
                   ? 'hasOwnAcceptsFunctions'
-                  : needsIsRecord
-                    ? 'useIsRecordAndHasKey'
-                    : 'useHasKey',
+                  : wideKeySuggestOnly
+                    ? 'wideKeyNarrowsToNever'
+                    : needsIsRecord
+                      ? 'useIsRecordAndHasKey'
+                      : 'useHasKey',
               data,
               fix: suggestOnly ? null : fix,
               suggest:
@@ -374,7 +407,9 @@ export const createPreferIsRecordAndHasKey = ({
                       {
                         messageId: prototypeSuggestOnly
                           ? 'suggestOwnPropertyCheck'
-                          : 'suggestRecordCheck',
+                          : hasOwnSuggestOnly
+                            ? 'suggestRecordCheck'
+                            : 'suggestHasKeyForWideKey',
                         data,
                         fix,
                       },
@@ -410,31 +445,51 @@ const objectPrototypeMembers: ReadonlySet<string> = new Set(
   Object.getOwnPropertyNames(Object.prototype),
 );
 
+/** The value of a string literal or of a template literal with no substitution. */
+const stringLiteralValueOf = (
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  node: TSESTree.Node,
+): string | undefined =>
+  node.type === AST_NODE_TYPES.Literal && typeof node.value === 'string'
+    ? node.value
+    : node.type === AST_NODE_TYPES.TemplateLiteral &&
+        node.expressions.length === 0
+      ? (node.quasis[0]?.value.cooked ?? undefined)
+      : undefined;
+
 /**
- * Whether `key` is a string literal naming a member of `Object.prototype`,
- * which `in` finds on every object and `hasKey` on none that does not own it.
+ * Whether `key` names a member of `Object.prototype`, which `in` finds on every
+ * object and `hasKey` on none that does not own it: written as a string or a
+ * template literal with no substitution, or typed as such a string literal, or
+ * a union with one, at some layer of type wrappers (`const k = 'toString'`).
  */
 const namesObjectPrototypeMember = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
+  sourceCode: TSESLint.SourceCode,
+  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
   wrapped: TSESTree.Expression,
 ): boolean => {
-  const key = skipTypeWrappers(wrapped);
+  const written = stringLiteralValueOf(skipTypeWrappers(wrapped));
 
-  // Known limit: only the syntax is read, so a key whose type is such a literal
-  // without being one (`const k = 'toString'`, `` `constructor` ``) is fixed.
   return (
-    key.type === AST_NODE_TYPES.Literal &&
-    typeof key.value === 'string' &&
-    objectPrototypeMembers.has(key.value)
+    (written !== undefined && objectPrototypeMembers.has(written)) ||
+    typeHoldsAtSomeLayer(sourceCode, wrapped, (type) =>
+      (type.isUnion() ? type.types : [type]).some(
+        (member) =>
+          member.isStringLiteral() && objectPrototypeMembers.has(member.value),
+      ),
+    )
   );
 };
 
 /**
  * Whether every member of `type` is an object type literal, an object literal
  * or a mapped type (`Record<string, V>`) none of whose properties a class or an
- * interface declares. A class, an interface, a type parameter, or a mapped type
- * over one of them (`Readonly<Bag>`) may stand for an instance whose methods
- * live on a prototype, so it is not counted.
+ * interface declares, nor is declared as a method signature, a getter or a
+ * setter. A class, an interface, a type parameter, or a mapped type over one of
+ * them (`Readonly<Bag>`) may stand for an instance whose methods live on a
+ * prototype, and so may a type literal with a method signature, which a class
+ * implements as well, so neither is counted.
  */
 const isPlainObjectType = (
   // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
@@ -455,7 +510,10 @@ const isPlainObjectType = (
             property.declarations?.every(
               (declaration) =>
                 !ts.isClassLike(declaration.parent) &&
-                !ts.isInterfaceDeclaration(declaration.parent),
+                !ts.isInterfaceDeclaration(declaration.parent) &&
+                !ts.isMethodSignature(declaration) &&
+                !ts.isGetAccessorDeclaration(declaration) &&
+                !ts.isSetAccessorDeclaration(declaration),
             ) ?? true,
         );
 
