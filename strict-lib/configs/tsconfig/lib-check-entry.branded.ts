@@ -249,6 +249,11 @@ export const fromEntriesTypes = (
   s: string,
   indexSignatureMap: ReadonlyMap<`a-${string}` | `b-${string}`, number>,
   openStringMap: ReadonlyMap<'a' | (string & {}), number>,
+  mixed: 'x' | `a-${string}`,
+  mixedMap: ReadonlyMap<'x' | `a-${string}`, number>,
+  branded: 'a' & { readonly __b: 1 },
+  oneLiteralMap: ReadonlyMap<'a', number>,
+  oneLiteralArray: readonly (readonly ['a', number])[],
 ): readonly true[] => {
   const distinctKeys = Object.fromEntries([
     ['x', 1],
@@ -279,6 +284,26 @@ export const fromEntriesTypes = (
   const mapWithIndexSignatureKeys = Object.fromEntries(indexSignatureMap);
 
   const mapWithOpenStringKey = Object.fromEntries(openStringMap);
+
+  const indexSignatureKeyAfterLiteral = Object.fromEntries([
+    ['x', 1],
+    [s, 2],
+  ]);
+
+  const numberAndStringKey = Object.fromEntries([
+    ['0', 'a'],
+    [0, 'b'],
+  ]);
+
+  const mixedKey = Object.fromEntries([[mixed, 1]]);
+
+  const mapWithMixedKey = Object.fromEntries(mixedMap);
+
+  const brandedKey = Object.fromEntries([[branded, 1]]);
+
+  const mapWithOneLiteralKey = Object.fromEntries(oneLiteralMap);
+
+  const arrayWithOneLiteralKey = Object.fromEntries(oneLiteralArray);
 
   return [
     true satisfies TypeEq<
@@ -313,6 +338,23 @@ export const fromEntriesTypes = (
     true satisfies TypeEq<
       (typeof mapWithOpenStringKey)['a'],
       number | undefined
+    >,
+    true satisfies TypeEq<(typeof indexSignatureKeyAfterLiteral)['x'], 1 | 2>,
+    true satisfies TypeEq<(typeof indexSignatureKeyAfterLiteral)['y'], 2>,
+    true satisfies TypeEq<typeof numberAndStringKey, { readonly '0': 'b' }>,
+    true satisfies TypeEq<
+      typeof mixedKey,
+      { readonly x?: 1; readonly [k: `a-${string}`]: 1 }
+    >,
+    true satisfies TypeEq<
+      typeof mapWithMixedKey,
+      { readonly x?: number; readonly [k: `a-${string}`]: number }
+    >,
+    true satisfies TypeEq<typeof brandedKey, { readonly [k: string]: 1 }>,
+    true satisfies TypeEq<typeof mapWithOneLiteralKey, { readonly a?: number }>,
+    true satisfies TypeEq<
+      typeof arrayWithOneLiteralKey,
+      { readonly a?: number }
     >,
   ];
 };

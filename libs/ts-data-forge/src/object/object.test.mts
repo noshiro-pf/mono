@@ -257,6 +257,117 @@ describe('fromEntries', () => {
 
     assert.deepStrictEqual(result, { name: 'Alice' });
   });
+
+  // The cases of `strict-lib/configs/tsconfig/lib-check-entry.object-from-entries.ts`,
+  // which `Obj.fromEntries` types as the strict `Object.fromEntries` does, readonly.
+  describe('as the strict Object.fromEntries types it', () => {
+    test('a later entry replaces an earlier one with the same key', () => {
+      const result = Obj.fromEntries([
+        ['x', 1],
+        ['x', 2],
+      ]);
+
+      expectType<typeof result, Readonly<{ x: 2 }>>('=');
+
+      assert.deepStrictEqual(result, { x: 2 });
+    });
+
+    test('a union-keyed entry sets one of its members, so each is optional', () => {
+      const k = 'x' as 'x' | 'y';
+
+      const result = Obj.fromEntries([[k, 1]]);
+
+      expectType<typeof result, Readonly<{ x?: 1; y?: 1 }>>('=');
+
+      assert.deepStrictEqual(result, { x: 1 });
+    });
+
+    test('a union-keyed entry after a literal one keeps that key present', () => {
+      const k = 'y' as 'x' | 'y';
+
+      const result = Obj.fromEntries([
+        ['x', 1],
+        [k, 2],
+      ]);
+
+      expectType<typeof result, Readonly<{ x: 1 | 2; y?: 2 }>>('=');
+
+      assert.deepStrictEqual(result, { x: 1, y: 2 });
+    });
+
+    test('a literal-keyed entry after a union-keyed one sets its key for certain', () => {
+      const k = 'y' as 'x' | 'y';
+
+      const result = Obj.fromEntries([
+        [k, 1],
+        ['x', 2],
+      ]);
+
+      expectType<typeof result, Readonly<{ y?: 1; x: 2 }>>('=');
+
+      assert.deepStrictEqual(result, { y: 1, x: 2 });
+    });
+
+    test('a key with no literal gives an index signature and widens a key it may overwrite', () => {
+      const s = 'x' as string;
+
+      const result = Obj.fromEntries([
+        ['x', 1],
+        [s, 2],
+      ]);
+
+      expectType<(typeof result)['x'], 1 | 2>('=');
+
+      expectType<(typeof result)['y'], 2>('=');
+
+      assert.deepStrictEqual(result, { x: 2 });
+    });
+
+    test('a number key sets its string, the key a string spells the same', () => {
+      const result = Obj.fromEntries([
+        ['0', 'a'],
+        [0, 'b'],
+      ]);
+
+      expectType<typeof result, Readonly<{ '0': 'b' }>>('=');
+
+      assert.deepStrictEqual(result, { '0': 'b' });
+    });
+
+    test('a key mixing a literal with an index signature makes the literal optional', () => {
+      const k = 'a-1' as 'x' | `a-${string}`;
+
+      const result = Obj.fromEntries([[k, 1]]);
+
+      expectType<typeof result, Readonly<{ x?: 1; [k: `a-${string}`]: 1 }>>(
+        '=',
+      );
+
+      assert.deepStrictEqual(result, { 'a-1': 1 });
+    });
+
+    test('a branded literal key widens to an index signature of its primitive', () => {
+      // A branded key is the input under test.
+      // eslint-disable-next-line total-functions/no-unsafe-type-assertion
+      const k = 'a' as 'a' & Readonly<{ __b: 1 }>;
+
+      const result = Obj.fromEntries([[k, 1]]);
+
+      expectType<typeof result, Readonly<{ [k: string]: 1 }>>('=');
+
+      assert.deepStrictEqual(result, { a: 1 });
+    });
+
+    test('entries that are not a tuple make even one literal key optional', () => {
+      const entries: readonly (readonly ['a', number])[] = [] as const;
+
+      const result = Obj.fromEntries(entries);
+
+      expectType<typeof result, Readonly<{ a?: number }>>('=');
+
+      assert.deepStrictEqual(result, {});
+    });
+  });
 });
 
 describe('map', () => {

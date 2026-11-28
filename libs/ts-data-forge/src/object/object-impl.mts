@@ -6,6 +6,7 @@ import type {
   IsFixedLengthList,
   IsUnion,
   List,
+  MutableRecord,
   ReadonlyRecord,
   RelaxedExclude,
   RelaxedOmit,
@@ -275,9 +276,14 @@ export function omit<
  *
  * **Type Behavior**:
  *
- * - When entries is a fixed-length tuple, the exact object type is inferred
- * - When entries has dynamic length with union key types, `Partial` is applied
- *   to prevent incorrect assumptions about which keys will be present
+ * - When entries is a fixed-length tuple, the exact object type is inferred:
+ *   a later entry replaces an earlier one with the same key, a union-keyed
+ *   entry makes its keys optional, and a key with no literal (`string`) gives
+ *   an index signature and widens the keys it may overwrite
+ * - When entries has dynamic length, each literal key is optional, since the
+ *   entries may be empty or leave a key out; an index signature is not
+ * - A number key sets its string (`0` sets `'0'`), and a branded literal key
+ *   widens to an index signature of its primitive
  *
  * @example
  *
@@ -297,7 +303,7 @@ export function omit<
  *   active: true,
  * });
  *
- * // Dynamic length array - Partial type applied
+ * // Dynamic length array - each key optional
  * const dynamicEntries: readonly (readonly ['x' | 'y', number])[] = [
  *   ['x', 10],
  *   ['y', 20],
@@ -318,12 +324,9 @@ export const fromEntries = <
   entries: Entries,
 ): IsFixedLengthList<Entries> extends true
   ? TsDataForgeInternals.EntriesToObject<Entries>
-  : TsDataForgeInternals.PartialIfKeyIsUnion<
+  : TsDataForgeInternals.ObjectOfEntryKeys<
       TsDataForgeInternals.KeysOfEntries<Entries>,
-      ReadonlyRecord<
-        TsDataForgeInternals.KeysOfEntries<Entries>,
-        TsDataForgeInternals.ValuesOfEntries<Entries>
-      >
+      TsDataForgeInternals.ValuesOfEntries<Entries>
     > =>
   // eslint-disable-next-line total-functions/no-unsafe-type-assertion
   Object.fromEntries(entries) as never;
@@ -802,9 +805,95 @@ declare namespace TsDataForgeInternals {
     TypeEq<Entries['length'], 0> extends true
       ? R
       : EntriesToObjectImpl<
-          R & ReadonlyRecord<Entries[0][0], Entries[0][1]>,
+          EntryStep<R, Entries[0][0], Entries[0][1]>,
           List.Tail<Entries>
         >;
+
+  /**
+   * One entry set on `R`, as the strict `Object.fromEntries` sets it (see
+   * `strict-lib/scripts-common/src/convert-dts/lib.es2019.object.mts`): it
+   * replaces an earlier entry with the same key as at run time. The key is read
+   * as {@link EntryKey} gives it, and split into the literals a record lists and
+   * the index signatures it does not:
+   *
+   * - literals alone: one replaces an earlier value, and a union sets one of its
+   *   members, so a member `R` already has keeps its value or takes `V`, and one
+   *   it lacks is optional;
+   * - index signatures alone: an index signature of `V`, and a key of `R` they
+   *   match may have been overwritten, so it takes `V` too;
+   * - both: either may be the key, so the literals are optional, as for a union,
+   *   and then the index signatures are set.
+   */
+  type EntryStep<
+    R,
+    K0 extends PropertyKey,
+    V,
+    K extends PropertyKey = EntryKey<K0>,
+  > = [LiteralKeys<K>] extends [never]
+    ? IndexSignatureStep<R, K, V>
+    : [IndexSignatureKeys<K>] extends [never]
+      ? IsUnion<K> extends true
+        ? UnionStep<R, K, V>
+        : Readonly<{ [P in keyof R as P extends K ? never : P]: R[P] }> &
+            ReadonlyRecord<K, V>
+      : IndexSignatureStep<
+          UnionStep<R, LiteralKeys<K>, V>,
+          IndexSignatureKeys<K>,
+          V
+        >;
+
+  type UnionStep<R, K extends PropertyKey, V> = Readonly<{
+    [P in keyof R]: [P & K] extends [never] ? R[P] : R[P] | V;
+  }> &
+    Partial<ReadonlyRecord<RelaxedExclude<K, keyof R>, V>>;
+
+  type IndexSignatureStep<R, K extends PropertyKey, V> = Readonly<{
+    [P in keyof R]: P extends K ? R[P] | V : R[P];
+  }> &
+    ReadonlyRecord<K, V>;
+
+  /**
+   * A key as `Object.fromEntries` sets it. A number literal sets its string (`0`
+   * sets `'0'`). A branded literal, which a mapped type cannot list, widens to
+   * its primitive, an index signature. `string`, a pattern (`p-${string}`) and
+   * an open `string & {}` stay as they are.
+   */
+  type EntryKey<K extends PropertyKey> = K extends string
+    ? string extends K
+      ? K
+      : K extends `${infer _}`
+        ? K
+        : string
+    : K extends number
+      ? // eslint-disable-next-line @typescript-eslint/no-empty-object-type
+        {} extends MutableRecord<K, unknown>
+        ? number
+        : `${K}`
+      : K;
+
+  /** The members of `K` a record keyed by it must hold, not index signatures. */
+  type LiteralKeys<K> = K extends unknown
+    ? // eslint-disable-next-line @typescript-eslint/no-empty-object-type
+      {} extends MutableRecord<K & PropertyKey, unknown>
+      ? never
+      : K
+    : never;
+
+  type IndexSignatureKeys<K> = RelaxedExclude<K, LiteralKeys<K>>;
+
+  /**
+   * What entries that need not be a tuple set: each literal key is optional,
+   * since such entries may be empty or leave a key out, and an index signature
+   * is not, since its values hold no `undefined`.
+   */
+  export type ObjectOfEntryKeys<
+    K0 extends PropertyKey,
+    V,
+    K extends PropertyKey = EntryKey<K0>,
+  > = Readonly<
+    Partial<MutableRecord<LiteralKeys<K>, V>> &
+      MutableRecord<IndexSignatureKeys<K>, V>
+  >;
 
   /**
    * - `['x' | 'y' | 'z', number][]]` -> `'x' | 'y' | 'z'`
@@ -851,9 +940,6 @@ declare namespace TsDataForgeInternals {
             List.Tail<Entries>,
             Decrement<RemainingNumRecursions>
           >;
-
-  export type PartialIfKeyIsUnion<K, T> =
-    IsUnion<K> extends true ? Partial<T> : T;
 
   /**
    * The keys `Object.entries` yields for `R`: symbol keys are not enumerated,
