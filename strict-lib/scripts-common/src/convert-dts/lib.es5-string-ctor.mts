@@ -6,32 +6,29 @@ import {
   replaceWithNoMatchCheck,
   replaceWithinInterface,
 } from '../functions/utils/node-utils.mjs';
-import type { ConverterOptions } from './common.mjs';
 
-export const convertLibEs5_StringConstructor =
-  ({
-    config: { commentOutDeprecated },
-  }: ConverterOptions): MonoTypeFunction<string> =>
-  (src) =>
-    pipe(src).map(
-      composeMonoTypeFns(
-        replaceWithinInterface({
-          name: 'StringConstructor',
-          mapFn: composeMonoTypeFns(
-            ...[
-              //
-              'new (value?: unknown): String;',
-              '(value?: unknown): string;',
-            ].map((line) =>
-              replaceWithNoMatchCheck(
-                line,
-                dedent`
-                    /** @deprecated Don't use String constructor */
-                  ${commentOutDeprecated ? `// ${line}` : line}
-                `,
-              ),
+export const convertLibEs5_StringConstructor: MonoTypeFunction<string> = (
+  src,
+) =>
+  pipe(src).map(
+    composeMonoTypeFns(
+      replaceWithinInterface({
+        name: 'StringConstructor',
+        mapFn: composeMonoTypeFns(
+          ...[
+            //
+            'new (value?: unknown): String;',
+            '(value?: unknown): string;',
+          ].map((line) =>
+            replaceWithNoMatchCheck(
+              line,
+              dedent`
+                  /** @deprecated Don't use String constructor */
+                ${line}
+              `,
             ),
           ),
-        }),
-      ),
-    ).value;
+        ),
+      }),
+    ),
+  ).value;

@@ -9,10 +9,7 @@ import {
 import type { ConverterOptions } from './common.mjs';
 
 export const convertLibEs5_ObjectConstructor =
-  ({
-    config: { commentOutDeprecated },
-    readonlyModifier,
-  }: ConverterOptions): MonoTypeFunction<string> =>
+  ({ readonlyModifier }: ConverterOptions): MonoTypeFunction<string> =>
   (src) =>
     pipe(src).map(
       composeMonoTypeFns(
@@ -28,7 +25,7 @@ export const convertLibEs5_ObjectConstructor =
                 line,
                 dedent`
                     /** @deprecated Don't use Object constructor */
-                  ${commentOutDeprecated ? `// ${line}` : line}
+                  ${line}
                 `,
               ),
             ),

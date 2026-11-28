@@ -4,15 +4,11 @@ import type { MonoTypeFunction } from 'ts-type-forge';
 import {
   composeMonoTypeFns,
   replaceWithNoMatchCheck,
-  replaceWithinInterface,
 } from '../functions/utils/node-utils.mjs';
 import type { ConverterOptions } from './common.mjs';
 
 export const convertLibEs5_deprecated =
-  ({
-    config: { commentOutDeprecated },
-    brandedNumber,
-  }: ConverterOptions): MonoTypeFunction<string> =>
+  ({ brandedNumber }: ConverterOptions): MonoTypeFunction<string> =>
   (src) =>
     pipe(src).map(
       composeMonoTypeFns(
@@ -25,7 +21,7 @@ export const convertLibEs5_deprecated =
           dedent`
              * @deprecated
              */
-            ${commentOutDeprecated ? '// ' : ''}declare function eval(x: string): unknown;
+            declare function eval(x: string): unknown;
           `,
         ),
         replaceWithNoMatchCheck(
@@ -36,7 +32,7 @@ export const convertLibEs5_deprecated =
           dedent`
              * @deprecated Use \`Number.isNaN\` instead.
              */
-            ${commentOutDeprecated ? '// ' : ''}declare function isNaN(number: number): boolean;
+            declare function isNaN(number: number): boolean;
           `,
         ),
         replaceWithNoMatchCheck(
@@ -47,7 +43,7 @@ export const convertLibEs5_deprecated =
           dedent`
              * @deprecated Use \`Number.isFinite\` instead.
              */
-            ${commentOutDeprecated ? '// ' : ''}declare function isFinite(number: number): boolean;
+            declare function isFinite(number: number): boolean;
           `,
         ),
         replaceWithNoMatchCheck(
@@ -58,7 +54,7 @@ export const convertLibEs5_deprecated =
           dedent`
              * @deprecated Prefer \`String#at(...)\` over \`String#charAt(...)\`. eslint(unicorn/prefer-at)
              */
-            ${commentOutDeprecated ? '// ' : ''}charAt(pos: ${brandedNumber.StringSizeArg}): string;
+            charAt(pos: ${brandedNumber.StringSizeArg}): string;
           `,
         ),
         replaceWithNoMatchCheck(
@@ -69,42 +65,8 @@ export const convertLibEs5_deprecated =
           dedent`
              * @deprecated Prefer the spread operator over \`Array#concat(...)\`. eslint(unicorn/prefer-spread)
              */
-            ${commentOutDeprecated ? '// ' : ''}concat(...strings: readonly string[]): string;
+            concat(...strings: readonly string[]): string;
           `,
         ),
-
-        ...(!commentOutDeprecated
-          ? []
-          : [
-              'declare function escape(string: string): string;',
-              'declare function unescape(string: string): string;',
-              'declare function eval(x: string): unknown;',
-              'declare function isNaN(number: number): boolean;',
-              'declare function isFinite(number: number): boolean;',
-              'substr(from: number, length?: number): string;',
-              'compile(pattern: string, flags?: string): this;',
-              'charAt(pos: number): string;',
-              'concat(...strings: readonly string[]): string;',
-            ].map((line) =>
-              // comment out deprecated functions
-              replaceWithNoMatchCheck(
-                //
-                line,
-                `// ${line}`,
-              ),
-            )),
-
-        ...(!commentOutDeprecated
-          ? []
-          : [
-              replaceWithinInterface({
-                name: 'RegExpConstructor',
-                mapFn: replaceWithNoMatchCheck(
-                  //
-                  'readonly',
-                  '// readonly',
-                ),
-              }),
-            ]),
       ),
     ).value;

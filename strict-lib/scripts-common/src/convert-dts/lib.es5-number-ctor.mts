@@ -6,31 +6,28 @@ import {
   replaceWithNoMatchCheck,
   replaceWithinInterface,
 } from '../functions/utils/node-utils.mjs';
-import type { ConverterOptions } from './common.mjs';
 
-export const convertLibEs5_NumberConstructor =
-  ({
-    config: { commentOutDeprecated },
-  }: ConverterOptions): MonoTypeFunction<string> =>
-  (src) =>
-    pipe(src).map(
-      composeMonoTypeFns(
-        replaceWithinInterface({
-          name: 'NumberConstructor',
-          mapFn: composeMonoTypeFns(
-            ...[
-              //
-              'new (value?: unknown): Number;',
-            ].map((line) =>
-              replaceWithNoMatchCheck(
-                line,
-                dedent`
-                    /** @deprecated Don't use Number constructor */
-                  ${commentOutDeprecated ? `// ${line}` : line}
-                `,
-              ),
+export const convertLibEs5_NumberConstructor: MonoTypeFunction<string> = (
+  src,
+) =>
+  pipe(src).map(
+    composeMonoTypeFns(
+      replaceWithinInterface({
+        name: 'NumberConstructor',
+        mapFn: composeMonoTypeFns(
+          ...[
+            //
+            'new (value?: unknown): Number;',
+          ].map((line) =>
+            replaceWithNoMatchCheck(
+              line,
+              dedent`
+                  /** @deprecated Don't use Number constructor */
+                ${line}
+              `,
             ),
           ),
-        }),
-      ),
-    ).value;
+        ),
+      }),
+    ),
+  ).value;
