@@ -1,5 +1,14 @@
 # eslint-rule-forge
 
+## 0.14.0
+
+### Minor Changes
+
+- 076cc43: Add `outermostTypeWrapper`, the counterpart of `skipTypeWrappers`: a node with
+  every `as`, `satisfies`, `!` and `<T>` that wraps it, where its value ends up.
+  Add `isCallee`: whether a node is what a call calls, through the type wrappers
+  and an optional chain around it (`f!()`, `(f as F)()`, `(o?.f)()`).
+
 ## 0.13.0
 
 ### Minor Changes

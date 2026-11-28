@@ -1,6 +1,6 @@
 {
   "name": "eslint-plugin-synstate-dom-a11y",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "private": false,
   "description": "jsx-a11y's rules for synstate-dom components: an attribute bound to constant(x) reads as x, and synstate-dom's attribute names read as React's.",
   "keywords": [

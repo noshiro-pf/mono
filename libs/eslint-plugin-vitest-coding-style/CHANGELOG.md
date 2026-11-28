@@ -1,5 +1,16 @@
 # eslint-plugin-vitest-coding-style
 
+## 1.0.4
+
+### Patch Changes
+
+- 076cc43: `prefer-assert-deep-strict-equal-over-deep-equal` and
+  `prefer-assert-is-false-over-assert-not-ok` now recognize the method called
+  through an optional chain, `(assert?.deepEqual)(a, b)` and `(assert?.notOk)(x)`,
+  as they did through a type wrapper.
+- Updated dependencies [076cc43]
+    - eslint-rule-forge@0.14.0
+
 ## 1.0.3
 
 ### Patch Changes

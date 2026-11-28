@@ -1,7 +1,0 @@
----
-'eslint-config-typed': patch
----
-
-Turn off the rules whose reports another enabled rule already makes, so a violation is reported once and a suppression names one rule: the `vitest/padding-around-*` and `jest/padding-around-*` rules and `playwright/consistent-spacing-between-blocks` (covered by `@stylistic/padding-line-between-statements`), `n/prefer-node-protocol`, `import-x/no-anonymous-default-export`, `math/prefer-number-is-safe-integer`, `array-func/prefer-flat`, `security/detect-new-buffer`, `security/detect-eval-with-expression`, `security/detect-non-literal-require`, `promise/no-return-wrap`, `promise/no-multiple-resolved`, `functional/prefer-property-signatures`, `consistent-this`, `@typescript-eslint/no-invalid-this`, `@typescript-eslint/prefer-for-of`, and `unicorn/prefer-string-starts-ends-with`, `unicorn/prefer-array-from-map`, `unicorn/prefer-math-abs`, `unicorn/no-static-only-class`, `unicorn/no-this-assignment`, `unicorn/no-unnecessary-boolean-comparison`, `unicorn/no-useless-coercion`, `unicorn/no-useless-template-literals`, `unicorn/no-unnecessary-await` and `unicorn/prefer-then-catch`. Each rule's comment names the rule that covers it. An `eslint-disable` comment that names one of these rules is now reported as unused for that rule: drop the name, and name the covering rule instead where that rule now reports the line.
-
-The `@link` on `prefer-arrow-functions/prefer-arrow-functions` in the rule types now leads to the plugin's repository; the plugin publishes a URL to a repository that does not exist.
