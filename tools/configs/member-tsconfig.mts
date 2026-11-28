@@ -16,7 +16,7 @@ export type MemberTsconfig = Readonly<{
    * The `jsxImportSource`. The shared base already sets `jsx: 'react-jsx'`,
    * whose default source is React, so a React member needs no entry.
    */
-  jsx?: 'synstate-dom' | 'synstate-dom-next' | 'preact' | '@emotion/react';
+  jsx?: 'synstate-dom' | 'preact' | '@emotion/react';
 
   /** Adds `tsconfig.node-only.json`, which drops the DOM lib, to `extends`. */
   nodeOnly?: true;
@@ -172,16 +172,7 @@ export const memberTsconfigs: ReadonlyRecord<string, MemberTsconfig> = {
       "Every code block on the site is a file in `samples/`, checked as a consumer would write it: against synstate-dom's published types.",
     ),
   },
-  'apps/synstate-dom-next-docs': {
-    jsx: 'synstate-dom-next',
-    ...astroDocs(
-      "Every code block on the site is a file in `samples/`, checked as a consumer would write it: against synstate-dom-next's types.",
-    ),
-  },
   'apps/synstate-dom-sample-app': { jsx: 'synstate-dom' },
-  'apps/synstate-next-docs': astroDocs(
-    'The code blocks are samples in `libs/synstate-next/samples/docs-site/`, type-checked and run as tests there.',
-  ),
   'apps/synstate-router-dom-sample-app': { jsx: 'synstate-dom' },
   'apps/task-manager': { jsx: 'synstate-dom' },
   'apps/ts-fortress-types': { nodeOnly: true },
@@ -222,14 +213,6 @@ export const memberTsconfigs: ReadonlyRecord<string, MemberTsconfig> = {
   'libs/github-settings-as-code': { nodeOnly: true },
   'libs/synstate-dom': {
     jsx: 'synstate-dom',
-    selfPaths: true,
-    notes: {
-      paths:
-        '`jsxImportSource` names this package itself, and the tests import it by name the way a consumer does. Mapped to the source so that they are checked against the code being edited rather than against the last build. See docs/workspace-package-linking.md.',
-    },
-  },
-  'libs/synstate-dom-next': {
-    jsx: 'synstate-dom-next',
     selfPaths: true,
     notes: {
       paths:

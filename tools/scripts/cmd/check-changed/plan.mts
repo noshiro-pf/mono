@@ -846,17 +846,16 @@ export const ROOT_GENERATORS = {
 >;
 
 /**
- * The members whose `gen` reads what the strict-lib generators write: the
- * synstate-dom packages' `gen:reflected-keys` reads each harness's
+ * The members whose `gen` reads what the strict-lib generators write:
+ * synstate-dom's `gen:reflected-keys` reads each harness's
  * `temp/copied/lib.dom.d.ts` and the strict `lib.dom` through the root
- * `@typescript/lib-*` link. Their `gen` runs after the strict-lib generators,
- * on `strict-lib-output`, whether or not the diff touches them.
+ * `@typescript/lib-*` link. Its `gen` runs after the strict-lib generators, on
+ * `strict-lib-output`, whether or not the diff touches it.
  * `strict-lib-readers.test.mts` holds the list to the members whose generators
  * name the strict lib.
  */
 export const STRICT_LIB_READERS: readonly string[] = [
   'libs/synstate-dom',
-  'libs/synstate-dom-next',
 ] as const;
 
 /** Whether `file` is one of `inputs`, or under one ending in `/`. */

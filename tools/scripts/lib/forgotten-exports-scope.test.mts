@@ -74,22 +74,22 @@ describe(readsForgottenExports, () => {
     );
   });
 
+  test('no private one by default, while the list is empty', () => {
+    assert.isFalse(
+      readsForgottenExports({
+        name: 'a',
+        dir: 'libs/a',
+        manifest: { ...withTypes, private: true },
+      }),
+    );
+  });
+
   test('a private one listed', () => {
     assert.isTrue(
       readsForgottenExports(
         { name: 'a', dir: 'libs/a', manifest: { ...withTypes, private: true } },
         new Set<string>(['a']),
       ),
-    );
-  });
-
-  test('the listed private packages, by default', () => {
-    assert.isTrue(
-      readsForgottenExports({
-        name: 'synstate-next',
-        dir: 'libs/synstate-next',
-        manifest: { ...withTypes, private: true },
-      }),
     );
   });
 });

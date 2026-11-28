@@ -58,5 +58,3 @@ In synstate-dom's scenarios a figure computed from others is a `map`, or a `deri
 - **js-framework-benchmark table** (`src/frameworks/`) and the **loan**, **schedule** and **zoom scenarios** (`src/scenarios/`), as timed.
 
 The code the implementations share, the row factory and the scenario models, is in every column. One run is enough: the sizes depend only on the sources and the installed versions.
-
-`RESULTS-NEXT.md` and `BUNDLE-SIZE-NEXT.md` are the last measurements of synstate-dom-next, the rebuild that has replaced synstate-dom, against the synstate-dom it replaced; synstate-dom-next's documentation site embeds them until it is removed.

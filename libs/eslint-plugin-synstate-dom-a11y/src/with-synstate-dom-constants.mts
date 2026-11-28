@@ -91,9 +91,6 @@ export const withSynstateDomConstants = (
     ),
   }) as const;
 
-// The published module alone: synstate-dom-next is a private rebuild that
-// replaces synstate-dom under this name at its next major, so a module list
-// would only keep a name nothing will publish.
 const synstateDom = 'synstate-dom';
 
 /**

@@ -190,9 +190,9 @@ diff that reaches the converter or its output — `strict-lib/scripts-common/`,
 `strict-lib:gen:with-codemod-fixed` and then `strict-lib:gen:version-diff`
 (about two and a half minutes), and fails when they change the tree. Then it
 runs the `gen` of each package that reads what they write (`STRICT_LIB_READERS`:
-the synstate-dom packages' reflected keys, from the strict `lib.dom`), after
-building what that package is built against, which its generator reads from
-`dist/`, and fails when it changes the tree too.
+synstate-dom's reflected keys, from the strict `lib.dom`), after building what
+that package is built against, which its generator reads from `dist/`, and fails
+when it changes the tree too.
 The harnesses' own type checks (`ws:check:types:strict-lib`, each TypeScript
 minor over its generated lib) are `strict-lib-gen.yml`'s.
 Browser tests, end-to-end tests, the Firestore rules tests (`check:test:rules`,
