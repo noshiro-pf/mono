@@ -85,6 +85,8 @@ export const eventSettingsPageDictionary = {
   createEventResultMessage: {
     success: 'イベント設定を作成しました。',
     error: 'イベント設定の作成中にエラーが発生しました。',
+    notificationError:
+      'イベントは作成しましたが、通知の設定に失敗しました。編集ページで通知を設定し直してください。',
   },
   editEventResultMessage: {
     success: 'イベント設定を更新しました。',
