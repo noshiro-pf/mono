@@ -264,14 +264,28 @@ export const buildNamedImportFix = (
  * name is written, and a name still to add goes into its braces when the file
  * imports nothing from `moduleName` itself and the module exports every name to
  * add.
+ *
+ * `namespaceSubpaths` name the exports of `moduleName` that are also the
+ * namespace of a module of their own ({@link NamespaceSubpath}): such an export
+ * is written by the local name of a namespace import of that module, and one
+ * still to add is added as one (`import * as Arr from 'ts-data-forge/array'`)
+ * when the file imports from any subpath of `moduleName` already.
  */
 export const bindValueImports = (
   sourceCode: TSESLint.SourceCode,
   moduleName: string,
   exportNames: readonly string[],
   equivalentModules: readonly EquivalentModule[] = [],
+  namespaceSubpaths: readonly NamespaceSubpath[] = [],
 ): ValueImportBinding | undefined =>
-  bindNames(sourceCode, moduleName, exportNames, undefined, equivalentModules);
+  bindNames(
+    sourceCode,
+    moduleName,
+    exportNames,
+    undefined,
+    equivalentModules,
+    namespaceSubpaths,
+  );
 
 /**
  * {@link bindValueImports} for the code at a node, which writes an export
@@ -290,6 +304,8 @@ export const bindValueImports = (
  *   as {@link bindValueImports} binds it instead.
  * - A namespace import of one of `equivalentModules` serves as well, after
  *   `moduleName`'s own, when that module exports every one of `exportNames`.
+ * - An export of `namespaceSubpaths` is written by the local name of the
+ *   namespace import of its own module, as {@link bindValueImports} writes it.
  *
  * Each choice is worked out once, however many nodes ask.
  */
@@ -298,6 +314,7 @@ export const bindValueImportsAt = (
   moduleName: string,
   exportNames: readonly string[],
   equivalentModules: readonly EquivalentModule[] = [],
+  namespaceSubpaths: readonly NamespaceSubpath[] = [],
 ): ((node: TSESTree.Node) => ValueImportBinding | undefined) => {
   const namespaceModules = [
     moduleName,
@@ -324,6 +341,7 @@ export const bindValueImportsAt = (
             exportNames,
             namespaceName,
             equivalentModules,
+            namespaceSubpaths,
           ),
         ];
   });
@@ -334,11 +352,13 @@ export const bindValueImportsAt = (
     exportNames,
     undefined,
     equivalentModules,
+    namespaceSubpaths,
   );
 
   const importedFrom = [
     moduleName,
     ...equivalentModules.map((equivalent) => equivalent.moduleName),
+    ...namespaceSubpaths.map((subpath) => subpath.moduleName),
   ] as const;
 
   const holdsAt = (
@@ -480,6 +500,20 @@ export type EquivalentModule = Readonly<{
   exportNames: readonly string[];
 }>;
 
+/**
+ * An export of a module that is also the namespace of a module of its own —
+ * ts-data-forge's `Arr`, which `ts-data-forge/array` is as a whole — so that
+ * `import * as Arr from 'ts-data-forge/array'` binds what `import { Arr } from
+ * 'ts-data-forge'` does.
+ */
+export type NamespaceSubpath = Readonly<{
+  /** The export of the module (`'Arr'`). */
+  exportName: string;
+
+  /** The module that is that export as a namespace (`'ts-data-forge/array'`). */
+  moduleName: string;
+}>;
+
 /** Whether `equivalent` exports every one of `names`. */
 const exportsAll = (
   equivalent: EquivalentModule,
@@ -583,6 +617,7 @@ const bindingOf = (
   named: readonly NamedSpecifier[],
   exportName: string,
   namespaceName: string | undefined,
+  subpathNamespaceName: string | undefined,
 ):
   | Readonly<{
       localName: string;
@@ -601,6 +636,16 @@ const bindingOf = (
     return {
       localName: value.specifier.local.name,
       boundName: value.specifier.local.name,
+      isAdded: false,
+      edits: () => [],
+    };
+  }
+
+  // `import * as Arr from 'ts-data-forge/array'` is `Arr` itself.
+  if (subpathNamespaceName !== undefined) {
+    return {
+      localName: subpathNamespaceName,
+      boundName: subpathNamespaceName,
       isAdded: false,
       edits: () => [],
     };
@@ -693,6 +738,49 @@ const namedIn = (
   );
 
 /**
+ * The local name of the first namespace import of `moduleName` that is not
+ * `import type * as`, if any.
+ */
+const namespaceImportOf = (
+  program: TSESTree.Program,
+  moduleName: string,
+): string | undefined =>
+  getImportDeclarations(program, moduleName)
+    .filter((declaration) => !isTypeOnlyDeclaration(declaration))
+    .flatMap((declaration) => declaration.specifiers)
+    .find(
+      (specifier) => specifier.type === AST_NODE_TYPES.ImportNamespaceSpecifier,
+    )?.local.name;
+
+/**
+ * The edit that adds `import * as X from '<subpath>'` for each of `subpaths`,
+ * after the file's last import: the file has one, the subpath import that chose
+ * this form, and a new declaration there cannot meet one
+ * {@link buildNamedImportFix} puts at the top.
+ */
+const addNamespaceImports = (
+  fixer: TSESLint.RuleFixer,
+  allImports: readonly TSESTree.ImportDeclaration[],
+  subpaths: readonly NamespaceSubpath[],
+): readonly TSESLint.RuleFix[] => {
+  const last = allImports.at(-1);
+
+  return last === undefined || subpaths.length === 0
+    ? []
+    : [
+        fixer.insertTextAfter(
+          last,
+          subpaths
+            .map(
+              ({ exportName, moduleName }) =>
+                `\nimport * as ${exportName} from '${moduleName}';`,
+            )
+            .join(''),
+        ),
+      ];
+};
+
+/**
  * {@link bindValueImports}, writing an export no value import binds through the
  * namespace import `namespaceName` when there is one. `boundNames` are the
  * names the written text starts with, which something at the node must not
@@ -704,8 +792,12 @@ const bindNames = (
   exportNames: readonly string[],
   namespaceName: string | undefined,
   equivalentModules: readonly EquivalentModule[],
+  namespaceSubpaths: readonly NamespaceSubpath[],
 ): BoundNames | undefined => {
   const program = sourceCode.ast;
+
+  const subpathOf = (exportName: string): NamespaceSubpath | undefined =>
+    namespaceSubpaths.find((subpath) => subpath.exportName === exportName);
 
   const allImports = program.body.filter(
     (node): node is TSESTree.ImportDeclaration =>
@@ -725,9 +817,20 @@ const bindNames = (
     ),
   ] as const;
 
-  const bindings = exportNames.map((exportName) =>
-    bindingOf(sourceCode, allImports, named, exportName, namespaceName),
-  );
+  const bindings = exportNames.map((exportName) => {
+    const subpath = subpathOf(exportName);
+
+    return bindingOf(
+      sourceCode,
+      allImports,
+      named,
+      exportName,
+      namespaceName,
+      subpath === undefined
+        ? undefined
+        : namespaceImportOf(program, subpath.moduleName),
+    );
+  });
 
   if (bindings.includes(undefined)) {
     return undefined;
@@ -735,7 +838,25 @@ const bindNames = (
 
   const defined = bindings.filter((b) => b !== undefined);
 
-  const toAdd = defined.flatMap((b) => (b.isAdded ? [b.localName] : []));
+  // A file that imports from a subpath of the module already (`import * as Num
+  // from 'ts-data-forge/number'`) takes what a fix adds the same way, where the
+  // export has a subpath of its own.
+  const followsSubpaths = allImports.some((declaration) =>
+    declaration.source.value.startsWith(`${moduleName}/`),
+  );
+
+  const viaSubpath = (localName: string): NamespaceSubpath | undefined =>
+    followsSubpaths ? subpathOf(localName) : undefined;
+
+  const toAdd = defined.flatMap((b) =>
+    b.isAdded && viaSubpath(b.localName) === undefined ? [b.localName] : [],
+  );
+
+  const subpathsToAdd = defined.flatMap((b) => {
+    const subpath = b.isAdded ? viaSubpath(b.localName) : undefined;
+
+    return subpath === undefined ? [] : [subpath];
+  });
 
   const host = hostModuleFor(
     program,
@@ -759,6 +880,7 @@ const bindNames = (
             host.hosts,
             toAdd,
           )),
+      ...addNamespaceImports(fixer, allImports, subpathsToAdd),
     ],
   };
 };
