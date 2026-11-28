@@ -57,23 +57,24 @@ export default [
 
   {
     files: ['test/**/*.mts', '**/*.test.mts'],
-    /* Five files sit under `test/` but are not tests: each holds
+    /* Six files sit under `test/` but are not tests. Four hold
        `@ts-expect-error` lines that `check:types` reads —
        `strict-lib-active.mts` stops compiling if the strict standard library
        stops being applied, `arr-tail-ts2590.mts` as its header says,
-       `range-for-loop-fix-output.mts` if `range` stops agreeing with what
-       `prefer-range-for-loop` fixes, and `as-int-fix-output.mts` if the cast
-       functions stop agreeing with what `prefer-as-int` fixes, and
-       `largest-literal-count.mts` if the largest literal count `Arr.take`
-       takes moves from what `prefer-canonical-array-slicing` fixes — and the
-       `export` is what keeps their declarations from being unused locals,
-       whose error would satisfy the directive instead. The no-export rule
-       below is about test files, so it — and the loosened rules beside it —
-       do not apply to them. */
+       `as-int-fix-output.mts` if the cast functions stop agreeing with what
+       `prefer-as-int` fixes, and `largest-literal-count.mts` if the largest
+       literal count `Arr.take` takes moves from what
+       `prefer-canonical-array-slicing` fixes — and the `export` is what keeps
+       their declarations from being unused locals, whose error would satisfy
+       the directive instead. `type-check-outputs.mts` and its barrel
+       `index.mts` are a helper the rules' tests import, which compiles their
+       outputs. The no-export rule below is about test files, so it — and the
+       loosened rules beside it — do not apply to them. */
     ignores: [
       'test/strict-lib-active.mts',
       'test/arr-tail-ts2590.mts',
-      'test/range-for-loop-fix-output.mts',
+      'test/type-check-outputs.mts',
+      'test/index.mts',
       'test/as-int-fix-output.mts',
       'test/largest-literal-count.mts',
     ],
