@@ -7,6 +7,9 @@ type Options = readonly Selector[];
 
 type MessageIds = 'restrictedSyntax';
 
+// Copied from https://github.com/eslint/eslint/blob/main/lib/rules/no-restricted-syntax.js
+// (its schema and message verbatim); its license ships as
+// third-party/eslint/LICENSE.txt
 /**
  * ESLint's `no-restricted-syntax` under another id, so that a config can add a
  * set of selectors at a severity of its own without restating the core rule's:

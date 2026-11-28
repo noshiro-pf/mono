@@ -6,7 +6,8 @@ import { Arr, hasKey, isNotUndefined } from 'ts-data-forge';
 import type { DeepReadonly, ReadonlyRecord } from 'ts-type-forge';
 import { resolveImportPath } from './resolve-import-path.mjs';
 
-// Forked from https://github.com/knowledge-work/eslint-plugin-strict-dependencies/blob/v1.3.27/strict-dependencies/index.js
+// Forked from https://github.com/knowledge-work/eslint-plugin-strict-dependencies/blob/v1.3.27/strict-dependencies/index.js;
+// its license ships as third-party/eslint-plugin-strict-dependencies/LICENSE.txt
 
 // Fork 時の変更点メモ
 // - normalize は path.normalize に変更（厳密には挙動が異なるが、この ESLint ルールの用途的には問題ないはず）
