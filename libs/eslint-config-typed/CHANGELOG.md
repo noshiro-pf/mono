@@ -1,5 +1,24 @@
 ## [5.8.4](https://github.com/noshiro-pf/eslint-config-typed/compare/v5.8.3...v5.8.4) (2026-08-09)
 
+## 7.16.1
+
+### Patch Changes
+
+- a6eefd8: Turn off the rules whose reports another enabled rule already makes, so a violation is reported once and a suppression names one rule: the `vitest/padding-around-*` and `jest/padding-around-*` rules and `playwright/consistent-spacing-between-blocks` (covered by `@stylistic/padding-line-between-statements`), `n/prefer-node-protocol`, `import-x/no-anonymous-default-export`, `math/prefer-number-is-safe-integer`, `array-func/prefer-flat`, `security/detect-new-buffer`, `security/detect-eval-with-expression`, `security/detect-non-literal-require`, `promise/no-return-wrap`, `promise/no-multiple-resolved`, `functional/prefer-property-signatures`, `consistent-this`, `@typescript-eslint/no-invalid-this`, `@typescript-eslint/prefer-for-of`, and `unicorn/prefer-string-starts-ends-with`, `unicorn/prefer-array-from-map`, `unicorn/prefer-math-abs`, `unicorn/no-static-only-class`, `unicorn/no-this-assignment`, `unicorn/no-unnecessary-boolean-comparison`, `unicorn/no-useless-coercion`, `unicorn/no-useless-template-literals`, `unicorn/no-unnecessary-await` and `unicorn/prefer-then-catch`. Each rule's comment names the rule that covers it. An `eslint-disable` comment that names one of these rules is now reported as unused for that rule: drop the name, and name the covering rule instead where that rule now reports the line.
+
+    The `@link` on `prefer-arrow-functions/prefer-arrow-functions` in the rule types now leads to the plugin's repository; the plugin publishes a URL to a repository that does not exist.
+
+- Updated dependencies [076cc43]
+- Updated dependencies [076cc43]
+    - eslint-rule-forge@0.14.0
+    - eslint-plugin-vitest-coding-style@1.0.4
+    - eslint-plugin-immer-coding-style@1.0.4
+    - eslint-plugin-react-coding-style@1.0.4
+    - eslint-plugin-synstate@0.8.1
+    - eslint-plugin-synstate-dom-a11y@1.0.4
+    - eslint-plugin-ts-restrictions@1.0.6
+    - eslint-plugin-ts-ui-restrictions@1.0.5
+
 ## 7.16.0
 
 ### Minor Changes

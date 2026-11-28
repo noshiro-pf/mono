@@ -1,5 +1,13 @@
 # @sumi-lang/cli
 
+## 0.1.18
+
+### Patch Changes
+
+- @sumi-lang/checker@0.0.16
+    - @sumi-lang/oxlint-config@0.1.18
+    - ts-data-forge@15.1.1
+
 ## 0.1.17
 
 ### Patch Changes

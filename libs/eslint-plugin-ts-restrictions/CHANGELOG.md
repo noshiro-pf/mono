@@ -1,5 +1,12 @@
 # eslint-plugin-ts-restrictions
 
+## 1.0.6
+
+### Patch Changes
+
+- Updated dependencies [076cc43]
+    - eslint-rule-forge@0.14.0
+
 ## 1.0.5
 
 ### Patch Changes
