@@ -151,7 +151,7 @@ const main = async (): Promise<number> => {
   const notes = [
     ...(Arr.isNonEmpty(classification.ignored)
       ? ([
-          `${classification.ignored.length} file(s) under experimental/ are outside every check.`,
+          `${classification.ignored.length} file(s) under experimental/ are outside every check but check:prose:private-pointers.`,
         ] as const)
       : ([] as const)),
     ...(classification.areas.has('repo-settings')

@@ -3,7 +3,7 @@ import { isDirectlyExecuted } from 'ts-repo-utils';
 import { listCheckoutFiles, readRepositoryFile } from '../lib/repo-files.mjs';
 // From the hook rather than from `tools/scripts/lib/`: the hook runs with plain
 // `node` and may import nothing but `node:*`, so the pattern lives there.
-import { findPrivatePointers } from './claude-code-public-write-gate.mjs';
+import { findPointers } from './claude-code-public-write-gate.mjs';
 
 /**
  * Fails when a file of the checkout, by its path or its text, points into the
@@ -15,17 +15,17 @@ import { findPrivatePointers } from './claude-code-public-write-gate.mjs';
  * `claude-code-public-write-gate.mts` refuses one in the text a call carries
  * and in the messages a push sends, but not in its diffs; this reads those as
  * files, tracked and untracked alike, before the push in `check-changed` and on
- * any diff in CI. The pattern is the hook's {@link findPrivatePointers}, so the
- * two cannot disagree.
+ * any diff in CI. The pattern is the hook's, read by its {@link findPointers}, so
+ * the two cannot disagree.
  *
  * It reads the checkout, not a commit: in `check-changed` that is what is about
  * to be committed, in CI it is the commit. A commit pushed that differs from
  * the checkout is the hook's review to catch.
  *
  * Naming the repository as where findings go is not a pointer. `experimental/`,
- * which nothing else checks, is read too, as it is published like the rest; a
- * diff touching it alone runs no check, so a pointer there fails the next diff
- * that does, the latest a check can catch it.
+ * which nothing else checks, is read too, as it is published like the rest. A
+ * diff touching it alone skips the check workflows; `verify-lockfile.yml` reads
+ * it then, with the hook's `--scan`, which needs no install.
  */
 export const checkPrivatePointers = async (): Promise<
   Result<number, string>
@@ -81,22 +81,6 @@ export const checkPrivatePointers = async (): Promise<
 
   return Result.ok(listed.value.length);
 };
-
-/**
- * `<file>: <pointer>` for its path, and `<file>:<line>: <pointer>` for its
- * text. A binary file's bytes are read too, at the cost of a pointer its bytes
- * might happen to spell.
- */
-export const findPointers = (
-  file: string,
-  content: string,
-): readonly string[] =>
-  [
-    ...findPrivatePointers(file).map(({ pointer }) => `${file}: ${pointer}`),
-    ...findPrivatePointers(content).map(
-      ({ line, pointer }) => `${file}:${line}: ${pointer}`,
-    ),
-  ] as const;
 
 /** How many files are read at once. */
 const BATCH_SIZE = asPositiveUint32(256);
