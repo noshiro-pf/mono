@@ -1,5 +1,5 @@
 import { AST_NODE_TYPES, type TSESLint } from '@typescript-eslint/utils';
-import { isCalleeOfCall } from './type-wrappers.mjs';
+import { isCallee } from 'eslint-rule-forge';
 import { getVitestReceiver } from './vitest-binding.mjs';
 
 type MessageIds = 'preferAssertDeepStrictEqual';
@@ -36,7 +36,7 @@ export const preferAssertDeepStrictEqualOverDeepEqualRule: TSESLint.RuleModule<
           undefined &&
         node.property.type === AST_NODE_TYPES.Identifier &&
         node.property.name === 'deepEqual' &&
-        isCalleeOfCall(node)
+        isCallee(node)
       ) {
         const { property } = node;
 

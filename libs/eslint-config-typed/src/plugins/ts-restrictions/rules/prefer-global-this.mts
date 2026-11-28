@@ -6,8 +6,9 @@ import {
 } from '@typescript-eslint/utils';
 import type { Rule } from 'eslint';
 import eslintPluginUnicorn from 'eslint-plugin-unicorn';
-import { isTypeWrapper } from 'eslint-rule-forge';
+import { outermostTypeWrapper } from 'eslint-rule-forge';
 import { hasKey, isRecord } from 'ts-data-forge';
+import type { DeepReadonly } from 'ts-type-forge';
 import type * as ts from 'typescript';
 
 type Options = readonly [];
@@ -164,22 +165,9 @@ const reportedStart = (
   return { line: start.line, column: start.column };
 };
 
-/** `node`, or the outermost type wrapper whose value is `node`. */
-// eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-const outermostTypeWrapper = (node: TSESTree.Node): TSESTree.Node => {
-  const { parent } = node;
-
-  return parent !== undefined &&
-    isTypeWrapper(parent) &&
-    parent.expression === node
-    ? outermostTypeWrapper(parent)
-    : node;
-};
-
 /** The name a member key spells out, if it is static. */
 const staticKeyName = (
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  key: TSESTree.Node,
+  key: DeepReadonly<TSESTree.Node>,
   computed: boolean,
 ): string | undefined =>
   !computed && key.type === AST_NODE_TYPES.Identifier

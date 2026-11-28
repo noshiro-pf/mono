@@ -6,8 +6,9 @@ import {
 } from '@typescript-eslint/utils';
 import {
   getArgumentText,
-  isTypeWrapper,
+  isCallee,
   mayHaveEffect,
+  outermostTypeWrapper,
   skipTypeWrappers,
 } from 'eslint-rule-forge';
 import { Arr, hasKey, isRecord } from 'ts-data-forge';
@@ -187,33 +188,6 @@ const scopesWithin = (
 ): readonly TSESLint.Scope.Scope[] =>
   Arr.toUnshifted(scope)(scope.childScopes.flatMap(scopesWithin));
 
-/** `node` with the type wrappers around it. */
-const outermostWrapper = (
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  node: TSESTree.Node,
-): TSESTree.Node =>
-  node.parent !== undefined && isTypeWrapper(node.parent)
-    ? outermostWrapper(node.parent)
-    : node;
-
-/**
- * Whether `node`, with the type wrappers and an optional chain around it, is
- * what a call calls.
- */
-const isCallee = (
-  // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types
-  node: TSESTree.Node,
-): boolean => {
-  const { parent } = node;
-
-  return (
-    parent !== undefined &&
-    (isTypeWrapper(parent) || parent.type === AST_NODE_TYPES.ChainExpression
-      ? isCallee(parent)
-      : parent.type === AST_NODE_TYPES.CallExpression && parent.callee === node)
-  );
-};
-
 /**
  * Whether `node` reads a member named `expect` other than to call it
  * (`v.expect.any(Date)`, `ctx.expect!.any(Date)`, `v['expect']`, `` v[`expect`] ``,
@@ -250,7 +224,7 @@ const holdsExpectMember = (
           : atToken;
 
       // A computed key may be wrapped: `v['expect' as const]`.
-      const wrappedKey = key === null ? undefined : outermostWrapper(key);
+      const wrappedKey = key === null ? undefined : outermostTypeWrapper(key);
 
       const member = wrappedKey?.parent;
 
