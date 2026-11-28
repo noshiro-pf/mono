@@ -42,9 +42,13 @@ export const readShellCommands = (script: string): ShellReading => {
 export const readShellScript = (script: string): ShellScriptReading => {
   const chars = Array.from(script.replaceAll('\r\n', '\n'));
 
-  const { commands, assignments, problems } = readList(chars, 0, undefined);
+  const { commands, assignments, problems, details } = readList(
+    chars,
+    0,
+    undefined,
+  );
 
-  return { commands, assignments, problems };
+  return { commands, assignments, problems, details };
 };
 
 export type ShellReading = Readonly<{
@@ -64,6 +68,20 @@ export type ShellScriptReading = Readonly<{
   /** {@link ShellReading.assignments}, each with where it is made. */
   assignments: readonly ShellAssignment[];
   problems: ShellReading['problems'];
+  /** For each of `commands`, at the same index, how it runs. */
+  details: readonly CommandDetail[];
+}>;
+
+/**
+ * How a simple command runs, beyond its words: its redirections in the order
+ * written, each as its operator with the descriptor before it and the target
+ * after it, quotes taken off (`2>&1`, `>/dev/null`, `&>log`, `2>$errors`), and
+ * `|&` for a pipe that takes its stderr too; and whether it runs inside a
+ * command substitution (`$(…)` or backticks), whose output is captured.
+ */
+export type CommandDetail = Readonly<{
+  redirections: readonly string[];
+  inSubstitution: boolean;
 }>;
 
 export type ShellAssignment = Readonly<{
@@ -373,6 +391,11 @@ const readList = (
 
   const mut_problems: string[] = [];
 
+  const mut_details: CommandDetail[] = [];
+
+  /** The redirections of the command being read, the last one's target to come. */
+  let mut_redirections: string[] = [];
+
   let mut_words: string[] = [];
 
   let mut_word: string[] = [];
@@ -391,6 +414,8 @@ const readList = (
     skipNextWord: false,
     /** A `case <word>` ended its line, its `in` on the next one. */
     caseAwaitsIn: false,
+    /** The skipped word is the target of the last redirection. */
+    redirectionTarget: false,
   };
 
   const stopped = (): ListReading =>
@@ -398,6 +423,7 @@ const readList = (
       commands: mut_commands,
       assignments: mut_assignments,
       problems: mut_problems,
+      details: mut_details,
       end: chars.length,
     }) as const;
 
@@ -426,6 +452,14 @@ const readList = (
 
     if (mut_state.skipNextWord) {
       mut_state.skipNextWord = false;
+
+      if (mut_state.redirectionTarget) {
+        mut_state.redirectionTarget = false;
+
+        const last = mut_redirections.pop() ?? '';
+
+        mut_redirections.push(`${last}${text}`);
+      }
 
       return;
     }
@@ -499,7 +533,14 @@ const readList = (
 
     if (command !== undefined) {
       mut_commands.push(command);
+
+      mut_details.push({
+        redirections: mut_redirections,
+        inSubstitution: false,
+      });
     }
+
+    mut_redirections = [];
   };
 
   /** Reads a nested list up to its `)`; the index after it, or a problem. */
@@ -507,6 +548,14 @@ const readList = (
     const inner = readList(chars, from, what);
 
     mut_commands.push(...inner.commands);
+
+    mut_details.push(
+      ...inner.details.map((detail) =>
+        what === SUBSTITUTION_OPENING
+          ? { ...detail, inSubstitution: true }
+          : detail,
+      ),
+    );
 
     mut_problems.push(...inner.problems);
 
@@ -531,7 +580,7 @@ const readList = (
     }
 
     if (next === '(') {
-      const end = nested(at + 2, '`$(`');
+      const end = nested(at + 2, SUBSTITUTION_OPENING);
 
       return typeof end === 'number' ? { text: SUBSTITUTION, end } : end;
     }
@@ -574,6 +623,13 @@ const readList = (
         const inner = readList(Array.from(mut_inner.join('')), 0, undefined);
 
         mut_commands.push(...inner.commands);
+
+        mut_details.push(
+          ...inner.details.map((detail) => ({
+            ...detail,
+            inSubstitution: true,
+          })),
+        );
 
         mut_problems.push(...inner.problems);
 
@@ -689,15 +745,23 @@ const readList = (
     return mut_cursor.at;
   };
 
-  /** A redirection operator at `at`; the index after it. */
-  const readRedirection = (at: number): number => {
+  /**
+   * A redirection operator at `at`, written from `from` (the first `<` of
+   * `<<<`); the index after it.
+   */
+  const readRedirection = (at: number, from: number = at): number => {
     // A file descriptor written against the operator (`2>`) is no word.
-    if (mut_state.inWord && mut_word.every((part) => DIGIT.test(part))) {
+    const descriptor =
+      mut_state.inWord && mut_word.every((part) => DIGIT.test(part))
+        ? mut_word.join('')
+        : '';
+
+    if (descriptor === '') {
+      endWord();
+    } else {
       mut_word = [];
 
       mut_state.inWord = false;
-    } else {
-      endWord();
     }
 
     const mut_cursor = { at: at + 1 };
@@ -705,6 +769,9 @@ const readList = (
     while (REDIRECTION_TAIL.has(chars[mut_cursor.at] ?? '')) {
       mut_cursor.at += 1;
     }
+
+    // `&>` is read from its `>`.
+    const both = chars[at] === '>' && chars[at - 1] === '&' ? '&' : '';
 
     // `2>&1`, `>&-`: the target is a descriptor, not a word.
     if (
@@ -715,10 +782,20 @@ const readList = (
         mut_cursor.at += 1;
       }
 
+      mut_redirections.push(
+        `${descriptor}${both}${chars.slice(from, mut_cursor.at).join('')}`,
+      );
+
       return mut_cursor.at;
     }
 
+    mut_redirections.push(
+      `${descriptor}${both}${chars.slice(from, mut_cursor.at).join('')}`,
+    );
+
     mut_state.skipNextWord = true;
+
+    mut_state.redirectionTarget = true;
 
     return mut_cursor.at;
   };
@@ -829,6 +906,7 @@ const readList = (
         commands: mut_commands,
         assignments: mut_assignments,
         problems: mut_problems,
+        details: mut_details,
         end: at + 1,
       };
     }
@@ -963,6 +1041,11 @@ const readList = (
     }
 
     if (character === '|') {
+      // `|&` pipes stderr too.
+      if (next === '&') {
+        mut_redirections.push('|&');
+      }
+
       endCommand();
 
       mut_state.at += next === '|' || next === '&' ? 2 : 1;
@@ -986,7 +1069,7 @@ const readList = (
 
     if (character === '<' && next === '<') {
       if (chars[at + 2] === '<') {
-        mut_state.at = readRedirection(at + 2);
+        mut_state.at = readRedirection(at + 2, at);
 
         continue;
       }
@@ -1041,9 +1124,13 @@ const readList = (
         commands: mut_commands,
         assignments: mut_assignments,
         problems: mut_problems,
+        details: mut_details,
         end: chars.length,
       };
 };
+
+/** What {@link readList} is told it reads for a `$(`, which captures output. */
+const SUBSTITUTION_OPENING = '`$(`';
 
 /** What a substitution's word reads, its commands having been read apart. */
 const SUBSTITUTION = '$(…)';

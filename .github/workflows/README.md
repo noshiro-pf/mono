@@ -1088,6 +1088,5 @@ Nothing checks this; a review does.
   `errors` a file under `RUNNER_TEMP`, whose text (gh's names the server's
   message and status) goes into the error message. A capture with `2>&1` turns a
   warning a command writes on success into a value, which in `check-gates.yml`
-  would be the newest verdict on the tree. No check reports such a capture yet:
-  it needs the redirections that `readShellCommands` in
-  `tools/scripts/lib/shell-commands.mts` reads past without keeping.
+  would be the newest verdict on the tree. `check:root:stderr-captures` reports
+  such a capture.
