@@ -404,7 +404,9 @@ export const flattenShapeStructure = (
       return parts.includes(undefined)
         ? // Contains union - cannot flatten
           undefined
-        : // No part is a union here.
+        : // No part is a union here. Parts that declare the same key keep the
+          // last part's member alone, as in `expandShapeStructure`, which says
+          // why.
           // @sumi-expect-error banned-syntax/no-unsafe-type-assertion
           Obj.merge(...(parts as readonly UnknownShape[]));
     }
@@ -437,18 +439,40 @@ const EXPAND_SHAPE_STRUCTURE_MAX_VARIANTS = 10_000;
  */
 export const expandShapeStructure = (
   structure: ShapeStructure,
-): readonly UnknownShape[] => {
+): readonly UnknownShape[] =>
+  // Parts that declare the same key keep the last part's member alone, though
+  // the intersection itself requires every part's, so `at` of such an
+  // intersection checks that member alone (and `flattenShapeStructure` does the
+  // same for `pick`, `omit`, `partial`, `required` and `valueof`). Requiring
+  // all of them needs `mergeRecords`'s merge of a key's members, which
+  // `mergeRecords` applies to the parts `expandShapeParts` returns; this module
+  // cannot import it, since `merge-records.mts` is built on `compose/`, which
+  // imports this module. Until those operations apply it themselves, they read
+  // an intersection as they always have.
+  Arr.map(expandShapeParts(structure), (shapes) => Obj.merge(...shapes));
+
+/**
+ * @internal {@link expandShapeStructure} without merging the parts of an
+ * intersection: each variant is the list of the simple shapes it is made of,
+ * in order, for a caller that merges the members of a key they share itself.
+ *
+ * @throws If the intersection expansion would exceed
+ *   {@link EXPAND_SHAPE_STRUCTURE_MAX_VARIANTS} concrete shapes.
+ */
+export const expandShapeParts = (
+  structure: ShapeStructure,
+): readonly (readonly UnknownShape[])[] => {
   switch (structure.kind) {
     case 'simple': {
-      return [structure.shape];
+      return [[structure.shape]];
     }
     case 'union': {
       // Union: flatten all variants
-      return structure.variants.flatMap(expandShapeStructure);
+      return structure.variants.flatMap(expandShapeParts);
     }
     case 'intersection': {
       // Intersection: compute cartesian product of all parts
-      const expandedParts = structure.parts.map(expandShapeStructure);
+      const expandedParts = structure.parts.map(expandShapeParts);
 
       // The cartesian product size is the product of the per-part variant
       // counts, which grows multiplicatively. Bound it before materializing to
@@ -464,9 +488,9 @@ export const expandShapeStructure = (
         );
       }
 
-      const combinations = Arr.cartesianProduct(expandedParts);
-
-      return Arr.map(combinations, (shapes) => Obj.merge(...shapes));
+      return Arr.map(Arr.cartesianProduct(expandedParts), (parts) =>
+        parts.flat(),
+      );
     }
   }
 };
@@ -479,6 +503,15 @@ export const expandShapeStructure = (
  */
 export const recordViewOf = (type: UnknownType): RecordView | undefined =>
   recordViewOfImpl(type, new Set<() => UnknownType>());
+
+/**
+ * @internal {@link recordViewOf} without running any `recursion`'s definition,
+ * for a caller that may run while that definition's binding is still being
+ * initialized: a `recursion` is not a record here.
+ */
+export const recordViewWithoutResolvingOf = (
+  type: UnknownType,
+): RecordView | undefined => recordViewOfImpl(type, undefined);
 
 /** @internal The element types of a `tuple`, if the type is one. */
 export const tupleElementTypesOf = (
@@ -496,9 +529,13 @@ export const unionMembersOf = (type: UnknownType): readonly UnknownType[] =>
     ? type.structure.memberTypes.flatMap(unionMembersOf)
     : ([type] as const);
 
+/**
+ * `resolving` holds the `recursion`s being resolved, or is `undefined` when no
+ * `recursion` may be resolved.
+ */
 const recordViewOfImpl = (
   type: UnknownType,
-  resolving: ReadonlySet<() => UnknownType>,
+  resolving: ReadonlySet<() => UnknownType> | undefined,
 ): RecordView | undefined => {
   const { structure } = type;
 
@@ -532,7 +569,11 @@ const recordViewOfImpl = (
     };
   }
 
-  if (structure?.kind === 'recursion' && !resolving.has(structure.resolve)) {
+  if (
+    resolving !== undefined &&
+    structure?.kind === 'recursion' &&
+    !resolving.has(structure.resolve)
+  ) {
     return recordViewOfImpl(
       structure.resolve(),
       new Set<() => UnknownType>([...resolving, structure.resolve]),

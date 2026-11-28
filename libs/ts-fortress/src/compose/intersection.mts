@@ -94,7 +94,11 @@ export const intersection = <const Types extends NonEmptyTuple<UnknownType>>(
 
   const baseType: Type<T> = {
     typeName: typeNameFilled,
-    defaultValue: defaultType.defaultValue,
+    // Read on first use rather than here, for the reason given at
+    // `isRecordIntersection`: the default type may be a `recursion` too.
+    get defaultValue() {
+      return defaultType.defaultValue;
+    },
     fill,
     prune,
     validate,
