@@ -311,12 +311,6 @@ export const CI_ONLY: readonly CiOnly[] = [
     reason:
       'Installs the versions on the registry; nothing in the diff decides it.',
   },
-  {
-    directory: 'strict-lib/',
-    scriptName: 'check:types',
-    reason:
-      "Each harness type-checks its TypeScript minor over the lib its generators write. These checks are nine tenths of `ws:check:types`, and `strict-lib-gen.yml` runs them; check-changed runs the tooling's `strict-lib:check:types`, and the generators for a change that reaches them.",
-  },
 ] as const;
 
 export type CiOnly = Readonly<{

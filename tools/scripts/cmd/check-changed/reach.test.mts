@@ -212,9 +212,15 @@ describe('matchesCiOnly', () => {
   });
 
   test('an entry ending in a slash applies to every package under it', () => {
-    assert.isTrue(matches('strict-lib/v5.0:check:types'));
+    const entry = {
+      directory: 'strict-lib/',
+      scriptName: 'check:types',
+      reason: 'an example',
+    } as const;
 
-    assert.isFalse(matches('libs/a:check:types'));
+    assert.isTrue(matchesCiOnly(entry, 'strict-lib/v5.0:check:types'));
+
+    assert.isFalse(matchesCiOnly(entry, 'libs/a:check:types'));
   });
 });
 
