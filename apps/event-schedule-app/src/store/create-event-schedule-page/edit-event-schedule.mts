@@ -12,6 +12,7 @@ import type { Api } from '../../api/index.mjs';
 import { dict, routes } from '../../constants/index.mjs';
 import {
   collectEventSettingsPageDiff,
+  notificationEmailToSave,
   showToast,
   type EventSettingsPageDiffResult,
 } from '../../functions/index.mjs';
@@ -160,17 +161,15 @@ export const createEditEventScheduleStore = (
 
   const diff$: InitializedObservable<EventSettingsPageDiffResult> = derive(
     [emailVerified$, eventScheduleFromDatabase$, commonState$, baseline$],
-    (
-      emailVerified,
-      eventScheduleFromDatabase,
-      { eventScheduleNormalized, notificationSettingsWithEmail },
-      baseline,
-    ) =>
+    (emailVerified, eventScheduleFromDatabase, commonState, baseline) =>
       collectEventSettingsPageDiff(
         eventScheduleFromDatabase ?? baseline,
-        keepIdentityOf(eventScheduleFromDatabase, eventScheduleNormalized),
+        keepIdentityOf(
+          eventScheduleFromDatabase,
+          commonState.eventScheduleNormalized,
+        ),
         emailVerified,
-        notificationSettingsWithEmail?.email,
+        notificationEmailToSave(commonState),
       ),
   );
 
@@ -184,15 +183,14 @@ export const createEditEventScheduleStore = (
 
   const hasNoChanges$: InitializedObservable<boolean> = derive(
     [emailVerified$, eventScheduleFromDatabase$, commonState$],
-    (
-      emailVerified,
-      eventScheduleFromDatabase,
-      { eventScheduleNormalized, notificationSettingsWithEmail },
-    ) =>
-      emailVerified === notificationSettingsWithEmail?.email &&
+    (emailVerified, eventScheduleFromDatabase, commonState) =>
+      emailVerified === notificationEmailToSave(commonState) &&
       fastDeepEqual(
         eventScheduleFromDatabase,
-        keepIdentityOf(eventScheduleFromDatabase, eventScheduleNormalized),
+        keepIdentityOf(
+          eventScheduleFromDatabase,
+          commonState.eventScheduleNormalized,
+        ),
       ),
   );
 
@@ -209,17 +207,13 @@ export const createEditEventScheduleStore = (
 
     const eventId = Optional.unwrap(deps.router.eventId$.getSnapshot());
 
-    const {
-      eventScheduleNormalized,
-      eventScheduleValidationOk,
-      notificationSettingsWithEmail,
-    } = commonState;
+    const { eventScheduleNormalized, eventScheduleValidationOk } = commonState;
 
     if (!eventScheduleValidationOk || eventId === undefined) {
       return;
     }
 
-    const email = notificationSettingsWithEmail?.email ?? '';
+    const email = notificationEmailToSave(commonState) ?? '';
 
     setIsLoadingTrue();
 

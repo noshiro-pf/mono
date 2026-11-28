@@ -11,6 +11,11 @@ export type EventScheduleSettingCommonState = Readonly<{
   answerIcons: AnswerIconSettings;
   useNotification: boolean;
   notificationSettingsWithEmail: NotificationSettingsWithEmail | undefined;
+  /**
+   * The signed-in account's verified email, which notifications go to;
+   * `undefined` when there is none, and notifications cannot be turned on.
+   */
+  notificationEmail: string | undefined;
   eventScheduleValidation: EventScheduleValidation;
   eventScheduleNormalized: EventSchedule;
   eventScheduleValidationOk: boolean;

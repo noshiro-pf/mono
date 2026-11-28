@@ -1,6 +1,13 @@
 import { expect, type Locator, type Page, test } from '@playwright/test';
-import type { DeepReadonly, ReadonlyRecord } from 'ts-type-forge';
-import { password, register, uniqueEmail, username } from './account-steps.mjs';
+import type { DeepReadonly } from 'ts-type-forge';
+import {
+  openEmailChangeLink,
+  password,
+  register,
+  signOut,
+  uniqueEmail,
+  username,
+} from './account-steps.mjs';
 import {
   answerPageLoadTimeout,
   authCallTimeout,
@@ -294,81 +301,6 @@ test(
   },
 );
 
-/**
- * `ts-data-forge`'s `isRecord`, written out: the daily job against production
- * imports every spec and builds no workspace package (see `productionE2eRules`
- * in `eslint.config.mts`).
- */
-const isObject = (u: unknown): u is ReadonlyRecord<string, unknown> =>
-  typeof u === 'object' && u !== null && !Array.isArray(u);
-
-/**
- * The link of the code the Auth emulator's `oobCodes` endpoint lists as sent to
- * change an address to `newEmail`.
- */
-const emailChangeLinkTo = (
-  body: unknown,
-  newEmail: string,
-): string | undefined => {
-  const codes: unknown = isObject(body) ? body['oobCodes'] : undefined;
-
-  if (!Array.isArray(codes)) {
-    return undefined;
-  }
-
-  const code: unknown = codes.find(
-    (c: unknown) =>
-      isObject(c) &&
-      c['requestType'] === 'VERIFY_AND_CHANGE_EMAIL' &&
-      c['newEmail'] === newEmail,
-  );
-
-  const link: unknown = isObject(code) ? code['oobLink'] : undefined;
-
-  return typeof link === 'string' ? link : undefined;
-};
-
-/**
- * Opens the link the Auth emulator recorded as sent to `newEmail`, as its owner
- * would from the mail. `firebase emulators:exec` gives the tests the emulator's
- * host and the project.
- */
-const openEmailChangeLink = async (
-  page: DeepReadonly<Page>,
-  newEmail: string,
-): Promise<void> => {
-  const host = process.env['FIREBASE_AUTH_EMULATOR_HOST'];
-
-  const projectId = process.env['GCLOUD_PROJECT'];
-
-  if (host === undefined || projectId === undefined) {
-    throw new Error(
-      'FIREBASE_AUTH_EMULATOR_HOST and GCLOUD_PROJECT are unset: run this under `check:e2e:emulators`',
-    );
-  }
-
-  const response = await page.request.get(
-    `http://${host}/emulator/v1/projects/${projectId}/oobCodes`,
-  );
-
-  if (!response.ok()) {
-    throw new Error(
-      `The Auth emulator's oobCodes endpoint answered ${response.status().toString()}`,
-    );
-  }
-
-  const oobLink = emailChangeLinkTo(await response.json(), newEmail);
-
-  if (oobLink === undefined) {
-    throw new Error(`The Auth emulator sent ${newEmail} no email change link`);
-  }
-
-  // The emulator's action page applies the code when it is fetched.
-  const applied = await page.request.get(oobLink);
-
-  expect.soft(applied.ok()).toBe(true);
-};
-
 /** Opens the dialog `item` names, from the user menu's account settings. */
 const openAccountSetting = async (
   page: DeepReadonly<Page>,
@@ -388,15 +320,4 @@ const openAccountSetting = async (
   await expect.soft(dialog).toBeVisible();
 
   return dialog;
-};
-
-/** Signs out from the user menu, which leads to the sign-in page. */
-const signOut = async (page: DeepReadonly<Page>): Promise<void> => {
-  await page.getByTestId('nav-user-menu').click();
-
-  await page.getByRole('menuitem', { name: 'ログアウト' }).click();
-
-  await expect.soft(page.getByTestId('nav-sign-in')).toBeVisible();
-
-  await expect.soft(page.getByTestId('sign-in-page')).toBeVisible();
 };

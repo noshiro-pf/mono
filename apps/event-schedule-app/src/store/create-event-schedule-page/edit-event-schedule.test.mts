@@ -28,7 +28,7 @@ describe(createEditEventScheduleStore, () => {
 
   // The edit page's diff box says nothing changed by `hasNoChanges$`, so a
   // change it would miss would be hidden there too.
-  test('an answer icon’s point, or the email alone, is a change, and listed', () => {
+  test('an answer icon’s point, or a notification email other than the account’s, is a change, and listed', () => {
     const { store } = setup();
 
     store.setEventSchedule(fromDatabase, undefined);
@@ -44,30 +44,27 @@ describe(createEditEventScheduleStore, () => {
       Optional.unwrap(store.diff$.getSnapshot()).answerIcons.fair.point,
     );
 
+    // An email confirmed that is not the account's verified one, which the save
+    // replaces.
     const { store: withEmail } = setup();
 
-    withEmail.setEmailVerified('abc', 'bob@example.com');
+    withEmail.setEmailVerified('abc', 'old@example.com');
 
-    withEmail.setEventSchedule(withNotifications, 'bob@example.com');
-
-    assert.isTrue(Optional.unwrap(withEmail.hasNoChanges$.getSnapshot()));
-
-    const { notificationSettingsWithEmail } = Optional.unwrap(
-      withEmail.commonState$.getSnapshot(),
-    );
-
-    assert.isDefined(notificationSettingsWithEmail);
-
-    withEmail.commonStateHandlers.setNotificationSettingsWithEmail({
-      ...notificationSettingsWithEmail,
-      email: 'carol@example.com',
-    });
+    withEmail.setEventSchedule(withNotifications, 'old@example.com');
 
     assert.isFalse(Optional.unwrap(withEmail.hasNoChanges$.getSnapshot()));
 
     assert.isDefined(
       Optional.unwrap(withEmail.diff$.getSnapshot()).notificationSettings,
     );
+
+    const { store: sameEmail } = setup();
+
+    sameEmail.setEmailVerified('abc', 'bob@example.com');
+
+    sameEmail.setEventSchedule(withNotifications, 'bob@example.com');
+
+    assert.isTrue(Optional.unwrap(sameEmail.hasNoChanges$.getSnapshot()));
   });
 
   // #3416: the form outlived the visit, and another event's edit page showed it
@@ -356,7 +353,9 @@ const setup = (
   const [fireAuthUser$] = createState<EventScheduleSettingUser | undefined>({
     uid: 'u1',
     displayName: 'alice',
-    email: 'alice@example.com',
+    // The account the events' notification email belongs to.
+    email: 'bob@example.com',
+    emailVerified: true,
   });
 
   const mut_calls: string[] = [];

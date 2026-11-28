@@ -29,7 +29,10 @@ export const EventSchedulePropertiesErrors = ({
     <div class={constant(styles.errors)}>
       {error((v) => v.title, dc.errorMessages.titleIsEmpty)}
       {error((v) => v.datetimeRangeList, dc.errorMessages.datetimeIsEmpty)}
-      {error((v) => v.notificationEmail, dict.common.error.invalidEmail)}
+      {error(
+        (v) => v.notificationEmail,
+        dict.eventSettingsPage.section3.notification.requiresVerifiedAccount,
+      )}
       {error(
         (v) => v.notificationItems,
         dc.errorMessages.atLeastOneNotificationCheckRequired,
