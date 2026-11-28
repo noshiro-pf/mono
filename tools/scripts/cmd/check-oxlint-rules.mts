@@ -3,8 +3,8 @@ import * as path from 'node:path';
 import {
   Arr,
   fastDeepEqual,
-  hasKey,
   isString,
+  keyIsIn,
   Result,
   unknownToString,
 } from 'ts-data-forge';
@@ -157,7 +157,7 @@ const depsBuiltGuardPrefix =
   /^node (?:\.\.\/)+tools\/scripts\/cmd\/assert-deps-built\.mts && /u;
 
 const ruleEntry = (ruleId: string): unknown =>
-  hasKey(eslintRulesMovedToOxlint, ruleId)
+  keyIsIn(ruleId, eslintRulesMovedToOxlint)
     ? eslintRulesMovedToOxlint[ruleId]
     : undefined;
 

@@ -1,8 +1,12 @@
-import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
+import {
+  AST_NODE_TYPES,
+  type TSESLint,
+  type TSESTree,
+} from '@typescript-eslint/utils';
 import isGlob from 'is-glob';
 import mm from 'micromatch';
 import * as path from 'node:path';
-import { Arr, hasKey, isNotUndefined } from 'ts-data-forge';
+import { Arr, isNotUndefined } from 'ts-data-forge';
 import type { DeepReadonly, ReadonlyRecord } from 'ts-type-forge';
 import { resolveImportPath } from './resolve-import-path.mjs';
 
@@ -132,9 +136,11 @@ export const strictDependenciesRule: TSESLint.RuleModule<
             )[]
           >
         )
-          .filter((spec) => hasKey(spec, 'imported')) // NOTE: ImportSpecifierの場合はimportedが存在する
+          .filter((spec) => spec.type === AST_NODE_TYPES.ImportSpecifier) // NOTE: ImportSpecifierの場合はimportedが存在する
           .map((spec: DeepReadonly<TSESTree.ImportSpecifier>) =>
-            hasKey(spec.imported, 'name') ? spec.imported.name : undefined,
+            spec.imported.type === AST_NODE_TYPES.Identifier
+              ? spec.imported.name
+              : undefined,
           )
           .filter(isNotUndefined);
 

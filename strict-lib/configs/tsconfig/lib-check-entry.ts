@@ -12,7 +12,7 @@
 // holds only from TypeScript 5.4 on goes in `lib-check-entry.since-5.4.ts`, and
 // one that holds only from 5.8 on in `lib-check-entry.since-5.8.ts`.
 
-import type { Int16 } from 'ts-type-forge';
+import type { Int16, TypeEq, UnknownRecord } from 'ts-type-forge';
 
 /**
  * #1840 — `ReturnType<typeof setTimeout>` came out `unknown`.
@@ -168,3 +168,180 @@ declare const int16: Int16;
 export const absOfInt16: Int16 = Math.abs(int16);
 
 export const absOfSmallLiteral: 3 = Math.abs(-3);
+
+/**
+ * #4015 — `Object.keys` and `Object.hasOwn` took only what `UnknownRecord`
+ * accepts, so a value typed by an `interface` without a string index signature,
+ * a class instance, an array, a `Map`, and an `object` — what `typeof u ===
+ * 'object' && u !== null` narrows `unknown` to — did not compile.
+ *
+ * `Object.keys` takes any object now and gives the keys of a type
+ * `UnknownRecord` accepts, `string` for any other, in one signature, so that
+ * `records.map(Object.keys)` keeps the keys too. A primitive is still refused.
+ *
+ * `Object.hasOwn` takes any object too, and its type predicate narrows only
+ * where it returns `true`: returning `false` says only that there is no *own*
+ * property, which no type can tell from an inherited one or from one a type
+ * leaves out, so where it returns `false` nothing is removed. It narrows only
+ * for one literal key that no member of the object's type declares as
+ * required; a required key, a union of keys, a `string` key and a union of
+ * shapes told apart by a key narrow nothing either way.
+ */
+interface WithOptionalKey {
+  a: number;
+  b?: string;
+}
+
+class Counter {
+  readonly count = 1;
+}
+
+declare const withOptionalKey: WithOptionalKey;
+
+declare const someObject: object;
+
+declare const xy: Readonly<{ x: 1; y: 2 }>;
+
+declare const records: readonly Readonly<{ x: 1; y: 2 }>[];
+
+const keysOfInterface = Object.keys(withOptionalKey);
+
+const keysOfObject = Object.keys(someObject);
+
+const keysOfArray = Object.keys([1, 2]);
+
+const keysOfInstance = Object.keys(new Counter());
+
+const keysOfMap = Object.keys(new Map<string, number>());
+
+const keysOfRecord = Object.keys(xy);
+
+// Point-free: the one signature is what TypeScript reads here.
+const keysOfRecords = records.map(Object.keys);
+
+export const objectKeysTypes = [
+  true satisfies TypeEq<typeof keysOfInterface, string[]>,
+  true satisfies TypeEq<typeof keysOfObject, string[]>,
+  true satisfies TypeEq<typeof keysOfArray, string[]>,
+  true satisfies TypeEq<typeof keysOfInstance, string[]>,
+  true satisfies TypeEq<typeof keysOfMap, string[]>,
+  true satisfies TypeEq<typeof keysOfRecord, ('x' | 'y' | (string & {}))[]>,
+  true satisfies TypeEq<typeof keysOfRecords, ('x' | 'y' | (string & {}))[][]>,
+] as const;
+
+// In a generic function the result is an array of the condition, which
+// TypeScript resolves only for a type argument; its elements are strings either
+// way.
+export const keysOfGeneric = <T extends UnknownRecord>(
+  record: T,
+): readonly string[] => Object.keys(record);
+
+export const keysOfGenericAreUnresolved = <T extends UnknownRecord>(
+  record: T,
+): readonly StrictLibInternals.ToObjectKeys<T>[] => {
+  // @ts-expect-error Not `ToObjectKeys<T>[]` until `T` is known.
+  return Object.keys(record);
+};
+
+// @ts-expect-error A number is not an object.
+export const keysOfNumber = Object.keys(1);
+
+// @ts-expect-error A string is not an object.
+export const keysOfString = Object.keys('s');
+
+// @ts-expect-error `undefined` is not an object.
+export const keysOfUndefined = Object.keys(undefined);
+
+type WithX = { x: number };
+
+type WithOptionalA = { a?: number };
+
+type WithA = { a: number };
+
+type WithB = { b: string };
+
+export const hasOwnNarrowsWhereTrue = (
+  u: unknown,
+  dict: Readonly<Record<string, number>>,
+  withX: WithX,
+  withOptionalA: WithOptionalA,
+  withOptionalAOrB: WithOptionalA | WithB,
+): void => {
+  if (typeof u === 'object' && u !== null && Object.hasOwn(u, 'a')) {
+    true satisfies TypeEq<typeof u, object & { a: unknown }>;
+  }
+
+  if (Object.hasOwn(dict, 'a')) {
+    true satisfies TypeEq<typeof dict.a, number>;
+  } else {
+    true satisfies TypeEq<typeof dict, Readonly<Record<string, number>>>;
+  }
+
+  // A value of `WithX` may hold more properties than `WithX` names.
+  if (Object.hasOwn(withX, 'y')) {
+    true satisfies TypeEq<typeof withX, WithX & { y: unknown }>;
+  } else {
+    true satisfies TypeEq<typeof withX, WithX>;
+  }
+
+  // `{}` is a `WithOptionalA`, and has no own `a`.
+  if (Object.hasOwn(withOptionalA, 'a')) {
+    true satisfies TypeEq<typeof withOptionalA.a, number | undefined>;
+  } else {
+    true satisfies TypeEq<typeof withOptionalA, WithOptionalA>;
+  }
+
+  if (Object.hasOwn(withOptionalKey, 'b')) {
+    true satisfies TypeEq<typeof withOptionalKey.b, string | undefined>;
+  } else {
+    true satisfies TypeEq<typeof withOptionalKey, WithOptionalKey>;
+  }
+
+  if (!Object.hasOwn(withOptionalAOrB, 'a')) {
+    true satisfies TypeEq<typeof withOptionalAOrB, WithOptionalA | WithB>;
+  }
+};
+
+export const hasOwnNarrowsNothing = (
+  withX: WithX,
+  withAOrB: WithA | WithB,
+  key: string,
+  xOrY: 'x' | 'y',
+): void => {
+  // A class instance whose `x` is a getter is a `WithX`, and has no own `x`.
+  if (Object.hasOwn(withX, 'x')) {
+    true satisfies TypeEq<typeof withX, WithX>;
+  } else {
+    true satisfies TypeEq<typeof withX, WithX>;
+  }
+
+  // Tell such a union apart by a discriminant property, or with a type guard
+  // written for the union.
+  if (Object.hasOwn(withAOrB, 'a')) {
+    true satisfies TypeEq<typeof withAOrB, WithA | WithB>;
+  } else {
+    true satisfies TypeEq<typeof withAOrB, WithA | WithB>;
+  }
+
+  if (Object.hasOwn(withX, key)) {
+    true satisfies TypeEq<typeof withX, WithX>;
+  } else {
+    true satisfies TypeEq<typeof withX, WithX>;
+  }
+
+  if (Object.hasOwn(withX, xOrY)) {
+    true satisfies TypeEq<typeof withX, WithX>;
+  } else {
+    true satisfies TypeEq<typeof withX, WithX>;
+  }
+};
+
+export const hasOwnOfOtherObjects: readonly boolean[] = [
+  Object.hasOwn(someObject, 'a'),
+  Object.hasOwn(new Counter(), 'count'),
+  Object.hasOwn([1, 2], 0),
+  Object.hasOwn(new Map<string, number>(), 'size'),
+];
+
+// @ts-expect-error A number is not an object.
+export const hasOwnOfNumber = Object.hasOwn(1, 'a');

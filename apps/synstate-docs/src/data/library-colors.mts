@@ -1,4 +1,4 @@
-import { hasKey } from 'ts-data-forge';
+import { keyIsIn } from 'ts-data-forge';
 
 /**
  * The colour each benchmark chart draws a library in, keyed by the `label` the
@@ -15,7 +15,7 @@ import { hasKey } from 'ts-data-forge';
  * cannot disagree on which labels have a colour.
  */
 export const libraryColorOf = (label: string): string | undefined =>
-  hasKey(libraryColors, label) ? libraryColors[label] : undefined;
+  keyIsIn(label, libraryColors) ? libraryColors[label] : undefined;
 
 /**
  * Whether a chart draws `label` dashed: the rows a runner labels `(naive…)`.

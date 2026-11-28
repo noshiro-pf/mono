@@ -202,7 +202,8 @@ type ReportContext = Readonly<{
 const getTypeArguments = (
   node: DeepReadonly<TSESTree.CallExpression>,
 ): TSESTree.TSTypeParameterInstantiation | undefined => {
-  const mutableNode = castDeepMutable(node);
+  const mutableNode: CallExpressionWithLegacyTypeParameters =
+    castDeepMutable(node);
 
   if (isRecord(mutableNode) && hasKey(mutableNode, 'typeArguments')) {
     return (
@@ -213,12 +214,9 @@ const getTypeArguments = (
     ).typeArguments;
   }
 
-  if (isRecord(mutableNode) && hasKey(mutableNode, 'typeParameters')) {
-    return (mutableNode as CallExpressionWithLegacyTypeParameters)
-      .typeParameters;
-  }
-
-  return undefined;
+  return isRecord(mutableNode) && hasKey(mutableNode, 'typeParameters')
+    ? mutableNode.typeParameters
+    : undefined;
 };
 
 const getArrowFunctionParameterType = ({
