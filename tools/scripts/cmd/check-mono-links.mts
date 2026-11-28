@@ -25,7 +25,12 @@ import {
  *   (`https://github.com/noshiro-pf/mono/blob/main/<path>`, and `tree`, `raw`,
  *   `edit`). A line anchor (`#L10`, `#L10-L20`) also has to fall inside the
  *   file, because a link to a line that has moved away is as broken as one to
- *   a file that has.
+ *   a file that has. One on any other ref fails unless the ref is a full
+ *   40-character commit SHA, which is not read: it says what it meant when it
+ *   was written. A branch can be renamed or deleted (`develop` was, leaving
+ *   the articles that named it dead), and a short SHA cannot be told from a
+ *   branch name. Resolving a branch against the remote is not done: a
+ *   `check:prose` guard does not depend on the network.
  * - a relative link (`[x](../../libs/synstate)`, `[y](docs/a.md)`) in any of
  *   the repository's own Markdown documents, which GitHub and npm render as
  *   they are — `isRepositoryProse` in `tools/scripts/lib/repo-files.mts` says
@@ -40,12 +45,17 @@ import {
  * because GitHub has only what is committed: a link to an untracked `dist/`
  * file works locally and nowhere else.
  *
- * A link into `experimental/` is not resolved, for the reason
- * `isUnderExperimental` gives.
+ * The Zenn content, `articles/*.md` and every `.md` under `books/`, is read for its
+ * absolute URLs alone: Zenn publishes it from here, so a URL in it is read by
+ * every reader of the article, and its relative links are Zenn's to resolve,
+ * not GitHub's. `isRepositoryProse` stays false for it, so the other prose
+ * guards leave published text alone.
  *
- * A URL pinned to a commit or another branch is not read; it says what it meant
- * when it was written. A URL with a placeholder in its path (`{path}`, `${…}`)
- * is a template, and is not read either. Heading anchors are not checked:
+ * A link on `main` into `experimental/` is not resolved, for the reason
+ * `isUnderExperimental` gives; one on another ref still fails.
+ *
+ * A URL with a placeholder in its path or ref (`{path}`, `${…}`) is a template,
+ * and is not read. Heading anchors are not checked:
  * GitHub's slugs are its own and change with the heading.
  *
  * External URLs are not this check's business; `link-check.yml` runs lychee
@@ -101,7 +111,7 @@ export const checkMonoLinks = async (): Promise<
 
   for (const { relativePath, links } of visited) {
     for (const link of links) {
-      if (isUnderExperimental(link.target)) {
+      if (link.ref === undefined && isUnderExperimental(link.target)) {
         continue;
       }
 
@@ -135,7 +145,12 @@ export const findMonoLinks = (
 
   return markdownLines(fileText).flatMap(({ line, text, fenced }) => [
     ...Array.from(text.matchAll(MONO_URL), (matched) =>
-      toAbsoluteLink(matched[0], line),
+      toAbsoluteLink(
+        matched[0],
+        matched.groups?.['ref'] ?? '',
+        matched.groups?.['rest'] ?? '',
+        line,
+      ),
     ).filter((link) => link !== undefined),
     // A link written in code is an example of one, and is not rendered.
     ...(readsRelative && !fenced
@@ -156,6 +171,10 @@ export const brokenReason = async (
   tree: Tree,
   mut_lineCounts: Map<string, number>,
 ): Promise<string | undefined> => {
+  if (link.ref !== undefined) {
+    return `names the ref \`${link.ref}\`, neither main nor a full commit SHA: a branch can be renamed or deleted`;
+  }
+
   const isFile = tree.files.has(link.target);
 
   if (!isFile && !tree.directories.has(link.target)) {
@@ -182,11 +201,12 @@ export const brokenReason = async (
 
 /**
  * Whether the links of the tracked file at `relativePath` are read: the
- * repository's own Markdown, and the files {@link isInScope} with a scanned
- * extension.
+ * repository's own Markdown, the Zenn content's Markdown (its absolute URLs
+ * alone), and the files {@link isInScope} with a scanned extension.
  */
 export const isScanned = (relativePath: string): boolean =>
   isRepositoryProse(relativePath) ||
+  ZENN_CONTENT.test(relativePath) ||
   (isInScope(relativePath) &&
     SCANNED_EXTENSIONS.has(path.extname(relativePath)));
 
@@ -207,6 +227,12 @@ export type MonoLink = Readonly<{
   /** The path it points at, from the repository root, with no trailing `/`. */
   target: string;
   lines: Readonly<{ first: number; last: number }> | undefined;
+  /**
+   * For an absolute URL on a ref other than `main` (and not a full commit SHA,
+   * which is not read), that ref; `undefined` otherwise. Such a link fails
+   * whatever its path.
+   */
+  ref: string | undefined;
 }>;
 
 type BrokenLink = Readonly<{
@@ -243,14 +269,18 @@ const SCANNED_EXTENSIONS: ReadonlySet<string> = new Set<string>([
 ]);
 
 /**
- * An absolute URL into this repository on `main`, up to whitespace, a quote, a
- * bracket or a backtick. The query and the fragment are split off after.
+ * An absolute URL into this repository on any ref, up to whitespace, a quote, a
+ * bracket or a backtick: the ref is judged after the match. The query and the
+ * fragment are split off after.
  */
 const MONO_URL =
-  /https:\/\/github\.com\/noshiro-pf\/mono\/(?:blob|tree|raw|edit)\/main\/[^\s"'`<>()[\]]+/gu;
+  /https:\/\/github\.com\/noshiro-pf\/mono\/(?:blob|tree|raw|edit)\/(?<ref>[^/\s"'`<>()[\]]+)\/(?<rest>[^\s"'`<>()[\]]+)/gu;
 
-/** What comes before a path in {@link MONO_URL}. */
-const BRANCH_SEGMENT = '/main/';
+/** A full commit SHA, the one ref besides `main` that cannot move. */
+const FULL_SHA = /^[\da-f]{40}$/u;
+
+/** The Markdown Zenn publishes: `articles/*.md` and every `.md` under `books/`. */
+const ZENN_CONTENT = /^(?:articles\/[^/]+|books\/.+)\.md$/u;
 
 /** A Markdown link or image with no title: `[x](./a.md)`. */
 const MARKDOWN_LINK = /\]\(([^\s()]+)\)/gu;
@@ -350,21 +380,34 @@ const decodePath = (encoded: string): string => {
   return Result.isErr(decoded) ? encoded : decoded.value;
 };
 
+/** `matchedText` as {@link MONO_URL} matched it, with its `ref` and `rest` groups. */
 const toAbsoluteLink = (
   matchedText: string,
+  ref: string,
+  rest: string,
   line: number,
 ): MonoLink | undefined => {
+  if (FULL_SHA.test(ref) || isTemplate(ref)) {
+    return undefined;
+  }
+
   const written = matchedText.replace(TRAILING_PUNCTUATION, '');
 
   const { linkPath, fragment } = splitFragment(
-    written.slice(written.indexOf(BRANCH_SEGMENT) + BRANCH_SEGMENT.length),
+    rest.replace(TRAILING_PUNCTUATION, ''),
   );
 
   const target = decodePath(linkPath).replace(/\/+$/u, '');
 
   return isTemplate(target)
     ? undefined
-    : { line, written, target, lines: toLineRange(fragment) };
+    : {
+        line,
+        written,
+        target,
+        lines: toLineRange(fragment),
+        ref: ref === 'main' ? undefined : ref,
+      };
 };
 
 /**
@@ -396,7 +439,7 @@ const toRelativeLink = (
 
   return isTemplate(target)
     ? undefined
-    : { line, written, target, lines: toLineRange(fragment) };
+    : { line, written, target, lines: toLineRange(fragment), ref: undefined };
 };
 
 const countLines = async (relativePath: string): Promise<number> => {
@@ -420,8 +463,8 @@ const formatBroken = (broken: readonly BrokenLink[]): string =>
         `  ${relativePath}:${link.line}  ${link.written}\n      ${reason}`,
     ),
     '',
-    'Point each one at where the file is now. A file that is gone for good',
-    'can be linked at the last commit that had it',
+    'Point each one at where the file is now, on main. A file that is gone for',
+    'good can be linked at the last commit that had it, by its full SHA',
     '(`git log -1 --format=%H -- <path>`, then its parent), which this check',
     'does not read.',
   ].join('\n');
