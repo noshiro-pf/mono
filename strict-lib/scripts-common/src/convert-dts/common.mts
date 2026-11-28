@@ -7,7 +7,6 @@ import { generateKeyValueRecordFromKeys } from '../functions/utils/node-utils.mj
 import { brandedNumberFromTypeUtils } from './constants.mjs';
 
 export type ConverterConfig = Readonly<{
-  commentOutDeprecated: boolean;
   returnType: 'mutable' | 'readonly';
   useBrandedNumber: boolean;
 }>;

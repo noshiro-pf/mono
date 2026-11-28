@@ -32,7 +32,6 @@ import { convertLibEs2017Sharedmemory } from './lib.es2017.sharedmemory.mjs';
 import { convertLibEs2017String } from './lib.es2017.string.mjs';
 import { convertLibEs2019Array } from './lib.es2019.array.mjs';
 import { convertLibEs2019Object } from './lib.es2019.object.mjs';
-import { convertLibEs2019String } from './lib.es2019.string.mjs';
 import { convertLibEs2020Bigint } from './lib.es2020.bigint.mjs';
 import { convertLibEs2020Sharedmemory } from './lib.es2020.sharedmemory.mjs';
 import { convertLibEs2022Array } from './lib.es2022.array.mjs';
@@ -290,7 +289,8 @@ const perFileConverters: ReadonlyMap<string, PerFileConverter> = new Map(
 
     'lib.es2019.object.d.ts': convertLibEs2019Object,
 
-    'lib.es2019.string.d.ts': convertLibEs2019String,
+    // `trimLeft` / `trimRight`, deprecated aliases kept as they are.
+    'lib.es2019.string.d.ts': () => idFn,
 
     'lib.es2020.bigint.d.ts': convertLibEs2020Bigint,
 

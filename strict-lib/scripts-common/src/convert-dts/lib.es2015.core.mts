@@ -12,7 +12,7 @@ export const convertLibEs2015Core =
   ({
     brandedNumber,
     readonlyModifier,
-    config: { commentOutDeprecated, returnType, useBrandedNumber },
+    config: { returnType, useBrandedNumber },
   }: ConverterOptions): MonoTypeFunction<string> =>
   (src) =>
     pipe(src).map(
@@ -245,32 +245,5 @@ export const convertLibEs2015Core =
             `fromCodePoint(...codePoints: readonly ${brandedNumber.Uint32}[]): string`,
           ),
         }),
-
-        ...(!commentOutDeprecated
-          ? []
-          : [
-              'anchor(name: string): string;',
-              'big(): string;',
-              'blink(): string;',
-              'bold(): string;',
-              'fixed(): string;',
-              'fontcolor(color: string): string;',
-              'fontsize(size: number): string;',
-              'fontsize(size: string): string;',
-              'italics(): string;',
-              'link(url: string): string;',
-              'small(): string;',
-              'strike(): string;',
-              'sub(): string;',
-              'sup(): string;',
-            ].map(
-              // comment out deprecated functions
-              (line) =>
-                replaceWithNoMatchCheck(
-                  //
-                  line,
-                  `// ${line}`,
-                ),
-            )),
       ),
     ).value;

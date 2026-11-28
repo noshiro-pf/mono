@@ -132,12 +132,10 @@ export type StrictTsLibPaths = ReturnType<typeof buildPaths>;
 const defaultConfigs = [
   {
     useBrandedNumber: false,
-    commentOutDeprecated: false,
     returnType: 'mutable',
   },
   {
     useBrandedNumber: true,
-    commentOutDeprecated: false,
     returnType: 'readonly',
   },
 ] as const satisfies readonly ConverterConfig[];
